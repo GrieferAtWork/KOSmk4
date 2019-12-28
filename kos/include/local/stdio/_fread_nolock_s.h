@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd3a5bd9 */
+/* HASH CRC-32:0x438e9504 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __LOCAL_LIBC(_fread_nolock_s) __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __SIZE_TYPE_
                                                 __SIZE_TYPE__ __elemsize,
                                                 __SIZE_TYPE__ __elemcount,
                                                 __FILE *__restrict __stream) __THROWS(...) {
-#line 2742 "kos/src/libc/magic/stdio.c"
+#line 2743 "kos/src/libc/magic/stdio.c"
 	__bufsize = __elemsize ? __bufsize / __elemsize : 0;
 	return __localdep_fread_unlocked(__buf, __elemsize, __bufsize < __elemcount ? __bufsize : __elemcount, __stream);
 }

@@ -1926,6 +1926,7 @@ REF struct vfs *(KCALL vfs_alloc)(void) THROWS(E_BADALLOC) {
 PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct vfs *KCALL
 vfs_clone(struct vfs *__restrict self) THROWS(E_BADALLOC) {
 	(void)self;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 

@@ -549,11 +549,11 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 
-INTDEF void KCALL
+INTDEF ATTR_COLD void KCALL
 kernel_halt_dump_traceback(pformatprinter printer, void *arg,
                            struct ucpustate *__restrict state);
 
-INTERN void FCALL
+INTERN ATTR_COLD void FCALL
 halt_unhandled_exception(unsigned int unwind_error,
                          struct kcpustate *__restrict unwind_state) {
 	struct exception_info *info;

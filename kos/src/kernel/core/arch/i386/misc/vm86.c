@@ -33,6 +33,7 @@ PUBLIC u8 KCALL
 x86_vm86_inb(struct icpustate *__restrict state, u16 port) {
 	(void)state;
 	(void)port;
+	COMPILER_IMPURE();
 	THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 }
 
@@ -40,6 +41,7 @@ PUBLIC u16 KCALL
 x86_vm86_inw(struct icpustate *__restrict state, u16 port) {
 	(void)state;
 	(void)port;
+	COMPILER_IMPURE();
 	THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 }
 
@@ -47,6 +49,7 @@ PUBLIC u32 KCALL
 x86_vm86_inl(struct icpustate *__restrict state, u16 port) {
 	(void)state;
 	(void)port;
+	COMPILER_IMPURE();
 	THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 }
 
@@ -55,6 +58,7 @@ x86_vm86_outb(struct icpustate *__restrict state, u16 port, u8 value) {
 	(void)state;
 	(void)port;
 	(void)value;
+	COMPILER_IMPURE();
 	THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 }
 
@@ -63,6 +67,7 @@ x86_vm86_outw(struct icpustate *__restrict state, u16 port, u16 value) {
 	(void)state;
 	(void)port;
 	(void)value;
+	COMPILER_IMPURE();
 	THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 }
 
@@ -71,6 +76,7 @@ x86_vm86_outl(struct icpustate *__restrict state, u16 port, u32 value) {
 	(void)state;
 	(void)port;
 	(void)value;
+	COMPILER_IMPURE();
 	THROW(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE);
 }
 

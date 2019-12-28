@@ -41,7 +41,7 @@
 
 #ifdef __CC__
 /* IEEE positive infinity. */
-#if __GCC_VERSION(3, 3, 0) || __has_builtin(__builtin_inff)
+#if __has_builtin(__builtin_inff)
 #define INFINITY __builtin_inff()
 #else
 #include <bits/huge_valf.h>

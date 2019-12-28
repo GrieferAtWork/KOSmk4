@@ -44,12 +44,12 @@
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 __SYSDECL_BEGIN
 
-#if __GCC_VERSION(3, 3, 0) || __has_builtin(__builtin_huge_vall)
+#if __has_builtin(__builtin_huge_vall)
 #define HUGE_VALL (__builtin_huge_vall())
 #else /* ... */
 #include <hybrid/typecore.h>
 #if __SIZEOF_LONG_DOUBLE__ == 12
-#if __GCC_VERSION(2, 96, 0)
+#if defined(__GNUC__) && __GCC_VERSION_NUM >= 29600
 #define HUGE_VALL (__extension__ 0x1.0p32767L)
 #elif defined(__GNUC__)
 #define HUGE_VALL (__extension__((union { __BYTE_TYPE__ __c[12]; long double __ld; }) { { 0, 0, 0, 0, 0, 0, 0, 0x80, 0xff, 0x7f, 0, 0 } }).__ld)
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_END
 #define HUGE_VALL (__NAMESPACE_LOCAL_SYM __huge_valf.__ld)
 #endif /* !... */
 #elif __SIZEOF_LONG_DOUBLE__ == 8
-#if __GCC_VERSION(2, 96, 0)
+#if defined(__GNUC__) && __GCC_VERSION_NUM >= 29600
 #define HUGE_VALL (__extension__ 0x1.0p2047)
 #elif defined(__GNUC__)
 #define HUGE_VALL (__extension__((union { __UINT64_TYPE__ __l; long double __ld; }) { 0x7ff0000000000000ULL }).__ld)
@@ -88,7 +88,7 @@ __NAMESPACE_LOCAL_END
 #define HUGE_VALL (__NAMESPACE_LOCAL_SYM __huge_valf.__ld)
 #endif /* !... */
 #elif __SIZEOF_LONG_DOUBLE__ == 4
-#if __GCC_VERSION(2, 96, 0)
+#if defined(__GNUC__) && __GCC_VERSION_NUM >= 29600
 #define HUGE_VALL (__extension__ 0x1.0p255f)
 #elif defined(__GNUC__)
 #define HUGE_VALL (__extension__((union { __UINT32_TYPE__ __l; long double __ld; }) { 0x7f800000UL }).__ld)

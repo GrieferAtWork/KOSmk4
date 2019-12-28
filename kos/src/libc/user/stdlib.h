@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6aea9082 */
+/* HASH CRC-32:0x493570c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,8 +167,6 @@ INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char c
 INTDEF void NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__set_error_mode)(int mode);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq, unsigned int duration);
-INTDEF ATTR_COLD void NOTHROW_RPC(LIBCCALL libc__wperror)(char32_t const *errmsg);
-INTDEF ATTR_COLD void NOTHROW_RPC(LIBDCALL libd__wperror)(char16_t const *errmsg);
 INTDEF onexit_t NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func);
 
 DECL_END

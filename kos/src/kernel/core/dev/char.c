@@ -535,9 +535,9 @@ INTERN size_t KCALL
 handle_characterdevice_read(struct character_device *__restrict self,
                             USER CHECKED void *dst, size_t num_bytes,
                             iomode_t mode) {
-	if (self->cd_type.ct_read)
+	if likely(self->cd_type.ct_read)
 		return (*self->cd_type.ct_read)(self, dst, num_bytes, mode);
-	if (self->cd_type.ct_pread)
+	if likely(self->cd_type.ct_pread)
 		return (*self->cd_type.ct_pread)(self, dst, num_bytes, 0, mode);
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_READ);
@@ -547,9 +547,9 @@ INTERN size_t KCALL
 handle_characterdevice_write(struct character_device *__restrict self,
                              USER CHECKED void const *src, size_t num_bytes,
                              iomode_t mode) {
-	if (self->cd_type.ct_write)
+	if likely(self->cd_type.ct_write)
 		return (*self->cd_type.ct_write)(self, src, num_bytes, mode);
-	if (self->cd_type.ct_pwrite)
+	if likely(self->cd_type.ct_pwrite)
 		return (*self->cd_type.ct_pwrite)(self, src, num_bytes, 0, mode);
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_WRITE);
@@ -559,7 +559,7 @@ INTERN size_t KCALL
 handle_characterdevice_pread(struct character_device *__restrict self,
                              USER CHECKED void *dst, size_t num_bytes,
                              pos_t addr, iomode_t mode) {
-	if (self->cd_type.ct_pread)
+	if likely(self->cd_type.ct_pread)
 		return (*self->cd_type.ct_pread)(self, dst, num_bytes, addr, mode);
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_READ);
@@ -569,7 +569,7 @@ INTERN size_t KCALL
 handle_characterdevice_pwrite(struct character_device *__restrict self,
                               USER CHECKED void const *src, size_t num_bytes,
                               pos_t addr, iomode_t mode) {
-	if (self->cd_type.ct_pwrite)
+	if likely(self->cd_type.ct_pwrite)
 		return (*self->cd_type.ct_pwrite)(self, src, num_bytes, addr, mode);
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_WRITE);
@@ -583,7 +583,7 @@ handle_characterdevice_readv(struct character_device *__restrict self,
 	size_t temp, result = 0;
 	assert(num_bytes == aio_buffer_size(dst));
 	(void)num_bytes;
-	if (self->cd_type.ct_read) {
+	if likely(self->cd_type.ct_read) {
 		AIO_BUFFER_FOREACH(ent, dst) {
 			temp = (*self->cd_type.ct_read)(self,
 			                                ent.ab_base,
@@ -593,7 +593,7 @@ handle_characterdevice_readv(struct character_device *__restrict self,
 			if (temp != ent.ab_size)
 				break;
 		}
-	} else if (self->cd_type.ct_pread) {
+	} else if likely(self->cd_type.ct_pread) {
 		AIO_BUFFER_FOREACH(ent, dst) {
 			temp = (*self->cd_type.ct_pread)(self,
 			                                 ent.ab_base,
@@ -619,7 +619,7 @@ handle_characterdevice_writev(struct character_device *__restrict self,
 	size_t temp, result = 0;
 	assert(num_bytes == aio_buffer_size(src));
 	(void)num_bytes;
-	if (self->cd_type.ct_write) {
+	if likely(self->cd_type.ct_write) {
 		AIO_BUFFER_FOREACH(ent, src) {
 			temp = (*self->cd_type.ct_write)(self,
 			                                 ent.ab_base,
@@ -629,7 +629,7 @@ handle_characterdevice_writev(struct character_device *__restrict self,
 			if (temp != ent.ab_size)
 				break;
 		}
-	} else if (self->cd_type.ct_pwrite) {
+	} else if likely(self->cd_type.ct_pwrite) {
 		AIO_BUFFER_FOREACH(ent, src) {
 			temp = (*self->cd_type.ct_pwrite)(self,
 			                                  ent.ab_base,
@@ -655,7 +655,7 @@ handle_characterdevice_preadv(struct character_device *__restrict self,
 	size_t result = 0;
 	assert(num_bytes == aio_buffer_size(dst));
 	(void)num_bytes;
-	if (self->cd_type.ct_pread) {
+	if likely(self->cd_type.ct_pread) {
 		AIO_BUFFER_FOREACH(ent, dst) {
 			size_t temp;
 			temp = (*self->cd_type.ct_pread)(self,
@@ -683,7 +683,7 @@ handle_characterdevice_pwritev(struct character_device *__restrict self,
 	size_t result = 0;
 	assert(num_bytes == aio_buffer_size(src));
 	(void)num_bytes;
-	if (self->cd_type.ct_pwrite) {
+	if likely(self->cd_type.ct_pwrite) {
 		AIO_BUFFER_FOREACH(ent, src) {
 			size_t temp;
 			temp = (*self->cd_type.ct_pwrite)(self,
@@ -715,7 +715,7 @@ DEFINE_HANDLE_APWRITEV_FROM_PWRITEV(characterdevice, struct character_device)
 INTERN syscall_slong_t KCALL
 handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
                              USER UNCHECKED void *arg, iomode_t mode) {
-	if (self->cd_type.ct_ioctl)
+	if likely(self->cd_type.ct_ioctl)
 		return (*self->cd_type.ct_ioctl)(self, cmd, arg, mode);
 	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
@@ -726,7 +726,7 @@ INTERN NONNULL((1)) REF struct vm_datablock *KCALL
 handle_characterdevice_mmap(struct character_device *__restrict self,
                             pos_t *__restrict pminoffset,
                             pos_t *__restrict pnumbytes) THROWS(...) {
-	if (self->cd_type.ct_mmap)
+	if likely(self->cd_type.ct_mmap)
 		return (*self->cd_type.ct_mmap)(self, pminoffset, pnumbytes);
 	THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 	      E_FILESYSTEM_OPERATION_MMAP);
@@ -749,7 +749,7 @@ handle_characterdevice_stat(struct character_device *__restrict self,
 	result->st_mode = (result->st_mode & ~S_IFMT) | S_IFCHR;
 	result->st_dev  = (__dev_t)character_device_devno(self);
 	result->st_rdev = (__dev_t)character_device_devno(self);
-	if unlikely(self->cd_type.ct_stat)
+	if (self->cd_type.ct_stat)
 		(*self->cd_type.ct_stat)(self, result);
 }
 
@@ -769,6 +769,7 @@ handle_characterdevice_hop(struct character_device *__restrict self,
 	(void)self;
 	(void)arg;
 	(void)mode;
+	COMPILER_IMPURE();
 	switch (cmd) {
 
 		/* TODO */

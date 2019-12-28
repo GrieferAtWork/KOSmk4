@@ -2573,6 +2573,7 @@ handle_pidns_hop(struct pidns *__restrict self,
 	(void)self;
 	(void)arg;
 	(void)mode;
+	COMPILER_IMPURE();
 	switch (cmd) {
 
 	/* TODO */

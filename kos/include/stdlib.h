@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e09d906 */
+/* HASH CRC-32:0x3f837b08 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3088,9 +3088,14 @@ __CDECLARE_VOID(,__NOTHROW_NCX,_beep,(unsigned int __freq, unsigned int __durati
 
 #ifndef _CRT_WPERROR_DEFINED
 #define _CRT_WPERROR_DEFINED 1
+#ifndef ___wperror_defined
+#define ___wperror_defined 1
 #ifdef __CRT_HAVE__wperror
-__CDECLARE_VOID(__ATTR_COLD,__NOTHROW_RPC,_wperror,(wchar_t const *__errmsg),(__errmsg))
+__CDECLARE_VOID(__ATTR_COLD,,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message)) __THROWS(...)
+#else /* LIBC: _wperror */
+#undef ___wperror_defined
 #endif /* _wperror... */
+#endif /* !___wperror_defined */
 #endif /* !_CRT_WPERROR_DEFINED */
 #ifdef __CRT_HAVE__sleep
 /* >> sleep(3)

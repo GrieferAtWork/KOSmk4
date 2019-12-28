@@ -180,8 +180,8 @@ PRIVATE ATTR_SECTION(".rodata.crt.errno.strsignal.unknown_error_format") char co
 /*[[[skip:strerrorname_s]]]*/
 
 
-/*[[[head:strerror,hash:CRC-32=0x48cde331]]]*/
-INTERN ATTR_RETNONNULL WUNUSED
+/*[[[head:strerror,hash:CRC-32=0x21c3a6e0]]]*/
+INTERN ATTR_COLD ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.errno.strerror") char *
 NOTHROW_NCX(LIBCCALL libc_strerror)(int errnum)
 /*[[[body:strerror]]]*/
@@ -242,8 +242,8 @@ NOTHROW_NCX(LIBCCALL libc_strsignal)(int signo)
 }
 /*[[[end:strsignal]]]*/
 
-/*[[[head:strerror_r,hash:CRC-32=0x97942068]]]*/
-INTERN ATTR_RETNONNULL NONNULL((2))
+/*[[[head:strerror_r,hash:CRC-32=0x33f9bcd5]]]*/
+INTERN ATTR_COLD ATTR_RETNONNULL NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.errno.strerror_r") char *
 NOTHROW_NCX(LIBCCALL libc_strerror_r)(int errnum,
                                       char *buf,
@@ -406,8 +406,8 @@ NOTHROW_RPC(LIBDCALL libd__strerror_s)(char *__restrict buf,
 }
 /*[[[end:DOS$_strerror_s]]]*/
 
-/*[[[head:strerror_l,hash:CRC-32=0xe0b038e7]]]*/
-INTERN WUNUSED
+/*[[[head:strerror_l,hash:CRC-32=0x2e29481d]]]*/
+INTERN ATTR_COLD WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.errno.strerror_l") char *
 NOTHROW_NCX(LIBCCALL libc_strerror_l)(int errnum,
                                       locale_t locale)

@@ -2713,8 +2713,9 @@ vsnprintf_s:([outp_opt(min(return, buflen, bufsize))] char *__restrict buf,
 %
 %#ifndef _CRT_WPERROR_DEFINED
 %#define _CRT_WPERROR_DEFINED 1
-%[default_impl_section(.text.crt.dos.errno.utility)]
-[cp_stdio][wchar][ATTR_COLD] _wperror:($wchar_t const *__restrict message);
+[section(.text.crt.dos.errno.utility)]
+[cp_stdio][wchar][ATTR_COLD][guard] /* TODO: Use `_CRT_WPERROR_DEFINED' as guard macro */
+_wperror:($wchar_t const *__restrict message);
 %#endif /* !_CRT_WPERROR_DEFINED */
 %
 %#endif /* _STDIO_DEFINED */

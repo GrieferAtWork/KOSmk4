@@ -82,6 +82,7 @@ handle_vm_hop(struct vm *__restrict self, syscall_ulong_t cmd,
 	(void)self;
 	(void)arg;
 	(void)mode;
+	COMPILER_IMPURE();
 	switch (cmd) {
 
 	/* TODO */

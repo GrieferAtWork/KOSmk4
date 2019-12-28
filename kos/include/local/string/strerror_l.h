@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ee820f9 */
+/* HASH CRC-32:0x91969c2c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_strerror_defined
 #define ____localdep_strerror_defined 1
 #ifdef __CRT_HAVE_strerror
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(int __errnum),strerror,(__errnum))
+__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(int __errnum),strerror,(__errnum))
 #else /* LIBC: strerror */
 #include <local/string/strerror.h>
 #define __localdep_strerror (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror))
@@ -32,7 +32,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_str
 #endif /* !____localdep_strerror_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strerror_l) __ATTR_WUNUSED char *
+__LOCAL_LIBC(strerror_l) __ATTR_COLD __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror_l))(int __errnum,
                                                         __locale_t __locale) {
 #line 500 "kos/src/libc/magic/string.c"

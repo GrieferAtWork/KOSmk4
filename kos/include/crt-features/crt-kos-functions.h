@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1ee80f4 */
+/* HASH CRC-32:0xd6af57ef */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3524,7 +3524,7 @@ __CRT_KOS_WCHAR_FUNCTION(_wfdopen,0,(),2,(fd_t,fd,char32_t const *,mode),FILE *)
 __CRT_KOS_WCHAR_FUNCTION(_wfopen_s,0,(),3,(FILE **,pstream,char32_t const *,filename,char32_t const *,mode),errno_t)
 __CRT_KOS_WCHAR_FUNCTION(_wfreopen_s,0,(),4,(FILE **,pstream,char32_t const *,filename,char32_t const *,mode,FILE *,stream),errno_t)
 __CRT_KOS_WCHAR_FUNCTION(_wfsopen,0,(),3,(char32_t const *,filename,char32_t const *,mode,int,sh_flag),FILE *)
-__CRT_KOS_WCHAR_FUNCTION(_wperror,0,(),1,(char32_t const *,errmsg),void)
+__CRT_KOS_WCHAR_FUNCTION(_wperror,0,(),1,(char32_t const *__restrict,message),void)
 __CRT_KOS_WCHAR_FUNCTION(_wprintf_l,0,(),VA(2),(char32_t const *,format,locale_t,locale),__STDC_INT_AS_SSIZE_T)
 __CRT_KOS_WCHAR_FUNCTION(_wprintf_p,0,(),VA(1),(char32_t const *,format),__STDC_INT_AS_SSIZE_T)
 __CRT_KOS_WCHAR_FUNCTION(_wprintf_p_l,0,(),VA(2),(char32_t const *,format,locale_t,locale),__STDC_INT_AS_SSIZE_T)
@@ -3848,7 +3848,7 @@ __CRT_DOS_WCHAR_FUNCTION(_wfdopen,0,(),2,(fd_t,fd,char16_t const *,mode),FILE *)
 __CRT_DOS_WCHAR_FUNCTION(_wfopen_s,0,(),3,(FILE **,pstream,char16_t const *,filename,char16_t const *,mode),errno_t)
 __CRT_DOS_WCHAR_FUNCTION(_wfreopen_s,0,(),4,(FILE **,pstream,char16_t const *,filename,char16_t const *,mode,FILE *,stream),errno_t)
 __CRT_DOS_WCHAR_FUNCTION(_wfsopen,0,(),3,(char16_t const *,filename,char16_t const *,mode,int,sh_flag),FILE *)
-__CRT_DOS_WCHAR_FUNCTION(_wperror,0,(),1,(char16_t const *,errmsg),void)
+__CRT_DOS_WCHAR_FUNCTION(_wperror,0,(),1,(char16_t const *__restrict,message),void)
 __CRT_DOS_WCHAR_FUNCTION(_wprintf_l,0,(),VA(2),(char16_t const *,format,locale_t,locale),__STDC_INT_AS_SSIZE_T)
 __CRT_DOS_WCHAR_FUNCTION(_wprintf_p,0,(),VA(1),(char16_t const *,format),__STDC_INT_AS_SSIZE_T)
 __CRT_DOS_WCHAR_FUNCTION(_wprintf_p_l,0,(),VA(2),(char16_t const *,format,locale_t,locale),__STDC_INT_AS_SSIZE_T)

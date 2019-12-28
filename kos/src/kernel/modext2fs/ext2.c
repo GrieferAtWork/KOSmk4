@@ -60,6 +60,7 @@ Ext2_VWriteToINode(struct inode *__restrict self,
 	(void)buf;
 	(void)bufsize;
 	(void)pos;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -72,6 +73,7 @@ Ext2_ReadFromINode(struct inode *__restrict self,
 	(void)bufsize;
 	(void)pos;
 	(void)aio;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -84,6 +86,7 @@ Ext2_WriteToINode(struct inode *__restrict self,
 	(void)bufsize;
 	(void)pos;
 	(void)aio;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -96,6 +99,7 @@ Ext2_ReadFromINodePhys(struct inode *__restrict self,
 	(void)bufsize;
 	(void)pos;
 	(void)aio;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -108,6 +112,7 @@ Ext2_WriteToINodePhys(struct inode *__restrict self,
 	(void)bufsize;
 	(void)pos;
 	(void)aio;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -120,6 +125,7 @@ Ext2_ReadFromINodeVector(struct inode *__restrict self,
 	(void)bufsize;
 	(void)pos;
 	(void)aio;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -132,6 +138,7 @@ Ext2_WriteToINodeVector(struct inode *__restrict self,
 	(void)bufsize;
 	(void)pos;
 	(void)aio;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -144,6 +151,7 @@ Ext2_ReadFromINodeVectorPhys(struct inode *__restrict self,
 	(void)bufsize;
 	(void)pos;
 	(void)aio;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -156,6 +164,7 @@ Ext2_WriteToINodeVectorPhys(struct inode *__restrict self,
 	(void)bufsize;
 	(void)pos;
 	(void)aio;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 

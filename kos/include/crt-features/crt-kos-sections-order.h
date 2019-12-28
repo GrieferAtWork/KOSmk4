@@ -350,7 +350,7 @@
 	CB(PREFIX.dos.unicode.locale.format.scanf.*) \
 	CB(PREFIX.dos.random.*) \
 	CB(PREFIX.dos.math.utility.*) \
-	CB(PREFIX.dos.errno.*) \
+	CB(PREFIX.dos.errno.utility.* PREFIX.dos.errno.*) \
 	CB(PREFIX.dos.utility.*) \
 	CB(PREFIX.dos.system.utility.* PREFIX.dos.system.*) \
 	CB(PREFIX.dos.unsorted.*) \
@@ -385,7 +385,7 @@
 	CB(PREFIX.dos.wchar.unicode.static.mbs.*) \
 	CB(PREFIX.dos.wchar.unicode.convert.*) \
 	CB(PREFIX.dos.wchar.fs.modify_time.*) \
-	CB(PREFIX.dos.wchar.errno.utility.* PREFIX.dos.wchar.errno.*) \
+	CB(PREFIX.dos.wchar.errno.*) \
 /**/
 //[[[end]]]
 

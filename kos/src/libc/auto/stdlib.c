@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7dc5a940 */
+/* HASH CRC-32:0xe772e9d8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1825,7 +1825,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.itoa") char *
 NOTHROW_NCX(LIBCCALL libc_itoa)(int val,
                                 char *dst,
                                 int radix) {
-#line 2976 "kos/src/libc/magic/stdlib.c"
+#line 2975 "kos/src/libc/magic/stdlib.c"
 	libc__itoa_s(val, dst, (size_t)-1, radix);
 	return dst;
 }
@@ -1835,7 +1835,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.ltoa") char *
 NOTHROW_NCX(LIBCCALL libc_ltoa)(long val,
                                 char *dst,
                                 int radix) {
-#line 2984 "kos/src/libc/magic/stdlib.c"
+#line 2983 "kos/src/libc/magic/stdlib.c"
 	libc__ltoa_s(val, dst, (size_t)-1, radix);
 	return dst;
 }
@@ -1845,7 +1845,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.ultoa") char *
 NOTHROW_NCX(LIBCCALL libc_ultoa)(unsigned long val,
                                  char *dst,
                                  int radix) {
-#line 2991 "kos/src/libc/magic/stdlib.c"
+#line 2990 "kos/src/libc/magic/stdlib.c"
 	libc__ultoa_s(val, dst, (size_t)-1, radix);
 	return dst;
 }
@@ -1856,7 +1856,7 @@ NOTHROW_NCX(LIBCCALL libc_strto64_l)(char const *__restrict nptr,
                                      char **endptr,
                                      int base,
                                      locale_t locale) {
-#line 3023 "kos/src/libc/magic/stdlib.c"
+#line 3022 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_strto64(nptr, endptr, base);
 }
@@ -1867,7 +1867,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_l)(char const *__restrict nptr,
                                       char **endptr,
                                       int base,
                                       locale_t locale) {
-#line 3032 "kos/src/libc/magic/stdlib.c"
+#line 3031 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_strtou64(nptr, endptr, base);
 }

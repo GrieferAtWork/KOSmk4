@@ -153,8 +153,14 @@ CC_FLAGS({
 
 	"-Wsuggest-attribute=pure",
 	"-Wsuggest-attribute=const",
-	"-Wsuggest-attribute=cold",
 	"-Wsuggest-attribute=malloc",
+
+	/* cold attribute suggestions are broken at the moment:
+	 * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93087
+	 * If (and once) they get fixed, and I've updated the
+	 * toolchain, this'll get enabled again. */
+//	"-Wsuggest-attribute=cold",
+
 //	"-Wsuggest-attribute=noreturn", /* Causes warnings about functions with `kernel_panic("TODO")', so nope! */
 
 	/* KOS never assumes _signed_ overflow (only unsigned overflow),

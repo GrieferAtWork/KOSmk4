@@ -79,7 +79,7 @@ __SYSDECL_BEGIN
 __SYSDECL_END
 #include "__atomic-libatomic.h"
 __SYSDECL_BEGIN
-#elif __GCC_VERSION(4, 7, 0) || defined(____INTELLISENSE_STDINC_COMMON_H)
+#elif (defined(__GNUC__) && __GCC_VERSION_NUM >= 40700) || defined(____INTELLISENSE_STDINC_COMMON_H)
 
 /************************************************************************/
 /* __atomic_xxx()                                                       */
@@ -143,7 +143,7 @@ __SYSDECL_BEGIN
 #define __impl_hybrid_atomic_fetchor_seqcst(x, v)   __sync_fetch_and_or(&(x), v)
 #define __impl_hybrid_atomic_fetchand_seqcst(x, v)  __sync_fetch_and_and(&(x), v)
 #define __impl_hybrid_atomic_fetchxor_seqcst(x, v)  __sync_fetch_and_xor(&(x), v)
-#if !defined(__GNUC__) || __GCC_VERSION(4, 4, 0)
+#if !defined(__GNUC__) || __GCC_VERSION_NUM >= 40400
 #define __impl_hybrid_atomic_fetchnand_seqcst(x, v) __sync_fetch_and_nand(&(x), v)
 #define __impl_hybrid_atomic_nandfetch_seqcst(x, v) __sync_nand_and_fetch(&(x), v)
 #endif /* GCC 4.4 */

@@ -24,9 +24,9 @@
 
 #if defined(__x86_64__) && defined(__FAST_MATH__)
 #if defined(_OPENMP) && _OPENMP >= 201307
-#   define __DECL_SIMD_x86_64 _Pragma("omp declare simd notinbranch")
-#elif __GCC_VERSION(6,0,0)
-#   define __DECL_SIMD_x86_64 __attribute__((__simd__ ("notinbranch")))
+#define __DECL_SIMD_x86_64 _Pragma("omp declare simd notinbranch")
+#elif defined(__GNUC__) && __GCC_VERSION_NUM >= 60000
+#define __DECL_SIMD_x86_64 __attribute__((__simd__("notinbranch")))
 #endif
 #ifdef __DECL_SIMD_x86_64
 #define __DECL_SIMD_cos     __DECL_SIMD_x86_64

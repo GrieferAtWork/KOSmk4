@@ -68,6 +68,7 @@ DEFINE_SYSCALL6(syscall_slong_t, futex,
 	(void)timeout_or_val2;
 	(void)uaddr2;
 	(void)val3;
+	COMPILER_IMPURE();
 	kernel_panic("TODO");
 }
 

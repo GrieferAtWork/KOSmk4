@@ -43,12 +43,12 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#if __GCC_VERSION(3, 3, 0) || __has_builtin(__builtin_huge_valf)
+#if __has_builtin(__builtin_huge_valf)
 #define HUGE_VALF (__builtin_huge_valf())
 #else /* ... */
 #include <hybrid/typecore.h>
 #if __SIZEOF_FLOAT__ == 4
-#if __GCC_VERSION(2, 96, 0)
+#if defined(__GNUC__) && __GCC_VERSION_NUM >= 29600
 #define HUGE_VALF (__extension__ 0x1.0p255f)
 #elif defined(__GNUC__)
 #define HUGE_VALF (__extension__((union { __UINT32_TYPE__ __l; float __f; }) { 0x7f800000UL }).__f)
@@ -71,7 +71,7 @@ __NAMESPACE_LOCAL_END
 #define HUGE_VALF (__NAMESPACE_LOCAL_SYM __huge_valf.__f)
 #endif /* !... */
 #elif __SIZEOF_FLOAT__ == 8
-#if __GCC_VERSION(2, 96, 0)
+#if defined(__GNUC__) && __GCC_VERSION_NUM >= 29600
 #define HUGE_VALF (__extension__ 0x1.0p2047)
 #elif defined(__GNUC__)
 #define HUGE_VALF (__extension__((union { __UINT64_TYPE__ __l; float __f; }) { 0x7ff0000000000000ULL }).__f)
@@ -94,7 +94,7 @@ __NAMESPACE_LOCAL_END
 #define HUGE_VALF (__NAMESPACE_LOCAL_SYM __huge_valf.__f)
 #endif /* !... */
 #elif __SIZEOF_FLOAT__ == 12
-#if __GCC_VERSION(2, 96, 0)
+#if defined(__GNUC__) && __GCC_VERSION_NUM >= 29600
 #define HUGE_VALF (__extension__ 0x1.0p32767L)
 #elif defined(__GNUC__)
 #define HUGE_VALF (__extension__((union { __BYTE_TYPE__ __c[12]; float __f; }) { { 0, 0, 0, 0, 0, 0, 0, 0x80, 0xff, 0x7f, 0, 0 } }).__f)

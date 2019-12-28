@@ -1999,27 +1999,7 @@ NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory,
 }
 /*[[[end:DOS$_wtempnam]]]*/
 
-/*[[[head:_wperror,hash:CRC-32=0xd6a3a2ce]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.errno.utility._wperror") void
-NOTHROW_NCX(LIBCCALL libc__wperror)(char32_t const *errmsg)
-/*[[[body:_wperror]]]*/
-{
-	(void)errmsg;
-	CRT_UNIMPLEMENTED("_wperror"); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:_wperror]]]*/
 
-/*[[[head:DOS$_wperror,hash:CRC-32=0x7c2eb7ac]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.errno.utility._wperror") void
-NOTHROW_NCX(LIBDCALL libd__wperror)(char16_t const *errmsg)
-/*[[[body:DOS$_wperror]]]*/
-{
-	(void)errmsg;
-	CRT_UNIMPLEMENTED("_wperror"); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:DOS$_wperror]]]*/
 
 
 
@@ -2443,7 +2423,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_s
 
 
 
-/*[[[start:exports,hash:CRC-32=0x444f8c3d]]]*/
+/*[[[start:exports,hash:CRC-32=0xc2b3e6f7]]]*/
 #undef fwprintf
 #undef fwprintf_s
 #undef wprintf
@@ -2618,8 +2598,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(_putws, libc__putws);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_putws, libd__putws);
 DEFINE_PUBLIC_WEAK_ALIAS(_wtempnam, libc__wtempnam);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtempnam, libd__wtempnam);
-DEFINE_PUBLIC_WEAK_ALIAS(_wperror, libc__wperror);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wperror, libd__wperror);
 DEFINE_PUBLIC_WEAK_ALIAS(_wtmpnam_s, libc__wtmpnam_s);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtmpnam_s, libd__wtmpnam_s);
 /*[[[end:exports]]]*/

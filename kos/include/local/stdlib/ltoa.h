@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x189de05f */
+/* HASH CRC-32:0xd77ffb25 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __LOCAL_LIBC(ltoa) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ltoa))(long __val,
                                                   char *__dst,
                                                   int __radix) {
-#line 2984 "kos/src/libc/magic/stdlib.c"
+#line 2983 "kos/src/libc/magic/stdlib.c"
 	__localdep__ltoa_s(__val, __dst, (__SIZE_TYPE__)-1, __radix);
 	return __dst;
 }

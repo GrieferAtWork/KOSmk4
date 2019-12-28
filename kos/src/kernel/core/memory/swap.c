@@ -65,6 +65,7 @@ NOTHROW(KCALL swap_free)(swapptr_t start, pagecnt_t num_pages) {
 	(void)start;
 	(void)num_pages;
 	/* TODO */
+	COMPILER_IMPURE();
 	kernel_panic("TODO");
 }
 
@@ -79,6 +80,7 @@ swap_read(swapptr_t start,
 	(void)start;
 	(void)buffer;
 	(void)num_pages;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -89,12 +91,14 @@ swap_write(swapptr_t start,
 	(void)start;
 	(void)buffer;
 	(void)num_pages;
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
 /* Wait for all out-standing swap reads/writes to be completed.
  * @throw: E_IOERROR: The swap back-end has issued an I/O error. */
 PUBLIC void KCALL swap_sync(void) THROWS(E_IOERROR) {
+	COMPILER_IMPURE();
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 

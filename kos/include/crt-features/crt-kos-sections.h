@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3997bdb */
+/* HASH CRC-32:0x8e3eb94c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,46 +71,46 @@
 #define __CRT_SECTINFO_dos_FILE_utility                         (49, .dos.FILE.utility, dos_FILE_utility)
 #define __CRT_SECTINFO_dos_application_init                     (50, .dos.application.init, dos_application_init)
 #define __CRT_SECTINFO_dos_errno                                (51, .dos.errno, dos_errno)
-#define __CRT_SECTINFO_dos_fs_dlfcn                             (52, .dos.fs.dlfcn, dos_fs_dlfcn)
-#define __CRT_SECTINFO_dos_fs_environ                           (53, .dos.fs.environ, dos_fs_environ)
-#define __CRT_SECTINFO_dos_fs_exec_spawn                        (54, .dos.fs.exec.spawn, dos_fs_exec_spawn)
-#define __CRT_SECTINFO_dos_fs_modify                            (55, .dos.fs.modify, dos_fs_modify)
-#define __CRT_SECTINFO_dos_fs_property                          (56, .dos.fs.property, dos_fs_property)
-#define __CRT_SECTINFO_dos_fs_utility                           (57, .dos.fs.utility, dos_fs_utility)
-#define __CRT_SECTINFO_dos_heap                                 (58, .dos.heap, dos_heap)
-#define __CRT_SECTINFO_dos_heap_debug_malloc                    (59, .dos.heap.debug_malloc, dos_heap_debug_malloc)
-#define __CRT_SECTINFO_dos_math_utility                         (60, .dos.math.utility, dos_math_utility)
-#define __CRT_SECTINFO_dos_random                               (61, .dos.random, dos_random)
-#define __CRT_SECTINFO_dos_sched_signal                         (62, .dos.sched.signal, dos_sched_signal)
-#define __CRT_SECTINFO_dos_sched_thread                         (63, .dos.sched.thread, dos_sched_thread)
-#define __CRT_SECTINFO_dos_string_memory                        (64, .dos.string.memory, dos_string_memory)
-#define __CRT_SECTINFO_dos_system                               (65, .dos.system, dos_system)
-#define __CRT_SECTINFO_dos_system_utility                       (66, .dos.system.utility, dos_system_utility)
-#define __CRT_SECTINFO_dos_unicode_locale_convert               (67, .dos.unicode.locale.convert, dos_unicode_locale_convert)
-#define __CRT_SECTINFO_dos_unicode_locale_format_printf         (68, .dos.unicode.locale.format.printf, dos_unicode_locale_format_printf)
-#define __CRT_SECTINFO_dos_unicode_locale_format_scanf          (69, .dos.unicode.locale.format.scanf, dos_unicode_locale_format_scanf)
-#define __CRT_SECTINFO_dos_unicode_locale_memory                (70, .dos.unicode.locale.memory, dos_unicode_locale_memory)
-#define __CRT_SECTINFO_dos_unicode_static_convert               (71, .dos.unicode.static.convert, dos_unicode_static_convert)
-#define __CRT_SECTINFO_dos_unicode_static_format_printf         (72, .dos.unicode.static.format.printf, dos_unicode_static_format_printf)
-#define __CRT_SECTINFO_dos_unicode_static_format_scanf          (73, .dos.unicode.static.format.scanf, dos_unicode_static_format_scanf)
-#define __CRT_SECTINFO_dos_unicode_static_memory                (74, .dos.unicode.static.memory, dos_unicode_static_memory)
-#define __CRT_SECTINFO_dos_unsorted                             (75, .dos.unsorted, dos_unsorted)
-#define __CRT_SECTINFO_dos_utility                              (76, .dos.utility, dos_utility)
-#define __CRT_SECTINFO_dos_wchar_FILE_locked_access             (77, .dos.wchar.FILE.locked.access, dos_wchar_FILE_locked_access)
-#define __CRT_SECTINFO_dos_wchar_FILE_locked_read_getc          (78, .dos.wchar.FILE.locked.read.getc, dos_wchar_FILE_locked_read_getc)
-#define __CRT_SECTINFO_dos_wchar_FILE_locked_read_read          (79, .dos.wchar.FILE.locked.read.read, dos_wchar_FILE_locked_read_read)
-#define __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         (80, .dos.wchar.FILE.locked.read.scanf, dos_wchar_FILE_locked_read_scanf)
-#define __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       (81, .dos.wchar.FILE.locked.write.printf, dos_wchar_FILE_locked_write_printf)
-#define __CRT_SECTINFO_dos_wchar_FILE_locked_write_putc         (82, .dos.wchar.FILE.locked.write.putc, dos_wchar_FILE_locked_write_putc)
-#define __CRT_SECTINFO_dos_wchar_FILE_locked_write_write        (83, .dos.wchar.FILE.locked.write.write, dos_wchar_FILE_locked_write_write)
-#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_getc        (84, .dos.wchar.FILE.unlocked.read.getc, dos_wchar_FILE_unlocked_read_getc)
-#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_read        (85, .dos.wchar.FILE.unlocked.read.read, dos_wchar_FILE_unlocked_read_read)
-#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_scanf       (86, .dos.wchar.FILE.unlocked.read.scanf, dos_wchar_FILE_unlocked_read_scanf)
-#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_write_printf     (87, .dos.wchar.FILE.unlocked.write.printf, dos_wchar_FILE_unlocked_write_printf)
-#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_write_putc       (88, .dos.wchar.FILE.unlocked.write.putc, dos_wchar_FILE_unlocked_write_putc)
-#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_write_write      (89, .dos.wchar.FILE.unlocked.write.write, dos_wchar_FILE_unlocked_write_write)
-#define __CRT_SECTINFO_dos_wchar_errno                          (90, .dos.wchar.errno, dos_wchar_errno)
-#define __CRT_SECTINFO_dos_wchar_errno_utility                  (91, .dos.wchar.errno.utility, dos_wchar_errno_utility)
+#define __CRT_SECTINFO_dos_errno_utility                        (52, .dos.errno.utility, dos_errno_utility)
+#define __CRT_SECTINFO_dos_fs_dlfcn                             (53, .dos.fs.dlfcn, dos_fs_dlfcn)
+#define __CRT_SECTINFO_dos_fs_environ                           (54, .dos.fs.environ, dos_fs_environ)
+#define __CRT_SECTINFO_dos_fs_exec_spawn                        (55, .dos.fs.exec.spawn, dos_fs_exec_spawn)
+#define __CRT_SECTINFO_dos_fs_modify                            (56, .dos.fs.modify, dos_fs_modify)
+#define __CRT_SECTINFO_dos_fs_property                          (57, .dos.fs.property, dos_fs_property)
+#define __CRT_SECTINFO_dos_fs_utility                           (58, .dos.fs.utility, dos_fs_utility)
+#define __CRT_SECTINFO_dos_heap                                 (59, .dos.heap, dos_heap)
+#define __CRT_SECTINFO_dos_heap_debug_malloc                    (60, .dos.heap.debug_malloc, dos_heap_debug_malloc)
+#define __CRT_SECTINFO_dos_math_utility                         (61, .dos.math.utility, dos_math_utility)
+#define __CRT_SECTINFO_dos_random                               (62, .dos.random, dos_random)
+#define __CRT_SECTINFO_dos_sched_signal                         (63, .dos.sched.signal, dos_sched_signal)
+#define __CRT_SECTINFO_dos_sched_thread                         (64, .dos.sched.thread, dos_sched_thread)
+#define __CRT_SECTINFO_dos_string_memory                        (65, .dos.string.memory, dos_string_memory)
+#define __CRT_SECTINFO_dos_system                               (66, .dos.system, dos_system)
+#define __CRT_SECTINFO_dos_system_utility                       (67, .dos.system.utility, dos_system_utility)
+#define __CRT_SECTINFO_dos_unicode_locale_convert               (68, .dos.unicode.locale.convert, dos_unicode_locale_convert)
+#define __CRT_SECTINFO_dos_unicode_locale_format_printf         (69, .dos.unicode.locale.format.printf, dos_unicode_locale_format_printf)
+#define __CRT_SECTINFO_dos_unicode_locale_format_scanf          (70, .dos.unicode.locale.format.scanf, dos_unicode_locale_format_scanf)
+#define __CRT_SECTINFO_dos_unicode_locale_memory                (71, .dos.unicode.locale.memory, dos_unicode_locale_memory)
+#define __CRT_SECTINFO_dos_unicode_static_convert               (72, .dos.unicode.static.convert, dos_unicode_static_convert)
+#define __CRT_SECTINFO_dos_unicode_static_format_printf         (73, .dos.unicode.static.format.printf, dos_unicode_static_format_printf)
+#define __CRT_SECTINFO_dos_unicode_static_format_scanf          (74, .dos.unicode.static.format.scanf, dos_unicode_static_format_scanf)
+#define __CRT_SECTINFO_dos_unicode_static_memory                (75, .dos.unicode.static.memory, dos_unicode_static_memory)
+#define __CRT_SECTINFO_dos_unsorted                             (76, .dos.unsorted, dos_unsorted)
+#define __CRT_SECTINFO_dos_utility                              (77, .dos.utility, dos_utility)
+#define __CRT_SECTINFO_dos_wchar_FILE_locked_access             (78, .dos.wchar.FILE.locked.access, dos_wchar_FILE_locked_access)
+#define __CRT_SECTINFO_dos_wchar_FILE_locked_read_getc          (79, .dos.wchar.FILE.locked.read.getc, dos_wchar_FILE_locked_read_getc)
+#define __CRT_SECTINFO_dos_wchar_FILE_locked_read_read          (80, .dos.wchar.FILE.locked.read.read, dos_wchar_FILE_locked_read_read)
+#define __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         (81, .dos.wchar.FILE.locked.read.scanf, dos_wchar_FILE_locked_read_scanf)
+#define __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       (82, .dos.wchar.FILE.locked.write.printf, dos_wchar_FILE_locked_write_printf)
+#define __CRT_SECTINFO_dos_wchar_FILE_locked_write_putc         (83, .dos.wchar.FILE.locked.write.putc, dos_wchar_FILE_locked_write_putc)
+#define __CRT_SECTINFO_dos_wchar_FILE_locked_write_write        (84, .dos.wchar.FILE.locked.write.write, dos_wchar_FILE_locked_write_write)
+#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_getc        (85, .dos.wchar.FILE.unlocked.read.getc, dos_wchar_FILE_unlocked_read_getc)
+#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_read        (86, .dos.wchar.FILE.unlocked.read.read, dos_wchar_FILE_unlocked_read_read)
+#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_scanf       (87, .dos.wchar.FILE.unlocked.read.scanf, dos_wchar_FILE_unlocked_read_scanf)
+#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_write_printf     (88, .dos.wchar.FILE.unlocked.write.printf, dos_wchar_FILE_unlocked_write_printf)
+#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_write_putc       (89, .dos.wchar.FILE.unlocked.write.putc, dos_wchar_FILE_unlocked_write_putc)
+#define __CRT_SECTINFO_dos_wchar_FILE_unlocked_write_write      (90, .dos.wchar.FILE.unlocked.write.write, dos_wchar_FILE_unlocked_write_write)
+#define __CRT_SECTINFO_dos_wchar_errno                          (91, .dos.wchar.errno, dos_wchar_errno)
 #define __CRT_SECTINFO_dos_wchar_fs_exec_exec                   (92, .dos.wchar.fs.exec.exec, dos_wchar_fs_exec_exec)
 #define __CRT_SECTINFO_dos_wchar_fs_exec_spawn                  (93, .dos.wchar.fs.exec.spawn, dos_wchar_fs_exec_spawn)
 #define __CRT_SECTINFO_dos_wchar_fs_exec_system                 (94, .dos.wchar.fs.exec.system, dos_wchar_fs_exec_system)
@@ -357,6 +357,7 @@
 	CB(__CRT_SECTINFO_dos_FILE_utility)                         \
 	CB(__CRT_SECTINFO_dos_application_init)                     \
 	CB(__CRT_SECTINFO_dos_errno)                                \
+	CB(__CRT_SECTINFO_dos_errno_utility)                        \
 	CB(__CRT_SECTINFO_dos_fs_dlfcn)                             \
 	CB(__CRT_SECTINFO_dos_fs_environ)                           \
 	CB(__CRT_SECTINFO_dos_fs_exec_spawn)                        \
@@ -396,7 +397,6 @@
 	CB(__CRT_SECTINFO_dos_wchar_FILE_unlocked_write_putc)       \
 	CB(__CRT_SECTINFO_dos_wchar_FILE_unlocked_write_write)      \
 	CB(__CRT_SECTINFO_dos_wchar_errno)                          \
-	CB(__CRT_SECTINFO_dos_wchar_errno_utility)                  \
 	CB(__CRT_SECTINFO_dos_wchar_fs_exec_exec)                   \
 	CB(__CRT_SECTINFO_dos_wchar_fs_exec_spawn)                  \
 	CB(__CRT_SECTINFO_dos_wchar_fs_exec_system)                 \
@@ -939,6 +939,10 @@
 #define __CRT_SECTION__strerror                             __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._strerror */
 #define __CRT_SECTION__strerror_s                           __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._strerror_s */
 
+/* .text.crt.dos.errno.utility.* */
+#define __CRT_SECTION__wperror                              __CRT_SECTINFO_dos_errno_utility                        /* .text.crt.dos.errno.utility._wperror */
+#define __CRT_DOS_SECTION__wperror                          __CRT_SECTINFO_dos_errno_utility                        /* .text.crt.dos.errno.utility._wperror */
+
 /* .text.crt.dos.fs.dlfcn.* */
 #define __CRT_SECTION__getdllprocaddr                       __CRT_SECTINFO_dos_fs_dlfcn                             /* .text.crt.dos.fs.dlfcn._getdllprocaddr */
 #define __CRT_SECTION__loaddll                              __CRT_SECTINFO_dos_fs_dlfcn                             /* .text.crt.dos.fs.dlfcn._loaddll */
@@ -1413,10 +1417,6 @@
 #define __CRT_SECTION___wcserror_s                          __CRT_SECTINFO_dos_wchar_errno                          /* .text.crt.dos.wchar.errno.__wcserror_s */
 #define __CRT_SECTION__wcserror                             __CRT_SECTINFO_dos_wchar_errno                          /* .text.crt.dos.wchar.errno._wcserror */
 #define __CRT_SECTION__wcserror_s                           __CRT_SECTINFO_dos_wchar_errno                          /* .text.crt.dos.wchar.errno._wcserror_s */
-
-/* .text.crt.dos.wchar.errno.utility.* */
-#define __CRT_SECTION__wperror                              __CRT_SECTINFO_dos_wchar_errno_utility                  /* .text.crt.dos.wchar.errno.utility._wperror */
-#define __CRT_DOS_SECTION__wperror                          __CRT_SECTINFO_dos_wchar_errno_utility                  /* .text.crt.dos.wchar.errno.utility._wperror */
 
 /* .text.crt.dos.wchar.fs.exec.exec.* */
 #define __CRT_DOS_SECTION_wexecl                            __CRT_SECTINFO_dos_wchar_fs_exec_exec                   /* .text.crt.dos.wchar.fs.exec.exec.wexecl */

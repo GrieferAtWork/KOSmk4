@@ -408,7 +408,7 @@ strxfrm:(char *dst, [nonnull] char const *__restrict src, size_t maxlen) -> size
 	return n;
 }
 
-[std][ATTR_WUNUSED][impl_prefix(
+[std][ATTR_WUNUSED][ATTR_COLD][impl_prefix(
 @__LOCAL_LIBC_DATA@(strerror_buf) char strerror_buf[64] = { 0 };
 )][section(.text.crt.errno)][noexport][user]
 strerror:(int errnum) -> [nonnull] char * {
@@ -495,7 +495,7 @@ strxfrm_l:(char *dst, [nonnull] char const *__restrict src,
 }
 
 [requires($has_function(strerror))][noexport][user]
-[ATTR_WUNUSED][section(.text.crt.errno)][same_impl]
+[ATTR_COLD][ATTR_WUNUSED][section(.text.crt.errno)][same_impl]
 strerror_l:(int errnum, $locale_t locale) -> char * {
 	(void)locale;
 	return strerror(errnum);
@@ -816,10 +816,10 @@ strncasecmp_l:([nonnull] char const *s1, [nonnull] char const *s2, $size_t maxle
 %
 %#ifdef __USE_XOPEN2K
 %#ifdef __USE_GNU
-[section(.text.crt.errno)][export_alias(__strerror_r)]
+[section(.text.crt.errno)][export_alias(__strerror_r)][ATTR_COLD]
 strerror_r:(int errnum, [nonnull] char *buf, $size_t buflen) -> [nonnull] char *;
 %#else /* __USE_GNU */
-[section(.text.crt.errno)]
+[section(.text.crt.errno)][ATTR_COLD]
 strerror_r:(int errnum, [nonnull] char *buf, $size_t buflen) -> $errno_t = __xpg_strerror_r?;
 %#endif /* !__USE_GNU */
 %#endif /* __USE_XOPEN2K */

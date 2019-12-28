@@ -360,7 +360,11 @@
 #endif /* !__LIBCCALL */
 
 #ifndef __LIBC
+#if defined(__KOS__) && defined(__KERNEL__)
+#define __LIBC __PUBDEF
+#else
 #define __LIBC __IMPDEF
+#endif
 #endif /* !__LIBC */
 
 

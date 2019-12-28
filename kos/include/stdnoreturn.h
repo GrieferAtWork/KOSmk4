@@ -21,9 +21,7 @@
 
 #include "__stdinc.h"
 
-#if !defined(noreturn) && \
-    !defined(__cplusplus) && \
-    !__GCC_VERSION(4,7,0)
+#if !defined(noreturn) && !defined(__cplusplus) && (__GCC_VERSION_NUM < 40700)
 #define noreturn __ATTR_NORETURN
 #endif /* ... */
 

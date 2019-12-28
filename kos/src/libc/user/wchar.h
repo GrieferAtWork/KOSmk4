@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x793dba9d */
+/* HASH CRC-32:0x897e6083 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -165,8 +165,6 @@ INTDEF NONNULL((1)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc__putws)(char3
 INTDEF NONNULL((1)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd__putws)(char16_t const *string);
 INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBCCALL libc__wtempnam)(char32_t const *directory, char32_t const *file_prefix);
 INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory, char16_t const *file_prefix);
-INTDEF void NOTHROW_NCX(LIBCCALL libc__wperror)(char32_t const *errmsg);
-INTDEF void NOTHROW_NCX(LIBDCALL libd__wperror)(char16_t const *errmsg);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__wtmpnam_s)(char32_t *dst, size_t wchar_count);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst, size_t wchar_count);
 

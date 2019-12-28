@@ -42,7 +42,7 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#if __GCC_VERSION(3, 3, 0) || __has_builtin(__builtin_nanf)
+#if __has_builtin(__builtin_nanf)
 #define NAN __builtin_nanf("")
 #elif defined(__GNUC__)
 #define NAN (__extension__((union { unsigned __l __attribute__((__mode__(__SI__))); float __d; }) { 0x7fc00000UL }).__d)

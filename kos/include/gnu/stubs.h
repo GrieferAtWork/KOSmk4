@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x371af683 */
+/* HASH CRC-32:0xdf51f6f2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,6 @@
 #define __stub__wfopen_s 1
 #define __stub__wfreopen_s 1
 #define __stub__wfsopen 1
-#define __stub__wperror 1
 #define __stub__wtempnam 1
 #define __stub__wtmpnam_s 1
 #define __stub_a64l 1

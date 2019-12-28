@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a466ca3 */
+/* HASH CRC-32:0x1e7a851e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4381,9 +4381,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vsnprintf_s, __FORCELOCAL __ATTR_NONNULL((4)) __
 
 #ifndef _CRT_WPERROR_DEFINED
 #define _CRT_WPERROR_DEFINED 1
+#ifndef ___wperror_defined
+#define ___wperror_defined 1
 #ifdef __CRT_HAVE__wperror
 __CDECLARE_VOID(__ATTR_COLD,,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message)) __THROWS(...)
+#else /* LIBC: _wperror */
+#undef ___wperror_defined
 #endif /* _wperror... */
+#endif /* !___wperror_defined */
 #endif /* !_CRT_WPERROR_DEFINED */
 
 #endif /* _STDIO_DEFINED */
@@ -5886,7 +5891,7 @@ __CDECLARE(__ATTR_WUNUSED,wchar_t *,__NOTHROW_NCX,_wtempnam,(wchar_t const *__di
 #ifndef ___wperror_defined
 #define ___wperror_defined 1
 #ifdef __CRT_HAVE__wperror
-__CDECLARE_VOID(,__NOTHROW_NCX,_wperror,(wchar_t const *__errmsg),(__errmsg))
+__CDECLARE_VOID(__ATTR_COLD,,_wperror,(__WCHAR_TYPE__ const *__restrict __message),(__message)) __THROWS(...)
 #else /* LIBC: _wperror */
 #undef ___wperror_defined
 #endif /* _wperror... */

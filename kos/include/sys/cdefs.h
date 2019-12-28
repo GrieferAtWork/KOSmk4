@@ -32,7 +32,11 @@
  *       applications that may rely on this non-standard header
  *       and its contents. */
 
-#define __GNUC_PREREQ(a,b) __GCC_VERSION(a,b,0)
+#ifdef __GNUC__
+#define __GNUC_PREREQ(a, b) (__GCC_VERSION_NUM >= ((a)*10000 + (b)*100))
+#else /* __GNUC__ */
+#define __GNUC_PREREQ(a, b) 0
+#endif /* !__GNUC__ */
 
 #undef __P
 #undef __PMT

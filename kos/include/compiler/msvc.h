@@ -16,10 +16,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __GCC_VERSION
-#define __GCC_VERSION(a, b, c) 0
-#endif /* !__GCC_VERSION */
-
 #define __builtin_expect(x, y) (x)
 #define __NO_builtin_expect    1
 #define __likely      /* Nothing */
@@ -27,7 +23,7 @@
 #define __P(x)                 x
 
 #if defined(_MSC_EXTENSIONS) || _MSC_VER >= 1400
-#   define __COMPILER_HAVE_LONGLONG 1
+#define __COMPILER_HAVE_LONGLONG 1
 #endif /* _MSC_EXTENSIONS || _MSC_VER >= 1400 */
 #define __COMPILER_HAVE_LONGDOUBLE 1
 #if defined(_MSC_EXTENSIONS)/* || _MSC_VER >= ???? */
@@ -39,35 +35,74 @@
 #ifdef __CC__
 #define __COMPILER_HAVE_PRAGMA_PACK 1
 #endif /* __CC__ */
+
+#ifndef __has_builtin
+#define __NO_has_builtin 1
+#define __has_builtin(x) 0
+#endif /* !__has_builtin */
+
 #ifndef __has_feature
 #define __NO_has_feature 1
 #define __has_feature(x) 0
 #endif /* !__has_feature */
 
+#ifndef __has_extension
+#ifndef __NO_has_feature
+#define __NO_has_extension 1
+#endif /* !__NO_has_feature */
+#define __has_extension  __has_feature
+#endif /* !__has_extension */
+
+#ifndef __has_attribute
+#define __NO_has_attribute 1
+#define __has_attribute(x) 0
+#endif /* !__has_attribute */
+
+#ifndef __has_declspec_attribute
+#define __NO_has_declspec_attribute 1
+#define __has_declspec_attribute(x) 0
+#endif /* !__has_declspec_attribute */
+
+#ifndef __has_cpp_attribute
+#define __NO_has_cpp_attribute 1
+#define __has_cpp_attribute(x) 0
+#endif /* !__has_cpp_attribute */
+
+#ifndef __has_include
+#define __NO_has_include 1
+#define __has_include(x) 0
+#endif /* !__has_include */
+
+#ifndef __has_include_next
+#define __NO_has_include_next 1
+#define __has_include_next(x) 0
+#endif /* !__has_include */
+
+
 
 #if __has_feature(cxx_auto_type) || \
    (defined(__cplusplus) && _MSC_VER >= 1600)
-#   define __auto_type              auto
-#   define __COMPILER_HAVE_AUTOTYPE 1
+#define __auto_type              auto
+#define __COMPILER_HAVE_AUTOTYPE 1
 #endif
 
 #if __has_feature(cxx_static_assert) || _MSC_VER >= 1600
-#   define __STATIC_ASSERT(expr)          static_assert(expr, #expr)
-#   define __STATIC_ASSERT_MSG(expr, msg) static_assert(expr, msg)
+#define __STATIC_ASSERT(expr)          static_assert(expr, #expr)
+#define __STATIC_ASSERT_MSG(expr, msg) static_assert(expr, msg)
 #elif __has_feature(c_static_assert) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__+0 >= 201112L)
 /* XXX: Known Visual C/C++, checking for C11 may not actually allow us to assume this one... */
-#   define __STATIC_ASSERT(expr)          _Static_assert(expr, #expr)
-#   define __STATIC_ASSERT_MSG(expr, msg) _Static_assert(expr, msg)
+#define __STATIC_ASSERT(expr)          _Static_assert(expr, #expr)
+#define __STATIC_ASSERT_MSG(expr, msg) _Static_assert(expr, msg)
 #elif defined(__TPP_COUNTER)
-#   define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __TPP_COUNTER(__static_assert))[(expr) ? 1 : -1]
-#   define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __TPP_COUNTER(__static_assert))[(expr) ? 1 : -1]
+#define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __TPP_COUNTER(__static_assert))[(expr) ? 1 : -1]
+#define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __TPP_COUNTER(__static_assert))[(expr) ? 1 : -1]
 #elif defined(__COUNTER__)
-#   define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __COUNTER__)[(expr) ? 1 : -1]
-#   define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __COUNTER__)[(expr) ? 1 : -1]
+#define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __COUNTER__)[(expr) ? 1 : -1]
+#define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __COUNTER__)[(expr) ? 1 : -1]
 #else
-#   define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __LINE__)[(expr) ? 1 : -1]
-#   define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __LINE__)[(expr) ? 1 : -1]
+#define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __LINE__)[(expr) ? 1 : -1]
+#define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __LINE__)[(expr) ? 1 : -1]
 #endif
 #define __NO_ASMNAME             1
 #define __ASMNAME(x)             /* Nothing */
@@ -102,9 +137,13 @@
 #define __ATTR_SYSVABI           /* Nothing */
 #define __NO_ATTR_SYSVABI        1
 #define __ATTR_PURE              __declspec(noalias)
+#define __ATTR_PURE_P            __declspec(noalias) /* XXX: Is this ok? */
 #define __ATTR_CONST             __declspec(noalias)
+#define __ATTR_CONST_P           __declspec(noalias) /* XXX: Is this ok? */
 #define __NO_ATTR_LEAF           1
 #define __ATTR_LEAF              /* Nothing */
+#define __NO_ATTR_LEAF_P         1
+#define __ATTR_LEAF_P            /* Nothing */
 #define __NO_ATTR_FLATTEN        1
 #define __ATTR_FLATTEN           /* Nothing */
 #define __ATTR_MALLOC            __declspec(restrict)
@@ -129,29 +168,29 @@
 #define __NO_ATTR_SENTINEL_O     1
 #define __ATTR_SENTINEL_O(x)     /* Nothing */
 #if _MSC_VER >= 1700
-#   define __ATTR_THREAD         __declspec(thread)
+#define __ATTR_THREAD __declspec(thread)
 #else /* _MSC_VER >= 1700 */
-#   define __NO_ATTR_THREAD      1
-#   define __ATTR_THREAD         /* Nothing */
+#define __NO_ATTR_THREAD 1
+#define __ATTR_THREAD    /* Nothing */
 #endif /* _MSC_VER < 1700 */
 #if _MSC_VER >= 1200
-#   define __ATTR_DEPRECATED_      __declspec(deprecated)
-#   define __ATTR_DEPRECATED(text) __declspec(deprecated(text))
+#define __ATTR_DEPRECATED_      __declspec(deprecated)
+#define __ATTR_DEPRECATED(text) __declspec(deprecated(text))
 #else /* _MSC_VER >= 1200 */
-#   define __NO_ATTR_DEPRECATED  1
-#   define __ATTR_DEPRECATED(text) /* Nothing */
+#define __NO_ATTR_DEPRECATED  1
+#define __ATTR_DEPRECATED(text) /* Nothing */
 #endif /* _MSC_VER < 1200 */
-#define __NO_ATTR_ERROR          1
-#define __ATTR_ERROR(text)       /* Nothing */
-#define __NO_ATTR_WARNING        1
-#define __ATTR_WARNING(text)     /* Nothing */
-#define __NO_ATTR_SECTION        1
-#define __ATTR_SECTION(name)     /* Nothing */
+#define __NO_ATTR_ERROR      1
+#define __ATTR_ERROR(text)   /* Nothing */
+#define __NO_ATTR_WARNING    1
+#define __ATTR_WARNING(text) /* Nothing */
+#define __NO_ATTR_SECTION    1
+#define __ATTR_SECTION(name) /* Nothing */
 #ifdef __cplusplus
-#define __ATTR_NOTHROW           __declspec(nothrow)
+#define __ATTR_NOTHROW __declspec(nothrow)
 #else /* __cplusplus */
-#define __NO_ATTR_NOTHROW        1
-#define __ATTR_NOTHROW           /* Nothing */
+#define __NO_ATTR_NOTHROW 1
+#define __ATTR_NOTHROW    /* Nothing */
 #endif /* !__cplusplus */
 #define __NO_ATTR_OPTIMIZE       1
 #define __ATTR_OPTIMIZE(opt)     /* Nothing */
@@ -163,41 +202,44 @@
 #define __NO_ATTR_ALIAS          1
 #define __ATTR_ALIAS(name)       /* Nothing */
 #if _MSC_VER >= 1300
-#   define __ATTR_ALIGNED(n)     __declspec(align(n))
+#define __ATTR_ALIGNED(n) __declspec(align(n))
 #else /* _MSC_VER >= 1300 */
-#   define __NO_ATTR_ALIGNED     1
-#   define __ATTR_ALIGNED(n)     /* Nothing */
+#define __NO_ATTR_ALIGNED 1
+#define __ATTR_ALIGNED(n) /* Nothing */
 #endif /* _MSC_VER < 1300 */
-#define __ATTR_WEAK_IS_SELECTANY 1
-#define __ATTR_WEAK              __declspec(selectany) /* For all that we care, it's basically the same. */
-#define __ATTR_SELECTANY         __declspec(selectany)
-#define __NO_ATTR_RETURNS_TWICE  1
-#define __ATTR_RETURNS_TWICE     /* Nothing */
-#define __NO_ATTR_EXTERNALLY_VISIBLE 1
-#define __ATTR_EXTERNALLY_VISIBLE /* Nothing */
-#define __NO_ATTR_VISIBILITY     1
-#define __ATTR_VISIBILITY(vis)   /* Nothing */
-#define __NO_ATTR_FORMAT_PRINTF  1
-#define __ATTR_FORMAT_PRINTF(fmt,args) /* Nothing */
-#define __NO_ATTR_FORMAT_SCANF   1
-#define __ATTR_FORMAT_SCANF(fmt,args) /* Nothing */
-#define __NO_ATTR_FORMAT_STRFMON 1
-#define __ATTR_FORMAT_STRFMON(fmt,args) /* Nothing */
-#define __NO_ATTR_FORMAT_STRFTIME 1
-#define __ATTR_FORMAT_STRFTIME(fmt,args) /* Nothing */
-#define __ATTR_DLLIMPORT         __declspec(dllimport)
-#define __ATTR_DLLEXPORT         __declspec(dllexport)
-#define __NO_ATTR_NONNULL        1
-#define __ATTR_NONNULL(ppars)    /* Nothing */
-#define __NO_ATTR_WUNUSED        1
-#define __ATTR_WUNUSED           /* Nothing */
-#define __NO_ATTR_TRANSPARENT_UNION 1
-#define __ATTR_TRANSPARENT_UNION /* Nothing */
-#define __NO_XBLOCK              1
-#define __IF0                    __pragma(warning(suppress: 4127)) if(0)
-#define __IF1                    __pragma(warning(suppress: 4127)) if(0)
-#define __WHILE0                 __pragma(warning(suppress: 4127)) while(0)
-#define __WHILE1                 __pragma(warning(suppress: 4127)) while(0)
+#define __ATTR_WEAK_IS_SELECTANY          1
+#define __ATTR_WEAK                       __declspec(selectany) /* For all that we care, it's basically the same. */
+#define __ATTR_SELECTANY                  __declspec(selectany)
+#define __NO_ATTR_RETURNS_TWICE           1
+#define __ATTR_RETURNS_TWICE              /* Nothing */
+#define __NO_ATTR_EXTERNALLY_VISIBLE      1
+#define __ATTR_EXTERNALLY_VISIBLE         /* Nothing */
+#define __NO_ATTR_VISIBILITY              1
+#define __ATTR_VISIBILITY(vis)            /* Nothing */
+#define __NO_ATTR_FORMAT_PRINTF           1
+#define __ATTR_FORMAT_PRINTF(fmt, args)   /* Nothing */
+#define __NO_ATTR_FORMAT_SCANF            1
+#define __ATTR_FORMAT_SCANF(fmt, args)    /* Nothing */
+#define __NO_ATTR_FORMAT_STRFMON          1
+#define __ATTR_FORMAT_STRFMON(fmt, args)  /* Nothing */
+#define __NO_ATTR_FORMAT_STRFTIME         1
+#define __ATTR_FORMAT_STRFTIME(fmt, args) /* Nothing */
+#define __ATTR_DLLIMPORT                  __declspec(dllimport)
+#define __ATTR_DLLEXPORT                  __declspec(dllexport)
+#define __NO_ATTR_NOPLT                   1
+#define __ATTR_NOPLT                      /* nothing */
+#define __NO_ATTR_NONNULL                 1
+#define __ATTR_NONNULL(ppars)             /* Nothing */
+#define __NO_ATTR_WUNUSED                 1
+#define __ATTR_WUNUSED                    /* Nothing */
+#define __NO_ATTR_TRANSPARENT_UNION       1
+#define __ATTR_TRANSPARENT_UNION          /* Nothing */
+
+#define __IF0    __pragma(warning(suppress: 4127)) if(0)
+#define __IF1    __pragma(warning(suppress: 4127)) if(0)
+#define __WHILE0 __pragma(warning(suppress: 4127)) while(0)
+#define __WHILE1 __pragma(warning(suppress: 4127)) while(0)
+
 #ifdef __cplusplus
 namespace __intern {
 template<bool> struct __msvc_static_if {};
@@ -215,12 +257,17 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __NO_builtin_choose_expr 1
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
 #endif /* !__cplusplus */
+
 #define __NO_builtin_types_compatible_p   1
 #define __builtin_types_compatible_p(...) 0
-#define __XBLOCK(...)            do __VA_ARGS__ __WHILE0
-#define __XRETURN                /* Nothing */
+
+#define __NO_XBLOCK   1
+#define __XBLOCK(...) do __VA_ARGS__ __WHILE0
+#define __XRETURN     /* Nothing */
+
 #undef __builtin_assume_has_sideeffects
-#define __builtin_assume(x)      __assume(x)
+#define __builtin_assume(x) __assume(x)
+
 #define __builtin_unreachable()  __assume(0)
 #define __COMPILER_ALIGNOF       __alignof
 #define __builtin_offsetof(s,m)  ((__SIZE_TYPE__)&((s *)0)->m)
@@ -239,26 +286,26 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __NO_COMPILER_IGNORE_UNINITIALIZED 1
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var
 
-#define __INT8_TYPE__            signed __int8
-#define __UINT8_TYPE__           unsigned __int8
-#define __INT16_TYPE__           signed __int16
-#define __UINT16_TYPE__          unsigned __int16
-#define __INT32_TYPE__           signed __int32
-#define __UINT32_TYPE__          unsigned __int32
-#define __INT64_TYPE__           signed __int64
-#define __UINT64_TYPE__          unsigned __int64
+#define __INT8_TYPE__   signed __int8
+#define __UINT8_TYPE__  unsigned __int8
+#define __INT16_TYPE__  signed __int16
+#define __UINT16_TYPE__ unsigned __int16
+#define __INT32_TYPE__  signed __int32
+#define __UINT32_TYPE__ unsigned __int32
+#define __INT64_TYPE__  signed __int64
+#define __UINT64_TYPE__ unsigned __int64
 
 #ifndef __USER_LABEL_PREFIX__
-#if defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
-    defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) || \
-    defined(_WIN64) || defined(WIN64)
+#if (defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
+     defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) ||     \
+     defined(_WIN64) || defined(WIN64))
 #define __USER_LABEL_PREFIX__    /* nothing */
 #else
 #define __USER_LABEL_PREFIX__    _
 #endif
 #endif /* !__USER_LABEL_PREFIX__ */
 
-#define __DEFINE_ALIAS_STR(x)    #x
+#define __DEFINE_ALIAS_STR(x) #x
 #define __DEFINE_PRIVATE_ALIAS(new, old) \
 	__pragma(comment(linker, "/alternatename:" __DEFINE_ALIAS_STR(new) "=" __DEFINE_ALIAS_STR(old)))
 #define __DEFINE_PUBLIC_ALIAS(new, old)                                                              \
@@ -338,23 +385,23 @@ extern void (__cdecl _ReadWriteBarrier)(void);
 
 #ifdef __cplusplus
 #ifdef __INTELLISENSE__
-#   define __NULLPTR    nullptr
+#define __NULLPTR    nullptr
 #else /* __INTELLISENSE__ */
-#   define __NULLPTR          0
+#define __NULLPTR          0
 #endif /* !__INTELLISENSE__ */
 #else /* __cplusplus */
-#   define __NULLPTR ((void *)0)
+#define __NULLPTR ((void *)0)
 #endif /* !__cplusplus */
 
 /* Emulate the `__OPTIMIZE__' predefined macro, used in various headers. */
 #if defined(RELEASE) || defined(_RELEASE)
 #ifndef _RELEASE
-#   define _RELEASE  RELEASE
+#define _RELEASE  RELEASE
 #endif /* !_RELEASE */
 #if (_RELEASE+0) >= 1
-#   define __OPTIMIZE__ _RELEASE
+#define __OPTIMIZE__ _RELEASE
 #else /* (_RELEASE+0) >= 1 */
-#   define __OPTIMIZE__ 3
+#define __OPTIMIZE__ 3
 #endif /* (_RELEASE+0) < 1 */
 #endif /* RELEASE || _RELEASE */
 

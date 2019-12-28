@@ -2908,8 +2908,7 @@ _beep:(unsigned int freq, unsigned int duration);
 %
 %#ifndef _CRT_WPERROR_DEFINED
 %#define _CRT_WPERROR_DEFINED 1
-%[default_impl_section(.text.crt.dos.errno)]
-[cp][ATTR_COLD][wchar] _wperror:(wchar_t const *errmsg);
+%[insert:extern(_wperror)]
 %#endif /* !_CRT_WPERROR_DEFINED */
 
 %[default_impl_section(.text.crt.dos.system)]

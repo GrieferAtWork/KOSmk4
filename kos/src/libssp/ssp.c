@@ -29,7 +29,7 @@
 
 DECL_BEGIN
 
-IMPDEF uintptr_t __stack_chk_guard;               /* from `libc.so' */
+IMPDAT uintptr_t __stack_chk_guard;               /* from `libc.so' */
 IMPDEF ATTR_NORETURN void __stack_chk_fail(void); /* from `libc.so' */
 
 /* TODO: Library initializer to assign a random value to `__stack_chk_guard()' */

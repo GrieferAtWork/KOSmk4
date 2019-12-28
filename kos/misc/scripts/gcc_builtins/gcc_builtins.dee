@@ -248,6 +248,9 @@ local gccReleaseCommits: {(string, (int,int,int))...} = {
 	("8d705311c5c80046444afea85585cb94d307aecd", (4, 4, 0)),
 	("782f6c8b1609769f2f94a74e5409bc91993c1cda", (4, 3, 0)),
 	("bb23e61120082b6643da44eb85ee331060bf8e42", (4, 2, 0)),
+	/* TODO: The history of GCC builtins goes back even further!
+	 *       e.g. 3.3.0 apparently introduced `__builtin_huge_val()' and `__builtin_inf()' / `__builtin_nan()'
+	 */
 };
 
 for (local x: gccReleaseCommits) {

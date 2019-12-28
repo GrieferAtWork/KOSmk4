@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99459661 */
+/* HASH CRC-32:0x1be1c605 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -586,12 +586,12 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(strxfrm, __FORCELOCAL __ATTR_NONNULL((2)) size_t __NOTHROW_NCX(__LIBCCALL strxfrm)(char *__dst, char const *__restrict __src, size_t __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strxfrm))(__dst, __src, __maxlen); })
 #endif /* strxfrm... */
 #ifdef __CRT_HAVE_strerror
-__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror,(int __errnum),(__errnum))
+__CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror,(int __errnum),(__errnum))
 #else /* LIBC: strerror */
 __NAMESPACE_STD_END
 #include <local/string/strerror.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(strerror, __FORCELOCAL __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror)(int __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror))(__errnum); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strerror, __FORCELOCAL __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror)(int __errnum) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror))(__errnum); })
 #endif /* strerror... */
 #if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
 extern "C++" {
@@ -754,10 +754,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,strxfrm_l,(char *__d
 __NAMESPACE_LOCAL_USING_OR_IMPL(strxfrm_l, __FORCELOCAL __ATTR_NONNULL((2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strxfrm_l)(char *__dst, char const *__restrict __src, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strxfrm_l))(__dst, __src, __maxlen, __locale); })
 #endif /* strxfrm_l... */
 #ifdef __CRT_HAVE_strerror_l
-__CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror_l,(int __errnum, __locale_t __locale),(__errnum,__locale))
+__CDECLARE(__ATTR_COLD __ATTR_WUNUSED,char *,__NOTHROW_NCX,strerror_l,(int __errnum, __locale_t __locale),(__errnum,__locale))
 #else /* LIBC: strerror_l */
 #include <local/string/strerror_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(strerror_l, __FORCELOCAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror_l)(int __errnum, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_l))(__errnum, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(strerror_l, __FORCELOCAL __ATTR_COLD __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL strerror_l)(int __errnum, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_l))(__errnum, __locale); })
 #endif /* strerror_l... */
 #ifdef __CRT_HAVE_strsignal
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,strsignal,(int __signo),(__signo))
@@ -1144,13 +1144,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strncasecmp_l, __FORCELOCAL __ATTR_PURE __ATTR_W
 #ifdef __USE_XOPEN2K
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_strerror_r
-__CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),(__errnum,__buf,__buflen))
+__CDECLARE(__ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),(__errnum,__buf,__buflen))
 #elif defined(__CRT_HAVE___strerror_r)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),__strerror_r,(__errnum,__buf,__buflen))
+__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_NONNULL((2)),char *,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),__strerror_r,(__errnum,__buf,__buflen))
 #endif /* strerror_r... */
 #else /* __USE_GNU */
 #ifdef __CRT_HAVE___xpg_strerror_r
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),__xpg_strerror_r,(__errnum,__buf,__buflen))
+__CREDIRECT(__ATTR_COLD __ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,strerror_r,(int __errnum, char *__buf, __SIZE_TYPE__ __buflen),__xpg_strerror_r,(__errnum,__buf,__buflen))
 #endif /* strerror_r... */
 #endif /* !__USE_GNU */
 #endif /* __USE_XOPEN2K */

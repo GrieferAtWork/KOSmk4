@@ -25,77 +25,55 @@
 #error "A C++ compiler is required"
 #endif /* !__cplusplus */
 
-#ifndef __GCC_VERSION
-#ifdef __GNUC__
-#ifndef __GNUC_MINOR__
-#define __GNUC_MINOR__ 0
-#endif /* !__GNUC_MINOR__ */
-#ifndef __GNUC_PATCH__
-#ifdef __GNUC_PATCHLEVEL__
-#define __GNUC_PATCH__ __GNUC_PATCHLEVEL__
-#else /* __GNUC_PATCHLEVEL__ */
-#define __GNUC_PATCH__ 0
-#endif /* !__GNUC_PATCHLEVEL__ */
-#endif /* !__GNUC_PATCH__ */
-#ifndef __GCC_VERSION_NUM
-#define __GCC_VERSION_NUM (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCH__)
-#endif /* !__GCC_VERSION_NUM */
-#define __GCC_VERSION(a, b, c) (__GCC_VERSION_NUM >= ((a)*10000 + (b)*100 + (c)))
-#else /* __GNUC__ */
-#define __GCC_VERSION(a, b, c) 0
-#endif /* !__GNUC__ */
-#endif /* !__GCC_VERSION */
-
-
 //#define __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR 1
 #define __COMPILER_HAVE_CXX_PARTIAL_TPL_SPEC 1
 #define __CXX_DEDUCE_TYPENAME typename
 
-#if __has_feature(cxx_variadic_templates) || \
-   (defined(__cpp_variadic_templates) && __cpp_variadic_templates >= 200704) || \
-   (__GCC_VERSION(4, 3, 0) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
-   (defined(_MSC_VER) && _MSC_VER >= 1800) || \
-   (defined(__IBMCPP_VARIADIC_TEMPLATES) && __IBMCPP_VARIADIC_TEMPLATES)
+#if (__has_feature(cxx_variadic_templates) ||                                                           \
+     (defined(__cpp_variadic_templates) && __cpp_variadic_templates >= 200704) ||                       \
+     (__GCC_VERSION_NUM >= 40300 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
+     (defined(_MSC_VER) && _MSC_VER >= 1800) ||                                                         \
+     (defined(__IBMCPP_VARIADIC_TEMPLATES) && __IBMCPP_VARIADIC_TEMPLATES))
 #define __COMPILER_HAVE_CXX_VARIABLE_TEMPLATES 1
 #endif /* ... */
 
-#if __has_feature(cxx_alias_templates) || \
-   (defined(__cpp_alias_templates) && __cpp_alias_templates >= 200704) || \
-   (defined(__BORLANDC__) && __BORLANDC__ > 0x613) || \
-   (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827)
+#if (__has_feature(cxx_alias_templates) ||                                  \
+     (defined(__cpp_alias_templates) && __cpp_alias_templates >= 200704) || \
+     (defined(__BORLANDC__) && __BORLANDC__ > 0x613) ||                     \
+     (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827))
 #define __COMPILER_HAVE_CXX_TEMPLATE_USING 1
 #endif /* ... */
 
-#if __has_feature(cxx_rvalue_references) || \
-   (defined(__cpp_rvalue_references) && __cpp_rvalue_references >= 200610) || \
-   (defined(_MSC_VER) && _MSC_VER >= 1600) || \
-   (__GCC_VERSION(4, 3, 0) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
-   (defined(__BORLANDC__) && defined(__CODEGEAR_0X_SUPPORT__) && __BORLANDC__ >= 0x610) || \
-   (defined(__IBMCPP_RVALUE_REFERENCES) && (__IBMCPP_RVALUE_REFERENCES+0))
+#if (__has_feature(cxx_rvalue_references) ||                                                            \
+     (defined(__cpp_rvalue_references) && __cpp_rvalue_references >= 200610) ||                         \
+     (defined(_MSC_VER) && _MSC_VER >= 1600) ||                                                         \
+     (__GCC_VERSION_NUM >= 40300 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
+     (defined(__BORLANDC__) && defined(__CODEGEAR_0X_SUPPORT__) && __BORLANDC__ >= 0x610) ||            \
+     (defined(__IBMCPP_RVALUE_REFERENCES) && (__IBMCPP_RVALUE_REFERENCES + 0)))
 #define __COMPILER_HAVE_CXX_RVALUE_REFERENCE 1
 #endif /* ... */
 
-#if __has_feature(cxx_strong_enums) || \
-   (defined(_MSC_VER) && _MSC_VER >= 1700) || \
-   (defined(__BORLANDC__) && defined(__CODEGEAR_0X_SUPPORT__) && __BORLANDC__ >= 0x610) ||\
-   (__GCC_VERSION(4, 5, 1) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
-   (defined(__IBMCPP_SCOPED_ENUM) && (__IBMCPP_SCOPED_ENUM+0))
+#if (__has_feature(cxx_strong_enums) ||                                                                 \
+     (defined(_MSC_VER) && _MSC_VER >= 1700) ||                                                         \
+     (defined(__BORLANDC__) && defined(__CODEGEAR_0X_SUPPORT__) && __BORLANDC__ >= 0x610) ||            \
+     (__GCC_VERSION_NUM >= 40501 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
+     (defined(__IBMCPP_SCOPED_ENUM) && (__IBMCPP_SCOPED_ENUM + 0)))
 #define __COMPILER_HAVE_CXX_ENUM_CLASSES 1
 #endif  /* ... */
 
-#if __has_feature(cxx_nullptr) || \
-   (defined(__INTEL_VERSION__) && __INTEL_VERSION__ >= 1210) || \
-   (defined(_MSC_VER) && _MSC_VER >= 1600) || \
-   (__GCC_VERSION(4, 6, 0) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L))
+#if (__has_feature(cxx_nullptr) ||                                \
+     (defined(__INTEL_VERSION__) && __INTEL_VERSION__ >= 1210) || \
+     (defined(_MSC_VER) && _MSC_VER >= 1600) ||                   \
+     (__GCC_VERSION_NUM >= 40600 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)))
 #define __COMPILER_HAVE_CXX_NULLPTR 1
 #endif /* ... */
 
-#if __has_feature(cxx_decltype) || \
-   (defined(__cpp_decltype) && __cpp_decltype >= 200707) || \
-   (defined(_MSC_VER) && _MSC_VER >= 1600) || \
-   (__GCC_VERSION(4, 3, 0) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
-   (defined(__BORLANDC__) && defined(__CODEGEAR_0X_SUPPORT__) && __BORLANDC__ >= 0x610) || \
-   (defined(__IBMCPP_DECLTYPE) && (__IBMCPP_DECLTYPE+0))
+#if (__has_feature(cxx_decltype) ||                                                                     \
+     (defined(__cpp_decltype) && __cpp_decltype >= 200707) ||                                           \
+     (defined(_MSC_VER) && _MSC_VER >= 1600) ||                                                         \
+     (__GCC_VERSION_NUM >= 40300 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
+     (defined(__BORLANDC__) && defined(__CODEGEAR_0X_SUPPORT__) && __BORLANDC__ >= 0x610) ||            \
+     (defined(__IBMCPP_DECLTYPE) && (__IBMCPP_DECLTYPE + 0)))
 #define __COMPILER_HAVE_CXX_DECLTYPE 1
 #endif /* ... */
 
@@ -120,9 +98,9 @@
 #endif
 #endif /* !__CXX_INLINE_CONSTEXPR */
 
-#if __has_feature(defaulted_functions) || \
-   (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827) || \
-   (__GCC_VERSION(4, 4, 0) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L))
+#if (__has_feature(defaulted_functions) ||                     \
+     (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827) || \
+     (__GCC_VERSION_NUM >= 40400 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)))
 #define __CXX_HAVE_DEFAULT_FUNCTIONS 1
 #define __CXX_DEFAULT_CTOR(T)                      T() = default
 #define __CXX_DEFAULT_DTOR(T)                      ~T() = default
@@ -158,9 +136,9 @@
 #endif /* !__CXX_STATIC_CONST */
 
 
-#if __has_feature(deleted_functions) || \
-   (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827) || \
-   (__GCC_VERSION(4, 4, 0) && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L))
+#if (__has_feature(deleted_functions) ||                       \
+     (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827) || \
+     (__GCC_VERSION_NUM >= 40400 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)))
 #define __CXX_HAVE_DELETE_FUNCTIONS 1
 #define __CXX_DELETE_CTOR(T)                 T() = delete
 #define __CXX_DELETE_DTOR(T)                 ~T() = delete

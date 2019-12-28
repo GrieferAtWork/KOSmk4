@@ -2202,8 +2202,7 @@ _wtempnam:([nullable] wchar_t const *directory,
 
 %#ifndef _CRT_WPERROR_DEFINED
 %#define _CRT_WPERROR_DEFINED
-[section(.text.crt.dos.wchar.errno.utility)][guard][wchar]
-_wperror:([nullable] wchar_t const *errmsg);
+%[insert:extern(_wperror)]
 %#endif  /* _CRT_WPERROR_DEFINED */
 
 [guard][wchar][alias(*)][attribute(*)] _wpopen:(*) = wpopen;

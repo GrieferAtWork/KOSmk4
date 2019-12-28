@@ -104,6 +104,7 @@ libvideo_preferred_format(void) {
 	if (!result->vf_codec) {
 		struct video_codec *codec;
 		/* TODO: Ask the bound video driver for its preferred format. */
+		COMPILER_IMPURE();
 		codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
 		result->vf_pal = NULL;
 		assert(codec != NULL);

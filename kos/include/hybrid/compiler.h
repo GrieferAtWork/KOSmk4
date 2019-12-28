@@ -180,6 +180,7 @@
 #define NONNULL             __ATTR_NONNULL
 #define WUNUSED             __ATTR_WUNUSED
 #define UNUSED              __UNUSED
+#define IMPDAT              __IMPDAT
 #define IMPDEF              __IMPDEF
 #define EXPDEF              __EXPDEF
 #define FUNDEF              __PUBDEF

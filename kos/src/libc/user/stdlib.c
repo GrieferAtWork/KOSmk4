@@ -1996,29 +1996,7 @@ NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func)
 }
 /*[[[end:onexit]]]*/
 
-/*[[[head:_wperror,hash:CRC-32=0xa5962fc3]]]*/
-INTERN ATTR_COLD
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._wperror") void
-NOTHROW_RPC(LIBCCALL libc__wperror)(char32_t const *errmsg)
-/*[[[body:_wperror]]]*/
-{
-	(void)errmsg;
-	CRT_UNIMPLEMENTED("_wperror"); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:_wperror]]]*/
 
-/*[[[head:DOS$_wperror,hash:CRC-32=0xf1b3aa1]]]*/
-INTERN ATTR_COLD
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._wperror") void
-NOTHROW_RPC(LIBDCALL libd__wperror)(char16_t const *errmsg)
-/*[[[body:DOS$_wperror]]]*/
-{
-	(void)errmsg;
-	CRT_UNIMPLEMENTED("_wperror"); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:DOS$_wperror]]]*/
 
 /*[[[head:_beep,hash:CRC-32=0xac9f7eb3]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.system._beep") void
@@ -2042,7 +2020,7 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8683d69]]]*/
+/*[[[start:exports,hash:CRC-32=0x18fa2fd0]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_WEAK_ALIAS(system, libc_system);
 DEFINE_PUBLIC_WEAK_ALIAS(abort, libc_abort);
@@ -2149,8 +2127,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(_searchenv_s, libc__searchenv_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_seterrormode, libc__seterrormode);
 DEFINE_PUBLIC_WEAK_ALIAS(_set_error_mode, libc__set_error_mode);
 DEFINE_PUBLIC_WEAK_ALIAS(_beep, libc__beep);
-DEFINE_PUBLIC_WEAK_ALIAS(_wperror, libc__wperror);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wperror, libd__wperror);
 DEFINE_PUBLIC_WEAK_ALIAS(onexit, libc_onexit);
 DEFINE_PUBLIC_WEAK_ALIAS(_onexit, libc_onexit);
 /*[[[end:exports]]]*/

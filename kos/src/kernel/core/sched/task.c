@@ -573,9 +573,12 @@ PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) REF struct task *
 
 
 DEFINE_SYSCALL1(void, exit, syscall_ulong_t, exit_code) {
+	COMPILER_IMPURE();
 	THROW(E_EXIT_THREAD, W_EXITCODE(exit_code & 0xff, 0));
 }
+
 DEFINE_SYSCALL1(void, exit_group, syscall_ulong_t, exit_code) {
+	COMPILER_IMPURE();
 	THROW(E_EXIT_PROCESS, W_EXITCODE(exit_code & 0xff, 0));
 }
 

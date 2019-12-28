@@ -185,6 +185,7 @@ vm_paged_forcefault(struct vm *__restrict self,
 	(void)maxpageid;
 	(void)for_writing;
 
+	COMPILER_IMPURE();
 	kernel_panic("TODO");
 
 	return 0;

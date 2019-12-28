@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84acc1da */
+/* HASH CRC-32:0xcb9a99f3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NO
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__strerror_buf) char __strerror_buf[64] = { 0 };
-__LOCAL_LIBC(strerror) __ATTR_RETNONNULL __ATTR_WUNUSED char *
+__LOCAL_LIBC(strerror) __ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(int __errnum) {
 #line 415 "kos/src/libc/magic/string.c"
 	char *__result = __strerror_buf;

@@ -250,8 +250,7 @@
 #define __USE_ISOCXX17 1
 #endif
 
-#if defined(__cplusplus) && \
-  (!defined(__GNUC__) || __GCC_VERSION(4,4,0))
+#if defined(__cplusplus) && (!defined(__GNUC__) || __GCC_VERSION_NUM >= 40400)
 /* Enable proper C++ prototype declarations. */
 #define __CORRECT_ISO_CPP_STRING_H_PROTO    1
 #define __CORRECT_ISO_CPP_STRINGS_H_PROTO   1

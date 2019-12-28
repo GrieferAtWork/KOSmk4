@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54368905 */
+/* HASH CRC-32:0xfd052183 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,7 +119,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_
 #ifndef ____localdep_strerror_defined
 #define ____localdep_strerror_defined 1
 #ifdef __CRT_HAVE_strerror
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(int __errnum),strerror,(__errnum))
+__CREDIRECT(__ATTR_COLD __ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(int __errnum),strerror,(__errnum))
 #else /* LIBC: strerror */
 #include <local/string/strerror.h>
 #define __localdep_strerror (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror))

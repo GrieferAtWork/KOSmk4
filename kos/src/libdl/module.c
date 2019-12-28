@@ -195,7 +195,7 @@ DlModule_GetFd(DlModule *__restrict self) {
 		fd_t newresult;
 		assert(result == -1);
 		result = sys_open(self->dm_filename, O_RDONLY | O_CLOEXEC, 0);
-		if (E_ISERR(result))
+		if unlikely(E_ISERR(result))
 			goto err;
 		/* Make sure to only use big file descriptor indices, so-as
 		 * to prevent use of reserved file numbers, as used by the
@@ -209,9 +209,8 @@ DlModule_GetFd(DlModule *__restrict self) {
 	}
 	return result;
 err:
-	elf_setdlerrorf("%q: Failed to open module for reading",
-	                self->dm_filename);
-	return -1;
+	return elf_setdlerrorf("%q: Failed to open module for reading",
+	                       self->dm_filename);
 }
 
 /* Lazily allocate if necessary, and return the vector of section headers for `self'
@@ -339,7 +338,7 @@ err:
 }
 
 
-INTERN ATTR_COLD NONNULL((1, 2)) int CC
+INTERN NONNULL((1, 2)) __attribute__((__cold__)) int CC
 elf_setdlerror_nosect(DlModule *__restrict self,
                       char const *__restrict name) {
 	return elf_setdlerrorf("%q: No such section %q",

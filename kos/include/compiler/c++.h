@@ -38,60 +38,60 @@
 #define __DECL_BEGIN extern "C" {
 #define __DECL_END   }
 
-#if __has_feature(cxx_constexpr) || \
-   (defined(__cpp_constexpr) && __cpp_constexpr >= 200704) || \
-   (defined(__IBMCPP__) && defined(__IBMCPP_CONSTEXPR) && (__IBMCPP_CONSTEXPR+0)) || \
-   (defined(__SUNPRO_CC) && __SUNPRO_CC >= 0x5130) || \
-   (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GCC_VERSION(4,6,0) && !defined(__INTELLISENSE__)) || \
-   (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190023026)
+#if (__has_feature(cxx_constexpr) ||                                                                      \
+     (defined(__cpp_constexpr) && __cpp_constexpr >= 200704) ||                                           \
+     (defined(__IBMCPP__) && defined(__IBMCPP_CONSTEXPR) && (__IBMCPP_CONSTEXPR + 0)) ||                  \
+     (defined(__SUNPRO_CC) && __SUNPRO_CC >= 0x5130) ||                                                   \
+     (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GCC_VERSION_NUM >= 40600 && !defined(__INTELLISENSE__)) || \
+     (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190023026))
 #ifdef _MSC_VER
 /* Some stupid warning about adding `const' even though
  * we already differenciate with C++14 constexpr. */
-#   pragma warning(disable: 4814)
+#pragma warning(disable: 4814)
 #endif /* _MSC_VER */
-#   define __COMPILER_HAVE_CXX11_CONSTEXPR 1
-#   define __CXX11_CONSTEXPR          constexpr
-#   define __CXX11_CONSTEXPR_OR_CONST constexpr
+#define __COMPILER_HAVE_CXX11_CONSTEXPR 1
+#define __CXX11_CONSTEXPR          constexpr
+#define __CXX11_CONSTEXPR_OR_CONST constexpr
 #else
-#   define __CXX11_CONSTEXPR          /* Nothing */
-#   define __CXX11_CONSTEXPR_OR_CONST const
+#define __CXX11_CONSTEXPR          /* Nothing */
+#define __CXX11_CONSTEXPR_OR_CONST const
 #endif
 
-#if (defined(__clang__) && !(!__has_feature(cxx_generic_lambdas) || \
-                            !(__has_feature(cxx_relaxed_constexpr) || \
-                              __has_extension(cxx_relaxed_constexpr)))) || \
-    (defined(__cpp_constexpr) && __cpp_constexpr >= 201304 && !defined(__clang__))
-#   define __COMPILER_HAVE_CXX14_CONSTEXPR 1
-#   define __CXX14_CONSTEXPR          constexpr
-#   define __CXX14_CONSTEXPR_OR_CONST constexpr
+#if ((defined(__clang__) && !(!__has_feature(cxx_generic_lambdas) ||         \
+                              !(__has_feature(cxx_relaxed_constexpr) ||      \
+                                __has_extension(cxx_relaxed_constexpr)))) || \
+     (defined(__cpp_constexpr) && __cpp_constexpr >= 201304 && !defined(__clang__)))
+#define __COMPILER_HAVE_CXX14_CONSTEXPR 1
+#define __CXX14_CONSTEXPR          constexpr
+#define __CXX14_CONSTEXPR_OR_CONST constexpr
 #else
-#   define __CXX14_CONSTEXPR          /* Nothing */
-#   define __CXX14_CONSTEXPR_OR_CONST const
+#define __CXX14_CONSTEXPR          /* Nothing */
+#define __CXX14_CONSTEXPR_OR_CONST const
 #endif
 
 
 #if 0
-#   define __COMPILER_HAVE_CXX17_CONSTEXPR 1
-#   define __CXX17_CONSTEXPR          constexpr
-#   define __CXX17_CONSTEXPR_OR_CONST constexpr
+#define __COMPILER_HAVE_CXX17_CONSTEXPR 1
+#define __CXX17_CONSTEXPR          constexpr
+#define __CXX17_CONSTEXPR_OR_CONST constexpr
 #else
-#   define __CXX17_CONSTEXPR          /* Nothing */
-#   define __CXX17_CONSTEXPR_OR_CONST const
+#define __CXX17_CONSTEXPR          /* Nothing */
+#define __CXX17_CONSTEXPR_OR_CONST const
 #endif
 
-#if __has_feature(cxx_noexcept) || \
-   (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GCC_VERSION(4,6,0) && !defined(__INTELLISENSE__)) || \
-   (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190021730)
-#   define __COMPILER_HAVE_CXX11_NOEXCEPT 1
-#   define __CXX_NOEXCEPT            noexcept
-#   define __CXX_NOEXCEPT_IF(expr)   noexcept(expr)
-#   define __CXX_NOEXCEPT_IS(expr)   noexcept(expr)
-#   define __CXX_NOEXCEPT_IFNX(expr) noexcept(noexcept(expr))
+#if (__has_feature(cxx_noexcept) ||                                                                       \
+     (defined(__GXX_EXPERIMENTAL_CXX0X__) && __GCC_VERSION_NUM >= 40600 && !defined(__INTELLISENSE__)) || \
+     (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 190021730))
+#define __COMPILER_HAVE_CXX11_NOEXCEPT 1
+#define __CXX_NOEXCEPT            noexcept
+#define __CXX_NOEXCEPT_IF(expr)   noexcept(expr)
+#define __CXX_NOEXCEPT_IS(expr)   noexcept(expr)
+#define __CXX_NOEXCEPT_IFNX(expr) noexcept(noexcept(expr))
 #else
-#   define __CXX_NOEXCEPT            throw()
-#   define __CXX_NOEXCEPT_IF(expr)   /* nothing */
-#   define __CXX_NOEXCEPT_IS(expr)   0
-#   define __CXX_NOEXCEPT_IFNX(expr) /* nothing */
+#define __CXX_NOEXCEPT            throw()
+#define __CXX_NOEXCEPT_IF(expr)   /* nothing */
+#define __CXX_NOEXCEPT_IS(expr)   0
+#define __CXX_NOEXCEPT_IFNX(expr) /* nothing */
 #endif
 
 #if !defined(__KOS__) || !defined(__KERNEL__)
@@ -99,11 +99,11 @@
 #endif /* !__KOS__ || !__KERNEL__ */
 
 #ifndef __ELF__
-#   define __CXX_CLASSMEMBER inline
+#define __CXX_CLASSMEMBER inline
 #elif defined(__NO_ATTR_VISIBILITY)
-#   define __CXX_CLASSMEMBER __ATTR_FORCEINLINE
+#define __CXX_CLASSMEMBER __ATTR_FORCEINLINE
 #else
-#   define __CXX_CLASSMEMBER inline __ATTR_VISIBILITY("hidden")
+#define __CXX_CLASSMEMBER inline __ATTR_VISIBILITY("hidden")
 #endif
 
 #ifdef __NO_NAMESPACE_STD
