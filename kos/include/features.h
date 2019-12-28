@@ -391,6 +391,24 @@
 #endif /* _UTF_SOURCE */
 
 
+/* Enable closer emulation of glibc headers in cases where
+ * standards leave the implementation behavior open.
+ * This mainly affects optional include implications in system
+ * headers. For example, POSIX allows (but doesn't require) <aio.h>
+ * to also #include <sys/types.h>, where glibc does perform this
+ * inclusion, however doing so isn't actually necessary under KOS.
+ *
+ * When `_GLIBC_SOURCE' is defined, non-portable, implicit includes
+ * are emulated more closely to what is also done by glibc, note
+ * however that this additional level of compatibility is not backed
+ * by any fixed standard, but depends solely on what glibc actually
+ * does in relation to fixed standards (such as POSIX) */
+#ifdef _GLIBC_SOURCE
+#undef __USE_GLIBC
+#define __USE_GLIBC 1
+#endif /* _GLIBC_SOURCE */
+
+
 #ifdef _ALL_SOURCE
 #undef __USE_KOS
 #undef __USE_STRING_BWLQ

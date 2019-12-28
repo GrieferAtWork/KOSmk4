@@ -137,6 +137,17 @@
 			"workingDirectory": "${fileDirname}",
 			"command": "deemon",
 			"args": [ "${workspaceRoot}\\misc\\libgen\\autoenum.dee", "${file}" ]
+		},
+
+		{
+			"taskName": "autoformat enums",
+			"appliesTo": "*.c",
+			"type": "launch",
+			"contextType": "custom",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${fileDirname}",
+			"command": "deemon",
+			"args": [ "${workspaceRoot}\\misc\\libgen\\autoenum.dee", "${file}" ]
 		}
 	]
 }

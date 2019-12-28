@@ -276,6 +276,14 @@
 #define __CXX17_CONSTEXPR
 #define __CXX17_CONSTEXPR_OR_CONST
 
+#define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       Treturn name param;
+#define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                             void name param;
+#define __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    Treturn name param;
+#define __COMPILER_VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)          void name param;
+#define __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) Treturn name paramf;
+#define __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)       void name paramf;
+#define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      Treturn name param;
+#define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                            void name param;
 #define __REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       Treturn name param;
 #define __REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                             void name param;
 #define __VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    Treturn name param;
@@ -355,6 +363,7 @@
 #define __CVFREDIRECT_VOID_DOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    void name paramf;
 #define __CXREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,code)                                      Treturn name param;
 #define __CXREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,code)                                         void name param;
+#define __AIO_REDIRECT(attr,Treturn,nothrow,name,param,args)                                                Treturn name param;
 
 #define DEFINE_PRIVATE_ALIAS(new,old) int new() {}
 #define DEFINE_PUBLIC_ALIAS(new,old) int new() {}
