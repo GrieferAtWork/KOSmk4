@@ -1553,7 +1553,9 @@
 #define __CRT_HAVE_sys32_mq_notify 1
 #define __CRT_HAVE_sys32_mq_open 1
 #define __CRT_HAVE_sys32_mq_timedreceive 1
+#define __CRT_HAVE_sys32_mq_timedreceive64 1
 #define __CRT_HAVE_sys32_mq_timedsend 1
+#define __CRT_HAVE_sys32_mq_timedsend64 1
 #define __CRT_HAVE_sys32_mq_unlink 1
 #define __CRT_HAVE_sys32_mremap 1
 #define __CRT_HAVE_sys32_msync 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bcf2213 */
+/* HASH CRC-32:0x622567dc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -288,12 +288,12 @@
 #define SYS_mbind                  __NR_mbind                  /* errno_t mbind(int TODO_PROTOTYPE) */
 #define SYS_set_mempolicy          __NR_set_mempolicy          /* errno_t set_mempolicy(int TODO_PROTOTYPE) */
 #define SYS_get_mempolicy          __NR_get_mempolicy          /* errno_t get_mempolicy(int TODO_PROTOTYPE) */
-#define SYS_mq_open                __NR_mq_open                /* errno_t mq_open(int TODO_PROTOTYPE) */
-#define SYS_mq_unlink              __NR_mq_unlink              /* errno_t mq_unlink(int TODO_PROTOTYPE) */
-#define SYS_mq_timedsend           __NR_mq_timedsend           /* errno_t mq_timedsend(int TODO_PROTOTYPE) */
-#define SYS_mq_timedreceive        __NR_mq_timedreceive        /* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
-#define SYS_mq_notify              __NR_mq_notify              /* errno_t mq_notify(int TODO_PROTOTYPE) */
-#define SYS_mq_getsetattr          __NR_mq_getsetattr          /* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+#define SYS_mq_open                __NR_mq_open                /* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
+#define SYS_mq_unlink              __NR_mq_unlink              /* errno_t mq_unlink(char const *name) */
+#define SYS_mq_timedsend           __NR_mq_timedsend           /* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx64 const *abs_timeout) */
+#define SYS_mq_timedreceive        __NR_mq_timedreceive        /* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx64 const *abs_timeout) */
+#define SYS_mq_notify              __NR_mq_notify              /* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
+#define SYS_mq_getsetattr          __NR_mq_getsetattr          /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 #define SYS_kexec_load             __NR_kexec_load             /* errno_t kexec_load(int TODO_PROTOTYPE) */
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 #define SYS_waitid                 __NR_waitid                 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, syscall_ulong_t options, struct rusage *ru) */

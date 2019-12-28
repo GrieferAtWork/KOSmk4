@@ -914,10 +914,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak page_malloc; .quad page_malloc
 	.reloc ., R_X86_64_SIZE32, page_malloc; .int 0
 	.int 0x64270e3
-	.quad 0 /* index: 228 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname228 /* index: 228 */
+	.weak sys32_mq_timedreceive64; .quad sys32_mq_timedreceive64
+	.reloc ., R_X86_64_SIZE32, sys32_mq_timedreceive64; .int 0
+	.int 0x1c400e4
 	.quad .Lname229 /* index: 229 */
 	.weak page_ffree; .quad page_ffree
 	.reloc ., R_X86_64_SIZE32, page_ffree; .int 0
@@ -2346,10 +2346,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pidns_destroy; .quad pidns_destroy
 	.reloc ., R_X86_64_SIZE32, pidns_destroy; .int 0
 	.int 0xc31e249
-	.quad 0 /* index: 586 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname586 /* index: 586 */
+	.weak unwind_fde_find; .quad unwind_fde_find
+	.reloc ., R_X86_64_SIZE32, unwind_fde_find; .int 0
+	.int 0x4b137d4
 	.quad .Lname587 /* index: 587 */
 	.weak unwind_setreg_kcpustate; .quad unwind_setreg_kcpustate
 	.reloc ., R_X86_64_SIZE32, unwind_setreg_kcpustate; .int 0
@@ -5919,9 +5919,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1479 /* index: 1479 */
-	.weak unwind_fde_find; .quad unwind_fde_find
-	.reloc ., R_X86_64_SIZE32, unwind_fde_find; .int 0
-	.int 0x4b137d4
+	.weak sys32_mq_timedsend64; .quad sys32_mq_timedsend64
+	.reloc ., R_X86_64_SIZE32, sys32_mq_timedsend64; .int 0
+	.int 0xc98c7d4
 	.quad 0 /* index: 1480 */
 	.quad 0
 	.int 0
@@ -16712,6 +16712,8 @@ END(kernel_symbol_table)
 	.string "sys32_pipe2"
 .Lname227:
 	.string "page_malloc"
+.Lname228:
+	.string "sys32_mq_timedreceive64"
 .Lname229:
 	.string "page_ffree"
 .Lname230:
@@ -17240,6 +17242,8 @@ END(kernel_symbol_table)
 	.string "ringbuffer_setwritten"
 .Lname585:
 	.string "pidns_destroy"
+.Lname586:
+	.string "unwind_fde_find"
 .Lname587:
 	.string "unwind_setreg_kcpustate"
 .Lname588:
@@ -18433,7 +18437,7 @@ END(kernel_symbol_table)
 .Lname1477:
 	.string "pagedir_unmapone"
 .Lname1479:
-	.string "unwind_fde_find"
+	.string "sys32_mq_timedsend64"
 .Lname1481:
 	.string "sys32_poll"
 .Lname1484:

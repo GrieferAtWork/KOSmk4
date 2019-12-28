@@ -3758,7 +3758,9 @@
 #define __CRT_HAVE_sys_Xmq_notify 1
 #define __CRT_HAVE_sys_Xmq_open 1
 #define __CRT_HAVE_sys_Xmq_timedreceive 1
+#define __CRT_HAVE_sys_Xmq_timedreceive64 1
 #define __CRT_HAVE_sys_Xmq_timedsend 1
+#define __CRT_HAVE_sys_Xmq_timedsend64 1
 #define __CRT_HAVE_sys_Xmq_unlink 1
 #define __CRT_HAVE_sys_Xmremap 1
 #define __CRT_HAVE_sys_Xmsync 1
@@ -4199,7 +4201,9 @@
 #define __CRT_HAVE_sys_mq_notify 1
 #define __CRT_HAVE_sys_mq_open 1
 #define __CRT_HAVE_sys_mq_timedreceive 1
+#define __CRT_HAVE_sys_mq_timedreceive64 1
 #define __CRT_HAVE_sys_mq_timedsend 1
+#define __CRT_HAVE_sys_mq_timedsend64 1
 #define __CRT_HAVE_sys_mq_unlink 1
 #define __CRT_HAVE_sys_mremap 1
 #define __CRT_HAVE_sys_msync 1

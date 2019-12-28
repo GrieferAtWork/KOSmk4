@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89c2bd2e */
+/* HASH CRC-32:0x126cca94 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -175,8 +175,6 @@
 #define __NR3264COMPAT_mq_getsetattr          1
 #define __NR3264COMPAT_mq_notify              1
 #define __NR3264COMPAT_mq_open                1
-#define __NR3264COMPAT_mq_timedreceive        1
-#define __NR3264COMPAT_mq_timedsend           1
 #define __NR3264COMPAT_mq_unlink              1
 #define __NR3264COMPAT_mremap                 1
 #define __NR3264COMPAT_msync                  1

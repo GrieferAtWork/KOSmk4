@@ -23,6 +23,7 @@
 
 #include <librt/api.h>
 
-#define CC LIBRT_CC
+#define CC  LIBRT_CC
+#define VCC LIBRT_VCC
 
 #endif /* !GUARD_LIBRT_API_H */

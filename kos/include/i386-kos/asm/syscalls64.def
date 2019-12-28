@@ -73,6 +73,8 @@ timerfd_gettime = timerfd_gettimex64;
 timerfd_settime = timerfd_settimex64;
 timer_settime = timer_settimex64;
 timer_gettime = timer_gettimex64;
+mq_timedsend = mq_timedsendx64;
+mq_timedreceive = mq_timedreceivex64;
 
 
 /* Syscall definition syntax

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e1dd07f */
+/* HASH CRC-32:0xe38cad37 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -217,12 +217,12 @@
 #define SYS_getegid                __NR_getegid                /* gid_t getegid(void) */
 #define SYS_gettid                 __NR_gettid                 /* pid_t gettid(void) */
 #define SYS_sysinfo                __NR_sysinfo                /* errno_t sysinfo(struct sysinfo *info) */
-#define SYS_mq_open                __NR_mq_open                /* errno_t mq_open(int TODO_PROTOTYPE) */
-#define SYS_mq_unlink              __NR_mq_unlink              /* errno_t mq_unlink(int TODO_PROTOTYPE) */
-#define SYS_mq_timedsend           __NR_mq_timedsend           /* errno_t mq_timedsend(int TODO_PROTOTYPE) */
-#define SYS_mq_timedreceive        __NR_mq_timedreceive        /* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
-#define SYS_mq_notify              __NR_mq_notify              /* errno_t mq_notify(int TODO_PROTOTYPE) */
-#define SYS_mq_getsetattr          __NR_mq_getsetattr          /* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+#define SYS_mq_open                __NR_mq_open                /* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
+#define SYS_mq_unlink              __NR_mq_unlink              /* errno_t mq_unlink(char const *name) */
+#define SYS_mq_timedsend           __NR_mq_timedsend           /* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespec const *abs_timeout) */
+#define SYS_mq_timedreceive        __NR_mq_timedreceive        /* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespec const *abs_timeout) */
+#define SYS_mq_notify              __NR_mq_notify              /* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
+#define SYS_mq_getsetattr          __NR_mq_getsetattr          /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 #define SYS_msgget                 __NR_msgget                 /* errno_t msgget(int TODO_PROTOTYPE) */
 #define SYS_msgctl                 __NR_msgctl                 /* errno_t msgctl(int TODO_PROTOTYPE) */
 #define SYS_msgrcv                 __NR_msgrcv                 /* errno_t msgrcv(int TODO_PROTOTYPE) */

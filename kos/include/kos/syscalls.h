@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe9e47f6 */
+/* HASH CRC-32:0xa3d4d610 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>
 #include <librpc/bits/syscall-info.h>
+#include <librt/bits/mqueue.h>
 
 
 #ifndef __CDECLARE_SC
@@ -70,6 +71,7 @@ struct getcpu_cache;
 struct linux_dirent;
 struct linux_dirent64;
 struct mmsghdr;
+struct mq_attr;
 struct msghdr;
 struct pollfd;
 struct rlimit;
@@ -455,22 +457,16 @@ __CDECLARE_SC(,__errno_t,move_pages,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,mprotect,(void *__addr, __size_t __len, __syscall_ulong_t __prot),(__addr,__len,__prot))
 #endif /* __CRT_HAVE_SC(mprotect) */
 #if __CRT_HAVE_SC(mq_getsetattr)
-__CDECLARE_SC(,__errno_t,mq_getsetattr,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,mq_getsetattr,(__fd_t __mqdes, struct mq_attr const *__newattr, struct mq_attr *__oldattr),(__mqdes,__newattr,__oldattr))
 #endif /* __CRT_HAVE_SC(mq_getsetattr) */
 #if __CRT_HAVE_SC(mq_notify)
-__CDECLARE_SC(,__errno_t,mq_notify,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,mq_notify,(__fd_t __mqdes, struct sigevent const *__notification),(__mqdes,__notification))
 #endif /* __CRT_HAVE_SC(mq_notify) */
 #if __CRT_HAVE_SC(mq_open)
-__CDECLARE_SC(,__errno_t,mq_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__fd_t,mq_open,(char const *__name, __oflag_t __oflags, __mode_t __mode),(__name,__oflags,__mode))
 #endif /* __CRT_HAVE_SC(mq_open) */
-#if __CRT_HAVE_SC(mq_timedreceive)
-__CDECLARE_SC(,__errno_t,mq_timedreceive,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
-#endif /* __CRT_HAVE_SC(mq_timedreceive) */
-#if __CRT_HAVE_SC(mq_timedsend)
-__CDECLARE_SC(,__errno_t,mq_timedsend,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
-#endif /* __CRT_HAVE_SC(mq_timedsend) */
 #if __CRT_HAVE_SC(mq_unlink)
-__CDECLARE_SC(,__errno_t,mq_unlink,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,mq_unlink,(char const *__name),(__name))
 #endif /* __CRT_HAVE_SC(mq_unlink) */
 #if __CRT_HAVE_SC(mremap)
 /* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
@@ -1195,22 +1191,16 @@ __CDECLARE_XSC(,__errno_t,move_pages,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,mprotect,(void *__addr, __size_t __len, __syscall_ulong_t __prot),(__addr,__len,__prot))
 #endif /* __CRT_HAVE_XSC(mprotect) */
 #if __CRT_HAVE_XSC(mq_getsetattr)
-__CDECLARE_XSC(,__errno_t,mq_getsetattr,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,mq_getsetattr,(__fd_t __mqdes, struct mq_attr const *__newattr, struct mq_attr *__oldattr),(__mqdes,__newattr,__oldattr))
 #endif /* __CRT_HAVE_XSC(mq_getsetattr) */
 #if __CRT_HAVE_XSC(mq_notify)
-__CDECLARE_XSC(,__errno_t,mq_notify,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,mq_notify,(__fd_t __mqdes, struct sigevent const *__notification),(__mqdes,__notification))
 #endif /* __CRT_HAVE_XSC(mq_notify) */
 #if __CRT_HAVE_XSC(mq_open)
-__CDECLARE_XSC(,__errno_t,mq_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__fd_t,mq_open,(char const *__name, __oflag_t __oflags, __mode_t __mode),(__name,__oflags,__mode))
 #endif /* __CRT_HAVE_XSC(mq_open) */
-#if __CRT_HAVE_XSC(mq_timedreceive)
-__CDECLARE_XSC(,__errno_t,mq_timedreceive,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
-#endif /* __CRT_HAVE_XSC(mq_timedreceive) */
-#if __CRT_HAVE_XSC(mq_timedsend)
-__CDECLARE_XSC(,__errno_t,mq_timedsend,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
-#endif /* __CRT_HAVE_XSC(mq_timedsend) */
 #if __CRT_HAVE_XSC(mq_unlink)
-__CDECLARE_XSC(,__errno_t,mq_unlink,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,mq_unlink,(char const *__name),(__name))
 #endif /* __CRT_HAVE_XSC(mq_unlink) */
 #if __CRT_HAVE_XSC(mremap)
 /* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */

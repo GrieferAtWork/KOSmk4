@@ -130,6 +130,10 @@ timer_settime = timer_settimex32;
 timer_settime64 = timer_settimex32_64;
 timer_gettime = timer_gettimex32;
 timer_gettime64 = timer_gettimex32_64;
+mq_timedsend = mq_timedsendx32;
+mq_timedsend64 = mq_timedsendx32_64;
+mq_timedreceive = mq_timedreceivex32;
+mq_timedreceive64 = mq_timedreceivex32_64;
 
 
 /* Syscall definition syntax
@@ -580,6 +584,8 @@ timer_gettime64 = timer_gettimex32_64;
 0x8000010a:clock_getres64
 0x8000010b:clock_nanosleep64
 0x8000010f:utimes64
+0x80000117:mq_timedsend64
+0x80000118:mq_timedreceive64
 0x80000128:fmkdirat
 0x80000129:fmknodat
 0x8000012b:futimesat64

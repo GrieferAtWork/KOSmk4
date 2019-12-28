@@ -27,7 +27,7 @@
 #include <bits/sigevent.h>
 #include <bits/types.h>
 
-/* Documentation taken from Glibc /usr/include/aio.h */
+/* Documentation derived from Glibc /usr/include/aio.h */
 /* Copyright (C) 1996-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 

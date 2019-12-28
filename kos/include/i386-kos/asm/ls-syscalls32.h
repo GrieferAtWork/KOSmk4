@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2556412 */
+/* HASH CRC-32:0x21aeed58 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -787,8 +787,8 @@ __TSYSCALL1_UNUSED(0x80000113, 0x112, 0x112)
 __TSYSCALL1_UNUSED(0x80000114, 0x113, 0x113)
 __TSYSCALL1_UNUSED(0x80000115, 0x114, 0x114)
 __TSYSCALL1_UNUSED(0x80000116, 0x115, 0x115)
-__TSYSCALL1_UNUSED(0x80000117, 0x116, 0x116)
-__TSYSCALL1_UNUSED(0x80000118, 0x117, 0x117)
+__TSYSCALL1(mq_timedsend64, 0x116, 0x116)
+__TSYSCALL1(mq_timedreceive64, 0x117, 0x117)
 __TSYSCALL1_UNUSED(0x80000119, 0x118, 0x118)
 __TSYSCALL1_UNUSED(0x8000011a, 0x119, 0x119)
 __TSYSCALL1_UNUSED(0x8000011b, 0x11a, 0x11a)

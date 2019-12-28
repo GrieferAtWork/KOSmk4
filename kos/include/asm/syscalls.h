@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90094f27 */
+/* HASH CRC-32:0x694c4f39 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -214,12 +214,12 @@
 #define __NR_getegid                0xb1  /* gid_t getegid(void) */
 #define __NR_gettid                 0xb2  /* pid_t gettid(void) */
 #define __NR_sysinfo                0xb3  /* errno_t sysinfo(struct sysinfo *info) */
-#define __NR_mq_open                0xb4  /* errno_t mq_open(int TODO_PROTOTYPE) */
-#define __NR_mq_unlink              0xb5  /* errno_t mq_unlink(int TODO_PROTOTYPE) */
-#define __NR_mq_timedsend           0xb6  /* errno_t mq_timedsend(int TODO_PROTOTYPE) */
-#define __NR_mq_timedreceive        0xb7  /* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
-#define __NR_mq_notify              0xb8  /* errno_t mq_notify(int TODO_PROTOTYPE) */
-#define __NR_mq_getsetattr          0xb9  /* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+#define __NR_mq_open                0xb4  /* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
+#define __NR_mq_unlink              0xb5  /* errno_t mq_unlink(char const *name) */
+#define __NR_mq_timedsend           0xb6  /* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespec const *abs_timeout) */
+#define __NR_mq_timedreceive        0xb7  /* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespec const *abs_timeout) */
+#define __NR_mq_notify              0xb8  /* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
+#define __NR_mq_getsetattr          0xb9  /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 #define __NR_msgget                 0xba  /* errno_t msgget(int TODO_PROTOTYPE) */
 #define __NR_msgctl                 0xbb  /* errno_t msgctl(int TODO_PROTOTYPE) */
 #define __NR_msgrcv                 0xbc  /* errno_t msgrcv(int TODO_PROTOTYPE) */
@@ -1046,12 +1046,12 @@
 #define __NRRC_getegid                0
 #define __NRRC_gettid                 0
 #define __NRRC_sysinfo                1
-#define __NRRC_mq_open                1
+#define __NRRC_mq_open                3
 #define __NRRC_mq_unlink              1
-#define __NRRC_mq_timedsend           1
-#define __NRRC_mq_timedreceive        1
-#define __NRRC_mq_notify              1
-#define __NRRC_mq_getsetattr          1
+#define __NRRC_mq_timedsend           5
+#define __NRRC_mq_timedreceive        5
+#define __NRRC_mq_notify              2
+#define __NRRC_mq_getsetattr          3
 #define __NRRC_msgget                 1
 #define __NRRC_msgctl                 1
 #define __NRRC_msgrcv                 1

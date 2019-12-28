@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1eef9ae */
+/* HASH CRC-32:0x7f73563e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -329,12 +329,12 @@
 #define __NR_mbind                   0x112                  /* errno_t mbind(int TODO_PROTOTYPE) */
 #define __NR_get_mempolicy           0x113                  /* errno_t get_mempolicy(int TODO_PROTOTYPE) */
 #define __NR_set_mempolicy           0x114                  /* errno_t set_mempolicy(int TODO_PROTOTYPE) */
-#define __NR_mq_open                 0x115                  /* errno_t mq_open(int TODO_PROTOTYPE) */
-#define __NR_mq_unlink               0x116                  /* errno_t mq_unlink(int TODO_PROTOTYPE) */
-#define __NR_mq_timedsend            0x117                  /* errno_t mq_timedsend(int TODO_PROTOTYPE) */
-#define __NR_mq_timedreceive         0x118                  /* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
-#define __NR_mq_notify               0x119                  /* errno_t mq_notify(int TODO_PROTOTYPE) */
-#define __NR_mq_getsetattr           0x11a                  /* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+#define __NR_mq_open                 0x115                  /* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
+#define __NR_mq_unlink               0x116                  /* errno_t mq_unlink(char const *name) */
+#define __NR_mq_timedsend            0x117                  /* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
+#define __NR_mq_timedreceive         0x118                  /* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
+#define __NR_mq_notify               0x119                  /* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
+#define __NR_mq_getsetattr           0x11a                  /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 #define __NR_kexec_load              0x11b                  /* errno_t kexec_load(int TODO_PROTOTYPE) */
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 #define __NR_waitid                  0x11c                  /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusage *ru) */
@@ -774,6 +774,8 @@
 #define __NR_clock_getres64          __UINT32_C(0x8000010a) /* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
 #define __NR_clock_nanosleep64       __UINT32_C(0x8000010b) /* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
 #define __NR_utimes64                __UINT32_C(0x8000010f) /* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
+#define __NR_mq_timedsend64          __UINT32_C(0x80000117) /* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+#define __NR_mq_timedreceive64       __UINT32_C(0x80000118) /* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR_fmkdirat                __UINT32_C(0x80000128) /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -1283,6 +1285,8 @@
 #define __NRRM_clock_getres64          0
 #define __NRRM_clock_nanosleep64       1
 #define __NRRM_utimes64                0
+#define __NRRM_mq_timedsend64          0
+#define __NRRM_mq_timedreceive64       0
 #define __NRRM_fmkdirat                0
 #define __NRRM_fmknodat                0
 #define __NRRM_futimesat64             0
@@ -1460,6 +1464,8 @@
 #define __NRCP_kreaddirf               1
 #define __NRCP_clock_nanosleep64       1
 #define __NRCP_utimes64                1
+#define __NRCP_mq_timedsend64          1
+#define __NRCP_mq_timedreceive64       1
 #define __NRCP_fmkdirat                1
 #define __NRCP_fmknodat                1
 #define __NRCP_futimesat64             1
@@ -1759,12 +1765,12 @@
 #define __NRRC_mbind                   1
 #define __NRRC_get_mempolicy           1
 #define __NRRC_set_mempolicy           1
-#define __NRRC_mq_open                 1
+#define __NRRC_mq_open                 3
 #define __NRRC_mq_unlink               1
-#define __NRRC_mq_timedsend            1
-#define __NRRC_mq_timedreceive         1
-#define __NRRC_mq_notify               1
-#define __NRRC_mq_getsetattr           1
+#define __NRRC_mq_timedsend            5
+#define __NRRC_mq_timedreceive         5
+#define __NRRC_mq_notify               2
+#define __NRRC_mq_getsetattr           3
 #define __NRRC_kexec_load              1
 #define __NRRC_waitid                  5
 #define __NRRC_add_key                 1
@@ -1912,6 +1918,8 @@
 #define __NRRC_clock_getres64          2
 #define __NRRC_clock_nanosleep64       4
 #define __NRRC_utimes64                2
+#define __NRRC_mq_timedsend64          5
+#define __NRRC_mq_timedreceive64       5
 #define __NRRC_fmkdirat                4
 #define __NRRC_fmknodat                5
 #define __NRRC_futimesat64             3

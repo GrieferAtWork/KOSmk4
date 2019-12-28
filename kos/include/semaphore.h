@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bfbd555 */
+/* HASH CRC-32:0x56c0380 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_init,(sem_t *__sem, int __p
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_destroy,(sem_t *__sem),(__sem))
 #endif /* sem_destroy... */
 #ifdef __CRT_HAVE_sem_open
-/* Open a named semaphore NAME with open flags OFLAG */
+/* Open a named semaphore NAME with open flags OFLAGS */
 __LIBC __ATTR_NONNULL((1)) sem_t *__NOTHROW_RPC_KOS(__VLIBCCALL sem_open)(char const *__name, __oflag_t __oflags, ...) __CASMNAME_SAME("sem_open");
 #endif /* sem_open... */
 #ifdef __CRT_HAVE_sem_close

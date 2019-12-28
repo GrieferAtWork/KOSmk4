@@ -22,6 +22,7 @@
 #include "_api.h"
 
 #define LIBRT_CC           __LIBRT_CC
+#define LIBRT_VCC          __LIBRT_VCC
 #define LIBRT_DECL         __LIBRT_DECL
 #define LIBRT_LIBRARY_NAME __LIBRT_LIBRARY_NAME
 

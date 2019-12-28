@@ -1495,6 +1495,7 @@
 #define __CRT_HAVE_sys_kreaddir 1
 #define __CRT_HAVE_sys_kreaddirf 1
 #define __CRT_HAVE_sys_kstat 1
+#define __CRT_HAVE_sys_ksysctl 1
 #define __CRT_HAVE_sys_lchown 1
 #define __CRT_HAVE_sys_lchown32 1
 #define __CRT_HAVE_sys_lfutex 1
@@ -1548,7 +1549,9 @@
 #define __CRT_HAVE_sys_mq_notify 1
 #define __CRT_HAVE_sys_mq_open 1
 #define __CRT_HAVE_sys_mq_timedreceive 1
+#define __CRT_HAVE_sys_mq_timedreceive64 1
 #define __CRT_HAVE_sys_mq_timedsend 1
+#define __CRT_HAVE_sys_mq_timedsend64 1
 #define __CRT_HAVE_sys_mq_unlink 1
 #define __CRT_HAVE_sys_mremap 1
 #define __CRT_HAVE_sys_msync 1
@@ -1714,7 +1717,6 @@
 #define __CRT_HAVE_sys_sync 1
 #define __CRT_HAVE_sys_sync_file_range 1
 #define __CRT_HAVE_sys_syncfs 1
-#define __CRT_HAVE_sys_sysctl 1
 #define __CRT_HAVE_sys_sysfs 1
 #define __CRT_HAVE_sys_sysinfo 1
 #define __CRT_HAVE_sys_syslog 1

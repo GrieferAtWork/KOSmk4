@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d21cdd */
+/* HASH CRC-32:0x72640a46 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,12 +208,12 @@
 #define __NRAC_getegid                0
 #define __NRAC_gettid                 0
 #define __NRAC_sysinfo                1
-#define __NRAC_mq_open                1
+#define __NRAC_mq_open                3
 #define __NRAC_mq_unlink              1
-#define __NRAC_mq_timedsend           1
-#define __NRAC_mq_timedreceive        1
-#define __NRAC_mq_notify              1
-#define __NRAC_mq_getsetattr          1
+#define __NRAC_mq_timedsend           5
+#define __NRAC_mq_timedreceive        5
+#define __NRAC_mq_notify              2
+#define __NRAC_mq_getsetattr          3
 #define __NRAC_msgget                 1
 #define __NRAC_msgctl                 1
 #define __NRAC_msgrcv                 1
@@ -530,10 +530,10 @@
 #define __NRRT_getegid                (gid_t, __gid_t)
 #define __NRRT_gettid                 (pid_t, __pid_t)
 #define __NRRT_sysinfo                (errno_t, __errno_t)
-#define __NRRT_mq_open                (errno_t, __errno_t)
+#define __NRRT_mq_open                (fd_t, __fd_t)
 #define __NRRT_mq_unlink              (errno_t, __errno_t)
 #define __NRRT_mq_timedsend           (errno_t, __errno_t)
-#define __NRRT_mq_timedreceive        (errno_t, __errno_t)
+#define __NRRT_mq_timedreceive        (ssize_t, __ssize_t)
 #define __NRRT_mq_notify              (errno_t, __errno_t)
 #define __NRRT_mq_getsetattr          (errno_t, __errno_t)
 #define __NRRT_msgget                 (errno_t, __errno_t)
@@ -1072,12 +1072,25 @@
 #define __NRAT1_settimeofday           (struct timezone const *, struct timezone const *)
 #define __NRAT0_adjtimex               (int, int)
 #define __NRAT0_sysinfo                (struct sysinfo *, struct sysinfo *)
-#define __NRAT0_mq_open                (int, int)
-#define __NRAT0_mq_unlink              (int, int)
-#define __NRAT0_mq_timedsend           (int, int)
-#define __NRAT0_mq_timedreceive        (int, int)
-#define __NRAT0_mq_notify              (int, int)
-#define __NRAT0_mq_getsetattr          (int, int)
+#define __NRAT0_mq_open                (char const *, char const *)
+#define __NRAT1_mq_open                (oflag_t, __oflag_t)
+#define __NRAT2_mq_open                (mode_t, __mode_t)
+#define __NRAT0_mq_unlink              (char const *, char const *)
+#define __NRAT0_mq_timedsend           (fd_t, __fd_t)
+#define __NRAT1_mq_timedsend           (char const *, char const *)
+#define __NRAT2_mq_timedsend           (size_t, __size_t)
+#define __NRAT3_mq_timedsend           (uint32_t, __uint32_t)
+#define __NRAT4_mq_timedsend           (struct timespec const *, struct timespec const *)
+#define __NRAT0_mq_timedreceive        (fd_t, __fd_t)
+#define __NRAT1_mq_timedreceive        (char *, char *)
+#define __NRAT2_mq_timedreceive        (size_t, __size_t)
+#define __NRAT3_mq_timedreceive        (uint32_t *, __uint32_t *)
+#define __NRAT4_mq_timedreceive        (struct timespec const *, struct timespec const *)
+#define __NRAT0_mq_notify              (fd_t, __fd_t)
+#define __NRAT1_mq_notify              (struct sigevent const *, struct sigevent const *)
+#define __NRAT0_mq_getsetattr          (fd_t, __fd_t)
+#define __NRAT1_mq_getsetattr          (struct mq_attr const *, struct mq_attr const *)
+#define __NRAT2_mq_getsetattr          (struct mq_attr *, struct mq_attr *)
 #define __NRAT0_msgget                 (int, int)
 #define __NRAT0_msgctl                 (int, int)
 #define __NRAT0_msgrcv                 (int, int)
@@ -1569,12 +1582,12 @@
 #define __NRAM_getegid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                /* nothing */
 #define __NRAM_gettid(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 /* nothing */
 #define __NRAM_sysinfo(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (struct sysinfo *)a
-#define __NRAM_mq_open(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (int)a
-#define __NRAM_mq_unlink(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (int)a
-#define __NRAM_mq_timedsend(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (int)a
-#define __NRAM_mq_timedreceive(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (int)a
-#define __NRAM_mq_notify(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (int)a
-#define __NRAM_mq_getsetattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
+#define __NRAM_mq_open(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (char const *)a, (__oflag_t)b, (__mode_t)c
+#define __NRAM_mq_unlink(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (char const *)a
+#define __NRAM_mq_timedsend(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__fd_t)a, (char const *)b, (__size_t)c, (__uint32_t)d, (struct timespec const *)e
+#define __NRAM_mq_timedreceive(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (__fd_t)a, (char *)b, (__size_t)c, (__uint32_t *)d, (struct timespec const *)e
+#define __NRAM_mq_notify(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (struct sigevent const *)b
+#define __NRAM_mq_getsetattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__fd_t)a, (struct mq_attr const *)b, (struct mq_attr *)c
 #define __NRAM_msgget(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (int)a
 #define __NRAM_msgctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (int)a
 #define __NRAM_msgrcv(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (int)a
@@ -1891,12 +1904,12 @@
 #define __NRAP_getegid()                                                                                            /* nothing */
 #define __NRAP_gettid()                                                                                             /* nothing */
 #define __NRAP_sysinfo(a)                                                                                           (__syscall_ulong_t)a
-#define __NRAP_mq_open(a)                                                                                           (__syscall_ulong_t)a
+#define __NRAP_mq_open(a, b, c)                                                                                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_mq_unlink(a)                                                                                         (__syscall_ulong_t)a
-#define __NRAP_mq_timedsend(a)                                                                                      (__syscall_ulong_t)a
-#define __NRAP_mq_timedreceive(a)                                                                                   (__syscall_ulong_t)a
-#define __NRAP_mq_notify(a)                                                                                         (__syscall_ulong_t)a
-#define __NRAP_mq_getsetattr(a)                                                                                     (__syscall_ulong_t)a
+#define __NRAP_mq_timedsend(a, b, c, d, e)                                                                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_mq_timedreceive(a, b, c, d, e)                                                                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_mq_notify(a, b)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_mq_getsetattr(a, b, c)                                                                               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_msgget(a)                                                                                            (__syscall_ulong_t)a
 #define __NRAP_msgctl(a)                                                                                            (__syscall_ulong_t)a
 #define __NRAP_msgrcv(a)                                                                                            (__syscall_ulong_t)a

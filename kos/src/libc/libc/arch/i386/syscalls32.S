@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe04697b7 */
+/* HASH CRC-32:0xb9d13882 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4933,23 +4933,23 @@ INTERN_FUNCTION(libc_sys_Xset_mempolicy)
 END(libc_sys_Xset_mempolicy)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xset_mempolicy, libc_sys_Xset_mempolicy)
 
-/* errno_t mq_open(int TODO_PROTOTYPE) */
+/* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
 .section .text.crt.syscall.mq_open
 INTERN_FUNCTION(libc_sys_mq_open)
 	movl   $(0x115), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall3
 END(libc_sys_mq_open)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_open, libc_sys_mq_open)
 
-/* errno_t mq_open(int TODO_PROTOTYPE) */
+/* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
 .section .text.crt.syscall.Xmq_open
 INTERN_FUNCTION(libc_sys_Xmq_open)
 	movl   $(0x115), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall3
 END(libc_sys_Xmq_open)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_open, libc_sys_Xmq_open)
 
-/* errno_t mq_unlink(int TODO_PROTOTYPE) */
+/* errno_t mq_unlink(char const *name) */
 .section .text.crt.syscall.mq_unlink
 INTERN_FUNCTION(libc_sys_mq_unlink)
 	movl   $(0x116), %eax
@@ -4957,7 +4957,7 @@ INTERN_FUNCTION(libc_sys_mq_unlink)
 END(libc_sys_mq_unlink)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_unlink, libc_sys_mq_unlink)
 
-/* errno_t mq_unlink(int TODO_PROTOTYPE) */
+/* errno_t mq_unlink(char const *name) */
 .section .text.crt.syscall.Xmq_unlink
 INTERN_FUNCTION(libc_sys_Xmq_unlink)
 	movl   $(0x116), %eax
@@ -4965,67 +4965,67 @@ INTERN_FUNCTION(libc_sys_Xmq_unlink)
 END(libc_sys_Xmq_unlink)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_unlink, libc_sys_Xmq_unlink)
 
-/* errno_t mq_timedsend(int TODO_PROTOTYPE) */
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
 .section .text.crt.syscall.mq_timedsend
 INTERN_FUNCTION(libc_sys_mq_timedsend)
 	movl   $(0x117), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall5
 END(libc_sys_mq_timedsend)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_timedsend, libc_sys_mq_timedsend)
 
-/* errno_t mq_timedsend(int TODO_PROTOTYPE) */
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
 .section .text.crt.syscall.Xmq_timedsend
 INTERN_FUNCTION(libc_sys_Xmq_timedsend)
 	movl   $(0x117), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall5
 END(libc_sys_Xmq_timedsend)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_timedsend, libc_sys_Xmq_timedsend)
 
-/* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
 .section .text.crt.syscall.mq_timedreceive
 INTERN_FUNCTION(libc_sys_mq_timedreceive)
 	movl   $(0x118), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall5
 END(libc_sys_mq_timedreceive)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_timedreceive, libc_sys_mq_timedreceive)
 
-/* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
 .section .text.crt.syscall.Xmq_timedreceive
 INTERN_FUNCTION(libc_sys_Xmq_timedreceive)
 	movl   $(0x118), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall5
 END(libc_sys_Xmq_timedreceive)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_timedreceive, libc_sys_Xmq_timedreceive)
 
-/* errno_t mq_notify(int TODO_PROTOTYPE) */
+/* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
 .section .text.crt.syscall.mq_notify
 INTERN_FUNCTION(libc_sys_mq_notify)
 	movl   $(0x119), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall2
 END(libc_sys_mq_notify)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_notify, libc_sys_mq_notify)
 
-/* errno_t mq_notify(int TODO_PROTOTYPE) */
+/* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
 .section .text.crt.syscall.Xmq_notify
 INTERN_FUNCTION(libc_sys_Xmq_notify)
 	movl   $(0x119), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xmq_notify)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_notify, libc_sys_Xmq_notify)
 
-/* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+/* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 .section .text.crt.syscall.mq_getsetattr
 INTERN_FUNCTION(libc_sys_mq_getsetattr)
 	movl   $(0x11a), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall3
 END(libc_sys_mq_getsetattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_getsetattr, libc_sys_mq_getsetattr)
 
-/* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+/* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 .section .text.crt.syscall.Xmq_getsetattr
 INTERN_FUNCTION(libc_sys_Xmq_getsetattr)
 	movl   $(0x11a), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall3
 END(libc_sys_Xmq_getsetattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_getsetattr, libc_sys_Xmq_getsetattr)
 
@@ -7964,6 +7964,38 @@ INTERN_FUNCTION(libc_sys_Xutimes64)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xutimes64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xutimes64, libc_sys_Xutimes64)
+
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.crt.syscall.mq_timedsend64
+INTERN_FUNCTION(libc_sys_mq_timedsend64)
+	movl   $(0x80000117), %eax
+	jmp    libc_x86_exec_syscall5
+END(libc_sys_mq_timedsend64)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_timedsend64, libc_sys_mq_timedsend64)
+
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.crt.syscall.Xmq_timedsend64
+INTERN_FUNCTION(libc_sys_Xmq_timedsend64)
+	movl   $(0x80000117), %eax
+	jmp    libc_x86_exec_Xsyscall5
+END(libc_sys_Xmq_timedsend64)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_timedsend64, libc_sys_Xmq_timedsend64)
+
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.crt.syscall.mq_timedreceive64
+INTERN_FUNCTION(libc_sys_mq_timedreceive64)
+	movl   $(0x80000118), %eax
+	jmp    libc_x86_exec_syscall5
+END(libc_sys_mq_timedreceive64)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_timedreceive64, libc_sys_mq_timedreceive64)
+
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.crt.syscall.Xmq_timedreceive64
+INTERN_FUNCTION(libc_sys_Xmq_timedreceive64)
+	movl   $(0x80000118), %eax
+	jmp    libc_x86_exec_Xsyscall5
+END(libc_sys_Xmq_timedreceive64)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_timedreceive64, libc_sys_Xmq_timedreceive64)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */

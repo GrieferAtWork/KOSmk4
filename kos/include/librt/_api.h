@@ -22,7 +22,8 @@
 #include <__crt.h>
 #include <__stdinc.h>
 
-#define __LIBRT_CC __LIBCCALL
+#define __LIBRT_CC  __LIBCCALL
+#define __LIBRT_VCC __VLIBCCALL
 #ifdef __LIBRT_STATIC
 #define __LIBRT_DECL __INTDEF
 #else /* __LIBRT_STATIC */

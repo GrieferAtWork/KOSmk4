@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6731cddc */
+/* HASH CRC-32:0x78201291 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7293,7 +7293,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_mempolicy)
 	.cfi_endproc
 END(__x86_asm64_syscall_get_mempolicy)
 
-/* errno_t mq_open(int TODO_PROTOTYPE) */
+/* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm64_syscall.mq_open
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_open)
 	.cfi_startproc simple
@@ -7323,7 +7323,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_open)
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_open)
 
-/* errno_t mq_unlink(int TODO_PROTOTYPE) */
+/* errno_t mq_unlink(char const *name) */
 .section .text.x86.asm64_syscall.mq_unlink
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_unlink)
 	.cfi_startproc simple
@@ -7353,7 +7353,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_unlink)
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_unlink)
 
-/* errno_t mq_timedsend(int TODO_PROTOTYPE) */
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx64 const *abs_timeout) */
 .section .text.x86.asm64_syscall.mq_timedsend
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_timedsend)
 	.cfi_startproc simple
@@ -7369,6 +7369,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_timedsend)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
+	movq   %r10, %rcx
 	EXTERN(sys_mq_timedsend)
 	call   sys_mq_timedsend
 	popq_cfi_r %r11
@@ -7383,7 +7384,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_timedsend)
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_timedsend)
 
-/* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx64 const *abs_timeout) */
 .section .text.x86.asm64_syscall.mq_timedreceive
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_timedreceive)
 	.cfi_startproc simple
@@ -7399,6 +7400,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_timedreceive)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
+	movq   %r10, %rcx
 	EXTERN(sys_mq_timedreceive)
 	call   sys_mq_timedreceive
 	popq_cfi_r %r11
@@ -7413,7 +7415,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_timedreceive)
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_timedreceive)
 
-/* errno_t mq_notify(int TODO_PROTOTYPE) */
+/* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
 .section .text.x86.asm64_syscall.mq_notify
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_notify)
 	.cfi_startproc simple
@@ -7443,7 +7445,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_notify)
 	.cfi_endproc
 END(__x86_asm64_syscall_mq_notify)
 
-/* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+/* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 .section .text.x86.asm64_syscall.mq_getsetattr
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mq_getsetattr)
 	.cfi_startproc simple
@@ -20357,7 +20359,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_mempolicy)
 	.cfi_endproc
 END(__x86_asm32_int80_set_mempolicy)
 
-/* errno_t mq_open(int TODO_PROTOTYPE) */
+/* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_int80.mq_open
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_open)
 	.cfi_startproc simple
@@ -20374,6 +20376,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_open)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_mq_open)
 	call   sys32_mq_open
 	popq_cfi_r %r11
@@ -20388,7 +20392,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_open)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_open)
 
-/* errno_t mq_unlink(int TODO_PROTOTYPE) */
+/* errno_t mq_unlink(char const *name) */
 .section .text.x86.asm32_syscall_int80.mq_unlink
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_unlink)
 	.cfi_startproc simple
@@ -20419,7 +20423,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_unlink)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_unlink)
 
-/* errno_t mq_timedsend(int TODO_PROTOTYPE) */
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
 .section .text.x86.asm32_syscall_int80.mq_timedsend
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	.cfi_startproc simple
@@ -20435,6 +20439,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mq_timedsend)
 	call   sys32_mq_timedsend
@@ -20450,7 +20459,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedsend)
 
-/* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
 .section .text.x86.asm32_syscall_int80.mq_timedreceive
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	.cfi_startproc simple
@@ -20466,6 +20475,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_mq_timedreceive)
 	call   sys32_mq_timedreceive
@@ -20481,7 +20495,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedreceive)
 
-/* errno_t mq_notify(int TODO_PROTOTYPE) */
+/* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
 .section .text.x86.asm32_syscall_int80.mq_notify
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_notify)
 	.cfi_startproc simple
@@ -20498,6 +20512,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_notify)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_mq_notify)
 	call   sys32_mq_notify
 	popq_cfi_r %r11
@@ -20512,7 +20527,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_notify)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_notify)
 
-/* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+/* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 .section .text.x86.asm32_syscall_int80.mq_getsetattr
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_getsetattr)
 	.cfi_startproc simple
@@ -20529,6 +20544,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_getsetattr)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_mq_getsetattr)
 	call   sys32_mq_getsetattr
 	popq_cfi_r %r11
@@ -25779,6 +25796,78 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
 	.cfi_endproc
 END(__x86_asm32_int80_utimes64)
 
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_int80.mq_timedsend64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x80000117
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedsend64)
+	call   sys32_mq_timedsend64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_mq_timedsend64)
+
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_int80.mq_timedreceive64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x80000118
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedreceive64)
+	call   sys32_mq_timedreceive64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_mq_timedreceive64)
+
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.fmkdirat
@@ -27750,22 +27839,90 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_get_mempolicy, __x86_asm32_int80_g
 /* errno_t set_mempolicy(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_mempolicy, __x86_asm32_int80_set_mempolicy)
 
-/* errno_t mq_open(int TODO_PROTOTYPE) */
+/* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mq_open, __x86_asm32_int80_mq_open)
 
-/* errno_t mq_unlink(int TODO_PROTOTYPE) */
+/* errno_t mq_unlink(char const *name) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mq_unlink, __x86_asm32_int80_mq_unlink)
 
-/* errno_t mq_timedsend(int TODO_PROTOTYPE) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mq_timedsend, __x86_asm32_int80_mq_timedsend)
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysenter.mq_timedsend
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x117
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedsend)
+	call   sys32_mq_timedsend
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_mq_timedsend)
 
-/* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mq_timedreceive, __x86_asm32_int80_mq_timedreceive)
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysenter.mq_timedreceive
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x118
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedreceive)
+	call   sys32_mq_timedreceive
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_mq_timedreceive)
 
-/* errno_t mq_notify(int TODO_PROTOTYPE) */
+/* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mq_notify, __x86_asm32_int80_mq_notify)
 
-/* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+/* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mq_getsetattr, __x86_asm32_int80_mq_getsetattr)
 
 /* errno_t kexec_load(int TODO_PROTOTYPE) */
@@ -29611,6 +29768,80 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_nanosleep64, __x86_asm32_int
 
 /* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimes64, __x86_asm32_int80_utimes64)
+
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysenter.mq_timedsend64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x80000117
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedsend64)
+	call   sys32_mq_timedsend64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_mq_timedsend64)
+
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysenter.mq_timedreceive64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x80000118
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedreceive64)
+	call   sys32_mq_timedreceive64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_mq_timedreceive64)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */

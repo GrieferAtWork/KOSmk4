@@ -16,14 +16,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBRT_BITS_AIOINIT_H
-#define _LIBRT_BITS_AIOINIT_H 1
+#ifndef _LIBRT_BITS_MQUEUE_H
+#define _LIBRT_BITS_MQUEUE_H 1
 
 #include <__stdinc.h>
 
-#include <hybrid/typecore.h>
+#include <bits/types.h>
 
-/* Documentation derived from Glibc /usr/include/aio.h */
+/* Documentation derived from Glibc /usr/include/mqueue.h */
 /* Copyright (C) 1996-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -43,23 +43,24 @@
 
 __SYSDECL_BEGIN
 
-/* To customize the implementation one can use the following struct.
- * This implementation follows the one in Irix. */
 /*[[[struct]]]*/
 #ifdef __CC__
-struct aioinit {
-	__INT32_TYPE__ aio_threads;   /* Maximal number of threads. */
-	__INT32_TYPE__ aio_num;       /* Number of expected simultaneous requests. */
-	__INT32_TYPE__ aio_locks;     /* Not used. */
-	__INT32_TYPE__ aio_usedba;    /* Not used. */
-	__INT32_TYPE__ aio_debug;     /* Not used. */
-	__INT32_TYPE__ aio_numusers;  /* Not used. */
-	__INT32_TYPE__ aio_idle_time; /* Number of seconds before idle thread terminates. */
-	__INT32_TYPE__ aio_reserved;  /* ... */
+typedef __fd_t mqd_t;
+#endif /* __CC__ */
+/*[[[end]]]*/
+
+/*[[[struct]]]*/
+#ifdef __CC__
+struct mq_attr {
+	__syscall_slong_t mq_flags;   /* Message queue flags.  */
+	__syscall_slong_t mq_maxmsg;  /* Maximum number of messages.  */
+	__syscall_slong_t mq_msgsize; /* Maximum message size.  */
+	__syscall_slong_t mq_curmsgs; /* Number of messages currently queued.  */
+	__syscall_slong_t __pad[4];   /* ... */
 };
 #endif /* __CC__ */
 /*[[[end]]]*/
 
 __SYSDECL_END
 
-#endif /* !_LIBRT_BITS_AIOINIT_H */
+#endif /* !_LIBRT_BITS_MQUEUE_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99fb538f */
+/* HASH CRC-32:0x4e13884b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -311,12 +311,12 @@
 #define __NR32AC_mbind                   1
 #define __NR32AC_get_mempolicy           1
 #define __NR32AC_set_mempolicy           1
-#define __NR32AC_mq_open                 1
+#define __NR32AC_mq_open                 3
 #define __NR32AC_mq_unlink               1
-#define __NR32AC_mq_timedsend            1
-#define __NR32AC_mq_timedreceive         1
-#define __NR32AC_mq_notify               1
-#define __NR32AC_mq_getsetattr           1
+#define __NR32AC_mq_timedsend            5
+#define __NR32AC_mq_timedreceive         5
+#define __NR32AC_mq_notify               2
+#define __NR32AC_mq_getsetattr           3
 #define __NR32AC_kexec_load              1
 #define __NR32AC_waitid                  5
 #define __NR32AC_add_key                 1
@@ -464,6 +464,8 @@
 #define __NR32AC_clock_getres64          2
 #define __NR32AC_clock_nanosleep64       4
 #define __NR32AC_utimes64                2
+#define __NR32AC_mq_timedsend64          5
+#define __NR32AC_mq_timedreceive64       5
 #define __NR32AC_fmkdirat                4
 #define __NR32AC_fmknodat                5
 #define __NR32AC_futimesat64             3
@@ -764,10 +766,10 @@
 #define __NR32RT_mbind                   (errno_t, __errno_t)
 #define __NR32RT_get_mempolicy           (errno_t, __errno_t)
 #define __NR32RT_set_mempolicy           (errno_t, __errno_t)
-#define __NR32RT_mq_open                 (errno_t, __errno_t)
+#define __NR32RT_mq_open                 (fd_t, __fd_t)
 #define __NR32RT_mq_unlink               (errno_t, __errno_t)
 #define __NR32RT_mq_timedsend            (errno_t, __errno_t)
-#define __NR32RT_mq_timedreceive         (errno_t, __errno_t)
+#define __NR32RT_mq_timedreceive         (ssize_t, __ssize_t)
 #define __NR32RT_mq_notify               (errno_t, __errno_t)
 #define __NR32RT_mq_getsetattr           (errno_t, __errno_t)
 #define __NR32RT_kexec_load              (errno_t, __errno_t)
@@ -917,6 +919,8 @@
 #define __NR32RT_clock_getres64          (errno_t, __errno_t)
 #define __NR32RT_clock_nanosleep64       (errno_t, __errno_t)
 #define __NR32RT_utimes64                (errno_t, __errno_t)
+#define __NR32RT_mq_timedsend64          (errno_t, __errno_t)
+#define __NR32RT_mq_timedreceive64       (ssize_t, __ssize_t)
 #define __NR32RT_fmkdirat                (errno_t, __errno_t)
 #define __NR32RT_fmknodat                (errno_t, __errno_t)
 #define __NR32RT_futimesat64             (errno_t, __errno_t)
@@ -1472,12 +1476,25 @@
 #define __NR32AT0_mbind                   (int, int)
 #define __NR32AT0_get_mempolicy           (int, int)
 #define __NR32AT0_set_mempolicy           (int, int)
-#define __NR32AT0_mq_open                 (int, int)
-#define __NR32AT0_mq_unlink               (int, int)
-#define __NR32AT0_mq_timedsend            (int, int)
-#define __NR32AT0_mq_timedreceive         (int, int)
-#define __NR32AT0_mq_notify               (int, int)
-#define __NR32AT0_mq_getsetattr           (int, int)
+#define __NR32AT0_mq_open                 (char const *, char const *)
+#define __NR32AT1_mq_open                 (oflag_t, __oflag_t)
+#define __NR32AT2_mq_open                 (mode_t, __mode_t)
+#define __NR32AT0_mq_unlink               (char const *, char const *)
+#define __NR32AT0_mq_timedsend            (fd_t, __fd_t)
+#define __NR32AT1_mq_timedsend            (char const *, char const *)
+#define __NR32AT2_mq_timedsend            (size_t, __size_t)
+#define __NR32AT3_mq_timedsend            (uint32_t, __uint32_t)
+#define __NR32AT4_mq_timedsend            (struct __timespecx32 const *, struct __timespecx32 const *)
+#define __NR32AT0_mq_timedreceive         (fd_t, __fd_t)
+#define __NR32AT1_mq_timedreceive         (char *, char *)
+#define __NR32AT2_mq_timedreceive         (size_t, __size_t)
+#define __NR32AT3_mq_timedreceive         (uint32_t *, __uint32_t *)
+#define __NR32AT4_mq_timedreceive         (struct __timespecx32 const *, struct __timespecx32 const *)
+#define __NR32AT0_mq_notify               (fd_t, __fd_t)
+#define __NR32AT1_mq_notify               (struct sigevent const *, struct sigevent const *)
+#define __NR32AT0_mq_getsetattr           (fd_t, __fd_t)
+#define __NR32AT1_mq_getsetattr           (struct mq_attr const *, struct mq_attr const *)
+#define __NR32AT2_mq_getsetattr           (struct mq_attr *, struct mq_attr *)
 #define __NR32AT0_kexec_load              (int, int)
 #define __NR32AT0_waitid                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_waitid                  (id_t, __id_t)
@@ -1918,6 +1935,16 @@
 #define __NR32AT3_clock_nanosleep64       (struct __timespecx32_64 *, struct __timespecx32_64 *)
 #define __NR32AT0_utimes64                (char const *, char const *)
 #define __NR32AT1_utimes64                (struct __timevalx32_64 const *, struct __timevalx32_64 const *)
+#define __NR32AT0_mq_timedsend64          (fd_t, __fd_t)
+#define __NR32AT1_mq_timedsend64          (char const *, char const *)
+#define __NR32AT2_mq_timedsend64          (size_t, __size_t)
+#define __NR32AT3_mq_timedsend64          (uint32_t, __uint32_t)
+#define __NR32AT4_mq_timedsend64          (struct __timespecx32_64 const *, struct __timespecx32_64 const *)
+#define __NR32AT0_mq_timedreceive64       (fd_t, __fd_t)
+#define __NR32AT1_mq_timedreceive64       (char *, char *)
+#define __NR32AT2_mq_timedreceive64       (size_t, __size_t)
+#define __NR32AT3_mq_timedreceive64       (uint32_t *, __uint32_t *)
+#define __NR32AT4_mq_timedreceive64       (struct __timespecx32_64 const *, struct __timespecx32_64 const *)
 #define __NR32AT0_fmkdirat                (fd_t, __fd_t)
 #define __NR32AT1_fmkdirat                (char const *, char const *)
 #define __NR32AT2_fmkdirat                (mode_t, __mode_t)
@@ -2272,12 +2299,12 @@
 #define __NR32AM_mbind(a, b, c, d, e, f)                   (int)a
 #define __NR32AM_get_mempolicy(a, b, c, d, e, f)           (int)a
 #define __NR32AM_set_mempolicy(a, b, c, d, e, f)           (int)a
-#define __NR32AM_mq_open(a, b, c, d, e, f)                 (int)a
-#define __NR32AM_mq_unlink(a, b, c, d, e, f)               (int)a
-#define __NR32AM_mq_timedsend(a, b, c, d, e, f)            (int)a
-#define __NR32AM_mq_timedreceive(a, b, c, d, e, f)         (int)a
-#define __NR32AM_mq_notify(a, b, c, d, e, f)               (int)a
-#define __NR32AM_mq_getsetattr(a, b, c, d, e, f)           (int)a
+#define __NR32AM_mq_open(a, b, c, d, e, f)                 (char const *)a, (__oflag_t)b, (__mode_t)c
+#define __NR32AM_mq_unlink(a, b, c, d, e, f)               (char const *)a
+#define __NR32AM_mq_timedsend(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (__size_t)c, (__uint32_t)d, (struct __timespecx32 const *)e
+#define __NR32AM_mq_timedreceive(a, b, c, d, e, f)         (__fd_t)a, (char *)b, (__size_t)c, (__uint32_t *)d, (struct __timespecx32 const *)e
+#define __NR32AM_mq_notify(a, b, c, d, e, f)               (__fd_t)a, (struct sigevent const *)b
+#define __NR32AM_mq_getsetattr(a, b, c, d, e, f)           (__fd_t)a, (struct mq_attr const *)b, (struct mq_attr *)c
 #define __NR32AM_kexec_load(a, b, c, d, e, f)              (int)a
 #define __NR32AM_waitid(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo32_struct *)c, (__syscall_ulong_t)d, (struct rusage *)e
 #define __NR32AM_add_key(a, b, c, d, e, f)                 (int)a
@@ -2425,6 +2452,8 @@
 #define __NR32AM_clock_getres64(a, b, c, d, e, f)          (__clockid_t)a, (struct __timespecx32_64 *)b
 #define __NR32AM_clock_nanosleep64(a, b, c, d, e, f)       (__clockid_t)a, (__syscall_ulong_t)b, (struct __timespecx32_64 const *)c, (struct __timespecx32_64 *)d
 #define __NR32AM_utimes64(a, b, c, d, e, f)                (char const *)a, (struct __timevalx32_64 const *)b
+#define __NR32AM_mq_timedsend64(a, b, c, d, e, f)          (__fd_t)a, (char const *)b, (__size_t)c, (__uint32_t)d, (struct __timespecx32_64 const *)e
+#define __NR32AM_mq_timedreceive64(a, b, c, d, e, f)       (__fd_t)a, (char *)b, (__size_t)c, (__uint32_t *)d, (struct __timespecx32_64 const *)e
 #define __NR32AM_fmkdirat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NR32AM_fmknodat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NR32AM_futimesat64(a, b, c, d, e, f)             (__fd_t)a, (__const char *)b, (struct __timevalx32_64 const *)c
@@ -2725,12 +2754,12 @@
 #define __NR32AP_mbind(a)                                  (__syscall_ulong_t)a
 #define __NR32AP_get_mempolicy(a)                          (__syscall_ulong_t)a
 #define __NR32AP_set_mempolicy(a)                          (__syscall_ulong_t)a
-#define __NR32AP_mq_open(a)                                (__syscall_ulong_t)a
+#define __NR32AP_mq_open(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_mq_unlink(a)                              (__syscall_ulong_t)a
-#define __NR32AP_mq_timedsend(a)                           (__syscall_ulong_t)a
-#define __NR32AP_mq_timedreceive(a)                        (__syscall_ulong_t)a
-#define __NR32AP_mq_notify(a)                              (__syscall_ulong_t)a
-#define __NR32AP_mq_getsetattr(a)                          (__syscall_ulong_t)a
+#define __NR32AP_mq_timedsend(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR32AP_mq_timedreceive(a, b, c, d, e)            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR32AP_mq_notify(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_mq_getsetattr(a, b, c)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_kexec_load(a)                             (__syscall_ulong_t)a
 #define __NR32AP_waitid(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_add_key(a)                                (__syscall_ulong_t)a
@@ -2878,6 +2907,8 @@
 #define __NR32AP_clock_getres64(a, b)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_clock_nanosleep64(a, b, c, d)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_utimes64(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_mq_timedsend64(a, b, c, d, e)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR32AP_mq_timedreceive64(a, b, c, d, e)          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_fmkdirat(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_fmknodat(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_futimesat64(a, b, c)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

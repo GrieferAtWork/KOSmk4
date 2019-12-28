@@ -85,8 +85,8 @@ PRIVATE ATTR_SECTION(".rodata.crt.sched.semaphore.named_prefix")
 char const named_prefix[] = "/dev/shm/sem.";
 
 
-/*[[[head:sem_open,hash:CRC-32=0x39382f10]]]*/
-/* Open a named semaphore NAME with open flags OFLAG */
+/*[[[head:sem_open,hash:CRC-32=0x39b93373]]]*/
+/* Open a named semaphore NAME with open flags OFLAGS */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_open") sem_t *
 NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,

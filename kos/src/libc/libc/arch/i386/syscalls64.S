@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41c6850b */
+/* HASH CRC-32:0x1a4bca11 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5882,7 +5882,7 @@ INTERN_FUNCTION(libc_sys_Xget_mempolicy)
 END(libc_sys_Xget_mempolicy)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xget_mempolicy, libc_sys_Xget_mempolicy)
 
-/* errno_t mq_open(int TODO_PROTOTYPE) */
+/* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
 .section .text.crt.syscall.mq_open
 INTERN_FUNCTION(libc_sys_mq_open)
 	.cfi_startproc
@@ -5894,7 +5894,7 @@ INTERN_FUNCTION(libc_sys_mq_open)
 END(libc_sys_mq_open)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_open, libc_sys_mq_open)
 
-/* errno_t mq_open(int TODO_PROTOTYPE) */
+/* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
 .section .text.crt.syscall.Xmq_open
 INTERN_FUNCTION(libc_sys_Xmq_open)
 	.cfi_startproc
@@ -5906,7 +5906,7 @@ INTERN_FUNCTION(libc_sys_Xmq_open)
 END(libc_sys_Xmq_open)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_open, libc_sys_Xmq_open)
 
-/* errno_t mq_unlink(int TODO_PROTOTYPE) */
+/* errno_t mq_unlink(char const *name) */
 .section .text.crt.syscall.mq_unlink
 INTERN_FUNCTION(libc_sys_mq_unlink)
 	.cfi_startproc
@@ -5918,7 +5918,7 @@ INTERN_FUNCTION(libc_sys_mq_unlink)
 END(libc_sys_mq_unlink)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_unlink, libc_sys_mq_unlink)
 
-/* errno_t mq_unlink(int TODO_PROTOTYPE) */
+/* errno_t mq_unlink(char const *name) */
 .section .text.crt.syscall.Xmq_unlink
 INTERN_FUNCTION(libc_sys_Xmq_unlink)
 	.cfi_startproc
@@ -5930,11 +5930,12 @@ INTERN_FUNCTION(libc_sys_Xmq_unlink)
 END(libc_sys_Xmq_unlink)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_unlink, libc_sys_Xmq_unlink)
 
-/* errno_t mq_timedsend(int TODO_PROTOTYPE) */
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx64 const *abs_timeout) */
 .section .text.crt.syscall.mq_timedsend
 INTERN_FUNCTION(libc_sys_mq_timedsend)
 	.cfi_startproc
 	movq   $(0xf2), %rax
+	movq   %rcx, %r10
 	clc
 	syscall
 	ret
@@ -5942,11 +5943,12 @@ INTERN_FUNCTION(libc_sys_mq_timedsend)
 END(libc_sys_mq_timedsend)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_timedsend, libc_sys_mq_timedsend)
 
-/* errno_t mq_timedsend(int TODO_PROTOTYPE) */
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx64 const *abs_timeout) */
 .section .text.crt.syscall.Xmq_timedsend
 INTERN_FUNCTION(libc_sys_Xmq_timedsend)
 	.cfi_startproc
 	movq   $(0xf2), %rax
+	movq   %rcx, %r10
 	stc
 	syscall
 	ret
@@ -5954,11 +5956,12 @@ INTERN_FUNCTION(libc_sys_Xmq_timedsend)
 END(libc_sys_Xmq_timedsend)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_timedsend, libc_sys_Xmq_timedsend)
 
-/* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx64 const *abs_timeout) */
 .section .text.crt.syscall.mq_timedreceive
 INTERN_FUNCTION(libc_sys_mq_timedreceive)
 	.cfi_startproc
 	movq   $(0xf3), %rax
+	movq   %rcx, %r10
 	clc
 	syscall
 	ret
@@ -5966,11 +5969,12 @@ INTERN_FUNCTION(libc_sys_mq_timedreceive)
 END(libc_sys_mq_timedreceive)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_timedreceive, libc_sys_mq_timedreceive)
 
-/* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx64 const *abs_timeout) */
 .section .text.crt.syscall.Xmq_timedreceive
 INTERN_FUNCTION(libc_sys_Xmq_timedreceive)
 	.cfi_startproc
 	movq   $(0xf3), %rax
+	movq   %rcx, %r10
 	stc
 	syscall
 	ret
@@ -5978,7 +5982,7 @@ INTERN_FUNCTION(libc_sys_Xmq_timedreceive)
 END(libc_sys_Xmq_timedreceive)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_timedreceive, libc_sys_Xmq_timedreceive)
 
-/* errno_t mq_notify(int TODO_PROTOTYPE) */
+/* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
 .section .text.crt.syscall.mq_notify
 INTERN_FUNCTION(libc_sys_mq_notify)
 	.cfi_startproc
@@ -5990,7 +5994,7 @@ INTERN_FUNCTION(libc_sys_mq_notify)
 END(libc_sys_mq_notify)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_notify, libc_sys_mq_notify)
 
-/* errno_t mq_notify(int TODO_PROTOTYPE) */
+/* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
 .section .text.crt.syscall.Xmq_notify
 INTERN_FUNCTION(libc_sys_Xmq_notify)
 	.cfi_startproc
@@ -6002,7 +6006,7 @@ INTERN_FUNCTION(libc_sys_Xmq_notify)
 END(libc_sys_Xmq_notify)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_notify, libc_sys_Xmq_notify)
 
-/* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+/* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 .section .text.crt.syscall.mq_getsetattr
 INTERN_FUNCTION(libc_sys_mq_getsetattr)
 	.cfi_startproc
@@ -6014,7 +6018,7 @@ INTERN_FUNCTION(libc_sys_mq_getsetattr)
 END(libc_sys_mq_getsetattr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_getsetattr, libc_sys_mq_getsetattr)
 
-/* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+/* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 .section .text.crt.syscall.Xmq_getsetattr
 INTERN_FUNCTION(libc_sys_Xmq_getsetattr)
 	.cfi_startproc

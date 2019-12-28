@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb462c8e */
+/* HASH CRC-32:0xc8d892ba */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -516,12 +516,25 @@
 #define __NR64AN0_mbind                  TODO_PROTOTYPE
 #define __NR64AN0_set_mempolicy          TODO_PROTOTYPE
 #define __NR64AN0_get_mempolicy          TODO_PROTOTYPE
-#define __NR64AN0_mq_open                TODO_PROTOTYPE
-#define __NR64AN0_mq_unlink              TODO_PROTOTYPE
-#define __NR64AN0_mq_timedsend           TODO_PROTOTYPE
-#define __NR64AN0_mq_timedreceive        TODO_PROTOTYPE
-#define __NR64AN0_mq_notify              TODO_PROTOTYPE
-#define __NR64AN0_mq_getsetattr          TODO_PROTOTYPE
+#define __NR64AN0_mq_open                name
+#define __NR64AN1_mq_open                oflags
+#define __NR64AN2_mq_open                mode
+#define __NR64AN0_mq_unlink              name
+#define __NR64AN0_mq_timedsend           mqdes
+#define __NR64AN1_mq_timedsend           msg_ptr
+#define __NR64AN2_mq_timedsend           msg_len
+#define __NR64AN3_mq_timedsend           msg_prio
+#define __NR64AN4_mq_timedsend           abs_timeout
+#define __NR64AN0_mq_timedreceive        mqdes
+#define __NR64AN1_mq_timedreceive        msg_ptr
+#define __NR64AN2_mq_timedreceive        msg_len
+#define __NR64AN3_mq_timedreceive        pmsg_prio
+#define __NR64AN4_mq_timedreceive        abs_timeout
+#define __NR64AN0_mq_notify              mqdes
+#define __NR64AN1_mq_notify              notification
+#define __NR64AN0_mq_getsetattr          mqdes
+#define __NR64AN1_mq_getsetattr          newattr
+#define __NR64AN2_mq_getsetattr          oldattr
 #define __NR64AN0_kexec_load             TODO_PROTOTYPE
 #define __NR64AN0_waitid                 idtype
 #define __NR64AN1_waitid                 id
@@ -1991,18 +2004,65 @@
 #define __NR64ATRA0_set_mempolicy(TODO_PROTOTYPE) ,TODO_PROTOTYPE
 #define __NR64ATRF0_get_mempolicy          "%d"
 #define __NR64ATRA0_get_mempolicy(TODO_PROTOTYPE) ,TODO_PROTOTYPE
-#define __NR64ATRF0_mq_open                "%d"
-#define __NR64ATRA0_mq_open(TODO_PROTOTYPE) ,TODO_PROTOTYPE
-#define __NR64ATRF0_mq_unlink              "%d"
-#define __NR64ATRA0_mq_unlink(TODO_PROTOTYPE) ,TODO_PROTOTYPE
+#define __NR64ATRF0_mq_open                "%q"
+#define __NR64ATRA0_mq_open(name, oflags, mode) ,(validate_readable_opt(name,1),name)
+#define __NR64ATRF1_mq_open                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA1_mq_open(name, oflags, mode) ,(uintptr_t)(oflags),(oflags) & O_WRONLY ? "O_WRONLY" : (oflags) ? "" : "O_RDONLY" \
+                                                ,((oflags) & O_RDWR) && ((oflags) & (O_WRONLY)) ? "|" : "",(oflags) & O_RDWR ? "O_RDWR" : "" \
+                                                ,((oflags) & O_CREAT) && ((oflags) & (O_WRONLY|O_RDWR)) ? "|" : "",(oflags) & O_CREAT ? "O_CREAT" : "" \
+                                                ,((oflags) & O_EXCL) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT)) ? "|" : "",(oflags) & O_EXCL ? "O_EXCL" : "" \
+                                                ,((oflags) & O_NOCTTY) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL)) ? "|" : "",(oflags) & O_NOCTTY ? "O_NOCTTY" : "" \
+                                                ,((oflags) & O_TRUNC) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY)) ? "|" : "",(oflags) & O_TRUNC ? "O_TRUNC" : "" \
+                                                ,((oflags) & O_APPEND) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC)) ? "|" : "",(oflags) & O_APPEND ? "O_APPEND" : "" \
+                                                ,((oflags) & O_NONBLOCK) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND)) ? "|" : "",(oflags) & O_NONBLOCK ? "O_NONBLOCK" : "" \
+                                                ,((oflags) & O_SYNC) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK)) ? "|" : "",(oflags) & O_SYNC ? "O_SYNC" : "" \
+                                                ,((oflags) & O_DSYNC) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC)) ? "|" : "",(oflags) & O_DSYNC ? "O_DSYNC" : "" \
+                                                ,((oflags) & O_ASYNC) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC)) ? "|" : "",(oflags) & O_ASYNC ? "O_ASYNC" : "" \
+                                                ,((oflags) & O_DIRECT) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC)) ? "|" : "",(oflags) & O_DIRECT ? "O_DIRECT" : "" \
+                                                ,((oflags) & O_LARGEFILE) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT)) ? "|" : "",(oflags) & O_LARGEFILE ? "O_LARGEFILE" : "" \
+                                                ,((oflags) & O_DIRECTORY) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE)) ? "|" : "",(oflags) & O_DIRECTORY ? "O_DIRECTORY" : "" \
+                                                ,((oflags) & O_NOFOLLOW) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY)) ? "|" : "",(oflags) & O_NOFOLLOW ? "O_NOFOLLOW" : "" \
+                                                ,((oflags) & O_NOATIME) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW)) ? "|" : "",(oflags) & O_NOATIME ? "O_NOATIME" : "" \
+                                                ,((oflags) & O_CLOEXEC) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME)) ? "|" : "",(oflags) & O_CLOEXEC ? "O_CLOEXEC" : "" \
+                                                ,((oflags) & O_CLOFORK) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC)) ? "|" : "",(oflags) & O_CLOFORK ? "O_CLOFORK" : "" \
+                                                ,((oflags) & O_PATH) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK)) ? "|" : "",(oflags) & O_PATH ? "O_PATH" : "" \
+                                                ,((oflags) & 0x0400000) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH)) ? "|" : "",(oflags) & 0x0400000 ? "O_TMPFILE" : "" \
+                                                ,((oflags) & O_SYMLINK) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000)) ? "|" : "",(oflags) & O_SYMLINK ? "O_SYMLINK" : "" \
+                                                ,((oflags) & O_DOSPATH) && ((oflags) & (O_WRONLY|O_RDWR|O_CREAT|O_EXCL|O_NOCTTY|O_TRUNC|O_APPEND|O_NONBLOCK|O_SYNC|O_DSYNC|O_ASYNC|O_DIRECT|O_LARGEFILE|O_DIRECTORY|O_NOFOLLOW|O_NOATIME|O_CLOEXEC|O_CLOFORK|O_PATH|0x0400000|O_SYMLINK)) ? "|" : "",(oflags) & O_DOSPATH ? "O_DOSPATH" : ""
+#define __NR64ATRF2_mq_open                "%#" PRIoSIZ
+#define __NR64ATRA2_mq_open(name, oflags, mode) ,(uintptr_t)(mode)
+#define __NR64ATRF0_mq_unlink              "%q"
+#define __NR64ATRA0_mq_unlink(name)        ,(validate_readable_opt(name,1),name)
 #define __NR64ATRF0_mq_timedsend           "%d"
-#define __NR64ATRA0_mq_timedsend(TODO_PROTOTYPE) ,TODO_PROTOTYPE
+#define __NR64ATRA0_mq_timedsend(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,(int)(mqdes)
+#define __NR64ATRF1_mq_timedsend           "%q"
+#define __NR64ATRA1_mq_timedsend(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,(validate_readable_opt(msg_ptr,1),msg_ptr)
+#define __NR64ATRF2_mq_timedsend           "%" PRIuSIZ
+#define __NR64ATRA2_mq_timedsend(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,msg_len
+#define __NR64ATRF3_mq_timedsend           "%" PRIu32
+#define __NR64ATRA3_mq_timedsend(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,msg_prio
+#define __NR64ATRF4_mq_timedsend           "%p"
+#define __NR64ATRA4_mq_timedsend(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,abs_timeout
 #define __NR64ATRF0_mq_timedreceive        "%d"
-#define __NR64ATRA0_mq_timedreceive(TODO_PROTOTYPE) ,TODO_PROTOTYPE
+#define __NR64ATRA0_mq_timedreceive(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,(int)(mqdes)
+#define __NR64ATRF1_mq_timedreceive        "%p"
+#define __NR64ATRA1_mq_timedreceive(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,msg_ptr
+#define __NR64ATRF2_mq_timedreceive        "%" PRIuSIZ
+#define __NR64ATRA2_mq_timedreceive(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,msg_len
+#define __NR64ATRF3_mq_timedreceive        "%p"
+#define __NR64ATRA3_mq_timedreceive(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,pmsg_prio
+#define __NR64ATRF4_mq_timedreceive        "%p"
+#define __NR64ATRA4_mq_timedreceive(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,abs_timeout
 #define __NR64ATRF0_mq_notify              "%d"
-#define __NR64ATRA0_mq_notify(TODO_PROTOTYPE) ,TODO_PROTOTYPE
+#define __NR64ATRA0_mq_notify(mqdes, notification) ,(int)(mqdes)
+#define __NR64ATRF1_mq_notify              "%p"
+#define __NR64ATRA1_mq_notify(mqdes, notification) ,notification
 #define __NR64ATRF0_mq_getsetattr          "%d"
-#define __NR64ATRA0_mq_getsetattr(TODO_PROTOTYPE) ,TODO_PROTOTYPE
+#define __NR64ATRA0_mq_getsetattr(mqdes, newattr, oldattr) ,(int)(mqdes)
+#define __NR64ATRF1_mq_getsetattr          "%p"
+#define __NR64ATRA1_mq_getsetattr(mqdes, newattr, oldattr) ,newattr
+#define __NR64ATRF2_mq_getsetattr          "%p"
+#define __NR64ATRA2_mq_getsetattr(mqdes, newattr, oldattr) ,oldattr
 #define __NR64ATRF0_kexec_load             "%d"
 #define __NR64ATRA0_kexec_load(TODO_PROTOTYPE) ,TODO_PROTOTYPE
 #define __NR64ATRF0_waitid                 "%#Ix=%s"

@@ -30,7 +30,7 @@
 #ifndef __NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT
 #undef __WANT_SYSCALL_REGISTER_COUNT
 #define __WANT_SYSCALL_REGISTER_COUNT 1
-#include <asm/syscalls32_d.h>
+#include "../../../../../../include/i386-kos/asm/syscalls32_d.h"
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT */
 
 
@@ -100,7 +100,7 @@ END(sys_break6)
 #define __SYSINVALID_OF(register_count) __SYSINVALID_OF2(register_count)
 #define __SYSCALL(name) \
 	DEFINE_PUBLIC_WEAK_ALIAS(sys_##name, __SYSINVALID_OF(__NR32RC_##name))
-#include <asm/ls-syscalls32.h>
+#include "../../../../../../include/i386-kos/asm/ls-syscalls32.h"
 
 /* Define the 32-bit break system call (if it wasn't already defined by <i386-kos/asm/syscalls32.def>) */
 .ifndef sys_break

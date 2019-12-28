@@ -890,10 +890,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long .Lname222 /* index: 222 */
-	.weak x86_getiopl; .long x86_getiopl
-	.reloc ., R_386_SIZE32, x86_getiopl; .int 0
-	.int 0xdb15a3c
+	.long 0 /* index: 222 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname223 /* index: 223 */
 	.weak sys_nice; .long sys_nice
 	.reloc ., R_386_SIZE32, sys_nice; .int 0
@@ -3463,9 +3463,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, task_sleep; .int 0
 	.int 0x16f8360
 	.long .Lname865 /* index: 865 */
-	.weak vmb_node_remove; .long vmb_node_remove
-	.reloc ., R_386_SIZE32, vmb_node_remove; .int 0
-	.int 0xeef2165
+	.weak unregister_filesystem_type; .long unregister_filesystem_type
+	.reloc ., R_386_SIZE32, unregister_filesystem_type; .int 0
+	.int 0x7be1165
 	.long 0 /* index: 866 */
 	.long 0
 	.int 0
@@ -3890,10 +3890,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak handle_get_task; .long handle_get_task
 	.reloc ., R_386_SIZE32, handle_get_task; .int 0
 	.int 0x83473cb
-	.long 0 /* index: 972 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname972 /* index: 972 */
+	.weak sys_ksysctl; .long sys_ksysctl
+	.reloc ., R_386_SIZE32, sys_ksysctl; .int 0
+	.int 0x2eb93cc
 	.long .Lname973 /* index: 973 */
 	.weak fpustate_loadfrom; .long fpustate_loadfrom
 	.reloc ., R_386_SIZE32, fpustate_loadfrom; .int 0
@@ -3971,9 +3971,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_rename; .int 0
 	.int 0x68df8a5
 	.long .Lname992 /* index: 992 */
-	.weak unregister_filesystem_type; .long unregister_filesystem_type
-	.reloc ., R_386_SIZE32, unregister_filesystem_type; .int 0
-	.int 0x7be1165
+	.weak task_serve; .long task_serve
+	.reloc ., R_386_SIZE32, task_serve; .int 0
+	.int 0x16e6165
 	.long 0 /* index: 993 */
 	.long 0
 	.int 0
@@ -5474,10 +5474,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long 0 /* index: 1368 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname1368 /* index: 1368 */
+	.weak vmb_node_remove; .long vmb_node_remove
+	.reloc ., R_386_SIZE32, vmb_node_remove; .int 0
+	.int 0xeef2165
 	.long .Lname1369 /* index: 1369 */
 	.weak sys_get_mempolicy; .long sys_get_mempolicy
 	.reloc ., R_386_SIZE32, sys_get_mempolicy; .int 0
@@ -6059,9 +6059,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, directory_getentry; .int 0
 	.int 0x17325e9
 	.long .Lname1514 /* index: 1514 */
-	.weak task_serve; .long task_serve
-	.reloc ., R_386_SIZE32, task_serve; .int 0
-	.int 0x16e6165
+	.weak sys_mq_timedreceive64; .long sys_mq_timedreceive64
+	.reloc ., R_386_SIZE32, sys_mq_timedreceive64; .int 0
+	.int 0xeff5d84
 	.long 0 /* index: 1515 */
 	.long 0
 	.int 0
@@ -8263,9 +8263,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname2065 /* index: 2065 */
-	.weak vm_readphysq; .long vm_readphysq
-	.reloc ., R_386_SIZE32, vm_readphysq; .int 0
-	.int 0x65a811
+	.weak sys_waitid; .long sys_waitid
+	.reloc ., R_386_SIZE32, sys_waitid; .int 0
+	.int 0x6d1ba64
 	.long 0 /* index: 2066 */
 	.long 0
 	.int 0
@@ -8914,10 +8914,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak path_lock_upgrade; .long path_lock_upgrade
 	.reloc ., R_386_SIZE32, path_lock_upgrade; .int 0
 	.int 0xa0dac25
-	.long 0 /* index: 2228 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname2228 /* index: 2228 */
+	.weak vm_readphysq; .long vm_readphysq
+	.reloc ., R_386_SIZE32, vm_readphysq; .int 0
+	.int 0x65a811
 	.long .Lname2229 /* index: 2229 */
 	.weak getreg_fcpustate; .long getreg_fcpustate
 	.reloc ., R_386_SIZE32, getreg_fcpustate; .int 0
@@ -13735,9 +13735,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, atomic64_xch; .int 0
 	.int 0x130d68
 	.long .Lname3433 /* index: 3433 */
-	.weak sys_sysctl; .long sys_sysctl
-	.reloc ., R_386_SIZE32, sys_sysctl; .int 0
-	.int 0x6b72a3c
+	.weak x86_getiopl; .long x86_getiopl
+	.reloc ., R_386_SIZE32, x86_getiopl; .int 0
+	.int 0xdb15a3c
 	.long 0 /* index: 3434 */
 	.long 0
 	.int 0
@@ -14695,9 +14695,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vm_datapart_lockwrite_setcore_unsharecow_nx; .int 0
 	.int 0x2083e58
 	.long .Lname3673 /* index: 3673 */
-	.weak sys_waitid; .long sys_waitid
-	.reloc ., R_386_SIZE32, sys_waitid; .int 0
-	.int 0x6d1ba64
+	.weak sys_mq_timedsend64; .long sys_mq_timedsend64
+	.reloc ., R_386_SIZE32, sys_mq_timedsend64; .int 0
+	.int 0x9423264
 	.long .Lname3674 /* index: 3674 */
 	.weak terminal_setios; .long terminal_setios
 	.reloc ., R_386_SIZE32, terminal_setios; .int 0
@@ -16646,8 +16646,6 @@ END(kernel_symbol_table)
 	.string "swap_malloc_part"
 .Lname219:
 	.string "sys_unlink"
-.Lname222:
-	.string "x86_getiopl"
 .Lname223:
 	.string "sys_nice"
 .Lname226:
@@ -17405,7 +17403,7 @@ END(kernel_symbol_table)
 .Lname864:
 	.string "task_sleep"
 .Lname865:
-	.string "vmb_node_remove"
+	.string "unregister_filesystem_type"
 .Lname867:
 	.string "sigqueue_fini"
 .Lname868:
@@ -17544,6 +17542,8 @@ END(kernel_symbol_table)
 	.string "sys_hopf"
 .Lname971:
 	.string "handle_get_task"
+.Lname972:
+	.string "sys_ksysctl"
 .Lname973:
 	.string "fpustate_loadfrom"
 .Lname974:
@@ -17569,7 +17569,7 @@ END(kernel_symbol_table)
 .Lname991:
 	.string "sys_rename"
 .Lname992:
-	.string "unregister_filesystem_type"
+	.string "task_serve"
 .Lname994:
 	.string "x86_userexcept_callhandler"
 .Lname995:
@@ -18010,6 +18010,8 @@ END(kernel_symbol_table)
 	.string "sys_utimensat"
 .Lname1365:
 	.string "keymap_codesize"
+.Lname1368:
+	.string "vmb_node_remove"
 .Lname1369:
 	.string "sys_get_mempolicy"
 .Lname1374:
@@ -18187,7 +18189,7 @@ END(kernel_symbol_table)
 .Lname1513:
 	.string "directory_getentry"
 .Lname1514:
-	.string "task_serve"
+	.string "sys_mq_timedreceive64"
 .Lname1517:
 	.string "sys_fsetxattr"
 .Lname1518:
@@ -18779,7 +18781,7 @@ END(kernel_symbol_table)
 .Lname2060:
 	.string "sys_userfaultfd"
 .Lname2065:
-	.string "vm_readphysq"
+	.string "sys_waitid"
 .Lname2067:
 	.string "sys_migrate_pages"
 .Lname2068:
@@ -18980,6 +18982,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_map_ram"
 .Lname2227:
 	.string "path_lock_upgrade"
+.Lname2228:
+	.string "vm_readphysq"
 .Lname2229:
 	.string "getreg_fcpustate"
 .Lname2230:
@@ -20429,7 +20433,7 @@ END(kernel_symbol_table)
 .Lname3432:
 	.string "atomic64_xch"
 .Lname3433:
-	.string "sys_sysctl"
+	.string "x86_getiopl"
 .Lname3435:
 	.string "pidns_trylookup_task"
 .Lname3437:
@@ -20735,7 +20739,7 @@ END(kernel_symbol_table)
 .Lname3672:
 	.string "vm_datapart_lockwrite_setcore_unsharecow_nx"
 .Lname3673:
-	.string "sys_waitid"
+	.string "sys_mq_timedsend64"
 .Lname3674:
 	.string "terminal_setios"
 .Lname3677:

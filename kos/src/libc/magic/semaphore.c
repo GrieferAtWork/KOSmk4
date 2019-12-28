@@ -61,7 +61,7 @@ sem_init:([nonnull] sem_t *sem, int pshared, unsigned int value) -> int;
 @@Free resources associated with semaphore object SEM
 sem_destroy:([nonnull] sem_t *sem) -> int;
 
-@@Open a named semaphore NAME with open flags OFLAG
+@@Open a named semaphore NAME with open flags OFLAGS
 [cp_kos][vartypes($mode_t, unsigned int)]
 sem_open:([nonnull] char const *name, $oflag_t oflags, ...) -> sem_t *;
 

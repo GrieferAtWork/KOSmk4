@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5ec75ac */
+/* HASH CRC-32:0xfe3d76b7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10223,7 +10223,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_mempolicy)
 	.cfi_endproc
 END(__x86_asm32_int80_set_mempolicy)
 
-/* errno_t mq_open(int TODO_PROTOTYPE) */
+/* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_int80.mq_open
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_open)
 	.cfi_startproc simple
@@ -10242,14 +10242,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_open)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mq_open)
 	call   sys_mq_open
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -10260,7 +10260,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_open)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_open)
 
-/* errno_t mq_unlink(int TODO_PROTOTYPE) */
+/* errno_t mq_unlink(char const *name) */
 .section .text.x86.asm32_syscall_int80.mq_unlink
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_unlink)
 	.cfi_startproc simple
@@ -10297,7 +10297,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_unlink)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_unlink)
 
-/* errno_t mq_timedsend(int TODO_PROTOTYPE) */
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
 .section .text.x86.asm32_syscall_int80.mq_timedsend
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	.cfi_startproc simple
@@ -10316,14 +10316,18 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edi  /* Arg #4 */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mq_timedsend)
 	call   sys_mq_timedsend
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -10334,7 +10338,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedsend)
 
-/* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
 .section .text.x86.asm32_syscall_int80.mq_timedreceive
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	.cfi_startproc simple
@@ -10353,14 +10357,18 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edi  /* Arg #4 */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mq_timedreceive)
 	call   sys_mq_timedreceive
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -10371,7 +10379,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedreceive)
 
-/* errno_t mq_notify(int TODO_PROTOTYPE) */
+/* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
 .section .text.x86.asm32_syscall_int80.mq_notify
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_notify)
 	.cfi_startproc simple
@@ -10390,14 +10398,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_notify)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mq_notify)
 	call   sys_mq_notify
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -10408,7 +10416,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_notify)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_notify)
 
-/* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+/* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 .section .text.x86.asm32_syscall_int80.mq_getsetattr
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_getsetattr)
 	.cfi_startproc simple
@@ -10427,14 +10435,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_getsetattr)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mq_getsetattr)
 	call   sys_mq_getsetattr
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -16370,6 +16378,88 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_utimes64)
+
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_int80.mq_timedsend64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x80000117
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edi  /* Arg #4 */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_mq_timedsend64)
+	call   sys_mq_timedsend64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_mq_timedsend64)
+
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_int80.mq_timedreceive64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x80000118
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edi  /* Arg #4 */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_mq_timedreceive64)
+	call   sys_mq_timedreceive64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_mq_timedreceive64)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
@@ -27248,7 +27338,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_mempolicy)
 	.cfi_endproc
 END(__x86_asm32_sysenter_set_mempolicy)
 
-/* errno_t mq_open(int TODO_PROTOTYPE) */
+/* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
 .section .text.x86.asm32_syscall_sysenter.mq_open
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_open)
 	.cfi_startproc simple
@@ -27267,14 +27357,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_open)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mq_open)
 	call   sys_mq_open
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -27285,7 +27375,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_open)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_open)
 
-/* errno_t mq_unlink(int TODO_PROTOTYPE) */
+/* errno_t mq_unlink(char const *name) */
 .section .text.x86.asm32_syscall_sysenter.mq_unlink
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_unlink)
 	.cfi_startproc simple
@@ -27322,7 +27412,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_unlink)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_unlink)
 
-/* errno_t mq_timedsend(int TODO_PROTOTYPE) */
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
 .section .text.x86.asm32_syscall_sysenter.mq_timedsend
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend)
 	.cfi_startproc simple
@@ -27341,14 +27431,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	cmpl   $(KERNELSPACE_BASE), %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mq_timedsend)
 	call   sys_mq_timedsend
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -27359,7 +27455,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_timedsend)
 
-/* errno_t mq_timedreceive(int TODO_PROTOTYPE) */
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
 .section .text.x86.asm32_syscall_sysenter.mq_timedreceive
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive)
 	.cfi_startproc simple
@@ -27378,14 +27474,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	cmpl   $(KERNELSPACE_BASE), %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mq_timedreceive)
 	call   sys_mq_timedreceive
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -27396,7 +27498,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_timedreceive)
 
-/* errno_t mq_notify(int TODO_PROTOTYPE) */
+/* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
 .section .text.x86.asm32_syscall_sysenter.mq_notify
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_notify)
 	.cfi_startproc simple
@@ -27415,14 +27517,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_notify)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mq_notify)
 	call   sys_mq_notify
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -27433,7 +27535,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_notify)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_notify)
 
-/* errno_t mq_getsetattr(int TODO_PROTOTYPE) */
+/* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 .section .text.x86.asm32_syscall_sysenter.mq_getsetattr
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_getsetattr)
 	.cfi_startproc simple
@@ -27452,14 +27554,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_getsetattr)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mq_getsetattr)
 	call   sys_mq_getsetattr
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -33459,6 +33561,92 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimes64)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_utimes64)
+
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysenter.mq_timedsend64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x80000117
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	cmpl   $(KERNELSPACE_BASE), %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_mq_timedsend64)
+	call   sys_mq_timedsend64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_mq_timedsend64)
+
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysenter.mq_timedreceive64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x80000118
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	cmpl   $(KERNELSPACE_BASE), %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_mq_timedreceive64)
+	call   sys_mq_timedreceive64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_mq_timedreceive64)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */

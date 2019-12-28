@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7802ff2c */
+/* HASH CRC-32:0xef4fcab6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -542,6 +542,12 @@ __CDECLARE_SC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __pr
 #if __CRT_HAVE_SC(modify_ldt)
 __CDECLARE_SC(,__syscall_slong_t,modify_ldt,(__syscall_ulong_t __func, void *__ptr, __syscall_ulong_t __bytecount),(__func,__ptr,__bytecount))
 #endif /* __CRT_HAVE_SC(modify_ldt) */
+#if __CRT_HAVE_SC(mq_timedreceive)
+__CDECLARE_SC(,__ssize_t,mq_timedreceive,(__fd_t __mqdes, char *__msg_ptr, __size_t __msg_len, __uint32_t *__pmsg_prio, struct __timespecx64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+#endif /* __CRT_HAVE_SC(mq_timedreceive) */
+#if __CRT_HAVE_SC(mq_timedsend)
+__CDECLARE_SC(,__errno_t,mq_timedsend,(__fd_t __mqdes, char const *__msg_ptr, __size_t __msg_len, __uint32_t __msg_prio, struct __timespecx64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+#endif /* __CRT_HAVE_SC(mq_timedsend) */
 #if __CRT_HAVE_SC(msgctl)
 __CDECLARE_SC(,__errno_t,msgctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(msgctl) */
@@ -1223,6 +1229,12 @@ __CDECLARE_XSC(,void *,mmap,(void *__addr, __size_t __len, __syscall_ulong_t __p
 #if __CRT_HAVE_XSC(modify_ldt)
 __CDECLARE_XSC(,__syscall_slong_t,modify_ldt,(__syscall_ulong_t __func, void *__ptr, __syscall_ulong_t __bytecount),(__func,__ptr,__bytecount))
 #endif /* __CRT_HAVE_XSC(modify_ldt) */
+#if __CRT_HAVE_XSC(mq_timedreceive)
+__CDECLARE_XSC(,__ssize_t,mq_timedreceive,(__fd_t __mqdes, char *__msg_ptr, __size_t __msg_len, __uint32_t *__pmsg_prio, struct __timespecx64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+#endif /* __CRT_HAVE_XSC(mq_timedreceive) */
+#if __CRT_HAVE_XSC(mq_timedsend)
+__CDECLARE_XSC(,__errno_t,mq_timedsend,(__fd_t __mqdes, char const *__msg_ptr, __size_t __msg_len, __uint32_t __msg_prio, struct __timespecx64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+#endif /* __CRT_HAVE_XSC(mq_timedsend) */
 #if __CRT_HAVE_XSC(msgctl)
 __CDECLARE_XSC(,__errno_t,msgctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(msgctl) */
