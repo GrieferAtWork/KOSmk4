@@ -312,7 +312,7 @@ function main(argv: {string...}) {
 					CONFIG_EMULATOR_USED = value;
 					break;
 				case "--changed":
-					addForceChanged(value);
+					setForceChanged(normalizePath(value, true));
 					break;
 				case "--verbose":
 					config.VERBOSE = BOOLMAP[value];

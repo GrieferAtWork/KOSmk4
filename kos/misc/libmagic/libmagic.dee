@@ -293,14 +293,16 @@ function getLastModfiedTime(filename: string): time.Time | none {
 }
 
 @@Assume that a given file has changed by settings its last-changed field to now()
-function addForceChanged(file: string): bool {
-	local now;
-	if (libwin32 is none) {
-		now = import("time").now();
-	} else {
-		now = (int)import("time").now() * 10;
+function setForceChanged(filename: string, now: Object = none): Object {
+	if (now is none) {
+		if (libwin32 is none) {
+			now = import("time").now();
+		} else {
+			now = (int)import("time").now() * 10;
+		}
 	}
-	_lastModfiedTimeCache[normalizePath(file, false)] = now;
+	_lastModfiedTimeCache[filename] = now;
+	return now;
 }
 
 

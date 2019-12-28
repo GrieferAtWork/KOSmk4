@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ebff1a7 */
+/* HASH CRC-32:0xff35d785 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __SYSDECL_BEGIN
 #ifndef ____gwchar_t_defined
 #define ____gwchar_t_defined 1
 #define __gwchar_t __WCHAR_TYPE__
-#endif
+#endif /* !____gwchar_t_defined */
 
 /* Since `__VA_SIZE >= sizeof(int)', and `sizeof(int) != 0',
  * we also know that `sizeof(int) >= 1', meaning that any 8-bit

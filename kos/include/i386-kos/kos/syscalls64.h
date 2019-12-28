@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3e1be97 */
+/* HASH CRC-32:0x895ee38d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_I386_KOS_SYSCALLS64_H
-#define _KOS_I386_KOS_SYSCALLS64_H 1
+#ifndef _I386_KOS_KOS_SYSCALLS64_H
+#define _I386_KOS_KOS_SYSCALLS64_H 1
 
 #include <__stdinc.h>
 #include <kos/asm/syscall.h>
@@ -2977,4 +2977,4 @@ __CDECLARE_XSC(,__ssize_t,writevf,(__fd_t __fd, struct iovec64 const *__iovec, _
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_KOS_I386_KOS_SYSCALLS64_H */
+#endif /* !_I386_KOS_KOS_SYSCALLS64_H */

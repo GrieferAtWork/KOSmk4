@@ -33,10 +33,11 @@ function doRunDeemonScript(
 
 
 function doRunDeemonScriptIfFilesAreOutOfDate(
-		script: string, inputs: {string...},
+		script: string, inputs: {string...}, latestSuffix: string = none,
 		additionalArguments: {string...} = none): (string, ipc.Process) | none {
 	assert inputs;
-	local latest = normalizePath(getLatestFilenameOf(script), false);
+	local latest = normalizePath(getLatestFilenameOf(
+		latestSuffix is none ? script : "{}.{}".format({ script, latestSuffix })), false);
 	local oldestOutput = getLastModfiedTime(latest);
 	if (oldestOutput is none) {
 		print "[PRE] Running script", repr script, "because it hasn't been run, yet";
@@ -73,20 +74,12 @@ function runGenerateErrors(xarch_path: string): (string, ipc.Process) | none {
 function runGenerateSyscalls(
 		xarch_path: string, TARGET_ARCH: string,
 		TARGET: Module): (string, ipc.Process) | none {
-	/* Run for all architectures if the common definitions file was changed. */
-	local result = doRunDeemonScriptIfFilesAreOutOfDate(
+	return doRunDeemonScriptIfFilesAreOutOfDate(
 		script: "kos/misc/magicgenerator/generate_syscalls.dee",
-		inputs: { "kos/include/asm/syscalls.def" }
+		inputs: { "{}/asm/syscalls{}.def".format({ xarch_path, TARGET.SUFFIX }), },
+		latestSuffix: TARGET_ARCH,
+		additionalArguments: { TARGET_ARCH }
 	);
-	if (result is none) {
-		/* Only run for the current architecture if its definitions file was changed. */
-		result = doRunDeemonScriptIfFilesAreOutOfDate(
-			script: "kos/misc/magicgenerator/generate_syscalls.dee",
-			inputs: { "{}/asm/syscalls{}.def".format({ xarch_path, TARGET.SUFFIX }), },
-			additionalArguments: { TARGET_ARCH }
-		);
-	}
-	return result;
 }
 
 function runGenerateHeaders(): (string, ipc.Process) | none {
@@ -108,10 +101,12 @@ function updateAutomaticSourcesOnDemand(TARGET_ARCH: string, TARGET: Module) {
 	collect(runGenerateSyscalls(xarch_path, TARGET_ARCH, TARGET));
 	collect(runGenerateHeaders());
 
+	local now = none;
 	while (autoScripts) {
 		local latest, proc = autoScripts.pop()...;
 		joinProcess(proc);
 		File.open(latest, "wb").close();
+		now = setForceChanged(latest, now);
 	}
 }
 
