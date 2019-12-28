@@ -16,7 +16,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _CXX_CLIMITS
-#define _CXX_CLIMITS 1
+#ifndef _LIMITS_H
 #include "limits.h"
-#endif /* !_CXX_CLIMITS */
+#endif /* !_LIMITS_H */

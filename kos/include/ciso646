@@ -16,7 +16,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _CXX_CISO646
-#define _CXX_CISO646 1
+#ifndef _ISO646_H
 #include "iso646.h"
-#endif /* !_CXX_ISO646 */
+#endif /* !_ISO646_H */

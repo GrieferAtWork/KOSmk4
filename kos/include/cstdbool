@@ -16,7 +16,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _CXX_CSTDBOOL
-#define _CXX_CSTDBOOL 1
+#ifndef _STDBOOL_H
 #include <stdbool.h>
-#endif /* !_CXX_CSTDBOOL */
+#endif /* !_STDBOOL_H */

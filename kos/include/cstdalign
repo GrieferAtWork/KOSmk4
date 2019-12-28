@@ -16,7 +16,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _CXX_CSTDALIGN
-#define _CXX_CSTDALIGN 1
+#ifndef _STDALIGN_H
 #include <stdalign.h>
-#endif /* !_CXX_CSTDALIGN */
+#endif /* !_STDALIGN_H */
