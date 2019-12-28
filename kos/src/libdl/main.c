@@ -137,7 +137,7 @@ INTDEF byte_t __rtld_end[];
 INTDEF byte_t __rtld_start[];
 
 
-INTERN void *FCALL
+INTERN WUNUSED NONNULL((1, 3)) void *FCALL
 linker_main(struct elfexec_info *__restrict info,
             uintptr_t loadaddr,
             struct process_peb *__restrict peb) {

@@ -20,7 +20,7 @@
 #define __GCC_VERSION(a, b, c) 0
 #endif /* !__GCC_VERSION */
 
-#define __builtin_expect(x,y) (x)
+#define __builtin_expect(x, y) (x)
 #define __NO_builtin_expect    1
 #define __likely      /* Nothing */
 #define __unlikely    /* Nothing */
@@ -52,22 +52,22 @@
 #endif
 
 #if __has_feature(cxx_static_assert) || _MSC_VER >= 1600
-#   define __STATIC_ASSERT(expr)         static_assert(expr,#expr)
-#   define __STATIC_ASSERT_MSG(expr,msg) static_assert(expr,msg)
+#   define __STATIC_ASSERT(expr)          static_assert(expr, #expr)
+#   define __STATIC_ASSERT_MSG(expr, msg) static_assert(expr, msg)
 #elif __has_feature(c_static_assert) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__+0 >= 201112L)
 /* XXX: Known Visual C/C++, checking for C11 may not actually allow us to assume this one... */
-#   define __STATIC_ASSERT(expr)         _Static_assert(expr,#expr)
-#   define __STATIC_ASSERT_MSG(expr,msg) _Static_assert(expr,msg)
+#   define __STATIC_ASSERT(expr)          _Static_assert(expr, #expr)
+#   define __STATIC_ASSERT_MSG(expr, msg) _Static_assert(expr, msg)
 #elif defined(__TPP_COUNTER)
-#   define __STATIC_ASSERT(expr)         typedef int __PP_CAT2(__static_assert_,__TPP_COUNTER(__static_assert))[(expr)?1:-1]
-#   define __STATIC_ASSERT_MSG(expr,msg) typedef int __PP_CAT2(__static_assert_,__TPP_COUNTER(__static_assert))[(expr)?1:-1]
+#   define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __TPP_COUNTER(__static_assert))[(expr) ? 1 : -1]
+#   define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __TPP_COUNTER(__static_assert))[(expr) ? 1 : -1]
 #elif defined(__COUNTER__)
-#   define __STATIC_ASSERT(expr)         typedef int __PP_CAT2(__static_assert_,__COUNTER__)[(expr)?1:-1]
-#   define __STATIC_ASSERT_MSG(expr,msg) typedef int __PP_CAT2(__static_assert_,__COUNTER__)[(expr)?1:-1]
+#   define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __COUNTER__)[(expr) ? 1 : -1]
+#   define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __COUNTER__)[(expr) ? 1 : -1]
 #else
-#   define __STATIC_ASSERT(expr)         typedef int __PP_CAT2(__static_assert_,__LINE__)[(expr)?1:-1]
-#   define __STATIC_ASSERT_MSG(expr,msg) typedef int __PP_CAT2(__static_assert_,__LINE__)[(expr)?1:-1]
+#   define __STATIC_ASSERT(expr)          typedef int __PP_CAT2(__static_assert_, __LINE__)[(expr) ? 1 : -1]
+#   define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __LINE__)[(expr) ? 1 : -1]
 #endif
 #define __NO_ASMNAME             1
 #define __ASMNAME(x)             /* Nothing */

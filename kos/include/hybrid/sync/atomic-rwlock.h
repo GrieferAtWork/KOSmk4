@@ -45,21 +45,21 @@ struct __ATTR_PACKED atomic_rwlock {
 	__UINTPTR_TYPE__   arw_lock;
 };
 
-#define ATOMIC_RWLOCK_INIT              {0}
-#define ATOMIC_RWLOCK_INIT_READ         {1}
-#define ATOMIC_RWLOCK_INIT_WRITE        {__ATOMIC_RWLOCK_WFLAG}
+#define ATOMIC_RWLOCK_INIT              { 0 }
+#define ATOMIC_RWLOCK_INIT_READ         { 1 }
+#define ATOMIC_RWLOCK_INIT_WRITE        { __ATOMIC_RWLOCK_WFLAG }
 #define atomic_rwlock_cinit(self)       (void)__hybrid_assert((self)->arw_lock == 0)
-#define atomic_rwlock_cinit_read(self)  (void)(__hybrid_assert((self)->arw_lock == 0),(self)->arw_lock = 1)
-#define atomic_rwlock_cinit_write(self) (void)(__hybrid_assert((self)->arw_lock == 0),(self)->arw_lock = __ATOMIC_RWLOCK_WFLAG)
+#define atomic_rwlock_cinit_read(self)  (void)(__hybrid_assert((self)->arw_lock == 0), (self)->arw_lock = 1)
+#define atomic_rwlock_cinit_write(self) (void)(__hybrid_assert((self)->arw_lock == 0), (self)->arw_lock = __ATOMIC_RWLOCK_WFLAG)
 #define atomic_rwlock_init(self)        (void)((self)->arw_lock = 0)
 #define atomic_rwlock_init_read(self)   (void)((self)->arw_lock = 1)
 #define atomic_rwlock_init_write(self)  (void)((self)->arw_lock = __ATOMIC_RWLOCK_WFLAG)
-#define DEFINE_ATOMIC_RWLOCK(name)       struct atomic_rwlock name = ATOMIC_RWLOCK_INIT
+#define DEFINE_ATOMIC_RWLOCK(name)      struct atomic_rwlock name = ATOMIC_RWLOCK_INIT
 
-#define atomic_rwlock_reading(self)    (__hybrid_atomic_load((self)->arw_lock,__ATOMIC_ACQUIRE) != 0)
-#define atomic_rwlock_writing(self)    (__hybrid_atomic_load((self)->arw_lock,__ATOMIC_ACQUIRE) & __ATOMIC_RWLOCK_WFLAG)
-#define atomic_rwlock_canread(self)  (!(__hybrid_atomic_load((self)->arw_lock,__ATOMIC_ACQUIRE) & __ATOMIC_RWLOCK_WFLAG))
-#define atomic_rwlock_canwrite(self)   (__hybrid_atomic_load((self)->arw_lock,__ATOMIC_ACQUIRE) == 0)
+#define atomic_rwlock_reading(self)  (__hybrid_atomic_load((self)->arw_lock, __ATOMIC_ACQUIRE) != 0)
+#define atomic_rwlock_writing(self)  (__hybrid_atomic_load((self)->arw_lock, __ATOMIC_ACQUIRE) & __ATOMIC_RWLOCK_WFLAG)
+#define atomic_rwlock_canread(self)  (!(__hybrid_atomic_load((self)->arw_lock, __ATOMIC_ACQUIRE) & __ATOMIC_RWLOCK_WFLAG))
+#define atomic_rwlock_canwrite(self) (__hybrid_atomic_load((self)->arw_lock, __ATOMIC_ACQUIRE) == 0)
 
 /* Acquire an exclusive read/write lock. */
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self);

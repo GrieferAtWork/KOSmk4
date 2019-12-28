@@ -24,40 +24,41 @@
 #include <elf.h>
 
 #ifdef __x86_64__
-#define ELF_ARCH_R_NONE             R_X86_64_NONE
-#define ELF_ARCH_R_8S               R_X86_64_8
-#define ELF_ARCH_R_PC8              R_X86_64_PC8
-#define ELF_ARCH_R_16               R_X86_64_16
-#define ELF_ARCH_R_PC16             R_X86_64_PC16
-#define ELF_ARCH_R_32               R_X86_64_32
-#define ELF_ARCH_R_32S              R_X86_64_32S
-#define ELF_ARCH_R_PC32             R_X86_64_PC32
-#define ELF_ARCH_R_64               R_X86_64_64
-#define ELF_ARCH_R_PC64             R_X86_64_PC64
-#define ELF_ARCH_R_COPY             R_X86_64_COPY
-#define ELF_ARCH_R_GLOB_DAT         R_X86_64_GLOB_DAT
-#define ELF_ARCH_R_JMP_SLOT         R_X86_64_JMP_SLOT
+#define ELF_ARCH_R_NONE              R_X86_64_NONE
+#define ELF_ARCH_R_8S                R_X86_64_8
+#define ELF_ARCH_R_PC8               R_X86_64_PC8
+#define ELF_ARCH_R_16                R_X86_64_16
+#define ELF_ARCH_R_PC16              R_X86_64_PC16
+#define ELF_ARCH_R_32                R_X86_64_32
+#define ELF_ARCH_R_32S               R_X86_64_32S
+#define ELF_ARCH_R_PC32              R_X86_64_PC32
+#define ELF_ARCH_R_64                R_X86_64_64
+#define ELF_ARCH_R_PC64              R_X86_64_PC64
+#define ELF_ARCH_R_COPY              R_X86_64_COPY
+#define ELF_ARCH_R_GLOB_DAT          R_X86_64_GLOB_DAT
+#define ELF_ARCH_R_JMP_SLOT          R_X86_64_JMP_SLOT
+#define ELF_ARCH_NAME_R_JMP_SLOT    "R_X86_64_JMP_SLOT"
 #if __SIZEOF_POINTER__ == 4
-#define ELF_ARCH_R_RELATIVE32       R_X86_64_RELATIVE
-#define ELF_ARCH_R_RELATIVE64       R_X86_64_RELATIVE64
+#define ELF_ARCH_R_RELATIVE32        R_X86_64_RELATIVE
+#define ELF_ARCH_R_RELATIVE64        R_X86_64_RELATIVE64
 #else /* __SIZEOF_POINTER__ == 4 */
-#define ELF_ARCH_CASE_R_RELATIVE64  case R_X86_64_RELATIVE: case R_X86_64_RELATIVE64
-#define ELF_ARCH_IS_R_RELATIVE64(x) ((x) == R_X86_64_RELATIVE || (x) == R_X86_64_RELATIVE64)
+#define ELF_ARCH_CASE_R_RELATIVE64   case R_X86_64_RELATIVE: case R_X86_64_RELATIVE64
+#define ELF_ARCH_IS_R_RELATIVE64(x)  ((x) == R_X86_64_RELATIVE || (x) == R_X86_64_RELATIVE64)
 #endif /* __SIZEOF_POINTER__ != 4 */
-#define ELF_ARCH_R_IRELATIVE64      R_X86_64_IRELATIVE
-#define ELF_ARCH_R_SIZE32           R_X86_64_SIZE32
-#define ELF_ARCH_R_SIZE64           R_X86_64_SIZE64
-#define ELF_ARCH_R_DTPMOD64         R_X86_64_DTPMOD64
-#define ELF_ARCH_R_DTPOFF64         R_X86_64_DTPOFF64
-#define ELF_ARCH_R_TPOFF64          R_X86_64_TPOFF64 /* *ADDR = VALUE - dm_tlsstoff */
-#define ELF_ARCH_NAME_R_TPOFF64    "R_X86_64_TPOFF64"
-#define ELF_ARCH_R_DTPOFF32         R_X86_64_DTPOFF32
-#define ELF_ARCH_R_TPOFF32          R_X86_64_TPOFF32 /* *ADDR = VALUE - dm_tlsstoff */
-#define ELF_ARCH_NAME_R_TPOFF32    "R_X86_64_TPOFF32"
-#define ELF_ARCH_R_TLSDESC          R_X86_64_TLSDESC
+#define ELF_ARCH_R_IRELATIVE64       R_X86_64_IRELATIVE
+#define ELF_ARCH_R_SIZE32            R_X86_64_SIZE32
+#define ELF_ARCH_R_SIZE64            R_X86_64_SIZE64
+#define ELF_ARCH_R_DTPMOD64          R_X86_64_DTPMOD64
+#define ELF_ARCH_R_DTPOFF64          R_X86_64_DTPOFF64
+#define ELF_ARCH_R_TPOFF64           R_X86_64_TPOFF64 /* *ADDR = VALUE - dm_tlsstoff */
+#define ELF_ARCH_NAME_R_TPOFF64     "R_X86_64_TPOFF64"
+#define ELF_ARCH_R_DTPOFF32          R_X86_64_DTPOFF32
+#define ELF_ARCH_R_TPOFF32           R_X86_64_TPOFF32 /* *ADDR = VALUE - dm_tlsstoff */
+#define ELF_ARCH_NAME_R_TPOFF32     "R_X86_64_TPOFF32"
+#define ELF_ARCH_R_TLSDESC           R_X86_64_TLSDESC
 #else  /* __x86_64__ */
 #define ELF_ARCH_R_NONE              R_386_NONE
-#define ELF_ARCH_R_8                 R_386_8
+#define ELF_ARCH_R_8S                R_386_8
 #define ELF_ARCH_R_PC8               R_386_PC8
 #define ELF_ARCH_R_16                R_386_16
 #define ELF_ARCH_R_PC16              R_386_PC16

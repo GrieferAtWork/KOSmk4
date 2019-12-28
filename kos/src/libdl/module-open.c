@@ -56,7 +56,7 @@ INTERN LLIST(DlModule) DlModule_AllList = LLIST_INIT;
 INTERN DEFINE_ATOMIC_RWLOCK(DlModule_AllLock);
 
 
-INTERN fd_t CC reopen_bigfs(fd_t fd) {
+INTERN WUNUSED fd_t CC reopen_bigfs(fd_t fd) {
 	enum {
 		MAX_RESERVED_FD_2 = STDIN_FILENO > STDOUT_FILENO
 		                    ? STDIN_FILENO
@@ -81,7 +81,8 @@ INTERN fd_t CC reopen_bigfs(fd_t fd) {
 }
 
 
-PRIVATE char *CC realpath_malloc(fd_t fd) {
+PRIVATE ATTR_MALLOC WUNUSED char *CC
+realpath_malloc(fd_t fd) {
 	char *resolved, *buffer;
 	ssize_t result;
 	size_t bufsize;
@@ -145,7 +146,7 @@ err:
 	return 0;
 }
 
-LOCAL void CC
+LOCAL NONNULL((1)) void CC
 update_module_flags(DlModule *__restrict self, int mode) {
 	uintptr_t old_flags;
 again_old_flags:
@@ -172,7 +173,7 @@ again_old_flags:
 
 DEFINE_INTERN_ALIAS(libdl_dlfopen, DlModule_OpenFd);
 DEFINE_PUBLIC_ALIAS(dlfopen, libdl_dlfopen);
-INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *LIBCCALL
+INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *LIBCCALL
 DlModule_OpenFd(/*inherit(on_success)*/ fd_t fd, unsigned int mode) {
 	REF DlModule *result;
 	char *rp = realpath_malloc(fd);
@@ -190,7 +191,7 @@ err:
 	return NULL;
 }
 
-INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
+INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilename(char const *__restrict filename,
                       unsigned int mode) {
 	fd_t fd;
@@ -217,7 +218,8 @@ err:
 	return NULL;
 }
 
-INTERN ATTR_NOINLINE REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
+INTERN WUNUSED ATTR_NOINLINE NONNULL((1, 3))
+REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameInPath(char const *__restrict path,
                             size_t pathlen,
                             char const *__restrict filename,
@@ -247,7 +249,8 @@ DlModule_OpenFilenameInPath(char const *__restrict path,
 	return result;
 }
 
-INTERN ATTR_NOINLINE REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
+INTERN WUNUSED ATTR_NOINLINE NONNULL((1, 3))
+REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_FindFilenameInPathFromAll(char const *__restrict path,
                                    size_t pathlen,
                                    char const *__restrict filename,
@@ -271,7 +274,7 @@ DlModule_FindFilenameInPathFromAll(char const *__restrict path,
 	return result;
 }
 
-INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
+INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_FindFilenameInPathListFromAll(char const *__restrict filename) {
 	REF DlModule *result;
 	char const *sep;
@@ -292,7 +295,7 @@ DlModule_FindFilenameInPathListFromAll(char const *__restrict filename) {
 	return result;
 }
 
-INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
+INTERN WUNUSED NONNULL((1, 2)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameInPathList(char const *__restrict path,
                                 char const *__restrict filename,
                                 unsigned int mode) {
@@ -327,7 +330,7 @@ DlModule_OpenFilenameInPathList(char const *__restrict path,
 
 
 
-INTERN int CC
+PRIVATE NONNULL((1)) int CC
 DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 	uint16_t pidx;
 	for (pidx = 0; pidx < self->dm_phnum; ++pidx) {
@@ -459,7 +462,7 @@ err:
 }
 
 
-INTERN REF_IF(!(mode & RTLD_NODELETE)) DlModule *CC
+INTERN WUNUSED NONNULL((1, 3)) REF_IF(!(mode & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
                                   uint16_t pnum, ElfW(Phdr) *__restrict phdr,
                                   uintptr_t loadaddr, unsigned int mode) {
@@ -505,7 +508,7 @@ err_r:
 }
 
 
-INTERN int CC
+INTERN WUNUSED NONNULL((1, 2)) int CC
 DlModule_VerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
                     char const *__restrict filename,
                     bool requires_ET_DYN) {
@@ -547,12 +550,11 @@ DlModule_VerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
 		goto err;
 	return 0;
 err:
-	elf_setdlerrorf("%q: Faulty ELF header: %q", filename, reason);
-	return -1;
+	return elf_setdlerrorf("%q: Faulty ELF header: %q", filename, reason);
 }
 
 
-PRIVATE REF DlModule *CC
+PRIVATE WUNUSED NONNULL((1)) REF DlModule *CC
 DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
                            /*inherit(on_success)*/ fd_t fd) {
 	ElfW(Ehdr) ehdr;
@@ -629,7 +631,7 @@ err:
 
 
 
-INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
+INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filename,
                            /*inherit(on_success)*/ fd_t fd, unsigned int mode) {
 	REF DlModule *result;
@@ -663,7 +665,8 @@ err_r:
 
 /* Find the DL module mapping the specified file.
  * If no such module is loaded, `NULL' is returned instead. */
-INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
+INTERN WUNUSED NONNULL((1))
+REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_FindFromFilename(char const *__restrict filename) {
 	REF DlModule *result;
 	atomic_rwlock_read(&DlModule_AllLock);
@@ -678,15 +681,15 @@ DlModule_FindFromFilename(char const *__restrict filename) {
 	return result;
 }
 
-INTERN ATTR_COLD void CC
-set_error_no_module_with_static_pointer(void const *static_pointer) {
-	elf_setdlerrorf("The address %p is not mapped to a static module segment",
-	                static_pointer);
+INTERN ATTR_COLD int CC
+elf_setdlerror_nomodataddr(void const *static_pointer) {
+	return elf_setdlerrorf("Address %p does not map to any module",
+	                       static_pointer);
 }
 
 
 /* Find the DL module containing a given static pointer. */
-INTERN DlModule *CC
+INTERN WUNUSED DlModule *CC
 DlModule_FindFromStaticPointer(void const *static_pointer) {
 	REF DlModule *result;
 	atomic_rwlock_read(&DlModule_AllLock);
@@ -712,7 +715,7 @@ DlModule_FindFromStaticPointer(void const *static_pointer) {
 		}
 	}
 	atomic_rwlock_endread(&DlModule_AllLock);
-	set_error_no_module_with_static_pointer(static_pointer);
+	elf_setdlerror_nomodataddr(static_pointer);
 	return NULL;
 got_result:
 	atomic_rwlock_endread(&DlModule_GlobalLock);

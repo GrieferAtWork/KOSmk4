@@ -152,7 +152,7 @@
  * memory buffers applies for this, as the user may have defined a
  * signal handler to throw an exception upon `SIGSEGV', or the like.
  * Or alternatively, has KOS kernel exceptions enabled (s.a. <kos/except-handler.h>)
- * Additionally, in KOS the kernel may have thrown the exception, and
+ * Additionally, on KOS the kernel may have thrown the exception, and
  * is in the process of propagating it into user-space. */
 #if !defined(__NO_NON_CALL_EXCEPTIONS) || \
     (defined(__NON_CALL_EXCEPTIONS) && (__NON_CALL_EXCEPTIONS+0) != 0)
@@ -206,7 +206,7 @@
 #endif /* __cplusplus */
 #endif /* __NON_CALL_EXCEPTIONS || !__NO_RPC_EXCEPTIONS */
 
-#define __untraced    /* Annotation for `if __untraced()' or `while __untraced()'
+#define __untraced    /* Annotation for `if __untraced(...)' or `while __untraced(...)'
                        * Using this macro prevents the injection of meta-data profilers
                        * which would otherwise allow branches to be traced. */
 
@@ -243,7 +243,7 @@
 #if 1 /* PE doesn't have .pushsection, .popsection, or even .previous, however we'd need
        * to change sections in order to write to the `.drectve' section that we want to
        * export a certain symbol. - So while in theory we can define non-public aliases,
-       * defining public ones if something that we cannot do without assuming the caller's
+       * defining public ones is something that we cannot do without assuming the caller's
        * current section. */
 #   define __NO_DEFINE_ALIAS 1
 #   define __DEFINE_PRIVATE_ALIAS(new, old)      /* Nothing */

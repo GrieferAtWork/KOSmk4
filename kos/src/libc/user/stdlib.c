@@ -371,8 +371,10 @@ again_searchenv:
 			new_envp = NULL;
 		}
 		atomic_rwlock_endwrite(&libc_environ_lock);
-		new_enva = envc + 1;
-		new_new_envp = (char **)realloc(new_envp, (new_enva + 1) * sizeof(char *));
+		new_enva     = envc + 1;
+		new_new_envp = (char **)realloc(new_envp,
+		                                (new_enva + 1) *
+		                                sizeof(char *));
 		if unlikely(!new_new_envp) {
 			free(new_envp);
 			return -1;

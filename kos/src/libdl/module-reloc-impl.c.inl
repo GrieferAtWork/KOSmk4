@@ -35,13 +35,13 @@ DECL_BEGIN
 /* Apply relocations for `self'
  * @param: flags: Set of `DL_MODULE_INITIALIZE_F*' */
 #ifdef APPLY_RELA
-INTERN int CC
+INTERN WUNUSED NONNULL((1)) int CC
 DlModule_ApplyRelocationsWithAddend(DlModule *__restrict self,
                                     ElfW(Rela) *__restrict vector,
                                     size_t count,
                                     unsigned int flags)
 #else /* APPLY_RELA */
-INTERN int CC
+INTERN WUNUSED NONNULL((1)) int CC
 DlModule_ApplyRelocations(DlModule *__restrict self,
                           ElfW(Rel) *__restrict vector,
                           size_t count,

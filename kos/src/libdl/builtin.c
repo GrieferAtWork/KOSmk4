@@ -41,7 +41,7 @@
 
 DECL_BEGIN
 
-INTERN ssize_t
+INTERN NONNULL((2)) ssize_t
 NOTHROW_RPC(LIBCCALL syslog_printer)(void *arg,
                                      char const *__restrict data,
                                      size_t datalen) {
@@ -73,7 +73,7 @@ struct assert_args {
 	void        *pc;
 };
 
-PRIVATE ATTR_NOINLINE ATTR_NORETURN void LIBCCALL
+PRIVATE ATTR_NOINLINE ATTR_NORETURN NONNULL((1)) void LIBCCALL
 assertion_failure_core(struct assert_args *__restrict args) {
 	syslog(LOG_ERR, "[rtld] Assertion Failure [pc=%p]\n", args->pc);
 	syslog(LOG_ERR, "%s(%d) : %s%s%s\n",
@@ -139,16 +139,26 @@ INTERN char *LIBCCALL libdl_dlerror(void) {
 	return ATOMIC_XCH(elf_dlerror_message, NULL);
 }
 
-PRIVATE char const message_nomem[] = "Insufficient memory";
 
-INTERN ATTR_COLD void CC
-elf_setdlerror_nomem(void) {
-	memcpy(elf_dlerror_buffer, message_nomem, sizeof(message_nomem));
-	ATOMIC_WRITE(elf_dlerror_message,
-	             (char *)elf_dlerror_buffer);
+INTERN ATTR_COLD int CC
+elf_setdlerror_badmodule(void *modptr) {
+	return elf_setdlerrorf("Bad module handle: %p", modptr);
 }
 
-INTERN ATTR_COLD int VCC
+INTERN ATTR_COLD int CC
+elf_setdlerror_badsection(void *sectptr) {
+	return elf_setdlerrorf("Bad section handle: %p", sectptr);
+}
+
+PRIVATE char const message_nomem[] = "Insufficient memory";
+INTERN ATTR_COLD int CC
+elf_setdlerror_nomem(void) {
+	memcpy(elf_dlerror_buffer, message_nomem, sizeof(message_nomem));
+	ATOMIC_WRITE(elf_dlerror_message, (char *)elf_dlerror_buffer);
+	return -1;
+}
+
+INTERN ATTR_COLD NONNULL((1)) int VCC
 elf_setdlerrorf(char const *__restrict format, ...) {
 	int result;
 	va_list args;
@@ -158,7 +168,7 @@ elf_setdlerrorf(char const *__restrict format, ...) {
 	return result;
 }
 
-INTERN ATTR_COLD int CC
+INTERN ATTR_COLD NONNULL((1)) int CC
 elf_vsetdlerrorf(char const *__restrict format, va_list args) {
 	vsnprintf(elf_dlerror_buffer,
 	          sizeof(elf_dlerror_buffer),
@@ -176,7 +186,7 @@ elf_vsetdlerrorf(char const *__restrict format, va_list args) {
  * from the fact that various components must be accessed globally). */
 INTERN struct atomic_owner_rwlock DlModule_LoadLock = ATOMIC_OWNER_RWLOCK_INIT;
 
-LOCAL void CC
+LOCAL NONNULL((1)) void CC
 update_module_flags(DlModule *__restrict self, int mode) {
 	uintptr_t old_flags;
 again_old_flags:
@@ -254,22 +264,26 @@ again:
 	return result;
 }
 INTERN NONNULL((1)) int LIBCCALL
-libdl_dlclose(REF DlModule *handle) {
-	if unlikely(!handle || handle == (void *)-1)
-		return elf_setdlerrorf("Cannot close handle %p", handle);
-	if unlikely(handle->dm_flags & RTLD_NODELETE)
-		return 0; /* Don't ever close this module! */
-	DlModule_Decref(handle);
+libdl_dlclose(REF DlModule *self) {
+	if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
+		goto err_bad_module;
+	/* Don't decref NODELETE modules! */
+	if likely(!(self->dm_flags & RTLD_NODELETE))
+		DlModule_Decref(self);
 	return 0;
+err_bad_module:
+	return elf_setdlerror_badmodule(self);
 }
 
 
 INTERN NONNULL((1)) int LIBCCALL
-libdl_dlexceptaware(DlModule *handle) {
-	if unlikely(!handle || handle == (void *)-1)
-		return elf_setdlerrorf("Invalid module handle %p", handle);
+libdl_dlexceptaware(DlModule *self) {
+	if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
+		goto err_bad_module;
 	/* TODO */
 	return 1;
+err_bad_module:
+	return elf_setdlerror_badmodule(self);
 }
 
 
@@ -358,7 +372,7 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
 }
 
 INTERN NONNULL((2)) void *LIBCCALL
-libdl_dlsym(DlModule *handle, char const *__restrict name) {
+libdl_dlsym(DlModule *self, char const *__restrict name) {
 	ElfW(Addr) result;
 	uintptr_t hash_elf, hash_gnu;
 	struct dl_symbol symbol;
@@ -366,14 +380,7 @@ libdl_dlsym(DlModule *handle, char const *__restrict name) {
 	REF DlModule *next_module;
 	hash_elf = hash_gnu = DLMODULE_GETLOCALSYMBOL_HASH_UNSET;
 	weak_symbol.ds_mod  = NULL;
-	if (handle == RTLD_NEXT) {
-		symbol.ds_mod = libdl_dlgethandle(__builtin_return_address(0), DLGETHANDLE_FNORMAL);
-		/* Search modules loaded after `symbol.ds_mod' */
-		if unlikely(!symbol.ds_mod)
-			goto err_rtld_next_no_base;
-		atomic_rwlock_read(&DlModule_GlobalLock);
-		goto again_search_globals_next_noref;
-	} else if (handle == RTLD_DEFAULT) {
+	if (self == RTLD_DEFAULT) {
 		/* Search all modules in order of being loaded. */
 		atomic_rwlock_read(&DlModule_GlobalLock);
 		symbol.ds_mod = DlModule_GlobalList;
@@ -474,7 +481,7 @@ again_search_globals_module:
 			DlModule_Decref(weak_symbol.ds_mod);
 			goto done;
 		}
-		if unlikely(handle == RTLD_NEXT) {
+		if unlikely(self == RTLD_NEXT) {
 			symbol.ds_mod = libdl_dlgethandle(__builtin_return_address(0), DLGETHANDLE_FNORMAL);
 			if unlikely(!symbol.ds_mod)
 				goto err_rtld_next_no_base;
@@ -483,14 +490,23 @@ again_search_globals_module:
 		} else {
 			elf_setdlerrorf("No loaded module contains a symbol %q", name);
 		}
+	} else if (self == RTLD_NEXT) {
+		symbol.ds_mod = libdl_dlgethandle(__builtin_return_address(0), DLGETHANDLE_FNORMAL);
+		/* Search modules loaded after `symbol.ds_mod' */
+		if unlikely(!symbol.ds_mod)
+			goto err_rtld_next_no_base;
+		atomic_rwlock_read(&DlModule_GlobalLock);
+		goto again_search_globals_next_noref;
 	} else {
-		if unlikely(handle == &ld_rtld_module) {
+		if unlikely(self == &ld_rtld_module) {
 			result = (ElfW(Addr))dlsym_builtin(name);
 			if likely(result)
 				goto done;
 		} else {
+			if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
+				goto err_bad_module;
 			/* Scan the given module itself */
-			symbol.ds_sym = DlModule_GetLocalSymbol(handle,
+			symbol.ds_sym = DlModule_GetLocalSymbol(self,
 			                                        name,
 			                                        &hash_elf,
 			                                        &hash_gnu);
@@ -503,13 +519,13 @@ again_search_globals_module:
 					result = symbol.ds_sym->st_value;
 					if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_TLS) {
 						void *tlsbase;
-						tlsbase = libdl_dltlsaddr(handle);
+						tlsbase = libdl_dltlsaddr(self);
 						if unlikely(!tlsbase)
 							goto err;
 						result += (ElfW(Addr))tlsbase;
 					} else {
 						if (symbol.ds_sym->st_shndx != SHN_ABS)
-							result += handle->dm_loadaddr;
+							result += self->dm_loadaddr;
 						if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC)
 							result = (*(ElfW(Addr)(*)(void))(void *)result)();
 					}
@@ -523,7 +539,7 @@ done:
 				unsigned int error;
 				for (;; ++depth) {
 					/* Breadth-first search using a depth counter. */
-					error = dlmodule_search_symbol_in_dependencies(handle,
+					error = dlmodule_search_symbol_in_dependencies(self,
 					                                               name,
 					                                               &hash_elf,
 					                                               &hash_gnu,
@@ -538,29 +554,27 @@ done:
 						break;
 				}
 			}
-		}
-
-		/* Check if we found a weak symbol at one point. */
-		if (weak_symbol.ds_mod) {
-			result = weak_symbol.ds_sym->st_value;
-			if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_TLS) {
-				void *tlsbase;
-				tlsbase = libdl_dltlsaddr(weak_symbol.ds_mod);
-				if unlikely(!tlsbase)
-					goto err;
-				result += (ElfW(Addr))tlsbase;
-			} else {
-				if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
-					result += weak_symbol.ds_mod->dm_loadaddr;
-				if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC)
-					result = (*(ElfW(Addr)(*)(void))(void *)result)();
+			/* Check if we found a weak symbol at one point. */
+			if (weak_symbol.ds_mod) {
+				result = weak_symbol.ds_sym->st_value;
+				if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_TLS) {
+					void *tlsbase;
+					tlsbase = libdl_dltlsaddr(weak_symbol.ds_mod);
+					if unlikely(!tlsbase)
+						goto err;
+					result += (ElfW(Addr))tlsbase;
+				} else {
+					if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
+						result += weak_symbol.ds_mod->dm_loadaddr;
+					if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC)
+						result = (*(ElfW(Addr)(*)(void))(void *)result)();
+				}
+				goto done;
 			}
-			goto done;
 		}
-
 		/* Missing symbol... */
 		elf_setdlerrorf("Failed to find symbol %q in %q",
-		                name, handle->dm_filename);
+		                name, self->dm_filename);
 	}
 err:
 	return NULL;
@@ -573,16 +587,18 @@ err_weak_symbol_mod:
 err_rtld_next_no_base:
 	elf_setdlerrorf("Can only use `RTLD_NEXT' from dynamically loaded code");
 	goto err;
+err_bad_module:
+	elf_setdlerror_badmodule(self);
+	goto err;
 }
 
 
 
 
-INTDEF ATTR_COLD void CC
-set_error_no_module_with_static_pointer(void const *static_pointer);
-
-INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF))
-DlModule *LIBCCALL libdl_dlgethandle(void const *static_pointer, unsigned int flags) {
+INTERN WUNUSED
+REF_IF(!(return->dm_flags & RTLD_NODELETE) &&
+       (flags & DLGETHANDLE_FINCREF)) DlModule *LIBCCALL
+libdl_dlgethandle(void const *static_pointer, unsigned int flags) {
 	DlModule *result;
 	if unlikely(flags & ~(DLGETHANDLE_FINCREF)) {
 		elf_setdlerrorf("Invalid flags %#x passed to `dlgethandle()'", flags);
@@ -613,7 +629,7 @@ DlModule *LIBCCALL libdl_dlgethandle(void const *static_pointer, unsigned int fl
 		}
 	}
 	atomic_rwlock_endread(&DlModule_AllLock);
-	set_error_no_module_with_static_pointer(static_pointer);
+	elf_setdlerror_nomodataddr(static_pointer);
 err:
 	return NULL;
 got_result:
@@ -779,36 +795,35 @@ err:
 
 INTERN WUNUSED fd_t LIBCCALL
 libdl_dlmodulefd(DlModule *self) {
-	if unlikely(!self)
+	if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
 	return DlModule_GetFd(self);
 err_bad_module:
-	elf_setdlerrorf("Invalid module handle");
-	return -1;
+	return elf_setdlerror_badmodule(self);
 }
 
 INTERN WUNUSED char const *LIBCCALL
 libdl_dlmodulename(DlModule *self) {
-	if unlikely(!self)
+	if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
 	return self->dm_filename;
 err_bad_module:
-	elf_setdlerrorf("Invalid module handle");
+	elf_setdlerror_badmodule(self);
 	return NULL;
 }
 
 INTERN WUNUSED void *LIBCCALL
 libdl_dlmodulebase(DlModule *self) {
-	if unlikely(!self)
+	if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
 	return (void *)self->dm_loadaddr;
 err_bad_module:
-	elf_setdlerrorf("Invalid module handle");
+	elf_setdlerror_badmodule(self);
 	return NULL;
 }
 
 
-INTERN void CC
+INTERN NONNULL((1)) void CC
 DlSection_Destroy(DlSection *__restrict self) {
 	DlModule *mod;
 	if ((self->ds_flags & ELF_DLSECTION_FLAG_OWNED) && (self->ds_data != (void *)-1))
@@ -849,14 +864,10 @@ libdl_dllocksection(DlModule *self,
 	ElfW(Shdr) *sect;
 	size_t index;
 	REF DlSection *result;
-	if unlikely(flags & ~(DLLOCKSECTION_FINDEX | DLLOCKSECTION_FNODATA)) {
-		elf_setdlerrorf("Invalid flags %#x passed to `dllocksection()'", flags);
-		goto err;
-	}
-	if unlikely(!self) {
-		elf_setdlerrorf("Invalid module handle");
-		goto err;
-	}
+	if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
+		goto err_bad_module;
+	if unlikely(flags & ~(DLLOCKSECTION_FINDEX | DLLOCKSECTION_FNODATA))
+		goto err_bad_flags;
 	if (self == &ld_rtld_module) {
 		/* Special case: Lookup a section within the dynamic linker itself. */
 		result = flags & DLLOCKSECTION_FINDEX
@@ -981,15 +992,19 @@ err_nomem:
 	elf_setdlerror_nomem();
 err:
 	return NULL;
+err_bad_module:
+	elf_setdlerror_badmodule(self);
+	goto err;
+err_bad_flags:
+	elf_setdlerrorf("Invalid flags %#x passed to `dllocksection()'", flags);
+	goto err;
 }
 
 
 INTERN int LIBCCALL
 libdl_dlunlocksection(REF DlSection *sect) {
-	if unlikely(!sect) {
-		elf_setdlerrorf("Invalid section");
-		goto err;
-	}
+	if unlikely(!ELF_VERIFY_SECTION_HANDLE(sect))
+		goto err_bad_section;
 #ifndef CONFIG_NO_DANGLING_DL_SECTIONS
 	{
 		refcnt_t refcnt;
@@ -1022,25 +1037,20 @@ set_dangling_section:
 			atomic_rwlock_endwrite(&mod->dm_sections_lock);
 			DlModule_Decref(mod);
 		}
-		DlSection_Decref(sect);
-		return 0;
 	}
-#else /* !CONFIG_NO_DANGLING_DL_SECTIONS */
+#endif /* !CONFIG_NO_DANGLING_DL_SECTIONS */
 	DlSection_Decref(sect);
 	return 0;
-#endif /* CONFIG_NO_DANGLING_DL_SECTIONS */
-err:
-	return -1;
+err_bad_section:
+	return elf_setdlerror_badsection(sect);
 }
 
 INTERN char const *LIBCCALL
 libdl_dlsectionname(DlSection *sect) {
 	char const *result;
 	REF DlModule *mod;
-	if unlikely(!sect) {
-		elf_setdlerrorf("Invalid section");
-		goto err;
-	}
+	if unlikely(!sect)
+		goto err_bad_section;
 	atomic_rwlock_read(&sect->ds_module_lock);
 	mod = sect->ds_module;
 	if (!mod || !DlModule_TryIncref(mod)) {
@@ -1066,6 +1076,8 @@ err_mod_unloaded:
 	if unlikely(!DlModule_Decref(mod))
 		goto err_mod_unloaded;
 	return result;
+err_bad_section:
+	elf_setdlerror_badsection(sect);
 err:
 	return NULL;
 }
@@ -1073,23 +1085,21 @@ err:
 INTERN size_t LIBCCALL
 libdl_dlsectionindex(DlSection *sect) {
 	size_t result;
-	if unlikely(!sect) {
-		elf_setdlerrorf("Invalid section");
-		result = (size_t)-1;
-	} else {
-		result = sect->ds_index;
-	}
+	if unlikely(!ELF_VERIFY_SECTION_HANDLE(sect))
+		goto err_bad_section;
+	result = sect->ds_index;
 	return result;
+err_bad_section:
+	elf_setdlerror_badsection(sect);
+	return (size_t)-1;
 }
 
 
 INTERN DlModule *LIBCCALL
 libdl_dlsectionmodule(DlSection *sect, unsigned int flags) {
 	DlModule *mod;
-	if unlikely(!sect) {
-		elf_setdlerrorf("Invalid section");
-		goto err;
-	}
+	if unlikely(!ELF_VERIFY_SECTION_HANDLE(sect))
+		goto err_bad_section;
 	if unlikely(flags & ~(DLGETHANDLE_FINCREF)) {
 		elf_setdlerrorf("Invalid flags %#x passed to `dlsectionmodule()'", flags);
 		goto err;
@@ -1106,15 +1116,18 @@ libdl_dlsectionmodule(DlSection *sect, unsigned int flags) {
 	}
 	atomic_rwlock_endread(&sect->ds_module_lock);
 	return mod;
+err_bad_section:
+	elf_setdlerror_badsection(sect);
 err:
 	return NULL;
 }
 
-PRIVATE int CC
+PRIVATE NONNULL((1)) int CC
 DlModule_InvokeDlCacheFunctions(DlModule *__restrict self) {
 	int result = 0;
 	DlSection *sect;
-	sect = libdl_dllocksection(self, ".dl_caches", DLLOCKSECTION_FNORMAL);
+	sect = libdl_dllocksection(self, ".dl_caches",
+	                           DLLOCKSECTION_FNORMAL);
 	if unlikely(!sect)
 		goto done;
 	if likely(!(sect->ds_size & (sizeof(void *) - 1))) {
@@ -1218,12 +1231,13 @@ again_lock_global:
 
 
 INTERN void *LIBCCALL
-libdl_dlauxinfo(DlModule *self, unsigned int type, void *buf, size_t *pauxvlen) {
+libdl_dlauxinfo(DlModule *self, unsigned int type,
+                void *buf, size_t *pauxvlen) {
 	void *result;
 	if (!self)
 		self = DlModule_GlobalList;
-	else if unlikely(self == (DlModule *)-1) {
-		elf_setdlerrorf("Invalid module handle");
+	else if unlikely(!ELF_VERIFY_MODULE_HANDLE(self)) {
+		elf_setdlerror_badmodule(self);
 		goto err;
 	}
 	(void)buf;
@@ -1354,7 +1368,7 @@ DEFINE_PUBLIC_ALIAS(dlauxinfo, libdl_dlauxinfo);
 
 
 PRIVATE char *dl_program_invocation_short_name = NULL;
-PRIVATE char **FCALL dlget_p_program_invocation_short_name(void) {
+PRIVATE WUNUSED char **FCALL dlget_p_program_invocation_short_name(void) {
 	if (!dl_program_invocation_short_name) {
 		char *progname = root_peb->pp_argv
 		                 ? root_peb->pp_argv[0]
@@ -1374,7 +1388,8 @@ PRIVATE char **FCALL dlget_p_program_invocation_short_name(void) {
 
 
 /* Return the address of a builtin function (e.g. `dlopen()') */
-INTERN void *FCALL dlsym_builtin(char const *__restrict name) {
+INTERN WUNUSED ATTR_PURE NONNULL((1)) void *FCALL
+dlsym_builtin(char const *__restrict name) {
 	void *result = NULL;
 /*[[[deemon
 import * from ...misc.libgen.stringswitch;
@@ -1420,9 +1435,34 @@ stringSwitch("name",
 					result = (void *)&root_peb->pp_envp;
 				}
 			} else if (name[2] == 'p') {
-				if (name[3] == 'e' && name[4] == 'b' && name[5] == '\0') {
-					/* case "__peb": ... */
-					result = (void *)root_peb;
+				if (name[3] == 'r') {
+					if (name[4] == 'o') {
+						if (name[5] == 'g') {
+							if (name[6] == 'n') {
+								if (name[7] == 'a') {
+									if (name[8] == 'm') {
+										if (name[9] == 'e') {
+											if (name[10] == '_') {
+												if (name[11] == 'f' && name[12] == 'u' && name[13] == 'l' &&
+												    name[14] == 'l' && name[15] == '\0') {
+													/* case "__progname_full": ... */
+													result = (void *)&root_peb->pp_argv[0];
+												}
+											} else if (name[10] == '\0') {
+												/* case "__progname": ... */
+												result = (void *)dlget_p_program_invocation_short_name();
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				} else if (name[3] == 'e') {
+					if (name[4] == 'b' && name[5] == '\0') {
+						/* case "__peb": ... */
+						result = (void *)root_peb;
+					}
 				}
 			} else if (name[2] == 't') {
 				if (name[3] == 'l' && name[4] == 's' && name[5] == '_' &&
@@ -1767,7 +1807,7 @@ stringSwitch("name",
 
 
 
-INTERN WUNUSED struct elf_dlsection *FCALL
+INTERN WUNUSED ATTR_CONST struct elf_dlsection *FCALL
 dlsec_builtin_index(size_t sect_index) {
 	struct elf_dlsection *result;
 	switch (sect_index) {
@@ -1783,7 +1823,7 @@ dlsec_builtin_index(size_t sect_index) {
 			COMPILER_WRITE_BARRIER();                                                             \
 			result->ds_module = &ld_rtld_module;                                                  \
 		}                                                                                         \
-	} break;
+	}	break;
 	BUILTIN_SECTIONS_ENUMERATE(DEFINE_BUILTIN_SECTION)
 #undef DEFINE_BUILTIN_SECTION
 	default:
@@ -1811,7 +1851,7 @@ dlsec_builtin_name(size_t sect_index) {
 }
 
 
-INTERN WUNUSED ATTR_PURE struct elf_dlsection *FCALL
+INTERN WUNUSED ATTR_PURE NONNULL((1)) struct elf_dlsection *FCALL
 dlsec_builtin(char const *__restrict name) {
 	size_t sect_index;
 	char const *sect_name;
@@ -1830,7 +1870,7 @@ dlsec_builtin(char const *__restrict name) {
  * and must be defined by one of the loaded libraries. - If no such function
  * is defined, log an error message to the system log and terminate the hosted
  * application ungracefully. */
-INTERN ATTR_RETNONNULL void *FCALL
+INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) void *FCALL
 require_global(char const *__restrict name) {
 	void *result;
 	/* Search all globally loaded modules for the symbol. */

@@ -41,7 +41,7 @@ DECL_BEGIN
 INTERN ElfW(Shdr) empty_shdr[1] = { 0 };
 
 /* DlModule functions */
-INTERN void CC
+INTERN NONNULL((1)) void CC
 DlModule_Destroy(DlModule *__restrict self) {
 	uint16_t i;
 	uintptr_t fini_func        = 0;
@@ -151,7 +151,7 @@ again_free_sections:
 			atomic_rwlock_endwrite(&sect->ds_module_lock);
 #ifndef NDEBUG
 			memset(&self->dm_sections[i], 0xcc, sizeof(self->dm_sections[i]));
-#endif
+#endif /* !NDEBUG */
 		}
 #ifndef CONFIG_NO_DANGLING_DL_SECTIONS
 		{
@@ -185,10 +185,10 @@ again_free_sections:
 }
 
 
-INTDEF fd_t CC reopen_bigfs(fd_t fd);
+INTDEF WUNUSED fd_t CC reopen_bigfs(fd_t fd);
 
 /* Lazily allocate if necessary, and return the file descriptor for `self' */
-INTERN fd_t CC
+INTERN WUNUSED NONNULL((1)) fd_t CC
 DlModule_GetFd(DlModule *__restrict self) {
 	fd_t result = self->dm_file;
 	if (result < 0) {
@@ -221,7 +221,7 @@ err:
  *  - self->dm_shstrndx
  *  - self->dm_shdr
  * @return: NULL: Error */
-INTERN ElfW(Shdr) *CC
+INTERN WUNUSED NONNULL((1)) ElfW(Shdr) *CC
 DlModule_GetShdrs(DlModule *__restrict self) {
 	fd_t fd;
 	ElfW(Shdr) *result;
@@ -283,7 +283,7 @@ err_nomem:
 	                self->dm_filename);
 	goto err;
 err_read_ehdr:
-	elf_setdlerrorf("%q: Failed to read ElfW(Ehdr) of",
+	elf_setdlerrorf("%q: Failed to read ElfW(Ehdr)",
 	                self->dm_filename);
 err:
 	return NULL;
@@ -291,7 +291,7 @@ err:
 
 /* Lazily allocate if necessary, and return the section header string table for `self'
  * @return: NULL: Error (s.a. elf_dlerror_message) */
-INTERN char *CC
+INTERN WUNUSED NONNULL((1)) char *CC
 DlModule_GetShstrtab(DlModule *__restrict self) {
 	char *result;
 	ElfW(Shdr) *shdrs;
@@ -339,14 +339,14 @@ err:
 }
 
 
-INTERN ATTR_COLD void CC
+INTERN ATTR_COLD NONNULL((1, 2)) int CC
 elf_setdlerror_nosect(DlModule *__restrict self,
                       char const *__restrict name) {
-	elf_setdlerrorf("%q: No such section %q",
-	                self->dm_filename, name);
+	return elf_setdlerrorf("%q: No such section %q",
+	                       self->dm_filename, name);
 }
 
-INTERN ElfW(Shdr) *CC
+INTERN WUNUSED NONNULL((1, 2)) ElfW(Shdr) *CC
 DlModule_GetSection(DlModule *__restrict self,
                     char const *__restrict name) {
 	ElfW(Shdr) *result;

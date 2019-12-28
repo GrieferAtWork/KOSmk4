@@ -69,7 +69,7 @@ builtin_symbol_size(char const *__restrict name) {
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NOT_FOUND 0
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND     1
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NO_MODULE 2
-PRIVATE NONNULL((2)) unsigned int LIBCCALL
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4, 5, 8)) unsigned int LIBCCALL
 dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
                                      char const *__restrict name,
                                      uintptr_t *__restrict phash_elf,
@@ -164,7 +164,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 }
 
 
-PRIVATE ATTR_NOINLINE bool CC
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 3)) bool CC
 DlModule_FindSymbol(DlModule *__restrict self, uintptr_t symid,
                     ElfW(Addr) *__restrict presult,
                     size_t *psize, DlModule **pmodule) {
@@ -332,7 +332,8 @@ again_search_globals_module:
 			goto got_local_symbol;
 
 		/* If the symbol continues to be undefined, set an error. */
-		elf_setdlerrorf("Could not find symbol %q required by %q", name, self->dm_filename);
+		elf_setdlerrorf("Could not find symbol %q required by %q",
+		                name, self->dm_filename);
 		return false;
 	}
 done_result:
@@ -357,10 +358,14 @@ STATIC_ASSERT(offsetof(Elf32_Rel, r_info) == offsetof(Elf32_Rela, r_info));
 STATIC_ASSERT(offsetof(Elf64_Rel, r_info) == offsetof(Elf64_Rela, r_info));
 
 #ifndef ELF_ARCH_NAME_R_JMP_SLOT
+#ifdef ELF_ARCH_R_JMP_SLOT
+#define ELF_ARCH_NAME_R_JMP_SLOT PP_STR(ELF_ARCH_R_JMP_SLOT)
+#else /* ELF_ARCH_R_JMP_SLOT */
 #define ELF_ARCH_NAME_R_JMP_SLOT "R_" ELF_ARCH_MACHINENAME "_JMP_SLOT"
+#endif /* !ELF_ARCH_R_JMP_SLOT */
 #endif /* !ELF_ARCH_NAME_R_JMP_SLOT */
 
-INTERN ElfW(Addr) ATTR_FASTCALL
+INTERN WUNUSED NONNULL((1)) ElfW(Addr) ATTR_FASTCALL
 libdl_bind_lazy_relocation(DlModule *__restrict self,
 #if ELF_ARCH_LAZYINDX
                            uintptr_t jmp_rel_index

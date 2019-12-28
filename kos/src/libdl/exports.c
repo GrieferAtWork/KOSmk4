@@ -29,7 +29,7 @@
 
 DECL_BEGIN
 
-#define FAKEDATA   ATTR_SECTION(".fakedata")
+#define FAKEDATA ATTR_SECTION(".fakedata")
 
 #undef environ
 #undef _environ

@@ -39,7 +39,7 @@
 
 DECL_BEGIN
 
-LOCAL void CC try_add2global(DlModule *__restrict self) {
+LOCAL NONNULL((1)) void CC try_add2global(DlModule *__restrict self) {
 	uintptr_t old_flags;
 again_old_flags:
 	old_flags = ATOMIC_READ(self->dm_flags);
@@ -92,7 +92,7 @@ again_search_noinit:
 	last->dm_flags &= ~RTLD_NOINIT;
 	DlModule_Incref(last);
 	atomic_rwlock_endread(&DlModule_GlobalLock);
-#if 1 /* This is called during init. - If an exception happens here, it wouldn't matter at all... */
+#if 1 /* This is called during init. - If an exception happens here, it wouldn't even matter... */
 	DlModule_RunInitializers(last);
 #else
 	TRY {
@@ -112,7 +112,7 @@ done:
 
 
 /* Run library initializers for `self' */
-INTERN void CC
+INTERN NONNULL((1)) void CC
 DlModule_RunInitializers(DlModule *__restrict self) {
 	uint16_t dyni;
 	size_t i;
@@ -160,7 +160,7 @@ done_dyntag:
 
 #if PF_X == PROT_EXEC && PF_W == PROT_WRITE && PF_R == PROT_READ
 #define ELF_PF_FLAGS_TO_PROT_FLAGS(x) ((x) & (PF_X | PF_W | PF_R))
-#else
+#else /* PF_* == PROT_* */
 #define ELF_PF_FLAGS_TO_PROT_FLAGS(x)        \
 	(((x) & PF_X ? PROT_EXEC : PROT_NONE) |  \
 	 ((x) & PF_W ? PROT_WRITE : PROT_NONE) | \
@@ -168,14 +168,14 @@ done_dyntag:
 #define ELF_PF_FLAGS_TO_PROT_FLAGS_PLUS_WRITE(x) \
 	(((x) & PF_X ? PROT_EXEC : PROT_NONE) |      \
 	 ((x) & PF_R ? PROT_READ : PROT_NONE) | PROT_WRITE)
-#endif
+#endif /* PF_* != PROT_* */
 #ifndef ELF_PF_FLAGS_TO_PROT_FLAGS_PLUS_WRITE
 #define ELF_PF_FLAGS_TO_PROT_FLAGS_PLUS_WRITE(x) \
 	(ELF_PF_FLAGS_TO_PROT_FLAGS(x) | PROT_WRITE)
 #endif /* !ELF_PF_FLAGS_TO_PROT_FLAGS_PLUS_WRITE */
 
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 DlModule_MakeTextWritable(DlModule *__restrict self) {
 	ElfW(Half) i;
 	errno_t error;
@@ -192,12 +192,11 @@ DlModule_MakeTextWritable(DlModule *__restrict self) {
 	}
 	return 0;
 err_mprotect_failed:
-	elf_setdlerrorf("%q: Failed to make text writable (errno=%d)",
-	                self->dm_filename, -error);
-	return -1;
+	return elf_setdlerrorf("%q: Failed to make text writable (errno=%d)",
+	                       self->dm_filename, -error);
 }
 
-INTERN void CC
+INTERN NONNULL((1)) void CC
 DlModule_MakeTextReadonly(DlModule *__restrict self) {
 	ElfW(Half) i;
 	for (i = 0; i < self->dm_phnum; ++i) {
@@ -213,7 +212,7 @@ DlModule_MakeTextReadonly(DlModule *__restrict self) {
 
 /* Apply relocations & execute library initialized within `self'
  * @param: flags: Set of `DL_MODULE_INITIALIZE_F*' */
-INTERN int CC
+INTERN NONNULL((1)) int CC
 DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 #if ELF_ARCH_USESRELA
 	ElfW(Rela) *rela_base = NULL;

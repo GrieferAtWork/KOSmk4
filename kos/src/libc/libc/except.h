@@ -40,12 +40,13 @@
 #define SECTION_EXCEPT_BSS     ATTR_SECTION(".bss.crt.except")
 #define SECTION_EXCEPT_RODATA  ATTR_SECTION(".rodata.crt.except")
 #define SECTION_EXCEPT_STRING  ATTR_SECTION(".rodata.crt.except")
-#else
+#else /* __CC__ */
 #define SECTION_EXCEPT_TEXT    .text.crt.except
 #define SECTION_EXCEPT_DATA    .data.crt.except
+#define SECTION_EXCEPT_BSS     .bss.crt.except
 #define SECTION_EXCEPT_RODATA  .rodata.crt.except
 #define SECTION_EXCEPT_STRING  .rodata.crt.except
-#endif
+#endif /* !__CC__ */
 
 
 DECL_BEGIN

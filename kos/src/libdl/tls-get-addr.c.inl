@@ -22,22 +22,38 @@
 
 DECL_BEGIN
 
+#ifdef FAIL_ON_ERROR
 /* Return a pointer to the base of the given module's
  * TLS segment, as seen form the calling thread.
  * In the case of dynamic TLS, allocate missing segments lazily,
  * logging a system error and exiting the calling application if
  * doing so fails. */
-#ifdef FAIL_ON_ERROR
 INTERN WUNUSED ATTR_RETNONNULL void *ATTR_FASTCALL
 libdl_dltlsbase(DlModule *__restrict self)
 #else /* FAIL_ON_ERROR */
+/* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
+ * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
+ *       passed to `dltlsalloc()' will be called by this function upon the first use of
+ *       that segment within each individual thread, also causing the finalizer to be
+ *       enqueued for invocation when the calling thread exists.
+ * WARNING: The order in which TLS finalizers are invoked is entirely UNDEFINED!
+ * NOTE: the given `TLS_HANDLE' may also be a module handle, as returned by `dlopen()',
+ *       in which case this function returns a pointer to the TLS segment of that module for
+ *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
+ * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
+ * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
 INTERN WUNUSED void *LIBCCALL
-libdl_dltlsaddr(DlModule *__restrict self)
+libdl_dltlsaddr(DlModule *self)
 #endif /* !FAIL_ON_ERROR */
 {
+#ifndef FAIL_ON_ERROR
+	if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
+		goto err_badmodule;
+#endif /* !FAIL_ON_ERROR */
 	byte_t *result;
 	struct dtls_extension *extab;
 	result = (byte_t *)RD_TLS_BASE_REGISTER();
+	/* Simple case: Static TLS, and special case: Empty TLS */
 	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))
 		return result + self->dm_tlsstoff;
 	/* FIXME: This isn't re-entrant! - What if a signal handler accesses a TLS variable from
@@ -61,13 +77,15 @@ libdl_dltlsaddr(DlModule *__restrict self)
 		if unlikely(fd < 0)
 			goto err;
 		if (preadall(fd, init, self->dm_tlsfsize, self->dm_tlsoff) <= 0) {
-#if ELF_POINTER_SIZE >= 8
-			elf_setdlerrorf("Failed to read %Iu bytes of TLS template data from %I64u",
-			                self->dm_tlsfsize, (uint64_t)self->dm_tlsoff);
-#else /* ELF_POINTER_SIZE >= 8 */
-			elf_setdlerrorf("Failed to read %Iu bytes of TLS template data from %I32u",
-			                self->dm_tlsfsize, (uint32_t)self->dm_tlsoff);
-#endif /* ELF_POINTER_SIZE < 8 */
+			__STATIC_IF(sizeof(ElfW(Off)) >= 8) {
+				elf_setdlerrorf("Failed to read %Iu bytes of TLS template data from %I64u",
+				                self->dm_tlsfsize,
+				                (uint64_t)self->dm_tlsoff);
+			} __STATIC_ELSE(sizeof(ElfW(Off)) >= 8) {
+				elf_setdlerrorf("Failed to read %Iu bytes of TLS template data from %I32u",
+				                self->dm_tlsfsize,
+				                (uint32_t)self->dm_tlsoff);
+			}
 			goto err;
 		}
 		new_init = (byte_t *)ATOMIC_CMPXCH_VAL(self->dm_tlsinit,
@@ -138,6 +156,9 @@ err:
 	sys_exit_group(EXIT_FAILURE);
 #else /* FAIL_ON_ERROR */
 	return NULL;
+err_badmodule:
+	elf_setdlerror_badmodule(self);
+	goto err;
 #endif /* !FAIL_ON_ERROR */
 }
 

@@ -32,6 +32,7 @@
 #include <kos/syscalls.h>
 
 #include <malloc.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
@@ -61,14 +62,18 @@ DECL_BEGIN
 /* This is the actual structure that the TLS register (e.g. `%fs.base' / `%gs.base') points to. */
 struct tls_segment {
 	/* Static TLS data goes here (aka. at negative offsets from `ts_self') */
-	struct tls_segment               *ts_self;    /* [1..1][const][== self] Self-pointer (AT offset 0; mandaged by ELF, and a good idea in general). */
+	struct tls_segment               *ts_self;    /* [1..1][const][== self] Self-pointer
+	                                               * At offset 0; mandaged by ELF, and a good idea in general. */
 	LLIST_NODE(struct tls_segment)    ts_threads; /* [lock(:static_tls_lock)] Thread entry within `static_tls_list' */
 	struct atomic_rwlock              ts_exlock;  /* Lock for `ts_extree' */
 	ATREE_HEAD(struct dtls_extension) ts_extree;  /* [0..1][lock(ts_exlock)] TLS extension table. */
 };
 
+STATIC_ASSERT_MSG(offsetof(struct tls_segment, ts_self) == 0,
+                  "The self-pointer being at offset=0 is ABI mandated");
+
 /* List of all allocated static-tls segments (usually 1 for each thread) */
-PRIVATE DEFINE_ATOMIC_RWLOCK(static_tls_lock);
+PRIVATE struct atomic_rwlock static_tls_lock = ATOMIC_RWLOCK_INIT;
 PRIVATE LLIST(struct tls_segment) static_tls_list = LLIST_INIT;
 
 /* Minimum alignment of the static TLS segment. */
@@ -80,7 +85,7 @@ PRIVATE size_t static_tls_size_no_segment = 0;
 /* Initializer for the first `static_tls_size_no_segment' bytes of the static TLS segment. */
 PRIVATE void const *static_tls_init = NULL;
 
-INTERN void LIBCCALL
+INTERN NONNULL((1)) void LIBCCALL
 DlModule_RemoveTLSExtension(DlModule *__restrict self) {
 	struct tls_segment *iter;
 	struct dtls_extension *chain, *next;
@@ -111,7 +116,7 @@ again:
 
 
 /* Initialize the static TLS bindings table from the set of currently loaded modules. */
-INTERN int LIBCCALL
+INTERN WUNUSED int LIBCCALL
 DlModule_InitStaticTLSBindings(void) {
 	DlModule *iter;
 	ptrdiff_t endptr = 0;
@@ -143,13 +148,17 @@ DlModule_InitStaticTLSBindings(void) {
 			if unlikely(fd < 0)
 				goto err;
 			if (preadall(fd, dst, iter->dm_tlsfsize, iter->dm_tlsoff) <= 0) {
-#if ELF_POINTER_SIZE >= 8
-				elf_setdlerrorf("%q: Failed to read %Iu bytes of TLS template data from %I64u",
-				                iter->dm_filename, iter->dm_tlsfsize, (uint64_t)iter->dm_tlsoff);
-#else
-				elf_setdlerrorf("%q: Failed to read %Iu bytes of TLS template data from %I32u",
-				                iter->dm_filename, iter->dm_tlsfsize, (uint32_t)iter->dm_tlsoff);
-#endif
+				__STATIC_IF(sizeof(ElfW(Off)) >= 8) {
+					elf_setdlerrorf("%q: Failed to read %Iu bytes of TLS template data from %I64u",
+					                iter->dm_filename,
+					                iter->dm_tlsfsize,
+					                (uint64_t)iter->dm_tlsoff);
+				} __STATIC_ELSE(sizeof(ElfW(Off)) >= 8) {
+					elf_setdlerrorf("%q: Failed to read %Iu bytes of TLS template data from %I32u",
+					                iter->dm_filename,
+					                iter->dm_tlsfsize,
+					                (uint32_t)iter->dm_tlsoff);
+				}
 				goto err;
 			}
 		}
@@ -168,7 +177,13 @@ err:
 }
 
 
-INTERN void *LIBCCALL
+/* Allocate/Free a static TLS segment
+ * These functions are called by by libc in order to safely create a new thread, such that
+ * all current and future modules are able to store thread-local storage within that thread.
+ * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
+ * @return: * :   Pointer to the newly allocated TLS segment.
+ * @return: NULL: Error (s.a. dlerror()) */
+INTERN WUNUSED ATTR_MALLOC void *LIBCCALL
 libdl_dltlsallocseg(void) {
 	struct tls_segment *result;
 	result = (struct tls_segment *)memalign(static_tls_align,
@@ -189,7 +204,7 @@ err_nomem:
 	return NULL;
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 try_incref_extension_table_modules(struct dtls_extension *__restrict self) {
 again:
 	if (!DlModule_TryIncref((DlModule *)self->te_tree.a_vaddr))
@@ -206,7 +221,7 @@ again:
 	}
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 delete_extension_tables(struct dtls_extension *__restrict self) {
 	struct dtls_extension *minptr, *maxptr;
 again:
@@ -234,7 +249,7 @@ again:
 	}
 }
 
-LOCAL void CC
+LOCAL NONNULL((1)) void CC
 clear_extension_table(struct tls_segment *__restrict self) {
 	struct dtls_extension *ext_free;
 	atomic_rwlock_write(&self->ts_exlock);
@@ -250,19 +265,19 @@ clear_extension_table(struct tls_segment *__restrict self) {
 	}
 }
 
+/* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
 INTERN int LIBCCALL
 libdl_dltlsfreeseg(void *ptr) {
-	if unlikely(!ptr)
-		goto err_badptr;
+	if unlikely(!ELF_VERIFY_MODULE_HANDLE(ptr))
+		goto err_nullmodule;
 	atomic_rwlock_write(&static_tls_lock);
 	LLIST_REMOVE((struct tls_segment *)ptr, ts_threads);
 	atomic_rwlock_endwrite(&static_tls_lock);
 	clear_extension_table((struct tls_segment *)ptr);
 	free((byte_t *)ptr - static_tls_size_no_segment);
 	return 0;
-err_badptr:
-	elf_setdlerrorf("Invalid pointer");
-	return -1;
+err_nullmodule:
+	return elf_setdlerror_badmodule(ptr);
 }
 
 
@@ -280,6 +295,47 @@ err_badptr:
 
 
 
+/* DL-based TLS memory management API.
+ * These functions may be used to dynamically allocate TLS memory that works everywhere where
+ * ATTR_THREAD-based TLS memory also works. - However using these functions, TLS memory can
+ * be allocated dynamically at runtime (behaving the same as a call to dlopen() loading a
+ * module containing a TLS segment would).
+ * @param: NUM_BYTES:      The size of the TLS segment (in bytes)
+ * @param: MIN_ALIGNMENT:  The minimum alignment requirements for the TLS segment base address.
+ * @param: TEMPLATE_DATA:  Base address of an initialization template.
+ *                         The first `TEMPLATE_SIZE' bytes of any per-thread data segment
+ *                         that gets allocated will be initialized to the contents of these
+ *                         values before `PERTHREAD_INIT' is optionally invoked in order to
+ *                         perform additional initialization.
+ * @param: TEMPLATE_SIZE:  The size of `TEMPLATE_DATA' in bytes, indicating the number of
+ *                         leading bytes within the TLS segment that should be pre-defined
+ *                         to mirror the contents of `TEMPLATE_DATA' at the time of a call
+ *                         to this function (`TEMPLATE_DATA' need not remain valid or
+ *                         accessible after this function returns)
+ *                         Any memory after `TEMPLATE_SIZE', but before `NUM_BYTES' is initialized
+ *                         to all ZEROes, however `TEMPLATE_SIZE' must not be greater than
+ *                        `NUM_BYTES', and if it is, this function returns `NULL' and sets
+ *                        `dlerror()' accordingly.
+ * @param: PERTHREAD_INIT: An optional callback that will be invoked on a per-thread basis
+ *                         in order to perform additional initialization of the associated
+ *                         TLS segment within the associated thread.
+ *                         This function will be called upon first access of the segment
+ *                         within the thread using the data (s.a. `dltlsaddr()')
+ *                         @param: ARG:  The value of `PERTHREAD_CALLBACK_ARG' passed to `dltlsalloc'
+ *                         @param: BASE: The base address of the associated segment within the calling
+ *                                       thread (same as the return value of `dltlsaddr()')
+ * @param: PERTHREAD_FINI: An optional callback that behaves similar to `PERTHREAD_INIT',
+ *                         but called by `pthread_exit()' or any other thread finalizer
+ *                        (more specifically: by `dltlsfreeseg()') within any thread that
+ *                         has been seen using the associated segment, and causing it to
+ *                         be allocated and initialized for that thread.
+ * @param: PERTHREAD_CALLBACK_ARG: A user-specified argument passed to the init/fini callbacks.
+ * @return: * :            An opaque handle for the newly created TLS segment.
+ *                         This handle may be used in future calls to `dltlsaddr()', and can be
+ *                         destroyed (causing all threads that had previously allocated the
+ *                         segment to delete it and optionally invoke finalizer callbacks) by
+ *                         passing it to `dltlsfree()'
+ * @return: NULL:          Failed to allocate the TLS segment (s.a. `dlerror()') */
 INTERN WUNUSED DlModule *LIBCCALL
 libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
                  void const *template_data, size_t template_size,
@@ -332,10 +388,11 @@ err:
 
 
 
+/* Free a TLS segment previously allocated with `dltlsalloc' */
 INTERN WUNUSED int LIBCCALL
-libdl_dltlsfree(DlModule *__restrict self) {
-	if unlikely(!self)
-		goto err_badptr;
+libdl_dltlsfree(DlModule *self) {
+	if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
+		goto err_nullmodule;
 	DlModule_RemoveTLSExtension(self);
 	/* Wait for other threads to complete finalization (which may happen
 	 * if they began to do so, just before this function got called)
@@ -347,9 +404,8 @@ libdl_dltlsfree(DlModule *__restrict self) {
 	free((byte_t *)self->dm_tlsinit);
 	free(self);
 	return 0;
-err_badptr:
-	elf_setdlerrorf("Invalid pointer");
-	return -1;
+err_nullmodule:
+	return elf_setdlerror_badmodule(self);
 }
 
 DEFINE_PUBLIC_ALIAS(dltlsallocseg, libdl_dltlsallocseg);

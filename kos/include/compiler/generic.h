@@ -551,12 +551,12 @@
 #   define __XBLOCK(...)         do __VA_ARGS__ while(0)
 #   define __XRETURN             /* Nothing */
 #endif
-#define __DEFINE_PRIVATE_ALIAS(new,old)      /* Nothing */
-#define __DEFINE_PUBLIC_ALIAS(new,old)       /* Nothing */
-#define __DEFINE_INTERN_ALIAS(new,old)       /* Nothing */
-#define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) /* Nothing */
-#define __DEFINE_PUBLIC_WEAK_ALIAS(new,old)  /* Nothing */
-#define __DEFINE_INTERN_WEAK_ALIAS(new,old)  /* Nothing */
+#define __DEFINE_PRIVATE_ALIAS(new, old)      /* Nothing */
+#define __DEFINE_PUBLIC_ALIAS(new, old)       /* Nothing */
+#define __DEFINE_INTERN_ALIAS(new, old)       /* Nothing */
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* Nothing */
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* Nothing */
+#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* Nothing */
 #define __NO_DEFINE_ALIAS 1
 #if defined(__INTELLISENSE__)
 #elif defined(__TPP_VERSION__)
