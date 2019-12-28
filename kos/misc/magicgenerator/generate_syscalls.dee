@@ -31,13 +31,8 @@ local copyright =
  *
  * Output:
  *  /kos/include/kos/syscalls.h
- *       Syscall prototypes common to all platforms
+ *  /kos/include/{name}/kos/syscalls{suffix}.h
  *       >> __CDECLARE_VOID_SC(ATTR_NORETURN,exit,(syscall_ulong_t status),(status))
- *
- *  /kos/include/kos/bits/syscalls.h
- *  /kos/include/{name}/kos/bits/syscalls{suffix}.h
- *       Syscall prototypes that are platform-specific, or differ between platforms
- *       >> #define __CRT_HAVE_sys_exit 1
  *
  *  /kos/include/crt-features/crt-kos-syscalls.h
  *  /kos/include/{name}/crt-features/crt-kos-syscalls{suffix}.h
@@ -2622,20 +2617,12 @@ function main(archNames: {string...}) {
 	local baseContext: ParserContext = ParserContext();
 	local final ALL_ARCH = import(".generate_syscalls_arch").ARCH;
 	local ARCH = ALL_ARCH;
-	/* This doesn't work, because of `<kos/syscalls.h>' being set up as the
-	 * hub for fully portable system calls. FIXME: Get rid of the idea that
-	 * <kos/syscalls.h> should contain fully portable system calls, and simply
-	 * have each arch define its own (arch-specific) <kos/syscalls.h> header.
-	 * That way, we could make generate_syscalls.dee only have to parse def
-	 * files for specific architectures, rather than always having to parse
-	 * everything.
-	 */
-	//if (archNames) {
-	//	print "[generate_syscalls] Generating system calls for:", repr archNames;
-	//	ARCH = Dict(for (local name, a: ALL_ARCH) if (name in archNames) (name, a));
-	//} else {
-	//	print "[generate_syscalls] Generating system calls for all architectures";
-	//}
+	if (archNames) {
+		print "[generate_syscalls] Generating system calls for:", repr archNames;
+		ARCH = Dict(for (local name, a: ALL_ARCH) if (name in archNames) (name, a));
+	} else {
+		print "[generate_syscalls] Generating system calls for all architectures";
+	}
 	parseSyscallDefsFile(baseContext, "include/asm/syscalls.def");
 	local archContexts: {string: ParserContext} = Dict();
 	archContexts[""] = baseContext;
@@ -2652,58 +2639,26 @@ function main(archNames: {string...}) {
 				c.errSysID(data, "Undefined function {!r}".format({ x }));
 		}
 	}
-	local commonSyscallsByName: {string: Function} = Dict();
-	/* Figure out system call names available on
-	 * all platforms, using the same definitions. */
-	local isFirst = true;
-	for (local none, c: archContexts) {
-		if (isFirst) {
-			for (local x, none: c.nameMappings)
-				commonSyscallsByName[x] = c.functions[x];
-			isFirst = false;
-			continue;
-		}
-again_scan_common:
-		for (local name, sc: commonSyscallsByName) {
-			if (name !in c.nameMappings ||
-			    name !in c.functions ||
-			    c.functions[name] != sc) {
-				del commonSyscallsByName[name];
-				goto again_scan_common;
-			}
-		}
-	}
-	/* `commonSyscallsByName' is the set of system calls that
-	 * should immediatly be defined in `<kos/syscall.h>' */
-	writeHashedFile("include/kos/syscalls.h", [](fp){
-		generateKosSyscallHeader(
-			fp,
-			for (local none, sc: commonSyscallsByName)
-				sc,
-			"_KOS_SYSCALLS_H", true);
-	});
 	for (local name, a: ARCH) {
 		local c = archContexts[name];
 		writeHashedFile(a.formatPath(
-			"include/{name}/kos/bits/syscalls{suffix}.h"
+			"include/{name}/kos/syscalls{suffix}.h"
 		), [](fp){
 			generateKosSyscallHeader(
 				fp,
 				for (local name, none: c.nameMappings)
-					if (name !in commonSyscallsByName)
-						c.functions[name],
+					c.functions[name],
 				sanitizeIncludeGuard(a.formatPath(
-					"_KOS_{name}_SYSCALLS{suffix}_H")),
+					"_{name}_KOS_SYSCALLS{suffix}_H")),
 				false);
 		});
 	}
-	writeHashedFile("include/kos/bits/syscalls.h", [](fp){
+	writeHashedFile("include/kos/syscalls.h", [](fp){
 		generateKosSyscallHeader(
 			fp,
 			for (local name, none: baseContext.nameMappings)
-				if (name !in commonSyscallsByName)
-					baseContext.functions[name],
-			sanitizeIncludeGuard("_KOS_BITS_SYSCALL_H"),
+				baseContext.functions[name],
+			sanitizeIncludeGuard("_KOS_SYSCALL_H"),
 			false);
 	});
 
