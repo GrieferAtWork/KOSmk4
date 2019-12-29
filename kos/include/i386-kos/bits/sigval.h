@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BIT_SIGVAL_H
-#define _I386_KOS_BIT_SIGVAL_H 1
+#ifndef _I386_KOS_BITS_SIGVAL_H
+#define _I386_KOS_BITS_SIGVAL_H 1
 
 #include <hybrid/host.h>
 
@@ -27,4 +27,4 @@
 #include "sigval32.h"
 #endif /* !__x86_64__ */
 
-#endif /* !_I386_KOS_BIT_SIGVAL_H */
+#endif /* !_I386_KOS_BITS_SIGVAL_H */

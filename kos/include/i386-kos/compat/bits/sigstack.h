@@ -16,30 +16,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_SIGVAL_H
-#define _BITS_SIGVAL_H 1
+#ifndef _I386_KOS_COMPAT_BITS_SIGSTACK_H
+#define _I386_KOS_COMPAT_BITS_SIGSTACK_H 1
 
-#include <__stdinc.h>
-#include <hybrid/typecore.h>
+#include <hybrid/host.h>
 
-__SYSDECL_BEGIN
-
-#ifndef __sigval_t_defined
-#define __sigval_t_defined 1
-/* Type for data associated with a signal. */
-#if __SIZEOF_POINTER__ >= __SIZEOF_INT__
-#define __SIZEOF_SIGVAL __SIZEOF_POINTER__
-#else /* __SIZEOF_POINTER__ >= __SIZEOF_INT__ */
-#define __SIZEOF_SIGVAL __SIZEOF_INT__
-#endif /* __SIZEOF_POINTER__ < __SIZEOF_INT__ */
+#ifdef __x86_64__
+#include <bits/sigstack32.h>
+#define compat_sigstack    sigstack32
+#define compat_sigaltstack sigaltstack32
 #ifdef __CC__
-typedef union sigval /*[PREFIX(sival_)]*/ {
-	__INT32_TYPE__ sival_int;
-	void          *sival_ptr;
-} sigval_t;
+__DECL_BEGIN
+typedef struct sigaltstack32 compat_stack_t;
+__DECL_END
 #endif /* __CC__ */
-#endif /* !__sigval_t_defined */
+#endif /* __x86_64__ */
 
-__SYSDECL_END
-
-#endif /* !_BITS_SIGVAL_H */
+#endif /* !_I386_KOS_COMPAT_BITS_SIGSTACK_H */

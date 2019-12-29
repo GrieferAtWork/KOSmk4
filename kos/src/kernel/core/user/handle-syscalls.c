@@ -60,10 +60,13 @@
 #include <stdint.h>
 #include <string.h>
 
-#if defined(__ARCH_WANT_COMPAT_SYSCALL_PREADV) || \
-    defined(__ARCH_WANT_COMPAT_SYSCALL_PWRITEV)
-#include <compat/bits/iovec-struct.h> /* struct compat_iovec */
-#endif /* preadv(), pwrietv() */
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/iovec-struct.h>
+#include <compat/bits/timespec.h>
+#include <compat/bits/timeval.h>
+#include <compat/kos/types.h>
+#include <compat/signal.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -1351,6 +1354,56 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 #endif /* __ARCH_WANT_SYSCALL_KREADDIRF */
 
 
+
+
+
+/************************************************************************/
+/* poll(), ppoll(), ppoll64()                                           */
+/* select(), select64(), pselect6(), pselect6_64()                      */
+/************************************************************************/
+#undef WANT_SYS_POLL
+#if (defined(__ARCH_WANT_SYSCALL_POLL) ||         \
+     defined(__ARCH_WANT_SYSCALL_PPOLL) ||        \
+     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||      \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64))
+#define WANT_SYS_POLL 1
+#endif /* poll... */
+#undef WANT_SYS_SELECT
+#if (defined(__ARCH_WANT_SYSCALL_SELECT) ||          \
+     defined(__ARCH_WANT_SYSCALL_SELECT64) ||        \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6) ||        \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||     \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64))
+#define WANT_SYS_SELECT 1
+#endif /* select... */
+#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||           \
+     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||         \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6) ||        \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||     \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) ||    \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) ||  \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64))
+#define WANT_SYS_POLLSELECT_SIGSET 1
+#endif /* p(poll|select)... */
+#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||        \
+     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||      \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64))
+#define WANT_SYS_POLL_SIGSET 1
+#endif /* ppoll... */
+#if (defined(__ARCH_WANT_SYSCALL_PSELECT6) ||        \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||     \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64))
+#define WANT_SYS_SELECT_SIGSET 1
+#endif /* pselect... */
+
+#if defined(WANT_SYS_POLL) || defined(WANT_SYS_SELECT)
 PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
                                          poll_mode_t what) {
 	poll_mode_t result;
@@ -1377,8 +1430,10 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 	}
 	return result;
 }
+#endif /* WANT_SYS_POLL || WANT_SYS_SELECT */
 
 /* Low-level implementations for the user-space poll() and select() system calls. */
+#ifdef WANT_SYS_POLL
 PRIVATE size_t KCALL
 do_poll(USER CHECKED struct pollfd *fds,
         size_t nfds, qtime_t const *timeout) {
@@ -1441,7 +1496,9 @@ again:
 	/* Check to see what happened. */
 	goto again;
 }
+#endif /* WANT_SYS_POLL */
 
+#ifdef WANT_SYS_SELECT
 PRIVATE size_t KCALL
 do_select(size_t nfds,
           USER CHECKED fd_set *readfds,
@@ -1528,10 +1585,9 @@ again:
 	/* Check to see what happened. */
 	goto again;
 }
+#endif /* WANT_SYS_SELECT */
 
-
-
-
+#ifdef WANT_SYS_POLLSELECT_SIGSET
 /* POLL/SELECT Helper functions */
 PRIVATE void KCALL
 atomic_sigmask_begin(struct kernel_sigmask *__restrict mymask,
@@ -1558,8 +1614,6 @@ atomic_sigmask_begin(struct kernel_sigmask *__restrict mymask,
 	}
 }
 
-#undef sigmask
-
 PRIVATE void KCALL
 atomic_sigmask_except(struct kernel_sigmask *__restrict mymask,
                       sigset_t const *__restrict oldmask) {
@@ -1574,7 +1628,10 @@ atomic_sigmask_return(struct kernel_sigmask *__restrict mymask,
 	memcpy(&mymask->sm_mask, oldmask, sizeof(sigset_t));
 	sigmask_check_after_syscall(syscall_result);
 }
+#endif /* WANT_SYS_POLLSELECT_SIGSET */
 
+#ifdef WANT_SYS_POLL_SIGSET
+#undef sigmask
 PRIVATE size_t KCALL
 do_ppoll(USER CHECKED struct pollfd *fds,
          size_t nfds, qtime_t const *timeout,
@@ -1597,7 +1654,9 @@ do_ppoll(USER CHECKED struct pollfd *fds,
 	}
 	return result;
 }
+#endif /* WANT_SYS_POLL_SIGSET */
 
+#ifdef WANT_SYS_SELECT_SIGSET
 PRIVATE size_t KCALL
 do_pselect(size_t nfds,
            USER CHECKED fd_set *readfds,
@@ -1623,7 +1682,9 @@ do_pselect(size_t nfds,
 	}
 	return result;
 }
+#endif /* WANT_SYS_SELECT_SIGSET */
 
+#ifdef __ARCH_WANT_SYSCALL_POLL
 DEFINE_SYSCALL3(ssize_t, poll,
                 USER UNCHECKED struct pollfd *, fds,
                 size_t, nfds, syscall_slong_t, timeout) {
@@ -1641,10 +1702,12 @@ DEFINE_SYSCALL3(ssize_t, poll,
 	}
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_POLL */
 
+#ifdef __ARCH_WANT_SYSCALL_PPOLL
 DEFINE_SYSCALL5(ssize_t, ppoll,
                 USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                USER UNCHECKED struct __timespec32 const *, timeout_ts,
+                USER UNCHECKED struct timespec32 const *, timeout_ts,
                 USER UNCHECKED sigset_t const *, sigmask,
                 size_t, sigsetsize) {
 	size_t result;
@@ -1675,11 +1738,49 @@ DEFINE_SYSCALL5(ssize_t, ppoll,
 	}
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_PPOLL */
 
-#ifdef __NR_ppoll64
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PPOLL
+DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
+                       USER UNCHECKED struct pollfd *, fds, size_t, nfds,
+                       USER UNCHECKED struct compat_timespec32 const *, timeout_ts,
+                       USER UNCHECKED compat_sigset_t const *, sigmask,
+                size_t, sigsetsize) {
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	size_t result;
+	if unlikely(sigsetsize != sizeof(compat_sigset_t))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	validate_readable_opt(sigmask, sizeof(compat_sigset_t));
+	validate_writablem(fds, nfds, sizeof(struct pollfd));
+	if (!timeout_ts) {
+		result = do_ppoll(fds, nfds, NULL, sigmask);
+	} else {
+		qtime_t tmo;
+		struct timespec tms;
+		validate_readable(timeout_ts, sizeof(*timeout_ts));
+		COMPILER_READ_BARRIER();
+		tms.tv_sec  = (time_t)timeout_ts->tv_sec;
+		tms.tv_nsec = timeout_ts->tv_nsec;
+		COMPILER_READ_BARRIER();
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
+		result = do_ppoll(fds, nfds, &tmo, sigmask);
+	}
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL */
+
+#ifdef __ARCH_WANT_SYSCALL_PPOLL64
 DEFINE_SYSCALL5(ssize_t, ppoll64,
                 USER UNCHECKED struct pollfd *, fds, size_t, nfds,
-                USER UNCHECKED struct __timespec64 const *, timeout_ts,
+                USER UNCHECKED struct timespec64 const *, timeout_ts,
                 USER UNCHECKED sigset_t const *, sigmask,
                 size_t, sigsetsize) {
 	size_t result;
@@ -1710,13 +1811,51 @@ DEFINE_SYSCALL5(ssize_t, ppoll64,
 	}
 	return (ssize_t)result;
 }
-#endif /* __NR_ppoll64 */
+#endif /* __ARCH_WANT_SYSCALL_PPOLL64 */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PPOLL64
+DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll64,
+                       USER UNCHECKED struct pollfd *, fds, size_t, nfds,
+                       USER UNCHECKED struct compat_timespec64 const *, timeout_ts,
+                       USER UNCHECKED compat_sigset_t const *, sigmask,
+                size_t, sigsetsize) {
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	size_t result;
+	if unlikely(sigsetsize != sizeof(compat_sigset_t))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	validate_readable_opt(sigmask, sizeof(compat_sigset_t));
+	validate_writablem(fds, nfds, sizeof(struct pollfd));
+	if (!timeout_ts) {
+		result = do_ppoll(fds, nfds, NULL, sigmask);
+	} else {
+		qtime_t tmo;
+		struct timespec tms;
+		validate_readable(timeout_ts, sizeof(*timeout_ts));
+		COMPILER_READ_BARRIER();
+		tms.tv_sec  = (time_t)timeout_ts->tv_sec;
+		tms.tv_nsec = timeout_ts->tv_nsec;
+		COMPILER_READ_BARRIER();
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
+		result = do_ppoll(fds, nfds, &tmo, sigmask);
+	}
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL64 */
+
+#ifdef __ARCH_WANT_SYSCALL_SELECT
 DEFINE_SYSCALL5(ssize_t, select, size_t, nfds,
                 USER UNCHECKED fd_set *, readfds,
                 USER UNCHECKED fd_set *, writefds,
                 USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct __timeval32 *, timeout) {
+                USER UNCHECKED struct timeval32 *, timeout) {
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
 	validate_writable_opt(readfds, nfd_size);
@@ -1750,13 +1889,14 @@ DEFINE_SYSCALL5(ssize_t, select, size_t, nfds,
 	}
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_SELECT */
 
-#ifdef __NR_select64
+#ifdef __ARCH_WANT_SYSCALL_SELECT64
 DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
                 USER UNCHECKED fd_set *, readfds,
                 USER UNCHECKED fd_set *, writefds,
                 USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct __timeval64 *, timeout) {
+                USER UNCHECKED struct timeval64 *, timeout) {
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
 	validate_writable_opt(readfds, nfd_size);
@@ -1790,13 +1930,96 @@ DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
 	}
 	return (ssize_t)result;
 }
-#endif /* __NR_select64 */
+#endif /* __ARCH_WANT_SYSCALL_SELECT64 */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SELECT
+DEFINE_COMPAT_SYSCALL5(ssize_t, select, size_t, nfds,
+                       USER UNCHECKED fd_set *, readfds,
+                       USER UNCHECKED fd_set *, writefds,
+                       USER UNCHECKED fd_set *, exceptfds,
+                       USER UNCHECKED struct compat_timeval32 *, timeout) {
+	size_t result, nfd_size;
+	nfd_size = CEILDIV(nfds, __NFDBITS);
+	validate_writable_opt(readfds, nfd_size);
+	validate_writable_opt(writefds, nfd_size);
+	validate_writable_opt(exceptfds, nfd_size);
+	if (timeout) {
+		qtime_t tmo;
+		struct timespec tms;
+		validate_readable(timeout, sizeof(*timeout));
+		COMPILER_READ_BARRIER();
+		TIMEVAL_TO_TIMESPEC(timeout, &tms);
+		COMPILER_READ_BARRIER();
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
+		result = do_select(nfds,
+		                   readfds,
+		                   writefds,
+		                   exceptfds,
+		                   &tmo);
+	} else {
+		result = do_select(nfds,
+		                   readfds,
+		                   writefds,
+		                   exceptfds,
+		                   NULL);
+	}
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SELECT64
+DEFINE_COMPAT_SYSCALL5(ssize_t, select64, size_t, nfds,
+                       USER UNCHECKED fd_set *, readfds,
+                       USER UNCHECKED fd_set *, writefds,
+                       USER UNCHECKED fd_set *, exceptfds,
+                       USER UNCHECKED struct compat_timeval64 *, timeout) {
+	size_t result, nfd_size;
+	nfd_size = CEILDIV(nfds, __NFDBITS);
+	validate_writable_opt(readfds, nfd_size);
+	validate_writable_opt(writefds, nfd_size);
+	validate_writable_opt(exceptfds, nfd_size);
+	if (timeout) {
+		qtime_t tmo;
+		struct timespec tms;
+		validate_readable(timeout, sizeof(*timeout));
+		COMPILER_READ_BARRIER();
+		TIMEVAL_TO_TIMESPEC(timeout, &tms);
+		COMPILER_READ_BARRIER();
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
+		result = do_select(nfds,
+		                   readfds,
+		                   writefds,
+		                   exceptfds,
+		                   &tmo);
+	} else {
+		result = do_select(nfds,
+		                   readfds,
+		                   writefds,
+		                   exceptfds,
+		                   NULL);
+	}
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT64 */
+
+#ifdef __ARCH_WANT_SYSCALL_PSELECT6
 DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
                 USER UNCHECKED fd_set *, readfds,
                 USER UNCHECKED fd_set *, writefds,
                 USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct __timespec32 const *, timeout,
+                USER UNCHECKED struct timespec32 const *, timeout,
                 USER UNCHECKED void const *, sigmask_sigset_and_len) {
 	struct sigset_and_len {
 		sigset_t const *ss_ptr;
@@ -1848,16 +2071,14 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 	}
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
 
-
-
-
-#ifdef __NR_pselect6_64
+#ifdef __ARCH_WANT_SYSCALL_PSELECT6_64
 DEFINE_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
                 USER UNCHECKED fd_set *, readfds,
                 USER UNCHECKED fd_set *, writefds,
                 USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct __timespec64 const *, timeout,
+                USER UNCHECKED struct timespec64 const *, timeout,
                 USER UNCHECKED void const *, sigmask_sigset_and_len) {
 	struct sigset_and_len {
 		sigset_t const *ss_ptr;
@@ -1909,8 +2130,127 @@ DEFINE_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 	}
 	return (ssize_t)result;
 }
-#endif /* __NR_pselect6_64 */
+#endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6
+DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
+                       USER UNCHECKED fd_set *, readfds,
+                       USER UNCHECKED fd_set *, writefds,
+                       USER UNCHECKED fd_set *, exceptfds,
+                       USER UNCHECKED struct compat_timespec32 const *, timeout,
+                       USER UNCHECKED void const *, sigmask_sigset_and_len) {
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	struct sigset_and_len {
+		compat_sigset_t const *ss_ptr;
+		compat_size_t          ss_len;
+	};
+	size_t result, nfd_size;
+	struct sigset_and_len ss;
+	nfd_size = CEILDIV(nfds, __NFDBITS);
+	validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	validate_writable_opt(readfds, nfd_size);
+	validate_writable_opt(writefds, nfd_size);
+	validate_writable_opt(exceptfds, nfd_size);
+	COMPILER_READ_BARRIER();
+	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	if unlikely(ss.ss_len != sizeof(compat_sigset_t))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      ss.ss_len);
+	validate_readable_opt(ss.ss_ptr, sizeof(compat_sigset_t));
+	if (timeout) {
+		qtime_t tmo;
+		struct timespec tms;
+		validate_readable(timeout, sizeof(*timeout));
+		COMPILER_READ_BARRIER();
+		tms.tv_sec  = (time_t)timeout->tv_sec;
+		tms.tv_nsec = timeout->tv_nsec;
+		COMPILER_READ_BARRIER();
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
+		result = do_pselect(nfds,
+		                    readfds,
+		                    writefds,
+		                    exceptfds,
+		                    &tmo,
+		                    ss.ss_ptr);
+	} else {
+		result = do_pselect(nfds,
+		                    readfds,
+		                    writefds,
+		                    exceptfds,
+		                    NULL,
+		                    ss.ss_ptr);
+	}
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64
+DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
+                       USER UNCHECKED fd_set *, readfds,
+                       USER UNCHECKED fd_set *, writefds,
+                       USER UNCHECKED fd_set *, exceptfds,
+                       USER UNCHECKED struct compat_timespec64 const *, timeout,
+                       USER UNCHECKED void const *, sigmask_sigset_and_len) {
+	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
+	struct sigset_and_len {
+		compat_sigset_t const *ss_ptr;
+		compat_size_t          ss_len;
+	};
+	size_t result, nfd_size;
+	struct sigset_and_len ss;
+	nfd_size = CEILDIV(nfds, __NFDBITS);
+	validate_readable(sigmask_sigset_and_len, sizeof(ss));
+	validate_writable_opt(readfds, nfd_size);
+	validate_writable_opt(writefds, nfd_size);
+	validate_writable_opt(exceptfds, nfd_size);
+	COMPILER_READ_BARRIER();
+	memcpy(&ss, sigmask_sigset_and_len, sizeof(ss));
+	COMPILER_READ_BARRIER();
+	if unlikely(ss.ss_len != sizeof(compat_sigset_t))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      ss.ss_len);
+	validate_readable_opt(ss.ss_ptr, sizeof(compat_sigset_t));
+	if (timeout) {
+		qtime_t tmo;
+		struct timespec tms;
+		validate_readable(timeout, sizeof(*timeout));
+		COMPILER_READ_BARRIER();
+		tms.tv_sec  = (time_t)timeout->tv_sec;
+		tms.tv_nsec = timeout->tv_nsec;
+		COMPILER_READ_BARRIER();
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
+		result = do_pselect(nfds,
+		                    readfds,
+		                    writefds,
+		                    exceptfds,
+		                    &tmo,
+		                    ss.ss_ptr);
+	} else {
+		result = do_pselect(nfds,
+		                    readfds,
+		                    writefds,
+		                    exceptfds,
+		                    NULL,
+		                    ss.ss_ptr);
+	}
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
 
 
 DECL_END

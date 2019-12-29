@@ -30,9 +30,12 @@
 %[typesize(i386:uintptr_half_t = 2)]
 
 %[typecompat(i386:__sigset_struct = *:__sigset_struct)]
+%[typecompat(i386:sigset_t = *:sigset_t)]
 %[typecompat(i386:sockaddr = *:sockaddr)]
 %[typecompat(i386:pollfd = *:pollfd)]
 %[typecompat(i386:dirent = *:dirent)]
+%[typecompat(i386:__fd_set_struct = *:__fd_set_struct)]
+%[typecompat(i386:fd_set = *:fd_set)]
 
 
 @@Restore the specified register state when returning from a signal handler

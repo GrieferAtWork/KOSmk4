@@ -16,12 +16,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_COMPAT_H
-#define _BITS_COMPAT_H 1
+#ifndef _I386_KOS_COMPAT_BITS_SIGINFO_STRUCT_H
+#define _I386_KOS_COMPAT_BITS_SIGINFO_STRUCT_H 1
 
-#include <__stdinc.h>
+#include <hybrid/host.h> /* __x86_64__ */
+#ifdef __x86_64__
+#include <bits/siginfo-struct32.h>
+#define __compat_siginfo_struct __siginfo32_struct
+#define compat_siginfo_t        siginfo32_t
+#endif /* !__x86_64__ */
 
-/* Compatibility mode definitions */
-#undef __ARCH_HAVE_COMPAT
-
-#endif /* !_BITS_COMPAT_H */
+#endif /* !_I386_KOS_COMPAT_BITS_SIGINFO_STRUCT_H */

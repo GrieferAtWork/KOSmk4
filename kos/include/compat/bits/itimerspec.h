@@ -16,30 +16,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_SIGVAL_H
-#define _BITS_SIGVAL_H 1
+#ifndef _COMPAT_BITS_ITIMERSPEC_H
+#define _COMPAT_BITS_ITIMERSPEC_H 1
 
-#include <__stdinc.h>
-#include <hybrid/typecore.h>
+#include <compat/config.h>
+#ifdef __ARCH_HAVE_COMPAT
+#include <bits/itimerspec.h>
+#define compat_itimerspec32 __itimerspec32
+#define compat_itimerspec64 __itimerspec64
+#endif /* __ARCH_HAVE_COMPAT */
 
-__SYSDECL_BEGIN
-
-#ifndef __sigval_t_defined
-#define __sigval_t_defined 1
-/* Type for data associated with a signal. */
-#if __SIZEOF_POINTER__ >= __SIZEOF_INT__
-#define __SIZEOF_SIGVAL __SIZEOF_POINTER__
-#else /* __SIZEOF_POINTER__ >= __SIZEOF_INT__ */
-#define __SIZEOF_SIGVAL __SIZEOF_INT__
-#endif /* __SIZEOF_POINTER__ < __SIZEOF_INT__ */
-#ifdef __CC__
-typedef union sigval /*[PREFIX(sival_)]*/ {
-	__INT32_TYPE__ sival_int;
-	void          *sival_ptr;
-} sigval_t;
-#endif /* __CC__ */
-#endif /* !__sigval_t_defined */
-
-__SYSDECL_END
-
-#endif /* !_BITS_SIGVAL_H */
+#endif /* !_COMPAT_BITS_ITIMERSPEC_H */

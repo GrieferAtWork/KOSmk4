@@ -16,30 +16,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_SIGVAL_H
-#define _BITS_SIGVAL_H 1
+#ifndef _I386_KOS_COMPAT_BITS_VA_LIST_STRUCT_H
+#define _I386_KOS_COMPAT_BITS_VA_LIST_STRUCT_H 1
 
-#include <__stdinc.h>
-#include <hybrid/typecore.h>
+#include <hybrid/host.h>
 
-__SYSDECL_BEGIN
+#ifdef __x86_64__
+#include <bits/va_list-struct32.h>
+#define compat_va_list_struct i386_va_list_struct
+#endif /* __x86_64__ */
 
-#ifndef __sigval_t_defined
-#define __sigval_t_defined 1
-/* Type for data associated with a signal. */
-#if __SIZEOF_POINTER__ >= __SIZEOF_INT__
-#define __SIZEOF_SIGVAL __SIZEOF_POINTER__
-#else /* __SIZEOF_POINTER__ >= __SIZEOF_INT__ */
-#define __SIZEOF_SIGVAL __SIZEOF_INT__
-#endif /* __SIZEOF_POINTER__ < __SIZEOF_INT__ */
-#ifdef __CC__
-typedef union sigval /*[PREFIX(sival_)]*/ {
-	__INT32_TYPE__ sival_int;
-	void          *sival_ptr;
-} sigval_t;
-#endif /* __CC__ */
-#endif /* !__sigval_t_defined */
-
-__SYSDECL_END
-
-#endif /* !_BITS_SIGVAL_H */
+#endif /* !_I386_KOS_COMPAT_BITS_VA_LIST_STRUCT_H */
