@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30f38b7a */
+/* HASH CRC-32:0x87a52226 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1040,8 +1040,8 @@
 #define __NR32AT0_dup2                    (fd_t, __fd_t)
 #define __NR32AT1_dup2                    (fd_t, __fd_t)
 #define __NR32AT0_sigaction               (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT1_sigaction               (struct sigaction const *, struct sigaction const *)
-#define __NR32AT2_sigaction               (struct sigaction *, struct sigaction *)
+#define __NR32AT1_sigaction               (struct sigaction32 const *, struct sigaction32 const *)
+#define __NR32AT2_sigaction               (struct sigaction32 *, struct sigaction32 *)
 #define __NR32AT0_ssetmask                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_setreuid                (uint16_t, __uint16_t)
 #define __NR32AT1_setreuid                (uint16_t, __uint16_t)
@@ -1251,8 +1251,8 @@
 #define __NR32AT2_rt_sigreturn            (struct rpc_syscall_info *, struct rpc_syscall_info *)
 #define __NR32AT3_rt_sigreturn            (struct ucpustate const *, struct ucpustate const *)
 #define __NR32AT0_rt_sigaction            (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT1_rt_sigaction            (struct sigaction const *, struct sigaction const *)
-#define __NR32AT2_rt_sigaction            (struct sigaction *, struct sigaction *)
+#define __NR32AT1_rt_sigaction            (struct sigaction32 const *, struct sigaction32 const *)
+#define __NR32AT2_rt_sigaction            (struct sigaction32 *, struct sigaction32 *)
 #define __NR32AT3_rt_sigaction            (size_t, __size_t)
 #define __NR32AT0_rt_sigprocmask          (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_rt_sigprocmask          (struct __sigset_struct const *, struct __sigset_struct const *)
@@ -2095,7 +2095,7 @@
 #define __NR32AM_getppid(a, b, c, d, e, f)                 /* nothing */
 #define __NR32AM_getpgrp(a, b, c, d, e, f)                 /* nothing */
 #define __NR32AM_setsid(a, b, c, d, e, f)                  /* nothing */
-#define __NR32AM_sigaction(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct sigaction const *)b, (struct sigaction *)c
+#define __NR32AM_sigaction(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct sigaction32 const *)b, (struct sigaction32 *)c
 #define __NR32AM_sgetmask(a, b, c, d, e, f)                /* nothing */
 #define __NR32AM_ssetmask(a, b, c, d, e, f)                (__syscall_ulong_t)a
 #define __NR32AM_setreuid(a, b, c, d, e, f)                (__uint16_t)a, (__uint16_t)b
@@ -2202,7 +2202,7 @@
 #define __NR32AM_getresgid(a, b, c, d, e, f)               (__uint16_t *)a, (__uint16_t *)b, (__uint16_t *)c
 #define __NR32AM_prctl(a, b, c, d, e, f)                   (int)a
 #define __NR32AM_rt_sigreturn(a, b, c, d, e, f)            (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info *)c, (struct ucpustate const *)d
-#define __NR32AM_rt_sigaction(a, b, c, d, e, f)            (__syscall_ulong_t)a, (struct sigaction const *)b, (struct sigaction *)c, (__size_t)d
+#define __NR32AM_rt_sigaction(a, b, c, d, e, f)            (__syscall_ulong_t)a, (struct sigaction32 const *)b, (struct sigaction32 *)c, (__size_t)d
 #define __NR32AM_rt_sigprocmask(a, b, c, d, e, f)          (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NR32AM_rt_sigpending(a, b, c, d, e, f)           (struct __sigset_struct *)a, (__size_t)b
 #define __NR32AM_rt_sigtimedwait(a, b, c, d, e, f)         (struct __sigset_struct const *)a, (struct __siginfo32_struct *)b, (struct __timespecx32 const *)c, (__size_t)d

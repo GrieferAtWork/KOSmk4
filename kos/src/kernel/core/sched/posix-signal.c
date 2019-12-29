@@ -43,6 +43,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
+#include <compat/config.h>
 #include <kos/except-inval.h>
 #include <sys/wait.h>
 
@@ -53,6 +54,15 @@
 #include <string.h>
 
 #include <librpc/rpc.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/sigaction-struct.h>
+#include <compat/bits/siginfo-convert.h>
+#include <compat/bits/siginfo-struct.h>
+#include <compat/bits/timespec.h>
+#include <compat/kos/types.h>
+#include <compat/signal.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -1212,6 +1222,22 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 }
 
 
+
+
+
+/************************************************************************/
+/* sigaction(), rt_sigaction(), signal()                                */
+/************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_SIGACTION) ||           \
+     defined(__ARCH_WANT_SYSCALL_RT_SIGACTION) ||        \
+     defined(__ARCH_WANT_SYSCALL_SIGNAL) ||              \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SIGACTION) ||    \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SIGNAL))
+#define WANT_SIGACTION 1
+#endif /* ... */
+
+#ifdef WANT_SIGACTION
 PRIVATE void KCALL
 do_sigaction(syscall_ulong_t signo,
              CHECKED USER struct sigaction const *act,
@@ -1322,31 +1348,102 @@ no_old_handler:
 		xdecref(ohandler.sa_mask);
 	}
 }
+#endif /* WANT_SIGACTION */
 
+#ifdef __ARCH_WANT_SYSCALL_RT_SIGACTION
 DEFINE_SYSCALL4(errno_t, rt_sigaction, syscall_ulong_t, signo,
                 UNCHECKED USER struct sigaction const *, act,
                 UNCHECKED USER struct sigaction *, oact,
                 size_t, sigsetsize) {
-	if unlikely(sigsetsize != sizeof(sigset_t))
+	if unlikely(sigsetsize != sizeof(sigset_t)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
 		      sigsetsize);
+	}
 	/* Validate user-structure pointers. */
 	validate_readable_opt(act, sizeof(*act));
 	validate_writable_opt(oact, sizeof(*oact));
 	do_sigaction(signo, act, oact);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_RT_SIGACTION */
 
-#ifdef __NR_sigaction
+#ifdef __ARCH_WANT_SYSCALL_SIGACTION
 DEFINE_SYSCALL3(errno_t, sigaction, syscall_ulong_t, signo,
                 UNCHECKED USER struct sigaction const *, act,
                 UNCHECKED USER struct sigaction *, oact) {
 	return sys_rt_sigaction(signo, act, oact, sizeof(sigset_t));
 }
-#endif /* __NR_sigaction */
+#endif /* __ARCH_WANT_SYSCALL_SIGACTION */
 
-#ifdef __NR_signal
+#if defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION) || \
+    defined(__ARCH_WANT_COMPAT_SYSCALL_SIGACTION)
+PRIVATE void KCALL
+compat_sigaction_to_sigaction(CHECKED USER struct compat_sigaction const *self,
+                              struct sigaction *__restrict result) {
+	*(void **)&result->sa_handler  = (void *)self->sa_handler;
+	memcpy(&result->sa_mask, &self->sa_mask, MIN(sizeof(sigset_t), sizeof(compat_sigset_t)));
+	__STATIC_IF(sizeof(sigset_t) > sizeof(compat_sigset_t)) {
+		memset((byte_t *)&result->sa_mask + sizeof(compat_sigset_t), 0,
+		       sizeof(sigset_t) - sizeof(compat_sigset_t));
+	}
+	result->sa_flags = self->sa_flags;
+	*(void **)&result->sa_restorer  = (void *)self->sa_restorer;
+}
+PRIVATE void KCALL
+sigaction_to_compat_sigaction(struct sigaction const *__restrict self,
+                              CHECKED USER struct compat_sigaction *result) {
+	*(__ARCH_COMPAT_PTR(void) *)&result->sa_handler  = (__ARCH_COMPAT_PTR(void))(void *)self->sa_handler;
+	memcpy(&result->sa_mask, &self->sa_mask, MIN(sizeof(sigset_t), sizeof(compat_sigset_t)));
+	__STATIC_IF(sizeof(compat_sigset_t) > sizeof(sigset_t)) {
+		memset((byte_t *)&result->sa_mask + sizeof(sigset_t), 0,
+		       sizeof(compat_sigset_t) - sizeof(sigset_t));
+	}
+	result->sa_flags = self->sa_flags;
+	*(__ARCH_COMPAT_PTR(void) *)&result->sa_restorer  = (__ARCH_COMPAT_PTR(void))(void *)self->sa_restorer;
+}
+PRIVATE errno_t KCALL
+do_compat_sigaction(syscall_ulong_t signo,
+                    UNCHECKED USER struct compat_sigaction const *act,
+                    UNCHECKED USER struct compat_sigaction *oact) {
+	struct sigaction real_act, real_oact;
+	/* Validate user-structure pointers. */
+	validate_readable_opt(act, sizeof(*act));
+	validate_writable_opt(oact, sizeof(*oact));
+	if (act)
+		compat_sigaction_to_sigaction(act, &real_act);
+	do_sigaction(signo,
+	             act ? &real_act : NULL,
+	             oact ? &real_oact : NULL);
+	if (oact)
+		sigaction_to_compat_sigaction(&real_oact, oact);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGACTION */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION
+DEFINE_COMPAT_SYSCALL4(errno_t, rt_sigaction, syscall_ulong_t, signo,
+                       UNCHECKED USER struct compat_sigaction const *, act,
+                       UNCHECKED USER struct compat_sigaction *, oact,
+                       size_t, sigsetsize) {
+	if unlikely(sigsetsize != sizeof(sigset_t)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	}
+	return do_compat_sigaction(signo, act, oact);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGACTION
+DEFINE_COMPAT_SYSCALL3(errno_t, sigaction, syscall_ulong_t, signo,
+                       UNCHECKED USER struct compat_sigaction const *, act,
+                       UNCHECKED USER struct compat_sigaction *, oact) {
+	return do_compat_sigaction(signo, act, oact);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGACTION */
+
+#ifdef __ARCH_WANT_SYSCALL_SIGNAL
 DEFINE_SYSCALL2(sighandler_t, signal,
                 syscall_ulong_t, signo,
                 UNCHECKED USER sighandler_t, handler) {
@@ -1360,27 +1457,33 @@ DEFINE_SYSCALL2(sighandler_t, signal,
 	}
 	return oact.sa_handler;
 }
-#endif /* __NR_signal */
+#endif /* __ARCH_WANT_SYSCALL_SIGNAL */
 
-#undef sigmask
-
-LOCAL void KCALL
-sigmask_ensure_unmasked_mandatory(struct kernel_sigmask *__restrict sigmask) {
-	/* Make sure that everything got written. */
-	COMPILER_BARRIER();
-	/* Ensure that SIGKILL and SIGSTOP aren't masked.
-	 * If either got accidentally (or intentionally) got masked, unmask them
-	 * and manually check for pending signals (in case some got delivered between
-	 * the point when they got masked, and the point when we unmask them below) */
-	if unlikely(sigismember(&sigmask->sm_mask, SIGKILL) ||
-	            sigismember(&sigmask->sm_mask, SIGSTOP)) {
-		sigdelset(&sigmask->sm_mask, SIGKILL);
-		sigdelset(&sigmask->sm_mask, SIGSTOP);
-		COMPILER_BARRIER();
-		sigmask_check();
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGNAL
+DEFINE_COMPAT_SYSCALL2(sighandler_t, signal,
+                       syscall_ulong_t, signo,
+                       UNCHECKED USER sighandler_t, handler) {
+	struct sigaction oact, act;
+	if (handler == KERNEL_SIG_GET) {
+		do_sigaction(signo, NULL, &oact);
+	} else {
+		memset(&act, 0, sizeof(act));
+		act.sa_handler = handler;
+		do_sigaction(signo, &act, &oact);
 	}
+	return oact.sa_handler;
 }
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGNAL */
 
+
+
+
+
+/************************************************************************/
+/* sigprocmask(), rt_sigprocmask()                                      */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_RT_SIGPROCMASK
+#undef sigmask
 LOCAL void KCALL
 sigmask_ensure_unmasked_mandatory_after_syscall(struct kernel_sigmask *__restrict sigmask,
                                                 syscall_ulong_t syscall_result) {
@@ -1491,19 +1594,32 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_RT_SIGPROCMASK */
 
-
-
-#ifdef __NR_sigprocmask
+#ifdef __ARCH_WANT_SYSCALL_SIGPROCMASK
 DEFINE_SYSCALL3(errno_t, sigprocmask, syscall_ulong_t, how,
                 UNCHECKED USER sigset_t const *, set,
                 UNCHECKED USER sigset_t *, oset) {
 	return sys_rt_sigprocmask(how, set, oset, sizeof(sigset_t));
 }
-#endif /* __NR_sigprocmask */
+#endif /* __ARCH_WANT_SYSCALL_SIGPROCMASK */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGPROCMASK
+DEFINE_COMPAT_SYSCALL3(errno_t, sigprocmask, syscall_ulong_t, how,
+                       UNCHECKED USER compat_sigset_t const *, set,
+                       UNCHECKED USER compat_sigset_t *, oset) {
+	return sys_rt_sigprocmask(how, set, oset, sizeof(compat_sigset_t));
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGPROCMASK */
 
 
-#ifdef __NR_sgetmask
+
+
+
+/************************************************************************/
+/* sgetmask(), ssetmask()                                               */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SGETMASK
 DEFINE_SYSCALL0(syscall_ulong_t, sgetmask) {
 	syscall_ulong_t result;
 	struct kernel_sigmask *mymask;
@@ -1516,9 +1632,24 @@ DEFINE_SYSCALL0(syscall_ulong_t, sgetmask) {
 	       MIN(sizeof(mymask->sm_mask), sizeof(result)));
 	return result;
 }
-#endif /* __NR_sgetmask */
+#endif /* __ARCH_WANT_SYSCALL_SGETMASK */
 
-#ifdef __NR_ssetmask
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SGETMASK
+DEFINE_COMPAT_SYSCALL0(syscall_ulong_t, sgetmask) {
+	compat_syscall_ulong_t result;
+	struct kernel_sigmask *mymask;
+	mymask = sigmask_getrd();
+	assert(mymask);
+#if __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
+	result = 0;
+#endif /* __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
+	memcpy(&result, &mymask->sm_mask,
+	       MIN(sizeof(mymask->sm_mask), sizeof(result)));
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SGETMASK */
+
+#ifdef __ARCH_WANT_SYSCALL_SSETMASK
 DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, sigmask) {
 	syscall_ulong_t result;
 	struct kernel_sigmask *mymask;
@@ -1540,21 +1671,56 @@ DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, sigmask) {
 	sigmask_check_after_syscall(result);
 	return result;
 }
-#endif /* __NR_ssetmask */
+#endif /* __ARCH_WANT_SYSCALL_SSETMASK */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SSETMASK
+DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, sigmask) {
+	compat_syscall_ulong_t result;
+	compat_syscall_ulong_t used_sigmask;
+	struct kernel_sigmask *mymask;
+	mymask = sigmask_getwr();
+	used_sigmask = (compat_syscall_ulong_t)sigmask;
+#if __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
+	result = 0;
+#endif /* __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
+	memcpy(&result, &mymask->sm_mask,
+	       MIN(sizeof(mymask->sm_mask), sizeof(result)));
+	memcpy(&mymask->sm_mask, &used_sigmask,
+	       MIN(sizeof(mymask->sm_mask), sizeof(used_sigmask)));
+#if __SIZEOF_SIGSET_T__ > __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
+	memset((byte_t *)&mymask->sm_mask + sizeof(used_sigmask),
+	       0, sizeof(mymask->sm_mask) - sizeof(used_sigmask));
+#endif /* __SIZEOF_SIGSET_T__ > __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
+	/* Make sure that these two signals aren't being masked! */
+	sigdelset(&mymask->sm_mask, SIGKILL);
+	sigdelset(&mymask->sm_mask, SIGSTOP);
+	sigmask_check_after_syscall(result);
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SSETMASK */
 
 
-LOCAL size_t KCALL get_pid_indirection(struct task *__restrict thread) {
+LOCAL WUNUSED ATTR_PURE NONNULL((1)) size_t KCALL
+get_pid_indirection(struct task const *__restrict thread) {
 	struct taskpid *pid = FORTASK(thread, this_taskpid);
 	return likely(pid) ? pid->tp_pidns->pn_indirection : 0;
 }
 
-LOCAL upid_t KCALL taskpid_getpid_ind(struct taskpid *__restrict self, size_t ind) {
+LOCAL WUNUSED ATTR_PURE NONNULL((1)) upid_t KCALL
+taskpid_getpid_ind(struct taskpid *__restrict self, size_t ind) {
 	if likely(ind <= self->tp_pidns->pn_indirection)
 		return self->tp_pids[ind];
 	return 0;
 }
 
 
+
+
+
+/************************************************************************/
+/* kill(), tgkill(), tkill()                                            */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_KILL
 DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, syscall_ulong_t, signo) {
 	REF struct task *target;
 	struct taskpid *mypid;
@@ -1594,7 +1760,9 @@ do_inherit_target_and_raise_processgroup:
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_KILL */
 
+#ifdef __ARCH_WANT_SYSCALL_TGKILL
 DEFINE_SYSCALL3(errno_t, tgkill,
                 pid_t, tgid, pid_t, pid,
                 syscall_ulong_t, signo) {
@@ -1629,7 +1797,9 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_TGKILL */
 
+#ifdef __ARCH_WANT_SYSCALL_TKILL
 DEFINE_SYSCALL2(errno_t, tkill, pid_t, pid, syscall_ulong_t, signo) {
 	REF struct task *target;
 	if unlikely(/*signo == 0 ||*/ signo >= NSIG)
@@ -1654,7 +1824,16 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, pid, syscall_ulong_t, signo) {
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_TKILL */
 
+
+
+
+
+/************************************************************************/
+/* rt_sigqueueinfo(), rt_tgsigqueueinfo()                               */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_RT_SIGQUEUEINFO
 DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
                 pid_t, tgid, syscall_ulong_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
@@ -1668,6 +1847,7 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
 	validate_readable(uinfo, sizeof(siginfo_t));
 	memcpy(&info, uinfo, sizeof(siginfo_t));
+	COMPILER_READ_BARRIER();
 	info.si_signo = signo;
 	target        = pidns_lookup_task(THIS_PIDNS, (upid_t)tgid);
 	FINALLY_DECREF_UNLIKELY(target);
@@ -1683,7 +1863,9 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_RT_SIGQUEUEINFO */
 
+#ifdef __ARCH_WANT_SYSCALL_RT_TGSIGQUEUEINFO
 DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
                 pid_t, tgid, pid_t, tid, syscall_ulong_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
@@ -1701,6 +1883,7 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
 	validate_readable(uinfo, sizeof(siginfo_t));
 	memcpy(&info, uinfo, sizeof(siginfo_t));
+	COMPILER_READ_BARRIER();
 	info.si_signo = signo;
 	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
@@ -1719,11 +1902,94 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_RT_TGSIGQUEUEINFO */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGQUEUEINFO
+DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
+                       pid_t, tgid, syscall_ulong_t, signo,
+                       USER UNCHECKED compat_siginfo_t const *, uinfo) {
+	REF struct task *target;
+	siginfo_t info;
+	if unlikely(tgid <= 0)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tgid);
+	if unlikely(/*signo == 0 ||*/ signo >= NSIG)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
+	validate_readable(uinfo, sizeof(compat_siginfo_t));
+	compat_siginfo_to_siginfo(uinfo, &info);
+	COMPILER_READ_BARRIER();
+	info.si_signo = signo;
+	target        = pidns_lookup_task(THIS_PIDNS, (upid_t)tgid);
+	FINALLY_DECREF_UNLIKELY(target);
+	/* Don't allow sending arbitrary signals to other processes. */
+	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
+	    (task_getprocess_of(target) != task_getprocess()))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
+		      info.si_code);
+	if (signo != 0) {
+		if (!task_raisesignalprocess(target, &info))
+			THROW(E_PROCESS_EXITED, task_getpid_of_s(target));
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGQUEUEINFO */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_TGSIGQUEUEINFO
+DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
+                       pid_t, tgid, pid_t, tid, syscall_ulong_t, signo,
+                       USER UNCHECKED compat_siginfo_t const *, uinfo) {
+	siginfo_t info;
+	REF struct task *target;
+	struct task *leader;
+	if unlikely(tgid <= 0)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tgid);
+	if unlikely(tid <= 0)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tid);
+	if unlikely(/*signo == 0 ||*/ signo >= NSIG)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
+	validate_readable(uinfo, sizeof(compat_siginfo_t));
+	compat_siginfo_to_siginfo(uinfo, &info);
+	COMPILER_READ_BARRIER();
+	info.si_signo = signo;
+	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
+	FINALLY_DECREF_UNLIKELY(target);
+	/* Don't allow sending arbitrary signals to other processes. */
+	leader = task_getprocess_of(target);
+	if ((info.si_code >= 0 || info.si_code == SI_TKILL) && leader != task_getprocess())
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
+		      info.si_code);
+	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
+	if (task_gettid_of_s(leader) != (upid_t)tgid)
+		THROW(E_PROCESS_EXITED, tgid);
+	if (signo != 0) {
+		if (!task_raisesignalthread(target, &info))
+			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_TGSIGQUEUEINFO */
 
 
 
 
 
+/************************************************************************/
+/* rt_sigtimedwait(), rt_sigtimedwait64()                               */
+/************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT) ||        \
+     defined(__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64) ||      \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64))
+#define WANT_SIGTIMEDWAIT 1
+#endif /* ... */
+
+#ifdef WANT_SIGTIMEDWAIT
 /* @return: NULL : No signal was detected
  * @return: *    : The accepted signal entry (must be inherited by the caller) */
 PRIVATE struct sigqueue_entry *KCALL
@@ -1870,24 +2136,14 @@ copy_and_free_ent_info:
 	}
 	return result;
 }
+#endif /* WANT_SIGTIMEDWAIT */
 
-
-
-
-#ifdef __NR_rt_sigtimedwait64
+#ifdef __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT
 DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
                 UNCHECKED USER sigset_t const *, uthese,
                 UNCHECKED USER siginfo_t *, uinfo,
                 UNCHECKED USER struct timespec32 const *, uts,
-                size_t, sigsetsize)
-#else /* __NR_rt_sigtimedwait64 */
-DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
-                UNCHECKED USER sigset_t const *, uthese,
-                UNCHECKED USER siginfo_t *, uinfo,
-                UNCHECKED USER struct timespec const *, uts,
-                size_t, sigsetsize)
-#endif /* !__NR_rt_sigtimedwait64 */
-{
+                size_t, sigsetsize) {
 	syscall_slong_t result;
 	/* Validate user-structure pointers. */
 	validate_readable(uthese, sigsetsize);
@@ -1915,8 +2171,9 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
 	return result;
 }
+#endif /* __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT */
 
-#ifdef __NR_rt_sigtimedwait64
+#ifdef __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64
 DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
                 UNCHECKED USER sigset_t const *, uthese,
                 UNCHECKED USER siginfo_t *, uinfo,
@@ -1930,8 +2187,10 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
 		struct timespec tms;
 		qtime_t tmo;
 		validate_readable(uts, sizeof(*uts));
+		COMPILER_READ_BARRIER();
 		tms.tv_sec  = (time_t)uts->tv_sec;
 		tms.tv_nsec = uts->tv_nsec;
+		COMPILER_READ_BARRIER();
 		if (!tms.tv_sec && !tms.tv_nsec) {
 			tmo.q_jtime = 0;
 			tmo.q_qtime = 0;
@@ -1947,7 +2206,107 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
 	return result;
 }
-#endif /* __NR_rt_sigtimedwait64 */
+#endif /* __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT
+DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
+                       UNCHECKED USER compat_sigset_t const *, uthese,
+                       UNCHECKED USER compat_siginfo_t *, uinfo,
+                       UNCHECKED USER struct compat_timespec32 const *, uts,
+                       size_t, sigsetsize) {
+	syscall_slong_t result;
+	siginfo_t info;
+	/* Validate user-structure pointers. */
+	validate_readable(uthese, sigsetsize);
+	validate_writable(uinfo, sizeof(compat_siginfo_t));
+	compat_siginfo_to_siginfo(uinfo, &info);
+	if (uts) {
+		struct timespec tms;
+		qtime_t tmo;
+		validate_readable(uts, sizeof(*uts));
+		COMPILER_READ_BARRIER();
+		tms.tv_sec  = (time_t)uts->tv_sec;
+		tms.tv_nsec = uts->tv_nsec;
+		COMPILER_READ_BARRIER();
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
+		result = (syscall_slong_t)signal_waitfor(uthese, &info, &tmo);
+	} else {
+		result = (syscall_slong_t)signal_waitfor(uthese, &info, NULL);
+	}
+	if (!result)
+		result = -EAGAIN; /* Posix says EAGAIN for this. */
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64
+DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
+                       UNCHECKED USER compat_sigset_t const *, uthese,
+                       UNCHECKED USER compat_siginfo_t *, uinfo,
+                       UNCHECKED USER struct compat_timespec64 const *, uts,
+                       size_t, sigsetsize) {
+	syscall_slong_t result;
+	siginfo_t info;
+	/* Validate user-structure pointers. */
+	validate_readable(uthese, sigsetsize);
+	validate_writable(uinfo, sizeof(compat_siginfo_t));
+	compat_siginfo_to_siginfo(uinfo, &info);
+	if (uts) {
+		struct timespec tms;
+		qtime_t tmo;
+		validate_readable(uts, sizeof(*uts));
+		COMPILER_READ_BARRIER();
+		tms.tv_sec  = (time_t)uts->tv_sec;
+		tms.tv_nsec = uts->tv_nsec;
+		COMPILER_READ_BARRIER();
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
+		result = (syscall_slong_t)signal_waitfor(uthese, &info, &tmo);
+	} else {
+		result = (syscall_slong_t)signal_waitfor(uthese, &info, NULL);
+	}
+	if (!result)
+		result = -EAGAIN; /* Posix says EAGAIN for this. */
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 */
+
+
+
+
+
+/************************************************************************/
+/* rt_sigsuspend(), sigsuspend()                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_RT_SIGSUSPEND
+#undef sigmask
+LOCAL void KCALL
+sigmask_ensure_unmasked_mandatory(struct kernel_sigmask *__restrict sigmask) {
+	/* Make sure that everything got written. */
+	COMPILER_BARRIER();
+	/* Ensure that SIGKILL and SIGSTOP aren't masked.
+	 * If either got accidentally (or intentionally) got masked, unmask them
+	 * and manually check for pending signals (in case some got delivered between
+	 * the point when they got masked, and the point when we unmask them below) */
+	if unlikely(sigismember(&sigmask->sm_mask, SIGKILL) ||
+	            sigismember(&sigmask->sm_mask, SIGSTOP)) {
+		sigdelset(&sigmask->sm_mask, SIGKILL);
+		sigdelset(&sigmask->sm_mask, SIGSTOP);
+		COMPILER_BARRIER();
+		sigmask_check();
+	}
+}
 
 DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
                 USER UNCHECKED sigset_t const *, uthese,
@@ -1991,17 +2350,32 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 	}
 	__builtin_unreachable();
 }
+#endif /* __ARCH_WANT_SYSCALL_RT_SIGSUSPEND */
 
-#ifdef __NR_sigsuspend
+#ifdef __ARCH_WANT_SYSCALL_SIGSUSPEND
 DEFINE_SYSCALL1(errno_t, sigsuspend,
                 USER UNCHECKED sigset_t const *, uthese) {
 	return sys_rt_sigsuspend(uthese, sizeof(sigset_t));
 }
-#endif /* __NR_sigsuspend */
+#endif /* __ARCH_WANT_SYSCALL_SIGSUSPEND */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGSUSPEND
+DEFINE_COMPAT_SYSCALL1(errno_t, sigsuspend,
+                       USER UNCHECKED compat_sigset_t const *, uthese) {
+	return sys_rt_sigsuspend(uthese, sizeof(compat_sigset_t));
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGSUSPEND */
 
 
+
+
+
+/************************************************************************/
+/* rt_sigpending(), sigpending()                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_RT_SIGPENDING
 /* Gather the set of pending signals. */
-PRIVATE void KCALL
+LOCAL void KCALL
 signal_gather_pending(sigset_t *__restrict these) {
 	struct kernel_sigmask *mymask;
 	struct sigqueue *myqueue;
@@ -2055,8 +2429,6 @@ no_perthread_pending:
 	sync_endread(prqueue);
 }
 
-
-
 DEFINE_SYSCALL2(errno_t, rt_sigpending,
                 UNCHECKED USER sigset_t *, uset,
                 size_t, sigsetsize) {
@@ -2073,13 +2445,21 @@ DEFINE_SYSCALL2(errno_t, rt_sigpending,
 	memcpy(uset, &pending, sizeof(pending));
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_RT_SIGPENDING */
 
-#ifdef __NR_sigpending
+#ifdef __ARCH_WANT_SYSCALL_SIGPENDING
 DEFINE_SYSCALL1(errno_t, sigpending,
                 UNCHECKED USER sigset_t *, uset) {
 	return sys_rt_sigpending(uset, sizeof(sigset_t));
 }
-#endif /* __NR_sigpending */
+#endif /* __ARCH_WANT_SYSCALL_SIGPENDING */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGPENDING
+DEFINE_COMPAT_SYSCALL1(errno_t, sigpending,
+                       UNCHECKED USER compat_sigset_t *, uset) {
+	return sys_rt_sigpending(uset, sizeof(compat_sigset_t));
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGPENDING */
 
 
 

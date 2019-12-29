@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8658a50a */
+/* HASH CRC-32:0x579e357a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,8 @@
 #include <bits/iovec-struct32.h>
 #include <bits/itimerspec32.h>
 #include <bits/itimerval.h>
-#include <bits/sigaction.h>
+#include <bits/sigaction-struct.h>
+#include <bits/sigaction-struct32.h>
 #include <bits/siginfo-struct32.h>
 #include <bits/statfs.h>
 #include <bits/timespec32.h>
@@ -128,7 +129,7 @@ struct rpc_syscall_info;
 struct rpc_syscall_info32;
 struct rusage;
 struct sched_param;
-struct sigaction;
+struct sigaction32;
 struct sigaltstack;
 struct sigevent;
 struct sockaddr;
@@ -1322,8 +1323,7 @@ __CDECLARE_SC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong
 __CDECLARE_SC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_SC(rpc_service) */
 #if __CRT_HAVE_SC(rt_sigaction)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_SC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct sigaction const *__act, struct sigaction *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_SC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct sigaction32 const *__act, struct sigaction32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigaction) */
 #if __CRT_HAVE_SC(rt_sigpending)
 __CDECLARE_SC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -1547,8 +1547,7 @@ __CDECLARE_SC(,__syscall_ulong_t,sgetmask,(void),())
 __CDECLARE_SC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_SC(shutdown) */
 #if __CRT_HAVE_SC(sigaction)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_SC(,__errno_t,sigaction,(__syscall_ulong_t __signo, struct sigaction const *__act, struct sigaction *__oact),(__signo,__act,__oact))
+__CDECLARE_SC(,__errno_t,sigaction,(__syscall_ulong_t __signo, struct sigaction32 const *__act, struct sigaction32 *__oact),(__signo,__act,__oact))
 #endif /* __CRT_HAVE_SC(sigaction) */
 #if __CRT_HAVE_SC(sigaltstack)
 __CDECLARE_SC(,__errno_t,sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),(__ss,__oss))
@@ -2996,8 +2995,7 @@ __CDECLARE_XSC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulon
 __CDECLARE_XSC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_XSC(rpc_service) */
 #if __CRT_HAVE_XSC(rt_sigaction)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_XSC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct sigaction const *__act, struct sigaction *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_XSC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct sigaction32 const *__act, struct sigaction32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigaction) */
 #if __CRT_HAVE_XSC(rt_sigpending)
 __CDECLARE_XSC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -3218,8 +3216,7 @@ __CDECLARE_XSC(,__syscall_ulong_t,sgetmask,(void),())
 __CDECLARE_XSC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_XSC(shutdown) */
 #if __CRT_HAVE_XSC(sigaction)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_XSC(,__errno_t,sigaction,(__syscall_ulong_t __signo, struct sigaction const *__act, struct sigaction *__oact),(__signo,__act,__oact))
+__CDECLARE_XSC(,__errno_t,sigaction,(__syscall_ulong_t __signo, struct sigaction32 const *__act, struct sigaction32 *__oact),(__signo,__act,__oact))
 #endif /* __CRT_HAVE_XSC(sigaction) */
 #if __CRT_HAVE_XSC(sigaltstack)
 __CDECLARE_XSC(,__errno_t,sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),(__ss,__oss))

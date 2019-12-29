@@ -384,6 +384,10 @@ NOTHROW(FCALL blocking_cleanup_prioritize)(void) {
 }
 
 
+
+#if defined(__ARCH_WANT_SYSCALL_RPC_SCHEDULE) || \
+    defined(__ARCH_WANT_COMPAT_SYSCALL_RPC_SCHEDULE)
+
 /* The task has terminated in the mean time.
  * may be send through `rpc_completed' */
 #define USER_RPC_SIGALT_TERMINATED (__CCAST(struct sig *)(-1))
@@ -888,6 +892,7 @@ restore_old_except:
 	 RPC_SCHEDULE_FLAG_WAITSMPACK | RPC_SCHEDULE_FLAG_DONTWAKE |      \
 	 RPC_SCHEDULE_FLAG_HIGHPRIO | RPC_SCHEDULE_FLAG_LOWPRIO)
 
+#ifdef __ARCH_WANT_SYSCALL_RPC_SCHEDULE
 DEFINE_SYSCALL4(syscall_slong_t, rpc_schedule,
                 pid_t, target, syscall_ulong_t, flags,
                 USER UNCHECKED uint8_t const *, program,
@@ -1006,10 +1011,35 @@ DEFINE_SYSCALL4(syscall_slong_t, rpc_schedule,
 	decref(args_packet);
 	return 0;
 }
+#endif /* __ARCH_WANT_SYSCALL_RPC_SCHEDULE */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_RPC_SCHEDULE
+DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rpc_schedule,
+                       pid_t, target, syscall_ulong_t, flags,
+                       USER UNCHECKED uint8_t const *, program,
+                       USER UNCHECKED __ARCH_COMPAT_PTR(void) *, arguments) {
+	(void)target;
+	(void)flags;
+	(void)program;
+	(void)arguments;
+	/* TODO */
+	THROW(E_NOT_IMPLEMENTED_TODO);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_RPC_SCHEDULE */
+#endif /* rpc_schedule... */
+
+
+
+
+
+/************************************************************************/
+/* rpc_service()                                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_RPC_SERVICE
 DEFINE_SYSCALL0(syscall_slong_t, rpc_service) {
 	return task_serve() ? 1 : 0;
 }
+#endif /* __ARCH_WANT_SYSCALL_RPC_SERVICE */
 
 
 

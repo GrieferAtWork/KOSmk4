@@ -103,7 +103,9 @@
 %[typeorg(<bits/timeval64.h>: __timevalx64)]
 %[typeorg(<bits/itimerval.h>: __itimerval32, __itimerval64)]
 %[typeorg(<bits/statfs.h>: __statfs32, statfs64)]
-%[typeorg(<bits/sigaction.h>: sigaction)]
+%[typeorg(<bits/sigaction-struct.h>: sigaction, __sighandler_t)]
+%[typeorg(<bits/sigaction-struct32.h>: sigaction32, __sighandler32_t)]
+%[typeorg(<bits/sigaction-struct64.h>: sigaction64, __sighandler64_t)]
 %[typeorg(<bits/utimebuf.h>: __utimbuf32, __utimbuf64)]
 %[typeorg(<bits/siginfo-struct.h>: __siginfo_struct, siginfo_t)]
 %[typeorg(<bits/siginfo-struct32.h>: __siginfo32_struct, siginfo32_t)]
@@ -480,8 +482,21 @@ oldolduname:(struct linux_oldolduname *name) -> errno_t;
 olduname:(struct linux_olduname *name) -> errno_t;
 uname:(struct utsname *name) -> errno_t;
 
+%[startgroup]
 @@@param: signo: One of `SIG*'
 sigaction:(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact) -> errno_t;
+sigaction32:(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) -> errno_t;
+sigaction64:(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact) -> errno_t;
+%[endgroup]
+
+%[startgroup]
+@@@param: signo: One of `SIG*'
+rt_sigaction:(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) -> errno_t;
+rt_sigaction32:(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) -> errno_t;
+rt_sigaction64:(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact, size_t sigsetsize) -> errno_t;
+%[endgroup]
+
+
 sgetmask:() -> syscall_ulong_t;
 ssetmask:(syscall_ulong_t sigmask) -> syscall_ulong_t;
 
@@ -782,9 +797,6 @@ query_module:(int TODO_PROTOTYPE) -> errno_t;
 [restart(dont)][cp] poll:(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) -> ssize_t;
 nfsservctl:(int TODO_PROTOTYPE) -> errno_t;
 prctl:(int TODO_PROTOTYPE) -> errno_t;
-
-@@@param: signo: One of `SIG*'
-rt_sigaction:(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) -> errno_t;
 
 @@@param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
 rt_sigprocmask:(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) -> errno_t;

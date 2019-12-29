@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84a8f501 */
+/* HASH CRC-32:0xb287680b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -830,8 +830,8 @@
 #define __NRAT1_munmap                 (size_t, __size_t)
 #define __NRAT0_brk                    (void *, void *)
 #define __NRAT0_rt_sigaction           (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_rt_sigaction           (struct sigaction const *, struct sigaction const *)
-#define __NRAT2_rt_sigaction           (struct sigaction *, struct sigaction *)
+#define __NRAT1_rt_sigaction           (struct sigaction64 const *, struct sigaction64 const *)
+#define __NRAT2_rt_sigaction           (struct sigaction64 *, struct sigaction64 *)
 #define __NRAT3_rt_sigaction           (size_t, __size_t)
 #define __NRAT0_rt_sigprocmask         (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_rt_sigprocmask         (struct __sigset_struct const *, struct __sigset_struct const *)
@@ -1709,7 +1709,7 @@
 #define __NRAM_mprotect(a, b, c, d, e, f)               (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_munmap(a, b, c, d, e, f)                 (void *)a, (__size_t)b
 #define __NRAM_brk(a, b, c, d, e, f)                    (void *)a
-#define __NRAM_rt_sigaction(a, b, c, d, e, f)           (__syscall_ulong_t)a, (struct sigaction const *)b, (struct sigaction *)c, (__size_t)d
+#define __NRAM_rt_sigaction(a, b, c, d, e, f)           (__syscall_ulong_t)a, (struct sigaction64 const *)b, (struct sigaction64 *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f)         (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NRAM_rt_sigreturn(a, b, c, d, e, f)           (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info *)c, (struct ucpustate const *)d
 #define __NRAM_ioctl(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (void *)c

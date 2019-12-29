@@ -32,6 +32,7 @@
 %[typecompat(x86_64:sockaddr = *:sockaddr)]
 %[typecompat(x86_64:pollfd = *:pollfd)]
 %[typecompat(x86_64:dirent = *:dirent)]
+%[typecompat(x86_64:sighandler_t = *:sighandler_t)]
 
 /* Define type compatibilities between x86_64 and i386 */
 %[typecompat(x86_64:[timeb,__timebx64] = i386:[__timebx32_64])]
@@ -50,6 +51,7 @@ clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRA
        pid_t *ctid, uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
+rt_sigaction = rt_sigaction64;
 gettimeofday = gettimeofdayx64;
 settimeofday = settimeofdayx64;
 select = selectx64;

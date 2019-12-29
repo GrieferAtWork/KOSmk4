@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6a855a3 */
+/* HASH CRC-32:0x602b9f55 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -351,8 +351,7 @@ INTERN_FUNCTION(libc_sys_Xbrk)
 END(libc_sys_Xbrk)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xbrk, libc_sys_Xbrk)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact, size_t sigsetsize) */
 .section .text.crt.syscall.rt_sigaction
 INTERN_FUNCTION(libc_sys_rt_sigaction)
 	.cfi_startproc
@@ -365,8 +364,7 @@ INTERN_FUNCTION(libc_sys_rt_sigaction)
 END(libc_sys_rt_sigaction)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigaction, libc_sys_rt_sigaction)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact, size_t sigsetsize) */
 .section .text.crt.syscall.Xrt_sigaction
 INTERN_FUNCTION(libc_sys_Xrt_sigaction)
 	.cfi_startproc

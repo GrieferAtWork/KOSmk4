@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf9d5a4f */
+/* HASH CRC-32:0x1be6bf1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1597,8 +1597,7 @@ INTERN_FUNCTION(libc_sys_Xsetsid)
 END(libc_sys_Xsetsid)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsetsid, libc_sys_Xsetsid)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact) */
+/* errno_t sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) */
 .section .text.crt.syscall.sigaction
 INTERN_FUNCTION(libc_sys_sigaction)
 	movl   $(0x43), %eax
@@ -1606,8 +1605,7 @@ INTERN_FUNCTION(libc_sys_sigaction)
 END(libc_sys_sigaction)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sigaction, libc_sys_sigaction)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact) */
+/* errno_t sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) */
 .section .text.crt.syscall.Xsigaction
 INTERN_FUNCTION(libc_sys_Xsigaction)
 	movl   $(0x43), %eax
@@ -3327,8 +3325,7 @@ INTERN_FUNCTION(libc_sys_rt_sigreturn)
 END(libc_sys_rt_sigreturn)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigreturn, libc_sys_rt_sigreturn)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) */
 .section .text.crt.syscall.rt_sigaction
 INTERN_FUNCTION(libc_sys_rt_sigaction)
 	movl   $(0xae), %eax
@@ -3336,8 +3333,7 @@ INTERN_FUNCTION(libc_sys_rt_sigaction)
 END(libc_sys_rt_sigaction)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigaction, libc_sys_rt_sigaction)
 
-/* @param: signo: One of `SIG*' */
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) */
 .section .text.crt.syscall.Xrt_sigaction
 INTERN_FUNCTION(libc_sys_Xrt_sigaction)
 	movl   $(0xae), %eax

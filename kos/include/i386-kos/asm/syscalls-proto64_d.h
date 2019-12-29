@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x511a9d0b */
+/* HASH CRC-32:0x6fc2fca3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -830,8 +830,8 @@
 #define __NR64AT1_munmap                 (size_t, __size_t)
 #define __NR64AT0_brk                    (void *, void *)
 #define __NR64AT0_rt_sigaction           (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT1_rt_sigaction           (struct sigaction const *, struct sigaction const *)
-#define __NR64AT2_rt_sigaction           (struct sigaction *, struct sigaction *)
+#define __NR64AT1_rt_sigaction           (struct sigaction64 const *, struct sigaction64 const *)
+#define __NR64AT2_rt_sigaction           (struct sigaction64 *, struct sigaction64 *)
 #define __NR64AT3_rt_sigaction           (size_t, __size_t)
 #define __NR64AT0_rt_sigprocmask         (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_rt_sigprocmask         (struct __sigset_struct const *, struct __sigset_struct const *)
@@ -1709,7 +1709,7 @@
 #define __NR64AM_mprotect(a, b, c, d, e, f)               (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR64AM_munmap(a, b, c, d, e, f)                 (void *)a, (__size_t)b
 #define __NR64AM_brk(a, b, c, d, e, f)                    (void *)a
-#define __NR64AM_rt_sigaction(a, b, c, d, e, f)           (__syscall_ulong_t)a, (struct sigaction const *)b, (struct sigaction *)c, (__size_t)d
+#define __NR64AM_rt_sigaction(a, b, c, d, e, f)           (__syscall_ulong_t)a, (struct sigaction64 const *)b, (struct sigaction64 *)c, (__size_t)d
 #define __NR64AM_rt_sigprocmask(a, b, c, d, e, f)         (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NR64AM_rt_sigreturn(a, b, c, d, e, f)           (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info *)c, (struct ucpustate const *)d
 #define __NR64AM_ioctl(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (void *)c

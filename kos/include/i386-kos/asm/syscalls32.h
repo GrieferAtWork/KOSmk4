@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cd82401 */
+/* HASH CRC-32:0xa399e53f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,8 +99,7 @@
 #define __NR_getppid                 0x40                   /* pid_t getppid(void) */
 #define __NR_getpgrp                 0x41                   /* pid_t getpgrp(void) */
 #define __NR_setsid                  0x42                   /* pid_t setsid(void) */
-/* @param: signo: One of `SIG*' */
-#define __NR_sigaction               0x43                   /* errno_t sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact) */
+#define __NR_sigaction               0x43                   /* errno_t sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) */
 #define __NR_sgetmask                0x44                   /* syscall_ulong_t sgetmask(void) */
 #define __NR_ssetmask                0x45                   /* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
 #define __NR_setreuid                0x46                   /* errno_t setreuid(uint16_t ruid, uint16_t euid) */
@@ -226,8 +225,7 @@
 #define __NR_getresgid               0xab                   /* errno_t getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) */
 #define __NR_prctl                   0xac                   /* errno_t prctl(int TODO_PROTOTYPE) */
 #define __NR_rt_sigreturn            0xad                   /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
-/* @param: signo: One of `SIG*' */
-#define __NR_rt_sigaction            0xae                   /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
+#define __NR_rt_sigaction            0xae                   /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR_rt_sigprocmask          0xaf                   /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 #define __NR_rt_sigpending           0xb0                   /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */

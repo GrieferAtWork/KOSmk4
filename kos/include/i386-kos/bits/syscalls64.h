@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1877dcd6 */
+/* HASH CRC-32:0xd66741eb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,8 +45,7 @@
 #define SYS_mprotect               __NR_mprotect               /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 #define SYS_munmap                 __NR_munmap                 /* errno_t munmap(void *addr, size_t len) */
 #define SYS_brk                    __NR_brk                    /* errno_t brk(void *addr) */
-/* @param: signo: One of `SIG*' */
-#define SYS_rt_sigaction           __NR_rt_sigaction           /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
+#define SYS_rt_sigaction           __NR_rt_sigaction           /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define SYS_rt_sigprocmask         __NR_rt_sigprocmask         /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 #define SYS_rt_sigreturn           __NR_rt_sigreturn           /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */

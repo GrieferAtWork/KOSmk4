@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x895ee38d */
+/* HASH CRC-32:0x826bae1a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #include <bits/iovec-struct64.h>
 #include <bits/itimerspec64.h>
 #include <bits/itimerval.h>
-#include <bits/sigaction.h>
+#include <bits/sigaction-struct64.h>
 #include <bits/siginfo-struct64.h>
 #include <bits/statfs.h>
 #include <bits/timespec64.h>
@@ -111,7 +111,7 @@ struct rlimit64;
 struct rpc_syscall_info;
 struct rusage;
 struct sched_param;
-struct sigaction;
+struct sigaction64;
 struct sigaltstack;
 struct sigevent;
 struct sockaddr;
@@ -1171,8 +1171,7 @@ __CDECLARE_SC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong
 __CDECLARE_SC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_SC(rpc_service) */
 #if __CRT_HAVE_SC(rt_sigaction)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_SC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct sigaction const *__act, struct sigaction *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_SC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct sigaction64 const *__act, struct sigaction64 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigaction) */
 #if __CRT_HAVE_SC(rt_sigpending)
 __CDECLARE_SC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -2592,8 +2591,7 @@ __CDECLARE_XSC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulon
 __CDECLARE_XSC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_XSC(rpc_service) */
 #if __CRT_HAVE_XSC(rt_sigaction)
-/* @param: signo: One of `SIG*' */
-__CDECLARE_XSC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct sigaction const *__act, struct sigaction *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_XSC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct sigaction64 const *__act, struct sigaction64 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigaction) */
 #if __CRT_HAVE_XSC(rt_sigpending)
 __CDECLARE_XSC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
