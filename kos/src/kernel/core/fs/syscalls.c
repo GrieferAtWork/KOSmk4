@@ -3142,11 +3142,11 @@ syscall_execveat_rpc(void *UNUSED(arg),
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		/* Actually service the exec() system call. */
 		state = kernel_execveat(state,
-		                        (fd_t)sc_info->rsi_args[0],
-		                        (USER UNCHECKED char const *)sc_info->rsi_args[1],
-		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_args[2],
-		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_args[3],
-		                        (atflag_t)sc_info->rsi_args[4]);
+		                        (fd_t)sc_info->rsi_regs[0],
+		                        (USER UNCHECKED char const *)sc_info->rsi_regs[1],
+		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[2],
+		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[3],
+		                        (atflag_t)sc_info->rsi_regs[4]);
 	}
 	return state;
 }
@@ -3182,9 +3182,9 @@ syscall_execve_rpc(void *UNUSED(arg),
 		/* Actually service the exec() system call. */
 		state = kernel_execveat(state,
 		                        AT_FDCWD,
-		                        (USER UNCHECKED char const *)sc_info->rsi_args[0],
-		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_args[1],
-		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_args[2],
+		                        (USER UNCHECKED char const *)sc_info->rsi_regs[0],
+		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[1],
+		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[2],
 		                        0);
 	}
 	return state;

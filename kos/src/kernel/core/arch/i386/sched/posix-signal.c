@@ -265,10 +265,10 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		size_t ob_size;
 		/* Only copy data up to the first unused argument. */
 		for (argc = kernel_syscall_regcnt(sc_info->rsi_sysno); argc; --argc) {
-			if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FARGVALID(argc - 1))
+			if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FREGVALID(argc - 1))
 				break;
 		}
-		ob_size = (offsetof(struct rpc_syscall_info32, rsi_args) + (argc * 4));
+		ob_size = (offsetof(struct rpc_syscall_info32, rsi_regs) + (argc * 4));
 		usp -= ob_size;
 		user_sc_info = (USER CHECKED struct rpc_syscall_info32 *)usp;
 		validate_writable(user_sc_info, ob_size);
@@ -488,8 +488,8 @@ again:
 			}
 			/* Set invalid arguments to 0 */
 			for (i = 0; i < 6; ++i) {
-				if (!(sc.rsi_flags & RPC_SYSCALL_INFO_FARGVALID(i)))
-					sc.rsi_args[i] = 0;
+				if (!(sc.rsi_flags & RPC_SYSCALL_INFO_FREGVALID(i)))
+					sc.rsi_regs[i] = 0;
 			}
 			if unlikely(sc.rsi_sysno == SYSCALL_VECTOR_SIGRETURN32) {
 				/* Special case: Return to sigreturn.
@@ -498,10 +498,10 @@ again:
 				 * NOTE: This special case mainly prevents user-space from being
 				 *       able to cause a kernel stack overflow by chaining a bunch
 				 *       of sigreturn invocations ontop of each other. */
-				restore_cpu     = (USER UNCHECKED struct ucpustate32 const *)sc.rsi_args[SIGRETURN_386_ARGID_RESTORE_CPU];
-				restore_fpu     = (USER UNCHECKED struct fpustate32 const *)sc.rsi_args[SIGRETURN_386_ARGID_RESTORE_FPU];
-				restore_sigmask = (USER UNCHECKED sigset_t const *)sc.rsi_args[SIGRETURN_386_ARGID_RESTORE_SIGMASK];
-				sc_info         = (USER UNCHECKED struct rpc_syscall_info32 *)sc.rsi_args[SIGRETURN_386_ARGID_SC_INFO];
+				restore_cpu     = (USER UNCHECKED struct ucpustate32 const *)sc.rsi_regs[SIGRETURN_386_ARGID_RESTORE_CPU];
+				restore_fpu     = (USER UNCHECKED struct fpustate32 const *)sc.rsi_regs[SIGRETURN_386_ARGID_RESTORE_FPU];
+				restore_sigmask = (USER UNCHECKED sigset_t const *)sc.rsi_regs[SIGRETURN_386_ARGID_RESTORE_SIGMASK];
+				sc_info         = (USER UNCHECKED struct rpc_syscall_info32 *)sc.rsi_regs[SIGRETURN_386_ARGID_SC_INFO];
 				/* Disable exception propagation when sigreturn() is invoked without exceptions enabled. */
 				if ((sc.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) == 0)
 					enable_except = false;
@@ -556,10 +556,10 @@ sigreturn32_rpc(void *UNUSED(arg),
 	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
 		return state;
 	return sigreturn32_impl(state,
-	                        (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_args[SIGRETURN_386_ARGID_RESTORE_CPU],
-	                        (USER UNCHECKED struct fpustate32 const *)sc_info->rsi_args[SIGRETURN_386_ARGID_RESTORE_FPU],
-	                        (USER UNCHECKED sigset_t const *)sc_info->rsi_args[SIGRETURN_386_ARGID_RESTORE_SIGMASK],
-	                        (USER UNCHECKED struct rpc_syscall_info32 *)sc_info->rsi_args[SIGRETURN_386_ARGID_SC_INFO]);
+	                        (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_regs[SIGRETURN_386_ARGID_RESTORE_CPU],
+	                        (USER UNCHECKED struct fpustate32 const *)sc_info->rsi_regs[SIGRETURN_386_ARGID_RESTORE_FPU],
+	                        (USER UNCHECKED sigset_t const *)sc_info->rsi_regs[SIGRETURN_386_ARGID_RESTORE_SIGMASK],
+	                        (USER UNCHECKED struct rpc_syscall_info32 *)sc_info->rsi_regs[SIGRETURN_386_ARGID_SC_INFO]);
 }
 
 DEFINE_SYSCALL32_6(void, sigreturn,
@@ -617,8 +617,8 @@ raiseat32_rpc(void *UNUSED(arg),
 	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
 		return state;
 	return raiseat32_impl(state,
-	                      (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_args[0],
-	                      (USER UNCHECKED siginfo32_t const *)sc_info->rsi_args[1]);
+	                      (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_regs[0],
+	                      (USER UNCHECKED siginfo32_t const *)sc_info->rsi_regs[1]);
 }
 
 DEFINE_SYSCALL32_2(errno_t, raiseat,
@@ -707,8 +707,8 @@ raiseat64_rpc(void *UNUSED(arg),
 	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
 		return state;
 	return raiseat64_impl(state,
-	                      (USER UNCHECKED struct ucpustate64 const *)sc_info->rsi_args[0],
-	                      (USER UNCHECKED siginfo64_t const *)sc_info->rsi_args[1]);
+	                      (USER UNCHECKED struct ucpustate64 const *)sc_info->rsi_regs[0],
+	                      (USER UNCHECKED siginfo64_t const *)sc_info->rsi_regs[1]);
 }
 
 DEFINE_SYSCALL64_2(errno_t, raiseat,

@@ -24,10 +24,10 @@
 
 __DECL_BEGIN
 
-#define OFFSET_RPC_SYSCALL_INFO_FLAGS      0
-#define OFFSET_RPC_SYSCALL_INFO_SYSNO      __SIZEOF_SYSCALL_LONG_T__
-#define OFFSET_RPC_SYSCALL_INFO_ARG(i)  (((i) + 2) * __SIZEOF_SYSCALL_LONG_T__)
-#define SIZEOF_RPC_SYSCALL_INFO           (8 * __SIZEOF_SYSCALL_LONG_T__)
+#define OFFSET_RPC_SYSCALL_INFO_FLAGS  0
+#define OFFSET_RPC_SYSCALL_INFO_SYSNO  __SIZEOF_SYSCALL_LONG_T__
+#define OFFSET_RPC_SYSCALL_INFO_REG(i) (((i) + 2) * __SIZEOF_SYSCALL_LONG_T__)
+#define SIZEOF_RPC_SYSCALL_INFO        (8 * __SIZEOF_SYSCALL_LONG_T__)
 #ifndef __rpc_syscall_info_defined
 #define __rpc_syscall_info_defined 1
 #ifdef __CC__
@@ -35,8 +35,8 @@ struct rpc_syscall_info {
 	/* Structure pushed by `RPC_PROGRAM_OP_psh_sys' */
 	__syscall_ulong_t  rsi_flags;   /* System call invocation flags (Set of `RPC_SYSCALL_INFO_F*') */
 	__syscall_ulong_t  rsi_sysno;   /* The system call vector that got invoked. */
-	__syscall_ulong_t  rsi_args[6]; /* Arguments passed to the system call.
-	                                 * NOTE: You may validate any argument by testing for `RPC_SYSCALL_INFO_FARGVALID(i)' */
+	__syscall_ulong_t  rsi_regs[6]; /* Arguments passed to the system call.
+	                                 * NOTE: You may validate any argument by testing for `RPC_SYSCALL_INFO_FREGVALID(i)' */
 };
 #endif /* __CC__ */
 #endif /* !__rpc_syscall_info_defined */

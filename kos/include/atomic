@@ -86,8 +86,20 @@ typedef enum {
 #endif /* !__USE_KOS */
 
 __NAMESPACE_INT_BEGIN
-__CXX_CLASSMEMBER __CXX11_CONSTEXPR memory_order __cmpexch_failure_order2(memory_order __order) __CXX_NOEXCEPT { return __order == memory_order_acq_rel ? memory_order_acquire : __order == memory_order_release ? memory_order_relaxed : __order; }
-__CXX_CLASSMEMBER __CXX11_CONSTEXPR memory_order __cmpexch_failure_order(memory_order __order) __CXX_NOEXCEPT { return memory_order(__cmpexch_failure_order2(memory_order(__order & 0x0ffff))|(__order & 0xffff0000)); }
+
+__CXX_CLASSMEMBER __CXX11_CONSTEXPR memory_order
+__cmpexch_failure_order2(memory_order __order) __CXX_NOEXCEPT {
+	return __order == memory_order_acq_rel
+	       ? memory_order_acquire
+	       : __order == memory_order_release
+	         ? memory_order_relaxed
+	         : __order;
+}
+__CXX_CLASSMEMBER __CXX11_CONSTEXPR memory_order
+__cmpexch_failure_order(memory_order __order) __CXX_NOEXCEPT {
+	return memory_order(__cmpexch_failure_order2(memory_order(__order & 0xffff)) |
+	                    (__order & 0xffff0000));
+}
 
 template<class __T> struct __atomic_int {
 private:

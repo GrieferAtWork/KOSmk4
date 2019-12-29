@@ -277,12 +277,12 @@ __SYSDECL_BEGIN
 
 
 
-#define RPC_SYSCALL_INFO_FNORMAL       0x0000 /* Normal system call flags. */
-#define RPC_SYSCALL_INFO_FEXCEPT       0x8000 /* Exceptions were enabled for this system call. */
-#define RPC_SYSCALL_INFO_FMETHOD       0x00ff /* Mask for the arch-specific system call invocation method. (One of `SYSCALL_INFO_METHOD_*') */
-#define RPC_SYSCALL_INFO_FARGVALID(i) (0x0100 << (i)) /* Mask for checking if some given argument `i' is valid */
-#define RPC_SYSCALL_INFO_FARGVALID_SHIFT 8
-#define RPC_SYSCALL_INFO_FARGVALID_MASK  0x7f00
+#define RPC_SYSCALL_INFO_FNORMAL         0x0000 /* Normal system call flags. */
+#define RPC_SYSCALL_INFO_FEXCEPT         0x8000 /* Exceptions were enabled for this system call. */
+#define RPC_SYSCALL_INFO_FMETHOD         0x00ff /* Mask for the arch-specific system call invocation method. (One of `SYSCALL_INFO_METHOD_*') */
+#define RPC_SYSCALL_INFO_FREGVALID(i)    (0x0100 << (i)) /* Mask for checking if some given register `i' is valid */
+#define RPC_SYSCALL_INFO_FREGVALID_SHIFT 8
+#define RPC_SYSCALL_INFO_FREGVALID_MASK  0x7f00
 
 
 

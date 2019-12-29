@@ -202,12 +202,12 @@ coredump32_rpc(void *UNUSED(arg),
 	if unlikely(reason != TASK_RPC_REASON_SYSCALL)
 		return state;
 	return coredump32_impl(state,
-	                       (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_args[0],
-	                       (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_args[1],
-	                       (USER UNCHECKED u32 const *const *)sc_info->rsi_args[2],
-	                       (size_t)sc_info->rsi_args[3],
-	                       (USER UNCHECKED struct exception_data32 const *)sc_info->rsi_args[4],
-	                       (syscall_ulong_t)sc_info->rsi_args[5]);
+	                       (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_regs[0],
+	                       (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_regs[1],
+	                       (USER UNCHECKED u32 const *const *)sc_info->rsi_regs[2],
+	                       (size_t)sc_info->rsi_regs[3],
+	                       (USER UNCHECKED struct exception_data32 const *)sc_info->rsi_regs[4],
+	                       (syscall_ulong_t)sc_info->rsi_regs[5]);
 }
 
 

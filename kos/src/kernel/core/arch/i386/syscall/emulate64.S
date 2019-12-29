@@ -100,12 +100,12 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	/* Figure out which system call is actually being invoked. */
 	movq   OFFSET_RPC_SYSCALL_INFO_SYSNO(%rbx), %rax
 	/* Load system call arguments (from `sc_info') */
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(0))(%rbx), %rdi
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(1))(%rbx), %rsi
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(2))(%rbx), %rdx
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(3))(%rbx), %rcx
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(4))(%rbx), %r8
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(5))(%rbx), %r9
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(0))(%rbx), %rdi
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(1))(%rbx), %rsi
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(2))(%rbx), %rdx
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(3))(%rbx), %rcx
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(4))(%rbx), %r8
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(5))(%rbx), %r9
 
 	cmpq   $(__NR64_syscall0_max), %rax
 	ja     .Lcall_sysex64
@@ -182,12 +182,12 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	movzlq OFFSET_RPC_SYSCALL_INFO_SYSNO(%rbx), %rax
 
 	/* Load system call arguments (from `sc_info') */
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(0))(%rbx), %rdi
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(1))(%rbx), %rsi
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(2))(%rbx), %rdx
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(3))(%rbx), %rcx
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(4))(%rbx), %r8
-	movq   (OFFSET_RPC_SYSCALL_INFO_ARG(5))(%rbx), %r9
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(0))(%rbx), %rdi
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(1))(%rbx), %rsi
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(2))(%rbx), %rdx
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(3))(%rbx), %rcx
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(4))(%rbx), %r8
+	movq   (OFFSET_RPC_SYSCALL_INFO_REG(5))(%rbx), %r9
 
 	cmpl   $(__NR32_syscall0_max), %eax
 	ja     .Lcall_sysex32

@@ -51,12 +51,12 @@ INTERN_FUNCTION(sys_break0)
 	pushl_cfi $(0) /* flags (filled in later) */
 	pushl_cfi %ecx /* argc */
 	/* *(u32 *)(ESP + 4) = (RPC_SYSCALL_INFO_METHOD_OTHER_32 | RPC_SYSCALL_INFO_FEXCEPT |
-	 *                      ((1 << (%ecx - 2)) - 1) << RPC_SYSCALL_INFO_FARGVALID_SHIFT); */
+	 *                      ((1 << (%ecx - 2)) - 1) << RPC_SYSCALL_INFO_FREGVALID_SHIFT); */
 	subl   $(2), %ecx
 	movl   $(1), %edx
 	shll   %cl, %edx
 	decl   %edx
-	shll   $(RPC_SYSCALL_INFO_FARGVALID_SHIFT), %edx
+	shll   $(RPC_SYSCALL_INFO_FREGVALID_SHIFT), %edx
 	orl    $(RPC_SYSCALL_INFO_METHOD_OTHER_32 | RPC_SYSCALL_INFO_FEXCEPT), %edx
 	movl   %edx, 4(%esp) /* flags */
 	pushl_cfi $(ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL))

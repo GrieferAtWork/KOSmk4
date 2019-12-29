@@ -388,8 +388,8 @@ sys_debugtrap_rpc32(void *UNUSED(arg), struct icpustate *__restrict state,
                     unsigned int reason, struct rpc_syscall_info const *sc_info) {
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		state = sys_debugtrap32_impl(state,
-		                             (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_args[0],
-		                             (USER UNCHECKED struct debugtrap_reason32 const *)sc_info->rsi_args[1]);
+		                             (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_regs[0],
+		                             (USER UNCHECKED struct debugtrap_reason32 const *)sc_info->rsi_regs[1]);
 	}
 	return state;
 }
@@ -400,8 +400,8 @@ sys_debugtrap_rpc64(void *UNUSED(arg), struct icpustate *__restrict state,
                     unsigned int reason, struct rpc_syscall_info const *sc_info) {
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		state = sys_debugtrap64_impl(state,
-		                             (USER UNCHECKED struct ucpustate64 const *)sc_info->rsi_args[0],
-		                             (USER UNCHECKED struct debugtrap_reason64 const *)sc_info->rsi_args[1]);
+		                             (USER UNCHECKED struct ucpustate64 const *)sc_info->rsi_regs[0],
+		                             (USER UNCHECKED struct debugtrap_reason64 const *)sc_info->rsi_regs[1]);
 	}
 	return state;
 }

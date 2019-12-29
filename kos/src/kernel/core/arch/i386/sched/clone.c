@@ -342,13 +342,13 @@ task_clone_rpc(void *UNUSED(arg),
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		pid_t child_tid;
 		child_tid = x86_task_clone(state,
-		                           sc_info->rsi_args[0],                         /* clone_flags */
-		                           (USER UNCHECKED pid_t *)sc_info->rsi_args[2], /* parent_tidptr */
+		                           sc_info->rsi_regs[0],                         /* clone_flags */
+		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[2], /* parent_tidptr */
 #ifndef __x86_64__
-		                           sc_info->rsi_args[3],                        /* newtls */
-		                           (USER UNCHECKED pid_t *)sc_info->rsi_args[4] /* child_tidptr */
+		                           sc_info->rsi_regs[3],                        /* newtls */
+		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[4] /* child_tidptr */
 #else /* !__x86_64__ */
-		                           (USER UNCHECKED pid_t *)sc_info->rsi_args[3] /* child_tidptr */
+		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[3] /* child_tidptr */
 #endif /* __x86_64__ */
 		                           );
 		gpregs_setpax(&state->ics_gpregs, child_tid);

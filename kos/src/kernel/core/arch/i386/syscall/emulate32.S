@@ -103,12 +103,12 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	.cfi_def_cfa %edi, (4 + SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
 
 	/* Push system call arguments. */
-	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(5))(%edi)
-	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(4))(%edi)
-	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(3))(%edi)
-	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(2))(%edi)
-	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(1))(%edi)
-	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_ARG(0))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_REG(5))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_REG(4))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_REG(3))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_REG(2))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_REG(1))(%edi)
+	pushl  (4 + OFFSET_RPC_SYSCALL_INFO_REG(0))(%edi)
 
 	cmpl   $(__NR_syscall0_max), %eax
 	ja     .Lcall_sysex

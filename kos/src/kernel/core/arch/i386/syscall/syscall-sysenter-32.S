@@ -436,18 +436,18 @@ PRIVATE_FUNCTION(copy_extended_user_arguments)
 			.Lsysenter_guard_entry)
 	EXCEPT_HANDLERS_END
 	movl   $(RPC_SYSCALL_INFO_METHOD_SYSENTER_32 | RPC_SYSCALL_INFO_FEXCEPT |  \
-	         RPC_SYSCALL_INFO_FARGVALID(0) | RPC_SYSCALL_INFO_FARGVALID(1) |   \
-	         RPC_SYSCALL_INFO_FARGVALID(2) | RPC_SYSCALL_INFO_FARGVALID(3)), %eax
+	         RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) |   \
+	         RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3)), %eax
 	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    1f
 .Lsysenter_guard_start:
 	movl   0(%ebp), %ecx
 	movl   %ecx, 24(%esp) /* ARG[4] */
-	orl    $(RPC_SYSCALL_INFO_FARGVALID(4)), %eax
+	orl    $(RPC_SYSCALL_INFO_FREGVALID(4)), %eax
 	movl   4(%ebp), %ecx
 .Lsysenter_guard_end:
 	movl   %ecx, 28(%esp) /* ARG[5] */
-	orl    $(RPC_SYSCALL_INFO_FARGVALID(5)), %eax
+	orl    $(RPC_SYSCALL_INFO_FREGVALID(5)), %eax
 .Lsysenter_guard_entry:
 1:	ret
 	.cfi_endproc

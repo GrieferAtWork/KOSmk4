@@ -202,7 +202,7 @@ sys_iopl_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
              unsigned int reason, struct rpc_syscall_info const *sc_info) {
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		state = sys_iopl_impl(state,
-		                      sc_info->rsi_args[0]);
+		                      sc_info->rsi_regs[0]);
 	}
 	return state;
 }

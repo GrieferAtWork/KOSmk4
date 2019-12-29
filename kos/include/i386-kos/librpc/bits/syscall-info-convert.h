@@ -34,38 +34,38 @@ __DECL_BEGIN
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(rpc_syscall_info32_to_rpc_syscall_info32)(struct rpc_syscall_info32 const *__restrict __self,
                                                         struct rpc_syscall_info32 *__restrict __result,
-                                                        unsigned int __max_argc __DFL(6)) {
-	__libc_memcpy(__result, __self, OFFSET_RPC_SYSCALL_INFO32_ARG(__max_argc));
+                                                        unsigned int __max_regc __DFL(6)) {
+	__libc_memcpy(__result, __self, OFFSET_RPC_SYSCALL_INFO32_REG(__max_regc));
 }
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(rpc_syscall_info64_to_rpc_syscall_info64)(struct rpc_syscall_info64 const *__restrict __self,
                                                         struct rpc_syscall_info64 *__restrict __result,
-                                                        unsigned int __max_argc __DFL(6)) {
-	__libc_memcpy(__result, __self, OFFSET_RPC_SYSCALL_INFO64_ARG(__max_argc));
+                                                        unsigned int __max_regc __DFL(6)) {
+	__libc_memcpy(__result, __self, OFFSET_RPC_SYSCALL_INFO64_REG(__max_regc));
 }
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(rpc_syscall_info32_to_rpc_syscall_info64)(struct rpc_syscall_info32 const *__restrict __self,
                                                         struct rpc_syscall_info64 *__restrict __result,
-                                                        unsigned int __max_argc __DFL(6)) {
+                                                        unsigned int __max_regc __DFL(6)) {
 	unsigned int __i;
 	__result->rsi_flags = (__UINT64_TYPE__)__self->rsi_flags;
 	__result->rsi_sysno = (__UINT64_TYPE__)__self->rsi_sysno;
-	for (__i = 0; __i < __max_argc; ++__i) {
-		__result->rsi_args[__i] = (__UINT64_TYPE__)__self->rsi_args[__i];
+	for (__i = 0; __i < __max_regc; ++__i) {
+		__result->rsi_regs[__i] = (__UINT64_TYPE__)__self->rsi_regs[__i];
 	}
 }
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(rpc_syscall_info64_to_rpc_syscall_info32)(struct rpc_syscall_info64 const *__restrict __self,
                                                         struct rpc_syscall_info32 *__restrict __result,
-                                                        unsigned int __max_argc __DFL(6)) {
+                                                        unsigned int __max_regc __DFL(6)) {
 	unsigned int __i;
 	__result->rsi_flags = (__UINT32_TYPE__)__self->rsi_flags;
 	__result->rsi_sysno = (__UINT32_TYPE__)__self->rsi_sysno;
-	for (__i = 0; __i < __max_argc; ++__i) {
-		__result->rsi_args[__i] = (__UINT32_TYPE__)__self->rsi_args[__i];
+	for (__i = 0; __i < __max_regc; ++__i) {
+		__result->rsi_regs[__i] = (__UINT32_TYPE__)__self->rsi_regs[__i];
 	}
 }
 

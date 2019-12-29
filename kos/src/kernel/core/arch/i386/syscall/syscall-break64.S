@@ -49,7 +49,7 @@
 /* SyscallInvalidFlags(Count) */
 #define SIF(c) \
 	(RPC_SYSCALL_INFO_METHOD_OTHER_64 | RPC_SYSCALL_INFO_FEXCEPT | \
-	 ((1 << (c)) - 1) << RPC_SYSCALL_INFO_FARGVALID_SHIFT)
+	 ((1 << (c)) - 1) << RPC_SYSCALL_INFO_FREGVALID_SHIFT)
 
 /* Called when a system call is recognized, but hasn't been implemented yet */
 .cfi_startproc
@@ -162,7 +162,7 @@ DEFINE_PUBLIC_ALIAS(sys_break, sys_break6)
 /* SyscallInvalidFlags(Count) */
 #define SIF(c) \
 	(RPC_SYSCALL_INFO_METHOD_OTHER_32 | RPC_SYSCALL_INFO_FEXCEPT | \
-	 ((1 << (c)) - 1) << RPC_SYSCALL_INFO_FARGVALID_SHIFT)
+	 ((1 << (c)) - 1) << RPC_SYSCALL_INFO_FREGVALID_SHIFT)
 
 /* Called when a system call is recognized, but hasn't been implemented yet */
 .cfi_startproc

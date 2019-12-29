@@ -70,8 +70,8 @@ x86_emulate_syscall32_lcall7(struct icpustate *__restrict state, u32 segment_off
 			validate_readable(argv, argc * 4);
 			for (i = 0; i < argc; ++i) {
 				u32 arg = ATOMIC_READ(argv[i]);
-				sc_info.rsi_args[i] = (syscall_ulong_t)arg;
-				sc_info.rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(i);
+				sc_info.rsi_regs[i] = (syscall_ulong_t)arg;
+				sc_info.rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 			}
 		} EXCEPT {
 			x86_userexcept_unwind_i(state, &sc_info);
@@ -101,8 +101,8 @@ x86_emulate_syscall64_lcall7(struct icpustate *__restrict state, u64 segment_off
 			validate_readable(argv, argc * 8);
 			for (i = 0; i < argc; ++i) {
 				u64 arg = ATOMIC_READ(argv[i]);
-				sc_info.rsi_args[i] = (syscall_ulong_t)arg;
-				sc_info.rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(i);
+				sc_info.rsi_regs[i] = (syscall_ulong_t)arg;
+				sc_info.rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 			}
 		} EXCEPT {
 			x86_userexcept_unwind_i(state, &sc_info);

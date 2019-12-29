@@ -65,21 +65,21 @@ LOCAL NONNULL((1, 2)) void
 NOTHROW(FCALL rpc_syscall_info_get32_int80h_ucpustate)(struct rpc_syscall_info *__restrict self,
                                                        struct ucpustate const *__restrict state) {
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_INT80H_32 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3) |
-	                  RPC_SYSCALL_INFO_FARGVALID(4) |
-	                  RPC_SYSCALL_INFO_FARGVALID(5);
+	                  RPC_SYSCALL_INFO_FREGVALID(0) |
+	                  RPC_SYSCALL_INFO_FREGVALID(1) |
+	                  RPC_SYSCALL_INFO_FREGVALID(2) |
+	                  RPC_SYSCALL_INFO_FREGVALID(3) |
+	                  RPC_SYSCALL_INFO_FREGVALID(4) |
+	                  RPC_SYSCALL_INFO_FREGVALID(5);
 	if (ucpustate_getpflags(state) & EFLAGS_CF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ucs_gpregs);
-	self->rsi_args[0] = gpregs_getpbx(&state->ucs_gpregs);
-	self->rsi_args[1] = gpregs_getpcx(&state->ucs_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ucs_gpregs);
-	self->rsi_args[3] = gpregs_getpsi(&state->ucs_gpregs);
-	self->rsi_args[4] = gpregs_getpdi(&state->ucs_gpregs);
-	self->rsi_args[5] = gpregs_getpbp(&state->ucs_gpregs);
+	self->rsi_regs[0] = gpregs_getpbx(&state->ucs_gpregs);
+	self->rsi_regs[1] = gpregs_getpcx(&state->ucs_gpregs);
+	self->rsi_regs[2] = gpregs_getpdx(&state->ucs_gpregs);
+	self->rsi_regs[3] = gpregs_getpsi(&state->ucs_gpregs);
+	self->rsi_regs[4] = gpregs_getpdi(&state->ucs_gpregs);
+	self->rsi_regs[5] = gpregs_getpbp(&state->ucs_gpregs);
 }
 
 /* 32-bit: int 80h */
@@ -87,21 +87,21 @@ LOCAL NONNULL((1, 2)) void
 NOTHROW(FCALL rpc_syscall_info_get32_int80h_icpustate)(struct rpc_syscall_info *__restrict self,
                                                        struct icpustate const *__restrict state) {
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_INT80H_32 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3) |
-	                  RPC_SYSCALL_INFO_FARGVALID(4) |
-	                  RPC_SYSCALL_INFO_FARGVALID(5);
+	                  RPC_SYSCALL_INFO_FREGVALID(0) |
+	                  RPC_SYSCALL_INFO_FREGVALID(1) |
+	                  RPC_SYSCALL_INFO_FREGVALID(2) |
+	                  RPC_SYSCALL_INFO_FREGVALID(3) |
+	                  RPC_SYSCALL_INFO_FREGVALID(4) |
+	                  RPC_SYSCALL_INFO_FREGVALID(5);
 	if (icpustate_getpflags(state) & EFLAGS_CF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
-	self->rsi_args[0] = gpregs_getpbx(&state->ics_gpregs);
-	self->rsi_args[1] = gpregs_getpcx(&state->ics_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
-	self->rsi_args[3] = gpregs_getpsi(&state->ics_gpregs);
-	self->rsi_args[4] = gpregs_getpdi(&state->ics_gpregs);
-	self->rsi_args[5] = gpregs_getpbp(&state->ics_gpregs);
+	self->rsi_regs[0] = gpregs_getpbx(&state->ics_gpregs);
+	self->rsi_regs[1] = gpregs_getpcx(&state->ics_gpregs);
+	self->rsi_regs[2] = gpregs_getpdx(&state->ics_gpregs);
+	self->rsi_regs[3] = gpregs_getpsi(&state->ics_gpregs);
+	self->rsi_regs[4] = gpregs_getpdi(&state->ics_gpregs);
+	self->rsi_regs[5] = gpregs_getpbp(&state->ics_gpregs);
 }
 
 /* 32-bit: sysenter */
@@ -111,27 +111,27 @@ rpc_syscall_info_get32_sysenter_icpustate(struct rpc_syscall_info *__restrict se
 		THROWS(E_SEGFAULT) {
 	unsigned int regcount;
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_SYSENTER_32 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3);
+	                  RPC_SYSCALL_INFO_FREGVALID(0) |
+	                  RPC_SYSCALL_INFO_FREGVALID(1) |
+	                  RPC_SYSCALL_INFO_FREGVALID(2) |
+	                  RPC_SYSCALL_INFO_FREGVALID(3);
 	if (icpustate_getpflags(state) & EFLAGS_CF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
-	self->rsi_args[0] = gpregs_getpbx(&state->ics_gpregs);
-	self->rsi_args[1] = gpregs_getpcx(&state->ics_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
-	self->rsi_args[3] = gpregs_getpsi(&state->ics_gpregs);
+	self->rsi_regs[0] = gpregs_getpbx(&state->ics_gpregs);
+	self->rsi_regs[1] = gpregs_getpcx(&state->ics_gpregs);
+	self->rsi_regs[2] = gpregs_getpdx(&state->ics_gpregs);
+	self->rsi_regs[3] = gpregs_getpsi(&state->ics_gpregs);
 	regcount = kernel_syscall32_regcnt(self->rsi_sysno);
 	if (regcount >= 5) {
 		USER u32 *ebp;
 		ebp = (USER u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ics_gpregs);
 		validate_readable(ebp, 4);
-		self->rsi_args[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
-		self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(4);
+		self->rsi_regs[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
+		self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(4);
 		if (regcount >= 6) {
-			self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(5);
-			self->rsi_args[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
+			self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(5);
+			self->rsi_regs[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
 		}
 	}
 }
@@ -142,17 +142,17 @@ NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate_nx)(struct rpc_syscall_i
                                                             struct ucpustate const *__restrict state) {
 	unsigned int regcount;
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_SYSENTER_32 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3);
+	                  RPC_SYSCALL_INFO_FREGVALID(0) |
+	                  RPC_SYSCALL_INFO_FREGVALID(1) |
+	                  RPC_SYSCALL_INFO_FREGVALID(2) |
+	                  RPC_SYSCALL_INFO_FREGVALID(3);
 	if (ucpustate_getpflags(state) & EFLAGS_CF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ucs_gpregs);
-	self->rsi_args[0] = gpregs_getpbx(&state->ucs_gpregs);
-	self->rsi_args[1] = gpregs_getpcx(&state->ucs_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ucs_gpregs);
-	self->rsi_args[3] = gpregs_getpsi(&state->ucs_gpregs);
+	self->rsi_regs[0] = gpregs_getpbx(&state->ucs_gpregs);
+	self->rsi_regs[1] = gpregs_getpcx(&state->ucs_gpregs);
+	self->rsi_regs[2] = gpregs_getpdx(&state->ucs_gpregs);
+	self->rsi_regs[3] = gpregs_getpsi(&state->ucs_gpregs);
 	regcount = kernel_syscall32_regcnt(self->rsi_sysno);
 	if (regcount >= 5) {
 		u32 *ebp = (u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ucs_gpregs);
@@ -160,11 +160,11 @@ NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate_nx)(struct rpc_syscall_i
 			struct exception_info old_info;
 			memcpy(&old_info, &THIS_EXCEPTION_INFO, sizeof(struct exception_info));
 			TRY {
-				self->rsi_args[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
-				self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(4);
+				self->rsi_regs[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
+				self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(4);
 				if (regcount >= 6) {
-					self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(5);
-					self->rsi_args[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
+					self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(5);
+					self->rsi_regs[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
 				}
 			} EXCEPT {
 				goto restore_exception;
@@ -194,8 +194,8 @@ NOTHROW(FCALL rpc_syscall_info_get32_cdecl_icpustate)(struct rpc_syscall_info *_
 		esp = (USER u32 *)(uintptr_t)(u32)icpustate_getuserpsp(state);
 		validate_readable(esp, regcount * 4);
 		for (i = 0; i < regcount; ++i) {
-			self->rsi_args[i] = __hybrid_atomic_load(esp[i], __ATOMIC_ACQUIRE);
-			self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(i);
+			self->rsi_regs[i] = __hybrid_atomic_load(esp[i], __ATOMIC_ACQUIRE);
+			self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 		}
 	}
 }
@@ -236,8 +236,8 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 			       sizeof(struct exception_info));
 			TRY {
 				for (i = 0; i < argc; ++i) {
-					self->rsi_args[i] = __hybrid_atomic_load(sp[i], __ATOMIC_ACQUIRE);
-					self->rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(i);
+					self->rsi_regs[i] = __hybrid_atomic_load(sp[i], __ATOMIC_ACQUIRE);
+					self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 				}
 			} EXCEPT {
 				goto restore_exception;
@@ -260,21 +260,21 @@ LOCAL NONNULL((1, 2)) void /* or `rpc_syscall_info_get64_syscall_ucpustate' */
 NOTHROW(FCALL rpc_syscall_info_get64_int80h_ucpustate)(struct rpc_syscall_info *__restrict self,
                                                        struct ucpustate const *__restrict state) {
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_INT80H_64 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3) |
-	                  RPC_SYSCALL_INFO_FARGVALID(4) |
-	                  RPC_SYSCALL_INFO_FARGVALID(5);
+	                  RPC_SYSCALL_INFO_FREGVALID(0) |
+	                  RPC_SYSCALL_INFO_FREGVALID(1) |
+	                  RPC_SYSCALL_INFO_FREGVALID(2) |
+	                  RPC_SYSCALL_INFO_FREGVALID(3) |
+	                  RPC_SYSCALL_INFO_FREGVALID(4) |
+	                  RPC_SYSCALL_INFO_FREGVALID(5);
 	if (ucpustate_getpflags(state) & EFLAGS_CF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ucs_gpregs);
-	self->rsi_args[0] = gpregs_getpdi(&state->ucs_gpregs);
-	self->rsi_args[1] = gpregs_getpsi(&state->ucs_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ucs_gpregs);
-	self->rsi_args[3] = gpregs_getp10(&state->ucs_gpregs);
-	self->rsi_args[4] = gpregs_getp8(&state->ucs_gpregs);
-	self->rsi_args[5] = gpregs_getp9(&state->ucs_gpregs);
+	self->rsi_regs[0] = gpregs_getpdi(&state->ucs_gpregs);
+	self->rsi_regs[1] = gpregs_getpsi(&state->ucs_gpregs);
+	self->rsi_regs[2] = gpregs_getpdx(&state->ucs_gpregs);
+	self->rsi_regs[3] = gpregs_getp10(&state->ucs_gpregs);
+	self->rsi_regs[4] = gpregs_getp8(&state->ucs_gpregs);
+	self->rsi_regs[5] = gpregs_getp9(&state->ucs_gpregs);
 }
 
 /* 64-bit: syscall / int 80h */
@@ -282,21 +282,21 @@ LOCAL NONNULL((1, 2)) void /* or `rpc_syscall_info_get64_syscall_icpustate' */
 NOTHROW(FCALL rpc_syscall_info_get64_int80h_icpustate)(struct rpc_syscall_info *__restrict self,
                                                        struct icpustate const *__restrict state) {
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_INT80H_64 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3) |
-	                  RPC_SYSCALL_INFO_FARGVALID(4) |
-	                  RPC_SYSCALL_INFO_FARGVALID(5);
+	                  RPC_SYSCALL_INFO_FREGVALID(0) |
+	                  RPC_SYSCALL_INFO_FREGVALID(1) |
+	                  RPC_SYSCALL_INFO_FREGVALID(2) |
+	                  RPC_SYSCALL_INFO_FREGVALID(3) |
+	                  RPC_SYSCALL_INFO_FREGVALID(4) |
+	                  RPC_SYSCALL_INFO_FREGVALID(5);
 	if (icpustate_getpflags(state) & EFLAGS_CF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
-	self->rsi_args[0] = gpregs_getpdi(&state->ics_gpregs);
-	self->rsi_args[1] = gpregs_getpsi(&state->ics_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
-	self->rsi_args[3] = gpregs_getp10(&state->ics_gpregs);
-	self->rsi_args[4] = gpregs_getp8(&state->ics_gpregs);
-	self->rsi_args[5] = gpregs_getp9(&state->ics_gpregs);
+	self->rsi_regs[0] = gpregs_getpdi(&state->ics_gpregs);
+	self->rsi_regs[1] = gpregs_getpsi(&state->ics_gpregs);
+	self->rsi_regs[2] = gpregs_getpdx(&state->ics_gpregs);
+	self->rsi_regs[3] = gpregs_getp10(&state->ics_gpregs);
+	self->rsi_regs[4] = gpregs_getp8(&state->ics_gpregs);
+	self->rsi_regs[5] = gpregs_getp9(&state->ics_gpregs);
 }
 
 /* 64-bit: ATTR_SYSVABI */
@@ -305,21 +305,21 @@ rpc_syscall_info_get64_sysvabi_icpustate(struct rpc_syscall_info *__restrict sel
                                          struct icpustate const *__restrict state,
                                          u64 sysno, bool enable_except) {
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_SYSVABI_64 |
-	                  RPC_SYSCALL_INFO_FARGVALID(0) |
-	                  RPC_SYSCALL_INFO_FARGVALID(1) |
-	                  RPC_SYSCALL_INFO_FARGVALID(2) |
-	                  RPC_SYSCALL_INFO_FARGVALID(3) |
-	                  RPC_SYSCALL_INFO_FARGVALID(4) |
-	                  RPC_SYSCALL_INFO_FARGVALID(5);
+	                  RPC_SYSCALL_INFO_FREGVALID(0) |
+	                  RPC_SYSCALL_INFO_FREGVALID(1) |
+	                  RPC_SYSCALL_INFO_FREGVALID(2) |
+	                  RPC_SYSCALL_INFO_FREGVALID(3) |
+	                  RPC_SYSCALL_INFO_FREGVALID(4) |
+	                  RPC_SYSCALL_INFO_FREGVALID(5);
 	if (enable_except)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = sysno;
-	self->rsi_args[0] = gpregs_getpdi(&state->ics_gpregs);
-	self->rsi_args[1] = gpregs_getpsi(&state->ics_gpregs);
-	self->rsi_args[2] = gpregs_getpdx(&state->ics_gpregs);
-	self->rsi_args[3] = gpregs_getpcx(&state->ics_gpregs);
-	self->rsi_args[4] = gpregs_getp8(&state->ics_gpregs);
-	self->rsi_args[5] = gpregs_getp9(&state->ics_gpregs);
+	self->rsi_regs[0] = gpregs_getpdi(&state->ics_gpregs);
+	self->rsi_regs[1] = gpregs_getpsi(&state->ics_gpregs);
+	self->rsi_regs[2] = gpregs_getpdx(&state->ics_gpregs);
+	self->rsi_regs[3] = gpregs_getpcx(&state->ics_gpregs);
+	self->rsi_regs[4] = gpregs_getp8(&state->ics_gpregs);
+	self->rsi_regs[5] = gpregs_getp9(&state->ics_gpregs);
 }
 #endif /* __x86_64__ */
 

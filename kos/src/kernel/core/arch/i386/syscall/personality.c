@@ -170,17 +170,17 @@ x86_syscall32_lcall7_main(struct x86_syscall32_lcall7_args *__restrict args,
 		if likely(ADDR_ISUSER(usp)) {
 			TRY {
 				argv[0] = ATOMIC_READ(usp[0]);
-				rpc_flags |= RPC_SYSCALL_INFO_FARGVALID(0);
+				rpc_flags |= RPC_SYSCALL_INFO_FREGVALID(0);
 				argv[1] = ATOMIC_READ(usp[1]);
-				rpc_flags |= RPC_SYSCALL_INFO_FARGVALID(1);
+				rpc_flags |= RPC_SYSCALL_INFO_FREGVALID(1);
 				argv[2] = ATOMIC_READ(usp[2]);
-				rpc_flags |= RPC_SYSCALL_INFO_FARGVALID(2);
+				rpc_flags |= RPC_SYSCALL_INFO_FREGVALID(2);
 				argv[3] = ATOMIC_READ(usp[3]);
-				rpc_flags |= RPC_SYSCALL_INFO_FARGVALID(3);
+				rpc_flags |= RPC_SYSCALL_INFO_FREGVALID(3);
 				argv[4] = ATOMIC_READ(usp[4]);
-				rpc_flags |= RPC_SYSCALL_INFO_FARGVALID(4);
+				rpc_flags |= RPC_SYSCALL_INFO_FREGVALID(4);
 				argv[5] = ATOMIC_READ(usp[5]);
-				rpc_flags |= RPC_SYSCALL_INFO_FARGVALID(5);
+				rpc_flags |= RPC_SYSCALL_INFO_FREGVALID(5);
 			} EXCEPT {
 			}
 		}
