@@ -156,7 +156,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execl") void
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	va_end(vargs);
 	Execv(path,
 	      (char const *const *)vector);
@@ -188,7 +188,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execle") void
 	va_list vargs;
 	char **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
 	Execve(path,
@@ -218,7 +218,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execpl") void
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	va_end(vargs);
 	Execvp(file,
 	       (char const *const *)vector);
@@ -250,7 +250,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execlpe") void
 	va_list vargs;
 	char **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
 	Execvpe(file,

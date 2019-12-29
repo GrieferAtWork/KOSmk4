@@ -164,7 +164,7 @@ NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	va_end(vargs);
 	return execv(path,
 	             (char const *const *)vector);
@@ -194,7 +194,7 @@ NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
 	va_list vargs;
 	char **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
 	return execve(path,
@@ -222,7 +222,7 @@ NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file,
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	va_end(vargs);
 	return execvp(file,
 	              (char const *const *)vector);
@@ -309,7 +309,7 @@ NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
 	va_list vargs;
 	char **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char, vector, vargs, args);
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
 	return execvpe(file,

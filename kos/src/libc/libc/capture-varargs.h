@@ -29,22 +29,29 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-#define CAPTURE_VARARGS(T, vector, args)                             \
+#define CAPTURE_VARARGS_PLUS_ONE(T, vector, args, first)             \
 	do {                                                             \
 		T *arg;                                                      \
 		size_t count = 0;                                            \
 		__builtin_va_list copy;                                      \
 		__builtin_va_copy(copy, args);                               \
-		while ((arg = __builtin_va_arg(copy, T *)) != NULL)          \
+		if (first) {                                                 \
 			++count;                                                 \
+			while ((arg = __builtin_va_arg(copy, T *)) != NULL)      \
+				++count;                                             \
+		}                                                            \
 		__builtin_va_end(copy);                                      \
 		/* Always need to use alloca(), since malloc() might corrupt \
 		 * the heap in a vfork() scenario */                         \
-		vector = (T **)alloca((count + 1) * sizeof(T *));            \
-		count  = 0;                                                  \
-		do {                                                         \
-			vector[count++] = arg = __builtin_va_arg(args, T *);     \
-		} while (arg != NULL);                                       \
+		vector    = (T **)alloca((count + 1) * sizeof(T *));         \
+		vector[0] = (T *)(first);                                    \
+		if (first) {                                                 \
+			count = 1;                                               \
+			do {                                                     \
+				arg = __builtin_va_arg(args, T *);                   \
+				vector[count++] = arg;                               \
+			} while (arg != NULL);                                   \
+		}                                                            \
 	} __WHILE0
 
 #endif /* __CC__ */

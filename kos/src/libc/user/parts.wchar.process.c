@@ -292,7 +292,7 @@ NOTHROW_RPC(VLIBCCALL libc_wexecl)(char32_t const *__restrict path,
 	va_list vargs;
 	char32_t **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char32_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char32_t, vector, vargs, args);
 	va_end(vargs);
 	return libc_do_c32exec(path, (char32_t const *const *)vector, NULL, false);
 #endif
@@ -313,7 +313,7 @@ NOTHROW_RPC(VLIBDCALL libd_wexecl)(char16_t const *__restrict path,
 	va_list vargs;
 	char16_t **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char16_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char16_t, vector, vargs, args);
 	va_end(vargs);
 	return libc_do_c16exec(path, (char16_t const *const *)vector, NULL, false);
 #endif
@@ -340,7 +340,7 @@ NOTHROW_RPC(VLIBCCALL libc_wexecle)(char32_t const *__restrict path,
 	va_list vargs;
 	char32_t **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char32_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char32_t, vector, vargs, args);
 	envp = va_arg(vargs, char32_t **);
 	va_end(vargs);
 	return libc_do_c32exec(path,
@@ -371,7 +371,7 @@ NOTHROW_RPC(VLIBDCALL libd_wexecle)(char16_t const *__restrict path,
 	va_list vargs;
 	char16_t **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char16_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char16_t, vector, vargs, args);
 	envp = va_arg(vargs, char16_t **);
 	va_end(vargs);
 	return libc_do_c16exec(path,
@@ -396,7 +396,7 @@ NOTHROW_RPC(VLIBCCALL libc_wexeclp)(char32_t const *__restrict file,
 	va_list vargs;
 	char32_t **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char32_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char32_t, vector, vargs, args);
 	va_end(vargs);
 	return libc_do_c32exec(file, (char32_t const *const *)vector, NULL, true);
 #endif
@@ -417,7 +417,7 @@ NOTHROW_RPC(VLIBDCALL libd_wexeclp)(char16_t const *__restrict file,
 	va_list vargs;
 	char16_t **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char16_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char16_t, vector, vargs, args);
 	va_end(vargs);
 	return libc_do_c16exec(file, (char16_t const *const *)vector, NULL, true);
 #endif
@@ -444,7 +444,7 @@ NOTHROW_RPC(VLIBCCALL libc_wexeclpe)(char32_t const *__restrict file,
 	va_list vargs;
 	char32_t **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char32_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char32_t, vector, vargs, args);
 	envp = va_arg(vargs, char32_t **);
 	va_end(vargs);
 	return libc_do_c32exec(file,
@@ -475,7 +475,7 @@ NOTHROW_RPC(VLIBDCALL libd_wexeclpe)(char16_t const *__restrict file,
 	va_list vargs;
 	char16_t **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char16_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char16_t, vector, vargs, args);
 	envp = va_arg(vargs, char16_t **);
 	va_end(vargs);
 	return libc_do_c16exec(file,
@@ -601,7 +601,7 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnl)(int mode,
 	va_list vargs;
 	char32_t **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char32_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char32_t, vector, vargs, args);
 	va_end(vargs);
 	return libc_do_c32spawn(mode, path, (char32_t const *const *)vector, NULL, false);
 #endif
@@ -623,7 +623,7 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnl)(int mode,
 	va_list vargs;
 	char16_t **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char16_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char16_t, vector, vargs, args);
 	va_end(vargs);
 	return libc_do_c16spawn(mode, path, (char16_t const *const *)vector, NULL, false);
 #endif
@@ -651,7 +651,7 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnle)(int mode,
 	va_list vargs;
 	char32_t **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char32_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char32_t, vector, vargs, args);
 	envp = va_arg(vargs, char32_t **);
 	va_end(vargs);
 	return libc_do_c32spawn(mode, path,
@@ -683,7 +683,7 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnle)(int mode,
 	va_list vargs;
 	char16_t **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char16_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char16_t, vector, vargs, args);
 	envp = va_arg(vargs, char16_t **);
 	va_end(vargs);
 	return libc_do_c16spawn(mode, path,
@@ -709,7 +709,7 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnlp)(int mode,
 	va_list vargs;
 	char32_t **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char32_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char32_t, vector, vargs, args);
 	va_end(vargs);
 	return libc_do_c32spawn(mode, file, (char32_t const *const *)vector, NULL, true);
 #endif
@@ -731,7 +731,7 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnlp)(int mode,
 	va_list vargs;
 	char16_t **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char16_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char16_t, vector, vargs, args);
 	va_end(vargs);
 	return libc_do_c16spawn(mode, file, (char16_t const *const *)vector, NULL, true);
 #endif
@@ -759,7 +759,7 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnlpe)(int mode,
 	va_list vargs;
 	char32_t **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char32_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char32_t, vector, vargs, args);
 	envp = va_arg(vargs, char32_t **);
 	va_end(vargs);
 	return libc_do_c32spawn(mode, file,
@@ -791,7 +791,7 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnlpe)(int mode,
 	va_list vargs;
 	char16_t **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(char16_t, vector, vargs);
+	CAPTURE_VARARGS_PLUS_ONE(char16_t, vector, vargs, args);
 	envp = va_arg(vargs, char16_t **);
 	va_end(vargs);
 	return libc_do_c16spawn(mode, file,
