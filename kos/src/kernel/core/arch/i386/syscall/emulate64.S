@@ -181,19 +181,14 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	/* Figure out which system call is actually being invoked. */
 	movzlq OFFSET_RPC_SYSCALL_INFO_SYSNO(%rbx), %rax
 
-	/* Load system call arguments (from `sc_info') */
-	movq   (OFFSET_RPC_SYSCALL_INFO_REG(0))(%rbx), %rdi
-	movq   (OFFSET_RPC_SYSCALL_INFO_REG(1))(%rbx), %rsi
-	movq   (OFFSET_RPC_SYSCALL_INFO_REG(2))(%rbx), %rdx
-	movq   (OFFSET_RPC_SYSCALL_INFO_REG(3))(%rbx), %rcx
-	movq   (OFFSET_RPC_SYSCALL_INFO_REG(4))(%rbx), %r8
-	movq   (OFFSET_RPC_SYSCALL_INFO_REG(5))(%rbx), %r9
+	/* Load the system call argument vector (from `sc_info') */
+	leaq   (OFFSET_RPC_SYSCALL_INFO_REG(0))(%rbx), %rdi
 
 	cmpl   $(__NR32_syscall0_max), %eax
 	ja     .Lcall_sysex32
 	pushq_cfi $.Lnormal_return32
-	EXTERN(x86_sysroute0_c32)
-	jmpq   *x86_sysroute0_c32(,%rax,8)
+	EXTERN(x86_sysroute0_runc32)
+	jmpq   *x86_sysroute0_runc32(,%rax,8)
 	.cfi_adjust_cfa_offset -8
 .Lbad_sysno32:
 	/* %rax is a system call number that doesn't exist. */
@@ -209,8 +204,8 @@ INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	ja     .Lbad_sysno32
 	subl   $(__NR32_syscall1_min), %eax
 	jb     .Lbad_sysno32
-	EXTERN(x86_sysroute1_c32)
-	callq  *x86_sysroute1_c32(,%rax,8)
+	EXTERN(x86_sysroute1_runc32)
+	callq  *x86_sysroute1_runc32(,%rax,8)
 .Lnormal_return32:
 
 

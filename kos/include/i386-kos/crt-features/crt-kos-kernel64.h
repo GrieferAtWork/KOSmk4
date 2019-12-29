@@ -2821,11 +2821,13 @@
 #define __CRT_HAVE_x86_sysroute0_asm64_syscall 1
 #define __CRT_HAVE_x86_sysroute0_c 1
 #define __CRT_HAVE_x86_sysroute0_c32 1
+#define __CRT_HAVE_x86_sysroute0_runc32 1
 #define __CRT_HAVE_x86_sysroute1_asm32_int80 1
 #define __CRT_HAVE_x86_sysroute1_asm32_sysenter 1
 #define __CRT_HAVE_x86_sysroute1_asm64_syscall 1
 #define __CRT_HAVE_x86_sysroute1_c 1
 #define __CRT_HAVE_x86_sysroute1_c32 1
+#define __CRT_HAVE_x86_sysroute1_runc32 1
 #define __CRT_HAVE_x86_userexcept_callhandler 1
 #define __CRT_HAVE_x86_userexcept_callhandler32 1
 #define __CRT_HAVE_x86_userexcept_callhandler64 1

@@ -6722,10 +6722,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak x86_memcpy_nopf_ret_pointer; .quad x86_memcpy_nopf_ret_pointer
 	.reloc ., R_X86_64_SIZE32, x86_memcpy_nopf_ret_pointer; .int 0
 	.int 0x8a132d2
-	.quad 0 /* index: 1680 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1680 /* index: 1680 */
+	.weak x86_sysroute1_runc32; .quad x86_sysroute1_runc32
+	.reloc ., R_X86_64_SIZE32, x86_sysroute1_runc32; .int 0
+	.int 0x23259e2
 	.quad .Lname1681 /* index: 1681 */
 	.weak sys32_detach; .quad sys32_detach
 	.reloc ., R_X86_64_SIZE32, sys32_detach; .int 0
@@ -7350,10 +7350,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 1837 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1837 /* index: 1837 */
+	.weak x86_sysroute0_runc32; .quad x86_sysroute0_runc32
+	.reloc ., R_X86_64_SIZE32, x86_sysroute0_runc32; .int 0
+	.int 0x2325932
 	.quad 0 /* index: 1838 */
 	.quad 0
 	.int 0
@@ -18714,6 +18714,8 @@ END(kernel_symbol_table)
 	.string "keymap_instrlen"
 .Lname1679:
 	.string "x86_memcpy_nopf_ret_pointer"
+.Lname1680:
+	.string "x86_sysroute1_runc32"
 .Lname1681:
 	.string "sys32_detach"
 .Lname1683:
@@ -18920,6 +18922,8 @@ END(kernel_symbol_table)
 	.string "vm_oninit_callbacks"
 .Lname1835:
 	.string "sys_symlink"
+.Lname1837:
+	.string "x86_sysroute0_runc32"
 .Lname1839:
 	.string "x86_bootcpu_gdt"
 .Lname1841:

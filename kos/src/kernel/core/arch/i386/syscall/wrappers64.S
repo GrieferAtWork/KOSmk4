@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x589d3d77 */
+/* HASH CRC-32:0x338a4846 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30219,6 +30219,5286 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	intr_exit_sysret
 	.cfi_endproc
 END(__x86_asm32_sysenter_recvmmsg64)
+
+
+
+
+
+
+
+
+
+
+/* errno_t restart_syscall(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_restart_syscall, sys32_restart_syscall); */
+
+/* void exit(syscall_ulong_t status) */
+.section .text.x86.asm32_syscall_sysrun32.exit
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_exit)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_exit)
+	jmp    sys32_exit
+	.cfi_endproc
+END(__x86_asm32_sysrun32_exit)
+
+/* pid_t fork(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_fork, sys32_fork); */
+
+/* ssize_t read(fd_t fd, void *buf, size_t bufsize) */
+.section .text.x86.asm32_syscall_sysrun32.read
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_read)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_read)
+	jmp    sys32_read
+	.cfi_endproc
+END(__x86_asm32_sysrun32_read)
+
+/* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
+.section .text.x86.asm32_syscall_sysrun32.write
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_write)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_write)
+	jmp    sys32_write
+	.cfi_endproc
+END(__x86_asm32_sysrun32_write)
+
+/* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.open
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_open)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_open)
+	jmp    sys32_open
+	.cfi_endproc
+END(__x86_asm32_sysrun32_open)
+
+/* Close a given file descriptor/handle `FD' */
+/* errno_t close(fd_t fd) */
+.section .text.x86.asm32_syscall_sysrun32.close
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_close)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_close)
+	jmp    sys32_close
+	.cfi_endproc
+END(__x86_asm32_sysrun32_close)
+
+/* Wait for a child process:
+ *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
+ *  - `pid == -1': Wait for any child process
+ *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
+ *  - `pid > 0':   Wait for the child whose process ID is equal to `PID'
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* pid_t waitpid(pid_t pid, int32_t *stat_loc, syscall_ulong_t options) */
+.section .text.x86.asm32_syscall_sysrun32.waitpid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitpid)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_waitpid)
+	jmp    sys32_waitpid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_waitpid)
+
+/* fd_t creat(char const *filename, mode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.creat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_creat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_creat)
+	jmp    sys32_creat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_creat)
+
+/* errno_t link(char const *existing_file, char const *link_file) */
+.section .text.x86.asm32_syscall_sysrun32.link
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_link)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_link)
+	jmp    sys32_link
+	.cfi_endproc
+END(__x86_asm32_sysrun32_link)
+
+/* errno_t unlink(char const *filename) */
+.section .text.x86.asm32_syscall_sysrun32.unlink
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_unlink)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_unlink)
+	jmp    sys32_unlink
+	.cfi_endproc
+END(__x86_asm32_sysrun32_unlink)
+
+/* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
+.section .text.x86.asm32_syscall_sysrun32.execve
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_execve)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_execve)
+	jmp    sys32_execve
+	.cfi_endproc
+END(__x86_asm32_sysrun32_execve)
+
+/* errno_t chdir(char const *path) */
+.section .text.x86.asm32_syscall_sysrun32.chdir
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_chdir)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_chdir)
+	jmp    sys32_chdir
+	.cfi_endproc
+END(__x86_asm32_sysrun32_chdir)
+
+/* time32_t time(time32_t *timer) */
+.section .text.x86.asm32_syscall_sysrun32.time
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_time)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_time)
+	jmp    sys32_time
+	.cfi_endproc
+END(__x86_asm32_sysrun32_time)
+
+/* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
+.section .text.x86.asm32_syscall_sysrun32.mknod
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mknod)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mknod)
+	jmp    sys32_mknod
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mknod)
+
+/* errno_t chmod(char const *filename, mode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.chmod
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_chmod)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_chmod)
+	jmp    sys32_chmod
+	.cfi_endproc
+END(__x86_asm32_sysrun32_chmod)
+
+/* errno_t lchown(char const *filename, uint16_t owner, uint16_t group) */
+.section .text.x86.asm32_syscall_sysrun32.lchown
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lchown)
+	.cfi_startproc
+	movzwq 16(%rdi), %rdx
+	movzwq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lchown)
+	jmp    sys32_lchown
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lchown)
+
+/* errno_t break(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_break, sys32_break); */
+
+/* errno_t linux_oldstat(char const *filename, struct linux_oldstat *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_oldstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_oldstat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linux_oldstat)
+	jmp    sys32_linux_oldstat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linux_oldstat)
+
+/* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
+.section .text.x86.asm32_syscall_sysrun32.lseek
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lseek)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lseek)
+	jmp    sys32_lseek
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lseek)
+
+/* pid_t getpid(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getpid, sys32_getpid); */
+
+/* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t rwflag, void const *data) */
+.section .text.x86.asm32_syscall_sysrun32.mount
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mount)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mount)
+	jmp    sys32_mount
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mount)
+
+/* errno_t umount(char const *special_file) */
+.section .text.x86.asm32_syscall_sysrun32.umount
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_umount)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_umount)
+	jmp    sys32_umount
+	.cfi_endproc
+END(__x86_asm32_sysrun32_umount)
+
+/* errno_t setuid(uint16_t uid) */
+.section .text.x86.asm32_syscall_sysrun32.setuid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setuid)
+	.cfi_startproc
+	movzwq 0(%rdi), %rdi
+	EXTERN(sys32_setuid)
+	jmp    sys32_setuid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setuid)
+
+/* uint16_t getuid(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getuid, sys32_getuid); */
+
+/* errno_t stime(time32_t const *t) */
+.section .text.x86.asm32_syscall_sysrun32.stime
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_stime)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_stime)
+	jmp    sys32_stime
+	.cfi_endproc
+END(__x86_asm32_sysrun32_stime)
+
+/* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
+.section .text.x86.asm32_syscall_sysrun32.ptrace
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ptrace)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ptrace)
+	jmp    sys32_ptrace
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ptrace)
+
+/* syscall_ulong_t alarm(syscall_ulong_t seconds) */
+.section .text.x86.asm32_syscall_sysrun32.alarm
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_alarm)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_alarm)
+	jmp    sys32_alarm
+	.cfi_endproc
+END(__x86_asm32_sysrun32_alarm)
+
+/* errno_t linux_oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_oldfstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_oldfstat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linux_oldfstat)
+	jmp    sys32_linux_oldfstat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linux_oldfstat)
+
+/* errno_t pause(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_pause, sys32_pause); */
+
+/* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
+.section .text.x86.asm32_syscall_sysrun32.utime
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_utime)
+	jmp    sys32_utime
+	.cfi_endproc
+END(__x86_asm32_sysrun32_utime)
+
+/* errno_t stty(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_stty, sys32_stty); */
+
+/* errno_t gtty(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_gtty, sys32_gtty); */
+
+/* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK' */
+/* errno_t access(char const *filename, syscall_ulong_t type) */
+.section .text.x86.asm32_syscall_sysrun32.access
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_access)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_access)
+	jmp    sys32_access
+	.cfi_endproc
+END(__x86_asm32_sysrun32_access)
+
+/* errno_t nice(syscall_slong_t inc) */
+.section .text.x86.asm32_syscall_sysrun32.nice
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_nice)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_nice)
+	jmp    sys32_nice
+	.cfi_endproc
+END(__x86_asm32_sysrun32_nice)
+
+/* errno_t ftime(struct timeb *tp) */
+.section .text.x86.asm32_syscall_sysrun32.ftime
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftime)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ftime)
+	jmp    sys32_ftime
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ftime)
+
+/* errno_t sync(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_sync, sys32_sync); */
+
+/* @param: signo: One of `SIG*' */
+/* errno_t kill(pid_t pid, syscall_ulong_t signo) */
+.section .text.x86.asm32_syscall_sysrun32.kill
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kill)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kill)
+	jmp    sys32_kill
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kill)
+
+/* errno_t rename(char const *oldname, char const *newname_or_path) */
+.section .text.x86.asm32_syscall_sysrun32.rename
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rename)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rename)
+	jmp    sys32_rename
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rename)
+
+/* errno_t mkdir(char const *pathname, mode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.mkdir
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mkdir)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mkdir)
+	jmp    sys32_mkdir
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mkdir)
+
+/* errno_t rmdir(char const *path) */
+.section .text.x86.asm32_syscall_sysrun32.rmdir
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rmdir)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rmdir)
+	jmp    sys32_rmdir
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rmdir)
+
+/* fd_t dup(fd_t fd) */
+.section .text.x86.asm32_syscall_sysrun32.dup
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_dup)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_dup)
+	jmp    sys32_dup
+	.cfi_endproc
+END(__x86_asm32_sysrun32_dup)
+
+/* errno_t pipe(fd_t[2] pipedes) */
+.section .text.x86.asm32_syscall_sysrun32.pipe
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pipe)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pipe)
+	jmp    sys32_pipe
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pipe)
+
+/* clock_t times(struct tms *buf) */
+.section .text.x86.asm32_syscall_sysrun32.times
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_times)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_times)
+	jmp    sys32_times
+	.cfi_endproc
+END(__x86_asm32_sysrun32_times)
+
+/* errno_t prof(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_prof, sys32_prof); */
+
+/* errno_t brk(void *addr) */
+.section .text.x86.asm32_syscall_sysrun32.brk
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_brk)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_brk)
+	jmp    sys32_brk
+	.cfi_endproc
+END(__x86_asm32_sysrun32_brk)
+
+/* errno_t setgid(uint16_t gid) */
+.section .text.x86.asm32_syscall_sysrun32.setgid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setgid)
+	.cfi_startproc
+	movzwq 0(%rdi), %rdi
+	EXTERN(sys32_setgid)
+	jmp    sys32_setgid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setgid)
+
+/* uint16_t getgid(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getgid, sys32_getgid); */
+
+/* @param: signo: One of `SIG*' */
+/* sighandler_t signal(syscall_ulong_t signo, sighandler_t handler) */
+.section .text.x86.asm32_syscall_sysrun32.signal
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_signal)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_signal)
+	jmp    sys32_signal
+	.cfi_endproc
+END(__x86_asm32_sysrun32_signal)
+
+/* uint16_t geteuid(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_geteuid, sys32_geteuid); */
+
+/* uint16_t getegid(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getegid, sys32_getegid); */
+
+/* errno_t acct(char const *filename) */
+.section .text.x86.asm32_syscall_sysrun32.acct
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_acct)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_acct)
+	jmp    sys32_acct
+	.cfi_endproc
+END(__x86_asm32_sysrun32_acct)
+
+/* errno_t umount2(char const *special_file, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.umount2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_umount2)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_umount2)
+	jmp    sys32_umount2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_umount2)
+
+/* errno_t lock(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_lock, sys32_lock); */
+
+/* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t request, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.ioctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioctl)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ioctl)
+	jmp    sys32_ioctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ioctl)
+
+/* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.fcntl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fcntl)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fcntl)
+	jmp    sys32_fcntl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fcntl)
+
+/* errno_t mpx(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_mpx, sys32_mpx); */
+
+/* errno_t setpgid(pid_t pid, pid_t pgid) */
+.section .text.x86.asm32_syscall_sysrun32.setpgid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setpgid)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setpgid)
+	jmp    sys32_setpgid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setpgid)
+
+/* errno_t ulimit(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_ulimit, sys32_ulimit); */
+
+/* errno_t oldolduname(struct linux_oldolduname *name) */
+.section .text.x86.asm32_syscall_sysrun32.oldolduname
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_oldolduname)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_oldolduname)
+	jmp    sys32_oldolduname
+	.cfi_endproc
+END(__x86_asm32_sysrun32_oldolduname)
+
+/* mode_t umask(mode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.umask
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_umask)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_umask)
+	jmp    sys32_umask
+	.cfi_endproc
+END(__x86_asm32_sysrun32_umask)
+
+/* errno_t chroot(char const *path) */
+.section .text.x86.asm32_syscall_sysrun32.chroot
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_chroot)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_chroot)
+	jmp    sys32_chroot
+	.cfi_endproc
+END(__x86_asm32_sysrun32_chroot)
+
+/* errno_t ustat(dev_t dev, struct ustat *ubuf) */
+.section .text.x86.asm32_syscall_sysrun32.ustat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ustat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ustat)
+	jmp    sys32_ustat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ustat)
+
+/* fd_t dup2(fd_t oldfd, fd_t newfd) */
+.section .text.x86.asm32_syscall_sysrun32.dup2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_dup2)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_dup2)
+	jmp    sys32_dup2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_dup2)
+
+/* pid_t getppid(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getppid, sys32_getppid); */
+
+/* pid_t getpgrp(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getpgrp, sys32_getpgrp); */
+
+/* pid_t setsid(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_setsid, sys32_setsid); */
+
+/* @param: signo: One of `SIG*' */
+/* errno_t sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact) */
+.section .text.x86.asm32_syscall_sysrun32.sigaction
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigaction)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sigaction)
+	jmp    sys32_sigaction
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sigaction)
+
+/* syscall_ulong_t sgetmask(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_sgetmask, sys32_sgetmask); */
+
+/* syscall_ulong_t ssetmask(syscall_ulong_t sigmask) */
+.section .text.x86.asm32_syscall_sysrun32.ssetmask
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ssetmask)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ssetmask)
+	jmp    sys32_ssetmask
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ssetmask)
+
+/* errno_t setreuid(uint16_t ruid, uint16_t euid) */
+.section .text.x86.asm32_syscall_sysrun32.setreuid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setreuid)
+	.cfi_startproc
+	movzwq 8(%rdi), %rsi
+	movzwq 0(%rdi), %rdi
+	EXTERN(sys32_setreuid)
+	jmp    sys32_setreuid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setreuid)
+
+/* errno_t setregid(uint16_t rgid, uint16_t egid) */
+.section .text.x86.asm32_syscall_sysrun32.setregid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setregid)
+	.cfi_startproc
+	movzwq 8(%rdi), %rsi
+	movzwq 0(%rdi), %rdi
+	EXTERN(sys32_setregid)
+	jmp    sys32_setregid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setregid)
+
+/* errno_t sigsuspend(struct __sigset_struct const *set) */
+.section .text.x86.asm32_syscall_sysrun32.sigsuspend
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigsuspend)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sigsuspend)
+	jmp    sys32_sigsuspend
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sigsuspend)
+
+/* errno_t sigpending(struct __sigset_struct *set) */
+.section .text.x86.asm32_syscall_sysrun32.sigpending
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigpending)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sigpending)
+	jmp    sys32_sigpending
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sigpending)
+
+/* errno_t sethostname(char const *name, size_t len) */
+.section .text.x86.asm32_syscall_sysrun32.sethostname
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sethostname)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sethostname)
+	jmp    sys32_sethostname
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sethostname)
+
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+.section .text.x86.asm32_syscall_sysrun32.setrlimit
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setrlimit)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setrlimit)
+	jmp    sys32_setrlimit
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setrlimit)
+
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+.section .text.x86.asm32_syscall_sysrun32.getrlimit
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrlimit)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getrlimit)
+	jmp    sys32_getrlimit
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getrlimit)
+
+/* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
+.section .text.x86.asm32_syscall_sysrun32.getrusage
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrusage)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getrusage)
+	jmp    sys32_getrusage
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getrusage)
+
+/* errno_t gettimeofday(struct __timevalx32 *tv, struct timezone *tz) */
+.section .text.x86.asm32_syscall_sysrun32.gettimeofday
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_gettimeofday)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_gettimeofday)
+	jmp    sys32_gettimeofday
+	.cfi_endproc
+END(__x86_asm32_sysrun32_gettimeofday)
+
+/* errno_t settimeofday(struct __timevalx32 const *tv, struct timezone const *tz) */
+.section .text.x86.asm32_syscall_sysrun32.settimeofday
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_settimeofday)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_settimeofday)
+	jmp    sys32_settimeofday
+	.cfi_endproc
+END(__x86_asm32_sysrun32_settimeofday)
+
+/* errno_t getgroups(size_t size, uint16_t[] list) */
+.section .text.x86.asm32_syscall_sysrun32.getgroups
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getgroups)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getgroups)
+	jmp    sys32_getgroups
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getgroups)
+
+/* errno_t setgroups(size_t count, uint16_t const *groups) */
+.section .text.x86.asm32_syscall_sysrun32.setgroups
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setgroups)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setgroups)
+	jmp    sys32_setgroups
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setgroups)
+
+/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32 *timeout) */
+.section .text.x86.asm32_syscall_sysrun32.select
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_select)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_select)
+	jmp    sys32_select
+	.cfi_endproc
+END(__x86_asm32_sysrun32_select)
+
+/* errno_t symlink(char const *link_text, char const *target_path) */
+.section .text.x86.asm32_syscall_sysrun32.symlink
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_symlink)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_symlink)
+	jmp    sys32_symlink
+	.cfi_endproc
+END(__x86_asm32_sysrun32_symlink)
+
+/* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_oldlstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_oldlstat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linux_oldlstat)
+	jmp    sys32_linux_oldlstat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linux_oldlstat)
+
+/* ssize_t readlink(char const *path, char *buf, size_t buflen) */
+.section .text.x86.asm32_syscall_sysrun32.readlink
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readlink)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_readlink)
+	jmp    sys32_readlink
+	.cfi_endproc
+END(__x86_asm32_sysrun32_readlink)
+
+/* errno_t uselib(char const *library) */
+.section .text.x86.asm32_syscall_sysrun32.uselib
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_uselib)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_uselib)
+	jmp    sys32_uselib
+	.cfi_endproc
+END(__x86_asm32_sysrun32_uselib)
+
+/* @param: swapflags: Set of `SWAP_FLAG_*' */
+/* errno_t swapon(char const *pathname, syscall_ulong_t swapflags) */
+.section .text.x86.asm32_syscall_sysrun32.swapon
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_swapon)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_swapon)
+	jmp    sys32_swapon
+	.cfi_endproc
+END(__x86_asm32_sysrun32_swapon)
+
+/* @param: how: One of the `RB_*' constants from <sys/reboot.h> */
+/* errno_t reboot(syscall_ulong_t how) */
+.section .text.x86.asm32_syscall_sysrun32.reboot
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_reboot)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_reboot)
+	jmp    sys32_reboot
+	.cfi_endproc
+END(__x86_asm32_sysrun32_reboot)
+
+/* Returns `0' to indicate end-of-directory; 1 to to indicate success */
+/* errno_t readdir(fd_t fd, struct old_linux_dirent *dirp, size_t count) */
+.section .text.x86.asm32_syscall_sysrun32.readdir
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readdir)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_readdir)
+	jmp    sys32_readdir
+	.cfi_endproc
+END(__x86_asm32_sysrun32_readdir)
+
+/* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+ * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
+/* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
+.section .text.x86.asm32_syscall_sysrun32.mmap
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mmap)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mmap)
+	jmp    sys32_mmap
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mmap)
+
+/* errno_t munmap(void *addr, size_t len) */
+.section .text.x86.asm32_syscall_sysrun32.munmap
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_munmap)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_munmap)
+	jmp    sys32_munmap
+	.cfi_endproc
+END(__x86_asm32_sysrun32_munmap)
+
+/* errno_t truncate(char const *filename, syscall_ulong_t length) */
+.section .text.x86.asm32_syscall_sysrun32.truncate
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_truncate)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_truncate)
+	jmp    sys32_truncate
+	.cfi_endproc
+END(__x86_asm32_sysrun32_truncate)
+
+/* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */
+.section .text.x86.asm32_syscall_sysrun32.ftruncate
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftruncate)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ftruncate)
+	jmp    sys32_ftruncate
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ftruncate)
+
+/* errno_t fchmod(fd_t fd, mode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.fchmod
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchmod)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fchmod)
+	jmp    sys32_fchmod
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fchmod)
+
+/* errno_t fchown(fd_t fd, uint16_t owner, uint16_t group) */
+.section .text.x86.asm32_syscall_sysrun32.fchown
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchown)
+	.cfi_startproc
+	movzwq 16(%rdi), %rdx
+	movzwq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fchown)
+	jmp    sys32_fchown
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fchown)
+
+/* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
+.section .text.x86.asm32_syscall_sysrun32.getpriority
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getpriority)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getpriority)
+	jmp    sys32_getpriority
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getpriority)
+
+/* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
+.section .text.x86.asm32_syscall_sysrun32.setpriority
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setpriority)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setpriority)
+	jmp    sys32_setpriority
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setpriority)
+
+/* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
+.section .text.x86.asm32_syscall_sysrun32.profil
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_profil)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_profil)
+	jmp    sys32_profil
+	.cfi_endproc
+END(__x86_asm32_sysrun32_profil)
+
+/* errno_t statfs(char const *file, struct __statfs32 *buf) */
+.section .text.x86.asm32_syscall_sysrun32.statfs
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_statfs)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_statfs)
+	jmp    sys32_statfs
+	.cfi_endproc
+END(__x86_asm32_sysrun32_statfs)
+
+/* errno_t fstatfs(fd_t file, struct __statfs32 *buf) */
+.section .text.x86.asm32_syscall_sysrun32.fstatfs
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fstatfs)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fstatfs)
+	jmp    sys32_fstatfs
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fstatfs)
+
+/* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
+.section .text.x86.asm32_syscall_sysrun32.ioperm
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioperm)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ioperm)
+	jmp    sys32_ioperm
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ioperm)
+
+/* errno_t socketcall(int call, unsigned long *args) */
+.section .text.x86.asm32_syscall_sysrun32.socketcall
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_socketcall)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_socketcall)
+	jmp    sys32_socketcall
+	.cfi_endproc
+END(__x86_asm32_sysrun32_socketcall)
+
+/* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
+.section .text.x86.asm32_syscall_sysrun32.syslog
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_syslog)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_syslog)
+	jmp    sys32_syslog
+	.cfi_endproc
+END(__x86_asm32_sysrun32_syslog)
+
+/* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
+.section .text.x86.asm32_syscall_sysrun32.setitimer
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setitimer)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setitimer)
+	jmp    sys32_setitimer
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setitimer)
+
+/* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
+.section .text.x86.asm32_syscall_sysrun32.getitimer
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getitimer)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getitimer)
+	jmp    sys32_getitimer
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getitimer)
+
+/* errno_t linux_stat32(char const *filename, struct linux_stat32 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_stat32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_stat32)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linux_stat32)
+	jmp    sys32_linux_stat32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linux_stat32)
+
+/* errno_t linux_lstat32(char const *filename, struct linux_stat32 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_lstat32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_lstat32)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linux_lstat32)
+	jmp    sys32_linux_lstat32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linux_lstat32)
+
+/* errno_t linux_fstat32(fd_t fd, struct linux_stat32 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_fstat32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_fstat32)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linux_fstat32)
+	jmp    sys32_linux_fstat32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linux_fstat32)
+
+/* errno_t olduname(struct linux_olduname *name) */
+.section .text.x86.asm32_syscall_sysrun32.olduname
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_olduname)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_olduname)
+	jmp    sys32_olduname
+	.cfi_endproc
+END(__x86_asm32_sysrun32_olduname)
+
+/* errno_t iopl(syscall_ulong_t level) */
+.section .text.x86.asm32_syscall_sysrun32.iopl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_iopl)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_iopl)
+	jmp    sys32_iopl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_iopl)
+
+/* errno_t vhangup(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_vhangup, sys32_vhangup); */
+
+/* errno_t idle(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_idle, sys32_idle); */
+
+/* errno_t vm86old(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.vm86old
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_vm86old)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_vm86old)
+	jmp    sys32_vm86old
+	.cfi_endproc
+END(__x86_asm32_sysrun32_vm86old)
+
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+.section .text.x86.asm32_syscall_sysrun32.wait4
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_wait4)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_wait4)
+	jmp    sys32_wait4
+	.cfi_endproc
+END(__x86_asm32_sysrun32_wait4)
+
+/* errno_t swapoff(char const *pathname) */
+.section .text.x86.asm32_syscall_sysrun32.swapoff
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_swapoff)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_swapoff)
+	jmp    sys32_swapoff
+	.cfi_endproc
+END(__x86_asm32_sysrun32_swapoff)
+
+/* errno_t sysinfo(struct sysinfo *info) */
+.section .text.x86.asm32_syscall_sysrun32.sysinfo
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sysinfo)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sysinfo)
+	jmp    sys32_sysinfo
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sysinfo)
+
+/* errno_t ipc(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.ipc
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ipc)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ipc)
+	jmp    sys32_ipc
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ipc)
+
+/* errno_t fsync(fd_t fd) */
+.section .text.x86.asm32_syscall_sysrun32.fsync
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsync)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fsync)
+	jmp    sys32_fsync
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fsync)
+
+/* Restore the specified register state when returning from a signal handler
+ * Note that the order and locations of arguments taken by this system call
+ * are of great importance, as they must match what is encoded by the kernel
+ * within `sighand_raise_signal()'
+ * The order chosen is also important, as it is selected such that arguments
+ * are only passed through registers that are preserved by CDECL */
+/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu) */
+.section .text.x86.asm32_syscall_sysrun32.sigreturn
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigreturn)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sigreturn)
+	jmp    sys32_sigreturn
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sigreturn)
+
+/* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) */
+.section .text.x86.asm32_syscall_sysrun32.clone
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clone)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clone)
+	jmp    sys32_clone
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clone)
+
+/* errno_t setdomainname(char const *name, size_t len) */
+.section .text.x86.asm32_syscall_sysrun32.setdomainname
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setdomainname)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setdomainname)
+	jmp    sys32_setdomainname
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setdomainname)
+
+/* errno_t uname(struct utsname *name) */
+.section .text.x86.asm32_syscall_sysrun32.uname
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_uname)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_uname)
+	jmp    sys32_uname
+	.cfi_endproc
+END(__x86_asm32_sysrun32_uname)
+
+/* syscall_slong_t modify_ldt(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) */
+.section .text.x86.asm32_syscall_sysrun32.modify_ldt
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_modify_ldt)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_modify_ldt)
+	jmp    sys32_modify_ldt
+	.cfi_endproc
+END(__x86_asm32_sysrun32_modify_ldt)
+
+/* errno_t adjtimex(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.adjtimex
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_adjtimex)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_adjtimex)
+	jmp    sys32_adjtimex
+	.cfi_endproc
+END(__x86_asm32_sysrun32_adjtimex)
+
+/* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
+.section .text.x86.asm32_syscall_sysrun32.mprotect
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mprotect)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mprotect)
+	jmp    sys32_mprotect
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mprotect)
+
+/* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+/* errno_t sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset) */
+.section .text.x86.asm32_syscall_sysrun32.sigprocmask
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigprocmask)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sigprocmask)
+	jmp    sys32_sigprocmask
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sigprocmask)
+
+/* errno_t create_module(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.create_module
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_create_module)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_create_module)
+	jmp    sys32_create_module
+	.cfi_endproc
+END(__x86_asm32_sysrun32_create_module)
+
+/* errno_t init_module(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.init_module
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_init_module)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_init_module)
+	jmp    sys32_init_module
+	.cfi_endproc
+END(__x86_asm32_sysrun32_init_module)
+
+/* errno_t delete_module(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.delete_module
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_delete_module)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_delete_module)
+	jmp    sys32_delete_module
+	.cfi_endproc
+END(__x86_asm32_sysrun32_delete_module)
+
+/* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.get_kernel_syms
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_get_kernel_syms)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_get_kernel_syms)
+	jmp    sys32_get_kernel_syms
+	.cfi_endproc
+END(__x86_asm32_sysrun32_get_kernel_syms)
+
+/* errno_t quotactl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.quotactl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_quotactl)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_quotactl)
+	jmp    sys32_quotactl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_quotactl)
+
+/* pid_t getpgid(pid_t pid) */
+.section .text.x86.asm32_syscall_sysrun32.getpgid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getpgid)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getpgid)
+	jmp    sys32_getpgid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getpgid)
+
+/* errno_t fchdir(fd_t fd) */
+.section .text.x86.asm32_syscall_sysrun32.fchdir
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchdir)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fchdir)
+	jmp    sys32_fchdir
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fchdir)
+
+/* errno_t bdflush(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.bdflush
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_bdflush)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_bdflush)
+	jmp    sys32_bdflush
+	.cfi_endproc
+END(__x86_asm32_sysrun32_bdflush)
+
+/* errno_t sysfs(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.sysfs
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sysfs)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sysfs)
+	jmp    sys32_sysfs
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sysfs)
+
+/* errno_t personality(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.personality
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_personality)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_personality)
+	jmp    sys32_personality
+	.cfi_endproc
+END(__x86_asm32_sysrun32_personality)
+
+/* errno_t afs_syscall(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.afs_syscall
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_afs_syscall)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_afs_syscall)
+	jmp    sys32_afs_syscall
+	.cfi_endproc
+END(__x86_asm32_sysrun32_afs_syscall)
+
+/* errno_t setfsuid(uint16_t uid) */
+.section .text.x86.asm32_syscall_sysrun32.setfsuid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setfsuid)
+	.cfi_startproc
+	movzwq 0(%rdi), %rdi
+	EXTERN(sys32_setfsuid)
+	jmp    sys32_setfsuid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setfsuid)
+
+/* errno_t setfsgid(uint16_t gid) */
+.section .text.x86.asm32_syscall_sysrun32.setfsgid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setfsgid)
+	.cfi_startproc
+	movzwq 0(%rdi), %rdi
+	EXTERN(sys32_setfsgid)
+	jmp    sys32_setfsgid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setfsgid)
+
+/* errno_t _llseek(fd_t fd, int64_t offset, uint64_t *result, syscall_ulong_t whence) */
+.section .text.x86.asm32_syscall_sysrun32._llseek
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32__llseek)
+	.cfi_startproc
+	movzlq 32(%rdi), %rcx
+	movzlq 24(%rdi), %rdx
+	movzlq 16(%rdi), %rax
+	movzlq 8(%rdi), %rsi
+	shlq   $32, %rax
+	orq    %rax, %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32__llseek)
+	jmp    sys32__llseek
+	.cfi_endproc
+END(__x86_asm32_sysrun32__llseek)
+
+/* ssize_t getdents(fd_t fd, struct linux_dirent *dirp, size_t count) */
+.section .text.x86.asm32_syscall_sysrun32.getdents
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getdents)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getdents)
+	jmp    sys32_getdents
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getdents)
+
+/* errno_t _newselect(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32._newselect
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32__newselect)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32__newselect)
+	jmp    sys32__newselect
+	.cfi_endproc
+END(__x86_asm32_sysrun32__newselect)
+
+/* errno_t flock(fd_t fd, syscall_ulong_t operation) */
+.section .text.x86.asm32_syscall_sysrun32.flock
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_flock)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_flock)
+	jmp    sys32_flock
+	.cfi_endproc
+END(__x86_asm32_sysrun32_flock)
+
+/* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.msync
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_msync)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_msync)
+	jmp    sys32_msync
+	.cfi_endproc
+END(__x86_asm32_sysrun32_msync)
+
+/* ssize_t readv(fd_t fd, struct iovec32 const *iovec, size_t count) */
+.section .text.x86.asm32_syscall_sysrun32.readv
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readv)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_readv)
+	jmp    sys32_readv
+	.cfi_endproc
+END(__x86_asm32_sysrun32_readv)
+
+/* ssize_t writev(fd_t fd, struct iovec32 const *iovec, size_t count) */
+.section .text.x86.asm32_syscall_sysrun32.writev
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writev)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_writev)
+	jmp    sys32_writev
+	.cfi_endproc
+END(__x86_asm32_sysrun32_writev)
+
+/* pid_t getsid(pid_t pid) */
+.section .text.x86.asm32_syscall_sysrun32.getsid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getsid)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getsid)
+	jmp    sys32_getsid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getsid)
+
+/* errno_t fdatasync(fd_t fd) */
+.section .text.x86.asm32_syscall_sysrun32.fdatasync
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fdatasync)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fdatasync)
+	jmp    sys32_fdatasync
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fdatasync)
+
+/* errno_t _sysctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32._sysctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32__sysctl)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32__sysctl)
+	jmp    sys32__sysctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32__sysctl)
+
+/* errno_t mlock(void const *addr, size_t len) */
+.section .text.x86.asm32_syscall_sysrun32.mlock
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mlock)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mlock)
+	jmp    sys32_mlock
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mlock)
+
+/* errno_t munlock(void const *addr, size_t len) */
+.section .text.x86.asm32_syscall_sysrun32.munlock
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_munlock)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_munlock)
+	jmp    sys32_munlock
+	.cfi_endproc
+END(__x86_asm32_sysrun32_munlock)
+
+/* errno_t mlockall(syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.mlockall
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mlockall)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mlockall)
+	jmp    sys32_mlockall
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mlockall)
+
+/* errno_t munlockall(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_munlockall, sys32_munlockall); */
+
+/* errno_t sched_setparam(pid_t pid, struct sched_param const *param) */
+.section .text.x86.asm32_syscall_sysrun32.sched_setparam
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_setparam)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_setparam)
+	jmp    sys32_sched_setparam
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_setparam)
+
+/* errno_t sched_getparam(pid_t pid, struct sched_param *param) */
+.section .text.x86.asm32_syscall_sysrun32.sched_getparam
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_getparam)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_getparam)
+	jmp    sys32_sched_getparam
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_getparam)
+
+/* errno_t sched_setscheduler(pid_t pid, syscall_ulong_t policy, struct sched_param const *param) */
+.section .text.x86.asm32_syscall_sysrun32.sched_setscheduler
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_setscheduler)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_setscheduler)
+	jmp    sys32_sched_setscheduler
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_setscheduler)
+
+/* syscall_slong_t sched_getscheduler(pid_t pid) */
+.section .text.x86.asm32_syscall_sysrun32.sched_getscheduler
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_getscheduler)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_getscheduler)
+	jmp    sys32_sched_getscheduler
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_getscheduler)
+
+/* errno_t sched_yield(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_sched_yield, sys32_sched_yield); */
+
+/* syscall_slong_t sched_get_priority_max(syscall_ulong_t algorithm) */
+.section .text.x86.asm32_syscall_sysrun32.sched_get_priority_max
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_get_priority_max)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_get_priority_max)
+	jmp    sys32_sched_get_priority_max
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_get_priority_max)
+
+/* syscall_slong_t sched_get_priority_min(syscall_ulong_t algorithm) */
+.section .text.x86.asm32_syscall_sysrun32.sched_get_priority_min
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_get_priority_min)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_get_priority_min)
+	jmp    sys32_sched_get_priority_min
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_get_priority_min)
+
+/* errno_t sched_rr_get_interval(pid_t pid, struct __timespecx32 *tms) */
+.section .text.x86.asm32_syscall_sysrun32.sched_rr_get_interval
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_rr_get_interval)
+	jmp    sys32_sched_rr_get_interval
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_rr_get_interval)
+
+/* errno_t nanosleep(struct __timespecx32 const *req, struct __timespecx32 *rem) */
+.section .text.x86.asm32_syscall_sysrun32.nanosleep
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_nanosleep)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_nanosleep)
+	jmp    sys32_nanosleep
+	.cfi_endproc
+END(__x86_asm32_sysrun32_nanosleep)
+
+/* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
+/* void *mremap(void *addr, size_t old_len, size_t new_len, syscall_ulong_t flags, void *new_address) */
+.section .text.x86.asm32_syscall_sysrun32.mremap
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mremap)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mremap)
+	jmp    sys32_mremap
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mremap)
+
+/* errno_t setresuid(uint16_t ruid, uint16_t euid, uint16_t suid) */
+.section .text.x86.asm32_syscall_sysrun32.setresuid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setresuid)
+	.cfi_startproc
+	movzwq 16(%rdi), %rdx
+	movzwq 8(%rdi), %rsi
+	movzwq 0(%rdi), %rdi
+	EXTERN(sys32_setresuid)
+	jmp    sys32_setresuid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setresuid)
+
+/* errno_t getresuid(uint16_t *ruid, uint16_t *euid, uint16_t *suid) */
+.section .text.x86.asm32_syscall_sysrun32.getresuid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getresuid)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getresuid)
+	jmp    sys32_getresuid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getresuid)
+
+/* errno_t vm86(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.vm86
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_vm86)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_vm86)
+	jmp    sys32_vm86
+	.cfi_endproc
+END(__x86_asm32_sysrun32_vm86)
+
+/* errno_t query_module(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.query_module
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_query_module)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_query_module)
+	jmp    sys32_query_module
+	.cfi_endproc
+END(__x86_asm32_sysrun32_query_module)
+
+/* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
+.section .text.x86.asm32_syscall_sysrun32.poll
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_poll)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_poll)
+	jmp    sys32_poll
+	.cfi_endproc
+END(__x86_asm32_sysrun32_poll)
+
+/* errno_t nfsservctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.nfsservctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_nfsservctl)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_nfsservctl)
+	jmp    sys32_nfsservctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_nfsservctl)
+
+/* errno_t setresgid(uint16_t rgid, uint16_t egid, uint16_t sgid) */
+.section .text.x86.asm32_syscall_sysrun32.setresgid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setresgid)
+	.cfi_startproc
+	movzwq 16(%rdi), %rdx
+	movzwq 8(%rdi), %rsi
+	movzwq 0(%rdi), %rdi
+	EXTERN(sys32_setresgid)
+	jmp    sys32_setresgid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setresgid)
+
+/* errno_t getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid) */
+.section .text.x86.asm32_syscall_sysrun32.getresgid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getresgid)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getresgid)
+	jmp    sys32_getresgid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getresgid)
+
+/* errno_t prctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.prctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_prctl)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_prctl)
+	jmp    sys32_prctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_prctl)
+
+/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
+.section .text.x86.asm32_syscall_sysrun32.rt_sigreturn
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigreturn)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_sigreturn)
+	jmp    sys32_rt_sigreturn
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_sigreturn)
+
+/* @param: signo: One of `SIG*' */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.rt_sigaction
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigaction)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_sigaction)
+	jmp    sys32_rt_sigaction
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_sigaction)
+
+/* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+/* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.rt_sigprocmask
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigprocmask)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_sigprocmask)
+	jmp    sys32_rt_sigprocmask
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_sigprocmask)
+
+/* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.rt_sigpending
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigpending)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_sigpending)
+	jmp    sys32_rt_sigpending
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_sigpending)
+
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32 const *timeout, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_sigtimedwait)
+	jmp    sys32_rt_sigtimedwait
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_sigtimedwait)
+
+/* @param: signo: One of `SIG*' */
+/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+.section .text.x86.asm32_syscall_sysrun32.rt_sigqueueinfo
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigqueueinfo)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_sigqueueinfo)
+	jmp    sys32_rt_sigqueueinfo
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_sigqueueinfo)
+
+/* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.rt_sigsuspend
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigsuspend)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_sigsuspend)
+	jmp    sys32_rt_sigsuspend
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_sigsuspend)
+
+/* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
+.section .text.x86.asm32_syscall_sysrun32.pread64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pread64)
+	.cfi_startproc
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pread64)
+	jmp    sys32_pread64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pread64)
+
+/* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
+.section .text.x86.asm32_syscall_sysrun32.pwrite64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwrite64)
+	.cfi_startproc
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pwrite64)
+	jmp    sys32_pwrite64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pwrite64)
+
+/* errno_t chown(char const *filename, uint16_t owner, uint16_t group) */
+.section .text.x86.asm32_syscall_sysrun32.chown
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_chown)
+	.cfi_startproc
+	movzwq 16(%rdi), %rdx
+	movzwq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_chown)
+	jmp    sys32_chown
+	.cfi_endproc
+END(__x86_asm32_sysrun32_chown)
+
+/* ssize_t getcwd(char *buf, size_t size) */
+.section .text.x86.asm32_syscall_sysrun32.getcwd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getcwd)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getcwd)
+	jmp    sys32_getcwd
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getcwd)
+
+/* errno_t capget(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.capget
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_capget)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_capget)
+	jmp    sys32_capget
+	.cfi_endproc
+END(__x86_asm32_sysrun32_capget)
+
+/* errno_t capset(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.capset
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_capset)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_capset)
+	jmp    sys32_capset
+	.cfi_endproc
+END(__x86_asm32_sysrun32_capset)
+
+/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+.section .text.x86.asm32_syscall_sysrun32.sigaltstack
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigaltstack)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sigaltstack)
+	jmp    sys32_sigaltstack
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sigaltstack)
+
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+.section .text.x86.asm32_syscall_sysrun32.sendfile
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendfile)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sendfile)
+	jmp    sys32_sendfile
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sendfile)
+
+/* errno_t getpmsg(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.getpmsg
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getpmsg)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getpmsg)
+	jmp    sys32_getpmsg
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getpmsg)
+
+/* errno_t putpmsg(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.putpmsg
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_putpmsg)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_putpmsg)
+	jmp    sys32_putpmsg
+	.cfi_endproc
+END(__x86_asm32_sysrun32_putpmsg)
+
+/* pid_t vfork(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_vfork, sys32_vfork); */
+
+/* errno_t ugetrlimit(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.ugetrlimit
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ugetrlimit)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ugetrlimit)
+	jmp    sys32_ugetrlimit
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ugetrlimit)
+
+/* void *mmap2(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset) */
+.section .text.x86.asm32_syscall_sysrun32.mmap2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mmap2)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mmap2)
+	jmp    sys32_mmap2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mmap2)
+
+/* errno_t truncate64(char const *filename, uint64_t length) */
+.section .text.x86.asm32_syscall_sysrun32.truncate64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_truncate64)
+	.cfi_startproc
+	movzlq 16(%rdi), %rax
+	movzlq 8(%rdi), %rsi
+	shlq   $32, %rax
+	orq    %rax, %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_truncate64)
+	jmp    sys32_truncate64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_truncate64)
+
+/* errno_t ftruncate64(fd_t fd, uint64_t length) */
+.section .text.x86.asm32_syscall_sysrun32.ftruncate64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftruncate64)
+	.cfi_startproc
+	movzlq 16(%rdi), %rax
+	movzlq 8(%rdi), %rsi
+	shlq   $32, %rax
+	orq    %rax, %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ftruncate64)
+	jmp    sys32_ftruncate64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ftruncate64)
+
+/* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_stat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_stat64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linux_stat64)
+	jmp    sys32_linux_stat64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linux_stat64)
+
+/* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_lstat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_lstat64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linux_lstat64)
+	jmp    sys32_linux_lstat64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linux_lstat64)
+
+/* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_fstat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_fstat64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linux_fstat64)
+	jmp    sys32_linux_fstat64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linux_fstat64)
+
+/* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
+.section .text.x86.asm32_syscall_sysrun32.lchown32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lchown32)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lchown32)
+	jmp    sys32_lchown32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lchown32)
+
+/* uint32_t getuid32(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getuid32, sys32_getuid32); */
+
+/* uint32_t getgid32(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getgid32, sys32_getgid32); */
+
+/* uint32_t geteuid32(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_geteuid32, sys32_geteuid32); */
+
+/* uint32_t getegid32(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getegid32, sys32_getegid32); */
+
+/* errno_t setreuid32(uint32_t ruid, uint32_t euid) */
+.section .text.x86.asm32_syscall_sysrun32.setreuid32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setreuid32)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setreuid32)
+	jmp    sys32_setreuid32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setreuid32)
+
+/* errno_t setregid32(uint32_t rgid, uint32_t egid) */
+.section .text.x86.asm32_syscall_sysrun32.setregid32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setregid32)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setregid32)
+	jmp    sys32_setregid32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setregid32)
+
+/* errno_t getgroups32(size_t size, uint32_t[] list) */
+.section .text.x86.asm32_syscall_sysrun32.getgroups32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getgroups32)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getgroups32)
+	jmp    sys32_getgroups32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getgroups32)
+
+/* errno_t setgroups32(size_t count, uint32_t const *groups) */
+.section .text.x86.asm32_syscall_sysrun32.setgroups32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setgroups32)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setgroups32)
+	jmp    sys32_setgroups32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setgroups32)
+
+/* errno_t fchown32(fd_t fd, uint32_t owner, uint32_t group) */
+.section .text.x86.asm32_syscall_sysrun32.fchown32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchown32)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fchown32)
+	jmp    sys32_fchown32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fchown32)
+
+/* errno_t setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid) */
+.section .text.x86.asm32_syscall_sysrun32.setresuid32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setresuid32)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setresuid32)
+	jmp    sys32_setresuid32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setresuid32)
+
+/* errno_t getresuid32(uint32_t *ruid, uint32_t *euid, uint32_t *suid) */
+.section .text.x86.asm32_syscall_sysrun32.getresuid32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getresuid32)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getresuid32)
+	jmp    sys32_getresuid32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getresuid32)
+
+/* errno_t setresgid32(uint32_t rgid, uint32_t egid, uint32_t sgid) */
+.section .text.x86.asm32_syscall_sysrun32.setresgid32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setresgid32)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setresgid32)
+	jmp    sys32_setresgid32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setresgid32)
+
+/* errno_t getresgid32(uint32_t *rgid, uint32_t *egid, uint32_t *sgid) */
+.section .text.x86.asm32_syscall_sysrun32.getresgid32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getresgid32)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getresgid32)
+	jmp    sys32_getresgid32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getresgid32)
+
+/* errno_t chown32(char const *filename, uint32_t owner, uint32_t group) */
+.section .text.x86.asm32_syscall_sysrun32.chown32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_chown32)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_chown32)
+	jmp    sys32_chown32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_chown32)
+
+/* errno_t setuid32(uint32_t uid) */
+.section .text.x86.asm32_syscall_sysrun32.setuid32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setuid32)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setuid32)
+	jmp    sys32_setuid32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setuid32)
+
+/* errno_t setgid32(uint32_t gid) */
+.section .text.x86.asm32_syscall_sysrun32.setgid32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setgid32)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setgid32)
+	jmp    sys32_setgid32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setgid32)
+
+/* errno_t setfsuid32(uint32_t uid) */
+.section .text.x86.asm32_syscall_sysrun32.setfsuid32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setfsuid32)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setfsuid32)
+	jmp    sys32_setfsuid32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setfsuid32)
+
+/* errno_t setfsgid32(uint32_t gid) */
+.section .text.x86.asm32_syscall_sysrun32.setfsgid32
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setfsgid32)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setfsgid32)
+	jmp    sys32_setfsgid32
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setfsgid32)
+
+/* errno_t pivot_root(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.pivot_root
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pivot_root)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pivot_root)
+	jmp    sys32_pivot_root
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pivot_root)
+
+/* errno_t mincore(void *start, size_t len, uint8_t *vec) */
+.section .text.x86.asm32_syscall_sysrun32.mincore
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mincore)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mincore)
+	jmp    sys32_mincore
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mincore)
+
+/* errno_t madvise(void *addr, size_t len, syscall_ulong_t advice) */
+.section .text.x86.asm32_syscall_sysrun32.madvise
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_madvise)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_madvise)
+	jmp    sys32_madvise
+	.cfi_endproc
+END(__x86_asm32_sysrun32_madvise)
+
+/* ssize_t getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count) */
+.section .text.x86.asm32_syscall_sysrun32.getdents64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getdents64)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getdents64)
+	jmp    sys32_getdents64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getdents64)
+
+/* syscall_slong_t fcntl64(fd_t fd, syscall_ulong_t command, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.fcntl64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fcntl64)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fcntl64)
+	jmp    sys32_fcntl64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fcntl64)
+
+/* pid_t gettid(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_gettid, sys32_gettid); */
+
+/* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
+.section .text.x86.asm32_syscall_sysrun32.readahead
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readahead)
+	.cfi_startproc
+	movzlq 24(%rdi), %rdx
+	movzlq 16(%rdi), %rax
+	movzlq 8(%rdi), %rsi
+	shlq   $32, %rax
+	orq    %rax, %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_readahead)
+	jmp    sys32_readahead
+	.cfi_endproc
+END(__x86_asm32_sysrun32_readahead)
+
+/* errno_t setxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.setxattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setxattr)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setxattr)
+	jmp    sys32_setxattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setxattr)
+
+/* errno_t lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.lsetxattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lsetxattr)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lsetxattr)
+	jmp    sys32_lsetxattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lsetxattr)
+
+/* errno_t fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fsetxattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsetxattr)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fsetxattr)
+	jmp    sys32_fsetxattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fsetxattr)
+
+/* ssize_t getxattr(char const *path, char const *name, void *buf, size_t bufsize) */
+.section .text.x86.asm32_syscall_sysrun32.getxattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getxattr)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getxattr)
+	jmp    sys32_getxattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getxattr)
+
+/* ssize_t lgetxattr(char const *path, char const *name, void *buf, size_t bufsize) */
+.section .text.x86.asm32_syscall_sysrun32.lgetxattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lgetxattr)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lgetxattr)
+	jmp    sys32_lgetxattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lgetxattr)
+
+/* ssize_t fgetxattr(fd_t fd, char const *name, void *buf, size_t bufsize) */
+.section .text.x86.asm32_syscall_sysrun32.fgetxattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fgetxattr)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fgetxattr)
+	jmp    sys32_fgetxattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fgetxattr)
+
+/* ssize_t listxattr(char const *path, char *listbuf, size_t listbufsize) */
+.section .text.x86.asm32_syscall_sysrun32.listxattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_listxattr)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_listxattr)
+	jmp    sys32_listxattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_listxattr)
+
+/* ssize_t llistxattr(char const *path, char *listbuf, size_t listbufsize) */
+.section .text.x86.asm32_syscall_sysrun32.llistxattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_llistxattr)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_llistxattr)
+	jmp    sys32_llistxattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_llistxattr)
+
+/* ssize_t flistxattr(fd_t fd, char *listbuf, size_t listbufsize) */
+.section .text.x86.asm32_syscall_sysrun32.flistxattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_flistxattr)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_flistxattr)
+	jmp    sys32_flistxattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_flistxattr)
+
+/* errno_t removexattr(char const *path, char const *name) */
+.section .text.x86.asm32_syscall_sysrun32.removexattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_removexattr)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_removexattr)
+	jmp    sys32_removexattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_removexattr)
+
+/* errno_t lremovexattr(char const *path, char const *name) */
+.section .text.x86.asm32_syscall_sysrun32.lremovexattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lremovexattr)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lremovexattr)
+	jmp    sys32_lremovexattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lremovexattr)
+
+/* errno_t fremovexattr(int fd, char const *name) */
+.section .text.x86.asm32_syscall_sysrun32.fremovexattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fremovexattr)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fremovexattr)
+	jmp    sys32_fremovexattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fremovexattr)
+
+/* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
+.section .text.x86.asm32_syscall_sysrun32.tkill
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tkill)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_tkill)
+	jmp    sys32_tkill
+	.cfi_endproc
+END(__x86_asm32_sysrun32_tkill)
+
+/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
+.section .text.x86.asm32_syscall_sysrun32.sendfile64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendfile64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sendfile64)
+	jmp    sys32_sendfile64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sendfile64)
+
+/* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+.section .text.x86.asm32_syscall_sysrun32.futex
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_futex)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_futex)
+	jmp    sys32_futex
+	.cfi_endproc
+END(__x86_asm32_sysrun32_futex)
+
+/* errno_t sched_setaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset) */
+.section .text.x86.asm32_syscall_sysrun32.sched_setaffinity
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_setaffinity)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_setaffinity)
+	jmp    sys32_sched_setaffinity
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_setaffinity)
+
+/* errno_t sched_getaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct *cpuset) */
+.section .text.x86.asm32_syscall_sysrun32.sched_getaffinity
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_getaffinity)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_getaffinity)
+	jmp    sys32_sched_getaffinity
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_getaffinity)
+
+/* errno_t set_thread_area(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.set_thread_area
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_thread_area)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_set_thread_area)
+	jmp    sys32_set_thread_area
+	.cfi_endproc
+END(__x86_asm32_sysrun32_set_thread_area)
+
+/* errno_t get_thread_area(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.get_thread_area
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_get_thread_area)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_get_thread_area)
+	jmp    sys32_get_thread_area
+	.cfi_endproc
+END(__x86_asm32_sysrun32_get_thread_area)
+
+/* errno_t io_setup(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.io_setup
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_io_setup)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_io_setup)
+	jmp    sys32_io_setup
+	.cfi_endproc
+END(__x86_asm32_sysrun32_io_setup)
+
+/* errno_t io_destroy(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.io_destroy
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_io_destroy)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_io_destroy)
+	jmp    sys32_io_destroy
+	.cfi_endproc
+END(__x86_asm32_sysrun32_io_destroy)
+
+/* errno_t io_getevents(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.io_getevents
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_io_getevents)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_io_getevents)
+	jmp    sys32_io_getevents
+	.cfi_endproc
+END(__x86_asm32_sysrun32_io_getevents)
+
+/* errno_t io_submit(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.io_submit
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_io_submit)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_io_submit)
+	jmp    sys32_io_submit
+	.cfi_endproc
+END(__x86_asm32_sysrun32_io_submit)
+
+/* errno_t io_cancel(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.io_cancel
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_io_cancel)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_io_cancel)
+	jmp    sys32_io_cancel
+	.cfi_endproc
+END(__x86_asm32_sysrun32_io_cancel)
+
+/* errno_t fadvise64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.fadvise64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fadvise64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fadvise64)
+	jmp    sys32_fadvise64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fadvise64)
+
+/* void exit_group(syscall_ulong_t exit_code) */
+.section .text.x86.asm32_syscall_sysrun32.exit_group
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_exit_group)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_exit_group)
+	jmp    sys32_exit_group
+	.cfi_endproc
+END(__x86_asm32_sysrun32_exit_group)
+
+/* errno_t lookup_dcookie(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.lookup_dcookie
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lookup_dcookie)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lookup_dcookie)
+	jmp    sys32_lookup_dcookie
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lookup_dcookie)
+
+/* fd_t epoll_create(syscall_ulong_t size) */
+.section .text.x86.asm32_syscall_sysrun32.epoll_create
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_create)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_epoll_create)
+	jmp    sys32_epoll_create
+	.cfi_endproc
+END(__x86_asm32_sysrun32_epoll_create)
+
+/* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
+.section .text.x86.asm32_syscall_sysrun32.epoll_ctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_ctl)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_epoll_ctl)
+	jmp    sys32_epoll_ctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_epoll_ctl)
+
+/* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
+.section .text.x86.asm32_syscall_sysrun32.epoll_wait
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_wait)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_epoll_wait)
+	jmp    sys32_epoll_wait
+	.cfi_endproc
+END(__x86_asm32_sysrun32_epoll_wait)
+
+/* errno_t remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.remap_file_pages
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_remap_file_pages)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_remap_file_pages)
+	jmp    sys32_remap_file_pages
+	.cfi_endproc
+END(__x86_asm32_sysrun32_remap_file_pages)
+
+/* pid_t set_tid_address(pid_t *tidptr) */
+.section .text.x86.asm32_syscall_sysrun32.set_tid_address
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_tid_address)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_set_tid_address)
+	jmp    sys32_set_tid_address
+	.cfi_endproc
+END(__x86_asm32_sysrun32_set_tid_address)
+
+/* errno_t timer_create(clockid_t clock_id, struct sigevent *evp, timer_t *timerid) */
+.section .text.x86.asm32_syscall_sysrun32.timer_create
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_create)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_create)
+	jmp    sys32_timer_create
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_create)
+
+/* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32 const *value, struct __itimerspecx32 *ovalue) */
+.section .text.x86.asm32_syscall_sysrun32.timer_settime
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_settime)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_settime)
+	jmp    sys32_timer_settime
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_settime)
+
+/* errno_t timer_gettime(timer_t timerid, struct __itimerspecx32 *value) */
+.section .text.x86.asm32_syscall_sysrun32.timer_gettime
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_gettime)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_gettime)
+	jmp    sys32_timer_gettime
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_gettime)
+
+/* syscall_slong_t timer_getoverrun(timer_t timerid) */
+.section .text.x86.asm32_syscall_sysrun32.timer_getoverrun
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_getoverrun)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_getoverrun)
+	jmp    sys32_timer_getoverrun
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_getoverrun)
+
+/* errno_t timer_delete(timer_t timerid) */
+.section .text.x86.asm32_syscall_sysrun32.timer_delete
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_delete)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_delete)
+	jmp    sys32_timer_delete
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_delete)
+
+/* errno_t clock_settime(clockid_t clock_id, struct __timespecx32 const *tp) */
+.section .text.x86.asm32_syscall_sysrun32.clock_settime
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_settime)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_settime)
+	jmp    sys32_clock_settime
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_settime)
+
+/* errno_t clock_gettime(clockid_t clock_id, struct __timespecx32 *tp) */
+.section .text.x86.asm32_syscall_sysrun32.clock_gettime
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_gettime)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_gettime)
+	jmp    sys32_clock_gettime
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_gettime)
+
+/* errno_t clock_getres(clockid_t clock_id, struct __timespecx32 *res) */
+.section .text.x86.asm32_syscall_sysrun32.clock_getres
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_getres)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_getres)
+	jmp    sys32_clock_getres
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_getres)
+
+/* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32 const *requested_time, struct __timespecx32 *remaining) */
+.section .text.x86.asm32_syscall_sysrun32.clock_nanosleep
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_nanosleep)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_nanosleep)
+	jmp    sys32_clock_nanosleep
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_nanosleep)
+
+/* errno_t statfs64(char const *file, struct statfs64 *buf) */
+.section .text.x86.asm32_syscall_sysrun32.statfs64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_statfs64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_statfs64)
+	jmp    sys32_statfs64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_statfs64)
+
+/* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
+.section .text.x86.asm32_syscall_sysrun32.fstatfs64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fstatfs64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fstatfs64)
+	jmp    sys32_fstatfs64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fstatfs64)
+
+/* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
+.section .text.x86.asm32_syscall_sysrun32.tgkill
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tgkill)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_tgkill)
+	jmp    sys32_tgkill
+	.cfi_endproc
+END(__x86_asm32_sysrun32_tgkill)
+
+/* errno_t utimes(char const *filename, struct __timevalx32 const[2] times) */
+.section .text.x86.asm32_syscall_sysrun32.utimes
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimes)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_utimes)
+	jmp    sys32_utimes
+	.cfi_endproc
+END(__x86_asm32_sysrun32_utimes)
+
+/* errno_t fadvise64_64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.fadvise64_64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fadvise64_64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fadvise64_64)
+	jmp    sys32_fadvise64_64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fadvise64_64)
+
+/* errno_t vserver(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.vserver
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_vserver)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_vserver)
+	jmp    sys32_vserver
+	.cfi_endproc
+END(__x86_asm32_sysrun32_vserver)
+
+/* errno_t mbind(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.mbind
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mbind)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mbind)
+	jmp    sys32_mbind
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mbind)
+
+/* errno_t get_mempolicy(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.get_mempolicy
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_get_mempolicy)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_get_mempolicy)
+	jmp    sys32_get_mempolicy
+	.cfi_endproc
+END(__x86_asm32_sysrun32_get_mempolicy)
+
+/* errno_t set_mempolicy(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.set_mempolicy
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_mempolicy)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_set_mempolicy)
+	jmp    sys32_set_mempolicy
+	.cfi_endproc
+END(__x86_asm32_sysrun32_set_mempolicy)
+
+/* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.mq_open
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_open)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_open)
+	jmp    sys32_mq_open
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_open)
+
+/* errno_t mq_unlink(char const *name) */
+.section .text.x86.asm32_syscall_sysrun32.mq_unlink
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_unlink)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_unlink)
+	jmp    sys32_mq_unlink
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_unlink)
+
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysrun32.mq_timedsend
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedsend)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_timedsend)
+	jmp    sys32_mq_timedsend
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_timedsend)
+
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysrun32.mq_timedreceive
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedreceive)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_timedreceive)
+	jmp    sys32_mq_timedreceive
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_timedreceive)
+
+/* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
+.section .text.x86.asm32_syscall_sysrun32.mq_notify
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_notify)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_notify)
+	jmp    sys32_mq_notify
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_notify)
+
+/* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
+.section .text.x86.asm32_syscall_sysrun32.mq_getsetattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_getsetattr)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_getsetattr)
+	jmp    sys32_mq_getsetattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_getsetattr)
+
+/* errno_t kexec_load(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.kexec_load
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kexec_load)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kexec_load)
+	jmp    sys32_kexec_load
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kexec_load)
+
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+.section .text.x86.asm32_syscall_sysrun32.waitid
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_waitid)
+	jmp    sys32_waitid
+	.cfi_endproc
+END(__x86_asm32_sysrun32_waitid)
+
+/* errno_t add_key(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.add_key
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_add_key)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_add_key)
+	jmp    sys32_add_key
+	.cfi_endproc
+END(__x86_asm32_sysrun32_add_key)
+
+/* errno_t request_key(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.request_key
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_request_key)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_request_key)
+	jmp    sys32_request_key
+	.cfi_endproc
+END(__x86_asm32_sysrun32_request_key)
+
+/* errno_t keyctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.keyctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_keyctl)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_keyctl)
+	jmp    sys32_keyctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_keyctl)
+
+/* errno_t ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio) */
+.section .text.x86.asm32_syscall_sysrun32.ioprio_set
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioprio_set)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ioprio_set)
+	jmp    sys32_ioprio_set
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ioprio_set)
+
+/* errno_t ioprio_get(syscall_ulong_t which, syscall_ulong_t who) */
+.section .text.x86.asm32_syscall_sysrun32.ioprio_get
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioprio_get)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ioprio_get)
+	jmp    sys32_ioprio_get
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ioprio_get)
+
+/* errno_t inotify_init(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.inotify_init
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_init)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_inotify_init)
+	jmp    sys32_inotify_init
+	.cfi_endproc
+END(__x86_asm32_sysrun32_inotify_init)
+
+/* errno_t inotify_add_watch(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.inotify_add_watch
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_add_watch)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_inotify_add_watch)
+	jmp    sys32_inotify_add_watch
+	.cfi_endproc
+END(__x86_asm32_sysrun32_inotify_add_watch)
+
+/* errno_t inotify_rm_watch(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.inotify_rm_watch
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_rm_watch)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_inotify_rm_watch)
+	jmp    sys32_inotify_rm_watch
+	.cfi_endproc
+END(__x86_asm32_sysrun32_inotify_rm_watch)
+
+/* errno_t migrate_pages(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.migrate_pages
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_migrate_pages)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_migrate_pages)
+	jmp    sys32_migrate_pages
+	.cfi_endproc
+END(__x86_asm32_sysrun32_migrate_pages)
+
+/* fd_t openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.openat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_openat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_openat)
+	jmp    sys32_openat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_openat)
+
+/* errno_t mkdirat(fd_t dirfd, char const *pathname, mode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.mkdirat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mkdirat)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mkdirat)
+	jmp    sys32_mkdirat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mkdirat)
+
+/* errno_t mknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev) */
+.section .text.x86.asm32_syscall_sysrun32.mknodat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mknodat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mknodat)
+	jmp    sys32_mknodat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mknodat)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t fchownat(fd_t dirfd, char const *filename, uid_t owner, gid_t group, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fchownat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchownat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fchownat)
+	jmp    sys32_fchownat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fchownat)
+
+/* errno_t futimesat(fd_t dirfd, const char *filename, struct __timevalx32 const[2] times) */
+.section .text.x86.asm32_syscall_sysrun32.futimesat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_futimesat)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_futimesat)
+	jmp    sys32_futimesat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_futimesat)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.linux_fstatat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_fstatat64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linux_fstatat64)
+	jmp    sys32_linux_fstatat64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linux_fstatat64)
+
+/* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
+/* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.unlinkat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_unlinkat)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_unlinkat)
+	jmp    sys32_unlinkat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_unlinkat)
+
+/* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */
+.section .text.x86.asm32_syscall_sysrun32.renameat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_renameat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_renameat)
+	jmp    sys32_renameat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_renameat)
+
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
+/* errno_t linkat(fd_t fromfd, char const *existing_file, fd_t tofd, char const *target_path, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.linkat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linkat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_linkat)
+	jmp    sys32_linkat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_linkat)
+
+/* errno_t symlinkat(char const *link_text, fd_t tofd, char const *target_path) */
+.section .text.x86.asm32_syscall_sysrun32.symlinkat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_symlinkat)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_symlinkat)
+	jmp    sys32_symlinkat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_symlinkat)
+
+/* ssize_t readlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen) */
+.section .text.x86.asm32_syscall_sysrun32.readlinkat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readlinkat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_readlinkat)
+	jmp    sys32_readlinkat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_readlinkat)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t fchmodat(fd_t dirfd, char const *filename, mode_t mode, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fchmodat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchmodat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fchmodat)
+	jmp    sys32_fchmodat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fchmodat)
+
+/* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
+ * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS | AT_DOSPATH' */
+/* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.faccessat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_faccessat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_faccessat)
+	jmp    sys32_faccessat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_faccessat)
+
+/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
+.section .text.x86.asm32_syscall_sysrun32.pselect6
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pselect6)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pselect6)
+	jmp    sys32_pselect6
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pselect6)
+
+/* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct __timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.ppoll
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ppoll)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ppoll)
+	jmp    sys32_ppoll
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ppoll)
+
+/* param flags: Set of `CLONE_*' */
+/* errno_t unshare(syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.unshare
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_unshare)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_unshare)
+	jmp    sys32_unshare
+	.cfi_endproc
+END(__x86_asm32_sysrun32_unshare)
+
+/* errno_t set_robust_list(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.set_robust_list
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_robust_list)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_set_robust_list)
+	jmp    sys32_set_robust_list
+	.cfi_endproc
+END(__x86_asm32_sysrun32_set_robust_list)
+
+/* errno_t get_robust_list(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.get_robust_list
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_get_robust_list)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_get_robust_list)
+	jmp    sys32_get_robust_list
+	.cfi_endproc
+END(__x86_asm32_sysrun32_get_robust_list)
+
+/* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.splice
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_splice)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_splice)
+	jmp    sys32_splice
+	.cfi_endproc
+END(__x86_asm32_sysrun32_splice)
+
+/* errno_t sync_file_range(fd_t fd, uint64_t offset, uint64_t count, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.sync_file_range
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sync_file_range)
+	.cfi_startproc
+	movzlq 40(%rdi), %rcx
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rdx
+	shlq   $32, %rax
+	orq    %rax, %rdx
+	movzlq 16(%rdi), %rax
+	movzlq 8(%rdi), %rsi
+	shlq   $32, %rax
+	orq    %rax, %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sync_file_range)
+	jmp    sys32_sync_file_range
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sync_file_range)
+
+/* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.tee
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tee)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_tee)
+	jmp    sys32_tee
+	.cfi_endproc
+END(__x86_asm32_sysrun32_tee)
+
+/* ssize_t vmsplice(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.vmsplice
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_vmsplice)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_vmsplice)
+	jmp    sys32_vmsplice
+	.cfi_endproc
+END(__x86_asm32_sysrun32_vmsplice)
+
+/* errno_t move_pages(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.move_pages
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_move_pages)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_move_pages)
+	jmp    sys32_move_pages
+	.cfi_endproc
+END(__x86_asm32_sysrun32_move_pages)
+
+/* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
+.section .text.x86.asm32_syscall_sysrun32.getcpu
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getcpu)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getcpu)
+	jmp    sys32_getcpu
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getcpu)
+
+/* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
+.section .text.x86.asm32_syscall_sysrun32.epoll_pwait
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_pwait)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_epoll_pwait)
+	jmp    sys32_epoll_pwait
+	.cfi_endproc
+END(__x86_asm32_sysrun32_epoll_pwait)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* errno_t utimensat(fd_t dirfd, char const *filename, struct __timespecx32 const[2] times, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.utimensat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimensat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_utimensat)
+	jmp    sys32_utimensat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_utimensat)
+
+/* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.signalfd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_signalfd)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_signalfd)
+	jmp    sys32_signalfd
+	.cfi_endproc
+END(__x86_asm32_sysrun32_signalfd)
+
+/* Return file descriptor for new interval timer source */
+/* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.timerfd_create
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_create)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timerfd_create)
+	jmp    sys32_timerfd_create
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timerfd_create)
+
+/* fd_t eventfd(syscall_ulong_t initval) */
+.section .text.x86.asm32_syscall_sysrun32.eventfd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_eventfd)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_eventfd)
+	jmp    sys32_eventfd
+	.cfi_endproc
+END(__x86_asm32_sysrun32_eventfd)
+
+/* errno_t fallocate(fd_t fd, syscall_ulong_t mode, syscall_ulong_t offset, syscall_ulong_t length) */
+.section .text.x86.asm32_syscall_sysrun32.fallocate
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fallocate)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fallocate)
+	jmp    sys32_fallocate
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fallocate)
+
+/* Set next expiration time of interval timer source UFD to UTMR.
+ * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
+ * is absolute. Optionally return the old expiration time in OTMR */
+/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32 const *utmr, struct __itimerspecx32 *otmr) */
+.section .text.x86.asm32_syscall_sysrun32.timerfd_settime
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_settime)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timerfd_settime)
+	jmp    sys32_timerfd_settime
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timerfd_settime)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime(fd_t ufd, struct __itimerspecx32 *otmr) */
+.section .text.x86.asm32_syscall_sysrun32.timerfd_gettime
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timerfd_gettime)
+	jmp    sys32_timerfd_gettime
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timerfd_gettime)
+
+/* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.signalfd4
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_signalfd4)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_signalfd4)
+	jmp    sys32_signalfd4
+	.cfi_endproc
+END(__x86_asm32_sysrun32_signalfd4)
+
+/* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.eventfd2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_eventfd2)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_eventfd2)
+	jmp    sys32_eventfd2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_eventfd2)
+
+/* fd_t epoll_create1(syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.epoll_create1
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_create1)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_epoll_create1)
+	jmp    sys32_epoll_create1
+	.cfi_endproc
+END(__x86_asm32_sysrun32_epoll_create1)
+
+/* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
+/* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.dup3
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_dup3)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_dup3)
+	jmp    sys32_dup3
+	.cfi_endproc
+END(__x86_asm32_sysrun32_dup3)
+
+/* errno_t pipe2(fd_t[2] pipedes, oflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.pipe2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pipe2)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pipe2)
+	jmp    sys32_pipe2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pipe2)
+
+/* errno_t inotify_init1(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.inotify_init1
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_init1)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_inotify_init1)
+	jmp    sys32_inotify_init1
+	.cfi_endproc
+END(__x86_asm32_sysrun32_inotify_init1)
+
+/* ssize_t preadv(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+.section .text.x86.asm32_syscall_sysrun32.preadv
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadv)
+	.cfi_startproc
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_preadv)
+	jmp    sys32_preadv
+	.cfi_endproc
+END(__x86_asm32_sysrun32_preadv)
+
+/* ssize_t pwritev(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+.section .text.x86.asm32_syscall_sysrun32.pwritev
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritev)
+	.cfi_startproc
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pwritev)
+	jmp    sys32_pwritev
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pwritev)
+
+/* @param: signo: One of `SIG*' */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+.section .text.x86.asm32_syscall_sysrun32.rt_tgsigqueueinfo
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_tgsigqueueinfo)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_tgsigqueueinfo)
+	jmp    sys32_rt_tgsigqueueinfo
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_tgsigqueueinfo)
+
+/* errno_t perf_event_open(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.perf_event_open
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_perf_event_open)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_perf_event_open)
+	jmp    sys32_perf_event_open
+	.cfi_endproc
+END(__x86_asm32_sysrun32_perf_event_open)
+
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32 *tmo) */
+.section .text.x86.asm32_syscall_sysrun32.recvmmsg
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_recvmmsg)
+	jmp    sys32_recvmmsg
+	.cfi_endproc
+END(__x86_asm32_sysrun32_recvmmsg)
+
+/* errno_t fanotify_init(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.fanotify_init
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fanotify_init)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fanotify_init)
+	jmp    sys32_fanotify_init
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fanotify_init)
+
+/* errno_t fanotify_mark(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.fanotify_mark
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fanotify_mark)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fanotify_mark)
+	jmp    sys32_fanotify_mark
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fanotify_mark)
+
+/* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
+/* errno_t prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit) */
+.section .text.x86.asm32_syscall_sysrun32.prlimit64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_prlimit64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_prlimit64)
+	jmp    sys32_prlimit64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_prlimit64)
+
+/* errno_t name_to_handle_at(fd_t dirfd, char const *name, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.name_to_handle_at
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_name_to_handle_at)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_name_to_handle_at)
+	jmp    sys32_name_to_handle_at
+	.cfi_endproc
+END(__x86_asm32_sysrun32_name_to_handle_at)
+
+/* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.open_by_handle_at
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_open_by_handle_at)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_open_by_handle_at)
+	jmp    sys32_open_by_handle_at
+	.cfi_endproc
+END(__x86_asm32_sysrun32_open_by_handle_at)
+
+/* errno_t clock_adjtime(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.clock_adjtime
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_adjtime)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_adjtime)
+	jmp    sys32_clock_adjtime
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_adjtime)
+
+/* errno_t syncfs(fd_t fd) */
+.section .text.x86.asm32_syscall_sysrun32.syncfs
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_syncfs)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_syncfs)
+	jmp    sys32_syncfs
+	.cfi_endproc
+END(__x86_asm32_sysrun32_syncfs)
+
+/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.sendmmsg
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendmmsg)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sendmmsg)
+	jmp    sys32_sendmmsg
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sendmmsg)
+
+/* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
+.section .text.x86.asm32_syscall_sysrun32.setns
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setns)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setns)
+	jmp    sys32_setns
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setns)
+
+/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.process_vm_readv
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_readv)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_process_vm_readv)
+	jmp    sys32_process_vm_readv
+	.cfi_endproc
+END(__x86_asm32_sysrun32_process_vm_readv)
+
+/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.process_vm_writev
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_writev)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_process_vm_writev)
+	jmp    sys32_process_vm_writev
+	.cfi_endproc
+END(__x86_asm32_sysrun32_process_vm_writev)
+
+/* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
+.section .text.x86.asm32_syscall_sysrun32.kcmp
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kcmp)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kcmp)
+	jmp    sys32_kcmp
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kcmp)
+
+/* errno_t finit_module(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.finit_module
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_finit_module)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_finit_module)
+	jmp    sys32_finit_module
+	.cfi_endproc
+END(__x86_asm32_sysrun32_finit_module)
+
+/* errno_t sched_setattr(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.sched_setattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_setattr)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_setattr)
+	jmp    sys32_sched_setattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_setattr)
+
+/* errno_t sched_getattr(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.sched_getattr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_getattr)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_getattr)
+	jmp    sys32_sched_getattr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_getattr)
+
+/* @param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT' */
+/* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.renameat2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_renameat2)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_renameat2)
+	jmp    sys32_renameat2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_renameat2)
+
+/* errno_t seccomp(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.seccomp
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_seccomp)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_seccomp)
+	jmp    sys32_seccomp
+	.cfi_endproc
+END(__x86_asm32_sysrun32_seccomp)
+
+/* errno_t getrandom(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.getrandom
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrandom)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getrandom)
+	jmp    sys32_getrandom
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getrandom)
+
+/* errno_t memfd_create(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.memfd_create
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_memfd_create)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_memfd_create)
+	jmp    sys32_memfd_create
+	.cfi_endproc
+END(__x86_asm32_sysrun32_memfd_create)
+
+/* errno_t bpf(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.bpf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_bpf)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_bpf)
+	jmp    sys32_bpf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_bpf)
+
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.execveat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_execveat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_execveat)
+	jmp    sys32_execveat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_execveat)
+
+/* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
+.section .text.x86.asm32_syscall_sysrun32.socket
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_socket)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_socket)
+	jmp    sys32_socket
+	.cfi_endproc
+END(__x86_asm32_sysrun32_socket)
+
+/* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
+.section .text.x86.asm32_syscall_sysrun32.socketpair
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_socketpair)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_socketpair)
+	jmp    sys32_socketpair
+	.cfi_endproc
+END(__x86_asm32_sysrun32_socketpair)
+
+/* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
+.section .text.x86.asm32_syscall_sysrun32.bind
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_bind)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_bind)
+	jmp    sys32_bind
+	.cfi_endproc
+END(__x86_asm32_sysrun32_bind)
+
+/* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
+.section .text.x86.asm32_syscall_sysrun32.connect
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_connect)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_connect)
+	jmp    sys32_connect
+	.cfi_endproc
+END(__x86_asm32_sysrun32_connect)
+
+/* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
+.section .text.x86.asm32_syscall_sysrun32.listen
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_listen)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_listen)
+	jmp    sys32_listen
+	.cfi_endproc
+END(__x86_asm32_sysrun32_listen)
+
+/* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.accept4
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_accept4)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_accept4)
+	jmp    sys32_accept4
+	.cfi_endproc
+END(__x86_asm32_sysrun32_accept4)
+
+/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level' */
+/* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
+.section .text.x86.asm32_syscall_sysrun32.getsockopt
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getsockopt)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getsockopt)
+	jmp    sys32_getsockopt
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getsockopt)
+
+/* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level' */
+/* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
+.section .text.x86.asm32_syscall_sysrun32.setsockopt
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setsockopt)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setsockopt)
+	jmp    sys32_setsockopt
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setsockopt)
+
+/* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
+.section .text.x86.asm32_syscall_sysrun32.getsockname
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getsockname)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getsockname)
+	jmp    sys32_getsockname
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getsockname)
+
+/* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
+.section .text.x86.asm32_syscall_sysrun32.getpeername
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getpeername)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getpeername)
+	jmp    sys32_getpeername
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getpeername)
+
+/* param flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
+.section .text.x86.asm32_syscall_sysrun32.sendto
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendto)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sendto)
+	jmp    sys32_sendto
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sendto)
+
+/* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.sendmsg
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendmsg)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sendmsg)
+	jmp    sys32_sendmsg
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sendmsg)
+
+/* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
+.section .text.x86.asm32_syscall_sysrun32.recvfrom
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvfrom)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_recvfrom)
+	jmp    sys32_recvfrom
+	.cfi_endproc
+END(__x86_asm32_sysrun32_recvfrom)
+
+/* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.recvmsg
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmsg)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_recvmsg)
+	jmp    sys32_recvmsg
+	.cfi_endproc
+END(__x86_asm32_sysrun32_recvmsg)
+
+/* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
+/* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
+.section .text.x86.asm32_syscall_sysrun32.shutdown
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_shutdown)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_shutdown)
+	jmp    sys32_shutdown
+	.cfi_endproc
+END(__x86_asm32_sysrun32_shutdown)
+
+/* errno_t userfaultfd(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.userfaultfd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_userfaultfd)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_userfaultfd)
+	jmp    sys32_userfaultfd
+	.cfi_endproc
+END(__x86_asm32_sysrun32_userfaultfd)
+
+/* errno_t membarrier(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.membarrier
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_membarrier)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_membarrier)
+	jmp    sys32_membarrier
+	.cfi_endproc
+END(__x86_asm32_sysrun32_membarrier)
+
+/* errno_t mlock2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.mlock2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mlock2)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mlock2)
+	jmp    sys32_mlock2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mlock2)
+
+/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.hop
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hop)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_hop)
+	jmp    sys32_hop
+	.cfi_endproc
+END(__x86_asm32_sysrun32_hop)
+
+/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.hopf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hopf)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_hopf)
+	jmp    sys32_hopf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_hopf)
+
+/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.readf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readf)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_readf)
+	jmp    sys32_readf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_readf)
+
+/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.writef
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writef)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_writef)
+	jmp    sys32_writef
+	.cfi_endproc
+END(__x86_asm32_sysrun32_writef)
+
+/* >> detach(2)
+ * Detach the descriptor of `PID' from the thread that
+ * would have received a signal when it changes state,
+ * as well as prevent the thread from turning into a
+ * zombie once it dies.
+ * For simplicity, think of it like this:
+ *   - pthread_create()  -->  clone()
+ *   - pthread_join()    -->  wait()
+ *   - pthread_detach()  -->  detach()  // Linux's missing link, now implemented
+ * A total of 4 special cases exists to alter the behavior of this function:
+ *   - PID == 0 || PID == gettid():
+ *     Detach the calling thread from the set of running children within
+ *     its own process. Note however that when this is done by the main
+ *     thread of the process, gettid() will equal getpid(), and the behavior
+ *     will be different.
+ *   - PID == getpid():
+ *     Detach the calling process from its parent, essentially daemonizing
+ *     the calling process the same way a double-fork would:
+ *     >> if (fork() == 0) {
+ *     >> 	if (fork() == 0) {
+ *     >> 		// This is a daemonized process
+ *     >> 		// aka. the parent process no longer knows
+ *     >> 		// about us, and also can't wait(2) on us.
+ *     >> 		...
+ *     >> 	}
+ *     >> 	exit(0);
+ *     >> }
+ *     Same as:
+ *     >> if (fork() == 0) {
+ *     >> 	detach(0); // or `detach(getpid())', since 0 --> gettid() and gettid() == getpid()
+ *     >> 	// This is a daemonized process
+ *     >> 	// aka. the parent process no longer knows
+ *     >> 	// about us, and also can't wait(2) on us.
+ *     >> 	...
+ *     >> }
+ *   - PID == -1:
+ *     Detach all child processes/threads of the calling process, essentially
+ *     turning its chain of children into a clean slate that no longer contains
+ *     any wait(2)able child threads or processes.
+ *     If no waitable children existed, `ECHILD' is set; else `0' is returned.
+ * Before any of this is done, the thread referred to by `PID' is one of the following:
+ *   - The leader of the process that called `fork()' or `clone()' without
+ *    `CLONE_PARENT' to create the thread referred to by `PID'
+ *   - The creator of the process containing a thread that called
+ *    `clone()' with `CLONE_PARENT', which then created the thread
+ *     referred to by `PID'.
+ *   - Even if the thread doesn't deliver a signal upon it terminating,
+ *     the process that would have received such a signal is still relevant.
+ *   -> In other words: The thread `PID' must be one of your children,
+ *                      or you had to have been assigned as its child.
+ * If the calling thread isn't part of that process that will receive
+ * the signal if the thread dies without being detached first, then
+ * the call fails by throwing an `E_ILLEGAL_OPERATION'.
+ * If the thread had already been detached, then the call fails by
+ * throwing an `E_ILLEGAL_OPERATION' as well.
+ * Upon success, the thread referred to by `PID' will clean up its own
+ * PID descriptor without the need of anyone to wait() for it, a behavior
+ * that linux implements using `CLONE_THREAD' (which you shouldn't use,
+ * because it's flawed by design)
+ * Once detached, any further use of PID results in a race condition
+ * (which linux neglects to mention for `CLONE_THREAD'), because there
+ * is no way of ensuring that PID still refers to the original thread,
+ * as another thread may have been created using the same PID, after
+ * the detached thread exited.
+ * NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+ *       it will behave effectively as though this function had already
+ *       be called.
+ * NOTE: If the thread already has terminated, detaching it will kill
+ *       its zombie the same way wait() would.
+ * NOTE: Passing ZERO(0) for `PID' will detach the calling thread.
+ *       However, this operation fails if the calling thread isn't
+ *       part of the same process as the parent process of the thread.
+ *       In other words, the child of a fork() can't do this, and
+ *       neither can the spawnee of clone(CLONE_THREAD|CLONE_PARENT),
+ *       clone(0) or clone(CLONE_PARENT).
+ * @return: -EPERM:             The calling process isn't the recipient of signals
+ *                              delivered when `PID' changes state. This can either
+ *                              be because `PID' has already been detached, or because
+ *                              YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
+ *                              Another possibility is that the thread was already
+ *                              detached, then exited, following which a new thread
+ *                              got created and had been assigned the PID of your
+ *                              ancient, no longer existent thread.
+ * @return: -ECHILD:           `PID' was equal to `-1', but no waitable children existed
+ * @throw: E_PROCESS_EXITED:    The process referred to by `PID' doesn't exist.
+ *                              This could mean that it had already been detached
+ *                              and exited, or that the `PID' is just invalid (which
+ *                              would also be the case if it was valid at some point) */
+/* errno_t detach(pid_t pid) */
+.section .text.x86.asm32_syscall_sysrun32.detach
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_detach)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_detach)
+	jmp    sys32_detach
+	.cfi_endproc
+END(__x86_asm32_sysrun32_detach)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getdrives, sys32_getdrives); */
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.frealpath4
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_frealpath4)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_frealpath4)
+	jmp    sys32_frealpath4
+	.cfi_endproc
+END(__x86_asm32_sysrun32_frealpath4)
+
+/* Returns the absolute filesystem path for the specified file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+ * causing the pointed-to file location to be retrieved. - Otherwise, the
+ * location of the link is printed instead.
+ * You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.frealpathat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_frealpathat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_frealpathat)
+	jmp    sys32_frealpathat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_frealpathat)
+
+/* Schedule an RPC for execution on the specified `target' thread.
+ * @param: target:    The targeted thread.
+ * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
+ * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
+ * @param: arguments: Arguments for the RPC loader program.
+ * @return: 1:  The specified `target' thread has already terminated.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno')
+ * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
+ * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
+/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
+.section .text.x86.asm32_syscall_sysrun32.rpc_schedule
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rpc_schedule)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rpc_schedule)
+	jmp    sys32_rpc_schedule
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rpc_schedule)
+
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.ksysctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ksysctl)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ksysctl)
+	jmp    sys32_ksysctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ksysctl)
+
+/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
+.section .text.x86.asm32_syscall_sysrun32.openpty
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_openpty)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_openpty)
+	jmp    sys32_openpty
+	.cfi_endproc
+END(__x86_asm32_sysrun32_openpty)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fchdirat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchdirat)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fchdirat)
+	jmp    sys32_fchdirat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fchdirat)
+
+/* time64_t time64(time64_t *timer) */
+.section .text.x86.asm32_syscall_sysrun32.time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_time64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_time64)
+	jmp    sys32_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_time64)
+
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
+ *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
+ * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given MODE is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) */
+.section .text.x86.asm32_syscall_sysrun32.set_exception_handler
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_exception_handler)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_set_exception_handler)
+	jmp    sys32_set_exception_handler
+	.cfi_endproc
+END(__x86_asm32_sysrun32_set_exception_handler)
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: PHANDLER:    The address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+/* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
+.section .text.x86.asm32_syscall_sysrun32.get_exception_handler
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_get_exception_handler)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_get_exception_handler)
+	jmp    sys32_get_exception_handler
+	.cfi_endproc
+END(__x86_asm32_sysrun32_get_exception_handler)
+
+/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
+/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
+.section .text.x86.asm32_syscall_sysrun32.set_library_listdef
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_library_listdef)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_set_library_listdef)
+	jmp    sys32_set_library_listdef
+	.cfi_endproc
+END(__x86_asm32_sysrun32_set_library_listdef)
+
+/* Trigger a debugger trap `trapno', optionally extended with `regs'
+ * at either the system call return location, or at the given `state'
+ * In the later case, this system call will by default return to the
+ * given `state', though given the purpose of this system call being
+ * to inform a connected debugger of some breakable event, allowing
+ * it to do whatever it wishes before execution is resumed.
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
+ * @param: state:    When non-NULL, the CPU state where the trap should return to by default
+ * @return: -EOK:    `state' was NULL and the trap returned successfully
+ * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
+/* errno_t debugtrap(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) */
+.section .text.x86.asm32_syscall_sysrun32.debugtrap
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_debugtrap)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_debugtrap)
+	jmp    sys32_debugtrap
+	.cfi_endproc
+END(__x86_asm32_sysrun32_debugtrap)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) */
+.section .text.x86.asm32_syscall_sysrun32.lfutex
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lfutex)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lfutex)
+	jmp    sys32_lfutex
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lfutex)
+
+/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
+.section .text.x86.asm32_syscall_sysrun32.lseek64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lseek64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rdx
+	movzlq 16(%rdi), %rax
+	movzlq 8(%rdi), %rsi
+	shlq   $32, %rax
+	orq    %rax, %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lseek64)
+	jmp    sys32_lseek64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lseek64)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.x86.asm32_syscall_sysrun32.lfutexexpr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lfutexexpr)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lfutexexpr)
+	jmp    sys32_lfutexexpr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lfutexexpr)
+
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.x86.asm32_syscall_sysrun32.lfutexlockexpr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lfutexlockexpr)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lfutexlockexpr)
+	jmp    sys32_lfutexlockexpr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lfutexlockexpr)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The newly created device automatically gets assigned an arbitrary device number, before
+ * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+.section .text.x86.asm32_syscall_sysrun32.mktty
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mktty)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mktty)
+	jmp    sys32_mktty
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mktty)
+
+/* Raise a signal within the calling thread alongside the given CPU state
+ * This system call is used when translating exceptions into POSIX signal in error mode #4
+ * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
+ *                be raised for the caller's source location. Note that only in the later case
+ *                will this function return to its caller. - When `state' is non-NULL, it will
+ *                return to the text location described by it.
+ * TODO: Add a flags argument to control if the current signal mask
+ *       should be ignored (currently, it's always being ignored) */
+/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
+.section .text.x86.asm32_syscall_sysrun32.raiseat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_raiseat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_raiseat)
+	jmp    sys32_raiseat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_raiseat)
+
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
+ * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+ *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           In this case, a traceback displayed to a human should not include the text location at
+ *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+ *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_NOTHROW' if unwinding
+ *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
+.section .text.x86.asm32_syscall_sysrun32.coredump
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_coredump)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_coredump)
+	jmp    sys32_coredump
+	.cfi_endproc
+END(__x86_asm32_sysrun32_coredump)
+
+/* errno_t stime64(time64_t const *t) */
+.section .text.x86.asm32_syscall_sysrun32.stime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_stime64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_stime64)
+	jmp    sys32_stime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_stime64)
+
+/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+.section .text.x86.asm32_syscall_sysrun32.utime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_utime64)
+	jmp    sys32_utime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_utime64)
+
+/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.ioctlf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioctlf)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ioctlf)
+	jmp    sys32_ioctlf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ioctlf)
+
+/* uint64_t fsmode(uint64_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.fsmode
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsmode)
+	.cfi_startproc
+	movzlq 8(%rdi), %rax
+	movzlq 0(%rdi), %rdi
+	shlq   $32, %rax
+	orq    %rax, %rdi
+	EXTERN(sys32_fsmode)
+	jmp    sys32_fsmode
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fsmode)
+
+/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
+.section .text.x86.asm32_syscall_sysrun32.gettimeofday64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_gettimeofday64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_gettimeofday64)
+	jmp    sys32_gettimeofday64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_gettimeofday64)
+
+/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
+.section .text.x86.asm32_syscall_sysrun32.settimeofday64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_settimeofday64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_settimeofday64)
+	jmp    sys32_settimeofday64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_settimeofday64)
+
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
+.section .text.x86.asm32_syscall_sysrun32.select64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_select64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_select64)
+	jmp    sys32_select64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_select64)
+
+/* Map the segments of a given library into memory
+ * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
+ * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
+ *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
+ *                       MAP_DONT_OVERRIDE'
+ * @param: fd:    A handle for the library file being mapped
+ *                (must be a file or vm_datablock/inode)
+ * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+ *                (depending on the caller running in 32- or 64-bit mode)
+ * @param: hdrc:  The number of program headers */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
+.section .text.x86.asm32_syscall_sysrun32.maplibrary
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_maplibrary)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_maplibrary)
+	jmp    sys32_maplibrary
+	.cfi_endproc
+END(__x86_asm32_sysrun32_maplibrary)
+
+/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
+.section .text.x86.asm32_syscall_sysrun32.setitimer64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setitimer64)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setitimer64)
+	jmp    sys32_setitimer64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setitimer64)
+
+/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+.section .text.x86.asm32_syscall_sysrun32.getitimer64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getitimer64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getitimer64)
+	jmp    sys32_getitimer64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getitimer64)
+
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.kreaddir
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kreaddir)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kreaddir)
+	jmp    sys32_kreaddir
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kreaddir)
+
+/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.readvf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readvf)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_readvf)
+	jmp    sys32_readvf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_readvf)
+
+/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.writevf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writevf)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_writevf)
+	jmp    sys32_writevf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_writevf)
+
+/* syscall_slong_t rpc_service(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rpc_service, sys32_rpc_service); */
+
+/* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
+.section .text.x86.asm32_syscall_sysrun32.sched_rr_get_interval64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_rr_get_interval64)
+	jmp    sys32_sched_rr_get_interval64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_rr_get_interval64)
+
+/* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
+.section .text.x86.asm32_syscall_sysrun32.nanosleep64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_nanosleep64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_nanosleep64)
+	jmp    sys32_nanosleep64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_nanosleep64)
+
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_sigtimedwait64)
+	jmp    sys32_rt_sigtimedwait64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_sigtimedwait64)
+
+/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.pread64f
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pread64f)
+	.cfi_startproc
+	movzlq 40(%rdi), %r8
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pread64f)
+	jmp    sys32_pread64f
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pread64f)
+
+/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.pwrite64f
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwrite64f)
+	.cfi_startproc
+	movzlq 40(%rdi), %r8
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pwrite64f)
+	jmp    sys32_pwrite64f
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pwrite64f)
+
+/* errno_t kstat(char const *filename, struct stat *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.kstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kstat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kstat)
+	jmp    sys32_kstat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kstat)
+
+/* errno_t klstat(char const *filename, struct stat *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.klstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_klstat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_klstat)
+	jmp    sys32_klstat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_klstat)
+
+/* errno_t kfstat(fd_t fd, struct stat *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.kfstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kfstat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kfstat)
+	jmp    sys32_kfstat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kfstat)
+
+/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+.section .text.x86.asm32_syscall_sysrun32.kreaddirf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kreaddirf)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kreaddirf)
+	jmp    sys32_kreaddirf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kreaddirf)
+
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
+.section .text.x86.asm32_syscall_sysrun32.timer_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_settime64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_settime64)
+	jmp    sys32_timer_settime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_settime64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
+.section .text.x86.asm32_syscall_sysrun32.timer_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_gettime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_gettime64)
+	jmp    sys32_timer_gettime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_gettime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
+.section .text.x86.asm32_syscall_sysrun32.clock_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_settime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_settime64)
+	jmp    sys32_clock_settime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_settime64)
+
+/* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
+.section .text.x86.asm32_syscall_sysrun32.clock_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_gettime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_gettime64)
+	jmp    sys32_clock_gettime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_gettime64)
+
+/* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
+.section .text.x86.asm32_syscall_sysrun32.clock_getres64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_getres64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_getres64)
+	jmp    sys32_clock_getres64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_getres64)
+
+/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
+.section .text.x86.asm32_syscall_sysrun32.clock_nanosleep64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_nanosleep64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_nanosleep64)
+	jmp    sys32_clock_nanosleep64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_nanosleep64)
+
+/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
+.section .text.x86.asm32_syscall_sysrun32.utimes64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimes64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_utimes64)
+	jmp    sys32_utimes64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_utimes64)
+
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysrun32.mq_timedsend64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedsend64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_timedsend64)
+	jmp    sys32_mq_timedsend64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_timedsend64)
+
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysrun32.mq_timedreceive64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedreceive64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_timedreceive64)
+	jmp    sys32_mq_timedreceive64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_timedreceive64)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fmkdirat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fmkdirat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fmkdirat)
+	jmp    sys32_fmkdirat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fmkdirat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fmknodat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fmknodat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fmknodat)
+	jmp    sys32_fmknodat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fmknodat)
+
+/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
+.section .text.x86.asm32_syscall_sysrun32.futimesat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_futimesat64)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_futimesat64)
+	jmp    sys32_futimesat64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_futimesat64)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.kfstatat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kfstatat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kfstatat)
+	jmp    sys32_kfstatat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kfstatat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.frenameat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_frenameat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_frenameat)
+	jmp    sys32_frenameat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_frenameat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fsymlinkat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsymlinkat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fsymlinkat)
+	jmp    sys32_fsymlinkat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fsymlinkat)
+
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.freadlinkat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_freadlinkat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_freadlinkat)
+	jmp    sys32_freadlinkat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_freadlinkat)
+
+/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+.section .text.x86.asm32_syscall_sysrun32.pselect6_64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pselect6_64)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pselect6_64)
+	jmp    sys32_pselect6_64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pselect6_64)
+
+/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.ppoll64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ppoll64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ppoll64)
+	jmp    sys32_ppoll64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ppoll64)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* errno_t utimensat64(fd_t dirfd, char const *filename, struct __timespecx32_64 const[2] times, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.utimensat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimensat64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_utimensat64)
+	jmp    sys32_utimensat64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_utimensat64)
+
+/* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
+.section .text.x86.asm32_syscall_sysrun32.fallocate64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fallocate64)
+	.cfi_startproc
+	movzlq 40(%rdi), %rax
+	movzlq 32(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 24(%rdi), %rax
+	movzlq 16(%rdi), %rdx
+	shlq   $32, %rax
+	orq    %rax, %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fallocate64)
+	jmp    sys32_fallocate64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fallocate64)
+
+/* Set next expiration time of interval timer source UFD to UTMR.
+ * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
+ * is absolute. Optionally return the old expiration time in OTMR */
+/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_sysrun32.timerfd_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_settime64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timerfd_settime64)
+	jmp    sys32_timerfd_settime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timerfd_settime64)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t ufd, struct __itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_sysrun32.timerfd_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timerfd_gettime64)
+	jmp    sys32_timerfd_gettime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timerfd_gettime64)
+
+/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.preadvf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadvf)
+	.cfi_startproc
+	movzlq 40(%rdi), %r8
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_preadvf)
+	jmp    sys32_preadvf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_preadvf)
+
+/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.pwritevf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritevf)
+	.cfi_startproc
+	movzlq 40(%rdi), %r8
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pwritevf)
+	jmp    sys32_pwritevf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pwritevf)
+
+/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
+.section .text.x86.asm32_syscall_sysrun32.recvmmsg64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_recvmmsg64)
+	jmp    sys32_recvmmsg64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_recvmmsg64)
 
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_WRAPPERS64_S */

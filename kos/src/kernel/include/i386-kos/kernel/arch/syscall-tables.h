@@ -74,8 +74,13 @@
  *         x86_64:  - %esp has been loaded
  *                  - A user-space IRET tail was pushed and created
  *                  - Compatibility-mode
+ *     X86_ASMSYSCALL32_RUNC32:
+ *         x86_64:  SYSVABI-compatible, takes a register vector `u64 *regv = %rdi'
+ *                  Used to wrap around `sys32_*' system calls, handling double-wide
+ *                  registers, as well as smaller-than-32-bit arguments by zero-
+ *                  extending them when necessary.
  *     X86_ASMSYSCALL64:
- *         x86_64:  Unchanged (all registers are the same)
+ *         x86_64:  SYSVABI-compatible
  * HINT: The low-level interrupt/entry handlers
  *       for system calls are implemented in:
  *        - /src/kernel/core/arch/i386/syscall/wrappers32.S
@@ -84,6 +89,7 @@
 #define X86_ASMSYSCALL32_INT80(name)    __x86_asm32_int80_##name    /* Section: .text.x86.asm32_syscall_int80.<name> */
 #define X86_ASMSYSCALL32_SYSENTER(name) __x86_asm32_sysenter_##name /* Section: .text.x86.asm32_syscall_sysenter.<name> */
 #ifdef __x86_64__
+#define X86_ASMSYSCALL32_RUNC32(name)   __x86_asm32_sysrun32_##name /* Section: .text.x86.asm32_syscall_sysrun32.<name> */
 #define X86_ASMSYSCALL64(name)          __x86_asm64_syscall_##name  /* Section: .text.x86.asm64_syscall.<name> */
 #endif /* __x86_64__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
@@ -95,11 +101,12 @@ DECL_BEGIN
 
 /* Define tables used during system call routing. */
 #ifdef __x86_64__
-#define DEFINE_KERNEL_SYSCALL_ROUTES(id)                                                                          \
-	DATDEF void *const x86_sysroute##id##_c[__NR_syscall##id##_cnt];                /* sys_XXX */                 \
-	DATDEF void *const x86_sysroute##id##_asm64_syscall[__NR32_syscall##id##_cnt];  /* __x86_asm64_syscall_XXX */ \
-	DATDEF void *const x86_sysroute##id##_c32[__NR_syscall##id##_cnt];              /* sys32_XXX */               \
-	DATDEF void *const x86_sysroute##id##_asm32_int80[__NR32_syscall##id##_cnt];    /* __x86_asm32_int80_XXX */   \
+#define DEFINE_KERNEL_SYSCALL_ROUTES(id)                                                                           \
+	DATDEF void *const x86_sysroute##id##_c[__NR_syscall##id##_cnt];                /* sys_XXX */                  \
+	DATDEF void *const x86_sysroute##id##_c32[__NR32_syscall##id##_cnt];            /* sys32_XXX */                \
+	DATDEF void *const x86_sysroute##id##_asm64_syscall[__NR32_syscall##id##_cnt];  /* __x86_asm64_syscall_XXX */  \
+	DATDEF void *const x86_sysroute##id##_runc32[__NR32_syscall##id##_cnt];         /* __x86_asm32_sysrun32_XXX */ \
+	DATDEF void *const x86_sysroute##id##_asm32_int80[__NR32_syscall##id##_cnt];    /* __x86_asm32_int80_XXX */    \
 	DATDEF void *const x86_sysroute##id##_asm32_sysenter[__NR32_syscall##id##_cnt]; /* __x86_asm32_sysenter_XXX */
 #else /* __x86_64__ */
 #define DEFINE_KERNEL_SYSCALL_ROUTES(id)                                                                        \

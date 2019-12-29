@@ -113,6 +113,9 @@ SECTIONS {
 #endif /* __x86_64__ */
 		*(.text.x86.asm32_syscall_int80.*)
 		*(.text.x86.asm32_syscall_sysenter.*)
+#ifdef __x86_64__
+		*(.text.x86.asm32_syscall_sysrun32.*)
+#endif /* __x86_64__ */
 		*(.text.x86.*)
 		*(.text.cold .text.unlikely .text.cold.*)
 	}

@@ -2603,9 +2603,9 @@ function generateSyscallCompatibilityHeader(
 				<< " " * (longestNameLen - #n);
 			local compatNames: {string...} = compatFunctionMap[n].sorted();
 			assert compatNames;
-			fp << " (" << #compatNames << ",(";
-			fp << ", ".join(compatNames);
-			fp << "))\n";
+			fp << " " << #compatNames << "(";
+			fp << ",".join(compatNames);
+			fp << ")\n";
 		}
 		fp << "#endif /* !" << prefix << firstName << " */\n";
 	}

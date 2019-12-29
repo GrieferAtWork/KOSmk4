@@ -256,8 +256,21 @@ END(sys32_break6)
 
 #define __SYSINVALID32_OF2(register_count) sys32_break##register_count
 #define __SYSINVALID32_OF(register_count) __SYSINVALID32_OF2(register_count)
-#define __SYSCALL(name) \
-	DEFINE_PUBLIC_WEAK_ALIAS(sys32_##name, __SYSINVALID32_OF(__NR32RC_##name))
+#define __DEFINE_SYSRUN32_ALIAS_IF_NOREGS2_0(name) DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysrun32_##name, sys32_break0)
+#define __DEFINE_SYSRUN32_ALIAS_IF_NOREGS2_1(name) /* nothing */
+#define __DEFINE_SYSRUN32_ALIAS_IF_NOREGS2_2(name) /* nothing */
+#define __DEFINE_SYSRUN32_ALIAS_IF_NOREGS2_3(name) /* nothing */
+#define __DEFINE_SYSRUN32_ALIAS_IF_NOREGS2_4(name) /* nothing */
+#define __DEFINE_SYSRUN32_ALIAS_IF_NOREGS2_5(name) /* nothing */
+#define __DEFINE_SYSRUN32_ALIAS_IF_NOREGS2_6(name) /* nothing */
+#define __DEFINE_SYSRUN32_ALIAS_IF_NOREGS2(name, register_count) \
+	__DEFINE_SYSRUN32_ALIAS_IF_NOREGS2_##register_count(name)
+#define __DEFINE_SYSRUN32_ALIAS_IF_NOREGS(name, register_count) \
+	__DEFINE_SYSRUN32_ALIAS_IF_NOREGS2(name, register_count)
+#define __SYSCALL(name)                                                        \
+	DEFINE_PUBLIC_WEAK_ALIAS(sys32_##name, __SYSINVALID32_OF(__NR32RC_##name)) \
+	__DEFINE_SYSRUN32_ALIAS_IF_NOREGS(name, __NR32RC_##name)
+
 /* #include <asm/ls-syscalls32.h> */
 #include "../../../../../../include/i386-kos/asm/ls-syscalls32.h"
 
@@ -265,5 +278,7 @@ END(sys32_break6)
 .ifndef sys32_break
 DEFINE_PUBLIC_ALIAS(sys32_break, sys32_break6)
 .endif /* !sys32_break */
+
+
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_SYSCALL_BREAK64_S */
