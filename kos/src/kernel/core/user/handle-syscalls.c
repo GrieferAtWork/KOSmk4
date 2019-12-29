@@ -1859,6 +1859,10 @@ DEFINE_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
                 USER UNCHECKED fd_set *, exceptfds,
                 USER UNCHECKED struct __timespec64 const *, timeout,
                 USER UNCHECKED void const *, sigmask_sigset_and_len) {
+	struct sigset_and_len {
+		sigset_t const *ss_ptr;
+		size_t          ss_len;
+	};
 	size_t result, nfd_size;
 	struct sigset_and_len ss;
 	nfd_size = CEILDIV(nfds, __NFDBITS);

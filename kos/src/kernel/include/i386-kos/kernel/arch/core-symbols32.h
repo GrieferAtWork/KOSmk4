@@ -10638,10 +10638,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak atomic64_write_r; .long atomic64_write_r
 	.reloc ., R_386_SIZE32, atomic64_write_r; .int 0
 	.int 0xd80ba62
-	.long 0 /* index: 2659 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname2659 /* index: 2659 */
+	.weak handle_stflags; .long handle_stflags
+	.reloc ., R_386_SIZE32, handle_stflags; .int 0
+	.int 0x2e80a63
 	.long .Lname2660 /* index: 2660 */
 	.weak sys_gettid; .long sys_gettid
 	.reloc ., R_386_SIZE32, sys_gettid; .int 0
@@ -19494,6 +19494,8 @@ END(kernel_symbol_table)
 	.string "sys_hop"
 .Lname2658:
 	.string "atomic64_write_r"
+.Lname2659:
+	.string "handle_stflags"
 .Lname2660:
 	.string "sys_gettid"
 .Lname2661:
