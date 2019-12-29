@@ -129,6 +129,7 @@ waitpid:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options) -> $pid_t;
 @@Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [cp] wait3:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage *usage) -> $pid_t;
+%/* TODO: wait3_64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 %
@@ -136,6 +137,7 @@ waitpid:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options) -> $pid_t;
 @@Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [cp] wait4:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage *usage) -> $pid_t;
+%/* TODO: wait4_64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
 %#endif /* __USE_MISC */
 
 %

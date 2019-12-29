@@ -40,13 +40,13 @@ NOTHROW_RPC(LIBCCALL libc_wait)(__WAIT_STATUS stat_loc)
 /*[[[body:wait]]]*/
 {
 	pid_t result;
-#ifdef __NR_waitpid
-	result = sys_waitpid(-1,
-	                     (int32_t *)stat_loc,
-	                     0);
-#else /* __NR_waitpid */
+#ifdef SYS_waitpid
+	result = sys_waitpid(-1, (int32_t *)stat_loc, 0);
+#elif defined(SYS_wait4_64)
+	result = sys_wait4_64(-1, (int32_t *)stat_loc, 0, NULL);
+#else /* ... */
 	result = sys_wait4(-1, (int32_t *)stat_loc, 0, NULL);
-#endif /* !__NR_waitpid */
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:wait]]]*/
@@ -69,12 +69,17 @@ NOTHROW_RPC(LIBCCALL libc_waitpid)(pid_t pid,
 	result = sys_waitpid(pid,
 	                     (int32_t *)stat_loc,
 	                     (syscall_ulong_t)(unsigned int)options);
-#else
+#elif defined(SYS_wait4_64)
+	result = sys_wait4_64(pid,
+	                      (int32_t *)stat_loc,
+	                      (syscall_ulong_t)(unsigned int)options,
+	                      NULL);
+#else /* ... */
 	result = sys_wait4(pid,
 	                   (int32_t *)stat_loc,
 	                   (syscall_ulong_t)(unsigned int)options,
 	                   NULL);
-#endif
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:waitpid]]]*/
@@ -89,11 +94,15 @@ NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype,
 /*[[[body:waitid]]]*/
 {
 	pid_t result;
-	result = sys_waitid(idtype,
-	                    id,
-	                    infop,
+#ifdef SYS_waitid64
+	result = sys_waitid64(idtype, id, infop,
+	                      (syscall_ulong_t)(unsigned int)options,
+	                      NULL);
+#else /* SYS_waitid64 */
+	result = sys_waitid(idtype, id, infop,
 	                    (syscall_ulong_t)(unsigned int)options,
 	                    NULL);
+#endif /* !SYS_waitid64 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:waitid]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5556727 */
+/* HASH CRC-32:0x7b517c2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -147,6 +147,7 @@ struct rusage;
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),(__stat_loc,__options,__usage))
 #endif /* wait3... */
+/* TODO: wait3_64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_MISC
@@ -155,6 +156,7 @@ __CDECLARE(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, int __options
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* wait4... */
+/* TODO: wait4_64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
 #endif /* __USE_MISC */
 
 #ifdef __USE_KOS

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2a7771f */
+/* HASH CRC-32:0x334c0e05 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,6 +97,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit,(__rlimit_resource_t 
  * and put it in *USAGE. Returns 0 for success, -1 for failure */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, struct rusage *__usage),(__who,__usage))
 #endif /* getrusage... */
+/* TODO: getrusage64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
 #ifdef __CRT_HAVE_getpriority
 /* Return the highest priority of any process specified by WHICH and
  * WHO (see above); if WHO is zero, the current process, process group,

@@ -82,6 +82,8 @@ setrlimit:(__rlimit_resource_t resource, [nonnull] struct rlimit const *rlimits)
 @@and put it in *USAGE. Returns 0 for success, -1 for failure
 getrusage:(__rusage_who_t who, [nonnull] struct rusage *usage) -> int;
 
+%/* TODO: getrusage64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
+
 @@Return the highest priority of any process specified by WHICH and
 @@WHO (see above); if WHO is zero, the current process, process group,
 @@or user (as specified by WHO) is used.  A lower priority number means
