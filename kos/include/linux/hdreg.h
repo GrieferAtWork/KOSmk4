@@ -21,7 +21,7 @@
 
 #include <__stdinc.h>
 #include <asm/ioctl.h>
-#include <bits/compat.h>
+#include <compat/config.h>
 #include <hybrid/typecore.h>
 
 __DECL_BEGIN

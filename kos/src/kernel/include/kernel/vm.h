@@ -37,7 +37,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/pageid.h>
-#include <bits/compat.h>
+#include <compat/config.h>
 
 #include <stdbool.h>
 

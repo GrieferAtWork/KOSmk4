@@ -370,6 +370,14 @@ handle_close_nosym(unsigned int fd,
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
 
+/* Modify the I/O-flags of a given file handle
+ * The new I/O flags are calculated as `(old_flags & mask) | flag'
+ * @return: * :  The handle's old I/O-flags */
+FUNDEF NONNULL((1)) iomode_t FCALL
+handle_stflags(struct handle_manager *__restrict self,
+               unsigned int fd, iomode_t mask, iomode_t flag)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+
 
 /* Add the given handle to the handle manager and
  * return the handle number of where it was placed.

@@ -2562,39 +2562,38 @@ STATIC_ASSERT(IO_TO_OPENFLAG_NOHANDLE(IO_ASYNC)     == O_ASYNC);
 STATIC_ASSERT(IO_TO_OPENFLAG_NOHANDLE(IO_DIRECT)    == O_DIRECT);
 
 
-INTERN void KCALL
-handle_stcloexec(struct handle_manager *__restrict self,
-                 unsigned int fd, iomode_t cloexec_mode) {
-	struct handle *p;
-	assert(!(cloexec_mode & ~IO_CLOEXEC));
-	sync_write(&self->hm_lock);
-	p = handle_lookup_ptr(fd, self);
-	if (p->h_mode & IO_CLOEXEC) {
-		assert(self->hm_cloexec_count);
-		--self->hm_cloexec_count;
-	}
-	p->h_mode &= ~(IO_CLOEXEC);
-	p->h_mode |= cloexec_mode;
-	if (p->h_mode & IO_CLOEXEC)
-		++self->hm_cloexec_count;
-	sync_endwrite(&self->hm_lock);
-}
-
-
-INTERN void KCALL
+/* Modify the I/O-flags of a given file handle
+ * The new I/O flags are calculated as `(old_flags & mask) | flag'
+ * @return: * :  The handle's old I/O-flags */
+PUBLIC NONNULL((1)) iomode_t FCALL
 handle_stflags(struct handle_manager *__restrict self,
-               unsigned int fd,
-               iomode_t mask, iomode_t flag) {
+               unsigned int fd, iomode_t mask, iomode_t flag)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
+	iomode_t result;
 	struct handle *p;
-	assert(mask & IO_CLOEXEC);
-	assert(mask & IO_CLOFORK);
-	assert(!(flag & IO_CLOEXEC));
-	assert(!(flag & IO_CLOFORK));
 	sync_write(&self->hm_lock);
 	p = handle_lookup_ptr(fd, self);
+	result = p->h_mode;
 	p->h_mode &= mask;
 	p->h_mode |= flag;
+	if ((result & IO_CLOEXEC) != (p->h_mode & IO_CLOEXEC)) {
+		if (!(result & IO_CLOEXEC))
+			++self->hm_cloexec_count;
+		else {
+			assert(self->hm_cloexec_count);
+			--self->hm_cloexec_count;
+		}
+	}
+	if ((result & IO_CLOFORK) != (p->h_mode & IO_CLOFORK)) {
+		if (!(result & IO_CLOFORK))
+			++self->hm_clofork_count;
+		else {
+			assert(self->hm_clofork_count);
+			--self->hm_clofork_count;
+		}
+	}
 	sync_endwrite(&self->hm_lock);
+	return result;
 }
 
 

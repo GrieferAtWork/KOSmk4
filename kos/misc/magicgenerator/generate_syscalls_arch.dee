@@ -43,6 +43,15 @@ class SyscallArch {
 	@@mode variant of another system call with the same name.
 	member platformSyscallCompatArch: {(string, string, string)...} = none;
 
+	@@Name of the architecture that is targeted by `__ARCH_HAVE_COMPAT', and
+	@@for which compatibility-mode implementation requests are issued to the
+	@@kernel. (when defined, emit `#define __ARCH_WANT_COMPAT_SYSCALL_XXX 1'
+	@@alongside `#define __ARCH_WANT_SYSCALL_YYY 1' in `<kos/kernel/syscalls.h>')
+	@@NOTE: Compatibility-mode system calls that are already share binary
+	@@      compatibility with other, regular system calls will not cause
+	@@      an implementation request to be issued.
+	member platformSyscallCompatRequest: string = none;
+
 	@@Size of general-purpose registers used for passing system call arguments (in bits)
 	member platformGpRegisterSizeInBits: int;
 
@@ -1355,6 +1364,7 @@ global ARCH: {string: SyscallArch} = {
 			 */
 			("include/i386-kos/asm/syscall3264-compat.h", "__NR3264COMPAT_", "i386"),
 		},
+		platformSyscallCompatRequest: "i386",
 		platformGpRegisterSizeInBits: 64,
 		platformPointerSizeInBytes: 8,
 		platformSyscallRegisterCount: 6,

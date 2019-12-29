@@ -40,6 +40,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
+#include <bits/iovec-struct.h> /* struct iovec */
 #include <kos/except-fs.h>
 #include <kos/except-inval.h>
 #include <kos/hop.h>
@@ -59,21 +60,30 @@
 #include <stdint.h>
 #include <string.h>
 
+#if defined(__ARCH_WANT_COMPAT_SYSCALL_PREADV) || \
+    defined(__ARCH_WANT_COMPAT_SYSCALL_PWRITEV)
+#include <compat/bits/iovec-struct.h> /* struct compat_iovec */
+#endif /* preadv(), pwrietv() */
+
 DECL_BEGIN
 
 STATIC_ASSERT(IO_HANDLE_FFROM_OPENFLAG(O_CLOEXEC) == IO_CLOEXEC);
 STATIC_ASSERT(IO_HANDLE_FFROM_OPENFLAG(O_CLOFORK) == IO_CLOFORK);
-STATIC_ASSERT(IO_HANDLE_FFROM_OPENFLAG(O_CLOEXEC|O_CLOFORK) == (IO_CLOEXEC|IO_CLOFORK));
+STATIC_ASSERT(IO_HANDLE_FFROM_OPENFLAG(O_CLOEXEC | O_CLOFORK) == (IO_CLOEXEC | IO_CLOFORK));
 STATIC_ASSERT(IO_HANDLE_FTO_OPENFLAG(IO_CLOEXEC) == O_CLOEXEC);
 STATIC_ASSERT(IO_HANDLE_FTO_OPENFLAG(IO_CLOFORK) == O_CLOFORK);
-STATIC_ASSERT(IO_HANDLE_FTO_OPENFLAG(IO_CLOEXEC|IO_CLOFORK) == (O_CLOEXEC|O_CLOFORK));
+STATIC_ASSERT(IO_HANDLE_FTO_OPENFLAG(IO_CLOEXEC | IO_CLOFORK) == (O_CLOEXEC | O_CLOFORK));
 STATIC_ASSERT(IO_HANDLE_FFROM_FD(FD_CLOEXEC) == IO_CLOEXEC);
 STATIC_ASSERT(IO_HANDLE_FFROM_FD(FD_CLOFORK) == IO_CLOFORK);
-STATIC_ASSERT(IO_HANDLE_FFROM_FD(FD_CLOEXEC|FD_CLOFORK) == (IO_CLOEXEC|IO_CLOFORK));
+STATIC_ASSERT(IO_HANDLE_FFROM_FD(FD_CLOEXEC | FD_CLOFORK) == (IO_CLOEXEC | IO_CLOFORK));
 STATIC_ASSERT(IO_HANDLE_FTO_FD(IO_CLOEXEC) == FD_CLOEXEC);
 STATIC_ASSERT(IO_HANDLE_FTO_FD(IO_CLOFORK) == FD_CLOFORK);
-STATIC_ASSERT(IO_HANDLE_FTO_FD(IO_CLOEXEC|IO_CLOFORK) == (FD_CLOEXEC|FD_CLOFORK));
+STATIC_ASSERT(IO_HANDLE_FTO_FD(IO_CLOEXEC | IO_CLOFORK) == (FD_CLOEXEC | FD_CLOFORK));
 
+/************************************************************************/
+/* dup(), dup2(), dup3()                                                */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_DUP
 DEFINE_SYSCALL1(fd_t, dup, fd_t, fd) {
 	unsigned int result;
 	struct handle hand;
@@ -88,7 +98,10 @@ DEFINE_SYSCALL1(fd_t, dup, fd_t, fd) {
 	decref(hand);
 	return result;
 }
+#endif /* __ARCH_WANT_SYSCALL_DUP */
 
+
+#ifdef __ARCH_WANT_SYSCALL_DUP2
 DEFINE_SYSCALL2(fd_t, dup2, fd_t, oldfd, fd_t, newfd) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)oldfd);
@@ -107,7 +120,10 @@ DEFINE_SYSCALL2(fd_t, dup2, fd_t, oldfd, fd_t, newfd) {
 	decref(hand);
 	return newfd;
 }
+#endif /* __ARCH_WANT_SYSCALL_DUP2 */
 
+
+#ifdef __ARCH_WANT_SYSCALL_DUP3
 DEFINE_SYSCALL3(fd_t, dup3, fd_t, oldfd, fd_t, newfd, oflag_t, flags) {
 	struct handle hand;
 	VALIDATE_FLAGSET(flags,
@@ -125,7 +141,16 @@ DEFINE_SYSCALL3(fd_t, dup3, fd_t, oldfd, fd_t, newfd, oflag_t, flags) {
 	decref(hand);
 	return newfd;
 }
+#endif /* __ARCH_WANT_SYSCALL_DUP3 */
 
+
+
+
+
+/************************************************************************/
+/* fcntl()                                                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FCNTL
 DEFINE_SYSCALL3(syscall_slong_t, fcntl,
                 fd_t, fd,
                 syscall_ulong_t, command,
@@ -135,7 +160,16 @@ DEFINE_SYSCALL3(syscall_slong_t, fcntl,
 	                    command,
 	                    arg);
 }
+#endif /* __ARCH_WANT_SYSCALL_FCNTL */
 
+
+
+
+
+/************************************************************************/
+/* ioctl(), ioctlf()                                                    */
+/************************************************************************/
+#if defined(__ARCH_WANT_SYSCALL_IOCTL) || defined(__ARCH_WANT_SYSCALL_IOCTLF)
 PRIVATE NOBLOCK void
 NOTHROW(KCALL ioctl_complete_exception_info)(unsigned int fd) {
 	error_code_t code = error_code();
@@ -150,14 +184,6 @@ NOTHROW(KCALL ioctl_complete_exception_info)(unsigned int fd) {
 	}
 }
 
-INTDEF void KCALL
-handle_stcloexec(struct handle_manager *__restrict self,
-                 unsigned int fd, iomode_t cloexec_mode);
-INTDEF void KCALL
-handle_stflags(struct handle_manager *__restrict self,
-               unsigned int fd,
-               iomode_t mask, iomode_t flag);
-
 PRIVATE bool KCALL
 ioctl_generic(syscall_ulong_t command,
               unsigned int fd,
@@ -170,21 +196,24 @@ ioctl_generic(syscall_ulong_t command,
 		/* Set IO_CLOEXEC */
 		if (hand->h_mode & IO_CLOEXEC)
 			break;
-		handle_stcloexec(THIS_HANDLE_MANAGER, fd, IO_CLOEXEC);
+		handle_stflags(THIS_HANDLE_MANAGER, fd, ~0, IO_CLOEXEC);
 		break;
 
 	case FIONCLEX:
 		/* Clear IO_CLOEXEC */
 		if (!(hand->h_mode & IO_CLOEXEC))
 			break;
-		handle_stcloexec(THIS_HANDLE_MANAGER, fd, 0);
+		handle_stflags(THIS_HANDLE_MANAGER, fd, ~IO_CLOEXEC, 0);
 		break;
 
 	case FIONBIO:
 	case _IOW(_IOC_TYPE(FIONBIO), _IOC_NR(FIONBIO), int):
 		/* Set/clear IO_NONBLOCK */
 		validate_readable(arg, sizeof(int));
-		handle_stflags(THIS_HANDLE_MANAGER, fd, IO_NONBLOCK, ATOMIC_READ(*(int *)arg) ? IO_NONBLOCK : 0);
+		handle_stflags(THIS_HANDLE_MANAGER,
+		               fd,
+		               ~IO_NONBLOCK,
+		               ATOMIC_READ(*(int *)arg) ? IO_NONBLOCK : 0);
 		break;
 
 	case FIOASYNC:
@@ -195,7 +224,9 @@ ioctl_generic(syscall_ulong_t command,
 		COMPILER_READ_BARRIER();
 		mode = *(USER CHECKED int *)arg;
 		COMPILER_READ_BARRIER();
-		handle_stflags(THIS_HANDLE_MANAGER, fd, IO_ASYNC,
+		handle_stflags(THIS_HANDLE_MANAGER,
+		               fd,
+		               ~IO_ASYNC,
 		               mode ? IO_ASYNC
 		                    : 0);
 	}	break;
@@ -256,8 +287,9 @@ ioctl_generic(syscall_ulong_t command,
 /*done:*/
 	return true;
 }
+#endif /* __ARCH_WANT_SYSCALL_IOCTL || __ARCH_WANT_SYSCALL_IOCTLF */
 
-
+#ifdef __ARCH_WANT_SYSCALL_IOCTL
 DEFINE_SYSCALL3(syscall_slong_t, ioctl,
                 fd_t, fd,
                 syscall_ulong_t, command,
@@ -289,20 +321,61 @@ done:
 	decref(hand);
 	return result;
 }
+#endif /* __ARCH_WANT_SYSCALL_IOCTL */
 
-#ifdef __NR_ftruncate64
-DEFINE_SYSCALL2(errno_t, ftruncate64, fd_t, fd, uint64_t, length)
-#else /* __NR_ftruncate64 */
-DEFINE_SYSCALL2(errno_t, ftruncate, fd_t, fd, syscall_ulong_t, length)
-#endif /* !__NR_ftruncate64 */
-{
+#ifdef __ARCH_WANT_SYSCALL_IOCTLF
+DEFINE_SYSCALL4(syscall_slong_t, ioctlf,
+                fd_t, fd, syscall_ulong_t, command,
+                iomode_t, mode,
+                USER UNCHECKED void *, arg) {
+	struct handle hand;
+	syscall_slong_t result;
+	VALIDATE_FLAGSET(mode,
+	                 IO_USERF_MASK,
+	                 E_INVALID_ARGUMENT_CONTEXT_IOCTLF_MODE);
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		result = handle_ioctlf(hand,
+		                       command,
+		                       arg,
+		                       mode);
+	} EXCEPT {
+		if (was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) &&
+		    PERTASK_GET(this_exception_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
+			TRY {
+				if (ioctl_generic(command, fd, &hand, arg, &result))
+					goto done;
+			} EXCEPT {
+				ioctl_complete_exception_info((unsigned int)fd);
+				decref(hand);
+				RETHROW();
+			}
+		}
+		ioctl_complete_exception_info((unsigned int)fd);
+		decref(hand);
+		RETHROW();
+	}
+done:
+	decref(hand);
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_IOCTLF */
+
+
+
+
+
+/************************************************************************/
+/* ftruncate(), ftruncate64()                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FTRUNCATE
+DEFINE_SYSCALL2(errno_t, ftruncate, fd_t, fd, syscall_ulong_t, length) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
 		if (!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_TRUNC, hand.h_mode);
-		handle_truncate(hand,
-		                (pos_t)length);
+		handle_truncate(hand, (pos_t)length);
 	} EXCEPT {
 		decref(hand);
 		RETHROW();
@@ -310,25 +383,37 @@ DEFINE_SYSCALL2(errno_t, ftruncate, fd_t, fd, syscall_ulong_t, length)
 	decref(hand);
 	return 0;
 }
+#endif /* __ARCH_WANT_SYSCALL_FTRUNCATE */
 
-#ifdef __NR_ftruncate64
-DEFINE_SYSCALL2(errno_t, ftruncate, fd_t, fd, syscall_ulong_t, length) {
-	return sys_ftruncate64(fd, (uint64_t)length);
+#ifdef __ARCH_WANT_SYSCALL_FTRUNCATE64
+DEFINE_SYSCALL2(errno_t, ftruncate64, fd_t, fd, uint64_t, length) {
+	struct handle hand;
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANWRITE(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_TRUNC, hand.h_mode);
+		handle_truncate(hand, (pos_t)length);
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return 0;
 }
-#endif /* __NR_ftruncate64 */
+#endif /* __ARCH_WANT_SYSCALL_FTRUNCATE64 */
 
 
-#ifdef __NR_fallocate64
-DEFINE_SYSCALL4(errno_t, fallocate64,
-                fd_t, fd, syscall_ulong_t, mode,
-                uint64_t, offset, uint64_t, length)
-#else /* __NR_fallocate64 */
+
+
+
+/************************************************************************/
+/* fallocate(), fallocate64()                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FALLOCATE
 DEFINE_SYSCALL4(errno_t, fallocate,
                 fd_t, fd, syscall_ulong_t, mode,
                 syscall_ulong_t, offset,
-                syscall_ulong_t, length)
-#endif /* !__NR_fallocate64 */
-{
+                syscall_ulong_t, length) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
@@ -343,31 +428,71 @@ DEFINE_SYSCALL4(errno_t, fallocate,
 	decref(hand);
 	return 0;
 }
+#endif /* __ARCH_WANT_SYSCALL_FALLOCATE */
 
-#ifdef __NR_fallocate64
-DEFINE_SYSCALL4(errno_t, fallocate,
+#ifdef __ARCH_WANT_SYSCALL_FALLOCATE64
+DEFINE_SYSCALL4(errno_t, fallocate64,
                 fd_t, fd, syscall_ulong_t, mode,
-                syscall_ulong_t, offset,
-                syscall_ulong_t, length) {
-	return sys_fallocate64(fd, mode, (uint64_t)offset, (uint64_t)length);
+                uint64_t, offset, uint64_t, length) {
+	struct handle hand;
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		handle_allocate(hand,
+		                mode,
+		                (pos_t)offset,
+		                (pos_t)length);
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return 0;
 }
-#endif /* __NR_fallocate64 */
+#endif /* __ARCH_WANT_SYSCALL_FALLOCATE64 */
 
+
+
+
+
+/************************************************************************/
+/* close()                                                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_CLOSE
 DEFINE_SYSCALL1(errno_t, close, fd_t, fd) {
 	handle_close((unsigned int)fd);
 	return 0;
 }
+#endif /* __ARCH_WANT_SYSCALL_CLOSE */
 
-#ifdef __NR_lseek64
+
+
+
+
+/************************************************************************/
+/* lseek(), lseek64(), _llseek()                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_LSEEK
+DEFINE_SYSCALL3(syscall_slong_t, lseek,
+                fd_t, fd, syscall_slong_t, offset,
+                syscall_ulong_t, whence) {
+	pos_t result;
+	struct handle hand;
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		result = handle_seek(hand, (off_t)offset, whence);
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (syscall_slong_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_LSEEK */
+
+#ifdef __ARCH_WANT_SYSCALL_LSEEK64
 DEFINE_SYSCALL3(int64_t, lseek64,
                 fd_t, fd, int64_t, offset,
-                syscall_ulong_t, whence)
-#else /* __NR_lseek64 */
-DEFINE_SYSCALL3(int64_t, lseek,
-                fd_t, fd, syscall_slong_t, offset,
-                syscall_ulong_t, whence)
-#endif /* !__NR_lseek64 */
-{
+                syscall_ulong_t, whence) {
 	pos_t result;
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
@@ -382,20 +507,9 @@ DEFINE_SYSCALL3(int64_t, lseek,
 	decref(hand);
 	return (int64_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_LSEEK64 */
 
-#if defined(__NR_lseek64) && defined(__NR_lseek)
-DEFINE_SYSCALL3(syscall_slong_t, lseek,
-                fd_t, fd, syscall_slong_t, offset,
-                syscall_ulong_t, whence) {
-	uint64_t result;
-	result = (uint64_t)sys_lseek64(fd, offset, whence);
-	if unlikely(result > UINT32_MAX)
-		THROW(E_OVERFLOW);
-	return (syscall_slong_t)(uint32_t)result;
-}
-#endif /* __NR_lseek64 && __NR_lseek */
-
-#ifdef __NR__llseek
+#ifdef __ARCH_WANT_SYSCALL__LLSEEK
 DEFINE_SYSCALL4(errno_t, _llseek, fd_t, fd, int64_t, offset,
                 USER UNCHECKED uint64_t *, result,
                 syscall_ulong_t, whence) {
@@ -405,8 +519,29 @@ DEFINE_SYSCALL4(errno_t, _llseek, fd_t, fd, int64_t, offset,
 	*result = retpos;
 	return -EOK;
 }
-#endif /* __NR__llseek */
+#endif /* __ARCH_WANT_SYSCALL__LLSEEK */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL__LLSEEK
+DEFINE_COMPAT_SYSCALL4(errno_t, _llseek,
+                       fd_t, fd, int64_t, offset,
+                       USER UNCHECKED uint64_t *, result,
+                       syscall_ulong_t, whence) {
+	uint64_t retpos;
+	compat_validate_writable(result, sizeof(uint64_t));
+	retpos  = (uint64_t)sys_lseek64(fd, offset, whence);
+	*result = retpos;
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL__LLSEEK */
+
+
+
+
+
+/************************************************************************/
+/* read(), write(), readf(), writef()                                   */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_READ
 DEFINE_SYSCALL3(ssize_t, read, fd_t, fd,
                 USER UNCHECKED void *, buf, size_t, bufsize) {
 	size_t result;
@@ -424,7 +559,9 @@ DEFINE_SYSCALL3(ssize_t, read, fd_t, fd,
 	decref(hand);
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_READ */
 
+#ifdef __ARCH_WANT_SYSCALL_WRITE
 DEFINE_SYSCALL3(ssize_t, write, fd_t, fd,
                 USER UNCHECKED void const *, buf, size_t, bufsize) {
 	size_t result;
@@ -442,7 +579,70 @@ DEFINE_SYSCALL3(ssize_t, write, fd_t, fd,
 	decref(hand);
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_WRITE */
 
+#ifdef __ARCH_WANT_SYSCALL_READF
+DEFINE_SYSCALL4(ssize_t, readf,
+                fd_t, fd, USER UNCHECKED void *, buf,
+                size_t, bufsize, iomode_t, mode) {
+	size_t result;
+	struct handle hand;
+	VALIDATE_FLAGSET(mode,
+	                 IO_USERF_MASK,
+	                 E_INVALID_ARGUMENT_CONTEXT_READF_MODE);
+	validate_writable(buf, bufsize);
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANREAD(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+		result = handle_readf(hand,
+		                      buf,
+		                      bufsize,
+		                      (hand.h_mode & ~IO_USERF_MASK) | mode);
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_READF */
+
+#ifdef __ARCH_WANT_SYSCALL_WRITEF
+DEFINE_SYSCALL4(ssize_t, writef,
+                fd_t, fd, USER UNCHECKED void const *, buf,
+                size_t, bufsize, iomode_t, mode) {
+	size_t result;
+	struct handle hand;
+	VALIDATE_FLAGSET(mode,
+	                 IO_USERF_MASK,
+	                 E_INVALID_ARGUMENT_CONTEXT_WRITEF_MODE);
+	validate_readable(buf, bufsize);
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANWRITE(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+		result = handle_writef(hand,
+		                       buf,
+		                       bufsize,
+		                       (hand.h_mode & ~IO_USERF_MASK) | mode);
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_WRITEF */
+
+
+
+
+
+/************************************************************************/
+/* pread64(), pwrite64(), pread64f(), pwrite64f()                       */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_PREAD64
 DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd,
                 USER UNCHECKED void *, buf,
                 size_t, bufsize, uint64_t, offset) {
@@ -464,7 +664,9 @@ DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd,
 	decref(hand);
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_PREAD64 */
 
+#ifdef __ARCH_WANT_SYSCALL_PWRITE64
 DEFINE_SYSCALL4(ssize_t, pwrite64, fd_t, fd,
                 USER UNCHECKED void const *, buf,
                 size_t, bufsize, uint64_t, offset) {
@@ -486,7 +688,271 @@ DEFINE_SYSCALL4(ssize_t, pwrite64, fd_t, fd,
 	decref(hand);
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_PWRITE64 */
 
+#ifdef __ARCH_WANT_SYSCALL_PREAD64F
+DEFINE_SYSCALL5(ssize_t, pread64f,
+                fd_t, fd, USER UNCHECKED void *, buf,
+                size_t, bufsize, uint64_t, offset, iomode_t, mode) {
+	size_t result;
+	struct handle hand;
+	VALIDATE_FLAGSET(mode,
+	                 IO_USERF_MASK,
+	                 E_INVALID_ARGUMENT_CONTEXT_PREADF_MODE);
+	validate_writable(buf, bufsize);
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANREAD(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+		result = handle_preadf(hand,
+		                       buf,
+		                       bufsize,
+		                       (pos_t)offset,
+		                       (hand.h_mode & ~IO_USERF_MASK) | mode);
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PREAD64F */
+
+#ifdef __ARCH_WANT_SYSCALL_PWRITE64F
+DEFINE_SYSCALL5(ssize_t, pwrite64f,
+                fd_t, fd, USER UNCHECKED void const *, buf,
+                size_t, bufsize, uint64_t, offset, iomode_t, mode) {
+	size_t result;
+	struct handle hand;
+	VALIDATE_FLAGSET(mode,
+	                 IO_USERF_MASK,
+	                 E_INVALID_ARGUMENT_CONTEXT_PWRITEF_MODE);
+	validate_readable(buf, bufsize);
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANWRITE(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+		result = handle_pwritef(hand,
+		                        buf,
+		                        bufsize,
+		                        (pos_t)offset,
+		                        (hand.h_mode & ~IO_USERF_MASK) | mode);
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PWRITE64F */
+
+
+
+
+
+/************************************************************************/
+/* preadv(), pwritev()                                                  */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_PREADV
+DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
+                USER UNCHECKED struct iovec const *, iov,
+                size_t, count, uint64_t, offset) {
+	size_t result, num_bytes;
+	struct handle hand;
+	struct aio_buffer dst;
+	validate_readablem(iov, count, sizeof(*iov));
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANREAD(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+		if unlikely(!count)
+			result = 0;
+		else {
+			dst.ab_entc = count;
+			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
+			                                                 sizeof(struct aio_buffer_entry));
+			TRY {
+				size_t i;
+				for (i = 0, num_bytes = 0; i < count; ++i) {
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
+					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
+					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+				}
+				dst.ab_head = dst.ab_entv[0];
+				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				result = handle_preadv(hand,
+				                       &dst,
+				                       num_bytes,
+				                       (pos_t)offset);
+			} EXCEPT {
+				freea((void *)dst.ab_entv);
+				RETHROW();
+			}
+			freea((void *)dst.ab_entv);
+		}
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PREADV */
+
+#ifdef __ARCH_WANT_SYSCALL_PWRITEV
+DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
+                USER UNCHECKED struct iovec const *, iov,
+                size_t, count, uint64_t, offset) {
+	size_t result, num_bytes;
+	struct handle hand;
+	struct aio_buffer dst;
+	validate_readablem(iov, count, sizeof(*iov));
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANWRITE(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+		if unlikely(!count)
+			result = 0;
+		else {
+			dst.ab_entc = count;
+			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
+			                                                 sizeof(struct aio_buffer_entry));
+			TRY {
+				size_t i;
+				for (i = 0, num_bytes = 0; i < count; ++i) {
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
+					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
+					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+				}
+				dst.ab_head = dst.ab_entv[0];
+				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				result = handle_pwritev(hand,
+				                        &dst,
+				                        num_bytes,
+				                        (pos_t)offset);
+			} EXCEPT {
+				freea((void *)dst.ab_entv);
+				RETHROW();
+			}
+			freea((void *)dst.ab_entv);
+		}
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PWRITEV */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PREADV
+DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
+                       USER UNCHECKED struct compat_iovec const *, iov,
+                       size_t, count, uint64_t, offset) {
+	size_t result, num_bytes;
+	struct handle hand;
+	struct aio_buffer dst;
+	compat_validate_readablem(iov, count, sizeof(*iov));
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANREAD(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+		if unlikely(!count)
+			result = 0;
+		else {
+			dst.ab_entc = count;
+			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
+			                                                 sizeof(struct aio_buffer_entry));
+			TRY {
+				size_t i;
+				for (i = 0, num_bytes = 0; i < count; ++i) {
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
+					compat_validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
+					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+				}
+				dst.ab_head = dst.ab_entv[0];
+				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				result = handle_preadv(hand,
+				                       &dst,
+				                       num_bytes,
+				                       (pos_t)offset);
+			} EXCEPT {
+				freea((void *)dst.ab_entv);
+				RETHROW();
+			}
+			freea((void *)dst.ab_entv);
+		}
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PREADV */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PWRITEV
+DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
+                       USER UNCHECKED struct compat_iovec const *, iov,
+                       size_t, count, uint64_t, offset) {
+	size_t result, num_bytes;
+	struct handle hand;
+	struct aio_buffer dst;
+	compat_validate_readablem(iov, count, sizeof(*iov));
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANWRITE(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+		if unlikely(!count)
+			result = 0;
+		else {
+			dst.ab_entc = count;
+			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
+			                                                 sizeof(struct aio_buffer_entry));
+			TRY {
+				size_t i;
+				for (i = 0, num_bytes = 0; i < count; ++i) {
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
+					compat_validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
+					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+				}
+				dst.ab_head = dst.ab_entv[0];
+				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				result = handle_pwritev(hand,
+				                        &dst,
+				                        num_bytes,
+				                        (pos_t)offset);
+			} EXCEPT {
+				freea((void *)dst.ab_entv);
+				RETHROW();
+			}
+			freea((void *)dst.ab_entv);
+		}
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PWRITEV */
+
+
+
+
+
+/************************************************************************/
+/* fsync(), fdatasync()                                                 */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FSYNC
 DEFINE_SYSCALL1(errno_t, fsync, fd_t, fd) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
@@ -499,7 +965,9 @@ DEFINE_SYSCALL1(errno_t, fsync, fd_t, fd) {
 	decref(hand);
 	return 0;
 }
+#endif /* __ARCH_WANT_SYSCALL_FSYNC */
 
+#ifdef __ARCH_WANT_SYSCALL_FDATASYNC
 DEFINE_SYSCALL1(errno_t, fdatasync, fd_t, fd) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
@@ -512,9 +980,16 @@ DEFINE_SYSCALL1(errno_t, fdatasync, fd_t, fd) {
 	decref(hand);
 	return 0;
 }
+#endif /* __ARCH_WANT_SYSCALL_FDATASYNC */
 
 
 
+
+
+/************************************************************************/
+/* hop(), hopf()                                                        */
+/************************************************************************/
+#if defined(__ARCH_WANT_SYSCALL_HOP) || defined(__ARCH_WANT_SYSCALL_HOPF)
 #define hop_do_generic_operation(hand, hop_command, fd, arg) \
 	hop_do_generic_operation(hand, hop_command, arg)
 PRIVATE syscall_slong_t
@@ -624,7 +1099,6 @@ PRIVATE syscall_slong_t
 	return 0;
 }
 
-
 PRIVATE NOBLOCK void
 NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
                                            unsigned int fd,
@@ -659,8 +1133,9 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 	default: break;
 	}
 }
+#endif /* __ARCH_WANT_SYSCALL_HOP || __ARCH_WANT_SYSCALL_HOPF */
 
-
+#ifdef __ARCH_WANT_SYSCALL_HOP
 DEFINE_SYSCALL3(syscall_slong_t, hop,
                 fd_t, fd, syscall_ulong_t, cmd,
                 USER UNCHECKED void *, arg) {
@@ -685,7 +1160,9 @@ DEFINE_SYSCALL3(syscall_slong_t, hop,
 	decref(hand);
 	return result;
 }
+#endif /* __ARCH_WANT_SYSCALL_HOP */
 
+#ifdef __ARCH_WANT_SYSCALL_HOPF
 DEFINE_SYSCALL4(syscall_slong_t, hopf,
                 fd_t, fd, syscall_ulong_t, cmd,
                 iomode_t, mode,
@@ -714,146 +1191,16 @@ DEFINE_SYSCALL4(syscall_slong_t, hopf,
 	decref(hand);
 	return result;
 }
-
-DEFINE_SYSCALL4(syscall_slong_t, ioctlf,
-                fd_t, fd, syscall_ulong_t, command,
-                iomode_t, mode,
-                USER UNCHECKED void *, arg) {
-	struct handle hand;
-	syscall_slong_t result;
-	VALIDATE_FLAGSET(mode,
-	                 IO_USERF_MASK,
-	                 E_INVALID_ARGUMENT_CONTEXT_IOCTLF_MODE);
-	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		result = handle_ioctlf(hand,
-		                       command,
-		                       arg,
-		                       mode);
-	} EXCEPT {
-		if (was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) &&
-		    PERTASK_GET(this_exception_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
-			TRY {
-				if (ioctl_generic(command, fd, &hand, arg, &result))
-					goto done;
-			} EXCEPT {
-				ioctl_complete_exception_info((unsigned int)fd);
-				decref(hand);
-				RETHROW();
-			}
-		}
-		ioctl_complete_exception_info((unsigned int)fd);
-		decref(hand);
-		RETHROW();
-	}
-done:
-	decref(hand);
-	return result;
-}
+#endif /* __ARCH_WANT_SYSCALL_HOPF */
 
 
-DEFINE_SYSCALL4(ssize_t, readf,
-                fd_t, fd, USER UNCHECKED void *, buf,
-                size_t, bufsize, iomode_t, mode) {
-	size_t result;
-	struct handle hand;
-	VALIDATE_FLAGSET(mode,
-	                 IO_USERF_MASK,
-	                 E_INVALID_ARGUMENT_CONTEXT_READF_MODE);
-	validate_writable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if (!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		result = handle_readf(hand,
-		                      buf,
-		                      bufsize,
-		                      (hand.h_mode & ~IO_USERF_MASK) | mode);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return (ssize_t)result;
-}
 
-DEFINE_SYSCALL4(ssize_t, writef,
-                fd_t, fd, USER UNCHECKED void const *, buf,
-                size_t, bufsize, iomode_t, mode) {
-	size_t result;
-	struct handle hand;
-	VALIDATE_FLAGSET(mode,
-	                 IO_USERF_MASK,
-	                 E_INVALID_ARGUMENT_CONTEXT_WRITEF_MODE);
-	validate_readable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		result = handle_writef(hand,
-		                       buf,
-		                       bufsize,
-		                       (hand.h_mode & ~IO_USERF_MASK) | mode);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return (ssize_t)result;
-}
 
-DEFINE_SYSCALL5(ssize_t, pread64f,
-                fd_t, fd, USER UNCHECKED void *, buf,
-                size_t, bufsize, uint64_t, offset, iomode_t, mode) {
-	size_t result;
-	struct handle hand;
-	VALIDATE_FLAGSET(mode,
-	                 IO_USERF_MASK,
-	                 E_INVALID_ARGUMENT_CONTEXT_PREADF_MODE);
-	validate_writable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if (!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		result = handle_preadf(hand,
-		                       buf,
-		                       bufsize,
-		                       (pos_t)offset,
-		                       (hand.h_mode & ~IO_USERF_MASK) | mode);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return (ssize_t)result;
-}
 
-DEFINE_SYSCALL5(ssize_t, pwrite64f,
-                fd_t, fd, USER UNCHECKED void const *, buf,
-                size_t, bufsize, uint64_t, offset, iomode_t, mode) {
-	size_t result;
-	struct handle hand;
-	VALIDATE_FLAGSET(mode,
-	                 IO_USERF_MASK,
-	                 E_INVALID_ARGUMENT_CONTEXT_PWRITEF_MODE);
-	validate_readable(buf, bufsize);
-	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		result = handle_pwritef(hand,
-		                        buf,
-		                        bufsize,
-		                        (pos_t)offset,
-		                        (hand.h_mode & ~IO_USERF_MASK) | mode);
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return (ssize_t)result;
-}
-
+/************************************************************************/
+/* kreaddir(), kreaddirf()                                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_KREADDIR
 DEFINE_SYSCALL4(ssize_t, kreaddir,
                 fd_t, fd, USER UNCHECKED struct dirent *, buf,
                 size_t, bufsize, syscall_ulong_t, mode) {
@@ -873,7 +1220,7 @@ DEFINE_SYSCALL4(ssize_t, kreaddir,
 			mode &= ~(READDIR_MODEMASK);
 #if READDIR_DEFAULT != 0
 			mode |= READDIR_DEFAULT;
-#endif
+#endif /* READDIR_DEFAULT != 0 */
 			for (;;) {
 				partial = handle_readdir(hand, buf, bufsize, (readdir_mode_t)mode);
 				if (!partial) {
@@ -923,7 +1270,9 @@ DEFINE_SYSCALL4(ssize_t, kreaddir,
 	decref(hand);
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_KREADDIR */
 
+#ifdef __ARCH_WANT_SYSCALL_KREADDIRF
 DEFINE_SYSCALL5(ssize_t, kreaddirf,
                 fd_t, fd, struct dirent *, buf,
                 size_t, bufsize, syscall_ulong_t, mode,
@@ -999,99 +1348,7 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 	decref(hand);
 	return (ssize_t)result;
 }
-
-
-DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
-                USER UNCHECKED struct iovec const *, iov,
-                size_t, count, uint64_t, offset) {
-	size_t result, num_bytes;
-	struct handle hand;
-	struct aio_buffer dst;
-	validate_readablem(iov, count, sizeof(struct iovec));
-	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if (!IO_CANREAD(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-		if unlikely(!count)
-			result = 0;
-		else {
-			dst.ab_entc = count;
-			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
-			                                                 sizeof(struct aio_buffer_entry));
-			TRY {
-				size_t i;
-				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
-					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
-					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
-				}
-				dst.ab_head = dst.ab_entv[0];
-				dst.ab_last = dst.ab_entv[count - 1].ab_size;
-				result = handle_preadv(hand,
-				                       &dst,
-				                       num_bytes,
-				                       (pos_t)offset);
-			} EXCEPT {
-				freea((void *)dst.ab_entv);
-				RETHROW();
-			}
-			freea((void *)dst.ab_entv);
-		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return (ssize_t)result;
-}
-
-DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
-                USER UNCHECKED struct iovec const *, iov,
-                size_t, count, uint64_t, offset) {
-	size_t result, num_bytes;
-	struct handle hand;
-	struct aio_buffer dst;
-	validate_readablem(iov, count, sizeof(struct iovec));
-	hand = handle_lookup((unsigned int)fd);
-	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
-			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
-		if unlikely(!count)
-			result = 0;
-		else {
-			dst.ab_entc = count;
-			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
-			                                                 sizeof(struct aio_buffer_entry));
-			TRY {
-				size_t i;
-				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
-					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
-					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
-					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
-				}
-				dst.ab_head = dst.ab_entv[0];
-				dst.ab_last = dst.ab_entv[count - 1].ab_size;
-				result = handle_pwritev(hand,
-				                        &dst,
-				                        num_bytes,
-				                        (pos_t)offset);
-			} EXCEPT {
-				freea((void *)dst.ab_entv);
-				RETHROW();
-			}
-			freea((void *)dst.ab_entv);
-		}
-	} EXCEPT {
-		decref(hand);
-		RETHROW();
-	}
-	decref(hand);
-	return (ssize_t)result;
-}
+#endif /* __ARCH_WANT_SYSCALL_KREADDIRF */
 
 
 PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
@@ -1535,18 +1792,16 @@ DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
 }
 #endif /* __NR_select64 */
 
-struct sigset_and_len {
-	sigset_t const *ss_ptr;
-	size_t          ss_len;
-};
-
-
 DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
                 USER UNCHECKED fd_set *, readfds,
                 USER UNCHECKED fd_set *, writefds,
                 USER UNCHECKED fd_set *, exceptfds,
                 USER UNCHECKED struct __timespec32 const *, timeout,
                 USER UNCHECKED void const *, sigmask_sigset_and_len) {
+	struct sigset_and_len {
+		sigset_t const *ss_ptr;
+		size_t          ss_len;
+	};
 	size_t result, nfd_size;
 	struct sigset_and_len ss;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
@@ -1593,6 +1848,9 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 	}
 	return (ssize_t)result;
 }
+
+
+
 
 #ifdef __NR_pselect6_64
 DEFINE_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,

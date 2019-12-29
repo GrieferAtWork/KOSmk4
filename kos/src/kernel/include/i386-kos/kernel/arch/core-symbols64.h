@@ -10638,10 +10638,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak kernel_syscall1_iscp32; .quad kernel_syscall1_iscp32
 	.reloc ., R_X86_64_SIZE32, kernel_syscall1_iscp32; .int 0
 	.int 0x958fa62
-	.quad 0 /* index: 2659 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2659 /* index: 2659 */
+	.weak handle_stflags; .quad handle_stflags
+	.reloc ., R_X86_64_SIZE32, handle_stflags; .int 0
+	.int 0x2e80a63
 	.quad .Lname2660 /* index: 2660 */
 	.weak sys_epoll_ctl_old; .quad sys_epoll_ctl_old
 	.reloc ., R_X86_64_SIZE32, sys_epoll_ctl_old; .int 0
@@ -20026,6 +20026,8 @@ END(kernel_symbol_table)
 	.string "sys_hop"
 .Lname2658:
 	.string "kernel_syscall1_iscp32"
+.Lname2659:
+	.string "handle_stflags"
 .Lname2660:
 	.string "sys_epoll_ctl_old"
 .Lname2661:

@@ -16,29 +16,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_COMPAT_H
-#define _I386_KOS_BITS_COMPAT_H 1
+#ifndef _I386_KOS_COMPAT_BITS_TYPESIZES_H
+#define _I386_KOS_COMPAT_BITS_TYPESIZES_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/host.h>
-/* Compatibility mode definitions */
 
-#undef __ARCH_HAVE_COMPAT
 #ifdef __x86_64__
-#include <hybrid/typecore.h>
-#include <hybrid/__pointer.h>
-
-#define __ARCH_HAVE_COMPAT 1
-#define __ARCH_COMPAT_FUNCPTR(return, cc, name, args) __HYBRID_FUNCPTR32(return, cc, name, args)
-#define __ARCH_COMPAT(x)             x##32
-#define __ARCH_COMPAT_PTR(T)         __HYBRID_PTR32(T)
-#define __ARCH_COMPAT_SIZEOF_POINTER 4
-#define __ARCH_COMPAT_INTPTR_TYPE    __INT32_TYPE__
-#define __ARCH_COMPAT_LONGPTR_TYPE   __LONG32_TYPE__
-#define __ARCH_COMPAT_UINTPTR_TYPE   __UINT32_TYPE__
-#define __ARCH_COMPAT_ULONGPTR_TYPE  __ULONG32_TYPE__
-#define __ARCH_COMPAT_SIZE_TYPE      __ULONG32_TYPE__
-#define __ARCH_COMPAT_SSIZE_TYPE     __LONG32_TYPE__
+/* Override: Due to historical reasons, sizeof(socklen_t) == sizeof(int) */
+#define __ARCH_COMPAT_SIZEOF_SOCKLEN_T    4
+#define __ARCH_COMPAT_SIZEOF_OFF32_T      4
+#define __ARCH_COMPAT_SIZEOF_BLKCNT32_T   4
+#define __ARCH_COMPAT_SIZEOF_FSBLKCNT32_T 4
+#define __ARCH_COMPAT_SIZEOF_FSFILCNT32_T 4
+#define __ARCH_COMPAT_SIZEOF_INO32_T      4
+#define __ARCH_COMPAT_SIZEOF_RLIM32_T     4
+#define __ARCH_COMPAT_SIZEOF_TIME32_T     4
+#define __ARCH_COMPAT_SIZEOF_USECOND_T    4
+#define __ARCH_COMPAT_SIZEOF_SUSECONDS_T  4
+#define __ARCH_COMPAT_SIZEOF_CLOCKID_T    4
+#define __ARCH_COMPAT_SIZEOF_CLOCK_T      4
+#define __ARCH_COMPAT_SIZEOF_IOMODE_T     2
 #endif /* __x86_64__ */
 
-#endif /* !_I386_KOS_BITS_COMPAT_H */
+#endif /* !_I386_KOS_COMPAT_BITS_TYPESIZES_H */

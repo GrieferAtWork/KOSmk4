@@ -16,11 +16,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_COMPAT_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_COMPAT_H 1
+#ifndef _I386_KOS_KOS_KERNEL_SYSCALLS_H
+#define _I386_KOS_KOS_KERNEL_SYSCALLS_H 1
 
-#include <kernel/compiler.h>
-#include <kernel/arch/compat.h>
-#include <compat/config.h>
+#include <hybrid/host.h>
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_COMPAT_H */
+#ifdef __x86_64__
+#include "syscalls64.h"
+#else /* __x86_64__ */
+#include "syscalls32.h"
+#endif /* !__x86_64__ */
+
+#endif /* !_I386_KOS_KOS_KERNEL_SYSCALLS_H */

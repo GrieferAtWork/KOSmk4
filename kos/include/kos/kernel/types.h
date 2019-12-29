@@ -20,9 +20,15 @@
 #define _KOS_KERNEL_TYPES_H 1
 
 #include <hybrid/compiler.h>
+
 #include <bits/types.h>
-#include <kos/types.h>
 #include <kos/bits/types.h>
+#include <kos/types.h>
+#include <compat/config.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/kos/types.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 

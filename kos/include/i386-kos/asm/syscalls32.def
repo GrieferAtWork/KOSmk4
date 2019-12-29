@@ -31,6 +31,8 @@
 
 %[typecompat(i386:__sigset_struct = *:__sigset_struct)]
 %[typecompat(i386:sockaddr = *:sockaddr)]
+%[typecompat(i386:pollfd = *:pollfd)]
+%[typecompat(i386:dirent = *:dirent)]
 
 
 @@Restore the specified register state when returning from a signal handler

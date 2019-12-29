@@ -16,11 +16,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_COMPAT_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_COMPAT_H 1
+#ifndef _I386_KOS_COMPAT_BITS_IOVEC_STRUCT_H
+#define _I386_KOS_COMPAT_BITS_IOVEC_STRUCT_H 1
 
-#include <kernel/compiler.h>
-#include <kernel/arch/compat.h>
-#include <compat/config.h>
+#include <hybrid/host.h>
+#ifdef __x86_64__
+#include <bits/iovec-struct32.h>
+#define compat_iovec iovec32
+#endif /* __x86_64__ */
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_COMPAT_H */
+#endif /* !_COMPAT_BITS_IOVEC_STRUCT_H */

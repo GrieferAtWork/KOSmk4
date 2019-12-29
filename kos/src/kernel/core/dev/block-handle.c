@@ -373,9 +373,9 @@ do_BLKFRAGET_compat:
 		*(size_t *)arg = block_device_get_sector_size(self);
 		break;
 #ifdef __ARCH_HAVE_COMPAT
-	case _IOR(_IOC_TYPE(BLKBSZGET), _IOC_NR(BLKBSZGET), __ARCH_COMPAT_SIZE_TYPE):
-		validate_writable(arg, sizeof(__ARCH_COMPAT_SIZE_TYPE));
-		*(__ARCH_COMPAT_SIZE_TYPE *)arg = (__ARCH_COMPAT_SIZE_TYPE)block_device_get_sector_size(self);
+	case _IOR(_IOC_TYPE(BLKBSZGET), _IOC_NR(BLKBSZGET), __ARCH_COMPAT_SIZE_T):
+		validate_writable(arg, sizeof(__ARCH_COMPAT_SIZE_T));
+		*(__ARCH_COMPAT_SIZE_T *)arg = (__ARCH_COMPAT_SIZE_T)block_device_get_sector_size(self);
 		break;
 #endif /* __ARCH_HAVE_COMPAT */
 
@@ -384,9 +384,9 @@ do_BLKFRAGET_compat:
 		block_device_set_sector_size(self, *(size_t *)arg);
 		break;
 #ifdef __ARCH_HAVE_COMPAT
-	case _IOW(_IOC_TYPE(BLKBSZSET), _IOC_NR(BLKBSZSET), __ARCH_COMPAT_SIZE_TYPE):
-		validate_readable(arg, sizeof(__ARCH_COMPAT_SIZE_TYPE));
-		block_device_set_sector_size(self, (size_t)*(__ARCH_COMPAT_SIZE_TYPE *)arg);
+	case _IOW(_IOC_TYPE(BLKBSZSET), _IOC_NR(BLKBSZSET), __ARCH_COMPAT_SIZE_T):
+		validate_readable(arg, sizeof(__ARCH_COMPAT_SIZE_T));
+		block_device_set_sector_size(self, (size_t)*(__ARCH_COMPAT_SIZE_T *)arg);
 		break;
 #endif /* __ARCH_HAVE_COMPAT */
 

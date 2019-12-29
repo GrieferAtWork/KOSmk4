@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a5ba851 */
+/* HASH CRC-32:0x7166f65b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,6 +129,8 @@
 #define __NR3264COMPAT_kexec_load             1(kexec_load)
 #define __NR3264COMPAT_keyctl                 1(keyctl)
 #define __NR3264COMPAT_kill                   1(kill)
+#define __NR3264COMPAT_kreaddir               1(kreaddir)
+#define __NR3264COMPAT_kreaddirf              1(kreaddirf)
 #define __NR3264COMPAT_ksysctl                1(ksysctl)
 #define __NR3264COMPAT_lchown                 2(lchown32,lchown)
 #define __NR3264COMPAT_lgetxattr              1(lgetxattr)
@@ -177,6 +179,7 @@
 #define __NR3264COMPAT_pipe                   1(pipe)
 #define __NR3264COMPAT_pipe2                  1(pipe2)
 #define __NR3264COMPAT_pivot_root             1(pivot_root)
+#define __NR3264COMPAT_poll                   1(poll)
 #define __NR3264COMPAT_prctl                  1(prctl)
 #define __NR3264COMPAT_pread64                1(pread64)
 #define __NR3264COMPAT_pread64f               1(pread64f)

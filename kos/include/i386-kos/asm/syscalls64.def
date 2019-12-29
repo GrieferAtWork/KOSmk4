@@ -29,6 +29,8 @@
 /* Define type compatibilities between x86_64 and i386 */
 %[typecompat(x86_64:__sigset_struct = *:__sigset_struct)]
 %[typecompat(x86_64:sockaddr = *:sockaddr)]
+%[typecompat(x86_64:pollfd = *:pollfd)]
+%[typecompat(x86_64:dirent = *:dirent)]
 
 
 

@@ -32,7 +32,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <bits/compat.h>
+#include <compat/config.h>
 #include <kos/exec/library-listdef.h>
 
 #include <errno.h>
@@ -257,7 +257,7 @@ DEFINE_SYSCALL1(errno_t, set_library_listdef,
 }
 
 #ifdef __ARCH_HAVE_COMPAT
-DEFINE_SYSCALL1_COMPAT(errno_t, set_library_listdef,
+DEFINE_COMPAT_SYSCALL1(errno_t, set_library_listdef,
                        USER UNCHECKED struct __ARCH_COMPAT(library_listdef) const *, listdef) {
 	struct library_listdef newdef;
 	validate_readable(listdef, sizeof(*listdef));

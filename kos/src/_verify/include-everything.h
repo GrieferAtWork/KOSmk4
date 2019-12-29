@@ -120,6 +120,7 @@ incdir("", "../../include");
 #include <__stdinc.h>
 #include <_ansi.h>
 #include <_newlib_version.h>
+#include <aio.h>
 #include <aliases.h>
 #include <alloc.h>
 #include <alloca.h>
@@ -284,6 +285,11 @@ incdir("", "../../include");
 #include <bits/xopen_lim.h>
 #include <bits/xtitypes.h>
 #include <byteswap.h>
+#include <compat/bits/iovec-struct.h>
+#include <compat/bits/types.h>
+#include <compat/bits/typesizes.h>
+#include <compat/config.h>
+#include <compat/kos/types.h>
 #include <cpio.h>
 #include <crtdbg.h>
 #include <crtdefs.h>
@@ -387,7 +393,6 @@ incdir("", "../../include");
 #include <kos/bits/exception_data.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>
-#include <kos/bits/syscalls.h>
 #include <kos/bits/thread.h>
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
@@ -404,6 +409,7 @@ incdir("", "../../include");
 #include <kos/exec/bits/library-listdef.h>
 #include <kos/exec/bits/library.h>
 #include <kos/exec/bits/peb.h>
+#include <kos/exec/elf-rel.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/lazybind.h>
 #include <kos/exec/library-listdef.h>
@@ -434,15 +440,16 @@ incdir("", "../../include");
 #include <kos/ioctl/keyboard.h>
 #include <kos/ioctl/mouse.h>
 #include <kos/jiffies.h>
-#include <kos/kernel/types.h>
 #include <kos/kernel/handle.h>
+#include <kos/kernel/syscalls.h>
+#include <kos/kernel/types.h>
 #include <kos/keyboard.h>
+#include <kos/ksysctl.h>
 #include <kos/malloc.h>
 #include <kos/personality.h>
 #include <kos/sys/stat.h>
 #include <kos/sys/ioctl.h>
 #include <kos/syscalls.h>
-#include <kos/ksysctl.h>
 #include <kos/thread.h>
 #include <kos/types.h>
 #include <kos/ukern.h>
@@ -503,6 +510,14 @@ incdir("", "../../include");
 #include <librpc/bits/syscall-info.h>
 #include <librpc/bits/rpc.h>
 #include <librpc/rpc.h>
+#include <librt/_api.h>
+#include <librt/aio.h>
+#include <librt/api.h>
+#include <librt/asm/aio.h>
+#include <librt/bits/aiocb.h>
+#include <librt/bits/aioinit.h>
+#include <librt/bits/mqueue.h>
+#include <librt/mqueue.h>
 #include <libterm/termio.h>
 #include <libterm/api.h>
 #include <libunwind/api.h>
@@ -577,6 +592,7 @@ incdir("", "../../include");
 #include <minmax.h>
 #include <mntent.h>
 #include <monetary.h>
+#include <mqueue.h>
 #if __has_include(<nc_tparm.h>)
 #include <nc_tparm.h>
 #endif /* __has_include(<nc_tparm.h>) */

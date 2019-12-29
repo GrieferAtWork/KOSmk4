@@ -36,7 +36,7 @@
 #include <hybrid/align.h>
 #include <hybrid/pointer.h>
 
-#include <bits/compat.h>
+#include <compat/config.h>
 #include <kos/except-fs.h>
 #include <kos/except-noexec.h>
 #include <kos/exec/elf.h>

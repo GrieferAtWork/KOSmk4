@@ -27,7 +27,7 @@
 #include <hybrid/__assert.h>
 
 #include <asm/pageid.h>
-#include <bits/compat.h> /* __ARCH_HAVE_COMPAT */
+#include <compat/config.h> /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 

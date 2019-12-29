@@ -25,9 +25,10 @@
 #include <kernel/types.h>
 
 #include <asm/unistd.h>
-#include <bits/compat.h>
+#include <compat/config.h>
 #include <bits/format-printer.h>
-#include <kos/syscalls.h>
+#include <kos/kernel/syscalls.h> /* __ARCH_WANT_SYSCALL_* */
+#include <kos/syscalls.h> /* System call prototypes */
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #if !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT) || \

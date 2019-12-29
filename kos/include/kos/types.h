@@ -20,11 +20,12 @@
 #define _KOS_TYPES_H 1
 
 #include <__stdinc.h>
-#include <features.h>
 
 #ifdef __KERNEL__
 #include <hybrid/__altint.h>
 #endif /* __KERNEL__ */
+
+#include <features.h>
 
 #include <hybrid/typecore.h>
 

@@ -51,6 +51,12 @@ local copyright =
  *       Syscall ID and meta-data definitions
  *       >> #define __NR_exit 123
  *
+ *  /kos/include/kos/syscalls.h
+ *  /kos/include/{name}/kos/syscalls{suffix}.h
+ *       Syscall implementation requests
+ *       >> #define __ARCH_WANT_SYSCALL_NANOSLEEP 1
+ *       >> #define __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP 1
+ *
  *  /kos/include/asm/ls-syscalls.h
  *  /kos/include/{name}/asm/ls-syscalls{suffix}.h
  *       Enumerate system calls, and system call grounds
@@ -2612,6 +2618,64 @@ function generateSyscallCompatibilityHeader(
 }
 
 
+@@Generate include/kos/kernel/syscalls.h
+function generateKosKernelSyscallsRequestHeader(fp: File,
+		baseContext: ParserContext, baseArch/*: SyscallArch*/, baseArchName: string,
+		compatContext: ParserContext = none, compatArch/*: SyscallArch*/ = none,
+		compatArchName: string = none) {
+	local baseFunctions = Dict(
+		for (local none, decl: baseContext.sysidMappings)
+			(decl[2], baseContext.functions[decl[2]]));
+	local compatFunctions = Dict(
+		for (local none, decl: compatContext.sysidMappings)
+			(decl[2], compatContext.functions[decl[2]]));
+	local implicitlyDefinedCompatFunctions: HashSet with string = HashSet();
+	if (compatFunctions) {
+		for (local name, baseFunc: baseFunctions) {
+			local compatNames = enumerateCompatibilityConsiderationFunctions(name);
+			if (baseFunc.name != name) {
+				compatNames = HashSet(compatNames);
+				compatNames.update(enumerateCompatibilityConsiderationFunctions(baseFunc.name));
+			}
+			for (local compatName: compatNames) {
+				local compatFunc = compatFunctions.get(compatName);
+				if (compatFunc is none)
+					continue;
+				if (areFunctionsBinaryCompatible(baseFunc, baseContext, baseArch, baseArchName,
+				                                 compatFunc, compatContext, compatArch, compatArchName))
+					implicitlyDefinedCompatFunctions.insert(compatName);
+			}
+		}
+	}
+	fp << copyright << "\n";
+	local requestedBaseFunctionNames = baseFunctions.keys.sorted();
+	local requestedCompatFunctionNames = HashSet();
+	for (local name, func: compatFunctions) {
+		if (name !in implicitlyDefinedCompatFunctions)
+			requestedCompatFunctionNames.insert(name);
+	}
+	requestedCompatFunctionNames = requestedCompatFunctionNames.sorted();
+	local longestNameLen = requestedBaseFunctionNames.each.length > ...;
+	if (requestedCompatFunctionNames) {
+		local temp = requestedCompatFunctionNames.each.length > ...;
+		if (longestNameLen < temp)
+			longestNameLen = temp;
+	}
+	fp << "#ifndef __ARCH_WANT_SYSCALL_" << requestedBaseFunctionNames.first.upper() << "\n";
+	for (local n: requestedBaseFunctionNames) {
+		fp << "#define __ARCH_WANT_SYSCALL_" << n.upper();
+		if (requestedCompatFunctionNames)
+			fp << "       ";
+		fp << " " * (longestNameLen - #n) << " 1\n";
+	}
+	for (local n: requestedCompatFunctionNames) {
+		fp << "#define __ARCH_WANT_COMPAT_SYSCALL_" << n.upper();
+		fp << " " * (longestNameLen - #n) << " 1\n";
+	}
+	fp << "#endif /* !__ARCH_WANT_SYSCALL_" << requestedBaseFunctionNames.first.upper() << " */\n";
+}
+
+
 
 function main(archNames: {string...}) {
 	local baseContext: ParserContext = ParserContext();
@@ -2741,6 +2805,35 @@ function main(archNames: {string...}) {
 	writeHashedFile("include/asm/ls-syscalls.h", [](fp){
 		generateAsmLsSyscallsHeader(fp, baseContext, none);
 	});
+	writeHashedFile("include/kos/kernel/syscalls.h", [](fp){
+		generateKosKernelSyscallsRequestHeader(fp, baseContext, none, none);
+	});
+
+	for (local name, a: ARCH) {
+		local archContext = archContexts[name];
+		writeHashedFile(a.formatPath(
+			"include/{name}/kos/kernel/syscalls{suffix}.h"
+		), [](fp){
+			local compatArchName = a.platformSyscallCompatRequest;
+			if (compatArchName is none) {
+				generateKosKernelSyscallsRequestHeader(fp, archContext, a, name);
+			} else {
+				local compatArch = ALL_ARCH[compatArchName];
+				if (compatArchName !in archContexts) {
+					/* Lazily load definitions for compatibility-mode architectures */
+					local a = ALL_ARCH[compatArchName];
+					local c = copy baseContext;
+					parseSyscallDefsFile(c, a.formatPath(
+						"include/{name}/asm/syscalls{suffix}.def"));
+					archContexts[compatArchName] = c;
+				}
+				local compatContext = archContexts[compatArchName];
+				generateKosKernelSyscallsRequestHeader(fp,
+					archContext, a, name,
+					compatContext, compatArch, compatArchName);
+			}
+		});
+	}
 
 	for (local name, a: ARCH) {
 		if (!a.platformSyscallCompatArch)
