@@ -27,13 +27,11 @@
 %[typesize(x86_64:uintptr_half_t = 4)]
 
 /* Define type compatibilities between x86_64 and i386 */
-%[typecompat(x86_64:__sigset_struct = *:__sigset_struct)]
-%[typecompat(x86_64:sigset_t = *:sigset_t)]
+%[typecompat(x86_64:[sigset_t,__sigset_struct] = *:[__sigset_struct,sigset_t])]
+%[typecompat(x86_64:[fd_set,__fd_set_struct] = *:[fd_set,__fd_set_struct])]
 %[typecompat(x86_64:sockaddr = *:sockaddr)]
 %[typecompat(x86_64:pollfd = *:pollfd)]
 %[typecompat(x86_64:dirent = *:dirent)]
-%[typecompat(x86_64:__fd_set_struct = *:__fd_set_struct)]
-%[typecompat(x86_64:fd_set = *:fd_set)]
 
 /* Define type compatibilities between x86_64 and i386 */
 %[typecompat(x86_64:[timeb,__timebx64] = i386:[__timebx32_64])]

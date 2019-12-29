@@ -801,9 +801,30 @@ again:
 	return false;
 }
 
+function removeWord(x: string, word: string): string {
+	for (;;) {
+		if (x.startswith(word + " ")) {
+			x = x[#word:];
+			continue;
+		}
+		if (x.endswith(" " + word)) {
+			x = x[:-#word];
+			continue;
+		}
+		local new_x = x.replace(" " + word + " ", "  ");
+		if (new_x != x) {
+			x = new_x;
+			continue;
+		}
+		return x;
+	}
+}
+
 function simpifyTypeName(x: string): string {
-	x = x.replace("const", "").replace("volatile", "")
-	     .replace("struct", "").replace("[]", "*");
+	x = removeWord(x, "const");
+	x = removeWord(x, "volatile");
+	x = removeWord(x, "struct");
+	x = x.replace("[]", "*");
 	for (;;) {
 		local r = x.replace("  ", "");
 		if (r.endswith("]"))
@@ -834,35 +855,49 @@ function areCTypesCompatible(
 function areFunctionsBinaryCompatible(
 		a: Function, aContext: ParserContext, aArch/*: SyscallArch*/, aArchName: string,
 		b: Function, bContext: ParserContext, bArch/*: SyscallArch*/, bArchName: string): bool {
-	print "areFunctionsBinaryCompatible(a: ",;
-	print repr str a,;
-	print ", aArchName: ",;
-	print repr aArchName,;
-	print ", b: ",;
-	print repr str b,;
-	print ", bArchName: ",;
-	print repr bArchName,;
-	print ")";
-	if (a.isNoExcept != b.isNoExcept)
+#define PRINT_COMPAT(...) print __VA_ARGS__
+	PRINT_COMPAT("areFunctionsBinaryCompatible(a: ",);
+	PRINT_COMPAT(repr str a,);
+	PRINT_COMPAT(", aArchName: ",);
+	PRINT_COMPAT(repr aArchName,);
+	PRINT_COMPAT(", b: ",);
+	PRINT_COMPAT(repr str b,);
+	PRINT_COMPAT(", bArchName: ",);
+	PRINT_COMPAT(repr bArchName,);
+	PRINT_COMPAT(")... ",);
+	if (a.isNoExcept != b.isNoExcept) {
+		PRINT_COMPAT("No: isNoExcept");
 		return false;
-	if (a.isCp != b.isCp)
+	}
+//	if (a.isCp != b.isCp) {
+//		PRINT_COMPAT("No: isCp");
+//		return false;
+//	}
+	if (a.isNoReturn != b.isNoReturn) {
+		PRINT_COMPAT("No: isNoReturn");
 		return false;
-	if (a.isNoReturn != b.isNoReturn)
-		return false;
+	}
 	if (!areCTypesCompatible(a.returnType, aContext, aArch, aArchName,
-	                         b.returnType, bContext, bArch, bArchName))
+	                         b.returnType, bContext, bArch, bArchName)) {
+		PRINT_COMPAT("No: returnType");
 		return false;
+	}
 	local aArgs: {(CType, string)...} = a.args;
 	local bArgs: {(CType, string)...} = b.args;
-	if (#aArgs != #bArgs)
+	if (#aArgs != #bArgs) {
+		PRINT_COMPAT("No: argc");
 		return false;
+	}
 	for (local i: [:#aArgs]) {
 		local aArgType: CType = aArgs[i][0];
 		local bArgType: CType = bArgs[i][0];
 		if (!areCTypesCompatible(aArgType, aContext, aArch, aArchName,
-		                         bArgType, bContext, bArch, bArchName))
+		                         bArgType, bContext, bArch, bArchName)) {
+			PRINT_COMPAT("No: arg",i,":",repr aArgType.typename,"!=",repr bArgType.typename);
 			return false;
+		}
 	}
+	PRINT_COMPAT("Yes");
 	return true;
 }
 

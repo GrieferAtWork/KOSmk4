@@ -311,6 +311,14 @@ update_signalfd(unsigned int fd,
 	decref(hnd);
 }
 
+
+
+
+
+/************************************************************************/
+/* signalfd(), signalfd4()                                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SIGNALFD4
 DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
                 USER UNCHECKED sigset_t const *, sigmask,
                 size_t, sigsetsize, syscall_ulong_t, flags) {
@@ -348,12 +356,15 @@ DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
 	}
 	return (fd_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_SIGNALFD4 */
 
+#ifdef __ARCH_WANT_SYSCALL_SIGNALFD
 DEFINE_SYSCALL3(fd_t, signalfd, fd_t, fd,
                 USER UNCHECKED sigset_t const *, sigmask,
                 size_t, sigsetsize) {
 	return sys_signalfd4(fd, sigmask, sigsetsize, 0);
 }
+#endif /* __ARCH_WANT_SYSCALL_SIGNALFD */
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfa86f8d */
+/* HASH CRC-32:0x48fd8e6a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -488,11 +488,8 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_RECVMSG                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_RPC_SCHEDULE            1
 #define __ARCH_WANT_COMPAT_SYSCALL_RT_SIGACTION            1
-#define __ARCH_WANT_COMPAT_SYSCALL_RT_SIGPENDING           1
-#define __ARCH_WANT_COMPAT_SYSCALL_RT_SIGPROCMASK          1
 #define __ARCH_WANT_COMPAT_SYSCALL_RT_SIGQUEUEINFO         1
 #define __ARCH_WANT_COMPAT_SYSCALL_RT_SIGRETURN            1
-#define __ARCH_WANT_COMPAT_SYSCALL_RT_SIGSUSPEND           1
 #define __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT         1
 #define __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64       1
 #define __ARCH_WANT_COMPAT_SYSCALL_RT_TGSIGQUEUEINFO       1
@@ -520,8 +517,6 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_SIGACTION               1
 #define __ARCH_WANT_COMPAT_SYSCALL_SIGALTSTACK             1
 #define __ARCH_WANT_COMPAT_SYSCALL_SIGNAL                  1
-#define __ARCH_WANT_COMPAT_SYSCALL_SIGNALFD                1
-#define __ARCH_WANT_COMPAT_SYSCALL_SIGNALFD4               1
 #define __ARCH_WANT_COMPAT_SYSCALL_SIGPENDING              1
 #define __ARCH_WANT_COMPAT_SYSCALL_SIGPROCMASK             1
 #define __ARCH_WANT_COMPAT_SYSCALL_SIGRETURN               1

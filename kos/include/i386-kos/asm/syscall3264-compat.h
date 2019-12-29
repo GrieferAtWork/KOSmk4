@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdf1bbba */
+/* HASH CRC-32:0x53f83c01 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -205,6 +205,9 @@
 #define __NR3264COMPAT_restart_syscall        1(restart_syscall)
 #define __NR3264COMPAT_rmdir                  1(rmdir)
 #define __NR3264COMPAT_rpc_service            1(rpc_service)
+#define __NR3264COMPAT_rt_sigpending          1(rt_sigpending)
+#define __NR3264COMPAT_rt_sigprocmask         1(rt_sigprocmask)
+#define __NR3264COMPAT_rt_sigsuspend          1(rt_sigsuspend)
 #define __NR3264COMPAT_sched_get_priority_max 1(sched_get_priority_max)
 #define __NR3264COMPAT_sched_get_priority_min 1(sched_get_priority_min)
 #define __NR3264COMPAT_sched_getattr          1(sched_getattr)
@@ -236,6 +239,8 @@
 #define __NR3264COMPAT_setuid                 2(setuid32,setuid)
 #define __NR3264COMPAT_setxattr               1(setxattr)
 #define __NR3264COMPAT_shutdown               1(shutdown)
+#define __NR3264COMPAT_signalfd               1(signalfd)
+#define __NR3264COMPAT_signalfd4              1(signalfd4)
 #define __NR3264COMPAT_socket                 1(socket)
 #define __NR3264COMPAT_socketpair             1(socketpair)
 #define __NR3264COMPAT_splice                 1(splice)
