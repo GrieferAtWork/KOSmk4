@@ -1,7 +1,16 @@
 # KOS mk4 Hobby Operating System Kernel
 
 
-KOSmk4 no longer is a small kernel. I'd say it has reached the point of really being allowed to call itself a monolithic kernel (the kernel's ELF binary is ~10MiB with debug information included, and ~5MiB without)
+KOSmk4 (the 4th rendition of the KOS operating system series) is a home-made, hobby, monolithic, but still modular kernel for __i386__ and __x86_64__ (including its 32-bit compatibility mode) machines, and is written in c++ (though only to use function overloads and exceptions; __all__ ABIs are always C-compatible).
+
+It is designed with a *lot* of tricks up its sleeve to aid during debugging, such as a fully interactive builtin debugger that gives you the ability to interactively analyze the system state when something goes wrong, as well as support for various different forms of debugging using GDB.
+
+In general, KOS isn't designed to re-invent the wheel (no square wheels here), but rather tries to make said metaphorical wheel look and roll as best as possible. What this means is that:
+- KOS tries to be fully [POSIX](http://www.open-std.org/jtc1/sc22/open/n4217.pdf) compliant
+- KOS tries to be fully API- and ABI-compatible with Linux/GNU/GLibc/... on all supported architectures
+- KOS's source components of are very tightly interwoven with each other and both headers and sources will try to make use of the many GCC extensions that exist to improve generated code and behavioral inference
+- KOS's sources and headers contain a lot of documentation and I try to given every *magic* number that gets used a proper name, so to understand how KOS works, all that should be necessary is for you to read the documentation for whatever you're looking at
+- KOS also includes binary compatibility for simple NT programs compiled with VisualC (but is currently lacking a PE loader such that only ELF binaries can be loaded at the moment)
 
 
 ## Table of contents
@@ -17,6 +26,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 - [Building & using Bochs to run KOS](#bochs)
 - [Automatic System Headers](#headers)
 - [GPL Licensing](#gpl)
+- [Older KOS Revisions](#old-kos)
 
 
 <a name="applications"></a>
@@ -91,6 +101,10 @@ All ported applications can be installed onto your KOS disk image by using `bash
 		- Where normally you'd only be able to see a `#UD`, KOS will analyze faulting instructions to
 			- Figure out what exactly went wrong and, throwing a very detailed exception explaining exactly that
 			- Emulate the intended behavior if it turned out that the host didn't support it natively (see list above)
+- x86_64
+	- Same features as also available on i386, as KOS contains support for compatibility mode
+	- vm86 support via libvm86 allows for real-mode-like bios calls to still be made from a controlled 64-bit environment
+	- Note to build KOS for x86_64, simply replace all of the mentions of *i386* in command lines with *x86_64* (e.g. `bash $PROJPATH/kos/misc/make_toolchain.sh x86_64-kos`)
 - FPU
 	- x87 FPU / SSE
 	- Automatic capability detection `fxsave` / `fxrstor`
@@ -127,11 +141,14 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- Support for
 		- `invpcid` (selected using `cpuid`)
 		- `invlpg` (selected using `cpuid`)
-		- `P32` (normal) and `PAE` paging (selected using `cpuid`)
 		- `PGE` global pages (selected using `cpuid`)
+		- `P32` (normal) and `PAE` paging on i386 (selected using `cpuid`)
 		- `PAE.2MiB` and `P32.4MiB` large pages (selected using `cpuid`)
 		- `PAE.XD` (Execute-disable) (selected using `cpuid`)
-	- `mmap()` with support for write-back file mappings
+		- `P64` (4-level) paging on x86_64
+		- `P64.2MiB` and `P64.1GiB` large pages (the later being selected using `cpuid`)
+		- `P64.NX` (No-execute) (selected using `cpuid`)
+	- `mmap()` with support for lazy-initialized and write-back file mappings
 	- Lazy file mappings / Copy-on-write
 	- Emulated memory access (VIO)
 		- Allows for emulation of instruction-level memory access using high-level read/write primitives
@@ -240,7 +257,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 			- `[p]read()`, `[p]write()`, `lseek()`
 			- `[f]realpath[at]()`
 			- ... (many, __many__, __MANY__ more!)
-		- TTY support (with job control)
+		- TTY support (with job control; aka. `SIGTTIN` and `SIGTTOU`)
 		- File-descriptor based handle management
 			- Allows for 2 modes of execution
 				- Linear mode (all file descriptors indices have low values)
@@ -719,3 +736,15 @@ Note that for this purpose, GPL was only mentioned as an example, but not as the
 In practice this means that the KOS source tree, and its repository are required to remain open-source forever, thus complying with GPL, however other projects are allowed to lift KOS-specific code (and KOS-specific code only), and only have to comply with requirements stated by the ZLib license. (e.g. You could steal my pageframe allocator system and use it in a commercial kernel, so-long as you neither claim to have written it yourself, and as an extension: don't claim to have written everything in your project yourself, as well as take the blame when it does end up breaking for some reason at some point)
 
 Another important distinction applies to GPL code that has been modified for the purpose of being made functional with KOS. Such code will always be marked as such and must be handled as falling under both the GPL, and the ZLib license, meaning that it, too, has to remain open-source, may not end up being used in commercial products, and any further changes made to it in the context of other projects will also have to be marked as such (in this case it sufficies to include all pre-exting copyright notices, before adding your own (GPL- and ZLib-compatible) license alongside a comment stating something something along the lines of `Originally lifted from https://github.com/GrieferAtWork/KOSmk4/..., before changes were made to the original source material`) The exact changes are not required to be marked on a per-line basis, since the inclusion of a reference to the original source would allow one to perform a diff between the two versions to determine changes made.
+
+
+
+
+<a name="old-kos"></a>
+## Older KOS Revisions
+
+- [KOSmk1](https://github.com/GrieferAtWork/KOSmk1) (30.11.2016 - 01.04.2017)
+- [KOSmk2](https://github.com/GrieferAtWork/KOSmk2) (05.07.2017 - 24.11.2017)
+- [KOSmk3](https://github.com/GrieferAtWork/KOSmk3) (10.02.2018 - 02.06.2018)
+- [KOSmk4](https://github.com/GrieferAtWork/KOSmk4) (01.09.2018 - ...) (You are here)
+

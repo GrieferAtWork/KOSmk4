@@ -1962,7 +1962,6 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		memcpy((void *)&pagedir_syncall, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
 	}
 
-
 	/* Initialize the `_bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
 	FORCPU(&_bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p64(&_bootcpu);
 }
