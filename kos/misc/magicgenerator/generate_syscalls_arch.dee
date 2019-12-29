@@ -1345,9 +1345,9 @@ global ARCH: {string: SyscallArch} = {
 			 *       >> DEFINE_PUBLIC_ALIAS(sys32_setuid32, sys_setuid);
 			 *       >> DEFINE_PUBLIC_ALIAS(sys32_setuid, sys_setuid);
 			 * As such, `syscall3264-compat.h' contains the following definition:
-			 * >> #define __NR3264COMPAT_setuid   (2,(setuid32, setuid))
+			 * >> #define __NR3264COMPAT_setuid   2(setuid32,setuid)
 			 * Or in more general terms (with 2 being the number of aliases):
-			 * >> #define __NR3264COMPAT_<sys_mysyscall>   (2,(<sys32_firstalias>, <sys32_secondalias>))
+			 * >> #define __NR3264COMPAT_<sys_mysyscall>   2(<sys32_firstalias>,<sys32_secondalias>)
 			 * NOTE: In the case of functions such as `sys32_setuid` (which take a 16-bit
 			 *       argument), the underlying system call wrapper will (usually) have already
 			 *       truncated the argument (s.a. `__x86_asm32_int80_setuid', which contains a

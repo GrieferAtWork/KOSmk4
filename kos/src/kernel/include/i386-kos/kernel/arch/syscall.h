@@ -132,106 +132,114 @@ DECL_END
 /* Define compatibility-mode system calls. */
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #ifdef __x86_64__
-/* When defining a 64-bit system call, weakly alias 32-bit variants onto it,
+/* When defining a 64-bit system call, alias compatible 32-bit variant(s) onto it,
  * thus implementing system calls without dedicated compatibility-mode variants
  * by calling forward to their 64-bit (regular) variants (if possible).
- * s.a. `<asm/syscall3264-compat.h>'  */
+ * A listing of compatible system calls can be found in: `<asm/syscall3264-compat.h>',
+ * available as `#define __NR3264COMPAT_<NAME> <COMPAT_COUNT>(<FIRST_COMPAT>,<SECOND_COMPAT>,<...>)'
+ * Comments found further below detail exactly how this meta-data is used to define
+ * system call aliases (don't even try to read the preprocessor magic used to implement
+ * the logic. - It works and is standard-compliant, but it is extremely convoluted) */
 #undef __ARCH_DEFINE_SYSCALL_COMMON
 #undef __ARCH_DEFINE_SYSCALL32_COMMON
 
-#define __X86_NR3264COMAPT_ARG_PLACEHOLDER_1(...) ,
-#define __X86_NR3264COMAPT_TAKE_SECOND_ARG_IMPL(x, val, ...) val
-#define __X86_NR3264COMAPT_TAKE_SECOND_ARG(x) __X86_NR3264COMAPT_TAKE_SECOND_ARG_IMPL x
-#define __X86_NR3264COMAPT_IS_DEFINED3(...) __X86_NR3264COMAPT_TAKE_SECOND_ARG((__VA_ARGS__ 1,0))
-#define __X86_NR3264COMAPT_IS_DEFINED2(x) __X86_NR3264COMAPT_IS_DEFINED3(__X86_NR3264COMAPT_ARG_PLACEHOLDER_##x)
-#define __X86_NR3264COMAPT_IS_DEFINED(x) __X86_NR3264COMAPT_IS_DEFINED2(x)
+#define __X86_NR3264COMPAT_ARG_PLACEHOLDER_1(...) ,
+#define __X86_NR3264COMPAT_TAKE_SECOND_ARG_IMPL(x, val, ...) val
+#define __X86_NR3264COMPAT_TAKE_SECOND_ARG(x) __X86_NR3264COMPAT_TAKE_SECOND_ARG_IMPL x
+#define __X86_NR3264COMPAT_IS_DEFINED3(...) __X86_NR3264COMPAT_TAKE_SECOND_ARG((__VA_ARGS__ 1,0))
+#define __X86_NR3264COMPAT_IS_DEFINED2(x) __X86_NR3264COMPAT_IS_DEFINED3(__X86_NR3264COMPAT_ARG_PLACEHOLDER_##x)
+#define __X86_NR3264COMPAT_IS_DEFINED(x) __X86_NR3264COMPAT_IS_DEFINED2(x)
 
 /* ... and the following behavior when defining a 32-bit system call:
- * >> .ifdef sys32_##compat_name
- * >> .error "Duplicate definition of sys32_##compat_name"
- * >> .endif
+ * >> __asm__(".ifdef sys32_" #compat_name "\n");
+ * >> __asm__(".error \"" __FILE__ ":" __LINE_STR__ ":error: Duplicate definition of sys32_" #compat_name "\"\n");
+ * >> __asm__(".endif\n");
  * >> if (__NR32RC_##compat_name == 0) {
  * >>     DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_##compat_name, sys_name);
  * >> }
  */
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_REGC2_0(sys_name, compat_name) DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_##compat_name, sys_name);
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_REGC2_1(sys_name, compat_name) /* nothing */
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_REGC2_2(sys_name, compat_name) /* nothing */
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_REGC2_3(sys_name, compat_name) /* nothing */
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_REGC2_4(sys_name, compat_name) /* nothing */
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_REGC2_5(sys_name, compat_name) /* nothing */
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_REGC2_6(sys_name, compat_name) /* nothing */
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_REGC2(sys_name, compat_name, regc) \
-	__ARCH_DEFINE_SYSCALL32_COMPAT64_REGC2_##regc(sys_name, compat_name)
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_REGC(sys_name, compat_name, regc) \
-	__ARCH_DEFINE_SYSCALL32_COMPAT64_REGC2(sys_name, compat_name, regc)
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_LINE_STR3(x) #x
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_LINE_STR2(x) __ARCH_DEFINE_SYSCALL32_COMPAT64_LINE_STR3(x)
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64_LINE_STR __ARCH_DEFINE_SYSCALL32_COMPAT64_LINE_STR2(__LINE__)
-#define __ARCH_DEFINE_SYSCALL32_COMPAT64(sys_name, compat_name)                           \
-	__asm__(".ifdef sys32_" #compat_name "\n"                                             \
-	        ".error \"" __FILE__ ":" __ARCH_DEFINE_SYSCALL32_COMPAT64_LINE_STR ":error: " \
-	        "Duplicate definition of 'sys32_" #compat_name "'\"\n"                        \
-	        ".endif");                                                                    \
-	__ARCH_DEFINE_SYSCALL32_COMPAT64_REGC(sys_name, compat_name, __NR32RC_##compat_name)
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC2_0(sys_name, compat_name) DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_##compat_name, sys_name);
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC2_1(sys_name, compat_name) /* nothing */
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC2_2(sys_name, compat_name) /* nothing */
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC2_3(sys_name, compat_name) /* nothing */
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC2_4(sys_name, compat_name) /* nothing */
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC2_5(sys_name, compat_name) /* nothing */
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC2_6(sys_name, compat_name) /* nothing */
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC2(sys_name, compat_name, regc) \
+	__X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC2_##regc(sys_name, compat_name)
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC(sys_name, compat_name, regc) \
+	__X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC2(sys_name, compat_name, regc)
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_LINE_STR3(x) #x
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_LINE_STR2(x) __X86_NR3264COMPAT_SYSCALL32_COMPAT64_LINE_STR3(x)
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64_LINE_STR __X86_NR3264COMPAT_SYSCALL32_COMPAT64_LINE_STR2(__LINE__)
+#define __X86_NR3264COMPAT_SYSCALL32_COMPAT64(sys_name, compat_name, more)                     \
+	__asm__(".ifdef sys32_" #compat_name "\n"                                                  \
+	        ".error \"" __FILE__ ":" __X86_NR3264COMPAT_SYSCALL32_COMPAT64_LINE_STR ":error: " \
+	        "Duplicate definition of 'sys32_" #compat_name "'\"\n" more                        \
+	        ".endif");                                                                         \
+	__X86_NR3264COMPAT_SYSCALL32_COMPAT64_REGC(sys_name, compat_name, __NR32RC_##compat_name)
 
 
 /* Using macros, implement the following behavior when defining a 64-bit system call:
  * >> if (defined(__NR3264COMPAT_##name)) {
  * >>     for (compat_name: __NR3264COMPAT_##name) {
- * >>         .ifdef sys32_##compat_name
- * >>         .error "Duplicate definition of sys32_##compat_name"
- * >>         .endif
+ * >>         __asm__(".ifdef sys32_" #compat_name "\n");
+ * >>         __asm__(".error \"" __FILE__ ":" __LINE_STR__ ":error: Duplicate definition of sys32_" #compat_name "\"\n");
  * >>         DEFINE_PUBLIC_ALIAS(sys32_##compat_name, sys_##name);
+ * >>         __asm__(".endif\n");
  * >>         if (__NR32RC_##compat_name == 0) {
  * >>             DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_##compat_name, sys_##name);
  * >>         }
  * >>     }
  * >> } */
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, a) \
-	__ARCH_DEFINE_SYSCALL32_COMPAT64(sys_##name, a)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_X_2(name, a, b) \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, a)        \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, b)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_X_3(name, a, b, c) \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, a)           \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, b)           \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, c)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_X_4(name, a, b, c, d) \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, a)              \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, b)              \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, c)              \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, d)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_X_5(name, a, b, c, d, e) \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, a)                 \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, b)                 \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, c)                 \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, d)                 \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_X_1(name, e)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_Y_1(...) __VA_ARGS__
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_Y_2(...) __VA_ARGS__
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_Y_3(...) __VA_ARGS__
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_Y_4(...) __VA_ARGS__
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_Y_5(...) __VA_ARGS__
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_Z_1(...) 1
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_Z_2(...) 2
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_Z_3(...) 3
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_Z_4(...) 4
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_Z_5(...) 5
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_X1(name, compatc, ...) __ARCH_DEFINE_SYSCALL_COMMON3_1_X_##compatc(name, __VA_ARGS__)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_3(name, argc, ...) __ARCH_DEFINE_SYSCALL_COMMON3_1_X_##argc(name, __VA_ARGS__)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_2(name, argc, ...) __ARCH_DEFINE_SYSCALL_COMMON3_1_3(name, argc, __VA_ARGS__)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_1(name, def) \
-	__ARCH_DEFINE_SYSCALL_COMMON3_1_2(name, __ARCH_DEFINE_SYSCALL_COMMON3_1_Z_##def, __ARCH_DEFINE_SYSCALL_COMMON3_1_Y_##def)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1_0(name, def) __ARCH_DEFINE_SYSCALL_COMMON3_1_1(name, def)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_1(name) __ARCH_DEFINE_SYSCALL_COMMON3_1_0(name, __NR3264COMPAT_##name)
-#define __ARCH_DEFINE_SYSCALL_COMMON3_0(name) /* nothing */
-#define __ARCH_DEFINE_SYSCALL_COMMON3(is_defined, name) \
-	__ARCH_DEFINE_SYSCALL_COMMON3_##is_defined(name)
-#define __ARCH_DEFINE_SYSCALL_COMMON2(is_defined, name) \
-	__ARCH_DEFINE_SYSCALL_COMMON3(is_defined, name)
+#define __X86_NR3264COMPAT_SYSCALL_TEXTALIAS32(compat_name, name) \
+	/* DEFINE_PUBLIC_ALIAS(sys32_##compat_name, sys_##name); */   \
+	".global sys32_" #compat_name "\n"                            \
+	".set sys32_" #compat_name ",sys_" #name "\n"
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, a) \
+	__X86_NR3264COMPAT_SYSCALL32_COMPAT64(sys_##name, a, ".else\n" __X86_NR3264COMPAT_SYSCALL_TEXTALIAS32(a, name))
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_2(name, a, b) \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, a)        \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, b)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_3(name, a, b, c) \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, a)           \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, b)           \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, c)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_4(name, a, b, c, d) \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, a)              \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, b)              \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, c)              \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, d)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_5(name, a, b, c, d, e) \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, a)                 \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, b)                 \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, c)                 \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, d)                 \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_1(name, e)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Y_1(...) __VA_ARGS__
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Y_2(...) __VA_ARGS__
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Y_3(...) __VA_ARGS__
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Y_4(...) __VA_ARGS__
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Y_5(...) __VA_ARGS__
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Z_1(...) 1
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Z_2(...) 2
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Z_3(...) 3
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Z_4(...) 4
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Z_5(...) 5
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_X1(name, compatc, ...) __X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_##compatc(name, __VA_ARGS__)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_3(name, argc, ...) __X86_NR3264COMPAT_SYSCALL_COMMON3_1_X_##argc(name, __VA_ARGS__)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_2(name, argc, ...) __X86_NR3264COMPAT_SYSCALL_COMMON3_1_3(name, argc, __VA_ARGS__)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_1(name, def) \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_1_2(name, __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Z_##def, __X86_NR3264COMPAT_SYSCALL_COMMON3_1_Y_##def)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1_0(name, def) __X86_NR3264COMPAT_SYSCALL_COMMON3_1_1(name, def)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_1(name) __X86_NR3264COMPAT_SYSCALL_COMMON3_1_0(name, __NR3264COMPAT_##name)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3_0(name) /* nothing */
+#define __X86_NR3264COMPAT_SYSCALL_COMMON3(is_defined, name) \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3_##is_defined(name)
+#define __X86_NR3264COMPAT_SYSCALL_COMMON2(is_defined, name) \
+	__X86_NR3264COMPAT_SYSCALL_COMMON3(is_defined, name)
 #define __ARCH_DEFINE_SYSCALL_COMMON(name) \
-	__ARCH_DEFINE_SYSCALL_COMMON2(__X86_NR3264COMAPT_IS_DEFINED(__NR3264COMPAT_##name), name)
+	__X86_NR3264COMPAT_SYSCALL_COMMON2(__X86_NR3264COMPAT_IS_DEFINED(__NR3264COMPAT_##name), name)
 /* ... and the following behavior when defining a 32-bit system call:
  * >> .ifdef sys32_##name
  * >> .error "Duplicate definition of sys32_##name"
@@ -241,7 +249,7 @@ DECL_END
  * >> }
  */
 #define __ARCH_DEFINE_SYSCALL32_COMMON(name) \
-	__ARCH_DEFINE_SYSCALL32_COMPAT64(sys32_##name, name)
+	__X86_NR3264COMPAT_SYSCALL32_COMPAT64(sys32_##name, name,)
 
 #ifndef __PRIVATE_SYSCALL_GET_ESCAPED_TYPE
 #define __PRIVATE_SYSCALL_GET_ESCAPED_TYPE2(a, b) b
