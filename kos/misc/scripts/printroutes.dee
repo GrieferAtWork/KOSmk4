@@ -1,0 +1,254 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import ipc;
+import * from deemon;
+
+#ifdef __WINDOWS__
+#define EXE ".exe"
+#else /* __WINDOWS__ */
+#define EXE
+#endif /* !__WINDOWS__ */
+
+fs.chdir(fs.headof(__FILE__));
+fs.chdir("../../..");
+
+local function getLines(fp: File): Bytes {
+	local result = fp.read();
+again:
+	if (result &&
+	    !result.endswith("\n") &&
+	    !result.endswith("\r") &&
+	    !result.endswith("\r\n")) {
+		local d = fp.read();
+		if (d) {
+			result = result + d;
+			goto again;
+		}
+	}
+	return result;
+}
+
+function runProc(exe: string, args: {string...}, callback: Callable with {string...}) {
+	local result;
+	local p = ipc.Process(exe, args);
+	local r, w = ipc.Pipe.new()...;
+	r = File.Buffer(r, "ro,c,none"); /* line-buffered */
+	p.stdout = w;
+	p.start();
+	w.close();
+	try {
+		result = callback([]{
+			while (local d = getLines(r))
+				yield d.splitlines(false)...;
+		}());
+	} catch (...) {
+		try p.terminate(); catch (...);
+		throw;
+	}
+	r.close();
+	local error = p.join();
+	if (error != 0) {
+		throw Error("Process {!r} exited with {}"
+			.format({ p.cmdline, error }));
+	}
+	return result;
+}
+
+final global READELF = "binutils/x86_64-kos/bin/x86_64-kos-readelf" EXE;
+final global OBJDUMP = "binutils/x86_64-kos/bin/x86_64-kos-objdump" EXE;
+
+function dumpTables(filename: string, tableNames: {string...}) {
+	@@List of (start, end, name)
+	local knownSymbols: {(int, int, string)...} = List();
+	runProc(READELF, ["-s", "-W", filename], [](lines: {string...}) {
+		for (local l: lines) {
+			local start, size, name;
+			try {
+				none, start, size = l.scanf(" %[^:]: %[^ ] %[^ ]")...;
+				name = l[l.rindex(" ")+1:].strip();
+				start = int(start, 16);
+				size = int(size);
+			} catch (...) {
+				continue;
+			}
+			if (size != 0)
+				knownSymbols.append((start, start + size, name));
+		}
+	});
+	local addr2nameCache: {int: ({string...}, int)} = Dict();
+	function addr2name(addr: int): {(string, int)...} {
+		local r = addr2nameCache.get(addr);
+		if (r !is none)
+			return r;
+		r = [];
+		for (local start, end, name: knownSymbols) {
+			if (addr >= start && addr < end) {
+				local ent = (name, addr - start);
+				if ("break" in name) {
+					r = [ent];
+					break;
+				}
+				r.append(ent);
+			}
+		}
+		addr2nameCache[addr] = r;
+		return r;
+	}
+	for (local tableName: tableNames) {
+		local start, end, name;
+		for (start, end, name: knownSymbols) {
+			if (name == tableName)
+				goto got_name;
+		}
+		throw Error("Unknown tableName: {!r}".format({ tableName }));
+got_name:
+		print "BEGIN_TABLE:", repr tableName;
+		runProc(OBJDUMP, ["-s", "-w",
+				"--start-address=" + start.hex(),
+				"--stop-address=" + end.hex(),
+				filename], [](lines: {string...}){
+			for (local l: lines) {
+				if (!l || !l.startswith(" "))
+					continue;
+				local spc0 = l.index(" ", 1);
+				local lineaddr = int(l[1:spc0], 16);
+				l = l[l.index(" ", 1) + 1:];
+				while (!l.startswith(" ")) {
+					local spc1 = l.index(" ");
+					local spc2 = l.index(" ", spc1 + 1);
+					local addr = l[:spc1] + l[spc1+1:spc2];
+					addr = int(addr, 16).swap64;
+					local info = addr2name(addr);
+					print "0x",;
+					print (lineaddr - start).hex()[2:].zfill(4) + ": ",;
+					print ".quad", addr.hex(),;
+					if (info) {
+						print "  # ",;
+						local isFirst = true;
+						for (local ent: info.sorted()) {
+							if (!isFirst)
+								print ", ",;
+							isFirst = false;
+							local name, offset = ent...;
+							print name,;
+							if (offset) {
+								print " ",;
+								print "+",offset,;
+							}
+						}
+					}
+					print;
+					l = l[spc2+1:];
+					lineaddr += 8;
+				}
+			}
+		});
+		print "END_TABLE:", repr tableName;
+		print;
+		print;
+		print;
+	}
+}
+
+File.stdout = File.open("kos/misc/scripts/routes-x86_64.txt", "w");
+
+/* Dump all of the system call tables that can be found within the x86_64 KOS kernel
+ * This dump also includes all of the different names by which individual entries may
+ * be addressed. This utility is mainly intended to confirm that system call tables
+ * got linked correctly (which would otherwise be really had to ensure, given the
+ * huge number of various automated systems working together in order to form them,
+ * including all of the system call compatibility checks done by generate_syscalls.dee,
+ * along to the way that system call tables are generated, along to system calls being
+ * implemented, alongside possibly aliasing entires in various other tables) */
+dumpTables("bin/x86_64-kos-nOD/os/kernel.bin", {
+
+	/* 64-bit, high-level SYSVABI-compatible tables
+	 * In general, entires of this table are `sys_*' */
+	"x86_sysroute0_c",
+	"x86_sysroute1_c",
+
+	/* 32-bit, high-level SYSVABI-compatible tables, with double-wide
+	 * and < 32-bit arguments already zero-extended/merged
+	 * This table isn't actually used by the kernel and may be removed
+	 * in the furture, however for now it is here for the sake of completion
+	 * In general, entires of this table are `sys32_*' */
+	"x86_sysroute0_c32",
+	"x86_sysroute1_c32",
+
+	/* 32-bit, high-level SYSVABI-compatible tables, each on taking
+	 * a single argument `u64 *regv = %rdi' that points to a vector
+	 * of up to 6 registers to-be used during invocation. This table
+	 * is used when system calls are emulated (s.a. `syscall_emulate()'),
+	 * and the `regv' argument taken by these functions is likely to
+	 * point at `rpc_syscall_info::rsi_regs'.
+	 * This table contains wrapper functions that handle double-wide,
+	 * as well as < 32-bit arguments, before calling forward to `sys32_*'
+	 * functions. If a system call doesn't take any arguments (and doesn't
+	 * need any form of adjustment being done to convert 32-bit registers
+	 * into 64-bit argument), then this table directly contains a `sys32_*'
+	 * function pointer.
+	 * In general, entires of this table are `__x86_asm32_sysrun32_*' */
+	"x86_sysroute0_runc32",
+	"x86_sysroute1_runc32",
+
+	/* 64-bit, low-level system call wrappers to-be called by the `int80'
+	 * and `syscall' system call invocation facilities.
+	 * These tables are used by the kernel-space entry points for handling
+	 * `int80' and `syscall' interrupts and are entered with `struct irregs64'
+	 * located at `0(%rsp)', with all other registers (including %rax, but
+	 * excluding any register found int he IRET tail) still having their
+	 * original user-space values.
+	 * In general, entires of this table are `__x86_asm64_syscall_*' */
+	"x86_sysroute0_asm64_syscall",
+	"x86_sysroute1_asm64_syscall",
+
+	/* 32-bit, low-level system call wrappers to-be called by `int80' from
+	 * compatibility mode (the `int80' contains a branch to check if the
+	 * interrupt originated from compatibility mode, and these tables are
+	 * used if it did)
+	 * These wrappers are invoked the same way `x86_sysrouteN_asm64_syscall' is,
+	 * only that the register state matches what the 32-bit system call invocation
+	 * ABI (aka. REG0=%ebx, REG1=%ecx, etc...)
+	 * Additionally, a `struct irregs64' structure can be found at `0(%rsp)'
+	 * In general, entires of this table are `__x86_asm32_int80_*' */
+	"x86_sysroute0_asm32_int80",
+	"x86_sysroute1_asm32_int80",
+
+	/* 32-bit, low-level system call wrappers to-be called by `sysenter' from
+	 * compatibility mode (the `int80' contains a branch to check if the
+	 * interrupt originated from compatibility mode, and these tables are
+	 * used if it did)
+	 * Same as `x86_sysrouteN_asm32_int80', however REG4 and REG5 are passed
+	 * via `0(%ebp)' and `4(%ebp)' (s.a. `x86_syscall32_sysenter')
+	 * Note that the `struct irregs64' structure found at `0(%rsp)'
+	 * is also present when one of these wrapper is called.
+	 * In general, entires of this table are `__x86_asm32_int80_*'
+	 * NOTE: Becaues binary compatibility with `x86_sysrouteN_asm32_int80' is
+	 *       possible when a system call's register count is `<= 4', the actual
+	 *       entry points used in these cases are shared with the `x86_sysrouteN_asm32_int80'
+	 *       tables, meaning that (e.g.) `__x86_asm32_int80_read' and `__x86_asm32_sysenter_read'
+	 *       are actually linked to the same address, which is something that is displayed
+	 *       very neatly when this table gets dumped. */
+	"x86_sysroute0_asm32_sysenter",
+	"x86_sysroute1_asm32_sysenter",
+});
+
+
