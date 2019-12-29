@@ -53,6 +53,8 @@ local files = {
 	"../../../../include/i386-kos/bits/sigval64.h",
 	"../../../../include/i386-kos/bits/itimerspec32.h",
 	"../../../../include/i386-kos/bits/itimerspec64.h",
+	"../../../../include/i386-kos/bits/timeb32.h",
+	"../../../../include/i386-kos/bits/timeb64.h",
 	"../../../../include/i386-kos/bits/timespec32.h",
 	"../../../../include/i386-kos/bits/timespec64.h",
 	"../../../../include/i386-kos/bits/timeval32.h",
@@ -437,6 +439,39 @@ STATIC_ASSERT(sizeof(struct itimerspecx32_64) == __SIZEOF_ITIMERSPECX32_64);
 STATIC_ASSERT(offsetof(struct itimerspecx64, it_value) == __OFFSET_ITIMERSPECX64_VALUE);
 STATIC_ASSERT(offsetof(struct itimerspecx64, it_interval) == __OFFSET_ITIMERSPECX64_INTERVAL);
 STATIC_ASSERT(sizeof(struct itimerspecx64) == __SIZEOF_ITIMERSPECX64);
+
+
+
+
+
+#include <bits/timeb32.h>
+
+/* struct timebx32 */
+STATIC_ASSERT(offsetof(struct timebx32, dstflag) == __OFFSET_TIMEBX32_DSTFLAG);
+STATIC_ASSERT(offsetof(struct timebx32, millitm) == __OFFSET_TIMEBX32_MILLITM);
+STATIC_ASSERT(offsetof(struct timebx32, time) == __OFFSET_TIMEBX32_TIME);
+STATIC_ASSERT(offsetof(struct timebx32, timezone) == __OFFSET_TIMEBX32_TIMEZONE);
+STATIC_ASSERT(sizeof(struct timebx32) == __SIZEOF_TIMEBX32);
+
+/* struct timebx32_64 */
+STATIC_ASSERT(offsetof(struct timebx32_64, dstflag) == __OFFSET_TIMEBX32_64_DSTFLAG);
+STATIC_ASSERT(offsetof(struct timebx32_64, millitm) == __OFFSET_TIMEBX32_64_MILLITM);
+STATIC_ASSERT(offsetof(struct timebx32_64, time) == __OFFSET_TIMEBX32_64_TIME);
+STATIC_ASSERT(offsetof(struct timebx32_64, timezone) == __OFFSET_TIMEBX32_64_TIMEZONE);
+STATIC_ASSERT(sizeof(struct timebx32_64) == __SIZEOF_TIMEBX32_64);
+
+
+
+
+
+#include <bits/timeb64.h>
+
+/* struct timebx64 */
+STATIC_ASSERT(offsetof(struct timebx64, dstflag) == __OFFSET_TIMEBX64_DSTFLAG);
+STATIC_ASSERT(offsetof(struct timebx64, millitm) == __OFFSET_TIMEBX64_MILLITM);
+STATIC_ASSERT(offsetof(struct timebx64, time) == __OFFSET_TIMEBX64_TIME);
+STATIC_ASSERT(offsetof(struct timebx64, timezone) == __OFFSET_TIMEBX64_TIMEZONE);
+STATIC_ASSERT(sizeof(struct timebx64) == __SIZEOF_TIMEBX64);
 
 
 

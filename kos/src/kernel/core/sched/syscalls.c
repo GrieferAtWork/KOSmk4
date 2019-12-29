@@ -34,10 +34,19 @@
 
 #include <bits/timespec.h>
 #include <bits/timeval.h>
+#include <compat/config.h>
 #include <sys/time.h>
 #include <sys/timeb.h>
 
 #include <errno.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/timeb.h>
+#include <compat/bits/timespec.h>
+#include <compat/bits/timeval.h>
+#include <compat/kos/types.h>
+#endif /* __ARCH_HAVE_COMPAT */
+
 
 DECL_BEGIN
 
@@ -59,27 +68,87 @@ PRIVATE void KCALL get_timezone(USER CHECKED struct timezone *result) {
 
 
 
-#ifdef __NR_ftime
-DEFINE_SYSCALL1(errno_t,ftime,
-                USER UNCHECKED struct timeb *, tp) {
+/************************************************************************/
+/* ftime(), ftime64()                                                   */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FTIME
+DEFINE_SYSCALL1(errno_t, ftime,
+                USER UNCHECKED struct timeb32 *, tp) {
 	struct timespec ts;
 	struct timezone tz;
-	USER struct __timeb32 *utp = (struct __timeb32 *)tp;
-	validate_writable(utp, sizeof(*utp));
+	validate_writable(tp, sizeof(*tp));
 	ts = realtime_now();
 	get_timezone(&tz);
 	COMPILER_WRITE_BARRIER();
-	utp->dstflag  = (s16)tz.tz_dsttime;
-	utp->timezone = (s16)tz.tz_minuteswest;
-	utp->millitm  = (u16)(ts.tv_nsec / 1000000);
-	utp->time     = (time32_t)ts.tv_sec;
+	tp->dstflag  = (s16)tz.tz_dsttime;
+	tp->timezone = (s16)tz.tz_minuteswest;
+	tp->millitm  = (u16)(ts.tv_nsec / 1000000);
+	tp->time     = (time32_t)ts.tv_sec;
 	return -EOK;
 }
-#endif /* __NR_ftime */
+#endif /* __ARCH_WANT_SYSCALL_FTIME */
+
+#ifdef __ARCH_WANT_SYSCALL_FTIME64
+DEFINE_SYSCALL1(errno_t, ftime64,
+                USER UNCHECKED struct timeb64 *, tp) {
+	struct timespec ts;
+	struct timezone tz;
+	validate_writable(tp, sizeof(*tp));
+	ts = realtime_now();
+	get_timezone(&tz);
+	COMPILER_WRITE_BARRIER();
+	tp->dstflag  = (s16)tz.tz_dsttime;
+	tp->timezone = (s16)tz.tz_minuteswest;
+	tp->millitm  = (u16)(ts.tv_nsec / 1000000);
+	tp->time     = (time64_t)ts.tv_sec;
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_FTIME64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_FTIME
+DEFINE_COMPAT_SYSCALL1(errno_t, ftime,
+                       USER UNCHECKED struct compat_timeb32 *, tp) {
+	struct timespec ts;
+	struct timezone tz;
+	validate_writable(tp, sizeof(*tp));
+	ts = realtime_now();
+	get_timezone(&tz);
+	COMPILER_WRITE_BARRIER();
+	tp->dstflag  = (s16)tz.tz_dsttime;
+	tp->timezone = (s16)tz.tz_minuteswest;
+	tp->millitm  = (u16)(ts.tv_nsec / 1000000);
+	tp->time     = (compat_time32_t)ts.tv_sec;
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_FTIME */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_FTIME64
+DEFINE_COMPAT_SYSCALL1(errno_t, ftime64,
+                       USER UNCHECKED struct compat_timeb64 *, tp) {
+	struct timespec ts;
+	struct timezone tz;
+	validate_writable(tp, sizeof(*tp));
+	ts = realtime_now();
+	get_timezone(&tz);
+	COMPILER_WRITE_BARRIER();
+	tp->dstflag  = (s16)tz.tz_dsttime;
+	tp->timezone = (s16)tz.tz_minuteswest;
+	tp->millitm  = (u16)(ts.tv_nsec / 1000000);
+	tp->time     = (compat_time64_t)ts.tv_sec;
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_FTIME64 */
 
 
+
+
+
+/************************************************************************/
+/* gettimeofday(), gettimeofday64()                                     */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETTIMEOFDAY
 DEFINE_SYSCALL2(errno_t, gettimeofday,
-                USER UNCHECKED struct __timeval32 *, tv,
+                USER UNCHECKED struct timeval32 *, tv,
                 USER UNCHECKED struct timezone *, tz) {
 	if (tv) {
 		struct timespec ts;
@@ -97,10 +166,11 @@ DEFINE_SYSCALL2(errno_t, gettimeofday,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_GETTIMEOFDAY */
 
-#ifdef __NR_gettimeofday64
+#ifdef __ARCH_WANT_SYSCALL_GETTIMEOFDAY64
 DEFINE_SYSCALL2(errno_t, gettimeofday64,
-                USER UNCHECKED struct __timeval64 *, tv,
+                USER UNCHECKED struct timeval64 *, tv,
                 USER UNCHECKED struct timezone *, tz) {
 	if (tv) {
 		struct timespec ts;
@@ -118,41 +188,136 @@ DEFINE_SYSCALL2(errno_t, gettimeofday64,
 	}
 	return -EOK;
 }
-#endif /* __NR_gettimeofday64 */
+#endif /* __ARCH_WANT_SYSCALL_GETTIMEOFDAY64 */
 
-#ifdef __NR_time
-DEFINE_SYSCALL1(time32_t, time,
-                USER UNCHECKED time32_t *, tmp) {
-	time32_t now;
-	now = (time32_t)realtime_now().tv_sec;
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_GETTIMEOFDAY
+DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday,
+                       USER UNCHECKED struct compat_timeval32 *, tv,
+                       USER UNCHECKED struct timezone *, tz) {
+	if (tv) {
+		struct timespec ts;
+		validate_writable(tv, sizeof(*tv));
+		ts = realtime_now();
+		COMPILER_WRITE_BARRIER();
+		TIMESPEC_TO_TIMEVAL(tv, &ts);
+		COMPILER_WRITE_BARRIER();
+	}
+	if (tz) {
+		validate_writable(tz, sizeof(*tz));
+		COMPILER_WRITE_BARRIER();
+		get_timezone(tz);
+		COMPILER_WRITE_BARRIER();
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_GETTIMEOFDAY */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_GETTIMEOFDAY64
+DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday64,
+                       USER UNCHECKED struct compat_timeval64 *, tv,
+                       USER UNCHECKED struct timezone *, tz) {
+	if (tv) {
+		struct timespec ts;
+		validate_writable(tv, sizeof(*tv));
+		ts = realtime_now();
+		COMPILER_WRITE_BARRIER();
+		TIMESPEC_TO_TIMEVAL(tv, &ts);
+		COMPILER_WRITE_BARRIER();
+	}
+	if (tz) {
+		validate_writable(tz, sizeof(*tz));
+		COMPILER_WRITE_BARRIER();
+		get_timezone(tz);
+		COMPILER_WRITE_BARRIER();
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_GETTIMEOFDAY64 */
+
+
+
+
+
+/************************************************************************/
+/* time(), time64()                                                     */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_TIME
+DEFINE_SYSCALL1(time32_t, time, USER UNCHECKED time32_t *, tmp) {
+	time32_t result;
+	struct timespec nowts;
+	nowts = realtime_now();
+	result = (time32_t)nowts.tv_sec;
 	if (tmp) {
 		validate_writable(tmp, sizeof(*tmp));
 		COMPILER_WRITE_BARRIER();
-		*tmp = now;
+		*tmp = result;
 		COMPILER_WRITE_BARRIER();
 	}
-	return now;
+	return result;
 }
-#endif /* __NR_time */
+#endif /* __ARCH_WANT_SYSCALL_TIME */
 
-#ifdef __NR_time64
-DEFINE_SYSCALL1(time64_t, time64,
-                USER UNCHECKED time64_t *, tmp) {
-	time64_t now;
-	now = (time64_t)realtime_now().tv_sec;
+#ifdef __ARCH_WANT_SYSCALL_TIME64
+DEFINE_SYSCALL1(time64_t, time64, USER UNCHECKED time64_t *, tmp) {
+	time64_t result;
+	struct timespec nowts;
+	nowts = realtime_now();
+	result = (time64_t)nowts.tv_sec;
 	if (tmp) {
 		validate_writable(tmp, sizeof(*tmp));
 		COMPILER_WRITE_BARRIER();
-		*tmp = now;
+		*tmp = result;
 		COMPILER_WRITE_BARRIER();
 	}
-	return now;
+	return result;
 }
-#endif /* __NR_time64 */
+#endif /* __ARCH_WANT_SYSCALL_TIME64 */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_TIME
+DEFINE_COMPAT_SYSCALL1(compat_time32_t, time,
+                       USER UNCHECKED compat_time32_t *, tmp) {
+	compat_time32_t result;
+	struct timespec nowts;
+	nowts = realtime_now();
+	result = (compat_time32_t)nowts.tv_sec;
+	if (tmp) {
+		validate_writable(tmp, sizeof(*tmp));
+		COMPILER_WRITE_BARRIER();
+		*tmp = result;
+		COMPILER_WRITE_BARRIER();
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_TIME */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_TIME64
+DEFINE_COMPAT_SYSCALL1(compat_time64_t, time64,
+                       USER UNCHECKED compat_time64_t *, tmp) {
+	compat_time64_t result;
+	struct timespec nowts;
+	nowts = realtime_now();
+	result = (compat_time64_t)nowts.tv_sec;
+	if (tmp) {
+		validate_writable(tmp, sizeof(*tmp));
+		COMPILER_WRITE_BARRIER();
+		*tmp = result;
+		COMPILER_WRITE_BARRIER();
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_TIME64 */
+
+
+
+
+
+/************************************************************************/
+/* nanosleep(), nanosleep64()                                           */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_NANOSLEEP
 DEFINE_SYSCALL2(errno_t, nanosleep,
-                USER UNCHECKED struct __timespec32 const *, req,
-                USER UNCHECKED struct __timespec32 *, rem) {
+                USER UNCHECKED struct timespec32 const *, req,
+                USER UNCHECKED struct timespec32 *, rem) {
 	qtime_t tmo;
 	struct timespec tms;
 	validate_readable(req, sizeof(*req));
@@ -193,11 +358,12 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_NANOSLEEP */
 
-#ifdef __NR_nanosleep64
+#ifdef __ARCH_WANT_SYSCALL_NANOSLEEP64
 DEFINE_SYSCALL2(errno_t, nanosleep64,
-                USER UNCHECKED struct __timespec64 const *, req,
-                USER UNCHECKED struct __timespec64 *, rem) {
+                USER UNCHECKED struct timespec64 const *, req,
+                USER UNCHECKED struct timespec64 *, rem) {
 	qtime_t tmo;
 	struct timespec tms;
 	validate_readable(req, sizeof(*req));
@@ -238,8 +404,99 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 	}
 	return -EOK;
 }
-#endif /* __NR_nanosleep64 */
+#endif /* __ARCH_WANT_SYSCALL_NANOSLEEP64 */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP
+DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
+                       USER UNCHECKED struct compat_timespec32 const *, req,
+                       USER UNCHECKED struct compat_timespec32 *, rem) {
+	qtime_t tmo;
+	struct timespec tms;
+	validate_readable(req, sizeof(*req));
+	validate_writable_opt(rem, sizeof(*rem));
+	COMPILER_READ_BARRIER();
+	tms.tv_sec  = (time_t)req->tv_sec;
+	tms.tv_nsec = req->tv_nsec;
+	COMPILER_READ_BARRIER();
+	if unlikely(!tms.tv_sec && !tms.tv_nsec)
+		return -EOK;
+	tmo = quantum_time() + timespec_to_qtime(&tms);
+	TRY {
+		for (;;) {
+			PREEMPTION_DISABLE();
+			/* Service RPC functions */
+			if (task_serve())
+				continue;
+			if (!task_sleep(&tmo))
+				break; /* Timeout */
+		}
+	} EXCEPT {
+		if (rem != NULL && was_thrown(E_INTERRUPT)) {
+			/* Write back the remaining time to user-space.
+			 * NOTE: If `rem' is a faulty pointer, it is undefined what
+			 *       will happen to that E_SEGFAULT exception, however it
+			 *       is guarantied that an E_INTERRUPT caused by a user-space
+			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
+			struct timespec tsrem;
+			qtime_t now = quantum_time();
+			now -= tmo;
+			tsrem = qtime_to_timespec(&now);
+			COMPILER_WRITE_BARRIER();
+			rem->tv_sec  = (compat_time32_t)tsrem.tv_sec;
+			rem->tv_nsec = tsrem.tv_nsec;
+			COMPILER_WRITE_BARRIER();
+		}
+		RETHROW();
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP64
+DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
+                       USER UNCHECKED struct compat_timespec64 const *, req,
+                       USER UNCHECKED struct compat_timespec64 *, rem) {
+	qtime_t tmo;
+	struct timespec tms;
+	validate_readable(req, sizeof(*req));
+	validate_writable_opt(rem, sizeof(*rem));
+	COMPILER_READ_BARRIER();
+	tms.tv_sec  = (time_t)req->tv_sec;
+	tms.tv_nsec = req->tv_nsec;
+	COMPILER_READ_BARRIER();
+	if unlikely(!tms.tv_sec && !tms.tv_nsec)
+		return -EOK;
+	tmo = quantum_time() + timespec_to_qtime(&tms);
+	TRY {
+		for (;;) {
+			PREEMPTION_DISABLE();
+			/* Service RPC functions */
+			if (task_serve())
+				continue;
+			if (!task_sleep(&tmo))
+				break; /* Timeout */
+		}
+	} EXCEPT {
+		if (rem != NULL && was_thrown(E_INTERRUPT)) {
+			/* Write back the remaining time to user-space.
+			 * NOTE: If `rem' is a faulty pointer, it is undefined what
+			 *       will happen to that E_SEGFAULT exception, however it
+			 *       is guarantied that an E_INTERRUPT caused by a user-space
+			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
+			struct timespec tsrem;
+			qtime_t now = quantum_time();
+			now -= tmo;
+			tsrem = qtime_to_timespec(&now);
+			COMPILER_WRITE_BARRIER();
+			rem->tv_sec  = (compat_time64_t)tsrem.tv_sec;
+			rem->tv_nsec = tsrem.tv_nsec;
+			COMPILER_WRITE_BARRIER();
+		}
+		RETHROW();
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP64 */
 
 
 DECL_END

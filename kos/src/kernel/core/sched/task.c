@@ -572,17 +572,22 @@ PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) REF struct task *
 
 
 
+/************************************************************************/
+/* exit(), exit_group()                                                 */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_EXIT
 DEFINE_SYSCALL1(void, exit, syscall_ulong_t, exit_code) {
 	COMPILER_IMPURE();
 	THROW(E_EXIT_THREAD, W_EXITCODE(exit_code & 0xff, 0));
 }
+#endif /* __ARCH_WANT_SYSCALL_EXIT */
 
+#ifdef __ARCH_WANT_SYSCALL_EXIT_GROUP
 DEFINE_SYSCALL1(void, exit_group, syscall_ulong_t, exit_code) {
 	COMPILER_IMPURE();
 	THROW(E_EXIT_PROCESS, W_EXITCODE(exit_code & 0xff, 0));
 }
-
-
+#endif /* __ARCH_WANT_SYSCALL_EXIT_GROUP */
 
 DECL_END
 

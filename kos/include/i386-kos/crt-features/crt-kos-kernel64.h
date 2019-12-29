@@ -1421,6 +1421,7 @@
 #define __CRT_HAVE_sys32_fsymlinkat 1
 #define __CRT_HAVE_sys32_fsync 1
 #define __CRT_HAVE_sys32_ftime 1
+#define __CRT_HAVE_sys32_ftime64 1
 #define __CRT_HAVE_sys32_ftruncate 1
 #define __CRT_HAVE_sys32_ftruncate64 1
 #define __CRT_HAVE_sys32_futex 1

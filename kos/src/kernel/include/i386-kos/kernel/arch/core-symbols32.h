@@ -2978,10 +2978,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak inode_read_blocking; .long inode_read_blocking
 	.reloc ., R_386_SIZE32, inode_read_blocking; .int 0
 	.int 0xbbc52e7
-	.long 0 /* index: 744 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname744 /* index: 744 */
+	.weak tty_device_startfwd; .long tty_device_startfwd
+	.reloc ., R_386_SIZE32, tty_device_startfwd; .int 0
+	.int 0xdcea1c4
 	.long .Lname745 /* index: 745 */
 	.weak driver_state_destroy; .long driver_state_destroy
 	.reloc ., R_386_SIZE32, driver_state_destroy; .int 0
@@ -9463,9 +9463,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname2365 /* index: 2365 */
-	.weak tty_device_startfwd; .long tty_device_startfwd
-	.reloc ., R_386_SIZE32, tty_device_startfwd; .int 0
-	.int 0xdcea1c4
+	.weak sys_ftime64; .long sys_ftime64
+	.reloc ., R_386_SIZE32, sys_ftime64; .int 0
+	.int 0xdd531c4
 	.long 0 /* index: 2366 */
 	.long 0
 	.int 0
@@ -17278,6 +17278,8 @@ END(kernel_symbol_table)
 	.string "keymap_translate_buf"
 .Lname743:
 	.string "inode_read_blocking"
+.Lname744:
+	.string "tty_device_startfwd"
 .Lname745:
 	.string "driver_state_destroy"
 .Lname747:
@@ -19143,7 +19145,7 @@ END(kernel_symbol_table)
 .Lname2361:
 	.string "sighand_ptr_lockread"
 .Lname2365:
-	.string "tty_device_startfwd"
+	.string "sys_ftime64"
 .Lname2367:
 	.string "error_code"
 .Lname2368:

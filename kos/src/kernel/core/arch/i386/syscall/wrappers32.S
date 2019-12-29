@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe3d76b7 */
+/* HASH CRC-32:0x174d9f1b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -510,7 +510,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chdir)
 	.cfi_endproc
 END(__x86_asm32_int80_chdir)
 
-/* time32_t time(time32_t *timer) */
+/* int32_t time(int32_t *timer) */
 .section .text.x86.asm32_syscall_int80.time
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_time)
 	.cfi_startproc simple
@@ -1319,7 +1319,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nice)
 	.cfi_endproc
 END(__x86_asm32_int80_nice)
 
-/* errno_t ftime(struct timeb *tp) */
+/* errno_t ftime(struct __timebx32 *tp) */
 .section .text.x86.asm32_syscall_int80.ftime
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime)
 	.cfi_startproc simple
@@ -14618,7 +14618,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
 	.cfi_endproc
 END(__x86_asm32_int80_fchdirat)
 
-/* time64_t time64(time64_t *timer) */
+/* int64_t time64(int64_t *timer) */
 .section .text.x86.asm32_syscall_int80.time64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_time64)
 	.cfi_startproc simple
@@ -15300,6 +15300,43 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_utime64)
+
+/* errno_t ftime64(struct __timebx32_64 *tp) */
+.section .text.x86.asm32_syscall_int80.ftime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x80000023
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_ftime64)
+	call   sys_ftime64
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_ftime64)
 
 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 .section .text.x86.asm32_syscall_int80.ioctlf
@@ -17595,7 +17632,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_chdir)
 	.cfi_endproc
 END(__x86_asm32_sysenter_chdir)
 
-/* time32_t time(time32_t *timer) */
+/* int32_t time(int32_t *timer) */
 .section .text.x86.asm32_syscall_sysenter.time
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_time)
 	.cfi_startproc simple
@@ -18406,7 +18443,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_nice)
 	.cfi_endproc
 END(__x86_asm32_sysenter_nice)
 
-/* errno_t ftime(struct timeb *tp) */
+/* errno_t ftime(struct __timebx32 *tp) */
 .section .text.x86.asm32_syscall_sysenter.ftime
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftime)
 	.cfi_startproc simple
@@ -31783,7 +31820,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchdirat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_fchdirat)
 
-/* time64_t time64(time64_t *timer) */
+/* int64_t time64(int64_t *timer) */
 .section .text.x86.asm32_syscall_sysenter.time64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_time64)
 	.cfi_startproc simple
@@ -32473,6 +32510,43 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utime64)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_utime64)
+
+/* errno_t ftime64(struct __timebx32_64 *tp) */
+.section .text.x86.asm32_syscall_sysenter.ftime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x80000023
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_ftime64)
+	call   sys_ftime64
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_ftime64)
 
 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 .section .text.x86.asm32_syscall_sysenter.ioctlf

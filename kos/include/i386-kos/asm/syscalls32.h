@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f73563e */
+/* HASH CRC-32:0x6cd82401 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@
 #define __NR_unlink                  0xa                    /* errno_t unlink(char const *filename) */
 #define __NR_execve                  0xb                    /* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
 #define __NR_chdir                   0xc                    /* errno_t chdir(char const *path) */
-#define __NR_time                    0xd                    /* time32_t time(time32_t *timer) */
+#define __NR_time                    0xd                    /* int32_t time(int32_t *timer) */
 #define __NR_mknod                   0xe                    /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
 #define __NR_chmod                   0xf                    /* errno_t chmod(char const *filename, mode_t mode) */
 #define __NR_lchown                  0x10                   /* errno_t lchown(char const *filename, uint16_t owner, uint16_t group) */
@@ -65,7 +65,7 @@
 /* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK' */
 #define __NR_access                  0x21                   /* errno_t access(char const *filename, syscall_ulong_t type) */
 #define __NR_nice                    0x22                   /* errno_t nice(syscall_slong_t inc) */
-#define __NR_ftime                   0x23                   /* errno_t ftime(struct timeb *tp) */
+#define __NR_ftime                   0x23                   /* errno_t ftime(struct __timebx32 *tp) */
 #define __NR_sync                    0x24                   /* errno_t sync(void) */
 /* @param: signo: One of `SIG*' */
 #define __NR_kill                    0x25                   /* errno_t kill(pid_t pid, syscall_ulong_t signo) */
@@ -577,7 +577,7 @@
 #define __NR_openpty                 __UINT32_C(0x8000000b) /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR_fchdirat                __UINT32_C(0x8000000c) /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-#define __NR_time64                  __UINT32_C(0x8000000d) /* time64_t time64(time64_t *timer) */
+#define __NR_time64                  __UINT32_C(0x8000000d) /* int64_t time64(int64_t *timer) */
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
@@ -736,6 +736,7 @@
 #define __NR_coredump                __UINT32_C(0x80000018) /* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
 #define __NR_stime64                 __UINT32_C(0x80000019) /* errno_t stime64(time64_t const *t) */
 #define __NR_utime64                 __UINT32_C(0x8000001e) /* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+#define __NR_ftime64                 __UINT32_C(0x80000023) /* errno_t ftime64(struct __timebx32_64 *tp) */
 #define __NR_ioctlf                  __UINT32_C(0x80000036) /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define __NR_fsmode                  __UINT32_C(0x8000003c) /* uint64_t fsmode(uint64_t mode) */
 #define __NR_gettimeofday64          __UINT32_C(0x8000004e) /* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
@@ -1257,6 +1258,7 @@
 #define __NRRM_coredump                2
 #define __NRRM_stime64                 0
 #define __NRRM_utime64                 0
+#define __NRRM_ftime64                 0
 #define __NRRM_ioctlf                  0
 #define __NRRM_fsmode                  2
 #define __NRRM_gettimeofday64          0
@@ -1890,6 +1892,7 @@
 #define __NRRC_coredump                6
 #define __NRRC_stime64                 1
 #define __NRRC_utime64                 2
+#define __NRRC_ftime64                 1
 #define __NRRC_ioctlf                  4
 #define __NRRC_fsmode                  2 /* __NRAC_fsmode + 1 */
 #define __NRRC_gettimeofday64          2

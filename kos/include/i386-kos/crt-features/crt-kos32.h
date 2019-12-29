@@ -3625,6 +3625,7 @@
 #define __CRT_HAVE_sys_Xfsymlinkat 1
 #define __CRT_HAVE_sys_Xfsync 1
 #define __CRT_HAVE_sys_Xftime 1
+#define __CRT_HAVE_sys_Xftime64 1
 #define __CRT_HAVE_sys_Xftruncate 1
 #define __CRT_HAVE_sys_Xftruncate64 1
 #define __CRT_HAVE_sys_Xfutex 1
@@ -4068,6 +4069,7 @@
 #define __CRT_HAVE_sys_fsymlinkat 1
 #define __CRT_HAVE_sys_fsync 1
 #define __CRT_HAVE_sys_ftime 1
+#define __CRT_HAVE_sys_ftime64 1
 #define __CRT_HAVE_sys_ftruncate 1
 #define __CRT_HAVE_sys_ftruncate64 1
 #define __CRT_HAVE_sys_futex 1

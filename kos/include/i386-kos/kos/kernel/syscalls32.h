@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x877b9449 */
+/* HASH CRC-32:0x6ae610c9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,6 +108,7 @@
 #define __ARCH_WANT_SYSCALL_FSYMLINKAT              1
 #define __ARCH_WANT_SYSCALL_FSYNC                   1
 #define __ARCH_WANT_SYSCALL_FTIME                   1
+#define __ARCH_WANT_SYSCALL_FTIME64                 1
 #define __ARCH_WANT_SYSCALL_FTRUNCATE               1
 #define __ARCH_WANT_SYSCALL_FTRUNCATE64             1
 #define __ARCH_WANT_SYSCALL_FUTEX                   1

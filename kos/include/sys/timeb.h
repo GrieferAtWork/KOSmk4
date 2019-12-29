@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0fc1b51 */
+/* HASH CRC-32:0xf1727608 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+#include <bits/timeb.h>
 #include <bits/types.h>
 #include <hybrid/typecore.h>
 
@@ -39,72 +40,6 @@ __SYSDECL_BEGIN
 #define __time_t_defined 1
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
-
-#if __TM_SIZEOF(TIME) <= 4
-#define __timeb64  __timeb_alt
-#define __timeb32  timeb
-#else
-#define __timeb64  timeb
-#define __timeb32  __timeb_alt
-#endif
-
-#ifdef __USE_TIME64
-#ifndef __time64_t_defined
-#define __time64_t_defined 1
-typedef __time64_t time64_t;
-#endif /* !__time64_t_defined */
-#if __TM_SIZEOF(TIME) <= 4
-#define __timeb_alt timeb64
-#else
-#define timeb64     timeb
-#endif
-#endif /* __USE_TIME64 */
-
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("time")
-#pragma push_macro("millitm")
-#pragma push_macro("timezone")
-#pragma push_macro("dstflag")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef time
-#undef millitm
-#undef timezone
-#undef dstflag
-struct timeb {
-#if __TM_SIZEOF(TIME) <= 4
-	__time32_t      time;     /* Seconds since epoch, as from `time'. */
-#else
-	__time64_t      time;     /* Seconds since epoch, as from `time'. */
-#endif
-	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
-	__INT16_TYPE__  timezone; /* Minutes west of GMT. */
-	__INT16_TYPE__  dstflag;  /* Nonzero if Daylight Savings Time used. */
-};
-#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-#if defined(__USE_TIME64) && __TM_SIZEOF(TIME) <= 4
-#define timeb64     timeb
-#else
-#define __timeb_alt timeb
-#endif
-#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-struct __timeb_alt {
-#if __TM_SIZEOF(TIME) <= 4
-	__time64_t      time;     /* Seconds since epoch, as from `time'. */
-#else
-	__time32_t      time;     /* Seconds since epoch, as from `time'. */
-#endif
-	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
-	__INT16_TYPE__  timezone; /* Minutes west of GMT. */
-	__INT16_TYPE__  dstflag;  /* Nonzero if Daylight Savings Time used. */
-};
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("dstflag")
-#pragma pop_macro("timezone")
-#pragma pop_macro("millitm")
-#pragma pop_macro("time")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #ifdef __USE_DOS
 #ifndef __errno_t_defined

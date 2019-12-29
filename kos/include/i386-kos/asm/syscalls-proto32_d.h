@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e13884b */
+/* HASH CRC-32:0x30f38b7a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -436,6 +436,7 @@
 #define __NR32AC_coredump                6
 #define __NR32AC_stime64                 1
 #define __NR32AC_utime64                 2
+#define __NR32AC_ftime64                 1
 #define __NR32AC_ioctlf                  4
 #define __NR32AC_fsmode                  1
 #define __NR32AC_gettimeofday64          2
@@ -505,7 +506,7 @@
 #define __NR32RT_unlink                  (errno_t, __errno_t)
 #define __NR32RT_execve                  (errno_t, __errno_t)
 #define __NR32RT_chdir                   (errno_t, __errno_t)
-#define __NR32RT_time                    (time32_t, __time32_t)
+#define __NR32RT_time                    (int32_t, __int32_t)
 #define __NR32RT_mknod                   (errno_t, __errno_t)
 #define __NR32RT_chmod                   (errno_t, __errno_t)
 #define __NR32RT_lchown                  (errno_t, __errno_t)
@@ -877,7 +878,7 @@
 #define __NR32RT_ksysctl                 (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_openpty                 (errno_t, __errno_t)
 #define __NR32RT_fchdirat                (errno_t, __errno_t)
-#define __NR32RT_time64                  (time64_t, __time64_t)
+#define __NR32RT_time64                  (int64_t, __int64_t)
 #define __NR32RT_set_exception_handler   (errno_t, __errno_t)
 #define __NR32RT_get_exception_handler   (errno_t, __errno_t)
 #define __NR32RT_set_library_listdef     (errno_t, __errno_t)
@@ -891,6 +892,7 @@
 #define __NR32RT_coredump                (errno_t, __errno_t)
 #define __NR32RT_stime64                 (errno_t, __errno_t)
 #define __NR32RT_utime64                 (errno_t, __errno_t)
+#define __NR32RT_ftime64                 (errno_t, __errno_t)
 #define __NR32RT_ioctlf                  (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_fsmode                  (uint64_t, __uint64_t)
 #define __NR32RT_gettimeofday64          (errno_t, __errno_t)
@@ -970,7 +972,7 @@
 #define __NR32AT1_execve                  (char const *const *, char const *const *)
 #define __NR32AT2_execve                  (char const *const *, char const *const *)
 #define __NR32AT0_chdir                   (char const *, char const *)
-#define __NR32AT0_time                    (time32_t *, __time32_t *)
+#define __NR32AT0_time                    (int32_t *, __int32_t *)
 #define __NR32AT0_mknod                   (char const *, char const *)
 #define __NR32AT1_mknod                   (mode_t, __mode_t)
 #define __NR32AT2_mknod                   (dev_t, __dev_t)
@@ -1004,7 +1006,7 @@
 #define __NR32AT0_access                  (char const *, char const *)
 #define __NR32AT1_access                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_nice                    (syscall_slong_t, __syscall_slong_t)
-#define __NR32AT0_ftime                   (struct timeb *, struct timeb *)
+#define __NR32AT0_ftime                   (struct __timebx32 *, struct __timebx32 *)
 #define __NR32AT0_kill                    (pid_t, __pid_t)
 #define __NR32AT1_kill                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_rename                  (char const *, char const *)
@@ -1808,7 +1810,7 @@
 #define __NR32AT0_fchdirat                (fd_t, __fd_t)
 #define __NR32AT1_fchdirat                (char const *, char const *)
 #define __NR32AT2_fchdirat                (atflag_t, __atflag_t)
-#define __NR32AT0_time64                  (time64_t *, __time64_t *)
+#define __NR32AT0_time64                  (int64_t *, __int64_t *)
 #define __NR32AT0_set_exception_handler   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_set_exception_handler   (__except_handler32_t, __except_handler32_t)
 #define __NR32AT2_set_exception_handler   (void *, void *)
@@ -1852,6 +1854,7 @@
 #define __NR32AT0_stime64                 (time64_t const *, __time64_t const *)
 #define __NR32AT0_utime64                 (char const *, char const *)
 #define __NR32AT1_utime64                 (struct __utimbuf64 const *, struct __utimbuf64 const *)
+#define __NR32AT0_ftime64                 (struct __timebx32_64 *, struct __timebx32_64 *)
 #define __NR32AT0_ioctlf                  (fd_t, __fd_t)
 #define __NR32AT1_ioctlf                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_ioctlf                  (iomode_t, __iomode_t)
@@ -2038,7 +2041,7 @@
 #define __NR32AM_unlink(a, b, c, d, e, f)                  (char const *)a
 #define __NR32AM_execve(a, b, c, d, e, f)                  (char const *)a, (char const *const *)b, (char const *const *)c
 #define __NR32AM_chdir(a, b, c, d, e, f)                   (char const *)a
-#define __NR32AM_time(a, b, c, d, e, f)                    (__time32_t *)a
+#define __NR32AM_time(a, b, c, d, e, f)                    (__int32_t *)a
 #define __NR32AM_mknod(a, b, c, d, e, f)                   (char const *)a, (__mode_t)b, (__dev_t)c
 #define __NR32AM_chmod(a, b, c, d, e, f)                   (char const *)a, (__mode_t)b
 #define __NR32AM_lchown(a, b, c, d, e, f)                  (char const *)a, (__uint16_t)b, (__uint16_t)c
@@ -2060,7 +2063,7 @@
 #define __NR32AM_gtty(a, b, c, d, e, f)                    /* nothing */
 #define __NR32AM_access(a, b, c, d, e, f)                  (char const *)a, (__syscall_ulong_t)b
 #define __NR32AM_nice(a, b, c, d, e, f)                    (__syscall_slong_t)a
-#define __NR32AM_ftime(a, b, c, d, e, f)                   (struct timeb *)a
+#define __NR32AM_ftime(a, b, c, d, e, f)                   (struct __timebx32 *)a
 #define __NR32AM_sync(a, b, c, d, e, f)                    /* nothing */
 #define __NR32AM_kill(a, b, c, d, e, f)                    (__pid_t)a, (__syscall_ulong_t)b
 #define __NR32AM_rename(a, b, c, d, e, f)                  (char const *)a, (char const *)b
@@ -2410,7 +2413,7 @@
 #define __NR32AM_ksysctl(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (void *)b
 #define __NR32AM_openpty(a, b, c, d, e, f)                 (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
 #define __NR32AM_fchdirat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__atflag_t)c
-#define __NR32AM_time64(a, b, c, d, e, f)                  (__time64_t *)a
+#define __NR32AM_time64(a, b, c, d, e, f)                  (__int64_t *)a
 #define __NR32AM_set_exception_handler(a, b, c, d, e, f)   (__syscall_ulong_t)a, (__except_handler32_t)b, (void *)c
 #define __NR32AM_get_exception_handler(a, b, c, d, e, f)   (__ULONG32_TYPE__ *)a, (__except_handler32_t *)b, (__HYBRID_PTR32(void) *)c
 #define __NR32AM_set_library_listdef(a, b, c, d, e, f)     (struct library_listdef32 const *)a
@@ -2424,6 +2427,7 @@
 #define __NR32AM_coredump(a, b, c, d, e, f)                (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void) const *)c, (__size_t)d, (struct exception_data32 const *)e, (__syscall_ulong_t)f
 #define __NR32AM_stime64(a, b, c, d, e, f)                 (__time64_t const *)a
 #define __NR32AM_utime64(a, b, c, d, e, f)                 (char const *)a, (struct __utimbuf64 const *)b
+#define __NR32AM_ftime64(a, b, c, d, e, f)                 (struct __timebx32_64 *)a
 #define __NR32AM_ioctlf(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
 #define __NR32AM_fsmode(a, b, c, d, e, f)                  (__uint64_t)((__uint64_t)a | (__uint64_t)b << 32)
 #define __NR32AM_gettimeofday64(a, b, c, d, e, f)          (struct __timevalx32_64 *)a, (struct timezone *)b
@@ -2879,6 +2883,7 @@
 #define __NR32AP_coredump(a, b, c, d, e, f)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_stime64(a)                                (__syscall_ulong_t)a
 #define __NR32AP_utime64(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_ftime64(a)                                (__syscall_ulong_t)a
 #define __NR32AP_ioctlf(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_fsmode(a)                                 (__syscall_ulong_t)a, (__syscall_ulong_t)((__uint64_t)a >> 32)
 #define __NR32AP_gettimeofday64(a, b)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b

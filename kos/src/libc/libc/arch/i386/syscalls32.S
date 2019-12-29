@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9d13882 */
+/* HASH CRC-32:0xbf9d5a4f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -727,7 +727,7 @@ INTERN_FUNCTION(libc_sys_Xchdir)
 END(libc_sys_Xchdir)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xchdir, libc_sys_Xchdir)
 
-/* time32_t time(time32_t *timer) */
+/* int32_t time(int32_t *timer) */
 .section .text.crt.syscall.time
 INTERN_FUNCTION(libc_sys_time)
 	movl   $(0xd), %eax
@@ -735,7 +735,7 @@ INTERN_FUNCTION(libc_sys_time)
 END(libc_sys_time)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_time, libc_sys_time)
 
-/* time32_t time(time32_t *timer) */
+/* int32_t time(int32_t *timer) */
 .section .text.crt.syscall.Xtime
 INTERN_FUNCTION(libc_sys_Xtime)
 	movl   $(0xd), %eax
@@ -1081,7 +1081,7 @@ INTERN_FUNCTION(libc_sys_Xnice)
 END(libc_sys_Xnice)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xnice, libc_sys_Xnice)
 
-/* errno_t ftime(struct timeb *tp) */
+/* errno_t ftime(struct __timebx32 *tp) */
 .section .text.crt.syscall.ftime
 INTERN_FUNCTION(libc_sys_ftime)
 	movl   $(0x23), %eax
@@ -1089,7 +1089,7 @@ INTERN_FUNCTION(libc_sys_ftime)
 END(libc_sys_ftime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_ftime, libc_sys_ftime)
 
-/* errno_t ftime(struct timeb *tp) */
+/* errno_t ftime(struct __timebx32 *tp) */
 .section .text.crt.syscall.Xftime
 INTERN_FUNCTION(libc_sys_Xftime)
 	movl   $(0x23), %eax
@@ -6983,7 +6983,7 @@ INTERN_FUNCTION(libc_sys_Xfchdirat)
 END(libc_sys_Xfchdirat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfchdirat, libc_sys_Xfchdirat)
 
-/* time64_t time64(time64_t *timer) */
+/* int64_t time64(int64_t *timer) */
 .section .text.crt.syscall.time64
 INTERN_FUNCTION(libc_sys_time64)
 	movl   $(0x8000000d), %eax
@@ -6991,7 +6991,7 @@ INTERN_FUNCTION(libc_sys_time64)
 END(libc_sys_time64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_time64, libc_sys_time64)
 
-/* time64_t time64(time64_t *timer) */
+/* int64_t time64(int64_t *timer) */
 .section .text.crt.syscall.Xtime64
 INTERN_FUNCTION(libc_sys_Xtime64)
 	movl   $(0x8000000d), %eax
@@ -7496,6 +7496,22 @@ INTERN_FUNCTION(libc_sys_Xutime64)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xutime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xutime64, libc_sys_Xutime64)
+
+/* errno_t ftime64(struct __timebx32_64 *tp) */
+.section .text.crt.syscall.ftime64
+INTERN_FUNCTION(libc_sys_ftime64)
+	movl   $(0x80000023), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_ftime64)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_ftime64, libc_sys_ftime64)
+
+/* errno_t ftime64(struct __timebx32_64 *tp) */
+.section .text.crt.syscall.Xftime64
+INTERN_FUNCTION(libc_sys_Xftime64)
+	movl   $(0x80000023), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xftime64)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xftime64, libc_sys_Xftime64)
 
 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 .section .text.crt.syscall.ioctlf

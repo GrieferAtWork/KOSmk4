@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x338a4846 */
+/* HASH CRC-32:0xcbe1b0e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11947,7 +11947,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_chdir)
 	.cfi_endproc
 END(__x86_asm32_int80_chdir)
 
-/* time32_t time(time32_t *timer) */
+/* int32_t time(int32_t *timer) */
 .section .text.x86.asm32_syscall_int80.time
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_time)
 	.cfi_startproc simple
@@ -12644,7 +12644,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nice)
 	.cfi_endproc
 END(__x86_asm32_int80_nice)
 
-/* errno_t ftime(struct timeb *tp) */
+/* errno_t ftime(struct __timebx32 *tp) */
 .section .text.x86.asm32_syscall_int80.ftime
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime)
 	.cfi_startproc simple
@@ -24218,7 +24218,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
 	.cfi_endproc
 END(__x86_asm32_int80_fchdirat)
 
-/* time64_t time64(time64_t *timer) */
+/* int64_t time64(int64_t *timer) */
 .section .text.x86.asm32_syscall_int80.time64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_time64)
 	.cfi_startproc simple
@@ -24839,6 +24839,37 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	intr_exit_sysret
 	.cfi_endproc
 END(__x86_asm32_int80_utime64)
+
+/* errno_t ftime64(struct __timebx32_64 *tp) */
+.section .text.x86.asm32_syscall_int80.ftime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x80000023
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_ftime64)
+	call   sys32_ftime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_ftime64)
 
 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 .section .text.x86.asm32_syscall_int80.ioctlf
@@ -26510,7 +26541,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_execve, __x86_asm32_int80_execve)
 /* errno_t chdir(char const *path) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_chdir, __x86_asm32_int80_chdir)
 
-/* time32_t time(time32_t *timer) */
+/* int32_t time(int32_t *timer) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_time, __x86_asm32_int80_time)
 
 /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
@@ -26611,7 +26642,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_access, __x86_asm32_int80_access)
 /* errno_t nice(syscall_slong_t inc) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_nice, __x86_asm32_int80_nice)
 
-/* errno_t ftime(struct timeb *tp) */
+/* errno_t ftime(struct __timebx32 *tp) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime, __x86_asm32_int80_ftime)
 
 /* errno_t sync(void) */
@@ -29174,7 +29205,7 @@ END(__x86_asm32_sysenter_openpty)
 /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fchdirat, __x86_asm32_int80_fchdirat)
 
-/* time64_t time64(time64_t *timer) */
+/* int64_t time64(int64_t *timer) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_time64, __x86_asm32_int80_time64)
 
 /* Set the exception handler mode for the calling thread.
@@ -29498,6 +29529,9 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_stime64, __x86_asm32_int80_stime64
 
 /* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utime64, __x86_asm32_int80_utime64)
+
+/* errno_t ftime64(struct __timebx32_64 *tp) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime64, __x86_asm32_int80_ftime64)
 
 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioctlf, __x86_asm32_int80_ioctlf)
@@ -30364,7 +30398,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_chdir)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_chdir)
 
-/* time32_t time(time32_t *timer) */
+/* int32_t time(int32_t *timer) */
 .section .text.x86.asm32_syscall_sysrun32.time
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_time)
 	.cfi_startproc
@@ -30561,7 +30595,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_nice)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_nice)
 
-/* errno_t ftime(struct timeb *tp) */
+/* errno_t ftime(struct __timebx32 *tp) */
 .section .text.x86.asm32_syscall_sysrun32.ftime
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftime)
 	.cfi_startproc
@@ -34569,7 +34603,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchdirat)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fchdirat)
 
-/* time64_t time64(time64_t *timer) */
+/* int64_t time64(int64_t *timer) */
 .section .text.x86.asm32_syscall_sysrun32.time64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_time64)
 	.cfi_startproc
@@ -34886,6 +34920,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime64)
 	jmp    sys32_utime64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_utime64)
+
+/* errno_t ftime64(struct __timebx32_64 *tp) */
+.section .text.x86.asm32_syscall_sysrun32.ftime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftime64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ftime64)
+	jmp    sys32_ftime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ftime64)
 
 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 .section .text.x86.asm32_syscall_sysrun32.ioctlf

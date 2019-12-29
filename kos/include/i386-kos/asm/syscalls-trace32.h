@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4c5fece */
+/* HASH CRC-32:0xb324ece9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -929,6 +929,7 @@
 #define __NRAN0_stime64                 t
 #define __NRAN0_utime64                 filename
 #define __NRAN1_utime64                 times
+#define __NRAN0_ftime64                 tp
 #define __NRAN0_ioctlf                  fd
 #define __NRAN1_ioctlf                  command
 #define __NRAN2_ioctlf                  mode
@@ -3160,6 +3161,8 @@
 #define __NRATRA0_utime64(filename, times) ,(validate_readable_opt(filename,1),filename)
 #define __NRATRF1_utime64                 "%p"
 #define __NRATRA1_utime64(filename, times) ,times
+#define __NRATRF0_ftime64                 "%p"
+#define __NRATRA0_ftime64(tp)             ,tp
 #define __NRATRF0_ioctlf                  "%d"
 #define __NRATRA0_ioctlf(fd, command, mode, arg) ,(int)(fd)
 #define __NRATRF1_ioctlf                  "%#" PRIxSIZ

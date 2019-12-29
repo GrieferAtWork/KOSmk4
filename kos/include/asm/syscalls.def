@@ -45,6 +45,8 @@
 %[typesize(*:[uintptr_t] = size_t)]
 %[typesize(*:[intptr_t] = uintptr_t)]
 %[typesize(*:[intptr_half_t] = uintptr_half_t)]
+%[typesize(*:[time32_t] = syscall_ulong_t)]
+%[typesize(*:[time64_t] = 8)]
 
 
 
@@ -266,8 +268,12 @@ idle:() -> errno_t;
 @@@param: flags: Set of `0 | AT_DOSPATH'
 [cp] fchdirat:(fd_t dirfd, char const *path, [tostr(flagset(AT_DOSPATH))] atflag_t flags) -> errno_t;
 
+%[startgroup]
 time:(time32_t *timer) -> time32_t;
 time64:(time64_t *timer) -> [reg64] time64_t;
+timex32:(int32_t *timer) -> int32_t;
+timex64:(int64_t *timer) -> [reg64] int64_t;
+%[endgroup]
 
 [cp] mknod:(char const *nodename, mode_t mode, dev_t dev) -> errno_t;
 [cp] chmod:(char const *filename, mode_t mode) -> errno_t;
@@ -427,7 +433,14 @@ alarm:(syscall_ulong_t seconds) -> syscall_ulong_t;
 
 nice:(syscall_slong_t inc) -> errno_t;
 
-ftime:(struct timeb *tp) -> errno_t; /* TODO: 32/64-variant */
+%[startgroup]
+ftime:(struct timeb *tp) -> errno_t;
+ftime32:(struct __timeb32 *tp) -> errno_t;
+ftime64:(struct __timeb64 *tp) -> errno_t;
+ftimex32:(struct __timebx32 *tp) -> errno_t;
+ftimex32_64:(struct __timebx32_64 *tp) -> errno_t;
+ftimex64:(struct __timebx64 *tp) -> errno_t;
+%[endgroup]
 
 [cp] sync:() -> errno_t;
 

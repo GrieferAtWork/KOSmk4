@@ -249,6 +249,7 @@ local files = {
 	"../../include/bits/itimerspec.h",
 	"../../include/bits/timespec.h",
 	"../../include/bits/timeval.h",
+	"../../include/bits/timeb.h",
 	"../../include/bits/siginfo-struct.h",
 	"../../include/bits/sigaction-struct.h",
 	"../../include/elf.h",
@@ -329,6 +330,26 @@ STATIC_ASSERT(sizeof(struct timeval) == __SIZEOF_TIMEVAL);
 STATIC_ASSERT(offsetof(struct timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
 STATIC_ASSERT(offsetof(struct timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
 STATIC_ASSERT(sizeof(struct timeval64) == __SIZEOF_TIMEVAL64);
+
+
+
+
+
+#include <bits/timeb.h>
+
+/* struct timeb */
+STATIC_ASSERT(offsetof(struct timeb, dstflag) == __OFFSET_TIMEB_DSTFLAG);
+STATIC_ASSERT(offsetof(struct timeb, millitm) == __OFFSET_TIMEB_MILLITM);
+STATIC_ASSERT(offsetof(struct timeb, time) == __OFFSET_TIMEB_TIME);
+STATIC_ASSERT(offsetof(struct timeb, timezone) == __OFFSET_TIMEB_TIMEZONE);
+STATIC_ASSERT(sizeof(struct timeb) == __SIZEOF_TIMEB);
+
+/* struct timeb64 */
+STATIC_ASSERT(offsetof(struct timeb64, dstflag) == __OFFSET_TIMEB64_DSTFLAG);
+STATIC_ASSERT(offsetof(struct timeb64, millitm) == __OFFSET_TIMEB64_MILLITM);
+STATIC_ASSERT(offsetof(struct timeb64, time) == __OFFSET_TIMEB64_TIME);
+STATIC_ASSERT(offsetof(struct timeb64, timezone) == __OFFSET_TIMEB64_TIMEZONE);
+STATIC_ASSERT(sizeof(struct timeb64) == __SIZEOF_TIMEB64);
 
 
 

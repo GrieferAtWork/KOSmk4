@@ -83,7 +83,11 @@ setfsgid = setfsgid16;
 mmap = mmap32;
 
 /* Configure binding of multi-arch types in system calls. */
+time = timex32;
+time64 = timex64;
 utime = utime32;
+ftime = ftimex32;
+ftime64 = ftimex32_64;
 gettimeofday = gettimeofdayx32;
 gettimeofday64 = gettimeofdayx32_64;
 settimeofday = settimeofdayx32;
@@ -575,6 +579,7 @@ mq_timedreceive64 = mq_timedreceivex32_64;
 0x80000018:coredump
 0x80000019:stime64
 0x8000001e:utime64
+0x80000023:ftime64
 0x80000036:ioctlf
 0x8000003c:fsmode
 0x8000004e:gettimeofday64

@@ -28,6 +28,9 @@
 #define __OFFSET_TIMEVAL_SEC    __OFFSET_TIMEVALX64_SEC
 #define __OFFSET_TIMEVAL_USEC   __OFFSET_TIMEVALX64_USEC
 #define __SIZEOF_TIMEVAL        __SIZEOF_TIMEVALX64
+#define __OFFSET_TIMEVAL64_SEC  __OFFSET_TIMEVALX64_SEC
+#define __OFFSET_TIMEVAL64_USEC __OFFSET_TIMEVALX64_USEC
+#define __SIZEOF_TIMEVAL64      __SIZEOF_TIMEVALX64
 #define timevalx64              timeval
 #define __timevalx64            timeval
 #define __timeval32             timeval
@@ -38,9 +41,6 @@
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
 #define timeval64               timeval
-#define __OFFSET_TIMEVAL64_SEC  __OFFSET_TIMEVALX64_SEC
-#define __OFFSET_TIMEVAL64_USEC __OFFSET_TIMEVALX64_USEC
-#define __SIZEOF_TIMEVAL64      __SIZEOF_TIMEVALX64
 #endif /* __USE_TIME64 */
 #define __timeval_defined 1
 #else /* __x86_64__ */

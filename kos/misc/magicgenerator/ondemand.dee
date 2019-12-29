@@ -74,12 +74,17 @@ function runGenerateErrors(xarch_path: string): (string, ipc.Process) | none {
 function runGenerateSyscalls(
 		xarch_path: string, TARGET_ARCH: string,
 		TARGET: Module): (string, ipc.Process) | none {
-	return doRunDeemonScriptIfFilesAreOutOfDate(
+	local result = doRunDeemonScriptIfFilesAreOutOfDate(
 		script: "kos/misc/magicgenerator/generate_syscalls.dee",
-		inputs: { "{}/asm/syscalls{}.def".format({ xarch_path, TARGET.SUFFIX }), },
-		latestSuffix: TARGET_ARCH,
-		additionalArguments: { TARGET_ARCH }
-	);
+		inputs: { "kos/include/asm/syscalls.def" });
+	if (result is none) {
+		result = doRunDeemonScriptIfFilesAreOutOfDate(
+			script: "kos/misc/magicgenerator/generate_syscalls.dee",
+			inputs: { "{}/asm/syscalls{}.def".format({ xarch_path, TARGET.SUFFIX }), },
+			latestSuffix: TARGET_ARCH,
+			additionalArguments: { TARGET_ARCH });
+	}
+	return result;
 }
 
 function runGenerateHeaders(): (string, ipc.Process) | none {

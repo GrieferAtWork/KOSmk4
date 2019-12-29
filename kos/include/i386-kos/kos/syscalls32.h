@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b518aea */
+/* HASH CRC-32:0x8658a50a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,12 +76,10 @@ __SYSDECL_BEGIN
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("dirent")
 #pragma push_macro("stat")
-#pragma push_macro("timeb")
 #pragma push_macro("timezone")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #undef dirent
 #undef stat
-#undef timeb
 #undef timezone
 
 struct __cpu_set_struct;
@@ -93,6 +91,8 @@ struct __itimerval64;
 struct __siginfo32_struct;
 struct __sigset_struct;
 struct __statfs32;
+struct __timebx32;
+struct __timebx32_64;
 struct __timespecx32;
 struct __timespecx32_64;
 struct __timevalx32;
@@ -136,7 +136,6 @@ struct stat;
 struct statfs64;
 struct sysinfo;
 struct termios;
-struct timeb;
 struct timezone;
 struct tms;
 struct ucpustate;
@@ -559,8 +558,11 @@ __CDECLARE_SC(,__errno_t,fsymlinkat,(char const *__link_text, __fd_t __tofd, cha
 __CDECLARE_SC(,__errno_t,fsync,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(fsync) */
 #if __CRT_HAVE_SC(ftime)
-__CDECLARE_SC(,__errno_t,ftime,(struct timeb *__tp),(__tp))
+__CDECLARE_SC(,__errno_t,ftime,(struct __timebx32 *__tp),(__tp))
 #endif /* __CRT_HAVE_SC(ftime) */
+#if __CRT_HAVE_SC(ftime64)
+__CDECLARE_SC(,__errno_t,ftime64,(struct __timebx32_64 *__tp),(__tp))
+#endif /* __CRT_HAVE_SC(ftime64) */
 #if __CRT_HAVE_SC(ftruncate)
 __CDECLARE_SC(,__errno_t,ftruncate,(__fd_t __fd, __syscall_ulong_t __length),(__fd,__length))
 #endif /* __CRT_HAVE_SC(ftruncate) */
@@ -1648,10 +1650,10 @@ __CDECLARE_SC(,__ssize_t,tee,(__fd_t __fdin, __fd_t __fdout, __size_t __length, 
 __CDECLARE_SC(,__errno_t,tgkill,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo),(__tgid,__tid,__signo))
 #endif /* __CRT_HAVE_SC(tgkill) */
 #if __CRT_HAVE_SC(time)
-__CDECLARE_SC(,__time32_t,time,(__time32_t *__timer),(__timer))
+__CDECLARE_SC(,__int32_t,time,(__int32_t *__timer),(__timer))
 #endif /* __CRT_HAVE_SC(time) */
 #if __CRT_HAVE_SC(time64)
-__CDECLARE_SC(,__time64_t,time64,(__time64_t *__timer),(__timer))
+__CDECLARE_SC(,__int64_t,time64,(__int64_t *__timer),(__timer))
 #endif /* __CRT_HAVE_SC(time64) */
 #if __CRT_HAVE_SC(timer_create)
 __CDECLARE_SC(,__errno_t,timer_create,(__clockid_t __clock_id, struct sigevent *__evp, __timer_t *__timerid),(__clock_id,__evp,__timerid))
@@ -2230,8 +2232,11 @@ __CDECLARE_XSC(,__errno_t,fsymlinkat,(char const *__link_text, __fd_t __tofd, ch
 __CDECLARE_XSC(,__errno_t,fsync,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(fsync) */
 #if __CRT_HAVE_XSC(ftime)
-__CDECLARE_XSC(,__errno_t,ftime,(struct timeb *__tp),(__tp))
+__CDECLARE_XSC(,__errno_t,ftime,(struct __timebx32 *__tp),(__tp))
 #endif /* __CRT_HAVE_XSC(ftime) */
+#if __CRT_HAVE_XSC(ftime64)
+__CDECLARE_XSC(,__errno_t,ftime64,(struct __timebx32_64 *__tp),(__tp))
+#endif /* __CRT_HAVE_XSC(ftime64) */
 #if __CRT_HAVE_XSC(ftruncate)
 __CDECLARE_XSC(,__errno_t,ftruncate,(__fd_t __fd, __syscall_ulong_t __length),(__fd,__length))
 #endif /* __CRT_HAVE_XSC(ftruncate) */
@@ -3307,10 +3312,10 @@ __CDECLARE_XSC(,__ssize_t,tee,(__fd_t __fdin, __fd_t __fdout, __size_t __length,
 __CDECLARE_XSC(,__errno_t,tgkill,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo),(__tgid,__tid,__signo))
 #endif /* __CRT_HAVE_XSC(tgkill) */
 #if __CRT_HAVE_XSC(time)
-__CDECLARE_XSC(,__time32_t,time,(__time32_t *__timer),(__timer))
+__CDECLARE_XSC(,__int32_t,time,(__int32_t *__timer),(__timer))
 #endif /* __CRT_HAVE_XSC(time) */
 #if __CRT_HAVE_XSC(time64)
-__CDECLARE_XSC(,__time64_t,time64,(__time64_t *__timer),(__timer))
+__CDECLARE_XSC(,__int64_t,time64,(__int64_t *__timer),(__timer))
 #endif /* __CRT_HAVE_XSC(time64) */
 #if __CRT_HAVE_XSC(timer_create)
 __CDECLARE_XSC(,__errno_t,timer_create,(__clockid_t __clock_id, struct sigevent *__evp, __timer_t *__timerid),(__clock_id,__evp,__timerid))
@@ -3478,7 +3483,6 @@ __CDECLARE_XSC(,__ssize_t,writevf,(__fd_t __fd, struct iovec32 const *__iovec, _
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("timezone")
-#pragma pop_macro("timeb")
 #pragma pop_macro("stat")
 #pragma pop_macro("dirent")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */

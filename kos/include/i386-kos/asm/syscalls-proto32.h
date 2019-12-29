@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9508e2 */
+/* HASH CRC-32:0xe5ad9b05 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -436,6 +436,7 @@
 #define __NRAC_coredump                6
 #define __NRAC_stime64                 1
 #define __NRAC_utime64                 2
+#define __NRAC_ftime64                 1
 #define __NRAC_ioctlf                  4
 #define __NRAC_fsmode                  1
 #define __NRAC_gettimeofday64          2
@@ -505,7 +506,7 @@
 #define __NRRT_unlink                  (errno_t, __errno_t)
 #define __NRRT_execve                  (errno_t, __errno_t)
 #define __NRRT_chdir                   (errno_t, __errno_t)
-#define __NRRT_time                    (time32_t, __time32_t)
+#define __NRRT_time                    (int32_t, __int32_t)
 #define __NRRT_mknod                   (errno_t, __errno_t)
 #define __NRRT_chmod                   (errno_t, __errno_t)
 #define __NRRT_lchown                  (errno_t, __errno_t)
@@ -877,7 +878,7 @@
 #define __NRRT_ksysctl                 (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_openpty                 (errno_t, __errno_t)
 #define __NRRT_fchdirat                (errno_t, __errno_t)
-#define __NRRT_time64                  (time64_t, __time64_t)
+#define __NRRT_time64                  (int64_t, __int64_t)
 #define __NRRT_set_exception_handler   (errno_t, __errno_t)
 #define __NRRT_get_exception_handler   (errno_t, __errno_t)
 #define __NRRT_set_library_listdef     (errno_t, __errno_t)
@@ -891,6 +892,7 @@
 #define __NRRT_coredump                (errno_t, __errno_t)
 #define __NRRT_stime64                 (errno_t, __errno_t)
 #define __NRRT_utime64                 (errno_t, __errno_t)
+#define __NRRT_ftime64                 (errno_t, __errno_t)
 #define __NRRT_ioctlf                  (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_fsmode                  (uint64_t, __uint64_t)
 #define __NRRT_gettimeofday64          (errno_t, __errno_t)
@@ -970,7 +972,7 @@
 #define __NRAT1_execve                  (char const *const *, char const *const *)
 #define __NRAT2_execve                  (char const *const *, char const *const *)
 #define __NRAT0_chdir                   (char const *, char const *)
-#define __NRAT0_time                    (time32_t *, __time32_t *)
+#define __NRAT0_time                    (int32_t *, __int32_t *)
 #define __NRAT0_mknod                   (char const *, char const *)
 #define __NRAT1_mknod                   (mode_t, __mode_t)
 #define __NRAT2_mknod                   (dev_t, __dev_t)
@@ -1004,7 +1006,7 @@
 #define __NRAT0_access                  (char const *, char const *)
 #define __NRAT1_access                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_nice                    (syscall_slong_t, __syscall_slong_t)
-#define __NRAT0_ftime                   (struct timeb *, struct timeb *)
+#define __NRAT0_ftime                   (struct __timebx32 *, struct __timebx32 *)
 #define __NRAT0_kill                    (pid_t, __pid_t)
 #define __NRAT1_kill                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_rename                  (char const *, char const *)
@@ -1808,7 +1810,7 @@
 #define __NRAT0_fchdirat                (fd_t, __fd_t)
 #define __NRAT1_fchdirat                (char const *, char const *)
 #define __NRAT2_fchdirat                (atflag_t, __atflag_t)
-#define __NRAT0_time64                  (time64_t *, __time64_t *)
+#define __NRAT0_time64                  (int64_t *, __int64_t *)
 #define __NRAT0_set_exception_handler   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_set_exception_handler   (__except_handler32_t, __except_handler32_t)
 #define __NRAT2_set_exception_handler   (void *, void *)
@@ -1852,6 +1854,7 @@
 #define __NRAT0_stime64                 (time64_t const *, __time64_t const *)
 #define __NRAT0_utime64                 (char const *, char const *)
 #define __NRAT1_utime64                 (struct __utimbuf64 const *, struct __utimbuf64 const *)
+#define __NRAT0_ftime64                 (struct __timebx32_64 *, struct __timebx32_64 *)
 #define __NRAT0_ioctlf                  (fd_t, __fd_t)
 #define __NRAT1_ioctlf                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_ioctlf                  (iomode_t, __iomode_t)
@@ -2038,7 +2041,7 @@
 #define __NRAM_unlink(a, b, c, d, e, f)                  (char const *)a
 #define __NRAM_execve(a, b, c, d, e, f)                  (char const *)a, (char const *const *)b, (char const *const *)c
 #define __NRAM_chdir(a, b, c, d, e, f)                   (char const *)a
-#define __NRAM_time(a, b, c, d, e, f)                    (__time32_t *)a
+#define __NRAM_time(a, b, c, d, e, f)                    (__int32_t *)a
 #define __NRAM_mknod(a, b, c, d, e, f)                   (char const *)a, (__mode_t)b, (__dev_t)c
 #define __NRAM_chmod(a, b, c, d, e, f)                   (char const *)a, (__mode_t)b
 #define __NRAM_lchown(a, b, c, d, e, f)                  (char const *)a, (__uint16_t)b, (__uint16_t)c
@@ -2060,7 +2063,7 @@
 #define __NRAM_gtty(a, b, c, d, e, f)                    /* nothing */
 #define __NRAM_access(a, b, c, d, e, f)                  (char const *)a, (__syscall_ulong_t)b
 #define __NRAM_nice(a, b, c, d, e, f)                    (__syscall_slong_t)a
-#define __NRAM_ftime(a, b, c, d, e, f)                   (struct timeb *)a
+#define __NRAM_ftime(a, b, c, d, e, f)                   (struct __timebx32 *)a
 #define __NRAM_sync(a, b, c, d, e, f)                    /* nothing */
 #define __NRAM_kill(a, b, c, d, e, f)                    (__pid_t)a, (__syscall_ulong_t)b
 #define __NRAM_rename(a, b, c, d, e, f)                  (char const *)a, (char const *)b
@@ -2410,7 +2413,7 @@
 #define __NRAM_ksysctl(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (void *)b
 #define __NRAM_openpty(a, b, c, d, e, f)                 (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
 #define __NRAM_fchdirat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__atflag_t)c
-#define __NRAM_time64(a, b, c, d, e, f)                  (__time64_t *)a
+#define __NRAM_time64(a, b, c, d, e, f)                  (__int64_t *)a
 #define __NRAM_set_exception_handler(a, b, c, d, e, f)   (__syscall_ulong_t)a, (__except_handler32_t)b, (void *)c
 #define __NRAM_get_exception_handler(a, b, c, d, e, f)   (__ULONG32_TYPE__ *)a, (__except_handler32_t *)b, (__HYBRID_PTR32(void) *)c
 #define __NRAM_set_library_listdef(a, b, c, d, e, f)     (struct library_listdef32 const *)a
@@ -2424,6 +2427,7 @@
 #define __NRAM_coredump(a, b, c, d, e, f)                (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void) const *)c, (__size_t)d, (struct exception_data32 const *)e, (__syscall_ulong_t)f
 #define __NRAM_stime64(a, b, c, d, e, f)                 (__time64_t const *)a
 #define __NRAM_utime64(a, b, c, d, e, f)                 (char const *)a, (struct __utimbuf64 const *)b
+#define __NRAM_ftime64(a, b, c, d, e, f)                 (struct __timebx32_64 *)a
 #define __NRAM_ioctlf(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
 #define __NRAM_fsmode(a, b, c, d, e, f)                  (__uint64_t)((__uint64_t)a | (__uint64_t)b << 32)
 #define __NRAM_gettimeofday64(a, b, c, d, e, f)          (struct __timevalx32_64 *)a, (struct timezone *)b
@@ -2879,6 +2883,7 @@
 #define __NRAP_coredump(a, b, c, d, e, f)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_stime64(a)                                (__syscall_ulong_t)a
 #define __NRAP_utime64(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_ftime64(a)                                (__syscall_ulong_t)a
 #define __NRAP_ioctlf(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_fsmode(a)                                 (__syscall_ulong_t)a, (__syscall_ulong_t)((__uint64_t)a >> 32)
 #define __NRAP_gettimeofday64(a, b)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b

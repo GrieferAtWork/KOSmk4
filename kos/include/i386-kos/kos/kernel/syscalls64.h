@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe246735a */
+/* HASH CRC-32:0xbfa86f8d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -412,6 +412,7 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_FSTATFS                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_FSTATFS64               1
 #define __ARCH_WANT_COMPAT_SYSCALL_FTIME                   1
+#define __ARCH_WANT_COMPAT_SYSCALL_FTIME64                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_FUTEX                   1
 #define __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT               1
 #define __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64             1
@@ -534,7 +535,6 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_STTY                    1
 #define __ARCH_WANT_COMPAT_SYSCALL_SYSINFO                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_TIME                    1
-#define __ARCH_WANT_COMPAT_SYSCALL_TIME64                  1
 #define __ARCH_WANT_COMPAT_SYSCALL_TIMER_CREATE            1
 #define __ARCH_WANT_COMPAT_SYSCALL_TIMER_GETTIME           1
 #define __ARCH_WANT_COMPAT_SYSCALL_TIMER_GETTIME64         1

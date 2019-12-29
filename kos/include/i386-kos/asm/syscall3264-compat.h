@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7166f65b */
+/* HASH CRC-32:0xcdf1bbba */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -250,6 +250,7 @@
 #define __NR3264COMPAT_syslog                 1(syslog)
 #define __NR3264COMPAT_tee                    1(tee)
 #define __NR3264COMPAT_tgkill                 1(tgkill)
+#define __NR3264COMPAT_time                   1(time64)
 #define __NR3264COMPAT_timer_delete           1(timer_delete)
 #define __NR3264COMPAT_timer_getoverrun       1(timer_getoverrun)
 #define __NR3264COMPAT_timerfd_create         1(timerfd_create)

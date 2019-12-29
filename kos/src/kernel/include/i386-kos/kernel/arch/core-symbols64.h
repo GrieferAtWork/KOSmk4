@@ -802,10 +802,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 200 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname200 /* index: 200 */
+	.weak sys_io_setup; .quad sys_io_setup
+	.reloc ., R_X86_64_SIZE32, sys_io_setup; .int 0
+	.int 0x4d95dc0
 	.quad .Lname201 /* index: 201 */
 	.weak sys_getpriority; .quad sys_getpriority
 	.reloc ., R_X86_64_SIZE32, sys_getpriority; .int 0
@@ -2567,9 +2567,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys_kstat; .int 0
 	.int 0x962d184
 	.quad .Lname641 /* index: 641 */
-	.weak sys_io_setup; .quad sys_io_setup
-	.reloc ., R_X86_64_SIZE32, sys_io_setup; .int 0
-	.int 0x4d95dc0
+	.weak sys32_getcpu; .quad sys32_getcpu
+	.reloc ., R_X86_64_SIZE32, sys32_getcpu; .int 0
+	.int 0x26cccf5
 	.quad .Lname642 /* index: 642 */
 	.weak vpage_ffree_untraced; .quad vpage_ffree_untraced
 	.reloc ., R_X86_64_SIZE32, vpage_ffree_untraced; .int 0
@@ -5263,9 +5263,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1315 /* index: 1315 */
-	.weak sys32_getcpu; .quad sys32_getcpu
-	.reloc ., R_X86_64_SIZE32, sys32_getcpu; .int 0
-	.int 0x26cccf5
+	.weak sys32_ftime64; .quad sys32_ftime64
+	.reloc ., R_X86_64_SIZE32, sys32_ftime64; .int 0
+	.int 0x6aa50b4
 	.quad .Lname1316 /* index: 1316 */
 	.weak cred_require_vmread; .quad cred_require_vmread
 	.reloc ., R_X86_64_SIZE32, cred_require_vmread; .int 0
@@ -16674,6 +16674,8 @@ END(kernel_symbol_table)
 	.string "superblock_nodeslock_write"
 .Lname198:
 	.string "slab_malloc56"
+.Lname200:
+	.string "sys_io_setup"
 .Lname201:
 	.string "sys_getpriority"
 .Lname203:
@@ -17323,7 +17325,7 @@ END(kernel_symbol_table)
 .Lname640:
 	.string "sys_kstat"
 .Lname641:
-	.string "sys_io_setup"
+	.string "sys32_getcpu"
 .Lname642:
 	.string "vpage_ffree_untraced"
 .Lname643:
@@ -18219,7 +18221,7 @@ END(kernel_symbol_table)
 .Lname1311:
 	.string "path_lock_write"
 .Lname1315:
-	.string "sys32_getcpu"
+	.string "sys32_ftime64"
 .Lname1316:
 	.string "cred_require_vmread"
 .Lname1317:

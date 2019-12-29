@@ -231,6 +231,7 @@ incdir("", "../../include");
 #include <bits/termios.h>
 #include <bits/threads.h>
 #include <bits/time.h>
+#include <bits/timeb.h>
 #include <bits/timerfd.h>
 #include <bits/timespec-cxx-support.h>
 #include <bits/timespec.h>
@@ -291,6 +292,7 @@ incdir("", "../../include");
 #include <compat/bits/sigset.h>
 #include <compat/bits/sigstack.h>
 #include <compat/bits/sigval.h>
+#include <compat/bits/timeb.h>
 #include <compat/bits/timespec.h>
 #include <compat/bits/timeval.h>
 #include <compat/bits/types.h>

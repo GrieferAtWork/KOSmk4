@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24b7cbb6 */
+/* HASH CRC-32:0x7a39bc0a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -929,6 +929,7 @@
 #define __NR32AN0_stime64                 t
 #define __NR32AN0_utime64                 filename
 #define __NR32AN1_utime64                 times
+#define __NR32AN0_ftime64                 tp
 #define __NR32AN0_ioctlf                  fd
 #define __NR32AN1_ioctlf                  command
 #define __NR32AN2_ioctlf                  mode
@@ -3160,6 +3161,8 @@
 #define __NR32ATRA0_utime64(filename, times) ,(validate_readable_opt(filename,1),filename)
 #define __NR32ATRF1_utime64                 "%p"
 #define __NR32ATRA1_utime64(filename, times) ,times
+#define __NR32ATRF0_ftime64                 "%p"
+#define __NR32ATRA0_ftime64(tp)             ,tp
 #define __NR32ATRF0_ioctlf                  "%d"
 #define __NR32ATRA0_ioctlf(fd, command, mode, arg) ,(int)(fd)
 #define __NR32ATRF1_ioctlf                  "%#" PRIxSIZ

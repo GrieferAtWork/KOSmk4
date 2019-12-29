@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa062db7b */
+/* HASH CRC-32:0x25375cd4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@
 #define SYS_unlink                  __NR_unlink                  /* errno_t unlink(char const *filename) */
 #define SYS_execve                  __NR_execve                  /* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
 #define SYS_chdir                   __NR_chdir                   /* errno_t chdir(char const *path) */
-#define SYS_time                    __NR_time                    /* time32_t time(time32_t *timer) */
+#define SYS_time                    __NR_time                    /* int32_t time(int32_t *timer) */
 #define SYS_mknod                   __NR_mknod                   /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
 #define SYS_chmod                   __NR_chmod                   /* errno_t chmod(char const *filename, mode_t mode) */
 #define SYS_lchown                  __NR_lchown                  /* errno_t lchown(char const *filename, uint16_t owner, uint16_t group) */
@@ -68,7 +68,7 @@
 /* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK' */
 #define SYS_access                  __NR_access                  /* errno_t access(char const *filename, syscall_ulong_t type) */
 #define SYS_nice                    __NR_nice                    /* errno_t nice(syscall_slong_t inc) */
-#define SYS_ftime                   __NR_ftime                   /* errno_t ftime(struct timeb *tp) */
+#define SYS_ftime                   __NR_ftime                   /* errno_t ftime(struct __timebx32 *tp) */
 #define SYS_sync                    __NR_sync                    /* errno_t sync(void) */
 /* @param: signo: One of `SIG*' */
 #define SYS_kill                    __NR_kill                    /* errno_t kill(pid_t pid, syscall_ulong_t signo) */
@@ -580,7 +580,7 @@
 #define SYS_openpty                 __NR_openpty                 /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_fchdirat                __NR_fchdirat                /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-#define SYS_time64                  __NR_time64                  /* time64_t time64(time64_t *timer) */
+#define SYS_time64                  __NR_time64                  /* int64_t time64(int64_t *timer) */
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
@@ -739,6 +739,7 @@
 #define SYS_coredump                __NR_coredump                /* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
 #define SYS_stime64                 __NR_stime64                 /* errno_t stime64(time64_t const *t) */
 #define SYS_utime64                 __NR_utime64                 /* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+#define SYS_ftime64                 __NR_ftime64                 /* errno_t ftime64(struct __timebx32_64 *tp) */
 #define SYS_ioctlf                  __NR_ioctlf                  /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define SYS_fsmode                  __NR_fsmode                  /* uint64_t fsmode(uint64_t mode) */
 #define SYS_gettimeofday64          __NR_gettimeofday64          /* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
