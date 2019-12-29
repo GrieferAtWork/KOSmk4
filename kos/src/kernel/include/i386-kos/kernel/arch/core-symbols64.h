@@ -4050,10 +4050,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_utimes; .quad sys_utimes
 	.reloc ., R_X86_64_SIZE32, sys_utimes; .int 0
 	.int 0x6cd5353
-	.quad 0 /* index: 1012 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1012 /* index: 1012 */
+	.weak sys32_wait4_64; .quad sys32_wait4_64
+	.reloc ., R_X86_64_SIZE32, sys32_wait4_64; .int 0
+	.int 0x86123f4
 	.quad .Lname1013 /* index: 1013 */
 	.weak kernel_debugtrap_lcpustate; .quad kernel_debugtrap_lcpustate
 	.reloc ., R_X86_64_SIZE32, kernel_debugtrap_lcpustate; .int 0
@@ -4271,9 +4271,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1067 /* index: 1067 */
-	.weak sys_chroot; .quad sys_chroot
-	.reloc ., R_X86_64_SIZE32, sys_chroot; .int 0
-	.int 0x59846f4
+	.weak sys32_waitid64; .quad sys32_waitid64
+	.reloc ., R_X86_64_SIZE32, sys32_waitid64; .int 0
+	.int 0x86c76f4
 	.quad .Lname1068 /* index: 1068 */
 	.weak superblock_syncall; .quad superblock_syncall
 	.reloc ., R_X86_64_SIZE32, superblock_syncall; .int 0
@@ -4963,9 +4963,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1240 /* index: 1240 */
-	.weak sys_epoll_wait; .quad sys_epoll_wait
-	.reloc ., R_X86_64_SIZE32, sys_epoll_wait; .int 0
-	.int 0x39316f4
+	.weak sys_chroot; .quad sys_chroot
+	.reloc ., R_X86_64_SIZE32, sys_chroot; .int 0
+	.int 0x59846f4
 	.quad .Lname1241 /* index: 1241 */
 	.weak block_device_acquire_partlock_tryread; .quad block_device_acquire_partlock_tryread
 	.reloc ., R_X86_64_SIZE32, block_device_acquire_partlock_tryread; .int 0
@@ -8930,10 +8930,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak rwlock_reading; .quad rwlock_reading
 	.reloc ., R_X86_64_SIZE32, rwlock_reading; .int 0
 	.int 0x68208b7
-	.quad 0 /* index: 2232 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2232 /* index: 2232 */
+	.weak thisvm_x86_dr7; .quad thisvm_x86_dr7
+	.reloc ., R_X86_64_SIZE32, thisvm_x86_dr7; .int 0
+	.int 0x4b28d97
 	.quad .Lname2233 /* index: 2233 */
 	.weak sys32_inotify_init; .quad sys32_inotify_init
 	.reloc ., R_X86_64_SIZE32, sys32_inotify_init; .int 0
@@ -9339,9 +9339,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, vm_futex_broadcast; .int 0
 	.int 0x8659cf4
 	.quad .Lname2334 /* index: 2334 */
-	.weak sys_reboot; .quad sys_reboot
-	.reloc ., R_X86_64_SIZE32, sys_reboot; .int 0
-	.int 0x68c46f4
+	.weak sys_epoll_wait; .quad sys_epoll_wait
+	.reloc ., R_X86_64_SIZE32, sys_epoll_wait; .int 0
+	.int 0x39316f4
 	.quad .Lname2335 /* index: 2335 */
 	.weak this_kernel_stacknode; .quad this_kernel_stacknode
 	.reloc ., R_X86_64_SIZE32, this_kernel_stacknode; .int 0
@@ -9790,10 +9790,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 2447 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2447 /* index: 2447 */
+	.weak sys32_getrusage64; .quad sys32_getrusage64
+	.reloc ., R_X86_64_SIZE32, sys32_getrusage64; .int 0
+	.int 0x4b11564
 	.quad .Lname2448 /* index: 2448 */
 	.weak sys32_io_setup; .quad sys32_io_setup
 	.reloc ., R_X86_64_SIZE32, sys32_io_setup; .int 0
@@ -13919,9 +13919,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, this_trampoline_node; .int 0
 	.int 0xe061b45
 	.quad .Lname3479 /* index: 3479 */
-	.weak thisvm_x86_dr7; .quad thisvm_x86_dr7
-	.reloc ., R_X86_64_SIZE32, thisvm_x86_dr7; .int 0
-	.int 0x4b28d97
+	.weak sys_reboot; .quad sys_reboot
+	.reloc ., R_X86_64_SIZE32, sys_reboot; .int 0
+	.int 0x68c46f4
 	.quad 0 /* index: 3480 */
 	.quad 0
 	.int 0
@@ -17822,6 +17822,8 @@ END(kernel_symbol_table)
 	.string "block_device_awrite_phys_sector"
 .Lname1011:
 	.string "sys_utimes"
+.Lname1012:
+	.string "sys32_wait4_64"
 .Lname1013:
 	.string "kernel_debugtrap_lcpustate"
 .Lname1014:
@@ -17899,7 +17901,7 @@ END(kernel_symbol_table)
 .Lname1065:
 	.string "sys_rmdir"
 .Lname1067:
-	.string "sys_chroot"
+	.string "sys32_waitid64"
 .Lname1068:
 	.string "superblock_syncall"
 .Lname1069:
@@ -18135,7 +18137,7 @@ END(kernel_symbol_table)
 .Lname1238:
 	.string "sys32_writevf"
 .Lname1240:
-	.string "sys_epoll_wait"
+	.string "sys_chroot"
 .Lname1241:
 	.string "block_device_acquire_partlock_tryread"
 .Lname1244:
@@ -19438,6 +19440,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_write_nopf"
 .Lname2231:
 	.string "rwlock_reading"
+.Lname2232:
+	.string "thisvm_x86_dr7"
 .Lname2233:
 	.string "sys32_inotify_init"
 .Lname2235:
@@ -19567,7 +19571,7 @@ END(kernel_symbol_table)
 .Lname2333:
 	.string "vm_futex_broadcast"
 .Lname2334:
-	.string "sys_reboot"
+	.string "sys_epoll_wait"
 .Lname2335:
 	.string "this_kernel_stacknode"
 .Lname2336:
@@ -19714,6 +19718,8 @@ END(kernel_symbol_table)
 	.string "vm_kernel"
 .Lname2445:
 	.string "fpustate32_loadfrom"
+.Lname2447:
+	.string "sys32_getrusage64"
 .Lname2448:
 	.string "sys32_io_setup"
 .Lname2449:
@@ -21199,7 +21205,7 @@ END(kernel_symbol_table)
 .Lname3478:
 	.string "this_trampoline_node"
 .Lname3479:
-	.string "thisvm_x86_dr7"
+	.string "sys_reboot"
 .Lname3483:
 	.string "sys_chdir"
 .Lname3484:

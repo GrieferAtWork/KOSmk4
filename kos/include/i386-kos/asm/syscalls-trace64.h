@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99dc0f45 */
+/* HASH CRC-32:0xb669793a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -255,7 +255,7 @@
 #define __NRAN0_getrlimit              resource
 #define __NRAN1_getrlimit              rlimits
 #define __NRAN0_getrusage              who
-#define __NRAN1_getrusage              usage
+#define __NRAN1_getrusage              tv
 #define __NRAN0_sysinfo                info
 #define __NRAN0_times                  buf
 #define __NRAN0_ptrace                 request
@@ -1480,9 +1480,9 @@
 #define __NRATRF1_getrlimit              "%p"
 #define __NRATRA1_getrlimit(resource, rlimits) ,rlimits
 #define __NRATRF0_getrusage              "%" PRIdSIZ
-#define __NRATRA0_getrusage(who, usage)  ,(intptr_t)(who)
+#define __NRATRA0_getrusage(who, tv)     ,(intptr_t)(who)
 #define __NRATRF1_getrusage              "%p"
-#define __NRATRA1_getrusage(who, usage)  ,usage
+#define __NRATRA1_getrusage(who, tv)     ,tv
 #define __NRATRF0_sysinfo                "%p"
 #define __NRATRA0_sysinfo(info)          ,info
 #define __NRATRF0_times                  "%p"

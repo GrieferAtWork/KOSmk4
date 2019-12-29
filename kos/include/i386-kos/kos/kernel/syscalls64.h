@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48fd8e6a */
+/* HASH CRC-32:0x64a71777 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -427,6 +427,7 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_GETRESUID               1
 #define __ARCH_WANT_COMPAT_SYSCALL_GETRLIMIT               1
 #define __ARCH_WANT_COMPAT_SYSCALL_GETRUSAGE               1
+#define __ARCH_WANT_COMPAT_SYSCALL_GETRUSAGE64             1
 #define __ARCH_WANT_COMPAT_SYSCALL_GETTIMEOFDAY            1
 #define __ARCH_WANT_COMPAT_SYSCALL_GETTIMEOFDAY64          1
 #define __ARCH_WANT_COMPAT_SYSCALL_GTTY                    1
@@ -555,7 +556,9 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_VM86OLD                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_VMSPLICE                1
 #define __ARCH_WANT_COMPAT_SYSCALL_WAIT4                   1
+#define __ARCH_WANT_COMPAT_SYSCALL_WAIT4_64                1
 #define __ARCH_WANT_COMPAT_SYSCALL_WAITID                  1
+#define __ARCH_WANT_COMPAT_SYSCALL_WAITID64                1
 #define __ARCH_WANT_COMPAT_SYSCALL_WAITPID                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_WRITEV                  1
 #define __ARCH_WANT_COMPAT_SYSCALL_WRITEVF                 1

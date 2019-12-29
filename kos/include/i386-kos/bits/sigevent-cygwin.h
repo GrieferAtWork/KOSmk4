@@ -19,9 +19,11 @@
 #ifndef _I386_KOS_BIT_SIGEVENT_CYGWIN_H
 #define _I386_KOS_BIT_SIGEVENT_CYGWIN_H 1
 
-#include <__stdinc.h>
 #include <__crt.h> /* __CRT_CYG_PRIMARY */
+#include <__stdinc.h>
+
 #include <hybrid/typecore.h> /* __INT32_TYPE__ */
+
 #include <bits/sigval.h> /* sigval_t */
 
 __SYSDECL_BEGIN

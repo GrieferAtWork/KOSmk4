@@ -199,6 +199,8 @@ incdir("", "../../include");
 #include <bits/pthreadtypes.h>
 #include <bits/pthreadvalues.h>
 #include <bits/resource.h>
+#include <bits/rusage-convert.h>
+#include <bits/rusage-struct.h>
 #include <bits/sched.h>
 #include <bits/select.h>
 #include <bits/sem.h>
@@ -287,7 +289,10 @@ incdir("", "../../include");
 #include <byteswap.h>
 #include <compat/bits/iovec-struct.h>
 #include <compat/bits/itimerspec.h>
+#include <compat/bits/rusage-convert.h>
+#include <compat/bits/rusage-struct.h>
 #include <compat/bits/sigaction-struct.h>
+#include <compat/bits/siginfo-convert.h>
 #include <compat/bits/siginfo-struct.h>
 #include <compat/bits/sigset.h>
 #include <compat/bits/sigstack.h>

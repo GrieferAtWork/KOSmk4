@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a39bc0a */
+/* HASH CRC-32:0x62196b1b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,7 +131,7 @@
 #define __NR32AN0_getrlimit               resource
 #define __NR32AN1_getrlimit               rlimits
 #define __NR32AN0_getrusage               who
-#define __NR32AN1_getrusage               usage
+#define __NR32AN1_getrusage               tv
 #define __NR32AN0_gettimeofday            tv
 #define __NR32AN1_gettimeofday            tz
 #define __NR32AN0_settimeofday            tv
@@ -935,6 +935,8 @@
 #define __NR32AN2_ioctlf                  mode
 #define __NR32AN3_ioctlf                  arg
 #define __NR32AN0_fsmode                  mode
+#define __NR32AN0_getrusage64             who
+#define __NR32AN1_getrusage64             tv
 #define __NR32AN0_gettimeofday64          tv
 #define __NR32AN1_gettimeofday64          tz
 #define __NR32AN0_settimeofday64          tv
@@ -954,6 +956,10 @@
 #define __NR32AN2_setitimer64             oldval
 #define __NR32AN0_getitimer64             which
 #define __NR32AN1_getitimer64             curr_value
+#define __NR32AN0_wait4_64                pid
+#define __NR32AN1_wait4_64                stat_loc
+#define __NR32AN2_wait4_64                options
+#define __NR32AN3_wait4_64                usage
 #define __NR32AN0_kreaddir                fd
 #define __NR32AN1_kreaddir                buf
 #define __NR32AN2_kreaddir                bufsize
@@ -1023,6 +1029,11 @@
 #define __NR32AN2_mq_timedreceive64       msg_len
 #define __NR32AN3_mq_timedreceive64       pmsg_prio
 #define __NR32AN4_mq_timedreceive64       abs_timeout
+#define __NR32AN0_waitid64                idtype
+#define __NR32AN1_waitid64                id
+#define __NR32AN2_waitid64                infop
+#define __NR32AN3_waitid64                options
+#define __NR32AN4_waitid64                ru
 #define __NR32AN0_fmkdirat                dirfd
 #define __NR32AN1_fmkdirat                pathname
 #define __NR32AN2_fmkdirat                mode
@@ -1342,9 +1353,9 @@
 #define __NR32ATRF1_getrlimit               "%p"
 #define __NR32ATRA1_getrlimit(resource, rlimits) ,rlimits
 #define __NR32ATRF0_getrusage               "%" PRIdSIZ
-#define __NR32ATRA0_getrusage(who, usage)   ,(intptr_t)(who)
+#define __NR32ATRA0_getrusage(who, tv)      ,(intptr_t)(who)
 #define __NR32ATRF1_getrusage               "%p"
-#define __NR32ATRA1_getrusage(who, usage)   ,usage
+#define __NR32ATRA1_getrusage(who, tv)      ,tv
 #define __NR32ATRF0_gettimeofday            "%p"
 #define __NR32ATRA0_gettimeofday(tv, tz)    ,tv
 #define __NR32ATRF1_gettimeofday            "%p"
@@ -3181,6 +3192,10 @@
 #define __NR32ATRA3_ioctlf(fd, command, mode, arg) ,arg
 #define __NR32ATRF0_fsmode                  "%" PRIu64
 #define __NR32ATRA0_fsmode(mode)            ,mode
+#define __NR32ATRF0_getrusage64             "%" PRIdSIZ
+#define __NR32ATRA0_getrusage64(who, tv)    ,(intptr_t)(who)
+#define __NR32ATRF1_getrusage64             "%p"
+#define __NR32ATRA1_getrusage64(who, tv)    ,tv
 #define __NR32ATRF0_gettimeofday64          "%p"
 #define __NR32ATRA0_gettimeofday64(tv, tz)  ,tv
 #define __NR32ATRF1_gettimeofday64          "%p"
@@ -3226,6 +3241,17 @@
 #define __NR32ATRA0_getitimer64(which, curr_value) ,(uintptr_t)(which)
 #define __NR32ATRF1_getitimer64             "%p"
 #define __NR32ATRA1_getitimer64(which, curr_value) ,curr_value
+#define __NR32ATRF0_wait4_64                "%" PRIdSIZ
+#define __NR32ATRA0_wait4_64(pid, stat_loc, options, usage) ,(intptr_t)(pid)
+#define __NR32ATRF1_wait4_64                "%p"
+#define __NR32ATRA1_wait4_64(pid, stat_loc, options, usage) ,stat_loc
+#define __NR32ATRF2_wait4_64                "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
+#define __NR32ATRA2_wait4_64(pid, stat_loc, options, usage) ,(uintptr_t)(options),(options) & WNOHANG ? "WNOHANG" : "" \
+                                                            ,((options) & WUNTRACED) && ((options) & (WNOHANG)) ? "|" : "",(options) & WUNTRACED ? "WUNTRACED" : "" \
+                                                            ,((options) & WCONTINUED) && ((options) & (WNOHANG|WUNTRACED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
+                                                            ,((options) & WNOWAIT) && ((options) & (WNOHANG|WUNTRACED|WCONTINUED)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
+#define __NR32ATRF3_wait4_64                "%p"
+#define __NR32ATRA3_wait4_64(pid, stat_loc, options, usage) ,usage
 #define __NR32ATRF0_kreaddir                "%d"
 #define __NR32ATRA0_kreaddir(fd, buf, bufsize, mode) ,(int)(fd)
 #define __NR32ATRF1_kreaddir                "%p"
@@ -3410,6 +3436,20 @@
 #define __NR32ATRA3_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,pmsg_prio
 #define __NR32ATRF4_mq_timedreceive64       "%p"
 #define __NR32ATRA4_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,abs_timeout
+#define __NR32ATRF0_waitid64                "%#Ix=%s"
+#define __NR32ATRA0_waitid64(idtype, id, infop, options, ru) ,(idtype),(idtype) == P_ALL ? "P_ALL" : (idtype) == P_PID ? "P_PID" : (idtype) == P_PGID ? "P_PGID" : "?"
+#define __NR32ATRF1_waitid64                "%" PRIuSIZ
+#define __NR32ATRA1_waitid64(idtype, id, infop, options, ru) ,(uintptr_t)(id)
+#define __NR32ATRF2_waitid64                "%p"
+#define __NR32ATRA2_waitid64(idtype, id, infop, options, ru) ,infop
+#define __NR32ATRF3_waitid64                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s"
+#define __NR32ATRA3_waitid64(idtype, id, infop, options, ru) ,(uintptr_t)(options),(options) & WEXITED ? "WEXITED" : "" \
+                                                             ,((options) & WSTOPPED) && ((options) & (WEXITED)) ? "|" : "",(options) & WSTOPPED ? "WSTOPPED" : "" \
+                                                             ,((options) & WCONTINUED) && ((options) & (WEXITED|WSTOPPED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
+                                                             ,((options) & WNOHANG) && ((options) & (WEXITED|WSTOPPED|WCONTINUED)) ? "|" : "",(options) & WNOHANG ? "WNOHANG" : "" \
+                                                             ,((options) & WNOWAIT) && ((options) & (WEXITED|WSTOPPED|WCONTINUED|WNOHANG)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
+#define __NR32ATRF4_waitid64                "%p"
+#define __NR32ATRA4_waitid64(idtype, id, infop, options, ru) ,ru
 #define __NR32ATRF0_fmkdirat                "%d"
 #define __NR32ATRA0_fmkdirat(dirfd, pathname, mode, flags) ,(int)(dirfd)
 #define __NR32ATRF1_fmkdirat                "%q"

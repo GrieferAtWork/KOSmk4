@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba6e411d */
+/* HASH CRC-32:0xd1cda6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1900,7 +1900,7 @@ END(__x86_asm64_syscall_exit)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex64 *usage) */
 .section .text.x86.asm64_syscall.wait4
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_wait4)
 	.cfi_startproc simple
@@ -3012,7 +3012,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrlimit)
 	.cfi_endproc
 END(__x86_asm64_syscall_getrlimit)
 
-/* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
+/* errno_t getrusage(syscall_slong_t who, struct __rusagex64 *tv) */
 .section .text.x86.asm64_syscall.getrusage
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrusage)
 	.cfi_startproc simple
@@ -7505,7 +7505,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kexec_load)
 END(__x86_asm64_syscall_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, syscall_ulong_t options, struct __rusagex64 *ru) */
 .section .text.x86.asm64_syscall.waitid
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_waitid)
 	.cfi_startproc simple
@@ -13954,7 +13954,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrlimit)
 	.cfi_endproc
 END(__x86_asm32_int80_getrlimit)
 
-/* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
+/* errno_t getrusage(syscall_slong_t who, struct __rusagex32 *tv) */
 .section .text.x86.asm32_syscall_int80.getrusage
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage)
 	.cfi_startproc simple
@@ -15158,7 +15158,7 @@ END(__x86_asm32_int80_vm86old)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32 *usage) */
 .section .text.x86.asm32_syscall_int80.wait4
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4)
 	.cfi_startproc simple
@@ -20589,7 +20589,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kexec_load)
 END(__x86_asm32_int80_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
 	.cfi_startproc simple
@@ -24939,6 +24939,38 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmode)
 	.cfi_endproc
 END(__x86_asm32_int80_fsmode)
 
+/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
+.section .text.x86.asm32_syscall_int80.getrusage64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x8000004d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_getrusage64)
+	call   sys32_getrusage64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_getrusage64)
+
 /* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
 .section .text.x86.asm32_syscall_int80.gettimeofday64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday64)
@@ -25149,6 +25181,43 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
 	intr_exit_sysret
 	.cfi_endproc
 END(__x86_asm32_int80_getitimer64)
+
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
+.section .text.x86.asm32_syscall_int80.wait4_64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x80000072
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_wait4_64)
+	call   sys32_wait4_64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_wait4_64)
 
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 .section .text.x86.asm32_syscall_int80.kreaddir
@@ -25895,6 +25964,43 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive64)
 	intr_exit_sysret
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedreceive64)
+
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
+.section .text.x86.asm32_syscall_int80.waitid64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x8000011c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_waitid64)
+	call   sys32_waitid64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_waitid64)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
@@ -26767,7 +26873,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setrlimit, __x86_asm32_int80_setrl
 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrlimit, __x86_asm32_int80_getrlimit)
 
-/* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
+/* errno_t getrusage(syscall_slong_t who, struct __rusagex32 *tv) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrusage, __x86_asm32_int80_getrusage)
 
 /* errno_t gettimeofday(struct __timevalx32 *tv, struct timezone *tz) */
@@ -26957,7 +27063,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_vm86old, __x86_asm32_int80_vm86old
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32 *usage) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_wait4, __x86_asm32_int80_wait4)
 
 /* errno_t swapoff(char const *pathname) */
@@ -27955,7 +28061,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mq_getsetattr, __x86_asm32_int80_m
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kexec_load, __x86_asm32_int80_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
 	.cfi_startproc simple
@@ -29534,6 +29640,9 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioctlf, __x86_asm32_int80_ioctlf)
 /* uint64_t fsmode(uint64_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsmode, __x86_asm32_int80_fsmode)
 
+/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrusage64, __x86_asm32_int80_getrusage64)
+
 /* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_gettimeofday64, __x86_asm32_int80_gettimeofday64)
 
@@ -29629,6 +29738,11 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setitimer64, __x86_asm32_int80_set
 
 /* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getitimer64, __x86_asm32_int80_getitimer64)
+
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_wait4_64, __x86_asm32_int80_wait4_64)
 
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kreaddir, __x86_asm32_int80_kreaddir)
@@ -29871,6 +29985,44 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive64)
 	intr_exit_sysret
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_timedreceive64)
+
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
+.section .text.x86.asm32_syscall_sysenter.waitid64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x8000011c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_waitid64)
+	call   sys32_waitid64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_waitid64)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
@@ -30947,7 +31099,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrlimit)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getrlimit)
 
-/* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
+/* errno_t getrusage(syscall_slong_t who, struct __rusagex32 *tv) */
 .section .text.x86.asm32_syscall_sysrun32.getrusage
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrusage)
 	.cfi_startproc
@@ -31359,7 +31511,7 @@ END(__x86_asm32_sysrun32_vm86old)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32 *usage) */
 .section .text.x86.asm32_syscall_sysrun32.wait4
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_wait4)
 	.cfi_startproc
@@ -33206,7 +33358,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kexec_load)
 END(__x86_asm32_sysrun32_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32 *ru) */
 .section .text.x86.asm32_syscall_sysrun32.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid)
 	.cfi_startproc
@@ -34950,6 +35102,17 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsmode)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fsmode)
 
+/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
+.section .text.x86.asm32_syscall_sysrun32.getrusage64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrusage64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getrusage64)
+	jmp    sys32_getrusage64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getrusage64)
+
 /* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
 .section .text.x86.asm32_syscall_sysrun32.gettimeofday64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_gettimeofday64)
@@ -35032,6 +35195,21 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getitimer64)
 	jmp    sys32_getitimer64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getitimer64)
+
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
+.section .text.x86.asm32_syscall_sysrun32.wait4_64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_wait4_64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_wait4_64)
+	jmp    sys32_wait4_64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_wait4_64)
 
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.kreaddir
@@ -35299,6 +35477,21 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedreceive64)
 	jmp    sys32_mq_timedreceive64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_mq_timedreceive64)
+
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
+.section .text.x86.asm32_syscall_sysrun32.waitid64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_waitid64)
+	jmp    sys32_waitid64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_waitid64)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */

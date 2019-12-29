@@ -19,13 +19,15 @@
 #ifndef _I386_KOS_BITS_SIGINFO64_H
 #define _I386_KOS_BITS_SIGINFO64_H 1
 
+#include <__crt.h> /* __CRT_CYG_PRIMARY */
 #include <__stdinc.h>
-#include <__crt.h>            /* __CRT_CYG_PRIMARY */
-#include <features.h>         /* __USE_KOS */
+#include <features.h> /* __USE_KOS */
+
+#include <hybrid/__pointer.h> /* __HYBRID_PTR64 */
 #include <hybrid/host.h>      /* __x86_64__ */
 #include <hybrid/typecore.h>  /* __INT32_TYPE__ */
-#include <hybrid/__pointer.h> /* __HYBRID_PTR64 */
-#include <bits/sigval64.h>    /* union sigval64 */
+
+#include <bits/sigval64.h> /* union sigval64 */
 
 __SYSDECL_BEGIN
 

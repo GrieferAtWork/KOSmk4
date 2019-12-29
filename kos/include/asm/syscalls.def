@@ -101,6 +101,9 @@
 %[typeorg(<bits/timeval.h>: timeval, __timeval32, __timeval64)]
 %[typeorg(<bits/timeval32.h>: __timevalx32, __timevalx32_64)]
 %[typeorg(<bits/timeval64.h>: __timevalx64)]
+%[typeorg(<bits/rusage-struct.h>: rusage, __rusage32, __rusage64)]
+%[typeorg(<bits/rusage-struct32.h>: __rusagex32, __rusagex32_64)]
+%[typeorg(<bits/rusage-struct64.h>: __rusagex64)]
 %[typeorg(<bits/itimerval.h>: __itimerval32, __itimerval64)]
 %[typeorg(<bits/statfs.h>: __statfs32, statfs64)]
 %[typeorg(<bits/sigaction-struct.h>: sigaction, __sighandler_t)]
@@ -485,15 +488,15 @@ uname:(struct utsname *name) -> errno_t;
 %[startgroup]
 @@@param: signo: One of `SIG*'
 sigaction:(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact) -> errno_t;
-sigaction32:(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) -> errno_t;
-sigaction64:(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact) -> errno_t;
+sigactionx32:(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) -> errno_t;
+sigactionx64:(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact) -> errno_t;
 %[endgroup]
 
 %[startgroup]
 @@@param: signo: One of `SIG*'
 rt_sigaction:(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) -> errno_t;
-rt_sigaction32:(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) -> errno_t;
-rt_sigaction64:(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx32:(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx64:(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact, size_t sigsetsize) -> errno_t;
 %[endgroup]
 
 
@@ -506,7 +509,15 @@ sigpending:(struct __sigset_struct *set) -> errno_t;
 sethostname:(char const *name, size_t len) -> errno_t;
 setrlimit:(syscall_ulong_t resource, struct rlimit const *rlimits) -> errno_t;
 getrlimit:(syscall_ulong_t resource, struct rlimit *rlimits) -> errno_t;
+
+%[startgroup]
 getrusage:(syscall_slong_t who, struct rusage *usage) -> errno_t;
+getrusage32:(syscall_slong_t who, struct __rusage32 *tv) -> errno_t;
+getrusage64:(syscall_slong_t who, struct __rusage64 *tv) -> errno_t;
+getrusagex32:(syscall_slong_t who, struct __rusagex32 *tv) -> errno_t;
+getrusagex32_64:(syscall_slong_t who, struct __rusagex32_64 *tv) -> errno_t;
+getrusagex64:(syscall_slong_t who, struct __rusagex64 *tv) -> errno_t;
+%[endgroup]
 
 %[startgroup]
 gettimeofday:(struct timeval *tv, struct timezone *tz) -> errno_t;
@@ -660,18 +671,28 @@ iopl:(syscall_ulong_t level) -> errno_t;
 vhangup:() -> errno_t;
 vm86old:(int TODO_PROTOTYPE) -> errno_t;
 
+%[startgroup]
 @@Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
 [restart(dont)][cp]
 wait4:(pid_t pid, int32_t *stat_loc,
        [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options,
        struct rusage *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusage32 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusage64 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_x32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex32 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_x32_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex32_64 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_x64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex64 *usage) -> pid_t;
+%[endgroup]
 
-
-[restart(dont)][cp] /* ??? */
-oldwait4:(pid_t pid, int32_t *stat_loc,
-          [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options,
-          struct rusage *usage) -> pid_t;
+%[startgroup]
+[restart(dont)][cp] oldwait4:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusage *usage) -> pid_t;
+[restart(dont)][cp] oldwait4_32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusage32 *usage) -> pid_t;
+[restart(dont)][cp] oldwait4_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusage64 *usage) -> pid_t;
+[restart(dont)][cp] oldwait4_x32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex32 *usage) -> pid_t;
+[restart(dont)][cp] oldwait4_x32_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex32_64 *usage) -> pid_t;
+[restart(dont)][cp] oldwait4_x64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex64 *usage) -> pid_t;
+%[endgroup]
 
 [cp] sysinfo:(struct sysinfo *info) -> errno_t;
 ipc:(int TODO_PROTOTYPE) -> errno_t;
@@ -1010,8 +1031,11 @@ mq_getsetattr:(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldatt
 waitid:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop,
         [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options,
         struct rusage *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitid32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct __rusage32 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitid64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct __rusage64 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct __rusagex32 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx32_64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct __rusagex32_64 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct __rusagex64 *ru) -> errno_t;
 %[endgroup]
 
 add_key:(int TODO_PROTOTYPE) -> errno_t;

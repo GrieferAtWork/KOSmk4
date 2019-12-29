@@ -19,11 +19,12 @@
 #ifndef _I386_KOS_BITS_SIGACTION_STRUCT_CYGWIN_H
 #define _I386_KOS_BITS_SIGACTION_STRUCT_CYGWIN_H 1
 
-#include <__stdinc.h>
 #include <__crt.h>
+#include <__stdinc.h>
 #include <features.h>
-#include <bits/types.h>
+
 #include <bits/sigset.h>
+#include <bits/types.h>
 
 #ifdef __CRT_CYG_PRIMARY
 #define __OFFSET_SIGACTION_HANDLER   __OFFSET_SIGACTION_CYGWIN_HANDLER

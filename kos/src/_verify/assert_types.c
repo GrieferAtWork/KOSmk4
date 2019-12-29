@@ -252,6 +252,7 @@ local files = {
 	"../../include/bits/timeb.h",
 	"../../include/bits/siginfo-struct.h",
 	"../../include/bits/sigaction-struct.h",
+	"../../include/bits/rusage-struct.h",
 	"../../include/elf.h",
 	"../../include/kos/hop.h",
 	"../../include/kos/ksysctl.h",
@@ -395,6 +396,15 @@ STATIC_ASSERT(offsetof(struct sigaction, sa_restorer) == __OFFSET_SIGACTION_REST
 STATIC_ASSERT(offsetof(struct sigaction, sa_sigaction) == __OFFSET_SIGACTION_SIGACTION);
 STATIC_ASSERT(sizeof(struct sigaction) == __SIZEOF_SIGACTION);
 STATIC_ASSERT(alignof(struct sigaction) == __ALIGNOF_SIGACTION);
+
+
+
+
+
+#include <bits/rusage-struct.h>
+
+/* struct rusage */
+/* ... */
 
 
 

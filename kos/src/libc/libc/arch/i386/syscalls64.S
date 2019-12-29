@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x602b9f55 */
+/* HASH CRC-32:0x3ab47dde */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1538,7 +1538,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xexit, libc_sys_Xexit)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex64 *usage) */
 .section .text.crt.syscall.wait4
 INTERN_FUNCTION(libc_sys_wait4)
 	.cfi_startproc
@@ -1553,7 +1553,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_wait4, libc_sys_wait4)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex64 *usage) */
 .section .text.crt.syscall.Xwait4
 INTERN_FUNCTION(libc_sys_Xwait4)
 	.cfi_startproc
@@ -2432,7 +2432,7 @@ INTERN_FUNCTION(libc_sys_Xgetrlimit)
 END(libc_sys_Xgetrlimit)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetrlimit, libc_sys_Xgetrlimit)
 
-/* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
+/* errno_t getrusage(syscall_slong_t who, struct __rusagex64 *tv) */
 .section .text.crt.syscall.getrusage
 INTERN_FUNCTION(libc_sys_getrusage)
 	.cfi_startproc
@@ -2444,7 +2444,7 @@ INTERN_FUNCTION(libc_sys_getrusage)
 END(libc_sys_getrusage)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getrusage, libc_sys_getrusage)
 
-/* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
+/* errno_t getrusage(syscall_slong_t who, struct __rusagex64 *tv) */
 .section .text.crt.syscall.Xgetrusage
 INTERN_FUNCTION(libc_sys_Xgetrusage)
 	.cfi_startproc
@@ -6053,7 +6053,7 @@ END(libc_sys_Xkexec_load)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkexec_load, libc_sys_Xkexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, syscall_ulong_t options, struct __rusagex64 *ru) */
 .section .text.crt.syscall.waitid
 INTERN_FUNCTION(libc_sys_waitid)
 	.cfi_startproc
@@ -6067,7 +6067,7 @@ END(libc_sys_waitid)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_waitid, libc_sys_waitid)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, syscall_ulong_t options, struct __rusagex64 *ru) */
 .section .text.crt.syscall.Xwaitid
 INTERN_FUNCTION(libc_sys_Xwaitid)
 	.cfi_startproc

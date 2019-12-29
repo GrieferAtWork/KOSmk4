@@ -103,9 +103,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, slab_malloc28; .int 0
 	.int 0xe16d018
 	.long .Lname25 /* index: 25 */
-	.weak sys_ioprio_set; .long sys_ioprio_set
-	.reloc ., R_386_SIZE32, sys_ioprio_set; .int 0
-	.int 0x8736804
+	.weak sys_getrusage64; .long sys_getrusage64
+	.reloc ., R_386_SIZE32, sys_getrusage64; .int 0
+	.int 0x5ca6804
 	.long .Lname26 /* index: 26 */
 	.weak sys_frealpath4; .long sys_frealpath4
 	.reloc ., R_386_SIZE32, sys_frealpath4; .int 0
@@ -763,9 +763,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname190 /* index: 190 */
-	.weak sys_time64; .long sys_time64
-	.reloc ., R_386_SIZE32, sys_time64; .int 0
-	.int 0x6a98804
+	.weak sys_ioprio_set; .long sys_ioprio_set
+	.reloc ., R_386_SIZE32, sys_ioprio_set; .int 0
+	.int 0x8736804
 	.long .Lname191 /* index: 191 */
 	.weak vm_datapart_read_unsafe; .long vm_datapart_read_unsafe
 	.reloc ., R_386_SIZE32, vm_datapart_read_unsafe; .int 0
@@ -2871,9 +2871,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname717 /* index: 717 */
-	.weak vm_tasklock_end; .long vm_tasklock_end
-	.reloc ., R_386_SIZE32, vm_tasklock_end; .int 0
-	.int 0x349a764
+	.weak vm_datablock_locatepart; .long vm_datablock_locatepart
+	.reloc ., R_386_SIZE32, vm_datablock_locatepart; .int 0
+	.int 0xa5c95f4
 	.long .Lname718 /* index: 718 */
 	.weak memrlen; .long memrlen
 	.reloc ., R_386_SIZE32, memrlen; .int 0
@@ -3247,9 +3247,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname811 /* index: 811 */
-	.weak vm_datapart_lockwrite_setcore_unsharecow; .long vm_datapart_lockwrite_setcore_unsharecow
-	.reloc ., R_386_SIZE32, vm_datapart_lockwrite_setcore_unsharecow; .int 0
-	.int 0xe802087
+	.weak sys_wait4_64; .long sys_wait4_64
+	.reloc ., R_386_SIZE32, sys_wait4_64; .int 0
+	.int 0x1b71444
 	.long 0 /* index: 812 */
 	.long 0
 	.int 0
@@ -3815,9 +3815,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, path_lock_tryupgrade; .int 0
 	.int 0xed66795
 	.long .Lname953 /* index: 953 */
-	.weak vm_datablock_locatepart; .long vm_datablock_locatepart
-	.reloc ., R_386_SIZE32, vm_datablock_locatepart; .int 0
-	.int 0xa5c95f4
+	.weak sys_time64; .long sys_time64
+	.reloc ., R_386_SIZE32, sys_time64; .int 0
+	.int 0x6a98804
 	.long 0 /* index: 954 */
 	.long 0
 	.int 0
@@ -6971,9 +6971,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_sysinfo; .int 0
 	.int 0xb730daf
 	.long .Lname1742 /* index: 1742 */
-	.weak syscall_tracing_getenabled; .long syscall_tracing_getenabled
-	.reloc ., R_386_SIZE32, syscall_tracing_getenabled; .int 0
-	.int 0xab3b144
+	.weak sys_waitid64; .long sys_waitid64
+	.reloc ., R_386_SIZE32, sys_waitid64; .int 0
+	.int 0x1ba6144
 	.long 0 /* index: 1743 */
 	.long 0
 	.int 0
@@ -7506,10 +7506,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datapart_read_phys; .long vm_datapart_read_phys
 	.reloc ., R_386_SIZE32, vm_datapart_read_phys; .int 0
 	.int 0xab4d3e3
-	.long 0 /* index: 1876 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname1876 /* index: 1876 */
+	.weak vm_tasklock_end; .long vm_tasklock_end
+	.reloc ., R_386_SIZE32, vm_tasklock_end; .int 0
+	.int 0x349a764
 	.long .Lname1877 /* index: 1877 */
 	.weak thiscpu_x86_iob; .long thiscpu_x86_iob
 	.reloc ., R_386_SIZE32, thiscpu_x86_iob; .int 0
@@ -7735,9 +7735,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, memcpyl; .int 0
 	.int 0x3c3a78c
 	.long .Lname1933 /* index: 1933 */
-	.weak system_rtld; .long system_rtld
-	.reloc ., R_386_SIZE32, system_rtld; .int 0
-	.int 0xc6d9184
+	.weak syscall_tracing_setenabled; .long syscall_tracing_setenabled
+	.reloc ., R_386_SIZE32, syscall_tracing_setenabled; .int 0
+	.int 0xab0f144
 	.long .Lname1934 /* index: 1934 */
 	.weak unwind_fde_find; .long unwind_fde_find
 	.reloc ., R_386_SIZE32, unwind_fde_find; .int 0
@@ -12807,9 +12807,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, pagedir_prepare_map_keep; .int 0
 	.int 0xa0d0c80
 	.long .Lname3201 /* index: 3201 */
-	.weak syscall_tracing_setenabled; .long syscall_tracing_setenabled
-	.reloc ., R_386_SIZE32, syscall_tracing_setenabled; .int 0
-	.int 0xab0f144
+	.weak syscall_tracing_getenabled; .long syscall_tracing_getenabled
+	.reloc ., R_386_SIZE32, syscall_tracing_getenabled; .int 0
+	.int 0xab3b144
 	.long .Lname3202 /* index: 3202 */
 	.weak block_device_areadv_sector; .long block_device_areadv_sector
 	.reloc ., R_386_SIZE32, block_device_areadv_sector; .int 0
@@ -13102,10 +13102,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datablock_vio_writev; .long vm_datablock_vio_writev
 	.reloc ., R_386_SIZE32, vm_datablock_vio_writev; .int 0
 	.int 0x4050206
-	.long 0 /* index: 3275 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname3275 /* index: 3275 */
+	.weak system_rtld; .long system_rtld
+	.reloc ., R_386_SIZE32, system_rtld; .int 0
+	.int 0xc6d9184
 	.long .Lname3276 /* index: 3276 */
 	.weak thiscpu_id; .long thiscpu_id
 	.reloc ., R_386_SIZE32, thiscpu_id; .int 0
@@ -16242,10 +16242,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long 0 /* index: 4060 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname4060 /* index: 4060 */
+	.weak vm_datapart_lockwrite_setcore_unsharecow; .long vm_datapart_lockwrite_setcore_unsharecow
+	.reloc ., R_386_SIZE32, vm_datapart_lockwrite_setcore_unsharecow; .int 0
+	.int 0xe802087
 	.long .Lname4061 /* index: 4061 */
 	.weak sys_nanosleep; .long sys_nanosleep
 	.reloc ., R_386_SIZE32, sys_nanosleep; .int 0
@@ -16419,7 +16419,7 @@ END(kernel_symbol_table)
 .Lname24:
 	.string "slab_malloc28"
 .Lname25:
-	.string "sys_ioprio_set"
+	.string "sys_getrusage64"
 .Lname26:
 	.string "sys_frealpath4"
 .Lname28:
@@ -16603,7 +16603,7 @@ END(kernel_symbol_table)
 .Lname188:
 	.string "sys_nfsservctl"
 .Lname190:
-	.string "sys_time64"
+	.string "sys_ioprio_set"
 .Lname191:
 	.string "vm_datapart_read_unsafe"
 .Lname192:
@@ -17249,7 +17249,7 @@ END(kernel_symbol_table)
 .Lname715:
 	.string "vm_datablock_getfutex_existing"
 .Lname717:
-	.string "vm_tasklock_end"
+	.string "vm_datablock_locatepart"
 .Lname718:
 	.string "memrlen"
 .Lname722:
@@ -17353,7 +17353,7 @@ END(kernel_symbol_table)
 .Lname807:
 	.string "json_writer_putstring"
 .Lname811:
-	.string "vm_datapart_lockwrite_setcore_unsharecow"
+	.string "sys_wait4_64"
 .Lname813:
 	.string "validate_user"
 .Lname818:
@@ -17523,7 +17523,7 @@ END(kernel_symbol_table)
 .Lname952:
 	.string "path_lock_tryupgrade"
 .Lname953:
-	.string "vm_datablock_locatepart"
+	.string "sys_time64"
 .Lname958:
 	.string "userkern_segment_part"
 .Lname959:
@@ -18445,7 +18445,7 @@ END(kernel_symbol_table)
 .Lname1741:
 	.string "sys_sysinfo"
 .Lname1742:
-	.string "syscall_tracing_getenabled"
+	.string "sys_waitid64"
 .Lname1746:
 	.string "dbg_fillrect2"
 .Lname1747:
@@ -18594,6 +18594,8 @@ END(kernel_symbol_table)
 	.string "pidns_lookup"
 .Lname1875:
 	.string "vm_datapart_read_phys"
+.Lname1876:
+	.string "vm_tasklock_end"
 .Lname1877:
 	.string "thiscpu_x86_iob"
 .Lname1878:
@@ -18647,7 +18649,7 @@ END(kernel_symbol_table)
 .Lname1932:
 	.string "memcpyl"
 .Lname1933:
-	.string "system_rtld"
+	.string "syscall_tracing_setenabled"
 .Lname1934:
 	.string "unwind_fde_find"
 .Lname1939:
@@ -20155,7 +20157,7 @@ END(kernel_symbol_table)
 .Lname3200:
 	.string "pagedir_prepare_map_keep"
 .Lname3201:
-	.string "syscall_tracing_setenabled"
+	.string "syscall_tracing_getenabled"
 .Lname3202:
 	.string "block_device_areadv_sector"
 .Lname3203:
@@ -20248,6 +20250,8 @@ END(kernel_symbol_table)
 	.string "fpustate_init_nx"
 .Lname3274:
 	.string "vm_datablock_vio_writev"
+.Lname3275:
+	.string "system_rtld"
 .Lname3276:
 	.string "thiscpu_id"
 .Lname3277:
@@ -21216,6 +21220,8 @@ END(kernel_symbol_table)
 	.string "krealign_nx"
 .Lname4057:
 	.string "sys_fallocate64"
+.Lname4060:
+	.string "vm_datapart_lockwrite_setcore_unsharecow"
 .Lname4061:
 	.string "sys_nanosleep"
 .Lname4062:

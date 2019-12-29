@@ -42,8 +42,11 @@
 #include <hybrid/overflow.h>
 
 #include <bits/resource.h>
+#include <bits/rusage-convert.h>
+#include <bits/rusage-struct.h>
 #include <bits/siginfo.h>
 #include <bits/timespec.h>
+#include <compat/config.h>
 #include <kos/except-inval.h>
 #include <kos/hop.h>
 #include <sys/poll.h>
@@ -55,6 +58,15 @@
 #include <limits.h>
 #include <sched.h>
 #include <string.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/rusage-convert.h>
+#include <compat/bits/rusage-struct.h>
+#include <compat/bits/siginfo-convert.h>
+#include <compat/bits/siginfo-struct.h>
+#include <compat/bits/types.h>
+#include <compat/kos/types.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -1518,15 +1530,23 @@ NOTHROW(KCALL kernel_initialize_bootpid)(void) {
 
 
 
-/* PID-related system calls. */
+/************************************************************************/
+/* gettid(), getpid(), getppid(), getpgrp(), getpgid()                  */
+/* setpgid(), getsid(), setsid()                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETTID
 DEFINE_SYSCALL0(pid_t, gettid) {
 	return task_gettid();
 }
+#endif /* __ARCH_WANT_SYSCALL_GETTID */
 
+#ifdef __ARCH_WANT_SYSCALL_GETPID
 DEFINE_SYSCALL0(pid_t, getpid) {
 	return task_getpid();
 }
+#endif /* __ARCH_WANT_SYSCALL_GETPID */
 
+#ifdef __ARCH_WANT_SYSCALL_GETPPID
 DEFINE_SYSCALL0(pid_t, getppid) {
 	upid_t result;
 	REF struct task *parent;
@@ -1537,7 +1557,9 @@ DEFINE_SYSCALL0(pid_t, getppid) {
 	decref_unlikely(parent);
 	return (pid_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_GETPPID */
 
+#ifdef __ARCH_WANT_SYSCALL_GETPGRP
 DEFINE_SYSCALL0(pid_t, getpgrp) {
 	/* Same as `getpgid(0)' */
 	upid_t result;
@@ -1547,7 +1569,9 @@ DEFINE_SYSCALL0(pid_t, getpgrp) {
 	decref_unlikely(group);
 	return (pid_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_GETPGRP */
 
+#ifdef __ARCH_WANT_SYSCALL_GETPGID
 DEFINE_SYSCALL1(pid_t, getpgid, pid_t, pid) {
 	upid_t result;
 	REF struct task *group;
@@ -1565,7 +1589,9 @@ DEFINE_SYSCALL1(pid_t, getpgid, pid_t, pid) {
 	decref_unlikely(group);
 	return (pid_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_GETPGID */
 
+#ifdef __ARCH_WANT_SYSCALL_SETPGID
 DEFINE_SYSCALL2(errno_t, setpgid, pid_t, pid, pid_t, pgid) {
 	REF struct task *thread, *group;
 	unsigned int error;
@@ -1606,7 +1632,9 @@ handle_error:
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_SETPGID */
 
+#ifdef __ARCH_WANT_SYSCALL_GETSID
 DEFINE_SYSCALL1(pid_t, getsid, pid_t, pid) {
 	upid_t result;
 	REF struct task *session;
@@ -1622,13 +1650,18 @@ DEFINE_SYSCALL1(pid_t, getsid, pid_t, pid) {
 	decref_unlikely(session);
 	return (pid_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_GETSID */
 
+#ifdef __ARCH_WANT_SYSCALL_SETSID
 DEFINE_SYSCALL0(pid_t, setsid) {
 	struct task *me = THIS_TASK;
 	/* Set the calling process to become its own session. */
 	task_setsessionleader(me, me);
 	return (pid_t)task_getpid();
 }
+#endif /* __ARCH_WANT_SYSCALL_SETSID */
+
+
 
 
 /* Detach the given `thread' from its parent
@@ -1772,6 +1805,12 @@ again:
 
 
 
+
+
+/************************************************************************/
+/* detach()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_DETACH
 DEFINE_SYSCALL1(errno_t, detach, pid_t, pid) {
 	errno_t result = -EPERM;
 	struct task *proc           = task_getprocess();
@@ -1853,7 +1892,24 @@ again:
 done:
 	return result;
 }
+#endif /* __ARCH_WANT_SYSCALL_DETACH */
 
+
+
+
+/************************************************************************/
+/* waitid(), waitpid(), wait4()                                         */
+/************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_WAITID) ||         \
+     defined(__ARCH_WANT_SYSCALL_WAITPID) ||        \
+     defined(__ARCH_WANT_SYSCALL_WAIT4) ||          \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_WAITID) ||  \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_WAITPID) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_WAIT4))
+#define WANT_WAIT 1
+#endif
+
+#ifdef WANT_WAIT
 LOCAL NOBLOCK bool
 NOTHROW(KCALL has_taskpid_terminated)(struct taskpid *__restrict self) {
 	bool result = true;
@@ -1867,11 +1923,10 @@ NOTHROW(KCALL has_taskpid_terminated)(struct taskpid *__restrict self) {
 	return result;
 }
 
-
 PRIVATE pid_t KCALL
 posix_waitfor(idtype_t which,
               id_t upid,
-              USER CHECKED int *wstatus,
+              USER CHECKED int32_t *wstatus,
               USER CHECKED siginfo_t *infop,
               syscall_ulong_t options,
               USER CHECKED struct rusage *ru) {
@@ -2111,13 +2166,14 @@ next_candidate:
 	}
 #undef mygroup
 }
+#endif /* WANT_WAIT */
 
-
+#ifdef __ARCH_WANT_SYSCALL_WAITID
 DEFINE_SYSCALL5(pid_t, waitid,
                 syscall_ulong_t, which, id_t, upid,
                 USER UNCHECKED siginfo_t *, infop,
                 syscall_ulong_t, options,
-                USER UNCHECKED struct rusage *, ru) {
+                USER UNCHECKED struct rusage32 *, ru) {
 	pid_t result;
 	VALIDATE_FLAGSET(options,
 	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
@@ -2132,32 +2188,179 @@ DEFINE_SYSCALL5(pid_t, waitid,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH,
 		      which);
-	validate_writable_opt(infop, SIZEOF_USER_SIGINFO_T);
-	validate_writable_opt(ru, sizeof(struct rusage));
+	validate_writable_opt(infop, sizeof(*infop));
+	validate_writable_opt(ru, sizeof(*ru));
+#if __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME)
 	result = posix_waitfor((idtype_t)which, upid, NULL,
 	                       infop, options, ru);
+#else /* __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME) */
+	if (ru) {
+		struct rusage kru;
+		result = posix_waitfor((idtype_t)which, upid, NULL,
+		                       infop, options, &kru);
+		if (E_ISOK(result))
+			rusage_to_rusage32(&kru, ru);
+	} else {
+		result = posix_waitfor((idtype_t)which, upid, NULL,
+		                       infop, options, NULL);
+	}
+#endif /* __SIZEOF_TIME32_T__ != __TM_SIZEOF(TIME) */
 	return result;
 }
+#endif /* __ARCH_WANT_SYSCALL_WAITID */
 
-#ifdef __NR_waitpid
+#ifdef __ARCH_WANT_SYSCALL_WAITID64
+DEFINE_SYSCALL5(pid_t, waitid64,
+                syscall_ulong_t, which, id_t, upid,
+                USER UNCHECKED siginfo_t *, infop,
+                syscall_ulong_t, options,
+                USER UNCHECKED struct rusage64 *, ru) {
+	pid_t result;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS);
+	if (!(options & (WEXITED | WSTOPPED | WCONTINUED)))
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS,
+		      options,
+		      WEXITED | WSTOPPED | WCONTINUED,
+		      0);
+	if (which > P_PGID)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH,
+		      which);
+	validate_writable_opt(infop, sizeof(*infop));
+	validate_writable_opt(ru, sizeof(*ru));
+#if __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME)
+	result = posix_waitfor((idtype_t)which, upid, NULL,
+	                       infop, options, ru);
+#else /* __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME) */
+	if (ru) {
+		struct rusage kru;
+		result = posix_waitfor((idtype_t)which, upid, NULL,
+		                       infop, options, &kru);
+		if (E_ISOK(result))
+			rusage_to_rusage64(&kru, ru);
+	} else {
+		result = posix_waitfor((idtype_t)which, upid, NULL,
+		                       infop, options, NULL);
+	}
+#endif /* __SIZEOF_TIME64_T__ != __TM_SIZEOF(TIME) */
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_WAITID64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_WAITID
+DEFINE_COMPAT_SYSCALL5(pid_t, waitid,
+                       syscall_ulong_t, which, id_t, upid,
+                       USER UNCHECKED compat_siginfo_t *, infop,
+                       syscall_ulong_t, options,
+                       USER UNCHECKED struct compat_rusage32 *, ru) {
+	pid_t result;
+	siginfo_t info;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS);
+	if (!(options & (WEXITED | WSTOPPED | WCONTINUED)))
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS,
+		      options,
+		      WEXITED | WSTOPPED | WCONTINUED,
+		      0);
+	if (which > P_PGID)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH,
+		      which);
+	validate_writable_opt(infop, sizeof(*infop));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (ru) {
+		struct rusage kru;
+		result = posix_waitfor((idtype_t)which, upid, NULL,
+		                       infop ? &info : NULL,
+		                       options, &kru);
+		if (E_ISOK(result))
+			rusage_to_compat_rusage32(&kru, ru);
+	} else {
+		result = posix_waitfor((idtype_t)which, upid, NULL,
+		                       infop ? &info : NULL,
+		                       options, NULL);
+	}
+	if (E_ISOK(result) && infop)
+		siginfo_to_compat_siginfo(&info, infop);
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_WAITID */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_WAITID64
+DEFINE_COMPAT_SYSCALL5(pid_t, waitid64,
+                       syscall_ulong_t, which, id_t, upid,
+                       USER UNCHECKED compat_siginfo_t *, infop,
+                       syscall_ulong_t, options,
+                       USER UNCHECKED struct compat_rusage64 *, ru) {
+	pid_t result;
+	siginfo_t info;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS);
+	if (!(options & (WEXITED | WSTOPPED | WCONTINUED)))
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_OPTIONS,
+		      options,
+		      WEXITED | WSTOPPED | WCONTINUED,
+		      0);
+	if (which > P_PGID)
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_WAITID_WHICH,
+		      which);
+	validate_writable_opt(infop, sizeof(*infop));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (ru) {
+		struct rusage kru;
+		result = posix_waitfor((idtype_t)which, upid, NULL,
+		                       infop ? &info : NULL,
+		                       options, &kru);
+		if (E_ISOK(result))
+			rusage_to_compat_rusage64(&kru, ru);
+	} else {
+		result = posix_waitfor((idtype_t)which, upid, NULL,
+		                       infop ? &info : NULL,
+		                       options, NULL);
+	}
+	if (E_ISOK(result) && infop)
+		siginfo_to_compat_siginfo(&info, infop);
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_WAITID64 */
+
+#ifdef __ARCH_WANT_SYSCALL_WAITPID
 DEFINE_SYSCALL3(pid_t, waitpid,
-                pid_t, pid, int32_t *, stat_loc, syscall_ulong_t, options) {
+                pid_t, pid, int32_t *, stat_loc,
+                syscall_ulong_t, options) {
 	return sys_wait4(pid, stat_loc, options, NULL);
 }
-#endif /* __NR_waitpid */
+#endif /* __ARCH_WANT_SYSCALL_WAITPID */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_WAITPID
+DEFINE_COMPAT_SYSCALL3(pid_t, waitpid,
+                       pid_t, pid, int32_t *, stat_loc,
+                       syscall_ulong_t, options) {
+	return sys_wait4(pid, stat_loc, options, NULL);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_WAITPID */
+
+#ifdef __ARCH_WANT_SYSCALL_WAIT4
 DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
-                USER UNCHECKED int *, wstatus,
+                USER UNCHECKED int32_t *, wstatus,
                 syscall_ulong_t, options,
-                USER UNCHECKED struct rusage *, ru) {
+                USER UNCHECKED struct rusage32 *, ru) {
 	idtype_t which;
 	pid_t result;
 	VALIDATE_FLAGSET(options,
 	                 WNOHANG | WSTOPPED | WCONTINUED | WNOREAP,
 	                 E_INVALID_ARGUMENT_CONTEXT_WAIT4_OPTIONS);
 	options |= WEXITED;
-	validate_writable_opt(wstatus, sizeof(int));
-	validate_writable_opt(ru, sizeof(struct rusage));
+	validate_writable_opt(wstatus, sizeof(*wstatus));
+	validate_writable_opt(ru, sizeof(*ru));
 	if (upid < -1) {
 		upid  = -upid;
 		which = (idtype_t)P_PGID;
@@ -2177,14 +2380,208 @@ DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
 		/* wait for the child whose process ID is equal to the value of pid. */
 		which = (idtype_t)P_PID;
 	}
+#if __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME)
 	result = posix_waitfor(which,
 	                       (upid_t)upid,
 	                       wstatus,
 	                       NULL,
 	                       options,
 	                       ru);
+#else /* __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME) */
+	if (ru) {
+		struct rusage kru;
+		result = posix_waitfor(which,
+		                       (upid_t)upid,
+		                       wstatus,
+		                       NULL,
+		                       options,
+		                       &kru);
+		if (E_ISOK(result))
+			rusage_to_rusage32(&kru, ru);
+	} else {
+		result = posix_waitfor(which,
+		                       (upid_t)upid,
+		                       wstatus,
+		                       NULL,
+		                       options,
+		                       NULL);
+	}
+#endif /* __SIZEOF_TIME32_T__ != __TM_SIZEOF(TIME) */
 	return result;
 }
+#endif /* __ARCH_WANT_SYSCALL_WAIT4 */
+
+#ifdef __ARCH_WANT_SYSCALL_WAIT4_64
+DEFINE_SYSCALL4(pid_t, wait4_64, pid_t, upid,
+                USER UNCHECKED int32_t *, wstatus,
+                syscall_ulong_t, options,
+                USER UNCHECKED struct rusage64 *, ru) {
+	idtype_t which;
+	pid_t result;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WSTOPPED | WCONTINUED | WNOREAP,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAIT4_OPTIONS);
+	options |= WEXITED;
+	validate_writable_opt(wstatus, sizeof(*wstatus));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (upid < -1) {
+		upid  = -upid;
+		which = (idtype_t)P_PGID;
+	} else if (upid == -1) {
+		upid  = 0;
+		which = (idtype_t)P_ALL;
+	} else if (upid == 0) {
+		/* wait for any child process whose process group ID is equal to that of the calling process. */
+		REF struct task *group;
+		struct taskpid *pid;
+		group = task_getprocessgroupleader();
+		pid   = FORTASK(group, this_taskpid);
+		upid  = pid->tp_pids[THIS_PIDNS->pn_indirection];
+		which = (idtype_t)P_PGID;
+		decref(group);
+	} else {
+		/* wait for the child whose process ID is equal to the value of pid. */
+		which = (idtype_t)P_PID;
+	}
+#if __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME)
+	result = posix_waitfor(which,
+	                       (upid_t)upid,
+	                       wstatus,
+	                       NULL,
+	                       options,
+	                       ru);
+#else /* __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME) */
+	if (ru) {
+		struct rusage kru;
+		result = posix_waitfor(which,
+		                       (upid_t)upid,
+		                       wstatus,
+		                       NULL,
+		                       options,
+		                       &kru);
+		if (E_ISOK(result))
+			rusage_to_rusage64(&kru, ru);
+	} else {
+		result = posix_waitfor(which,
+		                       (upid_t)upid,
+		                       wstatus,
+		                       NULL,
+		                       options,
+		                       NULL);
+	}
+#endif /* __SIZEOF_TIME64_T__ != __TM_SIZEOF(TIME) */
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_WAIT4_64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_WAIT4
+DEFINE_COMPAT_SYSCALL4(pid_t, wait4, pid_t, upid,
+                       USER UNCHECKED int32_t *, wstatus,
+                       syscall_ulong_t, options,
+                       USER UNCHECKED struct compat_rusage32 *, ru) {
+	idtype_t which;
+	pid_t result;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WSTOPPED | WCONTINUED | WNOREAP,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAIT4_OPTIONS);
+	options |= WEXITED;
+	validate_writable_opt(wstatus, sizeof(*wstatus));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (upid < -1) {
+		upid  = -upid;
+		which = (idtype_t)P_PGID;
+	} else if (upid == -1) {
+		upid  = 0;
+		which = (idtype_t)P_ALL;
+	} else if (upid == 0) {
+		/* wait for any child process whose process group ID is equal to that of the calling process. */
+		REF struct task *group;
+		struct taskpid *pid;
+		group = task_getprocessgroupleader();
+		pid   = FORTASK(group, this_taskpid);
+		upid  = pid->tp_pids[THIS_PIDNS->pn_indirection];
+		which = (idtype_t)P_PGID;
+		decref(group);
+	} else {
+		/* wait for the child whose process ID is equal to the value of pid. */
+		which = (idtype_t)P_PID;
+	}
+	if (ru) {
+		struct rusage kru;
+		result = posix_waitfor(which,
+		                       (upid_t)upid,
+		                       wstatus,
+		                       NULL,
+		                       options,
+		                       &kru);
+		if (E_ISOK(result))
+			rusage_to_compat_rusage32(&kru, ru);
+	} else {
+		result = posix_waitfor(which,
+		                       (upid_t)upid,
+		                       wstatus,
+		                       NULL,
+		                       options,
+		                       NULL);
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_WAIT4 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_WAIT4_64
+DEFINE_COMPAT_SYSCALL4(pid_t, wait4_64, pid_t, upid,
+                       USER UNCHECKED int32_t *, wstatus,
+                       syscall_ulong_t, options,
+                       USER UNCHECKED struct compat_rusage64 *, ru) {
+	idtype_t which;
+	pid_t result;
+	VALIDATE_FLAGSET(options,
+	                 WNOHANG | WSTOPPED | WCONTINUED | WNOREAP,
+	                 E_INVALID_ARGUMENT_CONTEXT_WAIT4_OPTIONS);
+	options |= WEXITED;
+	validate_writable_opt(wstatus, sizeof(*wstatus));
+	validate_writable_opt(ru, sizeof(*ru));
+	if (upid < -1) {
+		upid  = -upid;
+		which = (idtype_t)P_PGID;
+	} else if (upid == -1) {
+		upid  = 0;
+		which = (idtype_t)P_ALL;
+	} else if (upid == 0) {
+		/* wait for any child process whose process group ID is equal to that of the calling process. */
+		REF struct task *group;
+		struct taskpid *pid;
+		group = task_getprocessgroupleader();
+		pid   = FORTASK(group, this_taskpid);
+		upid  = pid->tp_pids[THIS_PIDNS->pn_indirection];
+		which = (idtype_t)P_PGID;
+		decref(group);
+	} else {
+		/* wait for the child whose process ID is equal to the value of pid. */
+		which = (idtype_t)P_PID;
+	}
+	if (ru) {
+		struct rusage kru;
+		result = posix_waitfor(which,
+		                       (upid_t)upid,
+		                       wstatus,
+		                       NULL,
+		                       options,
+		                       &kru);
+		if (E_ISOK(result))
+			rusage_to_compat_rusage64(&kru, ru);
+	} else {
+		result = posix_waitfor(which,
+		                       (upid_t)upid,
+		                       wstatus,
+		                       NULL,
+		                       options,
+		                       NULL);
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_WAIT4_64 */
+
 
 
 

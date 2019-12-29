@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7192ea32 */
+/* HASH CRC-32:0x8f6a1379 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -585,7 +585,7 @@ __TSYSCALL1_UNUSED(0x80000049, 0x48, 0x48)
 __TSYSCALL1_UNUSED(0x8000004a, 0x49, 0x49)
 __TSYSCALL1_UNUSED(0x8000004b, 0x4a, 0x4a)
 __TSYSCALL1_UNUSED(0x8000004c, 0x4b, 0x4b)
-__TSYSCALL1_UNUSED(0x8000004d, 0x4c, 0x4c)
+__TSYSCALL1(getrusage64, 0x4c, 0x4c)
 __TSYSCALL1(gettimeofday64, 0x4d, 0x4d)
 __TSYSCALL1(settimeofday64, 0x4e, 0x4e)
 __TSYSCALL1_UNUSED(0x80000050, 0x4f, 0x4f)
@@ -622,7 +622,7 @@ __TSYSCALL1_UNUSED(0x8000006e, 0x6d, 0x6d)
 __TSYSCALL1_UNUSED(0x8000006f, 0x6e, 0x6e)
 __TSYSCALL1_UNUSED(0x80000070, 0x6f, 0x6f)
 __TSYSCALL1_UNUSED(0x80000071, 0x70, 0x70)
-__TSYSCALL1_UNUSED(0x80000072, 0x71, 0x71)
+__TSYSCALL1(wait4_64, 0x71, 0x71)
 __TSYSCALL1_UNUSED(0x80000073, 0x72, 0x72)
 __TSYSCALL1_UNUSED(0x80000074, 0x73, 0x73)
 __TSYSCALL1_UNUSED(0x80000075, 0x74, 0x74)
@@ -792,7 +792,7 @@ __TSYSCALL1(mq_timedreceive64, 0x117, 0x117)
 __TSYSCALL1_UNUSED(0x80000119, 0x118, 0x118)
 __TSYSCALL1_UNUSED(0x8000011a, 0x119, 0x119)
 __TSYSCALL1_UNUSED(0x8000011b, 0x11a, 0x11a)
-__TSYSCALL1_UNUSED(0x8000011c, 0x11b, 0x11b)
+__TSYSCALL1(waitid64, 0x11b, 0x11b)
 __TSYSCALL1_UNUSED(0x8000011d, 0x11c, 0x11c)
 __TSYSCALL1_UNUSED(0x8000011e, 0x11d, 0x11d)
 __TSYSCALL1_UNUSED(0x8000011f, 0x11e, 0x11e)

@@ -1461,6 +1461,7 @@
 #define __CRT_HAVE_sys32_getresuid32 1
 #define __CRT_HAVE_sys32_getrlimit 1
 #define __CRT_HAVE_sys32_getrusage 1
+#define __CRT_HAVE_sys32_getrusage64 1
 #define __CRT_HAVE_sys32_getsid 1
 #define __CRT_HAVE_sys32_getsockname 1
 #define __CRT_HAVE_sys32_getsockopt 1
@@ -1771,7 +1772,9 @@
 #define __CRT_HAVE_sys32_vmsplice 1
 #define __CRT_HAVE_sys32_vserver 1
 #define __CRT_HAVE_sys32_wait4 1
+#define __CRT_HAVE_sys32_wait4_64 1
 #define __CRT_HAVE_sys32_waitid 1
+#define __CRT_HAVE_sys32_waitid64 1
 #define __CRT_HAVE_sys32_waitpid 1
 #define __CRT_HAVE_sys32_write 1
 #define __CRT_HAVE_sys32_writef 1

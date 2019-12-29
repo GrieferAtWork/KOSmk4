@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7067d2e8 */
+/* HASH CRC-32:0x92cd1baa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -147,6 +147,7 @@
 #define __CRT_HAVE_sys_getresuid32 1
 #define __CRT_HAVE_sys_getrlimit 1
 #define __CRT_HAVE_sys_getrusage 1
+#define __CRT_HAVE_sys_getrusage64 1
 #define __CRT_HAVE_sys_getsid 1
 #define __CRT_HAVE_sys_getsockname 1
 #define __CRT_HAVE_sys_getsockopt 1
@@ -457,7 +458,9 @@
 #define __CRT_HAVE_sys_vmsplice 1
 #define __CRT_HAVE_sys_vserver 1
 #define __CRT_HAVE_sys_wait4 1
+#define __CRT_HAVE_sys_wait4_64 1
 #define __CRT_HAVE_sys_waitid 1
+#define __CRT_HAVE_sys_waitid64 1
 #define __CRT_HAVE_sys_waitpid 1
 #define __CRT_HAVE_sys_write 1
 #define __CRT_HAVE_sys_writef 1
@@ -593,6 +596,7 @@
 #define __CRT_HAVE_sys_Xgetresuid32 1
 #define __CRT_HAVE_sys_Xgetrlimit 1
 #define __CRT_HAVE_sys_Xgetrusage 1
+#define __CRT_HAVE_sys_Xgetrusage64 1
 #define __CRT_HAVE_sys_Xgetsid 1
 #define __CRT_HAVE_sys_Xgetsockname 1
 #define __CRT_HAVE_sys_Xgetsockopt 1
@@ -901,7 +905,9 @@
 #define __CRT_HAVE_sys_Xvmsplice 1
 #define __CRT_HAVE_sys_Xvserver 1
 #define __CRT_HAVE_sys_Xwait4 1
+#define __CRT_HAVE_sys_Xwait4_64 1
 #define __CRT_HAVE_sys_Xwaitid 1
+#define __CRT_HAVE_sys_Xwaitid64 1
 #define __CRT_HAVE_sys_Xwaitpid 1
 #define __CRT_HAVE_sys_Xwrite 1
 #define __CRT_HAVE_sys_Xwritef 1

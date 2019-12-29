@@ -19,12 +19,13 @@
 #ifndef _I386_KOS_BITS_SIGINFO_STRUCT_CYGWIN_H
 #define _I386_KOS_BITS_SIGINFO_STRUCT_CYGWIN_H 1
 
-#include <__stdinc.h>
 #include <__crt.h>
+#include <__stdinc.h>
+
 #include <hybrid/typecore.h>
+
 #include <bits/sigval.h>
 #include <bits/types.h>
-
 
 #ifdef __CRT_CYG_PRIMARY
 #define __siginfo_cygwin_struct __siginfo_struct

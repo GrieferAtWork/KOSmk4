@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfe0922e */
+/* HASH CRC-32:0x3e0ac112 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <bits/iovec-struct.h>
 #include <bits/itimerspec.h>
 #include <bits/itimerval.h>
+#include <bits/rusage-struct.h>
 #include <bits/sigaction-struct.h>
 #include <bits/siginfo-struct.h>
 #include <bits/statfs.h>

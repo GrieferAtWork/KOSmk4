@@ -20,6 +20,7 @@
 #define _I386_KOS_BITS_TIMEB32_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/typecore.h>
 
 #ifdef __x86_64__

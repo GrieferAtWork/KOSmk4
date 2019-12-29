@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb287680b */
+/* HASH CRC-32:0x36654974 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -962,7 +962,7 @@
 #define __NRAT0_wait4                  (pid_t, __pid_t)
 #define __NRAT1_wait4                  (int32_t *, __int32_t *)
 #define __NRAT2_wait4                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT3_wait4                  (struct rusage *, struct rusage *)
+#define __NRAT3_wait4                  (struct __rusagex64 *, struct __rusagex64 *)
 #define __NRAT0_kill                   (pid_t, __pid_t)
 #define __NRAT1_kill                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_uname                  (struct utsname *, struct utsname *)
@@ -1026,7 +1026,7 @@
 #define __NRAT0_getrlimit              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_getrlimit              (struct rlimit *, struct rlimit *)
 #define __NRAT0_getrusage              (syscall_slong_t, __syscall_slong_t)
-#define __NRAT1_getrusage              (struct rusage *, struct rusage *)
+#define __NRAT1_getrusage              (struct __rusagex64 *, struct __rusagex64 *)
 #define __NRAT0_sysinfo                (struct sysinfo *, struct sysinfo *)
 #define __NRAT0_times                  (struct tms *, struct tms *)
 #define __NRAT0_ptrace                 (syscall_ulong_t, __syscall_ulong_t)
@@ -1311,7 +1311,7 @@
 #define __NRAT1_waitid                 (id_t, __id_t)
 #define __NRAT2_waitid                 (struct __siginfo64_struct *, struct __siginfo64_struct *)
 #define __NRAT3_waitid                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT4_waitid                 (struct rusage *, struct rusage *)
+#define __NRAT4_waitid                 (struct __rusagex64 *, struct __rusagex64 *)
 #define __NRAT0_add_key                (int, int)
 #define __NRAT0_request_key            (int, int)
 #define __NRAT0_keyctl                 (int, int)
@@ -1757,7 +1757,7 @@
 #define __NRAM_vfork(a, b, c, d, e, f)                  /* nothing */
 #define __NRAM_execve(a, b, c, d, e, f)                 (char const *)a, (char const *const *)b, (char const *const *)c
 #define __NRAM_exit(a, b, c, d, e, f)                   (__syscall_ulong_t)a
-#define __NRAM_wait4(a, b, c, d, e, f)                  (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct rusage *)d
+#define __NRAM_wait4(a, b, c, d, e, f)                  (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusagex64 *)d
 #define __NRAM_kill(a, b, c, d, e, f)                   (__pid_t)a, (__syscall_ulong_t)b
 #define __NRAM_uname(a, b, c, d, e, f)                  (struct utsname *)a
 #define __NRAM_semget(a, b, c, d, e, f)                 (int)a
@@ -1794,7 +1794,7 @@
 #define __NRAM_umask(a, b, c, d, e, f)                  (__mode_t)a
 #define __NRAM_gettimeofday(a, b, c, d, e, f)           (struct __timevalx64 *)a, (struct timezone *)b
 #define __NRAM_getrlimit(a, b, c, d, e, f)              (__syscall_ulong_t)a, (struct rlimit *)b
-#define __NRAM_getrusage(a, b, c, d, e, f)              (__syscall_slong_t)a, (struct rusage *)b
+#define __NRAM_getrusage(a, b, c, d, e, f)              (__syscall_slong_t)a, (struct __rusagex64 *)b
 #define __NRAM_sysinfo(a, b, c, d, e, f)                (struct sysinfo *)a
 #define __NRAM_times(a, b, c, d, e, f)                  (struct tms *)a
 #define __NRAM_ptrace(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__pid_t)b, (void *)c, (void *)d
@@ -1943,7 +1943,7 @@
 #define __NRAM_mq_notify(a, b, c, d, e, f)              (__fd_t)a, (struct sigevent const *)b
 #define __NRAM_mq_getsetattr(a, b, c, d, e, f)          (__fd_t)a, (struct mq_attr const *)b, (struct mq_attr *)c
 #define __NRAM_kexec_load(a, b, c, d, e, f)             (int)a
-#define __NRAM_waitid(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo64_struct *)c, (__syscall_ulong_t)d, (struct rusage *)e
+#define __NRAM_waitid(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo64_struct *)c, (__syscall_ulong_t)d, (struct __rusagex64 *)e
 #define __NRAM_add_key(a, b, c, d, e, f)                (int)a
 #define __NRAM_request_key(a, b, c, d, e, f)            (int)a
 #define __NRAM_keyctl(a, b, c, d, e, f)                 (int)a

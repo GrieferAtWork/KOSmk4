@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fc2fca3 */
+/* HASH CRC-32:0x2a10f312 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -962,7 +962,7 @@
 #define __NR64AT0_wait4                  (pid_t, __pid_t)
 #define __NR64AT1_wait4                  (int32_t *, __int32_t *)
 #define __NR64AT2_wait4                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT3_wait4                  (struct rusage *, struct rusage *)
+#define __NR64AT3_wait4                  (struct __rusagex64 *, struct __rusagex64 *)
 #define __NR64AT0_kill                   (pid_t, __pid_t)
 #define __NR64AT1_kill                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_uname                  (struct utsname *, struct utsname *)
@@ -1026,7 +1026,7 @@
 #define __NR64AT0_getrlimit              (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_getrlimit              (struct rlimit *, struct rlimit *)
 #define __NR64AT0_getrusage              (syscall_slong_t, __syscall_slong_t)
-#define __NR64AT1_getrusage              (struct rusage *, struct rusage *)
+#define __NR64AT1_getrusage              (struct __rusagex64 *, struct __rusagex64 *)
 #define __NR64AT0_sysinfo                (struct sysinfo *, struct sysinfo *)
 #define __NR64AT0_times                  (struct tms *, struct tms *)
 #define __NR64AT0_ptrace                 (syscall_ulong_t, __syscall_ulong_t)
@@ -1311,7 +1311,7 @@
 #define __NR64AT1_waitid                 (id_t, __id_t)
 #define __NR64AT2_waitid                 (struct __siginfo64_struct *, struct __siginfo64_struct *)
 #define __NR64AT3_waitid                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT4_waitid                 (struct rusage *, struct rusage *)
+#define __NR64AT4_waitid                 (struct __rusagex64 *, struct __rusagex64 *)
 #define __NR64AT0_add_key                (int, int)
 #define __NR64AT0_request_key            (int, int)
 #define __NR64AT0_keyctl                 (int, int)
@@ -1757,7 +1757,7 @@
 #define __NR64AM_vfork(a, b, c, d, e, f)                  /* nothing */
 #define __NR64AM_execve(a, b, c, d, e, f)                 (char const *)a, (char const *const *)b, (char const *const *)c
 #define __NR64AM_exit(a, b, c, d, e, f)                   (__syscall_ulong_t)a
-#define __NR64AM_wait4(a, b, c, d, e, f)                  (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct rusage *)d
+#define __NR64AM_wait4(a, b, c, d, e, f)                  (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusagex64 *)d
 #define __NR64AM_kill(a, b, c, d, e, f)                   (__pid_t)a, (__syscall_ulong_t)b
 #define __NR64AM_uname(a, b, c, d, e, f)                  (struct utsname *)a
 #define __NR64AM_semget(a, b, c, d, e, f)                 (int)a
@@ -1794,7 +1794,7 @@
 #define __NR64AM_umask(a, b, c, d, e, f)                  (__mode_t)a
 #define __NR64AM_gettimeofday(a, b, c, d, e, f)           (struct __timevalx64 *)a, (struct timezone *)b
 #define __NR64AM_getrlimit(a, b, c, d, e, f)              (__syscall_ulong_t)a, (struct rlimit *)b
-#define __NR64AM_getrusage(a, b, c, d, e, f)              (__syscall_slong_t)a, (struct rusage *)b
+#define __NR64AM_getrusage(a, b, c, d, e, f)              (__syscall_slong_t)a, (struct __rusagex64 *)b
 #define __NR64AM_sysinfo(a, b, c, d, e, f)                (struct sysinfo *)a
 #define __NR64AM_times(a, b, c, d, e, f)                  (struct tms *)a
 #define __NR64AM_ptrace(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__pid_t)b, (void *)c, (void *)d
@@ -1943,7 +1943,7 @@
 #define __NR64AM_mq_notify(a, b, c, d, e, f)              (__fd_t)a, (struct sigevent const *)b
 #define __NR64AM_mq_getsetattr(a, b, c, d, e, f)          (__fd_t)a, (struct mq_attr const *)b, (struct mq_attr *)c
 #define __NR64AM_kexec_load(a, b, c, d, e, f)             (int)a
-#define __NR64AM_waitid(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo64_struct *)c, (__syscall_ulong_t)d, (struct rusage *)e
+#define __NR64AM_waitid(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo64_struct *)c, (__syscall_ulong_t)d, (struct __rusagex64 *)e
 #define __NR64AM_add_key(a, b, c, d, e, f)                (int)a
 #define __NR64AM_request_key(a, b, c, d, e, f)            (int)a
 #define __NR64AM_keyctl(a, b, c, d, e, f)                 (int)a

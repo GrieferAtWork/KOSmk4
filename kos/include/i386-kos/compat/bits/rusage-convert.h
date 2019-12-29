@@ -16,37 +16,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BIT_SIGVAL32_H
-#define _I386_KOS_BIT_SIGVAL32_H 1
+#ifndef _I386_KOS_COMPAT_BITS_RUSAGE_CONVERT_H
+#define _I386_KOS_COMPAT_BITS_RUSAGE_CONVERT_H 1
 
-#include <__stdinc.h>
+#include <hybrid/host.h> /* __x86_64__ */
+#ifdef __x86_64__
+#include <bits/rusage-convert.h>
+#define compat_rusage32_to_rusage   rusagex32_to_rusage32
+#define compat_rusage64_to_rusage   rusagex32_64_to_rusage32
+#define compat_rusage32_to_rusage32 rusagex32_to_rusage32
+#define compat_rusage64_to_rusage32 rusagex32_64_to_rusage32
+#define compat_rusage32_to_rusage64 rusagex32_to_rusage64
+#define compat_rusage64_to_rusage64 rusagex32_64_to_rusage64
+#define rusage_to_compat_rusage32   rusage32_to_rusagex32
+#define rusage_to_compat_rusage64   rusage32_to_rusagex32_64
+#define rusage32_to_compat_rusage32 rusage32_to_rusagex32
+#define rusage32_to_compat_rusage64 rusage32_to_rusagex32_64
+#define rusage64_to_compat_rusage32 rusage64_to_rusagex32
+#define rusage64_to_compat_rusage64 rusage64_to_rusagex32_64
 
-#include <hybrid/__pointer.h>
-#include <hybrid/host.h>
-#include <hybrid/typecore.h>
-
-__SYSDECL_BEGIN
-
-#ifndef __x86_64__
-#ifndef __sigval_t_defined
-#define __sigval_t_defined 1
-#define __SIZEOF_SIGVAL __SIZEOF_SIGVAL32
-#define __sigval_defined 1
-#define sigval32        sigval
-#define sigval32_t      sigval_t
-#endif /* !__sigval_t_defined */
 #endif /* !__x86_64__ */
 
-
-#define __SIZEOF_SIGVAL32 4
-#ifdef __CC__
-/* Type for data associated with a signal. */
-typedef union sigval32 /*[PREFIX(sival_)]*/ {
-	__INT32_TYPE__       sival_int;
-	__HYBRID_PTR32(void) sival_ptr;
-} sigval32_t;
-#endif /* __CC__ */
-
-__SYSDECL_END
-
-#endif /* !_I386_KOS_BIT_SIGVAL32_H */
+#endif /* !_I386_KOS_COMPAT_BITS_RUSAGE_CONVERT_H */

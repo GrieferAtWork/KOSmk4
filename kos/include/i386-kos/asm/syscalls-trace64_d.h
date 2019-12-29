@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8d892ba */
+/* HASH CRC-32:0xce6d7a06 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -255,7 +255,7 @@
 #define __NR64AN0_getrlimit              resource
 #define __NR64AN1_getrlimit              rlimits
 #define __NR64AN0_getrusage              who
-#define __NR64AN1_getrusage              usage
+#define __NR64AN1_getrusage              tv
 #define __NR64AN0_sysinfo                info
 #define __NR64AN0_times                  buf
 #define __NR64AN0_ptrace                 request
@@ -1480,9 +1480,9 @@
 #define __NR64ATRF1_getrlimit              "%p"
 #define __NR64ATRA1_getrlimit(resource, rlimits) ,rlimits
 #define __NR64ATRF0_getrusage              "%" PRIdSIZ
-#define __NR64ATRA0_getrusage(who, usage)  ,(intptr_t)(who)
+#define __NR64ATRA0_getrusage(who, tv)     ,(intptr_t)(who)
 #define __NR64ATRF1_getrusage              "%p"
-#define __NR64ATRA1_getrusage(who, usage)  ,usage
+#define __NR64ATRA1_getrusage(who, tv)     ,tv
 #define __NR64ATRF0_sysinfo                "%p"
 #define __NR64ATRA0_sysinfo(info)          ,info
 #define __NR64ATRF0_times                  "%p"

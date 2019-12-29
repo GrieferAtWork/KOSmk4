@@ -20,9 +20,10 @@
 #define _BITS_SIGSTACK64_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/__pointer.h>
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
-#include <hybrid/__pointer.h>
 
 __SYSDECL_BEGIN
 

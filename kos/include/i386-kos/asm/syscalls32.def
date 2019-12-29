@@ -83,11 +83,18 @@ setfsgid = setfsgid16;
 mmap = mmap32;
 
 /* Configure binding of multi-arch types in system calls. */
-sigaction = sigaction32;
-rt_sigaction = rt_sigaction32;
+sigaction = sigactionx32;
+rt_sigaction = rt_sigactionx32;
+utime = utime32;
+
+getrusage = getrusagex32;
+getrusage64 = getrusagex32_64;
+wait4 = wait4_x32;
+wait4_64 = wait4_x32_64;
+waitid = waitidx32;
+waitid64 = waitidx32_64;
 time = timex32;
 time64 = timex64;
-utime = utime32;
 ftime = ftimex32;
 ftime64 = ftimex32_64;
 gettimeofday = gettimeofdayx32;
@@ -124,7 +131,6 @@ utimensat64 = utimensatx32_64;
 recvmmsg = recvmmsgx32;
 recvmmsg64 = recvmmsgx32_64;
 rt_sigqueueinfo = rt_sigqueueinfox32;
-waitid = waitidx32;
 rt_tgsigqueueinfo = rt_tgsigqueueinfox32;
 raiseat = raiseatx32;
 coredump = coredumpx32;
@@ -584,12 +590,14 @@ mq_timedreceive64 = mq_timedreceivex32_64;
 0x80000023:ftime64
 0x80000036:ioctlf
 0x8000003c:fsmode
+0x8000004d:getrusage64
 0x8000004e:gettimeofday64
 0x8000004f:settimeofday64
 0x80000052:select64
 0x80000056:maplibrary
 0x80000068:setitimer64
 0x80000069:getitimer64
+0x80000072:wait4_64
 0x8000008d:kreaddir
 0x80000091:readvf
 0x80000092:writevf
@@ -610,6 +618,7 @@ mq_timedreceive64 = mq_timedreceivex32_64;
 0x8000010a:clock_getres64
 0x8000010b:clock_nanosleep64
 0x8000010f:utimes64
+0x8000011c:waitid64
 0x80000117:mq_timedsend64
 0x80000118:mq_timedreceive64
 0x80000128:fmkdirat

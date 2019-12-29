@@ -19,12 +19,14 @@
 #ifndef _I386_KOS_BIT_SIGEVENT64_H
 #define _I386_KOS_BIT_SIGEVENT64_H 1
 
+#include <__crt.h> /* __CRT_CYG_PRIMARY */
 #include <__stdinc.h>
-#include <__crt.h>            /* __CRT_CYG_PRIMARY */
+
+#include <hybrid/__pointer.h> /* __HYBRID_PTR64 */
 #include <hybrid/host.h>      /* __x86_64__ */
 #include <hybrid/typecore.h>  /* __INT32_TYPE__ */
-#include <hybrid/__pointer.h> /* __HYBRID_PTR64 */
-#include <bits/sigval64.h>    /* union sigval64 */
+
+#include <bits/sigval64.h> /* union sigval64 */
 
 #if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)
 #define __sigevent_t_defined 1

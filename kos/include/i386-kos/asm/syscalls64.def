@@ -51,7 +51,10 @@ clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRA
        pid_t *ctid, uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
-rt_sigaction = rt_sigaction64;
+getrusage = getrusagex64;
+wait4 = wait4_x64;
+waitid = waitidx64;
+rt_sigaction = rt_sigactionx64;
 gettimeofday = gettimeofdayx64;
 settimeofday = settimeofdayx64;
 select = selectx64;
@@ -70,7 +73,6 @@ ppoll = ppollx64;
 utimensat = utimensatx64;
 recvmmsg = recvmmsgx64;
 rt_sigqueueinfo = rt_sigqueueinfox64;
-waitid = waitidx64;
 rt_tgsigqueueinfo = rt_tgsigqueueinfox64;
 raiseat = raiseatx64;
 coredump = coredumpx64;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf666e9a4 */
+/* HASH CRC-32:0x4c0b279a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,7 +109,7 @@
 #define __NR32_sethostname             0x4a                   /* errno_t sethostname(char const *name, size_t len) */
 #define __NR32_setrlimit               0x4b                   /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 #define __NR32_getrlimit               0x4c                   /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
-#define __NR32_getrusage               0x4d                   /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
+#define __NR32_getrusage               0x4d                   /* errno_t getrusage(syscall_slong_t who, struct __rusagex32 *tv) */
 #define __NR32_gettimeofday            0x4e                   /* errno_t gettimeofday(struct __timevalx32 *tv, struct timezone *tz) */
 #define __NR32_settimeofday            0x4f                   /* errno_t settimeofday(struct __timevalx32 const *tv, struct timezone const *tz) */
 #define __NR32_getgroups               0x50                   /* errno_t getgroups(size_t size, uint16_t[] list) */
@@ -156,7 +156,7 @@
 #define __NR32_vm86old                 0x71                   /* errno_t vm86old(int TODO_PROTOTYPE) */
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-#define __NR32_wait4                   0x72                   /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+#define __NR32_wait4                   0x72                   /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32 *usage) */
 #define __NR32_swapoff                 0x73                   /* errno_t swapoff(char const *pathname) */
 #define __NR32_sysinfo                 0x74                   /* errno_t sysinfo(struct sysinfo *info) */
 #define __NR32_ipc                     0x75                   /* errno_t ipc(int TODO_PROTOTYPE) */
@@ -335,7 +335,7 @@
 #define __NR32_mq_getsetattr           0x11a                  /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 #define __NR32_kexec_load              0x11b                  /* errno_t kexec_load(int TODO_PROTOTYPE) */
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-#define __NR32_waitid                  0x11c                  /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+#define __NR32_waitid                  0x11c                  /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32 *ru) */
 #define __NR32_add_key                 0x11e                  /* errno_t add_key(int TODO_PROTOTYPE) */
 #define __NR32_request_key             0x11f                  /* errno_t request_key(int TODO_PROTOTYPE) */
 #define __NR32_keyctl                  0x120                  /* errno_t keyctl(int TODO_PROTOTYPE) */
@@ -737,6 +737,7 @@
 #define __NR32_ftime64                 __UINT32_C(0x80000023) /* errno_t ftime64(struct __timebx32_64 *tp) */
 #define __NR32_ioctlf                  __UINT32_C(0x80000036) /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define __NR32_fsmode                  __UINT32_C(0x8000003c) /* uint64_t fsmode(uint64_t mode) */
+#define __NR32_getrusage64             __UINT32_C(0x8000004d) /* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
 #define __NR32_gettimeofday64          __UINT32_C(0x8000004e) /* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
 #define __NR32_settimeofday64          __UINT32_C(0x8000004f) /* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
 #define __NR32_select64                __UINT32_C(0x80000052) /* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
@@ -753,6 +754,9 @@
 #define __NR32_maplibrary              __UINT32_C(0x80000056) /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
 #define __NR32_setitimer64             __UINT32_C(0x80000068) /* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
 #define __NR32_getitimer64             __UINT32_C(0x80000069) /* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+#define __NR32_wait4_64                __UINT32_C(0x80000072) /* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
 #define __NR32_kreaddir                __UINT32_C(0x8000008d) /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 #define __NR32_readvf                  __UINT32_C(0x80000091) /* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
 #define __NR32_writevf                 __UINT32_C(0x80000092) /* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
@@ -775,6 +779,8 @@
 #define __NR32_utimes64                __UINT32_C(0x8000010f) /* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
 #define __NR32_mq_timedsend64          __UINT32_C(0x80000117) /* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
 #define __NR32_mq_timedreceive64       __UINT32_C(0x80000118) /* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+#define __NR32_waitid64                __UINT32_C(0x8000011c) /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR32_fmkdirat                __UINT32_C(0x80000128) /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -1259,12 +1265,14 @@
 #define __NR32RM_ftime64                 0
 #define __NR32RM_ioctlf                  0
 #define __NR32RM_fsmode                  2
+#define __NR32RM_getrusage64             0
 #define __NR32RM_gettimeofday64          0
 #define __NR32RM_settimeofday64          0
 #define __NR32RM_select64                1
 #define __NR32RM_maplibrary              0
 #define __NR32RM_setitimer64             0
 #define __NR32RM_getitimer64             0
+#define __NR32RM_wait4_64                1
 #define __NR32RM_kreaddir                0
 #define __NR32RM_readvf                  0
 #define __NR32RM_writevf                 0
@@ -1287,6 +1295,7 @@
 #define __NR32RM_utimes64                0
 #define __NR32RM_mq_timedsend64          0
 #define __NR32RM_mq_timedreceive64       0
+#define __NR32RM_waitid64                1
 #define __NR32RM_fmkdirat                0
 #define __NR32RM_fmknodat                0
 #define __NR32RM_futimesat64             0
@@ -1450,6 +1459,7 @@
 #define __NR32CP_utime64                 1
 #define __NR32CP_ioctlf                  1
 #define __NR32CP_select64                1
+#define __NR32CP_wait4_64                1
 #define __NR32CP_kreaddir                1
 #define __NR32CP_readvf                  1
 #define __NR32CP_writevf                 1
@@ -1466,6 +1476,7 @@
 #define __NR32CP_utimes64                1
 #define __NR32CP_mq_timedsend64          1
 #define __NR32CP_mq_timedreceive64       1
+#define __NR32CP_waitid64                1
 #define __NR32CP_fmkdirat                1
 #define __NR32CP_fmknodat                1
 #define __NR32CP_futimesat64             1
@@ -1893,12 +1904,14 @@
 #define __NR32RC_ftime64                 1
 #define __NR32RC_ioctlf                  4
 #define __NR32RC_fsmode                  2 /* __NR32AC_fsmode + 1 */
+#define __NR32RC_getrusage64             2
 #define __NR32RC_gettimeofday64          2
 #define __NR32RC_settimeofday64          2
 #define __NR32RC_select64                5
 #define __NR32RC_maplibrary              5
 #define __NR32RC_setitimer64             3
 #define __NR32RC_getitimer64             2
+#define __NR32RC_wait4_64                4
 #define __NR32RC_kreaddir                4
 #define __NR32RC_readvf                  4
 #define __NR32RC_writevf                 4
@@ -1921,6 +1934,7 @@
 #define __NR32RC_utimes64                2
 #define __NR32RC_mq_timedsend64          5
 #define __NR32RC_mq_timedreceive64       5
+#define __NR32RC_waitid64                5
 #define __NR32RC_fmkdirat                4
 #define __NR32RC_fmknodat                5
 #define __NR32RC_futimesat64             3

@@ -31,7 +31,6 @@
 #include "siginfo-struct32.h"
 #include "siginfo-struct64.h"
 
-
 #ifdef __CC__
 __DECL_BEGIN
 

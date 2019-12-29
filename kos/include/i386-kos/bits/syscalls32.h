@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccb28f54 */
+/* HASH CRC-32:0x94482574 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,7 +112,7 @@
 #define SYS_sethostname             __NR_sethostname             /* errno_t sethostname(char const *name, size_t len) */
 #define SYS_setrlimit               __NR_setrlimit               /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
 #define SYS_getrlimit               __NR_getrlimit               /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
-#define SYS_getrusage               __NR_getrusage               /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
+#define SYS_getrusage               __NR_getrusage               /* errno_t getrusage(syscall_slong_t who, struct __rusagex32 *tv) */
 #define SYS_gettimeofday            __NR_gettimeofday            /* errno_t gettimeofday(struct __timevalx32 *tv, struct timezone *tz) */
 #define SYS_settimeofday            __NR_settimeofday            /* errno_t settimeofday(struct __timevalx32 const *tv, struct timezone const *tz) */
 #define SYS_getgroups               __NR_getgroups               /* errno_t getgroups(size_t size, uint16_t[] list) */
@@ -159,7 +159,7 @@
 #define SYS_vm86old                 __NR_vm86old                 /* errno_t vm86old(int TODO_PROTOTYPE) */
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-#define SYS_wait4                   __NR_wait4                   /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+#define SYS_wait4                   __NR_wait4                   /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32 *usage) */
 #define SYS_swapoff                 __NR_swapoff                 /* errno_t swapoff(char const *pathname) */
 #define SYS_sysinfo                 __NR_sysinfo                 /* errno_t sysinfo(struct sysinfo *info) */
 #define SYS_ipc                     __NR_ipc                     /* errno_t ipc(int TODO_PROTOTYPE) */
@@ -338,7 +338,7 @@
 #define SYS_mq_getsetattr           __NR_mq_getsetattr           /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 #define SYS_kexec_load              __NR_kexec_load              /* errno_t kexec_load(int TODO_PROTOTYPE) */
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-#define SYS_waitid                  __NR_waitid                  /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+#define SYS_waitid                  __NR_waitid                  /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32 *ru) */
 #define SYS_add_key                 __NR_add_key                 /* errno_t add_key(int TODO_PROTOTYPE) */
 #define SYS_request_key             __NR_request_key             /* errno_t request_key(int TODO_PROTOTYPE) */
 #define SYS_keyctl                  __NR_keyctl                  /* errno_t keyctl(int TODO_PROTOTYPE) */
@@ -740,6 +740,7 @@
 #define SYS_ftime64                 __NR_ftime64                 /* errno_t ftime64(struct __timebx32_64 *tp) */
 #define SYS_ioctlf                  __NR_ioctlf                  /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define SYS_fsmode                  __NR_fsmode                  /* uint64_t fsmode(uint64_t mode) */
+#define SYS_getrusage64             __NR_getrusage64             /* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
 #define SYS_gettimeofday64          __NR_gettimeofday64          /* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
 #define SYS_settimeofday64          __NR_settimeofday64          /* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
 #define SYS_select64                __NR_select64                /* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
@@ -756,6 +757,9 @@
 #define SYS_maplibrary              __NR_maplibrary              /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
 #define SYS_setitimer64             __NR_setitimer64             /* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
 #define SYS_getitimer64             __NR_getitimer64             /* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+#define SYS_wait4_64                __NR_wait4_64                /* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
 #define SYS_kreaddir                __NR_kreaddir                /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 #define SYS_readvf                  __NR_readvf                  /* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
 #define SYS_writevf                 __NR_writevf                 /* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
@@ -778,6 +782,8 @@
 #define SYS_utimes64                __NR_utimes64                /* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
 #define SYS_mq_timedsend64          __NR_mq_timedsend64          /* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
 #define SYS_mq_timedreceive64       __NR_mq_timedreceive64       /* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+#define SYS_waitid64                __NR_waitid64                /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_fmkdirat                __NR_fmkdirat                /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */

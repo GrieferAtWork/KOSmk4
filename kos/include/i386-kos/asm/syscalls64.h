@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9f0785e */
+/* HASH CRC-32:0x65e34fbc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,7 +101,7 @@
 #define __NR_exit                   0x3c                           /* void exit(syscall_ulong_t status) */
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-#define __NR_wait4                  0x3d                           /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+#define __NR_wait4                  0x3d                           /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex64 *usage) */
 /* @param: signo: One of `SIG*' */
 #define __NR_kill                   0x3e                           /* errno_t kill(pid_t pid, syscall_ulong_t signo) */
 #define __NR_uname                  0x3f                           /* errno_t uname(struct utsname *name) */
@@ -139,7 +139,7 @@
 #define __NR_umask                  0x5f                           /* mode_t umask(mode_t mode) */
 #define __NR_gettimeofday           0x60                           /* errno_t gettimeofday(struct __timevalx64 *tv, struct timezone *tz) */
 #define __NR_getrlimit              0x61                           /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
-#define __NR_getrusage              0x62                           /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
+#define __NR_getrusage              0x62                           /* errno_t getrusage(syscall_slong_t who, struct __rusagex64 *tv) */
 #define __NR_sysinfo                0x63                           /* errno_t sysinfo(struct sysinfo *info) */
 #define __NR_times                  0x64                           /* clock_t times(struct tms *buf) */
 #define __NR_ptrace                 0x65                           /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
@@ -292,7 +292,7 @@
 #define __NR_mq_getsetattr          0xf5                           /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 #define __NR_kexec_load             0xf6                           /* errno_t kexec_load(int TODO_PROTOTYPE) */
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-#define __NR_waitid                 0xf7                           /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+#define __NR_waitid                 0xf7                           /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, syscall_ulong_t options, struct __rusagex64 *ru) */
 #define __NR_add_key                0xf8                           /* errno_t add_key(int TODO_PROTOTYPE) */
 #define __NR_request_key            0xf9                           /* errno_t request_key(int TODO_PROTOTYPE) */
 #define __NR_keyctl                 0xfa                           /* errno_t keyctl(int TODO_PROTOTYPE) */

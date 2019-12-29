@@ -20,7 +20,9 @@
 #define _I386_KOS_BITS_TIMEVAL32_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/typecore.h>
+
 #include <bits/timeval-cxx-support.h>
 
 #ifdef __x86_64__

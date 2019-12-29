@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x826bae1a */
+/* HASH CRC-32:0xee9d2186 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <bits/iovec-struct64.h>
 #include <bits/itimerspec64.h>
 #include <bits/itimerval.h>
+#include <bits/rusage-struct64.h>
 #include <bits/sigaction-struct64.h>
 #include <bits/siginfo-struct64.h>
 #include <bits/statfs.h>
@@ -83,6 +84,7 @@ struct __cpu_set_struct;
 struct __fd_set_struct;
 struct __itimerspecx64;
 struct __itimerval32;
+struct __rusagex64;
 struct __siginfo64_struct;
 struct __sigset_struct;
 struct __statfs32;
@@ -109,7 +111,6 @@ struct pollfd;
 struct rlimit;
 struct rlimit64;
 struct rpc_syscall_info;
-struct rusage;
 struct sched_param;
 struct sigaction64;
 struct sigaltstack;
@@ -612,7 +613,7 @@ __CDECLARE_SC(,__errno_t,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *_
 __CDECLARE_SC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_SC(getrlimit) */
 #if __CRT_HAVE_SC(getrusage)
-__CDECLARE_SC(,__errno_t,getrusage,(__syscall_slong_t __who, struct rusage *__usage),(__who,__usage))
+__CDECLARE_SC(,__errno_t,getrusage,(__syscall_slong_t __who, struct __rusagex64 *__tv),(__who,__tv))
 #endif /* __CRT_HAVE_SC(getrusage) */
 #if __CRT_HAVE_SC(getsid)
 __CDECLARE_SC(,__pid_t,getsid,(__pid_t __pid),(__pid))
@@ -1529,11 +1530,11 @@ __CDECLARE_SC(,__errno_t,vserver,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_SC(wait4)
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CDECLARE_SC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
+__CDECLARE_SC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct __rusagex64 *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* __CRT_HAVE_SC(wait4) */
 #if __CRT_HAVE_SC(waitid)
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-__CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo64_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
+__CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo64_struct *__infop, __syscall_ulong_t __options, struct __rusagex64 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_SC(waitid) */
 #if __CRT_HAVE_SC(write)
 __CDECLARE_SC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
@@ -2032,7 +2033,7 @@ __CDECLARE_XSC(,__errno_t,getresuid,(__uid_t *__ruid, __uid_t *__euid, __uid_t *
 __CDECLARE_XSC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_XSC(getrlimit) */
 #if __CRT_HAVE_XSC(getrusage)
-__CDECLARE_XSC(,__errno_t,getrusage,(__syscall_slong_t __who, struct rusage *__usage),(__who,__usage))
+__CDECLARE_XSC(,__errno_t,getrusage,(__syscall_slong_t __who, struct __rusagex64 *__tv),(__who,__tv))
 #endif /* __CRT_HAVE_XSC(getrusage) */
 #if __CRT_HAVE_XSC(getsid)
 __CDECLARE_XSC(,__pid_t,getsid,(__pid_t __pid),(__pid))
@@ -2946,11 +2947,11 @@ __CDECLARE_XSC(,__errno_t,vserver,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_XSC(wait4)
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CDECLARE_XSC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
+__CDECLARE_XSC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct __rusagex64 *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* __CRT_HAVE_XSC(wait4) */
 #if __CRT_HAVE_XSC(waitid)
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-__CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo64_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
+__CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo64_struct *__infop, __syscall_ulong_t __options, struct __rusagex64 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_XSC(waitid) */
 #if __CRT_HAVE_XSC(write)
 __CDECLARE_XSC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))

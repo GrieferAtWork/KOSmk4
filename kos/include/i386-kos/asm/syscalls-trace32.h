@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb324ece9 */
+/* HASH CRC-32:0x6c7c4ed7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,7 +131,7 @@
 #define __NRAN0_getrlimit               resource
 #define __NRAN1_getrlimit               rlimits
 #define __NRAN0_getrusage               who
-#define __NRAN1_getrusage               usage
+#define __NRAN1_getrusage               tv
 #define __NRAN0_gettimeofday            tv
 #define __NRAN1_gettimeofday            tz
 #define __NRAN0_settimeofday            tv
@@ -935,6 +935,8 @@
 #define __NRAN2_ioctlf                  mode
 #define __NRAN3_ioctlf                  arg
 #define __NRAN0_fsmode                  mode
+#define __NRAN0_getrusage64             who
+#define __NRAN1_getrusage64             tv
 #define __NRAN0_gettimeofday64          tv
 #define __NRAN1_gettimeofday64          tz
 #define __NRAN0_settimeofday64          tv
@@ -954,6 +956,10 @@
 #define __NRAN2_setitimer64             oldval
 #define __NRAN0_getitimer64             which
 #define __NRAN1_getitimer64             curr_value
+#define __NRAN0_wait4_64                pid
+#define __NRAN1_wait4_64                stat_loc
+#define __NRAN2_wait4_64                options
+#define __NRAN3_wait4_64                usage
 #define __NRAN0_kreaddir                fd
 #define __NRAN1_kreaddir                buf
 #define __NRAN2_kreaddir                bufsize
@@ -1023,6 +1029,11 @@
 #define __NRAN2_mq_timedreceive64       msg_len
 #define __NRAN3_mq_timedreceive64       pmsg_prio
 #define __NRAN4_mq_timedreceive64       abs_timeout
+#define __NRAN0_waitid64                idtype
+#define __NRAN1_waitid64                id
+#define __NRAN2_waitid64                infop
+#define __NRAN3_waitid64                options
+#define __NRAN4_waitid64                ru
 #define __NRAN0_fmkdirat                dirfd
 #define __NRAN1_fmkdirat                pathname
 #define __NRAN2_fmkdirat                mode
@@ -1342,9 +1353,9 @@
 #define __NRATRF1_getrlimit               "%p"
 #define __NRATRA1_getrlimit(resource, rlimits) ,rlimits
 #define __NRATRF0_getrusage               "%" PRIdSIZ
-#define __NRATRA0_getrusage(who, usage)   ,(intptr_t)(who)
+#define __NRATRA0_getrusage(who, tv)      ,(intptr_t)(who)
 #define __NRATRF1_getrusage               "%p"
-#define __NRATRA1_getrusage(who, usage)   ,usage
+#define __NRATRA1_getrusage(who, tv)      ,tv
 #define __NRATRF0_gettimeofday            "%p"
 #define __NRATRA0_gettimeofday(tv, tz)    ,tv
 #define __NRATRF1_gettimeofday            "%p"
@@ -3181,6 +3192,10 @@
 #define __NRATRA3_ioctlf(fd, command, mode, arg) ,arg
 #define __NRATRF0_fsmode                  "%" PRIu64
 #define __NRATRA0_fsmode(mode)            ,mode
+#define __NRATRF0_getrusage64             "%" PRIdSIZ
+#define __NRATRA0_getrusage64(who, tv)    ,(intptr_t)(who)
+#define __NRATRF1_getrusage64             "%p"
+#define __NRATRA1_getrusage64(who, tv)    ,tv
 #define __NRATRF0_gettimeofday64          "%p"
 #define __NRATRA0_gettimeofday64(tv, tz)  ,tv
 #define __NRATRF1_gettimeofday64          "%p"
@@ -3226,6 +3241,17 @@
 #define __NRATRA0_getitimer64(which, curr_value) ,(uintptr_t)(which)
 #define __NRATRF1_getitimer64             "%p"
 #define __NRATRA1_getitimer64(which, curr_value) ,curr_value
+#define __NRATRF0_wait4_64                "%" PRIdSIZ
+#define __NRATRA0_wait4_64(pid, stat_loc, options, usage) ,(intptr_t)(pid)
+#define __NRATRF1_wait4_64                "%p"
+#define __NRATRA1_wait4_64(pid, stat_loc, options, usage) ,stat_loc
+#define __NRATRF2_wait4_64                "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
+#define __NRATRA2_wait4_64(pid, stat_loc, options, usage) ,(uintptr_t)(options),(options) & WNOHANG ? "WNOHANG" : "" \
+                                                          ,((options) & WUNTRACED) && ((options) & (WNOHANG)) ? "|" : "",(options) & WUNTRACED ? "WUNTRACED" : "" \
+                                                          ,((options) & WCONTINUED) && ((options) & (WNOHANG|WUNTRACED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
+                                                          ,((options) & WNOWAIT) && ((options) & (WNOHANG|WUNTRACED|WCONTINUED)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
+#define __NRATRF3_wait4_64                "%p"
+#define __NRATRA3_wait4_64(pid, stat_loc, options, usage) ,usage
 #define __NRATRF0_kreaddir                "%d"
 #define __NRATRA0_kreaddir(fd, buf, bufsize, mode) ,(int)(fd)
 #define __NRATRF1_kreaddir                "%p"
@@ -3410,6 +3436,20 @@
 #define __NRATRA3_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,pmsg_prio
 #define __NRATRF4_mq_timedreceive64       "%p"
 #define __NRATRA4_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,abs_timeout
+#define __NRATRF0_waitid64                "%#Ix=%s"
+#define __NRATRA0_waitid64(idtype, id, infop, options, ru) ,(idtype),(idtype) == P_ALL ? "P_ALL" : (idtype) == P_PID ? "P_PID" : (idtype) == P_PGID ? "P_PGID" : "?"
+#define __NRATRF1_waitid64                "%" PRIuSIZ
+#define __NRATRA1_waitid64(idtype, id, infop, options, ru) ,(uintptr_t)(id)
+#define __NRATRF2_waitid64                "%p"
+#define __NRATRA2_waitid64(idtype, id, infop, options, ru) ,infop
+#define __NRATRF3_waitid64                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s"
+#define __NRATRA3_waitid64(idtype, id, infop, options, ru) ,(uintptr_t)(options),(options) & WEXITED ? "WEXITED" : "" \
+                                                           ,((options) & WSTOPPED) && ((options) & (WEXITED)) ? "|" : "",(options) & WSTOPPED ? "WSTOPPED" : "" \
+                                                           ,((options) & WCONTINUED) && ((options) & (WEXITED|WSTOPPED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
+                                                           ,((options) & WNOHANG) && ((options) & (WEXITED|WSTOPPED|WCONTINUED)) ? "|" : "",(options) & WNOHANG ? "WNOHANG" : "" \
+                                                           ,((options) & WNOWAIT) && ((options) & (WEXITED|WSTOPPED|WCONTINUED|WNOHANG)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
+#define __NRATRF4_waitid64                "%p"
+#define __NRATRA4_waitid64(idtype, id, infop, options, ru) ,ru
 #define __NRATRF0_fmkdirat                "%d"
 #define __NRATRA0_fmkdirat(dirfd, pathname, mode, flags) ,(int)(dirfd)
 #define __NRATRF1_fmkdirat                "%q"

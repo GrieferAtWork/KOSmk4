@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b04965b */
+/* HASH CRC-32:0xb7dca146 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,11 @@
 #include <features.h>
 #include <bits/types.h>
 #include <bits/timeval.h>
+#include <bits/rusage-struct.h>
 
 __SYSDECL_BEGIN
 
+/* Documentation taken from GLibc /usr/include/i386-linux-gnu/bits/resource.h */
 /* Bit values & structures for resource limits.  Linux version.
    Copyright (C) 1994-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -272,35 +274,6 @@ struct rlimit64 {
 };
 #endif /* !__rlimit64_defined */
 #endif /* __USE_LARGEFILE64 */
-
-
-#ifndef __rusage_defined
-#define __rusage_defined 1
-struct rusage {
-	struct timeval ru_utime;  /* Total amount of user time used. */
-	struct timeval ru_stime;  /* Total amount of system time used. */
-#define __RU_MEMBER(x) __extension__ union { long int x; __syscall_slong_t __##x##_word; }
-	__RU_MEMBER(ru_maxrss);   /* Maximum resident set size (in kilobytes). */
-	/* Amount of sharing of text segment memory with other processes (kilobyte-seconds). */
-	__RU_MEMBER(ru_ixrss);    /* Maximum resident set size (in kilobytes). */
-	__RU_MEMBER(ru_idrss);    /* Amount of data segment memory used (kilobyte-seconds). */
-	__RU_MEMBER(ru_isrss);    /* Amount of stack memory used (kilobyte-seconds). */
-	__RU_MEMBER(ru_minflt);   /* Number of soft page faults (i.e. those serviced by reclaiming a page from the list of pages awaiting reallocation. */
-	__RU_MEMBER(ru_majflt);   /* Number of hard page faults (i.e. those that required I/O). */
-	__RU_MEMBER(ru_nswap);    /* Number of times a process was swapped out of physical memory. */
-	__RU_MEMBER(ru_inblock);  /* Number of input operations via the file system.
-	                           * NOTE: This and `ru_oublock' do not include operations with the cache. */
-	__RU_MEMBER(ru_oublock);  /* Number of output operations via the file system. */
-	__RU_MEMBER(ru_msgsnd);   /* Number of IPC messages sent. */
-	__RU_MEMBER(ru_msgrcv);   /* Number of IPC messages received. */
-	__RU_MEMBER(ru_nsignals); /* Number of signals delivered. */
-	__RU_MEMBER(ru_nvcsw);    /* Number of voluntary context switches, i.e. because the process gave up the
-	                           * process before it had to (usually to wait for some resource to be available). */
-	__RU_MEMBER(ru_nivcsw);   /* Number of involuntary context switches, i.e. a higher priority process
-	                           * became runnable or the current process used up its time slice. */
-#undef __RU_MEMBER
-};
-#endif /* !__rusage_defined */
 
 #ifdef __USE_GNU
 #ifdef __COMPILER_PREFERR_ENUMS

@@ -40,6 +40,8 @@ STATIC_ASSERT(sizeof(union ieee854_float80) == 10);
 /*[[[deemon
 import * from .....misc.libgen.assert_offsetof;
 local files = {
+	"../../../../include/i386-kos/bits/rusage-struct32.h",
+	"../../../../include/i386-kos/bits/rusage-struct64.h",
 	"../../../../include/i386-kos/bits/sigevent32.h",
 	"../../../../include/i386-kos/bits/sigevent64.h",
 	"../../../../include/i386-kos/bits/siginfo-struct32.h",
@@ -166,6 +168,75 @@ for (local i: [:16]) {
 }
 
 ]]]*/
+#include <bits/rusage-struct32.h>
+
+/* struct rusagex32 */
+STATIC_ASSERT(offsetof(struct rusagex32, ru_idrss) == __OFFSET_RUSAGEX32_IDRSS);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_inblock) == __OFFSET_RUSAGEX32_INBLOCK);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_isrss) == __OFFSET_RUSAGEX32_ISRSS);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_ixrss) == __OFFSET_RUSAGEX32_IXRSS);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_majflt) == __OFFSET_RUSAGEX32_MAJFLT);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_maxrss) == __OFFSET_RUSAGEX32_MAXRSS);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_minflt) == __OFFSET_RUSAGEX32_MINFLT);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_msgrcv) == __OFFSET_RUSAGEX32_MSGRCV);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_msgsnd) == __OFFSET_RUSAGEX32_MSGSND);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_nivcsw) == __OFFSET_RUSAGEX32_NIVCSW);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_nsignals) == __OFFSET_RUSAGEX32_NSIGNALS);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_nswap) == __OFFSET_RUSAGEX32_NSWAP);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_nvcsw) == __OFFSET_RUSAGEX32_NVCSW);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_oublock) == __OFFSET_RUSAGEX32_OUBLOCK);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_stime) == __OFFSET_RUSAGEX32_STIME);
+STATIC_ASSERT(offsetof(struct rusagex32, ru_utime) == __OFFSET_RUSAGEX32_UTIME);
+STATIC_ASSERT(sizeof(struct rusagex32) == __SIZEOF_RUSAGEX32);
+
+/* struct rusagex32_64 */
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_idrss) == __OFFSET_RUSAGEX32_64_IDRSS);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_inblock) == __OFFSET_RUSAGEX32_64_INBLOCK);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_isrss) == __OFFSET_RUSAGEX32_64_ISRSS);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_ixrss) == __OFFSET_RUSAGEX32_64_IXRSS);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_majflt) == __OFFSET_RUSAGEX32_64_MAJFLT);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_maxrss) == __OFFSET_RUSAGEX32_64_MAXRSS);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_minflt) == __OFFSET_RUSAGEX32_64_MINFLT);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_msgrcv) == __OFFSET_RUSAGEX32_64_MSGRCV);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_msgsnd) == __OFFSET_RUSAGEX32_64_MSGSND);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_nivcsw) == __OFFSET_RUSAGEX32_64_NIVCSW);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_nsignals) == __OFFSET_RUSAGEX32_64_NSIGNALS);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_nswap) == __OFFSET_RUSAGEX32_64_NSWAP);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_nvcsw) == __OFFSET_RUSAGEX32_64_NVCSW);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_oublock) == __OFFSET_RUSAGEX32_64_OUBLOCK);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_stime) == __OFFSET_RUSAGEX32_64_STIME);
+STATIC_ASSERT(offsetof(struct rusagex32_64, ru_utime) == __OFFSET_RUSAGEX32_64_UTIME);
+STATIC_ASSERT(sizeof(struct rusagex32_64) == __SIZEOF_RUSAGEX32_64);
+
+
+
+
+
+#include <bits/rusage-struct64.h>
+
+/* struct rusagex64 */
+STATIC_ASSERT(offsetof(struct rusagex64, ru_idrss) == __OFFSET_RUSAGEX64_IDRSS);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_inblock) == __OFFSET_RUSAGEX64_INBLOCK);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_isrss) == __OFFSET_RUSAGEX64_ISRSS);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_ixrss) == __OFFSET_RUSAGEX64_IXRSS);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_majflt) == __OFFSET_RUSAGEX64_MAJFLT);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_maxrss) == __OFFSET_RUSAGEX64_MAXRSS);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_minflt) == __OFFSET_RUSAGEX64_MINFLT);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_msgrcv) == __OFFSET_RUSAGEX64_MSGRCV);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_msgsnd) == __OFFSET_RUSAGEX64_MSGSND);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_nivcsw) == __OFFSET_RUSAGEX64_NIVCSW);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_nsignals) == __OFFSET_RUSAGEX64_NSIGNALS);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_nswap) == __OFFSET_RUSAGEX64_NSWAP);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_nvcsw) == __OFFSET_RUSAGEX64_NVCSW);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_oublock) == __OFFSET_RUSAGEX64_OUBLOCK);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_stime) == __OFFSET_RUSAGEX64_STIME);
+STATIC_ASSERT(offsetof(struct rusagex64, ru_utime) == __OFFSET_RUSAGEX64_UTIME);
+STATIC_ASSERT(sizeof(struct rusagex64) == __SIZEOF_RUSAGEX64);
+
+
+
+
+
 #include <bits/sigevent32.h>
 
 /* struct sigevent32 */

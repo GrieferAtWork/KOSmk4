@@ -26,6 +26,7 @@
 
 #include <kos/syscalls.h>
 
+#include <signal.h>
 #include <string.h>
 
 #include "../libc/pthread.h"
