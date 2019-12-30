@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83b5838 */
+/* HASH CRC-32:0x9731dc88 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1880,7 +1880,7 @@
 #define __NRAT0_maplibrary              (void *, void *)
 #define __NRAT1_maplibrary              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_maplibrary              (fd_t, __fd_t)
-#define __NRAT3_maplibrary              (void *, void *)
+#define __NRAT3_maplibrary              (struct elf32_phdr *, struct elf32_phdr *)
 #define __NRAT4_maplibrary              (size_t, __size_t)
 #define __NRAT0_setitimer64             (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_setitimer64             (struct __itimerval64 const *, struct __itimerval64 const *)
@@ -2451,7 +2451,7 @@
 #define __NRAM_gettimeofday64(a, b, c, d, e, f)          (struct __timevalx32_64 *)a, (struct timezone *)b
 #define __NRAM_settimeofday64(a, b, c, d, e, f)          (struct __timevalx32_64 const *)a, (struct timezone const *)b
 #define __NRAM_select64(a, b, c, d, e, f)                (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timevalx32_64 *)e
-#define __NRAM_maplibrary(a, b, c, d, e, f)              (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (void *)d, (__size_t)e
+#define __NRAM_maplibrary(a, b, c, d, e, f)              (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf32_phdr *)d, (__size_t)e
 #define __NRAM_setitimer64(a, b, c, d, e, f)             (__syscall_ulong_t)a, (struct __itimerval64 const *)b, (struct __itimerval64 *)c
 #define __NRAM_getitimer64(a, b, c, d, e, f)             (__syscall_ulong_t)a, (struct __itimerval64 *)b
 #define __NRAM_wait4_64(a, b, c, d, e, f)                (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusagex32_64 *)d

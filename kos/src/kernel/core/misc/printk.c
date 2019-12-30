@@ -180,6 +180,13 @@ kprinter(void *level, char const *__restrict data, size_t datalen) {
 }
 
 
+
+
+
+/************************************************************************/
+/* syslog()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SYSLOG
 DEFINE_SYSCALL3(ssize_t, syslog,
                 syscall_ulong_t, level,
                 USER UNCHECKED char const *, str, size_t, len) {
@@ -190,6 +197,7 @@ DEFINE_SYSCALL3(ssize_t, syslog,
 	kprinter_impl((void *)(uintptr_t)level, str, len);
 	return (ssize_t)len;
 }
+#endif /* __ARCH_WANT_SYSCALL_SYSLOG */
 
 
 DECL_END

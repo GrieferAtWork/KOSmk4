@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x438b331b */
+/* HASH CRC-32:0x87fd1e4a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap64))(void *__addr,
                                                     int __flags,
                                                     __fd_t __fd,
                                                     __off64_t __offset) {
-#line 346 "kos/src/libc/magic/sys.mman.c"
+#line 344 "kos/src/libc/magic/sys.mman.c"
 	return __localdep_mmap32(__addr, __len, __prot, __flags, __fd, (__off32_t)__offset);
 }
 __NAMESPACE_LOCAL_END

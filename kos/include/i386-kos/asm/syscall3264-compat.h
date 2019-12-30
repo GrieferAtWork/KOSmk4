@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1f32734 */
+/* HASH CRC-32:0xeed36a5c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -144,7 +144,6 @@
 #define __NR3264COMPAT_lseek64                2(lseek64,lseek)
 #define __NR3264COMPAT_lsetxattr              1(lsetxattr)
 #define __NR3264COMPAT_madvise                1(madvise)
-#define __NR3264COMPAT_maplibrary             1(maplibrary)
 #define __NR3264COMPAT_mbind                  1(mbind)
 #define __NR3264COMPAT_membarrier             1(membarrier)
 #define __NR3264COMPAT_memfd_create           1(memfd_create)

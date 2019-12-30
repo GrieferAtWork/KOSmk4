@@ -256,7 +256,7 @@ NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr,
 		                  fd,
 		                  (syscall_ulong_t)&offset64);
 	} else
-#endif
+#endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
 	{
 		result = sys_mmap(addr,
 		                  len,

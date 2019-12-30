@@ -55,6 +55,7 @@ clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRA
        pid_t *ctid, uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
+maplibrary = maplibraryx64;
 sigaltstack = sigaltstackx64;
 getrusage = getrusagex64;
 wait4 = wait4_x64;

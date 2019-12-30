@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43fe29ff */
+/* HASH CRC-32:0x18df4201 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -751,7 +751,7 @@
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-#define __NR32_maplibrary              __UINT32_C(0x80000056) /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
+#define __NR32_maplibrary              __UINT32_C(0x80000056) /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
 #define __NR32_setitimer64             __UINT32_C(0x80000068) /* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
 #define __NR32_getitimer64             __UINT32_C(0x80000069) /* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL

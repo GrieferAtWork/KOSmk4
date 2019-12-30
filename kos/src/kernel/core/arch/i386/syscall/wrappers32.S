@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd70ff452 */
+/* HASH CRC-32:0x95541894 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -15572,7 +15572,7 @@ END(__x86_asm32_int80_select64)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
 .section .text.x86.asm32_syscall_int80.maplibrary
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
 	.cfi_startproc simple
@@ -32902,7 +32902,7 @@ END(__x86_asm32_sysenter_select64)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
 .section .text.x86.asm32_syscall_sysenter.maplibrary
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
 	.cfi_startproc simple

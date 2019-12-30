@@ -181,7 +181,7 @@ typedef __mode_t mode_t;
                                       * NOTE: Implied for physical mappings.
                                       * NOTE: The kernel may initialize memory randomly in sandboxed threads. */
 #endif /* !MAP_UNINITIALIZED */
-#if __KOS_VERSION__ >= 400 && defined(__USE_KOS_KERNEL)
+#if defined(__KOS__) && __KOS_VERSION__ >= 400 && defined(__USE_KOS_KERNEL)
 #define MAP_DONT_MAP         0x20000000 /* Don't actually map memory, but test the waters of a memory
                                          * location hasn't already been mapped, or locate a suitably
                                          * large free memory range.
@@ -189,11 +189,9 @@ typedef __mode_t mode_t;
                                          * the `MAP_DONT_OVERRIDE' flag. */
 #define MAP_DONT_OVERRIDE    0x40000000 /* Don't override existing mappings when `MAP_FIXED' is passed.
                                          * Instead, TODO:ERROR. */
-#if __SIZEOF_POINTER__ < 8
 #define MAP_OFFSET64_POINTER 0x80000000 /* The `OFFSET' argument of MMAP is actually a pointer to the 64-bit
                                          * unsigned integer that should actually be used as offset. */
-#endif /* __SIZEOF_POINTER__ < 8 */
-#endif
+#endif /* __KOS__ && __KOS_VERSION__ >= 400 && __USE_KOS_KERNEL */
 #endif /* __USE_MISC */
 
 /* Error return value for `mmap()' */

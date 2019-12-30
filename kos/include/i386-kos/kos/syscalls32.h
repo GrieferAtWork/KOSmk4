@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ba5b06a */
+/* HASH CRC-32:0xfd0cbf7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,7 @@
 #include <bits/timeval32.h>
 #include <bits/types.h>
 #include <bits/utimebuf.h>
+#include <elf.h>
 #include <hybrid/__pointer.h>
 #include <hybrid/typecore.h>
 #include <kos/bits/debugtrap32.h>
@@ -106,6 +107,7 @@ struct __utimbuf32;
 struct __utimbuf64;
 struct debugtrap_reason32;
 struct dirent;
+struct elf32_phdr;
 struct epoll_event;
 struct exception_data32;
 struct file_handle;
@@ -1001,7 +1003,7 @@ __CDECLARE_SC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong_
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-__CDECLARE_SC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, void *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
+__CDECLARE_SC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, struct elf32_phdr *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
 #endif /* __CRT_HAVE_SC(maplibrary) */
 #if __CRT_HAVE_SC(mbind)
 __CDECLARE_SC(,__errno_t,mbind,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -2685,7 +2687,7 @@ __CDECLARE_XSC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-__CDECLARE_XSC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, void *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
+__CDECLARE_XSC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, struct elf32_phdr *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
 #endif /* __CRT_HAVE_XSC(maplibrary) */
 #if __CRT_HAVE_XSC(mbind)
 __CDECLARE_XSC(,__errno_t,mbind,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))

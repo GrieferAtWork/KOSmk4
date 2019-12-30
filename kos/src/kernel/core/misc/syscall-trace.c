@@ -78,16 +78,6 @@
 
 DECL_BEGIN
 
-#if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER == 4
-#ifndef MAP_OFFSET64_POINTER
-/* XXX: Somehow pull this one from headers? */
-#define MAP_OFFSET64_POINTER 0x80000000
-#else /* !MAP_OFFSET64_POINTER */
-STATIC_ASSERT(MAP_OFFSET64_POINTER == 0x80000000);
-#endif /* MAP_OFFSET64_POINTER */
-#endif /* __ARCH_HAVE_COMPAT && __ARCH_COMPAT_SIZEOF_POINTER == 4 */
-
-
 PUBLIC void FCALL
 syscall_trace(struct syscall_trace_args const *__restrict args) {
 #if 1

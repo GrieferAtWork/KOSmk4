@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40f1152b */
+/* HASH CRC-32:0x28c31cd3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -245,7 +245,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlseek64, libc_sys_Xlseek64)
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 .section .text.crt.syscall.mmap
 INTERN_FUNCTION(libc_sys_mmap)
@@ -263,7 +263,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_mmap, libc_sys_mmap)
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 .section .text.crt.syscall.Xmmap
 INTERN_FUNCTION(libc_sys_Xmmap)
@@ -9404,7 +9404,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfsmode, libc_sys_Xfsmode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
 .section .text.crt.syscall.maplibrary
 INTERN_FUNCTION(libc_sys_maplibrary)
 	.cfi_startproc
@@ -9427,7 +9427,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_maplibrary, libc_sys_maplibrary)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
 .section .text.crt.syscall.Xmaplibrary
 INTERN_FUNCTION(libc_sys_Xmaplibrary)
 	.cfi_startproc

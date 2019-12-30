@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f1216c9 */
+/* HASH CRC-32:0x46d3961f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -451,6 +451,7 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT32            1
 #define __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT64            1
 #define __ARCH_WANT_COMPAT_SYSCALL_LOCK                    1
+#define __ARCH_WANT_COMPAT_SYSCALL_MAPLIBRARY              1
 #define __ARCH_WANT_COMPAT_SYSCALL_MMAP2                   1
 #define __ARCH_WANT_COMPAT_SYSCALL_MPX                     1
 #define __ARCH_WANT_COMPAT_SYSCALL_MQ_GETSETATTR           1

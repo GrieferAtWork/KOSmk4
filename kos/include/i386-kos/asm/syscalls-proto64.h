@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b261519 */
+/* HASH CRC-32:0x9a5df4b8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1642,7 +1642,7 @@
 #define __NRAT0_maplibrary             (void *, void *)
 #define __NRAT1_maplibrary             (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_maplibrary             (fd_t, __fd_t)
-#define __NRAT3_maplibrary             (void *, void *)
+#define __NRAT3_maplibrary             (struct elf64_phdr *, struct elf64_phdr *)
 #define __NRAT4_maplibrary             (size_t, __size_t)
 #define __NRAT0_kreaddirf              (fd_t, __fd_t)
 #define __NRAT1_kreaddirf              (struct dirent *, struct dirent *)
@@ -2055,7 +2055,7 @@
 #define __NRAM_kreaddir(a, b, c, d, e, f)               (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_fchdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NRAM_fsmode(a, b, c, d, e, f)                 (__uint64_t)a
-#define __NRAM_maplibrary(a, b, c, d, e, f)             (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (void *)d, (__size_t)e
+#define __NRAM_maplibrary(a, b, c, d, e, f)             (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf64_phdr *)d, (__size_t)e
 #define __NRAM_kreaddirf(a, b, c, d, e, f)              (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
 #define __NRAM_fmkdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NRAM_fmknodat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e

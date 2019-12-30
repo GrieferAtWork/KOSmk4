@@ -83,10 +83,8 @@ setgroups = setgroups16;
 setfsuid = setfsuid16;
 setfsgid = setfsgid16;
 
-/* Enable support for `MAP_OFFSET64_POINTER' */
-mmap = mmap32;
-
 /* Configure binding of multi-arch types in system calls. */
+maplibrary = maplibraryx32;
 sigaction = sigactionx32;
 rt_sigaction = rt_sigactionx32;
 utime = utime32;

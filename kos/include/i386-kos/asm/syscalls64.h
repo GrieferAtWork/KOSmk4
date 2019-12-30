@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7acc3223 */
+/* HASH CRC-32:0x2b2b74df */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
- *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
+ *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER' */
 #define __NR_mmap                   0x9                            /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 /* @param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
 #define __NR_mprotect               0xa                            /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
@@ -688,7 +688,7 @@
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-#define __NR_maplibrary             __UINT64_C(0xffffffff80000086) /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
+#define __NR_maplibrary             __UINT64_C(0xffffffff80000086) /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
 #define __NR_kreaddirf              __UINT64_C(0xffffffff800000d9) /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR_fmkdirat               __UINT64_C(0xffffffff80000102) /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */

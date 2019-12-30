@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b9fcd76 */
+/* HASH CRC-32:0xafe0f91e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7615,7 +7615,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xselect64, libc_sys_Xselect64)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
 .section .text.crt.syscall.maplibrary
 INTERN_FUNCTION(libc_sys_maplibrary)
 	movl   $(0x80000056), %eax
@@ -7633,7 +7633,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_maplibrary, libc_sys_maplibrary)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
 .section .text.crt.syscall.Xmaplibrary
 INTERN_FUNCTION(libc_sys_Xmaplibrary)
 	movl   $(0x80000056), %eax
