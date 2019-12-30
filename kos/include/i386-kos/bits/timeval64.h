@@ -21,38 +21,62 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 #include <bits/timeval-cxx-support.h>
 
-#ifdef __x86_64__
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef timevalx64
+#pragma push_macro("timevalx64")
+#define __PRIVATE_DID_PUSH_TIMEVALX64
+#endif /* timevalx64 */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+/*[[[autogen:wrap3264_x64(
+	linkIf:   "defined(__x86_64__)",
+	name:     "timeval",
+	name64:   "timevalx64",
+	name32If: "defined(__USE_KOS)",
+	name64If: "defined(__USE_TIME64)",
+)]]]*/
+#undef timevalx64
+#ifndef __x86_64__
+#define timevalx64 __timevalx64
+#else /* !__x86_64__ */
 #include <features.h>
 #define __OFFSET_TIMEVAL_SEC    __OFFSET_TIMEVALX64_SEC
 #define __OFFSET_TIMEVAL_USEC   __OFFSET_TIMEVALX64_USEC
 #define __SIZEOF_TIMEVAL        __SIZEOF_TIMEVALX64
+#define __ALIGNOF_TIMEVAL       __ALIGNOF_TIMEVALX64
+#define __OFFSET_TIMEVAL32_SEC  __OFFSET_TIMEVALX64_SEC
+#define __OFFSET_TIMEVAL32_USEC __OFFSET_TIMEVALX64_USEC
+#define __SIZEOF_TIMEVAL32      __SIZEOF_TIMEVALX64
+#define __ALIGNOF_TIMEVAL32     __ALIGNOF_TIMEVALX64
 #define __OFFSET_TIMEVAL64_SEC  __OFFSET_TIMEVALX64_SEC
 #define __OFFSET_TIMEVAL64_USEC __OFFSET_TIMEVALX64_USEC
 #define __SIZEOF_TIMEVAL64      __SIZEOF_TIMEVALX64
+#define __ALIGNOF_TIMEVAL64     __ALIGNOF_TIMEVALX64
 #define timevalx64              timeval
 #define __timevalx64            timeval
 #define __timeval32             timeval
 #define __timeval64             timeval
 #define __timeval_alt           timeval
+#define _TIMEVAL_MATCHES_TIMEVAL64 1
 #ifdef __USE_KOS
-#define timeval32               timeval
+#define timeval32 timeval
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
-#define timeval64               timeval
+#define timeval64 timeval
 #endif /* __USE_TIME64 */
 #define __timeval_defined 1
-#else /* __x86_64__ */
-#define timevalx64              __timevalx64
-#endif /* !__x86_64__ */
-
+#endif /* __x86_64__ */
+/*[[[end]]]*/
 
 #define __OFFSET_TIMEVALX64_SEC   0
 #define __OFFSET_TIMEVALX64_USEC  8
 #define __SIZEOF_TIMEVALX64       16
+#define __ALIGNOF_TIMEVALX64      __ALIGNOF_INT64__
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -73,5 +97,12 @@ __DECL_END
 #ifndef __USE_KOS
 #undef timevalx64
 #endif /* !__USE_KOS */
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef __PRIVATE_DID_PUSH_TIMEVALX64
+#undef __PRIVATE_DID_PUSH_TIMEVALX64
+#pragma pop_macro("timevalx64")
+#endif /* __PRIVATE_DID_PUSH_TIMEVALX64 */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #endif /* !_I386_KOS_BITS_TIMEVAL64_H */

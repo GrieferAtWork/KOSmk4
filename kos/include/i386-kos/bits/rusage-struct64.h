@@ -25,7 +25,24 @@
 
 #include <bits/timeval64.h>
 
-#ifdef __x86_64__
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef rusagex64
+#pragma push_macro("rusagex64")
+#define __PRIVATE_DID_PUSH_RUSAGEX64
+#endif /* rusagex64 */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+/*[[[autogen:wrap3264_x64(
+	linkIf:   "defined(__x86_64__)",
+	name:     "rusage",
+	name64:   "rusagex64",
+	name32If: "defined(__USE_KOS)",
+	name64If: "defined(__USE_TIME64)",
+)]]]*/
+#undef rusagex64
+#ifndef __x86_64__
+#define rusagex64 __rusagex64
+#else /* !__x86_64__ */
 #include <features.h>
 #define __OFFSET_RUSAGE_UTIME      __OFFSET_RUSAGEX64_UTIME
 #define __OFFSET_RUSAGE_STIME      __OFFSET_RUSAGEX64_STIME
@@ -44,6 +61,25 @@
 #define __OFFSET_RUSAGE_NVCSW      __OFFSET_RUSAGEX64_NVCSW
 #define __OFFSET_RUSAGE_NIVCSW     __OFFSET_RUSAGEX64_NIVCSW
 #define __SIZEOF_RUSAGE            __SIZEOF_RUSAGEX64
+#define __ALIGNOF_RUSAGE           __ALIGNOF_RUSAGEX64
+#define __OFFSET_RUSAGE32_UTIME    __OFFSET_RUSAGEX64_UTIME
+#define __OFFSET_RUSAGE32_STIME    __OFFSET_RUSAGEX64_STIME
+#define __OFFSET_RUSAGE32_MAXRSS   __OFFSET_RUSAGEX64_MAXRSS
+#define __OFFSET_RUSAGE32_IXRSS    __OFFSET_RUSAGEX64_IXRSS
+#define __OFFSET_RUSAGE32_IDRSS    __OFFSET_RUSAGEX64_IDRSS
+#define __OFFSET_RUSAGE32_ISRSS    __OFFSET_RUSAGEX64_ISRSS
+#define __OFFSET_RUSAGE32_MINFLT   __OFFSET_RUSAGEX64_MINFLT
+#define __OFFSET_RUSAGE32_MAJFLT   __OFFSET_RUSAGEX64_MAJFLT
+#define __OFFSET_RUSAGE32_NSWAP    __OFFSET_RUSAGEX64_NSWAP
+#define __OFFSET_RUSAGE32_INBLOCK  __OFFSET_RUSAGEX64_INBLOCK
+#define __OFFSET_RUSAGE32_OUBLOCK  __OFFSET_RUSAGEX64_OUBLOCK
+#define __OFFSET_RUSAGE32_MSGSND   __OFFSET_RUSAGEX64_MSGSND
+#define __OFFSET_RUSAGE32_MSGRCV   __OFFSET_RUSAGEX64_MSGRCV
+#define __OFFSET_RUSAGE32_NSIGNALS __OFFSET_RUSAGEX64_NSIGNALS
+#define __OFFSET_RUSAGE32_NVCSW    __OFFSET_RUSAGEX64_NVCSW
+#define __OFFSET_RUSAGE32_NIVCSW   __OFFSET_RUSAGEX64_NIVCSW
+#define __SIZEOF_RUSAGE32          __SIZEOF_RUSAGEX64
+#define __ALIGNOF_RUSAGE32         __ALIGNOF_RUSAGEX64
 #define __OFFSET_RUSAGE64_UTIME    __OFFSET_RUSAGEX64_UTIME
 #define __OFFSET_RUSAGE64_STIME    __OFFSET_RUSAGEX64_STIME
 #define __OFFSET_RUSAGE64_MAXRSS   __OFFSET_RUSAGEX64_MAXRSS
@@ -61,21 +97,22 @@
 #define __OFFSET_RUSAGE64_NVCSW    __OFFSET_RUSAGEX64_NVCSW
 #define __OFFSET_RUSAGE64_NIVCSW   __OFFSET_RUSAGEX64_NIVCSW
 #define __SIZEOF_RUSAGE64          __SIZEOF_RUSAGEX64
-#define rusagex64              rusage
-#define __rusagex64            rusage
-#define __rusage32             rusage
-#define __rusage64             rusage
-#define __rusage_alt           rusage
+#define __ALIGNOF_RUSAGE64         __ALIGNOF_RUSAGEX64
+#define rusagex64                  rusage
+#define __rusagex64                rusage
+#define __rusage32                 rusage
+#define __rusage64                 rusage
+#define __rusage_alt               rusage
+#define _RUSAGE_MATCHES_RUSAGE64 1
 #ifdef __USE_KOS
-#define rusage32               rusage
+#define rusage32 rusage
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
-#define rusage64               rusage
+#define rusage64 rusage
 #endif /* __USE_TIME64 */
 #define __rusage_defined 1
-#else /* __x86_64__ */
-#define rusagex64              __rusagex64
-#endif /* !__x86_64__ */
+#endif /* __x86_64__ */
+/*[[[end]]]*/
 
 
 #define __OFFSET_RUSAGEX64_UTIME    0
@@ -95,6 +132,7 @@
 #define __OFFSET_RUSAGEX64_NVCSW    128
 #define __OFFSET_RUSAGEX64_NIVCSW   136
 #define __SIZEOF_RUSAGEX64          144
+#define __ALIGNOF_RUSAGEX64         __ALIGNOF_INT64__
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -129,5 +167,12 @@ __DECL_END
 #ifndef __USE_KOS
 #undef rusagex64
 #endif /* !__USE_KOS */
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef __PRIVATE_DID_PUSH_RUSAGEX64
+#undef __PRIVATE_DID_PUSH_RUSAGEX64
+#pragma pop_macro("rusagex64")
+#endif /* __PRIVATE_DID_PUSH_RUSAGEX64 */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #endif /* !_I386_KOS_BITS_RUSAGE_STRUCT64_H */

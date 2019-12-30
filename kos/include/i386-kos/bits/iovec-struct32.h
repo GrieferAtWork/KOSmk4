@@ -20,7 +20,9 @@
 #define _I386_KOS_BITS_IOVEC_STRUCT32_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/host.h>
+#include <hybrid/typecore.h>
 
 #ifndef __x86_64__
 #ifndef __iovec_defined
@@ -34,11 +36,10 @@
 
 #define __OFFSET_IOVEC32_BASE 0
 #define __OFFSET_IOVEC32_LEN  4
-#define __SIZEOF_IOVEC32      8
+#define __SIZEOF_IOVEC32      __ALIGNOF_INT32__
 
 #ifdef __CC__
 #include <hybrid/__pointer.h>
-#include <hybrid/typecore.h>
 
 __SYSDECL_BEGIN
 struct iovec32 /*[prefix(iov_)]*/ {

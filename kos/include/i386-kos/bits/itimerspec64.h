@@ -20,38 +20,63 @@
 #define _I386_KOS_BITS_ITIMERSPEC64_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 #include "timespec64.h"
 
-#ifdef __x86_64__
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef itimerspecx64
+#pragma push_macro("itimerspecx64")
+#define __PRIVATE_DID_PUSH_ITIMERSPECX64
+#endif /* itimerspecx64 */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+/*[[[autogen:wrap3264_x64(
+	linkIf:   "defined(__x86_64__)",
+	name:     "itimerspec",
+	name64:   "itimerspecx64",
+	name32If: "defined(__USE_KOS)",
+	name64If: "defined(__USE_TIME64)",
+)]]]*/
+#undef itimerspecx64
+#ifndef __x86_64__
+#define itimerspecx64 __itimerspecx64
+#else /* !__x86_64__ */
 #include <features.h>
 #define __OFFSET_ITIMERSPEC_INTERVAL   __OFFSET_ITIMERSPECX64_INTERVAL
 #define __OFFSET_ITIMERSPEC_VALUE      __OFFSET_ITIMERSPECX64_VALUE
 #define __SIZEOF_ITIMERSPEC            __SIZEOF_ITIMERSPECX64
+#define __ALIGNOF_ITIMERSPEC           __ALIGNOF_ITIMERSPECX64
+#define __OFFSET_ITIMERSPEC32_INTERVAL __OFFSET_ITIMERSPECX64_INTERVAL
+#define __OFFSET_ITIMERSPEC32_VALUE    __OFFSET_ITIMERSPECX64_VALUE
+#define __SIZEOF_ITIMERSPEC32          __SIZEOF_ITIMERSPECX64
+#define __ALIGNOF_ITIMERSPEC32         __ALIGNOF_ITIMERSPECX64
 #define __OFFSET_ITIMERSPEC64_INTERVAL __OFFSET_ITIMERSPECX64_INTERVAL
 #define __OFFSET_ITIMERSPEC64_VALUE    __OFFSET_ITIMERSPECX64_VALUE
 #define __SIZEOF_ITIMERSPEC64          __SIZEOF_ITIMERSPECX64
-#define itimerspecx64              itimerspec
-#define __itimerspecx64            itimerspec
-#define __itimerspec32             itimerspec
-#define __itimerspec64             itimerspec
-#define __itimerspec_alt           itimerspec
+#define __ALIGNOF_ITIMERSPEC64         __ALIGNOF_ITIMERSPECX64
+#define itimerspecx64                  itimerspec
+#define __itimerspecx64                itimerspec
+#define __itimerspec32                 itimerspec
+#define __itimerspec64                 itimerspec
+#define __itimerspec_alt               itimerspec
+#define _ITIMERSPEC_MATCHES_ITIMERSPEC64 1
 #ifdef __USE_KOS
-#define itimerspec32               itimerspec
+#define itimerspec32 itimerspec
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
-#define itimerspec64               itimerspec
+#define itimerspec64 itimerspec
 #endif /* __USE_TIME64 */
 #define __itimerspec_defined 1
-#else /* __x86_64__ */
-#define itimerspecx64              __itimerspecx64
-#endif /* !__x86_64__ */
-
+#endif /* __x86_64__ */
+/*[[[end]]]*/
 
 #define __OFFSET_ITIMERSPECX64_INTERVAL 0
 #define __OFFSET_ITIMERSPECX64_VALUE    16
 #define __SIZEOF_ITIMERSPECX64          32
+#define __ALIGNOF_ITIMERSPECX64         __ALIGNOF_INT64__
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -80,5 +105,12 @@ __DECL_END
 #ifndef __USE_KOS
 #undef itimerspecx64
 #endif /* !__USE_KOS */
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef __PRIVATE_DID_PUSH_ITIMERSPECX64
+#undef __PRIVATE_DID_PUSH_ITIMERSPECX64
+#pragma pop_macro("itimerspecx64")
+#endif /* __PRIVATE_DID_PUSH_ITIMERSPECX64 */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #endif /* !_I386_KOS_BITS_ITIMERSPEC64_H */

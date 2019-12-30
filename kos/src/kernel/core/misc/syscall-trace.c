@@ -89,6 +89,18 @@ syscall_trace(struct syscall_trace_args const *__restrict args) {
 	                   args);
 }
 
+
+#undef statfs
+#undef statfs32
+#undef statfs64
+#undef stat
+#undef stat32
+#undef stat64
+#undef linux_stat
+#undef linux_stat32
+#undef linux_stat64
+#undef linux_oldstat
+
 PUBLIC ssize_t KCALL
 syscall_printtrace(pformatprinter printer, void *arg,
                    struct syscall_trace_args const *__restrict args) {

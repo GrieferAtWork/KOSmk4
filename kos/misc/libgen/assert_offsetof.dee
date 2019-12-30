@@ -250,7 +250,7 @@ got_field:
 		}
 		local didSomething = !!knownFields;
 		for (local pat: SIZEOF_MACRO_PATTERNS) {
-			local macro_name = pat.format({ .typ = typ.upper() });
+			local macro_name = pat.format({ .typ = macro_typ.upper() });
 			if (macro_name in knownMacros) {
 				print assertSizeofMacro.format({
 					.typ   = struct_prefix + " " + typ,
@@ -261,7 +261,7 @@ got_field:
 			}
 		}
 		for (local pat: ALIGNOF_MACRO_PATTERNS) {
-			local macro_name = pat.format({ .typ = typ.upper() });
+			local macro_name = pat.format({ .typ = macro_typ.upper() });
 			if (macro_name in knownMacros) {
 				print assertAlignofMacro.format({
 					.typ   = struct_prefix + " " + typ,

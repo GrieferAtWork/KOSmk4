@@ -44,6 +44,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
+#include <bits/statfs-convert.h>
+#include <bits/statfs.h>
 #include <compat/config.h>
 #include <kos/debugtrap.h>
 #include <kos/except-inval.h>
@@ -3825,39 +3827,35 @@ DEFINE_SYSCALL0(syscall_slong_t, getdrives) {
 
 
 
-LOCAL void KCALL
-statfs64_to_statfs32(USER CHECKED struct __statfs32 *dst,
-                     struct statfs const *__restrict src) {
-	dst->f_type    = src->f_type;
-	dst->f_bsize   = src->f_bsize;
-	dst->f_blocks  = (__fsblkcnt32_t)src->f_blocks;
-	dst->f_bfree   = (__fsblkcnt32_t)src->f_bfree;
-	dst->f_bavail  = (__fsblkcnt32_t)src->f_bavail;
-	dst->f_files   = (__fsfilcnt32_t)src->f_files;
-	dst->f_ffree   = (__fsfilcnt32_t)src->f_ffree;
-	dst->f_fsid    = src->f_fsid;
-	dst->f_namelen = src->f_namelen;
-	dst->f_frsize  = src->f_frsize;
-	dst->f_flags   = src->f_flags;
-	memcpy(dst->f_spare, src->f_spare, sizeof(src->f_spare));
-}
-
+/************************************************************************/
+/* fstatfs(), fstatfs64(), statfs(), statfs64()                         */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FSTATFS
 DEFINE_SYSCALL2(errno_t, fstatfs, fd_t, fd,
-                USER UNCHECKED struct __statfs32 *, result) {
+                USER UNCHECKED struct statfs32 *, result) {
 	REF struct superblock *super;
+#ifndef _STATFS_MATCHES_STATFS64
 	struct statfs data;
+#endif /* !_STATFS_MATCHES_STATFS64 */
 	validate_writable(result, sizeof(*result));
 	super = handle_get_superblock_relaxed((unsigned int)fd);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
+#ifdef _STATFS_MATCHES_STATFS64
+		superblock_statfs(super, result);
+#else /* _STATFS_MATCHES_STATFS64 */
 		superblock_statfs(super, &data);
+#endif /* !_STATFS_MATCHES_STATFS64 */
 	}
 	COMPILER_WRITE_BARRIER();
-	statfs64_to_statfs32(result, &data);
+#ifndef _STATFS_MATCHES_STATFS64
+	statfs_to_statfs32(&data, result);
+#endif /* !_STATFS_MATCHES_STATFS64 */
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FSTATFS */
 
-#ifdef __NR_fstatfs64
+#ifdef __ARCH_WANT_SYSCALL_FSTATFS64
 DEFINE_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
                 USER UNCHECKED struct statfs64 *, result) {
 	REF struct superblock *super;
@@ -3865,11 +3863,19 @@ DEFINE_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
 	super = handle_get_superblock_relaxed((unsigned int)fd);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
-		superblock_statfs(super, (struct statfs *)result);
+#ifdef __USE_FILE_OFFSET64
+		superblock_statfs(super, result);
+#else /* __USE_FILE_OFFSET64 */
+		{
+			struct statfs data;
+			superblock_statfs(super, &data);
+			statfs_to_statfs64(&data, result);
+		}
+#endif /* !__USE_FILE_OFFSET64 */
 	}
 	return -EOK;
 }
-#endif /* __NR_fstatfs64 */
+#endif /* __ARCH_WANT_SYSCALL_FSTATFS64 */
 
 PRIVATE REF struct superblock *KCALL
 get_superblock_from_path(USER CHECKED char const *filename) {
@@ -3892,34 +3898,44 @@ get_superblock_from_path(USER CHECKED char const *filename) {
 }
 
 
+#undef statfs
 DEFINE_SYSCALL2(errno_t, statfs,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct __statfs32 *, result) {
+                USER UNCHECKED struct statfs32 *, result) {
 	REF struct superblock *super;
+#ifndef _STATFS_MATCHES_STATFS64
 	struct statfs data;
+#endif /* !_STATFS_MATCHES_STATFS64 */
 	validate_readable(filename, 1);
 	validate_writable(result, sizeof(*result));
 	super = get_superblock_from_path(filename);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
+#ifdef _STATFS_MATCHES_STATFS64
+		superblock_statfs(super, result);
+#else /* _STATFS_MATCHES_STATFS64 */
 		superblock_statfs(super, &data);
+#endif /* !_STATFS_MATCHES_STATFS64 */
 	}
 	COMPILER_WRITE_BARRIER();
-	statfs64_to_statfs32(result, &data);
+#ifndef _STATFS_MATCHES_STATFS64
+	statfs_to_statfs32(&data, result);
+#endif /* !_STATFS_MATCHES_STATFS64 */
 	return -EOK;
 }
 
 #ifdef __NR_statfs64
+#undef statfs64
 DEFINE_SYSCALL2(errno_t, statfs64,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct statfs64 *, result) {
+                USER UNCHECKED struct statfs *, result) {
 	REF struct superblock *super;
 	validate_readable(filename, 1);
 	validate_writable(result, sizeof(*result));
 	super = get_superblock_from_path(filename);
 	{
 		FINALLY_DECREF_UNLIKELY(super);
-		superblock_statfs(super, (struct statfs *)result);
+		superblock_statfs(super, result);
 	}
 	return -EOK;
 }

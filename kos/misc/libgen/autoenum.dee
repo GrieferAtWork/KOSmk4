@@ -20,6 +20,8 @@ import fs;
 import util;
 import * from deemon;
 
+/* TODO: Implement autoenum as part of autogen (by using a function `enum()') */
+
 /* Automatically generate enum wrappers */
 
 function printReflowedComment(fp: File, indent: string, doc: string) {

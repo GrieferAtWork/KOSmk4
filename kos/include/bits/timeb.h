@@ -37,11 +37,6 @@
 #define __OFFSET_TIMEB64_DSTFLAG  (__SIZEOF_TIME64_T__ + 4)
 #define __SIZEOF_TIMEB64          (__SIZEOF_TIME64_T__ + 8)
 
-#if 0
-struct timeb /*[PREFIX()]*/ {};
-struct timeb64 /*[PREFIX()]*/ {};
-#endif
-
 #ifdef __CC__
 __SYSDECL_BEGIN
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -56,6 +51,12 @@ __SYSDECL_BEGIN
 #undef millitm
 #undef timezone
 #undef dstflag
+
+#if 0 /* For assert_types.c */
+struct timeb /*[PREFIX()]*/ {};
+struct timeb32 /*[PREFIX()]*/ {};
+struct timeb64 /*[PREFIX()]*/ {};
+#endif
 
 struct timeb {
 	__TM_TYPE(time) time;     /* Seconds since epoch, as from `time'. */

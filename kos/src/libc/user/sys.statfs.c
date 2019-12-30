@@ -20,14 +20,13 @@
 #define GUARD_LIBC_USER_SYS_STATFS_C 1
 
 #include "../api.h"
-#include "sys.statfs.h"
+/**/
+
 #include <kos/syscalls.h>
 
+#include "sys.statfs.h"
+
 DECL_BEGIN
-
-
-
-
 
 /*[[[start:implementation]]]*/
 
@@ -59,10 +58,12 @@ NOTHROW_NCX(LIBCCALL libc_fstatfs)(fd_t filedes,
 }
 /*[[[end:fstatfs]]]*/
 
-#if __SIZEOF_FSBLKCNT32_T__ == __SIZEOF_FSBLKCNT64_T__ && \
-    __SIZEOF_FSFILCNT32_T__ == __SIZEOF_FSFILCNT64_T__
-DEFINE_INTERN_ALIAS(libc_statfs64,libc_statfs);
-DEFINE_INTERN_ALIAS(libc_fstatfs64,libc_fstatfs);
+
+/* TODO: Implement this condition as a [xxx_variant_of()] tag for `statfs64()' and `fstatfs64()' */
+#if (__SIZEOF_FSBLKCNT32_T__ == __SIZEOF_FSBLKCNT64_T__ && \
+     __SIZEOF_FSFILCNT32_T__ == __SIZEOF_FSFILCNT64_T__)
+DEFINE_INTERN_ALIAS(libc_statfs64, libc_statfs);
+DEFINE_INTERN_ALIAS(libc_fstatfs64, libc_fstatfs);
 #else
 /*[[[head:statfs64,hash:CRC-32=0x30f6f471]]]*/
 /* Return information about the filesystem on which FILE resides */
@@ -105,6 +106,8 @@ NOTHROW_NCX(LIBCCALL libc_fstatfs64)(fd_t filedes,
 /*[[[end:implementation]]]*/
 
 
+#undef statfs
+#undef statfs64
 
 /*[[[start:exports,hash:CRC-32=0xa2b30c54]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(statfs, libc_statfs);

@@ -1,0 +1,374 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import fs;
+import util;
+import * from .optiexpr;
+import * from deemon;
+
+global FILENAME: string;
+global FILETEXT: string;
+global FILESIZE: int;
+global CURRENT_CMD_START: int;
+global CURRENT_CMD_END: int;
+global CURRENT_OUTPUT_START: int;
+global CURRENT_OUTPUT_END: int;   /* Points at `/.*[[[end]]]*./' */
+global CURRENT_OUTPUT_END2: int;  /* Points after `/.*[[[end]]]*./' */
+
+function err(i: int, message: string) {
+	local fp = File.stderr;
+	fp << FILENAME << "(" << (FILETEXT.count("\n", i) + 1) << ") : Error : "
+		<< message << "\n";
+	throw Error(message);
+}
+
+function enumerateMacrosNamesBetween(start: int, end: int): {string...} {
+	for (local l: FILETEXT[start:end].splitlines(false)) {
+		l = l.lstrip();
+		if (!l.startswith("#"))
+			continue;
+		l = l[1:].lstrip();
+		if (!l.startswith("define"))
+			continue;
+		l = l[#"define":].lstrip();
+		local nameEnd = 0;
+		while (nameEnd < #l && l.issymcont(nameEnd))
+			++nameEnd;
+		yield l[:nameEnd];
+	}
+}
+
+function enumerateMacrosNamesAfterOutputEnd(): {string...} {
+	local nextOutputStart = FILETEXT.find("/*[[[", CURRENT_OUTPUT_END2);
+	if (nextOutputStart < 0)
+		nextOutputStart = FILESIZE;
+	return enumerateMacrosNamesBetween(CURRENT_OUTPUT_END2, nextOutputStart);
+}
+
+global MACROS_FOR_TYPE_PATTERNS: {string...} = {
+	"OFFSET_{typ}_",
+	"__OFFSET_{typ}_",
+	"OFFSETOF_{typ}_",
+	"__OFFSETOF_{typ}_",
+	"{typ}_OFFSET_",
+	"__{typ}_OFFSET_",
+	"{typ}_OFFSETOF_",
+	"__{typ}_OFFSETOF_",
+	"ALIGNOF_{typ}",
+	"__ALIGNOF_{typ}",
+	"{typ}_ALIGN",
+	"__{typ}_ALIGN",
+	"__ALIGNOF_{typ}__",
+	"__ALIGNOF_{typ}_T__",
+	"SIZEOF_{typ}",
+	"__SIZEOF_{typ}",
+	"{typ}_SIZE",
+	"__{typ}_SIZE",
+	"__SIZEOF_{typ}__",
+	"__SIZEOF_{typ}_T__",
+};
+
+@@Yield pairs of (pattern, matchedPattern, macroName)
+function enumerateMacrosForTypeAfterOutputEnd(
+		typename: string, notTypename: string | none = none): {(string, string, string)...} {
+	for (local macroName: enumerateMacrosNamesAfterOutputEnd()) {
+		if (notTypename !is none) {
+			for (local pattern: MACROS_FOR_TYPE_PATTERNS) {
+				local matchedPattern = pattern.format({ .typ = notTypename });
+				if (macroName.startswith(matchedPattern))
+					goto next_macro;
+			}
+		}
+		for (local pattern: MACROS_FOR_TYPE_PATTERNS) {
+			local matchedPattern = pattern.format({ .typ = typename });
+			if (macroName.startswith(matchedPattern))
+				yield (pattern, matchedPattern, macroName);
+		}
+next_macro:
+		;
+	}
+}
+
+function defineMacros(macros: {(string, string)...}) {
+	macros = List(macros);
+	local longestNameLength = macros.each[0].length > ...;
+	for (local name, value: macros) {
+		print "#define", name.ljust(longestNameLength), value;
+	}
+}
+
+/*[[[wrapx32_and_x32_64(
+	linkIf:   "defined(__x86_64__) || !defined(__i386__)",
+	name:     "itimerspec",
+	name32:   "itimerspecx32",
+	name64:   "itimerspecx32_64",
+	name32If: "defined(__USE_KOS)",
+	name64If: "defined(__USE_TIME64)",
+	link64If: "defined(__USE_TIME_BITS64)",
+)]]]*/
+function do_wrap3264_x32_and_x32_64(
+		linkIf: string, name: string, name32: string, name64: string,
+		name32If: string, name64If: string, link64If: string) {
+	local dontLinkIf = "!({})".format({ linkIf });
+	local fp = File.stdout;
+	fp << "#undef " << name32 << "\n";
+	fp << "#undef " << name64 << "\n";
+	fp << optimizeAndWrapProcessorExpressionForIf(dontLinkIf) << "\n";
+	defineMacros({
+		(name32, "__" + name32),
+		(name64, "__" + name64),
+	});
+	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(dontLinkIf) << " */\n";
+	if ("__USE_" in name32If || "__USE_" in name64If || "__USE_" in link64If)
+		fp << "#include <features.h>\n";
+	fp << optimizeAndWrapProcessorExpressionForIf(link64If) << "\n";
+	fp << "/* Configure:\n";
+	fp << " *   - `" << name64 << "' as `" << name << "'\n";
+	fp << " *   - `" << name32 << "' as `__" << name << "32' */\n";
+	defineMacros({
+		(name32, "__{}32".format({ name })),
+		(name64, name),
+		("__{}".format({ name32 }), "__{}32".format({ name })),
+		("__{}".format({ name64 }), name),
+		("__{}32".format({ name }), "__{}32".format({ name })),
+		("__{}64".format({ name }), name),
+		("__{}_alt".format({ name }), "__{}32".format({ name })),
+	});
+	fp << optimizeAndWrapProcessorExpressionForIf(name32If) << "\n";
+	defineMacros({ ("{}32".format({ name }), "__{}32".format({ name })), });
+	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(name32If) << " */\n";
+	fp << optimizeAndWrapProcessorExpressionForIf(name64If) << "\n";
+	defineMacros({ ("{}64".format({ name }), name), });
+	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(name64If) << " */\n";
+	local nameUpper   = name.upper();
+	local name32Upper = name32.upper();
+	local name64Upper = name64.upper();
+	local type32Macros: {(string, string, string)...} =
+		List(enumerateMacrosForTypeAfterOutputEnd(
+			name32Upper, #name64 > #name32 ? name64Upper : none));
+	local type64Macros: {(string, string, string)...} =
+		List(enumerateMacrosForTypeAfterOutputEnd(
+			name64Upper, #name32 > #name64 ? name32Upper : none));
+	fp << "\n";
+	defineMacros(for (local pattern, matchedPattern, macroName: type64Macros) (
+		pattern.format({ .typ = nameUpper }) + macroName[#matchedPattern:],
+		macroName,
+	));
+	fp << "\n";
+	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(link64If) << " */\n";
+	fp << "/* Configure:\n";
+	fp << " *   - `" << name64 << "' as `" << name << "64' or `__" << name << "64'\n";
+	fp << " *   - `" << name32 << "' as `" << name << "' */\n";
+	defineMacros({
+		(name32, name),
+		("__{}32".format({ name }), name),
+		("__{}".format({ name32 }), name),
+	});
+	fp << optimizeAndWrapProcessorExpressionForIf(name32If) << "\n";
+	defineMacros({ ("{}32".format({ name }), name), });
+	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(name32If) << " */\n";
+	fp << optimizeAndWrapProcessorExpressionForIf(name64If) << "\n";
+	defineMacros({
+		("__{}".format({ name64 }), "{}64".format({ name })),
+		(name64, "{}64".format({ name })),
+		("__{}64".format({ name }), "{}64".format({ name })),
+		("__{}_alt".format({ name }), "{}64".format({ name })),
+	});
+	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(name64If) << " */\n";
+	defineMacros({
+		("__{}".format({ name64 }), "__{}64".format({ name })),
+		(name64, "__{}64".format({ name })),
+		("__{}64".format({ name }), "__{}64".format({ name })),
+		("__{}_alt".format({ name }), "__{}64".format({ name })),
+	});
+	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined("!({})".format({ name64If })) << " */\n";
+	fp << "\n";
+	defineMacros(for (local pattern, matchedPattern, macroName: type32Macros) (
+		pattern.format({ .typ = nameUpper }) + macroName[#matchedPattern:],
+		macroName,
+	));
+	fp << "\n";
+	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined("!({})".format({ link64If })) << " */\n";
+	fp << "\n";
+	defineMacros((for (local pattern, matchedPattern, macroName: type32Macros) (
+		pattern.format({ .typ = nameUpper + "32" }) + macroName[#matchedPattern:],
+		macroName,
+	)) + (for (local pattern, matchedPattern, macroName: type64Macros) (
+		pattern.format({ .typ = nameUpper + "64" }) + macroName[#matchedPattern:],
+		macroName,
+	)));
+	fp << "\n";
+	fp << "#define __itimerspec_defined 1\n";
+	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(linkIf) << "*/\n";
+}
+
+/*[[[autogen:wrap3264_x64(
+	linkIf:   "defined(__x86_64__)",
+	name:     "itimerspec",
+	name64:   "itimerspecx64",
+	name32If: "defined(__USE_KOS)",
+	name64If: "defined(__USE_TIME64)",
+)]]]*/
+function do_wrap3264_x64(
+		linkIf: string, name: string, name64: string,
+		name32If: string, name64If: string) {
+	local dontLinkIf = "!({})".format({ linkIf });
+	local fp = File.stdout;
+	fp << "#undef " << name64 << "\n";
+	fp << optimizeAndWrapProcessorExpressionForIf(dontLinkIf) << "\n";
+	defineMacros({ (name64, "__{}".format({ name64 })), });
+	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(dontLinkIf) << " */\n";
+	if ("__USE_" in name32If || "__USE_" in name64If)
+		fp << "#include <features.h>\n";
+	local type64Macros: {(string, string, string)...} =
+		List(enumerateMacrosForTypeAfterOutputEnd(name64.upper()));
+	local nameUpper = name.upper();
+	defineMacros((for (local pattern, matchedPattern, macroName: type64Macros) (
+		pattern.format({ .typ = nameUpper }) + macroName[#matchedPattern:],
+		macroName,
+	)) + (for (local pattern, matchedPattern, macroName: type64Macros) (
+		pattern.format({ .typ = nameUpper + "32" }) + macroName[#matchedPattern:],
+		macroName,
+	)) + (for (local pattern, matchedPattern, macroName: type64Macros) (
+		pattern.format({ .typ = nameUpper + "64" }) + macroName[#matchedPattern:],
+		macroName,
+	)) + {
+		(name64, name),
+		("__{}".format({ name64 }), name),
+		("__{}32".format({ name }), name),
+		("__{}64".format({ name }), name),
+		("__{}_alt".format({ name }), name),
+	});
+	defineMacros({ ("_{0}_MATCHES_{0}64".format({ nameUpper }), "1"), });
+	fp << optimizeAndWrapProcessorExpressionForIf(name32If) << "\n";
+	defineMacros({ ("{}32".format({ name }), name), });
+	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(name32If) << " */\n";
+	fp << optimizeAndWrapProcessorExpressionForIf(name64If) << "\n";
+	defineMacros({ ("{}64".format({ name }), name), });
+	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(name64If) << " */\n";
+	defineMacros({ ("__{}_defined".format({ name }), "1"), });
+	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(linkIf) << " */\n";
+}
+
+
+
+
+global functions: {string: Callable} = {
+	"wrap3264_x32_and_x32_64" : do_wrap3264_x32_and_x32_64,
+	"wrap3264_x64"            : do_wrap3264_x64,
+};
+
+function doFileImpl(filename: string) {
+	FILENAME = filename;
+	File.Writer newText;
+	with (local fp = File.open(FILENAME, "r"))
+		FILETEXT = fp.read().decode("utf-8").unifylines();
+	FILESIZE = #FILETEXT;
+	local prevOutputEnd = 0;
+	local i = 0;
+	while (i < FILESIZE) {
+		final local START_PATTERN = "/*[[[autogen:";
+		local cmd_start = FILETEXT.find(START_PATTERN, i);
+		if (cmd_start < 0)
+			break;
+		CURRENT_CMD_START = cmd_start + #START_PATTERN;
+		while (CURRENT_CMD_START < FILESIZE && FILETEXT.isspace(CURRENT_CMD_START))
+			++CURRENT_CMD_START;
+		CURRENT_CMD_END = FILETEXT.find("]]]*/", CURRENT_CMD_START);
+		if (CURRENT_CMD_END < 0)
+			err(CURRENT_CMD_START, "Missing `]]]*/'");
+		CURRENT_OUTPUT_START = CURRENT_CMD_END + 5;
+		while (CURRENT_CMD_END > CURRENT_CMD_START && FILETEXT.isspace(CURRENT_CMD_END - 1))
+			--CURRENT_CMD_END;
+		local startsWithSpace = false;
+		if (CURRENT_OUTPUT_START < FILESIZE && FILETEXT.islf(CURRENT_OUTPUT_START)) {
+			startsWithSpace = true;
+			++CURRENT_OUTPUT_START;
+		}
+		CURRENT_OUTPUT_END = FILETEXT.find("/*[[[end]]]*/", CURRENT_OUTPUT_START);
+		if (CURRENT_OUTPUT_END < 0)
+			err(CURRENT_OUTPUT_START, "Missing `/*[[[end]]]*/'");
+		CURRENT_OUTPUT_END2 = CURRENT_OUTPUT_END + #"/*[[[end]]]*/";
+		while (CURRENT_OUTPUT_END2 < FILESIZE && FILETEXT.isspace(CURRENT_OUTPUT_END2))
+			++CURRENT_OUTPUT_END2;
+		newText << FILETEXT[prevOutputEnd:CURRENT_OUTPUT_START];
+		local oldStdout = File.stdout;
+		File.Writer replacementText;
+		File.stdout = replacementText;
+		try {
+			exec(
+				FILETEXT[CURRENT_CMD_START:CURRENT_CMD_END],
+				globals: functions);
+		} finally {
+			File.stdout = oldStdout;
+		}
+		replacementText = replacementText.string.rstrip();
+		if (startsWithSpace)
+			replacementText += "\n";
+		newText << replacementText;
+		prevOutputEnd = CURRENT_OUTPUT_END;
+		i = CURRENT_OUTPUT_END2;
+	}
+	newText << FILETEXT[prevOutputEnd:];
+	newText = newText.string;
+	if (newText != FILETEXT) {
+		print "Updating file:", repr filename;
+		local tempFilename = filename + ".new";
+		try fs.unlink(tempFilename); catch (...);
+		with (local newFp = File.open(tempFilename, "w"))
+			newFp.write(newText.encode("utf-8"));
+		try fs.unlink(filename); catch (...);
+		fs.rename(tempFilename, filename);
+	}
+}
+
+function doFile(filename: string) {
+	try {
+		doFileImpl(filename);
+	} catch (e...) {
+		print File.stderr: "Failed to autogen file:", repr filename;
+		print File.stderr: repr e;
+		print File.stderr: repr Traceback.current;
+	}
+}
+
+function main(argv: {string...}) {
+	for (local filename: argv) {
+		if ("*" in filename) {
+			local head = fs.headof(filename);
+			local tail = fs.tailof(filename);
+			if ("*" in tail) {
+				for (local f: fs.query(filename)) {
+					f = fs.joinpath(head, f);
+					if (fs.stat.isreg(f))
+						doFile(f);
+				}
+				continue;
+			}
+		}
+		doFile(filename);
+	}
+}
+
+main([...][1:]);
+
+
+
+
+
+

@@ -412,9 +412,9 @@ function parsePPBranchUnary(parser: PPBranchParser): Object {
 	case "!": {
 		parser.next();
 		local inner = parsePPBranchUnary(parser);
-		inner = inner is string
+		inner = /*inner is string
 			? "!" + inner
-			: PPBranchNot(inner);
+			: */PPBranchNot(inner);
 		return inner;
 	}	break;
 
@@ -548,7 +548,7 @@ function wrapProcessorExpressionForIf(expr: string): string {
 	if (expr.startswith("!")) {
 		local temp = expr[1:].lstrip();
 		if (temp.startswith("defined")) {
-			temp = expr[7:].lstrip();
+			temp = temp[7:].lstrip();
 			if (temp.startswith("(") && temp.endswith(")") &&
 				temp.findmatch("(", ")", 1) == #temp - 1)
 				return "#ifndef " + temp[1:-1].strip();
@@ -563,6 +563,10 @@ function optimizeAndWrapProcessorExpressionForIf(expr: string): string {
 			expr));
 }
 
+assert optimizePreprocessorExpression("!(!bar && foo)") == "bar || !foo";
+assert optimizePreprocessorExpression("!(foo && !bar)") == "!foo || bar";
+assert optimizePreprocessorExpression("!(!defined(bar) && defined(foo))") == "defined(bar) || !defined(foo)";
+assert optimizePreprocessorExpression("!(defined(foo) && !defined(bar))") == "!defined(foo) || defined(bar)";
 assert optimizePreprocessorExpression("") == "1";
 assert optimizePreprocessorExpression("(foo)") == "foo";
 assert optimizePreprocessorExpression("(defined(foo) || defined(bar))") == "defined(foo) || defined(bar)";

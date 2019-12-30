@@ -947,7 +947,6 @@
 #define __UINTPTR_HALF_TYPE__ __UINT32_TYPE__
 #endif
 
-
 #ifndef __SSIZE_TYPE__
 #define __SSIZE_TYPE__   __ATTR_W64 __TYPEFOR_INTIB(__SIZEOF_SIZE_T__)
 #endif /* !__SSIZE_TYPE__ */
@@ -1106,6 +1105,39 @@
 #define __REGISTER_TYPE__    __ULONGPTR_TYPE__
 #define __SREGISTER_TYPE__   __LONGPTR_TYPE__
 #endif /* !__SIZEOF_REGISTER__ */
+
+#ifdef __UINT128_TYPE__
+#ifndef __ALIGNOF_INT128__
+#define __ALIGNOF_INT128__ 16
+#endif /* !__ALIGNOF_INT128__ */
+#endif /* __UINT128_TYPE__ */
+
+#ifdef __UINT64_TYPE__
+#ifndef __ALIGNOF_INT64__
+#if !defined(_MSC_VER) && !defined(__INTELLISENSE__)
+#include "host.h"
+#if defined(__i386__) && !defined(__x86_64__)
+/* GCC (and I think SysV) says that 64-bit integers on i386 are aligned by 4 bytes. */
+#define __ALIGNOF_INT64__ 4
+#endif /* __i386__ && !__x86_64__ */
+#endif /* __GNUC__ && !__INTELLISENSE__ */
+#ifndef __ALIGNOF_INT64__
+#define __ALIGNOF_INT64__ 8
+#endif /* !__ALIGNOF_INT64__ */
+#endif /* !__ALIGNOF_INT64__ */
+#endif /* __UINT64_TYPE__ */
+
+#ifndef __ALIGNOF_INT32__
+#define __ALIGNOF_INT32__ 4
+#endif /* !__ALIGNOF_INT32__ */
+
+#ifndef __ALIGNOF_INT16__
+#if defined(__COMPILER_HAVE_DOUBLE_WIDE_REGISTERS) && __SIZEOF_REGISTER__ < 2
+#define __ALIGNOF_INT16__ __SIZEOF_REGISTER__
+#else /* __SIZEOF_REGISTER__ < 2 */
+#define __ALIGNOF_INT16__ 2
+#endif /* __SIZEOF_REGISTER__ >= 2 */
+#endif /* !__ALIGNOF_INT16__ */
 
 
 #if (defined(_NATIVE_CHAR16_T_DEFINED) ||                                                                               \

@@ -23,40 +23,65 @@
 
 #include <hybrid/typecore.h>
 
-#ifdef __x86_64__
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef timebx64
+#pragma push_macro("timebx64")
+#define __PRIVATE_DID_PUSH_TIMEBX64
+#endif /* timebx64 */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+/*[[[autogen:wrap3264_x64(
+	linkIf:   "defined(__x86_64__)",
+	name:     "timeb",
+	name64:   "timebx64",
+	name32If: "defined(__USE_KOS)",
+	name64If: "defined(__USE_TIME64)",
+)]]]*/
+#undef timebx64
+#ifndef __x86_64__
+#define timebx64 __timebx64
+#else /* !__x86_64__ */
 #include <features.h>
 #define __OFFSET_TIMEB_TIME       __OFFSET_TIMEBX64_TIME
 #define __OFFSET_TIMEB_MILLITM    __OFFSET_TIMEBX64_MILLITM
 #define __OFFSET_TIMEB_TIMEZONE   __OFFSET_TIMEBX64_TIMEZONE
 #define __OFFSET_TIMEB_DSTFLAG    __OFFSET_TIMEBX64_DSTFLAG
 #define __SIZEOF_TIMEB            __SIZEOF_TIMEBX64
+#define __ALIGNOF_TIMEB           __ALIGNOF_TIMEBX64
+#define __OFFSET_TIMEB32_TIME     __OFFSET_TIMEBX64_TIME
+#define __OFFSET_TIMEB32_MILLITM  __OFFSET_TIMEBX64_MILLITM
+#define __OFFSET_TIMEB32_TIMEZONE __OFFSET_TIMEBX64_TIMEZONE
+#define __OFFSET_TIMEB32_DSTFLAG  __OFFSET_TIMEBX64_DSTFLAG
+#define __SIZEOF_TIMEB32          __SIZEOF_TIMEBX64
+#define __ALIGNOF_TIMEB32         __ALIGNOF_TIMEBX64
 #define __OFFSET_TIMEB64_TIME     __OFFSET_TIMEBX64_TIME
 #define __OFFSET_TIMEB64_MILLITM  __OFFSET_TIMEBX64_MILLITM
 #define __OFFSET_TIMEB64_TIMEZONE __OFFSET_TIMEBX64_TIMEZONE
 #define __OFFSET_TIMEB64_DSTFLAG  __OFFSET_TIMEBX64_DSTFLAG
 #define __SIZEOF_TIMEB64          __SIZEOF_TIMEBX64
-
-#define timebx64              timeb
-#define __timebx64            timeb
-#define __timeb32             timeb
-#define __timeb64             timeb
-#define __timeb_alt           timeb
+#define __ALIGNOF_TIMEB64         __ALIGNOF_TIMEBX64
+#define timebx64                  timeb
+#define __timebx64                timeb
+#define __timeb32                 timeb
+#define __timeb64                 timeb
+#define __timeb_alt               timeb
+#define _TIMEB_MATCHES_TIMEB64 1
 #ifdef __USE_KOS
-#define timeb32               timeb
+#define timeb32 timeb
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
-#define timeb64               timeb
+#define timeb64 timeb
 #endif /* __USE_TIME64 */
 #define __timeb_defined 1
-#else /* __x86_64__ */
-#define timebx64              __timebx64
-#endif /* !__x86_64__ */
+#endif /* __x86_64__ */
+/*[[[end]]]*/
 
 #define __OFFSET_TIMEBX64_TIME     0
 #define __OFFSET_TIMEBX64_MILLITM  8
 #define __OFFSET_TIMEBX64_TIMEZONE 10
 #define __OFFSET_TIMEBX64_DSTFLAG  12
 #define __SIZEOF_TIMEBX64          16
+#define __ALIGNOF_TIMEBX64         __ALIGNOF_INT64__
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -94,5 +119,12 @@ __DECL_END
 #ifndef __USE_KOS
 #undef timebx64
 #endif /* !__USE_KOS */
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef __PRIVATE_DID_PUSH_TIMEBX64
+#undef __PRIVATE_DID_PUSH_TIMEBX64
+#pragma pop_macro("timebx64")
+#endif /* __PRIVATE_DID_PUSH_TIMEBX64 */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #endif /* !_I386_KOS_BITS_TIMEB64_H */

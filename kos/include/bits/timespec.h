@@ -43,12 +43,6 @@
 #define __SIZEOF_TIMESPEC64       16
 
 
-#if 0
-struct timespec /*[PREFIX(tv_)]*/ {};
-struct timespec64 /*[PREFIX(tv_)]*/ {};
-#endif
-
-
 #ifdef __CC__
 __SYSDECL_BEGIN
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -59,6 +53,12 @@ __SYSDECL_BEGIN
 #undef timespec
 #undef tv_sec
 #undef tv_nsec
+
+#if 0 /* For assert_types.c */
+struct timespec /*[PREFIX(tv_)]*/ {};
+struct timespec32 /*[PREFIX(tv_)]*/ {};
+struct timespec64 /*[PREFIX(tv_)]*/ {};
+#endif
 
 __TIMESPEC_CXX_DECL_BEGIN
 struct timespec {

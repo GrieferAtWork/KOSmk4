@@ -30,7 +30,8 @@ __SYSDECL_BEGIN
 #ifdef __x86_64__
 #ifndef __sigval_t_defined
 #define __sigval_t_defined 1
-#define __SIZEOF_SIGVAL __SIZEOF_SIGVAL64
+#define __SIZEOF_SIGVAL  __SIZEOF_SIGVAL64
+#define __ALIGNOF_SIGVAL __ALIGNOF_SIGVAL64
 #define __sigval_defined 1
 #define sigval64        sigval
 #define sigval64_t      sigval_t
@@ -39,6 +40,7 @@ __SYSDECL_BEGIN
 
 
 #define __SIZEOF_SIGVAL64 8
+#define __ALIGNOF_SIGVAL64 __ALIGNOF_INT64__
 #ifdef __CC__
 /* Type for data associated with a signal. */
 typedef union sigval64 /*[PREFIX(sival_)]*/ {

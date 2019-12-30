@@ -169,7 +169,7 @@ class __intellisense_int128;
 class __intellisense_uint128;
 template<> struct ____INTELLISENSE_issigned<__intellisense_int128> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isunsigned<__intellisense_uint128> { enum { __value = true }; };
-class __intellisense_int128 {
+class __attribute__((__aligned__(16))) __intellisense_int128 {
 private:
 	signed char __data[__SIZEOF_INT128__];
 public:
@@ -261,7 +261,7 @@ public:
 #endif /* _WCHAR_T_DEFINED || __GNUC__ */
 };
 
-class __intellisense_uint128 {
+class __attribute__((__aligned__(16))) __intellisense_uint128 {
 private:
 	unsigned char __data[__SIZEOF_INT128__];
 public:

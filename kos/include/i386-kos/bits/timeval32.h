@@ -21,20 +21,42 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 #include <bits/timeval-cxx-support.h>
 
-#ifdef __x86_64__
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef timevalx32
+#pragma push_macro("timevalx32")
+#define __PRIVATE_DID_PUSH_TIMEVALX32
+#endif /* timevalx32 */
+#ifdef timevalx32_64
+#pragma push_macro("timevalx32_64")
+#define __PRIVATE_DID_PUSH_TIMEVALX32_64
+#endif /* timevalx32_64 */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+ /*[[[autogen:wrap3264_x32_and_x32_64(
+	linkIf:   "defined(__i386__) && !defined(__x86_64__)",
+	name:     "timeval",
+	name32:   "timevalx32",
+	name64:   "timevalx32_64",
+	name32If: "defined(__USE_KOS)",
+	name64If: "defined(__USE_TIME64)",
+	link64If: "defined(__USE_TIME_BITS64)",
+)]]]*/
+#undef timevalx32
+#undef timevalx32_64
+#if !defined(__i386__) || defined(__x86_64__)
 #define timevalx32    __timevalx32
 #define timevalx32_64 __timevalx32_64
-#else /* __x86_64__ */
+#else /* !__i386__ || __x86_64__ */
 #include <features.h>
 #ifdef __USE_TIME_BITS64
 /* Configure:
  *   - `timevalx32_64' as `timeval'
  *   - `timevalx32' as `__timeval32' */
-
 #define timevalx32      __timeval32
 #define timevalx32_64   timeval
 #define __timevalx32    __timeval32
@@ -43,26 +65,27 @@
 #define __timeval64     timeval
 #define __timeval_alt   __timeval32
 #ifdef __USE_KOS
-#define timeval32       __timeval32
+#define timeval32 __timeval32
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
-#define timeval64       timeval
+#define timeval64 timeval
 #endif /* __USE_TIME64 */
 
-#define __OFFSET_TIMEVAL_SEC    __OFFSET_TIMEVALX32_64_SEC
-#define __OFFSET_TIMEVAL_USEC   __OFFSET_TIMEVALX32_64_USEC
-#define __SIZEOF_TIMEVAL        __SIZEOF_TIMEVALX32_64
-#define __OFFSET_TIMEVAL64_SEC  __OFFSET_TIMEVALX32_64_SEC
-#define __OFFSET_TIMEVAL64_USEC __OFFSET_TIMEVALX32_64_USEC
-#define __SIZEOF_TIMEVAL64      __SIZEOF_TIMEVALX32_64
+#define __OFFSET_TIMEVAL_SEC  __OFFSET_TIMEVALX32_64_SEC
+#define __OFFSET_TIMEVAL_USEC __OFFSET_TIMEVALX32_64_USEC
+#define __SIZEOF_TIMEVAL      __SIZEOF_TIMEVALX32_64
+#define __ALIGNOF_TIMEVAL     __ALIGNOF_TIMEVALX32_64
 
 #else /* __USE_TIME_BITS64 */
 /* Configure:
  *   - `timevalx32_64' as `timeval64' or `__timeval64'
  *   - `timevalx32' as `timeval' */
-#define timevalx32      timeval
-#define __timeval32     timeval
-#define __timevalx32    timeval
+#define timevalx32   timeval
+#define __timeval32  timeval
+#define __timevalx32 timeval
+#ifdef __USE_KOS
+#define timeval32 timeval
+#endif /* __USE_KOS */
 #ifdef __USE_TIME64
 #define __timevalx32_64 timeval64
 #define timevalx32_64   timeval64
@@ -73,29 +96,37 @@
 #define timevalx32_64   __timeval64
 #define __timeval64     __timeval64
 #define __timeval_alt   __timeval64
-#endif /* __USE_TIME64 */
-#ifdef __USE_KOS
-#define timeval32       timeval
-#endif /* __USE_KOS */
+#endif /* !__USE_TIME64 */
 
-#define __OFFSET_TIMEVAL_SEC    __OFFSET_TIMEVALX32_SEC
-#define __OFFSET_TIMEVAL_USEC   __OFFSET_TIMEVALX32_USEC
-#define __SIZEOF_TIMEVAL        __SIZEOF_TIMEVALX32
+#define __OFFSET_TIMEVAL_SEC  __OFFSET_TIMEVALX32_SEC
+#define __OFFSET_TIMEVAL_USEC __OFFSET_TIMEVALX32_USEC
+#define __SIZEOF_TIMEVAL      __SIZEOF_TIMEVALX32
+#define __ALIGNOF_TIMEVAL     __ALIGNOF_TIMEVALX32
+
+#endif /* !__USE_TIME_BITS64 */
+
+#define __OFFSET_TIMEVAL32_SEC  __OFFSET_TIMEVALX32_SEC
+#define __OFFSET_TIMEVAL32_USEC __OFFSET_TIMEVALX32_USEC
+#define __SIZEOF_TIMEVAL32      __SIZEOF_TIMEVALX32
+#define __ALIGNOF_TIMEVAL32     __ALIGNOF_TIMEVALX32
 #define __OFFSET_TIMEVAL64_SEC  __OFFSET_TIMEVALX32_64_SEC
 #define __OFFSET_TIMEVAL64_USEC __OFFSET_TIMEVALX32_64_USEC
 #define __SIZEOF_TIMEVAL64      __SIZEOF_TIMEVALX32_64
+#define __ALIGNOF_TIMEVAL64     __ALIGNOF_TIMEVALX32_64
 
-#endif /* !__USE_TIME_BITS64 */
-#define __timeval_defined 1
-#endif /* !__x86_64__ */
+#define __itimerspec_defined 1
+#endif /* __i386__ && !__x86_64__*/
+/*[[[end]]]*/
 
 
 #define __OFFSET_TIMEVALX32_SEC      0
 #define __OFFSET_TIMEVALX32_USEC     4
 #define __SIZEOF_TIMEVALX32          8
+#define __ALIGNOF_TIMEVALX32         __ALIGNOF_INT32__
 #define __OFFSET_TIMEVALX32_64_SEC   0
 #define __OFFSET_TIMEVALX32_64_USEC  8
 #define __SIZEOF_TIMEVALX32_64       16
+#define __ALIGNOF_TIMEVALX32_64      __ALIGNOF_INT64__
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -126,5 +157,16 @@ __DECL_END
 #undef timevalx32
 #undef timevalx32_64
 #endif /* !__USE_KOS */
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#ifdef __PRIVATE_DID_PUSH_TIMEVALX32_64
+#undef __PRIVATE_DID_PUSH_TIMEVALX32_64
+#pragma pop_macro("timevalx32_64")
+#endif /* __PRIVATE_DID_PUSH_TIMEVALX32_64 */
+#ifdef __PRIVATE_DID_PUSH_TIMEVALX32
+#undef __PRIVATE_DID_PUSH_TIMEVALX32
+#pragma pop_macro("timevalx32")
+#endif /* __PRIVATE_DID_PUSH_TIMEVALX32 */
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #endif /* !_I386_KOS_BITS_TIMEVAL32_H */

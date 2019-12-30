@@ -49,6 +49,13 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
+/* TODO: `struct rusage64' (based on __USE_TIME_BITS64) */
+//#if 0 /* For assert_types.c */
+//struct rusage /*[PREFIX(ru_)]*/ {};
+//struct rusage32 /*[PREFIX(ru_)]*/ {};
+//struct rusage64 /*[PREFIX(ru_)]*/ {};
+//#endif
+
 #ifndef __rusage_defined
 #define __rusage_defined 1
 struct rusage {

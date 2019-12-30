@@ -148,6 +148,28 @@
 			"workingDirectory": "${fileDirname}",
 			"command": "deemon",
 			"args": [ "${workspaceRoot}\\misc\\libgen\\autoenum.dee", "${file}" ]
+		},
+
+		{
+			"taskName": "autogen",
+			"appliesTo": "*.h",
+			"type": "launch",
+			"contextType": "custom",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${fileDirname}",
+			"command": "deemon",
+			"args": [ "${workspaceRoot}\\misc\\libgen\\autogen.dee", "${file}" ]
+		},
+
+		{
+			"taskName": "autogen",
+			"appliesTo": "*.c",
+			"type": "launch",
+			"contextType": "custom",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${fileDirname}",
+			"command": "deemon",
+			"args": [ "${workspaceRoot}\\misc\\libgen\\autogen.dee", "${file}" ]
 		}
 	]
 }

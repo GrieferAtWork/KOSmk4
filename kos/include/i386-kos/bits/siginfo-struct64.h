@@ -109,11 +109,11 @@ typedef struct __siginfo64_struct /*[NAME(siginfo64)][PREFIX(si_)]*/ {
 	__INT32_TYPE__ __si_pad;   /* ... */
 #if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
 	defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C)
+#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
 	union {
-#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C */
+#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */
 	union {
-		__INT64_TYPE__ _si_data[(__SI64_MAX_SIZE / 8) - 4];
+		__INT64_TYPE__ _si_data[(__SI64_MAX_SIZE - 16) / 8];
 		struct { /* kill(). */
 			__UINT32_TYPE__  si_pid; /* Sending process ID. */
 			__UINT32_TYPE__  si_uid; /* Real user ID of sending process. */
@@ -159,9 +159,9 @@ typedef struct __siginfo64_struct /*[NAME(siginfo64)][PREFIX(si_)]*/ {
 #endif /* Transparent struct/union */
 #if !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) || \
 	!defined(__COMPILER_HAVE_TRANSPARENT_UNION) || \
-	!defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C)
+	!defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
 	union {
-		__INT64_TYPE__ _data[(__SI64_MAX_SIZE / 8) - 4];
+		__INT64_TYPE__ _data[(__SI64_MAX_SIZE - 16) / 8];
 		struct { /* kill(). */
 			__INT32_TYPE__  _si_pid; /* Sending process ID. */
 			__UINT32_TYPE__ _si_uid; /* Real user ID of sending process. */
@@ -205,9 +205,9 @@ typedef struct __siginfo64_struct /*[NAME(siginfo64)][PREFIX(si_)]*/ {
 #endif /* ... */
 #if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
 	defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C)
+#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
 	};
-#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C */
+#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */
 #else
 #define _si_data        _sifields._data
 #define __sig_si_pid    _sifields._rt._si_pid
@@ -237,7 +237,6 @@ typedef struct __siginfo64_struct /*[NAME(siginfo64)][PREFIX(si_)]*/ {
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 } siginfo64_t;
 #endif /* __CC__ */
-
 
 __SYSDECL_END
 

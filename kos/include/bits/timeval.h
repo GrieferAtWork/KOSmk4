@@ -39,13 +39,6 @@
 #define __OFFSET_TIMEVAL64_USEC  8
 #define __SIZEOF_TIMEVAL64       16
 
-
-#if 0
-struct timeval /*[PREFIX(tv_)]*/ {};
-struct timeval64 /*[PREFIX(tv_)]*/ {};
-#endif
-
-
 #ifdef __CC__
 __SYSDECL_BEGIN
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -56,6 +49,12 @@ __SYSDECL_BEGIN
 #undef timeval
 #undef tv_sec
 #undef tv_usec
+
+#if 0 /* For assert_types.c */
+struct timeval /*[PREFIX(tv_)]*/ {};
+struct timeval32 /*[PREFIX(tv_)]*/ {};
+struct timeval64 /*[PREFIX(tv_)]*/ {};
+#endif
 
 __TIMEVAL_CXX_DECL_BEGIN
 struct timeval {
