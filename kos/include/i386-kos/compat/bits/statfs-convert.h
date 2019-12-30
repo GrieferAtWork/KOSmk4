@@ -16,15 +16,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_COMPAT_BITS_RUSAGE_STRUCT_H
-#define _I386_KOS_COMPAT_BITS_RUSAGE_STRUCT_H 1
+#ifndef _I386_KOS_COMPAT_BITS_STATFS_CONVERT_H
+#define _I386_KOS_COMPAT_BITS_STATFS_CONVERT_H 1
 
-#include <hybrid/host.h>
-
+#include <hybrid/host.h> /* __x86_64__ */
 #ifdef __x86_64__
-#include <bits/rusage-struct32.h>
-#define compat_rusage32 __rusagex32
-#define compat_rusage64 __rusagex32_64
-#endif /* __x86_64__ */
+#include <bits/statfs-convert.h>
+#define compat_statfs32_to_statfs   statfsx32_to_statfs32
+#define compat_statfs64_to_statfs   statfsx32_64_to_statfs32
+#define compat_statfs32_to_statfs32 statfsx32_to_statfs32
+#define compat_statfs64_to_statfs32 statfsx32_64_to_statfs32
+#define compat_statfs32_to_statfs64 statfsx32_to_statfs64
+#define compat_statfs64_to_statfs64 statfsx32_64_to_statfs64
+#define statfs_to_compat_statfs32   statfs32_to_statfsx32
+#define statfs_to_compat_statfs64   statfs32_to_statfsx32_64
+#define statfs32_to_compat_statfs32 statfs32_to_statfsx32
+#define statfs32_to_compat_statfs64 statfs32_to_statfsx32_64
+#define statfs64_to_compat_statfs32 statfs64_to_statfsx32
+#define statfs64_to_compat_statfs64 statfs64_to_statfsx32_64
 
-#endif /* !_I386_KOS_COMPAT_BITS_RUSAGE_STRUCT_H */
+#endif /* !__x86_64__ */
+
+#endif /* !_I386_KOS_COMPAT_BITS_STATFS_CONVERT_H */

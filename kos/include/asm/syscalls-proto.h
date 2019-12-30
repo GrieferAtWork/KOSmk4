@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcd5aba1 */
+/* HASH CRC-32:0x704439ca */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1347,9 +1347,9 @@
 #define __NRAT2_linux_newfstatat       (struct linux64_stat32 *, struct linux64_stat32 *)
 #define __NRAT3_linux_newfstatat       (atflag_t, __atflag_t)
 #define __NRAT0_fstatfs                (fd_t, __fd_t)
-#define __NRAT1_fstatfs                (struct __statfs32 *, struct __statfs32 *)
+#define __NRAT1_fstatfs                (struct statfs *, struct statfs *)
 #define __NRAT0_statfs                 (char const *, char const *)
-#define __NRAT1_statfs                 (struct __statfs32 *, struct __statfs32 *)
+#define __NRAT1_statfs                 (struct statfs *, struct statfs *)
 #define __NRAT0_lseek                  (fd_t, __fd_t)
 #define __NRAT1_lseek                  (syscall_slong_t, __syscall_slong_t)
 #define __NRAT2_lseek                  (syscall_ulong_t, __syscall_ulong_t)
@@ -1698,8 +1698,8 @@
 #define __NRAM_fcntl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__syscall_ulong_t)b, (void *)c
 #define __NRAM_fadvise64(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (int)a
 #define __NRAM_linux_newfstatat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)       (__fd_t)a, (char const *)b, (struct linux64_stat32 *)c, (__atflag_t)d
-#define __NRAM_fstatfs(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__fd_t)a, (struct __statfs32 *)b
-#define __NRAM_statfs(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (char const *)a, (struct __statfs32 *)b
+#define __NRAM_fstatfs(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__fd_t)a, (struct statfs *)b
+#define __NRAM_statfs(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (char const *)a, (struct statfs *)b
 #define __NRAM_lseek(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__syscall_slong_t)b, (__syscall_ulong_t)c
 #define __NRAM_mmap(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__fd_t)e, (__syscall_ulong_t)f
 #define __NRAM_alarm(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__syscall_ulong_t)a

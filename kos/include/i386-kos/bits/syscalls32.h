@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25dfcbab */
+/* HASH CRC-32:0xb2a244f2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,8 +142,8 @@
 #define SYS_getpriority             __NR_getpriority             /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 #define SYS_setpriority             __NR_setpriority             /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 #define SYS_profil                  __NR_profil                  /* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
-#define SYS_statfs                  __NR_statfs                  /* errno_t statfs(char const *file, struct __statfs32 *buf) */
-#define SYS_fstatfs                 __NR_fstatfs                 /* errno_t fstatfs(fd_t file, struct __statfs32 *buf) */
+#define SYS_statfs                  __NR_statfs                  /* errno_t statfs(char const *file, struct __statfsx32 *buf) */
+#define SYS_fstatfs                 __NR_fstatfs                 /* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
 #define SYS_ioperm                  __NR_ioperm                  /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
 #define SYS_socketcall              __NR_socketcall              /* errno_t socketcall(int call, unsigned long *args) */
 #define SYS_syslog                  __NR_syslog                  /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
@@ -321,8 +321,8 @@
 #define SYS_clock_gettime           __NR_clock_gettime           /* errno_t clock_gettime(clockid_t clock_id, struct __timespecx32 *tp) */
 #define SYS_clock_getres            __NR_clock_getres            /* errno_t clock_getres(clockid_t clock_id, struct __timespecx32 *res) */
 #define SYS_clock_nanosleep         __NR_clock_nanosleep         /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32 const *requested_time, struct __timespecx32 *remaining) */
-#define SYS_statfs64                __NR_statfs64                /* errno_t statfs64(char const *file, struct statfs64 *buf) */
-#define SYS_fstatfs64               __NR_fstatfs64               /* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
+#define SYS_statfs64                __NR_statfs64                /* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
+#define SYS_fstatfs64               __NR_fstatfs64               /* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
 #define SYS_tgkill                  __NR_tgkill                  /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
 #define SYS_utimes                  __NR_utimes                  /* errno_t utimes(char const *filename, struct __timevalx32 const[2] times) */
 #define SYS_fadvise64_64            __NR_fadvise64_64            /* errno_t fadvise64_64(int TODO_PROTOTYPE) */

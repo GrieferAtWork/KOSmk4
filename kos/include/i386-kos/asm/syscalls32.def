@@ -84,6 +84,10 @@ setfsuid = setfsuid16;
 setfsgid = setfsgid16;
 
 /* Configure binding of multi-arch types in system calls. */
+statfs = statfsx32;
+statfs64 = statfsx32_64;
+fstatfs = fstatfsx32;
+fstatfs64 = fstatfsx32_64;
 execve = execvex32;
 execveat = execveatx32;
 maplibrary = maplibraryx32;

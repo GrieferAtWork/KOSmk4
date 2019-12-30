@@ -20,12 +20,12 @@
 #define _I386_KOS_BITS_STATFS64_H 1
 
 #include <__stdinc.h>
-#include <features.h>
 
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
+
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef statfsx64

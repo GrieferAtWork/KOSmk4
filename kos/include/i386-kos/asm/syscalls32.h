@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5920f13 */
+/* HASH CRC-32:0xb3f7c538 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -139,8 +139,8 @@
 #define __NR_getpriority             0x60                   /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 #define __NR_setpriority             0x61                   /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 #define __NR_profil                  0x62                   /* errno_t profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) */
-#define __NR_statfs                  0x63                   /* errno_t statfs(char const *file, struct __statfs32 *buf) */
-#define __NR_fstatfs                 0x64                   /* errno_t fstatfs(fd_t file, struct __statfs32 *buf) */
+#define __NR_statfs                  0x63                   /* errno_t statfs(char const *file, struct __statfsx32 *buf) */
+#define __NR_fstatfs                 0x64                   /* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
 #define __NR_ioperm                  0x65                   /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
 #define __NR_socketcall              0x66                   /* errno_t socketcall(int call, unsigned long *args) */
 #define __NR_syslog                  0x67                   /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
@@ -318,8 +318,8 @@
 #define __NR_clock_gettime           0x109                  /* errno_t clock_gettime(clockid_t clock_id, struct __timespecx32 *tp) */
 #define __NR_clock_getres            0x10a                  /* errno_t clock_getres(clockid_t clock_id, struct __timespecx32 *res) */
 #define __NR_clock_nanosleep         0x10b                  /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32 const *requested_time, struct __timespecx32 *remaining) */
-#define __NR_statfs64                0x10c                  /* errno_t statfs64(char const *file, struct statfs64 *buf) */
-#define __NR_fstatfs64               0x10d                  /* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
+#define __NR_statfs64                0x10c                  /* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
+#define __NR_fstatfs64               0x10d                  /* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
 #define __NR_tgkill                  0x10e                  /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
 #define __NR_utimes                  0x10f                  /* errno_t utimes(char const *filename, struct __timevalx32 const[2] times) */
 #define __NR_fadvise64_64            0x110                  /* errno_t fadvise64_64(int TODO_PROTOTYPE) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63d81300 */
+/* HASH CRC-32:0x36a45dbe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 #include <bits/sigaction-struct64.h>
 #include <bits/siginfo-struct64.h>
 #include <bits/stat-kos64.h>
-#include <bits/statfs.h>
+#include <bits/statfs64.h>
 #include <bits/timespec64.h>
 #include <bits/timeval64.h>
 #include <bits/types.h>
@@ -90,7 +90,7 @@ struct __kos_statx64;
 struct __rusagex64;
 struct __siginfo64_struct;
 struct __sigset_struct;
-struct __statfs32;
+struct __statfsx64;
 struct __timespecx64;
 struct __timevalx64;
 struct debugtrap_reason64;
@@ -504,7 +504,7 @@ __CDECLARE_SC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const 
 __CDECLARE_SC(,__uint64_t,fsmode,(__uint64_t __mode),(__mode))
 #endif /* __CRT_HAVE_SC(fsmode) */
 #if __CRT_HAVE_SC(fstatfs)
-__CDECLARE_SC(,__errno_t,fstatfs,(__fd_t __file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_SC(,__errno_t,fstatfs,(__fd_t __file, struct __statfsx64 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(fstatfs) */
 #if __CRT_HAVE_SC(fsymlinkat)
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -1396,7 +1396,7 @@ __CDECLARE_SC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulong
 __CDECLARE_SC(,__ssize_t,splice,(__fd_t __fdin, __uint64_t *__offin, __fd_t __fdout, __uint64_t *__offout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
 #endif /* __CRT_HAVE_SC(splice) */
 #if __CRT_HAVE_SC(statfs)
-__CDECLARE_SC(,__errno_t,statfs,(char const *__file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_SC(,__errno_t,statfs,(char const *__file, struct __statfsx64 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(statfs) */
 #if __CRT_HAVE_SC(swapoff)
 __CDECLARE_SC(,__errno_t,swapoff,(char const *__pathname),(__pathname))
@@ -1925,7 +1925,7 @@ __CDECLARE_XSC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const
 __CDECLARE_XSC(,__uint64_t,fsmode,(__uint64_t __mode),(__mode))
 #endif /* __CRT_HAVE_XSC(fsmode) */
 #if __CRT_HAVE_XSC(fstatfs)
-__CDECLARE_XSC(,__errno_t,fstatfs,(__fd_t __file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_XSC(,__errno_t,fstatfs,(__fd_t __file, struct __statfsx64 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(fstatfs) */
 #if __CRT_HAVE_XSC(fsymlinkat)
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -2814,7 +2814,7 @@ __CDECLARE_XSC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulon
 __CDECLARE_XSC(,__ssize_t,splice,(__fd_t __fdin, __uint64_t *__offin, __fd_t __fdout, __uint64_t *__offout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
 #endif /* __CRT_HAVE_XSC(splice) */
 #if __CRT_HAVE_XSC(statfs)
-__CDECLARE_XSC(,__errno_t,statfs,(char const *__file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_XSC(,__errno_t,statfs,(char const *__file, struct __statfsx64 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(statfs) */
 #if __CRT_HAVE_XSC(swapoff)
 __CDECLARE_XSC(,__errno_t,swapoff,(char const *__pathname),(__pathname))

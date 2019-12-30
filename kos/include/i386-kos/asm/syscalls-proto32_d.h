@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x861aa4d3 */
+/* HASH CRC-32:0xbba4e0d1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1117,9 +1117,9 @@
 #define __NR32AT2_profil                  (size_t, __size_t)
 #define __NR32AT3_profil                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_statfs                  (char const *, char const *)
-#define __NR32AT1_statfs                  (struct __statfs32 *, struct __statfs32 *)
+#define __NR32AT1_statfs                  (struct __statfsx32 *, struct __statfsx32 *)
 #define __NR32AT0_fstatfs                 (fd_t, __fd_t)
-#define __NR32AT1_fstatfs                 (struct __statfs32 *, struct __statfs32 *)
+#define __NR32AT1_fstatfs                 (struct __statfsx32 *, struct __statfsx32 *)
 #define __NR32AT0_ioperm                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_ioperm                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_ioperm                  (syscall_ulong_t, __syscall_ulong_t)
@@ -1471,9 +1471,9 @@
 #define __NR32AT2_clock_nanosleep         (struct __timespecx32 const *, struct __timespecx32 const *)
 #define __NR32AT3_clock_nanosleep         (struct __timespecx32 *, struct __timespecx32 *)
 #define __NR32AT0_statfs64                (char const *, char const *)
-#define __NR32AT1_statfs64                (struct statfs64 *, struct statfs64 *)
+#define __NR32AT1_statfs64                (struct __statfsx32_64 *, struct __statfsx32_64 *)
 #define __NR32AT0_fstatfs64               (fd_t, __fd_t)
-#define __NR32AT1_fstatfs64               (struct statfs64 *, struct statfs64 *)
+#define __NR32AT1_fstatfs64               (struct __statfsx32_64 *, struct __statfsx32_64 *)
 #define __NR32AT0_tgkill                  (pid_t, __pid_t)
 #define __NR32AT1_tgkill                  (pid_t, __pid_t)
 #define __NR32AT2_tgkill                  (syscall_ulong_t, __syscall_ulong_t)
@@ -2144,8 +2144,8 @@
 #define __NR32AM_getpriority(a, b, c, d, e, f)             (__syscall_ulong_t)a, (__id_t)b
 #define __NR32AM_setpriority(a, b, c, d, e, f)             (__syscall_ulong_t)a, (__id_t)b, (__syscall_ulong_t)c
 #define __NR32AM_profil(a, b, c, d, e, f)                  (__uint16_t *)a, (__size_t)b, (__size_t)c, (__syscall_ulong_t)d
-#define __NR32AM_statfs(a, b, c, d, e, f)                  (char const *)a, (struct __statfs32 *)b
-#define __NR32AM_fstatfs(a, b, c, d, e, f)                 (__fd_t)a, (struct __statfs32 *)b
+#define __NR32AM_statfs(a, b, c, d, e, f)                  (char const *)a, (struct __statfsx32 *)b
+#define __NR32AM_fstatfs(a, b, c, d, e, f)                 (__fd_t)a, (struct __statfsx32 *)b
 #define __NR32AM_ioperm(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AM_socketcall(a, b, c, d, e, f)              (int)a, (unsigned long *)b
 #define __NR32AM_syslog(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (char const *)b, (__size_t)c
@@ -2310,8 +2310,8 @@
 #define __NR32AM_clock_gettime(a, b, c, d, e, f)           (__clockid_t)a, (struct __timespecx32 *)b
 #define __NR32AM_clock_getres(a, b, c, d, e, f)            (__clockid_t)a, (struct __timespecx32 *)b
 #define __NR32AM_clock_nanosleep(a, b, c, d, e, f)         (__clockid_t)a, (__syscall_ulong_t)b, (struct __timespecx32 const *)c, (struct __timespecx32 *)d
-#define __NR32AM_statfs64(a, b, c, d, e, f)                (char const *)a, (struct statfs64 *)b
-#define __NR32AM_fstatfs64(a, b, c, d, e, f)               (__fd_t)a, (struct statfs64 *)b
+#define __NR32AM_statfs64(a, b, c, d, e, f)                (char const *)a, (struct __statfsx32_64 *)b
+#define __NR32AM_fstatfs64(a, b, c, d, e, f)               (__fd_t)a, (struct __statfsx32_64 *)b
 #define __NR32AM_tgkill(a, b, c, d, e, f)                  (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c
 #define __NR32AM_utimes(a, b, c, d, e, f)                  (char const *)a, (struct __timevalx32 const *)b
 #define __NR32AM_fadvise64_64(a, b, c, d, e, f)            (int)a

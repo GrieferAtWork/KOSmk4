@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff15d7f7 */
+/* HASH CRC-32:0x8a085349 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2125,7 +2125,7 @@ INTERN_FUNCTION(libc_sys_Xprofil)
 END(libc_sys_Xprofil)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xprofil, libc_sys_Xprofil)
 
-/* errno_t statfs(char const *file, struct __statfs32 *buf) */
+/* errno_t statfs(char const *file, struct __statfsx32 *buf) */
 .section .text.crt.syscall.statfs
 INTERN_FUNCTION(libc_sys_statfs)
 	movl   $(0x63), %eax
@@ -2133,7 +2133,7 @@ INTERN_FUNCTION(libc_sys_statfs)
 END(libc_sys_statfs)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_statfs, libc_sys_statfs)
 
-/* errno_t statfs(char const *file, struct __statfs32 *buf) */
+/* errno_t statfs(char const *file, struct __statfsx32 *buf) */
 .section .text.crt.syscall.Xstatfs
 INTERN_FUNCTION(libc_sys_Xstatfs)
 	movl   $(0x63), %eax
@@ -2141,7 +2141,7 @@ INTERN_FUNCTION(libc_sys_Xstatfs)
 END(libc_sys_Xstatfs)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xstatfs, libc_sys_Xstatfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfs32 *buf) */
+/* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
 .section .text.crt.syscall.fstatfs
 INTERN_FUNCTION(libc_sys_fstatfs)
 	movl   $(0x64), %eax
@@ -2149,7 +2149,7 @@ INTERN_FUNCTION(libc_sys_fstatfs)
 END(libc_sys_fstatfs)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fstatfs, libc_sys_fstatfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfs32 *buf) */
+/* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
 .section .text.crt.syscall.Xfstatfs
 INTERN_FUNCTION(libc_sys_Xfstatfs)
 	movl   $(0x64), %eax
@@ -4785,7 +4785,7 @@ INTERN_FUNCTION(libc_sys_Xclock_nanosleep)
 END(libc_sys_Xclock_nanosleep)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xclock_nanosleep, libc_sys_Xclock_nanosleep)
 
-/* errno_t statfs64(char const *file, struct statfs64 *buf) */
+/* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
 .section .text.crt.syscall.statfs64
 INTERN_FUNCTION(libc_sys_statfs64)
 	movl   $(0x10c), %eax
@@ -4793,7 +4793,7 @@ INTERN_FUNCTION(libc_sys_statfs64)
 END(libc_sys_statfs64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_statfs64, libc_sys_statfs64)
 
-/* errno_t statfs64(char const *file, struct statfs64 *buf) */
+/* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
 .section .text.crt.syscall.Xstatfs64
 INTERN_FUNCTION(libc_sys_Xstatfs64)
 	movl   $(0x10c), %eax
@@ -4801,7 +4801,7 @@ INTERN_FUNCTION(libc_sys_Xstatfs64)
 END(libc_sys_Xstatfs64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xstatfs64, libc_sys_Xstatfs64)
 
-/* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
+/* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
 .section .text.crt.syscall.fstatfs64
 INTERN_FUNCTION(libc_sys_fstatfs64)
 	movl   $(0x10d), %eax
@@ -4809,7 +4809,7 @@ INTERN_FUNCTION(libc_sys_fstatfs64)
 END(libc_sys_fstatfs64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fstatfs64, libc_sys_fstatfs64)
 
-/* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
+/* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
 .section .text.crt.syscall.Xfstatfs64
 INTERN_FUNCTION(libc_sys_Xfstatfs64)
 	movl   $(0x10d), %eax

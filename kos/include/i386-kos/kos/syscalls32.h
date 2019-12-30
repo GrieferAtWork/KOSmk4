@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x277b7bc4 */
+/* HASH CRC-32:0xf236edd4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #include <bits/sigaction-struct32.h>
 #include <bits/siginfo-struct32.h>
 #include <bits/stat-kos32.h>
-#include <bits/statfs.h>
+#include <bits/statfs32.h>
 #include <bits/timespec32.h>
 #include <bits/timeval32.h>
 #include <bits/types.h>
@@ -97,7 +97,8 @@ struct __rusagex32;
 struct __rusagex32_64;
 struct __siginfo32_struct;
 struct __sigset_struct;
-struct __statfs32;
+struct __statfsx32;
+struct __statfsx32_64;
 struct __timebx32;
 struct __timebx32_64;
 struct __timespecx32;
@@ -139,7 +140,6 @@ struct sigaction32;
 struct sigaltstack32;
 struct sigevent;
 struct sockaddr;
-struct statfs64;
 struct sysinfo;
 struct termios;
 struct timezone;
@@ -551,10 +551,10 @@ __CDECLARE_SC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const 
 __CDECLARE_SC(,__uint64_t,fsmode,(__uint64_t __mode),(__mode))
 #endif /* __CRT_HAVE_SC(fsmode) */
 #if __CRT_HAVE_SC(fstatfs)
-__CDECLARE_SC(,__errno_t,fstatfs,(__fd_t __file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_SC(,__errno_t,fstatfs,(__fd_t __file, struct __statfsx32 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(fstatfs) */
 #if __CRT_HAVE_SC(fstatfs64)
-__CDECLARE_SC(,__errno_t,fstatfs64,(__fd_t __file, struct statfs64 *__buf),(__file,__buf))
+__CDECLARE_SC(,__errno_t,fstatfs64,(__fd_t __file, struct __statfsx32_64 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(fstatfs64) */
 #if __CRT_HAVE_SC(fsymlinkat)
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -1605,10 +1605,10 @@ __CDECLARE_SC(,__ssize_t,splice,(__fd_t __fdin, __uint64_t *__offin, __fd_t __fd
 __CDECLARE_SC(,__syscall_ulong_t,ssetmask,(__syscall_ulong_t __sigmask),(__sigmask))
 #endif /* __CRT_HAVE_SC(ssetmask) */
 #if __CRT_HAVE_SC(statfs)
-__CDECLARE_SC(,__errno_t,statfs,(char const *__file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_SC(,__errno_t,statfs,(char const *__file, struct __statfsx32 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(statfs) */
 #if __CRT_HAVE_SC(statfs64)
-__CDECLARE_SC(,__errno_t,statfs64,(char const *__file, struct statfs64 *__buf),(__file,__buf))
+__CDECLARE_SC(,__errno_t,statfs64,(char const *__file, struct __statfsx32_64 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(statfs64) */
 #if __CRT_HAVE_SC(stime)
 __CDECLARE_SC(,__errno_t,stime,(__time32_t const *__t),(__t))
@@ -2235,10 +2235,10 @@ __CDECLARE_XSC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const
 __CDECLARE_XSC(,__uint64_t,fsmode,(__uint64_t __mode),(__mode))
 #endif /* __CRT_HAVE_XSC(fsmode) */
 #if __CRT_HAVE_XSC(fstatfs)
-__CDECLARE_XSC(,__errno_t,fstatfs,(__fd_t __file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_XSC(,__errno_t,fstatfs,(__fd_t __file, struct __statfsx32 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(fstatfs) */
 #if __CRT_HAVE_XSC(fstatfs64)
-__CDECLARE_XSC(,__errno_t,fstatfs64,(__fd_t __file, struct statfs64 *__buf),(__file,__buf))
+__CDECLARE_XSC(,__errno_t,fstatfs64,(__fd_t __file, struct __statfsx32_64 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(fstatfs64) */
 #if __CRT_HAVE_XSC(fsymlinkat)
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -3277,10 +3277,10 @@ __CDECLARE_XSC(,__ssize_t,splice,(__fd_t __fdin, __uint64_t *__offin, __fd_t __f
 __CDECLARE_XSC(,__syscall_ulong_t,ssetmask,(__syscall_ulong_t __sigmask),(__sigmask))
 #endif /* __CRT_HAVE_XSC(ssetmask) */
 #if __CRT_HAVE_XSC(statfs)
-__CDECLARE_XSC(,__errno_t,statfs,(char const *__file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_XSC(,__errno_t,statfs,(char const *__file, struct __statfsx32 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(statfs) */
 #if __CRT_HAVE_XSC(statfs64)
-__CDECLARE_XSC(,__errno_t,statfs64,(char const *__file, struct statfs64 *__buf),(__file,__buf))
+__CDECLARE_XSC(,__errno_t,statfs64,(char const *__file, struct __statfsx32_64 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(statfs64) */
 #if __CRT_HAVE_XSC(stime)
 __CDECLARE_XSC(,__errno_t,stime,(__time32_t const *__t),(__t))

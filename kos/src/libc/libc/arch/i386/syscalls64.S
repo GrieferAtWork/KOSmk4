@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61c7d00b */
+/* HASH CRC-32:0x16993a67 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3374,7 +3374,7 @@ INTERN_FUNCTION(libc_sys_Xustat)
 END(libc_sys_Xustat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xustat, libc_sys_Xustat)
 
-/* errno_t statfs(char const *file, struct __statfs32 *buf) */
+/* errno_t statfs(char const *file, struct __statfsx64 *buf) */
 .section .text.crt.syscall.statfs
 INTERN_FUNCTION(libc_sys_statfs)
 	.cfi_startproc
@@ -3386,7 +3386,7 @@ INTERN_FUNCTION(libc_sys_statfs)
 END(libc_sys_statfs)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_statfs, libc_sys_statfs)
 
-/* errno_t statfs(char const *file, struct __statfs32 *buf) */
+/* errno_t statfs(char const *file, struct __statfsx64 *buf) */
 .section .text.crt.syscall.Xstatfs
 INTERN_FUNCTION(libc_sys_Xstatfs)
 	.cfi_startproc
@@ -3398,7 +3398,7 @@ INTERN_FUNCTION(libc_sys_Xstatfs)
 END(libc_sys_Xstatfs)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xstatfs, libc_sys_Xstatfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfs32 *buf) */
+/* errno_t fstatfs(fd_t file, struct __statfsx64 *buf) */
 .section .text.crt.syscall.fstatfs
 INTERN_FUNCTION(libc_sys_fstatfs)
 	.cfi_startproc
@@ -3410,7 +3410,7 @@ INTERN_FUNCTION(libc_sys_fstatfs)
 END(libc_sys_fstatfs)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fstatfs, libc_sys_fstatfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfs32 *buf) */
+/* errno_t fstatfs(fd_t file, struct __statfsx64 *buf) */
 .section .text.crt.syscall.Xfstatfs
 INTERN_FUNCTION(libc_sys_Xfstatfs)
 	.cfi_startproc

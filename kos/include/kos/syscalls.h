@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed7d10ae */
+/* HASH CRC-32:0xbeda5d97 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,6 @@ struct __fd_set_struct;
 struct __itimerval32;
 struct __siginfo_struct;
 struct __sigset_struct;
-struct __statfs32;
 struct __timespec;
 struct epoll_event;
 struct file_handle;
@@ -99,6 +98,7 @@ struct sigaction;
 struct sigaltstack;
 struct sigevent;
 struct sockaddr;
+struct statfs;
 struct sysinfo;
 struct timespec;
 struct timeval;
@@ -301,7 +301,7 @@ __CDECLARE_SC(,__errno_t,fremovexattr,(int __fd, char const *__name),(__fd,__nam
 __CDECLARE_SC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__fd,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_SC(fsetxattr) */
 #if __CRT_HAVE_SC(fstatfs)
-__CDECLARE_SC(,__errno_t,fstatfs,(__fd_t __file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_SC(,__errno_t,fstatfs,(__fd_t __file, struct statfs *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(fstatfs) */
 #if __CRT_HAVE_SC(fsync)
 __CDECLARE_SC(,__errno_t,fsync,(__fd_t __fd),(__fd))
@@ -945,7 +945,7 @@ __CDECLARE_SC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulong
 __CDECLARE_SC(,__ssize_t,splice,(__fd_t __fdin, __uint64_t *__offin, __fd_t __fdout, __uint64_t *__offout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
 #endif /* __CRT_HAVE_SC(splice) */
 #if __CRT_HAVE_SC(statfs)
-__CDECLARE_SC(,__errno_t,statfs,(char const *__file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_SC(,__errno_t,statfs,(char const *__file, struct statfs *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(statfs) */
 #if __CRT_HAVE_SC(swapoff)
 __CDECLARE_SC(,__errno_t,swapoff,(char const *__pathname),(__pathname))
@@ -1280,7 +1280,7 @@ __CDECLARE_XSC(,__errno_t,fremovexattr,(int __fd, char const *__name),(__fd,__na
 __CDECLARE_XSC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__fd,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_XSC(fsetxattr) */
 #if __CRT_HAVE_XSC(fstatfs)
-__CDECLARE_XSC(,__errno_t,fstatfs,(__fd_t __file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_XSC(,__errno_t,fstatfs,(__fd_t __file, struct statfs *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(fstatfs) */
 #if __CRT_HAVE_XSC(fsync)
 __CDECLARE_XSC(,__errno_t,fsync,(__fd_t __fd),(__fd))
@@ -1921,7 +1921,7 @@ __CDECLARE_XSC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulon
 __CDECLARE_XSC(,__ssize_t,splice,(__fd_t __fdin, __uint64_t *__offin, __fd_t __fdout, __uint64_t *__offout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
 #endif /* __CRT_HAVE_XSC(splice) */
 #if __CRT_HAVE_XSC(statfs)
-__CDECLARE_XSC(,__errno_t,statfs,(char const *__file, struct __statfs32 *__buf),(__file,__buf))
+__CDECLARE_XSC(,__errno_t,statfs,(char const *__file, struct statfs *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(statfs) */
 #if __CRT_HAVE_XSC(swapoff)
 __CDECLARE_XSC(,__errno_t,swapoff,(char const *__pathname),(__pathname))

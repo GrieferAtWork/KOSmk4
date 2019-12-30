@@ -16,15 +16,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_COMPAT_BITS_RUSAGE_STRUCT_H
-#define _I386_KOS_COMPAT_BITS_RUSAGE_STRUCT_H 1
+#ifndef _COMPAT_BITS_STATFS_H
+#define _COMPAT_BITS_STATFS_H 1
 
-#include <hybrid/host.h>
+#include <compat/config.h>
+#ifdef __ARCH_HAVE_COMPAT
+#include <bits/statfs.h>
+#define compat_statfs32 __statfs32
+#define compat_statfs64 __statfs64
+#endif /* __ARCH_HAVE_COMPAT */
 
-#ifdef __x86_64__
-#include <bits/rusage-struct32.h>
-#define compat_rusage32 __rusagex32
-#define compat_rusage64 __rusagex32_64
-#endif /* __x86_64__ */
-
-#endif /* !_I386_KOS_COMPAT_BITS_RUSAGE_STRUCT_H */
+#endif /* !_COMPAT_BITS_STATFS_H */

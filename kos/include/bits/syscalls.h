@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5b91b42 */
+/* HASH CRC-32:0x49cbd41c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -349,8 +349,8 @@
 #define SYS_fcntl                  __NR_fcntl                  /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
 #define SYS_fadvise64              __NR_fadvise64              /* errno_t fadvise64(int TODO_PROTOTYPE) */
 #define SYS_linux_newfstatat       __NR_linux_newfstatat       /* errno_t linux_newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
-#define SYS_fstatfs                __NR_fstatfs                /* errno_t fstatfs(fd_t file, struct __statfs32 *buf) */
-#define SYS_statfs                 __NR_statfs                 /* errno_t statfs(char const *file, struct __statfs32 *buf) */
+#define SYS_fstatfs                __NR_fstatfs                /* errno_t fstatfs(fd_t file, struct statfs *buf) */
+#define SYS_statfs                 __NR_statfs                 /* errno_t statfs(char const *file, struct statfs *buf) */
 #define SYS_lseek                  __NR_lseek                  /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd

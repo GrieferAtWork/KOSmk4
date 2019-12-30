@@ -67,6 +67,8 @@
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/stat-convert.h>
 #include <compat/bits/stat.h>
+#include <compat/bits/statfs-convert.h>
+#include <compat/bits/statfs.h>
 #include <compat/pointer.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
@@ -3116,7 +3118,6 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_lstat64,
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT64 */
 
 #ifdef __ARCH_WANT_SYSCALL_LINUX_STAT
-#undef linux_stat
 DEFINE_SYSCALL2(errno_t, linux_stat,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_stat32 *, statbuf) {
@@ -3129,7 +3130,6 @@ DEFINE_SYSCALL2(errno_t, linux_stat,
 #endif /* __ARCH_WANT_SYSCALL_LINUX_STAT */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT
-#undef linux_stat
 DEFINE_COMPAT_SYSCALL2(errno_t, linux_stat,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_linux_stat32 *, statbuf) {
@@ -3855,6 +3855,23 @@ DEFINE_SYSCALL2(errno_t, fstatfs, fd_t, fd,
 }
 #endif /* __ARCH_WANT_SYSCALL_FSTATFS */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTATFS
+DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs, fd_t, fd,
+                       USER UNCHECKED struct compat_statfs32 *, result) {
+	REF struct superblock *super;
+	struct statfs data;
+	validate_writable(result, sizeof(*result));
+	super = handle_get_superblock_relaxed((unsigned int)fd);
+	{
+		FINALLY_DECREF_UNLIKELY(super);
+		superblock_statfs(super, &data);
+	}
+	COMPILER_WRITE_BARRIER();
+	statfs_to_compat_statfs32(&data, result);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_FSTATFS */
+
 #ifdef __ARCH_WANT_SYSCALL_FSTATFS64
 DEFINE_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
                 USER UNCHECKED struct statfs64 *, result) {
@@ -3877,6 +3894,23 @@ DEFINE_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
 }
 #endif /* __ARCH_WANT_SYSCALL_FSTATFS64 */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTATFS64
+DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
+                       USER UNCHECKED struct compat_statfs64 *, result) {
+	REF struct superblock *super;
+	struct statfs data;
+	validate_writable(result, sizeof(*result));
+	super = handle_get_superblock_relaxed((unsigned int)fd);
+	{
+		FINALLY_DECREF_UNLIKELY(super);
+		superblock_statfs(super, &data);
+	}
+	COMPILER_WRITE_BARRIER();
+	statfs_to_compat_statfs64(&data, result);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_FSTATFS64 */
+
 PRIVATE REF struct superblock *KCALL
 get_superblock_from_path(USER CHECKED char const *filename) {
 	struct fs *f = THIS_FS;
@@ -3897,8 +3931,7 @@ get_superblock_from_path(USER CHECKED char const *filename) {
 	return result;
 }
 
-
-#undef statfs
+#ifdef __ARCH_WANT_SYSCALL_STATFS
 DEFINE_SYSCALL2(errno_t, statfs,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct statfs32 *, result) {
@@ -3923,12 +3956,31 @@ DEFINE_SYSCALL2(errno_t, statfs,
 #endif /* !_STATFS_MATCHES_STATFS64 */
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_STATFS */
 
-#ifdef __NR_statfs64
-#undef statfs64
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_STATFS
+DEFINE_COMPAT_SYSCALL2(errno_t, statfs,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_statfs32 *, result) {
+	REF struct superblock *super;
+	struct statfs data;
+	validate_readable(filename, 1);
+	validate_writable(result, sizeof(*result));
+	super = get_superblock_from_path(filename);
+	{
+		FINALLY_DECREF_UNLIKELY(super);
+		superblock_statfs(super, &data);
+	}
+	COMPILER_WRITE_BARRIER();
+	statfs_to_compat_statfs32(&data, result);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_STATFS */
+
+#ifdef __ARCH_WANT_SYSCALL_STATFS64
 DEFINE_SYSCALL2(errno_t, statfs64,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct statfs *, result) {
+                USER UNCHECKED struct statfs64 *, result) {
 	REF struct superblock *super;
 	validate_readable(filename, 1);
 	validate_writable(result, sizeof(*result));
@@ -3939,20 +3991,31 @@ DEFINE_SYSCALL2(errno_t, statfs64,
 	}
 	return -EOK;
 }
-#endif /* __NR_statfs64 */
+#endif /* __ARCH_WANT_SYSCALL_STATFS64 */
 
-
-
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_STATFS64
+DEFINE_COMPAT_SYSCALL2(errno_t, statfs64,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_statfs64 *, result) {
+	struct statfs st;
+	REF struct superblock *super;
+	validate_readable(filename, 1);
+	validate_writable(result, sizeof(*result));
+	super = get_superblock_from_path(filename);
+	{
+		FINALLY_DECREF_UNLIKELY(super);
+		superblock_statfs(super, &st);
+	}
+	statfs_to_compat_statfs64(&st, result);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_STATFS64 */
 
 
 
 /* TODO: Missing system calls: */
-//#define SYS_faccessat       __NR_faccessat       /* errno_t faccessat(fd_t dirfd, char const *pathname, syscall_ulong_t mode, atflag_t flags) */
 //#define __NR_utimensat                  320        /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3]struct __timespec32 const *times, atflag_t flags) */
 //#define __NR_utimensat64                0x80000140 /* errno_t utimensat64(fd_t dirfd, char const *filename, [2-3]struct timespec64 const *times, atflag_t flags) */
-//#define __NR_fallocate                  324        /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, uint32_t offset, uint32_t length) */
-//#define __NR_fallocate64                0x80000144 /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
-
 
 DECL_END
 

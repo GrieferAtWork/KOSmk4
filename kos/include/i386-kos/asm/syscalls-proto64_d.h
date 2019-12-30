@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x513b9a74 */
+/* HASH CRC-32:0xe75cb30c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1089,9 +1089,9 @@
 #define __NR64AT0_ustat                  (dev_t, __dev_t)
 #define __NR64AT1_ustat                  (struct ustat *, struct ustat *)
 #define __NR64AT0_statfs                 (char const *, char const *)
-#define __NR64AT1_statfs                 (struct __statfs32 *, struct __statfs32 *)
+#define __NR64AT1_statfs                 (struct __statfsx64 *, struct __statfsx64 *)
 #define __NR64AT0_fstatfs                (fd_t, __fd_t)
-#define __NR64AT1_fstatfs                (struct __statfs32 *, struct __statfs32 *)
+#define __NR64AT1_fstatfs                (struct __statfsx64 *, struct __statfsx64 *)
 #define __NR64AT0_sysfs                  (int, int)
 #define __NR64AT0_getpriority            (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_getpriority            (id_t, __id_t)
@@ -1833,8 +1833,8 @@
 #define __NR64AM_uselib(a, b, c, d, e, f)                 (char const *)a
 #define __NR64AM_personality(a, b, c, d, e, f)            (int)a
 #define __NR64AM_ustat(a, b, c, d, e, f)                  (__dev_t)a, (struct ustat *)b
-#define __NR64AM_statfs(a, b, c, d, e, f)                 (char const *)a, (struct __statfs32 *)b
-#define __NR64AM_fstatfs(a, b, c, d, e, f)                (__fd_t)a, (struct __statfs32 *)b
+#define __NR64AM_statfs(a, b, c, d, e, f)                 (char const *)a, (struct __statfsx64 *)b
+#define __NR64AM_fstatfs(a, b, c, d, e, f)                (__fd_t)a, (struct __statfsx64 *)b
 #define __NR64AM_sysfs(a, b, c, d, e, f)                  (int)a
 #define __NR64AM_getpriority(a, b, c, d, e, f)            (__syscall_ulong_t)a, (__id_t)b
 #define __NR64AM_setpriority(a, b, c, d, e, f)            (__syscall_ulong_t)a, (__id_t)b, (__syscall_ulong_t)c

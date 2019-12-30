@@ -108,7 +108,9 @@
 %[typeorg(<bits/stat-kos.h>: __kos_stat)]
 %[typeorg(<bits/stat-kos32.h>: __kos_statx32)]
 %[typeorg(<bits/stat-kos64.h>: __kos_statx64)]
-%[typeorg(<bits/statfs.h>: __statfs32, statfs64)]
+%[typeorg(<bits/statfs.h>: statfs, statfs32, statfs64, __statfs32, __statfs64)]
+%[typeorg(<bits/statfs32.h>: __statfsx32, __statfsx32_64, statfsx32, statfsx32_64)]
+%[typeorg(<bits/statfs64.h>: __statfsx64, statfsx64)]
 %[typeorg(<bits/sigaction-struct.h>: sigaction, __sighandler_t)]
 %[typeorg(<bits/sigaction-struct32.h>: sigaction32, __sighandler32_t)]
 %[typeorg(<bits/sigaction-struct64.h>: sigaction64, __sighandler64_t)]
@@ -622,13 +624,21 @@ setpriority:(syscall_ulong_t which, id_t who, syscall_ulong_t value) -> errno_t;
 profil:(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale) -> errno_t;
 
 %[startgroup]
-statfs:(char const *file, struct __statfs32 *buf) -> errno_t;
-statfs64:(char const *file, struct statfs64 *buf) -> errno_t;
+statfs:(char const *file, struct statfs *buf) -> errno_t;
+statfs32:(char const *file, struct __statfs32 *buf) -> errno_t;
+statfs64:(char const *file, struct __statfs64 *buf) -> errno_t;
+statfsx32:(char const *file, struct __statfsx32 *buf) -> errno_t;
+statfsx32_64:(char const *file, struct __statfsx32_64 *buf) -> errno_t;
+statfsx64:(char const *file, struct __statfsx64 *buf) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-fstatfs:(fd_t file, struct __statfs32 *buf) -> errno_t;
-fstatfs64:(fd_t file, struct statfs64 *buf) -> errno_t;
+fstatfs:(fd_t file, struct statfs *buf) -> errno_t;
+fstatfs32:(fd_t file, struct __statfs32 *buf) -> errno_t;
+fstatfs64:(fd_t file, struct __statfs64 *buf) -> errno_t;
+fstatfsx32:(fd_t file, struct __statfsx32 *buf) -> errno_t;
+fstatfsx32_64:(fd_t file, struct __statfsx32_64 *buf) -> errno_t;
+fstatfsx64:(fd_t file, struct __statfsx64 *buf) -> errno_t;
 %[endgroup]
 
 ioperm:(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) -> errno_t;
