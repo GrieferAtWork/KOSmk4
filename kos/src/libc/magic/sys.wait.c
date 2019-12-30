@@ -18,14 +18,13 @@
  */
 
 %[define_replacement(pid_t = __pid_t)]
+%[define_replacement(rusage32 = __rusage32)]
+%[define_replacement(rusage64 = __rusage64)]
 %[default_impl_section(.text.crt.sched.wait)]
 
 %{
 #include <features.h>
 #include <bits/types.h>
-#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-#include <bits/rusage-struct.h>
-#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #include <bits/siginfo.h> /* We'd only need `siginfo_t' */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
@@ -131,7 +130,7 @@ waitpid:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options) -> $pid_t;
 %struct rusage;
 
 [decl_include(<bits/rusage-struct.h>)][ignore][cp][doc_alias(wait3)]
-wait3_32:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct __rusage32 *usage) -> $pid_t = wait3?;
+wait3_32:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct $rusage32 *usage) -> $pid_t = wait3?;
 
 @@Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
@@ -144,7 +143,7 @@ wait3_32:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct __ru
 wait3:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage *usage) -> $pid_t {
 	pid_t result;
 @@if_has_function(wait3_32)@@
-	struct __rusage32 ru32;
+	struct rusage32 ru32;
 	result = wait3_32(stat_loc, options, usage ? &ru32 : NULL);
 	if (result >= 0 && usage)
 		@rusage32_to_rusage@(&ru32, usage);
@@ -157,13 +156,14 @@ wait3:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage 
 	return result;
 }
 %#ifdef __USE_TIME64
+%struct rusage64;
 [time64_variant_of(wait3)]
 [requires($has_function(wait3_32))]
 [decl_include(<bits/rusage-struct.h>)]
 [impl_include(<bits/rusage-convert.h>)]
-wait3_64:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct __rusage64 *usage) -> $pid_t {
+wait3_64:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage64 *usage) -> $pid_t {
 	pid_t result;
-	struct __rusage32 ru32;
+	struct rusage32 ru32;
 	result = wait3_32(stat_loc, options, usage ? &ru32 : NULL);
 	if (result >= 0 && usage)
 		@rusage32_to_rusage64@(&ru32, usage);
@@ -176,7 +176,7 @@ wait3_64:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct __ru
 %#ifdef __USE_MISC
 
 [decl_include(<bits/rusage-struct.h>)][ignore][cp][doc_alias(wait4)][cp]
-wait4_32:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct __rusage32 *usage) -> $pid_t = wait4?;
+wait4_32:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct $rusage32 *usage) -> $pid_t = wait4?;
 
 @@Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
@@ -189,7 +189,7 @@ wait4_32:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable]
 wait4:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage *usage) -> $pid_t {
 	pid_t result;
 @@if_has_function(wait4_32)@@
-	struct __rusage32 ru32;
+	struct rusage32 ru32;
 	result = wait4_32(pid, stat_loc, options, usage ? &ru32 : NULL);
 	if (result >= 0 && usage)
 		@rusage32_to_rusage@(&ru32, usage);
@@ -202,13 +202,14 @@ wait4:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] st
 	return result;
 }
 %#ifdef __USE_TIME64
+%struct rusage64;
 [time64_variant_of(wait4)]
 [requires($has_function(wait4_32))]
 [decl_include(<bits/rusage-struct.h>)]
 [impl_include(<bits/rusage-convert.h>)]
-wait4_64:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct __rusage64 *usage) -> $pid_t {
+wait4_64:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage64 *usage) -> $pid_t {
 	pid_t result;
-	struct __rusage32 ru32;
+	struct rusage32 ru32;
 	result = wait4_32(pid, stat_loc, options, usage ? &ru32 : NULL);
 	if (result >= 0 && usage)
 		@rusage32_to_rusage64@(&ru32, usage);

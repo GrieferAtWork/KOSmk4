@@ -136,7 +136,7 @@ NOTHROW_RPC(LIBCCALL libc_wait3)(__WAIT_STATUS stat_loc,
 }
 /*[[[end:wait3]]]*/
 
-/*[[[head:wait3_64,hash:CRC-32=0x2e6e7fde]]]*/
+/*[[[head:wait3_64,hash:CRC-32=0x361b2583]]]*/
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -145,7 +145,7 @@ DEFINE_INTERN_ALIAS(libc_wait3_64, libc_wait3);
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.wait.wait3_64") pid_t
 NOTHROW_NCX(LIBCCALL libc_wait3_64)(__WAIT_STATUS stat_loc,
                                     int options,
-                                    struct __rusage64 *usage)
+                                    struct rusage64 *usage)
 /*[[[body:wait3_64]]]*/
 {
 	pid_t result;
@@ -197,7 +197,7 @@ NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid,
 }
 /*[[[end:wait4]]]*/
 
-/*[[[head:wait4_64,hash:CRC-32=0x61b96143]]]*/
+/*[[[head:wait4_64,hash:CRC-32=0xb7e9abce]]]*/
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -207,7 +207,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.wait.wait4_64") pid_t
 NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid,
                                     __WAIT_STATUS stat_loc,
                                     int options,
-                                    struct __rusage64 *usage)
+                                    struct rusage64 *usage)
 /*[[[body:wait4_64]]]*/
 {
 	pid_t result;

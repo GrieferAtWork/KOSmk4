@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d860da0 */
+/* HASH CRC-32:0x202b3a32 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ __LOCAL_LIBC(wait3) __pid_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wait3))(__WAIT_STATUS __stat_loc,
                                                    int __options,
                                                    struct rusage *__usage) {
-#line 145 "kos/src/libc/magic/sys.wait.c"
+#line 144 "kos/src/libc/magic/sys.wait.c"
 	__pid_t __result;
 #ifdef __CRT_HAVE_wait3
 	struct __rusage32 __ru32;
