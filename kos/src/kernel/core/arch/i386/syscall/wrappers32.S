@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cef07be */
+/* HASH CRC-32:0x7aec7e94 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -436,7 +436,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_unlink)
 	.cfi_endproc
 END(__x86_asm32_int80_unlink)
 
-/* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
+/* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 .section .text.x86.asm32_syscall_int80.execve
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_execve)
 	.cfi_startproc simple
@@ -13310,7 +13310,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bpf)
 END(__x86_asm32_int80_bpf)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
+/* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.execveat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
 	.cfi_startproc simple
@@ -17676,7 +17676,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_unlink)
 	.cfi_endproc
 END(__x86_asm32_sysenter_unlink)
 
-/* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
+/* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 .section .text.x86.asm32_syscall_sysenter.execve
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execve)
 	.cfi_startproc simple
@@ -30616,7 +30616,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_bpf)
 END(__x86_asm32_sysenter_bpf)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
+/* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.execveat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
 	.cfi_startproc simple

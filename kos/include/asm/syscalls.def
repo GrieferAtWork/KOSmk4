@@ -271,7 +271,6 @@ idle:() -> errno_t;
 [cp] creat:(char const *filename, mode_t mode) -> fd_t;
 [cp] link:(char const *existing_file, char const *link_file) -> errno_t;
 [cp] unlink:(char const *filename) -> errno_t;
-[cp] execve:(char const *path, char const *const *argv, char const *const *envp) -> errno_t;
 [cp] chdir:(char const *path) -> errno_t;
 
 @@@param: flags: Set of `0 | AT_DOSPATH'
@@ -1334,9 +1333,19 @@ getrandom:(int TODO_PROTOTYPE) -> errno_t;
 memfd_create:(int TODO_PROTOTYPE) -> errno_t;
 bpf:(int TODO_PROTOTYPE) -> errno_t;
 
+%[startgroup]
+[cp] execve:(char const *path, char const *const *argv, char const *const *envp) -> errno_t;
+[cp] execvex32:(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) -> errno_t;
+[cp] execvex64:(char const *path, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp) -> errno_t;
+%[endgroup]
+
+%[startgroup]
 @@@param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [cp] execveat:(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp,
                [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(execveat)][cp] execveatx32:(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(execveat)][cp] execveatx64:(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+%[endgroup]
 
 socket:(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) -> fd_t;
 socketpair:(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t fds[2]) -> errno_t;

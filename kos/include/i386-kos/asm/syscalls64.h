@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7497027 */
+/* HASH CRC-32:0xa137da5f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,7 +97,7 @@
 #define __NR_clone                  0x38                           /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, pid_t *ctid, uintptr_t newtls) */
 #define __NR_fork                   0x39                           /* pid_t fork(void) */
 #define __NR_vfork                  0x3a                           /* pid_t vfork(void) */
-#define __NR_execve                 0x3b                           /* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
+#define __NR_execve                 0x3b                           /* errno_t execve(char const *path, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp) */
 #define __NR_exit                   0x3c                           /* void exit(syscall_ulong_t status) */
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
@@ -386,7 +386,7 @@
 #define __NR_kexec_file_load        0x140                          /* errno_t kexec_file_load(int TODO_PROTOTYPE) */
 #define __NR_bpf                    0x141                          /* errno_t bpf(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR_execveat               0x142                          /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
+#define __NR_execveat               0x142                          /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 #define __NR_userfaultfd            0x143                          /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define __NR_membarrier             0x144                          /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define __NR_mlock2                 0x145                          /* errno_t mlock2(int TODO_PROTOTYPE) */

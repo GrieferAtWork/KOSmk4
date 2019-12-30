@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66ebdbfd */
+/* HASH CRC-32:0x25dfcbab */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@
 #define SYS_creat                   __NR_creat                   /* fd_t creat(char const *filename, mode_t mode) */
 #define SYS_link                    __NR_link                    /* errno_t link(char const *existing_file, char const *link_file) */
 #define SYS_unlink                  __NR_unlink                  /* errno_t unlink(char const *filename) */
-#define SYS_execve                  __NR_execve                  /* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
+#define SYS_execve                  __NR_execve                  /* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 #define SYS_chdir                   __NR_chdir                   /* errno_t chdir(char const *path) */
 #define SYS_time                    __NR_time                    /* int32_t time(int32_t *timer) */
 #define SYS_mknod                   __NR_mknod                   /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
@@ -430,7 +430,7 @@
 #define SYS_memfd_create            __NR_memfd_create            /* errno_t memfd_create(int TODO_PROTOTYPE) */
 #define SYS_bpf                     __NR_bpf                     /* errno_t bpf(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define SYS_execveat                __NR_execveat                /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
+#define SYS_execveat                __NR_execveat                /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 #define SYS_socket                  __NR_socket                  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 #define SYS_socketpair              __NR_socketpair              /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 #define SYS_bind                    __NR_bind                    /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */

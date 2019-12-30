@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dd78015 */
+/* HASH CRC-32:0xefce0f2b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -956,8 +956,8 @@
 #define __NRAT3_clone                  (pid_t *, __pid_t *)
 #define __NRAT4_clone                  (uintptr_t, __uintptr_t)
 #define __NRAT0_execve                 (char const *, char const *)
-#define __NRAT1_execve                 (char const *const *, char const *const *)
-#define __NRAT2_execve                 (char const *const *, char const *const *)
+#define __NRAT1_execve                 (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
+#define __NRAT2_execve                 (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
 #define __NRAT0_exit                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_wait4                  (pid_t, __pid_t)
 #define __NRAT1_wait4                  (int32_t *, __int32_t *)
@@ -1524,8 +1524,8 @@
 #define __NRAT0_bpf                    (int, int)
 #define __NRAT0_execveat               (fd_t, __fd_t)
 #define __NRAT1_execveat               (char const *, char const *)
-#define __NRAT2_execveat               (char const *const *, char const *const *)
-#define __NRAT3_execveat               (char const *const *, char const *const *)
+#define __NRAT2_execveat               (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
+#define __NRAT3_execveat               (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
 #define __NRAT4_execveat               (atflag_t, __atflag_t)
 #define __NRAT0_userfaultfd            (int, int)
 #define __NRAT0_membarrier             (int, int)
@@ -1755,7 +1755,7 @@
 #define __NRAM_clone(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (void *)b, (__pid_t *)c, (__pid_t *)d, (__uintptr_t)e
 #define __NRAM_fork(a, b, c, d, e, f)                   /* nothing */
 #define __NRAM_vfork(a, b, c, d, e, f)                  /* nothing */
-#define __NRAM_execve(a, b, c, d, e, f)                 (char const *)a, (char const *const *)b, (char const *const *)c
+#define __NRAM_execve(a, b, c, d, e, f)                 (char const *)a, (__HYBRID_PTR64(char const) const *)b, (__HYBRID_PTR64(char const) const *)c
 #define __NRAM_exit(a, b, c, d, e, f)                   (__syscall_ulong_t)a
 #define __NRAM_wait4(a, b, c, d, e, f)                  (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusagex64 *)d
 #define __NRAM_kill(a, b, c, d, e, f)                   (__pid_t)a, (__syscall_ulong_t)b
@@ -2018,7 +2018,7 @@
 #define __NRAM_memfd_create(a, b, c, d, e, f)           (int)a
 #define __NRAM_kexec_file_load(a, b, c, d, e, f)        (int)a
 #define __NRAM_bpf(a, b, c, d, e, f)                    (int)a
-#define __NRAM_execveat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (char const *const *)c, (char const *const *)d, (__atflag_t)e
+#define __NRAM_execveat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e
 #define __NRAM_userfaultfd(a, b, c, d, e, f)            (int)a
 #define __NRAM_membarrier(a, b, c, d, e, f)             (int)a
 #define __NRAM_mlock2(a, b, c, d, e, f)                 (int)a

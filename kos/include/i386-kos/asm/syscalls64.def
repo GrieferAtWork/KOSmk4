@@ -55,6 +55,8 @@ clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRA
        pid_t *ctid, uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
+execve = execvex64;
+execveat = execveatx64;
 linux_fstatat = linux_fstatatx64;
 linux_fstat = linux_fstatx64;
 linux_lstat = linux_lstatx64;

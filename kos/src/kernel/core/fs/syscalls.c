@@ -65,6 +65,7 @@
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/stat-convert.h>
 #include <compat/bits/stat.h>
+#include <compat/pointer.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
 #if (defined(__ARCH_WANT_SYSCALL_LINUX_OLDFSTATAT) ||        \
@@ -3166,71 +3167,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_stat64,
 
 
 
-DEFINE_SYSCALL3(ssize_t, readlink,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED char *, buf, size_t, buflen) {
-	size_t result;
-	struct fs *f = THIS_FS;
-	REF struct symlink_node *link_node;
-	validate_readable(filename, 1);
-	validate_writable(buf, buflen);
-	link_node = (REF struct symlink_node *)path_traversefull(f,
-	                                                         filename,
-	                                                         false,
-	                                                         ATOMIC_READ(f->f_atflag),
-	                                                         NULL,
-	                                                         NULL,
-	                                                         NULL,
-	                                                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY((struct inode *)link_node);
-		/* Check that the named INode is actually a symbolic link. */
-		if (!INODE_ISLNK((struct inode *)link_node))
-			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
-			      E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK);
-		/* Read the contents of the symbolic link. */
-		result = symlink_node_readlink(link_node,
-		                               buf,
-		                               buflen);
-	}
-	if (result >= buflen)
-		result = buflen;
-	return (ssize_t)result;
-}
-
-DEFINE_SYSCALL4(ssize_t, readlinkat,
-                fd_t, dirfd, USER UNCHECKED char const *, filename,
-                USER UNCHECKED char *, buf, size_t, buflen) {
-	size_t result;
-	struct fs *f = THIS_FS;
-	REF struct symlink_node *link_node;
-	validate_readable(filename, 1);
-	validate_writable(buf, buflen);
-	link_node = (REF struct symlink_node *)path_traversefull_at(f,
-	                                                            (unsigned int)dirfd,
-	                                                            filename,
-	                                                            false,
-	                                                            ATOMIC_READ(f->f_atflag),
-	                                                            NULL,
-	                                                            NULL,
-	                                                            NULL,
-	                                                            NULL);
-	{
-		FINALLY_DECREF_UNLIKELY((struct inode *)link_node);
-		/* Check that the named INode is actually a symbolic link. */
-		if (!INODE_ISLNK((struct inode *)link_node))
-			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
-			      E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK);
-		/* Read the contents of the symbolic link. */
-		result = symlink_node_readlink(link_node,
-		                               buf,
-		                               buflen);
-	}
-	if (result >= buflen)
-		result = buflen;
-	return (ssize_t)result;
-}
-
+/************************************************************************/
+/* freadlinkat(), readlinkat(), readlink()                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FREADLINKAT
 DEFINE_SYSCALL5(ssize_t, freadlinkat,
                 fd_t, dirfd, USER UNCHECKED char const *, filename,
                 USER UNCHECKED char *, buf, size_t, buflen, atflag_t, flags) {
@@ -3278,6 +3218,76 @@ DEFINE_SYSCALL5(ssize_t, freadlinkat,
 	}
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_FREADLINKAT */
+
+#ifdef __ARCH_WANT_SYSCALL_READLINKAT
+DEFINE_SYSCALL4(ssize_t, readlinkat,
+                fd_t, dirfd, USER UNCHECKED char const *, filename,
+                USER UNCHECKED char *, buf, size_t, buflen) {
+	size_t result;
+	struct fs *f = THIS_FS;
+	REF struct symlink_node *link_node;
+	validate_readable(filename, 1);
+	validate_writable(buf, buflen);
+	link_node = (REF struct symlink_node *)path_traversefull_at(f,
+	                                                            (unsigned int)dirfd,
+	                                                            filename,
+	                                                            false,
+	                                                            ATOMIC_READ(f->f_atflag),
+	                                                            NULL,
+	                                                            NULL,
+	                                                            NULL,
+	                                                            NULL);
+	{
+		FINALLY_DECREF_UNLIKELY((struct inode *)link_node);
+		/* Check that the named INode is actually a symbolic link. */
+		if (!INODE_ISLNK((struct inode *)link_node))
+			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
+			      E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK);
+		/* Read the contents of the symbolic link. */
+		result = symlink_node_readlink(link_node,
+		                               buf,
+		                               buflen);
+	}
+	if (result >= buflen)
+		result = buflen;
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_READLINKAT */
+
+#ifdef __ARCH_WANT_SYSCALL_READLINK
+DEFINE_SYSCALL3(ssize_t, readlink,
+                USER UNCHECKED char const *, filename,
+                USER UNCHECKED char *, buf, size_t, buflen) {
+	size_t result;
+	struct fs *f = THIS_FS;
+	REF struct symlink_node *link_node;
+	validate_readable(filename, 1);
+	validate_writable(buf, buflen);
+	link_node = (REF struct symlink_node *)path_traversefull(f,
+	                                                         filename,
+	                                                         false,
+	                                                         ATOMIC_READ(f->f_atflag),
+	                                                         NULL,
+	                                                         NULL,
+	                                                         NULL,
+	                                                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY((struct inode *)link_node);
+		/* Check that the named INode is actually a symbolic link. */
+		if (!INODE_ISLNK((struct inode *)link_node))
+			THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
+			      E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK);
+		/* Read the contents of the symbolic link. */
+		result = symlink_node_readlink(link_node,
+		                               buf,
+		                               buflen);
+	}
+	if (result >= buflen)
+		result = buflen;
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_READLINK */
 
 
 typedef void(KCALL *kernel_pervm_onexec_t)(void);
@@ -3300,8 +3310,15 @@ kernel_do_execveat(struct icpustate *__restrict state,
                    REF struct regular_node *__restrict exec_node,
                    REF struct path *__restrict containing_path,
                    REF struct directory_entry *__restrict containing_dentry,
+#ifdef __ARCH_HAVE_COMPAT
+                   USER CHECKED void const *argv,
+                   USER CHECKED void const *envp,
+                   bool argv_is_compat
+#else /* __ARCH_HAVE_COMPAT */
                    USER UNCHECKED char const *USER CHECKED const *argv,
-                   USER UNCHECKED char const *USER CHECKED const *envp) {
+                   USER UNCHECKED char const *USER CHECKED const *envp
+#endif /* !__ARCH_HAVE_COMPAT */
+                   ) {
 	if (kernel_debugtrap_enabled()) {
 		/* Trigger an EXEC debug trap. */
 		char *buf, *dst;
@@ -3329,7 +3346,12 @@ kernel_do_execveat(struct icpustate *__restrict state,
 			                0,
 			                NULL,
 			                argv,
-			                envp);
+			                envp
+#ifdef __ARCH_HAVE_COMPAT
+			                ,
+			                argv_is_compat
+#endif /* __ARCH_HAVE_COMPAT */
+			                );
 			/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
 			run_pertask_onexec();
 			{
@@ -3354,7 +3376,12 @@ kernel_do_execveat(struct icpustate *__restrict state,
 		                0,
 		                NULL,
 		                argv,
-		                envp);
+		                envp
+#ifdef __ARCH_HAVE_COMPAT
+		                ,
+		                argv_is_compat
+#endif /* __ARCH_HAVE_COMPAT */
+		                );
 		/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
 		run_pertask_onexec();
 	}
@@ -3366,8 +3393,14 @@ struct kernel_exec_rpc_data {
 	REF struct regular_node                       *er_node;   /* [1..1] The INode that should be executed. */
 	REF struct path                               *er_path;   /* [1..1] The containing path for `er_node' */
 	REF struct directory_entry                    *er_dentry; /* [1..1] The directory entry for `er_node' */
+#ifdef __ARCH_HAVE_COMPAT
+	USER CHECKED void const                       *er_argv;   /* [?..?][1..1] Vector user-supplied arguments to-be passed to the targeted executable. */
+	USER CHECKED void const                       *er_envp;   /* [?..?][1..1] Vector user-supplied environment variables to-be passed to the targeted executable. */
+	bool                                           er_argv_is_compat; /* True if `er_argv' and `er_envp' original from compat-mode */
+#else /* __ARCH_HAVE_COMPAT */
 	USER UNCHECKED char const *USER CHECKED const *er_argv;   /* [?..?][1..1] Vector user-supplied arguments to-be passed to the targeted executable. */
 	USER UNCHECKED char const *USER CHECKED const *er_envp;   /* [?..?][1..1] Vector user-supplied environment variables to-be passed to the targeted executable. */
+#endif /* !__ARCH_HAVE_COMPAT */
 	struct exception_data                          er_except; /* Information about the exception that caused exec() to fail. */
 	struct sig                                     er_error;  /* Signal broadcast upon error. */
 };
@@ -3409,7 +3442,12 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 		                           data->er_path,
 		                           data->er_dentry,
 		                           data->er_argv,
-		                           data->er_envp);
+		                           data->er_envp
+#ifdef __ARCH_HAVE_COMPAT
+		                           ,
+		                           data->er_argv_is_compat
+#endif /* __ARCH_HAVE_COMPAT */
+		                           );
 	} EXCEPT {
 		memcpy(&data->er_except,
 		       &THIS_EXCEPTION_INFO,
@@ -3444,16 +3482,27 @@ INTERN struct icpustate *KCALL
 kernel_execveat(struct icpustate *__restrict state,
                 fd_t dirfd,
                 USER UNCHECKED char const *pathname,
+#ifdef __ARCH_HAVE_COMPAT
+                USER UNCHECKED void const *argv,
+                USER UNCHECKED void const *envp,
+                bool argv_is_compat,
+#else /* __ARCH_HAVE_COMPAT */
                 USER UNCHECKED char const *USER UNCHECKED const *argv,
                 USER UNCHECKED char const *USER UNCHECKED const *envp,
+#endif /* !__ARCH_HAVE_COMPAT */
                 atflag_t flags) {
 	struct fs *f = THIS_FS;
 	REF struct inode *node;
 	REF struct path *containing_path;
 	REF struct directory_entry *containing_dentry;
 	struct task *caller = THIS_TASK;
+#ifdef __ARCH_HAVE_COMPAT
+	validate_readable_opt(argv, 1);
+	validate_readable_opt(envp, 1);
+#else /* __ARCH_HAVE_COMPAT */
 	validate_readable_opt(argv, sizeof(*argv));
 	validate_readable_opt(envp, sizeof(*envp));
+#endif /* !__ARCH_HAVE_COMPAT */
 	VALIDATE_FLAGSET(flags,
 	                 AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
 	                 E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS);
@@ -3482,7 +3531,12 @@ kernel_execveat(struct icpustate *__restrict state,
 			                           containing_path,
 			                           containing_dentry,
 			                           argv,
-			                           envp);
+			                           envp
+#ifdef __ARCH_HAVE_COMPAT
+			                           ,
+			                           argv_is_compat
+#endif /* __ARCH_HAVE_COMPAT */
+			                           );
 		} else {
 			struct kernel_exec_rpc_data *data;
 			struct task *proc = task_getprocess_of(caller);
@@ -3497,6 +3551,9 @@ kernel_execveat(struct icpustate *__restrict state,
 			data->er_dentry = incref(containing_dentry);
 			data->er_argv   = argv;
 			data->er_envp   = envp;
+#ifdef __ARCH_HAVE_COMPAT
+			data->er_argv_is_compat = argv_is_compat;
+#endif /* __ARCH_HAVE_COMPAT */
 			sig_init(&data->er_error);
 			TRY {
 				task_connect(&data->er_error);
@@ -3567,6 +3624,10 @@ kernel_execveat(struct icpustate *__restrict state,
 }
 
 
+/************************************************************************/
+/* execveat(), execve()                                                 */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_EXECVEAT
 PRIVATE struct icpustate *FCALL
 syscall_execveat_rpc(void *UNUSED(arg),
                      struct icpustate *__restrict state,
@@ -3577,13 +3638,22 @@ syscall_execveat_rpc(void *UNUSED(arg),
 		state = kernel_execveat(state,
 		                        (fd_t)sc_info->rsi_regs[0],
 		                        (USER UNCHECKED char const *)sc_info->rsi_regs[1],
+#ifdef __ARCH_HAVE_COMPAT
+		                        (USER UNCHECKED void const *)sc_info->rsi_regs[2],
+		                        (USER UNCHECKED void const *)sc_info->rsi_regs[3],
+#else /* __ARCH_HAVE_COMPAT */
 		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[2],
 		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[3],
-		                        (atflag_t)sc_info->rsi_regs[4]);
+#endif /* !__ARCH_HAVE_COMPAT */
+		                        (atflag_t)sc_info->rsi_regs[4]
+#ifdef __ARCH_HAVE_COMPAT
+		                        ,
+		                        false
+#endif /* __ARCH_HAVE_COMPAT */
+		                        );
 	}
 	return state;
 }
-
 
 DEFINE_SYSCALL5(errno_t, execveat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
@@ -3605,7 +3675,50 @@ DEFINE_SYSCALL5(errno_t, execveat, fd_t, dirfd,
 	/* Shouldn't get here... */
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_EXECVEAT */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_EXECVEAT
+PRIVATE struct icpustate *FCALL
+compat_syscall_execveat_rpc(void *UNUSED(arg),
+                            struct icpustate *__restrict state,
+                            unsigned int reason,
+                            struct rpc_syscall_info const *sc_info) {
+	if (reason == TASK_RPC_REASON_SYSCALL) {
+		/* Actually service the exec() system call. */
+		state = kernel_execveat(state,
+		                        (fd_t)sc_info->rsi_regs[0],
+		                        (USER UNCHECKED char const *)sc_info->rsi_regs[1],
+		                        (USER UNCHECKED void const *)sc_info->rsi_regs[2],
+		                        (USER UNCHECKED void const *)sc_info->rsi_regs[3],
+		                        (atflag_t)sc_info->rsi_regs[4],
+		                        true);
+	}
+	return state;
+}
+
+DEFINE_COMPAT_SYSCALL5(errno_t, execveat, fd_t, dirfd,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, argv,
+                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, envp,
+                       atflag_t, flags) {
+	(void)dirfd;
+	(void)filename;
+	(void)argv;
+	(void)envp;
+	(void)flags;
+	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+	task_schedule_user_rpc(THIS_TASK,
+	                       &compat_syscall_execveat_rpc,
+	                       NULL,
+	                       TASK_RPC_FHIGHPRIO |
+	                       TASK_USER_RPC_FINTR,
+	                       GFP_NORMAL);
+	/* Shouldn't get here... */
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_EXECVEAT */
+
+#ifdef __ARCH_WANT_SYSCALL_EXECVE
 PRIVATE struct icpustate *FCALL
 syscall_execve_rpc(void *UNUSED(arg),
                    struct icpustate *__restrict state,
@@ -3616,13 +3729,22 @@ syscall_execve_rpc(void *UNUSED(arg),
 		state = kernel_execveat(state,
 		                        AT_FDCWD,
 		                        (USER UNCHECKED char const *)sc_info->rsi_regs[0],
+#ifdef __ARCH_HAVE_COMPAT
+		                        (USER UNCHECKED void const *)sc_info->rsi_regs[1],
+		                        (USER UNCHECKED void const *)sc_info->rsi_regs[2],
+#else /* __ARCH_HAVE_COMPAT */
 		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[1],
 		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_regs[2],
-		                        0);
+#endif /* !__ARCH_HAVE_COMPAT */
+		                        0
+#ifdef __ARCH_HAVE_COMPAT
+		                        ,
+		                        false
+#endif /* __ARCH_HAVE_COMPAT */
+		                        );
 	}
 	return state;
 }
-
 
 DEFINE_SYSCALL3(errno_t, execve,
                 USER UNCHECKED char const *, filename,
@@ -3641,7 +3763,53 @@ DEFINE_SYSCALL3(errno_t, execve,
 	/* Shouldn't get here... */
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_EXECVE */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_EXECVE
+PRIVATE struct icpustate *FCALL
+compat_syscall_execve_rpc(void *UNUSED(arg),
+                          struct icpustate *__restrict state,
+                          unsigned int reason,
+                          struct rpc_syscall_info const *sc_info) {
+	if (reason == TASK_RPC_REASON_SYSCALL) {
+		/* Actually service the exec() system call. */
+		state = kernel_execveat(state,
+		                        AT_FDCWD,
+		                        (USER UNCHECKED char const *)sc_info->rsi_regs[0],
+		                        (USER UNCHECKED void const *)sc_info->rsi_regs[1],
+		                        (USER UNCHECKED void const *)sc_info->rsi_regs[2],
+		                        0,
+		                        true);
+	}
+	return state;
+}
+
+DEFINE_COMPAT_SYSCALL3(errno_t, execve,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, argv,
+                       USER UNCHECKED compat_ptr(char const) USER UNCHECKED const *, envp) {
+	(void)filename;
+	(void)argv;
+	(void)envp;
+	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+	task_schedule_user_rpc(THIS_TASK,
+	                       &compat_syscall_execve_rpc,
+	                       NULL,
+	                       TASK_RPC_FHIGHPRIO |
+	                       TASK_USER_RPC_FINTR,
+	                       GFP_NORMAL);
+	/* Shouldn't get here... */
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_EXECVE */
+
+
+
+
+/************************************************************************/
+/* getdrives()                                                          */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETDRIVES
 DEFINE_SYSCALL0(syscall_slong_t, getdrives) {
 	unsigned int i;
 	syscall_ulong_t mask, result = 0;
@@ -3652,6 +3820,10 @@ DEFINE_SYSCALL0(syscall_slong_t, getdrives) {
 	}
 	return result;
 }
+#endif /* __ARCH_WANT_SYSCALL_GETDRIVES */
+
+
+
 
 LOCAL void KCALL
 statfs64_to_statfs32(USER CHECKED struct __statfs32 *dst,

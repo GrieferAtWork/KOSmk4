@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c76041d */
+/* HASH CRC-32:0x61c7d00b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1488,7 +1488,7 @@ INTERN_FUNCTION(libc_sys_Xvfork)
 END(libc_sys_Xvfork)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xvfork, libc_sys_Xvfork)
 
-/* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
+/* errno_t execve(char const *path, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp) */
 .section .text.crt.syscall.execve
 INTERN_FUNCTION(libc_sys_execve)
 	.cfi_startproc
@@ -1500,7 +1500,7 @@ INTERN_FUNCTION(libc_sys_execve)
 END(libc_sys_execve)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_execve, libc_sys_execve)
 
-/* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
+/* errno_t execve(char const *path, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp) */
 .section .text.crt.syscall.Xexecve
 INTERN_FUNCTION(libc_sys_Xexecve)
 	.cfi_startproc
@@ -7957,7 +7957,7 @@ END(libc_sys_Xbpf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xbpf, libc_sys_Xbpf)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
+/* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 .section .text.crt.syscall.execveat
 INTERN_FUNCTION(libc_sys_execveat)
 	.cfi_startproc
@@ -7971,7 +7971,7 @@ END(libc_sys_execveat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_execveat, libc_sys_execveat)
 
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
+/* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 .section .text.crt.syscall.Xexecveat
 INTERN_FUNCTION(libc_sys_Xexecveat)
 	.cfi_startproc

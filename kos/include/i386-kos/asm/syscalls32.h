@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12183e6c */
+/* HASH CRC-32:0xb5920f13 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@
 #define __NR_creat                   0x8                    /* fd_t creat(char const *filename, mode_t mode) */
 #define __NR_link                    0x9                    /* errno_t link(char const *existing_file, char const *link_file) */
 #define __NR_unlink                  0xa                    /* errno_t unlink(char const *filename) */
-#define __NR_execve                  0xb                    /* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
+#define __NR_execve                  0xb                    /* errno_t execve(char const *path, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp) */
 #define __NR_chdir                   0xc                    /* errno_t chdir(char const *path) */
 #define __NR_time                    0xd                    /* int32_t time(int32_t *timer) */
 #define __NR_mknod                   0xe                    /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
@@ -427,7 +427,7 @@
 #define __NR_memfd_create            0x164                  /* errno_t memfd_create(int TODO_PROTOTYPE) */
 #define __NR_bpf                     0x165                  /* errno_t bpf(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR_execveat                0x166                  /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
+#define __NR_execveat                0x166                  /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 #define __NR_socket                  0x167                  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 #define __NR_socketpair              0x168                  /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 #define __NR_bind                    0x169                  /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */

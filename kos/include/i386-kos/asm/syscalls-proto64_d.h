@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9a02bf1 */
+/* HASH CRC-32:0x513b9a74 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -956,8 +956,8 @@
 #define __NR64AT3_clone                  (pid_t *, __pid_t *)
 #define __NR64AT4_clone                  (uintptr_t, __uintptr_t)
 #define __NR64AT0_execve                 (char const *, char const *)
-#define __NR64AT1_execve                 (char const *const *, char const *const *)
-#define __NR64AT2_execve                 (char const *const *, char const *const *)
+#define __NR64AT1_execve                 (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
+#define __NR64AT2_execve                 (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
 #define __NR64AT0_exit                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_wait4                  (pid_t, __pid_t)
 #define __NR64AT1_wait4                  (int32_t *, __int32_t *)
@@ -1524,8 +1524,8 @@
 #define __NR64AT0_bpf                    (int, int)
 #define __NR64AT0_execveat               (fd_t, __fd_t)
 #define __NR64AT1_execveat               (char const *, char const *)
-#define __NR64AT2_execveat               (char const *const *, char const *const *)
-#define __NR64AT3_execveat               (char const *const *, char const *const *)
+#define __NR64AT2_execveat               (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
+#define __NR64AT3_execveat               (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
 #define __NR64AT4_execveat               (atflag_t, __atflag_t)
 #define __NR64AT0_userfaultfd            (int, int)
 #define __NR64AT0_membarrier             (int, int)
@@ -1755,7 +1755,7 @@
 #define __NR64AM_clone(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (void *)b, (__pid_t *)c, (__pid_t *)d, (__uintptr_t)e
 #define __NR64AM_fork(a, b, c, d, e, f)                   /* nothing */
 #define __NR64AM_vfork(a, b, c, d, e, f)                  /* nothing */
-#define __NR64AM_execve(a, b, c, d, e, f)                 (char const *)a, (char const *const *)b, (char const *const *)c
+#define __NR64AM_execve(a, b, c, d, e, f)                 (char const *)a, (__HYBRID_PTR64(char const) const *)b, (__HYBRID_PTR64(char const) const *)c
 #define __NR64AM_exit(a, b, c, d, e, f)                   (__syscall_ulong_t)a
 #define __NR64AM_wait4(a, b, c, d, e, f)                  (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusagex64 *)d
 #define __NR64AM_kill(a, b, c, d, e, f)                   (__pid_t)a, (__syscall_ulong_t)b
@@ -2018,7 +2018,7 @@
 #define __NR64AM_memfd_create(a, b, c, d, e, f)           (int)a
 #define __NR64AM_kexec_file_load(a, b, c, d, e, f)        (int)a
 #define __NR64AM_bpf(a, b, c, d, e, f)                    (int)a
-#define __NR64AM_execveat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (char const *const *)c, (char const *const *)d, (__atflag_t)e
+#define __NR64AM_execveat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e
 #define __NR64AM_userfaultfd(a, b, c, d, e, f)            (int)a
 #define __NR64AM_membarrier(a, b, c, d, e, f)             (int)a
 #define __NR64AM_mlock2(a, b, c, d, e, f)                 (int)a

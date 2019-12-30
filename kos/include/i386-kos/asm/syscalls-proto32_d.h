@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a594f86 */
+/* HASH CRC-32:0x861aa4d3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -975,8 +975,8 @@
 #define __NR32AT1_link                    (char const *, char const *)
 #define __NR32AT0_unlink                  (char const *, char const *)
 #define __NR32AT0_execve                  (char const *, char const *)
-#define __NR32AT1_execve                  (char const *const *, char const *const *)
-#define __NR32AT2_execve                  (char const *const *, char const *const *)
+#define __NR32AT1_execve                  (__HYBRID_PTR32(char const) const *, __HYBRID_PTR32(char const) const *)
+#define __NR32AT2_execve                  (__HYBRID_PTR32(char const) const *, __HYBRID_PTR32(char const) const *)
 #define __NR32AT0_chdir                   (char const *, char const *)
 #define __NR32AT0_time                    (int32_t *, __int32_t *)
 #define __NR32AT0_mknod                   (char const *, char const *)
@@ -1716,8 +1716,8 @@
 #define __NR32AT0_bpf                     (int, int)
 #define __NR32AT0_execveat                (fd_t, __fd_t)
 #define __NR32AT1_execveat                (char const *, char const *)
-#define __NR32AT2_execveat                (char const *const *, char const *const *)
-#define __NR32AT3_execveat                (char const *const *, char const *const *)
+#define __NR32AT2_execveat                (__HYBRID_PTR32(char const) const *, __HYBRID_PTR32(char const) const *)
+#define __NR32AT3_execveat                (__HYBRID_PTR32(char const) const *, __HYBRID_PTR32(char const) const *)
 #define __NR32AT4_execveat                (atflag_t, __atflag_t)
 #define __NR32AT0_socket                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_socket                  (syscall_ulong_t, __syscall_ulong_t)
@@ -2056,7 +2056,7 @@
 #define __NR32AM_creat(a, b, c, d, e, f)                   (char const *)a, (__mode_t)b
 #define __NR32AM_link(a, b, c, d, e, f)                    (char const *)a, (char const *)b
 #define __NR32AM_unlink(a, b, c, d, e, f)                  (char const *)a
-#define __NR32AM_execve(a, b, c, d, e, f)                  (char const *)a, (char const *const *)b, (char const *const *)c
+#define __NR32AM_execve(a, b, c, d, e, f)                  (char const *)a, (__HYBRID_PTR32(char const) const *)b, (__HYBRID_PTR32(char const) const *)c
 #define __NR32AM_chdir(a, b, c, d, e, f)                   (char const *)a
 #define __NR32AM_time(a, b, c, d, e, f)                    (__int32_t *)a
 #define __NR32AM_mknod(a, b, c, d, e, f)                   (char const *)a, (__mode_t)b, (__dev_t)c
@@ -2399,7 +2399,7 @@
 #define __NR32AM_getrandom(a, b, c, d, e, f)               (int)a
 #define __NR32AM_memfd_create(a, b, c, d, e, f)            (int)a
 #define __NR32AM_bpf(a, b, c, d, e, f)                     (int)a
-#define __NR32AM_execveat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (char const *const *)c, (char const *const *)d, (__atflag_t)e
+#define __NR32AM_execveat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__HYBRID_PTR32(char const) const *)c, (__HYBRID_PTR32(char const) const *)d, (__atflag_t)e
 #define __NR32AM_socket(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AM_socketpair(a, b, c, d, e, f)              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__fd_t *)d
 #define __NR32AM_bind(a, b, c, d, e, f)                    (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c

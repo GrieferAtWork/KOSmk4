@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a3cffc3 */
+/* HASH CRC-32:0xcf42177c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,7 +100,7 @@
 #define SYS_clone                  __NR_clone                  /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, pid_t *ctid, uintptr_t newtls) */
 #define SYS_fork                   __NR_fork                   /* pid_t fork(void) */
 #define SYS_vfork                  __NR_vfork                  /* pid_t vfork(void) */
-#define SYS_execve                 __NR_execve                 /* errno_t execve(char const *path, char const *const *argv, char const *const *envp) */
+#define SYS_execve                 __NR_execve                 /* errno_t execve(char const *path, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp) */
 #define SYS_exit                   __NR_exit                   /* void exit(syscall_ulong_t status) */
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
@@ -389,7 +389,7 @@
 #define SYS_kexec_file_load        __NR_kexec_file_load        /* errno_t kexec_file_load(int TODO_PROTOTYPE) */
 #define SYS_bpf                    __NR_bpf                    /* errno_t bpf(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define SYS_execveat               __NR_execveat               /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
+#define SYS_execveat               __NR_execveat               /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 #define SYS_userfaultfd            __NR_userfaultfd            /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define SYS_membarrier             __NR_membarrier             /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define SYS_mlock2                 __NR_mlock2                 /* errno_t mlock2(int TODO_PROTOTYPE) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c3defa0 */
+/* HASH CRC-32:0x63d81300 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -391,11 +391,11 @@ __CDECLARE_SC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 __CDECLARE_SC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_SC(eventfd2) */
 #if __CRT_HAVE_SC(execve)
-__CDECLARE_SC(,__errno_t,execve,(char const *__path, char const *const *__argv, char const *const *__envp),(__path,__argv,__envp))
+__CDECLARE_SC(,__errno_t,execve,(char const *__path, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp),(__path,__argv,__envp))
 #endif /* __CRT_HAVE_SC(execve) */
 #if __CRT_HAVE_SC(execveat)
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, char const *const *__argv, char const *const *__envp, __atflag_t __flags),(__dirfd,__pathname,__argv,__envp,__flags))
+__CDECLARE_SC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp, __atflag_t __flags),(__dirfd,__pathname,__argv,__envp,__flags))
 #endif /* __CRT_HAVE_SC(execveat) */
 #if __CRT_HAVE_SC(exit)
 __CDECLARE_VOID_SC(__ATTR_NORETURN,exit,(__syscall_ulong_t __status),(__status))
@@ -1812,11 +1812,11 @@ __CDECLARE_XSC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 __CDECLARE_XSC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* __CRT_HAVE_XSC(eventfd2) */
 #if __CRT_HAVE_XSC(execve)
-__CDECLARE_XSC(,__errno_t,execve,(char const *__path, char const *const *__argv, char const *const *__envp),(__path,__argv,__envp))
+__CDECLARE_XSC(,__errno_t,execve,(char const *__path, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp),(__path,__argv,__envp))
 #endif /* __CRT_HAVE_XSC(execve) */
 #if __CRT_HAVE_XSC(execveat)
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, char const *const *__argv, char const *const *__envp, __atflag_t __flags),(__dirfd,__pathname,__argv,__envp,__flags))
+__CDECLARE_XSC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp, __atflag_t __flags),(__dirfd,__pathname,__argv,__envp,__flags))
 #endif /* __CRT_HAVE_XSC(execveat) */
 #if __CRT_HAVE_XSC(exit)
 __CDECLARE_VOID_XSC(__ATTR_NORETURN,exit,(__syscall_ulong_t __status),(__status))
