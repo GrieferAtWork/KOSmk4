@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a10f312 */
+/* HASH CRC-32:0xb9061995 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1077,8 +1077,8 @@
 #define __NR64AT2_rt_sigqueueinfo        (struct __siginfo64_struct const *, struct __siginfo64_struct const *)
 #define __NR64AT0_rt_sigsuspend          (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NR64AT1_rt_sigsuspend          (size_t, __size_t)
-#define __NR64AT0_sigaltstack            (struct sigaltstack const *, struct sigaltstack const *)
-#define __NR64AT1_sigaltstack            (struct sigaltstack *, struct sigaltstack *)
+#define __NR64AT0_sigaltstack            (struct sigaltstack64 const *, struct sigaltstack64 const *)
+#define __NR64AT1_sigaltstack            (struct sigaltstack64 *, struct sigaltstack64 *)
 #define __NR64AT0_utime                  (char const *, char const *)
 #define __NR64AT1_utime                  (struct utimbuf const *, struct utimbuf const *)
 #define __NR64AT0_mknod                  (char const *, char const *)
@@ -1573,7 +1573,7 @@
 #define __NR64AT3_openpty                (struct termios const *, struct termios const *)
 #define __NR64AT4_openpty                (struct winsize const *, struct winsize const *)
 #define __NR64AT0_set_exception_handler  (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT1_set_exception_handler  (__except_handler64_t, __except_handler64_t)
+#define __NR64AT1_set_exception_handler  (except_handler_t, __except_handler_t)
 #define __NR64AT2_set_exception_handler  (void *, void *)
 #define __NR64AT0_get_exception_handler  (__ULONG64_TYPE__ *, __ULONG64_TYPE__ *)
 #define __NR64AT1_get_exception_handler  (__except_handler64_t *, __except_handler64_t *)
@@ -1827,7 +1827,7 @@
 #define __NR64AM_rt_sigtimedwait(a, b, c, d, e, f)        (struct __sigset_struct const *)a, (struct __siginfo64_struct *)b, (struct __timespecx64 const *)c, (__size_t)d
 #define __NR64AM_rt_sigqueueinfo(a, b, c, d, e, f)        (__pid_t)a, (__syscall_ulong_t)b, (struct __siginfo64_struct const *)c
 #define __NR64AM_rt_sigsuspend(a, b, c, d, e, f)          (struct __sigset_struct const *)a, (__size_t)b
-#define __NR64AM_sigaltstack(a, b, c, d, e, f)            (struct sigaltstack const *)a, (struct sigaltstack *)b
+#define __NR64AM_sigaltstack(a, b, c, d, e, f)            (struct sigaltstack64 const *)a, (struct sigaltstack64 *)b
 #define __NR64AM_utime(a, b, c, d, e, f)                  (char const *)a, (struct utimbuf const *)b
 #define __NR64AM_mknod(a, b, c, d, e, f)                  (char const *)a, (__mode_t)b, (__dev_t)c
 #define __NR64AM_uselib(a, b, c, d, e, f)                 (char const *)a
@@ -2036,7 +2036,7 @@
 #define __NR64AM_rpc_schedule(a, b, c, d, e, f)           (__pid_t)a, (__syscall_ulong_t)b, (__uint8_t const *)c, (__HYBRID_PTR64(void) *)d
 #define __NR64AM_ksysctl(a, b, c, d, e, f)                (__syscall_ulong_t)a, (void *)b
 #define __NR64AM_openpty(a, b, c, d, e, f)                (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
-#define __NR64AM_set_exception_handler(a, b, c, d, e, f)  (__syscall_ulong_t)a, (__except_handler64_t)b, (void *)c
+#define __NR64AM_set_exception_handler(a, b, c, d, e, f)  (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
 #define __NR64AM_get_exception_handler(a, b, c, d, e, f)  (__ULONG64_TYPE__ *)a, (__except_handler64_t *)b, (__HYBRID_PTR64(void) *)c
 #define __NR64AM_ioctlf(a, b, c, d, e, f)                 (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
 #define __NR64AM_pread64f(a, b, c, d, e, f)               (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e

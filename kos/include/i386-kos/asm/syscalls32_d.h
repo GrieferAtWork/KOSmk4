@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71fbd378 */
+/* HASH CRC-32:0x43fe29ff */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,7 +239,7 @@
 #define __NR32_getcwd                  0xb7                   /* ssize_t getcwd(char *buf, size_t size) */
 #define __NR32_capget                  0xb8                   /* errno_t capget(int TODO_PROTOTYPE) */
 #define __NR32_capset                  0xb9                   /* errno_t capset(int TODO_PROTOTYPE) */
-#define __NR32_sigaltstack             0xba                   /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+#define __NR32_sigaltstack             0xba                   /* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
 #define __NR32_sendfile                0xbb                   /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
 #define __NR32_getpmsg                 0xbc                   /* errno_t getpmsg(int TODO_PROTOTYPE) */
 #define __NR32_putpmsg                 0xbd                   /* errno_t putpmsg(int TODO_PROTOTYPE) */
@@ -585,7 +585,7 @@
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-#define __NR32_set_exception_handler   __UINT32_C(0x8000000e) /* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) */
+#define __NR32_set_exception_handler   __UINT32_C(0x8000000e) /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'

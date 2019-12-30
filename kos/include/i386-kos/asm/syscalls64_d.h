@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea6e7f4e */
+/* HASH CRC-32:0xef968992 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -173,7 +173,7 @@
 /* @param: signo: One of `SIG*' */
 #define __NR64_rt_sigqueueinfo        0x81                           /* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) */
 #define __NR64_rt_sigsuspend          0x82                           /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
-#define __NR64_sigaltstack            0x83                           /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+#define __NR64_sigaltstack            0x83                           /* errno_t sigaltstack(struct sigaltstack64 const *ss, struct sigaltstack64 *oss) */
 #define __NR64_utime                  0x84                           /* errno_t utime(char const *filename, struct utimbuf const *times) */
 #define __NR64_mknod                  0x85                           /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
 #define __NR64_uselib                 0x86                           /* errno_t uselib(char const *library) */
@@ -522,7 +522,7 @@
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-#define __NR64_set_exception_handler  __UINT64_C(0xffffffff8000000e) /* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler64_t handler, void *handler_sp) */
+#define __NR64_set_exception_handler  __UINT64_C(0xffffffff8000000e) /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'

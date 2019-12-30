@@ -84,10 +84,7 @@ struct sigstack32 /*[PREFIX(ss_)]*/ {
 /* Alternate, preferred interface. */
 struct sigaltstack32 /*[PREFIX(ss_)]*/ {
 	__HYBRID_PTR32(void) ss_sp;
-	int                  ss_flags;
-#if __SIZEOF_INT__ < 4
-	__BYTE_TYPE__ __ss_pad[4 - __SIZEOF_INT__];
-#endif
+	__INT32_TYPE__       ss_flags;
 	__ULONG32_TYPE__     ss_size;
 };
 #endif /* __CC__ */

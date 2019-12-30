@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c7031ce */
+/* HASH CRC-32:0xd70ff452 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6943,7 +6943,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capset)
 	.cfi_endproc
 END(__x86_asm32_int80_capset)
 
-/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
 .section .text.x86.asm32_syscall_int80.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	.cfi_startproc simple
@@ -14660,7 +14660,7 @@ END(__x86_asm32_int80_time64)
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.x86.asm32_syscall_int80.set_exception_handler
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
 	.cfi_startproc simple
@@ -24201,7 +24201,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_capset)
 	.cfi_endproc
 END(__x86_asm32_sysenter_capset)
 
-/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
 .section .text.x86.asm32_syscall_sysenter.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigaltstack)
 	.cfi_startproc simple
@@ -31980,7 +31980,7 @@ END(__x86_asm32_sysenter_time64)
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.x86.asm32_syscall_sysenter.set_exception_handler
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_exception_handler)
 	.cfi_startproc simple

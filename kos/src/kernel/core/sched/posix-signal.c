@@ -61,6 +61,7 @@
 #include <compat/bits/siginfo-struct.h>
 #include <compat/bits/timespec.h>
 #include <compat/kos/types.h>
+#include <compat/pointer.h>
 #include <compat/signal.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
@@ -1390,18 +1391,20 @@ compat_sigaction_to_sigaction(CHECKED USER struct compat_sigaction const *self,
 	result->sa_flags = self->sa_flags;
 	*(void **)&result->sa_restorer  = (void *)self->sa_restorer;
 }
+
 PRIVATE void KCALL
 sigaction_to_compat_sigaction(struct sigaction const *__restrict self,
                               CHECKED USER struct compat_sigaction *result) {
-	*(__ARCH_COMPAT_PTR(void) *)&result->sa_handler  = (__ARCH_COMPAT_PTR(void))(void *)self->sa_handler;
+	*(compat_ptr(void) *)&result->sa_handler  = (compat_ptr(void))(void *)self->sa_handler;
 	memcpy(&result->sa_mask, &self->sa_mask, MIN(sizeof(sigset_t), sizeof(compat_sigset_t)));
 	__STATIC_IF(sizeof(compat_sigset_t) > sizeof(sigset_t)) {
 		memset((byte_t *)&result->sa_mask + sizeof(sigset_t), 0,
 		       sizeof(compat_sigset_t) - sizeof(sigset_t));
 	}
 	result->sa_flags = self->sa_flags;
-	*(__ARCH_COMPAT_PTR(void) *)&result->sa_restorer  = (__ARCH_COMPAT_PTR(void))(void *)self->sa_restorer;
+	*(compat_ptr(void) *)&result->sa_restorer  = (compat_ptr(void))(void *)self->sa_restorer;
 }
+
 PRIVATE errno_t KCALL
 do_compat_sigaction(syscall_ulong_t signo,
                     UNCHECKED USER struct compat_sigaction const *act,

@@ -65,10 +65,8 @@ typedef struct sigaltstack stack_t;
 /* Structure describing a signal stack (obsolete). */
 struct sigstack64 /*[PREFIX(ss_)]*/ {
 	__HYBRID_PTR64(void) ss_sp;      /* Signal stack pointer. */
-	int                  ss_onstack; /* Nonzero if executing on this stack. */
-#if 8 > __SIZEOF_INT__
-	__BYTE_TYPE__ __ss_pad[8 - __SIZEOF_INT__];
-#endif /* 8 > __SIZEOF_INT__ */
+	__INT32_TYPE__       ss_onstack; /* Nonzero if executing on this stack. */
+	__BYTE_TYPE__      __ss_pad[4];  /* ... */
 };
 #endif /* __CC__ */
 
@@ -82,10 +80,8 @@ struct sigstack64 /*[PREFIX(ss_)]*/ {
 /* Alternate, preferred interface. */
 struct sigaltstack64 /*[PREFIX(ss_)]*/ {
 	__HYBRID_PTR64(void) ss_sp;
-	int                  ss_flags;
-#if 8 > __SIZEOF_INT__
-	__BYTE_TYPE__      __ss_pad[8 - __SIZEOF_INT__];
-#endif
+	__INT32_TYPE__       ss_flags;
+	__BYTE_TYPE__      __ss_pad[4];
 	__ULONG64_TYPE__     ss_size;
 };
 #endif /* __CC__ */

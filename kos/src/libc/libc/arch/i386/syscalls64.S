@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ce6096 */
+/* HASH CRC-32:0x40f1152b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3230,7 +3230,7 @@ INTERN_FUNCTION(libc_sys_Xrt_sigsuspend)
 END(libc_sys_Xrt_sigsuspend)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrt_sigsuspend, libc_sys_Xrt_sigsuspend)
 
-/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* errno_t sigaltstack(struct sigaltstack64 const *ss, struct sigaltstack64 *oss) */
 .section .text.crt.syscall.sigaltstack
 INTERN_FUNCTION(libc_sys_sigaltstack)
 	.cfi_startproc
@@ -3242,7 +3242,7 @@ INTERN_FUNCTION(libc_sys_sigaltstack)
 END(libc_sys_sigaltstack)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sigaltstack, libc_sys_sigaltstack)
 
-/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* errno_t sigaltstack(struct sigaltstack64 const *ss, struct sigaltstack64 *oss) */
 .section .text.crt.syscall.Xsigaltstack
 INTERN_FUNCTION(libc_sys_Xsigaltstack)
 	.cfi_startproc
@@ -8633,7 +8633,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xopenpty, libc_sys_Xopenpty)
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler64_t handler, void *handler_sp) */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.crt.syscall.set_exception_handler
 INTERN_FUNCTION(libc_sys_set_exception_handler)
 	.cfi_startproc
@@ -8654,7 +8654,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_set_exception_handler, libc_sys_set_exception_handl
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler64_t handler, void *handler_sp) */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.crt.syscall.Xset_exception_handler
 INTERN_FUNCTION(libc_sys_Xset_exception_handler)
 	.cfi_startproc

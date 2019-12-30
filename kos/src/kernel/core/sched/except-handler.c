@@ -32,12 +32,20 @@
 #include <sched/pid.h>
 #include <sched/task.h>
 
+#include <compat/config.h>
 #include <kos/except-handler.h>
 #include <kos/except-inval.h>
 
 #include <errno.h>
 #include <signal.h>
 #include <string.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/sigstack.h>
+#include <compat/kos/except-handler.h>
+#include <compat/kos/types.h>
+#include <compat/pointer.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -109,6 +117,65 @@ NOTHROW(KCALL reset_user_except_handler)(void) {
 }
 
 
+
+
+
+/************************************************************************/
+/* get_exception_handler(), set_exception_handler()                     */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GET_EXCEPTION_HANDLER
+DEFINE_SYSCALL3(errno_t, get_exception_handler,
+                USER UNCHECKED syscall_ulong_t *, pmode,
+                USER UNCHECKED except_handler_t *, phandler,
+                USER UNCHECKED void **, phandler_sp) {
+	struct user_except_handler *exc;
+	exc = &PERTASK(this_user_except_handler);
+	if (pmode) {
+		validate_writable(pmode, sizeof(*pmode));
+		COMPILER_WRITE_BARRIER();
+		*pmode = exc->ueh_mode;
+	}
+	if (phandler) {
+		validate_writable(phandler, sizeof(*phandler));
+		COMPILER_WRITE_BARRIER();
+		*phandler = exc->ueh_handler;
+	}
+	if (phandler_sp) {
+		validate_writable(phandler_sp, sizeof(*phandler_sp));
+		COMPILER_WRITE_BARRIER();
+		*phandler_sp = exc->ueh_stack;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_GET_EXCEPTION_HANDLER */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_GET_EXCEPTION_HANDLER
+DEFINE_COMPAT_SYSCALL3(errno_t, get_exception_handler,
+                       USER UNCHECKED compat_syscall_ulong_t *, pmode,
+                       USER UNCHECKED compat_except_handler_t *, phandler,
+                       USER UNCHECKED compat_ptr(void) *, phandler_sp) {
+	struct user_except_handler *exc;
+	exc = &PERTASK(this_user_except_handler);
+	if (pmode) {
+		validate_writable(pmode, sizeof(*pmode));
+		COMPILER_WRITE_BARRIER();
+		*pmode = exc->ueh_mode;
+	}
+	if (phandler) {
+		validate_writable(phandler, sizeof(*phandler));
+		COMPILER_WRITE_BARRIER();
+		*phandler = (compat_except_handler_t)(uintptr_t)(void *)exc->ueh_handler;
+	}
+	if (phandler_sp) {
+		validate_writable(phandler_sp, sizeof(*phandler_sp));
+		COMPILER_WRITE_BARRIER();
+		*phandler_sp = exc->ueh_stack;
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_GET_EXCEPTION_HANDLER */
+
+#ifdef __ARCH_WANT_SYSCALL_SET_EXCEPTION_HANDLER
 DEFINE_SYSCALL3(errno_t, set_exception_handler,
                 syscall_ulong_t, mode,
                 USER UNCHECKED except_handler_t, handler,
@@ -148,31 +215,16 @@ DEFINE_SYSCALL3(errno_t, set_exception_handler,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_SET_EXCEPTION_HANDLER */
 
-DEFINE_SYSCALL3(errno_t, get_exception_handler,
-                USER UNCHECKED syscall_ulong_t *, pmode,
-                USER UNCHECKED except_handler_t *, phandler,
-                USER UNCHECKED void **, phandler_sp) {
-	struct user_except_handler *exc;
-	exc = &PERTASK(this_user_except_handler);
-	if (pmode) {
-		validate_writable(pmode, sizeof(*pmode));
-		COMPILER_WRITE_BARRIER();
-		*pmode = exc->ueh_mode;
-	}
-	if (phandler) {
-		validate_writable(phandler, sizeof(*phandler));
-		COMPILER_WRITE_BARRIER();
-		*phandler = exc->ueh_handler;
-	}
-	if (phandler_sp) {
-		validate_writable(phandler_sp, sizeof(*phandler_sp));
-		COMPILER_WRITE_BARRIER();
-		*phandler_sp = exc->ueh_stack;
-	}
-	return -EOK;
-}
 
+
+
+
+/************************************************************************/
+/* sigaltstack()                                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SIGALTSTACK
 DEFINE_SYSCALL2(errno_t, sigaltstack,
                 USER UNCHECKED struct sigaltstack const *, ss,
                 USER UNCHECKED struct sigaltstack *, oss) {
@@ -180,7 +232,7 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 	if (oss) {
 		validate_writable(oss, sizeof(*oss));
 		COMPILER_WRITE_BARRIER();
-		sp            = PERTASK_GET(this_user_except_handler.ueh_stack);
+		sp = PERTASK_GET(this_user_except_handler.ueh_stack);
 		oss->ss_flags = 0;
 		if (sp == EXCEPT_HANDLER_SP_CURRENT) {
 			oss->ss_sp   = NULL;
@@ -236,13 +288,89 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_SIGALTSTACK */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_SIGALTSTACK
+DEFINE_COMPAT_SYSCALL2(errno_t, sigaltstack,
+                       USER UNCHECKED struct compat_sigaltstack const *, ss,
+                       USER UNCHECKED struct compat_sigaltstack *, oss) {
+	void *sp;
+	if (oss) {
+		validate_writable(oss, sizeof(*oss));
+		COMPILER_WRITE_BARRIER();
+		sp = PERTASK_GET(this_user_except_handler.ueh_stack);
+		oss->ss_flags = 0;
+		if (sp == EXCEPT_HANDLER_SP_CURRENT) {
+			oss->ss_sp   = (compat_ptr(void))NULL;
+			oss->ss_size = 0;
+		} else {
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+#ifdef KERNELSPACE_HIGHMEM
+			if unlikely((uintptr_t)sp <= PAGESIZE) {
+				oss->ss_sp   = (compat_ptr(void))0;
+				oss->ss_size = (compat_size_t)(uintptr_t)sp;
+			} else {
+				oss->ss_sp   = (compat_ptr(void))(void *)PAGESIZE;
+				oss->ss_size = (compat_size_t)(uintptr_t)sp - PAGESIZE;
+			}
+#else /* KERNELSPACE_HIGHMEM */
+			if unlikely((uintptr_t)sp <= KERNEL_CEILING) {
+				oss->ss_sp   = (compat_ptr(void))0;
+				oss->ss_size = (compat_size_t)(uintptr_t)sp;
+			} else {
+				oss->ss_sp   = (compat_ptr(void))(void *)KERNEL_CEILING;
+				oss->ss_size = (compat_size_t)((uintptr_t)sp - KERNEL_CEILING);
+			}
+#endif /* !KERNELSPACE_HIGHMEM */
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+#ifdef KERNELSPACE_HIGHMEM
+			oss->ss_sp   = (compat_ptr(void))sp;
+			oss->ss_size = (compat_size_t)((uintptr_t)KERNELSPACE_BASE - (uintptr_t)sp);
+#else /* KERNELSPACE_HIGHMEM */
+			oss->ss_sp   = (compat_ptr(void))sp;
+			oss->ss_size = (compat_size_t)(sp == 0 ? (uintptr_t)-1 : (uintptr_t)0 - (uintptr_t)sp);
+#endif /* !KERNELSPACE_HIGHMEM */
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+		}
+	}
+	if (ss) {
+		validate_readable(ss, sizeof(*ss));
+		COMPILER_READ_BARRIER();
+		if (ss->ss_flags & SS_DISABLE)
+			sp = EXCEPT_HANDLER_SP_CURRENT;
+		else {
+			sp = ss->ss_sp;
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+			sp = (byte_t *)sp + ss->ss_size;
+#endif /* __ARCH_STACK_GROWS_DOWNWARDS */
+			/* Validate that the given stack pointer is actually writable. */
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+			validate_writable((byte_t *)sp - 1, 1);
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+			validate_writable(sp, 1);
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+		}
+		PERTASK_SET(this_user_except_handler.ueh_stack, sp);
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGALTSTACK */
+
+
+
+
+
+/************************************************************************/
+/* set_tid_address()                                                    */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SET_TID_ADDRESS
 DEFINE_SYSCALL1(pid_t, set_tid_address,
                 USER UNCHECKED pid_t *, tidptr) {
 	validate_writable(tidptr, sizeof(*tidptr));
 	PERTASK_SET(this_tid_address, tidptr);
 	return task_gettid();
 }
+#endif /* __ARCH_WANT_SYSCALL_SET_TID_ADDRESS */
 
 
 

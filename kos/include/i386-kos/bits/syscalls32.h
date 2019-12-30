@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb226741b */
+/* HASH CRC-32:0xaa75b00e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -242,7 +242,7 @@
 #define SYS_getcwd                  __NR_getcwd                  /* ssize_t getcwd(char *buf, size_t size) */
 #define SYS_capget                  __NR_capget                  /* errno_t capget(int TODO_PROTOTYPE) */
 #define SYS_capset                  __NR_capset                  /* errno_t capset(int TODO_PROTOTYPE) */
-#define SYS_sigaltstack             __NR_sigaltstack             /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+#define SYS_sigaltstack             __NR_sigaltstack             /* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
 #define SYS_sendfile                __NR_sendfile                /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
 #define SYS_getpmsg                 __NR_getpmsg                 /* errno_t getpmsg(int TODO_PROTOTYPE) */
 #define SYS_putpmsg                 __NR_putpmsg                 /* errno_t putpmsg(int TODO_PROTOTYPE) */
@@ -588,7 +588,7 @@
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-#define SYS_set_exception_handler   __NR_set_exception_handler   /* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) */
+#define SYS_set_exception_handler   __NR_set_exception_handler   /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'

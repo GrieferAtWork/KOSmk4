@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b52aa5d */
+/* HASH CRC-32:0xc090c48f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4005,7 +4005,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigsuspend)
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigsuspend)
 
-/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* errno_t sigaltstack(struct sigaltstack64 const *ss, struct sigaltstack64 *oss) */
 .section .text.x86.asm64_syscall.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sigaltstack)
 	.cfi_startproc simple
@@ -10473,7 +10473,7 @@ END(__x86_asm64_syscall_openpty)
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler64_t handler, void *handler_sp) */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.x86.asm64_syscall.set_exception_handler
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_exception_handler)
 	.cfi_startproc simple
@@ -17497,7 +17497,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capset)
 	.cfi_endproc
 END(__x86_asm32_int80_capset)
 
-/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
 .section .text.x86.asm32_syscall_int80.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	.cfi_startproc simple
@@ -24257,7 +24257,7 @@ END(__x86_asm32_int80_time64)
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.x86.asm32_syscall_int80.set_exception_handler
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
 	.cfi_startproc simple
@@ -27501,7 +27501,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_capget, __x86_asm32_int80_capget)
 /* errno_t capset(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_capset, __x86_asm32_int80_capset)
 
-/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigaltstack, __x86_asm32_int80_sigaltstack)
 
 /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
@@ -29318,7 +29318,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_time64, __x86_asm32_int80_time64)
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_exception_handler, __x86_asm32_int80_set_exception_handler)
 
 /* Get the current exception handler mode for the calling thread.
@@ -32315,7 +32315,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_capset)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_capset)
 
-/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
 .section .text.x86.asm32_syscall_sysrun32.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigaltstack)
 	.cfi_startproc
@@ -34767,7 +34767,7 @@ END(__x86_asm32_sysrun32_time64)
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.x86.asm32_syscall_sysrun32.set_exception_handler
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_exception_handler)
 	.cfi_startproc

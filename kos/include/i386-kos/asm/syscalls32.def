@@ -86,6 +86,7 @@ mmap = mmap32;
 sigaction = sigactionx32;
 rt_sigaction = rt_sigactionx32;
 utime = utime32;
+sigaltstack = sigaltstackx32;
 
 getrusage = getrusagex32;
 getrusage64 = getrusagex32_64;
@@ -140,7 +141,6 @@ lfutex = lfutexx32_64;
 debugtrap = debugtrapx32;
 set_library_listdef = set_library_listdefx32;
 get_exception_handler = get_exception_handlerx32;
-set_exception_handler = set_exception_handlerx32;
 rpc_schedule = rpc_schedulex32;
 readv = readvx32;
 readvf = readvfx32;

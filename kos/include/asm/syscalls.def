@@ -851,7 +851,13 @@ rt_sigsuspend:(struct __sigset_struct const *set, size_t sigsetsize) -> errno_t;
 [cp] getcwd:(char *buf, size_t size) -> ssize_t;
 capget:(int TODO_PROTOTYPE) -> errno_t;
 capset:(int TODO_PROTOTYPE) -> errno_t;
+
+%[startgroup]
 sigaltstack:(struct sigaltstack const *ss, struct sigaltstack *oss) -> errno_t;
+sigaltstackx32:(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) -> errno_t;
+sigaltstackx64:(struct sigaltstack64 const *ss, struct sigaltstack64 *oss) -> errno_t;
+%[endgroup]
+
 [restart(dont)][cp] sendfile:(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) -> ssize_t;
 [cp] getpmsg:(int TODO_PROTOTYPE) -> errno_t;
 [cp] putpmsg:(int TODO_PROTOTYPE) -> errno_t;
@@ -1531,7 +1537,6 @@ rpc_schedule:(pid_t target,
 @@Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers.
 openpty:(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) -> errno_t;
 
-%[startgroup]
 @@Set the exception handler mode for the calling thread.
 @@Examples:
 @@  Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
@@ -1542,9 +1547,6 @@ openpty:(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, s
 @@@return: 0 :        Success.
 @@@return: -1:EINVAL: The given MODE is invalid
 [restart(must)] set_exception_handler:(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) -> errno_t;
-[doc_alias(set_exception_handler)][restart(must)] set_exception_handlerx32:(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) -> errno_t;
-[doc_alias(set_exception_handler)][restart(must)] set_exception_handlerx64:(syscall_ulong_t mode, __except_handler64_t handler, void *handler_sp) -> errno_t;
-%[endgroup]
 
 %[startgroup]
 @@Get the current exception handler mode for the calling thread.

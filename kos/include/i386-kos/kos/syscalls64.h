@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x572a35db */
+/* HASH CRC-32:0x37fdbf8b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,7 @@
 #include <hybrid/__pointer.h>
 #include <hybrid/typecore.h>
 #include <kos/bits/debugtrap64.h>
+#include <kos/bits/except-handler.h>
 #include <kos/bits/except-handler64.h>
 #include <kos/bits/exception_data64.h>
 #include <kos/bits/futex-expr64.h>
@@ -113,7 +114,7 @@ struct rlimit64;
 struct rpc_syscall_info;
 struct sched_param;
 struct sigaction64;
-struct sigaltstack;
+struct sigaltstack64;
 struct sigevent;
 struct sockaddr;
 struct stat;
@@ -1278,7 +1279,7 @@ __CDECLARE_SC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t __
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-__CDECLARE_SC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler64_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
+__CDECLARE_SC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
 #endif /* __CRT_HAVE_SC(set_exception_handler) */
 #if __CRT_HAVE_SC(set_library_listdef)
 /* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
@@ -1375,7 +1376,7 @@ __CDECLARE_SC(,__errno_t,shmget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_SC(shutdown) */
 #if __CRT_HAVE_SC(sigaltstack)
-__CDECLARE_SC(,__errno_t,sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),(__ss,__oss))
+__CDECLARE_SC(,__errno_t,sigaltstack,(struct sigaltstack64 const *__ss, struct sigaltstack64 *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_SC(sigaltstack) */
 #if __CRT_HAVE_SC(signalfd)
 __CDECLARE_SC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fd,__sigmask,__sigsetsize))
@@ -2695,7 +2696,7 @@ __CDECLARE_XSC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t _
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-__CDECLARE_XSC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler64_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
+__CDECLARE_XSC(,__errno_t,set_exception_handler,(__syscall_ulong_t __mode, __except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
 #endif /* __CRT_HAVE_XSC(set_exception_handler) */
 #if __CRT_HAVE_XSC(set_library_listdef)
 /* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
@@ -2792,7 +2793,7 @@ __CDECLARE_XSC(,__errno_t,shmget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_XSC(shutdown) */
 #if __CRT_HAVE_XSC(sigaltstack)
-__CDECLARE_XSC(,__errno_t,sigaltstack,(struct sigaltstack const *__ss, struct sigaltstack *__oss),(__ss,__oss))
+__CDECLARE_XSC(,__errno_t,sigaltstack,(struct sigaltstack64 const *__ss, struct sigaltstack64 *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_XSC(sigaltstack) */
 #if __CRT_HAVE_XSC(signalfd)
 __CDECLARE_XSC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fd,__sigmask,__sigsetsize))

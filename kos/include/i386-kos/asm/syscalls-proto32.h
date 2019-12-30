@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9041e3e */
+/* HASH CRC-32:0x83b5838 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1290,8 +1290,8 @@
 #define __NRAT1_getcwd                  (size_t, __size_t)
 #define __NRAT0_capget                  (int, int)
 #define __NRAT0_capset                  (int, int)
-#define __NRAT0_sigaltstack             (struct sigaltstack const *, struct sigaltstack const *)
-#define __NRAT1_sigaltstack             (struct sigaltstack *, struct sigaltstack *)
+#define __NRAT0_sigaltstack             (struct sigaltstack32 const *, struct sigaltstack32 const *)
+#define __NRAT1_sigaltstack             (struct sigaltstack32 *, struct sigaltstack32 *)
 #define __NRAT0_sendfile                (fd_t, __fd_t)
 #define __NRAT1_sendfile                (fd_t, __fd_t)
 #define __NRAT2_sendfile                (syscall_ulong_t *, __syscall_ulong_t *)
@@ -1818,7 +1818,7 @@
 #define __NRAT2_fchdirat                (atflag_t, __atflag_t)
 #define __NRAT0_time64                  (int64_t *, __int64_t *)
 #define __NRAT0_set_exception_handler   (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_set_exception_handler   (__except_handler32_t, __except_handler32_t)
+#define __NRAT1_set_exception_handler   (except_handler_t, __except_handler_t)
 #define __NRAT2_set_exception_handler   (void *, void *)
 #define __NRAT0_get_exception_handler   (__ULONG32_TYPE__ *, __ULONG32_TYPE__ *)
 #define __NRAT1_get_exception_handler   (__except_handler32_t *, __except_handler32_t *)
@@ -2231,7 +2231,7 @@
 #define __NRAM_getcwd(a, b, c, d, e, f)                  (char *)a, (__size_t)b
 #define __NRAM_capget(a, b, c, d, e, f)                  (int)a
 #define __NRAM_capset(a, b, c, d, e, f)                  (int)a
-#define __NRAM_sigaltstack(a, b, c, d, e, f)             (struct sigaltstack const *)a, (struct sigaltstack *)b
+#define __NRAM_sigaltstack(a, b, c, d, e, f)             (struct sigaltstack32 const *)a, (struct sigaltstack32 *)b
 #define __NRAM_sendfile(a, b, c, d, e, f)                (__fd_t)a, (__fd_t)b, (__syscall_ulong_t *)c, (__size_t)d
 #define __NRAM_getpmsg(a, b, c, d, e, f)                 (int)a
 #define __NRAM_putpmsg(a, b, c, d, e, f)                 (int)a
@@ -2431,7 +2431,7 @@
 #define __NRAM_openpty(a, b, c, d, e, f)                 (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
 #define __NRAM_fchdirat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NRAM_time64(a, b, c, d, e, f)                  (__int64_t *)a
-#define __NRAM_set_exception_handler(a, b, c, d, e, f)   (__syscall_ulong_t)a, (__except_handler32_t)b, (void *)c
+#define __NRAM_set_exception_handler(a, b, c, d, e, f)   (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
 #define __NRAM_get_exception_handler(a, b, c, d, e, f)   (__ULONG32_TYPE__ *)a, (__except_handler32_t *)b, (__HYBRID_PTR32(void) *)c
 #define __NRAM_set_library_listdef(a, b, c, d, e, f)     (struct library_listdef32 const *)a
 #define __NRAM_debugtrap(a, b, c, d, e, f)               (struct ucpustate32 const *)a, (struct debugtrap_reason32 const *)b

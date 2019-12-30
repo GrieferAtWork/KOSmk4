@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2faf9a8b */
+/* HASH CRC-32:0x7b9fcd76 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3521,7 +3521,7 @@ INTERN_FUNCTION(libc_sys_Xcapset)
 END(libc_sys_Xcapset)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xcapset, libc_sys_Xcapset)
 
-/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
 .section .text.crt.syscall.sigaltstack
 INTERN_FUNCTION(libc_sys_sigaltstack)
 	movl   $(0xba), %eax
@@ -3529,7 +3529,7 @@ INTERN_FUNCTION(libc_sys_sigaltstack)
 END(libc_sys_sigaltstack)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sigaltstack, libc_sys_sigaltstack)
 
-/* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
+/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
 .section .text.crt.syscall.Xsigaltstack
 INTERN_FUNCTION(libc_sys_Xsigaltstack)
 	movl   $(0xba), %eax
@@ -7004,7 +7004,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtime64, libc_sys_Xtime64)
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.crt.syscall.set_exception_handler
 INTERN_FUNCTION(libc_sys_set_exception_handler)
 	movl   $(0x8000000e), %eax
@@ -7021,7 +7021,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_set_exception_handler, libc_sys_set_exception_handl
  * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, __except_handler32_t handler, void *handler_sp) */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 .section .text.crt.syscall.Xset_exception_handler
 INTERN_FUNCTION(libc_sys_Xset_exception_handler)
 	movl   $(0x8000000e), %eax

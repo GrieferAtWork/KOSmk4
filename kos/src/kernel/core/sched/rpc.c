@@ -41,6 +41,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <compat/config.h>
 #include <kos/except-inval.h>
 #include <sys/wait.h>
 
@@ -51,6 +52,10 @@
 #include <string.h>
 
 #include <librpc/rpc.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/pointer.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
@@ -1017,7 +1022,7 @@ DEFINE_SYSCALL4(syscall_slong_t, rpc_schedule,
 DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rpc_schedule,
                        pid_t, target, syscall_ulong_t, flags,
                        USER UNCHECKED uint8_t const *, program,
-                       USER UNCHECKED __ARCH_COMPAT_PTR(void) *, arguments) {
+                       USER UNCHECKED compat_ptr(void) *, arguments) {
 	(void)target;
 	(void)flags;
 	(void)program;
