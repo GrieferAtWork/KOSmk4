@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x275b3207 */
+/* HASH CRC-32:0xa72c5477 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -837,7 +837,7 @@ __CRT_FUNCTION(fsetpos64_unlocked,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,fs
 __CRT_FUNCTION(fsetpos_unlocked,0,(),2,(FILE *__restrict,stream,fpos_t const *__restrict,pos),int)
 __CRT_FUNCTION(fsetxattr,0,(),5,(fd_t,fd,char const *,name,void const *,buf,size_t,bufsize,int,flags),int)
 __CRT_FUNCTION(fstatfs,0,(),2,(fd_t,filedes,struct statfs *,buf),int)
-__CRT_FUNCTION(fstatfs64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,fstatfs),2,(fd_t,filedes,struct statfs64 *,buf),int)
+__CRT_FUNCTION(fstatfs64,1,(IS_DEFINED(_STATFS_MATCHES_STATFS64),fstatfs),2,(fd_t,filedes,struct statfs64 *,buf),int)
 __CRT_FUNCTION(fstatvfs,0,(),2,(fd_t,filedes,struct statvfs *,buf),int)
 __CRT_FUNCTION(fstatvfs64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,fstatvfs),2,(fd_t,filedes,struct statvfs64 *,buf),int)
 __CRT_FUNCTION(fsync,0,(),1,(fd_t,fd),int)
@@ -2081,7 +2081,7 @@ __CRT_FUNCTION(srandom_r,0,(),2,(unsigned int,seed,struct random_data *,buf),int
 __CRT_FUNCTION(sscanf,0,(),VA(2),(char const *__restrict,input,char const *__restrict,format),__STDC_INT_AS_SIZE_T)
 __CRT_FUNCTION(ssignal,0,(),2,(int,signo,sighandler_t,handler),sighandler_t)
 __CRT_FUNCTION(statfs,0,(),2,(char const *,file,struct statfs *,buf),int)
-__CRT_FUNCTION(statfs64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,statfs),2,(const char *,file,struct statfs64 *,buf),int)
+__CRT_FUNCTION(statfs64,1,(IS_DEFINED(_STATFS_MATCHES_STATFS64),statfs),2,(const char *,file,struct statfs64 *,buf),int)
 __CRT_FUNCTION(statvfs,0,(),2,(char const *,file,struct statvfs *,buf),int)
 __CRT_FUNCTION(statvfs64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,statvfs),2,(const char *,file,struct statvfs64 *,buf),int)
 __CRT_FUNCTION(stime,0,(),1,(time_t const *,when),int)

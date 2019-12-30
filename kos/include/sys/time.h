@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ebd511a */
+/* HASH CRC-32:0xb7432721 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,14 +116,14 @@ typedef void *__restrict __timezone_ptr_t;
  * NOTE: This form of timezone information is obsolete.
  * Use the functions and variables declared in <time.h> instead */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday,(struct timeval *__restrict __tv, __timezone_ptr_t __tz),gettimeofday64,(__tv,__tz))
-#elif defined(__CRT_HAVE_gettimeofday) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_gettimeofday) && !defined(__USE_TIME_BITS64)
 /* Get the current time of day and timezone information,
  * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
  * Returns 0 on success, -1 on errors.
  * NOTE: This form of timezone information is obsolete.
  * Use the functions and variables declared in <time.h> instead */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday,(struct timeval *__restrict __tv, __timezone_ptr_t __tz),(__tv,__tz))
-#elif defined(__CRT_HAVE___gettimeofday) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE___gettimeofday) && !defined(__USE_TIME_BITS64)
 /* Get the current time of day and timezone information,
  * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
  * Returns 0 on success, -1 on errors.
@@ -143,7 +143,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(gettimeofday, __FORCELOCAL __ATTR_NONNULL((1)) i
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getitimer,(__itimer_which_t __which, struct itimerval *__curr_value),getitimer64,(__which,__curr_value))
-#elif defined(__CRT_HAVE_getitimer) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_getitimer) && !defined(__USE_TIME_BITS64)
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getitimer,(__itimer_which_t __which, struct itimerval *__curr_value),(__which,__curr_value))
@@ -157,7 +157,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getitimer, __FORCELOCAL __ATTR_NONNULL((2)) int 
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setitimer,(__itimer_which_t __which, struct itimerval const *__newval, struct itimerval *__oldval),setitimer64,(__which,__newval,__oldval))
-#elif defined(__CRT_HAVE_setitimer) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_setitimer) && !defined(__USE_TIME_BITS64)
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setitimer,(__itimer_which_t __which, struct itimerval const *__newval, struct itimerval *__oldval),(__which,__newval,__oldval))
@@ -172,7 +172,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setitimer, __FORCELOCAL __ATTR_NONNULL((2)) int 
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,utimes,(char const *__file, struct timeval const __tvp[2]),utimes64,(__file,__tvp))
-#elif defined(__CRT_HAVE_utimes) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_utimes) && !defined(__USE_TIME_BITS64)
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
@@ -189,7 +189,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(utimes, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #if defined(__CRT_HAVE_futimesat64) && defined(__USE_TIME_BITS64)
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,futimesat,(__fd_t __fd, char const *__file, struct timeval const __tvp[2]),futimesat64,(__fd,__file,__tvp))
-#elif defined(__CRT_HAVE_futimesat) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_futimesat) && !defined(__USE_TIME_BITS64)
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,futimesat,(__fd_t __fd, char const *__file, struct timeval const __tvp[2]),(__fd,__file,__tvp))
 #elif defined(__CRT_HAVE_futimesat) || defined(__CRT_HAVE_futimesat64)
@@ -204,7 +204,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futimesat, __FORCELOCAL __ATTR_NONNULL((2)) int 
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,settimeofday,(struct timeval const *__tv, struct timezone const *__tz),settimeofday64,(__tv,__tz))
-#elif defined(__CRT_HAVE_settimeofday) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_settimeofday) && !defined(__USE_TIME_BITS64)
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
 __CDECLARE(,int,__NOTHROW_NCX,settimeofday,(struct timeval const *__tv, struct timezone const *__tz),(__tv,__tz))
@@ -220,7 +220,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(settimeofday, __FORCELOCAL int __NOTHROW_NCX(__L
  * adjustment remaining to be done from the last `adjtime' call.
  * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,adjtime,(struct timeval const *__delta, struct timeval *__olddelta),adjtime64,(__delta,__olddelta))
-#elif defined(__CRT_HAVE_adjtime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_adjtime) && !defined(__USE_TIME_BITS64)
 /* Adjust the current time of day by the amount in DELTA.
  * If OLDDELTA is not NULL, it is filled in with the amount of time
  * adjustment remaining to be done from the last `adjtime' call.
@@ -237,7 +237,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(adjtime, __FORCELOCAL int __NOTHROW_NCX(__LIBCCA
 #if defined(__CRT_HAVE_lutimes64) && defined(__USE_TIME_BITS64)
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,lutimes,(char const *__file, struct timeval const __tvp[2]),lutimes64,(__file,__tvp))
-#elif defined(__CRT_HAVE_lutimes) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_lutimes) && !defined(__USE_TIME_BITS64)
 /* Same as `utimes', but does not follow symbolic links */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,lutimes,(char const *__file, struct timeval const __tvp[2]),(__file,__tvp))
 #elif defined(__CRT_HAVE_lutimes) || defined(__CRT_HAVE_lutimes64)
@@ -248,7 +248,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lutimes, __FORCELOCAL __ATTR_NONNULL((1)) int __
 #if defined(__CRT_HAVE_futimes64) && defined(__USE_TIME_BITS64)
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(,int,__NOTHROW_NCX,futimes,(__fd_t __fd, struct timeval const __tvp[2]),futimes64,(__fd,__tvp))
-#elif defined(__CRT_HAVE_futimes) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_futimes) && !defined(__USE_TIME_BITS64)
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CDECLARE(,int,__NOTHROW_NCX,futimes,(__fd_t __fd, struct timeval const __tvp[2]),(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes) || defined(__CRT_HAVE_futimes64)

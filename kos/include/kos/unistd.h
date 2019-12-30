@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa26151d1 */
+/* HASH CRC-32:0x68f6c818 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -281,7 +281,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_NONNULL((2)) size_t
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__pos64_t,,LSeek,(__fd_t __fd, __off64_t __offset, int __whence),LSeek64,(__fd,__offset,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_LSeek) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_LSeek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CDECLARE(,__pos32_t,,LSeek,(__fd_t __fd, __off32_t __offset, int __whence),(__fd,__offset,__whence)) __THROWS(...)
@@ -414,7 +414,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek64, __FORCELOCAL __pos64_t (__LIBCCALL LSee
 /* >> pread(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,,PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),PRead64,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
-#elif defined(__CRT_HAVE_PRead) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_PRead) && !defined(__USE_FILE_OFFSET64)
 /* >> pread(2)
  * Read data from a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,,PRead,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset)) __THROWS(...)
@@ -428,7 +428,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PRead, __FORCELOCAL __ATTR_NONNULL((2)) size_t (
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,,PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),PWrite64,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
-#elif defined(__CRT_HAVE_PWrite) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_PWrite) && !defined(__USE_FILE_OFFSET64)
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,,PWrite,(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset)) __THROWS(...)
@@ -444,7 +444,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(PWrite, __FORCELOCAL __ATTR_NONNULL((2)) size_t 
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,,PReadAll,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),PReadAll64,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
-#elif defined(__CRT_HAVE_PReadAll) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_PReadAll) && !defined(__USE_FILE_OFFSET64)
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,,PReadAll,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset)) __THROWS(...)
@@ -595,7 +595,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(LChown, __FORCELOCAL __ATTR_NONNULL((1)) void (_
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),,Truncate,(char const *__file, pos_t __length),Truncate64,(__file,__length)) __THROWS(...)
-#elif defined(__CRT_HAVE_Truncate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_Truncate) && !defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),,Truncate,(char const *__file, pos_t __length),(__file,__length)) __THROWS(...)
@@ -763,7 +763,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),,SetDomainName,(char const *__name, size_t _
 __LIBC __syscall_slong_t (__VLIBCCALL Syscall)(__syscall_ulong_t __sysno, ...) __THROWS(...) __CASMNAME_SAME("Syscall");
 #endif /* Syscall... */
 #ifdef __USE_KOS
-#if defined(__CRT_HAVE_Syscall) && (!defined(__NO_ASMNAME))
+#if defined(__CRT_HAVE_Syscall) && !defined(__NO_ASMNAME)
 __LIBC __LONG64_TYPE__ (__VLIBCCALL Syscall64)(__syscall_ulong_t __sysno, ...) __THROWS(...) __CASMNAME("Syscall");
 #elif defined(__CRT_HAVE_Syscall64)
 __LIBC __LONG64_TYPE__ (__VLIBCCALL Syscall64)(__syscall_ulong_t __sysno, ...) __THROWS(...) __CASMNAME_SAME("Syscall64");
@@ -786,7 +786,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),,ChRoot,(char const *__restrict __path),(__p
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT_VOID(,,FTruncate,(__fd_t __fd, pos_t __length),FTruncate64,(__fd,__length)) __THROWS(...)
-#elif defined(__CRT_HAVE_FTruncate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_FTruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE_VOID(,,FTruncate,(__fd_t __fd, pos_t __length),(__fd,__length)) __THROWS(...)

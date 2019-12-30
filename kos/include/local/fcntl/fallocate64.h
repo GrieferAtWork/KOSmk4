@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42729462 */
+/* HASH CRC-32:0x8909e549 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #define ____localdep_fallocate_defined 1
 #if defined(__CRT_HAVE_fallocate64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate,(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length),fallocate64,(__fd,__mode,__offset,__length))
-#elif defined(__CRT_HAVE_fallocate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fallocate) && !defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate,(__fd_t __fd, int __mode, __off32_t __offset, __off32_t __length),fallocate,(__fd,__mode,__offset,__length))
 #else /* LIBC: fallocate */
 #include <local/fcntl/fallocate.h>

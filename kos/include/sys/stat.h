@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3d15d34 */
+/* HASH CRC-32:0xf661071c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -273,7 +273,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restric
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32,(__filename,__buf))
 #elif defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),stat64,(__filename,__buf))
-#elif defined(__CRT_HAVE_stat) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64)
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stat,(char const *__restrict __filename, struct stat *__restrict __buf),(__filename,__buf))
 #endif /* stat... */
 
@@ -295,7 +295,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct sta
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),_fstat32,(__fd,__buf))
 #elif defined(__CRT_HAVE_fstat64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),fstat64,(__fd,__buf))
-#elif defined(__CRT_HAVE_fstat) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fstat) && !defined(__USE_FILE_OFFSET64)
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstat,(__fd_t __fd, struct stat *__restrict __buf),(__fd,__buf))
 #endif /* fstat... */
 
@@ -318,7 +318,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restri
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),_stat32,(__filename,__buf))
 #elif defined(__CRT_HAVE_lstat64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),lstat64,(__filename,__buf))
-#elif defined(__CRT_HAVE_lstat) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_lstat) && !defined(__USE_FILE_OFFSET64)
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,lstat,(char const *__restrict __filename, struct stat *__restrict __buf),(__filename,__buf))
 #endif /* lstat... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -387,7 +387,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, ch
 #elif defined(__CRT_HAVE_fstatat64) && defined(__USE_FILE_OFFSET64)
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),fstatat64,(__dirfd,__filename,__buf,__flags))
-#elif defined(__CRT_HAVE_fstatat) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fstatat) && !defined(__USE_FILE_OFFSET64)
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 __CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,fstatat,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),(__dirfd,__filename,__buf,__flags))
 #endif /* fstatat... */
@@ -516,7 +516,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,mknodat,(__fd_t __dirfd, char c
 #if defined(__CRT_HAVE_utimensat64) && defined(__USE_TIME_BITS64)
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),utimensat64,(__dirfd,__filename,__times,__flags))
-#elif defined(__CRT_HAVE_utimensat) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_utimensat) && !defined(__USE_TIME_BITS64)
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,utimensat,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #elif defined(__CRT_HAVE_utimensat) || defined(__CRT_HAVE_utimensat64)
@@ -542,7 +542,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(utimensat64, __FORCELOCAL __ATTR_NONNULL((2)) in
 #ifdef __USE_XOPEN2K8
 #if defined(__CRT_HAVE_futimens64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),futimens64,(__fd,__times))
-#elif defined(__CRT_HAVE_futimens) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_futimens) && !defined(__USE_TIME_BITS64)
 __CDECLARE(,int,__NOTHROW_RPC,futimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times))
 #elif defined(__CRT_HAVE_futimens) || defined(__CRT_HAVE_futimens64)
 #include <local/sys.stat/futimens.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x535fb096 */
+/* HASH CRC-32:0xa9dd94dc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,15 +48,15 @@ __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off64_t __
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off64_t __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off32_t __offset, int __whence),lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE__lseek) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off32_t __offset, int __whence),_lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE___lseek) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE___lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off32_t __offset, int __whence),__lseek,(__fd,__offset,__whence))

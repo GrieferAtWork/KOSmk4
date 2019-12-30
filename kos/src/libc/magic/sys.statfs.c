@@ -64,9 +64,11 @@ fstatfs:($fd_t filedes, [nonnull] struct statfs *buf) -> int;
 
 %
 %#ifdef __USE_LARGEFILE64
-[off64_variant_of(statfs)]
+%#ifndef statfs64
+[statfs64_variant_of(statfs)]
 statfs64:([nonnull] const char *file, [nonnull] struct statfs64 *buf) -> int;
-[off64_variant_of(fstatfs)]
+%#endif /* !statfs64 */
+[statfs64_variant_of(fstatfs)]
 fstatfs64:($fd_t filedes, [nonnull] struct statfs64 *buf) -> int;
 %#endif /* __USE_LARGEFILE64 */
 

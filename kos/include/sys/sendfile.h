@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6bfbc79 */
+/* HASH CRC-32:0xcb4df6a3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __SYSDECL_BEGIN
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
  * Return the number of written bytes, or -1 in case of error */
 __CREDIRECT(,ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, off_t *__offset, size_t __count),sendfile64,(__out_fd,__in_fd,__offset,__count))
-#elif defined(__CRT_HAVE_sendfile) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_sendfile) && !defined(__USE_FILE_OFFSET64)
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.

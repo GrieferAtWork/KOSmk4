@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x397d78a7 */
+/* HASH CRC-32:0xfa98d995 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,9 +62,9 @@ typedef __TM_TYPE(time) time_t;
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,utime,(char const *__filename, struct utimbuf const *__file_times),utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,utime,(char const *__filename, struct utimbuf const *__file_times),_utime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_utime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_utime) && !defined(__USE_TIME_BITS64)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,utime,(char const *__filename, struct utimbuf const *__file_times),(__filename,__file_times))
-#elif defined(__CRT_HAVE__utime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__utime32) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,utime,(char const *__filename, struct utimbuf const *__file_times),_utime32,(__filename,__file_times))
 #elif defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
 #include <local/utime/utime.h>
@@ -90,9 +90,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(utime64, __FORCELOCAL __ATTR_NONNULL((1)) int __
 __CREDIRECT(,int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime64,(__fd,__file_times))
-#elif defined(__CRT_HAVE_futime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_futime) && !defined(__USE_TIME_BITS64)
 __CDECLARE(,int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),(__fd,__file_times))
-#elif defined(__CRT_HAVE__futime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__futime32) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_RPC,futime,(__fd_t __fd, struct utimbuf const *__file_times),_futime32,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime32) || defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #include <local/utime/futime.h>
@@ -124,9 +124,9 @@ typedef __WCHAR_TYPE__ wchar_t;
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_utime,(char const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_utime,(char const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),_utime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_utime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_utime) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_utime,(char const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),utime,(__filename,__file_times))
-#elif defined(__CRT_HAVE__utime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__utime32) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_utime,(char const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),_utime32,(__filename,__file_times))
 #elif defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
 #include <local/utime/utime.h>
@@ -136,9 +136,9 @@ __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _utime)(char const
 __CREDIRECT(,int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct _utimbuf __KOS_FIXED_CONST *__file_times),futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct _utimbuf __KOS_FIXED_CONST *__file_times),_futime64,(__fd,__file_times))
-#elif defined(__CRT_HAVE_futime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_futime) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct _utimbuf __KOS_FIXED_CONST *__file_times),futime,(__fd,__file_times))
-#elif defined(__CRT_HAVE__futime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__futime32) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_RPC,_futime,(__fd_t __fd, struct _utimbuf __KOS_FIXED_CONST *__file_times),_futime32,(__fd,__file_times))
 #elif defined(__CRT_HAVE_futime) || defined(__CRT_HAVE__futime32) || defined(__CRT_HAVE_futime64) || defined(__CRT_HAVE__futime64)
 #include <local/utime/futime.h>
@@ -180,9 +180,9 @@ __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL _futime64)(__fd_t __fd, struct utimbuf
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime,(wchar_t const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime,(wchar_t const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),_wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_wutime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_wutime) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime,(wchar_t const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE__wutime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__wutime32) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_wutime,(wchar_t const *__filename, struct _utimbuf __KOS_FIXED_CONST *__file_times),_wutime32,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 #include <local/parts.wchar.utime/wutime.h>

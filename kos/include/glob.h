@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc24ede9 */
+/* HASH CRC-32:0xb33ab29e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,7 +169,7 @@ typedef int (__LIBCCALL *__glob_errfunc_t)(char const *__path, int __flags);
  * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
  * Otherwise, `glob' returns zero */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_NCX,glob,(char const *__restrict __pattern, int __flags, __glob_errfunc_t __errfunc, glob_t *__restrict __pglob),glob64,(__pattern,__flags,__errfunc,__pglob))
-#elif defined(__CRT_HAVE_glob) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_glob) && !defined(__USE_FILE_OFFSET64)
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
  * If a directory cannot be opened or read and ERRFUNC is not nil,
@@ -194,7 +194,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(glob, __FORCELOCAL __ATTR_NONNULL((1, 4)) int __
 #if defined(__CRT_HAVE_globfree64) && defined(__USE_FILE_OFFSET64)
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),globfree64,(__pglob))
-#elif defined(__CRT_HAVE_globfree) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_globfree) && !defined(__USE_FILE_OFFSET64)
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,globfree,(glob_t *__pglob),(__pglob))
 #else /* LIBC: globfree */

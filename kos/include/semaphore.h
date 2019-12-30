@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56c0380 */
+/* HASH CRC-32:0xce16026b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sem_wait,(sem_t *__sem),(__sem)
 #endif /* sem_wait... */
 
 #ifdef __USE_XOPEN2K
-#if defined(__CRT_HAVE_sem_timedwait) && (!defined(__USE_TIME_BITS64))
+#if defined(__CRT_HAVE_sem_timedwait) && !defined(__USE_TIME_BITS64)
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait,(sem_t *__restrict __sem, struct timespec const *__restrict __abstime),(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait64) && defined(__USE_TIME_BITS64)

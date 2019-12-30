@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x303272b4 */
+/* HASH CRC-32:0x4a2dc986 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_memcmpl_defined
-#if !defined(__NO_MALLOCA)
+#ifndef __NO_MALLOCA
 #define __local_fuzzy_memcmpl_defined 1
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>

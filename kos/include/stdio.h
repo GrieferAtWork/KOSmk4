@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e7a851e */
+/* HASH CRC-32:0xe4fdc0ef */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1138,7 +1138,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos,(FILE *__restrict __stream, fpos
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos,(FILE *__restrict __stream, fpos_t *__restrict __pos),fgetpos64,(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fgetpos) && !defined(__USE_FILE_OFFSET64)
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,fgetpos,(FILE *__restrict __stream, fpos_t *__restrict __pos),(__stream,__pos)) __THROWS(...)
@@ -1168,7 +1168,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos,(FILE *__restrict __stream, fpos
 #elif defined(__CRT_HAVE_fsetpos64) && defined(__USE_FILE_OFFSET64)
 /* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos,(FILE *__restrict __stream, fpos_t const *__restrict __pos),fsetpos64,(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fsetpos) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fsetpos) && !defined(__USE_FILE_OFFSET64)
 /* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,fsetpos,(FILE *__restrict __stream, fpos_t const *__restrict __pos),(__stream,__pos)) __THROWS(...)
 #elif defined(__CRT_HAVE__IO_fsetpos)
@@ -1227,7 +1227,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vfprintf, __FORCELOCAL __ATTR_NONNULL((1, 2)) __
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) { return __builtin_fprintf(__stream, __format, __builtin_va_arg_pack()); }
-#elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
@@ -1235,15 +1235,15 @@ __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("fprintf");
-#elif defined(__CRT_HAVE__IO_fprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__IO_fprintf) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_fprintf");
-#elif defined(__CRT_HAVE_fprintf_s) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fprintf_s) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
-#elif defined(__CRT_HAVE_fprintf_unlocked) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fprintf_unlocked) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
@@ -1301,7 +1301,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vprintf, __FORCELOCAL __ATTR_NONNULL((1)) __ATTR
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf)(char const *__restrict __format, ...) __THROWS(...) { return __builtin_printf(__format, __builtin_va_arg_pack()); }
-#elif defined(__CRT_HAVE_printf_unlocked) && defined(__USE_STDIO_UNLOCKED) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_printf_unlocked) && defined(__USE_STDIO_UNLOCKED) && !defined(__NO_ASMNAME)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_unlocked");
@@ -1309,15 +1309,15 @@ __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLI
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("printf");
-#elif defined(__CRT_HAVE__IO_printf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__IO_printf) && !defined(__NO_ASMNAME)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_printf");
-#elif defined(__CRT_HAVE_printf_s) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_printf_s) && !defined(__NO_ASMNAME)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_s");
-#elif defined(__CRT_HAVE_printf_unlocked) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_printf_unlocked) && !defined(__NO_ASMNAME)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_unlocked");
@@ -1428,7 +1428,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vscanf, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNU
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) { return __builtin_fscanf(__stream, __format, __builtin_va_arg_pack()); }
-#elif defined(__CRT_HAVE_fscanf_unlocked) && defined(__USE_STDIO_UNLOCKED) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fscanf_unlocked) && defined(__USE_STDIO_UNLOCKED) && !defined(__NO_ASMNAME)
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fscanf_unlocked");
@@ -1436,7 +1436,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("fscanf");
-#elif defined(__CRT_HAVE_fscanf_unlocked) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fscanf_unlocked) && !defined(__NO_ASMNAME)
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf)(FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fscanf_unlocked");
@@ -1461,7 +1461,7 @@ __NAMESPACE_LOCAL_USING(fscanf)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf)(char const *__restrict __format, ...) __THROWS(...) { return __builtin_scanf(__format, __builtin_va_arg_pack()); }
-#elif defined(__CRT_HAVE_scanf_unlocked) && defined(__USE_STDIO_UNLOCKED) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_scanf_unlocked) && defined(__USE_STDIO_UNLOCKED) && !defined(__NO_ASMNAME)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf_unlocked");
@@ -1469,7 +1469,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("scanf");
-#elif defined(__CRT_HAVE_scanf_unlocked) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_scanf_unlocked) && !defined(__NO_ASMNAME)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf_unlocked");
@@ -1555,7 +1555,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sscanf)(char const *__restrict __input, char const *__restrict __format, ...) __CASMNAME_SAME("sscanf");
-#elif defined(__CRT_HAVE__IO_sscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__IO_sscanf) && !defined(__NO_ASMNAME)
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sscanf)(char const *__restrict __input, char const *__restrict __format, ...) __CASMNAME("_IO_sscanf");
@@ -1602,7 +1602,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME_SAME("sprintf");
-#elif defined(__CRT_HAVE__IO_sprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__IO_sprintf) && !defined(__NO_ASMNAME)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("_IO_sprintf");
@@ -2357,7 +2357,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_T
 #elif defined(__CRT_HAVE__fseeki64) && defined(__USE_FILE_OFFSET64)
 /* Change the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fseeko) && !defined(__USE_FILE_OFFSET64)
 /* Change the current in-file position of `STREAM' */
 __CDECLARE(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseek) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
@@ -2375,7 +2375,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_T
 #elif defined(__CRT_HAVE__fseeki64_nolock) && defined(__USE_FILE_OFFSET64)
 /* Change the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko_unlocked) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fseeko_unlocked) && !defined(__USE_FILE_OFFSET64)
 /* Change the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko_unlocked,(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
@@ -2404,7 +2404,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *_
 #elif defined(__CRT_HAVE__ftelli64) && defined(__USE_FILE_OFFSET64)
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),_ftelli64,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftello) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_ftello) && !defined(__USE_FILE_OFFSET64)
 /* Return the current in-file position of `STREAM' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FS_TYPE(off),,ftello,(__FILE *__restrict __stream),(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftell) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
@@ -2600,7 +2600,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vasprintf, __FORCELOCAL __ATTR_WUNUSED __ATTR_NO
 #ifdef __CRT_HAVE_asprintf
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL asprintf)(char **__restrict __pstr, char const *__restrict __format, ...) __CASMNAME_SAME("asprintf");
-#elif defined(__CRT_HAVE___asprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE___asprintf) && !defined(__NO_ASMNAME)
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL asprintf)(char **__restrict __pstr, char const *__restrict __format, ...) __CASMNAME("__asprintf");
 #elif ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf)
@@ -2615,7 +2615,7 @@ __NAMESPACE_LOCAL_USING(asprintf)
 #ifdef __CRT_HAVE___asprintf
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL __asprintf)(char **__restrict __pstr, char const *__restrict __format, ...) __CASMNAME_SAME("__asprintf");
-#elif defined(__CRT_HAVE_asprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_asprintf) && !defined(__NO_ASMNAME)
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL __asprintf)(char **__restrict __pstr, char const *__restrict __format, ...) __CASMNAME("asprintf");
 #elif ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf)
@@ -2769,10 +2769,10 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __strea
 #elif defined(__CRT_HAVE__fseeki64) && defined(__USE_FILE_OFFSET64)
 /* Change the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64,(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko_unlocked) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fseeko_unlocked) && !defined(__USE_FILE_OFFSET64)
 /* Change the current in-file position of `STREAM' */
 __CDECLARE(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),(__stream,__off,__whence)) __THROWS(...)
-#elif defined(__CRT_HAVE_fseeko) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fseeko) && !defined(__USE_FILE_OFFSET64)
 /* Change the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko,(__stream,__off,__whence)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseek_unlocked) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
@@ -2804,10 +2804,10 @@ __CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restr
 #elif defined(__CRT_HAVE__ftelli64) && defined(__USE_FILE_OFFSET64)
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),_ftelli64,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftello_unlocked) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_ftello_unlocked) && !defined(__USE_FILE_OFFSET64)
 /* Return the current in-file position of `STREAM' */
 __CDECLARE(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_ftello) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_ftello) && !defined(__USE_FILE_OFFSET64)
 /* Return the current in-file position of `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),__FS_TYPE(off),,ftello_unlocked,(__FILE *__restrict __stream),ftello,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_ftell_unlocked) && ((defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (!defined(__USE_FILE_OFFSET64) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__))
@@ -2842,11 +2842,11 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos_unlocked,(__FILE *__restrict __s
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos64,(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos_unlocked) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fgetpos_unlocked) && !defined(__USE_FILE_OFFSET64)
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetpos) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fgetpos) && !defined(__USE_FILE_OFFSET64)
 /* Initialize an opaque descriptor `POS' for the current in-file position of `STREAM'
  * Upon success (return == 0), `POS' can be used to restore the current position by calling `fsetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) *__restrict __pos),fgetpos,(__stream,__pos)) __THROWS(...)
@@ -2862,10 +2862,10 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos_unlocked,(__FILE *__restrict __s
 #elif defined(__CRT_HAVE_fsetpos64) && defined(__USE_FILE_OFFSET64)
 /* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos64,(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fsetpos_unlocked) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fsetpos_unlocked) && !defined(__USE_FILE_OFFSET64)
 /* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),(__stream,__pos)) __THROWS(...)
-#elif defined(__CRT_HAVE_fsetpos) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fsetpos) && !defined(__USE_FILE_OFFSET64)
 /* Set the file position of `STREAM' to `POS', as previously initialized with a call to `fgetpos()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(pos) const *__restrict __pos),fsetpos,(__stream,__pos)) __THROWS(...)
 #elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
@@ -2973,7 +2973,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __
 /* >> fftruncate(3)
  * Truncate the given file `STREAM' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64,(__stream,__length)) __THROWS(...)
-#elif defined(__CRT_HAVE_fftruncate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fftruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> fftruncate(3)
  * Truncate the given file `STREAM' to a length of `LENGTH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),(__stream,__length)) __THROWS(...)
@@ -2981,7 +2981,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __P
 /* >> fftruncate(3)
  * Truncate the given file `STREAM' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64_unlocked,(__stream,__length)) __THROWS(...)
-#elif defined(__CRT_HAVE_fftruncate_unlocked) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fftruncate_unlocked) && !defined(__USE_FILE_OFFSET64)
 /* >> fftruncate(3)
  * Truncate the given file `STREAM' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate_unlocked,(__stream,__length)) __THROWS(...)
@@ -2995,7 +2995,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fftruncate, __FORCELOCAL __ATTR_NONNULL((1)) int
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64_unlocked,(__stream,__length)) __THROWS(...)
-#elif defined(__CRT_HAVE_fftruncate_unlocked) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fftruncate_unlocked) && !defined(__USE_FILE_OFFSET64)
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 __CDECLARE(__ATTR_NONNULL((1)),int,,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),(__stream,__length)) __THROWS(...)
@@ -3003,7 +3003,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,,fftruncate_unlocked,(__FILE *__restrict __st
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64,(__stream,__length)) __THROWS(...)
-#elif defined(__CRT_HAVE_fftruncate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_fftruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate,(__stream,__length)) __THROWS(...)
@@ -3172,11 +3172,11 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("fprintf_unlocked");
-#elif defined(__CRT_HAVE_fprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fprintf) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf");
-#elif defined(__CRT_HAVE_fprintf_s) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fprintf_s) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fprintf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
@@ -3216,11 +3216,11 @@ __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T 
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf_unlocked)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("printf_unlocked");
-#elif defined(__CRT_HAVE_printf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_printf) && !defined(__NO_ASMNAME)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf_unlocked)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf");
-#elif defined(__CRT_HAVE_printf_s) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_printf_s) && !defined(__NO_ASMNAME)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SSIZE_T (__VLIBCCALL printf_unlocked)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf_s");
@@ -3290,7 +3290,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STD
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("fscanf_unlocked");
-#elif defined(__CRT_HAVE_fscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fscanf) && !defined(__NO_ASMNAME)
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf_unlocked)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fscanf");
@@ -3308,7 +3308,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_I
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf_unlocked)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("scanf_unlocked");
-#elif defined(__CRT_HAVE_scanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_scanf) && !defined(__NO_ASMNAME)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf_unlocked)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf");
@@ -3641,7 +3641,7 @@ __CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_set_output_format,(__UINT32_TYPE__ __
 
 #ifdef __CRT_HAVE__scanf_l
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL _scanf_l)(char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_scanf_l");
-#elif defined(__CRT_HAVE__scanf_s_l) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__scanf_s_l) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL _scanf_l)(char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME("_scanf_s_l");
 #elif (!defined(__NO_STDSTREAMS) && ((((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf))) || defined(__CRT_HAVE_vscanf) || defined(__CRT_HAVE__vscanf) || defined(__CRT_HAVE_vscanf_unlocked) || defined(__CRT_HAVE__vscanf_l) || defined(__CRT_HAVE__vscanf_s_l)
 #include <local/stdio/_scanf_l.h>
@@ -3653,7 +3653,7 @@ __NAMESPACE_LOCAL_USING(_scanf_l)
 #endif /* _scanf_l... */
 #ifdef __CRT_HAVE__fscanf_l
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SIZE_T (__VLIBCCALL _fscanf_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fscanf_l");
-#elif defined(__CRT_HAVE__fscanf_s_l) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__fscanf_s_l) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 4) __STDC_INT_AS_SIZE_T (__VLIBCCALL _fscanf_l)(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, ...) __THROWS(...) __CASMNAME("_fscanf_s_l");
 #elif (((defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked)) && (defined(__CRT_HAVE_ungetc) || defined(__CRT_HAVE__IO_ungetc) || defined(__CRT_HAVE_ungetc_unlocked) || defined(__CRT_HAVE__ungetc_nolock))) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE__IO_vfscanf) || defined(__CRT_HAVE_vfscanf_unlocked) || defined(__CRT_HAVE___vfscanf) || defined(__CRT_HAVE__vfscanf_l)
 #include <local/stdio/_fscanf_l.h>
@@ -3665,7 +3665,7 @@ __NAMESPACE_LOCAL_USING(_fscanf_l)
 #endif /* _fscanf_l... */
 #ifdef __CRT_HAVE__snscanf
 __LIBC __ATTR_NONNULL((1, 3)) __ATTR_LIBC_SCANF(3, 4) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL _snscanf)(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, ...) __CASMNAME_SAME("_snscanf");
-#elif defined(__CRT_HAVE__snscanf_s) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__snscanf_s) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1, 3)) __ATTR_LIBC_SCANF(3, 4) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL _snscanf)(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, ...) __CASMNAME("_snscanf_s");
 #else /* LIBC: _snscanf */
 #include <local/stdio/_snscanf.h>
@@ -3677,7 +3677,7 @@ __NAMESPACE_LOCAL_USING(_snscanf)
 #endif /* _snscanf... */
 #ifdef __CRT_HAVE__snscanf_l
 __LIBC __ATTR_NONNULL((1, 3)) __ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL _snscanf_l)(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __locale_t __locale, ...) __CASMNAME_SAME("_snscanf_l");
-#elif defined(__CRT_HAVE__snscanf_s_l) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__snscanf_s_l) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1, 3)) __ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL _snscanf_l)(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __locale_t __locale, ...) __CASMNAME("_snscanf_s_l");
 #else /* LIBC: _snscanf_l */
 #include <local/stdio/_snscanf_l.h>
@@ -4163,7 +4163,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL printf_s)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("printf_s");
-#elif defined(__CRT_HAVE_printf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_printf) && !defined(__NO_ASMNAME)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL printf_s)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("printf");
@@ -4199,7 +4199,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fprintf_s)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("fprintf_s");
-#elif defined(__CRT_HAVE_fprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fprintf) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fprintf_s)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf");
@@ -4235,7 +4235,7 @@ __FORCELOCAL __ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SIZE_T _
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 __LIBC __ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sprintf_s)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, ...) __CASMNAME_SAME("sprintf_s");
-#elif defined(__CRT_HAVE_snprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_snprintf) && !defined(__NO_ASMNAME)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 __LIBC __ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sprintf_s)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, ...) __CASMNAME("snprintf");
@@ -4271,7 +4271,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf_s)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("fscanf_s");
-#elif defined(__CRT_HAVE_fscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fscanf) && !defined(__NO_ASMNAME)
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fscanf_s)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fscanf");
@@ -4307,7 +4307,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf_s)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("scanf_s");
-#elif defined(__CRT_HAVE_scanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_scanf) && !defined(__NO_ASMNAME)
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL scanf_s)(char const *__restrict __format, ...) __THROWS(...) __CASMNAME("scanf");
@@ -4343,7 +4343,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sscanf_s)(char const *__restrict __input, char const *__restrict __format, ...) __CASMNAME_SAME("sscanf_s");
-#elif defined(__CRT_HAVE_sscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_sscanf) && !defined(__NO_ASMNAME)
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sscanf_s)(char const *__restrict __input, char const *__restrict __format, ...) __CASMNAME("sscanf");
@@ -5053,7 +5053,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCA
 #define __swprintf_s_defined 1
 #ifdef __CRT_HAVE_swprintf_s
 __LIBC __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swprintf_s)(wchar_t *__dst, __SIZE_TYPE__ __wchar_count, wchar_t const *__format, ...) __CASMNAME_SAME("swprintf_s");
-#elif defined(__CRT_HAVE_swprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_swprintf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swprintf_s)(wchar_t *__dst, __SIZE_TYPE__ __wchar_count, wchar_t const *__format, ...) __CASMNAME("swprintf");
 #else /* LIBC: swprintf */
 #include <local/wchar/swprintf.h>
@@ -5077,7 +5077,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__LIBCCALL vfwprintf_
 #define __fwprintf_s_defined 1
 #ifdef __CRT_HAVE_fwprintf_s
 __LIBC __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fwprintf_s)(__FILE *__stream, wchar_t const *__format, ...) __THROWS(...) __CASMNAME_SAME("fwprintf_s");
-#elif defined(__CRT_HAVE_fwprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fwprintf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fwprintf_s)(__FILE *__stream, wchar_t const *__format, ...) __THROWS(...) __CASMNAME("fwprintf");
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)
 #include <local/wchar/fwprintf.h>
@@ -5103,7 +5103,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__LIBCCALL vwprintf_s)(w
 #define __wprintf_s_defined 1
 #ifdef __CRT_HAVE_wprintf_s
 __LIBC __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL wprintf_s)(wchar_t const *__format, ...) __THROWS(...) __CASMNAME_SAME("wprintf_s");
-#elif defined(__CRT_HAVE_wprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_wprintf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL wprintf_s)(wchar_t const *__format, ...) __THROWS(...) __CASMNAME("wprintf");
 #elif ((defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)) && !defined(__NO_STDSTREAMS)) || defined(__CRT_HAVE_vwprintf)
 #include <local/wchar/wprintf.h>
@@ -5127,7 +5127,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHR
 #define __swscanf_s_defined 1
 #ifdef __CRT_HAVE_swscanf_s
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swscanf_s)(wchar_t const *__src, wchar_t const *__format, ...) __CASMNAME_SAME("swscanf_s");
-#elif defined(__CRT_HAVE_swscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_swscanf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swscanf_s)(wchar_t const *__src, wchar_t const *__format, ...) __CASMNAME("swscanf");
 #else /* LIBC: swscanf */
 #include <local/wchar/swscanf.h>
@@ -5148,7 +5148,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,vfwscan
 #define __fwscanf_s_defined 1
 #ifdef __CRT_HAVE_fwscanf_s
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fwscanf_s)(__FILE *__stream, wchar_t const *__format, ...) __THROWS(...) __CASMNAME_SAME("fwscanf_s");
-#elif defined(__CRT_HAVE_fwscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fwscanf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fwscanf_s)(__FILE *__stream, wchar_t const *__format, ...) __THROWS(...) __CASMNAME("fwscanf");
 #elif defined(__CRT_HAVE_vfwscanf)
 #include <local/wchar/fwscanf.h>
@@ -5174,7 +5174,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__LIBCCAL
 #define __wscanf_s_defined 1
 #ifdef __CRT_HAVE_wscanf_s
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL wscanf_s)(wchar_t const *__format, ...) __THROWS(...) __CASMNAME_SAME("wscanf_s");
-#elif defined(__CRT_HAVE_wscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_wscanf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL wscanf_s)(wchar_t const *__format, ...) __THROWS(...) __CASMNAME("wscanf");
 #elif (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)) || defined(__CRT_HAVE_vwscanf)
 #include <local/wchar/wscanf.h>
@@ -5287,7 +5287,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCA
 #define ___swprintf_c_defined 1
 #ifdef __CRT_HAVE__swprintf_c
 __LIBC __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__VLIBCCALL _swprintf_c)(wchar_t *__buf, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME_SAME("_swprintf_c");
-#elif defined(__CRT_HAVE_swprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_swprintf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__VLIBCCALL _swprintf_c)(wchar_t *__buf, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME("swprintf");
 #else /* LIBC: swprintf */
 #include <local/wchar/swprintf.h>
@@ -5667,7 +5667,7 @@ __NAMESPACE_LOCAL_USING(_fwscanf_l)
 #define ___fwscanf_s_l_defined 1
 #ifdef __CRT_HAVE__fwscanf_s_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _fwscanf_s_l)(__FILE *__stream, wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fwscanf_s_l");
-#elif defined(__CRT_HAVE__fwscanf_l) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__fwscanf_l) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _fwscanf_s_l)(__FILE *__stream, wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME("_fwscanf_l");
 #elif defined(__CRT_HAVE_vfwscanf) || defined(__CRT_HAVE__vfwscanf_l)
 #include <local/wchar/_fwscanf_l.h>
@@ -5693,7 +5693,7 @@ __NAMESPACE_LOCAL_USING(_swscanf_l)
 #define ___swscanf_s_l_defined 1
 #ifdef __CRT_HAVE__swscanf_s_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_s_l)(wchar_t const *__src, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_swscanf_s_l");
-#elif defined(__CRT_HAVE__swscanf_l) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__swscanf_l) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_s_l)(wchar_t const *__src, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME("_swscanf_l");
 #else /* LIBC: _swscanf_l */
 #include <local/wchar/_swscanf_l.h>
@@ -5730,7 +5730,7 @@ __NAMESPACE_LOCAL_USING(_snwscanf_l)
 #define ___snwscanf_s_defined 1
 #ifdef __CRT_HAVE__snwscanf_s
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwscanf_s)(wchar_t const *__src, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME_SAME("_snwscanf_s");
-#elif defined(__CRT_HAVE__snwscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__snwscanf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwscanf_s)(wchar_t const *__src, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME("_snwscanf");
 #else /* LIBC: _snwscanf */
 #include <local/wchar/_snwscanf.h>
@@ -5769,7 +5769,7 @@ __NAMESPACE_LOCAL_USING(_wscanf_l)
 #define ___wscanf_s_l_defined 1
 #ifdef __CRT_HAVE__wscanf_s_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _wscanf_s_l)(wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_wscanf_s_l");
-#elif defined(__CRT_HAVE__wscanf_l) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__wscanf_l) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _wscanf_s_l)(wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME("_wscanf_l");
 #elif (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)) || defined(__CRT_HAVE_vwscanf) || defined(__CRT_HAVE__vwscanf_l)
 #include <local/wchar/_wscanf_l.h>

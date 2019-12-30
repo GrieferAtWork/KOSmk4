@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a4a6ebc */
+/* HASH CRC-32:0x35872e88 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -160,7 +160,7 @@ __CREDIRECT(,thrd_t,__NOTHROW_NCX,thrd_current,(void),pthread_self,())
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec const *__time_point, struct timespec *__remaining),thrd_sleep64,(__time_point,__remaining))
-#elif defined(__CRT_HAVE_thrd_sleep) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_thrd_sleep) && !defined(__USE_TIME_BITS64)
 /* Block current thread execution for at least the time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
@@ -295,7 +295,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mtx_lock, __FORCELOCAL __ATTR_NONNULL((1)) int _
  * In case the mutex is unlock, the current thread will not be blocked
  * s.a. `pthread_mutex_timedlock()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,mtx_timedlock,(mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),mtx_timedlock64,(__mutex,__time_point))
-#elif defined(__CRT_HAVE_mtx_timedlock) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_mtx_timedlock) && !defined(__USE_TIME_BITS64)
 /* Block the current thread until the mutex pointed by MUTEX
  * is unlocked or time pointed by TIME_POINT is reached.
  * In case the mutex is unlock, the current thread will not be blocked
@@ -426,7 +426,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cnd_wait, __FORCELOCAL __ATTR_NONNULL((1, 2)) in
  * pointed by COND is signaled or time pointed by TIME_POINT is reached
  * s.a. `pthread_cond_timedwait()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,cnd_timedwait,(cnd_t *__restrict __cond, mtx_t *__restrict __mutex, struct timespec const *__restrict __time_point),cnd_timedwait64,(__cond,__mutex,__time_point))
-#elif defined(__CRT_HAVE_cnd_timedwait) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_cnd_timedwait) && !defined(__USE_TIME_BITS64)
 /* Block current thread on the condition variable until condition variable
  * pointed by COND is signaled or time pointed by TIME_POINT is reached
  * s.a. `pthread_cond_timedwait()' */

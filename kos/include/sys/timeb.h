@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1727608 */
+/* HASH CRC-32:0xeb42d4db */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,7 +91,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ftime64_s, __FORCELOCAL __ATTR_NONNULL((1)) err
 #if defined(__CRT_HAVE_ftime64) && defined(__USE_TIME_BITS64)
 /* Fill in TIMEBUF with information about the current time */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftime,(struct timeb *__timebuf),ftime64,(__timebuf))
-#elif defined(__CRT_HAVE_ftime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_ftime) && !defined(__USE_TIME_BITS64)
 /* Fill in TIMEBUF with information about the current time */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftime,(struct timeb *__timebuf),(__timebuf))
 #elif defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64)

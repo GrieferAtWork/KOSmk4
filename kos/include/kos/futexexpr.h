@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x248a8c10 */
+/* HASH CRC-32:0xd929ac47 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -197,7 +197,7 @@ __NAMESPACE_INT_END
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,lfutexexpr,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),lfutexexpr64,(__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexexpr) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_lfutexexpr) && !defined(__USE_TIME_BITS64)
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -286,7 +286,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexexpr, __FORCELOCAL __ATTR_NONNULL((3)) int
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((1, 4)),int,__NOTHROW_RPC,lfutexlockexpr,(lfutex_t *__ulockaddr, void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct timespec const *__timeout, unsigned int __timeout_flags),lfutexlockexpr64,(__ulockaddr,__base,__exprc,__exprv,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_lfutexlockexpr) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_lfutexlockexpr) && !defined(__USE_TIME_BITS64)
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex

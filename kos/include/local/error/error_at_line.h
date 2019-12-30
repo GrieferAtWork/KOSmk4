@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52599869 */
+/* HASH CRC-32:0x7fd5cb1c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,23 +75,23 @@ __CREDIRECT(,int,,__localdep_fflush,(__FILE *__stream),_fflush_nolock,(__stream)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) { return __builtin_fprintf(__stream, __format, __builtin_va_arg_pack()); }
-#elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fprintf_unlocked) && defined(__USE_STDIO_UNLOCKED) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");
-#elif defined(__CRT_HAVE_fprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fprintf) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf");
-#elif defined(__CRT_HAVE__IO_fprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__IO_fprintf) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("_IO_fprintf");
-#elif defined(__CRT_HAVE_fprintf_s) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fprintf_s) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_s");
-#elif defined(__CRT_HAVE_fprintf_unlocked) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fprintf_unlocked) && !defined(__NO_ASMNAME)
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SSIZE_T (__VLIBCCALL __localdep_fprintf)(__FILE *__restrict __stream, char const *__restrict __format, ...) __THROWS(...) __CASMNAME("fprintf_unlocked");

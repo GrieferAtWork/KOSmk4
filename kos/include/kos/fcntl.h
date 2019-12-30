@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x647049c5 */
+/* HASH CRC-32:0x5316d412 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __LIBC __STDC_INT_AS_SSIZE_T (__VLIBCCALL Fcntl)(__fd_t __fd, int __cmd, ...) __
 #define __Open_defined 1
 #if defined(__CRT_HAVE_Open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
-#elif defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_Open) && !defined(__USE_FILE_OFFSET64)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__VLIBCCALL Open)(char const *__filename, __oflag_t __oflags, ...) __THROWS(...) __CASMNAME_SAME("Open");
 #elif (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) || defined(__CRT_HAVE_Open) || defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64) || (defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64))))
 #include <local/kos.fcntl/Open.h>
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_USING(Open)
 #define __Creat_defined 1
 #if defined(__CRT_HAVE_Creat64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Creat,(char const *__filename, __mode_t __mode),Creat64,(__filename,__mode)) __THROWS(...)
-#elif defined(__CRT_HAVE_Creat) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_Creat) && !defined(__USE_FILE_OFFSET64)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Creat,(char const *__filename, __mode_t __mode),(__filename,__mode)) __THROWS(...)
 #elif (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) || defined(__CRT_HAVE_Open) || defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64) || (defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64))))
 #include <local/kos.fcntl/Creat.h>
@@ -107,7 +107,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Creat64, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONN
 #define __OpenAt_defined 1
 #if defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,,OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),Openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
-#elif defined(__CRT_HAVE_OpenAt) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_OpenAt) && !defined(__USE_FILE_OFFSET64)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t (__VLIBCCALL OpenAt)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __THROWS(...) __CASMNAME_SAME("OpenAt");
 #elif defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)
 #include <local/kos.fcntl/OpenAt.h>

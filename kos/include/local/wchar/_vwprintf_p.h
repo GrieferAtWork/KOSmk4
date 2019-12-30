@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bd35f0e */
+/* HASH CRC-32:0xbda41afa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__vwprintf_p_defined
-#if !defined(__NO_STDSTREAMS)
+#ifndef __NO_STDSTREAMS
 #define __local__vwprintf_p_defined 1
 #include <kos/anno.h>
 #include <local/stdstreams.h>

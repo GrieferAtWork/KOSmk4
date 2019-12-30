@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8d17a2c */
+/* HASH CRC-32:0x78088cb7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -805,7 +805,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcsftime, __FORCELOCAL __ATTR_NONNULL((1, 3, 4))
 #define __std_wcstok_defined 1
 #ifdef __wcstok_defined
 __NAMESPACE_GLB_USING(wcstok)
-#elif defined(__CRT_HAVE_wcstok) && (!defined(__CRT_DOS_PRIMARY))
+#elif defined(__CRT_HAVE_wcstok) && !defined(__CRT_DOS_PRIMARY)
 __CDECLARE(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,wcstok,(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr),(__string,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_wcstok_s)
 __CREDIRECT(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,wcstok,(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr),wcstok_s,(__string,__delim,__save_ptr))
@@ -1213,7 +1213,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vswprintf, __FORCELOCAL __ATTR_NONNULL((3)) __AT
 __NAMESPACE_GLB_USING(swprintf)
 #elif defined(__CRT_HAVE_swprintf)
 __LIBC __ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 4) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL swprintf)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, ...) __CASMNAME_SAME("swprintf");
-#elif defined(__CRT_HAVE__swprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__swprintf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 4) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL swprintf)(wchar_t *__restrict __buf, size_t __buflen, wchar_t const *__restrict __format, ...) __CASMNAME("_swprintf");
 #else /* LIBC: swprintf */
 __NAMESPACE_STD_END
@@ -2307,7 +2307,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,wexecvpe,(wchar_t const 
 #define __wexecl_defined 1
 #ifdef __CRT_HAVE_wexecl
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecl)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL*/) __CASMNAME_SAME("wexecl");
-#elif defined(__CRT_HAVE__wexecl) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__wexecl) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecl)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL*/) __CASMNAME("_wexecl");
 #elif defined(__CRT_HAVE_wexecv) || defined(__CRT_HAVE__wexecv)
 #include <local/parts.wchar.process/wexecl.h>
@@ -2324,7 +2324,7 @@ __NAMESPACE_LOCAL_USING(wexecl)
 #define __wexecle_defined 1
 #ifdef __CRT_HAVE_wexecle
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("wexecle");
-#elif defined(__CRT_HAVE__wexecle) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__wexecle) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexecle)(wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wexecle");
 #elif defined(__CRT_HAVE_wexecve) || defined(__CRT_HAVE__wexecve)
 #include <local/parts.wchar.process/wexecle.h>
@@ -2341,7 +2341,7 @@ __NAMESPACE_LOCAL_USING(wexecle)
 #define __wexeclp_defined 1
 #ifdef __CRT_HAVE_wexeclp
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexeclp)(wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL*/) __CASMNAME_SAME("wexeclp");
-#elif defined(__CRT_HAVE__wexeclp) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__wexeclp) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexeclp)(wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL*/) __CASMNAME("_wexeclp");
 #elif defined(__CRT_HAVE_wexecvp) || defined(__CRT_HAVE__wexecvp)
 #include <local/parts.wchar.process/wexeclp.h>
@@ -2358,7 +2358,7 @@ __NAMESPACE_LOCAL_USING(wexeclp)
 #define __wexeclpe_defined 1
 #ifdef __CRT_HAVE_wexeclpe
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("wexeclpe");
-#elif defined(__CRT_HAVE__wexecle) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__wexecle) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL wexeclpe)(wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wexecle");
 #elif defined(__CRT_HAVE_wexecvpe) || defined(__CRT_HAVE__wexecvpe)
 #include <local/parts.wchar.process/wexeclpe.h>
@@ -2415,7 +2415,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,wspawnvpe,(int __mod
 #define __wspawnl_defined 1
 #ifdef __CRT_HAVE_wspawnl
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnl)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL*/) __CASMNAME_SAME("wspawnl");
-#elif defined(__CRT_HAVE__wspawnl) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__wspawnl) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnl)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL*/) __CASMNAME("_wspawnl");
 #elif defined(__CRT_HAVE_wspawnv) || defined(__CRT_HAVE__wspawnv)
 #include <local/parts.wchar.process/wspawnl.h>
@@ -2432,7 +2432,7 @@ __NAMESPACE_LOCAL_USING(wspawnl)
 #define __wspawnle_defined 1
 #ifdef __CRT_HAVE_wspawnle
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("wspawnle");
-#elif defined(__CRT_HAVE__wspawnle) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__wspawnle) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnle)(int __mode, wchar_t const *__restrict __path, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wspawnle");
 #elif defined(__CRT_HAVE_wspawnve) || defined(__CRT_HAVE__wspawnve)
 #include <local/parts.wchar.process/wspawnle.h>
@@ -2449,7 +2449,7 @@ __NAMESPACE_LOCAL_USING(wspawnle)
 #define __wspawnlp_defined 1
 #ifdef __CRT_HAVE_wspawnlp
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnlp)(int __mode, wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL*/) __CASMNAME_SAME("wspawnlp");
-#elif defined(__CRT_HAVE__wspawnlp) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__wspawnlp) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnlp)(int __mode, wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL*/) __CASMNAME("_wspawnlp");
 #elif defined(__CRT_HAVE_wspawnvp) || defined(__CRT_HAVE__wspawnvp)
 #include <local/parts.wchar.process/wspawnlp.h>
@@ -2466,7 +2466,7 @@ __NAMESPACE_LOCAL_USING(wspawnlp)
 #define __wspawnlpe_defined 1
 #ifdef __CRT_HAVE_wspawnlpe
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnlpe)(int __mode, wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME_SAME("wspawnlpe");
-#elif defined(__CRT_HAVE__wspawnle) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__wspawnle) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL wspawnlpe)(int __mode, wchar_t const *__restrict __file, wchar_t const *__args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) __CASMNAME("_wspawnle");
 #elif defined(__CRT_HAVE_wspawnvpe) || defined(__CRT_HAVE__wspawnvpe)
 #include <local/parts.wchar.process/wspawnlpe.h>
@@ -3531,7 +3531,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCA
 #define __swprintf_s_defined 1
 #ifdef __CRT_HAVE_swprintf_s
 __LIBC __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swprintf_s)(wchar_t *__dst, __SIZE_TYPE__ __wchar_count, wchar_t const *__format, ...) __CASMNAME_SAME("swprintf_s");
-#elif defined(__CRT_HAVE_swprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_swprintf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swprintf_s)(wchar_t *__dst, __SIZE_TYPE__ __wchar_count, wchar_t const *__format, ...) __CASMNAME("swprintf");
 #else /* LIBC: swprintf */
 #include <local/wchar/swprintf.h>
@@ -3555,7 +3555,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__LIBCCALL vfwprintf_
 #define __fwprintf_s_defined 1
 #ifdef __CRT_HAVE_fwprintf_s
 __LIBC __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fwprintf_s)(__FILE *__stream, wchar_t const *__format, ...) __THROWS(...) __CASMNAME_SAME("fwprintf_s");
-#elif defined(__CRT_HAVE_fwprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fwprintf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fwprintf_s)(__FILE *__stream, wchar_t const *__format, ...) __THROWS(...) __CASMNAME("fwprintf");
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)
 #include <local/wchar/fwprintf.h>
@@ -3581,7 +3581,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__LIBCCALL vwprintf_s)(w
 #define __wprintf_s_defined 1
 #ifdef __CRT_HAVE_wprintf_s
 __LIBC __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL wprintf_s)(wchar_t const *__format, ...) __THROWS(...) __CASMNAME_SAME("wprintf_s");
-#elif defined(__CRT_HAVE_wprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_wprintf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL wprintf_s)(wchar_t const *__format, ...) __THROWS(...) __CASMNAME("wprintf");
 #elif ((defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)) && !defined(__NO_STDSTREAMS)) || defined(__CRT_HAVE_vwprintf)
 #include <local/wchar/wprintf.h>
@@ -3605,7 +3605,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHR
 #define __swscanf_s_defined 1
 #ifdef __CRT_HAVE_swscanf_s
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swscanf_s)(wchar_t const *__src, wchar_t const *__format, ...) __CASMNAME_SAME("swscanf_s");
-#elif defined(__CRT_HAVE_swscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_swscanf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL swscanf_s)(wchar_t const *__src, wchar_t const *__format, ...) __CASMNAME("swscanf");
 #else /* LIBC: swscanf */
 #include <local/wchar/swscanf.h>
@@ -3626,7 +3626,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,vfwscan
 #define __fwscanf_s_defined 1
 #ifdef __CRT_HAVE_fwscanf_s
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fwscanf_s)(__FILE *__stream, wchar_t const *__format, ...) __THROWS(...) __CASMNAME_SAME("fwscanf_s");
-#elif defined(__CRT_HAVE_fwscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_fwscanf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL fwscanf_s)(__FILE *__stream, wchar_t const *__format, ...) __THROWS(...) __CASMNAME("fwscanf");
 #elif defined(__CRT_HAVE_vfwscanf)
 #include <local/wchar/fwscanf.h>
@@ -3652,7 +3652,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__LIBCCAL
 #define __wscanf_s_defined 1
 #ifdef __CRT_HAVE_wscanf_s
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL wscanf_s)(wchar_t const *__format, ...) __THROWS(...) __CASMNAME_SAME("wscanf_s");
-#elif defined(__CRT_HAVE_wscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_wscanf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL wscanf_s)(wchar_t const *__format, ...) __THROWS(...) __CASMNAME("wscanf");
 #elif (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)) || defined(__CRT_HAVE_vwscanf)
 #include <local/wchar/wscanf.h>
@@ -3765,7 +3765,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCA
 #define ___swprintf_c_defined 1
 #ifdef __CRT_HAVE__swprintf_c
 __LIBC __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__VLIBCCALL _swprintf_c)(wchar_t *__buf, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME_SAME("_swprintf_c");
-#elif defined(__CRT_HAVE_swprintf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE_swprintf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_NONNULL((1, 3)) void __NOTHROW_NCX(__VLIBCCALL _swprintf_c)(wchar_t *__buf, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME("swprintf");
 #else /* LIBC: swprintf */
 #include <local/wchar/swprintf.h>
@@ -4145,7 +4145,7 @@ __NAMESPACE_LOCAL_USING(_fwscanf_l)
 #define ___fwscanf_s_l_defined 1
 #ifdef __CRT_HAVE__fwscanf_s_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _fwscanf_s_l)(__FILE *__stream, wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_fwscanf_s_l");
-#elif defined(__CRT_HAVE__fwscanf_l) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__fwscanf_l) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _fwscanf_s_l)(__FILE *__stream, wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME("_fwscanf_l");
 #elif defined(__CRT_HAVE_vfwscanf) || defined(__CRT_HAVE__vfwscanf_l)
 #include <local/wchar/_fwscanf_l.h>
@@ -4171,7 +4171,7 @@ __NAMESPACE_LOCAL_USING(_swscanf_l)
 #define ___swscanf_s_l_defined 1
 #ifdef __CRT_HAVE__swscanf_s_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_s_l)(wchar_t const *__src, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME_SAME("_swscanf_s_l");
-#elif defined(__CRT_HAVE__swscanf_l) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__swscanf_l) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _swscanf_s_l)(wchar_t const *__src, wchar_t const *__format, __locale_t __locale, ...) __CASMNAME("_swscanf_l");
 #else /* LIBC: _swscanf_l */
 #include <local/wchar/_swscanf_l.h>
@@ -4208,7 +4208,7 @@ __NAMESPACE_LOCAL_USING(_snwscanf_l)
 #define ___snwscanf_s_defined 1
 #ifdef __CRT_HAVE__snwscanf_s
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwscanf_s)(wchar_t const *__src, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME_SAME("_snwscanf_s");
-#elif defined(__CRT_HAVE__snwscanf) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__snwscanf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL _snwscanf_s)(wchar_t const *__src, __SIZE_TYPE__ __bufsize, wchar_t const *__format, ...) __CASMNAME("_snwscanf");
 #else /* LIBC: _snwscanf */
 #include <local/wchar/_snwscanf.h>
@@ -4247,7 +4247,7 @@ __NAMESPACE_LOCAL_USING(_wscanf_l)
 #define ___wscanf_s_l_defined 1
 #ifdef __CRT_HAVE__wscanf_s_l
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _wscanf_s_l)(wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME_SAME("_wscanf_s_l");
-#elif defined(__CRT_HAVE__wscanf_l) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__wscanf_l) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _wscanf_s_l)(wchar_t const *__format, __locale_t __locale, ...) __THROWS(...) __CASMNAME("_wscanf_l");
 #elif (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)) || defined(__CRT_HAVE_vwscanf) || defined(__CRT_HAVE__vwscanf_l)
 #include <local/wchar/_wscanf_l.h>

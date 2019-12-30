@@ -59,15 +59,9 @@ NOTHROW_NCX(LIBCCALL libc_fstatfs)(fd_t filedes,
 /*[[[end:fstatfs]]]*/
 
 
-/* TODO: Implement this condition as a [xxx_variant_of()] tag for `statfs64()' and `fstatfs64()' */
-#if (__SIZEOF_FSBLKCNT32_T__ == __SIZEOF_FSBLKCNT64_T__ && \
-     __SIZEOF_FSFILCNT32_T__ == __SIZEOF_FSFILCNT64_T__)
-DEFINE_INTERN_ALIAS(libc_statfs64, libc_statfs);
-DEFINE_INTERN_ALIAS(libc_fstatfs64, libc_fstatfs);
-#else
-/*[[[head:statfs64,hash:CRC-32=0x30f6f471]]]*/
+/*[[[head:statfs64,hash:CRC-32=0xdaff54cb]]]*/
 /* Return information about the filesystem on which FILE resides */
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#if defined(_STATFS_MATCHES_STATFS64)
 DEFINE_INTERN_ALIAS(libc_statfs64, libc_statfs);
 #else
 INTERN NONNULL((1, 2))
@@ -83,9 +77,9 @@ NOTHROW_NCX(LIBCCALL libc_statfs64)(const char *file,
 #endif /* MAGIC:alias */
 /*[[[end:statfs64]]]*/
 
-/*[[[head:fstatfs64,hash:CRC-32=0xd804b978]]]*/
+/*[[[head:fstatfs64,hash:CRC-32=0xbae41809]]]*/
 /* Return information about the filesystem containing the file FILDES refers to */
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#if defined(_STATFS_MATCHES_STATFS64)
 DEFINE_INTERN_ALIAS(libc_fstatfs64, libc_fstatfs);
 #else
 INTERN NONNULL((2))
@@ -100,7 +94,6 @@ NOTHROW_NCX(LIBCCALL libc_fstatfs64)(fd_t filedes,
 }
 #endif /* MAGIC:alias */
 /*[[[end:fstatfs64]]]*/
-#endif
 
 
 /*[[[end:implementation]]]*/

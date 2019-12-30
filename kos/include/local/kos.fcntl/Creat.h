@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa55b2138 */
+/* HASH CRC-32:0xd620baf5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #define ____localdep_Open_defined 1
 #if defined(__CRT_HAVE_Open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
-#elif defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_Open) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
 #elif (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) || defined(__CRT_HAVE_Open) || defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64) || (defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64))))
 #include <local/kos.fcntl/Open.h>

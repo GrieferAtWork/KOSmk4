@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x191967ba */
+/* HASH CRC-32:0x4da9b4c2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,9 +53,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__fi
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$_wutime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),_wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$wutime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_DOS$wutime) && !defined(__USE_TIME_BITS64)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE_DOS$_wutime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_DOS$_wutime32) && !defined(__USE_TIME_BITS64)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),_wutime32,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$wutime)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),wutime,(__filename,__file_times))

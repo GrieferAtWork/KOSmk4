@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8826235c */
+/* HASH CRC-32:0xdb9cc6b3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -282,10 +282,10 @@ __CREDIRECT(,time_t,__NOTHROW_NCX,time,(time_t *__timer),time64,(__timer))
 #elif defined(__CRT_HAVE__time64) && defined(__USE_TIME_BITS64)
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 __CREDIRECT(,time_t,__NOTHROW_NCX,time,(time_t *__timer),_time64,(__timer))
-#elif defined(__CRT_HAVE_time) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_time) && !defined(__USE_TIME_BITS64)
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 __CDECLARE(,time_t,__NOTHROW_NCX,time,(time_t *__timer),(__timer))
-#elif defined(__CRT_HAVE__time32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__time32) && !defined(__USE_TIME_BITS64)
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 __CREDIRECT(,time_t,__NOTHROW_NCX,time,(time_t *__timer),_time32,(__timer))
 #elif defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32)
@@ -309,10 +309,10 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime,(time_t __
 #elif defined(__CRT_HAVE__difftime64) && defined(__USE_TIME_BITS64)
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime,(time_t __time1, time_t __time0),_difftime64,(__time1,__time0))
-#elif defined(__CRT_HAVE_difftime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_difftime) && !defined(__USE_TIME_BITS64)
 /* Return the difference between TIME1 and TIME0 */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime,(time_t __time1, time_t __time0),(__time1,__time0))
-#elif defined(__CRT_HAVE__difftime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__difftime32) && !defined(__USE_TIME_BITS64)
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime,(time_t __time1, time_t __time0),_difftime32,(__time1,__time0))
 #else /* LIBC: difftime */
@@ -333,13 +333,13 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),time_t,__NOTHROW_NCX,
 #elif defined(__CRT_HAVE_timelocal64) && defined(__USE_TIME_BITS64)
 /* Return the `time_t' representation of TP and normalize TP */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),time_t,__NOTHROW_NCX,mktime,(__STRUCT_TM __KOS_FIXED_CONST *__tp),timelocal64,(__tp))
-#elif defined(__CRT_HAVE_mktime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_mktime) && !defined(__USE_TIME_BITS64)
 /* Return the `time_t' representation of TP and normalize TP */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),time_t,__NOTHROW_NCX,mktime,(__STRUCT_TM __KOS_FIXED_CONST *__tp),(__tp))
-#elif defined(__CRT_HAVE__mktime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__mktime32) && !defined(__USE_TIME_BITS64)
 /* Return the `time_t' representation of TP and normalize TP */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),time_t,__NOTHROW_NCX,mktime,(__STRUCT_TM __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
-#elif defined(__CRT_HAVE_timelocal) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_timelocal) && !defined(__USE_TIME_BITS64)
 /* Return the `time_t' representation of TP and normalize TP */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),time_t,__NOTHROW_NCX,mktime,(__STRUCT_TM __KOS_FIXED_CONST *__tp),timelocal,(__tp))
 #else /* LIBC: mktime */
@@ -355,10 +355,10 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHRO
 #elif defined(__CRT_HAVE__ctime64) && defined(__USE_TIME_BITS64)
 /* Equivalent to `asctime (localtime (timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ctime,(time_t const *__timer),_ctime64,(__timer))
-#elif defined(__CRT_HAVE_ctime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_ctime) && !defined(__USE_TIME_BITS64)
 /* Equivalent to `asctime (localtime (timer))' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ctime,(time_t const *__timer),(__timer))
-#elif defined(__CRT_HAVE__ctime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__ctime32) && !defined(__USE_TIME_BITS64)
 /* Equivalent to `asctime (localtime (timer))' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,ctime,(time_t const *__timer),_ctime32,(__timer))
 #else /* LIBC: ctime */
@@ -376,11 +376,11 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct tm *,__N
 /* Return the `struct tm' representation of *TIMER
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct tm *,__NOTHROW_NCX,gmtime,(time_t const *__timer),_gmtime64,(__timer))
-#elif defined(__CRT_HAVE_gmtime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_gmtime) && !defined(__USE_TIME_BITS64)
 /* Return the `struct tm' representation of *TIMER
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct tm *,__NOTHROW_NCX,gmtime,(time_t const *__timer),(__timer))
-#elif defined(__CRT_HAVE__gmtime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__gmtime32) && !defined(__USE_TIME_BITS64)
 /* Return the `struct tm' representation of *TIMER
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct tm *,__NOTHROW_NCX,gmtime,(time_t const *__timer),_gmtime32,(__timer))
@@ -398,10 +398,10 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct tm *,__N
 #elif defined(__CRT_HAVE__localtime64) && defined(__USE_TIME_BITS64)
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct tm *,__NOTHROW_NCX,localtime,(time_t const *__timer),_localtime64,(__timer))
-#elif defined(__CRT_HAVE_localtime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_localtime) && !defined(__USE_TIME_BITS64)
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct tm *,__NOTHROW_NCX,localtime,(time_t const *__timer),(__timer))
-#elif defined(__CRT_HAVE__localtime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__localtime32) && !defined(__USE_TIME_BITS64)
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),struct tm *,__NOTHROW_NCX,localtime,(time_t const *__timer),_localtime32,(__timer))
 #else /* LIBC: localtime */
@@ -720,7 +720,7 @@ __LIBC __LONGPTR_TYPE__ (timezone) __ASMNAME("__timezone");
 #if defined(__CRT_HAVE_stime64) && defined(__USE_TIME_BITS64)
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),stime64,(__when))
-#elif defined(__CRT_HAVE_stime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_stime) && !defined(__USE_TIME_BITS64)
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *__when),(__when))
 #elif defined(__CRT_HAVE_stime) || defined(__CRT_HAVE_stime64)
@@ -731,7 +731,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(stime, __FORCELOCAL __ATTR_NONNULL((1)) int __NO
 #if defined(__CRT_HAVE_timegm64) && defined(__USE_TIME_BITS64)
 /* Like `mktime', but for TP represents Universal Time, not local time */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,timegm,(__STRUCT_TM *__tp),timegm64,(__tp))
-#elif defined(__CRT_HAVE_timegm) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_timegm) && !defined(__USE_TIME_BITS64)
 /* Like `mktime', but for TP represents Universal Time, not local time */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,timegm,(__STRUCT_TM *__tp),(__tp))
 #else /* LIBC: timegm */
@@ -748,13 +748,13 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOT
 #elif defined(__CRT_HAVE_timelocal64) && defined(__USE_TIME_BITS64)
 /* Another name for `mktime' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,timelocal,(__STRUCT_TM *__tp),timelocal64,(__tp))
-#elif defined(__CRT_HAVE_mktime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_mktime) && !defined(__USE_TIME_BITS64)
 /* Another name for `mktime' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,timelocal,(__STRUCT_TM *__tp),mktime,(__tp))
-#elif defined(__CRT_HAVE__mktime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__mktime32) && !defined(__USE_TIME_BITS64)
 /* Another name for `mktime' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,timelocal,(__STRUCT_TM *__tp),_mktime32,(__tp))
-#elif defined(__CRT_HAVE_timelocal) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_timelocal) && !defined(__USE_TIME_BITS64)
 /* Another name for `mktime' */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,timelocal,(__STRUCT_TM *__tp),(__tp))
 #else /* LIBC: mktime */
@@ -815,7 +815,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t __NOTHROW
 #if defined(__CRT_HAVE_nanosleep64) && defined(__USE_TIME_BITS64)
 /* Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),nanosleep64,(__requested_time,__remaining))
-#elif defined(__CRT_HAVE_nanosleep) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_nanosleep) && !defined(__USE_TIME_BITS64)
 /* Pause execution for a number of nanoseconds */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep)
@@ -829,10 +829,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nanosleep, __FORCELOCAL __ATTR_NONNULL((1)) int 
 #if defined(__CRT_HAVE_clock_getres64) && defined(__USE_TIME_BITS64)
 /* Get resolution of clock CLOCK_ID */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_getres,(clockid_t __clock_id, struct timespec *__res),clock_getres64,(__clock_id,__res))
-#elif defined(__CRT_HAVE_clock_getres) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_clock_getres) && !defined(__USE_TIME_BITS64)
 /* Get resolution of clock CLOCK_ID */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_getres,(clockid_t __clock_id, struct timespec *__res),(__clock_id,__res))
-#elif defined(__CRT_HAVE___clock_getres) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE___clock_getres) && !defined(__USE_TIME_BITS64)
 /* Get resolution of clock CLOCK_ID */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_getres,(clockid_t __clock_id, struct timespec *__res),__clock_getres,(__clock_id,__res))
 #elif defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE_clock_getres64)
@@ -843,10 +843,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(clock_getres, __FORCELOCAL __ATTR_NONNULL((2)) i
 #if defined(__CRT_HAVE_clock_gettime64) && defined(__USE_TIME_BITS64)
 /* Get current value of clock CLOCK_ID and store it in TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_gettime,(clockid_t __clock_id, struct timespec *__tp),clock_gettime64,(__clock_id,__tp))
-#elif defined(__CRT_HAVE_clock_gettime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_clock_gettime) && !defined(__USE_TIME_BITS64)
 /* Get current value of clock CLOCK_ID and store it in TP */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_gettime,(clockid_t __clock_id, struct timespec *__tp),(__clock_id,__tp))
-#elif defined(__CRT_HAVE___clock_gettime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE___clock_gettime) && !defined(__USE_TIME_BITS64)
 /* Get current value of clock CLOCK_ID and store it in TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_gettime,(clockid_t __clock_id, struct timespec *__tp),__clock_gettime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE_clock_gettime64)
@@ -857,10 +857,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(clock_gettime, __FORCELOCAL __ATTR_NONNULL((2)) 
 #if defined(__CRT_HAVE_clock_settime64) && defined(__USE_TIME_BITS64)
 /* Set clock CLOCK_ID to value TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clock_id, struct timespec const *__tp),clock_settime64,(__clock_id,__tp))
-#elif defined(__CRT_HAVE_clock_settime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_clock_settime) && !defined(__USE_TIME_BITS64)
 /* Set clock CLOCK_ID to value TP */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clock_id, struct timespec const *__tp),(__clock_id,__tp))
-#elif defined(__CRT_HAVE___clock_settime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE___clock_settime) && !defined(__USE_TIME_BITS64)
 /* Set clock CLOCK_ID to value TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clock_id, struct timespec const *__tp),__clock_settime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE_clock_settime64)
@@ -879,7 +879,7 @@ __CDECLARE(,int,__NOTHROW_NCX,timer_delete,(timer_t __timerid),(__timerid))
 #if defined(__CRT_HAVE_timer_settime64) && defined(__USE_TIME_BITS64)
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timer_settime,(timer_t __timerid, int __flags, struct itimerspec const *__restrict __value, struct itimerspec *__restrict __ovalue),timer_settime64,(__timerid,__flags,__value,__ovalue))
-#elif defined(__CRT_HAVE_timer_settime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_timer_settime) && !defined(__USE_TIME_BITS64)
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timer_settime,(timer_t __timerid, int __flags, struct itimerspec const *__restrict __value, struct itimerspec *__restrict __ovalue),(__timerid,__flags,__value,__ovalue))
 #elif defined(__CRT_HAVE_timer_settime) || defined(__CRT_HAVE_timer_settime64)
@@ -890,7 +890,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timer_settime, __FORCELOCAL __ATTR_NONNULL((3)) 
 #if defined(__CRT_HAVE_timer_gettime64) && defined(__USE_TIME_BITS64)
 /* Get current value of timer TIMERID and store it in VALUE */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timer_gettime,(timer_t __timerid, struct itimerspec *__value),timer_gettime64,(__timerid,__value))
-#elif defined(__CRT_HAVE_timer_gettime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_timer_gettime) && !defined(__USE_TIME_BITS64)
 /* Get current value of timer TIMERID and store it in VALUE */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timer_gettime,(timer_t __timerid, struct itimerspec *__value),(__timerid,__value))
 #elif defined(__CRT_HAVE_timer_gettime) || defined(__CRT_HAVE_timer_gettime64)
@@ -907,10 +907,10 @@ __CDECLARE(,int,__NOTHROW_NCX,timer_getoverrun,(timer_t __timerid),(__timerid))
 #if defined(__CRT_HAVE_clock_nanosleep64) && defined(__USE_TIME_BITS64)
 /* High-resolution sleep with the specified clock */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, int __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),clock_nanosleep64,(__clock_id,__flags,__requested_time,__remaining))
-#elif defined(__CRT_HAVE_clock_nanosleep) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_clock_nanosleep) && !defined(__USE_TIME_BITS64)
 /* High-resolution sleep with the specified clock */
 __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, int __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),(__clock_id,__flags,__requested_time,__remaining))
-#elif defined(__CRT_HAVE___clock_nanosleep) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE___clock_nanosleep) && !defined(__USE_TIME_BITS64)
 /* High-resolution sleep with the specified clock */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, int __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),__clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE_clock_nanosleep64)

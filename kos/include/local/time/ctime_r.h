@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e848602 */
+/* HASH CRC-32:0x68647f28 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __NAMESPACE_STD_END
 #if defined(__CRT_HAVE__ctime32_s) && defined(__USE_TIME_BITS64)
 /* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __TM_TYPE(time) const *__restrict __timer),_ctime32_s,(__buf,__bufsize,__timer))
-#elif defined(__CRT_HAVE__ctime64_s) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__ctime64_s) && !defined(__USE_TIME_BITS64)
 /* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __TM_TYPE(time) const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
 #elif defined(__CRT_HAVE__ctime32_s) || defined(__CRT_HAVE__ctime64_s)

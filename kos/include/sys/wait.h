@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23804a9c */
+/* HASH CRC-32:0x9ee24e66 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,7 +146,7 @@ struct rusage;
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),wait3_64,(__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait3) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_wait3) && !defined(__USE_TIME_BITS64)
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),(__stat_loc,__options,__usage))
@@ -180,7 +180,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wait3_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__L
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),wait4_64,(__pid,__stat_loc,__options,__usage))
-#elif defined(__CRT_HAVE_wait4) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_wait4) && !defined(__USE_TIME_BITS64)
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))

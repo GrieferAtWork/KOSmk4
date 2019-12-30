@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x755b7a5a */
+/* HASH CRC-32:0x3bb4e09c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,7 +393,7 @@ struct timespec;
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
 __CREDIRECT(,int,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime),pthread_timedjoin64_np,(__pthread,__thread_return,__abstime))
-#elif defined(__CRT_HAVE_pthread_timedjoin_np) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_pthread_timedjoin_np) && !defined(__USE_TIME_BITS64)
 /* Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
@@ -974,7 +974,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_mutex_lock,(pthread_mut
 #if defined(__CRT_HAVE_pthread_mutex_timedlock64) && defined(__USE_TIME_BITS64)
 /* Wait until lock becomes available, or specified time passes */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock64,(__mutex,__abstime))
-#elif defined(__CRT_HAVE_pthread_mutex_timedlock) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_pthread_mutex_timedlock) && !defined(__USE_TIME_BITS64)
 /* Wait until lock becomes available, or specified time passes */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),(__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64)
@@ -1130,7 +1130,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_rwlock_tryrdlock,(pthre
 #if defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) && defined(__USE_TIME_BITS64)
 /* Try to acquire read lock for RWLOCK or return after specfied time */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedrdlock64,(__rwlock,__abstime))
-#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && !defined(__USE_TIME_BITS64)
 /* Try to acquire read lock for RWLOCK or return after specfied time */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock64)
@@ -1171,7 +1171,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_rwlock_trywrlock,(pthre
 #if defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) && defined(__USE_TIME_BITS64)
 /* Try to acquire write lock for RWLOCK or return after specfied time */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedwrlock64,(__rwlock,__abstime))
-#elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && !defined(__USE_TIME_BITS64)
 /* Try to acquire write lock for RWLOCK or return after specfied time */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock64)
@@ -1274,7 +1274,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_cond_wait,(pthread_c
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait64,(__cond,__mutex,__abstime))
-#elif defined(__CRT_HAVE_pthread_cond_timedwait) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait) && !defined(__USE_TIME_BITS64)
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch

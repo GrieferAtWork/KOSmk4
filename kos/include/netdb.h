@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55d7c2d */
+/* HASH CRC-32:0xae0b12ba */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -624,7 +624,7 @@ __CDECLARE(,int,__NOTHROW_RPC,getaddrinfo_a,(int __mode, struct gaicb *__list[__
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CREDIRECT(,int,__NOTHROW_RPC,gai_suspend,(struct gaicb const *const __list[], int __ent, struct timespec const *__timeout),gai_suspend64,(__list,__ent,__timeout))
-#elif defined(__CRT_HAVE_gai_suspend) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_gai_suspend) && !defined(__USE_TIME_BITS64)
 /* Suspend execution of the thread until at least one of the ENT requests
  * in LIST is handled. If TIMEOUT is not a null pointer it specifies the
  * longest time the function keeps waiting before returning with an error.

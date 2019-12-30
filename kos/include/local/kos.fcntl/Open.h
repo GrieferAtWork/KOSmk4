@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5cc7ffe6 */
+/* HASH CRC-32:0x6ea69a7c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open64,(char 
 #define ____localdep_OpenAt_defined 1
 #if defined(__CRT_HAVE_Openat64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),Openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
-#elif defined(__CRT_HAVE_OpenAt) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_OpenAt) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,,__localdep_OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
 #elif defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)
 #include <local/kos.fcntl/OpenAt.h>

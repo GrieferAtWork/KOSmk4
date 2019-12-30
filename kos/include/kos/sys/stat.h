@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0599ec9 */
+/* HASH CRC-32:0xe8728d1e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,20 +37,20 @@ __SYSDECL_BEGIN
 
 #if defined(__CRT_HAVE_KStat) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),,Stat,(char const *__restrict __filename, struct stat *__restrict __buf),KStat,(__filename,__buf)) __THROWS(...)
-#elif defined(__CRT_HAVE_KStat64) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_KStat64) && !defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),,Stat,(char const *__restrict __filename, struct stat *__restrict __buf),KStat64,(__filename,__buf)) __THROWS(...)
 #endif /* Stat... */
 
 #if defined(__CRT_HAVE_KFStat) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),,FStat,(__fd_t __fd, struct stat *__restrict __buf),KFStat,(__fd,__buf)) __THROWS(...)
-#elif defined(__CRT_HAVE_KFStat64) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_KFStat64) && !defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),,FStat,(__fd_t __fd, struct stat *__restrict __buf),KFStat64,(__fd,__buf)) __THROWS(...)
 #endif /* FStat... */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_KLStat) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),,LStat,(char const *__restrict __filename, struct stat *__restrict __buf),KLStat,(__filename,__buf)) __THROWS(...)
-#elif defined(__CRT_HAVE_KLStat64) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_KLStat64) && !defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),,LStat,(char const *__restrict __filename, struct stat *__restrict __buf),KLStat64,(__filename,__buf)) __THROWS(...)
 #endif /* LStat... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -76,7 +76,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),,LStat64,(char const *__restrict __filen
 #if defined(__CRT_HAVE_KFStatAt) && defined(__USE_FILE_OFFSET64)
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),,FStatAt,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),KFStatAt,(__dirfd,__filename,__buf,__flags)) __THROWS(...)
-#elif defined(__CRT_HAVE_KFStatAt64) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_KFStatAt64) && !defined(__USE_FILE_OFFSET64)
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),,FStatAt,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),KFStatAt64,(__dirfd,__filename,__buf,__flags)) __THROWS(...)
 #endif /* FStatAt... */
@@ -151,7 +151,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),,MknodAt,(__fd_t __dirfd, char const *__node
 #if defined(__CRT_HAVE_UTimensAt64) && defined(__USE_TIME_BITS64)
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),,UTimensAt,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt64,(__dirfd,__filename,__times,__flags)) __THROWS(...)
-#elif defined(__CRT_HAVE_UTimensAt) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_UTimensAt) && !defined(__USE_TIME_BITS64)
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CDECLARE_VOID(__ATTR_NONNULL((2)),,UTimensAt,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags)) __THROWS(...)
 #elif defined(__CRT_HAVE_UTimensAt) || defined(__CRT_HAVE_UTimensAt64)
@@ -177,7 +177,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt64, __FORCELOCAL __ATTR_NONNULL((2)) vo
 #ifdef __USE_XOPEN2K8
 #if defined(__CRT_HAVE_FUtimens64) && defined(__USE_TIME_BITS64)
 __CREDIRECT_VOID(,,FUtimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),FUtimens64,(__fd,__times)) __THROWS(...)
-#elif defined(__CRT_HAVE_FUtimens) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_FUtimens) && !defined(__USE_TIME_BITS64)
 __CDECLARE_VOID(,,FUtimens,(__fd_t __fd, struct timespec const __times[2 /*or:3*/]),(__fd,__times)) __THROWS(...)
 #elif defined(__CRT_HAVE_FUtimens) || defined(__CRT_HAVE_FUtimens64)
 #include <local/kos.sys.stat/FUtimens.h>

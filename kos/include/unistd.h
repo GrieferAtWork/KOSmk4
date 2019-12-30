@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c7f139f */
+/* HASH CRC-32:0x6214fc98 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -295,7 +295,7 @@ __FORCELOCAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL e
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/) __CASMNAME_SAME("execl");
-#elif defined(__CRT_HAVE__execl) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__execl) && !defined(__NO_ASMNAME)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
@@ -326,7 +326,7 @@ __FORCELOCAL __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCC
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("execle");
-#elif defined(__CRT_HAVE__execle) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__execle) && !defined(__NO_ASMNAME)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
@@ -357,7 +357,7 @@ __FORCELOCAL __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL e
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/) __CASMNAME_SAME("execlp");
-#elif defined(__CRT_HAVE__execlp) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__execlp) && !defined(__NO_ASMNAME)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
@@ -402,7 +402,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execvpe,(char const *__r
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("execlpe");
-#elif defined(__CRT_HAVE__execlpe) && (!defined(__NO_ASMNAME))
+#elif defined(__CRT_HAVE__execlpe) && !defined(__NO_ASMNAME)
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
@@ -848,15 +848,15 @@ __CREDIRECT(,__off64_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off64_t __offset, int
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off64_t __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CDECLARE(,__off32_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off32_t __offset, int __whence),(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE__lseek) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off32_t __offset, int __whence),_lseek,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE___lseek) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE___lseek) && !defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off32_t __offset, int __whence),__lseek,(__fd,__offset,__whence))
@@ -1171,7 +1171,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek64, __FORCELOCAL __off64_t __NOTHROW_NCX(__
 /* >> pread(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),pread64,(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_pread) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_pread) && !defined(__USE_FILE_OFFSET64)
 /* >> pread(2)
  * Read data from a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
@@ -1185,7 +1185,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pread, __FORCELOCAL __ATTR_NONNULL((2)) ssize_t 
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),pwrite64,(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_pwrite) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_pwrite) && !defined(__USE_FILE_OFFSET64)
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
@@ -1201,7 +1201,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pwrite, __FORCELOCAL __ATTR_NONNULL((2)) ssize_t
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadall,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),preadall64,(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_preadall) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_preadall) && !defined(__USE_FILE_OFFSET64)
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadall,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
@@ -1215,7 +1215,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(preadall, __FORCELOCAL __ATTR_NONNULL((2)) ssize
 /* >> pwriteall(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwriteall,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),pwriteall64,(__fd,__buf,__bufsize,__offset))
-#elif defined(__CRT_HAVE_pwriteall) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_pwriteall) && !defined(__USE_FILE_OFFSET64)
 /* >> pwriteall(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwriteall,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
@@ -1462,7 +1462,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),truncate64,(__file,__length))
-#elif defined(__CRT_HAVE_truncate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_truncate) && !defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,truncate,(char const *__file, __PIO_OFFSET __length),(__file,__length))
@@ -1822,7 +1822,7 @@ __CDECLARE(,int,__NOTHROW_RPC,acct,(char const *__name),(__name))
 __LIBC long int __NOTHROW_RPC(__VLIBCCALL syscall)(long int __sysno, ...) __CASMNAME_SAME("syscall");
 #endif /* syscall... */
 #ifdef __USE_KOS
-#if defined(__CRT_HAVE_syscall) && (!defined(__NO_ASMNAME))
+#if defined(__CRT_HAVE_syscall) && !defined(__NO_ASMNAME)
 __LIBC __LONG64_TYPE__ __NOTHROW_RPC(__VLIBCCALL syscall64)(__syscall_ulong_t __sysno, ...) __CASMNAME("syscall");
 #elif defined(__CRT_HAVE_syscall64)
 __LIBC __LONG64_TYPE__ __NOTHROW_RPC(__VLIBCCALL syscall64)(__syscall_ulong_t __sysno, ...) __CASMNAME_SAME("syscall64");
@@ -1854,15 +1854,15 @@ __CREDIRECT(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ft
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
-#elif defined(__CRT_HAVE_ftruncate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),(__fd,__length))
-#elif defined(__CRT_HAVE__chsize) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize,(__fd,__length))
-#elif defined(__CRT_HAVE_chsize) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,ftruncate,(__fd_t __fd, __PIO_OFFSET __length),chsize,(__fd,__length))
@@ -2027,11 +2027,11 @@ __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW_NCX,sysconf,(int __name),__sysconf
 #define __lockf_defined 1
 #if defined(__CRT_HAVE_lockf64) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __off64_t __length),lockf64,(__fd,__cmd,__length))
-#elif defined(__CRT_HAVE_lockf) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_lockf) && !defined(__USE_FILE_OFFSET64)
 __CDECLARE(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __off32_t __length),(__fd,__cmd,__length))
-#elif defined(__CRT_HAVE__locking) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__locking) && !defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __FS_TYPE(off) __length),_locking,(__fd,__cmd,__length))
-#elif defined(__CRT_HAVE_locking) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_locking) && !defined(__USE_FILE_OFFSET64)
 __CREDIRECT(,int,__NOTHROW_RPC,lockf,(__fd_t __fd, int __cmd, __FS_TYPE(off) __length),locking,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf64) || defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE__locking) || defined(__CRT_HAVE_locking)
 #include <local/fcntl/lockf.h>

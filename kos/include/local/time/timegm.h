@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2436d323 */
+/* HASH CRC-32:0x938529b6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,13 +79,13 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOT
 #elif defined(__CRT_HAVE_timelocal64) && defined(__USE_TIME_BITS64)
 /* Return the `time_t' representation of TP and normalize TP */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,__localdep_mktime,(__STRUCT_TM __KOS_FIXED_CONST *__tp),timelocal64,(__tp))
-#elif defined(__CRT_HAVE_mktime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_mktime) && !defined(__USE_TIME_BITS64)
 /* Return the `time_t' representation of TP and normalize TP */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,__localdep_mktime,(__STRUCT_TM __KOS_FIXED_CONST *__tp),mktime,(__tp))
-#elif defined(__CRT_HAVE__mktime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__mktime32) && !defined(__USE_TIME_BITS64)
 /* Return the `time_t' representation of TP and normalize TP */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,__localdep_mktime,(__STRUCT_TM __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
-#elif defined(__CRT_HAVE_timelocal) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_timelocal) && !defined(__USE_TIME_BITS64)
 /* Return the `time_t' representation of TP and normalize TP */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,__localdep_mktime,(__STRUCT_TM __KOS_FIXED_CONST *__tp),timelocal,(__tp))
 #else /* LIBC: mktime */

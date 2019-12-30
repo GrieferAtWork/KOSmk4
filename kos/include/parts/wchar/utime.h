@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6c46d22 */
+/* HASH CRC-32:0xae3b2453 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,9 +44,9 @@ __SYSDECL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime,(wchar_t const *__filename, struct utimbuf const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime,(wchar_t const *__filename, struct utimbuf const *__file_times),_wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_wutime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_wutime) && !defined(__USE_TIME_BITS64)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime,(wchar_t const *__filename, struct utimbuf const *__file_times),(__filename,__file_times))
-#elif defined(__CRT_HAVE__wutime32) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE__wutime32) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime,(wchar_t const *__filename, struct utimbuf const *__file_times),_wutime32,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 #include <local/parts.wchar.utime/wutime.h>

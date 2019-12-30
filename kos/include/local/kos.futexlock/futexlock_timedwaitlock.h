@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe992181a */
+/* HASH CRC-32:0x80620eee */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),lfutexlock64,(__ulockaddr,__uaddr,__futex_op,__val,))
-#elif defined(__CRT_HAVE_lfutexlock) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_lfutexlock) && !defined(__USE_TIME_BITS64)
 /* >> lfutexlock(3)
  * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes

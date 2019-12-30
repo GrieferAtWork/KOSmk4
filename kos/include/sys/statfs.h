@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xecfff090 */
+/* HASH CRC-32:0x1760c742 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,17 +55,17 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_statfs) && (!defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_statfs) && !defined(__USE_FILE_OFFSET64)
 /* Return information about the filesystem on which FILE resides */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs,(char const *__file, struct statfs *__buf),(__file,__buf))
-#elif defined(__CRT_HAVE___statfs) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE___statfs) && !defined(__USE_FILE_OFFSET64)
 /* Return information about the filesystem on which FILE resides */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs,(char const *__file, struct statfs *__buf),__statfs,(__file,__buf))
 #elif defined(__CRT_HAVE_statfs64) && defined(__USE_FILE_OFFSET64)
 /* Return information about the filesystem on which FILE resides */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs,(char const *__file, struct statfs *__buf),statfs64,(__file,__buf))
 #endif /* statfs... */
-#if defined(__CRT_HAVE_fstatfs) && (!defined(__USE_FILE_OFFSET64))
+#if defined(__CRT_HAVE_fstatfs) && !defined(__USE_FILE_OFFSET64)
 /* Return information about the filesystem containing the file FILDES refers to */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, struct statfs *__buf),(__filedes,__buf))
 #elif defined(__CRT_HAVE_fstatfs64) && defined(__USE_FILE_OFFSET64)
@@ -74,17 +74,19 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstatfs,(__fd_t __filedes, str
 #endif /* fstatfs... */
 
 #ifdef __USE_LARGEFILE64
+#ifndef statfs64
 #ifdef __CRT_HAVE_statfs64
 /* Return information about the filesystem on which FILE resides */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs64,(const char *__file, struct statfs64 *__buf),(__file,__buf))
-#elif defined(__CRT_HAVE_statfs) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_statfs) && defined(_STATFS_MATCHES_STATFS64)
 /* Return information about the filesystem on which FILE resides */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs64,(const char *__file, struct statfs64 *__buf),statfs,(__file,__buf))
 #endif /* statfs64... */
+#endif /* !statfs64 */
 #ifdef __CRT_HAVE_fstatfs64
 /* Return information about the filesystem containing the file FILDES refers to */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),(__filedes,__buf))
-#elif defined(__CRT_HAVE_fstatfs) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_fstatfs) && defined(_STATFS_MATCHES_STATFS64)
 /* Return information about the filesystem containing the file FILDES refers to */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,fstatfs64,(__fd_t __filedes, struct statfs64 *__buf),fstatfs,(__filedes,__buf))
 #endif /* fstatfs64... */

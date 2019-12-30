@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb892e6e3 */
+/* HASH CRC-32:0xb4a3daa5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),lfutex64,(__uaddr,__futex_op,__val,))
-#elif defined(__CRT_HAVE_lfutex) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_lfutex) && !defined(__USE_TIME_BITS64)
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:

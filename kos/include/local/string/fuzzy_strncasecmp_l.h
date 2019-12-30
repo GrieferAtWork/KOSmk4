@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeaf08476 */
+/* HASH CRC-32:0xe3508786 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_strncasecmp_l_defined
-#if !defined(__NO_MALLOCA)
+#ifndef __NO_MALLOCA
 #define __local_fuzzy_strncasecmp_l_defined 1
 #include <parts/malloca.h>
 /* Dependency: "fuzzy_memcasecmp_l" from "string" */

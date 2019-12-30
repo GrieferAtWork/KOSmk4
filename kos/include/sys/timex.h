@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85c85bed */
+/* HASH CRC-32:0xcee0112e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -126,9 +126,9 @@ struct __ntptimeval_alt {
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE___adjtimex64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),__adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE_adjtimex) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_adjtimex) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),adjtimex,(__ntx))
-#elif defined(__CRT_HAVE___adjtimex) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE___adjtimex) && !defined(__USE_TIME_BITS64)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),(__ntx))
 #elif defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64)
 #include <local/sys.timex/adjtimex.h>
@@ -138,9 +138,9 @@ __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __adjtimex)(struct
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE___adjtimex64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),__adjtimex64,(__ntx))
-#elif defined(__CRT_HAVE_adjtimex) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_adjtimex) && !defined(__USE_TIME_BITS64)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),(__ntx))
-#elif defined(__CRT_HAVE___adjtimex) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE___adjtimex) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex,(struct timex *__restrict __ntx),__adjtimex,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64)
 #include <local/sys.timex/adjtimex.h>
@@ -148,7 +148,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(adjtimex, __FORCELOCAL __ATTR_NONNULL((1)) int _
 #endif /* adjtimex... */
 #if defined(__CRT_HAVE_ntp_gettimex64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_gettime,(struct ntptimeval *__restrict __ntv),ntp_gettimex64,(__ntv))
-#elif defined(__CRT_HAVE_ntp_gettimex) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_ntp_gettimex) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_gettime,(struct ntptimeval *__restrict __ntv),ntp_gettimex,(__ntv))
 #elif defined(__CRT_HAVE_ntp_gettimex) || defined(__CRT_HAVE_ntp_gettimex64)
 #include <local/sys.timex/ntp_gettime.h>
@@ -156,7 +156,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntp_gettime, __FORCELOCAL __ATTR_NONNULL((1)) in
 #endif /* ntp_gettime... */
 #if defined(__CRT_HAVE_ntp_adjtime64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_adjtime,(struct timex *__restrict __tntx),ntp_adjtime64,(__tntx))
-#elif defined(__CRT_HAVE_ntp_adjtime) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_ntp_adjtime) && !defined(__USE_TIME_BITS64)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_adjtime,(struct timex *__restrict __tntx),(__tntx))
 #elif defined(__CRT_HAVE_ntp_adjtime) || defined(__CRT_HAVE_ntp_adjtime64)
 #include <local/sys.timex/ntp_adjtime.h>

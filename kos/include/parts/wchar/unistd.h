@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f33724a */
+/* HASH CRC-32:0xa56f0998 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -250,7 +250,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wlchown, __FORCELOCAL __ATTR_NONNULL((1)) int __
 /* >> wtruncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate,(wchar_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
-#elif defined(__CRT_HAVE_wtruncate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_wtruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> wtruncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wtruncate,(wchar_t const *__file, __PIO_OFFSET __length),(__file,__length))

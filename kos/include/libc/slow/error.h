@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7ef3836 */
+/* HASH CRC-32:0x68abdb11 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __SYSDECL_BEGIN
 
 #ifndef ____libc_slow_error_defined
 #define ____libc_slow_error_defined 1
-#if defined(__CRT_HAVE_error) && (!defined(__NO_ASMNAME))
+#if defined(__CRT_HAVE_error) && !defined(__NO_ASMNAME)
 /* Helper function for printing an error message to `stderr' and possibly exiting the program
  * The message is printed as: `<program_invocation_short_name>: <format...>[: <strerror(errnum)>]\n'
  * Also note that `stdout' is flushed before the message is printed.
@@ -55,7 +55,7 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) void (__VLIBCCALL __libc_slow_error)(int __statu
 #endif /* !____libc_slow_error_defined */
 #ifndef ____libc_slow_error_at_line_defined
 #define ____libc_slow_error_at_line_defined 1
-#if defined(__CRT_HAVE_error_at_line) && (!defined(__NO_ASMNAME))
+#if defined(__CRT_HAVE_error_at_line) && !defined(__NO_ASMNAME)
 /* Same as `error()', but also include the given filename in the error message.
  * The message is printed as: `<program_invocation_short_name>:<filename>:<line>: <format...>[: <strerror(errnum)>]\n'
  * Additionally, when `error_one_per_line' is non-zero, consecutive calls to this function that

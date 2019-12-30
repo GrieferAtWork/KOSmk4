@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59b12df1 */
+/* HASH CRC-32:0xd153f165 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -587,7 +587,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t cons
 /* >> c16truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t const *__file, __PIO_OFFSET __length),wtruncate,(__file,__length))
-#elif defined(__CRT_HAVE_DOS$wtruncate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_DOS$wtruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> c16truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t const *__file, __PIO_OFFSET __length),wtruncate,(__file,__length))

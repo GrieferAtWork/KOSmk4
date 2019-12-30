@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x334c0e05 */
+/* HASH CRC-32:0xf97da3ac */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,11 +72,11 @@ typedef int __priority_which_t;
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),getrlimit64,(__resource,__rlimits))
-#elif defined(__CRT_HAVE_getrlimit) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_getrlimit) && !defined(__USE_FILE_OFFSET64)
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
-#elif defined(__CRT_HAVE___getrlimit) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE___getrlimit) && !defined(__USE_FILE_OFFSET64)
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),__getrlimit,(__resource,__rlimits))
@@ -86,7 +86,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit,(__rlimit_resource_t __resource, struct rlimit const *__rlimits),setrlimit64,(__resource,__rlimits))
-#elif defined(__CRT_HAVE_setrlimit) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_setrlimit) && !defined(__USE_FILE_OFFSET64)
 /* Set the soft and hard limits for RESOURCE to *RLIMITS.
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */

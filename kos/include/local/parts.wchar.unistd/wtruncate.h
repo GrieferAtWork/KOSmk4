@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb3f1398 */
+/* HASH CRC-32:0x214fa36e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__f
 #define ____localdep_open_defined 1
 #if defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -84,15 +84,15 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET _
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
-#elif defined(__CRT_HAVE_ftruncate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
-#elif defined(__CRT_HAVE__chsize) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize,(__fd,__length))
-#elif defined(__CRT_HAVE_chsize) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),chsize,(__fd,__length))

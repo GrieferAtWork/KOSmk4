@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x751b2bfa */
+/* HASH CRC-32:0x426da93f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,15 +58,15 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET _
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize_s,(__fd,__length))
-#elif defined(__CRT_HAVE_ftruncate) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),ftruncate,(__fd,__length))
-#elif defined(__CRT_HAVE__chsize) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),_chsize,(__fd,__length))
-#elif defined(__CRT_HAVE_chsize) && (!defined(__USE_FILE_OFFSET64))
+#elif defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET __length),chsize,(__fd,__length))

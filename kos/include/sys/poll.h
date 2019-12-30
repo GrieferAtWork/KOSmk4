@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x564aa1d */
+/* HASH CRC-32:0x1110b5d8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,poll,(struct pollfd *__fds, nf
 #ifdef __USE_GNU
 #if defined(__CRT_HAVE_ppoll) && defined(__USE_TIME_BITS64)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,ppoll,(struct pollfd *__fds, nfds_t __nfds, struct timespec const *__timeout, struct __sigset_struct const *__ss),(__fds,__nfds,__timeout,__ss))
-#elif defined(__CRT_HAVE_ppoll64) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_ppoll64) && !defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,ppoll,(struct pollfd *__fds, nfds_t __nfds, struct timespec const *__timeout, struct __sigset_struct const *__ss),ppoll64,(__fds,__nfds,__timeout,__ss))
 #elif defined(__CRT_HAVE_ppoll) || defined(__CRT_HAVE_ppoll64)
 #include <local/sys.poll/ppoll.h>

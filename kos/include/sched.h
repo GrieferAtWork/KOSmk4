@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48b7c75c */
+/* HASH CRC-32:0x6efb8606 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,7 +128,7 @@ __CDECLARE(,int,__NOTHROW_NCX,sched_getaffinity,(__pid_t __pid, __SIZE_TYPE__ __
 #endif /* sched_getaffinity... */
 #if defined(__CRT_HAVE_sched_rr_get_interval64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(,int,__NOTHROW_NCX,sched_rr_get_interval,(__pid_t __pid, struct timespec *__tms),sched_rr_get_interval64,(__pid,__tms))
-#elif defined(__CRT_HAVE_sched_rr_get_interval) && (!defined(__USE_TIME_BITS64))
+#elif defined(__CRT_HAVE_sched_rr_get_interval) && !defined(__USE_TIME_BITS64)
 __CDECLARE(,int,__NOTHROW_NCX,sched_rr_get_interval,(__pid_t __pid, struct timespec *__tms),(__pid,__tms))
 #elif defined(__CRT_HAVE_sched_rr_get_interval) || defined(__CRT_HAVE_sched_rr_get_interval64)
 #include <local/sched/sched_rr_get_interval.h>
