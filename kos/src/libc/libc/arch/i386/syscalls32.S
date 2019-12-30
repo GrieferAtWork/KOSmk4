@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5ae35d */
+/* HASH CRC-32:0x54db1e10 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2237,53 +2237,53 @@ INTERN_FUNCTION(libc_sys_Xgetitimer)
 END(libc_sys_Xgetitimer)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetitimer, libc_sys_Xgetitimer)
 
-/* errno_t linux_stat32(char const *filename, struct linux_stat32 *statbuf) */
-.section .text.crt.syscall.linux_stat32
-INTERN_FUNCTION(libc_sys_linux_stat32)
+/* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.linux_stat
+INTERN_FUNCTION(libc_sys_linux_stat)
 	movl   $(0x6a), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_stat32)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_linux_stat32, libc_sys_linux_stat32)
+END(libc_sys_linux_stat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_linux_stat, libc_sys_linux_stat)
 
-/* errno_t linux_stat32(char const *filename, struct linux_stat32 *statbuf) */
-.section .text.crt.syscall.Xlinux_stat32
-INTERN_FUNCTION(libc_sys_Xlinux_stat32)
+/* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.Xlinux_stat
+INTERN_FUNCTION(libc_sys_Xlinux_stat)
 	movl   $(0x6a), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_stat32)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlinux_stat32, libc_sys_Xlinux_stat32)
+END(libc_sys_Xlinux_stat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlinux_stat, libc_sys_Xlinux_stat)
 
-/* errno_t linux_lstat32(char const *filename, struct linux_stat32 *statbuf) */
-.section .text.crt.syscall.linux_lstat32
-INTERN_FUNCTION(libc_sys_linux_lstat32)
+/* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.linux_lstat
+INTERN_FUNCTION(libc_sys_linux_lstat)
 	movl   $(0x6b), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_lstat32)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_linux_lstat32, libc_sys_linux_lstat32)
+END(libc_sys_linux_lstat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_linux_lstat, libc_sys_linux_lstat)
 
-/* errno_t linux_lstat32(char const *filename, struct linux_stat32 *statbuf) */
-.section .text.crt.syscall.Xlinux_lstat32
-INTERN_FUNCTION(libc_sys_Xlinux_lstat32)
+/* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.Xlinux_lstat
+INTERN_FUNCTION(libc_sys_Xlinux_lstat)
 	movl   $(0x6b), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_lstat32)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlinux_lstat32, libc_sys_Xlinux_lstat32)
+END(libc_sys_Xlinux_lstat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlinux_lstat, libc_sys_Xlinux_lstat)
 
-/* errno_t linux_fstat32(fd_t fd, struct linux_stat32 *statbuf) */
-.section .text.crt.syscall.linux_fstat32
-INTERN_FUNCTION(libc_sys_linux_fstat32)
+/* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.linux_fstat
+INTERN_FUNCTION(libc_sys_linux_fstat)
 	movl   $(0x6c), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_fstat32)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_linux_fstat32, libc_sys_linux_fstat32)
+END(libc_sys_linux_fstat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_linux_fstat, libc_sys_linux_fstat)
 
-/* errno_t linux_fstat32(fd_t fd, struct linux_stat32 *statbuf) */
-.section .text.crt.syscall.Xlinux_fstat32
-INTERN_FUNCTION(libc_sys_Xlinux_fstat32)
+/* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.Xlinux_fstat
+INTERN_FUNCTION(libc_sys_Xlinux_fstat)
 	movl   $(0x6c), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_fstat32)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlinux_fstat32, libc_sys_Xlinux_fstat32)
+END(libc_sys_Xlinux_fstat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlinux_fstat, libc_sys_Xlinux_fstat)
 
 /* errno_t olduname(struct linux_olduname *name) */
 .section .text.crt.syscall.olduname
@@ -3665,7 +3665,7 @@ INTERN_FUNCTION(libc_sys_Xftruncate64)
 END(libc_sys_Xftruncate64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xftruncate64, libc_sys_Xftruncate64)
 
-/* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
+/* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
 .section .text.crt.syscall.linux_stat64
 INTERN_FUNCTION(libc_sys_linux_stat64)
 	movl   $(0xc3), %eax
@@ -3673,7 +3673,7 @@ INTERN_FUNCTION(libc_sys_linux_stat64)
 END(libc_sys_linux_stat64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_linux_stat64, libc_sys_linux_stat64)
 
-/* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
+/* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
 .section .text.crt.syscall.Xlinux_stat64
 INTERN_FUNCTION(libc_sys_Xlinux_stat64)
 	movl   $(0xc3), %eax
@@ -3681,7 +3681,7 @@ INTERN_FUNCTION(libc_sys_Xlinux_stat64)
 END(libc_sys_Xlinux_stat64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlinux_stat64, libc_sys_Xlinux_stat64)
 
-/* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
+/* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
 .section .text.crt.syscall.linux_lstat64
 INTERN_FUNCTION(libc_sys_linux_lstat64)
 	movl   $(0xc4), %eax
@@ -3689,7 +3689,7 @@ INTERN_FUNCTION(libc_sys_linux_lstat64)
 END(libc_sys_linux_lstat64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_linux_lstat64, libc_sys_linux_lstat64)
 
-/* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
+/* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
 .section .text.crt.syscall.Xlinux_lstat64
 INTERN_FUNCTION(libc_sys_Xlinux_lstat64)
 	movl   $(0xc4), %eax
@@ -3697,7 +3697,7 @@ INTERN_FUNCTION(libc_sys_Xlinux_lstat64)
 END(libc_sys_Xlinux_lstat64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlinux_lstat64, libc_sys_Xlinux_lstat64)
 
-/* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
+/* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
 .section .text.crt.syscall.linux_fstat64
 INTERN_FUNCTION(libc_sys_linux_fstat64)
 	movl   $(0xc5), %eax
@@ -3705,7 +3705,7 @@ INTERN_FUNCTION(libc_sys_linux_fstat64)
 END(libc_sys_linux_fstat64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_linux_fstat64, libc_sys_linux_fstat64)
 
-/* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
+/* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
 .section .text.crt.syscall.Xlinux_fstat64
 INTERN_FUNCTION(libc_sys_Xlinux_fstat64)
 	movl   $(0xc5), %eax
@@ -5286,7 +5286,7 @@ END(libc_sys_Xfutimesat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfutimesat, libc_sys_Xfutimesat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, atflag_t flags) */
+/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
 .section .text.crt.syscall.linux_fstatat64
 INTERN_FUNCTION(libc_sys_linux_fstatat64)
 	movl   $(0x12c), %eax
@@ -5295,7 +5295,7 @@ END(libc_sys_linux_fstatat64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_linux_fstatat64, libc_sys_linux_fstatat64)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, atflag_t flags) */
+/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
 .section .text.crt.syscall.Xlinux_fstatat64
 INTERN_FUNCTION(libc_sys_Xlinux_fstatat64)
 	movl   $(0x12c), %eax

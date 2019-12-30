@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88035e66 */
+/* HASH CRC-32:0x5ef40285 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,10 +133,10 @@
 #define __CRT_HAVE_sys_lgetxattr 1
 #define __CRT_HAVE_sys_link 1
 #define __CRT_HAVE_sys_linkat 1
-#define __CRT_HAVE_sys_linux_fstat32 1
-#define __CRT_HAVE_sys_linux_lstat32 1
+#define __CRT_HAVE_sys_linux_fstat 1
+#define __CRT_HAVE_sys_linux_lstat 1
 #define __CRT_HAVE_sys_linux_newfstatat 1
-#define __CRT_HAVE_sys_linux_stat32 1
+#define __CRT_HAVE_sys_linux_stat 1
 #define __CRT_HAVE_sys_listen 1
 #define __CRT_HAVE_sys_listxattr 1
 #define __CRT_HAVE_sys_llistxattr 1
@@ -445,10 +445,10 @@
 #define __CRT_HAVE_sys_Xlgetxattr 1
 #define __CRT_HAVE_sys_Xlink 1
 #define __CRT_HAVE_sys_Xlinkat 1
-#define __CRT_HAVE_sys_Xlinux_fstat32 1
-#define __CRT_HAVE_sys_Xlinux_lstat32 1
+#define __CRT_HAVE_sys_Xlinux_fstat 1
+#define __CRT_HAVE_sys_Xlinux_lstat 1
 #define __CRT_HAVE_sys_Xlinux_newfstatat 1
-#define __CRT_HAVE_sys_Xlinux_stat32 1
+#define __CRT_HAVE_sys_Xlinux_stat 1
 #define __CRT_HAVE_sys_Xlisten 1
 #define __CRT_HAVE_sys_Xlistxattr 1
 #define __CRT_HAVE_sys_Xllistxattr 1

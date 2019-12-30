@@ -93,6 +93,14 @@ kfstatat = kfstatatx32;
 kfstat = kfstatx32;
 klstat = klstatx32;
 kstat = kstatx32;
+linux_fstatat = linux_fstatatx32; /* Not exported */
+linux_fstatat64 = linux_fstatatx32_64;
+linux_fstat = linux_fstatx32;
+linux_fstat64 = linux_fstatx32_64;
+linux_lstat = linux_lstatx32;
+linux_lstat64 = linux_lstatx32_64;
+linux_stat = linux_statx32;
+linux_stat64 = linux_statx32_64;
 
 getrusage = getrusagex32;
 getrusage64 = getrusagex32_64;
@@ -300,9 +308,9 @@ mq_timedreceive64 = mq_timedreceivex32_64;
 0x00000067:syslog
 0x00000068:setitimer
 0x00000069:getitimer
-0x0000006a:linux_stat32
-0x0000006b:linux_lstat32
-0x0000006c:linux_fstat32
+0x0000006a:linux_stat
+0x0000006b:linux_lstat
+0x0000006c:linux_fstat
 0x0000006d:olduname
 0x0000006e:iopl
 0x0000006f:vhangup

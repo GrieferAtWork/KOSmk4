@@ -55,6 +55,10 @@ clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRA
        pid_t *ctid, uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
+linux_fstatat = linux_fstatatx64;
+linux_fstat = linux_fstatx64;
+linux_lstat = linux_lstatx64;
+linux_stat = linux_statx64;
 kfstatat = kfstatatx64;
 kfstat = kfstatx64;
 klstat = klstatx64;
@@ -125,9 +129,9 @@ mq_timedreceive = mq_timedreceivex64;
 0x0000000000000001:write
 0x0000000000000002:open
 0x0000000000000003:close
-0x0000000000000004:linux_stat64
-0x0000000000000005:linux_fstat64
-0x0000000000000006:linux_lstat64
+0x0000000000000004:linux_stat
+0x0000000000000005:linux_fstat
+0x0000000000000006:linux_lstat
 0x0000000000000007:poll
 0x0000000000000008:lseek64
 0x0000000000000009:mmap

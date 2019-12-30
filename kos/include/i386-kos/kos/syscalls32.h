@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdba5091c */
+/* HASH CRC-32:0x9c06b0c6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,8 +123,8 @@ struct linux_dirent64;
 struct linux_oldolduname;
 struct linux_oldstat;
 struct linux_olduname;
-struct linux_stat32;
-struct linux_stat64;
+struct linux_statx32;
+struct linux_statx32_64;
 struct mmsghdr;
 struct mq_attr;
 struct msghdr;
@@ -931,21 +931,21 @@ __CDECLARE_SC(,__errno_t,link,(char const *__existing_file, char const *__link_f
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,linkat,(__fd_t __fromfd, char const *__existing_file, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__fromfd,__existing_file,__tofd,__target_path,__flags))
 #endif /* __CRT_HAVE_SC(linkat) */
-#if __CRT_HAVE_SC(linux_fstat32)
-__CDECLARE_SC(,__errno_t,linux_fstat32,(__fd_t __fd, struct linux_stat32 *__statbuf),(__fd,__statbuf))
-#endif /* __CRT_HAVE_SC(linux_fstat32) */
+#if __CRT_HAVE_SC(linux_fstat)
+__CDECLARE_SC(,__errno_t,linux_fstat,(__fd_t __fd, struct linux_statx32 *__statbuf),(__fd,__statbuf))
+#endif /* __CRT_HAVE_SC(linux_fstat) */
 #if __CRT_HAVE_SC(linux_fstat64)
-__CDECLARE_SC(,__errno_t,linux_fstat64,(__fd_t __fd, struct linux_stat64 *__statbuf),(__fd,__statbuf))
+__CDECLARE_SC(,__errno_t,linux_fstat64,(__fd_t __fd, struct linux_statx32_64 *__statbuf),(__fd,__statbuf))
 #endif /* __CRT_HAVE_SC(linux_fstat64) */
 #if __CRT_HAVE_SC(linux_fstatat64)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,linux_fstatat64,(__fd_t __dirfd, char const *__filename, struct linux_stat64 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
+__CDECLARE_SC(,__errno_t,linux_fstatat64,(__fd_t __dirfd, char const *__filename, struct linux_statx32_64 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_SC(linux_fstatat64) */
-#if __CRT_HAVE_SC(linux_lstat32)
-__CDECLARE_SC(,__errno_t,linux_lstat32,(char const *__filename, struct linux_stat32 *__statbuf),(__filename,__statbuf))
-#endif /* __CRT_HAVE_SC(linux_lstat32) */
+#if __CRT_HAVE_SC(linux_lstat)
+__CDECLARE_SC(,__errno_t,linux_lstat,(char const *__filename, struct linux_statx32 *__statbuf),(__filename,__statbuf))
+#endif /* __CRT_HAVE_SC(linux_lstat) */
 #if __CRT_HAVE_SC(linux_lstat64)
-__CDECLARE_SC(,__errno_t,linux_lstat64,(char const *__filename, struct linux_stat64 *__statbuf),(__filename,__statbuf))
+__CDECLARE_SC(,__errno_t,linux_lstat64,(char const *__filename, struct linux_statx32_64 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(linux_lstat64) */
 #if __CRT_HAVE_SC(linux_oldfstat)
 __CDECLARE_SC(,__errno_t,linux_oldfstat,(__fd_t __fd, struct linux_oldstat *__statbuf),(__fd,__statbuf))
@@ -956,11 +956,11 @@ __CDECLARE_SC(,__errno_t,linux_oldlstat,(char const *__filename, struct linux_ol
 #if __CRT_HAVE_SC(linux_oldstat)
 __CDECLARE_SC(,__errno_t,linux_oldstat,(char const *__filename, struct linux_oldstat *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(linux_oldstat) */
-#if __CRT_HAVE_SC(linux_stat32)
-__CDECLARE_SC(,__errno_t,linux_stat32,(char const *__filename, struct linux_stat32 *__statbuf),(__filename,__statbuf))
-#endif /* __CRT_HAVE_SC(linux_stat32) */
+#if __CRT_HAVE_SC(linux_stat)
+__CDECLARE_SC(,__errno_t,linux_stat,(char const *__filename, struct linux_statx32 *__statbuf),(__filename,__statbuf))
+#endif /* __CRT_HAVE_SC(linux_stat) */
 #if __CRT_HAVE_SC(linux_stat64)
-__CDECLARE_SC(,__errno_t,linux_stat64,(char const *__filename, struct linux_stat64 *__statbuf),(__filename,__statbuf))
+__CDECLARE_SC(,__errno_t,linux_stat64,(char const *__filename, struct linux_statx32_64 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(linux_stat64) */
 #if __CRT_HAVE_SC(listen)
 __CDECLARE_SC(,__errno_t,listen,(__fd_t __sockfd, __syscall_ulong_t __max_backlog),(__sockfd,__max_backlog))
@@ -2615,21 +2615,21 @@ __CDECLARE_XSC(,__errno_t,link,(char const *__existing_file, char const *__link_
 /* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,linkat,(__fd_t __fromfd, char const *__existing_file, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__fromfd,__existing_file,__tofd,__target_path,__flags))
 #endif /* __CRT_HAVE_XSC(linkat) */
-#if __CRT_HAVE_XSC(linux_fstat32)
-__CDECLARE_XSC(,__errno_t,linux_fstat32,(__fd_t __fd, struct linux_stat32 *__statbuf),(__fd,__statbuf))
-#endif /* __CRT_HAVE_XSC(linux_fstat32) */
+#if __CRT_HAVE_XSC(linux_fstat)
+__CDECLARE_XSC(,__errno_t,linux_fstat,(__fd_t __fd, struct linux_statx32 *__statbuf),(__fd,__statbuf))
+#endif /* __CRT_HAVE_XSC(linux_fstat) */
 #if __CRT_HAVE_XSC(linux_fstat64)
-__CDECLARE_XSC(,__errno_t,linux_fstat64,(__fd_t __fd, struct linux_stat64 *__statbuf),(__fd,__statbuf))
+__CDECLARE_XSC(,__errno_t,linux_fstat64,(__fd_t __fd, struct linux_statx32_64 *__statbuf),(__fd,__statbuf))
 #endif /* __CRT_HAVE_XSC(linux_fstat64) */
 #if __CRT_HAVE_XSC(linux_fstatat64)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,linux_fstatat64,(__fd_t __dirfd, char const *__filename, struct linux_stat64 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
+__CDECLARE_XSC(,__errno_t,linux_fstatat64,(__fd_t __dirfd, char const *__filename, struct linux_statx32_64 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_XSC(linux_fstatat64) */
-#if __CRT_HAVE_XSC(linux_lstat32)
-__CDECLARE_XSC(,__errno_t,linux_lstat32,(char const *__filename, struct linux_stat32 *__statbuf),(__filename,__statbuf))
-#endif /* __CRT_HAVE_XSC(linux_lstat32) */
+#if __CRT_HAVE_XSC(linux_lstat)
+__CDECLARE_XSC(,__errno_t,linux_lstat,(char const *__filename, struct linux_statx32 *__statbuf),(__filename,__statbuf))
+#endif /* __CRT_HAVE_XSC(linux_lstat) */
 #if __CRT_HAVE_XSC(linux_lstat64)
-__CDECLARE_XSC(,__errno_t,linux_lstat64,(char const *__filename, struct linux_stat64 *__statbuf),(__filename,__statbuf))
+__CDECLARE_XSC(,__errno_t,linux_lstat64,(char const *__filename, struct linux_statx32_64 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(linux_lstat64) */
 #if __CRT_HAVE_XSC(linux_oldfstat)
 __CDECLARE_XSC(,__errno_t,linux_oldfstat,(__fd_t __fd, struct linux_oldstat *__statbuf),(__fd,__statbuf))
@@ -2640,11 +2640,11 @@ __CDECLARE_XSC(,__errno_t,linux_oldlstat,(char const *__filename, struct linux_o
 #if __CRT_HAVE_XSC(linux_oldstat)
 __CDECLARE_XSC(,__errno_t,linux_oldstat,(char const *__filename, struct linux_oldstat *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(linux_oldstat) */
-#if __CRT_HAVE_XSC(linux_stat32)
-__CDECLARE_XSC(,__errno_t,linux_stat32,(char const *__filename, struct linux_stat32 *__statbuf),(__filename,__statbuf))
-#endif /* __CRT_HAVE_XSC(linux_stat32) */
+#if __CRT_HAVE_XSC(linux_stat)
+__CDECLARE_XSC(,__errno_t,linux_stat,(char const *__filename, struct linux_statx32 *__statbuf),(__filename,__statbuf))
+#endif /* __CRT_HAVE_XSC(linux_stat) */
 #if __CRT_HAVE_XSC(linux_stat64)
-__CDECLARE_XSC(,__errno_t,linux_stat64,(char const *__filename, struct linux_stat64 *__statbuf),(__filename,__statbuf))
+__CDECLARE_XSC(,__errno_t,linux_stat64,(char const *__filename, struct linux_statx32_64 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(linux_stat64) */
 #if __CRT_HAVE_XSC(listen)
 __CDECLARE_XSC(,__errno_t,listen,(__fd_t __sockfd, __syscall_ulong_t __max_backlog),(__sockfd,__max_backlog))

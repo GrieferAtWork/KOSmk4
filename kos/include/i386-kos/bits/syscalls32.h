@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x851bdc6c */
+/* HASH CRC-32:0x66ebdbfd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,9 +149,9 @@
 #define SYS_syslog                  __NR_syslog                  /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
 #define SYS_setitimer               __NR_setitimer               /* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
 #define SYS_getitimer               __NR_getitimer               /* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
-#define SYS_linux_stat32            __NR_linux_stat32            /* errno_t linux_stat32(char const *filename, struct linux_stat32 *statbuf) */
-#define SYS_linux_lstat32           __NR_linux_lstat32           /* errno_t linux_lstat32(char const *filename, struct linux_stat32 *statbuf) */
-#define SYS_linux_fstat32           __NR_linux_fstat32           /* errno_t linux_fstat32(fd_t fd, struct linux_stat32 *statbuf) */
+#define SYS_linux_stat              __NR_linux_stat              /* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
+#define SYS_linux_lstat             __NR_linux_lstat             /* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
+#define SYS_linux_fstat             __NR_linux_fstat             /* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
 #define SYS_olduname                __NR_olduname                /* errno_t olduname(struct linux_olduname *name) */
 #define SYS_iopl                    __NR_iopl                    /* errno_t iopl(syscall_ulong_t level) */
 #define SYS_vhangup                 __NR_vhangup                 /* errno_t vhangup(void) */
@@ -251,9 +251,9 @@
 #define SYS_mmap2                   __NR_mmap2                   /* void *mmap2(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset) */
 #define SYS_truncate64              __NR_truncate64              /* errno_t truncate64(char const *filename, uint64_t length) */
 #define SYS_ftruncate64             __NR_ftruncate64             /* errno_t ftruncate64(fd_t fd, uint64_t length) */
-#define SYS_linux_stat64            __NR_linux_stat64            /* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
-#define SYS_linux_lstat64           __NR_linux_lstat64           /* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
-#define SYS_linux_fstat64           __NR_linux_fstat64           /* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
+#define SYS_linux_stat64            __NR_linux_stat64            /* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
+#define SYS_linux_lstat64           __NR_linux_lstat64           /* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
+#define SYS_linux_fstat64           __NR_linux_fstat64           /* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
 #define SYS_lchown32                __NR_lchown32                /* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
 #define SYS_getuid32                __NR_getuid32                /* uint32_t getuid32(void) */
 #define SYS_getgid32                __NR_getgid32                /* uint32_t getgid32(void) */
@@ -355,7 +355,7 @@
 #define SYS_fchownat                __NR_fchownat                /* errno_t fchownat(fd_t dirfd, char const *filename, uid_t owner, gid_t group, atflag_t flags) */
 #define SYS_futimesat               __NR_futimesat               /* errno_t futimesat(fd_t dirfd, const char *filename, struct __timevalx32 const[2] times) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define SYS_linux_fstatat64         __NR_linux_fstatat64         /* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, atflag_t flags) */
+#define SYS_linux_fstatat64         __NR_linux_fstatat64         /* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
 #define SYS_unlinkat                __NR_unlinkat                /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 #define SYS_renameat                __NR_renameat                /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */

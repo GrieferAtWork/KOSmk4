@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd38c5d91 */
+/* HASH CRC-32:0xa1bbd566 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,9 +143,9 @@
 #define __NRAC_syslog                  3
 #define __NRAC_setitimer               3
 #define __NRAC_getitimer               2
-#define __NRAC_linux_stat32            2
-#define __NRAC_linux_lstat32           2
-#define __NRAC_linux_fstat32           2
+#define __NRAC_linux_stat              2
+#define __NRAC_linux_lstat             2
+#define __NRAC_linux_fstat             2
 #define __NRAC_olduname                1
 #define __NRAC_iopl                    1
 #define __NRAC_vhangup                 0
@@ -602,9 +602,9 @@
 #define __NRRT_syslog                  (ssize_t, __ssize_t)
 #define __NRRT_setitimer               (errno_t, __errno_t)
 #define __NRRT_getitimer               (errno_t, __errno_t)
-#define __NRRT_linux_stat32            (errno_t, __errno_t)
-#define __NRRT_linux_lstat32           (errno_t, __errno_t)
-#define __NRRT_linux_fstat32           (errno_t, __errno_t)
+#define __NRRT_linux_stat              (errno_t, __errno_t)
+#define __NRRT_linux_lstat             (errno_t, __errno_t)
+#define __NRRT_linux_fstat             (errno_t, __errno_t)
 #define __NRRT_olduname                (errno_t, __errno_t)
 #define __NRRT_iopl                    (errno_t, __errno_t)
 #define __NRRT_vhangup                 (errno_t, __errno_t)
@@ -1133,12 +1133,12 @@
 #define __NRAT2_setitimer               (struct __itimerval32 *, struct __itimerval32 *)
 #define __NRAT0_getitimer               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_getitimer               (struct __itimerval32 *, struct __itimerval32 *)
-#define __NRAT0_linux_stat32            (char const *, char const *)
-#define __NRAT1_linux_stat32            (struct linux_stat32 *, struct linux_stat32 *)
-#define __NRAT0_linux_lstat32           (char const *, char const *)
-#define __NRAT1_linux_lstat32           (struct linux_stat32 *, struct linux_stat32 *)
-#define __NRAT0_linux_fstat32           (fd_t, __fd_t)
-#define __NRAT1_linux_fstat32           (struct linux_stat32 *, struct linux_stat32 *)
+#define __NRAT0_linux_stat              (char const *, char const *)
+#define __NRAT1_linux_stat              (struct linux_statx32 *, struct linux_statx32 *)
+#define __NRAT0_linux_lstat             (char const *, char const *)
+#define __NRAT1_linux_lstat             (struct linux_statx32 *, struct linux_statx32 *)
+#define __NRAT0_linux_fstat             (fd_t, __fd_t)
+#define __NRAT1_linux_fstat             (struct linux_statx32 *, struct linux_statx32 *)
 #define __NRAT0_olduname                (struct linux_olduname *, struct linux_olduname *)
 #define __NRAT0_iopl                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_vm86old                 (int, int)
@@ -1310,11 +1310,11 @@
 #define __NRAT0_ftruncate64             (fd_t, __fd_t)
 #define __NRAT1_ftruncate64             (uint64_t, __uint64_t)
 #define __NRAT0_linux_stat64            (char const *, char const *)
-#define __NRAT1_linux_stat64            (struct linux_stat64 *, struct linux_stat64 *)
+#define __NRAT1_linux_stat64            (struct linux_statx32_64 *, struct linux_statx32_64 *)
 #define __NRAT0_linux_lstat64           (char const *, char const *)
-#define __NRAT1_linux_lstat64           (struct linux_stat64 *, struct linux_stat64 *)
+#define __NRAT1_linux_lstat64           (struct linux_statx32_64 *, struct linux_statx32_64 *)
 #define __NRAT0_linux_fstat64           (fd_t, __fd_t)
-#define __NRAT1_linux_fstat64           (struct linux_stat64 *, struct linux_stat64 *)
+#define __NRAT1_linux_fstat64           (struct linux_statx32_64 *, struct linux_statx32_64 *)
 #define __NRAT0_lchown32                (char const *, char const *)
 #define __NRAT1_lchown32                (uint32_t, __uint32_t)
 #define __NRAT2_lchown32                (uint32_t, __uint32_t)
@@ -1542,7 +1542,7 @@
 #define __NRAT2_futimesat               (struct __timevalx32 const *, struct __timevalx32 const *)
 #define __NRAT0_linux_fstatat64         (fd_t, __fd_t)
 #define __NRAT1_linux_fstatat64         (char const *, char const *)
-#define __NRAT2_linux_fstatat64         (struct linux_stat64 *, struct linux_stat64 *)
+#define __NRAT2_linux_fstatat64         (struct linux_statx32_64 *, struct linux_statx32_64 *)
 #define __NRAT3_linux_fstatat64         (atflag_t, __atflag_t)
 #define __NRAT0_unlinkat                (fd_t, __fd_t)
 #define __NRAT1_unlinkat                (char const *, char const *)
@@ -2151,9 +2151,9 @@
 #define __NRAM_syslog(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (char const *)b, (__size_t)c
 #define __NRAM_setitimer(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __itimerval32 const *)b, (struct __itimerval32 *)c
 #define __NRAM_getitimer(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __itimerval32 *)b
-#define __NRAM_linux_stat32(a, b, c, d, e, f)            (char const *)a, (struct linux_stat32 *)b
-#define __NRAM_linux_lstat32(a, b, c, d, e, f)           (char const *)a, (struct linux_stat32 *)b
-#define __NRAM_linux_fstat32(a, b, c, d, e, f)           (__fd_t)a, (struct linux_stat32 *)b
+#define __NRAM_linux_stat(a, b, c, d, e, f)              (char const *)a, (struct linux_statx32 *)b
+#define __NRAM_linux_lstat(a, b, c, d, e, f)             (char const *)a, (struct linux_statx32 *)b
+#define __NRAM_linux_fstat(a, b, c, d, e, f)             (__fd_t)a, (struct linux_statx32 *)b
 #define __NRAM_olduname(a, b, c, d, e, f)                (struct linux_olduname *)a
 #define __NRAM_iopl(a, b, c, d, e, f)                    (__syscall_ulong_t)a
 #define __NRAM_vhangup(a, b, c, d, e, f)                 /* nothing */
@@ -2240,9 +2240,9 @@
 #define __NRAM_mmap2(a, b, c, d, e, f)                   (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__fd_t)e, (__syscall_ulong_t)f
 #define __NRAM_truncate64(a, b, c, d, e, f)              (char const *)a, (__uint64_t)((__uint64_t)b | (__uint64_t)c << 32)
 #define __NRAM_ftruncate64(a, b, c, d, e, f)             (__fd_t)a, (__uint64_t)((__uint64_t)b | (__uint64_t)c << 32)
-#define __NRAM_linux_stat64(a, b, c, d, e, f)            (char const *)a, (struct linux_stat64 *)b
-#define __NRAM_linux_lstat64(a, b, c, d, e, f)           (char const *)a, (struct linux_stat64 *)b
-#define __NRAM_linux_fstat64(a, b, c, d, e, f)           (__fd_t)a, (struct linux_stat64 *)b
+#define __NRAM_linux_stat64(a, b, c, d, e, f)            (char const *)a, (struct linux_statx32_64 *)b
+#define __NRAM_linux_lstat64(a, b, c, d, e, f)           (char const *)a, (struct linux_statx32_64 *)b
+#define __NRAM_linux_fstat64(a, b, c, d, e, f)           (__fd_t)a, (struct linux_statx32_64 *)b
 #define __NRAM_lchown32(a, b, c, d, e, f)                (char const *)a, (__uint32_t)b, (__uint32_t)c
 #define __NRAM_getuid32(a, b, c, d, e, f)                /* nothing */
 #define __NRAM_getgid32(a, b, c, d, e, f)                /* nothing */
@@ -2341,7 +2341,7 @@
 #define __NRAM_mknodat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d
 #define __NRAM_fchownat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__uid_t)c, (__gid_t)d, (__atflag_t)e
 #define __NRAM_futimesat(a, b, c, d, e, f)               (__fd_t)a, (__const char *)b, (struct __timevalx32 const *)c
-#define __NRAM_linux_fstatat64(a, b, c, d, e, f)         (__fd_t)a, (char const *)b, (struct linux_stat64 *)c, (__atflag_t)d
+#define __NRAM_linux_fstatat64(a, b, c, d, e, f)         (__fd_t)a, (char const *)b, (struct linux_statx32_64 *)c, (__atflag_t)d
 #define __NRAM_unlinkat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NRAM_renameat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d
 #define __NRAM_linkat(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
@@ -2610,9 +2610,9 @@
 #define __NRAP_syslog(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_setitimer(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_getitimer(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_linux_stat32(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_linux_lstat32(a, b)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_linux_fstat32(a, b)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_linux_stat(a, b)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_linux_lstat(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_linux_fstat(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_olduname(a)                               (__syscall_ulong_t)a
 #define __NRAP_iopl(a)                                   (__syscall_ulong_t)a
 #define __NRAP_vhangup()                                 /* nothing */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f6a1379 */
+/* HASH CRC-32:0x537f4e92 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -232,9 +232,9 @@ __TSYSCALL0(socketcall, 0x66, 0x66)
 __TSYSCALL0(syslog, 0x67, 0x67)
 __TSYSCALL0(setitimer, 0x68, 0x68)
 __TSYSCALL0(getitimer, 0x69, 0x69)
-__TSYSCALL0(linux_stat32, 0x6a, 0x6a)
-__TSYSCALL0(linux_lstat32, 0x6b, 0x6b)
-__TSYSCALL0(linux_fstat32, 0x6c, 0x6c)
+__TSYSCALL0(linux_stat, 0x6a, 0x6a)
+__TSYSCALL0(linux_lstat, 0x6b, 0x6b)
+__TSYSCALL0(linux_fstat, 0x6c, 0x6c)
 __TSYSCALL0(olduname, 0x6d, 0x6d)
 __TSYSCALL0(iopl, 0x6e, 0x6e)
 __TSYSCALL0(vhangup, 0x6f, 0x6f)

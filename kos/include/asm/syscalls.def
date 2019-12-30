@@ -108,7 +108,6 @@
 %[typeorg(<bits/stat-kos.h>: __kos_stat)]
 %[typeorg(<bits/stat-kos32.h>: __kos_statx32)]
 %[typeorg(<bits/stat-kos64.h>: __kos_statx64)]
-%[typeorg(<kos/compat/linux-stat.h>: linux_oldstat, linux_stat32, linux_stat64)]
 %[typeorg(<bits/statfs.h>: __statfs32, statfs64)]
 %[typeorg(<bits/sigaction-struct.h>: sigaction, __sighandler_t)]
 %[typeorg(<bits/sigaction-struct32.h>: sigaction32, __sighandler32_t)]
@@ -311,9 +310,6 @@ timex64:(int64_t *timer) -> [reg64] int64_t;
                [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
 
-
-[cp] linux_oldstat:(char const *filename, struct linux_oldstat *statbuf) -> errno_t;
-
 %[startgroup]
 [cp] lseek:(fd_t fd, syscall_slong_t offset, [tostr(select(SEEK_SET, SEEK_CUR, SEEK_END, SEEK_DATA, SEEK_HOLE))] syscall_ulong_t whence) -> syscall_slong_t;
 [cp] lseek64:(fd_t fd, [reg64] int64_t offset, [tostr(select(SEEK_SET, SEEK_CUR, SEEK_END, SEEK_DATA, SEEK_HOLE))] syscall_ulong_t whence) -> [reg64] int64_t;
@@ -429,7 +425,6 @@ stime64:(time64_t const *t) -> errno_t;
 
 ptrace:(syscall_ulong_t request, pid_t pid, void *addr, void *data) -> syscall_slong_t;
 alarm:(syscall_ulong_t seconds) -> syscall_ulong_t;
-[cp] linux_oldfstat:(fd_t fd, struct linux_oldstat *statbuf) -> errno_t;
 [restart(dont)][cp] pause:() -> errno_t;
 
 %[startgroup]
@@ -552,7 +547,6 @@ settimeofdayx64:(struct __timevalx64 const *tv, struct timezone const *tz) -> er
 %[endgroup]
 
 [cp] symlink:(char const *link_text, char const *target_path) -> errno_t;
-[cp] linux_oldlstat:(char const *filename, struct linux_oldstat *statbuf) -> errno_t;
 [cp] readlink:(char const *path, char *buf, size_t buflen) -> ssize_t;
 uselib:(char const *library) -> errno_t;
 
@@ -850,15 +844,51 @@ vfork:() -> pid_t;
 ugetrlimit:(int TODO_PROTOTYPE) -> errno_t;
 mmap2:(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset) -> void *;
 
-[cp] linux_stat32:(char const *filename, struct linux_stat32 *statbuf) -> errno_t;
-[cp] linux_lstat32:(char const *filename, struct linux_stat32 *statbuf) -> errno_t;
-[cp] linux_fstat32:(fd_t fd, struct linux_stat32 *statbuf) -> errno_t;
+%[typeorg(<kos/compat/linux-stat.h>: linux_oldstat)]
+%[typeorg(<kos/compat/linux-stat.h>: linux_stat, linux_stat32, linux_stat64)]
+%[typeorg(<kos/compat/linux-stat.h>: linux_statx32, linux_statx64, linux_statx32_64)]
 
+[cp] linux_oldfstatat:(fd_t dirfd, char const *filename, struct linux_oldstat *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[cp] linux_oldfstat:(fd_t fd, struct linux_oldstat *statbuf) -> errno_t;
+[cp] linux_oldlstat:(char const *filename, struct linux_oldstat *statbuf) -> errno_t;
+[cp] linux_oldstat:(char const *filename, struct linux_oldstat *statbuf) -> errno_t;
+
+%[startgroup]
 @@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
-[cp] linux_fstatat64:(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[cp] linux_fstatat:(fd_t dirfd, char const *filename, struct linux_stat *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(linux_fstatat)][cp] linux_fstatat32:(fd_t dirfd, char const *filename, struct linux_stat32 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(linux_fstatat)][cp] linux_fstatat64:(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(linux_fstatat)][cp] linux_fstatatx32:(fd_t dirfd, char const *filename, struct linux_statx32 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(linux_fstatat)][cp] linux_fstatatx32_64:(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(linux_fstatat)][cp] linux_fstatatx64:(fd_t dirfd, char const *filename, struct linux_statx64 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+%[endgroup]
+
+%[startgroup]
+[cp] linux_fstat:(fd_t fd, struct linux_stat *statbuf) -> errno_t;
+[cp] linux_fstat32:(fd_t fd, struct linux_stat32 *statbuf) -> errno_t;
 [cp] linux_fstat64:(fd_t fd, struct linux_stat64 *statbuf) -> errno_t;
+[cp] linux_fstatx32:(fd_t fd, struct linux_statx32 *statbuf) -> errno_t;
+[cp] linux_fstatx32_64:(fd_t fd, struct linux_statx32_64 *statbuf) -> errno_t;
+[cp] linux_fstatx64:(fd_t fd, struct linux_statx64 *statbuf) -> errno_t;
+%[endgroup]
+
+%[startgroup]
+[cp] linux_lstat:(char const *filename, struct linux_stat *statbuf) -> errno_t;
+[cp] linux_lstat32:(char const *filename, struct linux_stat32 *statbuf) -> errno_t;
 [cp] linux_lstat64:(char const *filename, struct linux_stat64 *statbuf) -> errno_t;
+[cp] linux_lstatx32:(char const *filename, struct linux_statx32 *statbuf) -> errno_t;
+[cp] linux_lstatx32_64:(char const *filename, struct linux_statx32_64 *statbuf) -> errno_t;
+[cp] linux_lstatx64:(char const *filename, struct linux_statx64 *statbuf) -> errno_t;
+%[endgroup]
+
+%[startgroup]
+[cp] linux_stat:(char const *filename, struct linux_stat *statbuf) -> errno_t;
+[cp] linux_stat32:(char const *filename, struct linux_stat32 *statbuf) -> errno_t;
 [cp] linux_stat64:(char const *filename, struct linux_stat64 *statbuf) -> errno_t;
+[cp] linux_statx32:(char const *filename, struct linux_statx32 *statbuf) -> errno_t;
+[cp] linux_statx32_64:(char const *filename, struct linux_statx32_64 *statbuf) -> errno_t;
+[cp] linux_statx64:(char const *filename, struct linux_statx64 *statbuf) -> errno_t;
+%[endgroup]
 
 
 %[startgroup]
@@ -868,6 +898,8 @@ mmap2:(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t
 [doc_alias(kfstatat)][cp] kfstatatx32:(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 [doc_alias(kfstatat)][cp] kfstatatx64:(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 %[endgroup]
+
+[cp] linux_newfstatat:(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
 %[startgroup]
 [cp] kfstat:(fd_t fd, struct __kos_stat *statbuf) -> errno_t;
@@ -1383,9 +1415,6 @@ kexec_file_load:(int TODO_PROTOTYPE) -> errno_t;
 
 epoll_ctl_old:(fd_t epfd, [tostr(select(EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD))] syscall_ulong_t op, fd_t fd, struct epoll_event *event) -> errno_t;
 [restart(dont)][cp] epoll_wait_old:(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) -> errno_t;
-
-[cp] linux_fstatat:(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
-[cp] linux_newfstatat:(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, [tostr(flagset(AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 
 [cp] hop:(fd_t fd, syscall_ulong_t command, void *arg) -> syscall_slong_t;
 [cp] hopf:(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) -> syscall_slong_t;
@@ -2059,9 +2088,9 @@ coredumpx64:(struct ucpustate64 const *curr_state, struct ucpustate64 const *ori
 1046:sendfile
 1047:ftruncate
 1048:truncate
-1049:linux_stat32
-1050:linux_lstat32
-1051:linux_fstat32
+1049:linux_stat
+1050:linux_lstat
+1051:linux_fstat
 1052:fcntl
 1053:fadvise64
 1054:linux_newfstatat

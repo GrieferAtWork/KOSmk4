@@ -45,7 +45,6 @@
 #include <hybrid/minmax.h>
 
 #include <compat/config.h>
-#include <kos/compat/linux-stat.h>
 #include <kos/debugtrap.h>
 #include <kos/except-inval.h>
 #include <kos/kernel/handle.h>
@@ -67,6 +66,51 @@
 #include <compat/bits/stat-convert.h>
 #include <compat/bits/stat.h>
 #endif /* __ARCH_HAVE_COMPAT */
+
+#if (defined(__ARCH_WANT_SYSCALL_LINUX_OLDFSTATAT) ||        \
+     defined(__ARCH_WANT_SYSCALL_LINUX_OLDFSTAT) ||          \
+     defined(__ARCH_WANT_SYSCALL_LINUX_OLDLSTAT) ||          \
+     defined(__ARCH_WANT_SYSCALL_LINUX_OLDSTAT) ||           \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTATAT) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDLSTAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDSTAT))
+#define WANT_LINUX_OLDSTAT 1
+#endif /* linux_oldstat()... */
+
+#if (defined(__ARCH_WANT_SYSCALL_LINUX_FSTATAT) ||        \
+     defined(__ARCH_WANT_SYSCALL_LINUX_FSTAT) ||          \
+     defined(__ARCH_WANT_SYSCALL_LINUX_LSTAT) ||          \
+     defined(__ARCH_WANT_SYSCALL_LINUX_STAT) ||           \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT))
+#define WANT_LINUX_STAT 1
+#endif /* linux_stat()... */
+
+#if (defined(__ARCH_WANT_SYSCALL_LINUX_FSTATAT64) ||        \
+     defined(__ARCH_WANT_SYSCALL_LINUX_FSTAT64) ||          \
+     defined(__ARCH_WANT_SYSCALL_LINUX_LSTAT64) ||          \
+     defined(__ARCH_WANT_SYSCALL_LINUX_STAT64) ||           \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT64) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT64) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT64))
+#define WANT_LINUX_STAT64 1
+#endif /* linux_stat64()... */
+
+#if (defined(WANT_LINUX_OLDSTAT) || \
+     defined(WANT_LINUX_STAT) ||    \
+     defined(WANT_LINUX_STAT64))
+#include <kos/compat/linux-stat-convert.h>
+#include <kos/compat/linux-stat.h>
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/kos/compat/linux-stat-convert.h>
+#include <compat/kos/compat/linux-stat.h>
+#endif /* __ARCH_HAVE_COMPAT */
+#endif /* linux_stat... */
+
 
 DECL_BEGIN
 
@@ -2592,6 +2636,96 @@ DEFINE_SYSCALL5(ssize_t, frealpathat,
 
 
 
+
+
+/************************************************************************/
+/* Base implementation of all stat() functions                          */
+/************************************************************************/
+LOCAL void KCALL
+system_fstatat(fd_t dirfd,
+               USER UNCHECKED char const *filename,
+               USER CHECKED struct stat *statbuf,
+               atflag_t flags) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	VALIDATE_FLAGSET(flags,
+	                 AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
+	                 E_INVALID_ARGUMENT_CONTEXT_KFSTATAT_FLAGS);
+	node = path_traversefull_at(f,
+	                            (unsigned int)dirfd,
+	                            filename,
+	                            !(flags & AT_SYMLINK_NOFOLLOW),
+	                            fs_getmode_for(f, flags),
+	                            NULL,
+	                            NULL,
+	                            NULL,
+	                            NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_stat(node, statbuf);
+	}
+}
+
+LOCAL void KCALL
+system_fstat(fd_t fd, USER CHECKED struct stat *statbuf) {
+	struct handle hnd;
+	hnd = handle_lookup((unsigned int)fd);
+	TRY {
+		handle_stat(hnd, statbuf);
+	} EXCEPT {
+		decref(hnd);
+		RETHROW();
+	}
+	decref(hnd);
+}
+
+LOCAL void KCALL
+system_lstat(USER UNCHECKED char const *filename,
+             USER CHECKED struct stat *statbuf) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	node = path_traversefull(f,
+	                         filename,
+	                         false,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_stat(node, statbuf);
+	}
+}
+
+LOCAL void KCALL
+system_stat(USER UNCHECKED char const *filename,
+            USER CHECKED struct stat *statbuf) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	node = path_traversefull(f,
+	                         filename,
+	                         true,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_stat(node, statbuf);
+	}
+}
+
+
+
+
+
+
+
 /************************************************************************/
 /* kfstatat(), kfstat(), klstat(), kstat()                              */
 /************************************************************************/
@@ -2636,26 +2770,8 @@ DEFINE_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct stat *, statbuf,
                 atflag_t, flags) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	validate_readable(filename, 1);
 	validate_writable(statbuf, sizeof(*statbuf));
-	VALIDATE_FLAGSET(flags,
-	                 AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
-	                 E_INVALID_ARGUMENT_CONTEXT_KFSTATAT_FLAGS);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            !(flags & AT_SYMLINK_NOFOLLOW),
-	                            fs_getmode_for(f, flags),
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, statbuf);
-	}
+	system_fstatat(dirfd, filename, statbuf, flags);
 	complete_kstat(statbuf);
 	return -EOK;
 }
@@ -2666,27 +2782,9 @@ DEFINE_COMPAT_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_stat *, statbuf,
                        atflag_t, flags) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
 	struct stat st;
-	validate_readable(filename, 1);
-	validate_writable(statbuf, sizeof(*statbuf));
-	VALIDATE_FLAGSET(flags,
-	                 AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
-	                 E_INVALID_ARGUMENT_CONTEXT_KFSTATAT_FLAGS);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            !(flags & AT_SYMLINK_NOFOLLOW),
-	                            fs_getmode_for(f, flags),
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &st);
-	}
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_fstatat(dirfd, filename, &st, flags);
 	stat_to_compat_stat(&st, statbuf);
 	return -EOK;
 }
@@ -2695,16 +2793,8 @@ DEFINE_COMPAT_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
 #ifdef __ARCH_WANT_SYSCALL_KFSTAT
 DEFINE_SYSCALL2(errno_t, kfstat, fd_t, fd,
                 USER UNCHECKED struct stat *, statbuf) {
-	struct handle hnd;
 	validate_writable(statbuf, sizeof(*statbuf));
-	hnd = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_stat(hnd, statbuf);
-	} EXCEPT {
-		decref(hnd);
-		RETHROW();
-	}
-	decref(hnd);
+	system_fstat(fd, statbuf);
 	complete_kstat(statbuf);
 	return -EOK;
 }
@@ -2713,17 +2803,9 @@ DEFINE_SYSCALL2(errno_t, kfstat, fd_t, fd,
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_KFSTAT
 DEFINE_COMPAT_SYSCALL2(errno_t, kfstat, fd_t, fd,
                        USER UNCHECKED struct compat_stat *, statbuf) {
-	struct handle hnd;
 	struct stat st;
-	validate_writable(statbuf, sizeof(*statbuf));
-	hnd = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_stat(hnd, &st);
-	} EXCEPT {
-		decref(hnd);
-		RETHROW();
-	}
-	decref(hnd);
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_fstat(fd, &st);
 	stat_to_compat_stat(&st, statbuf);
 	return -EOK;
 }
@@ -2733,22 +2815,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, kfstat, fd_t, fd,
 DEFINE_SYSCALL2(errno_t, klstat,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct stat *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	validate_readable(filename, 1);
 	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         false,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, statbuf);
-	}
+	system_lstat(filename, statbuf);
 	complete_kstat(statbuf);
 	return -EOK;
 }
@@ -2758,23 +2826,9 @@ DEFINE_SYSCALL2(errno_t, klstat,
 DEFINE_COMPAT_SYSCALL2(errno_t, klstat,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_stat *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
 	struct stat st;
-	validate_readable(filename, 1);
-	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         false,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &st);
-	}
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_lstat(filename, &st);
 	stat_to_compat_stat(&st, statbuf);
 	return -EOK;
 }
@@ -2784,22 +2838,8 @@ DEFINE_COMPAT_SYSCALL2(errno_t, klstat,
 DEFINE_SYSCALL2(errno_t, kstat,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct stat *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	validate_readable(filename, 1);
 	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         true,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, statbuf);
-	}
+	system_stat(filename, statbuf);
 	complete_kstat(statbuf);
 	return -EOK;
 }
@@ -2809,23 +2849,9 @@ DEFINE_SYSCALL2(errno_t, kstat,
 DEFINE_COMPAT_SYSCALL2(errno_t, kstat,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_stat *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
 	struct stat st;
-	validate_readable(filename, 1);
-	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         true,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &st);
-	}
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_stat(filename, &st);
 	stat_to_compat_stat(&st, statbuf);
 	return -EOK;
 }
@@ -2835,348 +2861,309 @@ DEFINE_COMPAT_SYSCALL2(errno_t, kstat,
 
 
 
-
-/* Compatibility with the linux kernel. */
-
-#if defined(__NR_linux_oldstat) || defined(__NR_linux_oldlstat) || defined(__NR_linux_oldfstat)
-PRIVATE void KCALL
-convert_kos2linold(USER CHECKED struct linux_oldstat *__restrict dst,
-                   KERNEL struct stat const *__restrict src)
-		THROWS(E_SEGFAULT) {
-	dst->st_dev   = (__uint16_t)src->st_dev;
-	dst->st_ino   = (__uint16_t)src->st_ino;
-	dst->st_mode  = (__uint16_t)src->st_mode;
-	dst->st_nlink = (__uint16_t)src->st_nlink;
-	dst->st_uid   = (__uint16_t)src->st_uid;
-	dst->st_gid   = (__uint16_t)src->st_gid;
-	dst->st_rdev  = (__uint16_t)src->st_rdev;
-	dst->st_size  = (__uint32_t)src->st_size;
-	dst->st_atime = (__uint32_t)src->st_atime;
-	dst->st_mtime = (__uint32_t)src->st_mtime;
-	dst->st_ctime = (__uint32_t)src->st_ctime;
-}
-#endif /* __NR_linux_oldstat || __NR_linux_oldlstat || __NR_linux_oldfstat */
-
-#ifdef __NR_linux_oldstat
-DEFINE_SYSCALL2(errno_t, linux_oldstat,
+/************************************************************************/
+/* linux_oldfstatat(), linux_oldfstat(), linux_oldlstat(), linux_oldstat() */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_LINUX_OLDFSTATAT
+DEFINE_SYSCALL4(errno_t, linux_oldfstatat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_oldstat *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	struct stat kbuf;
-	validate_readable(filename, 1);
+                USER UNCHECKED struct linux_oldstat *, statbuf,
+                atflag_t, flags) {
+	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         true,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &kbuf);
-	}
-	convert_kos2linold(statbuf, &kbuf);
+	system_fstatat(dirfd, filename, &st, flags);
+	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __NR_linux_oldstat */
+#endif /* __ARCH_WANT_SYSCALL_LINUX_OLDFSTATAT */
 
-#ifdef __NR_linux_oldlstat
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTATAT
+DEFINE_COMPAT_SYSCALL4(errno_t, linux_oldfstatat, fd_t, dirfd,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct linux_oldstat *, statbuf,
+                       atflag_t, flags) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_fstatat(dirfd, filename, &st, flags);
+	stat_to_linux_oldstat(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTATAT */
+
+#ifdef __ARCH_WANT_SYSCALL_LINUX_OLDFSTAT
+DEFINE_SYSCALL2(errno_t, linux_oldfstat, fd_t, fd,
+                USER UNCHECKED struct linux_oldstat *, statbuf) {
+	struct stat st;
+	validate_writable(statbuf, sizeof(*statbuf));
+	system_fstat(fd, &st);
+	stat_to_linux_oldstat(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_LINUX_OLDFSTAT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, linux_oldfstat, fd_t, fd,
+                       USER UNCHECKED struct linux_oldstat *, statbuf) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_fstat(fd, &st);
+	stat_to_linux_oldstat(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTAT */
+
+#ifdef __ARCH_WANT_SYSCALL_LINUX_OLDLSTAT
 DEFINE_SYSCALL2(errno_t, linux_oldlstat,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_oldstat *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	struct stat kbuf;
-	validate_readable(filename, 1);
+	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         false,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &kbuf);
-	}
-	convert_kos2linold(statbuf, &kbuf);
+	system_lstat(filename, &st);
+	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __NR_linux_oldlstat */
+#endif /* __ARCH_WANT_SYSCALL_LINUX_OLDLSTAT */
 
-#ifdef __NR_linux_oldfstat
-DEFINE_SYSCALL2(errno_t, linux_oldfstat, fd_t, fd,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDLSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, linux_oldlstat,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct linux_oldstat *, statbuf) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_lstat(filename, &st);
+	stat_to_linux_oldstat(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDLSTAT */
+
+#ifdef __ARCH_WANT_SYSCALL_LINUX_OLDSTAT
+DEFINE_SYSCALL2(errno_t, linux_oldstat,
+                USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_oldstat *, statbuf) {
-	struct handle hnd;
-	struct stat kbuf;
+	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
-	hnd = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_stat(hnd, &kbuf);
-	} EXCEPT {
-		decref(hnd);
-		RETHROW();
-	}
-	decref(hnd);
-	convert_kos2linold(statbuf, &kbuf);
+	system_stat(filename, &st);
+	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __NR_linux_oldfstat */
+#endif /* __ARCH_WANT_SYSCALL_LINUX_OLDSTAT */
 
-
-#if defined(__NR_linux_stat32) || defined(__NR_linux_lstat32) || \
-    defined(__NR_linux_fstatat32) || defined(__NR_linux_fstat32)
-PRIVATE void KCALL
-convert_kos2lin32(USER CHECKED struct linux_stat32 *__restrict dst,
-                  KERNEL struct stat const *__restrict src)
-		THROWS(E_SEGFAULT) {
-	dst->st_dev        = (__uint32_t)src->st_dev;
-	dst->st_ino        = (__uint32_t)src->st_ino;
-	dst->st_mode       = (__uint16_t)src->st_mode;
-	dst->st_nlink      = (__uint16_t)src->st_nlink;
-	dst->st_uid        = (__uint16_t)src->st_uid;
-	dst->st_gid        = (__uint16_t)src->st_gid;
-	dst->st_rdev       = (__uint32_t)src->st_rdev;
-	dst->st_size       = (__uint32_t)src->st_size;
-	dst->st_blksize    = (__uint32_t)src->st_blksize;
-	dst->st_blocks     = (__uint32_t)src->st_blocks;
-	dst->st_atime      = (__uint32_t)src->st_atime;
-	dst->st_atime_nsec = (__uint32_t)src->st_atimensec;
-	dst->st_mtime      = (__uint32_t)src->st_mtime;
-	dst->st_mtime_nsec = (__uint32_t)src->st_mtimensec;
-	dst->st_ctime      = (__uint32_t)src->st_ctime;
-	dst->st_ctime_nsec = (__uint32_t)src->st_ctimensec;
-}
-#endif /* __NR_linux_stat32 || __NR_linux_lstat32 || __NR_linux_fstatat32 || __NR_linux_fstat32 */
-
-#ifdef __NR_linux_stat32
-DEFINE_SYSCALL2(errno_t, linux_stat32,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_stat32 *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	struct stat kbuf;
-	validate_readable(filename, 1);
-	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         true,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &kbuf);
-	}
-	convert_kos2lin32(statbuf, &kbuf);
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, linux_oldstat,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct linux_oldstat *, statbuf) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_stat(filename, &st);
+	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __NR_linux_stat32 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDSTAT */
 
-#ifdef __NR_linux_lstat32
-DEFINE_SYSCALL2(errno_t, linux_lstat32,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_stat32 *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	struct stat kbuf;
-	validate_readable(filename, 1);
-	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         false,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &kbuf);
-	}
-	convert_kos2lin32(statbuf, &kbuf);
-	return -EOK;
-}
-#endif /* __NR_linux_lstat32 */
 
-#ifdef __NR_linux_fstatat32
-DEFINE_SYSCALL4(errno_t, linux_fstatat32, fd_t, dirfd,
+
+
+
+/************************************************************************/
+/* linux_fstatat(), linux_fstat(), linux_lstat(), linux_stat()          */
+/* linux_fstatat64(), linux_fstat64(), linux_lstat64(), linux_stat64()  */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_LINUX_FSTATAT
+DEFINE_SYSCALL4(errno_t, linux_fstatat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_stat32 *, statbuf,
                 atflag_t, flags) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	struct stat kbuf;
-	validate_readable(filename, 1);
+	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
-	VALIDATE_FLAGSET(flags,
-	                 AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
-	                 E_INVALID_ARGUMENT_CONTEXT_KFSTATAT_FLAGS);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            !(flags & AT_SYMLINK_NOFOLLOW),
-	                            fs_getmode_for(f, flags),
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &kbuf);
-	}
-	convert_kos2lin32(statbuf, &kbuf);
+	system_fstatat(dirfd, filename, &st, flags);
+	stat_to_linux_stat32(&st, statbuf);
 	return -EOK;
 }
-#endif
+#endif /* __ARCH_WANT_SYSCALL_LINUX_FSTATAT */
 
-#ifdef __NR_linux_fstat32
-DEFINE_SYSCALL2(errno_t, linux_fstat32, fd_t, fd,
-                USER UNCHECKED struct linux_stat32 *, statbuf) {
-	struct handle hnd;
-	struct stat kbuf;
-	validate_writable(statbuf, sizeof(*statbuf));
-	hnd = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_stat(hnd, &kbuf);
-	} EXCEPT {
-		decref(hnd);
-		RETHROW();
-	}
-	decref(hnd);
-	convert_kos2lin32(statbuf, &kbuf);
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT
+DEFINE_COMPAT_SYSCALL4(errno_t, linux_fstatat, fd_t, dirfd,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_linux_stat32 *, statbuf,
+                       atflag_t, flags) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_fstatat(dirfd, filename, &st, flags);
+	stat_to_compat_linux_stat32(&st, statbuf);
 	return -EOK;
 }
-#endif /* __NR_linux_fstat32 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT */
 
-
-PRIVATE void KCALL
-convert_kos2lin64(USER CHECKED struct linux_stat64 *__restrict dst,
-                  KERNEL struct stat const *__restrict src)
-		THROWS(E_SEGFAULT) {
-	dst->st_dev        = (__uint64_t)src->st_dev;
-	dst->__st_ino      = (__uint32_t)src->st_ino;
-	dst->st_mode       = (__uint32_t)src->st_mode;
-	dst->st_nlink      = (__uint32_t)src->st_nlink;
-	dst->st_uid        = (__uint32_t)src->st_uid;
-	dst->st_gid        = (__uint32_t)src->st_gid;
-	dst->st_rdev       = (__uint64_t)src->st_rdev;
-	dst->st_size       = (__int64_t)src->st_size;
-	dst->st_blksize    = (__uint32_t)src->st_blksize;
-	dst->st_blocks     = (__uint64_t)src->st_blocks;
-	dst->st_atime      = (__uint32_t)src->st_atime;
-	dst->st_atime_nsec = (__uint32_t)src->st_atimensec;
-	dst->st_mtime      = (__uint32_t)src->st_mtime;
-	dst->st_mtime_nsec = (__uint32_t)src->st_mtimensec;
-	dst->st_ctime      = (__uint32_t)src->st_ctime;
-	dst->st_ctime_nsec = (__uint32_t)src->st_ctimensec;
-	dst->st_ino        = (__uint64_t)src->st_ino;
-}
-
-
-DEFINE_SYSCALL2(errno_t, linux_stat64,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_stat64 *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	struct stat kbuf;
-	validate_readable(filename, 1);
-	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         true,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &kbuf);
-	}
-	convert_kos2lin64(statbuf, &kbuf);
-	return -EOK;
-}
-
-DEFINE_SYSCALL2(errno_t, linux_lstat64,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct linux_stat64 *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	struct stat kbuf;
-	validate_readable(filename, 1);
-	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         false,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &kbuf);
-	}
-	convert_kos2lin64(statbuf, &kbuf);
-	return -EOK;
-}
-
-DEFINE_SYSCALL2(errno_t, linux_fstat64, fd_t, fd,
-                USER UNCHECKED struct linux_stat64 *, statbuf) {
-	__NR_linux_fstat64;
-	struct handle hnd;
-	struct stat kbuf;
-	validate_writable(statbuf, sizeof(*statbuf));
-	hnd = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_stat(hnd, &kbuf);
-	} EXCEPT {
-		decref(hnd);
-		RETHROW();
-	}
-	decref(hnd);
-	convert_kos2lin64(statbuf, &kbuf);
-	return -EOK;
-}
-
-#ifdef __NR_linux_fstatat64
+#ifdef __ARCH_WANT_SYSCALL_LINUX_FSTATAT64
 DEFINE_SYSCALL4(errno_t, linux_fstatat64, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_stat64 *, statbuf,
                 atflag_t, flags) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	struct stat kbuf;
-	validate_readable(filename, 1);
+	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
-	VALIDATE_FLAGSET(flags,
-	                 AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
-	                 E_INVALID_ARGUMENT_CONTEXT_KFSTATAT_FLAGS);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            !(flags & AT_SYMLINK_NOFOLLOW),
-	                            fs_getmode_for(f, flags),
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, &kbuf);
-	}
-	convert_kos2lin64(statbuf, &kbuf);
+	system_fstatat(dirfd, filename, &st, flags);
+	stat_to_linux_stat64(&st, statbuf);
 	return -EOK;
 }
-#endif /* __NR_linux_fstatat64 */
+#endif /* __ARCH_WANT_SYSCALL_LINUX_FSTATAT64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT64
+DEFINE_COMPAT_SYSCALL4(errno_t, linux_fstatat64, fd_t, dirfd,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_linux_stat64 *, statbuf,
+                       atflag_t, flags) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_fstatat(dirfd, filename, &st, flags);
+	stat_to_compat_linux_stat64(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT64 */
+
+#ifdef __ARCH_WANT_SYSCALL_LINUX_FSTAT
+DEFINE_SYSCALL2(errno_t, linux_fstat, fd_t, fd,
+                USER UNCHECKED struct linux_stat32 *, statbuf) {
+	struct stat st;
+	validate_writable(statbuf, sizeof(*statbuf));
+	system_fstat(fd, &st);
+	stat_to_linux_stat32(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_LINUX_FSTAT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, linux_fstat, fd_t, fd,
+                       USER UNCHECKED struct compat_linux_stat32 *, statbuf) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_fstat(fd, &st);
+	stat_to_compat_linux_stat32(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT */
+
+#ifdef __ARCH_WANT_SYSCALL_LINUX_FSTAT64
+DEFINE_SYSCALL2(errno_t, linux_fstat64, fd_t, fd,
+                USER UNCHECKED struct linux_stat64 *, statbuf) {
+	struct stat st;
+	validate_writable(statbuf, sizeof(*statbuf));
+	system_fstat(fd, &st);
+	stat_to_linux_stat64(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_LINUX_FSTAT64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT64
+DEFINE_COMPAT_SYSCALL2(errno_t, linux_fstat64, fd_t, fd,
+                       USER UNCHECKED struct compat_linux_stat64 *, statbuf) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_fstat(fd, &st);
+	stat_to_compat_linux_stat64(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT64 */
+
+#ifdef __ARCH_WANT_SYSCALL_LINUX_LSTAT
+DEFINE_SYSCALL2(errno_t, linux_lstat,
+                USER UNCHECKED char const *, filename,
+                USER UNCHECKED struct linux_stat32 *, statbuf) {
+	struct stat st;
+	validate_writable(statbuf, sizeof(*statbuf));
+	system_lstat(filename, &st);
+	stat_to_linux_stat32(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_LINUX_LSTAT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, linux_lstat,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_linux_stat32 *, statbuf) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_lstat(filename, &st);
+	stat_to_compat_linux_stat32(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT */
+
+#ifdef __ARCH_WANT_SYSCALL_LINUX_LSTAT64
+DEFINE_SYSCALL2(errno_t, linux_lstat64,
+                USER UNCHECKED char const *, filename,
+                USER UNCHECKED struct linux_stat64 *, statbuf) {
+	struct stat st;
+	validate_writable(statbuf, sizeof(*statbuf));
+	system_lstat(filename, &st);
+	stat_to_linux_stat64(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_LINUX_LSTAT64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT64
+DEFINE_COMPAT_SYSCALL2(errno_t, linux_lstat64,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_linux_stat64 *, statbuf) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_lstat(filename, &st);
+	stat_to_compat_linux_stat64(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT64 */
+
+#ifdef __ARCH_WANT_SYSCALL_LINUX_STAT
+#undef linux_stat
+DEFINE_SYSCALL2(errno_t, linux_stat,
+                USER UNCHECKED char const *, filename,
+                USER UNCHECKED struct linux_stat32 *, statbuf) {
+	struct stat st;
+	validate_writable(statbuf, sizeof(*statbuf));
+	system_stat(filename, &st);
+	stat_to_linux_stat32(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_LINUX_STAT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT
+#undef linux_stat
+DEFINE_COMPAT_SYSCALL2(errno_t, linux_stat,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_linux_stat32 *, statbuf) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_stat(filename, &st);
+	stat_to_compat_linux_stat32(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT */
+
+#ifdef __ARCH_WANT_SYSCALL_LINUX_STAT64
+DEFINE_SYSCALL2(errno_t, linux_stat64,
+                USER UNCHECKED char const *, filename,
+                USER UNCHECKED struct linux_stat64 *, statbuf) {
+	struct stat st;
+	validate_writable(statbuf, sizeof(*statbuf));
+	system_stat(filename, &st);
+	stat_to_linux_stat64(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_LINUX_STAT64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT64
+DEFINE_COMPAT_SYSCALL2(errno_t, linux_stat64,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_linux_stat64 *, statbuf) {
+	struct stat st;
+	compat_validate_writable(statbuf, sizeof(*statbuf));
+	system_stat(filename, &st);
+	stat_to_compat_linux_stat64(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT64 */
+
+
+
 
 
 DEFINE_SYSCALL3(ssize_t, readlink,

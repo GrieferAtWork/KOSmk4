@@ -131,9 +131,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname32 /* index: 32 */
-	.weak sys_setresgid; .long sys_setresgid
-	.reloc ., R_386_SIZE32, sys_setresgid; .int 0
-	.int 0x85f444
+	.weak sys_linux_fstat; .long sys_linux_fstat
+	.reloc ., R_386_SIZE32, sys_linux_fstat; .int 0
+	.int 0x53f3444
 	.long 0 /* index: 33 */
 	.long 0
 	.int 0
@@ -366,10 +366,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long 0 /* index: 91 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname91 /* index: 91 */
+	.weak vpage_alloc_untraced; .long vpage_alloc_untraced
+	.reloc ., R_386_SIZE32, vpage_alloc_untraced; .int 0
+	.int 0xd03da4
 	.long .Lname92 /* index: 92 */
 	.weak error_as_signal; .long error_as_signal
 	.reloc ., R_386_SIZE32, error_as_signal; .int 0
@@ -651,9 +651,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname162 /* index: 162 */
-	.weak sys_renameat2; .long sys_renameat2
-	.reloc ., R_386_SIZE32, sys_renameat2; .int 0
-	.int 0xf8ad0a2
+	.weak sys_linux_lstat; .long sys_linux_lstat
+	.reloc ., R_386_SIZE32, sys_linux_lstat; .int 0
+	.int 0x5413444
 	.long .Lname163 /* index: 163 */
 	.weak ringbuffer_write_nonblock_noalloc; .long ringbuffer_write_nonblock_noalloc
 	.reloc ., R_386_SIZE32, ringbuffer_write_nonblock_noalloc; .int 0
@@ -2187,9 +2187,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vm_datapart_do_read; .int 0
 	.int 0x2bb9e4
 	.long .Lname546 /* index: 546 */
-	.weak sys_linux_lstat32; .long sys_linux_lstat32
-	.reloc ., R_386_SIZE32, sys_linux_lstat32; .int 0
-	.int 0x1344222
+	.weak vmb_node_remove; .long vmb_node_remove
+	.reloc ., R_386_SIZE32, vmb_node_remove; .int 0
+	.int 0xeef2165
 	.long .Lname547 /* index: 547 */
 	.weak inode_readv_phys; .long inode_readv_phys
 	.reloc ., R_386_SIZE32, inode_readv_phys; .int 0
@@ -2378,10 +2378,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak fpustate_alloc_nx; .long fpustate_alloc_nx
 	.reloc ., R_386_SIZE32, fpustate_alloc_nx; .int 0
 	.int 0x9d27db8
-	.long .Lname594 /* index: 594 */
-	.weak sys_linux_fstat32; .long sys_linux_fstat32
-	.reloc ., R_386_SIZE32, sys_linux_fstat32; .int 0
-	.int 0xf344252
+	.long 0 /* index: 594 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname595 /* index: 595 */
 	.weak inode_write_phys; .long inode_write_phys
 	.reloc ., R_386_SIZE32, inode_write_phys; .int 0
@@ -3102,10 +3102,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long 0 /* index: 775 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname775 /* index: 775 */
+	.weak sys_renameat2; .long sys_renameat2
+	.reloc ., R_386_SIZE32, sys_renameat2; .int 0
+	.int 0xf8ad0a2
 	.long 0 /* index: 776 */
 	.long 0
 	.int 0
@@ -3247,9 +3247,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname811 /* index: 811 */
-	.weak sys_wait4_64; .long sys_wait4_64
-	.reloc ., R_386_SIZE32, sys_wait4_64; .int 0
-	.int 0x1b71444
+	.weak sys_setresgid; .long sys_setresgid
+	.reloc ., R_386_SIZE32, sys_setresgid; .int 0
+	.int 0x85f444
 	.long 0 /* index: 812 */
 	.long 0
 	.int 0
@@ -5474,10 +5474,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long .Lname1368 /* index: 1368 */
-	.weak vmb_node_remove; .long vmb_node_remove
-	.reloc ., R_386_SIZE32, vmb_node_remove; .int 0
-	.int 0xeef2165
+	.long 0 /* index: 1368 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname1369 /* index: 1369 */
 	.weak sys_get_mempolicy; .long sys_get_mempolicy
 	.reloc ., R_386_SIZE32, sys_get_mempolicy; .int 0
@@ -9903,9 +9903,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname2475 /* index: 2475 */
-	.weak vpage_alloc_untraced; .long vpage_alloc_untraced
-	.reloc ., R_386_SIZE32, vpage_alloc_untraced; .int 0
-	.int 0xd03da4
+	.weak vio_subw; .long vio_subw
+	.reloc ., R_386_SIZE32, vio_subw; .int 0
+	.int 0x56ac47
 	.long 0 /* index: 2476 */
 	.long 0
 	.int 0
@@ -11466,10 +11466,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long .Lname2866 /* index: 2866 */
-	.weak sys_linux_stat32; .long sys_linux_stat32
-	.reloc ., R_386_SIZE32, sys_linux_stat32; .int 0
-	.int 0x836b32
+	.long 0 /* index: 2866 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname2867 /* index: 2867 */
 	.weak slab_kmalloc; .long slab_kmalloc
 	.reloc ., R_386_SIZE32, slab_kmalloc; .int 0
@@ -12575,9 +12575,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname3143 /* index: 3143 */
-	.weak vio_subw; .long vio_subw
-	.reloc ., R_386_SIZE32, vio_subw; .int 0
-	.int 0x56ac47
+	.weak terminal_init; .long terminal_init
+	.reloc ., R_386_SIZE32, terminal_init; .int 0
+	.int 0xeecc534
 	.long 0 /* index: 3144 */
 	.long 0
 	.int 0
@@ -13562,10 +13562,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long 0 /* index: 3390 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname3390 /* index: 3390 */
+	.weak sys_linux_stat; .long sys_linux_stat
+	.reloc ., R_386_SIZE32, sys_linux_stat; .int 0
+	.int 0xc508364
 	.long .Lname3391 /* index: 3391 */
 	.weak pidns_downgrade; .long pidns_downgrade
 	.reloc ., R_386_SIZE32, pidns_downgrade; .int 0
@@ -15591,9 +15591,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname3897 /* index: 3897 */
-	.weak terminal_init; .long terminal_init
-	.reloc ., R_386_SIZE32, terminal_init; .int 0
-	.int 0xeecc534
+	.weak sys_wait4_64; .long sys_wait4_64
+	.reloc ., R_386_SIZE32, sys_wait4_64; .int 0
+	.int 0x1b71444
 	.long .Lname3898 /* index: 3898 */
 	.weak vm_datapart_haschanged; .long vm_datapart_haschanged
 	.reloc ., R_386_SIZE32, vm_datapart_haschanged; .int 0
@@ -16427,7 +16427,7 @@ END(kernel_symbol_table)
 .Lname30:
 	.string "pagedir_syncone"
 .Lname32:
-	.string "sys_setresgid"
+	.string "sys_linux_fstat"
 .Lname34:
 	.string "slab_malloc32"
 .Lname35:
@@ -16484,6 +16484,8 @@ END(kernel_symbol_table)
 	.string "sys_open_by_handle_at"
 .Lname89:
 	.string "pagedir_ismapped"
+.Lname91:
+	.string "vpage_alloc_untraced"
 .Lname92:
 	.string "error_as_signal"
 .Lname94:
@@ -16569,7 +16571,7 @@ END(kernel_symbol_table)
 .Lname160:
 	.string "regdump_drregs"
 .Lname162:
-	.string "sys_renameat2"
+	.string "sys_linux_lstat"
 .Lname163:
 	.string "ringbuffer_write_nonblock_noalloc"
 .Lname164:
@@ -17037,7 +17039,7 @@ END(kernel_symbol_table)
 .Lname545:
 	.string "vm_datapart_do_read"
 .Lname546:
-	.string "sys_linux_lstat32"
+	.string "vmb_node_remove"
 .Lname547:
 	.string "inode_readv_phys"
 .Lname548:
@@ -17104,8 +17106,6 @@ END(kernel_symbol_table)
 	.string "x86_memcpy_nopf"
 .Lname593:
 	.string "fpustate_alloc_nx"
-.Lname594:
-	.string "sys_linux_fstat32"
 .Lname595:
 	.string "inode_write_phys"
 .Lname596:
@@ -17312,6 +17312,8 @@ END(kernel_symbol_table)
 	.string "addr2line_end"
 .Lname773:
 	.string "pagedir_unmap_userspace"
+.Lname775:
+	.string "sys_renameat2"
 .Lname777:
 	.string "block_device_destroy"
 .Lname780:
@@ -17353,7 +17355,7 @@ END(kernel_symbol_table)
 .Lname807:
 	.string "json_writer_putstring"
 .Lname811:
-	.string "sys_wait4_64"
+	.string "sys_setresgid"
 .Lname813:
 	.string "validate_user"
 .Lname818:
@@ -18012,8 +18014,6 @@ END(kernel_symbol_table)
 	.string "sys_utimensat"
 .Lname1365:
 	.string "keymap_codesize"
-.Lname1368:
-	.string "vmb_node_remove"
 .Lname1369:
 	.string "sys_get_mempolicy"
 .Lname1374:
@@ -19259,7 +19259,7 @@ END(kernel_symbol_table)
 .Lname2473:
 	.string "linebuffer_writesome"
 .Lname2475:
-	.string "vpage_alloc_untraced"
+	.string "vio_subw"
 .Lname2477:
 	.string "unwind_fde_exec"
 .Lname2481:
@@ -19736,8 +19736,6 @@ END(kernel_symbol_table)
 	.string "keyboard_buffer_getkey"
 .Lname2859:
 	.string "sys_fanotify_mark"
-.Lname2866:
-	.string "sys_linux_stat32"
 .Lname2867:
 	.string "slab_kmalloc"
 .Lname2868:
@@ -20085,7 +20083,7 @@ END(kernel_symbol_table)
 .Lname3141:
 	.string "kernel_vpanic_ucpustate"
 .Lname3143:
-	.string "vio_subw"
+	.string "terminal_init"
 .Lname3145:
 	.string "disasm_print_until"
 .Lname3148:
@@ -20386,6 +20384,8 @@ END(kernel_symbol_table)
 	.string "sys_settimeofday"
 .Lname3388:
 	.string "driver_insmod_file"
+.Lname3390:
+	.string "sys_linux_stat"
 .Lname3391:
 	.string "pidns_downgrade"
 .Lname3392:
@@ -21027,7 +21027,7 @@ END(kernel_symbol_table)
 .Lname3895:
 	.string "unwind_getreg_fcpustate"
 .Lname3897:
-	.string "terminal_init"
+	.string "sys_wait4_64"
 .Lname3898:
 	.string "vm_datapart_haschanged"
 .Lname3899:

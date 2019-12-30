@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbee0eef0 */
+/* HASH CRC-32:0x11b5b86b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,12 +34,12 @@
 #define __NRAN1_open                   oflags
 #define __NRAN2_open                   mode
 #define __NRAN0_close                  fd
-#define __NRAN0_linux_stat64           filename
-#define __NRAN1_linux_stat64           statbuf
-#define __NRAN0_linux_fstat64          fd
-#define __NRAN1_linux_fstat64          statbuf
-#define __NRAN0_linux_lstat64          filename
-#define __NRAN1_linux_lstat64          statbuf
+#define __NRAN0_linux_stat             filename
+#define __NRAN1_linux_stat             statbuf
+#define __NRAN0_linux_fstat            fd
+#define __NRAN1_linux_fstat            statbuf
+#define __NRAN0_linux_lstat            filename
+#define __NRAN1_linux_lstat            statbuf
 #define __NRAN0_poll                   fds
 #define __NRAN1_poll                   nfds
 #define __NRAN2_poll                   timeout
@@ -966,18 +966,18 @@
 #define __NRATRA2_open(filename, oflags, mode) ,(uintptr_t)(mode)
 #define __NRATRF0_close                  "%d"
 #define __NRATRA0_close(fd)              ,(int)(fd)
-#define __NRATRF0_linux_stat64           "%q"
-#define __NRATRA0_linux_stat64(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_linux_stat64           "%p"
-#define __NRATRA1_linux_stat64(filename, statbuf) ,statbuf
-#define __NRATRF0_linux_fstat64          "%d"
-#define __NRATRA0_linux_fstat64(fd, statbuf) ,(int)(fd)
-#define __NRATRF1_linux_fstat64          "%p"
-#define __NRATRA1_linux_fstat64(fd, statbuf) ,statbuf
-#define __NRATRF0_linux_lstat64          "%q"
-#define __NRATRA0_linux_lstat64(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_linux_lstat64          "%p"
-#define __NRATRA1_linux_lstat64(filename, statbuf) ,statbuf
+#define __NRATRF0_linux_stat             "%q"
+#define __NRATRA0_linux_stat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF1_linux_stat             "%p"
+#define __NRATRA1_linux_stat(filename, statbuf) ,statbuf
+#define __NRATRF0_linux_fstat            "%d"
+#define __NRATRA0_linux_fstat(fd, statbuf) ,(int)(fd)
+#define __NRATRF1_linux_fstat            "%p"
+#define __NRATRA1_linux_fstat(fd, statbuf) ,statbuf
+#define __NRATRF0_linux_lstat            "%q"
+#define __NRATRA0_linux_lstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF1_linux_lstat            "%p"
+#define __NRATRA1_linux_lstat(filename, statbuf) ,statbuf
 #define __NRATRF0_poll                   "%p"
 #define __NRATRA0_poll(fds, nfds, timeout) ,fds
 #define __NRATRF1_poll                   "%" PRIuSIZ

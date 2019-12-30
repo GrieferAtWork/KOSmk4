@@ -5959,10 +5959,10 @@
 #define __CRT_HAVE_sys_Xlgetxattr 1
 #define __CRT_HAVE_sys_Xlink 1
 #define __CRT_HAVE_sys_Xlinkat 1
-#define __CRT_HAVE_sys_Xlinux_fstat64 1
+#define __CRT_HAVE_sys_Xlinux_fstat 1
 #define __CRT_HAVE_sys_Xlinux_fstatat 1
-#define __CRT_HAVE_sys_Xlinux_lstat64 1
-#define __CRT_HAVE_sys_Xlinux_stat64 1
+#define __CRT_HAVE_sys_Xlinux_lstat 1
+#define __CRT_HAVE_sys_Xlinux_stat 1
 #define __CRT_HAVE_sys_Xlisten 1
 #define __CRT_HAVE_sys_Xlistxattr 1
 #define __CRT_HAVE_sys_Xllistxattr 1
@@ -6327,10 +6327,10 @@
 #define __CRT_HAVE_sys_lgetxattr 1
 #define __CRT_HAVE_sys_link 1
 #define __CRT_HAVE_sys_linkat 1
-#define __CRT_HAVE_sys_linux_fstat64 1
+#define __CRT_HAVE_sys_linux_fstat 1
 #define __CRT_HAVE_sys_linux_fstatat 1
-#define __CRT_HAVE_sys_linux_lstat64 1
-#define __CRT_HAVE_sys_linux_stat64 1
+#define __CRT_HAVE_sys_linux_lstat 1
+#define __CRT_HAVE_sys_linux_stat 1
 #define __CRT_HAVE_sys_listen 1
 #define __CRT_HAVE_sys_listxattr 1
 #define __CRT_HAVE_sys_llistxattr 1

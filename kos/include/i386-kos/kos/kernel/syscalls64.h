@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46d3961f */
+/* HASH CRC-32:0x1eeb2d8b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -171,10 +171,10 @@
 #define __ARCH_WANT_SYSCALL_LGETXATTR                      1
 #define __ARCH_WANT_SYSCALL_LINK                           1
 #define __ARCH_WANT_SYSCALL_LINKAT                         1
-#define __ARCH_WANT_SYSCALL_LINUX_FSTAT64                  1
+#define __ARCH_WANT_SYSCALL_LINUX_FSTAT                    1
 #define __ARCH_WANT_SYSCALL_LINUX_FSTATAT                  1
-#define __ARCH_WANT_SYSCALL_LINUX_LSTAT64                  1
-#define __ARCH_WANT_SYSCALL_LINUX_STAT64                   1
+#define __ARCH_WANT_SYSCALL_LINUX_LSTAT                    1
+#define __ARCH_WANT_SYSCALL_LINUX_STAT                     1
 #define __ARCH_WANT_SYSCALL_LISTEN                         1
 #define __ARCH_WANT_SYSCALL_LISTXATTR                      1
 #define __ARCH_WANT_SYSCALL_LLISTXATTR                     1
@@ -440,15 +440,15 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_LFUTEX                  1
 #define __ARCH_WANT_COMPAT_SYSCALL_LFUTEXEXPR              1
 #define __ARCH_WANT_COMPAT_SYSCALL_LFUTEXLOCKEXPR          1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT32           1
+#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT             1
 #define __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT64           1
 #define __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT64         1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT32           1
+#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT             1
 #define __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT64           1
 #define __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTAT          1
 #define __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDLSTAT          1
 #define __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDSTAT           1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT32            1
+#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT              1
 #define __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT64            1
 #define __ARCH_WANT_COMPAT_SYSCALL_LOCK                    1
 #define __ARCH_WANT_COMPAT_SYSCALL_MAPLIBRARY              1

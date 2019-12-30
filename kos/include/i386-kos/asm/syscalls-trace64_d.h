@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e4e500d */
+/* HASH CRC-32:0xeb618cab */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,12 +34,12 @@
 #define __NR64AN1_open                   oflags
 #define __NR64AN2_open                   mode
 #define __NR64AN0_close                  fd
-#define __NR64AN0_linux_stat64           filename
-#define __NR64AN1_linux_stat64           statbuf
-#define __NR64AN0_linux_fstat64          fd
-#define __NR64AN1_linux_fstat64          statbuf
-#define __NR64AN0_linux_lstat64          filename
-#define __NR64AN1_linux_lstat64          statbuf
+#define __NR64AN0_linux_stat             filename
+#define __NR64AN1_linux_stat             statbuf
+#define __NR64AN0_linux_fstat            fd
+#define __NR64AN1_linux_fstat            statbuf
+#define __NR64AN0_linux_lstat            filename
+#define __NR64AN1_linux_lstat            statbuf
 #define __NR64AN0_poll                   fds
 #define __NR64AN1_poll                   nfds
 #define __NR64AN2_poll                   timeout
@@ -966,18 +966,18 @@
 #define __NR64ATRA2_open(filename, oflags, mode) ,(uintptr_t)(mode)
 #define __NR64ATRF0_close                  "%d"
 #define __NR64ATRA0_close(fd)              ,(int)(fd)
-#define __NR64ATRF0_linux_stat64           "%q"
-#define __NR64ATRA0_linux_stat64(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF1_linux_stat64           "%p"
-#define __NR64ATRA1_linux_stat64(filename, statbuf) ,statbuf
-#define __NR64ATRF0_linux_fstat64          "%d"
-#define __NR64ATRA0_linux_fstat64(fd, statbuf) ,(int)(fd)
-#define __NR64ATRF1_linux_fstat64          "%p"
-#define __NR64ATRA1_linux_fstat64(fd, statbuf) ,statbuf
-#define __NR64ATRF0_linux_lstat64          "%q"
-#define __NR64ATRA0_linux_lstat64(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF1_linux_lstat64          "%p"
-#define __NR64ATRA1_linux_lstat64(filename, statbuf) ,statbuf
+#define __NR64ATRF0_linux_stat             "%q"
+#define __NR64ATRA0_linux_stat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
+#define __NR64ATRF1_linux_stat             "%p"
+#define __NR64ATRA1_linux_stat(filename, statbuf) ,statbuf
+#define __NR64ATRF0_linux_fstat            "%d"
+#define __NR64ATRA0_linux_fstat(fd, statbuf) ,(int)(fd)
+#define __NR64ATRF1_linux_fstat            "%p"
+#define __NR64ATRA1_linux_fstat(fd, statbuf) ,statbuf
+#define __NR64ATRF0_linux_lstat            "%q"
+#define __NR64ATRA0_linux_lstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
+#define __NR64ATRF1_linux_lstat            "%p"
+#define __NR64ATRA1_linux_lstat(filename, statbuf) ,statbuf
 #define __NR64ATRF0_poll                   "%p"
 #define __NR64ATRA0_poll(fds, nfds, timeout) ,fds
 #define __NR64ATRF1_poll                   "%" PRIuSIZ

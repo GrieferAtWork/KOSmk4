@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcffff633 */
+/* HASH CRC-32:0xfa099688 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -675,12 +675,12 @@
 #define __NRAN1_ftruncate              length
 #define __NRAN0_truncate               filename
 #define __NRAN1_truncate               length
-#define __NRAN0_linux_stat32           filename
-#define __NRAN1_linux_stat32           statbuf
-#define __NRAN0_linux_lstat32          filename
-#define __NRAN1_linux_lstat32          statbuf
-#define __NRAN0_linux_fstat32          fd
-#define __NRAN1_linux_fstat32          statbuf
+#define __NRAN0_linux_stat             filename
+#define __NRAN1_linux_stat             statbuf
+#define __NRAN0_linux_lstat            filename
+#define __NRAN1_linux_lstat            statbuf
+#define __NRAN0_linux_fstat            fd
+#define __NRAN1_linux_fstat            statbuf
 #define __NRAN0_fcntl                  fd
 #define __NRAN1_fcntl                  cmd
 #define __NRAN2_fcntl                  arg
@@ -2242,18 +2242,18 @@
 #define __NRATRA0_truncate(filename, length) ,(validate_readable_opt(filename,1),filename)
 #define __NRATRF1_truncate               "%#" PRIxSIZ
 #define __NRATRA1_truncate(filename, length) ,(uintptr_t)(length)
-#define __NRATRF0_linux_stat32           "%q"
-#define __NRATRA0_linux_stat32(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_linux_stat32           "%p"
-#define __NRATRA1_linux_stat32(filename, statbuf) ,statbuf
-#define __NRATRF0_linux_lstat32          "%q"
-#define __NRATRA0_linux_lstat32(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_linux_lstat32          "%p"
-#define __NRATRA1_linux_lstat32(filename, statbuf) ,statbuf
-#define __NRATRF0_linux_fstat32          "%d"
-#define __NRATRA0_linux_fstat32(fd, statbuf) ,(int)(fd)
-#define __NRATRF1_linux_fstat32          "%p"
-#define __NRATRA1_linux_fstat32(fd, statbuf) ,statbuf
+#define __NRATRF0_linux_stat             "%q"
+#define __NRATRA0_linux_stat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF1_linux_stat             "%p"
+#define __NRATRA1_linux_stat(filename, statbuf) ,statbuf
+#define __NRATRF0_linux_lstat            "%q"
+#define __NRATRA0_linux_lstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF1_linux_lstat            "%p"
+#define __NRATRA1_linux_lstat(filename, statbuf) ,statbuf
+#define __NRATRF0_linux_fstat            "%d"
+#define __NRATRA0_linux_fstat(fd, statbuf) ,(int)(fd)
+#define __NRATRF1_linux_fstat            "%p"
+#define __NRATRA1_linux_fstat(fd, statbuf) ,statbuf
 #define __NRATRF0_fcntl                  "%d"
 #define __NRATRA0_fcntl(fd, cmd, arg)    ,(int)(fd)
 #define __NRATRF1_fcntl                  "%#" PRIxSIZ

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6246cd71 */
+/* HASH CRC-32:0x7f04fcef */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,9 +130,9 @@ __TSYSCALL0(read, 0x0, 0x0)
 __TSYSCALL0(write, 0x1, 0x1)
 __TSYSCALL0(open, 0x2, 0x2)
 __TSYSCALL0(close, 0x3, 0x3)
-__TSYSCALL0(linux_stat64, 0x4, 0x4)
-__TSYSCALL0(linux_fstat64, 0x5, 0x5)
-__TSYSCALL0(linux_lstat64, 0x6, 0x6)
+__TSYSCALL0(linux_stat, 0x4, 0x4)
+__TSYSCALL0(linux_fstat, 0x5, 0x5)
+__TSYSCALL0(linux_lstat, 0x6, 0x6)
 __TSYSCALL0(poll, 0x7, 0x7)
 __TSYSCALL0(lseek64, 0x8, 0x8)
 __TSYSCALL0(mmap, 0x9, 0x9)

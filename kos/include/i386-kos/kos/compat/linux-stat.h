@@ -20,7 +20,19 @@
 #define _I386_KOS_KOS_COMPAT_LINUX_STAT_H 1
 
 #include <__stdinc.h>
-#include <bits/types.h>
+
+#include <hybrid/typecore.h>
+
+#ifdef __x86_64__
+#define linux_stat       linux_stat64
+#define linux_stat32     linux_stat64
+#define linux_statx64    linux_stat64
+#else /* __x86_64__ */
+#define linux_stat32     linux_stat
+#define linux_statx32    linux_stat
+#define linux_statx32_64 linux_stat64
+#endif /* !__x86_64__ */
+
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -50,67 +62,90 @@ __DECL_BEGIN
 
 /* From: https://elixir.bootlin.com/linux/latest/source/arch/x86/include/uapi/asm/stat.h#L117 */
 struct linux_oldstat {
-	__uint16_t st_dev;
-	__uint16_t st_ino;
-	__uint16_t st_mode;
-	__uint16_t st_nlink;
-	__uint16_t st_uid;
-	__uint16_t st_gid;
-	__uint16_t st_rdev;
-	__uint16_t __pad;    /* Hidden padding made visible */
-	__uint32_t st_size;
-	__uint32_t st_atime;
-	__uint32_t st_mtime;
-	__uint32_t st_ctime;
+	__UINT16_TYPE__  st_dev;
+	__UINT16_TYPE__  st_ino;
+	__UINT16_TYPE__  st_mode;
+	__UINT16_TYPE__  st_nlink;
+	__UINT16_TYPE__  st_uid;
+	__UINT16_TYPE__  st_gid;
+	__UINT16_TYPE__  st_rdev;
+	__UINT16_TYPE__  __pad;    /* Hidden padding made visible */
+	/* Linux declares these as `unsigned long' on
+	 * i386, but as `unsigned int' on x86_64... */
+	__ULONG32_TYPE__ st_size;
+	__ULONG32_TYPE__ st_atime;
+	__ULONG32_TYPE__ st_mtime;
+	__ULONG32_TYPE__ st_ctime;
 };
 
 /* From: https://elixir.bootlin.com/linux/latest/source/arch/x86/include/uapi/asm/stat.h#L10 */
-struct linux_stat32 {
-	__uint32_t st_dev;
-	__uint32_t st_ino;
-	__uint16_t st_mode;
-	__uint16_t st_nlink;
-	__uint16_t st_uid;
-	__uint16_t st_gid;
-	__uint32_t st_rdev;
-	__uint32_t st_size;
-	__uint32_t st_blksize;
-	__uint32_t st_blocks;
-	__uint32_t st_atime;
-	__uint32_t st_atime_nsec;
-	__uint32_t st_mtime;
-	__uint32_t st_mtime_nsec;
-	__uint32_t st_ctime;
-	__uint32_t st_ctime_nsec;
-	__uint32_t __unused4;
-	__uint32_t __unused5;
+struct linux_statx32 {
+	__ULONG32_TYPE__ st_dev;
+	__ULONG32_TYPE__ st_ino;
+	__UINT16_TYPE__  st_mode;
+	__UINT16_TYPE__  st_nlink;
+	__UINT16_TYPE__  st_uid;
+	__UINT16_TYPE__  st_gid;
+	__ULONG32_TYPE__ st_rdev;
+	__ULONG32_TYPE__ st_size;
+	__ULONG32_TYPE__ st_blksize;
+	__ULONG32_TYPE__ st_blocks;
+	__ULONG32_TYPE__ st_atime;
+	__ULONG32_TYPE__ st_atime_nsec;
+	__ULONG32_TYPE__ st_mtime;
+	__ULONG32_TYPE__ st_mtime_nsec;
+	__ULONG32_TYPE__ st_ctime;
+	__ULONG32_TYPE__ st_ctime_nsec;
+	__ULONG32_TYPE__ __unused4;
+	__ULONG32_TYPE__ __unused5;
 };
 
 /* From: https://elixir.bootlin.com/linux/latest/source/arch/x86/include/uapi/asm/stat.h#L42 */
-struct linux_stat64 {
-	__uint64_t st_dev;
-	__uint8_t  __pad0[4];
-	__uint32_t __st_ino;
-	__uint32_t st_mode;
-	__uint32_t st_nlink;
-	__uint32_t st_uid;
-	__uint32_t st_gid;
-	__uint64_t st_rdev;
-	__uint8_t  __pad3[4];
-	__uint8_t  __pad4[4]; /* Hidden padding made visible */
-	__int64_t  st_size;
-	__uint32_t st_blksize;
-	__uint8_t  __pad5[4]; /* Hidden padding made visible */
-	__uint64_t st_blocks;
-	__uint32_t st_atime;
-	__uint32_t st_atime_nsec;
-	__uint32_t st_mtime;
-	__uint32_t st_mtime_nsec;
-	__uint32_t st_ctime;
-	__uint32_t st_ctime_nsec;
-	__uint64_t st_ino;
+struct linux_statx32_64 {
+	__ULONG64_TYPE__ st_dev;
+	__BYTE_TYPE__    __pad0[4];
+	__ULONG32_TYPE__ __st_ino;
+	__UINT32_TYPE__  st_mode;
+	__UINT32_TYPE__  st_nlink;
+	__ULONG32_TYPE__ st_uid;
+	__ULONG32_TYPE__ st_gid;
+	__ULONG64_TYPE__ st_rdev;
+	__BYTE_TYPE__    __pad3[4];
+	__BYTE_TYPE__    __pad4[4]; /* Hidden padding made visible */
+	__LONG64_TYPE__  st_size;
+	__ULONG32_TYPE__ st_blksize;
+	__BYTE_TYPE__    __pad5[4]; /* Hidden padding made visible */
+	__ULONG64_TYPE__ st_blocks;
+	__ULONG32_TYPE__ st_atime;
+	__ULONG32_TYPE__ st_atime_nsec;
+	__ULONG32_TYPE__ st_mtime;
+	__UINT32_TYPE__  st_mtime_nsec;
+	__ULONG32_TYPE__ st_ctime;
+	__ULONG32_TYPE__ st_ctime_nsec;
+	__ULONG64_TYPE__ st_ino;
 };
 
+/* From: https://elixir.bootlin.com/linux/latest/source/arch/x86/include/uapi/asm/stat.h#L83 */
+struct linux_statx64 {
+	__ULONG64_TYPE__ st_dev;
+	__ULONG64_TYPE__ st_ino;
+	__ULONG64_TYPE__ st_nlink;
+	__UINT32_TYPE__  st_mode;
+	__UINT32_TYPE__  st_uid;
+	__UINT32_TYPE__  st_gid;
+	__UINT32_TYPE__  __pad0;
+	__ULONG64_TYPE__ st_rdev;
+	__LONG64_TYPE__  st_size;
+	__LONG64_TYPE__  st_blksize;
+	__LONG64_TYPE__  st_blocks; /* Number 512-byte blocks allocated. */
+	__ULONG64_TYPE__ st_atime;
+	__ULONG64_TYPE__ st_atime_nsec;
+	__ULONG64_TYPE__ st_mtime;
+	__ULONG64_TYPE__ st_mtime_nsec;
+	__ULONG64_TYPE__ st_ctime;
+	__ULONG64_TYPE__ st_ctime_nsec;
+	__LONG64_TYPE__  __unused[3];
+};
 
 __DECL_END
 #endif /* __CC__ */

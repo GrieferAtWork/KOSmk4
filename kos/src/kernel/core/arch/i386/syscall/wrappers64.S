@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e0f9f82 */
+/* HASH CRC-32:0xfe308fe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,9 +158,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_close)
 	.cfi_endproc
 END(__x86_asm64_syscall_close)
 
-/* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
-.section .text.x86.asm64_syscall.linux_stat64
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_stat64)
+/* errno_t linux_stat(char const *filename, struct linux_statx64 *statbuf) */
+.section .text.x86.asm64_syscall.linux_stat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_stat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
 	.cfi_lsda 0, 0x4
@@ -174,8 +174,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_stat64)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	EXTERN(sys_linux_stat64)
-	call   sys_linux_stat64
+	EXTERN(sys_linux_stat)
+	call   sys_linux_stat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -186,11 +186,11 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_stat64)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_linux_stat64)
+END(__x86_asm64_syscall_linux_stat)
 
-/* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
-.section .text.x86.asm64_syscall.linux_fstat64
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_fstat64)
+/* errno_t linux_fstat(fd_t fd, struct linux_statx64 *statbuf) */
+.section .text.x86.asm64_syscall.linux_fstat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_fstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
 	.cfi_lsda 0, 0x5
@@ -204,8 +204,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_fstat64)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	EXTERN(sys_linux_fstat64)
-	call   sys_linux_fstat64
+	EXTERN(sys_linux_fstat)
+	call   sys_linux_fstat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -216,11 +216,11 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_fstat64)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_linux_fstat64)
+END(__x86_asm64_syscall_linux_fstat)
 
-/* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
-.section .text.x86.asm64_syscall.linux_lstat64
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_lstat64)
+/* errno_t linux_lstat(char const *filename, struct linux_statx64 *statbuf) */
+.section .text.x86.asm64_syscall.linux_lstat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_lstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
 	.cfi_lsda 0, 0x6
@@ -234,8 +234,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_lstat64)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	EXTERN(sys_linux_lstat64)
-	call   sys_linux_lstat64
+	EXTERN(sys_linux_lstat)
+	call   sys_linux_lstat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -246,7 +246,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_lstat64)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_linux_lstat64)
+END(__x86_asm64_syscall_linux_lstat)
 
 /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
 .section .text.x86.asm64_syscall.poll
@@ -7960,7 +7960,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_futimesat)
 	.cfi_endproc
 END(__x86_asm64_syscall_futimesat)
 
-/* errno_t linux_fstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t linux_fstatat(fd_t dirfd, char const *filename, struct linux_statx64 *statbuf, atflag_t flags) */
 .section .text.x86.asm64_syscall.linux_fstatat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_linux_fstatat)
 	.cfi_startproc simple
@@ -14907,9 +14908,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer)
 	.cfi_endproc
 END(__x86_asm32_int80_getitimer)
 
-/* errno_t linux_stat32(char const *filename, struct linux_stat32 *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_stat32
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat32)
+/* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_int80.linux_stat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6a
@@ -14925,8 +14926,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat32)
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_linux_stat32)
-	call   sys32_linux_stat32
+	EXTERN(sys32_linux_stat)
+	call   sys32_linux_stat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -14937,11 +14938,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat32)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_stat32)
+END(__x86_asm32_int80_linux_stat)
 
-/* errno_t linux_lstat32(char const *filename, struct linux_stat32 *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_lstat32
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat32)
+/* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_int80.linux_lstat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6b
@@ -14957,8 +14958,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat32)
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_linux_lstat32)
-	call   sys32_linux_lstat32
+	EXTERN(sys32_linux_lstat)
+	call   sys32_linux_lstat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -14969,11 +14970,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat32)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_lstat32)
+END(__x86_asm32_int80_linux_lstat)
 
-/* errno_t linux_fstat32(fd_t fd, struct linux_stat32 *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_fstat32
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat32)
+/* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_int80.linux_fstat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6c
@@ -14989,8 +14990,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat32)
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_linux_fstat32)
-	call   sys32_linux_fstat32
+	EXTERN(sys32_linux_fstat)
+	call   sys32_linux_fstat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -15001,7 +15002,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat32)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_fstat32)
+END(__x86_asm32_int80_linux_fstat)
 
 /* errno_t olduname(struct linux_olduname *name) */
 .section .text.x86.asm32_syscall_int80.olduname
@@ -17794,7 +17795,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate64)
 	.cfi_endproc
 END(__x86_asm32_int80_ftruncate64)
 
-/* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
+/* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
 .section .text.x86.asm32_syscall_int80.linux_stat64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat64)
 	.cfi_startproc simple
@@ -17826,7 +17827,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat64)
 	.cfi_endproc
 END(__x86_asm32_int80_linux_stat64)
 
-/* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
+/* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
 .section .text.x86.asm32_syscall_int80.linux_lstat64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat64)
 	.cfi_startproc simple
@@ -17858,7 +17859,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat64)
 	.cfi_endproc
 END(__x86_asm32_int80_linux_lstat64)
 
-/* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
+/* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
 .section .text.x86.asm32_syscall_int80.linux_fstat64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat64)
 	.cfi_startproc simple
@@ -21081,7 +21082,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat)
 END(__x86_asm32_int80_futimesat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, atflag_t flags) */
+/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.linux_fstatat64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstatat64)
 	.cfi_startproc simple
@@ -27037,14 +27038,14 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setitimer, __x86_asm32_int80_setit
 /* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getitimer, __x86_asm32_int80_getitimer)
 
-/* errno_t linux_stat32(char const *filename, struct linux_stat32 *statbuf) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_linux_stat32, __x86_asm32_int80_linux_stat32)
+/* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_linux_stat, __x86_asm32_int80_linux_stat)
 
-/* errno_t linux_lstat32(char const *filename, struct linux_stat32 *statbuf) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_linux_lstat32, __x86_asm32_int80_linux_lstat32)
+/* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_linux_lstat, __x86_asm32_int80_linux_lstat)
 
-/* errno_t linux_fstat32(fd_t fd, struct linux_stat32 *statbuf) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_linux_fstat32, __x86_asm32_int80_linux_fstat32)
+/* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_linux_fstat, __x86_asm32_int80_linux_fstat)
 
 /* errno_t olduname(struct linux_olduname *name) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_olduname, __x86_asm32_int80_olduname)
@@ -27563,13 +27564,13 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_truncate64, __x86_asm32_int80_trun
 /* errno_t ftruncate64(fd_t fd, uint64_t length) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftruncate64, __x86_asm32_int80_ftruncate64)
 
-/* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
+/* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_linux_stat64, __x86_asm32_int80_linux_stat64)
 
-/* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
+/* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_linux_lstat64, __x86_asm32_int80_linux_lstat64)
 
-/* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
+/* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_linux_fstat64, __x86_asm32_int80_linux_fstat64)
 
 /* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
@@ -28176,7 +28177,7 @@ END(__x86_asm32_sysenter_fchownat)
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_futimesat, __x86_asm32_int80_futimesat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, atflag_t flags) */
+/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_linux_fstatat64, __x86_asm32_int80_linux_fstatat64)
 
 /* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
@@ -31440,38 +31441,38 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getitimer)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getitimer)
 
-/* errno_t linux_stat32(char const *filename, struct linux_stat32 *statbuf) */
-.section .text.x86.asm32_syscall_sysrun32.linux_stat32
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_stat32)
+/* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_stat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_stat)
 	.cfi_startproc
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_linux_stat32)
-	jmp    sys32_linux_stat32
+	EXTERN(sys32_linux_stat)
+	jmp    sys32_linux_stat
 	.cfi_endproc
-END(__x86_asm32_sysrun32_linux_stat32)
+END(__x86_asm32_sysrun32_linux_stat)
 
-/* errno_t linux_lstat32(char const *filename, struct linux_stat32 *statbuf) */
-.section .text.x86.asm32_syscall_sysrun32.linux_lstat32
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_lstat32)
+/* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_lstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_lstat)
 	.cfi_startproc
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_linux_lstat32)
-	jmp    sys32_linux_lstat32
+	EXTERN(sys32_linux_lstat)
+	jmp    sys32_linux_lstat
 	.cfi_endproc
-END(__x86_asm32_sysrun32_linux_lstat32)
+END(__x86_asm32_sysrun32_linux_lstat)
 
-/* errno_t linux_fstat32(fd_t fd, struct linux_stat32 *statbuf) */
-.section .text.x86.asm32_syscall_sysrun32.linux_fstat32
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_fstat32)
+/* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.linux_fstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_fstat)
 	.cfi_startproc
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_linux_fstat32)
-	jmp    sys32_linux_fstat32
+	EXTERN(sys32_linux_fstat)
+	jmp    sys32_linux_fstat
 	.cfi_endproc
-END(__x86_asm32_sysrun32_linux_fstat32)
+END(__x86_asm32_sysrun32_linux_fstat)
 
 /* errno_t olduname(struct linux_olduname *name) */
 .section .text.x86.asm32_syscall_sysrun32.olduname
@@ -32415,7 +32416,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftruncate64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ftruncate64)
 
-/* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
+/* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
 .section .text.x86.asm32_syscall_sysrun32.linux_stat64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_stat64)
 	.cfi_startproc
@@ -32426,7 +32427,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_stat64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_linux_stat64)
 
-/* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
+/* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
 .section .text.x86.asm32_syscall_sysrun32.linux_lstat64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_lstat64)
 	.cfi_startproc
@@ -32437,7 +32438,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_lstat64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_linux_lstat64)
 
-/* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
+/* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
 .section .text.x86.asm32_syscall_sysrun32.linux_fstat64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_fstat64)
 	.cfi_startproc
@@ -33531,7 +33532,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_futimesat)
 END(__x86_asm32_sysrun32_futimesat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, atflag_t flags) */
+/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.linux_fstatat64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_linux_fstatat64)
 	.cfi_startproc

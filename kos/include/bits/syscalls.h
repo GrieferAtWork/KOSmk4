@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b04f5d1 */
+/* HASH CRC-32:0xf5b91b42 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -343,9 +343,9 @@
 #define SYS_sendfile               __NR_sendfile               /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
 #define SYS_ftruncate              __NR_ftruncate              /* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */
 #define SYS_truncate               __NR_truncate               /* errno_t truncate(char const *filename, syscall_ulong_t length) */
-#define SYS_linux_stat32           __NR_linux_stat32           /* errno_t linux_stat32(char const *filename, struct linux_stat32 *statbuf) */
-#define SYS_linux_lstat32          __NR_linux_lstat32          /* errno_t linux_lstat32(char const *filename, struct linux_stat32 *statbuf) */
-#define SYS_linux_fstat32          __NR_linux_fstat32          /* errno_t linux_fstat32(fd_t fd, struct linux_stat32 *statbuf) */
+#define SYS_linux_stat             __NR_linux_stat             /* errno_t linux_stat(char const *filename, struct linux_stat *statbuf) */
+#define SYS_linux_lstat            __NR_linux_lstat            /* errno_t linux_lstat(char const *filename, struct linux_stat *statbuf) */
+#define SYS_linux_fstat            __NR_linux_fstat            /* errno_t linux_fstat(fd_t fd, struct linux_stat *statbuf) */
 #define SYS_fcntl                  __NR_fcntl                  /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t cmd, void *arg) */
 #define SYS_fadvise64              __NR_fadvise64              /* errno_t fadvise64(int TODO_PROTOTYPE) */
 #define SYS_linux_newfstatat       __NR_linux_newfstatat       /* errno_t linux_newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe01f0a98 */
+/* HASH CRC-32:0xcfdff0e0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,9 +146,9 @@
 #define __NR32_syslog                  0x67                   /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
 #define __NR32_setitimer               0x68                   /* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
 #define __NR32_getitimer               0x69                   /* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
-#define __NR32_linux_stat32            0x6a                   /* errno_t linux_stat32(char const *filename, struct linux_stat32 *statbuf) */
-#define __NR32_linux_lstat32           0x6b                   /* errno_t linux_lstat32(char const *filename, struct linux_stat32 *statbuf) */
-#define __NR32_linux_fstat32           0x6c                   /* errno_t linux_fstat32(fd_t fd, struct linux_stat32 *statbuf) */
+#define __NR32_linux_stat              0x6a                   /* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
+#define __NR32_linux_lstat             0x6b                   /* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
+#define __NR32_linux_fstat             0x6c                   /* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
 #define __NR32_olduname                0x6d                   /* errno_t olduname(struct linux_olduname *name) */
 #define __NR32_iopl                    0x6e                   /* errno_t iopl(syscall_ulong_t level) */
 #define __NR32_vhangup                 0x6f                   /* errno_t vhangup(void) */
@@ -248,9 +248,9 @@
 #define __NR32_mmap2                   0xc0                   /* void *mmap2(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset) */
 #define __NR32_truncate64              0xc1                   /* errno_t truncate64(char const *filename, uint64_t length) */
 #define __NR32_ftruncate64             0xc2                   /* errno_t ftruncate64(fd_t fd, uint64_t length) */
-#define __NR32_linux_stat64            0xc3                   /* errno_t linux_stat64(char const *filename, struct linux_stat64 *statbuf) */
-#define __NR32_linux_lstat64           0xc4                   /* errno_t linux_lstat64(char const *filename, struct linux_stat64 *statbuf) */
-#define __NR32_linux_fstat64           0xc5                   /* errno_t linux_fstat64(fd_t fd, struct linux_stat64 *statbuf) */
+#define __NR32_linux_stat64            0xc3                   /* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
+#define __NR32_linux_lstat64           0xc4                   /* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
+#define __NR32_linux_fstat64           0xc5                   /* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
 #define __NR32_lchown32                0xc6                   /* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
 #define __NR32_getuid32                0xc7                   /* uint32_t getuid32(void) */
 #define __NR32_getgid32                0xc8                   /* uint32_t getgid32(void) */
@@ -352,7 +352,7 @@
 #define __NR32_fchownat                0x12a                  /* errno_t fchownat(fd_t dirfd, char const *filename, uid_t owner, gid_t group, atflag_t flags) */
 #define __NR32_futimesat               0x12b                  /* errno_t futimesat(fd_t dirfd, const char *filename, struct __timevalx32 const[2] times) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR32_linux_fstatat64         0x12c                  /* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, atflag_t flags) */
+#define __NR32_linux_fstatat64         0x12c                  /* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH' */
 #define __NR32_unlinkat                0x12d                  /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 #define __NR32_renameat                0x12e                  /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */
@@ -969,9 +969,9 @@
 #define __NR32RM_syslog                  2
 #define __NR32RM_setitimer               0
 #define __NR32RM_getitimer               0
-#define __NR32RM_linux_stat32            0
-#define __NR32RM_linux_lstat32           0
-#define __NR32RM_linux_fstat32           0
+#define __NR32RM_linux_stat              0
+#define __NR32RM_linux_lstat             0
+#define __NR32RM_linux_fstat             0
 #define __NR32RM_olduname                0
 #define __NR32RM_iopl                    0
 #define __NR32RM_vhangup                 0
@@ -1357,9 +1357,9 @@
 #define __NR32CP_fchmod                  1
 #define __NR32CP_fchown                  1
 #define __NR32CP_syslog                  1
-#define __NR32CP_linux_stat32            1
-#define __NR32CP_linux_lstat32           1
-#define __NR32CP_linux_fstat32           1
+#define __NR32CP_linux_stat              1
+#define __NR32CP_linux_lstat             1
+#define __NR32CP_linux_fstat             1
 #define __NR32CP_wait4                   1
 #define __NR32CP_sysinfo                 1
 #define __NR32CP_fsync                   1
@@ -1608,9 +1608,9 @@
 #define __NR32RC_syslog                  3
 #define __NR32RC_setitimer               3
 #define __NR32RC_getitimer               2
-#define __NR32RC_linux_stat32            2
-#define __NR32RC_linux_lstat32           2
-#define __NR32RC_linux_fstat32           2
+#define __NR32RC_linux_stat              2
+#define __NR32RC_linux_lstat             2
+#define __NR32RC_linux_fstat             2
 #define __NR32RC_olduname                1
 #define __NR32RC_iopl                    1
 #define __NR32RC_vhangup                 0
