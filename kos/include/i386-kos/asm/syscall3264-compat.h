@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53f83c01 */
+/* HASH CRC-32:0xf1f32734 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -263,6 +263,7 @@
 #define __NR3264COMPAT_truncate               2(truncate64,truncate)
 #define __NR3264COMPAT_umask                  1(umask)
 #define __NR3264COMPAT_umount2                1(umount2)
+#define __NR3264COMPAT_uname                  1(uname)
 #define __NR3264COMPAT_unlink                 1(unlink)
 #define __NR3264COMPAT_unlinkat               1(unlinkat)
 #define __NR3264COMPAT_unshare                1(unshare)

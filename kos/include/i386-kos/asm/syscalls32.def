@@ -36,6 +36,10 @@
 %[typecompat(i386:pollfd = *:pollfd)]
 %[typecompat(i386:dirent = *:dirent)]
 %[typecompat(i386:sighandler_t = *:sighandler_t)]
+%[typecompat(i386:linux_oldolduname = *:linux_oldolduname)]
+%[typecompat(i386:linux_olduname = *:linux_olduname)]
+%[typecompat(i386:linux_uname = *:linux_uname)]
+%[typecompat(i386:utsname = *:utsname)]
 
 
 @@Restore the specified register state when returning from a signal handler

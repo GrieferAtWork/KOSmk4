@@ -33,6 +33,10 @@
 %[typecompat(x86_64:pollfd = *:pollfd)]
 %[typecompat(x86_64:dirent = *:dirent)]
 %[typecompat(x86_64:sighandler_t = *:sighandler_t)]
+%[typecompat(x86_64:linux_oldolduname = *:linux_oldolduname)]
+%[typecompat(x86_64:linux_olduname = *:linux_olduname)]
+%[typecompat(x86_64:linux_uname = *:linux_uname)]
+%[typecompat(x86_64:utsname = *:utsname)]
 
 /* Define type compatibilities between x86_64 and i386 */
 %[typecompat(x86_64:[timeb,__timebx64] = i386:[__timebx32_64])]

@@ -157,17 +157,17 @@ DEFINE_COMPAT_SYSCALL3(errno_t, get_exception_handler,
 	struct user_except_handler *exc;
 	exc = &PERTASK(this_user_except_handler);
 	if (pmode) {
-		validate_writable(pmode, sizeof(*pmode));
+		compat_validate_writable(pmode, sizeof(*pmode));
 		COMPILER_WRITE_BARRIER();
 		*pmode = exc->ueh_mode;
 	}
 	if (phandler) {
-		validate_writable(phandler, sizeof(*phandler));
+		compat_validate_writable(phandler, sizeof(*phandler));
 		COMPILER_WRITE_BARRIER();
 		*phandler = (compat_except_handler_t)(uintptr_t)(void *)exc->ueh_handler;
 	}
 	if (phandler_sp) {
-		validate_writable(phandler_sp, sizeof(*phandler_sp));
+		compat_validate_writable(phandler_sp, sizeof(*phandler_sp));
 		COMPILER_WRITE_BARRIER();
 		*phandler_sp = exc->ueh_stack;
 	}

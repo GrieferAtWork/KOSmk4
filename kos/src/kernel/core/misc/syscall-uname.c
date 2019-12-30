@@ -39,9 +39,12 @@
 #include <string.h>
 #include <syscall.h>
 
-#if defined(__NR_oldolduname) || defined(__NR_olduname)
+#if (defined(__ARCH_WANT_SYSCALL_OLDOLDUNAME) ||        \
+     defined(__ARCH_WANT_SYSCALL_OLDUNAME) ||           \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_OLDOLDUNAME) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_OLDUNAME))
 #include <kos/compat/linux-uname.h>
-#endif
+#endif /* __ARCH_WANT_[COMPAT_]SYSCALL_OLD[OLD]UNAME */
 
 
 DECL_BEGIN
@@ -79,7 +82,14 @@ PUBLIC struct utsname kernel_uname = {
 	/* .domainname = */ "(none)"
 };
 
-#ifdef __NR_oldolduname
+
+
+
+
+/************************************************************************/
+/* oldolduname(), olduname(), uname()                                   */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_OLDOLDUNAME
 DEFINE_SYSCALL1(errno_t, oldolduname,
                 USER UNCHECKED struct linux_oldolduname *, name) {
 	validate_writable(name, sizeof(*name));
@@ -90,10 +100,22 @@ DEFINE_SYSCALL1(errno_t, oldolduname,
 	memcpy(name->machine, kernel_uname.machine, sizeof(name->machine));
 	return -EOK;
 }
-#endif /* __NR_oldolduname */
+#endif /* __ARCH_WANT_SYSCALL_OLDOLDUNAME */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDOLDUNAME
+DEFINE_COMPAT_SYSCALL1(errno_t, oldolduname,
+                       USER UNCHECKED struct linux_oldolduname *, name) {
+	compat_validate_writable(name, sizeof(*name));
+	memcpy(name->sysname, kernel_uname.sysname, sizeof(name->sysname));
+	memcpy(name->nodename, kernel_uname.nodename, sizeof(name->nodename));
+	memcpy(name->release, kernel_uname.release, sizeof(name->release));
+	memcpy(name->version, kernel_uname.version, sizeof(name->version));
+	memcpy(name->machine, kernel_uname.machine, sizeof(name->machine));
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_OLDOLDUNAME */
 
-#ifdef __NR_olduname
+#ifdef __ARCH_WANT_SYSCALL_OLDUNAME
 DEFINE_SYSCALL1(errno_t, olduname,
                 USER UNCHECKED struct linux_olduname *, name) {
 	validate_writable(name, sizeof(*name));
@@ -104,15 +126,38 @@ DEFINE_SYSCALL1(errno_t, olduname,
 	memcpy(name->machine, kernel_uname.machine, sizeof(name->machine));
 	return -EOK;
 }
-#endif /* __NR_olduname */
+#endif /* __ARCH_WANT_SYSCALL_OLDUNAME */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDUNAME
+DEFINE_COMPAT_SYSCALL1(errno_t, olduname,
+                       USER UNCHECKED struct linux_olduname *, name) {
+	compat_validate_writable(name, sizeof(*name));
+	memcpy(name->sysname, kernel_uname.sysname, sizeof(name->sysname));
+	memcpy(name->nodename, kernel_uname.nodename, sizeof(name->nodename));
+	memcpy(name->release, kernel_uname.release, sizeof(name->release));
+	memcpy(name->version, kernel_uname.version, sizeof(name->version));
+	memcpy(name->machine, kernel_uname.machine, sizeof(name->machine));
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_OLDUNAME */
+
+#ifdef __ARCH_WANT_SYSCALL_UNAME
 DEFINE_SYSCALL1(errno_t, uname,
                 USER UNCHECKED struct utsname *, name) {
 	validate_writable(name, sizeof(*name));
 	memcpy(name, &kernel_uname, sizeof(*name));
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_UNAME */
 
+
+
+
+
+/************************************************************************/
+/* sethostname(), setdomainname()                                       */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SETHOSTNAME
 DEFINE_SYSCALL2(errno_t, sethostname,
                 USER UNCHECKED char const *, name,
                 size_t, namelen) {
@@ -127,7 +172,9 @@ DEFINE_SYSCALL2(errno_t, sethostname,
 	memcpy(kernel_uname.nodename, temp, sizeof(temp));
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_SETHOSTNAME */
 
+#ifdef __ARCH_WANT_SYSCALL_SETDOMAINNAME
 DEFINE_SYSCALL2(errno_t, setdomainname,
                 USER UNCHECKED char const *, name,
                 size_t, namelen) {
@@ -142,6 +189,7 @@ DEFINE_SYSCALL2(errno_t, setdomainname,
 	memcpy(kernel_uname.domainname, temp, sizeof(temp));
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_SETDOMAINNAME */
 
 
 

@@ -216,6 +216,13 @@ handle_eventfd_fence_poll(struct eventfd *__restrict self,
 DEFINE_INTERN_ALIAS(handle_eventfd_sema_poll, handle_eventfd_fence_poll);
 
 
+
+
+
+/************************************************************************/
+/* eventfd2(), eventfd()                                                */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_EVENTFD2
 DEFINE_SYSCALL2(fd_t, eventfd2,
                 syscall_ulong_t, initval,
                 syscall_ulong_t, flags) {
@@ -255,12 +262,14 @@ DEFINE_SYSCALL2(fd_t, eventfd2,
 	}
 	return (fd_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_EVENTFD2 */
 
+#ifdef __ARCH_WANT_SYSCALL_EVENTFD
 DEFINE_SYSCALL1(fd_t, eventfd,
                 syscall_ulong_t, initval) {
 	return sys_eventfd2(initval, 0);
 }
-
+#endif /* __ARCH_WANT_SYSCALL_EVENTFD */
 
 DECL_END
 
