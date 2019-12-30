@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b517c2 */
+/* HASH CRC-32:0xa2b89cc8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,9 @@
 
 #include <features.h>
 #include <bits/types.h>
+#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+#include <bits/rusage-struct.h>
+#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #include <bits/siginfo.h> /* We'd only need `siginfo_t' */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
@@ -81,13 +84,13 @@ __SYSDECL_BEGIN
 #ifdef __NO_ATTR_TRANSPARENT_UNION
 #   define __WAIT_STATUS      void *
 #   define __WAIT_STATUS_DEFN void *
-#else
+#else /* __NO_ATTR_TRANSPARENT_UNION */
 typedef union {
 	union wait *__uptr;
 	int        *__iptr;
 } __WAIT_STATUS __ATTR_TRANSPARENT_UNION;
 #   define __WAIT_STATUS_DEFN int *
-#endif
+#endif /* !__NO_ATTR_TRANSPARENT_UNION */
 #else /* __USE_MISC */
 #   define __WAIT_INT(status)  (status)
 #   define __WAIT_STATUS        int *
@@ -101,7 +104,7 @@ typedef union {
 #   define WIFSTOPPED(status)   __WIFSTOPPED(__WAIT_INT(status))
 #ifdef __WIFCONTINUED
 #   define WIFCONTINUED(status) __WIFCONTINUED(__WAIT_INT(status))
-#endif
+#endif /* __WIFCONTINUED */
 #endif /* !__WAIT_MACROS_DEFINED */
 
 #ifdef __CRT_HAVE_wait
@@ -142,21 +145,69 @@ __CDECLARE(,int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *_
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 struct rusage;
-#ifdef __CRT_HAVE_wait3
+#if defined(__CRT_HAVE_wait3_64) && defined(__USE_TIME_BITS64)
+/* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),wait3_64,(__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait3) && (!defined(__USE_TIME_BITS64))
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),(__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait3) || defined(__CRT_HAVE_wait3_64)
+#include <local/sys.wait/wait3.h>
+/* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wait3, __FORCELOCAL __pid_t __NOTHROW_RPC(__LIBCCALL wait3)(__WAIT_STATUS __stat_loc, int __options, struct rusage *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait3))(__stat_loc, __options, __usage); })
 #endif /* wait3... */
-/* TODO: wait3_64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
+#ifdef __USE_TIME64
+#ifdef __CRT_HAVE_wait3_64
+/* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CDECLARE(,__pid_t,__NOTHROW_NCX,wait3_64,(__WAIT_STATUS __stat_loc, int __options, struct __rusage64 *__usage),(__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait3) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,wait3_64,(__WAIT_STATUS __stat_loc, int __options, struct __rusage64 *__usage),wait3,(__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait3)
+#include <local/sys.wait/wait3_64.h>
+/* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wait3_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__LIBCCALL wait3_64)(__WAIT_STATUS __stat_loc, int __options, struct __rusage64 *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait3_64))(__stat_loc, __options, __usage); })
+#endif /* wait3_64... */
+#endif /* __USE_TIME64 */
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE_wait4
+#if defined(__CRT_HAVE_wait4_64) && defined(__USE_TIME_BITS64)
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),wait4_64,(__pid,__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait4) && (!defined(__USE_TIME_BITS64))
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait4) || defined(__CRT_HAVE_wait4_64)
+#include <local/sys.wait/wait4.h>
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wait4, __FORCELOCAL __pid_t __NOTHROW_RPC(__LIBCCALL wait4)(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait4))(__pid, __stat_loc, __options, __usage); })
 #endif /* wait4... */
-/* TODO: wait4_64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
+#ifdef __USE_TIME64
+#ifdef __CRT_HAVE_wait4_64
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CDECLARE(,__pid_t,__NOTHROW_NCX,wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct __rusage64 *__usage),(__pid,__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait4) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_NCX,wait4_64,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct __rusage64 *__usage),wait4,(__pid,__stat_loc,__options,__usage))
+#elif defined(__CRT_HAVE_wait4)
+#include <local/sys.wait/wait4_64.h>
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wait4_64, __FORCELOCAL __pid_t __NOTHROW_NCX(__LIBCCALL wait4_64)(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct __rusage64 *__usage) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wait4_64))(__pid, __stat_loc, __options, __usage); })
+#endif /* wait4_64... */
+#endif /* __USE_TIME64 */
 #endif /* __USE_MISC */
 
 #ifdef __USE_KOS
@@ -225,7 +276,7 @@ __CDECLARE(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc
  * is no way of ensuring that PID still refers to the original thread,
  * as another thread may have been created using the same PID, after
  * the detached thread exited.
- * NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+ * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill

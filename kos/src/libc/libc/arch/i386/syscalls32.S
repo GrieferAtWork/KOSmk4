@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cf759d6 */
+/* HASH CRC-32:0x2faf9a8b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6693,7 +6693,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xwritef, libc_sys_Xwritef)
  * is no way of ensuring that PID still refers to the original thread,
  * as another thread may have been created using the same PID, after
  * the detached thread exited.
- * NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+ * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill
@@ -6789,7 +6789,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_detach, libc_sys_detach)
  * is no way of ensuring that PID still refers to the original thread,
  * as another thread may have been created using the same PID, after
  * the detached thread exited.
- * NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+ * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill

@@ -18,10 +18,14 @@
  */
 
 %[define_replacement(pid_t = __pid_t)]
+%[default_impl_section(.text.crt.sched.wait)]
 
 %{
 #include <features.h>
 #include <bits/types.h>
+#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
+#include <bits/rusage-struct.h>
+#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #include <bits/siginfo.h> /* We'd only need `siginfo_t' */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
@@ -74,13 +78,13 @@ __SYSDECL_BEGIN
 #ifdef __NO_ATTR_TRANSPARENT_UNION
 #   define __WAIT_STATUS      void *
 #   define __WAIT_STATUS_DEFN void *
-#else
+#else /* __NO_ATTR_TRANSPARENT_UNION */
 typedef union {
 	union wait *__uptr;
 	int        *__iptr;
 } __WAIT_STATUS __ATTR_TRANSPARENT_UNION;
 #   define __WAIT_STATUS_DEFN int *
-#endif
+#endif /* !__NO_ATTR_TRANSPARENT_UNION */
 #else /* __USE_MISC */
 #   define __WAIT_INT(status)  (status)
 #   define __WAIT_STATUS        int *
@@ -94,7 +98,7 @@ typedef union {
 #   define WIFSTOPPED(status)   __WIFSTOPPED(__WAIT_INT(status))
 #ifdef __WIFCONTINUED
 #   define WIFCONTINUED(status) __WIFCONTINUED(__WAIT_INT(status))
-#endif
+#endif /* __WIFCONTINUED */
 #endif /* !__WAIT_MACROS_DEFINED */
 
 }
@@ -120,24 +124,97 @@ waitpid:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options) -> $pid_t;
 %#endif /* !__id_t_defined */
 @@@param options: At least one of `WEXITED|WSTOPPED|WCONTINUED', optionally or'd with `WNOHANG|WNOWAIT'
 [cp] waitid:(idtype_t idtype, id_t id, [nullable] siginfo_t *infop, int options) -> int;
-
 %#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 %struct rusage;
+
+[decl_include(<bits/rusage-struct.h>)][ignore][cp][doc_alias(wait3)]
+wait3_32:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct __rusage32 *usage) -> $pid_t = wait3?;
+
 @@Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
-[cp] wait3:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage *usage) -> $pid_t;
-%/* TODO: wait3_64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
+[if(defined(__USE_TIME_BITS64)), preferred_alias(wait3_64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(wait3)][cp]
+[requires($has_function(wait3_32) || $has_function(wait3_64))]
+[decl_prefix(struct rusage;)]
+[impl_include(<bits/rusage-struct.h>)]
+[impl_include(<bits/rusage-convert.h>)]
+wait3:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage *usage) -> $pid_t {
+	pid_t result;
+@@if_has_function(wait3_32)@@
+	struct __rusage32 ru32;
+	result = wait3_32(stat_loc, options, usage ? &ru32 : NULL);
+	if (result >= 0 && usage)
+		@rusage32_to_rusage@(&ru32, usage);
+@@else_has_function(wait3_32)@@
+	struct __rusage64 ru64;
+	result = wait3_64(stat_loc, options, usage ? &ru64 : NULL);
+	if (result >= 0 && usage)
+		@rusage64_to_rusage@(&ru64, usage);
+@@endif_has_function(wait3_32)@@
+	return result;
+}
+%#ifdef __USE_TIME64
+[time64_variant_of(wait3)]
+[requires($has_function(wait3_32))]
+[decl_include(<bits/rusage-struct.h>)]
+[impl_include(<bits/rusage-convert.h>)]
+wait3_64:([nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct __rusage64 *usage) -> $pid_t {
+	pid_t result;
+	struct __rusage32 ru32;
+	result = wait3_32(stat_loc, options, usage ? &ru32 : NULL);
+	if (result >= 0 && usage)
+		@rusage32_to_rusage64@(&ru32, usage);
+	return result;
+}
+%#endif /* __USE_TIME64 */
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 %
 %#ifdef __USE_MISC
+
+[decl_include(<bits/rusage-struct.h>)][ignore][cp][doc_alias(wait4)][cp]
+wait4_32:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct __rusage32 *usage) -> $pid_t = wait4?;
+
 @@Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
 @@@param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
-[cp] wait4:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage *usage) -> $pid_t;
-%/* TODO: wait4_64() (__USE_TIME64 & __USE_TIME_BITS64 integration) */
+[if(defined(__USE_TIME_BITS64)), preferred_alias(wait4_64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(wait4)][cp]
+[requires($has_function(wait4_32) || $has_function(wait4_64))]
+[decl_prefix(struct rusage;)]
+[impl_include(<bits/rusage-struct.h>)]
+[impl_include(<bits/rusage-convert.h>)]
+wait4:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct rusage *usage) -> $pid_t {
+	pid_t result;
+@@if_has_function(wait4_32)@@
+	struct __rusage32 ru32;
+	result = wait4_32(pid, stat_loc, options, usage ? &ru32 : NULL);
+	if (result >= 0 && usage)
+		@rusage32_to_rusage@(&ru32, usage);
+@@else_has_function(wait4_32)@@
+	struct __rusage64 ru64;
+	result = wait4_64(pid, stat_loc, options, usage ? &ru64 : NULL);
+	if (result >= 0 && usage)
+		@rusage64_to_rusage@(&ru64, usage);
+@@endif_has_function(wait4_32)@@
+	return result;
+}
+%#ifdef __USE_TIME64
+[time64_variant_of(wait4)]
+[requires($has_function(wait4_32))]
+[decl_include(<bits/rusage-struct.h>)]
+[impl_include(<bits/rusage-convert.h>)]
+wait4_64:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options, [nullable] struct __rusage64 *usage) -> $pid_t {
+	pid_t result;
+	struct __rusage32 ru32;
+	result = wait4_32(pid, stat_loc, options, usage ? &ru32 : NULL);
+	if (result >= 0 && usage)
+		@rusage32_to_rusage64@(&ru32, usage);
+	return result;
+}
+%#endif /* __USE_TIME64 */
 %#endif /* __USE_MISC */
 
 %
@@ -206,7 +283,7 @@ waitpid:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options) -> $pid_t;
 @@is no way of ensuring that PID still refers to the original thread,
 @@as another thread may have been created using the same PID, after
 @@the detached thread exited.
-@@NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+@@NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
 @@      it will behave effectively as though this function had already
 @@      be called.
 @@NOTE: If the thread already has terminated, detaching it will kill

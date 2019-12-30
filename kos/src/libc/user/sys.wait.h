@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf37d24e4 */
+/* HASH CRC-32:0xffb1c128 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,9 +41,15 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype, id_t id, siginfo_t
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait3)(__WAIT_STATUS stat_loc, int options, struct rusage *usage);
+/* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait3_64)(__WAIT_STATUS stat_loc, int options, struct __rusage64 *usage);
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid, __WAIT_STATUS stat_loc, int options, struct rusage *usage);
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid, __WAIT_STATUS stat_loc, int options, struct __rusage64 *usage);
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -108,7 +114,7 @@ INTDEF pid_t NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid, __WAIT_STATUS stat_loc,
  * is no way of ensuring that PID still refers to the original thread,
  * as another thread may have been created using the same PID, after
  * the detached thread exited.
- * NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+ * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill

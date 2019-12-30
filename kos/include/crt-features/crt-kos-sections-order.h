@@ -54,6 +54,7 @@
 	.sched.signal*
 	.sched.utility*
 	.sched.user*
+	.sched.wait*
 	.sched*
 
 # Time sub-system
@@ -187,6 +188,7 @@
 	CB(PREFIX.sched.signalfd.* PREFIX.sched.signal.*) \
 	CB(PREFIX.sched.utility.*) \
 	CB(PREFIX.sched.user.*) \
+	CB(PREFIX.sched.wait.*) \
 	CB(PREFIX.sched.eventfd.*) \
 	CB(PREFIX.time.*) \
 	CB(PREFIX.heap.mman.*) \

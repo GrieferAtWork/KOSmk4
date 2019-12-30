@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe641888 */
+/* HASH CRC-32:0x7e27c93d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -365,7 +365,7 @@ __CDECLARE_SC(,__errno_t,delete_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE)
  * is no way of ensuring that PID still refers to the original thread,
  * as another thread may have been created using the same PID, after
  * the detached thread exited.
- * NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+ * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill
@@ -2049,7 +2049,7 @@ __CDECLARE_XSC(,__errno_t,delete_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE
  * is no way of ensuring that PID still refers to the original thread,
  * as another thread may have been created using the same PID, after
  * the detached thread exited.
- * NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+ * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x511b6569 */
+/* HASH CRC-32:0x8c7031ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -14263,7 +14263,7 @@ END(__x86_asm32_int80_writef)
  * is no way of ensuring that PID still refers to the original thread,
  * as another thread may have been created using the same PID, after
  * the detached thread exited.
- * NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+ * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill
@@ -31579,7 +31579,7 @@ END(__x86_asm32_sysenter_writef)
  * is no way of ensuring that PID still refers to the original thread,
  * as another thread may have been created using the same PID, after
  * the detached thread exited.
- * NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+ * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill

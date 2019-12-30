@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c62dd0b */
+/* HASH CRC-32:0xd8193444 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3688,7 +3688,9 @@
 #define __CRT_HAVE_waccess 1
 #define __CRT_HAVE_wait 1
 #define __CRT_HAVE_wait3 1
+#define __CRT_HAVE_wait3_64 1
 #define __CRT_HAVE_wait4 1
+#define __CRT_HAVE_wait4_64 1
 #define __CRT_HAVE_waitid 1
 #define __CRT_HAVE_waitpid 1
 #define __CRT_HAVE_warn 1

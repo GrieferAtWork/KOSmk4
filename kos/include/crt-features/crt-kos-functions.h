@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6af57ef */
+/* HASH CRC-32:0x7555cfc6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2372,7 +2372,9 @@ __CRT_FUNCTION(vwarn,0,(),2,(char const *,format,va_list,args),void)
 __CRT_FUNCTION(vwarnx,0,(),2,(char const *,format,va_list,args),void)
 __CRT_FUNCTION(wait,0,(),1,(__WAIT_STATUS,stat_loc),pid_t)
 __CRT_FUNCTION(wait3,0,(),3,(__WAIT_STATUS,stat_loc,int,options,struct rusage *,usage),pid_t)
+__CRT_FUNCTION(wait3_64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,wait3),3,(__WAIT_STATUS,stat_loc,int,options,struct __rusage64 *,usage),pid_t)
 __CRT_FUNCTION(wait4,0,(),4,(pid_t,pid,__WAIT_STATUS,stat_loc,int,options,struct rusage *,usage),pid_t)
+__CRT_FUNCTION(wait4_64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,wait4),4,(pid_t,pid,__WAIT_STATUS,stat_loc,int,options,struct __rusage64 *,usage),pid_t)
 __CRT_FUNCTION(waitid,0,(),4,(idtype_t,idtype,id_t,id,siginfo_t *,infop,int,options),int)
 __CRT_FUNCTION(waitpid,0,(),3,(pid_t,pid,__WAIT_STATUS,stat_loc,int,options),pid_t)
 __CRT_FUNCTION(warn,0,(),VA(1),(char const *,format),void)

@@ -20,22 +20,23 @@
 #define GUARD_LIBC_USER_SYS_WAIT_C 1
 
 #include "../api.h"
-#include "sys.wait.h"
+/**/
 
+#include <bits/rusage-convert.h>
+#include <bits/rusage-struct.h>
 #include <kos/syscalls.h>
+
 #include <syscall.h>
+
+#include "sys.wait.h"
 
 DECL_BEGIN
 
-
-
-
-
 /*[[[start:implementation]]]*/
 
-/*[[[head:wait,hash:CRC-32=0x51c2a33d]]]*/
+/*[[[head:wait,hash:CRC-32=0x91290dd3]]]*/
 /* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wait") pid_t
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.wait.wait") pid_t
 NOTHROW_RPC(LIBCCALL libc_wait)(__WAIT_STATUS stat_loc)
 /*[[[body:wait]]]*/
 {
@@ -51,14 +52,14 @@ NOTHROW_RPC(LIBCCALL libc_wait)(__WAIT_STATUS stat_loc)
 }
 /*[[[end:wait]]]*/
 
-/*[[[head:waitpid,hash:CRC-32=0xb94e8d5d]]]*/
+/*[[[head:waitpid,hash:CRC-32=0x1f24be83]]]*/
 /* Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
  *  - `pid == -1': Wait for any child process
  *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
  *  - `pid > 0':   Wait for the child whose process ID is equal to `PID'
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.waitpid") pid_t
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.wait.waitpid") pid_t
 NOTHROW_RPC(LIBCCALL libc_waitpid)(pid_t pid,
                                    __WAIT_STATUS stat_loc,
                                    int options)
@@ -84,9 +85,9 @@ NOTHROW_RPC(LIBCCALL libc_waitpid)(pid_t pid,
 }
 /*[[[end:waitpid]]]*/
 
-/*[[[head:waitid,hash:CRC-32=0x98f3d30f]]]*/
+/*[[[head:waitid,hash:CRC-32=0xffcb3874]]]*/
 /* @param options: At least one of `WEXITED|WSTOPPED|WCONTINUED', optionally or'd with `WNOHANG|WNOWAIT' */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.waitid") int
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.wait.waitid") int
 NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype,
                                   id_t id,
                                   siginfo_t *infop,
@@ -107,28 +108,70 @@ NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype,
 }
 /*[[[end:waitid]]]*/
 
-/*[[[head:wait3,hash:CRC-32=0x9c75742b]]]*/
+/*[[[head:wait3,hash:CRC-32=0x24ad66bc]]]*/
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wait3") pid_t
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.wait.wait3") pid_t
 NOTHROW_RPC(LIBCCALL libc_wait3)(__WAIT_STATUS stat_loc,
                                  int options,
                                  struct rusage *usage)
 /*[[[body:wait3]]]*/
 {
 	pid_t result;
+#ifdef SYS_wait4
 	result = sys_wait4(-1,
 	                   (int32_t *)stat_loc,
 	                   (syscall_ulong_t)(unsigned int)options,
 	                   usage);
+#else /* SYS_wait4 */
+	struct rusage64 ru64;
+	result = sys_wait4_64(-1,
+	                      (int32_t *)stat_loc,
+	                      (syscall_ulong_t)(unsigned int)options,
+	                      usage ? &ru64 : NULL);
+	if (E_ISOK(result) && usage)
+		rusage64_to_rusage(&ru64, usage);
+#endif /* !SYS_wait4 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:wait3]]]*/
 
-/*[[[head:wait4,hash:CRC-32=0x3269b18]]]*/
+/*[[[head:wait3_64,hash:CRC-32=0x2e6e7fde]]]*/
+/* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_wait3_64, libc_wait3);
+#else
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.wait.wait3_64") pid_t
+NOTHROW_NCX(LIBCCALL libc_wait3_64)(__WAIT_STATUS stat_loc,
+                                    int options,
+                                    struct __rusage64 *usage)
+/*[[[body:wait3_64]]]*/
+{
+	pid_t result;
+#ifdef SYS_wait4_64
+	result = sys_wait4_64(-1,
+	                      (int32_t *)stat_loc,
+	                      (syscall_ulong_t)(unsigned int)options,
+	                      usage);
+#else /* SYS_wait4_64 */
+	struct rusage32 ru32;
+	result = sys_wait4(-1,
+	                   (int32_t *)stat_loc,
+	                   (syscall_ulong_t)(unsigned int)options,
+	                   usage ? &ru32 : NULL);
+	if (E_ISOK(result) && usage)
+		rusage32_to_rusage64(&ru32, usage);
+#endif /* !SYS_wait4_64 */
+	return libc_seterrno_syserr(result);
+}
+#endif /* MAGIC:alias */
+/*[[[end:wait3_64]]]*/
+
+/*[[[head:wait4,hash:CRC-32=0xda2e018d]]]*/
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wait4") pid_t
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.wait.wait4") pid_t
 NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid,
                                  __WAIT_STATUS stat_loc,
                                  int options,
@@ -136,15 +179,58 @@ NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid,
 /*[[[body:wait4]]]*/
 {
 	pid_t result;
+#ifdef SYS_wait4
 	result = sys_wait4(pid,
 	                   (int32_t *)stat_loc,
 	                   (syscall_ulong_t)(unsigned int)options,
 	                   usage);
+#else /* SYS_wait4 */
+	struct rusage64 ru64;
+	result = sys_wait4_64(pid,
+	                      (int32_t *)stat_loc,
+	                      (syscall_ulong_t)(unsigned int)options,
+	                      usage ? &ru64 : NULL);
+	if (E_ISOK(result) && usage)
+		rusage64_to_rusage(&ru64, usage);
+#endif /* !SYS_wait4 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:wait4]]]*/
 
-/*[[[head:detach,hash:CRC-32=0x9da0d053]]]*/
+/*[[[head:wait4_64,hash:CRC-32=0x61b96143]]]*/
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_wait4_64, libc_wait4);
+#else
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.wait.wait4_64") pid_t
+NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid,
+                                    __WAIT_STATUS stat_loc,
+                                    int options,
+                                    struct __rusage64 *usage)
+/*[[[body:wait4_64]]]*/
+{
+	pid_t result;
+#ifdef SYS_wait4_64
+	result = sys_wait4_64(pid,
+	                      (int32_t *)stat_loc,
+	                      (syscall_ulong_t)(unsigned int)options,
+	                      usage);
+#else /* SYS_wait4_64 */
+	struct rusage32 ru32;
+	result = sys_wait4(pid,
+	                   (int32_t *)stat_loc,
+	                   (syscall_ulong_t)(unsigned int)options,
+	                   usage ? &ru32 : NULL);
+	if (E_ISOK(result) && usage)
+		rusage32_to_rusage64(&ru32, usage);
+#endif /* !SYS_wait4_64 */
+	return libc_seterrno_syserr(result);
+}
+#endif /* MAGIC:alias */
+/*[[[end:wait4_64]]]*/
+
+/*[[[head:detach,hash:CRC-32=0xe16e3749]]]*/
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -209,7 +295,7 @@ NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid,
  * is no way of ensuring that PID still refers to the original thread,
  * as another thread may have been created using the same PID, after
  * the detached thread exited.
- * NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+ * NOTE: If a thread is created using clone() with `CLONE_DETACHED' set,
  *       it will behave effectively as though this function had already
  *       be called.
  * NOTE: If the thread already has terminated, detaching it will kill
@@ -233,7 +319,7 @@ NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid,
  *                              This could mean that it had already been detached
  *                              and exited, or that the `PID' is just invalid (which
  *                              would also be the case if it was valid at some point) */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.detach") int
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.wait.detach") int
 NOTHROW_NCX(LIBCCALL libc_detach)(pid_t pid)
 /*[[[body:detach]]]*/
 {
@@ -247,14 +333,16 @@ NOTHROW_NCX(LIBCCALL libc_detach)(pid_t pid)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xcd64ad8f]]]*/
+/*[[[start:exports,hash:CRC-32=0xddd5ad7c]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(wait, libc_wait);
 DEFINE_PUBLIC_WEAK_ALIAS(__wait, libc_wait);
 DEFINE_PUBLIC_WEAK_ALIAS(waitpid, libc_waitpid);
 DEFINE_PUBLIC_WEAK_ALIAS(__waitpid, libc_waitpid);
 DEFINE_PUBLIC_WEAK_ALIAS(waitid, libc_waitid);
 DEFINE_PUBLIC_WEAK_ALIAS(wait3, libc_wait3);
+DEFINE_PUBLIC_WEAK_ALIAS(wait3_64, libc_wait3_64);
 DEFINE_PUBLIC_WEAK_ALIAS(wait4, libc_wait4);
+DEFINE_PUBLIC_WEAK_ALIAS(wait4_64, libc_wait4_64);
 DEFINE_PUBLIC_WEAK_ALIAS(detach, libc_detach);
 /*[[[end:exports]]]*/
 

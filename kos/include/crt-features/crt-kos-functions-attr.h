@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2644a3 */
+/* HASH CRC-32:0x32324b24 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2937,6 +2937,8 @@
 #define __CRT_ATTR_NOTHROW_NCX_vswscanf 1
 #define __CRT_ATTR_NOTHROW_NCX_vswscanf_s 1
 #define __CRT_ATTR_NOTHROW_NCX_waccess 1
+#define __CRT_ATTR_NOTHROW_NCX_wait3_64 1
+#define __CRT_ATTR_NOTHROW_NCX_wait4_64 1
 #define __CRT_ATTR_NOTHROW_NCX_wchdir 1
 #define __CRT_ATTR_NOTHROW_NCX_wchown 1
 #define __CRT_ATTR_NOTHROW_NCX_wchroot 1
@@ -3797,7 +3799,9 @@
 #define __CRT_ATTR_NOTHROW_RPC_waccess 1
 #define __CRT_ATTR_NOTHROW_RPC_wait 1
 #define __CRT_ATTR_NOTHROW_RPC_wait3 1
+#define __CRT_ATTR_NOTHROW_RPC_wait3_32 1
 #define __CRT_ATTR_NOTHROW_RPC_wait4 1
+#define __CRT_ATTR_NOTHROW_RPC_wait4_32 1
 #define __CRT_ATTR_NOTHROW_RPC_waitid 1
 #define __CRT_ATTR_NOTHROW_RPC_waitpid 1
 #define __CRT_ATTR_NOTHROW_RPC_wchdir 1
