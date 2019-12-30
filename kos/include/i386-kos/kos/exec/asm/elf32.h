@@ -33,10 +33,12 @@
 #ifdef __KERNEL__
 #if defined(__x86_64__) || defined(__i386__)
 #include <kernel/compiler.h>
+
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/types.h>
-#include <sched/iopl.h>
+#include <sched/arch/posix-signal.h>
+
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #ifdef __x86_64__
@@ -122,8 +124,12 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 	gpregs_setpbp(&user_state->ics_gpregs, (__uintptr_t)peb_address); /* ELF_ARCH386_PEB_REGISTER */
 	icpustate_setpc(user_state, (__uintptr_t)entry_pc);
 	icpustate_setuserpsp(user_state, (__uintptr_t)ustack_base + ustack_size);
-	if (!x86_iopl_keep_after_exec)
-		icpustate_mskpflags(user_state, ~0x3000, 0); /* EFLAGS_IOPLMASK */
+	{
+		union x86_user_eflags_mask mask;
+		mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
+		/* Mask eflags for exec() */
+		icpustate_mskpflags(user_state, mask.uem_mask, mask.uem_flag);
+	}
 #ifdef __x86_64__
 	icpustate_setcs(user_state, SEGMENT_USER_CODE32_RPL);
 	icpustate_setss(user_state, SEGMENT_USER_DATA32_RPL);

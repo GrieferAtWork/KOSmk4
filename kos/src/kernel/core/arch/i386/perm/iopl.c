@@ -28,6 +28,7 @@
 #include <kernel/panic.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
+#include <sched/arch/posix-signal.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/iopl.h>
@@ -52,15 +53,11 @@
 
 DECL_BEGIN
 
-
 /* When true, iopl() is kept after fork() (w/o CLONE_THREAD) */
 PUBLIC bool x86_iopl_keep_after_fork = false;
 
 /* When true, iopl() is kept after clone() (w/ CLONE_THREAD) */
 PUBLIC bool x86_iopl_keep_after_clone = true;
-
-/* When true, iopl() is kept after exec() */
-PUBLIC bool x86_iopl_keep_after_exec = false;
 
 INTERN ATTR_FREETEXT void KCALL
 x86_init_keepiopl(char const *__restrict arg) {
@@ -78,7 +75,11 @@ x86_init_keepiopl(char const *__restrict arg) {
 		if (len == 4 && UNALIGNED_GET32((u32 *)arg) == ENCODE_INT32('f', 'o', 'r', 'k')) {
 			x86_iopl_keep_after_fork = setstate;
 		} else if (len == 4 && UNALIGNED_GET32((u32 *)arg) == ENCODE_INT32('e', 'x', 'e', 'c')) {
-			x86_iopl_keep_after_exec = setstate;
+			union x86_user_eflags_mask *mask;
+			mask = (union x86_user_eflags_mask *)&x86_exec_eflags_mask;
+			mask->uem_mask &= ~EFLAGS_IOPLMASK;
+			if (setstate) /* Keep iopl() during exec() */
+				mask->uem_mask |= EFLAGS_IOPLMASK;
 		} else if (len == 5 && UNALIGNED_GET32((u32 *)arg) == ENCODE_INT32('c', 'l', 'o', 'n') && arg[4] == 'e') {
 			x86_iopl_keep_after_clone = setstate;
 		} else {

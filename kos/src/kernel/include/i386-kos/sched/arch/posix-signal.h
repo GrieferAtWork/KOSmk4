@@ -1,0 +1,59 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_POSIX_SIGNAL_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_POSIX_SIGNAL_H 1
+
+#include <kernel/compiler.h>
+
+#include <kernel/types.h>
+#include <sched/atomic64.h>
+
+#ifdef __CC__
+DECL_BEGIN
+
+/* NOTE: Mask/Flag pair used to modify eflags when calling into user-space:
+ *  - raise(): A user-space posix signal handler is invoked
+ *  - THROW(): A user-space exception handler (s.a. `set_exception_handler()') is called
+ * This descriptor is mainly used to ensure SysV ABI compliance when it
+ * comes to clearing the #DF flag before calling a user-space function.
+ * This mask/flag pair can be modified by:
+ *  - Passing a `user_eflags_mask=mask,flag' kernel commandline option
+ *  - Reading/writing to/from `/proc/sys/x86/user_eflags_mask'
+ * NOTE: The later only allows changes to be made to EFLAGS bits
+ *       that aren't reserved and don't carry the `(System)' tag. */
+union x86_user_eflags_mask {
+	struct {
+		uint32_t uem_mask; /* Set of bits masked */
+		uint32_t uem_flag; /* Set of bits set */
+	};
+	uint64_t uem_word;
+};
+
+DATDEF struct atomic64 x86_user_eflags_mask;
+/* Same as `x86_user_eflags_mask', but used during exec()
+ * May be set by:
+ *  - Passing a `exec_eflags_mask=mask,flag' kernel commandline option
+ *  - Reading/writing to/from `/proc/sys/x86/exec_eflags_mask'
+ *  - Reading/writing to/from `/proc/sys/x86/keepiopl/exec' */
+DATDEF struct atomic64 x86_exec_eflags_mask;
+
+DECL_END
+#endif /* __CC__ */
+
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_POSIX_SIGNAL_H */

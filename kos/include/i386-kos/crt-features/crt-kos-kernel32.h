@@ -2389,6 +2389,7 @@
 #define __CRT_HAVE_x86_emulock_cmpxchg32 1
 #define __CRT_HAVE_x86_emulock_cmpxchg64 1
 #define __CRT_HAVE_x86_emulock_cmpxchg8 1
+#define __CRT_HAVE_x86_exec_eflags_mask 1
 #define __CRT_HAVE_x86_fpustate_init 1
 #define __CRT_HAVE_x86_fpustate_load 1
 #define __CRT_HAVE_x86_fpustate_save 1
@@ -2406,7 +2407,6 @@
 #define __CRT_HAVE_x86_idt_syscall 1
 #define __CRT_HAVE_x86_idt_syscall_traced 1
 #define __CRT_HAVE_x86_iopl_keep_after_clone 1
-#define __CRT_HAVE_x86_iopl_keep_after_exec 1
 #define __CRT_HAVE_x86_iopl_keep_after_fork 1
 #define __CRT_HAVE_x86_lapicbase 1
 #define __CRT_HAVE_x86_memcpy_nopf 1
@@ -2431,6 +2431,7 @@
 #define __CRT_HAVE_x86_sysroute1_asm32_int80 1
 #define __CRT_HAVE_x86_sysroute1_asm32_sysenter 1
 #define __CRT_HAVE_x86_sysroute1_c 1
+#define __CRT_HAVE_x86_user_eflags_mask 1
 #define __CRT_HAVE_x86_userexcept_callhandler 1
 #define __CRT_HAVE_x86_userexcept_propagate 1
 #define __CRT_HAVE_x86_userexcept_raisesignal 1

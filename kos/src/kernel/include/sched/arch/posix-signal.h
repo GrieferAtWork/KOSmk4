@@ -16,38 +16,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_IOPL_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_IOPL_H 1
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_ARCH_POSIX_SIGNAL_H
+#define GUARD_KERNEL_INCLUDE_SCHED_ARCH_POSIX_SIGNAL_H 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/types.h>
-
-DECL_BEGIN
-
-#ifdef __CC__
-
-/* When true, iopl() is kept after fork() (w/o CLONE_THREAD) */
-DATDEF bool x86_iopl_keep_after_fork;
-
-/* When true, iopl() is kept after clone() (w/ CLONE_THREAD) */
-DATDEF bool x86_iopl_keep_after_clone;
-
-struct task;
-
-/* Get/Set the iopl() value of the given thread.
- * @return: * : All functions return the iopl() active prior to the call being made. */
-FUNDEF unsigned int KCALL
-x86_getiopl(struct task *__restrict thread)
-		THROWS(E_WOULDBLOCK);
-FUNDEF unsigned int KCALL
-x86_setiopl(struct task *__restrict thread,
-            unsigned int new_iopl,
-            bool check_creds DFL(true))
-		THROWS(E_WOULDBLOCK, E_INSUFFICIENT_RIGHTS);
-
-#endif /* __CC__ */
-
-DECL_END
-
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_IOPL_H */
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_ARCH_POSIX_SIGNAL_H */

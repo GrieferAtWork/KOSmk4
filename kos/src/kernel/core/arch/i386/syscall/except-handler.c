@@ -129,6 +129,12 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_error); /* struct exception_data64 *__restrict error */
 	icpustate_setuserpsp(state, (uintptr_t)user_error);
 	icpustate_setpc(state, (uintptr_t)(void *)handler);
+	{
+		union x86_user_eflags_mask word;
+		word.uem_word = atomic64_read(&x86_user_eflags_mask);
+		/* Mask %eflags, as specified by `x86_user_eflags_mask' */
+		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
+	}
 	COMPILER_WRITE_BARRIER();
 	/* Disable exception handling in one-shot mode. */
 	if (mode & EXCEPT_HANDLER_FLAG_ONESHOT) {
@@ -191,6 +197,12 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_error); /* struct exception_data32 *__restrict error */
 	icpustate_setuserpsp(state, (uintptr_t)user_error);
 	icpustate_setpc(state, (uintptr_t)(void *)handler);
+	{
+		union x86_user_eflags_mask word;
+		word.uem_word = atomic64_read(&x86_user_eflags_mask);
+		/* Mask %eflags, as specified by `x86_user_eflags_mask' */
+		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
+	}
 	COMPILER_WRITE_BARRIER();
 	/* Disable exception handling in one-shot mode. */
 	if (mode & EXCEPT_HANDLER_FLAG_ONESHOT) {

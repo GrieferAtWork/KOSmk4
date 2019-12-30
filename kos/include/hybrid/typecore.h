@@ -1117,7 +1117,9 @@
 #if !defined(_MSC_VER) && !defined(__INTELLISENSE__)
 #include "host.h"
 #if defined(__i386__) && !defined(__x86_64__)
-/* GCC (and I think SysV) says that 64-bit integers on i386 are aligned by 4 bytes. */
+/* On i386, `-mno-align-double' is the ABI default, which causes `long long'
+ * and `double' to have 4-byte alignment, rather than be 8-byte aligned!
+ * s.a. `https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html#index-malign-double' */
 #define __ALIGNOF_INT64__ 4
 #endif /* __i386__ && !__x86_64__ */
 #endif /* __GNUC__ && !__INTELLISENSE__ */

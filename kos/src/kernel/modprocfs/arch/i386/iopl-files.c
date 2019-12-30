@@ -24,12 +24,14 @@
 
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <sched/arch/posix-signal.h>
 #include <sched/cred.h>
 #include <sched/iopl.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
 
+#include <asm/cpu-flags.h>
 #include <kos/except-inval.h>
 
 #include <string.h>
@@ -93,13 +95,30 @@ ProcFS_Sys_X86_KeepIopl_Clone_Write(struct regular_node *__restrict UNUSED(self)
 INTERN NONNULL((1)) ssize_t KCALL
 ProcFS_Sys_X86_KeepIopl_Exec_Print(struct regular_node *__restrict UNUSED(self),
                                    pformatprinter printer, void *arg) {
-	return ProcFS_PrintBool(printer, arg, x86_iopl_keep_after_exec);
+	bool keep;
+	union x86_user_eflags_mask mask;
+	mask.uem_word = atomic64_read(&x86_exec_eflags_mask);
+	keep = (mask.uem_mask & EFLAGS_IOPLMASK) == EFLAGS_IOPLMASK;
+	return ProcFS_PrintBool(printer, arg, keep);
 }
 INTERN NONNULL((1)) void KCALL
 ProcFS_Sys_X86_KeepIopl_Exec_Write(struct regular_node *__restrict UNUSED(self),
                                    USER CHECKED void const *buf,
                                    size_t bufsize) {
-	KeepIopl_Write(buf, bufsize, &x86_iopl_keep_after_exec);
+	bool keep;
+	union x86_user_eflags_mask oldmask, newmask;
+	KeepIopl_Write(buf, bufsize, &keep);
+	for (;;) {
+		oldmask.uem_word = atomic64_read(&x86_exec_eflags_mask);
+		newmask.uem_word = oldmask.uem_word;
+		newmask.uem_mask &= ~EFLAGS_IOPLMASK;
+		if (keep)
+			newmask.uem_mask |= EFLAGS_IOPLMASK;
+		if (oldmask.uem_mask == newmask.uem_mask)
+			break; /* Unchanged. */
+		if (atomic64_cmpxch(&x86_exec_eflags_mask, oldmask.uem_word, newmask.uem_word))
+			break;
+	}
 }
 
 

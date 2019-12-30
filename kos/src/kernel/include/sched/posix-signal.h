@@ -24,6 +24,7 @@
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
+#include <sched/arch/posix-signal.h>
 #include <sched/pertask.h>
 #include <sched/signal.h>
 
@@ -31,11 +32,11 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/sigevent.h>
+#include <bits/siginfo-struct.h>
 #include <bits/siginfo.h>
 #include <bits/signum.h>
 #include <bits/sigset.h>
 #include <bits/waitstatus.h>
-#include <bits/siginfo-struct.h>
 
 #include <libc/string.h>
 

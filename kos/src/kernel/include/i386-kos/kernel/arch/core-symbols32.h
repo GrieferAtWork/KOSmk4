@@ -4015,9 +4015,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname1003 /* index: 1003 */
-	.weak x86_pit_lock; .long x86_pit_lock
-	.reloc ., R_386_SIZE32, x86_pit_lock; .int 0
-	.int 0x73ff3eb
+	.weak x86_exec_eflags_mask; .long x86_exec_eflags_mask
+	.reloc ., R_386_SIZE32, x86_exec_eflags_mask; .int 0
+	.int 0xa2c23eb
 	.long 0 /* index: 1004 */
 	.long 0
 	.int 0
@@ -4718,10 +4718,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak unicode_16to32; .long unicode_16to32
 	.reloc ., R_386_SIZE32, unicode_16to32; .int 0
 	.int 0x6b80f12
-	.long 0 /* index: 1179 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname1179 /* index: 1179 */
+	.weak x86_user_eflags_mask; .long x86_user_eflags_mask
+	.reloc ., R_386_SIZE32, x86_user_eflags_mask; .int 0
+	.int 0x329249b
 	.long 0 /* index: 1180 */
 	.long 0
 	.int 0
@@ -4750,10 +4750,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_epoll_ctl; .long sys_epoll_ctl
 	.reloc ., R_386_SIZE32, sys_epoll_ctl; .int 0
 	.int 0xf39068c
-	.long .Lname1187 /* index: 1187 */
-	.weak x86_iopl_keep_after_exec; .long x86_iopl_keep_after_exec
-	.reloc ., R_386_SIZE32, x86_iopl_keep_after_exec; .int 0
-	.int 0x1cb14a3
+	.long 0 /* index: 1187 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname1188 /* index: 1188 */
 	.weak sys_getegid; .long sys_getegid
 	.reloc ., R_386_SIZE32, sys_getegid; .int 0
@@ -7694,10 +7694,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_getgroups32; .long sys_getgroups32
 	.reloc ., R_386_SIZE32, sys_getgroups32; .int 0
 	.int 0x231c782
-	.long 0 /* index: 1923 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname1923 /* index: 1923 */
+	.weak x86_pit_lock; .long x86_pit_lock
+	.reloc ., R_386_SIZE32, x86_pit_lock; .int 0
+	.int 0x73ff3eb
 	.long 0 /* index: 1924 */
 	.long 0
 	.int 0
@@ -17589,7 +17589,7 @@ END(kernel_symbol_table)
 .Lname1001:
 	.string "x86_pagedir_syncall_maybe_global"
 .Lname1003:
-	.string "x86_pit_lock"
+	.string "x86_exec_eflags_mask"
 .Lname1005:
 	.string "validate_userm"
 .Lname1007:
@@ -17794,12 +17794,12 @@ END(kernel_symbol_table)
 	.string "dbg_getuni"
 .Lname1178:
 	.string "unicode_16to32"
+.Lname1179:
+	.string "x86_user_eflags_mask"
 .Lname1183:
 	.string "sys_setfsgid"
 .Lname1186:
 	.string "sys_epoll_ctl"
-.Lname1187:
-	.string "x86_iopl_keep_after_exec"
 .Lname1188:
 	.string "sys_getegid"
 .Lname1189:
@@ -18642,6 +18642,8 @@ END(kernel_symbol_table)
 	.string "sys_idle"
 .Lname1922:
 	.string "sys_getgroups32"
+.Lname1923:
+	.string "x86_pit_lock"
 .Lname1925:
 	.string "debuginfo_cu_parser_loadattr_inlined_subroutine"
 .Lname1929:

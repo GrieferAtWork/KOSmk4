@@ -61,6 +61,11 @@
 
 DECL_BEGIN
 
+#define WORD64(a, b) (u64)((u64)(u32)(a) | (u64)(u32)(b) << 32)
+PUBLIC struct atomic64 x86_user_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF), 0));
+PUBLIC struct atomic64 x86_exec_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF | EFLAGS_IOPLMASK), 0));
+#undef WORD64
+
 #ifdef __x86_64__
 #define SYSCALL_VECTOR_SIGRETURN64 __NR_rt_sigreturn
 #define SYSCALL_VECTOR_SIGRETURN32 __NR32_sigreturn
@@ -338,21 +343,18 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	 *       Note also that we can only use callee-preserve registers
 	 *       here, as all other registers may be clobbered by the signal
 	 *       handler itself. */
-#ifdef __x86_64__
-	state->ics_gpregs.gp_rbp = (u32)(uintptr_t)&user_ucontext->uc_mcontext.mc_context;
-	state->ics_gpregs.gp_rbx = (u32)(uintptr_t)user_fpustate;
-	state->ics_gpregs.gp_rsi = (u32)(uintptr_t)(must_restore_sigmask ? user_sigset : NULL);
-	state->ics_gpregs.gp_rdi = (u32)(uintptr_t)user_sc_info;
-	irregs_wrip(&state->ics_irregs, (u32)(uintptr_t)action->sa_handler);
-	irregs_wrsp(&state->ics_irregs, (u32)(uintptr_t)usp);
-#else /* __x86_64__ */
-	state->ics_gpregs.gp_ebp = (uintptr_t)&user_ucontext->uc_mcontext.mc_context;
-	state->ics_gpregs.gp_ebx = (uintptr_t)user_fpustate;
-	state->ics_gpregs.gp_esi = (uintptr_t)(must_restore_sigmask ? user_sigset : NULL);
-	state->ics_gpregs.gp_edi = (uintptr_t)user_sc_info;
-	irregs_wrip(&state->ics_irregs_k, (uintptr_t)action->sa_handler);
-	state->ics_irregs_u.ir_esp = (uintptr_t)usp;
-#endif /* !__x86_64__ */
+	gpregs_setpbp(&state->ics_gpregs, (u32)(uintptr_t)&user_ucontext->uc_mcontext.mc_context);
+	gpregs_setpbx(&state->ics_gpregs, (u32)(uintptr_t)user_fpustate);
+	gpregs_setpsi(&state->ics_gpregs, (u32)(uintptr_t)(must_restore_sigmask ? user_sigset : NULL));
+	gpregs_setpdi(&state->ics_gpregs, (u32)(uintptr_t)user_sc_info);
+	icpustate_setpc(state, (u32)(uintptr_t)action->sa_handler);
+	icpustate_setuserpsp(state, (u32)(uintptr_t)usp);
+	{
+		union x86_user_eflags_mask word;
+		word.uem_word = atomic64_read(&x86_user_eflags_mask);
+		/* Mask %eflags, as specified by `x86_user_eflags_mask' */
+		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
+	}
 	return state;
 }
 
