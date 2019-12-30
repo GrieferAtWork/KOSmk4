@@ -114,8 +114,17 @@ got_field:
 			continue;
 		}
 		local struct_pos = l.find("struct");
-		if (struct_pos >= 0) {
+		local isUnion = false;
+		if (struct_pos < 0) {
+			struct_pos = l.find("union");
+			if (struct_pos >= 0) {
+				l = l[struct_pos + #"union":].lstrip();
+				isUnion = true;
+			}
+		} else {
 			l = l[struct_pos + #"struct":].lstrip();
+		}
+		if (struct_pos >= 0) {
 			for (;;) {
 				local new_l = l;
 				for (local attr: { "__ATTR_PACKED", "ATTR_PACKED" })
@@ -170,7 +179,7 @@ got_field:
 					}
 				}
 				if (l.startswith("{")) {
-					name = (name,macro_name);
+					name = (name,macro_name,isUnion);
 					if (name !in knownStructs)
 						knownStructs.append(name);
 				} else {
@@ -182,9 +191,10 @@ got_field:
 		}
 	}
 	/* Generate assertions for all structures. */
-	for (local typ, macro_typ: knownStructs) {
+	for (local typ, macro_typ, isUnion: knownStructs) {
+		local struct_prefix = isUnion ? "union" : "struct";
 		print;
-		print "/* struct", typ, "*/";
+		print "/*", struct_prefix, typ, "*/";
 		@@Mapping from UPPERCASE_FIELD_NAME -> MACRO
 		local knownFields: {string: string} = Dict();
 		for (local pat: OFFSET_MACRO_PATTERNS) {
@@ -232,7 +242,7 @@ got_field:
 				if (f in ["tv_64_nsec", "tv_64_sec", "tv_64_usec"])
 					continue; /* HACK */
 				print assertOffsetMacro.format({
-					.typ   = "struct " + typ,
+					.typ   = struct_prefix + " " + typ,
 					.field = f.strip(),
 					.value = macro,
 				}),;
@@ -243,7 +253,7 @@ got_field:
 			local macro_name = pat.format({ .typ = typ.upper() });
 			if (macro_name in knownMacros) {
 				print assertSizeofMacro.format({
-					.typ   = "struct " + typ,
+					.typ   = struct_prefix + " " + typ,
 					.value = macro_name,
 				}),;
 				didSomething = true;
@@ -254,7 +264,7 @@ got_field:
 			local macro_name = pat.format({ .typ = typ.upper() });
 			if (macro_name in knownMacros) {
 				print assertAlignofMacro.format({
-					.typ   = "struct " + typ,
+					.typ   = struct_prefix + " " + typ,
 					.value = macro_name,
 				}),;
 				didSomething = true;

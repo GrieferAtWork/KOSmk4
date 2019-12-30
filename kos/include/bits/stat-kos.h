@@ -27,6 +27,12 @@
 #include <bits/timespec.h>
 #include <bits/types.h>
 
+#ifndef __WANT_FULL_STRUCT_STAT
+#if !defined(__KERNEL__) || !defined(__KOS__)
+#define __WANT_FULL_STRUCT_STAT 1
+#endif /* !__KERNEL__ || !__KOS__ */
+#endif /* !__WANT_FULL_STRUCT_STAT */
+
 #ifdef __KOS__
 #ifndef __stat_defined
 #define __stat_defined 1
@@ -77,6 +83,7 @@
 #ifdef __USE_LARGEFILE64
 #ifndef __stat64_defined
 #define __stat64_defined 1
+#undef __kos_stat_alias64
 #define __kos_stat_alias64 stat64
 #define __OFFSET_STAT64_DEV         __OFFSET_KOS_STAT_DEV
 #define __OFFSET_STAT64_INO         __OFFSET_KOS_STAT_INO
@@ -128,7 +135,7 @@
 #define _STATBUF_ST_NSEC     1
 #define _STATBUF_ST_BLKSIZE  1
 #define _STATBUF_ST_RDEV     1
-#if defined(__USE_KOS) && !(defined(__KERNEL__) && defined(__KOS__))
+#if defined(__USE_KOS) && defined(__WANT_FULL_STRUCT_STAT)
 #define _STATBUF_ST_INO32      1
 #define _STATBUF_ST_INO64      1
 #define _STATBUF_ST_SIZE32     1
@@ -145,7 +152,7 @@
 #define _STATBUF_ST_TIME64     1
 #define _STATBUF_ST_NSEC32     1
 #define _STATBUF_ST_NSEC64     1
-#endif /* __USE_KOS && !(__KERNEL__ && __KOS__) */
+#endif /* __USE_KOS && __WANT_FULL_STRUCT_STAT */
 
 #endif /* __KOS__ */
 
@@ -238,7 +245,7 @@ __DECL_BEGIN
 	}
 #endif
 
-struct __kos_stat /*[PREFIX(st_)]*/ {
+struct __kos_stat /*[PREFIX(st_)][NAME(kos_stat)]*/ {
 	__dev_t          st_dev;
 	__FS_INT64_FIELD(st_ino, __ino32_t, __ino64_t);
 	__mode_t         st_mode;
@@ -267,7 +274,7 @@ struct __kos_stat /*[PREFIX(st_)]*/ {
 			__TM_TYPE(time)   st_atime;
 			__syscall_ulong_t st_atimensec;
 		};
-#if defined(__USE_KOS) && !(defined(__KERNEL__) && defined(__KOS__))
+#if defined(__USE_KOS) && defined(__WANT_FULL_STRUCT_STAT)
 #ifdef __USE_XOPEN2K8
 		struct __timespec32 st_atim32;
 		struct __timespec64 st_atim64;
@@ -282,7 +289,7 @@ struct __kos_stat /*[PREFIX(st_)]*/ {
 			__time64_t        st_atime64;
 			__syscall_ulong_t st_atimensec64;
 		};
-#endif /* __USE_KOS && !(__KERNEL__ && __KOS__) */
+#endif /* __USE_KOS && __WANT_FULL_STRUCT_STAT */
 	};
 	union {
 #ifdef __USE_XOPEN2K8
@@ -293,7 +300,7 @@ struct __kos_stat /*[PREFIX(st_)]*/ {
 			__TM_TYPE(time)   st_mtime;
 			__syscall_ulong_t st_mtimensec;
 		};
-#if defined(__USE_KOS) && !(defined(__KERNEL__) && defined(__KOS__))
+#if defined(__USE_KOS) && defined(__WANT_FULL_STRUCT_STAT)
 #ifdef __USE_XOPEN2K8
 		struct __timespec32 st_mtim32;
 		struct __timespec64 st_mtim64;
@@ -308,7 +315,7 @@ struct __kos_stat /*[PREFIX(st_)]*/ {
 			__time64_t        st_mtime64;
 			__syscall_ulong_t st_mtimensec64;
 		};
-#endif /* __USE_KOS && !(__KERNEL__ && __KOS__) */
+#endif /* __USE_KOS && __WANT_FULL_STRUCT_STAT */
 	};
 	union {
 #ifdef __USE_XOPEN2K8
@@ -319,7 +326,7 @@ struct __kos_stat /*[PREFIX(st_)]*/ {
 			__TM_TYPE(time)   st_ctime;
 			__syscall_ulong_t st_ctimensec;
 		};
-#if defined(__USE_KOS) && !(defined(__KERNEL__) && defined(__KOS__))
+#if defined(__USE_KOS) && defined(__WANT_FULL_STRUCT_STAT)
 #ifdef __USE_XOPEN2K8
 		struct __timespec32 st_ctim32;
 		struct __timespec64 st_ctim64;
@@ -334,10 +341,10 @@ struct __kos_stat /*[PREFIX(st_)]*/ {
 			__time64_t        st_ctime64;
 			__syscall_ulong_t st_ctimensec64;
 		};
-#endif /* __USE_KOS && !(__KERNEL__ && __KOS__) */
+#endif /* __USE_KOS && __WANT_FULL_STRUCT_STAT */
 	};
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#if defined(__KERNEL__) && defined(__KOS__)
+#ifndef __WANT_FULL_STRUCT_STAT
 	struct __timespec32 __st_atimespec32;
 	struct __timespec32 __st_mtimespec32;
 	struct __timespec32 __st_ctimespec32;
@@ -371,7 +378,7 @@ struct __kos_stat /*[PREFIX(st_)]*/ {
 			__syscall_ulong_t st_ctimensec;
 		};
 	};
-#else /* __KERNEL__ && __KOS__ */
+#else /* __WANT_FULL_STRUCT_STAT */
 	/* struct __timespec32 st_atimespec32; */
 #if defined(__USE_KOS) || !defined(__USE_TIME_BITS64)
 	union {
@@ -534,7 +541,7 @@ struct __kos_stat /*[PREFIX(st_)]*/ {
 #else /* __USE_KOS || !__USE_TIME_BITS64 */
 	struct __timespec64 __st_ctimespec64;
 #endif /* !__USE_KOS && __USE_TIME_BITS64 */
-#endif /* !__KERNEL__ || !__KOS__ */
+#endif /* __WANT_FULL_STRUCT_STAT */
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 };
 
@@ -543,17 +550,17 @@ struct __kos_stat /*[PREFIX(st_)]*/ {
 
 
 #ifdef __kos_stat_alias64
-#if defined(__USE_KOS) && !(defined(__KERNEL__) && defined(__KOS__))
+#if defined(__USE_KOS) && defined(__WANT_FULL_STRUCT_STAT)
 #define __FS_INT64_FIELD(name, T32, T64) \
 	union {                              \
 		T64 name;                        \
 		T32 name##32;                    \
 		T64 name##64;                    \
 	}
-#else /* __USE_KOS && !(__KERNEL__ && __KOS__) */
+#else /* __USE_KOS && __WANT_FULL_STRUCT_STAT */
 #define __FS_INT64_FIELD(name, T32, T64) T64 name
-#endif /* !__USE_KOS || (__KERNEL__ && __KOS__) */
-struct __kos_stat_alias64 /*[PREFIX(st_)]*/ {
+#endif /* !__USE_KOS || !__WANT_FULL_STRUCT_STAT */
+struct __kos_stat_alias64 /*[PREFIX(st_)][NAME(kos_stat)]*/ {
 	__dev_t          st_dev;
 	__FS_INT64_FIELD(st_ino, __ino32_t, __ino64_t);
 	__mode_t         st_mode;
@@ -582,7 +589,7 @@ struct __kos_stat_alias64 /*[PREFIX(st_)]*/ {
 			__TM_TYPE(time)   st_atime;
 			__syscall_ulong_t st_atimensec;
 		};
-#if defined(__USE_KOS) && !(defined(__KERNEL__) && defined(__KOS__))
+#if defined(__USE_KOS) && defined(__WANT_FULL_STRUCT_STAT)
 #ifdef __USE_XOPEN2K8
 		struct __timespec32 st_atim32;
 		struct __timespec64 st_atim64;
@@ -597,7 +604,7 @@ struct __kos_stat_alias64 /*[PREFIX(st_)]*/ {
 			__time64_t        st_atime64;
 			__syscall_ulong_t st_atimensec64;
 		};
-#endif /* __USE_KOS && !(__KERNEL__ && __KOS__) */
+#endif /* __USE_KOS && __WANT_FULL_STRUCT_STAT */
 	};
 	union {
 #ifdef __USE_XOPEN2K8
@@ -608,7 +615,7 @@ struct __kos_stat_alias64 /*[PREFIX(st_)]*/ {
 			__TM_TYPE(time)   st_mtime;
 			__syscall_ulong_t st_mtimensec;
 		};
-#if defined(__USE_KOS) && !(defined(__KERNEL__) && defined(__KOS__))
+#if defined(__USE_KOS) && defined(__WANT_FULL_STRUCT_STAT)
 #ifdef __USE_XOPEN2K8
 		struct __timespec32 st_mtim32;
 		struct __timespec64 st_mtim64;
@@ -623,7 +630,7 @@ struct __kos_stat_alias64 /*[PREFIX(st_)]*/ {
 			__time64_t        st_mtime64;
 			__syscall_ulong_t st_mtimensec64;
 		};
-#endif /* __USE_KOS && !(__KERNEL__ && __KOS__) */
+#endif /* __USE_KOS && __WANT_FULL_STRUCT_STAT */
 	};
 	union {
 #ifdef __USE_XOPEN2K8
@@ -634,7 +641,7 @@ struct __kos_stat_alias64 /*[PREFIX(st_)]*/ {
 			__TM_TYPE(time)   st_ctime;
 			__syscall_ulong_t st_ctimensec;
 		};
-#if defined(__USE_KOS) && !(defined(__KERNEL__) && defined(__KOS__))
+#if defined(__USE_KOS) && defined(__WANT_FULL_STRUCT_STAT)
 #ifdef __USE_XOPEN2K8
 		struct __timespec32 st_ctim32;
 		struct __timespec64 st_ctim64;
@@ -649,10 +656,10 @@ struct __kos_stat_alias64 /*[PREFIX(st_)]*/ {
 			__time64_t        st_ctime64;
 			__syscall_ulong_t st_ctimensec64;
 		};
-#endif /* __USE_KOS && !(__KERNEL__ && __KOS__) */
+#endif /* __USE_KOS && __WANT_FULL_STRUCT_STAT */
 	};
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#if defined(__KERNEL__) && defined(__KOS__)
+#ifndef __WANT_FULL_STRUCT_STAT
 	struct __timespec32 __st_atimespec32;
 	struct __timespec32 __st_mtimespec32;
 	struct __timespec32 __st_ctimespec32;
@@ -686,7 +693,7 @@ struct __kos_stat_alias64 /*[PREFIX(st_)]*/ {
 			__syscall_ulong_t st_ctimensec;
 		};
 	};
-#else /* __KERNEL__ && __KOS__ */
+#else /* !__WANT_FULL_STRUCT_STAT */
 	/* struct __timespec32 st_atimespec32; */
 #if defined(__USE_KOS) || !defined(__USE_TIME_BITS64)
 	union {
@@ -849,7 +856,7 @@ struct __kos_stat_alias64 /*[PREFIX(st_)]*/ {
 #else /* __USE_KOS || !__USE_TIME_BITS64 */
 	struct __timespec64 __st_ctimespec64;
 #endif /* !__USE_KOS && __USE_TIME_BITS64 */
-#endif /* !__KERNEL__ || !__KOS__ */
+#endif /* __WANT_FULL_STRUCT_STAT */
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 };
 #undef __FS_INT64_FIELD
