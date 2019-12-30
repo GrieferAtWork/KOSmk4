@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd0cbf7 */
+/* HASH CRC-32:0xdba5091c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 #include <bits/sigaction-struct.h>
 #include <bits/sigaction-struct32.h>
 #include <bits/siginfo-struct32.h>
+#include <bits/stat-kos32.h>
 #include <bits/statfs.h>
 #include <bits/timespec32.h>
 #include <bits/timeval32.h>
@@ -43,6 +44,7 @@
 #include <kos/bits/except-handler32.h>
 #include <kos/bits/exception_data32.h>
 #include <kos/bits/futex-expr32.h>
+#include <kos/compat/linux-stat.h>
 #include <kos/exec/bits/library-listdef32.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
@@ -78,13 +80,11 @@
 __SYSDECL_BEGIN
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("dirent")
-#pragma push_macro("stat")
 #pragma push_macro("timezone")
+#pragma push_macro("dirent")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef dirent
-#undef stat
 #undef timezone
+#undef dirent
 
 struct __cpu_set_struct;
 struct __fd_set_struct;
@@ -92,6 +92,7 @@ struct __itimerspecx32;
 struct __itimerspecx32_64;
 struct __itimerval32;
 struct __itimerval64;
+struct __kos_statx32;
 struct __rusagex32;
 struct __rusagex32_64;
 struct __siginfo32_struct;
@@ -138,7 +139,6 @@ struct sigaction32;
 struct sigaltstack32;
 struct sigevent;
 struct sockaddr;
-struct stat;
 struct statfs64;
 struct sysinfo;
 struct termios;
@@ -805,18 +805,18 @@ __CDECLARE_SC(,__errno_t,kexec_load,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,keyctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(keyctl) */
 #if __CRT_HAVE_SC(kfstat)
-__CDECLARE_SC(,__errno_t,kfstat,(__fd_t __fd, struct stat *__statbuf),(__fd,__statbuf))
+__CDECLARE_SC(,__errno_t,kfstat,(__fd_t __fd, struct __kos_statx32 *__statbuf),(__fd,__statbuf))
 #endif /* __CRT_HAVE_SC(kfstat) */
 #if __CRT_HAVE_SC(kfstatat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct stat *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
+__CDECLARE_SC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct __kos_statx32 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_SC(kfstatat) */
 #if __CRT_HAVE_SC(kill)
 /* @param: signo: One of `SIG*' */
 __CDECLARE_SC(,__errno_t,kill,(__pid_t __pid, __syscall_ulong_t __signo),(__pid,__signo))
 #endif /* __CRT_HAVE_SC(kill) */
 #if __CRT_HAVE_SC(klstat)
-__CDECLARE_SC(,__errno_t,klstat,(char const *__filename, struct stat *__statbuf),(__filename,__statbuf))
+__CDECLARE_SC(,__errno_t,klstat,(char const *__filename, struct __kos_statx32 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(klstat) */
 #if __CRT_HAVE_SC(kreaddir)
 __CDECLARE_SC(,__ssize_t,kreaddir,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode),(__fd,__buf,__bufsize,__mode))
@@ -825,7 +825,7 @@ __CDECLARE_SC(,__ssize_t,kreaddir,(__fd_t __fd, struct dirent *__buf, __size_t _
 __CDECLARE_SC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode, __iomode_t __iomode),(__fd,__buf,__bufsize,__mode,__iomode))
 #endif /* __CRT_HAVE_SC(kreaddirf) */
 #if __CRT_HAVE_SC(kstat)
-__CDECLARE_SC(,__errno_t,kstat,(char const *__filename, struct stat *__statbuf),(__filename,__statbuf))
+__CDECLARE_SC(,__errno_t,kstat,(char const *__filename, struct __kos_statx32 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(kstat) */
 #if __CRT_HAVE_SC(ksysctl)
 __CDECLARE_SC(,__syscall_slong_t,ksysctl,(__syscall_ulong_t __command, void *__arg),(__command,__arg))
@@ -2489,18 +2489,18 @@ __CDECLARE_XSC(,__errno_t,kexec_load,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,keyctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(keyctl) */
 #if __CRT_HAVE_XSC(kfstat)
-__CDECLARE_XSC(,__errno_t,kfstat,(__fd_t __fd, struct stat *__statbuf),(__fd,__statbuf))
+__CDECLARE_XSC(,__errno_t,kfstat,(__fd_t __fd, struct __kos_statx32 *__statbuf),(__fd,__statbuf))
 #endif /* __CRT_HAVE_XSC(kfstat) */
 #if __CRT_HAVE_XSC(kfstatat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct stat *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
+__CDECLARE_XSC(,__errno_t,kfstatat,(__fd_t __dirfd, char const *__filename, struct __kos_statx32 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_XSC(kfstatat) */
 #if __CRT_HAVE_XSC(kill)
 /* @param: signo: One of `SIG*' */
 __CDECLARE_XSC(,__errno_t,kill,(__pid_t __pid, __syscall_ulong_t __signo),(__pid,__signo))
 #endif /* __CRT_HAVE_XSC(kill) */
 #if __CRT_HAVE_XSC(klstat)
-__CDECLARE_XSC(,__errno_t,klstat,(char const *__filename, struct stat *__statbuf),(__filename,__statbuf))
+__CDECLARE_XSC(,__errno_t,klstat,(char const *__filename, struct __kos_statx32 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(klstat) */
 #if __CRT_HAVE_XSC(kreaddir)
 __CDECLARE_XSC(,__ssize_t,kreaddir,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode),(__fd,__buf,__bufsize,__mode))
@@ -2509,7 +2509,7 @@ __CDECLARE_XSC(,__ssize_t,kreaddir,(__fd_t __fd, struct dirent *__buf, __size_t 
 __CDECLARE_XSC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode, __iomode_t __iomode),(__fd,__buf,__bufsize,__mode,__iomode))
 #endif /* __CRT_HAVE_XSC(kreaddirf) */
 #if __CRT_HAVE_XSC(kstat)
-__CDECLARE_XSC(,__errno_t,kstat,(char const *__filename, struct stat *__statbuf),(__filename,__statbuf))
+__CDECLARE_XSC(,__errno_t,kstat,(char const *__filename, struct __kos_statx32 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(kstat) */
 #if __CRT_HAVE_XSC(ksysctl)
 __CDECLARE_XSC(,__syscall_slong_t,ksysctl,(__syscall_ulong_t __command, void *__arg),(__command,__arg))
@@ -3508,9 +3508,8 @@ __CDECLARE_XSC(,__ssize_t,writevf,(__fd_t __fd, struct iovec32 const *__iovec, _
 #endif /* __CRT_HAVE_XSC(writevf) */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("timezone")
-#pragma pop_macro("stat")
 #pragma pop_macro("dirent")
+#pragma pop_macro("timezone")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 

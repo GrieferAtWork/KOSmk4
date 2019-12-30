@@ -305,10 +305,18 @@ typedef __CRT_PRIVATE_SLNG(__ARCH_COMPAT_SIZEOF_OFF32_T) __compat_off32_t;
 typedef __CRT_PRIVATE_SLNG(__ARCH_COMPAT_SIZEOF_OFF64_T) __compat_off64_t;
 #define __compat_off64_t __compat_off64_t
 #undef  __compat_blkcnt32_t
+#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+typedef __CRT_PRIVATE_ULNG(__ARCH_COMPAT_SIZEOF_BLKCNT32_T) __compat_blkcnt32_t;
+#else /* __USE_KOS || __USE_KOS_KERNEL */
 typedef __CRT_PRIVATE_SLNG(__ARCH_COMPAT_SIZEOF_BLKCNT32_T) __compat_blkcnt32_t;
+#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
 #define __compat_blkcnt32_t __compat_blkcnt32_t
 #undef  __compat_blkcnt64_t
+#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+typedef __CRT_PRIVATE_ULNG(__ARCH_COMPAT_SIZEOF_BLKCNT64_T) __compat_blkcnt64_t;
+#else /* __USE_KOS || __USE_KOS_KERNEL */
 typedef __CRT_PRIVATE_SLNG(__ARCH_COMPAT_SIZEOF_BLKCNT64_T) __compat_blkcnt64_t;
+#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
 #define __compat_blkcnt64_t __compat_blkcnt64_t
 #undef  __compat_fsblkcnt32_t
 typedef __CRT_PRIVATE_ULNG(__ARCH_COMPAT_SIZEOF_FSBLKCNT32_T) __compat_fsblkcnt32_t;

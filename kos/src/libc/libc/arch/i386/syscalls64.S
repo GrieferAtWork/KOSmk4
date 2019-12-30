@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28c31cd3 */
+/* HASH CRC-32:0x53001de5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8156,7 +8156,7 @@ INTERN_FUNCTION(libc_sys_Xhopf)
 END(libc_sys_Xhopf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xhopf, libc_sys_Xhopf)
 
-/* errno_t kstat(char const *filename, struct stat *statbuf) */
+/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
 .section .text.crt.syscall.kstat
 INTERN_FUNCTION(libc_sys_kstat)
 	.cfi_startproc
@@ -8168,7 +8168,7 @@ INTERN_FUNCTION(libc_sys_kstat)
 END(libc_sys_kstat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_kstat, libc_sys_kstat)
 
-/* errno_t kstat(char const *filename, struct stat *statbuf) */
+/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
 .section .text.crt.syscall.Xkstat
 INTERN_FUNCTION(libc_sys_Xkstat)
 	.cfi_startproc
@@ -8180,7 +8180,7 @@ INTERN_FUNCTION(libc_sys_Xkstat)
 END(libc_sys_Xkstat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkstat, libc_sys_Xkstat)
 
-/* errno_t kfstat(fd_t fd, struct stat *statbuf) */
+/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
 .section .text.crt.syscall.kfstat
 INTERN_FUNCTION(libc_sys_kfstat)
 	.cfi_startproc
@@ -8192,7 +8192,7 @@ INTERN_FUNCTION(libc_sys_kfstat)
 END(libc_sys_kfstat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_kfstat, libc_sys_kfstat)
 
-/* errno_t kfstat(fd_t fd, struct stat *statbuf) */
+/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
 .section .text.crt.syscall.Xkfstat
 INTERN_FUNCTION(libc_sys_Xkfstat)
 	.cfi_startproc
@@ -8204,7 +8204,7 @@ INTERN_FUNCTION(libc_sys_Xkfstat)
 END(libc_sys_Xkfstat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkfstat, libc_sys_Xkfstat)
 
-/* errno_t klstat(char const *filename, struct stat *statbuf) */
+/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
 .section .text.crt.syscall.klstat
 INTERN_FUNCTION(libc_sys_klstat)
 	.cfi_startproc
@@ -8216,7 +8216,7 @@ INTERN_FUNCTION(libc_sys_klstat)
 END(libc_sys_klstat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_klstat, libc_sys_klstat)
 
-/* errno_t klstat(char const *filename, struct stat *statbuf) */
+/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
 .section .text.crt.syscall.Xklstat
 INTERN_FUNCTION(libc_sys_Xklstat)
 	.cfi_startproc
@@ -9523,7 +9523,7 @@ END(libc_sys_Xfmknodat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfmknodat, libc_sys_Xfmknodat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
 .section .text.crt.syscall.kfstatat
 INTERN_FUNCTION(libc_sys_kfstatat)
 	.cfi_startproc
@@ -9537,7 +9537,7 @@ END(libc_sys_kfstatat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_kfstatat, libc_sys_kfstatat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
 .section .text.crt.syscall.Xkfstatat
 INTERN_FUNCTION(libc_sys_Xkfstatat)
 	.cfi_startproc

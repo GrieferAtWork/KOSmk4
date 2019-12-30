@@ -89,6 +89,10 @@ sigaction = sigactionx32;
 rt_sigaction = rt_sigactionx32;
 utime = utime32;
 sigaltstack = sigaltstackx32;
+kfstatat = kfstatatx32;
+kfstat = kfstatx32;
+klstat = klstatx32;
+kstat = kstatx32;
 
 getrusage = getrusagex32;
 getrusage64 = getrusagex32_64;

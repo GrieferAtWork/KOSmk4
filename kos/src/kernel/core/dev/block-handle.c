@@ -447,11 +447,11 @@ handle_blockdevice_stat(struct basic_block_device *__restrict self,
 	if (node)
 		inode_stat(node, result);
 	result->st_mode = (result->st_mode & ~S_IFMT) | S_IFBLK;
-	result->st_dev      = (__dev_t)block_device_devno(self);
-	result->st_rdev     = (__dev_t)block_device_devno(self);
-	result->st_size64   = (__pos64_t)self->bd_total_bytes;
-	result->st_blksize  = (__blksize_t)self->bd_sector_size;
-	result->st_blocks64 = (__blkcnt64_t)self->bd_sector_count;
+	result->st_dev     = (__dev_t)block_device_devno(self);
+	result->st_rdev    = (__dev_t)block_device_devno(self);
+	result->st_size    = (__pos64_t)self->bd_total_bytes;
+	result->st_blksize = (__blksize_t)self->bd_sector_size;
+	result->st_blocks  = (__blkcnt64_t)self->bd_sector_count;
 }
 
 INTERN poll_mode_t KCALL

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x776e1e96 */
+/* HASH CRC-32:0x5e0f9f82 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10050,7 +10050,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hopf)
 	.cfi_endproc
 END(__x86_asm64_syscall_hopf)
 
-/* errno_t kstat(char const *filename, struct stat *statbuf) */
+/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
 .section .text.x86.asm64_syscall.kstat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kstat)
 	.cfi_startproc simple
@@ -10080,7 +10080,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kstat)
 	.cfi_endproc
 END(__x86_asm64_syscall_kstat)
 
-/* errno_t kfstat(fd_t fd, struct stat *statbuf) */
+/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
 .section .text.x86.asm64_syscall.kfstat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstat)
 	.cfi_startproc simple
@@ -10110,7 +10110,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstat)
 	.cfi_endproc
 END(__x86_asm64_syscall_kfstat)
 
-/* errno_t klstat(char const *filename, struct stat *statbuf) */
+/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
 .section .text.x86.asm64_syscall.klstat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_klstat)
 	.cfi_startproc simple
@@ -11328,7 +11328,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmknodat)
 END(__x86_asm64_syscall_fmknodat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
 .section .text.x86.asm64_syscall.kfstatat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstatat)
 	.cfi_startproc simple
@@ -25531,7 +25531,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64f)
 	.cfi_endproc
 END(__x86_asm32_int80_pwrite64f)
 
-/* errno_t kstat(char const *filename, struct stat *statbuf) */
+/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
 .section .text.x86.asm32_syscall_int80.kstat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_kstat)
 	.cfi_startproc simple
@@ -25563,7 +25563,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kstat)
 	.cfi_endproc
 END(__x86_asm32_int80_kstat)
 
-/* errno_t klstat(char const *filename, struct stat *statbuf) */
+/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
 .section .text.x86.asm32_syscall_int80.klstat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_klstat)
 	.cfi_startproc simple
@@ -25595,7 +25595,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_klstat)
 	.cfi_endproc
 END(__x86_asm32_int80_klstat)
 
-/* errno_t kfstat(fd_t fd, struct stat *statbuf) */
+/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
 .section .text.x86.asm32_syscall_int80.kfstat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstat)
 	.cfi_startproc simple
@@ -26109,7 +26109,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat64)
 END(__x86_asm32_int80_futimesat64)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.kfstatat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstatat)
 	.cfi_startproc simple
@@ -29845,13 +29845,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64f)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pwrite64f)
 
-/* errno_t kstat(char const *filename, struct stat *statbuf) */
+/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kstat, __x86_asm32_int80_kstat)
 
-/* errno_t klstat(char const *filename, struct stat *statbuf) */
+/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_klstat, __x86_asm32_int80_klstat)
 
-/* errno_t kfstat(fd_t fd, struct stat *statbuf) */
+/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kfstat, __x86_asm32_int80_kfstat)
 
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
@@ -30070,7 +30070,7 @@ END(__x86_asm32_sysenter_fmknodat)
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_futimesat64, __x86_asm32_int80_futimesat64)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kfstatat, __x86_asm32_int80_kfstatat)
 
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -35322,7 +35322,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwrite64f)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pwrite64f)
 
-/* errno_t kstat(char const *filename, struct stat *statbuf) */
+/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
 .section .text.x86.asm32_syscall_sysrun32.kstat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kstat)
 	.cfi_startproc
@@ -35333,7 +35333,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kstat)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_kstat)
 
-/* errno_t klstat(char const *filename, struct stat *statbuf) */
+/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
 .section .text.x86.asm32_syscall_sysrun32.klstat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_klstat)
 	.cfi_startproc
@@ -35344,7 +35344,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_klstat)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_klstat)
 
-/* errno_t kfstat(fd_t fd, struct stat *statbuf) */
+/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
 .section .text.x86.asm32_syscall_sysrun32.kfstat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kfstat)
 	.cfi_startproc
@@ -35535,7 +35535,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_futimesat64)
 END(__x86_asm32_sysrun32_futimesat64)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.kfstatat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kfstatat)
 	.cfi_startproc

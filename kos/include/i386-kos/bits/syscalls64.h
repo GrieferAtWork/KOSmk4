@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca679d5d */
+/* HASH CRC-32:0xe304e4f6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -396,9 +396,9 @@
 #define SYS_writef                 __NR_writef                 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
 #define SYS_hop                    __NR_hop                    /* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
 #define SYS_hopf                   __NR_hopf                   /* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-#define SYS_kstat                  __NR_kstat                  /* errno_t kstat(char const *filename, struct stat *statbuf) */
-#define SYS_kfstat                 __NR_kfstat                 /* errno_t kfstat(fd_t fd, struct stat *statbuf) */
-#define SYS_klstat                 __NR_klstat                 /* errno_t klstat(char const *filename, struct stat *statbuf) */
+#define SYS_kstat                  __NR_kstat                  /* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
+#define SYS_kfstat                 __NR_kfstat                 /* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
+#define SYS_klstat                 __NR_klstat                 /* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -698,7 +698,7 @@
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_fmknodat               __NR_fmknodat               /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define SYS_kfstatat               __NR_kfstatat               /* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+#define SYS_kfstatat               __NR_kfstatat               /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_frenameat              __NR_frenameat              /* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */

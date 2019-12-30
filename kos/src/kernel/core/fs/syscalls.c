@@ -31,9 +31,9 @@
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/debugtrap.h>
-#include <kernel/personality.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/personality.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
@@ -44,6 +44,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
+#include <compat/config.h>
 #include <kos/compat/linux-stat.h>
 #include <kos/debugtrap.h>
 #include <kos/except-inval.h>
@@ -62,9 +63,38 @@
 
 #include <librpc/rpc.h>
 
+#ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/stat-convert.h>
+#include <compat/bits/stat.h>
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 
+/* Ensure that AT_* flags map onto the correct FS_MODE_* flags. */
+STATIC_ASSERT(AT_SYMLINK_NOFOLLOW == FS_MODE_FSYMLINK_NOFOLLOW);
+STATIC_ASSERT(AT_NO_AUTOMOUNT == FS_MODE_FNO_AUTOMOUNT);
+STATIC_ASSERT(AT_EMPTY_PATH == FS_MODE_FEMPTY_PATH);
+STATIC_ASSERT(AT_SYMLINK_REGULAR == FS_MODE_FSYMLINK_REGULAR);
+STATIC_ASSERT(AT_DOSPATH == FS_MODE_FDOSPATH);
+
+STATIC_ASSERT((unsigned int)AT_FDCWD == (unsigned int)HANDLE_SYMBOLIC_FDCWD);
+STATIC_ASSERT((unsigned int)AT_FDROOT == (unsigned int)HANDLE_SYMBOLIC_FDROOT);
+STATIC_ASSERT((unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN) == (unsigned int)HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN));
+STATIC_ASSERT((unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX) == (unsigned int)HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMAX));
+STATIC_ASSERT((unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) == (unsigned int)HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
+STATIC_ASSERT((unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX) == (unsigned int)HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX));
+STATIC_ASSERT(AT_DOS_DRIVEMIN == HANDLE_SYMBOLIC_DDRIVEMIN);
+STATIC_ASSERT(AT_DOS_DRIVEMAX == HANDLE_SYMBOLIC_DDRIVEMAX);
+
+
+
+
+
+
+/************************************************************************/
+/* faccessat(), access()                                                */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FACCESSAT
 DEFINE_SYSCALL4(errno_t, faccessat,
                 fd_t, dirfd, USER UNCHECKED char const *, filename,
                 syscall_ulong_t, type, atflag_t, flags) {
@@ -90,16 +120,24 @@ DEFINE_SYSCALL4(errno_t, faccessat,
 	inode_access(accessed_inode, type);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FACCESSAT */
 
-
-#ifdef __NR_access
+#ifdef __ARCH_WANT_SYSCALL_ACCESS
 DEFINE_SYSCALL2(errno_t, access,
                 USER UNCHECKED char const *, filename,
                 syscall_ulong_t, type) {
 	return sys_faccessat(AT_FDCWD, filename, type, 0);
 }
-#endif /* __NR_access */
+#endif /* __ARCH_WANT_SYSCALL_ACCESS */
 
+
+
+
+
+/************************************************************************/
+/* getcwd()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_GETCWD
 DEFINE_SYSCALL2(ssize_t, getcwd,
                 USER UNCHECKED char *, buf, size_t, bufsize) {
 	struct fs *f = THIS_FS;
@@ -114,10 +152,10 @@ DEFINE_SYSCALL2(ssize_t, getcwd,
 	mode = PATH_PRINT_MODE_INCTRAIL;
 #if PATH_PRINT_MODE_DOSPATH == FS_MODE_FDOSPATH
 	mode |= ATOMIC_READ(f->f_atflag) & PATH_PRINT_MODE_DOSPATH;
-#else
+#else /* PATH_PRINT_MODE_DOSPATH == FS_MODE_FDOSPATH */
 	if (ATOMIC_READ(f->f_atflag) & FS_MODE_FDOSPATH)
 		mode |= PATH_PRINT_MODE_DOSPATH;
-#endif
+#endif /* PATH_PRINT_MODE_DOSPATH != FS_MODE_FDOSPATH */
 	{
 		FINALLY_DECREF_UNLIKELY(cwd);
 		FINALLY_DECREF_UNLIKELY(root);
@@ -127,8 +165,16 @@ DEFINE_SYSCALL2(ssize_t, getcwd,
 		THROW(E_BUFFER_TOO_SMALL, reqlen, bufsize);
 	return reqlen;
 }
+#endif /* __ARCH_WANT_SYSCALL_GETCWD */
 
 
+
+
+
+/************************************************************************/
+/* fmknodat(), mknodat(), mknod()                                       */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FMKNODAT
 DEFINE_SYSCALL5(errno_t, fmknodat, fd_t, dirfd,
                 USER UNCHECKED char const *, nodename,
                 mode_t, mode, __dev_t, dev, atflag_t, flags) {
@@ -183,20 +229,32 @@ DEFINE_SYSCALL5(errno_t, fmknodat, fd_t, dirfd,
 	decref(result_node);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FMKNODAT */
 
+#ifdef __ARCH_WANT_SYSCALL_MKNODAT
 DEFINE_SYSCALL4(errno_t, mknodat, fd_t, dirfd,
                 USER UNCHECKED char const *, nodename,
                 mode_t, mode, __dev_t, dev) {
 	return sys_fmknodat(dirfd, nodename, mode, dev, 0);
 }
+#endif /* __ARCH_WANT_SYSCALL_MKNODAT */
 
+#ifdef __ARCH_WANT_SYSCALL_MKNOD
 DEFINE_SYSCALL3(errno_t, mknod,
                 USER UNCHECKED char const *, nodename,
                 mode_t, mode, __dev_t, dev) {
 	return sys_fmknodat(AT_FDCWD, nodename, mode, dev, 0);
 }
+#endif /* __ARCH_WANT_SYSCALL_MKNOD */
 
 
+
+
+
+/************************************************************************/
+/* fmkdirat(), mkdirat(), mkdir()                                       */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FMKDIRAT
 DEFINE_SYSCALL4(errno_t, fmkdirat, fd_t, dirfd,
                 USER UNCHECKED char const *, pathname, mode_t, mode,
                 atflag_t, flags) {
@@ -241,7 +299,9 @@ DEFINE_SYSCALL4(errno_t, fmkdirat, fd_t, dirfd,
 	decref(result_dir);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FMKDIRAT */
 
+#ifdef __ARCH_WANT_SYSCALL_MKDIRAT
 DEFINE_SYSCALL3(errno_t, mkdirat, fd_t, dirfd,
                 USER UNCHECKED char const *, pathname, mode_t, mode) {
 	char const *last_seg;
@@ -281,7 +341,9 @@ DEFINE_SYSCALL3(errno_t, mkdirat, fd_t, dirfd,
 	decref(result_dir);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_MKDIRAT */
 
+#ifdef __ARCH_WANT_SYSCALL_MKDIR
 DEFINE_SYSCALL2(errno_t, mkdir,
                 USER UNCHECKED char const *, pathname, mode_t, mode) {
 	char const *last_seg;
@@ -320,25 +382,16 @@ DEFINE_SYSCALL2(errno_t, mkdir,
 	decref(result_dir);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_MKDIR */
 
 
-/* Ensure that AT_* flags map onto the correct FS_MODE_* flags. */
-STATIC_ASSERT(AT_SYMLINK_NOFOLLOW == FS_MODE_FSYMLINK_NOFOLLOW);
-STATIC_ASSERT(AT_NO_AUTOMOUNT == FS_MODE_FNO_AUTOMOUNT);
-STATIC_ASSERT(AT_EMPTY_PATH == FS_MODE_FEMPTY_PATH);
-STATIC_ASSERT(AT_SYMLINK_REGULAR == FS_MODE_FSYMLINK_REGULAR);
-STATIC_ASSERT(AT_DOSPATH == FS_MODE_FDOSPATH);
-
-STATIC_ASSERT((unsigned int)AT_FDCWD == (unsigned int)HANDLE_SYMBOLIC_FDCWD);
-STATIC_ASSERT((unsigned int)AT_FDROOT == (unsigned int)HANDLE_SYMBOLIC_FDROOT);
-STATIC_ASSERT((unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN) == (unsigned int)HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN));
-STATIC_ASSERT((unsigned int)AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX) == (unsigned int)HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMAX));
-STATIC_ASSERT((unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) == (unsigned int)HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
-STATIC_ASSERT((unsigned int)AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX) == (unsigned int)HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX));
-STATIC_ASSERT(AT_DOS_DRIVEMIN == HANDLE_SYMBOLIC_DDRIVEMIN);
-STATIC_ASSERT(AT_DOS_DRIVEMAX == HANDLE_SYMBOLIC_DDRIVEMAX);
 
 
+
+/************************************************************************/
+/* unlinkat(), unlink(), rmdir()                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_UNLINKAT
 DEFINE_SYSCALL3(errno_t, unlinkat, fd_t, dirfd,
                 USER UNCHECKED char const *, pathname,
                 atflag_t, flags) {
@@ -388,7 +441,9 @@ DEFINE_SYSCALL3(errno_t, unlinkat, fd_t, dirfd,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_UNLINKAT */
 
+#ifdef __ARCH_WANT_SYSCALL_UNLINK
 DEFINE_SYSCALL1(errno_t, unlink, USER UNCHECKED char const *, pathname) {
 	char const *last_seg;
 	u16 last_seglen;
@@ -423,7 +478,9 @@ DEFINE_SYSCALL1(errno_t, unlink, USER UNCHECKED char const *, pathname) {
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_UNLINK */
 
+#ifdef __ARCH_WANT_SYSCALL_RMDIR
 DEFINE_SYSCALL1(errno_t, rmdir, USER UNCHECKED char const *, pathname) {
 	char const *last_seg;
 	u16 last_seglen;
@@ -458,8 +515,16 @@ DEFINE_SYSCALL1(errno_t, rmdir, USER UNCHECKED char const *, pathname) {
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_RMDIR */
 
 
+
+
+
+/************************************************************************/
+/* fsymlinkat(), symlinkat(), symlink()                                 */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FSYMLINKAT
 DEFINE_SYSCALL4(errno_t, fsymlinkat,
                 USER UNCHECKED char const *, link_text, fd_t, target_dirfd,
                 USER UNCHECKED char const *, target_path, atflag_t, flags) {
@@ -506,7 +571,9 @@ DEFINE_SYSCALL4(errno_t, fsymlinkat,
 	decref(result_link);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FSYMLINKAT */
 
+#ifdef __ARCH_WANT_SYSCALL_SYMLINKAT
 DEFINE_SYSCALL3(errno_t, symlinkat,
                 USER UNCHECKED char const *, link_text, fd_t, target_dirfd,
                 USER UNCHECKED char const *, target_path) {
@@ -550,8 +617,9 @@ DEFINE_SYSCALL3(errno_t, symlinkat,
 	decref(result_link);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_SYMLINKAT */
 
-
+#ifdef __ARCH_WANT_SYSCALL_SYMLINK
 DEFINE_SYSCALL2(errno_t, symlink,
                 USER UNCHECKED char const *, link_text,
                 USER UNCHECKED char const *, target_path) {
@@ -594,16 +662,16 @@ DEFINE_SYSCALL2(errno_t, symlink,
 	decref(result_link);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_SYMLINK */
 
 
 
-DEFINE_SYSCALL2(errno_t, link,
-                USER UNCHECKED char const *, oldpath,
-                USER UNCHECKED char const *, newpath) {
-	return sys_linkat(AT_FDCWD, oldpath,
-	                  AT_FDCWD, newpath,
-	                  0);
-}
+
+
+/************************************************************************/
+/* linkat(), link()                                                     */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_LINKAT
 DEFINE_SYSCALL5(errno_t, linkat,
                 fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
                 fd_t, newdirfd, USER UNCHECKED char const *, newpath,
@@ -790,19 +858,26 @@ done_decref_components:
 	decref(root);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_LINKAT */
 
-DEFINE_SYSCALL2(errno_t, rename,
+#ifdef __ARCH_WANT_SYSCALL_LINK
+DEFINE_SYSCALL2(errno_t, link,
                 USER UNCHECKED char const *, oldpath,
                 USER UNCHECKED char const *, newpath) {
-	return sys_frenameat(AT_FDCWD, oldpath,
-	                     AT_FDCWD, newpath, 0);
+	return sys_linkat(AT_FDCWD, oldpath,
+	                  AT_FDCWD, newpath,
+	                  0);
 }
-DEFINE_SYSCALL4(errno_t, renameat,
-                fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
-                fd_t, newdirfd, USER UNCHECKED char const *, newpath) {
-	return sys_frenameat(olddirfd, oldpath,
-	                     newdirfd, newpath, 0);
-}
+#endif /* __ARCH_WANT_SYSCALL_LINK */
+
+
+
+
+
+/************************************************************************/
+/* frenameat(), renameat(), rename()                                    */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FRENAMEAT
 DEFINE_SYSCALL5(errno_t, frenameat,
                 fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
                 fd_t, newdirfd, USER UNCHECKED char const *, newpath,
@@ -920,7 +995,34 @@ have_paths:
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FRENAMEAT */
 
+#ifdef __ARCH_WANT_SYSCALL_RENAMEAT
+DEFINE_SYSCALL4(errno_t, renameat,
+                fd_t, olddirfd, USER UNCHECKED char const *, oldpath,
+                fd_t, newdirfd, USER UNCHECKED char const *, newpath) {
+	return sys_frenameat(olddirfd, oldpath,
+	                     newdirfd, newpath, 0);
+}
+#endif /* __ARCH_WANT_SYSCALL_RENAMEAT */
+
+#ifdef __ARCH_WANT_SYSCALL_RENAME
+DEFINE_SYSCALL2(errno_t, rename,
+                USER UNCHECKED char const *, oldpath,
+                USER UNCHECKED char const *, newpath) {
+	return sys_frenameat(AT_FDCWD, oldpath,
+	                     AT_FDCWD, newpath, 0);
+}
+#endif /* __ARCH_WANT_SYSCALL_RENAME */
+
+
+
+
+
+/************************************************************************/
+/* umount2(), umount()                                                  */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_UMOUNT2
 DEFINE_SYSCALL2(errno_t, umount2,
                 USER UNCHECKED char const *, target,
                 syscall_ulong_t, flags) {
@@ -954,14 +1056,30 @@ DEFINE_SYSCALL2(errno_t, umount2,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_UMOUNT2 */
 
-#ifdef __NR_umount
+#ifdef __ARCH_WANT_SYSCALL_UMOUNT
 DEFINE_SYSCALL1(errno_t, umount,
                 USER UNCHECKED char const *, special_file) {
 	return sys_umount2(special_file, 0);
 }
-#endif /* __NR_umount */
+#endif /* __ARCH_WANT_SYSCALL_UMOUNT */
 
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_UMOUNT
+DEFINE_COMPAT_SYSCALL1(errno_t, umount,
+                       USER UNCHECKED char const *, special_file) {
+	return sys_umount2(special_file, 0);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_UMOUNT */
+
+
+
+
+
+/************************************************************************/
+/* mount()                                                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_MOUNT
 DEFINE_SYSCALL5(errno_t, mount,
                 USER UNCHECKED char const *, source,
                 USER UNCHECKED char const *, target,
@@ -1154,20 +1272,19 @@ DEFINE_SYSCALL5(errno_t, mount,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_MOUNT */
 
 
 
 
-#ifdef __NR_truncate64
-DEFINE_SYSCALL2(errno_t, truncate64,
-                USER UNCHECKED char const *, pathname,
-                uint64_t, length)
-#else /* __NR_truncate64 */
+
+/************************************************************************/
+/* truncate(), truncate64()                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_TRUNCATE
 DEFINE_SYSCALL2(errno_t, truncate,
                 USER UNCHECKED char const *, pathname,
-                syscall_ulong_t, length)
-#endif /* !__NR_truncate64 */
-{
+                syscall_ulong_t, length) {
 	struct fs *f = THIS_FS;
 	REF struct inode *node;
 	validate_readable(pathname, 1);
@@ -1185,65 +1302,39 @@ DEFINE_SYSCALL2(errno_t, truncate,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_TRUNCATE */
 
-
-#ifdef __NR_truncate64
-DEFINE_SYSCALL2(errno_t, truncate,
+#ifdef __ARCH_WANT_SYSCALL_TRUNCATE64
+DEFINE_SYSCALL2(errno_t, truncate64,
                 USER UNCHECKED char const *, pathname,
-                syscall_ulong_t, length) {
-	return sys_truncate64(pathname, length);
-}
-#endif /* __NR_truncate64 */
-
-
-DEFINE_SYSCALL1(errno_t, chdir,
-                USER UNCHECKED char const *, pathname) {
-	REF struct path *old_cwd;
-	REF struct path *new_cwd;
-	REF struct path *root;
+                uint64_t, length) {
 	struct fs *f = THIS_FS;
-	fsmode_t fsmode;
-again:
-	sync_read(&f->f_pathlock);
-	fsmode  = ATOMIC_READ(f->f_atflag);
-	root    = incref(f->f_root);
-	old_cwd = incref(f->f_cwd);
-	sync_endread(&f->f_pathlock);
-	TRY {
-		new_cwd = path_traverse_ex(f,
-		                           old_cwd,
-		                           root,
-		                           pathname,
-		                           NULL,
-		                           NULL,
-		                           fsmode,
-		                           NULL);
-		TRY {
-			sync_write(&f->f_pathlock);
-		} EXCEPT {
-			decref(new_cwd);
-			RETHROW();
-		}
-	} EXCEPT {
-		decref(old_cwd);
-		decref(root);
-		RETHROW();
+	REF struct inode *node;
+	validate_readable(pathname, 1);
+	node = path_traversefull(f,
+	                         pathname,
+	                         true,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_truncate(node, (pos_t)length);
 	}
-	if (f->f_cwd != old_cwd) {
-		/* CWD changed in the mean time... (try again) */
-		sync_endwrite(&f->f_pathlock);
-		decref(root);
-		decref(old_cwd);
-		goto again;
-	}
-	f->f_cwd = new_cwd; /* Inherit reference (x2) */
-	sync_endwrite(&f->f_pathlock);
-	decref_nokill(old_cwd); /* Inherited from `f->f_cwd' */
-	decref(old_cwd);
-	decref(root);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_TRUNCATE64 */
 
+
+
+
+
+/************************************************************************/
+/* fchdirat(), fchdir(), chdir()                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FCHDIRAT
 DEFINE_SYSCALL3(errno_t, fchdirat, fd_t, dirfd,
                 USER UNCHECKED char const *, pathname, atflag_t, flags) {
 	REF struct path *old_cwd;
@@ -1305,7 +1396,9 @@ again:
 	decref(root);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FCHDIRAT */
 
+#ifdef __ARCH_WANT_SYSCALL_FCHDIR
 DEFINE_SYSCALL1(errno_t, fchdir, fd_t, fd) {
 	REF struct path *old_cwd;
 	REF struct path *new_cwd;
@@ -1323,7 +1416,66 @@ DEFINE_SYSCALL1(errno_t, fchdir, fd_t, fd) {
 	decref(old_cwd);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FCHDIR */
 
+#ifdef __ARCH_WANT_SYSCALL_CHDIR
+DEFINE_SYSCALL1(errno_t, chdir,
+                USER UNCHECKED char const *, pathname) {
+	REF struct path *old_cwd;
+	REF struct path *new_cwd;
+	REF struct path *root;
+	struct fs *f = THIS_FS;
+	fsmode_t fsmode;
+again:
+	sync_read(&f->f_pathlock);
+	fsmode  = ATOMIC_READ(f->f_atflag);
+	root    = incref(f->f_root);
+	old_cwd = incref(f->f_cwd);
+	sync_endread(&f->f_pathlock);
+	TRY {
+		new_cwd = path_traverse_ex(f,
+		                           old_cwd,
+		                           root,
+		                           pathname,
+		                           NULL,
+		                           NULL,
+		                           fsmode,
+		                           NULL);
+		TRY {
+			sync_write(&f->f_pathlock);
+		} EXCEPT {
+			decref(new_cwd);
+			RETHROW();
+		}
+	} EXCEPT {
+		decref(old_cwd);
+		decref(root);
+		RETHROW();
+	}
+	if (f->f_cwd != old_cwd) {
+		/* CWD changed in the mean time... (try again) */
+		sync_endwrite(&f->f_pathlock);
+		decref(root);
+		decref(old_cwd);
+		goto again;
+	}
+	f->f_cwd = new_cwd; /* Inherit reference (x2) */
+	sync_endwrite(&f->f_pathlock);
+	decref_nokill(old_cwd); /* Inherited from `f->f_cwd' */
+	decref(old_cwd);
+	decref(root);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_CHDIR */
+
+
+
+
+
+/************************************************************************/
+/* chroot()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_CHROOT
 DEFINE_SYSCALL1(errno_t, chroot,
                 USER UNCHECKED char const *, pathname) {
 	REF struct path *cwd;
@@ -1370,42 +1522,16 @@ again:
 	decref(old_root);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_CHROOT */
 
-DEFINE_SYSCALL2(errno_t, fchmod, fd_t, fd, mode_t, mode) {
-	REF struct inode *node;
-	VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
-	node = handle_get_inode((unsigned int)fd);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_chmod(node,
-		            07777,
-		            mode);
-	}
-	return -EOK;
-}
 
-DEFINE_SYSCALL2(errno_t, chmod, USER CHECKED char const *, filename, mode_t, mode) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	validate_readable(filename, 1);
-	VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
-	node = path_traversefull(f,
-	                         filename,
-	                         true,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_chmod(node,
-		            07777,
-		            mode);
-	}
-	return -EOK;
-}
 
+
+
+/************************************************************************/
+/* fchmodat(), fchmod(), chmod()                                        */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FCHMODAT
 DEFINE_SYSCALL4(errno_t, fchmodat, fd_t, dirfd,
                 USER CHECKED char const *, filename,
                 mode_t, mode, atflag_t, flags) {
@@ -1433,75 +1559,29 @@ DEFINE_SYSCALL4(errno_t, fchmodat, fd_t, dirfd,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FCHMODAT */
 
-#ifdef __NR_fchown32
-DEFINE_SYSCALL3(errno_t, fchown32,
-                fd_t, fd, uint32_t, owner, uint32_t, group)
-#else /* __NR_fchown32 */
-DEFINE_SYSCALL3(errno_t, fchown,
-                fd_t, fd, uint32_t, owner, uint32_t, group)
-#endif /* !__NR_fchown32 */
-{
+#ifdef __ARCH_WANT_SYSCALL_FCHMOD
+DEFINE_SYSCALL2(errno_t, fchmod, fd_t, fd, mode_t, mode) {
 	REF struct inode *node;
+	VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
 	node = handle_get_inode((unsigned int)fd);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
-		inode_chown(node,
-		            (uid_t)owner,
-		            (gid_t)group);
+		inode_chmod(node,
+		            07777,
+		            mode);
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FCHMOD */
 
-#ifdef __NR_fchown32
-DEFINE_SYSCALL3(errno_t, fchown, fd_t, fd, uint16_t, owner, uint16_t, group) {
-	return sys_fchown32(fd, owner, group);
-}
-#endif /* __NR_fchown32 */
-
-#ifdef __NR_lchown32
-DEFINE_SYSCALL3(errno_t, lchown32,
-                USER UNCHECKED char const *, filename,
-                uint32_t, owner, uint32_t, group)
-#else /* __NR_lchown32 */
-DEFINE_SYSCALL3(errno_t, lchown,
-                USER UNCHECKED char const *, filename,
-                uint32_t, owner, uint32_t, group)
-#endif /* !__NR_lchown32 */
-{
+#ifdef __ARCH_WANT_SYSCALL_CHMOD
+DEFINE_SYSCALL2(errno_t, chmod, USER CHECKED char const *, filename, mode_t, mode) {
 	struct fs *f = THIS_FS;
 	REF struct inode *node;
 	validate_readable(filename, 1);
-	node = path_traversefull(f,
-	                         filename,
-	                         false,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_chown(node,
-		            (uid_t)owner,
-		            (gid_t)group);
-	}
-	return -EOK;
-}
-
-#ifdef __NR_lchown32
-DEFINE_SYSCALL3(errno_t, chown32,
-                USER UNCHECKED char const *, filename,
-                uint32_t, owner, uint32_t, group)
-#else
-DEFINE_SYSCALL3(errno_t, chown,
-                USER UNCHECKED char const *, filename,
-                uint32_t, owner, uint32_t, group)
-#endif
-{
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	validate_readable(filename, 1);
+	VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
 	node = path_traversefull(f,
 	                         filename,
 	                         true,
@@ -1512,15 +1592,27 @@ DEFINE_SYSCALL3(errno_t, chown,
 	                         NULL);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
-		inode_chown(node,
-		            (uid_t)owner,
-		            (gid_t)group);
+		inode_chmod(node,
+		            07777,
+		            mode);
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_CHMOD */
+
+
+
+
+
+/************************************************************************/
+/* fchownat(), fchown(), lchown(), chown()                              */
+/* fchownat32(), fchown32(), lchown32(), chown32()                      */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FCHOWNAT
 DEFINE_SYSCALL5(errno_t, fchownat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
-                uint32_t, owner, uint32_t, group,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_fchownat), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_fchownat), group,
                 atflag_t, flags) {
 	struct fs *f = THIS_FS;
 	REF struct inode *node;
@@ -1545,30 +1637,197 @@ DEFINE_SYSCALL5(errno_t, fchownat, fd_t, dirfd,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_FCHOWNAT */
 
+#ifdef __ARCH_WANT_SYSCALL_FCHOWNAT32
+DEFINE_SYSCALL5(errno_t, fchownat32, fd_t, dirfd,
+                USER UNCHECKED char const *, filename,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_fchownat32), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_fchownat32), group,
+                atflag_t, flags) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	VALIDATE_FLAGSET(flags,
+	                 AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
+	                 E_INVALID_ARGUMENT_CONTEXT_FCHOWNAT_FLAGS);
+	node = path_traversefull_at(f,
+	                            (unsigned int)dirfd,
+	                            filename,
+	                            !(flags & AT_SYMLINK_NOFOLLOW),
+	                            fs_getmode_for(f, flags),
+	                            NULL,
+	                            NULL,
+	                            NULL,
+	                            NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_chown(node,
+		            (uid_t)owner,
+		            (gid_t)group);
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_FCHOWNAT32 */
 
-#ifdef __NR_lchown32
+#ifdef __ARCH_WANT_SYSCALL_FCHOWN
+DEFINE_SYSCALL3(errno_t, fchown, fd_t, fd,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_fchown), group) {
+	REF struct inode *node;
+	node = handle_get_inode((unsigned int)fd);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_chown(node,
+		            (uid_t)owner,
+		            (gid_t)group);
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_FCHOWN */
+
+#ifdef __ARCH_WANT_SYSCALL_FCHOWN32
+DEFINE_SYSCALL3(errno_t, fchown32, fd_t, fd,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_fchown32), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_fchown32), group) {
+	REF struct inode *node;
+	node = handle_get_inode((unsigned int)fd);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_chown(node,
+		            (uid_t)owner,
+		            (gid_t)group);
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_FCHOWN32 */
+
+#ifdef __ARCH_WANT_SYSCALL_LCHOWN
 DEFINE_SYSCALL3(errno_t, lchown,
                 USER UNCHECKED char const *, filename,
-                uint16_t, owner, uint16_t, group) {
-	return sys_lchown32(filename, owner, group);
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_lchown), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_lchown), group) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	node = path_traversefull(f,
+	                         filename,
+	                         false,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_chown(node,
+		            (uid_t)owner,
+		            (gid_t)group);
+	}
+	return -EOK;
 }
-#endif /* __NR_lchown32 */
+#endif /* __ARCH_WANT_SYSCALL_LCHOWN */
 
-#ifdef __NR_chown32
+#ifdef __ARCH_WANT_SYSCALL_LCHOWN32
+DEFINE_SYSCALL3(errno_t, lchown32,
+                USER UNCHECKED char const *, filename,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_lchown32), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_lchown32), group) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	node = path_traversefull(f,
+	                         filename,
+	                         false,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_chown(node,
+		            (uid_t)owner,
+		            (gid_t)group);
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_LCHOWN32 */
+
+#ifdef __ARCH_WANT_SYSCALL_CHOWN
 DEFINE_SYSCALL3(errno_t, chown,
                 USER UNCHECKED char const *, filename,
-                uint16_t, owner, uint16_t, group) {
-	return sys_chown32(filename, owner, group);
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_chown), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_chown), group) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	node = path_traversefull(f,
+	                         filename,
+	                         true,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_chown(node,
+		            (uid_t)owner,
+		            (gid_t)group);
+	}
+	return -EOK;
 }
-#endif /* __NR_chown32 */
+#endif /* __ARCH_WANT_SYSCALL_CHOWN */
+
+#ifdef __ARCH_WANT_SYSCALL_CHOWN32
+DEFINE_SYSCALL3(errno_t, chown32,
+                USER UNCHECKED char const *, filename,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_chown32), owner,
+                __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_chown32), group) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	node = path_traversefull(f,
+	                         filename,
+	                         true,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_chown(node,
+		            (uid_t)owner,
+		            (gid_t)group);
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_CHOWN32 */
 
 
+
+
+
+/************************************************************************/
+/* umask()                                                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_UMASK
 DEFINE_SYSCALL1(mode_t, umask, mode_t, mode) {
 	struct fs *f = THIS_FS;
 	return ATOMIC_XCH(f->f_umask, mode & 0777);
 }
+#endif /* __ARCH_WANT_SYSCALL_UMASK */
 
+
+
+
+
+/************************************************************************/
+/* fsmode()                                                             */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FSMODE
 DEFINE_SYSCALL1(uint64_t, fsmode, uint64_t, mode) {
 	struct fs *f = THIS_FS;
 	union {
@@ -1585,7 +1844,16 @@ DEFINE_SYSCALL1(uint64_t, fsmode, uint64_t, mode) {
 	new_mode.f_atflag |= FS_MODE_FALWAYS1FLAG;
 	return ATOMIC_XCH(f->f_mode, new_mode.f_mode);
 }
+#endif /* __ARCH_WANT_SYSCALL_FSMODE */
 
+
+
+
+
+/************************************************************************/
+/* sync(), syncfs()                                                     */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_SYNC
 DEFINE_SYSCALL0(errno_t, sync) {
 	TRY {
 		superblock_syncall();
@@ -1595,7 +1863,9 @@ DEFINE_SYSCALL0(errno_t, sync) {
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_SYNC */
 
+#ifdef __ARCH_WANT_SYSCALL_SYNCFS
 DEFINE_SYSCALL1(errno_t, syncfs, fd_t, fd) {
 	REF struct superblock *super;
 	super = handle_get_superblock_relaxed((unsigned int)fd);
@@ -1606,25 +1876,16 @@ DEFINE_SYSCALL1(errno_t, syncfs, fd_t, fd) {
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_SYNCFS */
 
-DEFINE_SYSCALL3(fd_t, open,
-                USER UNCHECKED char const *, filename,
-                oflag_t, oflags, mode_t, mode) {
-	return sys_openat(AT_FDCWD,
-	                  filename,
-	                  oflags,
-	                  mode);
-}
 
-DEFINE_SYSCALL2(fd_t, creat,
-                USER UNCHECKED char const *, filename,
-                mode_t, mode) {
-	return sys_openat(AT_FDCWD,
-	                  filename,
-	                  O_CREAT | O_WRONLY | O_TRUNC,
-	                  mode);
-}
 
+
+
+/************************************************************************/
+/* openat(), open(), creat()                                            */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_OPENAT
 PRIVATE ATTR_NOINLINE NONNULL((1, 2, 4, 7, 8, 9, 10, 11, 12, 13)) bool KCALL
 openat_create_follow_symlink_dynamic_impl(struct fs *__restrict f,
                                           struct path *__restrict root,
@@ -1733,7 +1994,6 @@ openat_create_follow_symlink_dynamic(struct fs *__restrict f,
 			break;
 	}
 }
-
 
 DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
@@ -2015,6 +2275,13 @@ check_result_inode_for_symlink:
 			/* Create a file handle from all of the gathered object pointers. */
 			switch (result_inode->i_filemode & S_IFMT) {
 
+				STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_refcnt) == offsetof(struct file, f_refcnt));
+				STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_node) == offsetof(struct file, f_node));
+				STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_path) == offsetof(struct file, f_path));
+				STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_dir) == offsetof(struct file, f_dir));
+				STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_dirent) == offsetof(struct file, f_dirent));
+				STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_offset) == offsetof(struct file, f_offset));
+
 			case S_IFBLK: {
 				/* Open the associated block-device. */
 				dev_t devno;
@@ -2124,18 +2391,38 @@ check_result_inode_for_symlink:
 	decref(result_handle);
 	return (fd_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_OPENAT */
+
+#ifdef __ARCH_WANT_SYSCALL_OPEN
+DEFINE_SYSCALL3(fd_t, open,
+                USER UNCHECKED char const *, filename,
+                oflag_t, oflags, mode_t, mode) {
+	return sys_openat(AT_FDCWD,
+	                  filename,
+	                  oflags,
+	                  mode);
+}
+#endif /* __ARCH_WANT_SYSCALL_OPEN */
+
+#ifdef __ARCH_WANT_SYSCALL_CREAT
+DEFINE_SYSCALL2(fd_t, creat,
+                USER UNCHECKED char const *, filename,
+                mode_t, mode) {
+	return sys_openat(AT_FDCWD,
+	                  filename,
+	                  O_CREAT | O_WRONLY | O_TRUNC,
+	                  mode);
+}
+#endif /* __ARCH_WANT_SYSCALL_CREAT */
 
 
 
 
-STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_refcnt) == offsetof(struct file, f_refcnt));
-STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_node) == offsetof(struct file, f_node));
-STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_path) == offsetof(struct file, f_path));
-STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_dir) == offsetof(struct file, f_dir));
-STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_dirent) == offsetof(struct file, f_dirent));
-STATIC_ASSERT(offsetof(struct oneshot_directory_file, d_offset) == offsetof(struct file, f_offset));
 
-
+/************************************************************************/
+/* frealpath4(), frealpathat()                                          */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_FREALPATH4
 DEFINE_SYSCALL4(ssize_t, frealpath4,
                 fd_t, fd, USER UNCHECKED char *, buf,
                 size_t, buflen, atflag_t, flags) {
@@ -2232,7 +2519,9 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 		THROW(E_BUFFER_TOO_SMALL, result, buflen);
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_FREALPATH4 */
 
+#ifdef __ARCH_WANT_SYSCALL_FREALPATHAT
 DEFINE_SYSCALL5(ssize_t, frealpathat,
                 fd_t, dirfd, USER UNCHECKED char const *, filename,
                 USER UNCHECKED char *, buf, size_t, buflen, atflag_t, flags) {
@@ -2298,69 +2587,51 @@ DEFINE_SYSCALL5(ssize_t, frealpathat,
 		THROW(E_BUFFER_TOO_SMALL, result, buflen);
 	return (ssize_t)result;
 }
+#endif /* __ARCH_WANT_SYSCALL_FREALPATHAT */
 
 
 
 
+/************************************************************************/
+/* kfstatat(), kfstat(), klstat(), kstat()                              */
+/************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_KFSTATAT) || \
+     defined(__ARCH_WANT_SYSCALL_KFSTAT) ||   \
+     defined(__ARCH_WANT_SYSCALL_KLSTAT) ||   \
+     defined(__ARCH_WANT_SYSCALL_KSTAT))
+#define WANT_KSTAT_NATIVE 1
+#endif /* kstat... */
 
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_KFSTATAT) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_KFSTAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_KLSTAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_KSTAT))
+#define WANT_KSTAT_COMPAT 1
+#endif /* kstat... (compat) */
 
-DEFINE_SYSCALL2(errno_t, kstat,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct stat *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	validate_readable(filename, 1);
-	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         true,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, statbuf);
-	}
-	return -EOK;
+#if defined(WANT_KSTAT_NATIVE) || defined(WANT_KSTAT_COMPAT)
+#define WANT_KSTAT 1
+#endif /* kstat... */
+
+#ifdef WANT_KSTAT_NATIVE
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define complete_kstat(statbuf) (void)0
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+LOCAL void KCALL
+complete_kstat(USER CHECKED struct stat *statbuf) {
+	COMPILER_BARRIER();
+	statbuf->__st_atimespec32.tv_sec  = statbuf->st_atime;
+	statbuf->__st_atimespec32.tv_nsec = statbuf->st_atimensec;
+	statbuf->__st_mtimespec32.tv_sec  = statbuf->st_mtime;
+	statbuf->__st_mtimespec32.tv_nsec = statbuf->st_mtimensec;
+	statbuf->__st_ctimespec32.tv_sec  = statbuf->st_ctime;
+	statbuf->__st_ctimespec32.tv_nsec = statbuf->st_ctimensec;
+	COMPILER_BARRIER();
 }
-DEFINE_SYSCALL2(errno_t, klstat,
-                USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct stat *, statbuf) {
-	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	validate_readable(filename, 1);
-	validate_writable(statbuf, sizeof(*statbuf));
-	node = path_traversefull(f,
-	                         filename,
-	                         false,
-	                         ATOMIC_READ(f->f_atflag),
-	                         NULL,
-	                         NULL,
-	                         NULL,
-	                         NULL);
-	{
-		FINALLY_DECREF_UNLIKELY(node);
-		inode_stat(node, statbuf);
-	}
-	return -EOK;
-}
-DEFINE_SYSCALL2(errno_t, kfstat, fd_t, fd,
-                USER UNCHECKED struct stat *, statbuf) {
-	struct handle hnd;
-	validate_writable(statbuf, sizeof(*statbuf));
-	hnd = handle_lookup((unsigned int)fd);
-	TRY {
-		handle_stat(hnd, statbuf);
-	} EXCEPT {
-		decref(hnd);
-		RETHROW();
-	}
-	decref(hnd);
-	return -EOK;
-}
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#endif /* WANT_KSTAT_NATIVE */
 
+#ifdef __ARCH_WANT_SYSCALL_KFSTATAT
 DEFINE_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct stat *, statbuf,
@@ -2385,8 +2656,183 @@ DEFINE_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
 		FINALLY_DECREF_UNLIKELY(node);
 		inode_stat(node, statbuf);
 	}
+	complete_kstat(statbuf);
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_KFSTATAT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_KFSTATAT
+DEFINE_COMPAT_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_stat *, statbuf,
+                       atflag_t, flags) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	struct stat st;
+	validate_readable(filename, 1);
+	validate_writable(statbuf, sizeof(*statbuf));
+	VALIDATE_FLAGSET(flags,
+	                 AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
+	                 E_INVALID_ARGUMENT_CONTEXT_KFSTATAT_FLAGS);
+	node = path_traversefull_at(f,
+	                            (unsigned int)dirfd,
+	                            filename,
+	                            !(flags & AT_SYMLINK_NOFOLLOW),
+	                            fs_getmode_for(f, flags),
+	                            NULL,
+	                            NULL,
+	                            NULL,
+	                            NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_stat(node, &st);
+	}
+	stat_to_compat_stat(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_KFSTATAT */
+
+#ifdef __ARCH_WANT_SYSCALL_KFSTAT
+DEFINE_SYSCALL2(errno_t, kfstat, fd_t, fd,
+                USER UNCHECKED struct stat *, statbuf) {
+	struct handle hnd;
+	validate_writable(statbuf, sizeof(*statbuf));
+	hnd = handle_lookup((unsigned int)fd);
+	TRY {
+		handle_stat(hnd, statbuf);
+	} EXCEPT {
+		decref(hnd);
+		RETHROW();
+	}
+	decref(hnd);
+	complete_kstat(statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_KFSTAT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_KFSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, kfstat, fd_t, fd,
+                       USER UNCHECKED struct compat_stat *, statbuf) {
+	struct handle hnd;
+	struct stat st;
+	validate_writable(statbuf, sizeof(*statbuf));
+	hnd = handle_lookup((unsigned int)fd);
+	TRY {
+		handle_stat(hnd, &st);
+	} EXCEPT {
+		decref(hnd);
+		RETHROW();
+	}
+	decref(hnd);
+	stat_to_compat_stat(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_KFSTAT */
+
+#ifdef __ARCH_WANT_SYSCALL_KLSTAT
+DEFINE_SYSCALL2(errno_t, klstat,
+                USER UNCHECKED char const *, filename,
+                USER UNCHECKED struct stat *, statbuf) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	validate_writable(statbuf, sizeof(*statbuf));
+	node = path_traversefull(f,
+	                         filename,
+	                         false,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_stat(node, statbuf);
+	}
+	complete_kstat(statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_KLSTAT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_KLSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, klstat,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_stat *, statbuf) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	struct stat st;
+	validate_readable(filename, 1);
+	validate_writable(statbuf, sizeof(*statbuf));
+	node = path_traversefull(f,
+	                         filename,
+	                         false,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_stat(node, &st);
+	}
+	stat_to_compat_stat(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_KLSTAT */
+
+#ifdef __ARCH_WANT_SYSCALL_KSTAT
+DEFINE_SYSCALL2(errno_t, kstat,
+                USER UNCHECKED char const *, filename,
+                USER UNCHECKED struct stat *, statbuf) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	validate_readable(filename, 1);
+	validate_writable(statbuf, sizeof(*statbuf));
+	node = path_traversefull(f,
+	                         filename,
+	                         true,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_stat(node, statbuf);
+	}
+	complete_kstat(statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_KSTAT */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_KSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, kstat,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_stat *, statbuf) {
+	struct fs *f = THIS_FS;
+	REF struct inode *node;
+	struct stat st;
+	validate_readable(filename, 1);
+	validate_writable(statbuf, sizeof(*statbuf));
+	node = path_traversefull(f,
+	                         filename,
+	                         true,
+	                         ATOMIC_READ(f->f_atflag),
+	                         NULL,
+	                         NULL,
+	                         NULL,
+	                         NULL);
+	{
+		FINALLY_DECREF_UNLIKELY(node);
+		inode_stat(node, &st);
+	}
+	stat_to_compat_stat(&st, statbuf);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_KSTAT */
+
+
+
 
 
 
@@ -2398,16 +2844,16 @@ convert_kos2linold(USER CHECKED struct linux_oldstat *__restrict dst,
                    KERNEL struct stat const *__restrict src)
 		THROWS(E_SEGFAULT) {
 	dst->st_dev   = (__uint16_t)src->st_dev;
-	dst->st_ino   = (__uint16_t)src->st_ino32;
+	dst->st_ino   = (__uint16_t)src->st_ino;
 	dst->st_mode  = (__uint16_t)src->st_mode;
 	dst->st_nlink = (__uint16_t)src->st_nlink;
 	dst->st_uid   = (__uint16_t)src->st_uid;
 	dst->st_gid   = (__uint16_t)src->st_gid;
 	dst->st_rdev  = (__uint16_t)src->st_rdev;
-	dst->st_size  = (__uint32_t)src->st_size32;
-	dst->st_atime = (__uint32_t)src->st_atime32;
-	dst->st_mtime = (__uint32_t)src->st_mtime32;
-	dst->st_ctime = (__uint32_t)src->st_ctime32;
+	dst->st_size  = (__uint32_t)src->st_size;
+	dst->st_atime = (__uint32_t)src->st_atime;
+	dst->st_mtime = (__uint32_t)src->st_mtime;
+	dst->st_ctime = (__uint32_t)src->st_ctime;
 }
 #endif /* __NR_linux_oldstat || __NR_linux_oldlstat || __NR_linux_oldfstat */
 
@@ -2490,7 +2936,7 @@ convert_kos2lin32(USER CHECKED struct linux_stat32 *__restrict dst,
                   KERNEL struct stat const *__restrict src)
 		THROWS(E_SEGFAULT) {
 	dst->st_dev        = (__uint32_t)src->st_dev;
-	dst->st_ino        = (__uint32_t)src->st_ino32;
+	dst->st_ino        = (__uint32_t)src->st_ino;
 	dst->st_mode       = (__uint16_t)src->st_mode;
 	dst->st_nlink      = (__uint16_t)src->st_nlink;
 	dst->st_uid        = (__uint16_t)src->st_uid;
@@ -2498,12 +2944,12 @@ convert_kos2lin32(USER CHECKED struct linux_stat32 *__restrict dst,
 	dst->st_rdev       = (__uint32_t)src->st_rdev;
 	dst->st_size       = (__uint32_t)src->st_size;
 	dst->st_blksize    = (__uint32_t)src->st_blksize;
-	dst->st_blocks     = (__uint32_t)src->st_blocks32;
-	dst->st_atime      = (__uint32_t)src->st_atime32;
+	dst->st_blocks     = (__uint32_t)src->st_blocks;
+	dst->st_atime      = (__uint32_t)src->st_atime;
 	dst->st_atime_nsec = (__uint32_t)src->st_atimensec;
-	dst->st_mtime      = (__uint32_t)src->st_mtime32;
+	dst->st_mtime      = (__uint32_t)src->st_mtime;
 	dst->st_mtime_nsec = (__uint32_t)src->st_mtimensec;
-	dst->st_ctime      = (__uint32_t)src->st_ctime32;
+	dst->st_ctime      = (__uint32_t)src->st_ctime;
 	dst->st_ctime_nsec = (__uint32_t)src->st_ctimensec;
 }
 #endif /* __NR_linux_stat32 || __NR_linux_lstat32 || __NR_linux_fstatat32 || __NR_linux_fstat32 */
@@ -2616,22 +3062,22 @@ convert_kos2lin64(USER CHECKED struct linux_stat64 *__restrict dst,
                   KERNEL struct stat const *__restrict src)
 		THROWS(E_SEGFAULT) {
 	dst->st_dev        = (__uint64_t)src->st_dev;
-	dst->__st_ino      = (__uint32_t)src->st_ino32;
+	dst->__st_ino      = (__uint32_t)src->st_ino;
 	dst->st_mode       = (__uint32_t)src->st_mode;
 	dst->st_nlink      = (__uint32_t)src->st_nlink;
 	dst->st_uid        = (__uint32_t)src->st_uid;
 	dst->st_gid        = (__uint32_t)src->st_gid;
 	dst->st_rdev       = (__uint64_t)src->st_rdev;
-	dst->st_size       = (__int64_t)src->st_size64;
+	dst->st_size       = (__int64_t)src->st_size;
 	dst->st_blksize    = (__uint32_t)src->st_blksize;
-	dst->st_blocks     = (__uint64_t)src->st_blocks64;
-	dst->st_atime      = (__uint32_t)src->st_atime32;
+	dst->st_blocks     = (__uint64_t)src->st_blocks;
+	dst->st_atime      = (__uint32_t)src->st_atime;
 	dst->st_atime_nsec = (__uint32_t)src->st_atimensec;
-	dst->st_mtime      = (__uint32_t)src->st_mtime32;
+	dst->st_mtime      = (__uint32_t)src->st_mtime;
 	dst->st_mtime_nsec = (__uint32_t)src->st_mtimensec;
-	dst->st_ctime      = (__uint32_t)src->st_ctime32;
+	dst->st_ctime      = (__uint32_t)src->st_ctime;
 	dst->st_ctime_nsec = (__uint32_t)src->st_ctimensec;
-	dst->st_ino        = (__uint64_t)src->st_ino64;
+	dst->st_ino        = (__uint64_t)src->st_ino;
 }
 
 

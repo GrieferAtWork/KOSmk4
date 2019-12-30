@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x358602e5 */
+/* HASH CRC-32:0xc95d9fe7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,9 +393,9 @@
 #define __NR64_writef                 __UINT64_C(0xffffffff80000001) /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
 #define __NR64_hop                    __UINT64_C(0xffffffff80000002) /* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
 #define __NR64_hopf                   __UINT64_C(0xffffffff80000003) /* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-#define __NR64_kstat                  __UINT64_C(0xffffffff80000004) /* errno_t kstat(char const *filename, struct stat *statbuf) */
-#define __NR64_kfstat                 __UINT64_C(0xffffffff80000005) /* errno_t kfstat(fd_t fd, struct stat *statbuf) */
-#define __NR64_klstat                 __UINT64_C(0xffffffff80000006) /* errno_t klstat(char const *filename, struct stat *statbuf) */
+#define __NR64_kstat                  __UINT64_C(0xffffffff80000004) /* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
+#define __NR64_kfstat                 __UINT64_C(0xffffffff80000005) /* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
+#define __NR64_klstat                 __UINT64_C(0xffffffff80000006) /* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -695,7 +695,7 @@
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR64_fmknodat               __UINT64_C(0xffffffff80000103) /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR64_kfstatat               __UINT64_C(0xffffffff80000106) /* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+#define __NR64_kfstatat               __UINT64_C(0xffffffff80000106) /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR64_frenameat              __UINT64_C(0xffffffff80000108) /* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */

@@ -195,36 +195,25 @@ handle_datapart_stat(struct vm_datapart *__restrict self,
 			temp.tv_nsec  = ino->i_fileatime.tv_nsec;
 			temp.__tv_pad = 0;
 			COMPILER_WRITE_BARRIER();
-			result->st_atim64 = temp;
+			result->st_atimespec = temp;
 
 			temp.tv_sec   = ino->i_filemtime.tv_sec;
 			temp.tv_nsec  = ino->i_filemtime.tv_nsec;
 			temp.__tv_pad = 0;
 			COMPILER_WRITE_BARRIER();
-			result->st_mtim64 = temp;
+			result->st_mtimespec = temp;
 
 			temp.tv_sec   = ino->i_filectime.tv_sec;
 			temp.tv_nsec  = ino->i_filectime.tv_nsec;
 			temp.__tv_pad = 0;
 			COMPILER_WRITE_BARRIER();
-			result->st_ctim64 = temp;
+			result->st_ctimespec = temp;
 		}
 #else /* __TIMESPEC64_HAVE_TV_PAD */
-		result->st_atim64 = ino->i_fileatime;
-		result->st_mtim64 = ino->i_filemtime;
-		result->st_ctim64 = ino->i_filectime;
+		result->st_atimespec = ino->i_fileatime;
+		result->st_mtimespec = ino->i_filemtime;
+		result->st_ctimespec = ino->i_filectime;
 #endif /* !__TIMESPEC64_HAVE_TV_PAD */
-		result->st_atim32.tv_sec  = (__time32_t)result->st_atim64.tv_sec;
-		result->st_atim32.tv_nsec = result->st_atim64.tv_nsec;
-		result->st_mtim32.tv_sec  = (__time32_t)result->st_mtim64.tv_sec;
-		result->st_mtim32.tv_nsec = result->st_mtim64.tv_nsec;
-		result->st_ctim32.tv_sec  = (__time32_t)result->st_ctim64.tv_sec;
-		result->st_ctim32.tv_nsec = result->st_ctim64.tv_nsec;
-#ifdef __TIMESPEC32_HAVE_TV_PAD
-		result->st_atim32.__tv_pad = 0;
-		result->st_mtim32.__tv_pad = 0;
-		result->st_ctim32.__tv_pad = 0;
-#endif /* __TIMESPEC32_HAVE_TV_PAD */
 	} else {
 		result->st_dev   = 0;
 		result->st_ino   = 0;
@@ -233,12 +222,9 @@ handle_datapart_stat(struct vm_datapart *__restrict self,
 		result->st_uid   = 0;
 		result->st_gid   = 0;
 		result->st_rdev  = 0;
-		memset(&result->st_atim64, 0, sizeof(result->st_atim64));
-		memset(&result->st_mtim64, 0, sizeof(result->st_mtim64));
-		memset(&result->st_ctim64, 0, sizeof(result->st_ctim64));
-		memset(&result->st_atim32, 0, sizeof(result->st_atim32));
-		memset(&result->st_mtim32, 0, sizeof(result->st_mtim32));
-		memset(&result->st_ctim32, 0, sizeof(result->st_ctim32));
+		memset(&result->st_atimespec, 0, sizeof(result->st_atimespec));
+		memset(&result->st_mtimespec, 0, sizeof(result->st_mtimespec));
+		memset(&result->st_ctimespec, 0, sizeof(result->st_ctimespec));
 	}
 	result->st_size    = (__FS_TYPE(pos))vm_datapart_numbytes(self);
 	result->st_blksize = (__blksize_t)VM_DATABLOCK_PAGESIZE(block);

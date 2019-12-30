@@ -18,17 +18,23 @@
  */
 #ifndef GUARD_LIBC_USER_SYS_STAT_C
 #define GUARD_LIBC_USER_SYS_STAT_C 1
+#define __DEFINE_DOS_STAT_STRUCTURES 1
 
 #include "../api.h"
 /**/
 
-#include "../libc/uchar.h"
-#include "sys.stat.h"
+#include <bits/stat-cyg.h>
+#include <bits/stat-dos.h>
+#include <bits/stat-glc.h>
+#include <bits/stat-kos.h>
+#include <kos/syscalls.h>
 
 #include <fcntl.h>
-#include <kos/syscalls.h>
-#include <unistd.h>
 #include <malloc.h>
+#include <unistd.h>
+
+#include "../libc/uchar.h"
+#include "sys.stat.h"
 
 DECL_BEGIN
 

@@ -146,9 +146,9 @@ INTERN NONNULL((1)) void KCALL
 handle_directoryentry_stat(struct directory_entry *__restrict self,
                            USER CHECKED struct stat *result) {
 	memset(result, 0, sizeof(*result));
-	result->st_size  = (self->de_namelen + 1) * sizeof(char);
-	result->st_ino64 = (__ino64_t)self->de_ino;
-	result->st_mode  = DTTOIF(self->de_type);
+	result->st_size = (self->de_namelen + 1) * sizeof(char);
+	result->st_ino  = (__ino64_t)self->de_ino;
+	result->st_mode = DTTOIF(self->de_type);
 }
 
 INTERN ATTR_CONST NONNULL((1)) poll_mode_t KCALL
@@ -735,36 +735,25 @@ inode_stat(struct inode *__restrict self,
 		temp.tv_nsec  = self->i_fileatime.tv_nsec;
 		temp.__tv_pad = 0;
 		COMPILER_WRITE_BARRIER();
-		result->st_atim64 = temp;
+		result->st_atimespec = temp;
 
 		temp.tv_sec   = self->i_filemtime.tv_sec;
 		temp.tv_nsec  = self->i_filemtime.tv_nsec;
 		temp.__tv_pad = 0;
 		COMPILER_WRITE_BARRIER();
-		result->st_mtim64 = temp;
+		result->st_mtimespec = temp;
 
 		temp.tv_sec   = self->i_filectime.tv_sec;
 		temp.tv_nsec  = self->i_filectime.tv_nsec;
 		temp.__tv_pad = 0;
 		COMPILER_WRITE_BARRIER();
-		result->st_ctim64 = temp;
+		result->st_ctimespec = temp;
 	}
 #else /* __TIMESPEC64_HAVE_TV_PAD */
-	result->st_atim64 = self->i_fileatime;
-	result->st_mtim64 = self->i_filemtime;
-	result->st_ctim64 = self->i_filectime;
+	result->st_atimespec = self->i_fileatime;
+	result->st_mtimespec = self->i_filemtime;
+	result->st_ctimespec = self->i_filectime;
 #endif /* !__TIMESPEC64_HAVE_TV_PAD */
-	result->st_atim32.tv_sec  = (__time32_t)result->st_atim64.tv_sec;
-	result->st_atim32.tv_nsec = result->st_atim64.tv_nsec;
-	result->st_mtim32.tv_sec  = (__time32_t)result->st_mtim64.tv_sec;
-	result->st_mtim32.tv_nsec = result->st_mtim64.tv_nsec;
-	result->st_ctim32.tv_sec  = (__time32_t)result->st_ctim64.tv_sec;
-	result->st_ctim32.tv_nsec = result->st_ctim64.tv_nsec;
-#ifdef __TIMESPEC32_HAVE_TV_PAD
-	result->st_atim32.__tv_pad = 0;
-	result->st_mtim32.__tv_pad = 0;
-	result->st_ctim32.__tv_pad = 0;
-#endif /* __TIMESPEC32_HAVE_TV_PAD */
 }
 
 

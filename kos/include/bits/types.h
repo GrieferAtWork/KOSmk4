@@ -386,10 +386,18 @@ typedef __CRT_PRIVATE_SLNG(__SIZEOF_OFF32_T__) __off32_t;
 typedef __CRT_PRIVATE_SLNG(__SIZEOF_OFF64_T__) __off64_t;
 #define __off64_t       __off64_t
 #undef  __blkcnt32_t
+#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+typedef __CRT_PRIVATE_ULNG(__SIZEOF_BLKCNT32_T__) __blkcnt32_t;
+#else /* __USE_KOS || __USE_KOS_KERNEL */
 typedef __CRT_PRIVATE_SLNG(__SIZEOF_BLKCNT32_T__) __blkcnt32_t;
+#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
 #define __blkcnt32_t    __blkcnt32_t
 #undef  __blkcnt64_t
+#if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
+typedef __CRT_PRIVATE_ULNG(__SIZEOF_BLKCNT64_T__) __blkcnt64_t;
+#else /* __USE_KOS || __USE_KOS_KERNEL */
 typedef __CRT_PRIVATE_SLNG(__SIZEOF_BLKCNT64_T__) __blkcnt64_t;
+#endif /* !__USE_KOS && !__USE_KOS_KERNEL */
 #define __blkcnt64_t    __blkcnt64_t
 #undef  __fsblkcnt32_t
 typedef __CRT_PRIVATE_ULNG(__SIZEOF_FSBLKCNT32_T__) __fsblkcnt32_t;

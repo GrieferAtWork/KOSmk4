@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18df4201 */
+/* HASH CRC-32:0xe01f0a98 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -766,9 +766,9 @@
 #define __NR32_rt_sigtimedwait64       __UINT32_C(0x800000b1) /* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
 #define __NR32_pread64f                __UINT32_C(0x800000b4) /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define __NR32_pwrite64f               __UINT32_C(0x800000b5) /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-#define __NR32_kstat                   __UINT32_C(0x800000c3) /* errno_t kstat(char const *filename, struct stat *statbuf) */
-#define __NR32_klstat                  __UINT32_C(0x800000c4) /* errno_t klstat(char const *filename, struct stat *statbuf) */
-#define __NR32_kfstat                  __UINT32_C(0x800000c5) /* errno_t kfstat(fd_t fd, struct stat *statbuf) */
+#define __NR32_kstat                   __UINT32_C(0x800000c3) /* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
+#define __NR32_klstat                  __UINT32_C(0x800000c4) /* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
+#define __NR32_kfstat                  __UINT32_C(0x800000c5) /* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
 #define __NR32_kreaddirf               __UINT32_C(0x800000dc) /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 #define __NR32_timer_settime64         __UINT32_C(0x80000104) /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
 #define __NR32_timer_gettime64         __UINT32_C(0x80000105) /* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
@@ -787,7 +787,7 @@
 #define __NR32_fmknodat                __UINT32_C(0x80000129) /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 #define __NR32_futimesat64             __UINT32_C(0x8000012b) /* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR32_kfstatat                __UINT32_C(0x8000012c) /* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+#define __NR32_kfstatat                __UINT32_C(0x8000012c) /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR32_frenameat               __UINT32_C(0x8000012e) /* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */

@@ -41,6 +41,7 @@
 #include <sys/uio.h>
 
 #include <errno.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <libbuffer/ringbuffer.h>
@@ -463,28 +464,12 @@ handle_pipe_stat(struct pipe *__restrict self,
                  USER CHECKED struct stat *result) {
 	size_t size;
 	size = ATOMIC_READ(self->p_buffer.rb_avail);
-	result->st_dev            = 0;
-	result->st_ino            = 0;
-	result->st_mode           = S_IFIFO;
-	result->st_nlink          = 1;
-	result->st_uid            = 0;
-	result->st_gid            = 0;
-	result->st_rdev           = 0;
-	result->st_size           = size;
-	result->st_blksize        = 1;
-	result->st_blocks         = size;
-	result->st_atim32.tv_sec  = 0;
-	result->st_atim32.tv_nsec = 0;
-	result->st_mtim32.tv_sec  = 0;
-	result->st_mtim32.tv_nsec = 0;
-	result->st_ctim32.tv_sec  = 0;
-	result->st_ctim32.tv_nsec = 0;
-	result->st_atim64.tv_sec  = 0;
-	result->st_atim64.tv_nsec = 0;
-	result->st_mtim64.tv_sec  = 0;
-	result->st_mtim64.tv_nsec = 0;
-	result->st_ctim64.tv_sec  = 0;
-	result->st_ctim64.tv_nsec = 0;
+	memset(result, 0, sizeof(*result));
+	result->st_mode    = S_IFIFO;
+	result->st_nlink   = 1;
+	result->st_size    = size;
+	result->st_blksize = 1;
+	result->st_blocks  = size;
 }
 
 INTERN poll_mode_t KCALL

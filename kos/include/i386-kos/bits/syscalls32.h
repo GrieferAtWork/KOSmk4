@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x105eb0e2 */
+/* HASH CRC-32:0x851bdc6c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -769,9 +769,9 @@
 #define SYS_rt_sigtimedwait64       __NR_rt_sigtimedwait64       /* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
 #define SYS_pread64f                __NR_pread64f                /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define SYS_pwrite64f               __NR_pwrite64f               /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-#define SYS_kstat                   __NR_kstat                   /* errno_t kstat(char const *filename, struct stat *statbuf) */
-#define SYS_klstat                  __NR_klstat                  /* errno_t klstat(char const *filename, struct stat *statbuf) */
-#define SYS_kfstat                  __NR_kfstat                  /* errno_t kfstat(fd_t fd, struct stat *statbuf) */
+#define SYS_kstat                   __NR_kstat                   /* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
+#define SYS_klstat                  __NR_klstat                  /* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
+#define SYS_kfstat                  __NR_kfstat                  /* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
 #define SYS_kreaddirf               __NR_kreaddirf               /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 #define SYS_timer_settime64         __NR_timer_settime64         /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
 #define SYS_timer_gettime64         __NR_timer_gettime64         /* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
@@ -790,7 +790,7 @@
 #define SYS_fmknodat                __NR_fmknodat                /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
 #define SYS_futimesat64             __NR_futimesat64             /* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define SYS_kfstatat                __NR_kfstatat                /* errno_t kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf, atflag_t flags) */
+#define SYS_kfstatat                __NR_kfstatat                /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define SYS_frenameat               __NR_frenameat               /* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */

@@ -35,6 +35,9 @@
 #define __OFFSET_TIMESPEC_NSEC    4
 #define __SIZEOF_TIMESPEC         8
 #endif /* __TM_SIZEOF(TIME) < 8 && __SIZEOF_SYSCALL_LONG_T__ <8 */
+#define __OFFSET_TIMESPEC32_SEC   0
+#define __OFFSET_TIMESPEC32_NSEC  4
+#define __SIZEOF_TIMESPEC32       8
 #define __OFFSET_TIMESPEC64_SEC   0
 #define __OFFSET_TIMESPEC64_NSEC  8
 #define __SIZEOF_TIMESPEC64       16

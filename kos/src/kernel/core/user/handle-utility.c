@@ -106,15 +106,15 @@ character_device_datasize(struct character_device *__restrict self,
 	if (!self->cd_type.ct_stat)
 		return false;
 	/* Check if the stat-operator fills in the size-field. */
-	st.st_size64 = UINT64_C(0xaaaaaaaaaaaaaaaa);
+	st.st_size = UINT64_C(0xaaaaaaaaaaaaaaaa);
 	(*self->cd_type.ct_stat)(self, &st);
-	if (st.st_size64 == UINT64_C(0xaaaaaaaaaaaaaaaa)) {
-		st.st_size64 = UINT64_C(0x5555555555555555);
+	if (st.st_size == UINT64_C(0xaaaaaaaaaaaaaaaa)) {
+		st.st_size = UINT64_C(0x5555555555555555);
 		(*self->cd_type.ct_stat)(self, &st);
-		if (st.st_size64 == UINT64_C(0x5555555555555555))
+		if (st.st_size == UINT64_C(0x5555555555555555))
 			return false; /* The size-field isn't filled in. */
 	}
-	*presult = (pos_t)st.st_size64;
+	*presult = (pos_t)st.st_size;
 	return true;
 }
 

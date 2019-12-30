@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a5df4b8 */
+/* HASH CRC-32:0x6d302ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1546,11 +1546,11 @@
 #define __NRAT2_hopf                   (iomode_t, __iomode_t)
 #define __NRAT3_hopf                   (void *, void *)
 #define __NRAT0_kstat                  (char const *, char const *)
-#define __NRAT1_kstat                  (struct stat *, struct stat *)
+#define __NRAT1_kstat                  (struct __kos_statx64 *, struct __kos_statx64 *)
 #define __NRAT0_kfstat                 (fd_t, __fd_t)
-#define __NRAT1_kfstat                 (struct stat *, struct stat *)
+#define __NRAT1_kfstat                 (struct __kos_statx64 *, struct __kos_statx64 *)
 #define __NRAT0_klstat                 (char const *, char const *)
-#define __NRAT1_klstat                 (struct stat *, struct stat *)
+#define __NRAT1_klstat                 (struct __kos_statx64 *, struct __kos_statx64 *)
 #define __NRAT0_detach                 (pid_t, __pid_t)
 #define __NRAT0_frealpath4             (fd_t, __fd_t)
 #define __NRAT1_frealpath4             (char *, char *)
@@ -1660,7 +1660,7 @@
 #define __NRAT4_fmknodat               (atflag_t, __atflag_t)
 #define __NRAT0_kfstatat               (fd_t, __fd_t)
 #define __NRAT1_kfstatat               (char const *, char const *)
-#define __NRAT2_kfstatat               (struct stat *, struct stat *)
+#define __NRAT2_kfstatat               (struct __kos_statx64 *, struct __kos_statx64 *)
 #define __NRAT3_kfstatat               (atflag_t, __atflag_t)
 #define __NRAT0_frenameat              (fd_t, __fd_t)
 #define __NRAT1_frenameat              (char const *, char const *)
@@ -2026,9 +2026,9 @@
 #define __NRAM_writef(a, b, c, d, e, f)                 (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
 #define __NRAM_hop(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b, (void *)c
 #define __NRAM_hopf(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
-#define __NRAM_kstat(a, b, c, d, e, f)                  (char const *)a, (struct stat *)b
-#define __NRAM_kfstat(a, b, c, d, e, f)                 (__fd_t)a, (struct stat *)b
-#define __NRAM_klstat(a, b, c, d, e, f)                 (char const *)a, (struct stat *)b
+#define __NRAM_kstat(a, b, c, d, e, f)                  (char const *)a, (struct __kos_statx64 *)b
+#define __NRAM_kfstat(a, b, c, d, e, f)                 (__fd_t)a, (struct __kos_statx64 *)b
+#define __NRAM_klstat(a, b, c, d, e, f)                 (char const *)a, (struct __kos_statx64 *)b
 #define __NRAM_detach(a, b, c, d, e, f)                 (__pid_t)a
 #define __NRAM_getdrives(a, b, c, d, e, f)              /* nothing */
 #define __NRAM_frealpath4(a, b, c, d, e, f)             (__fd_t)a, (char *)b, (__size_t)c, (__atflag_t)d
@@ -2059,7 +2059,7 @@
 #define __NRAM_kreaddirf(a, b, c, d, e, f)              (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
 #define __NRAM_fmkdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NRAM_fmknodat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
-#define __NRAM_kfstatat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (struct stat *)c, (__atflag_t)d
+#define __NRAM_kfstatat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (struct __kos_statx64 *)c, (__atflag_t)d
 #define __NRAM_frenameat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
 #define __NRAM_fsymlinkat(a, b, c, d, e, f)             (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
 #define __NRAM_freadlinkat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
