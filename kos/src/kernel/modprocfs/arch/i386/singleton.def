@@ -20,6 +20,8 @@
 
 MKDIR(sys_kernel_x86, 0555,
       F(sys_kernel_x86, "keepiopl", DT_DIR, sys_x86_keepiopl) /* /proc/sys/x86/keepiopl */
+      /* TODO: /proc/sys/x86/user_eflags_mask */
+      /* TODO: /proc/sys/x86/exec_eflags_mask */
       ARCH_ENUMERATE_PROC_SYS_FS
       F_END)
 

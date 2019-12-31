@@ -66,6 +66,12 @@ PUBLIC struct atomic64 x86_user_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF),
 PUBLIC struct atomic64 x86_exec_eflags_mask = ATOMIC64_INIT(WORD64(~(EFLAGS_DF | EFLAGS_IOPLMASK), 0));
 #undef WORD64
 
+/* TODO: Kernel commandline options:
+ *  - user_eflags_mask=mask,flag
+ *  - exec_eflags_mask=mask,flag
+ */
+
+
 #ifdef __x86_64__
 #define SYSCALL_VECTOR_SIGRETURN64 __NR_rt_sigreturn
 #define SYSCALL_VECTOR_SIGRETURN32 __NR32_sigreturn

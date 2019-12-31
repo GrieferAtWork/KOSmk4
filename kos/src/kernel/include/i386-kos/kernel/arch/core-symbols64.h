@@ -4015,9 +4015,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1003 /* index: 1003 */
-	.weak x86_pit_lock; .quad x86_pit_lock
-	.reloc ., R_X86_64_SIZE32, x86_pit_lock; .int 0
-	.int 0x73ff3eb
+	.weak x86_exec_eflags_mask; .quad x86_exec_eflags_mask
+	.reloc ., R_X86_64_SIZE32, x86_exec_eflags_mask; .int 0
+	.int 0xa2c23eb
 	.quad .Lname1004 /* index: 1004 */
 	.weak x86_userexcept_callhandler64; .quad x86_userexcept_callhandler64
 	.reloc ., R_X86_64_SIZE32, x86_userexcept_callhandler64; .int 0
@@ -4718,10 +4718,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak unicode_16to32; .quad unicode_16to32
 	.reloc ., R_X86_64_SIZE32, unicode_16to32; .int 0
 	.int 0x6b80f12
-	.quad 0 /* index: 1179 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1179 /* index: 1179 */
+	.weak x86_user_eflags_mask; .quad x86_user_eflags_mask
+	.reloc ., R_X86_64_SIZE32, x86_user_eflags_mask; .int 0
+	.int 0x329249b
 	.quad 0 /* index: 1180 */
 	.quad 0
 	.int 0
@@ -4750,10 +4750,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_epoll_ctl; .quad sys_epoll_ctl
 	.reloc ., R_X86_64_SIZE32, sys_epoll_ctl; .int 0
 	.int 0xf39068c
-	.quad .Lname1187 /* index: 1187 */
-	.weak x86_iopl_keep_after_exec; .quad x86_iopl_keep_after_exec
-	.reloc ., R_X86_64_SIZE32, x86_iopl_keep_after_exec; .int 0
-	.int 0x1cb14a3
+	.quad 0 /* index: 1187 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname1188 /* index: 1188 */
 	.weak sys_getegid; .quad sys_getegid
 	.reloc ., R_X86_64_SIZE32, sys_getegid; .int 0
@@ -7694,10 +7694,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 1923 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1923 /* index: 1923 */
+	.weak x86_pit_lock; .quad x86_pit_lock
+	.reloc ., R_X86_64_SIZE32, x86_pit_lock; .int 0
+	.int 0x73ff3eb
 	.quad .Lname1924 /* index: 1924 */
 	.weak sys32_ppoll64; .quad sys32_ppoll64
 	.reloc ., R_X86_64_SIZE32, sys32_ppoll64; .int 0
@@ -17815,7 +17815,7 @@ END(kernel_symbol_table)
 .Lname1001:
 	.string "x86_pagedir_syncall_maybe_global"
 .Lname1003:
-	.string "x86_pit_lock"
+	.string "x86_exec_eflags_mask"
 .Lname1004:
 	.string "x86_userexcept_callhandler64"
 .Lname1005:
@@ -18052,12 +18052,12 @@ END(kernel_symbol_table)
 	.string "dbg_getuni"
 .Lname1178:
 	.string "unicode_16to32"
+.Lname1179:
+	.string "x86_user_eflags_mask"
 .Lname1183:
 	.string "sys_setfsgid"
 .Lname1186:
 	.string "sys_epoll_ctl"
-.Lname1187:
-	.string "x86_iopl_keep_after_exec"
 .Lname1188:
 	.string "sys_getegid"
 .Lname1189:
@@ -19036,6 +19036,8 @@ END(kernel_symbol_table)
 	.string "task_wake"
 .Lname1921:
 	.string "sys32_inotify_init1"
+.Lname1923:
+	.string "x86_pit_lock"
 .Lname1924:
 	.string "sys32_ppoll64"
 .Lname1925:
