@@ -1,5 +1,5 @@
-/* HASH CRC-32:0x16e9381e */
-/* Copyright (c) 2019 Griefer@Work                                            *
+/* HASH CRC-32:0xa13c4b0d */
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *

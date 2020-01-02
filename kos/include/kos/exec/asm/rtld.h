@@ -1,5 +1,5 @@
 /* HASH 0x93f678da */
-/* Copyright (c) 2019 Griefer@Work                                            *
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *

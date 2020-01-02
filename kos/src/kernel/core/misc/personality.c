@@ -6,7 +6,7 @@ local gcc_opt = options.setdefault("GCC.options", []);
 gcc_opt.remove("-fno-rtti");
 gcc_opt.append("-fexceptions");
 ]]]*/
-/* Copyright (c) 2019 Griefer@Work                                            *
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *

@@ -1,4 +1,4 @@
-/* Copyright (c) 2019 Griefer@Work                                            *
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -27,7 +27,7 @@
 #ifdef __CC__
 DECL_BEGIN
 
-/* NOTE: Mask/Flag pair used to modify eflags when calling into user-space:
+/* Mask/Flag pair used to modify eflags when calling into user-space:
  *  - raise(): A user-space posix signal handler is invoked
  *  - THROW(): A user-space exception handler (s.a. `set_exception_handler()') is called
  * This descriptor is mainly used to ensure SysV ABI compliance when it
