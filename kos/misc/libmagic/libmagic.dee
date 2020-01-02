@@ -431,7 +431,7 @@ class Group {
 				bss = { bss };
 			}
 			for (local bs: bss)
-				yield bs.required_files...;
+				yield bs.requiredFiles...;
 		}
 	}
 
@@ -624,80 +624,80 @@ class BoundStep {
 	public final member userData: Object;
 
 	@@List of required input files
-	public final property required_files: {string | FirstFileOf...} = {
+	public final property requiredFiles: {string | FirstFileOf...} = {
 		get(): {string | FirstFileOf...} {
 #ifdef ASYNC_FILE_ENUMERATION
-			if (_required_files !is bound) {
-				_required_files = HashSet();
+			if (_requiredFiles !is bound) {
+				_requiredFiles = HashSet();
 				for (local x: step.getRequiredFiles(this)) {
-					_required_files.insert(x);
+					_requiredFiles.insert(x);
 					yield x;
 				}
 			} else {
-				yield _required_files...;
+				yield _requiredFiles...;
 			}
 #else /* ASYNC_FILE_ENUMERATION */
-			if (_required_files !is bound)
-				_required_files = HashSet(step.getRequiredFiles(this));
-			return _required_files;
+			if (_requiredFiles !is bound)
+				_requiredFiles = HashSet(step.getRequiredFiles(this));
+			return _requiredFiles;
 #endif /* !ASYNC_FILE_ENUMERATION */
 		}
 	}
 
 	@@List of produced build artifacts
-	public final property produced_files: {string...} = {
+	public final property producedFiles: {string...} = {
 		get(): {string...} {
 #ifdef ASYNC_FILE_ENUMERATION
-			if (_produced_files !is bound) {
-				_produced_files = HashSet();
+			if (_producedFiles !is bound) {
+				_producedFiles = HashSet();
 				for (local x: step.getProducedFiles(this)) {
-					if (_produced_files.insert(x))
+					if (_producedFiles.insert(x))
 						yield x;
 				}
 			} else {
-				yield _produced_files...;
+				yield _producedFiles...;
 			}
 #else /* ASYNC_FILE_ENUMERATION */
-			if (_produced_files !is bound)
-				_produced_files = HashSet(step.getProducedFiles(this));
-			return _produced_files;
+			if (_producedFiles !is bound)
+				_producedFiles = HashSet(step.getProducedFiles(this));
+			return _producedFiles;
 #endif /* !ASYNC_FILE_ENUMERATION */
 		}
 	}
 
 	@@List of intended build outputs
-	public final property produced_output_files: {string...} = {
+	public final property producedOutputFiles: {string...} = {
 		get(): {string...} {
 #ifdef ASYNC_FILE_ENUMERATION
-			if (_produced_output_files !is bound) {
+			if (_producedOutputFiles !is bound) {
 				local fun = step.getProducedOutputFiles;
 				if (fun is none) {
-					if (_produced_files is bound) {
-						_produced_output_files = _produced_files;
-						yield _produced_output_files...;
+					if (_producedFiles is bound) {
+						_producedOutputFiles = _producedFiles;
+						yield _producedOutputFiles...;
 					} else {
-						yield produced_files...;
+						yield producedFiles...;
 					}
 				} else {
-					_produced_output_files = HashSet();
+					_producedOutputFiles = HashSet();
 					for (local x: fun(this)) {
-						if (_produced_output_files.insert(x))
+						if (_producedOutputFiles.insert(x))
 							yield x;
 					}
 				}
 			} else {
-				yield _produced_output_files...;
+				yield _producedOutputFiles...;
 			}
 #else /* ASYNC_FILE_ENUMERATION */
-			if (_produced_output_files !is bound) {
+			if (_producedOutputFiles !is bound) {
 				local fun = step.getProducedOutputFiles;
 				if (fun is none)
-					_produced_output_files = produced_files;
+					_producedOutputFiles = producedFiles;
 				else {
-					_produced_output_files = HashSet(fun(this));
+					_producedOutputFiles = HashSet(fun(this));
 				}
 			}
-			return _produced_output_files;
+			return _producedOutputFiles;
 #endif /* !ASYNC_FILE_ENUMERATION */
 		}
 	}
@@ -724,130 +724,130 @@ class BoundStep {
 	@@In this case, the 4th step would be skipped because TIME(log.txt) > TIME(b.txt),
 	@@since log.txt was already modified by `a.txt'
 	@@Because of this, we need to make a compare TIME_AT_BUILD_START(log.txt) > TIME(b.txt),
-	public final property modified_output_files: {(string, int | none)...} = {
+	public final property modifiedOutputFiles: {(string, int | none)...} = {
 		get(): {string...} {
 #ifdef ASYNC_FILE_ENUMERATION
-			if (_modified_output_files !is bound) {
+			if (_modifiedOutputFiles !is bound) {
 				local fun = step.getModifiedOutputFiles;
 				if (fun is none)
-					_modified_output_files = {};
+					_modifiedOutputFiles = {};
 				else {
-					_modified_output_files = HashSet();
+					_modifiedOutputFiles = HashSet();
 					for (local f: fun(this)) {
 						local pair = (f, getLastModfiedTime(f));
-						if (_modified_output_files.insert(pair))
+						if (_modifiedOutputFiles.insert(pair))
 							yield pair;
 					}
 				}
 			} else {
-				yield _modified_output_files...;
+				yield _modifiedOutputFiles...;
 			}
 #else /* ASYNC_FILE_ENUMERATION */
-			if (_modified_output_files !is bound) {
+			if (_modifiedOutputFiles !is bound) {
 				local fun = step.getModifiedOutputFiles;
 				if (fun is none)
-					_modified_output_files = {};
+					_modifiedOutputFiles = {};
 				else {
-					_modified_output_files = HashSet(
+					_modifiedOutputFiles = HashSet(
 						for (local f: fun(this))
 							(f, getLastModfiedTime(f)));
 				}
 			}
-			return _modified_output_files;
+			return _modifiedOutputFiles;
 #endif /* !ASYNC_FILE_ENUMERATION */
 		}
 	}
 
 	public function updateModifiedOutputTimes() {
-		if (_modified_output_files is bound) {
+		if (_modifiedOutputFiles is bound) {
 			local new = HashSet();
-			for (local f, none: _modified_output_files)
+			for (local f, none: _modifiedOutputFiles)
 				new.insert((f, getLastModfiedTime(f)));
-			_modified_output_files = new;
+			_modifiedOutputFiles = new;
 		}
-		if (_maybe_modified_output_files is bound) {
+		if (_maybeModifiedOutputFiles is bound) {
 			local new = HashSet();
-			for (local f, none: _maybe_modified_output_files)
+			for (local f, none: _maybeModifiedOutputFiles)
 				new.insert((f, getLastModfiedTime(getLatestFilenameOf(f))));
-			_maybe_modified_output_files = new;
+			_maybeModifiedOutputFiles = new;
 		}
 #ifdef CACHE_ALL_MODIFIED_OUTPUT_FILES
 		try {
-			del _all_modified_output_files;
+			del _allModifiedOutputFiles;
 		} catch (...) {
 		}
 #endif /* CACHE_ALL_MODIFIED_OUTPUT_FILES */
 	}
 
 #ifdef CACHE_ALL_MODIFIED_OUTPUT_FILES
-	private final member _all_modified_output_files: {(string, int | none)...};
-	public final property all_modified_output_files: {(string, int | none)...} = {
+	private final member _allModifiedOutputFiles: {(string, int | none)...};
+	public final property allModifiedOutputFiles: {(string, int | none)...} = {
 		get(): {(string, int | none)...} {
-			if (_all_modified_output_files !is bound) {
-				_all_modified_output_files = HashSet();
-				_all_modified_output_files.update(modified_output_files);
-				_all_modified_output_files.update(maybe_modified_output_files);
+			if (_allModifiedOutputFiles !is bound) {
+				_allModifiedOutputFiles = HashSet();
+				_allModifiedOutputFiles.update(modifiedOutputFiles);
+				_allModifiedOutputFiles.update(maybeModifiedOutputFiles);
 			}
-			return _all_modified_output_files;
+			return _allModifiedOutputFiles;
 		}
 	}
 #else /* CACHE_ALL_MODIFIED_OUTPUT_FILES */
-	public final property all_modified_output_files: {(string, int | none)...} = {
+	public final property allModifiedOutputFiles: {(string, int | none)...} = {
 		get(): {(string, int | none)...} {
-			yield modified_output_files...;
-			yield maybe_modified_output_files...;
+			yield modifiedOutputFiles...;
+			yield maybeModifiedOutputFiles...;
 		}
 	}
 #endif /* !CACHE_ALL_MODIFIED_OUTPUT_FILES */
 
-	public final property maybe_modified_output_files: {(string, int | none)...} = {
+	public final property maybeModifiedOutputFiles: {(string, int | none)...} = {
 		get(): {string...} {
 #ifdef ASYNC_FILE_ENUMERATION
-			if (_maybe_modified_output_files !is bound) {
+			if (_maybeModifiedOutputFiles !is bound) {
 				local fun = step.getMaybeModifiedOutputFiles;
 				if (fun is none)
-					_maybe_modified_output_files = {};
+					_maybeModifiedOutputFiles = {};
 				else {
-					_maybe_modified_output_files = HashSet();
+					_maybeModifiedOutputFiles = HashSet();
 					for (local f: fun(this)) {
 						local pair = (f, getLastModfiedTime(getLatestFilenameOf(f)));
-						if (_maybe_modified_output_files.insert(pair))
+						if (_maybeModifiedOutputFiles.insert(pair))
 							yield pair;
 					}
 				}
 			} else {
-				yield _maybe_modified_output_files...;
+				yield _maybeModifiedOutputFiles...;
 			}
 #else /* ASYNC_FILE_ENUMERATION */
-			if (_maybe_modified_output_files !is bound) {
+			if (_maybeModifiedOutputFiles !is bound) {
 				local fun = step.getMaybeModifiedOutputFiles;
 				if (fun is none)
-					_maybe_modified_output_files = {};
+					_maybeModifiedOutputFiles = {};
 				else {
-					_maybe_modified_output_files = HashSet(
+					_maybeModifiedOutputFiles = HashSet(
 						for (local f: fun(this))
 							(f, getLastModfiedTime(getLatestFilenameOf(f))));
 				}
 			}
-			return _maybe_modified_output_files;
+			return _maybeModifiedOutputFiles;
 #endif /* !ASYNC_FILE_ENUMERATION */
 		}
 	}
 
 	@@Check if this step has been completed
 	final function complete(): bool {
-		return _step_waitables is bound && !_step_waitables;
+		return _stepWaitables is bound && !_stepWaitables;
 	}
 
 	@@Mark this step as being skipped (presumably because none of its inputs have changed)
 	final function skip() {
-		_step_waitables = [];
+		_stepWaitables = [];
 	}
 
 	@@Reset this step
 	final function reset() {
 		try {
-			del _step_waitables;
+			del _stepWaitables;
 		} catch (...) {
 		}
 	}
@@ -856,9 +856,9 @@ class BoundStep {
 	@@If the step was already started or has already finished,
 	@@return immediately.
 	final function begin() {
-		if (_step_waitables is bound)
+		if (_stepWaitables is bound)
 			return;
-		_step_waitables = List(step.run(this));
+		_stepWaitables = List(step.run(this));
 	}
 
 	@@Wait for all waitables of this step to complete
@@ -867,18 +867,18 @@ class BoundStep {
 	@@If the step hadn't been started yet, start it now
 	final function waitfor() {
 		begin();
-		while (_step_waitables)
-			_step_waitables.pop().waitfor();
+		while (_stepWaitables)
+			_stepWaitables.pop().waitfor();
 		onCompleted();
 	}
 
 	@@Try to wait for this step to have completed
 	final function trywaitfor(): bool {
 		begin();
-		while (_step_waitables) {
-			if (!_step_waitables[0].trywaitfor())
+		while (_stepWaitables) {
+			if (!_stepWaitables[0].trywaitfor())
 				return false;
-			_step_waitables.pop(0);
+			_stepWaitables.pop(0);
 		}
 		onCompleted();
 		return true;
@@ -886,11 +886,11 @@ class BoundStep {
 
 	final function onCompleted() {
 		/* Save that all (possibly) output files may have changed */
-		for (local x: produced_files)
+		for (local x: producedFiles)
 			fileMayHaveChanged(x);
-		for (local x, none: modified_output_files)
+		for (local x, none: modifiedOutputFiles)
 			fileMayHaveChanged(x);
-		for (local x, none: maybe_modified_output_files) {
+		for (local x, none: maybeModifiedOutputFiles) {
 			fileMayHaveChanged(x);
 			x = getLatestFilenameOf(x);
 			File.open(x, "wb").close(); /* touch */
@@ -899,22 +899,22 @@ class BoundStep {
 	}
 
 	@@Waitables that need to complete before this step can be finished
-	private final member _step_waitables: {Waitable...};
+	private final member _stepWaitables: {Waitable...};
 
-	@@Cache for @this.required_files
-	private final member _required_files: {string | FirstFileOf...};
+	@@Cache for @this.requiredFiles
+	private final member _requiredFiles: {string | FirstFileOf...};
 
-	@@Cache for @this.produced_files
-	private final member _produced_files: {string...};
+	@@Cache for @this.producedFiles
+	private final member _producedFiles: {string...};
 
-	@@Cache for @this.produced_output_files
-	private final member _produced_output_files: {string...};
+	@@Cache for @this.producedOutputFiles
+	private final member _producedOutputFiles: {string...};
 
-	@@Cache for @this.modified_output_files
-	private final member _modified_output_files: {(string, int | none)...};
+	@@Cache for @this.modifiedOutputFiles
+	private final member _modifiedOutputFiles: {(string, int | none)...};
 
-	@@Cache for @this.maybe_modified_output_files
-	private final member _maybe_modified_output_files: {(string, int | none)...};
+	@@Cache for @this.maybeModifiedOutputFiles
+	private final member _maybeModifiedOutputFiles: {(string, int | none)...};
 
 	operator == (other) -> this === other;
 	operator != (other) -> this !== other;
@@ -924,13 +924,13 @@ class BoundStep {
 	public final member dependencies: {BoundStep...} = HashSet();
 
 	@@Recursively check if @this step has a dependency on @s
-	function has_recursive_dependency(s: BoundStep): bool {
+	function hasRecursiveDependency(s: BoundStep): bool {
 		if (s === this)
 			return true;
 		if (s in dependencies)
 			return true;
 		for (local i: dependencies) {
-			if (i.has_recursive_dependency(s))
+			if (i.hasRecursiveDependency(s))
 				return true;
 		}
 		return false;
@@ -938,26 +938,26 @@ class BoundStep {
 
 	@@Enumerate the full path of dependencies
 	@@to reach a given recursive dependency @s
-	function walk_recursive_dependency(s: BoundStep): {BoundStep...} {
+	function walkRecursiveDependencies(s: BoundStep): {BoundStep...} {
 		yield this;
 		if (s !in dependencies) {
 			for (local i: dependencies) {
-				if (!i.has_recursive_dependency(s))
+				if (!i.hasRecursiveDependency(s))
 					continue;
-				yield i.walk_recursive_dependency(s)...;
+				yield i.walkRecursiveDependencies(s)...;
 			}
 		} else {
 			yield s;
 		}
 	}
 
-	@@Create folders for output of this step
+	@@Create folders for output files of this step
 	function createOutputFolders() {
-		for (local o: produced_files)
+		for (local o: producedFiles)
 			createDirectoryTree(fs.headof(o));
-		for (local o, none: modified_output_files)
+		for (local o, none: modifiedOutputFiles)
 			createDirectoryTree(fs.headof(o));
-		for (local o, none: maybe_modified_output_files)
+		for (local o, none: maybeModifiedOutputFiles)
 			createDirectoryTree(fs.headof(o));
 	}
 }
@@ -1003,7 +1003,7 @@ function orderGroups(toolchain: Toolchain, groups: {Group...}): ({BoundStep...},
 	local file_producers: {string: BoundStep} = Dict();
 	local file_modifiers: {string: {BoundStep...}} = Dict();
 	for (local s: allsteps) {
-		for (local f: s.produced_files) {
+		for (local f: s.producedFiles) {
 			if (!file_producers.setnew(f, s)) {
 				local o = file_producers[f];
 				throw Error("File {!r} is produced by multiple steps {}.{} and {}.{}"
@@ -1013,7 +1013,7 @@ function orderGroups(toolchain: Toolchain, groups: {Group...}): ({BoundStep...},
 					}));
 			}
 		}
-		for (local f, none: s.all_modified_output_files) {
+		for (local f, none: s.allModifiedOutputFiles) {
 			local stps = file_modifiers.get(f);
 			if (stps is none)
 				file_modifiers[f] = stps = HashSet();
@@ -1023,7 +1023,7 @@ function orderGroups(toolchain: Toolchain, groups: {Group...}): ({BoundStep...},
 	local weak_dependency_pairs: {(BoundStep, BoundStep)...} = HashSet();
 	/* Determine step dependencies. */
 	for (local s: allsteps) {
-		for (local f: s.required_files) {
+		for (local f: s.requiredFiles) {
 			local dep;
 			if (f is FirstFileOf) {
 				dep = none;
@@ -1037,8 +1037,8 @@ function orderGroups(toolchain: Toolchain, groups: {Group...}): ({BoundStep...},
 			}
 			if (dep is none)
 				continue;
-			if (dep.has_recursive_dependency(s)) {
-				local chain = List(dep.walk_recursive_dependency(s));
+			if (dep.hasRecursiveDependency(s)) {
+				local chain = List(dep.walkRecursiveDependencies(s));
 				for (local i = 0; i < #chain - 1; ++i) {
 					local pair = (chain[i], chain[i+1]);
 					if (pair in weak_dependency_pairs) {
@@ -1060,10 +1060,10 @@ did_resolve:
 		/* Go through required input files one more time and check if
 		 * steps exist that may try to modify those files. - If adding
 		 * those steps as dependencies won't create a loop, do so */
-		for (local f: s.required_files) {
+		for (local f: s.requiredFiles) {
 			local mods = file_modifiers.get(f);
 			for (local m: mods) {
-				if (!m.has_recursive_dependency(s)) {
+				if (!m.hasRecursiveDependency(s)) {
 					s.dependencies.insert(m);
 					weak_dependency_pairs.insert((s, m));
 				} else {
@@ -1071,14 +1071,14 @@ did_resolve:
 				}
 			}
 		}
-		for (local f, none: s.all_modified_output_files) {
+		for (local f, none: s.allModifiedOutputFiles) {
 			/* Check if modified output files are created by some
 			 * other step. - If so, that step becomes a dependency
 			 * of `s' */
 			local dep = file_producers.get(f);
 			if (dep !is none) {
 				/* Don't create the dependency if it would cause a loop. */
-				if (!dep.has_recursive_dependency(s)) {
+				if (!dep.hasRecursiveDependency(s)) {
 					s.dependencies.insert(dep);
 					weak_dependency_pairs.insert((s, dep));
 				} else {
@@ -1092,17 +1092,17 @@ did_resolve:
 
 
 function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxParallelSteps: int = 8) {
-	local missing_steps: {BoundStep...} = HashSet(steps);
-	local finished_steps: {BoundStep...} = HashSet();
-	local running_steps: {BoundStep...} = HashSet();
-	function print_status(marker: string, message: string) {
-		local num_missing = #missing_steps;
-		local num_finished = #finished_steps;
-		local num_running = #running_steps;
-		local avg_missing  = (float)num_missing + (float)num_running / 2;
-		local avg_finished = (float)num_finished + (float)num_running / 2;
-		local progress = try ((avg_finished / (avg_missing + avg_finished))) catch(...) 1.0;
-		print "["+marker+num_running+":" + str(int(progress * 100.0)).rjust(3) + "%",;
+	local missingSteps: {BoundStep...} = HashSet(steps);
+	local finishedSteps: {BoundStep...} = HashSet();
+	local runningSteps: {BoundStep...} = HashSet();
+	function printStatus(marker: string, message: string) {
+		local numMissing = #missingSteps;
+		local numFinished = #finishedSteps;
+		local numRunning = #runningSteps;
+		local avgMissing  = (float)numMissing + (float)numRunning / 2;
+		local avgFinished = (float)numFinished + (float)numRunning / 2;
+		local progress = try ((avgFinished / (avgMissing + avgFinished))) catch(...) 1.0;
+		print "[" + marker + numRunning + ":" + str(int(progress * 100.0)).rjust(3) + "%",;
 		if (!message.startswith("["))
 			print "] ",;
 		else {
@@ -1111,107 +1111,107 @@ function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxPa
 		}
 		print message;
 	}
-	function waitfor_any_step() {
-		assert !running_steps.empty(),
-			"missing_steps: {!r}\n"
-			"finished_steps: {!r}\n"
+	function waitforAnyStep() {
+		assert !runningSteps.empty(),
+			"missingSteps: {!r}\n"
+			"finishedSteps: {!r}\n"
 			.format({
-				for (local x: missing_steps) str(x),
-				for (local x: finished_steps) str(x),
+				for (local x: missingSteps) str(x),
+				for (local x: finishedSteps) str(x),
 			})
 		;
-		local unchanged_iterations = 0;
+		local unchangedIterations = 0;
 again:
-		if (#running_steps == 1) {
-			local s = running_steps.first;
+		if (#runningSteps == 1) {
+			local s = runningSteps.first;
 			s.waitfor();
-			print_status(LOG_END_MARKER, "{} (done)".format({ s }));
-			running_steps.clear();
-			finished_steps.insert(s);
-		} else if (running_steps) {
-			for (local s: running_steps) {
+			printStatus(LOG_END_MARKER, "{} (done)".format({ s }));
+			runningSteps.clear();
+			finishedSteps.insert(s);
+		} else if (runningSteps) {
+			for (local s: runningSteps) {
 				if (!s.trywaitfor())
 					continue;
-				print_status(LOG_END_MARKER, "{} (done)".format({ s }));
-				running_steps.remove(s);
-				finished_steps.insert(s);
-				unchanged_iterations = 0;
+				printStatus(LOG_END_MARKER, "{} (done)".format({ s }));
+				runningSteps.remove(s);
+				finishedSteps.insert(s);
+				unchangedIterations = 0;
 				return; /* Got one! */
 			}
-			if ((unchanged_iterations % 10) == 9) {
-				print_status(LOG_UPDATE_MARKER, "Still waiting on:");
-				for (local x: running_steps)
+			if ((unchangedIterations % 10) == 9) {
+				printStatus(LOG_UPDATE_MARKER, "Still waiting on:");
+				for (local x: runningSteps)
 					print "\t" + x;
 			}
 			Thread.sleep(JOIN_WAIT_DELAY);
-			++unchanged_iterations;
+			++unchangedIterations;
 			goto again;
 		}
 	}
-	function start_step(s: BoundStep, reason: string) {
-		local unchanged_iterations = 0;
+	function startStep(s: BoundStep, reason: string) {
+		local unchangedIterations = 0;
 again:
-		if (running_steps) {
+		if (runningSteps) {
 			/* Make sure that no other steps are already running that
 			 * may also be trying to modify any of our in-out files. */
-			local mod = s.all_modified_output_files;
+			local mod = s.allModifiedOutputFiles;
 			if (mod) {
 				local io_files = HashSet(mod.each[0]);
-				local colliding_steps = HashSet();
-				for (local run: running_steps) {
-					for (local o, none: run.all_modified_output_files) {
+				local collidingSteps = HashSet();
+				for (local run: runningSteps) {
+					for (local o, none: run.allModifiedOutputFiles) {
 						if (o in io_files) {
-							colliding_steps.insert(run);
+							collidingSteps.insert(run);
 							break;
 						}
 					}
 				}
 				/* Wait for all colliding steps to complete. */
-				while (colliding_steps) {
-					local st = colliding_steps.popitem();
+				while (collidingSteps) {
+					local st = collidingSteps.popitem();
 					st.waitfor();
-					print_status(LOG_END_MARKER, "{} (done)".format({ st }));
-					running_steps.remove(st);
-					finished_steps.insert(st);
+					printStatus(LOG_END_MARKER, "{} (done)".format({ st }));
+					runningSteps.remove(st);
+					finishedSteps.insert(st);
 				}
 			}
 		}
 		if (s.complete()) {
-			missing_steps.remove(s);
-			finished_steps.insert(s);
+			missingSteps.remove(s);
+			finishedSteps.insert(s);
 			return;
 		}
 		/* If there are too many running steps, wait for one of them to finish */
-		if (#running_steps >= maxParallelSteps) {
-			for (local x: running_steps) {
+		if (#runningSteps >= maxParallelSteps) {
+			for (local x: runningSteps) {
 				if (x.trywaitfor()) {
-					print_status(LOG_END_MARKER, "{} (done)".format({ x }));
-					running_steps.remove(x);
-					finished_steps.insert(x);
+					printStatus(LOG_END_MARKER, "{} (done)".format({ x }));
+					runningSteps.remove(x);
+					finishedSteps.insert(x);
 					goto do_start_step;
 				}
 			}
-			if ((unchanged_iterations % 10) == 9) {
-				print_status(LOG_UPDATE_MARKER, "Still waiting on:");
-				for (local x: running_steps)
+			if ((unchangedIterations % 10) == 9) {
+				printStatus(LOG_UPDATE_MARKER, "Still waiting on:");
+				for (local x: runningSteps)
 					print "\t" + x;
 			}
 			Thread.sleep(JOIN_WAIT_DELAY);
-			++unchanged_iterations;
+			++unchangedIterations;
 			goto again;
 		}
 do_start_step:
-		missing_steps.remove(s);
-		running_steps.insert(s);
-		print_status(LOG_START_MARKER, "{} (begin: {})".format({ s, reason }));
+		missingSteps.remove(s);
+		runningSteps.insert(s);
+		printStatus(LOG_START_MARKER, "{} (begin: {})".format({ s, reason }));
 		s.begin();
 	}
 search_next_step:
-	while (missing_steps) {
+	while (missingSteps) {
 		local blockers: {BoundStep...} = HashSet();
-		for (local s: missing_steps) {
+		for (local s: missingSteps) {
 			for (local x: s.dependencies) {
-				if (x !in finished_steps) {
+				if (x !in finishedSteps) {
 					blockers.insert(s);
 					goto try_next_step;
 				}
@@ -1221,7 +1221,7 @@ search_next_step:
 				/* Allow the use of OPT_NOFORCE to ignore config.FORCE */
 				if (!s.group.options.get(OPT_NOFORCE, false)) {
 					s.createOutputFolders();
-					start_step(s, "FORCE");
+					startStep(s, "FORCE");
 					goto search_next_step;
 				}
 			}
@@ -1230,32 +1230,32 @@ search_next_step:
 			 * are missing, or if any of its input files are newer
 			 * that the newest output file. */
 			local lmod = none;
-			for (local o: s.produced_output_files) {
-				assert o in s.produced_files;
+			for (local o: s.producedOutputFiles) {
+				assert o in s.producedFiles;
 				local temp = getLastModfiedTime(o);
 				if (temp is none) {
 					/* Create missing folders leading up to all output files. */
 					s.createOutputFolders();
-					start_step(s, "output {!r} is missing".format({ o }));
+					startStep(s, "output {!r} is missing".format({ o }));
 					goto search_next_step;
 				}
 				if (lmod is none || temp > lmod)
 					lmod = temp;
 			}
-			for (local o, temp: s.modified_output_files) {
+			for (local o, temp: s.modifiedOutputFiles) {
 				if (temp is none) {
 					/* The modified file didn't exist when dependencies were ordered */
 					s.createOutputFolders();
-					start_step(s, "file {!r} didn't exist".format({ o }));
+					startStep(s, "file {!r} didn't exist".format({ o }));
 					goto search_next_step;
 				}
 				if (lmod is none || temp > lmod)
 					lmod = temp;
 			}
-			for (local o, temp: s.maybe_modified_output_files) {
+			for (local o, temp: s.maybeModifiedOutputFiles) {
 				if (temp is none) {
 					s.createOutputFolders();
-					start_step(s, "file {!r} was never updated".format({ o }));
+					startStep(s, "file {!r} was never updated".format({ o }));
 					goto search_next_step;
 				}
 				if (lmod is none || temp > lmod)
@@ -1263,7 +1263,7 @@ search_next_step:
 			}
 			if (lmod !is none) {
 				/* Check if any of the step's input files were modified after its output. */
-				for (local i: s.required_files) {
+				for (local i: s.requiredFiles) {
 					local temp;
 					local filename = i;
 					if (i is FirstFileOf) {
@@ -1279,19 +1279,19 @@ search_next_step:
 						temp = getLastModfiedTime(filename);
 					}
 					if (temp is none) {
-						start_step(s, "{!r} was deleted".format({ filename }));
+						startStep(s, "{!r} was deleted".format({ filename }));
 						goto search_next_step;
 					}
 					if (temp > lmod) {
-						start_step(s, "{!r} has changed".format({ filename }));
+						startStep(s, "{!r} has changed".format({ filename }));
 						goto search_next_step;
 					}
 				}
 			}
 			/* This step can be skipped! */
 			s.skip();
-			missing_steps.remove(s);
-			finished_steps.insert(s);
+			missingSteps.remove(s);
+			finishedSteps.insert(s);
 			goto search_next_step;
 try_next_step:
 			;
@@ -1321,35 +1321,35 @@ try_next_step:
 			 * them to finish.
 			 */
 			for (local block: common_deps) {
-				if (block !in running_steps)
+				if (block !in runningSteps)
 					continue; /* Hasn't started, yet */
 				block.waitfor();
-				print_status(LOG_END_MARKER, "{} (done)".format({ block }));
-				running_steps.remove(block);
-				finished_steps.insert(block);
+				printStatus(LOG_END_MARKER, "{} (done)".format({ block }));
+				runningSteps.remove(block);
+				finishedSteps.insert(block);
 				did_wait_any = true;
 			}
 			if (did_wait_any)
 				goto search_next_step;
 		}
 		/* If no step was started, wait for one of the running steps to finish */
-		waitfor_any_step();
+		waitforAnyStep();
 	}
 	/* Wait for all steps that are still running */
-	while (running_steps) {
-		local st = running_steps.first;
+	while (runningSteps) {
+		local st = runningSteps.first;
 		st.waitfor();
-		print_status(LOG_END_MARKER, "{} (done)".format({ st }));
-		running_steps.remove(st);
-		finished_steps.insert(st);
+		printStatus(LOG_END_MARKER, "{} (done)".format({ st }));
+		runningSteps.remove(st);
+		finishedSteps.insert(st);
 	}
 	if (recheck) {
 		local recheck_reason;
 		for (local s: recheck) {
 			local lmod = none;
 			s.updateModifiedOutputTimes();
-			for (local o: s.produced_output_files) {
-				assert o in s.produced_files;
+			for (local o: s.producedOutputFiles) {
+				assert o in s.producedFiles;
 				local temp = getLastModfiedTime(o);
 				if (temp is none) {
 					recheck_reason = "output {!r} is missing".format({ o });
@@ -1358,7 +1358,7 @@ try_next_step:
 				if (lmod is none || temp > lmod)
 					lmod = temp;
 			}
-			for (local o, temp: s.modified_output_files) {
+			for (local o, temp: s.modifiedOutputFiles) {
 				if (temp is none) {
 					recheck_reason = "file {!r} didn't exist".format({ o });
 					goto do_reset_step;
@@ -1366,7 +1366,7 @@ try_next_step:
 				if (lmod is none || temp > lmod)
 					lmod = temp;
 			}
-			for (local o, temp: s.maybe_modified_output_files) {
+			for (local o, temp: s.maybeModifiedOutputFiles) {
 				if (temp is none) {
 					recheck_reason = "file {!r} was never updated".format({ o });
 					goto do_reset_step;
@@ -1376,7 +1376,7 @@ try_next_step:
 			}
 			if (lmod !is none) {
 				/* Check if any of the step's input files were modified after its output. */
-				for (local i: s.required_files) {
+				for (local i: s.requiredFiles) {
 					local temp;
 					local filename = i;
 					if (i is FirstFileOf) {
@@ -1403,20 +1403,20 @@ try_next_step:
 			}
 			continue;
 do_reset_step:
-			print_status(LOG_UPDATE_MARKER, "{} (Restarting: {})"
+			printStatus(LOG_UPDATE_MARKER, "{} (Restarting: {})"
 				.format({ s, recheck_reason }));
-			missing_steps.insert(s);
-			finished_steps.remove(s);
+			missingSteps.insert(s);
+			finishedSteps.remove(s);
 			s.reset();
 		}
-		if (missing_steps) {
+		if (missingSteps) {
 			/* Must also restart all steps that have
 			 * dependencies on on restarted steps. */
 again_search_fin_steps:
-			for (local fin: finished_steps) {
+			for (local fin: finishedSteps) {
 				local has_restart_dep = false;
 				for (local dep: fin.dependencies) {
-					if (dep in missing_steps) {
+					if (dep in missingSteps) {
 						has_restart_dep = true;
 						break;
 					}
@@ -1424,13 +1424,13 @@ again_search_fin_steps:
 				if (has_restart_dep) {
 					fin.reset();
 					fin.updateModifiedOutputTimes();
-					finished_steps.remove(fin);
-					missing_steps.insert(fin);
+					finishedSteps.remove(fin);
+					missingSteps.insert(fin);
 					goto again_search_fin_steps;
 				}
 			}
 			print "Restarting the following steps:";
-			for (local s: missing_steps) {
+			for (local s: missingSteps) {
 				print "\t",;
 				print s;
 			}
@@ -1527,10 +1527,10 @@ function buildGroupsWithStepFilter(
 
 
 function enumerateBoundStepOutputFilesForWhitelistChecking(step: BoundStep): {string...} {
-	yield step.produced_output_files...;
-	for (local o, none: step.modified_output_files)
+	yield step.producedOutputFiles...;
+	for (local o, none: step.modifiedOutputFiles)
 		yield o;
-	for (local o, none: step.maybe_modified_output_files)
+	for (local o, none: step.maybeModifiedOutputFiles)
 		yield o;
 }
 
@@ -1545,9 +1545,9 @@ function buildGroupsWithOutputWhitelist(
 	return buildGroupsWithStepFilter(toolchain, groups, [](step: BoundStep) {
 		/* `outputWhiteList' must contain a regex pattern for
 		 * any of the step's following output file categories:
-		 *   - produced_output_files
-		 *   - modified_output_files
-		 *   - maybe_modified_output_files
+		 *   - producedOutputFiles
+		 *   - modifiedOutputFiles
+		 *   - maybeModifiedOutputFiles
 		 */
 		for (local f: enumerateBoundStepOutputFilesForWhitelistChecking(step)) {
 			for (local is_regex, pattern: outputWhiteList) {
@@ -1588,7 +1588,7 @@ function buildGroupsWithGroupOfInputFileWhitelist(
 	local steps, recheck = orderGroups(toolchain, groups)...;
 	local whiteListGroupNames = HashSet();
 	for (local bs: steps) {
-		for (local rf: bs.required_files) {
+		for (local rf: bs.requiredFiles) {
 			if (rf in inputFileWhitelist) {
 				whiteListGroupNames.insert(bs.group.name);
 				goto next_step;
