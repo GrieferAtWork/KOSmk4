@@ -1149,6 +1149,7 @@ again:
 		}
 	}
 	function startStep(s: BoundStep, reason: string) {
+		s.createOutputFolders();
 		local unchangedIterations = 0;
 again:
 		if (runningSteps) {
@@ -1220,7 +1221,6 @@ search_next_step:
 			if (s.toolchain.config.FORCE) {
 				/* Allow the use of OPT_NOFORCE to ignore config.FORCE */
 				if (!s.group.options.get(OPT_NOFORCE, false)) {
-					s.createOutputFolders();
 					startStep(s, "FORCE");
 					goto search_next_step;
 				}
@@ -1235,7 +1235,6 @@ search_next_step:
 				local temp = getLastModfiedTime(o);
 				if (temp is none) {
 					/* Create missing folders leading up to all output files. */
-					s.createOutputFolders();
 					startStep(s, "output {!r} is missing".format({ o }));
 					goto search_next_step;
 				}
@@ -1245,7 +1244,6 @@ search_next_step:
 			for (local o, temp: s.modifiedOutputFiles) {
 				if (temp is none) {
 					/* The modified file didn't exist when dependencies were ordered */
-					s.createOutputFolders();
 					startStep(s, "file {!r} didn't exist".format({ o }));
 					goto search_next_step;
 				}
@@ -1254,7 +1252,6 @@ search_next_step:
 			}
 			for (local o, temp: s.maybeModifiedOutputFiles) {
 				if (temp is none) {
-					s.createOutputFolders();
 					startStep(s, "file {!r} was never updated".format({ o }));
 					goto search_next_step;
 				}
