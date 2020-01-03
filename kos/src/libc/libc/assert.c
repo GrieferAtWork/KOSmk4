@@ -24,19 +24,20 @@
 #include "../api.h"
 /**/
 
-#include <kos/kernel/cpu-state.h>
+#include <asm/intrin.h>
 #include <kos/debugtrap.h>
-#include <sys/syslog.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state.h>
 #include <kos/syscalls.h>
+#include <sys/syslog.h>
 
 #include <format-printer.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <asm/intrin.h>
-#include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state-helpers.h>
+
+#include <libunwind/api.h> /* UNWIND_USER_ABORT */
 
 #include "assert.h"
 
@@ -45,35 +46,42 @@ DECL_BEGIN
 
 PUBLIC uintptr_t __stack_chk_guard = 0x123baf37;
 
-PRIVATE void LIBCCALL trap(struct kcpustate *__restrict state,
-                           syscall_ulong_t trapno) {
+PRIVATE ATTR_NORETURN ATTR_COLD void LIBCCALL
+trap_application(struct kcpustate *__restrict state,
+                 syscall_ulong_t trapno,
+                 unsigned int unwind_error) {
 	struct ucpustate ustate;
 	struct debugtrap_reason r;
 	kcpustate_to_ucpustate(state, &ustate);
 	r.dtr_signo  = trapno;
 	r.dtr_reason = DEBUGTRAP_REASON_NONE;
+	/* Try to trap into a debugger */
 	sys_debugtrap(&ustate, &r);
+	/* If the debugger trap failed, try to do a coredump */
+	sys_coredump(&ustate, NULL, NULL, 0, NULL, unwind_error);
+	/* If even the coredump failed (which it shouldn't have,
+	 * consequently meaning that shouldn't actually get here),
+	 * simply terminate the process. */
+	sys_exit_group(EXIT_FAILURE);
 }
 
 
-INTERN ATTR_SECTION(".text.crt.assert.__stack_chk_fail") ATTR_NORETURN void __FCALL
+INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert.__stack_chk_fail") void __FCALL
 libc_stack_failure_core(struct kcpustate *__restrict state) {
 	syslog(LOG_ERR, "User-space stack check failure [pc=%p]\n",
 	       kcpustate_getpc(state));
-	trap(state, SIGABRT);
-	_Exit(EXIT_FAILURE);
+	trap_application(state, SIGABRT, UNWIND_USER_SSP);
 }
 
-INTERN ATTR_SECTION(".text.crt.assert.abort") ATTR_NORETURN void __FCALL
+INTERN ATTR_NORETURN ATTR_COLD ATTR_SECTION(".text.crt.assert.abort") void __FCALL
 libc_abort_failure_core(struct kcpustate *__restrict state) {
 	syslog(LOG_ERR, "abort() called [pc=%p]\n", kcpustate_getpc(state));
-	trap(state, SIGABRT);
-	_Exit(EXIT_FAILURE);
+	trap_application(state, SIGABRT, UNWIND_USER_ABORT);
 }
 
 
 INTERN ATTR_SECTION(".text.crt.assert.assert")
-ATTR_NOINLINE ATTR_NORETURN void LIBCCALL
+ATTR_NOINLINE ATTR_NORETURN ATTR_COLD void LIBCCALL
 libc_assertion_failure_core(struct assert_args *__restrict args) {
 	syslog(LOG_ERR, "Assertion Failure [pc=%p]\n",
 	       kcpustate_getpc(&args->aa_state));
@@ -91,8 +99,7 @@ libc_assertion_failure_core(struct assert_args *__restrict args) {
 		va_end(vargs);
 		syslog(LOG_ERR, "\n");
 	}
-	trap(&args->aa_state, SIGABRT);
-	_Exit(EXIT_FAILURE);
+	trap_application(&args->aa_state, SIGABRT, UNWIND_USER_ASSERT);
 }
 
 #ifdef CONFIG_LOG_LIBC_UNIMPLEMENTED

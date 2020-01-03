@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ee66fe2 */
+/* HASH CRC-32:0x96a01972 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -729,7 +729,7 @@
  * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
  *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
  *                           allowing coredumps to also be triggerred for unhandled signals.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_NOTHROW' if unwinding
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
  *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
 #define __NR32_coredump                __UINT32_C(0x80000018) /* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
 #define __NR32_stime64                 __UINT32_C(0x80000019) /* errno_t stime64(time64_t const *t) */

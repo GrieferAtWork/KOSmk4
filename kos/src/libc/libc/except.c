@@ -556,7 +556,7 @@ search_fde:
 		}
 		if unlikely(reason != _URC_CONTINUE_UNWIND) {
 			unwind_error = reason == _URC_END_OF_STACK
-			               ? UNWIND_NOTHROW
+			               ? UNWIND_USER_NOTHROW
 			               : UNWIND_PERSONALITY_ERROR;
 			goto err;
 		}
@@ -585,7 +585,7 @@ search_fde:
 err:
 	{
 		struct exception_info *info = error_info();
-		if (unwind_error == UNWIND_NO_FRAME || unwind_error == UNWIND_NOTHROW) {
+		if (unwind_error == UNWIND_NO_FRAME || unwind_error == UNWIND_USER_NOTHROW) {
 			error_register_state_t *new_state;
 			/* Try to handle special exceptions (E_EXIT_THREAD and E_EXIT_PROCESS) */
 			new_state = handle_special_exception(state, &info->ei_data);
@@ -1011,7 +1011,7 @@ libc_except_handler3_impl(error_register_state_t *__restrict state,
 	/* Prevent recursion if we're already within the kernel-level exception handler. */
 	if unlikely(info->ei_flags & EXCEPT_FINEXCEPT) {
 		if unlikely(info->ei_flags & EXCEPT_FINEXCEPT2)
-			trigger_coredump(state, state, error, NULL, 0, UNWIND_RECURSION);
+			trigger_coredump(state, state, error, NULL, 0, UNWIND_USER_RECURSION);
 		recursion_flag = EXCEPT_FINEXCEPT2;
 	}
 	COMPILER_BARRIER();
@@ -1050,7 +1050,7 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 	/* Prevent recursion if we're already within the kernel-level exception handler. */
 	if unlikely(info->ei_flags & EXCEPT_FINEXCEPT) {
 		if unlikely(info->ei_flags & EXCEPT_FINEXCEPT2)
-			trigger_coredump(state, state, error, NULL, 0, UNWIND_RECURSION);
+			trigger_coredump(state, state, error, NULL, 0, UNWIND_USER_RECURSION);
 		recursion_flag = EXCEPT_FINEXCEPT2;
 	}
 	COMPILER_BARRIER();
@@ -1172,7 +1172,7 @@ do_coredump_with_unwind_error:
 	memcpy(info, &saved_info, sizeof(*info));
 	trigger_coredump(state, state, error, NULL, 0, unwind_error);
 do_coredump_with_dlerror:
-	unwind_error = UNWIND_DLERROR;
+	unwind_error = UNWIND_USER_DLERROR;
 	goto do_coredump_with_unwind_error;
 }
 

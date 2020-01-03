@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5a1aea6 */
+/* HASH CRC-32:0xfb8debf1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -654,7 +654,7 @@ __DECL_BEGIN
                                   *       Using this double-indirection mechanism, it becomes possible to handle
                                   *       things such as segmentation faults when accessing memory during unwinding,
                                   *       and ensuring that the correct unwind error codes (in this case `UNWIND_SEGFAULT')
-                                  *       get produced instead of always causing `UNWIND_RECURSION' (which should only
+                                  *       get produced instead of always causing `UNWIND_USER_RECURSION' (which should only
                                   *       be produced if the unwind machinery itself has become faulty) */
 #define EXCEPT_FMAYSIGNAL 0x0008 /* FLAG: The exception may be converted into a signal when `error_unwind(3)' cannot find
                                   *       a handler apart of some except-aware module (s.a. set_exception_handler:#4).

@@ -255,7 +255,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	pageid   = PAGEID_ENCODE(addr);
 	pageaddr = (void *)((uintptr_t)addr & ~PAGEMASK);
 #if 0
-	printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#x] [pid=%u]\n",
+	printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#x] [tid=%u]\n",
 	       (uintptr_t)addr, pageaddr, pc, icpustate_getsp(state),
 	       ecode, (unsigned int)task_getroottid_s());
 #endif
@@ -1102,7 +1102,7 @@ set_exception_pointers:
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
 	pc = (uintptr_t)instruction_trysucc((void const *)pc);
 #if 1
-	printk(KERN_DEBUG "Segmentation fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [pid=%u]\n",
+	printk(KERN_DEBUG "Segmentation fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [tid=%u]\n",
 	       addr, pageaddr, icpustate_getpc(state), pc,
 	       ecode, (unsigned int)task_getroottid_s());
 #endif

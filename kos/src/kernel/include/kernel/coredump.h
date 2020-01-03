@@ -68,12 +68,12 @@ struct __siginfo_struct;
  * @param: unwind_error:      The unwind error that caused user-space to halt exception handling,
  *                            or `UNWIND_SUCCESS' if the coredump was triggered by a signal and
  *                            never caused any unwinding to be done.
- *                            In the former, it is more likely that `unwind_error == UNWIND_NOTHROW',
+ *                            In the former, it is more likely that `unwind_error == UNWIND_USER_NOTHROW',
  *                            which happens when an exception is propagated through a function marked
  *                            as `NOTHROW()' (or `noexcept' if you prefer that one), however any other
- *                            error can also be indicate such as `UNWIND_RECURSION' in case an exception
+ *                            error can also be indicate such as `UNWIND_USER_RECURSION' in case an exception
  *                            was triggered whilst user-space was already in the process of handling two
- *                            others, and `UNWIND_DISABLED' in case user-space exception handling never
+ *                            others, and `UNWIND_USER_DISABLED' in case user-space exception handling never
  *                            even got triggered.
  * @param: orig_kstate:       The kernel-space CPU state where the exception originally got thrown
  * @param: ktraceback_vector: The vector of kernel-space program pointers traversed during unwinding.

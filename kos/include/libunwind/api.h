@@ -69,12 +69,14 @@
 #define UNWIND_CFA_ILLEGAL_INSTRUCTION      19 /* Illegal CFA instruction encountered. */
 #define UNWIND_APPLY_NOADDR_REGISTER        20 /* Attempted to use a non-address (e.g. FPU) register as a memory location */
 #define UNWIND_PERSONALITY_ERROR            21 /* A personality function returned an error. */
-#define UNWIND_NOTHROW                      22 /* (Used internally by libc): Unable to unwind a function marked as NOTHROW */
-#define UNWIND_RECURSION                    23 /* (Used internally by libc): At least 2 additional exceptions were
-                                                * thrown whilst already in the process of unwinding another exception. */
-#define UNWIND_DLERROR                      24 /* (Used internally by libc): Mode#4 unwinding failed because dl information
-                                                * could not be accessed (s.a. `dlerror()') */
-#define UNWIND_DISABLED                     25 /* (Used internally by the kernel): User-space exception handling is disabled. */
+/*...*/
+#define UNWIND_USER_DISABLED                64 /* (Used internally by the kernel): User-space exception handling is disabled. */
+#define UNWIND_USER_NOTHROW                 65 /* (Used internally by libc): Unable to unwind a function marked as NOTHROW */
+#define UNWIND_USER_RECURSION               66 /* (Used internally by libc): At least 2 additional exceptions were thrown whilst already in the process of unwinding another exception. */
+#define UNWIND_USER_DLERROR                 67 /* (Used internally by libc): Mode#4 unwinding failed because dl information could not be accessed (s.a. `dlerror()') */
+#define UNWIND_USER_ABORT                   68 /* (Used internally by libc): `abort()' or `std::terminate()' was called. */
+#define UNWIND_USER_ASSERT                  69 /* (Used internally by libc): `assert_failed()' was called. */
+#define UNWIND_USER_SSP                     70 /* (Used internally by libc): `__stack_chk_fail()' was called. */
 
 
 #endif /* !_LIBUNWIND_API_H */
