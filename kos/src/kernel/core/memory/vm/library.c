@@ -53,6 +53,15 @@ DECL_BEGIN
  * When unavailable, `lld_size' is set to ZERO(0). */
 PUBLIC ATTR_PERVM struct library_listdef thisvm_library_listdef = { 0 };
 
+INTERN NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL clone_thisvm_library_listdef)(struct vm *__restrict newvm,
+                                            struct vm *__restrict oldvm) {
+	memcpy(&FORVM(newvm, thisvm_library_listdef),
+	       &FORVM(oldvm, thisvm_library_listdef),
+	       sizeof(struct library_listdef));
+}
+DEFINE_PERVM_CLONE(clone_thisvm_library_listdef);
+
 
 typedef struct anonymous_module_struct MODULE;
 typedef struct anonymous_module_entry_struct MODULE_ENTRY;
