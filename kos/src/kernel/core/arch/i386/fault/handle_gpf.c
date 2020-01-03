@@ -151,7 +151,7 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 		/* Check for #GPFs caused by non-canonical memory accesses. */
 		if (ecode == 0 && !is_ss) {
 			uintptr_t nc_addr;
-			byte_t *old_pc = pc;
+			byte_t *pc_after_opcode = pc;
 			switch (opcode) {
 
 			case 0x88:    /* MOV r/m8,r8 */
@@ -566,16 +566,39 @@ do_noncanon:
 					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 #if 1
 				printk(KERN_DEBUG "Segmentation fault at %p [pc=%p,%p] [#GPF] [pid=%u]\n",
-				       nc_addr, old_pc, pc, (unsigned int)task_getroottid_s());
+				       nc_addr, pc_after_opcode, pc, (unsigned int)task_getroottid_s());
 #endif
 				goto unwind_state;
 			}
 done_noncanon_check:
-			pc = old_pc;
+			pc = pc_after_opcode;
 		}
 #endif /* __x86_64__ */
 
 		switch (opcode) {
+
+#ifdef __x86_64__
+			/* Because the default #GPF cause assumption on x86_64 is a non-canonical
+			 * memory access, all #GPF causes related to privileged instructions must
+			 * be checked for explicitly. */
+		case 0x6e: /* outsb */
+		case 0x6f: /* outsw / outsl / outsq */
+		case 0x6c: /* insb */
+		case 0x6d: /* insw / insl / insq */
+		case 0xec: /* inb */
+		case 0xed: /* inw / inl */
+		case 0xee: /* outb */
+		case 0xef: /* outw / outl */
+			goto generic_privileged_instruction;
+		case 0xe4: /* inb */
+		case 0xe5: /* inw / inl */
+		case 0xe6: /* outb */
+		case 0xe7: /* outw / outl */
+			pc += 1;
+			goto generic_privileged_instruction;
+			/* TODO:  */
+#endif /* __x86_64__ */
+
 
 		case 0x9a: {
 			u16 segment;
@@ -990,12 +1013,17 @@ null_segment_error:
 			PERTASK_SET(this_exception_pointers[1],
 			            (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
 		}
+		printk(KERN_WARNING "Assuming Segmentation fault at ? [pc=%p,%p,opcode=%I32u] [#GPF] [pid=%u]\n",
+		       orig_pc, pc, opcode, (unsigned int)task_getroottid_s());
 		goto unwind_state;
 	}
-#endif
+#endif /* __x86_64__ */
 	/* If the error originated from user-space, default to assuming it's
 	 * because of some privileged instruction not explicitly handled above. */
 	if (isuser()) {
+#ifdef __x86_64__
+generic_privileged_instruction:
+#endif /* __x86_64__ */
 		for (i = 1; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE));
