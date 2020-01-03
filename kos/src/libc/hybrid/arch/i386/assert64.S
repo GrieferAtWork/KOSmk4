@@ -201,7 +201,7 @@ INTERN_FUNCTION(libc___afailf)
 	subq_imm_cfi (1 * 8 + X86_64_VA_LIST_XMM_COUNT * 16), %rsp
 	leaq   -OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_R9(%rsp), %rcx
 	movq   %rcx, OFFSET_X86_64_VA_LIST_STRUCT_REG_SAVE_AREA(%rdi)
-	movl   $(0),   OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
+	movl   $(0), OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%rdi)
 	movq   %r9,  0(%rsp)
 	X86_64_VA_LIST_SAVE_XMM(8(%rsp))
 	INTERN(libc_assertion_failure_core)

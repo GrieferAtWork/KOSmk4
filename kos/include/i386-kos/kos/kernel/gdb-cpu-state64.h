@@ -34,14 +34,15 @@ __SYSDECL_BEGIN
 #endif /* __x86_64__ */
 #define GDB_REGISTER_X86_64_MAXSIZE 16 /* Max register size (including extended registers). */
 
+/* For no reason what-so-ever, GDB uses a totally f%*$ed up ordering for GP register 0-7 */
 #define GDB_REGISTER_X86_64_RAX    0x00 /* 64-bit [C] Accumulator register */
-#define GDB_REGISTER_X86_64_RCX    0x01 /* 64-bit [C] Count register */
-#define GDB_REGISTER_X86_64_RDX    0x02 /* 64-bit [C] Data register */
-#define GDB_REGISTER_X86_64_RBX    0x03 /* 64-bit [P] Base register */
-#define GDB_REGISTER_X86_64_RSP    0x04 /* 64-bit [P] Stack pointer */
-#define GDB_REGISTER_X86_64_RBP    0x05 /* 64-bit [P] Frame base pointer */
-#define GDB_REGISTER_X86_64_RSI    0x06 /* 64-bit [C] Source pointer */
-#define GDB_REGISTER_X86_64_RDI    0x07 /* 64-bit [C] Destination pointer */
+#define GDB_REGISTER_X86_64_RBX    0x01 /* 64-bit [P] Base register */
+#define GDB_REGISTER_X86_64_RCX    0x02 /* 64-bit [C] Count register */
+#define GDB_REGISTER_X86_64_RDX    0x03 /* 64-bit [C] Data register */
+#define GDB_REGISTER_X86_64_RSI    0x04 /* 64-bit [C] Source pointer */
+#define GDB_REGISTER_X86_64_RDI    0x05 /* 64-bit [C] Destination pointer */
+#define GDB_REGISTER_X86_64_RBP    0x06 /* 64-bit [P] Frame base pointer */
+#define GDB_REGISTER_X86_64_RSP    0x07 /* 64-bit [P] Stack pointer */
 #define GDB_REGISTER_X86_64_R8     0x08 /* 64-bit %r8 */
 #define GDB_REGISTER_X86_64_R9     0x09 /* 64-bit %r9 */
 #define GDB_REGISTER_X86_64_R10    0x0a /* 64-bit %r10 */
@@ -99,13 +100,13 @@ __SYSDECL_BEGIN
 struct __ATTR_PACKED gdb_cpustate64 {
 	/* The basic register state that is used by the `g' / `G' commands. */
 	__u64 gcs_rax;    /* [C] Accumulator register */
+	__u64 gcs_rbx;    /* [P] Base register */
 	__u64 gcs_rcx;    /* [C] Count register */
 	__u64 gcs_rdx;    /* [C] Data register */
-	__u64 gcs_rbx;    /* [P] Base register */
-	__u64 gcs_rsp;    /* [P] Stack pointer */
-	__u64 gcs_rbp;    /* [P] Frame base pointer */
 	__u64 gcs_rsi;    /* [C] Source pointer */
 	__u64 gcs_rdi;    /* [C] Destination pointer */
+	__u64 gcs_rbp;    /* [P] Frame base pointer */
+	__u64 gcs_rsp;    /* [P] Stack pointer */
 	__u64 gcs_r8;     /* %r8 */
 	__u64 gcs_r9;     /* %r9 */
 	__u64 gcs_r10;    /* %r10 */

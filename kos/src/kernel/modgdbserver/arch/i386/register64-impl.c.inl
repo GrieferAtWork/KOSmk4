@@ -321,13 +321,13 @@ NOTHROW(FCALL FUNC(GPRegsNspRegister))(uintptr_t regno, void BUF_CONST *buf, siz
 	    regno != GDB_REGISTER_X86_64_RSP) {
 		PRIVATE ptrdiff_t const offset_table[16] = {
 			/* [GDB_REGISTER_X86_64_RAX - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_rax),
+			/* [GDB_REGISTER_X86_64_RBX - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_rbx),
 			/* [GDB_REGISTER_X86_64_RCX - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_rcx),
 			/* [GDB_REGISTER_X86_64_RDX - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_rdx),
-			/* [GDB_REGISTER_X86_64_RBX - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_rbx),
-			/* [GDB_REGISTER_X86_64_RSP - GDB_REGISTER_X86_64_RAX] = */ 0,
-			/* [GDB_REGISTER_X86_64_RBP - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_rbp),
 			/* [GDB_REGISTER_X86_64_RSI - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_rsi),
 			/* [GDB_REGISTER_X86_64_RDI - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_rdi),
+			/* [GDB_REGISTER_X86_64_RBP - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_rbp),
+			/* [GDB_REGISTER_X86_64_RSP - GDB_REGISTER_X86_64_RAX] = */ 0,
 			/* [GDB_REGISTER_X86_64_R8  - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_r8 ),
 			/* [GDB_REGISTER_X86_64_R9  - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_r9 ),
 			/* [GDB_REGISTER_X86_64_R10 - GDB_REGISTER_X86_64_RAX] = */ offsetof(struct gpregsnsp64, gp_r10),

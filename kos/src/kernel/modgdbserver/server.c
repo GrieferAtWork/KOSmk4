@@ -557,8 +557,8 @@ LOCAL void NOTHROW(FCALL GDBServer_SetRemoteDetached)(void) {
 #ifdef __x86_64__
 #define REASON_REGISTER_MAXSIZE 8
 #define FOREACH_REASON_REGISTER(callback)   \
-	callback("05", GDB_REGISTER_X86_64_RBP) \
-	callback("04", GDB_REGISTER_X86_64_RSP) \
+	callback("06", GDB_REGISTER_X86_64_RBP) \
+	callback("07", GDB_REGISTER_X86_64_RSP) \
 	callback("10", GDB_REGISTER_X86_64_RIP)
 #elif defined(__i386__)
 #define REASON_REGISTER_MAXSIZE 4
