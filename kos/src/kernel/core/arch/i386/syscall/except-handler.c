@@ -57,6 +57,65 @@
 
 DECL_BEGIN
 
+LOCAL NOBLOCK void
+NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict state,
+                                              struct rpc_syscall_info const *__restrict sc_info,
+                                              struct exception_data const *__restrict data,
+                                              errno_t negative_errno_value) {
+	unsigned int pointer_count = EXCEPTION_DATA_POINTERS;
+	(void)state;
+	(void)sc_info;
+	while (pointer_count != 0 &&
+	       data->e_pointers[pointer_count - 1] == 0)
+		--pointer_count;
+	printk(KERN_TRACE "[except] Translate exception %#x:%#x",
+	       data->e_class, data->e_subclass);
+	if (pointer_count != 0) {
+		unsigned int i;
+		for (i = 0; i < pointer_count; ++i) {
+			printk(KERN_TRACE "%c%#Ix",
+			       i == 0 ? '[' : ',',
+			       data->e_pointers[i]);
+		}
+		printk(KERN_TRACE "]");
+	}
+	printk(KERN_TRACE " into errno=%d [tid=%u]\n",
+	       negative_errno_value, task_getroottid_s());
+}
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict state,
+                                              struct rpc_syscall_info const *__restrict sc_info,
+                                              struct exception_data const *__restrict data,
+                                              uintptr_t mode,
+                                              USER void *handler,
+                                              USER void *stack) {
+	unsigned int pointer_count = EXCEPTION_DATA_POINTERS;
+	(void)state;
+	(void)sc_info;
+	while (pointer_count != 0 &&
+	       data->e_pointers[pointer_count - 1] == 0)
+		--pointer_count;
+	printk(KERN_TRACE "[except] Propagate exception %#x:%#x",
+	       data->e_class, data->e_subclass);
+	if (pointer_count != 0) {
+		unsigned int i;
+		for (i = 0; i < pointer_count; ++i) {
+			printk(KERN_TRACE "%c%#Ix",
+			       i == 0 ? '[' : ',',
+			       data->e_pointers[i]);
+		}
+		printk(KERN_TRACE "]");
+	}
+	printk(KERN_TRACE " hand:[pc=%IX,sp=%IX] orig:[pc=%IX,sp=%IX] [mode=%#Ix,tid=%u]\n",
+	       handler, stack,
+	       icpustate_getpc(state),
+	       icpustate_getuserpsp(state),
+	       mode, task_getroottid_s());
+}
+
+
+
 /* Try to invoke the user-space exception handler for the
  * currently set exception, as described by `error_info()'
  * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)
@@ -124,6 +183,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	user_error->e_faultaddr = sc_info != NULL
 	                          ? (__HYBRID_PTR64(void))(u64)(uintptr_t)icpustate_getuserpsp(state)
 	                          : (__HYBRID_PTR64(void))(u64)(uintptr_t)mydata->e_faultaddr;
+	log_userexcept_error_propagate(state, sc_info, mydata, mode, (void *)handler, user_error);
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpdi(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate64 *__restrict state */
 	gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_error); /* struct exception_data64 *__restrict error */
@@ -192,6 +252,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	user_error->e_faultaddr = sc_info != NULL
 	                          ? (__HYBRID_PTR32(void))(u32)(uintptr_t)icpustate_getuserpsp(state)
 	                          : (__HYBRID_PTR32(void))(u32)(uintptr_t)mydata->e_faultaddr;
+	log_userexcept_error_propagate(state, sc_info, mydata, mode, (void *)handler, user_error);
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpcx(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate32 *__restrict state */
 	gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_error); /* struct exception_data32 *__restrict error */
@@ -376,32 +437,6 @@ x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
 	                                  &siginfo, true);
 }
 
-
-LOCAL NOBLOCK void
-NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict state,
-                                              struct rpc_syscall_info const *__restrict sc_info,
-                                              struct exception_data const *__restrict data,
-                                              errno_t negative_errno_value) {
-	unsigned int pointer_count = EXCEPTION_DATA_POINTERS;
-	(void)state;
-	(void)sc_info;
-	while (pointer_count != 0 &&
-	       data->e_pointers[pointer_count - 1] == 0)
-		--pointer_count;
-	printk(KERN_TRACE "[except] Translate exception %#x:%#x",
-	       data->e_class, data->e_subclass);
-	if (pointer_count != 0) {
-		unsigned int i;
-		for (i = 0; i < pointer_count; ++i) {
-			printk(KERN_TRACE "%c%#Ix",
-			       i == 0 ? '[' : ',',
-			       data->e_pointers[i]);
-		}
-		printk(KERN_TRACE "]");
-	}
-	printk(KERN_TRACE " into errno=%d [tid=%u]\n",
-	       negative_errno_value, task_getroottid_s());
-}
 
 /* Set the appropriate error flag for the system call method described by `sc_info' (if any)
  * In all current cases where such a flag is defined, this is EFLAGS.CF, allowing user-space
