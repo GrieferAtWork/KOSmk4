@@ -505,7 +505,7 @@ __FORCELOCAL void (__wrgs_keepbase)(__UINT16_TYPE__ __val) {
 	__asm__ __volatile__("pushfq\n\t"
 	                     "cli\n\t"
 	                     "movq %%gs:0, %q0\n\t"
-	                     "movw %w0, %%gs\n\t"
+	                     "movw %w1, %%gs\n\t"
 	                     "safe_wrgsbase %q0\n\t"
 	                     "popfq"
 	                     : "=&r" (__temp)
