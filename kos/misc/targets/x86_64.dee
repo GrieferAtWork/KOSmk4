@@ -60,20 +60,20 @@ global final AS_I32 = ".int";
 
 @@An optional function called before building is started
 function build(magic: Module) {
-	import * from ..libmagic.libmagic;
+	import updateAutomaticSourcesOnDemand from ..magicgenerator.ondemand;
 
 	/* Re-configure for i386 settions */
 	magic.TARGET_ARCH = "i386";
 	magic.TARGET = import(".i386");
 	local saved_CONFIG_ONLY_BUILD_LIBRARIES = magic.CONFIG_ONLY_BUILD_LIBRARIES;
-	local savedOptions = deepcopy magic.options;
-	local savedToolchain = deepcopy magic.toolchain;
-	local savedConfig = deepcopy magic.config;
+	local saved_CONFIG_DONT_BUILD = magic.CONFIG_DONT_BUILD;
+	local x64Options = deepcopy magic.options;
+	local x64Toolchain = deepcopy magic.toolchain;
+	local x64Config = deepcopy magic.config;
+	magic.CONFIG_DONT_BUILD = true;
 
 	/* Generate build steps for i386 */
-	local saved_LIBMAGIC_ONLY_GATHER_STEPS = LIBMAGIC_ONLY_GATHER_STEPS;
-	LIBMAGIC_ONLY_GATHER_STEPS = true;
-	local steps32, recheck32 = magic.build(reconfigure: [](magic: Module) {
+	magic.build(reconfigure: [](magic: Module) {
 		import TOOLCHAIN_MTOOLS_DISK from ..libmagic.steps.mtools;
 		/* Re-configure to output files into the x86_64 binpath */
 		magic.TARGET_BINPATH              = "/bin/x86_64-kos-" + magic.getConfig();
@@ -88,31 +88,47 @@ function build(magic: Module) {
 		magic.toolchain.name = "x86_32-kos-" + magic.getConfig();
 		magic.TARGET.provideToolchainCache(
 			magic.toolchain, "x86_64-kos-" + magic.getConfig());
-	})...;
+	});
+	/* Check that source generators are up-to-date. */
+	updateAutomaticSourcesOnDemand("i386", magic.TARGET);
 
-	/* Restore x86_64 settions */
-	magic.options.clear();
-	magic.options.update(savedOptions);
+	/* Collect 32-bit build settings */
+	local x32Toolchain = magic.toolchain;
+	local x32Groups = magic.groups;
+
+	/* Restore x86_64 settings */
+	magic.toolchain = x64Toolchain;
+	magic.options = x64Options;
 	magic.CONFIG_ONLY_BUILD_LIBRARIES = saved_CONFIG_ONLY_BUILD_LIBRARIES;
-	magic.groups.clear();
+	local x64Groups = [];
+	magic.groups = x64Groups;
+
 	magic.TARGET_ARCH = "x86_64";
-	import . as mytarget;
-	magic.TARGET    = mytarget;
-	magic.toolchain = savedToolchain;
-	magic.config    = savedConfig;
-	savedToolchain._stdlibCache.clear();
-	savedToolchain.config = savedConfig;
-	savedToolchain.name = "x86_64-kos-" + magic.getConfig();
+	import . as target_x86_64;
+	magic.TARGET = target_x86_64;
+	magic.config = x64Config;
+	x64Toolchain._stdlibCache.clear();
+	x64Toolchain.config = x64Config;
+	x64Toolchain.name = "x86_64-kos-" + magic.getConfig();
 
 	/* Generate build steps for x86_64 */
-	local steps64, recheck64 = magic.build()...;
+	magic.build();
+
+	/* Setup available toolchains. */
+	magic.toolchainsAndGroups = {
+		(x32Toolchain, x32Groups),
+		(x64Toolchain, x64Groups),
+	};
+
+	magic.CONFIG_DONT_BUILD = saved_CONFIG_DONT_BUILD;
+	if (saved_CONFIG_DONT_BUILD)
+		return;
+
+	/* Check that source generators are up-to-date. */
+	updateAutomaticSourcesOnDemand("x86_64", target_x86_64);
 
 	/* Execute 32-bit and 64-bit build steps in parallel */
-	LIBMAGIC_ONLY_GATHER_STEPS = saved_LIBMAGIC_ONLY_GATHER_STEPS;
-
-	local allSteps: {BoundStep...}   = Sequence.concat(steps32, steps64);
-	local allRecheck: {BoundStep...} = Sequence.concat(recheck32, recheck64);
-	return executeBuildSteps(allSteps, allRecheck, magic.CONFIG_MAX_COMPILERS);
+	return magic.buildToolchainsAndGroups();
 }
 
 @@Provide a cache for the toolchain.

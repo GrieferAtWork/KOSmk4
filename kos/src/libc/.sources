@@ -123,7 +123,7 @@ BEGIN
 		/* `libc' as a static library (link as `OBJECT("$OUTPATH/lib/libc.a")')
 		 * NOTE: Don't forget to turn on `L_FLAGS("-Wl,--gc-sections")', to prevent
 		 *       any function that you didn't use from clobbering your binary */
-		SET_STATIC_OUTPUT(TARGET_BINPATH + "/lib/libc.a")
+		SET_STATIC_OUTPUT(TARGET_BINPATH + DISK_LIBPATH + "libc.a")
 		/* WARNING: Because `AR' is shitty and doesn't understand weak symbols,
 		 *          the order of SOURCE files here is important in that all files
 		 *          containing weak declarations must come _AFTER_ files which may

@@ -56,8 +56,9 @@ global requiredGroupWhiteList: {string...} | none = none;
 global requiredGroupOfSourceFileWhiteList: {string...} | none = none;
 global config: Config = Config(LIBRARY_SUFFIX: ".so");
 global toolchain: Toolchain = GCCToolchain(config: config);
-global final groups: {Group...} = [];
-global final options: {string: Object} = Dict();
+global toolchainsAndGroups: {(Toolchain, {Group...})...};
+global groups: {Group...} = [];
+global options: {string: Object} = Dict();
 
 /* Build configuration */
 global CONFIG_OPTIMIZE: bool;
@@ -140,6 +141,28 @@ function generateProjectOfInputFile(filename: string) {
 	CONFIG_EMULATOR_USED = none;
 }
 
+function buildToolchainsAndGroups() {
+	if (requiredOutputWhiteList !is none) {
+		return buildGroupsWithOutputWhitelist(
+			toolchainsAndGroups: toolchainsAndGroups,
+			outputWhiteList:     requiredOutputWhiteList,
+			maxParallelSteps:    CONFIG_MAX_COMPILERS);
+	} else if (requiredGroupWhiteList !is none) {
+		return buildGroupsWithGroupWhitelist(
+			toolchainsAndGroups: toolchainsAndGroups,
+			groupWhiteList:      requiredGroupWhiteList,
+			maxParallelSteps:    CONFIG_MAX_COMPILERS);
+	} else if (requiredGroupOfSourceFileWhiteList !is none) {
+		return buildGroupsWithGroupOfInputFileWhitelist(
+			toolchainsAndGroups: toolchainsAndGroups,
+			inputFileWhitelist:  requiredGroupOfSourceFileWhiteList,
+			maxParallelSteps:    CONFIG_MAX_COMPILERS);
+	} else {
+		return buildGroups(
+			toolchainsAndGroups: toolchainsAndGroups,
+			maxParallelSteps:    CONFIG_MAX_COMPILERS);
+	}
+}
 
 function build(reconfigure: Callable = none) {
 	TARGET_NAME = "{}-kos-{}".format({ TARGET_ARCH, getConfig() });
@@ -190,6 +213,8 @@ function build(reconfigure: Callable = none) {
 #include "kos/.sources"
 	}
 
+	toolchainsAndGroups = { (toolchain, groups) };
+
 	/* NOTE: Must always load groups for stuff like like magic-driven %{vinfo} */
 	if (CONFIG_DONT_BUILD)
 		return;
@@ -199,30 +224,7 @@ function build(reconfigure: Callable = none) {
 	updateAutomaticSourcesOnDemand(TARGET_ARCH, TARGET);
 
 	/* Automatically re-build changed sources */
-	if (requiredOutputWhiteList !is none) {
-		return buildGroupsWithOutputWhitelist(
-			toolchain:          toolchain,
-			groups:             groups,
-			outputWhiteList:    requiredOutputWhiteList,
-			maxParallelSteps:   CONFIG_MAX_COMPILERS);
-	} else if (requiredGroupWhiteList !is none) {
-		return buildGroupsWithGroupWhitelist(
-			toolchain:          toolchain,
-			groups:             groups,
-			groupWhiteList:     requiredGroupWhiteList,
-			maxParallelSteps:   CONFIG_MAX_COMPILERS);
-	} else if (requiredGroupOfSourceFileWhiteList !is none) {
-		return buildGroupsWithGroupOfInputFileWhitelist(
-			toolchain:          toolchain,
-			groups:             groups,
-			inputFileWhitelist: requiredGroupOfSourceFileWhiteList,
-			maxParallelSteps:   CONFIG_MAX_COMPILERS);
-	} else {
-		return buildGroups(
-			toolchain:          toolchain,
-			groups:             groups,
-			maxParallelSteps:   CONFIG_MAX_COMPILERS);
-	}
+	buildToolchainsAndGroups();
 }
 
 function main(argv: {string...}) {

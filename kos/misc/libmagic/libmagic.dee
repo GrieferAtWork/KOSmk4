@@ -110,9 +110,6 @@ import * from errors;
 @@cause it to ignore the effects of @Config.FORCE
 global final OPT_NOFORCE = "noforce";
 
-@@When @true, only gather steps but don't actually execute them
-global LIBMAGIC_ONLY_GATHER_STEPS = false;
-
 local final LOG_START_MARKER  = ">";
 local final LOG_END_MARKER    = "<";
 local final LOG_UPDATE_MARKER = "~";
@@ -995,36 +992,38 @@ function combineSteps(steps...: Step): Step {
 @@Order build steps and return all steps that need to be performed to build all of the given groups.
 @@The second set of steps are steps that depend on MaybeModified steps forming a dependency loop.
 @@When non-empty, the input files of these steps must be re-checked for changes.
-function orderGroups(toolchain: Toolchain, groups: {Group...}): ({BoundStep...}, {BoundStep...}) {
+function orderGroups(toolchainsAndGroups: {(Toolchain, {Group...})...}): ({BoundStep...}, {BoundStep...}) {
 	local loop_recheck: {BoundStep...} = HashSet();
 	local allsteps: {BoundStep...} = HashSet();
-	for (local p: groups) {
-		for (local s: p.steps) {
-			local bs = BoundStep(p, s, toolchain);
-			if (s.split !is none)
-				allsteps.update(s.split(bs));
-			else {
-				allsteps.insert(bs);
+	for (local toolchain, groups: toolchainsAndGroups) {
+		for (local p: groups) {
+			for (local s: p.steps) {
+				local bs = BoundStep(p, s, toolchain);
+				if (s.split !is none)
+					allsteps.update(s.split(bs));
+				else {
+					allsteps.insert(bs);
+				}
 			}
 		}
 	}
-	local file_producers: {string: BoundStep} = Dict();
-	local file_modifiers: {string: {BoundStep...}} = Dict();
+	local fileProducers: {string: BoundStep} = Dict();
+	local fileModifiers: {string: {BoundStep...}} = Dict();
 	for (local s: allsteps) {
 		for (local f: s.producedFiles) {
-			if (!file_producers.setnew(f, s)) {
-				local o = file_producers[f];
-				throw Error("File {!r} is produced by multiple steps {}.{} and {}.{}"
+			if (!fileProducers.setnew(f, s)) {
+				local o = fileProducers[f];
+				throw Error("File {!r} is produced by multiple steps {}:{}.{} and {}:{}.{}"
 					.format({ f,
-						s.group.name, s.step.name,
-						o.group.name, o.step.name,
+						s.toolchain.name, s.group.name, s.step.name,
+						s.toolchain.name, o.group.name, o.step.name,
 					}));
 			}
 		}
 		for (local f, none: s.allModifiedOutputFiles) {
-			local stps = file_modifiers.get(f);
+			local stps = fileModifiers.get(f);
 			if (stps is none)
-				file_modifiers[f] = stps = HashSet();
+				fileModifiers[f] = stps = HashSet();
 			stps.insert(s);
 		}
 	}
@@ -1036,12 +1035,12 @@ function orderGroups(toolchain: Toolchain, groups: {Group...}): ({BoundStep...},
 			if (f is FirstFileOf) {
 				dep = none;
 				for (local x: f.files) {
-					dep = file_producers.get(x);
+					dep = fileProducers.get(x);
 					if (dep !is none)
 						break;
 				}
 			} else {
-				dep = file_producers.get(f);
+				dep = fileProducers.get(f);
 			}
 			if (dep is none)
 				continue;
@@ -1069,7 +1068,7 @@ did_resolve:
 		 * steps exist that may try to modify those files. - If adding
 		 * those steps as dependencies won't create a loop, do so */
 		for (local f: s.requiredFiles) {
-			local mods = file_modifiers.get(f);
+			local mods = fileModifiers.get(f);
 			for (local m: mods) {
 				if (!m.hasRecursiveDependency(s)) {
 					s.dependencies.insert(m);
@@ -1083,7 +1082,7 @@ did_resolve:
 			/* Check if modified output files are created by some
 			 * other step. - If so, that step becomes a dependency
 			 * of `s' */
-			local dep = file_producers.get(f);
+			local dep = fileProducers.get(f);
 			if (dep !is none) {
 				/* Don't create the dependency if it would cause a loop. */
 				if (!dep.hasRecursiveDependency(s)) {
@@ -1100,8 +1099,6 @@ did_resolve:
 
 
 function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxParallelSteps: int = 8) {
-	if (LIBMAGIC_ONLY_GATHER_STEPS)
-		return (steps, recheck);
 	local missingSteps: {BoundStep...} = HashSet(steps);
 	local finishedSteps: {BoundStep...} = HashSet();
 	local runningSteps: {BoundStep...} = HashSet();
@@ -1477,16 +1474,14 @@ class Timed {
 
 @@Helper function for combining @orderGroups and @executeBuildSteps
 @@in order to perform a parallel build of all of the specified groups
-function buildGroups(toolchain: Toolchain, groups: {Group...}, maxParallelSteps: int = 8) {
+function buildGroups(toolchainsAndGroups: {(Toolchain, {Group...})...}, maxParallelSteps: int = 8) {
 #if 1
-	local steps, recheck = orderGroups(toolchain, groups)...;
-	if (LIBMAGIC_ONLY_GATHER_STEPS)
-		return (steps, recheck);
+	local steps, recheck = orderGroups(toolchainsAndGroups)...;
 	return executeBuildSteps(steps, recheck, maxParallelSteps);
 #else
 	local steps, recheck = (
 		with(Timed("orderGroups"))
-			orderGroups(toolchain, groups))...;
+			orderGroups(toolchainsAndGroups)...;
 	with(Timed("executeBuildSteps"))
 		return executeBuildSteps(steps, recheck, maxParallelSteps);
 #endif
@@ -1532,9 +1527,9 @@ again_recheck_deps:
 @@Same as @buildGroups(), however only perform steps
 @@for which the given @filterStep() returns true
 function buildGroupsWithStepFilter(
-		toolchain: Toolchain, groups: {Group...},
+		toolchainsAndGroups: {(Toolchain, {Group...})...},
 		filterStep: {(bool,string)...} = none, maxParallelSteps: int = 8) {
-	local steps, recheck = orderGroups(toolchain, groups)...;
+	local steps, recheck = orderGroups(toolchainsAndGroups)...;
 	if (filterStep !is none) {
 		steps   = filterStepsWithCallbackWithDepdendencies(steps, filterStep);
 		recheck = filterStepsWithCallbackWithDepdendencies(recheck, filterStep);
@@ -1556,11 +1551,11 @@ function enumerateBoundStepOutputFilesForWhitelistChecking(step: BoundStep): {st
 @@as well as steps that produce output files that are apart of @outputWhiteList
 @@@param outputWhiteList: Set of (is_regex, pattern_or_filename)
 function buildGroupsWithOutputWhitelist(
-		toolchain: Toolchain, groups: {Group...},
+		toolchainsAndGroups: {(Toolchain, {Group...})...},
 		outputWhiteList: {(bool,string)...} = none, maxParallelSteps: int = 8) {
 	if (outputWhiteList is none)
-		return buildGroups(toolchain, groups, maxParallelSteps);
-	return buildGroupsWithStepFilter(toolchain, groups, [](step: BoundStep) {
+		return buildGroups(toolchainsAndGroups, maxParallelSteps);
+	return buildGroupsWithStepFilter(toolchainsAndGroups, [](step: BoundStep) {
 		/* `outputWhiteList' must contain a regex pattern for
 		 * any of the step's following output file categories:
 		 *   - producedOutputFiles
@@ -1582,12 +1577,11 @@ function buildGroupsWithOutputWhitelist(
 @@as well as steps that are apart of one of the given groups
 @@@param groupWhiteList: Set of List of whitelisted group names
 function buildGroupsWithGroupWhitelist(
-		toolchain: Toolchain, groups: {Group...},
+		toolchainsAndGroups: {(Toolchain, {Group...})...},
 		groupWhiteList: {string...} = none, maxParallelSteps: int = 8) {
 	if (groupWhiteList is none)
-		return buildGroups(toolchain, groups, maxParallelSteps);
-	return buildGroupsWithStepFilter(toolchain, groups,
-		[](step: BoundStep) {
+		return buildGroups(toolchainsAndGroups, maxParallelSteps);
+	return buildGroupsWithStepFilter(toolchainsAndGroups, [](step: BoundStep) {
 		return step.group.name in groupWhiteList;
 	}, maxParallelSteps);
 }
@@ -1599,11 +1593,11 @@ function buildGroupsWithGroupWhitelist(
 @@Using this, you can implement something like BUILD_PROJECT_OF(SOURCE_FILE)
 @@@param inputFileWhitelist: Set of filenames normalized using `normalizePath(NAME, false)'
 function buildGroupsWithGroupOfInputFileWhitelist(
-		toolchain: Toolchain, groups: {Group...},
+		toolchainsAndGroups: {(Toolchain, {Group...})...},
 		inputFileWhitelist: {string...} = none, maxParallelSteps: int = 8) {
 	if (inputFileWhitelist is none)
-		return buildGroups(toolchain, groups, maxParallelSteps);
-	local steps, recheck = orderGroups(toolchain, groups)...;
+		return buildGroups(toolchainsAndGroups, maxParallelSteps);
+	local steps, recheck = orderGroups(toolchainsAndGroups)...;
 	local whiteListGroupNames = HashSet();
 	for (local bs: steps) {
 		for (local rf: bs.requiredFiles) {

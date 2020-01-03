@@ -183,6 +183,7 @@ options[OPT_COMPILE_INLINE_SOURCE_FLAGS] = true;
 
 #include "src/.sources"
 
+if (!CONFIG_ONLY_BUILD_LIBRARIES) {
 /* Define the DISK */
 BEGIN_ANONYMOUS GROUP("disk") { MFORMAT };
 	options[OPT_NOFORCE] = true; /* Don't re-create the disk when doing a forced re-build. */
@@ -193,6 +194,7 @@ BEGIN_ANONYMOUS GROUP("disk") { MFORMAT };
 	options[OPT_MFORMAT_SECTORS_PER_HEAD] = 128;
 	options[OPT_MFORMAT_VOLUME_LABEL]     = "KOS";
 END
+}
 
 
 /* Copy libgcc.so.1 and libstdc++.so.1 to the disk */
