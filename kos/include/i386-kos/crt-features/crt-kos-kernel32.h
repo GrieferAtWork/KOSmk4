@@ -2274,6 +2274,7 @@
 #define __CRT_HAVE_vm_node_insert 1
 #define __CRT_HAVE_vm_node_update_write_access 1
 #define __CRT_HAVE_vm_node_update_write_access_locked_vm 1
+#define __CRT_HAVE_vm_onclone_callbacks 1
 #define __CRT_HAVE_vm_onexec_callbacks 1
 #define __CRT_HAVE_vm_onfini_callbacks 1
 #define __CRT_HAVE_vm_oninit_callbacks 1

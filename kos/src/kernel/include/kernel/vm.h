@@ -2690,6 +2690,7 @@ DATDEF CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks;
 /* VM initialization/finalization callbacks. */
 DATDEF CALLBACK_LIST(void FCALL(struct vm *)) vm_oninit_callbacks;
 DATDEF CALLBACK_LIST(void FCALL(struct vm *)) vm_onfini_callbacks;
+DATDEF CALLBACK_LIST(void FCALL(struct vm * /*newvm*/, struct vm * /*oldvm*/)) vm_onclone_callbacks;
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 /* >> void KCALL func(void);

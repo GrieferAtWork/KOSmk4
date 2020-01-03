@@ -62,6 +62,7 @@ PRIVATE DRIVER_FINI void KCALL GDBServer_Fini(void) {
 
 	/* Uninstall traps and hooks. */
 	vm_onfini_callbacks.remove(&GDB_ClearAllBreakpointsOfVM);
+	vm_onclone_callbacks.remove(&GDB_CloneAllBreakpointsFromVM);
 	kernel_debugtraps_uninstall(&GDBServer_DebugTraps);
 
 	/* Terminate the fallback-host thread */
@@ -81,8 +82,9 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		/* Install interrupt handlers */
 		GDBInterrupt_Init();
 
-		/* Hook the vm finalizer to clear breakpoints for that VM. */
+		/* Hook the vm callbacks for breakpoints. */
 		vm_onfini_callbacks.insert(&GDB_ClearAllBreakpointsOfVM);
+		vm_onclone_callbacks.insert(&GDB_CloneAllBreakpointsFromVM);
 
 		/* Create the fallback-host thread. */
 		GDBServer_FallbackHost = task_alloc(&vm_kernel);

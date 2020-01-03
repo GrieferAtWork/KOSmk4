@@ -279,6 +279,9 @@ INTDEF void NOTHROW(FCALL GDB_RemoveAllBreakpoints)(void);
  * host thread, as it is invoked as part of `vm_onfini_callbacks()'! */
 INTDEF void NOTHROW(FCALL GDB_ClearAllBreakpointsOfVM)(struct vm *__restrict effective_vm);
 
+/* Copy all breakpoint definitions of `oldvm' to also exist in `newvm' (called during `vm_clone()') */
+INTDEF void NOTHROW(FCALL GDB_CloneAllBreakpointsFromVM)(struct vm *__restrict newvm, struct vm *__restrict oldvm);
+
 /* Read/Write memory
  * WARNING: `GDB_WriteMemory()' and `GDB_VM_WriteMemory()' may modify the contents of the given `buf'! 
  * @return: 0 : The copy operation completed without any problems.

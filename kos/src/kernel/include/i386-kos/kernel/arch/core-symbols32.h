@@ -1206,10 +1206,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak x86_bootcpu_cpufeatures; .long x86_bootcpu_cpufeatures
 	.reloc ., R_386_SIZE32, x86_bootcpu_cpufeatures; .int 0
 	.int 0xfeca523
-	.long 0 /* index: 301 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname301 /* index: 301 */
+	.weak vm_onclone_callbacks; .long vm_onclone_callbacks
+	.reloc ., R_386_SIZE32, vm_onclone_callbacks; .int 0
+	.int 0x60571a3
 	.long .Lname302 /* index: 302 */
 	.weak dbg_fillscreen; .long dbg_fillscreen
 	.reloc ., R_386_SIZE32, dbg_fillscreen; .int 0
@@ -16732,6 +16732,8 @@ END(kernel_symbol_table)
 	.string "path_traversenfull"
 .Lname300:
 	.string "x86_bootcpu_cpufeatures"
+.Lname301:
+	.string "vm_onclone_callbacks"
 .Lname302:
 	.string "dbg_fillscreen"
 .Lname303:

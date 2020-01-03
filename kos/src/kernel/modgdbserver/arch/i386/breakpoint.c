@@ -279,6 +279,23 @@ NOTHROW(FCALL GDB_ClearAllBreakpointsOfVM)(struct vm *__restrict effective_vm) {
 	}
 }
 
+/* Copy all breakpoint definitions of `oldvm' to also exist in `newvm' (called during `vm_clone()') */
+INTERN void
+NOTHROW(FCALL GDB_CloneAllBreakpointsFromVM)(struct vm *__restrict newvm,
+                                             struct vm *__restrict oldvm) {
+	size_t i, maxused;
+	maxused = ATOMIC_READ(GDBBreak_SwMaxUsed);
+	for (i = 0; i <= maxused; ++i) {
+		byte_t *addr, prev;
+		if (GDBBreak_SwList[i].sb_vm != oldvm)
+			continue; /* Already in use. */
+		/* Add a new breakpoint for `newvm' */
+		addr = GDBBreak_SwList[i].sb_addr;
+		prev = GDBBreak_SwList[i].sb_prev;
+		GDBBreak_SwPush(newvm, addr, prev);
+	}
+}
+
 
 /* Include (insert) or exclude (remove) SwBreak instruction overrides
  * defined within the range `addr...+=bufsize' with the given `buf'

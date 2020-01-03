@@ -102,7 +102,7 @@ typedef void (KCALL *pervm_clone_t)(struct vm *__restrict newvm,
                                     struct vm *__restrict oldvm) THROWS(...);
 INTDEF pervm_clone_t __kernel_pervm_clone_start[];
 INTDEF pervm_clone_t __kernel_pervm_clone_end[];
-
+PUBLIC CALLBACK_LIST(void FCALL(struct vm * /*newvm*/, struct vm * /*oldvm*/)) vm_onclone_callbacks = CALLBACK_LIST_INIT;
 
 /* Clone the given VM `self'
  * NOTE: The clone operation is performed atomically, meaning that
@@ -368,6 +368,7 @@ handle_remove_write_error:
 		     iter < __kernel_pervm_clone_end; ++iter)
 			(**iter)(result, self);
 		assert(iter == __kernel_pervm_clone_end);
+		vm_onclone_callbacks(result, self);
 	} EXCEPT {
 		destroy(result);
 		RETHROW();
