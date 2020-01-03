@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccea771d */
+/* HASH CRC-32:0xeb8c144b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,6 @@
 #define __local_asctime_defined 1
 #ifndef __LIBC_CTIME_BUFFER_DEFINED
 #define __LIBC_CTIME_BUFFER_DEFINED 1
-#if (!defined(__CRT_HAVE_ctime64) && !defined(__CRT_HAVE__ctime64) && \
-     !defined(__CRT_HAVE_ctime) && !defined(__CRT_HAVE__ctime32)) || \
-     !defined(__CRT_HAVE_asctime) || \
-     (defined(__BUILDING_LIBC) && defined(GUARD_LIBC_AUTO_TIME_C))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __NO_ATTR_WEAK
 __INTERN __ATTR_UNUSED __ATTR_WEAK char __ctime_buf[26] = {0};
@@ -34,7 +30,6 @@ __INTERN __ATTR_UNUSED __ATTR_SELECTANY char __ctime_buf[26] = {0};
 __PRIVATE __ATTR_UNUSED char __ctime_buf[26] = {0};
 #endif
 __NAMESPACE_LOCAL_END
-#endif
 #endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 /* Dependency: "asctime_r" from "time" */
 #ifndef ____localdep_asctime_r_defined
@@ -56,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
  * that is the representation of TP in this format */
 __LOCAL_LIBC(asctime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {
-#line 585 "kos/src/libc/magic/time.c"
+#line 589 "kos/src/libc/magic/time.c"
 	return __localdep_asctime_r(__tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
 }
 __NAMESPACE_LOCAL_END

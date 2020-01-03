@@ -2910,10 +2910,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys32_pwritev; .quad sys32_pwritev
 	.reloc ., R_X86_64_SIZE32, sys32_pwritev; .int 0
 	.int 0xcef62d6
-	.quad 0 /* index: 727 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname727 /* index: 727 */
+	.weak vm_onclone_callbacks; .quad vm_onclone_callbacks
+	.reloc ., R_X86_64_SIZE32, vm_onclone_callbacks; .int 0
+	.int 0x60571a3
 	.quad 0 /* index: 728 */
 	.quad 0
 	.int 0
@@ -17442,6 +17442,8 @@ END(kernel_symbol_table)
 	.string "vm_tasklock_endread"
 .Lname726:
 	.string "sys32_pwritev"
+.Lname727:
+	.string "vm_onclone_callbacks"
 .Lname729:
 	.string "sys32_fsymlinkat"
 .Lname732:

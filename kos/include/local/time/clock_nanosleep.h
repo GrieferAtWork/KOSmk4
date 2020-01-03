@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaba5dfdd */
+/* HASH CRC-32:0x88335642 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clock_nanosleep_defined
-#if defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE_clock_nanosleep64)
+#if defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep) || defined(__CRT_HAVE_clock_nanosleep64)
 #define __local_clock_nanosleep_defined 1
 /* Dependency: "clock_nanosleep32" from "time" */
 #ifndef ____localdep_clock_nanosleep32_defined
@@ -59,8 +59,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(clock_nanosleep))(__clockid_t __clock
                                                              int __flags,
                                                              struct timespec const *__restrict __requested_time,
                                                              struct timespec *__remaining) {
-#line 1143 "kos/src/libc/magic/time.c"
-#ifdef __CRT_HAVE_clock_nanosleep
+#line 1186 "kos/src/libc/magic/time.c"
+#if defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
 	int __result;
 	struct __timespec32 __req32, __rem32;
 	__req32.tv_sec  = (__time32_t)__requested_time->tv_sec;
@@ -71,7 +71,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(clock_nanosleep))(__clockid_t __clock
 		__remaining->tv_nsec = __rem32.tv_nsec;
 	}
 	return __result;
-#else
+#else /* __CRT_HAVE_clock_nanosleep || __CRT_HAVE___clock_nanosleep */
 	int __result;
 	struct __timespec64 __req64, __rem64;
 	__req64.tv_sec  = (__time64_t)__requested_time->tv_sec;
@@ -82,8 +82,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(clock_nanosleep))(__clockid_t __clock
 		__remaining->tv_nsec = __rem64.tv_nsec;
 	}
 	return __result;
-#endif
+#endif /* !__CRT_HAVE_clock_nanosleep && !__CRT_HAVE___clock_nanosleep */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_clock_nanosleep || __CRT_HAVE_clock_nanosleep64 */
+#endif /* __CRT_HAVE_clock_nanosleep || __CRT_HAVE___clock_nanosleep || __CRT_HAVE_clock_nanosleep64 */
 #endif /* !__local_clock_nanosleep_defined */

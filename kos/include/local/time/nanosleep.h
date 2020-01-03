@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf786025 */
+/* HASH CRC-32:0x5ceef91c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nanosleep_defined
-#if defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE_nanosleep64)
+#if defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE_nanosleep64)
 #define __local_nanosleep_defined 1
 /* Dependency: "nanosleep32" from "time" */
 #ifndef ____localdep_nanosleep32_defined
@@ -57,8 +57,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(nanosleep) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep))(struct timespec const *__requested_time,
                                                        struct timespec *__remaining) {
-#line 922 "kos/src/libc/magic/time.c"
-#ifdef __CRT_HAVE_nanosleep
+#line 965 "kos/src/libc/magic/time.c"
+#if defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep)
 	int __result;
 	struct __timespec32 __req32, __rem32;
 	__req32.tv_sec  = (__time32_t)__requested_time->tv_sec;
@@ -69,7 +69,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep))(struct timespec const *__
 		__remaining->tv_nsec = __rem32.tv_nsec;
 	}
 	return __result;
-#else /* __CRT_HAVE_nanosleep */
+#else /* __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep */
 	int __result;
 	struct __timespec64 __req64, __rem64;
 	__req64.tv_sec  = (__time64_t)__requested_time->tv_sec;
@@ -80,8 +80,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(nanosleep))(struct timespec const *__
 		__remaining->tv_nsec = __rem64.tv_nsec;
 	}
 	return __result;
-#endif /* !__CRT_HAVE_nanosleep */
+#endif /* !__CRT_HAVE_nanosleep && !__CRT_HAVE___nanosleep */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_nanosleep || __CRT_HAVE_nanosleep64 */
+#endif /* __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE_nanosleep64 */
 #endif /* !__local_nanosleep_defined */

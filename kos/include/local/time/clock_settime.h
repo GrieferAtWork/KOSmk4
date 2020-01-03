@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa429e776 */
+/* HASH CRC-32:0x8d4b2f5c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clock_settime_defined
-#if defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE_clock_settime64)
+#if defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime) || defined(__CRT_HAVE_clock_settime64)
 #define __local_clock_settime_defined 1
 /* Dependency: "clock_settime32" from "time" */
 #ifndef ____localdep_clock_settime32_defined
@@ -57,19 +57,19 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clock_settime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_settime))(__clockid_t __clock_id,
                                                            struct timespec const *__tp) {
-#line 1018 "kos/src/libc/magic/time.c"
-#ifdef __CRT_HAVE_clock_settime
+#line 1061 "kos/src/libc/magic/time.c"
+#if defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
 	struct __timespec32 __tp32;
 	__tp32.tv_sec  = (__time32_t)__tp->tv_sec;
 	__tp32.tv_nsec = __tp->tv_nsec;
 	return __localdep_clock_settime32(__clock_id, &__tp32);
-#else
+#else /* __CRT_HAVE_clock_settime || __CRT_HAVE___clock_settime */
 	struct __timespec64 __tp64;
 	__tp64.tv_sec  = (__time64_t)__tp->tv_sec;
 	__tp64.tv_nsec = __tp->tv_nsec;
 	return __localdep_clock_settime64(__clock_id, &__tp64);
-#endif
+#endif /* !__CRT_HAVE_clock_settime && !__CRT_HAVE___clock_settime */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_clock_settime || __CRT_HAVE_clock_settime64 */
+#endif /* __CRT_HAVE_clock_settime || __CRT_HAVE___clock_settime || __CRT_HAVE_clock_settime64 */
 #endif /* !__local_clock_settime_defined */

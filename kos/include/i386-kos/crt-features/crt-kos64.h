@@ -2927,6 +2927,7 @@
 #define __CRT_HAVE___cxa_end_catch 1
 #define __CRT_HAVE___cxa_rethrow 1
 #define __CRT_HAVE___daylight 1
+#define __CRT_HAVE___difftime64 1
 #define __CRT_HAVE___doserrno 1
 #define __CRT_HAVE___drem 1
 #define __CRT_HAVE___dremf 1

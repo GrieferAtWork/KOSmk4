@@ -448,10 +448,10 @@ upgrade_and_recheck_vm_for_node:
 					try_merge_part = true;
 
 #if 1
-					printk(KERN_TRACE "Unshared page at %p (%p) (RW) [tid=%u]\n",
+					printk(KERN_TRACE "[vm] Unshared page at %p (%p) (RW) [tid=%u]\n",
 					       pageaddr, addr, task_getroottid_s());
 #else
-					printk(KERN_TRACE "Unshared page at %p (%p) (RW) [tid=%u,oldpage=" FORMAT_VM_PHYS_T ",newpage=" FORMAT_VM_PHYS_T "]\n",
+					printk(KERN_TRACE "[vm] Unshared page at %p (%p) (RW) [tid=%u,oldpage=" FORMAT_VM_PHYS_T ",newpage=" FORMAT_VM_PHYS_T "]\n",
 					       pageaddr, addr, task_getroottid_s(),
 					       page2addr(old_ppage), page2addr(new_ppage));
 #endif

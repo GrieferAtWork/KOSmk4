@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x795dd14a */
+/* HASH CRC-32:0x572debe1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,12 +38,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(difftime64) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(difftime64))(__time64_t __time1,
                                                         __time64_t __time0) {
-#line 618 "kos/src/libc/magic/time.c"
-#if (defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)) && !defined(__BUILDING_LIBC)
+#line 623 "kos/src/libc/magic/time.c"
+#if defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
 	return __localdep_difftime32((__time32_t)__time1, (__time32_t)__time0);
-#else /* ... */
-	return (double)__time1 - (double)__time0;
-#endif /* !... */
+#else /* __CRT_HAVE_difftime || __CRT_HAVE__difftime32 */
+	return __time1 > __time0 ? __time1 - __time0 : __time0 - __time1;
+#endif /* !__CRT_HAVE_difftime && !__CRT_HAVE__difftime32 */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_difftime64_defined */

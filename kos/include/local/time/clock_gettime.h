@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7346379 */
+/* HASH CRC-32:0xb6c6eae0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clock_gettime_defined
-#if defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE_clock_gettime64)
+#if defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime) || defined(__CRT_HAVE_clock_gettime64)
 #define __local_clock_gettime_defined 1
 /* Dependency: "clock_gettime32" from "time" */
 #ifndef ____localdep_clock_gettime32_defined
@@ -57,8 +57,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clock_gettime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_gettime))(__clockid_t __clock_id,
                                                            struct timespec *__tp) {
-#line 986 "kos/src/libc/magic/time.c"
-#ifdef __CRT_HAVE_clock_gettime
+#line 1029 "kos/src/libc/magic/time.c"
+#if defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime)
 	int __result;
 	struct __timespec32 __res32;
 	__result = __localdep_clock_gettime32(__clock_id, &__res32);
@@ -67,7 +67,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_gettime))(__clockid_t __clock_i
 		__tp->tv_nsec = __res32.tv_nsec;
 	}
 	return __result;
-#else /* __CRT_HAVE_clock_gettime */
+#else /* __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime */
 	int __result;
 	struct __timespec64 __res64;
 	__result = __localdep_clock_gettime64(__clock_id, &__res64);
@@ -76,8 +76,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_gettime))(__clockid_t __clock_i
 		__tp->tv_nsec = __res64.tv_nsec;
 	}
 	return __result;
-#endif /* !__CRT_HAVE_clock_gettime */
+#endif /* !__CRT_HAVE_clock_gettime && !__CRT_HAVE___clock_gettime */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_clock_gettime || __CRT_HAVE_clock_gettime64 */
+#endif /* __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime || __CRT_HAVE_clock_gettime64 */
 #endif /* !__local_clock_gettime_defined */

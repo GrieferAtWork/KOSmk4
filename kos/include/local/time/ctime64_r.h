@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d279be3 */
+/* HASH CRC-32:0x72cf0b6a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __NAMESPACE_STD_END
 #ifdef __CRT_HAVE__ctime64_s
 /* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime64_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
-#elif defined(__CRT_HAVE__gmtime32_s)
+#elif defined(__CRT_HAVE__ctime32_s)
 #include <local/time/dos_ctime64_s.h>
 /* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
 #define __localdep_dos_ctime64_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dos_ctime64_s))
@@ -102,17 +102,17 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ctime64_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime64_r))(__time64_t const *__restrict __timer,
                                                        char __buf[26]) {
-#line 1565 "kos/src/libc/magic/time.c"
+#line 1698 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE__ctime32_s) || defined(__CRT_HAVE__ctime64_s)
 	return __localdep_dos_ctime64_s(__buf, 26, __timer) ? __NULLPTR : __buf;
-#else
+#else /* __CRT_HAVE__ctime32_s || __CRT_HAVE__ctime64_s */
 #ifdef __std_tm_defined
 	struct __NAMESPACE_STD_SYM tm __ltm;
 #else /* __std_tm_defined */
 	struct tm __ltm;
 #endif /* !__std_tm_defined */
 	return __localdep_asctime_r(__localdep_localtime64_r(__timer, &__ltm), __buf);
-#endif
+#endif /* !__CRT_HAVE__ctime32_s && !__CRT_HAVE__ctime64_s */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_ctime64_r_defined */

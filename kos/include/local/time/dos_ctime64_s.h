@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d369c3 */
+/* HASH CRC-32:0x5398387e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dos_ctime64_s_defined
-#ifdef __CRT_HAVE__gmtime32_s
+#ifdef __CRT_HAVE__ctime32_s
 #define __local_dos_ctime64_s_defined 1
 /* Dependency: "dos_ctime32_s" from "time" */
 #ifndef ____localdep_dos_ctime32_s_defined
@@ -42,5 +42,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_ctime64_s))(char __buf[26],
 	return __localdep_dos_ctime32_s(__buf, __bufsize, &__tm64);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE__gmtime32_s */
+#endif /* __CRT_HAVE__ctime32_s */
 #endif /* !__local_dos_ctime64_s_defined */

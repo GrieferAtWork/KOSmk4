@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8003c23c */
+/* HASH CRC-32:0xee899990 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,9 @@
  */
 #ifndef __local_ctime_defined
 #define __local_ctime_defined 1
+#if defined(__CRT_HAVE_ctime) || defined(__CRT_HAVE__ctime32) && 1
 #ifndef __LIBC_CTIME_BUFFER_DEFINED
 #define __LIBC_CTIME_BUFFER_DEFINED 1
-#if (!defined(__CRT_HAVE_ctime64) && !defined(__CRT_HAVE__ctime64) && \
-     !defined(__CRT_HAVE_ctime) && !defined(__CRT_HAVE__ctime32)) || \
-     !defined(__CRT_HAVE_asctime) || \
-     (defined(__BUILDING_LIBC) && defined(GUARD_LIBC_AUTO_TIME_C))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __NO_ATTR_WEAK
 __INTERN __ATTR_UNUSED __ATTR_WEAK char __ctime_buf[26] = {0};
@@ -34,8 +31,8 @@ __INTERN __ATTR_UNUSED __ATTR_SELECTANY char __ctime_buf[26] = {0};
 __PRIVATE __ATTR_UNUSED char __ctime_buf[26] = {0};
 #endif
 __NAMESPACE_LOCAL_END
-#endif
 #endif /* !__LIBC_CTIME_BUFFER_DEFINED */
+#endif /* __CRT_HAVE_ctime || __CRT_HAVE__ctime32 */
 /* Dependency: "ctime64" from "time" */
 #ifndef ____localdep_ctime64_defined
 #define ____localdep_ctime64_defined 1
@@ -86,16 +83,16 @@ __NAMESPACE_LOCAL_BEGIN
 /* Equivalent to `asctime (localtime (timer))' */
 __LOCAL_LIBC(ctime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime))(__TM_TYPE(time) const *__timer) {
-#line 461 "kos/src/libc/magic/time.c"
-#if defined(__CRT_HAVE_ctime64) || defined(__CRT_HAVE__ctime64)
+#line 454 "kos/src/libc/magic/time.c"
+#if 1
 	__time64_t __tm64 = (__time64_t)*__timer;
 	return __localdep_ctime64(&__tm64);
 #elif defined(__CRT_HAVE_ctime) || defined(__CRT_HAVE__ctime32)
 	__time32_t __tm32 = (__time32_t)*__timer;
 	return __localdep_ctime32(&__tm32);
-#else
+#else /* __CRT_HAVE_ctime || __CRT_HAVE__ctime32 */
 	return __localdep_ctime_r(__timer, __NAMESPACE_LOCAL_SYM __ctime_buf);
-#endif
+#endif /* !__CRT_HAVE_ctime && !__CRT_HAVE__ctime32 */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_ctime_defined */

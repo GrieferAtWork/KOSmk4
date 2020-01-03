@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3ed8ef1 */
+/* HASH CRC-32:0xfdb30e76 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __NAMESPACE_STD_END
 #define ____localdep_dos_localtime64_s_defined 1
 #ifdef __CRT_HAVE__localtime64_s
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_localtime64_s,(__STRUCT_TM *__restrict __tp, __time64_t const *__restrict __timer),_localtime64_s,(__tp,__timer))
-#elif defined(__CRT_HAVE__gmtime32_s)
+#elif defined(__CRT_HAVE__localtime32_s)
 #include <local/time/dos_localtime64_s.h>
 #define __localdep_dos_localtime64_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dos_localtime64_s))
 #else /* CUSTOM: dos_localtime64_s */
@@ -85,13 +85,13 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(localtime64_r) __ATTR_NONNULL((1, 2)) __STRUCT_TM *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(localtime64_r))(__time64_t const *__restrict __timer,
                                                            __STRUCT_TM *__restrict __tp) {
-#line 1552 "kos/src/libc/magic/time.c"
+#line 1685 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE__localtime32_s) || defined(__CRT_HAVE__localtime64_s)
 	return __localdep_dos_localtime64_s(__tp, __timer) ? __NULLPTR : __tp;
-#else
+#else /* __CRT_HAVE__localtime32_s || __CRT_HAVE__localtime64_s */
 	/* XXX: Timezone support? */
 	return __localdep_gmtime64_r(__timer, __tp);
-#endif
+#endif /* !__CRT_HAVE__localtime32_s && !__CRT_HAVE__localtime64_s */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_localtime64_r_defined */

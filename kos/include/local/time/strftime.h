@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5bffca6 */
+/* HASH CRC-32:0x755293f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,10 +80,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf,
                                                       __SIZE_TYPE__ __bufsize,
                                                       char const *__restrict __format,
                                                       __STRUCT_TM const *__restrict __tp) {
-#line 547 "kos/src/libc/magic/time.c"
-#if (defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l)) && !defined(__BUILDING_LIBC)
+#line 556 "kos/src/libc/magic/time.c"
+#if defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l) || defined(__CRT_HAVE___strftime_l)
 	return __localdep_crt_strftime_l(__buf, __bufsize, __format, __tp, __NULLPTR);
-#else
+#else /* __CRT_HAVE_strftime_l || __CRT_HAVE__strftime_l || __CRT_HAVE___strftime_l */
 	/* TODO */
 	(void)__buf;
 	(void)__bufsize;
@@ -91,7 +91,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf,
 	(void)__tp;
 	__COMPILER_IMPURE();
 	return 0;
-#endif
+#endif /* !__CRT_HAVE_strftime_l && !__CRT_HAVE__strftime_l && !__CRT_HAVE___strftime_l */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_strftime_defined */

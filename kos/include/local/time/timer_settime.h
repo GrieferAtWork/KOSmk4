@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x100f48ff */
+/* HASH CRC-32:0x8d745780 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_settime))(timer_t __timerid,
                                                            int __flags,
                                                            struct itimerspec const *__restrict __value,
                                                            struct itimerspec *__restrict __ovalue) {
-#line 1056 "kos/src/libc/magic/time.c"
+#line 1099 "kos/src/libc/magic/time.c"
 #ifdef __CRT_HAVE_timer_settime
 	int __result;
 	struct __itimerspec32 __value32, __ovalue32;
@@ -74,7 +74,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_settime))(timer_t __timerid,
 		__ovalue->__it_value.tv_nsec    = __ovalue32.__it_value.tv_nsec;
 	}
 	return __result;
-#else
+#else /* __CRT_HAVE_timer_settime */
 	int __result;
 	struct __itimerspec64 __value64, __ovalue64;
 	__value64.__it_interval.tv_sec  = (__time64_t)__value->__it_interval.tv_sec;
@@ -89,7 +89,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_settime))(timer_t __timerid,
 		__ovalue->__it_value.tv_nsec    = __ovalue64.__it_value.tv_nsec;
 	}
 	return __result;
-#endif
+#endif /* !__CRT_HAVE_timer_settime */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_timer_settime || __CRT_HAVE_timer_settime64 */

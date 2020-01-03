@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3650d65e */
+/* HASH CRC-32:0xc8d59a14 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -288,7 +288,7 @@ __CDECLARE(,time_t,__NOTHROW_NCX,time,(time_t *__timer),(__timer))
 #elif defined(__CRT_HAVE__time32) && !defined(__USE_TIME_BITS64)
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 __CREDIRECT(,time_t,__NOTHROW_NCX,time,(time_t *__timer),_time32,(__timer))
-#elif defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32)
+#elif defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64)
 __NAMESPACE_STD_END
 #include <local/time/time.h>
 __NAMESPACE_STD_BEGIN
@@ -524,6 +524,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime64,(__time64
 #elif defined(__CRT_HAVE_difftime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime64,(__time64_t __time1, __time64_t __time0),difftime,(__time1,__time0))
+#elif defined(__CRT_HAVE___difftime64)
+/* Return the difference between TIME1 and TIME0 */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime64,(__time64_t __time1, __time64_t __time0),__difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime64)
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,difftime64,(__time64_t __time1, __time64_t __time0),_difftime64,(__time1,__time0))
@@ -821,7 +824,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,nanosleep,(struct timespec cons
 #elif defined(__CRT_HAVE___nanosleep)
 /* Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),__nanosleep,(__requested_time,__remaining))
-#elif defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE_nanosleep64)
+#elif defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE_nanosleep64)
 #include <local/time/nanosleep.h>
 /* Pause execution for a number of nanoseconds */
 __NAMESPACE_LOCAL_USING_OR_IMPL(nanosleep, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL nanosleep)(struct timespec const *__requested_time, struct timespec *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanosleep))(__requested_time, __remaining); })
@@ -835,7 +838,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_getres,(clockid_t __clock
 #elif defined(__CRT_HAVE___clock_getres) && !defined(__USE_TIME_BITS64)
 /* Get resolution of clock CLOCK_ID */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_getres,(clockid_t __clock_id, struct timespec *__res),__clock_getres,(__clock_id,__res))
-#elif defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE_clock_getres64)
+#elif defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres) || defined(__CRT_HAVE_clock_getres64)
 #include <local/time/clock_getres.h>
 /* Get resolution of clock CLOCK_ID */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_getres, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL clock_getres)(clockid_t __clock_id, struct timespec *__res) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_getres))(__clock_id, __res); })
@@ -849,7 +852,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_gettime,(clockid_t __cloc
 #elif defined(__CRT_HAVE___clock_gettime) && !defined(__USE_TIME_BITS64)
 /* Get current value of clock CLOCK_ID and store it in TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_gettime,(clockid_t __clock_id, struct timespec *__tp),__clock_gettime,(__clock_id,__tp))
-#elif defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE_clock_gettime64)
+#elif defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime) || defined(__CRT_HAVE_clock_gettime64)
 #include <local/time/clock_gettime.h>
 /* Get current value of clock CLOCK_ID and store it in TP */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_gettime, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL clock_gettime)(clockid_t __clock_id, struct timespec *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_gettime))(__clock_id, __tp); })
@@ -863,7 +866,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __cloc
 #elif defined(__CRT_HAVE___clock_settime) && !defined(__USE_TIME_BITS64)
 /* Set clock CLOCK_ID to value TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,clock_settime,(clockid_t __clock_id, struct timespec const *__tp),__clock_settime,(__clock_id,__tp))
-#elif defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE_clock_settime64)
+#elif defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime) || defined(__CRT_HAVE_clock_settime64)
 #include <local/time/clock_settime.h>
 /* Set clock CLOCK_ID to value TP */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_settime, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL clock_settime)(clockid_t __clock_id, struct timespec const *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_settime))(__clock_id, __tp); })
@@ -913,7 +916,7 @@ __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __cl
 #elif defined(__CRT_HAVE___clock_nanosleep) && !defined(__USE_TIME_BITS64)
 /* High-resolution sleep with the specified clock */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, int __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),__clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
-#elif defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE_clock_nanosleep64)
+#elif defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep) || defined(__CRT_HAVE_clock_nanosleep64)
 #include <local/time/clock_nanosleep.h>
 /* High-resolution sleep with the specified clock */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_nanosleep, __FORCELOCAL __ATTR_NONNULL((3)) int __NOTHROW_RPC(__LIBCCALL clock_nanosleep)(clockid_t __clock_id, int __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_nanosleep))(__clock_id, __flags, __requested_time, __remaining); })

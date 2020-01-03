@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4dd5b06 */
+/* HASH CRC-32:0x2cbc5af9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,13 +51,10 @@ __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
 #endif /* !__STRUCT_TM */
+
+#if !(defined(__CRT_HAVE_localtime) || defined(__CRT_HAVE__localtime32))
 #ifndef __LIBC_GMTIME_BUFFER_DEFINED
 #define __LIBC_GMTIME_BUFFER_DEFINED 1
-#if (!defined(__CRT_HAVE_gmtime64) && !defined(__CRT_HAVE__gmtime64) && \
-     !defined(__CRT_HAVE_gmtime) && !defined(__CRT_HAVE__gmtime32)) || \
-    (!defined(__CRT_HAVE_localtime64) && !defined(__CRT_HAVE__localtime64) && \
-     !defined(__CRT_HAVE_localtime) && !defined(__CRT_HAVE__localtime32)) || \
-     (defined(__BUILDING_LIBC) && defined(GUARD_LIBC_AUTO_TIME_C))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __NO_ATTR_WEAK
 __INTERN __ATTR_UNUSED __ATTR_WEAK __STRUCT_TM __gmtime_buf = {0};
@@ -67,8 +64,8 @@ __INTERN __ATTR_UNUSED __ATTR_SELECTANY __STRUCT_TM __gmtime_buf = {0};
 __PRIVATE __ATTR_UNUSED __STRUCT_TM __gmtime_buf = {0};
 #endif
 __NAMESPACE_LOCAL_END
-#endif
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
+#endif /* !__CRT_HAVE_localtime && !__CRT_HAVE__localtime32 */
 /* Dependency: "localtime32" from "time" */
 #ifndef ____localdep_localtime32_defined
 #define ____localdep_localtime32_defined 1
@@ -103,13 +100,13 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 __LOCAL_LIBC(localtime64) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __STRUCT_TM *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(localtime64))(__time64_t const *__timer) {
-#line 693 "kos/src/libc/magic/time.c"
-#if (defined(__CRT_HAVE_localtime) || defined(__CRT_HAVE__localtime32)) && !defined(__BUILDING_LIBC)
+#line 710 "kos/src/libc/magic/time.c"
+#if defined(__CRT_HAVE_localtime) || defined(__CRT_HAVE__localtime32)
 	__time32_t __tm32 = (__time32_t)*__timer;
 	return __localdep_localtime32(&__tm32);
-#else
+#else /* __CRT_HAVE_localtime || __CRT_HAVE__localtime32 */
 	return __localdep_localtime64_r(__timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
-#endif
+#endif /* !__CRT_HAVE_localtime && !__CRT_HAVE__localtime32 */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_localtime64_defined */

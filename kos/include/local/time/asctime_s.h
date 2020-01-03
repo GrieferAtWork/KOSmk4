@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ca7e445 */
+/* HASH CRC-32:0xd3bf4f06 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __LOCAL_LIBC(asctime_s) __ATTR_NONNULL((1, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_s))(char *__restrict __buf,
                                                        __SIZE_TYPE__ __buflen,
                                                        struct __NAMESPACE_STD_SYM tm const *__restrict __tp) {
-#line 594 "kos/src/libc/magic/time.c"
+#line 598 "kos/src/libc/magic/time.c"
 	if (__buflen < 26)
 		return __ERANGE;
 	__localdep_asctime_r(__tp, __buf);

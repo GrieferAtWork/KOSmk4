@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9293f07d */
+/* HASH CRC-32:0xeb0cd3fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_time_defined
-#if defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32)
+#if defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32) || defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64)
 #define __local_time_defined 1
 /* Dependency: "time32" from "time" */
 #ifndef ____localdep_time32_defined
@@ -60,18 +60,18 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(time) __TM_TYPE(time)
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(time))(__TM_TYPE(time) *__timer) {
 #line 367 "kos/src/libc/magic/time.c"
-#ifdef __USE_TIME_BITS64
+#if defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32)
 	__time32_t __tm32 = __localdep_time32(__NULLPTR);
 	if (__timer)
 		*__timer = (__TM_TYPE(time))__tm32;
 	return (__TM_TYPE(time))__tm32;
-#else /* __USE_TIME_BITS64 */
+#else /* __CRT_HAVE_time || __CRT_HAVE__time32 */
 	__time64_t __tm64 = __localdep_time64(__NULLPTR);
 	if (__timer)
 		*__timer = (__TM_TYPE(time))__tm64;
 	return (__TM_TYPE(time))__tm64;
-#endif /* !__USE_TIME_BITS64 */
+#endif /* !__CRT_HAVE_time && !__CRT_HAVE__time32 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE__time32 */
+#endif /* __CRT_HAVE_time || __CRT_HAVE__time32 || __CRT_HAVE_time64 || __CRT_HAVE__time64 */
 #endif /* !__local_time_defined */

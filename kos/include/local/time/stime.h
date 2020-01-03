@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79c79b6a */
+/* HASH CRC-32:0x3a51fa04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __LOCAL_LIBC(stime) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(stime))(__TM_TYPE(time) const *__when) {
-#line 841 "kos/src/libc/magic/time.c"
+#line 858 "kos/src/libc/magic/time.c"
 #ifdef __CRT_HAVE_stime
 	__time32_t __tms = (__time32_t)*__when;
 	return __localdep_stime32(&__tms);

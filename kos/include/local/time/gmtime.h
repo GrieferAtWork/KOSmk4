@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2420e94 */
+/* HASH CRC-32:0x8b654bad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,13 +51,10 @@ __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
 #endif /* !__STRUCT_TM */
+
+#if !(defined(__CRT_HAVE_gmtime) || defined(__CRT_HAVE__gmtime32)) || !(1)
 #ifndef __LIBC_GMTIME_BUFFER_DEFINED
 #define __LIBC_GMTIME_BUFFER_DEFINED 1
-#if (!defined(__CRT_HAVE_gmtime64) && !defined(__CRT_HAVE__gmtime64) && \
-     !defined(__CRT_HAVE_gmtime) && !defined(__CRT_HAVE__gmtime32)) || \
-    (!defined(__CRT_HAVE_localtime64) && !defined(__CRT_HAVE__localtime64) && \
-     !defined(__CRT_HAVE_localtime) && !defined(__CRT_HAVE__localtime32)) || \
-     (defined(__BUILDING_LIBC) && defined(GUARD_LIBC_AUTO_TIME_C))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __NO_ATTR_WEAK
 __INTERN __ATTR_UNUSED __ATTR_WEAK __STRUCT_TM __gmtime_buf = {0};
@@ -67,8 +64,8 @@ __INTERN __ATTR_UNUSED __ATTR_SELECTANY __STRUCT_TM __gmtime_buf = {0};
 __PRIVATE __ATTR_UNUSED __STRUCT_TM __gmtime_buf = {0};
 #endif
 __NAMESPACE_LOCAL_END
-#endif
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
+#endif /* (!__CRT_HAVE_gmtime && !__CRT_HAVE__gmtime32) || !1 */
 /* Dependency: "gmtime64" from "time" */
 #ifndef ____localdep_gmtime64_defined
 #define ____localdep_gmtime64_defined 1
@@ -129,16 +126,16 @@ __NAMESPACE_LOCAL_BEGIN
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
 __LOCAL_LIBC(gmtime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __NAMESPACE_STD_SYM tm *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime))(__TM_TYPE(time) const *__timer) {
-#line 502 "kos/src/libc/magic/time.c"
-#if defined(__CRT_HAVE_gmtime64) || defined(__CRT_HAVE__gmtime64)
+#line 496 "kos/src/libc/magic/time.c"
+#if 1
 	__time64_t __tm64 = (__time64_t)*__timer;
 	return __localdep_gmtime64(&__tm64);
 #elif defined(__CRT_HAVE_gmtime) || defined(__CRT_HAVE__gmtime32)
 	__time32_t __tm32 = (__time32_t)*__timer;
 	return __localdep_gmtime32(&__tm32);
-#else
+#else /* __CRT_HAVE_gmtime || __CRT_HAVE__gmtime32 */
 	return __localdep_gmtime_r(__timer, &__NAMESPACE_LOCAL_SYM __gmtime_buf);
-#endif
+#endif /* !__CRT_HAVE_gmtime && !__CRT_HAVE__gmtime32 */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_gmtime_defined */

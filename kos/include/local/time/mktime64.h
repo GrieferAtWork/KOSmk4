@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc907b96c */
+/* HASH CRC-32:0x56edc6e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,10 +75,10 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the `time_t' representation of TP and normalize TP */
 __LOCAL_LIBC(mktime64) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(__STRUCT_TM __KOS_FIXED_CONST *__tp) {
-#line 636 "kos/src/libc/magic/time.c"
-#if (defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE__mktime32)) && !defined(__BUILDING_LIBC)
+#line 650 "kos/src/libc/magic/time.c"
+#if defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE__mktime32) || defined(__CRT_HAVE_timelocal)
 	return (__time64_t)__localdep_mktime32(__tp);
-#else
+#else /* __CRT_HAVE_mktime || __CRT_HAVE__mktime32 || __CRT_HAVE_timelocal */
 	__time64_t __result;
 	__result = __yearstodays(__tp->tm_year) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
 	__result += __tp->tm_yday;
@@ -87,7 +87,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime64))(__STRUCT_TM __KOS_FIXED_CO
 	__result += __tp->tm_min*60;
 	__result += __tp->tm_sec;
 	return __result;
-#endif
+#endif /* !__CRT_HAVE_mktime && !__CRT_HAVE__mktime32 && !__CRT_HAVE_timelocal */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_mktime64_defined */

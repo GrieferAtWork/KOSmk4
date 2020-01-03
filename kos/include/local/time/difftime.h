@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa26b418d */
+/* HASH CRC-32:0x3017e451 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime
 #elif defined(__CRT_HAVE_difftime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime,(__time1,__time0))
+#elif defined(__CRT_HAVE___difftime64)
+/* Return the difference between TIME1 and TIME0 */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),__difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime64)
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),_difftime64,(__time1,__time0))
@@ -57,14 +60,14 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(difftime) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(difftime))(__TM_TYPE(time) __time1,
                                                       __TM_TYPE(time) __time0) {
-#line 390 "kos/src/libc/magic/time.c"
+#line 389 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_difftime) || defined(__CRT_HAVE__difftime32)
 	return __localdep_difftime32((__time32_t)__time1, (__time32_t)__time0);
-#elif defined(__CRT_HAVE_difftime64) || defined(__CRT_HAVE__difftime64)
+#elif 1
 	return __localdep_difftime64((__time32_t)__time1, (__time32_t)__time0);
-#else /* ... */
+#else /* 1 */
 	return __time1 > __time0 ? __time1 - __time0 : __time0 - __time1;
-#endif /* !... */
+#endif /* !1 */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_difftime_defined */

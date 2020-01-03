@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ae52c39 */
+/* HASH CRC-32:0x76fa081f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,10 +52,9 @@ __NAMESPACE_STD_END
 #endif /* !__tm_defined */
 #endif /* !__STRUCT_TM */
 
-#ifndef __LIBC_TIME_MOUNTSTART_YDAY_DEFINED
-#define __LIBC_TIME_MOUNTSTART_YDAY_DEFINED 1
-#if (!defined(__CRT_HAVE__gmtime32_s) && !defined(__CRT_HAVE__gmtime64_s)) || \
-    (defined(__BUILDING_LIBC) && defined(GUARD_LIBC_AUTO_TIME_C))
+#if !(defined(__CRT_HAVE__gmtime32_s) || defined(__CRT_HAVE__gmtime64_s))
+#ifndef ____TIME_MONTHSTART_YDAY_DEFINED
+#define ____TIME_MONTHSTART_YDAY_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __NO_ATTR_WEAK
 __INTERN_CONST __ATTR_UNUSED __ATTR_WEAK __UINT16_TYPE__ const __time_monthstart_yday[2][13] =
@@ -69,8 +68,8 @@ __PRIVATE __ATTR_UNUSED __UINT16_TYPE__ const __time_monthstart_yday[2][13] =
 	{ 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
 };
 __NAMESPACE_LOCAL_END
-#endif
-#endif /* !__LIBC_TIME_MOUNTSTART_YDAY_DEFINED */
+#endif /* !____TIME_MONTHSTART_YDAY_DEFINED */
+#endif /* !__CRT_HAVE__gmtime32_s && !__CRT_HAVE__gmtime64_s */
 /* Dependency: "dos_gmtime64_s" from "time" */
 #ifndef ____localdep_dos_gmtime64_s_defined
 #define ____localdep_dos_gmtime64_s_defined 1
@@ -88,9 +87,11 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __isleap
 #define __isleap(year) ((year)%4 == 0 && ((year)%100 != 0 || (year)%400 == 0))
 #endif /* !__isleap */
+
 #ifndef __daystoyears
 #define __daystoyears(n_days)  ((400*((n_days)+1))/146097)
 #endif /* !__daystoyears */
+
 #ifndef __yearstodays
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
@@ -98,10 +99,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gmtime64_r) __ATTR_NONNULL((1, 2)) __STRUCT_TM *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__restrict __timer,
                                                         __STRUCT_TM *__restrict __tp) {
-#line 1501 "kos/src/libc/magic/time.c"
-#if (defined(__CRT_HAVE__gmtime32_s) || defined(__CRT_HAVE__gmtime64_s)) && !defined(__BUILDING_LIBC)
+#line 1634 "kos/src/libc/magic/time.c"
+#if defined(__CRT_HAVE__gmtime32_s) || defined(__CRT_HAVE__gmtime64_s)
 	return __localdep_dos_gmtime64_s(__tp, __timer) ? __NULLPTR : __tp;
-#else
+#else /* __CRT_HAVE__gmtime32_s || __CRT_HAVE__gmtime64_s */
 	__time64_t __t; int __i;
 	__UINT16_TYPE__ const *__monthvec;
 	__t = *__timer;
@@ -142,7 +143,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__rest
 	}
 	__tp->tm_year -= 1900;
 	return __tp;
-#endif
+#endif /* !__CRT_HAVE__gmtime32_s && !__CRT_HAVE__gmtime64_s */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_gmtime64_r_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe72f446a */
+/* HASH CRC-32:0xa87cd1c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,10 +52,9 @@ __NAMESPACE_STD_END
 #endif /* !__tm_defined */
 #endif /* !__STRUCT_TM */
 
+#if !(defined(__CRT_HAVE_asctime_s))
 #ifndef __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED
 #define __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED 1
-#if (!defined(__CRT_HAVE__asctime32_s) && !defined(__CRT_HAVE__asctime64_s)) || \
-    (defined(__BUILDING_LIBC) && defined(GUARD_LIBC_AUTO_TIME_C))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __NO_ATTR_WEAK
 __INTERN_CONST __ATTR_UNUSED __ATTR_WEAK char const __abbr_wday_names[7][4] =
@@ -66,12 +65,9 @@ __PRIVATE __ATTR_UNUSED char const __abbr_wday_names[7][4] =
 #endif
 	{ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 __NAMESPACE_LOCAL_END
-#endif
 #endif /* !__LIBC_TIME_ABBR_WDAY_NAMES_DEFINED */
 #ifndef __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED
 #define __LIBC_TIME_ABBR_MONTH_NAMES_DEFINED 1
-#if (!defined(__CRT_HAVE__asctime32_s) && !defined(__CRT_HAVE__asctime64_s)) || \
-    (defined(__BUILDING_LIBC) && defined(GUARD_LIBC_AUTO_TIME_C))
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __NO_ATTR_WEAK
 __INTERN_CONST __ATTR_UNUSED __ATTR_WEAK char const __abbr_month_names[12][4] =
@@ -82,8 +78,8 @@ __PRIVATE __ATTR_UNUSED char const __abbr_month_names[12][4] =
 #endif
 	{ "Jan", "Feb", "Mar", "Apr", "May", "Jun",  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 __NAMESPACE_LOCAL_END
-#endif
 #endif /* !__LIBC_TIME_ABBR_MONTH_NAMES_DEFINED */
+#endif /* !__CRT_HAVE_asctime_s */
 /* Dependency: "crt_asctime_s" from "time" */
 #ifndef ____localdep_crt_asctime_s_defined
 #define ____localdep_crt_asctime_s_defined 1
@@ -125,10 +121,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(asctime_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(__STRUCT_TM const *__restrict __tp,
                                                        char __buf[26]) {
-#line 1619 "kos/src/libc/magic/time.c"
-#if defined(__CRT_HAVE_asctime_s) && !defined(__BUILDING_LIBC)
+#line 1772 "kos/src/libc/magic/time.c"
+#ifdef __CRT_HAVE_asctime_s
 	return __localdep_crt_asctime_s(__buf, 26, __tp) ? __NULLPTR : __buf;
-#else
+#else /* __CRT_HAVE_asctime_s */
 	__localdep_sprintf(__buf,
 	        "%.3s %.3s%3u %.2u:%.2u:%.2u %u\n",
 	       (unsigned int)__tp->tm_wday >= 7 ? "??" "?" :
@@ -141,7 +137,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(__STRUCT_TM const *__rest
 	       (unsigned int)__tp->tm_sec,
 	       (unsigned int)__tp->tm_year + 1900);
 	return __buf;
-#endif
+#endif /* !__CRT_HAVE_asctime_s */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_asctime_r_defined */

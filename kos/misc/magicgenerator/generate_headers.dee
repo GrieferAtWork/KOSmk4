@@ -478,6 +478,11 @@ global Function;
 global functions_prototypes;
 
 function form_has_function_expression(name: string): string {
+	if ("," in name) {
+		return " && ".join(
+			for (local x: name.split(","))
+				form_has_function_expression(x.strip()));
+	}
 	local func = functions_prototypes.get(name.rstrip("?"));
 	if (func !is none)
 		return func.get_dependency_string();
@@ -486,8 +491,23 @@ function form_has_function_expression(name: string): string {
 	throw "Unknown function " + repr name;
 }
 
+function form_not_has_function_expression(name: string): string {
+	if ("," in name) {
+		return " || ".join(
+			for (local x: name.split(","))
+				form_not_has_function_expression(x.strip()));
+	}
+	local func = functions_prototypes.get(name.rstrip("?"));
+	if (func !is none)
+		return "!({})".format({ func.get_dependency_string() });
+	if (name.endswith("?"))
+		return "!" + key_crt_have(name.rstrip("?"));
+	throw Error("Unknown function " + repr name);
+}
+
 global directivesEnvironmentFunctions = {
-	"has_function" : form_has_function_expression
+	"has_function"     : form_has_function_expression,
+	"not_has_function" : form_not_has_function_expression,
 };
 
 class DirectivesEnvironment {
@@ -639,6 +659,55 @@ function split_words(
 							if (!directive.startswith("(") || !directive.endswith(")"))
 								throw Error("Argument of @@endif_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
 							directive = form_has_function_expression(directive[1:-1].strip());
+							if (did_encounter_else_if_has_function)
+								directive = "!({})".format({ directive });
+							yield split_words(
+								"#endif /* {} */".format({
+									optimizePreprocessorExpressionAndRemoveDefined(directive) }),
+								env, for_copy)...;
+						}
+						break;
+					case "if_not_has_function":
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Argument of @@if_not_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+						directive = directive[1:-1].strip();
+						yield split_words(
+							wrapProcessorExpressionForIf(
+								form_not_has_function_expression(directive)),
+							env, for_copy)...;
+						did_encounter_else_if_has_function = false;
+						break;
+					case "elif_not_has_function":
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Argument of @@elif_not_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+						directive = directive[1:-1].strip();
+						yield split_words(
+							"#elif " + form_not_has_function_expression(directive),
+							env, for_copy)...;
+						did_encounter_else_if_has_function = false;
+						break;
+					case "else_not_has_function":
+						if (!directive) {
+							yield split_words("#else", env, for_copy)...;
+						} else {
+							if (!directive.startswith("(") || !directive.endswith(")"))
+								throw Error("Argument of @@else_not_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+							directive = directive[1:-1].strip();
+							yield split_words(
+								"#else /* {} */".format({
+									optimizePreprocessorExpressionAndRemoveDefined(
+										form_not_has_function_expression(directive))
+								}), env, for_copy)...;
+						}
+						did_encounter_else_if_has_function = true;
+						break;
+					case "endif_not_has_function":
+						if (!directive) {
+							yield split_words("#endif", env, for_copy)...;
+						} else {
+							if (!directive.startswith("(") || !directive.endswith(")"))
+								throw Error("Argument of @@endif_not_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+							directive = form_not_has_function_expression(directive[1:-1].strip());
 							if (did_encounter_else_if_has_function)
 								directive = "!({})".format({ directive });
 							yield split_words(
@@ -1529,6 +1598,7 @@ function parse_functions(filename: string, text: string): {string | Function...}
 	local has_fast_implementation = false;
 	local impl_prefix = "";
 	local requires_prefix = "";
+	local libc_prefix = "";
 	local declaration_prefix = "";
 	local dependency_prefix = "";
 	local same_impl = false;
@@ -2644,11 +2714,20 @@ again_enum_name:
 				case "no_same_impl":
 					same_impl = false;
 					break;
+				case "libc_prefix":
+					if (libc_prefix)
+						libc_prefix += "\n";
+					libc_prefix += get_tag_operand();
+					break;
 				case "libc_impl":
 					libc_impl = get_tag_operand();
+					if (libc_impl.startswith("{") && libc_impl.findmatch("{", "}", 1) != #libc_impl - 1)
+						err(tag_start, "Unmatched `{' in `libc_impl'");
 					break;
 				case "user_impl":
 					user_impl = get_tag_operand();
+					if (user_impl.startswith("{") && user_impl.findmatch("{", "}", 1) != #user_impl - 1)
+						err(tag_start, "Unmatched `{' in `user_impl'");
 					break;
 				case "default_component_name":
 					component_name = none;
@@ -3234,6 +3313,7 @@ again_enum_name:
 			fun.impl_prefix = impl_prefix;
 			fun.requires_prefix = requires_prefix;
 			fun.declaration_prefix = declaration_prefix;
+			fun.libc_prefix = libc_prefix;
 			fun.dependency_prefix = dependency_prefix;
 			if (same_impl && (block is string || block is CopyFunctionBody)) {
 				if (libc_impl is none)
@@ -3442,6 +3522,7 @@ known_alias_declared:
 			impl_prefix = "";
 			requires_prefix = "";
 			declaration_prefix = "";
+			libc_prefix = "";
 			dependency_prefix = "";
 			same_impl = false;
 			libc_impl = none;
@@ -3745,6 +3826,9 @@ class Function {
 
 	@@A block of text that is emit prior to declaring the function in local definition files
 	member declaration_prefix: string;
+
+	@@A block of text that is emit prior to the libc auto implementation
+	member libc_prefix: string;
 
 	@@A block of text that is emit prior to entering the function's implementation namespace
 	member dependency_prefix: string;
@@ -4249,6 +4333,18 @@ class Function {
 		include_line_directives = old;
 	}
 
+	function print_libc_prefix(
+			fp: File, keydep: Callable, keyloc: Callable = none,
+			repl_words: int = REPLACE_TYPE_WORDS_LOCAL,
+			wchar_t_replacement: int = none) {
+		local old = include_line_directives;
+		include_line_directives = false;
+		do_transform_block(
+			fp, libc_prefix, keydep, keydep,
+			keyloc, repl_words, wchar_t_replacement);
+		include_line_directives = old;
+	}
+
 	function print_argument_list(
 			fp: File, args: {(string, string)...},
 			keyarg: Callable, args_prefix: string = "",
@@ -4656,6 +4752,7 @@ do_return_crt:
 		local wchar_mode = wchar_mode_for_key(key);
 		print_dependency_prefix(fp, key, key_identity, REPLACE_TYPE_WORDS_LIBC, wchar_mode);
 		print_impl_prefix(fp, key, key_identity, REPLACE_TYPE_WORDS_LIBC, wchar_mode);
+		print_libc_prefix(fp, key, key_identity, REPLACE_TYPE_WORDS_LIBC, wchar_mode);
 		print_doc(fp);
 		generate_libc_user_impl_proto_head(fp, key);
 		fp << "INTERN ";

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x868f6596 */
+/* HASH CRC-32:0x6810273d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -559,6 +559,7 @@
 #define __CRT_HAVE___ctype_b_loc 1
 #define __CRT_HAVE___ctype_tolower_loc 1
 #define __CRT_HAVE___ctype_toupper_loc 1
+#define __CRT_HAVE___difftime64 1
 #define __CRT_HAVE___doserrno 1
 #define __CRT_HAVE___drem 1
 #define __CRT_HAVE___dremf 1

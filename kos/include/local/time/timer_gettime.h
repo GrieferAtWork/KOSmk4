@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a4c830a */
+/* HASH CRC-32:0x21fcb6f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,8 +56,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(timer_gettime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime))(timer_t __timerid,
                                                            struct itimerspec *__value) {
-#line 1099 "kos/src/libc/magic/time.c"
-#ifdef __CRT_HAVE_timer_settime
+#line 1142 "kos/src/libc/magic/time.c"
+#ifdef __CRT_HAVE_timer_gettime
 	int __result;
 	struct __itimerspec32 __value32;
 	__result = __localdep_timer_gettime32(__timerid, &__value32);
@@ -68,7 +68,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime))(timer_t __timerid,
 		__value->__it_value.tv_nsec    = __value32.__it_value.tv_nsec;
 	}
 	return __result;
-#else
+#else /* __CRT_HAVE_timer_gettime */
 	int __result;
 	struct __itimerspec64 __value64;
 	__result = __localdep_timer_gettime64(__timerid, &__value64);
@@ -79,7 +79,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timer_gettime))(timer_t __timerid,
 		__value->__it_value.tv_nsec    = __value64.__it_value.tv_nsec;
 	}
 	return __result;
-#endif
+#endif /* !__CRT_HAVE_timer_gettime */
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_timer_gettime || __CRT_HAVE_timer_gettime64 */
