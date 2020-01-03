@@ -90,6 +90,11 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 		__sti();
 	orig_pc = pc;
 	opcode  = x86_decode_instruction(state, &pc, &flags);
+
+	/* TODO: Some instructions (such as `XSAVEC') raise #GP if their operands are miss-aligned.
+	 *       KOS has a dedicated exception for this (`E_SEGFAULT_UNALIGNED') that should be
+	 *       thrown in such cases! */
+
 	TRY {
 #define isuser()     icpustate_isuser(state)
 #define MOD_DECODE() (pc = x86_decode_modrm(pc, &mod, flags))
@@ -441,6 +446,7 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 			               * bts $imm8, r/m16 / bts $imm8, r/m32
 			               * btr $imm8, r/m16 / btr $imm8, r/m32 */
 			case 0x0fc2:  /* cmppd $imm8, xmm2/m128, xmm1 */
+			case 0x0f3882:/* invpcid r32/r64, m128 */
 				MOD_DECODE();
 				if (mod.mi_type != MODRM_MEMORY)
 					break;
@@ -589,14 +595,29 @@ done_noncanon_check:
 		case 0xed: /* inw / inl */
 		case 0xee: /* outb */
 		case 0xef: /* outw / outl */
+		case 0xfa: /* cli */
+		case 0xfb: /* sti */
+		case 0x0f06: /* clts */
+		case 0xf4: /* hlt */
+		case 0xcc: /* int3 (shouldn't appear here) */
+		case 0xce: /* into (shouldn't appear here) */
+		case 0xf1: /* int1 */
+		case 0x0f35: /* sysexit */
+		case 0x0f07: /* sysret */
+		case 0x0f08: /* invd */
+		case 0x0f09: /* wbinvd */
 			goto generic_privileged_instruction;
 		case 0xe4: /* inb */
 		case 0xe5: /* inw / inl */
 		case 0xe6: /* outb */
 		case 0xe7: /* outw / outl */
+		case 0xcd: /* int $n */
 			pc += 1;
 			goto generic_privileged_instruction;
-			/* TODO:  */
+		case 0x0f3882: /* invpcid */
+			MOD_DECODE();
+			goto generic_privileged_instruction;
+
 #endif /* __x86_64__ */
 
 
@@ -673,6 +694,34 @@ done_noncanon_check:
 			}
 			goto generic_failure;
 
+		case 0x0fae:
+			MOD_DECODE();
+			if (mod.mi_reg == 2 && mod.mi_type == MODRM_MEMORY) {
+				/* ldmxcsr m32 (attempted to set a reserved bit) */
+				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+				PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
+				PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
+				PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MISC_MXCSR);
+				PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_RML());
+				for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
+					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+				goto unwind_state;
+			}
+#ifdef __x86_64__
+			if (mod.mi_reg == 5) /* xrstor */
+				goto generic_privileged_instruction;
+			if (mod.mi_reg == 6) /* tpause */
+				goto generic_privileged_instruction;
+#endif /* __x86_64__ */
+			goto generic_failure;
+
+#ifdef __x86_64__
+		case 0x0fc3:
+			MOD_DECODE();
+			if (mod.mi_reg == 3) /* xrstors */
+				goto generic_privileged_instruction;
+			goto generic_failure;
+#endif /* __x86_64__ */
 
 		case 0x0f22:
 			/* MOV CRx,r32 */
@@ -844,6 +893,15 @@ done_noncanon_check:
 				PERTASK_SET(this_exception_pointers[3],
 				            (uintptr_t)RD_RMW());
 				goto unwind_state;
+#ifdef __x86_64__
+			} else if (mod.mi_reg) {
+				/* TODO: 0x0f01c8: monitor */
+				/* TODO: 0x0f01c9: mwait */
+				/* TODO: 0x0f01f8: swapgs */
+				/* TODO: 0x0f01ef: wrpkru */
+				/* TODO: 0x0f01d0: xgetbv */
+				/* TODO: 0x0f01d1: xsetbv */
+#endif /* __x86_64__ */
 			} else {
 				goto generic_failure;
 			}
