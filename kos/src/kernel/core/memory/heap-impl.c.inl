@@ -146,9 +146,12 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	{
 		pageptr_t block0_addr;
 		pagecnt_t block0_size;
-		corepair.cp_part->dp_state = flags & GFP_LOCKED
-		                             ? VM_DATAPART_STATE_LOCKED
-		                             : VM_DATAPART_STATE_INCORE;
+		if (flags & GFP_LOCKED) {
+			corepair.cp_part->dp_state = VM_DATAPART_STATE_LOCKED;
+			corepair.cp_part->dp_flags |= VM_DATAPART_FLAG_LOCKED;
+		} else {
+			corepair.cp_part->dp_state = VM_DATAPART_STATE_INCORE;
+		}
 		/* Allocate / initialize the did-init bitset. */
 		if (num_bytes <= (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) * PAGESIZE) {
 			corepair.cp_part->dp_pprop = (flags & GFP_PREFLT) ? (uintptr_t)-1 : 0;
@@ -494,6 +497,7 @@ again_tryhard_mapping_target:
 					pagedir_maphint((byte_t *)mapping_target + mapping_offset,
 					                blocks[i].rb_size * PAGESIZE,
 					                corepair.cp_node);
+					mapping_offset += blocks[i].rb_size * PAGESIZE;
 				}
 			}
 		}
@@ -786,7 +790,7 @@ allocate_without_overalloc:
 				goto err;
 #endif /* HEAP_NX */
 		}
-		PRINTK_SYSTEM_ALLOCATION("Acquire kernel heap: %p...%p\n",
+		PRINTK_SYSTEM_ALLOCATION("[heap] Acquire kernel heap: %p...%p\n",
 		                         pageaddr,
 		                         (byte_t *)pageaddr + page_bytes - 1);
 		/* Got it! */

@@ -941,7 +941,7 @@ load_new_slot:
 				}
 #endif /* CONFIG_DEBUG_HEAP */
 			}
-			PRINTK_SYSTEM_ALLOCATION("Release kernel heap: [%p+%#Ix head] %p...%p [%p+%#Ix tail]\n",
+			PRINTK_SYSTEM_ALLOCATION("[heap] Release kernel heap: [%p+%#Ix head] %p...%p [%p+%#Ix tail]\n",
 			                         hkeep, hkeep_size,
 			                         (byte_t *)free_minaddr,
 			                         (byte_t *)free_endaddr - 1,
