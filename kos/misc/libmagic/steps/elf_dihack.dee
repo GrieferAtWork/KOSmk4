@@ -376,10 +376,7 @@ local final function ELF_DIHACK_tostr(self: BoundStep): string {
 	local input = options.get(OPT_ELF_DIHACK_FILE);
 	if (input is none)
 		input = options[OPT_LINK_OUTPUT];
-	return "[{}] Enable `SHF_ALLOC' for `.debug_*' in {!r}".format({
-		self.group.name,
-		group.fixFilename(input)
-	});
+	return "Enable `SHF_ALLOC' for `.debug_*' in {!r}".format({ group.fixFilename(input) });
 }
 local final function ELF_DIHACK_getRequiredFiles(self: BoundStep): {string...} {
 	local group = self.group;

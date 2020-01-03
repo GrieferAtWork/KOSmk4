@@ -60,18 +60,20 @@ global final AS_I32 = ".int";
 
 @@An optional function called before building is started
 function build(magic: Module) {
+	import * from ..libmagic.libmagic;
 
 	/* Re-configure for i386 settions */
 	magic.TARGET_ARCH = "i386";
 	magic.TARGET = import(".i386");
 	local saved_CONFIG_ONLY_BUILD_LIBRARIES = magic.CONFIG_ONLY_BUILD_LIBRARIES;
-	local saved_options = deepcopy magic.options;
+	local savedOptions = deepcopy magic.options;
+	local savedToolchain = deepcopy magic.toolchain;
+	local savedConfig = deepcopy magic.config;
 
-	/* Build for i386 */
-	print "Building cross-arch for x86_64: i386-kos-",;
-	print magic.getConfig(),;
-	print "...";
-	magic.build(reconfigure: [](magic: Module) {
+	/* Generate build steps for i386 */
+	local saved_LIBMAGIC_ONLY_GATHER_STEPS = LIBMAGIC_ONLY_GATHER_STEPS;
+	LIBMAGIC_ONLY_GATHER_STEPS = true;
+	local steps32, recheck32 = magic.build(reconfigure: [](magic: Module) {
 		import TOOLCHAIN_MTOOLS_DISK from ..libmagic.steps.mtools;
 		/* Re-configure to output files into the x86_64 binpath */
 		magic.TARGET_BINPATH              = "/bin/x86_64-kos-" + magic.getConfig();
@@ -83,25 +85,34 @@ function build(magic: Module) {
 		 * This is required to properly handle library dependencies for compatibility
 		 * mode system libraries. */
 		magic.toolchain._stdlibCache.clear();
+		magic.toolchain.name = "x86_32-kos-" + magic.getConfig();
 		magic.TARGET.provideToolchainCache(
 			magic.toolchain, "x86_64-kos-" + magic.getConfig());
-	});
+	})...;
 
 	/* Restore x86_64 settions */
 	magic.options.clear();
-	magic.options.update(saved_options);
+	magic.options.update(savedOptions);
 	magic.CONFIG_ONLY_BUILD_LIBRARIES = saved_CONFIG_ONLY_BUILD_LIBRARIES;
 	magic.groups.clear();
 	magic.TARGET_ARCH = "x86_64";
 	import . as mytarget;
-	magic.TARGET = mytarget;
-	magic.toolchain._stdlibCache.clear();
+	magic.TARGET    = mytarget;
+	magic.toolchain = savedToolchain;
+	magic.config    = savedConfig;
+	savedToolchain._stdlibCache.clear();
+	savedToolchain.config = savedConfig;
+	savedToolchain.name = "x86_64-kos-" + magic.getConfig();
 
-	/* Build for x86_64 */
-	print "Building cross-arch for x86_64: x86_64-kos-",;
-	print magic.getConfig(),;
-	print "...";
-	magic.build();
+	/* Generate build steps for x86_64 */
+	local steps64, recheck64 = magic.build()...;
+
+	/* Execute 32-bit and 64-bit build steps in parallel */
+	LIBMAGIC_ONLY_GATHER_STEPS = saved_LIBMAGIC_ONLY_GATHER_STEPS;
+
+	local allSteps: {BoundStep...}   = Sequence.concat(steps32, steps64);
+	local allRecheck: {BoundStep...} = Sequence.concat(recheck32, recheck64);
+	return executeBuildSteps(allSteps, allRecheck, magic.CONFIG_MAX_COMPILERS);
 }
 
 @@Provide a cache for the toolchain.

@@ -42,8 +42,7 @@ final local function COPYFILE_run(self: BoundStep): {Waitable...} {
 }
 final local function COPYFILE_tostr(self: BoundStep): string {
 	local group = self.group;
-	return "[{}] Copy {!r} to {!r}".format({
-		self.group.name,
+	return "Copy {!r} to {!r}".format({
 		group.fixFilename(group.options[OPT_COPYFILE_SRC]),
 		group.fixFilename(group.options[OPT_COPYFILE_DST]),
 	});

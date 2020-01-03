@@ -110,6 +110,9 @@ import * from errors;
 @@cause it to ignore the effects of @Config.FORCE
 global final OPT_NOFORCE = "noforce";
 
+@@When @true, only gather steps but don't actually execute them
+global LIBMAGIC_ONLY_GATHER_STEPS = false;
+
 local final LOG_START_MARKER  = ">";
 local final LOG_END_MARKER    = "<";
 local final LOG_UPDATE_MARKER = "~";
@@ -371,7 +374,7 @@ class Step {
 	@@created by this step. - This differs from @getProducedFiles,
 	@@in that modified output files may overlap with build steps,
 	@@however, during execution, care will be taken that no 2 steps
-	@@are executed that may modify the same output file.
+	@@that may modify the same output file are executed in parallel.
 	@@Also: In case another build step exists that may create such an
 	@@      output file, that step is always executed first, allowing
 	@@      it to create the output file before steps that may modify
@@ -580,6 +583,10 @@ class Toolchain {
 	this = default;
 
 	member config: Config;
+
+	@@Name of the toolchain (for logs; if @none, then it isn't used)
+	member name: string = none;
+
 	@@Storage for toolchain extension configurations (e.g. mtools)
 	member options: { string: Object } = Dict();
 
@@ -604,11 +611,11 @@ class BoundStep {
 
 	@@Create a new child-step of @this with @userData
 	public final function createChildStep(userData: Object): BoundStep {
-		local result = BoundStep();
-		result.group = group;
-		result.step = step;
+		local result     = BoundStep();
+		result.group     = group;
+		result.step      = step;
 		result.toolchain = toolchain;
-		result.userData = userData;
+		result.userData  = userData;
 		return result;
 	}
 
@@ -1093,13 +1100,15 @@ did_resolve:
 
 
 function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxParallelSteps: int = 8) {
+	if (LIBMAGIC_ONLY_GATHER_STEPS)
+		return (steps, recheck);
 	local missingSteps: {BoundStep...} = HashSet(steps);
 	local finishedSteps: {BoundStep...} = HashSet();
 	local runningSteps: {BoundStep...} = HashSet();
 	function printStatus(marker: string, message: string) {
-		local numMissing = #missingSteps;
+		local numMissing  = #missingSteps;
 		local numFinished = #finishedSteps;
-		local numRunning = #runningSteps;
+		local numRunning  = #runningSteps;
 		local avgMissing  = (float)numMissing + (float)numRunning / 2;
 		local avgFinished = (float)numFinished + (float)numRunning / 2;
 		local progress = try ((avgFinished / (avgMissing + avgFinished))) catch(...) 1.0;
@@ -1111,6 +1120,16 @@ function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxPa
 			message = message[1:];
 		}
 		print message;
+	}
+	function printStepStatus(marker: string, step: BoundStep, message: string) {
+		printStatus(marker, "[{}] {} ({})".format({
+			step.toolchain.name !is none ? ("{}:{}".format({
+				step.toolchain.name,
+				step.group.name
+			})) : step.group.name,
+			step,
+			message
+		}));
 	}
 	function waitforAnyStep() {
 		assert !runningSteps.empty(),
@@ -1126,14 +1145,14 @@ again:
 		if (#runningSteps == 1) {
 			local s = runningSteps.first;
 			s.waitfor();
-			printStatus(LOG_END_MARKER, "{} (done)".format({ s }));
+			printStepStatus(LOG_END_MARKER, s, "done");
 			runningSteps.clear();
 			finishedSteps.insert(s);
 		} else if (runningSteps) {
 			for (local s: runningSteps) {
 				if (!s.trywaitfor())
 					continue;
-				printStatus(LOG_END_MARKER, "{} (done)".format({ s }));
+				printStepStatus(LOG_END_MARKER, s, "done");
 				runningSteps.remove(s);
 				finishedSteps.insert(s);
 				unchangedIterations = 0;
@@ -1172,7 +1191,7 @@ again:
 				while (collidingSteps) {
 					local st = collidingSteps.popitem();
 					st.waitfor();
-					printStatus(LOG_END_MARKER, "{} (done)".format({ st }));
+					printStepStatus(LOG_END_MARKER, st, "done");
 					runningSteps.remove(st);
 					finishedSteps.insert(st);
 				}
@@ -1187,7 +1206,7 @@ again:
 		if (#runningSteps >= maxParallelSteps) {
 			for (local x: runningSteps) {
 				if (x.trywaitfor()) {
-					printStatus(LOG_END_MARKER, "{} (done)".format({ x }));
+					printStepStatus(LOG_END_MARKER, x, "done");
 					runningSteps.remove(x);
 					finishedSteps.insert(x);
 					goto do_start_step;
@@ -1205,7 +1224,7 @@ again:
 do_start_step:
 		missingSteps.remove(s);
 		runningSteps.insert(s);
-		printStatus(LOG_START_MARKER, "{} (begin: {})".format({ s, reason }));
+		printStepStatus(LOG_START_MARKER, s, "begin: " + reason);
 		s.begin();
 	}
 search_next_step:
@@ -1232,7 +1251,7 @@ search_next_step:
 			 * that the newest output file. */
 			local lmod = none;
 			for (local o: s.producedOutputFiles) {
-				assert o in s.producedFiles;
+				assert o in s.producedFiles, "o:" + repr(o) + "\ns:" + repr(s);
 				local temp = getLastModfiedTime(o);
 				if (temp is none) {
 					/* Create missing folders leading up to all output files. */
@@ -1322,7 +1341,7 @@ try_next_step:
 				if (block !in runningSteps)
 					continue; /* Hasn't started, yet */
 				block.waitfor();
-				printStatus(LOG_END_MARKER, "{} (done)".format({ block }));
+				printStepStatus(LOG_END_MARKER, block, "done");
 				runningSteps.remove(block);
 				finishedSteps.insert(block);
 				did_wait_any = true;
@@ -1337,7 +1356,7 @@ try_next_step:
 	while (runningSteps) {
 		local st = runningSteps.first;
 		st.waitfor();
-		printStatus(LOG_END_MARKER, "{} (done)".format({ st }));
+		printStepStatus(LOG_END_MARKER, st, "done");
 		runningSteps.remove(st);
 		finishedSteps.insert(st);
 	}
@@ -1401,8 +1420,7 @@ try_next_step:
 			}
 			continue;
 do_reset_step:
-			printStatus(LOG_UPDATE_MARKER, "{} (Restarting: {})"
-				.format({ s, recheck_reason }));
+			printStepStatus(LOG_UPDATE_MARKER, s, "Restarting: {}" + recheck_reason);
 			missingSteps.insert(s);
 			finishedSteps.remove(s);
 			s.reset();
@@ -1462,13 +1480,15 @@ class Timed {
 function buildGroups(toolchain: Toolchain, groups: {Group...}, maxParallelSteps: int = 8) {
 #if 1
 	local steps, recheck = orderGroups(toolchain, groups)...;
-	executeBuildSteps(steps, recheck, maxParallelSteps);
+	if (LIBMAGIC_ONLY_GATHER_STEPS)
+		return (steps, recheck);
+	return executeBuildSteps(steps, recheck, maxParallelSteps);
 #else
 	local steps, recheck = (
 		with(Timed("orderGroups"))
 			orderGroups(toolchain, groups))...;
 	with(Timed("executeBuildSteps"))
-		executeBuildSteps(steps, recheck, maxParallelSteps);
+		return executeBuildSteps(steps, recheck, maxParallelSteps);
 #endif
 }
 
@@ -1516,10 +1536,10 @@ function buildGroupsWithStepFilter(
 		filterStep: {(bool,string)...} = none, maxParallelSteps: int = 8) {
 	local steps, recheck = orderGroups(toolchain, groups)...;
 	if (filterStep !is none) {
-		steps = filterStepsWithCallbackWithDepdendencies(steps, filterStep);
+		steps   = filterStepsWithCallbackWithDepdendencies(steps, filterStep);
 		recheck = filterStepsWithCallbackWithDepdendencies(recheck, filterStep);
 	}
-	executeBuildSteps(steps, recheck, maxParallelSteps);
+	return executeBuildSteps(steps, recheck, maxParallelSteps);
 }
 
 
@@ -1598,7 +1618,7 @@ next_step:
 	/* Apply a filter to only run steps apart of the whitelisted groups. */
 	steps = filterStepsWithCallbackWithDepdendencies(steps,
 		[](step: BoundStep) -> step.group.name in whiteListGroupNames);
-	executeBuildSteps(steps, recheck, maxParallelSteps);
+	return executeBuildSteps(steps, recheck, maxParallelSteps);
 }
 
 

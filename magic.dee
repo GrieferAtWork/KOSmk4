@@ -54,10 +54,10 @@ global CONFIG_MULTIBOOT_DRIVERS: {(string, string)...} = List();
 global requiredOutputWhiteList: {(bool, string)...} | none = none;
 global requiredGroupWhiteList: {string...} | none = none;
 global requiredGroupOfSourceFileWhiteList: {string...} | none = none;
-global final config: Config = Config(LIBRARY_SUFFIX: ".so");
+global config: Config = Config(LIBRARY_SUFFIX: ".so");
+global toolchain: Toolchain = GCCToolchain(config: config);
 global final groups: {Group...} = [];
 global final options: {string: Object} = Dict();
-global final toolchain: Toolchain = GCCToolchain(config: config);
 
 /* Build configuration */
 global CONFIG_OPTIMIZE: bool;
@@ -200,25 +200,25 @@ function build(reconfigure: Callable = none) {
 
 	/* Automatically re-build changed sources */
 	if (requiredOutputWhiteList !is none) {
-		buildGroupsWithOutputWhitelist(
+		return buildGroupsWithOutputWhitelist(
 			toolchain:          toolchain,
 			groups:             groups,
 			outputWhiteList:    requiredOutputWhiteList,
 			maxParallelSteps:   CONFIG_MAX_COMPILERS);
 	} else if (requiredGroupWhiteList !is none) {
-		buildGroupsWithGroupWhitelist(
+		return buildGroupsWithGroupWhitelist(
 			toolchain:          toolchain,
 			groups:             groups,
 			groupWhiteList:     requiredGroupWhiteList,
 			maxParallelSteps:   CONFIG_MAX_COMPILERS);
 	} else if (requiredGroupOfSourceFileWhiteList !is none) {
-		buildGroupsWithGroupOfInputFileWhitelist(
+		return buildGroupsWithGroupOfInputFileWhitelist(
 			toolchain:          toolchain,
 			groups:             groups,
 			inputFileWhitelist: requiredGroupOfSourceFileWhiteList,
 			maxParallelSteps:   CONFIG_MAX_COMPILERS);
 	} else {
-		buildGroups(
+		return buildGroups(
 			toolchain:          toolchain,
 			groups:             groups,
 			maxParallelSteps:   CONFIG_MAX_COMPILERS);

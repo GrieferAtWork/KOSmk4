@@ -215,6 +215,7 @@ final local function PREPROCESS_run(self: BoundStep): {Waitable...} {
 		macros:   options.get(OPT_COMPILE_MACROS),
 	);
 }
+
 final local function PREPROCESS_getProducedFiles(self: BoundStep): {string...} {
 	local config = self.toolchain.config;
 	local group = self.group;
@@ -222,17 +223,15 @@ final local function PREPROCESS_getProducedFiles(self: BoundStep): {string...} {
 	yield config.getDependencyFilename(group, srcFile);
 	yield config.getPreprocessedFilename(group, srcFile);
 }
+
 final local function PREPROCESS_getProducedOutputFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	local srcFile = group.fixFilename(self.userData);
 	yield self.toolchain.config.getPreprocessedFilename(group, srcFile);
 }
+
 final local function PREPROCESS_tostr(self: BoundStep): string {
-	local group = self.group;
-	return "[{}] Preprocess {!r}".format({
-		group.name,
-		group.fixFilename(self.userData),
-	});
+	return "Preprocess {!r}".format({ self.group.fixFilename(self.userData) });
 }
 
 final local function ASSEMBLE_run(self: BoundStep): {Waitable...} {
@@ -254,6 +253,7 @@ final local function ASSEMBLE_run(self: BoundStep): {Waitable...} {
 		macros:   options.get(OPT_COMPILE_MACROS)
 	);
 }
+
 final local function ASSEMBLE_getProducedFiles(self: BoundStep): {string...} {
 	local config = self.toolchain.config;
 	local group = self.group;
@@ -261,17 +261,15 @@ final local function ASSEMBLE_getProducedFiles(self: BoundStep): {string...} {
 	yield config.getDependencyFilename(group, srcFile);
 	yield config.getAssembledFilename(group, srcFile);
 }
+
 final local function ASSEMBLE_getProducedOutputFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	local srcFile = group.fixFilename(self.userData);
 	yield self.toolchain.config.getAssembledFilename(group, srcFile);
 }
+
 final local function ASSEMBLE_tostr(self: BoundStep): string {
-	local group = self.group;
-	return "[{}] Assemble {!r}".format({
-		group.name,
-		group.fixFilename(self.userData),
-	});
+	return "Assemble {!r}".format({ self.group.fixFilename(self.userData) });
 }
 
 
@@ -402,10 +400,7 @@ final local function COMPILE_getProducedOutputFiles(self: BoundStep): {string...
 	}
 }
 final local function COMPILE_tostr(self: BoundStep): string {
-	return "[{}] Compile {!r}".format({
-		self.group.name,
-		self.userData,
-	});
+	return "Compile {!r}".format({ self.userData });
 }
 
 
@@ -482,10 +477,7 @@ final local function LINK_getProducedFiles(self: BoundStep): string {
 }
 final local function LINK_tostr(self: BoundStep): string {
 	local group = self.group;
-	return "[{}] Link {!r}".format({
-		group.name,
-		group.fixFilename(group.options[OPT_LINK_OUTPUT]),
-	});
+	return "Link {!r}".format({ group.fixFilename(group.options[OPT_LINK_OUTPUT]) });
 }
 
 
@@ -521,10 +513,7 @@ final local function ARCHIVE_getProducedFiles(self: BoundStep): string {
 }
 final local function ARCHIVE_tostr(self: BoundStep): string {
 	local group = self.group;
-	return "[{}] Archive {!r}".format({
-		group.name,
-		group.fixFilename(group.options[OPT_ARCHIVE_OUTPUT]),
-	});
+	return "Archive {!r}".format({ group.fixFilename(group.options[OPT_ARCHIVE_OUTPUT]) });
 }
 
 

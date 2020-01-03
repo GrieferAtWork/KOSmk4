@@ -48,22 +48,23 @@ global final OPT_MCOPY_OUTPUT = "MCOPY.output";
 global final OPT_MCOPY_INPUT = "MCOPY.input";
 
 
-local final function mtools_invoke(
+final local function mtoolsInvoke(
 		self: BoundStep, cmd: string, args: {string...}): Waitable {
-	local toolchain_options = self.toolchain.options;
+	local toolchainOptions = self.toolchain.options;
 	local proc = ipc.Process(
-		toolchain_options[TOOLCHAIN_MTOOLS_EXE],
-		["-c", cmd, "-i", toolchain_options[TOOLCHAIN_MTOOLS_DISK], args...]);
+		toolchainOptions[TOOLCHAIN_MTOOLS_EXE],
+		["-c", cmd, "-i", toolchainOptions[TOOLCHAIN_MTOOLS_DISK], args...]);
 	if (self.toolchain.config.VERBOSE)
 		print "Exec", repr proc.cmdline;
 	proc.start();
 	return WaitableJoin(proc);
 }
 
-local final function MTOOLS_getModifiedOutputFiles(self: BoundStep): {string...} {
+final local function MTOOLS_getModifiedOutputFiles(self: BoundStep): {string...} {
 	yield self.toolchain.options[TOOLCHAIN_MTOOLS_DISK];
 }
-local final function MFORMAT_run(self: BoundStep): {Waitable...} {
+
+final local function MFORMAT_run(self: BoundStep): {Waitable...} {
 	local options = self.group.options;
 	local disk = self.toolchain.options[TOOLCHAIN_MTOOLS_DISK];
 	local num_sectors = options[OPT_MFORMAT_TOTAL_SECTORS];
@@ -81,17 +82,15 @@ local final function MFORMAT_run(self: BoundStep): {Waitable...} {
 		args.append("-v");
 		args.append(label);
 	}
-	yield mtools_invoke(self, "mformat", args);
+	yield mtoolsInvoke(self, "mformat", args);
 }
-local final function MFORMAT_tostr(self: BoundStep): string {
-	return "[{}] Mformat {!r}".format({
-		self.group.name,
-		self.toolchain.options[TOOLCHAIN_MTOOLS_DISK],
-	});
+
+final local function MFORMAT_tostr(self: BoundStep): string {
+	return "Mformat {!r}".format({ self.toolchain.options[TOOLCHAIN_MTOOLS_DISK] });
 }
 
 
-local final function MMD(self: BoundStep, cache: HashSet with string, path: string) {
+final local function MMD(self: BoundStep, cache: HashSet with string, path: string) {
 	path = path.replace("\\", "/").strip("/").strip();
 	local head, none, tail = path.rpartition("/")...;
 	if (tail)
@@ -99,7 +98,7 @@ local final function MMD(self: BoundStep, cache: HashSet with string, path: stri
 	if (path !in cache) {
 		cache.insert(path);
 		try {
-			mtools_invoke(self, "mmd", { "-D", "s", "::/" + path }).waitfor();
+			mtoolsInvoke(self, "mmd", { "-D", "s", "::/" + path }).waitfor();
 		} catch (...) {
 		}
 	}
@@ -114,7 +113,8 @@ final local function MCOPY_split(self: BoundStep): {BoundStep...} {
 	for (local f: group.enumerateWildcardFiles(input))
 		yield self.createChildStep(f);
 }
-local final function MCOPY_getOutputFilename(
+
+final local function MCOPY_getOutputFilename(
 		options: {string: Object}, input: string): string {
 	local result = options[OPT_MCOPY_OUTPUT].replace("\\", "/").lstrip("/");
 	if (result.endswith("/"))
@@ -122,40 +122,41 @@ local final function MCOPY_getOutputFilename(
 	return result;
 }
 
-local final function MCOPY_run(self: BoundStep): {Waitable...} {
+final local function MCOPY_run(self: BoundStep): {Waitable...} {
 	local th = Thread([](self: BoundStep) {
 		local group: Group = self.group;
 		local options: {string: Object} = group.options;
 		local input: string = self.userData;
 		final local DISK_MMD_CACHE: string = "MTOOLS.disk_mmd_cache";
-		local toolchain_options: {string: Object} = self.toolchain.options;
-		local mmd_cache: {string: {string...}} = toolchain_options.get(DISK_MMD_CACHE);
-		if (mmd_cache is none)
-			toolchain_options[DISK_MMD_CACHE] = mmd_cache = Dict();
-		local diskname: string = toolchain_options[TOOLCHAIN_MTOOLS_DISK];
-		local known_dirs: HashSet with string = mmd_cache.get(diskname);
-		if (known_dirs is none)
-			mmd_cache[diskname] = known_dirs = HashSet();
+		local toolchainOptions: {string: Object} = self.toolchain.options;
+		local mmdCache: {string: {string...}} = toolchainOptions.get(DISK_MMD_CACHE);
+		if (mmdCache is none)
+			toolchainOptions[DISK_MMD_CACHE] = mmdCache = Dict();
+		local diskname: string = toolchainOptions[TOOLCHAIN_MTOOLS_DISK];
+		local knownDirs: HashSet with string = mmdCache.get(diskname);
+		if (knownDirs is none)
+			mmdCache[diskname] = knownDirs = HashSet();
 		local output: string = MCOPY_getOutputFilename(options, input);
 		/* Make sure that all directories leading up
 		 * to the file to-be created created exist */
-		MMD(self, known_dirs, output.rpartition("/")[0]);
+		MMD(self, knownDirs, output.rpartition("/")[0]);
 		/* Copy the actual file onto the disk. */
-		mtools_invoke(self, "mcopy", {
+		mtoolsInvoke(self, "mcopy", {
 			"-D", "o", input, "::/" + output
 		}).waitfor();
 	}, (self, ));
 	th.start();
 	yield WaitableJoin(th);
 }
-local final function MCOPY_getRequiredFiles(self: BoundStep): {string...} {
+
+final local function MCOPY_getRequiredFiles(self: BoundStep): {string...} {
 	yield self.userData;
 }
-local final function MCOPY_tostr(self: BoundStep): string {
+
+final local function MCOPY_tostr(self: BoundStep): string {
 	local group = self.group;
 	local options = group.options;
-	return "[{}] Mcopy {}:{}".format({
-		group.name,
+	return "Mcopy {}:{}".format({
 		self.toolchain.options[TOOLCHAIN_MTOOLS_DISK],
 		group.options[OPT_MCOPY_OUTPUT],
 	});

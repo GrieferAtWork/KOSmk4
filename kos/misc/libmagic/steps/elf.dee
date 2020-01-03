@@ -200,8 +200,7 @@ local final function ELF_FLATTEN_tostr(self: BoundStep): string {
 	local input = options.get(OPT_ELF_FLATTEN_INPUT);
 	if (input is none)
 		input = options[OPT_LINK_OUTPUT];
-	return "[{}] Flatten {!r} to {!r}".format({
-		self.group.name,
+	return "Flatten {!r} to {!r}".format({
 		group.fixFilename(input),
 		group.fixFilename(options[OPT_ELF_FLATTEN_OUTPUT]),
 	});
@@ -262,10 +261,7 @@ function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
 	result.name = "ENUM_SYMBOLS";
 	result.options = {};
 	result.tostr = [](self: BoundStep): string {
-		return "[{}] Enum symbols of {!r}".format({
-			self.group.name,
-			self.group.fixFilename(elfBinary),
-		});
+		return "Enum symbols of {!r}".format({ self.group.fixFilename(elfBinary) });
 	};
 	result.run = [](self: BoundStep): {Waitable...} {
 		local readelf_bin = HOST_EXE(self.toolchain.config.CROSS_PREFIX + "readelf");
