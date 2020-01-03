@@ -19,8 +19,6 @@
 #ifndef GUARD_APPS_SYSTEM_TEST_TEST_IOPERM_C
 #define GUARD_APPS_SYSTEM_TEST_TEST_IOPERM_C 1
 #define _KOS_SOURCE 1
-#define __CRT_HAVE_iopl 1 /* TODO: Remove me */
-#define __CRT_HAVE_ioperm 1 /* TODO: Remove me */
 
 #include <hybrid/compiler.h>
 
@@ -65,7 +63,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 	TRY {
 		/* Make sure outsb() works with IOPL=3 */
 		if (iopl(3))
-			err(1, "iopl(3) failed");
+			err(EXIT_FAILURE, "iopl(3) failed");
 		doio();
 	} EXCEPT {
 		assert_failed("outsb:iopl(3): error_code(): %I#x\n", error_code());
@@ -73,7 +71,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 	TRY {
 		/* Make sure outsb() doesn't work with IOPL=0 */
 		if (iopl(0))
-			err(1, "iopl(0) failed");
+			err(EXIT_FAILURE, "iopl(0) failed");
 		doio();
 		assert_failed("outsb:iopl(0): ok\n");
 	} EXCEPT {
@@ -82,12 +80,12 @@ DEFINE_TEST(ioperm_works_correctly) {
 	TRY {
 		/* Make sure ioperm() can be used to enable access to ports */
 		if (ioperm(portno, 1, 1))
-			err(1, "ioperm(%#I16x, 1, 1) failed", portno);
+			err(EXIT_FAILURE, "ioperm(%#I16x, 1, 1) failed", portno);
 		doio();
 	} EXCEPT {
 		assert_failed("outsb:ioperm(1): error_code(): %I#x\n", error_code());
 	}
-	TRY {
+	{
 		pid_t cpid = fork();
 		if (cpid == 0) {
 			/* Make sure that the child process inherited the ioperm() */
@@ -99,7 +97,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 			TRY {
 				/* Turn off permissions within the child process. */
 				if (ioperm(portno, 1, 0))
-					err(1, "child:ioperm(%#I16x, 1, 1) failed", portno);
+					err(EXIT_FAILURE, "child:ioperm(%#I16x, 1, 1) failed", portno);
 				doio();
 				assert_failed("child:outsb:ioperm(0): ok\n");
 			} EXCEPT {
@@ -108,19 +106,21 @@ DEFINE_TEST(ioperm_works_correctly) {
 			_Exit(0);
 		}
 		if (cpid < 0)
-			err(1, "fork() failed");
+			err(EXIT_FAILURE, "fork() failed");
 		/* Wait for the child process, thus ensuring that our own
 		 * thread got preempted at least once */
-		errno = 0;
+		errno = EOK;
 		while (waitpid(cpid, NULL, 0) != cpid) {
-			if (errno)
-				err(1, "waitpid(%d) failed", cpid);
+			if (errno != EOK)
+				err(EXIT_FAILURE, "waitpid(%d) failed", cpid);
 		}
-		/* Make sure that ioperm() continues to work after fork() and preemption
-		 * This part is crucial, since this is where the CPU itself accesses a
-		 * kernel-space structure as-per instruction from user-space (essentially
-		 * meaning that it is user-space that accesses kernel-space memory in a
-		 * certain way) */
+	}
+	/* Make sure that ioperm() continues to work after fork() and preemption
+	 * This part is crucial, since this is where the CPU itself accesses a
+	 * kernel-space structure as-per instruction from user-space (essentially
+	 * meaning that it is user-space that accesses kernel-space memory in a
+	 * certain way) */
+	TRY {
 		doio();
 	} EXCEPT {
 		assert_failed("outsb:ioperm(1): error_code(): %I#x\n", error_code());
@@ -135,7 +135,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 	TRY {
 		/* Make sure ioperm() can also be used to turn off permissions */
 		if (ioperm(portno, 1, 0))
-			err(1, "ioperm(%#I16x, 1, 1) failed", portno);
+			err(EXIT_FAILURE, "ioperm(%#I16x, 1, 1) failed", portno);
 		doio();
 		assert_failed("outsb:ioperm(0): ok\n");
 	} EXCEPT {
