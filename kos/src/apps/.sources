@@ -52,7 +52,7 @@ END
 
 BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
 	DEFINE({ "__INSIDE_LIBTEST" : "1" })
-	LINKER_SCRIPT("system-test/arch/" + XARCH + "/_linker.ld")
+	LINKER_SCRIPT("system-test/arch/" + XARCH + "/_linker" + SUFFIX + ".ld")
 	SET_OUTPUT("/bin/system-test")
 
 	/* When building the compatibility-mode system libraries for x86_64, also

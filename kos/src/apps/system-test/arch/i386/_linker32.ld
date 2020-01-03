@@ -16,24 +16,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_APPS_SYSTEM_TEST_ARC_I386__LINKER32_LD
+#define GUARD_APPS_SYSTEM_TEST_ARC_I386__LINKER32_LD 1
 
 #include <hybrid/typecore.h>
 
 ENTRY(_start)
 
 SECTIONS {
-	PROVIDE (__executable_start = SEGMENT_START("text-segment", 0x08048000));
+	PROVIDE(__executable_start = SEGMENT_START("text-segment", 0x08048000));
 	. = SEGMENT_START("text-segment", 0x08048000) + SIZEOF_HEADERS;
-	.interp         : { *(.interp) }
-	.note.gnu.build-id  : { *(.note.gnu.build-id) }
-	.hash           : { *(.hash) }
-	.gnu.hash       : { *(.gnu.hash) }
-	.dynsym         : { *(.dynsym) }
-	.dynstr         : { *(.dynstr) }
-	.gnu.version    : { *(.gnu.version) }
-	.gnu.version_d  : { *(.gnu.version_d) }
-	.gnu.version_r  : { *(.gnu.version_r) }
-	.rel.dyn        : {
+	.interp : { *(.interp) }
+	.note.gnu.build-id : { *(.note.gnu.build-id) }
+	.hash : { *(.hash) }
+	.gnu.hash : { *(.gnu.hash) }
+	.dynsym : { *(.dynsym) }
+	.dynstr : { *(.dynstr) }
+	.gnu.version : { *(.gnu.version) }
+	.gnu.version_d : { *(.gnu.version_d) }
+	.gnu.version_r : { *(.gnu.version_r) }
+	.rel.dyn : {
 		*(.rel.init)
 		*(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
 		*(.rel.fini)
@@ -48,19 +50,19 @@ SECTIONS {
 		*(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
 		*(.rel.ifunc)
 	}
-	.rel.plt        : {
+	.rel.plt : {
 		*(.rel.plt)
-		PROVIDE_HIDDEN (__rel_iplt_start = .);
+		PROVIDE_HIDDEN(__rel_iplt_start = .);
 		*(.rel.iplt)
-		PROVIDE_HIDDEN (__rel_iplt_end = .);
+		PROVIDE_HIDDEN(__rel_iplt_end = .);
 	}
-	.init           : {
-		KEEP (*(SORT_NONE(.init)))
+	.init : {
+		KEEP(*(SORT_NONE(.init)))
 	}
-	.plt            : { *(.plt) *(.iplt) }
-	.plt.got        : { *(.plt.got) }
-	.plt.sec        : { *(.plt.sec) }
-	.text           : {
+	.plt : { *(.plt) *(.iplt) }
+	.plt.got : { *(.plt.got) }
+	.plt.sec : { *(.plt.sec) }
+	.text : {
 		*(.text.unlikely .text.*_unlikely .text.unlikely.*)
 		*(.text.exit .text.exit.*)
 		*(.text.startup .text.startup.*)
@@ -68,12 +70,12 @@ SECTIONS {
 		*(.text .stub .text.* .gnu.linkonce.t.*)
 		*(.gnu.warning)
 	}
-	.fini           : {
-		KEEP (*(SORT_NONE(.fini)))
+	.fini : {
+		KEEP(*(SORT_NONE(.fini)))
 	}
-	PROVIDE (__etext = .);
-	PROVIDE (_etext = .);
-	PROVIDE (etext = .);
+	PROVIDE(__etext = .);
+	PROVIDE(_etext = .);
+	PROVIDE(etext = .);
 	.xdata : {
 		*(.xdata.unlikely .xdata.*_unlikely .xdata.unlikely.*)
 		*(.xdata.exit .xdata.exit.*)
@@ -81,64 +83,64 @@ SECTIONS {
 		*(.xdata.hot .xdata.hot.*)
 		*(.xdata  .xdata.*)
 	}
-	.rodata         : { *(.rodata .rodata.* .gnu.linkonce.r.*) }
-	.rodata1        : { *(.rodata1) }
-	.eh_frame_hdr   : { *(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*) }
-	.eh_frame       : ONLY_IF_RO { KEEP (*(.eh_frame)) *(.eh_frame.*) }
-	.gcc_except_table   : ONLY_IF_RO { *(.gcc_except_table .gcc_except_table.*) }
-	.gnu_extab   : ONLY_IF_RO { *(.gnu_extab*) }
-	.exception_ranges   : ONLY_IF_RO { *(.exception_ranges*) }
-	. = DATA_SEGMENT_ALIGN (CONSTANT (MAXPAGESIZE), CONSTANT (COMMONPAGESIZE));
-	.eh_frame       : ONLY_IF_RW { KEEP (*(.eh_frame)) *(.eh_frame.*) }
-	.gnu_extab      : ONLY_IF_RW { *(.gnu_extab) }
-	.gcc_except_table   : ONLY_IF_RW { *(.gcc_except_table .gcc_except_table.*) }
-	.exception_ranges   : ONLY_IF_RW { *(.exception_ranges*) }
-	.tdata  : {
-		PROVIDE_HIDDEN (__tdata_start = .);
+	.rodata : { *(.rodata .rodata.* .gnu.linkonce.r.*) }
+	.rodata1 : { *(.rodata1) }
+	.eh_frame_hdr : { *(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*) }
+	.eh_frame : ONLY_IF_RO { KEEP(*(.eh_frame)) *(.eh_frame.*) }
+	.gcc_except_table : ONLY_IF_RO { *(.gcc_except_table .gcc_except_table.*) }
+	.gnu_extab : ONLY_IF_RO { *(.gnu_extab*) }
+	.exception_ranges : ONLY_IF_RO { *(.exception_ranges*) }
+	. = DATA_SEGMENT_ALIGN(CONSTANT(MAXPAGESIZE), CONSTANT(COMMONPAGESIZE));
+	.eh_frame : ONLY_IF_RW { KEEP(*(.eh_frame)) *(.eh_frame.*) }
+	.gnu_extab : ONLY_IF_RW { *(.gnu_extab) }
+	.gcc_except_table : ONLY_IF_RW { *(.gcc_except_table .gcc_except_table.*) }
+	.exception_ranges : ONLY_IF_RW { *(.exception_ranges*) }
+	.tdata : {
+		PROVIDE_HIDDEN(__tdata_start = .);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 	}
-	.tbss  : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) }
-	.preinit_array    : {
-		PROVIDE_HIDDEN (__preinit_array_start = .);
-		KEEP (*(.preinit_array))
-		PROVIDE_HIDDEN (__preinit_array_end = .);
+	.tbss : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) }
+	.preinit_array : {
+		PROVIDE_HIDDEN(__preinit_array_start = .);
+		KEEP(*(.preinit_array))
+		PROVIDE_HIDDEN(__preinit_array_end = .);
 	}
-	.init_array    : {
-		PROVIDE_HIDDEN (__init_array_start = .);
-		KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
-		KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
-		PROVIDE_HIDDEN (__init_array_end = .);
+	.init_array : {
+		PROVIDE_HIDDEN(__init_array_start = .);
+		KEEP(*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
+		KEEP(*(.init_array EXCLUDE_FILE(*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
+		PROVIDE_HIDDEN(__init_array_end = .);
 	}
-	.fini_array    : {
-		PROVIDE_HIDDEN (__fini_array_start = .);
-		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
-		KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
-		PROVIDE_HIDDEN (__fini_array_end = .);
+	.fini_array : {
+		PROVIDE_HIDDEN(__fini_array_start = .);
+		KEEP(*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
+		KEEP(*(.fini_array EXCLUDE_FILE(*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
+		PROVIDE_HIDDEN(__fini_array_end = .);
 	}
-	.ctors          : {
-		KEEP (*crtbegin.o(.ctors))
-		KEEP (*crtbegin?.o(.ctors))
-		KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .ctors))
-		KEEP (*(SORT(.ctors.*)))
-		KEEP (*(.ctors))
+	.ctors : {
+		KEEP(*crtbegin.o(.ctors))
+		KEEP(*crtbegin?.o(.ctors))
+		KEEP(*(EXCLUDE_FILE(*crtend.o *crtend?.o ) .ctors))
+		KEEP(*(SORT(.ctors.*)))
+		KEEP(*(.ctors))
 	}
-	.dtors          : {
-		KEEP (*crtbegin.o(.dtors))
-		KEEP (*crtbegin?.o(.dtors))
-		KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .dtors))
-		KEEP (*(SORT(.dtors.*)))
-		KEEP (*(.dtors))
+	.dtors : {
+		KEEP(*crtbegin.o(.dtors))
+		KEEP(*crtbegin?.o(.dtors))
+		KEEP(*(EXCLUDE_FILE(*crtend.o *crtend?.o ) .dtors))
+		KEEP(*(SORT(.dtors.*)))
+		KEEP(*(.dtors))
 	}
-	.jcr            : { KEEP (*(.jcr)) }
+	.jcr : { KEEP(*(.jcr)) }
 	.data.rel.ro : {
 		*(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
 		*(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
 	}
-	.dynamic        : { *(.dynamic) }
-	.got            : { *(.got) *(.igot) }
-	. = DATA_SEGMENT_RELRO_END (SIZEOF (.got.plt) >= 12 ? 12 : 0, .);
-	.got.plt        : { *(.got.plt) *(.igot.plt) }
-	.data           : {
+	.dynamic : { *(.dynamic) }
+	.got : { *(.got) *(.igot) }
+	. = DATA_SEGMENT_RELRO_END(SIZEOF(.got.plt) >= 12 ? 12 : 0, .);
+	.got.plt : { *(.got.plt) *(.igot.plt) }
+	.data : {
 		. = ALIGN(__SIZEOF_POINTER__);
 		PROVIDE_HIDDEN(__system_tests_begin = .);
 		KEEP(*(.data.system_tests))
@@ -147,11 +149,11 @@ SECTIONS {
 		*(.data .data.* .gnu.linkonce.d.*)
 		SORT(CONSTRUCTORS)
 	}
-	.data1          : { *(.data1) }
-	_edata = .; PROVIDE (edata = .);
+	.data1 : { *(.data1) }
+	_edata = .; PROVIDE(edata = .);
 	. = .;
 	__bss_start = .;
-	.bss            : {
+	.bss : {
 		*(.dynbss)
 		*(.bss .bss.* .gnu.linkonce.b.*)
 		*(COMMON)
@@ -160,8 +162,8 @@ SECTIONS {
 	. = ALIGN(32 / 8);
 	. = SEGMENT_START("ldata-segment", .);
 	. = ALIGN(32 / 8);
-	_end = .; PROVIDE (end = .);
-	. = DATA_SEGMENT_END (.);
+	_end = .; PROVIDE(end = .);
+	. = DATA_SEGMENT_END(.);
 	.stab          0 : { *(.stab) }
 	.stabstr       0 : { *(.stabstr) }
 	.stab.excl     0 : { *(.stab.excl) }
@@ -191,7 +193,7 @@ SECTIONS {
 	.debug_ranges   0 : { *(.debug_ranges) }
 	.debug_macro    0 : { *(.debug_macro) }
 	.debug_addr     0 : { *(.debug_addr) }
-	.gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
+	.gnu.attributes 0 : { KEEP(*(.gnu.attributes)) }
 	/DISCARD/ : {
 		*(.note.GNU-stack)
 		*(.gnu_debuglink)
@@ -199,3 +201,4 @@ SECTIONS {
 	}
 }
 
+#endif /* !GUARD_APPS_SYSTEM_TEST_ARC_I386__LINKER32_LD */
