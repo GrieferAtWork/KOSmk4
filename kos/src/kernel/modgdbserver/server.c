@@ -646,6 +646,8 @@ NOTHROW(FCALL GDB_ConstructStopReply)(char *ptr,
 			break;
 
 		default:
+			if (!signo)
+				signo = SIGINT;
 			break;
 		}
 		*ptr++ = 'T';
@@ -745,7 +747,7 @@ do_wbreak:
 	} else {
 		/* Shouldn't actually get here, since stop events without reason should
 		 * never cause stop replies to be constructed in the first place! */
-		ptr = STPCAT(ptr, "T05"); /* SIGTRAP */
+		ptr = STPCAT(ptr, "T02"); /* SIGINT */
 	}
 
 	/* Additional registers. */

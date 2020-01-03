@@ -577,8 +577,9 @@ class WaitableJoin: Waitable {
 
 
 class Toolchain {
-	member config: Config;
 	this = default;
+
+	member config: Config;
 	@@Storage for toolchain extension configurations (e.g. mtools)
 	member options: { string: Object } = Dict();
 
