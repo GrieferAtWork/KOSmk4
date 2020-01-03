@@ -75,7 +75,7 @@ DECL_BEGIN
 #define PAE_PAGE_ALIGN      __UINT64_C(0x0000000000001000) /* Required page alignment. */
 #define PAE_PAGE_SIZE       __UINT64_C(0x0000000000001000) /* Required page size. */
 #define PAE_PAGE_FVECTOR    __UINT64_C(0x000ffffffffff000) /* [bit(12:51)] Mask of an inner vector. */
-#define PAE_PAGE_FHINT      __UINT64_C(0xfffffffffffffffe) /* Mask of page hints. */
+#define PAE_PAGE_FHINT      __UINT64_C(0xfffffffffffffffc) /* Mask of page hints. */
 #define PAE_PAGE_FADDR_4KIB __UINT64_C(0x000ffffffffff000) /* Mask of the page address for 1KiB pages. */
 #define PAE_PAGE_OFFST_4KIB         __UINT32_C(0x00000fff) /* Offset mask for 1KiB pages. */
 #define PAE_PAGE_FADDR_2MIB __UINT64_C(0x000fffffffe00000) /* Mask of the page address for 2MiB pages. */

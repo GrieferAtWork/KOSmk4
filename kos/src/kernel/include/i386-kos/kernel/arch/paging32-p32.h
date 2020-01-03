@@ -76,7 +76,7 @@ DECL_BEGIN
 #define P32_PAGE_ALIGN      __UINT32_C(0x00001000) /* Required page alignment. */
 #define P32_PAGE_SIZE       __UINT32_C(0x00001000) /* Required page size. */
 #define P32_PAGE_FVECTOR    __UINT32_C(0xfffff000) /* [bit(12:31)] Mask of an inner vector. */
-#define P32_PAGE_FHINT      __UINT32_C(0xfffffffe) /* Mask of page hints. */
+#define P32_PAGE_FHINT      __UINT32_C(0xfffffffc) /* Mask of page hints. */
 #define P32_PAGE_FADDR_4KIB __UINT32_C(0xfffff000) /* Mask of the page address for 1KiB pages. */
 #define P32_PAGE_OFFST_4KIB __UINT32_C(0x00000fff) /* Offset mask for 1KiB pages. */
 #define P32_PAGE_FADDR_4MIB __UINT32_C(0xffc00000) /* Mask of the page address for 4MiB pages. */
