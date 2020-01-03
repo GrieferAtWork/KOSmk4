@@ -817,7 +817,7 @@ upgrade_and_recheck_vm_for_node:
 #else
 							printk(KERN_TRACE "[vm] Unshared page at %p [tid=%u,pc=%p,sp=%p,oldpage=" FORMAT_VM_PHYS_T ",newpage=" FORMAT_VM_PHYS_T "]\n",
 							       pageaddr, task_getroottid_s(),
-							       page2addr(old_ppage), page2addr(new_ppage),					 dos_localtime32_s
+							       page2addr(old_ppage), page2addr(new_ppage),
 							       pc, icpustate_getsp(state));
 #endif
 							goto done_before_pop_connections;
