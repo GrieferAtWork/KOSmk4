@@ -97,12 +97,16 @@ PRIVATE ATTR_NOINLINE void sysenter_Pipe(fd_t fd[2]) {
 #endif /* __i386__ && !__x86_64 */
 
 #if defined(__i386__) || defined(__x86_64__)
-PRIVATE ATTR_NOINLINE void int80_Pipe(fd_t fd[2]) {
+LOCAL void int80_Pipe(fd_t fd[2]) {
 	__asm__ __volatile__("stc\n\t"
 	                     "int $0x80"
 	                     :
 	                     : "a" (SYS_pipe)
+#ifdef __x86_64__
+	                     , "D" (&fd[0])
+#else /* __x86_64__ */
 	                     , "b" (&fd[0])
+#endif /* !__x86_64__ */
 	                     : "cc", "memory");
 }
 #endif /* __i386__ || __x86_64__ */
