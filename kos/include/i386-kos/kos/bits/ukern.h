@@ -20,20 +20,22 @@
 #define _I386_KOS_KOS_BITS_UKERN_H 1
 
 #include <__stdinc.h>
-#include <asm/intrin.h>
+
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
+#include <asm/intrin.h>
+
 #ifdef __x86_64__
 #define userkern_self()             ((struct userkern *)__rdgsbase())
-#define userkern_valid()            (__rdgsbasel() >= __UINT32_C(0xc0000000))
-#define userkern_getfield(field)    ((__typeof__(((struct userkern *)0)->field))__readgsptr(__builtin_ofgsetof(struct userkern, field)))
-#define userkern_setfield(field, v) __writegsptr(__builtin_ofgsetof(struct userkern, field), (void *)(v))
+#define userkern_valid()            (__rdgsbaseq() >= __UINT64_C(0xffff800000000000))
+#define userkern_getfield(field)    ((__typeof__(((struct userkern *)0)->field))__rdgsptr(__builtin_ofgsetof(struct userkern, field)))
+#define userkern_setfield(field, v) __wrgsptr(__builtin_ofgsetof(struct userkern, field), (void *)(v))
 #else /* __x86_64__ */
 #define userkern_self()             ((struct userkern *)__rdfsbase())
-#define userkern_valid()            (__rdfsbasel() >= __UINT64_C(0xffff800000000000))
-#define userkern_getfield(field)    ((__typeof__(((struct userkern *)0)->field))__readfsptr(__builtin_offsetof(struct userkern, field)))
-#define userkern_setfield(field, v) __writefsptr(__builtin_offsetof(struct userkern, field), (void *)(v))
+#define userkern_valid()            (__rdfsbasel() >= __UINT32_C(0xc0000000))
+#define userkern_getfield(field)    ((__typeof__(((struct userkern *)0)->field))__rdfsptr(__builtin_offsetof(struct userkern, field)))
+#define userkern_setfield(field, v) __wrfsptr(__builtin_offsetof(struct userkern, field), (void *)(v))
 #endif /* !__x86_64__ */
 
 

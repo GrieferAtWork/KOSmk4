@@ -501,8 +501,8 @@ do_handle_iob_node_access:
 #ifdef __x86_64__
 							if (isuser() != (callsite_eip < KERNELSPACE_BASE))
 								goto do_normal_vio;
-							irregs_wrip(&state->ics_irregs, callsite_eip);
-							irregs_wrsp(&state->ics_irregs, sp + 8);
+							icpustate_setpc(state, callsite_eip);
+							icpustate_setsp(state, sp + 8);
 #else /* __x86_64__ */
 							if (sp != (uintptr_t)(&state->ics_irregs_k + 1) ||
 							    isuser()) {
@@ -1032,15 +1032,15 @@ throw_segfault:
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
-		if (isuser() != (old_eip >= KERNELSPACE_BASE))
+		if (isuser() != (old_eip < KERNELSPACE_BASE))
 			goto not_a_badcall;
-		irregs_wrip(&state->ics_irregs, old_eip);
-		irregs_wrsp(&state->ics_irregs, sp + 8);
+		icpustate_setpc(state, old_eip);
+		icpustate_setsp(state, sp + 8);
 #else /* __x86_64__ */
 		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || isuser()) {
 			if (old_eip >= KERNELSPACE_BASE)
 				goto not_a_badcall;
-			irregs_wrip(&state->ics_irregs_k, old_eip);
+			icpustate_setpc(state, old_eip);
 			state->ics_irregs_u.ir_esp += 4;
 		} else {
 			if (old_eip < KERNELSPACE_BASE)
