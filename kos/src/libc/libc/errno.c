@@ -192,7 +192,9 @@ PRIVATE ATTR_SECTION(".rodata.crt.errno.sys_siglist_names") char const name_SIGQ
 PRIVATE ATTR_SECTION(".rodata.crt.errno.sys_siglist_names") char const name_SIGILL[]    = "SIGILL";
 PRIVATE ATTR_SECTION(".rodata.crt.errno.sys_siglist_names") char const name_SIGTRAP[]   = "SIGTRAP";
 PRIVATE ATTR_SECTION(".rodata.crt.errno.sys_siglist_names") char const name_SIGABRT[]   = "SIGABRT";
+#if SIGABRT != SIGIOT
 PRIVATE ATTR_SECTION(".rodata.crt.errno.sys_siglist_names") char const name_SIGIOT[]    = "SIGIOT";
+#endif /* SIGABRT != SIGIOT */
 PRIVATE ATTR_SECTION(".rodata.crt.errno.sys_siglist_names") char const name_SIGBUS[]    = "SIGBUS";
 PRIVATE ATTR_SECTION(".rodata.crt.errno.sys_siglist_names") char const name_SIGFPE[]    = "SIGFPE";
 PRIVATE ATTR_SECTION(".rodata.crt.errno.sys_siglist_names") char const name_SIGKILL[]   = "SIGKILL";
@@ -224,14 +226,16 @@ INTERN ATTR_CONST WUNUSED ATTR_RETNONNULL char const *const *
 ATTR_SECTION(".text.crt.errno.__p_sys_siglist")
 NOTHROW_NCX(libc___p_sys_siglist)(void) {
 	char const **result = libc_sys_siglist;
-	if (!result[__SIGSYS]) {
+	if (!result[SIGSYS]) {
 		result[SIGHUP]    = name_SIGHUP;
 		result[SIGINT]    = name_SIGINT;
 		result[SIGQUIT]   = name_SIGQUIT;
 		result[SIGILL]    = name_SIGILL;
 		result[SIGTRAP]   = name_SIGTRAP;
 		result[SIGABRT]   = name_SIGABRT;
+#if SIGABRT != SIGIOT
 		result[SIGIOT]    = name_SIGIOT;
+#endif /* SIGABRT != SIGIOT */
 		result[SIGBUS]    = name_SIGBUS;
 		result[SIGFPE]    = name_SIGFPE;
 		result[SIGKILL]   = name_SIGKILL;

@@ -40,7 +40,7 @@
 #define __KOS_SIGILL    4             /* Illegal instruction (ANSI). */
 #define __KOS_SIGTRAP   5             /* Trace trap (POSIX). */
 #define __KOS_SIGABRT   6             /* Abort (ANSI). */
-#define __KOS_SIGIOT    6             /* IOT trap (4.2 BSD). */
+#define __KOS_SIGIOT    __KOS_SIGABRT /* IOT trap (4.2 BSD). */
 #define __KOS_SIGBUS    7             /* BUS error (4.2 BSD). */
 #define __KOS_SIGFPE    8             /* Floating-point exception (ANSI). */
 #define __KOS_SIGKILL   9             /* Kill, unblockable (POSIX). */
