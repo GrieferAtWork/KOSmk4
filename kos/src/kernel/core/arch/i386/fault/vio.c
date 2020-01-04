@@ -4479,7 +4479,7 @@ undefined_instruction:
 			if (fixed_pc > (uintptr_t)end_pc)
 				end_pc = (byte_t *)fixed_pc;
 			printk(KERN_WARNING "[vio] unrecognized instruction %#I32x (accessing %p)\n", opcode, cr2);
-			irregs_wrip(&state->ics_irregs, (uintptr_t)end_pc);
+			icpustate_setpc(state, (uintptr_t)end_pc);
 			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE));
 			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
 			for (i = 1; i < EXCEPTION_DATA_POINTERS; ++i)

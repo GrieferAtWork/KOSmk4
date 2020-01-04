@@ -107,10 +107,11 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
 		}
 		printk(KERN_TRACE "]");
 	}
-	printk(KERN_TRACE " hand:[pc=%IX,sp=%IX] orig:[pc=%IX,sp=%IX] [mode=%#Ix,tid=%u]\n",
+	printk(KERN_TRACE " hand:[pc=%IX,sp=%IX] orig:[pc=%IX,sp=%IX] fault:[pc=%IX] [mode=%#Ix,tid=%u]\n",
 	       handler, stack,
 	       icpustate_getpc(state),
 	       icpustate_getuserpsp(state),
+	       data->e_faultaddr,
 	       mode, task_getroottid_s());
 }
 

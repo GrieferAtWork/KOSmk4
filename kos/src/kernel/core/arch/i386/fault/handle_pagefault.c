@@ -80,6 +80,9 @@ handle_iob_access(struct cpu *__restrict mycpu,
 	assert(!PREEMPTION_ENABLED());
 	iob = THIS_X86_IOPERM_BITMAP;
 	if (!iob) {
+		assertf(ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)) == NULL,
+		        "FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = %p",
+		        ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)));
 		if (is_writing) {
 			iob = ioperm_bitmap_allocf_nx(GET_GFP_FLAGS());
 			if unlikely(!iob) {
@@ -88,6 +91,9 @@ handle_iob_access(struct cpu *__restrict mycpu,
 				/* Re-attempt the allocation with preemption enabled. */
 				PREEMPTION_ENABLE();
 				iob = ioperm_bitmap_allocf(GFP_LOCKED | GFP_PREFLT);
+				assertf(ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)) == NULL,
+				        "FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = %p",
+				        ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)));
 				PERTASK_SET(this_x86_ioperm_bitmap, iob);
 				return false;
 			}
@@ -95,6 +101,10 @@ handle_iob_access(struct cpu *__restrict mycpu,
 			iob = incref(&ioperm_bitmap_empty);
 			ATOMIC_FETCHINC(iob->ib_share);
 		}
+		/* NOTE: The following line causes an inconsistency that is fixed by
+		 *       assigning `FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = iob'
+		 *       below. Because preemption is currently off, this inconsistency
+		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, iob);
 	} else if (is_writing && ATOMIC_READ(iob->ib_share) > 1) {
 		/* Unshare the IOB vector prior to allowing write-access */
@@ -103,14 +113,44 @@ handle_iob_access(struct cpu *__restrict mycpu,
 		if unlikely(!cow) {
 			if (!allow_preemption)
 				THROW(E_WOULDBLOCK_PREEMPTED);
+
 			/* Re-attempt the allocation with preemption enabled. */
 			PREEMPTION_ENABLE();
 			cow = ioperm_bitmap_copyf(iob, GFP_LOCKED | GFP_PREFLT);
+
+			/* Unmap the current IOB map if it still points to our old IOB.
+			 * This must be done to ensure that the assumption:
+			 *     FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == NULL ||
+			 *     FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP
+			 * continues to be consistent.
+			 */
+			assertf(THIS_X86_IOPERM_BITMAP == iob,
+			        "THIS_X86_IOPERM_BITMAP = %p\n"
+			        "iob                    = %p",
+			        THIS_X86_IOPERM_BITMAP, iob);
+			if (ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)) == iob) {
+				PREEMPTION_DISABLE();
+				COMPILER_READ_BARRIER();
+				if (FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == iob) {
+					pagedir_unmap(FORCPU(mycpu, thiscpu_x86_iob), 2 * PAGESIZE);
+					pagedir_sync(FORCPU(mycpu, thiscpu_x86_iob), 2 * PAGESIZE);
+					FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = NULL;
+				}
+				PREEMPTION_ENABLE();
+			} else {
+				assertf(ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)) == NULL,
+				        "FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = %p",
+				        ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)));
+			}
 			PERTASK_SET(this_x86_ioperm_bitmap, cow);
 			ATOMIC_FETCHDEC(iob->ib_share);
 			decref(iob);
 			return false;
 		}
+		/* NOTE: The following line causes an inconsistency that is fixed by
+		 *       assigning `FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = iob'
+		 *       below. Because preemption is currently off, this inconsistency
+		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, cow);
 		ATOMIC_FETCHDEC(iob->ib_share);
 		decref(iob);
@@ -350,6 +390,7 @@ do_handle_iob_node_access:
 					IF_SMP(COMPILER_READ_BARRIER();)
 					IF_SMP(mycpu = THIS_CPU;)
 					IF_SMP(if (node == &FORCPU(mycpu, thiscpu_x86_iobnode))) {
+						/* Most likely case: Accessing the IOB of the current CPU. */
 						bool allow_preemption;
 						assertf(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == NULL ||
 						        FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP,
@@ -370,7 +411,6 @@ do_handle_iob_node_access:
 								goto pop_connections_and_throw_segfault;
 							}
 						}
-						/* Most likely case: Accessing the IOB of the current CPU. */
 						allow_preemption = (icpustate_getpflags(state) & EFLAGS_IF) != 0;
 						/* Make special checks if the access itself seems to
 						 * originate from a direct user-space access. */
