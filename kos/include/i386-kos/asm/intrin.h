@@ -31,9 +31,9 @@ __SYSDECL_BEGIN
 #ifdef __COMPILER_HAVE_GCC_ASM
 #ifdef __KERNEL__
 #define __PRIVATE_PREFIX_REP_CLD "cld\n\t"
-#else
+#else /* __KERNEL__ */
 #define __PRIVATE_PREFIX_REP_CLD /* nothing */
-#endif
+#endif /* !__KERNEL__ */
 
 
 /* Read from / write to general purpose registers. */

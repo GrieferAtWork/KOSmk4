@@ -673,11 +673,24 @@ INTERN_FUNCTION(_start)
 	 * as well as PhysicalAddressExtension (required for the 48-bit
 	 * physical address space needed in long-mode) */
 	orl    $(CR4_PSE | CR4_PAE), %eax
-	/* Enable PGE if supported by the host */
+
+	/* Enable PGE if supported by the host (optional feature) */
 	testl  $(CPUID_1D_PGE), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_1D
 	jz     1f
 	orl    $(CR4_PGE), %eax
-1:	movl   %eax, %cr4
+1:
+	/* Enable SMAP if supported by the host (optional feature) */
+	testl  $(CPUID_7B_SMEP), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7B
+	jz     1f
+	orl    $(CR4_SMEP), %eax
+1:
+	/* Enable FSGSBASE if supported by the host (emulated if unsupported) */
+	testl  $(CPUID_7B_FSGSBASE), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7B
+	jz     1f
+	orl    $(CR4_FSGSBASE), %eax
+1:
+	/* Save the fully configured CR4 register. */
+	movl   %eax, %cr4
 
 	/* Set the LME bit in the EFER MSR register. */
 	movl   $(IA32_EFER), %ecx

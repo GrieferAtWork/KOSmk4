@@ -56,6 +56,7 @@
 	(EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_TF | \
 	 EFLAGS_DF | EFLAGS_OF | EFLAGS_NT | EFLAGS_AC | EFLAGS_ID)
 
+/* %cr0 */
 #define CR0_PE             0x00000001 /* [bit(0)] Protected Mode Enable. */
 #define CR0_MP             0x00000002 /* [bit(1)] Monitor CO-Processor. */
 #define CR0_EM             0x00000004 /* [bit(2)] Emulation. */
@@ -68,9 +69,11 @@
 #define CR0_CD             0x40000000 /* [bit(30)] Cache Disable. */
 #define CR0_PG             0x80000000 /* [bit(31)] Paging. */
 
+/* %cr2 */
 #define CR3_PWT            0x00000008 /* [bit(3)] Page-level Write-Through. */
 #define CR3_PCD            0x00000010 /* [bit(4)] Page-level Cache Disable. */
 
+/* %cr4 */
 #define CR4_VME            0x00000001 /* [bit(0)] Virtual 8086 mode extensions. */
 #define CR4_PVI            0x00000002 /* [bit(1)] Protected mode virtual interrupts. */
 #define CR4_TSD            0x00000004 /* [bit(2)] Time stamp disable. */
@@ -85,9 +88,7 @@
 #define CR4_UMIP           0x00000800 /* [bit(11)] Disable user-space access to `s(g|i)dt' (s.a. `CPUID_7C_UMIP'). */
 #define CR4_VMXE           0x00002000 /* [bit(13)] Virtual Machine extensions enable. */
 #define CR4_SMXE           0x00004000 /* [bit(14)] Safer mode extensions enable. */
-#ifdef __x86_64__
 #define CR4_FSGSBASE       0x00010000 /* [bit(16)] Enable (rd|wr)(fs|gs)base instructions. */
-#endif
 #define CR4_PCIDE          0x00020000 /* [bit(17)] Enables process-context identifiers. */
 #define CR4_OSXSAVE        0x00040000 /* [bit(18)] XSAVE and Processor extended states enable. */
 #define CR4_SMEP           0x00100000 /* [bit(20)] Supervisor Mode executions Protection enable. */

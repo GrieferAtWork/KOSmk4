@@ -414,7 +414,12 @@ INTERN_FUNCTION(_start)
 	/* Enable PAE support in CR4 */
 	movl   %cr4, %eax
 	orl    $(CR4_PAE), %eax
-	movl   %eax, %cr4
+	/* With PAE we're also able to support the NX bit, so try to enable
+	 * its effects while in kernel-space (if supported by the CPU) */
+	testl  $(CPUID_7B_SMEP), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7B
+	jz     1f
+	orl    $(CR4_SMEP), %eax
+1:	movl   %eax, %cr4
 #ifdef HYBRID_PAGING_MODE
 	jmp    .Ldone_init_paging
 #endif /* HYBRID_PAGING_MODE */
