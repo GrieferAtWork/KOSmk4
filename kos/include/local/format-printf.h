@@ -207,10 +207,12 @@ __nextfmt:
 	case '?':
 #if __SIZEOF_POINTER__ > __VA_SIZE
 		__width = __builtin_va_arg(__FORMAT_ARGS, __SIZE_TYPE__);
+		__flags |= __PRINTF_F_HASWIDTH;
 		goto __nextfmt;
 #endif /* __SIZEOF_POINTER__ > __VA_SIZE */
 	case '*':
 		__width = (__SIZE_TYPE__)__builtin_va_arg(__FORMAT_ARGS, unsigned int);
+		__flags |= __PRINTF_F_HASWIDTH;
 		goto __nextfmt;
 
 	case ':': /* Precision. */
