@@ -64,7 +64,7 @@
 #ifdef __KERNEL__
 #define WAS_SEGFAULT_THROWN() (was_thrown(E_SEGFAULT) || was_thrown(E_WOULDBLOCK))
 #else /* __KERNEL__ */
-#define WAS_SEGFAULT_THROWN()  was_thrown(E_SEGFAULT)
+#define WAS_SEGFAULT_THROWN() was_thrown(E_SEGFAULT)
 #endif /* !__KERNEL__ */
 
 
@@ -86,11 +86,13 @@ NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 	} EXCEPT {
 		if (!WAS_SEGFAULT_THROWN())
 			RETHROW(); /* This will panic() because we're NOTHROW */
-		EXCEPTION_INFO_LOAD();
-		return false;
+		goto err_segfault;
 	}
 	*result = (uintptr_t)value;
 	return true;
+err_segfault:
+	EXCEPTION_INFO_LOAD();
+	return false;
 }
 
 LOCAL WUNUSED NONNULL((2)) bool
@@ -102,11 +104,13 @@ NOTHROW(CC guarded_readw)(uint16_t *ptr, uintptr_t *__restrict result) {
 	} EXCEPT {
 		if (!WAS_SEGFAULT_THROWN())
 			RETHROW(); /* This will panic() because we're NOTHROW */
-		EXCEPTION_INFO_LOAD();
-		return false;
+		goto err_segfault;
 	}
 	*result = (uintptr_t)value;
 	return true;
+err_segfault:
+	EXCEPTION_INFO_LOAD();
+	return false;
 }
 
 LOCAL WUNUSED NONNULL((2)) bool
@@ -118,11 +122,13 @@ NOTHROW(CC guarded_readl)(uint32_t *ptr, uintptr_t *__restrict result) {
 	} EXCEPT {
 		if (!WAS_SEGFAULT_THROWN())
 			RETHROW(); /* This will panic() because we're NOTHROW */
-		EXCEPTION_INFO_LOAD();
-		return false;
+		goto err_segfault;
 	}
 	*result = (uintptr_t)value;
 	return true;
+err_segfault:
+	EXCEPTION_INFO_LOAD();
+	return false;
 }
 
 #if __SIZEOF_POINTER__ > 4
@@ -135,16 +141,18 @@ NOTHROW(CC guarded_readq)(uint64_t *ptr, uintptr_t *__restrict result) {
 	} EXCEPT {
 		if (!WAS_SEGFAULT_THROWN())
 			RETHROW(); /* This will panic() because we're NOTHROW */
-		EXCEPTION_INFO_LOAD();
-		return false;
+		goto err_segfault;
 	}
 	*result = (uintptr_t)value;
 	return true;
+err_segfault:
+	EXCEPTION_INFO_LOAD();
+	return false;
 }
 #define guarded_readptr guarded_readq
-#else
+#else /* __SIZEOF_POINTER__ > 4 */
 #define guarded_readptr guarded_readl
-#endif
+#endif /* __SIZEOF_POINTER__ <= 4 */
 
 INTERN WUNUSED bool
 NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes) {
@@ -154,16 +162,18 @@ NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes) {
 	} EXCEPT {
 		if (!WAS_SEGFAULT_THROWN())
 			RETHROW(); /* This will panic() because we're NOTHROW */
-		EXCEPTION_INFO_LOAD();
-		return false;
+		goto err_segfault;
 	}
 	return true;
+err_segfault:
+	EXCEPTION_INFO_LOAD();
+	return false;
 }
 
 
 
 #ifndef __KERNEL__
-PRIVATE void *pdyn_libdebuginfo                                              = NULL;
+PRIVATE void *pdyn_libdebuginfo                                         = NULL;
 PRIVATE PDEBUGINFO_CU_ABBREV_FINI     pdyn_debuginfo_cu_abbrev_fini     = NULL;
 PRIVATE PDEBUGINFO_CU_PARSER_LOADUNIT pdyn_debuginfo_cu_parser_loadunit = NULL;
 PRIVATE PDEBUGINFO_CU_PARSER_SKIPFORM pdyn_debuginfo_cu_parser_skipform = NULL;
@@ -571,18 +581,18 @@ err_illegal_instruction:
 }
 
 
-/* Execute the CFI expression loaded into the given unwind-emulator `self'.
- * Upon success, `self->ue_stacksz' will have been updated to the new stack
+/* Execute the CFI expression loaded into the given unwind-emulator `SELF'.
+ * Upon success, `SELF->ue_stacksz' will have been updated to the new stack
  * size, allowing the caller to read the expression's return values from it.
  * NOTE: `unwind_emulator_exec_autostack()' behaves the same as `unwind_emulator_exec()',
  *        but will automatically allocated/free the expression stack upon entry/return, pushing
- *       `pentry_stack_top' upon entry, and storing the last stack-entry in `*pexit_stack_top'
+ *       `PENTRY_STACK_TOP' upon entry, and storing the last stack-entry in `*PEXIT_STACK_TOP'
  *        before returning (if no such value exists, `UNWIND_EMULATOR_NO_RETURN_VALUE' is returned).
  *        If no stack of sufficient size could be allocated (or if the required stack size is
  *        absurdly large), `UNWIND_EMULATOR_STACK_OVERFLOW' will be returned instead.
- * @param: pentry_stack_top:      A value to-be pushed onto the stack upon entry (or NULL).
- * @param: pexit_stack_top:       A value to-be popped off of the stack upon exit (or NULL).
- * @param: pexit_stack_top_const: Same as `pexit_stack_top', but casted into a constant.
+ * @param: PENTRY_STACK_TOP:      A value to-be pushed onto the stack upon entry (or NULL).
+ * @param: PEXIT_STACK_TOP:       A value to-be popped off of the stack upon exit (or NULL).
+ * @param: PEXIT_STACK_TOP_CONST: Same as `PEXIT_STACK_TOP', but casted into a constant.
  * @return: UNWIND_SUCCESS:          ...
  * @return: UNWIND_INVALID_REGISTER: ...
  * @return: UNWIND_SEGFAULT:         ...
@@ -1129,7 +1139,7 @@ do_make_second_const:
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
 			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGISTER;
-			self->ue_stack[stacksz].s_register  = (__UINTPTR_HALF_TYPE__)dwarf_decode_uleb128(&pc);
+			self->ue_stack[stacksz].s_register  = (unwind_regno_t)dwarf_decode_uleb128(&pc);
 			self->ue_stack[stacksz].s_regoffset = 0;
 			++stacksz;
 			break;
@@ -1185,7 +1195,7 @@ do_make_second_const:
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
 			self->ue_stack[stacksz].s_type      = UNWIND_STE_REGISTER;
-			self->ue_stack[stacksz].s_register  = (__UINTPTR_HALF_TYPE__)dwarf_decode_uleb128(&pc);
+			self->ue_stack[stacksz].s_register  = (unwind_regno_t)dwarf_decode_uleb128(&pc);
 			self->ue_stack[stacksz].s_regoffset = dwarf_decode_sleb128(&pc);
 			++stacksz;
 			break;
@@ -1341,7 +1351,7 @@ do_read_bit_pieces:
 			size                             = dwarf_decode_uleb128(&pc);
 			self->ue_stack[stacksz].s_type   = UNWIND_STE_RO_LVALUE;
 			self->ue_stack[stacksz].s_lvalue = pc;
-			self->ue_stack[stacksz].s_lsize  = (__UINTPTR_HALF_TYPE__)size;
+			self->ue_stack[stacksz].s_lsize  = (unwind_regno_t)size;
 			pc += size;
 			++stacksz;
 		}	break;
@@ -1581,13 +1591,13 @@ err_no_return_value:
 }
 
 
-/* Return a pointer to the next unwind instruction following `unwind_pc'
+/* Return a pointer to the next unwind instruction following `UNWIND_PC'
  * -> Useful for dumping unwind instruction without having to take care
  *    of handling all possible instruction (after all: CFI has a CISC
  *    instruction set with variable-length instructions)
- * @param: addrsize: Size of a target address.
- * @param: ptrsize:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
- * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
+ * @param: ADDRSIZE: Size of a target address.
+ * @param: PTRSIZE:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
+ * @return: NULL: The instruction at `UNWIND_PC' wasn't recognized. */
 INTERN ATTR_PURE WUNUSED NONNULL((1)) byte_t const *
 NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc,
                                               uint8_t addrsize, uint8_t ptrsize) {
@@ -1798,7 +1808,7 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 
 
 
-/* Return a pointer to a CFI expression that is applicable for `cu_base + module_relative_pc'
+/* Return a pointer to a CFI expression that is applicable for `CU_BASE + MODULE_RELATIVE_PC'
  * If no such expression exists, return `NULL' instead. */
 INTERN WUNUSED NONNULL((1, 5)) byte_t *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
@@ -1880,34 +1890,34 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 
 
 /* Read/Write the value associated a given debuginfo location descriptor.
- * @param: self:                  The debug info location descriptor (s.a. libdebuginfo.so)
- * @param: sectinfo:              Emulator section information (to-be filled in by the caller)
+ * @param: SELF:                  The debug info location descriptor (s.a. libdebuginfo.so)
+ * @param: SECTINFO:              Emulator section information (to-be filled in by the caller)
  *                                Optionally, this argument may be `NULL', however if this is the
  *                                case, the function may fail in cases where it would have otherwise
  *                                succeeded.
- * @param: regget:                Register getter callback.
- * @param: regget_arg:            Register getter callback argument.
- * @param: regset:                Register setter callback.
- * @param: regset_arg:            Register setter callback argument.
- * @param: cu_base:               Base address of the associated CU (or `0') (== `di_debuginfo_compile_unit_t::cu_ranges::r_startpc')
- * @param: module_relative_pc:    The module-relative program counter, to-be used to select
+ * @param: REGGET:                Register getter callback.
+ * @param: REGGET_ARG:            Register getter callback argument.
+ * @param: REGSET:                Register setter callback.
+ * @param: REGSET_ARG:            Register setter callback argument.
+ * @param: CU_BASE:               Base address of the associated CU (or `0') (== `di_debuginfo_compile_unit_t::cu_ranges::r_startpc')
+ * @param: MODULE_RELATIVE_PC:    The module-relative program counter, to-be used to select
  *                                the appropriate expression within a location list.
- * @param: buf:                   Source/target buffer containing the value read from,
+ * @param: BUF:                   Source/target buffer containing the value read from,
  *                                or written to the location expression.
- * @param: bufsize:               Size of the given `buf' in bytes.
- * @param: pnum_written_bits:     The number of _BITS_ (not bytes!) read from the location expression,
- *                                and written to the given `buf' (any trailing bits of buffer memory
+ * @param: BUFSIZE:               Size of the given `BUF' in bytes.
+ * @param: PNUM_WRITTEN_BITS:     The number of _BITS_ (not bytes!) read from the location expression,
+ *                                and written to the given `BUF' (any trailing bits of buffer memory
  *                                that weren't written will be filled with `0' upon success)
- * @param: pnum_read_bits:        The number of _BITS_ (not bytes!) written to the location expression,
- *                                and read from the given `buf'.
- * @param: frame_base_expression: The expression used to calculate the frame-base address (or NULL if unknown)
- * @param: objaddr:               The address of the base-object (used e.g. for structure member expressions)
- * @param: addrsize:              Size of an address (defined by the associated CU, and usually == sizeof(void *))
- * @param: ptrsize:               DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf)
+ * @param: PNUM_READ_BITS:        The number of _BITS_ (not bytes!) written to the location expression,
+ *                                and read from the given `BUF'.
+ * @param: FRAME_BASE_EXPRESSION: The expression used to calculate the frame-base address (or NULL if unknown)
+ * @param: OBJADDR:               The address of the base-object (used e.g. for structure member expressions)
+ * @param: ADDRSIZE:              Size of an address (defined by the associated CU, and usually == sizeof(void *))
+ * @param: PTRSIZE:               DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf)
  * @return: * :                               One of `UNWIND_*'
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
- * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
- * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
+ * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `BUFSIZE' is too small.
+ * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `MODULE_RELATIVE_PC' */
 INTERN NONNULL((1, 3, 7, 9)) unsigned int CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,

@@ -117,7 +117,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
 		unwind_cfa_register_t common_init_regs[CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT];
 #endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0 */
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
-		uintptr_half_t uncommon_init_regs[CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT];
+		unwind_regno_t uncommon_init_regs[CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT];
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0
 		memcpy(common_init_regs, result->cs_regs, sizeof(result->cs_regs));
@@ -223,8 +223,8 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 		bool max_order_is_common = true;
 #endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
 		unwind_order_index_t max_order = 0;
-		uintptr_half_t i, max_index = 0;
-		uintptr_half_t dw_regno;
+		unwind_regno_t i, max_index = 0;
+		unwind_regno_t dw_regno;
 		unwind_cfa_register_t *rule;
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 		unwind_cfa_register_t uncommon_rule;
@@ -288,7 +288,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 
 		case DW_CFA_register_rule_register:
 			if unlikely(!(*reg_getter)(reg_getter_arg,
-			                           (uintptr_half_t)rule->cr_value,
+			                           (unwind_regno_t)rule->cr_value,
 			                           reg_buf.bytes))
 				ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)rule->cr_value);
 			if unlikely(!(*reg_setter)(reg_setter_arg,

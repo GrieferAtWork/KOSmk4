@@ -38,17 +38,22 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#ifndef __unwind_regno_t_defined
+#define __unwind_regno_t_defined 1
+typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
+#endif /* !__unwind_regno_t_defined */
+
 /* Register accessor callbacks for a variety of known cpu context structures. */
 #ifndef __KERNEL__
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext*/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext*/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext*/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext*/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext*/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext*/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext*/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext*/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 #ifndef LIBUNWIND_HAVE_ERROR_REGISTER_STATE_ACCESSORS
@@ -73,31 +78,31 @@ typedef PUNWIND_SETREG_MCONTEXT PUNWIND_SETREG_ERROR_REGISTER_STATE;
  * caches for quick (O(1)) repeated access to an FDE located within a known
  * function. */
 typedef __ATTR_NONNULL((2)) unsigned int
-(LIBUNWIND_CC *PUNWIND_FDE_FIND)(void *absolute_pc,
-                                 unwind_fde_t *__restrict result);
+(LIBUNWIND_CC *PUNWIND_FDE_FIND)(void *__absolute_pc,
+                                 unwind_fde_t *__restrict __result);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((2)) unsigned int
-__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(void *absolute_pc,
-                                            unwind_fde_t *__restrict result);
+__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(void *__absolute_pc,
+                                            unwind_fde_t *__restrict __result);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
 /* Top-level function for unwinding the specific register state, automatically
  * locating the associated FDE entry, before using it to unwind the specified
  * register state.
- * NOTE: The given `absolute_pc' should point _to_ the instruction that should
+ * NOTE: The given `ABSOLUTE_PC' should point _to_ the instruction that should
  *       be unwound; Not after it. - i.e. range checking is done as:
- *       `absolute_pc >= start && absolute_pc < end'
+ *       `ABSOLUTE_PC >= start && ABSOLUTE_PC < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 typedef __ATTR_NONNULL((2, 4)) unsigned int
-(LIBUNWIND_CC *PUNWIND)(void *absolute_pc,
-                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
-                        unwind_setreg_t reg_setter, void *reg_setter_arg);
+(LIBUNWIND_CC *PUNWIND)(void *__absolute_pc,
+                        unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
+                        unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((2, 4)) unsigned int
-__NOTHROW_NCX(LIBUNWIND_CC unwind)(void *absolute_pc,
-                                   unwind_getreg_t reg_getter, void const *reg_getter_arg,
-                                   unwind_setreg_t reg_setter, void *reg_setter_arg);
+__NOTHROW_NCX(LIBUNWIND_CC unwind)(void *__absolute_pc,
+                                   unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
+                                   unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 __DECL_END

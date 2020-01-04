@@ -20,9 +20,17 @@
 #define _I386_KOS_LIBUNWIND_ARCH_REGISTER_H 1
 
 #include "../../libunwind/api.h"
+/**/
+
+#include <hybrid/typecore.h>
 
 #ifdef __CC__
 __DECL_BEGIN
+
+#ifndef __unwind_regno_t_defined
+#define __unwind_regno_t_defined 1
+typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
+#endif /* !__unwind_regno_t_defined */
 
 /* Register accessor callbacks for a variety of known cpu context structures.
  * NOTE: When the intent is to unwind both CPU and FPU registers, you must create
@@ -46,96 +54,95 @@ __DECL_BEGIN
  * >>         return true;
  * >>     return false;
  * >> }
- * NOTE: *_exclusive functions will always return `false' when attempting to access presistent
+ * NOTE: *_exclusive functions will always return `false' when attempting to access persistent
  *       registers that are not present within the given CPU state, as opposed to reading the
  *       current register value during get, and returning `CURRENT_VAL() == new_val' on set
  *       (aka.: setreg() normally returns true for untraced registers when the old value
  *       matches the new one) */
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_LCPUSTATE)(/*struct lcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE)(/*struct lcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCPUSTATE)(/*struct ucpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE)(/*struct ucpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_KCPUSTATE)(/*struct kcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE)(/*struct kcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_FCPUSTATE)(/*struct fcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE)(/*struct fcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_SFPUSTATE)(/*struct sfpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SFPUSTATE)(/*struct sfpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_XFPUSTATE)(/*struct xfpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_XFPUSTATE)(/*struct xfpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_LCPUSTATE_EXCLUSIVE)(/*struct lcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE_EXCLUSIVE)(/*struct lcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCPUSTATE_EXCLUSIVE)(/*struct ucpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE_EXCLUSIVE)(/*struct ucpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_KCPUSTATE_EXCLUSIVE)(/*struct kcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE_EXCLUSIVE)(/*struct kcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_FCPUSTATE_EXCLUSIVE)(/*struct fcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE_EXCLUSIVE)(/*struct fcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_SFPUSTATE_EXCLUSIVE)(/*struct sfpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SFPUSTATE_EXCLUSIVE)(/*struct sfpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_XFPUSTATE_EXCLUSIVE)(/*struct xfpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_XFPUSTATE_EXCLUSIVE)(/*struct xfpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_LCPUSTATE)(/*struct lcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE)(/*struct lcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCPUSTATE)(/*struct ucpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE)(/*struct ucpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_KCPUSTATE)(/*struct kcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE)(/*struct kcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_FCPUSTATE)(/*struct fcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE)(/*struct fcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_SFPUSTATE)(/*struct sfpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SFPUSTATE)(/*struct sfpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_XFPUSTATE)(/*struct xfpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_XFPUSTATE)(/*struct xfpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_LCPUSTATE_EXCLUSIVE)(/*struct lcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_LCPUSTATE_EXCLUSIVE)(/*struct lcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCPUSTATE_EXCLUSIVE)(/*struct ucpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCPUSTATE_EXCLUSIVE)(/*struct ucpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_KCPUSTATE_EXCLUSIVE)(/*struct kcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_KCPUSTATE_EXCLUSIVE)(/*struct kcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_FCPUSTATE_EXCLUSIVE)(/*struct fcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_FCPUSTATE_EXCLUSIVE)(/*struct fcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_SFPUSTATE_EXCLUSIVE)(/*struct sfpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SFPUSTATE_EXCLUSIVE)(/*struct sfpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_XFPUSTATE_EXCLUSIVE)(/*struct xfpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_XFPUSTATE_EXCLUSIVE)(/*struct xfpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
 #ifdef __KERNEL__
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_SCPUSTATE)(/*struct scpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_ICPUSTATE)(/*struct icpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_SCPUSTATE_EXCLUSIVE)(/*struct scpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_ICPUSTATE_EXCLUSIVE)(/*struct icpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_SCPUSTATE)(/*struct scpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_ICPUSTATE)(/*struct icpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_SCPUSTATE_EXCLUSIVE)(/*struct scpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_ICPUSTATE_EXCLUSIVE)(/*struct icpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef __x86_64__
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE)(/*struct scpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE)(/*struct icpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE)(/*struct scpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE)(/*struct icpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE)(/*struct scpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE)(/*struct icpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE)(/*struct scpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE)(/*struct icpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
 #else /* __x86_64__ */
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_P)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_P)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE_P)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE_P)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_P)(/*struct scpustate ***/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_P)(/*struct icpustate ***/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_SCPUSTATE_EXCLUSIVE_P)(/*struct scpustate ***/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_ICPUSTATE_EXCLUSIVE_P)(/*struct icpustate ***/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !__x86_64__ */
 #endif /* __KERNEL__ */
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_lcpustate)(/*struct lcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate)(/*struct lcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucpustate)(/*struct ucpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate)(/*struct ucpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_kcpustate)(/*struct kcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate)(/*struct kcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fcpustate)(/*struct fcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate)(/*struct fcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_sfpustate)(/*struct sfpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_sfpustate)(/*struct sfpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_xfpustate)(/*struct xfpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_xfpustate)(/*struct xfpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_lcpustate_exclusive)(/*struct lcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate_exclusive)(/*struct lcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucpustate_exclusive)(/*struct ucpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate_exclusive)(/*struct ucpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_kcpustate_exclusive)(/*struct kcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate_exclusive)(/*struct kcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fcpustate_exclusive)(/*struct fcpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate_exclusive)(/*struct fcpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_sfpustate_exclusive)(/*struct sfpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_sfpustate_exclusive)(/*struct sfpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_xfpustate_exclusive)(/*struct xfpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_xfpustate_exclusive)(/*struct xfpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_lcpustate)(/*struct lcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate)(/*struct lcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucpustate)(/*struct ucpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate)(/*struct ucpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_kcpustate)(/*struct kcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate)(/*struct kcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fcpustate)(/*struct fcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate)(/*struct fcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_sfpustate)(/*struct sfpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_sfpustate)(/*struct sfpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_xfpustate)(/*struct xfpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_xfpustate)(/*struct xfpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_lcpustate_exclusive)(/*struct lcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_lcpustate_exclusive)(/*struct lcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucpustate_exclusive)(/*struct ucpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucpustate_exclusive)(/*struct ucpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_kcpustate_exclusive)(/*struct kcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_kcpustate_exclusive)(/*struct kcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_fcpustate_exclusive)(/*struct fcpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_fcpustate_exclusive)(/*struct fcpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_sfpustate_exclusive)(/*struct sfpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_sfpustate_exclusive)(/*struct sfpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_xfpustate_exclusive)(/*struct xfpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_xfpustate_exclusive)(/*struct xfpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
 #ifdef __KERNEL__
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_scpustate)(/*struct scpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_icpustate)(/*struct icpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_scpustate_exclusive)(/*struct scpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_icpustate_exclusive)(/*struct icpustate **/ void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_scpustate)(/*struct scpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_icpustate)(/*struct icpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_scpustate_exclusive)(/*struct scpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_icpustate_exclusive)(/*struct icpustate **/ void const *__arg, unwind_regno_t __regno, void *__restrict __dst);
 #ifdef __x86_64__
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate)(/*struct scpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate)(/*struct icpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive)(/*struct scpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive)(/*struct icpustate **/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate)(/*struct scpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate)(/*struct icpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive)(/*struct scpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive)(/*struct icpustate **/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
 #else /* __x86_64__ */
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_p)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_p)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive_p)(/*struct scpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive_p)(/*struct icpustate ***/ void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_p)(/*struct scpustate ***/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_p)(/*struct icpustate ***/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_scpustate_exclusive_p)(/*struct scpustate ***/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_icpustate_exclusive_p)(/*struct icpustate ***/ void *__arg, unwind_regno_t __regno, void const *__restrict __src);
 #endif /* !__x86_64__ */
 #endif /* __KERNEL__ */
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
-
 
 
 
@@ -149,6 +156,7 @@ typedef PUNWIND_SETREG_KCPUSTATE PUNWIND_SETREG_ERROR_REGISTER_STATE;
 #define unwind_getreg_error_register_state       unwind_getreg_kcpustate
 #define unwind_setreg_error_register_state       unwind_setreg_kcpustate
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
+
 
 __DECL_END
 #endif /* __CC__ */

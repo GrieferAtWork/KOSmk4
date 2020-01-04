@@ -140,18 +140,18 @@ typedef __uintptr_t _Unwind_Internal_Ptr;    /* Unwind pointer */
 typedef __uint64_t  _Unwind_Exception_Class; /* Unwind exception class (One of `_UEC_*'; may also be some unrecognized value) */
 struct _Unwind_Exception;
 typedef __ATTR_NONNULL((2)) void
-(__LIBCCALL *_Unwind_Exception_Cleanup_Fn)(_Unwind_Reason_Code reason /* = _URC_FOREIGN_EXCEPTION_CAUGHT */,
-                                           struct _Unwind_Exception *__restrict exc);
+(__LIBCCALL *_Unwind_Exception_Cleanup_Fn)(_Unwind_Reason_Code __reason /* = _URC_FOREIGN_EXCEPTION_CAUGHT */,
+                                           struct _Unwind_Exception *__restrict __exc);
 
 typedef _Unwind_Reason_Code
-(__LIBCCALL *_Unwind_Stop_Fn)(int version /*=1*/,
-                              _Unwind_Action actions,
-                              _Unwind_Exception_Class exception_class,
-                              struct _Unwind_Exception *exc,
-                              struct _Unwind_Context *context, void *stop_arg);
+(__LIBCCALL *_Unwind_Stop_Fn)(int __version /*=1*/,
+                              _Unwind_Action __actions,
+                              _Unwind_Exception_Class __exception_class,
+                              struct _Unwind_Exception *__exc,
+                              struct _Unwind_Context *__context, void *__stop_arg);
 
 typedef _Unwind_Reason_Code
-(__LIBCCALL *_Unwind_Trace_Fn)(struct _Unwind_Context *context, void *trace_arg);
+(__LIBCCALL *_Unwind_Trace_Fn)(struct _Unwind_Context *__context, void *__trace_arg);
 
 
 
@@ -191,66 +191,66 @@ struct _Unwind_Context /* Opaque structure */
 
 /* NOTE: `__gcc_personality_v0' has the prototype `_Unwind_Personality_Fn' */
 typedef __ATTR_NONNULL((4, 5)) _Unwind_Reason_Code
-(__LIBCCALL *_Unwind_Personality_Fn)(int version /* = 1 */,
-                                     _Unwind_Action actions,
-                                     _Unwind_Exception_Class exception_class,
-                                     struct _Unwind_Exception *__restrict ue_header,
-                                     struct _Unwind_Context *__restrict context);
+(__LIBCCALL *_Unwind_Personality_Fn)(int __version /* = 1 */,
+                                     _Unwind_Action __actions,
+                                     _Unwind_Exception_Class __exception_class,
+                                     struct _Unwind_Exception *__restrict __ue_header,
+                                     struct _Unwind_Context *__restrict __context);
 
 /* Exception ABI functions exported by libc.so */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_RaiseException)
-__CDECLARE(__ATTR_NONNULL((1)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_RaiseException,(struct _Unwind_Exception *__restrict exception_object),(exception_object))
+__CDECLARE(__ATTR_NONNULL((1)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_RaiseException,(struct _Unwind_Exception *__restrict __exception_object),(__exception_object))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_RaiseException */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_Resume)
-__CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_Resume,(struct _Unwind_Exception *__restrict exception_object),(exception_object))
+__CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_Resume,(struct _Unwind_Exception *__restrict __exception_object),(__exception_object))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_Resume */
 /* Why wasn't this called `_Unwind_ResumeOrRethrow'???
  * Everything else uses proper CamelCase, so why does this one do so this half-heartedly?
  * s.a. https://refspecs.linuxfoundation.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/baselib--unwind-resume-or-rethrow.html */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_Resume_or_Rethrow)
-__CDECLARE(__ATTR_NONNULL((1)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_Resume_or_Rethrow,(struct _Unwind_Exception *__restrict exception_object),(exception_object))
+__CDECLARE(__ATTR_NONNULL((1)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_Resume_or_Rethrow,(struct _Unwind_Exception *__restrict __exception_object),(__exception_object))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_Resume_or_Rethrow */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_DeleteException)
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_DeleteException,(struct _Unwind_Exception *__restrict exception_object),(exception_object))
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_DeleteException,(struct _Unwind_Exception *__restrict __exception_object),(__exception_object))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_DeleteException */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetGR)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetGR,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict context, int index),(context,index))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetGR,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context, int __index),(__context,__index))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetGR */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_SetGR)
-__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_SetGR,(struct _Unwind_Context *__restrict context, int index, __uintptr_t value),(context,index,value))
+__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_SetGR,(struct _Unwind_Context *__restrict __context, int __index, __uintptr_t __value),(__context,__index,__value))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_SetGR */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetIP)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetIP,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict context),(context))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetIP,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetIP */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_SetIP)
-__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_SetIP,(struct _Unwind_Context *__restrict context, __uintptr_t value),(context,value))
+__CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_SetIP,(struct _Unwind_Context *__restrict __context, __uintptr_t __value),(__context,__value))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_SetIP */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetLanguageSpecificData)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetLanguageSpecificData,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict context),(context))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetLanguageSpecificData,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetLanguageSpecificData */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetRegionStart)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetRegionStart,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict context),(context))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetRegionStart,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetRegionStart */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetIPInfo)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetIPInfo,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict context, int *__restrict ip_before_insn),(context,ip_before_insn))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetIPInfo,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context, int *__restrict __p_ip_before_insn),(__context,__p_ip_before_insn))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetIPInfo */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_ForcedUnwind)
-__CDECLARE(__ATTR_NONNULL((1, 2)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_ForcedUnwind,(struct _Unwind_Exception *__restrict exception_object, _Unwind_Stop_Fn stop, void *stop_arg),(exception_object,stop,stop_arg))
+__CDECLARE(__ATTR_NONNULL((1, 2)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_ForcedUnwind,(struct _Unwind_Exception *__restrict __exception_object, _Unwind_Stop_Fn __stop, void *__stop_arg),(__exception_object,__stop,__stop_arg))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_ForcedUnwind */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_Backtrace)
-__CDECLARE(__ATTR_NONNULL((1)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_Backtrace,(_Unwind_Trace_Fn func, void *arg),(func,arg))
+__CDECLARE(__ATTR_NONNULL((1)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_Backtrace,(_Unwind_Trace_Fn __func, void *__arg),(__func,__arg))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_Backtrace */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetCFA)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),_Unwind_Word,__NOTHROW_NCX,_Unwind_GetCFA,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict ctx),(ctx))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),_Unwind_Word,__NOTHROW_NCX,_Unwind_GetCFA,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetCFA */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetDataRelBase)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetDataRelBase,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict ctx),(ctx))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetDataRelBase,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetDataRelBase */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetTextRelBase)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetTextRelBase,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict ctx),(ctx))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetTextRelBase,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetTextRelBase */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_FindEnclosingFunction)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE,void *,__NOTHROW_NCX,_Unwind_FindEnclosingFunction,(void *pc),(pc))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE,void *,__NOTHROW_NCX,_Unwind_FindEnclosingFunction,(void *__pc),(__pc))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_FindEnclosingFunction */
 
 

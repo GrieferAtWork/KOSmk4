@@ -81,8 +81,14 @@
  *    .cfi_escape ...  // This code (with a size of n + (m << 8)) is only executed in KOS
  */
 
+/*      DW_OP_                      0x00  * ... */
+/*      DW_OP_                      0x01  * ... */
+/*      DW_OP_                      0x02  * ... */
 #define DW_OP_addr                  0x03 /* [+4|8] +uintptr_t constant address */
+/*      DW_OP_                      0x04  * ... */
+/*      DW_OP_                      0x05  * ... */
 #define DW_OP_deref                 0x06 /* [+0]   TOP = *(uintptr_t *)TOP; */
+/*      DW_OP_                      0x07  * ... */
 #define DW_OP_const1u               0x08 /* [+1]   PUSH(*(u8 *)pc); */
 #define DW_OP_const1s               0x09 /* [+1]   PUSH(*(s8 *)pc); */
 #define DW_OP_const2u               0x0a /* [+2]   PUSH(*(u16 *)pc); */
@@ -235,8 +241,11 @@
 #define DW_OP_bit_piece             0x9d /* [+*]   size = dwarf_decode_uleb128(&pc); offset = dwarf_decode_uleb128(&pc); WRITE_RESULT((TOP >> offset) & ((1 << size) - 1), size); */
 #define DW_OP_implicit_value        0x9e /* [+*]   size = dwarf_decode_uleb128(&pc); PUSH(LVALUE(pc, size)); pc += size; */
 #define DW_OP_stack_value           0x9f /* [+0]   TOP = TOP; // Load the value of `TOP' into a stack constant */
-#define DW_OP_lo_user               0xe0
-#define DW_OP_hi_user               0xff
+/*      DW_OP_                      0xa0  * ... */
+/*      DW_OP_                      ...   * ... */
+/*      DW_OP_                      0xdf  * ... */
+#define DW_OP_lo_user               0xe0 /* First user-defined (or rather: GNU extension) opcode */
+#define DW_OP_hi_user               0xff /* Last user-defined (or rather: GNU extension) opcode */
 
 
 /* GNU extensions. */
@@ -263,52 +272,51 @@
 //DW_OP (DW_OP_PGI_omp_thread_num, 0xf8)
 
 /* Call Frame Information (section 6.4.1) */
-#define DW_CFA_register_rule_undefined      0
-#define DW_CFA_register_rule_same_value     1
-#define DW_CFA_register_rule_offsetn        2
-#define DW_CFA_register_rule_val_offsetn    3
-#define DW_CFA_register_rule_register       4
-#define DW_CFA_register_rule_expression     5
-#define DW_CFA_register_rule_val_expression 6
-
+#define DW_CFA_register_rule_undefined      0 /* Register has an undefined after unwinding */
+#define DW_CFA_register_rule_same_value     1 /* Register maintains its value after unwinding */
+#define DW_CFA_register_rule_offsetn        2 /* Register value is stored at `*(CFA + OFFSET)' */
+#define DW_CFA_register_rule_val_offsetn    3 /* Register value is equal to `CFA + OFFSET' */
+#define DW_CFA_register_rule_register       4 /* Register value is identical to another register */
+#define DW_CFA_register_rule_expression     5 /* Register value is the result of `*eval(EXPR)' */
+#define DW_CFA_register_rule_val_expression 6 /* Register value is the result of `eval(EXPR)' */
 
 /* Call Frame Information (section 7.23) */
-#define DW_CFA_advance_loc          0x40
-#define DW_CFA_offset               0x80
-#define DW_CFA_restore              0xc0
-#define DW_CFA_nop                  0x00
-#define DW_CFA_set_loc              0x01
-#define DW_CFA_advance_loc1         0x02
-#define DW_CFA_advance_loc2         0x03
-#define DW_CFA_advance_loc4         0x04
-#define DW_CFA_offset_extended      0x05
-#define DW_CFA_restore_extended     0x06
-#define DW_CFA_undefined            0x07
-#define DW_CFA_same_value           0x08
-#define DW_CFA_register             0x09
-#define DW_CFA_remember_state       0x0a
-#define DW_CFA_restore_state        0x0b
-#define DW_CFA_def_cfa              0x0c
-#define DW_CFA_def_cfa_register     0x0d
-#define DW_CFA_def_cfa_offset       0x0e
-#define DW_CFA_def_cfa_expression   0x0f
-#define DW_CFA_expression           0x10
-#define DW_CFA_offset_extended_sf   0x11
-#define DW_CFA_def_cfa_sf           0x12
-#define DW_CFA_def_cfa_offset_sf    0x13
-#define DW_CFA_val_offset           0x14
-#define DW_CFA_val_offset_sf        0x15
-#define DW_CFA_val_expression       0x16
+#define DW_CFA_advance_loc          0x40 /* upc += opcode & 0x3f */
+#define DW_CFA_offset               0x80 /* register[opcode & 0x3f] = { DW_CFA_register_rule_offsetn, dwarf_decode_uleb128(&pc) }; */
+#define DW_CFA_restore              0xc0 /* register[opcode & 0x3f] = init_regs[opcode & 0x3f]; */
+#define DW_CFA_nop                  0x00 /* nop(); */
+#define DW_CFA_set_loc              0x01 /* upc = fde.f_pcstart + dwarf_decode_pointer(&pc, fde.f_encptr, ...); */
+#define DW_CFA_advance_loc1         0x02 /* upc += *(u8 *)pc; pc += 1; */
+#define DW_CFA_advance_loc2         0x03 /* upc += *(u16 *)pc; pc += 2; */
+#define DW_CFA_advance_loc4         0x04 /* upc += *(u32 *)pc; pc += 4; */
+#define DW_CFA_offset_extended      0x05 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_offsetn, dwarf_decode_uleb128(&pc) }; */
+#define DW_CFA_restore_extended     0x06 /* r = dwarf_decode_uleb128(&pc); register[r] = init_regs[r]; */
+#define DW_CFA_undefined            0x07 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_undefined }; */
+#define DW_CFA_same_value           0x08 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_same_value }; */
+#define DW_CFA_register             0x09 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_register, dwarf_decode_uleb128(&pc) }; */
+#define DW_CFA_remember_state       0x0a /* PUSH({ register, cfa }); */
+#define DW_CFA_restore_state        0x0b /* POP({ register, cfa }); */
+#define DW_CFA_def_cfa              0x0c /* cfa = { type: UNWIND_CFA_VALUE_REGISTER, reg: dwarf_decode_uleb128(&pc), offset: dwarf_decode_uleb128(&pc) }; */
+#define DW_CFA_def_cfa_register     0x0d /* assert(cfa.type == UNWIND_CFA_VALUE_REGISTER); cfa.reg = dwarf_decode_uleb128(&pc); */
+#define DW_CFA_def_cfa_offset       0x0e /* assert(cfa.type == UNWIND_CFA_VALUE_REGISTER); cfa.offset = dwarf_decode_uleb128(&pc); */
+#define DW_CFA_def_cfa_expression   0x0f /* expr_size = dwarf_decode_uleb128(&pc); cfa = { type: UNWIND_CFA_VALUE_EXPRESSION, expr: { pc, pc + expr_size } }; pc += expr_size; */
+#define DW_CFA_expression           0x10 /* reg = dwarf_decode_uleb128(&pc); expr_size = dwarf_decode_uleb128(&pc); register[reg] = { type: DW_CFA_register_rule_expression, expr: { pc, pc + expr_size } }; pc += expr_size; */
+#define DW_CFA_offset_extended_sf   0x11 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_register, dwarf_decode_sleb128(&pc) * fde.f_dataalign }; */
+#define DW_CFA_def_cfa_sf           0x12 /* cfa = { type: UNWIND_CFA_VALUE_REGISTER, reg: dwarf_decode_uleb128(&pc), offset: dwarf_decode_sleb128(&pc) * fde.f_dataalign }; */
+#define DW_CFA_def_cfa_offset_sf    0x13 /* assert(cfa.type == UNWIND_CFA_VALUE_REGISTER); cfa.offset = dwarf_decode_sleb128(&pc) * fde.f_dataalign; */
+#define DW_CFA_val_offset           0x14 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_val_offsetn, dwarf_decode_uleb128(&pc) }; */
+#define DW_CFA_val_offset_sf        0x15 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_val_offsetn, dwarf_decode_sleb128(&pc) * self->f_dataalign }; */
+#define DW_CFA_val_expression       0x16 /* reg = dwarf_decode_uleb128(&pc); expr_size = dwarf_decode_uleb128(&pc); register[reg] = { type: DW_CFA_register_rule_val_expression, expr: { pc, pc + expr_size } }; pc += expr_size; */
 
 /* DWARF Call Frame Instruction (CFI) Extensions (section 10.5.2) */
-#define DW_CFA_GNU_args_size                0x2e
-#define DW_CFA_GNU_negative_offset_extended 0x2f
+#define DW_CFA_GNU_args_size                0x2e /* landing_pad_adjustment = dwarf_decode_uleb128(&pc); */
+#define DW_CFA_GNU_negative_offset_extended 0x2f /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_offsetn, -((signed)dwarf_decode_uleb128(&pc) * self->f_dataalign) }; */
 
 
 /* Type codes for `unwind_ste_t::s_type' */
-#define UNWIND_STE_CONSTANT    0
+#define UNWIND_STE_CONSTANT    0 /* Constant value */
 #define UNWIND_STE_STACKVALUE  1 /* On-stack constant value (Same as `UNWIND_STE_CONSTANT') */
-#define UNWIND_STE_REGISTER    2
+#define UNWIND_STE_REGISTER    2 /* Register value */
 #define UNWIND_STE_RW_LVALUE   3 /* Read-write l-value */
 #define UNWIND_STE_RO_LVALUE   4 /* Read-only l-value */
 #define UNWIND_STE_ISCONSTANT(x) ((x) <= UNWIND_STE_STACKVALUE)
@@ -321,32 +329,37 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#ifndef __unwind_regno_t_defined
+#define __unwind_regno_t_defined 1
+typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
+#endif /* !__unwind_regno_t_defined */
+
 typedef struct {
 	/* Stack entry for unwind expressions. */
-	__uint8_t                 s_type;      /* Stack entry type (One of `UNWIND_STE_*') */
-	__uint8_t                 s_pad[(sizeof(__uintptr_t) / 2) - 1];
+	__uint8_t          s_type;      /* Stack entry type (One of `UNWIND_STE_*') */
+	__uint8_t          s_pad[(sizeof(__uintptr_t) / 2) - 1];
 	union {
-		__UINTPTR_HALF_TYPE__ s_lsize;     /* [UNWIND_STE_RW_LVALUE] Size of an L-value expression in bytes (If unknown, set to `0') */
-		__UINTPTR_HALF_TYPE__ s_register;  /* [UNWIND_STE_REGISTER] Register ID */
+		unwind_regno_t s_lsize;     /* [UNWIND_STE_RW_LVALUE] Size of an L-value expression in bytes (If unknown, set to `0') */
+		unwind_regno_t s_register;  /* [UNWIND_STE_REGISTER] Register ID */
 	};
 	union {
-		__uintptr_t       s_uconst;    /* Unsigned constant value */
-		__intptr_t        s_sconst;    /* Signed constant value */
-		__intptr_t        s_regoffset; /* Offset added to a register expression */
-		__byte_t         *s_lvalue;    /* L-value pointer. */
+		__uintptr_t    s_uconst;    /* Unsigned constant value */
+		__intptr_t     s_sconst;    /* Signed constant value */
+		__intptr_t     s_regoffset; /* Offset added to a register expression */
+		__byte_t      *s_lvalue;    /* L-value pointer. */
 	};
 } unwind_ste_t;
 
-/* Read out the contents of a CFI register `regno' and store their value in `dst'
- * The size of the `dst' buffer depends on `regno' and can be calculated with the
+/* Read out the contents of a CFI register `DW_REGNO' and store their value in `DST'
+ * The size of the `DST' buffer depends on `DW_REGNO' and can be calculated with the
  * arch-specific `CFI_REGISTER_SIZE()' macro.
- * @param: regno:  One of `CFI_[arch]_UNWIND_REGISTER_[name]'
- * @param: dst:    A buffer of `CFI_386_REGISTER_SIZE(regno)' bytes,
- *                 to-be filled with the register value.
- * @return: true:  Processed as `UNWIND_SUCCESS'
- * @return: false: Processed as `UNWIND_INVALID_REGISTER' */
-typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_getreg_t)(void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
-typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_setreg_t)(void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+ * @param: DW_REGNO: One of `CFI_[arch]_UNWIND_REGISTER_[name]'
+ * @param: DST:      A buffer of `CFI_386_REGISTER_SIZE(DW_REGNO)' bytes,
+ *                   to-be filled with the register value.
+ * @return: true:    Processed as `UNWIND_SUCCESS'
+ * @return: false:   Processed as `UNWIND_INVALID_REGISTER' */
+typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_getreg_t)(void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
+typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_setreg_t)(void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
 
 typedef struct unwind_emulator_sections_struct {
 	__byte_t             *ues_eh_frame_start;     /* [0..1][const] Starting address of the .eh_frame section (used for the `DW_OP_call_frame_cfa' instruction).
@@ -388,7 +401,7 @@ typedef struct unwind_emulator_struct {
 	                                                * Set to NULL to consider `DW_OP_fbreg' as an illegal instruction. */
 	void                   *ue_objaddr;            /* [0..1][const] Object address value (for use with `DW_OP_push_object_address').
 	                                                * Set to NULL to consider `DW_OP_push_object_address' as an illegal instruction. */
-	__UINTPTR_HALF_TYPE__   ue_bjmprem;            /* Number of remaining allowed backwards-jumps (used to prevent infinite loops,
+	__uint32_t              ue_bjmprem;            /* Number of remaining allowed backwards-jumps (used to prevent infinite loops,
 	                                                * which get terminated and cause `UNWIND_EMULATOR_LOOP' to be returned)
 	                                                * During initialization, you may simply assign `UNWIND_EMULATOR_BJMPREM_DEFAULT'
 	                                                * to this field. */
@@ -410,148 +423,148 @@ typedef struct unwind_emulator_struct {
 	                                                * is considered an illegal instruction, or `(__byte_t *)-1' to lazily calculate) */
 } unwind_emulator_t;
 
-/* Execute the CFI expression loaded into the given unwind-emulator `self'.
- * Upon success, `self->ue_stacksz' will have been updated to the new stack
+/* Execute the CFI expression loaded into the given unwind-emulator `SELF'.
+ * Upon success, `SELF->ue_stacksz' will have been updated to the new stack
  * size, allowing the caller to read the expression's return values from it.
  * NOTE: `unwind_emulator_exec_autostack()' behaves the same as `unwind_emulator_exec()',
  *        but will automatically allocated/free the expression stack upon entry/return, pushing
- *       `pentry_stack_top' upon entry, and storing the last stack-entry in `*pexit_stack_top'
+ *       `PENTRY_STACK_TOP' upon entry, and storing the last stack-entry in `*PEXIT_STACK_TOP'
  *        before returning (if no such value exists, `UNWIND_EMULATOR_NO_RETURN_VALUE' is returned).
  *        If no stack of sufficient size could be allocated (or if the required stack size is
  *        absurdly large), `UNWIND_EMULATOR_STACK_OVERFLOW' will be returned instead.
- * @param: pentry_stack_top:      A value to-be pushed onto the stack upon entry (or NULL).
- * @param: pexit_stack_top:       A value to-be popped off of the stack upon exit (or NULL).
- * @param: pexit_stack_top_const: Same as `pexit_stack_top', but casted into a constant.
+ * @param: PENTRY_STACK_TOP:      A value to-be pushed onto the stack upon entry (or NULL).
+ * @param: PEXIT_STACK_TOP:       A value to-be popped off of the stack upon exit (or NULL).
+ * @param: PEXIT_STACK_TOP_CONST: Same as `PEXIT_STACK_TOP', but casted into a constant.
  * @return: UNWIND_SUCCESS:          ...
  * @return: UNWIND_INVALID_REGISTER: ...
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */
 typedef __ATTR_NONNULL((1)) unsigned int
-(LIBUNWIND_CC *PUNWIND_EMULATOR_EXEC)(unwind_emulator_t *__restrict self);
+(LIBUNWIND_CC *PUNWIND_EMULATOR_EXEC)(unwind_emulator_t *__restrict __self);
 typedef __ATTR_NONNULL((1)) unsigned int
-(LIBUNWIND_CC *PUNWIND_EMULATOR_EXEC_AUTOSTACK)(unwind_emulator_t *__restrict self,
-                                                unwind_ste_t const *pentry_stack_top,
-                                                unwind_ste_t *pexit_stack_top,
-                                                __uintptr_t *pexit_stack_top_const);
+(LIBUNWIND_CC *PUNWIND_EMULATOR_EXEC_AUTOSTACK)(unwind_emulator_t *__restrict __self,
+                                                unwind_ste_t const *__pentry_stack_top,
+                                                unwind_ste_t *__pexit_stack_top,
+                                                __uintptr_t *__pexit_stack_top_const);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1)) unsigned int LIBUNWIND_CC
-unwind_emulator_exec(unwind_emulator_t *__restrict self);
+unwind_emulator_exec(unwind_emulator_t *__restrict __self);
 LIBUNWIND_DECL __ATTR_NONNULL((1)) unsigned int LIBUNWIND_CC
-unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
-                               unwind_ste_t const *pentry_stack_top,
-                               unwind_ste_t *pexit_stack_top,
-                               __uintptr_t *pexit_stack_top_const);
+unwind_emulator_exec_autostack(unwind_emulator_t *__restrict __self,
+                               unwind_ste_t const *__pentry_stack_top,
+                               unwind_ste_t *__pexit_stack_top,
+                               __uintptr_t *__pexit_stack_top_const);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
-/* Return a pointer to the next unwind instruction following `unwind_pc'
+/* Return a pointer to the next unwind instruction following `UNWIND_PC'
  * -> Useful for dumping unwind instruction without having to take care
  *    of handling all possible instruction (after all: CFI has a CISC
  *    instruction set with variable-length instructions)
- * @param: addrsize: Size of a target address.
- * @param: ptrsize:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
- * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
+ * @param: ADDRSIZE: Size of a target address.
+ * @param: PTRSIZE:  Size of a DWARF pointer (4 for 32-bit dwarf; 8 for 64-bit dwarf).
+ * @return: NULL: The instruction at `UNWIND_PC' wasn't recognized. */
 typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __ATTR_NONNULL((1)) __byte_t const *
-(LIBUNWIND_CC *PUNWIND_INSTRUCTION_SUCC)(__byte_t const *__restrict unwind_pc,
-                                         __uint8_t addrsize, __uint8_t ptrsize);
+(LIBUNWIND_CC *PUNWIND_INSTRUCTION_SUCC)(__byte_t const *__restrict __unwind_pc,
+                                         __uint8_t __addrsize, __uint8_t __ptrsize);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __byte_t const *
-__NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t const *__restrict unwind_pc,
-                                                    __uint8_t addrsize, __uint8_t ptrsize);
+__NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t const *__restrict __unwind_pc,
+                                                    __uint8_t __addrsize, __uint8_t __ptrsize);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
-/* Return a pointer to a CFI expression that is applicable for `cu_base + module_relative_pc'
+/* Return a pointer to a CFI expression that is applicable for `CU_BASE + MODULE_RELATIVE_PC'
  * If no such expression exists, return `NULL' instead. */
 typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __byte_t *
-(LIBUNWIND_CC *PDEBUGINFO_LOCATION_SELECT)(di_debuginfo_location_t const *__restrict self,
-                                           __uintptr_t cu_base,
-                                           __uintptr_t module_relative_pc,
-                                           __uint8_t addrsize,
-                                           __size_t *__restrict pexpr_length);
+(LIBUNWIND_CC *PDEBUGINFO_LOCATION_SELECT)(di_debuginfo_location_t const *__restrict __self,
+                                           __uintptr_t __cu_base,
+                                           __uintptr_t __module_relative_pc,
+                                           __uint8_t __addrsize,
+                                           __size_t *__restrict __pexpr_length);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __byte_t *
-__NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
-                                                      __uintptr_t cu_base,
-                                                      __uintptr_t module_relative_pc,
-                                                      __uint8_t addrsize,
-                                                      __size_t *__restrict pexpr_length);
+__NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t const *__restrict __self,
+                                                      __uintptr_t __cu_base,
+                                                      __uintptr_t __module_relative_pc,
+                                                      __uint8_t __addrsize,
+                                                      __size_t *__restrict __pexpr_length);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
 
 /* Read/Write the value associated a given debuginfo location descriptor.
- * @param: self:                  The debug info location descriptor (s.a. libdebuginfo.so)
- * @param: sectinfo:              Emulator section information (to-be filled in by the caller)
+ * @param: SELF:                  The debug info location descriptor (s.a. libdebuginfo.so)
+ * @param: SECTINFO:              Emulator section information (to-be filled in by the caller)
  *                                Optionally, this argument may be `NULL', however if this is the
  *                                case, the function may fail in cases where it would have otherwise
  *                                succeeded.
- * @param: regget:                Register getter callback.
- * @param: regget_arg:            Register getter callback argument.
- * @param: regset:                Register setter callback.
- * @param: regset_arg:            Register setter callback argument.
- * @param: cu_base:               Base address of the associated CU (or `0') (== `di_debuginfo_compile_unit_t::cu_ranges::r_startpc')
- * @param: module_relative_pc:    The module-relative program counter, to-be used to select
+ * @param: REGGET:                Register getter callback.
+ * @param: REGGET_ARG:            Register getter callback argument.
+ * @param: REGSET:                Register setter callback.
+ * @param: REGSET_ARG:            Register setter callback argument.
+ * @param: CU_BASE:               Base address of the associated CU (or `0') (== `di_debuginfo_compile_unit_t::cu_ranges::r_startpc')
+ * @param: MODULE_RELATIVE_PC:    The module-relative program counter, to-be used to select
  *                                the appropriate expression within a location list.
- * @param: buf:                   Source/target buffer containing the value read from,
+ * @param: BUF:                   Source/target buffer containing the value read from,
  *                                or written to the location expression.
- * @param: bufsize:               Size of the given `buf' in bytes.
- * @param: pnum_written_bits:     The number of _BITS_ (not bytes!) read from the location expression,
- *                                and written to the given `buf' (any trailing bits of buffer memory
+ * @param: BUFSIZE:               Size of the given `BUF' in bytes.
+ * @param: PNUM_WRITTEN_BITS:     The number of _BITS_ (not bytes!) read from the location expression,
+ *                                and written to the given `BUF' (any trailing bits of buffer memory
  *                                that weren't written will be filled with `0' upon success)
- * @param: pnum_read_bits:        The number of _BITS_ (not bytes!) written to the location expression,
- *                                and read from the given `buf'.
- * @param: frame_base_expression: The expression used to calculate the frame-base address (or NULL if unknown)
- * @param: objaddr:               The address of the base-object (used e.g. for structure member expressions)
- * @param: addrsize:              Size of an address (defined by the associated CU, and usually == sizeof(void *))
- * @param: ptrsize:               DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf)
+ * @param: PNUM_READ_BITS:        The number of _BITS_ (not bytes!) written to the location expression,
+ *                                and read from the given `BUF'.
+ * @param: FRAME_BASE_EXPRESSION: The expression used to calculate the frame-base address (or NULL if unknown)
+ * @param: OBJADDR:               The address of the base-object (used e.g. for structure member expressions)
+ * @param: ADDRSIZE:              Size of an address (defined by the associated CU, and usually == sizeof(void *))
+ * @param: PTRSIZE:               DWARF pointer size (4 for 32-bit dwarf; 8 for 64-bit dwarf)
  * @return: * :                               One of `UNWIND_*'
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
- * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
- * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
+ * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `BUFSIZE' is too small.
+ * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `MODULE_RELATIVE_PC' */
 typedef __ATTR_NONNULL((1, 3, 7, 9)) unsigned int
-(LIBUNWIND_CC *PDEBUGINFO_LOCATION_GETVALUE)(di_debuginfo_location_t const *__restrict self,
-                                             unwind_emulator_sections_t const *sectinfo,
-                                             unwind_getreg_t regget, void *regget_arg,
-                                             __uintptr_t cu_base,
-                                             __uintptr_t module_relative_pc,
-                                             void *__restrict buf, __size_t bufsize,
-                                             __size_t *__restrict pnum_written_bits,
-                                             di_debuginfo_location_t const *frame_base_expression,
-                                             void *objaddr, __uint8_t addrsize, __uint8_t ptrsize);
+(LIBUNWIND_CC *PDEBUGINFO_LOCATION_GETVALUE)(di_debuginfo_location_t const *__restrict __self,
+                                             unwind_emulator_sections_t const *__sectinfo,
+                                             unwind_getreg_t __regget, void *__regget_arg,
+                                             __uintptr_t __cu_base,
+                                             __uintptr_t __module_relative_pc,
+                                             void *__restrict __buf, __size_t __bufsize,
+                                             __size_t *__restrict __pnum_written_bits,
+                                             di_debuginfo_location_t const *__frame_base_expression,
+                                             void *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
 typedef __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int
-(LIBUNWIND_CC *PDEBUGINFO_LOCATION_SETVALUE)(di_debuginfo_location_t const *__restrict self,
-                                             unwind_emulator_sections_t const *sectinfo,
-                                             unwind_getreg_t regget, void *regget_arg,
-                                             unwind_setreg_t regset, void *regset_arg,
-                                             __uintptr_t cu_base,
-                                             __uintptr_t module_relative_pc,
-                                             void const *__restrict buf, __size_t bufsize,
-                                             __size_t *__restrict pnum_read_bits,
-                                             di_debuginfo_location_t const *frame_base_expression,
-                                             void *objaddr, __uint8_t addrsize, __uint8_t ptrsize);
+(LIBUNWIND_CC *PDEBUGINFO_LOCATION_SETVALUE)(di_debuginfo_location_t const *__restrict __self,
+                                             unwind_emulator_sections_t const *__sectinfo,
+                                             unwind_getreg_t __regget, void *__regget_arg,
+                                             unwind_setreg_t __regset, void *__regset_arg,
+                                             __uintptr_t __cu_base,
+                                             __uintptr_t __module_relative_pc,
+                                             void const *__restrict __buf, __size_t __bufsize,
+                                             __size_t *__restrict __pnum_read_bits,
+                                             di_debuginfo_location_t const *__frame_base_expression,
+                                             void *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 7, 9)) unsigned int LIBUNWIND_CC
-debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
-                            unwind_emulator_sections_t const *sectinfo,
-                            unwind_getreg_t regget, void *regget_arg,
-                            __uintptr_t cu_base,
-                            __uintptr_t module_relative_pc,
-                            void *__restrict buf, __size_t bufsize,
-                            __size_t *__restrict pnum_written_bits,
-                            di_debuginfo_location_t const *frame_base_expression,
-                            void *objaddr, __uint8_t addrsize, __uint8_t ptrsize);
+debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict __self,
+                            unwind_emulator_sections_t const *__sectinfo,
+                            unwind_getreg_t __regget, void *__regget_arg,
+                            __uintptr_t __cu_base,
+                            __uintptr_t __module_relative_pc,
+                            void *__restrict __buf, __size_t __bufsize,
+                            __size_t *__restrict __pnum_written_bits,
+                            di_debuginfo_location_t const *__frame_base_expression,
+                            void *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int LIBUNWIND_CC
-debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
-                            unwind_emulator_sections_t const *sectinfo,
-                            unwind_getreg_t regget, void *regget_arg,
-                            unwind_setreg_t regset, void *regset_arg,
-                            __uintptr_t cu_base,
-                            __uintptr_t module_relative_pc,
-                            void const *__restrict buf, __size_t bufsize,
-                            __size_t *__restrict pnum_read_bits,
-                            di_debuginfo_location_t const *frame_base_expression,
-                            void *objaddr, __uint8_t addrsize, __uint8_t ptrsize);
+debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict __self,
+                            unwind_emulator_sections_t const *__sectinfo,
+                            unwind_getreg_t __regget, void *__regget_arg,
+                            unwind_setreg_t __regset, void *__regset_arg,
+                            __uintptr_t __cu_base,
+                            __uintptr_t __module_relative_pc,
+                            void const *__restrict __buf, __size_t __bufsize,
+                            __size_t *__restrict __pnum_read_bits,
+                            di_debuginfo_location_t const *__frame_base_expression,
+                            void *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 

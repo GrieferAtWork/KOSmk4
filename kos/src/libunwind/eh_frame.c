@@ -92,7 +92,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t const *__restrict self,
                                             unwind_cfa_register_t *common_init_regs,
 #endif /* CFI_UNWIND_COMMON_REGISTER_COUNT != 0 */
 #if CFI_UNWIND_UNCOMMON_REGISTER_COUNT != 0
-                                            uintptr_half_t *uncommon_init_regs,
+                                            unwind_regno_t *uncommon_init_regs,
 #endif /* CFI_UNWIND_UNCOMMON_REGISTER_COUNT != 0 */
                                             unwind_order_index_t *__restrict porder,
                                             byte_t *__restrict reader,
@@ -113,7 +113,7 @@ NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t const *__restr
                                                      unwind_cfa_register_t *common_init_regs,
 #endif /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 */
 #if CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
-                                                     uintptr_half_t *uncommon_init_regs,
+                                                     unwind_regno_t *uncommon_init_regs,
 #endif /* CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0 */
                                                      unwind_order_index_t *__restrict porder,
                                                      byte_t *__restrict reader,
@@ -132,7 +132,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
                                                  byte_t *__restrict reader,
                                                  byte_t *__restrict end,
                                                  unwind_cfa_register_t *__restrict rule,
-                                                 uintptr_half_t dw_regno,
+                                                 unwind_regno_t dw_regno,
                                                  void *absolute_pc);
 #endif /* __INTELLISENSE__ */
 
@@ -155,7 +155,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
 INTERN NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_register_t *__restrict result,
-                                      uintptr_half_t dw_regno,
+                                      unwind_regno_t dw_regno,
                                       void *absolute_pc) {
 	unsigned int error;
 	/* `libuw_unwind_fde_exec_rule_until()' won't initialize

@@ -117,9 +117,9 @@ NOTHROW_NCX(CC SYM(unwind_cfa_backup_state_freechain))(SYM(unwind_cfa_backup_sta
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0
 PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC SYM(set_common_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__restrict self,
-                                          uintptr_half_t com_regno) {
+                                          unwind_regno_t com_regno) {
 	unwind_order_index_t base;
-	uintptr_half_t i;
+	unwind_regno_t i;
 	base = self->cs_regs[com_regno].cr_order;
 	for (i = 0; i < CFI_UNWIND_COMMON_REGISTER_COUNT; ++i) {
 		if (self->cs_regs[i].cr_order > base)
@@ -138,9 +138,9 @@ NOTHROW_NCX(CC SYM(set_common_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__restri
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC SYM(set_uncommon_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__restrict self,
-                                            uintptr_half_t uncom_regno) {
+                                            unwind_regno_t uncom_regno) {
 	unwind_order_index_t base;
-	uintptr_half_t i;
+	unwind_regno_t i;
 	base = self->cs_uncorder[uncom_regno];
 	for (i = 0; i < CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT; ++i) {
 		if (self->cs_uncorder[i] > base)
@@ -190,7 +190,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t const *__restrict self,
                                             unwind_cfa_register_t *common_init_regs,
 #endif /* CFI_UNWIND_COMMON_REGISTER_COUNT != 0 */
 #if CFI_UNWIND_UNCOMMON_REGISTER_COUNT != 0
-                                            uintptr_half_t *uncommon_init_regs,
+                                            unwind_regno_t *uncommon_init_regs,
 #endif /* CFI_UNWIND_UNCOMMON_REGISTER_COUNT != 0 */
                                             unwind_order_index_t *__restrict porder,
                                             byte_t *__restrict reader,
@@ -225,7 +225,7 @@ NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t const *__restr
                                                      unwind_cfa_register_t *common_init_regs,
 #endif /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 */
 #if CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
-                                                     uintptr_half_t *uncommon_init_regs,
+                                                     unwind_regno_t *uncommon_init_regs,
 #endif /* CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0 */
                                                      unwind_order_index_t *__restrict porder,
                                                      byte_t *__restrict reader,
@@ -264,7 +264,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
                                                  byte_t *__restrict reader,
                                                  byte_t *__restrict end,
                                                  unwind_cfa_register_t *__restrict rule,
-                                                 uintptr_half_t dw_regno,
+                                                 unwind_regno_t dw_regno,
                                                  void *absolute_pc)
 #elif defined(EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT)
 /* Similar to `unwind_fde_exec()', but only decode `DW_CFA_GNU_args_size' instructions
@@ -305,7 +305,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 #define SET_REGISTER(dw_regid, ...)                                       \
 	{                                                                     \
-		uintptr_half_t temp;                                              \
+		unwind_regno_t temp;                                              \
 		temp = cfi_unwind_local_register_dw2common(dw_regid);             \
 		if likely(temp < CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT) {        \
 			/* Common register */                                         \
@@ -333,7 +333,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 #else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
 #define SET_REGISTER(dw_regid, ...)                                \
 	{                                                              \
-		uintptr_half_t temp;                                       \
+		unwind_regno_t temp;                                       \
 		temp = cfi_unwind_local_register_dw2common(dw_regid);      \
 		if likely(temp < CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT) { \
 			/* Common register */                                  \
@@ -355,7 +355,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 #define SET_REGISTER(dw_regid, ...)                                   \
 	{                                                                 \
-		uintptr_half_t temp;                                          \
+		unwind_regno_t temp;                                          \
 		temp = cfi_unwind_local_register_dw2uncommon(dw_regid);       \
 		if unlikely(temp >= CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT) \
 			ERRORF(err_invalid_register, "regno=%u\n",                \
@@ -413,7 +413,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 #if defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE)
 			{
-				uintptr_half_t temp;
+				unwind_regno_t temp;
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0
 				temp = cfi_unwind_local_register_dw2common(operand);
 				if likely(temp < CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT) {
@@ -481,9 +481,9 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
     defined(EH_FRAME_FDE_EXEC_CFA_RULE)
 			CASE(DW_CFA_offset_extended) {
-				uintptr_half_t reg;
+				unwind_regno_t reg;
 				intptr_t value;
-				reg = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 				value = ((intptr_t)dwarf_decode_uleb128((byte_t **)&reader) * self->f_dataalign);
 				SET_REGISTER(reg, {
 					rule->cr_rule  = DW_CFA_register_rule_offsetn;
@@ -492,12 +492,12 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 			}	break;
 
 			CASE(DW_CFA_restore_extended) {
-				uintptr_half_t reg;
-				reg = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				unwind_regno_t reg;
+				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 #if defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE)
 				{
-					uintptr_half_t temp;
+					unwind_regno_t temp;
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0
 					temp = cfi_unwind_local_register_dw2common(reg);
 					if likely(temp < CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT) {
@@ -537,19 +537,19 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 			CASE(DW_CFA_same_value)
 #if 0 /* Handled identical to UNDEFINED for the purpose of unwinding at runtime */
 			{
-				uintptr_half_t reg;
-				reg = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				unwind_regno_t reg;
+				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 				SET_REGISTER(reg, {
 					rule->cr_rule = DW_CFA_register_rule_same_value;
 				});
 			}	break;
 #endif
 			CASE(DW_CFA_undefined) {
-				uintptr_half_t reg;
+				unwind_regno_t reg;
 #ifndef EH_FRAME_FDE_EXEC_CFA_RULE
-				uintptr_half_t temp;
+				unwind_regno_t temp;
 #endif /* !EH_FRAME_FDE_EXEC_CFA_RULE */
-				reg = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 #ifdef EH_FRAME_FDE_EXEC_CFA_RULE
 				if (reg == dw_regno) {
 					/* We can't set `DW_CFA_register_rule_undefined', because then the caller
@@ -583,9 +583,9 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 			}	break;
 
 			CASE(DW_CFA_register) {
-				uintptr_half_t reg1;
+				unwind_regno_t reg1;
 				uintptr_t reg2;
-				reg1 = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				reg1 = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 				reg2 = dwarf_decode_uleb128((byte_t **)&reader);
 				if unlikely(reg2 >= CFI_UNWIND_REGISTER_COUNT)
 					ERRORF(err_invalid_register, "regno=%Iu\n", reg2);
@@ -724,7 +724,7 @@ skip_expression:
 				if unlikely(reg >= CFI_UNWIND_REGISTER_COUNT)
 					ERRORF(err_invalid_register, "regno=%Iu\n", reg);
 				RESULT_CFA.cv_type = UNWIND_CFA_VALUE_REGISTER;
-				RESULT_CFA.cv_reg = (uintptr_half_t)reg;
+				RESULT_CFA.cv_reg = (unwind_regno_t)reg;
 				RESULT_CFA.cv_value = (intptr_t)dwarf_decode_uleb128((byte_t **)&reader);
 			}	break;
 
@@ -734,7 +734,7 @@ skip_expression:
 				if unlikely(reg >= CFI_UNWIND_REGISTER_COUNT)
 					ERRORF(err_invalid_register, "regno=%Iu\n", reg);
 				RESULT_CFA.cv_type = UNWIND_CFA_VALUE_REGISTER;
-				RESULT_CFA.cv_reg = (uintptr_half_t)reg;
+				RESULT_CFA.cv_reg = (unwind_regno_t)reg;
 				RESULT_CFA.cv_value = (intptr_t)(dwarf_decode_sleb128((byte_t **)&reader) * self->f_dataalign);
 			}	break;
 
@@ -747,7 +747,7 @@ skip_expression:
 				reg = dwarf_decode_uleb128((byte_t **)&reader);
 				if unlikely(reg >= CFI_UNWIND_REGISTER_COUNT)
 					ERRORF(err_invalid_register, "regno=%Iu\n", reg);
-				RESULT_CFA.cv_reg = (uintptr_half_t)reg;
+				RESULT_CFA.cv_reg = (unwind_regno_t)reg;
 				/*RESULT_CFA.cv_value = ...;*/ /* Keep the old offset */
 			}	break;
 
@@ -791,8 +791,8 @@ skip_expression:
     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
     defined(EH_FRAME_FDE_EXEC_CFA_RULE)
 			CASE(DW_CFA_expression) {
-				uintptr_half_t reg;
-				reg = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				unwind_regno_t reg;
+				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 				SET_REGISTER(reg, {
 					rule->cr_rule = DW_CFA_register_rule_expression;
 					rule->cr_expr = reader;
@@ -801,9 +801,9 @@ skip_expression:
 			}	break;
 
 			CASE(DW_CFA_offset_extended_sf) {
-				uintptr_half_t reg;
+				unwind_regno_t reg;
 				intptr_t value;
-				reg   = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				reg   = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 				value = (dwarf_decode_sleb128((byte_t **)&reader) * self->f_dataalign);
 				SET_REGISTER(reg, {
 					rule->cr_rule  = DW_CFA_register_rule_offsetn;
@@ -812,9 +812,9 @@ skip_expression:
 			}	break;
 
 			CASE(DW_CFA_val_offset) {
-				uintptr_half_t reg;
+				unwind_regno_t reg;
 				intptr_t value;
-				reg = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 				value = ((intptr_t)dwarf_decode_uleb128((byte_t **)&reader) * self->f_dataalign);
 				SET_REGISTER(reg, {
 					rule->cr_rule  = DW_CFA_register_rule_val_offsetn;
@@ -823,9 +823,9 @@ skip_expression:
 			}	break;
 
 			CASE(DW_CFA_val_offset_sf) {
-				uintptr_half_t reg;
+				unwind_regno_t reg;
 				intptr_t value;
-				reg = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 				value = (dwarf_decode_sleb128((byte_t **)&reader) * self->f_dataalign);
 				SET_REGISTER(reg, {
 					rule->cr_rule  = DW_CFA_register_rule_val_offsetn;
@@ -834,8 +834,8 @@ skip_expression:
 			}	break;
 
 			CASE(DW_CFA_val_expression) {
-				uintptr_half_t reg;
-				reg = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				unwind_regno_t reg;
+				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 				SET_REGISTER(reg, {
 					rule->cr_rule = DW_CFA_register_rule_val_expression;
 					rule->cr_expr = reader;
@@ -844,9 +844,9 @@ skip_expression:
 			}	break;
 
 			CASE(DW_CFA_GNU_negative_offset_extended) {
-				uintptr_half_t reg;
+				unwind_regno_t reg;
 				intptr_t value;
-				reg = (uintptr_half_t)dwarf_decode_uleb128((byte_t **)&reader);
+				reg = (unwind_regno_t)dwarf_decode_uleb128((byte_t **)&reader);
 				value = -((intptr_t)dwarf_decode_uleb128((byte_t **)&reader) * self->f_dataalign);
 				SET_REGISTER(reg, {
 					rule->cr_rule  = DW_CFA_register_rule_offsetn;

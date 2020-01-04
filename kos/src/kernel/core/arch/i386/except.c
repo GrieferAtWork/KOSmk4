@@ -815,7 +815,7 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 	uint8_t *callsite_end;
 	size_t callsite_size;
 
-	/* This function is hooked by CFI under `struct unwind_fde_struct::f_encperso'
+	/* This function is hooked by CFI under `struct unwind_fde_struct::f_persofun'
 	 * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
 	landingpad = (uintptr_t)fde->f_pcstart;
 

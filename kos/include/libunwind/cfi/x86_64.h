@@ -20,6 +20,8 @@
 #define _LIBUNWIND_CFI_X86_64_H 1
 
 #include "../api.h"
+/**/
+
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
@@ -637,7 +639,6 @@ __NOTHROW(cfi_x86_64_unwind_sigframe_register_uncommon2dw)(__UINTPTR_HALF_TYPE__
 
 /* Host-specific CFI constants. */
 #ifdef __x86_64__
-
 #define CFI_UNWIND_REGISTER_MAXSIZE   CFI_X86_64_UNWIND_FPU_REGISTER_SIZE
 #define CFI_REGISTER_SIZE(regno)      CFI_X86_64_REGISTER_SIZE(regno)
 #define CFI_UNWIND_REGISTER_PC        CFI_X86_64_UNWIND_REGISTER_PC        /* The register containing the program counter. */
@@ -662,7 +663,6 @@ __NOTHROW(cfi_x86_64_unwind_sigframe_register_uncommon2dw)(__UINTPTR_HALF_TYPE__
 #define cfi_unwind_sigframe_register_dw2uncommon    cfi_x86_64_unwind_sigframe_register_dw2uncommon
 #define cfi_unwind_sigframe_register_common2dw      cfi_x86_64_unwind_sigframe_register_common2dw
 #define cfi_unwind_sigframe_register_uncommon2dw    cfi_x86_64_unwind_sigframe_register_uncommon2dw
-
 #endif /* __x86_64__ */
 
 

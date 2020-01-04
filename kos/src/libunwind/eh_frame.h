@@ -105,7 +105,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict se
 INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_register_t *__restrict result,
-                                      __UINTPTR_HALF_TYPE__ dw_regno,
+                                      unwind_regno_t dw_regno,
                                       void *absolute_pc);
 
 /* Same as `unwind_fde_exec()', however only calculate the CFA restore descriptor.

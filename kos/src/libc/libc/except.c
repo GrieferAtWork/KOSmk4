@@ -946,10 +946,10 @@ DEFINE_PUBLIC_ALIAS(_Unwind_GetGR, libc_Unwind_GetGR);
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
 NOTHROW_NCX(LIBCCALL libc_Unwind_GetGR)(struct _Unwind_Context const *__restrict context, int index) {
 	uintptr_t result = 0;
-	if likely(CFI_REGISTER_SIZE((uintptr_half_t)index) <= sizeof(result)) {
+	if likely(CFI_REGISTER_SIZE((unwind_regno_t)index) <= sizeof(result)) {
 		ENSURE_LIBUNWIND_LOADED();
 		unwind_getreg_error_register_state(context->uc_state,
-		                                   (uintptr_half_t)index,
+		                                   (unwind_regno_t)index,
 		                                   &result);
 	}
 	return result;
@@ -959,10 +959,10 @@ DEFINE_PUBLIC_ALIAS(_Unwind_SetGR, libc_Unwind_SetGR);
 INTERN SECTION_EXCEPT_TEXT ATTR_LEAF NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_Unwind_SetGR)(struct _Unwind_Context *__restrict context,
                                         int index, uintptr_t value) {
-	if likely(CFI_REGISTER_SIZE((uintptr_half_t)index) <= sizeof(value)) {
+	if likely(CFI_REGISTER_SIZE((unwind_regno_t)index) <= sizeof(value)) {
 		ENSURE_LIBUNWIND_LOADED();
 		unwind_setreg_error_register_state(context->uc_state,
-		                                   (uintptr_half_t)index,
+		                                   (unwind_regno_t)index,
 		                                   &value);
 	}
 }

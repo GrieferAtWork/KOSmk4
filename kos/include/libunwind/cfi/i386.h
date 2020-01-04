@@ -570,7 +570,6 @@ cfi_386_unwind_sigframe_register_uncommon2dw(__UINTPTR_HALF_TYPE__ __uncom_regno
 #define cfi_unwind_sigframe_register_dw2uncommon    cfi_386_unwind_sigframe_register_dw2uncommon
 #define cfi_unwind_sigframe_register_common2dw      cfi_386_unwind_sigframe_register_common2dw
 #define cfi_unwind_sigframe_register_uncommon2dw    cfi_386_unwind_sigframe_register_uncommon2dw
-
 #endif /* __i386__ && !__x86_64__ */
 
 

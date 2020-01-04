@@ -323,7 +323,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	wrmsr
 	/* With PAE + NX, try to enable its effects while
 	 * in kernel-space (if supported by the CPU) */
-	testl  $(CPUID_7B_SMEP), V2P(x86_bootcpu_cpuid) + OFFSET_CPUID_7B
+	testl  $(CPUID_7B_SMEP), (x86_bootcpu_cpuid + OFFSET_CPUID_7B)
 	jz     1f
 	orl    $(CR4_SMEP), %esp
 1:

@@ -62,6 +62,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t *__restrict reader,
 	byte_t *cie_reader, *fde_reader;
 	size_t length;
 	uint32_t cie_offset;
+	uint8_t enclsda;
 	char *cie_augstr;
 	struct CIE *cie;
 again:
@@ -106,11 +107,10 @@ again:
 	/* Read code and data alignments. */
 	result->f_codealign = dwarf_decode_uleb128(&cie_reader); /* c_codealignfac */
 	result->f_dataalign = dwarf_decode_sleb128(&cie_reader); /* c_dataalignfac */
-	result->f_retreg    = (uintptr_half_t)dwarf_decode_uleb128(&cie_reader); /* c_returnreg */
+	result->f_retreg    = (unwind_regno_t)dwarf_decode_uleb128(&cie_reader); /* c_returnreg */
 	/* Pointer encodings default to ZERO(0). */
 	result->f_encptr   = 0;
-	result->f_enclsda  = 0;
-	result->f_encperso = 0;
+	enclsda            = 0;
 	result->f_sigframe = 0;
 	/* No personality function by default. */
 	result->f_persofun = 0;
@@ -129,11 +129,12 @@ again:
 		}
 		while (*++aug_iter && cie_reader < aug_end) {
 			if (*aug_iter == 'L') {
-				result->f_enclsda = *cie_reader++;
+				enclsda = *cie_reader++;
 			} else if (*aug_iter == 'P') {
-				result->f_encperso = *cie_reader++;
+				uint8_t encperso;
+				encperso = *cie_reader++;
 				result->f_persofun = (void *)dwarf_decode_pointer(&cie_reader,
-				                                                  result->f_encperso,
+				                                                  encperso,
 				                                                  sizeof_address,
 				                                                  0,
 				                                                  0,
@@ -196,7 +197,7 @@ again:
 				if unlikely(fde_reader == aug_end)
 					break;
 				result->f_lsdaaddr = (void *)dwarf_decode_pointer(&fde_reader,
-				                                                  result->f_enclsda,
+				                                                  enclsda,
 				                                                  sizeof_address,
 				                                                  0,
 				                                                  0,
