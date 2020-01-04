@@ -51,7 +51,7 @@
 [restart(must)][noexcept]
 sigreturn:(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1,
            syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask,
-           struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu);
+           struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu);
 
 clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRACE,
                       CLONE_VFORK, CLONE_PARENT, CLONE_THREAD, CLONE_NEWNS, CLONE_SYSVSEM,

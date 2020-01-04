@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f45da34 */
+/* HASH CRC-32:0xa46aab4f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4430,7 +4430,7 @@ END(__x86_asm32_int80_fsync)
  * within `sighand_raise_signal()'
  * The order chosen is also important, as it is selected such that arguments
  * are only passed through registers that are preserved by CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 .section .text.x86.asm32_syscall_int80.sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	.cfi_startproc simple
@@ -21676,7 +21676,7 @@ END(__x86_asm32_sysenter_fsync)
  * within `sighand_raise_signal()'
  * The order chosen is also important, as it is selected such that arguments
  * are only passed through registers that are preserved by CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 .section .text.x86.asm32_syscall_sysenter.sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigreturn)
 	.cfi_startproc simple

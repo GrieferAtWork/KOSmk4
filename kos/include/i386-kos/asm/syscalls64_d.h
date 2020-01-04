@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9b85a80 */
+/* HASH CRC-32:0xa5a8ea44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,21 @@
 #define __NR64_rt_sigaction           0xd                            /* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact, size_t sigsetsize) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR64_rt_sigprocmask         0xe                            /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
-#define __NR64_rt_sigreturn           0xf                            /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
+/* Restore the given CPU/FPU context descriptors, as well as signal mask
+ * before resuming execution by either invoking another system call `sc_info',
+ * which will then return to `restore_cpu', or by directly returning there.
+ * Arguments:
+ *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
+ *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
+ *  - %r12: [0..1] sigset_t const *restore_sigmask;
+ *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
+ * This system call uses a custom calling convention because registers passed
+ * must not get clobbered during execution of a normal C function. On i386
+ * this doesn't require a custom calling convention since enough registers
+ * exist that are preserved by a C function, but are still used by at least
+ * one system call invocation method. However on x86_64, no such registers
+ * exist, requiring the use of a custom protocol. */
+#define __NR64_rt_sigreturn           0xf                            /* void rt_sigreturn(void) */
 #define __NR64_ioctl                  0x10                           /* syscall_slong_t ioctl(fd_t fd, syscall_ulong_t request, void *arg) */
 #define __NR64_pread64                0x11                           /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
 #define __NR64_pwrite64               0x12                           /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
@@ -1308,7 +1322,7 @@
 #define __NR64RC_brk                    1
 #define __NR64RC_rt_sigaction           4
 #define __NR64RC_rt_sigprocmask         4
-#define __NR64RC_rt_sigreturn           4
+#define __NR64RC_rt_sigreturn           0
 #define __NR64RC_ioctl                  3
 #define __NR64RC_pread64                4
 #define __NR64RC_pwrite64               4

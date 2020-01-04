@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe926c0e9 */
+/* HASH CRC-32:0xe12ef297 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,7 +167,7 @@
  * within `sighand_raise_signal()'
  * The order chosen is also important, as it is selected such that arguments
  * are only passed through registers that are preserved by CDECL */
-#define __NR_sigreturn               0x77                   /* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu) */
+#define __NR_sigreturn               0x77                   /* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 #define __NR_clone                   0x78                   /* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid) */
 #define __NR_setdomainname           0x79                   /* errno_t setdomainname(char const *name, size_t len) */
 #define __NR_uname                   0x7a                   /* errno_t uname(struct utsname *name) */

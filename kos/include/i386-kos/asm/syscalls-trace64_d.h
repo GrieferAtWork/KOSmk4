@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbae600b6 */
+/* HASH CRC-32:0x281bf9c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,10 +66,6 @@
 #define __NR64AN1_rt_sigprocmask         set
 #define __NR64AN2_rt_sigprocmask         oset
 #define __NR64AN3_rt_sigprocmask         sigsetsize
-#define __NR64AN0_rt_sigreturn           restore_fpu
-#define __NR64AN1_rt_sigreturn           restore_sigmask
-#define __NR64AN2_rt_sigreturn           sc_info
-#define __NR64AN3_rt_sigreturn           restore_cpu
 #define __NR64AN0_ioctl                  fd
 #define __NR64AN1_ioctl                  request
 #define __NR64AN2_ioctl                  arg
@@ -1053,14 +1049,6 @@
 #define __NR64ATRA2_rt_sigprocmask(how, set, oset, sigsetsize) ,oset
 #define __NR64ATRF3_rt_sigprocmask         "%" PRIuSIZ
 #define __NR64ATRA3_rt_sigprocmask(how, set, oset, sigsetsize) ,sigsetsize
-#define __NR64ATRF0_rt_sigreturn           "%p"
-#define __NR64ATRA0_rt_sigreturn(restore_fpu, restore_sigmask, sc_info, restore_cpu) ,restore_fpu
-#define __NR64ATRF1_rt_sigreturn           "%p"
-#define __NR64ATRA1_rt_sigreturn(restore_fpu, restore_sigmask, sc_info, restore_cpu) ,restore_sigmask
-#define __NR64ATRF2_rt_sigreturn           "%p"
-#define __NR64ATRA2_rt_sigreturn(restore_fpu, restore_sigmask, sc_info, restore_cpu) ,sc_info
-#define __NR64ATRF3_rt_sigreturn           "%p"
-#define __NR64ATRA3_rt_sigreturn(restore_fpu, restore_sigmask, sc_info, restore_cpu) ,restore_cpu
 #define __NR64ATRF0_ioctl                  "%d"
 #define __NR64ATRA0_ioctl(fd, request, arg) ,(int)(fd)
 #define __NR64ATRF1_ioctl                  "%#" PRIxSIZ

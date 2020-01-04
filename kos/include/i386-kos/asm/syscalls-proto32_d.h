@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x572b3d1c */
+/* HASH CRC-32:0xadeb941e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1154,7 +1154,7 @@
 #define __NR32AT1_sigreturn               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_sigreturn               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT3_sigreturn               (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NR32AT4_sigreturn               (struct rpc_syscall_info32 *, struct rpc_syscall_info32 *)
+#define __NR32AT4_sigreturn               (struct rpc_syscall_info32 const *, struct rpc_syscall_info32 const *)
 #define __NR32AT5_sigreturn               (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NR32AT0_clone                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_clone                   (void *, void *)
@@ -2164,7 +2164,7 @@
 #define __NR32AM_sysinfo(a, b, c, d, e, f)                 (struct sysinfo *)a
 #define __NR32AM_ipc(a, b, c, d, e, f)                     (int)a
 #define __NR32AM_fsync(a, b, c, d, e, f)                   (__fd_t)a
-#define __NR32AM_sigreturn(a, b, c, d, e, f)               (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_struct const *)d, (struct rpc_syscall_info32 *)e, (struct ucpustate32 const *)f
+#define __NR32AM_sigreturn(a, b, c, d, e, f)               (struct fpustate32 const *)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (struct __sigset_struct const *)d, (struct rpc_syscall_info32 const *)e, (struct ucpustate32 const *)f
 #define __NR32AM_clone(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (void *)b, (__pid_t *)c, (__uintptr_t)d, (__pid_t *)e
 #define __NR32AM_setdomainname(a, b, c, d, e, f)           (char const *)a, (__size_t)b
 #define __NR32AM_uname(a, b, c, d, e, f)                   (struct utsname *)a

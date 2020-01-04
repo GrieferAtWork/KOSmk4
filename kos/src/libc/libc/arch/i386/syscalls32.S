@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47d835f1 */
+/* HASH CRC-32:0x7d80023d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2455,7 +2455,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfsync, libc_sys_Xfsync)
  * within `sighand_raise_signal()'
  * The order chosen is also important, as it is selected such that arguments
  * are only passed through registers that are preserved by CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 .section .text.crt.syscall.sigreturn
 INTERN_FUNCTION(libc_sys_sigreturn)
 	movl   $(0x77), %eax

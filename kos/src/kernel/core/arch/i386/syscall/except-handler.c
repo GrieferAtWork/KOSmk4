@@ -161,8 +161,10 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	stack   = PERTASK_GET(this_user_except_handler.ueh_stack);
 	if unlikely(!(mode & EXCEPT_HANDLER_FLAG_SETHANDLER))
 		return NULL; /* No handler defined */
-	if (stack == EXCEPT_HANDLER_SP_CURRENT)
+	if (stack == EXCEPT_HANDLER_SP_CURRENT) {
 		stack = (void *)icpustate_getuserpsp(state);
+		stack = (byte_t *)stack - 128; /* Red zone (TODO: Make this configurable!) */
+	}
 	/* Align the stack. */
 	stack = (void *)((uintptr_t)stack & ~7);
 	/* Allocate structures */

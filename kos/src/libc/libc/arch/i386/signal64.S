@@ -21,17 +21,33 @@
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
-#include <syscall.h>
+#include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
+
+#include <syscall.h>
 
 .section .text.crt.sched.signal.sig_restore
 INTERN_FUNCTION(libc_sig_restore)
 	.cfi_startproc simple
 	.cfi_signal_frame
-	.cfi_def_cfa %rsp, 0
+	/* %rbp: [1..1] struct ucpustate const *restore_cpu  CPU context */
+	/* %rbx: [0..1] struct fpustate const *restore_fpu   FPU context */
+	/* %r12: [0..1] sigset_t const *restore_sigmask      Signal mask */
+	/* %r13: [0..1] struct rpc_syscall_info *sc_info     Restartable system call */
+	.cfi_def_cfa %rbp, 0
+	ASM_CFI_REL_OFFSET_RESTORE_UCPUSTATE(0)
 
-	/* TODO: Encode CFI instrumentation for unwinding */
+	/* TODO: CFI expressions for conditional restoring of FPU registers:
+	 *    >> if (EBX) {
+	 *    >>     SOME_FPU_REGISTER = RESTORE_FROM_FPUSTATE(EBX);
+	 *    >> } else {
+	 *    >>     SOME_FPU_REGISTER = SAME_VALUE;
+	 *    >> }
+	 * TODO: Add some way for user-code to select the type of FPU context
+	 *       that will get loaded by the sigreturn() system call.
+	 */
 
 	movq  $(SYS_rt_sigreturn), %rax
 	syscall

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4955decd */
+/* HASH CRC-32:0x8307de9b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@
 #define __NRAC_brk                    1
 #define __NRAC_rt_sigaction           4
 #define __NRAC_rt_sigprocmask         4
-#define __NRAC_rt_sigreturn           4
+#define __NRAC_rt_sigreturn           0
 #define __NRAC_ioctl                  3
 #define __NRAC_pread64                4
 #define __NRAC_pwrite64               4
@@ -837,10 +837,6 @@
 #define __NRAT1_rt_sigprocmask         (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NRAT2_rt_sigprocmask         (struct __sigset_struct *, struct __sigset_struct *)
 #define __NRAT3_rt_sigprocmask         (size_t, __size_t)
-#define __NRAT0_rt_sigreturn           (struct fpustate const *, struct fpustate const *)
-#define __NRAT1_rt_sigreturn           (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NRAT2_rt_sigreturn           (struct rpc_syscall_info *, struct rpc_syscall_info *)
-#define __NRAT3_rt_sigreturn           (struct ucpustate const *, struct ucpustate const *)
 #define __NRAT0_ioctl                  (fd_t, __fd_t)
 #define __NRAT1_ioctl                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_ioctl                  (void *, void *)
@@ -1711,7 +1707,7 @@
 #define __NRAM_brk(a, b, c, d, e, f)                    (void *)a
 #define __NRAM_rt_sigaction(a, b, c, d, e, f)           (__syscall_ulong_t)a, (struct sigaction64 const *)b, (struct sigaction64 *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f)         (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
-#define __NRAM_rt_sigreturn(a, b, c, d, e, f)           (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info *)c, (struct ucpustate const *)d
+#define __NRAM_rt_sigreturn(a, b, c, d, e, f)           /* nothing */
 #define __NRAM_ioctl(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (void *)c
 #define __NRAM_pread64(a, b, c, d, e, f)                (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d
 #define __NRAM_pwrite64(a, b, c, d, e, f)               (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d
@@ -2090,7 +2086,7 @@
 #define __NRAP_brk(a)                                   (__syscall_ulong_t)a
 #define __NRAP_rt_sigaction(a, b, c, d)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_rt_sigprocmask(a, b, c, d)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_rt_sigreturn(a, b, c, d)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_rt_sigreturn()                           /* nothing */
 #define __NRAP_ioctl(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_pread64(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_pwrite64(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d

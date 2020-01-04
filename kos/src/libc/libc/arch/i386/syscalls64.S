@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2babb889 */
+/* HASH CRC-32:0x1f31e0c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -405,12 +405,25 @@ INTERN_FUNCTION(libc_sys_Xrt_sigprocmask)
 END(libc_sys_Xrt_sigprocmask)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrt_sigprocmask, libc_sys_Xrt_sigprocmask)
 
-/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
+/* Restore the given CPU/FPU context descriptors, as well as signal mask
+ * before resuming execution by either invoking another system call `sc_info',
+ * which will then return to `restore_cpu', or by directly returning there.
+ * Arguments:
+ *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
+ *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
+ *  - %r12: [0..1] sigset_t const *restore_sigmask;
+ *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
+ * This system call uses a custom calling convention because registers passed
+ * must not get clobbered during execution of a normal C function. On i386
+ * this doesn't require a custom calling convention since enough registers
+ * exist that are preserved by a C function, but are still used by at least
+ * one system call invocation method. However on x86_64, no such registers
+ * exist, requiring the use of a custom protocol. */
+/* void rt_sigreturn(void) */
 .section .text.crt.syscall.rt_sigreturn
 INTERN_FUNCTION(libc_sys_rt_sigreturn)
 	.cfi_startproc
 	movq   $(0xf), %rax
-	movq   %rcx, %r10
 	clc
 	syscall
 	ret

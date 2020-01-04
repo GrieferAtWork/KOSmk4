@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d48c33 */
+/* HASH CRC-32:0x117d14df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -498,7 +498,21 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigprocmask)
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigprocmask)
 
-/* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
+/* Restore the given CPU/FPU context descriptors, as well as signal mask
+ * before resuming execution by either invoking another system call `sc_info',
+ * which will then return to `restore_cpu', or by directly returning there.
+ * Arguments:
+ *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
+ *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
+ *  - %r12: [0..1] sigset_t const *restore_sigmask;
+ *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
+ * This system call uses a custom calling convention because registers passed
+ * must not get clobbered during execution of a normal C function. On i386
+ * this doesn't require a custom calling convention since enough registers
+ * exist that are preserved by a C function, but are still used by at least
+ * one system call invocation method. However on x86_64, no such registers
+ * exist, requiring the use of a custom protocol. */
+/* void rt_sigreturn(void) */
 .section .text.x86.asm64_syscall.rt_sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigreturn)
 	.cfi_startproc simple
@@ -514,7 +528,6 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigreturn)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movq   %r10, %rcx
 	EXTERN(sys_rt_sigreturn)
 	call   sys_rt_sigreturn
 	popq_cfi_r %r11
@@ -15324,7 +15337,7 @@ END(__x86_asm32_int80_fsync)
  * within `sighand_raise_signal()'
  * The order chosen is also important, as it is selected such that arguments
  * are only passed through registers that are preserved by CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 .section .text.x86.asm32_syscall_int80.sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigreturn)
 	.cfi_startproc simple
@@ -27085,7 +27098,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsync, __x86_asm32_int80_fsync)
  * within `sighand_raise_signal()'
  * The order chosen is also important, as it is selected such that arguments
  * are only passed through registers that are preserved by CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 .section .text.x86.asm32_syscall_sysenter.sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigreturn)
 	.cfi_startproc simple
@@ -31571,7 +31584,7 @@ END(__x86_asm32_sysrun32_fsync)
  * within `sighand_raise_signal()'
  * The order chosen is also important, as it is selected such that arguments
  * are only passed through registers that are preserved by CDECL */
-/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 *sc_info, struct ucpustate32 const *restore_cpu) */
+/* void sigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 .section .text.x86.asm32_syscall_sysrun32.sigreturn
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigreturn)
 	.cfi_startproc

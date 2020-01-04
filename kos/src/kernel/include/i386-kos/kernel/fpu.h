@@ -120,6 +120,8 @@ DATDEF u32 const x86_fxsave_mxcsr_mask;
 struct fpustate32;
 FUNDEF NOBLOCK void KCALL fpustate32_loadfrom(USER CHECKED struct fpustate32 const *state) THROWS(E_SEGFAULT, E_BADALLOC);
 FUNDEF NOBLOCK void KCALL fpustate32_saveinto(USER CHECKED struct fpustate32 *state) THROWS(E_SEGFAULT);
+#define fpustate64_loadfrom fpustate_loadfrom
+#define fpustate64_saveinto fpustate_saveinto
 #else /* __x86_64__ */
 #define fpustate32_loadfrom fpustate_loadfrom
 #define fpustate32_saveinto fpustate_saveinto

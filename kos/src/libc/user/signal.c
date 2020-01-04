@@ -46,11 +46,9 @@ libc_sigms_dos2kos(int dos_sigms) {
 
 
 #ifdef __x86_64__
-#if 0 /* TODO */
 #define HAVE_SET_SIGRESTORE 1
 INTDEF void libc_sig_restore(void);
 #define SET_SIGRESTORE(x) ((x).sa_restorer = &libc_sig_restore, (x).sa_flags |= SA_RESTORER)
-#endif
 #elif defined(__i386__)
 #define HAVE_SET_SIGRESTORE 1
 INTDEF void libc_sig_restore(void);

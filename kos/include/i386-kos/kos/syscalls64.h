@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85d28ab3 */
+/* HASH CRC-32:0xea9b0f03 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,10 +44,7 @@
 #include <kos/bits/futex-expr64.h>
 #include <kos/compat/linux-stat.h>
 #include <kos/exec/bits/library-listdef64.h>
-#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state64.h>
-#include <kos/kernel/fpu-state.h>
-#include <librpc/bits/syscall-info.h>
 #include <librt/bits/mqueue.h>
 
 
@@ -99,7 +96,6 @@ struct elf64_phdr;
 struct epoll_event;
 struct exception_data64;
 struct file_handle;
-struct fpustate;
 struct getcpu_cache;
 struct iovec64;
 struct lfutexexpr64;
@@ -113,7 +109,6 @@ struct msghdr;
 struct pollfd;
 struct rlimit;
 struct rlimit64;
-struct rpc_syscall_info;
 struct sched_param;
 struct sigaction64;
 struct sigaltstack64;
@@ -123,7 +118,6 @@ struct sysinfo;
 struct termios;
 struct timezone;
 struct tms;
-struct ucpustate;
 struct ucpustate64;
 struct ustat;
 struct utimbuf;
@@ -1189,7 +1183,21 @@ __CDECLARE_SC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigse
 __CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __syscall_ulong_t __signo, struct __siginfo64_struct const *__uinfo),(__tgid,__signo,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
 #if __CRT_HAVE_SC(rt_sigreturn)
-__CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate const *__restore_fpu, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info *__sc_info, struct ucpustate const *__restore_cpu),(__restore_fpu,__restore_sigmask,__sc_info,__restore_cpu))
+/* Restore the given CPU/FPU context descriptors, as well as signal mask
+ * before resuming execution by either invoking another system call `sc_info',
+ * which will then return to `restore_cpu', or by directly returning there.
+ * Arguments:
+ *  - %rbp: [1..1] struct ucpustate64 const *restore_cpu;
+ *  - %rbx: [0..1] struct fpustate64 const *restore_fpu;
+ *  - %r12: [0..1] sigset_t const *restore_sigmask;
+ *  - %r13: [0..1] struct rpc_syscall_info64 const *sc_info;
+ * This system call uses a custom calling convention because registers passed
+ * must not get clobbered during execution of a normal C function. On i386
+ * this doesn't require a custom calling convention since enough registers
+ * exist that are preserved by a C function, but are still used by at least
+ * one system call invocation method. However on x86_64, no such registers
+ * exist, requiring the use of a custom protocol. */
+__CDECLARE_VOID_SC(,rt_sigreturn,(void),())
 #endif /* __CRT_HAVE_SC(rt_sigreturn) */
 #if __CRT_HAVE_SC(rt_sigsuspend)
 __CDECLARE_SC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __size_t __sigsetsize),(__set,__sigsetsize))
