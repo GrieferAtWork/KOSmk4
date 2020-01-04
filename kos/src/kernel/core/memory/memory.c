@@ -98,7 +98,7 @@ NOTHROW(KCALL do_trace_external)(char const *method,
  * allocate less than the maximum request in order to harden the less-traveled
  * paths used when allocating scattered memory. */
 //#define ALLOCATE_MIN_PARTS_RANDOMIZE 1
-#define ALLOCATE_MIN_PARTS_RANDOMIZE_CHANCE()  (krand() < 0x55555555)
+#define ALLOCATE_MIN_PARTS_RANDOMIZE_CHANCE()  (krand32() < 0x55555555)
 #endif /* !NDEBUG */
 
 

@@ -1451,7 +1451,7 @@ restart_acquire_locks:
 		if (ns_pid == 0) {
 next_random_pid:
 			/* Generate a random PID */
-			ns_pid = (krand() % pidcount) + 1; /* +1, so we never use PID#0 */
+			ns_pid = (KRAND(pid_t) % pidcount) + 1; /* +1, so we never use PID#0 */
 		}
 		/* Try to install the taskpid structure under this PID */
 		assert(ns_iter->pn_mask > 0);

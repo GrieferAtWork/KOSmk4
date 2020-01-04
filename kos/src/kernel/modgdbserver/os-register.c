@@ -66,7 +66,7 @@ NOTHROW(FCALL GDB_GetOsRegisterName)(uintptr_t os_regno) {
 }
 
 /* Enumerate/print special OS registers. */
-INTERN NONNULL((1)) bool
+INTERN ATTR_CONST NONNULL((1)) bool
 NOTHROW(FCALL GDB_HasOsRegister)(struct task *__restrict thread, uintptr_t os_regno) {
 	(void)thread;
 	return os_regno < OS_REGISTER_COUNT;

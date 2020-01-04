@@ -268,7 +268,7 @@ NOTHROW(FCALL GDB_GetArchRegisterName)(uintptr_t arch_regno) {
 }
 
 /* Enumerate/print special ARCH registers. */
-INTERN NONNULL((1)) bool
+INTERN ATTR_CONST NONNULL((1)) bool
 NOTHROW(FCALL GDB_HasArchRegister)(struct task *__restrict thread, uintptr_t arch_regno) {
 	(void)thread;
 	return arch_regno < ARCH_REGISTER_COUNT;
@@ -302,6 +302,7 @@ NOTHROW(FCALL GDB_PrintArchRegisterValue)(struct task *__restrict thread, uintpt
 		break;
 
 	default:
+		result = 0;
 		break;
 	}
 	return result;

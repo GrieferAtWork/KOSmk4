@@ -42,7 +42,7 @@ PRIVATE u32 const rand_map[] = {
 };
 
 /* Generate and return a 32-bit, pseudo-random integer. */
-PUBLIC NOBLOCK WUNUSED u32 NOTHROW(KCALL krand)(void) {
+PUBLIC NOBLOCK WUNUSED u32 NOTHROW(KCALL krand32)(void) {
 	u32 old_seed, new_seed;
 	do {
 		new_seed = old_seed = ATOMIC_READ(krand_seed);
@@ -53,7 +53,7 @@ PUBLIC NOBLOCK WUNUSED u32 NOTHROW(KCALL krand)(void) {
 }
 
 PUBLIC NOBLOCK WUNUSED u32
-NOTHROW(KCALL krand_r)(u32 *__restrict pseed) {
+NOTHROW(KCALL krand32_r)(u32 *__restrict pseed) {
 	u32 old_seed, new_seed;
 	new_seed = old_seed = *pseed;
 	new_seed = (((new_seed + 7) << 1) / 3);

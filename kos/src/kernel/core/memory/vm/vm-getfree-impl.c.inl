@@ -59,13 +59,13 @@ INTERN NOBLOCK uintptr_t
 NOTHROW(KCALL krand_exponential)(uintptr_t rand_limit, uintptr_t rand_avg) {
 	uintptr_t result;
 	assert(rand_limit != 0);
-	result = krandptr() % rand_limit;
-	result &= krandptr() % rand_limit;
-	result += (krandptr() % rand_limit) >> 16;
+	result = krand() % rand_limit;
+	result &= krand() % rand_limit;
+	result += (krand() % rand_limit) >> 16;
 	result += rand_avg;
-	result &= ((krandptr() % rand_limit) |
-	           (krandptr() % rand_limit) |
-	           (krandptr() % rand_limit));
+	result &= ((krand() % rand_limit) |
+	           (krand() % rand_limit) |
+	           (krand() % rand_limit));
 	result %= rand_limit; /* Prevent overflow. */
 	return result;
 }

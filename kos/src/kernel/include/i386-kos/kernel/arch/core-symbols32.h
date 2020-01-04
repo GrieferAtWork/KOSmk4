@@ -1639,9 +1639,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, cpu_private_function_callbuf_ex; .int 0
 	.int 0x1a95198
 	.long .Lname409 /* index: 409 */
-	.weak krand; .long krand
-	.reloc ., R_386_SIZE32, krand; .int 0
-	.int 0x728844
+	.weak superblock_mountlock_tryread; .long superblock_mountlock_tryread
+	.reloc ., R_386_SIZE32, superblock_mountlock_tryread; .int 0
+	.int 0x2a1f844
 	.long 0 /* index: 410 */
 	.long 0
 	.int 0
@@ -4459,9 +4459,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, mouse_buffer_trygetpacket; .int 0
 	.int 0xe4b64
 	.long .Lname1114 /* index: 1114 */
-	.weak thisvm_pdir_phys_ptr; .long thisvm_pdir_phys_ptr
-	.reloc ., R_386_SIZE32, thisvm_pdir_phys_ptr; .int 0
-	.int 0x7b3d712
+	.weak sys_fgetxattr; .long sys_fgetxattr
+	.reloc ., R_386_SIZE32, sys_fgetxattr; .int 0
+	.int 0x7b7d712
 	.long 0 /* index: 1115 */
 	.long 0
 	.int 0
@@ -5907,9 +5907,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_setgroups; .int 0
 	.int 0x1e205c3
 	.long .Lname1476 /* index: 1476 */
-	.weak vm_paged_syncone_locked; .long vm_paged_syncone_locked
-	.reloc ., R_386_SIZE32, vm_paged_syncone_locked; .int 0
-	.int 0xde575c4
+	.weak thisvm_pdir_phys_ptr; .long thisvm_pdir_phys_ptr
+	.reloc ., R_386_SIZE32, thisvm_pdir_phys_ptr; .int 0
+	.int 0x7b3d712
 	.long .Lname1477 /* index: 1477 */
 	.weak pagedir_unmapone; .long pagedir_unmapone
 	.reloc ., R_386_SIZE32, pagedir_unmapone; .int 0
@@ -6315,9 +6315,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname1578 /* index: 1578 */
-	.weak sys_syncfs; .long sys_syncfs
-	.reloc ., R_386_SIZE32, sys_syncfs; .int 0
-	.int 0x6a9f943
+	.weak task_raisesignalprocess; .long task_raisesignalprocess
+	.reloc ., R_386_SIZE32, task_raisesignalprocess; .int 0
+	.int 0x8915943
 	.long 0 /* index: 1579 */
 	.long 0
 	.int 0
@@ -7051,9 +7051,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname1762 /* index: 1762 */
-	.weak sys_set_exception_handler; .long sys_set_exception_handler
-	.reloc ., R_386_SIZE32, sys_set_exception_handler; .int 0
-	.int 0xa9f56e2
+	.weak krand32_r; .long krand32_r
+	.reloc ., R_386_SIZE32, krand32_r; .int 0
+	.int 0x84716e2
 	.long .Lname1763 /* index: 1763 */
 	.weak pty_alloc; .long pty_alloc
 	.reloc ., R_386_SIZE32, pty_alloc; .int 0
@@ -7243,9 +7243,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vio_cmpxch_or_writew; .int 0
 	.int 0x8230f27
 	.long .Lname1810 /* index: 1810 */
-	.weak sys_fgetxattr; .long sys_fgetxattr
-	.reloc ., R_386_SIZE32, sys_fgetxattr; .int 0
-	.int 0x7b7d712
+	.weak krand32; .long krand32
+	.reloc ., R_386_SIZE32, krand32; .int 0
+	.int 0x2884712
 	.long .Lname1811 /* index: 1811 */
 	.weak block_device_sync; .long block_device_sync
 	.reloc ., R_386_SIZE32, block_device_sync; .int 0
@@ -9487,9 +9487,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, path_recent_clear; .int 0
 	.int 0xa53942
 	.long .Lname2371 /* index: 2371 */
-	.weak superblock_mountlock_tryread; .long superblock_mountlock_tryread
-	.reloc ., R_386_SIZE32, superblock_mountlock_tryread; .int 0
-	.int 0x2a1f844
+	.weak sys_syncfs; .long sys_syncfs
+	.reloc ., R_386_SIZE32, sys_syncfs; .int 0
+	.int 0x6a9f943
 	.long .Lname2372 /* index: 2372 */
 	.weak cpu_sendipi_cpuset; .long cpu_sendipi_cpuset
 	.reloc ., R_386_SIZE32, cpu_sendipi_cpuset; .int 0
@@ -10183,9 +10183,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname2545 /* index: 2545 */
-	.weak thiscpu_quantum_offset; .long thiscpu_quantum_offset
-	.reloc ., R_386_SIZE32, thiscpu_quantum_offset; .int 0
-	.int 0x8b97a74
+	.weak sys_ugetrlimit; .long sys_ugetrlimit
+	.reloc ., R_386_SIZE32, sys_ugetrlimit; .int 0
+	.int 0xb245a74
 	.long .Lname2546 /* index: 2546 */
 	.weak memchr; .long memchr
 	.reloc ., R_386_SIZE32, memchr; .int 0
@@ -10314,10 +10314,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak x86_asm_except_personality; .long x86_asm_except_personality
 	.reloc ., R_386_SIZE32, x86_asm_except_personality; .int 0
 	.int 0xe2c0ae9
-	.long .Lname2578 /* index: 2578 */
-	.weak krand_r; .long krand_r
-	.reloc ., R_386_SIZE32, krand_r; .int 0
-	.int 0x2884a12
+	.long 0 /* index: 2578 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname2579 /* index: 2579 */
 	.weak driver_unloaded_callbacks; .long driver_unloaded_callbacks
 	.reloc ., R_386_SIZE32, driver_unloaded_callbacks; .int 0
@@ -10410,10 +10410,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vio_subl; .long vio_subl
 	.reloc ., R_386_SIZE32, vio_subl; .int 0
 	.int 0x56ac5c
-	.long .Lname2602 /* index: 2602 */
-	.weak task_raisesignalprocess; .long task_raisesignalprocess
-	.reloc ., R_386_SIZE32, task_raisesignalprocess; .int 0
-	.int 0x8915943
+	.long 0 /* index: 2602 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname2603 /* index: 2603 */
 	.weak debuginfo_cu_parser_loadattr_lexical_block; .long debuginfo_cu_parser_loadattr_lexical_block
 	.reloc ., R_386_SIZE32, debuginfo_cu_parser_loadattr_lexical_block; .int 0
@@ -11258,10 +11258,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datapart_do_copyram; .long vm_datapart_do_copyram
 	.reloc ., R_386_SIZE32, vm_datapart_do_copyram; .int 0
 	.int 0xb4f0afd
-	.long 0 /* index: 2814 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname2814 /* index: 2814 */
+	.weak thiscpu_quantum_offset; .long thiscpu_quantum_offset
+	.reloc ., R_386_SIZE32, thiscpu_quantum_offset; .int 0
+	.int 0x8b97a74
 	.long .Lname2815 /* index: 2815 */
 	.weak rwlock_pollwrite; .long rwlock_pollwrite
 	.reloc ., R_386_SIZE32, rwlock_pollwrite; .int 0
@@ -13490,10 +13490,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long 0 /* index: 3372 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname3372 /* index: 3372 */
+	.weak vm_paged_syncone_locked; .long vm_paged_syncone_locked
+	.reloc ., R_386_SIZE32, vm_paged_syncone_locked; .int 0
+	.int 0xde575c4
 	.long 0 /* index: 3373 */
 	.long 0
 	.int 0
@@ -15079,9 +15079,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vm_do_allocram_nx; .int 0
 	.int 0xfad1eb8
 	.long .Lname3769 /* index: 3769 */
-	.weak sys_ugetrlimit; .long sys_ugetrlimit
-	.reloc ., R_386_SIZE32, sys_ugetrlimit; .int 0
-	.int 0xb245a74
+	.weak sys_set_exception_handler; .long sys_set_exception_handler
+	.reloc ., R_386_SIZE32, sys_set_exception_handler; .int 0
+	.int 0xa9f56e2
 	.long 0 /* index: 3770 */
 	.long 0
 	.int 0
@@ -16871,7 +16871,7 @@ END(kernel_symbol_table)
 .Lname408:
 	.string "cpu_private_function_callbuf_ex"
 .Lname409:
-	.string "krand"
+	.string "superblock_mountlock_tryread"
 .Lname411:
 	.string "inode_awritek"
 .Lname414:
@@ -17715,7 +17715,7 @@ END(kernel_symbol_table)
 .Lname1113:
 	.string "mouse_buffer_trygetpacket"
 .Lname1114:
-	.string "thisvm_pdir_phys_ptr"
+	.string "sys_fgetxattr"
 .Lname1116:
 	.string "vmb_find_last_node_lower_equal"
 .Lname1117:
@@ -18147,7 +18147,7 @@ END(kernel_symbol_table)
 .Lname1475:
 	.string "sys_setgroups"
 .Lname1476:
-	.string "vm_paged_syncone_locked"
+	.string "thisvm_pdir_phys_ptr"
 .Lname1477:
 	.string "pagedir_unmapone"
 .Lname1480:
@@ -18273,7 +18273,7 @@ END(kernel_symbol_table)
 .Lname1576:
 	.string "vm_paged_map_subrange"
 .Lname1578:
-	.string "sys_syncfs"
+	.string "task_raisesignalprocess"
 .Lname1581:
 	.string "task_setprocessgroupleader"
 .Lname1584:
@@ -18465,7 +18465,7 @@ END(kernel_symbol_table)
 .Lname1759:
 	.string "character_device_pwrite"
 .Lname1762:
-	.string "sys_set_exception_handler"
+	.string "krand32_r"
 .Lname1763:
 	.string "pty_alloc"
 .Lname1764:
@@ -18519,7 +18519,7 @@ END(kernel_symbol_table)
 .Lname1809:
 	.string "vio_cmpxch_or_writew"
 .Lname1810:
-	.string "sys_fgetxattr"
+	.string "krand32"
 .Lname1811:
 	.string "block_device_sync"
 .Lname1812:
@@ -19159,7 +19159,7 @@ END(kernel_symbol_table)
 .Lname2370:
 	.string "path_recent_clear"
 .Lname2371:
-	.string "superblock_mountlock_tryread"
+	.string "sys_syncfs"
 .Lname2372:
 	.string "cpu_sendipi_cpuset"
 .Lname2373:
@@ -19343,7 +19343,7 @@ END(kernel_symbol_table)
 .Lname2541:
 	.string "vio_subb"
 .Lname2545:
-	.string "thiscpu_quantum_offset"
+	.string "sys_ugetrlimit"
 .Lname2546:
 	.string "memchr"
 .Lname2547:
@@ -19388,8 +19388,6 @@ END(kernel_symbol_table)
 	.string "superblock_nodeslock_trywrite"
 .Lname2577:
 	.string "x86_asm_except_personality"
-.Lname2578:
-	.string "krand_r"
 .Lname2579:
 	.string "driver_unloaded_callbacks"
 .Lname2580:
@@ -19418,8 +19416,6 @@ END(kernel_symbol_table)
 	.string "sys_set_thread_area"
 .Lname2601:
 	.string "vio_subl"
-.Lname2602:
-	.string "task_raisesignalprocess"
 .Lname2603:
 	.string "debuginfo_cu_parser_loadattr_lexical_block"
 .Lname2604:
@@ -19690,6 +19686,8 @@ END(kernel_symbol_table)
 	.string "x86_dbg_setregbyidp"
 .Lname2813:
 	.string "vm_datapart_do_copyram"
+.Lname2814:
+	.string "thiscpu_quantum_offset"
 .Lname2815:
 	.string "rwlock_pollwrite"
 .Lname2816:
@@ -20370,6 +20368,8 @@ END(kernel_symbol_table)
 	.string "keyboard_device_fini"
 .Lname3370:
 	.string "vm_datablock_debugheap_type"
+.Lname3372:
+	.string "vm_paged_syncone_locked"
 .Lname3375:
 	.string "vm_do_ccfreeram"
 .Lname3377:
@@ -20875,7 +20875,7 @@ END(kernel_symbol_table)
 .Lname3768:
 	.string "vm_do_allocram_nx"
 .Lname3769:
-	.string "sys_ugetrlimit"
+	.string "sys_set_exception_handler"
 .Lname3772:
 	.string "sighand_raise_signal"
 .Lname3775:

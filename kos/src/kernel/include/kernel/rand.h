@@ -27,21 +27,30 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* Generate and return a 32-bit, pseudo-random integer. */
-FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL krand)(void);
-LOCAL NOBLOCK WUNUSED u64 NOTHROW(KCALL krand64)(void) { return (u64)krand() | (u64)krand() << 32; }
-FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL krand_r)(u32 *__restrict pseed);
+FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL krand32)(void);
+FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL krand32_r)(u32 *__restrict pseed);
+
+LOCAL NOBLOCK WUNUSED u64 NOTHROW(KCALL krand64)(void) {
+	return (u64)krand32() | (u64)krand32() << 32;
+}
 
 #ifdef __INTELLISENSE__
-FUNDEF NOBLOCK WUNUSED uintptr_t NOTHROW(KCALL krandptr)(void);
+FUNDEF NOBLOCK WUNUSED uintptr_t NOTHROW(KCALL krand)(void);
 #elif __SIZEOF_POINTER__ <= 4
-#define krandptr()   krand()
+#define krand() krand32()
 #else
-#define krandptr()   krand64()
+#define krand() krand64()
 #endif
+
+#ifdef __NO_builtin_choose_expr
+#define KRAND(T) (sizeof(T) <= 4 ? krand32() : krand64())
+#else /* __NO_builtin_choose_expr */
+#define KRAND(T) __builtin_choose_expr(sizeof(T) <= 4, krand32(), krand64())
+#endif /* !__NO_builtin_choose_expr */
+
 
 /* The current kernel seed. */
 DATDEF WEAK u32 krand_seed;
-
 
 #endif /* __CC__ */
 

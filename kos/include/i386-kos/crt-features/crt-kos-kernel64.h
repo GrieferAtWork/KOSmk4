@@ -846,8 +846,8 @@
 #define __CRT_HAVE_kmemalign_offset 1
 #define __CRT_HAVE_kmemalign_offset_nx 1
 #define __CRT_HAVE_kprinter 1
-#define __CRT_HAVE_krand 1
-#define __CRT_HAVE_krand_r 1
+#define __CRT_HAVE_krand32 1
+#define __CRT_HAVE_krand32_r 1
 #define __CRT_HAVE_krand_seed 1
 #define __CRT_HAVE_krealign 1
 #define __CRT_HAVE_krealign_nx 1

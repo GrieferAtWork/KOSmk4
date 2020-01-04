@@ -187,7 +187,7 @@ urandom_read(struct character_device *__restrict UNUSED(self),
              iomode_t UNUSED(mode)) THROWS(...) {
 	size_t result = num_bytes;
 	while (num_bytes >= 4) {
-		*(u32 *)dst = krand();
+		*(u32 *)dst = krand32();
 		dst         = (byte_t *)dst + 4;
 		num_bytes -= 4;
 	}
@@ -196,7 +196,7 @@ urandom_read(struct character_device *__restrict UNUSED(self),
 			u32 r;
 			u8 b[4];
 		} x;
-		x.r = krand();
+		x.r = krand32();
 		while (num_bytes--)
 			((u8 *)dst)[num_bytes] = x.b[num_bytes];
 	}
@@ -219,7 +219,7 @@ urandom_poll(struct character_device *__restrict UNUSED(self),
 
 PRIVATE u32 KCALL krand32_nondeterministic(void) {
 	/* TODO */
-	return krand();
+	return krand32();
 }
 
 PRIVATE u16 KCALL krand16_nondeterministic(void) {
@@ -367,15 +367,15 @@ random_mmap(struct character_device *__restrict UNUSED(self),
 }
 
 PRIVATE u8 KCALL urandom_rdb(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
-	return (u8)krand();
+	return (u8)krand32();
 }
 
 PRIVATE u16 KCALL urandom_rdw(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
-	return (u16)krand();
+	return (u16)krand32();
 }
 
 PRIVATE u32 KCALL urandom_rdl(struct vio_args *__restrict UNUSED(args), pos_t UNUSED(addr)) {
-	return krand();
+	return krand32();
 }
 
 #ifdef CONFIG_VIO_HAS_QWORD
