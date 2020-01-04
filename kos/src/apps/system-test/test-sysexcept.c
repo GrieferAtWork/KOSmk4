@@ -234,6 +234,26 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		assert_error_code(E_DIVIDE_BY_ZERO);
 	}
 
+	/* Throw an exception manually by using the THROW() macro (with additional pointers). */
+	assert_error_code(E_OK);
+	TRY {
+		THROW(E_DIVIDE_BY_ZERO, 1, 2, 3);
+		assert_failed("THROW(): Shouldn't get here!\n");
+	} EXCEPT {
+		unsigned int i;
+		struct exception_data *data;
+		assert_error_code(E_DIVIDE_BY_ZERO);
+		data = error_data();
+		assertf(data->e_pointers[0] == 1, "data->e_pointers[0] = %p", data->e_pointers[0]);
+		assertf(data->e_pointers[1] == 2, "data->e_pointers[1] = %p", data->e_pointers[1]);
+		assertf(data->e_pointers[2] == 3, "data->e_pointers[2] = %p", data->e_pointers[2]);
+		for (i = 3; i < COMPILER_LENOF(data->e_pointers); ++i) {
+			assertf(data->e_pointers[i] == 0,
+			        "data->e_pointers[%u] = %p",
+			        i, data->e_pointers[i]);
+		}
+	}
+
 	/* Do something that causes the kernel to throw an
 	 * exception due to performing an illegal operation. */
 	assert_error_code(E_OK);
