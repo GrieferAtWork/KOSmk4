@@ -36,6 +36,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/unaligned.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -784,6 +785,69 @@ NOTHROW(FCALL GDBInfo_PrintUserLibraryList)(pformatprinter printer, void *arg,
 	return result;
 }
 
+PRIVATE NONNULL((1, 3)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintRegisters)(pformatprinter printer, void *arg,
+                                      struct task *__restrict thread) {
+	ssize_t temp, result = 0;
+	uintptr_t regno;
+	PRINT("<osdata type=\"regs\">");
+	for (regno = 0; regno < GDB_REGISTER_COUNT; ++regno) {
+		byte_t buf[GDB_REGISTER_MAXSIZE];
+		size_t i, size;
+		size = GDB_GetRegister(thread, regno, buf, sizeof(buf));
+		if (!size || size > sizeof(buf))
+			continue;
+		/* Skip empty registers. */
+		if ((buf[0] == 0 || buf[0] == 0xff) && size > 1) {
+			for (i = 1; i < size; ++i) {
+				if (buf[i] != buf[0])
+					goto do_printer_register;
+			}
+			goto skip_register;
+		}
+do_printer_register:
+		PRINT("<item><column name=\"name\">");
+		DO(GDB_PrintRegisterName(regno, printer, arg));
+		PRINT("</column><column name=\"value\">");
+		if (size == 1) {
+			PRINTF("%#I8x", *(u8 *)buf);
+		} else if (size == 2) {
+			PRINTF("%#I16x", UNALIGNED_GET16((u16 *)buf));
+		} else if (size == 4) {
+			PRINTF("%#I32x", UNALIGNED_GET32((u32 *)buf));
+		} else if (size == 8) {
+			PRINTF("%#I64x", UNALIGNED_GET64((u64 *)buf));
+		} else {
+			for (i = 0; i < size; ++i) {
+				if (i != 0)
+					PRINT(" ");
+				PRINTF("%.2I8X", buf[i]);
+			}
+		}
+		PRINT("</column></item>");
+skip_register:
+		;
+	}
+	for (regno = 0; GDB_HasOsRegister(thread, regno); ++regno) {
+		PRINT("<item><column name=\"name\">");
+		DO(GDB_PrintOsRegisterName(thread, regno, printer, arg));
+		PRINT("</column><column name=\"value\">");
+		DO(GDB_PrintOsRegisterValue(thread, regno, printer, arg));
+		PRINT("</column></item>");
+	}
+	for (regno = 0; GDB_HasArchRegister(thread, regno); ++regno) {
+		PRINT("<item><column name=\"name\">");
+		DO(GDB_PrintArchRegisterName(thread, regno, printer, arg));
+		PRINT("</column><column name=\"value\">");
+		DO(GDB_PrintArchRegisterValue(thread, regno, printer, arg));
+		PRINT("</column></item>");
+	}
+	PRINT("</osdata>");
+	return result;
+err:
+	return temp;
+}
+
 
 PRIVATE char const GDBInfo_OsDataOverview[] =
 "<osdata type=\"types\">"
@@ -817,6 +881,11 @@ PRIVATE char const GDBInfo_OsDataOverview[] =
 		"<column name=\"Description\">Libraries</column>"
 		"<column name=\"Title\">List information about user-space libraries</column>"
 	"</item>"
+	"<item>"
+		"<column name=\"Type\">regs</column>"
+		"<column name=\"Description\">Registers</column>"
+		"<column name=\"Title\">Enumerate _all_ registers</column>"
+	"</item>"
 "</osdata>";
 
 
@@ -843,6 +912,8 @@ NOTHROW(FCALL GDBInfo_PrintOSData)(pformatprinter printer, void *arg,
 		result = GDBInfo_PrintOSThreadList(printer, arg);
 	} else if (strcmp(name, "libraries") == 0) {
 		result = GDBInfo_PrintUserLibraryList(printer, arg, thread);
+	} else if (strcmp(name, "regs") == 0) {
+		result = GDBInfo_PrintRegisters(printer, arg, thread);
 	} else {
 		result = -ENOENT;
 	}

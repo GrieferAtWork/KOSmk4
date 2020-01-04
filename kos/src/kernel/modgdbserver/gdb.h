@@ -26,6 +26,7 @@
 #include <sched/signal.h>
 #include <sched/task.h>
 
+#include <bits/format-printer.h>
 #include <kos/kernel/gdb-cpu-state.h>
 
 DECL_BEGIN
@@ -224,6 +225,17 @@ INTERN void FCALL GDBInterrupt_Fini(void);
  * @return: 0 : Invalid `regno', or `thread' has terminated. */
 INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_GetRegister)(struct task *__restrict thread, uintptr_t regno, void *buf, size_t bufsize);
 INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_SetRegister)(struct task *__restrict thread, uintptr_t regno, void const *buf, size_t bufsize);
+INTDEF NONNULL((2)) ssize_t NOTHROW(FCALL GDB_PrintRegisterName)(uintptr_t regno, __pformatprinter printer, void *arg);
+
+/* Enumerate/print special OS registers. */
+INTDEF NONNULL((1)) bool NOTHROW(FCALL GDB_HasOsRegister)(struct task *__restrict thread, uintptr_t os_regno);
+INTDEF NONNULL((1, 3)) ssize_t NOTHROW(FCALL GDB_PrintOsRegisterName)(struct task *__restrict thread, uintptr_t os_regno, __pformatprinter printer, void *arg);
+INTDEF NONNULL((1, 3)) ssize_t NOTHROW(FCALL GDB_PrintOsRegisterValue)(struct task *__restrict thread, uintptr_t os_regno, __pformatprinter printer, void *arg);
+
+/* Enumerate/print special Arch registers. */
+INTDEF NONNULL((1)) bool NOTHROW(FCALL GDB_HasArchRegister)(struct task *__restrict thread, uintptr_t arch_regno);
+INTDEF NONNULL((1, 3)) ssize_t NOTHROW(FCALL GDB_PrintArchRegisterName)(struct task *__restrict thread, uintptr_t arch_regno, __pformatprinter printer, void *arg);
+INTDEF NONNULL((1, 3)) ssize_t NOTHROW(FCALL GDB_PrintArchRegisterValue)(struct task *__restrict thread, uintptr_t arch_regno, __pformatprinter printer, void *arg);
 
 #ifdef __INTELLISENSE__
 /* Get/Set the program counter register.

@@ -29,6 +29,7 @@ __SYSDECL_BEGIN
 
 #ifdef __x86_64__
 #define GDB_REGISTER_MAXSIZE GDB_REGISTER_X86_64_MAXSIZE
+#define GDB_REGISTER_COUNT   GDB_REGISTER_X86_64_COUNT
 #define GDB_REGISTER_PC      GDB_REGISTER_X86_64_RIP
 #define gdb_cpustate64       gdb_cpustate
 #endif /* __x86_64__ */
@@ -70,10 +71,10 @@ __SYSDECL_BEGIN
 #define GDB_REGISTER_X86_64_FCW    0x20 /* 32-bit fs_fcw (fctrl) */
 #define GDB_REGISTER_X86_64_FSW    0x21 /* 32-bit fs_fsw (fstat) */
 #define GDB_REGISTER_X86_64_FTW    0x22 /* 32-bit fs_ftw (ftag) */
-#define GDB_REGISTER_X86_64_FPUCS  0x23 /* 32-bit fs_fcs (fiseg) */
-#define GDB_REGISTER_X86_64_FPUIP  0x24 /* 32-bit fs_fip (fioff) */
-#define GDB_REGISTER_X86_64_FPUDS  0x25 /* 32-bit fs_fds (foseg) */
-#define GDB_REGISTER_X86_64_FPUDP  0x26 /* 32-bit fs_fdp (fooff) */
+#define GDB_REGISTER_X86_64_FCS    0x23 /* 32-bit fs_fcs (fiseg) */
+#define GDB_REGISTER_X86_64_FIP    0x24 /* 32-bit fs_fip (fioff) */
+#define GDB_REGISTER_X86_64_FDS    0x25 /* 32-bit fs_fds (foseg) */
+#define GDB_REGISTER_X86_64_FDP    0x26 /* 32-bit fs_fdp (fooff) */
 #define GDB_REGISTER_X86_64_FOP    0x27 /* 32-bit fs_fop (fop) */
 #define GDB_REGISTER_X86_64_XMM0   0x28 /* 128-bit %xmm0 */
 #define GDB_REGISTER_X86_64_XMM1   0x29 /* 128-bit %xmm1 */
@@ -94,6 +95,7 @@ __SYSDECL_BEGIN
 #define GDB_REGISTER_X86_64_MXCSR  0x38 /* 32-bit %mxcsr */
 #define GDB_REGISTER_X86_64_FSBASE 0x40 /* 64-bit %fs.base */
 #define GDB_REGISTER_X86_64_GSBASE 0x41 /* 64-bit %gs.base */
+#define GDB_REGISTER_X86_64_COUNT  0x42
 
 
 #ifdef __CC__

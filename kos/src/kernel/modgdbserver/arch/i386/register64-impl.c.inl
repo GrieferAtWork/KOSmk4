@@ -240,7 +240,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			}
 			break;
 
-		case GDB_REGISTER_X86_64_FPUCS:
+		case GDB_REGISTER_X86_64_FCS:
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fcs);
 			} else {
@@ -248,7 +248,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			}
 			break;
 
-		case GDB_REGISTER_X86_64_FPUIP:
+		case GDB_REGISTER_X86_64_FIP:
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fip);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {
@@ -258,7 +258,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			}
 			break;
 
-		case GDB_REGISTER_X86_64_FPUDS:
+		case GDB_REGISTER_X86_64_FDS:
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fds);
 			} else {
@@ -266,7 +266,7 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			}
 			break;
 
-		case GDB_REGISTER_X86_64_FPUDP:
+		case GDB_REGISTER_X86_64_FDP:
 			if (x86_fpustate_variant == FPU_STATE_SSTATE) {
 				FIELD4(fpu->f_ssave.fs_fdp);
 			} else if (x86_fpustate_variant == FPU_STATE_XSTATE) {

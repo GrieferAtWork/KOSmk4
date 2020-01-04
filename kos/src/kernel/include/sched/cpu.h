@@ -81,7 +81,7 @@ DECL_BEGIN
 
 #ifndef CONFIG_NO_SMP
 #define CPU_PENDING_ENDOFCHAIN (__CCAST(struct task *)(-1))
-#endif
+#endif /* !CONFIG_NO_SMP */
 
 #ifdef __CC__
 

@@ -93,6 +93,12 @@ FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) upid_t
 NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
                                 struct pidns const *__restrict ns);
 
+/* Return the PID of `self' within its own PID namespace. */
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+NOTHROW(KCALL taskpid_getselfpid)(struct taskpid const *__restrict self);
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+NOTHROW(KCALL taskpid_getselfpid_s)(struct taskpid const *__restrict self);
+
 /* Return the PID of `self' within the root PID namespace. */
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self);
@@ -299,24 +305,28 @@ FORCELOCAL NOBLOCK WUNUSED ATTR_PURE upid_t NOTHROW(KCALL task_getrootpid_s)(voi
  * With that in mind, the non-*_s variants will cause kernel panic/undefined behavior for any
  * for the following situations:
  * task_gettid_of:
- *   - FORTASK(thread,this_taskpid) == NULL                                  (`thread' is a kernel thread)
+ *   - FORTASK(thread, this_taskpid) == NULL                                  (`thread' is a kernel thread)
  *   - THIS_TASKPID == NULL                                                   (The caller is a kernel thread)
  * task_getroottid_of:
- *   - FORTASK(thread,this_taskpid) == NULL                                  (`thread' is a kernel thread)
+ *   - FORTASK(thread, this_taskpid) == NULL                                  (`thread' is a kernel thread)
  * task_getpid_of:
- *   - FORTASK(thread,_this_group.tg_process) == NULL                         (`thread' is a kernel thread)
- *   - FORTASK(FORTASK(thread,_this_group.tg_process),this_taskpid) == NULL  (The process leader of `thread' is a kernel thread)
+ *   - FORTASK(thread, _this_group.tg_process) == NULL                        (`thread' is a kernel thread)
+ *   - FORTASK(FORTASK(thread, _this_group.tg_process), this_taskpid) == NULL (The process leader of `thread' is a kernel thread)
  *   - THIS_TASKPID == NULL                                                   (The caller is a kernel thread)
  * task_getrootpid_of:
- *   - FORTASK(thread,_this_group.tg_process) == NULL                         (`thread' is a kernel thread)
- *   - FORTASK(FORTASK(thread,_this_group.tg_process),this_taskpid) == NULL  (The process leader of `thread' is a kernel thread)
+ *   - FORTASK(thread, _this_group.tg_process) == NULL                        (`thread' is a kernel thread)
+ *   - FORTASK(FORTASK(thread, _this_group.tg_process), this_taskpid) == NULL (The process leader of `thread' is a kernel thread)
  */
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread);
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread);
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getselftid_of)(struct task const *__restrict thread);
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getselftid_of_s)(struct task const *__restrict thread);
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getroottid_of)(struct task const *__restrict thread);
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getroottid_of_s)(struct task const *__restrict thread);
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getpid_of)(struct task const *__restrict thread);
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getpid_of_s)(struct task const *__restrict thread);
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getselfpid_of)(struct task const *__restrict thread);
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getselfpid_of_s)(struct task const *__restrict thread);
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getrootpid_of)(struct task const *__restrict thread);
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t NOTHROW(KCALL task_getrootpid_of_s)(struct task const *__restrict thread);
 
@@ -569,6 +579,17 @@ NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
 		return self->tp_pids[ns->pn_indirection];
 	return 0;
 }
+
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+NOTHROW(KCALL taskpid_getselfpid)(struct taskpid const *__restrict self) {
+	return taskpid_getpid(self, self->tp_pidns);
+}
+
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+NOTHROW(KCALL taskpid_getselfpid_s)(struct taskpid const *__restrict self) {
+	return taskpid_getpid_s(self, self->tp_pidns);
+}
+
 
 /* Return the PID of `self' within the root PID namespace. */
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
@@ -995,11 +1016,28 @@ NOTHROW(KCALL task_gettid_of)(struct task const *__restrict thread) {
 }
 
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+NOTHROW(KCALL task_getselftid_of)(struct task const *__restrict thread) {
+	struct taskpid *pid = FORTASK(thread, this_taskpid);
+	__hybrid_assertf(pid, "task_getselftid_of(%p) is a kernel thread", thread);
+	__hybrid_assertf(pid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection,
+	                 "task_getselftid_of(%p) PID cannot be represented in the caller's namespace", thread);
+	return pid->tp_pids[pid->tp_pidns->pn_indirection];
+}
+
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
 NOTHROW(KCALL task_gettid_of_s)(struct task const *__restrict thread) {
 	struct taskpid *pid   = FORTASK(thread, this_taskpid);
 	struct taskpid *mypid = THIS_TASKPID;
 	return likely(pid && mypid && mypid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
 	       ? pid->tp_pids[mypid->tp_pidns->pn_indirection]
+	       : 0;
+}
+
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+NOTHROW(KCALL task_getselftid_of_s)(struct task const *__restrict thread) {
+	struct taskpid *pid = FORTASK(thread, this_taskpid);
+	return likely(pid && pid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
+	       ? pid->tp_pids[pid->tp_pidns->pn_indirection]
 	       : 0;
 }
 
@@ -1031,6 +1069,18 @@ NOTHROW(KCALL task_getpid_of)(struct task const *__restrict thread) {
 }
 
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+NOTHROW(KCALL task_getselfpid_of)(struct task const *__restrict thread) {
+	struct taskpid *pid;
+	struct task *leader = task_getprocess_of(thread);
+	__hybrid_assertf(leader, "task_getselfpid_of(%p) is a kernel thread", thread);
+	pid = FORTASK(leader, this_taskpid);
+	__hybrid_assertf(pid, "task_getselfpid_of(%p) is a thread within a kernel process", thread);
+	__hybrid_assertf(pid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection,
+	                 "task_getselfpid_of(%p) PID cannot be represented in the caller's namespace", thread);
+	return pid->tp_pids[pid->tp_pidns->pn_indirection];
+}
+
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
 NOTHROW(KCALL task_getpid_of_s)(struct task const *__restrict thread) {
 	struct taskpid *pid;
 	struct task *leader   = task_getprocess_of(thread);
@@ -1038,8 +1088,20 @@ NOTHROW(KCALL task_getpid_of_s)(struct task const *__restrict thread) {
 	if unlikely(!leader || !mypid)
 		return 0;
 	pid = FORTASK(leader, this_taskpid);
-	return likely(pid && mypid && mypid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
+	return likely(pid && mypid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
 	       ? pid->tp_pids[mypid->tp_pidns->pn_indirection]
+	       : 0;
+}
+
+FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) upid_t
+NOTHROW(KCALL task_getselfpid_of_s)(struct task const *__restrict thread) {
+	struct taskpid *pid;
+	struct task *leader = task_getprocess_of(thread);
+	if unlikely(!leader)
+		return 0;
+	pid = FORTASK(leader, this_taskpid);
+	return likely(pid && pid->tp_pidns->pn_indirection <= pid->tp_pidns->pn_indirection)
+	       ? pid->tp_pids[pid->tp_pidns->pn_indirection]
 	       : 0;
 }
 
