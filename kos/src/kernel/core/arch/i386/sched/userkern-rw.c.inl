@@ -30,16 +30,19 @@
 #define USERKERN_WIDTH __SIZEOF_POINTER__
 #endif /* !USERKERN_WIDTH */
 
-#include <hybrid/host.h>
-#include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state-helpers.h>
-#include <kos/kernel/cpu-state-compat.h>
-#include <kos/bits/ukern-struct.h>
 #include <kernel/except.h>
-#include <asm/registers.h>
-#include <asm/cpu-flags.h>
-#include <kos/except-inval.h>
 #include <sched/cred.h>
+
+#include <hybrid/host.h>
+
+#include <asm/cpu-flags.h>
+#include <asm/registers.h>
+#include <kos/bits/ukern-struct.h>
+#include <kos/except-inval.h>
+#include <kos/kernel/cpu-state-compat.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state-verify.h>
+#include <kos/kernel/cpu-state.h>
 
 #ifndef USERKERN_STRUCT
 #if USERKERN_WIDTH == 4
@@ -186,11 +189,7 @@ userkern_set_arch_specific_field(struct vio_args *__restrict args,
 			break;
 		}
 #endif /* !__x86_64__ */
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(value)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_GS, value);
-		}
+		cpustate_verify_usergs(value);
 		icpustate_setgs_novm86(state, value);
 		break;
 
@@ -201,11 +200,7 @@ userkern_set_arch_specific_field(struct vio_args *__restrict args,
 			break;
 		}
 #endif /* !__x86_64__ */
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(value)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_FS, value);
-		}
+		cpustate_verify_userfs(value);
 		icpustate_setfs_novm86(state, value);
 		break;
 
@@ -216,11 +211,7 @@ userkern_set_arch_specific_field(struct vio_args *__restrict args,
 			break;
 		}
 #endif /* !__x86_64__ */
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(value)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_ES, value);
-		}
+		cpustate_verify_useres(value);
 		icpustate_setes_novm86(state, value);
 		break;
 
@@ -231,11 +222,7 @@ userkern_set_arch_specific_field(struct vio_args *__restrict args,
 			break;
 		}
 #endif /* !__x86_64__ */
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(value)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_DS, value);
-		}
+		cpustate_verify_userds(value);
 		icpustate_setds_novm86(state, value);
 		break;
 
@@ -244,11 +231,7 @@ userkern_set_arch_specific_field(struct vio_args *__restrict args,
 		if (!icpustate_isvm86(state))
 #endif /* !__x86_64__ */
 		{
-			if unlikely(!SEGMENT_IS_VALID_USERCODE(value)) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_CS, value);
-			}
+			cpustate_verify_usercs(value);
 		}
 		icpustate_setcs(state, value);
 		break;
@@ -258,11 +241,7 @@ userkern_set_arch_specific_field(struct vio_args *__restrict args,
 		if (!icpustate_isvm86(state))
 #endif /* !__x86_64__ */
 		{
-			if unlikely(!SEGMENT_IS_VALID_USERDATA(value)) {
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_SS, value);
-			}
+			cpustate_verify_userss(value);
 		}
 		icpustate_setuserss(state, value);
 		break;
@@ -274,12 +253,8 @@ userkern_set_arch_specific_field(struct vio_args *__restrict args,
 		*presult = (VALUE_TYPE)icpustate_getpflags(state);
 #else /* DEFINE_IO_READ */
 		uintptr_t pflags_mask = cred_allow_eflags_modify_mask();
-		if ((icpustate_getpflags(state) & ~pflags_mask) !=
-		    (value & ~pflags_mask)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_MISC_EFLAGS, value);
-		}
+		cpustate_verify_userpflags(icpustate_getpflags(state),
+		                           value, pflags_mask);
 		icpustate_setpflags(state, value);
 #endif /* !DEFINE_IO_READ */
 	}	break;

@@ -41,6 +41,7 @@
 #include <kos/bits/debugtrap32.h>
 #include <kos/debugtrap.h>
 #include <kos/except-inval.h>
+#include <kos/kernel/cpu-state-verify.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
 
@@ -218,11 +219,8 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 		cs     = ustate->ucs_cs16;
 		eflags = ustate->ucs_eflags;
 		COMPILER_READ_BARRIER();
-		if unlikely((icpustate_getpflags(return_state) & ~eflags_mask) !=
-		            (eflags & ~eflags_mask))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_MISC_EFLAGS, eflags);
+		cpustate_verify_userpflags(icpustate_getpflags(return_state),
+		                           eflags, eflags_mask);
 #ifndef __x86_64__
 		if (icpustate_isvm86(return_state)) {
 			return_state->ics_irregs_v.ir_es = es;
@@ -233,30 +231,12 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 #endif /* !__x86_64__ */
 		{
 			/* Validate segment register indices before actually restoring them. */
-			if unlikely(!SEGMENT_IS_VALID_USERCODE(cs))
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_CS, cs);
-			if unlikely(!SEGMENT_IS_VALID_USERDATA(gs))
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_GS, gs);
-			if unlikely(!SEGMENT_IS_VALID_USERDATA(fs))
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_FS, fs);
-			if unlikely(!SEGMENT_IS_VALID_USERDATA(es))
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_ES, es);
-			if unlikely(!SEGMENT_IS_VALID_USERDATA(ds))
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_DS, ds);
-			if unlikely(!SEGMENT_IS_VALID_USERDATA(ss))
-				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-				      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-				      X86_REGISTER_SEGMENT_SS, ss);
+			cpustate_verify_usercs(cs);
+			cpustate_verify_usergs(gs);
+			cpustate_verify_userfs(fs);
+			cpustate_verify_useres(es);
+			cpustate_verify_userds(ds);
+			cpustate_verify_userss(ss);
 #ifdef __x86_64__
 			__wrgs_keepbase(gs);
 			__wrfs_keepbase(fs);
@@ -306,37 +286,15 @@ sys_do_debugtrap64_impl(struct icpustate *__restrict return_state,
 		cs     = ustate->ucs_cs16;
 		rflags = ustate->ucs_rflags;
 		COMPILER_READ_BARRIER();
-		if unlikely((icpustate_getpflags(return_state) & ~rflags_mask) !=
-		            (rflags & ~rflags_mask)) {
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_MISC_EFLAGS, rflags);
-		}
+		cpustate_verify_userpflags(icpustate_getpflags(return_state),
+		                           rflags, rflags_mask);
 		/* Validate segment register indices before actually restoring them. */
-		if unlikely(!SEGMENT_IS_VALID_USERCODE(cs))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_CS, cs);
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(gs))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_GS, gs);
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(fs))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_FS, fs);
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(es))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_ES, es);
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ds))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_DS, ds);
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ss))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_SS, ss);
+		cpustate_verify_usercs(cs);
+		cpustate_verify_usergs(gs);
+		cpustate_verify_userfs(fs);
+		cpustate_verify_useres(es);
+		cpustate_verify_userds(ds);
+		cpustate_verify_userss(ss);
 		__wrgs_keepbase(gs);
 		__wrfs_keepbase(fs);
 		__wres(es);

@@ -906,14 +906,18 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 					switch (mod.mi_rm) {
 
 					case 2: /* CLAC */
+#if !(EFLAGS_UMASK & EFLAGS_AC)
 						if (isuser())
 							goto e_privileged_instruction;
+#endif /* !(EFLAGS_UMASK & EFLAGS_AC) */
 						del_pflags(EFLAGS_AC);
 						goto done;
 
 					case 3: /* STAC */
+#if !(EFLAGS_UMASK & EFLAGS_AC)
 						if (isuser())
 							goto e_privileged_instruction;
+#endif /* !(EFLAGS_UMASK & EFLAGS_AC) */
 						add_pflags(EFLAGS_AC);
 						goto done;
 

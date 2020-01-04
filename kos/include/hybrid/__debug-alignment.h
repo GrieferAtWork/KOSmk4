@@ -34,6 +34,8 @@
  * stack-cookie checks (similar to gcc's -fstack-smash-protection). And
  * it's these checks that will always perform unaligned memory accesses,
  * so we can't actually turn on this functionality here, either... */
+#elif defined(__KERNEL__)
+/* EFLAGS.AC is always ignored in kernel-space */
 #elif defined(__x86_64__)
 #ifdef _MSC_VER
 __NAMESPACE_INT_BEGIN

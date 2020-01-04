@@ -33,9 +33,9 @@ DECL_BEGIN
  *            X86_REGISTER_MISC_EFLAGS:
  *                value
  * to be thrown */
-#define cred_allow_eflags_modify_mask()                                                                      \
-	(cred_allow_hwio() ? (EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_OF | EFLAGS_ID) \
-	                   : (EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_OF | EFLAGS_ID | EFLAGS_IOPLMASK))
+#define cred_allow_eflags_modify_mask() \
+	(cred_allow_hwio() ? (EFLAGS_UMASK) \
+	                   : (EFLAGS_UMASK | EFLAGS_IOPLMASK))
 
 
 DECL_END

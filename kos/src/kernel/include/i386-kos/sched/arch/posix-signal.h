@@ -35,8 +35,9 @@ DECL_BEGIN
  * This mask/flag pair can be modified by:
  *  - Passing a `user_eflags_mask=mask,flag' kernel commandline option
  *  - Reading/writing to/from `/proc/sys/x86/user_eflags_mask'
- * NOTE: The later only allows changes to be made to EFLAGS bits
- *       that aren't reserved and don't carry the `(System)' tag. */
+ * NOTE: The later only allows for bits to be changed that are masked
+ *       by `cred_allow_eflags_modify_mask()' for the thread attempting
+ *       to perform the modification. */
 union x86_user_eflags_mask {
 	struct {
 		uint32_t uem_mask; /* Set of bits masked */

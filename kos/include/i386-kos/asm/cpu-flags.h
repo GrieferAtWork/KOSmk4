@@ -39,6 +39,23 @@
 #define EFLAGS_ID          0x00200000 /* [bit(21)] ID Flag (System). */
 #define EFLAGS_GTIOPL(flags) (((flags) >> 12) & 3)
 
+/* Mask of bits that user-space may assume to always be modifiable
+ * There are a couple of instructions in here that I wish weren't available
+ * to ring#3, however ring#3 already has implicit access to them since these
+ * are the bits that `popf[l|q]' allows to be modified.
+ * The only thing that I don't understand about this is `EFLAGS.AC', because
+ * there are 2 dedicated instructions `stac' and `clac' that can be used to
+ * set/clear that bit. However attempting to do so (normally) causes a #GP
+ * if done so from ring#3 (and there is no way to disable this other than
+ * emulating these instructions for ring#3 from kernel-space, as done by
+ * the KOS kernel). So it doesn't actually make sense to lock these instructions
+ * as being privileged when in fact everything they might be useful for can
+ * already be done via the `popf' instruction (which isn't privileged for
+ * `EFLAGS.AC' and cannot be made to be privileged, either...) */
+#define EFLAGS_UMASK                                                         \
+	(EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_TF | \
+	 EFLAGS_DF | EFLAGS_OF | EFLAGS_NT | EFLAGS_AC | EFLAGS_ID)
+
 #define CR0_PE             0x00000001 /* [bit(0)] Protected Mode Enable. */
 #define CR0_MP             0x00000002 /* [bit(1)] Monitor CO-Processor. */
 #define CR0_EM             0x00000004 /* [bit(2)] Emulation. */
