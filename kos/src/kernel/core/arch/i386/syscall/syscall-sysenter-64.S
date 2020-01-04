@@ -28,7 +28,6 @@
 #include <asm/cpu-flags.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
-#include <asm/syscalls32_d.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
@@ -37,6 +36,8 @@
 #include <errno.h>
 
 #include <librpc/rpc.h>
+
+#include "../../../../../../include/i386-kos/asm/syscalls32_d.h"
 
 
 

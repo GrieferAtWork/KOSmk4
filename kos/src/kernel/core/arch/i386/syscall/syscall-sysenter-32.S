@@ -26,7 +26,6 @@
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
-#include <asm/unistd.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/paging.h>
@@ -34,6 +33,8 @@
 #include <errno.h>
 
 #include <librpc/rpc.h>
+
+#include "../../../../../../include/i386-kos/asm/syscalls32.h"
 
 
 

@@ -24,13 +24,13 @@
 #include <kernel/except.h>
 
 #include <asm/cfi.h>
-#include <asm/unistd.h>
 #include <kos/kernel/gdt.h>
 
 #include <errno.h>
 
 #include <librpc/rpc.h>
 
+#include "../../../../../../include/i386-kos/asm/syscalls32.h"
 
 
 
