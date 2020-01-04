@@ -68,6 +68,12 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	/* Copy the PER-VM initialization template. */
 	memcpy((byte_t *)result + PAGEDIR_SIZE, __kernel_pervm_start,
 	       (size_t)__kernel_pervm_size);
+	/* Force an access of the first page of the resulting VM to
+	 * ensure that the page gets faulted (This is a work-around
+	 * for `GFP_PREFLT' because that flag doesn't actually guaranty
+	 * to always fault the resulting memory...) */
+	*(u8 *)result = 0;
+	COMPILER_WRITE_BARRIER();
 	/* Setup and initialize the VM's page directory. */
 	result->v_pdir_phys = pagedir_translate(result);
 	result->v_refcnt    = 1;

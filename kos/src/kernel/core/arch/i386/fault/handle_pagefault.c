@@ -351,8 +351,13 @@ do_handle_iob_node_access:
 					IF_SMP(mycpu = THIS_CPU;)
 					IF_SMP(if (node == &FORCPU(mycpu, thiscpu_x86_iobnode))) {
 						bool allow_preemption;
-						assert(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == NULL ||
-						       FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP);
+						assertf(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == NULL ||
+						        FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP,
+						        "mycpu                                    = %p\n"
+						        "FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = %p\n"
+						        "THIS_X86_IOPERM_BITMAP                   = %p\n",
+						        mycpu, FORCPU(mycpu, thiscpu_x86_ioperm_bitmap),
+						        THIS_X86_IOPERM_BITMAP);
 						/* Make sure to handle any access errors after the ioperm() bitmap
 						 * was already mapped during the current quantum as full segfault. */
 						if unlikely(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) != NULL) {
