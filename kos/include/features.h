@@ -153,11 +153,20 @@
 #endif
 
 /* 64-bit time_t extensions for KOS
- * (By the time of this writing, but I'm guessing by 2038 this'll be
- *  similar to what glibc will have to do if it doesn't wan'na roll over) */
-#ifdef _TIME64_SOURCE
+ * (By the time of this writing, but I'm guessing by 2038-01-19T03:14:07 this'll
+ * be similar to what glibc will have to do if it doesn't wan'na roll over)
+ * Also available as extensions in other libcs:
+ *  - defined(_TIME64_SOURCE):
+ *    - KOS-specific feature macro
+ *  - defined(_TIME64_T):
+ *    - Compaq:     http://www.frascati.enea.it/documentation/tru6450/MAN/MAN3/0254____.HTM
+ *    - Tru64 UNIX: http://nixdoc.net/man-pages/Tru64/man3/difftime.3.html
+ *    - other:      https://www.unix.com/man-page/osf1/3/difftime/
+ */
+#if (defined(_TIME64_SOURCE) || \
+     defined(_TIME64_T))
 #define __USE_TIME64 1
-#endif /* _TIME64_SOURCE */
+#endif /* ... */
 
 #ifdef _TIME_T_BITS
 #if (_TIME_T_BITS+0) == 64

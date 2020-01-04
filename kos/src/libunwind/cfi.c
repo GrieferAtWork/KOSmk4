@@ -363,7 +363,9 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 	if unlikely(!self->ue_sectinfo)
 		goto err_no_cfa;
 	/* Load the current program counter position. */
-	if unlikely(!(*self->ue_regget)(self->ue_regget_arg, CFI_UNWIND_REGISTER_PC, pc_buf.buf))
+	if unlikely(!(*self->ue_regget)(self->ue_regget_arg,
+	                                CFI_UNWIND_REGISTER_PC,
+	                                pc_buf.buf))
 		ERROR(err_invalid_register);
 	/* Search for an FDE descriptor for the program counter within the .eh_frame section. */
 	error = libuw_unwind_fde_scan(self->ue_sectinfo->ues_eh_frame_start,
