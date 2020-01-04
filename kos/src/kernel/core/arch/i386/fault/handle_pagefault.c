@@ -502,7 +502,7 @@ do_handle_iob_node_access:
 					sync_read(part);
 					args.ma_args.va_block = incref(part->dp_block);
 					args.ma_args.va_access_partoff = ((pos_t)(vpage_offset +
-					                                               vm_datapart_mindpage(part))
+					                                          vm_datapart_mindpage(part))
 					                                  << VM_DATABLOCK_ADDRSHIFT(args.ma_args.va_block));
 					sync_endread(part);
 					args.ma_args.va_type = args.ma_args.va_block->db_vio;
@@ -562,7 +562,7 @@ do_handle_iob_node_access:
 #endif /* !__x86_64__ */
 							/* Figure out the exact VIO address that got called. */
 							vio_addr = (pos_t)addr;
-							vio_addr -= (pos_t)args.ma_args.va_access_pageid * PAGESIZE;
+							vio_addr -= (pos_t)PAGEID_DECODE(args.ma_args.va_access_pageid);
 							vio_addr += (pos_t)args.ma_args.va_access_partoff;
 							/* Invoke the VIO call operator. */
 							state = (*args.ma_args.va_type->dtv_call)(&args.ma_args,
@@ -1125,8 +1125,8 @@ not_a_badcall:
 	}
 set_exception_pointers:
 	PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
-#if X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
-    X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING
+#if (X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
+     X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING)
 	PERTASK_SET(this_exception_pointers[1],
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 	            (uintptr_t)(ecode & (X86_PAGEFAULT_ECODE_USERSPACE | X86_PAGEFAULT_ECODE_WRITING)));

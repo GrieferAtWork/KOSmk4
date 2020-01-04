@@ -230,7 +230,7 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 		{
 			if (reladdr < sizeof(USERKERN_STRUCT)) {
 				addr -= (pos_t)args->va_access_partoff;
-				addr += (pos_t)args->va_access_pageid * PAGESIZE;
+				addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 #ifdef DEFINE_IO_READ
 				THROW(E_SEGFAULT_NOTREADABLE,
 				      (uintptr_t)addr,
@@ -251,7 +251,7 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 #endif /* !DEFINE_IO_READ */
 err_invalid_addr:
 	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	THROW(E_SEGFAULT_UNMAPPED,
 	      (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_FAULT |

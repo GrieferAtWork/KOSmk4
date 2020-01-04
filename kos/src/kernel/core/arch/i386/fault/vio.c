@@ -287,7 +287,7 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 	isuser  = icpustate_isuser(state);
 	orig_pc = (byte_t *)icpustate_getpc(state);
 	vio_addr = (pos_t)cr2;
-	vio_addr -= (pos_t)args->ma_args.va_access_pageid * PAGESIZE;
+	vio_addr -= (pos_t)PAGEID_DECODE(args->ma_args.va_access_pageid);
 	vio_addr += (pos_t)args->ma_args.va_access_partoff;
 	TRY {
 		pc     = orig_pc;

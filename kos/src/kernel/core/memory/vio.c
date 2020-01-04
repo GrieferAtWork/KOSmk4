@@ -37,7 +37,7 @@ DECL_BEGIN
 PRIVATE ATTR_NORETURN void KCALL
 vio_illegal_read(struct vio_args const *__restrict args, pos_t addr) {
 	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	THROW(E_SEGFAULT_NOTREADABLE, (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_VIO);
 }
@@ -45,7 +45,7 @@ vio_illegal_read(struct vio_args const *__restrict args, pos_t addr) {
 PRIVATE ATTR_NORETURN void KCALL
 vio_illegal_write(struct vio_args const *__restrict args, pos_t addr) {
 	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	THROW(E_SEGFAULT_READONLY, (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING);
 }
@@ -55,7 +55,7 @@ PRIVATE ATTR_NORETURN void KCALL
 vio_nonatomic_operation128(struct vio_args const *__restrict args,
                            pos_t addr, uint128_t oldval, uint128_t newval) {
 	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	if ((uintptr_t)(uintptr_t)addr & 15) {
 		THROW(E_SEGFAULT_UNALIGNED, (uintptr_t)addr,
 		      E_SEGFAULT_CONTEXT_VIO, 16);
@@ -74,7 +74,7 @@ PRIVATE ATTR_NORETURN void KCALL
 vio_nonatomic_operation64(struct vio_args const *__restrict args,
                           pos_t addr, u64 oldval, u64 newval) {
 	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	if ((uintptr_t)(uintptr_t)addr & 7) {
 		THROW(E_SEGFAULT_UNALIGNED, (uintptr_t)addr,
 		      E_SEGFAULT_CONTEXT_VIO, 8);
@@ -96,7 +96,7 @@ PRIVATE ATTR_NORETURN void KCALL
 vio_nonatomic_operation32(struct vio_args const *__restrict args,
                           pos_t addr, u32 oldval, u32 newval) {
 	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	if ((uintptr_t)(uintptr_t)addr & 3) {
 		THROW(E_SEGFAULT_UNALIGNED, (uintptr_t)addr,
 		      E_SEGFAULT_CONTEXT_VIO, 4);
@@ -110,7 +110,7 @@ PRIVATE ATTR_NORETURN void KCALL
 vio_nonatomic_operation16(struct vio_args const *__restrict args,
                           pos_t addr, u16 oldval, u16 newval) {
 	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	if ((uintptr_t)(uintptr_t)addr & 2) {
 		THROW(E_SEGFAULT_UNALIGNED, (uintptr_t)addr,
 		      E_SEGFAULT_CONTEXT_VIO, 2);
@@ -124,7 +124,7 @@ PRIVATE ATTR_NORETURN void KCALL
 vio_nonatomic_operation8(struct vio_args const *__restrict args,
                          pos_t addr, u8 oldval, u8 newval) {
 	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	THROW(E_SEGFAULT_NOTATOMIC, (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_VIO | E_SEGFAULT_CONTEXT_WRITING, 1,
 	      oldval, 0, newval);

@@ -199,7 +199,7 @@ userkern_segment_call(struct vio_args *__restrict args,
 	return regs;
 err_invalid_addr:
 	addr -= (pos_t)args->va_access_partoff;
-	addr += (pos_t)args->va_access_pageid * PAGESIZE;
+	addr += (pos_t)PAGEID_DECODE(args->va_access_pageid);
 	THROW(E_SEGFAULT_UNMAPPED,
 	      (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_FAULT |
