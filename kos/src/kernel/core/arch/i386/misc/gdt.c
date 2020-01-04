@@ -141,7 +141,7 @@ NOTHROW(KCALL x86_get_random_userkern_address)(void) {
 	 * as the base address for the userkern segment. */
 	offset = (uintptr_t)(krand() * USERKERN_SEGMENT_ALIGN);
 	offset %= ((uintptr_t)0 - KERNELSPACE_BASE) - (USERKERN_SYSCALL_MAXVALID + 1);
-	offset += KERNEL_CORE_BASE;
+	offset += KERNELSPACE_BASE;
 	return offset;
 }
 

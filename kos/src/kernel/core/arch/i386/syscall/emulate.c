@@ -52,7 +52,7 @@ PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_int80h") struct i
 x86_syscall_emulate32_int80h(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_int80h(&sc, state);
-	return syscall_emulate(state, &sc);
+	return syscall_emulate32(state, &sc);
 }
 
 PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_int80h_r") void FCALL
@@ -66,7 +66,7 @@ PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_sysenter") struct
 x86_syscall_emulate32_sysenter(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_sysenter(&sc, state);
-	return syscall_emulate(state, &sc);
+	return syscall_emulate32(state, &sc);
 }
 
 PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_sysenter_r") void FCALL
@@ -81,7 +81,7 @@ x86_syscall_emulate32_cdecl(struct icpustate *__restrict state,
                             syscall_ulong_t sysno, bool enable_except) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_cdecl(&sc, state, sysno, enable_except);
-	return syscall_emulate(state, &sc);
+	return syscall_emulate32(state, &sc);
 }
 
 PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_cdecl_r") void FCALL
@@ -97,7 +97,7 @@ PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_int80h") struct i
 x86_syscall_emulate64_int80h(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get64_int80h(&sc, state);
-	return syscall_emulate(state, &sc);
+	return syscall_emulate64(state, &sc);
 }
 
 PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_int80h_r") void FCALL
@@ -112,7 +112,7 @@ x86_syscall_emulate64_sysvabi(struct icpustate *__restrict state,
                               syscall_ulong_t sysno, bool enable_except) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get64_sysvabi(&sc, state, sysno, enable_except);
-	return syscall_emulate(state, &sc);
+	return syscall_emulate64(state, &sc);
 }
 
 PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_sysvabi_r") void FCALL
