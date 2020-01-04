@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x281bf9c3 */
+/* HASH CRC-32:0x2449eccd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -755,162 +755,162 @@
 #define __NR64AN0_userfaultfd            TODO_PROTOTYPE
 #define __NR64AN0_membarrier             TODO_PROTOTYPE
 #define __NR64AN0_mlock2                 TODO_PROTOTYPE
-#define __NR64AN0_readf                  fd
-#define __NR64AN1_readf                  buf
-#define __NR64AN2_readf                  bufsize
-#define __NR64AN3_readf                  mode
-#define __NR64AN0_writef                 fd
-#define __NR64AN1_writef                 buf
-#define __NR64AN2_writef                 bufsize
-#define __NR64AN3_writef                 mode
-#define __NR64AN0_hop                    fd
-#define __NR64AN1_hop                    command
-#define __NR64AN2_hop                    arg
-#define __NR64AN0_hopf                   fd
-#define __NR64AN1_hopf                   command
-#define __NR64AN2_hopf                   mode
-#define __NR64AN3_hopf                   arg
-#define __NR64AN0_kstat                  filename
-#define __NR64AN1_kstat                  statbuf
-#define __NR64AN0_kfstat                 fd
-#define __NR64AN1_kfstat                 statbuf
-#define __NR64AN0_klstat                 filename
-#define __NR64AN1_klstat                 statbuf
-#define __NR64AN0_detach                 pid
-#define __NR64AN0_frealpath4             fd
-#define __NR64AN1_frealpath4             buf
-#define __NR64AN2_frealpath4             buflen
-#define __NR64AN3_frealpath4             flags
-#define __NR64AN0_frealpathat            dirfd
-#define __NR64AN1_frealpathat            filename
-#define __NR64AN2_frealpathat            buf
-#define __NR64AN3_frealpathat            buflen
-#define __NR64AN4_frealpathat            flags
-#define __NR64AN0_rpc_schedule           target
-#define __NR64AN1_rpc_schedule           flags
-#define __NR64AN2_rpc_schedule           program
-#define __NR64AN3_rpc_schedule           arguments
+#define __NR64AN0_pwritevf               fd
+#define __NR64AN1_pwritevf               iovec
+#define __NR64AN2_pwritevf               count
+#define __NR64AN3_pwritevf               offset
+#define __NR64AN4_pwritevf               mode
+#define __NR64AN0_preadvf                fd
+#define __NR64AN1_preadvf                iovec
+#define __NR64AN2_preadvf                count
+#define __NR64AN3_preadvf                offset
+#define __NR64AN4_preadvf                mode
+#define __NR64AN0_freadlinkat            dirfd
+#define __NR64AN1_freadlinkat            path
+#define __NR64AN2_freadlinkat            buf
+#define __NR64AN3_freadlinkat            buflen
+#define __NR64AN4_freadlinkat            flags
+#define __NR64AN0_fsymlinkat             link_text
+#define __NR64AN1_fsymlinkat             tofd
+#define __NR64AN2_fsymlinkat             target_path
+#define __NR64AN3_fsymlinkat             flags
+#define __NR64AN0_frenameat              oldfd
+#define __NR64AN1_frenameat              oldname
+#define __NR64AN2_frenameat              newfd
+#define __NR64AN3_frenameat              newname_or_path
+#define __NR64AN4_frenameat              flags
+#define __NR64AN0_kfstatat               dirfd
+#define __NR64AN1_kfstatat               filename
+#define __NR64AN2_kfstatat               statbuf
+#define __NR64AN3_kfstatat               flags
+#define __NR64AN0_fmknodat               dirfd
+#define __NR64AN1_fmknodat               nodename
+#define __NR64AN2_fmknodat               mode
+#define __NR64AN3_fmknodat               dev
+#define __NR64AN4_fmknodat               flags
+#define __NR64AN0_fmkdirat               dirfd
+#define __NR64AN1_fmkdirat               pathname
+#define __NR64AN2_fmkdirat               mode
+#define __NR64AN3_fmkdirat               flags
 #define __NR64AN0_ksysctl                command
 #define __NR64AN1_ksysctl                arg
-#define __NR64AN0_openpty                amaster
-#define __NR64AN1_openpty                aslave
-#define __NR64AN2_openpty                name
-#define __NR64AN3_openpty                termp
-#define __NR64AN4_openpty                winp
-#define __NR64AN0_set_exception_handler  mode
-#define __NR64AN1_set_exception_handler  handler
-#define __NR64AN2_set_exception_handler  handler_sp
-#define __NR64AN0_get_exception_handler  pmode
-#define __NR64AN1_get_exception_handler  phandler
-#define __NR64AN2_get_exception_handler  phandler_sp
-#define __NR64AN0_ioctlf                 fd
-#define __NR64AN1_ioctlf                 command
-#define __NR64AN2_ioctlf                 mode
-#define __NR64AN3_ioctlf                 arg
-#define __NR64AN0_pread64f               fd
-#define __NR64AN1_pread64f               buf
-#define __NR64AN2_pread64f               bufsize
-#define __NR64AN3_pread64f               offset
-#define __NR64AN4_pread64f               mode
-#define __NR64AN0_pwrite64f              fd
-#define __NR64AN1_pwrite64f              buf
-#define __NR64AN2_pwrite64f              bufsize
-#define __NR64AN3_pwrite64f              offset
-#define __NR64AN4_pwrite64f              mode
-#define __NR64AN0_readvf                 fd
-#define __NR64AN1_readvf                 iovec
-#define __NR64AN2_readvf                 count
-#define __NR64AN3_readvf                 mode
-#define __NR64AN0_writevf                fd
-#define __NR64AN1_writevf                iovec
-#define __NR64AN2_writevf                count
-#define __NR64AN3_writevf                mode
-#define __NR64AN0_set_library_listdef    listdef
-#define __NR64AN0_debugtrap              state
-#define __NR64AN1_debugtrap              reason
-#define __NR64AN0_lfutex                 uaddr
-#define __NR64AN1_lfutex                 futex_op
-#define __NR64AN2_lfutex                 val
-#define __NR64AN3_lfutex                 timeout
-#define __NR64AN4_lfutex                 val2
-#define __NR64AN0_lfutexexpr             base
-#define __NR64AN1_lfutexexpr             exprc
-#define __NR64AN2_lfutexexpr             exprv
-#define __NR64AN3_lfutexexpr             timeout
-#define __NR64AN4_lfutexexpr             timeout_flags
-#define __NR64AN0_lfutexlockexpr         ulockaddr
-#define __NR64AN1_lfutexlockexpr         base
-#define __NR64AN2_lfutexlockexpr         exprc
-#define __NR64AN3_lfutexlockexpr         exprv
-#define __NR64AN4_lfutexlockexpr         timeout
-#define __NR64AN5_lfutexlockexpr         timeout_flags
-#define __NR64AN0_mktty                  keyboard
-#define __NR64AN1_mktty                  display
-#define __NR64AN2_mktty                  name
-#define __NR64AN3_mktty                  rsvd
-#define __NR64AN0_raiseat                state
-#define __NR64AN1_raiseat                si
+#define __NR64AN0_maplibrary             addr
+#define __NR64AN1_maplibrary             flags
+#define __NR64AN2_maplibrary             fd
+#define __NR64AN3_maplibrary             hdrv
+#define __NR64AN4_maplibrary             hdrc
+#define __NR64AN0_fsmode                 mode
+#define __NR64AN0_fchdirat               dirfd
+#define __NR64AN1_fchdirat               path
+#define __NR64AN2_fchdirat               flags
+#define __NR64AN0_kreaddirf              fd
+#define __NR64AN1_kreaddirf              buf
+#define __NR64AN2_kreaddirf              bufsize
+#define __NR64AN3_kreaddirf              mode
+#define __NR64AN4_kreaddirf              iomode
+#define __NR64AN0_kreaddir               fd
+#define __NR64AN1_kreaddir               buf
+#define __NR64AN2_kreaddir               bufsize
+#define __NR64AN3_kreaddir               mode
 #define __NR64AN0_coredump               curr_state
 #define __NR64AN1_coredump               orig_state
 #define __NR64AN2_coredump               traceback_vector
 #define __NR64AN3_coredump               traceback_length
 #define __NR64AN4_coredump               exception
 #define __NR64AN5_coredump               unwind_error
-#define __NR64AN0_kreaddir               fd
-#define __NR64AN1_kreaddir               buf
-#define __NR64AN2_kreaddir               bufsize
-#define __NR64AN3_kreaddir               mode
-#define __NR64AN0_fchdirat               dirfd
-#define __NR64AN1_fchdirat               path
-#define __NR64AN2_fchdirat               flags
-#define __NR64AN0_fsmode                 mode
-#define __NR64AN0_maplibrary             addr
-#define __NR64AN1_maplibrary             flags
-#define __NR64AN2_maplibrary             fd
-#define __NR64AN3_maplibrary             hdrv
-#define __NR64AN4_maplibrary             hdrc
-#define __NR64AN0_kreaddirf              fd
-#define __NR64AN1_kreaddirf              buf
-#define __NR64AN2_kreaddirf              bufsize
-#define __NR64AN3_kreaddirf              mode
-#define __NR64AN4_kreaddirf              iomode
-#define __NR64AN0_fmkdirat               dirfd
-#define __NR64AN1_fmkdirat               pathname
-#define __NR64AN2_fmkdirat               mode
-#define __NR64AN3_fmkdirat               flags
-#define __NR64AN0_fmknodat               dirfd
-#define __NR64AN1_fmknodat               nodename
-#define __NR64AN2_fmknodat               mode
-#define __NR64AN3_fmknodat               dev
-#define __NR64AN4_fmknodat               flags
-#define __NR64AN0_kfstatat               dirfd
-#define __NR64AN1_kfstatat               filename
-#define __NR64AN2_kfstatat               statbuf
-#define __NR64AN3_kfstatat               flags
-#define __NR64AN0_frenameat              oldfd
-#define __NR64AN1_frenameat              oldname
-#define __NR64AN2_frenameat              newfd
-#define __NR64AN3_frenameat              newname_or_path
-#define __NR64AN4_frenameat              flags
-#define __NR64AN0_fsymlinkat             link_text
-#define __NR64AN1_fsymlinkat             tofd
-#define __NR64AN2_fsymlinkat             target_path
-#define __NR64AN3_fsymlinkat             flags
-#define __NR64AN0_freadlinkat            dirfd
-#define __NR64AN1_freadlinkat            path
-#define __NR64AN2_freadlinkat            buf
-#define __NR64AN3_freadlinkat            buflen
-#define __NR64AN4_freadlinkat            flags
-#define __NR64AN0_preadvf                fd
-#define __NR64AN1_preadvf                iovec
-#define __NR64AN2_preadvf                count
-#define __NR64AN3_preadvf                offset
-#define __NR64AN4_preadvf                mode
-#define __NR64AN0_pwritevf               fd
-#define __NR64AN1_pwritevf               iovec
-#define __NR64AN2_pwritevf               count
-#define __NR64AN3_pwritevf               offset
-#define __NR64AN4_pwritevf               mode
+#define __NR64AN0_raiseat                state
+#define __NR64AN1_raiseat                si
+#define __NR64AN0_mktty                  keyboard
+#define __NR64AN1_mktty                  display
+#define __NR64AN2_mktty                  name
+#define __NR64AN3_mktty                  rsvd
+#define __NR64AN0_lfutexlockexpr         ulockaddr
+#define __NR64AN1_lfutexlockexpr         base
+#define __NR64AN2_lfutexlockexpr         exprc
+#define __NR64AN3_lfutexlockexpr         exprv
+#define __NR64AN4_lfutexlockexpr         timeout
+#define __NR64AN5_lfutexlockexpr         timeout_flags
+#define __NR64AN0_lfutexexpr             base
+#define __NR64AN1_lfutexexpr             exprc
+#define __NR64AN2_lfutexexpr             exprv
+#define __NR64AN3_lfutexexpr             timeout
+#define __NR64AN4_lfutexexpr             timeout_flags
+#define __NR64AN0_lfutex                 uaddr
+#define __NR64AN1_lfutex                 futex_op
+#define __NR64AN2_lfutex                 val
+#define __NR64AN3_lfutex                 timeout
+#define __NR64AN4_lfutex                 val2
+#define __NR64AN0_debugtrap              state
+#define __NR64AN1_debugtrap              reason
+#define __NR64AN0_set_library_listdef    listdef
+#define __NR64AN0_writevf                fd
+#define __NR64AN1_writevf                iovec
+#define __NR64AN2_writevf                count
+#define __NR64AN3_writevf                mode
+#define __NR64AN0_readvf                 fd
+#define __NR64AN1_readvf                 iovec
+#define __NR64AN2_readvf                 count
+#define __NR64AN3_readvf                 mode
+#define __NR64AN0_pwrite64f              fd
+#define __NR64AN1_pwrite64f              buf
+#define __NR64AN2_pwrite64f              bufsize
+#define __NR64AN3_pwrite64f              offset
+#define __NR64AN4_pwrite64f              mode
+#define __NR64AN0_pread64f               fd
+#define __NR64AN1_pread64f               buf
+#define __NR64AN2_pread64f               bufsize
+#define __NR64AN3_pread64f               offset
+#define __NR64AN4_pread64f               mode
+#define __NR64AN0_ioctlf                 fd
+#define __NR64AN1_ioctlf                 command
+#define __NR64AN2_ioctlf                 mode
+#define __NR64AN3_ioctlf                 arg
+#define __NR64AN0_set_exception_handler  mode
+#define __NR64AN1_set_exception_handler  handler
+#define __NR64AN2_set_exception_handler  handler_sp
+#define __NR64AN0_get_exception_handler  pmode
+#define __NR64AN1_get_exception_handler  phandler
+#define __NR64AN2_get_exception_handler  phandler_sp
+#define __NR64AN0_openpty                amaster
+#define __NR64AN1_openpty                aslave
+#define __NR64AN2_openpty                name
+#define __NR64AN3_openpty                termp
+#define __NR64AN4_openpty                winp
+#define __NR64AN0_rpc_schedule           target
+#define __NR64AN1_rpc_schedule           flags
+#define __NR64AN2_rpc_schedule           program
+#define __NR64AN3_rpc_schedule           arguments
+#define __NR64AN0_frealpathat            dirfd
+#define __NR64AN1_frealpathat            filename
+#define __NR64AN2_frealpathat            buf
+#define __NR64AN3_frealpathat            buflen
+#define __NR64AN4_frealpathat            flags
+#define __NR64AN0_frealpath4             fd
+#define __NR64AN1_frealpath4             buf
+#define __NR64AN2_frealpath4             buflen
+#define __NR64AN3_frealpath4             flags
+#define __NR64AN0_detach                 pid
+#define __NR64AN0_readf                  fd
+#define __NR64AN1_readf                  buf
+#define __NR64AN2_readf                  bufsize
+#define __NR64AN3_readf                  mode
+#define __NR64AN0_klstat                 filename
+#define __NR64AN1_klstat                 statbuf
+#define __NR64AN0_kfstat                 fd
+#define __NR64AN1_kfstat                 statbuf
+#define __NR64AN0_kstat                  filename
+#define __NR64AN1_kstat                  statbuf
+#define __NR64AN0_hopf                   fd
+#define __NR64AN1_hopf                   command
+#define __NR64AN2_hopf                   mode
+#define __NR64AN3_hopf                   arg
+#define __NR64AN0_hop                    fd
+#define __NR64AN1_hop                    command
+#define __NR64AN2_hop                    arg
+#define __NR64AN0_writef                 fd
+#define __NR64AN1_writef                 buf
+#define __NR64AN2_writef                 bufsize
+#define __NR64AN3_writef                 mode
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES */
 #endif /* __WANT_SYSCALL_ARGUMENT_NAMES */
 
@@ -2590,166 +2590,16 @@
 #define __NR64ATRA0_membarrier(TODO_PROTOTYPE) ,TODO_PROTOTYPE
 #define __NR64ATRF0_mlock2                 "%d"
 #define __NR64ATRA0_mlock2(TODO_PROTOTYPE) ,TODO_PROTOTYPE
-#define __NR64ATRF0_readf                  "%d"
-#define __NR64ATRA0_readf(fd, buf, bufsize, mode) ,(int)(fd)
-#define __NR64ATRF1_readf                  "%p"
-#define __NR64ATRA1_readf(fd, buf, bufsize, mode) ,buf
-#define __NR64ATRF2_readf                  "%" PRIuSIZ
-#define __NR64ATRA2_readf(fd, buf, bufsize, mode) ,bufsize
-#define __NR64ATRF3_readf                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA3_readf(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                  ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                  ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                  ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                  ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                  ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                  ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                  ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                  ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NR64ATRF0_writef                 "%d"
-#define __NR64ATRA0_writef(fd, buf, bufsize, mode) ,(int)(fd)
-#define __NR64ATRF1_writef                 "%p"
-#define __NR64ATRA1_writef(fd, buf, bufsize, mode) ,buf
-#define __NR64ATRF2_writef                 "%" PRIuSIZ
-#define __NR64ATRA2_writef(fd, buf, bufsize, mode) ,bufsize
-#define __NR64ATRF3_writef                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA3_writef(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                   ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                   ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                   ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                   ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                   ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                   ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                   ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                   ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NR64ATRF0_hop                    "%d"
-#define __NR64ATRA0_hop(fd, command, arg)  ,(int)(fd)
-#define __NR64ATRF1_hop                    "%#" PRIxSIZ
-#define __NR64ATRA1_hop(fd, command, arg)  ,(uintptr_t)(command)
-#define __NR64ATRF2_hop                    "%p"
-#define __NR64ATRA2_hop(fd, command, arg)  ,arg
-#define __NR64ATRF0_hopf                   "%d"
-#define __NR64ATRA0_hopf(fd, command, mode, arg) ,(int)(fd)
-#define __NR64ATRF1_hopf                   "%#" PRIxSIZ
-#define __NR64ATRA1_hopf(fd, command, mode, arg) ,(uintptr_t)(command)
-#define __NR64ATRF2_hopf                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA2_hopf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                 ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                 ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                 ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                 ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                 ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                 ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                 ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                 ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NR64ATRF3_hopf                   "%p"
-#define __NR64ATRA3_hopf(fd, command, mode, arg) ,arg
-#define __NR64ATRF0_kstat                  "%q"
-#define __NR64ATRA0_kstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF1_kstat                  "%p"
-#define __NR64ATRA1_kstat(filename, statbuf) ,statbuf
-#define __NR64ATRF0_kfstat                 "%d"
-#define __NR64ATRA0_kfstat(fd, statbuf)    ,(int)(fd)
-#define __NR64ATRF1_kfstat                 "%p"
-#define __NR64ATRA1_kfstat(fd, statbuf)    ,statbuf
-#define __NR64ATRF0_klstat                 "%q"
-#define __NR64ATRA0_klstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF1_klstat                 "%p"
-#define __NR64ATRA1_klstat(filename, statbuf) ,statbuf
-#define __NR64ATRF0_detach                 "%" PRIdSIZ
-#define __NR64ATRA0_detach(pid)            ,(intptr_t)(pid)
-#define __NR64ATRF0_frealpath4             "%d"
-#define __NR64ATRA0_frealpath4(fd, buf, buflen, flags) ,(int)(fd)
-#define __NR64ATRF1_frealpath4             "%p"
-#define __NR64ATRA1_frealpath4(fd, buf, buflen, flags) ,buf
-#define __NR64ATRF2_frealpath4             "%" PRIuSIZ
-#define __NR64ATRA2_frealpath4(fd, buf, buflen, flags) ,buflen
-#define __NR64ATRF3_frealpath4             "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NR64ATRA3_frealpath4(fd, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
-                                                       ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
-                                                       ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_frealpathat            "%d"
-#define __NR64ATRA0_frealpathat(dirfd, filename, buf, buflen, flags) ,(int)(dirfd)
-#define __NR64ATRF1_frealpathat            "%q"
-#define __NR64ATRA1_frealpathat(dirfd, filename, buf, buflen, flags) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF2_frealpathat            "%p"
-#define __NR64ATRA2_frealpathat(dirfd, filename, buf, buflen, flags) ,buf
-#define __NR64ATRF3_frealpathat            "%" PRIuSIZ
-#define __NR64ATRA3_frealpathat(dirfd, filename, buf, buflen, flags) ,buflen
-#define __NR64ATRF4_frealpathat            "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NR64ATRA4_frealpathat(dirfd, filename, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
-                                                                     ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                                     ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
-                                                                     ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_rpc_schedule           "%" PRIdSIZ
-#define __NR64ATRA0_rpc_schedule(target, flags, program, arguments) ,(intptr_t)(target)
-#define __NR64ATRF1_rpc_schedule           "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA1_rpc_schedule(target, flags, program, arguments) ,(uintptr_t)(flags),(flags) & RPC_SCHEDULE_ASYNC ? "RPC_SCHEDULE_ASYNC" : (flags) ? "" : "RPC_SCHEDULE_SYNC" \
-                                                                    ,((flags) & RPC_SCHEDULE_FLAG_NONSYSCALL) && ((flags) & (RPC_SCHEDULE_ASYNC)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_NONSYSCALL ? "RPC_SCHEDULE_FLAG_NONSYSCALL" : "" \
-                                                                    ,((flags) & RPC_SCHEDULE_FLAG_WAITFORSTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_WAITFORSTART ? "RPC_SCHEDULE_FLAG_WAITFORSTART" : "" \
-                                                                    ,((flags) & RPC_SCHEDULE_FLAG_STATUSFUTEX) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_STATUSFUTEX ? "RPC_SCHEDULE_FLAG_STATUSFUTEX" : "" \
-                                                                    ,((flags) & RPC_SCHEDULE_FLAG_SYSRESTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_SYSRESTART ? "RPC_SCHEDULE_FLAG_SYSRESTART" : "" \
-                                                                    ,((flags) & RPC_SCHEDULE_FLAG_NOSYSRESTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_NOSYSRESTART ? "RPC_SCHEDULE_FLAG_NOSYSRESTART" : "" \
-                                                                    ,((flags) & RPC_SCHEDULE_FLAG_WAITSMPACK) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_WAITSMPACK ? "RPC_SCHEDULE_FLAG_WAITSMPACK" : "" \
-                                                                    ,((flags) & RPC_SCHEDULE_FLAG_DONTWAKE) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_DONTWAKE ? "RPC_SCHEDULE_FLAG_DONTWAKE" : "" \
-                                                                    ,((flags) & RPC_SCHEDULE_FLAG_HIGHPRIO) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK|RPC_SCHEDULE_FLAG_DONTWAKE)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_HIGHPRIO ? "RPC_SCHEDULE_FLAG_HIGHPRIO" : "" \
-                                                                    ,((flags) & RPC_SCHEDULE_FLAG_LOWPRIO) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK|RPC_SCHEDULE_FLAG_DONTWAKE|RPC_SCHEDULE_FLAG_HIGHPRIO)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_LOWPRIO ? "RPC_SCHEDULE_FLAG_LOWPRIO" : ""
-#define __NR64ATRF2_rpc_schedule           "%p"
-#define __NR64ATRA2_rpc_schedule(target, flags, program, arguments) ,program
-#define __NR64ATRF3_rpc_schedule           "%p"
-#define __NR64ATRA3_rpc_schedule(target, flags, program, arguments) ,arguments
-#define __NR64ATRF0_ksysctl                "%#" PRIxSIZ
-#define __NR64ATRA0_ksysctl(command, arg)  ,(uintptr_t)(command)
-#define __NR64ATRF1_ksysctl                "%p"
-#define __NR64ATRA1_ksysctl(command, arg)  ,arg
-#define __NR64ATRF0_openpty                "%p"
-#define __NR64ATRA0_openpty(amaster, aslave, name, termp, winp) ,amaster
-#define __NR64ATRF1_openpty                "%p"
-#define __NR64ATRA1_openpty(amaster, aslave, name, termp, winp) ,aslave
-#define __NR64ATRF2_openpty                "%p"
-#define __NR64ATRA2_openpty(amaster, aslave, name, termp, winp) ,name
-#define __NR64ATRF3_openpty                "%p"
-#define __NR64ATRA3_openpty(amaster, aslave, name, termp, winp) ,termp
-#define __NR64ATRF4_openpty                "%p"
-#define __NR64ATRA4_openpty(amaster, aslave, name, termp, winp) ,winp
-#define __NR64ATRF0_set_exception_handler  "%#" PRIxSIZ
-#define __NR64ATRA0_set_exception_handler(mode, handler, handler_sp) ,(uintptr_t)(mode)
-#define __NR64ATRF1_set_exception_handler  "%p"
-#define __NR64ATRA1_set_exception_handler(mode, handler, handler_sp) ,handler
-#define __NR64ATRF2_set_exception_handler  "%p"
-#define __NR64ATRA2_set_exception_handler(mode, handler, handler_sp) ,handler_sp
-#define __NR64ATRF0_get_exception_handler  "%p"
-#define __NR64ATRA0_get_exception_handler(pmode, phandler, phandler_sp) ,pmode
-#define __NR64ATRF1_get_exception_handler  "%p"
-#define __NR64ATRA1_get_exception_handler(pmode, phandler, phandler_sp) ,phandler
-#define __NR64ATRF2_get_exception_handler  "%p"
-#define __NR64ATRA2_get_exception_handler(pmode, phandler, phandler_sp) ,phandler_sp
-#define __NR64ATRF0_ioctlf                 "%d"
-#define __NR64ATRA0_ioctlf(fd, command, mode, arg) ,(int)(fd)
-#define __NR64ATRF1_ioctlf                 "%#" PRIxSIZ
-#define __NR64ATRA1_ioctlf(fd, command, mode, arg) ,(uintptr_t)(command)
-#define __NR64ATRF2_ioctlf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA2_ioctlf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                   ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                   ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                   ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                   ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                   ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                   ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                   ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                   ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NR64ATRF3_ioctlf                 "%p"
-#define __NR64ATRA3_ioctlf(fd, command, mode, arg) ,arg
-#define __NR64ATRF0_pread64f               "%d"
-#define __NR64ATRA0_pread64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
-#define __NR64ATRF1_pread64f               "%p"
-#define __NR64ATRA1_pread64f(fd, buf, bufsize, offset, mode) ,buf
-#define __NR64ATRF2_pread64f               "%" PRIuSIZ
-#define __NR64ATRA2_pread64f(fd, buf, bufsize, offset, mode) ,bufsize
-#define __NR64ATRF3_pread64f               "%" PRIu64
-#define __NR64ATRA3_pread64f(fd, buf, bufsize, offset, mode) ,offset
-#define __NR64ATRF4_pread64f               "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA4_pread64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+#define __NR64ATRF0_pwritevf               "%d"
+#define __NR64ATRA0_pwritevf(fd, iovec, count, offset, mode) ,(int)(fd)
+#define __NR64ATRF1_pwritevf               "%p"
+#define __NR64ATRA1_pwritevf(fd, iovec, count, offset, mode) ,iovec
+#define __NR64ATRF2_pwritevf               "%" PRIuSIZ
+#define __NR64ATRA2_pwritevf(fd, iovec, count, offset, mode) ,count
+#define __NR64ATRF3_pwritevf               "%" PRIu64
+#define __NR64ATRA3_pwritevf(fd, iovec, count, offset, mode) ,offset
+#define __NR64ATRF4_pwritevf               "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA4_pwritevf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                              ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                              ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
                                                              ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
@@ -2758,137 +2608,84 @@
                                                              ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
                                                              ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
                                                              ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NR64ATRF0_pwrite64f              "%d"
-#define __NR64ATRA0_pwrite64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
-#define __NR64ATRF1_pwrite64f              "%p"
-#define __NR64ATRA1_pwrite64f(fd, buf, bufsize, offset, mode) ,buf
-#define __NR64ATRF2_pwrite64f              "%" PRIuSIZ
-#define __NR64ATRA2_pwrite64f(fd, buf, bufsize, offset, mode) ,bufsize
-#define __NR64ATRF3_pwrite64f              "%" PRIu64
-#define __NR64ATRA3_pwrite64f(fd, buf, bufsize, offset, mode) ,offset
-#define __NR64ATRF4_pwrite64f              "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA4_pwrite64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                              ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                              ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                              ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                              ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                              ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                              ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                              ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                              ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NR64ATRF0_readvf                 "%d"
-#define __NR64ATRA0_readvf(fd, iovec, count, mode) ,(int)(fd)
-#define __NR64ATRF1_readvf                 "%p"
-#define __NR64ATRA1_readvf(fd, iovec, count, mode) ,iovec
-#define __NR64ATRF2_readvf                 "%" PRIuSIZ
-#define __NR64ATRA2_readvf(fd, iovec, count, mode) ,count
-#define __NR64ATRF3_readvf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA3_readvf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                   ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                   ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                   ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                   ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                   ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                   ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                   ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                   ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NR64ATRF0_writevf                "%d"
-#define __NR64ATRA0_writevf(fd, iovec, count, mode) ,(int)(fd)
-#define __NR64ATRF1_writevf                "%p"
-#define __NR64ATRA1_writevf(fd, iovec, count, mode) ,iovec
-#define __NR64ATRF2_writevf                "%" PRIuSIZ
-#define __NR64ATRA2_writevf(fd, iovec, count, mode) ,count
-#define __NR64ATRF3_writevf                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA3_writevf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                    ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                    ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                    ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                    ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                    ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                    ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                    ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                    ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NR64ATRF0_set_library_listdef    "%p"
-#define __NR64ATRA0_set_library_listdef(listdef) ,listdef
-#define __NR64ATRF0_debugtrap              "%p"
-#define __NR64ATRA0_debugtrap(state, reason) ,state
-#define __NR64ATRF1_debugtrap              "%p"
-#define __NR64ATRA1_debugtrap(state, reason) ,reason
-#define __NR64ATRF0_lfutex                 "%p"
-#define __NR64ATRA0_lfutex(uaddr, futex_op, val, timeout, val2) ,uaddr
-#define __NR64ATRF1_lfutex                 "%#" PRIxSIZ
-#define __NR64ATRA1_lfutex(uaddr, futex_op, val, timeout, val2) ,(uintptr_t)(futex_op)
-#define __NR64ATRF2_lfutex                 "%" PRIu64
-#define __NR64ATRA2_lfutex(uaddr, futex_op, val, timeout, val2) ,val
-#define __NR64ATRF3_lfutex                 "%p"
-#define __NR64ATRA3_lfutex(uaddr, futex_op, val, timeout, val2) ,timeout
-#define __NR64ATRF4_lfutex                 "%" PRIu64
-#define __NR64ATRA4_lfutex(uaddr, futex_op, val, timeout, val2) ,val2
-#define __NR64ATRF0_lfutexexpr             "%p"
-#define __NR64ATRA0_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,base
-#define __NR64ATRF1_lfutexexpr             "%" PRIuSIZ
-#define __NR64ATRA1_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprc
-#define __NR64ATRF2_lfutexexpr             "%p"
-#define __NR64ATRA2_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprv
-#define __NR64ATRF3_lfutexexpr             "%p"
-#define __NR64ATRA3_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,timeout
-#define __NR64ATRF4_lfutexexpr             "%#" PRIxSIZ
-#define __NR64ATRA4_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
-#define __NR64ATRF0_lfutexlockexpr         "%p"
-#define __NR64ATRA0_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,ulockaddr
-#define __NR64ATRF1_lfutexlockexpr         "%p"
-#define __NR64ATRA1_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,base
-#define __NR64ATRF2_lfutexlockexpr         "%" PRIuSIZ
-#define __NR64ATRA2_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprc
-#define __NR64ATRF3_lfutexlockexpr         "%p"
-#define __NR64ATRA3_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprv
-#define __NR64ATRF4_lfutexlockexpr         "%p"
-#define __NR64ATRA4_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,timeout
-#define __NR64ATRF5_lfutexlockexpr         "%#" PRIxSIZ
-#define __NR64ATRA5_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
-#define __NR64ATRF0_mktty                  "%d"
-#define __NR64ATRA0_mktty(keyboard, display, name, rsvd) ,(int)(keyboard)
-#define __NR64ATRF1_mktty                  "%d"
-#define __NR64ATRA1_mktty(keyboard, display, name, rsvd) ,(int)(display)
-#define __NR64ATRF2_mktty                  "%q"
-#define __NR64ATRA2_mktty(keyboard, display, name, rsvd) ,(validate_readable_opt(name,1),name)
-#define __NR64ATRF3_mktty                  "%#" PRIxSIZ
-#define __NR64ATRA3_mktty(keyboard, display, name, rsvd) ,(uintptr_t)(rsvd)
-#define __NR64ATRF0_raiseat                "%p"
-#define __NR64ATRA0_raiseat(state, si)     ,state
-#define __NR64ATRF1_raiseat                "%p"
-#define __NR64ATRA1_raiseat(state, si)     ,si
-#define __NR64ATRF0_coredump               "%p"
-#define __NR64ATRA0_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,curr_state
-#define __NR64ATRF1_coredump               "%p"
-#define __NR64ATRA1_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,orig_state
-#define __NR64ATRF2_coredump               "%p"
-#define __NR64ATRA2_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_vector
-#define __NR64ATRF3_coredump               "%" PRIuSIZ
-#define __NR64ATRA3_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_length
-#define __NR64ATRF4_coredump               "%p"
-#define __NR64ATRA4_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,exception
-#define __NR64ATRF5_coredump               "%#" PRIxSIZ
-#define __NR64ATRA5_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,(uintptr_t)(unwind_error)
-#define __NR64ATRF0_kreaddir               "%d"
-#define __NR64ATRA0_kreaddir(fd, buf, bufsize, mode) ,(int)(fd)
-#define __NR64ATRF1_kreaddir               "%p"
-#define __NR64ATRA1_kreaddir(fd, buf, bufsize, mode) ,buf
-#define __NR64ATRF2_kreaddir               "%" PRIuSIZ
-#define __NR64ATRA2_kreaddir(fd, buf, bufsize, mode) ,bufsize
-#define __NR64ATRF3_kreaddir               "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NR64ATRA3_kreaddir(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & READDIR_CONTINUE ? "READDIR_CONTINUE" : (mode) ? "" : "READDIR_DEFAULT" \
-                                                     ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
-                                                     ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
-                                                     ,((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK|READDIR_SKIPREL)) ? "|" : "",(mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
-#define __NR64ATRF0_fchdirat               "%d"
-#define __NR64ATRA0_fchdirat(dirfd, path, flags) ,(int)(dirfd)
-#define __NR64ATRF1_fchdirat               "%q"
-#define __NR64ATRA1_fchdirat(dirfd, path, flags) ,(validate_readable_opt(path,1),path)
-#define __NR64ATRF2_fchdirat               "%#" PRIxSIZ "=%s"
-#define __NR64ATRA2_fchdirat(dirfd, path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_fsmode                 "%" PRIu64
-#define __NR64ATRA0_fsmode(mode)           ,mode
+#define __NR64ATRF0_preadvf                "%d"
+#define __NR64ATRA0_preadvf(fd, iovec, count, offset, mode) ,(int)(fd)
+#define __NR64ATRF1_preadvf                "%p"
+#define __NR64ATRA1_preadvf(fd, iovec, count, offset, mode) ,iovec
+#define __NR64ATRF2_preadvf                "%" PRIuSIZ
+#define __NR64ATRA2_preadvf(fd, iovec, count, offset, mode) ,count
+#define __NR64ATRF3_preadvf                "%" PRIu64
+#define __NR64ATRA3_preadvf(fd, iovec, count, offset, mode) ,offset
+#define __NR64ATRF4_preadvf                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA4_preadvf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                            ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                            ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                            ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                            ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                            ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                            ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                            ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                            ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NR64ATRF0_freadlinkat            "%d"
+#define __NR64ATRA0_freadlinkat(dirfd, path, buf, buflen, flags) ,(int)(dirfd)
+#define __NR64ATRF1_freadlinkat            "%q"
+#define __NR64ATRA1_freadlinkat(dirfd, path, buf, buflen, flags) ,(validate_readable_opt(path,1),path)
+#define __NR64ATRF2_freadlinkat            "%p"
+#define __NR64ATRA2_freadlinkat(dirfd, path, buf, buflen, flags) ,buf
+#define __NR64ATRF3_freadlinkat            "%" PRIuSIZ
+#define __NR64ATRA3_freadlinkat(dirfd, path, buf, buflen, flags) ,buflen
+#define __NR64ATRF4_freadlinkat            "%#" PRIxSIZ "=%s%s%s"
+#define __NR64ATRA4_freadlinkat(dirfd, path, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
+                                                                 ,((flags) & AT_DOSPATH) && ((flags) & (AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR64ATRF0_fsymlinkat             "%q"
+#define __NR64ATRA0_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(link_text,1),link_text)
+#define __NR64ATRF1_fsymlinkat             "%d"
+#define __NR64ATRA1_fsymlinkat(link_text, tofd, target_path, flags) ,(int)(tofd)
+#define __NR64ATRF2_fsymlinkat             "%q"
+#define __NR64ATRA2_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(target_path,1),target_path)
+#define __NR64ATRF3_fsymlinkat             "%#" PRIxSIZ "=%s"
+#define __NR64ATRA3_fsymlinkat(link_text, tofd, target_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR64ATRF0_frenameat              "%d"
+#define __NR64ATRA0_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(int)(oldfd)
+#define __NR64ATRF1_frenameat              "%q"
+#define __NR64ATRA1_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(validate_readable_opt(oldname,1),oldname)
+#define __NR64ATRF2_frenameat              "%d"
+#define __NR64ATRA2_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(int)(newfd)
+#define __NR64ATRF3_frenameat              "%q"
+#define __NR64ATRA3_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(validate_readable_opt(newname_or_path,1),newname_or_path)
+#define __NR64ATRF4_frenameat              "%#" PRIxSIZ "=%s"
+#define __NR64ATRA4_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR64ATRF0_kfstatat               "%d"
+#define __NR64ATRA0_kfstatat(dirfd, filename, statbuf, flags) ,(int)(dirfd)
+#define __NR64ATRF1_kfstatat               "%q"
+#define __NR64ATRA1_kfstatat(dirfd, filename, statbuf, flags) ,(validate_readable_opt(filename,1),filename)
+#define __NR64ATRF2_kfstatat               "%p"
+#define __NR64ATRA2_kfstatat(dirfd, filename, statbuf, flags) ,statbuf
+#define __NR64ATRF3_kfstatat               "%#" PRIxSIZ "=%s%s%s"
+#define __NR64ATRA3_kfstatat(dirfd, filename, statbuf, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
+                                                              ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR64ATRF0_fmknodat               "%d"
+#define __NR64ATRA0_fmknodat(dirfd, nodename, mode, dev, flags) ,(int)(dirfd)
+#define __NR64ATRF1_fmknodat               "%q"
+#define __NR64ATRA1_fmknodat(dirfd, nodename, mode, dev, flags) ,(validate_readable_opt(nodename,1),nodename)
+#define __NR64ATRF2_fmknodat               "%#" PRIoSIZ
+#define __NR64ATRA2_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(mode)
+#define __NR64ATRF3_fmknodat               "%.2x:%.2x"
+#define __NR64ATRA3_fmknodat(dirfd, nodename, mode, dev, flags) ,(unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
+#define __NR64ATRF4_fmknodat               "%#" PRIxSIZ "=%s"
+#define __NR64ATRA4_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR64ATRF0_fmkdirat               "%d"
+#define __NR64ATRA0_fmkdirat(dirfd, pathname, mode, flags) ,(int)(dirfd)
+#define __NR64ATRF1_fmkdirat               "%q"
+#define __NR64ATRA1_fmkdirat(dirfd, pathname, mode, flags) ,(validate_readable_opt(pathname,1),pathname)
+#define __NR64ATRF2_fmkdirat               "%#" PRIoSIZ
+#define __NR64ATRA2_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(mode)
+#define __NR64ATRF3_fmkdirat               "%#" PRIxSIZ "=%s"
+#define __NR64ATRA3_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR64ATRF0_ksysctl                "%#" PRIxSIZ
+#define __NR64ATRA0_ksysctl(command, arg)  ,(uintptr_t)(command)
+#define __NR64ATRF1_ksysctl                "%p"
+#define __NR64ATRA1_ksysctl(command, arg)  ,arg
 #define __NR64ATRF0_maplibrary             "%p"
 #define __NR64ATRA0_maplibrary(addr, flags, fd, hdrv, hdrc) ,addr
 #define __NR64ATRF1_maplibrary             "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
@@ -2906,6 +2703,14 @@
 #define __NR64ATRA3_maplibrary(addr, flags, fd, hdrv, hdrc) ,hdrv
 #define __NR64ATRF4_maplibrary             "%" PRIuSIZ
 #define __NR64ATRA4_maplibrary(addr, flags, fd, hdrv, hdrc) ,hdrc
+#define __NR64ATRF0_fsmode                 "%" PRIu64
+#define __NR64ATRA0_fsmode(mode)           ,mode
+#define __NR64ATRF0_fchdirat               "%d"
+#define __NR64ATRA0_fchdirat(dirfd, path, flags) ,(int)(dirfd)
+#define __NR64ATRF1_fchdirat               "%q"
+#define __NR64ATRA1_fchdirat(dirfd, path, flags) ,(validate_readable_opt(path,1),path)
+#define __NR64ATRF2_fchdirat               "%#" PRIxSIZ "=%s"
+#define __NR64ATRA2_fchdirat(dirfd, path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_kreaddirf              "%d"
 #define __NR64ATRA0_kreaddirf(fd, buf, bufsize, mode, iomode) ,(int)(fd)
 #define __NR64ATRF1_kreaddirf              "%p"
@@ -2927,90 +2732,139 @@
                                                               ,((iomode) & IO_SYNC) && ((iomode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(iomode) & IO_SYNC ? "IO_SYNC" : "" \
                                                               ,((iomode) & IO_ASYNC) && ((iomode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(iomode) & IO_ASYNC ? "IO_ASYNC" : "" \
                                                               ,((iomode) & IO_DIRECT) && ((iomode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(iomode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NR64ATRF0_fmkdirat               "%d"
-#define __NR64ATRA0_fmkdirat(dirfd, pathname, mode, flags) ,(int)(dirfd)
-#define __NR64ATRF1_fmkdirat               "%q"
-#define __NR64ATRA1_fmkdirat(dirfd, pathname, mode, flags) ,(validate_readable_opt(pathname,1),pathname)
-#define __NR64ATRF2_fmkdirat               "%#" PRIoSIZ
-#define __NR64ATRA2_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(mode)
-#define __NR64ATRF3_fmkdirat               "%#" PRIxSIZ "=%s"
-#define __NR64ATRA3_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_fmknodat               "%d"
-#define __NR64ATRA0_fmknodat(dirfd, nodename, mode, dev, flags) ,(int)(dirfd)
-#define __NR64ATRF1_fmknodat               "%q"
-#define __NR64ATRA1_fmknodat(dirfd, nodename, mode, dev, flags) ,(validate_readable_opt(nodename,1),nodename)
-#define __NR64ATRF2_fmknodat               "%#" PRIoSIZ
-#define __NR64ATRA2_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(mode)
-#define __NR64ATRF3_fmknodat               "%.2x:%.2x"
-#define __NR64ATRA3_fmknodat(dirfd, nodename, mode, dev, flags) ,(unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
-#define __NR64ATRF4_fmknodat               "%#" PRIxSIZ "=%s"
-#define __NR64ATRA4_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_kfstatat               "%d"
-#define __NR64ATRA0_kfstatat(dirfd, filename, statbuf, flags) ,(int)(dirfd)
-#define __NR64ATRF1_kfstatat               "%q"
-#define __NR64ATRA1_kfstatat(dirfd, filename, statbuf, flags) ,(validate_readable_opt(filename,1),filename)
-#define __NR64ATRF2_kfstatat               "%p"
-#define __NR64ATRA2_kfstatat(dirfd, filename, statbuf, flags) ,statbuf
-#define __NR64ATRF3_kfstatat               "%#" PRIxSIZ "=%s%s%s"
-#define __NR64ATRA3_kfstatat(dirfd, filename, statbuf, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                              ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_frenameat              "%d"
-#define __NR64ATRA0_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(int)(oldfd)
-#define __NR64ATRF1_frenameat              "%q"
-#define __NR64ATRA1_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(validate_readable_opt(oldname,1),oldname)
-#define __NR64ATRF2_frenameat              "%d"
-#define __NR64ATRA2_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(int)(newfd)
-#define __NR64ATRF3_frenameat              "%q"
-#define __NR64ATRA3_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(validate_readable_opt(newname_or_path,1),newname_or_path)
-#define __NR64ATRF4_frenameat              "%#" PRIxSIZ "=%s"
-#define __NR64ATRA4_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_fsymlinkat             "%q"
-#define __NR64ATRA0_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(link_text,1),link_text)
-#define __NR64ATRF1_fsymlinkat             "%d"
-#define __NR64ATRA1_fsymlinkat(link_text, tofd, target_path, flags) ,(int)(tofd)
-#define __NR64ATRF2_fsymlinkat             "%q"
-#define __NR64ATRA2_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(target_path,1),target_path)
-#define __NR64ATRF3_fsymlinkat             "%#" PRIxSIZ "=%s"
-#define __NR64ATRA3_fsymlinkat(link_text, tofd, target_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_freadlinkat            "%d"
-#define __NR64ATRA0_freadlinkat(dirfd, path, buf, buflen, flags) ,(int)(dirfd)
-#define __NR64ATRF1_freadlinkat            "%q"
-#define __NR64ATRA1_freadlinkat(dirfd, path, buf, buflen, flags) ,(validate_readable_opt(path,1),path)
-#define __NR64ATRF2_freadlinkat            "%p"
-#define __NR64ATRA2_freadlinkat(dirfd, path, buf, buflen, flags) ,buf
-#define __NR64ATRF3_freadlinkat            "%" PRIuSIZ
-#define __NR64ATRA3_freadlinkat(dirfd, path, buf, buflen, flags) ,buflen
-#define __NR64ATRF4_freadlinkat            "%#" PRIxSIZ "=%s%s%s"
-#define __NR64ATRA4_freadlinkat(dirfd, path, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
-                                                                 ,((flags) & AT_DOSPATH) && ((flags) & (AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NR64ATRF0_preadvf                "%d"
-#define __NR64ATRA0_preadvf(fd, iovec, count, offset, mode) ,(int)(fd)
-#define __NR64ATRF1_preadvf                "%p"
-#define __NR64ATRA1_preadvf(fd, iovec, count, offset, mode) ,iovec
-#define __NR64ATRF2_preadvf                "%" PRIuSIZ
-#define __NR64ATRA2_preadvf(fd, iovec, count, offset, mode) ,count
-#define __NR64ATRF3_preadvf                "%" PRIu64
-#define __NR64ATRA3_preadvf(fd, iovec, count, offset, mode) ,offset
-#define __NR64ATRF4_preadvf                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA4_preadvf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                            ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                            ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                            ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                            ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                            ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                            ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                            ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                            ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NR64ATRF0_pwritevf               "%d"
-#define __NR64ATRA0_pwritevf(fd, iovec, count, offset, mode) ,(int)(fd)
-#define __NR64ATRF1_pwritevf               "%p"
-#define __NR64ATRA1_pwritevf(fd, iovec, count, offset, mode) ,iovec
-#define __NR64ATRF2_pwritevf               "%" PRIuSIZ
-#define __NR64ATRA2_pwritevf(fd, iovec, count, offset, mode) ,count
-#define __NR64ATRF3_pwritevf               "%" PRIu64
-#define __NR64ATRA3_pwritevf(fd, iovec, count, offset, mode) ,offset
-#define __NR64ATRF4_pwritevf               "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR64ATRA4_pwritevf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+#define __NR64ATRF0_kreaddir               "%d"
+#define __NR64ATRA0_kreaddir(fd, buf, bufsize, mode) ,(int)(fd)
+#define __NR64ATRF1_kreaddir               "%p"
+#define __NR64ATRA1_kreaddir(fd, buf, bufsize, mode) ,buf
+#define __NR64ATRF2_kreaddir               "%" PRIuSIZ
+#define __NR64ATRA2_kreaddir(fd, buf, bufsize, mode) ,bufsize
+#define __NR64ATRF3_kreaddir               "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
+#define __NR64ATRA3_kreaddir(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & READDIR_CONTINUE ? "READDIR_CONTINUE" : (mode) ? "" : "READDIR_DEFAULT" \
+                                                     ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
+                                                     ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
+                                                     ,((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK|READDIR_SKIPREL)) ? "|" : "",(mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
+#define __NR64ATRF0_coredump               "%p"
+#define __NR64ATRA0_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,curr_state
+#define __NR64ATRF1_coredump               "%p"
+#define __NR64ATRA1_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,orig_state
+#define __NR64ATRF2_coredump               "%p"
+#define __NR64ATRA2_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_vector
+#define __NR64ATRF3_coredump               "%" PRIuSIZ
+#define __NR64ATRA3_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_length
+#define __NR64ATRF4_coredump               "%p"
+#define __NR64ATRA4_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,exception
+#define __NR64ATRF5_coredump               "%#" PRIxSIZ
+#define __NR64ATRA5_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,(uintptr_t)(unwind_error)
+#define __NR64ATRF0_raiseat                "%p"
+#define __NR64ATRA0_raiseat(state, si)     ,state
+#define __NR64ATRF1_raiseat                "%p"
+#define __NR64ATRA1_raiseat(state, si)     ,si
+#define __NR64ATRF0_mktty                  "%d"
+#define __NR64ATRA0_mktty(keyboard, display, name, rsvd) ,(int)(keyboard)
+#define __NR64ATRF1_mktty                  "%d"
+#define __NR64ATRA1_mktty(keyboard, display, name, rsvd) ,(int)(display)
+#define __NR64ATRF2_mktty                  "%q"
+#define __NR64ATRA2_mktty(keyboard, display, name, rsvd) ,(validate_readable_opt(name,1),name)
+#define __NR64ATRF3_mktty                  "%#" PRIxSIZ
+#define __NR64ATRA3_mktty(keyboard, display, name, rsvd) ,(uintptr_t)(rsvd)
+#define __NR64ATRF0_lfutexlockexpr         "%p"
+#define __NR64ATRA0_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,ulockaddr
+#define __NR64ATRF1_lfutexlockexpr         "%p"
+#define __NR64ATRA1_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,base
+#define __NR64ATRF2_lfutexlockexpr         "%" PRIuSIZ
+#define __NR64ATRA2_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprc
+#define __NR64ATRF3_lfutexlockexpr         "%p"
+#define __NR64ATRA3_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprv
+#define __NR64ATRF4_lfutexlockexpr         "%p"
+#define __NR64ATRA4_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,timeout
+#define __NR64ATRF5_lfutexlockexpr         "%#" PRIxSIZ
+#define __NR64ATRA5_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
+#define __NR64ATRF0_lfutexexpr             "%p"
+#define __NR64ATRA0_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,base
+#define __NR64ATRF1_lfutexexpr             "%" PRIuSIZ
+#define __NR64ATRA1_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprc
+#define __NR64ATRF2_lfutexexpr             "%p"
+#define __NR64ATRA2_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprv
+#define __NR64ATRF3_lfutexexpr             "%p"
+#define __NR64ATRA3_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,timeout
+#define __NR64ATRF4_lfutexexpr             "%#" PRIxSIZ
+#define __NR64ATRA4_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
+#define __NR64ATRF0_lfutex                 "%p"
+#define __NR64ATRA0_lfutex(uaddr, futex_op, val, timeout, val2) ,uaddr
+#define __NR64ATRF1_lfutex                 "%#" PRIxSIZ
+#define __NR64ATRA1_lfutex(uaddr, futex_op, val, timeout, val2) ,(uintptr_t)(futex_op)
+#define __NR64ATRF2_lfutex                 "%" PRIu64
+#define __NR64ATRA2_lfutex(uaddr, futex_op, val, timeout, val2) ,val
+#define __NR64ATRF3_lfutex                 "%p"
+#define __NR64ATRA3_lfutex(uaddr, futex_op, val, timeout, val2) ,timeout
+#define __NR64ATRF4_lfutex                 "%" PRIu64
+#define __NR64ATRA4_lfutex(uaddr, futex_op, val, timeout, val2) ,val2
+#define __NR64ATRF0_debugtrap              "%p"
+#define __NR64ATRA0_debugtrap(state, reason) ,state
+#define __NR64ATRF1_debugtrap              "%p"
+#define __NR64ATRA1_debugtrap(state, reason) ,reason
+#define __NR64ATRF0_set_library_listdef    "%p"
+#define __NR64ATRA0_set_library_listdef(listdef) ,listdef
+#define __NR64ATRF0_writevf                "%d"
+#define __NR64ATRA0_writevf(fd, iovec, count, mode) ,(int)(fd)
+#define __NR64ATRF1_writevf                "%p"
+#define __NR64ATRA1_writevf(fd, iovec, count, mode) ,iovec
+#define __NR64ATRF2_writevf                "%" PRIuSIZ
+#define __NR64ATRA2_writevf(fd, iovec, count, mode) ,count
+#define __NR64ATRF3_writevf                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA3_writevf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                    ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                    ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                    ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                    ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                    ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                    ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                    ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                    ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NR64ATRF0_readvf                 "%d"
+#define __NR64ATRA0_readvf(fd, iovec, count, mode) ,(int)(fd)
+#define __NR64ATRF1_readvf                 "%p"
+#define __NR64ATRA1_readvf(fd, iovec, count, mode) ,iovec
+#define __NR64ATRF2_readvf                 "%" PRIuSIZ
+#define __NR64ATRA2_readvf(fd, iovec, count, mode) ,count
+#define __NR64ATRF3_readvf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA3_readvf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                   ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                   ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                   ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                   ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                   ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                   ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                   ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                   ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NR64ATRF0_pwrite64f              "%d"
+#define __NR64ATRA0_pwrite64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
+#define __NR64ATRF1_pwrite64f              "%p"
+#define __NR64ATRA1_pwrite64f(fd, buf, bufsize, offset, mode) ,buf
+#define __NR64ATRF2_pwrite64f              "%" PRIuSIZ
+#define __NR64ATRA2_pwrite64f(fd, buf, bufsize, offset, mode) ,bufsize
+#define __NR64ATRF3_pwrite64f              "%" PRIu64
+#define __NR64ATRA3_pwrite64f(fd, buf, bufsize, offset, mode) ,offset
+#define __NR64ATRF4_pwrite64f              "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA4_pwrite64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                              ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                              ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                              ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                              ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                              ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                              ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                              ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                              ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NR64ATRF0_pread64f               "%d"
+#define __NR64ATRA0_pread64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
+#define __NR64ATRF1_pread64f               "%p"
+#define __NR64ATRA1_pread64f(fd, buf, bufsize, offset, mode) ,buf
+#define __NR64ATRF2_pread64f               "%" PRIuSIZ
+#define __NR64ATRA2_pread64f(fd, buf, bufsize, offset, mode) ,bufsize
+#define __NR64ATRF3_pread64f               "%" PRIu64
+#define __NR64ATRA3_pread64f(fd, buf, bufsize, offset, mode) ,offset
+#define __NR64ATRF4_pread64f               "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA4_pread64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                              ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                              ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
                                                              ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
@@ -3019,6 +2873,152 @@
                                                              ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
                                                              ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
                                                              ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NR64ATRF0_ioctlf                 "%d"
+#define __NR64ATRA0_ioctlf(fd, command, mode, arg) ,(int)(fd)
+#define __NR64ATRF1_ioctlf                 "%#" PRIxSIZ
+#define __NR64ATRA1_ioctlf(fd, command, mode, arg) ,(uintptr_t)(command)
+#define __NR64ATRF2_ioctlf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA2_ioctlf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                   ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                   ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                   ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                   ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                   ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                   ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                   ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                   ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NR64ATRF3_ioctlf                 "%p"
+#define __NR64ATRA3_ioctlf(fd, command, mode, arg) ,arg
+#define __NR64ATRF0_set_exception_handler  "%#" PRIxSIZ
+#define __NR64ATRA0_set_exception_handler(mode, handler, handler_sp) ,(uintptr_t)(mode)
+#define __NR64ATRF1_set_exception_handler  "%p"
+#define __NR64ATRA1_set_exception_handler(mode, handler, handler_sp) ,handler
+#define __NR64ATRF2_set_exception_handler  "%p"
+#define __NR64ATRA2_set_exception_handler(mode, handler, handler_sp) ,handler_sp
+#define __NR64ATRF0_get_exception_handler  "%p"
+#define __NR64ATRA0_get_exception_handler(pmode, phandler, phandler_sp) ,pmode
+#define __NR64ATRF1_get_exception_handler  "%p"
+#define __NR64ATRA1_get_exception_handler(pmode, phandler, phandler_sp) ,phandler
+#define __NR64ATRF2_get_exception_handler  "%p"
+#define __NR64ATRA2_get_exception_handler(pmode, phandler, phandler_sp) ,phandler_sp
+#define __NR64ATRF0_openpty                "%p"
+#define __NR64ATRA0_openpty(amaster, aslave, name, termp, winp) ,amaster
+#define __NR64ATRF1_openpty                "%p"
+#define __NR64ATRA1_openpty(amaster, aslave, name, termp, winp) ,aslave
+#define __NR64ATRF2_openpty                "%p"
+#define __NR64ATRA2_openpty(amaster, aslave, name, termp, winp) ,name
+#define __NR64ATRF3_openpty                "%p"
+#define __NR64ATRA3_openpty(amaster, aslave, name, termp, winp) ,termp
+#define __NR64ATRF4_openpty                "%p"
+#define __NR64ATRA4_openpty(amaster, aslave, name, termp, winp) ,winp
+#define __NR64ATRF0_rpc_schedule           "%" PRIdSIZ
+#define __NR64ATRA0_rpc_schedule(target, flags, program, arguments) ,(intptr_t)(target)
+#define __NR64ATRF1_rpc_schedule           "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA1_rpc_schedule(target, flags, program, arguments) ,(uintptr_t)(flags),(flags) & RPC_SCHEDULE_ASYNC ? "RPC_SCHEDULE_ASYNC" : (flags) ? "" : "RPC_SCHEDULE_SYNC" \
+                                                                    ,((flags) & RPC_SCHEDULE_FLAG_NONSYSCALL) && ((flags) & (RPC_SCHEDULE_ASYNC)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_NONSYSCALL ? "RPC_SCHEDULE_FLAG_NONSYSCALL" : "" \
+                                                                    ,((flags) & RPC_SCHEDULE_FLAG_WAITFORSTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_WAITFORSTART ? "RPC_SCHEDULE_FLAG_WAITFORSTART" : "" \
+                                                                    ,((flags) & RPC_SCHEDULE_FLAG_STATUSFUTEX) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_STATUSFUTEX ? "RPC_SCHEDULE_FLAG_STATUSFUTEX" : "" \
+                                                                    ,((flags) & RPC_SCHEDULE_FLAG_SYSRESTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_SYSRESTART ? "RPC_SCHEDULE_FLAG_SYSRESTART" : "" \
+                                                                    ,((flags) & RPC_SCHEDULE_FLAG_NOSYSRESTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_NOSYSRESTART ? "RPC_SCHEDULE_FLAG_NOSYSRESTART" : "" \
+                                                                    ,((flags) & RPC_SCHEDULE_FLAG_WAITSMPACK) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_WAITSMPACK ? "RPC_SCHEDULE_FLAG_WAITSMPACK" : "" \
+                                                                    ,((flags) & RPC_SCHEDULE_FLAG_DONTWAKE) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_DONTWAKE ? "RPC_SCHEDULE_FLAG_DONTWAKE" : "" \
+                                                                    ,((flags) & RPC_SCHEDULE_FLAG_HIGHPRIO) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK|RPC_SCHEDULE_FLAG_DONTWAKE)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_HIGHPRIO ? "RPC_SCHEDULE_FLAG_HIGHPRIO" : "" \
+                                                                    ,((flags) & RPC_SCHEDULE_FLAG_LOWPRIO) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK|RPC_SCHEDULE_FLAG_DONTWAKE|RPC_SCHEDULE_FLAG_HIGHPRIO)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_LOWPRIO ? "RPC_SCHEDULE_FLAG_LOWPRIO" : ""
+#define __NR64ATRF2_rpc_schedule           "%p"
+#define __NR64ATRA2_rpc_schedule(target, flags, program, arguments) ,program
+#define __NR64ATRF3_rpc_schedule           "%p"
+#define __NR64ATRA3_rpc_schedule(target, flags, program, arguments) ,arguments
+#define __NR64ATRF0_frealpathat            "%d"
+#define __NR64ATRA0_frealpathat(dirfd, filename, buf, buflen, flags) ,(int)(dirfd)
+#define __NR64ATRF1_frealpathat            "%q"
+#define __NR64ATRA1_frealpathat(dirfd, filename, buf, buflen, flags) ,(validate_readable_opt(filename,1),filename)
+#define __NR64ATRF2_frealpathat            "%p"
+#define __NR64ATRA2_frealpathat(dirfd, filename, buf, buflen, flags) ,buf
+#define __NR64ATRF3_frealpathat            "%" PRIuSIZ
+#define __NR64ATRA3_frealpathat(dirfd, filename, buf, buflen, flags) ,buflen
+#define __NR64ATRF4_frealpathat            "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
+#define __NR64ATRA4_frealpathat(dirfd, filename, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
+                                                                     ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
+                                                                     ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
+                                                                     ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR64ATRF0_frealpath4             "%d"
+#define __NR64ATRA0_frealpath4(fd, buf, buflen, flags) ,(int)(fd)
+#define __NR64ATRF1_frealpath4             "%p"
+#define __NR64ATRA1_frealpath4(fd, buf, buflen, flags) ,buf
+#define __NR64ATRF2_frealpath4             "%" PRIuSIZ
+#define __NR64ATRA2_frealpath4(fd, buf, buflen, flags) ,buflen
+#define __NR64ATRF3_frealpath4             "%#" PRIxSIZ "=%s%s%s%s%s"
+#define __NR64ATRA3_frealpath4(fd, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
+                                                       ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
+                                                       ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR64ATRF0_detach                 "%" PRIdSIZ
+#define __NR64ATRA0_detach(pid)            ,(intptr_t)(pid)
+#define __NR64ATRF0_readf                  "%d"
+#define __NR64ATRA0_readf(fd, buf, bufsize, mode) ,(int)(fd)
+#define __NR64ATRF1_readf                  "%p"
+#define __NR64ATRA1_readf(fd, buf, bufsize, mode) ,buf
+#define __NR64ATRF2_readf                  "%" PRIuSIZ
+#define __NR64ATRA2_readf(fd, buf, bufsize, mode) ,bufsize
+#define __NR64ATRF3_readf                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA3_readf(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                  ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                  ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                  ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                  ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                  ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                  ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                  ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                  ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NR64ATRF0_klstat                 "%q"
+#define __NR64ATRA0_klstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
+#define __NR64ATRF1_klstat                 "%p"
+#define __NR64ATRA1_klstat(filename, statbuf) ,statbuf
+#define __NR64ATRF0_kfstat                 "%d"
+#define __NR64ATRA0_kfstat(fd, statbuf)    ,(int)(fd)
+#define __NR64ATRF1_kfstat                 "%p"
+#define __NR64ATRA1_kfstat(fd, statbuf)    ,statbuf
+#define __NR64ATRF0_kstat                  "%q"
+#define __NR64ATRA0_kstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
+#define __NR64ATRF1_kstat                  "%p"
+#define __NR64ATRA1_kstat(filename, statbuf) ,statbuf
+#define __NR64ATRF0_hopf                   "%d"
+#define __NR64ATRA0_hopf(fd, command, mode, arg) ,(int)(fd)
+#define __NR64ATRF1_hopf                   "%#" PRIxSIZ
+#define __NR64ATRA1_hopf(fd, command, mode, arg) ,(uintptr_t)(command)
+#define __NR64ATRF2_hopf                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA2_hopf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                 ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                 ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                 ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                 ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                 ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                 ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                 ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                 ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NR64ATRF3_hopf                   "%p"
+#define __NR64ATRA3_hopf(fd, command, mode, arg) ,arg
+#define __NR64ATRF0_hop                    "%d"
+#define __NR64ATRA0_hop(fd, command, arg)  ,(int)(fd)
+#define __NR64ATRF1_hop                    "%#" PRIxSIZ
+#define __NR64ATRA1_hop(fd, command, arg)  ,(uintptr_t)(command)
+#define __NR64ATRF2_hop                    "%p"
+#define __NR64ATRA2_hop(fd, command, arg)  ,arg
+#define __NR64ATRF0_writef                 "%d"
+#define __NR64ATRA0_writef(fd, buf, bufsize, mode) ,(int)(fd)
+#define __NR64ATRF1_writef                 "%p"
+#define __NR64ATRA1_writef(fd, buf, bufsize, mode) ,buf
+#define __NR64ATRF2_writef                 "%" PRIuSIZ
+#define __NR64ATRA2_writef(fd, buf, bufsize, mode) ,bufsize
+#define __NR64ATRF3_writef                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NR64ATRA3_writef(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                   ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                   ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                   ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                   ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                   ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                   ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                   ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                   ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT */
 #endif /* __WANT_SYSCALL_ARGUMENT_FORMAT */
 

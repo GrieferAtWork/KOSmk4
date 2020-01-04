@@ -922,7 +922,9 @@ function skipSpace(text: string, pos: int): int {
 }
 
 
-function parseSyscallDefs(context: ParserContext, text: string, filename: string) {
+function parseSyscallDefs(
+		context: ParserContext, text: string,
+		filename: string, arch/*: SyscallArch*/) {
 	local i = 0;
 	local len = #text;
 	local currentFunction: Function | none = none;
@@ -1237,7 +1239,7 @@ function parseSyscallDefs(context: ParserContext, text: string, filename: string
 				continue;
 			}
 		}
-		if (ch.isnumeric()) {
+		if (ch.isnumeric() || ch == "-") {
 			/* System call mapping  */
 			local line = text.count("\n", 0, i - 1) + 1;
 			local number_start = i - 1;
@@ -1247,7 +1249,22 @@ function parseSyscallDefs(context: ParserContext, text: string, filename: string
 			try {
 				syscall_number = int(syscall_number);
 			} catch (e...) {
-				err(number_start, "Invalid number: " + repr(e));
+				err(number_start, "Invalid number: {!r}\n{!r}"
+					.format({ syscall_number, e }));
+			}
+			/* Deal with negative (extended) system call numbers */
+			if (syscall_number < 0) {
+				if (arch.platformMaxPossibleSysno >= 0xffffffffffffffffffffffffffffffff)
+					syscall_number = syscall_number.unsigned128;
+				else if (arch.platformMaxPossibleSysno >= 0xffffffffffffffff)
+					syscall_number = syscall_number.unsigned64;
+				else if (arch.platformMaxPossibleSysno >= 0xffffffff)
+					syscall_number = syscall_number.unsigned32;
+				else if (arch.platformMaxPossibleSysno >= 0xffff)
+					syscall_number = syscall_number.unsigned16;
+				else {
+					syscall_number = syscall_number.unsigned8;
+				}
 			}
 			while (i < len && text.isspace(i))
 				++i;
@@ -1536,11 +1553,12 @@ done_argument_list:
 		err(currentGroupPos, "Group wasn't terminated");
 }
 
-function parseSyscallDefsFile(context: ParserContext, filename: string) {
+function parseSyscallDefsFile(
+		context: ParserContext, filename: string, arch/*: SyscallArch*/) {
 	local text;
 	with (local fp = File.open(filename, "r"))
 		text = fp.read().decode("utf-8");
-	parseSyscallDefs(context, text, filename);
+	parseSyscallDefs(context, text, filename, arch);
 }
 
 function printSyscallDeclarations(
@@ -2405,6 +2423,7 @@ function generateAsmLsSyscallsHeader(
 		fp << "#endif /* !__TSYSCALL" << i << "_TABLE_END */\n";
 		fp << "\n";
 	}
+	print repr ranges;
 	for (local i, data: util.enumerate(ranges)) {
 		local minsysno, maxsysno = data...;
 		printMessageBox(fp, "Contents of the {} table".format({ nth(i + 1) }));
@@ -2722,13 +2741,13 @@ function main(archNames: {string...}) {
 	} else {
 		print "[generate_syscalls] Generating system calls for all architectures";
 	}
-	parseSyscallDefsFile(baseContext, "include/asm/syscalls.def");
+	parseSyscallDefsFile(baseContext, "include/asm/syscalls.def", none);
 	local archContexts: {string: ParserContext} = Dict();
 	archContexts[""] = baseContext;
 	for (local name, a: ARCH) {
 		local c = copy baseContext;
 		parseSyscallDefsFile(c, a.formatPath(
-			"include/{name}/asm/syscalls{suffix}.def"));
+			"include/{name}/asm/syscalls{suffix}.def"), a);
 		archContexts[name] = c;
 	}
 	/* Make sure that system call names are actually defined */
@@ -2859,7 +2878,7 @@ function main(archNames: {string...}) {
 					local a = ALL_ARCH[compatArchName];
 					local c = copy baseContext;
 					parseSyscallDefsFile(c, a.formatPath(
-						"include/{name}/asm/syscalls{suffix}.def"));
+						"include/{name}/asm/syscalls{suffix}.def"), a);
 					archContexts[compatArchName] = c;
 				}
 				local compatContext = archContexts[compatArchName];
@@ -2882,7 +2901,7 @@ function main(archNames: {string...}) {
 				local a = ALL_ARCH[compatArchName];
 				local c = copy baseContext;
 				parseSyscallDefsFile(c, a.formatPath(
-					"include/{name}/asm/syscalls{suffix}.def"));
+					"include/{name}/asm/syscalls{suffix}.def"), a);
 				archContexts[compatArchName] = c;
 			}
 			local compatContext = archContexts[compatArchName];

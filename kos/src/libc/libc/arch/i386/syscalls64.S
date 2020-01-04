@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f31e0c6 */
+/* HASH CRC-32:0xdb393703 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8069,179 +8069,1263 @@ INTERN_FUNCTION(libc_sys_Xmlock2)
 END(libc_sys_Xmlock2)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmlock2, libc_sys_Xmlock2)
 
-/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-.section .text.crt.syscall.readf
-INTERN_FUNCTION(libc_sys_readf)
+/* ssize_t pwritevf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.crt.syscall.pwritevf
+INTERN_FUNCTION(libc_sys_pwritevf)
 	.cfi_startproc
-	movq   $(0xffffffff80000000), %rax
+	movq   $(0xfffffffffffffed8), %rax
 	movq   %rcx, %r10
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_readf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_readf, libc_sys_readf)
+END(libc_sys_pwritevf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_pwritevf, libc_sys_pwritevf)
 
-/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-.section .text.crt.syscall.Xreadf
-INTERN_FUNCTION(libc_sys_Xreadf)
+/* ssize_t pwritevf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.crt.syscall.Xpwritevf
+INTERN_FUNCTION(libc_sys_Xpwritevf)
 	.cfi_startproc
-	movq   $(0xffffffff80000000), %rax
+	movq   $(0xfffffffffffffed8), %rax
 	movq   %rcx, %r10
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xreadf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xreadf, libc_sys_Xreadf)
+END(libc_sys_Xpwritevf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpwritevf, libc_sys_Xpwritevf)
 
-/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
-.section .text.crt.syscall.writef
-INTERN_FUNCTION(libc_sys_writef)
+/* ssize_t preadvf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.crt.syscall.preadvf
+INTERN_FUNCTION(libc_sys_preadvf)
 	.cfi_startproc
-	movq   $(0xffffffff80000001), %rax
+	movq   $(0xfffffffffffffed9), %rax
 	movq   %rcx, %r10
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_writef)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_writef, libc_sys_writef)
+END(libc_sys_preadvf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_preadvf, libc_sys_preadvf)
 
-/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
-.section .text.crt.syscall.Xwritef
-INTERN_FUNCTION(libc_sys_Xwritef)
+/* ssize_t preadvf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.crt.syscall.Xpreadvf
+INTERN_FUNCTION(libc_sys_Xpreadvf)
 	.cfi_startproc
-	movq   $(0xffffffff80000001), %rax
+	movq   $(0xfffffffffffffed9), %rax
 	movq   %rcx, %r10
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xwritef)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xwritef, libc_sys_Xwritef)
+END(libc_sys_Xpreadvf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpreadvf, libc_sys_Xpreadvf)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
-.section .text.crt.syscall.hop
-INTERN_FUNCTION(libc_sys_hop)
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
+.section .text.crt.syscall.freadlinkat
+INTERN_FUNCTION(libc_sys_freadlinkat)
 	.cfi_startproc
-	movq   $(0xffffffff80000002), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_hop)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_hop, libc_sys_hop)
-
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
-.section .text.crt.syscall.Xhop
-INTERN_FUNCTION(libc_sys_Xhop)
-	.cfi_startproc
-	movq   $(0xffffffff80000002), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xhop)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xhop, libc_sys_Xhop)
-
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-.section .text.crt.syscall.hopf
-INTERN_FUNCTION(libc_sys_hopf)
-	.cfi_startproc
-	movq   $(0xffffffff80000003), %rax
+	movq   $(0xfffffffffffffef5), %rax
 	movq   %rcx, %r10
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_hopf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_hopf, libc_sys_hopf)
+END(libc_sys_freadlinkat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_freadlinkat, libc_sys_freadlinkat)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-.section .text.crt.syscall.Xhopf
-INTERN_FUNCTION(libc_sys_Xhopf)
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
+.section .text.crt.syscall.Xfreadlinkat
+INTERN_FUNCTION(libc_sys_Xfreadlinkat)
 	.cfi_startproc
-	movq   $(0xffffffff80000003), %rax
+	movq   $(0xfffffffffffffef5), %rax
 	movq   %rcx, %r10
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xhopf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xhopf, libc_sys_Xhopf)
+END(libc_sys_Xfreadlinkat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfreadlinkat, libc_sys_Xfreadlinkat)
 
-/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
-.section .text.crt.syscall.kstat
-INTERN_FUNCTION(libc_sys_kstat)
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
+.section .text.crt.syscall.fsymlinkat
+INTERN_FUNCTION(libc_sys_fsymlinkat)
 	.cfi_startproc
-	movq   $(0xffffffff80000004), %rax
+	movq   $(0xfffffffffffffef6), %rax
+	movq   %rcx, %r10
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_kstat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_kstat, libc_sys_kstat)
+END(libc_sys_fsymlinkat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_fsymlinkat, libc_sys_fsymlinkat)
 
-/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
-.section .text.crt.syscall.Xkstat
-INTERN_FUNCTION(libc_sys_Xkstat)
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
+.section .text.crt.syscall.Xfsymlinkat
+INTERN_FUNCTION(libc_sys_Xfsymlinkat)
 	.cfi_startproc
-	movq   $(0xffffffff80000004), %rax
+	movq   $(0xfffffffffffffef6), %rax
+	movq   %rcx, %r10
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xkstat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkstat, libc_sys_Xkstat)
+END(libc_sys_Xfsymlinkat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfsymlinkat, libc_sys_Xfsymlinkat)
 
-/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
-.section .text.crt.syscall.kfstat
-INTERN_FUNCTION(libc_sys_kfstat)
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
+.section .text.crt.syscall.frenameat
+INTERN_FUNCTION(libc_sys_frenameat)
 	.cfi_startproc
-	movq   $(0xffffffff80000005), %rax
+	movq   $(0xfffffffffffffef8), %rax
+	movq   %rcx, %r10
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_kfstat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_kfstat, libc_sys_kfstat)
+END(libc_sys_frenameat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_frenameat, libc_sys_frenameat)
 
-/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
-.section .text.crt.syscall.Xkfstat
-INTERN_FUNCTION(libc_sys_Xkfstat)
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
+.section .text.crt.syscall.Xfrenameat
+INTERN_FUNCTION(libc_sys_Xfrenameat)
 	.cfi_startproc
-	movq   $(0xffffffff80000005), %rax
+	movq   $(0xfffffffffffffef8), %rax
+	movq   %rcx, %r10
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xkfstat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkfstat, libc_sys_Xkfstat)
+END(libc_sys_Xfrenameat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfrenameat, libc_sys_Xfrenameat)
 
-/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
-.section .text.crt.syscall.klstat
-INTERN_FUNCTION(libc_sys_klstat)
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
+.section .text.crt.syscall.kfstatat
+INTERN_FUNCTION(libc_sys_kfstatat)
 	.cfi_startproc
-	movq   $(0xffffffff80000006), %rax
+	movq   $(0xfffffffffffffefa), %rax
+	movq   %rcx, %r10
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_klstat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_klstat, libc_sys_klstat)
+END(libc_sys_kfstatat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_kfstatat, libc_sys_kfstatat)
 
-/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
-.section .text.crt.syscall.Xklstat
-INTERN_FUNCTION(libc_sys_Xklstat)
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
+.section .text.crt.syscall.Xkfstatat
+INTERN_FUNCTION(libc_sys_Xkfstatat)
 	.cfi_startproc
-	movq   $(0xffffffff80000006), %rax
+	movq   $(0xfffffffffffffefa), %rax
+	movq   %rcx, %r10
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xklstat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xklstat, libc_sys_Xklstat)
+END(libc_sys_Xkfstatat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkfstatat, libc_sys_Xkfstatat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
+.section .text.crt.syscall.fmknodat
+INTERN_FUNCTION(libc_sys_fmknodat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffefd), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_fmknodat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_fmknodat, libc_sys_fmknodat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
+.section .text.crt.syscall.Xfmknodat
+INTERN_FUNCTION(libc_sys_Xfmknodat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffefd), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfmknodat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfmknodat, libc_sys_Xfmknodat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+.section .text.crt.syscall.fmkdirat
+INTERN_FUNCTION(libc_sys_fmkdirat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffefe), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_fmkdirat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_fmkdirat, libc_sys_fmkdirat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+.section .text.crt.syscall.Xfmkdirat
+INTERN_FUNCTION(libc_sys_Xfmkdirat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffefe), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfmkdirat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfmkdirat, libc_sys_Xfmkdirat)
+
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+.section .text.crt.syscall.ksysctl
+INTERN_FUNCTION(libc_sys_ksysctl)
+	.cfi_startproc
+	movq   $(0xffffffffffffff64), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_ksysctl)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_ksysctl, libc_sys_ksysctl)
+
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+.section .text.crt.syscall.Xksysctl
+INTERN_FUNCTION(libc_sys_Xksysctl)
+	.cfi_startproc
+	movq   $(0xffffffffffffff64), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xksysctl)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xksysctl, libc_sys_Xksysctl)
+
+/* Map the segments of a given library into memory
+ * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
+ * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
+ *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
+ *                       MAP_DONT_OVERRIDE'
+ * @param: fd:    A handle for the library file being mapped
+ *                (must be a file or vm_datablock/inode)
+ * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+ *                (depending on the caller running in 32- or 64-bit mode)
+ * @param: hdrc:  The number of program headers */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
+.section .text.crt.syscall.maplibrary
+INTERN_FUNCTION(libc_sys_maplibrary)
+	.cfi_startproc
+	movq   $(0xffffffffffffff7a), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_maplibrary)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_maplibrary, libc_sys_maplibrary)
+
+/* Map the segments of a given library into memory
+ * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
+ * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
+ *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
+ *                       MAP_DONT_OVERRIDE'
+ * @param: fd:    A handle for the library file being mapped
+ *                (must be a file or vm_datablock/inode)
+ * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+ *                (depending on the caller running in 32- or 64-bit mode)
+ * @param: hdrc:  The number of program headers */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
+.section .text.crt.syscall.Xmaplibrary
+INTERN_FUNCTION(libc_sys_Xmaplibrary)
+	.cfi_startproc
+	movq   $(0xffffffffffffff7a), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xmaplibrary)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmaplibrary, libc_sys_Xmaplibrary)
+
+/* uint64_t fsmode(uint64_t mode) */
+.section .text.crt.syscall.fsmode
+INTERN_FUNCTION(libc_sys_fsmode)
+	.cfi_startproc
+	movq   $(0xffffffffffffffa1), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_fsmode)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_fsmode, libc_sys_fsmode)
+
+/* uint64_t fsmode(uint64_t mode) */
+.section .text.crt.syscall.Xfsmode
+INTERN_FUNCTION(libc_sys_Xfsmode)
+	.cfi_startproc
+	movq   $(0xffffffffffffffa1), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfsmode)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfsmode, libc_sys_Xfsmode)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
+.section .text.crt.syscall.fchdirat
+INTERN_FUNCTION(libc_sys_fchdirat)
+	.cfi_startproc
+	movq   $(0xffffffffffffffb0), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_fchdirat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_fchdirat, libc_sys_fchdirat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
+.section .text.crt.syscall.Xfchdirat
+INTERN_FUNCTION(libc_sys_Xfchdirat)
+	.cfi_startproc
+	movq   $(0xffffffffffffffb0), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfchdirat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfchdirat, libc_sys_Xfchdirat)
+
+/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+.section .text.crt.syscall.kreaddirf
+INTERN_FUNCTION(libc_sys_kreaddirf)
+	.cfi_startproc
+	movq   $(0xffffffffffffffb1), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_kreaddirf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_kreaddirf, libc_sys_kreaddirf)
+
+/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+.section .text.crt.syscall.Xkreaddirf
+INTERN_FUNCTION(libc_sys_Xkreaddirf)
+	.cfi_startproc
+	movq   $(0xffffffffffffffb1), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xkreaddirf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkreaddirf, libc_sys_Xkreaddirf)
+
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+.section .text.crt.syscall.kreaddir
+INTERN_FUNCTION(libc_sys_kreaddir)
+	.cfi_startproc
+	movq   $(0xffffffffffffffb2), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_kreaddir)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_kreaddir, libc_sys_kreaddir)
+
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+.section .text.crt.syscall.Xkreaddir
+INTERN_FUNCTION(libc_sys_Xkreaddir)
+	.cfi_startproc
+	movq   $(0xffffffffffffffb2), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xkreaddir)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkreaddir, libc_sys_Xkreaddir)
+
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
+ * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+ *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           In this case, a traceback displayed to a human should not include the text location at
+ *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+ *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
+ *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
+/* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length, struct exception_data64 const *exception, syscall_ulong_t unwind_error) */
+.section .text.crt.syscall.coredump
+INTERN_FUNCTION(libc_sys_coredump)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe3), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_coredump)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_coredump, libc_sys_coredump)
+
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
+ * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+ *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           In this case, a traceback displayed to a human should not include the text location at
+ *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+ *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
+ *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
+/* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length, struct exception_data64 const *exception, syscall_ulong_t unwind_error) */
+.section .text.crt.syscall.Xcoredump
+INTERN_FUNCTION(libc_sys_Xcoredump)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe3), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xcoredump)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xcoredump, libc_sys_Xcoredump)
+
+/* Raise a signal within the calling thread alongside the given CPU state
+ * This system call is used when translating exceptions into POSIX signal in error mode #4
+ * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
+ *                be raised for the caller's source location. Note that only in the later case
+ *                will this function return to its caller. - When `state' is non-NULL, it will
+ *                return to the text location described by it.
+ * TODO: Add a flags argument to control if the current signal mask
+ *       should be ignored (currently, it's always being ignored) */
+/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfo64_struct const *si) */
+.section .text.crt.syscall.raiseat
+INTERN_FUNCTION(libc_sys_raiseat)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe4), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_raiseat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_raiseat, libc_sys_raiseat)
+
+/* Raise a signal within the calling thread alongside the given CPU state
+ * This system call is used when translating exceptions into POSIX signal in error mode #4
+ * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
+ *                be raised for the caller's source location. Note that only in the later case
+ *                will this function return to its caller. - When `state' is non-NULL, it will
+ *                return to the text location described by it.
+ * TODO: Add a flags argument to control if the current signal mask
+ *       should be ignored (currently, it's always being ignored) */
+/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfo64_struct const *si) */
+.section .text.crt.syscall.Xraiseat
+INTERN_FUNCTION(libc_sys_Xraiseat)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe4), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xraiseat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xraiseat, libc_sys_Xraiseat)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The newly created device automatically gets assigned an arbitrary device number, before
+ * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+.section .text.crt.syscall.mktty
+INTERN_FUNCTION(libc_sys_mktty)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe5), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_mktty)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_mktty, libc_sys_mktty)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The newly created device automatically gets assigned an arbitrary device number, before
+ * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+.section .text.crt.syscall.Xmktty
+INTERN_FUNCTION(libc_sys_Xmktty)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe5), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xmktty)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmktty, libc_sys_Xmktty)
+
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.crt.syscall.lfutexlockexpr
+INTERN_FUNCTION(libc_sys_lfutexlockexpr)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe6), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_lfutexlockexpr)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexlockexpr, libc_sys_lfutexlockexpr)
+
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.crt.syscall.Xlfutexlockexpr
+INTERN_FUNCTION(libc_sys_Xlfutexlockexpr)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe6), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xlfutexlockexpr)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutexlockexpr, libc_sys_Xlfutexlockexpr)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.crt.syscall.lfutexexpr
+INTERN_FUNCTION(libc_sys_lfutexexpr)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe7), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_lfutexexpr)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexexpr, libc_sys_lfutexexpr)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.crt.syscall.Xlfutexexpr
+INTERN_FUNCTION(libc_sys_Xlfutexexpr)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe7), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xlfutexexpr)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutexexpr, libc_sys_Xlfutexexpr)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val, struct __timespecx64 const *timeout, uint64_t val2) */
+.section .text.crt.syscall.lfutex
+INTERN_FUNCTION(libc_sys_lfutex)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe8), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_lfutex)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutex, libc_sys_lfutex)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val, struct __timespecx64 const *timeout, uint64_t val2) */
+.section .text.crt.syscall.Xlfutex
+INTERN_FUNCTION(libc_sys_Xlfutex)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe8), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xlfutex)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutex, libc_sys_Xlfutex)
+
+/* syscall_slong_t rpc_service(void) */
+.section .text.crt.syscall.rpc_service
+INTERN_FUNCTION(libc_sys_rpc_service)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe9), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_rpc_service)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_rpc_service, libc_sys_rpc_service)
+
+/* syscall_slong_t rpc_service(void) */
+.section .text.crt.syscall.Xrpc_service
+INTERN_FUNCTION(libc_sys_Xrpc_service)
+	.cfi_startproc
+	movq   $(0xffffffffffffffe9), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xrpc_service)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrpc_service, libc_sys_Xrpc_service)
+
+/* Trigger a debugger trap `trapno', optionally extended with `regs'
+ * at either the system call return location, or at the given `state'
+ * In the later case, this system call will by default return to the
+ * given `state', though given the purpose of this system call being
+ * to inform a connected debugger of some breakable event, allowing
+ * it to do whatever it wishes before execution is resumed.
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
+ * @param: state:    When non-NULL, the CPU state where the trap should return to by default
+ * @return: -EOK:    `state' was NULL and the trap returned successfully
+ * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
+/* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
+.section .text.crt.syscall.debugtrap
+INTERN_FUNCTION(libc_sys_debugtrap)
+	.cfi_startproc
+	movq   $(0xffffffffffffffea), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_debugtrap)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_debugtrap, libc_sys_debugtrap)
+
+/* Trigger a debugger trap `trapno', optionally extended with `regs'
+ * at either the system call return location, or at the given `state'
+ * In the later case, this system call will by default return to the
+ * given `state', though given the purpose of this system call being
+ * to inform a connected debugger of some breakable event, allowing
+ * it to do whatever it wishes before execution is resumed.
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
+ * @param: state:    When non-NULL, the CPU state where the trap should return to by default
+ * @return: -EOK:    `state' was NULL and the trap returned successfully
+ * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
+/* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
+.section .text.crt.syscall.Xdebugtrap
+INTERN_FUNCTION(libc_sys_Xdebugtrap)
+	.cfi_startproc
+	movq   $(0xffffffffffffffea), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xdebugtrap)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xdebugtrap, libc_sys_Xdebugtrap)
+
+/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
+/* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
+.section .text.crt.syscall.set_library_listdef
+INTERN_FUNCTION(libc_sys_set_library_listdef)
+	.cfi_startproc
+	movq   $(0xffffffffffffffeb), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_set_library_listdef)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_set_library_listdef, libc_sys_set_library_listdef)
+
+/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
+/* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
+.section .text.crt.syscall.Xset_library_listdef
+INTERN_FUNCTION(libc_sys_Xset_library_listdef)
+	.cfi_startproc
+	movq   $(0xffffffffffffffeb), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xset_library_listdef)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xset_library_listdef, libc_sys_Xset_library_listdef)
+
+/* ssize_t writevf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
+.section .text.crt.syscall.writevf
+INTERN_FUNCTION(libc_sys_writevf)
+	.cfi_startproc
+	movq   $(0xffffffffffffffec), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_writevf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_writevf, libc_sys_writevf)
+
+/* ssize_t writevf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
+.section .text.crt.syscall.Xwritevf
+INTERN_FUNCTION(libc_sys_Xwritevf)
+	.cfi_startproc
+	movq   $(0xffffffffffffffec), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xwritevf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xwritevf, libc_sys_Xwritevf)
+
+/* ssize_t readvf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
+.section .text.crt.syscall.readvf
+INTERN_FUNCTION(libc_sys_readvf)
+	.cfi_startproc
+	movq   $(0xffffffffffffffed), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_readvf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_readvf, libc_sys_readvf)
+
+/* ssize_t readvf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
+.section .text.crt.syscall.Xreadvf
+INTERN_FUNCTION(libc_sys_Xreadvf)
+	.cfi_startproc
+	movq   $(0xffffffffffffffed), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xreadvf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xreadvf, libc_sys_Xreadvf)
+
+/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.crt.syscall.pwrite64f
+INTERN_FUNCTION(libc_sys_pwrite64f)
+	.cfi_startproc
+	movq   $(0xffffffffffffffee), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_pwrite64f)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_pwrite64f, libc_sys_pwrite64f)
+
+/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.crt.syscall.Xpwrite64f
+INTERN_FUNCTION(libc_sys_Xpwrite64f)
+	.cfi_startproc
+	movq   $(0xffffffffffffffee), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xpwrite64f)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpwrite64f, libc_sys_Xpwrite64f)
+
+/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.crt.syscall.pread64f
+INTERN_FUNCTION(libc_sys_pread64f)
+	.cfi_startproc
+	movq   $(0xffffffffffffffef), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_pread64f)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_pread64f, libc_sys_pread64f)
+
+/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.crt.syscall.Xpread64f
+INTERN_FUNCTION(libc_sys_Xpread64f)
+	.cfi_startproc
+	movq   $(0xffffffffffffffef), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xpread64f)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpread64f, libc_sys_Xpread64f)
+
+/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.crt.syscall.ioctlf
+INTERN_FUNCTION(libc_sys_ioctlf)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff0), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_ioctlf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_ioctlf, libc_sys_ioctlf)
+
+/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.crt.syscall.Xioctlf
+INTERN_FUNCTION(libc_sys_Xioctlf)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff0), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xioctlf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xioctlf, libc_sys_Xioctlf)
+
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
+ *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
+ * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given MODE is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+.section .text.crt.syscall.set_exception_handler
+INTERN_FUNCTION(libc_sys_set_exception_handler)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff1), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_set_exception_handler)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_set_exception_handler, libc_sys_set_exception_handler)
+
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
+ *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
+ * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given MODE is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+.section .text.crt.syscall.Xset_exception_handler
+INTERN_FUNCTION(libc_sys_Xset_exception_handler)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff1), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xset_exception_handler)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xset_exception_handler, libc_sys_Xset_exception_handler)
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: PHANDLER:    The address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
+.section .text.crt.syscall.get_exception_handler
+INTERN_FUNCTION(libc_sys_get_exception_handler)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff2), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_get_exception_handler)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_get_exception_handler, libc_sys_get_exception_handler)
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: PHANDLER:    The address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
+.section .text.crt.syscall.Xget_exception_handler
+INTERN_FUNCTION(libc_sys_Xget_exception_handler)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff2), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xget_exception_handler)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xget_exception_handler, libc_sys_Xget_exception_handler)
+
+/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
+.section .text.crt.syscall.openpty
+INTERN_FUNCTION(libc_sys_openpty)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff3), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_openpty)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_openpty, libc_sys_openpty)
+
+/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
+.section .text.crt.syscall.Xopenpty
+INTERN_FUNCTION(libc_sys_Xopenpty)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff3), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xopenpty)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xopenpty, libc_sys_Xopenpty)
+
+/* Schedule an RPC for execution on the specified `target' thread.
+ * @param: target:    The targeted thread.
+ * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
+ * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
+ * @param: arguments: Arguments for the RPC loader program.
+ * @return: 1:  The specified `target' thread has already terminated.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno')
+ * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
+ * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
+/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
+.section .text.crt.syscall.rpc_schedule
+INTERN_FUNCTION(libc_sys_rpc_schedule)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff4), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_rpc_schedule)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_rpc_schedule, libc_sys_rpc_schedule)
+
+/* Schedule an RPC for execution on the specified `target' thread.
+ * @param: target:    The targeted thread.
+ * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
+ * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
+ * @param: arguments: Arguments for the RPC loader program.
+ * @return: 1:  The specified `target' thread has already terminated.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno')
+ * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
+ * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
+/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
+.section .text.crt.syscall.Xrpc_schedule
+INTERN_FUNCTION(libc_sys_Xrpc_schedule)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff4), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xrpc_schedule)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrpc_schedule, libc_sys_Xrpc_schedule)
+
+/* Returns the absolute filesystem path for the specified file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+ * causing the pointed-to file location to be retrieved. - Otherwise, the
+ * location of the link is printed instead.
+ * You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
+.section .text.crt.syscall.frealpathat
+INTERN_FUNCTION(libc_sys_frealpathat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff5), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_frealpathat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_frealpathat, libc_sys_frealpathat)
+
+/* Returns the absolute filesystem path for the specified file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+ * causing the pointed-to file location to be retrieved. - Otherwise, the
+ * location of the link is printed instead.
+ * You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
+.section .text.crt.syscall.Xfrealpathat
+INTERN_FUNCTION(libc_sys_Xfrealpathat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff5), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfrealpathat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfrealpathat, libc_sys_Xfrealpathat)
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+.section .text.crt.syscall.frealpath4
+INTERN_FUNCTION(libc_sys_frealpath4)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff6), %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_frealpath4)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_frealpath4, libc_sys_frealpath4)
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+.section .text.crt.syscall.Xfrealpath4
+INTERN_FUNCTION(libc_sys_Xfrealpath4)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff6), %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfrealpath4)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfrealpath4, libc_sys_Xfrealpath4)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+.section .text.crt.syscall.getdrives
+INTERN_FUNCTION(libc_sys_getdrives)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff7), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_getdrives)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_getdrives, libc_sys_getdrives)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+.section .text.crt.syscall.Xgetdrives
+INTERN_FUNCTION(libc_sys_Xgetdrives)
+	.cfi_startproc
+	movq   $(0xfffffffffffffff7), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xgetdrives)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetdrives, libc_sys_Xgetdrives)
 
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
@@ -8335,7 +9419,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xklstat, libc_sys_Xklstat)
 .section .text.crt.syscall.detach
 INTERN_FUNCTION(libc_sys_detach)
 	.cfi_startproc
-	movq   $(0xffffffff80000007), %rax
+	movq   $(0xfffffffffffffff8), %rax
 	clc
 	syscall
 	ret
@@ -8435,7 +9519,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_detach, libc_sys_detach)
 .section .text.crt.syscall.Xdetach
 INTERN_FUNCTION(libc_sys_Xdetach)
 	.cfi_startproc
-	movq   $(0xffffffff80000007), %rax
+	movq   $(0xfffffffffffffff8), %rax
 	stc
 	syscall
 	ret
@@ -8443,1263 +9527,179 @@ INTERN_FUNCTION(libc_sys_Xdetach)
 END(libc_sys_Xdetach)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xdetach, libc_sys_Xdetach)
 
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-.section .text.crt.syscall.getdrives
-INTERN_FUNCTION(libc_sys_getdrives)
+/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
+.section .text.crt.syscall.readf
+INTERN_FUNCTION(libc_sys_readf)
 	.cfi_startproc
-	movq   $(0xffffffff80000008), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_getdrives)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_getdrives, libc_sys_getdrives)
-
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-.section .text.crt.syscall.Xgetdrives
-INTERN_FUNCTION(libc_sys_Xgetdrives)
-	.cfi_startproc
-	movq   $(0xffffffff80000008), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xgetdrives)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetdrives, libc_sys_Xgetdrives)
-
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
-.section .text.crt.syscall.frealpath4
-INTERN_FUNCTION(libc_sys_frealpath4)
-	.cfi_startproc
-	movq   $(0xffffffff80000009), %rax
+	movq   $(0xfffffffffffffff9), %rax
 	movq   %rcx, %r10
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_frealpath4)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_frealpath4, libc_sys_frealpath4)
+END(libc_sys_readf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_readf, libc_sys_readf)
 
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
-.section .text.crt.syscall.Xfrealpath4
-INTERN_FUNCTION(libc_sys_Xfrealpath4)
+/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
+.section .text.crt.syscall.Xreadf
+INTERN_FUNCTION(libc_sys_Xreadf)
 	.cfi_startproc
-	movq   $(0xffffffff80000009), %rax
+	movq   $(0xfffffffffffffff9), %rax
 	movq   %rcx, %r10
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xfrealpath4)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfrealpath4, libc_sys_Xfrealpath4)
+END(libc_sys_Xreadf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xreadf, libc_sys_Xreadf)
 
-/* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
- * causing the pointed-to file location to be retrieved. - Otherwise, the
- * location of the link is printed instead.
- * You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
-.section .text.crt.syscall.frealpathat
-INTERN_FUNCTION(libc_sys_frealpathat)
+/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
+.section .text.crt.syscall.klstat
+INTERN_FUNCTION(libc_sys_klstat)
 	.cfi_startproc
-	movq   $(0xffffffff8000000a), %rax
+	movq   $(0xfffffffffffffffa), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_klstat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_klstat, libc_sys_klstat)
+
+/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
+.section .text.crt.syscall.Xklstat
+INTERN_FUNCTION(libc_sys_Xklstat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffffa), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xklstat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xklstat, libc_sys_Xklstat)
+
+/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
+.section .text.crt.syscall.kfstat
+INTERN_FUNCTION(libc_sys_kfstat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffffb), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_kfstat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_kfstat, libc_sys_kfstat)
+
+/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
+.section .text.crt.syscall.Xkfstat
+INTERN_FUNCTION(libc_sys_Xkfstat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffffb), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xkfstat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkfstat, libc_sys_Xkfstat)
+
+/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
+.section .text.crt.syscall.kstat
+INTERN_FUNCTION(libc_sys_kstat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffffc), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_kstat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_kstat, libc_sys_kstat)
+
+/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
+.section .text.crt.syscall.Xkstat
+INTERN_FUNCTION(libc_sys_Xkstat)
+	.cfi_startproc
+	movq   $(0xfffffffffffffffc), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xkstat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkstat, libc_sys_Xkstat)
+
+/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.crt.syscall.hopf
+INTERN_FUNCTION(libc_sys_hopf)
+	.cfi_startproc
+	movq   $(0xfffffffffffffffd), %rax
 	movq   %rcx, %r10
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_frealpathat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_frealpathat, libc_sys_frealpathat)
+END(libc_sys_hopf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_hopf, libc_sys_hopf)
 
-/* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
- * causing the pointed-to file location to be retrieved. - Otherwise, the
- * location of the link is printed instead.
- * You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
-.section .text.crt.syscall.Xfrealpathat
-INTERN_FUNCTION(libc_sys_Xfrealpathat)
+/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.crt.syscall.Xhopf
+INTERN_FUNCTION(libc_sys_Xhopf)
 	.cfi_startproc
-	movq   $(0xffffffff8000000a), %rax
+	movq   $(0xfffffffffffffffd), %rax
 	movq   %rcx, %r10
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xfrealpathat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfrealpathat, libc_sys_Xfrealpathat)
+END(libc_sys_Xhopf)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xhopf, libc_sys_Xhopf)
 
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
-.section .text.crt.syscall.rpc_schedule
-INTERN_FUNCTION(libc_sys_rpc_schedule)
+/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+.section .text.crt.syscall.hop
+INTERN_FUNCTION(libc_sys_hop)
 	.cfi_startproc
-	movq   $(0xffffffff8000000b), %rax
+	movq   $(0xfffffffffffffffe), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_hop)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_hop, libc_sys_hop)
+
+/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+.section .text.crt.syscall.Xhop
+INTERN_FUNCTION(libc_sys_Xhop)
+	.cfi_startproc
+	movq   $(0xfffffffffffffffe), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xhop)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xhop, libc_sys_Xhop)
+
+/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
+.section .text.crt.syscall.writef
+INTERN_FUNCTION(libc_sys_writef)
+	.cfi_startproc
+	movq   $(0xffffffffffffffff), %rax
 	movq   %rcx, %r10
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_rpc_schedule)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_rpc_schedule, libc_sys_rpc_schedule)
+END(libc_sys_writef)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_writef, libc_sys_writef)
 
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
-.section .text.crt.syscall.Xrpc_schedule
-INTERN_FUNCTION(libc_sys_Xrpc_schedule)
+/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
+.section .text.crt.syscall.Xwritef
+INTERN_FUNCTION(libc_sys_Xwritef)
 	.cfi_startproc
-	movq   $(0xffffffff8000000b), %rax
+	movq   $(0xffffffffffffffff), %rax
 	movq   %rcx, %r10
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xrpc_schedule)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrpc_schedule, libc_sys_Xrpc_schedule)
-
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
-.section .text.crt.syscall.ksysctl
-INTERN_FUNCTION(libc_sys_ksysctl)
-	.cfi_startproc
-	movq   $(0xffffffff8000000c), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_ksysctl)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_ksysctl, libc_sys_ksysctl)
-
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
-.section .text.crt.syscall.Xksysctl
-INTERN_FUNCTION(libc_sys_Xksysctl)
-	.cfi_startproc
-	movq   $(0xffffffff8000000c), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xksysctl)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xksysctl, libc_sys_Xksysctl)
-
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
-/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
-.section .text.crt.syscall.openpty
-INTERN_FUNCTION(libc_sys_openpty)
-	.cfi_startproc
-	movq   $(0xffffffff8000000d), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_openpty)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_openpty, libc_sys_openpty)
-
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
-/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
-.section .text.crt.syscall.Xopenpty
-INTERN_FUNCTION(libc_sys_Xopenpty)
-	.cfi_startproc
-	movq   $(0xffffffff8000000d), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xopenpty)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xopenpty, libc_sys_Xopenpty)
-
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-.section .text.crt.syscall.set_exception_handler
-INTERN_FUNCTION(libc_sys_set_exception_handler)
-	.cfi_startproc
-	movq   $(0xffffffff8000000e), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_set_exception_handler)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_set_exception_handler, libc_sys_set_exception_handler)
-
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-.section .text.crt.syscall.Xset_exception_handler
-INTERN_FUNCTION(libc_sys_Xset_exception_handler)
-	.cfi_startproc
-	movq   $(0xffffffff8000000e), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xset_exception_handler)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xset_exception_handler, libc_sys_Xset_exception_handler)
-
-/* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
-.section .text.crt.syscall.get_exception_handler
-INTERN_FUNCTION(libc_sys_get_exception_handler)
-	.cfi_startproc
-	movq   $(0xffffffff8000000f), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_get_exception_handler)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_get_exception_handler, libc_sys_get_exception_handler)
-
-/* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
-.section .text.crt.syscall.Xget_exception_handler
-INTERN_FUNCTION(libc_sys_Xget_exception_handler)
-	.cfi_startproc
-	movq   $(0xffffffff8000000f), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xget_exception_handler)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xget_exception_handler, libc_sys_Xget_exception_handler)
-
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-.section .text.crt.syscall.ioctlf
-INTERN_FUNCTION(libc_sys_ioctlf)
-	.cfi_startproc
-	movq   $(0xffffffff80000010), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_ioctlf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_ioctlf, libc_sys_ioctlf)
-
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-.section .text.crt.syscall.Xioctlf
-INTERN_FUNCTION(libc_sys_Xioctlf)
-	.cfi_startproc
-	movq   $(0xffffffff80000010), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xioctlf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xioctlf, libc_sys_Xioctlf)
-
-/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.crt.syscall.pread64f
-INTERN_FUNCTION(libc_sys_pread64f)
-	.cfi_startproc
-	movq   $(0xffffffff80000011), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_pread64f)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_pread64f, libc_sys_pread64f)
-
-/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.crt.syscall.Xpread64f
-INTERN_FUNCTION(libc_sys_Xpread64f)
-	.cfi_startproc
-	movq   $(0xffffffff80000011), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xpread64f)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpread64f, libc_sys_Xpread64f)
-
-/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.crt.syscall.pwrite64f
-INTERN_FUNCTION(libc_sys_pwrite64f)
-	.cfi_startproc
-	movq   $(0xffffffff80000012), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_pwrite64f)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_pwrite64f, libc_sys_pwrite64f)
-
-/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.crt.syscall.Xpwrite64f
-INTERN_FUNCTION(libc_sys_Xpwrite64f)
-	.cfi_startproc
-	movq   $(0xffffffff80000012), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xpwrite64f)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpwrite64f, libc_sys_Xpwrite64f)
-
-/* ssize_t readvf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
-.section .text.crt.syscall.readvf
-INTERN_FUNCTION(libc_sys_readvf)
-	.cfi_startproc
-	movq   $(0xffffffff80000013), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_readvf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_readvf, libc_sys_readvf)
-
-/* ssize_t readvf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
-.section .text.crt.syscall.Xreadvf
-INTERN_FUNCTION(libc_sys_Xreadvf)
-	.cfi_startproc
-	movq   $(0xffffffff80000013), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xreadvf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xreadvf, libc_sys_Xreadvf)
-
-/* ssize_t writevf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
-.section .text.crt.syscall.writevf
-INTERN_FUNCTION(libc_sys_writevf)
-	.cfi_startproc
-	movq   $(0xffffffff80000014), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_writevf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_writevf, libc_sys_writevf)
-
-/* ssize_t writevf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
-.section .text.crt.syscall.Xwritevf
-INTERN_FUNCTION(libc_sys_Xwritevf)
-	.cfi_startproc
-	movq   $(0xffffffff80000014), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xwritevf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xwritevf, libc_sys_Xwritevf)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
-.section .text.crt.syscall.set_library_listdef
-INTERN_FUNCTION(libc_sys_set_library_listdef)
-	.cfi_startproc
-	movq   $(0xffffffff80000015), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_set_library_listdef)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_set_library_listdef, libc_sys_set_library_listdef)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
-.section .text.crt.syscall.Xset_library_listdef
-INTERN_FUNCTION(libc_sys_Xset_library_listdef)
-	.cfi_startproc
-	movq   $(0xffffffff80000015), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xset_library_listdef)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xset_library_listdef, libc_sys_Xset_library_listdef)
-
-/* Trigger a debugger trap `trapno', optionally extended with `regs'
- * at either the system call return location, or at the given `state'
- * In the later case, this system call will by default return to the
- * given `state', though given the purpose of this system call being
- * to inform a connected debugger of some breakable event, allowing
- * it to do whatever it wishes before execution is resumed.
- * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
- * @param: state:    When non-NULL, the CPU state where the trap should return to by default
- * @return: -EOK:    `state' was NULL and the trap returned successfully
- * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-/* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
-.section .text.crt.syscall.debugtrap
-INTERN_FUNCTION(libc_sys_debugtrap)
-	.cfi_startproc
-	movq   $(0xffffffff80000016), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_debugtrap)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_debugtrap, libc_sys_debugtrap)
-
-/* Trigger a debugger trap `trapno', optionally extended with `regs'
- * at either the system call return location, or at the given `state'
- * In the later case, this system call will by default return to the
- * given `state', though given the purpose of this system call being
- * to inform a connected debugger of some breakable event, allowing
- * it to do whatever it wishes before execution is resumed.
- * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
- * @param: state:    When non-NULL, the CPU state where the trap should return to by default
- * @return: -EOK:    `state' was NULL and the trap returned successfully
- * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-/* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
-.section .text.crt.syscall.Xdebugtrap
-INTERN_FUNCTION(libc_sys_Xdebugtrap)
-	.cfi_startproc
-	movq   $(0xffffffff80000016), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xdebugtrap)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xdebugtrap, libc_sys_Xdebugtrap)
-
-/* syscall_slong_t rpc_service(void) */
-.section .text.crt.syscall.rpc_service
-INTERN_FUNCTION(libc_sys_rpc_service)
-	.cfi_startproc
-	movq   $(0xffffffff80000018), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_rpc_service)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_rpc_service, libc_sys_rpc_service)
-
-/* syscall_slong_t rpc_service(void) */
-.section .text.crt.syscall.Xrpc_service
-INTERN_FUNCTION(libc_sys_Xrpc_service)
-	.cfi_startproc
-	movq   $(0xffffffff80000018), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xrpc_service)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrpc_service, libc_sys_Xrpc_service)
-
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
- *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val, struct __timespecx64 const *timeout, uint64_t val2) */
-.section .text.crt.syscall.lfutex
-INTERN_FUNCTION(libc_sys_lfutex)
-	.cfi_startproc
-	movq   $(0xffffffff80000019), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_lfutex)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutex, libc_sys_lfutex)
-
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
- *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val, struct __timespecx64 const *timeout, uint64_t val2) */
-.section .text.crt.syscall.Xlfutex
-INTERN_FUNCTION(libc_sys_Xlfutex)
-	.cfi_startproc
-	movq   $(0xffffffff80000019), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xlfutex)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutex, libc_sys_Xlfutex)
-
-/* >> lfutexexpr(2)
- * The lfutexexpr() system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread, as well as
- * have the calling thread wait for any number of futex objects associated with
- * any address that is checked as part of the expression. (s.a. `lfutex()')
- * Notes:
- *   - This is the only futex function that can be used to wait on multiple futex
- *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on futex objects, as well as waiting on
- *     futexes in conjunction with waiting on other things such as files, see the
- *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.crt.syscall.lfutexexpr
-INTERN_FUNCTION(libc_sys_lfutexexpr)
-	.cfi_startproc
-	movq   $(0xffffffff8000001a), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_lfutexexpr)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexexpr, libc_sys_lfutexexpr)
-
-/* >> lfutexexpr(2)
- * The lfutexexpr() system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread, as well as
- * have the calling thread wait for any number of futex objects associated with
- * any address that is checked as part of the expression. (s.a. `lfutex()')
- * Notes:
- *   - This is the only futex function that can be used to wait on multiple futex
- *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on futex objects, as well as waiting on
- *     futexes in conjunction with waiting on other things such as files, see the
- *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.crt.syscall.Xlfutexexpr
-INTERN_FUNCTION(libc_sys_Xlfutexexpr)
-	.cfi_startproc
-	movq   $(0xffffffff8000001a), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xlfutexexpr)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutexexpr, libc_sys_Xlfutexexpr)
-
-/* >> lfutexlockexpr(2)
- * A function that is similar to `lfutexexpr()', but allows for the use of one central
- * locking futex that is used for waiting and may be distinct from any other given futex
- * object pointer.
- * Notes:
- *   - This function only has the calling thread wait on a single futex `ulockaddr',
- *     rather than having it wait on an arbitrary number of futexes, as would be the case when
- *     the `lfutexexpr()' function is used.
- *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things such as files, see the documentation on
- *     this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.crt.syscall.lfutexlockexpr
-INTERN_FUNCTION(libc_sys_lfutexlockexpr)
-	.cfi_startproc
-	movq   $(0xffffffff8000001b), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_lfutexlockexpr)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexlockexpr, libc_sys_lfutexlockexpr)
-
-/* >> lfutexlockexpr(2)
- * A function that is similar to `lfutexexpr()', but allows for the use of one central
- * locking futex that is used for waiting and may be distinct from any other given futex
- * object pointer.
- * Notes:
- *   - This function only has the calling thread wait on a single futex `ulockaddr',
- *     rather than having it wait on an arbitrary number of futexes, as would be the case when
- *     the `lfutexexpr()' function is used.
- *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things such as files, see the documentation on
- *     this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.crt.syscall.Xlfutexlockexpr
-INTERN_FUNCTION(libc_sys_Xlfutexlockexpr)
-	.cfi_startproc
-	movq   $(0xffffffff8000001b), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xlfutexlockexpr)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutexlockexpr, libc_sys_Xlfutexlockexpr)
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The newly created device automatically gets assigned an arbitrary device number, before
- * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
-.section .text.crt.syscall.mktty
-INTERN_FUNCTION(libc_sys_mktty)
-	.cfi_startproc
-	movq   $(0xffffffff8000001c), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_mktty)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_mktty, libc_sys_mktty)
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The newly created device automatically gets assigned an arbitrary device number, before
- * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
-.section .text.crt.syscall.Xmktty
-INTERN_FUNCTION(libc_sys_Xmktty)
-	.cfi_startproc
-	movq   $(0xffffffff8000001c), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xmktty)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmktty, libc_sys_Xmktty)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfo64_struct const *si) */
-.section .text.crt.syscall.raiseat
-INTERN_FUNCTION(libc_sys_raiseat)
-	.cfi_startproc
-	movq   $(0xffffffff8000001d), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_raiseat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_raiseat, libc_sys_raiseat)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfo64_struct const *si) */
-.section .text.crt.syscall.Xraiseat
-INTERN_FUNCTION(libc_sys_Xraiseat)
-	.cfi_startproc
-	movq   $(0xffffffff8000001d), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xraiseat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xraiseat, libc_sys_Xraiseat)
-
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-/* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length, struct exception_data64 const *exception, syscall_ulong_t unwind_error) */
-.section .text.crt.syscall.coredump
-INTERN_FUNCTION(libc_sys_coredump)
-	.cfi_startproc
-	movq   $(0xffffffff8000001e), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_coredump)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_coredump, libc_sys_coredump)
-
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-/* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length, struct exception_data64 const *exception, syscall_ulong_t unwind_error) */
-.section .text.crt.syscall.Xcoredump
-INTERN_FUNCTION(libc_sys_Xcoredump)
-	.cfi_startproc
-	movq   $(0xffffffff8000001e), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xcoredump)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xcoredump, libc_sys_Xcoredump)
-
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-.section .text.crt.syscall.kreaddir
-INTERN_FUNCTION(libc_sys_kreaddir)
-	.cfi_startproc
-	movq   $(0xffffffff8000004e), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_kreaddir)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_kreaddir, libc_sys_kreaddir)
-
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-.section .text.crt.syscall.Xkreaddir
-INTERN_FUNCTION(libc_sys_Xkreaddir)
-	.cfi_startproc
-	movq   $(0xffffffff8000004e), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xkreaddir)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkreaddir, libc_sys_Xkreaddir)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-.section .text.crt.syscall.fchdirat
-INTERN_FUNCTION(libc_sys_fchdirat)
-	.cfi_startproc
-	movq   $(0xffffffff80000050), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_fchdirat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_fchdirat, libc_sys_fchdirat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-.section .text.crt.syscall.Xfchdirat
-INTERN_FUNCTION(libc_sys_Xfchdirat)
-	.cfi_startproc
-	movq   $(0xffffffff80000050), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xfchdirat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfchdirat, libc_sys_Xfchdirat)
-
-/* uint64_t fsmode(uint64_t mode) */
-.section .text.crt.syscall.fsmode
-INTERN_FUNCTION(libc_sys_fsmode)
-	.cfi_startproc
-	movq   $(0xffffffff8000005f), %rax
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_fsmode)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_fsmode, libc_sys_fsmode)
-
-/* uint64_t fsmode(uint64_t mode) */
-.section .text.crt.syscall.Xfsmode
-INTERN_FUNCTION(libc_sys_Xfsmode)
-	.cfi_startproc
-	movq   $(0xffffffff8000005f), %rax
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xfsmode)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfsmode, libc_sys_Xfsmode)
-
-/* Map the segments of a given library into memory
- * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
- * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *                (depending on the caller running in 32- or 64-bit mode)
- * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
-.section .text.crt.syscall.maplibrary
-INTERN_FUNCTION(libc_sys_maplibrary)
-	.cfi_startproc
-	movq   $(0xffffffff80000086), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_maplibrary)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_maplibrary, libc_sys_maplibrary)
-
-/* Map the segments of a given library into memory
- * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
- * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *                (depending on the caller running in 32- or 64-bit mode)
- * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
-.section .text.crt.syscall.Xmaplibrary
-INTERN_FUNCTION(libc_sys_Xmaplibrary)
-	.cfi_startproc
-	movq   $(0xffffffff80000086), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xmaplibrary)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmaplibrary, libc_sys_Xmaplibrary)
-
-/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
-.section .text.crt.syscall.kreaddirf
-INTERN_FUNCTION(libc_sys_kreaddirf)
-	.cfi_startproc
-	movq   $(0xffffffff800000d9), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_kreaddirf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_kreaddirf, libc_sys_kreaddirf)
-
-/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
-.section .text.crt.syscall.Xkreaddirf
-INTERN_FUNCTION(libc_sys_Xkreaddirf)
-	.cfi_startproc
-	movq   $(0xffffffff800000d9), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xkreaddirf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkreaddirf, libc_sys_Xkreaddirf)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-.section .text.crt.syscall.fmkdirat
-INTERN_FUNCTION(libc_sys_fmkdirat)
-	.cfi_startproc
-	movq   $(0xffffffff80000102), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_fmkdirat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_fmkdirat, libc_sys_fmkdirat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-.section .text.crt.syscall.Xfmkdirat
-INTERN_FUNCTION(libc_sys_Xfmkdirat)
-	.cfi_startproc
-	movq   $(0xffffffff80000102), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xfmkdirat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfmkdirat, libc_sys_Xfmkdirat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
-.section .text.crt.syscall.fmknodat
-INTERN_FUNCTION(libc_sys_fmknodat)
-	.cfi_startproc
-	movq   $(0xffffffff80000103), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_fmknodat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_fmknodat, libc_sys_fmknodat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
-.section .text.crt.syscall.Xfmknodat
-INTERN_FUNCTION(libc_sys_Xfmknodat)
-	.cfi_startproc
-	movq   $(0xffffffff80000103), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xfmknodat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfmknodat, libc_sys_Xfmknodat)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
-.section .text.crt.syscall.kfstatat
-INTERN_FUNCTION(libc_sys_kfstatat)
-	.cfi_startproc
-	movq   $(0xffffffff80000106), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_kfstatat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_kfstatat, libc_sys_kfstatat)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
-.section .text.crt.syscall.Xkfstatat
-INTERN_FUNCTION(libc_sys_Xkfstatat)
-	.cfi_startproc
-	movq   $(0xffffffff80000106), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xkfstatat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkfstatat, libc_sys_Xkfstatat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.crt.syscall.frenameat
-INTERN_FUNCTION(libc_sys_frenameat)
-	.cfi_startproc
-	movq   $(0xffffffff80000108), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_frenameat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_frenameat, libc_sys_frenameat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.crt.syscall.Xfrenameat
-INTERN_FUNCTION(libc_sys_Xfrenameat)
-	.cfi_startproc
-	movq   $(0xffffffff80000108), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xfrenameat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfrenameat, libc_sys_Xfrenameat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
-.section .text.crt.syscall.fsymlinkat
-INTERN_FUNCTION(libc_sys_fsymlinkat)
-	.cfi_startproc
-	movq   $(0xffffffff8000010a), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_fsymlinkat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_fsymlinkat, libc_sys_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
-.section .text.crt.syscall.Xfsymlinkat
-INTERN_FUNCTION(libc_sys_Xfsymlinkat)
-	.cfi_startproc
-	movq   $(0xffffffff8000010a), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xfsymlinkat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfsymlinkat, libc_sys_Xfsymlinkat)
-
-/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
-.section .text.crt.syscall.freadlinkat
-INTERN_FUNCTION(libc_sys_freadlinkat)
-	.cfi_startproc
-	movq   $(0xffffffff8000010b), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_freadlinkat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_freadlinkat, libc_sys_freadlinkat)
-
-/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
-.section .text.crt.syscall.Xfreadlinkat
-INTERN_FUNCTION(libc_sys_Xfreadlinkat)
-	.cfi_startproc
-	movq   $(0xffffffff8000010b), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xfreadlinkat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfreadlinkat, libc_sys_Xfreadlinkat)
-
-/* ssize_t preadvf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.crt.syscall.preadvf
-INTERN_FUNCTION(libc_sys_preadvf)
-	.cfi_startproc
-	movq   $(0xffffffff80000127), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_preadvf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_preadvf, libc_sys_preadvf)
-
-/* ssize_t preadvf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.crt.syscall.Xpreadvf
-INTERN_FUNCTION(libc_sys_Xpreadvf)
-	.cfi_startproc
-	movq   $(0xffffffff80000127), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xpreadvf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpreadvf, libc_sys_Xpreadvf)
-
-/* ssize_t pwritevf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.crt.syscall.pwritevf
-INTERN_FUNCTION(libc_sys_pwritevf)
-	.cfi_startproc
-	movq   $(0xffffffff80000128), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_pwritevf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_pwritevf, libc_sys_pwritevf)
-
-/* ssize_t pwritevf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.crt.syscall.Xpwritevf
-INTERN_FUNCTION(libc_sys_Xpwritevf)
-	.cfi_startproc
-	movq   $(0xffffffff80000128), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xpwritevf)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpwritevf, libc_sys_Xpwritevf)
+END(libc_sys_Xwritef)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xwritef, libc_sys_Xwritef)
 
 
 

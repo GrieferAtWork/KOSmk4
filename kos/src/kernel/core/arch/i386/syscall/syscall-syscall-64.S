@@ -88,12 +88,8 @@ __ASM_L(	.cfi_escape 0x10,0x07,0x04,0x90,0x3b,0x23,(this_x86_rpc_redirection_ire
 	jb     __x86_asm64_syscall_break
 	cmpq   $(__NR64_syscall1_max), %rax
 	ja     __x86_asm64_syscall_break
-	pushq_cfi_r %rax
-	subq   $(__NR64_syscall1_min), %rax
 	EXTERN(x86_sysroute1_asm64_syscall)
-	movq   x86_sysroute1_asm64_syscall(,%rax,8), %rax
-	xchgq  0(%rsp), %rax /* Restore RAX and store syscall entry in 0(%rsp) */
-	ret                  /* Jump to the syscall entry */
+	jmpq   *(x86_sysroute1_asm64_syscall - ((__NR64_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,8)
 	.cfi_endproc
 END(x86_syscall64_syscall)
 

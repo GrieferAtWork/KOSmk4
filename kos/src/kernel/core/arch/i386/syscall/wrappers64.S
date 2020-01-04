@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x117d14df */
+/* HASH CRC-32:0x5e0b48d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9941,12 +9941,12 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlock2)
 	.cfi_endproc
 END(__x86_asm64_syscall_mlock2)
 
-/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-.section .text.x86.asm64_syscall.readf
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readf)
+/* ssize_t pwritevf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm64_syscall.pwritevf
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritevf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000000
+	.cfi_lsda 0, 0xfffffffffffffed8
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -9958,8 +9958,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readf)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movq   %r10, %rcx
-	EXTERN(sys_readf)
-	call   sys_readf
+	EXTERN(sys_pwritevf)
+	call   sys_pwritevf
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -9970,14 +9970,14 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readf)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_readf)
+END(__x86_asm64_syscall_pwritevf)
 
-/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
-.section .text.x86.asm64_syscall.writef
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writef)
+/* ssize_t preadvf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm64_syscall.preadvf
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadvf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000001
+	.cfi_lsda 0, 0xfffffffffffffed9
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -9989,8 +9989,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writef)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movq   %r10, %rcx
-	EXTERN(sys_writef)
-	call   sys_writef
+	EXTERN(sys_preadvf)
+	call   sys_preadvf
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -10001,44 +10001,15 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writef)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_writef)
+END(__x86_asm64_syscall_preadvf)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
-.section .text.x86.asm64_syscall.hop
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hop)
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm64_syscall.freadlinkat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_freadlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000002
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_hop)
-	call   sys_hop
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_hop)
-
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm64_syscall.hopf
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hopf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000003
+	.cfi_lsda 0, 0xfffffffffffffef5
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -10050,8 +10021,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hopf)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movq   %r10, %rcx
-	EXTERN(sys_hopf)
-	call   sys_hopf
+	EXTERN(sys_freadlinkat)
+	call   sys_freadlinkat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -10062,14 +10033,15 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hopf)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_hopf)
+END(__x86_asm64_syscall_freadlinkat)
 
-/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
-.section .text.x86.asm64_syscall.kstat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kstat)
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
+.section .text.x86.asm64_syscall.fsymlinkat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsymlinkat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000004
+	.cfi_lsda 0, 0xfffffffffffffef6
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -10080,8 +10052,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kstat)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	EXTERN(sys_kstat)
-	call   sys_kstat
+	movq   %r10, %rcx
+	EXTERN(sys_fsymlinkat)
+	call   sys_fsymlinkat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -10092,14 +10065,15 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kstat)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_kstat)
+END(__x86_asm64_syscall_fsymlinkat)
 
-/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
-.section .text.x86.asm64_syscall.kfstat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstat)
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
+.section .text.x86.asm64_syscall.frenameat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frenameat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000005
+	.cfi_lsda 0, 0xfffffffffffffef8
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -10110,8 +10084,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstat)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	EXTERN(sys_kfstat)
-	call   sys_kfstat
+	movq   %r10, %rcx
+	EXTERN(sys_frenameat)
+	call   sys_frenameat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -10122,14 +10097,15 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstat)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_kfstat)
+END(__x86_asm64_syscall_frenameat)
 
-/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
-.section .text.x86.asm64_syscall.klstat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_klstat)
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
+.section .text.x86.asm64_syscall.kfstatat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstatat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000006
+	.cfi_lsda 0, 0xfffffffffffffefa
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -10140,8 +10116,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_klstat)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	EXTERN(sys_klstat)
-	call   sys_klstat
+	movq   %r10, %rcx
+	EXTERN(sys_kfstatat)
+	call   sys_kfstatat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -10152,7 +10129,1076 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_klstat)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_klstat)
+END(__x86_asm64_syscall_kfstatat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
+.section .text.x86.asm64_syscall.fmknodat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmknodat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffefd
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_fmknodat)
+	call   sys_fmknodat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_fmknodat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+.section .text.x86.asm64_syscall.fmkdirat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmkdirat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffefe
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_fmkdirat)
+	call   sys_fmkdirat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_fmkdirat)
+
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+.section .text.x86.asm64_syscall.ksysctl
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ksysctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffff64
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_ksysctl)
+	call   sys_ksysctl
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_ksysctl)
+
+/* Map the segments of a given library into memory
+ * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
+ * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
+ *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
+ *                       MAP_DONT_OVERRIDE'
+ * @param: fd:    A handle for the library file being mapped
+ *                (must be a file or vm_datablock/inode)
+ * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+ *                (depending on the caller running in 32- or 64-bit mode)
+ * @param: hdrc:  The number of program headers */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
+.section .text.x86.asm64_syscall.maplibrary
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_maplibrary)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffff7a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_maplibrary)
+	call   sys_maplibrary
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_maplibrary)
+
+/* uint64_t fsmode(uint64_t mode) */
+.section .text.x86.asm64_syscall.fsmode
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsmode)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffa1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_fsmode)
+	call   sys_fsmode
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_fsmode)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
+.section .text.x86.asm64_syscall.fchdirat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchdirat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffb0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_fchdirat)
+	call   sys_fchdirat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_fchdirat)
+
+/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+.section .text.x86.asm64_syscall.kreaddirf
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddirf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffb1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_kreaddirf)
+	call   sys_kreaddirf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_kreaddirf)
+
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+.section .text.x86.asm64_syscall.kreaddir
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffb2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_kreaddir)
+	call   sys_kreaddir
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_kreaddir)
+
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
+ * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+ *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           In this case, a traceback displayed to a human should not include the text location at
+ *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+ *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
+ *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
+/* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length, struct exception_data64 const *exception, syscall_ulong_t unwind_error) */
+.section .text.x86.asm64_syscall.coredump
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_coredump)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffe3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_coredump)
+	call   sys_coredump
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_coredump)
+
+/* Raise a signal within the calling thread alongside the given CPU state
+ * This system call is used when translating exceptions into POSIX signal in error mode #4
+ * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
+ *                be raised for the caller's source location. Note that only in the later case
+ *                will this function return to its caller. - When `state' is non-NULL, it will
+ *                return to the text location described by it.
+ * TODO: Add a flags argument to control if the current signal mask
+ *       should be ignored (currently, it's always being ignored) */
+/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfo64_struct const *si) */
+.section .text.x86.asm64_syscall.raiseat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_raiseat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffe4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_raiseat)
+	call   sys_raiseat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_raiseat)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The newly created device automatically gets assigned an arbitrary device number, before
+ * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+.section .text.x86.asm64_syscall.mktty
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mktty)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffe5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_mktty)
+	call   sys_mktty
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_mktty)
+
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.x86.asm64_syscall.lfutexlockexpr
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutexlockexpr)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffe6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_lfutexlockexpr)
+	call   sys_lfutexlockexpr
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_lfutexlockexpr)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.x86.asm64_syscall.lfutexexpr
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutexexpr)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffe7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_lfutexexpr)
+	call   sys_lfutexexpr
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_lfutexexpr)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val, struct __timespecx64 const *timeout, uint64_t val2) */
+.section .text.x86.asm64_syscall.lfutex
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutex)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffe8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_lfutex)
+	call   sys_lfutex
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_lfutex)
+
+/* syscall_slong_t rpc_service(void) */
+.section .text.x86.asm64_syscall.rpc_service
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_service)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffe9
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_rpc_service)
+	call   sys_rpc_service
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_rpc_service)
+
+/* Trigger a debugger trap `trapno', optionally extended with `regs'
+ * at either the system call return location, or at the given `state'
+ * In the later case, this system call will by default return to the
+ * given `state', though given the purpose of this system call being
+ * to inform a connected debugger of some breakable event, allowing
+ * it to do whatever it wishes before execution is resumed.
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
+ * @param: state:    When non-NULL, the CPU state where the trap should return to by default
+ * @return: -EOK:    `state' was NULL and the trap returned successfully
+ * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
+/* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
+.section .text.x86.asm64_syscall.debugtrap
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_debugtrap)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffea
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_debugtrap)
+	call   sys_debugtrap
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_debugtrap)
+
+/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
+/* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
+.section .text.x86.asm64_syscall.set_library_listdef
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_library_listdef)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffeb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_set_library_listdef)
+	call   sys_set_library_listdef
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_set_library_listdef)
+
+/* ssize_t writevf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
+.section .text.x86.asm64_syscall.writevf
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writevf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffec
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_writevf)
+	call   sys_writevf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_writevf)
+
+/* ssize_t readvf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
+.section .text.x86.asm64_syscall.readvf
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readvf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffed
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_readvf)
+	call   sys_readvf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_readvf)
+
+/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm64_syscall.pwrite64f
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwrite64f)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffee
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_pwrite64f)
+	call   sys_pwrite64f
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_pwrite64f)
+
+/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm64_syscall.pread64f
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pread64f)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffef
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_pread64f)
+	call   sys_pread64f
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_pread64f)
+
+/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.x86.asm64_syscall.ioctlf
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioctlf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffff0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_ioctlf)
+	call   sys_ioctlf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_ioctlf)
+
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
+ *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
+ * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given MODE is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+.section .text.x86.asm64_syscall.set_exception_handler
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_exception_handler)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffff1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_set_exception_handler)
+	call   sys_set_exception_handler
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_set_exception_handler)
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: PHANDLER:    The address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
+.section .text.x86.asm64_syscall.get_exception_handler
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_exception_handler)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffff2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_get_exception_handler)
+	call   sys_get_exception_handler
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_get_exception_handler)
+
+/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
+.section .text.x86.asm64_syscall.openpty
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openpty)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffff3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_openpty)
+	call   sys_openpty
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_openpty)
+
+/* Schedule an RPC for execution on the specified `target' thread.
+ * @param: target:    The targeted thread.
+ * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
+ * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
+ * @param: arguments: Arguments for the RPC loader program.
+ * @return: 1:  The specified `target' thread has already terminated.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno')
+ * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
+ * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
+/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
+.section .text.x86.asm64_syscall.rpc_schedule
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_schedule)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffff4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_rpc_schedule)
+	call   sys_rpc_schedule
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_rpc_schedule)
+
+/* Returns the absolute filesystem path for the specified file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+ * causing the pointed-to file location to be retrieved. - Otherwise, the
+ * location of the link is printed instead.
+ * You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm64_syscall.frealpathat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpathat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffff5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_frealpathat)
+	call   sys_frealpathat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_frealpathat)
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm64_syscall.frealpath4
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpath4)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffff6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_frealpath4)
+	call   sys_frealpath4
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_frealpath4)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+.section .text.x86.asm64_syscall.getdrives
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getdrives)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffff7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_getdrives)
+	call   sys_getdrives
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_getdrives)
 
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
@@ -10247,7 +11293,7 @@ END(__x86_asm64_syscall_klstat)
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_detach)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000007
+	.cfi_lsda 0, 0xfffffffffffffff8
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -10272,46 +11318,12 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_detach)
 	.cfi_endproc
 END(__x86_asm64_syscall_detach)
 
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-.section .text.x86.asm64_syscall.getdrives
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getdrives)
+/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
+.section .text.x86.asm64_syscall.readf
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000008
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_getdrives)
-	call   sys_getdrives
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_getdrives)
-
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm64_syscall.frealpath4
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpath4)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000009
+	.cfi_lsda 0, 0xfffffffffffffff9
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -10323,8 +11335,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpath4)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movq   %r10, %rcx
-	EXTERN(sys_frealpath4)
-	call   sys_frealpath4
+	EXTERN(sys_readf)
+	call   sys_readf
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -10335,21 +11347,104 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpath4)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_frealpath4)
+END(__x86_asm64_syscall_readf)
 
-/* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
- * causing the pointed-to file location to be retrieved. - Otherwise, the
- * location of the link is printed instead.
- * You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm64_syscall.frealpathat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpathat)
+/* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
+.section .text.x86.asm64_syscall.klstat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_klstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000000a
+	.cfi_lsda 0, 0xfffffffffffffffa
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_klstat)
+	call   sys_klstat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_klstat)
+
+/* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
+.section .text.x86.asm64_syscall.kfstat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffffb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_kfstat)
+	call   sys_kfstat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_kfstat)
+
+/* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
+.section .text.x86.asm64_syscall.kstat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kstat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffffc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_kstat)
+	call   sys_kstat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_kstat)
+
+/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.x86.asm64_syscall.hopf
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hopf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xfffffffffffffffd
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -10361,8 +11456,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpathat)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movq   %r10, %rcx
-	EXTERN(sys_frealpathat)
-	call   sys_frealpathat
+	EXTERN(sys_hopf)
+	call   sys_hopf
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -10373,24 +11468,44 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frealpathat)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_frealpathat)
+END(__x86_asm64_syscall_hopf)
 
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
-.section .text.x86.asm64_syscall.rpc_schedule
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_schedule)
+/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+.section .text.x86.asm64_syscall.hop
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_hop)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000000b
+	.cfi_lsda 0, 0xfffffffffffffffe
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_hop)
+	call   sys_hop
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_hop)
+
+/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
+.section .text.x86.asm64_syscall.writef
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writef)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffff
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -10402,8 +11517,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_schedule)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movq   %r10, %rcx
-	EXTERN(sys_rpc_schedule)
-	call   sys_rpc_schedule
+	EXTERN(sys_writef)
+	call   sys_writef
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -10414,1122 +11529,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_schedule)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_rpc_schedule)
-
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
-.section .text.x86.asm64_syscall.ksysctl
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ksysctl)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000000c
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_ksysctl)
-	call   sys_ksysctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_ksysctl)
-
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
-/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
-.section .text.x86.asm64_syscall.openpty
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openpty)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000000d
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_openpty)
-	call   sys_openpty
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_openpty)
-
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-.section .text.x86.asm64_syscall.set_exception_handler
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_exception_handler)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000000e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_set_exception_handler)
-	call   sys_set_exception_handler
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_set_exception_handler)
-
-/* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-/* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
-.section .text.x86.asm64_syscall.get_exception_handler
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_exception_handler)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000000f
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_get_exception_handler)
-	call   sys_get_exception_handler
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_get_exception_handler)
-
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm64_syscall.ioctlf
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioctlf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000010
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_ioctlf)
-	call   sys_ioctlf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_ioctlf)
-
-/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm64_syscall.pread64f
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pread64f)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000011
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_pread64f)
-	call   sys_pread64f
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_pread64f)
-
-/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm64_syscall.pwrite64f
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwrite64f)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000012
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_pwrite64f)
-	call   sys_pwrite64f
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_pwrite64f)
-
-/* ssize_t readvf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
-.section .text.x86.asm64_syscall.readvf
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readvf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000013
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_readvf)
-	call   sys_readvf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_readvf)
-
-/* ssize_t writevf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
-.section .text.x86.asm64_syscall.writevf
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writevf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000014
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_writevf)
-	call   sys_writevf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_writevf)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
-.section .text.x86.asm64_syscall.set_library_listdef
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_library_listdef)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000015
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_set_library_listdef)
-	call   sys_set_library_listdef
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_set_library_listdef)
-
-/* Trigger a debugger trap `trapno', optionally extended with `regs'
- * at either the system call return location, or at the given `state'
- * In the later case, this system call will by default return to the
- * given `state', though given the purpose of this system call being
- * to inform a connected debugger of some breakable event, allowing
- * it to do whatever it wishes before execution is resumed.
- * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
- * @param: state:    When non-NULL, the CPU state where the trap should return to by default
- * @return: -EOK:    `state' was NULL and the trap returned successfully
- * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-/* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
-.section .text.x86.asm64_syscall.debugtrap
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_debugtrap)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000016
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_debugtrap)
-	call   sys_debugtrap
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_debugtrap)
-
-/* syscall_slong_t rpc_service(void) */
-.section .text.x86.asm64_syscall.rpc_service
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rpc_service)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000018
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_rpc_service)
-	call   sys_rpc_service
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_rpc_service)
-
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
- *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val, struct __timespecx64 const *timeout, uint64_t val2) */
-.section .text.x86.asm64_syscall.lfutex
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutex)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000019
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_lfutex)
-	call   sys_lfutex
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_lfutex)
-
-/* >> lfutexexpr(2)
- * The lfutexexpr() system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread, as well as
- * have the calling thread wait for any number of futex objects associated with
- * any address that is checked as part of the expression. (s.a. `lfutex()')
- * Notes:
- *   - This is the only futex function that can be used to wait on multiple futex
- *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on futex objects, as well as waiting on
- *     futexes in conjunction with waiting on other things such as files, see the
- *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.x86.asm64_syscall.lfutexexpr
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutexexpr)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000001a
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_lfutexexpr)
-	call   sys_lfutexexpr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_lfutexexpr)
-
-/* >> lfutexlockexpr(2)
- * A function that is similar to `lfutexexpr()', but allows for the use of one central
- * locking futex that is used for waiting and may be distinct from any other given futex
- * object pointer.
- * Notes:
- *   - This function only has the calling thread wait on a single futex `ulockaddr',
- *     rather than having it wait on an arbitrary number of futexes, as would be the case when
- *     the `lfutexexpr()' function is used.
- *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things such as files, see the documentation on
- *     this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.x86.asm64_syscall.lfutexlockexpr
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lfutexlockexpr)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000001b
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_lfutexlockexpr)
-	call   sys_lfutexlockexpr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_lfutexlockexpr)
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The newly created device automatically gets assigned an arbitrary device number, before
- * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
-.section .text.x86.asm64_syscall.mktty
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mktty)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000001c
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_mktty)
-	call   sys_mktty
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_mktty)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfo64_struct const *si) */
-.section .text.x86.asm64_syscall.raiseat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_raiseat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000001d
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_raiseat)
-	call   sys_raiseat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_raiseat)
-
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-/* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length, struct exception_data64 const *exception, syscall_ulong_t unwind_error) */
-.section .text.x86.asm64_syscall.coredump
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_coredump)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000001e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_coredump)
-	call   sys_coredump
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_coredump)
-
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-.section .text.x86.asm64_syscall.kreaddir
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000004e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_kreaddir)
-	call   sys_kreaddir
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_kreaddir)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-.section .text.x86.asm64_syscall.fchdirat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fchdirat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000050
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_fchdirat)
-	call   sys_fchdirat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_fchdirat)
-
-/* uint64_t fsmode(uint64_t mode) */
-.section .text.x86.asm64_syscall.fsmode
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsmode)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000005f
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys_fsmode)
-	call   sys_fsmode
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_fsmode)
-
-/* Map the segments of a given library into memory
- * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
- * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *                (depending on the caller running in 32- or 64-bit mode)
- * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
-.section .text.x86.asm64_syscall.maplibrary
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_maplibrary)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000086
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_maplibrary)
-	call   sys_maplibrary
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_maplibrary)
-
-/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
-.section .text.x86.asm64_syscall.kreaddirf
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddirf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff800000d9
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_kreaddirf)
-	call   sys_kreaddirf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_kreaddirf)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-.section .text.x86.asm64_syscall.fmkdirat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmkdirat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000102
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_fmkdirat)
-	call   sys_fmkdirat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_fmkdirat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
-.section .text.x86.asm64_syscall.fmknodat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fmknodat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000103
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_fmknodat)
-	call   sys_fmknodat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_fmknodat)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
-.section .text.x86.asm64_syscall.kfstatat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kfstatat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000106
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_kfstatat)
-	call   sys_kfstatat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_kfstatat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.x86.asm64_syscall.frenameat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_frenameat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000108
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_frenameat)
-	call   sys_frenameat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_frenameat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
-.section .text.x86.asm64_syscall.fsymlinkat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsymlinkat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000010a
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_fsymlinkat)
-	call   sys_fsymlinkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm64_syscall.freadlinkat
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_freadlinkat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff8000010b
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_freadlinkat)
-	call   sys_freadlinkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_freadlinkat)
-
-/* ssize_t preadvf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm64_syscall.preadvf
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadvf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000127
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_preadvf)
-	call   sys_preadvf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_preadvf)
-
-/* ssize_t pwritevf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm64_syscall.pwritevf
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritevf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm64_syscall
-	.cfi_lsda 0, 0xffffffff80000128
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movq   %r10, %rcx
-	EXTERN(sys_pwritevf)
-	call   sys_pwritevf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm64_syscall_pwritevf)
+END(__x86_asm64_syscall_writef)
 
 
 
@@ -23712,12 +23712,493 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	.cfi_endproc
 END(__x86_asm32_int80_mlock2)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
-.section .text.x86.asm32_syscall_int80.hop
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_hop)
+/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
+.section .text.x86.asm32_syscall_int80.recvmmsg64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000001
+	.cfi_lsda 0, 0xfffffeaf
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_recvmmsg64)
+	call   sys32_recvmmsg64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_recvmmsg64)
+
+/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_int80.pwritevf
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffeb2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %rax          /* %rax = REG3:REG4 */
+	movzlq %esi, %r8           /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movq   %rax, %rcx /* ARG3 = %rax */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebp, %r8 /* ARG4 = REG5 */
+	EXTERN(sys32_pwritevf)
+	call   sys32_pwritevf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_pwritevf)
+
+/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_int80.preadvf
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffeb3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %rax          /* %rax = REG3:REG4 */
+	movzlq %esi, %r8           /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movq   %rax, %rcx /* ARG3 = %rax */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebp, %r8 /* ARG4 = REG5 */
+	EXTERN(sys32_preadvf)
+	call   sys32_preadvf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_preadvf)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t ufd, struct __itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_int80.timerfd_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffeba
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_timerfd_gettime64)
+	call   sys32_timerfd_gettime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_timerfd_gettime64)
+
+/* Set next expiration time of interval timer source UFD to UTMR.
+ * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
+ * is absolute. Optionally return the old expiration time in OTMR */
+/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_int80.timerfd_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffebb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_timerfd_settime64)
+	call   sys32_timerfd_settime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_timerfd_settime64)
+
+/* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
+.section .text.x86.asm32_syscall_int80.fallocate64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffebc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %esi, %rdx          /* ARG2 = REG2:REG3 */
+	movzlq %edx, %rax          /* ... */
+	shlq   $(32), %rdx            /* ... */
+	orq    %rax, %rdx          /* ... */
+	movzlq %ebp, %rax          /* %rax = REG4:REG5 */
+	movzlq %edi, %r8           /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movq   %rax, %rcx /* ARG3 = %rax */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_fallocate64)
+	call   sys32_fallocate64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_fallocate64)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* errno_t utimensat64(fd_t dirfd, char const *filename, struct __timespecx32_64 const[2] times, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.utimensat64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffec0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_utimensat64)
+	call   sys32_utimensat64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_utimensat64)
+
+/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_int80.ppoll64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffecb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_ppoll64)
+	call   sys32_ppoll64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_ppoll64)
+
+/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+.section .text.x86.asm32_syscall_int80.pselect6_64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffecc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %ebp, %r9 /* ARG5 = REG5 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pselect6_64)
+	call   sys32_pselect6_64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_pselect6_64)
+
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.freadlinkat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_freadlinkat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffecf
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_freadlinkat)
+	call   sys32_freadlinkat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_freadlinkat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.fsymlinkat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsymlinkat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffed0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_fsymlinkat)
+	call   sys32_fsymlinkat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_fsymlinkat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.frenameat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_frenameat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffed2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_frenameat)
+	call   sys32_frenameat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_frenameat)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.kfstatat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstatat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffed4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_kfstatat)
+	call   sys32_kfstatat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_kfstatat)
+
+/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
+.section .text.x86.asm32_syscall_int80.futimesat64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffed5
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -23731,8 +24212,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hop)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
-	EXTERN(sys32_hop)
-	call   sys32_hop
+	EXTERN(sys32_futimesat64)
+	call   sys32_futimesat64
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -23743,14 +24224,52 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hop)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_hop)
+END(__x86_asm32_int80_futimesat64)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm32_syscall_int80.hopf
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.fmknodat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmknodat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000002
+	.cfi_lsda 0, 0xfffffed7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_fmknodat)
+	call   sys32_fmknodat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_fmknodat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.fmkdirat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffed8
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -23766,8 +24285,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
 	movzlq %esi, %rsi /* ARG1 = REG3 */
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_hopf)
-	call   sys32_hopf
+	EXTERN(sys32_fmkdirat)
+	call   sys32_fmkdirat
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -23778,14 +24297,155 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_hopf)
+END(__x86_asm32_int80_fmkdirat)
 
-/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-.section .text.x86.asm32_syscall_int80.readf
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
+.section .text.x86.asm32_syscall_int80.waitid64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000003
+	.cfi_lsda 0, 0xfffffee4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_waitid64)
+	call   sys32_waitid64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_waitid64)
+
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_int80.mq_timedreceive64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffee8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedreceive64)
+	call   sys32_mq_timedreceive64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_mq_timedreceive64)
+
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_int80.mq_timedsend64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffee9
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedsend64)
+	call   sys32_mq_timedsend64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_mq_timedsend64)
+
+/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
+.section .text.x86.asm32_syscall_int80.utimes64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffef1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_utimes64)
+	call   sys32_utimes64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_utimes64)
+
+/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
+.section .text.x86.asm32_syscall_int80.clock_nanosleep64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffef5
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -23801,8 +24461,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	movzlq %esi, %rsi /* ARG1 = REG3 */
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_readf)
-	call   sys32_readf
+	EXTERN(sys32_clock_nanosleep64)
+	call   sys32_clock_nanosleep64
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -23813,14 +24473,142 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_readf)
+END(__x86_asm32_int80_clock_nanosleep64)
 
-/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
-.section .text.x86.asm32_syscall_int80.writef
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
+/* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
+.section .text.x86.asm32_syscall_int80.clock_getres64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000004
+	.cfi_lsda 0, 0xfffffef6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_clock_getres64)
+	call   sys32_clock_getres64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_clock_getres64)
+
+/* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
+.section .text.x86.asm32_syscall_int80.clock_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffef7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_clock_gettime64)
+	call   sys32_clock_gettime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_clock_gettime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
+.section .text.x86.asm32_syscall_int80.clock_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffef8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_clock_settime64)
+	call   sys32_clock_settime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_clock_settime64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
+.section .text.x86.asm32_syscall_int80.timer_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffefb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_timer_gettime64)
+	call   sys32_timer_gettime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_timer_gettime64)
+
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
+.section .text.x86.asm32_syscall_int80.timer_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffefc
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -23836,8 +24624,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
 	movzlq %esi, %rsi /* ARG1 = REG3 */
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_writef)
-	call   sys32_writef
+	EXTERN(sys32_timer_settime64)
+	call   sys32_timer_settime64
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -23848,7 +24636,1715 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_writef)
+END(__x86_asm32_int80_timer_settime64)
+
+/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+.section .text.x86.asm32_syscall_int80.kreaddirf
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff24
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_kreaddirf)
+	call   sys32_kreaddirf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_kreaddirf)
+
+/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_int80.kfstat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff3b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_kfstat)
+	call   sys32_kfstat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_kfstat)
+
+/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_int80.klstat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_klstat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff3c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_klstat)
+	call   sys32_klstat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_klstat)
+
+/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_int80.kstat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_kstat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff3d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_kstat)
+	call   sys32_kstat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_kstat)
+
+/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_int80.pwrite64f
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64f)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff4b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %rax          /* %rax = REG3:REG4 */
+	movzlq %esi, %r8           /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movq   %rax, %rcx /* ARG3 = %rax */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebp, %r8 /* ARG4 = REG5 */
+	EXTERN(sys32_pwrite64f)
+	call   sys32_pwrite64f
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_pwrite64f)
+
+/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_int80.pread64f
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff4c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %rax          /* %rax = REG3:REG4 */
+	movzlq %esi, %r8           /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movq   %rax, %rcx /* ARG3 = %rax */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebp, %r8 /* ARG4 = REG5 */
+	EXTERN(sys32_pread64f)
+	call   sys32_pread64f
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_pread64f)
+
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_int80.rt_sigtimedwait64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff4f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_rt_sigtimedwait64)
+	call   sys32_rt_sigtimedwait64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_rt_sigtimedwait64)
+
+/* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
+.section .text.x86.asm32_syscall_int80.nanosleep64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff5e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_nanosleep64)
+	call   sys32_nanosleep64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_nanosleep64)
+
+/* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
+.section .text.x86.asm32_syscall_int80.sched_rr_get_interval64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff5f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_sched_rr_get_interval64)
+	call   sys32_sched_rr_get_interval64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_sched_rr_get_interval64)
+
+/* syscall_slong_t rpc_service(void) */
+.section .text.x86.asm32_syscall_int80.rpc_service
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_service)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff62
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys32_rpc_service)
+	call   sys32_rpc_service
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_rpc_service)
+
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+.section .text.x86.asm32_syscall_int80.ksysctl
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff6b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_ksysctl)
+	call   sys32_ksysctl
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_ksysctl)
+
+/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+.section .text.x86.asm32_syscall_int80.writevf
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff6e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_writevf)
+	call   sys32_writevf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_writevf)
+
+/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+.section .text.x86.asm32_syscall_int80.readvf
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff6f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_readvf)
+	call   sys32_readvf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_readvf)
+
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+.section .text.x86.asm32_syscall_int80.kreaddir
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff73
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_kreaddir)
+	call   sys32_kreaddir
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_kreaddir)
+
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
+.section .text.x86.asm32_syscall_int80.wait4_64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff8e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_wait4_64)
+	call   sys32_wait4_64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_wait4_64)
+
+/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+.section .text.x86.asm32_syscall_int80.getitimer64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff97
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_getitimer64)
+	call   sys32_getitimer64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_getitimer64)
+
+/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
+.section .text.x86.asm32_syscall_int80.setitimer64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff98
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	EXTERN(sys32_setitimer64)
+	call   sys32_setitimer64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_setitimer64)
+
+/* Map the segments of a given library into memory
+ * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
+ * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
+ *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
+ *                       MAP_DONT_OVERRIDE'
+ * @param: fd:    A handle for the library file being mapped
+ *                (must be a file or vm_datablock/inode)
+ * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+ *                (depending on the caller running in 32- or 64-bit mode)
+ * @param: hdrc:  The number of program headers */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
+.section .text.x86.asm32_syscall_int80.maplibrary
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffaa
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_maplibrary)
+	call   sys32_maplibrary
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_maplibrary)
+
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
+.section .text.x86.asm32_syscall_int80.select64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffae
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_select64)
+	call   sys32_select64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_select64)
+
+/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
+.section .text.x86.asm32_syscall_int80.settimeofday64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffb1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_settimeofday64)
+	call   sys32_settimeofday64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_settimeofday64)
+
+/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
+.section .text.x86.asm32_syscall_int80.gettimeofday64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffb2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_gettimeofday64)
+	call   sys32_gettimeofday64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_gettimeofday64)
+
+/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
+.section .text.x86.asm32_syscall_int80.getrusage64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffb3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_getrusage64)
+	call   sys32_getrusage64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_getrusage64)
+
+/* uint64_t fsmode(uint64_t mode) */
+.section .text.x86.asm32_syscall_int80.fsmode
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmode)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffc4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ecx, %rdi          /* ARG0 = REG0:REG1 */
+	movzlq %ebx, %rax          /* ... */
+	shlq   $(32), %rdi            /* ... */
+	orq    %rax, %rdi          /* ... */
+	EXTERN(sys32_fsmode)
+	call   sys32_fsmode
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi %rcx
+ /* %rdx */	movq   %rax, %rdx
+	shrq   $(32), %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_fsmode)
+
+/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.x86.asm32_syscall_int80.ioctlf
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctlf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffca
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_ioctlf)
+	call   sys32_ioctlf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_ioctlf)
+
+/* errno_t ftime64(struct __timebx32_64 *tp) */
+.section .text.x86.asm32_syscall_int80.ftime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffdd
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_ftime64)
+	call   sys32_ftime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_ftime64)
+
+/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+.section .text.x86.asm32_syscall_int80.utime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffe2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_utime64)
+	call   sys32_utime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_utime64)
+
+/* errno_t stime64(time64_t const *t) */
+.section .text.x86.asm32_syscall_int80.stime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffe7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_stime64)
+	call   sys32_stime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_stime64)
+
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
+ * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+ *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           In this case, a traceback displayed to a human should not include the text location at
+ *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+ *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
+ *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
+.section .text.x86.asm32_syscall_int80.coredump
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffe8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %ebp, %r9 /* ARG5 = REG5 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_coredump)
+	call   sys32_coredump
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_coredump)
+
+/* Raise a signal within the calling thread alongside the given CPU state
+ * This system call is used when translating exceptions into POSIX signal in error mode #4
+ * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
+ *                be raised for the caller's source location. Note that only in the later case
+ *                will this function return to its caller. - When `state' is non-NULL, it will
+ *                return to the text location described by it.
+ * TODO: Add a flags argument to control if the current signal mask
+ *       should be ignored (currently, it's always being ignored) */
+/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
+.section .text.x86.asm32_syscall_int80.raiseat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_raiseat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffe9
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_raiseat)
+	call   sys32_raiseat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_raiseat)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The newly created device automatically gets assigned an arbitrary device number, before
+ * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+.section .text.x86.asm32_syscall_int80.mktty
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffea
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_mktty)
+	call   sys32_mktty
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_mktty)
+
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.x86.asm32_syscall_int80.lfutexlockexpr
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexlockexpr)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffeb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %ebp, %r9 /* ARG5 = REG5 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_lfutexlockexpr)
+	call   sys32_lfutexlockexpr
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_lfutexlockexpr)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.x86.asm32_syscall_int80.lfutexexpr
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffec
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_lfutexexpr)
+	call   sys32_lfutexexpr
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_lfutexexpr)
+
+/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
+.section .text.x86.asm32_syscall_int80.lseek64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffed
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rax          /* %rax = REG1:REG2 */
+	movzlq %ecx, %r8           /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %esi, %rdx /* ARG2 = REG3 */
+	movq   %rax, %rsi /* ARG1 = %rax */
+	EXTERN(sys32_lseek64)
+	call   sys32_lseek64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi %rcx
+ /* %rdx */	movq   %rax, %rdx
+	shrq   $(32), %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_lseek64)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) */
+.section .text.x86.asm32_syscall_int80.lfutex
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffee
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_lfutex)
+	call   sys32_lfutex
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_lfutex)
+
+/* Trigger a debugger trap `trapno', optionally extended with `regs'
+ * at either the system call return location, or at the given `state'
+ * In the later case, this system call will by default return to the
+ * given `state', though given the purpose of this system call being
+ * to inform a connected debugger of some breakable event, allowing
+ * it to do whatever it wishes before execution is resumed.
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
+ * @param: state:    When non-NULL, the CPU state where the trap should return to by default
+ * @return: -EOK:    `state' was NULL and the trap returned successfully
+ * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
+/* errno_t debugtrap(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) */
+.section .text.x86.asm32_syscall_int80.debugtrap
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_debugtrap)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffef
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_debugtrap)
+	call   sys32_debugtrap
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_debugtrap)
+
+/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
+/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
+.section .text.x86.asm32_syscall_int80.set_library_listdef
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_library_listdef)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffff0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_set_library_listdef)
+	call   sys32_set_library_listdef
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_set_library_listdef)
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: PHANDLER:    The address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+/* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
+.section .text.x86.asm32_syscall_int80.get_exception_handler
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_exception_handler)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffff1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	EXTERN(sys32_get_exception_handler)
+	call   sys32_get_exception_handler
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_get_exception_handler)
+
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
+ *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
+ * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given MODE is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+.section .text.x86.asm32_syscall_int80.set_exception_handler
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffff2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	EXTERN(sys32_set_exception_handler)
+	call   sys32_set_exception_handler
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_set_exception_handler)
+
+/* int64_t time64(int64_t *timer) */
+.section .text.x86.asm32_syscall_int80.time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffff3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_time64)
+	call   sys32_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi %rcx
+ /* %rdx */	movq   %rax, %rdx
+	shrq   $(32), %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_time64)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.fchdirat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffff4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	EXTERN(sys32_fchdirat)
+	call   sys32_fchdirat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_fchdirat)
+
+/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
+.section .text.x86.asm32_syscall_int80.openpty
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffff5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_openpty)
+	call   sys32_openpty
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_openpty)
+
+/* Schedule an RPC for execution on the specified `target' thread.
+ * @param: target:    The targeted thread.
+ * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
+ * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
+ * @param: arguments: Arguments for the RPC loader program.
+ * @return: 1:  The specified `target' thread has already terminated.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno')
+ * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
+ * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
+/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
+.section .text.x86.asm32_syscall_int80.rpc_schedule
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffff7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_rpc_schedule)
+	call   sys32_rpc_schedule
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_rpc_schedule)
+
+/* Returns the absolute filesystem path for the specified file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+ * causing the pointed-to file location to be retrieved. - Otherwise, the
+ * location of the link is printed instead.
+ * You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.frealpathat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpathat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffff8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_frealpathat)
+	call   sys32_frealpathat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_frealpathat)
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.frealpath4
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffff9
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_frealpath4)
+	call   sys32_frealpath4
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_frealpath4)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+.section .text.x86.asm32_syscall_int80.getdrives
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdrives)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffffa
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys32_getdrives)
+	call   sys32_getdrives
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_getdrives)
 
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
@@ -23943,7 +26439,7 @@ END(__x86_asm32_int80_writef)
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000005
+	.cfi_lsda 0, 0xfffffffb
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -23969,46 +26465,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
 	.cfi_endproc
 END(__x86_asm32_int80_detach)
 
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-.section .text.x86.asm32_syscall_int80.getdrives
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdrives)
+/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
+.section .text.x86.asm32_syscall_int80.writef
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_writef)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000006
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys32_getdrives)
-	call   sys32_getdrives
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_getdrives)
-
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.frealpath4
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000007
+	.cfi_lsda 0, 0xfffffffc
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -24024,8 +26486,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
 	movzlq %esi, %rsi /* ARG1 = REG3 */
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_frealpath4)
-	call   sys32_frealpath4
+	EXTERN(sys32_writef)
+	call   sys32_writef
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -24036,67 +26498,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_frealpath4)
+END(__x86_asm32_int80_writef)
 
-/* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
- * causing the pointed-to file location to be retrieved. - Otherwise, the
- * location of the link is printed instead.
- * You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.frealpathat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpathat)
+/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
+.section .text.x86.asm32_syscall_int80.readf
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_readf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000008
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_frealpathat)
-	call   sys32_frealpathat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_frealpathat)
-
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
-.section .text.x86.asm32_syscall_int80.rpc_schedule
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000009
+	.cfi_lsda 0, 0xfffffffd
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -24112,8 +26521,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	movzlq %esi, %rsi /* ARG1 = REG3 */
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_rpc_schedule)
-	call   sys32_rpc_schedule
+	EXTERN(sys32_readf)
+	call   sys32_readf
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -24124,14 +26533,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_schedule)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_rpc_schedule)
+END(__x86_asm32_int80_readf)
 
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
-.section .text.x86.asm32_syscall_int80.ksysctl
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
+/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.x86.asm32_syscall_int80.hopf
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_hopf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000000a
+	.cfi_lsda 0, 0xfffffffe
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -24143,46 +26552,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_ksysctl)
-	call   sys32_ksysctl
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_ksysctl)
-
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
-/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
-.section .text.x86.asm32_syscall_int80.openpty
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000000b
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movzlq %esi, %rsi /* ARG1 = REG3 */
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_openpty)
-	call   sys32_openpty
+	EXTERN(sys32_hopf)
+	call   sys32_hopf
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -24193,15 +26568,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openpty)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_openpty)
+END(__x86_asm32_int80_hopf)
 
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.fchdirat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
+/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+.section .text.x86.asm32_syscall_int80.hop
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_hop)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000000c
+	.cfi_lsda 0, 0xffffffff
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -24215,8 +26589,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
-	EXTERN(sys32_fchdirat)
-	call   sys32_fchdirat
+	EXTERN(sys32_hop)
+	call   sys32_hop
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -24227,2381 +26601,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchdirat)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm32_int80_fchdirat)
-
-/* int64_t time64(int64_t *timer) */
-.section .text.x86.asm32_syscall_int80.time64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_time64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000000d
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_time64)
-	call   sys32_time64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi %rcx
- /* %rdx */	movq   %rax, %rdx
-	shrq   $(32), %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_time64)
-
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-.section .text.x86.asm32_syscall_int80.set_exception_handler
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000000e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	EXTERN(sys32_set_exception_handler)
-	call   sys32_set_exception_handler
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_set_exception_handler)
-
-/* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-/* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
-.section .text.x86.asm32_syscall_int80.get_exception_handler
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_exception_handler)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000000f
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	EXTERN(sys32_get_exception_handler)
-	call   sys32_get_exception_handler
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_get_exception_handler)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
-.section .text.x86.asm32_syscall_int80.set_library_listdef
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_library_listdef)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000010
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_set_library_listdef)
-	call   sys32_set_library_listdef
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_set_library_listdef)
-
-/* Trigger a debugger trap `trapno', optionally extended with `regs'
- * at either the system call return location, or at the given `state'
- * In the later case, this system call will by default return to the
- * given `state', though given the purpose of this system call being
- * to inform a connected debugger of some breakable event, allowing
- * it to do whatever it wishes before execution is resumed.
- * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
- * @param: state:    When non-NULL, the CPU state where the trap should return to by default
- * @return: -EOK:    `state' was NULL and the trap returned successfully
- * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-/* errno_t debugtrap(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) */
-.section .text.x86.asm32_syscall_int80.debugtrap
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_debugtrap)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000011
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_debugtrap)
-	call   sys32_debugtrap
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_debugtrap)
-
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
- *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) */
-.section .text.x86.asm32_syscall_int80.lfutex
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000012
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_lfutex)
-	call   sys32_lfutex
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_lfutex)
-
-/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-.section .text.x86.asm32_syscall_int80.lseek64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000013
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rax          /* %rax = REG1:REG2 */
-	movzlq %ecx, %r8           /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %esi, %rdx /* ARG2 = REG3 */
-	movq   %rax, %rsi /* ARG1 = %rax */
-	EXTERN(sys32_lseek64)
-	call   sys32_lseek64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi %rcx
- /* %rdx */	movq   %rax, %rdx
-	shrq   $(32), %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_lseek64)
-
-/* >> lfutexexpr(2)
- * The lfutexexpr() system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread, as well as
- * have the calling thread wait for any number of futex objects associated with
- * any address that is checked as part of the expression. (s.a. `lfutex()')
- * Notes:
- *   - This is the only futex function that can be used to wait on multiple futex
- *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on futex objects, as well as waiting on
- *     futexes in conjunction with waiting on other things such as files, see the
- *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.x86.asm32_syscall_int80.lfutexexpr
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000014
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_lfutexexpr)
-	call   sys32_lfutexexpr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_lfutexexpr)
-
-/* >> lfutexlockexpr(2)
- * A function that is similar to `lfutexexpr()', but allows for the use of one central
- * locking futex that is used for waiting and may be distinct from any other given futex
- * object pointer.
- * Notes:
- *   - This function only has the calling thread wait on a single futex `ulockaddr',
- *     rather than having it wait on an arbitrary number of futexes, as would be the case when
- *     the `lfutexexpr()' function is used.
- *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things such as files, see the documentation on
- *     this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.x86.asm32_syscall_int80.lfutexlockexpr
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexlockexpr)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000015
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %ebp, %r9 /* ARG5 = REG5 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_lfutexlockexpr)
-	call   sys32_lfutexlockexpr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_lfutexlockexpr)
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The newly created device automatically gets assigned an arbitrary device number, before
- * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
-.section .text.x86.asm32_syscall_int80.mktty
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000016
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_mktty)
-	call   sys32_mktty
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_mktty)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
-.section .text.x86.asm32_syscall_int80.raiseat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_raiseat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000017
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_raiseat)
-	call   sys32_raiseat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_raiseat)
-
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
-.section .text.x86.asm32_syscall_int80.coredump
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000018
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %ebp, %r9 /* ARG5 = REG5 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_coredump)
-	call   sys32_coredump
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_coredump)
-
-/* errno_t stime64(time64_t const *t) */
-.section .text.x86.asm32_syscall_int80.stime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000019
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_stime64)
-	call   sys32_stime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_stime64)
-
-/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
-.section .text.x86.asm32_syscall_int80.utime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000001e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_utime64)
-	call   sys32_utime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_utime64)
-
-/* errno_t ftime64(struct __timebx32_64 *tp) */
-.section .text.x86.asm32_syscall_int80.ftime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000023
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_ftime64)
-	call   sys32_ftime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_ftime64)
-
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm32_syscall_int80.ioctlf
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctlf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000036
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_ioctlf)
-	call   sys32_ioctlf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_ioctlf)
-
-/* uint64_t fsmode(uint64_t mode) */
-.section .text.x86.asm32_syscall_int80.fsmode
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmode)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000003c
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ecx, %rdi          /* ARG0 = REG0:REG1 */
-	movzlq %ebx, %rax          /* ... */
-	shlq   $(32), %rdi            /* ... */
-	orq    %rax, %rdi          /* ... */
-	EXTERN(sys32_fsmode)
-	call   sys32_fsmode
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi %rcx
- /* %rdx */	movq   %rax, %rdx
-	shrq   $(32), %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_fsmode)
-
-/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
-.section .text.x86.asm32_syscall_int80.getrusage64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000004d
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_getrusage64)
-	call   sys32_getrusage64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_getrusage64)
-
-/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
-.section .text.x86.asm32_syscall_int80.gettimeofday64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000004e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_gettimeofday64)
-	call   sys32_gettimeofday64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_gettimeofday64)
-
-/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
-.section .text.x86.asm32_syscall_int80.settimeofday64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000004f
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_settimeofday64)
-	call   sys32_settimeofday64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_settimeofday64)
-
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
-.section .text.x86.asm32_syscall_int80.select64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000052
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_select64)
-	call   sys32_select64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_select64)
-
-/* Map the segments of a given library into memory
- * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
- * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *                (depending on the caller running in 32- or 64-bit mode)
- * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
-.section .text.x86.asm32_syscall_int80.maplibrary
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000056
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_maplibrary)
-	call   sys32_maplibrary
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_maplibrary)
-
-/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
-.section .text.x86.asm32_syscall_int80.setitimer64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000068
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	EXTERN(sys32_setitimer64)
-	call   sys32_setitimer64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_setitimer64)
-
-/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
-.section .text.x86.asm32_syscall_int80.getitimer64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000069
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_getitimer64)
-	call   sys32_getitimer64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_getitimer64)
-
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
-.section .text.x86.asm32_syscall_int80.wait4_64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000072
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_wait4_64)
-	call   sys32_wait4_64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_wait4_64)
-
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-.section .text.x86.asm32_syscall_int80.kreaddir
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000008d
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_kreaddir)
-	call   sys32_kreaddir
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_kreaddir)
-
-/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
-.section .text.x86.asm32_syscall_int80.readvf
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000091
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_readvf)
-	call   sys32_readvf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_readvf)
-
-/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
-.section .text.x86.asm32_syscall_int80.writevf
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000092
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_writevf)
-	call   sys32_writevf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_writevf)
-
-/* syscall_slong_t rpc_service(void) */
-.section .text.x86.asm32_syscall_int80.rpc_service
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_service)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000009e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	EXTERN(sys32_rpc_service)
-	call   sys32_rpc_service
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_rpc_service)
-
-/* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
-.section .text.x86.asm32_syscall_int80.sched_rr_get_interval64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x800000a1
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_sched_rr_get_interval64)
-	call   sys32_sched_rr_get_interval64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_sched_rr_get_interval64)
-
-/* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
-.section .text.x86.asm32_syscall_int80.nanosleep64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x800000a2
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_nanosleep64)
-	call   sys32_nanosleep64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_nanosleep64)
-
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
-.section .text.x86.asm32_syscall_int80.rt_sigtimedwait64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x800000b1
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_rt_sigtimedwait64)
-	call   sys32_rt_sigtimedwait64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_rt_sigtimedwait64)
-
-/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_int80.pread64f
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x800000b4
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %rax          /* %rax = REG3:REG4 */
-	movzlq %esi, %r8           /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movq   %rax, %rcx /* ARG3 = %rax */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ebp, %r8 /* ARG4 = REG5 */
-	EXTERN(sys32_pread64f)
-	call   sys32_pread64f
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_pread64f)
-
-/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_int80.pwrite64f
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwrite64f)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x800000b5
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %rax          /* %rax = REG3:REG4 */
-	movzlq %esi, %r8           /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movq   %rax, %rcx /* ARG3 = %rax */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ebp, %r8 /* ARG4 = REG5 */
-	EXTERN(sys32_pwrite64f)
-	call   sys32_pwrite64f
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_pwrite64f)
-
-/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_int80.kstat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_kstat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x800000c3
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_kstat)
-	call   sys32_kstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_kstat)
-
-/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_int80.klstat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_klstat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x800000c4
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_klstat)
-	call   sys32_klstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_klstat)
-
-/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_int80.kfstat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x800000c5
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_kfstat)
-	call   sys32_kfstat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_kfstat)
-
-/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
-.section .text.x86.asm32_syscall_int80.kreaddirf
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x800000dc
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_kreaddirf)
-	call   sys32_kreaddirf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_kreaddirf)
-
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
-.section .text.x86.asm32_syscall_int80.timer_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000104
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_timer_settime64)
-	call   sys32_timer_settime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_timer_settime64)
-
-/* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
-.section .text.x86.asm32_syscall_int80.timer_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000105
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_timer_gettime64)
-	call   sys32_timer_gettime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_timer_gettime64)
-
-/* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
-.section .text.x86.asm32_syscall_int80.clock_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000108
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_clock_settime64)
-	call   sys32_clock_settime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_clock_settime64)
-
-/* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
-.section .text.x86.asm32_syscall_int80.clock_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000109
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_clock_gettime64)
-	call   sys32_clock_gettime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_clock_gettime64)
-
-/* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
-.section .text.x86.asm32_syscall_int80.clock_getres64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000010a
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_clock_getres64)
-	call   sys32_clock_getres64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_clock_getres64)
-
-/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
-.section .text.x86.asm32_syscall_int80.clock_nanosleep64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000010b
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_clock_nanosleep64)
-	call   sys32_clock_nanosleep64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_clock_nanosleep64)
-
-/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
-.section .text.x86.asm32_syscall_int80.utimes64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000010f
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_utimes64)
-	call   sys32_utimes64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_utimes64)
-
-/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_int80.mq_timedsend64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000117
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_mq_timedsend64)
-	call   sys32_mq_timedsend64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_mq_timedsend64)
-
-/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_int80.mq_timedreceive64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000118
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_mq_timedreceive64)
-	call   sys32_mq_timedreceive64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_mq_timedreceive64)
-
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
-.section .text.x86.asm32_syscall_int80.waitid64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000011c
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_waitid64)
-	call   sys32_waitid64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_waitid64)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.fmkdirat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000128
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_fmkdirat)
-	call   sys32_fmkdirat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_fmkdirat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.fmknodat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmknodat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000129
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_fmknodat)
-	call   sys32_fmknodat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_fmknodat)
-
-/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
-.section .text.x86.asm32_syscall_int80.futimesat64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000012b
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	EXTERN(sys32_futimesat64)
-	call   sys32_futimesat64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_futimesat64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.kfstatat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstatat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000012c
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_kfstatat)
-	call   sys32_kfstatat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_kfstatat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.frenameat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_frenameat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000012e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_frenameat)
-	call   sys32_frenameat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_frenameat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.fsymlinkat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsymlinkat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000130
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_fsymlinkat)
-	call   sys32_fsymlinkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.freadlinkat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_freadlinkat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000131
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_freadlinkat)
-	call   sys32_freadlinkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_freadlinkat)
-
-/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
-.section .text.x86.asm32_syscall_int80.pselect6_64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000134
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %ebp, %r9 /* ARG5 = REG5 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_pselect6_64)
-	call   sys32_pselect6_64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_pselect6_64)
-
-/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-.section .text.x86.asm32_syscall_int80.ppoll64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000135
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_ppoll64)
-	call   sys32_ppoll64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_ppoll64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat64(fd_t dirfd, char const *filename, struct __timespecx32_64 const[2] times, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.utimensat64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000140
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_utimensat64)
-	call   sys32_utimensat64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_utimensat64)
-
-/* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
-.section .text.x86.asm32_syscall_int80.fallocate64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000144
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %esi, %rdx          /* ARG2 = REG2:REG3 */
-	movzlq %edx, %rax          /* ... */
-	shlq   $(32), %rdx            /* ... */
-	orq    %rax, %rdx          /* ... */
-	movzlq %ebp, %rax          /* %rax = REG4:REG5 */
-	movzlq %edi, %r8           /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movq   %rax, %rcx /* ARG3 = %rax */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_fallocate64)
-	call   sys32_fallocate64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_fallocate64)
-
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_int80.timerfd_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000145
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_timerfd_settime64)
-	call   sys32_timerfd_settime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_timerfd_settime64)
-
-/* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t ufd, struct __itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_int80.timerfd_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000146
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_timerfd_gettime64)
-	call   sys32_timerfd_gettime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_timerfd_gettime64)
-
-/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_int80.preadvf
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000014d
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %rax          /* %rax = REG3:REG4 */
-	movzlq %esi, %r8           /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movq   %rax, %rcx /* ARG3 = %rax */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ebp, %r8 /* ARG4 = REG5 */
-	EXTERN(sys32_preadvf)
-	call   sys32_preadvf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_preadvf)
-
-/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_int80.pwritevf
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x8000014e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %rax          /* %rax = REG3:REG4 */
-	movzlq %esi, %r8           /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movq   %rax, %rcx /* ARG3 = %rax */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ebp, %r8 /* ARG4 = REG5 */
-	EXTERN(sys32_pwritevf)
-	call   sys32_pwritevf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_pwritevf)
-
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
-.section .text.x86.asm32_syscall_int80.recvmmsg64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0x80000151
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_recvmmsg64)
-	call   sys32_recvmmsg64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_int80_recvmmsg64)
+END(__x86_asm32_int80_hop)
 
 
 
@@ -29105,17 +29105,1212 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_membarrier, __x86_asm32_int80_memb
 /* errno_t mlock2(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mlock2, __x86_asm32_int80_mlock2)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_hop, __x86_asm32_int80_hop)
+/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
+.section .text.x86.asm32_syscall_sysenter.recvmmsg64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffeaf
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_recvmmsg64)
+	call   sys32_recvmmsg64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_recvmmsg64)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_hopf, __x86_asm32_int80_hopf)
+/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysenter.pwritevf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffeb2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %rax       /* %rax = REG3:0(%ebp) */
+	movzlq %esi, %r8           /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movq   %rax, %rcx /* ARG3 = %rax */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
+	EXTERN(sys32_pwritevf)
+	call   sys32_pwritevf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_pwritevf)
 
-/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readf, __x86_asm32_int80_readf)
+/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysenter.preadvf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffeb3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %rax       /* %rax = REG3:0(%ebp) */
+	movzlq %esi, %r8           /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movq   %rax, %rcx /* ARG3 = %rax */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
+	EXTERN(sys32_preadvf)
+	call   sys32_preadvf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_preadvf)
 
-/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writef, __x86_asm32_int80_writef)
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t ufd, struct __itimerspecx32_64 *otmr) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_gettime64, __x86_asm32_int80_timerfd_gettime64)
+
+/* Set next expiration time of interval timer source UFD to UTMR.
+ * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
+ * is absolute. Optionally return the old expiration time in OTMR */
+/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_settime64, __x86_asm32_int80_timerfd_settime64)
+
+/* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
+.section .text.x86.asm32_syscall_sysenter.fallocate64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffebc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq %esi, %rdx          /* ARG2 = REG2:REG3 */
+	movzlq %edx, %rax          /* ... */
+	shlq   $(32), %rdx            /* ... */
+	orq    %rax, %rdx          /* ... */
+	movzlq 4(%ebp), %rax       /* %rax = 0(%ebp):4(%ebp) */
+	movzlq 0(%ebp), %r8        /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movq   %rax, %rcx /* ARG3 = %rax */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_fallocate64)
+	call   sys32_fallocate64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_fallocate64)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* errno_t utimensat64(fd_t dirfd, char const *filename, struct __timespecx32_64 const[2] times, atflag_t flags) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimensat64, __x86_asm32_int80_utimensat64)
+
+/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysenter.ppoll64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffecb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_ppoll64)
+	call   sys32_ppoll64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_ppoll64)
+
+/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+.section .text.x86.asm32_syscall_sysenter.pselect6_64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6_64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffecc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pselect6_64)
+	call   sys32_pselect6_64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_pselect6_64)
+
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysenter.freadlinkat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_freadlinkat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffecf
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_freadlinkat)
+	call   sys32_freadlinkat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_freadlinkat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsymlinkat, __x86_asm32_int80_fsymlinkat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysenter.frenameat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frenameat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffed2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_frenameat)
+	call   sys32_frenameat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_frenameat)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kfstatat, __x86_asm32_int80_kfstatat)
+
+/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_futimesat64, __x86_asm32_int80_futimesat64)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysenter.fmknodat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmknodat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffed7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_fmknodat)
+	call   sys32_fmknodat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_fmknodat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fmkdirat, __x86_asm32_int80_fmkdirat)
+
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
+.section .text.x86.asm32_syscall_sysenter.waitid64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffee4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_waitid64)
+	call   sys32_waitid64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_waitid64)
+
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysenter.mq_timedreceive64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffee8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedreceive64)
+	call   sys32_mq_timedreceive64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_mq_timedreceive64)
+
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysenter.mq_timedsend64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffee9
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedsend64)
+	call   sys32_mq_timedsend64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_mq_timedsend64)
+
+/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimes64, __x86_asm32_int80_utimes64)
+
+/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_nanosleep64, __x86_asm32_int80_clock_nanosleep64)
+
+/* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_getres64, __x86_asm32_int80_clock_getres64)
+
+/* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_gettime64, __x86_asm32_int80_clock_gettime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_settime64, __x86_asm32_int80_clock_settime64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_gettime64, __x86_asm32_int80_timer_gettime64)
+
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_settime64, __x86_asm32_int80_timer_settime64)
+
+/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+.section .text.x86.asm32_syscall_sysenter.kreaddirf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddirf)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffff24
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_kreaddirf)
+	call   sys32_kreaddirf
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_kreaddirf)
+
+/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kfstat, __x86_asm32_int80_kfstat)
+
+/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_klstat, __x86_asm32_int80_klstat)
+
+/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kstat, __x86_asm32_int80_kstat)
+
+/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysenter.pwrite64f
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64f)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffff4b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %rax       /* %rax = REG3:0(%ebp) */
+	movzlq %esi, %r8           /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movq   %rax, %rcx /* ARG3 = %rax */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
+	EXTERN(sys32_pwrite64f)
+	call   sys32_pwrite64f
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_pwrite64f)
+
+/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysenter.pread64f
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffff4c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %rax       /* %rax = REG3:0(%ebp) */
+	movzlq %esi, %r8           /* ... */
+	shlq   $(32), %rax            /* ... */
+	orq    %r8, %rax           /* ... */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movq   %rax, %rcx /* ARG3 = %rax */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
+	EXTERN(sys32_pread64f)
+	call   sys32_pread64f
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_pread64f)
+
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigtimedwait64, __x86_asm32_int80_rt_sigtimedwait64)
+
+/* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_nanosleep64, __x86_asm32_int80_nanosleep64)
+
+/* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_rr_get_interval64, __x86_asm32_int80_sched_rr_get_interval64)
+
+/* syscall_slong_t rpc_service(void) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_service, __x86_asm32_int80_rpc_service)
+
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ksysctl, __x86_asm32_int80_ksysctl)
+
+/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writevf, __x86_asm32_int80_writevf)
+
+/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readvf, __x86_asm32_int80_readvf)
+
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kreaddir, __x86_asm32_int80_kreaddir)
+
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_wait4_64, __x86_asm32_int80_wait4_64)
+
+/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getitimer64, __x86_asm32_int80_getitimer64)
+
+/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setitimer64, __x86_asm32_int80_setitimer64)
+
+/* Map the segments of a given library into memory
+ * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
+ * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
+ *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
+ *                       MAP_DONT_OVERRIDE'
+ * @param: fd:    A handle for the library file being mapped
+ *                (must be a file or vm_datablock/inode)
+ * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+ *                (depending on the caller running in 32- or 64-bit mode)
+ * @param: hdrc:  The number of program headers */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
+.section .text.x86.asm32_syscall_sysenter.maplibrary
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffffaa
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_maplibrary)
+	call   sys32_maplibrary
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_maplibrary)
+
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
+.section .text.x86.asm32_syscall_sysenter.select64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffffae
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_select64)
+	call   sys32_select64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_select64)
+
+/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_settimeofday64, __x86_asm32_int80_settimeofday64)
+
+/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_gettimeofday64, __x86_asm32_int80_gettimeofday64)
+
+/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrusage64, __x86_asm32_int80_getrusage64)
+
+/* uint64_t fsmode(uint64_t mode) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsmode, __x86_asm32_int80_fsmode)
+
+/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioctlf, __x86_asm32_int80_ioctlf)
+
+/* errno_t ftime64(struct __timebx32_64 *tp) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime64, __x86_asm32_int80_ftime64)
+
+/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utime64, __x86_asm32_int80_utime64)
+
+/* errno_t stime64(time64_t const *t) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_stime64, __x86_asm32_int80_stime64)
+
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
+ * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+ *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           In this case, a traceback displayed to a human should not include the text location at
+ *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+ *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
+ *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
+.section .text.x86.asm32_syscall_sysenter.coredump
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffffe8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_coredump)
+	call   sys32_coredump
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_coredump)
+
+/* Raise a signal within the calling thread alongside the given CPU state
+ * This system call is used when translating exceptions into POSIX signal in error mode #4
+ * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
+ *                be raised for the caller's source location. Note that only in the later case
+ *                will this function return to its caller. - When `state' is non-NULL, it will
+ *                return to the text location described by it.
+ * TODO: Add a flags argument to control if the current signal mask
+ *       should be ignored (currently, it's always being ignored) */
+/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_raiseat, __x86_asm32_int80_raiseat)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The newly created device automatically gets assigned an arbitrary device number, before
+ * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mktty, __x86_asm32_int80_mktty)
+
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.x86.asm32_syscall_sysenter.lfutexlockexpr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexlockexpr)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffffeb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_lfutexlockexpr)
+	call   sys32_lfutexlockexpr
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_lfutexlockexpr)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.x86.asm32_syscall_sysenter.lfutexexpr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffffec
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_lfutexexpr)
+	call   sys32_lfutexexpr
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_lfutexexpr)
+
+/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_lseek64, __x86_asm32_int80_lseek64)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) */
+.section .text.x86.asm32_syscall_sysenter.lfutex
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffffee
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_lfutex)
+	call   sys32_lfutex
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_lfutex)
+
+/* Trigger a debugger trap `trapno', optionally extended with `regs'
+ * at either the system call return location, or at the given `state'
+ * In the later case, this system call will by default return to the
+ * given `state', though given the purpose of this system call being
+ * to inform a connected debugger of some breakable event, allowing
+ * it to do whatever it wishes before execution is resumed.
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
+ * @param: state:    When non-NULL, the CPU state where the trap should return to by default
+ * @return: -EOK:    `state' was NULL and the trap returned successfully
+ * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
+/* errno_t debugtrap(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_debugtrap, __x86_asm32_int80_debugtrap)
+
+/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
+/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_library_listdef, __x86_asm32_int80_set_library_listdef)
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: PHANDLER:    The address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+/* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_get_exception_handler, __x86_asm32_int80_get_exception_handler)
+
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
+ *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
+ * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given MODE is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_exception_handler, __x86_asm32_int80_set_exception_handler)
+
+/* int64_t time64(int64_t *timer) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_time64, __x86_asm32_int80_time64)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fchdirat, __x86_asm32_int80_fchdirat)
+
+/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
+.section .text.x86.asm32_syscall_sysenter.openpty
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openpty)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffff5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_openpty)
+	call   sys32_openpty
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_openpty)
+
+/* Schedule an RPC for execution on the specified `target' thread.
+ * @param: target:    The targeted thread.
+ * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
+ * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
+ * @param: arguments: Arguments for the RPC loader program.
+ * @return: 1:  The specified `target' thread has already terminated.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno')
+ * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
+ * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
+/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_schedule, __x86_asm32_int80_rpc_schedule)
+
+/* Returns the absolute filesystem path for the specified file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+ * causing the pointed-to file location to be retrieved. - Otherwise, the
+ * location of the link is printed instead.
+ * You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysenter.frealpathat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpathat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffff8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_frealpathat)
+	call   sys32_frealpathat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_frealpathat)
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_frealpath4, __x86_asm32_int80_frealpath4)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getdrives, __x86_asm32_int80_getdrives)
 
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
@@ -29208,1212 +30403,17 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writef, __x86_asm32_int80_writef)
 /* errno_t detach(pid_t pid) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_detach, __x86_asm32_int80_detach)
 
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getdrives, __x86_asm32_int80_getdrives)
+/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writef, __x86_asm32_int80_writef)
 
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_frealpath4, __x86_asm32_int80_frealpath4)
+/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readf, __x86_asm32_int80_readf)
 
-/* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
- * causing the pointed-to file location to be retrieved. - Otherwise, the
- * location of the link is printed instead.
- * You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysenter.frealpathat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpathat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000008
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_frealpathat)
-	call   sys32_frealpathat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_frealpathat)
+/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_hopf, __x86_asm32_int80_hopf)
 
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_schedule, __x86_asm32_int80_rpc_schedule)
-
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ksysctl, __x86_asm32_int80_ksysctl)
-
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
-/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
-.section .text.x86.asm32_syscall_sysenter.openpty
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openpty)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x8000000b
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_openpty)
-	call   sys32_openpty
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_openpty)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fchdirat, __x86_asm32_int80_fchdirat)
-
-/* int64_t time64(int64_t *timer) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_time64, __x86_asm32_int80_time64)
-
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_exception_handler, __x86_asm32_int80_set_exception_handler)
-
-/* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-/* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_get_exception_handler, __x86_asm32_int80_get_exception_handler)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_library_listdef, __x86_asm32_int80_set_library_listdef)
-
-/* Trigger a debugger trap `trapno', optionally extended with `regs'
- * at either the system call return location, or at the given `state'
- * In the later case, this system call will by default return to the
- * given `state', though given the purpose of this system call being
- * to inform a connected debugger of some breakable event, allowing
- * it to do whatever it wishes before execution is resumed.
- * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
- * @param: state:    When non-NULL, the CPU state where the trap should return to by default
- * @return: -EOK:    `state' was NULL and the trap returned successfully
- * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-/* errno_t debugtrap(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_debugtrap, __x86_asm32_int80_debugtrap)
-
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
- *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) */
-.section .text.x86.asm32_syscall_sysenter.lfutex
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000012
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_lfutex)
-	call   sys32_lfutex
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_lfutex)
-
-/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_lseek64, __x86_asm32_int80_lseek64)
-
-/* >> lfutexexpr(2)
- * The lfutexexpr() system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread, as well as
- * have the calling thread wait for any number of futex objects associated with
- * any address that is checked as part of the expression. (s.a. `lfutex()')
- * Notes:
- *   - This is the only futex function that can be used to wait on multiple futex
- *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on futex objects, as well as waiting on
- *     futexes in conjunction with waiting on other things such as files, see the
- *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.x86.asm32_syscall_sysenter.lfutexexpr
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000014
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_lfutexexpr)
-	call   sys32_lfutexexpr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_lfutexexpr)
-
-/* >> lfutexlockexpr(2)
- * A function that is similar to `lfutexexpr()', but allows for the use of one central
- * locking futex that is used for waiting and may be distinct from any other given futex
- * object pointer.
- * Notes:
- *   - This function only has the calling thread wait on a single futex `ulockaddr',
- *     rather than having it wait on an arbitrary number of futexes, as would be the case when
- *     the `lfutexexpr()' function is used.
- *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things such as files, see the documentation on
- *     this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.x86.asm32_syscall_sysenter.lfutexlockexpr
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexlockexpr)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000015
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_lfutexlockexpr)
-	call   sys32_lfutexlockexpr
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_lfutexlockexpr)
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The newly created device automatically gets assigned an arbitrary device number, before
- * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mktty, __x86_asm32_int80_mktty)
-
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_raiseat, __x86_asm32_int80_raiseat)
-
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
-.section .text.x86.asm32_syscall_sysenter.coredump
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000018
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_coredump)
-	call   sys32_coredump
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_coredump)
-
-/* errno_t stime64(time64_t const *t) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_stime64, __x86_asm32_int80_stime64)
-
-/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utime64, __x86_asm32_int80_utime64)
-
-/* errno_t ftime64(struct __timebx32_64 *tp) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime64, __x86_asm32_int80_ftime64)
-
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ioctlf, __x86_asm32_int80_ioctlf)
-
-/* uint64_t fsmode(uint64_t mode) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsmode, __x86_asm32_int80_fsmode)
-
-/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrusage64, __x86_asm32_int80_getrusage64)
-
-/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_gettimeofday64, __x86_asm32_int80_gettimeofday64)
-
-/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_settimeofday64, __x86_asm32_int80_settimeofday64)
-
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
-.section .text.x86.asm32_syscall_sysenter.select64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000052
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_select64)
-	call   sys32_select64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_select64)
-
-/* Map the segments of a given library into memory
- * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
- * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *                (depending on the caller running in 32- or 64-bit mode)
- * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
-.section .text.x86.asm32_syscall_sysenter.maplibrary
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000056
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_maplibrary)
-	call   sys32_maplibrary
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_maplibrary)
-
-/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setitimer64, __x86_asm32_int80_setitimer64)
-
-/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getitimer64, __x86_asm32_int80_getitimer64)
-
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_wait4_64, __x86_asm32_int80_wait4_64)
-
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kreaddir, __x86_asm32_int80_kreaddir)
-
-/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readvf, __x86_asm32_int80_readvf)
-
-/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writevf, __x86_asm32_int80_writevf)
-
-/* syscall_slong_t rpc_service(void) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_service, __x86_asm32_int80_rpc_service)
-
-/* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_rr_get_interval64, __x86_asm32_int80_sched_rr_get_interval64)
-
-/* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_nanosleep64, __x86_asm32_int80_nanosleep64)
-
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigtimedwait64, __x86_asm32_int80_rt_sigtimedwait64)
-
-/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysenter.pread64f
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x800000b4
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %rax       /* %rax = REG3:0(%ebp) */
-	movzlq %esi, %r8           /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movq   %rax, %rcx /* ARG3 = %rax */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
-	EXTERN(sys32_pread64f)
-	call   sys32_pread64f
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_pread64f)
-
-/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysenter.pwrite64f
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwrite64f)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x800000b5
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %rax       /* %rax = REG3:0(%ebp) */
-	movzlq %esi, %r8           /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movq   %rax, %rcx /* ARG3 = %rax */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
-	EXTERN(sys32_pwrite64f)
-	call   sys32_pwrite64f
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_pwrite64f)
-
-/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kstat, __x86_asm32_int80_kstat)
-
-/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_klstat, __x86_asm32_int80_klstat)
-
-/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kfstat, __x86_asm32_int80_kfstat)
-
-/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
-.section .text.x86.asm32_syscall_sysenter.kreaddirf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddirf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x800000dc
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_kreaddirf)
-	call   sys32_kreaddirf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_kreaddirf)
-
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_settime64, __x86_asm32_int80_timer_settime64)
-
-/* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_gettime64, __x86_asm32_int80_timer_gettime64)
-
-/* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_settime64, __x86_asm32_int80_clock_settime64)
-
-/* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_gettime64, __x86_asm32_int80_clock_gettime64)
-
-/* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_getres64, __x86_asm32_int80_clock_getres64)
-
-/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_nanosleep64, __x86_asm32_int80_clock_nanosleep64)
-
-/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimes64, __x86_asm32_int80_utimes64)
-
-/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_sysenter.mq_timedsend64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000117
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_mq_timedsend64)
-	call   sys32_mq_timedsend64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_mq_timedsend64)
-
-/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_sysenter.mq_timedreceive64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000118
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_mq_timedreceive64)
-	call   sys32_mq_timedreceive64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_mq_timedreceive64)
-
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
-.section .text.x86.asm32_syscall_sysenter.waitid64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x8000011c
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_waitid64)
-	call   sys32_waitid64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_waitid64)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fmkdirat, __x86_asm32_int80_fmkdirat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysenter.fmknodat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmknodat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000129
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_fmknodat)
-	call   sys32_fmknodat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_fmknodat)
-
-/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_futimesat64, __x86_asm32_int80_futimesat64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kfstatat, __x86_asm32_int80_kfstatat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysenter.frenameat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frenameat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x8000012e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_frenameat)
-	call   sys32_frenameat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_frenameat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsymlinkat, __x86_asm32_int80_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysenter.freadlinkat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_freadlinkat)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000131
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_freadlinkat)
-	call   sys32_freadlinkat
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_freadlinkat)
-
-/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
-.section .text.x86.asm32_syscall_sysenter.pselect6_64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6_64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000134
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_pselect6_64)
-	call   sys32_pselect6_64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_pselect6_64)
-
-/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-.section .text.x86.asm32_syscall_sysenter.ppoll64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000135
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_ppoll64)
-	call   sys32_ppoll64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_ppoll64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat64(fd_t dirfd, char const *filename, struct __timespecx32_64 const[2] times, atflag_t flags) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimensat64, __x86_asm32_int80_utimensat64)
-
-/* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
-.section .text.x86.asm32_syscall_sysenter.fallocate64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000144
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq %esi, %rdx          /* ARG2 = REG2:REG3 */
-	movzlq %edx, %rax          /* ... */
-	shlq   $(32), %rdx            /* ... */
-	orq    %rax, %rdx          /* ... */
-	movzlq 4(%ebp), %rax       /* %rax = 0(%ebp):4(%ebp) */
-	movzlq 0(%ebp), %r8        /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movq   %rax, %rcx /* ARG3 = %rax */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_fallocate64)
-	call   sys32_fallocate64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_fallocate64)
-
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_settime64, __x86_asm32_int80_timerfd_settime64)
-
-/* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t ufd, struct __itimerspecx32_64 *otmr) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_gettime64, __x86_asm32_int80_timerfd_gettime64)
-
-/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysenter.preadvf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x8000014d
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %rax       /* %rax = REG3:0(%ebp) */
-	movzlq %esi, %r8           /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movq   %rax, %rcx /* ARG3 = %rax */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
-	EXTERN(sys32_preadvf)
-	call   sys32_preadvf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_preadvf)
-
-/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysenter.pwritevf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x8000014e
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %rax       /* %rax = REG3:0(%ebp) */
-	movzlq %esi, %r8           /* ... */
-	shlq   $(32), %rax            /* ... */
-	orq    %r8, %rax           /* ... */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	movq   %rax, %rcx /* ARG3 = %rax */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq 4(%ebp), %r8 /* ARG4 = 4(%ebp) */
-	EXTERN(sys32_pwritevf)
-	call   sys32_pwritevf
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_pwritevf)
-
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
-.section .text.x86.asm32_syscall_sysenter.recvmmsg64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0x80000151
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebp, %rbp
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_recvmmsg64)
-	call   sys32_recvmmsg64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit_sysret
-	.cfi_endproc
-END(__x86_asm32_sysenter_recvmmsg64)
+/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_hop, __x86_asm32_int80_hop)
 
 
 
@@ -34510,56 +34510,1090 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mlock2)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_mlock2)
 
-/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
-.section .text.x86.asm32_syscall_sysrun32.hop
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hop)
+/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
+.section .text.x86.asm32_syscall_sysrun32.recvmmsg64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg64)
 	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_hop)
-	jmp    sys32_hop
+	EXTERN(sys32_recvmmsg64)
+	jmp    sys32_recvmmsg64
 	.cfi_endproc
-END(__x86_asm32_sysrun32_hop)
+END(__x86_asm32_sysrun32_recvmmsg64)
 
-/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm32_syscall_sysrun32.hopf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hopf)
+/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.pwritevf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritevf)
+	.cfi_startproc
+	movzlq 40(%rdi), %r8
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pwritevf)
+	jmp    sys32_pwritevf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pwritevf)
+
+/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.preadvf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadvf)
+	.cfi_startproc
+	movzlq 40(%rdi), %r8
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_preadvf)
+	jmp    sys32_preadvf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_preadvf)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t ufd, struct __itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_sysrun32.timerfd_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timerfd_gettime64)
+	jmp    sys32_timerfd_gettime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timerfd_gettime64)
+
+/* Set next expiration time of interval timer source UFD to UTMR.
+ * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
+ * is absolute. Optionally return the old expiration time in OTMR */
+/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_sysrun32.timerfd_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_settime64)
 	.cfi_startproc
 	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_hopf)
-	jmp    sys32_hopf
+	EXTERN(sys32_timerfd_settime64)
+	jmp    sys32_timerfd_settime64
 	.cfi_endproc
-END(__x86_asm32_sysrun32_hopf)
+END(__x86_asm32_sysrun32_timerfd_settime64)
 
-/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysrun32.readf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readf)
+/* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
+.section .text.x86.asm32_syscall_sysrun32.fallocate64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fallocate64)
+	.cfi_startproc
+	movzlq 40(%rdi), %rax
+	movzlq 32(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 24(%rdi), %rax
+	movzlq 16(%rdi), %rdx
+	shlq   $32, %rax
+	orq    %rax, %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fallocate64)
+	jmp    sys32_fallocate64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fallocate64)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* errno_t utimensat64(fd_t dirfd, char const *filename, struct __timespecx32_64 const[2] times, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.utimensat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimensat64)
 	.cfi_startproc
 	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_readf)
-	jmp    sys32_readf
+	EXTERN(sys32_utimensat64)
+	jmp    sys32_utimensat64
 	.cfi_endproc
-END(__x86_asm32_sysrun32_readf)
+END(__x86_asm32_sysrun32_utimensat64)
 
-/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysrun32.writef
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writef)
+/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.ppoll64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ppoll64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ppoll64)
+	jmp    sys32_ppoll64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ppoll64)
+
+/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+.section .text.x86.asm32_syscall_sysrun32.pselect6_64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pselect6_64)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pselect6_64)
+	jmp    sys32_pselect6_64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pselect6_64)
+
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.freadlinkat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_freadlinkat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_freadlinkat)
+	jmp    sys32_freadlinkat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_freadlinkat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fsymlinkat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsymlinkat)
 	.cfi_startproc
 	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_writef)
-	jmp    sys32_writef
+	EXTERN(sys32_fsymlinkat)
+	jmp    sys32_fsymlinkat
 	.cfi_endproc
-END(__x86_asm32_sysrun32_writef)
+END(__x86_asm32_sysrun32_fsymlinkat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.frenameat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_frenameat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_frenameat)
+	jmp    sys32_frenameat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_frenameat)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.kfstatat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kfstatat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kfstatat)
+	jmp    sys32_kfstatat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kfstatat)
+
+/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
+.section .text.x86.asm32_syscall_sysrun32.futimesat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_futimesat64)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_futimesat64)
+	jmp    sys32_futimesat64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_futimesat64)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fmknodat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fmknodat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fmknodat)
+	jmp    sys32_fmknodat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fmknodat)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fmkdirat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fmkdirat)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fmkdirat)
+	jmp    sys32_fmkdirat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fmkdirat)
+
+/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
+.section .text.x86.asm32_syscall_sysrun32.waitid64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_waitid64)
+	jmp    sys32_waitid64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_waitid64)
+
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysrun32.mq_timedreceive64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedreceive64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_timedreceive64)
+	jmp    sys32_mq_timedreceive64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_timedreceive64)
+
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysrun32.mq_timedsend64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedsend64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_timedsend64)
+	jmp    sys32_mq_timedsend64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_timedsend64)
+
+/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
+.section .text.x86.asm32_syscall_sysrun32.utimes64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimes64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_utimes64)
+	jmp    sys32_utimes64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_utimes64)
+
+/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
+.section .text.x86.asm32_syscall_sysrun32.clock_nanosleep64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_nanosleep64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_nanosleep64)
+	jmp    sys32_clock_nanosleep64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_nanosleep64)
+
+/* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
+.section .text.x86.asm32_syscall_sysrun32.clock_getres64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_getres64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_getres64)
+	jmp    sys32_clock_getres64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_getres64)
+
+/* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
+.section .text.x86.asm32_syscall_sysrun32.clock_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_gettime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_gettime64)
+	jmp    sys32_clock_gettime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_gettime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
+.section .text.x86.asm32_syscall_sysrun32.clock_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_settime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_settime64)
+	jmp    sys32_clock_settime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_settime64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
+.section .text.x86.asm32_syscall_sysrun32.timer_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_gettime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_gettime64)
+	jmp    sys32_timer_gettime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_gettime64)
+
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
+.section .text.x86.asm32_syscall_sysrun32.timer_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_settime64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_settime64)
+	jmp    sys32_timer_settime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_settime64)
+
+/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+.section .text.x86.asm32_syscall_sysrun32.kreaddirf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kreaddirf)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kreaddirf)
+	jmp    sys32_kreaddirf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kreaddirf)
+
+/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.kfstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kfstat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kfstat)
+	jmp    sys32_kfstat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kfstat)
+
+/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.klstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_klstat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_klstat)
+	jmp    sys32_klstat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_klstat)
+
+/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_sysrun32.kstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kstat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kstat)
+	jmp    sys32_kstat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kstat)
+
+/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.pwrite64f
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwrite64f)
+	.cfi_startproc
+	movzlq 40(%rdi), %r8
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pwrite64f)
+	jmp    sys32_pwrite64f
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pwrite64f)
+
+/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.pread64f
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pread64f)
+	.cfi_startproc
+	movzlq 40(%rdi), %r8
+	movzlq 32(%rdi), %rax
+	movzlq 24(%rdi), %rcx
+	shlq   $32, %rax
+	orq    %rax, %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pread64f)
+	jmp    sys32_pread64f
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pread64f)
+
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_sigtimedwait64)
+	jmp    sys32_rt_sigtimedwait64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_sigtimedwait64)
+
+/* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
+.section .text.x86.asm32_syscall_sysrun32.nanosleep64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_nanosleep64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_nanosleep64)
+	jmp    sys32_nanosleep64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_nanosleep64)
+
+/* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
+.section .text.x86.asm32_syscall_sysrun32.sched_rr_get_interval64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_rr_get_interval64)
+	jmp    sys32_sched_rr_get_interval64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_rr_get_interval64)
+
+/* syscall_slong_t rpc_service(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rpc_service, sys32_rpc_service); */
+
+/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.ksysctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ksysctl)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ksysctl)
+	jmp    sys32_ksysctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ksysctl)
+
+/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.writevf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writevf)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_writevf)
+	jmp    sys32_writevf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_writevf)
+
+/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.readvf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readvf)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_readvf)
+	jmp    sys32_readvf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_readvf)
+
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.kreaddir
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kreaddir)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_kreaddir)
+	jmp    sys32_kreaddir
+	.cfi_endproc
+END(__x86_asm32_sysrun32_kreaddir)
+
+/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
+.section .text.x86.asm32_syscall_sysrun32.wait4_64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_wait4_64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_wait4_64)
+	jmp    sys32_wait4_64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_wait4_64)
+
+/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+.section .text.x86.asm32_syscall_sysrun32.getitimer64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getitimer64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getitimer64)
+	jmp    sys32_getitimer64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getitimer64)
+
+/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
+.section .text.x86.asm32_syscall_sysrun32.setitimer64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setitimer64)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_setitimer64)
+	jmp    sys32_setitimer64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_setitimer64)
+
+/* Map the segments of a given library into memory
+ * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
+ * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
+ *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
+ *                       MAP_DONT_OVERRIDE'
+ * @param: fd:    A handle for the library file being mapped
+ *                (must be a file or vm_datablock/inode)
+ * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+ *                (depending on the caller running in 32- or 64-bit mode)
+ * @param: hdrc:  The number of program headers */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
+.section .text.x86.asm32_syscall_sysrun32.maplibrary
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_maplibrary)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_maplibrary)
+	jmp    sys32_maplibrary
+	.cfi_endproc
+END(__x86_asm32_sysrun32_maplibrary)
+
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
+.section .text.x86.asm32_syscall_sysrun32.select64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_select64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_select64)
+	jmp    sys32_select64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_select64)
+
+/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
+.section .text.x86.asm32_syscall_sysrun32.settimeofday64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_settimeofday64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_settimeofday64)
+	jmp    sys32_settimeofday64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_settimeofday64)
+
+/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
+.section .text.x86.asm32_syscall_sysrun32.gettimeofday64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_gettimeofday64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_gettimeofday64)
+	jmp    sys32_gettimeofday64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_gettimeofday64)
+
+/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
+.section .text.x86.asm32_syscall_sysrun32.getrusage64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrusage64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_getrusage64)
+	jmp    sys32_getrusage64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_getrusage64)
+
+/* uint64_t fsmode(uint64_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.fsmode
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsmode)
+	.cfi_startproc
+	movzlq 8(%rdi), %rax
+	movzlq 0(%rdi), %rdi
+	shlq   $32, %rax
+	orq    %rax, %rdi
+	EXTERN(sys32_fsmode)
+	jmp    sys32_fsmode
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fsmode)
+
+/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.ioctlf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioctlf)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ioctlf)
+	jmp    sys32_ioctlf
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ioctlf)
+
+/* errno_t ftime64(struct __timebx32_64 *tp) */
+.section .text.x86.asm32_syscall_sysrun32.ftime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftime64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ftime64)
+	jmp    sys32_ftime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ftime64)
+
+/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+.section .text.x86.asm32_syscall_sysrun32.utime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_utime64)
+	jmp    sys32_utime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_utime64)
+
+/* errno_t stime64(time64_t const *t) */
+.section .text.x86.asm32_syscall_sysrun32.stime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_stime64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_stime64)
+	jmp    sys32_stime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_stime64)
+
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
+ * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+ *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           In this case, a traceback displayed to a human should not include the text location at
+ *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+ *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
+ *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
+.section .text.x86.asm32_syscall_sysrun32.coredump
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_coredump)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_coredump)
+	jmp    sys32_coredump
+	.cfi_endproc
+END(__x86_asm32_sysrun32_coredump)
+
+/* Raise a signal within the calling thread alongside the given CPU state
+ * This system call is used when translating exceptions into POSIX signal in error mode #4
+ * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
+ *                be raised for the caller's source location. Note that only in the later case
+ *                will this function return to its caller. - When `state' is non-NULL, it will
+ *                return to the text location described by it.
+ * TODO: Add a flags argument to control if the current signal mask
+ *       should be ignored (currently, it's always being ignored) */
+/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
+.section .text.x86.asm32_syscall_sysrun32.raiseat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_raiseat)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_raiseat)
+	jmp    sys32_raiseat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_raiseat)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The newly created device automatically gets assigned an arbitrary device number, before
+ * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+.section .text.x86.asm32_syscall_sysrun32.mktty
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mktty)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mktty)
+	jmp    sys32_mktty
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mktty)
+
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.x86.asm32_syscall_sysrun32.lfutexlockexpr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lfutexlockexpr)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lfutexlockexpr)
+	jmp    sys32_lfutexlockexpr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lfutexlockexpr)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+.section .text.x86.asm32_syscall_sysrun32.lfutexexpr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lfutexexpr)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lfutexexpr)
+	jmp    sys32_lfutexexpr
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lfutexexpr)
+
+/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
+.section .text.x86.asm32_syscall_sysrun32.lseek64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lseek64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rdx
+	movzlq 16(%rdi), %rax
+	movzlq 8(%rdi), %rsi
+	shlq   $32, %rax
+	orq    %rax, %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lseek64)
+	jmp    sys32_lseek64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lseek64)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) */
+.section .text.x86.asm32_syscall_sysrun32.lfutex
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lfutex)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_lfutex)
+	jmp    sys32_lfutex
+	.cfi_endproc
+END(__x86_asm32_sysrun32_lfutex)
+
+/* Trigger a debugger trap `trapno', optionally extended with `regs'
+ * at either the system call return location, or at the given `state'
+ * In the later case, this system call will by default return to the
+ * given `state', though given the purpose of this system call being
+ * to inform a connected debugger of some breakable event, allowing
+ * it to do whatever it wishes before execution is resumed.
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
+ * @param: state:    When non-NULL, the CPU state where the trap should return to by default
+ * @return: -EOK:    `state' was NULL and the trap returned successfully
+ * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
+/* errno_t debugtrap(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) */
+.section .text.x86.asm32_syscall_sysrun32.debugtrap
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_debugtrap)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_debugtrap)
+	jmp    sys32_debugtrap
+	.cfi_endproc
+END(__x86_asm32_sysrun32_debugtrap)
+
+/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
+/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
+.section .text.x86.asm32_syscall_sysrun32.set_library_listdef
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_library_listdef)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_set_library_listdef)
+	jmp    sys32_set_library_listdef
+	.cfi_endproc
+END(__x86_asm32_sysrun32_set_library_listdef)
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: PHANDLER:    The address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+/* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
+.section .text.x86.asm32_syscall_sysrun32.get_exception_handler
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_get_exception_handler)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_get_exception_handler)
+	jmp    sys32_get_exception_handler
+	.cfi_endproc
+END(__x86_asm32_sysrun32_get_exception_handler)
+
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
+ *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
+ * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given MODE is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+.section .text.x86.asm32_syscall_sysrun32.set_exception_handler
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_exception_handler)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_set_exception_handler)
+	jmp    sys32_set_exception_handler
+	.cfi_endproc
+END(__x86_asm32_sysrun32_set_exception_handler)
+
+/* int64_t time64(int64_t *timer) */
+.section .text.x86.asm32_syscall_sysrun32.time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_time64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_time64)
+	jmp    sys32_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_time64)
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.fchdirat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchdirat)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fchdirat)
+	jmp    sys32_fchdirat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fchdirat)
+
+/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
+.section .text.x86.asm32_syscall_sysrun32.openpty
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_openpty)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_openpty)
+	jmp    sys32_openpty
+	.cfi_endproc
+END(__x86_asm32_sysrun32_openpty)
+
+/* Schedule an RPC for execution on the specified `target' thread.
+ * @param: target:    The targeted thread.
+ * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
+ * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
+ * @param: arguments: Arguments for the RPC loader program.
+ * @return: 1:  The specified `target' thread has already terminated.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno')
+ * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
+ * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
+/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
+.section .text.x86.asm32_syscall_sysrun32.rpc_schedule
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rpc_schedule)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rpc_schedule)
+	jmp    sys32_rpc_schedule
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rpc_schedule)
+
+/* Returns the absolute filesystem path for the specified file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+ * causing the pointed-to file location to be retrieved. - Otherwise, the
+ * location of the link is printed instead.
+ * You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.frealpathat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_frealpathat)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_frealpathat)
+	jmp    sys32_frealpathat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_frealpathat)
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.frealpath4
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_frealpath4)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_frealpath4)
+	jmp    sys32_frealpath4
+	.cfi_endproc
+END(__x86_asm32_sysrun32_frealpath4)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getdrives, sys32_getdrives); */
 
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
@@ -34659,1090 +35693,56 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_detach)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_detach)
 
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_getdrives, sys32_getdrives); */
-
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.frealpath4
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_frealpath4)
+/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.writef
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writef)
 	.cfi_startproc
 	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_frealpath4)
-	jmp    sys32_frealpath4
+	EXTERN(sys32_writef)
+	jmp    sys32_writef
 	.cfi_endproc
-END(__x86_asm32_sysrun32_frealpath4)
+END(__x86_asm32_sysrun32_writef)
 
-/* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
- * causing the pointed-to file location to be retrieved. - Otherwise, the
- * location of the link is printed instead.
- * You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.frealpathat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_frealpathat)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_frealpathat)
-	jmp    sys32_frealpathat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_frealpathat)
-
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-/* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR32(void) *arguments) */
-.section .text.x86.asm32_syscall_sysrun32.rpc_schedule
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rpc_schedule)
+/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
+.section .text.x86.asm32_syscall_sysrun32.readf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readf)
 	.cfi_startproc
 	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_rpc_schedule)
-	jmp    sys32_rpc_schedule
+	EXTERN(sys32_readf)
+	jmp    sys32_readf
 	.cfi_endproc
-END(__x86_asm32_sysrun32_rpc_schedule)
+END(__x86_asm32_sysrun32_readf)
 
-/* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
-.section .text.x86.asm32_syscall_sysrun32.ksysctl
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ksysctl)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_ksysctl)
-	jmp    sys32_ksysctl
-	.cfi_endproc
-END(__x86_asm32_sysrun32_ksysctl)
-
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
-/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
-.section .text.x86.asm32_syscall_sysrun32.openpty
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_openpty)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_openpty)
-	jmp    sys32_openpty
-	.cfi_endproc
-END(__x86_asm32_sysrun32_openpty)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.fchdirat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fchdirat)
-	.cfi_startproc
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_fchdirat)
-	jmp    sys32_fchdirat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_fchdirat)
-
-/* int64_t time64(int64_t *timer) */
-.section .text.x86.asm32_syscall_sysrun32.time64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_time64)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_time64)
-	jmp    sys32_time64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_time64)
-
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-.section .text.x86.asm32_syscall_sysrun32.set_exception_handler
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_exception_handler)
-	.cfi_startproc
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_set_exception_handler)
-	jmp    sys32_set_exception_handler
-	.cfi_endproc
-END(__x86_asm32_sysrun32_set_exception_handler)
-
-/* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-/* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
-.section .text.x86.asm32_syscall_sysrun32.get_exception_handler
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_get_exception_handler)
-	.cfi_startproc
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_get_exception_handler)
-	jmp    sys32_get_exception_handler
-	.cfi_endproc
-END(__x86_asm32_sysrun32_get_exception_handler)
-
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-/* errno_t set_library_listdef(struct library_listdef32 const *listdef) */
-.section .text.x86.asm32_syscall_sysrun32.set_library_listdef
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_library_listdef)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_set_library_listdef)
-	jmp    sys32_set_library_listdef
-	.cfi_endproc
-END(__x86_asm32_sysrun32_set_library_listdef)
-
-/* Trigger a debugger trap `trapno', optionally extended with `regs'
- * at either the system call return location, or at the given `state'
- * In the later case, this system call will by default return to the
- * given `state', though given the purpose of this system call being
- * to inform a connected debugger of some breakable event, allowing
- * it to do whatever it wishes before execution is resumed.
- * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
- * @param: state:    When non-NULL, the CPU state where the trap should return to by default
- * @return: -EOK:    `state' was NULL and the trap returned successfully
- * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-/* errno_t debugtrap(struct ucpustate32 const *state, struct debugtrap_reason32 const *reason) */
-.section .text.x86.asm32_syscall_sysrun32.debugtrap
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_debugtrap)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_debugtrap)
-	jmp    sys32_debugtrap
-	.cfi_endproc
-END(__x86_asm32_sysrun32_debugtrap)
-
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
- *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) */
-.section .text.x86.asm32_syscall_sysrun32.lfutex
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lfutex)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_lfutex)
-	jmp    sys32_lfutex
-	.cfi_endproc
-END(__x86_asm32_sysrun32_lfutex)
-
-/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-.section .text.x86.asm32_syscall_sysrun32.lseek64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lseek64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rdx
-	movzlq 16(%rdi), %rax
-	movzlq 8(%rdi), %rsi
-	shlq   $32, %rax
-	orq    %rax, %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_lseek64)
-	jmp    sys32_lseek64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_lseek64)
-
-/* >> lfutexexpr(2)
- * The lfutexexpr() system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread, as well as
- * have the calling thread wait for any number of futex objects associated with
- * any address that is checked as part of the expression. (s.a. `lfutex()')
- * Notes:
- *   - This is the only futex function that can be used to wait on multiple futex
- *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on futex objects, as well as waiting on
- *     futexes in conjunction with waiting on other things such as files, see the
- *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.x86.asm32_syscall_sysrun32.lfutexexpr
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lfutexexpr)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_lfutexexpr)
-	jmp    sys32_lfutexexpr
-	.cfi_endproc
-END(__x86_asm32_sysrun32_lfutexexpr)
-
-/* >> lfutexlockexpr(2)
- * A function that is similar to `lfutexexpr()', but allows for the use of one central
- * locking futex that is used for waiting and may be distinct from any other given futex
- * object pointer.
- * Notes:
- *   - This function only has the calling thread wait on a single futex `ulockaddr',
- *     rather than having it wait on an arbitrary number of futexes, as would be the case when
- *     the `lfutexexpr()' function is used.
- *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things such as files, see the documentation on
- *     this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
-.section .text.x86.asm32_syscall_sysrun32.lfutexlockexpr
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lfutexlockexpr)
-	.cfi_startproc
-	movzlq 40(%rdi), %r9
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_lfutexlockexpr)
-	jmp    sys32_lfutexlockexpr
-	.cfi_endproc
-END(__x86_asm32_sysrun32_lfutexlockexpr)
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The newly created device automatically gets assigned an arbitrary device number, before
- * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
-.section .text.x86.asm32_syscall_sysrun32.mktty
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mktty)
+/* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.hopf
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hopf)
 	.cfi_startproc
 	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_mktty)
-	jmp    sys32_mktty
+	EXTERN(sys32_hopf)
+	jmp    sys32_hopf
 	.cfi_endproc
-END(__x86_asm32_sysrun32_mktty)
+END(__x86_asm32_sysrun32_hopf)
 
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
-.section .text.x86.asm32_syscall_sysrun32.raiseat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_raiseat)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_raiseat)
-	jmp    sys32_raiseat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_raiseat)
-
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
-.section .text.x86.asm32_syscall_sysrun32.coredump
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_coredump)
-	.cfi_startproc
-	movzlq 40(%rdi), %r9
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_coredump)
-	jmp    sys32_coredump
-	.cfi_endproc
-END(__x86_asm32_sysrun32_coredump)
-
-/* errno_t stime64(time64_t const *t) */
-.section .text.x86.asm32_syscall_sysrun32.stime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_stime64)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_stime64)
-	jmp    sys32_stime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_stime64)
-
-/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
-.section .text.x86.asm32_syscall_sysrun32.utime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_utime64)
-	jmp    sys32_utime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_utime64)
-
-/* errno_t ftime64(struct __timebx32_64 *tp) */
-.section .text.x86.asm32_syscall_sysrun32.ftime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftime64)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_ftime64)
-	jmp    sys32_ftime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_ftime64)
-
-/* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-.section .text.x86.asm32_syscall_sysrun32.ioctlf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ioctlf)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_ioctlf)
-	jmp    sys32_ioctlf
-	.cfi_endproc
-END(__x86_asm32_sysrun32_ioctlf)
-
-/* uint64_t fsmode(uint64_t mode) */
-.section .text.x86.asm32_syscall_sysrun32.fsmode
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsmode)
-	.cfi_startproc
-	movzlq 8(%rdi), %rax
-	movzlq 0(%rdi), %rdi
-	shlq   $32, %rax
-	orq    %rax, %rdi
-	EXTERN(sys32_fsmode)
-	jmp    sys32_fsmode
-	.cfi_endproc
-END(__x86_asm32_sysrun32_fsmode)
-
-/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
-.section .text.x86.asm32_syscall_sysrun32.getrusage64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrusage64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_getrusage64)
-	jmp    sys32_getrusage64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_getrusage64)
-
-/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
-.section .text.x86.asm32_syscall_sysrun32.gettimeofday64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_gettimeofday64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_gettimeofday64)
-	jmp    sys32_gettimeofday64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_gettimeofday64)
-
-/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
-.section .text.x86.asm32_syscall_sysrun32.settimeofday64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_settimeofday64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_settimeofday64)
-	jmp    sys32_settimeofday64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_settimeofday64)
-
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
-.section .text.x86.asm32_syscall_sysrun32.select64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_select64)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_select64)
-	jmp    sys32_select64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_select64)
-
-/* Map the segments of a given library into memory
- * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
- * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *                (depending on the caller running in 32- or 64-bit mode)
- * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr *hdrv, size_t hdrc) */
-.section .text.x86.asm32_syscall_sysrun32.maplibrary
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_maplibrary)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_maplibrary)
-	jmp    sys32_maplibrary
-	.cfi_endproc
-END(__x86_asm32_sysrun32_maplibrary)
-
-/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
-.section .text.x86.asm32_syscall_sysrun32.setitimer64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setitimer64)
+/* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+.section .text.x86.asm32_syscall_sysrun32.hop
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_hop)
 	.cfi_startproc
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_setitimer64)
-	jmp    sys32_setitimer64
+	EXTERN(sys32_hop)
+	jmp    sys32_hop
 	.cfi_endproc
-END(__x86_asm32_sysrun32_setitimer64)
-
-/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
-.section .text.x86.asm32_syscall_sysrun32.getitimer64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getitimer64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_getitimer64)
-	jmp    sys32_getitimer64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_getitimer64)
-
-/* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
-.section .text.x86.asm32_syscall_sysrun32.wait4_64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_wait4_64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_wait4_64)
-	jmp    sys32_wait4_64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_wait4_64)
-
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-.section .text.x86.asm32_syscall_sysrun32.kreaddir
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kreaddir)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_kreaddir)
-	jmp    sys32_kreaddir
-	.cfi_endproc
-END(__x86_asm32_sysrun32_kreaddir)
-
-/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysrun32.readvf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readvf)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_readvf)
-	jmp    sys32_readvf
-	.cfi_endproc
-END(__x86_asm32_sysrun32_readvf)
-
-/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysrun32.writevf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writevf)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_writevf)
-	jmp    sys32_writevf
-	.cfi_endproc
-END(__x86_asm32_sysrun32_writevf)
-
-/* syscall_slong_t rpc_service(void) */
-/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rpc_service, sys32_rpc_service); */
-
-/* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
-.section .text.x86.asm32_syscall_sysrun32.sched_rr_get_interval64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_sched_rr_get_interval64)
-	jmp    sys32_sched_rr_get_interval64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_sched_rr_get_interval64)
-
-/* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
-.section .text.x86.asm32_syscall_sysrun32.nanosleep64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_nanosleep64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_nanosleep64)
-	jmp    sys32_nanosleep64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_nanosleep64)
-
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
-.section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_rt_sigtimedwait64)
-	jmp    sys32_rt_sigtimedwait64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_rt_sigtimedwait64)
-
-/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysrun32.pread64f
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pread64f)
-	.cfi_startproc
-	movzlq 40(%rdi), %r8
-	movzlq 32(%rdi), %rax
-	movzlq 24(%rdi), %rcx
-	shlq   $32, %rax
-	orq    %rax, %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_pread64f)
-	jmp    sys32_pread64f
-	.cfi_endproc
-END(__x86_asm32_sysrun32_pread64f)
-
-/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysrun32.pwrite64f
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwrite64f)
-	.cfi_startproc
-	movzlq 40(%rdi), %r8
-	movzlq 32(%rdi), %rax
-	movzlq 24(%rdi), %rcx
-	shlq   $32, %rax
-	orq    %rax, %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_pwrite64f)
-	jmp    sys32_pwrite64f
-	.cfi_endproc
-END(__x86_asm32_sysrun32_pwrite64f)
-
-/* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_sysrun32.kstat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kstat)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_kstat)
-	jmp    sys32_kstat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_kstat)
-
-/* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_sysrun32.klstat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_klstat)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_klstat)
-	jmp    sys32_klstat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_klstat)
-
-/* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_sysrun32.kfstat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kfstat)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_kfstat)
-	jmp    sys32_kfstat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_kfstat)
-
-/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
-.section .text.x86.asm32_syscall_sysrun32.kreaddirf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kreaddirf)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_kreaddirf)
-	jmp    sys32_kreaddirf
-	.cfi_endproc
-END(__x86_asm32_sysrun32_kreaddirf)
-
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
-.section .text.x86.asm32_syscall_sysrun32.timer_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_settime64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_timer_settime64)
-	jmp    sys32_timer_settime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_timer_settime64)
-
-/* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
-.section .text.x86.asm32_syscall_sysrun32.timer_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_gettime64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_timer_gettime64)
-	jmp    sys32_timer_gettime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_timer_gettime64)
-
-/* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
-.section .text.x86.asm32_syscall_sysrun32.clock_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_settime64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_clock_settime64)
-	jmp    sys32_clock_settime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_clock_settime64)
-
-/* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
-.section .text.x86.asm32_syscall_sysrun32.clock_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_gettime64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_clock_gettime64)
-	jmp    sys32_clock_gettime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_clock_gettime64)
-
-/* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
-.section .text.x86.asm32_syscall_sysrun32.clock_getres64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_getres64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_clock_getres64)
-	jmp    sys32_clock_getres64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_clock_getres64)
-
-/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
-.section .text.x86.asm32_syscall_sysrun32.clock_nanosleep64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_nanosleep64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_clock_nanosleep64)
-	jmp    sys32_clock_nanosleep64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_clock_nanosleep64)
-
-/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
-.section .text.x86.asm32_syscall_sysrun32.utimes64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimes64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_utimes64)
-	jmp    sys32_utimes64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_utimes64)
-
-/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_sysrun32.mq_timedsend64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedsend64)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_mq_timedsend64)
-	jmp    sys32_mq_timedsend64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_mq_timedsend64)
-
-/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_sysrun32.mq_timedreceive64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedreceive64)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_mq_timedreceive64)
-	jmp    sys32_mq_timedreceive64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_mq_timedreceive64)
-
-/* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
-.section .text.x86.asm32_syscall_sysrun32.waitid64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid64)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_waitid64)
-	jmp    sys32_waitid64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_waitid64)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.fmkdirat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fmkdirat)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_fmkdirat)
-	jmp    sys32_fmkdirat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_fmkdirat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.fmknodat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fmknodat)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_fmknodat)
-	jmp    sys32_fmknodat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_fmknodat)
-
-/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
-.section .text.x86.asm32_syscall_sysrun32.futimesat64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_futimesat64)
-	.cfi_startproc
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_futimesat64)
-	jmp    sys32_futimesat64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_futimesat64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx32 *statbuf, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.kfstatat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kfstatat)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_kfstatat)
-	jmp    sys32_kfstatat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_kfstatat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.frenameat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_frenameat)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_frenameat)
-	jmp    sys32_frenameat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_frenameat)
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.fsymlinkat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsymlinkat)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_fsymlinkat)
-	jmp    sys32_fsymlinkat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_fsymlinkat)
-
-/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.freadlinkat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_freadlinkat)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_freadlinkat)
-	jmp    sys32_freadlinkat
-	.cfi_endproc
-END(__x86_asm32_sysrun32_freadlinkat)
-
-/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
-.section .text.x86.asm32_syscall_sysrun32.pselect6_64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pselect6_64)
-	.cfi_startproc
-	movzlq 40(%rdi), %r9
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_pselect6_64)
-	jmp    sys32_pselect6_64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_pselect6_64)
-
-/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-.section .text.x86.asm32_syscall_sysrun32.ppoll64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ppoll64)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_ppoll64)
-	jmp    sys32_ppoll64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_ppoll64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat64(fd_t dirfd, char const *filename, struct __timespecx32_64 const[2] times, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.utimensat64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimensat64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_utimensat64)
-	jmp    sys32_utimensat64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_utimensat64)
-
-/* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
-.section .text.x86.asm32_syscall_sysrun32.fallocate64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fallocate64)
-	.cfi_startproc
-	movzlq 40(%rdi), %rax
-	movzlq 32(%rdi), %rcx
-	shlq   $32, %rax
-	orq    %rax, %rcx
-	movzlq 24(%rdi), %rax
-	movzlq 16(%rdi), %rdx
-	shlq   $32, %rax
-	orq    %rax, %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_fallocate64)
-	jmp    sys32_fallocate64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_fallocate64)
-
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
- * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_sysrun32.timerfd_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_settime64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_timerfd_settime64)
-	jmp    sys32_timerfd_settime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_timerfd_settime64)
-
-/* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t ufd, struct __itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_sysrun32.timerfd_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_timerfd_gettime64)
-	jmp    sys32_timerfd_gettime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_timerfd_gettime64)
-
-/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysrun32.preadvf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadvf)
-	.cfi_startproc
-	movzlq 40(%rdi), %r8
-	movzlq 32(%rdi), %rax
-	movzlq 24(%rdi), %rcx
-	shlq   $32, %rax
-	orq    %rax, %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_preadvf)
-	jmp    sys32_preadvf
-	.cfi_endproc
-END(__x86_asm32_sysrun32_preadvf)
-
-/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-.section .text.x86.asm32_syscall_sysrun32.pwritevf
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritevf)
-	.cfi_startproc
-	movzlq 40(%rdi), %r8
-	movzlq 32(%rdi), %rax
-	movzlq 24(%rdi), %rcx
-	shlq   $32, %rax
-	orq    %rax, %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_pwritevf)
-	jmp    sys32_pwritevf
-	.cfi_endproc
-END(__x86_asm32_sysrun32_pwritevf)
-
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
-.section .text.x86.asm32_syscall_sysrun32.recvmmsg64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg64)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_recvmmsg64)
-	jmp    sys32_recvmmsg64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_recvmmsg64)
+END(__x86_asm32_sysrun32_hop)
 
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSCALL_WRAPPERS64_S */

@@ -70,26 +70,27 @@ PUBLIC_FUNCTION(x86_idt_syscall)
 	jb     __x86_asm64_syscall_break
 	cmpq   $(__NR64_syscall1_max), %rax
 	ja     __x86_asm64_syscall_break
-	pushq_cfi_r %rax
-	subq   $(__NR64_syscall1_min), %rax
-	EXTERN(x86_sysroute1_asm64_syscall)
-	movq   x86_sysroute1_asm64_syscall(,%rax,8), %rax
-	xchgq  0(%rsp), %rax /* Restore RAX and store syscall entry in 0(%rsp) */
-	ret                  /* Jump to the syscall entry */
+	jmpq   *(x86_sysroute1_asm64_syscall - ((__NR64_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,8)
 
 .Lsyscall_int80_32bit:
 	movzlq %eax, %rax /* Zero-extend to ensure that the upper 32 bit are zero */
 	cmpl   $(__NR32_syscall0_max), %eax
 	ja     1f
 	EXTERN(x86_sysroute0_asm32_int80)
-	jmpq   *x86_sysroute0_asm32_int80(,%rax,8)
+	jmpq   *(x86_sysroute0_asm32_int80 - ((__NR32_syscall0_min * 8) & 0xffffffffffffffff))(,%rax,8)
 1:	cmpl   $(__NR32_syscall1_min), %eax
 	EXTERN(__x86_asm32_int80_break)
 	jb     __x86_asm32_int80_break
 	cmpl   $(__NR32_syscall1_max), %eax
 	ja     __x86_asm32_int80_break
+
+	pushq_cfi_r %rax
+	subl   $(__NR32_syscall1_min), %eax
 	EXTERN(x86_sysroute1_asm32_int80)
-	jmpq   *(x86_sysroute1_asm32_int80 - ((__NR32_syscall1_min * 8) & 0xffffffff))(,%rax,8)
+	movq   x86_sysroute1_asm32_int80(,%rax,8), %rax
+	xchgq  0(%rsp), %rax /* Restore RAX and store syscall entry in 0(%rsp) */
+	.cfi_restore %rax
+	ret                  /* Jump to the syscall entry */
 	.cfi_endproc
 END(x86_idt_syscall)
 

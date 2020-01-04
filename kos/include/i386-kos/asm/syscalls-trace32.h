@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x166ab241 */
+/* HASH CRC-32:0x9c909889 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -846,264 +846,264 @@
 #define __NRAN0_userfaultfd             TODO_PROTOTYPE
 #define __NRAN0_membarrier              TODO_PROTOTYPE
 #define __NRAN0_mlock2                  TODO_PROTOTYPE
-#define __NRAN0_hop                     fd
-#define __NRAN1_hop                     command
-#define __NRAN2_hop                     arg
-#define __NRAN0_hopf                    fd
-#define __NRAN1_hopf                    command
-#define __NRAN2_hopf                    mode
-#define __NRAN3_hopf                    arg
-#define __NRAN0_readf                   fd
-#define __NRAN1_readf                   buf
-#define __NRAN2_readf                   bufsize
-#define __NRAN3_readf                   mode
-#define __NRAN0_writef                  fd
-#define __NRAN1_writef                  buf
-#define __NRAN2_writef                  bufsize
-#define __NRAN3_writef                  mode
-#define __NRAN0_detach                  pid
-#define __NRAN0_frealpath4              fd
-#define __NRAN1_frealpath4              buf
-#define __NRAN2_frealpath4              buflen
-#define __NRAN3_frealpath4              flags
-#define __NRAN0_frealpathat             dirfd
-#define __NRAN1_frealpathat             filename
-#define __NRAN2_frealpathat             buf
-#define __NRAN3_frealpathat             buflen
-#define __NRAN4_frealpathat             flags
-#define __NRAN0_rpc_schedule            target
-#define __NRAN1_rpc_schedule            flags
-#define __NRAN2_rpc_schedule            program
-#define __NRAN3_rpc_schedule            arguments
-#define __NRAN0_ksysctl                 command
-#define __NRAN1_ksysctl                 arg
-#define __NRAN0_openpty                 amaster
-#define __NRAN1_openpty                 aslave
-#define __NRAN2_openpty                 name
-#define __NRAN3_openpty                 termp
-#define __NRAN4_openpty                 winp
-#define __NRAN0_fchdirat                dirfd
-#define __NRAN1_fchdirat                path
-#define __NRAN2_fchdirat                flags
-#define __NRAN0_time64                  timer
-#define __NRAN0_set_exception_handler   mode
-#define __NRAN1_set_exception_handler   handler
-#define __NRAN2_set_exception_handler   handler_sp
-#define __NRAN0_get_exception_handler   pmode
-#define __NRAN1_get_exception_handler   phandler
-#define __NRAN2_get_exception_handler   phandler_sp
-#define __NRAN0_set_library_listdef     listdef
-#define __NRAN0_debugtrap               state
-#define __NRAN1_debugtrap               reason
-#define __NRAN0_lfutex                  uaddr
-#define __NRAN1_lfutex                  futex_op
-#define __NRAN2_lfutex                  val
-#define __NRAN3_lfutex                  timeout
-#define __NRAN4_lfutex                  val2
-#define __NRAN0_lseek64                 fd
-#define __NRAN1_lseek64                 offset
-#define __NRAN2_lseek64                 whence
-#define __NRAN0_lfutexexpr              base
-#define __NRAN1_lfutexexpr              exprc
-#define __NRAN2_lfutexexpr              exprv
-#define __NRAN3_lfutexexpr              timeout
-#define __NRAN4_lfutexexpr              timeout_flags
-#define __NRAN0_lfutexlockexpr          ulockaddr
-#define __NRAN1_lfutexlockexpr          base
-#define __NRAN2_lfutexlockexpr          exprc
-#define __NRAN3_lfutexlockexpr          exprv
-#define __NRAN4_lfutexlockexpr          timeout
-#define __NRAN5_lfutexlockexpr          timeout_flags
-#define __NRAN0_mktty                   keyboard
-#define __NRAN1_mktty                   display
-#define __NRAN2_mktty                   name
-#define __NRAN3_mktty                   rsvd
-#define __NRAN0_raiseat                 state
-#define __NRAN1_raiseat                 si
-#define __NRAN0_coredump                curr_state
-#define __NRAN1_coredump                orig_state
-#define __NRAN2_coredump                traceback_vector
-#define __NRAN3_coredump                traceback_length
-#define __NRAN4_coredump                exception
-#define __NRAN5_coredump                unwind_error
-#define __NRAN0_stime64                 t
-#define __NRAN0_utime64                 filename
-#define __NRAN1_utime64                 times
-#define __NRAN0_ftime64                 tp
-#define __NRAN0_ioctlf                  fd
-#define __NRAN1_ioctlf                  command
-#define __NRAN2_ioctlf                  mode
-#define __NRAN3_ioctlf                  arg
-#define __NRAN0_fsmode                  mode
-#define __NRAN0_getrusage64             who
-#define __NRAN1_getrusage64             tv
-#define __NRAN0_gettimeofday64          tv
-#define __NRAN1_gettimeofday64          tz
-#define __NRAN0_settimeofday64          tv
-#define __NRAN1_settimeofday64          tz
-#define __NRAN0_select64                nfds
-#define __NRAN1_select64                readfds
-#define __NRAN2_select64                writefds
-#define __NRAN3_select64                exceptfds
-#define __NRAN4_select64                timeout
-#define __NRAN0_maplibrary              addr
-#define __NRAN1_maplibrary              flags
-#define __NRAN2_maplibrary              fd
-#define __NRAN3_maplibrary              hdrv
-#define __NRAN4_maplibrary              hdrc
-#define __NRAN0_setitimer64             which
-#define __NRAN1_setitimer64             newval
-#define __NRAN2_setitimer64             oldval
-#define __NRAN0_getitimer64             which
-#define __NRAN1_getitimer64             curr_value
-#define __NRAN0_wait4_64                pid
-#define __NRAN1_wait4_64                stat_loc
-#define __NRAN2_wait4_64                options
-#define __NRAN3_wait4_64                usage
-#define __NRAN0_kreaddir                fd
-#define __NRAN1_kreaddir                buf
-#define __NRAN2_kreaddir                bufsize
-#define __NRAN3_kreaddir                mode
-#define __NRAN0_readvf                  fd
-#define __NRAN1_readvf                  iovec
-#define __NRAN2_readvf                  count
-#define __NRAN3_readvf                  mode
-#define __NRAN0_writevf                 fd
-#define __NRAN1_writevf                 iovec
-#define __NRAN2_writevf                 count
-#define __NRAN3_writevf                 mode
-#define __NRAN0_sched_rr_get_interval64 pid
-#define __NRAN1_sched_rr_get_interval64 tms
-#define __NRAN0_nanosleep64             req
-#define __NRAN1_nanosleep64             rem
-#define __NRAN0_rt_sigtimedwait64       set
-#define __NRAN1_rt_sigtimedwait64       info
-#define __NRAN2_rt_sigtimedwait64       timeout
-#define __NRAN3_rt_sigtimedwait64       sigsetsize
-#define __NRAN0_pread64f                fd
-#define __NRAN1_pread64f                buf
-#define __NRAN2_pread64f                bufsize
-#define __NRAN3_pread64f                offset
-#define __NRAN4_pread64f                mode
-#define __NRAN0_pwrite64f               fd
-#define __NRAN1_pwrite64f               buf
-#define __NRAN2_pwrite64f               bufsize
-#define __NRAN3_pwrite64f               offset
-#define __NRAN4_pwrite64f               mode
-#define __NRAN0_kstat                   filename
-#define __NRAN1_kstat                   statbuf
-#define __NRAN0_klstat                  filename
-#define __NRAN1_klstat                  statbuf
-#define __NRAN0_kfstat                  fd
-#define __NRAN1_kfstat                  statbuf
-#define __NRAN0_kreaddirf               fd
-#define __NRAN1_kreaddirf               buf
-#define __NRAN2_kreaddirf               bufsize
-#define __NRAN3_kreaddirf               mode
-#define __NRAN4_kreaddirf               iomode
-#define __NRAN0_timer_settime64         timerid
-#define __NRAN1_timer_settime64         flags
-#define __NRAN2_timer_settime64         value
-#define __NRAN3_timer_settime64         ovalue
-#define __NRAN0_timer_gettime64         timerid
-#define __NRAN1_timer_gettime64         value
-#define __NRAN0_clock_settime64         clock_id
-#define __NRAN1_clock_settime64         tp
-#define __NRAN0_clock_gettime64         clock_id
-#define __NRAN1_clock_gettime64         tp
-#define __NRAN0_clock_getres64          clock_id
-#define __NRAN1_clock_getres64          res
-#define __NRAN0_clock_nanosleep64       clock_id
-#define __NRAN1_clock_nanosleep64       flags
-#define __NRAN2_clock_nanosleep64       requested_time
-#define __NRAN3_clock_nanosleep64       remaining
-#define __NRAN0_utimes64                filename
-#define __NRAN1_utimes64                times
-#define __NRAN0_mq_timedsend64          mqdes
-#define __NRAN1_mq_timedsend64          msg_ptr
-#define __NRAN2_mq_timedsend64          msg_len
-#define __NRAN3_mq_timedsend64          msg_prio
-#define __NRAN4_mq_timedsend64          abs_timeout
-#define __NRAN0_mq_timedreceive64       mqdes
-#define __NRAN1_mq_timedreceive64       msg_ptr
-#define __NRAN2_mq_timedreceive64       msg_len
-#define __NRAN3_mq_timedreceive64       pmsg_prio
-#define __NRAN4_mq_timedreceive64       abs_timeout
-#define __NRAN0_waitid64                idtype
-#define __NRAN1_waitid64                id
-#define __NRAN2_waitid64                infop
-#define __NRAN3_waitid64                options
-#define __NRAN4_waitid64                ru
-#define __NRAN0_fmkdirat                dirfd
-#define __NRAN1_fmkdirat                pathname
-#define __NRAN2_fmkdirat                mode
-#define __NRAN3_fmkdirat                flags
-#define __NRAN0_fmknodat                dirfd
-#define __NRAN1_fmknodat                nodename
-#define __NRAN2_fmknodat                mode
-#define __NRAN3_fmknodat                dev
-#define __NRAN4_fmknodat                flags
-#define __NRAN0_futimesat64             dirfd
-#define __NRAN1_futimesat64             filename
-#define __NRAN2_futimesat64             times
-#define __NRAN0_kfstatat                dirfd
-#define __NRAN1_kfstatat                filename
-#define __NRAN2_kfstatat                statbuf
-#define __NRAN3_kfstatat                flags
-#define __NRAN0_frenameat               oldfd
-#define __NRAN1_frenameat               oldname
-#define __NRAN2_frenameat               newfd
-#define __NRAN3_frenameat               newname_or_path
-#define __NRAN4_frenameat               flags
-#define __NRAN0_fsymlinkat              link_text
-#define __NRAN1_fsymlinkat              tofd
-#define __NRAN2_fsymlinkat              target_path
-#define __NRAN3_fsymlinkat              flags
-#define __NRAN0_freadlinkat             dirfd
-#define __NRAN1_freadlinkat             path
-#define __NRAN2_freadlinkat             buf
-#define __NRAN3_freadlinkat             buflen
-#define __NRAN4_freadlinkat             flags
+#define __NRAN0_recvmmsg64              sockfd
+#define __NRAN1_recvmmsg64              vmessages
+#define __NRAN2_recvmmsg64              vlen
+#define __NRAN3_recvmmsg64              flags
+#define __NRAN4_recvmmsg64              tmo
+#define __NRAN0_pwritevf                fd
+#define __NRAN1_pwritevf                iovec
+#define __NRAN2_pwritevf                count
+#define __NRAN3_pwritevf                offset
+#define __NRAN4_pwritevf                mode
+#define __NRAN0_preadvf                 fd
+#define __NRAN1_preadvf                 iovec
+#define __NRAN2_preadvf                 count
+#define __NRAN3_preadvf                 offset
+#define __NRAN4_preadvf                 mode
+#define __NRAN0_timerfd_gettime64       ufd
+#define __NRAN1_timerfd_gettime64       otmr
+#define __NRAN0_timerfd_settime64       ufd
+#define __NRAN1_timerfd_settime64       flags
+#define __NRAN2_timerfd_settime64       utmr
+#define __NRAN3_timerfd_settime64       otmr
+#define __NRAN0_fallocate64             fd
+#define __NRAN1_fallocate64             mode
+#define __NRAN2_fallocate64             offset
+#define __NRAN3_fallocate64             length
+#define __NRAN0_utimensat64             dirfd
+#define __NRAN1_utimensat64             filename
+#define __NRAN2_utimensat64             times
+#define __NRAN3_utimensat64             flags
+#define __NRAN0_ppoll64                 fds
+#define __NRAN1_ppoll64                 nfds
+#define __NRAN2_ppoll64                 timeout_ts
+#define __NRAN3_ppoll64                 sigmask
+#define __NRAN4_ppoll64                 sigsetsize
 #define __NRAN0_pselect6_64             nfds
 #define __NRAN1_pselect6_64             readfds
 #define __NRAN2_pselect6_64             writefds
 #define __NRAN3_pselect6_64             exceptfds
 #define __NRAN4_pselect6_64             timeout
 #define __NRAN5_pselect6_64             sigmask_sigset_and_len
-#define __NRAN0_ppoll64                 fds
-#define __NRAN1_ppoll64                 nfds
-#define __NRAN2_ppoll64                 timeout_ts
-#define __NRAN3_ppoll64                 sigmask
-#define __NRAN4_ppoll64                 sigsetsize
-#define __NRAN0_utimensat64             dirfd
-#define __NRAN1_utimensat64             filename
-#define __NRAN2_utimensat64             times
-#define __NRAN3_utimensat64             flags
-#define __NRAN0_fallocate64             fd
-#define __NRAN1_fallocate64             mode
-#define __NRAN2_fallocate64             offset
-#define __NRAN3_fallocate64             length
-#define __NRAN0_timerfd_settime64       ufd
-#define __NRAN1_timerfd_settime64       flags
-#define __NRAN2_timerfd_settime64       utmr
-#define __NRAN3_timerfd_settime64       otmr
-#define __NRAN0_timerfd_gettime64       ufd
-#define __NRAN1_timerfd_gettime64       otmr
-#define __NRAN0_preadvf                 fd
-#define __NRAN1_preadvf                 iovec
-#define __NRAN2_preadvf                 count
-#define __NRAN3_preadvf                 offset
-#define __NRAN4_preadvf                 mode
-#define __NRAN0_pwritevf                fd
-#define __NRAN1_pwritevf                iovec
-#define __NRAN2_pwritevf                count
-#define __NRAN3_pwritevf                offset
-#define __NRAN4_pwritevf                mode
-#define __NRAN0_recvmmsg64              sockfd
-#define __NRAN1_recvmmsg64              vmessages
-#define __NRAN2_recvmmsg64              vlen
-#define __NRAN3_recvmmsg64              flags
-#define __NRAN4_recvmmsg64              tmo
+#define __NRAN0_freadlinkat             dirfd
+#define __NRAN1_freadlinkat             path
+#define __NRAN2_freadlinkat             buf
+#define __NRAN3_freadlinkat             buflen
+#define __NRAN4_freadlinkat             flags
+#define __NRAN0_fsymlinkat              link_text
+#define __NRAN1_fsymlinkat              tofd
+#define __NRAN2_fsymlinkat              target_path
+#define __NRAN3_fsymlinkat              flags
+#define __NRAN0_frenameat               oldfd
+#define __NRAN1_frenameat               oldname
+#define __NRAN2_frenameat               newfd
+#define __NRAN3_frenameat               newname_or_path
+#define __NRAN4_frenameat               flags
+#define __NRAN0_kfstatat                dirfd
+#define __NRAN1_kfstatat                filename
+#define __NRAN2_kfstatat                statbuf
+#define __NRAN3_kfstatat                flags
+#define __NRAN0_futimesat64             dirfd
+#define __NRAN1_futimesat64             filename
+#define __NRAN2_futimesat64             times
+#define __NRAN0_fmknodat                dirfd
+#define __NRAN1_fmknodat                nodename
+#define __NRAN2_fmknodat                mode
+#define __NRAN3_fmknodat                dev
+#define __NRAN4_fmknodat                flags
+#define __NRAN0_fmkdirat                dirfd
+#define __NRAN1_fmkdirat                pathname
+#define __NRAN2_fmkdirat                mode
+#define __NRAN3_fmkdirat                flags
+#define __NRAN0_waitid64                idtype
+#define __NRAN1_waitid64                id
+#define __NRAN2_waitid64                infop
+#define __NRAN3_waitid64                options
+#define __NRAN4_waitid64                ru
+#define __NRAN0_mq_timedreceive64       mqdes
+#define __NRAN1_mq_timedreceive64       msg_ptr
+#define __NRAN2_mq_timedreceive64       msg_len
+#define __NRAN3_mq_timedreceive64       pmsg_prio
+#define __NRAN4_mq_timedreceive64       abs_timeout
+#define __NRAN0_mq_timedsend64          mqdes
+#define __NRAN1_mq_timedsend64          msg_ptr
+#define __NRAN2_mq_timedsend64          msg_len
+#define __NRAN3_mq_timedsend64          msg_prio
+#define __NRAN4_mq_timedsend64          abs_timeout
+#define __NRAN0_utimes64                filename
+#define __NRAN1_utimes64                times
+#define __NRAN0_clock_nanosleep64       clock_id
+#define __NRAN1_clock_nanosleep64       flags
+#define __NRAN2_clock_nanosleep64       requested_time
+#define __NRAN3_clock_nanosleep64       remaining
+#define __NRAN0_clock_getres64          clock_id
+#define __NRAN1_clock_getres64          res
+#define __NRAN0_clock_gettime64         clock_id
+#define __NRAN1_clock_gettime64         tp
+#define __NRAN0_clock_settime64         clock_id
+#define __NRAN1_clock_settime64         tp
+#define __NRAN0_timer_gettime64         timerid
+#define __NRAN1_timer_gettime64         value
+#define __NRAN0_timer_settime64         timerid
+#define __NRAN1_timer_settime64         flags
+#define __NRAN2_timer_settime64         value
+#define __NRAN3_timer_settime64         ovalue
+#define __NRAN0_kreaddirf               fd
+#define __NRAN1_kreaddirf               buf
+#define __NRAN2_kreaddirf               bufsize
+#define __NRAN3_kreaddirf               mode
+#define __NRAN4_kreaddirf               iomode
+#define __NRAN0_kfstat                  fd
+#define __NRAN1_kfstat                  statbuf
+#define __NRAN0_klstat                  filename
+#define __NRAN1_klstat                  statbuf
+#define __NRAN0_kstat                   filename
+#define __NRAN1_kstat                   statbuf
+#define __NRAN0_pwrite64f               fd
+#define __NRAN1_pwrite64f               buf
+#define __NRAN2_pwrite64f               bufsize
+#define __NRAN3_pwrite64f               offset
+#define __NRAN4_pwrite64f               mode
+#define __NRAN0_pread64f                fd
+#define __NRAN1_pread64f                buf
+#define __NRAN2_pread64f                bufsize
+#define __NRAN3_pread64f                offset
+#define __NRAN4_pread64f                mode
+#define __NRAN0_rt_sigtimedwait64       set
+#define __NRAN1_rt_sigtimedwait64       info
+#define __NRAN2_rt_sigtimedwait64       timeout
+#define __NRAN3_rt_sigtimedwait64       sigsetsize
+#define __NRAN0_nanosleep64             req
+#define __NRAN1_nanosleep64             rem
+#define __NRAN0_sched_rr_get_interval64 pid
+#define __NRAN1_sched_rr_get_interval64 tms
+#define __NRAN0_ksysctl                 command
+#define __NRAN1_ksysctl                 arg
+#define __NRAN0_writevf                 fd
+#define __NRAN1_writevf                 iovec
+#define __NRAN2_writevf                 count
+#define __NRAN3_writevf                 mode
+#define __NRAN0_readvf                  fd
+#define __NRAN1_readvf                  iovec
+#define __NRAN2_readvf                  count
+#define __NRAN3_readvf                  mode
+#define __NRAN0_kreaddir                fd
+#define __NRAN1_kreaddir                buf
+#define __NRAN2_kreaddir                bufsize
+#define __NRAN3_kreaddir                mode
+#define __NRAN0_wait4_64                pid
+#define __NRAN1_wait4_64                stat_loc
+#define __NRAN2_wait4_64                options
+#define __NRAN3_wait4_64                usage
+#define __NRAN0_getitimer64             which
+#define __NRAN1_getitimer64             curr_value
+#define __NRAN0_setitimer64             which
+#define __NRAN1_setitimer64             newval
+#define __NRAN2_setitimer64             oldval
+#define __NRAN0_maplibrary              addr
+#define __NRAN1_maplibrary              flags
+#define __NRAN2_maplibrary              fd
+#define __NRAN3_maplibrary              hdrv
+#define __NRAN4_maplibrary              hdrc
+#define __NRAN0_select64                nfds
+#define __NRAN1_select64                readfds
+#define __NRAN2_select64                writefds
+#define __NRAN3_select64                exceptfds
+#define __NRAN4_select64                timeout
+#define __NRAN0_settimeofday64          tv
+#define __NRAN1_settimeofday64          tz
+#define __NRAN0_gettimeofday64          tv
+#define __NRAN1_gettimeofday64          tz
+#define __NRAN0_getrusage64             who
+#define __NRAN1_getrusage64             tv
+#define __NRAN0_fsmode                  mode
+#define __NRAN0_ioctlf                  fd
+#define __NRAN1_ioctlf                  command
+#define __NRAN2_ioctlf                  mode
+#define __NRAN3_ioctlf                  arg
+#define __NRAN0_ftime64                 tp
+#define __NRAN0_utime64                 filename
+#define __NRAN1_utime64                 times
+#define __NRAN0_stime64                 t
+#define __NRAN0_coredump                curr_state
+#define __NRAN1_coredump                orig_state
+#define __NRAN2_coredump                traceback_vector
+#define __NRAN3_coredump                traceback_length
+#define __NRAN4_coredump                exception
+#define __NRAN5_coredump                unwind_error
+#define __NRAN0_raiseat                 state
+#define __NRAN1_raiseat                 si
+#define __NRAN0_mktty                   keyboard
+#define __NRAN1_mktty                   display
+#define __NRAN2_mktty                   name
+#define __NRAN3_mktty                   rsvd
+#define __NRAN0_lfutexlockexpr          ulockaddr
+#define __NRAN1_lfutexlockexpr          base
+#define __NRAN2_lfutexlockexpr          exprc
+#define __NRAN3_lfutexlockexpr          exprv
+#define __NRAN4_lfutexlockexpr          timeout
+#define __NRAN5_lfutexlockexpr          timeout_flags
+#define __NRAN0_lfutexexpr              base
+#define __NRAN1_lfutexexpr              exprc
+#define __NRAN2_lfutexexpr              exprv
+#define __NRAN3_lfutexexpr              timeout
+#define __NRAN4_lfutexexpr              timeout_flags
+#define __NRAN0_lseek64                 fd
+#define __NRAN1_lseek64                 offset
+#define __NRAN2_lseek64                 whence
+#define __NRAN0_lfutex                  uaddr
+#define __NRAN1_lfutex                  futex_op
+#define __NRAN2_lfutex                  val
+#define __NRAN3_lfutex                  timeout
+#define __NRAN4_lfutex                  val2
+#define __NRAN0_debugtrap               state
+#define __NRAN1_debugtrap               reason
+#define __NRAN0_set_library_listdef     listdef
+#define __NRAN0_get_exception_handler   pmode
+#define __NRAN1_get_exception_handler   phandler
+#define __NRAN2_get_exception_handler   phandler_sp
+#define __NRAN0_set_exception_handler   mode
+#define __NRAN1_set_exception_handler   handler
+#define __NRAN2_set_exception_handler   handler_sp
+#define __NRAN0_time64                  timer
+#define __NRAN0_fchdirat                dirfd
+#define __NRAN1_fchdirat                path
+#define __NRAN2_fchdirat                flags
+#define __NRAN0_openpty                 amaster
+#define __NRAN1_openpty                 aslave
+#define __NRAN2_openpty                 name
+#define __NRAN3_openpty                 termp
+#define __NRAN4_openpty                 winp
+#define __NRAN0_rpc_schedule            target
+#define __NRAN1_rpc_schedule            flags
+#define __NRAN2_rpc_schedule            program
+#define __NRAN3_rpc_schedule            arguments
+#define __NRAN0_frealpathat             dirfd
+#define __NRAN1_frealpathat             filename
+#define __NRAN2_frealpathat             buf
+#define __NRAN3_frealpathat             buflen
+#define __NRAN4_frealpathat             flags
+#define __NRAN0_frealpath4              fd
+#define __NRAN1_frealpath4              buf
+#define __NRAN2_frealpath4              buflen
+#define __NRAN3_frealpath4              flags
+#define __NRAN0_detach                  pid
+#define __NRAN0_writef                  fd
+#define __NRAN1_writef                  buf
+#define __NRAN2_writef                  bufsize
+#define __NRAN3_writef                  mode
+#define __NRAN0_readf                   fd
+#define __NRAN1_readf                   buf
+#define __NRAN2_readf                   bufsize
+#define __NRAN3_readf                   mode
+#define __NRAN0_hopf                    fd
+#define __NRAN1_hopf                    command
+#define __NRAN2_hopf                    mode
+#define __NRAN3_hopf                    arg
+#define __NRAN0_hop                     fd
+#define __NRAN1_hop                     command
+#define __NRAN2_hop                     arg
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_NAMES */
 #endif /* __WANT_SYSCALL_ARGUMENT_NAMES */
 
@@ -2968,359 +2968,26 @@
 #define __NRATRA0_membarrier(TODO_PROTOTYPE) ,TODO_PROTOTYPE
 #define __NRATRF0_mlock2                  "%d"
 #define __NRATRA0_mlock2(TODO_PROTOTYPE)  ,TODO_PROTOTYPE
-#define __NRATRF0_hop                     "%d"
-#define __NRATRA0_hop(fd, command, arg)   ,(int)(fd)
-#define __NRATRF1_hop                     "%#" PRIxSIZ
-#define __NRATRA1_hop(fd, command, arg)   ,(uintptr_t)(command)
-#define __NRATRF2_hop                     "%p"
-#define __NRATRA2_hop(fd, command, arg)   ,arg
-#define __NRATRF0_hopf                    "%d"
-#define __NRATRA0_hopf(fd, command, mode, arg) ,(int)(fd)
-#define __NRATRF1_hopf                    "%#" PRIxSIZ
-#define __NRATRA1_hopf(fd, command, mode, arg) ,(uintptr_t)(command)
-#define __NRATRF2_hopf                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_hopf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                               ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                               ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                               ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                               ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                               ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                               ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                               ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                               ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF3_hopf                    "%p"
-#define __NRATRA3_hopf(fd, command, mode, arg) ,arg
-#define __NRATRF0_readf                   "%d"
-#define __NRATRA0_readf(fd, buf, bufsize, mode) ,(int)(fd)
-#define __NRATRF1_readf                   "%p"
-#define __NRATRA1_readf(fd, buf, bufsize, mode) ,buf
-#define __NRATRF2_readf                   "%" PRIuSIZ
-#define __NRATRA2_readf(fd, buf, bufsize, mode) ,bufsize
-#define __NRATRF3_readf                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_readf(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_writef                  "%d"
-#define __NRATRA0_writef(fd, buf, bufsize, mode) ,(int)(fd)
-#define __NRATRF1_writef                  "%p"
-#define __NRATRA1_writef(fd, buf, bufsize, mode) ,buf
-#define __NRATRF2_writef                  "%" PRIuSIZ
-#define __NRATRA2_writef(fd, buf, bufsize, mode) ,bufsize
-#define __NRATRF3_writef                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_writef(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                 ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                 ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                 ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                 ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                 ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                 ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                 ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                 ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_detach                  "%" PRIdSIZ
-#define __NRATRA0_detach(pid)             ,(intptr_t)(pid)
-#define __NRATRF0_frealpath4              "%d"
-#define __NRATRA0_frealpath4(fd, buf, buflen, flags) ,(int)(fd)
-#define __NRATRF1_frealpath4              "%p"
-#define __NRATRA1_frealpath4(fd, buf, buflen, flags) ,buf
-#define __NRATRF2_frealpath4              "%" PRIuSIZ
-#define __NRATRA2_frealpath4(fd, buf, buflen, flags) ,buflen
-#define __NRATRF3_frealpath4              "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA3_frealpath4(fd, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
-                                                     ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
-                                                     ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_frealpathat             "%d"
-#define __NRATRA0_frealpathat(dirfd, filename, buf, buflen, flags) ,(int)(dirfd)
-#define __NRATRF1_frealpathat             "%q"
-#define __NRATRA1_frealpathat(dirfd, filename, buf, buflen, flags) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF2_frealpathat             "%p"
-#define __NRATRA2_frealpathat(dirfd, filename, buf, buflen, flags) ,buf
-#define __NRATRF3_frealpathat             "%" PRIuSIZ
-#define __NRATRA3_frealpathat(dirfd, filename, buf, buflen, flags) ,buflen
-#define __NRATRF4_frealpathat             "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA4_frealpathat(dirfd, filename, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
-                                                                   ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                                   ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
-                                                                   ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_rpc_schedule            "%" PRIdSIZ
-#define __NRATRA0_rpc_schedule(target, flags, program, arguments) ,(intptr_t)(target)
-#define __NRATRF1_rpc_schedule            "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA1_rpc_schedule(target, flags, program, arguments) ,(uintptr_t)(flags),(flags) & RPC_SCHEDULE_ASYNC ? "RPC_SCHEDULE_ASYNC" : (flags) ? "" : "RPC_SCHEDULE_SYNC" \
-                                                                  ,((flags) & RPC_SCHEDULE_FLAG_NONSYSCALL) && ((flags) & (RPC_SCHEDULE_ASYNC)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_NONSYSCALL ? "RPC_SCHEDULE_FLAG_NONSYSCALL" : "" \
-                                                                  ,((flags) & RPC_SCHEDULE_FLAG_WAITFORSTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_WAITFORSTART ? "RPC_SCHEDULE_FLAG_WAITFORSTART" : "" \
-                                                                  ,((flags) & RPC_SCHEDULE_FLAG_STATUSFUTEX) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_STATUSFUTEX ? "RPC_SCHEDULE_FLAG_STATUSFUTEX" : "" \
-                                                                  ,((flags) & RPC_SCHEDULE_FLAG_SYSRESTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_SYSRESTART ? "RPC_SCHEDULE_FLAG_SYSRESTART" : "" \
-                                                                  ,((flags) & RPC_SCHEDULE_FLAG_NOSYSRESTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_NOSYSRESTART ? "RPC_SCHEDULE_FLAG_NOSYSRESTART" : "" \
-                                                                  ,((flags) & RPC_SCHEDULE_FLAG_WAITSMPACK) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_WAITSMPACK ? "RPC_SCHEDULE_FLAG_WAITSMPACK" : "" \
-                                                                  ,((flags) & RPC_SCHEDULE_FLAG_DONTWAKE) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_DONTWAKE ? "RPC_SCHEDULE_FLAG_DONTWAKE" : "" \
-                                                                  ,((flags) & RPC_SCHEDULE_FLAG_HIGHPRIO) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK|RPC_SCHEDULE_FLAG_DONTWAKE)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_HIGHPRIO ? "RPC_SCHEDULE_FLAG_HIGHPRIO" : "" \
-                                                                  ,((flags) & RPC_SCHEDULE_FLAG_LOWPRIO) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK|RPC_SCHEDULE_FLAG_DONTWAKE|RPC_SCHEDULE_FLAG_HIGHPRIO)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_LOWPRIO ? "RPC_SCHEDULE_FLAG_LOWPRIO" : ""
-#define __NRATRF2_rpc_schedule            "%p"
-#define __NRATRA2_rpc_schedule(target, flags, program, arguments) ,program
-#define __NRATRF3_rpc_schedule            "%p"
-#define __NRATRA3_rpc_schedule(target, flags, program, arguments) ,arguments
-#define __NRATRF0_ksysctl                 "%#" PRIxSIZ
-#define __NRATRA0_ksysctl(command, arg)   ,(uintptr_t)(command)
-#define __NRATRF1_ksysctl                 "%p"
-#define __NRATRA1_ksysctl(command, arg)   ,arg
-#define __NRATRF0_openpty                 "%p"
-#define __NRATRA0_openpty(amaster, aslave, name, termp, winp) ,amaster
-#define __NRATRF1_openpty                 "%p"
-#define __NRATRA1_openpty(amaster, aslave, name, termp, winp) ,aslave
-#define __NRATRF2_openpty                 "%p"
-#define __NRATRA2_openpty(amaster, aslave, name, termp, winp) ,name
-#define __NRATRF3_openpty                 "%p"
-#define __NRATRA3_openpty(amaster, aslave, name, termp, winp) ,termp
-#define __NRATRF4_openpty                 "%p"
-#define __NRATRA4_openpty(amaster, aslave, name, termp, winp) ,winp
-#define __NRATRF0_fchdirat                "%d"
-#define __NRATRA0_fchdirat(dirfd, path, flags) ,(int)(dirfd)
-#define __NRATRF1_fchdirat                "%q"
-#define __NRATRA1_fchdirat(dirfd, path, flags) ,(validate_readable_opt(path,1),path)
-#define __NRATRF2_fchdirat                "%#" PRIxSIZ "=%s"
-#define __NRATRA2_fchdirat(dirfd, path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_time64                  "%p"
-#define __NRATRA0_time64(timer)           ,timer
-#define __NRATRF0_set_exception_handler   "%#" PRIxSIZ
-#define __NRATRA0_set_exception_handler(mode, handler, handler_sp) ,(uintptr_t)(mode)
-#define __NRATRF1_set_exception_handler   "%p"
-#define __NRATRA1_set_exception_handler(mode, handler, handler_sp) ,handler
-#define __NRATRF2_set_exception_handler   "%p"
-#define __NRATRA2_set_exception_handler(mode, handler, handler_sp) ,handler_sp
-#define __NRATRF0_get_exception_handler   "%p"
-#define __NRATRA0_get_exception_handler(pmode, phandler, phandler_sp) ,pmode
-#define __NRATRF1_get_exception_handler   "%p"
-#define __NRATRA1_get_exception_handler(pmode, phandler, phandler_sp) ,phandler
-#define __NRATRF2_get_exception_handler   "%p"
-#define __NRATRA2_get_exception_handler(pmode, phandler, phandler_sp) ,phandler_sp
-#define __NRATRF0_set_library_listdef     "%p"
-#define __NRATRA0_set_library_listdef(listdef) ,listdef
-#define __NRATRF0_debugtrap               "%p"
-#define __NRATRA0_debugtrap(state, reason) ,state
-#define __NRATRF1_debugtrap               "%p"
-#define __NRATRA1_debugtrap(state, reason) ,reason
-#define __NRATRF0_lfutex                  "%p"
-#define __NRATRA0_lfutex(uaddr, futex_op, val, timeout, val2) ,uaddr
-#define __NRATRF1_lfutex                  "%#" PRIxSIZ
-#define __NRATRA1_lfutex(uaddr, futex_op, val, timeout, val2) ,(uintptr_t)(futex_op)
-#define __NRATRF2_lfutex                  "%" PRIu32
-#define __NRATRA2_lfutex(uaddr, futex_op, val, timeout, val2) ,val
-#define __NRATRF3_lfutex                  "%p"
-#define __NRATRA3_lfutex(uaddr, futex_op, val, timeout, val2) ,timeout
-#define __NRATRF4_lfutex                  "%" PRIu32
-#define __NRATRA4_lfutex(uaddr, futex_op, val, timeout, val2) ,val2
-#define __NRATRF0_lseek64                 "%d"
-#define __NRATRA0_lseek64(fd, offset, whence) ,(int)(fd)
-#define __NRATRF1_lseek64                 "%" PRId64
-#define __NRATRA1_lseek64(fd, offset, whence) ,offset
-#define __NRATRF2_lseek64                 "%#Ix=%s"
-#define __NRATRA2_lseek64(fd, offset, whence) ,(whence),(whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
-#define __NRATRF0_lfutexexpr              "%p"
-#define __NRATRA0_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,base
-#define __NRATRF1_lfutexexpr              "%" PRIuSIZ
-#define __NRATRA1_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprc
-#define __NRATRF2_lfutexexpr              "%p"
-#define __NRATRA2_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprv
-#define __NRATRF3_lfutexexpr              "%p"
-#define __NRATRA3_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,timeout
-#define __NRATRF4_lfutexexpr              "%#" PRIxSIZ
-#define __NRATRA4_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
-#define __NRATRF0_lfutexlockexpr          "%p"
-#define __NRATRA0_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,ulockaddr
-#define __NRATRF1_lfutexlockexpr          "%p"
-#define __NRATRA1_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,base
-#define __NRATRF2_lfutexlockexpr          "%" PRIuSIZ
-#define __NRATRA2_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprc
-#define __NRATRF3_lfutexlockexpr          "%p"
-#define __NRATRA3_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprv
-#define __NRATRF4_lfutexlockexpr          "%p"
-#define __NRATRA4_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,timeout
-#define __NRATRF5_lfutexlockexpr          "%#" PRIxSIZ
-#define __NRATRA5_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
-#define __NRATRF0_mktty                   "%d"
-#define __NRATRA0_mktty(keyboard, display, name, rsvd) ,(int)(keyboard)
-#define __NRATRF1_mktty                   "%d"
-#define __NRATRA1_mktty(keyboard, display, name, rsvd) ,(int)(display)
-#define __NRATRF2_mktty                   "%q"
-#define __NRATRA2_mktty(keyboard, display, name, rsvd) ,(validate_readable_opt(name,1),name)
-#define __NRATRF3_mktty                   "%#" PRIxSIZ
-#define __NRATRA3_mktty(keyboard, display, name, rsvd) ,(uintptr_t)(rsvd)
-#define __NRATRF0_raiseat                 "%p"
-#define __NRATRA0_raiseat(state, si)      ,state
-#define __NRATRF1_raiseat                 "%p"
-#define __NRATRA1_raiseat(state, si)      ,si
-#define __NRATRF0_coredump                "%p"
-#define __NRATRA0_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,curr_state
-#define __NRATRF1_coredump                "%p"
-#define __NRATRA1_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,orig_state
-#define __NRATRF2_coredump                "%p"
-#define __NRATRA2_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_vector
-#define __NRATRF3_coredump                "%" PRIuSIZ
-#define __NRATRA3_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_length
-#define __NRATRF4_coredump                "%p"
-#define __NRATRA4_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,exception
-#define __NRATRF5_coredump                "%#" PRIxSIZ
-#define __NRATRA5_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,(uintptr_t)(unwind_error)
-#define __NRATRF0_stime64                 "%p"
-#define __NRATRA0_stime64(t)              ,t
-#define __NRATRF0_utime64                 "%q"
-#define __NRATRA0_utime64(filename, times) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_utime64                 "%p"
-#define __NRATRA1_utime64(filename, times) ,times
-#define __NRATRF0_ftime64                 "%p"
-#define __NRATRA0_ftime64(tp)             ,tp
-#define __NRATRF0_ioctlf                  "%d"
-#define __NRATRA0_ioctlf(fd, command, mode, arg) ,(int)(fd)
-#define __NRATRF1_ioctlf                  "%#" PRIxSIZ
-#define __NRATRA1_ioctlf(fd, command, mode, arg) ,(uintptr_t)(command)
-#define __NRATRF2_ioctlf                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_ioctlf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                 ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                 ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                 ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                 ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                 ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                 ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                 ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                 ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF3_ioctlf                  "%p"
-#define __NRATRA3_ioctlf(fd, command, mode, arg) ,arg
-#define __NRATRF0_fsmode                  "%" PRIu64
-#define __NRATRA0_fsmode(mode)            ,mode
-#define __NRATRF0_getrusage64             "%" PRIdSIZ
-#define __NRATRA0_getrusage64(who, tv)    ,(intptr_t)(who)
-#define __NRATRF1_getrusage64             "%p"
-#define __NRATRA1_getrusage64(who, tv)    ,tv
-#define __NRATRF0_gettimeofday64          "%p"
-#define __NRATRA0_gettimeofday64(tv, tz)  ,tv
-#define __NRATRF1_gettimeofday64          "%p"
-#define __NRATRA1_gettimeofday64(tv, tz)  ,tz
-#define __NRATRF0_settimeofday64          "%p"
-#define __NRATRA0_settimeofday64(tv, tz)  ,tv
-#define __NRATRF1_settimeofday64          "%p"
-#define __NRATRA1_settimeofday64(tv, tz)  ,tz
-#define __NRATRF0_select64                "%" PRIuSIZ
-#define __NRATRA0_select64(nfds, readfds, writefds, exceptfds, timeout) ,nfds
-#define __NRATRF1_select64                "%p"
-#define __NRATRA1_select64(nfds, readfds, writefds, exceptfds, timeout) ,readfds
-#define __NRATRF2_select64                "%p"
-#define __NRATRA2_select64(nfds, readfds, writefds, exceptfds, timeout) ,writefds
-#define __NRATRF3_select64                "%p"
-#define __NRATRA3_select64(nfds, readfds, writefds, exceptfds, timeout) ,exceptfds
-#define __NRATRF4_select64                "%p"
-#define __NRATRA4_select64(nfds, readfds, writefds, exceptfds, timeout) ,timeout
-#define __NRATRF0_maplibrary              "%p"
-#define __NRATRA0_maplibrary(addr, flags, fd, hdrv, hdrc) ,addr
-#define __NRATRF1_maplibrary              "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA1_maplibrary(addr, flags, fd, hdrv, hdrc) ,(uintptr_t)(flags),(flags) & MAP_FIXED ? "MAP_FIXED" : "" \
-                                                          ,((flags) & MAP_LOCKED) && ((flags) & (MAP_FIXED)) ? "|" : "",(flags) & MAP_LOCKED ? "MAP_LOCKED" : "" \
-                                                          ,((flags) & MAP_NONBLOCK) && ((flags) & (MAP_FIXED|MAP_LOCKED)) ? "|" : "",(flags) & MAP_NONBLOCK ? "MAP_NONBLOCK" : "" \
-                                                          ,((flags) & MAP_NORESERVE) && ((flags) & (MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK)) ? "|" : "",(flags) & MAP_NORESERVE ? "MAP_NORESERVE" : "" \
-                                                          ,((flags) & MAP_POPULATE) && ((flags) & (MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE)) ? "|" : "",(flags) & MAP_POPULATE ? "MAP_POPULATE" : "" \
-                                                          ,((flags) & MAP_SYNC) && ((flags) & (MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE)) ? "|" : "",(flags) & MAP_SYNC ? "MAP_SYNC" : "" \
-                                                          ,((flags) & MAP_DONT_MAP) && ((flags) & (MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_SYNC)) ? "|" : "",(flags) & MAP_DONT_MAP ? "MAP_DONT_MAP" : "" \
-                                                          ,((flags) & MAP_DONT_OVERRIDE) && ((flags) & (MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP)) ? "|" : "",(flags) & MAP_DONT_OVERRIDE ? "MAP_DONT_OVERRIDE" : ""
-#define __NRATRF2_maplibrary              "%d"
-#define __NRATRA2_maplibrary(addr, flags, fd, hdrv, hdrc) ,(int)(fd)
-#define __NRATRF3_maplibrary              "%p"
-#define __NRATRA3_maplibrary(addr, flags, fd, hdrv, hdrc) ,hdrv
-#define __NRATRF4_maplibrary              "%" PRIuSIZ
-#define __NRATRA4_maplibrary(addr, flags, fd, hdrv, hdrc) ,hdrc
-#define __NRATRF0_setitimer64             "%#" PRIxSIZ
-#define __NRATRA0_setitimer64(which, newval, oldval) ,(uintptr_t)(which)
-#define __NRATRF1_setitimer64             "%p"
-#define __NRATRA1_setitimer64(which, newval, oldval) ,newval
-#define __NRATRF2_setitimer64             "%p"
-#define __NRATRA2_setitimer64(which, newval, oldval) ,oldval
-#define __NRATRF0_getitimer64             "%#" PRIxSIZ
-#define __NRATRA0_getitimer64(which, curr_value) ,(uintptr_t)(which)
-#define __NRATRF1_getitimer64             "%p"
-#define __NRATRA1_getitimer64(which, curr_value) ,curr_value
-#define __NRATRF0_wait4_64                "%" PRIdSIZ
-#define __NRATRA0_wait4_64(pid, stat_loc, options, usage) ,(intptr_t)(pid)
-#define __NRATRF1_wait4_64                "%p"
-#define __NRATRA1_wait4_64(pid, stat_loc, options, usage) ,stat_loc
-#define __NRATRF2_wait4_64                "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA2_wait4_64(pid, stat_loc, options, usage) ,(uintptr_t)(options),(options) & WNOHANG ? "WNOHANG" : "" \
-                                                          ,((options) & WUNTRACED) && ((options) & (WNOHANG)) ? "|" : "",(options) & WUNTRACED ? "WUNTRACED" : "" \
-                                                          ,((options) & WCONTINUED) && ((options) & (WNOHANG|WUNTRACED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
-                                                          ,((options) & WNOWAIT) && ((options) & (WNOHANG|WUNTRACED|WCONTINUED)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
-#define __NRATRF3_wait4_64                "%p"
-#define __NRATRA3_wait4_64(pid, stat_loc, options, usage) ,usage
-#define __NRATRF0_kreaddir                "%d"
-#define __NRATRA0_kreaddir(fd, buf, bufsize, mode) ,(int)(fd)
-#define __NRATRF1_kreaddir                "%p"
-#define __NRATRA1_kreaddir(fd, buf, bufsize, mode) ,buf
-#define __NRATRF2_kreaddir                "%" PRIuSIZ
-#define __NRATRA2_kreaddir(fd, buf, bufsize, mode) ,bufsize
-#define __NRATRF3_kreaddir                "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
-#define __NRATRA3_kreaddir(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & READDIR_CONTINUE ? "READDIR_CONTINUE" : (mode) ? "" : "READDIR_DEFAULT" \
-                                                   ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
-                                                   ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
-                                                   ,((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK|READDIR_SKIPREL)) ? "|" : "",(mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
-#define __NRATRF0_readvf                  "%d"
-#define __NRATRA0_readvf(fd, iovec, count, mode) ,(int)(fd)
-#define __NRATRF1_readvf                  "%p"
-#define __NRATRA1_readvf(fd, iovec, count, mode) ,iovec
-#define __NRATRF2_readvf                  "%" PRIuSIZ
-#define __NRATRA2_readvf(fd, iovec, count, mode) ,count
-#define __NRATRF3_readvf                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_readvf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                 ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                 ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                 ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                 ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                 ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                 ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                 ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                 ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_writevf                 "%d"
-#define __NRATRA0_writevf(fd, iovec, count, mode) ,(int)(fd)
-#define __NRATRF1_writevf                 "%p"
-#define __NRATRA1_writevf(fd, iovec, count, mode) ,iovec
-#define __NRATRF2_writevf                 "%" PRIuSIZ
-#define __NRATRA2_writevf(fd, iovec, count, mode) ,count
-#define __NRATRF3_writevf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_writevf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                  ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                  ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                  ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                  ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                  ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                  ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                  ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                  ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_sched_rr_get_interval64 "%" PRIdSIZ
-#define __NRATRA0_sched_rr_get_interval64(pid, tms) ,(intptr_t)(pid)
-#define __NRATRF1_sched_rr_get_interval64 "%p"
-#define __NRATRA1_sched_rr_get_interval64(pid, tms) ,tms
-#define __NRATRF0_nanosleep64             "%p"
-#define __NRATRA0_nanosleep64(req, rem)   ,req
-#define __NRATRF1_nanosleep64             "%p"
-#define __NRATRA1_nanosleep64(req, rem)   ,rem
-#define __NRATRF0_rt_sigtimedwait64       "%p"
-#define __NRATRA0_rt_sigtimedwait64(set, info, timeout, sigsetsize) ,set
-#define __NRATRF1_rt_sigtimedwait64       "%p"
-#define __NRATRA1_rt_sigtimedwait64(set, info, timeout, sigsetsize) ,info
-#define __NRATRF2_rt_sigtimedwait64       "%p"
-#define __NRATRA2_rt_sigtimedwait64(set, info, timeout, sigsetsize) ,timeout
-#define __NRATRF3_rt_sigtimedwait64       "%" PRIuSIZ
-#define __NRATRA3_rt_sigtimedwait64(set, info, timeout, sigsetsize) ,sigsetsize
-#define __NRATRF0_pread64f                "%d"
-#define __NRATRA0_pread64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
-#define __NRATRF1_pread64f                "%p"
-#define __NRATRA1_pread64f(fd, buf, bufsize, offset, mode) ,buf
-#define __NRATRF2_pread64f                "%" PRIuSIZ
-#define __NRATRA2_pread64f(fd, buf, bufsize, offset, mode) ,bufsize
-#define __NRATRF3_pread64f                "%" PRIu64
-#define __NRATRA3_pread64f(fd, buf, bufsize, offset, mode) ,offset
-#define __NRATRF4_pread64f                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA4_pread64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+#define __NRATRF0_recvmmsg64              "%d"
+#define __NRATRA0_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) ,(int)(sockfd)
+#define __NRATRF1_recvmmsg64              "%p"
+#define __NRATRA1_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) ,vmessages
+#define __NRATRF2_recvmmsg64              "%" PRIuSIZ
+#define __NRATRA2_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) ,vlen
+#define __NRATRF3_recvmmsg64              "%#" PRIxSIZ
+#define __NRATRA3_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) ,(uintptr_t)(flags)
+#define __NRATRF4_recvmmsg64              "%p"
+#define __NRATRA4_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) ,tmo
+#define __NRATRF0_pwritevf                "%d"
+#define __NRATRA0_pwritevf(fd, iovec, count, offset, mode) ,(int)(fd)
+#define __NRATRF1_pwritevf                "%p"
+#define __NRATRA1_pwritevf(fd, iovec, count, offset, mode) ,iovec
+#define __NRATRF2_pwritevf                "%" PRIuSIZ
+#define __NRATRA2_pwritevf(fd, iovec, count, offset, mode) ,count
+#define __NRATRF3_pwritevf                "%" PRIu64
+#define __NRATRA3_pwritevf(fd, iovec, count, offset, mode) ,offset
+#define __NRATRF4_pwritevf                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA4_pwritevf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                            ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                            ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
                                                            ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
@@ -3329,36 +2996,208 @@
                                                            ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
                                                            ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
                                                            ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_pwrite64f               "%d"
-#define __NRATRA0_pwrite64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
-#define __NRATRF1_pwrite64f               "%p"
-#define __NRATRA1_pwrite64f(fd, buf, bufsize, offset, mode) ,buf
-#define __NRATRF2_pwrite64f               "%" PRIuSIZ
-#define __NRATRA2_pwrite64f(fd, buf, bufsize, offset, mode) ,bufsize
-#define __NRATRF3_pwrite64f               "%" PRIu64
-#define __NRATRA3_pwrite64f(fd, buf, bufsize, offset, mode) ,offset
-#define __NRATRF4_pwrite64f               "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA4_pwrite64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                            ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                            ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                            ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                            ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                            ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                            ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                            ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                            ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_kstat                   "%q"
-#define __NRATRA0_kstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_kstat                   "%p"
-#define __NRATRA1_kstat(filename, statbuf) ,statbuf
-#define __NRATRF0_klstat                  "%q"
-#define __NRATRA0_klstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_klstat                  "%p"
-#define __NRATRA1_klstat(filename, statbuf) ,statbuf
-#define __NRATRF0_kfstat                  "%d"
-#define __NRATRA0_kfstat(fd, statbuf)     ,(int)(fd)
-#define __NRATRF1_kfstat                  "%p"
-#define __NRATRA1_kfstat(fd, statbuf)     ,statbuf
+#define __NRATRF0_preadvf                 "%d"
+#define __NRATRA0_preadvf(fd, iovec, count, offset, mode) ,(int)(fd)
+#define __NRATRF1_preadvf                 "%p"
+#define __NRATRA1_preadvf(fd, iovec, count, offset, mode) ,iovec
+#define __NRATRF2_preadvf                 "%" PRIuSIZ
+#define __NRATRA2_preadvf(fd, iovec, count, offset, mode) ,count
+#define __NRATRF3_preadvf                 "%" PRIu64
+#define __NRATRA3_preadvf(fd, iovec, count, offset, mode) ,offset
+#define __NRATRF4_preadvf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA4_preadvf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                          ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                          ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                          ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                          ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                          ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                          ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                          ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                          ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NRATRF0_timerfd_gettime64       "%d"
+#define __NRATRA0_timerfd_gettime64(ufd, otmr) ,(int)(ufd)
+#define __NRATRF1_timerfd_gettime64       "%p"
+#define __NRATRA1_timerfd_gettime64(ufd, otmr) ,otmr
+#define __NRATRF0_timerfd_settime64       "%d"
+#define __NRATRA0_timerfd_settime64(ufd, flags, utmr, otmr) ,(int)(ufd)
+#define __NRATRF1_timerfd_settime64       "%#" PRIxSIZ
+#define __NRATRA1_timerfd_settime64(ufd, flags, utmr, otmr) ,(uintptr_t)(flags)
+#define __NRATRF2_timerfd_settime64       "%p"
+#define __NRATRA2_timerfd_settime64(ufd, flags, utmr, otmr) ,utmr
+#define __NRATRF3_timerfd_settime64       "%p"
+#define __NRATRA3_timerfd_settime64(ufd, flags, utmr, otmr) ,otmr
+#define __NRATRF0_fallocate64             "%d"
+#define __NRATRA0_fallocate64(fd, mode, offset, length) ,(int)(fd)
+#define __NRATRF1_fallocate64             "%#" PRIxSIZ
+#define __NRATRA1_fallocate64(fd, mode, offset, length) ,(uintptr_t)(mode)
+#define __NRATRF2_fallocate64             "%" PRIu64
+#define __NRATRA2_fallocate64(fd, mode, offset, length) ,offset
+#define __NRATRF3_fallocate64             "%" PRIu64
+#define __NRATRA3_fallocate64(fd, mode, offset, length) ,length
+#define __NRATRF0_utimensat64             "%d"
+#define __NRATRA0_utimensat64(dirfd, filename, times, flags) ,(int)(dirfd)
+#define __NRATRF1_utimensat64             "%q"
+#define __NRATRA1_utimensat64(dirfd, filename, times, flags) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF2_utimensat64             "%p"
+#define __NRATRA2_utimensat64(dirfd, filename, times, flags) ,times
+#define __NRATRF3_utimensat64             "%#" PRIxSIZ "=%s%s%s%s%s"
+#define __NRATRA3_utimensat64(dirfd, filename, times, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
+                                                             ,((flags) & AT_CHANGE_CTIME) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_CHANGE_CTIME ? "AT_CHANGE_CTIME" : "" \
+                                                             ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF0_ppoll64                 "%p"
+#define __NRATRA0_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) ,fds
+#define __NRATRF1_ppoll64                 "%" PRIuSIZ
+#define __NRATRA1_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) ,nfds
+#define __NRATRF2_ppoll64                 "%p"
+#define __NRATRA2_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) ,timeout_ts
+#define __NRATRF3_ppoll64                 "%p"
+#define __NRATRA3_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) ,sigmask
+#define __NRATRF4_ppoll64                 "%" PRIuSIZ
+#define __NRATRA4_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) ,sigsetsize
+#define __NRATRF0_pselect6_64             "%" PRIuSIZ
+#define __NRATRA0_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,nfds
+#define __NRATRF1_pselect6_64             "%p"
+#define __NRATRA1_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,readfds
+#define __NRATRF2_pselect6_64             "%p"
+#define __NRATRA2_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,writefds
+#define __NRATRF3_pselect6_64             "%p"
+#define __NRATRA3_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,exceptfds
+#define __NRATRF4_pselect6_64             "%p"
+#define __NRATRA4_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,timeout
+#define __NRATRF5_pselect6_64             "%p"
+#define __NRATRA5_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,sigmask_sigset_and_len
+#define __NRATRF0_freadlinkat             "%d"
+#define __NRATRA0_freadlinkat(dirfd, path, buf, buflen, flags) ,(int)(dirfd)
+#define __NRATRF1_freadlinkat             "%q"
+#define __NRATRA1_freadlinkat(dirfd, path, buf, buflen, flags) ,(validate_readable_opt(path,1),path)
+#define __NRATRF2_freadlinkat             "%p"
+#define __NRATRA2_freadlinkat(dirfd, path, buf, buflen, flags) ,buf
+#define __NRATRF3_freadlinkat             "%" PRIuSIZ
+#define __NRATRA3_freadlinkat(dirfd, path, buf, buflen, flags) ,buflen
+#define __NRATRF4_freadlinkat             "%#" PRIxSIZ "=%s%s%s"
+#define __NRATRA4_freadlinkat(dirfd, path, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
+                                                               ,((flags) & AT_DOSPATH) && ((flags) & (AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF0_fsymlinkat              "%q"
+#define __NRATRA0_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(link_text,1),link_text)
+#define __NRATRF1_fsymlinkat              "%d"
+#define __NRATRA1_fsymlinkat(link_text, tofd, target_path, flags) ,(int)(tofd)
+#define __NRATRF2_fsymlinkat              "%q"
+#define __NRATRA2_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(target_path,1),target_path)
+#define __NRATRF3_fsymlinkat              "%#" PRIxSIZ "=%s"
+#define __NRATRA3_fsymlinkat(link_text, tofd, target_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF0_frenameat               "%d"
+#define __NRATRA0_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(int)(oldfd)
+#define __NRATRF1_frenameat               "%q"
+#define __NRATRA1_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(validate_readable_opt(oldname,1),oldname)
+#define __NRATRF2_frenameat               "%d"
+#define __NRATRA2_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(int)(newfd)
+#define __NRATRF3_frenameat               "%q"
+#define __NRATRA3_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(validate_readable_opt(newname_or_path,1),newname_or_path)
+#define __NRATRF4_frenameat               "%#" PRIxSIZ "=%s"
+#define __NRATRA4_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF0_kfstatat                "%d"
+#define __NRATRA0_kfstatat(dirfd, filename, statbuf, flags) ,(int)(dirfd)
+#define __NRATRF1_kfstatat                "%q"
+#define __NRATRA1_kfstatat(dirfd, filename, statbuf, flags) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF2_kfstatat                "%p"
+#define __NRATRA2_kfstatat(dirfd, filename, statbuf, flags) ,statbuf
+#define __NRATRF3_kfstatat                "%#" PRIxSIZ "=%s%s%s"
+#define __NRATRA3_kfstatat(dirfd, filename, statbuf, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
+                                                            ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF0_futimesat64             "%d"
+#define __NRATRA0_futimesat64(dirfd, filename, times) ,(int)(dirfd)
+#define __NRATRF1_futimesat64             "%p"
+#define __NRATRA1_futimesat64(dirfd, filename, times) ,filename
+#define __NRATRF2_futimesat64             "%p"
+#define __NRATRA2_futimesat64(dirfd, filename, times) ,times
+#define __NRATRF0_fmknodat                "%d"
+#define __NRATRA0_fmknodat(dirfd, nodename, mode, dev, flags) ,(int)(dirfd)
+#define __NRATRF1_fmknodat                "%q"
+#define __NRATRA1_fmknodat(dirfd, nodename, mode, dev, flags) ,(validate_readable_opt(nodename,1),nodename)
+#define __NRATRF2_fmknodat                "%#" PRIoSIZ
+#define __NRATRA2_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(mode)
+#define __NRATRF3_fmknodat                "%.2x:%.2x"
+#define __NRATRA3_fmknodat(dirfd, nodename, mode, dev, flags) ,(unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
+#define __NRATRF4_fmknodat                "%#" PRIxSIZ "=%s"
+#define __NRATRA4_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF0_fmkdirat                "%d"
+#define __NRATRA0_fmkdirat(dirfd, pathname, mode, flags) ,(int)(dirfd)
+#define __NRATRF1_fmkdirat                "%q"
+#define __NRATRA1_fmkdirat(dirfd, pathname, mode, flags) ,(validate_readable_opt(pathname,1),pathname)
+#define __NRATRF2_fmkdirat                "%#" PRIoSIZ
+#define __NRATRA2_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(mode)
+#define __NRATRF3_fmkdirat                "%#" PRIxSIZ "=%s"
+#define __NRATRA3_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF0_waitid64                "%#Ix=%s"
+#define __NRATRA0_waitid64(idtype, id, infop, options, ru) ,(idtype),(idtype) == P_ALL ? "P_ALL" : (idtype) == P_PID ? "P_PID" : (idtype) == P_PGID ? "P_PGID" : "?"
+#define __NRATRF1_waitid64                "%" PRIuSIZ
+#define __NRATRA1_waitid64(idtype, id, infop, options, ru) ,(uintptr_t)(id)
+#define __NRATRF2_waitid64                "%p"
+#define __NRATRA2_waitid64(idtype, id, infop, options, ru) ,infop
+#define __NRATRF3_waitid64                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s"
+#define __NRATRA3_waitid64(idtype, id, infop, options, ru) ,(uintptr_t)(options),(options) & WEXITED ? "WEXITED" : "" \
+                                                           ,((options) & WSTOPPED) && ((options) & (WEXITED)) ? "|" : "",(options) & WSTOPPED ? "WSTOPPED" : "" \
+                                                           ,((options) & WCONTINUED) && ((options) & (WEXITED|WSTOPPED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
+                                                           ,((options) & WNOHANG) && ((options) & (WEXITED|WSTOPPED|WCONTINUED)) ? "|" : "",(options) & WNOHANG ? "WNOHANG" : "" \
+                                                           ,((options) & WNOWAIT) && ((options) & (WEXITED|WSTOPPED|WCONTINUED|WNOHANG)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
+#define __NRATRF4_waitid64                "%p"
+#define __NRATRA4_waitid64(idtype, id, infop, options, ru) ,ru
+#define __NRATRF0_mq_timedreceive64       "%d"
+#define __NRATRA0_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,(int)(mqdes)
+#define __NRATRF1_mq_timedreceive64       "%p"
+#define __NRATRA1_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,msg_ptr
+#define __NRATRF2_mq_timedreceive64       "%" PRIuSIZ
+#define __NRATRA2_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,msg_len
+#define __NRATRF3_mq_timedreceive64       "%p"
+#define __NRATRA3_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,pmsg_prio
+#define __NRATRF4_mq_timedreceive64       "%p"
+#define __NRATRA4_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,abs_timeout
+#define __NRATRF0_mq_timedsend64          "%d"
+#define __NRATRA0_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,(int)(mqdes)
+#define __NRATRF1_mq_timedsend64          "%q"
+#define __NRATRA1_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,(validate_readable_opt(msg_ptr,1),msg_ptr)
+#define __NRATRF2_mq_timedsend64          "%" PRIuSIZ
+#define __NRATRA2_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,msg_len
+#define __NRATRF3_mq_timedsend64          "%" PRIu32
+#define __NRATRA3_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,msg_prio
+#define __NRATRF4_mq_timedsend64          "%p"
+#define __NRATRA4_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,abs_timeout
+#define __NRATRF0_utimes64                "%q"
+#define __NRATRA0_utimes64(filename, times) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF1_utimes64                "%p"
+#define __NRATRA1_utimes64(filename, times) ,times
+#define __NRATRF0_clock_nanosleep64       "%#" PRIxSIZ
+#define __NRATRA0_clock_nanosleep64(clock_id, flags, requested_time, remaining) ,(uintptr_t)(clock_id)
+#define __NRATRF1_clock_nanosleep64       "%#" PRIxSIZ
+#define __NRATRA1_clock_nanosleep64(clock_id, flags, requested_time, remaining) ,(uintptr_t)(flags)
+#define __NRATRF2_clock_nanosleep64       "%p"
+#define __NRATRA2_clock_nanosleep64(clock_id, flags, requested_time, remaining) ,requested_time
+#define __NRATRF3_clock_nanosleep64       "%p"
+#define __NRATRA3_clock_nanosleep64(clock_id, flags, requested_time, remaining) ,remaining
+#define __NRATRF0_clock_getres64          "%#" PRIxSIZ
+#define __NRATRA0_clock_getres64(clock_id, res) ,(uintptr_t)(clock_id)
+#define __NRATRF1_clock_getres64          "%p"
+#define __NRATRA1_clock_getres64(clock_id, res) ,res
+#define __NRATRF0_clock_gettime64         "%#" PRIxSIZ
+#define __NRATRA0_clock_gettime64(clock_id, tp) ,(uintptr_t)(clock_id)
+#define __NRATRF1_clock_gettime64         "%p"
+#define __NRATRA1_clock_gettime64(clock_id, tp) ,tp
+#define __NRATRF0_clock_settime64         "%#" PRIxSIZ
+#define __NRATRA0_clock_settime64(clock_id, tp) ,(uintptr_t)(clock_id)
+#define __NRATRF1_clock_settime64         "%p"
+#define __NRATRA1_clock_settime64(clock_id, tp) ,tp
+#define __NRATRF0_timer_gettime64         "%p"
+#define __NRATRA0_timer_gettime64(timerid, value) ,timerid
+#define __NRATRF1_timer_gettime64         "%p"
+#define __NRATRA1_timer_gettime64(timerid, value) ,value
+#define __NRATRF0_timer_settime64         "%p"
+#define __NRATRA0_timer_settime64(timerid, flags, value, ovalue) ,timerid
+#define __NRATRF1_timer_settime64         "%#" PRIxSIZ
+#define __NRATRA1_timer_settime64(timerid, flags, value, ovalue) ,(uintptr_t)(flags)
+#define __NRATRF2_timer_settime64         "%p"
+#define __NRATRA2_timer_settime64(timerid, flags, value, ovalue) ,value
+#define __NRATRF3_timer_settime64         "%p"
+#define __NRATRA3_timer_settime64(timerid, flags, value, ovalue) ,ovalue
 #define __NRATRF0_kreaddirf               "%d"
 #define __NRATRA0_kreaddirf(fd, buf, bufsize, mode, iomode) ,(int)(fd)
 #define __NRATRF1_kreaddirf               "%p"
@@ -3380,218 +3219,46 @@
                                                             ,((iomode) & IO_SYNC) && ((iomode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(iomode) & IO_SYNC ? "IO_SYNC" : "" \
                                                             ,((iomode) & IO_ASYNC) && ((iomode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(iomode) & IO_ASYNC ? "IO_ASYNC" : "" \
                                                             ,((iomode) & IO_DIRECT) && ((iomode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(iomode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_timer_settime64         "%p"
-#define __NRATRA0_timer_settime64(timerid, flags, value, ovalue) ,timerid
-#define __NRATRF1_timer_settime64         "%#" PRIxSIZ
-#define __NRATRA1_timer_settime64(timerid, flags, value, ovalue) ,(uintptr_t)(flags)
-#define __NRATRF2_timer_settime64         "%p"
-#define __NRATRA2_timer_settime64(timerid, flags, value, ovalue) ,value
-#define __NRATRF3_timer_settime64         "%p"
-#define __NRATRA3_timer_settime64(timerid, flags, value, ovalue) ,ovalue
-#define __NRATRF0_timer_gettime64         "%p"
-#define __NRATRA0_timer_gettime64(timerid, value) ,timerid
-#define __NRATRF1_timer_gettime64         "%p"
-#define __NRATRA1_timer_gettime64(timerid, value) ,value
-#define __NRATRF0_clock_settime64         "%#" PRIxSIZ
-#define __NRATRA0_clock_settime64(clock_id, tp) ,(uintptr_t)(clock_id)
-#define __NRATRF1_clock_settime64         "%p"
-#define __NRATRA1_clock_settime64(clock_id, tp) ,tp
-#define __NRATRF0_clock_gettime64         "%#" PRIxSIZ
-#define __NRATRA0_clock_gettime64(clock_id, tp) ,(uintptr_t)(clock_id)
-#define __NRATRF1_clock_gettime64         "%p"
-#define __NRATRA1_clock_gettime64(clock_id, tp) ,tp
-#define __NRATRF0_clock_getres64          "%#" PRIxSIZ
-#define __NRATRA0_clock_getres64(clock_id, res) ,(uintptr_t)(clock_id)
-#define __NRATRF1_clock_getres64          "%p"
-#define __NRATRA1_clock_getres64(clock_id, res) ,res
-#define __NRATRF0_clock_nanosleep64       "%#" PRIxSIZ
-#define __NRATRA0_clock_nanosleep64(clock_id, flags, requested_time, remaining) ,(uintptr_t)(clock_id)
-#define __NRATRF1_clock_nanosleep64       "%#" PRIxSIZ
-#define __NRATRA1_clock_nanosleep64(clock_id, flags, requested_time, remaining) ,(uintptr_t)(flags)
-#define __NRATRF2_clock_nanosleep64       "%p"
-#define __NRATRA2_clock_nanosleep64(clock_id, flags, requested_time, remaining) ,requested_time
-#define __NRATRF3_clock_nanosleep64       "%p"
-#define __NRATRA3_clock_nanosleep64(clock_id, flags, requested_time, remaining) ,remaining
-#define __NRATRF0_utimes64                "%q"
-#define __NRATRA0_utimes64(filename, times) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF1_utimes64                "%p"
-#define __NRATRA1_utimes64(filename, times) ,times
-#define __NRATRF0_mq_timedsend64          "%d"
-#define __NRATRA0_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,(int)(mqdes)
-#define __NRATRF1_mq_timedsend64          "%q"
-#define __NRATRA1_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,(validate_readable_opt(msg_ptr,1),msg_ptr)
-#define __NRATRF2_mq_timedsend64          "%" PRIuSIZ
-#define __NRATRA2_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,msg_len
-#define __NRATRF3_mq_timedsend64          "%" PRIu32
-#define __NRATRA3_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,msg_prio
-#define __NRATRF4_mq_timedsend64          "%p"
-#define __NRATRA4_mq_timedsend64(mqdes, msg_ptr, msg_len, msg_prio, abs_timeout) ,abs_timeout
-#define __NRATRF0_mq_timedreceive64       "%d"
-#define __NRATRA0_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,(int)(mqdes)
-#define __NRATRF1_mq_timedreceive64       "%p"
-#define __NRATRA1_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,msg_ptr
-#define __NRATRF2_mq_timedreceive64       "%" PRIuSIZ
-#define __NRATRA2_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,msg_len
-#define __NRATRF3_mq_timedreceive64       "%p"
-#define __NRATRA3_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,pmsg_prio
-#define __NRATRF4_mq_timedreceive64       "%p"
-#define __NRATRA4_mq_timedreceive64(mqdes, msg_ptr, msg_len, pmsg_prio, abs_timeout) ,abs_timeout
-#define __NRATRF0_waitid64                "%#Ix=%s"
-#define __NRATRA0_waitid64(idtype, id, infop, options, ru) ,(idtype),(idtype) == P_ALL ? "P_ALL" : (idtype) == P_PID ? "P_PID" : (idtype) == P_PGID ? "P_PGID" : "?"
-#define __NRATRF1_waitid64                "%" PRIuSIZ
-#define __NRATRA1_waitid64(idtype, id, infop, options, ru) ,(uintptr_t)(id)
-#define __NRATRF2_waitid64                "%p"
-#define __NRATRA2_waitid64(idtype, id, infop, options, ru) ,infop
-#define __NRATRF3_waitid64                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_waitid64(idtype, id, infop, options, ru) ,(uintptr_t)(options),(options) & WEXITED ? "WEXITED" : "" \
-                                                           ,((options) & WSTOPPED) && ((options) & (WEXITED)) ? "|" : "",(options) & WSTOPPED ? "WSTOPPED" : "" \
-                                                           ,((options) & WCONTINUED) && ((options) & (WEXITED|WSTOPPED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
-                                                           ,((options) & WNOHANG) && ((options) & (WEXITED|WSTOPPED|WCONTINUED)) ? "|" : "",(options) & WNOHANG ? "WNOHANG" : "" \
-                                                           ,((options) & WNOWAIT) && ((options) & (WEXITED|WSTOPPED|WCONTINUED|WNOHANG)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
-#define __NRATRF4_waitid64                "%p"
-#define __NRATRA4_waitid64(idtype, id, infop, options, ru) ,ru
-#define __NRATRF0_fmkdirat                "%d"
-#define __NRATRA0_fmkdirat(dirfd, pathname, mode, flags) ,(int)(dirfd)
-#define __NRATRF1_fmkdirat                "%q"
-#define __NRATRA1_fmkdirat(dirfd, pathname, mode, flags) ,(validate_readable_opt(pathname,1),pathname)
-#define __NRATRF2_fmkdirat                "%#" PRIoSIZ
-#define __NRATRA2_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(mode)
-#define __NRATRF3_fmkdirat                "%#" PRIxSIZ "=%s"
-#define __NRATRA3_fmkdirat(dirfd, pathname, mode, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_fmknodat                "%d"
-#define __NRATRA0_fmknodat(dirfd, nodename, mode, dev, flags) ,(int)(dirfd)
-#define __NRATRF1_fmknodat                "%q"
-#define __NRATRA1_fmknodat(dirfd, nodename, mode, dev, flags) ,(validate_readable_opt(nodename,1),nodename)
-#define __NRATRF2_fmknodat                "%#" PRIoSIZ
-#define __NRATRA2_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(mode)
-#define __NRATRF3_fmknodat                "%.2x:%.2x"
-#define __NRATRA3_fmknodat(dirfd, nodename, mode, dev, flags) ,(unsigned int)MAJOR(dev),(unsigned int)MINOR(dev)
-#define __NRATRF4_fmknodat                "%#" PRIxSIZ "=%s"
-#define __NRATRA4_fmknodat(dirfd, nodename, mode, dev, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_futimesat64             "%d"
-#define __NRATRA0_futimesat64(dirfd, filename, times) ,(int)(dirfd)
-#define __NRATRF1_futimesat64             "%p"
-#define __NRATRA1_futimesat64(dirfd, filename, times) ,filename
-#define __NRATRF2_futimesat64             "%p"
-#define __NRATRA2_futimesat64(dirfd, filename, times) ,times
-#define __NRATRF0_kfstatat                "%d"
-#define __NRATRA0_kfstatat(dirfd, filename, statbuf, flags) ,(int)(dirfd)
-#define __NRATRF1_kfstatat                "%q"
-#define __NRATRA1_kfstatat(dirfd, filename, statbuf, flags) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF2_kfstatat                "%p"
-#define __NRATRA2_kfstatat(dirfd, filename, statbuf, flags) ,statbuf
-#define __NRATRF3_kfstatat                "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA3_kfstatat(dirfd, filename, statbuf, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                            ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_frenameat               "%d"
-#define __NRATRA0_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(int)(oldfd)
-#define __NRATRF1_frenameat               "%q"
-#define __NRATRA1_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(validate_readable_opt(oldname,1),oldname)
-#define __NRATRF2_frenameat               "%d"
-#define __NRATRA2_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(int)(newfd)
-#define __NRATRF3_frenameat               "%q"
-#define __NRATRA3_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(validate_readable_opt(newname_or_path,1),newname_or_path)
-#define __NRATRF4_frenameat               "%#" PRIxSIZ "=%s"
-#define __NRATRA4_frenameat(oldfd, oldname, newfd, newname_or_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_fsymlinkat              "%q"
-#define __NRATRA0_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(link_text,1),link_text)
-#define __NRATRF1_fsymlinkat              "%d"
-#define __NRATRA1_fsymlinkat(link_text, tofd, target_path, flags) ,(int)(tofd)
-#define __NRATRF2_fsymlinkat              "%q"
-#define __NRATRA2_fsymlinkat(link_text, tofd, target_path, flags) ,(validate_readable_opt(target_path,1),target_path)
-#define __NRATRF3_fsymlinkat              "%#" PRIxSIZ "=%s"
-#define __NRATRA3_fsymlinkat(link_text, tofd, target_path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_freadlinkat             "%d"
-#define __NRATRA0_freadlinkat(dirfd, path, buf, buflen, flags) ,(int)(dirfd)
-#define __NRATRF1_freadlinkat             "%q"
-#define __NRATRA1_freadlinkat(dirfd, path, buf, buflen, flags) ,(validate_readable_opt(path,1),path)
-#define __NRATRF2_freadlinkat             "%p"
-#define __NRATRA2_freadlinkat(dirfd, path, buf, buflen, flags) ,buf
-#define __NRATRF3_freadlinkat             "%" PRIuSIZ
-#define __NRATRA3_freadlinkat(dirfd, path, buf, buflen, flags) ,buflen
-#define __NRATRF4_freadlinkat             "%#" PRIxSIZ "=%s%s%s"
-#define __NRATRA4_freadlinkat(dirfd, path, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
-                                                               ,((flags) & AT_DOSPATH) && ((flags) & (AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_pselect6_64             "%" PRIuSIZ
-#define __NRATRA0_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,nfds
-#define __NRATRF1_pselect6_64             "%p"
-#define __NRATRA1_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,readfds
-#define __NRATRF2_pselect6_64             "%p"
-#define __NRATRA2_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,writefds
-#define __NRATRF3_pselect6_64             "%p"
-#define __NRATRA3_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,exceptfds
-#define __NRATRF4_pselect6_64             "%p"
-#define __NRATRA4_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,timeout
-#define __NRATRF5_pselect6_64             "%p"
-#define __NRATRA5_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, sigmask_sigset_and_len) ,sigmask_sigset_and_len
-#define __NRATRF0_ppoll64                 "%p"
-#define __NRATRA0_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) ,fds
-#define __NRATRF1_ppoll64                 "%" PRIuSIZ
-#define __NRATRA1_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) ,nfds
-#define __NRATRF2_ppoll64                 "%p"
-#define __NRATRA2_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) ,timeout_ts
-#define __NRATRF3_ppoll64                 "%p"
-#define __NRATRA3_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) ,sigmask
-#define __NRATRF4_ppoll64                 "%" PRIuSIZ
-#define __NRATRA4_ppoll64(fds, nfds, timeout_ts, sigmask, sigsetsize) ,sigsetsize
-#define __NRATRF0_utimensat64             "%d"
-#define __NRATRA0_utimensat64(dirfd, filename, times, flags) ,(int)(dirfd)
-#define __NRATRF1_utimensat64             "%q"
-#define __NRATRA1_utimensat64(dirfd, filename, times, flags) ,(validate_readable_opt(filename,1),filename)
-#define __NRATRF2_utimensat64             "%p"
-#define __NRATRA2_utimensat64(dirfd, filename, times, flags) ,times
-#define __NRATRF3_utimensat64             "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA3_utimensat64(dirfd, filename, times, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
-                                                             ,((flags) & AT_CHANGE_CTIME) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_CHANGE_CTIME ? "AT_CHANGE_CTIME" : "" \
-                                                             ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
-#define __NRATRF0_fallocate64             "%d"
-#define __NRATRA0_fallocate64(fd, mode, offset, length) ,(int)(fd)
-#define __NRATRF1_fallocate64             "%#" PRIxSIZ
-#define __NRATRA1_fallocate64(fd, mode, offset, length) ,(uintptr_t)(mode)
-#define __NRATRF2_fallocate64             "%" PRIu64
-#define __NRATRA2_fallocate64(fd, mode, offset, length) ,offset
-#define __NRATRF3_fallocate64             "%" PRIu64
-#define __NRATRA3_fallocate64(fd, mode, offset, length) ,length
-#define __NRATRF0_timerfd_settime64       "%d"
-#define __NRATRA0_timerfd_settime64(ufd, flags, utmr, otmr) ,(int)(ufd)
-#define __NRATRF1_timerfd_settime64       "%#" PRIxSIZ
-#define __NRATRA1_timerfd_settime64(ufd, flags, utmr, otmr) ,(uintptr_t)(flags)
-#define __NRATRF2_timerfd_settime64       "%p"
-#define __NRATRA2_timerfd_settime64(ufd, flags, utmr, otmr) ,utmr
-#define __NRATRF3_timerfd_settime64       "%p"
-#define __NRATRA3_timerfd_settime64(ufd, flags, utmr, otmr) ,otmr
-#define __NRATRF0_timerfd_gettime64       "%d"
-#define __NRATRA0_timerfd_gettime64(ufd, otmr) ,(int)(ufd)
-#define __NRATRF1_timerfd_gettime64       "%p"
-#define __NRATRA1_timerfd_gettime64(ufd, otmr) ,otmr
-#define __NRATRF0_preadvf                 "%d"
-#define __NRATRA0_preadvf(fd, iovec, count, offset, mode) ,(int)(fd)
-#define __NRATRF1_preadvf                 "%p"
-#define __NRATRA1_preadvf(fd, iovec, count, offset, mode) ,iovec
-#define __NRATRF2_preadvf                 "%" PRIuSIZ
-#define __NRATRA2_preadvf(fd, iovec, count, offset, mode) ,count
-#define __NRATRF3_preadvf                 "%" PRIu64
-#define __NRATRA3_preadvf(fd, iovec, count, offset, mode) ,offset
-#define __NRATRF4_preadvf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA4_preadvf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
-                                                          ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
-                                                          ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
-                                                          ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
-                                                          ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
-                                                          ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
-                                                          ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
-                                                          ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
-                                                          ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_pwritevf                "%d"
-#define __NRATRA0_pwritevf(fd, iovec, count, offset, mode) ,(int)(fd)
-#define __NRATRF1_pwritevf                "%p"
-#define __NRATRA1_pwritevf(fd, iovec, count, offset, mode) ,iovec
-#define __NRATRF2_pwritevf                "%" PRIuSIZ
-#define __NRATRA2_pwritevf(fd, iovec, count, offset, mode) ,count
-#define __NRATRF3_pwritevf                "%" PRIu64
-#define __NRATRA3_pwritevf(fd, iovec, count, offset, mode) ,offset
-#define __NRATRF4_pwritevf                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA4_pwritevf(fd, iovec, count, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+#define __NRATRF0_kfstat                  "%d"
+#define __NRATRA0_kfstat(fd, statbuf)     ,(int)(fd)
+#define __NRATRF1_kfstat                  "%p"
+#define __NRATRA1_kfstat(fd, statbuf)     ,statbuf
+#define __NRATRF0_klstat                  "%q"
+#define __NRATRA0_klstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF1_klstat                  "%p"
+#define __NRATRA1_klstat(filename, statbuf) ,statbuf
+#define __NRATRF0_kstat                   "%q"
+#define __NRATRA0_kstat(filename, statbuf) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF1_kstat                   "%p"
+#define __NRATRA1_kstat(filename, statbuf) ,statbuf
+#define __NRATRF0_pwrite64f               "%d"
+#define __NRATRA0_pwrite64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
+#define __NRATRF1_pwrite64f               "%p"
+#define __NRATRA1_pwrite64f(fd, buf, bufsize, offset, mode) ,buf
+#define __NRATRF2_pwrite64f               "%" PRIuSIZ
+#define __NRATRA2_pwrite64f(fd, buf, bufsize, offset, mode) ,bufsize
+#define __NRATRF3_pwrite64f               "%" PRIu64
+#define __NRATRA3_pwrite64f(fd, buf, bufsize, offset, mode) ,offset
+#define __NRATRF4_pwrite64f               "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA4_pwrite64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                            ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                            ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                            ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                            ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                            ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                            ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                            ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                            ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NRATRF0_pread64f                "%d"
+#define __NRATRA0_pread64f(fd, buf, bufsize, offset, mode) ,(int)(fd)
+#define __NRATRF1_pread64f                "%p"
+#define __NRATRA1_pread64f(fd, buf, bufsize, offset, mode) ,buf
+#define __NRATRF2_pread64f                "%" PRIuSIZ
+#define __NRATRA2_pread64f(fd, buf, bufsize, offset, mode) ,bufsize
+#define __NRATRF3_pread64f                "%" PRIu64
+#define __NRATRA3_pread64f(fd, buf, bufsize, offset, mode) ,offset
+#define __NRATRF4_pread64f                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA4_pread64f(fd, buf, bufsize, offset, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
                                                            ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
                                                            ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
                                                            ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
@@ -3600,16 +3267,349 @@
                                                            ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
                                                            ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
                                                            ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
-#define __NRATRF0_recvmmsg64              "%d"
-#define __NRATRA0_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) ,(int)(sockfd)
-#define __NRATRF1_recvmmsg64              "%p"
-#define __NRATRA1_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) ,vmessages
-#define __NRATRF2_recvmmsg64              "%" PRIuSIZ
-#define __NRATRA2_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) ,vlen
-#define __NRATRF3_recvmmsg64              "%#" PRIxSIZ
-#define __NRATRA3_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) ,(uintptr_t)(flags)
-#define __NRATRF4_recvmmsg64              "%p"
-#define __NRATRA4_recvmmsg64(sockfd, vmessages, vlen, flags, tmo) ,tmo
+#define __NRATRF0_rt_sigtimedwait64       "%p"
+#define __NRATRA0_rt_sigtimedwait64(set, info, timeout, sigsetsize) ,set
+#define __NRATRF1_rt_sigtimedwait64       "%p"
+#define __NRATRA1_rt_sigtimedwait64(set, info, timeout, sigsetsize) ,info
+#define __NRATRF2_rt_sigtimedwait64       "%p"
+#define __NRATRA2_rt_sigtimedwait64(set, info, timeout, sigsetsize) ,timeout
+#define __NRATRF3_rt_sigtimedwait64       "%" PRIuSIZ
+#define __NRATRA3_rt_sigtimedwait64(set, info, timeout, sigsetsize) ,sigsetsize
+#define __NRATRF0_nanosleep64             "%p"
+#define __NRATRA0_nanosleep64(req, rem)   ,req
+#define __NRATRF1_nanosleep64             "%p"
+#define __NRATRA1_nanosleep64(req, rem)   ,rem
+#define __NRATRF0_sched_rr_get_interval64 "%" PRIdSIZ
+#define __NRATRA0_sched_rr_get_interval64(pid, tms) ,(intptr_t)(pid)
+#define __NRATRF1_sched_rr_get_interval64 "%p"
+#define __NRATRA1_sched_rr_get_interval64(pid, tms) ,tms
+#define __NRATRF0_ksysctl                 "%#" PRIxSIZ
+#define __NRATRA0_ksysctl(command, arg)   ,(uintptr_t)(command)
+#define __NRATRF1_ksysctl                 "%p"
+#define __NRATRA1_ksysctl(command, arg)   ,arg
+#define __NRATRF0_writevf                 "%d"
+#define __NRATRA0_writevf(fd, iovec, count, mode) ,(int)(fd)
+#define __NRATRF1_writevf                 "%p"
+#define __NRATRA1_writevf(fd, iovec, count, mode) ,iovec
+#define __NRATRF2_writevf                 "%" PRIuSIZ
+#define __NRATRA2_writevf(fd, iovec, count, mode) ,count
+#define __NRATRF3_writevf                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA3_writevf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                  ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                  ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                  ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                  ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                  ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                  ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                  ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                  ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NRATRF0_readvf                  "%d"
+#define __NRATRA0_readvf(fd, iovec, count, mode) ,(int)(fd)
+#define __NRATRF1_readvf                  "%p"
+#define __NRATRA1_readvf(fd, iovec, count, mode) ,iovec
+#define __NRATRF2_readvf                  "%" PRIuSIZ
+#define __NRATRA2_readvf(fd, iovec, count, mode) ,count
+#define __NRATRF3_readvf                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA3_readvf(fd, iovec, count, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                 ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                 ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                 ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                 ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                 ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                 ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                 ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                 ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NRATRF0_kreaddir                "%d"
+#define __NRATRA0_kreaddir(fd, buf, bufsize, mode) ,(int)(fd)
+#define __NRATRF1_kreaddir                "%p"
+#define __NRATRA1_kreaddir(fd, buf, bufsize, mode) ,buf
+#define __NRATRF2_kreaddir                "%" PRIuSIZ
+#define __NRATRA2_kreaddir(fd, buf, bufsize, mode) ,bufsize
+#define __NRATRF3_kreaddir                "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
+#define __NRATRA3_kreaddir(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & READDIR_CONTINUE ? "READDIR_CONTINUE" : (mode) ? "" : "READDIR_DEFAULT" \
+                                                   ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
+                                                   ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
+                                                   ,((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK|READDIR_SKIPREL)) ? "|" : "",(mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
+#define __NRATRF0_wait4_64                "%" PRIdSIZ
+#define __NRATRA0_wait4_64(pid, stat_loc, options, usage) ,(intptr_t)(pid)
+#define __NRATRF1_wait4_64                "%p"
+#define __NRATRA1_wait4_64(pid, stat_loc, options, usage) ,stat_loc
+#define __NRATRF2_wait4_64                "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
+#define __NRATRA2_wait4_64(pid, stat_loc, options, usage) ,(uintptr_t)(options),(options) & WNOHANG ? "WNOHANG" : "" \
+                                                          ,((options) & WUNTRACED) && ((options) & (WNOHANG)) ? "|" : "",(options) & WUNTRACED ? "WUNTRACED" : "" \
+                                                          ,((options) & WCONTINUED) && ((options) & (WNOHANG|WUNTRACED)) ? "|" : "",(options) & WCONTINUED ? "WCONTINUED" : "" \
+                                                          ,((options) & WNOWAIT) && ((options) & (WNOHANG|WUNTRACED|WCONTINUED)) ? "|" : "",(options) & WNOWAIT ? "WNOWAIT" : ""
+#define __NRATRF3_wait4_64                "%p"
+#define __NRATRA3_wait4_64(pid, stat_loc, options, usage) ,usage
+#define __NRATRF0_getitimer64             "%#" PRIxSIZ
+#define __NRATRA0_getitimer64(which, curr_value) ,(uintptr_t)(which)
+#define __NRATRF1_getitimer64             "%p"
+#define __NRATRA1_getitimer64(which, curr_value) ,curr_value
+#define __NRATRF0_setitimer64             "%#" PRIxSIZ
+#define __NRATRA0_setitimer64(which, newval, oldval) ,(uintptr_t)(which)
+#define __NRATRF1_setitimer64             "%p"
+#define __NRATRA1_setitimer64(which, newval, oldval) ,newval
+#define __NRATRF2_setitimer64             "%p"
+#define __NRATRA2_setitimer64(which, newval, oldval) ,oldval
+#define __NRATRF0_maplibrary              "%p"
+#define __NRATRA0_maplibrary(addr, flags, fd, hdrv, hdrc) ,addr
+#define __NRATRF1_maplibrary              "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA1_maplibrary(addr, flags, fd, hdrv, hdrc) ,(uintptr_t)(flags),(flags) & MAP_FIXED ? "MAP_FIXED" : "" \
+                                                          ,((flags) & MAP_LOCKED) && ((flags) & (MAP_FIXED)) ? "|" : "",(flags) & MAP_LOCKED ? "MAP_LOCKED" : "" \
+                                                          ,((flags) & MAP_NONBLOCK) && ((flags) & (MAP_FIXED|MAP_LOCKED)) ? "|" : "",(flags) & MAP_NONBLOCK ? "MAP_NONBLOCK" : "" \
+                                                          ,((flags) & MAP_NORESERVE) && ((flags) & (MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK)) ? "|" : "",(flags) & MAP_NORESERVE ? "MAP_NORESERVE" : "" \
+                                                          ,((flags) & MAP_POPULATE) && ((flags) & (MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE)) ? "|" : "",(flags) & MAP_POPULATE ? "MAP_POPULATE" : "" \
+                                                          ,((flags) & MAP_SYNC) && ((flags) & (MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE)) ? "|" : "",(flags) & MAP_SYNC ? "MAP_SYNC" : "" \
+                                                          ,((flags) & MAP_DONT_MAP) && ((flags) & (MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_SYNC)) ? "|" : "",(flags) & MAP_DONT_MAP ? "MAP_DONT_MAP" : "" \
+                                                          ,((flags) & MAP_DONT_OVERRIDE) && ((flags) & (MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP)) ? "|" : "",(flags) & MAP_DONT_OVERRIDE ? "MAP_DONT_OVERRIDE" : ""
+#define __NRATRF2_maplibrary              "%d"
+#define __NRATRA2_maplibrary(addr, flags, fd, hdrv, hdrc) ,(int)(fd)
+#define __NRATRF3_maplibrary              "%p"
+#define __NRATRA3_maplibrary(addr, flags, fd, hdrv, hdrc) ,hdrv
+#define __NRATRF4_maplibrary              "%" PRIuSIZ
+#define __NRATRA4_maplibrary(addr, flags, fd, hdrv, hdrc) ,hdrc
+#define __NRATRF0_select64                "%" PRIuSIZ
+#define __NRATRA0_select64(nfds, readfds, writefds, exceptfds, timeout) ,nfds
+#define __NRATRF1_select64                "%p"
+#define __NRATRA1_select64(nfds, readfds, writefds, exceptfds, timeout) ,readfds
+#define __NRATRF2_select64                "%p"
+#define __NRATRA2_select64(nfds, readfds, writefds, exceptfds, timeout) ,writefds
+#define __NRATRF3_select64                "%p"
+#define __NRATRA3_select64(nfds, readfds, writefds, exceptfds, timeout) ,exceptfds
+#define __NRATRF4_select64                "%p"
+#define __NRATRA4_select64(nfds, readfds, writefds, exceptfds, timeout) ,timeout
+#define __NRATRF0_settimeofday64          "%p"
+#define __NRATRA0_settimeofday64(tv, tz)  ,tv
+#define __NRATRF1_settimeofday64          "%p"
+#define __NRATRA1_settimeofday64(tv, tz)  ,tz
+#define __NRATRF0_gettimeofday64          "%p"
+#define __NRATRA0_gettimeofday64(tv, tz)  ,tv
+#define __NRATRF1_gettimeofday64          "%p"
+#define __NRATRA1_gettimeofday64(tv, tz)  ,tz
+#define __NRATRF0_getrusage64             "%" PRIdSIZ
+#define __NRATRA0_getrusage64(who, tv)    ,(intptr_t)(who)
+#define __NRATRF1_getrusage64             "%p"
+#define __NRATRA1_getrusage64(who, tv)    ,tv
+#define __NRATRF0_fsmode                  "%" PRIu64
+#define __NRATRA0_fsmode(mode)            ,mode
+#define __NRATRF0_ioctlf                  "%d"
+#define __NRATRA0_ioctlf(fd, command, mode, arg) ,(int)(fd)
+#define __NRATRF1_ioctlf                  "%#" PRIxSIZ
+#define __NRATRA1_ioctlf(fd, command, mode, arg) ,(uintptr_t)(command)
+#define __NRATRF2_ioctlf                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA2_ioctlf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                 ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                 ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                 ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                 ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                 ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                 ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                 ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                 ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NRATRF3_ioctlf                  "%p"
+#define __NRATRA3_ioctlf(fd, command, mode, arg) ,arg
+#define __NRATRF0_ftime64                 "%p"
+#define __NRATRA0_ftime64(tp)             ,tp
+#define __NRATRF0_utime64                 "%q"
+#define __NRATRA0_utime64(filename, times) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF1_utime64                 "%p"
+#define __NRATRA1_utime64(filename, times) ,times
+#define __NRATRF0_stime64                 "%p"
+#define __NRATRA0_stime64(t)              ,t
+#define __NRATRF0_coredump                "%p"
+#define __NRATRA0_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,curr_state
+#define __NRATRF1_coredump                "%p"
+#define __NRATRA1_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,orig_state
+#define __NRATRF2_coredump                "%p"
+#define __NRATRA2_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_vector
+#define __NRATRF3_coredump                "%" PRIuSIZ
+#define __NRATRA3_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,traceback_length
+#define __NRATRF4_coredump                "%p"
+#define __NRATRA4_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,exception
+#define __NRATRF5_coredump                "%#" PRIxSIZ
+#define __NRATRA5_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,(uintptr_t)(unwind_error)
+#define __NRATRF0_raiseat                 "%p"
+#define __NRATRA0_raiseat(state, si)      ,state
+#define __NRATRF1_raiseat                 "%p"
+#define __NRATRA1_raiseat(state, si)      ,si
+#define __NRATRF0_mktty                   "%d"
+#define __NRATRA0_mktty(keyboard, display, name, rsvd) ,(int)(keyboard)
+#define __NRATRF1_mktty                   "%d"
+#define __NRATRA1_mktty(keyboard, display, name, rsvd) ,(int)(display)
+#define __NRATRF2_mktty                   "%q"
+#define __NRATRA2_mktty(keyboard, display, name, rsvd) ,(validate_readable_opt(name,1),name)
+#define __NRATRF3_mktty                   "%#" PRIxSIZ
+#define __NRATRA3_mktty(keyboard, display, name, rsvd) ,(uintptr_t)(rsvd)
+#define __NRATRF0_lfutexlockexpr          "%p"
+#define __NRATRA0_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,ulockaddr
+#define __NRATRF1_lfutexlockexpr          "%p"
+#define __NRATRA1_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,base
+#define __NRATRF2_lfutexlockexpr          "%" PRIuSIZ
+#define __NRATRA2_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprc
+#define __NRATRF3_lfutexlockexpr          "%p"
+#define __NRATRA3_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprv
+#define __NRATRF4_lfutexlockexpr          "%p"
+#define __NRATRA4_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,timeout
+#define __NRATRF5_lfutexlockexpr          "%#" PRIxSIZ
+#define __NRATRA5_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
+#define __NRATRF0_lfutexexpr              "%p"
+#define __NRATRA0_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,base
+#define __NRATRF1_lfutexexpr              "%" PRIuSIZ
+#define __NRATRA1_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprc
+#define __NRATRF2_lfutexexpr              "%p"
+#define __NRATRA2_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprv
+#define __NRATRF3_lfutexexpr              "%p"
+#define __NRATRA3_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,timeout
+#define __NRATRF4_lfutexexpr              "%#" PRIxSIZ
+#define __NRATRA4_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
+#define __NRATRF0_lseek64                 "%d"
+#define __NRATRA0_lseek64(fd, offset, whence) ,(int)(fd)
+#define __NRATRF1_lseek64                 "%" PRId64
+#define __NRATRA1_lseek64(fd, offset, whence) ,offset
+#define __NRATRF2_lseek64                 "%#Ix=%s"
+#define __NRATRA2_lseek64(fd, offset, whence) ,(whence),(whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
+#define __NRATRF0_lfutex                  "%p"
+#define __NRATRA0_lfutex(uaddr, futex_op, val, timeout, val2) ,uaddr
+#define __NRATRF1_lfutex                  "%#" PRIxSIZ
+#define __NRATRA1_lfutex(uaddr, futex_op, val, timeout, val2) ,(uintptr_t)(futex_op)
+#define __NRATRF2_lfutex                  "%" PRIu32
+#define __NRATRA2_lfutex(uaddr, futex_op, val, timeout, val2) ,val
+#define __NRATRF3_lfutex                  "%p"
+#define __NRATRA3_lfutex(uaddr, futex_op, val, timeout, val2) ,timeout
+#define __NRATRF4_lfutex                  "%" PRIu32
+#define __NRATRA4_lfutex(uaddr, futex_op, val, timeout, val2) ,val2
+#define __NRATRF0_debugtrap               "%p"
+#define __NRATRA0_debugtrap(state, reason) ,state
+#define __NRATRF1_debugtrap               "%p"
+#define __NRATRA1_debugtrap(state, reason) ,reason
+#define __NRATRF0_set_library_listdef     "%p"
+#define __NRATRA0_set_library_listdef(listdef) ,listdef
+#define __NRATRF0_get_exception_handler   "%p"
+#define __NRATRA0_get_exception_handler(pmode, phandler, phandler_sp) ,pmode
+#define __NRATRF1_get_exception_handler   "%p"
+#define __NRATRA1_get_exception_handler(pmode, phandler, phandler_sp) ,phandler
+#define __NRATRF2_get_exception_handler   "%p"
+#define __NRATRA2_get_exception_handler(pmode, phandler, phandler_sp) ,phandler_sp
+#define __NRATRF0_set_exception_handler   "%#" PRIxSIZ
+#define __NRATRA0_set_exception_handler(mode, handler, handler_sp) ,(uintptr_t)(mode)
+#define __NRATRF1_set_exception_handler   "%p"
+#define __NRATRA1_set_exception_handler(mode, handler, handler_sp) ,handler
+#define __NRATRF2_set_exception_handler   "%p"
+#define __NRATRA2_set_exception_handler(mode, handler, handler_sp) ,handler_sp
+#define __NRATRF0_time64                  "%p"
+#define __NRATRA0_time64(timer)           ,timer
+#define __NRATRF0_fchdirat                "%d"
+#define __NRATRA0_fchdirat(dirfd, path, flags) ,(int)(dirfd)
+#define __NRATRF1_fchdirat                "%q"
+#define __NRATRA1_fchdirat(dirfd, path, flags) ,(validate_readable_opt(path,1),path)
+#define __NRATRF2_fchdirat                "%#" PRIxSIZ "=%s"
+#define __NRATRA2_fchdirat(dirfd, path, flags) ,(uintptr_t)(flags),(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF0_openpty                 "%p"
+#define __NRATRA0_openpty(amaster, aslave, name, termp, winp) ,amaster
+#define __NRATRF1_openpty                 "%p"
+#define __NRATRA1_openpty(amaster, aslave, name, termp, winp) ,aslave
+#define __NRATRF2_openpty                 "%p"
+#define __NRATRA2_openpty(amaster, aslave, name, termp, winp) ,name
+#define __NRATRF3_openpty                 "%p"
+#define __NRATRA3_openpty(amaster, aslave, name, termp, winp) ,termp
+#define __NRATRF4_openpty                 "%p"
+#define __NRATRA4_openpty(amaster, aslave, name, termp, winp) ,winp
+#define __NRATRF0_rpc_schedule            "%" PRIdSIZ
+#define __NRATRA0_rpc_schedule(target, flags, program, arguments) ,(intptr_t)(target)
+#define __NRATRF1_rpc_schedule            "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA1_rpc_schedule(target, flags, program, arguments) ,(uintptr_t)(flags),(flags) & RPC_SCHEDULE_ASYNC ? "RPC_SCHEDULE_ASYNC" : (flags) ? "" : "RPC_SCHEDULE_SYNC" \
+                                                                  ,((flags) & RPC_SCHEDULE_FLAG_NONSYSCALL) && ((flags) & (RPC_SCHEDULE_ASYNC)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_NONSYSCALL ? "RPC_SCHEDULE_FLAG_NONSYSCALL" : "" \
+                                                                  ,((flags) & RPC_SCHEDULE_FLAG_WAITFORSTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_WAITFORSTART ? "RPC_SCHEDULE_FLAG_WAITFORSTART" : "" \
+                                                                  ,((flags) & RPC_SCHEDULE_FLAG_STATUSFUTEX) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_STATUSFUTEX ? "RPC_SCHEDULE_FLAG_STATUSFUTEX" : "" \
+                                                                  ,((flags) & RPC_SCHEDULE_FLAG_SYSRESTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_SYSRESTART ? "RPC_SCHEDULE_FLAG_SYSRESTART" : "" \
+                                                                  ,((flags) & RPC_SCHEDULE_FLAG_NOSYSRESTART) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_NOSYSRESTART ? "RPC_SCHEDULE_FLAG_NOSYSRESTART" : "" \
+                                                                  ,((flags) & RPC_SCHEDULE_FLAG_WAITSMPACK) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_WAITSMPACK ? "RPC_SCHEDULE_FLAG_WAITSMPACK" : "" \
+                                                                  ,((flags) & RPC_SCHEDULE_FLAG_DONTWAKE) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_DONTWAKE ? "RPC_SCHEDULE_FLAG_DONTWAKE" : "" \
+                                                                  ,((flags) & RPC_SCHEDULE_FLAG_HIGHPRIO) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK|RPC_SCHEDULE_FLAG_DONTWAKE)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_HIGHPRIO ? "RPC_SCHEDULE_FLAG_HIGHPRIO" : "" \
+                                                                  ,((flags) & RPC_SCHEDULE_FLAG_LOWPRIO) && ((flags) & (RPC_SCHEDULE_ASYNC|RPC_SCHEDULE_FLAG_NONSYSCALL|RPC_SCHEDULE_FLAG_WAITFORSTART|RPC_SCHEDULE_FLAG_STATUSFUTEX|RPC_SCHEDULE_FLAG_SYSRESTART|RPC_SCHEDULE_FLAG_NOSYSRESTART|RPC_SCHEDULE_FLAG_WAITSMPACK|RPC_SCHEDULE_FLAG_DONTWAKE|RPC_SCHEDULE_FLAG_HIGHPRIO)) ? "|" : "",(flags) & RPC_SCHEDULE_FLAG_LOWPRIO ? "RPC_SCHEDULE_FLAG_LOWPRIO" : ""
+#define __NRATRF2_rpc_schedule            "%p"
+#define __NRATRA2_rpc_schedule(target, flags, program, arguments) ,program
+#define __NRATRF3_rpc_schedule            "%p"
+#define __NRATRA3_rpc_schedule(target, flags, program, arguments) ,arguments
+#define __NRATRF0_frealpathat             "%d"
+#define __NRATRA0_frealpathat(dirfd, filename, buf, buflen, flags) ,(int)(dirfd)
+#define __NRATRF1_frealpathat             "%q"
+#define __NRATRA1_frealpathat(dirfd, filename, buf, buflen, flags) ,(validate_readable_opt(filename,1),filename)
+#define __NRATRF2_frealpathat             "%p"
+#define __NRATRA2_frealpathat(dirfd, filename, buf, buflen, flags) ,buf
+#define __NRATRF3_frealpathat             "%" PRIuSIZ
+#define __NRATRA3_frealpathat(dirfd, filename, buf, buflen, flags) ,buflen
+#define __NRATRF4_frealpathat             "%#" PRIxSIZ "=%s%s%s%s%s%s%s"
+#define __NRATRA4_frealpathat(dirfd, filename, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
+                                                                   ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
+                                                                   ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
+                                                                   ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF0_frealpath4              "%d"
+#define __NRATRA0_frealpath4(fd, buf, buflen, flags) ,(int)(fd)
+#define __NRATRF1_frealpath4              "%p"
+#define __NRATRA1_frealpath4(fd, buf, buflen, flags) ,buf
+#define __NRATRF2_frealpath4              "%" PRIuSIZ
+#define __NRATRA2_frealpath4(fd, buf, buflen, flags) ,buflen
+#define __NRATRF3_frealpath4              "%#" PRIxSIZ "=%s%s%s%s%s"
+#define __NRATRA3_frealpath4(fd, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
+                                                     ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
+                                                     ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF0_detach                  "%" PRIdSIZ
+#define __NRATRA0_detach(pid)             ,(intptr_t)(pid)
+#define __NRATRF0_writef                  "%d"
+#define __NRATRA0_writef(fd, buf, bufsize, mode) ,(int)(fd)
+#define __NRATRF1_writef                  "%p"
+#define __NRATRA1_writef(fd, buf, bufsize, mode) ,buf
+#define __NRATRF2_writef                  "%" PRIuSIZ
+#define __NRATRA2_writef(fd, buf, bufsize, mode) ,bufsize
+#define __NRATRF3_writef                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA3_writef(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                 ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                 ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                 ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                 ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                 ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                 ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                 ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                 ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NRATRF0_readf                   "%d"
+#define __NRATRA0_readf(fd, buf, bufsize, mode) ,(int)(fd)
+#define __NRATRF1_readf                   "%p"
+#define __NRATRA1_readf(fd, buf, bufsize, mode) ,buf
+#define __NRATRF2_readf                   "%" PRIuSIZ
+#define __NRATRA2_readf(fd, buf, bufsize, mode) ,bufsize
+#define __NRATRF3_readf                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA3_readf(fd, buf, bufsize, mode) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                                ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                                ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                                ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                                ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                                ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                                ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                                ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                                ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NRATRF0_hopf                    "%d"
+#define __NRATRA0_hopf(fd, command, mode, arg) ,(int)(fd)
+#define __NRATRF1_hopf                    "%#" PRIxSIZ
+#define __NRATRA1_hopf(fd, command, mode, arg) ,(uintptr_t)(command)
+#define __NRATRF2_hopf                    "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
+#define __NRATRA2_hopf(fd, command, mode, arg) ,(uintptr_t)(mode),(mode) & IO_WRONLY ? "IO_WRONLY" : (mode) ? "" : "IO_RDONLY" \
+                                               ,((mode) & IO_RDWR) && ((mode) & (IO_WRONLY)) ? "|" : "",(mode) & IO_RDWR ? "IO_RDWR" : "" \
+                                               ,((mode) & IO_CLOEXEC) && ((mode) & (IO_WRONLY|IO_RDWR)) ? "|" : "",(mode) & IO_CLOEXEC ? "IO_CLOEXEC" : "" \
+                                               ,((mode) & IO_CLOFORK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC)) ? "|" : "",(mode) & IO_CLOFORK ? "IO_CLOFORK" : "" \
+                                               ,((mode) & IO_APPEND) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK)) ? "|" : "",(mode) & IO_APPEND ? "IO_APPEND" : "" \
+                                               ,((mode) & IO_NONBLOCK) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND)) ? "|" : "",(mode) & IO_NONBLOCK ? "IO_NONBLOCK" : "" \
+                                               ,((mode) & IO_SYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK)) ? "|" : "",(mode) & IO_SYNC ? "IO_SYNC" : "" \
+                                               ,((mode) & IO_ASYNC) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC)) ? "|" : "",(mode) & IO_ASYNC ? "IO_ASYNC" : "" \
+                                               ,((mode) & IO_DIRECT) && ((mode) & (IO_WRONLY|IO_RDWR|IO_CLOEXEC|IO_CLOFORK|IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC)) ? "|" : "",(mode) & IO_DIRECT ? "IO_DIRECT" : ""
+#define __NRATRF3_hopf                    "%p"
+#define __NRATRA3_hopf(fd, command, mode, arg) ,arg
+#define __NRATRF0_hop                     "%d"
+#define __NRATRA0_hop(fd, command, arg)   ,(int)(fd)
+#define __NRATRF1_hop                     "%#" PRIxSIZ
+#define __NRATRA1_hop(fd, command, arg)   ,(uintptr_t)(command)
+#define __NRATRF2_hop                     "%p"
+#define __NRATRA2_hop(fd, command, arg)   ,arg
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT */
 #endif /* __WANT_SYSCALL_ARGUMENT_FORMAT */
 

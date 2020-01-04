@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf81d99bf */
+/* HASH CRC-32:0x897be277 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -407,13 +407,225 @@
 #define SYS_userfaultfd            __NR_userfaultfd            /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define SYS_membarrier             __NR_membarrier             /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define SYS_mlock2                 __NR_mlock2                 /* errno_t mlock2(int TODO_PROTOTYPE) */
-#define SYS_readf                  __NR_readf                  /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-#define SYS_writef                 __NR_writef                 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
-#define SYS_hop                    __NR_hop                    /* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
-#define SYS_hopf                   __NR_hopf                   /* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-#define SYS_kstat                  __NR_kstat                  /* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
-#define SYS_kfstat                 __NR_kfstat                 /* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
-#define SYS_klstat                 __NR_klstat                 /* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
+#define SYS_pwritevf               __NR_pwritevf               /* ssize_t pwritevf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+#define SYS_preadvf                __NR_preadvf                /* ssize_t preadvf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
+#define SYS_freadlinkat            __NR_freadlinkat            /* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+#define SYS_fsymlinkat             __NR_fsymlinkat             /* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+#define SYS_frenameat              __NR_frenameat              /* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+#define SYS_kfstatat               __NR_kfstatat               /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+#define SYS_fmknodat               __NR_fmknodat               /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+#define SYS_fmkdirat               __NR_fmkdirat               /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+#define SYS_ksysctl                __NR_ksysctl                /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
+/* Map the segments of a given library into memory
+ * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
+ * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
+ *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
+ *                       MAP_DONT_OVERRIDE'
+ * @param: fd:    A handle for the library file being mapped
+ *                (must be a file or vm_datablock/inode)
+ * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+ *                (depending on the caller running in 32- or 64-bit mode)
+ * @param: hdrc:  The number of program headers */
+#define SYS_maplibrary             __NR_maplibrary             /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
+#define SYS_fsmode                 __NR_fsmode                 /* uint64_t fsmode(uint64_t mode) */
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+#define SYS_fchdirat               __NR_fchdirat               /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
+#define SYS_kreaddirf              __NR_kreaddirf              /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+#define SYS_kreaddir               __NR_kreaddir               /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
+ * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+ *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           In this case, a traceback displayed to a human should not include the text location at
+ *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+ *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
+ *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
+#define SYS_coredump               __NR_coredump               /* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length, struct exception_data64 const *exception, syscall_ulong_t unwind_error) */
+/* Raise a signal within the calling thread alongside the given CPU state
+ * This system call is used when translating exceptions into POSIX signal in error mode #4
+ * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
+ *                be raised for the caller's source location. Note that only in the later case
+ *                will this function return to its caller. - When `state' is non-NULL, it will
+ *                return to the text location described by it.
+ * TODO: Add a flags argument to control if the current signal mask
+ *       should be ignored (currently, it's always being ignored) */
+#define SYS_raiseat                __NR_raiseat                /* errno_t raiseat(struct ucpustate64 const *state, struct __siginfo64_struct const *si) */
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The newly created device automatically gets assigned an arbitrary device number, before
+ * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+#define SYS_mktty                  __NR_mktty                  /* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+#define SYS_lfutexlockexpr         __NR_lfutexlockexpr         /* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+#define SYS_lfutexexpr             __NR_lfutexexpr             /* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
+ *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
+ *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
+ *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+#define SYS_lfutex                 __NR_lfutex                 /* syscall_slong_t lfutex(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val, struct __timespecx64 const *timeout, uint64_t val2) */
+#define SYS_rpc_service            __NR_rpc_service            /* syscall_slong_t rpc_service(void) */
+/* Trigger a debugger trap `trapno', optionally extended with `regs'
+ * at either the system call return location, or at the given `state'
+ * In the later case, this system call will by default return to the
+ * given `state', though given the purpose of this system call being
+ * to inform a connected debugger of some breakable event, allowing
+ * it to do whatever it wishes before execution is resumed.
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
+ * @param: state:    When non-NULL, the CPU state where the trap should return to by default
+ * @return: -EOK:    `state' was NULL and the trap returned successfully
+ * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
+#define SYS_debugtrap              __NR_debugtrap              /* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
+/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
+#define SYS_set_library_listdef    __NR_set_library_listdef    /* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
+#define SYS_writevf                __NR_writevf                /* ssize_t writevf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
+#define SYS_readvf                 __NR_readvf                 /* ssize_t readvf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
+#define SYS_pwrite64f              __NR_pwrite64f              /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+#define SYS_pread64f               __NR_pread64f               /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+#define SYS_ioctlf                 __NR_ioctlf                 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
+ *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
+ * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given MODE is invalid */
+#define SYS_set_exception_handler  __NR_set_exception_handler  /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+/* Get the current exception handler mode for the calling thread.
+ * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: PHANDLER:    The address of the user-space exception handler.
+ *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+ *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
+#define SYS_get_exception_handler  __NR_get_exception_handler  /* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
+/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
+#define SYS_openpty                __NR_openpty                /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
+/* Schedule an RPC for execution on the specified `target' thread.
+ * @param: target:    The targeted thread.
+ * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
+ * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
+ * @param: arguments: Arguments for the RPC loader program.
+ * @return: 1:  The specified `target' thread has already terminated.
+ * @return: 0:  Success.
+ * @return: -1: Error (s.a. `errno')
+ * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
+ * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
+#define SYS_rpc_schedule           __NR_rpc_schedule           /* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
+/* Returns the absolute filesystem path for the specified file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+ * causing the pointed-to file location to be retrieved. - Otherwise, the
+ * location of the link is printed instead.
+ * You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
+#define SYS_frealpathat            __NR_frealpathat            /* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the required buffer size, rather than the used size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+#define SYS_frealpath4             __NR_frealpath4             /* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+/* Returns a bitset of all of the currently mounted dos-drives */
+#define SYS_getdrives              __NR_getdrives              /* syscall_slong_t getdrives(void) */
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -503,224 +715,12 @@
  *                              and exited, or that the `PID' is just invalid (which
  *                              would also be the case if it was valid at some point) */
 #define SYS_detach                 __NR_detach                 /* errno_t detach(pid_t pid) */
-/* Returns a bitset of all of the currently mounted dos-drives */
-#define SYS_getdrives              __NR_getdrives              /* syscall_slong_t getdrives(void) */
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-#define SYS_frealpath4             __NR_frealpath4             /* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
-/* Returns the absolute filesystem path for the specified file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
- * causing the pointed-to file location to be retrieved. - Otherwise, the
- * location of the link is printed instead.
- * You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the required buffer size, rather than the used size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
-#define SYS_frealpathat            __NR_frealpathat            /* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
-/* Schedule an RPC for execution on the specified `target' thread.
- * @param: target:    The targeted thread.
- * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
- * @param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
- * @param: arguments: Arguments for the RPC loader program.
- * @return: 1:  The specified `target' thread has already terminated.
- * @return: 0:  Success.
- * @return: -1: Error (s.a. `errno')
- * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
- * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-#define SYS_rpc_schedule           __NR_rpc_schedule           /* syscall_slong_t rpc_schedule(pid_t target, syscall_ulong_t flags, uint8_t const *program, __HYBRID_PTR64(void) *arguments) */
-#define SYS_ksysctl                __NR_ksysctl                /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
-/* Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers. */
-#define SYS_openpty                __NR_openpty                /* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
- *   Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
- * @param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given MODE is invalid */
-#define SYS_set_exception_handler  __NR_set_exception_handler  /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-/* Get the current exception handler mode for the calling thread.
- * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: PHANDLER:    The address of the user-space exception handler.
- *                      Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: PHANDLER_SP: The starting address of the user-space exception handler stack.
- *                      Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-NULL and faulty */
-#define SYS_get_exception_handler  __NR_get_exception_handler  /* errno_t get_exception_handler(__ULONG64_TYPE__ *pmode, __except_handler64_t *phandler, __HYBRID_PTR64(void) *phandler_sp) */
-#define SYS_ioctlf                 __NR_ioctlf                 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
-#define SYS_pread64f               __NR_pread64f               /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-#define SYS_pwrite64f              __NR_pwrite64f              /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-#define SYS_readvf                 __NR_readvf                 /* ssize_t readvf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
-#define SYS_writevf                __NR_writevf                /* ssize_t writevf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
-/* Set per-vm meta-data for allowing the kernel to enumerate loaded code modules */
-#define SYS_set_library_listdef    __NR_set_library_listdef    /* errno_t set_library_listdef(struct library_listdef64 const *listdef) */
-/* Trigger a debugger trap `trapno', optionally extended with `regs'
- * at either the system call return location, or at the given `state'
- * In the later case, this system call will by default return to the
- * given `state', though given the purpose of this system call being
- * to inform a connected debugger of some breakable event, allowing
- * it to do whatever it wishes before execution is resumed.
- * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
- * @param: state:    When non-NULL, the CPU state where the trap should return to by default
- * @return: -EOK:    `state' was NULL and the trap returned successfully
- * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-#define SYS_debugtrap              __NR_debugtrap              /* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
-#define SYS_rpc_service            __NR_rpc_service            /* syscall_slong_t rpc_service(void) */
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKE, size_t val = count)
- *    - LFUTEX_WAKEMASK:           (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAKEMASK, size_t val = count, struct timespec64 const *timeout = mask_and, uintptr_t val2 = mask_or)
- *    - LFUTEX_NOP:                (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_NOP)
- *    - LFUTEX_WAIT:               (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT, uintptr_t val = ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_LOCK, uintptr_t val = lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_ABOVE, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BELOW, uintptr_t val = value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_BITMASK, uintptr_t val = bitmask, struct timespec const *timeout, uintptr_t val2 = setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_WHILE_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (uintptr_t *uaddr, syscall_ulong_t futex_op = LFUTEX_WAIT_UNTIL_CMPXCH, uintptr_t val = oldval, struct timespec const *timeout, uintptr_t val2 = newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-#define SYS_lfutex                 __NR_lfutex                 /* syscall_slong_t lfutex(uint64_t *uaddr, syscall_ulong_t futex_op, uint64_t val, struct __timespecx64 const *timeout, uint64_t val2) */
-/* >> lfutexexpr(2)
- * The lfutexexpr() system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread, as well as
- * have the calling thread wait for any number of futex objects associated with
- * any address that is checked as part of the expression. (s.a. `lfutex()')
- * Notes:
- *   - This is the only futex function that can be used to wait on multiple futex
- *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
- *   - For more precise control over waiting on futex objects, as well as waiting on
- *     futexes in conjunction with waiting on other things such as files, see the
- *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define SYS_lfutexexpr             __NR_lfutexexpr             /* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
-/* >> lfutexlockexpr(2)
- * A function that is similar to `lfutexexpr()', but allows for the use of one central
- * locking futex that is used for waiting and may be distinct from any other given futex
- * object pointer.
- * Notes:
- *   - This function only has the calling thread wait on a single futex `ulockaddr',
- *     rather than having it wait on an arbitrary number of futexes, as would be the case when
- *     the `lfutexexpr()' function is used.
- *   - For more precise control over waiting on futex objects, as well as waiting on futexes
- *     in conjunction with waiting on other things such as files, see the documentation on
- *     this topic (lfutex() and select()) at the top of <kos/futex.h>
- * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
- * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
- * @param: exprv:         Vector of expressions for which to check
- * @param: exprc:         Number of expressions given in `exprv'
- * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
- * @return: * : The first non-zero return value from executing all of the given `exprv'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
- *              to see their possible return values, which are always `0' when they would
- *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define SYS_lfutexlockexpr         __NR_lfutexlockexpr         /* errno_t lfutexlockexpr(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) */
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The newly created device automatically gets assigned an arbitrary device number, before
- * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-#define SYS_mktty                  __NR_mktty                  /* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
-/* Raise a signal within the calling thread alongside the given CPU state
- * This system call is used when translating exceptions into POSIX signal in error mode #4
- * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
- *                be raised for the caller's source location. Note that only in the later case
- *                will this function return to its caller. - When `state' is non-NULL, it will
- *                return to the text location described by it.
- * TODO: Add a flags argument to control if the current signal mask
- *       should be ignored (currently, it's always being ignored) */
-#define SYS_raiseat                __NR_raiseat                /* errno_t raiseat(struct ucpustate64 const *state, struct __siginfo64_struct const *si) */
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-#define SYS_coredump               __NR_coredump               /* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length, struct exception_data64 const *exception, syscall_ulong_t unwind_error) */
-#define SYS_kreaddir               __NR_kreaddir               /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-#define SYS_fchdirat               __NR_fchdirat               /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-#define SYS_fsmode                 __NR_fsmode                 /* uint64_t fsmode(uint64_t mode) */
-/* Map the segments of a given library into memory
- * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
- *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
- *                       MAP_DONT_OVERRIDE'
- * @param: fd:    A handle for the library file being mapped
- *                (must be a file or vm_datablock/inode)
- * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *                (depending on the caller running in 32- or 64-bit mode)
- * @param: hdrc:  The number of program headers */
-#define SYS_maplibrary             __NR_maplibrary             /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf64_phdr *hdrv, size_t hdrc) */
-#define SYS_kreaddirf              __NR_kreaddirf              /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-#define SYS_fmkdirat               __NR_fmkdirat               /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-#define SYS_fmknodat               __NR_fmknodat               /* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define SYS_kfstatat               __NR_kfstatat               /* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_statx64 *statbuf, atflag_t flags) */
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-#define SYS_frenameat              __NR_frenameat              /* errno_t frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, atflag_t flags) */
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-#define SYS_fsymlinkat             __NR_fsymlinkat             /* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
-/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
-#define SYS_freadlinkat            __NR_freadlinkat            /* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
-#define SYS_preadvf                __NR_preadvf                /* ssize_t preadvf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-#define SYS_pwritevf               __NR_pwritevf               /* ssize_t pwritevf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+#define SYS_readf                  __NR_readf                  /* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
+#define SYS_klstat                 __NR_klstat                 /* errno_t klstat(char const *filename, struct __kos_statx64 *statbuf) */
+#define SYS_kfstat                 __NR_kfstat                 /* errno_t kfstat(fd_t fd, struct __kos_statx64 *statbuf) */
+#define SYS_kstat                  __NR_kstat                  /* errno_t kstat(char const *filename, struct __kos_statx64 *statbuf) */
+#define SYS_hopf                   __NR_hopf                   /* syscall_slong_t hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
+#define SYS_hop                    __NR_hop                    /* syscall_slong_t hop(fd_t fd, syscall_ulong_t command, void *arg) */
+#define SYS_writef                 __NR_writef                 /* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
 
 #endif /* !_I386_KOS_BITS_SYSCALLS64_H */

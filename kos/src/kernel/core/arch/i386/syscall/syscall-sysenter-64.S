@@ -86,7 +86,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter)
 	cmpl   $(__NR32_syscall0_max), %eax
 	ja     1f
 	EXTERN(x86_sysroute0_asm32_sysenter)
-	jmpq   *x86_sysroute0_asm32_sysenter(,%rax,4)
+	jmpq   *(x86_sysroute0_asm32_sysenter - ((__NR32_syscall0_min * 8) & 0xffffffffffffffff))(,%rax,4)
 1:	cmpl   $(__NR32_syscall1_min), %eax
 	EXTERN(__x86_asm32_sysenter_break)
 	jb     __x86_asm32_sysenter_break

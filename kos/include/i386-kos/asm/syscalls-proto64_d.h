@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26cb2453 */
+/* HASH CRC-32:0x4c358920 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -363,49 +363,49 @@
 #define __NR64AC_userfaultfd            1
 #define __NR64AC_membarrier             1
 #define __NR64AC_mlock2                 1
-#define __NR64AC_readf                  4
-#define __NR64AC_writef                 4
-#define __NR64AC_hop                    3
-#define __NR64AC_hopf                   4
-#define __NR64AC_kstat                  2
-#define __NR64AC_kfstat                 2
-#define __NR64AC_klstat                 2
-#define __NR64AC_detach                 1
-#define __NR64AC_getdrives              0
-#define __NR64AC_frealpath4             4
-#define __NR64AC_frealpathat            5
-#define __NR64AC_rpc_schedule           4
+#define __NR64AC_pwritevf               5
+#define __NR64AC_preadvf                5
+#define __NR64AC_freadlinkat            5
+#define __NR64AC_fsymlinkat             4
+#define __NR64AC_frenameat              5
+#define __NR64AC_kfstatat               4
+#define __NR64AC_fmknodat               5
+#define __NR64AC_fmkdirat               4
 #define __NR64AC_ksysctl                2
-#define __NR64AC_openpty                5
+#define __NR64AC_maplibrary             5
+#define __NR64AC_fsmode                 1
+#define __NR64AC_fchdirat               3
+#define __NR64AC_kreaddirf              5
+#define __NR64AC_kreaddir               4
+#define __NR64AC_coredump               6
+#define __NR64AC_raiseat                2
+#define __NR64AC_mktty                  4
+#define __NR64AC_lfutexlockexpr         6
+#define __NR64AC_lfutexexpr             5
+#define __NR64AC_lfutex                 5
+#define __NR64AC_rpc_service            0
+#define __NR64AC_debugtrap              2
+#define __NR64AC_set_library_listdef    1
+#define __NR64AC_writevf                4
+#define __NR64AC_readvf                 4
+#define __NR64AC_pwrite64f              5
+#define __NR64AC_pread64f               5
+#define __NR64AC_ioctlf                 4
 #define __NR64AC_set_exception_handler  3
 #define __NR64AC_get_exception_handler  3
-#define __NR64AC_ioctlf                 4
-#define __NR64AC_pread64f               5
-#define __NR64AC_pwrite64f              5
-#define __NR64AC_readvf                 4
-#define __NR64AC_writevf                4
-#define __NR64AC_set_library_listdef    1
-#define __NR64AC_debugtrap              2
-#define __NR64AC_rpc_service            0
-#define __NR64AC_lfutex                 5
-#define __NR64AC_lfutexexpr             5
-#define __NR64AC_lfutexlockexpr         6
-#define __NR64AC_mktty                  4
-#define __NR64AC_raiseat                2
-#define __NR64AC_coredump               6
-#define __NR64AC_kreaddir               4
-#define __NR64AC_fchdirat               3
-#define __NR64AC_fsmode                 1
-#define __NR64AC_maplibrary             5
-#define __NR64AC_kreaddirf              5
-#define __NR64AC_fmkdirat               4
-#define __NR64AC_fmknodat               5
-#define __NR64AC_kfstatat               4
-#define __NR64AC_frenameat              5
-#define __NR64AC_fsymlinkat             4
-#define __NR64AC_freadlinkat            5
-#define __NR64AC_preadvf                5
-#define __NR64AC_pwritevf               5
+#define __NR64AC_openpty                5
+#define __NR64AC_rpc_schedule           4
+#define __NR64AC_frealpathat            5
+#define __NR64AC_frealpath4             4
+#define __NR64AC_getdrives              0
+#define __NR64AC_detach                 1
+#define __NR64AC_readf                  4
+#define __NR64AC_klstat                 2
+#define __NR64AC_kfstat                 2
+#define __NR64AC_kstat                  2
+#define __NR64AC_hopf                   4
+#define __NR64AC_hop                    3
+#define __NR64AC_writef                 4
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT */
 #endif /* __WANT_SYSCALL_ARGUMENT_COUNT */
 
@@ -742,49 +742,49 @@
 #define __NR64RT_userfaultfd            (errno_t, __errno_t)
 #define __NR64RT_membarrier             (errno_t, __errno_t)
 #define __NR64RT_mlock2                 (errno_t, __errno_t)
-#define __NR64RT_readf                  (ssize_t, __ssize_t)
-#define __NR64RT_writef                 (ssize_t, __ssize_t)
-#define __NR64RT_hop                    (syscall_slong_t, __syscall_slong_t)
-#define __NR64RT_hopf                   (syscall_slong_t, __syscall_slong_t)
-#define __NR64RT_kstat                  (errno_t, __errno_t)
-#define __NR64RT_kfstat                 (errno_t, __errno_t)
-#define __NR64RT_klstat                 (errno_t, __errno_t)
-#define __NR64RT_detach                 (errno_t, __errno_t)
-#define __NR64RT_getdrives              (syscall_slong_t, __syscall_slong_t)
-#define __NR64RT_frealpath4             (ssize_t, __ssize_t)
-#define __NR64RT_frealpathat            (ssize_t, __ssize_t)
-#define __NR64RT_rpc_schedule           (syscall_slong_t, __syscall_slong_t)
+#define __NR64RT_pwritevf               (ssize_t, __ssize_t)
+#define __NR64RT_preadvf                (ssize_t, __ssize_t)
+#define __NR64RT_freadlinkat            (ssize_t, __ssize_t)
+#define __NR64RT_fsymlinkat             (errno_t, __errno_t)
+#define __NR64RT_frenameat              (errno_t, __errno_t)
+#define __NR64RT_kfstatat               (errno_t, __errno_t)
+#define __NR64RT_fmknodat               (errno_t, __errno_t)
+#define __NR64RT_fmkdirat               (errno_t, __errno_t)
 #define __NR64RT_ksysctl                (syscall_slong_t, __syscall_slong_t)
-#define __NR64RT_openpty                (errno_t, __errno_t)
+#define __NR64RT_maplibrary             (void *, void *)
+#define __NR64RT_fsmode                 (uint64_t, __uint64_t)
+#define __NR64RT_fchdirat               (errno_t, __errno_t)
+#define __NR64RT_kreaddirf              (ssize_t, __ssize_t)
+#define __NR64RT_kreaddir               (ssize_t, __ssize_t)
+#define __NR64RT_coredump               (errno_t, __errno_t)
+#define __NR64RT_raiseat                (errno_t, __errno_t)
+#define __NR64RT_mktty                  (fd_t, __fd_t)
+#define __NR64RT_lfutexlockexpr         (errno_t, __errno_t)
+#define __NR64RT_lfutexexpr             (errno_t, __errno_t)
+#define __NR64RT_lfutex                 (syscall_slong_t, __syscall_slong_t)
+#define __NR64RT_rpc_service            (syscall_slong_t, __syscall_slong_t)
+#define __NR64RT_debugtrap              (errno_t, __errno_t)
+#define __NR64RT_set_library_listdef    (errno_t, __errno_t)
+#define __NR64RT_writevf                (ssize_t, __ssize_t)
+#define __NR64RT_readvf                 (ssize_t, __ssize_t)
+#define __NR64RT_pwrite64f              (ssize_t, __ssize_t)
+#define __NR64RT_pread64f               (ssize_t, __ssize_t)
+#define __NR64RT_ioctlf                 (syscall_slong_t, __syscall_slong_t)
 #define __NR64RT_set_exception_handler  (errno_t, __errno_t)
 #define __NR64RT_get_exception_handler  (errno_t, __errno_t)
-#define __NR64RT_ioctlf                 (syscall_slong_t, __syscall_slong_t)
-#define __NR64RT_pread64f               (ssize_t, __ssize_t)
-#define __NR64RT_pwrite64f              (ssize_t, __ssize_t)
-#define __NR64RT_readvf                 (ssize_t, __ssize_t)
-#define __NR64RT_writevf                (ssize_t, __ssize_t)
-#define __NR64RT_set_library_listdef    (errno_t, __errno_t)
-#define __NR64RT_debugtrap              (errno_t, __errno_t)
-#define __NR64RT_rpc_service            (syscall_slong_t, __syscall_slong_t)
-#define __NR64RT_lfutex                 (syscall_slong_t, __syscall_slong_t)
-#define __NR64RT_lfutexexpr             (errno_t, __errno_t)
-#define __NR64RT_lfutexlockexpr         (errno_t, __errno_t)
-#define __NR64RT_mktty                  (fd_t, __fd_t)
-#define __NR64RT_raiseat                (errno_t, __errno_t)
-#define __NR64RT_coredump               (errno_t, __errno_t)
-#define __NR64RT_kreaddir               (ssize_t, __ssize_t)
-#define __NR64RT_fchdirat               (errno_t, __errno_t)
-#define __NR64RT_fsmode                 (uint64_t, __uint64_t)
-#define __NR64RT_maplibrary             (void *, void *)
-#define __NR64RT_kreaddirf              (ssize_t, __ssize_t)
-#define __NR64RT_fmkdirat               (errno_t, __errno_t)
-#define __NR64RT_fmknodat               (errno_t, __errno_t)
-#define __NR64RT_kfstatat               (errno_t, __errno_t)
-#define __NR64RT_frenameat              (errno_t, __errno_t)
-#define __NR64RT_fsymlinkat             (errno_t, __errno_t)
-#define __NR64RT_freadlinkat            (ssize_t, __ssize_t)
-#define __NR64RT_preadvf                (ssize_t, __ssize_t)
-#define __NR64RT_pwritevf               (ssize_t, __ssize_t)
+#define __NR64RT_openpty                (errno_t, __errno_t)
+#define __NR64RT_rpc_schedule           (syscall_slong_t, __syscall_slong_t)
+#define __NR64RT_frealpathat            (ssize_t, __ssize_t)
+#define __NR64RT_frealpath4             (ssize_t, __ssize_t)
+#define __NR64RT_getdrives              (syscall_slong_t, __syscall_slong_t)
+#define __NR64RT_detach                 (errno_t, __errno_t)
+#define __NR64RT_readf                  (ssize_t, __ssize_t)
+#define __NR64RT_klstat                 (errno_t, __errno_t)
+#define __NR64RT_kfstat                 (errno_t, __errno_t)
+#define __NR64RT_kstat                  (errno_t, __errno_t)
+#define __NR64RT_hopf                   (syscall_slong_t, __syscall_slong_t)
+#define __NR64RT_hop                    (syscall_slong_t, __syscall_slong_t)
+#define __NR64RT_writef                 (ssize_t, __ssize_t)
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_RETURN_TYPES */
 #endif /* __WANT_SYSCALL_RETURN_TYPES */
 
@@ -1526,162 +1526,162 @@
 #define __NR64AT0_userfaultfd            (int, int)
 #define __NR64AT0_membarrier             (int, int)
 #define __NR64AT0_mlock2                 (int, int)
-#define __NR64AT0_readf                  (fd_t, __fd_t)
-#define __NR64AT1_readf                  (void *, void *)
-#define __NR64AT2_readf                  (size_t, __size_t)
-#define __NR64AT3_readf                  (iomode_t, __iomode_t)
-#define __NR64AT0_writef                 (fd_t, __fd_t)
-#define __NR64AT1_writef                 (void const *, void const *)
-#define __NR64AT2_writef                 (size_t, __size_t)
-#define __NR64AT3_writef                 (iomode_t, __iomode_t)
-#define __NR64AT0_hop                    (fd_t, __fd_t)
-#define __NR64AT1_hop                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT2_hop                    (void *, void *)
-#define __NR64AT0_hopf                   (fd_t, __fd_t)
-#define __NR64AT1_hopf                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT2_hopf                   (iomode_t, __iomode_t)
-#define __NR64AT3_hopf                   (void *, void *)
-#define __NR64AT0_kstat                  (char const *, char const *)
-#define __NR64AT1_kstat                  (struct __kos_statx64 *, struct __kos_statx64 *)
-#define __NR64AT0_kfstat                 (fd_t, __fd_t)
-#define __NR64AT1_kfstat                 (struct __kos_statx64 *, struct __kos_statx64 *)
-#define __NR64AT0_klstat                 (char const *, char const *)
-#define __NR64AT1_klstat                 (struct __kos_statx64 *, struct __kos_statx64 *)
-#define __NR64AT0_detach                 (pid_t, __pid_t)
-#define __NR64AT0_frealpath4             (fd_t, __fd_t)
-#define __NR64AT1_frealpath4             (char *, char *)
-#define __NR64AT2_frealpath4             (size_t, __size_t)
-#define __NR64AT3_frealpath4             (atflag_t, __atflag_t)
-#define __NR64AT0_frealpathat            (fd_t, __fd_t)
-#define __NR64AT1_frealpathat            (char const *, char const *)
-#define __NR64AT2_frealpathat            (char *, char *)
-#define __NR64AT3_frealpathat            (size_t, __size_t)
-#define __NR64AT4_frealpathat            (atflag_t, __atflag_t)
-#define __NR64AT0_rpc_schedule           (pid_t, __pid_t)
-#define __NR64AT1_rpc_schedule           (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT2_rpc_schedule           (uint8_t const *, __uint8_t const *)
-#define __NR64AT3_rpc_schedule           (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
+#define __NR64AT0_pwritevf               (fd_t, __fd_t)
+#define __NR64AT1_pwritevf               (struct iovec64 const *, struct iovec64 const *)
+#define __NR64AT2_pwritevf               (size_t, __size_t)
+#define __NR64AT3_pwritevf               (uint64_t, __uint64_t)
+#define __NR64AT4_pwritevf               (iomode_t, __iomode_t)
+#define __NR64AT0_preadvf                (fd_t, __fd_t)
+#define __NR64AT1_preadvf                (struct iovec64 const *, struct iovec64 const *)
+#define __NR64AT2_preadvf                (size_t, __size_t)
+#define __NR64AT3_preadvf                (uint64_t, __uint64_t)
+#define __NR64AT4_preadvf                (iomode_t, __iomode_t)
+#define __NR64AT0_freadlinkat            (fd_t, __fd_t)
+#define __NR64AT1_freadlinkat            (char const *, char const *)
+#define __NR64AT2_freadlinkat            (char *, char *)
+#define __NR64AT3_freadlinkat            (size_t, __size_t)
+#define __NR64AT4_freadlinkat            (atflag_t, __atflag_t)
+#define __NR64AT0_fsymlinkat             (char const *, char const *)
+#define __NR64AT1_fsymlinkat             (fd_t, __fd_t)
+#define __NR64AT2_fsymlinkat             (char const *, char const *)
+#define __NR64AT3_fsymlinkat             (atflag_t, __atflag_t)
+#define __NR64AT0_frenameat              (fd_t, __fd_t)
+#define __NR64AT1_frenameat              (char const *, char const *)
+#define __NR64AT2_frenameat              (fd_t, __fd_t)
+#define __NR64AT3_frenameat              (char const *, char const *)
+#define __NR64AT4_frenameat              (atflag_t, __atflag_t)
+#define __NR64AT0_kfstatat               (fd_t, __fd_t)
+#define __NR64AT1_kfstatat               (char const *, char const *)
+#define __NR64AT2_kfstatat               (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NR64AT3_kfstatat               (atflag_t, __atflag_t)
+#define __NR64AT0_fmknodat               (fd_t, __fd_t)
+#define __NR64AT1_fmknodat               (char const *, char const *)
+#define __NR64AT2_fmknodat               (mode_t, __mode_t)
+#define __NR64AT3_fmknodat               (dev_t, __dev_t)
+#define __NR64AT4_fmknodat               (atflag_t, __atflag_t)
+#define __NR64AT0_fmkdirat               (fd_t, __fd_t)
+#define __NR64AT1_fmkdirat               (char const *, char const *)
+#define __NR64AT2_fmkdirat               (mode_t, __mode_t)
+#define __NR64AT3_fmkdirat               (atflag_t, __atflag_t)
 #define __NR64AT0_ksysctl                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_ksysctl                (void *, void *)
-#define __NR64AT0_openpty                (fd_t *, __fd_t *)
-#define __NR64AT1_openpty                (fd_t *, __fd_t *)
-#define __NR64AT2_openpty                (char *, char *)
-#define __NR64AT3_openpty                (struct termios const *, struct termios const *)
-#define __NR64AT4_openpty                (struct winsize const *, struct winsize const *)
-#define __NR64AT0_set_exception_handler  (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT1_set_exception_handler  (except_handler_t, __except_handler_t)
-#define __NR64AT2_set_exception_handler  (void *, void *)
-#define __NR64AT0_get_exception_handler  (__ULONG64_TYPE__ *, __ULONG64_TYPE__ *)
-#define __NR64AT1_get_exception_handler  (__except_handler64_t *, __except_handler64_t *)
-#define __NR64AT2_get_exception_handler  (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
-#define __NR64AT0_ioctlf                 (fd_t, __fd_t)
-#define __NR64AT1_ioctlf                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT2_ioctlf                 (iomode_t, __iomode_t)
-#define __NR64AT3_ioctlf                 (void *, void *)
-#define __NR64AT0_pread64f               (fd_t, __fd_t)
-#define __NR64AT1_pread64f               (void *, void *)
-#define __NR64AT2_pread64f               (size_t, __size_t)
-#define __NR64AT3_pread64f               (uint64_t, __uint64_t)
-#define __NR64AT4_pread64f               (iomode_t, __iomode_t)
-#define __NR64AT0_pwrite64f              (fd_t, __fd_t)
-#define __NR64AT1_pwrite64f              (void const *, void const *)
-#define __NR64AT2_pwrite64f              (size_t, __size_t)
-#define __NR64AT3_pwrite64f              (uint64_t, __uint64_t)
-#define __NR64AT4_pwrite64f              (iomode_t, __iomode_t)
-#define __NR64AT0_readvf                 (fd_t, __fd_t)
-#define __NR64AT1_readvf                 (struct iovec64 const *, struct iovec64 const *)
-#define __NR64AT2_readvf                 (size_t, __size_t)
-#define __NR64AT3_readvf                 (iomode_t, __iomode_t)
-#define __NR64AT0_writevf                (fd_t, __fd_t)
-#define __NR64AT1_writevf                (struct iovec64 const *, struct iovec64 const *)
-#define __NR64AT2_writevf                (size_t, __size_t)
-#define __NR64AT3_writevf                (iomode_t, __iomode_t)
-#define __NR64AT0_set_library_listdef    (struct library_listdef64 const *, struct library_listdef64 const *)
-#define __NR64AT0_debugtrap              (struct ucpustate64 const *, struct ucpustate64 const *)
-#define __NR64AT1_debugtrap              (struct debugtrap_reason64 const *, struct debugtrap_reason64 const *)
-#define __NR64AT0_lfutex                 (uint64_t *, __uint64_t *)
-#define __NR64AT1_lfutex                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT2_lfutex                 (uint64_t, __uint64_t)
-#define __NR64AT3_lfutex                 (struct __timespecx64 const *, struct __timespecx64 const *)
-#define __NR64AT4_lfutex                 (uint64_t, __uint64_t)
-#define __NR64AT0_lfutexexpr             (void *, void *)
-#define __NR64AT1_lfutexexpr             (size_t, __size_t)
-#define __NR64AT2_lfutexexpr             (struct lfutexexpr64 const *, struct lfutexexpr64 const *)
-#define __NR64AT3_lfutexexpr             (struct __timespecx64 const *, struct __timespecx64 const *)
-#define __NR64AT4_lfutexexpr             (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT0_lfutexlockexpr         (uint64_t *, __uint64_t *)
-#define __NR64AT1_lfutexlockexpr         (void *, void *)
-#define __NR64AT2_lfutexlockexpr         (size_t, __size_t)
-#define __NR64AT3_lfutexlockexpr         (struct lfutexexpr64 const *, struct lfutexexpr64 const *)
-#define __NR64AT4_lfutexlockexpr         (struct __timespecx64 const *, struct __timespecx64 const *)
-#define __NR64AT5_lfutexlockexpr         (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT0_mktty                  (fd_t, __fd_t)
-#define __NR64AT1_mktty                  (fd_t, __fd_t)
-#define __NR64AT2_mktty                  (char const *, char const *)
-#define __NR64AT3_mktty                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT0_raiseat                (struct ucpustate64 const *, struct ucpustate64 const *)
-#define __NR64AT1_raiseat                (struct __siginfo64_struct const *, struct __siginfo64_struct const *)
+#define __NR64AT0_maplibrary             (void *, void *)
+#define __NR64AT1_maplibrary             (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_maplibrary             (fd_t, __fd_t)
+#define __NR64AT3_maplibrary             (struct elf64_phdr *, struct elf64_phdr *)
+#define __NR64AT4_maplibrary             (size_t, __size_t)
+#define __NR64AT0_fsmode                 (uint64_t, __uint64_t)
+#define __NR64AT0_fchdirat               (fd_t, __fd_t)
+#define __NR64AT1_fchdirat               (char const *, char const *)
+#define __NR64AT2_fchdirat               (atflag_t, __atflag_t)
+#define __NR64AT0_kreaddirf              (fd_t, __fd_t)
+#define __NR64AT1_kreaddirf              (struct dirent *, struct dirent *)
+#define __NR64AT2_kreaddirf              (size_t, __size_t)
+#define __NR64AT3_kreaddirf              (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT4_kreaddirf              (iomode_t, __iomode_t)
+#define __NR64AT0_kreaddir               (fd_t, __fd_t)
+#define __NR64AT1_kreaddir               (struct dirent *, struct dirent *)
+#define __NR64AT2_kreaddir               (size_t, __size_t)
+#define __NR64AT3_kreaddir               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NR64AT1_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NR64AT2_coredump               (__HYBRID_PTR64(void) const *, __HYBRID_PTR64(void) const *)
 #define __NR64AT3_coredump               (size_t, __size_t)
 #define __NR64AT4_coredump               (struct exception_data64 const *, struct exception_data64 const *)
 #define __NR64AT5_coredump               (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT0_kreaddir               (fd_t, __fd_t)
-#define __NR64AT1_kreaddir               (struct dirent *, struct dirent *)
-#define __NR64AT2_kreaddir               (size_t, __size_t)
-#define __NR64AT3_kreaddir               (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT0_fchdirat               (fd_t, __fd_t)
-#define __NR64AT1_fchdirat               (char const *, char const *)
-#define __NR64AT2_fchdirat               (atflag_t, __atflag_t)
-#define __NR64AT0_fsmode                 (uint64_t, __uint64_t)
-#define __NR64AT0_maplibrary             (void *, void *)
-#define __NR64AT1_maplibrary             (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT2_maplibrary             (fd_t, __fd_t)
-#define __NR64AT3_maplibrary             (struct elf64_phdr *, struct elf64_phdr *)
-#define __NR64AT4_maplibrary             (size_t, __size_t)
-#define __NR64AT0_kreaddirf              (fd_t, __fd_t)
-#define __NR64AT1_kreaddirf              (struct dirent *, struct dirent *)
-#define __NR64AT2_kreaddirf              (size_t, __size_t)
-#define __NR64AT3_kreaddirf              (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT4_kreaddirf              (iomode_t, __iomode_t)
-#define __NR64AT0_fmkdirat               (fd_t, __fd_t)
-#define __NR64AT1_fmkdirat               (char const *, char const *)
-#define __NR64AT2_fmkdirat               (mode_t, __mode_t)
-#define __NR64AT3_fmkdirat               (atflag_t, __atflag_t)
-#define __NR64AT0_fmknodat               (fd_t, __fd_t)
-#define __NR64AT1_fmknodat               (char const *, char const *)
-#define __NR64AT2_fmknodat               (mode_t, __mode_t)
-#define __NR64AT3_fmknodat               (dev_t, __dev_t)
-#define __NR64AT4_fmknodat               (atflag_t, __atflag_t)
-#define __NR64AT0_kfstatat               (fd_t, __fd_t)
-#define __NR64AT1_kfstatat               (char const *, char const *)
-#define __NR64AT2_kfstatat               (struct __kos_statx64 *, struct __kos_statx64 *)
-#define __NR64AT3_kfstatat               (atflag_t, __atflag_t)
-#define __NR64AT0_frenameat              (fd_t, __fd_t)
-#define __NR64AT1_frenameat              (char const *, char const *)
-#define __NR64AT2_frenameat              (fd_t, __fd_t)
-#define __NR64AT3_frenameat              (char const *, char const *)
-#define __NR64AT4_frenameat              (atflag_t, __atflag_t)
-#define __NR64AT0_fsymlinkat             (char const *, char const *)
-#define __NR64AT1_fsymlinkat             (fd_t, __fd_t)
-#define __NR64AT2_fsymlinkat             (char const *, char const *)
-#define __NR64AT3_fsymlinkat             (atflag_t, __atflag_t)
-#define __NR64AT0_freadlinkat            (fd_t, __fd_t)
-#define __NR64AT1_freadlinkat            (char const *, char const *)
-#define __NR64AT2_freadlinkat            (char *, char *)
-#define __NR64AT3_freadlinkat            (size_t, __size_t)
-#define __NR64AT4_freadlinkat            (atflag_t, __atflag_t)
-#define __NR64AT0_preadvf                (fd_t, __fd_t)
-#define __NR64AT1_preadvf                (struct iovec64 const *, struct iovec64 const *)
-#define __NR64AT2_preadvf                (size_t, __size_t)
-#define __NR64AT3_preadvf                (uint64_t, __uint64_t)
-#define __NR64AT4_preadvf                (iomode_t, __iomode_t)
-#define __NR64AT0_pwritevf               (fd_t, __fd_t)
-#define __NR64AT1_pwritevf               (struct iovec64 const *, struct iovec64 const *)
-#define __NR64AT2_pwritevf               (size_t, __size_t)
-#define __NR64AT3_pwritevf               (uint64_t, __uint64_t)
-#define __NR64AT4_pwritevf               (iomode_t, __iomode_t)
+#define __NR64AT0_raiseat                (struct ucpustate64 const *, struct ucpustate64 const *)
+#define __NR64AT1_raiseat                (struct __siginfo64_struct const *, struct __siginfo64_struct const *)
+#define __NR64AT0_mktty                  (fd_t, __fd_t)
+#define __NR64AT1_mktty                  (fd_t, __fd_t)
+#define __NR64AT2_mktty                  (char const *, char const *)
+#define __NR64AT3_mktty                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_lfutexlockexpr         (uint64_t *, __uint64_t *)
+#define __NR64AT1_lfutexlockexpr         (void *, void *)
+#define __NR64AT2_lfutexlockexpr         (size_t, __size_t)
+#define __NR64AT3_lfutexlockexpr         (struct lfutexexpr64 const *, struct lfutexexpr64 const *)
+#define __NR64AT4_lfutexlockexpr         (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT5_lfutexlockexpr         (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_lfutexexpr             (void *, void *)
+#define __NR64AT1_lfutexexpr             (size_t, __size_t)
+#define __NR64AT2_lfutexexpr             (struct lfutexexpr64 const *, struct lfutexexpr64 const *)
+#define __NR64AT3_lfutexexpr             (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT4_lfutexexpr             (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_lfutex                 (uint64_t *, __uint64_t *)
+#define __NR64AT1_lfutex                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_lfutex                 (uint64_t, __uint64_t)
+#define __NR64AT3_lfutex                 (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT4_lfutex                 (uint64_t, __uint64_t)
+#define __NR64AT0_debugtrap              (struct ucpustate64 const *, struct ucpustate64 const *)
+#define __NR64AT1_debugtrap              (struct debugtrap_reason64 const *, struct debugtrap_reason64 const *)
+#define __NR64AT0_set_library_listdef    (struct library_listdef64 const *, struct library_listdef64 const *)
+#define __NR64AT0_writevf                (fd_t, __fd_t)
+#define __NR64AT1_writevf                (struct iovec64 const *, struct iovec64 const *)
+#define __NR64AT2_writevf                (size_t, __size_t)
+#define __NR64AT3_writevf                (iomode_t, __iomode_t)
+#define __NR64AT0_readvf                 (fd_t, __fd_t)
+#define __NR64AT1_readvf                 (struct iovec64 const *, struct iovec64 const *)
+#define __NR64AT2_readvf                 (size_t, __size_t)
+#define __NR64AT3_readvf                 (iomode_t, __iomode_t)
+#define __NR64AT0_pwrite64f              (fd_t, __fd_t)
+#define __NR64AT1_pwrite64f              (void const *, void const *)
+#define __NR64AT2_pwrite64f              (size_t, __size_t)
+#define __NR64AT3_pwrite64f              (uint64_t, __uint64_t)
+#define __NR64AT4_pwrite64f              (iomode_t, __iomode_t)
+#define __NR64AT0_pread64f               (fd_t, __fd_t)
+#define __NR64AT1_pread64f               (void *, void *)
+#define __NR64AT2_pread64f               (size_t, __size_t)
+#define __NR64AT3_pread64f               (uint64_t, __uint64_t)
+#define __NR64AT4_pread64f               (iomode_t, __iomode_t)
+#define __NR64AT0_ioctlf                 (fd_t, __fd_t)
+#define __NR64AT1_ioctlf                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_ioctlf                 (iomode_t, __iomode_t)
+#define __NR64AT3_ioctlf                 (void *, void *)
+#define __NR64AT0_set_exception_handler  (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_set_exception_handler  (except_handler_t, __except_handler_t)
+#define __NR64AT2_set_exception_handler  (void *, void *)
+#define __NR64AT0_get_exception_handler  (__ULONG64_TYPE__ *, __ULONG64_TYPE__ *)
+#define __NR64AT1_get_exception_handler  (__except_handler64_t *, __except_handler64_t *)
+#define __NR64AT2_get_exception_handler  (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
+#define __NR64AT0_openpty                (fd_t *, __fd_t *)
+#define __NR64AT1_openpty                (fd_t *, __fd_t *)
+#define __NR64AT2_openpty                (char *, char *)
+#define __NR64AT3_openpty                (struct termios const *, struct termios const *)
+#define __NR64AT4_openpty                (struct winsize const *, struct winsize const *)
+#define __NR64AT0_rpc_schedule           (pid_t, __pid_t)
+#define __NR64AT1_rpc_schedule           (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_rpc_schedule           (uint8_t const *, __uint8_t const *)
+#define __NR64AT3_rpc_schedule           (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
+#define __NR64AT0_frealpathat            (fd_t, __fd_t)
+#define __NR64AT1_frealpathat            (char const *, char const *)
+#define __NR64AT2_frealpathat            (char *, char *)
+#define __NR64AT3_frealpathat            (size_t, __size_t)
+#define __NR64AT4_frealpathat            (atflag_t, __atflag_t)
+#define __NR64AT0_frealpath4             (fd_t, __fd_t)
+#define __NR64AT1_frealpath4             (char *, char *)
+#define __NR64AT2_frealpath4             (size_t, __size_t)
+#define __NR64AT3_frealpath4             (atflag_t, __atflag_t)
+#define __NR64AT0_detach                 (pid_t, __pid_t)
+#define __NR64AT0_readf                  (fd_t, __fd_t)
+#define __NR64AT1_readf                  (void *, void *)
+#define __NR64AT2_readf                  (size_t, __size_t)
+#define __NR64AT3_readf                  (iomode_t, __iomode_t)
+#define __NR64AT0_klstat                 (char const *, char const *)
+#define __NR64AT1_klstat                 (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NR64AT0_kfstat                 (fd_t, __fd_t)
+#define __NR64AT1_kfstat                 (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NR64AT0_kstat                  (char const *, char const *)
+#define __NR64AT1_kstat                  (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NR64AT0_hopf                   (fd_t, __fd_t)
+#define __NR64AT1_hopf                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_hopf                   (iomode_t, __iomode_t)
+#define __NR64AT3_hopf                   (void *, void *)
+#define __NR64AT0_hop                    (fd_t, __fd_t)
+#define __NR64AT1_hop                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_hop                    (void *, void *)
+#define __NR64AT0_writef                 (fd_t, __fd_t)
+#define __NR64AT1_writef                 (void const *, void const *)
+#define __NR64AT2_writef                 (size_t, __size_t)
+#define __NR64AT3_writef                 (iomode_t, __iomode_t)
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES */
 #endif /* __WANT_SYSCALL_ARGUMENT_TYPES */
 
@@ -2018,49 +2018,49 @@
 #define __NR64AM_userfaultfd(a, b, c, d, e, f)            (int)a
 #define __NR64AM_membarrier(a, b, c, d, e, f)             (int)a
 #define __NR64AM_mlock2(a, b, c, d, e, f)                 (int)a
-#define __NR64AM_readf(a, b, c, d, e, f)                  (__fd_t)a, (void *)b, (__size_t)c, (__iomode_t)d
-#define __NR64AM_writef(a, b, c, d, e, f)                 (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
-#define __NR64AM_hop(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b, (void *)c
-#define __NR64AM_hopf(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
-#define __NR64AM_kstat(a, b, c, d, e, f)                  (char const *)a, (struct __kos_statx64 *)b
-#define __NR64AM_kfstat(a, b, c, d, e, f)                 (__fd_t)a, (struct __kos_statx64 *)b
-#define __NR64AM_klstat(a, b, c, d, e, f)                 (char const *)a, (struct __kos_statx64 *)b
-#define __NR64AM_detach(a, b, c, d, e, f)                 (__pid_t)a
-#define __NR64AM_getdrives(a, b, c, d, e, f)              /* nothing */
-#define __NR64AM_frealpath4(a, b, c, d, e, f)             (__fd_t)a, (char *)b, (__size_t)c, (__atflag_t)d
-#define __NR64AM_frealpathat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
-#define __NR64AM_rpc_schedule(a, b, c, d, e, f)           (__pid_t)a, (__syscall_ulong_t)b, (__uint8_t const *)c, (__HYBRID_PTR64(void) *)d
+#define __NR64AM_pwritevf(a, b, c, d, e, f)               (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
+#define __NR64AM_preadvf(a, b, c, d, e, f)                (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
+#define __NR64AM_freadlinkat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
+#define __NR64AM_fsymlinkat(a, b, c, d, e, f)             (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
+#define __NR64AM_frenameat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
+#define __NR64AM_kfstatat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (struct __kos_statx64 *)c, (__atflag_t)d
+#define __NR64AM_fmknodat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
+#define __NR64AM_fmkdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NR64AM_ksysctl(a, b, c, d, e, f)                (__syscall_ulong_t)a, (void *)b
-#define __NR64AM_openpty(a, b, c, d, e, f)                (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
+#define __NR64AM_maplibrary(a, b, c, d, e, f)             (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf64_phdr *)d, (__size_t)e
+#define __NR64AM_fsmode(a, b, c, d, e, f)                 (__uint64_t)a
+#define __NR64AM_fchdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__atflag_t)c
+#define __NR64AM_kreaddirf(a, b, c, d, e, f)              (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
+#define __NR64AM_kreaddir(a, b, c, d, e, f)               (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NR64AM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
+#define __NR64AM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfo64_struct const *)b
+#define __NR64AM_mktty(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
+#define __NR64AM_lfutexlockexpr(a, b, c, d, e, f)         (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexpr64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
+#define __NR64AM_lfutexexpr(a, b, c, d, e, f)             (void *)a, (__size_t)b, (struct lfutexexpr64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
+#define __NR64AM_lfutex(a, b, c, d, e, f)                 (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e
+#define __NR64AM_rpc_service(a, b, c, d, e, f)            /* nothing */
+#define __NR64AM_debugtrap(a, b, c, d, e, f)              (struct ucpustate64 const *)a, (struct debugtrap_reason64 const *)b
+#define __NR64AM_set_library_listdef(a, b, c, d, e, f)    (struct library_listdef64 const *)a
+#define __NR64AM_writevf(a, b, c, d, e, f)                (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__iomode_t)d
+#define __NR64AM_readvf(a, b, c, d, e, f)                 (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__iomode_t)d
+#define __NR64AM_pwrite64f(a, b, c, d, e, f)              (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
+#define __NR64AM_pread64f(a, b, c, d, e, f)               (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
+#define __NR64AM_ioctlf(a, b, c, d, e, f)                 (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
 #define __NR64AM_set_exception_handler(a, b, c, d, e, f)  (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
 #define __NR64AM_get_exception_handler(a, b, c, d, e, f)  (__ULONG64_TYPE__ *)a, (__except_handler64_t *)b, (__HYBRID_PTR64(void) *)c
-#define __NR64AM_ioctlf(a, b, c, d, e, f)                 (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
-#define __NR64AM_pread64f(a, b, c, d, e, f)               (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
-#define __NR64AM_pwrite64f(a, b, c, d, e, f)              (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
-#define __NR64AM_readvf(a, b, c, d, e, f)                 (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__iomode_t)d
-#define __NR64AM_writevf(a, b, c, d, e, f)                (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__iomode_t)d
-#define __NR64AM_set_library_listdef(a, b, c, d, e, f)    (struct library_listdef64 const *)a
-#define __NR64AM_debugtrap(a, b, c, d, e, f)              (struct ucpustate64 const *)a, (struct debugtrap_reason64 const *)b
-#define __NR64AM_rpc_service(a, b, c, d, e, f)            /* nothing */
-#define __NR64AM_lfutex(a, b, c, d, e, f)                 (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e
-#define __NR64AM_lfutexexpr(a, b, c, d, e, f)             (void *)a, (__size_t)b, (struct lfutexexpr64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
-#define __NR64AM_lfutexlockexpr(a, b, c, d, e, f)         (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexpr64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
-#define __NR64AM_mktty(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
-#define __NR64AM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfo64_struct const *)b
-#define __NR64AM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
-#define __NR64AM_kreaddir(a, b, c, d, e, f)               (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
-#define __NR64AM_fchdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__atflag_t)c
-#define __NR64AM_fsmode(a, b, c, d, e, f)                 (__uint64_t)a
-#define __NR64AM_maplibrary(a, b, c, d, e, f)             (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf64_phdr *)d, (__size_t)e
-#define __NR64AM_kreaddirf(a, b, c, d, e, f)              (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
-#define __NR64AM_fmkdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
-#define __NR64AM_fmknodat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
-#define __NR64AM_kfstatat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (struct __kos_statx64 *)c, (__atflag_t)d
-#define __NR64AM_frenameat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
-#define __NR64AM_fsymlinkat(a, b, c, d, e, f)             (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
-#define __NR64AM_freadlinkat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
-#define __NR64AM_preadvf(a, b, c, d, e, f)                (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
-#define __NR64AM_pwritevf(a, b, c, d, e, f)               (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
+#define __NR64AM_openpty(a, b, c, d, e, f)                (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
+#define __NR64AM_rpc_schedule(a, b, c, d, e, f)           (__pid_t)a, (__syscall_ulong_t)b, (__uint8_t const *)c, (__HYBRID_PTR64(void) *)d
+#define __NR64AM_frealpathat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
+#define __NR64AM_frealpath4(a, b, c, d, e, f)             (__fd_t)a, (char *)b, (__size_t)c, (__atflag_t)d
+#define __NR64AM_getdrives(a, b, c, d, e, f)              /* nothing */
+#define __NR64AM_detach(a, b, c, d, e, f)                 (__pid_t)a
+#define __NR64AM_readf(a, b, c, d, e, f)                  (__fd_t)a, (void *)b, (__size_t)c, (__iomode_t)d
+#define __NR64AM_klstat(a, b, c, d, e, f)                 (char const *)a, (struct __kos_statx64 *)b
+#define __NR64AM_kfstat(a, b, c, d, e, f)                 (__fd_t)a, (struct __kos_statx64 *)b
+#define __NR64AM_kstat(a, b, c, d, e, f)                  (char const *)a, (struct __kos_statx64 *)b
+#define __NR64AM_hopf(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
+#define __NR64AM_hop(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NR64AM_writef(a, b, c, d, e, f)                 (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_MAKER */
 
@@ -2397,49 +2397,49 @@
 #define __NR64AP_userfaultfd(a)                           (__syscall_ulong_t)a
 #define __NR64AP_membarrier(a)                            (__syscall_ulong_t)a
 #define __NR64AP_mlock2(a)                                (__syscall_ulong_t)a
-#define __NR64AP_readf(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_writef(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_hop(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR64AP_hopf(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_kstat(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_kfstat(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_klstat(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_detach(a)                                (__syscall_ulong_t)a
-#define __NR64AP_getdrives()                              /* nothing */
-#define __NR64AP_frealpath4(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_frealpathat(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_rpc_schedule(a, b, c, d)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_pwritevf(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_preadvf(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_freadlinkat(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_fsymlinkat(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_frenameat(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_kfstatat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_fmknodat(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_fmkdirat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_ksysctl(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_openpty(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_maplibrary(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_fsmode(a)                                (__syscall_ulong_t)a
+#define __NR64AP_fchdirat(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR64AP_kreaddirf(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_kreaddir(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_coredump(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
+#define __NR64AP_raiseat(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AP_mktty(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_lfutexlockexpr(a, b, c, d, e, f)         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
+#define __NR64AP_lfutexexpr(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_lfutex(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_rpc_service()                            /* nothing */
+#define __NR64AP_debugtrap(a, b)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AP_set_library_listdef(a)                   (__syscall_ulong_t)a
+#define __NR64AP_writevf(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_readvf(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_pwrite64f(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_pread64f(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_ioctlf(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_set_exception_handler(a, b, c)           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_get_exception_handler(a, b, c)           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR64AP_ioctlf(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_pread64f(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_pwrite64f(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_readvf(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_writevf(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_set_library_listdef(a)                   (__syscall_ulong_t)a
-#define __NR64AP_debugtrap(a, b)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_rpc_service()                            /* nothing */
-#define __NR64AP_lfutex(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_lfutexexpr(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_lfutexlockexpr(a, b, c, d, e, f)         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
-#define __NR64AP_mktty(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_raiseat(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_coredump(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
-#define __NR64AP_kreaddir(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_fchdirat(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR64AP_fsmode(a)                                (__syscall_ulong_t)a
-#define __NR64AP_maplibrary(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_kreaddirf(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_fmkdirat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_fmknodat(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_kfstatat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_frenameat(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_fsymlinkat(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_freadlinkat(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_preadvf(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_pwritevf(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_openpty(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_rpc_schedule(a, b, c, d)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_frealpathat(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_frealpath4(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_getdrives()                              /* nothing */
+#define __NR64AP_detach(a)                                (__syscall_ulong_t)a
+#define __NR64AP_readf(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_klstat(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AP_kfstat(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AP_kstat(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AP_hopf(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_hop(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR64AP_writef(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_PACKER */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8307de9b */
+/* HASH CRC-32:0x9946e2f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -363,49 +363,49 @@
 #define __NRAC_userfaultfd            1
 #define __NRAC_membarrier             1
 #define __NRAC_mlock2                 1
-#define __NRAC_readf                  4
-#define __NRAC_writef                 4
-#define __NRAC_hop                    3
-#define __NRAC_hopf                   4
-#define __NRAC_kstat                  2
-#define __NRAC_kfstat                 2
-#define __NRAC_klstat                 2
-#define __NRAC_detach                 1
-#define __NRAC_getdrives              0
-#define __NRAC_frealpath4             4
-#define __NRAC_frealpathat            5
-#define __NRAC_rpc_schedule           4
+#define __NRAC_pwritevf               5
+#define __NRAC_preadvf                5
+#define __NRAC_freadlinkat            5
+#define __NRAC_fsymlinkat             4
+#define __NRAC_frenameat              5
+#define __NRAC_kfstatat               4
+#define __NRAC_fmknodat               5
+#define __NRAC_fmkdirat               4
 #define __NRAC_ksysctl                2
-#define __NRAC_openpty                5
+#define __NRAC_maplibrary             5
+#define __NRAC_fsmode                 1
+#define __NRAC_fchdirat               3
+#define __NRAC_kreaddirf              5
+#define __NRAC_kreaddir               4
+#define __NRAC_coredump               6
+#define __NRAC_raiseat                2
+#define __NRAC_mktty                  4
+#define __NRAC_lfutexlockexpr         6
+#define __NRAC_lfutexexpr             5
+#define __NRAC_lfutex                 5
+#define __NRAC_rpc_service            0
+#define __NRAC_debugtrap              2
+#define __NRAC_set_library_listdef    1
+#define __NRAC_writevf                4
+#define __NRAC_readvf                 4
+#define __NRAC_pwrite64f              5
+#define __NRAC_pread64f               5
+#define __NRAC_ioctlf                 4
 #define __NRAC_set_exception_handler  3
 #define __NRAC_get_exception_handler  3
-#define __NRAC_ioctlf                 4
-#define __NRAC_pread64f               5
-#define __NRAC_pwrite64f              5
-#define __NRAC_readvf                 4
-#define __NRAC_writevf                4
-#define __NRAC_set_library_listdef    1
-#define __NRAC_debugtrap              2
-#define __NRAC_rpc_service            0
-#define __NRAC_lfutex                 5
-#define __NRAC_lfutexexpr             5
-#define __NRAC_lfutexlockexpr         6
-#define __NRAC_mktty                  4
-#define __NRAC_raiseat                2
-#define __NRAC_coredump               6
-#define __NRAC_kreaddir               4
-#define __NRAC_fchdirat               3
-#define __NRAC_fsmode                 1
-#define __NRAC_maplibrary             5
-#define __NRAC_kreaddirf              5
-#define __NRAC_fmkdirat               4
-#define __NRAC_fmknodat               5
-#define __NRAC_kfstatat               4
-#define __NRAC_frenameat              5
-#define __NRAC_fsymlinkat             4
-#define __NRAC_freadlinkat            5
-#define __NRAC_preadvf                5
-#define __NRAC_pwritevf               5
+#define __NRAC_openpty                5
+#define __NRAC_rpc_schedule           4
+#define __NRAC_frealpathat            5
+#define __NRAC_frealpath4             4
+#define __NRAC_getdrives              0
+#define __NRAC_detach                 1
+#define __NRAC_readf                  4
+#define __NRAC_klstat                 2
+#define __NRAC_kfstat                 2
+#define __NRAC_kstat                  2
+#define __NRAC_hopf                   4
+#define __NRAC_hop                    3
+#define __NRAC_writef                 4
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT */
 #endif /* __WANT_SYSCALL_ARGUMENT_COUNT */
 
@@ -742,49 +742,49 @@
 #define __NRRT_userfaultfd            (errno_t, __errno_t)
 #define __NRRT_membarrier             (errno_t, __errno_t)
 #define __NRRT_mlock2                 (errno_t, __errno_t)
-#define __NRRT_readf                  (ssize_t, __ssize_t)
-#define __NRRT_writef                 (ssize_t, __ssize_t)
-#define __NRRT_hop                    (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_hopf                   (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_kstat                  (errno_t, __errno_t)
-#define __NRRT_kfstat                 (errno_t, __errno_t)
-#define __NRRT_klstat                 (errno_t, __errno_t)
-#define __NRRT_detach                 (errno_t, __errno_t)
-#define __NRRT_getdrives              (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_frealpath4             (ssize_t, __ssize_t)
-#define __NRRT_frealpathat            (ssize_t, __ssize_t)
-#define __NRRT_rpc_schedule           (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_pwritevf               (ssize_t, __ssize_t)
+#define __NRRT_preadvf                (ssize_t, __ssize_t)
+#define __NRRT_freadlinkat            (ssize_t, __ssize_t)
+#define __NRRT_fsymlinkat             (errno_t, __errno_t)
+#define __NRRT_frenameat              (errno_t, __errno_t)
+#define __NRRT_kfstatat               (errno_t, __errno_t)
+#define __NRRT_fmknodat               (errno_t, __errno_t)
+#define __NRRT_fmkdirat               (errno_t, __errno_t)
 #define __NRRT_ksysctl                (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_openpty                (errno_t, __errno_t)
+#define __NRRT_maplibrary             (void *, void *)
+#define __NRRT_fsmode                 (uint64_t, __uint64_t)
+#define __NRRT_fchdirat               (errno_t, __errno_t)
+#define __NRRT_kreaddirf              (ssize_t, __ssize_t)
+#define __NRRT_kreaddir               (ssize_t, __ssize_t)
+#define __NRRT_coredump               (errno_t, __errno_t)
+#define __NRRT_raiseat                (errno_t, __errno_t)
+#define __NRRT_mktty                  (fd_t, __fd_t)
+#define __NRRT_lfutexlockexpr         (errno_t, __errno_t)
+#define __NRRT_lfutexexpr             (errno_t, __errno_t)
+#define __NRRT_lfutex                 (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_rpc_service            (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_debugtrap              (errno_t, __errno_t)
+#define __NRRT_set_library_listdef    (errno_t, __errno_t)
+#define __NRRT_writevf                (ssize_t, __ssize_t)
+#define __NRRT_readvf                 (ssize_t, __ssize_t)
+#define __NRRT_pwrite64f              (ssize_t, __ssize_t)
+#define __NRRT_pread64f               (ssize_t, __ssize_t)
+#define __NRRT_ioctlf                 (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_set_exception_handler  (errno_t, __errno_t)
 #define __NRRT_get_exception_handler  (errno_t, __errno_t)
-#define __NRRT_ioctlf                 (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_pread64f               (ssize_t, __ssize_t)
-#define __NRRT_pwrite64f              (ssize_t, __ssize_t)
-#define __NRRT_readvf                 (ssize_t, __ssize_t)
-#define __NRRT_writevf                (ssize_t, __ssize_t)
-#define __NRRT_set_library_listdef    (errno_t, __errno_t)
-#define __NRRT_debugtrap              (errno_t, __errno_t)
-#define __NRRT_rpc_service            (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_lfutex                 (syscall_slong_t, __syscall_slong_t)
-#define __NRRT_lfutexexpr             (errno_t, __errno_t)
-#define __NRRT_lfutexlockexpr         (errno_t, __errno_t)
-#define __NRRT_mktty                  (fd_t, __fd_t)
-#define __NRRT_raiseat                (errno_t, __errno_t)
-#define __NRRT_coredump               (errno_t, __errno_t)
-#define __NRRT_kreaddir               (ssize_t, __ssize_t)
-#define __NRRT_fchdirat               (errno_t, __errno_t)
-#define __NRRT_fsmode                 (uint64_t, __uint64_t)
-#define __NRRT_maplibrary             (void *, void *)
-#define __NRRT_kreaddirf              (ssize_t, __ssize_t)
-#define __NRRT_fmkdirat               (errno_t, __errno_t)
-#define __NRRT_fmknodat               (errno_t, __errno_t)
-#define __NRRT_kfstatat               (errno_t, __errno_t)
-#define __NRRT_frenameat              (errno_t, __errno_t)
-#define __NRRT_fsymlinkat             (errno_t, __errno_t)
-#define __NRRT_freadlinkat            (ssize_t, __ssize_t)
-#define __NRRT_preadvf                (ssize_t, __ssize_t)
-#define __NRRT_pwritevf               (ssize_t, __ssize_t)
+#define __NRRT_openpty                (errno_t, __errno_t)
+#define __NRRT_rpc_schedule           (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_frealpathat            (ssize_t, __ssize_t)
+#define __NRRT_frealpath4             (ssize_t, __ssize_t)
+#define __NRRT_getdrives              (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_detach                 (errno_t, __errno_t)
+#define __NRRT_readf                  (ssize_t, __ssize_t)
+#define __NRRT_klstat                 (errno_t, __errno_t)
+#define __NRRT_kfstat                 (errno_t, __errno_t)
+#define __NRRT_kstat                  (errno_t, __errno_t)
+#define __NRRT_hopf                   (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_hop                    (syscall_slong_t, __syscall_slong_t)
+#define __NRRT_writef                 (ssize_t, __ssize_t)
 #endif /* !__NRFEAT_DEFINED_SYSCALL_RETURN_TYPES */
 #endif /* __WANT_SYSCALL_RETURN_TYPES */
 
@@ -1526,162 +1526,162 @@
 #define __NRAT0_userfaultfd            (int, int)
 #define __NRAT0_membarrier             (int, int)
 #define __NRAT0_mlock2                 (int, int)
-#define __NRAT0_readf                  (fd_t, __fd_t)
-#define __NRAT1_readf                  (void *, void *)
-#define __NRAT2_readf                  (size_t, __size_t)
-#define __NRAT3_readf                  (iomode_t, __iomode_t)
-#define __NRAT0_writef                 (fd_t, __fd_t)
-#define __NRAT1_writef                 (void const *, void const *)
-#define __NRAT2_writef                 (size_t, __size_t)
-#define __NRAT3_writef                 (iomode_t, __iomode_t)
-#define __NRAT0_hop                    (fd_t, __fd_t)
-#define __NRAT1_hop                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_hop                    (void *, void *)
-#define __NRAT0_hopf                   (fd_t, __fd_t)
-#define __NRAT1_hopf                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_hopf                   (iomode_t, __iomode_t)
-#define __NRAT3_hopf                   (void *, void *)
-#define __NRAT0_kstat                  (char const *, char const *)
-#define __NRAT1_kstat                  (struct __kos_statx64 *, struct __kos_statx64 *)
-#define __NRAT0_kfstat                 (fd_t, __fd_t)
-#define __NRAT1_kfstat                 (struct __kos_statx64 *, struct __kos_statx64 *)
-#define __NRAT0_klstat                 (char const *, char const *)
-#define __NRAT1_klstat                 (struct __kos_statx64 *, struct __kos_statx64 *)
-#define __NRAT0_detach                 (pid_t, __pid_t)
-#define __NRAT0_frealpath4             (fd_t, __fd_t)
-#define __NRAT1_frealpath4             (char *, char *)
-#define __NRAT2_frealpath4             (size_t, __size_t)
-#define __NRAT3_frealpath4             (atflag_t, __atflag_t)
-#define __NRAT0_frealpathat            (fd_t, __fd_t)
-#define __NRAT1_frealpathat            (char const *, char const *)
-#define __NRAT2_frealpathat            (char *, char *)
-#define __NRAT3_frealpathat            (size_t, __size_t)
-#define __NRAT4_frealpathat            (atflag_t, __atflag_t)
-#define __NRAT0_rpc_schedule           (pid_t, __pid_t)
-#define __NRAT1_rpc_schedule           (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_rpc_schedule           (uint8_t const *, __uint8_t const *)
-#define __NRAT3_rpc_schedule           (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
+#define __NRAT0_pwritevf               (fd_t, __fd_t)
+#define __NRAT1_pwritevf               (struct iovec64 const *, struct iovec64 const *)
+#define __NRAT2_pwritevf               (size_t, __size_t)
+#define __NRAT3_pwritevf               (uint64_t, __uint64_t)
+#define __NRAT4_pwritevf               (iomode_t, __iomode_t)
+#define __NRAT0_preadvf                (fd_t, __fd_t)
+#define __NRAT1_preadvf                (struct iovec64 const *, struct iovec64 const *)
+#define __NRAT2_preadvf                (size_t, __size_t)
+#define __NRAT3_preadvf                (uint64_t, __uint64_t)
+#define __NRAT4_preadvf                (iomode_t, __iomode_t)
+#define __NRAT0_freadlinkat            (fd_t, __fd_t)
+#define __NRAT1_freadlinkat            (char const *, char const *)
+#define __NRAT2_freadlinkat            (char *, char *)
+#define __NRAT3_freadlinkat            (size_t, __size_t)
+#define __NRAT4_freadlinkat            (atflag_t, __atflag_t)
+#define __NRAT0_fsymlinkat             (char const *, char const *)
+#define __NRAT1_fsymlinkat             (fd_t, __fd_t)
+#define __NRAT2_fsymlinkat             (char const *, char const *)
+#define __NRAT3_fsymlinkat             (atflag_t, __atflag_t)
+#define __NRAT0_frenameat              (fd_t, __fd_t)
+#define __NRAT1_frenameat              (char const *, char const *)
+#define __NRAT2_frenameat              (fd_t, __fd_t)
+#define __NRAT3_frenameat              (char const *, char const *)
+#define __NRAT4_frenameat              (atflag_t, __atflag_t)
+#define __NRAT0_kfstatat               (fd_t, __fd_t)
+#define __NRAT1_kfstatat               (char const *, char const *)
+#define __NRAT2_kfstatat               (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NRAT3_kfstatat               (atflag_t, __atflag_t)
+#define __NRAT0_fmknodat               (fd_t, __fd_t)
+#define __NRAT1_fmknodat               (char const *, char const *)
+#define __NRAT2_fmknodat               (mode_t, __mode_t)
+#define __NRAT3_fmknodat               (dev_t, __dev_t)
+#define __NRAT4_fmknodat               (atflag_t, __atflag_t)
+#define __NRAT0_fmkdirat               (fd_t, __fd_t)
+#define __NRAT1_fmkdirat               (char const *, char const *)
+#define __NRAT2_fmkdirat               (mode_t, __mode_t)
+#define __NRAT3_fmkdirat               (atflag_t, __atflag_t)
 #define __NRAT0_ksysctl                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_ksysctl                (void *, void *)
-#define __NRAT0_openpty                (fd_t *, __fd_t *)
-#define __NRAT1_openpty                (fd_t *, __fd_t *)
-#define __NRAT2_openpty                (char *, char *)
-#define __NRAT3_openpty                (struct termios const *, struct termios const *)
-#define __NRAT4_openpty                (struct winsize const *, struct winsize const *)
-#define __NRAT0_set_exception_handler  (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_set_exception_handler  (except_handler_t, __except_handler_t)
-#define __NRAT2_set_exception_handler  (void *, void *)
-#define __NRAT0_get_exception_handler  (__ULONG64_TYPE__ *, __ULONG64_TYPE__ *)
-#define __NRAT1_get_exception_handler  (__except_handler64_t *, __except_handler64_t *)
-#define __NRAT2_get_exception_handler  (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
-#define __NRAT0_ioctlf                 (fd_t, __fd_t)
-#define __NRAT1_ioctlf                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_ioctlf                 (iomode_t, __iomode_t)
-#define __NRAT3_ioctlf                 (void *, void *)
-#define __NRAT0_pread64f               (fd_t, __fd_t)
-#define __NRAT1_pread64f               (void *, void *)
-#define __NRAT2_pread64f               (size_t, __size_t)
-#define __NRAT3_pread64f               (uint64_t, __uint64_t)
-#define __NRAT4_pread64f               (iomode_t, __iomode_t)
-#define __NRAT0_pwrite64f              (fd_t, __fd_t)
-#define __NRAT1_pwrite64f              (void const *, void const *)
-#define __NRAT2_pwrite64f              (size_t, __size_t)
-#define __NRAT3_pwrite64f              (uint64_t, __uint64_t)
-#define __NRAT4_pwrite64f              (iomode_t, __iomode_t)
-#define __NRAT0_readvf                 (fd_t, __fd_t)
-#define __NRAT1_readvf                 (struct iovec64 const *, struct iovec64 const *)
-#define __NRAT2_readvf                 (size_t, __size_t)
-#define __NRAT3_readvf                 (iomode_t, __iomode_t)
-#define __NRAT0_writevf                (fd_t, __fd_t)
-#define __NRAT1_writevf                (struct iovec64 const *, struct iovec64 const *)
-#define __NRAT2_writevf                (size_t, __size_t)
-#define __NRAT3_writevf                (iomode_t, __iomode_t)
-#define __NRAT0_set_library_listdef    (struct library_listdef64 const *, struct library_listdef64 const *)
-#define __NRAT0_debugtrap              (struct ucpustate64 const *, struct ucpustate64 const *)
-#define __NRAT1_debugtrap              (struct debugtrap_reason64 const *, struct debugtrap_reason64 const *)
-#define __NRAT0_lfutex                 (uint64_t *, __uint64_t *)
-#define __NRAT1_lfutex                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_lfutex                 (uint64_t, __uint64_t)
-#define __NRAT3_lfutex                 (struct __timespecx64 const *, struct __timespecx64 const *)
-#define __NRAT4_lfutex                 (uint64_t, __uint64_t)
-#define __NRAT0_lfutexexpr             (void *, void *)
-#define __NRAT1_lfutexexpr             (size_t, __size_t)
-#define __NRAT2_lfutexexpr             (struct lfutexexpr64 const *, struct lfutexexpr64 const *)
-#define __NRAT3_lfutexexpr             (struct __timespecx64 const *, struct __timespecx64 const *)
-#define __NRAT4_lfutexexpr             (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_lfutexlockexpr         (uint64_t *, __uint64_t *)
-#define __NRAT1_lfutexlockexpr         (void *, void *)
-#define __NRAT2_lfutexlockexpr         (size_t, __size_t)
-#define __NRAT3_lfutexlockexpr         (struct lfutexexpr64 const *, struct lfutexexpr64 const *)
-#define __NRAT4_lfutexlockexpr         (struct __timespecx64 const *, struct __timespecx64 const *)
-#define __NRAT5_lfutexlockexpr         (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_mktty                  (fd_t, __fd_t)
-#define __NRAT1_mktty                  (fd_t, __fd_t)
-#define __NRAT2_mktty                  (char const *, char const *)
-#define __NRAT3_mktty                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_raiseat                (struct ucpustate64 const *, struct ucpustate64 const *)
-#define __NRAT1_raiseat                (struct __siginfo64_struct const *, struct __siginfo64_struct const *)
+#define __NRAT0_maplibrary             (void *, void *)
+#define __NRAT1_maplibrary             (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_maplibrary             (fd_t, __fd_t)
+#define __NRAT3_maplibrary             (struct elf64_phdr *, struct elf64_phdr *)
+#define __NRAT4_maplibrary             (size_t, __size_t)
+#define __NRAT0_fsmode                 (uint64_t, __uint64_t)
+#define __NRAT0_fchdirat               (fd_t, __fd_t)
+#define __NRAT1_fchdirat               (char const *, char const *)
+#define __NRAT2_fchdirat               (atflag_t, __atflag_t)
+#define __NRAT0_kreaddirf              (fd_t, __fd_t)
+#define __NRAT1_kreaddirf              (struct dirent *, struct dirent *)
+#define __NRAT2_kreaddirf              (size_t, __size_t)
+#define __NRAT3_kreaddirf              (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT4_kreaddirf              (iomode_t, __iomode_t)
+#define __NRAT0_kreaddir               (fd_t, __fd_t)
+#define __NRAT1_kreaddir               (struct dirent *, struct dirent *)
+#define __NRAT2_kreaddir               (size_t, __size_t)
+#define __NRAT3_kreaddir               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NRAT1_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NRAT2_coredump               (__HYBRID_PTR64(void) const *, __HYBRID_PTR64(void) const *)
 #define __NRAT3_coredump               (size_t, __size_t)
 #define __NRAT4_coredump               (struct exception_data64 const *, struct exception_data64 const *)
 #define __NRAT5_coredump               (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_kreaddir               (fd_t, __fd_t)
-#define __NRAT1_kreaddir               (struct dirent *, struct dirent *)
-#define __NRAT2_kreaddir               (size_t, __size_t)
-#define __NRAT3_kreaddir               (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_fchdirat               (fd_t, __fd_t)
-#define __NRAT1_fchdirat               (char const *, char const *)
-#define __NRAT2_fchdirat               (atflag_t, __atflag_t)
-#define __NRAT0_fsmode                 (uint64_t, __uint64_t)
-#define __NRAT0_maplibrary             (void *, void *)
-#define __NRAT1_maplibrary             (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_maplibrary             (fd_t, __fd_t)
-#define __NRAT3_maplibrary             (struct elf64_phdr *, struct elf64_phdr *)
-#define __NRAT4_maplibrary             (size_t, __size_t)
-#define __NRAT0_kreaddirf              (fd_t, __fd_t)
-#define __NRAT1_kreaddirf              (struct dirent *, struct dirent *)
-#define __NRAT2_kreaddirf              (size_t, __size_t)
-#define __NRAT3_kreaddirf              (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT4_kreaddirf              (iomode_t, __iomode_t)
-#define __NRAT0_fmkdirat               (fd_t, __fd_t)
-#define __NRAT1_fmkdirat               (char const *, char const *)
-#define __NRAT2_fmkdirat               (mode_t, __mode_t)
-#define __NRAT3_fmkdirat               (atflag_t, __atflag_t)
-#define __NRAT0_fmknodat               (fd_t, __fd_t)
-#define __NRAT1_fmknodat               (char const *, char const *)
-#define __NRAT2_fmknodat               (mode_t, __mode_t)
-#define __NRAT3_fmknodat               (dev_t, __dev_t)
-#define __NRAT4_fmknodat               (atflag_t, __atflag_t)
-#define __NRAT0_kfstatat               (fd_t, __fd_t)
-#define __NRAT1_kfstatat               (char const *, char const *)
-#define __NRAT2_kfstatat               (struct __kos_statx64 *, struct __kos_statx64 *)
-#define __NRAT3_kfstatat               (atflag_t, __atflag_t)
-#define __NRAT0_frenameat              (fd_t, __fd_t)
-#define __NRAT1_frenameat              (char const *, char const *)
-#define __NRAT2_frenameat              (fd_t, __fd_t)
-#define __NRAT3_frenameat              (char const *, char const *)
-#define __NRAT4_frenameat              (atflag_t, __atflag_t)
-#define __NRAT0_fsymlinkat             (char const *, char const *)
-#define __NRAT1_fsymlinkat             (fd_t, __fd_t)
-#define __NRAT2_fsymlinkat             (char const *, char const *)
-#define __NRAT3_fsymlinkat             (atflag_t, __atflag_t)
-#define __NRAT0_freadlinkat            (fd_t, __fd_t)
-#define __NRAT1_freadlinkat            (char const *, char const *)
-#define __NRAT2_freadlinkat            (char *, char *)
-#define __NRAT3_freadlinkat            (size_t, __size_t)
-#define __NRAT4_freadlinkat            (atflag_t, __atflag_t)
-#define __NRAT0_preadvf                (fd_t, __fd_t)
-#define __NRAT1_preadvf                (struct iovec64 const *, struct iovec64 const *)
-#define __NRAT2_preadvf                (size_t, __size_t)
-#define __NRAT3_preadvf                (uint64_t, __uint64_t)
-#define __NRAT4_preadvf                (iomode_t, __iomode_t)
-#define __NRAT0_pwritevf               (fd_t, __fd_t)
-#define __NRAT1_pwritevf               (struct iovec64 const *, struct iovec64 const *)
-#define __NRAT2_pwritevf               (size_t, __size_t)
-#define __NRAT3_pwritevf               (uint64_t, __uint64_t)
-#define __NRAT4_pwritevf               (iomode_t, __iomode_t)
+#define __NRAT0_raiseat                (struct ucpustate64 const *, struct ucpustate64 const *)
+#define __NRAT1_raiseat                (struct __siginfo64_struct const *, struct __siginfo64_struct const *)
+#define __NRAT0_mktty                  (fd_t, __fd_t)
+#define __NRAT1_mktty                  (fd_t, __fd_t)
+#define __NRAT2_mktty                  (char const *, char const *)
+#define __NRAT3_mktty                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_lfutexlockexpr         (uint64_t *, __uint64_t *)
+#define __NRAT1_lfutexlockexpr         (void *, void *)
+#define __NRAT2_lfutexlockexpr         (size_t, __size_t)
+#define __NRAT3_lfutexlockexpr         (struct lfutexexpr64 const *, struct lfutexexpr64 const *)
+#define __NRAT4_lfutexlockexpr         (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT5_lfutexlockexpr         (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_lfutexexpr             (void *, void *)
+#define __NRAT1_lfutexexpr             (size_t, __size_t)
+#define __NRAT2_lfutexexpr             (struct lfutexexpr64 const *, struct lfutexexpr64 const *)
+#define __NRAT3_lfutexexpr             (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT4_lfutexexpr             (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_lfutex                 (uint64_t *, __uint64_t *)
+#define __NRAT1_lfutex                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_lfutex                 (uint64_t, __uint64_t)
+#define __NRAT3_lfutex                 (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT4_lfutex                 (uint64_t, __uint64_t)
+#define __NRAT0_debugtrap              (struct ucpustate64 const *, struct ucpustate64 const *)
+#define __NRAT1_debugtrap              (struct debugtrap_reason64 const *, struct debugtrap_reason64 const *)
+#define __NRAT0_set_library_listdef    (struct library_listdef64 const *, struct library_listdef64 const *)
+#define __NRAT0_writevf                (fd_t, __fd_t)
+#define __NRAT1_writevf                (struct iovec64 const *, struct iovec64 const *)
+#define __NRAT2_writevf                (size_t, __size_t)
+#define __NRAT3_writevf                (iomode_t, __iomode_t)
+#define __NRAT0_readvf                 (fd_t, __fd_t)
+#define __NRAT1_readvf                 (struct iovec64 const *, struct iovec64 const *)
+#define __NRAT2_readvf                 (size_t, __size_t)
+#define __NRAT3_readvf                 (iomode_t, __iomode_t)
+#define __NRAT0_pwrite64f              (fd_t, __fd_t)
+#define __NRAT1_pwrite64f              (void const *, void const *)
+#define __NRAT2_pwrite64f              (size_t, __size_t)
+#define __NRAT3_pwrite64f              (uint64_t, __uint64_t)
+#define __NRAT4_pwrite64f              (iomode_t, __iomode_t)
+#define __NRAT0_pread64f               (fd_t, __fd_t)
+#define __NRAT1_pread64f               (void *, void *)
+#define __NRAT2_pread64f               (size_t, __size_t)
+#define __NRAT3_pread64f               (uint64_t, __uint64_t)
+#define __NRAT4_pread64f               (iomode_t, __iomode_t)
+#define __NRAT0_ioctlf                 (fd_t, __fd_t)
+#define __NRAT1_ioctlf                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_ioctlf                 (iomode_t, __iomode_t)
+#define __NRAT3_ioctlf                 (void *, void *)
+#define __NRAT0_set_exception_handler  (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_set_exception_handler  (except_handler_t, __except_handler_t)
+#define __NRAT2_set_exception_handler  (void *, void *)
+#define __NRAT0_get_exception_handler  (__ULONG64_TYPE__ *, __ULONG64_TYPE__ *)
+#define __NRAT1_get_exception_handler  (__except_handler64_t *, __except_handler64_t *)
+#define __NRAT2_get_exception_handler  (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
+#define __NRAT0_openpty                (fd_t *, __fd_t *)
+#define __NRAT1_openpty                (fd_t *, __fd_t *)
+#define __NRAT2_openpty                (char *, char *)
+#define __NRAT3_openpty                (struct termios const *, struct termios const *)
+#define __NRAT4_openpty                (struct winsize const *, struct winsize const *)
+#define __NRAT0_rpc_schedule           (pid_t, __pid_t)
+#define __NRAT1_rpc_schedule           (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_rpc_schedule           (uint8_t const *, __uint8_t const *)
+#define __NRAT3_rpc_schedule           (__HYBRID_PTR64(void) *, __HYBRID_PTR64(void) *)
+#define __NRAT0_frealpathat            (fd_t, __fd_t)
+#define __NRAT1_frealpathat            (char const *, char const *)
+#define __NRAT2_frealpathat            (char *, char *)
+#define __NRAT3_frealpathat            (size_t, __size_t)
+#define __NRAT4_frealpathat            (atflag_t, __atflag_t)
+#define __NRAT0_frealpath4             (fd_t, __fd_t)
+#define __NRAT1_frealpath4             (char *, char *)
+#define __NRAT2_frealpath4             (size_t, __size_t)
+#define __NRAT3_frealpath4             (atflag_t, __atflag_t)
+#define __NRAT0_detach                 (pid_t, __pid_t)
+#define __NRAT0_readf                  (fd_t, __fd_t)
+#define __NRAT1_readf                  (void *, void *)
+#define __NRAT2_readf                  (size_t, __size_t)
+#define __NRAT3_readf                  (iomode_t, __iomode_t)
+#define __NRAT0_klstat                 (char const *, char const *)
+#define __NRAT1_klstat                 (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NRAT0_kfstat                 (fd_t, __fd_t)
+#define __NRAT1_kfstat                 (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NRAT0_kstat                  (char const *, char const *)
+#define __NRAT1_kstat                  (struct __kos_statx64 *, struct __kos_statx64 *)
+#define __NRAT0_hopf                   (fd_t, __fd_t)
+#define __NRAT1_hopf                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_hopf                   (iomode_t, __iomode_t)
+#define __NRAT3_hopf                   (void *, void *)
+#define __NRAT0_hop                    (fd_t, __fd_t)
+#define __NRAT1_hop                    (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_hop                    (void *, void *)
+#define __NRAT0_writef                 (fd_t, __fd_t)
+#define __NRAT1_writef                 (void const *, void const *)
+#define __NRAT2_writef                 (size_t, __size_t)
+#define __NRAT3_writef                 (iomode_t, __iomode_t)
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES */
 #endif /* __WANT_SYSCALL_ARGUMENT_TYPES */
 
@@ -2018,49 +2018,49 @@
 #define __NRAM_userfaultfd(a, b, c, d, e, f)            (int)a
 #define __NRAM_membarrier(a, b, c, d, e, f)             (int)a
 #define __NRAM_mlock2(a, b, c, d, e, f)                 (int)a
-#define __NRAM_readf(a, b, c, d, e, f)                  (__fd_t)a, (void *)b, (__size_t)c, (__iomode_t)d
-#define __NRAM_writef(a, b, c, d, e, f)                 (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
-#define __NRAM_hop(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b, (void *)c
-#define __NRAM_hopf(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
-#define __NRAM_kstat(a, b, c, d, e, f)                  (char const *)a, (struct __kos_statx64 *)b
-#define __NRAM_kfstat(a, b, c, d, e, f)                 (__fd_t)a, (struct __kos_statx64 *)b
-#define __NRAM_klstat(a, b, c, d, e, f)                 (char const *)a, (struct __kos_statx64 *)b
-#define __NRAM_detach(a, b, c, d, e, f)                 (__pid_t)a
-#define __NRAM_getdrives(a, b, c, d, e, f)              /* nothing */
-#define __NRAM_frealpath4(a, b, c, d, e, f)             (__fd_t)a, (char *)b, (__size_t)c, (__atflag_t)d
-#define __NRAM_frealpathat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
-#define __NRAM_rpc_schedule(a, b, c, d, e, f)           (__pid_t)a, (__syscall_ulong_t)b, (__uint8_t const *)c, (__HYBRID_PTR64(void) *)d
+#define __NRAM_pwritevf(a, b, c, d, e, f)               (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
+#define __NRAM_preadvf(a, b, c, d, e, f)                (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
+#define __NRAM_freadlinkat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
+#define __NRAM_fsymlinkat(a, b, c, d, e, f)             (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
+#define __NRAM_frenameat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
+#define __NRAM_kfstatat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (struct __kos_statx64 *)c, (__atflag_t)d
+#define __NRAM_fmknodat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
+#define __NRAM_fmkdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
 #define __NRAM_ksysctl(a, b, c, d, e, f)                (__syscall_ulong_t)a, (void *)b
-#define __NRAM_openpty(a, b, c, d, e, f)                (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
+#define __NRAM_maplibrary(a, b, c, d, e, f)             (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf64_phdr *)d, (__size_t)e
+#define __NRAM_fsmode(a, b, c, d, e, f)                 (__uint64_t)a
+#define __NRAM_fchdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__atflag_t)c
+#define __NRAM_kreaddirf(a, b, c, d, e, f)              (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
+#define __NRAM_kreaddir(a, b, c, d, e, f)               (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NRAM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
+#define __NRAM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfo64_struct const *)b
+#define __NRAM_mktty(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
+#define __NRAM_lfutexlockexpr(a, b, c, d, e, f)         (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexpr64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
+#define __NRAM_lfutexexpr(a, b, c, d, e, f)             (void *)a, (__size_t)b, (struct lfutexexpr64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
+#define __NRAM_lfutex(a, b, c, d, e, f)                 (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e
+#define __NRAM_rpc_service(a, b, c, d, e, f)            /* nothing */
+#define __NRAM_debugtrap(a, b, c, d, e, f)              (struct ucpustate64 const *)a, (struct debugtrap_reason64 const *)b
+#define __NRAM_set_library_listdef(a, b, c, d, e, f)    (struct library_listdef64 const *)a
+#define __NRAM_writevf(a, b, c, d, e, f)                (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__iomode_t)d
+#define __NRAM_readvf(a, b, c, d, e, f)                 (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__iomode_t)d
+#define __NRAM_pwrite64f(a, b, c, d, e, f)              (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
+#define __NRAM_pread64f(a, b, c, d, e, f)               (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
+#define __NRAM_ioctlf(a, b, c, d, e, f)                 (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
 #define __NRAM_set_exception_handler(a, b, c, d, e, f)  (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
 #define __NRAM_get_exception_handler(a, b, c, d, e, f)  (__ULONG64_TYPE__ *)a, (__except_handler64_t *)b, (__HYBRID_PTR64(void) *)c
-#define __NRAM_ioctlf(a, b, c, d, e, f)                 (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
-#define __NRAM_pread64f(a, b, c, d, e, f)               (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
-#define __NRAM_pwrite64f(a, b, c, d, e, f)              (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
-#define __NRAM_readvf(a, b, c, d, e, f)                 (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__iomode_t)d
-#define __NRAM_writevf(a, b, c, d, e, f)                (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__iomode_t)d
-#define __NRAM_set_library_listdef(a, b, c, d, e, f)    (struct library_listdef64 const *)a
-#define __NRAM_debugtrap(a, b, c, d, e, f)              (struct ucpustate64 const *)a, (struct debugtrap_reason64 const *)b
-#define __NRAM_rpc_service(a, b, c, d, e, f)            /* nothing */
-#define __NRAM_lfutex(a, b, c, d, e, f)                 (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e
-#define __NRAM_lfutexexpr(a, b, c, d, e, f)             (void *)a, (__size_t)b, (struct lfutexexpr64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
-#define __NRAM_lfutexlockexpr(a, b, c, d, e, f)         (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexpr64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
-#define __NRAM_mktty(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
-#define __NRAM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfo64_struct const *)b
-#define __NRAM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
-#define __NRAM_kreaddir(a, b, c, d, e, f)               (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
-#define __NRAM_fchdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__atflag_t)c
-#define __NRAM_fsmode(a, b, c, d, e, f)                 (__uint64_t)a
-#define __NRAM_maplibrary(a, b, c, d, e, f)             (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf64_phdr *)d, (__size_t)e
-#define __NRAM_kreaddirf(a, b, c, d, e, f)              (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
-#define __NRAM_fmkdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
-#define __NRAM_fmknodat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
-#define __NRAM_kfstatat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (struct __kos_statx64 *)c, (__atflag_t)d
-#define __NRAM_frenameat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
-#define __NRAM_fsymlinkat(a, b, c, d, e, f)             (char const *)a, (__fd_t)b, (char const *)c, (__atflag_t)d
-#define __NRAM_freadlinkat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
-#define __NRAM_preadvf(a, b, c, d, e, f)                (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
-#define __NRAM_pwritevf(a, b, c, d, e, f)               (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
+#define __NRAM_openpty(a, b, c, d, e, f)                (__fd_t *)a, (__fd_t *)b, (char *)c, (struct termios const *)d, (struct winsize const *)e
+#define __NRAM_rpc_schedule(a, b, c, d, e, f)           (__pid_t)a, (__syscall_ulong_t)b, (__uint8_t const *)c, (__HYBRID_PTR64(void) *)d
+#define __NRAM_frealpathat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
+#define __NRAM_frealpath4(a, b, c, d, e, f)             (__fd_t)a, (char *)b, (__size_t)c, (__atflag_t)d
+#define __NRAM_getdrives(a, b, c, d, e, f)              /* nothing */
+#define __NRAM_detach(a, b, c, d, e, f)                 (__pid_t)a
+#define __NRAM_readf(a, b, c, d, e, f)                  (__fd_t)a, (void *)b, (__size_t)c, (__iomode_t)d
+#define __NRAM_klstat(a, b, c, d, e, f)                 (char const *)a, (struct __kos_statx64 *)b
+#define __NRAM_kfstat(a, b, c, d, e, f)                 (__fd_t)a, (struct __kos_statx64 *)b
+#define __NRAM_kstat(a, b, c, d, e, f)                  (char const *)a, (struct __kos_statx64 *)b
+#define __NRAM_hopf(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
+#define __NRAM_hop(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b, (void *)c
+#define __NRAM_writef(a, b, c, d, e, f)                 (__fd_t)a, (void const *)b, (__size_t)c, (__iomode_t)d
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_MAKER */
 
@@ -2397,49 +2397,49 @@
 #define __NRAP_userfaultfd(a)                           (__syscall_ulong_t)a
 #define __NRAP_membarrier(a)                            (__syscall_ulong_t)a
 #define __NRAP_mlock2(a)                                (__syscall_ulong_t)a
-#define __NRAP_readf(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_writef(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_hop(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_hopf(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_kstat(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_kfstat(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_klstat(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_detach(a)                                (__syscall_ulong_t)a
-#define __NRAP_getdrives()                              /* nothing */
-#define __NRAP_frealpath4(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_frealpathat(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_rpc_schedule(a, b, c, d)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_pwritevf(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_preadvf(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_freadlinkat(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_fsymlinkat(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_frenameat(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_kfstatat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_fmknodat(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_fmkdirat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_ksysctl(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_openpty(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_maplibrary(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_fsmode(a)                                (__syscall_ulong_t)a
+#define __NRAP_fchdirat(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_kreaddirf(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_kreaddir(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_coredump(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
+#define __NRAP_raiseat(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_mktty(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_lfutexlockexpr(a, b, c, d, e, f)         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
+#define __NRAP_lfutexexpr(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_lfutex(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_rpc_service()                            /* nothing */
+#define __NRAP_debugtrap(a, b)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_set_library_listdef(a)                   (__syscall_ulong_t)a
+#define __NRAP_writevf(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_readvf(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_pwrite64f(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_pread64f(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_ioctlf(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_set_exception_handler(a, b, c)           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_get_exception_handler(a, b, c)           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_ioctlf(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_pread64f(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_pwrite64f(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_readvf(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_writevf(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_set_library_listdef(a)                   (__syscall_ulong_t)a
-#define __NRAP_debugtrap(a, b)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_rpc_service()                            /* nothing */
-#define __NRAP_lfutex(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_lfutexexpr(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_lfutexlockexpr(a, b, c, d, e, f)         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
-#define __NRAP_mktty(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_raiseat(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_coredump(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
-#define __NRAP_kreaddir(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_fchdirat(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_fsmode(a)                                (__syscall_ulong_t)a
-#define __NRAP_maplibrary(a, b, c, d, e)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_kreaddirf(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_fmkdirat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_fmknodat(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_kfstatat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_frenameat(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_fsymlinkat(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_freadlinkat(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_preadvf(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_pwritevf(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_openpty(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_rpc_schedule(a, b, c, d)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_frealpathat(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_frealpath4(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_getdrives()                              /* nothing */
+#define __NRAP_detach(a)                                (__syscall_ulong_t)a
+#define __NRAP_readf(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_klstat(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_kfstat(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_kstat(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_hopf(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_hop(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_writef(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER */
 #endif /* __WANT_SYSCALL_ARGUMENT_LIST_PACKER */
 
