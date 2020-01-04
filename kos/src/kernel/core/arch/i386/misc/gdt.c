@@ -134,27 +134,15 @@ PUBLIC ATTR_PERTASK uintptr_t this_x86_user_gsbase = 0;
 #endif /* !__x86_64__ */
 
 #ifndef CONFIG_NO_USERKERN_SEGMENT
-
-#ifdef __x86_64__
-INTERN NOBLOCK uintptr_t /* Returns the initial value for `%fs_base' */
-NOTHROW(KCALL init_this_x86_userkern)(void)
-#else /* __x86_64__ */
-DEFINE_PERTASK_INIT(init_this_x86_userkern);
-INTERN NOBLOCK void /* Needs to be INTERN because used by boot.c */
-NOTHROW(KCALL init_this_x86_userkern)(struct task *__restrict self)
-#endif /* !__x86_64__ */
-{
+INTERN NOBLOCK uintptr_t
+NOTHROW(KCALL x86_get_random_userkern_address)(void) {
 	uintptr_t offset;
 	/* Assign a random (pointer-aligned) offset into kernel-space
 	 * as the base address for the userkern segment. */
 	offset = (uintptr_t)(krand() * USERKERN_SEGMENT_ALIGN);
 	offset %= ((uintptr_t)0 - KERNELSPACE_BASE) - (USERKERN_SYSCALL_MAXVALID + 1);
 	offset += KERNEL_CORE_BASE;
-#ifdef __x86_64__
 	return offset;
-#else /* __x86_64__ */
-	FORTASK(self, this_x86_user_fsbase) = offset;
-#endif /* !__x86_64__ */
 }
 
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */

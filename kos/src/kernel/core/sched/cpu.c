@@ -828,6 +828,9 @@ NOTHROW(FCALL task_decref_for_exit)(void *arg,
                                     struct icpustate *__restrict state,
                                     unsigned int UNUSED(reason),
                                     struct rpc_syscall_info const *UNUSED(sc_info)) {
+	printk(KERN_DEBUG "[sched] Dropping reference to %p [tid=%u] from %p [tid=%u]\n",
+	       (struct task *)arg, task_getroottid_of_s((struct task *)arg),
+	       THIS_TASK, task_getroottid_s());
 	decref((struct task *)arg);
 	return state;
 }
@@ -920,6 +923,9 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	ATOMIC_FETCHAND(caller->t_flags, ~(TASK_FRUNNING | TASK_FWAKING | TASK_FTIMEOUT | TASK_FSUSPENDED));
 #endif /* CONFIG_NO_SMP */
 
+	printk(KERN_DEBUG "[sched] Switch to thread %p [tid=%u] after exiting %p [tid=%u]\n",
+	       next, task_getroottid_of_s(next),
+	       caller, task_getroottid_of_s(caller));
 	/* Good bye... */
 	cpu_run_current();
 }

@@ -96,32 +96,16 @@ task_srpc_set_child_tid(void *arg,
 	return state;
 }
 
-#if 0
-PRIVATE struct icpustate *FCALL
-kernel_debugtrap_fork_thread_entry(void *UNUSED(arg),
-                                   struct icpustate *__restrict state,
-                                   unsigned int reason,
-                                   struct rpc_syscall_info const *UNUSED(sc_info)) {
-	if likely(reason != TASK_RPC_REASON_SHUTDOWN) {
-		struct debugtrap_reason r;
-		r.dtr_signo  = SIGTRAP;
-		r.dtr_reason = DEBUGTRAP_REASON_LIBRARY;
-		kernel_debugtrap(&r);
-	}
-	return state;
-}
-#endif
 
-
+INTDEF NOBLOCK uintptr_t
+NOTHROW(KCALL x86_get_random_userkern_address)(void);
 
 INTERN pid_t KCALL
 x86_task_clone(struct icpustate const *__restrict init_state,
                uintptr_t clone_flags,
                USER UNCHECKED pid_t *parent_tidptr,
-#ifndef __x86_64__
-               uintptr_t newtls,
-#endif /* !__x86_64__ */
-               USER UNCHECKED pid_t *child_tidptr)
+               USER UNCHECKED pid_t *child_tidptr,
+               uintptr_t gsbase, uintptr_t fsbase)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	upid_t result_pid;
 	REF struct task *result;
@@ -216,8 +200,8 @@ again_lock_vm:
 				RETHROW();
 			}
 		} EXCEPT {
-			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stackpart_).dp_block */
-			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result,this_kernel_stacknode_).vn_block */
+			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result, this_kernel_stackpart_).dp_block */
+			decref_nokill(&vm_datablock_anonymous); /* FORTASK(result, this_kernel_stacknode_).vn_block */
 			heap_free(&kernel_locked_heap,
 			          resptr.hp_ptr,
 			          resptr.hp_siz,
@@ -234,7 +218,22 @@ again_lock_vm:
 		void *kernel_stack;
 		/* Initial the task's initial CPU state. */
 		kernel_stack = (void *)vm_node_getend(&FORTASK(result, this_kernel_stacknode));
-		state        = icpustate_to_scpustate_p(init_state, kernel_stack);
+
+#ifdef __x86_64__
+		state = icpustate_to_scpustate_p_ex(init_state,
+		                                    kernel_stack,
+		                                    gsbase,
+		                                    fsbase,
+		                                    __rdgs(),
+		                                    __rdfs(),
+		                                    __rdes(),
+		                                    __rdds());
+#else /* __x86_64__ */
+		state = icpustate_to_scpustate_p(init_state, kernel_stack);
+		/* Assign the used TLS segment bases. */
+		FORTASK(result, this_x86_user_gsbase) = gsbase;
+		FORTASK(result, this_x86_user_fsbase) = fsbase;
+#endif /* !__x86_64__ */
 
 		/* Reset iopl() for the child thread/process */
 		if ((clone_flags & CLONE_THREAD) ? !x86_iopl_keep_after_clone
@@ -244,13 +243,6 @@ again_lock_vm:
 		/* Have `clone()' or `fork()' return `0' in the child thread/process */
 		gpregs_setpax(&state->scs_gpregs, 0);
 
-#if 0
-		if (kernel_debugtrap_enabled()) {
-			/* When debug traps are enabled, trigger a FORK trap
-			 * before jump to user-space within the new thread. */
-			state = task_push_asynchronous_rpc(state, &kernel_debugtrap_fork_thread_entry, NULL, NULL);
-		}
-#endif
 		if (clone_flags & CLONE_CHILD_SETTID) {
 			/* Inject an RPC for saving the child's TID within the given pointer
 			 * This always needs to be done in the context of the child, so that exceptions
@@ -262,12 +254,6 @@ again_lock_vm:
 		}
 		result->t_sched.s_state = state;
 	}
-
-#ifndef __x86_64__
-	/* Assign the used TLS segment bases. */
-	FORTASK(result, this_x86_user_gsbase) = clone_flags & CLONE_SETTLS ? newtls : get_user_gsbase();
-	FORTASK(result, this_x86_user_fsbase) = get_user_fsbase();
-#endif /* !__x86_64__ */
 
 	result->t_vm = result_vm; /* Inherit reference. */
 	TRY {
@@ -344,12 +330,17 @@ task_clone_rpc(void *UNUSED(arg),
 		child_tid = x86_task_clone(state,
 		                           sc_info->rsi_regs[0],                         /* clone_flags */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[2], /* parent_tidptr */
-#ifndef __x86_64__
-		                           sc_info->rsi_regs[3],                        /* newtls */
-		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[4] /* child_tidptr */
-#else /* !__x86_64__ */
-		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[3] /* child_tidptr */
-#endif /* __x86_64__ */
+#ifdef __x86_64__
+		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[3], /* child_tidptr */
+		                           x86_get_random_userkern_address(),
+		                           sc_info->rsi_regs[0] & CLONE_SETTLS ? sc_info->rsi_regs[4]
+		                                                               : get_user_fsbase()
+#else /* __x86_64__ */
+		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[4], /* child_tidptr */
+		                           sc_info->rsi_regs[0] & CLONE_SETTLS ? sc_info->rsi_regs[3]
+		                                                               : get_user_gsbase(),
+		                           x86_get_random_userkern_address()
+#endif /* !__x86_64__ */
 		                           );
 		gpregs_setpax(&state->ics_gpregs, child_tid);
 	}
@@ -367,10 +358,9 @@ task_fork_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
 		child_tid = x86_task_clone(state,
 		                           SIGCHLD,
 		                           NULL,
-#ifndef __x86_64__
-		                           0, /* Ignored because we don't set CLONE_SETTLS */
-#endif /* !__x86_64__ */
-		                           NULL);
+		                           NULL,
+		                           get_user_gsbase(),
+		                           get_user_fsbase());
 		gpregs_setpax(&state->ics_gpregs, child_tid);
 	}
 	return state;
