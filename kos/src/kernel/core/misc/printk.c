@@ -27,6 +27,7 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/cpu.h>
 
 #include <hybrid/atomic.h>
 
@@ -37,12 +38,19 @@
 #include <format-printer.h>
 #include <stdarg.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <syslog.h>
 
 #undef CONFIG_PRINTK_DEDENT_LBRACKET_TEXT
 #if 1
 #define CONFIG_PRINTK_DEDENT_LBRACKET_TEXT 1
+#endif
+
+#undef CONFIG_PRINTK_TIMESTAMP
+#if 1
+#define CONFIG_PRINTK_TIMESTAMP 1
 #endif
 
 DECL_BEGIN
@@ -83,8 +91,36 @@ struct level_state {
 PRIVATE struct level_state level_states[LEVEL_COUNT];
 INTERN port_t debug_port = (port_t)0x80;
 
+/* TODO: Replace `outsb()' with a portable, arch-specific API. */
+#define DO_PRINTK(ptr, num_bytes) outsb(debug_port, ptr, num_bytes)
 
 
+#ifdef CONFIG_PRINTK_TIMESTAMP
+PRIVATE NOBLOCK void
+NOTHROW(KCALL printk_timestamp_prefix)(void) {
+	char buf[32], *ptr;
+	qtime_t now = quantum_time();
+	u64 qpart;
+#define QPART1_SIZE 100000
+#define QPART2_SIZE 100000
+	unsigned int jwidth = 5;
+	unsigned int qpart1, qpart2;
+	ptr = buf;
+	*ptr++ = '[';
+	if (now.q_jtime >= 100000) {
+		*ptr++ = '*';
+		now.q_jtime %= 10000;
+		--jwidth;
+	}
+	qpart  = ((u64)now.q_qtime * (u64)QPART1_SIZE * (u64)QPART2_SIZE) / now.q_qsize;
+	qpart1 = (unsigned int)(qpart / QPART2_SIZE);
+	qpart2 = (unsigned int)(qpart % QPART2_SIZE);
+	ptr += sprintf(ptr, "%*u+%.5u.%.5u:", jwidth,
+	               (unsigned int)now.q_jtime,
+	               qpart1, qpart2);
+	DO_PRINTK(buf, (size_t)(ptr - buf));
+}
+#endif /* CONFIG_PRINTK_TIMESTAMP */
 
 PRIVATE NOBLOCK ssize_t KCALL
 kprinter_impl(void *level_id,
@@ -94,7 +130,6 @@ kprinter_impl(void *level_id,
 	return (ssize_t)datalen;
 #else
 	ssize_t result = (ssize_t)datalen;
-	/* TODO: Replace `__outsb()' with a portable, arch-specific API. */
 	while (datalen) {
 		size_t print_len;
 		print_len = memlen(data, '\n', datalen);
@@ -108,15 +143,22 @@ kprinter_impl(void *level_id,
 				if (prefix_len && data[0] == '[')
 					--prefix_len;
 #endif /* CONFIG_PRINTK_DEDENT_LBRACKET_TEXT */
-				outsb(debug_port, prefix, prefix_len);
+#ifdef CONFIG_PRINTK_TIMESTAMP
+				if (prefix_len) {
+					++prefix;
+					--prefix_len;
+					printk_timestamp_prefix();
+				}
+#endif /* CONFIG_PRINTK_TIMESTAMP */
+				DO_PRINTK(prefix, prefix_len);
 			}
 		}
 		if (print_len < datalen) {
 			++print_len;
-			outsb(debug_port, data, print_len);
+			DO_PRINTK(data, print_len);
 			ATOMIC_FETCHAND(level_states[(uintptr_t)level_id].ls_flags, ~LEVEL_FINLINE);
 		} else {
-			outsb(debug_port, data, print_len);
+			DO_PRINTK(data, print_len);
 		}
 		data += print_len;
 		datalen -= print_len;
