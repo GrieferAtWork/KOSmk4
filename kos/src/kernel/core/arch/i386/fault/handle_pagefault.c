@@ -524,14 +524,14 @@ do_handle_iob_node_access:
 						/* Special case: call into VIO memory */
 						TRY {
 							pos_t vio_addr;
-							uintptr_t callsite_eip;
+							uintptr_t callsite_pc;
 							uintptr_t sp;
 							/* Must unwind the stack to restore the IP of the VIO call-site. */
 							sp = icpustate_getsp(state);
 							if (isuser() && sp >= KERNELSPACE_BASE)
 								goto do_normal_vio; /* Validate the stack-pointer for user-space. */
 							TRY {
-								callsite_eip = *(uintptr_t *)sp;
+								callsite_pc = *(uintptr_t *)sp;
 							} EXCEPT {
 								if (!was_thrown(E_SEGFAULT))
 									RETHROW();
@@ -539,21 +539,22 @@ do_handle_iob_node_access:
 							}
 							/* Unwind the stack, and remember the call-site instruction pointer. */
 #ifdef __x86_64__
-							if (isuser() != (callsite_eip < KERNELSPACE_BASE))
+							if (isuser() ? (callsite_pc >= KERNELSPACE_BASE)
+							             : (callsite_pc < KERNELSPACE_BASE))
 								goto do_normal_vio;
-							icpustate_setpc(state, callsite_eip);
+							icpustate_setpc(state, callsite_pc);
 							icpustate_setsp(state, sp + 8);
 #else /* __x86_64__ */
 							if (sp != (uintptr_t)(&state->ics_irregs_k + 1) ||
 							    isuser()) {
-								if (callsite_eip >= KERNELSPACE_BASE)
+								if (callsite_pc >= KERNELSPACE_BASE)
 									goto do_normal_vio;
-								irregs_wrip(&state->ics_irregs_k, callsite_eip);
+								irregs_wrip(&state->ics_irregs_k, callsite_pc);
 								state->ics_irregs_u.ir_esp += 4;
 							} else {
-								if (callsite_eip < KERNELSPACE_BASE)
+								if (callsite_pc < KERNELSPACE_BASE)
 									goto do_normal_vio;
-								state->ics_irregs_k.ir_eip = callsite_eip;
+								state->ics_irregs_k.ir_eip = callsite_pc;
 								state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
 								                                      OFFSET_ICPUSTATE_IRREGS +
 								                                      SIZEOF_IRREGS_KERNEL);
@@ -1057,12 +1058,12 @@ throw_segfault:
 	if (pc == (uintptr_t)addr) {
 		/* This can happen when trying to call an invalid function pointer.
 		 * -> Try to unwind this happening. */
-		uintptr_t old_eip;
+		uintptr_t callsite_pc;
 		uintptr_t sp = icpustate_getsp(state);
 		if (sp != (uintptr_t)(&state->ics_irregs + 1) && sp >= KERNELSPACE_BASE)
 			goto not_a_badcall;
 		TRY {
-			old_eip = *(uintptr_t *)sp;
+			callsite_pc = *(uintptr_t *)sp;
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT)) {
 				if (isuser())
@@ -1072,26 +1073,27 @@ throw_segfault:
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
-		if (isuser() != (old_eip < KERNELSPACE_BASE))
+		if (isuser() ? (callsite_pc >= KERNELSPACE_BASE)
+		             : (callsite_pc < KERNELSPACE_BASE))
 			goto not_a_badcall;
-		icpustate_setpc(state, old_eip);
+		icpustate_setpc(state, callsite_pc);
 		icpustate_setsp(state, sp + 8);
 #else /* __x86_64__ */
 		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || isuser()) {
-			if (old_eip >= KERNELSPACE_BASE)
+			if (callsite_pc >= KERNELSPACE_BASE)
 				goto not_a_badcall;
-			icpustate_setpc(state, old_eip);
+			icpustate_setpc(state, callsite_pc);
 			state->ics_irregs_u.ir_esp += 4;
 		} else {
-			if (old_eip < KERNELSPACE_BASE)
+			if (callsite_pc < KERNELSPACE_BASE)
 				goto not_a_badcall;
-			state->ics_irregs_k.ir_eip = old_eip;
+			state->ics_irregs_k.ir_eip = callsite_pc;
 			state = (struct icpustate *)memmoveup((byte_t *)state + sizeof(void *), state,
 			                                      OFFSET_ICPUSTATE_IRREGS +
 			                                      SIZEOF_IRREGS_KERNEL);
 		}
 #endif /* !__x86_64__ */
-		PERTASK_SET(this_exception_faultaddr, (void *)old_eip);
+		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 		PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
 #if X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
