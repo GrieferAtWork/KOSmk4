@@ -206,7 +206,7 @@ INTERN_FUNCTION(x86_load_thread_eax_cpu_ebx)
 	/* Check if the old thread had its I/O permissions bitmap loaded. */
 	EXTERN(thiscpu_x86_ioperm_bitmap)
 	cmpl   $(0), thiscpu_x86_ioperm_bitmap(%ebx)
-	jnz    .Llazy_disable_ioperm_bitmap
+	jne    .Llazy_disable_ioperm_bitmap
 INTERN_LABEL(__x86_lazy_disable_ioperm_bitmap_return):
 
 	.cfi_remember_state
@@ -263,6 +263,7 @@ INTERN_FUNCTION(__x86_lazy_disable_ioperm_bitmap_pae)
 	movl   %ecx, 0xc(%edx)
 END(__x86_lazy_disable_ioperm_bitmap_pae)
 #endif /* !CONFIG_NO_PAGING_PAE */
+	/* XXX: invlpg */
 	jmp    __x86_lazy_disable_ioperm_bitmap_return
 	.cfi_endproc
 END(x86_load_thread_eax_cpu_ebx)

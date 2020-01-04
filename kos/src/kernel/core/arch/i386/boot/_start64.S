@@ -695,7 +695,7 @@ INTERN_FUNCTION(_start)
 
 	/* Now to actually enable paging! */
 	movl  %cr0, %eax
-	orl   $(CR0_PG), %eax
+	orl   $(CR0_PG | CR0_WP), %eax
 	movl  %eax, %cr0
 
 	/* Even though paging's been enabled now, we can't unmap the unused identity mappings

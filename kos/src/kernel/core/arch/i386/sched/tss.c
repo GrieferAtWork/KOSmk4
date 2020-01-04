@@ -82,7 +82,7 @@ _current_x86_dfstackpart ASMNAME("thiscpu_x86_dfstackpart") = {
 	.dp_stale = NULL,
 	.dp_block = &vm_datablock_anonymous,
 #if CEILDIV(KERNEL_DF_STACKSIZE, PAGESIZE) > (BITS_PER_POINTER / VM_DATAPART_PPP_BITS)
-	.dp_flags = VM_DATAPART_FLAG_HEAPPPP,
+	.dp_flags = VM_DATAPART_FLAG_NORMAL | VM_DATAPART_FLAG_HEAPPPP,
 #else
 	.dp_flags = VM_DATAPART_FLAG_NORMAL,
 #endif

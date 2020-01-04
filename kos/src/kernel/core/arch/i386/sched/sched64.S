@@ -164,7 +164,7 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	/* Check if the old thread had its I/O permissions bitmap loaded. */
 	EXTERN(thiscpu_x86_ioperm_bitmap)
 	cmpq   $(0), thiscpu_x86_ioperm_bitmap(%rbx)
-	jnz    .Llazy_disable_ioperm_bitmap
+	jne    .Llazy_disable_ioperm_bitmap
 .Llazy_disable_ioperm_bitmap_return:
 
 	.cfi_remember_state
@@ -212,10 +212,11 @@ INTERN_FUNCTION(x86_load_thread_rax_cpu_rbx)
 	/* Must actually unmap the I/O permissions bitmap! */
 	EXTERN(thiscpu_x86_iobnode_pagedir_identity)
 	movq   thiscpu_x86_iobnode_pagedir_identity(%rbx), %rdx
-	movl   $(P64_PAGE_FPREPARED), %ecx
+	movzlq $(P64_PAGE_FPREPARED), %rcx
 	movq   $(0), thiscpu_x86_ioperm_bitmap(%rbx)
 	movq   %rcx, 0x0(%rdx)
 	movq   %rcx, 0x8(%rdx)
+	/* XXX: invlpg */
 	jmp    .Llazy_disable_ioperm_bitmap_return
 	.cfi_endproc
 END(x86_load_thread_rax_cpu_rbx)

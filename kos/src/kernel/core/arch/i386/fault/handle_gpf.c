@@ -581,6 +581,7 @@ done_noncanon_check:
 		}
 #endif /* __x86_64__ */
 
+		/* Check for #GP caused by privileged instructions or illegal registers */
 		switch (opcode) {
 
 #ifdef __x86_64__

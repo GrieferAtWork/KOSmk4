@@ -95,12 +95,12 @@ typedef u32 op_flag_t;
 
 
 
-#define MODRM_MOD_MASK     0xc0 /* 0b11000000 */
-#define MODRM_REG_MASK     0x38 /* 0b00111000 */
-#define MODRM_RM_MASK      0x07 /* 0b00000111 */
-#define MODRM_MOD_SHIFT    6
-#define MODRM_REG_SHIFT    3
-#define MODRM_RM_SHIFT     0
+#define MODRM_MOD_MASK  0xc0 /* 0b11000000 */
+#define MODRM_REG_MASK  0x38 /* 0b00111000 */
+#define MODRM_RM_MASK   0x07 /* 0b00000111 */
+#define MODRM_MOD_SHIFT 6
+#define MODRM_REG_SHIFT 3
+#define MODRM_RM_SHIFT  0
 #define MODRM_GETMOD(x) (((x) & MODRM_MOD_MASK) >> MODRM_MOD_SHIFT)
 #define MODRM_GETREG(x) (((x) & MODRM_REG_MASK) >> MODRM_REG_SHIFT)
 #define MODRM_GETRM(x)  (((x) & MODRM_RM_MASK) >> MODRM_RM_SHIFT)
