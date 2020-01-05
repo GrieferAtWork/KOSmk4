@@ -132,7 +132,7 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 		if (elapsed_error > nts.ct_prec) {
 			u64 elapsed_error_nano, cpu_elapsed_nano;
 			quantum_diff_t adjust, new_quantum_length;
-			elapsed_error -= nts.ct_prec / 2;
+			elapsed_error -= nts.ct_prec;
 			/* Adjust the quantum length to fix a precision error:
 			 *    Over the last `cpu_elapsed' seconds, our CPU has accumulated
 			 *    an error of approximately `elapsed_error' seconds.
@@ -145,7 +145,7 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 			cpu_elapsed_nano   = ((u64)cpu_elapsed.tv_sec * __NSECS_PER_SEC) + cpu_elapsed.tv_nsec;
 			if unlikely(!cpu_elapsed_nano)
 				return;
-			adjust = (quantum_diff_t)(elapsed_error_nano / cpu_elapsed_nano);
+			adjust = (quantum_diff_t)(((u64)elapsed_error_nano * (cpus / JIFFIES_FROM_SECONDS(3))) / cpu_elapsed_nano);
 			if (adjust != 0) {
 				new_quantum_length = cpu_clock_too_fast ? cpus + adjust : cpus - adjust;
 				printk(KERN_INFO "[cpu#%u] Adjust quantum length %I32u -> %I32u\n",

@@ -29,7 +29,6 @@
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
-#include <kernel/printk.h>
 #include <kernel/rand.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -2141,7 +2140,6 @@ again_read_status:
 						}
 						COMPILER_WRITE_BARRIER();
 					}
-					printk(KERN_DEBUG "posix_waitfor(): Success: %u\n", result);
 					return result;
 				}
 next_candidate:

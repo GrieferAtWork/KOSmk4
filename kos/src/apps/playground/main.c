@@ -280,8 +280,10 @@ int main_prognam(int argc, char *argv[], char *envp[]) {
 /************************************************************************/
 int main_logtime(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
-	for (;;)
+	for (;;) {
 		syslog(LOG_DEBUG, "Entry!\n");
+		sleep(1);
+	}
 	return 0;
 }
 /************************************************************************/
