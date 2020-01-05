@@ -210,6 +210,7 @@
 #define __COMPILER_HAVE_GCC_ASM 1
 #define __COMPILER_HAVE_REGISTER_VARS 1
 #define __COMPILER_HAVE_PRAGMA_PACK 1
+#define __COMPILER_HAVE_ADDRESSIBLE_LABELS 1 /* void *p = &&foo; goto *p; foo: */
 #define __COMPILER_HAVE_TYPEOF 1
 #if defined(__clang__) || !defined(__DARWIN_NO_LONG_LONG)
 #define __COMPILER_HAVE_LONGLONG 1

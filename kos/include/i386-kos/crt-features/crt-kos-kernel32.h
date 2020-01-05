@@ -1123,6 +1123,13 @@
 #define __CRT_HAVE_pipe_writer_create 1
 #define __CRT_HAVE_pipe_writer_destroy 1
 #define __CRT_HAVE_pmembank_type_names 1
+#define __CRT_HAVE_print_traceback 1
+#define __CRT_HAVE_print_traceback_fcpustate 1
+#define __CRT_HAVE_print_traceback_icpustate 1
+#define __CRT_HAVE_print_traceback_kcpustate 1
+#define __CRT_HAVE_print_traceback_lcpustate 1
+#define __CRT_HAVE_print_traceback_scpustate 1
+#define __CRT_HAVE_print_traceback_ucpustate 1
 #define __CRT_HAVE_printk 1
 #define __CRT_HAVE_pty_alloc 1
 #define __CRT_HAVE_qtime_to_timespec 1
@@ -1857,6 +1864,7 @@
 #define __CRT_HAVE_task_yield 1
 #define __CRT_HAVE_task_yield_nx 1
 #define __CRT_HAVE_taskpid_destroy 1
+#define __CRT_HAVE_tb 1
 #define __CRT_HAVE_terminal_flush_icanon 1
 #define __CRT_HAVE_terminal_init 1
 #define __CRT_HAVE_terminal_iread 1

@@ -35,16 +35,16 @@
 #include <sched/arch/task.h>
 #endif /* __KERNEL__ && __x86_64__ */
 
-#ifndef __CPUSTATE_GET_USER_FSBASE
+#ifndef __CPUSTATE_GET_USER_GSBASE
 #ifdef __KERNEL__
 #include <kernel/gdt.h>
-#define __CPUSTATE_GET_USER_FSBASE() get_user_fsbase()
 #define __CPUSTATE_GET_USER_GSBASE() get_user_gsbase()
+#define __CPUSTATE_GET_USER_FSBASE() get_user_fsbase()
 #else /* __KERNEL__ */
-#define __CPUSTATE_GET_USER_FSBASE() ((__uintptr_t)__rdfsbase())
 #define __CPUSTATE_GET_USER_GSBASE() ((__uintptr_t)__rdgsbase())
+#define __CPUSTATE_GET_USER_FSBASE() ((__uintptr_t)__rdfsbase())
 #endif /* !__KERNEL__ */
-#endif /* !__CPUSTATE_GET_USER_FSBASE */
+#endif /* !__CPUSTATE_GET_USER_GSBASE */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -691,6 +691,49 @@ __NOTHROW_NCX(scpustate64_to_scpustate64_p)(struct scpustate64 const *__restrict
 	__libc_memcpy(__COMPILER_REQTYPE(struct ucpustate64 *, result),     \
 	              __COMPILER_REQTYPE(struct ucpustate64 const *, self), \
 	              sizeof(struct ucpustate64))
+#ifdef __x86_64__
+__LOCAL __NOBLOCK void
+__NOTHROW_NCX(ucpustate64_current)(struct ucpustate64 *__restrict __result) {
+	__register __REGISTER_TYPE__ __temp;
+	__COMPILER_BARRIER();
+	__asm__ __volatile__("movq %%r15, 64(%2)\n\t"
+	                     "movq %%r14, 72(%2)\n\t"
+	                     "movq %%r13, 80(%2)\n\t"
+	                     "movq %%r12, 88(%2)\n\t"
+	                     "movq %%r11, 96(%2)\n\t"
+	                     "movq %%r10, 104(%2)\n\t"
+	                     "movq %%r9, 112(%2)\n\t"
+	                     "movq %%r8, 120(%2)\n\t"
+	                     "movq %%rdi, 128(%2)\n\t"
+	                     "movq %%rsi, 136(%2)\n\t"
+	                     "movq %%rbp, 144(%2)\n\t"
+	                     "movq %%rsp, 152(%2)\n\t"
+	                     "movq %%rbx, 160(%2)\n\t"
+	                     "movq %%rdx, 168(%2)\n\t"
+	                     "movq %%rcx, 176(%2)\n\t"
+	                     "movq %%rax, 184(%2)\n\t"
+	                     "pushfq\n\t"
+	                     ".cfi_adjust_cfa_offset 8\n\t"
+	                     "popq 192(%2)\n\t"
+	                     ".cfi_adjust_cfa_offset -8\n\t"
+	                     "leaq 991f(%%rip), %1\n\t"
+	                     "movq %1, 200(%2)\n\t"
+	                     "991:"
+	                     : "=m" /*0*/ (*__result)
+	                     , "=&r" /*1*/ (__temp)
+	                     : "r" /*2*/ (__result));
+	__result->ucs_sgbase.sg_gsbase = __CPUSTATE_GET_USER_GSBASE();
+	__result->ucs_sgbase.sg_fsbase = __CPUSTATE_GET_USER_FSBASE();
+	__result->ucs_cs               = SEGMENT_CURRENT_CODE_RPL;
+	__result->ucs_ss               = SEGMENT_CURRENT_DATA_RPL;
+	__result->ucs_sgregs.sg_gs     = __rdgs();
+	__result->ucs_sgregs.sg_fs     = __rdfs();
+	__result->ucs_sgregs.sg_es     = __rdes();
+	__result->ucs_sgregs.sg_ds     = __rdds();
+	__COMPILER_BARRIER();
+}
+#endif /* __x86_64__ */
+
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(ucpustate64_to_kcpustate64)(struct ucpustate64 const *__restrict __self,
                                           struct kcpustate64 *__restrict __result) {
@@ -1194,6 +1237,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define ucpustate_setsp                     ucpustate64_setrsp
 #define ucpustate_getpflags                 ucpustate64_getrflags
 #define ucpustate_setpflags                 ucpustate64_setrflags
+#define ucpustate_current                   ucpustate64_current
 #define ucpustate_to_ucpustate              ucpustate64_to_ucpustate64
 #define ucpustate_to_ucpustate64            ucpustate64_to_ucpustate64
 #define ucpustate64_to_ucpustate            ucpustate64_to_ucpustate64

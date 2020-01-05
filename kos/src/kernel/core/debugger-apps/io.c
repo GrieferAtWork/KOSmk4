@@ -260,7 +260,7 @@ DEFINE_DEBUG_FUNCTION(
 PRIVATE ATTR_DBGTEXT NOBLOCK bool
 NOTHROW(KCALL is_pc)(void *pc) {
 	struct vm_node *node;
-	if (pc < (void *)KERNELSPACE_BASE)
+	if (!ADDR_ISKERN(pc))
 		return false;
 	node = vm_getnodeofaddress(&vm_kernel, pc);
 	if (!node)

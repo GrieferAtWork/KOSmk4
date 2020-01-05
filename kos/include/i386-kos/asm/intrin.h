@@ -98,7 +98,32 @@ __FORCELOCAL void (__wrbx)(__UINTPTR_TYPE__ __val) { __asm__ __volatile__("movl 
 __FORCELOCAL __ATTR_WUNUSED __UINTPTR_TYPE__ (__rdflags)(void) { __UINTPTR_TYPE__ __result; __asm__ __volatile__("pushfl; popl %0" : "=g" (__result)); return __result; }
 __FORCELOCAL void (__wrflags)(__UINTPTR_TYPE__ __fl) { __asm__ __volatile__("pushl %k0; popfl" : : "g" (__fl) : "cc"); }
 #endif /* !__x86_64__ */
-__FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) { __label:; return (void *)&&__label; }
+#ifdef __COMPILER_HAVE_ADDRESSIBLE_LABELS
+__FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) { __label: return (void *)&&__label; }
+#else /* __COMPILER_HAVE_ADDRESSIBLE_LABELS */
+__FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) {
+	__register void *__result;
+#ifdef __x86_64__
+	__asm__("leaq 991f(%%rip), %0\n\t"
+	        "991:"
+	        : "=r" (__result));
+#else /* __x86_64__ */
+#if (defined(__pic__) || defined(__PIC__) || \
+     defined(__pie__) || defined(__PIE__)) && 0
+	__asm__("call 991f\n\t"
+	        "991: .cfi_adjust_cfa_offset 4\n\t"
+	        "popl %0\n\t"
+	        ".cfi_adjust_cfa_offset -4"
+	        : "=r" (__result));
+#else
+	__asm__("movl $991f, 60(%1)\n\t"
+	        "991:"
+	        : "=g" (__result));
+#endif
+#endif /* !__x86_64__ */
+	return __result;
+}
+#endif /* !__COMPILER_HAVE_ADDRESSIBLE_LABELS */
 __FORCELOCAL __ATTR_NORETURN void (__wrip)(void *__val) { __asm__ __volatile__("jmp *%0" : : "g" (__val)); __builtin_unreachable(); }
 
 

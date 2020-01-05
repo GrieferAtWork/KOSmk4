@@ -30,6 +30,7 @@ struct kcpustate;
 struct icpustate;
 struct scpustate;
 
+/* Cause kernel panic. */
 FUNDEF ATTR_NORETURN ATTR_COLD void KCALL kernel_panic_here(void);
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic(char const *format, ...);
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic_ucpustate(struct ucpustate *__restrict state, char const *format, ...);

@@ -1015,40 +1015,42 @@ __NOTHROW_NCX(scpustate32_user_to_scpustate32_p)(struct scpustate32 const *__res
 	__libc_memcpy(__COMPILER_REQTYPE(struct ucpustate32 *, result),     \
 	              __COMPILER_REQTYPE(struct ucpustate32 const *, self), \
 	              sizeof(struct ucpustate32))
-#ifndef __x86_64__
+#if !defined(__x86_64__) && defined(__i386__)
 __FORCELOCAL void __FCALL ucpustate32_current(struct ucpustate32 *__restrict __result) {
-	__asm__("movl %%edi, 0(%1)\n\t"
-			"movl %%esi, 4(%1)\n\t"
-			"movl %%ebp, 8(%1)\n\t"
-			"movl %%esp, 12(%1)\n\t"
-			"movl %%ebx, 16(%1)\n\t"
-			"movl %%edx, 20(%1)\n\t"
-			"movl %%ecx, 24(%1)\n\t"
-			"movl %%eax, 28(%1)\n\t"
-			"pushfl\n\t"
-			".cfi_adjust_cfa_offset 4\n\t"
-			"popl 56(%1)\n\t"
-			".cfi_adjust_cfa_offset -4\n\t"
+	__COMPILER_BARRIER();
+	__asm__ __volatile__("movl %%edi, 0(%1)\n\t"
+	                     "movl %%esi, 4(%1)\n\t"
+	                     "movl %%ebp, 8(%1)\n\t"
+	                     "movl %%esp, 12(%1)\n\t"
+	                     "movl %%ebx, 16(%1)\n\t"
+	                     "movl %%edx, 20(%1)\n\t"
+	                     "movl %%ecx, 24(%1)\n\t"
+	                     "movl %%eax, 28(%1)\n\t"
+	                     "pushfl\n\t"
+	                     ".cfi_adjust_cfa_offset 4\n\t"
+	                     "popl 56(%1)\n\t"
+	                     ".cfi_adjust_cfa_offset -4\n\t"
 #if (defined(__pic__) || defined(__PIC__) || \
      defined(__pie__) || defined(__PIE__)) && 0
-			"call 991f\n\t"
-			"991: .cfi_adjust_cfa_offset 4\n\t"
-			"popl 60(%1)\n\t"
-			".cfi_adjust_cfa_offset -4"
+	                     "call 991f\n\t"
+	                     "991: .cfi_adjust_cfa_offset 4\n\t"
+	                     "popl 60(%1)\n\t"
+	                     ".cfi_adjust_cfa_offset -4"
 #else
-			"movl $991f, 60(%1)\n\t"
-			"991:"
+	                     "movl $991f, 60(%1)\n\t"
+	                     "991:"
 #endif
-			: "=m" /*0*/ (*__result)
-			: "r" /*1*/ (__result));
+	                     : "=m" /*0*/ (*__result)
+	                     : "r" /*1*/ (__result));
 	__result->ucs_cs           = SEGMENT_CURRENT_CODE_RPL;
 	__result->ucs_ss           = SEGMENT_CURRENT_DATA_RPL;
 	__result->ucs_sgregs.sg_gs = __rdgs();
 	__result->ucs_sgregs.sg_fs = __rdfs();
 	__result->ucs_sgregs.sg_es = __rdes();
 	__result->ucs_sgregs.sg_ds = __rdds();
+	__COMPILER_BARRIER();
 }
-#endif /* !__x86_64__ */
+#endif /* !__x86_64__ && __i386__ */
 __LOCAL __NOBLOCK void
 __NOTHROW_NCX(ucpustate32_to_kcpustate32)(struct ucpustate32 const *__restrict __self,
                                           struct kcpustate32 *__restrict __result) {
@@ -1680,7 +1682,9 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define ucpustate_setsp                     ucpustate32_setesp
 #define ucpustate_getpflags                 ucpustate32_geteflags
 #define ucpustate_setpflags                 ucpustate32_seteflags
+#if !defined(__x86_64__) && defined(__i386__)
 #define ucpustate_current                   ucpustate32_current
+#endif /* !__x86_64__ && __i386__ */
 #define ucpustate_to_ucpustate              ucpustate32_to_ucpustate32
 #define ucpustate_to_ucpustate32            ucpustate32_to_ucpustate32
 #define ucpustate32_to_ucpustate            ucpustate32_to_ucpustate32
