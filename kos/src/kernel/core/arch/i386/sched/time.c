@@ -1,7 +1,7 @@
 /*[[[magic
 local deemon = import("deemon");
 local macros = options.setdefault("COMPILE.macros", deemon.Dict(()));
-macros["__DATE_YEAR__"] = str(deemon.int(import("time").Time.now().year));
+macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
 ]]]*/
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
@@ -33,7 +33,6 @@ macros["__DATE_YEAR__"] = str(deemon.int(import("time").Time.now().year));
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <sys/io.h>
-
 #include <assert.h>
 
 #ifndef __DATE_YEAR__
@@ -106,11 +105,11 @@ FORCELOCAL void KCALL cmos_wr(u8 reg, u8 val) {
 
 #define DAYS2YEARS(n_days)  ((400 * ((n_days) + 1)) / 146097)
 #define YEARS2DAYS(n_years) (((146097 * (n_years)) / 400) /*-1*/) // rounding error?
-#define ISLEAPYEAR(year) \
-	(__builtin_constant_p(year)                                                   \
-	 ? ((year) % 400 == 0 || ((year) % 100 != 0 && (year) % 4 == 0))              \
-	 : XBLOCK({ __typeof__(year) const _year = (year);                            \
-	            XRETURN _year % 400 == 0 || (_year % 100 != 0 && _year % 4 == 0); }))
+#define ISLEAPYEAR(year)                                                                                   \
+	(__builtin_constant_p(year) ? ((year) % 400 == 0 || ((year) % 100 != 0 && (year) % 4 == 0)) : XBLOCK({ \
+		__typeof__(year) const _year = (year);                                                             \
+		XRETURN _year % 400 == 0 || (_year % 100 != 0 && _year % 4 == 0);                                  \
+	}))
 
 PRIVATE time_t const time_monthstart_yday[2][13] = {
 	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
@@ -201,13 +200,14 @@ got_time:
 		if (year < (__DATE_YEAR__ % 100))
 			year += 100; /* 100 years into the future. */
 		year += (__DATE_YEAR__ / 100) * 100;
+		year = __DATE_YEAR__;
 	}
 	if unlikely(year < 1970)
 		result = 0;
 	else {
-		result = YEARS2DAYS((time_t)year) - YEARS2DAYS((time_t)1970);
-		result += MONTH_STARTING_DAY_OF_YEAR(ISLEAPYEAR(year), (cmos_month - 1) % 12);
-		result += cmos_day;
+		result = YEARS2DAYS((time_t)(year - 1970));
+		result += MONTH_STARTING_DAY_OF_YEAR(ISLEAPYEAR(year), (u8)(cmos_month - 1) % 12);
+		result += cmos_day - 1;
 		result *= SECONDS_PER_DAY;
 		result += cmos_hour * 60 * 60;
 		result += cmos_minute * 60;
@@ -226,6 +226,10 @@ NOTHROW(KCALL cmos_gettime)(struct realtime_clock_struct *__restrict UNUSED(self
 	return result;
 }
 
+INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_cmos)(void) {
+	cmos_state_b = cmos_rd(CMOS_STATE_B);
+	//cmos_cent_reg = ...; /* TODO: This can be read from the ACPI descriptor table. */
+}
 
 DECL_END
 

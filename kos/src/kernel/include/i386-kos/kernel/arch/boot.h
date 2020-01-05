@@ -54,6 +54,7 @@ DATDEF struct boot_device_info boot_device;
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
+INTDEF FREE void NOTHROW(KCALL x86_initialize_cmos)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_paging)(void);
 INTDEF FREE void NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info);
 INTDEF FREE void NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info);

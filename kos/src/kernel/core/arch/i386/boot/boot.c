@@ -90,6 +90,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 		debug_port = (port_t)0xe9;
 	}
 
+	x86_initialize_cmos();
+
 	printk(FREESTR(KERN_NOTICE "[boot] Begin kernel initialization\n"));
 	printk(FREESTR(KERN_INFO "[boot] CPU brand: %q\n"), x86_bootcpu_cpuid.ci_brand);
 
