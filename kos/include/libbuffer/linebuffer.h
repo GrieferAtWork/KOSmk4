@@ -110,7 +110,7 @@ struct linebuffer {
 	 sched_signal_cinit(&(self)->lb_nful))
 #define linebuffer_init(self)   linebuffer_init_ex(self, LINEBUFFER_DEFAULT_LIMIT)
 #define linebuffer_cinit(self)  linebuffer_cinit_ex(self, LINEBUFFER_DEFAULT_LIMIT)
-#define linebuffer_fini(self)   linecapture_fini(&(self)->lb_line)
+#define linebuffer_fini(self)   (linebuffer_close(self), linecapture_fini(&(self)->lb_line))
 
 
 /* Close the given line buffer, waking any remaining readers or writers. */
@@ -118,8 +118,8 @@ struct linebuffer {
 LIBBUFFER_DECL __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(LIBBUFFER_CC linebuffer_close)(struct linebuffer *__restrict __self);
 #else
-#define linebuffer_close(self) \
-	(__hybrid_atomic_store((self)->lb_limt,0,__ATOMIC_RELEASE), \
+#define linebuffer_close(self)                                    \
+	(__hybrid_atomic_store((self)->lb_limt, 0, __ATOMIC_RELEASE), \
 	 sched_signal_broadcast(&(self)->lb_nful))
 #endif
 

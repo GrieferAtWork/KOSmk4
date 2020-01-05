@@ -95,12 +95,13 @@ struct ringbuffer {
 
 #ifdef __KERNEL__
 #define ringbuffer_fini(self)                                                        \
-	((self)->rb_size                                                                 \
+	(ringbuffer_close(self),                                                         \
+	 (self)->rb_size                                                                 \
 	 ? heap_free(&kernel_default_heap, (self)->rb_data, (self)->rb_size, GFP_NORMAL) \
 	 : (void)0)
 #else /* __KERNEL__ */
 #define ringbuffer_fini(self) \
-	__libc_free((self)->rb_data)
+	(ringbuffer_close(self), __libc_free((self)->rb_data))
 #endif /* !__KERNEL__ */
 
 
