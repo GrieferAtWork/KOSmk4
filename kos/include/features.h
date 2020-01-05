@@ -21,20 +21,6 @@
 
 #include "__stdinc.h"
 
-//#undef __USE_KOS        /* __KOS_VERSION__ >= 100 */
-//#undef __USE_KXS        /* __KOS_VERSION__ >= 200/300 */
-//#undef __USE_KOS_KERNEL /* __KOS_VERSION__ >= 400 */
-//#undef __USE_STRING_BWLQ
-//#undef __USE_STRING_XCHR
-//#undef __USE_XOPEN2K8
-//#undef __USE_MISC
-//#undef __USE_GNU
-//#undef __USE_DOS
-//#undef __USE_XOPEN2K
-//#undef __USE_ISOC99
-//#undef __CORRECT_ISO_CPP_STRING_H_PROTO
-//#undef __USE_CTYPE_MACROS
-
 
 /* Don't implicitly expose any system functionality that isn't
  * strictly sanctioned by the C/C++ standard in C standard headers.
@@ -56,7 +42,7 @@
 
 
 #if defined(__cplusplus) && !defined(_NO_IMPLICIT_GNU_SOURCE) && \
-   !defined(__USE_ISOC_PURE) && \
+   !defined(__USE_ISOC_PURE) && !defined(_ALL_SOURCE) && \
    (defined(__GNUC__) || __has_include(<bits/vector.tcc>))
 /* Hacky work-around to satisfy header requirements for libstdc++
  * And before you say that this is a bad way of doing it, know that
@@ -98,9 +84,9 @@
 /* When exposed in headers, the behavior of memmem() and memrmem()
  * differs from the behavior found in glibc's implementation (of memmem())
  * #define _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (kos-specific)
- *    -> memmem() or memrmem() is called with `needlelen' set to ZERO(0), return `NULL'
+ *    -> memmem() or memrmem() called with `needlelen' set to ZERO(0), return `NULL'
  * #undef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (glibc-compatible)
- *    -> memmem() or memrmem() is called with `needlelen' set to ZERO(0), return:
+ *    -> memmem() or memrmem() called with `needlelen' set to ZERO(0), return:
  *       memmem():  `haystack'
  *       memrmem(): `haystack + haystacklen'
  */
@@ -110,46 +96,55 @@
 #endif /* _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 
 
-
+/* KOS System extensions */
 #ifdef _KOS_SOURCE
-#define __USE_KOS 1
-#define __USE_STRING_BWLQ 1
-#define __USE_STRING_XCHR 1
-#define __USE_STRING_OVERLOADS 1
+#define __USE_KOS 1 /* Various KOS extensions (e.g. `strend()') */
+#define __USE_STRING_BWLQ 1 /* `memcpy[bwlq]()' */
+#define __USE_STRING_XCHR 1 /* `memxchr()' */
+#define __USE_STRING_OVERLOADS 1 /* 4-argument `memcpy(dst, src, count, size)' */
 #endif /* _KOS_SOURCE */
 
+/* KOS Kernel extensions/kernel-level data structures/functions
+ * These become visible within the KOS kernel by default, and
+ * can manually be enabled by user-space applications.
+ * These include internal ABI/API details normally hidden from
+ * normal user-space applications and only need to be known by
+ * libc and the kernel, such as `SA_RESTORER' or `io_delay()' */
 #if defined(_KOS_KERNEL_SOURCE) || \
    (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE))
 #define __USE_KOS_KERNEL 1
 #endif /* _KOS_KERNEL_SOURCE || (__KOS__ && __KERNEL__ && !__USE_ISOC_PURE) */
 
+/* `memcpy[bwlq]()' (Also implied by `_KOS_SOURCE') */
 #ifdef _STRING_BWLQ_SOURCE
 #define __USE_STRING_BWLQ 1
 #endif /* _STRING_BWLQ_SOURCE */
 
+/* `memxchr()' (Also implied by `_KOS_SOURCE') */
 #ifdef _STRING_XCHR_SOURCE
 #define __USE_STRING_XCHR 1
 #endif /* _STRING_XCHR_SOURCE */
 
-
-/* In C++, still define ctype macros. */
+/* Explicitly allow definition of ctype macros. */
 #ifdef _CTYPE_MACRO_SOURCE
 #define __USE_CTYPE_MACROS 1
 #endif /* _CTYPE_MACRO_SOURCE */
 
+/* DOS (NT) extensions and symbol visibility.
+ * This is the stuff you'd also find in `msvcrt.dll' and its headers. */
 #ifdef _DOS_SOURCE
-#if (_DOS_SOURCE+0) != 0
+#if (_DOS_SOURCE + 0) != 0
 #define __USE_DOS 1
 #define __USE_DOS_SLIB 1
-#endif /* (_DOS_SOURCE+0) != 0 */
+#endif /* (_DOS_SOURCE + 0) != 0 */
 #elif defined(_MSC_VER) && !defined(__USE_ISOC_PURE)
 #define __USE_DOS 1
 #ifndef __STDC_WANT_SECURE_LIB__
 #define __STDC_WANT_SECURE_LIB__ 1
 #endif /* !__STDC_WANT_SECURE_LIB__ */
-#if (__STDC_WANT_SECURE_LIB__+0) != 0
+#if (__STDC_WANT_SECURE_LIB__ + 0) != 0
 #define __USE_DOS_SLIB 1
-#endif /* (__STDC_WANT_SECURE_LIB__+0) != 0 */
+#endif /* (__STDC_WANT_SECURE_LIB__ + 0) != 0 */
 #endif
 
 /* 64-bit time_t extensions for KOS
@@ -168,10 +163,24 @@
 #define __USE_TIME64 1
 #endif /* ... */
 
+/* Control the typing of `time_t' to either be `__time32_t' or `__time64_t'
+ * Note that despite their names, on some architectures `sizeof(__time32_t) == sizeof(__time64_t)',
+ * such that this option doesn't actually affect anything. One such architecture would be
+ * the x86_64 CPU where `__time32_t' is defined as `__syscall_slong_t', which is already
+ * 8 bytes big. To simplify the porting of programs, a properly written application could
+ * be made 64-bit time_t-compliant by simply re-compiling everything with `-D_TIME_T_BITS=64'
+ * Reminder: On `2038-01-19T03:14:07', 32-bit unix time will roll over, and this is a date
+ *           that anyone reading this is likely to still experience, so be prepared and know
+ *           that sooner or later _all_ applications will have to support this.
+ * NOTE: As the aforementioned date becomes closer and closer, `__USE_TIME_BITS64' will eventually
+ *       become the default, and if I (or someone else) will still be willing to maintain this file
+ *       as well as the KOS operating system at that point, 32-bit time support may eventually be
+ *       removed entirely, depending on adoption of 64-bit time by both KOS-specific and unix/linux
+ *       software in general. */
 #ifdef _TIME_T_BITS
-#if (_TIME_T_BITS+0) == 64
+#if (_TIME_T_BITS + 0) == 64
 #define __USE_TIME_BITS64 1
-#elif (_TIME_T_BITS+0) == 32
+#elif (_TIME_T_BITS + 0) == 32
 #undef __USE_TIME_BITS64
 #else
 #error "Must #define _TIME_T_BITS as either 32 or 64"
@@ -184,6 +193,8 @@
 #define __USE_TIME_BITS64 1
 #endif
 
+
+/* Make available some BSD-specific extensions such as `cfmakesane()' */
 #ifdef _BSD_SOURCE
 #define __USE_BSD 1
 /* BSD name (not used in headers, but may be checked by
@@ -192,9 +203,10 @@
 #define __BSD_VISIBLE 1
 #endif /* _BSD_SOURCE */
 
+
 #if (defined(_BSD_SOURCE) || defined(_SVID_SOURCE)) && \
     !defined(_DEFAULT_SOURCE)
-#undef  _DEFAULT_SOURCE
+#undef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
 #endif
 
