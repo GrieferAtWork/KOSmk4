@@ -278,6 +278,19 @@ int main_prognam(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+int main_logtime(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	for (;;)
+		syslog(LOG_DEBUG, "Entry!\n");
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
 PRIVATE ssize_t __LIBCCALL
 debug_printer(void *UNUSED(arg), char const *message, size_t len) {
 	struct debugtrap_reason r;
@@ -356,6 +369,7 @@ PRIVATE DEF defs[] = {
 	{ "color", &main_color },
 	{ "fpu", &main_fpu },
 	{ "fork", &main_fork },
+	{ "logtime", &main_logtime },
 	{ NULL, NULL },
 };
 

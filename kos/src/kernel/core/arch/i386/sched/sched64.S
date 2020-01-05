@@ -617,9 +617,8 @@ INTERN_FUNCTION(x86_apic_cpu_enable_preemptive_interrupts)
 	/* lapic_write(APIC_TIMER,
 	 *             // Set the PIT interrupt to the APIC timer.
 	 *             X86_INTNO_PIC1_PIT |
-	 *             APIC_TIMER_MODE_FPERIODIC |
-	 *             APIC_TIMER_SOURCE_FDIV); */
-	movl   $(X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC | APIC_TIMER_SOURCE_FDIV), \
+	 *             APIC_TIMER_MODE_FPERIODIC); */
+	movl   $(X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC), \
 	       APIC_TIMER(%rcx)
 	/* lapic_write(APIC_TIMER_INITIAL,PERCPU(thiscpu_quantum_length)); */
 	movl   %eax, APIC_TIMER_INITIAL(%rcx)
@@ -640,9 +639,8 @@ INTERN_FUNCTION(x86_apic_cpu_enable_preemptive_interrupts_nopr)
 	/* lapic_write(APIC_TIMER,
 	 *             // Set the PIT interrupt to the APIC timer.
 	 *             X86_INTNO_PIC1_PIT |
-	 *             APIC_TIMER_MODE_FPERIODIC |
-	 *             APIC_TIMER_SOURCE_FDIV); */
-	movl   $(X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC | APIC_TIMER_SOURCE_FDIV), \
+	 *             APIC_TIMER_MODE_FPERIODIC); */
+	movl   $(X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC), \
 	       APIC_TIMER(%rcx)
 	/* lapic_write(APIC_TIMER_INITIAL, PERCPU(thiscpu_quantum_length)); */
 	movl   %eax, APIC_TIMER_INITIAL(%rcx)
@@ -701,9 +699,9 @@ PUBLIC_FUNCTION(cpu_quantum_remaining_nopr)
 	         PIT_COMMAND_ACCESS_FLATCH | \
 	         PIT_COMMAND_FBINARY), %al
 	outb   %al,  $(PIT_COMMAND)
-	inb    $(PIT_DATA0),     %al
+	inb    $(PIT_DATA0), %al
 	movb   %al, %cl
-	inb    $(PIT_DATA0),     %al
+	inb    $(PIT_DATA0), %al
 	movb   %al, %ch
 	movzwq %cx, %rax
 	ret
@@ -721,9 +719,9 @@ PUBLIC_FUNCTION(cpu_quantum_remaining)
 	         PIT_COMMAND_ACCESS_FLATCH | \
 	         PIT_COMMAND_FBINARY), %al
 	outb   %al,  $(PIT_COMMAND)
-	inb    $(PIT_DATA0),     %al
+	inb    $(PIT_DATA0), %al
 	movb   %al, %cl
-	inb    $(PIT_DATA0),     %al
+	inb    $(PIT_DATA0), %al
 	popfq
 	movb   %al, %ch
 	movzwq %cx, %rax
@@ -739,11 +737,11 @@ PUBLIC_FUNCTION(cpu_quantum_elapsed_nopr)
 	         PIT_COMMAND_ACCESS_FLATCH | \
 	         PIT_COMMAND_FBINARY), %al
 	outb   %al,  $(PIT_COMMAND)
-	inb    $(PIT_DATA0),     %al
+	inb    $(PIT_DATA0), %al
 	movb   %al, %cl
-	inb    $(PIT_DATA0),     %al
+	inb    $(PIT_DATA0), %al
 	movb   %al, %ch
-	movq   $PIT_HZ_DIV(HZ), %rax
+	movq   $(PIT_HZ_DIV(HZ)), %rax
 	subw   %cx, %ax
 	ret
 .if x86_apic_cpu_quantum_elapsed_size_nopr > (. - cpu_quantum_elapsed_nopr)
@@ -759,12 +757,12 @@ PUBLIC_FUNCTION(cpu_quantum_elapsed)
 	cli
 	/* Read the current PIT counter position. */
 	outb   %al,  $(PIT_COMMAND)
-	inb    $(PIT_DATA0),     %al
+	inb    $(PIT_DATA0), %al
 	movb   %al, %cl
-	inb    $(PIT_DATA0),     %al
+	inb    $(PIT_DATA0), %al
 	popfq
 	movb   %al, %ch
-	movq   $PIT_HZ_DIV(HZ), %rax
+	movq   $(PIT_HZ_DIV(HZ)), %rax
 	subw   %cx, %ax
 	ret
 .if x86_apic_cpu_quantum_elapsed_size > (. - cpu_quantum_elapsed)
@@ -828,13 +826,13 @@ INTERN_FUNCTION(x86_cpu_enable_preemptive_interrupts)
 	pushfq
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLOHI | \
-	         PIT_COMMAND_MODE_FSQRWAVE | \
+	         PIT_COMMAND_MODE_FRATEGEN | \
 	         PIT_COMMAND_FBINARY), %al
 	cli
 	/* outb(PIT_COMMAND,
 	 *      PIT_COMMAND_SELECT_F0 |
 	 *      PIT_COMMAND_ACCESS_FLOHI |
-	 *      PIT_COMMAND_MODE_FSQRWAVE |
+	 *      PIT_COMMAND_MODE_FRATEGEN |
 	 *      PIT_COMMAND_FBINARY) */
 	outb   %al, $(PIT_COMMAND)
 	/* outb_p(PIT_DATA0, PIT_HZ_DIV(HZ) & 0xff) */
@@ -859,11 +857,11 @@ INTERN_FUNCTION(x86_cpu_enable_preemptive_interrupts_nopr)
 	/* outb(PIT_COMMAND,
 	 *      PIT_COMMAND_SELECT_F0 |
 	 *      PIT_COMMAND_ACCESS_FLOHI |
-	 *      PIT_COMMAND_MODE_FSQRWAVE |
+	 *      PIT_COMMAND_MODE_FRATEGEN |
 	 *      PIT_COMMAND_FBINARY) */
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLOHI | \
-	         PIT_COMMAND_MODE_FSQRWAVE | \
+	         PIT_COMMAND_MODE_FRATEGEN | \
 	         PIT_COMMAND_FBINARY), %al
 	outb   %al, $(PIT_COMMAND)
 	/* outb_p(PIT_DATA0, PIT_HZ_DIV(HZ) & 0xff) */
@@ -888,14 +886,14 @@ PUBLIC_FUNCTION(cpu_quantum_reset)
 	pushfq
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLOHI | \
-	         PIT_COMMAND_MODE_FSQRWAVE | \
+	         PIT_COMMAND_MODE_FRATEGEN | \
 	         PIT_COMMAND_FBINARY), %al
 	cli
 	/* Re-initialize to reset the latch counter. */
 	/* outb(PIT_COMMAND,
 	 *      PIT_COMMAND_SELECT_F0 |
 	 *      PIT_COMMAND_ACCESS_FLOHI |
-	 *      PIT_COMMAND_MODE_FSQRWAVE |
+	 *      PIT_COMMAND_MODE_FRATEGEN |
 	 *      PIT_COMMAND_FBINARY) */
 	outb   %al, $(PIT_COMMAND)
 	/* outb_p(PIT_DATA0, PIT_HZ_DIV(HZ) & 0xff) */
@@ -917,11 +915,11 @@ PUBLIC_FUNCTION(cpu_quantum_reset_nopr)
 	/* outb(PIT_COMMAND,
 	 *      PIT_COMMAND_SELECT_F0 |
 	 *      PIT_COMMAND_ACCESS_FLOHI |
-	 *      PIT_COMMAND_MODE_FSQRWAVE |
+	 *      PIT_COMMAND_MODE_FRATEGEN |
 	 *      PIT_COMMAND_FBINARY) */
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLOHI | \
-	         PIT_COMMAND_MODE_FSQRWAVE | \
+	         PIT_COMMAND_MODE_FRATEGEN | \
 	         PIT_COMMAND_FBINARY), %al
 	outb   %al, $(PIT_COMMAND)
 	/* outb_p(PIT_DATA0, PIT_HZ_DIV(HZ) & 0xff) */

@@ -466,6 +466,9 @@ DEFINE_PUBLIC_WEAK_ALIAS(cpu_quantum_elapsed_nopr, cpu_quantum_elapsed);
 DEFINE_PUBLIC_WEAK_ALIAS(cpu_quantum_remaining_nopr, cpu_quantum_remaining);
 
 
+PRIVATE ATTR_PERCPU jtime_t thiscpu_last_qtime_j = 0;
+PRIVATE ATTR_PERCPU quantum_diff_t thiscpu_last_qtime_q = 0;
+
 PUBLIC NOBLOCK WUNUSED qtime_t
 NOTHROW(KCALL cpu_quantum_time)(void) {
 	qtime_t result;
@@ -478,6 +481,16 @@ NOTHROW(KCALL cpu_quantum_time)(void) {
 	result.q_qtime = FORCPU(me, thiscpu_quantum_offset);
 	result.q_qsize = FORCPU(me, thiscpu_quantum_length);
 	elapsed        = cpu_quantum_elapsed_nopr();
+	/* prevent issues hardware timer roll-over happening
+	 * before we've able to read the timestamp counter. */
+	if (elapsed < FORCPU(me, thiscpu_last_qtime_q) &&
+	    result.q_jtime == FORCPU(me, thiscpu_last_qtime_j)) {
+		FORCPU(me, thiscpu_last_qtime_q) = (quantum_diff_t)-1;
+		++result.q_jtime;
+	} else {
+		FORCPU(me, thiscpu_last_qtime_j) = result.q_jtime;
+		FORCPU(me, thiscpu_last_qtime_q) = elapsed;
+	}
 	PREEMPTION_POP(was);
 	if (OVERFLOW_UADD(result.q_qtime, elapsed, &result.q_qtime)) {
 		result.q_jtime += ((quantum_diff_t)-1) / result.q_qsize;
@@ -499,7 +512,34 @@ NOTHROW(KCALL quantum_time)(void) {
 	quantum_diff_t elapsed, my_qoff, my_qlen;
 	/* BOOT_JIFFIES + (BOOT_QUANTUM_OFFSET - MY_QUANTUM_OFFSET + cpu_quantum_elapsed()) */
 	was = PREEMPTION_PUSHOFF();
-	me             = THIS_CPU;
+	me  = THIS_CPU;
+	if (me == &_bootcpu) {
+		result.q_jtime = FORCPU(me, thiscpu_jiffies);
+		result.q_qtime = FORCPU(me, thiscpu_quantum_offset);
+		result.q_qsize = FORCPU(me, thiscpu_quantum_length);
+		elapsed        = cpu_quantum_elapsed_nopr();
+		/* prevent issues hardware timer roll-over happening
+		 * before we've able to read the timestamp counter. */
+		if (elapsed < FORCPU(me, thiscpu_last_qtime_q) &&
+		    result.q_jtime == FORCPU(me, thiscpu_last_qtime_j)) {
+			FORCPU(me, thiscpu_last_qtime_q) = (quantum_diff_t)-1;
+			++result.q_jtime;
+		} else {
+			FORCPU(me, thiscpu_last_qtime_j) = result.q_jtime;
+			FORCPU(me, thiscpu_last_qtime_q) = elapsed;
+		}
+		PREEMPTION_POP(was);
+		if (OVERFLOW_UADD(result.q_qtime, elapsed, &result.q_qtime)) {
+			result.q_jtime += ((quantum_diff_t)-1) / result.q_qsize;
+			result.q_qtime += elapsed;
+			result.q_qtime -= (quantum_diff_t)-1;
+		}
+		if (result.q_qtime >= result.q_qsize) {
+			result.q_jtime += result.q_qtime / result.q_qsize;
+			result.q_qtime = result.q_qtime % result.q_qsize;
+		}
+		return result;
+	}
 	result.q_jtime = FORCPU(&_bootcpu, thiscpu_jiffies);
 	result.q_qtime = FORCPU(&_bootcpu, thiscpu_quantum_offset);
 	result.q_qsize = FORCPU(&_bootcpu, thiscpu_quantum_length);

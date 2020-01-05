@@ -163,7 +163,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	while (!sync_trywrite(&x86_pit_lock))
 		__pause();
 	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
-	lapic_write(APIC_TIMER, 0xff | APIC_TIMER_MODE_FONESHOT | APIC_TIMER_SOURCE_FDIV);
+	lapic_write(APIC_TIMER, 0xff | APIC_TIMER_MODE_FONESHOT);
 	x86_calibrate_apic_with_pic();
 	sync_endwrite(&x86_pit_lock);
 	num_ticks = lapic_read(APIC_TIMER_CURRENT);
@@ -187,8 +187,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
 	lapic_write(APIC_TIMER,
 	            X86_INTNO_PIC1_PIT |
-	            APIC_TIMER_MODE_FPERIODIC |
-	            APIC_TIMER_SOURCE_FDIV);
+	            APIC_TIMER_MODE_FPERIODIC);
 	lapic_write(APIC_TIMER_INITIAL, num_ticks);
 }
 
@@ -202,8 +201,7 @@ NOTHROW(FCALL x86_altcore_initapic)(struct cpu *__restrict me) {
 	lapic_write(APIC_TIMER,
 	            /* Set the PIT interrupt to the APIC timer. */
 	            X86_INTNO_PIC1_PIT |
-	            APIC_TIMER_MODE_FPERIODIC |
-	            APIC_TIMER_SOURCE_FDIV);
+	            APIC_TIMER_MODE_FPERIODIC);
 	lapic_write(APIC_TIMER_INITIAL, FORCPU(me, _thiscpu_quantum_length));
 }
 
@@ -901,8 +899,7 @@ done_early_altcore_init:
 		lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
 		lapic_write(APIC_TIMER,
 		            X86_INTERRUPT_APIC_SPURIOUS |
-		            APIC_TIMER_MODE_FONESHOT |
-		            APIC_TIMER_SOURCE_FDIV);
+		            APIC_TIMER_MODE_FONESHOT);
 		/* Calibrate the APIC */
 		x86_calibrate_apic_with_pic();
 #ifndef CONFIG_NO_SMP
@@ -928,8 +925,7 @@ done_early_altcore_init:
 		lapic_write(APIC_TIMER,
 		            /* Set the PIT interrupt to the APIC timer. */
 		            X86_INTNO_PIC1_PIT |
-		            APIC_TIMER_MODE_FPERIODIC |
-		            APIC_TIMER_SOURCE_FDIV);
+		            APIC_TIMER_MODE_FPERIODIC);
 		lapic_write(APIC_TIMER_INITIAL, num_ticks);
 		FORCPU(&_bootcpu, _thiscpu_quantum_length) = num_ticks;
 		PREEMPTION_ENABLE();
@@ -1025,7 +1021,7 @@ all_online:
 		outb(PIT_COMMAND,
 		     PIT_COMMAND_SELECT_F0 |
 		     PIT_COMMAND_ACCESS_FLOHI |
-		     PIT_COMMAND_MODE_FSQRWAVE |
+		     PIT_COMMAND_MODE_FRATEGEN |
 		     PIT_COMMAND_FBINARY);
 		outb_p(PIT_DATA0, PIT_HZ_DIV(HZ) & 0xff);
 		outb(PIT_DATA0, PIT_HZ_DIV(HZ) >> 8);

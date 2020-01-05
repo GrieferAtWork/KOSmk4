@@ -47,37 +47,6 @@ DECL_BEGIN
 #define APIC_ISR_INDEX(intno)                  ((intno) / 32)
 #define APIC_ISR_MASK(intno)                   (__CCAST(__UINT32_TYPE__)1 << ((intno) % 32))
 
-#define APIC_LINT0                              0x0350     /* Local interrupt vector #0 */
-#define APIC_LINT1                              0x0360     /* Local interrupt vector #1 */
-#    define APIC_LINT_FVECTOR                   0x000000ff /* Mask of the interrupt vector number. */
-#    define APIC_LINT_FDELIVERY                 0x00000700 /* Mask for the delivery type used. */
-#        define APIC_LINT_DELIVERY_FNORMAL      0x00000000 /* Normal delivery. */
-/*       define APIC_LINT_DELIVERY_F            0x00000000 ... 0x00000300  */
-#        define APIC_LINT_DELIVERY_FNMI         0x00000400 /* Normal delivery. */
-/*       define APIC_LINT_DELIVERY_F            0x00000500 ... 0x00000600  */
-#        define APIC_LINT_DELIVERY_FEXTERNAL    0x00000700 /* External interrupt (???) */
-#    define APIC_LINT_FPENDING                  0x00001000 /* The interrupt is pending delivery. */
-#    define APIC_LINT_FPOLARITY                 0x00002000 /* The polarity bit. */
-#        define APIC_LINT_POLARITY_FHIGH        0x00000000 /* High polarity. */
-#        define APIC_LINT_POLARITY_FLOW         0x00002000 /* Low polarity. */
-#    define APIC_LINT_FLEVELACK                 0x00004000 /* Level-triggered interrupt has been acknowledged. */
-#    define APIC_LINT_FTRIGGER                  0x00008000 /* The triggering mode. */
-#        define APIC_LINT_TRIGGER_EDGE          0x00000000 /* Edge-triggered. */
-#        define APIC_LINT_TRIGGER_LEVEL         0x00008000 /* Level-triggered. */
-#    define APIC_LINT_FDISABLED                 0x00010000 /* The interrupt is disabled. */
-
-#define APIC_TIMER                              0x0320     /* Interrupt vector fired by the LAPIC timer. */
-#    define APIC_TIMER_FVECTOR                  0x000000ff /* Mask for the interrupt vector number fired by the timer. */
-#    define APIC_TIMER_FPENDING                 0x00001000 /* The timer interrupt is pending delivery. */
-#    define APIC_TIMER_FDISABLED                0x00010000 /* The timer interrupt is disabled. */
-#    define APIC_TIMER_FMODE                    0x00020000 /* Mask for the timer operations mode. */
-#        define APIC_TIMER_MODE_FONESHOT        0x00000000 /* The timer will only fire once. */
-#        define APIC_TIMER_MODE_FPERIODIC       0x00020000 /* The timer will fire periodically. */
-#    define APIC_TIMER_FSOURCE                  0x000c0000 /* Timer source. */
-#        define APIC_TIMER_SOURCE_FCLKIN        0x00000000 /* Use CLKIN as input. */
-#        define APIC_TIMER_SOURCE_FTMBASE       0x00040000 /* Use TMBASE as input. */
-#        define APIC_TIMER_SOURCE_FDIV          0x00080000 /* Use the output of the divider as input. */
-
 #define APIC_ICR0                               0x0300     /* Common options to send to `APIC_ICR1' */
 #    define APIC_ICR0_FVECTOR                   0x000000ff /* Interrupt that should be triggered. */
 #    define APIC_ICR0_FPAGENO                   0x000000ff /* Page number to execute (for `APIC_ICR0_TYPE_FSIPI'). */
@@ -106,6 +75,38 @@ DECL_BEGIN
 #    define APIC_ICR1_GTDEST(x)               ((x) >> APIC_ICR1_SDEST)
 #    define APIC_ICR1_MKDEST(lapic_id)        ((lapic_id) << APIC_ICR1_SDEST)
 
+#define APIC_TIMER                              0x0320     /* Interrupt vector fired by the LAPIC timer. */
+#    define APIC_TIMER_FVECTOR                  0x000000ff /* Mask for the interrupt vector number fired by the timer. */
+#    define APIC_TIMER_FPENDING                 0x00001000 /* The timer interrupt is pending delivery. */
+#    define APIC_TIMER_FDISABLED                0x00010000 /* The timer interrupt is disabled. */
+#    define APIC_TIMER_FMODE                    0x00060000 /* Mask for the timer operations mode. */
+#        define APIC_TIMER_MODE_FONESHOT        0x00000000 /* The timer will only fire once. */
+#        define APIC_TIMER_MODE_FPERIODIC       0x00020000 /* The timer will fire periodically. */
+#        define APIC_TIMER_MODE_FTSCDEADLINE    0x00040000 /* The timer will operate in TSC deadline mode. */
+
+#define APIC_LINT0                              0x0350     /* Local interrupt vector #0 */
+#define APIC_LINT1                              0x0360     /* Local interrupt vector #1 */
+#    define APIC_LINT_FVECTOR                   0x000000ff /* Mask of the interrupt vector number. */
+#    define APIC_LINT_FDELIVERY                 0x00000700 /* Mask for the delivery type used. */
+#        define APIC_LINT_DELIVERY_FNORMAL      0x00000000 /* Normal delivery. */
+/*       define APIC_LINT_DELIVERY_F            0x00000000 ... 0x00000300  */
+#        define APIC_LINT_DELIVERY_FNMI         0x00000400 /* Normal delivery. */
+/*       define APIC_LINT_DELIVERY_F            0x00000500 ... 0x00000600  */
+#        define APIC_LINT_DELIVERY_FEXTERNAL    0x00000700 /* External interrupt (???) */
+#    define APIC_LINT_FPENDING                  0x00001000 /* The interrupt is pending delivery. */
+#    define APIC_LINT_FPOLARITY                 0x00002000 /* The polarity bit. */
+#        define APIC_LINT_POLARITY_FHIGH        0x00000000 /* High polarity. */
+#        define APIC_LINT_POLARITY_FLOW         0x00002000 /* Low polarity. */
+#    define APIC_LINT_FLEVELACK                 0x00004000 /* Level-triggered interrupt has been acknowledged. */
+#    define APIC_LINT_FTRIGGER                  0x00008000 /* The triggering mode. */
+#        define APIC_LINT_TRIGGER_EDGE          0x00000000 /* Edge-triggered. */
+#        define APIC_LINT_TRIGGER_LEVEL         0x00008000 /* Level-triggered. */
+#    define APIC_LINT_FDISABLED                 0x00010000 /* The interrupt is disabled. */
+
+#define APIC_TIMER_INITIAL                      0x0380     /* Initial timer value. */
+
+#define APIC_TIMER_CURRENT                      0x0390     /* Current timer value. */
+
 #define APIC_TIMER_DIVIDE                       0x03e0     /* Timer divide register. */
 #    define APIC_TIMER_DIVIDE_FMASK             0x0000000b /* Mask for the divide mode. */
 #    define APIC_TIMER_DIVIDE_F1                0x0000000b /* Divide by 1 */
@@ -116,10 +117,6 @@ DECL_BEGIN
 #    define APIC_TIMER_DIVIDE_F32               0x00000008 /* Divide by 32 */
 #    define APIC_TIMER_DIVIDE_F64               0x00000009 /* Divide by 64 */
 #    define APIC_TIMER_DIVIDE_F128              0x0000000a /* Divide by 128 */
-
-#define APIC_TIMER_INITIAL                      0x0380     /* Initial timer value. */
-
-#define APIC_TIMER_CURRENT                      0x0390     /* Current timer value. */
 
 #define APIC_SIZE                               0x1500
 

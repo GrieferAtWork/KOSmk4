@@ -98,8 +98,8 @@ INTERN port_t debug_port = (port_t)0x80;
 #ifdef CONFIG_PRINTK_TIMESTAMP
 PRIVATE NOBLOCK void
 NOTHROW(KCALL printk_timestamp_prefix)(void) {
-	char buf[32], *ptr;
 	qtime_t now = quantum_time();
+	char buf[32], *ptr;
 	u64 qpart;
 #define QPART1_SIZE 100000
 #define QPART2_SIZE 100000
