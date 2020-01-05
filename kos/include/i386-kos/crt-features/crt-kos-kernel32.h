@@ -84,6 +84,15 @@
 #define __CRT_HAVE_ansitty_putc 1
 #define __CRT_HAVE_ansitty_putuni 1
 #define __CRT_HAVE_ansitty_translate 1
+#define __CRT_HAVE_arch_cpu_disable_preemptive_interrupts 1
+#define __CRT_HAVE_arch_cpu_disable_preemptive_interrupts_nopr 1
+#define __CRT_HAVE_arch_cpu_enable_preemptive_interrupts 1
+#define __CRT_HAVE_arch_cpu_enable_preemptive_interrupts_nopr 1
+#define __CRT_HAVE_arch_cpu_quantum_elapsed 1
+#define __CRT_HAVE_arch_cpu_quantum_elapsed_nopr 1
+#define __CRT_HAVE_arch_cpu_quantum_remaining 1
+#define __CRT_HAVE_arch_cpu_quantum_remaining_nopr 1
+#define __CRT_HAVE_arch_cpu_update_quantum_length 1
 #define __CRT_HAVE_atomic64_cmpxch 1
 #define __CRT_HAVE_atomic64_cmpxch_r 1
 #define __CRT_HAVE_atomic64_cmpxch_val 1
@@ -1157,6 +1166,9 @@
 #define __CRT_HAVE_rawmemrlenl 1
 #define __CRT_HAVE_rawmemrlenq 1
 #define __CRT_HAVE_rawmemrlenw 1
+#define __CRT_HAVE_realtime 1
+#define __CRT_HAVE_realtime_clock 1
+#define __CRT_HAVE_realtime_clock_destroy 1
 #define __CRT_HAVE_regdump_coregs 1
 #define __CRT_HAVE_regdump_cr0 1
 #define __CRT_HAVE_regdump_cr4 1
@@ -2380,6 +2392,7 @@
 #define __CRT_HAVE_x86_bootcpu_cpufeatures 1
 #define __CRT_HAVE_x86_bootcpu_cpuid 1
 #define __CRT_HAVE_x86_bootcpu_gdt 1
+#define __CRT_HAVE_x86_cmos_realtime_clock 1
 #define __CRT_HAVE_x86_dbg_exitstate 1
 #define __CRT_HAVE_x86_dbg_getregbyid 1
 #define __CRT_HAVE_x86_dbg_getregbyidp 1

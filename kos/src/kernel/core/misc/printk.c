@@ -98,6 +98,13 @@ INTERN port_t debug_port = (port_t)0x80;
 #ifdef CONFIG_PRINTK_TIMESTAMP
 PRIVATE NOBLOCK void
 NOTHROW(KCALL printk_timestamp_prefix)(void) {
+#if 1
+	struct timespec now;
+	char buf[64], *ptr;
+	now = realtime();
+	ptr = buf + sprintf(buf, "[%I64u.%9Iu:", now.tv_sec, now.tv_nsec);
+	DO_PRINTK(buf, (size_t)(ptr - buf));
+#else
 	qtime_t now = quantum_time();
 	char buf[32], *ptr;
 	u64 qpart;
@@ -119,6 +126,7 @@ NOTHROW(KCALL printk_timestamp_prefix)(void) {
 	               (unsigned int)now.q_jtime,
 	               qpart1, qpart2);
 	DO_PRINTK(buf, (size_t)(ptr - buf));
+#endif
 }
 #endif /* CONFIG_PRINTK_TIMESTAMP */
 

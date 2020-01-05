@@ -715,8 +715,8 @@ i386_allocate_secondary_cores(void) {
 #endif /* !CONFIG_NO_SMP */
 
 
-/* Alternate implementations for `cpu_quantum_elapsed()'
- * and `cpu_quantum_remaining()' for when APIC is available. */
+/* Alternate implementations for `arch_cpu_quantum_elapsed()'
+ * and `arch_cpu_quantum_remaining()' for when APIC is available. */
 INTDEF FREE byte_t x86_apic_cpu_quantum_elapsed[];
 INTDEF byte_t x86_apic_cpu_quantum_elapsed_size[];
 INTDEF FREE byte_t x86_apic_cpu_quantum_elapsed_nopr[];
@@ -748,11 +748,6 @@ INTDEF byte_t x86_apic_cpu_ipi_pending_size[];
 #ifdef __HAVE_CPUSET_FULL_MASK
 DATDEF cpuset_t ___cpuset_full_mask ASMNAME("__cpuset_full_mask");
 #endif /* __HAVE_CPUSET_FULL_MASK */
-
-INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_disable_preemptive_interrupts)(void);
-INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_enable_preemptive_interrupts)(void);
-INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_disable_preemptive_interrupts_nopr)(void);
-INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_enable_preemptive_interrupts_nopr)(void);
 
 
 #ifndef CONFIG_HAVE_DEBUGGER
@@ -848,14 +843,14 @@ done_early_altcore_init:
 		printk(FREESTR(KERN_INFO "[apic] Using LAPIC for timings\n"));
 
 		/* Re-write text for the quantum accessor functions to use the APIC reload counter. */
-		memcpy((void *)&cpu_quantum_elapsed, x86_apic_cpu_quantum_elapsed, (size_t)x86_apic_cpu_quantum_elapsed_size);
-		memcpy((void *)&cpu_quantum_elapsed_nopr, x86_apic_cpu_quantum_elapsed_nopr, (size_t)x86_apic_cpu_quantum_elapsed_size_nopr);
-		memcpy((void *)&cpu_quantum_remaining, x86_apic_cpu_quantum_remaining, (size_t)x86_apic_cpu_quantum_remaining_size);
-		memcpy((void *)&cpu_quantum_remaining_nopr, x86_apic_cpu_quantum_remaining_nopr, (size_t)x86_apic_cpu_quantum_remaining_size_nopr);
-		memcpy((void *)&x86_cpu_disable_preemptive_interrupts, x86_apic_cpu_disable_preemptive_interrupts, (size_t)x86_apic_cpu_disable_preemptive_interrupts_size);
-		memcpy((void *)&x86_cpu_disable_preemptive_interrupts_nopr, x86_apic_cpu_disable_preemptive_interrupts_nopr, (size_t)x86_apic_cpu_disable_preemptive_interrupts_size_nopr);
-		memcpy((void *)&x86_cpu_enable_preemptive_interrupts, x86_apic_cpu_enable_preemptive_interrupts, (size_t)x86_apic_cpu_enable_preemptive_interrupts_size);
-		memcpy((void *)&x86_cpu_enable_preemptive_interrupts_nopr, x86_apic_cpu_enable_preemptive_interrupts_nopr, (size_t)x86_apic_cpu_enable_preemptive_interrupts_size_nopr);
+		memcpy((void *)&arch_cpu_quantum_elapsed, x86_apic_cpu_quantum_elapsed, (size_t)x86_apic_cpu_quantum_elapsed_size);
+		memcpy((void *)&arch_cpu_quantum_elapsed_nopr, x86_apic_cpu_quantum_elapsed_nopr, (size_t)x86_apic_cpu_quantum_elapsed_size_nopr);
+		memcpy((void *)&arch_cpu_quantum_remaining, x86_apic_cpu_quantum_remaining, (size_t)x86_apic_cpu_quantum_remaining_size);
+		memcpy((void *)&arch_cpu_quantum_remaining_nopr, x86_apic_cpu_quantum_remaining_nopr, (size_t)x86_apic_cpu_quantum_remaining_size_nopr);
+		memcpy((void *)&arch_cpu_disable_preemptive_interrupts, x86_apic_cpu_disable_preemptive_interrupts, (size_t)x86_apic_cpu_disable_preemptive_interrupts_size);
+		memcpy((void *)&arch_cpu_disable_preemptive_interrupts_nopr, x86_apic_cpu_disable_preemptive_interrupts_nopr, (size_t)x86_apic_cpu_disable_preemptive_interrupts_size_nopr);
+		memcpy((void *)&arch_cpu_enable_preemptive_interrupts, x86_apic_cpu_enable_preemptive_interrupts, (size_t)x86_apic_cpu_enable_preemptive_interrupts_size);
+		memcpy((void *)&arch_cpu_enable_preemptive_interrupts_nopr, x86_apic_cpu_enable_preemptive_interrupts_nopr, (size_t)x86_apic_cpu_enable_preemptive_interrupts_size_nopr);
 		memcpy((void *)&cpu_quantum_reset, x86_apic_cpu_quantum_reset, (size_t)x86_apic_cpu_quantum_reset_size);
 		memcpy((void *)&cpu_quantum_reset_nopr, x86_apic_cpu_quantum_reset_nopr, (size_t)x86_apic_cpu_quantum_reset_size_nopr);
 		memcpy((void *)&cpu_hwipi_pending, x86_apic_cpu_ipi_pending, (size_t)x86_apic_cpu_ipi_pending_size);
@@ -1029,7 +1024,6 @@ all_online:
 		PREEMPTION_ENABLE();
 	}
 }
-
 
 
 DECL_END

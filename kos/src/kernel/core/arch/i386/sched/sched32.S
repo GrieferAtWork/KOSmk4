@@ -712,7 +712,7 @@ END(x86_apic_cpu_ipi_pending)
 
 
 .section .text
-PUBLIC_FUNCTION(cpu_quantum_remaining_nopr)
+PUBLIC_FUNCTION(arch_cpu_quantum_remaining_nopr)
 	/* Read the current PIT counter position. */
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLATCH | \
@@ -724,13 +724,13 @@ PUBLIC_FUNCTION(cpu_quantum_remaining_nopr)
 	movb   %al, %ch
 	movzwl %cx, %eax
 	ret
-.if x86_apic_cpu_quantum_remaining_size_nopr > (. - cpu_quantum_remaining_nopr)
-.skip x86_apic_cpu_quantum_remaining_size_nopr - (. - cpu_quantum_remaining_nopr), 0x90
+.if x86_apic_cpu_quantum_remaining_size_nopr > (. - arch_cpu_quantum_remaining_nopr)
+.skip x86_apic_cpu_quantum_remaining_size_nopr - (. - arch_cpu_quantum_remaining_nopr), 0x90
 .endif
-END(cpu_quantum_remaining_nopr)
+END(arch_cpu_quantum_remaining_nopr)
 
 
-PUBLIC_FUNCTION(cpu_quantum_remaining)
+PUBLIC_FUNCTION(arch_cpu_quantum_remaining)
 	pushfl
 	cli
 	/* Read the current PIT counter position. */
@@ -745,12 +745,12 @@ PUBLIC_FUNCTION(cpu_quantum_remaining)
 	movb   %al, %ch
 	movzwl %cx, %eax
 	ret
-.if x86_apic_cpu_quantum_remaining_size > (. - cpu_quantum_remaining)
-.skip x86_apic_cpu_quantum_remaining_size - (. - cpu_quantum_remaining), 0x90
+.if x86_apic_cpu_quantum_remaining_size > (. - arch_cpu_quantum_remaining)
+.skip x86_apic_cpu_quantum_remaining_size - (. - arch_cpu_quantum_remaining), 0x90
 .endif
-END(cpu_quantum_remaining)
+END(arch_cpu_quantum_remaining)
 
-PUBLIC_FUNCTION(cpu_quantum_elapsed_nopr)
+PUBLIC_FUNCTION(arch_cpu_quantum_elapsed_nopr)
 	/* Read the current PIT counter position. */
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLATCH | \
@@ -763,12 +763,12 @@ PUBLIC_FUNCTION(cpu_quantum_elapsed_nopr)
 	movl   $(PIT_HZ_DIV(HZ)), %eax
 	subw   %cx, %ax
 	ret
-.if x86_apic_cpu_quantum_elapsed_size_nopr > (. - cpu_quantum_elapsed_nopr)
-.skip x86_apic_cpu_quantum_elapsed_size_nopr - (. - cpu_quantum_elapsed_nopr), 0x90
+.if x86_apic_cpu_quantum_elapsed_size_nopr > (. - arch_cpu_quantum_elapsed_nopr)
+.skip x86_apic_cpu_quantum_elapsed_size_nopr - (. - arch_cpu_quantum_elapsed_nopr), 0x90
 .endif
-END(cpu_quantum_elapsed_nopr)
+END(arch_cpu_quantum_elapsed_nopr)
 
-PUBLIC_FUNCTION(cpu_quantum_elapsed)
+PUBLIC_FUNCTION(arch_cpu_quantum_elapsed)
 	pushfl
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLATCH | \
@@ -784,13 +784,13 @@ PUBLIC_FUNCTION(cpu_quantum_elapsed)
 	movl   $(PIT_HZ_DIV(HZ)), %eax
 	subw   %cx, %ax
 	ret
-.if x86_apic_cpu_quantum_elapsed_size > (. - cpu_quantum_elapsed)
-.skip x86_apic_cpu_quantum_elapsed_size - (. - cpu_quantum_elapsed), 0x90
+.if x86_apic_cpu_quantum_elapsed_size > (. - arch_cpu_quantum_elapsed)
+.skip x86_apic_cpu_quantum_elapsed_size - (. - arch_cpu_quantum_elapsed), 0x90
 .endif
-END(cpu_quantum_elapsed)
+END(arch_cpu_quantum_elapsed)
 
 
-INTERN_FUNCTION(x86_cpu_disable_preemptive_interrupts)
+PUBLIC_FUNCTION(arch_cpu_disable_preemptive_interrupts)
 	pushfl
 	cli
 	/* Disable the PIT interrupt within the PIC */
@@ -812,12 +812,12 @@ INTERN_FUNCTION(x86_cpu_disable_preemptive_interrupts)
 	 * in this semi-disabled mode until we reset it at a later point in time. */
 	popfl
 	ret
-.if x86_apic_cpu_disable_preemptive_interrupts_size > (. - x86_cpu_disable_preemptive_interrupts)
-.skip x86_apic_cpu_disable_preemptive_interrupts_size - (. - x86_cpu_disable_preemptive_interrupts), 0x90
+.if x86_apic_cpu_disable_preemptive_interrupts_size > (. - arch_cpu_disable_preemptive_interrupts)
+.skip x86_apic_cpu_disable_preemptive_interrupts_size - (. - arch_cpu_disable_preemptive_interrupts), 0x90
 .endif
-END(x86_cpu_disable_preemptive_interrupts)
+END(arch_cpu_disable_preemptive_interrupts)
 
-INTERN_FUNCTION(x86_cpu_disable_preemptive_interrupts_nopr)
+PUBLIC_FUNCTION(arch_cpu_disable_preemptive_interrupts_nopr)
 	/* Disable the PIT interrupt within the PIC */
 	inb    $(X86_PIC1_DATA), %al
 	orb    $(1 << (X86_INTNO_PIC1_PIT-X86_INTERRUPT_PIC1_BASE)), %al
@@ -836,12 +836,12 @@ INTERN_FUNCTION(x86_cpu_disable_preemptive_interrupts_nopr)
 	 * however by not telling it anything, we essentially leave it hanging
 	 * in this semi-disabled mode until we reset it at a later point in time. */
 	ret
-.if x86_apic_cpu_disable_preemptive_interrupts_size_nopr > (. - x86_cpu_disable_preemptive_interrupts_nopr)
-.skip x86_apic_cpu_disable_preemptive_interrupts_size_nopr - (. - x86_cpu_disable_preemptive_interrupts_nopr), 0x90
+.if x86_apic_cpu_disable_preemptive_interrupts_size_nopr > (. - arch_cpu_disable_preemptive_interrupts_nopr)
+.skip x86_apic_cpu_disable_preemptive_interrupts_size_nopr - (. - arch_cpu_disable_preemptive_interrupts_nopr), 0x90
 .endif
-END(x86_cpu_disable_preemptive_interrupts_nopr)
+END(arch_cpu_disable_preemptive_interrupts_nopr)
 
-INTERN_FUNCTION(x86_cpu_enable_preemptive_interrupts)
+PUBLIC_FUNCTION(arch_cpu_enable_preemptive_interrupts)
 	pushfl
 	movb   $(PIT_COMMAND_SELECT_F0 | \
 	         PIT_COMMAND_ACCESS_FLOHI | \
@@ -867,12 +867,12 @@ INTERN_FUNCTION(x86_cpu_enable_preemptive_interrupts)
 	outb   %al, $(X86_PIC1_DATA)
 	popfl
 	ret
-.if x86_apic_cpu_enable_preemptive_interrupts_size > (. - x86_cpu_enable_preemptive_interrupts)
-.skip x86_apic_cpu_enable_preemptive_interrupts_size - (. - x86_cpu_enable_preemptive_interrupts), 0x90
+.if x86_apic_cpu_enable_preemptive_interrupts_size > (. - arch_cpu_enable_preemptive_interrupts)
+.skip x86_apic_cpu_enable_preemptive_interrupts_size - (. - arch_cpu_enable_preemptive_interrupts), 0x90
 .endif
-END(x86_cpu_enable_preemptive_interrupts)
+END(arch_cpu_enable_preemptive_interrupts)
 
-INTERN_FUNCTION(x86_cpu_enable_preemptive_interrupts_nopr)
+PUBLIC_FUNCTION(arch_cpu_enable_preemptive_interrupts_nopr)
 	/* outb(PIT_COMMAND,
 	 *      PIT_COMMAND_SELECT_F0 |
 	 *      PIT_COMMAND_ACCESS_FLOHI |
@@ -895,10 +895,10 @@ INTERN_FUNCTION(x86_cpu_enable_preemptive_interrupts_nopr)
 	andb   $~(1 << (X86_INTNO_PIC1_PIT-X86_INTERRUPT_PIC1_BASE)), %al
 	outb   %al, $(X86_PIC1_DATA)
 	ret
-.if x86_apic_cpu_enable_preemptive_interrupts_size_nopr > (. - x86_cpu_enable_preemptive_interrupts_nopr)
-.skip x86_apic_cpu_enable_preemptive_interrupts_size_nopr - (. - x86_cpu_enable_preemptive_interrupts_nopr), 0x90
+.if x86_apic_cpu_enable_preemptive_interrupts_size_nopr > (. - arch_cpu_enable_preemptive_interrupts_nopr)
+.skip x86_apic_cpu_enable_preemptive_interrupts_size_nopr - (. - arch_cpu_enable_preemptive_interrupts_nopr), 0x90
 .endif
-END(x86_cpu_enable_preemptive_interrupts_nopr)
+END(arch_cpu_enable_preemptive_interrupts_nopr)
 
 
 PUBLIC_FUNCTION(cpu_quantum_reset)
@@ -972,5 +972,7 @@ PUBLIC_FUNCTION(cpu_hwipi_pending)
 .skip x86_apic_cpu_ipi_pending_size - (. - cpu_hwipi_pending), 0x90
 .endif
 END(cpu_hwipi_pending)
+
+DEFINE_PUBLIC_ALIAS(arch_cpu_update_quantum_length, arch_cpu_enable_preemptive_interrupts)
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_SCHED32_S */

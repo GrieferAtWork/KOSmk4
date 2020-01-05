@@ -66,7 +66,7 @@ struct timespec {
 #if __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
-	__syscall_ulong_t tv_nsec;  /* Nano seconds (<= 1000000000 == 1_000_000_000) */
+	__syscall_ulong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
 #if __TM_SIZEOF(TIME) > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __TM_SIZEOF(TIME) > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
@@ -111,7 +111,7 @@ struct __timespec_alt
 	__UINT32_TYPE__ __tv_pad;   /* ... */
 #endif /* __SIZEOF_SYSCALL_LONG_T__ > 4 */
 #endif /* __TM_SIZEOF(TIME) > 4 */
-	__syscall_ulong_t tv_nsec;  /* Nano seconds (<= 1000000000 == 1_000_000_000) */
+	__syscall_ulong_t tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
 #if __SIZEOF_SYSCALL_LONG_T__ <= 4 && __TM_SIZEOF(TIME) <= 4
 	__UINT32_TYPE__ __tv_pad;   /* ... */
 #endif /* __SIZEOF_SYSCALL_LONG_T__ <= 4 && __TM_SIZEOF(TIME) <= 4 */

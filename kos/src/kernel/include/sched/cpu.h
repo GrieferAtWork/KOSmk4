@@ -26,9 +26,10 @@
 #include <hybrid/__bit.h>
 #include <hybrid/typecore.h>
 
-#include <stdbool.h>
 #include <kos/jiffies.h>
 #include <kos/kernel/types.h>
+
+#include <stdbool.h>
 
 DECL_BEGIN
 
@@ -148,16 +149,37 @@ DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length;
  * (in ticks) can then be calculated as:
  * >> (thiscpu_jiffies * PERCPU(thiscpu_quantum_length)) + PERCPU(thiscpu_quantum_offset) + cpu_quantum_elapsed();
  * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
-FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL cpu_quantum_elapsed)(void);
-FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL cpu_quantum_elapsed_nopr)(void);
-FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL cpu_quantum_remaining)(void);
-FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL cpu_quantum_remaining_nopr)(void);
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t NOTHROW(FCALL cpu_quantum_elapsed)(struct cpu *__restrict mycpu, jtime_t *__restrict preal_jtime);
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict mycpu, jtime_t *__restrict preal_jtime);
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t NOTHROW(FCALL cpu_quantum_remaining)(struct cpu *__restrict mycpu, jtime_t *__restrict preal_jtime);
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t NOTHROW(FCALL cpu_quantum_remaining_nopr)(struct cpu *__restrict mycpu, jtime_t *__restrict preal_jtime);
+
+/* Same as the functions above, however don't account for lazy/delayed interrupt handling. */
+FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_elapsed)(void);
+FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_elapsed_nopr)(void);
+FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_remaining)(void);
+FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_remaining_nopr)(void);
+
 
 /* Returns the cpu-local quantum time. */
 FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void);
 
 /* Returns the global quantum time, adjusted for the calling CPU. */
 FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL quantum_time)(void);
+
+/* TODO: Instead of using `qtime_t' as timeout type in system APIs, make
+ *       use of `realtime()' instead. Then, get rid of `quantum_time()'
+ * As it stands right now, `quantum_time()' can't account for time spans
+ * during which the boot cpu's clock is halted. */
+
+/* Returns the highly precise current real time derived from the current CPU time.
+ * If no realtime hardware clock is available, this clock may stop when the CPU is
+ * idle and will not indicate the actual current time. */
+FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
+
+/* Convert to/from cpu-local quantum time and realtime */
+FUNDEF NOBLOCK WUNUSED ATTR_PURE struct timespec NOTHROW(FCALL cpu_quantum_time_to_realtime)(qtime_t const *__restrict qtime);
+FUNDEF NOBLOCK WUNUSED ATTR_PURE qtime_t NOTHROW(FCALL realtime_to_cpu_quantum_time)(struct timespec const *__restrict tms);
 
 /* Convert to/from quantum time and regular timespecs */
 FUNDEF NOBLOCK WUNUSED ATTR_PURE struct timespec NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime);
@@ -424,6 +446,18 @@ FUNDEF NOBLOCK void NOTHROW(KCALL cpu_disable_preemptive_interrupts)(void);
 FUNDEF NOBLOCK void NOTHROW(KCALL cpu_enable_preemptive_interrupts)(void);
 FUNDEF NOBLOCK void NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void);
 FUNDEF NOBLOCK void NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void);
+
+/* Same as the functions above, but don't adjust the CPU time afterwards.
+ * WARNING: Keeping preemptive interrupts disabled without time loss accounting
+ *          for longer periods of time will cause `thiscpu_quantum_length' to
+ *          go nuts once they actually get turned back on. */
+FUNDEF NOBLOCK void NOTHROW(KCALL arch_cpu_disable_preemptive_interrupts)(void);
+FUNDEF NOBLOCK void NOTHROW(KCALL arch_cpu_enable_preemptive_interrupts)(void);
+FUNDEF NOBLOCK void NOTHROW(KCALL arch_cpu_disable_preemptive_interrupts_nopr)(void);
+FUNDEF NOBLOCK void NOTHROW(KCALL arch_cpu_enable_preemptive_interrupts_nopr)(void);
+
+/* Update hardware following a change made to `thiscpu_quantum_length' */
+FUNDEF NOBLOCK void NOTHROW(KCALL arch_cpu_update_quantum_length)(void);
 
 
 #ifndef CONFIG_NO_SMP

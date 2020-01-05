@@ -28,6 +28,7 @@
 #include <sched/signal.h>
 #include <sched/smp.h>
 #include <sched/task.h>
+#include <sched/time.h>
 
 #include <hybrid/atomic.h>
 
@@ -701,6 +702,47 @@ again_already_disabled:
 			if (iter->t_sched.s_asleep.ss_timeout.q_jtime == (jtime_t)-1)
 				continue;
 			/* Must keep jiffies running so-as to be able to service timeouts. */
+#if 0 /* TODO: Make use of hardware timeouts */
+			{
+				bool did_time_out;
+				struct timespec timeout;
+				REF struct realtime_clock_struct *rtc;
+				struct task *sleep_iter;
+				rtc = realtime_clock.get_nopr();
+				if (!rtc)
+					goto do_idle_wait;
+				if (!rtc->rc_waitfor) {
+					decref_unlikely(rtc);
+					goto do_idle_wait;
+				}
+				timeout = cpu_quantum_time_to_realtime(&iter->t_sched.s_asleep.ss_timeout);
+				/* Disable preemptive interrupts while we wait using the RTC.
+				 * If we left them enabled, then `rc_waitfor' would return
+				 * immediately after the first preemptive interrupt fired,
+				 * however the intend of this code is to make use of RTC
+				 * functionality to reduce power usage when all the system
+				 * is doing is serving a call to something like `nanosleep()',
+				 * while no other threads are running anywhere on the system. */
+				cpu_disable_preemptive_interrupts_nopr();
+				PREEMPTION_ENABLE();
+				did_time_out = (*rtc->rc_waitfor)(rtc, &timeout);
+				decref_unlikely(rtc);
+				cpu_enable_preemptive_interrupts();
+				if (!did_time_out)
+					goto again;
+				/* The timeout has expired. -> Timeout any thread who's timeout has expired. */
+				PREEMPTION_DISABLE();
+				cpu_timeout_sleeping_threads(me);
+				/* Check if there are any threads that were timed out. */
+				assert(me->c_current == &FORCPU(me, thiscpu_idle));
+				if (FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt != &FORCPU(me, thiscpu_idle))
+					goto yield_and_return;
+				/* Fallthrough: Do an IDLE wait (this could happen if the RTC and CPU clock are
+				 *              out of sync, in which case we should wait for preemption to fix
+				 *              this issue for us) */
+			}
+do_idle_wait:
+#endif
 			PREEMPTION_ENABLE_WAIT();
 			goto again;
 		}

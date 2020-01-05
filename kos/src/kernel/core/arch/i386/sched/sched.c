@@ -166,48 +166,6 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 
 
 
-INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_disable_preemptive_interrupts)(void);
-INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_enable_preemptive_interrupts)(void);
-INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_disable_preemptive_interrupts_nopr)(void);
-INTDEF NOBLOCK void NOTHROW(KCALL x86_cpu_enable_preemptive_interrupts_nopr)(void);
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL cpu_disable_preemptive_interrupts)(void) {
-	assert(!PREEMPTION_ENABLED() ||
-	       (PERTASK_GET(this_task.t_flags) & (TASK_FKEEPCORE | TASK_FTERMINATING)));
-	x86_cpu_disable_preemptive_interrupts();
-	/* TODO: Track the time that passes between here and the
-	 *       next call to `cpu_enable_preemptive_interrupts()' */
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
-	assert(!PREEMPTION_ENABLED());
-	x86_cpu_disable_preemptive_interrupts_nopr();
-	/* TODO: Track the time that passes between here and the
-	 *       next call to `cpu_enable_preemptive_interrupts()' */
-}
-
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL cpu_enable_preemptive_interrupts)(void) {
-	assert(!PREEMPTION_ENABLED() ||
-	       (PERTASK_GET(this_task.t_flags) & (TASK_FKEEPCORE | TASK_FTERMINATING)));
-	/* TODO: Track the time that passes between here and the
-	 *       last call to `cpu_disable_preemptive_interrupts()' */
-	x86_cpu_enable_preemptive_interrupts();
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void) {
-	assert(!PREEMPTION_ENABLED());
-	/* TODO: Track the time that passes between here and the
-	 *       last call to `cpu_disable_preemptive_interrupts()' */
-	x86_cpu_enable_preemptive_interrupts_nopr();
-}
-
-
-
 #ifdef __x86_64__
 
 /* RAX:    <task_rpc_t func>

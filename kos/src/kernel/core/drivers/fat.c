@@ -920,8 +920,8 @@ NOTHROW(KCALL Fat_FinalizeNode)(struct inode *__restrict self) {
 
 #define SECONDS_PER_DAY        86400
 
-#define DAYS2YEARS(n_days)   ((400*((n_days)+1))/146097)
-#define YEARS2DAYS(n_years)  (((146097*(n_years))/400)/*-1*/) // rounding error?
+#define DAYS2YEARS(n_days)  ((400 * ((n_days) + 1)) / 146097)
+#define YEARS2DAYS(n_years) (((146097 * (n_years)) / 400) /*-1*/) // rounding error?
 #define ISLEAPYEAR(year) \
 	(__builtin_constant_p(year)                                                   \
 	 ? ((year) % 400 == 0 || ((year) % 100 != 0 && (year) % 4 == 0))              \

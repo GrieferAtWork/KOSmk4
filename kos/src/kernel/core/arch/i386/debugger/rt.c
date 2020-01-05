@@ -229,7 +229,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 
 	/* Re-enable preemptive interrupts. */
 	if (ammend.dca_pint)
-		cpu_enable_preemptive_interrupts_nopr(); /* XXX: Don't account for lost time! */
+		cpu_enable_preemptive_interrupts_nopr();
 
 	return state;
 }

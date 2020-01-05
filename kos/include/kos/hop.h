@@ -744,7 +744,7 @@ struct hop_task_join /*[PREFIX(tj_)]*/ {
 	                                           * structure version. */
 	__uint32_t          __tj_pad1;            /* ... */
 	__uint64_t            tj_reltimeout_sec;  /* Relative timeout seconds (or (__uint64_t)-1 to wait indefinitely) */
-	__uint32_t            tj_reltimeout_nsec; /* Relative timeout nano seconds (<= 1000000000 == 1_000_000_000) */
+	__uint32_t            tj_reltimeout_nsec; /* Relative timeout nano seconds (< 1000000000 == 1_000_000_000) */
 	__uint32_t            tj_status;          /* [OUT][TYPE(union wait)] The exit status of the thread.
 	                                           * If the thread has yet to exit, this field is set to `0' */
 };

@@ -135,7 +135,7 @@ __TIMESPEC_CXX_DECL_BEGIN
 /* 32-bit timespec for i386 */
 struct timespecx32 /*[PREFIX(tv_)]*/ {
 	__INT32_TYPE__  tv_sec;   /* Seconds */
-	__UINT32_TYPE__ tv_nsec;  /* Nano seconds (<= 1000000000 == 1_000_000_000) */
+	__UINT32_TYPE__ tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
 	__TIMESPEC_CXX_SUPPORT(struct timespecx32, __INT32_TYPE__, __UINT32_TYPE__)
 };
 __TIMESPEC_CXX_SUPPORT2(struct timespecx32, __INT32_TYPE__, __UINT32_TYPE__)
@@ -143,7 +143,7 @@ __TIMESPEC_CXX_SUPPORT2(struct timespecx32, __INT32_TYPE__, __UINT32_TYPE__)
 /* 64-bit timespec for i386 */
 struct timespecx32_64 /*[PREFIX(tv_)]*/ {
 	__INT64_TYPE__    tv_sec;   /* Seconds */
-	__UINT32_TYPE__   tv_nsec;  /* Nano seconds (<= 1000000000 == 1_000_000_000) */
+	__UINT32_TYPE__   tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
 	__UINT32_TYPE__ __tv_pad;   /* ... */
 	__TIMESPEC_CXX_SUPPORT(struct timespecx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 };

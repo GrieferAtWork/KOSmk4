@@ -183,9 +183,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, memmoveupl; .int 0
 	.int 0x46bf02c
 	.quad .Lname45 /* index: 45 */
-	.weak syscall_emulate_r; .quad syscall_emulate_r
-	.reloc ., R_X86_64_SIZE32, syscall_emulate_r; .int 0
-	.int 0x443fab2
+	.weak sys_sched_setattr; .quad sys_sched_setattr
+	.reloc ., R_X86_64_SIZE32, sys_sched_setattr; .int 0
+	.int 0x2f3ab2
 	.quad 0 /* index: 46 */
 	.quad 0
 	.int 0
@@ -1602,10 +1602,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak handle_lookup_nosym; .quad handle_lookup_nosym
 	.reloc ., R_X86_64_SIZE32, handle_lookup_nosym; .int 0
 	.int 0xaf79aed
-	.quad 0 /* index: 400 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname400 /* index: 400 */
+	.weak vm_paged_node_remove; .quad vm_paged_node_remove
+	.reloc ., R_X86_64_SIZE32, vm_paged_node_remove; .int 0
+	.int 0xdc92615
 	.quad .Lname401 /* index: 401 */
 	.weak sys32_create_module; .quad sys32_create_module
 	.reloc ., R_X86_64_SIZE32, sys32_create_module; .int 0
@@ -1731,9 +1731,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname432 /* index: 432 */
-	.weak sys32_readdir; .quad sys32_readdir
-	.reloc ., R_X86_64_SIZE32, sys32_readdir; .int 0
-	.int 0x3b1c312
+	.weak regdump_fcpustate; .quad regdump_fcpustate
+	.reloc ., R_X86_64_SIZE32, regdump_fcpustate; .int 0
+	.int 0xbf449b5
 	.quad 0 /* index: 433 */
 	.quad 0
 	.int 0
@@ -2746,10 +2746,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 686 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname686 /* index: 686 */
+	.weak sys_sendmmsg; .quad sys_sendmmsg
+	.reloc ., R_X86_64_SIZE32, sys_sendmmsg; .int 0
+	.int 0xdfbb207
 	.quad .Lname687 /* index: 687 */
 	.weak vm_mapres; .quad vm_mapres
 	.reloc ., R_X86_64_SIZE32, vm_mapres; .int 0
@@ -3134,10 +3134,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 783 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname783 /* index: 783 */
+	.weak system_rtld32_size; .quad system_rtld32_size
+	.reloc ., R_X86_64_SIZE32, system_rtld32_size; .int 0
+	.int 0xbf99b5
 	.quad .Lname784 /* index: 784 */
 	.weak sys_mremap; .quad sys_mremap
 	.reloc ., R_X86_64_SIZE32, sys_mremap; .int 0
@@ -3594,10 +3594,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak memrendq; .quad memrendq
 	.reloc ., R_X86_64_SIZE32, memrendq; .int 0
 	.int 0xc48c381
-	.quad 0 /* index: 898 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname898 /* index: 898 */
+	.weak arch_cpu_enable_preemptive_interrupts_nopr; .quad arch_cpu_enable_preemptive_interrupts_nopr
+	.reloc ., R_X86_64_SIZE32, arch_cpu_enable_preemptive_interrupts_nopr; .int 0
+	.int 0x2cfc382
 	.quad .Lname899 /* index: 899 */
 	.weak sys_fstatfs; .quad sys_fstatfs
 	.reloc ., R_X86_64_SIZE32, sys_fstatfs; .int 0
@@ -4811,9 +4811,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, rawmemlenq; .int 0
 	.int 0x3c5a4b1
 	.quad .Lname1202 /* index: 1202 */
-	.weak task_waitfor; .quad task_waitfor
-	.reloc ., R_X86_64_SIZE32, task_waitfor; .int 0
-	.int 0xae80e02
+	.weak arch_cpu_quantum_elapsed_nopr; .quad arch_cpu_quantum_elapsed_nopr
+	.reloc ., R_X86_64_SIZE32, arch_cpu_quantum_elapsed_nopr; .int 0
+	.int 0x2e54b2
 	.quad 0 /* index: 1203 */
 	.quad 0
 	.int 0
@@ -4931,9 +4931,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, minfo; .int 0
 	.int 0x7404cf
 	.quad .Lname1232 /* index: 1232 */
-	.weak x86_syscall_emulate_sysenter_r; .quad x86_syscall_emulate_sysenter_r
-	.reloc ., R_X86_64_SIZE32, x86_syscall_emulate_sysenter_r; .int 0
-	.int 0x44af1c2
+	.weak sys_ioprio_get; .quad sys_ioprio_get
+	.reloc ., R_X86_64_SIZE32, sys_ioprio_get; .int 0
+	.int 0x8735c04
 	.quad 0 /* index: 1233 */
 	.quad 0
 	.int 0
@@ -5599,9 +5599,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1399 /* index: 1399 */
-	.weak validate_readable; .quad validate_readable
-	.reloc ., R_X86_64_SIZE32, validate_readable; .int 0
-	.int 0x18c4d55
+	.weak task_waitfor; .quad task_waitfor
+	.reloc ., R_X86_64_SIZE32, task_waitfor; .int 0
+	.int 0xae80e02
 	.quad .Lname1400 /* index: 1400 */
 	.weak vm_kernel_treelock_read; .quad vm_kernel_treelock_read
 	.reloc ., R_X86_64_SIZE32, vm_kernel_treelock_read; .int 0
@@ -6231,9 +6231,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_wait4; .int 0
 	.int 0x8168614
 	.quad .Lname1557 /* index: 1557 */
-	.weak syscall_printtrace; .quad syscall_printtrace
-	.reloc ., R_X86_64_SIZE32, syscall_printtrace; .int 0
-	.int 0x30d6615
+	.weak sys_socket; .quad sys_socket
+	.reloc ., R_X86_64_SIZE32, sys_socket; .int 0
+	.int 0x6a23154
 	.quad .Lname1558 /* index: 1558 */
 	.weak sys_setreuid; .quad sys_setreuid
 	.reloc ., R_X86_64_SIZE32, sys_setreuid; .int 0
@@ -6798,10 +6798,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak debuginfo_cu_parser_loadattr_member; .quad debuginfo_cu_parser_loadattr_member
 	.reloc ., R_X86_64_SIZE32, debuginfo_cu_parser_loadattr_member; .int 0
 	.int 0xd7446a2
-	.quad 0 /* index: 1699 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1699 /* index: 1699 */
+	.weak x86_cmos_realtime_clock; .quad x86_cmos_realtime_clock
+	.reloc ., R_X86_64_SIZE32, x86_cmos_realtime_clock; .int 0
+	.int 0xc68d37b
 	.quad .Lname1700 /* index: 1700 */
 	.weak sys32_kexec_load; .quad sys32_kexec_load
 	.reloc ., R_X86_64_SIZE32, sys32_kexec_load; .int 0
@@ -6923,9 +6923,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys_inotify_init1; .int 0
 	.int 0xf13f6c1
 	.quad .Lname1730 /* index: 1730 */
-	.weak block_device_areadv_phys_sector; .quad block_device_areadv_phys_sector
-	.reloc ., R_X86_64_SIZE32, block_device_areadv_phys_sector; .int 0
-	.int 0x88c86c2
+	.weak arch_cpu_disable_preemptive_interrupts_nopr; .quad arch_cpu_disable_preemptive_interrupts_nopr
+	.reloc ., R_X86_64_SIZE32, arch_cpu_disable_preemptive_interrupts_nopr; .int 0
+	.int 0x19dd6c2
 	.quad 0 /* index: 1731 */
 	.quad 0
 	.int 0
@@ -7007,9 +7007,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1751 /* index: 1751 */
-	.weak vm_datablock_vio_writev_phys; .quad vm_datablock_vio_writev_phys
-	.reloc ., R_X86_64_SIZE32, vm_datablock_vio_writev_phys; .int 0
-	.int 0x1064023
+	.weak syscall_printtrace; .quad syscall_printtrace
+	.reloc ., R_X86_64_SIZE32, syscall_printtrace; .int 0
+	.int 0x30d6615
 	.quad 0 /* index: 1752 */
 	.quad 0
 	.int 0
@@ -7275,9 +7275,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, userkern_segment_part; .int 0
 	.int 0xfac1e84
 	.quad .Lname1818 /* index: 1818 */
-	.weak vm_paged_node_remove; .quad vm_paged_node_remove
-	.reloc ., R_X86_64_SIZE32, vm_paged_node_remove; .int 0
-	.int 0xdc92615
+	.weak vm_datablock_vio_writev_phys; .quad vm_datablock_vio_writev_phys
+	.reloc ., R_X86_64_SIZE32, vm_datablock_vio_writev_phys; .int 0
+	.int 0x1064023
 	.quad .Lname1819 /* index: 1819 */
 	.weak pidns_write; .quad pidns_write
 	.reloc ., R_X86_64_SIZE32, pidns_write; .int 0
@@ -8295,9 +8295,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, heap_realign_untraced_nx; .int 0
 	.int 0x9ac7818
 	.quad .Lname2073 /* index: 2073 */
-	.weak sys32_klstat; .quad sys32_klstat
-	.reloc ., R_X86_64_SIZE32, sys32_klstat; .int 0
-	.int 0x3b3cc04
+	.weak sys32_kfstat; .quad sys32_kfstat
+	.reloc ., R_X86_64_SIZE32, sys32_kfstat; .int 0
+	.int 0x3adcc04
 	.quad .Lname2074 /* index: 2074 */
 	.weak this_tid_address; .quad this_tid_address
 	.reloc ., R_X86_64_SIZE32, this_tid_address; .int 0
@@ -8375,9 +8375,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, vm_readphysl; .int 0
 	.int 0x65a82c
 	.quad .Lname2093 /* index: 2093 */
-	.weak x86_syscall32_sysenter; .quad x86_syscall32_sysenter
-	.reloc ., R_X86_64_SIZE32, x86_syscall32_sysenter; .int 0
-	.int 0x4db3eb2
+	.weak unicode_readutf8_rev_n; .quad unicode_readutf8_rev_n
+	.reloc ., R_X86_64_SIZE32, unicode_readutf8_rev_n; .int 0
+	.int 0xd4e74be
 	.quad 0 /* index: 2094 */
 	.quad 0
 	.int 0
@@ -8538,10 +8538,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak dbg_getregbyname; .quad dbg_getregbyname
 	.reloc ., R_X86_64_SIZE32, dbg_getregbyname; .int 0
 	.int 0x8465855
-	.quad 0 /* index: 2134 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2134 /* index: 2134 */
+	.weak x86_syscall_emulate_sysenter_r; .quad x86_syscall_emulate_sysenter_r
+	.reloc ., R_X86_64_SIZE32, x86_syscall_emulate_sysenter_r; .int 0
+	.int 0x44af1c2
 	.quad .Lname2135 /* index: 2135 */
 	.weak sys_epoll_wait_old; .quad sys_epoll_wait_old
 	.reloc ., R_X86_64_SIZE32, sys_epoll_wait_old; .int 0
@@ -8759,9 +8759,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, disasm_print_symbol; .int 0
 	.int 0xbdfb88c
 	.quad .Lname2189 /* index: 2189 */
-	.weak keyboard_buffer_putkey_nopr; .quad keyboard_buffer_putkey_nopr
-	.reloc ., R_X86_64_SIZE32, keyboard_buffer_putkey_nopr; .int 0
-	.int 0x2a056c2
+	.weak block_device_areadv_phys_sector; .quad block_device_areadv_phys_sector
+	.reloc ., R_X86_64_SIZE32, block_device_areadv_phys_sector; .int 0
+	.int 0x88c86c2
 	.quad 0 /* index: 2190 */
 	.quad 0
 	.int 0
@@ -9083,9 +9083,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2270 /* index: 2270 */
-	.weak sys32_linux_oldstat; .quad sys32_linux_oldstat
-	.reloc ., R_X86_64_SIZE32, sys32_linux_oldstat; .int 0
-	.int 0x280c04
+	.weak sys32_klstat; .quad sys32_klstat
+	.reloc ., R_X86_64_SIZE32, sys32_klstat; .int 0
+	.int 0x3b3cc04
 	.quad .Lname2271 /* index: 2271 */
 	.weak handle_datasize; .quad handle_datasize
 	.reloc ., R_X86_64_SIZE32, handle_datasize; .int 0
@@ -10459,9 +10459,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, path_getcasechild_or_parent_inode; .int 0
 	.int 0x372aa35
 	.quad .Lname2614 /* index: 2614 */
-	.weak system_rtld32_size; .quad system_rtld32_size
-	.reloc ., R_X86_64_SIZE32, system_rtld32_size; .int 0
-	.int 0xbf99b5
+	.weak sys32_readdir; .quad sys32_readdir
+	.reloc ., R_X86_64_SIZE32, sys32_readdir; .int 0
+	.int 0x3b1c312
 	.quad .Lname2615 /* index: 2615 */
 	.weak dbg_ungetkey; .quad dbg_ungetkey
 	.reloc ., R_X86_64_SIZE32, dbg_ungetkey; .int 0
@@ -10495,9 +10495,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, devfs_lock_downgrade; .int 0
 	.int 0x5204855
 	.quad .Lname2623 /* index: 2623 */
-	.weak regdump_fcpustate; .quad regdump_fcpustate
-	.reloc ., R_X86_64_SIZE32, regdump_fcpustate; .int 0
-	.int 0xbf449b5
+	.weak realtime; .quad realtime
+	.reloc ., R_X86_64_SIZE32, realtime; .int 0
+	.int 0xb83a9b5
 	.quad .Lname2624 /* index: 2624 */
 	.weak bcmp; .quad bcmp
 	.reloc ., R_X86_64_SIZE32, bcmp; .int 0
@@ -10955,9 +10955,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_sched_getattr; .int 0
 	.int 0xf5259f2
 	.quad .Lname2738 /* index: 2738 */
-	.weak sys_sched_setattr; .quad sys_sched_setattr
-	.reloc ., R_X86_64_SIZE32, sys_sched_setattr; .int 0
-	.int 0x2f3ab2
+	.weak arch_cpu_quantum_remaining_nopr; .quad arch_cpu_quantum_remaining_nopr
+	.reloc ., R_X86_64_SIZE32, arch_cpu_quantum_remaining_nopr; .int 0
+	.int 0x6890ab2
 	.quad .Lname2739 /* index: 2739 */
 	.weak inode_areadallv_phys; .quad inode_areadallv_phys
 	.reloc ., R_X86_64_SIZE32, inode_areadallv_phys; .int 0
@@ -11234,10 +11234,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 2808 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2808 /* index: 2808 */
+	.weak keyboard_buffer_putkey_nopr; .quad keyboard_buffer_putkey_nopr
+	.reloc ., R_X86_64_SIZE32, keyboard_buffer_putkey_nopr; .int 0
+	.int 0x2a056c2
 	.quad 0 /* index: 2809 */
 	.quad 0
 	.int 0
@@ -11343,9 +11343,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2835 /* index: 2835 */
-	.weak inode_sync; .quad inode_sync
-	.reloc ., R_X86_64_SIZE32, inode_sync; .int 0
-	.int 0xab1ab13
+	.weak arch_cpu_disable_preemptive_interrupts; .quad arch_cpu_disable_preemptive_interrupts
+	.reloc ., R_X86_64_SIZE32, arch_cpu_disable_preemptive_interrupts; .int 0
+	.int 0x980b13
 	.quad .Lname2836 /* index: 2836 */
 	.weak debuginfo_cu_parser_next; .quad debuginfo_cu_parser_next
 	.reloc ., R_X86_64_SIZE32, debuginfo_cu_parser_next; .int 0
@@ -11602,10 +11602,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_paged_sync; .quad vm_paged_sync
 	.reloc ., R_X86_64_SIZE32, vm_paged_sync; .int 0
 	.int 0x6b0c9e3
-	.quad 0 /* index: 2900 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2900 /* index: 2900 */
+	.weak validate_readable; .quad validate_readable
+	.reloc ., R_X86_64_SIZE32, validate_readable; .int 0
+	.int 0x18c4d55
 	.quad .Lname2901 /* index: 2901 */
 	.weak devfs_remove; .quad devfs_remove
 	.reloc ., R_X86_64_SIZE32, devfs_remove; .int 0
@@ -12307,9 +12307,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, block_device_partition_readv_phys; .int 0
 	.int 0xdc34c03
 	.quad .Lname3076 /* index: 3076 */
-	.weak sys32_kfstat; .quad sys32_kfstat
-	.reloc ., R_X86_64_SIZE32, sys32_kfstat; .int 0
-	.int 0x3adcc04
+	.weak arch_cpu_quantum_elapsed; .quad arch_cpu_quantum_elapsed
+	.reloc ., R_X86_64_SIZE32, arch_cpu_quantum_elapsed; .int 0
+	.int 0x8802c04
 	.quad .Lname3077 /* index: 3077 */
 	.weak sys_rpc_schedule; .quad sys_rpc_schedule
 	.reloc ., R_X86_64_SIZE32, sys_rpc_schedule; .int 0
@@ -12463,9 +12463,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname3115 /* index: 3115 */
-	.weak sys_sendmmsg; .quad sys_sendmmsg
-	.reloc ., R_X86_64_SIZE32, sys_sendmmsg; .int 0
-	.int 0xdfbb207
+	.weak realtime_clock; .quad realtime_clock
+	.reloc ., R_X86_64_SIZE32, realtime_clock; .int 0
+	.int 0x2db9c2b
 	.quad .Lname3116 /* index: 3116 */
 	.weak sys32_keyctl; .quad sys32_keyctl
 	.reloc ., R_X86_64_SIZE32, sys32_keyctl; .int 0
@@ -12651,9 +12651,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_exit; .int 0
 	.int 0x6827f64
 	.quad .Lname3162 /* index: 3162 */
-	.weak sys_ioprio_get; .quad sys_ioprio_get
-	.reloc ., R_X86_64_SIZE32, sys_ioprio_get; .int 0
-	.int 0x8735c04
+	.weak sys32_linux_oldstat; .quad sys32_linux_oldstat
+	.reloc ., R_X86_64_SIZE32, sys32_linux_oldstat; .int 0
+	.int 0x280c04
 	.quad 0 /* index: 3163 */
 	.quad 0
 	.int 0
@@ -12703,9 +12703,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys_set_library_listdef; .int 0
 	.int 0x3315c66
 	.quad .Lname3175 /* index: 3175 */
-	.weak sys_socket; .quad sys_socket
-	.reloc ., R_X86_64_SIZE32, sys_socket; .int 0
-	.int 0x6a23154
+	.weak arch_cpu_quantum_remaining; .quad arch_cpu_quantum_remaining
+	.reloc ., R_X86_64_SIZE32, arch_cpu_quantum_remaining; .int 0
+	.int 0xb2bcc67
 	.quad 0 /* index: 3176 */
 	.quad 0
 	.int 0
@@ -12898,10 +12898,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys32_sched_setaffinity; .quad sys32_sched_setaffinity
 	.reloc ., R_X86_64_SIZE32, sys32_sched_setaffinity; .int 0
 	.int 0xeb52219
-	.quad 0 /* index: 3224 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3224 /* index: 3224 */
+	.weak inode_sync; .quad inode_sync
+	.reloc ., R_X86_64_SIZE32, inode_sync; .int 0
+	.int 0xab1ab13
 	.quad .Lname3225 /* index: 3225 */
 	.weak sys_fchmod; .quad sys_fchmod
 	.reloc ., R_X86_64_SIZE32, sys_fchmod; .int 0
@@ -13222,10 +13222,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak heap_realloc_untraced_nx; .quad heap_realloc_untraced_nx
 	.reloc ., R_X86_64_SIZE32, heap_realloc_untraced_nx; .int 0
 	.int 0xac8ce8
-	.quad 0 /* index: 3305 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3305 /* index: 3305 */
+	.weak realtime_clock_destroy; .quad realtime_clock_destroy
+	.reloc ., R_X86_64_SIZE32, realtime_clock_destroy; .int 0
+	.int 0x1568ce9
 	.quad .Lname3306 /* index: 3306 */
 	.weak sys32_ptrace; .quad sys32_ptrace
 	.reloc ., R_X86_64_SIZE32, sys32_ptrace; .int 0
@@ -14370,10 +14370,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_lchown; .quad sys_lchown
 	.reloc ., R_X86_64_SIZE32, sys_lchown; .int 0
 	.int 0x62e664e
-	.quad 0 /* index: 3592 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3592 /* index: 3592 */
+	.weak arch_cpu_update_quantum_length; .quad arch_cpu_update_quantum_length
+	.reloc ., R_X86_64_SIZE32, arch_cpu_update_quantum_length; .int 0
+	.int 0x938ae08
 	.quad 0 /* index: 3593 */
 	.quad 0
 	.int 0
@@ -14783,9 +14783,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, unwind_fde_exec_landing_pad_adjustment; .int 0
 	.int 0x3144214
 	.quad .Lname3695 /* index: 3695 */
-	.weak unicode_readutf8_rev_n; .quad unicode_readutf8_rev_n
-	.reloc ., R_X86_64_SIZE32, unicode_readutf8_rev_n; .int 0
-	.int 0xd4e74be
+	.weak syscall_emulate_r; .quad syscall_emulate_r
+	.reloc ., R_X86_64_SIZE32, syscall_emulate_r; .int 0
+	.int 0x443fab2
 	.quad 0 /* index: 3696 */
 	.quad 0
 	.int 0
@@ -15070,10 +15070,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 3767 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3767 /* index: 3767 */
+	.weak x86_syscall32_sysenter; .quad x86_syscall32_sysenter
+	.reloc ., R_X86_64_SIZE32, x86_syscall32_sysenter; .int 0
+	.int 0x4db3eb2
 	.quad .Lname3768 /* index: 3768 */
 	.weak vm_do_allocram_nx; .quad vm_do_allocram_nx
 	.reloc ., R_X86_64_SIZE32, vm_do_allocram_nx; .int 0
@@ -15502,10 +15502,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 3875 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3875 /* index: 3875 */
+	.weak arch_cpu_enable_preemptive_interrupts; .quad arch_cpu_enable_preemptive_interrupts
+	.reloc ., R_X86_64_SIZE32, arch_cpu_enable_preemptive_interrupts; .int 0
+	.int 0x3bf5f23
 	.quad 0 /* index: 3876 */
 	.quad 0
 	.int 0
@@ -16453,7 +16453,7 @@ END(kernel_symbol_table)
 .Lname44:
 	.string "memmoveupl"
 .Lname45:
-	.string "syscall_emulate_r"
+	.string "sys_sched_setattr"
 .Lname48:
 	.string "slab_malloc40"
 .Lname49:
@@ -16958,6 +16958,8 @@ END(kernel_symbol_table)
 	.string "kernel_syscall1_restartmode32"
 .Lname399:
 	.string "handle_lookup_nosym"
+.Lname400:
+	.string "vm_paged_node_remove"
 .Lname401:
 	.string "sys32_create_module"
 .Lname403:
@@ -17011,7 +17013,7 @@ END(kernel_symbol_table)
 .Lname429:
 	.string "vm_unmap_kernel_ram"
 .Lname432:
-	.string "sys32_readdir"
+	.string "regdump_fcpustate"
 .Lname434:
 	.string "block_device_awritev_sector"
 .Lname435:
@@ -17386,6 +17388,8 @@ END(kernel_symbol_table)
 	.string "ttybase_device_ioctl"
 .Lname683:
 	.string "handle_get_datablock"
+.Lname686:
+	.string "sys_sendmmsg"
 .Lname687:
 	.string "vm_mapres"
 .Lname688:
@@ -17516,6 +17520,8 @@ END(kernel_symbol_table)
 	.string "task_disconnectall"
 .Lname781:
 	.string "sys32_fanotify_mark"
+.Lname783:
+	.string "system_rtld32_size"
 .Lname784:
 	.string "sys_mremap"
 .Lname785:
@@ -17674,6 +17680,8 @@ END(kernel_symbol_table)
 	.string "vm_map"
 .Lname897:
 	.string "memrendq"
+.Lname898:
+	.string "arch_cpu_enable_preemptive_interrupts_nopr"
 .Lname899:
 	.string "sys_fstatfs"
 .Lname900:
@@ -18085,7 +18093,7 @@ END(kernel_symbol_table)
 .Lname1201:
 	.string "rawmemlenq"
 .Lname1202:
-	.string "task_waitfor"
+	.string "arch_cpu_quantum_elapsed_nopr"
 .Lname1204:
 	.string "character_device_read"
 .Lname1205:
@@ -18131,7 +18139,7 @@ END(kernel_symbol_table)
 .Lname1231:
 	.string "minfo"
 .Lname1232:
-	.string "x86_syscall_emulate_sysenter_r"
+	.string "sys_ioprio_get"
 .Lname1234:
 	.string "sys32_vserver"
 .Lname1235:
@@ -18333,7 +18341,7 @@ END(kernel_symbol_table)
 .Lname1396:
 	.string "handle_print"
 .Lname1399:
-	.string "validate_readable"
+	.string "task_waitfor"
 .Lname1400:
 	.string "vm_kernel_treelock_read"
 .Lname1401:
@@ -18573,7 +18581,7 @@ END(kernel_symbol_table)
 .Lname1556:
 	.string "sys32_wait4"
 .Lname1557:
-	.string "syscall_printtrace"
+	.string "sys_socket"
 .Lname1558:
 	.string "sys_setreuid"
 .Lname1559:
@@ -18752,6 +18760,8 @@ END(kernel_symbol_table)
 	.string "setreg_ucpustate"
 .Lname1698:
 	.string "debuginfo_cu_parser_loadattr_member"
+.Lname1699:
+	.string "x86_cmos_realtime_clock"
 .Lname1700:
 	.string "sys32_kexec_load"
 .Lname1701:
@@ -18793,7 +18803,7 @@ END(kernel_symbol_table)
 .Lname1729:
 	.string "sys_inotify_init1"
 .Lname1730:
-	.string "block_device_areadv_phys_sector"
+	.string "arch_cpu_disable_preemptive_interrupts_nopr"
 .Lname1732:
 	.string "page_isfree"
 .Lname1733:
@@ -18817,7 +18827,7 @@ END(kernel_symbol_table)
 .Lname1749:
 	.string "inode_recent"
 .Lname1751:
-	.string "vm_datablock_vio_writev_phys"
+	.string "syscall_printtrace"
 .Lname1753:
 	.string "pipe_max_bufsize_unprivileged"
 .Lname1755:
@@ -18903,7 +18913,7 @@ END(kernel_symbol_table)
 .Lname1817:
 	.string "userkern_segment_part"
 .Lname1818:
-	.string "vm_paged_node_remove"
+	.string "vm_datablock_vio_writev_phys"
 .Lname1819:
 	.string "pidns_write"
 .Lname1820:
@@ -19227,7 +19237,7 @@ END(kernel_symbol_table)
 .Lname2072:
 	.string "heap_realign_untraced_nx"
 .Lname2073:
-	.string "sys32_klstat"
+	.string "sys32_kfstat"
 .Lname2074:
 	.string "this_tid_address"
 .Lname2075:
@@ -19263,7 +19273,7 @@ END(kernel_symbol_table)
 .Lname2092:
 	.string "vm_readphysl"
 .Lname2093:
-	.string "x86_syscall32_sysenter"
+	.string "unicode_readutf8_rev_n"
 .Lname2095:
 	.string "sys_getrusage"
 .Lname2101:
@@ -19312,6 +19322,8 @@ END(kernel_symbol_table)
 	.string "dbg_hexedit"
 .Lname2133:
 	.string "dbg_getregbyname"
+.Lname2134:
+	.string "x86_syscall_emulate_sysenter_r"
 .Lname2135:
 	.string "sys_epoll_wait_old"
 .Lname2136:
@@ -19381,7 +19393,7 @@ END(kernel_symbol_table)
 .Lname2188:
 	.string "disasm_print_symbol"
 .Lname2189:
-	.string "keyboard_buffer_putkey_nopr"
+	.string "block_device_areadv_phys_sector"
 .Lname2191:
 	.string "dbg_enter_lcpustate_cr"
 .Lname2192:
@@ -19505,7 +19517,7 @@ END(kernel_symbol_table)
 .Lname2268:
 	.string "mempatl"
 .Lname2270:
-	.string "sys32_linux_oldstat"
+	.string "sys32_klstat"
 .Lname2271:
 	.string "handle_datasize"
 .Lname2274:
@@ -19975,7 +19987,7 @@ END(kernel_symbol_table)
 .Lname2613:
 	.string "path_getcasechild_or_parent_inode"
 .Lname2614:
-	.string "system_rtld32_size"
+	.string "sys32_readdir"
 .Lname2615:
 	.string "dbg_ungetkey"
 .Lname2616:
@@ -19993,7 +20005,7 @@ END(kernel_symbol_table)
 .Lname2622:
 	.string "devfs_lock_downgrade"
 .Lname2623:
-	.string "regdump_fcpustate"
+	.string "realtime"
 .Lname2624:
 	.string "bcmp"
 .Lname2625:
@@ -20159,7 +20171,7 @@ END(kernel_symbol_table)
 .Lname2737:
 	.string "sys32_sched_getattr"
 .Lname2738:
-	.string "sys_sched_setattr"
+	.string "arch_cpu_quantum_remaining_nopr"
 .Lname2739:
 	.string "inode_areadallv_phys"
 .Lname2740:
@@ -20250,6 +20262,8 @@ END(kernel_symbol_table)
 	.string "json_writer_putuint64"
 .Lname2805:
 	.string "kernel_debugtrap_ucpustate"
+.Lname2808:
+	.string "keyboard_buffer_putkey_nopr"
 .Lname2810:
 	.string "sys_name_to_handle_at"
 .Lname2812:
@@ -20283,7 +20297,7 @@ END(kernel_symbol_table)
 .Lname2831:
 	.string "sys32_mkdirat"
 .Lname2835:
-	.string "inode_sync"
+	.string "arch_cpu_disable_preemptive_interrupts"
 .Lname2836:
 	.string "debuginfo_cu_parser_next"
 .Lname2837:
@@ -20358,6 +20372,8 @@ END(kernel_symbol_table)
 	.string "block_device_awritev_phys_sector"
 .Lname2899:
 	.string "vm_paged_sync"
+.Lname2900:
+	.string "validate_readable"
 .Lname2901:
 	.string "devfs_remove"
 .Lname2902:
@@ -20591,7 +20607,7 @@ END(kernel_symbol_table)
 .Lname3075:
 	.string "block_device_partition_readv_phys"
 .Lname3076:
-	.string "sys32_kfstat"
+	.string "arch_cpu_quantum_elapsed"
 .Lname3077:
 	.string "sys_rpc_schedule"
 .Lname3078:
@@ -20653,7 +20669,7 @@ END(kernel_symbol_table)
 .Lname3113:
 	.string "vm_datablock_vio_write_phys"
 .Lname3115:
-	.string "sys_sendmmsg"
+	.string "realtime_clock"
 .Lname3116:
 	.string "sys32_keyctl"
 .Lname3117:
@@ -20733,7 +20749,7 @@ END(kernel_symbol_table)
 .Lname3161:
 	.string "sys32_exit"
 .Lname3162:
-	.string "sys_ioprio_get"
+	.string "sys32_linux_oldstat"
 .Lname3164:
 	.string "keyboard_device_ioctl"
 .Lname3166:
@@ -20753,7 +20769,7 @@ END(kernel_symbol_table)
 .Lname3174:
 	.string "sys_set_library_listdef"
 .Lname3175:
-	.string "sys_socket"
+	.string "arch_cpu_quantum_remaining"
 .Lname3178:
 	.string "pagedir_kernel"
 .Lname3179:
@@ -20830,6 +20846,8 @@ END(kernel_symbol_table)
 	.string "dbg_getcur_visible"
 .Lname3223:
 	.string "sys32_sched_setaffinity"
+.Lname3224:
+	.string "inode_sync"
 .Lname3225:
 	.string "sys_fchmod"
 .Lname3227:
@@ -20948,6 +20966,8 @@ END(kernel_symbol_table)
 	.string "json_writer_addfield"
 .Lname3304:
 	.string "heap_realloc_untraced_nx"
+.Lname3305:
+	.string "realtime_clock_destroy"
 .Lname3306:
 	.string "sys32_ptrace"
 .Lname3308:
@@ -21382,6 +21402,8 @@ END(kernel_symbol_table)
 	.string "thisvm_library_listdef"
 .Lname3591:
 	.string "sys_lchown"
+.Lname3592:
+	.string "arch_cpu_update_quantum_length"
 .Lname3594:
 	.string "sys_msync"
 .Lname3596:
@@ -21521,7 +21543,7 @@ END(kernel_symbol_table)
 .Lname3694:
 	.string "unwind_fde_exec_landing_pad_adjustment"
 .Lname3695:
-	.string "unicode_readutf8_rev_n"
+	.string "syscall_emulate_r"
 .Lname3697:
 	.string "regdump_sgregs"
 .Lname3698:
@@ -21624,6 +21646,8 @@ END(kernel_symbol_table)
 	.string "pidns_end"
 .Lname3765:
 	.string "pidns_upgrade"
+.Lname3767:
+	.string "x86_syscall32_sysenter"
 .Lname3768:
 	.string "vm_do_allocram_nx"
 .Lname3769:
@@ -21784,6 +21808,8 @@ END(kernel_symbol_table)
 	.string "kernel_syscall0_restartmode"
 .Lname3873:
 	.string "validate_readablem_opt"
+.Lname3875:
+	.string "arch_cpu_enable_preemptive_interrupts"
 .Lname3877:
 	.string "dbg_beginupdate"
 .Lname3878:

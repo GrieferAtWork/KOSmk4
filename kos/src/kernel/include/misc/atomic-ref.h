@@ -273,6 +273,23 @@ template<class T> struct xatomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
+	__CXX_CLASSMEMBER ATTR_LEAF NOBLOCK WUNUSED REF T *KCALL get_nopr() __CXX_NOEXCEPT {
+		REF T *result;
+#ifndef CONFIG_NO_SMP
+		__hybrid_atomic_fetchinc(this->m_inuse, __ATOMIC_SEQ_CST);
+#endif /* !CONFIG_NO_SMP */
+		COMPILER_READ_BARRIER();
+		result = this->m_pointer;
+		COMPILER_READ_BARRIER();
+		if (result)
+			refcnt_methods<T>::incref(result);
+#ifndef CONFIG_NO_SMP
+		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
+#endif /* !CONFIG_NO_SMP */
+		return result;
+	}
+
+	/* Return a reference to the current pointed-to value */
 	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED())
 	void KCALL set(T *new_pointer) __CXX_NOEXCEPT {
 		REF T *old_pointer;

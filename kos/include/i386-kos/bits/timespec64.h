@@ -85,7 +85,7 @@ __TIMESPEC_CXX_DECL_BEGIN
 /* timespec for x86_64 */
 struct timespecx64 /*[PREFIX(tv_)]*/ {
 	__INT64_TYPE__  tv_sec;   /* Seconds */
-	__UINT64_TYPE__ tv_nsec;  /* Nano seconds (<= 1000000000 == 1_000_000_000) */
+	__UINT64_TYPE__ tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
 	__TIMESPEC_CXX_SUPPORT(struct timespecx64, __INT64_TYPE__, __UINT64_TYPE__)
 };
 __TIMESPEC_CXX_SUPPORT2(struct timespecx64, __INT64_TYPE__, __UINT64_TYPE__)

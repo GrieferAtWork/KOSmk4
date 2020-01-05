@@ -29,6 +29,7 @@
 #include <sched/pid.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
+#include <sched/time.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
@@ -442,32 +443,28 @@ struct cpu cpu_header = {
 	/*.c_state    = */ CPU_STATE_RUNNING
 };
 
+/* Weakly implement preemptive interrupt disabling as no-ops. */
+PUBLIC ATTR_WEAK NOBLOCK ATTR_SECTION(".text.kernel.arch_cpu_disable_preemptive_interrupts") void
+NOTHROW(KCALL arch_cpu_disable_preemptive_interrupts)(void) {
+}
+DEFINE_PUBLIC_WEAK_ALIAS(arch_cpu_enable_preemptive_interrupts, arch_cpu_disable_preemptive_interrupts);
+DEFINE_PUBLIC_WEAK_ALIAS(cpu_quantum_reset, arch_cpu_disable_preemptive_interrupts);
+
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.arch_cpu_quantum_elapsed")
+ATTR_CONST quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_elapsed)(void) {
+	return 0;
+}
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.arch_cpu_quantum_remaining")
+ATTR_CONST quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_remaining)(void) {
+	return (quantum_diff_t)-1;
+}
+DEFINE_PUBLIC_WEAK_ALIAS(arch_cpu_quantum_elapsed_nopr, arch_cpu_quantum_elapsed);
+DEFINE_PUBLIC_WEAK_ALIAS(arch_cpu_quantum_remaining_nopr, arch_cpu_quantum_remaining);
+
+
 PUBLIC ATTR_PERCPU jtime_t volatile thiscpu_jiffies = 0;
 PUBLIC ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_offset = 0;
 PUBLIC ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length = (quantum_diff_t)-1;
-
-
-/* Weakly implement preemptive interrupt disabling as no-ops. */
-PUBLIC ATTR_WEAK NOBLOCK ATTR_SECTION(".text.kernel.cpu_disable_preemptive_interrupts") void
-NOTHROW(KCALL cpu_disable_preemptive_interrupts)(void) {
-}
-DEFINE_PUBLIC_WEAK_ALIAS(cpu_enable_preemptive_interrupts, cpu_disable_preemptive_interrupts);
-DEFINE_PUBLIC_WEAK_ALIAS(cpu_quantum_reset, cpu_disable_preemptive_interrupts);
-
-PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.cpu_quantum_elapsed")
-ATTR_CONST quantum_diff_t NOTHROW(KCALL cpu_quantum_elapsed)(void) {
-	return 0;
-}
-PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.cpu_quantum_remaining")
-ATTR_CONST quantum_diff_t NOTHROW(KCALL cpu_quantum_remaining)(void) {
-	return (quantum_diff_t)-1;
-}
-DEFINE_PUBLIC_WEAK_ALIAS(cpu_quantum_elapsed_nopr, cpu_quantum_elapsed);
-DEFINE_PUBLIC_WEAK_ALIAS(cpu_quantum_remaining_nopr, cpu_quantum_remaining);
-
-
-PRIVATE ATTR_PERCPU jtime_t thiscpu_last_qtime_j = 0;
-PRIVATE ATTR_PERCPU quantum_diff_t thiscpu_last_qtime_q = 0;
 
 PUBLIC NOBLOCK WUNUSED qtime_t
 NOTHROW(KCALL cpu_quantum_time)(void) {
@@ -477,20 +474,9 @@ NOTHROW(KCALL cpu_quantum_time)(void) {
 	quantum_diff_t elapsed;
 	was = PREEMPTION_PUSHOFF();
 	me             = THIS_CPU;
-	result.q_jtime = FORCPU(me, thiscpu_jiffies);
 	result.q_qtime = FORCPU(me, thiscpu_quantum_offset);
 	result.q_qsize = FORCPU(me, thiscpu_quantum_length);
-	elapsed        = cpu_quantum_elapsed_nopr();
-	/* prevent issues hardware timer roll-over happening
-	 * before we've able to read the timestamp counter. */
-	if (elapsed < FORCPU(me, thiscpu_last_qtime_q) &&
-	    result.q_jtime == FORCPU(me, thiscpu_last_qtime_j)) {
-		FORCPU(me, thiscpu_last_qtime_q) = (quantum_diff_t)-1;
-		++result.q_jtime;
-	} else {
-		FORCPU(me, thiscpu_last_qtime_j) = result.q_jtime;
-		FORCPU(me, thiscpu_last_qtime_q) = elapsed;
-	}
+	elapsed        = cpu_quantum_elapsed_nopr(me, &result.q_jtime);
 	PREEMPTION_POP(was);
 	if (OVERFLOW_UADD(result.q_qtime, elapsed, &result.q_qtime)) {
 		result.q_jtime += ((quantum_diff_t)-1) / result.q_qsize;
@@ -514,20 +500,9 @@ NOTHROW(KCALL quantum_time)(void) {
 	was = PREEMPTION_PUSHOFF();
 	me  = THIS_CPU;
 	if (me == &_bootcpu) {
-		result.q_jtime = FORCPU(me, thiscpu_jiffies);
 		result.q_qtime = FORCPU(me, thiscpu_quantum_offset);
 		result.q_qsize = FORCPU(me, thiscpu_quantum_length);
-		elapsed        = cpu_quantum_elapsed_nopr();
-		/* prevent issues hardware timer roll-over happening
-		 * before we've able to read the timestamp counter. */
-		if (elapsed < FORCPU(me, thiscpu_last_qtime_q) &&
-		    result.q_jtime == FORCPU(me, thiscpu_last_qtime_j)) {
-			FORCPU(me, thiscpu_last_qtime_q) = (quantum_diff_t)-1;
-			++result.q_jtime;
-		} else {
-			FORCPU(me, thiscpu_last_qtime_j) = result.q_jtime;
-			FORCPU(me, thiscpu_last_qtime_q) = elapsed;
-		}
+		elapsed        = cpu_quantum_elapsed_nopr(me, &result.q_jtime);
 		PREEMPTION_POP(was);
 		if (OVERFLOW_UADD(result.q_qtime, elapsed, &result.q_qtime)) {
 			result.q_jtime += ((quantum_diff_t)-1) / result.q_qsize;
@@ -545,7 +520,7 @@ NOTHROW(KCALL quantum_time)(void) {
 	result.q_qsize = FORCPU(&_bootcpu, thiscpu_quantum_length);
 	my_qoff        = FORCPU(me, thiscpu_quantum_offset);
 	my_qlen        = FORCPU(me, thiscpu_quantum_length);
-	elapsed        = cpu_quantum_elapsed_nopr();
+	elapsed        = arch_cpu_quantum_elapsed_nopr();
 	PREEMPTION_POP(was);
 	if (my_qlen > result.q_qsize) {
 		result.q_qtime = (quantum_diff_t)(((u64)result.q_qtime * result.q_qsize) / my_qlen);
@@ -577,10 +552,9 @@ NOTHROW(FCALL quantum_local_to_global)(qtime_t *__restrict tmp) {
 	qtime_t boot_time, locl_time;
 	struct cpu *me = THIS_CPU;
 	quantum_diff_t elapsed;
-	locl_time.q_jtime = FORCPU(me, thiscpu_jiffies);
 	locl_time.q_qtime = FORCPU(me, thiscpu_quantum_offset);
 	locl_time.q_qsize = FORCPU(me, thiscpu_quantum_length);
-	elapsed           = cpu_quantum_elapsed_nopr();
+	elapsed           = cpu_quantum_elapsed_nopr(me, &locl_time.q_jtime);
 	if (OVERFLOW_UADD(locl_time.q_qtime, elapsed, &locl_time.q_qtime)) {
 		locl_time.q_jtime += ((quantum_diff_t)-1) / locl_time.q_qsize;
 		locl_time.q_qtime += elapsed;
@@ -639,7 +613,7 @@ NOTHROW(FCALL quantum_global_to_local)(qtime_t *__restrict tmp) {
 	locl_time.q_jtime = FORCPU(me, thiscpu_jiffies);
 	locl_time.q_qtime = FORCPU(me, thiscpu_quantum_offset);
 	locl_time.q_qsize = FORCPU(me, thiscpu_quantum_length);
-	elapsed = cpu_quantum_elapsed_nopr();
+	elapsed = arch_cpu_quantum_elapsed_nopr();
 	if (OVERFLOW_UADD(locl_time.q_qtime, elapsed, &locl_time.q_qtime)) {
 		locl_time.q_jtime += ((quantum_diff_t)-1) / locl_time.q_qsize;
 		locl_time.q_qtime += elapsed;
@@ -716,7 +690,7 @@ NOTHROW(FCALL cpu_add_quantum_offset)(quantum_diff_t diff) {
 	if (more_jiffies) {
 		struct task *sleeper, *last_sleeper, *next;
 		jtime_t new_jiffies;
-		new_jiffies             = FORCPU(me, thiscpu_jiffies) + more_jiffies;
+		new_jiffies = FORCPU(me, thiscpu_jiffies) + more_jiffies;
 		FORCPU(me, thiscpu_jiffies) = new_jiffies;
 		if ((sleeper = me->c_sleeping) != NULL) {
 			if (sleeper->t_sched.s_asleep.ss_timeout.q_jtime > new_jiffies)
@@ -757,16 +731,6 @@ done_wakeup:
 }
 
 
-PUBLIC NOBLOCK void
-NOTHROW(KCALL cpu_quantum_end)(void) {
-	quantum_diff_t elapsed, length;
-	assert(!PREEMPTION_ENABLED());
-	elapsed = cpu_quantum_elapsed_nopr();
-	cpu_quantum_reset_nopr();
-	length = cpu_add_quantum_offset(elapsed);
-	THIS_TASK->t_atime.add_quantum(elapsed, length);
-}
-
 #ifndef __INTELLISENSE__
 DECL_END
 
@@ -777,8 +741,8 @@ DECL_END
 DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 
-
-
+INTDEF NOBLOCK void
+NOTHROW(FCALL cpu_inc_jiffies)(struct cpu *__restrict self);
 
 /* The C-level implementation of the scheduling interrupt
  * that is fired periodically for the purposes of preemption. */
@@ -798,7 +762,7 @@ NOTHROW(FCALL cpu_scheduler_interrupt)(struct cpu *__restrict caller,
 	cpu_assert_running(thread);
 	/* Keep track of the cpu-local time, as well
 	 * as the previous thread's active-time. */
-	++FORCPU(caller, thiscpu_jiffies);
+	cpu_inc_jiffies(caller);
 	++thread->t_atime.q_jtime;
 	/* Check for a scheduling override */
 	next = caller->c_override;
@@ -983,7 +947,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 PUBLIC NOBLOCK WUNUSED ATTR_PURE struct timespec
 NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime) {
 	struct timespec result;
-	result.tv_sec = qtime->q_jtime / HZ;
+	result.tv_sec  = qtime->q_jtime / HZ;
 	result.tv_nsec = ((qtime->q_jtime % HZ) * (__NSECS_PER_SEC / HZ)) +
 	                 (syscall_ulong_t)((u64)((u64)qtime->q_qtime *
 	                                         (__NSECS_PER_SEC / HZ)) /
@@ -1003,110 +967,11 @@ NOTHROW(FCALL timespec_to_qtime)(struct timespec const *__restrict tms) {
 
 
 
-#undef CONFIG_AUTOADJUST_QUANTUM_DRIFT
-//#define CONFIG_AUTOADJUST_QUANTUM_DRIFT 1
-
-
-#ifdef CONFIG_AUTOADJUST_QUANTUM_DRIFT
-LOCAL u8 cmos_read(u8 regno) {
-	outb((port_t)0x70, regno);
-	return inb((port_t)0x71);
-}
-
-INTERN struct timespec rtc_getnow(void) {
-	struct timespec result;
-	result.tv_nsec = 0;
-	result.tv_sec  = cmos_read(0x00);
-	result.tv_sec += cmos_read(0x02) * 60;
-	result.tv_sec += cmos_read(0x04) * 60 * 60;
-	/* TODO: day, month, year */
-	return result;
-}
-
-INTERN struct timespec rtc_getres(void) {
-	struct timespec result;
-	result.tv_sec = 1;
-	result.tv_nsec = 0;
-	return result;
-}
-
-
-PRIVATE ATTR_PERCPU struct timespec current_resync_prev_rtc; /* RTC time at the previous resync */
-PRIVATE ATTR_PERCPU struct timespec current_resync_prev_cpu; /* CPU time at the previous resync */
-
-/* Timestamp (in per-cpu jiffies) of when the next re-sync should take place the soonest. */
-PRIVATE ATTR_PERCPU jtime_t current_rtc_resync_next_jiffies;
-
-/* Min interval between jiffi resync timings. */
-PRIVATE jtime_t rtc_resync_interval = 2;
-#endif /* CONFIG_AUTOADJUST_QUANTUM_DRIFT */
 
 
 PUBLIC ATTR_NORETURN void
 NOTHROW(FCALL cpu_idlemain)(void) {
-#ifdef CONFIG_AUTOADJUST_QUANTUM_DRIFT
-	struct cpu *me = THIS_CPU;
-#endif /* CONFIG_AUTOADJUST_QUANTUM_DRIFT */
 	for (;;) {
-#ifdef CONFIG_AUTOADJUST_QUANTUM_DRIFT
-		if (FORCPU(me, thiscpu_jiffies) >= FORCPU(me, current_rtc_resync_next_jiffies)) {
-			qtime_t cpqtime;
-			struct timespec cputime, rtctime;
-			struct timespec cpudiff, rtcdiff;
-			struct timespec drift; /* About by which the CPU has drifted away from the RTC */
-again_resync:
-			COMPILER_BARRIER();
-			cpqtime = cpu_quantum_time();
-			rtctime = rtc_getnow();
-			COMPILER_BARRIER();
-			if unlikely(!rtctime.tv_sec && !rtctime.tv_nsec)
-				goto done_rtc; /* No RTC available... */
-			cputime = qtime_to_timespec(&cpqtime);
-			cputime -= cputime % rtc_getres();
-			cpudiff = cputime - FORCPU(me, current_resync_prev_cpu);
-			/* Truncate the CPU time diff to the RTC resolution. */
-			rtcdiff = rtctime - FORCPU(me, current_resync_prev_rtc);
-			drift   = cpudiff - rtcdiff;
-			if (drift.get_nanoseconds() >= (__NSECS_PER_SEC / 8)) {
-				/* Must fix the drift by adjusting `thiscpu_quantum_length'. */
-				typedef __CRT_PRIVATE_SINT(__SIZEOF_JTIME_T__) sjtime_t;
-				typedef __CRT_PRIVATE_UINT(__SIZEOF_QUANTUM_DIFF_T__) squantum_diff_t;
-				qtime_t qdrift  = timespec_to_qtime(&drift); /* Total drift in quantum time. */
-				qtime_t qpassd = timespec_to_qtime(&cpudiff);
-				quantum_diff_t old_qlen;
-				s64 total_quantum_drift;
-				u64 total_quantum_passd;
-				squantum_diff_t total_quantum_adjust;
-				assert(qdrift.q_qsize == qpassd.q_qsize);
-				assert(qdrift.q_qsize == __NSECS_PER_SEC);
-				old_qlen = FORCPU(me, thiscpu_quantum_length);
-				qdrift.q_qtime = (qdrift.q_qtime * old_qlen) / __NSECS_PER_SEC;
-				qpassd.q_qtime = (qpassd.q_qtime * old_qlen) / __NSECS_PER_SEC;
-				total_quantum_drift = ((s64)(sjtime_t)qdrift.q_jtime * (u64)old_qlen) + (squantum_diff_t)qdrift.q_qtime;
-				total_quantum_passd = ((u64)qpassd.q_jtime * (u64)old_qlen) + (u64)qpassd.q_qtime;
-				if unlikely(!total_quantum_passd)
-					goto done_rtc;
-				/* Must adjust `thiscpu_quantum_length' by subtracting `total_quantum_drift / total_quantum_passd' */
-				total_quantum_adjust = (squantum_diff_t)(total_quantum_drift / total_quantum_passd);
-				if (total_quantum_adjust != 0) {
-					if (!ATOMIC_CMPXCH(*(quantum_diff_t *)&FORCPU(me, thiscpu_quantum_length), old_qlen, total_quantum_adjust))
-						goto again_resync;
-					COMPILER_BARRIER();
-					FORCPU(me, current_resync_prev_rtc) = rtctime;
-					FORCPU(me, current_resync_prev_cpu) = cputime;
-					FORCPU(me, current_rtc_resync_next_jiffies) = FORCPU(me, thiscpu_jiffies) + rtc_resync_interval;
-					COMPILER_BARRIER();
-					printk(KERN_INFO "Adjust cpu#%u quantum length by %I32d (%I32u -> %I32u) to account for drift\n",
-					       (unsigned int)me->c_id,
-					       (s32)total_quantum_adjust,
-					       (u32)old_qlen,
-					       (u32)(old_qlen + total_quantum_adjust));
-				}
-			}
-		}
-done_rtc:
-#endif /* CONFIG_AUTOADJUST_QUANTUM_DRIFT */
-
 		/* TODO: sync() (`superblock_syncall()') superblocks.
 		 * NOTE: Should only happen after some delay (e.g. 2 seconds)
 		 *       since the last write operation, or since IDLE began. */
