@@ -42,6 +42,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <syslog.h>
+#include <time.h>
 
 #undef CONFIG_PRINTK_DEDENT_LBRACKET_TEXT
 #if 1
@@ -98,35 +99,16 @@ INTERN port_t debug_port = (port_t)0x80;
 #ifdef CONFIG_PRINTK_TIMESTAMP
 PRIVATE NOBLOCK void
 NOTHROW(KCALL printk_timestamp_prefix)(void) {
-#if 1
 	struct timespec now;
 	char buf[64], *ptr;
+	struct tm t;
 	now = realtime();
-	ptr = buf + sprintf(buf, "[%I64u.%9Iu:", now.tv_sec, now.tv_nsec);
+	localtime_r(&now.tv_sec, &t);
+	/* Use ISO-8601-derived format (without the timezone; plus nanoseconds) */
+	ptr = buf + sprintf(buf, "[%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%-9Iu:",
+	                    t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,
+	                    t.tm_hour, t.tm_min, t.tm_sec, now.tv_nsec);
 	DO_PRINTK(buf, (size_t)(ptr - buf));
-#else
-	qtime_t now = quantum_time();
-	char buf[32], *ptr;
-	u64 qpart;
-#define QPART1_SIZE 100000
-#define QPART2_SIZE 100000
-	unsigned int jwidth = 5;
-	unsigned int qpart1, qpart2;
-	ptr = buf;
-	*ptr++ = '[';
-	if (now.q_jtime >= 100000) {
-		*ptr++ = '*';
-		now.q_jtime %= 10000;
-		--jwidth;
-	}
-	qpart  = ((u64)now.q_qtime * (u64)QPART1_SIZE * (u64)QPART2_SIZE) / now.q_qsize;
-	qpart1 = (unsigned int)(qpart / QPART2_SIZE);
-	qpart2 = (unsigned int)(qpart % QPART2_SIZE);
-	ptr += sprintf(ptr, "%*u+%.5u.%.5u:", jwidth,
-	               (unsigned int)now.q_jtime,
-	               qpart1, qpart2);
-	DO_PRINTK(buf, (size_t)(ptr - buf));
-#endif
 }
 #endif /* CONFIG_PRINTK_TIMESTAMP */
 
