@@ -105,7 +105,7 @@ NOTHROW(KCALL printk_timestamp_prefix)(void) {
 	now = realtime();
 	localtime_r(&now.tv_sec, &t);
 	/* Use ISO-8601-derived format (without the timezone; plus nanoseconds) */
-	ptr = buf + sprintf(buf, "[%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%-9Iu:",
+	ptr = buf + sprintf(buf, "[%.4u-%.2u-%.2uT%.2u:%.2u:%.2u.%.9Iu:",
 	                    t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,
 	                    t.tm_hour, t.tm_min, t.tm_sec, now.tv_nsec);
 	DO_PRINTK(buf, (size_t)(ptr - buf));
