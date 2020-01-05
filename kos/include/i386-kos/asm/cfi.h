@@ -447,7 +447,7 @@ __ASM_L(.macro .cfi_restore_iret_ss)
 __ASM_L(	.cfi_offset %ss, 32)
 __ASM_L(.endm)
 
-__ASM_L(.macro cfi_restore_iret reg:req)
+__ASM_L(.macro .cfi_restore_iret reg:req)
 __ASM_L(.ifc __ASM_ARG(\reg),%rip; .cfi_restore_iret_rip; .else)
 __ASM_L(.ifc __ASM_ARG(\reg),%cs; .cfi_restore_iret_cs; .else)
 __ASM_L(.ifc __ASM_ARG(\reg),%rflags; .cfi_restore_iret_rflags; .else)
@@ -738,7 +738,7 @@ __ASM_L(.endm)
 
 
 
-__ASM_L(.macro cfi_restore_iret reg:req)
+__ASM_L(.macro .cfi_restore_iret reg:req)
 __ASM_L(.ifc __ASM_ARG(\reg),%eip; .cfi_restore_iret_eip; .else)
 __ASM_L(.ifc __ASM_ARG(\reg),%cs; .cfi_restore_iret_cs; .else)
 __ASM_L(.ifc __ASM_ARG(\reg),%eflags; .cfi_restore_iret_eflags; .else)

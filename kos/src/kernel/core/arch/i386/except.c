@@ -635,7 +635,6 @@ INTERN struct kcpustate *
 NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 	unsigned int error;
 	unwind_fde_t fde;
-	unwind_cfa_state_t cfa;
 	struct kcpustate old_state;
 	void *pc;
 
@@ -678,12 +677,26 @@ search_fde:
 		default: break;
 		}
 	}
-	error = unwind_fde_exec(&fde, &cfa, pc);
-	if unlikely(error != UNWIND_SUCCESS)
-		goto err;
-	error = unwind_cfa_apply(&cfa, &fde, pc,
-	                         &unwind_getreg_kcpustate, &old_state,
-	                         &unwind_setreg_kcpustate, state);
+#ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
+	if (fde.f_sigframe) {
+		unwind_cfa_sigframe_state_t cfa;
+		error = unwind_fde_sigframe_exec(&fde, &cfa, pc);
+		if unlikely(error != UNWIND_SUCCESS)
+			goto err;
+		error = unwind_cfa_sigframe_apply(&cfa, &fde, pc,
+		                                  &unwind_getreg_kcpustate, &old_state,
+		                                  &unwind_setreg_kcpustate, state);
+	} else
+#endif /* !CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
+	{
+		unwind_cfa_state_t cfa;
+		error = unwind_fde_exec(&fde, &cfa, pc);
+		if unlikely(error != UNWIND_SUCCESS)
+			goto err;
+		error = unwind_cfa_apply(&cfa, &fde, pc,
+		                         &unwind_getreg_kcpustate, &old_state,
+		                         &unwind_setreg_kcpustate, state);
+	}
 
 	/* When unwinding to user-space, well get an error `UNWIND_INVALID_REGISTER',
 	 * when trying to assign a user-space value to the CS register. */

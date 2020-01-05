@@ -159,7 +159,7 @@ typedef struct unwind_cfa_value_struct {
 		                      *       the amount of types that follow immediately after,
 		                      *       containing expression text. */
 		__intptr_t cv_value; /* [valid_if(cv_type == UNWIND_CFA_VALUE_REGISTER)]
-		                      * Address offset (added to the value of `cc_regno') */
+		                      * Address offset (added to the value of `cv_reg') */
 	};
 } unwind_cfa_value_t;
 
