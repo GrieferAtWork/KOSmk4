@@ -103,8 +103,8 @@ FORCELOCAL void KCALL cmos_wr(u8 reg, u8 val) {
 
 #define SECONDS_PER_DAY        86400
 
-#define DAYS2YEARS(n_days)  ((400 * ((n_days) + 1)) / 146097)
-#define YEARS2DAYS(n_years) (((146097 * (n_years)) / 400) /*-1*/) // rounding error?
+#define DAYS2YEARS(n_days)  ((((n_days) + 1) * 400) / 146097)
+#define YEARS2DAYS(n_years) ((((n_years) * 146097) / 400) /*-1*/) // rounding error?
 #define ISLEAPYEAR(year)                                                                                   \
 	(__builtin_constant_p(year) ? ((year) % 400 == 0 || ((year) % 100 != 0 && (year) % 4 == 0)) : XBLOCK({ \
 		__typeof__(year) const _year = (year);                                                             \
@@ -202,17 +202,13 @@ got_time:
 		year += (__DATE_YEAR__ / 100) * 100;
 		year = __DATE_YEAR__;
 	}
-	if unlikely(year < 1970)
-		result = 0;
-	else {
-		result = YEARS2DAYS((time_t)(year - 1970));
-		result += MONTH_STARTING_DAY_OF_YEAR(ISLEAPYEAR(year), (u8)(cmos_month - 1) % 12);
-		result += cmos_day - 1;
-		result *= SECONDS_PER_DAY;
-		result += cmos_hour * 60 * 60;
-		result += cmos_minute * 60;
-		result += cmos_second;
-	}
+	result = YEARS2DAYS((time_t)((s32)year - 1970));
+	result += MONTH_STARTING_DAY_OF_YEAR(ISLEAPYEAR(year), (u8)(cmos_month - 1) % 12);
+	result += cmos_day - 1;
+	result *= SECONDS_PER_DAY;
+	result += cmos_hour * 60 * 60;
+	result += cmos_minute * 60;
+	result += cmos_second;
 	return result;
 }
 
