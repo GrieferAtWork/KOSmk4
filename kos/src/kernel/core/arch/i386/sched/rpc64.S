@@ -298,9 +298,11 @@ END(task_rpc_exec_here_onexit)
 .section .text
 PUBLIC_FUNCTION(task_serve)
 	.cfi_startproc
+	EXTERN(this_rpc_pending_sync_count)
 	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	jne    1f
 #if 1 /* Service blocking cleanup operations. */
+	EXTERN(blocking_cleanup_service)
 	call   blocking_cleanup_service
 	/* If there are pending X-RPCs, service them below. */
 	cmpq   $(BLOCKING_CLEANUP_SERVICE_XRPC), %rax
@@ -337,15 +339,17 @@ PUBLIC_FUNCTION(task_serve)
 
 1:	movq   %rsp, %rdi
 	/* Service a single RPC function */
+	EXTERN(task_serve_one_impl)
 	call   task_serve_one_impl
 	/* Load the modified register state. */
 	movq   %rax, %rsp
-	.cfi_def_cfa_register %rsp
 	/* Check if there are more pending RPC callbacks. */
+	EXTERN(this_rpc_pending_sync_count)
 	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	jne    1b
 
 #if 1 /* Service blocking cleanup operations. */
+	EXTERN(blocking_cleanup_service)
 	call   blocking_cleanup_service
 	cmpq   $(BLOCKING_CLEANUP_SERVICE_XRPC), %rax
 	je     1b
@@ -405,7 +409,6 @@ PUBLIC_FUNCTION(task_serve_nx)
 	call   task_serve_one_nx_impl
 	/* Load the modified register state. */
 	movq   %rax, %rsp
-	.cfi_def_cfa_register %rsp
 	/* Check if there are more pending RPC callbacks. */
 	cmpq   $(0), %gs:this_rpc_pending_sync_count_nx
 	jne    1b

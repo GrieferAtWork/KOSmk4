@@ -118,30 +118,30 @@ IU(	call   libc_error_info)
 	INTERN(libc_error_unwind)
 	call   libc_error_unwind
 .Lload_kcpustate_rax:
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R15(%rax), %r15
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R15)(%rax), %r15
 	.cfi_same_value %r15
 	.cfi_def_cfa_register %rax
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R14(%rax), %r14
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R14)(%rax), %r14
 	.cfi_same_value %r14
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R13(%rax), %r13
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R13)(%rax), %r13
 	.cfi_same_value %r13
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R12(%rax), %r12
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R12)(%rax), %r12
 	.cfi_same_value %r12
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R11(%rax), %r11
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R11)(%rax), %r11
 	.cfi_same_value %r11
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R10(%rax), %r10
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R10)(%rax), %r10
 	.cfi_same_value %r10
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R9(%rax), %r9
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R9)(%rax), %r9
 	.cfi_same_value %r9
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R8(%rax), %r8
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R8)(%rax), %r8
 	.cfi_same_value %r8
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDI(%rax), %rdi
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDI)(%rax), %rdi
 	.cfi_same_value %rdi
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSI(%rax), %rsi
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSI)(%rax), %rsi
 	.cfi_same_value %rsi
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBP(%rax), %rbp
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBP)(%rax), %rbp
 	.cfi_same_value %rbp
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBX(%rax), %rbx
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RBX)(%rax), %rbx
 	.cfi_same_value %rbx
 	/* Push registers that we're going to restore later!
 	 * This must be done before we write to the target ESP in case
@@ -149,17 +149,17 @@ IU(	call   libc_error_info)
 	 * case we'll be overwriting the kcpustate during the stack setup,
 	 * meaning that any read from the structure has to happen before then) */
 	pushq  OFFSET_KCPUSTATE_RFLAGS(%rax)
-	pushq  OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX(%rax)
-	pushq  OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDX(%rax)
+	pushq  (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RAX)(%rax)
+	pushq  (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RDX)(%rax)
 	/* Push %rcx and the return address onto the target stack */
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSP(%rax), %rcx
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RSP)(%rax), %rcx
 	subq   $(16), %rcx
 	/* NOTE: Push EIP first, since that one is stored closer to the bottom
 	 *       of the kcpustate structure, meaning it would get overwritten
 	 *       first! */
 	movq   OFFSET_KCPUSTATE_RIP(%rax), %rdx
 	movq   %rdx, 8(%rcx)
-	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RCX(%rax), %rdx
+	movq   (OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_RCX)(%rax), %rdx
 	movq   %rdx, 0(%rcx)
 	/* Restore pushed registers */
 	popq   %rdx
