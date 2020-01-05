@@ -828,9 +828,6 @@ NOTHROW(FCALL task_decref_for_exit)(void *arg,
                                     struct icpustate *__restrict state,
                                     unsigned int UNUSED(reason),
                                     struct rpc_syscall_info const *UNUSED(sc_info)) {
-	printk(KERN_DEBUG "[sched] Dropping reference to %p [tid=%u] from %p [tid=%u]\n",
-	       (struct task *)arg, task_getroottid_of_s((struct task *)arg),
-	       THIS_TASK, task_getroottid_s());
 	decref((struct task *)arg);
 	return state;
 }
@@ -852,31 +849,28 @@ PUBLIC ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(int w_status) {
 	struct task *caller, *next;
 	struct cpu *mycpu;
+	struct taskpid *pid = THIS_TASKPID;
+	assert(!WIFSTOPPED(w_status));
+	assert(!WIFCONTINUED(w_status));
 	caller = THIS_TASK;
 	assert(caller->t_flags & TASK_FRUNNING);
 	if unlikely(caller->t_flags & TASK_FCRITICAL) {
 		kernel_panic("Critical thread %p [tid=%u] has exited",
 		             caller, task_getroottid_of_s(caller));
 	}
+	/* Fill in the exit status */
+	if (pid)
+		ATOMIC_WRITE(pid->tp_status.w_status, w_status);
 
 	/* Set the bit to indicate that we've started termination. */
 	if (!(ATOMIC_FETCHOR(caller->t_flags, TASK_FTERMINATING) & TASK_FTERMINATING)) {
 		/* Invoke cleanup callbacks. */
-		pertask_onexit_t *iter = __kernel_pertask_onexit_start;
+		pertask_onexit_t *iter;
+		iter = __kernel_pertask_onexit_start;
 		printk(KERN_TRACE "[sched] Exiting thread %p [tid=%u]\n",
 		       caller, task_getroottid_of_s(caller));
 		for (; iter < __kernel_pertask_onexit_end; ++iter)
 			(**iter)();
-	}
-	{
-		struct taskpid *pid = THIS_TASKPID;
-		if (pid) {
-			assert(!WIFSTOPPED(w_status));
-			assert(!WIFCONTINUED(w_status));
-			/* Remember the task's exit status. */
-			ATOMIC_WRITE(pid->tp_status.w_status, w_status);
-			sig_broadcast(&pid->tp_changed);
-		}
 	}
 
 	PREEMPTION_DISABLE();
@@ -923,9 +917,22 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	ATOMIC_FETCHAND(caller->t_flags, ~(TASK_FRUNNING | TASK_FWAKING | TASK_FTIMEOUT | TASK_FSUSPENDED));
 #endif /* CONFIG_NO_SMP */
 
-	printk(KERN_DEBUG "[sched] Switch to thread %p [tid=%u] after exiting %p [tid=%u]\n",
-	       next, task_getroottid_of_s(next),
-	       caller, task_getroottid_of_s(caller));
+	/* Broadcast the status-changed signal _after_ setting `TASK_FTERMINATED'
+	 * That way, other thread can use `tp_changed' alongside `TASK_FTERMINATED'
+	 * in order to wait for the thread to fully terminate. If we were to broadcast
+	 * `tp_changed' before setting the flag, then even though we've got interrupts
+	 * disabled, another CPU may receive the `tp_changed' signal and read the flags
+	 * field not containing `TASK_FTERMINATED' yet before we've set the flag, causing
+	 * it to end up soft-locked (as in: CTRL+C would still work), waiting for the
+	 * thread to terminate when in fact it already has terminated.
+	 * However, we must fill in the exit status _before_ setting `TASK_FTERMINATED',
+	 * such that another thread waiting for us to terminate knows that once `TASK_FTERMINATED'
+	 * has been set, the thread's pid's `tp_status' field contains its final exit status.
+	 * Thus, the terminate-flag acts as an interlocked check for the exit status and
+	 * waiting for the status to change during thread exit. */
+	if (pid)
+		sig_broadcast(&pid->tp_changed);
+
 	/* Good bye... */
 	cpu_run_current();
 }

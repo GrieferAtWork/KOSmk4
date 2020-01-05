@@ -180,7 +180,7 @@ NOTHROW(KCALL task_send_sigcld_to_parent_process)(struct task *__restrict parent
                                                   struct taskpid *__restrict origin_pid) {
 	/* Signal that we've changed state. */
 	sig_altbroadcast(&FORTASK(parent, this_taskgroup).tg_proc_threads_change,
-	                (struct sig *)origin_pid);
+	                 (struct sig *)origin_pid);
 	/* TODO: Send a SIGCLD to `parent' */
 	(void)parent;
 	(void)origin;
@@ -1911,7 +1911,7 @@ done:
 
 #ifdef WANT_WAIT
 LOCAL NOBLOCK bool
-NOTHROW(KCALL has_taskpid_terminated)(struct taskpid *__restrict self) {
+NOTHROW(KCALL is_taskpid_terminating)(struct taskpid *__restrict self) {
 	bool result = true;
 	REF struct task *thread;
 	thread = self->tp_thread.get();
@@ -1967,7 +1967,7 @@ reapall_check_already_locked:
 					}
 					if (!(options & WNOREAP)) {
 						for (; child; child = child->tp_siblings.ln_next) {
-							if (has_taskpid_terminated(child)) {
+							if (is_taskpid_terminating(child)) {
 								/* Detach (reap) this child. */
 								if (!sync_writing(&mygroup.tg_proc_threads_lock) &&
 								    !sync_upgrade(&mygroup.tg_proc_threads_lock))
@@ -2075,7 +2075,12 @@ again_read_status:
 						incref(child);
 						sync_end(&mygroup.tg_proc_threads_lock);
 						/* we're dealing with an stop/continue status */
-					} else if ((options & WEXITED) && has_taskpid_terminated(child)) {
+					} else if ((options & WEXITED) &&
+					           /* NOTE: Check for fully terminated here, since the `TASK_FTERMINATING'
+					            *       flag doesn't mean that the thread has already written its exit
+					            *       status message, or broadcast its tp_changed signal for the
+					            *       final time. (s.a. `task_exit()') */
+					           is_taskpid_terminating(child)) {
 						/* we're dealing with an exit-code status */
 						if (!(options & WNOREAP)) {
 							/* Detach the zombie process. */
