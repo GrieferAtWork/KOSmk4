@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f7c4ff8 */
+/* HASH CRC-32:0x271d5271 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -942,20 +942,20 @@ NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
 	for (i = 1; i < 12; ++i)
 		if (monthvec[i] >= t)
 			break;
-	tp->tm_mon = i;
+	tp->tm_mon = i - 1;
 	t -= monthvec[i - 1];
-	tp->tm_mday = t;
+	tp->tm_mday = t + 1;
 	/* found here: "http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date" */
-	if (tp->tm_mon < 3 || tp->tm_mon > 11) {
+	if (tp->tm_mon < 2 || tp->tm_mon > 10) {
 		//January, February, and December are out.
 		tp->tm_isdst = 0;
-	} else if (tp->tm_mon > 3 && tp->tm_mon < 11) {
+	} else if (tp->tm_mon > 2 && tp->tm_mon < 10) {
 		//April to October are in
 		tp->tm_isdst = 1;
 	} else {
 		int previousSunday;
 		previousSunday = tp->tm_mday - tp->tm_wday;
-		if (tp->tm_mon == 3) {
+		if (tp->tm_mon == 2) {
 			//In march, we are DST if our previous Sunday was on or after the 8th.
 			tp->tm_isdst = previousSunday >= 8;
 		} else {
@@ -1163,20 +1163,20 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
 	for (i = 1; i < 12; ++i)
 		if (monthvec[i] >= t)
 			break;
-	tp->tm_mon = i;
+	tp->tm_mon = i - 1;
 	t -= monthvec[i - 1];
-	tp->tm_mday = t;
+	tp->tm_mday = t + 1;
 	/* found here: "http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date" */
-	if (tp->tm_mon < 3 || tp->tm_mon > 11) {
+	if (tp->tm_mon < 2 || tp->tm_mon > 10) {
 		//January, February, and December are out.
 		tp->tm_isdst = 0;
-	} else if (tp->tm_mon > 3 && tp->tm_mon < 11) {
+	} else if (tp->tm_mon > 2 && tp->tm_mon < 10) {
 		//April to October are in
 		tp->tm_isdst = 1;
 	} else {
 		int previousSunday;
 		previousSunday = tp->tm_mday - tp->tm_wday;
-		if (tp->tm_mon == 3) {
+		if (tp->tm_mon == 2) {
 			//In march, we are DST if our previous Sunday was on or after the 8th.
 			tp->tm_isdst = previousSunday >= 8;
 		} else {

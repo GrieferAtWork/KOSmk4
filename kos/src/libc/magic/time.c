@@ -1484,20 +1484,20 @@ getdate_r:([nonnull] char const *__restrict string,
 	for (i = 1; i < 12; ++i)
 		if (monthvec[i] >= t)
 			break;
-	tp->@tm_mon@ = i;
+	tp->@tm_mon@ = i - 1;
 	t -= monthvec[i - 1];
-	tp->@tm_mday@ = t;
+	tp->@tm_mday@ = t + 1;
 	/* found here: "http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date" */
-	if (tp->@tm_mon@ < 3 || tp->@tm_mon@ > 11) {
+	if (tp->@tm_mon@ < 2 || tp->@tm_mon@ > 10) {
 		//January, February, and December are out.
 		tp->@tm_isdst@ = 0;
-	} else if (tp->@tm_mon@ > 3 && tp->@tm_mon@ < 11) {
+	} else if (tp->@tm_mon@ > 2 && tp->@tm_mon@ < 10) {
 		//April to October are in
 		tp->@tm_isdst@ = 1;
 	} else {
 		int previousSunday;
 		previousSunday = tp->@tm_mday@ - tp->@tm_wday@;
-		if (tp->@tm_mon@ == 3) {
+		if (tp->@tm_mon@ == 2) {
 			//In march, we are DST if our previous Sunday was on or after the 8th.
 			tp->@tm_isdst@ = previousSunday >= 8;
 		} else {
@@ -1605,20 +1605,20 @@ DEFINE_TIME_MONTHSTART_YDAY
 	for (i = 1; i < 12; ++i)
 		if (monthvec[i] >= t)
 			break;
-	tp->@tm_mon@ = i;
+	tp->@tm_mon@ = i - 1;
 	t -= monthvec[i - 1];
-	tp->@tm_mday@ = t;
+	tp->@tm_mday@ = t + 1;
 	/* found here: "http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date" */
-	if (tp->@tm_mon@ < 3 || tp->@tm_mon@ > 11) {
+	if (tp->@tm_mon@ < 2 || tp->@tm_mon@ > 10) {
 		//January, February, and December are out.
 		tp->@tm_isdst@ = 0;
-	} else if (tp->@tm_mon@ > 3 && tp->@tm_mon@ < 11) {
+	} else if (tp->@tm_mon@ > 2 && tp->@tm_mon@ < 10) {
 		//April to October are in
 		tp->@tm_isdst@ = 1;
 	} else {
 		int previousSunday;
 		previousSunday = tp->@tm_mday@ - tp->@tm_wday@;
-		if (tp->@tm_mon@ == 3) {
+		if (tp->@tm_mon@ == 2) {
 			//In march, we are DST if our previous Sunday was on or after the 8th.
 			tp->@tm_isdst@ = previousSunday >= 8;
 		} else {
@@ -1650,20 +1650,20 @@ gmtime64_r:([nonnull] $time64_t const *__restrict timer, [nonnull] __STRUCT_TM *
 	for (i = 1; i < 12; ++i)
 		if (monthvec[i] >= t)
 			break;
-	tp->@tm_mon@ = i;
+	tp->@tm_mon@ = i - 1;
 	t -= monthvec[i - 1];
-	tp->@tm_mday@ = t;
+	tp->@tm_mday@ = t + 1;
 	/* found here: "http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date" */
-	if (tp->@tm_mon@ < 3 || tp->@tm_mon@ > 11) {
+	if (tp->@tm_mon@ < 2 || tp->@tm_mon@ > 10) {
 		//January, February, and December are out.
 		tp->@tm_isdst@ = 0;
-	} else if (tp->@tm_mon@ > 3 && tp->@tm_mon@ < 11) {
+	} else if (tp->@tm_mon@ > 2 && tp->@tm_mon@ < 10) {
 		//April to October are in
 		tp->@tm_isdst@ = 1;
 	} else {
 		int previousSunday;
 		previousSunday = tp->@tm_mday@ - tp->@tm_wday@;
-		if (tp->@tm_mon@ == 3) {
+		if (tp->@tm_mon@ == 2) {
 			//In march, we are DST if our previous Sunday was on or after the 8th.
 			tp->@tm_isdst@ = previousSunday >= 8;
 		} else {

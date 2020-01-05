@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76fa081f */
+/* HASH CRC-32:0xbac08069 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,20 +119,20 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__rest
 	for (__i = 1; __i < 12; ++__i)
 		if (__monthvec[__i] >= __t)
 			break;
-	__tp->tm_mon = __i;
+	__tp->tm_mon = __i - 1;
 	__t -= __monthvec[__i - 1];
-	__tp->tm_mday = __t;
+	__tp->tm_mday = __t + 1;
 	/* found here: "http://stackoverflow.com/questions/5590429/calculating-daylight-savings-time-from-only-date" */
-	if (__tp->tm_mon < 3 || __tp->tm_mon > 11) {
+	if (__tp->tm_mon < 2 || __tp->tm_mon > 10) {
 		//January, February, and December are out.
 		__tp->tm_isdst = 0;
-	} else if (__tp->tm_mon > 3 && __tp->tm_mon < 11) {
+	} else if (__tp->tm_mon > 2 && __tp->tm_mon < 10) {
 		//April to October are in
 		__tp->tm_isdst = 1;
 	} else {
 		int __previousSunday;
 		__previousSunday = __tp->tm_mday - __tp->tm_wday;
-		if (__tp->tm_mon == 3) {
+		if (__tp->tm_mon == 2) {
 			//In march, we are DST if our previous Sunday was on or after the 8th.
 			__tp->tm_isdst = __previousSunday >= 8;
 		} else {
