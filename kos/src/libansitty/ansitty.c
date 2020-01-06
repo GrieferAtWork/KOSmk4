@@ -1333,8 +1333,6 @@ do_single_argument_case:
 				if (xy[1] == 0) {
 					if (xy[0] < (unsigned int)n)
 						break;
-				}
-				if (xy[1] == 0) {
 					copy_count = xy[0];
 					SETCURSOR((unsigned int)n, 0, false);
 				} else {
@@ -1382,12 +1380,12 @@ done_insert_ansitty_flag_hedit:
 				/* TODO: Need to account for the right margin here! */
 				ansitty_coord_t xy[2];
 				ansitty_coord_t sxy[2];
-				ansitty_coord_t cells_in_line;
 				GETCURSOR(xy);
 				GETSIZE(sxy);
 				if unlikely(xy[0] >= sxy[0]) {
 					/* Full area shift */
 				} else {
+					ansitty_coord_t cells_in_line;
 					cells_in_line = sxy[0] - xy[0];
 					if ((unsigned int)n >= cells_in_line) {
 						/* Full area shift */

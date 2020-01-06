@@ -178,13 +178,14 @@ NONNULL((1)) ssize_t LIBCCALL file_system_write(FILE *__restrict self,
 LOCAL ATTR_SECTION(".text.crt.FILE.core.write.file_system_writeall_vt")
 NONNULL((1)) ssize_t LIBCCALL file_system_writeall_vt(FILE *__restrict self,
                                                       void const *buf, size_t num_bytes) {
-	ssize_t result, temp;
+	ssize_t result;
 	struct iofile_data *ex;
 	ex = self->if_exdata;
 	result = (*ex->io_vtab.write)(ex->io_magi, (char const *)buf, num_bytes);
 	if (result > 0 && (size_t)result < num_bytes) {
 		/* Keep on writing */
 		for (;;) {
+			ssize_t temp;
 			temp = (*ex->io_vtab.write)(ex->io_magi,
 			                            (char const *)((byte_t *)buf + (size_t)result),
 			                            num_bytes - (size_t)result);
@@ -329,7 +330,7 @@ WUNUSED NONNULL((1)) int LIBCCALL file_setmode(FILE *__restrict self,
 			/* Resize-to-zero. */
 			if (self->if_flag & IO_MALLBUF)
 				free(self->if_base);
-			self->if_ptr    = (uint8_t *)NULL + (self->if_ptr - self->if_base);
+			self->if_ptr    = (uint8_t *)(uintptr_t)(self->if_ptr - self->if_base);
 			self->if_cnt    = 0;
 			self->if_bufsiz = 0;
 			self->if_base   = NULL;

@@ -128,11 +128,11 @@ typedef __ATTR_NONNULL((1)) void
 #define VM86_PIC_STATEMASK      0xf0 /* Mask for the current state of the PIC */
 #define VM86_PIC_STATESHIFT        4 /* Shift for the current state of the PIC */
 #define VM86_PIC_STATE_RUNNING  0x00 /* The PIC is fully initialized and running. */
-#define VM86_PIC_STATE_WORD2    0x01 /* Initialization word #2 is expected. */
-#define VM86_PIC_STATE_WORD3    0x02 /* Initialization word #3 is expected. */
-#define VM86_PIC_STATE_WORD4    0x03 /* Initialization word #4 is expected. */
-#define VM86_PIC_STATE_WORD2_N4 0x04 /* Initialization word #2 is expected (skip word #4). */
-#define VM86_PIC_STATE_WORD3_N4 0x05 /* Initialization word #3 is expected (skip word #4). */
+#define VM86_PIC_STATE_WORD2    0x10 /* Initialization word #2 is expected. */
+#define VM86_PIC_STATE_WORD3    0x20 /* Initialization word #3 is expected. */
+#define VM86_PIC_STATE_WORD4    0x30 /* Initialization word #4 is expected. */
+#define VM86_PIC_STATE_WORD2_N4 0x40 /* Initialization word #2 is expected (skip word #4). */
+#define VM86_PIC_STATE_WORD3_N4 0x50 /* Initialization word #3 is expected (skip word #4). */
 
 #ifdef __CC__
 struct vm86_state_struct {
@@ -140,6 +140,9 @@ struct vm86_state_struct {
 	vm86_translate_t   vr_trans;     /* [0..1][const] Translate address (or NULL for 1-on-1 translation). */
 	vm86_handle_io_t   vr_io;        /* [0..1][const] I/O handler (or NULL to make undefined I/O illegal). */
 	vm86_handle_intr_t vr_intr;      /* [0..1][const] Interrupt handling (or NULL to read from an IDT stored at address 0) */
+	/* TODO: Get rid of all of this PIC emulation stuff.
+	 *       If libvm86 should even emulate this at all, it shouldn't be emulated
+	 *       here, but rather as part of another wrapper around this structure! */
 	__uintptr_t        vr_intr_pending[256/(sizeof(__uintptr_t)*8)]; /* Bitset of pending interrupts */
 	__uintptr_t        vr_stateflags;/* State flags (Set of VM86_STATE_F*) */
 	__uint8_t          vr_pic1_base; /* Base address of the PIC#1 (Defaults to `0x08') */

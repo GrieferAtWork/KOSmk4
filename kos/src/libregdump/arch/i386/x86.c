@@ -1206,7 +1206,6 @@ libregdump_do_ip_addr2line_info(struct regdump_printer *__restrict self,
 INTERN NONNULL((1)) ssize_t CC
 libregdump_ip(struct regdump_printer *__restrict self,
               uintptr_t ip) {
-	struct exception_info info;
 	BEGIN;
 	format(REGDUMP_FORMAT_INDENT);
 	format(REGDUMP_FORMAT_REGISTER_PREFIX);
@@ -1220,17 +1219,18 @@ libregdump_ip(struct regdump_printer *__restrict self,
 		uintptr_t prev_ip;
 		bool did_lf_after_eip = false;
 		if (ENSURE_LIBINSTRLEN()) {
-			memcpy(&info, error_info(), sizeof(info));
+			struct exception_info saved_except;
+			memcpy(&saved_except, error_info(), sizeof(saved_except));
 			TRY {
 				prev_ip = (uintptr_t)instruction_pred((void const *)ip);
 			} EXCEPT {
 				prev_ip = ip;
 				/* Restore the previous exception state. */
-				goto restore_old_info_after_instruction_pred;
+				goto restore_old_except_after_instruction_pred;
 			}
 			__IF0 {
-restore_old_info_after_instruction_pred:
-				memcpy(error_info(), &info, sizeof(info));
+restore_old_except_after_instruction_pred:
+				memcpy(error_info(), &saved_except, sizeof(saved_except));
 			}
 		} else {
 			prev_ip = ip;
@@ -1265,7 +1265,8 @@ restore_old_info_after_instruction_pred:
 			}
 		}
 		if (ENSURE_LIBDISASM()) {
-			memcpy(&info, error_info(), sizeof(info));
+			struct exception_info saved_except;
+			memcpy(&saved_except, error_info(), sizeof(saved_except));
 			TRY {
 				if (did_lf_after_eip)
 					format(REGDUMP_FORMAT_INDENT);
@@ -1280,11 +1281,11 @@ restore_old_info_after_instruction_pred:
 				did_lf_after_eip = true;
 #endif /* !__KERNEL__ */
 			} EXCEPT {
-				goto restore_old_info_after_disasm;
+				goto restore_old_except_after_disasm;
 			}
 			__IF0 {
-restore_old_info_after_disasm:
-				memcpy(error_info(), &info, sizeof(info));
+restore_old_except_after_disasm:
+				memcpy(error_info(), &saved_except, sizeof(saved_except));
 			}
 		}
 #ifndef __KERNEL__

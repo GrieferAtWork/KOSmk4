@@ -84,10 +84,11 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 	if (!self->dm_depcnt)
 		return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NO_MODULE;
 	if (depth != 0) {
-		unsigned int result, error;
+		unsigned int result;
 		--depth;
 		result = DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NO_MODULE;
 		for (i = 0; i < self->dm_depcnt; ++i) {
+			unsigned int error;
 			error = dlmodule_find_symbol_in_dependencies(self->dm_depvec[i],
 			                                             name,
 			                                             phash_elf,
@@ -284,9 +285,9 @@ again_search_globals_module:
 		/* Search dependencies of the module. */
 		{
 			size_t depth = 0;
-			unsigned int error;
 			for (;; ++depth) {
 				/* Breadth-first search using a depth counter. */
+				unsigned int error;
 				error = dlmodule_find_symbol_in_dependencies(self,
 				                                             name,
 				                                             &hash_elf,

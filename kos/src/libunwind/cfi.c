@@ -405,7 +405,7 @@ copy_bits(byte_t *__restrict dst_base, unsigned int dst_bit_offset,
 	      src_base, src_bit_offset,
 	      num_bits);
 	while (num_bits) {
-		uint8_t remaining, avail;
+		uint8_t remaining;
 		uint8_t src_value, remaining_temp;
 		src_base += src_bit_offset / 8;
 		src_bit_offset &= 7;
@@ -415,6 +415,7 @@ copy_bits(byte_t *__restrict dst_base, unsigned int dst_bit_offset,
 		src_value      = *src_base >> src_bit_offset;
 		remaining_temp = remaining;
 		while (remaining_temp) {
+			uint8_t avail;
 			dst_base += dst_bit_offset / 8;
 			dst_bit_offset &= 7;
 			avail = 8 - dst_bit_offset;

@@ -734,11 +734,10 @@ libvm86_modrm_readb(vm86_state_t *__restrict self,
                     struct modrm const *__restrict info,
                     uint8_t *__restrict presult,
                     uint16_t op_flags) {
-	uint8_t *addr, value;
 	if (info->mi_type == MODRM_REGISTER) {
 		*presult = REG8(info->mi_rm);
-		return VM86_SUCCESS;
 	} else {
+		uint8_t *addr, value;
 		addr = (uint8_t *)libvm86_modrm_getaddr(self, info, op_flags);
 		TRY {
 			value = *addr;
@@ -792,10 +791,10 @@ LOCAL NONNULL((1, 2)) int CC
 libvm86_modrm_writeb(vm86_state_t *__restrict self,
                      struct modrm const *__restrict info,
                      uint8_t value, uint16_t op_flags) {
-	uint8_t *addr;
 	if (info->mi_type == MODRM_REGISTER) {
 		REG8(info->mi_rm) = value;
 	} else {
+		uint8_t *addr;
 		addr = (uint8_t *)libvm86_modrm_getaddr(self, info, op_flags);
 		TRY {
 			*addr = value;
@@ -812,10 +811,10 @@ LOCAL NONNULL((1, 2)) int CC
 libvm86_modrm_writew(vm86_state_t *__restrict self,
                      struct modrm const *__restrict info,
                      uint16_t value, uint16_t op_flags) {
-	uint16_t *addr;
 	if (info->mi_type == MODRM_REGISTER) {
 		REG32(info->mi_rm) = value;
 	} else {
+		uint16_t *addr;
 		addr = (uint16_t *)libvm86_modrm_getaddr(self, info, op_flags);
 		TRY {
 			UNALIGNED_SET16(addr, value);
@@ -1060,6 +1059,8 @@ read_opcode:
 			if unlikely(error != VM86_SUCCESS)                                             \
 				goto err;                                                                  \
 			error = libvm86_modrm_writeb(self, &mod, (cond) ? 1 : 0, op_flags);            \
+			if unlikely(error != VM86_SUCCESS)                                             \
+				goto err;                                                                  \
 			break
 
 			/* 0F 40      CMOVO r16, r/m16        Move if overflow (OF=1) */

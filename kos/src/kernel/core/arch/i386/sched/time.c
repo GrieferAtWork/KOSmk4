@@ -88,12 +88,14 @@ PRIVATE struct atomic_rwlock cmos_lock = ATOMIC_RWLOCK_INIT;
 PRIVATE u8 cmos_cent_reg = 0; /* [const] CMOS century register. */
 PRIVATE u8 cmos_state_b  = 0; /* [const] Value of 'CMOS_STATE_B' */
 
-FORCELOCAL u8 KCALL cmos_rd(u8 reg) {
+FORCELOCAL NOBLOCK u8
+NOTHROW(KCALL cmos_rd)(u8 reg) {
 	outb(CMOS_ADDR, reg);
 	return inb(CMOS_DATA);
 }
 
-FORCELOCAL void KCALL cmos_wr(u8 reg, u8 val) {
+FORCELOCAL NOBLOCK void
+NOTHROW(KCALL cmos_wr)(u8 reg, u8 val) {
 	outb(CMOS_ADDR, reg);
 	outb(CMOS_DATA, val);
 }
@@ -104,12 +106,8 @@ FORCELOCAL void KCALL cmos_wr(u8 reg, u8 val) {
 #define SECONDS_PER_DAY        86400
 
 #define DAYS2YEARS(n_days)  ((((n_days) + 1) * 400) / 146097)
-#define YEARS2DAYS(n_years) ((((n_years) * 146097) / 400) /*-1*/) // rounding error?
-#define ISLEAPYEAR(year)                                                                                   \
-	(__builtin_constant_p(year) ? ((year) % 400 == 0 || ((year) % 100 != 0 && (year) % 4 == 0)) : XBLOCK({ \
-		__typeof__(year) const _year = (year);                                                             \
-		XRETURN _year % 400 == 0 || (_year % 100 != 0 && _year % 4 == 0);                                  \
-	}))
+#define YEARS2DAYS(n_years) ((((n_years) * 146097) / 400) /* - 1*/) /* rounding error? */
+#define ISLEAPYEAR(year)    ((year) % 400 == 0 || ((year) % 100 != 0 && (year) % 4 == 0))
 
 PRIVATE time_t const time_monthstart_yday[2][13] = {
 	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
