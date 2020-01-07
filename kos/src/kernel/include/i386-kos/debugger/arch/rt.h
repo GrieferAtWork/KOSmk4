@@ -60,7 +60,7 @@ DECL_BEGIN
  *  - %es:        Always `SEGMENT_USER_DATA_RPL'
  *  - %fs:        Always [i386:`SEGMENT_KERNEL_FSBASE', x86_64:`SEGMENT_USER_DATA_RPL']
  *  - %gs:        Always [i386:`SEGMENT_USER_GSBASE_RPL', x86_64:`SEGMENT_USER_DATA_RPL']
- *  - %ss:        Always `SEGMENT_KERNEL_DATA'
+ *  - %ss:        Always `0' or `SEGMENT_KERNEL_DATA'
  *  - %cs:        Always `SEGMENT_KERNEL_CODE'
  *  - %tr:        Always `SEGMENT_CPU_TSS'
  *  - %ldtr:      Always `SEGMENT_CPU_LDT'

@@ -71,7 +71,7 @@ kernel_initialize_scheduler_arch(void) {
 	init_state->scs_sgregs.sg_es     = SEGMENT_USER_DATA_RPL;
 	init_state->scs_sgregs.sg_ds     = SEGMENT_USER_DATA_RPL;
 	init_state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
-	init_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA;
+	init_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
 	init_state->scs_irregs.ir_rsp    = (u64)(__kernel_bootidle_stack + KERNEL_IDLE_STACKSIZE);
 	init_state->scs_irregs.ir_rip    = (u64)(void *)&cpu_idlemain;
 	_bootidle.t_sched.s_state        = init_state;
@@ -106,7 +106,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 	/* Initialize the thread's entry state. */
 	memset(state, 0, sizeof(*state));
 	state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
-	state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA;
+	state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
 	state->scs_irregs.ir_rsp    = (u64)dest;
 	state->scs_irregs.ir_rflags = EFLAGS_IF;
 	state->scs_irregs.ir_rip    = (u64)(void *)thread_main;
@@ -177,7 +177,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
  * RBP:    <struct icpustate *>    (Alias for `RSI')
  * EFLAGS: <0>                     (interrupts are disabled)
  * CS:     <SEGMENT_KERNEL_CODE>
- * SS:     <SEGMENT_KERNEL_DATA>
+ * SS:     <SEGMENT_KERNEL_DATA0>
  * GS.BASE:<THIS_TASK>
  * *:      Undefined */
 INTDEF void ASMCALL x86_rpc_kernel_redirection(void);
@@ -207,7 +207,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 #ifndef NDEBUG
 	memset(&sched_state->scs_gpregs, 0xcc, sizeof(sched_state->scs_gpregs));
 #endif /* !NDEBUG */
-	sched_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA;
+	sched_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
 	sched_state->scs_irregs.ir_rsp    = (u64)rpc_state;
 	sched_state->scs_irregs.ir_rflags = 0;
 	sched_state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
@@ -246,7 +246,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	memset(&sched_state->scs_gpregs, 0xcc, sizeof(sched_state->scs_gpregs));
 #endif /* !NDEBUG */
 	memcpy(bufcopy, buf, bufsize);
-	sched_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA;
+	sched_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
 	sched_state->scs_irregs.ir_rsp    = (u64)rpc_state;
 	sched_state->scs_irregs.ir_rflags = 0;
 	sched_state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
@@ -306,7 +306,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	COMPILER_WRITE_BARRIER();
 	thread_iret->ir_rflags = 0;
 	COMPILER_WRITE_BARRIER();
-	thread_iret->ir_ss  = SEGMENT_KERNEL_DATA;
+	thread_iret->ir_ss  = SEGMENT_KERNEL_DATA0;
 	thread_iret->ir_rsp = (u64)(thread_iret + 1);
 	COMPILER_WRITE_BARRIER();
 	return true;
@@ -504,7 +504,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 			assertf(result->ir_eflags == userspace_eflags ||
 			        (!(result->ir_eflags & EFLAGS_VM) &&
 			         result->ir_eip == (uintptr_t)&x86_rpc_user_redirection &&
-			         result->ir_cs == SEGMENT_KERNEL_CODE),
+			         SEGMENT_IS_VALID_KERNCODE(result->ir_cs)),
 			        "Unexpected eflags at %p (found: %#Ix, expected: %#Ix)",
 			        &result->ir_eflags, result->ir_eflags, userspace_eflags);
 			printk(KERN_TRACE "[x86] Detected iret.vm86 tail at %p\n", result);
@@ -516,7 +516,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 		assertf(result->ir_eflags & EFLAGS_IF,
 		        "User-space IRET without EFLAGS.IF (%p)", result->ir_eflags);
 	} else if (result->ir_eip != (uintptr_t)&x86_rpc_user_redirection ||
-	           result->ir_cs != SEGMENT_KERNEL_CODE) {
+	           !SEGMENT_IS_VALID_KERNCODE(result->ir_cs)) {
 		assertf(SEGMENT_IS_VALID_USERCODE(result->ir_cs),
 		        "User-space IRET with invalid CS (%p)", result->ir_cs);
 		assertf(result->ir_eflags & EFLAGS_IF,

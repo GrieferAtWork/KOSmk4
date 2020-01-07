@@ -722,12 +722,9 @@ search_fde:
 			 * an exception directly (using `THROW()'), but should not happen
 			 * when a system call throws an exception, as system call entry
 			 * points and emulators are required to provide custom personality
-			 * functions that will also call `x86_userexcept_unwind()', however
+			 * functions that would then call `x86_userexcept_unwind()', however
 			 * will additionally provide the `sc_info' argument which is being
-			 * left as `NULL' here (indicating an async user-space exception).
-			 *
-			 * Now we must use that state to build a full `struct icpustate',
-			 * then pass that state to `x86_propagate_userspace_exception' */
+			 * left as `NULL' here (indicating an async user-space exception). */
 			x86_userexcept_unwind(&ustate, NULL);
 		}
 		{
@@ -735,18 +732,25 @@ search_fde:
 			u16 expected_fs = __rdfs();
 			u16 expected_es = __rdes();
 			u16 expected_ds = __rdds();
-			if unlikely(ustate.ucs_cs != SEGMENT_KERNEL_CODE ||
-			            ustate.ucs_ss != SEGMENT_KERNEL_DATA ||
+			if unlikely(!SEGMENT_IS_VALID_KERNCODE(ustate.ucs_cs) ||
+			            !SEGMENT_IS_VALID_KERNDATA(ustate.ucs_ss) ||
 			            ustate.ucs_sgregs.sg_gs != expected_gs ||
 			            ustate.ucs_sgregs.sg_fs != expected_fs ||
 			            ustate.ucs_sgregs.sg_es != expected_es ||
 			            ustate.ucs_sgregs.sg_ds != expected_ds) {
-#define LOG_SEGNENT_INCONSISTENCY(name, isval, wantval)                                               \
-				do {                                                                                  \
-					if (isval != wantval) {                                                           \
-						printk(KERN_WARNING "[except] Inconsistent unwind %%%cs: %#I16x != %#I16x\n", \
-						       name, isval, wantval);                                                 \
-					}                                                                                 \
+#define LOG_SEGNENT_INCONSISTENCY(name, isval, wantval)                                            \
+				do {                                                                               \
+					if (isval != wantval) {                                                        \
+						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: %#I16x != %#I16x\n", \
+						       name, isval, wantval);                                              \
+					}                                                                              \
+				} __WHILE0
+#define LOG_SEGNENT_INCONSISTENCY_CHK(name, isval, isok)                                 \
+				do {                                                                     \
+					if (!isok(isval)) {                                                  \
+						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: %#I16x\n", \
+						       name, isval);                                             \
+					}                                                                    \
 				} __WHILE0
 				/* NOTE: Some x86 processors behave kind-of weird:
 				 * [warn  ] [except] Inconsistent unwind %cs: 0x80000008 != 0x8
@@ -772,8 +776,8 @@ search_fde:
 				 *    one less Problem for me to figure out the hard way once testing
 				 *    on real Hardware is going to start...
 				 */
-				LOG_SEGNENT_INCONSISTENCY('c', ustate.ucs_cs, SEGMENT_KERNEL_CODE);
-				LOG_SEGNENT_INCONSISTENCY('s', ustate.ucs_ss, SEGMENT_KERNEL_DATA);
+				LOG_SEGNENT_INCONSISTENCY_CHK('c', ustate.ucs_cs, SEGMENT_IS_VALID_KERNCODE);
+				LOG_SEGNENT_INCONSISTENCY_CHK('s', ustate.ucs_ss, SEGMENT_IS_VALID_KERNDATA);
 				LOG_SEGNENT_INCONSISTENCY('g', ustate.ucs_sgregs.sg_gs, expected_gs);
 				LOG_SEGNENT_INCONSISTENCY('f', ustate.ucs_sgregs.sg_fs, expected_fs);
 				LOG_SEGNENT_INCONSISTENCY('e', ustate.ucs_sgregs.sg_es, expected_es);

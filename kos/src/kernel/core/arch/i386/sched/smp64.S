@@ -77,11 +77,11 @@ PUBLIC_FUNCTION(cpu_ipi_service)
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* %ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* %ss */
 	.cfi_rel_offset %ss, 0
 	pushq_cfi %rcx
 	pushfq_cfi_r
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* %cs */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* %cs */
 	.cfi_rel_offset %cs, 0
 	pushq_cfi %rax
 /*	.cfi_rel_offset %rip, 0 */
@@ -198,11 +198,11 @@ INTERN_FUNCTION(x86_execute_direct_ipi_nopr)
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* %ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* %ss */
 	.cfi_rel_offset %ss, 0
 	pushq_cfi %rcx
 	pushfq_cfi_r
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* %cs */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* %cs */
 	.cfi_rel_offset %cs, 0
 	pushq_cfi %rax
 	.cfi_def_cfa %rsp, 0
@@ -231,11 +231,11 @@ INTERN_FUNCTION(x86_execute_direct_ipi)
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* %ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* %ss */
 	.cfi_rel_offset %ss, 0
 	pushq_cfi %rcx
 	pushfq_cfi_r
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* %cs */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* %cs */
 	.cfi_rel_offset %cs, 0
 	pushq_cfi %rax
 	.cfi_def_cfa %rsp, 0
@@ -425,11 +425,11 @@ INTERN_FUNCTION(x86_smp_entry32)
 	movw   %cx, %es
 	/* NOTE: This also does the jump from physical into virtual memory! */
 	movq   %rsp, %rax
-	pushq  $(SEGMENT_KERNEL_DATA) /* %ss */
-	pushq  %rax                   /* %rsp */
-	pushfq                        /* %rflags */
-	pushq  $(SEGMENT_KERNEL_CODE) /* %cs */
-	pushq  $(1f)                  /* %rip */
+	pushq  $(SEGMENT_KERNEL_DATA0) /* %ss */
+	pushq  %rax                    /* %rsp */
+	pushfq                         /* %rflags */
+	pushq  $(SEGMENT_KERNEL_CODE)  /* %cs */
+	pushq  $(1f)                   /* %rip */
 	iretq  /* Jump to our per-cpu 64-bit code segment. */
 1:
 
@@ -710,15 +710,15 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* ir_ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %rcx                   /* ir_rsp */
+	pushq_cfi %rcx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
-	pushfq_cfi_r                     /* ir_rflags */
+	pushfq_cfi_r                      /* ir_rflags */
 	orq    $(EFLAGS_IF), (%rsp)
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* ir_cs */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* ir_cs */
 	.cfi_rel_offset %cs, 0
-	pushq_cfi %rax                   /* ir_rip */
+	pushq_cfi %rax                    /* ir_rip */
 	.cfi_rel_offset %rip, 0
 	.cfi_endproc
 

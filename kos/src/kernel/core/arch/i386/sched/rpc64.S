@@ -184,7 +184,7 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection)
 	 * RSP:    <struct icpustate *>    (Alias for `RSI')
 	 * EFLAGS: <0>                     (interrupts are disabled)
 	 * CS:     <SEGMENT_KERNEL_CODE>
-	 * SS:     <SEGMENT_KERNEL_DATA>
+	 * SS:     <SEGMENT_KERNEL_DATA0>
 	 * GS.BASE:<THIS_TASK>
 	 * *:      Undefined */
 	call   *%rax
@@ -210,7 +210,7 @@ INTERN_FUNCTION(x86_rpc_kernel_redirection_handler)
 	 * RSP:    <struct icpustate *>    (Alias for `RSI')
 	 * EFLAGS: <0>                     (interrupts are disabled)
 	 * CS:     <SEGMENT_KERNEL_CODE>
-	 * SS:     <SEGMENT_KERNEL_DATA>
+	 * SS:     <SEGMENT_KERNEL_DATA0>
 	 * GS.BASE:<THIS_TASK>
 	 * *:      Undefined */
 	call   *%rax
@@ -238,14 +238,14 @@ PUBLIC_FUNCTION(task_rpc_exec_here)
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* ir_ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %rcx                   /* ir_rsp */
+	pushq_cfi %rcx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
-	pushfq_cfi_r                     /* ir_rflags */
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* ir_cs */
+	pushfq_cfi_r                      /* ir_rflags */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* ir_cs */
 	.cfi_rel_offset %cs, 0
-	pushq_cfi %rax                   /* ir_rip */
+	pushq_cfi %rax                    /* ir_rip */
 	.cfi_rel_offset %rip, 0
 	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
@@ -270,12 +270,12 @@ PUBLIC_FUNCTION(task_rpc_exec_here_onexit)
 	 * RSI:    <void *arg>
 	 * 0(RSP): <return address>
 	 */
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* ir_ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	leaq   16(%rsp), %rax
-	pushq_cfi %rax                   /* ir_rsp */
-	pushfq_cfi                       /* ir_rflags */
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* ir_cs */
-	pushq_cfi (5 * 8)(%rsp)          /* ir_rip */
+	pushq_cfi %rax                    /* ir_rsp */
+	pushfq_cfi                        /* ir_rflags */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* ir_cs */
+	pushq_cfi (5 * 8)(%rsp)           /* ir_rip */
 	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
 	movq   %rdi, %rax                        /* <task_rpc_t func> */
@@ -322,11 +322,11 @@ PUBLIC_FUNCTION(task_serve)
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq     %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* ir_ss */
-	pushq_cfi %rcx                   /* ir_rsp */
-	pushfq_cfi                       /* ir_rflags */
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* ir_cs */
-	pushq_cfi %rax                   /* ir_rip */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
+	pushq_cfi %rcx                    /* ir_rsp */
+	pushfq_cfi                        /* ir_rflags */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* ir_cs */
+	pushq_cfi %rax                    /* ir_rip */
 	.cfi_endproc
 
 	.cfi_startproc simple
@@ -389,11 +389,11 @@ PUBLIC_FUNCTION(task_serve_nx)
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq     %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* ir_ss */
-	pushq_cfi %rcx                   /* ir_rsp */
-	pushfq_cfi                       /* ir_rflags */
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* ir_cs */
-	pushq_cfi %rax                   /* ir_rip */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
+	pushq_cfi %rcx                    /* ir_rsp */
+	pushfq_cfi                        /* ir_rflags */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* ir_cs */
+	pushq_cfi %rax                    /* ir_rip */
 	.cfi_endproc
 
 	.cfi_startproc simple

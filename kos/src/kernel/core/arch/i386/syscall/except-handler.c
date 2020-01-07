@@ -685,7 +685,7 @@ x86_userexcept_unwind(struct ucpustate *__restrict ustate,
 		 * HINT: The actual user-space return location is stored in `this_x86_rpc_redirection_iret' */
 		assert(PERTASK_GET(this_x86_rpc_redirection_iret.ir_pip) != (uintptr_t)&x86_rpc_user_redirection);
 		assert(return_state->ics_irregs.ir_pflags == 0);
-		assert(return_state->ics_irregs.ir_cs == SEGMENT_KERNEL_CODE);
+		assert(SEGMENT_IS_VALID_KERNCODE(return_state->ics_irregs.ir_cs));
 		/* Manually unwind additional FLAGS registers.
 		 * Because .cfi_iret_signal_frame perform a kernel-space unwind
 		 * due to the redirection, we must manually complete the

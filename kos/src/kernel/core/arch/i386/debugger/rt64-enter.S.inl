@@ -323,7 +323,7 @@ L(.Lalready_active):
 	movq   $(dbg_stack + KERNEL_DEBUG_STACKSIZE), %rsp
 
 	/* Load %ss and %cs */
-	pushq  $(SEGMENT_KERNEL_DATA)                /* %ss */
+	pushq  $(SEGMENT_KERNEL_DATA0)               /* %ss */
 	pushq  $(dbg_stack + KERNEL_DEBUG_STACKSIZE) /* %rsp */
 	pushfq                                       /* %rflags */
 	pushq  $(SEGMENT_KERNEL_CODE)                /* %cs */

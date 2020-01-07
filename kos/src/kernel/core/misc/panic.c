@@ -374,7 +374,7 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 	PREEMPTION_DISABLE();
 	fixup_potential_system_inconsistencies();
 	printk(KERN_RAW "\n\n\n");
-	printk(KERN_EMERG "Assertion Failure [pc=%p]\n",
+	printk(KERN_EMERG "Assertion Check [pc=%p]\n",
 	       kcpustate_getpc(&args->aa_state));
 	printk(KERN_RAW "%s(%d) : %s%s%s\n",
 	       args->aa_file, args->aa_line,

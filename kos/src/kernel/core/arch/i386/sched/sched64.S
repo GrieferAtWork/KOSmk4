@@ -262,17 +262,17 @@ PUBLIC_FUNCTION(task_yield)
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* ir_ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %rcx                   /* ir_rsp */
+	pushq_cfi %rcx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
-	pushfq_cfi_r                     /* ir_rflags */
+	pushfq_cfi_r                      /* ir_rflags */
 	testq  $(EFLAGS_IF), 0(%rsp)
 	.cfi_remember_state
 	jz     .Lillegal_task_yield
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* ir_cs */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* ir_cs */
 	.cfi_rel_offset %cs, 0
-	pushq_cfi %rax                   /* ir_rip */
+	pushq_cfi %rax                    /* ir_rip */
 	.cfi_rel_offset %rip, 0
 
 INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
@@ -356,17 +356,17 @@ PUBLIC_FUNCTION(task_yield_nx)
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* ir_ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %rcx                   /* ir_rsp */
+	pushq_cfi %rcx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
-	pushfq_cfi_r                     /* ir_rflags */
+	pushfq_cfi_r                      /* ir_rflags */
 	testq  $(EFLAGS_IF), 0(%rsp)
 	.cfi_remember_state
 	jz     .Lillegal_task_yield_nx
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* ir_cs */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* ir_cs */
 	.cfi_rel_offset %cs, 0
-	pushq_cfi %rax                   /* ir_rip */
+	pushq_cfi %rax                    /* ir_rip */
 	.cfi_rel_offset %rip, 0
 
 	/* Construct a full `struct scpustate' structure */
@@ -404,11 +404,11 @@ PUBLIC_FUNCTION(task_tryyield_or_pause)
 	popq_cfi %rcx
 	.cfi_register %rip, %rcx
 	movq   %rsp, %rdx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* ir_ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %rdx                   /* ir_rsp */
+	pushq_cfi %rdx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
-	pushfq_cfi_r                     /* ir_rflags */
+	pushfq_cfi_r                      /* ir_rflags */
 	testq  $(EFLAGS_IF), 0(%rsp)
 	jnz    1f
 	addq   $(24), %rsp
@@ -426,11 +426,11 @@ PUBLIC_FUNCTION(task_tryyield)
 	popq_cfi %rcx
 	.cfi_register %rip, %rcx
 	movq   %rsp, %rdx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* ir_ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %rdx                   /* ir_rsp */
+	pushq_cfi %rdx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
-	pushfq_cfi_r                     /* ir_rflags */
+	pushfq_cfi_r                      /* ir_rflags */
 	testq  $(EFLAGS_IF), 0(%rsp)
 	jnz    1f
 	addq   $(24), %rsp
@@ -489,15 +489,15 @@ PUBLIC_FUNCTION(cpu_run_current_and_remember)
 	popq_cfi %rax
 	.cfi_register %rip, %rax
 	movq   %rsp, %rcx
-	pushq_cfi $(SEGMENT_KERNEL_DATA) /* ir_ss */
+	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %rcx                   /* ir_rsp */
+	pushq_cfi %rcx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
-	pushfq_cfi_r                     /* ir_rflags */
+	pushfq_cfi_r                      /* ir_rflags */
 	orq    $(EFLAGS_IF), (%rsp)
-	pushq_cfi $(SEGMENT_KERNEL_CODE) /* ir_cs */
+	pushq_cfi $(SEGMENT_KERNEL_CODE)  /* ir_cs */
 	.cfi_rel_offset %cs, 0
-	pushq_cfi %rax                   /* ir_rip */
+	pushq_cfi %rax                    /* ir_rip */
 	.cfi_rel_offset %rip, 0
 
 	/* Construct a full `struct scpustate' structure */

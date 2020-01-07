@@ -125,9 +125,15 @@ __SYSDECL_BEGIN
 #define SEGMENT_IS_VALID_USERDATA(x)   ((x) == SEGMENT_USER_DATA64_RPL || (x) == SEGMENT_USER_DATA32_RPL || (x) == SEGMENT_USER_FSBASE_RPL || (x) == SEGMENT_USER_GSBASE_RPL)
 #define SEGMENT_IS_VALID_USERDATA32(x) ((x) == SEGMENT_USER_DATA32_RPL || (x) == SEGMENT_USER_FSBASE_RPL || (x) == SEGMENT_USER_GSBASE_RPL)
 #define SEGMENT_IS_VALID_USERDATA64(x) ((x) == SEGMENT_USER_DATA64_RPL)
+#define SEGMENT_IS_VALID_KERNCODE(x)   ((x) == SEGMENT_KERNEL_CODE)
+#define SEGMENT_IS_VALID_KERNDATA(x)   ((x) == 0 || (x) == SEGMENT_KERNEL_DATA)
+#define SEGMENT_KERNEL_DATA0           0
 #else /* __x86_64__ */
 #define SEGMENT_IS_VALID_USERCODE(x) ((x) == SEGMENT_USER_CODE32_RPL)
 #define SEGMENT_IS_VALID_USERDATA(x) ((x) == SEGMENT_USER_DATA32_RPL || (x) == SEGMENT_USER_FSBASE_RPL || (x) == SEGMENT_USER_GSBASE_RPL)
+#define SEGMENT_IS_VALID_KERNCODE(x) ((x) == SEGMENT_KERNEL_CODE)
+#define SEGMENT_IS_VALID_KERNDATA(x) ((x) == SEGMENT_KERNEL_DATA)
+#define SEGMENT_KERNEL_DATA0         SEGMENT_KERNEL_DATA
 #endif /* !__x86_64__ */
 
 /* NOTES:
@@ -142,7 +148,7 @@ __SYSDECL_BEGIN
  * In kernel-space (x86_64):
  *   - `%ds' is undefined (left unchanged), which means it's usually `SEGMENT_USER_DATA64_RPL' or `SEGMENT_USER_DATA32_RPL'
  *   - `%es' is undefined (left unchanged), which means it's usually `SEGMENT_USER_DATA64_RPL' or `SEGMENT_USER_DATA32_RPL'
- *   - `%ss' is always `SEGMENT_KERNEL_DATA'
+ *   - `%ss' is always either `SEGMENT_KERNEL_DATA' or `0'
  *   - `%cs' is always `SEGMENT_KERNEL_CODE'
  *   - `%fs' is undefined (left unchanged), which means it's usually `SEGMENT_USER_DATA64_RPL' or `SEGMENT_USER_FSBASE_RPL'
  *   - `%gs' is undefined (left unchanged), which means it's usually `SEGMENT_USER_DATA64_RPL' or `SEGMENT_USER_GSBASE_RPL'

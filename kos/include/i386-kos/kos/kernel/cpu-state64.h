@@ -352,9 +352,9 @@ struct irregs64 {
 	__u64     ir_rflags; /* Flags register */
 	__u64     ir_rsp;    /* Return stack pointer */
 	union {
-		__u64 ir_ss;     /* Return stack segment
+		__u64 ir_ss;     /* Return stack segment (Ring #0, usually `SEGMENT_KERNEL_DATA' or `0')
 		                  * (upper 48 bits are undefined, but should be written as zeros) */
-		__u16 ir_ss16;   /* Return stack segment */
+		__u16 ir_ss16;   /* Return stack segment (Ring #0, usually `SEGMENT_KERNEL_DATA' or `0') */
 	};
 };
 #endif /* __CC__ */

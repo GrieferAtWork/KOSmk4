@@ -332,7 +332,7 @@ FORCELOCAL NOBLOCK WUNUSED u16
 NOTHROW(FCALL irregs_rdcs)(struct irregs const *__restrict self) {
 	/* NOTE: The read-order here is very important! */
 	u16 result = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
-	if (result == SEGMENT_KERNEL_CODE) {
+	if (SEGMENT_IS_VALID_KERNCODE(result)) {
 		uintptr_t eip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 		if (eip == (uintptr_t)&x86_rpc_user_redirection)
 			result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs16);
@@ -356,7 +356,7 @@ NOTHROW(FCALL irregs_isuser)(struct irregs const *__restrict self) {
 	u16 cs = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
 	if (cs & 3)
 		return 1;
-	if (cs == SEGMENT_KERNEL_CODE) {
+	if (SEGMENT_IS_VALID_KERNCODE(cs)) {
 		uintptr_t eip;
 		eip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 		if (eip == (uintptr_t)&x86_rpc_user_redirection)
@@ -370,7 +370,7 @@ NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self) {
 	u16 cs = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
 	if (cs == SEGMENT_USER_CODE32_RPL)
 		return 1;
-	if (cs == SEGMENT_KERNEL_CODE) {
+	if (SEGMENT_IS_VALID_KERNCODE(cs)) {
 		uintptr_t eip;
 		eip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 		if (eip == (uintptr_t)&x86_rpc_user_redirection) {
@@ -398,7 +398,7 @@ FORCELOCAL NOBLOCK WUNUSED u16
 NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self) {
 	/* NOTE: The read-order here is very important! */
 	u16 result = __hybrid_atomic_load(self->ir_ss16, __ATOMIC_ACQUIRE);
-	if (result == SEGMENT_KERNEL_DATA) {
+	if (SEGMENT_IS_VALID_KERNDATA(result)) {
 		uintptr_t eip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 		if (eip == (uintptr_t)&x86_rpc_user_redirection)
 			result = PERTASK_GET(this_x86_rpc_redirection_iret.ir_ss16);

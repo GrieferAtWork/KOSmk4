@@ -670,7 +670,7 @@ i386_allocate_secondary_cores(void) {
 #ifdef __x86_64__
 			init_state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
 			init_state->scs_irregs.ir_rip    = (u64)&x86_altcore_entry;
-			init_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA;
+			init_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
 			init_state->scs_irregs.ir_rsp    = (u64)(init_state + 1);
 			init_state->scs_sgregs.sg_ds     = SEGMENT_USER_DATA_RPL;
 			init_state->scs_sgregs.sg_es     = SEGMENT_USER_DATA_RPL;

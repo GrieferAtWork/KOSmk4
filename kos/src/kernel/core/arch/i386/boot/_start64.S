@@ -784,7 +784,7 @@ INTERN_FUNCTION(_start64)
 	/* Load %ss and %cs (in pmode we'd use `ljmpl' for this,
 	 * but there is no `ljmpq', so we must use `iretq') */
 	movq   $(__kernel_boottask_stack + KERNEL_STACKSIZE), %rsp
-	pushq  $(SEGMENT_KERNEL_DATA)                        /* ir_ss */
+	pushq  $(SEGMENT_KERNEL_DATA0)                       /* ir_ss */
 	pushq  $(__kernel_boottask_stack + KERNEL_STACKSIZE) /* ir_rsp */
 	pushfq                                               /* ir_rflags */
 	pushq  $(SEGMENT_KERNEL_CODE)                        /* ir_cs */
