@@ -32,6 +32,7 @@
 #include <kernel/except.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#include <kernel/syslog.h>
 #include <sched/except-handler.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -455,11 +456,8 @@ NOTHROW(KCALL error_print_into)(pformatprinter printer, void *arg) {
 
 PUBLIC void
 NOTHROW(KCALL error_vprintf)(char const *__restrict reason, va_list args) {
-	char *level = (char *)reason;
-	if (!level || level[0] != '\001' || !level[0])
-		level = (char *)KERN_EMERG;
-	print_unhandled_exception(&kprinter, level,
-	                          &kprinter, (void *)KERN_RAW,
+	print_unhandled_exception(&syslog_printer, SYSLOG_LEVEL_ERR,
+	                          &syslog_printer, SYSLOG_LEVEL_RAW,
 	                          reason, args);
 }
 PUBLIC void
@@ -527,7 +525,7 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 			my_last_pc = prev_last_pc;
 		} else if (my_last_pc != prev_last_pc) {
 			dbg_print(DBGSTR("...\n"));
-			addr2line_printf(&kprinter, (void *)KERN_RAW,
+			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 			                 (uintptr_t)instruction_trypred((void const *)my_last_pc),
 			                 my_last_pc,
 			                 DBGSTR("Traceback ends here"));
@@ -559,8 +557,8 @@ halt_unhandled_exception(unsigned int unwind_error,
 	struct exception_info *info;
 	uintptr_t last_pc = kcpustate_getpc(unwind_state);
 	printk(KERN_RAW "\n\n\n");
-	print_unhandled_exception(&kprinter, (void *)KERN_EMERG,
-	                          &kprinter, (void *)KERN_RAW,
+	print_unhandled_exception(&syslog_printer, SYSLOG_LEVEL_EMERG,
+	                          &syslog_printer, SYSLOG_LEVEL_RAW,
 	                          NULL, NULL);
 	info = &THIS_EXCEPTION_INFO;
 #if EXCEPT_BACKTRACE_SIZE != 0
@@ -578,7 +576,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 			my_last_pc = prev_last_pc;
 		else if (my_last_pc != prev_last_pc) {
 			printk(KERN_RAW "...\n");
-			addr2line_printf(&kprinter, (void *)KERN_RAW,
+			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 			                 (uintptr_t)instruction_trypred((void const *)my_last_pc),
 			                 my_last_pc, "Traceback ends here");
 		}
@@ -596,7 +594,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 		struct ucpustate ustate;
 		/* Dump the remainder of the stack after the caller stopped unwinding. */
 		kcpustate_to_ucpustate(unwind_state, &ustate);
-		kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &ustate);
+		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &ustate);
 	}
 #ifdef CONFIG_HAVE_DEBUGGER
 	/* Try to trigger a debugger trap (if enabled) */

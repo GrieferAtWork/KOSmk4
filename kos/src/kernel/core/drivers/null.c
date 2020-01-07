@@ -24,8 +24,8 @@
 #include <dev/char.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
-#include <kernel/printk.h>
 #include <kernel/rand.h>
+#include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <kernel/vio.h>
 #include <kernel/vm.h>
@@ -274,7 +274,7 @@ PRIVATE NONNULL((1)) size_t KCALL
 kmsg_write(struct character_device *__restrict UNUSED(self),
            USER CHECKED void const *src, size_t num_bytes,
            iomode_t UNUSED(mode)) THROWS(...) {
-	return (size_t)kprinter((void *)KERN_RAW, (char const *)src, num_bytes);
+	return (size_t)syslog_printer(SYSLOG_LEVEL_RAW, (char const *)src, num_bytes);
 }
 
 PRIVATE NONNULL((1)) poll_mode_t KCALL

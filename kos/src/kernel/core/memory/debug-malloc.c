@@ -44,6 +44,7 @@
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
+#include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
@@ -1158,13 +1159,13 @@ again:
 		size_t trace_size, i;
 		/* This node wasn't reached. */
 		if (node->m_flags & MALLNODE_FUSERNODE) {
-			addr2line_printf(&kprinter, (void *)KERN_RAW,
+			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 			                 (uintptr_t)instruction_trypred(node->m_trace[0]),
 			                 (uintptr_t)node->m_trace[0],
 			                 "Leaked %Iu bytes of heap-memory at %p...%p",
 			                 MALLNODE_SIZE(node), MALLNODE_MIN(node), MALLNODE_MAX(node));
 		} else {
-			addr2line_printf(&kprinter, (void *)KERN_RAW,
+			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 			                 (uintptr_t)instruction_trypred(node->m_trace[0]),
 			                 (uintptr_t)node->m_trace[0],
 			                 "Leaked %Iu bytes of kmalloc-memory at %p...%p",
@@ -1176,7 +1177,7 @@ again:
 		for (i = 1; i < trace_size; ++i) {
 			if (!node->m_trace[i])
 				break;
-			addr2line_printf(&kprinter, (void *)KERN_RAW,
+			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 			                 (uintptr_t)instruction_trypred(node->m_trace[i]),
 			                 (uintptr_t)node->m_trace[i],
 			                 "Called here");
@@ -1470,10 +1471,11 @@ NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self) {
 #endif /* CONFIG_MALL_TAIL_SIZE */
 	return false;
 fail:
-	format_hexdump(&kprinter, (void *)KERN_CRIT, (void *)MALLNODE_BEGIN(self),
+	format_hexdump(&syslog_printer, SYSLOG_LEVEL_CRIT,
+	               (void *)MALLNODE_BEGIN(self),
 	               MALLNODE_SIZE(self), 16, FORMAT_HEXDUMP_FNORMAL);
 	printk(KERN_CRIT "\n");
-	mallnode_print_traceback(self, &kprinter, (void *)KERN_CRIT);
+	mallnode_print_traceback(self, &syslog_printer, SYSLOG_LEVEL_CRIT);
 	kernel_panic("Corrupt MALL header or tail");
 }
 
@@ -1591,7 +1593,7 @@ NOTHROW(KCALL mall_insert_tree)(struct mallnode *__restrict node) {
 		assert(existing_node);
 		if (MALLNODE_ISVALID(existing_node)) {
 			printk(KERN_CRIT "Traceback of existing node:\n");
-			mallnode_print_traceback(existing_node, &kprinter, (void *)KERN_CRIT);
+			mallnode_print_traceback(existing_node, &syslog_printer, SYSLOG_LEVEL_CRIT);
 			kernel_panic("Attempted to trace memory at %p...%p, which "
 			             "overlaps with an existing tracing of %p...%p",
 			             node->m_tree.a_vmin,
@@ -1746,7 +1748,7 @@ NOTHROW(KCALL mall_print_traceback)(void *ptr, gfp_t flags) {
 	}
 	/* TODO: Copy the traceback vector onto a local variable, so
 	 *       it can be dumped after having released `&mall_lock' */
-	mallnode_print_traceback(node, &kprinter, (void *)KERN_DEBUG);
+	mallnode_print_traceback(node, &syslog_printer, SYSLOG_LEVEL_DEBUG);
 	sync_endread(&mall_lock);
 }
 

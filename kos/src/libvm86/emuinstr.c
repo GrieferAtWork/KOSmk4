@@ -53,6 +53,8 @@ opt.append("-Os");
 #ifdef __KERNEL__
 #include <kernel/except.h>
 #include <kernel/printk.h>
+#include <kernel/syslog.h>
+
 #include <libdisasm/disassembler.h>
 #endif /* __KERNEL__ */
 
@@ -905,7 +907,7 @@ INTERN NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self) {
 			baseoff = (ptrdiff_t)(pc - newpc);
 			pc      = newpc;
 		}
-		disasm_init(&da, &kprinter, (void *)KERN_RAW,
+		disasm_init(&da, &syslog_printer, SYSLOG_LEVEL_RAW,
 		            pc, DISASSEMBLER_TARGET_8086,
 		            DISASSEMBLER_FNORMAL, baseoff);
 		len = (size_t)disasm_print_line_nolf(&da);

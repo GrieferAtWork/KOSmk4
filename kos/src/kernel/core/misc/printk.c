@@ -35,6 +35,21 @@
 
 DECL_BEGIN
 
+/* Print formatted system log message:
+ * >> printk(KERN_DEBUG "Hello %s!\n", "World");
+ * Same as:
+ * >> format_printf(&syslog_printer, SYSLOG_LEVEL_DEBUG, "Hello %s!\n", "World");
+ */
+PUBLIC NOBLOCK ssize_t VCALL
+printk(char const *__restrict format, ...) {
+	ssize_t result;
+	va_list args;
+	va_start(args, format);
+	result = vprintk(format, args);
+	va_end(args);
+	return result;
+}
+
 PUBLIC NOBLOCK ssize_t KCALL
 vprintk(char const *__restrict format, va_list args) {
 	void *level = SYSLOG_LEVEL_DEFAULT;
@@ -48,29 +63,6 @@ vprintk(char const *__restrict format, va_list args) {
 	return format_vprintf(&syslog_printer,
 	                      (void *)(uintptr_t)level,
 	                      format, args);
-}
-
-PUBLIC NOBLOCK ssize_t VCALL
-printk(char const *__restrict format, ...) {
-	ssize_t result;
-	va_list args;
-	va_start(args, format);
-	result = vprintk(format, args);
-	va_end(args);
-	return result;
-}
-
-/* @param: level: [0..1] The print level (One of `KERN_*'). */
-PUBLIC NOBLOCK ssize_t KCALL
-kprinter(void *level, char const *__restrict data, size_t datalen) {
-	void *used_level = SYSLOG_LEVEL_DEFAULT;
-	if (level && ((char *)level)[0] == '\001') {
-		char level_id = ((char *)level)[1];
-		if likely(level_id >= '0' &&
-		          level_id < ('0' + SYSLOG_LEVEL_COUNT))
-			used_level = (void *)(uintptr_t)(level_id - '0');
-	}
-	return syslog_printer(used_level, data, datalen);
 }
 
 
@@ -87,7 +79,6 @@ DEFINE_SYSCALL3(ssize_t, syslog,
 	if unlikely(level >= SYSLOG_LEVEL_COUNT)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE, E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL, level);
 	validate_readable(str, len);
-	/*if (!syscall_tracing_getenabled())*/
 	return syslog_printer((void *)(uintptr_t)level, str, len);
 }
 #endif /* __ARCH_WANT_SYSCALL_SYSLOG */

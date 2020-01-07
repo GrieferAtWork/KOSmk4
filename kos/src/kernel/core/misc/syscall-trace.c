@@ -32,11 +32,13 @@
 #include <kernel/driver.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
+#include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
+#include <kos/bits/except-handler.h>
 #include <kos/dev.h>           /* MAJOR(), MINOR() */
 #include <kos/io.h>            /* IO_* */
 #include <sys/epoll.h>         /* EPOLL* */
@@ -54,7 +56,6 @@
 #include <inttypes.h>       /* PRI* */
 #include <sched.h>          /* CLONE_* */
 #include <unistd.h>         /* SEEK_* */
-#include <kos/bits/except-handler.h>
 
 #include <librpc/rpc.h> /* RPC_SCHEDULE_FLAG_* */
 
@@ -84,8 +85,8 @@ syscall_trace(struct syscall_trace_args const *__restrict args) {
 	if (args->ta_sysno == SYS_syslog)
 		return; /* Don't trace this one! */
 #endif
-	syscall_printtrace(&kprinter,
-	                   (void *)(char *)KERN_TRACE,
+	syscall_printtrace(&syslog_printer,
+	                   SYSLOG_LEVEL_TRACE,
 	                   args);
 }
 
@@ -155,8 +156,8 @@ syscall_trace_compat(struct syscall_trace_args const *__restrict args) {
 	if (args->ta_sysno == COMPAT_NR(_syslog))
 		return; /* Don't trace this one! */
 #endif
-	syscall_printtrace_compat(&kprinter,
-	                          (void *)(char *)KERN_TRACE,
+	syscall_printtrace_compat(&syslog_printer,
+	                          SYSLOG_LEVEL_TRACE,
 	                          args);
 }
 

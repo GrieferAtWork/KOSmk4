@@ -25,6 +25,7 @@
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
+#include <kernel/syslog.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -140,7 +141,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 		name = get_exception_name(reason_error->e_code);
 		if (name)
 			printk(KERN_ERR " [%s]", name);
-		print_exception_desc_of(reason_error, &kprinter, (void *)KERN_ERR);
+		print_exception_desc_of(reason_error, &syslog_printer, SYSLOG_LEVEL_ERR);
 		printk(KERN_ERR "\n");
 		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
 			if (!reason_error->e_pointers[i])

@@ -32,6 +32,7 @@
 #include <kernel/paging.h>
 #include <kernel/pic.h>
 #include <kernel/printk.h>
+#include <kernel/syslog.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
@@ -128,8 +129,8 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	bool is_first;
 	struct regdump_printer rd_printer;
 	struct desctab tab;
-	rd_printer.rdp_printer     = &kprinter;
-	rd_printer.rdp_printer_arg = (void *)KERN_EMERG;
+	rd_printer.rdp_printer     = &syslog_printer;
+	rd_printer.rdp_printer_arg = SYSLOG_LEVEL_EMERG;
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &ustate->ucs_gpregs);
 	regdump_ip(&rd_printer, ucpustate_getpc(ustate));
@@ -146,7 +147,7 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	printk(KERN_EMERG "    %%cr2 %p\n", __rdcr2());
 	regdump_cr4(&rd_printer, __rdcr4());
 	printk(KERN_EMERG "    %%cr3 %p\n", (void *)cr3);
-	addr2line_printf(&kprinter, (void *)KERN_RAW,
+	addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 	                 ucpustate_getpc(ustate),
 	                 (uintptr_t)instruction_trysucc((void const *)ucpustate_getpc(ustate)),
 	                 "Caused here [sp=%p]",
@@ -163,7 +164,7 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 		if (error != UNWIND_SUCCESS)
 			break;
 		is_first = false;
-		addr2line_printf(&kprinter, (void *)KERN_RAW,
+		addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 		                 (uintptr_t)instruction_trypred((void const *)ucpustate_getpc(ustate)),
 		                 ucpustate_getpc(ustate), "Called here [sp=%p]",
 		                 ucpustate_getsp(ustate));

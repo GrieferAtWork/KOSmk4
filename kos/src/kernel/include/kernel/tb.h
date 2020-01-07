@@ -22,7 +22,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <kernel/printk.h>
+#include <kernel/syslog.h>
 
 #include <bits/format-printer.h>
 
@@ -48,12 +48,12 @@ FUNDEF ssize_t FCALL print_traceback_fcpustate(__pformatprinter printer, void *a
 
 /* Print a traceback to the system log, using `KERN_RAW' */
 FUNDEF void FCALL tb(unsigned int n_skip DFL(0));
-LOCAL void FCALL tb_ucpustate(struct ucpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_ucpustate(&kprinter, (void *)KERN_RAW, state, n_skip); }
-LOCAL void FCALL tb_lcpustate(struct lcpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_lcpustate(&kprinter, (void *)KERN_RAW, state, n_skip); }
-LOCAL void FCALL tb_kcpustate(struct kcpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_kcpustate(&kprinter, (void *)KERN_RAW, state, n_skip); }
-LOCAL void FCALL tb_icpustate(struct icpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_icpustate(&kprinter, (void *)KERN_RAW, state, n_skip); }
-LOCAL void FCALL tb_scpustate(struct scpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_scpustate(&kprinter, (void *)KERN_RAW, state, n_skip); }
-LOCAL void FCALL tb_fcpustate(struct fcpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_fcpustate(&kprinter, (void *)KERN_RAW, state, n_skip); }
+LOCAL void FCALL tb_ucpustate(struct ucpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_ucpustate(&syslog_printer, SYSLOG_LEVEL_RAW, state, n_skip); }
+LOCAL void FCALL tb_lcpustate(struct lcpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_lcpustate(&syslog_printer, SYSLOG_LEVEL_RAW, state, n_skip); }
+LOCAL void FCALL tb_kcpustate(struct kcpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_kcpustate(&syslog_printer, SYSLOG_LEVEL_RAW, state, n_skip); }
+LOCAL void FCALL tb_icpustate(struct icpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_icpustate(&syslog_printer, SYSLOG_LEVEL_RAW, state, n_skip); }
+LOCAL void FCALL tb_scpustate(struct scpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_scpustate(&syslog_printer, SYSLOG_LEVEL_RAW, state, n_skip); }
+LOCAL void FCALL tb_fcpustate(struct fcpustate const *__restrict state, unsigned int n_skip DFL(0)) { print_traceback_fcpustate(&syslog_printer, SYSLOG_LEVEL_RAW, state, n_skip); }
 
 #ifdef __cplusplus
 extern "C++" {

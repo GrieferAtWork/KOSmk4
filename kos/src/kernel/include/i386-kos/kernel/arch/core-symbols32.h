@@ -14218,10 +14218,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long .Lname3554 /* index: 3554 */
-	.weak kprinter; .long kprinter
-	.reloc ., R_386_SIZE32, kprinter; .int 0
-	.int 0x7905de2
+	.long 0 /* index: 3554 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname3555 /* index: 3555 */
 	.weak task_enable_redirect_usercode_rpc; .long task_enable_redirect_usercode_rpc
 	.reloc ., R_386_SIZE32, task_enable_redirect_usercode_rpc; .int 0
@@ -20642,8 +20642,6 @@ END(kernel_symbol_table)
 	.string "mall_trace"
 .Lname3552:
 	.string "slab_kmalloc_nx20"
-.Lname3554:
-	.string "kprinter"
 .Lname3555:
 	.string "task_enable_redirect_usercode_rpc"
 .Lname3556:

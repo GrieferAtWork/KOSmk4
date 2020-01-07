@@ -14218,10 +14218,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad .Lname3554 /* index: 3554 */
-	.weak kprinter; .quad kprinter
-	.reloc ., R_X86_64_SIZE32, kprinter; .int 0
-	.int 0x7905de2
+	.quad 0 /* index: 3554 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname3555 /* index: 3555 */
 	.weak task_enable_redirect_usercode_rpc; .quad task_enable_redirect_usercode_rpc
 	.reloc ., R_X86_64_SIZE32, task_enable_redirect_usercode_rpc; .int 0
@@ -21360,8 +21360,6 @@ END(kernel_symbol_table)
 	.string "sys_chown"
 .Lname3551:
 	.string "mall_trace"
-.Lname3554:
-	.string "kprinter"
 .Lname3555:
 	.string "task_enable_redirect_usercode_rpc"
 .Lname3556:

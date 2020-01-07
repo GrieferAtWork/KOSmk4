@@ -20,6 +20,8 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_SYSLOG_H 1
 
 #include <kernel/compiler.h>
+
+#include <kernel/printk.h>
 #include <kernel/types.h>
 
 DECL_BEGIN
@@ -46,11 +48,11 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct syslog_packet {
-	time_t sp_time;                          /* Seconds since 01.01.1970T00:00:00 */
-	u32    sp_nsec;                          /* Nano seconds of when packet was started. */
-	u16    sp_len;                           /* Syslog message length. */
+	time_t sp_time;                        /* Seconds since 01.01.1970T00:00:00 */
+	u32    sp_nsec;                        /* Nano seconds added to `sp_time'. */
+	u16    sp_len;                         /* Syslog message length. */
 #ifdef SYSLOG_LINEMAX
-	char   sp_msg[SYSLOG_LINEMAX];           /* Syslog message. */
+	char   sp_msg[SYSLOG_LINEMAX];         /* Syslog message. */
 #else /* SYSLOG_LINEMAX */
 	COMPILER_FLEXIBLE_ARRAY(char, sp_msg); /* Syslog message (terminated by '\n'). */
 #endif /* !SYSLOG_LINEMAX */
@@ -110,9 +112,13 @@ NOTHROW(FCALL syslog_packet_broadcast)(struct syslog_packet const *__restrict se
  *   - `\r': Clear the internal buffer for `level' (if not immediately followed by `\n')
  *   - `\n': Broadcast the contents of the internal buffer as a syslog
  *           packet (s.a. `syslog_packet_broadcast()') and clear the buffer.
+ * @except: May only throw exceptions as the result of accessing memory in `*data'
  * @return: * : Always re-returns `datalen' */
-FUNDEF NOBLOCK ssize_t
-NOTHROW(KCALL syslog_printer)(void *level, char const *__restrict data, size_t datalen);
+FUNDEF ssize_t KCALL
+syslog_printer(void *level,
+               USER CHECKED char const *data,
+               size_t datalen)
+		THROWS(E_SEGFAULT);
 
 
 #endif /* __CC__ */

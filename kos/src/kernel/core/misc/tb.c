@@ -30,7 +30,7 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/addr2line.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
-#include <kernel/printk.h>
+#include <kernel/syslog.h>
 #include <kernel/tb.h>
 #include <kernel/vm.h>
 #include <sched/task.h>
@@ -279,7 +279,7 @@ print_traceback_fcpustate(pformatprinter printer, void *arg,
 /* Print a traceback to the system log, using `KERN_RAW' */
 PUBLIC ATTR_WEAK ATTR_SECTION(".text.kernel.tb")
 void FCALL tb(unsigned int n_skip) {
-	print_traceback(&kprinter, (void *)KERN_RAW, n_skip + 1);
+	print_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, n_skip + 1);
 }
 
 

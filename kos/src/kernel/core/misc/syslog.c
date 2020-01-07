@@ -36,6 +36,7 @@
 
 #include <kernel/arch/syslog.h> /* ARCH_DEFAULT_SYSLOG_SINK */
 #include <kernel/dmesg.h>
+#include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/panic.h>
 #include <kernel/syslog.h>
@@ -114,7 +115,7 @@ PRIVATE ATOMIC_REF(struct syslog_sink_array) syslog_sinks =
 ATOMIC_REF_INIT(&default_syslog_sink_array);
 
 
-PRIVATE WUNUSED NOBLOCK bool
+PRIVATE WUNUSED NOBLOCK ATTR_PURE bool
 NOTHROW(KCALL syslog_sink_array_contains)(struct syslog_sink_array *__restrict self,
                                           struct syslog_sink const *__restrict sink) {
 	size_t i;
@@ -356,11 +357,12 @@ NOTHROW(FCALL syslog_buffer_unlock)(struct syslog_buffer *__restrict self,
 PRIVATE ATTR_BSS struct syslog_buffer syslog_buffers[SYSLOG_LEVEL_COUNT] = {};
 
 /* Append some amount of the given data to a given packet */
-LOCAL NOBLOCK unsigned int
-NOTHROW(FCALL syslog_packet_append_impl)(struct syslog_packet *__restrict self,
-                                         char const *__restrict data,
-                                         unsigned int datalen,
-                                         unsigned int level) {
+LOCAL unsigned int FCALL
+syslog_packet_append_impl(struct syslog_packet *__restrict self,
+                          USER CHECKED char const *data,
+                          unsigned int datalen,
+                          unsigned int level)
+		THROWS(E_SEGFAULT) {
 	char *dst;
 	unsigned int offset, result, count;
 	/* NOTE: We're allowed to assume that `datalen <= (SYSLOG_LINEMAX - 1)' */
@@ -384,10 +386,10 @@ NOTHROW(FCALL syslog_packet_append_impl)(struct syslog_packet *__restrict self,
 		struct timespec now;
 		/* Start of packet. */
 set_timestamp_and_write_data:
-		offset = 0;
-		now    = realtime();
-		self->sp_time  = (u64)now.tv_sec;
-		self->sp_nsec  = now.tv_nsec;
+		offset        = 0;
+		now           = realtime();
+		self->sp_time = (u64)now.tv_sec;
+		self->sp_nsec = now.tv_nsec;
 	}
 	dst = self->sp_msg + offset;
 	for (;;) {
@@ -433,11 +435,12 @@ done:
 }
 
 /* Append all given data to a given packet */
-LOCAL NOBLOCK void
-NOTHROW(FCALL syslog_packet_append)(struct syslog_packet *__restrict self,
-                                    char const *__restrict data,
-                                    unsigned int datalen,
-                                    unsigned int level) {
+LOCAL void FCALL
+syslog_packet_append(struct syslog_packet *__restrict self,
+                     USER CHECKED char const *data,
+                     unsigned int datalen,
+                     unsigned int level)
+		THROWS(E_SEGFAULT) {
 	for (;;) {
 		unsigned int written;
 		written = syslog_packet_append_impl(self, data, datalen, level);
@@ -459,11 +462,13 @@ NOTHROW(FCALL syslog_packet_append)(struct syslog_packet *__restrict self,
  *   - `\r': Clear the internal buffer for `level'
  *   - `\n': Broadcast the contents of the internal buffer as a syslog
  *           packet (s.a. `syslog_packet_broadcast()') and clear the buffer.
+ * @except: May only throw exceptions as the result of accessing memory in `*data'
  * @return: * : Always re-returns `datalen' */
-PUBLIC NOBLOCK ssize_t
-NOTHROW(KCALL syslog_printer)(void *level,
-                              char const *__restrict data,
-                              size_t datalen) {
+PUBLIC ssize_t KCALL
+syslog_printer(void *level,
+               USER CHECKED char const *data,
+               size_t datalen)
+		THROWS(E_SEGFAULT) {
 	ssize_t result = (ssize_t)datalen;
 	struct syslog_buffer *buffer;
 	/* Quick check: are log entires of level enabled. */
@@ -477,19 +482,25 @@ NOTHROW(KCALL syslog_printer)(void *level,
 	buffer = &syslog_buffers[(uintptr_t)level];
 	/* Try to lock the buffer. */
 	SYSLOG_BUFFER_LOCK(buffer);
-	/* Check for excessive data lengths. */
-	if unlikely(datalen > (SYSLOG_LINEMAX - 1)) {
-		do {
-			syslog_packet_append(&buffer->sb_packet, data, (SYSLOG_LINEMAX - 1),
-			                     (unsigned int)(uintptr_t)level);
-			datalen -= (SYSLOG_LINEMAX - 1);
-			data    += (SYSLOG_LINEMAX - 1);
-		} while (datalen > (SYSLOG_LINEMAX - 1));
+	TRY {
+		/* Check for excessive data lengths. */
+		if unlikely(datalen > (SYSLOG_LINEMAX - 1)) {
+			do {
+				syslog_packet_append(&buffer->sb_packet, data, (SYSLOG_LINEMAX - 1),
+				                     (unsigned int)(uintptr_t)level);
+				datalen -= (SYSLOG_LINEMAX - 1);
+				data    += (SYSLOG_LINEMAX - 1);
+			} while (datalen > (SYSLOG_LINEMAX - 1));
+		}
+		/* Append data to the buffer's packet. */
+		syslog_packet_append(&buffer->sb_packet, data,
+		                     (unsigned int)datalen,
+		                     (unsigned int)(uintptr_t)level);
+	} EXCEPT {
+		/* Unlock the buffer. */
+		SYSLOG_BUFFER_BREAK(buffer);
+		RETHROW();
 	}
-	/* Append data to the buffer's packet. */
-	syslog_packet_append(&buffer->sb_packet, data,
-	                     (unsigned int)datalen,
-	                     (unsigned int)(uintptr_t)level);
 	/* Unlock the buffer. */
 	SYSLOG_BUFFER_UNLOCK(buffer);
 done:

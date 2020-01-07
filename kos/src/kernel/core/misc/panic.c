@@ -37,6 +37,7 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/debugtrap.h>
 #include <kernel/memory.h>
 #include <kernel/printk.h>
+#include <kernel/syslog.h>
 #include <kernel/vm.h>
 #include <sched/rwlock-intern.h>
 #include <sched/signal-intern.h>
@@ -229,14 +230,14 @@ libc_assertion_failure_core(struct assert_args *__restrict args) {
 	if (args->aa_format) {
 		va_list vargs;
 		va_copy(vargs, args->aa_args);
-		format_vprintf(&kprinter, (void *)KERN_RAW, args->aa_format, vargs);
+		format_vprintf(&syslog_printer, SYSLOG_LEVEL_RAW, args->aa_format, vargs);
 		va_end(vargs);
 		printk(KERN_RAW "\n");
 	}
 	{
 		struct ucpustate temp;
 		kcpustate_to_ucpustate(&args->aa_state, &temp);
-		kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &temp);
+		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &temp);
 	}
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
@@ -384,14 +385,14 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 	if (args->aa_format) {
 		va_list vargs;
 		va_copy(vargs, args->aa_args);
-		format_vprintf(&kprinter, (void *)KERN_RAW, args->aa_format, vargs);
+		format_vprintf(&syslog_printer, SYSLOG_LEVEL_RAW, args->aa_format, vargs);
 		va_end(vargs);
 		printk(KERN_RAW "\n");
 	}
 	{
 		struct ucpustate temp;
 		kcpustate_to_ucpustate(&args->aa_state, &temp);
-		kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &temp);
+		kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &temp);
 	}
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
@@ -445,7 +446,7 @@ libc_stack_failure_core(struct kcpustate *__restrict state) {
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Stack check failure [pc=%p]\n", kcpustate_getpc(state));
 	kcpustate_to_ucpustate(state, &ustate);
-	kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &ustate);
+	kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &ustate);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGSEGV);
@@ -467,7 +468,7 @@ libc_abort_failure_core(struct kcpustate *__restrict state) {
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Kernel aborted [pc=%p]\n", kcpustate_getpc(state));
 	kcpustate_to_ucpustate(state, &ustate);
-	kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, &ustate);
+	kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, &ustate);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGABRT);
@@ -523,11 +524,11 @@ kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
 	if (format) {
 		va_list cargs;
 		va_copy(cargs, args);
-		format_vprintf(&kprinter, (void *)KERN_RAW, format, cargs);
+		format_vprintf(&syslog_printer, SYSLOG_LEVEL_RAW, format, cargs);
 		va_end(cargs);
 		printk(KERN_EMERG "\n");
 	}
-	kernel_halt_dump_traceback(&kprinter, (void *)KERN_RAW, state);
+	kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, state);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGABRT);

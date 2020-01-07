@@ -29,6 +29,7 @@
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
+#include <kernel/syslog.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
@@ -196,9 +197,9 @@ NOTHROW(KCALL GDB_HexPrinter)(void *arg, char const *__restrict data, size_t dat
 INTERN size_t FCALL
 GDBServer_PrintMessageInNonStopMode(USER CHECKED char const *message,
                                     size_t message_length) {
-	return (size_t)kprinter((char *)KERN_RAW,
-	                        message,
-	                        message_length);
+	return (size_t)syslog_printer(SYSLOG_LEVEL_RAW,
+	                              message,
+	                              message_length);
 }
 
 /* Print a message while in non-stop or all-stop mode.

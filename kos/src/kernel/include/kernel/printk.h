@@ -24,24 +24,26 @@
 
 DECL_BEGIN
 
-#define KERN_EMERG   "\001" "0"
-#define KERN_ALERT   "\001" "1"
-#define KERN_CRIT    "\001" "2"
-#define KERN_ERR     "\001" "3"
-#define KERN_WARNING "\001" "4"
-#define KERN_NOTICE  "\001" "5"
-#define KERN_INFO    "\001" "6"
-#define KERN_TRACE   "\001" "7"
-#define KERN_DEBUG   "\001" "8"
-#define KERN_DEFAULT "\001" "9"
-#define KERN_RAW     "\001" ":"
+#define KERN_EMERG   "\001" "0" /* s.a. `SYSLOG_LEVEL_EMERG' */
+#define KERN_ALERT   "\001" "1" /* s.a. `SYSLOG_LEVEL_ALERT' */
+#define KERN_CRIT    "\001" "2" /* s.a. `SYSLOG_LEVEL_CRIT' */
+#define KERN_ERR     "\001" "3" /* s.a. `SYSLOG_LEVEL_ERR' */
+#define KERN_WARNING "\001" "4" /* s.a. `SYSLOG_LEVEL_WARNING' */
+#define KERN_NOTICE  "\001" "5" /* s.a. `SYSLOG_LEVEL_NOTICE' */
+#define KERN_INFO    "\001" "6" /* s.a. `SYSLOG_LEVEL_INFO' */
+#define KERN_TRACE   "\001" "7" /* s.a. `SYSLOG_LEVEL_TRACE' */
+#define KERN_DEBUG   "\001" "8" /* s.a. `SYSLOG_LEVEL_DEBUG' */
+#define KERN_DEFAULT "\001" "9" /* s.a. `SYSLOG_LEVEL_DEFAULT' */
+#define KERN_RAW     "\001" ":" /* s.a. `SYSLOG_LEVEL_RAW' */
 
 #ifdef __CC__
+/* Print formatted system log message:
+ * >> printk(KERN_DEBUG "Hello %s!\n", "World");
+ * Same as:
+ * >> format_printf(&syslog_printer, SYSLOG_LEVEL_DEBUG, "Hello %s!\n", "World");
+ */
 FUNDEF NOBLOCK ssize_t (VCALL printk)(char const *__restrict format, ...);
 FUNDEF NOBLOCK ssize_t (KCALL vprintk)(char const *__restrict format, __builtin_va_list args);
-
-/* @param: level: [0..1] The print level (One of `KERN_*'). */
-FUNDEF NOBLOCK ssize_t (KCALL kprinter)(void *level, char const *__restrict data, size_t datalen);
 #endif /* __CC__ */
 
 
