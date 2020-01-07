@@ -3190,7 +3190,7 @@ print_byte:
 						continue;
 				}
 				if ((chain->i_flags & IF_RMM) &&
-				    (rm.mi_type != MODRM_MEMORY))
+				    (rm.mi_type == MODRM_REGISTER))
 					continue;
 			} else if (args_start) {
 				self->d_pc = args_start;

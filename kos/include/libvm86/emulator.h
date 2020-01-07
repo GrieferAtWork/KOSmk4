@@ -63,22 +63,34 @@ __DECL_BEGIN
 	}
 
 typedef struct {
-	VM86_REGISTER_GP(a);     /* [C] Accumulator register */
-	VM86_REGISTER_GP(c);     /* [C] Count register */
-	VM86_REGISTER_GP(d);     /* [C] Data register */
-	VM86_REGISTER_GP(b);     /* [P] Base register */
-	VM86_REGISTER_PT(sp);    /* [P] Stack pointer */
-	VM86_REGISTER_PT(bp);    /* [P] Frame base pointer */
-	VM86_REGISTER_PT(si);    /* [P] Source pointer */
-	VM86_REGISTER_PT(di);    /* [P] Destination pointer */
-	VM86_REGISTER_PT(ip);    /* Instruction pointer. */
-	VM86_REGISTER_PT(flags); /* Flags register. */
-	__uint16_t    vr_es;     /* E (source) segment register */
-	__uint16_t    vr_cs;     /* Code segment */
-	__uint16_t    vr_ss;     /* Stack segment */
-	__uint16_t    vr_ds;     /* D (destination) segment register */
-	__uint16_t    vr_fs;     /* F segment register */
-	__uint16_t    vr_gs;     /* G segment register */
+	union {
+		struct {
+			VM86_REGISTER_GP(a);     /* [C] Accumulator register */
+			VM86_REGISTER_GP(c);     /* [C] Count register */
+			VM86_REGISTER_GP(d);     /* [C] Data register */
+			VM86_REGISTER_GP(b);     /* [P] Base register */
+			VM86_REGISTER_PT(sp);    /* [P] Stack pointer */
+			VM86_REGISTER_PT(bp);    /* [P] Frame base pointer */
+			VM86_REGISTER_PT(si);    /* [P] Source pointer */
+			VM86_REGISTER_PT(di);    /* [P] Destination pointer */
+			VM86_REGISTER_PT(ip);    /* Instruction pointer. */
+			VM86_REGISTER_PT(flags); /* Flags register. */
+		};
+		__uint8_t  vr_regdatab[40];
+		__uint16_t vr_regdataw[20];
+		__uint32_t vr_regdatal[10];
+	};
+	union {
+		struct {
+			__uint16_t    vr_es;     /* E (source) segment register */
+			__uint16_t    vr_cs;     /* Code segment */
+			__uint16_t    vr_ss;     /* Stack segment */
+			__uint16_t    vr_ds;     /* D (destination) segment register */
+			__uint16_t    vr_fs;     /* F segment register */
+			__uint16_t    vr_gs;     /* G segment register */
+		};
+		__uint16_t vr_segments[6];
+	};
 } vm86_registers_t;
 #undef VM86_REGISTER_GP
 #undef VM86_REGISTER_PT
