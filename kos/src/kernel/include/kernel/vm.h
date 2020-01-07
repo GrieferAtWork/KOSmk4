@@ -154,13 +154,13 @@ struct vm_ramblock {
 #ifndef CONFIG_NO_SWAP
 #if __SIZEOF_VM_SPAGE_T__ == __SIZEOF_PAGEPTR_T__
 #define VM_SWPBLOCK_EQUALS_RAMBLOCK 1
-#endif
+#endif /* __SIZEOF_VM_SPAGE_T__ == __SIZEOF_PAGEPTR_T__ */
 struct vm_swpblock {
 	vm_spage_t  sb_start; /* Starting page number of swap memory associated with the ram block. */
 	size_t      sb_size;  /* Number of continuous swap memory pages used by this block. */
 #if __SIZEOF_VM_SPAGE_T__ > __SIZEOF_SIZE_T__
 	byte_t      sb_pad[__SIZEOF_VM_SPAGE_T__ - __SIZEOF_SIZE_T__];
-#endif
+#endif /* __SIZEOF_VM_SPAGE_T__ > __SIZEOF_SIZE_T__ */
 };
 #endif /* !CONFIG_NO_SWAP */
 
@@ -361,12 +361,12 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_endwrite)(struct
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_endread)(struct vm_datapart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_end)(struct vm_datapart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_downgrade)(struct vm_datapart *__restrict self);
-#define vm_datapart_lock_reading(self)    shared_rwlock_reading(&(self)->dp_lock)
-#define vm_datapart_lock_writing(self)    shared_rwlock_writing(&(self)->dp_lock)
-#define vm_datapart_lock_canread(self)    shared_rwlock_canread(&(self)->dp_lock)
-#define vm_datapart_lock_canwrite(self)   shared_rwlock_canwrite(&(self)->dp_lock)
-#define vm_datapart_lock_pollread(self)   shared_rwlock_pollread(&(self)->dp_lock)
-#define vm_datapart_lock_pollwrite(self)  shared_rwlock_pollwrite(&(self)->dp_lock)
+#define vm_datapart_lock_reading(self)   shared_rwlock_reading(&(self)->dp_lock)
+#define vm_datapart_lock_writing(self)   shared_rwlock_writing(&(self)->dp_lock)
+#define vm_datapart_lock_canread(self)   shared_rwlock_canread(&(self)->dp_lock)
+#define vm_datapart_lock_canwrite(self)  shared_rwlock_canwrite(&(self)->dp_lock)
+#define vm_datapart_lock_pollread(self)  shared_rwlock_pollread(&(self)->dp_lock)
+#define vm_datapart_lock_pollwrite(self) shared_rwlock_pollwrite(&(self)->dp_lock)
 
 /* Define C++ sync API hooks. */
 __DEFINE_SYNC_RWLOCK(struct vm_datapart,
@@ -468,11 +468,11 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_do_freeram)(struct vm_datapart *__restrict self);
 #else /* __INTELLISENSE__ */
 #define vm_datapart_do_ccfreeram(self) \
-        vm_do_ccfreeram(&(self)->dp_ramdata.rd_block0,(self)->dp_ramdata.rd_blockv)
-#define vm_datapart_do_ffreeram(self,is_zero) \
-        vm_do_ffreeram(&(self)->dp_ramdata.rd_block0,(self)->dp_ramdata.rd_blockv,is_zero)
+	vm_do_ccfreeram(&(self)->dp_ramdata.rd_block0, (self)->dp_ramdata.rd_blockv)
+#define vm_datapart_do_ffreeram(self, is_zero) \
+	vm_do_ffreeram(&(self)->dp_ramdata.rd_block0, (self)->dp_ramdata.rd_blockv, is_zero)
 #define vm_datapart_do_freeram(self) \
-        vm_do_freeram(&(self)->dp_ramdata.rd_block0,(self)->dp_ramdata.rd_blockv)
+	vm_do_freeram(&(self)->dp_ramdata.rd_block0, (self)->dp_ramdata.rd_blockv)
 #endif /* !__INTELLISENSE__ */
 
 /* Copy the physical memory backing of `src' into `dst'.
@@ -926,10 +926,6 @@ NOTHROW(KCALL vm_datapart_cmpxchstate)(struct vm_datapart *__restrict self,
 
 
 
-#ifdef CONFIG_VIO
-struct vm_datablock_type_vio;
-#endif
-
 struct vm_datablock_type {
 	/* [0..1] Finalize + free the given data-block. */
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *dt_destroy)(struct vm_datablock *__restrict self);
@@ -963,9 +959,13 @@ struct vm_datablock_type {
 
 /* Value for `db_parts' when all parts are not tracked as shared, but are instead
  * newly allocated each time they are accessed through `vm_paged_datablock_locatepart()'. */
-#define VM_DATABLOCK_ANONPARTS       ((struct vm_datapart *)-1)
-#define VM_DATABLOCK_ANONPARTS_INIT    VM_DATABLOCK_ANONPARTS
+#define VM_DATABLOCK_ANONPARTS      ((struct vm_datapart *)-1)
+#define VM_DATABLOCK_ANONPARTS_INIT VM_DATABLOCK_ANONPARTS
 
+
+#ifdef CONFIG_VIO
+struct vm_datablock_type_vio;
+#endif /* CONFIG_VIO */
 
 struct vm_datablock {
 	/* An infinite-length data block descriptor, used to refer
@@ -997,8 +997,7 @@ struct vm_datablock {
 	 * >> db_addrshift = PAGESHIFT;
 	 * >> db_pagealign = 1;
 	 * >> db_pagemask  = 0;
-	 * >> db_pagesize  = PAGESIZE;
-	 */
+	 * >> db_pagesize  = PAGESIZE; */
 	unsigned int              db_pageshift; /* [const][<= PAGESHIFT] Shift applied to page indices for converting between
 	                                         * `pageid_t' and `datapage_t', or `vm_virt_t' and `pos_t' or `pos_t'.
 	                                         * -> Since loading file data is most efficient when done in blocks,
@@ -1108,12 +1107,12 @@ datapage_t VM_DATABLOCK_DADDR2DPAGE(struct vm_datablock const *__restrict self, 
 datapage_t VM_DATABLOCK_VADDR2DPAGE(struct vm_datablock const *__restrict self, vm_virt_t vaddr);
 datapage_t VM_DATABLOCK_PAGEID2DATAPAGE(struct vm_datablock const *__restrict self, pageid_t vpage);
 #else /* __INTELLISENSE__ */
-#define VM_DATABLOCK_DPAGE2DADDR(self,dpage) ((pos_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
-#define VM_DATABLOCK_DPAGE2VADDR(self,dpage) ((vm_virt_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
-#define VM_DATABLOCK_DATAPAGE2PAGEID(self,dpage) ((pageid_t)(dpage) >> VM_DATABLOCK_PAGESHIFT(self))
-#define VM_DATABLOCK_DADDR2DPAGE(self,daddr) ((datapage_t)(daddr) >> VM_DATABLOCK_ADDRSHIFT(self))
-#define VM_DATABLOCK_VADDR2DPAGE(self,vaddr) ((datapage_t)(vaddr) >> VM_DATABLOCK_ADDRSHIFT(self))
-#define VM_DATABLOCK_PAGEID2DATAPAGE(self,vpage) ((datapage_t)(vpage) << VM_DATABLOCK_PAGESHIFT(self))
+#define VM_DATABLOCK_DPAGE2DADDR(self, dpage)     ((pos_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
+#define VM_DATABLOCK_DPAGE2VADDR(self, dpage)     ((vm_virt_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
+#define VM_DATABLOCK_DATAPAGE2PAGEID(self, dpage) ((pageid_t)(dpage) >> VM_DATABLOCK_PAGESHIFT(self))
+#define VM_DATABLOCK_DADDR2DPAGE(self, daddr)     ((datapage_t)(daddr) >> VM_DATABLOCK_ADDRSHIFT(self))
+#define VM_DATABLOCK_VADDR2DPAGE(self, vaddr)     ((datapage_t)(vaddr) >> VM_DATABLOCK_ADDRSHIFT(self))
+#define VM_DATABLOCK_PAGEID2DATAPAGE(self, vpage) ((datapage_t)(vpage) << VM_DATABLOCK_PAGESHIFT(self))
 #endif /* !__INTELLISENSE__ */
 
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -1138,19 +1137,19 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_end)(void);
 FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_downgrade)(void);
 
 /* Locking functions for data blocks */
-#define vm_datablock_lock_read(self)       (unlikely((self) == &__devfs_datablock) ? devfs_lock_read()       : (void)rwlock_read(&(self)->db_lock))
-#define vm_datablock_lock_write(self)      (unlikely((self) == &__devfs_datablock) ? devfs_lock_write()      : (void)rwlock_write(&(self)->db_lock))
-#define vm_datablock_lock_upgrade(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_upgrade()    : rwlock_upgrade(&(self)->db_lock))
-#define vm_datablock_lock_read_nx(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_read_nx()    : rwlock_read_nx(&(self)->db_lock))
-#define vm_datablock_lock_write_nx(self)   (unlikely((self) == &__devfs_datablock) ? devfs_lock_write_nx()   : rwlock_write_nx(&(self)->db_lock))
+#define vm_datablock_lock_read(self)       (unlikely((self) == &__devfs_datablock) ? devfs_lock_read() : (void)rwlock_read(&(self)->db_lock))
+#define vm_datablock_lock_write(self)      (unlikely((self) == &__devfs_datablock) ? devfs_lock_write() : (void)rwlock_write(&(self)->db_lock))
+#define vm_datablock_lock_upgrade(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_upgrade() : rwlock_upgrade(&(self)->db_lock))
+#define vm_datablock_lock_read_nx(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_read_nx() : rwlock_read_nx(&(self)->db_lock))
+#define vm_datablock_lock_write_nx(self)   (unlikely((self) == &__devfs_datablock) ? devfs_lock_write_nx() : rwlock_write_nx(&(self)->db_lock))
 #define vm_datablock_lock_upgrade_nx(self) (unlikely((self) == &__devfs_datablock) ? devfs_lock_upgrade_nx() : rwlock_upgrade_nx(&(self)->db_lock))
-#define vm_datablock_lock_tryread(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_tryread()    : rwlock_tryread(&(self)->db_lock))
-#define vm_datablock_lock_trywrite(self)   (unlikely((self) == &__devfs_datablock) ? devfs_lock_trywrite()   : rwlock_trywrite(&(self)->db_lock))
+#define vm_datablock_lock_tryread(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_tryread() : rwlock_tryread(&(self)->db_lock))
+#define vm_datablock_lock_trywrite(self)   (unlikely((self) == &__devfs_datablock) ? devfs_lock_trywrite() : rwlock_trywrite(&(self)->db_lock))
 #define vm_datablock_lock_tryupgrade(self) (unlikely((self) == &__devfs_datablock) ? devfs_lock_tryupgrade() : rwlock_tryupgrade(&(self)->db_lock))
-#define vm_datablock_lock_endwrite(self)   (unlikely((self) == &__devfs_datablock) ? devfs_lock_endwrite()   : rwlock_endwrite(&(self)->db_lock))
-#define vm_datablock_lock_endread(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_endread()    : rwlock_endread(&(self)->db_lock))
-#define vm_datablock_lock_end(self)        (unlikely((self) == &__devfs_datablock) ? devfs_lock_end()        : rwlock_end(&(self)->db_lock))
-#define vm_datablock_lock_downgrade(self)  (unlikely((self) == &__devfs_datablock) ? devfs_lock_downgrade()  : rwlock_downgrade(&(self)->db_lock))
+#define vm_datablock_lock_endwrite(self)   (unlikely((self) == &__devfs_datablock) ? devfs_lock_endwrite() : rwlock_endwrite(&(self)->db_lock))
+#define vm_datablock_lock_endread(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_endread() : rwlock_endread(&(self)->db_lock))
+#define vm_datablock_lock_end(self)        (unlikely((self) == &__devfs_datablock) ? devfs_lock_end() : rwlock_end(&(self)->db_lock))
+#define vm_datablock_lock_downgrade(self)  (unlikely((self) == &__devfs_datablock) ? devfs_lock_downgrade() : rwlock_downgrade(&(self)->db_lock))
 #define vm_datablock_lock_reading(self)    rwlock_reading(&(self)->db_lock)
 #define vm_datablock_lock_writing(self)    rwlock_writing(&(self)->db_lock)
 #define vm_datablock_lock_canread(self)    rwlock_canread(&(self)->db_lock)

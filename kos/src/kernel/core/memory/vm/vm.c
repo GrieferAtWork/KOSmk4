@@ -3233,6 +3233,25 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        self->vn_part, self->vn_block, self->vn_part->dp_block,
 	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
 	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax);
+	assertf(!self->vn_part || !wasdestroyed(self->vn_part),
+	        "Data part has a reference counter equal to 0\n"
+	        "self = %p (%p-%p)\n"
+	        "self->vn_part                 = %p\n"
+	        "self->vn_block                = %p\n"
+	        "self->vn_part->dp_block       = %p\n"
+	        "self->vn_part->dp_tree.a_vmin = %I64u(%#I64x)\n"
+	        "self->vn_part->dp_tree.a_vmax = %I64u(%#I64x)\n",
+	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self->vn_part, self->vn_block, self->vn_part->dp_block,
+	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
+	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax);
+	assertf(!self->vn_block || !wasdestroyed(self->vn_block),
+	        "Data block has a reference counter equal to 0\n"
+	        "self = %p (%p-%p)\n"
+	        "self->vn_part  = %p\n"
+	        "self->vn_block = %p\n",
+	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self->vn_part, self->vn_block, self->vn_part->dp_block);
 	assertf(!self->vn_part ||
 	        (self->vn_part->dp_block == self->vn_block ||
 	         self->vn_part->dp_block == &vm_datablock_anonymous ||

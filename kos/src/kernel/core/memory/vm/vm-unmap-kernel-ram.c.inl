@@ -38,7 +38,7 @@
 
 #ifdef __INTELLISENSE__
 #include "vm.c"
-#endif
+#endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 
@@ -483,7 +483,19 @@ again:
 			decref_unlikely(node->vn_block);
 			vm_do_pdir_unmap(addr, effective_pages * PAGESIZE);
 			part->dp_srefs = NULL;
-			vm_datapart_destroy(part, is_zero);
+#ifdef NDEBUG
+			if (ATOMIC_DECFETCH(part->dp_refcnt) == 0)
+				vm_datapart_destroy(part, is_zero);
+#else /* NDEBUG */
+			{
+				refcnt_t refcnt;
+				refcnt = ATOMIC_FETCHDEC(part->dp_refcnt);
+				assertf(refcnt != 0, "Part %p of node %p at %p-%p was already destroyed",
+				        part, node, vm_node_getmin(node), vm_node_getmax(node));
+				if (refcnt == 1)
+					vm_datapart_destroy(part, is_zero);
+			}
+#endif /* !NDEBUG */
 			vm_node_free(node);
 		} else {
 			/* Must truncate the node at the end. */
@@ -501,11 +513,11 @@ again:
 			 * near its end.
 			 * In either case, we must make sure to initialize all trailing
 			 * hinted pages such that no trailing pages are still being hinted
-			 * to. Otherwise, the page-fault handler may would run into race
-			 * conditions arising from the node changing while it is in the
-			 * processes of operating with that node (which we subvert by doing
-			 * it's work ahead of time for all of the nodes that could possibly
-			 * be affected by this) */
+			 * to. Otherwise, the page-fault handler may run into race conditions
+			 * arising from the node changing while it is in the processes of
+			 * operating with that node (which we subvert by doing it's work
+			 * ahead of time for all of the nodes that could possibly be affected
+			 * by this) */
 			void *tail_start;
 			size_t tail_size;
 			assert(part->dp_state == VM_DATAPART_STATE_LOCKED);
@@ -517,9 +529,9 @@ again:
 			do {
 #if __SIZEOF_POINTER__ >= 8
 				readq(tail_start);
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
 				readl(tail_start);
-#endif
+#endif /* __SIZEOF_POINTER__ < 8 */
 				tail_start = (byte_t *)tail_start + PAGESIZE;
 			} while (--tail_size);
 		}
@@ -792,11 +804,12 @@ page_properties_updated:
 			corepair.cp_node->vn_part          = corepair.cp_part;
 			corepair.cp_node->vn_block         = incref(node->vn_block);
 			corepair.cp_node->vn_link.ln_pself = &corepair.cp_part->dp_srefs;
-			corepair.cp_part->dp_tree.a_vmin   = (datapage_t)0;
+			corepair.cp_part->dp_refcnt        = 1; /* +1: corepair.cp_node->vn_part */
+			assertf(corepair.cp_part->dp_tree.a_vmin == (datapage_t)0, "GFP_CALLOC should have done this");
 			corepair.cp_part->dp_tree.a_vmax   = (datapage_t)(sizeof_trailing - 1);
 			corepair.cp_part->dp_srefs         = corepair.cp_node;
 			corepair.cp_part->dp_flags |= part->dp_flags & ~(VM_DATAPART_FLAG_COREPRT | VM_DATAPART_FLAG_HEAPPPP);
-			corepair.cp_part->dp_state = part->dp_state;
+			corepair.cp_part->dp_state  = part->dp_state;
 			part->dp_tree.a_vmax       = (datapage_t)(sizeof_leading - 1);
 			node->vn_node.a_vmax       = unmap_min - 1;
 			if (part->dp_flags & VM_DATAPART_FLAG_HEAPPPP && part->dp_pprop_p != NULL) {

@@ -234,6 +234,9 @@ again_reset:
 			part = node->vn_part;
 			if unlikely(!part)
 				goto err_unmapped;
+			assertf(!wasdestroyed(part),
+			        "Node %p at %p-%p points at destroyed data part at %p",
+			        node, vm_node_getmin(node), vm_node_getmax(node), part);
 			if unlikely(!sync_tryread(part)) {
 				/* Need to blocking wait for the lock, then try again. */
 wait_for_part_and_try_again:
@@ -414,6 +417,9 @@ unshare_copy_on_write_for_part:
 				part = node->vn_part;
 				if unlikely(!part)
 					goto err_unmapped;
+				assertf(!wasdestroyed(part),
+				        "Node %p at %p-%p points at destroyed data part at %p",
+				        node, vm_node_getmin(node), vm_node_getmax(node), part);
 #ifdef CONFIG_VIO
 				if unlikely(ATOMIC_READ(part->dp_state) == VM_DATAPART_STATE_VIOPRT)
 					goto err_unmapped;
