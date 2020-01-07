@@ -467,6 +467,12 @@ again:
 	assertf(part->dp_block->db_parts == VM_DATABLOCK_ANONPARTS,
 	        "Cannot unmap non-anonymous kernel-space node at %p...%p as RAM",
 	        vm_node_getmin(node), vm_node_getmax(node));
+	assertf(part->dp_tree.a_vmin == 0,
+	        "Data parts must be allocated with offset=0 to be usable as RAM\n"
+	        "part->dp_tree.a_vmin = %I64u(%#I64x)\n"
+	        "part->dp_tree.a_vmax = %I64u(%#I64x)\n",
+	        part->dp_tree.a_vmin, part->dp_tree.a_vmin,
+	        part->dp_tree.a_vmax, part->dp_tree.a_vmax);
 
 	if (unmap_max >= vm_node_getmaxpageid(node)) {
 		/* We can either unmap the entire node, or we can just truncate it. */
@@ -786,8 +792,8 @@ page_properties_updated:
 			corepair.cp_node->vn_part          = corepair.cp_part;
 			corepair.cp_node->vn_block         = incref(node->vn_block);
 			corepair.cp_node->vn_link.ln_pself = &corepair.cp_part->dp_srefs;
-			corepair.cp_part->dp_tree.a_vmin   = part->dp_tree.a_vmin + trailing_offset;
-			corepair.cp_part->dp_tree.a_vmax   = corepair.cp_part->dp_tree.a_vmin + sizeof_trailing - 1;
+			corepair.cp_part->dp_tree.a_vmin   = (datapage_t)0;
+			corepair.cp_part->dp_tree.a_vmax   = (datapage_t)(sizeof_trailing - 1);
 			corepair.cp_part->dp_srefs         = corepair.cp_node;
 			corepair.cp_part->dp_flags |= part->dp_flags & ~(VM_DATAPART_FLAG_COREPRT | VM_DATAPART_FLAG_HEAPPPP);
 			corepair.cp_part->dp_state = part->dp_state;

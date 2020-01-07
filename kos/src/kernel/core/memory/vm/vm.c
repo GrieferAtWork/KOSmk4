@@ -896,7 +896,7 @@ NOTHROW(KCALL vm_node_insert_ignore_missmatch)(struct vm_node *__restrict self) 
 	        "Unordered node: MIN(%p) >= MAX(%p)",
 	        vm_node_getmin(self), vm_node_getmax(self));
 	assertf(vm_node_getmaxpageid(self) <= __ARCH_PAGEID_MAX,
-	        "Mapping of node covering pages %p...%p is out-of-bounds",
+	        "Mapping of node covering pages %p-%p is out-of-bounds",
 	        vm_node_getminpageid(self), vm_node_getmaxpageid(self));
 	assert(self->vn_block ? true : !self->vn_part);
 #if 0
@@ -915,8 +915,8 @@ NOTHROW(KCALL vm_node_insert_ignore_missmatch)(struct vm_node *__restrict self) 
 		pinsert = &insert_before->vn_byaddr.ln_next;
 	assertf(!insert_before ||
 	        self->vn_node.a_vmax < insert_before->vn_node.a_vmin,
-	        "insert_before  = %p:%p...%p\n"
-	        "self           = %p:%p...%p\n"
+	        "insert_before  = %p (%p-%p)\n"
+	        "self           = %p (%p-%p)\n"
 	        "self->vn_flags = %#.4I16x\n",
 	        insert_before, vm_node_getmin(insert_before), vm_node_getmax(insert_before),
 	        self, vm_node_getmin(self), vm_node_getmax(self),
@@ -3045,7 +3045,7 @@ NOTHROW(KCALL vm_node_destroy)(struct vm_node *__restrict self) {
 
 
 LOCAL void KCALL log_updating_access_rights(struct vm_node *__restrict self) {
-	printk(KERN_DEBUG "[vm] Update access rights of %p...%p [pid:%u]\n",
+	printk(KERN_DEBUG "[vm] Update access rights of %p-%p [pid:%u]\n",
 	       vm_node_getmin(self), vm_node_getmax(self),
 	       task_getroottid_s());
 }
@@ -3205,13 +3205,69 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "Unordered node: MIN(%p) >= MAX(%p)",
 	        vm_node_getmin(self), vm_node_getmax(self));
 	assertf(vm_node_getmaxpageid(self) <= __ARCH_PAGEID_MAX,
-	        "Mapping of node covering pages %p...%p is out-of-bounds",
+	        "Mapping of node covering pages %p-%p is out-of-bounds",
 	        vm_node_getminpageid(self), vm_node_getmaxpageid(self));
-	assert(self->vn_block ? true : !self->vn_part);
+	assertf(self->vn_block ? true : !self->vn_part,
+	        "Node has a data part, but no data block\n"
+	        "self = %p (%p-%p)\n"
+	        "self->vn_part                 = %p\n"
+	        "self->vn_block                = %p\n"
+	        "self->vn_part->dp_block       = %p\n"
+	        "self->vn_part->dp_tree.a_vmin = %I64u(%#I64x)\n"
+	        "self->vn_part->dp_tree.a_vmax = %I64u(%#I64x)\n",
+	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self->vn_part, self->vn_block, self->vn_part->dp_block,
+	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
+	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax);
+	assertf(!self->vn_part ||
+	        (vm_datapart_mindpage(self->vn_part) <=
+	         vm_datapart_maxdpage(self->vn_part)),
+	        "Data part contains bad data page bounds\n"
+	        "self = %p (%p-%p)\n"
+	        "self->vn_part                 = %p\n"
+	        "self->vn_block                = %p\n"
+	        "self->vn_part->dp_block       = %p\n"
+	        "self->vn_part->dp_tree.a_vmin = %I64u(%#I64x)\n"
+	        "self->vn_part->dp_tree.a_vmax = %I64u(%#I64x)\n",
+	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self->vn_part, self->vn_block, self->vn_part->dp_block,
+	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
+	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax);
+	assertf(!self->vn_part ||
+	        (self->vn_part->dp_block == self->vn_block ||
+	         self->vn_part->dp_block == &vm_datablock_anonymous ||
+	         (self->vn_part->dp_block >= vm_datablock_anonymous_zero_vec &&
+	          self->vn_part->dp_block < COMPILER_ENDOF(vm_datablock_anonymous_zero_vec))),
+	        "Data part uses a different block than node\n"
+	        "self = %p (%p-%p)\n"
+	        "self->vn_part                 = %p\n"
+	        "self->vn_block                = %p\n"
+	        "self->vn_part->dp_block       = %p\n"
+	        "self->vn_part->dp_tree.a_vmin = %I64u(%#I64x)\n"
+	        "self->vn_part->dp_tree.a_vmax = %I64u(%#I64x)\n"
+	        "vm_datablock_anonymous_zero_vec = { %p-%p }\n",
+	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self->vn_part, self->vn_block, self->vn_part->dp_block,
+	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
+	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax,
+	        (byte_t *)vm_datablock_anonymous_zero_vec,
+	        (byte_t *)COMPILER_ENDOF(vm_datablock_anonymous_zero_vec) - 1);
 	assertf(!self->vn_part ||
 	        vm_node_getpagecount(self) == vm_datapart_numvpages(self->vn_part),
-	        "Node size missmatch (%Iu != %Iu)",
-	        vm_node_getpagecount(self), vm_datapart_numvpages(self->vn_part));
+	        "Node size missmatch (%Iu(%#Ix) != %Iu(%#Ix))\n"
+	        "self = %p (%p-%p)\n"
+	        "self->vn_part                         = %p\n"
+	        "self->vn_part->dp_block               = %p\n"
+	        "self->vn_part->dp_tree.a_vmin         = %I64u(%#I64x)\n"
+	        "self->vn_part->dp_tree.a_vmax         = %I64u(%#I64x)\n"
+	        "self->vn_part->dp_block->db_pageshift = %u\n",
+	        vm_node_getpagecount(self), vm_node_getpagecount(self),
+	        vm_datapart_numvpages(self->vn_part), vm_datapart_numvpages(self->vn_part),
+	        self, vm_node_getmin(self), vm_node_getmax(self),
+	        self->vn_part, self->vn_part->dp_block,
+	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
+	        self->vn_part->dp_tree.a_vmax, self->vn_part->dp_tree.a_vmax,
+	        self->vn_part->dp_block->db_pageshift);
 	assert((v->v_tree != NULL) == (v->v_byaddr != NULL));
 	vm_nodetree_insert(&v->v_tree, self);
 	/* Figure out where we need to insert the self. */
@@ -3221,8 +3277,8 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 		pinsert = &insert_before->vn_byaddr.ln_next;
 	assertf(!insert_before ||
 	        self->vn_node.a_vmax < insert_before->vn_node.a_vmin,
-	        "insert_before  = %p:%p...%p\n"
-	        "self           = %p:%p...%p\n"
+	        "insert_before  = %p (%p-%p)\n"
+	        "self           = %p (%p-%p)\n"
 	        "self->vn_flags = %#.4I16x\n",
 	        insert_before, vm_node_getmin(insert_before), vm_node_getmax(insert_before),
 	        self, vm_node_getmin(self), vm_node_getmax(self),
