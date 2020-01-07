@@ -4487,9 +4487,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1121 /* index: 1121 */
-	.weak x86_sysroute1_asm32_int80; .quad x86_sysroute1_asm32_int80
-	.reloc ., R_X86_64_SIZE32, x86_sysroute1_asm32_int80; .int 0
-	.int 0x4e1610
+	.weak x86_syscall64x32_int80; .quad x86_syscall64x32_int80
+	.reloc ., R_X86_64_SIZE32, x86_syscall64x32_int80; .int 0
+	.int 0x412ce10
 	.quad 0 /* index: 1122 */
 	.quad 0
 	.int 0
@@ -7986,10 +7986,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys32_rt_sigprocmask; .quad sys32_rt_sigprocmask
 	.reloc ., R_X86_64_SIZE32, sys32_rt_sigprocmask; .int 0
 	.int 0x35747cb
-	.quad 0 /* index: 1996 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1996 /* index: 1996 */
+	.weak x86_syscall64_int80_after_swapgs_traced; .quad x86_syscall64_int80_after_swapgs_traced
+	.reloc ., R_X86_64_SIZE32, x86_syscall64_int80_after_swapgs_traced; .int 0
+	.int 0xfa98964
 	.quad 0 /* index: 1997 */
 	.quad 0
 	.int 0
@@ -14434,10 +14434,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_getppid; .quad sys_getppid
 	.reloc ., R_X86_64_SIZE32, sys_getppid; .int 0
 	.int 0xdb07fa4
-	.quad 0 /* index: 3608 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3608 /* index: 3608 */
+	.weak x86_syscall64x32_int80_traced; .quad x86_syscall64x32_int80_traced
+	.reloc ., R_X86_64_SIZE32, x86_syscall64x32_int80_traced; .int 0
+	.int 0x7949894
 	.quad .Lname3609 /* index: 3609 */
 	.weak sys_renameat; .quad sys_renameat
 	.reloc ., R_X86_64_SIZE32, sys_renameat; .int 0
@@ -14786,10 +14786,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak syscall_emulate_r; .quad syscall_emulate_r
 	.reloc ., R_X86_64_SIZE32, syscall_emulate_r; .int 0
 	.int 0x443fab2
-	.quad 0 /* index: 3696 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3696 /* index: 3696 */
+	.weak x86_sysroute1_asm32_int80; .quad x86_sysroute1_asm32_int80
+	.reloc ., R_X86_64_SIZE32, x86_sysroute1_asm32_int80; .int 0
+	.int 0x4e1610
 	.quad .Lname3697 /* index: 3697 */
 	.weak regdump_sgregs; .quad regdump_sgregs
 	.reloc ., R_X86_64_SIZE32, regdump_sgregs; .int 0
@@ -15234,10 +15234,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak block_device_write; .quad block_device_write
 	.reloc ., R_X86_64_SIZE32, block_device_write; .int 0
 	.int 0xa512525
-	.quad 0 /* index: 3808 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3808 /* index: 3808 */
+	.weak x86_syscall64x64_int80; .quad x86_syscall64x64_int80
+	.reloc ., R_X86_64_SIZE32, x86_syscall64x64_int80; .int 0
+	.int 0xe12cee0
 	.quad 0 /* index: 3809 */
 	.quad 0
 	.int 0
@@ -15374,10 +15374,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_mq_getsetattr; .quad sys_mq_getsetattr
 	.reloc ., R_X86_64_SIZE32, sys_mq_getsetattr; .int 0
 	.int 0xde45e62
-	.quad 0 /* index: 3843 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3843 /* index: 3843 */
+	.weak x86_syscall64_int80_after_swapgs; .quad x86_syscall64_int80_after_swapgs
+	.reloc ., R_X86_64_SIZE32, x86_syscall64_int80_after_swapgs; .int 0
+	.int 0x4911f03
 	.quad .Lname3844 /* index: 3844 */
 	.weak error_throw_current; .quad error_throw_current
 	.reloc ., R_X86_64_SIZE32, error_throw_current; .int 0
@@ -16198,10 +16198,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak regdump_ip; .quad regdump_ip
 	.reloc ., R_X86_64_SIZE32, regdump_ip; .int 0
 	.int 0xbc3efd0
-	.quad 0 /* index: 4049 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname4049 /* index: 4049 */
+	.weak x86_syscall64x64_int80_traced; .quad x86_syscall64x64_int80_traced
+	.reloc ., R_X86_64_SIZE32, x86_syscall64x64_int80_traced; .int 0
+	.int 0x7949774
 	.quad 0 /* index: 4050 */
 	.quad 0
 	.int 0
@@ -17981,7 +17981,7 @@ END(kernel_symbol_table)
 .Lname1119:
 	.string "sys_setdomainname"
 .Lname1121:
-	.string "x86_sysroute1_asm32_int80"
+	.string "x86_syscall64x32_int80"
 .Lname1125:
 	.string "driver_clear_fde_cache"
 .Lname1127:
@@ -19142,6 +19142,8 @@ END(kernel_symbol_table)
 	.string "krealloc_nx"
 .Lname1995:
 	.string "sys32_rt_sigprocmask"
+.Lname1996:
+	.string "x86_syscall64_int80_after_swapgs_traced"
 .Lname1998:
 	.string "sys_swapon"
 .Lname2001:
@@ -21416,6 +21418,8 @@ END(kernel_symbol_table)
 	.string "kernel_symbol_table"
 .Lname3607:
 	.string "sys_getppid"
+.Lname3608:
+	.string "x86_syscall64x32_int80_traced"
 .Lname3609:
 	.string "sys_renameat"
 .Lname3611:
@@ -21538,6 +21542,8 @@ END(kernel_symbol_table)
 	.string "unwind_fde_exec_landing_pad_adjustment"
 .Lname3695:
 	.string "syscall_emulate_r"
+.Lname3696:
+	.string "x86_sysroute1_asm32_int80"
 .Lname3697:
 	.string "regdump_sgregs"
 .Lname3698:
@@ -21704,6 +21710,8 @@ END(kernel_symbol_table)
 	.string "sys_lseek64"
 .Lname3807:
 	.string "block_device_write"
+.Lname3808:
+	.string "x86_syscall64x64_int80"
 .Lname3810:
 	.string "dbg_enter_fcpustate_r"
 .Lname3811:
@@ -21754,6 +21762,8 @@ END(kernel_symbol_table)
 	.string "mempmoveq"
 .Lname3842:
 	.string "sys_mq_getsetattr"
+.Lname3843:
+	.string "x86_syscall64_int80_after_swapgs"
 .Lname3844:
 	.string "error_throw_current"
 .Lname3845:
@@ -22034,6 +22044,8 @@ END(kernel_symbol_table)
 	.string "sys32_sched_setparam"
 .Lname4048:
 	.string "regdump_ip"
+.Lname4049:
+	.string "x86_syscall64x64_int80_traced"
 .Lname4051:
 	.string "vm_datapart_readv_phys"
 .Lname4052:

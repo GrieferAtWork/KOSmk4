@@ -183,6 +183,15 @@ FUNDEF void ASMCALL x86_syscall32_int80_traced(void) ASMNAME("x86_idt_syscall_tr
  *       64-bit `syscall' system call (s.a. `x86_syscall64_syscall()') */
 FUNDEF void ASMCALL x86_syscall64_int80(void) ASMNAME("x86_idt_syscall");
 FUNDEF void ASMCALL x86_syscall64_int80_traced(void) ASMNAME("x86_idt_syscall_traced");
+/* Same as above, but these symbols point after the swapgs+sti introductory part.
+ * As such, these are used by system call emulation. */
+FUNDEF void ASMCALL x86_syscall64_int80_after_swapgs(void);
+FUNDEF void ASMCALL x86_syscall64_int80_after_swapgs_traced(void);
+/* System call entry point labels with x32 vs. x64 mode already decided */
+FUNDEF void ASMCALL x86_syscall64x64_int80(void);
+FUNDEF void ASMCALL x86_syscall64x32_int80(void);
+FUNDEF void ASMCALL x86_syscall64x64_int80_traced(void);
+FUNDEF void ASMCALL x86_syscall64x32_int80_traced(void);
 #endif /* __x86_64__ */
 
 /* Entry point for `lcall $7, $SYS_xxx' (32-bit system call invocation)

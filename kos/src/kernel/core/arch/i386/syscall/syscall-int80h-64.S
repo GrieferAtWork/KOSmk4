@@ -55,12 +55,13 @@ PUBLIC_FUNCTION(x86_idt_syscall)
 	 * we don't have to swapgs or sti conditionally, but can simply always do so. */
 	swapgs
 	sti
+PUBLIC_FUNCTION(x86_syscall64_int80_after_swapgs)
 	/* Check if the system call was invoked from compatibility mode. */
 	cmpq   $(SEGMENT_USER_CODE32_RPL), OFFSET_IRREGS_CS(%rsp)
-	je     .Lsyscall_int80_32bit
+	je     x86_syscall64x32_int80
 
 	/* Invocation of int80h from 64-bit code. */
-.Lsyscall_int80_64bit:
+PUBLIC_FUNCTION(x86_syscall64x64_int80)
 	cmpq   $(__NR64_syscall0_max), %rax
 	ja     1f
 	EXTERN(x86_sysroute0_asm64_syscall)
@@ -71,8 +72,9 @@ PUBLIC_FUNCTION(x86_idt_syscall)
 	cmpq   $(__NR64_syscall1_max), %rax
 	ja     __x86_asm64_syscall_break
 	jmpq   *(x86_sysroute1_asm64_syscall - ((__NR64_syscall1_min * 8) & 0xffffffffffffffff))(,%rax,8)
+END(x86_syscall64x64_int80)
 
-.Lsyscall_int80_32bit:
+PUBLIC_FUNCTION(x86_syscall64x32_int80)
 	movzlq %eax, %rax /* Zero-extend to ensure that the upper 32 bit are zero */
 	cmpl   $(__NR32_syscall0_max), %eax
 	ja     1f
@@ -91,7 +93,9 @@ PUBLIC_FUNCTION(x86_idt_syscall)
 	xchgq  0(%rsp), %rax /* Restore RAX and store syscall entry in 0(%rsp) */
 	.cfi_restore %rax
 	ret                  /* Jump to the syscall entry */
+END(x86_syscall64x32_int80)
 	.cfi_endproc
+END(x86_syscall64_int80_after_swapgs)
 END(x86_idt_syscall)
 
 
@@ -117,14 +121,16 @@ PUBLIC_FUNCTION(x86_idt_syscall_traced)
 	.cfi_def_cfa %rsp, 0
 	/* Only get here from user-space, so we can do an unconditional swapgs on entry! */
 	swapgs
+PUBLIC_FUNCTION(x86_syscall64_int80_after_swapgs_traced)
 	/* Check if we got here from compatibility mode.
 	 * Note that this check must be done before re-enabling interrupts, since
 	 * once that is done, our iret tail may have already been redirected! */
 	cmpq   $(SEGMENT_USER_CODE32_RPL), OFFSET_IRREGS64_CS(%rsp)
 	/* Unconditionally re-enable interrupts (only get here from user-space) */
 	sti
-	je     1f /* Compatibility mode */
+	je     x86_syscall64x32_int80_traced /* Compatibility mode */
 
+PUBLIC_FUNCTION(x86_syscall64x64_int80_traced)
 	pushq_cfi_r %rcx
 	pushq_cfi_r %r11
 	pushq_cfi_r %r9  /* ARG[5] */
@@ -148,9 +154,11 @@ PUBLIC_FUNCTION(x86_idt_syscall_traced)
 	popq_cfi_r %r9  /* ARG[5] */
 	popq_cfi_r %r11
 	popq_cfi_r %rcx
-	jmp    .Lsyscall_int80_64bit
+	jmp    x86_syscall64x64_int80
+END(x86_syscall64x64_int80_traced)
 
-1:	movzlq %eax, %rax
+PUBLIC_FUNCTION(x86_syscall64x32_int80_traced)
+	movzlq %eax, %rax
 	pushq_cfi_r %r8
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
@@ -178,8 +186,10 @@ PUBLIC_FUNCTION(x86_idt_syscall_traced)
 	popq_cfi_r %r10
 	popq_cfi_r %r9
 	popq_cfi_r %r8
-	jmp    .Lsyscall_int80_32bit
+	jmp    x86_syscall64x32_int80
+END(x86_syscall64x32_int80_traced)
 	.cfi_endproc
+END(x86_syscall64_int80_after_swapgs_traced)
 END(x86_idt_syscall_traced)
 #endif /* !CONFIG_NO_SYSCALL_TRACING */
 
@@ -208,25 +218,39 @@ PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
 	movq   %rdi, %rsp /* No need to disable interrupts, since this stack switch is atomic! */
 	.cfi_def_cfa_register %rsp
-	/* Restore user-space registers. */
-	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
+	/* Restore user-space registers. (except for RAX) */
+	ASM_POP_GPREGSNSP_NORAX_CFI_R
 
-	/* At this point, most of the original user-space CPU context from the point
-	 * when the `sysenter' instruction was executed has been restored. Additionally,
-	 * we have already applied the required register transformations for safely
-	 * returning to user-space once we're done here.
-	 * -> With all of this done, we can now continue handling the sysenter as
-	 *    though the CPU had supported the instruction from the get-go, using
-	 *    the same assembly-level wrappers that would normally be used for
-	 *    routing a real sysenter system call invocation. */
-#ifndef CONFIG_NO_SYSCALL_TRACING
-	EXTERN(syscall_tracing_enabled)
-	cmpb   $(0), syscall_tracing_enabled
-	EXTERN(x86_idt_syscall_traced)
-	jne    x86_idt_syscall_traced /* With tracing enabled... */
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
-	EXTERN(x86_idt_syscall)
-	jmp    x86_idt_syscall
+	/* Must account for IRET redirection when selecting compatibility mode!
+	 * >> temp = IRET.CS;
+	 * >> if unlikely(temp == SEGMENT_KERNEL_CODE)
+	 * >>     temp = PERTASK_GET(this_x86_rpc_redirection_iret.ir_cs);
+	 * >> if (temp == SEGMENT_USER_CODE32_RPL)
+	 * >>     DO_X32();
+	 * >> DO_X64(); */
+	movq   (8 + OFFSET_IRREGS64_CS)(%rsp), %rax
+	cmpq   $(SEGMENT_KERNEL_CODE), %rax
+	.cfi_remember_state
+	je     .Lsyscall_emulate_rpc_redirection_cs
+1:	cmpq   $(SEGMENT_USER_CODE32_RPL), %rax
+	popq_cfi_r %rax
+
+	/* Define internal labels to allow for self-modifying code! */
+	.byte  0x0f, 0x85 /* jne */
+INTERN_OBJECT(x86_syscall_emulate_int80h_r_rel_x86_syscall64x64_int80)
+	.reloc ., R_X86_64_PC32, x86_syscall64x64_int80 - 4
+	.long  0
+END(x86_syscall_emulate_int80h_r_rel_x86_syscall64x64_int80)
+
+	.byte  0xe9 /* jmp */
+INTERN_OBJECT(x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80)
+	.reloc ., R_X86_64_PC32, x86_syscall64x32_int80 - 4
+	.long  0
+END(x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80)
+.Lsyscall_emulate_rpc_redirection_cs:
+	.cfi_restore_state
+	movq   %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS64_CS), %rax
+	jmp    1b
 	.cfi_endproc
 END(x86_syscall_emulate_int80h_r)
 

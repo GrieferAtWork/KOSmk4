@@ -36,6 +36,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <kernel/vm/phys.h>
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
 #include <sched/mutex.h>
@@ -98,6 +99,21 @@ NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
 	return state;
 }
 
+#ifdef __x86_64__
+INTDEF s32 x86_syscall_emulate_int80h_r_rel_x86_syscall64x64_int80;
+INTDEF s32 x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80;
+#else /* __x86_64__ */
+INTDEF s32 x86_syscall_emulate_int80h_r_rel_x86_idt_syscall;
+#endif /* !__x86_64__ */
+
+PRIVATE NOBLOCK void
+NOTHROW(FCALL setpcrel32)(s32 *pcrel, void *dest) {
+	s32 offset;
+	offset = (s32)(intptr_t)((uintptr_t)dest - ((uintptr_t)pcrel + 4));
+	vm_writephysl_unaligned((vm_phys_t)((uintptr_t)pcrel - KERNEL_CORE_BASE), (u32)offset);
+}
+
+
 /* Enable/disable system call tracing.
  * @return: true:  Successfully changed the current tracing state.
  * @return: false: Tracing was already enabled/disabled. */
@@ -107,6 +123,21 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	struct idt_segment newsyscall;
 	void *addr;
 	SCOPED_WRITELOCK(&syscall_tracing_lock);
+	/* Re-write assembly to jump to tracing handlers. */
+#ifdef __x86_64__
+	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_syscall64x64_int80,
+	           enable ? (void *)&x86_syscall64x64_int80_traced
+	                  : (void *)&x86_syscall64x64_int80);
+	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80,
+	           enable ? (void *)&x86_syscall64x32_int80_traced
+	                  : (void *)&x86_syscall64x32_int80);
+#else /* __x86_64__ */
+	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_idt_syscall,
+	           enable ? (void *)&x86_syscall32_int80_traced
+	                  : (void *)&x86_syscall32_int80);
+#endif /* !__x86_64__ */
+	/* TODO: INVALIDATE_INSTRUCTION_CACHE(); */
+
 	argv[0] = (void *)(enable ? (uintptr_t)1 : (uintptr_t)0);
 	addr = enable ? (void *)&x86_syscall32_int80
 	              : (void *)&x86_syscall32_int80_traced;

@@ -2827,8 +2827,14 @@
 #define __CRT_HAVE_x86_setiopl 1
 #define __CRT_HAVE_x86_syscall32_sysenter 1
 #define __CRT_HAVE_x86_syscall32_sysenter_traced 1
+#define __CRT_HAVE_x86_syscall64_int80_after_swapgs 1
+#define __CRT_HAVE_x86_syscall64_int80_after_swapgs_traced 1
 #define __CRT_HAVE_x86_syscall64_syscall 1
 #define __CRT_HAVE_x86_syscall64_syscall_traced 1
+#define __CRT_HAVE_x86_syscall64x32_int80 1
+#define __CRT_HAVE_x86_syscall64x32_int80_traced 1
+#define __CRT_HAVE_x86_syscall64x64_int80 1
+#define __CRT_HAVE_x86_syscall64x64_int80_traced 1
 #define __CRT_HAVE_x86_syscall_emulate32_cdecl 1
 #define __CRT_HAVE_x86_syscall_emulate32_cdecl_r 1
 #define __CRT_HAVE_x86_syscall_emulate32_int80h 1

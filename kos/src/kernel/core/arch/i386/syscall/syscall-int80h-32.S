@@ -189,22 +189,12 @@ PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	popl_cfi %ds
 	.cfi_restore_iret_ds
 
-	/* At this point, most of the original user-space CPU context from the point
-	 * when the `sysenter' instruction was executed has been restored. Additionally,
-	 * we have already applied the required register transformations for safely
-	 * returning to user-space once we're done here.
-	 * -> With all of this done, we can now continue handling the sysenter as
-	 *    though the CPU had supported the instruction from the get-go, using
-	 *    the same assembly-level wrappers that would normally be used for
-	 *    routing a real sysenter system call invocation. */
-#ifndef CONFIG_NO_SYSCALL_TRACING
-	EXTERN(syscall_tracing_enabled)
-	cmpb   $(0), %ss:syscall_tracing_enabled
-	EXTERN(x86_idt_syscall_traced)
-	jne    x86_idt_syscall_traced /* With tracing enabled... */
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
-	EXTERN(x86_idt_syscall)
-	jmp    x86_idt_syscall
+	/* Define internal labels to allow for self-modifying code! */
+	.byte  0xe9 /* jmp */
+INTERN_OBJECT(x86_syscall_emulate_int80h_r_rel_x86_idt_syscall)
+	.reloc ., R_386_PC32, x86_idt_syscall
+	.long -4
+END(x86_syscall_emulate_int80h_r_rel_x86_idt_syscall)
 	.cfi_endproc
 END(x86_syscall_emulate_int80h_r)
 

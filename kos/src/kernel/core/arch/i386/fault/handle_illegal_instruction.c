@@ -197,6 +197,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			if unlikely(!isuser())
 				goto generic_illegal_instruction; /* Not allowed from kernel-space. */
 			/* sysenter emulation */
+			icpustate_setpc(state, (uintptr_t)pc);
 			x86_syscall_emulate32_sysenter_r(state);
 
 #ifdef __x86_64__
@@ -205,6 +206,7 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			if unlikely(!isuser())
 				goto generic_illegal_instruction; /* Not allowed from kernel-space. */
 			/* syscall emulation */
+			icpustate_setpc(state, (uintptr_t)pc);
 			x86_syscall_emulate64_int80h_r(state);
 #endif /* __x86_64__ */
 
