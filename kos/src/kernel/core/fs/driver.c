@@ -107,7 +107,7 @@ again:
 	if (mi) {
 		if (ma)
 			result += driver_fde_free_tree(ma);
-		self = ma;
+		self = mi;
 		goto again;
 	}
 	if (ma) {
