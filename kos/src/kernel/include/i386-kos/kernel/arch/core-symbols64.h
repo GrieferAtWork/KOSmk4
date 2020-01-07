@@ -1650,10 +1650,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak inode_awritek; .quad inode_awritek
 	.reloc ., R_X86_64_SIZE32, inode_awritek; .int 0
 	.int 0x8bea19b
-	.quad .Lname412 /* index: 412 */
-	.weak vm86_pic_intr; .quad vm86_pic_intr
-	.reloc ., R_X86_64_SIZE32, vm86_pic_intr; .int 0
-	.int 0x29e43a2
+	.quad 0 /* index: 412 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname413 /* index: 413 */
 	.weak x86_userexcept_seterrno64; .quad x86_userexcept_seterrno64
 	.reloc ., R_X86_64_SIZE32, x86_userexcept_seterrno64; .int 0
@@ -4203,9 +4203,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys32_set_mempolicy; .int 0
 	.int 0x6c66419
 	.quad .Lname1050 /* index: 1050 */
-	.weak vm86_hw_intr; .quad vm86_hw_intr
-	.reloc ., R_X86_64_SIZE32, vm86_hw_intr; .int 0
-	.int 0x82559e2
+	.weak vm_writephysb; .quad vm_writephysb
+	.reloc ., R_X86_64_SIZE32, vm_writephysb; .int 0
+	.int 0x7f029e2
 	.quad .Lname1051 /* index: 1051 */
 	.weak sys_setxattr; .quad sys_setxattr
 	.reloc ., R_X86_64_SIZE32, sys_setxattr; .int 0
@@ -4623,9 +4623,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1155 /* index: 1155 */
-	.weak vm_writephysb; .quad vm_writephysb
-	.reloc ., R_X86_64_SIZE32, vm_writephysb; .int 0
-	.int 0x7f029e2
+	.weak x86_sysroute1_runc32; .quad x86_sysroute1_runc32
+	.reloc ., R_X86_64_SIZE32, x86_sysroute1_runc32; .int 0
+	.int 0x23259e2
 	.quad .Lname1156 /* index: 1156 */
 	.weak dbg_indent; .quad dbg_indent
 	.reloc ., R_X86_64_SIZE32, dbg_indent; .int 0
@@ -4903,9 +4903,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1225 /* index: 1225 */
-	.weak vm86_fullstep; .quad vm86_fullstep
-	.reloc ., R_X86_64_SIZE32, vm86_fullstep; .int 0
-	.int 0x7386f60
+	.weak vm_datapart_haschanged; .quad vm_datapart_haschanged
+	.reloc ., R_X86_64_SIZE32, vm_datapart_haschanged; .int 0
+	.int 0xad0f0f4
 	.quad 0 /* index: 1226 */
 	.quad 0
 	.int 0
@@ -6259,9 +6259,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1564 /* index: 1564 */
-	.weak vm86_sw_intr; .quad vm86_sw_intr
-	.reloc ., R_X86_64_SIZE32, vm86_sw_intr; .int 0
-	.int 0xd2559d2
+	.weak x86_fpustate_save_noreset; .quad x86_fpustate_save_noreset
+	.reloc ., R_X86_64_SIZE32, x86_fpustate_save_noreset; .int 0
+	.int 0x6e6d734
 	.quad 0 /* index: 1565 */
 	.quad 0
 	.int 0
@@ -6722,10 +6722,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak x86_memcpy_nopf_ret_pointer; .quad x86_memcpy_nopf_ret_pointer
 	.reloc ., R_X86_64_SIZE32, x86_memcpy_nopf_ret_pointer; .int 0
 	.int 0x8a132d2
-	.quad .Lname1680 /* index: 1680 */
-	.weak x86_sysroute1_runc32; .quad x86_sysroute1_runc32
-	.reloc ., R_X86_64_SIZE32, x86_sysroute1_runc32; .int 0
-	.int 0x23259e2
+	.quad 0 /* index: 1680 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname1681 /* index: 1681 */
 	.weak sys32_detach; .quad sys32_detach
 	.reloc ., R_X86_64_SIZE32, sys32_detach; .int 0
@@ -7838,10 +7838,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad .Lname1959 /* index: 1959 */
-	.weak x86_userexcept_unwind; .quad x86_userexcept_unwind
-	.reloc ., R_X86_64_SIZE32, x86_userexcept_unwind; .int 0
-	.int 0x64100f4
+	.quad 0 /* index: 1959 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname1960 /* index: 1960 */
 	.weak sys_lookup_dcookie; .quad sys_lookup_dcookie
 	.reloc ., R_X86_64_SIZE32, sys_lookup_dcookie; .int 0
@@ -8123,9 +8123,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2030 /* index: 2030 */
-	.weak vm_datapart_haschanged; .quad vm_datapart_haschanged
-	.reloc ., R_X86_64_SIZE32, vm_datapart_haschanged; .int 0
-	.int 0xad0f0f4
+	.weak x86_userexcept_unwind; .quad x86_userexcept_unwind
+	.reloc ., R_X86_64_SIZE32, x86_userexcept_unwind; .int 0
+	.int 0x64100f4
 	.quad .Lname2031 /* index: 2031 */
 	.weak swap_free; .quad swap_free
 	.reloc ., R_X86_64_SIZE32, swap_free; .int 0
@@ -8907,9 +8907,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2226 /* index: 2226 */
-	.weak vm_datapart_map_ram; .quad vm_datapart_map_ram
-	.reloc ., R_X86_64_SIZE32, vm_datapart_map_ram; .int 0
-	.int 0x6d95aed
+	.weak vm86_intr; .quad vm86_intr
+	.reloc ., R_X86_64_SIZE32, vm86_intr; .int 0
+	.int 0xbc598b2
 	.quad .Lname2227 /* index: 2227 */
 	.weak path_lock_upgrade; .quad path_lock_upgrade
 	.reloc ., R_X86_64_SIZE32, path_lock_upgrade; .int 0
@@ -11758,10 +11758,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_syncall; .quad vm_syncall
 	.reloc ., R_X86_64_SIZE32, vm_syncall; .int 0
 	.int 0xb03454c
-	.quad 0 /* index: 2939 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2939 /* index: 2939 */
+	.weak vm_datapart_map_ram; .quad vm_datapart_map_ram
+	.reloc ., R_X86_64_SIZE32, vm_datapart_map_ram; .int 0
+	.int 0x6d95aed
 	.quad 0 /* index: 2940 */
 	.quad 0
 	.int 0
@@ -12078,10 +12078,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad .Lname3019 /* index: 3019 */
-	.weak x86_fpustate_save_noreset; .quad x86_fpustate_save_noreset
-	.reloc ., R_X86_64_SIZE32, x86_fpustate_save_noreset; .int 0
-	.int 0x6e6d734
+	.quad 0 /* index: 3019 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname3020 /* index: 3020 */
 	.weak x86_sysroute1_c32; .quad x86_sysroute1_c32
 	.reloc ., R_X86_64_SIZE32, x86_sysroute1_c32; .int 0
@@ -16978,8 +16978,6 @@ END(kernel_symbol_table)
 	.string "superblock_mountlock_tryread"
 .Lname411:
 	.string "inode_awritek"
-.Lname412:
-	.string "vm86_pic_intr"
 .Lname413:
 	.string "x86_userexcept_seterrno64"
 .Lname414:
@@ -17887,7 +17885,7 @@ END(kernel_symbol_table)
 .Lname1049:
 	.string "sys32_set_mempolicy"
 .Lname1050:
-	.string "vm86_hw_intr"
+	.string "vm_writephysb"
 .Lname1051:
 	.string "sys_setxattr"
 .Lname1052:
@@ -18025,7 +18023,7 @@ END(kernel_symbol_table)
 .Lname1153:
 	.string "sys32_dup"
 .Lname1155:
-	.string "vm_writephysb"
+	.string "x86_sysroute1_runc32"
 .Lname1156:
 	.string "dbg_indent"
 .Lname1157:
@@ -18127,7 +18125,7 @@ END(kernel_symbol_table)
 .Lname1223:
 	.string "memendw"
 .Lname1225:
-	.string "vm86_fullstep"
+	.string "vm_datapart_haschanged"
 .Lname1227:
 	.string "regdump_sreg"
 .Lname1228:
@@ -18589,7 +18587,7 @@ END(kernel_symbol_table)
 .Lname1561:
 	.string "krealign_offset"
 .Lname1564:
-	.string "vm86_sw_intr"
+	.string "x86_fpustate_save_noreset"
 .Lname1566:
 	.string "x86_fpustate_init"
 .Lname1567:
@@ -18732,8 +18730,6 @@ END(kernel_symbol_table)
 	.string "keymap_instrlen"
 .Lname1679:
 	.string "x86_memcpy_nopf_ret_pointer"
-.Lname1680:
-	.string "x86_sysroute1_runc32"
 .Lname1681:
 	.string "sys32_detach"
 .Lname1683:
@@ -19102,8 +19098,6 @@ END(kernel_symbol_table)
 	.string "sigmask_check_after_except"
 .Lname1957:
 	.string "kernel_debugtrap_r_kcpustate"
-.Lname1959:
-	.string "x86_userexcept_unwind"
 .Lname1960:
 	.string "sys_lookup_dcookie"
 .Lname1963:
@@ -19185,7 +19179,7 @@ END(kernel_symbol_table)
 .Lname2027:
 	.string "pidns_lookup_task"
 .Lname2030:
-	.string "vm_datapart_haschanged"
+	.string "x86_userexcept_unwind"
 .Lname2031:
 	.string "swap_free"
 .Lname2032:
@@ -19451,7 +19445,7 @@ END(kernel_symbol_table)
 .Lname2223:
 	.string "path_lock_end"
 .Lname2226:
-	.string "vm_datapart_map_ram"
+	.string "vm86_intr"
 .Lname2227:
 	.string "path_lock_upgrade"
 .Lname2228:
@@ -20426,6 +20420,8 @@ END(kernel_symbol_table)
 	.string "sys32_freadlinkat"
 .Lname2938:
 	.string "vm_syncall"
+.Lname2939:
+	.string "vm_datapart_map_ram"
 .Lname2942:
 	.string "lookup_taskpid"
 .Lname2943:
@@ -20534,8 +20530,6 @@ END(kernel_symbol_table)
 	.string "rwlock_write_aggressive"
 .Lname3017:
 	.string "pipe_reader_destroy"
-.Lname3019:
-	.string "x86_fpustate_save_noreset"
 .Lname3020:
 	.string "x86_sysroute1_c32"
 .Lname3024:

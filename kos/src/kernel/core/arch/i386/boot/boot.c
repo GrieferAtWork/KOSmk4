@@ -152,7 +152,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 		/* If we didn't gather at least 1MB, try to consult the bios to find more. */
 		total_pages = minfo_usable_ram_pages();
-		if (total_pages < X86_BOOT_MINIMUM_AVAILABLE_RAM || x86_force_detect_moreram) { /* Less than 1MB */
+		if (total_pages < X86_BOOT_MINIMUM_AVAILABLE_RAM || x86_force_detect_moreram || 1) { /* Less than 1MB */
 			x86_initialize_memory_via_bios();
 			total_pages = minfo_usable_ram_pages();
 		}

@@ -869,9 +869,10 @@ char const cpuid_brand_string[48] = {
  *    of any single instruction.
  *  - When `VM86_FROZEN' is returned, the program counter is also reset to
  *    the start of the responsible instruction.
- * @return: VM86_SUCCESS: The single instruction was successfully executed.
- * @return: VM86_STOPPED: The program counter was already placed at 0xffff:0xffff, or has jumped to that location.
- * @return: * :           One of `VM86_*' */
+ * @return: VM86_SUCCESS:      The single instruction was successfully executed.
+ * @return: VM86_STOPPED:      The program counter was already placed at 0xffff:0xffff, or has jumped to that location.
+ * @return: VM86_INTR_ENABLED: Interrupts should be enabled after the next call to `vm86_step()'
+ * @return: * :                One of `VM86_*' */
 INTERN NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self) {
 	int error;
 	uint8_t opcode;
@@ -1753,7 +1754,7 @@ read_opcode:
 
 	case 0xcc:
 		/* CC     INT3     ZO     Valid     Valid     Generate breakpoint trap. */
-		return libvm86_sw_intr(self, 3);
+		return libvm86_intr(self, 3);
 
 
 	case 0xcd:
@@ -1761,13 +1762,13 @@ read_opcode:
 		error = libvm86_read_pcbyte(self, &opcode);
 		if unlikely(error != VM86_SUCCESS)
 			goto err;
-		return libvm86_sw_intr(self, opcode);
+		return libvm86_intr(self, opcode);
 
 
 	case 0xce:
 		/* CE     INTO     ZO     Invalid     Valid     Generate overflow trap if overflow flag is 1. */
 		if (self->vr_regs.vr_flags & OF)
-			return libvm86_sw_intr(self, 4);
+			return libvm86_intr(self, 4);
 		break;
 
 
@@ -2019,7 +2020,7 @@ do_rep_instruction:
 
 	case 0xf1:
 		/* F1     INT1     ZO     Valid     Valid     Generate debug trap. */
-		return libvm86_sw_intr(self, 1);
+		return libvm86_intr(self, 1);
 
 
 	case 0xf5:
@@ -2069,24 +2070,8 @@ do_rep_instruction:
 
 	case 0xf4:
 		/* F4     HLT     ZO     Valid     Valid     Halt */
-		if (self->vr_regs.vr_flags & IF) {
-			unsigned int i;
-			for (i = 0; i < COMPILER_LENOF(self->vr_intr_pending); ++i) {
-				unsigned int shift;
-				uint8_t intno;
-				if (!self->vr_intr_pending[i])
-					continue;
-				shift = FFS(self->vr_intr_pending[i]) - 1;
-				self->vr_intr_pending[i] &= ~((uintptr_t)1 << shift);
-				intno = (uint8_t)((i * (sizeof(uintptr_t) * 8)) + shift);
-				assert(self->vr_stateflags & VM86_STATE_FINTR);
-				/* Load the interrupt vector. */
-				return libvm86_sw_intr(self, intno);
-			}
-			/* No more interrupts. */
-			self->vr_stateflags &= ~VM86_STATE_FINTR;
+		if (self->vr_regs.vr_flags & IF)
 			return VM86_HALTED;
-		}
 		self->vr_regs.vr_ip = ip_start;
 		return VM86_FROZEN;
 
@@ -3214,7 +3199,7 @@ do_81h_op16:
 				});
 				if ((int32_t)REG32(mod.mi_reg) < lo ||
 				    (int32_t)REG32(mod.mi_reg) > hi)
-					libvm86_sw_intr(self, 5); /* #BR */
+					libvm86_intr(self, 5); /* #BR */
 			} else {
 				int16_t lo, hi;
 				GUARD_SEGFAULT({
@@ -3223,7 +3208,7 @@ do_81h_op16:
 				});
 				if ((int16_t)REG16(mod.mi_reg) < lo ||
 				    (int16_t)REG16(mod.mi_reg) > hi)
-					libvm86_sw_intr(self, 5); /* #BR */
+					libvm86_intr(self, 5); /* #BR */
 			}
 		}
 		break;
@@ -4837,7 +4822,7 @@ do_c1h_switch_reg:
 				goto err;
 #ifndef E_DIVIDE_BY_ZERO
 			if unlikely(!opcode)
-				return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+				return libvm86_intr(self, 0x0); /* Divide by zero */
 #else /* !E_DIVIDE_BY_ZERO */
 			TRY
 #endif /* E_DIVIDE_BY_ZERO */
@@ -4850,7 +4835,7 @@ do_c1h_switch_reg:
 			EXCEPT {
 				if (!was_thrown(E_DIVIDE_BY_ZERO))
 					RETHROW();
-				return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+				return libvm86_intr(self, 0x0); /* Divide by zero */
 			}
 #endif /* E_DIVIDE_BY_ZERO */
 			break;
@@ -4862,7 +4847,7 @@ do_c1h_switch_reg:
 				goto err;
 #ifndef E_DIVIDE_BY_ZERO
 			if unlikely(!opcode)
-				return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+				return libvm86_intr(self, 0x0); /* Divide by zero */
 #else /* !E_DIVIDE_BY_ZERO */
 			TRY
 #endif /* E_DIVIDE_BY_ZERO */
@@ -4875,7 +4860,7 @@ do_c1h_switch_reg:
 			EXCEPT {
 				if (!was_thrown(E_DIVIDE_BY_ZERO))
 					RETHROW();
-				return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+				return libvm86_intr(self, 0x0); /* Divide by zero */
 			}
 #endif /* E_DIVIDE_BY_ZERO */
 			break;
@@ -5077,7 +5062,7 @@ do_c1h_switch_reg:
 					goto err;
 #ifndef E_DIVIDE_BY_ZERO
 				if unlikely(!opcode) {
-					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+					return libvm86_intr(self, 0x0); /* Divide by zero */
 				}
 #else
 				TRY
@@ -5092,7 +5077,7 @@ do_c1h_switch_reg:
 				EXCEPT {
 					if (!was_thrown(E_DIVIDE_BY_ZERO))
 						RETHROW();
-					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+					return libvm86_intr(self, 0x0); /* Divide by zero */
 				}
 #endif
 			} else {
@@ -5102,7 +5087,7 @@ do_c1h_switch_reg:
 					goto err;
 #ifndef E_DIVIDE_BY_ZERO
 				if unlikely(!opcode) {
-					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+					return libvm86_intr(self, 0x0); /* Divide by zero */
 				}
 #else
 				TRY
@@ -5117,7 +5102,7 @@ do_c1h_switch_reg:
 				EXCEPT {
 					if (!was_thrown(E_DIVIDE_BY_ZERO))
 						RETHROW();
-					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+					return libvm86_intr(self, 0x0); /* Divide by zero */
 				}
 #endif
 			}
@@ -5133,7 +5118,7 @@ do_c1h_switch_reg:
 					goto err;
 #ifndef E_DIVIDE_BY_ZERO
 				if unlikely(!opcode) {
-					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+					return libvm86_intr(self, 0x0); /* Divide by zero */
 				}
 #else
 				TRY
@@ -5148,7 +5133,7 @@ do_c1h_switch_reg:
 				EXCEPT {
 					if (!was_thrown(E_DIVIDE_BY_ZERO))
 						RETHROW();
-					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+					return libvm86_intr(self, 0x0); /* Divide by zero */
 				}
 #endif
 			} else {
@@ -5158,7 +5143,7 @@ do_c1h_switch_reg:
 					goto err;
 #ifndef E_DIVIDE_BY_ZERO
 				if unlikely(!opcode) {
-					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+					return libvm86_intr(self, 0x0); /* Divide by zero */
 				}
 #else
 				TRY
@@ -5173,7 +5158,7 @@ do_c1h_switch_reg:
 				EXCEPT {
 					if (!was_thrown(E_DIVIDE_BY_ZERO))
 						RETHROW();
-					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
+					return libvm86_intr(self, 0x0); /* Divide by zero */
 				}
 #endif
 			}
@@ -5189,7 +5174,7 @@ do_c1h_switch_reg:
 	default:
 err_ilop:
 		self->vr_regs.vr_eip = ip_start;
-		return libvm86_sw_intr(self, 0x6); /* Invalid Opcode */
+		return libvm86_intr(self, 0x6); /* Invalid Opcode */
 	}
 	return VM86_SUCCESS;
 err:

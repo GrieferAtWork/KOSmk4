@@ -1454,10 +1454,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long .Lname363 /* index: 363 */
-	.weak vm_datablock_vio_writev_phys; .long vm_datablock_vio_writev_phys
-	.reloc ., R_386_SIZE32, vm_datablock_vio_writev_phys; .int 0
-	.int 0x1064023
+	.long 0 /* index: 363 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname364 /* index: 364 */
 	.weak vfs_kernel; .long vfs_kernel
 	.reloc ., R_386_SIZE32, vfs_kernel; .int 0
@@ -5942,10 +5942,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long .Lname1485 /* index: 1485 */
-	.weak vm86_pic_intr; .long vm86_pic_intr
-	.reloc ., R_386_SIZE32, vm86_pic_intr; .int 0
-	.int 0x29e43a2
+	.long 0 /* index: 1485 */
+	.long 0
+	.int 0
+	.int 0
 	.long 0 /* index: 1486 */
 	.long 0
 	.int 0
@@ -7106,10 +7106,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vio_copytovio; .long vio_copytovio
 	.reloc ., R_386_SIZE32, vio_copytovio; .int 0
 	.int 0xb1036ef
-	.long .Lname1776 /* index: 1776 */
-	.weak vm86_sw_intr; .long vm86_sw_intr
-	.reloc ., R_386_SIZE32, vm86_sw_intr; .int 0
-	.int 0xd2559d2
+	.long 0 /* index: 1776 */
+	.long 0
+	.int 0
+	.int 0
 	.long 0 /* index: 1777 */
 	.long 0
 	.int 0
@@ -8907,9 +8907,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname2226 /* index: 2226 */
-	.weak vm_datapart_map_ram; .long vm_datapart_map_ram
-	.reloc ., R_386_SIZE32, vm_datapart_map_ram; .int 0
-	.int 0x6d95aed
+	.weak vm86_intr; .long vm86_intr
+	.reloc ., R_386_SIZE32, vm86_intr; .int 0
+	.int 0xbc598b2
 	.long .Lname2227 /* index: 2227 */
 	.weak path_lock_upgrade; .long path_lock_upgrade
 	.reloc ., R_386_SIZE32, path_lock_upgrade; .int 0
@@ -10123,9 +10123,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname2530 /* index: 2530 */
-	.weak vm86_hw_intr; .long vm86_hw_intr
-	.reloc ., R_386_SIZE32, vm86_hw_intr; .int 0
-	.int 0x82559e2
+	.weak vm_datablock_vio_writev_phys; .long vm_datablock_vio_writev_phys
+	.reloc ., R_386_SIZE32, vm_datablock_vio_writev_phys; .int 0
+	.int 0x1064023
 	.long .Lname2531 /* index: 2531 */
 	.weak unwind_emulator_exec_autostack; .long unwind_emulator_exec_autostack
 	.reloc ., R_386_SIZE32, unwind_emulator_exec_autostack; .int 0
@@ -11758,10 +11758,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long 0 /* index: 2939 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname2939 /* index: 2939 */
+	.weak vm_datapart_map_ram; .long vm_datapart_map_ram
+	.reloc ., R_386_SIZE32, vm_datapart_map_ram; .int 0
+	.int 0x6d95aed
 	.long 0 /* index: 2940 */
 	.long 0
 	.int 0
@@ -12550,10 +12550,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak character_device_mmap; .long character_device_mmap
 	.reloc ., R_386_SIZE32, character_device_mmap; .int 0
 	.int 0x9894c40
-	.long .Lname3137 /* index: 3137 */
-	.weak vm86_fullstep; .long vm86_fullstep
-	.reloc ., R_386_SIZE32, vm86_fullstep; .int 0
-	.int 0x7386f60
+	.long 0 /* index: 3137 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname3138 /* index: 3138 */
 	.weak isr_register; .long isr_register
 	.reloc ., R_386_SIZE32, isr_register; .int 0
@@ -16806,8 +16806,6 @@ END(kernel_symbol_table)
 	.string "error_rethrow"
 .Lname361:
 	.string "unwind_cfa_sigframe_apply"
-.Lname363:
-	.string "vm_datablock_vio_writev_phys"
 .Lname364:
 	.string "vfs_kernel"
 .Lname365:
@@ -18164,8 +18162,6 @@ END(kernel_symbol_table)
 	.string "pagedir_unmapone"
 .Lname1480:
 	.string "sys_bdflush"
-.Lname1485:
-	.string "vm86_pic_intr"
 .Lname1487:
 	.string "unwind_setreg_lcpustate_exclusive"
 .Lname1489:
@@ -18494,8 +18490,6 @@ END(kernel_symbol_table)
 	.string "path_lock_read_nx"
 .Lname1775:
 	.string "vio_copytovio"
-.Lname1776:
-	.string "vm86_sw_intr"
 .Lname1778:
 	.string "vio_orb"
 .Lname1779:
@@ -19007,7 +19001,7 @@ END(kernel_symbol_table)
 .Lname2223:
 	.string "path_lock_end"
 .Lname2226:
-	.string "vm_datapart_map_ram"
+	.string "vm86_intr"
 .Lname2227:
 	.string "path_lock_upgrade"
 .Lname2228:
@@ -19345,7 +19339,7 @@ END(kernel_symbol_table)
 .Lname2528:
 	.string "sys_utimes64"
 .Lname2530:
-	.string "vm86_hw_intr"
+	.string "vm_datablock_vio_writev_phys"
 .Lname2531:
 	.string "unwind_emulator_exec_autostack"
 .Lname2532:
@@ -19846,6 +19840,8 @@ END(kernel_symbol_table)
 	.string "cfmakesane"
 .Lname2937:
 	.string "sys_kfstatat"
+.Lname2939:
+	.string "vm_datapart_map_ram"
 .Lname2942:
 	.string "lookup_taskpid"
 .Lname2943:
@@ -20106,8 +20102,6 @@ END(kernel_symbol_table)
 	.string "sys_fallocate"
 .Lname3136:
 	.string "character_device_mmap"
-.Lname3137:
-	.string "vm86_fullstep"
 .Lname3138:
 	.string "isr_register"
 .Lname3140:

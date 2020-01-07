@@ -38,40 +38,20 @@ DECL_BEGIN
  *    of any single instruction.
  *  - When `VM86_FROZEN' is returned, the program counter is also reset to
  *    the start of the responsible instruction.
- * @return: VM86_SUCCESS: The single instruction was successfully executed.
- * @return: VM86_STOPPED: The program counter was already placed at 0xffff:0xffff, or has jumped to that location.
- * @return: * :           One of `VM86_*' */
+ * @return: VM86_SUCCESS:      The single instruction was successfully executed.
+ * @return: VM86_STOPPED:      The program counter was already placed at 0xffff:0xffff, or has jumped to that location.
+ * @return: VM86_INTR_ENABLED: Interrupts should be enabled after the next call to `vm86_step()'
+ * @return: * :                One of `VM86_*' */
 INTDEF NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self);
-
-/* Same as `vm86_step()', but also check for pending interrupts beforehand. */
-INTDEF NONNULL((1)) int CC libvm86_fullstep(vm86_state_t *__restrict self);
 
 /* Execute VM86 emulator code until that code finishes execution. */
 INTDEF NONNULL((1)) int CC libvm86_exec(vm86_state_t *__restrict self);
 
 /* Trigger an interrupt.
- * vm86_sw_intr:
- *   - Always trigger the interrupt
- * vm86_hw_intr:
- *   - Check if #IF is set
- *    - Yes: Trigger the interrupt by invoking `vm86_sw_intr(intno)'
- *    - No:  Mark the interrupt as pending
- * vm86_pic_intr:
- *   - `pic_intno' must be `>= 0 && <= 15', where 0..7 maps to PIC#1 and 8..15 to PIC#2
- *   #1: Determine which PIC is addressed.
- *   #2: If the interrupt is being ignored, returning immediately.
- *   #3: If the interrupt is already pending, returning immediately.
- *   #4: If `VM86_PIC_FNEEDEOI' is set, mark the interrupt and pending and returning immediately.
- *   #5: Set the `VM86_PIC_FNEEDEOI' flag (unless `VM86_PIC_FAUTOEOI' is also set)
- *   #6: Invoke `vm86_hw_intr()' with the pic_intno adjusted
- *       relative to the base of the associated PIC:
- *       >> intno = pic_intno >= 8 ? (vr_pic2_base + (pic_intno - 8)) : (vr_pic1_base + pic_intno);
  * @return: VM86_SUCCESS:      Success.
  * @return: VM86_DOUBLE_FAULT: Stack overflow.
  * @return: VM86_SEGFAULT:     Segmentation fault. */
-INTDEF NONNULL((1)) int CC libvm86_sw_intr(vm86_state_t *__restrict self, uint8_t intno);
-INTDEF NONNULL((1)) int CC libvm86_hw_intr(vm86_state_t *__restrict self, uint8_t intno);
-INTDEF NONNULL((1)) int CC libvm86_pic_intr(vm86_state_t *__restrict self, uint8_t pic_intno);
+INTDEF NONNULL((1)) int CC libvm86_intr(vm86_state_t *__restrict self, uint8_t intno);
 
 /* Read/Write values to/from an emulated VIO port.
  * @return: VM86_SUCCESS: Success.

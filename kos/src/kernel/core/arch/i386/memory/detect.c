@@ -143,15 +143,12 @@ NOTHROW(KCALL interrupt)(vm86_state_t *__restrict self, u8 intno) {
 	self->vr_trans = &vm86_translate;
 	self->vr_io    = &vm86_io;
 	self->vr_intr  = NULL;
-	memset(self->vr_intr_pending, 0,
-	       sizeof(*self) -
-	       offsetof(vm86_state_t, vr_intr_pending));
 	self->vr_regs.vr_esp = (VM86_BASE + 256) & 0xffff;
 	self->vr_regs.vr_ss  = ((VM86_BASE + 256) & 0xf0000) >> 4;
 	self->vr_regs.vr_eip = 0xffff;
 	self->vr_regs.vr_cs  = 0xffff;
 	/* Generate a software interrupt */
-	vm86_sw_intr(self, intno);
+	vm86_intr(self, intno);
 	/* Execute VM86 code. */
 	error = vm86_exec(self);
 	return error >= 0;
