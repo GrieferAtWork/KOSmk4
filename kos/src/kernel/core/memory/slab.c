@@ -270,15 +270,16 @@ again:
 #endif /* !CONFIG_DEBUG_HEAP */
 		                             ;
 		incref(corepair.cp_part->dp_block);
-		corepair.cp_node->vn_block = incref(corepair.cp_part->dp_block);
-		corepair.cp_node->vn_prot  = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
+		corepair.cp_node->vn_block  = incref(corepair.cp_part->dp_block);
+		corepair.cp_node->vn_prot   = VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED;
 		corepair.cp_node->vn_flags |= VM_NODE_FLAG_PREPARED;
-		corepair.cp_node->vn_part          = corepair.cp_part;
+		corepair.cp_node->vn_part   = corepair.cp_part;
 		corepair.cp_node->vn_link.ln_pself = &LLIST_HEAD(corepair.cp_part->dp_srefs);
-		corepair.cp_part->dp_srefs         = corepair.cp_node;
-		corepair.cp_part->dp_state = flags & GFP_LOCKED
-		                             ? VM_DATAPART_STATE_LOCKED
-		                             : VM_DATAPART_STATE_INCORE;
+		corepair.cp_part->dp_refcnt = 1;
+		corepair.cp_part->dp_srefs  = corepair.cp_node;
+		corepair.cp_part->dp_state  = flags & GFP_LOCKED
+		                              ? VM_DATAPART_STATE_LOCKED
+		                              : VM_DATAPART_STATE_INCORE;
 		corepair.cp_part->dp_pprop                      = (uintptr_t)-1;
 		corepair.cp_part->dp_ramdata.rd_blockv          = &corepair.cp_part->dp_ramdata.rd_block0;
 		corepair.cp_part->dp_ramdata.rd_block0.rb_size  = 1;
