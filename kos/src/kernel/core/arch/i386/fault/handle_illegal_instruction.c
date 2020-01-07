@@ -190,6 +190,25 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 #define WR_VEXREGQ(v) x86_icpustate_set64(state, (u8)((op_flags & F_VEX_VVVV_M) >> F_VEX_VVVV_S), v)
 #endif /* __x86_64__ */
 
+		/* Emulate syscall invocation methods not supported by the host */
+
+		case 0x0f34:
+			/* 0F 34       SYSENTER       Fast call to privilege level 0 system procedures. */
+			if unlikely(!isuser())
+				goto generic_illegal_instruction; /* Not allowed from kernel-space. */
+			/* sysenter emulation */
+			x86_syscall_emulate32_sysenter_r(state);
+
+#ifdef __x86_64__
+		case 0x0f05:
+			/* 0F 05       SYSCALL        Fast call to privilege level 0 system procedures. */
+			if unlikely(!isuser())
+				goto generic_illegal_instruction; /* Not allowed from kernel-space. */
+			/* syscall emulation */
+			x86_syscall_emulate64_int80h_r(state);
+#endif /* __x86_64__ */
+
+
 #ifndef __x86_64__
 		case 0x0fb0: {
 			u8 temp, value, newvalue;
@@ -397,14 +416,6 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 			}
 			set_pflags_mask(new_eflags, CF | PF | AF | SF | ZF | OF);
 		}	break;
-
-		case 0x0f34:
-			/* 0F 34       SYSENTER       Fast call to privilege level 0 system procedures. */
-			if unlikely(!isuser())
-				goto generic_illegal_instruction; /* Not allowed from kernel-space. */
-			/* sysenter emulation */
-			/* Direct emulation (allowing for low-level assembly callbacks). */
-			x86_syscall_emulate32_sysenter_r(state);
 
 		case 0x0fc8 ... 0x0fcf: {
 			/* BSWAP r32  -- Added with 80486 */
