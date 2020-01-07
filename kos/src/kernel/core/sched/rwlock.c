@@ -1338,7 +1338,7 @@ again:
 		desc = rwlock_find_readlock(self);
 		assertf(desc,
 		        "You're not holding any read-locks\n"
-		        "self                          = %p\n"
+		        "self                             = %p\n"
 		        "PERTASK(this_read_locks).rls_use = %Iu\n"
 		        "PERTASK(this_read_locks).rls_cnt = %Iu",
 		        self,
@@ -1548,7 +1548,7 @@ NOTHROW(KCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 		desc = rwlock_find_readlock(self);
 		assertf(desc,
 		        "You're not holding any read-locks\n"
-		        "self                          = %p\n"
+		        "self                             = %p\n"
 		        "PERTASK(this_read_locks).rls_use = %Iu\n"
 		        "PERTASK(this_read_locks).rls_cnt = %Iu",
 		        self,

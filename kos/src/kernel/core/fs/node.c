@@ -589,14 +589,14 @@ again:
 
 PUBLIC NOBLOCK bool
 NOTHROW(KCALL fs_filesystems_lock_endread)(void) {
-again:
 	if (rwlock_endread(&fs_filesystems.f_superlock))
 		return true;
+again_checkdel:
 	if unlikely(ATOMIC_READ(fs_filesystems_delblocks)) {
 		if (sync_trywrite(&fs_filesystems.f_superlock)) {
 			clear_fs_delblocks();
-			sync_downgrade(&fs_filesystems.f_superlock);
-			goto again;
+			sync_endwrite(&fs_filesystems.f_superlock);
+			goto again_checkdel;
 		}
 	}
 	return false;
@@ -3501,14 +3501,14 @@ NOTHROW(KCALL superblock_clear_all_caches_impl)(void) {
 	size_t result                 = 0;
 	struct superblock *last_block = NULL;
 	REF struct superblock *block;
+again:
 	if (!fs_filesystems_lock_tryread())
 		goto done;
-again:
-	block = fs_filesystems.f_superblocks;
 again_locked:
+	block = fs_filesystems.f_superblocks;
 	for (; block; block = block->s_filesystems.sn_next) {
 		if (last_block) {
-			if (block == last_block)
+			if (last_block == block)
 				last_block = NULL;
 			continue;
 		}

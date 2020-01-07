@@ -113,8 +113,13 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 				pc = (byte_t *)next_pc;
 			goto e_instruction_too_long;
 		}
-		printk(KERN_DEBUG "Illegal instruction %#I32x (from %p in %u)\n",
-		       opcode, orig_pc, task_getroottid_s());
+#ifdef __x86_64__
+		if (opcode != 0xf05) /* `syscall' (prevent spam if unsupported...) */
+#endif /* __x86_64__ */
+		{
+			printk(KERN_DEBUG "Illegal instruction %#I32x (from %p in %u)\n",
+			       opcode, orig_pc, task_getroottid_s());
+		}
 		switch (opcode) {
 
 #define get_al()       (u8)gpregs_getpax(&state->ics_gpregs)
