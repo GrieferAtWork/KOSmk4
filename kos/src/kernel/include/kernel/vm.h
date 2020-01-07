@@ -83,8 +83,8 @@ typedef unsigned int gfp_t;
 typedef __ARCH_PAGEID_TYPE pageid_t;
 #endif /* !__pageid_t_defined */
 #endif /* __CC__ */
-#define PAGEID_ENCODE        __ARCH_PAGEID_ENCODE
-#define PAGEID_DECODE        __ARCH_PAGEID_DECODE /* TODO: Go through all use-cases and optimize for `PAGEID_DECODE(_USER|_KERNEL)' */
+#define PAGEID_ENCODE __ARCH_PAGEID_ENCODE
+#define PAGEID_DECODE __ARCH_PAGEID_DECODE
 #ifdef __ARCH_PAGEID_DECODE_USER
 #define PAGEID_DECODE_USER(user_pageid) \
 	(__hybrid_assert(__ARCH_PAGEID_DECODE_ISUSER(user_pageid)), __ARCH_PAGEID_DECODE_USER(user_pageid))
