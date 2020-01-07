@@ -2841,6 +2841,8 @@
 #define __CRT_HAVE_x86_syscall_emulate32_int80h_r 1
 #define __CRT_HAVE_x86_syscall_emulate32_sysenter 1
 #define __CRT_HAVE_x86_syscall_emulate32_sysenter_r 1
+#define __CRT_HAVE_x86_syscall_emulate64_int80h 1
+#define __CRT_HAVE_x86_syscall_emulate64_int80h_r 1
 #define __CRT_HAVE_x86_syscall_emulate_int80h 1
 #define __CRT_HAVE_x86_syscall_emulate_int80h_r 1
 #define __CRT_HAVE_x86_syscall_emulate_sysenter_r 1

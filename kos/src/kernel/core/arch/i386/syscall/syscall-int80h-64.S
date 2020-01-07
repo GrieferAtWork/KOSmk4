@@ -228,11 +228,11 @@ PUBLIC_FUNCTION(x86_syscall_emulate_int80h_r)
 	 * >> if (temp == SEGMENT_USER_CODE32_RPL)
 	 * >>     DO_X32();
 	 * >> DO_X64(); */
-	movq   (8 + OFFSET_IRREGS64_CS)(%rsp), %rax
-	cmpq   $(SEGMENT_KERNEL_CODE), %rax
+	movw   (8 + OFFSET_IRREGS64_CS)(%rsp), %ax
+	cmpw   $(SEGMENT_KERNEL_CODE), %ax
 	.cfi_remember_state
 	je     .Lsyscall_emulate_rpc_redirection_cs
-1:	cmpq   $(SEGMENT_USER_CODE32_RPL), %rax
+1:	cmpw   $(SEGMENT_USER_CODE32_RPL), %ax
 	popq_cfi_r %rax
 
 	/* Define internal labels to allow for self-modifying code! */
@@ -249,10 +249,52 @@ INTERN_OBJECT(x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80)
 END(x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80)
 .Lsyscall_emulate_rpc_redirection_cs:
 	.cfi_restore_state
-	movq   %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS64_CS), %rax
+	movw   %gs:(this_x86_rpc_redirection_iret + OFFSET_IRREGS64_CS), %ax
 	jmp    1b
 	.cfi_endproc
 END(x86_syscall_emulate_int80h_r)
+
+.section .text
+PUBLIC_FUNCTION(x86_syscall_emulate32_int80h_r)
+	.cfi_startproc simple
+	/* `struct icpustate *%rdi'
+	 * NOTE: ENDOF(%rdi->IRREGS) is located at the end (top) of our kernel-stack! */
+	.cfi_signal_frame
+	.cfi_def_cfa %rdi, 0
+	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	movq   %rdi, %rsp /* No need to disable interrupts, since this stack switch is atomic! */
+	.cfi_def_cfa_register %rsp
+	/* Restore user-space registers. */
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
+
+	.byte  0xe9 /* jmp */
+INTERN_OBJECT(x86_syscall_emulate32_int80h_r_rel_x86_syscall64x32_int80)
+	.reloc ., R_X86_64_PC32, x86_syscall64x32_int80 - 4
+	.long  0
+END(x86_syscall_emulate32_int80h_r_rel_x86_syscall64x32_int80)
+	.cfi_endproc
+END(x86_syscall_emulate32_int80h_r)
+
+.section .text
+PUBLIC_FUNCTION(x86_syscall_emulate64_int80h_r)
+	.cfi_startproc simple
+	/* `struct icpustate *%rdi'
+	 * NOTE: ENDOF(%rdi->IRREGS) is located at the end (top) of our kernel-stack! */
+	.cfi_signal_frame
+	.cfi_def_cfa %rdi, 0
+	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+	movq   %rdi, %rsp /* No need to disable interrupts, since this stack switch is atomic! */
+	.cfi_def_cfa_register %rsp
+	/* Restore user-space registers. */
+	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
+
+	.byte  0xe9 /* jmp */
+INTERN_OBJECT(x86_syscall_emulate64_int80h_r_rel_x86_syscall64x64_int80)
+	.reloc ., R_X86_64_PC32, x86_syscall64x64_int80 - 4
+	.long  0
+END(x86_syscall_emulate64_int80h_r_rel_x86_syscall64x64_int80)
+	.cfi_endproc
+END(x86_syscall_emulate64_int80h_r)
 
 
 .section .text.cold

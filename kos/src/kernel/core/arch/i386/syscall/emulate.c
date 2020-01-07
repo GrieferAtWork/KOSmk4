@@ -48,51 +48,97 @@
 
 DECL_BEGIN
 
-PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_int80h") struct icpustate *FCALL
-x86_syscall_emulate32_int80h(struct icpustate *__restrict state) {
+#ifdef __x86_64__
+#define IFELSEX3264(x32, x64) x64
+#else /* __x86_64__ */
+#define IFELSEX3264(x32, x64) x32
+#endif /* !__x86_64__ */
+
+/* NOTE: Generic system call emulation helpers are implemented as WEAK
+ *       because some of them have more efficient assembly versions in
+ *       some of the (32|64).S files within the same folder as this file.
+ *       As such, we simply define everything there is, and let the linker
+ *       get rid of the (inefficient) C versions if assembly versions have
+ *       been defined. */
+
+/* Emulate x32:int80h */
+PUBLIC ATTR_WEAK IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_int80h"),
+                             ATTR_SECTION(".text.x86.x86_syscall_emulate32_int80h")) struct icpustate *FCALL
+IFELSEX3264(x86_syscall_emulate_int80h, x86_syscall_emulate32_int80h)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_int80h(&sc, state);
 	return syscall_emulate32(state, &sc);
 }
 
-PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_int80h_r") void FCALL
-x86_syscall_emulate32_int80h_r(struct icpustate *__restrict state) {
+/* Emulate x32:int80h */
+PUBLIC ATTR_NORETURN ATTR_WEAK IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_int80h_r"),
+                                           ATTR_SECTION(".text.x86.x86_syscall_emulate32_int80h_r")) void FCALL
+IFELSEX3264(x86_syscall_emulate_int80h_r,
+            x86_syscall_emulate32_int80h_r)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_int80h(&sc, state);
-	syscall_emulate_r(state, &sc);
+	syscall_emulate32_r(state, &sc);
 }
 
-PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_sysenter") struct icpustate *FCALL
-x86_syscall_emulate32_sysenter(struct icpustate *__restrict state) {
+/* Emulate x32:sysenter */
+PUBLIC ATTR_WEAK IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_sysenter"),
+                             ATTR_SECTION(".text.x86.x86_syscall_emulate32_sysenter")) struct icpustate *FCALL
+IFELSEX3264(x86_syscall_emulate_sysenter, x86_syscall_emulate32_sysenter)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_sysenter(&sc, state);
 	return syscall_emulate32(state, &sc);
 }
 
-PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_sysenter_r") void FCALL
-x86_syscall_emulate32_sysenter_r(struct icpustate *__restrict state) {
+/* Emulate x32:sysenter */
+PUBLIC ATTR_NORETURN ATTR_WEAK IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_sysenter_r"),
+                                           ATTR_SECTION(".text.x86.x86_syscall_emulate32_sysenter_r")) void FCALL
+IFELSEX3264(x86_syscall_emulate_sysenter_r,
+            x86_syscall_emulate32_sysenter_r)(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_sysenter(&sc, state);
-	syscall_emulate_r(state, &sc);
+	syscall_emulate32_r(state, &sc);
 }
 
-PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_cdecl") struct icpustate *FCALL
-x86_syscall_emulate32_cdecl(struct icpustate *__restrict state,
-                            syscall_ulong_t sysno, bool enable_except) {
+/* Emulate x32:cdecl */
+PUBLIC ATTR_WEAK IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_cdecl"),
+                             ATTR_SECTION(".text.x86.x86_syscall_emulate32_cdecl")) struct icpustate *FCALL
+IFELSEX3264(x86_syscall_emulate_cdecl,
+            x86_syscall_emulate32_cdecl)(struct icpustate *__restrict state,
+                                         syscall_ulong_t sysno, bool enable_except) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_cdecl(&sc, state, sysno, enable_except);
 	return syscall_emulate32(state, &sc);
 }
 
-PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate32_cdecl_r") void FCALL
-x86_syscall_emulate32_cdecl_r(struct icpustate *__restrict state,
-                              syscall_ulong_t sysno, bool enable_except) {
+/* Emulate x32:cdecl */
+PUBLIC ATTR_NORETURN ATTR_WEAK IFELSEX3264(ATTR_SECTION(".text.x86.x86_syscall_emulate_cdecl_r"),
+                                           ATTR_SECTION(".text.x86.x86_syscall_emulate32_cdecl_r")) void FCALL
+IFELSEX3264(x86_syscall_emulate_cdecl_r,
+            x86_syscall_emulate32_cdecl_r)(struct icpustate *__restrict state,
+                                           syscall_ulong_t sysno, bool enable_except) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get32_cdecl(&sc, state, sysno, enable_except);
-	syscall_emulate_r(state, &sc);
+	syscall_emulate32_r(state, &sc);
 }
 
 #ifdef __x86_64__
+/* Emulate x32:int80h, x64:int80h or x64:syscall */
+PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate_int80h") struct icpustate *FCALL
+x86_syscall_emulate_int80h(struct icpustate *__restrict state) {
+	struct rpc_syscall_info sc;
+	rpc_syscall_info_get64_int80h(&sc, state);
+	return syscall_emulate(state, &sc);
+}
+
+/* Emulate x32:int80h, x64:int80h or x64:syscall */
+PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate_int80h_r") void FCALL
+x86_syscall_emulate_int80h_r(struct icpustate *__restrict state) {
+	struct rpc_syscall_info sc;
+	rpc_syscall_info_get64_int80h(&sc, state);
+	syscall_emulate_r(state, &sc);
+}
+
+/* Emulate x64:int80h or x64:syscall */
 PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_int80h") struct icpustate *FCALL
 x86_syscall_emulate64_int80h(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
@@ -100,27 +146,30 @@ x86_syscall_emulate64_int80h(struct icpustate *__restrict state) {
 	return syscall_emulate64(state, &sc);
 }
 
+/* Emulate x64:int80h or x64:syscall */
 PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_int80h_r") void FCALL
 x86_syscall_emulate64_int80h_r(struct icpustate *__restrict state) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get64_int80h(&sc, state);
-	syscall_emulate_r(state, &sc);
+	syscall_emulate64_r(state, &sc);
 }
 
-PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_sysvabi") struct icpustate *FCALL
-x86_syscall_emulate64_sysvabi(struct icpustate *__restrict state,
-                              syscall_ulong_t sysno, bool enable_except) {
+/* Emulate x64:sysvabi */
+PUBLIC ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate_sysvabi") struct icpustate *FCALL
+x86_syscall_emulate_sysvabi(struct icpustate *__restrict state,
+                            syscall_ulong_t sysno, bool enable_except) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get64_sysvabi(&sc, state, sysno, enable_except);
 	return syscall_emulate64(state, &sc);
 }
 
-PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate64_sysvabi_r") void FCALL
-x86_syscall_emulate64_sysvabi_r(struct icpustate *__restrict state,
-                                syscall_ulong_t sysno, bool enable_except) {
+/* Emulate x64:sysvabi */
+PUBLIC ATTR_NORETURN ATTR_WEAK ATTR_SECTION(".text.x86.x86_syscall_emulate_sysvabi_r") void FCALL
+x86_syscall_emulate_sysvabi_r(struct icpustate *__restrict state,
+                              syscall_ulong_t sysno, bool enable_except) {
 	struct rpc_syscall_info sc;
 	rpc_syscall_info_get64_sysvabi(&sc, state, sysno, enable_except);
-	syscall_emulate_r(state, &sc);
+	syscall_emulate64_r(state, &sc);
 }
 #endif /* __x86_64__ */
 

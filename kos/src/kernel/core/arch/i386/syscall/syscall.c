@@ -102,6 +102,8 @@ NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
 #ifdef __x86_64__
 INTDEF s32 x86_syscall_emulate_int80h_r_rel_x86_syscall64x64_int80;
 INTDEF s32 x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80;
+INTDEF s32 x86_syscall_emulate64_int80h_r_rel_x86_syscall64x64_int80;
+INTDEF s32 x86_syscall_emulate32_int80h_r_rel_x86_syscall64x32_int80;
 #else /* __x86_64__ */
 INTDEF s32 x86_syscall_emulate_int80h_r_rel_x86_idt_syscall;
 #endif /* !__x86_64__ */
@@ -125,12 +127,14 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	SCOPED_WRITELOCK(&syscall_tracing_lock);
 	/* Re-write assembly to jump to tracing handlers. */
 #ifdef __x86_64__
-	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_syscall64x64_int80,
-	           enable ? (void *)&x86_syscall64x64_int80_traced
-	                  : (void *)&x86_syscall64x64_int80);
-	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80,
-	           enable ? (void *)&x86_syscall64x32_int80_traced
-	                  : (void *)&x86_syscall64x32_int80);
+	addr = enable ? (void *)&x86_syscall64x64_int80_traced
+	              : (void *)&x86_syscall64x64_int80;
+	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_syscall64x64_int80, addr);
+	setpcrel32(&x86_syscall_emulate64_int80h_r_rel_x86_syscall64x64_int80, addr);
+	addr = enable ? (void *)&x86_syscall64x32_int80_traced
+	              : (void *)&x86_syscall64x32_int80;
+	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80, addr);
+	setpcrel32(&x86_syscall_emulate32_int80h_r_rel_x86_syscall64x32_int80, addr);
 #else /* __x86_64__ */
 	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_idt_syscall,
 	           enable ? (void *)&x86_syscall32_int80_traced

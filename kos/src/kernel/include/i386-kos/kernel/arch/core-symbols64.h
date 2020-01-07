@@ -3050,10 +3050,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys32_getpgid; .quad sys32_getpgid
 	.reloc ., R_X86_64_SIZE32, sys32_getpgid; .int 0
 	.int 0x6cd05d4
-	.quad 0 /* index: 762 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname762 /* index: 762 */
+	.weak x86_syscall_emulate64_int80h; .quad x86_syscall_emulate64_int80h
+	.reloc ., R_X86_64_SIZE32, x86_syscall_emulate64_int80h; .int 0
+	.int 0x2dd5448
 	.quad 0 /* index: 763 */
 	.quad 0
 	.int 0
@@ -16282,10 +16282,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_mincore; .quad sys_mincore
 	.reloc ., R_X86_64_SIZE32, sys_mincore; .int 0
 	.int 0x39fafe5
-	.quad 0 /* index: 4070 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname4070 /* index: 4070 */
+	.weak x86_syscall_emulate64_int80h_r; .quad x86_syscall_emulate64_int80h_r
+	.reloc ., R_X86_64_SIZE32, x86_syscall_emulate64_int80h_r; .int 0
+	.int 0xd5450b2
 	.quad .Lname4071 /* index: 4071 */
 	.weak memchrw; .quad memchrw
 	.reloc ., R_X86_64_SIZE32, memchrw; .int 0
@@ -17496,6 +17496,8 @@ END(kernel_symbol_table)
 	.string "vm_readphysw"
 .Lname761:
 	.string "sys32_getpgid"
+.Lname762:
+	.string "x86_syscall_emulate64_int80h"
 .Lname764:
 	.string "sys32_geteuid"
 .Lname765:
@@ -22080,6 +22082,8 @@ END(kernel_symbol_table)
 	.string "fpustate_init"
 .Lname4069:
 	.string "sys_mincore"
+.Lname4070:
+	.string "x86_syscall_emulate64_int80h_r"
 .Lname4071:
 	.string "memchrw"
 .Lname4073:

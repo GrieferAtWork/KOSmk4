@@ -70,36 +70,55 @@ struct rpc_syscall_info;
 
 /* Emulate a system call invocation, given a user-space register state. */
 #ifdef __x86_64__
-#define x86_syscall_emulate64_int80h    x86_syscall_emulate_int80h
-#define x86_syscall_emulate64_sysvabi   x86_syscall_emulate_sysvabi
-#define x86_syscall_emulate64_int80h_r  x86_syscall_emulate_int80h_r
-#define x86_syscall_emulate64_sysvabi_r x86_syscall_emulate_sysvabi_r
+/* emulation with automatic target detection (either x32 or x64) */
+FUNDEF struct icpustate *FCALL x86_syscall_emulate_int80h(struct icpustate *__restrict state);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate_int80h_r(struct icpustate *__restrict state);
+/* x32-specific emulation */
+FUNDEF struct icpustate *FCALL x86_syscall_emulate32_int80h(struct icpustate *__restrict state);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate32_int80h_r(struct icpustate *__restrict state);
+FUNDEF struct icpustate *FCALL x86_syscall_emulate32_sysenter(struct icpustate *__restrict state);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate32_sysenter_r(struct icpustate *__restrict state);
+FUNDEF struct icpustate *FCALL x86_syscall_emulate32_cdecl(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate32_cdecl_r(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+/* x64-specific emulation */
+FUNDEF struct icpustate *FCALL x86_syscall_emulate_sysvabi(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate_sysvabi_r(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
 FUNDEF struct icpustate *FCALL x86_syscall_emulate64_int80h(struct icpustate *__restrict state);
-FUNDEF struct icpustate *FCALL x86_syscall_emulate64_sysvabi(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
 FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate64_int80h_r(struct icpustate *__restrict state);
-FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate64_sysvabi_r(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+#define x86_syscall_emulate64_sysvabi   x86_syscall_emulate_sysvabi
+#define x86_syscall_emulate64_sysvabi_r x86_syscall_emulate_sysvabi_r
 #else /* __x86_64__ */
+FUNDEF struct icpustate *FCALL x86_syscall_emulate_int80h(struct icpustate *__restrict state);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate_int80h_r(struct icpustate *__restrict state);
+FUNDEF struct icpustate *FCALL x86_syscall_emulate_sysenter(struct icpustate *__restrict state);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate_sysenter_r(struct icpustate *__restrict state);
+FUNDEF struct icpustate *FCALL x86_syscall_emulate_cdecl(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
+FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate_cdecl_r(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
 #define x86_syscall_emulate32_int80h     x86_syscall_emulate_int80h
-#define x86_syscall_emulate32_sysenter   x86_syscall_emulate_sysenter
-#define x86_syscall_emulate32_cdecl      x86_syscall_emulate_cdecl
 #define x86_syscall_emulate32_int80h_r   x86_syscall_emulate_int80h_r
+#define x86_syscall_emulate32_sysenter   x86_syscall_emulate_sysenter
 #define x86_syscall_emulate32_sysenter_r x86_syscall_emulate_sysenter_r
+#define x86_syscall_emulate32_cdecl      x86_syscall_emulate_cdecl
 #define x86_syscall_emulate32_cdecl_r    x86_syscall_emulate_cdecl_r
 #endif /* !__x86_64__ */
-FUNDEF struct icpustate *FCALL x86_syscall_emulate32_int80h(struct icpustate *__restrict state);
-FUNDEF struct icpustate *FCALL x86_syscall_emulate32_sysenter(struct icpustate *__restrict state);
-FUNDEF struct icpustate *FCALL x86_syscall_emulate32_cdecl(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
-FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate32_int80h_r(struct icpustate *__restrict state);
-FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate32_sysenter_r(struct icpustate *__restrict state);
-FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate32_cdecl_r(struct icpustate *__restrict state, __syscall_ulong_t sysno, bool enable_except);
 
 /* Emulate a system call using a standard function call */
 #ifdef __x86_64__
-#define syscall_emulate_callback   x86_syscall_emulate64_sysvabi
-#define syscall_emulate_callback_r x86_syscall_emulate64_sysvabi_r
+#define syscall_emulate_callback(state, sysno, enable_except)                            \
+	(icpustate_is64bit(state) ? x86_syscall_emulate_sysvabi(state, sysno, enable_except) \
+	                          : x86_syscall_emulate32_cdecl(state, sysno, enable_except))
+#define syscall_emulate_callback_r(state, sysno, enable_except)                            \
+	(icpustate_is64bit(state) ? x86_syscall_emulate_sysvabi_r(state, sysno, enable_except) \
+	                          : x86_syscall_emulate32_cdecl_r(state, sysno, enable_except))
+#define syscall_emulate32_callback   x86_syscall_emulate32_cdecl
+#define syscall_emulate32_callback_r x86_syscall_emulate32_cdecl_r
+#define syscall_emulate64_callback   x86_syscall_emulate_sysvabi
+#define syscall_emulate64_callback_r x86_syscall_emulate_sysvabi_r
 #else /* __x86_64__ */
-#define syscall_emulate_callback   x86_syscall_emulate32_cdecl
-#define syscall_emulate_callback_r x86_syscall_emulate32_cdecl_r
+#define syscall_emulate_callback     x86_syscall_emulate_cdecl
+#define syscall_emulate_callback_r   x86_syscall_emulate_cdecl_r
+#define syscall_emulate32_callback   x86_syscall_emulate_cdecl
+#define syscall_emulate32_callback_r x86_syscall_emulate_cdecl_r
 #endif /* !__x86_64__ */
 
 /* Emulate the execution of a system call.
@@ -122,8 +141,11 @@ syscall_emulate32(struct icpustate *__restrict state,
 FUNDEF WUNUSED struct icpustate *FCALL
 syscall_emulate64(struct icpustate *__restrict state,
                   struct rpc_syscall_info *__restrict sc_info);
+#define syscall_emulate32_r syscall_emulate_r
+#define syscall_emulate64_r syscall_emulate_r
 #else /* __x86_64__ */
-#define syscall_emulate32 syscall_emulate
+#define syscall_emulate32   syscall_emulate
+#define syscall_emulate32_r syscall_emulate_r
 #endif /* !__x86_64__ */
 
 DECL_END

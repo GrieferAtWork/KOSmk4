@@ -30,12 +30,16 @@ __DECL_BEGIN
 
 #ifndef USERKERN_SYSCALL_ENCODE
 /* Encode a system call number for use as an offset to the userkern descriptor. */
-#define USERKERN_SYSCALL_ENCODE(no)           ((((no) & 0x80000000) >> 15) | ((no) & 0xffff))
-#define USERKERN_SYSCALL_ENCODE_EX(no,except) ((((no) & 0x80000000) >> 15) | ((no) & 0xffff) | ((except) ? USERKERN_SYSCALL_EXCEPTBIT : 0))
-#define USERKERN_SYSCALL_DECODE(no)           ((((no) & 0x10000) << 15) | ((no) & 0xffff))
-#define USERKERN_SYSCALL_ISVALID(no)            ((no) <= USERKERN_SYSCALL_MAXVALID)
-#define USERKERN_SYSCALL_MAXVALID                        0x3ffff
-#define USERKERN_SYSCALL_EXCEPTBIT                       0x20000
+#define USERKERN_SYSCALL_ENCODE(no)            ((no) & 0x1ffff)
+#define USERKERN_SYSCALL_ENCODE_EX(no, except) (((no) & 0x1ffff) | ((except) ? USERKERN_SYSCALL_EXCEPTBIT : 0))
+#if __SIZEOF_SYSCALL_LONG_T__ >= 8
+#define USERKERN_SYSCALL_DECODE(no)  ((((no) & 0x10000) ? __UINT64_C(0xffffffffffff0000) : __UINT64_C(0)) | ((no) & __UINT64_C(0xffff)))
+#else /* __SIZEOF_SYSCALL_LONG_T__ >= 8 */
+#define USERKERN_SYSCALL_DECODE(no)  ((((no) & 0x10000) ? __UINT32_C(0xffff0000) : __UINT32_C(0)) | ((no) & __UINT32_C(0xffff)))
+#endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
+#define USERKERN_SYSCALL_ISVALID(no) ((no) <= USERKERN_SYSCALL_MAXVALID)
+#define USERKERN_SYSCALL_MAXVALID    0x3ffff
+#define USERKERN_SYSCALL_EXCEPTBIT   0x20000
 #endif /* !USERKERN_SYSCALL_ENCODE */
 
 
