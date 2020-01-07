@@ -131,9 +131,9 @@ struct vm86_state_struct {
  * s.a. `https://wiki.osdev.org/Real_Mode#Addressing_Modes' */
 #define vm86_state_hasstack(self, num_bytes) ((self)->vr_regs.vr_sp < (__uint16_t)((__uint16_t)0-(num_bytes)))
 #define vm86_state_sp(self)  VM86_ADDR((self)->vr_regs.vr_ss, (self)->vr_regs.vr_sp)
+#define vm86_state_si(self)  VM86_ADDR((self)->vr_regs.vr_ds, (self)->vr_regs.vr_si)
+#define vm86_state_di(self)  VM86_ADDR((self)->vr_regs.vr_es, (self)->vr_regs.vr_di)
 #define vm86_state_ip(self)  VM86_ADDR((self)->vr_regs.vr_cs, (self)->vr_regs.vr_ip)
-#define vm86_state_di(self)  VM86_ADDR((self)->vr_regs.vr_ds, (self)->vr_regs.vr_di)
-#define vm86_state_si(self)  VM86_ADDR((self)->vr_regs.vr_es, (self)->vr_regs.vr_si)
 
 #endif /* __CC__ */
 
