@@ -86,14 +86,16 @@ typedef __ARCH_PAGEID_TYPE pageid_t;
 #define PAGEID_ENCODE        __ARCH_PAGEID_ENCODE
 #define PAGEID_DECODE        __ARCH_PAGEID_DECODE /* TODO: Go through all use-cases and optimize for `PAGEID_DECODE(_USER|_KERNEL)' */
 #ifdef __ARCH_PAGEID_DECODE_USER
-#define PAGEID_DECODE_USER   __ARCH_PAGEID_DECODE_USER
+#define PAGEID_DECODE_USER(user_pageid) \
+	(__hybrid_assert(__ARCH_PAGEID_DECODE_ISUSER(user_pageid)), __ARCH_PAGEID_DECODE_USER(user_pageid))
 #else /* __ARCH_PAGEID_DECODE_USER */
-#define PAGEID_DECODE_USER   __ARCH_PAGEID_DECODE
+#define PAGEID_DECODE_USER(user_pageid) __ARCH_PAGEID_DECODE(user_pageid)
 #endif /* !__ARCH_PAGEID_DECODE_USER */
 #ifdef __ARCH_PAGEID_DECODE_KERNEL
-#define PAGEID_DECODE_KERNEL __ARCH_PAGEID_DECODE_KERNEL
+#define PAGEID_DECODE_KERNEL(kernel_pageid) \
+	(__hybrid_assert(__ARCH_PAGEID_DECODE_ISKERNEL(kernel_pageid)), __ARCH_PAGEID_DECODE_KERNEL(kernel_pageid))
 #else /* __ARCH_PAGEID_DECODE_KERNEL */
-#define PAGEID_DECODE_KERNEL __ARCH_PAGEID_DECODE
+#define PAGEID_DECODE_KERNEL(kernel_pageid) __ARCH_PAGEID_DECODE(kernel_pageid)
 #endif /* !__ARCH_PAGEID_DECODE_KERNEL */
 
 /* Check if a given `pageid' or [startpageid,endpageid)

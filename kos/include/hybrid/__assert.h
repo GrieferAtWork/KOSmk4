@@ -31,17 +31,17 @@ __NAMESPACE_INT_END
 #define __hybrid_assertf __NAMESPACE_INT_SYM __hybrid_check_assertionf
 #elif defined(NDEBUG)
 #ifdef __NO_builtin_assume
-#define __hybrid_assert(expr)   __builtin_assume(expr)
+#define __hybrid_assert        __builtin_assume
 #else /* __NO_builtin_assume */
 #define __hybrid_assert(expr)  (void)0
 #endif /* !__NO_builtin_assume */
 #else /* NDEBUG */
 #include <assert.h>
-#define __hybrid_assert(expr)   assert(expr)
+#define __hybrid_assert  assert
 #ifdef __assertf
-#define __hybrid_assertf        __assertf
+#define __hybrid_assertf __assertf
 #elif defined(assertf)
-#define __hybrid_assertf        assertf
+#define __hybrid_assertf assertf
 #endif
 #ifdef __assertion_failed
 #define __hybrid_assertion_failed __assertion_failed

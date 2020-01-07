@@ -50,20 +50,32 @@
 extern "C++" {
 #define __ARCH_PAGEID_ENCODE __ARCH_PAGEID_ENCODE
 #define __ARCH_PAGEID_DECODE __ARCH_PAGEID_DECODE
+#define __ARCH_PAGEID_DECODE_USER __ARCH_PAGEID_DECODE_USER
+#define __ARCH_PAGEID_DECODE_KERNEL __ARCH_PAGEID_DECODE_KERNEL
+#define __ARCH_PAGEID_DECODE_ISUSER __ARCH_PAGEID_DECODE_ISUSER
+#define __ARCH_PAGEID_DECODE_ISKERNEL __ARCH_PAGEID_DECODE_ISKERNEL
 __UINT64_TYPE__ (__ARCH_PAGEID_ENCODE)(void *addr);
 __UINT64_TYPE__ (__ARCH_PAGEID_ENCODE)(__UINTPTR_TYPE__ addr);
-void *(__ARCH_PAGEID_DECODE)(__UINT64_TYPE__ addr);
+void *(__ARCH_PAGEID_DECODE)(__UINT64_TYPE__ pageid);
+void *(__ARCH_PAGEID_DECODE_USER)(__UINT64_TYPE__ userspace_pageid);
+void *(__ARCH_PAGEID_DECODE_KERNEL)(__UINT64_TYPE__ kernelspace_pageid);
+__BOOL (__ARCH_PAGEID_DECODE_ISUSER)(__UINT64_TYPE__ pageid);
+__BOOL (__ARCH_PAGEID_DECODE_ISKERNEL)(__UINT64_TYPE__ pageid);
 }
 #else /* __INTELLISENSE__ && __CC__ && __cplusplus */
 #define __ARCH_PAGEID_ENCODE(addr) ((__CCAST(__UINT64_TYPE__)(addr) >> 12) & __ARCH_PAGEID_MAX)
+#define __ARCH_PAGEID_DECODE_USER(user_pageid)     __CCAST(void *)((__UINT64_TYPE__)(user_pageid) << 12)
+#define __ARCH_PAGEID_DECODE_KERNEL(kernel_pageid) __CCAST(void *)(((__UINT64_TYPE__)(kernel_pageid) << 12) | __UINT64_C(0xffff800000000000))
+#define __ARCH_PAGEID_DECODE_ISUSER(pageid)   (((pageid) & __UINT64_C(0x800000000)) == 0)
+#define __ARCH_PAGEID_DECODE_ISKERNEL(pageid) (((pageid) & __UINT64_C(0x800000000)) != 0)
 /* Re-construct the sign extension for kernel-space addresses */
 #ifdef __CC__
 #define __ARCH_PAGEID_DECODE(pageid) \
 	((void *)(((__INT64_TYPE__)(pageid) << 28) >> 16))
 #else /* __CC__ */
 #define __ARCH_PAGEID_DECODE(pageid)                             \
-	(((((pageid) >> 35) & 1) * __UINT64_C(0xffff000000000000)) | \
-	 ((pageid)&__UINT64_C(0x7ffffffff)) << 12)
+	(((((pageid) >> 35) & 1) * __UINT64_C(0xffff800000000000)) | \
+	 ((pageid) & __UINT64_C(0x7ffffffff)) << 12)
 #endif /* !__CC__ */
 #endif /* !__INTELLISENSE__ || !__CC__ || !__cplusplus */
 #else /* __x86_64__ */
