@@ -817,11 +817,11 @@ NOTHROW(LIBANSITTY_CC vga_tty_putc)(struct ansitty *__restrict UNUSED(self),
 	u8 cp_ch;
 #if 1
 	{
-		INTDEF port_t debug_port;
-		if (debug_port) {
+		INTDEF port_t x86_syslog_port;
+		if (x86_syslog_port) {
 			char buf[UNICODE_UTF8_CURLEN];
 			size_t buflen = (size_t)(unicode_writeutf8(buf, ch) - buf);
-			outsb(debug_port, buf, buflen);
+			outsb(x86_syslog_port, buf, buflen);
 		}
 	}
 #endif

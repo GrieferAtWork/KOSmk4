@@ -30,6 +30,12 @@ struct kcpustate;
 struct icpustate;
 struct scpustate;
 
+/* Returns non-zero if the kernel has been poisoned.
+ * This is the case after any of the panic functions have been called,
+ * or an assertion failure/check was triggered. - Basically, it is non-
+ * zero when the kernel may be in an inconsistent state. */
+#define kernel_poisoned() 0
+
 /* Cause kernel panic. */
 FUNDEF ATTR_NORETURN ATTR_COLD void KCALL kernel_panic_here(void);
 FUNDEF ATTR_NORETURN ATTR_COLD void VCALL kernel_panic(char const *format, ...);

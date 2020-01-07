@@ -16,35 +16,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_PRINTK_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_PRINTK_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_SYSLOG_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_SYSLOG_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
 
 DECL_BEGIN
 
-#define KERN_EMERG   "\001" "0"
-#define KERN_ALERT   "\001" "1"
-#define KERN_CRIT    "\001" "2"
-#define KERN_ERR     "\001" "3"
-#define KERN_WARNING "\001" "4"
-#define KERN_NOTICE  "\001" "5"
-#define KERN_INFO    "\001" "6"
-#define KERN_TRACE   "\001" "7"
-#define KERN_DEBUG   "\001" "8"
-#define KERN_DEFAULT "\001" "9"
-#define KERN_RAW     "\001" ":"
-
 #ifdef __CC__
-FUNDEF NOBLOCK ssize_t (VCALL printk)(char const *__restrict format, ...);
-FUNDEF NOBLOCK ssize_t (KCALL vprintk)(char const *__restrict format, __builtin_va_list args);
 
-/* @param: level: [0..1] The print level (One of `KERN_*'). */
-FUNDEF NOBLOCK ssize_t (KCALL kprinter)(void *level, char const *__restrict data, size_t datalen);
+struct syslog_sink;
+
+/* The x86 hook for the arch-specific, default system log sink */
+DATDEF struct syslog_sink x86_default_syslog_sink;
+
+#define ARCH_DEFAULT_SYSLOG_SINK (&x86_default_syslog_sink)
+
 #endif /* __CC__ */
-
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_PRINTK_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_SYSLOG_H */

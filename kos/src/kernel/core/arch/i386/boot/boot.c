@@ -55,7 +55,7 @@ struct fcpustate32 boot_cpustate;
 PUBLIC ATTR_USED ATTR_SECTION(".data.cold")
 struct boot_device_info boot_device = { 0xff, 0xff, 0xff, 0xff };
 
-INTDEF port_t debug_port;
+INTDEF port_t x86_syslog_port;
 
 #define MAKE_DWORD(a, b, c, d) \
 	((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
@@ -85,9 +85,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       in your .bxrc file
 	 */
 	if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U'))
-		debug_port = (port_t)0x3f8;
+		x86_syslog_port = (port_t)0x3f8;
 	else if (x86_bootcpu_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
-		debug_port = (port_t)0xe9;
+		x86_syslog_port = (port_t)0xe9;
 	}
 
 	x86_initialize_cmos();

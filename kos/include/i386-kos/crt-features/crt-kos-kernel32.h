@@ -462,6 +462,11 @@
 #define __CRT_HAVE_disasm_print_symbol 1
 #define __CRT_HAVE_disasm_print_until 1
 #define __CRT_HAVE_disasm_single 1
+#define __CRT_HAVE_dmesg_buffer 1
+#define __CRT_HAVE_dmesg_consistent 1
+#define __CRT_HAVE_dmesg_secondsbase 1
+#define __CRT_HAVE_dmesg_sink 1
+#define __CRT_HAVE_dmesg_size 1
 #define __CRT_HAVE_driver_at_address 1
 #define __CRT_HAVE_driver_clear_fde_cache 1
 #define __CRT_HAVE_driver_clear_fde_caches 1
@@ -1801,6 +1806,12 @@
 #define __CRT_HAVE_syscall_trace 1
 #define __CRT_HAVE_syscall_tracing_getenabled 1
 #define __CRT_HAVE_syscall_tracing_setenabled 1
+#define __CRT_HAVE_syslog_levels 1
+#define __CRT_HAVE_syslog_packet_broadcast 1
+#define __CRT_HAVE_syslog_printer 1
+#define __CRT_HAVE_syslog_sink_destroy 1
+#define __CRT_HAVE_syslog_sink_register 1
+#define __CRT_HAVE_syslog_sink_unregister 1
 #define __CRT_HAVE_system_clearcaches 1
 #define __CRT_HAVE_system_clearcaches_s 1
 #define __CRT_HAVE_system_rtld 1
@@ -2404,6 +2415,7 @@
 #define __CRT_HAVE_x86_dbggdt_ptr 1
 #define __CRT_HAVE_x86_dbgidt 1
 #define __CRT_HAVE_x86_dbgidt_ptr 1
+#define __CRT_HAVE_x86_default_syslog_sink 1
 #define __CRT_HAVE_x86_emulock_cmpxchg16 1
 #define __CRT_HAVE_x86_emulock_cmpxchg32 1
 #define __CRT_HAVE_x86_emulock_cmpxchg64 1
