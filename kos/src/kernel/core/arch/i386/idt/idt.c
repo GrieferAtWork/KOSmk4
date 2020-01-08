@@ -227,6 +227,7 @@ NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 	assert(sync_writing(&x86_idt_modify_lock));
 	assert(x86_idt_modify_copy);
 	copy = x86_idt_modify_copy;
+	x86_idt_modify_copy = NULL;
 	/* Check if we're supposed to discard any changes made. */
 	if (discard_changes)
 		memcpy(x86_dbgidt, copy, 256, sizeof(struct idt_segment));
