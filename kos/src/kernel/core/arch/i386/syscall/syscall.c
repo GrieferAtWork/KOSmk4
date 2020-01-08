@@ -78,7 +78,7 @@ DECL_BEGIN
 PRIVATE ATTR_COLDBSS struct mutex syscall_tracing_lock = MUTEX_INIT;
 INTERN ATTR_COLDBSS bool syscall_tracing_enabled = false;
 
-
+#ifndef CONFIG_NO_SMP
 PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
                                    void *args[CPU_IPI_ARGCOUNT]) {
@@ -98,6 +98,7 @@ NOTHROW(FCALL syscall_tracing_ipi)(struct icpustate *__restrict state,
 	__lidt_p(&x86_idt_ptr);
 	return state;
 }
+#endif /* !CONFIG_NO_SMP */
 
 #ifdef __x86_64__
 INTDEF s32 x86_syscall_emulate_int80h_r_rel_x86_syscall64x64_int80;
@@ -126,10 +127,25 @@ NOTHROW(FCALL setpcrel32)(s32 *pcrel, void *dest) {
  * @return: false: Tracing was already enabled/disabled. */
 PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	bool result;
-	void *argv[CPU_IPI_ARGCOUNT];
 	struct idt_segment newsyscall;
 	void *addr;
 	SCOPED_WRITELOCK(&syscall_tracing_lock);
+
+	addr = enable ? (void *)&x86_syscall32_int80_traced
+	              : (void *)&x86_syscall32_int80;
+#ifdef __x86_64__
+	newsyscall.i_seg.s_u = SEGMENT_INTRGATE_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+	newsyscall.i_ext.s_u = SEGMENT_INTRGATE_HI_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+#else /* __x86_64__ */
+	newsyscall.i_seg.s_ul = SEGMENT_INTRGATE_INIT_UL((uintptr_t)addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+	newsyscall.i_seg.s_uh = SEGMENT_INTRGATE_INIT_UH((uintptr_t)addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+#endif /* !__x86_64__ */
+	/* WARNING: This call right here can throw an exception!
+	 *          As such, it has to be kept near the top of this function. */
+	x86_idt_modify_begin();
+	x86_idt[0x80] = newsyscall;
+	x86_idt_modify_end();
+
 	/* Re-write assembly to jump to tracing handlers. */
 #ifdef __x86_64__
 	addr = enable ? (void *)&x86_syscall64x64_int80_traced
@@ -141,9 +157,7 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_syscall64x32_int80, addr);
 	setpcrel32(&x86_syscall_emulate32_int80h_r_rel_x86_syscall64x32_int80, addr);
 #else /* __x86_64__ */
-	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_idt_syscall,
-	           enable ? (void *)&x86_syscall32_int80_traced
-	                  : (void *)&x86_syscall32_int80);
+	setpcrel32(&x86_syscall_emulate_int80h_r_rel_x86_idt_syscall, addr);
 #endif /* !__x86_64__ */
 
 	/* Modify `syscall_emulate_r()' */
@@ -158,40 +172,30 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 #undef SYSCALL_EMULATE_DONT_TRACE_WORD
 	/* TODO: INVALIDATE_INSTRUCTION_CACHE(); */
 
-	argv[0] = (void *)(enable ? (uintptr_t)1 : (uintptr_t)0);
-	addr = enable ? (void *)&x86_syscall32_int80
-	              : (void *)&x86_syscall32_int80_traced;
-#ifdef __x86_64__
-	newsyscall.i_seg.s_u = SEGMENT_INTRGATE_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
-	newsyscall.i_ext.s_u = SEGMENT_INTRGATE_HI_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
-#else /* __x86_64__ */
-	newsyscall.i_seg.s_ul = SEGMENT_INTRGATE_INIT_UL((uintptr_t)addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
-	newsyscall.i_seg.s_uh = SEGMENT_INTRGATE_INIT_UH((uintptr_t)addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
-#endif /* !__x86_64__ */
-	/* TODO: This method of changing the IDT is racy.
-	 *       A proper solution would be to:
-	 *         - Temporary copy the entire IDT somewhere else
-	 *         - Broadcast an IPI to have all other CPUs load the address of the IDT copy
-	 *         - Modify the original IDT
-	 *         - Broadcast an IPI to have all other CPUs load the original IDT
-	 *         - Free the copy */
-	x86_idt[0x80] = newsyscall;
-
 	result = syscall_tracing_enabled;
 	syscall_tracing_enabled = enable;
-	cpu_broadcastipi_notthis(&syscall_tracing_ipi,
-	                         argv,
+
+
+#ifndef CONFIG_NO_SMP
+	{
+		void *argv[CPU_IPI_ARGCOUNT];
+		argv[0] = (void *)(enable ? (uintptr_t)1 : (uintptr_t)0);
+		cpu_broadcastipi_notthis(&syscall_tracing_ipi,
+		                         argv,
 #if 1
-	                         CPU_IPI_FNORMAL
-	                         /* NOTE: Don't wake up deep-sleep CPUs!
-	                          *       When a CPU wakes up, it already has to go through all
-	                          *       of the initialization that also contains the part where
-	                          *       it needs to load its IDT according to tracing of syscalls
-	                          *       currently being enabled. */
+		                         CPU_IPI_FNORMAL
+		                         /* NOTE: Don't wake up deep-sleep CPUs!
+		                          *       When a CPU wakes up, it already has to go through all
+		                          *       of the initialization that also contains the part where
+		                          *       it needs to load its IDT according to tracing of syscalls
+		                          *       currently being enabled. */
 #else
-	                         CPU_IPI_FWAKEUP
+		                         CPU_IPI_FWAKEUP
 #endif
-	                         );
+		                         );
+	}
+#endif /* !CONFIG_NO_SMP */
+
 	if (CURRENT_X86_CPUID.ci_1d & CPUID_1D_SEP) {
 		__wrmsr(IA32_SYSENTER_EIP,
 		        enable ? (uintptr_t)&x86_syscall32_sysenter_traced
