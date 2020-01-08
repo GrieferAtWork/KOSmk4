@@ -247,7 +247,14 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	icpustate_user_to_kcpustate32(state, user_state);
 	/* Copy exception data onto the user-space stack. */
 	mydata = &THIS_EXCEPTION_DATA;
+#ifdef __x86_64__
+	/* Propagate class & sub-class individually, since the way in
+	 * which they form e_code is different in x32 and x64 mode. */
+	user_error->e_class    = (error_class32_t)mydata->e_class;
+	user_error->e_subclass = (error_subclass32_t)mydata->e_subclass;
+#else /* __x86_64__ */
 	user_error->e_code = (error_code32_t)mydata->e_code;
+#endif /* !__x86_64__ */
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		user_error->e_pointers[i] = (u32)mydata->e_pointers[i];
 	/* In case of a system call, set the fault
