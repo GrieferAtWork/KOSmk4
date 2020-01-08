@@ -53,6 +53,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <assert.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -199,21 +200,34 @@ x86_handle_illegal_instruction(struct icpustate *__restrict state) {
 
 		case 0x0f34:
 			/* 0F 34       SYSENTER       Fast call to privilege level 0 system procedures. */
+#ifdef __x86_64__
+			if unlikely(!(op_flags & F_IS_X32)) {
+				/* Only allowed from 32-bit user-space. */
+				goto e_unsupported_instruction;
+			}
+			assert(isuser());
+#else /* __x86_64__ */
 			if unlikely(!isuser())
-				goto generic_illegal_instruction; /* Not allowed from kernel-space. */
+				goto e_unsupported_instruction; /* Not allowed from kernel-space. */
+#endif /* !__x86_64__ */
 			/* sysenter emulation */
 			icpustate_setpc(state, (uintptr_t)pc);
 			x86_syscall_emulate32_sysenter_r(state);
 
-#ifdef __x86_64__
 		case 0x0f05:
 			/* 0F 05       SYSCALL        Fast call to privilege level 0 system procedures. */
-			if unlikely(!isuser())
-				goto generic_illegal_instruction; /* Not allowed from kernel-space. */
+#ifdef __x86_64__
+			if unlikely(icpustate_getcs(state) != SEGMENT_USER_CODE64_RPL) { /* isuser32() */
+				/* Only allowed from 64-bit user-space. */
+				goto e_unsupported_instruction;
+			}
+			assert(!(op_flags & F_IS_X32));
 			/* syscall emulation */
 			icpustate_setpc(state, (uintptr_t)pc);
 			x86_syscall_emulate64_int80h_r(state);
-#endif /* __x86_64__ */
+#else /* __x86_64__ */
+			goto e_unsupported_instruction;
+#endif /* !__x86_64__ */
 
 
 #ifndef __x86_64__

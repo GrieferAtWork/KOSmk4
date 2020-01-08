@@ -291,6 +291,20 @@ int main_logtime(int argc, char *argv[], char *envp[]) {
 
 
 
+#if defined(__i386__) || defined(__x86_64__)
+#define HAVE_MAIN_SYSENTER 1
+/************************************************************************/
+int main_sysenter(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	__asm__(".byte 0x0f, 0x34\n");
+	return 0;
+}
+/************************************************************************/
+#endif /* __i386__ || __x86_64__ */
+
+
+
+
 
 /************************************************************************/
 PRIVATE ssize_t __LIBCCALL
@@ -372,7 +386,10 @@ PRIVATE DEF defs[] = {
 	{ "fpu", &main_fpu },
 	{ "fork", &main_fork },
 	{ "logtime", &main_logtime },
-	{ NULL, NULL },
+#ifdef HAVE_MAIN_SYSENTER
+	{ "sysenter", &main_sysenter },
+#endif /* HAVE_MAIN_SYSENTER */
+	{ NULL, NULL }
 };
 
 

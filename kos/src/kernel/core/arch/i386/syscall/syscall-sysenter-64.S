@@ -56,20 +56,20 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter)
 	.cfi_def_cfa %rsp, 0
 	.cfi_register %rsp, %rbp /* RBP is the designated return-sp register */
 	.cfi_register %rip, %rdi /* RDI is the designated return-pc register */
-	/* `IA32_SYSENTER_ESP' points at the ESP0 field of the CPU's TSS
+	/* `IA32_SYSENTER_ESP' points at the RSP0 field of the CPU's TSS
 	 * In other words: we only need to replace RSP with its own
 	 * dereference, and we already have `THIS_TASK->t_stackend'. */
 	movq   0(%rsp), %rsp
 	swapgs
 	/* Construct an IRET tail. */
-	pushq  $(SEGMENT_USER_DATA_RPL) /* %ss */
-	pushq  %rbp                     /* %useresp */
+	pushq  $(SEGMENT_USER_DATA32_RPL) /* %ss */
+	pushq  %rbp                       /* %useresp */
 	pushfq
 	orq    $(EFLAGS_IF), (%rsp)
 	.cfi_reg_offset %rflags, 0, %rsp
-	pushq  $(SEGMENT_USER_CODE_RPL) /* %cs */
+	pushq  $(SEGMENT_USER_CODE32_RPL) /* %cs */
 	.cfi_reg_offset %rflags, 8, %rsp
-	pushq  %rdi                     /* %rip */
+	pushq  %rdi                       /* %rip */
 /*	.cfi_reg_offset %rflags, 16, %rsp */
 
 	/* Switch over to IRET signal framing */
@@ -131,14 +131,14 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	movq   0(%rsp), %rsp
 	swapgs
 	/* Construct an IRET tail. */
-	pushq  $(SEGMENT_USER_DATA_RPL) /* %ss */
-	pushq  %rbp                     /* %useresp */
+	pushq  $(SEGMENT_USER_DATA32_RPL) /* %ss */
+	pushq  %rbp                       /* %useresp */
 	pushfq
 	orq    $(EFLAGS_IF), (%rsp)
 	.cfi_reg_offset %rflags, 0, %rsp
-	pushq  $(SEGMENT_USER_CODE_RPL) /* %cs */
+	pushq  $(SEGMENT_USER_CODE32_RPL) /* %cs */
 	.cfi_reg_offset %rflags, 8, %rsp
-	pushq  %rdi                     /* %rip */
+	pushq  %rdi                       /* %rip */
 
 	/* With the IRET tail constructed, start a new CFI function with the SIGNAL_FRAME
 	 * property enabled, thus allowing for normal system call return behavior. */
