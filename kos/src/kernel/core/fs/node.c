@@ -4337,9 +4337,6 @@ superblock_open(struct superblock_type *__restrict type,
 				result->s_device = incref(device);
 			result->s_driver = type->st_driver;
 			incref(result->s_driver);
-			atomic_rwlock_cinit(&result->s_wall_lock);
-			//TODO:result->s_wall = ...;
-			//TODO:incref(result->s_wall);
 			result->s_nodes = result;
 			result->s_flags = flags;
 			atomic_rwlock_cinit(&result->s_changed_lock);
@@ -4350,7 +4347,6 @@ superblock_open(struct superblock_type *__restrict type,
 				(*type->st_open)(result, args);
 			} EXCEPT {
 				kfree(result->d_map);
-				//TODO:decref(result->s_wall);
 				decref(result->s_driver);
 				decref_unlikely(result->s_device);
 				if (was_thrown(E_IOERROR_BADBOUNDS) || was_thrown(E_DIVIDE_BY_ZERO) ||
@@ -4457,7 +4453,6 @@ NOTHROW(KCALL inode_destroy)(struct inode *__restrict self) {
 			(*me->s_type->st_functions.f_fini)(me);
 		xdecref(me->s_device);
 		decref_unlikely(me->s_driver);
-		//TODO:decref(me->s_wall);
 
 		if (!fs_filesystems_lock_trywrite()) {
 			struct superblock *next;

@@ -226,9 +226,10 @@ INTERN ATTR_PERCPU WEAK uintptr_t thiscpu_x86_ipi_inuse[CEILDIV(CPU_IPI_BUFFER_S
 PRIVATE ATTR_PERCPU WEAK uintptr_t thiscpu_x86_ipi_alloc[CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER)] = { 0, };
 
 
-/* Check if there are any non-interrupting software-based IPIs pending. */
-PUBLIC NOBLOCK WUNUSED bool
-NOTHROW(KCALL cpu_swipi_pending)(void) {
+/* Check if there are any non-interrupting software-based IPIs pending.
+ * If some are present, these must be serviced by calling `cpu_ipi_service_nopr()' */
+PUBLIC NOBLOCK WUNUSED NOPREEMPT bool
+NOTHROW(KCALL arch_cpu_swipi_pending_nopr)(void) {
 	unsigned int i;
 	struct cpu *me = THIS_CPU;
 	assert(!PREEMPTION_ENABLED());

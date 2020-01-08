@@ -301,8 +301,8 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	movq   %rsp, this_sched_state(%rbx)
 
 	/* Prematurely end the current quantum */
-	EXTERN(cpu_quantum_end)
-	call   cpu_quantum_end
+	EXTERN(cpu_quantum_end_nopr)
+	call   cpu_quantum_end_nopr
 
 	/* Load the new CPU state */
 	EXTERN(this_cpu)
@@ -482,7 +482,7 @@ END(task_tryyield)
 
 
 .section .text
-PUBLIC_FUNCTION(cpu_run_current_and_remember)
+PUBLIC_FUNCTION(cpu_run_current_and_remember_nopr)
 	/* %rdi: <struct task *__restrict caller> */
 	.cfi_startproc
 	.cfi_signal_frame
@@ -515,10 +515,10 @@ PUBLIC_FUNCTION(cpu_run_current_and_remember)
 	EXTERN(x86_load_thread_rax_cpu_rbx)
 	jmp    x86_load_thread_rax_cpu_rbx
 	.cfi_endproc
-END(cpu_run_current_and_remember)
+END(cpu_run_current_and_remember_nopr)
 
 .section .text
-PUBLIC_FUNCTION(cpu_run_current)
+PUBLIC_FUNCTION(cpu_run_current_nopr)
 	.cfi_startproc
 	/* Load the CPU state of the task set as current. */
 	movq   %gs:0, %rax
@@ -529,27 +529,11 @@ PUBLIC_FUNCTION(cpu_run_current)
 	EXTERN(x86_load_thread_rax_cpu_rbx)
 	jmp    x86_load_thread_rax_cpu_rbx
 	.cfi_endproc
-END(cpu_run_current)
+END(cpu_run_current_nopr)
 
 
 
 .section .text.free
-INTERN_FUNCTION(x86_apic_cpu_quantum_elapsed)
-	pushfq
-	EXTERN(x86_lapicbase)
-	movq   x86_lapicbase, %rcx
-	EXTERN(this_cpu)
-	movq   %gs:this_cpu, %rax
-	cli
-	movzlq APIC_TIMER_CURRENT(%rcx), %rcx
-	EXTERN(thiscpu_quantum_length)
-	movzlq thiscpu_quantum_length(%rax), %rax
-	popfq
-	subq   %rcx, %rax
-	ret
-INTERN_CONST(x86_apic_cpu_quantum_elapsed_size, . - x86_apic_cpu_quantum_elapsed)
-END(x86_apic_cpu_quantum_elapsed)
-
 INTERN_FUNCTION(x86_apic_cpu_quantum_elapsed_nopr)
 	EXTERN(x86_lapicbase)
 	movq   x86_lapicbase, %rcx
@@ -560,39 +544,8 @@ INTERN_FUNCTION(x86_apic_cpu_quantum_elapsed_nopr)
 	movzlq thiscpu_quantum_length(%rax), %rax
 	subq   %rcx, %rax
 	ret
-INTERN_CONST(x86_apic_cpu_quantum_elapsed_size_nopr, . - x86_apic_cpu_quantum_elapsed_nopr)
+INTERN_CONST(x86_apic_cpu_quantum_elapsed_nopr_size, . - x86_apic_cpu_quantum_elapsed_nopr)
 END(x86_apic_cpu_quantum_elapsed_nopr)
-
-INTERN_FUNCTION(x86_apic_cpu_quantum_remaining)
-	pushfq
-	EXTERN(x86_lapicbase)
-	movq   x86_lapicbase, %rax
-	cli
-	movzlq APIC_TIMER_CURRENT(%rax), %rax
-	popfq
-	ret
-INTERN_CONST(x86_apic_cpu_quantum_remaining_size, . - x86_apic_cpu_quantum_remaining)
-END(x86_apic_cpu_quantum_remaining)
-
-INTERN_FUNCTION(x86_apic_cpu_quantum_remaining_nopr)
-	EXTERN(x86_lapicbase)
-	movq   x86_lapicbase, %rax
-	movzlq APIC_TIMER_CURRENT(%rax), %rax
-	ret
-INTERN_CONST(x86_apic_cpu_quantum_remaining_size_nopr, . - x86_apic_cpu_quantum_remaining_nopr)
-END(x86_apic_cpu_quantum_remaining_nopr)
-
-INTERN_FUNCTION(x86_apic_cpu_disable_preemptive_interrupts)
-	pushfq
-	EXTERN(x86_lapicbase)
-	movq   x86_lapicbase, %rcx
-	cli
-	/* lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED); */
-	movl   $(APIC_TIMER_FDISABLED), APIC_TIMER(%rcx)
-	popfq
-	ret
-INTERN_CONST(x86_apic_cpu_disable_preemptive_interrupts_size, . - x86_apic_cpu_disable_preemptive_interrupts)
-END(x86_apic_cpu_disable_preemptive_interrupts)
 
 INTERN_FUNCTION(x86_apic_cpu_disable_preemptive_interrupts_nopr)
 	EXTERN(x86_lapicbase)
@@ -600,32 +553,8 @@ INTERN_FUNCTION(x86_apic_cpu_disable_preemptive_interrupts_nopr)
 	/* lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED); */
 	movl   $(APIC_TIMER_FDISABLED), APIC_TIMER(%rcx)
 	ret
-INTERN_CONST(x86_apic_cpu_disable_preemptive_interrupts_size_nopr, . - x86_apic_cpu_disable_preemptive_interrupts_nopr)
+INTERN_CONST(x86_apic_cpu_disable_preemptive_interrupts_nopr_size, . - x86_apic_cpu_disable_preemptive_interrupts_nopr)
 END(x86_apic_cpu_disable_preemptive_interrupts_nopr)
-
-INTERN_FUNCTION(x86_apic_cpu_enable_preemptive_interrupts)
-	pushfq
-	EXTERN(this_cpu)
-	movq   %gs:this_cpu, %rax
-	EXTERN(x86_lapicbase)
-	movq   x86_lapicbase, %rcx
-	cli
-	EXTERN(thiscpu_quantum_length)
-	movl   thiscpu_quantum_length(%rax), %eax
-	/* lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16); */
-	movl   $(APIC_TIMER_DIVIDE_F16), APIC_TIMER_DIVIDE(%rcx)
-	/* lapic_write(APIC_TIMER,
-	 *             // Set the PIT interrupt to the APIC timer.
-	 *             X86_INTNO_PIC1_PIT |
-	 *             APIC_TIMER_MODE_FPERIODIC); */
-	movl   $(X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC), \
-	       APIC_TIMER(%rcx)
-	/* lapic_write(APIC_TIMER_INITIAL,PERCPU(thiscpu_quantum_length)); */
-	movl   %eax, APIC_TIMER_INITIAL(%rcx)
-	popfq
-	ret
-INTERN_CONST(x86_apic_cpu_enable_preemptive_interrupts_size, . - x86_apic_cpu_enable_preemptive_interrupts)
-END(x86_apic_cpu_enable_preemptive_interrupts)
 
 INTERN_FUNCTION(x86_apic_cpu_enable_preemptive_interrupts_nopr)
 	EXTERN(this_cpu)
@@ -645,24 +574,8 @@ INTERN_FUNCTION(x86_apic_cpu_enable_preemptive_interrupts_nopr)
 	/* lapic_write(APIC_TIMER_INITIAL, PERCPU(thiscpu_quantum_length)); */
 	movl   %eax, APIC_TIMER_INITIAL(%rcx)
 	ret
-INTERN_CONST(x86_apic_cpu_enable_preemptive_interrupts_size_nopr, . - x86_apic_cpu_enable_preemptive_interrupts_nopr)
+INTERN_CONST(x86_apic_cpu_enable_preemptive_interrupts_nopr_size, . - x86_apic_cpu_enable_preemptive_interrupts_nopr)
 END(x86_apic_cpu_enable_preemptive_interrupts_nopr)
-
-INTERN_FUNCTION(x86_apic_cpu_quantum_reset)
-	pushfq
-	EXTERN(this_cpu)
-	movq   %gs:this_cpu, %rax
-	EXTERN(x86_lapicbase)
-	movq   x86_lapicbase, %rcx
-	cli
-	EXTERN(thiscpu_quantum_length)
-	movl   thiscpu_quantum_length(%rax), %eax
-	/* lapic_write(APIC_TIMER_CURRENT, PERCPU(thiscpu_quantum_length)); */
-	movl   %eax, APIC_TIMER_CURRENT(%rcx)
-	popfq
-	ret
-INTERN_CONST(x86_apic_cpu_quantum_reset_size, . - x86_apic_cpu_quantum_reset)
-END(x86_apic_cpu_quantum_reset)
 
 INTERN_FUNCTION(x86_apic_cpu_quantum_reset_nopr)
 	EXTERN(this_cpu)
@@ -674,10 +587,10 @@ INTERN_FUNCTION(x86_apic_cpu_quantum_reset_nopr)
 	/* lapic_write(APIC_TIMER_CURRENT, PERCPU(thiscpu_quantum_length)); */
 	movl   %eax, APIC_TIMER_CURRENT(%rcx)
 	ret
-INTERN_CONST(x86_apic_cpu_quantum_reset_size_nopr, . - x86_apic_cpu_quantum_reset_nopr)
+INTERN_CONST(x86_apic_cpu_quantum_reset_nopr_size, . - x86_apic_cpu_quantum_reset_nopr)
 END(x86_apic_cpu_quantum_reset_nopr)
 
-INTERN_FUNCTION(x86_apic_cpu_ipi_pending)
+INTERN_FUNCTION(x86_apic_cpu_hwipi_pending_nopr)
 	/* u32 mask = lapic_read(APIC_ISR(APIC_ISR_INDEX(X86_INTERRUPT_APIC_IPI))); */
 	/* return (mask & APIC_ISR_MASK(X86_INTERRUPT_APIC_IPI)) != 0; */
 	xorq   %rax, %rax
@@ -687,49 +600,12 @@ INTERN_FUNCTION(x86_apic_cpu_ipi_pending)
 	testl  $(APIC_ISR_MASK(X86_INTERRUPT_APIC_IPI)), %ecx
 	setnz  %al
 	ret
-INTERN_CONST(x86_apic_cpu_ipi_pending_size, . - x86_apic_cpu_ipi_pending)
-END(x86_apic_cpu_ipi_pending)
+INTERN_CONST(x86_apic_cpu_hwipi_pending_nopr_size, . - x86_apic_cpu_hwipi_pending_nopr)
+END(x86_apic_cpu_hwipi_pending_nopr)
 
 
 
 .section .text
-PUBLIC_FUNCTION(arch_cpu_quantum_remaining_nopr)
-	/* Read the current PIT counter position. */
-	movb   $(PIT_COMMAND_SELECT_F0 | \
-	         PIT_COMMAND_ACCESS_FLATCH | \
-	         PIT_COMMAND_FBINARY), %al
-	outb   %al,  $(PIT_COMMAND)
-	inb    $(PIT_DATA0), %al
-	movb   %al, %cl
-	inb    $(PIT_DATA0), %al
-	movb   %al, %ch
-	movzwq %cx, %rax
-	ret
-.if x86_apic_cpu_quantum_remaining_size_nopr > (. - arch_cpu_quantum_remaining_nopr)
-.skip x86_apic_cpu_quantum_remaining_size_nopr - (. - arch_cpu_quantum_remaining_nopr), 0x90
-.endif
-END(arch_cpu_quantum_remaining_nopr)
-
-
-PUBLIC_FUNCTION(arch_cpu_quantum_remaining)
-	pushfq
-	cli
-	/* Read the current PIT counter position. */
-	movb   $(PIT_COMMAND_SELECT_F0 | \
-	         PIT_COMMAND_ACCESS_FLATCH | \
-	         PIT_COMMAND_FBINARY), %al
-	outb   %al,  $(PIT_COMMAND)
-	inb    $(PIT_DATA0), %al
-	movb   %al, %cl
-	inb    $(PIT_DATA0), %al
-	popfq
-	movb   %al, %ch
-	movzwq %cx, %rax
-	ret
-.if x86_apic_cpu_quantum_remaining_size > (. - arch_cpu_quantum_remaining)
-.skip x86_apic_cpu_quantum_remaining_size - (. - arch_cpu_quantum_remaining), 0x90
-.endif
-END(arch_cpu_quantum_remaining)
 
 PUBLIC_FUNCTION(arch_cpu_quantum_elapsed_nopr)
 	/* Read the current PIT counter position. */
@@ -744,59 +620,10 @@ PUBLIC_FUNCTION(arch_cpu_quantum_elapsed_nopr)
 	movq   $(PIT_HZ_DIV(HZ)), %rax
 	subw   %cx, %ax
 	ret
-.if x86_apic_cpu_quantum_elapsed_size_nopr > (. - arch_cpu_quantum_elapsed_nopr)
-.skip x86_apic_cpu_quantum_elapsed_size_nopr - (. - arch_cpu_quantum_elapsed_nopr), 0x90
+.if x86_apic_cpu_quantum_elapsed_nopr_size > (. - arch_cpu_quantum_elapsed_nopr)
+.skip x86_apic_cpu_quantum_elapsed_nopr_size - (. - arch_cpu_quantum_elapsed_nopr), 0x90
 .endif
 END(arch_cpu_quantum_elapsed_nopr)
-
-PUBLIC_FUNCTION(arch_cpu_quantum_elapsed)
-	pushfq
-	movb   $(PIT_COMMAND_SELECT_F0 | \
-	         PIT_COMMAND_ACCESS_FLATCH | \
-	         PIT_COMMAND_FBINARY), %al
-	cli
-	/* Read the current PIT counter position. */
-	outb   %al,  $(PIT_COMMAND)
-	inb    $(PIT_DATA0), %al
-	movb   %al, %cl
-	inb    $(PIT_DATA0), %al
-	popfq
-	movb   %al, %ch
-	movq   $(PIT_HZ_DIV(HZ)), %rax
-	subw   %cx, %ax
-	ret
-.if x86_apic_cpu_quantum_elapsed_size > (. - arch_cpu_quantum_elapsed)
-.skip x86_apic_cpu_quantum_elapsed_size - (. - arch_cpu_quantum_elapsed), 0x90
-.endif
-END(arch_cpu_quantum_elapsed)
-
-
-PUBLIC_FUNCTION(arch_cpu_disable_preemptive_interrupts)
-	pushfq
-	cli
-	/* Disable the PIT interrupt within the PIC */
-	inb    $(X86_PIC1_DATA), %al
-	orb    $(1 << (X86_INTNO_PIC1_PIT-X86_INTERRUPT_PIC1_BASE)), %al
-	outb   %al, $(X86_PIC1_DATA)
-	/* Set the PIT to one-shot mode to keep it from running
-	 * -> https://forum.osdev.org/viewtopic.php?t=11689&p=80318 */
-	/* outb(PIT_COMMAND,
-	 *      PIT_COMMAND_SELECT_F0 |
-	 *      PIT_COMMAND_ACCESS_FLOHI |
-	 *      PIT_COMMAND_MODE_FONESHOT); */
-	movb   $(PIT_COMMAND_SELECT_F0 | \
-	         PIT_COMMAND_ACCESS_FLOHI | \
-	         PIT_COMMAND_MODE_FONESHOT), %al
-	outb   %al, $(PIT_COMMAND)
-	/* Normally at this point, the PIT would want us to specify the delay,
-	 * however by not telling it anything, we essentially leave it hanging
-	 * in this semi-disabled mode until we reset it at a later point in time. */
-	popfq
-	ret
-.if x86_apic_cpu_disable_preemptive_interrupts_size > (. - arch_cpu_disable_preemptive_interrupts)
-.skip x86_apic_cpu_disable_preemptive_interrupts_size - (. - arch_cpu_disable_preemptive_interrupts), 0x90
-.endif
-END(arch_cpu_disable_preemptive_interrupts)
 
 PUBLIC_FUNCTION(arch_cpu_disable_preemptive_interrupts_nopr)
 	/* Disable the PIT interrupt within the PIC */
@@ -817,43 +644,10 @@ PUBLIC_FUNCTION(arch_cpu_disable_preemptive_interrupts_nopr)
 	 * however by not telling it anything, we essentially leave it hanging
 	 * in this semi-disabled mode until we reset it at a later point in time. */
 	ret
-.if x86_apic_cpu_disable_preemptive_interrupts_size_nopr > (. - arch_cpu_disable_preemptive_interrupts_nopr)
-.skip x86_apic_cpu_disable_preemptive_interrupts_size_nopr - (. - arch_cpu_disable_preemptive_interrupts_nopr), 0x90
+.if x86_apic_cpu_disable_preemptive_interrupts_nopr_size > (. - arch_cpu_disable_preemptive_interrupts_nopr)
+.skip x86_apic_cpu_disable_preemptive_interrupts_nopr_size - (. - arch_cpu_disable_preemptive_interrupts_nopr), 0x90
 .endif
 END(arch_cpu_disable_preemptive_interrupts_nopr)
-
-PUBLIC_FUNCTION(arch_cpu_enable_preemptive_interrupts)
-	/* TODO: Don't hardcode `PIT_HZ_DIV(HZ)' here, but rather
-	 *       make use of `PERCPU(_thiscpu_quantum_length)' */
-	pushfq
-	movb   $(PIT_COMMAND_SELECT_F0 | \
-	         PIT_COMMAND_ACCESS_FLOHI | \
-	         PIT_COMMAND_MODE_FRATEGEN | \
-	         PIT_COMMAND_FBINARY), %al
-	cli
-	/* outb(PIT_COMMAND,
-	 *      PIT_COMMAND_SELECT_F0 |
-	 *      PIT_COMMAND_ACCESS_FLOHI |
-	 *      PIT_COMMAND_MODE_FRATEGEN |
-	 *      PIT_COMMAND_FBINARY) */
-	outb   %al, $(PIT_COMMAND)
-	/* outb_p(PIT_DATA0, PIT_HZ_DIV(HZ) & 0xff) */
-	movb   $(PIT_HZ_DIV(HZ) & 0xff), %al
-	outb   %al, $(PIT_DATA0)
-	outb   %al, $(0x80)  /* io_pause() */
-	/* outb(PIT_DATA0, PIT_HZ_DIV(HZ) >> 8); */
-	movb   $(PIT_HZ_DIV(HZ) >> 8), %al
-	outb   %al, $(PIT_DATA0)
-	/* Now to enable to the PIC */
-	inb    $(X86_PIC1_DATA), %al
-	andb   $~(1 << (X86_INTNO_PIC1_PIT-X86_INTERRUPT_PIC1_BASE)), %al
-	outb   %al, $(X86_PIC1_DATA)
-	popfq
-	ret
-.if x86_apic_cpu_enable_preemptive_interrupts_size > (. - arch_cpu_enable_preemptive_interrupts)
-.skip x86_apic_cpu_enable_preemptive_interrupts_size - (. - arch_cpu_enable_preemptive_interrupts), 0x90
-.endif
-END(arch_cpu_enable_preemptive_interrupts)
 
 PUBLIC_FUNCTION(arch_cpu_enable_preemptive_interrupts_nopr)
 	/* outb(PIT_COMMAND,
@@ -878,41 +672,12 @@ PUBLIC_FUNCTION(arch_cpu_enable_preemptive_interrupts_nopr)
 	andb   $~(1 << (X86_INTNO_PIC1_PIT-X86_INTERRUPT_PIC1_BASE)), %al
 	outb   %al, $(X86_PIC1_DATA)
 	ret
-.if x86_apic_cpu_enable_preemptive_interrupts_size_nopr > (. - arch_cpu_enable_preemptive_interrupts_nopr)
-.skip x86_apic_cpu_enable_preemptive_interrupts_size_nopr - (. - arch_cpu_enable_preemptive_interrupts_nopr), 0x90
+.if x86_apic_cpu_enable_preemptive_interrupts_nopr_size > (. - arch_cpu_enable_preemptive_interrupts_nopr)
+.skip x86_apic_cpu_enable_preemptive_interrupts_nopr_size - (. - arch_cpu_enable_preemptive_interrupts_nopr), 0x90
 .endif
 END(arch_cpu_enable_preemptive_interrupts_nopr)
 
-
-PUBLIC_FUNCTION(cpu_quantum_reset)
-	pushfq
-	movb   $(PIT_COMMAND_SELECT_F0 | \
-	         PIT_COMMAND_ACCESS_FLOHI | \
-	         PIT_COMMAND_MODE_FRATEGEN | \
-	         PIT_COMMAND_FBINARY), %al
-	cli
-	/* Re-initialize to reset the latch counter. */
-	/* outb(PIT_COMMAND,
-	 *      PIT_COMMAND_SELECT_F0 |
-	 *      PIT_COMMAND_ACCESS_FLOHI |
-	 *      PIT_COMMAND_MODE_FRATEGEN |
-	 *      PIT_COMMAND_FBINARY) */
-	outb   %al, $(PIT_COMMAND)
-	/* outb_p(PIT_DATA0, PIT_HZ_DIV(HZ) & 0xff) */
-	movb   $(PIT_HZ_DIV(HZ) & 0xff), %al
-	outb   %al, $(PIT_DATA0)
-	outb   %al, $(0x80)  /* io_pause() */
-	/* outb(PIT_DATA0, PIT_HZ_DIV(HZ) >> 8); */
-	movb   $(PIT_HZ_DIV(HZ) >> 8), %al
-	outb   %al, $(PIT_DATA0)
-	popfq
-	ret
-.if x86_apic_cpu_quantum_reset_size > (. - cpu_quantum_reset)
-.skip x86_apic_cpu_quantum_reset_size - (. - cpu_quantum_reset), 0x90
-.endif
-END(cpu_quantum_reset)
-
-PUBLIC_FUNCTION(cpu_quantum_reset_nopr)
+PUBLIC_FUNCTION(arch_cpu_quantum_reset_nopr)
 	/* Re-initialize to reset the latch counter. */
 	/* outb(PIT_COMMAND,
 	 *      PIT_COMMAND_SELECT_F0 |
@@ -932,30 +697,27 @@ PUBLIC_FUNCTION(cpu_quantum_reset_nopr)
 	movb   $(PIT_HZ_DIV(HZ) >> 8), %al
 	outb   %al, $(PIT_DATA0)
 	ret
-.if x86_apic_cpu_quantum_reset_size_nopr > (. - cpu_quantum_reset_nopr)
-.skip x86_apic_cpu_quantum_reset_size_nopr - (. - cpu_quantum_reset_nopr), 0x90
+.if x86_apic_cpu_quantum_reset_nopr_size > (. - arch_cpu_quantum_reset_nopr)
+.skip x86_apic_cpu_quantum_reset_nopr_size - (. - arch_cpu_quantum_reset_nopr), 0x90
 .endif
-END(cpu_quantum_reset_nopr)
+END(arch_cpu_quantum_reset_nopr)
 
 
-PUBLIC_FUNCTION(cpu_hwipi_pending)
+PUBLIC_FUNCTION(arch_cpu_hwipi_pending_nopr)
 	/* outb(X86_PIC1_CMD, X86_PIC_READ_IRR) */
-	pushfq
 	movq   $(X86_PIC_READ_IRR), %rax /* NOTE: This also clears all of the upper bits! */
-	cli
 	outb   %al, $(X86_PIC1_CMD)
 	/* AL = inb(X86_PIC1_CMD) */
 	inb    $(X86_PIC2_CMD), %al
-	popfq
 	/* return PIT_BIT_IS_SET(AL); */
 	testb  $(1 << (X86_INTNO_PIC1_PIT-X86_INTERRUPT_PIC1_BASE)), %al
 	setnz  %al
 	ret
-.if x86_apic_cpu_ipi_pending_size > (. - cpu_hwipi_pending)
-.skip x86_apic_cpu_ipi_pending_size - (. - cpu_hwipi_pending), 0x90
+.if x86_apic_cpu_hwipi_pending_nopr_size > (. - arch_cpu_hwipi_pending_nopr)
+.skip x86_apic_cpu_hwipi_pending_nopr_size - (. - arch_cpu_hwipi_pending_nopr), 0x90
 .endif
-END(cpu_hwipi_pending)
+END(arch_cpu_hwipi_pending_nopr)
 
-DEFINE_PUBLIC_ALIAS(arch_cpu_update_quantum_length, arch_cpu_enable_preemptive_interrupts)
+DEFINE_PUBLIC_ALIAS(arch_cpu_update_quantum_length_nopr, arch_cpu_enable_preemptive_interrupts_nopr)
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_SCHED64_S */

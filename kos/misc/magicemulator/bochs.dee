@@ -143,6 +143,7 @@ got_bios:
 		rc << "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=0, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n";
 		rc << "cpuid: mmx=1, apic=xapic, simd=sse2, sse4a=0, misaligned_sse=0, sep=1, movbe=0, adx=0\n";
 		rc << "cpuid: aes=0, sha=0, xsave=0, xsaveopt=0, x86_64=1, 1g_pages=0, pcid=0, fsgsbase=0\n";
+		rc << "vga: extension=vbe, update_freq=30, realtime=1\n";
 		rc << "port_e9_hack: enabled=1\n";
 		rc << "clock: sync=none\n";
 //		rc << "debug: action=report\n";

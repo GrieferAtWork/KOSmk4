@@ -444,22 +444,16 @@ struct cpu cpu_header = {
 };
 
 /* Weakly implement preemptive interrupt disabling as no-ops. */
-PUBLIC ATTR_WEAK NOBLOCK ATTR_SECTION(".text.kernel.arch_cpu_disable_preemptive_interrupts") void
-NOTHROW(KCALL arch_cpu_disable_preemptive_interrupts)(void) {
+PUBLIC ATTR_WEAK NOBLOCK ATTR_SECTION(".text.kernel.arch_cpu_disable_preemptive_interrupts_nopr") void
+NOTHROW(KCALL arch_cpu_disable_preemptive_interrupts_nopr)(void) {
 }
-DEFINE_PUBLIC_WEAK_ALIAS(arch_cpu_enable_preemptive_interrupts, arch_cpu_disable_preemptive_interrupts);
-DEFINE_PUBLIC_WEAK_ALIAS(cpu_quantum_reset, arch_cpu_disable_preemptive_interrupts);
+DEFINE_PUBLIC_WEAK_ALIAS(arch_cpu_enable_preemptive_interrupts_nopr, arch_cpu_disable_preemptive_interrupts_nopr);
+DEFINE_PUBLIC_WEAK_ALIAS(arch_cpu_quantum_reset_nopr, arch_cpu_disable_preemptive_interrupts_nopr);
 
-PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.arch_cpu_quantum_elapsed")
-ATTR_CONST quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_elapsed)(void) {
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.arch_cpu_quantum_elapsed_nopr")
+ATTR_CONST quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_elapsed_nopr)(void) {
 	return 0;
 }
-PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.arch_cpu_quantum_remaining")
-ATTR_CONST quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_remaining)(void) {
-	return (quantum_diff_t)-1;
-}
-DEFINE_PUBLIC_WEAK_ALIAS(arch_cpu_quantum_elapsed_nopr, arch_cpu_quantum_elapsed);
-DEFINE_PUBLIC_WEAK_ALIAS(arch_cpu_quantum_remaining_nopr, arch_cpu_quantum_remaining);
 
 
 PUBLIC ATTR_PERCPU jtime_t volatile thiscpu_jiffies = 0;
@@ -496,7 +490,7 @@ NOTHROW(KCALL quantum_time)(void) {
 	struct cpu *me;
 	pflag_t was;
 	quantum_diff_t elapsed, my_qoff, my_qlen;
-	/* BOOT_JIFFIES + (BOOT_QUANTUM_OFFSET - MY_QUANTUM_OFFSET + cpu_quantum_elapsed()) */
+	/* BOOT_JIFFIES + (BOOT_QUANTUM_OFFSET - MY_QUANTUM_OFFSET + cpu_quantum_elapsed_nopr()) */
 	was = PREEMPTION_PUSHOFF();
 	me  = THIS_CPU;
 	if (me == &_bootcpu) {
@@ -885,7 +879,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	cpu_assert_integrity();
 
 	/* Indicate the end of the current quantum. */
-	cpu_quantum_end();
+	cpu_quantum_end_nopr();
 
 	if (caller->t_sched.s_running.sr_runnxt == caller) {
 		/* Last caller (load the IDLE caller now). */
@@ -938,7 +932,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		sig_broadcast(&pid->tp_changed);
 
 	/* Good bye... */
-	cpu_run_current();
+	cpu_run_current_nopr();
 }
 
 

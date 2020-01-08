@@ -218,7 +218,7 @@ switch_to_normal_stop:
 				mycpu->c_override != stop_event.e.tse_thread) {
 				/* Switch back to `c_override' */
 				mycpu->c_current = mycpu->c_override;
-				cpu_run_current_and_remember(stop_event.e.tse_thread);
+				cpu_run_current_and_remember_nopr(stop_event.e.tse_thread);
 			}
 		}
 		PREEMPTION_ENABLE();

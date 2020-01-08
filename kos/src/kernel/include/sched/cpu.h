@@ -144,23 +144,6 @@ DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_offset;
  * HINT: On x86, this the LAPIC reload value! */
 DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length;
 
-/* Returns the number of ticks that have passed since the start
- * of the current quantum. - The true current CPU-local time
- * (in ticks) can then be calculated as:
- * >> (thiscpu_jiffies * PERCPU(thiscpu_quantum_length)) + PERCPU(thiscpu_quantum_offset) + cpu_quantum_elapsed();
- * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
-FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t NOTHROW(FCALL cpu_quantum_elapsed)(struct cpu *__restrict mycpu, jtime_t *__restrict preal_jtime);
-FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict mycpu, jtime_t *__restrict preal_jtime);
-FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t NOTHROW(FCALL cpu_quantum_remaining)(struct cpu *__restrict mycpu, jtime_t *__restrict preal_jtime);
-FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t NOTHROW(FCALL cpu_quantum_remaining_nopr)(struct cpu *__restrict mycpu, jtime_t *__restrict preal_jtime);
-
-/* Same as the functions above, however don't account for lazy/delayed interrupt handling. */
-FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_elapsed)(void);
-FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_elapsed_nopr)(void);
-FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_remaining)(void);
-FUNDEF NOBLOCK WUNUSED quantum_diff_t NOTHROW(KCALL arch_cpu_quantum_remaining_nopr)(void);
-
-
 /* Returns the cpu-local quantum time. */
 FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void);
 
@@ -420,8 +403,8 @@ FUNDEF void NOTHROW(KCALL cpu_deepsleep)(void);
 #ifndef CONFIG_NO_SMP
 /* MUST ONLY BE CALLED FROM AN IDLE TAST!
  * This function does the following:
- * >> FORCPU(me,thiscpu_idle).t_sched.s_state = PUSH_CPU_STATE_FOR_RETURNING_TO_CALLER();
- * >> ATOMIC_WRITE(caller->c_state,CPU_STATE_DREAMING);
+ * >> FORCPU(me, thiscpu_idle).t_sched.s_state = PUSH_CPU_STATE_FOR_RETURNING_TO_CALLER();
+ * >> ATOMIC_WRITE(caller->c_state, CPU_STATE_DREAMING);
  * >> PREEMPTION_DEEPHALT();
  * NOTE: Do not call this function directly. - Use `cpu_deepsleep()' instead,
  *       and even then: Only call that function from an IDLE task.
@@ -430,44 +413,69 @@ FUNDEF void NOTHROW(KCALL cpu_deepsleep)(void);
  * NOTE: This function must not be called by the BOOT CPU!
  * With this, it is the arch-dependent portion of `cpu_deepsleep()' that performs
  * the actual deep-sleep on a multi-core system. */
-FUNDEF void NOTHROW(FCALL cpu_enter_deepsleep)(struct cpu *__restrict caller);
+FUNDEF NOPREEMPT void NOTHROW(FCALL cpu_enter_deepsleep)(struct cpu *__restrict caller);
 #endif /* !CONFIG_NO_SMP */
 
 
+/* Returns the number of ticks that have passed since the start of the current quantum.
+ * The true current CPU-local time (in ticks) can then be calculated as:
+ * >> (thiscpu_jiffies * PERCPU(thiscpu_quantum_length)) + PERCPU(thiscpu_quantum_offset) + cpu_quantum_elapsed_nopr();
+ * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
+FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 2)) quantum_diff_t
+NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict mycpu,
+                                        jtime_t *__restrict preal_jtime);
+
+/* Same as the function above, however don't account for lazy/delayed interrupt handling. */
+FUNDEF NOBLOCK NOPREEMPT WUNUSED quantum_diff_t
+NOTHROW(KCALL arch_cpu_quantum_elapsed_nopr)(void);
+
+
 /* Disable / re-enable preemptive interrupts on the calling CPU.
- * When `cpu_enable_preemptive_interrupts()' is called, any time that has
- * passed between then and a prior call to `cpu_disable_preemptive_interrupts()'
+ * When `cpu_enable_preemptive_interrupts_nopr()' is called, any time that has
+ * passed between then and a prior call to `cpu_disable_preemptive_interrupts_nopr()'
  * will be added to the cpu's local jiffies counter, while also configuring
  * the current quantum to be aligned with the amount of time that has passed.
  * NOTE: In case preemptive interrupts cannot be disabled,
  *       all of these these functions are no-ops.
  * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
-FUNDEF NOBLOCK void NOTHROW(KCALL cpu_disable_preemptive_interrupts)(void);
-FUNDEF NOBLOCK void NOTHROW(KCALL cpu_enable_preemptive_interrupts)(void);
-FUNDEF NOBLOCK void NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void);
-FUNDEF NOBLOCK void NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void);
+FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void);
+FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void);
 
 /* Same as the functions above, but don't adjust the CPU time afterwards.
  * WARNING: Keeping preemptive interrupts disabled without time loss accounting
  *          for longer periods of time will cause `thiscpu_quantum_length' to
  *          go nuts once they actually get turned back on. */
-FUNDEF NOBLOCK void NOTHROW(KCALL arch_cpu_disable_preemptive_interrupts)(void);
-FUNDEF NOBLOCK void NOTHROW(KCALL arch_cpu_enable_preemptive_interrupts)(void);
-FUNDEF NOBLOCK void NOTHROW(KCALL arch_cpu_disable_preemptive_interrupts_nopr)(void);
-FUNDEF NOBLOCK void NOTHROW(KCALL arch_cpu_enable_preemptive_interrupts_nopr)(void);
+FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL arch_cpu_disable_preemptive_interrupts_nopr)(void);
+FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL arch_cpu_enable_preemptive_interrupts_nopr)(void);
 
 /* Update hardware following a change made to `thiscpu_quantum_length' */
-FUNDEF NOBLOCK void NOTHROW(KCALL arch_cpu_update_quantum_length)(void);
+FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL arch_cpu_update_quantum_length_nopr)(void);
+
+/* Adjust quantum time to track the calling thread's quantum about to end prematurely. */
+FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_quantum_end_nopr)(void);
+
+/* Reset the amount of remaining time for the current quantum. */
+FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL arch_cpu_quantum_reset_nopr)(void);
+
+#ifndef CONFIG_NO_SMP
+/* Check if IPIs are pending to be executed by the calling CPU,
+ * returning `true' if this is the case, or `false' it not.
+ * In order to serve any pending IPIs, preemption must be enabled. */
+FUNDEF NOBLOCK WUNUSED NOPREEMPT bool NOTHROW(KCALL arch_cpu_hwipi_pending_nopr)(void);
+/* Check if there are any non-interrupting software-based IPIs pending.
+ * If some are present, these must be serviced by calling `cpu_ipi_service_nopr()' */
+FUNDEF NOBLOCK WUNUSED NOPREEMPT bool NOTHROW(KCALL arch_cpu_swipi_pending_nopr)(void);
+#endif /* !CONFIG_NO_SMP */
+
+
 
 
 #ifndef CONFIG_NO_SMP
-
 /* Load all pending threads within the calling CPU.
  * NOTE: Preemption must be disabled before this function may be called!
  * @return: true:  At least 1 new task was added to the execution ring.
  * @return: false: No tasks were pending. */
-FUNDEF NOBLOCK bool NOTHROW(KCALL cpu_loadpending)(void);
-
+FUNDEF NOBLOCK NOPREEMPT bool NOTHROW(KCALL cpu_loadpending_nopr)(void);
 
 /* Wake up a CPU, regardless of which ever state it may be in, potentially
  * not even waking it at all, but simply sending an IPI, such that sooner
@@ -519,13 +527,6 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL cpu_loadpending)(void);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target);
 
-/* Check if IPIs are pending to be executed by the calling CPU,
- * returning `true' if this is the case, or `false' it not.
- * In order to serve any pending IPIs, preemption must be enabled. */
-FUNDEF NOBLOCK WUNUSED bool NOTHROW(KCALL cpu_hwipi_pending)(void);
-/* Check if there are any non-interrupting software-based IPIs pending. */
-FUNDEF NOBLOCK WUNUSED bool NOTHROW(KCALL cpu_swipi_pending)(void);
-
 /* Service pending IPIs (must be called after a manual switch to the RUNNING state)
  * The general sequence of setting `CPU_STATE_RUNNING' looks like this:
  * >>again:
@@ -534,9 +535,9 @@ FUNDEF NOBLOCK WUNUSED bool NOTHROW(KCALL cpu_swipi_pending)(void);
  * >>    // Check for hardware IPIs which may have been delivered after `PREEMPTION_DISABLE()'
  * >>    // was called, but bfore `CPU_STATE_FALLING_ASLEEP' got set (letting other CPUs think
  * >>    // that our CPU would be able to service IPIs)
- * >>    if (cpu_hwipi_pending()) {
+ * >>    if (arch_cpu_hwipi_pending_nopr()) {
  * >>        ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
- * >>        cpu_ipi_service();
+ * >>        cpu_ipi_service_nopr();
  * >>        PREEMPTION_ENABLE_P();
  * >>        goto again;
  * >>    }
@@ -545,26 +546,15 @@ FUNDEF NOBLOCK WUNUSED bool NOTHROW(KCALL cpu_swipi_pending)(void);
  * >>    ...
  * >>
  * >>    ATOMIC_WRITE(THIS_CPU->c_state, CPU_STATE_RUNNING);
- * >>    if (cpu_swipi_pending()) {
- * >>        cpu_ipi_service();
+ * >>    if (arch_cpu_swipi_pending_nopr()) {
+ * >>        cpu_ipi_service_nopr();
  * >>        PREEMPTION_ENABLE();
  * >>        goto again;
  * >>    }
  * This sequence is required, since cpu_wake() which is used to deliver IPI requests
  * to cpus in a state other than `CPU_STATE_RUNNING' (in order to allow for deep-sleep
- * wake-ups), will not trigger an IPI interrupt if there are any sw-based IPIs pending
- */
-FUNDEF NOBLOCK void NOTHROW(KCALL cpu_ipi_service)(void);
-
-/* Reset the amount of remaining time for the current quantum.
- * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
-FUNDEF NOBLOCK void NOTHROW(KCALL cpu_quantum_reset)(void);
-FUNDEF NOBLOCK void NOTHROW(KCALL cpu_quantum_reset_nopr)(void);
-
-/* Adjust quantum time to track the calling thread's quantum about to end prematurely. */
-FUNDEF NOBLOCK void NOTHROW(KCALL cpu_quantum_end)(void);
-
-struct icpustate;
+ * wake-ups), will not trigger an IPI interrupt if there are any sw-based IPIs pending */
+FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_ipi_service_nopr)(void);
 #endif /* !CONFIG_NO_SMP */
 #endif /* __CC__ */
 
@@ -574,6 +564,7 @@ struct icpustate;
 
 #ifdef __CC__
 #ifndef CONFIG_NO_SMP
+struct icpustate;
 /* Callback for an asynchronous IPI executed by some target CPU.
  * IPIs can be handled (and thus executed) any time execution
  * in a target CPU has preemption enabled.
@@ -589,7 +580,7 @@ struct icpustate;
  * @param: args: The arguments alongside which the IPI was scheduled.
  * @return: * :  The cpu state to restore, or one of `CPU_IPI_MODE_*'
  */
-typedef NOBLOCK NONNULL((1, 2)) /*ATTR_NOTHROW*/ struct icpustate *
+typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) /*ATTR_NOTHROW*/ struct icpustate *
 (FCALL *cpu_ipi_t)(struct icpustate *__restrict state,
                    void *args[CPU_IPI_ARGCOUNT]);
 #endif /* !CONFIG_NO_SMP */
@@ -688,12 +679,15 @@ FUNDEF ATTR_NORETURN void NOTHROW(FCALL cpu_idlemain)(void);
  * Then, switch context to `THIS_CPU->c_current' and continue by executing it.
  * NOTE: Preemption must be disabled before this function may be called!
  * NOTE: Upon return, preemption will have been re-enabled! */
-FUNDEF NONNULL((1)) void NOTHROW(FCALL cpu_run_current_and_remember)(struct task *__restrict caller);
+FUNDEF NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL cpu_run_current_and_remember_nopr)(struct task *__restrict caller);
 
-/* Similar to `cpu_run_current_and_remember()', but don't remember the caller's context.
+/* Similar to `cpu_run_current_and_remember_nopr()',
+ * but don't remember the caller's context.
  * This function is used to implement `task_exit()'
  * NOTE: Preemption must be disabled before this function may be called! */
-FUNDEF ATTR_NORETURN void NOTHROW(FCALL cpu_run_current)(void);
+FUNDEF NOPREEMPT ATTR_NORETURN void
+NOTHROW(FCALL cpu_run_current_nopr)(void);
 
 #ifndef CONFIG_NO_SMP
 /* Schedule `thread' as a task that is pending execution on `target'
@@ -712,14 +706,14 @@ NOTHROW(FCALL cpu_addpendingtask)(struct cpu *__restrict target,
 /* Add the given task as running / sleeping within the current CPU.
  * NOTE: These functions inherit a reference to `thread' from the caller!
  * NOTE: Preemption must be disabled before this function may be called! */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_addrunningtask)(/*in*/ REF struct task *__restrict thread);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_addsleepingtask)(/*in*/ REF struct task *__restrict thread);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL cpu_addrunningtask_nopr)(/*in*/ REF struct task *__restrict thread);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL cpu_addsleepingtask_nopr)(/*in*/ REF struct task *__restrict thread);
 
 /* Remove a running or sleeping task `thread' from the current CPU.
  * NOTE: These functions return with a reference to `thread' handed to the caller.
  * NOTE: Preemption must be disabled before this function may be called! */
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_delrunningtask)(/*out*/ REF struct task *__restrict thread);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_delsleepingtask)(/*out*/ REF struct task *__restrict thread);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL cpu_delrunningtask_nopr)(/*out*/ REF struct task *__restrict thread);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL cpu_delsleepingtask_nopr)(/*out*/ REF struct task *__restrict thread);
 
 
 /* IDLE job prototype.

@@ -1183,28 +1183,6 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		}
 		break;
 
-#if 0 /* TODO */
-	case HOP_SUPERBLOCK_OPEN_WALL:
-		if (!vm_datablock_isinode(self) || !INODE_ISSUPER((struct inode *)self))
-			THROW(E_INVALID_HANDLE_FILETYPE,
-			      0, /* Filled in by the caller */
-			      HANDLE_TYPE_DATABLOCK,
-			      0,
-			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
-			      0);
-		{
-			struct handle result_handle;
-			sync_read(&((struct superblock *)self)->s_wall_lock);
-			result_handle.h_data = incref(((struct superblock *)self)->s_wall);
-			sync_endread(&((struct superblock *)self)->s_wall_lock);
-			FINALLY_DECREF_UNLIKELY((struct wall_clock *)result_handle.h_data);
-			result_handle.h_mode = mode;
-			result_handle.h_type = HANDLE_TYPE_CLOCK;
-			return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
-		}
-		break;
-#endif
-
 	case HOP_SUPERBLOCK_OPEN_DRIVER:
 		if (!vm_datablock_isinode(self) || !INODE_ISSUPER((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,

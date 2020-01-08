@@ -97,7 +97,7 @@ do_return_false:
 		PREEMPTION_DISABLE();
 	}
 	/* End the current quantum prematurely. */
-	cpu_quantum_end();
+	cpu_quantum_end_nopr();
 
 	mycpu = me->t_cpu;
 	cpu_assert_running(me);
@@ -148,10 +148,10 @@ wait_a_bit:
 	ATOMIC_FETCHAND(me->t_flags, ~TASK_FRUNNING);
 
 	/* Register the calling task as a sleeper within the CPU. */
-	cpu_addsleepingtask(me);
+	cpu_addsleepingtask_nopr(me);
 
 	/* Continue execution in the next thread. */
-	cpu_run_current_and_remember(me);
+	cpu_run_current_and_remember_nopr(me);
 
 	assert(PREEMPTION_ENABLED());
 

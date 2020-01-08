@@ -51,15 +51,6 @@
 DECL_BEGIN
 
 
-PRIVATE struct timespec KCALL realtime_now(void) {
-	struct timespec result;
-	qtime_t now;
-	/* TODO: This isn't `CLOCK_REALTIME'. - This is `CLOCK_MONOTONIC' */
-	now    = quantum_time();
-	result = qtime_to_timespec(&now);
-	return result;
-}
-
 PRIVATE void KCALL get_timezone(USER CHECKED struct timezone *result) {
 	/* TODO */
 	result->tz_dsttime     = 0;
@@ -77,7 +68,7 @@ DEFINE_SYSCALL1(errno_t, ftime,
 	struct timespec ts;
 	struct timezone tz;
 	validate_writable(tp, sizeof(*tp));
-	ts = realtime_now();
+	ts = realtime();
 	get_timezone(&tz);
 	COMPILER_WRITE_BARRIER();
 	tp->dstflag  = (s16)tz.tz_dsttime;
@@ -94,7 +85,7 @@ DEFINE_SYSCALL1(errno_t, ftime64,
 	struct timespec ts;
 	struct timezone tz;
 	validate_writable(tp, sizeof(*tp));
-	ts = realtime_now();
+	ts = realtime();
 	get_timezone(&tz);
 	COMPILER_WRITE_BARRIER();
 	tp->dstflag  = (s16)tz.tz_dsttime;
@@ -111,7 +102,7 @@ DEFINE_COMPAT_SYSCALL1(errno_t, ftime,
 	struct timespec ts;
 	struct timezone tz;
 	validate_writable(tp, sizeof(*tp));
-	ts = realtime_now();
+	ts = realtime();
 	get_timezone(&tz);
 	COMPILER_WRITE_BARRIER();
 	tp->dstflag  = (s16)tz.tz_dsttime;
@@ -128,7 +119,7 @@ DEFINE_COMPAT_SYSCALL1(errno_t, ftime64,
 	struct timespec ts;
 	struct timezone tz;
 	validate_writable(tp, sizeof(*tp));
-	ts = realtime_now();
+	ts = realtime();
 	get_timezone(&tz);
 	COMPILER_WRITE_BARRIER();
 	tp->dstflag  = (s16)tz.tz_dsttime;
@@ -153,7 +144,7 @@ DEFINE_SYSCALL2(errno_t, gettimeofday,
 	if (tv) {
 		struct timespec ts;
 		validate_writable(tv, sizeof(*tv));
-		ts = realtime_now();
+		ts = realtime();
 		COMPILER_WRITE_BARRIER();
 		TIMESPEC_TO_TIMEVAL(tv, &ts);
 		COMPILER_WRITE_BARRIER();
@@ -175,7 +166,7 @@ DEFINE_SYSCALL2(errno_t, gettimeofday64,
 	if (tv) {
 		struct timespec ts;
 		validate_writable(tv, sizeof(*tv));
-		ts = realtime_now();
+		ts = realtime();
 		COMPILER_WRITE_BARRIER();
 		TIMESPEC_TO_TIMEVAL(tv, &ts);
 		COMPILER_WRITE_BARRIER();
@@ -197,7 +188,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday,
 	if (tv) {
 		struct timespec ts;
 		validate_writable(tv, sizeof(*tv));
-		ts = realtime_now();
+		ts = realtime();
 		COMPILER_WRITE_BARRIER();
 		TIMESPEC_TO_TIMEVAL(tv, &ts);
 		COMPILER_WRITE_BARRIER();
@@ -219,7 +210,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday64,
 	if (tv) {
 		struct timespec ts;
 		validate_writable(tv, sizeof(*tv));
-		ts = realtime_now();
+		ts = realtime();
 		COMPILER_WRITE_BARRIER();
 		TIMESPEC_TO_TIMEVAL(tv, &ts);
 		COMPILER_WRITE_BARRIER();
@@ -245,7 +236,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday64,
 DEFINE_SYSCALL1(time32_t, time, USER UNCHECKED time32_t *, tmp) {
 	time32_t result;
 	struct timespec nowts;
-	nowts = realtime_now();
+	nowts = realtime();
 	result = (time32_t)nowts.tv_sec;
 	if (tmp) {
 		validate_writable(tmp, sizeof(*tmp));
@@ -261,7 +252,7 @@ DEFINE_SYSCALL1(time32_t, time, USER UNCHECKED time32_t *, tmp) {
 DEFINE_SYSCALL1(time64_t, time64, USER UNCHECKED time64_t *, tmp) {
 	time64_t result;
 	struct timespec nowts;
-	nowts = realtime_now();
+	nowts = realtime();
 	result = (time64_t)nowts.tv_sec;
 	if (tmp) {
 		validate_writable(tmp, sizeof(*tmp));
@@ -278,7 +269,7 @@ DEFINE_COMPAT_SYSCALL1(compat_time32_t, time,
                        USER UNCHECKED compat_time32_t *, tmp) {
 	compat_time32_t result;
 	struct timespec nowts;
-	nowts = realtime_now();
+	nowts = realtime();
 	result = (compat_time32_t)nowts.tv_sec;
 	if (tmp) {
 		validate_writable(tmp, sizeof(*tmp));
@@ -295,7 +286,7 @@ DEFINE_COMPAT_SYSCALL1(compat_time64_t, time64,
                        USER UNCHECKED compat_time64_t *, tmp) {
 	compat_time64_t result;
 	struct timespec nowts;
-	nowts = realtime_now();
+	nowts = realtime();
 	result = (compat_time64_t)nowts.tv_sec;
 	if (tmp) {
 		validate_writable(tmp, sizeof(*tmp));

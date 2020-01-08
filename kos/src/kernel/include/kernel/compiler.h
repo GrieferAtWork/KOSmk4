@@ -45,6 +45,7 @@
                        * making them safe to-be called from any asynchronous context. */
 #define NOCONNECT     /* Annotation for functions which may only be called when
                        * the calling thread isn't already connected to a signal. */
+#define NOPREEMPT     /* Annotation for functions that may only be called with preemption disabled. */
 #define NOBLOCK_IF(x) /* Annotation for functions that are conditionally non-blocking. */
 #define THROWS(...)   /* Annotation for the set of error codes/classes/sub-classes that may be thrown by a function.
                        * You may include `...' as a possible error code to indicate that the function

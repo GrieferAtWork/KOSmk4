@@ -1923,7 +1923,7 @@ struct superblock_type {
 	SLIST_NODE(struct superblock_type) st_chain;
 };
 
-#define __private_superblock_type_destroy(self)  driver_destroy((self)->st_driver)
+#define __private_superblock_type_destroy(self) driver_destroy((self)->st_driver)
 DEFINE_REFCOUNT_FUNCTIONS(struct superblock_type, st_driver->d_refcnt, __private_superblock_type_destroy);
 
 
@@ -1939,16 +1939,14 @@ DEFINE_REFCOUNT_FUNCTIONS(struct superblock_type, st_driver->d_refcnt, __private
 struct superblock
 #if defined(__cplusplus) && !defined(CONFIG_WANT_FS_AS_STRUCT)
 	: directory_node /* The underlying superblock root directory. */
-#endif
+#endif /* __cplusplus && !CONFIG_WANT_FS_AS_STRUCT */
 {
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
 	struct directory_node         s_rootdir;      /* The underlying superblock root directory. */
-#endif
+#endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 	struct superblock_type const *s_type;         /* [1..1][const] Superblock type & operations. */
 	REF struct basic_block_device*s_device;       /* [0..1][const] The device supposedly carrying the data of this superblock. */
 	REF struct driver            *s_driver;       /* [1..1][const] The driver implementing this superblock. */
-	struct atomic_rwlock          s_wall_lock;    /* Lock for `s_wall' */
-	REF struct wall_clock        *s_wall;         /* [1..1][lock(s_lock)] WALL-clock used to generate filesystem timestamps. */
 	uintptr_t                     s_flags;        /* Superblock flags (Set of `SUPERBLOCK_F*') */
 	struct atomic_rwlock          s_changed_lock; /* Lock that must be held when removing nodes from, or clearing `s_changed' */
 	WEAK REF struct inode        *s_changed;      /* [0..1][CHAIN(->i_changed_next)]
@@ -1981,7 +1979,7 @@ struct superblock
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
 __DEFINE_SYNC_PROXY(struct superblock, s_rootdir.d_node)
-#endif
+#endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 
 
 /* Functions for acquiring the `s_nodes_lock' for reading/writing. */

@@ -157,10 +157,10 @@ insert_target_after_caller:
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
 					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
 						/* End the current quantum prematurely. */
-						cpu_quantum_end();
+						cpu_quantum_end_nopr();
 						/* Immediately switch to the next target thread. */
 						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
-						cpu_run_current_and_remember(caller);
+						cpu_run_current_and_remember_nopr(caller);
 					}
 					PREEMPTION_ENABLE();
 				}
@@ -265,10 +265,10 @@ insert_target_after_caller:
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
 					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
 						/* End the current quantum prematurely. */
-						cpu_quantum_end();
+						cpu_quantum_end_nopr();
 						/* Immediately switch to the next target thread. */
 						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
-						cpu_run_current_and_remember(caller);
+						cpu_run_current_and_remember_nopr(caller);
 					}
 					PREEMPTION_ENABLE();
 				}
@@ -476,10 +476,10 @@ insert_target_after_caller:
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
 					    mycpu->c_override != caller) {
 						/* End the current quantum prematurely. */
-						cpu_quantum_end();
+						cpu_quantum_end_nopr();
 						/* Immediately switch to the next target thread. */
 						mycpu->c_current = target;
-						cpu_run_current_and_remember(caller);
+						cpu_run_current_and_remember_nopr(caller);
 					}
 					PREEMPTION_ENABLE();
 				}
@@ -699,10 +699,10 @@ insert_target_after_caller:
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
 					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
 						/* End the current quantum prematurely. */
-						cpu_quantum_end();
+						cpu_quantum_end_nopr();
 						/* Immediately switch to the next target thread. */
 						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
-						cpu_run_current_and_remember(caller);
+						cpu_run_current_and_remember_nopr(caller);
 					}
 					PREEMPTION_ENABLE();
 				}

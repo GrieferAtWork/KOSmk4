@@ -244,7 +244,6 @@ again:
 			result = (RETURN_NODE_TYPE *)resptr.hp_ptr;
 
 			TRY {
-				//TODO:result->i_fileatime = wall_gettime(self->i_super->s_wall);
 #ifdef DEFINE_DIRECTORY_SYMLINK
 				memcpy(result->sl_stext, link_text, link_text_size, sizeof(char));
 #elif defined(DEFINE_DIRECTORY_MKDIR)
@@ -287,8 +286,9 @@ again:
 			result->d_parent   = target_directory; /* NOTE: Incref()'d below. */
 			result->d_mask     = DIRECTORY_DEFAULT_MASK;
 #endif /* ... */
-			memcpy(&result->i_filemtime, &result->i_fileatime, sizeof(struct timespec));
-			memcpy(&result->i_filectime, &result->i_fileatime, sizeof(struct timespec));
+			result->i_fileatime = realtime();
+			result->i_filemtime = result->i_fileatime;
+			result->i_filectime = result->i_fileatime;
 		} EXCEPT {
 			assert(!isshared(target_entry));
 			destroy(target_entry);

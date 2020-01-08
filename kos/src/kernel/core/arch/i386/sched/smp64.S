@@ -71,7 +71,7 @@
 
 
 .section .text
-PUBLIC_FUNCTION(cpu_ipi_service)
+PUBLIC_FUNCTION(cpu_ipi_service_nopr)
 	.cfi_startproc
 	/* Simple wrapper around the IPI interrupt handler. */
 	popq_cfi %rax
@@ -134,8 +134,8 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	 * XXX: Add some way to have high-priority tasks be switched
 	 *      to immediately, rather than having the previous task
 	 *      complete its quantum. */
-2:	EXTERN(cpu_loadpending)
-	call   cpu_loadpending
+2:	EXTERN(cpu_loadpending_nopr)
+	call   cpu_loadpending_nopr
 
 	/* Check for more pending IPIs by looking at the first word
 	 * of the IPI in-use bitset. - The same check is also done by
@@ -170,8 +170,8 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	movq   %rsp, this_sched_state(%rsi)
 
 	/* Prematurely end the current quantum */
-	EXTERN(cpu_quantum_end)
-	call   cpu_quantum_end
+	EXTERN(cpu_quantum_end_nopr)
+	call   cpu_quantum_end_nopr
 
 	/* Load the new CPU state */
 	EXTERN(thiscpu_current)
@@ -180,7 +180,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	jmp    x86_load_thread_rax_cpu_rbx
 	.cfi_endproc
 END(x86_idt_apic_ipi)
-END(cpu_ipi_service)
+END(cpu_ipi_service_nopr)
 
 .section .rodata
 PRIVATE_OBJECT(ipi_action_table)
@@ -649,8 +649,8 @@ INTERN_FUNCTION(x86_smp_entry32)
 	cmpq   $(CPU_PENDING_ENDOFCHAIN), %rdx
 	jz     1f
 	movq   R_CPU, %rcx
-	EXTERN(cpu_loadpending_chain)
-	call   cpu_loadpending_chain
+	EXTERN(cpu_loadpending_chain_nopr)
+	call   cpu_loadpending_chain_nopr
 1:
 
 	/* Enable preemptive interrupts. */

@@ -160,8 +160,8 @@ NOTHROW(KCALL cpu_broadcastipi_notthis)(cpu_ipi_t func, void *args[CPU_IPI_ARGCO
 /* Add the given task as running / sleeping within the current CPU.
  * NOTE: These functions inherit a reference to `thread' from the caller!
  * NOTE: Preemption must be disabled before this function may be called! */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL cpu_addrunningtask)(/*in*/ REF struct task *__restrict thread) {
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL cpu_addrunningtask_nopr)(/*in*/ REF struct task *__restrict thread) {
 	struct cpu *me = thread->t_cpu;
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
@@ -175,8 +175,8 @@ NOTHROW(FCALL cpu_addrunningtask)(/*in*/ REF struct task *__restrict thread) {
 	cpu_assert_running(thread);
 }
 
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL cpu_addsleepingtask)(/*in*/ REF struct task *__restrict thread) {
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL cpu_addsleepingtask_nopr)(/*in*/ REF struct task *__restrict thread) {
 	struct cpu *me = thread->t_cpu;
 	struct task **pnext, *next;
 	assert(!PREEMPTION_ENABLED());
@@ -202,8 +202,8 @@ NOTHROW(FCALL cpu_addsleepingtask)(/*in*/ REF struct task *__restrict thread) {
 /* Remove a running or sleeping task `thread' from the current CPU.
  * NOTE: This function returns with a reference to `thread' handed to the caller.
  * NOTE: Preemption must be disabled before this function may be called! */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL cpu_delrunningtask)(/*out*/ REF struct task *__restrict thread) {
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL cpu_delrunningtask_nopr)(/*out*/ REF struct task *__restrict thread) {
 	struct cpu *me = thread->t_cpu;
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
@@ -247,8 +247,8 @@ done:
 	cpu_assert_integrity(/*ignored_thread:*/ thread);
 }
 
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL cpu_delsleepingtask)(/*out*/ REF struct task *__restrict thread) {
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL cpu_delsleepingtask_nopr)(/*out*/ REF struct task *__restrict thread) {
 	struct cpu *me = thread->t_cpu;
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
@@ -291,9 +291,9 @@ NOTHROW(FCALL cpu_addpendingtask)(struct cpu *__restrict target,
  * NOTE: Preemption must be disabled before this function may be called!
  * @return: true:  At least 1 new task was added to the execution ring.
  * @return: false: No tasks were pending. */
-INTERN NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL cpu_loadpending_chain)(struct cpu *__restrict me,
-                                     REF struct task *__restrict chain) {
+INTERN NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+NOTHROW(FCALL cpu_loadpending_chain_nopr)(struct cpu *__restrict me,
+                                          REF struct task *__restrict chain) {
 	REF struct task *next;
 	struct task *first_new, *last_new;
 	struct task *first_before, *first_after;
@@ -344,14 +344,15 @@ NOTHROW(FCALL cpu_loadpending_chain)(struct cpu *__restrict me,
 #endif
 }
 
-PUBLIC NOBLOCK bool NOTHROW(KCALL cpu_loadpending)(void) {
+PUBLIC NOBLOCK NOPREEMPT bool
+NOTHROW(KCALL cpu_loadpending_nopr)(void) {
 	REF struct task *chain;
 	struct cpu *me = THIS_CPU;
 	assert(!PREEMPTION_ENABLED());
 	chain = ATOMIC_XCH(me->c_pending, CPU_PENDING_ENDOFCHAIN);
 	if (chain == CPU_PENDING_ENDOFCHAIN)
 		return false;
-	cpu_loadpending_chain(me, chain);
+	cpu_loadpending_chain_nopr(me, chain);
 	return true;
 }
 #endif /* !CONFIG_NO_SMP */
@@ -359,7 +360,7 @@ PUBLIC NOBLOCK bool NOTHROW(KCALL cpu_loadpending)(void) {
 
 
 #ifndef CONFIG_NO_SMP
-PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
                              void *args[CPU_IPI_ARGCOUNT]) {
 	/* Check if the thread switched CPUs in the mean time. */
@@ -550,11 +551,11 @@ unset_waking:
 			if ((flags & TASK_WAKE_FHIGHPRIO) &&
 			    mycpu->c_override != caller) {
 				/* End the current quantum prematurely. */
-				cpu_quantum_end();
+				cpu_quantum_end_nopr();
 				/* Directly switch execution to the thread in question,
 				 * immediately allowing it to resume executing. */
 				mycpu->c_current = thread;
-				cpu_run_current_and_remember(caller);
+				cpu_run_current_and_remember_nopr(caller);
 				/* At this point, `thread' got to execute for a while, and we're
 				 * back in business, with preemption enabled once again. */
 			}
@@ -586,7 +587,7 @@ again_already_disabled:
 	cpu_assert_integrity();
 #ifndef CONFIG_NO_SMP
 	assert(!PREEMPTION_ENABLED());
-	if (cpu_loadpending())
+	if (cpu_loadpending_nopr())
 		goto yield_and_return;
 #endif /* !CONFIG_NO_SMP */
 	assert((FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt == &FORCPU(me, thiscpu_idle)) ==
@@ -596,9 +597,9 @@ again_already_disabled:
 #ifndef CONFIG_NO_SMP
 	/* Check if there are IPIs that are pending
 	 * execution, as send from other cores. */
-	if (cpu_hwipi_pending()) {
+	if (arch_cpu_hwipi_pending_nopr()) {
 		ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
-		cpu_ipi_service();
+		cpu_ipi_service_nopr();
 #ifdef PREEMPTION_ENABLE_P
 		/* Use `PREEMPTION_ENABLE_P()' in order to ensure that interrupts had at least
 		 * a single instruction during which they could be served, in case GCC decides
@@ -630,8 +631,8 @@ again_already_disabled:
 				continue;
 			/* There are sleeping threads with the KEEPCORE flag set... */
 			ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
-			if (cpu_swipi_pending()) {
-				cpu_ipi_service();
+			if (arch_cpu_swipi_pending_nopr()) {
+				cpu_ipi_service_nopr();
 				PREEMPTION_ENABLE();
 				goto again;
 			}
@@ -687,8 +688,8 @@ again_already_disabled:
 #endif /* !CONFIG_NO_SMP */
 	/* We're the boot CPU, which means we're not allowed to go to sleep. */
 	ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
-	if (cpu_swipi_pending()) {
-		cpu_ipi_service();
+	if (arch_cpu_swipi_pending_nopr()) {
+		cpu_ipi_service_nopr();
 		PREEMPTION_ENABLE();
 		goto again;
 	}
@@ -727,7 +728,9 @@ again_already_disabled:
 				PREEMPTION_ENABLE();
 				did_time_out = (*rtc->rc_waitfor)(rtc, &timeout);
 				decref_unlikely(rtc);
-				cpu_enable_preemptive_interrupts();
+				PREEMPTION_DISABLE();
+				cpu_enable_preemptive_interrupts_nopr();
+				PREEMPTION_ENABLE();
 				if (!did_time_out)
 					goto again;
 				/* The timeout has expired. -> Timeout any thread who's timeout has expired. */
@@ -764,13 +767,13 @@ do_idle_wait:
 yield_and_return:
 	/* Switch back to a running state. */
 	ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
-	if (cpu_swipi_pending()) {
-		cpu_ipi_service();
+	if (arch_cpu_swipi_pending_nopr()) {
+		cpu_ipi_service_nopr();
 		PREEMPTION_ENABLE();
 		goto again;
 	}
 	/* End the current quantum prematurely. */
-	cpu_quantum_end();
+	cpu_quantum_end_nopr();
 	/* Remove the IDLE thread from the running-ring. */
 	cpu_assert_integrity();
 	me->c_current = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt;
@@ -785,7 +788,7 @@ yield_and_return:
 	FORCPU(me, thiscpu_idle).t_sched.s_asleep.ss_timeout.q_jtime = (jtime_t)-1;
 	cpu_assert_integrity(/*ignored_thread:*/ THIS_TASK);
 	/* Switch context to the next task. */
-	cpu_run_current_and_remember(&FORCPU(me, thiscpu_idle));
+	cpu_run_current_and_remember_nopr(&FORCPU(me, thiscpu_idle));
 	assert(FORCPU(me, thiscpu_idle).t_flags & TASK_FRUNNING);
 }
 
@@ -875,11 +878,11 @@ done_pop_preemption:
 			if ((flags & TASK_START_FHIGHPRIO) &&
 			    mycpu->c_override != caller) {
 				/* End the current quantum prematurely. */
-				cpu_quantum_end();
+				cpu_quantum_end_nopr();
 				/* Directly switch execution to the new thread,
 				 * immediately allowing it to start executing. */
 				mycpu->c_current = thread;
-				cpu_run_current_and_remember(caller);
+				cpu_run_current_and_remember_nopr(caller);
 				/* At this point, `thread' got to execute for a while, and we're
 				 * back in business, with preemption enabled once again. */
 				assert(PREEMPTION_ENABLED());

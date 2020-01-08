@@ -1143,13 +1143,10 @@ struct hop_datapart_stat /*[PREFIX(ds_)]*/ {
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
                                                               * @throw: E_NO_SUCH_BLOCKDEVICE: No block device is bound to the given superblock.
                                                               * @return: * : The value written to `arg->of_hint' */
-#define HOP_SUPERBLOCK_OPEN_WALL                  0x00010502 /* [struct hop_openfd *arg] Open the wall-clock associated with a superblock.
+#define HOP_SUPERBLOCK_OPEN_DRIVER                0x00010502 /* [struct hop_openfd *arg] Open the driver associated with a superblock.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
                                                               * @return: * : The value written to `arg->of_hint' */
-#define HOP_SUPERBLOCK_OPEN_DRIVER                0x00010503 /* [struct hop_openfd *arg] Open the driver associated with a superblock.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
-                                                              * @return: * : The value written to `arg->of_hint' */
-#define HOP_SUPERBLOCK_SYNC                       0x00010504 /* [unsigned int sync_device] Synchronize the given superblock (when `sync_device' is non-zero, also sync the associated block device (if any)).
+#define HOP_SUPERBLOCK_SYNC                       0x00010503 /* [unsigned int sync_device] Synchronize the given superblock (when `sync_device' is non-zero, also sync the associated block device (if any)).
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock. */
 
 

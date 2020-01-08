@@ -69,7 +69,7 @@ struct cpu_timestamp {
 /* Timestamp for the last realtime re-sync made by the CPU */
 PRIVATE ATTR_PERCPU struct cpu_timestamp thiscpu_last_resync = {};
 
-INTERN NOBLOCK void
+INTERN NOBLOCK NOPREEMPT void
 NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 	REF struct realtime_clock_struct *rt;
 	struct cpu_timestamp *cts;
@@ -151,14 +151,14 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict self) {
 				printk(KERN_INFO "[cpu#%u] Adjust quantum length %I32u -> %I32u\n",
 				       self->c_id, cpus, new_quantum_length);
 				FORCPU(self, thiscpu_quantum_length) = new_quantum_length;
-				arch_cpu_update_quantum_length();
+				arch_cpu_update_quantum_length_nopr();
 				*cts = nts;
 			}
 		}
 	}
 }
 
-INTERN NOBLOCK void
+INTERN NOBLOCK NOPREEMPT void
 NOTHROW(FCALL cpu_inc_jiffies)(struct cpu *__restrict self) {
 	jtime_t newtime;
 	newtime = ++FORCPU(self, thiscpu_jiffies);
@@ -235,20 +235,9 @@ PRIVATE ATTR_PERCPU quantum_diff_t thiscpu_last_qtime_q = 0;
 /* Returns the number of ticks that have passed since the start
  * of the current quantum. - The true current CPU-local time
  * (in ticks) can then be calculated as:
- * >> (thiscpu_jiffies * PERCPU(thiscpu_quantum_length)) + PERCPU(thiscpu_quantum_offset) + cpu_quantum_elapsed();
+ * >> (thiscpu_jiffies * PERCPU(thiscpu_quantum_length)) + PERCPU(thiscpu_quantum_offset) + cpu_quantum_elapsed_nopr();
  * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
-PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t
-NOTHROW(FCALL cpu_quantum_elapsed)(struct cpu *__restrict mycpu,
-                                   jtime_t *__restrict preal_jtime) {
-	quantum_diff_t result;
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
-	result = cpu_quantum_elapsed_nopr(mycpu, preal_jtime);
-	PREEMPTION_POP(was);
-	return result;
-}
-
-PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t
+PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 2)) quantum_diff_t
 NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict mycpu,
                                         jtime_t *__restrict preal_jtime) {
 	quantum_diff_t result;
@@ -265,28 +254,9 @@ NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict mycpu,
 	return result;
 }
 
-PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t
-NOTHROW(FCALL cpu_quantum_remaining)(struct cpu *__restrict mycpu,
-                                     jtime_t *__restrict preal_jtime) {
-	quantum_diff_t result;
-	pflag_t was;
-	was = PREEMPTION_PUSHOFF();
-	result = cpu_quantum_remaining_nopr(mycpu, preal_jtime);
-	PREEMPTION_POP(was);
-	return result;
-}
-
-PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) quantum_diff_t
-NOTHROW(FCALL cpu_quantum_remaining_nopr)(struct cpu *__restrict mycpu,
-                                          jtime_t *__restrict preal_jtime) {
-	quantum_diff_t result;
-	result = cpu_quantum_elapsed_nopr(mycpu, preal_jtime);
-	return FORCPU(mycpu, thiscpu_quantum_length) - result;
-}
-
 /* Adjust quantum time to track the calling thread's quantum about to end prematurely. */
-PUBLIC NOBLOCK void
-NOTHROW(KCALL cpu_quantum_end)(void) {
+PUBLIC NOBLOCK NOPREEMPT void
+NOTHROW(KCALL cpu_quantum_end_nopr)(void) {
 	quantum_diff_t elapsed, length;
 	struct cpu *mycpu = THIS_CPU;
 	assert(!PREEMPTION_ENABLED());
@@ -299,7 +269,7 @@ NOTHROW(KCALL cpu_quantum_end)(void) {
 		FORCPU(mycpu, thiscpu_last_qtime_j) = FORCPU(mycpu, thiscpu_jiffies);
 		FORCPU(mycpu, thiscpu_last_qtime_q) = elapsed;
 	}
-	cpu_quantum_reset_nopr();
+	arch_cpu_quantum_reset_nopr();
 	length = cpu_add_quantum_offset(elapsed);
 	THIS_TASK->t_atime.add_quantum(elapsed, length);
 }
@@ -307,6 +277,14 @@ NOTHROW(KCALL cpu_quantum_end)(void) {
 
 
 
+/* Disable / re-enable preemptive interrupts on the calling CPU.
+ * When `cpu_enable_preemptive_interrupts_nopr()' is called, any time that has
+ * passed between then and a prior call to `cpu_disable_preemptive_interrupts_nopr()'
+ * will be added to the cpu's local jiffies counter, while also configuring
+ * the current quantum to be aligned with the amount of time that has passed.
+ * NOTE: In case preemptive interrupts cannot be disabled,
+ *       all of these these functions are no-ops.
+ * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
 PUBLIC NOBLOCK void
 NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
 	quantum_diff_t elapsed, length;
@@ -346,21 +324,6 @@ NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void) {
 	}
 	arch_cpu_enable_preemptive_interrupts_nopr();
 }
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL cpu_disable_preemptive_interrupts)(void) {
-	pflag_t was = PREEMPTION_PUSHOFF();
-	cpu_disable_preemptive_interrupts_nopr();
-	PREEMPTION_POP(was);
-}
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL cpu_enable_preemptive_interrupts)(void) {
-	pflag_t was = PREEMPTION_PUSHOFF();
-	cpu_enable_preemptive_interrupts_nopr();
-	PREEMPTION_POP(was);
-}
-
 
 
 DECL_END
