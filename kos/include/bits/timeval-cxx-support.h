@@ -25,6 +25,8 @@
 #if defined(__cplusplus) && defined(__USE_KOS)
 #include <__stdcxx.h>
 
+#include <hybrid/__overflow.h>
+
 #include <kos/anno.h>
 
 #ifndef __USECS_PER_SEC

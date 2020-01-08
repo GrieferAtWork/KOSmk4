@@ -187,7 +187,9 @@ syscall_printtrace(struct rpc_syscall_info const *__restrict args,
 	
 		default:
 			/* Unknown system call... */
+#ifdef __ARCH_HAVE_COMPAT
 done_unknown_system_call:
+#endif /* __ARCH_HAVE_COMPAT */
 			temp = format_printf(printer, arg, "break:%#Ix?\n", args->rsi_sysno);
 			goto done_check_and_account_temp;
 		}

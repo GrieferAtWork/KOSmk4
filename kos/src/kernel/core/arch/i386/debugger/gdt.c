@@ -73,19 +73,19 @@ PUBLIC ATTR_DBGDATA struct segment x86_dbggdt[SEGMENT_COUNT] = {
 	[SEGMENT_INDEX(SEGMENT_NULL)]          = SEGMENT_DESCRIPTOR_INIT(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),                                       /* NULL segment */
 	[SEGMENT_INDEX(SEGMENT_KERNEL_CODE)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, GDT_L, GDT_DB, 1), /* Kernel code segment */
 	[SEGMENT_INDEX(SEGMENT_KERNEL_DATA)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, GDT_L, GDT_DB, 1), /* Kernel data segment */
-	DEFINE_LOHI_SEGMENT(SEGMENT_CPU_LDT, __x86_gdt_ldt_lo, __x86_gdt_ldt_hi),                          /* CPU LDT */
-	N64(DEFINE_LOHI_SEGMENT(SEGMENT_KERNEL_FSBASE, __x86_gdt_kernel_tls_lo, __x86_gdt_kernel_tls_hi),) /* THIS_TASK */
-	DEFINE_LOHI_SEGMENT(SEGMENT_CPU_TSS, __x86_gdt_tss_lo, __x86_gdt_tss_hi),                          /* CPU TSS */
-	N64(DEFINE_LOHI_SEGMENT(SEGMENT_CPU_TSS_DF, __x86_gdt_tss_df_lo, __x86_gdt_tss_df_hi),)            /* CPU TSS (for #DF) */
 	[SEGMENT_INDEX(SEGMENT_USER_CODE32)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 3, 1, 0, 0, 1, 1), /* User code (32-bit) */
 	[SEGMENT_INDEX(SEGMENT_USER_DATA32)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, 0, 1, 1), /* User data (32-bit) */
 	[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, 0, 1, 1), /* User %fs base (32-bit) */
 	[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, 0, 1, 1), /* User %gs base (32-bit) */
+	DEFINE_LOHI_SEGMENT(SEGMENT_CPU_LDT, __x86_gdt_ldt_lo, __x86_gdt_ldt_hi),                          /* CPU LDT */
+	N64(DEFINE_LOHI_SEGMENT(SEGMENT_KERNEL_FSBASE, __x86_gdt_kernel_tls_lo, __x86_gdt_kernel_tls_hi),) /* THIS_TASK */
+	DEFINE_LOHI_SEGMENT(SEGMENT_CPU_TSS, __x86_gdt_tss_lo, __x86_gdt_tss_hi),                          /* CPU TSS */
+	N64(DEFINE_LOHI_SEGMENT(SEGMENT_CPU_TSS_DF, __x86_gdt_tss_df_lo, __x86_gdt_tss_df_hi),)            /* CPU TSS (for #DF) */
 #ifdef __x86_64__
-	[SEGMENT_INDEX(SEGMENT_USER_CODE64)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 3, 1, 0, 1, 0, 1), /* User code (64-bit) */
-	[SEGMENT_INDEX(SEGMENT_USER_DATA64)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, 1, 0, 1), /* User data (64-bit) */
 	[SEGMENT_INDEX(SEGMENT_KERNEL_CODE32)] = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 0, 1, 0, 0, 1, 1), /* Kernel code (32-bit) */
 	[SEGMENT_INDEX(SEGMENT_KERNEL_DATA32)] = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 0, 1, 0, 0, 1, 1), /* Kernel data (32-bit) */
+	[SEGMENT_INDEX(SEGMENT_USER_CODE64)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_CODE_EXRD, 1, 3, 1, 0, 1, 0, 1), /* User code (64-bit) */
+	[SEGMENT_INDEX(SEGMENT_USER_DATA64)]   = SEGMENT_DESCRIPTOR_INIT(0, 0xfffff, SEGMENT_DESCRIPTOR_TYPE_DATA_RDWR, 1, 3, 1, 0, 1, 0, 1), /* User data (64-bit) */
 #endif /* __x86_64__ */
 };
 

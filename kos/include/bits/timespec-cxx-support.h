@@ -25,8 +25,9 @@
 #if defined(__cplusplus) && defined(__USE_KOS)
 #include <__stdcxx.h>
 
-#include <kos/anno.h>
 #include <hybrid/__overflow.h>
+
+#include <kos/anno.h>
 
 #ifndef __NSECS_PER_SEC
 #define __NSECS_PER_SEC __UINTPTR_C(1000000000)

@@ -84,7 +84,8 @@ NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self);
  *       may have been held temporarily, meaning that the caller should
  *       re-load local copies of affected resources. */
 LOCAL NONNULL((1)) __BOOL
-(FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self)
+(FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self,
+                              struct timespec const *abs_timeout DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK);
 
 /* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,
@@ -93,7 +94,8 @@ LOCAL NONNULL((1)) __BOOL
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
 LOCAL NONNULL((1)) unsigned int
-NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self);
+NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self,
+                                        struct timespec const *abs_timeout DFL(__NULLPTR));
 
 /* Downgrade a write-lock to a read-lock (Always succeeds). */
 LOCAL NOBLOCK NONNULL((1)) void
@@ -300,12 +302,13 @@ NOTHROW(FCALL shared_rwlock_tryupgrade)(struct shared_rwlock *__restrict self) {
  *       may have been held temporarily, meaning that the caller should
  *       re-load local copies of affected resources. */
 LOCAL NONNULL((1)) __BOOL
-(FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self)
+(FCALL shared_rwlock_upgrade)(struct shared_rwlock *__restrict self,
+                              struct timespec const *abs_timeout)
 		THROWS(E_WOULDBLOCK) {
 	if (shared_rwlock_tryupgrade(self))
 		return 1;
 	shared_rwlock_endread(self);
-	shared_rwlock_write(self);
+	shared_rwlock_write(self, abs_timeout);
 	return 0;
 }
 
@@ -315,11 +318,12 @@ LOCAL NONNULL((1)) __BOOL
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
 LOCAL NONNULL((1)) unsigned int
-NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self) {
+NOTHROW(FCALL shared_rwlock_upgrade_nx)(struct shared_rwlock *__restrict self,
+                                        struct timespec const *abs_timeout) {
 	if (shared_rwlock_tryupgrade(self))
 		return 1;
 	shared_rwlock_endread(self);
-	if (!shared_rwlock_write_nx(self))
+	if (!shared_rwlock_write_nx(self, abs_timeout))
 		return 0;
 	return 2;
 }
