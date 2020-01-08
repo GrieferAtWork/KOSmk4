@@ -80,19 +80,19 @@
 DECL_BEGIN
 
 PUBLIC void FCALL
-syscall_trace(struct rpc_syscall_info const *__restrict args) {
+syscall_trace(struct rpc_syscall_info const *__restrict info) {
 #if 1
 #ifdef __ARCH_HAVE_COMPAT
-	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(args->rsi_flags)
-	    ? args->rsi_sysno == COMPAT_NR(_syslog)
-	    : args->rsi_sysno == SYS_syslog)
+	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(info->rsi_flags)
+	    ? info->rsi_sysno == COMPAT_NR(_syslog)
+	    : info->rsi_sysno == SYS_syslog)
 		return; /* Don't trace this one! */
 #else /* __ARCH_HAVE_COMPAT */
-	if (args->rsi_sysno == SYS_syslog)
+	if (info->rsi_sysno == SYS_syslog)
 		return; /* Don't trace this one! */
 #endif /* !__ARCH_HAVE_COMPAT */
 #endif
-	syscall_printtrace(args, &syslog_printer, SYSLOG_LEVEL_TRACE);
+	syscall_printtrace(info, &syslog_printer, SYSLOG_LEVEL_TRACE);
 }
 
 
@@ -108,12 +108,12 @@ syscall_trace(struct rpc_syscall_info const *__restrict args) {
 #undef linux_oldstat
 
 PUBLIC ssize_t FCALL
-syscall_printtrace(struct rpc_syscall_info const *__restrict args,
+syscall_printtrace(struct rpc_syscall_info const *__restrict info,
                    pformatprinter printer, void *arg) {
 	ssize_t result, temp;
 	/* Trace system calls. */
 #ifdef __ARCH_HAVE_COMPAT
-	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(args->rsi_flags)) {
+	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(info->rsi_flags)) {
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
 		result = format_printf(printer, arg, "task[%u].sys32_", task_gettid_s());
 #else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
@@ -121,13 +121,13 @@ syscall_printtrace(struct rpc_syscall_info const *__restrict args,
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER != 4 */
 		if unlikely(result < 0)
 			goto done;
-		if (args->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
+		if (info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
 			temp = (*printer)(arg, "X", 1);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
 		}
-		switch (args->rsi_sysno) {
+		switch (info->rsi_sysno) {
 	
 #define __SYSCALL(name)                                                              \
 		case COMPAT_NR(_##name):                                                     \
@@ -135,12 +135,12 @@ syscall_printtrace(struct rpc_syscall_info const *__restrict args,
 			                     arg,                                                \
 			                     #name "(" COMPAT_SYSCALL(TRACE_ARGS_FORMAT_L)(name) \
 			                     COMPAT_SYSCALL(TRACE_ARGS_ARGS)(name,               \
-			                         (COMPAT_NR(AM_##name)(args->rsi_regs[0],        \
-			                                               args->rsi_regs[1],        \
-			                                               args->rsi_regs[2],        \
-			                                               args->rsi_regs[3],        \
-			                                               args->rsi_regs[4],        \
-			                                               args->rsi_regs[5]))       \
+			                         (COMPAT_NR(AM_##name)(info->rsi_regs[0],        \
+			                                               info->rsi_regs[1],        \
+			                                               info->rsi_regs[2],        \
+			                                               info->rsi_regs[3],        \
+			                                               info->rsi_regs[4],        \
+			                                               info->rsi_regs[5]))       \
 			                     ));                                                 \
 			break;
 #ifndef __INTELLISENSE__
@@ -158,13 +158,13 @@ syscall_printtrace(struct rpc_syscall_info const *__restrict args,
 		result = format_printf(printer, arg, "task[%u].sys_", task_gettid_s());
 		if unlikely(result < 0)
 			goto done;
-		if (args->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
+		if (info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
 			temp = (*printer)(arg, "X", 1);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
 		}
-		switch (args->rsi_sysno) {
+		switch (info->rsi_sysno) {
 	
 #define __SYSCALL(name)                                                      \
 		case SYS_##name:                                                     \
@@ -172,12 +172,12 @@ syscall_printtrace(struct rpc_syscall_info const *__restrict args,
 			                     arg,                                        \
 			                     #name "(" SYSCALL_TRACE_ARGS_FORMAT_L(name) \
 			                     SYSCALL_TRACE_ARGS_ARGS(name,               \
-			                         (__NRAM_##name(args->rsi_regs[0],       \
-			                                        args->rsi_regs[1],       \
-			                                        args->rsi_regs[2],       \
-			                                        args->rsi_regs[3],       \
-			                                        args->rsi_regs[4],       \
-			                                        args->rsi_regs[5]))      \
+			                         (__NRAM_##name(info->rsi_regs[0],       \
+			                                        info->rsi_regs[1],       \
+			                                        info->rsi_regs[2],       \
+			                                        info->rsi_regs[3],       \
+			                                        info->rsi_regs[4],       \
+			                                        info->rsi_regs[5]))      \
 			                     ));                                         \
 			break;
 #ifndef __INTELLISENSE__
@@ -190,25 +190,25 @@ syscall_printtrace(struct rpc_syscall_info const *__restrict args,
 #ifdef __ARCH_HAVE_COMPAT
 done_unknown_system_call:
 #endif /* __ARCH_HAVE_COMPAT */
-			temp = format_printf(printer, arg, "break:%#Ix?", args->rsi_sysno);
+			temp = format_printf(printer, arg, "break:%#Ix?", info->rsi_sysno);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
-			if (args->rsi_flags & RPC_SYSCALL_INFO_FREGVALID_MASK) {
+			if (info->rsi_flags & RPC_SYSCALL_INFO_FREGVALID_MASK) {
 				size_t i;
 				bool is_first = true;
 				temp = (*printer)(arg, " [", 2);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;
-				for (i = 0; i < COMPILER_LENOF(args->rsi_regs); ++i) {
-					if (!(args->rsi_flags & RPC_SYSCALL_INFO_FREGVALID(i)))
+				for (i = 0; i < COMPILER_LENOF(info->rsi_regs); ++i) {
+					if (!(info->rsi_flags & RPC_SYSCALL_INFO_FREGVALID(i)))
 						continue;
 					temp = format_printf(printer, arg,
 					                     "%sarg%Iu: %#Ix",
 					                     is_first ? "" : ", ",
 					                     i,
-					                     args->rsi_regs[i]);
+					                     info->rsi_regs[i]);
 					if unlikely(temp < 0)
 						goto err;
 					result += temp;

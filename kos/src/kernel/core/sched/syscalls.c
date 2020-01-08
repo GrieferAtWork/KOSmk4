@@ -236,7 +236,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday64,
 DEFINE_SYSCALL1(time32_t, time, USER UNCHECKED time32_t *, tmp) {
 	time32_t result;
 	struct timespec nowts;
-	nowts = realtime();
+	nowts  = realtime();
 	result = (time32_t)nowts.tv_sec;
 	if (tmp) {
 		validate_writable(tmp, sizeof(*tmp));
@@ -252,7 +252,7 @@ DEFINE_SYSCALL1(time32_t, time, USER UNCHECKED time32_t *, tmp) {
 DEFINE_SYSCALL1(time64_t, time64, USER UNCHECKED time64_t *, tmp) {
 	time64_t result;
 	struct timespec nowts;
-	nowts = realtime();
+	nowts  = realtime();
 	result = (time64_t)nowts.tv_sec;
 	if (tmp) {
 		validate_writable(tmp, sizeof(*tmp));
@@ -269,7 +269,7 @@ DEFINE_COMPAT_SYSCALL1(compat_time32_t, time,
                        USER UNCHECKED compat_time32_t *, tmp) {
 	compat_time32_t result;
 	struct timespec nowts;
-	nowts = realtime();
+	nowts  = realtime();
 	result = (compat_time32_t)nowts.tv_sec;
 	if (tmp) {
 		compat_validate_writable(tmp, sizeof(*tmp));
@@ -286,7 +286,7 @@ DEFINE_COMPAT_SYSCALL1(compat_time64_t, time64,
                        USER UNCHECKED compat_time64_t *, tmp) {
 	compat_time64_t result;
 	struct timespec nowts;
-	nowts = realtime();
+	nowts  = realtime();
 	result = (compat_time64_t)nowts.tv_sec;
 	if (tmp) {
 		compat_validate_writable(tmp, sizeof(*tmp));

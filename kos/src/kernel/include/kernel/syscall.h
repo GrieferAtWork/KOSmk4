@@ -25,10 +25,9 @@
 #include <kernel/types.h>
 
 #include <asm/unistd.h>
-#include <compat/config.h>
 #include <bits/format-printer.h>
 #include <kos/kernel/syscalls.h> /* __ARCH_WANT_SYSCALL_* */
-#include <kos/syscalls.h> /* System call prototypes */
+#include <kos/syscalls.h>        /* System call prototypes */
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #if !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT) || \
@@ -145,21 +144,13 @@ DECL_BEGIN
  * @return: true:  Successfully changed the current tracing state.
  * @return: false: Tracing was already enabled/disabled. */
 FUNDEF bool (KCALL syscall_tracing_setenabled)(bool enable);
+
 /* Check if system call tracing is enabled. */
 FUNDEF WUNUSED bool NOTHROW(KCALL syscall_tracing_getenabled)(void);
 
-
 struct rpc_syscall_info;
-FUNDEF void FCALL syscall_trace(struct rpc_syscall_info const *__restrict args);
-FUNDEF ssize_t FCALL syscall_printtrace(struct rpc_syscall_info const *__restrict args, __pformatprinter printer, void *arg);
-
-#ifdef __ARCH_HAVE_COMPAT
-FUNDEF void FCALL
-syscall_trace_compat(struct rpc_syscall_info const *__restrict args);
-FUNDEF ssize_t KCALL
-syscall_printtrace_compat(__pformatprinter printer, void *arg,
-                          struct rpc_syscall_info const *__restrict args);
-#endif /* __ARCH_HAVE_COMPAT */
+FUNDEF void FCALL syscall_trace(struct rpc_syscall_info const *__restrict info);
+FUNDEF ssize_t FCALL syscall_printtrace(struct rpc_syscall_info const *__restrict info, __pformatprinter printer, void *arg);
 
 #else /* !CONFIG_NO_SYSCALL_TRACING */
 #define syscall_tracing_getenabled()  false
