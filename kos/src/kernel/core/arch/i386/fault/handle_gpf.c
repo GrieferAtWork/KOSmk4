@@ -89,14 +89,76 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
 	orig_pc = pc;
-	opcode  = x86_decode_instruction(state, &pc, &op_flags);
+#define isuser() icpustate_isuser(state)
+
+#ifdef __x86_64__
+	if unlikely(ADDR_IS_NONCANON(pc)) {
+		/* Special case: Non-canonical program counter
+		 * Just like with #PF for `%cr2 == %rip', handle this case by trying to
+		 * restore the original RIP-value from `0(%rsp)', assuming that the RIP
+		 * register ended up getting corrupted due to a bad `call', rather than
+		 * a bad `jmp' */
+		uintptr_t callsite_pc;
+		uintptr_t sp = icpustate_getsp(state);
+		unsigned int i;
+		callsite_pc = (uintptr_t)pc;
+		if (sp >= KERNELSPACE_BASE && isuser())
+			goto set_noncanon_pc_exception;
+		TRY {
+			callsite_pc = *(uintptr_t *)sp;
+		} EXCEPT {
+			if (!was_thrown(E_SEGFAULT)) {
+				if (isuser())
+					PERTASK_SET(this_exception_faultaddr, (void *)pc);
+				RETHROW();
+			}
+			goto set_noncanon_pc_exception;
+		}
+		if (isuser() ? (callsite_pc >= USERSPACE_END)
+		             : (callsite_pc < KERNELSPACE_BASE)) {
+			callsite_pc = (uintptr_t)pc;
+			goto set_noncanon_pc_exception;
+		}
+		icpustate_setpc(state, callsite_pc);
+		icpustate_setsp(state, sp + 8);
+		TRY {
+			void const *call_instr;
+			call_instr = instruction_pred((void *)callsite_pc);
+			if likely(call_instr)
+				callsite_pc = (uintptr_t)call_instr;
+		} EXCEPT {
+			if (!was_thrown(E_SEGFAULT)) {
+				if (isuser())
+					PERTASK_SET(this_exception_faultaddr, (void *)pc);
+				RETHROW();
+			}
+			/* Discard read-from-callsite_pc exception... */
+		}
+set_noncanon_pc_exception:
+		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
+		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
+		PERTASK_SET(this_exception_pointers[0], (uintptr_t)pc);
+		PERTASK_SET(this_exception_pointers[1],
+		            (uintptr_t)(E_SEGFAULT_CONTEXT_USERCODE |
+		                        E_SEGFAULT_CONTEXT_NONCANON));
+		if (!isuser())
+			PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
+		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
+			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+		printk(KERN_DEBUG "[segfault] PC-Fault at %p [pc=%p,%p] [ecode=%#x] [#GPF] [tid=%u]\n",
+		       pc, callsite_pc, icpustate_getpc(state),
+		       ecode, (unsigned int)task_getroottid_s());
+		goto unwind_state;
+	}
+#endif /* __x86_64__ */
+
+	opcode = x86_decode_instruction(state, &pc, &op_flags);
 
 	/* TODO: Some instructions (such as `XSAVEC') raise #GP if their operands are miss-aligned.
 	 *       KOS has a dedicated exception for this (`E_SEGFAULT_UNALIGNED') that should be
 	 *       thrown in such cases! */
 
 	TRY {
-#define isuser()     icpustate_isuser(state)
 #define MOD_DECODE() (pc = x86_decode_modrm(pc, &mod, op_flags))
 
 #define RD_RMB()  modrm_getrmb(state, &mod, op_flags)
@@ -570,10 +632,8 @@ do_noncanon:
 				}
 				for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
-#if 1
-				printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p,%p] [#GPF] [pid=%u]\n",
+				printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p,%p] [#GPF] [tid=%u]\n",
 				       nc_addr, orig_pc, pc, (unsigned int)task_getroottid_s());
-#endif
 				goto unwind_state;
 			}
 done_noncanon_check:
@@ -730,7 +790,7 @@ check_x86_64_noncanon_fsgsbase:
 					if (op_flags & F_REX_W) {
 						u64 nc_addr = RD_RMREGQ();
 						if (ADDR_IS_NONCANON(nc_addr)) {
-							printk(KERN_DEBUG "[segfault] Non-canonical wr%csbase with %p [pc=%p,%p] [#GPF] [pid=%u]\n",
+							printk(KERN_DEBUG "[segfault] Non-canonical wr%csbase with %p [pc=%p,%p] [#GPF] [tid=%u]\n",
 							       mod.mi_reg == 2 ? 'f' : 'g', nc_addr,
 							       orig_pc, pc, (unsigned int)task_getroottid_s());
 							PERTASK_SET(this_exception_pointers[0], (uintptr_t)nc_addr);
@@ -1044,7 +1104,7 @@ check_x86_64_noncanon_fsgsbase:
 				          ((u64)(u32)gpregs_getpdx(&state->ics_gpregs) << 32);
 				if (ADDR_IS_NONCANON(nc_addr)) {
 					PERTASK_SET(this_exception_pointers[0], (uintptr_t)nc_addr);
-					printk(KERN_DEBUG "[segfault] Non-canonical write to msr#%#I32x with %p [pc=%p,%p] [#GPF] [pid=%u]\n",
+					printk(KERN_DEBUG "[segfault] Non-canonical write to msr#%#I32x with %p [pc=%p,%p] [#GPF] [tid=%u]\n",
 					       (u32)gpregs_getpcx(&state->ics_gpregs), nc_addr,
 					       orig_pc, pc, (unsigned int)task_getroottid_s());
 set_x86_64_non_canon_special:
@@ -1147,7 +1207,7 @@ null_segment_error:
 			PERTASK_SET(this_exception_pointers[1],
 			            (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
 		}
-		printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? [pc=%p,%p,opcode=%I32u] [pid=%u]\n",
+		printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? [pc=%p,%p,opcode=%I32u] [tid=%u]\n",
 		       orig_pc, pc, opcode, (unsigned int)task_getroottid_s());
 		goto unwind_state;
 	}

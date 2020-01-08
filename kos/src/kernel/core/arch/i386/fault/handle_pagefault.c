@@ -528,7 +528,7 @@ do_handle_iob_node_access:
 							uintptr_t sp;
 							/* Must unwind the stack to restore the IP of the VIO call-site. */
 							sp = icpustate_getsp(state);
-							if (isuser() && sp >= KERNELSPACE_BASE)
+							if (sp >= KERNELSPACE_BASE && isuser())
 								goto do_normal_vio; /* Validate the stack-pointer for user-space. */
 							TRY {
 								callsite_pc = *(uintptr_t *)sp;
@@ -539,7 +539,7 @@ do_handle_iob_node_access:
 							}
 							/* Unwind the stack, and remember the call-site instruction pointer. */
 #ifdef __x86_64__
-							if (isuser() ? (callsite_pc >= KERNELSPACE_BASE)
+							if (isuser() ? (callsite_pc >= USERSPACE_END)
 							             : (callsite_pc < KERNELSPACE_BASE))
 								goto do_normal_vio;
 							icpustate_setpc(state, callsite_pc);
@@ -1060,7 +1060,7 @@ throw_segfault:
 		 * -> Try to unwind this happening. */
 		uintptr_t callsite_pc;
 		uintptr_t sp = icpustate_getsp(state);
-		if (sp != (uintptr_t)(&state->ics_irregs + 1) && sp >= KERNELSPACE_BASE)
+		if (sp >= KERNELSPACE_BASE && (sp != (uintptr_t)(&state->ics_irregs + 1) || isuser()))
 			goto not_a_badcall;
 		TRY {
 			callsite_pc = *(uintptr_t *)sp;
@@ -1073,7 +1073,7 @@ throw_segfault:
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__
-		if (isuser() ? (callsite_pc >= KERNELSPACE_BASE)
+		if (isuser() ? (callsite_pc >= USERSPACE_END)
 		             : (callsite_pc < KERNELSPACE_BASE))
 			goto not_a_badcall;
 		icpustate_setpc(state, callsite_pc);
@@ -1093,6 +1093,19 @@ throw_segfault:
 			                                      SIZEOF_IRREGS_KERNEL);
 		}
 #endif /* !__x86_64__ */
+		TRY {
+			void const *call_instr;
+			call_instr = instruction_pred((void *)callsite_pc);
+			if likely(call_instr)
+				callsite_pc = (uintptr_t)call_instr;
+		} EXCEPT {
+			if (!was_thrown(E_SEGFAULT)) {
+				if (isuser())
+					PERTASK_SET(this_exception_faultaddr, (void *)pc);
+				RETHROW();
+			}
+			/* Discard read-from-callsite_pc exception... */
+		}
 		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 		PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
@@ -1112,6 +1125,9 @@ throw_segfault:
 			for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 		}
+		printk(KERN_DEBUG "[segfault] PC-Fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [tid=%u]\n",
+		       addr, pageaddr, callsite_pc, icpustate_getpc(state),
+		       ecode, (unsigned int)task_getroottid_s());
 		goto do_unwind_state;
 	}
 not_a_badcall:
@@ -1148,11 +1164,9 @@ set_exception_pointers:
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
 	pc = (uintptr_t)instruction_trysucc((void const *)pc);
-#if 1
 	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [tid=%u]\n",
 	       addr, pageaddr, icpustate_getpc(state), pc,
 	       ecode, (unsigned int)task_getroottid_s());
-#endif
 	icpustate_setpc(state, pc);
 do_unwind_state:
 	/* Try to trigger a debugger trap (if enabled) */

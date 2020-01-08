@@ -63,8 +63,8 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter)
 	swapgs
 	/* Construct an IRET tail. */
 	pushq  $(SEGMENT_USER_DATA32_RPL) /* %ss */
-	pushq  %rbp                       /* %useresp */
-	pushfq
+	pushq  %rbp                       /* %userrsp */
+	pushfq                            /* %rflags */
 	orq    $(EFLAGS_IF), (%rsp)
 	.cfi_reg_offset %rflags, 0, %rsp
 	pushq  $(SEGMENT_USER_CODE32_RPL) /* %cs */
@@ -132,8 +132,8 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	swapgs
 	/* Construct an IRET tail. */
 	pushq  $(SEGMENT_USER_DATA32_RPL) /* %ss */
-	pushq  %rbp                       /* %useresp */
-	pushfq
+	pushq  %rbp                       /* %userrsp */
+	pushfq                            /* %rflags */
 	orq    $(EFLAGS_IF), (%rsp)
 	.cfi_reg_offset %rflags, 0, %rsp
 	pushq  $(SEGMENT_USER_CODE32_RPL) /* %cs */
