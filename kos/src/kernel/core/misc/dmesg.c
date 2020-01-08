@@ -67,7 +67,7 @@ DECL_BEGIN
  * within this buffer. However, be aware that the buffer can change at any
  * time, meaning that any packet decoding errors must be considered the same
  * as having fully wrapped around the buffer. */
-PUBLIC ATTR_BSS byte_t dmesg_buffer[CONFIG_DMESG_BUFFER_SIZE] = {};
+PUBLIC ATTR_BSS ATTR_ALIGNED(1) byte_t dmesg_buffer[CONFIG_DMESG_BUFFER_SIZE] = {};
 
 /* Base-line seconds for all cached dmesg packets. */
 PUBLIC ATTR_BSS time_t dmesg_secondsbase = 0;
@@ -249,8 +249,8 @@ PUBLIC struct syslog_sink dmesg_sink = {
 /* While running the builtin debugger, don't write log messages to dmesg.
  * This way, dmesg doesn't get flooded with messages from within the debugger,
  * which could otherwise pose problems when attempting to inspect dmesg logs
- * from within the debugger, more messages get added, maybe even override the
- * ones you were attempting to look at. */
+ * from within the debugger: more messages get added, maybe even override the
+ * ones you were trying to look at. */
 DEFINE_DBG_BZERO_OBJECT(dmesg_sink.ss_levels);
 
 

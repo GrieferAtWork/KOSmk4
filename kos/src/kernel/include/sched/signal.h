@@ -205,7 +205,7 @@ struct task_sigset {
  * `kmalloc()'). */
 #ifndef CONFIG_TASK_STATIC_CONNECTIONS
 #define CONFIG_TASK_STATIC_CONNECTIONS  3
-#endif
+#endif /* !CONFIG_TASK_STATIC_CONNECTIONS */
 
 struct task_connections {
 	struct task_sigset      tc_signals;                                /* Task signal set. */
@@ -257,6 +257,14 @@ FUNDEF struct sig *NOTHROW(KCALL task_disconnectall)(void);
 /* Check if the calling thread is connected to any signal. */
 FUNDEF NOBLOCK WUNUSED ATTR_CONST bool NOTHROW(KCALL task_isconnected)(void);
 
+/* Check if there is a signal to was delivered, disconnecting all
+ * other connected signals if this was the case.
+ * @return: NULL: No signal is available
+ * @return: * :   The signal that was delivered. */
+FUNDEF NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void);
+
+struct __qtime;
+
 /* Wait for the first signal to be delivered,
  * disconnecting all connected signals thereafter.
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
@@ -266,10 +274,6 @@ FUNDEF NOBLOCK WUNUSED ATTR_CONST bool NOTHROW(KCALL task_isconnected)(void);
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
  * @return: NULL: No signal has become available (never returned when `NULL' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */
-FUNDEF NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void);
-
-struct __qtime;
-
 FUNDEF struct sig *KCALL
 task_waitfor(struct __qtime const *abs_timeout DFL(__NULLPTR)) THROWS(E_WOULDBLOCK, ...);
 

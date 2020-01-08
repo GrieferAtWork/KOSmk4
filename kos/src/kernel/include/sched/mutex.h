@@ -48,7 +48,6 @@ struct mutex {
 #define mutex_init_held(x)  (void)(sig_init(&(x)->m_unlock), (x)->m_owner = THIS_TASK, (x)->m_count = 1)
 #define mutex_cinit_held(x) (void)(sig_cinit(&(x)->m_unlock), (x)->m_owner = THIS_TASK, (x)->m_count = 1)
 #define mutex_acquired(x)   (__hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE) == THIS_TASK)
-#define mutex_available(x)  (__hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE) == THIS_TASK)
 
 /* Try to acquire a lock to the given mutex without blocking. */
 LOCAL NOBLOCK WUNUSED NONNULL((1)) bool
@@ -106,7 +105,7 @@ again:
 #ifdef CONFIG_YIELD_BEFORE_CONNECT
 do_exchange:
 		;
-#endif
+#endif /* CONFIG_YIELD_BEFORE_CONNECT */
 	} while (!__hybrid_atomic_cmpxch_weak(self->m_owner, old_task, me,
 	                                      __ATOMIC_SEQ_CST,
 	                                      __ATOMIC_SEQ_CST));
@@ -150,7 +149,7 @@ again:
 #ifdef CONFIG_YIELD_BEFORE_CONNECT
 do_exchange:
 		;
-#endif
+#endif /* CONFIG_YIELD_BEFORE_CONNECT */
 	} while (!__hybrid_atomic_cmpxch_weak(self->m_owner, old_task, me,
 	                                      __ATOMIC_SEQ_CST,
 	                                      __ATOMIC_SEQ_CST));
@@ -210,7 +209,7 @@ NOTHROW(KCALL mutex_available)(struct mutex const *__restrict self) {
  * @return: true:  The mutex is currently available.
  * @return: false: The mutex wasn't available, and a connection was made to its signal. */
 LOCAL WUNUSED NONNULL((1)) bool
-(KCALL mutex_poll)(struct mutex *__restrict self) THROWS(W_BADALLOC) {
+(KCALL mutex_poll)(struct mutex *__restrict self) THROWS(E_BADALLOC) {
 	struct task *old_task;
 	old_task = __hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE);
 	if (!old_task || old_task == THIS_TASK)
@@ -223,7 +222,6 @@ LOCAL WUNUSED NONNULL((1)) bool
 }
 
 
-
 __DEFINE_SYNC_MUTEX(struct mutex,
                     mutex_tryacquire,
                     mutex_acquire,
@@ -234,8 +232,6 @@ __DEFINE_SYNC_MUTEX(struct mutex,
 __DEFINE_SYNC_POLL(struct mutex,
                    mutex_poll,
                    mutex_poll)
-
-
 
 #endif /* __CC__ */
 

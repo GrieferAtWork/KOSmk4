@@ -505,6 +505,11 @@ NOTHROW(KCALL task_disconnectall)(void) {
 
 
 
+/* Push/pop the active set of connections.
+ * NOTE: After having been pushed, the calling thread will appear to not be connected
+ *       to anything. - Similarly, `task_popconnections()' may only be called after
+ *       all connections made were disconnected again.
+ *    -> Signals delivered in the mean time will then immediately be available. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_pushconnections)(struct task_connections *__restrict cons) {
 	struct task_connections *mycons;
@@ -525,7 +530,7 @@ NOTHROW(KCALL task_pushconnections)(struct task_connections *__restrict cons) {
 	cons->tc_signals.ts_dlvr   = NULL;
 	IF_REENTRANT(was = PREEMPTION_PUSHOFF());
 	con = mycons->tc_signals.ts_cons;
-	cons->tc_signals.ts_cons   = con;
+	cons->tc_signals.ts_cons = con;
 	COMPILER_WRITE_BARRIER();
 	if (con) {
 		mycons->tc_signals.ts_cons = NULL;
@@ -592,7 +597,10 @@ NOTHROW(KCALL task_popconnections)(struct task_connections *__restrict cons) {
 }
 #undef IF_REENTRANT
 
-
+/* Check if there is a signal to was delivered, disconnecting all
+ * other connected signals if this was the case.
+ * @return: NULL: No signal is available
+ * @return: * :   The signal that was delivered. */
 PUBLIC NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void) {
 	struct task_connections *mycons;
 	struct sig *result;
@@ -606,7 +614,15 @@ PUBLIC NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void) {
 	return result;
 }
 
-
+/* Wait for the first signal to be delivered,
+ * disconnecting all connected signals thereafter.
+ * NOTE: Prior to fully starting to block, this function will call `task_serve()'
+ * @param: abs_timeout:  The global (s.a. `quantum_time()') timeout for the wait.
+ * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.
+ * @throw: * :          [task_waitfor] An error was thrown by an RPC function.
+ *                       NOTE: In this case, `task_disconnectall()' will have been called.
+ * @return: NULL: No signal has become available (never returned when `NULL' is passed for `abs_timeout').
+ * @return: * :   The signal that was delivered. */
 PUBLIC struct sig *KCALL
 task_waitfor(qtime_t const *abs_timeout) THROWS(E_WOULDBLOCK,...) {
 	struct task_connections *mycons;
@@ -644,6 +660,9 @@ got_signal:
 	return result;
 }
 
+/* Same as `task_waitfor', but only service NX RPCs, and return `NULL' if
+ * there are pending RPCs that are allowed to throw exception, or if preemption
+ * was disabled, and the operation would have blocked. */
 PUBLIC WUNUSED struct sig *
 NOTHROW(KCALL task_waitfor_nx)(qtime_t const *abs_timeout) {
 	struct task_connections *mycons;
@@ -715,8 +734,7 @@ got_signal:
 	return result;
 }
 
-
-
+/* Same as `task_waitfor', but don't serve RPC functions. */
 PUBLIC struct sig *KCALL
 task_waitfor_norpc(qtime_t const *abs_timeout) THROWS(E_WOULDBLOCK) {
 	struct task_connections *mycons;
@@ -746,8 +764,6 @@ got_signal:
 	}
 	return result;
 }
-
-
 
 
 DECL_END
