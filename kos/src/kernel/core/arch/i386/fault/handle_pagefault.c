@@ -1149,7 +1149,7 @@ set_exception_pointers:
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
 	pc = (uintptr_t)instruction_trysucc((void const *)pc);
 #if 1
-	printk(KERN_DEBUG "Segmentation fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [tid=%u]\n",
+	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p,%p] [ecode=%#x] [tid=%u]\n",
 	       addr, pageaddr, icpustate_getpc(state), pc,
 	       ecode, (unsigned int)task_getroottid_s());
 #endif

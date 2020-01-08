@@ -79,7 +79,7 @@ PRIVATE struct icpustate *FCALL
 x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) {
 	byte_t *orig_pc, *pc;
 	u32 opcode;
-	op_flag_t flags;
+	op_flag_t op_flags;
 	struct modrm mod;
 	u16 effective_segment_value;
 	unsigned int i;
@@ -89,7 +89,7 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 	if (state->ics_irregs.ir_pflags & EFLAGS_IF)
 		__sti();
 	orig_pc = pc;
-	opcode  = x86_decode_instruction(state, &pc, &flags);
+	opcode  = x86_decode_instruction(state, &pc, &op_flags);
 
 	/* TODO: Some instructions (such as `XSAVEC') raise #GP if their operands are miss-aligned.
 	 *       KOS has a dedicated exception for this (`E_SEGFAULT_UNALIGNED') that should be
@@ -97,47 +97,47 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 
 	TRY {
 #define isuser()     icpustate_isuser(state)
-#define MOD_DECODE() (pc = x86_decode_modrm(pc, &mod, flags))
+#define MOD_DECODE() (pc = x86_decode_modrm(pc, &mod, op_flags))
 
-#define RD_RMB()  modrm_getrmb(state, &mod, flags)
-#define WR_RMB(v) modrm_setrmb(state, &mod, flags, v)
-#define RD_RMW()  modrm_getrmw(state, &mod, flags)
-#define WR_RMW(v) modrm_setrmw(state, &mod, flags, v)
-#define RD_RML()  modrm_getrml(state, &mod, flags)
-#define WR_RML(v) modrm_setrml(state, &mod, flags, v)
+#define RD_RMB()  modrm_getrmb(state, &mod, op_flags)
+#define WR_RMB(v) modrm_setrmb(state, &mod, op_flags, v)
+#define RD_RMW()  modrm_getrmw(state, &mod, op_flags)
+#define WR_RMW(v) modrm_setrmw(state, &mod, op_flags, v)
+#define RD_RML()  modrm_getrml(state, &mod, op_flags)
+#define WR_RML(v) modrm_setrml(state, &mod, op_flags, v)
 #ifdef __x86_64__
-#define RD_RMQ()  modrm_getrmq(state, &mod, flags)
-#define WR_RMQ(v) modrm_setrmq(state, &mod, flags, v)
+#define RD_RMQ()  modrm_getrmq(state, &mod, op_flags)
+#define WR_RMQ(v) modrm_setrmq(state, &mod, op_flags, v)
 #endif /* __x86_64__ */
 
-#define RD_RMREGB()  modrm_getrmregb(state, &mod, flags)
-#define WR_RMREGB(v) modrm_setrmregb(state, &mod, flags, v)
-#define RD_RMREGW()  modrm_getrmregw(state, &mod, flags)
-#define WR_RMREGW(v) modrm_setrmregw(state, &mod, flags, v)
-#define RD_RMREGL()  modrm_getrmregl(state, &mod, flags)
-#define WR_RMREGL(v) modrm_setrmregl(state, &mod, flags, v)
+#define RD_RMREGB()  modrm_getrmregb(state, &mod, op_flags)
+#define WR_RMREGB(v) modrm_setrmregb(state, &mod, op_flags, v)
+#define RD_RMREGW()  modrm_getrmregw(state, &mod, op_flags)
+#define WR_RMREGW(v) modrm_setrmregw(state, &mod, op_flags, v)
+#define RD_RMREGL()  modrm_getrmregl(state, &mod, op_flags)
+#define WR_RMREGL(v) modrm_setrmregl(state, &mod, op_flags, v)
 #ifdef __x86_64__
-#define RD_RMREGQ()  modrm_getrmregq(state, &mod, flags)
-#define WR_RMREGQ(v) modrm_setrmregq(state, &mod, flags, v)
+#define RD_RMREGQ()  modrm_getrmregq(state, &mod, op_flags)
+#define WR_RMREGQ(v) modrm_setrmregq(state, &mod, op_flags, v)
 #endif /* __x86_64__ */
 
-#define RD_REG()   modrm_getreg(state, &mod, flags)
-#define WR_REG(v)  modrm_setreg(state, &mod, flags, v)
-#define RD_REGB()  modrm_getregb(state, &mod, flags)
-#define WR_REGB(v) modrm_setregb(state, &mod, flags, v)
-#define RD_REGW()  modrm_getregw(state, &mod, flags)
-#define WR_REGW(v) modrm_setregw(state, &mod, flags, v)
-#define RD_REGL()  modrm_getregl(state, &mod, flags)
-#define WR_REGL(v) modrm_setregl(state, &mod, flags, v)
+#define RD_REG()   modrm_getreg(state, &mod, op_flags)
+#define WR_REG(v)  modrm_setreg(state, &mod, op_flags, v)
+#define RD_REGB()  modrm_getregb(state, &mod, op_flags)
+#define WR_REGB(v) modrm_setregb(state, &mod, op_flags, v)
+#define RD_REGW()  modrm_getregw(state, &mod, op_flags)
+#define WR_REGW(v) modrm_setregw(state, &mod, op_flags, v)
+#define RD_REGL()  modrm_getregl(state, &mod, op_flags)
+#define WR_REGL(v) modrm_setregl(state, &mod, op_flags, v)
 #ifdef __x86_64__
-#define RD_REGQ()  modrm_getregq(state, &mod, flags)
-#define WR_REGQ(v) modrm_setregq(state, &mod, flags, v)
+#define RD_REGQ()  modrm_getregq(state, &mod, op_flags)
+#define WR_REGQ(v) modrm_setregq(state, &mod, op_flags, v)
 #endif /* !__x86_64__ */
 
 		if (is_ss) {
 			effective_segment_value = icpustate_getss(state);
 		} else {
-			switch (flags & F_SEGMASK) {
+			switch (op_flags & F_SEGMASK) {
 			case F_SEGFS: effective_segment_value = icpustate_getfs(state); break;
 			case F_SEGGS: effective_segment_value = icpustate_getgs(state); break;
 #ifndef __x86_64__
@@ -208,7 +208,7 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 				MOD_DECODE();
 				if (mod.mi_type != MODRM_MEMORY)
 					break;
-				nc_addr = x86_decode_modrmgetmem(state, &mod, flags);
+				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				goto noncanon_write;
 
 			case 0x8a:    /* MOV r8,r/m8 */
@@ -450,23 +450,23 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 				MOD_DECODE();
 				if (mod.mi_type != MODRM_MEMORY)
 					break;
-				nc_addr = x86_decode_modrmgetmem(state, &mod, flags);
+				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				goto noncanon_read;
 
 			case 0xa0:  /* MOV AL,moffs8* */
 				nc_addr = *(u8 *)pc;
 				pc += 1;
-				nc_addr += x86_decode_segmentbase(state, flags);
+				nc_addr += x86_decode_segmentbase(state, op_flags);
 				goto noncanon_read;
 			case 0xa1: /* MOV AX,moffs16*; MOV EAX,moffs32*; MOV RAX,moffs64* */
-				if (flags & F_AD64) {
+				if (op_flags & F_AD64) {
 					nc_addr = *(u64 *)pc;
 					pc += 8;
 				} else {
 					nc_addr = *(u32 *)pc;
 					pc += 4;
 				}
-				nc_addr += x86_decode_segmentbase(state, flags);
+				nc_addr += x86_decode_segmentbase(state, op_flags);
 				goto noncanon_read;
 
 			case 0x0f01: /* invlpg m / lgdt m48 / lidt m48 / lmsw r/m16
@@ -475,7 +475,7 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 				MOD_DECODE();
 				if (mod.mi_type != MODRM_MEMORY)
 					break;
-				nc_addr = x86_decode_modrmgetmem(state, &mod, flags);
+				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (mod.mi_reg == 0)
 					goto noncanon_write; /* sgdt */
 				if (mod.mi_reg == 1)
@@ -490,7 +490,7 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 				MOD_DECODE();
 				if (mod.mi_type != MODRM_MEMORY)
 					break;
-				nc_addr = x86_decode_modrmgetmem(state, &mod, flags);
+				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (mod.mi_reg == 1)
 					goto noncanon_write; /* fxrstor */
 				if (mod.mi_reg == 2)
@@ -500,17 +500,17 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 			case 0xa2: /* MOV moffs8*,AL */
 				nc_addr = *(u8 *)pc;
 				pc += 1;
-				nc_addr += x86_decode_segmentbase(state, flags);
+				nc_addr += x86_decode_segmentbase(state, op_flags);
 				goto noncanon_write;
 			case 0xa3: /* MOV moffs16*,AX; MOV moffs32*,EAX; MOV moffs64*,RAX */
-				if (flags & F_AD64) {
+				if (op_flags & F_AD64) {
 					nc_addr = *(u64 *)pc;
 					pc += 8;
 				} else {
 					nc_addr = *(u32 *)pc;
 					pc += 4;
 				}
-				nc_addr += x86_decode_segmentbase(state, flags);
+				nc_addr += x86_decode_segmentbase(state, op_flags);
 				goto noncanon_write;
 
 			case 0xac: /* lodsb */
@@ -571,8 +571,8 @@ do_noncanon:
 				for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 #if 1
-				printk(KERN_DEBUG "Segmentation fault at %p [pc=%p,%p] [#GPF] [pid=%u]\n",
-				       nc_addr, pc_after_opcode, pc, (unsigned int)task_getroottid_s());
+				printk(KERN_DEBUG "[segfault] Fault at %p [pc=%p,%p] [#GPF] [pid=%u]\n",
+				       nc_addr, orig_pc, pc, (unsigned int)task_getroottid_s());
 #endif
 				goto unwind_state;
 			}
@@ -607,17 +607,17 @@ done_noncanon_check:
 		case 0x0f07: /* sysret */
 		case 0x0f08: /* invd */
 		case 0x0f09: /* wbinvd */
-			goto generic_privileged_instruction;
+			goto generic_privileged_instruction_if_user;
 		case 0xe4: /* inb */
 		case 0xe5: /* inw / inl */
 		case 0xe6: /* outb */
 		case 0xe7: /* outw / outl */
 		case 0xcd: /* int $n */
 			pc += 1;
-			goto generic_privileged_instruction;
+			goto generic_privileged_instruction_if_user;
 		case 0x0f3882: /* invpcid */
 			MOD_DECODE();
-			goto generic_privileged_instruction;
+			goto generic_privileged_instruction_if_user;
 
 #endif /* __x86_64__ */
 
@@ -629,10 +629,10 @@ done_noncanon_check:
 			 * CALL ptr16:32 D Invalid Valid Call far, absolute, address given in operand. */
 #ifdef __x86_64__
 			/* This instruction only exists in compatibility mode! */
-			if (!(flags & F_IS_X32))
+			if (!(op_flags & F_IS_X32))
 				goto unsupported_instruction;
 #endif /* __x86_64__ */
-			if (flags & F_OP16) {
+			if (op_flags & F_OP16) {
 				offset = UNALIGNED_GET16((u16 *)pc);
 				pc += 2;
 			} else {
@@ -662,16 +662,16 @@ done_noncanon_check:
 				u16 segment;
 				uintptr_t offset;
 				byte_t *addr;
-				addr = (byte_t *)x86_decode_modrmgetmem(state, &mod, flags);
+				addr = (byte_t *)x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (isuser())
 					validate_readable(addr, 1);
 #ifdef __x86_64__
-				if (flags & F_REX_W) {
+				if (op_flags & F_REX_W) {
 					segment = UNALIGNED_GET16((u16 *)(addr + 0));
 					offset  = UNALIGNED_GET64((u64 *)(addr + 2));
 				} else
 #endif /* __x86_64__ */
-				if (!(flags & F_OP16)) {
+				if (!(op_flags & F_OP16)) {
 					segment = UNALIGNED_GET16((u16 *)(addr + 0));
 					offset  = UNALIGNED_GET32((u32 *)(addr + 2));
 				} else {
@@ -697,30 +697,71 @@ done_noncanon_check:
 
 		case 0x0fae:
 			MOD_DECODE();
-			if (mod.mi_reg == 2 && mod.mi_type == MODRM_MEMORY) {
-				/* ldmxcsr m32 (attempted to set a reserved bit) */
-				PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
-				PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
-				PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
-				PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MISC_MXCSR);
-				PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_RML());
-				for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
-					PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
-				goto unwind_state;
-			}
+			switch (mod.mi_reg) {
+
+			case 2:
+				if (mod.mi_type == MODRM_MEMORY) {
+					/* ldmxcsr m32 (attempted to set a reserved bit) */
+					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+					PERTASK_SET(this_exception_pointers[0], E_ILLEGAL_INSTRUCTION_X86_OPCODE(opcode, mod.mi_reg));
+					PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD);
+					PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_MISC_MXCSR);
+					PERTASK_SET(this_exception_pointers[3], (uintptr_t)RD_RML());
+					for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
+						PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+					goto unwind_state;
+				}
 #ifdef __x86_64__
-			if (mod.mi_reg == 5) /* xrstor */
-				goto generic_privileged_instruction;
-			if (mod.mi_reg == 6) /* tpause */
-				goto generic_privileged_instruction;
+				else {
+					/* F3       0F AE /2 WRFSBASE r32     Load the FS base address with the 32-bit value in the source register.
+					 * F3 REX.W 0F AE /2 WRFSBASE r64     Load the FS base address with the 64-bit value in the source register. */
+					goto check_x86_64_noncanon_fsgsbase;
+				}
 #endif /* __x86_64__ */
+				break;
+
+#ifdef __x86_64__
+			case 3:
+				if (mod.mi_type == MODRM_REGISTER) {
+					/* F3       0F AE /3 WRGSBASE r32     Load the GS base address with the 32-bit value in the source register.
+					 * F3 REX.W 0F AE /3 WRGSBASE r64     Load the GS base address with the 64-bit value in the source register. */
+check_x86_64_noncanon_fsgsbase:
+					/* The wr(fs|gs)base instructions will raise #GF if the operand is a non-canonical pointer. */
+					if (op_flags & F_REX_W) {
+						u64 nc_addr = RD_RMREGQ();
+						if (ADDR_IS_NONCANON(nc_addr)) {
+							printk(KERN_DEBUG "[segfault] Non-canonical wr%csbase with %p [pc=%p,%p] [#GPF] [pid=%u]\n",
+							       mod.mi_reg == 2 ? 'f' : 'g', nc_addr,
+							       orig_pc, pc, (unsigned int)task_getroottid_s());
+							PERTASK_SET(this_exception_pointers[0], (uintptr_t)nc_addr);
+							goto set_x86_64_non_canon_special;
+						}
+					} else {
+						/* 32-bit operand can never be non-canonical */
+					}
+				}
+				break;
+#endif /* __x86_64__ */
+
+
+#ifdef __x86_64__
+			case 5: /* xrstor */
+				goto generic_privileged_instruction_if_user;
+
+			case 6: /* tpause */
+				goto generic_privileged_instruction_if_user;
+#endif /* __x86_64__ */
+
+			default:
+				break;
+			}
 			goto generic_failure;
 
 #ifdef __x86_64__
 		case 0x0fc3:
 			MOD_DECODE();
 			if (mod.mi_reg == 3) /* xrstors */
-				goto generic_privileged_instruction;
+				goto generic_privileged_instruction_if_user;
 			goto generic_failure;
 #endif /* __x86_64__ */
 
@@ -918,7 +959,7 @@ done_noncanon_check:
 			}
 			{
 				u8 buf[2 + sizeof(uintptr_t)];
-				byte_t *addr = (byte_t *)x86_decode_modrmgetmem(state, &mod, flags);
+				byte_t *addr = (byte_t *)x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (isuser()) {
 					validate_readable(addr, sizeof(buf));
 					PERTASK_SET(this_exception_pointers[1],
@@ -984,8 +1025,42 @@ done_noncanon_check:
 				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 			goto unwind_state;
 
-		case 0x0f30:
-			/* wrmsr */
+		case 0x0f30: /* wrmsr */
+#ifdef __x86_64__
+			/* A couple of MSR registers can throw #GP if the written value
+			 * is a non-canonical pointer. Since KOS throws `E_SEGFAULT' for
+			 * this case, manually check if we're dealing with one of these MSRs,
+			 * and the written value is such a pointer.
+			 * s.a. Intel instruction set reference for `WRMSR' (Vol. 2C) */
+			if ((u32)gpregs_getpcx(&state->ics_gpregs) == IA32_DS_AREA ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_FS_BASE ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_GS_BASE ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_KERNEL_GS_BASE ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_LSTAR ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_SYSENTER_EIP ||
+			    (u32)gpregs_getpcx(&state->ics_gpregs) == IA32_SYSENTER_ESP) {
+				u64 nc_addr;
+				nc_addr = ((u64)(u32)gpregs_getpax(&state->ics_gpregs)) |
+				          ((u64)(u32)gpregs_getpdx(&state->ics_gpregs) << 32);
+				if (ADDR_IS_NONCANON(nc_addr)) {
+					PERTASK_SET(this_exception_pointers[0], (uintptr_t)nc_addr);
+					printk(KERN_DEBUG "[segfault] Non-canonical write to msr#%#I32x with %p [pc=%p,%p] [#GPF] [pid=%u]\n",
+					       (u32)gpregs_getpcx(&state->ics_gpregs), nc_addr,
+					       orig_pc, pc, (unsigned int)task_getroottid_s());
+set_x86_64_non_canon_special:
+					PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+					PERTASK_SET(this_exception_pointers[1], (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
+					if (isuser()) {
+						PERTASK_SET(this_exception_pointers[1],
+						            (uintptr_t)(E_SEGFAULT_CONTEXT_NONCANON |
+						                        E_SEGFAULT_CONTEXT_USERCODE));
+					}
+					for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
+						PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+					goto unwind_state;
+				}
+			}
+#endif /* __x86_64__ */
 			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
 			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
 			PERTASK_SET(this_exception_pointers[1],
@@ -1032,7 +1107,7 @@ null_segment_error:
 		PERTASK_SET(this_exception_pointers[3], (uintptr_t)effective_segment_value);
 		for (i = 4; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
-		switch (flags & F_SEGMASK) {
+		switch (op_flags & F_SEGMASK) {
 		default:      PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_DS); break;
 		case F_SEGFS: PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_FS); break;
 		case F_SEGGS: PERTASK_SET(this_exception_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_GS); break;
@@ -1072,17 +1147,17 @@ null_segment_error:
 			PERTASK_SET(this_exception_pointers[1],
 			            (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
 		}
-		printk(KERN_WARNING "Assuming Segmentation fault at ? [pc=%p,%p,opcode=%I32u] [#GPF] [pid=%u]\n",
+		printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? [pc=%p,%p,opcode=%I32u] [pid=%u]\n",
 		       orig_pc, pc, opcode, (unsigned int)task_getroottid_s());
 		goto unwind_state;
 	}
 #endif /* __x86_64__ */
 	/* If the error originated from user-space, default to assuming it's
 	 * because of some privileged instruction not explicitly handled above. */
-	if (isuser()) {
 #ifdef __x86_64__
-generic_privileged_instruction:
+generic_privileged_instruction_if_user:
 #endif /* __x86_64__ */
+	if (isuser()) {
 		for (i = 1; i < EXCEPTION_DATA_POINTERS; ++i)
 			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE));

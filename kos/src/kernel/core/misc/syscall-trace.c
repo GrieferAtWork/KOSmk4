@@ -124,7 +124,7 @@ syscall_printtrace(struct rpc_syscall_info const *__restrict args,
 		if (args->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
 			temp = (*printer)(arg, "X", 1);
 			if unlikely(temp < 0)
-				goto err_temp;
+				goto err;
 			result += temp;
 		}
 		switch (args->rsi_sysno) {
@@ -161,7 +161,7 @@ syscall_printtrace(struct rpc_syscall_info const *__restrict args,
 		if (args->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
 			temp = (*printer)(arg, "X", 1);
 			if unlikely(temp < 0)
-				goto err_temp;
+				goto err;
 			result += temp;
 		}
 		switch (args->rsi_sysno) {
@@ -190,21 +190,48 @@ syscall_printtrace(struct rpc_syscall_info const *__restrict args,
 #ifdef __ARCH_HAVE_COMPAT
 done_unknown_system_call:
 #endif /* __ARCH_HAVE_COMPAT */
-			temp = format_printf(printer, arg, "break:%#Ix?\n", args->rsi_sysno);
+			temp = format_printf(printer, arg, "break:%#Ix?", args->rsi_sysno);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+			if (args->rsi_flags & RPC_SYSCALL_INFO_FREGVALID_MASK) {
+				size_t i;
+				bool is_first = true;
+				temp = (*printer)(arg, " [", 2);
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+				for (i = 0; i < COMPILER_LENOF(args->rsi_regs); ++i) {
+					if (!(args->rsi_flags & RPC_SYSCALL_INFO_FREGVALID(i)))
+						continue;
+					temp = format_printf(printer, arg,
+					                     "%sarg%Iu: %#Ix",
+					                     is_first ? "" : ", ",
+					                     i,
+					                     args->rsi_regs[i]);
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
+					is_first = false;
+				}
+				temp = (*printer)(arg, "]\n", 2);
+			} else {
+				temp = (*printer)(arg, "\n", 1);
+			}
 			goto done_check_and_account_temp;
 		}
 	}
 	if unlikely(temp < 0)
-		goto err_temp;
+		goto err;
 	result += temp;
 	temp = (*printer)(arg, ")\n", 2);
 done_check_and_account_temp:
 	if unlikely(temp < 0)
-		goto err_temp;
+		goto err;
 	result += temp;
 done:
 	return result;
-err_temp:
+err:
 	return temp;
 }
 
