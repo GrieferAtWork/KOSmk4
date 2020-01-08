@@ -997,7 +997,7 @@ DEFINE_SYSCALL4(syscall_slong_t, rpc_schedule,
 		} else {
 			/* Must wait for the RPC to be received by the target thread. */
 			TRY {
-				status = task_waitfor(NULL);
+				status = task_waitfor();
 			} EXCEPT {
 				decref(args_packet);
 				RETHROW();

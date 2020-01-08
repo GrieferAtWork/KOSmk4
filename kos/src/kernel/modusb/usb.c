@@ -906,6 +906,15 @@ badconf:
 	return result;
 }
 
+PRIVATE void
+NOTHROW(FCALL sleep_milli)(unsigned int n) {
+	struct timespec then = realtime();
+	then.add_milliseconds(n);
+	do {
+		task_sleep(&then);
+	} while (realtime() < then);
+}
+
 
 
 /* Function called when a new USB endpoint is discovered.
@@ -993,13 +1002,7 @@ usb_device_discovered(struct usb_controller *__restrict self,
 
 	/* Allow the device to transition to the addressable state.
 	 * The specs state that we should wait 2 milliseconds for this. */
-	{
-		qtime_t then = quantum_time();
-		then.add_milliseconds(2);
-		do {
-			task_sleep(&then);
-		} while (quantum_time() < then);
-	}
+	sleep_milli(2);
 
 	/* Check if we got less data than expected during the initial
 	 * `USB_REQUEST_GET_DESCRIPTOR' call above. If so, then this

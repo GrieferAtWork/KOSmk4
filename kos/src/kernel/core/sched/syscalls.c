@@ -101,7 +101,7 @@ DEFINE_COMPAT_SYSCALL1(errno_t, ftime,
                        USER UNCHECKED struct compat_timeb32 *, tp) {
 	struct timespec ts;
 	struct timezone tz;
-	validate_writable(tp, sizeof(*tp));
+	compat_validate_writable(tp, sizeof(*tp));
 	ts = realtime();
 	get_timezone(&tz);
 	COMPILER_WRITE_BARRIER();
@@ -118,7 +118,7 @@ DEFINE_COMPAT_SYSCALL1(errno_t, ftime64,
                        USER UNCHECKED struct compat_timeb64 *, tp) {
 	struct timespec ts;
 	struct timezone tz;
-	validate_writable(tp, sizeof(*tp));
+	compat_validate_writable(tp, sizeof(*tp));
 	ts = realtime();
 	get_timezone(&tz);
 	COMPILER_WRITE_BARRIER();
@@ -187,14 +187,14 @@ DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday,
                        USER UNCHECKED struct timezone *, tz) {
 	if (tv) {
 		struct timespec ts;
-		validate_writable(tv, sizeof(*tv));
+		compat_validate_writable(tv, sizeof(*tv));
 		ts = realtime();
 		COMPILER_WRITE_BARRIER();
 		TIMESPEC_TO_TIMEVAL(tv, &ts);
 		COMPILER_WRITE_BARRIER();
 	}
 	if (tz) {
-		validate_writable(tz, sizeof(*tz));
+		compat_validate_writable(tz, sizeof(*tz));
 		COMPILER_WRITE_BARRIER();
 		get_timezone(tz);
 		COMPILER_WRITE_BARRIER();
@@ -209,14 +209,14 @@ DEFINE_COMPAT_SYSCALL2(errno_t, gettimeofday64,
                        USER UNCHECKED struct timezone *, tz) {
 	if (tv) {
 		struct timespec ts;
-		validate_writable(tv, sizeof(*tv));
+		compat_validate_writable(tv, sizeof(*tv));
 		ts = realtime();
 		COMPILER_WRITE_BARRIER();
 		TIMESPEC_TO_TIMEVAL(tv, &ts);
 		COMPILER_WRITE_BARRIER();
 	}
 	if (tz) {
-		validate_writable(tz, sizeof(*tz));
+		compat_validate_writable(tz, sizeof(*tz));
 		COMPILER_WRITE_BARRIER();
 		get_timezone(tz);
 		COMPILER_WRITE_BARRIER();
@@ -272,7 +272,7 @@ DEFINE_COMPAT_SYSCALL1(compat_time32_t, time,
 	nowts = realtime();
 	result = (compat_time32_t)nowts.tv_sec;
 	if (tmp) {
-		validate_writable(tmp, sizeof(*tmp));
+		compat_validate_writable(tmp, sizeof(*tmp));
 		COMPILER_WRITE_BARRIER();
 		*tmp = result;
 		COMPILER_WRITE_BARRIER();
@@ -289,7 +289,7 @@ DEFINE_COMPAT_SYSCALL1(compat_time64_t, time64,
 	nowts = realtime();
 	result = (compat_time64_t)nowts.tv_sec;
 	if (tmp) {
-		validate_writable(tmp, sizeof(*tmp));
+		compat_validate_writable(tmp, sizeof(*tmp));
 		COMPILER_WRITE_BARRIER();
 		*tmp = result;
 		COMPILER_WRITE_BARRIER();
@@ -309,17 +309,16 @@ DEFINE_COMPAT_SYSCALL1(compat_time64_t, time64,
 DEFINE_SYSCALL2(errno_t, nanosleep,
                 USER UNCHECKED struct timespec32 const *, req,
                 USER UNCHECKED struct timespec32 *, rem) {
-	qtime_t tmo;
-	struct timespec tms;
+	struct timespec tmo;
 	validate_readable(req, sizeof(*req));
 	validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	tms.tv_sec  = (time_t)req->tv_sec;
-	tms.tv_nsec = req->tv_nsec;
+	tmo.tv_sec  = (time_t)req->tv_sec;
+	tmo.tv_nsec = req->tv_nsec;
 	COMPILER_READ_BARRIER();
-	if unlikely(!tms.tv_sec && !tms.tv_nsec)
+	if unlikely(!tmo.tv_sec && !tmo.tv_nsec)
 		return -EOK;
-	tmo = quantum_time() + timespec_to_qtime(&tms);
+	tmo += realtime();
 	TRY {
 		for (;;) {
 			PREEMPTION_DISABLE();
@@ -336,10 +335,7 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 			 *       will happen to that E_SEGFAULT exception, however it
 			 *       is guarantied that an E_INTERRUPT caused by a user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
-			struct timespec tsrem;
-			qtime_t now = quantum_time();
-			now -= tmo;
-			tsrem = qtime_to_timespec(&now);
+			struct timespec tsrem = realtime() - tmo;
 			COMPILER_WRITE_BARRIER();
 			rem->tv_sec  = (time32_t)tsrem.tv_sec;
 			rem->tv_nsec = tsrem.tv_nsec;
@@ -355,17 +351,16 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 DEFINE_SYSCALL2(errno_t, nanosleep64,
                 USER UNCHECKED struct timespec64 const *, req,
                 USER UNCHECKED struct timespec64 *, rem) {
-	qtime_t tmo;
-	struct timespec tms;
+	struct timespec tmo;
 	validate_readable(req, sizeof(*req));
 	validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	tms.tv_sec  = (time_t)req->tv_sec;
-	tms.tv_nsec = req->tv_nsec;
+	tmo.tv_sec  = (time_t)req->tv_sec;
+	tmo.tv_nsec = req->tv_nsec;
 	COMPILER_READ_BARRIER();
-	if unlikely(!tms.tv_sec && !tms.tv_nsec)
+	if unlikely(!tmo.tv_sec && !tmo.tv_nsec)
 		return -EOK;
-	tmo = quantum_time() + timespec_to_qtime(&tms);
+	tmo += realtime();
 	TRY {
 		for (;;) {
 			PREEMPTION_DISABLE();
@@ -382,10 +377,7 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 			 *       will happen to that E_SEGFAULT exception, however it
 			 *       is guarantied that an E_INTERRUPT caused by a user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
-			struct timespec tsrem;
-			qtime_t now = quantum_time();
-			now -= tmo;
-			tsrem = qtime_to_timespec(&now);
+			struct timespec tsrem = realtime() - tmo;
 			COMPILER_WRITE_BARRIER();
 			rem->tv_sec  = (time64_t)tsrem.tv_sec;
 			rem->tv_nsec = tsrem.tv_nsec;
@@ -401,17 +393,16 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
                        USER UNCHECKED struct compat_timespec32 const *, req,
                        USER UNCHECKED struct compat_timespec32 *, rem) {
-	qtime_t tmo;
-	struct timespec tms;
-	validate_readable(req, sizeof(*req));
-	validate_writable_opt(rem, sizeof(*rem));
+	struct timespec tmo;
+	compat_validate_readable(req, sizeof(*req));
+	compat_validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	tms.tv_sec  = (time_t)req->tv_sec;
-	tms.tv_nsec = req->tv_nsec;
+	tmo.tv_sec  = (time_t)req->tv_sec;
+	tmo.tv_nsec = req->tv_nsec;
 	COMPILER_READ_BARRIER();
-	if unlikely(!tms.tv_sec && !tms.tv_nsec)
+	if unlikely(!tmo.tv_sec && !tmo.tv_nsec)
 		return -EOK;
-	tmo = quantum_time() + timespec_to_qtime(&tms);
+	tmo += realtime();
 	TRY {
 		for (;;) {
 			PREEMPTION_DISABLE();
@@ -428,10 +419,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
 			 *       will happen to that E_SEGFAULT exception, however it
 			 *       is guarantied that an E_INTERRUPT caused by a user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
-			struct timespec tsrem;
-			qtime_t now = quantum_time();
-			now -= tmo;
-			tsrem = qtime_to_timespec(&now);
+			struct timespec tsrem = realtime() - tmo;
 			COMPILER_WRITE_BARRIER();
 			rem->tv_sec  = (compat_time32_t)tsrem.tv_sec;
 			rem->tv_nsec = tsrem.tv_nsec;
@@ -447,17 +435,16 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep,
 DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
                        USER UNCHECKED struct compat_timespec64 const *, req,
                        USER UNCHECKED struct compat_timespec64 *, rem) {
-	qtime_t tmo;
-	struct timespec tms;
-	validate_readable(req, sizeof(*req));
-	validate_writable_opt(rem, sizeof(*rem));
+	struct timespec tmo;
+	compat_validate_readable(req, sizeof(*req));
+	compat_validate_writable_opt(rem, sizeof(*rem));
 	COMPILER_READ_BARRIER();
-	tms.tv_sec  = (time_t)req->tv_sec;
-	tms.tv_nsec = req->tv_nsec;
+	tmo.tv_sec  = (time_t)req->tv_sec;
+	tmo.tv_nsec = req->tv_nsec;
 	COMPILER_READ_BARRIER();
-	if unlikely(!tms.tv_sec && !tms.tv_nsec)
+	if unlikely(!tmo.tv_sec && !tmo.tv_nsec)
 		return -EOK;
-	tmo = quantum_time() + timespec_to_qtime(&tms);
+	tmo += realtime();
 	TRY {
 		for (;;) {
 			PREEMPTION_DISABLE();
@@ -474,10 +461,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 			 *       will happen to that E_SEGFAULT exception, however it
 			 *       is guarantied that an E_INTERRUPT caused by a user-space
 			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
-			struct timespec tsrem;
-			qtime_t now = quantum_time();
-			now -= tmo;
-			tsrem = qtime_to_timespec(&now);
+			struct timespec tsrem = realtime() - tmo;
 			COMPILER_WRITE_BARRIER();
 			rem->tv_sec  = (compat_time64_t)tsrem.tv_sec;
 			rem->tv_nsec = tsrem.tv_nsec;

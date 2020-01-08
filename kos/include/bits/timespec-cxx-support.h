@@ -26,6 +26,7 @@
 #include <__stdcxx.h>
 
 #include <kos/anno.h>
+#include <hybrid/__overflow.h>
 
 #ifndef __NSECS_PER_SEC
 #define __NSECS_PER_SEC __UINTPTR_C(1000000000)
@@ -36,8 +37,25 @@
 #define __TIMESPEC_CXX_SUPPORT(T, TV_SEC_TYPE, TV_NSEC_TYPE)               \
 	/* Add nanoseconds (1/1_000_000_000 seconds) */                        \
 	__CXX_CLASSMEMBER __NOBLOCK void                                       \
-	add_nanoseconds(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                     \
-		tv_nsec += __n;                                                    \
+	(add_nanoseconds)(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                   \
+		if (__hybrid_overflow_uadd(tv_nsec, __n, &tv_nsec)) {              \
+			tv_sec  += ((TV_NSEC_TYPE)-1) / __NSECS_PER_SEC;               \
+			tv_nsec += __n;                                                \
+			tv_nsec -= (TV_NSEC_TYPE)-1;                                   \
+		}                                                                  \
+		if (tv_nsec > __NSECS_PER_SEC) {                                   \
+			tv_sec += tv_nsec / __NSECS_PER_SEC;                           \
+			tv_nsec %= __NSECS_PER_SEC;                                    \
+		}                                                                  \
+	}                                                                      \
+	/* Subtract nanoseconds (1/1_000_000_000 seconds) */                   \
+	__CXX_CLASSMEMBER __NOBLOCK void                                       \
+	(sub_nanoseconds)(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                   \
+		if (__hybrid_overflow_usub(tv_nsec, __n, &tv_nsec)) {              \
+			tv_sec  -= ((TV_NSEC_TYPE)-1) / __NSECS_PER_SEC;               \
+			tv_nsec += (TV_NSEC_TYPE)-1;                                   \
+			tv_nsec -= __n;                                                \
+		}                                                                  \
 		if (tv_nsec > __NSECS_PER_SEC) {                                   \
 			tv_sec += tv_nsec / __NSECS_PER_SEC;                           \
 			tv_nsec %= __NSECS_PER_SEC;                                    \
@@ -45,13 +63,23 @@
 	}                                                                      \
 	/* Add microseconds (1/1_000_000 seconds) */                           \
 	__CXX_CLASSMEMBER __NOBLOCK void                                       \
-	add_microseconds(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                    \
-		add_nanoseconds(__n * 1000);                                       \
+	(add_microseconds)(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                  \
+		(add_nanoseconds)(__n * 1000);                                     \
+	}                                                                      \
+	/* Subtract microseconds (1/1_000_000 seconds) */                      \
+	__CXX_CLASSMEMBER __NOBLOCK void                                       \
+	(sub_microseconds)(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                  \
+		(sub_nanoseconds)(__n * 1000);                                     \
 	}                                                                      \
 	/* Add milliseconds (1/1_000 seconds) */                               \
 	__CXX_CLASSMEMBER __NOBLOCK void                                       \
-	add_milliseconds(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                    \
-		add_nanoseconds(__n * 1000000);                                    \
+	(add_milliseconds)(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                  \
+		(add_nanoseconds)(__n * 1000000);                                  \
+	}                                                                      \
+	/* Subtract milliseconds (1/1_000 seconds) */                          \
+	__CXX_CLASSMEMBER __NOBLOCK void                                       \
+	(sub_milliseconds)(TV_NSEC_TYPE __n) __CXX_NOEXCEPT {                  \
+		(sub_nanoseconds)(__n * 1000000);                                  \
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK T &                                        \
 	operator+=(T const &__other) __CXX_NOEXCEPT {                          \

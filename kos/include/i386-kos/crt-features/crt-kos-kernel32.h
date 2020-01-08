@@ -239,6 +239,7 @@
 #define __CRT_HAVE_cpu_quantum_elapsed_nopr 1
 #define __CRT_HAVE_cpu_quantum_end_nopr 1
 #define __CRT_HAVE_cpu_quantum_time 1
+#define __CRT_HAVE_cpu_quantum_time_to_realtime_nopr 1
 #define __CRT_HAVE_cpu_run_current_and_remember_nopr 1
 #define __CRT_HAVE_cpu_run_current_nopr 1
 #define __CRT_HAVE_cpu_schedule_idle_job 1
@@ -1162,6 +1163,7 @@
 #define __CRT_HAVE_realtime 1
 #define __CRT_HAVE_realtime_clock 1
 #define __CRT_HAVE_realtime_clock_destroy 1
+#define __CRT_HAVE_realtime_to_cpu_quantum_time_nopr 1
 #define __CRT_HAVE_regdump_coregs 1
 #define __CRT_HAVE_regdump_cr0 1
 #define __CRT_HAVE_regdump_cr4 1
@@ -1861,7 +1863,6 @@
 #define __CRT_HAVE_task_sigcont 1
 #define __CRT_HAVE_task_sigstop 1
 #define __CRT_HAVE_task_sleep 1
-#define __CRT_HAVE_task_sleep_cputime 1
 #define __CRT_HAVE_task_start 1
 #define __CRT_HAVE_task_start_default_flags 1
 #define __CRT_HAVE_task_trywait 1

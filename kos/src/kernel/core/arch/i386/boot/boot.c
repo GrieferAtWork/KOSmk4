@@ -336,7 +336,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	decref(test);
 
 	printk("Before waiting on signal\n");
-	task_waitfor(NULL);
+	task_waitfor();
 	printk("After waiting on signal\n");
 #endif
 

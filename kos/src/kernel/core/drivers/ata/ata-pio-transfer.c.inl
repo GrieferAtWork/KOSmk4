@@ -146,9 +146,9 @@ LOCAL errr_t
 			assert(num_sectors);
 			signal = task_trywait();
 			if (!signal) {
-				qtime_t timeout;
-				timeout = quantum_time();
-				timeout.add_seconds(2);
+				struct timespec timeout;
+				timeout = realtime();
+				timeout.tv_sec += 2;
 				signal = task_waitfor(&timeout);
 				if unlikely(!signal)
 					return ERRR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_SECTOR_WAIT);

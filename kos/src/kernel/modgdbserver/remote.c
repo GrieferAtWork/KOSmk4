@@ -121,7 +121,7 @@ PRIVATE unsigned int GDBRemote_Timeout = 1000; /* Milliseconds */
 INTERN int NOTHROW(FCALL GDBRemote_TimedGetByte)(void) {
 	int result;
 	for (;;) {
-		qtime_t tmo;
+		struct timespec timeout;
 		assert(PREEMPTION_ENABLED());
 		assert(!task_isconnected());
 		result = GDBRemote_TryGetByte();
@@ -134,14 +134,14 @@ INTERN int NOTHROW(FCALL GDBRemote_TimedGetByte)(void) {
 			task_disconnectall();
 			break;
 		}
-		tmo = quantum_time();
-		tmo.add_milliseconds(GDBRemote_Timeout);
-		if (!task_waitfor_norpc_nx(&tmo))
+		timeout = realtime();
+		timeout.add_milliseconds(GDBRemote_Timeout);
+		if (!task_waitfor_norpc_nx(&timeout))
 			task_disconnectall();
 		result = GDBRemote_TryGetByte();
 		if (result >= 0)
 			break;
-		if (quantum_time() <= tmo)
+		if (realtime() <= timeout)
 			continue;
 		printk(KERN_WARNING "[gdb] Timeout while waiting for a response\n");
 		return -1;

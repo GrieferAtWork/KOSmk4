@@ -2175,9 +2175,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, vm_paged_kernel_syncone; .int 0
 	.int 0x1d69455
 	.quad .Lname543 /* index: 543 */
-	.weak task_sleep_cputime; .quad task_sleep_cputime
-	.reloc ., R_X86_64_SIZE32, task_sleep_cputime; .int 0
-	.int 0x5ffcb05
+	.weak x86_fxsave; .quad x86_fxsave
+	.reloc ., R_X86_64_SIZE32, x86_fxsave; .int 0
+	.int 0x5d82305
 	.quad .Lname544 /* index: 544 */
 	.weak cred_require_debugtrap; .quad cred_require_debugtrap
 	.reloc ., R_X86_64_SIZE32, cred_require_debugtrap; .int 0
@@ -3766,10 +3766,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 941 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname941 /* index: 941 */
+	.weak cpu_quantum_time_to_realtime_nopr; .quad cpu_quantum_time_to_realtime_nopr
+	.reloc ., R_X86_64_SIZE32, cpu_quantum_time_to_realtime_nopr; .int 0
+	.int 0x85f6df2
 	.quad .Lname942 /* index: 942 */
 	.weak sys_userfaultfd; .quad sys_userfaultfd
 	.reloc ., R_X86_64_SIZE32, sys_userfaultfd; .int 0
@@ -8650,10 +8650,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak memcpyq; .quad memcpyq
 	.reloc ., R_X86_64_SIZE32, memcpyq; .int 0
 	.int 0x3c3a871
-	.quad 0 /* index: 2162 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2162 /* index: 2162 */
+	.weak realtime_to_cpu_quantum_time_nopr; .quad realtime_to_cpu_quantum_time_nopr
+	.reloc ., R_X86_64_SIZE32, realtime_to_cpu_quantum_time_nopr; .int 0
+	.int 0xd346872
 	.quad .Lname2163 /* index: 2163 */
 	.weak block_device_partition_write_phys; .quad block_device_partition_write_phys
 	.reloc ., R_X86_64_SIZE32, block_device_partition_write_phys; .int 0
@@ -11882,10 +11882,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pipe_writer_destroy; .quad pipe_writer_destroy
 	.reloc ., R_X86_64_SIZE32, pipe_writer_destroy; .int 0
 	.int 0xac6cb99
-	.quad .Lname2970 /* index: 2970 */
-	.weak x86_fxsave; .quad x86_fxsave
-	.reloc ., R_X86_64_SIZE32, x86_fxsave; .int 0
-	.int 0x5d82305
+	.quad 0 /* index: 2970 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad 0 /* index: 2971 */
 	.quad 0
 	.int 0
@@ -17181,7 +17181,7 @@ END(kernel_symbol_table)
 .Lname542:
 	.string "vm_paged_kernel_syncone"
 .Lname543:
-	.string "task_sleep_cputime"
+	.string "x86_fxsave"
 .Lname544:
 	.string "cred_require_debugtrap"
 .Lname545:
@@ -17740,6 +17740,8 @@ END(kernel_symbol_table)
 	.string "sys_pwritev"
 .Lname935:
 	.string "cpu_assert_running"
+.Lname941:
+	.string "cpu_quantum_time_to_realtime_nopr"
 .Lname942:
 	.string "sys_userfaultfd"
 .Lname944:
@@ -19362,6 +19364,8 @@ END(kernel_symbol_table)
 	.string "pagedir_unmap_p"
 .Lname2161:
 	.string "memcpyq"
+.Lname2162:
+	.string "realtime_to_cpu_quantum_time_nopr"
 .Lname2163:
 	.string "block_device_partition_write_phys"
 .Lname2164:
@@ -20478,8 +20482,6 @@ END(kernel_symbol_table)
 	.string "thiscpu_x86_tss"
 .Lname2969:
 	.string "pipe_writer_destroy"
-.Lname2970:
-	.string "x86_fxsave"
 .Lname2972:
 	.string "handle_install"
 .Lname2973:

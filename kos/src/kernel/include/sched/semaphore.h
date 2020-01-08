@@ -28,29 +28,32 @@
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 
-#include <kos/jiffies.h>
-
 #include <stdbool.h>
 
 DECL_BEGIN
 
 #ifdef __CC__
 struct task;
+struct timespec;
 
 struct semaphore {
 	struct sig s_avail; /* Signal send for every ticket made available. */
 	uintptr_t  s_count; /* # of available tickets. */
 };
 
-#define SEMAPHORE_INIT(n)     { SIG_INIT, n }
-#define semaphore_init(x,n)   (void)(sig_init(&(x)->s_avail),(x)->s_count = (n))
-#define semaphore_cinit(x,n)  (sig_cinit(&(x)->s_avail),(__builtin_constant_p(n) && (n) == 0) ? (__hybrid_assert((x)->s_count == 0)) : (void)((x)->s_count = (n)))
-#define semaphore_count(x)     __hybrid_atomic_load((x)->s_count,__ATOMIC_ACQUIRE)
+#define SEMAPHORE_INIT(n) { SIG_INIT, n }
+#define semaphore_init(x, n) (void)(sig_init(&(x)->s_avail), (x)->s_count = (n))
+#define semaphore_cinit(x, n)               \
+	(sig_cinit(&(x)->s_avail),              \
+	 (__builtin_constant_p(n) && (n) == 0)  \
+	 ? (__hybrid_assert((x)->s_count == 0)) \
+	 : (void)((x)->s_count = (n)))
+#define semaphore_count(x) __hybrid_atomic_load((x)->s_count, __ATOMIC_ACQUIRE)
 #define semaphore_available(x) (semaphore_count(x) != 0)
 
 /* Try to acquire a tick to the given semaphore. */
 LOCAL NOBLOCK WUNUSED NONNULL((1)) bool
-NOBLOCK(KCALL semaphore_trywait)(struct semaphore *__restrict self) {
+NOBLOCK(FCALL semaphore_trywait)(struct semaphore *__restrict self) {
 	uintptr_t count;
 	do {
 		count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
@@ -66,8 +69,8 @@ NOBLOCK(KCALL semaphore_trywait)(struct semaphore *__restrict self) {
  * @return: true:  Successfully acquired a ticket.
  * @return: false: The given `abs_timeout' has expired. */
 LOCAL NONNULL((1)) bool
-(KCALL semaphore_wait)(struct semaphore *__restrict self,
-                       qtime_t const *abs_timeout DFL(__NULLPTR))
+(FCALL semaphore_wait)(struct semaphore *__restrict self,
+                       struct timespec const *abs_timeout DFL(__NULLPTR))
                        THROWS(E_BADALLOC,E_WOULDBLOCK) {
 	uintptr_t count;
 again:
@@ -105,8 +108,8 @@ do_exchange:
  * @return: false: Preemption was disabled, and the operation would have blocked.
  * @return: false: There are pending X-RPCs that could not be serviced. */
 LOCAL WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL semaphore_wait_nx)(struct semaphore *__restrict self,
-                                 qtime_t const *abs_timeout DFL(__NULLPTR)) {
+NOTHROW(FCALL semaphore_wait_nx)(struct semaphore *__restrict self,
+                                 struct timespec const *abs_timeout DFL(__NULLPTR)) {
 	uintptr_t count;
 again:
 	do {
@@ -141,24 +144,24 @@ do_exchange:
  * @return: true:  A waiting thread was signaled.
  * @return: false: There were no waiting threads, but the ticket was added. */
 LOCAL NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL semaphore_post)(struct semaphore *__restrict self) {
+NOTHROW(FCALL semaphore_post)(struct semaphore *__restrict self) {
 	if (__hybrid_atomic_fetchinc(self->s_count, __ATOMIC_SEQ_CST) == 0)
 		return sig_send(&self->s_avail); /* Signal a single thread when the first ticket gets added. */
 	return false;
 }
 LOCAL NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL semaphore_altpost)(struct semaphore *__restrict self, struct sig *sender) {
+NOTHROW(FCALL semaphore_altpost)(struct semaphore *__restrict self, struct sig *sender) {
 	if (__hybrid_atomic_fetchinc(self->s_count, __ATOMIC_SEQ_CST) == 0)
 		return sig_altsend(&self->s_avail, sender); /* Signal a single thread when the first ticket gets added. */
 	return false;
 }
 LOCAL NOBLOCK NONNULL((1)) size_t
-NOTHROW(KCALL semaphore_postb)(struct semaphore *__restrict self) {
+NOTHROW(FCALL semaphore_postb)(struct semaphore *__restrict self) {
 	__hybrid_atomic_fetchinc(self->s_count, __ATOMIC_SEQ_CST);
 	return sig_broadcast(&self->s_avail); /* Signal all waiting threads. */
 }
 LOCAL NOBLOCK NONNULL((1)) size_t
-NOTHROW(KCALL semaphore_altpostb)(struct semaphore *__restrict self, struct sig *sender) {
+NOTHROW(FCALL semaphore_altpostb)(struct semaphore *__restrict self, struct sig *sender) {
 	__hybrid_atomic_fetchinc(self->s_count, __ATOMIC_SEQ_CST);
 	return sig_altbroadcast(&self->s_avail, sender); /* Signal all waiting threads. */
 }
@@ -168,7 +171,7 @@ NOTHROW(KCALL semaphore_altpostb)(struct semaphore *__restrict self, struct sig 
  * if it is, or `false' after connecting to the signal used to
  * indicate a ticket being available. */
 LOCAL WUNUSED NONNULL((1)) bool
-(KCALL semaphore_poll)(struct semaphore *__restrict self) THROWS(E_BADALLOC) {
+(FCALL semaphore_poll)(struct semaphore *__restrict self) THROWS(E_BADALLOC) {
 	uintptr_t count;
 	count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
 	if (count)

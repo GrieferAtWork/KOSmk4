@@ -88,7 +88,6 @@ PUBLIC ATTR_PERTASK struct read_locks this_read_locks = {
 };
 
 DEFINE_PERTASK_INIT(pertask_readlocks_init);
-DEFINE_PERTASK_FINI(pertask_readlocks_fini);
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_readlocks_init)(struct task *__restrict thread) {
 	struct read_locks *locks;
@@ -96,6 +95,7 @@ NOTHROW(KCALL pertask_readlocks_init)(struct task *__restrict thread) {
 	locks->rls_vec = locks->rls_sbuf;
 }
 
+DEFINE_PERTASK_FINI(pertask_readlocks_fini);
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_readlocks_fini)(struct task *__restrict thread) {
 	struct read_locks *locks;
@@ -114,8 +114,8 @@ NOTHROW(KCALL pertask_readlocks_fini)(struct task *__restrict thread) {
 }
 
 /* Find an existing read-lock descriptor for `lock', or return NULL. */
-INTERN NOBLOCK WUNUSED NONNULL((1)) struct read_lock *
-NOTHROW(KCALL rwlock_find_readlock)(struct rwlock const *__restrict lock) {
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct read_lock *
+NOTHROW(FCALL rwlock_find_readlock)(struct rwlock const *__restrict lock) {
 	uintptr_t i, perturb;
 	struct read_locks *locks;
 	struct read_lock *lockdesc;
@@ -135,7 +135,7 @@ NOTHROW(KCALL rwlock_find_readlock)(struct rwlock const *__restrict lock) {
 }
 
 /* Return a read-lock descriptor for `lock', or allocate a new one. */
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) struct read_lock *KCALL
+PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1)) struct read_lock *FCALL
 rwlock_get_readlock(struct rwlock *__restrict lock) THROWS(E_BADALLOC) {
 	uintptr_t j, perturb;
 	struct read_locks *locks;
@@ -214,8 +214,8 @@ again:
 
 
 /* Return a read-lock descriptor for `lock', or allocate a new one. */
-INTERN WUNUSED NONNULL((1)) struct read_lock *
-NOTHROW(KCALL rwlock_get_readlock_nx)(struct rwlock *__restrict lock) {
+PRIVATE WUNUSED NONNULL((1)) struct read_lock *
+NOTHROW(FCALL rwlock_get_readlock_nx)(struct rwlock *__restrict lock) {
 	uintptr_t j, perturb;
 	struct read_locks *locks;
 	struct read_lock *lockdesc;
@@ -295,8 +295,8 @@ again:
 
 
 /* Delete the given rlock. */
-INTERN NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL rwlock_delete_readlock)(struct read_lock *__restrict rlock) {
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL rwlock_delete_readlock)(struct read_lock *__restrict rlock) {
 	assert(PERTASK_TEST(this_read_locks.rls_use));
 	assert(PERTASK_TEST(this_read_locks.rls_cnt));
 	assert(rlock >= PERTASK_GET(this_read_locks.rls_vec));
@@ -308,7 +308,7 @@ NOTHROW(KCALL rwlock_delete_readlock)(struct read_lock *__restrict rlock) {
 
 
 PUBLIC WUNUSED ATTR_PURE NONNULL((1)) bool
-NOTHROW(KCALL rwlock_reading)(struct rwlock const *__restrict self) {
+NOTHROW(FCALL rwlock_reading)(struct rwlock const *__restrict self) {
 	struct read_lock *lock;
 	if (self->rw_scnt == 0)
 		return false;
@@ -320,13 +320,13 @@ NOTHROW(KCALL rwlock_reading)(struct rwlock const *__restrict self) {
 }
 
 PUBLIC WUNUSED ATTR_PURE NONNULL((1)) bool
-NOTHROW(KCALL rwlock_writing)(struct rwlock const *__restrict self) {
+NOTHROW(FCALL rwlock_writing)(struct rwlock const *__restrict self) {
 	return (self->rw_mode == RWLOCK_MODE_FWRITING &&
 	        self->rw_xowner == THIS_TASK);
 }
 
 PUBLIC WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
-NOTHROW(KCALL rwlock_reading_r)(struct rwlock const *__restrict self) {
+NOTHROW(FCALL rwlock_reading_r)(struct rwlock const *__restrict self) {
 	struct read_lock *lock;
 	if (self->rw_scnt == 0)
 		return 0;
@@ -339,7 +339,7 @@ NOTHROW(KCALL rwlock_reading_r)(struct rwlock const *__restrict self) {
 
 /* Return the total number of hold read-locks (or 0 if this is not tracked by the implementation) */
 PUBLIC WUNUSED ATTR_PURE uintptr_t
-NOTHROW(KCALL rwlock_reading_any)(void) {
+NOTHROW(FCALL rwlock_reading_any)(void) {
 	size_t i, result = 0;
 	struct read_locks *locks;
 	locks = &PERTASK(this_read_locks);
@@ -360,7 +360,7 @@ NOTHROW(KCALL rwlock_reading_any)(void) {
 
 
 PUBLIC WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
-NOTHROW(KCALL rwlock_writing_r)(struct rwlock const *__restrict self) {
+NOTHROW(FCALL rwlock_writing_r)(struct rwlock const *__restrict self) {
 	return (self->rw_mode == RWLOCK_MODE_FWRITING &&
 	        self->rw_xowner == THIS_TASK)
 	       ? self->rw_xind
@@ -368,7 +368,7 @@ NOTHROW(KCALL rwlock_writing_r)(struct rwlock const *__restrict self) {
 }
 
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL __os_rwlock_tryread)(struct rwlock *__restrict self) {
+NOTHROW(FCALL __os_rwlock_tryread)(struct rwlock *__restrict self) {
 	struct read_lock *desc;
 	u32 control_word;
 	RWLOCK_TRACE_F("rwlock_tryread");
@@ -422,7 +422,7 @@ NOTHROW(KCALL __os_rwlock_tryread)(struct rwlock *__restrict self) {
 
 
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL __os_rwlock_tryread_readonly)(struct rwlock *__restrict self) {
+NOTHROW(FCALL __os_rwlock_tryread_readonly)(struct rwlock *__restrict self) {
 	struct read_lock *desc;
 	u32 control_word;
 	RWLOCK_TRACE_F("rwlock_tryread_readonly");
@@ -477,8 +477,8 @@ NOTHROW(KCALL __os_rwlock_tryread_readonly)(struct rwlock *__restrict self) {
 
 
 PUBLIC NONNULL((1)) bool
-(KCALL __os_rwlock_read)(struct rwlock *__restrict self,
-                         qtime_t const *abs_timeout) {
+(FCALL __os_rwlock_read)(struct rwlock *__restrict self,
+                         struct timespec const *abs_timeout) {
 	struct read_lock *desc;
 	u32 control_word;
 	RWLOCK_TRACE_F2("rwlock_read", abs_timeout);
@@ -549,8 +549,8 @@ initial_lock:
 }
 
 PUBLIC WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL __os_rwlock_read_nx)(struct rwlock *__restrict self,
-                                   qtime_t const *abs_timeout) {
+NOTHROW(FCALL __os_rwlock_read_nx)(struct rwlock *__restrict self,
+                                   struct timespec const *abs_timeout) {
 	struct read_lock *desc;
 	u32 control_word;
 	RWLOCK_TRACE_F2("rwlock_read", abs_timeout);
@@ -625,7 +625,7 @@ initial_lock:
 }
 
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL __os_rwlock_trywrite)(struct rwlock *__restrict self) {
+NOTHROW(FCALL __os_rwlock_trywrite)(struct rwlock *__restrict self) {
 	u32 control_word;
 	RWLOCK_TRACE_F("rwlock_trywrite");
 again:
@@ -674,8 +674,8 @@ got_lock:
 }
 
 PUBLIC NONNULL((1)) bool
-(KCALL __os_rwlock_write)(struct rwlock *__restrict self,
-                          qtime_t const *abs_timeout) {
+(FCALL __os_rwlock_write)(struct rwlock *__restrict self,
+                          struct timespec const *abs_timeout) {
 #if 0
 	return __os_rwlock_write_aggressive(self, abs_timeout);
 #else
@@ -806,8 +806,8 @@ wait_for_unshare:
 
 
 PUBLIC WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL __os_rwlock_write_nx)(struct rwlock *__restrict self,
-                                    qtime_t const *abs_timeout) {
+NOTHROW(FCALL __os_rwlock_write_nx)(struct rwlock *__restrict self,
+                                    struct timespec const *abs_timeout) {
 	u32 control_word;
 	assertf(!task_isconnected(),
 	        "You mustn't be connected when calling this function");
@@ -986,7 +986,7 @@ done:
 	return true;
 }
 
-PRIVATE NONNULL((1)) void KCALL
+PRIVATE NONNULL((1)) void FCALL
 rwlock_kill_readers(struct rwlock *__restrict self) {
 	/* Enumerate all running threads to find (and kill; aka.
 	 * `rwlock_endread()') those that are using our R/W-lock. */
@@ -999,8 +999,8 @@ rwlock_kill_readers(struct rwlock *__restrict self) {
 
 
 PUBLIC NONNULL((1)) bool
-(KCALL __os_rwlock_write_aggressive)(struct rwlock *__restrict self,
-                                     qtime_t const *abs_timeout) {
+(FCALL __os_rwlock_write_aggressive)(struct rwlock *__restrict self,
+                                     struct timespec const *abs_timeout) {
 	u32 control_word;
 	assertf(!task_isconnected(),
 	        "You mustn't be connected when calling this function");
@@ -1113,7 +1113,7 @@ wait_for_unshare:
 				 * reacquire them, but noticing that the lock is in UPGRADING mode.
 				 * NOTE: We use a small timeout so we can try again in case we missed something. */
 				{
-					qtime_t tmo = quantum_time();
+					struct timespec tmo = realtime();
 					tmo.add_milliseconds(200);
 					task_waitfor(&tmo);
 				}
@@ -1137,7 +1137,7 @@ wait_for_unshare:
 }
 
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL __os_rwlock_tryupgrade)(struct rwlock *__restrict self) {
+NOTHROW(FCALL __os_rwlock_tryupgrade)(struct rwlock *__restrict self) {
 	/* Special handling to upgrade a non-shared
 	 * read-lock to an exclusive write-lock. */
 	u32 control_word;
@@ -1189,8 +1189,8 @@ again:
 
 
 PUBLIC NONNULL((1)) bool
-(KCALL __os_rwlock_upgrade)(struct rwlock *__restrict self,
-                            qtime_t const *abs_timeout) {
+(FCALL __os_rwlock_upgrade)(struct rwlock *__restrict self,
+                            struct timespec const *abs_timeout) {
 	/* Special handling to upgrade a non-shared
 	 * read-lock to an exclusive write-lock. */
 	u32 control_word;
@@ -1301,8 +1301,8 @@ wait_for_unshare:
 
 
 PUBLIC WUNUSED NONNULL((1)) unsigned int
-NOTHROW(KCALL __os_rwlock_upgrade_nx)(struct rwlock *__restrict self,
-                                      qtime_t const *abs_timeout) {
+NOTHROW(FCALL __os_rwlock_upgrade_nx)(struct rwlock *__restrict self,
+                                      struct timespec const *abs_timeout) {
 	/* Special handling to upgrade a non-shared
 	 * read-lock to an exclusive write-lock. */
 	u32 control_word;
@@ -1429,7 +1429,7 @@ wait_for_unshare:
 
 
 PUBLIC NONNULL((1)) bool
-NOTHROW(KCALL __os_rwlock_downgrade)(struct rwlock *__restrict self) {
+NOTHROW(FCALL __os_rwlock_downgrade)(struct rwlock *__restrict self) {
 	RWLOCK_TRACE_F("rwlock_downgrade");
 	assertf(self->rw_mode == RWLOCK_MODE_FWRITING,
 	        "Lock isn't in write-mode");
@@ -1455,7 +1455,7 @@ NOTHROW(KCALL __os_rwlock_downgrade)(struct rwlock *__restrict self) {
 }
 
 PUBLIC NONNULL((1)) void
-(KCALL __os_rwlock_downgrade_readonly)(struct rwlock *__restrict self) {
+(FCALL __os_rwlock_downgrade_readonly)(struct rwlock *__restrict self) {
 	RWLOCK_TRACE_F("rwlock_downgrade_readonly");
 	assertf(self->rw_mode == RWLOCK_MODE_FWRITING,
 	        "Lock isn't in write-mode");
@@ -1476,7 +1476,7 @@ PUBLIC NONNULL((1)) void
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL __os_rwlock_endwrite)(struct rwlock *__restrict self) {
+NOTHROW(FCALL __os_rwlock_endwrite)(struct rwlock *__restrict self) {
 	RWLOCK_TRACE_F("rwlock_endwrite");
 	assertf(self->rw_mode == RWLOCK_MODE_FWRITING,
 	        "Lock isn't in write-mode (%p:%p)",
@@ -1514,7 +1514,7 @@ NOTHROW(KCALL __os_rwlock_endwrite)(struct rwlock *__restrict self) {
 DEFINE_PUBLIC_ALIAS(rwlock_endread, rwlock_end);
 
 PUBLIC NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL __os_rwlock_end)(struct rwlock *__restrict self) {
+NOTHROW(FCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 	RWLOCK_TRACE_F("rwlock_end");
 	if (self->rw_mode == RWLOCK_MODE_FWRITING) {
 		/* end-read after already writing */
@@ -1595,7 +1595,7 @@ NOTHROW(KCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 }
 
 PUBLIC WUNUSED NONNULL((1)) bool
-(KCALL rwlock_pollread)(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
+(FCALL rwlock_pollread)(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
 	u32 state;
 	state = ATOMIC_READ(self->rw_state);
 	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING ||
@@ -1610,7 +1610,7 @@ PUBLIC WUNUSED NONNULL((1)) bool
 }
 
 PUBLIC WUNUSED NONNULL((1)) bool
-(KCALL rwlock_pollwrite)(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
+(FCALL rwlock_pollwrite)(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
 	u32 state;
 	state = ATOMIC_READ(self->rw_state);
 	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {
@@ -1635,7 +1635,7 @@ PUBLIC WUNUSED NONNULL((1)) bool
 }
 
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL rwlock_canwrite)(struct rwlock const *__restrict self) {
+NOTHROW(FCALL rwlock_canwrite)(struct rwlock const *__restrict self) {
 	u32 state;
 	state = ATOMIC_READ(self->rw_state);
 	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {

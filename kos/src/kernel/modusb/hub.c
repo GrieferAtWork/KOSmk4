@@ -51,11 +51,11 @@ NOTHROW(KCALL usb_hub_fini)(struct character_device *__restrict self) {
 
 PRIVATE void
 NOTHROW(FCALL sleep_milli)(unsigned int n) {
-	qtime_t then = quantum_time();
+	struct timespec then = realtime();
 	then.add_milliseconds(n);
 	do {
 		task_sleep(&then);
-	} while (quantum_time() < then);
+	} while (realtime() < then);
 }
 
 

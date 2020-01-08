@@ -161,8 +161,10 @@ FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL quantum_time)(void);
 FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 
 /* Convert to/from cpu-local quantum time and realtime */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE struct timespec NOTHROW(FCALL cpu_quantum_time_to_realtime)(qtime_t const *__restrict qtime);
-FUNDEF NOBLOCK WUNUSED ATTR_PURE qtime_t NOTHROW(FCALL realtime_to_cpu_quantum_time)(struct timespec const *__restrict tms);
+FUNDEF NOBLOCK NOPREEMPT WUNUSED ATTR_PURE struct timespec
+NOTHROW(FCALL cpu_quantum_time_to_realtime_nopr)(qtime_t const *__restrict qtime);
+FUNDEF NOBLOCK NOPREEMPT WUNUSED ATTR_PURE qtime_t
+NOTHROW(FCALL realtime_to_cpu_quantum_time_nopr)(struct timespec const *__restrict tms);
 
 /* Convert to/from quantum time and regular timespecs */
 FUNDEF NOBLOCK WUNUSED ATTR_PURE struct timespec NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime);
@@ -191,7 +193,7 @@ FUNDEF NOBLOCK quantum_diff_t NOTHROW(FCALL cpu_add_quantum_offset)(quantum_diff
 
 /* == FORCPU(&_bootcpu,thiscpu_jiffies)
  * The global jiffies counter, aliasing the one from the boot CPU. */
-DATDEF jtime_t volatile jiffies;
+DATDEF jtime_t volatile jiffies; /* TODO: Get rid of this global variable! */
 
 
 /* [!0][<= CONFIG_MAX_CPU_COUNT][const] The total number of known CPUs. */

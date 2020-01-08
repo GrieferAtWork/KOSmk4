@@ -28,14 +28,13 @@
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 
-#include <kos/jiffies.h>
-
 #include <stdbool.h>
 
 DECL_BEGIN
 
 #ifdef __CC__
 struct task;
+struct timespec;
 
 struct mutex {
 	struct sig        m_unlock; /* Signal send when the mutex is unlocked. */
@@ -76,7 +75,7 @@ NOTHROW(KCALL mutex_tryacquire)(struct mutex *__restrict self) {
  * @return: false: The given `abs_timeout' has expired. */
 LOCAL NONNULL((1)) bool
 (KCALL mutex_acquire)(struct mutex *__restrict self,
-                      qtime_t const *abs_timeout DFL(__NULLPTR))
+                      struct timespec const *abs_timeout DFL(__NULLPTR))
                       THROWS(E_WOULDBLOCK,...) {
 	struct task *old_task, *me = THIS_TASK;
 again:
@@ -121,7 +120,7 @@ do_exchange:
  * @return: false: There are pending X-RPCs that could not be serviced. */
 LOCAL WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL mutex_acquire_nx)(struct mutex *__restrict self,
-                                qtime_t const *abs_timeout DFL(__NULLPTR)) {
+                                struct timespec const *abs_timeout DFL(__NULLPTR)) {
 	struct task *old_task, *me = THIS_TASK;
 again:
 	do {

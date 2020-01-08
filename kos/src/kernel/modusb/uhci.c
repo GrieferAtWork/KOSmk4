@@ -1385,6 +1385,7 @@ PRIVATE NOBLOCK bool
 NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 	u16 status, ack;
 	struct uhci_controller *self;
+	assert(!PREEMPTION_ENABLED());
 	self = (struct uhci_controller *)arg;
 	status = uhci_rdw(self, UHCI_USBSTS);
 	ack    = 0;
@@ -1392,7 +1393,14 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 	              UHCI_USBSTS_RD | UHCI_USBSTS_HSE |
 	              UHCI_USBSTS_HCPE | UHCI_USBSTS_HCH)) {
 		/* Remember that we've just gotten an interrupt. */
-		atomic64_write(&self->uc_lastint, jiffies);
+#ifndef CONFIG_NO_SMP
+		while (!sync_trywrite(&self->uc_lastint_lock))
+			task_pause();
+#endif /* !CONFIG_NO_SMP */
+		self->uc_lastint = realtime();
+#ifndef CONFIG_NO_SMP
+		sync_endwrite(&self->uc_lastint_lock);
+#endif /* !CONFIG_NO_SMP */
 	}
 	if unlikely(status & UHCI_USBSTS_HSE) {
 		printk(KERN_CRIT "[usb][pci:%I32p,io:%#Ix] uhci:Host-System-Error set (status=%#I8x)\n",
@@ -2599,11 +2607,11 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 
 PRIVATE void
 NOTHROW(FCALL sleep_milli)(unsigned int n) {
-	qtime_t then = quantum_time();
+	struct timespec then = realtime();
 	then.add_milliseconds(n);
 	do {
 		task_sleep(&then);
-	} while (quantum_time() < then);
+	} while (realtime() < then);
 }
 
 PRIVATE u16
@@ -2748,8 +2756,7 @@ PRIVATE void KCALL
 uhci_powerctl_main(REF struct uhci_powerctl *__restrict ctl) {
 	FINALLY_DECREF_UNLIKELY(ctl);
 	for (;;) {
-		qtime_t timeout;
-		u64 last_int;
+		struct timespec timeout;
 		uintptr_t flags;
 		REF struct uhci_controller *uc;
 		bool egsm_ok;
@@ -2803,12 +2810,26 @@ do_connect:
 		 * to appear with a custom timeout that specifies how long to
 		 * wait before the bus should automatically be suspended.
 		 * Note that this is a relatively short delay, because for whatever
-		 * reason, USB attach/detach events only generate interrupts  */
-		last_int = atomic64_read_r(&uc->uc_lastint);
-		timeout.q_jtime = last_int + uc->uc_suspdelay;
+		 * reason, USB attach/detach events only generate interrupts when
+		 * the entire bus has been suspended (so we need to do this to be
+		 * able to handle attach/detach events!) */
+		assert(PREEMPTION_ENABLED());
+		PREEMPTION_DISABLE();
+#ifndef CONFIG_NO_SMP
+		while (!sync_tryread(&uc->uc_lastint_lock))
+			task_pause();
+#endif /* !CONFIG_NO_SMP */
+		COMPILER_READ_BARRIER();
+		timeout = uc->uc_lastint;
+		COMPILER_READ_BARRIER();
+#ifndef CONFIG_NO_SMP
+		sync_endread(&uc->uc_lastint_lock);
+#endif /* !CONFIG_NO_SMP */
+		PREEMPTION_ENABLE();
+
+		timeout.add_milliseconds(uc->uc_suspdelay);
 		decref_unlikely(uc);
-		timeout.q_qtime = 0;
-		timeout.q_qsize = 1;
+
 		/* Wait for our timeout to expire. */
 		if (task_waitfor(&timeout) != NULL)
 			continue; /* Something happened! -> Don't time out. */
@@ -3066,8 +3087,11 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	         UHCI_USBCMD_MAXP);
 
 	/* Configure the suspend timeout */
-	atomic64_cinit(&result->uc_lastint, jiffies);
-	result->uc_suspdelay = CEILDIV(HZ, 5);
+#ifndef CONFIG_NO_SMP
+	atomic_rwlock_cinit(&result->uc_lastint_lock);
+#endif /* !CONFIG_NO_SMP */
+	result->uc_lastint   = realtime();
+	result->uc_suspdelay = 250; /* Milliseconds */
 
 	{
 		REF struct task *pth;

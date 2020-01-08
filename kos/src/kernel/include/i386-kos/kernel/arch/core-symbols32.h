@@ -2175,9 +2175,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname543 /* index: 543 */
-	.weak task_sleep_cputime; .long task_sleep_cputime
-	.reloc ., R_386_SIZE32, task_sleep_cputime; .int 0
-	.int 0x5ffcb05
+	.weak x86_fxsave; .long x86_fxsave
+	.reloc ., R_386_SIZE32, x86_fxsave; .int 0
+	.int 0x5d82305
 	.long .Lname544 /* index: 544 */
 	.weak cred_require_debugtrap; .long cred_require_debugtrap
 	.reloc ., R_386_SIZE32, cred_require_debugtrap; .int 0
@@ -2886,10 +2886,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long 0 /* index: 721 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname721 /* index: 721 */
+	.weak slab_kmalloc_nx12; .long slab_kmalloc_nx12
+	.reloc ., R_386_SIZE32, slab_kmalloc_nx12; .int 0
+	.int 0x40d3df2
 	.long .Lname722 /* index: 722 */
 	.weak sys_removexattr; .long sys_removexattr
 	.reloc ., R_386_SIZE32, sys_removexattr; .int 0
@@ -3767,9 +3767,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname941 /* index: 941 */
-	.weak slab_kmalloc_nx12; .long slab_kmalloc_nx12
-	.reloc ., R_386_SIZE32, slab_kmalloc_nx12; .int 0
-	.int 0x40d3df2
+	.weak cpu_quantum_time_to_realtime_nopr; .long cpu_quantum_time_to_realtime_nopr
+	.reloc ., R_386_SIZE32, cpu_quantum_time_to_realtime_nopr; .int 0
+	.int 0x85f6df2
 	.long .Lname942 /* index: 942 */
 	.weak sys_stime; .long sys_stime
 	.reloc ., R_386_SIZE32, sys_stime; .int 0
@@ -8650,10 +8650,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak memcpyq; .long memcpyq
 	.reloc ., R_386_SIZE32, memcpyq; .int 0
 	.int 0x3c3a871
-	.long 0 /* index: 2162 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname2162 /* index: 2162 */
+	.weak realtime_to_cpu_quantum_time_nopr; .long realtime_to_cpu_quantum_time_nopr
+	.reloc ., R_386_SIZE32, realtime_to_cpu_quantum_time_nopr; .int 0
+	.int 0xd346872
 	.long .Lname2163 /* index: 2163 */
 	.weak block_device_partition_write_phys; .long block_device_partition_write_phys
 	.reloc ., R_386_SIZE32, block_device_partition_write_phys; .int 0
@@ -11882,10 +11882,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pipe_writer_destroy; .long pipe_writer_destroy
 	.reloc ., R_386_SIZE32, pipe_writer_destroy; .int 0
 	.int 0xac6cb99
-	.long .Lname2970 /* index: 2970 */
-	.weak x86_fxsave; .long x86_fxsave
-	.reloc ., R_386_SIZE32, x86_fxsave; .int 0
-	.int 0x5d82305
+	.long 0 /* index: 2970 */
+	.long 0
+	.int 0
+	.int 0
 	.long 0 /* index: 2971 */
 	.long 0
 	.int 0
@@ -17045,7 +17045,7 @@ END(kernel_symbol_table)
 .Lname539:
 	.string "__cpuset_full_mask"
 .Lname543:
-	.string "task_sleep_cputime"
+	.string "x86_fxsave"
 .Lname544:
 	.string "cred_require_debugtrap"
 .Lname545:
@@ -17260,6 +17260,8 @@ END(kernel_symbol_table)
 	.string "vm_datablock_locatepart"
 .Lname718:
 	.string "memrlen"
+.Lname721:
+	.string "slab_kmalloc_nx12"
 .Lname722:
 	.string "sys_removexattr"
 .Lname723:
@@ -17521,7 +17523,7 @@ END(kernel_symbol_table)
 .Lname935:
 	.string "cpu_assert_running"
 .Lname941:
-	.string "slab_kmalloc_nx12"
+	.string "cpu_quantum_time_to_realtime_nopr"
 .Lname942:
 	.string "sys_stime"
 .Lname944:
@@ -18924,6 +18926,8 @@ END(kernel_symbol_table)
 	.string "pagedir_unmap_p"
 .Lname2161:
 	.string "memcpyq"
+.Lname2162:
+	.string "realtime_to_cpu_quantum_time_nopr"
 .Lname2163:
 	.string "block_device_partition_write_phys"
 .Lname2164:
@@ -19894,8 +19898,6 @@ END(kernel_symbol_table)
 	.string "dbg_hasuni"
 .Lname2969:
 	.string "pipe_writer_destroy"
-.Lname2970:
-	.string "x86_fxsave"
 .Lname2972:
 	.string "handle_install"
 .Lname2973:

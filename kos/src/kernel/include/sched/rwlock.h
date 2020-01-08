@@ -25,8 +25,6 @@
 #include <sched/task.h>
 #include <sched/signal.h>
 
-#include <kos/jiffies.h>
-
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/byteorder.h>
@@ -162,11 +160,11 @@ struct rwlock {
 	       (x)->rw_state  = __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))
 
 /* Check if the caller is holding a read- or write-lock on `self' */
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(KCALL rwlock_reading)(struct rwlock const *__restrict self);
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(KCALL rwlock_writing)(struct rwlock const *__restrict self);
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(FCALL rwlock_reading)(struct rwlock const *__restrict self);
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) bool NOTHROW(FCALL rwlock_writing)(struct rwlock const *__restrict self);
 /* Same as above, but return the effective access recursion */
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW(KCALL rwlock_reading_r)(struct rwlock const *__restrict self);
-FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW(KCALL rwlock_writing_r)(struct rwlock const *__restrict self);
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW(FCALL rwlock_reading_r)(struct rwlock const *__restrict self);
+FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW(FCALL rwlock_writing_r)(struct rwlock const *__restrict self);
 #ifndef __INTELLISENSE__
 #define rwlock_writing(self)                    \
 	((self)->rw_mode == RWLOCK_MODE_FWRITING && \
@@ -176,7 +174,7 @@ FUNDEF WUNUSED ATTR_PURE NONNULL((1)) uintptr_t NOTHROW(KCALL rwlock_writing_r)(
 #endif
 
 /* Return the total number of hold read-locks (or 0 if this is not tracked by the implementation) */
-FUNDEF WUNUSED ATTR_PURE uintptr_t NOTHROW(KCALL rwlock_reading_any)(void);
+FUNDEF WUNUSED ATTR_PURE uintptr_t NOTHROW(FCALL rwlock_reading_any)(void);
 
 #define CONFIG_TASK_STATIC_READLOCKS 4 /* NOTE: Must be a power-of-2 (2, 4, 8, 16, etc...) */
 
@@ -195,39 +193,39 @@ FUNDEF WUNUSED ATTR_PURE uintptr_t NOTHROW(KCALL rwlock_reading_any)(void);
  *       use `rwlock_tryread_readonly()' instead, which will not
  *       return `false' after a failure to `kmalloc_nx()' a new read-lock,
  *       rather than attempting to acquire a write-lock instead. */
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL rwlock_tryread)(struct rwlock *__restrict self);
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL rwlock_trywrite)(struct rwlock *__restrict self);
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL rwlock_tryupgrade)(struct rwlock *__restrict self);
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL rwlock_tryread_readonly)(struct rwlock *__restrict self);
+FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_tryread)(struct rwlock *__restrict self);
+FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_trywrite)(struct rwlock *__restrict self);
+FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_tryupgrade)(struct rwlock *__restrict self);
+FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_tryread_readonly)(struct rwlock *__restrict self);
 
 #ifndef __INTELLISENSE__
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL __os_rwlock_tryread)(struct rwlock *__restrict self) ASMNAME("rwlock_tryread");
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL __os_rwlock_tryread_readonly)(struct rwlock *__restrict self) ASMNAME("rwlock_tryread_readonly");
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL __os_rwlock_trywrite)(struct rwlock *__restrict self) ASMNAME("rwlock_trywrite");
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL __os_rwlock_tryupgrade)(struct rwlock *__restrict self) ASMNAME("rwlock_tryupgrade");
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_tryread)(struct rwlock *__restrict self) ASMNAME("rwlock_tryread");
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_tryread_readonly)(struct rwlock *__restrict self) ASMNAME("rwlock_tryread_readonly");
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_trywrite)(struct rwlock *__restrict self) ASMNAME("rwlock_trywrite");
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_tryupgrade)(struct rwlock *__restrict self) ASMNAME("rwlock_tryupgrade");
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL rwlock_tryread)(struct rwlock *__restrict self) {
+NOTHROW(FCALL rwlock_tryread)(struct rwlock *__restrict self) {
 	if (!__os_rwlock_tryread(self))
 		return false;
 	COMPILER_READ_BARRIER();
 	return true;
 }
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL rwlock_tryread_readonly)(struct rwlock *__restrict self) {
+NOTHROW(FCALL rwlock_tryread_readonly)(struct rwlock *__restrict self) {
 	if (!__os_rwlock_tryread_readonly(self))
 		return false;
 	COMPILER_READ_BARRIER();
 	return true;
 }
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL rwlock_trywrite)(struct rwlock *__restrict self) {
+NOTHROW(FCALL rwlock_trywrite)(struct rwlock *__restrict self) {
 	if (!__os_rwlock_trywrite(self))
 		return false;
 	COMPILER_BARRIER();
 	return true;
 }
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL rwlock_tryupgrade)(struct rwlock *__restrict self) {
+NOTHROW(FCALL rwlock_tryupgrade)(struct rwlock *__restrict self) {
 	if (!__os_rwlock_tryupgrade(self))
 		return false;
 	COMPILER_WRITE_BARRIER();
@@ -235,6 +233,7 @@ NOTHROW(KCALL rwlock_tryupgrade)(struct rwlock *__restrict self) {
 }
 #endif /* !__INTELLISENSE__ */
 
+struct timespec;
 
 /* Blocking-acquire a shared/exclusive lock.
  * NOTE: These functions clobber task connections.
@@ -251,25 +250,25 @@ NOTHROW(KCALL rwlock_tryupgrade)(struct rwlock *__restrict self) {
  *                            See the section on `parallel-upgrade' above.
  * @return: true:  The operation was successful.
  * @return: false: The given timeout has expired. */
-FORCELOCAL NONNULL((1)) bool KCALL rwlock_read(struct rwlock *__restrict self, qtime_t const *abs_timeout DFL(__NULLPTR)) THROWS(E_BADALLOC,E_INTERRUPT,...);
-FORCELOCAL NONNULL((1)) bool KCALL rwlock_write(struct rwlock *__restrict self, qtime_t const *abs_timeout DFL(__NULLPTR)) THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...);
-FORCELOCAL WUNUSED NONNULL((1)) bool NOTHROW(KCALL rwlock_read_nx)(struct rwlock *__restrict self, qtime_t const *abs_timeout DFL(__NULLPTR));
-FORCELOCAL WUNUSED NONNULL((1)) bool NOTHROW(KCALL rwlock_write_nx)(struct rwlock *__restrict self, qtime_t const *abs_timeout DFL(__NULLPTR));
+FORCELOCAL NONNULL((1)) bool FCALL rwlock_read(struct rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR)) THROWS(E_BADALLOC,E_INTERRUPT,...);
+FORCELOCAL NONNULL((1)) bool FCALL rwlock_write(struct rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR)) THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...);
+FORCELOCAL WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_read_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR));
+FORCELOCAL WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_write_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout DFL(__NULLPTR));
 #ifndef __INTELLISENSE__
-FUNDEF NONNULL((1)) bool KCALL __os_rwlock_read(struct rwlock *__restrict self, qtime_t const *abs_timeout) THROWS(E_BADALLOC,E_INTERRUPT,...) ASMNAME("rwlock_read");
-FUNDEF NONNULL((1)) bool KCALL __os_rwlock_write(struct rwlock *__restrict self, qtime_t const *abs_timeout) THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...) ASMNAME("rwlock_write");
-FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL __os_rwlock_read_nx)(struct rwlock *__restrict self, qtime_t const *abs_timeout) ASMNAME("rwlock_read_nx");
-FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL __os_rwlock_write_nx)(struct rwlock *__restrict self, qtime_t const *abs_timeout) ASMNAME("rwlock_write_nx");
-FORCELOCAL NONNULL((1)) bool KCALL
-rwlock_read(struct rwlock *__restrict self, qtime_t const *abs_timeout)
+FUNDEF NONNULL((1)) bool FCALL __os_rwlock_read(struct rwlock *__restrict self, struct timespec const *abs_timeout) THROWS(E_BADALLOC,E_INTERRUPT,...) ASMNAME("rwlock_read");
+FUNDEF NONNULL((1)) bool FCALL __os_rwlock_write(struct rwlock *__restrict self, struct timespec const *abs_timeout) THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...) ASMNAME("rwlock_write");
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_read_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout) ASMNAME("rwlock_read_nx");
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_write_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout) ASMNAME("rwlock_write_nx");
+FORCELOCAL NONNULL((1)) bool FCALL
+rwlock_read(struct rwlock *__restrict self, struct timespec const *abs_timeout)
 		THROWS(E_BADALLOC,E_INTERRUPT,...) {
 	if (!__os_rwlock_read(self, abs_timeout))
 		return false;
 	COMPILER_READ_BARRIER();
 	return true;
 }
-FORCELOCAL NONNULL((1)) bool KCALL
-rwlock_write(struct rwlock *__restrict self, qtime_t const *abs_timeout)
+FORCELOCAL NONNULL((1)) bool FCALL
+rwlock_write(struct rwlock *__restrict self, struct timespec const *abs_timeout)
 		THROWS(E_INTERRUPT,__E_RETRY_RWLOCK,...) {
 	if (!__os_rwlock_write(self, abs_timeout))
 		return false;
@@ -277,14 +276,14 @@ rwlock_write(struct rwlock *__restrict self, qtime_t const *abs_timeout)
 	return true;
 }
 FORCELOCAL WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL rwlock_read_nx)(struct rwlock *__restrict self, qtime_t const *abs_timeout) {
+NOTHROW(FCALL rwlock_read_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout) {
 	if (!__os_rwlock_read_nx(self, abs_timeout))
 		return false;
 	COMPILER_READ_BARRIER();
 	return true;
 }
 FORCELOCAL WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL rwlock_write_nx)(struct rwlock *__restrict self, qtime_t const *abs_timeout) {
+NOTHROW(FCALL rwlock_write_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout) {
 	if (!__os_rwlock_write_nx(self, abs_timeout))
 		return false;
 	COMPILER_BARRIER();
@@ -320,17 +319,17 @@ NOTHROW(KCALL rwlock_write_nx)(struct rwlock *__restrict self, qtime_t const *ab
  *                         See the section on `parallel-upgrade' above.
  * @return: true:  Successfully acquire a write lock.
  * @return: false: The given timeout has expired. */
-FORCELOCAL NONNULL((1)) bool KCALL
+FORCELOCAL NONNULL((1)) bool FCALL
 rwlock_write_aggressive(struct rwlock *__restrict self,
-                                qtime_t const *abs_timeout DFL(__NULLPTR))
+                                struct timespec const *abs_timeout DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, __E_RETRY_RWLOCK, ...);
 #ifndef __INTELLISENSE__
-FUNDEF NONNULL((1)) bool KCALL
-__os_rwlock_write_aggressive(struct rwlock *__restrict self, qtime_t const *abs_timeout)
+FUNDEF NONNULL((1)) bool FCALL
+__os_rwlock_write_aggressive(struct rwlock *__restrict self, struct timespec const *abs_timeout)
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, __E_RETRY_RWLOCK, ...)
 		ASMNAME("rwlock_write_aggressive");
-FORCELOCAL NONNULL((1)) bool KCALL
-rwlock_write_aggressive(struct rwlock *__restrict self, qtime_t const *abs_timeout)
+FORCELOCAL NONNULL((1)) bool FCALL
+rwlock_write_aggressive(struct rwlock *__restrict self, struct timespec const *abs_timeout)
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, __E_RETRY_RWLOCK, ...) {
 	if (!__os_rwlock_write_aggressive(self, abs_timeout))
 		return false;
@@ -351,23 +350,24 @@ rwlock_write_aggressive(struct rwlock *__restrict self, qtime_t const *abs_timeo
  *                           to acquire a read-lock further up the execution tree.
  *                           See the section on `parallel-upgrade' above.
  *                          (a read-lock is still being held) */
-FORCELOCAL NONNULL((1)) bool KCALL
+FORCELOCAL NONNULL((1)) bool FCALL
 rwlock_upgrade(struct rwlock *__restrict self,
-               qtime_t const *abs_timeout DFL(__NULLPTR))
+               struct timespec const *abs_timeout DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, __E_RETRY_RWLOCK, ...);
 FORCELOCAL WUNUSED NONNULL((1)) unsigned int
-NOTHROW(KCALL rwlock_upgrade_nx)(struct rwlock *__restrict self,
-                                 qtime_t const *abs_timeout DFL(__NULLPTR));
+NOTHROW(FCALL rwlock_upgrade_nx)(struct rwlock *__restrict self,
+                                 struct timespec const *abs_timeout DFL(__NULLPTR));
 #ifndef __INTELLISENSE__
-FUNDEF NONNULL((1)) bool KCALL
-__os_rwlock_upgrade(struct rwlock *__restrict self, qtime_t const *abs_timeout)
+FUNDEF NONNULL((1)) bool FCALL
+__os_rwlock_upgrade(struct rwlock *__restrict self, struct timespec const *abs_timeout)
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, __E_RETRY_RWLOCK, ...)
 		ASMNAME("rwlock_upgrade");
 FUNDEF WUNUSED NONNULL((1)) unsigned int
-NOTHROW(KCALL __os_rwlock_upgrade_nx)(struct rwlock *__restrict self, qtime_t const *abs_timeout)
+NOTHROW(FCALL __os_rwlock_upgrade_nx)(struct rwlock *__restrict self, struct timespec const *abs_timeout)
 		ASMNAME("rwlock_upgrade_nx");
-FORCELOCAL NONNULL((1)) bool KCALL
-rwlock_upgrade(struct rwlock *__restrict self, qtime_t const *abs_timeout)
+FORCELOCAL NONNULL((1)) bool FCALL
+rwlock_upgrade(struct rwlock *__restrict self,
+               struct timespec const *abs_timeout)
 		THROWS(E_WOULDBLOCK, E_INTERRUPT, __E_RETRY_RWLOCK, ...) {
 	if (!__os_rwlock_upgrade(self, abs_timeout))
 		return false;
@@ -376,7 +376,8 @@ rwlock_upgrade(struct rwlock *__restrict self, qtime_t const *abs_timeout)
 }
 
 FORCELOCAL WUNUSED NONNULL((1)) unsigned int
-NOTHROW(KCALL rwlock_upgrade_nx)(struct rwlock *__restrict self, qtime_t const *abs_timeout) {
+NOTHROW(FCALL rwlock_upgrade_nx)(struct rwlock *__restrict self,
+                                 struct timespec const *abs_timeout) {
 	unsigned int result;
 	result = __os_rwlock_upgrade_nx(self, abs_timeout);
 	if (result != 0)
@@ -393,28 +394,28 @@ NOTHROW(KCALL rwlock_upgrade_nx)(struct rwlock *__restrict self, qtime_t const *
  * @return: true:  Successfully downgraded the R/W-lock
  * @return: false: Failed to allocate a read-lock descriptor (a write-lock was kept). */
 FORCELOCAL NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL rwlock_downgrade)(struct rwlock *__restrict self);
+NOTHROW(FCALL rwlock_downgrade)(struct rwlock *__restrict self);
 
 /* Same as `rwlock_downgrade()', but use use `GFP_NORMAL' and
  * `kmalloc()' in order to allocate a missing read-lock descriptor. */
-FORCELOCAL NONNULL((1)) void KCALL
+FORCELOCAL NONNULL((1)) void FCALL
 rwlock_downgrade_readonly(struct rwlock *__restrict self)
 		THROWS(E_BADALLOC);
 
 #ifndef __INTELLISENSE__
 FUNDEF NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL __os_rwlock_downgrade)(struct rwlock *__restrict self)
+NOTHROW(FCALL __os_rwlock_downgrade)(struct rwlock *__restrict self)
 		ASMNAME("rwlock_downgrade");
-FUNDEF NONNULL((1)) void KCALL
+FUNDEF NONNULL((1)) void FCALL
 __os_rwlock_downgrade_readonly(struct rwlock *__restrict self)
 		THROWS(E_BADALLOC)
 		ASMNAME("rwlock_downgrade_readonly");
 FORCELOCAL NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL rwlock_downgrade)(struct rwlock *__restrict self) {
+NOTHROW(FCALL rwlock_downgrade)(struct rwlock *__restrict self) {
 	COMPILER_WRITE_BARRIER();
 	return __os_rwlock_downgrade(self);
 }
-FORCELOCAL NONNULL((1)) void KCALL
+FORCELOCAL NONNULL((1)) void FCALL
 rwlock_downgrade_readonly(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
 	COMPILER_WRITE_BARRIER();
 	__os_rwlock_downgrade_readonly(self);
@@ -442,25 +443,25 @@ rwlock_downgrade_readonly(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
  * >>     }
  * >>     rwlock_endread(&my_lock);
  */
-FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL rwlock_endwrite)(struct rwlock *__restrict self);
-FORCELOCAL NOBLOCK NONNULL((1)) bool NOTHROW(KCALL rwlock_endread)(struct rwlock *__restrict self);
-FORCELOCAL NOBLOCK NONNULL((1)) bool NOTHROW(KCALL rwlock_end)(struct rwlock *__restrict self);
+FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(FCALL rwlock_endwrite)(struct rwlock *__restrict self);
+FORCELOCAL NOBLOCK NONNULL((1)) bool NOTHROW(FCALL rwlock_endread)(struct rwlock *__restrict self);
+FORCELOCAL NOBLOCK NONNULL((1)) bool NOTHROW(FCALL rwlock_end)(struct rwlock *__restrict self);
 #ifndef __INTELLISENSE__
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL __os_rwlock_endwrite)(struct rwlock *__restrict self) ASMNAME("rwlock_endwrite");
-FUNDEF NOBLOCK NONNULL((1)) bool NOTHROW(KCALL __os_rwlock_endread)(struct rwlock *__restrict self) ASMNAME("rwlock_endread");
-FUNDEF NOBLOCK NONNULL((1)) bool NOTHROW(KCALL __os_rwlock_end)(struct rwlock *__restrict self) ASMNAME("rwlock_end");
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL __os_rwlock_endwrite)(struct rwlock *__restrict self) ASMNAME("rwlock_endwrite");
+FUNDEF NOBLOCK NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_endread)(struct rwlock *__restrict self) ASMNAME("rwlock_endread");
+FUNDEF NOBLOCK NONNULL((1)) bool NOTHROW(FCALL __os_rwlock_end)(struct rwlock *__restrict self) ASMNAME("rwlock_end");
 FORCELOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL rwlock_endwrite)(struct rwlock *__restrict self) {
+NOTHROW(FCALL rwlock_endwrite)(struct rwlock *__restrict self) {
 	COMPILER_BARRIER();
 	__os_rwlock_endwrite(self);
 }
 FORCELOCAL NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL rwlock_endread)(struct rwlock *__restrict self) {
+NOTHROW(FCALL rwlock_endread)(struct rwlock *__restrict self) {
 	COMPILER_READ_BARRIER();
 	return __os_rwlock_endread(self);
 }
 FORCELOCAL NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL rwlock_end)(struct rwlock *__restrict self) {
+NOTHROW(FCALL rwlock_end)(struct rwlock *__restrict self) {
 	COMPILER_BARRIER();
 	return __os_rwlock_end(self);
 }
@@ -469,16 +470,16 @@ NOTHROW(KCALL rwlock_end)(struct rwlock *__restrict self) {
 /* Asynchronously connect to the given R/W-lock for reading or writing.
  * @return: true:  The rwlock is currently available for reading or writing.
  * @return: false: The rwlock wasn't available, and a connection was made to the proper signal. */
-FUNDEF WUNUSED NONNULL((1)) bool KCALL rwlock_pollread(struct rwlock *__restrict self) THROWS(E_BADALLOC);
-FUNDEF WUNUSED NONNULL((1)) bool KCALL rwlock_pollwrite(struct rwlock *__restrict self) THROWS(E_BADALLOC);
+FUNDEF WUNUSED NONNULL((1)) bool FCALL rwlock_pollread(struct rwlock *__restrict self) THROWS(E_BADALLOC);
+FUNDEF WUNUSED NONNULL((1)) bool FCALL rwlock_pollwrite(struct rwlock *__restrict self) THROWS(E_BADALLOC);
 
 /* Check if a read/write-lock can be acquired without blocking */
-FORCELOCAL WUNUSED NONNULL((1)) bool NOTHROW(KCALL rwlock_canread)(struct rwlock const *__restrict self);
-FUNDEF WUNUSED NOBLOCK NONNULL((1)) bool NOTHROW(KCALL rwlock_canwrite)(struct rwlock const *__restrict self);
+FORCELOCAL WUNUSED NONNULL((1)) bool NOTHROW(FCALL rwlock_canread)(struct rwlock const *__restrict self);
+FUNDEF WUNUSED NOBLOCK NONNULL((1)) bool NOTHROW(FCALL rwlock_canwrite)(struct rwlock const *__restrict self);
 
 #ifndef __INTELLISENSE__
 FORCELOCAL WUNUSED NONNULL((1)) bool
-NOTHROW(KCALL rwlock_canread)(struct rwlock const *__restrict self) {
+NOTHROW(FCALL rwlock_canread)(struct rwlock const *__restrict self) {
 	u32 state;
 	state = __hybrid_atomic_load(self->rw_state, __ATOMIC_ACQUIRE);
 	return (__RWLOCK_MODE(state) == RWLOCK_MODE_FREADING ||

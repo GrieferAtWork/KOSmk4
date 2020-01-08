@@ -31,6 +31,7 @@
 #include <sched/signal.h>
 #include <sched/task.h>
 
+#include <bits/timespec.h>
 #include <kos/io/uhci.h>
 #include <sys/io.h>
 #include <sys/mmio.h>
@@ -200,8 +201,11 @@ struct uhci_controller: usb_controller {
 	size_t                     uc_iisocount;      /* [lock(uc_lock)] Number of interrupt descriptors chains through `uc_intiso'.
 	                                               * NOTE: Interrupts chained more than once also count more than once here. */
 	struct uhci_osqh          *uc_qhlast;         /* [lock(uc_lock)][0..1] The last queue head in the `uc_qhstart.qh_next' chain. */
-	struct atomic64            uc_lastint;        /* Jiffies at the time when the last interrupt happened. */
-	unsigned int               uc_suspdelay;      /* Delay (in jiffies) before the controller is suspended. */
+#ifndef CONFIG_NO_SMP
+	struct atomic_rwlock       uc_lastint_lock;   /* SMP-lock for accessing `uc_lastint'. */
+#endif /* !CONFIG_NO_SMP */
+	struct timespec            uc_lastint;        /* Timestamp for the time when the last interrupt happened. */
+	unsigned int               uc_suspdelay;      /* Delay (in milliseconds) before the controller is suspended. */
 	alignas(UHCI_FLE_ALIGN)
 	struct uhci_osqh           uc_qhstart;        /* [lock(INSERT(uc_lock))] Queue head start (Entries of `uc_framelist' first point to
 	                                               * optional isochronous, and eventually to this one) Afterwards, all entires point to

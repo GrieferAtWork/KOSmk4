@@ -272,9 +272,7 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  * The sleeping thread should then be woken as follows:
  * >> SET_SHOULD_WAIT(false);
  * >> task_wake(waiting_thread); */
-FUNDEF __BOOL NOTHROW(FCALL task_sleep)(qtime_t const *abs_timeout DFL(__NULLPTR));
-/* Same as `task_sleep()', but `abs_timeout' exists on the `cpu_quantum_time()' timeline */
-FUNDEF __BOOL NOTHROW(FCALL task_sleep_cputime)(qtime_t const *abs_timeout DFL(__NULLPTR));
+FUNDEF __BOOL NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout DFL(__NULLPTR));
 
 /* Terminate the calling thread immediately.
  * WARNING: Do not call this function to terminate a thread.

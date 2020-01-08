@@ -31,6 +31,7 @@
 #include <hybrid/atomic.h>
 
 #include <string.h>
+#include <time.h>
 
 #include "keyboard.h"
 #include "mouse.h"
@@ -45,9 +46,9 @@ DECL_BEGIN
  *   - https://www.win.tue.nl/~aeb/linux/kbd/scancodes-13.html
  */
 
-DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_infull_timeout, "timeout_infull", HZ / 2);
-DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_outfull_timeout, "timeout_outfull", HZ / 2);
-DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_timeout, "timeout_command", HZ / 2);
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_infull_timeout, "timeout_infull", 100); /* In milliseconds */
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_outfull_timeout, "timeout_outfull", 100); /* In milliseconds */
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_timeout, "timeout_command", 100); /* In milliseconds */
 DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_attempts, "attempts_command", 3);
 
 
@@ -138,7 +139,7 @@ again:
 	COMPILER_WRITE_BARRIER();
 	ps2_write_data(portno, command);
 	for (;;) {
-		qtime_t tmo;
+		struct timespec tmo;
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (status != 0)
 			break;
@@ -148,8 +149,8 @@ again:
 			task_disconnectall();
 			break;
 		}
-		tmo = quantum_time();
-		tmo.q_jtime += ps2_command_timeout;
+		tmo = realtime();
+		tmo.add_milliseconds(ps2_command_timeout);
 		if (!task_waitfor(&tmo))
 			THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
 	}
@@ -172,7 +173,7 @@ again:
 	COMPILER_WRITE_BARRIER();
 	ps2_write_data(portno, command);
 	for (;;) {
-		qtime_t tmo;
+		struct timespec tmo;
 		state  = ATOMIC_READ(probe_data[portno].pd_state);
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND))
@@ -184,8 +185,8 @@ again:
 			task_disconnectall();
 			break;
 		}
-		tmo = quantum_time();
-		tmo.q_jtime += ps2_command_timeout;
+		tmo = realtime();
+		tmo.add_milliseconds(ps2_command_timeout);
 		if (!task_waitfor(&tmo)) {
 			state  = ATOMIC_READ(probe_data[portno].pd_state);
 			status = ATOMIC_READ(probe_data[portno].pd_status);
@@ -215,7 +216,7 @@ again:
 	COMPILER_WRITE_BARRIER();
 	ps2_write_data(portno, PS2_KEYBOARD_CMD_IDENTIFY);
 	for (;;) {
-		qtime_t tmo;
+		struct timespec tmo;
 		state  = ATOMIC_READ(probe_data[portno].pd_state);
 		status = ATOMIC_READ(probe_data[portno].pd_status);
 		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND))
@@ -227,8 +228,8 @@ again:
 			task_disconnectall();
 			break;
 		}
-		tmo = quantum_time();
-		tmo.q_jtime += ps2_command_timeout;
+		tmo = realtime();
+		tmo.add_milliseconds(ps2_command_timeout);
 		if (!task_waitfor(&tmo)) {
 			state  = ATOMIC_READ(probe_data[portno].pd_state);
 			status = ATOMIC_READ(probe_data[portno].pd_status);

@@ -1436,7 +1436,7 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 #ifdef WANT_SYS_POLL
 PRIVATE size_t KCALL
 do_poll(USER CHECKED struct pollfd *fds,
-        size_t nfds, qtime_t const *timeout) {
+        size_t nfds, struct timespec const *timeout) {
 	size_t i, result = 0;
 again:
 	assert(!task_isconnected());
@@ -1504,7 +1504,7 @@ do_select(size_t nfds,
           USER CHECKED fd_set *readfds,
           USER CHECKED fd_set *writefds,
           USER CHECKED fd_set *exceptfds,
-          qtime_t const *timeout) {
+          struct timespec const *timeout) {
 	typedef u8 fds_word_t;
 	enum { BITS_PER_FDS_WORD = 8 };
 	size_t nfds_words, i, result = 0;
@@ -1634,7 +1634,7 @@ atomic_sigmask_return(struct kernel_sigmask *__restrict mymask,
 #undef sigmask
 PRIVATE size_t KCALL
 do_ppoll(USER CHECKED struct pollfd *fds,
-         size_t nfds, qtime_t const *timeout,
+         size_t nfds, struct timespec const *timeout,
          USER CHECKED sigset_t const *sigmask) {
 	size_t result;
 	if (sigmask) {
@@ -1662,7 +1662,7 @@ do_pselect(size_t nfds,
            USER CHECKED fd_set *readfds,
            USER CHECKED fd_set *writefds,
            USER CHECKED fd_set *exceptfds,
-           qtime_t const *timeout,
+           struct timespec const *timeout,
            USER CHECKED sigset_t const *sigmask) {
 	size_t result;
 	if (sigmask) {
@@ -1693,10 +1693,10 @@ DEFINE_SYSCALL3(ssize_t, poll,
 	if (timeout < 0) {
 		result = do_poll(fds, nfds, NULL);
 	} else if (timeout == 0) {
-		qtime_t zero = { 0, 0 };
+		struct timespec zero = { 0, 0 };
 		result = do_poll(fds, nfds, &zero);
 	} else {
-		qtime_t tmo = quantum_time();
+		struct timespec tmo = realtime();
 		tmo.add_milliseconds((uintptr_t)timeout);
 		result = do_poll(fds, nfds, &tmo);
 	}
@@ -1720,20 +1720,14 @@ DEFINE_SYSCALL5(ssize_t, ppoll,
 	if (!timeout_ts) {
 		result = do_ppoll(fds, nfds, NULL, sigmask);
 	} else {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout_ts, sizeof(*timeout_ts));
 		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)timeout_ts->tv_sec;
-		tms.tv_nsec = timeout_ts->tv_nsec;
+		tmo.tv_sec  = (time_t)timeout_ts->tv_sec;
+		tmo.tv_nsec = timeout_ts->tv_nsec;
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_ppoll(fds, nfds, &tmo, sigmask);
 	}
 	return (ssize_t)result;
@@ -1757,20 +1751,14 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
 	if (!timeout_ts) {
 		result = do_ppoll(fds, nfds, NULL, sigmask);
 	} else {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout_ts, sizeof(*timeout_ts));
 		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)timeout_ts->tv_sec;
-		tms.tv_nsec = timeout_ts->tv_nsec;
+		tmo.tv_sec  = (time_t)timeout_ts->tv_sec;
+		tmo.tv_nsec = timeout_ts->tv_nsec;
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_ppoll(fds, nfds, &tmo, sigmask);
 	}
 	return (ssize_t)result;
@@ -1793,20 +1781,14 @@ DEFINE_SYSCALL5(ssize_t, ppoll64,
 	if (!timeout_ts) {
 		result = do_ppoll(fds, nfds, NULL, sigmask);
 	} else {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout_ts, sizeof(*timeout_ts));
 		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)timeout_ts->tv_sec;
-		tms.tv_nsec = timeout_ts->tv_nsec;
+		tmo.tv_sec  = (time_t)timeout_ts->tv_sec;
+		tmo.tv_nsec = timeout_ts->tv_nsec;
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_ppoll(fds, nfds, &tmo, sigmask);
 	}
 	return (ssize_t)result;
@@ -1830,20 +1812,14 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll64,
 	if (!timeout_ts) {
 		result = do_ppoll(fds, nfds, NULL, sigmask);
 	} else {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout_ts, sizeof(*timeout_ts));
 		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)timeout_ts->tv_sec;
-		tms.tv_nsec = timeout_ts->tv_nsec;
+		tmo.tv_sec  = (time_t)timeout_ts->tv_sec;
+		tmo.tv_nsec = timeout_ts->tv_nsec;
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_ppoll(fds, nfds, &tmo, sigmask);
 	}
 	return (ssize_t)result;
@@ -1862,19 +1838,13 @@ DEFINE_SYSCALL5(ssize_t, select, size_t, nfds,
 	validate_writable_opt(writefds, nfd_size);
 	validate_writable_opt(exceptfds, nfd_size);
 	if (timeout) {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
-		TIMEVAL_TO_TIMESPEC(timeout, &tms);
+		TIMEVAL_TO_TIMESPEC(timeout, &tmo);
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_select(nfds,
 		                   readfds,
 		                   writefds,
@@ -1903,19 +1873,13 @@ DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
 	validate_writable_opt(writefds, nfd_size);
 	validate_writable_opt(exceptfds, nfd_size);
 	if (timeout) {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
-		TIMEVAL_TO_TIMESPEC(timeout, &tms);
+		TIMEVAL_TO_TIMESPEC(timeout, &tmo);
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_select(nfds,
 		                   readfds,
 		                   writefds,
@@ -1944,19 +1908,13 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select, size_t, nfds,
 	validate_writable_opt(writefds, nfd_size);
 	validate_writable_opt(exceptfds, nfd_size);
 	if (timeout) {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
-		TIMEVAL_TO_TIMESPEC(timeout, &tms);
+		TIMEVAL_TO_TIMESPEC(timeout, &tmo);
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_select(nfds,
 		                   readfds,
 		                   writefds,
@@ -1985,19 +1943,13 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, select64, size_t, nfds,
 	validate_writable_opt(writefds, nfd_size);
 	validate_writable_opt(exceptfds, nfd_size);
 	if (timeout) {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
-		TIMEVAL_TO_TIMESPEC(timeout, &tms);
+		TIMEVAL_TO_TIMESPEC(timeout, &tmo);
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_select(nfds,
 		                   readfds,
 		                   writefds,
@@ -2041,20 +1993,14 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 		      ss.ss_len);
 	validate_readable_opt(ss.ss_ptr, sizeof(sigset_t));
 	if (timeout) {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)timeout->tv_sec;
-		tms.tv_nsec = timeout->tv_nsec;
+		tmo.tv_sec  = (time_t)timeout->tv_sec;
+		tmo.tv_nsec = timeout->tv_nsec;
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_pselect(nfds,
 		                    readfds,
 		                    writefds,
@@ -2100,20 +2046,14 @@ DEFINE_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 		      ss.ss_len);
 	validate_readable_opt(ss.ss_ptr, sizeof(sigset_t));
 	if (timeout) {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)timeout->tv_sec;
-		tms.tv_nsec = timeout->tv_nsec;
+		tmo.tv_sec  = (time_t)timeout->tv_sec;
+		tmo.tv_nsec = timeout->tv_nsec;
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_pselect(nfds,
 		                    readfds,
 		                    writefds,
@@ -2160,20 +2100,14 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 		      ss.ss_len);
 	validate_readable_opt(ss.ss_ptr, sizeof(compat_sigset_t));
 	if (timeout) {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)timeout->tv_sec;
-		tms.tv_nsec = timeout->tv_nsec;
+		tmo.tv_sec  = (time_t)timeout->tv_sec;
+		tmo.tv_nsec = timeout->tv_nsec;
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_pselect(nfds,
 		                    readfds,
 		                    writefds,
@@ -2220,20 +2154,14 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 		      ss.ss_len);
 	validate_readable_opt(ss.ss_ptr, sizeof(compat_sigset_t));
 	if (timeout) {
-		qtime_t tmo;
-		struct timespec tms;
+		struct timespec tmo;
 		validate_readable(timeout, sizeof(*timeout));
 		COMPILER_READ_BARRIER();
-		tms.tv_sec  = (time_t)timeout->tv_sec;
-		tms.tv_nsec = timeout->tv_nsec;
+		tmo.tv_sec  = (time_t)timeout->tv_sec;
+		tmo.tv_nsec = timeout->tv_nsec;
 		COMPILER_READ_BARRIER();
-		if (!tms.tv_sec && !tms.tv_nsec) {
-			tmo.q_jtime = 0;
-			tmo.q_qtime = 0;
-			tmo.q_qsize = 1;
-		} else {
-			tmo = quantum_time() + timespec_to_qtime(&tms);
-		}
+		if (tmo.tv_sec || tmo.tv_nsec)
+			tmo += realtime();
 		result = do_pselect(nfds,
 		                    readfds,
 		                    writefds,

@@ -226,6 +226,56 @@ PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
 }
 
 
+/* Convert to/from cpu-local quantum time and realtime */
+PUBLIC NOBLOCK NOPREEMPT WUNUSED ATTR_PURE struct timespec
+NOTHROW(FCALL cpu_quantum_time_to_realtime_nopr)(qtime_t const *__restrict qtime) {
+	struct timespec result;
+	qtime_t resync_qtime, dist;
+	struct cpu *me;
+	pflag_t was;
+	u64 total_nsec;
+	was = PREEMPTION_PUSHOFF();
+	me  = THIS_CPU;
+	/* Make sure that a timestamp was loaded at some point. */
+	if (!FORCPU(me, thiscpu_last_resync.ct_prec.tv_sec) &&
+	    !FORCPU(me, thiscpu_last_resync.ct_prec.tv_nsec))
+		cpu_resync_realtime(me);
+	result               = FORCPU(me, thiscpu_last_resync.ct_real);
+	resync_qtime.q_jtime = FORCPU(me, thiscpu_jiffies);
+	resync_qtime.q_qtime = FORCPU(me, thiscpu_last_resync.ct_cpuq);
+	resync_qtime.q_qsize = FORCPU(me, thiscpu_quantum_length);
+	PREEMPTION_POP(was);
+	dist.q_jtime = qtime->q_jtime - resync_qtime.q_jtime;
+	dist.q_qtime = qtime->q_qtime;
+	dist.q_qsize = qtime->q_qsize;
+	dist.sub_quantum(resync_qtime.q_qtime, resync_qtime.q_qsize);
+
+	/* We're now `(cpu_jtime + (cpu_qtime / cpu_qsize)) * HZ' seconds after `result'
+	 * Adjust `result' accordingly to be a timestamp that's as precise as possible. */
+	result.tv_sec += dist.q_jtime / HZ;
+	total_nsec = result.tv_nsec;
+	total_nsec += (dist.q_jtime % HZ) * (__NSECS_PER_SEC / HZ);
+	total_nsec += (u64)((u64)dist.q_qtime * (__NSECS_PER_SEC / HZ)) / dist.q_qsize;
+	result.tv_nsec = (syscall_ulong_t)total_nsec;
+	if (total_nsec > __NSECS_PER_SEC) {
+		result.tv_sec += (time_t)(total_nsec / __NSECS_PER_SEC);
+		result.tv_nsec = (syscall_ulong_t)(total_nsec % __NSECS_PER_SEC);
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK NOPREEMPT WUNUSED ATTR_PURE qtime_t
+NOTHROW(FCALL realtime_to_cpu_quantum_time_nopr)(struct timespec const *__restrict tms) {
+	/* XXX: This is very imprecise, but this function will go away once qtime_t gets removed! */
+	struct timespec offset_from_now;
+	qtime_t result;
+	offset_from_now = *tms - realtime();
+	result = cpu_quantum_time();
+	result.add_seconds(offset_from_now.tv_sec);
+	result.add_nanoseconds(offset_from_now.tv_nsec);
+	return result;
+}
+
 
 /* prevent issues hardware timer roll-over happening
  * before we've able to read the timestamp counter. */

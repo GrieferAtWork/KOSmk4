@@ -2637,11 +2637,11 @@ handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd,
 		if (WIFEXITED(self->tp_status)) {
 			ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
 		} else {
-			qtime_t timeout, *ptimeout = NULL;
+			struct timespec timeout, *ptimeout = NULL;
 			uint64_t timeout_sec = ATOMIC_READ(data->tj_reltimeout_sec);
 			if (timeout_sec != 0 && timeout_sec != (uint64_t)-1) {
-				timeout = quantum_time();
-				timeout.add_seconds64(timeout_sec);
+				timeout = realtime();
+				timeout.tv_sec += timeout_sec;
 				timeout.add_nanoseconds(ATOMIC_READ(data->tj_reltimeout_nsec));
 				ptimeout = &timeout;
 			}

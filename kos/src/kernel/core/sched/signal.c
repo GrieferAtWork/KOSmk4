@@ -617,14 +617,15 @@ PUBLIC NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void) {
 /* Wait for the first signal to be delivered,
  * disconnecting all connected signals thereafter.
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
- * @param: abs_timeout:  The global (s.a. `quantum_time()') timeout for the wait.
+ * @param: abs_timeout:  The timeout for the wait.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.
  * @throw: * :          [task_waitfor] An error was thrown by an RPC function.
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
  * @return: NULL: No signal has become available (never returned when `NULL' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */
-PUBLIC struct sig *KCALL
-task_waitfor(qtime_t const *abs_timeout) THROWS(E_WOULDBLOCK,...) {
+PUBLIC struct sig *FCALL
+task_waitfor(struct timespec const *abs_timeout)
+		THROWS(E_WOULDBLOCK, ...) {
 	struct task_connections *mycons;
 	struct sig *result;
 	mycons = &PERTASK(this_connections);
@@ -664,7 +665,7 @@ got_signal:
  * there are pending RPCs that are allowed to throw exception, or if preemption
  * was disabled, and the operation would have blocked. */
 PUBLIC WUNUSED struct sig *
-NOTHROW(KCALL task_waitfor_nx)(qtime_t const *abs_timeout) {
+NOTHROW(FCALL task_waitfor_nx)(struct timespec const *abs_timeout) {
 	struct task_connections *mycons;
 	struct sig *result;
 	mycons = &PERTASK(this_connections);
@@ -705,7 +706,7 @@ got_signal:
 /* Same as `task_waitfor', but don't serve RPC functions, and return
  * `NULL' if preemption was disabled, and the operation would have blocked. */
 PUBLIC struct sig *
-NOTHROW(KCALL task_waitfor_norpc_nx)(qtime_t const *abs_timeout) {
+NOTHROW(FCALL task_waitfor_norpc_nx)(struct timespec const *abs_timeout) {
 	struct task_connections *mycons;
 	struct sig *result;
 	mycons = &PERTASK(this_connections);
@@ -735,8 +736,9 @@ got_signal:
 }
 
 /* Same as `task_waitfor', but don't serve RPC functions. */
-PUBLIC struct sig *KCALL
-task_waitfor_norpc(qtime_t const *abs_timeout) THROWS(E_WOULDBLOCK) {
+PUBLIC struct sig *FCALL
+task_waitfor_norpc(struct timespec const *abs_timeout)
+		THROWS(E_WOULDBLOCK) {
 	struct task_connections *mycons;
 	struct sig *result;
 	mycons = &PERTASK(this_connections);

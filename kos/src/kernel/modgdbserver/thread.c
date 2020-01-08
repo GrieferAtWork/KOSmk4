@@ -200,7 +200,7 @@ switch_to_normal_stop:
 				task_disconnectall();
 				break;
 			}
-			if (!task_waitfor_norpc_nx(NULL))
+			if (!task_waitfor_norpc_nx())
 				task_disconnectall();
 		}
 		PREEMPTION_DISABLE();
@@ -266,7 +266,7 @@ do_normal_stop:
 					continue;
 				}
 			}
-			if (!task_waitfor_norpc_nx(NULL))
+			if (!task_waitfor_norpc_nx())
 				task_disconnectall();
 		}
 		PREEMPTION_DISABLE();

@@ -40,21 +40,27 @@ DECL_BEGIN
 typedef u8 ps2_portid_t; /* `PS2_PORT1' or `PS2_PORT2' */
 
 
-INTDEF unsigned int ps2_infull_timeout;
-INTDEF unsigned int ps2_outfull_timeout;
-INTDEF unsigned int ps2_command_timeout;
+INTDEF unsigned int ps2_infull_timeout;  /* In milliseconds */
+INTDEF unsigned int ps2_outfull_timeout; /* In milliseconds */
+INTDEF unsigned int ps2_command_timeout; /* In milliseconds */
 INTDEF unsigned int ps2_command_attempts;
 
 #define PS2_GET_ISR_FOR_PORT(portno) ((portno) == PS2_PORT1 ? X86_INTNO_PIC1_KBD : X86_INTNO_PIC2_PS2M)
 
 
+#if defined(__cplusplus) && defined(__USE_KOS)
+
 /* Wait until `PS2_STATUS_INFULL' is clear */
 LOCAL bool NOTHROW(KCALL ps2_waitfor_infull0_nx)(void) {
-	jtime_t jtm_end = jiffies + ps2_infull_timeout;
-	while (inb_p(PS2_STATUS) & PS2_STATUS_INFULL) {
-		if unlikely(jiffies > jtm_end)
-			return false;
-		task_tryyield_or_pause();
+	if (inb_p(PS2_STATUS) & PS2_STATUS_INFULL) {
+		struct timespec timeout;
+		timeout = realtime();
+		timeout.add_milliseconds(ps2_infull_timeout);
+		while (inb_p(PS2_STATUS) & PS2_STATUS_INFULL) {
+			if unlikely(realtime() > timeout)
+				return false;
+			task_tryyield_or_pause();
+		}
 	}
 	return true;
 }
@@ -62,11 +68,15 @@ LOCAL bool NOTHROW(KCALL ps2_waitfor_infull0_nx)(void) {
 /* Wait until `PS2_STATUS_OUTFULL' is set */
 LOCAL WUNUSED bool
 NOTHROW(KCALL ps2_waitfor_outfull1_nx)(void) {
-	jtime_t jtm_end = jiffies + ps2_outfull_timeout;
-	while (!(inb_p(PS2_STATUS) & PS2_STATUS_OUTFULL)) {
-		if unlikely(jiffies > jtm_end)
-			return false;
-		task_tryyield_or_pause();
+	if (!(inb_p(PS2_STATUS) & PS2_STATUS_OUTFULL)) {
+		struct timespec timeout;
+		timeout = realtime();
+		timeout.add_milliseconds(ps2_outfull_timeout);
+		while (!(inb_p(PS2_STATUS) & PS2_STATUS_OUTFULL)) {
+			if unlikely(realtime() > timeout)
+				return false;
+			task_tryyield_or_pause();
+		}
 	}
 	return true;
 }
@@ -143,6 +153,7 @@ LOCAL void KCALL ps2_write_data(ps2_portid_t portno, u8 data) THROWS(E_IOERROR) 
 	if unlikely(!ps2_write_data_nx(portno, data))
 		THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
 }
+#endif /* __cplusplus && __USE_KOS */
 
 
 

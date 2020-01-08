@@ -36,8 +36,25 @@
 #define __TIMEVAL_CXX_SUPPORT(T, TV_SEC_TYPE, TV_USEC_TYPE)                \
 	/* Add microseconds (1/1_000_000 seconds) */                           \
 	__CXX_CLASSMEMBER __NOBLOCK void                                       \
-	add_microseconds(TV_USEC_TYPE __n) __CXX_NOEXCEPT {                    \
-		tv_usec += __n;                                                    \
+	(add_microseconds)(TV_USEC_TYPE __n) __CXX_NOEXCEPT {                  \
+		if (__hybrid_overflow_uadd(tv_usec, __n, &tv_usec)) {              \
+			tv_sec  += ((TV_USEC_TYPE)-1) / __USECS_PER_SEC;               \
+			tv_usec += __n;                                                \
+			tv_usec -= (TV_USEC_TYPE)-1;                                   \
+		}                                                                  \
+		if (tv_usec > __USECS_PER_SEC) {                                   \
+			tv_sec += tv_usec / __USECS_PER_SEC;                           \
+			tv_usec %= __USECS_PER_SEC;                                    \
+		}                                                                  \
+	}                                                                      \
+	/* Subtract microseconds (1/1_000_000 seconds) */                      \
+	__CXX_CLASSMEMBER __NOBLOCK void                                       \
+	(sub_microseconds)(TV_USEC_TYPE __n) __CXX_NOEXCEPT {                  \
+		if (__hybrid_overflow_usub(tv_usec, __n, &tv_usec)) {              \
+			tv_sec  -= ((TV_USEC_TYPE)-1) / __USECS_PER_SEC;               \
+			tv_usec += (TV_USEC_TYPE)-1;                                   \
+			tv_usec -= __n;                                                \
+		}                                                                  \
 		if (tv_usec > __USECS_PER_SEC) {                                   \
 			tv_sec += tv_usec / __USECS_PER_SEC;                           \
 			tv_usec %= __USECS_PER_SEC;                                    \
@@ -45,8 +62,13 @@
 	}                                                                      \
 	/* Add milliseconds (1/1_000 seconds) */                               \
 	__CXX_CLASSMEMBER __NOBLOCK void                                       \
-	add_milliseconds(TV_USEC_TYPE __n) __CXX_NOEXCEPT {                    \
+	(add_milliseconds)(TV_USEC_TYPE __n) __CXX_NOEXCEPT {                  \
 		(add_microseconds)(__n * 1000);                                    \
+	}                                                                      \
+	/* Subtract milliseconds (1/1_000 seconds) */                          \
+	__CXX_CLASSMEMBER __NOBLOCK void                                       \
+	(sub_milliseconds)(TV_USEC_TYPE __n) __CXX_NOEXCEPT {                  \
+		(sub_microseconds)(__n * 1000);                                    \
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK T &                                        \
 	operator+=(T const &__other) __CXX_NOEXCEPT {                          \

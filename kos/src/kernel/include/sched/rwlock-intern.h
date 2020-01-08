@@ -58,20 +58,6 @@ DATDEF ATTR_PERTASK struct read_locks this_read_locks;
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pertask_readlocks_init)(struct task *__restrict thread);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pertask_readlocks_fini)(struct task *__restrict thread);
-
-/* Find an existing read-lock descriptor for `lock', or return NULL. */
-INTDEF NOBLOCK WUNUSED NONNULL((1)) struct read_lock *
-NOTHROW(KCALL rwlock_find_readlock)(struct rwlock const *__restrict lock);
-
-/* Return a read-lock descriptor for `lock', or allocate a new one. */
-INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) struct read_lock *
-(KCALL rwlock_get_readlock)(struct rwlock *__restrict lock) THROWS(E_BADALLOC);
-INTDEF WUNUSED NONNULL((1)) struct read_lock *
-NOTHROW(KCALL rwlock_get_readlock_nx)(struct rwlock *__restrict lock);
-
-/* Delete the given rlock. */
-INTDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL rwlock_delete_readlock)(struct read_lock *__restrict rlock);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #endif /* __CC__ */

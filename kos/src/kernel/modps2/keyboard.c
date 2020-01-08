@@ -18,6 +18,7 @@
  */
 #ifndef GUARD_MODPS2_KEYBOARD_C
 #define GUARD_MODPS2_KEYBOARD_C 1
+#define _KOS_SOURCE 1
 
 #include "keyboard.h"
 
@@ -358,15 +359,15 @@ again:
 	ATOMIC_WRITE(self->pk_errors, 0);
 	ps2_write_data(self->pk_portno, command_byte);
 	while ((errors = ATOMIC_READ(self->pk_errors)) == 0) {
-		qtime_t tmo;
+		struct timespec tmo;
 		task_connect(&self->pk_errors_sig);
 		errors = ATOMIC_READ(self->pk_errors);
 		if unlikely(errors != 0) {
 			task_disconnectall();
 			break;
 		}
-		tmo = quantum_time();
-		tmo.q_jtime += ps2_command_timeout;
+		tmo = realtime();
+		tmo.add_milliseconds(ps2_command_timeout);
 		if (!task_waitfor(&tmo)) {
 			errors = ATOMIC_READ(self->pk_errors);
 			if (errors != 0)

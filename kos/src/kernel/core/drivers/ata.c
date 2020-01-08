@@ -53,6 +53,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
+#include <time.h>
 
 DECL_BEGIN
 
@@ -1289,9 +1290,9 @@ do_compat_hdio_getgeo:
 			outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_IDENTIFY);
 			ATA_SELECT_DELAY(bus->b_ctrlio);
 			if ((signal = task_trywait()) == NULL) {
-				qtime_t timeout;
-				timeout = quantum_time();
-				timeout.add_seconds(2);
+				struct timespec timeout;
+				timeout = realtime();
+				timeout.tv_sec += 2;
 				signal = task_waitfor(&timeout);
 				if (!signal)
 					THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);
@@ -1450,9 +1451,9 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 				outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_IDENTIFY);
 				ATA_SELECT_DELAY(bus->b_ctrlio);
 				if ((signal = task_trywait()) == NULL) {
-					qtime_t timeout;
-					timeout = quantum_time();
-					timeout.add_seconds(2);
+					struct timespec timeout;
+					timeout = realtime();
+					timeout.tv_sec += 2;
 					signal = task_waitfor(&timeout);
 					if (!signal) {
 reset_bus_and_fail:

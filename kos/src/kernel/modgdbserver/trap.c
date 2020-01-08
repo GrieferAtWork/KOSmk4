@@ -242,7 +242,7 @@ again_waitfor_resume:
 			goto do_become_gdb_host_notif;
 		}
 		was_preemption_enabled = PREEMPTION_PUSHON();
-		if (!task_waitfor_norpc_nx(NULL))
+		if (!task_waitfor_norpc_nx())
 			task_disconnectall();
 		PREEMPTION_POP(was_preemption_enabled);
 		{

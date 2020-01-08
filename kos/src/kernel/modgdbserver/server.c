@@ -2203,7 +2203,7 @@ check_for_notif_or_remote_byte:
 				bi = GDBRemote_TryGetByte();
 				if likely(bi < 0) {
 					/* Wait for something to happen. */
-					if (!task_waitfor_norpc_nx(NULL))
+					if (!task_waitfor_norpc_nx())
 						task_disconnectall();
 					goto check_for_notif_or_remote_byte;
 				}
@@ -2296,7 +2296,7 @@ send_nack_and_wait_for_next_packet:
 							task_disconnectall();
 							goto again;
 						}
-						if (!task_waitfor_norpc_nx(NULL))
+						if (!task_waitfor_norpc_nx())
 							task_disconnectall();
 					}
 				}

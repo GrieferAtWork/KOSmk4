@@ -1250,7 +1250,7 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 		}
 		/* Wait for the other thread, but don't service RPCs,
 		 * or allow exceptions to be thrown. */
-		if (!task_waitfor_norpc_nx(NULL))
+		if (!task_waitfor_norpc_nx())
 			task_disconnectall();
 	}
 	PREEMPTION_DISABLE();

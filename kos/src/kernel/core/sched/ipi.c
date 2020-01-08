@@ -716,7 +716,7 @@ again_already_disabled:
 					decref_unlikely(rtc);
 					goto do_idle_wait;
 				}
-				timeout = cpu_quantum_time_to_realtime(&iter->t_sched.s_asleep.ss_timeout);
+				timeout = cpu_quantum_time_to_realtime_nopr(&iter->t_sched.s_asleep.ss_timeout);
 				/* Disable preemptive interrupts while we wait using the RTC.
 				 * If we left them enabled, then `rc_waitfor' would return
 				 * immediately after the first preemptive interrupt fired,

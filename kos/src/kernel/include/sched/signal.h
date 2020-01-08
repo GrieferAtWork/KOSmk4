@@ -263,7 +263,7 @@ FUNDEF NOBLOCK WUNUSED ATTR_CONST bool NOTHROW(KCALL task_isconnected)(void);
  * @return: * :   The signal that was delivered. */
 FUNDEF NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void);
 
-struct __qtime;
+struct timespec;
 
 /* Wait for the first signal to be delivered,
  * disconnecting all connected signals thereafter.
@@ -274,23 +274,23 @@ struct __qtime;
  *                       NOTE: In this case, `task_disconnectall()' will have been called.
  * @return: NULL: No signal has become available (never returned when `NULL' is passed for `abs_timeout').
  * @return: * :   The signal that was delivered. */
-FUNDEF struct sig *KCALL
-task_waitfor(struct __qtime const *abs_timeout DFL(__NULLPTR)) THROWS(E_WOULDBLOCK, ...);
+FUNDEF struct sig *FCALL
+task_waitfor(struct timespec const *abs_timeout DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK, ...);
 
 /* Same as `task_waitfor', but don't serve RPC functions. */
-FUNDEF struct sig *KCALL
-task_waitfor_norpc(struct __qtime const *abs_timeout DFL(__NULLPTR)) THROWS(E_WOULDBLOCK);
+FUNDEF struct sig *FCALL
+task_waitfor_norpc(struct timespec const *abs_timeout DFL(__NULLPTR))
+		THROWS(E_WOULDBLOCK);
 
 /* Same as `task_waitfor', but only service NX RPCs, and return `NULL' if
  * there are pending RPCs that are allowed to throw exception, or if preemption
  * was disabled, and the operation would have blocked. */
-FUNDEF struct sig *
-NOTHROW(KCALL task_waitfor_nx)(struct __qtime const *abs_timeout DFL(__NULLPTR));
+FUNDEF struct sig *NOTHROW(FCALL task_waitfor_nx)(struct timespec const *abs_timeout DFL(__NULLPTR));
 
 /* Same as `task_waitfor', but don't serve RPC functions, and return
  * `NULL' if preemption was disabled, and the operation would have blocked. */
-FUNDEF struct sig *
-NOTHROW(KCALL task_waitfor_norpc_nx)(struct __qtime const *abs_timeout DFL(__NULLPTR));
+FUNDEF struct sig *NOTHROW(FCALL task_waitfor_norpc_nx)(struct timespec const *abs_timeout DFL(__NULLPTR));
 #endif /* __CC__ */
 
 

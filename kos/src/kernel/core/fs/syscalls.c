@@ -3602,11 +3602,11 @@ kernel_execveat(struct icpustate *__restrict state,
 			 *      other exception caused by case #2 would have been.
 			 */
 #ifdef NDEBUG
-			task_waitfor(NULL);
+			task_waitfor();
 #else /* NDEBUG */
 			{
 				struct sig *recv;
-				recv = task_waitfor(NULL);
+				recv = task_waitfor();
 				assert(recv == &data->er_error);
 			}
 #endif /* !NDEBUG */

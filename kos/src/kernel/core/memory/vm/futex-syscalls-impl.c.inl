@@ -42,7 +42,7 @@ DECL_BEGIN
 PRIVATE syscall_slong_t KCALL
 FUNC(task_waitfor_futex)(syscall_ulong_t flags,
                          USER UNCHECKED struct FUNC(timespec64) const *timeout) {
-	qtime_t tmo;
+	struct timespec tmo;
 	/* Mask flag bits. */
 	flags &= LFUTEX_FLAGMASK;
 	/* Validate that only known flags are being used. */
@@ -64,24 +64,16 @@ FUNC(task_waitfor_futex)(syscall_ulong_t flags,
 	}
 	validate_readable(timeout, sizeof(*timeout));
 	COMPILER_READ_BARRIER();
-#ifdef DEFINE_COMPAT_FUTEX
-	{
-		struct timespec tm;
-		tm.tv_sec  = timeout->tv_sec;
-		tm.tv_nsec = timeout->tv_nsec;
-		COMPILER_READ_BARRIER();
-		tmo = timespec_to_qtime(&tm);
-	}
-#else /* DEFINE_COMPAT_FUTEX */
-	tmo = timespec_to_qtime(timeout);
-#endif /* !DEFINE_COMPAT_FUTEX */
+	tmo.tv_sec  = timeout->tv_sec;
+	tmo.tv_nsec = timeout->tv_nsec;
+	COMPILER_READ_BARRIER();
 	if (flags & LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME) {
-		/* TODO: tmo = qtime_realtime_to_cpu(tmo); */
+		/* XXX: How should we implement this? */
 	}
 	/* Allow for relative timeouts by adding the
 	 * current quantum time to the given timeout. */
 	if (flags & LFUTEX_WAIT_FLAG_TIMEOUT_RELATIVE)
-		tmo += quantum_time();
+		tmo += realtime();
 	if (!task_waitfor(&tmo))
 		return -ETIMEDOUT;
 	return 0;
