@@ -21,6 +21,9 @@
 #undef NDEBUG /* We can't have assertions be disabled! */
 
 #include "api.h"
+
+#include <__crt.h>
+
 #include <hybrid/__assert.h>
 
 #ifndef __INSIDE_LIBTEST
@@ -54,6 +57,9 @@ struct testdecl {
 		.td_func = &test_##name,                                                                 \
 	};                                                                                           \
 	__PRIVATE __ATTR_USED void test_##name(void)
+
+__INTDEF void __NOTHROW_NCX(__VLIBCCALL ctest_subtestf)(char const *__restrict __format, ...);
+__INTDEF void __NOTHROW_NCX(__LIBCCALL ctest_vsubtestf)(char const *__restrict __format, __builtin_va_list __args);
 
 
 __DECL_END

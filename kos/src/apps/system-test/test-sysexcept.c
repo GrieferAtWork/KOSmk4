@@ -29,6 +29,7 @@
 #include <sys/syscall.h>
 #include <sys/syscall-proto.h>
 #include <stdio.h>
+#include <syslog.h>
 #include <kos/ukern.h>
 #include <system-test/ctest.h>
 
@@ -121,6 +122,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 
 	/* The regular exception-enabled,
 	 * portable user-space wrapper function */
+	ctest_subtestf("Pipe() works");
 	{
 		fd_t fds[2];
 		fds[0] = fds[1] = -1;
@@ -130,14 +132,16 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		sys_Xclose(fds[1]);
 		sys_Xclose(fds[0]);
 	}
+	ctest_subtestf("Pipe(NULL) breaks");
 	TRY {
 		Pipe(NULL);
-		assert_failed("syscall:libc: Shouldn't get here!\n");
+		assert_failed("syscall:libc: Shouldn't get here!");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
 
 	/* The libc direct syscall function */
+	ctest_subtestf("sys_Xpipe() works");
 	{
 		fd_t fds[2];
 		fds[0] = fds[1] = -1;
@@ -147,9 +151,10 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		sys_Xclose(fds[1]);
 		sys_Xclose(fds[0]);
 	}
+	ctest_subtestf("sys_Xpipe(NULL) breaks");
 	TRY {
-		Pipe(NULL);
-		assert_failed("syscall:libc:sysX: Shouldn't get here!\n");
+		sys_Xpipe(NULL);
+		assert_failed("syscall:libc:sysX: Shouldn't get here!");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
@@ -159,6 +164,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 	 * so if anything went wrong in here, the kernel would
 	 * throw an exception that'd cause libc to trigger a
 	 * coredump when it couldn't find an exception handler. */
+	ctest_subtestf("userkern_Syscall(pipe) works");
 	{
 		fd_t fds[2];
 		fds[0] = fds[1] = -1;
@@ -168,15 +174,17 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		userkern_Syscall(userkern_self(), close)(fds[1]);
 		userkern_Syscall(userkern_self(), close)(fds[0]);
 	}
+	ctest_subtestf("userkern_Syscall(pipe(NULL)) breaks");
 	TRY {
 		userkern_Syscall(userkern_self(), pipe)(NULL);
-		assert_failed("syscall:useg: Shouldn't get here!\n");
+		assert_failed("syscall:useg: Shouldn't get here!");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
 
 #if defined(__i386__) && !defined(__x86_64__)
 	/* Manually invoke: lcall $7 */
+	ctest_subtestf("lcall7_Pipe() works");
 	{
 		fd_t fds[2];
 		fds[0] = fds[1] = -1;
@@ -186,13 +194,15 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		sys_Xclose(fds[1]);
 		sys_Xclose(fds[0]);
 	}
+	ctest_subtestf("lcall7_Pipe(NULL) breaks");
 	TRY {
 		lcall7_Pipe(NULL);
-		assert_failed("syscall:lcall7: Shouldn't get here!\n");
+		assert_failed("syscall:lcall7: Shouldn't get here!");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
 	/* Manually invoke: sysenter */
+	ctest_subtestf("sysenter_Pipe() works");
 	{
 		fd_t fds[2];
 		fds[0] = fds[1] = -1;
@@ -202,9 +212,10 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		sys_Xclose(fds[1]);
 		sys_Xclose(fds[0]);
 	}
+	ctest_subtestf("sysenter_Pipe(NULL) breaks");
 	TRY {
 		sysenter_Pipe(NULL);
-		assert_failed("syscall:sysenter: Shouldn't get here!\n");
+		assert_failed("syscall:sysenter: Shouldn't get here!");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
@@ -212,6 +223,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 
 #if defined(__i386__) || defined(__x86_64__)
 	/* Manually invoke: int $0x80 */
+	ctest_subtestf("int80_Pipe() works");
 	{
 		fd_t fds[2];
 		fds[0] = fds[1] = -1;
@@ -221,9 +233,10 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		sys_Xclose(fds[1]);
 		sys_Xclose(fds[0]);
 	}
+	ctest_subtestf("int80_Pipe(NULL) breaks");
 	TRY {
 		int80_Pipe(NULL);
-		assert_failed("syscall:int80: Shouldn't get here!\n");
+		assert_failed("syscall:int80: Shouldn't get here!");
 	} EXCEPT {
 		assert_error_code(E_SEGFAULT);
 	}
@@ -231,18 +244,20 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 
 	/* Throw an exception manually by using the THROW() macro. */
 	assert_error_code(E_OK);
+	ctest_subtestf("THROW(X) works");
 	TRY {
 		THROW(E_DIVIDE_BY_ZERO);
-		assert_failed("THROW(): Shouldn't get here!\n");
+		assert_failed("THROW(): Shouldn't get here!");
 	} EXCEPT {
 		assert_error_code(E_DIVIDE_BY_ZERO);
 	}
 
 	/* Throw an exception manually by using the THROW() macro (with additional pointers). */
 	assert_error_code(E_OK);
+	ctest_subtestf("THROW(X, Y, Z) works");
 	TRY {
 		THROW(E_DIVIDE_BY_ZERO, 1, 2, 3);
-		assert_failed("THROW(): Shouldn't get here!\n");
+		assert_failed("THROW(): Shouldn't get here!");
 	} EXCEPT {
 		unsigned int i;
 		struct exception_data *data;
@@ -261,12 +276,13 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 	/* Do something that causes the kernel to throw an
 	 * exception due to performing an illegal operation. */
 	assert_error_code(E_OK);
+	ctest_subtestf("E_DIVIDE_BY_ZERO works");
 	TRY {
 		static volatile int x = 10;
 		static volatile int y = 0;
 		static volatile int z;
 		z = x / y;
-		assert_failed("usfault: Shouldn't get here!\n");
+		assert_failed("usfault: Shouldn't get here!");
 		x = z; /* Suppress warning: z set, but not used */
 	} EXCEPT {
 		assert_error_code(E_DIVIDE_BY_ZERO);

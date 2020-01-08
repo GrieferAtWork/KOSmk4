@@ -22,21 +22,55 @@
 
 #include <hybrid/compiler.h>
 
-#include <stdio.h>
+#include <kos/types.h>
 #include <sys/syslog.h>
 #include <system-test/ctest.h>
+
+#include <format-printer.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 DECL_BEGIN
 
 INTDEF struct testdecl __system_tests_begin[];
 INTDEF struct testdecl __system_tests_end[];
 
+PRIVATE struct testdecl *ctest_current_test = NULL;
+
+INTERN void
+NOTHROW_NCX(__LIBCCALL ctest_vsubtestf)(char const *__restrict format,
+                                        va_list args) {
+	va_list args_copy;
+	syslog(LOG_DEBUG, "[test:%s] %s:%d: ",
+	       ctest_current_test->td_name,
+	       ctest_current_test->td_file,
+	       ctest_current_test->td_line);
+	va_copy(args_copy, args);
+	format_vprintf(&syslog_printer, (void *)(uintptr_t)LOG_DEBUG, format, args_copy);
+	va_end(args_copy);
+	putchar('\t');
+	vprintf(format, args);
+	putchar('\n');
+}
+
+INTERN void
+NOTHROW_NCX(__VLIBCCALL ctest_subtestf)(char const *__restrict format, ...) {
+	va_list args;
+	va_start(args, format);
+	ctest_vsubtestf(format, args);
+	va_end(args);
+}
+
+
+
 PRIVATE void run_all_tests(void) {
 	struct testdecl *iter;
 	for (iter = __system_tests_begin; iter < __system_tests_end; ++iter) {
+		ctest_current_test = iter;
 		syslog(LOG_DEBUG, "[test:%s] %s:%d\n",
 		       iter->td_name,
-		       iter->td_file, iter->td_line);
+		       iter->td_file,
+		       iter->td_line);
 		printf("test:%s\n", iter->td_name);
 		(*iter->td_func)();
 	}
