@@ -24,6 +24,7 @@
 #include <kernel/except.h>
 
 #include <asm/cfi.h>
+#include <asm/instr/jccN.h>
 #include <asm/unistd.h>
 #include <kos/kernel/cpu-state-asm32.h>
 #include <kos/kernel/cpu-state.h>
@@ -65,21 +66,25 @@
  * >> syscall_emulate_r(struct icpustate *__restrict state,
  * >>                   struct rpc_syscall_info *__restrict sc_info); */
 .section .text
-PUBLIC_FUNCTION(syscall_emulate_r)
 	.cfi_startproc simple
 	EXTERN(syscall_emulate_r_personality)
 	.cfi_personality 0, syscall_emulate_r_personality
 	.cfi_iret_signal_frame
-	.cfi_def_cfa  %ecx, OFFSET_ICPUSTATE_IRREGS
 	.cfi_restore_iret_ds_or_offset -4
 	.cfi_restore_iret_es_or_offset -8
 	.cfi_restore_iret_fs_or_offset -12
 	ASM_CFI_REL_OFFSET_RESTORE_GPREGSNSP(OFFSET_ICPUSTATE_GPREGS)
-	/* TODO: This is a `jmp 1f; 1:' instruction that is meant to be
-	 *       overwritten in order to facilitate system call tracing! */
-	.byte 0xe9
-	.long 0
+INTERN_FUNCTION(x86_syscall_emulate_traced_r)
+	.cfi_def_cfa %esp, (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
+	rep;   movsl
+	movl   %esp, %ecx
+	EXTERN(syscall_trace)
+	call   syscall_trace
+	jmp8   .Lsyscall_emulate_r_after_tracing
+END(x86_syscall_emulate_traced_r)
 
+PUBLIC_FUNCTION(syscall_emulate_r)
+	.cfi_def_cfa %ecx, OFFSET_ICPUSTATE_IRREGS
 	/* Start by copying `sc_info' (%edx) just infront of `state' (%ecx)
 	 * Note that that sc_info may already be overlapping with said target
 	 * area, meaning that we have to use memmove() semantics copying data
@@ -90,14 +95,33 @@ PUBLIC_FUNCTION(syscall_emulate_r)
 	leal   (SIZEOF_RPC_SYSCALL_INFO-4)(%edx), %esi
 	movl   $(SIZEOF_RPC_SYSCALL_INFO / 4), %ecx /* It's ok that this clobbers %ecx. - We can just load `%edi+4' once we're done */
 	std    /* Set the direction bit, meaning that movsX now advances downwards */
-	rep;   movsl /* memmove((byte_t *)state - SIZEOF_RPC_SYSCALL_INFO, sc_info, SIZEOF_RPC_SYSCALL_INFO); */
+
+	/* memmove((byte_t *)state - SIZEOF_RPC_SYSCALL_INFO, sc_info, SIZEOF_RPC_SYSCALL_INFO); */
+INTERN_OBJECT(x86_syscall_emulate_r_redirection)
+	/* When system calls are being traced, this `rep; movsl' is re-written as
+	 * `jmp8 x86_syscall_emulate_traced_r'. Note that in this case, the entry
+	 * point of `x86_syscall_emulate_traced_r' will do the missed `rep; movsl'
+	 * before performing tracing and returning to `.Lsyscall_emulate_r_after_tracing' */
+	.byte  0xf3 /* rep */
+	.byte  0xa5 /* movsl */
+.if (. - x86_syscall_emulate_traced_r) > 0x7f
+.error "Offset to `x86_syscall_emulate_traced_r' would be large"
+.endif
+	/* NOTE: `x86_syscall_emulate_r_redirection_jmp' are the little-enable 2-bytes for an instruction:
+	 *       `jmp8 x86_syscall_emulate_traced_r' */
+INTERN_CONST(x86_syscall_emulate_r_redirection_jmp, 0xeb | (((x86_syscall_emulate_traced_r - .) & 0xff) << 8))
+END(x86_syscall_emulate_r_redirection)
+.Lsyscall_emulate_r_after_tracing:
+
+
 	/* At this point, our stack looks like this:
 	 * %edi = %esp - 4
 	 * 0(%esp):                                                 struct rpc_syscall_info sc_info;
 	 * SIZEOF_RPC_SYSCALL_INFO(%esp):                           struct icpustate state;
 	 * SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS(%esp): <END-OF-STACK> */
-INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 
+
+INTERN_LABEL(__x86_syscall_emulate_r_protect_start):
 	/* Figure out which system call is actually being invoked. */
 	movl   (4 + OFFSET_RPC_SYSCALL_INFO_SYSNO)(%edi), %eax
 	.cfi_def_cfa %edi, (4 + SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)

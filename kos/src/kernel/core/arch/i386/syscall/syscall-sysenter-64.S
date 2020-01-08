@@ -138,7 +138,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	.cfi_reg_offset %rflags, 0, %rsp
 	pushq  $(SEGMENT_USER_CODE_RPL) /* %cs */
 	.cfi_reg_offset %rflags, 8, %rsp
-	pushq  %rdi                   /* %rip */
+	pushq  %rdi                     /* %rip */
 
 	/* With the IRET tail constructed, start a new CFI function with the SIGNAL_FRAME
 	 * property enabled, thus allowing for normal system call return behavior. */
@@ -154,7 +154,6 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 
 	/* Trace this system call invocation! */
 	movzlq %eax, %rax
-	pushfq_cfi_r
 
 	pushq_cfi_r %r8
 	pushq_cfi_r %r9
@@ -168,6 +167,15 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	pushq_cfi_r %rcx /* ARG[1] */
 	pushq_cfi_r %rbx /* ARG[0] */
 	pushq_cfi_r %rax /* SYSNO */
+
+	pushq_cfi $(RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
+	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
+	            RPC_SYSCALL_INFO_METHOD_SYSENTER_32)
+	/* Check if exceptions are enabled. */
+	testb  $(EFLAGS_CF), (104 + OFFSET_IRREGS_RFLAGS)(%rsp)
+	jz     1f
+	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%rsp)
+1:
 
 	/* Load ARG[4] / ARG[5] if necessary */
 	cmpl   $(__NR32_syscall0_max), %eax
@@ -195,12 +203,14 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	/* Must load one (%cl == 5) or two (%cl == 6) arguments */
 	movzlq %ebp, %rbp
 	movzlq 0(%rbp), %rax
-	movq   %rax, 40(%rsp) /* ARG[4] */
+	movq   %rax, 48(%rsp) /* ARG[4] */
+	orw    $(RPC_SYSCALL_INFO_FREGVALID(4)), 0(%rsp)
 	cmpb   $(5), %cl
 	jbe    .Lgot_sysenter_args
 	/* Must also load the six'th argument! */
 	movzlq 4(%rbp), %rax
-	movq   %rax, 48(%rsp) /* ARG[5] */
+	movq   %rax, 56(%rsp) /* ARG[5] */
+	orw    $(RPC_SYSCALL_INFO_FREGVALID(5)), 0(%rsp)
 .Lgot_sysenter_args:
 
 	/* Actually call through to the system call tracer. */
@@ -208,6 +218,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	EXTERN(syscall_trace)
 	call   syscall_trace
 
+	popq_cfi %rax /* flags (pop_void) */
 	popq_cfi_r %rax /* SYSNO */
 	popq_cfi_r %rbx /* ARG[0] */
 	popq_cfi_r %rcx /* ARG[1] */
@@ -221,7 +232,6 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	popq_cfi_r %r9
 	popq_cfi_r %r8
 
-	popfq_cfi_r
 	jmp    .Ldo_prepared_sysenter
 	.cfi_endproc
 END(x86_syscall32_sysenter_traced)

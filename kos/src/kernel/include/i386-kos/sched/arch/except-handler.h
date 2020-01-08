@@ -41,14 +41,14 @@ DECL_BEGIN
  *                  resumes. */
 FUNDEF struct icpustate *FCALL
 x86_userexcept_callhandler(struct icpustate *__restrict state,
-                           struct rpc_syscall_info *sc_info)
+                           struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT);
 
 #ifdef __x86_64__
 /* Dedicated functions which may be used if the caller already
  * knows the result of `icpustate_is32bit(state)' and related helpers. */
-FUNDEF struct icpustate *FCALL x86_userexcept_callhandler32(struct icpustate *__restrict state, struct rpc_syscall_info *sc_info) THROWS(E_SEGFAULT);
-FUNDEF struct icpustate *FCALL x86_userexcept_callhandler64(struct icpustate *__restrict state, struct rpc_syscall_info *sc_info) THROWS(E_SEGFAULT);
+FUNDEF struct icpustate *FCALL x86_userexcept_callhandler32(struct icpustate *__restrict state, struct rpc_syscall_info const *sc_info) THROWS(E_SEGFAULT);
+FUNDEF struct icpustate *FCALL x86_userexcept_callhandler64(struct icpustate *__restrict state, struct rpc_syscall_info const *sc_info) THROWS(E_SEGFAULT);
 #else /* __x86_64__ */
 #define x86_userexcept_callhandler32 x86_userexcept_callhandler
 #endif /* !__x86_64__ */
@@ -74,7 +74,7 @@ FUNDEF struct icpustate *FCALL x86_userexcept_callhandler64(struct icpustate *__
 struct __siginfo_struct;
 FUNDEF WUNUSED ATTR_RETNONNULL struct icpustate *FCALL
 x86_userexcept_raisesignal(struct icpustate *__restrict state,
-                           struct rpc_syscall_info *sc_info,
+                           struct rpc_syscall_info const *sc_info,
                            struct __siginfo_struct const *__restrict siginfo,
                            bool derived_from_exception DFL(false));
 
@@ -86,19 +86,19 @@ x86_userexcept_raisesignal(struct icpustate *__restrict state,
  *                  resumes. */
 FUNDEF WUNUSED struct icpustate *FCALL
 x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
-                                          struct rpc_syscall_info *sc_info);
+                                          struct rpc_syscall_info const *sc_info);
 
 /* Translate the current exception into an errno and set that errno
  * as the return value of the system call described by `sc_info'. */
 FUNDEF WUNUSED struct icpustate *FCALL
 x86_userexcept_seterrno(struct icpustate *__restrict state,
-                        struct rpc_syscall_info *__restrict sc_info);
+                        struct rpc_syscall_info const *__restrict sc_info);
 
 #ifdef __x86_64__
 /* Dedicated functions which may be used if the caller already
  * knows the result of `icpustate_is32bit(state)' and related helpers. */
-FUNDEF WUNUSED struct icpustate *FCALL x86_userexcept_seterrno32(struct icpustate *__restrict state, struct rpc_syscall_info *__restrict sc_info);
-FUNDEF WUNUSED struct icpustate *FCALL x86_userexcept_seterrno64(struct icpustate *__restrict state, struct rpc_syscall_info *__restrict sc_info);
+FUNDEF WUNUSED struct icpustate *FCALL x86_userexcept_seterrno32(struct icpustate *__restrict state, struct rpc_syscall_info const *__restrict sc_info);
+FUNDEF WUNUSED struct icpustate *FCALL x86_userexcept_seterrno64(struct icpustate *__restrict state, struct rpc_syscall_info const *__restrict sc_info);
 #else /* __x86_64__ */
 #define x86_userexcept_seterrno32 x86_userexcept_seterrno
 #endif /* !__x86_64__ */
@@ -111,7 +111,7 @@ FUNDEF WUNUSED struct icpustate *FCALL x86_userexcept_seterrno64(struct icpustat
  * from the `RPC_SYSCALL_INFO_FEXCEPT' bit in `sc_info->rsi_flags'). */
 FUNDEF WUNUSED ATTR_RETNONNULL struct icpustate *FCALL
 x86_userexcept_propagate(struct icpustate *__restrict state,
-                         struct rpc_syscall_info *sc_info);
+                         struct rpc_syscall_info const *sc_info);
 
 
 /* Given a user-space UCPUSTATE, load that state into the active IRET tail, whilst
@@ -124,13 +124,13 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
  *       custom system call handlers that also reset the kernel-space stack. */
 FUNDEF ATTR_NORETURN void FCALL
 x86_userexcept_unwind(struct ucpustate *__restrict state,
-                      struct rpc_syscall_info *sc_info);
+                      struct rpc_syscall_info const *sc_info);
 
 /* Same as `x86_userexcept_unwind()', however the caller has already done the work
  * of constructing a `struct icpustate *' at the base of the current thread's kernel stack. */
 FUNDEF ATTR_NORETURN void FCALL
 x86_userexcept_unwind_i(struct icpustate *__restrict state,
-                        struct rpc_syscall_info *sc_info);
+                        struct rpc_syscall_info const *sc_info);
 
 /* Unwind the currently set exception through an interrupt.
  * If the interrupt leads into user-space, service user-space RPC functions before

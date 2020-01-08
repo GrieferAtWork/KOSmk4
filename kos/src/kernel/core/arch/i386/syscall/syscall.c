@@ -107,12 +107,17 @@ INTDEF s32 x86_syscall_emulate32_int80h_r_rel_x86_syscall64x32_int80;
 #else /* __x86_64__ */
 INTDEF s32 x86_syscall_emulate_int80h_r_rel_x86_idt_syscall;
 #endif /* !__x86_64__ */
+INTDEF s8 x86_syscall_emulate_r_redirection[2];
+INTDEF byte_t x86_syscall_emulate_traced_r[];
+INTDEF byte_t x86_syscall_emulate_r_redirection_jmp[];
+
+#define V2P(addr) (vm_phys_t)((uintptr_t)(addr) - KERNEL_CORE_BASE)
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL setpcrel32)(s32 *pcrel, void *dest) {
 	s32 offset;
 	offset = (s32)(intptr_t)((uintptr_t)dest - ((uintptr_t)pcrel + 4));
-	vm_writephysl_unaligned((vm_phys_t)((uintptr_t)pcrel - KERNEL_CORE_BASE), (u32)offset);
+	vm_writephysl_unaligned(V2P(pcrel), (u32)offset);
 }
 
 
@@ -140,6 +145,17 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	           enable ? (void *)&x86_syscall32_int80_traced
 	                  : (void *)&x86_syscall32_int80);
 #endif /* !__x86_64__ */
+
+	/* Modify `syscall_emulate_r()' */
+#ifdef __x86_64__
+#define SYSCALL_EMULATE_DONT_TRACE_WORD 0x48f3 /* rep; REX.W */
+#else /* __x86_64__ */
+#define SYSCALL_EMULATE_DONT_TRACE_WORD 0xa5f3 /* rep; movsl */
+#endif /* !__x86_64__ */
+	vm_writephysw_unaligned(V2P(&x86_syscall_emulate_r_redirection[0]),
+	                        enable ? (u16)(uintptr_t)x86_syscall_emulate_r_redirection_jmp
+	                               : SYSCALL_EMULATE_DONT_TRACE_WORD);
+#undef SYSCALL_EMULATE_DONT_TRACE_WORD
 	/* TODO: INVALIDATE_INSTRUCTION_CACHE(); */
 
 	argv[0] = (void *)(enable ? (uintptr_t)1 : (uintptr_t)0);

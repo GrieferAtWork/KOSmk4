@@ -141,10 +141,21 @@ PUBLIC_FUNCTION(x86_syscall64x64_int80_traced)
 	pushq_cfi_r %rdi /* ARG[0] */
 	pushq_cfi_r %rax /* SYSNO */
 
+	pushq_cfi $(RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
+	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
+	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5) | \
+	            RPC_SYSCALL_INFO_METHOD_INT80H_64)
+	/* Check if exceptions are enabled. */
+	testb  $(EFLAGS_CF), (80 + OFFSET_IRREGS_RFLAGS)(%rsp)
+	jz     1f
+	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%rsp)
+1:
+
 	movq   %rsp, %rdi
 	EXTERN(syscall_trace)
 	call   syscall_trace
 
+	popq_cfi %rax /* flags (pop_void) */
 	popq_cfi_r %rax /* SYSNO */
 	popq_cfi_r %rdi /* ARG[0] */
 	popq_cfi_r %rsi /* ARG[1] */
@@ -171,10 +182,20 @@ PUBLIC_FUNCTION(x86_syscall64x32_int80_traced)
 	pushq_cfi_r %rbx /* ARG[0] */
 	pushq_cfi_r %rax /* SYSNO */
 
+	pushq_cfi $(RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
+	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
+	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5) | \
+	            RPC_SYSCALL_INFO_METHOD_INT80H_32)
+	/* Check if exceptions are enabled. */
+	testb  $(EFLAGS_CF), (96 + OFFSET_IRREGS_RFLAGS)(%rsp)
+	jz     1f
+	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%rsp)
+1:
 	movq   %rsp, %rdi
-	EXTERN(syscall_trace_compat)
-	call   syscall_trace_compat
+	EXTERN(syscall_trace)
+	call   syscall_trace
 
+	popq_cfi %rax /* flags (pop_void) */
 	popq_cfi_r %rax /* SYSNO */
 	popq_cfi_r %rbx /* ARG[0] */
 	popq_cfi_r %rcx /* ARG[1] */

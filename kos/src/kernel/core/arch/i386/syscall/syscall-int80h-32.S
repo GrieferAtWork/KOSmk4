@@ -34,10 +34,6 @@
 
 
 
-
-
-
-
 /************************************************************************/
 /* INT 80H ENTRY                                                        */
 /************************************************************************/
@@ -107,10 +103,21 @@ PUBLIC_FUNCTION(x86_idt_syscall_traced)
 	movl   $(SEGMENT_KERNEL_FSBASE), %eax
 	movl   %eax, %fs
 
+	pushl_cfi $(RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
+	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
+	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5) | \
+	            RPC_SYSCALL_INFO_METHOD_INT80H_32)
+	/* Check if exceptions are enabled. */
+	testb  $(EFLAGS_CF), (48 + OFFSET_IRREGS_EFLAGS)(%esp)
+	jz     1f
+	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%esp)
+1:
+
 	movl   %esp, %ecx
 	EXTERN(syscall_trace)
 	call   syscall_trace
 
+	popl_cfi %eax /* flags (pop_void) */
 	popl_cfi_r %eax /* SYSNO */
 	popl_cfi_r %ebx /* ARG[0] */
 	popl_cfi_r %ecx /* ARG[1] */

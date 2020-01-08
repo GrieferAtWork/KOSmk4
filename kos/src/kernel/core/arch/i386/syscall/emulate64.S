@@ -25,6 +25,7 @@
 
 #include <asm/cfi.h>
 #include <asm/instr/interrupt.h>
+#include <asm/instr/jccN.h>
 #include <asm/syscalls32_d.h>
 #include <asm/syscalls64_d.h>
 #include <kos/kernel/cpu-state-asm.h>
@@ -58,31 +59,64 @@
 	testb  $(0x8), tempreg_b;
 
 
+/* Emulate the execution of a system call.
+ * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however
+ *       will reset the kernel-space stack to `state', and immediately return
+ *       to userspace after the system call has returned (or unwind any exception
+ *       that was thrown by the system call, also dealing with the possibility
+ *       of RPC function handling, as well as system call restarting) */
+
 
 /* FUNDEF ATTR_NORETURN void FCALL
  * syscall_emulate_r(struct icpustate *__restrict state,
  *                   struct rpc_syscall_info *__restrict sc_info); */
 .section .text
-PUBLIC_FUNCTION(syscall_emulate_r)
 	.cfi_startproc simple
 	EXTERN(syscall_emulate_r_personality)
 	.cfi_personality 0, syscall_emulate_r_personality
 	.cfi_signal_frame
-	.cfi_def_cfa %rdi, OFFSET_ICPUSTATE_IRREGS
 	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+INTERN_FUNCTION(x86_syscall_emulate_traced_r)
+	.cfi_def_cfa %rsp, (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
+	rep;   movsq
+	movq   %rsp, %rdi
+	EXTERN(syscall_trace)
+	call   syscall_trace
+	jmp8   .Lsyscall_emulate_r_after_tracing
+END(x86_syscall_emulate_traced_r)
 
+PUBLIC_FUNCTION(syscall_emulate_r)
+	.cfi_def_cfa %rdi, OFFSET_ICPUSTATE_IRREGS
 	/* Start by copying `sc_info' (%rsi) just infront of `state' (%rdi)
 	 * Note that that sc_info may already be overlapping with said target
 	 * area, meaning that we have to use memmove() semantics copying data
 	 * from the top down to the bottom */
 	leaq   -SIZEOF_RPC_SYSCALL_INFO(%rdi), %rsp /* Load %rsp to point to the start of the copied `sc_info' */
 	movq   %rsp, %rbx
-	.cfi_def_cfa  %rsp, (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
+	.cfi_def_cfa %rsp, (SIZEOF_RPC_SYSCALL_INFO + OFFSET_ICPUSTATE_IRREGS)
 	subq   $(8), %rdi
 	addq   $(SIZEOF_RPC_SYSCALL_INFO - 8), %rsi
 	movq   $(SIZEOF_RPC_SYSCALL_INFO / 8), %rcx /* It's ok that this clobbers %rcx. - We can just load `%edi+4' once we're done */
 	std    /* Set the direction bit, meaning that movsX now advances downwards */
-	rep;   movsq /* memmove((byte_t *)state - SIZEOF_RPC_SYSCALL_INFO, sc_info, SIZEOF_RPC_SYSCALL_INFO); */
+
+	/* memmove((byte_t *)state - SIZEOF_RPC_SYSCALL_INFO, sc_info, SIZEOF_RPC_SYSCALL_INFO); */
+INTERN_OBJECT(x86_syscall_emulate_r_redirection)
+	/* When system calls are being traced, this `rep; movsq' is re-written as
+	 * `jmp8 x86_syscall_emulate_traced_r'. Note that in this case, the entry
+	 * point of `x86_syscall_emulate_traced_r' will do the missed `rep; movsq'
+	 * before performing tracing and returning to `.Lsyscall_emulate_r_after_tracing' */
+	.byte  0xf3 /* rep */
+	.byte  0x48 /* REX.W */
+.if (. - x86_syscall_emulate_traced_r) > 0x7f
+.error "Offset to `x86_syscall_emulate_traced_r' would be large"
+.endif
+	/* NOTE: `x86_syscall_emulate_r_redirection_jmp' are the little-enable 2-bytes for an instruction:
+	 *       `jmp8 x86_syscall_emulate_traced_r' */
+INTERN_CONST(x86_syscall_emulate_r_redirection_jmp, 0xeb | (((x86_syscall_emulate_traced_r - .) & 0xff) << 8))
+END(x86_syscall_emulate_r_redirection)
+	.byte  0xa5 /* `movsq' (actually `movsl', but part of the same instruction as the REX.W above, making it `movsq') */
+.Lsyscall_emulate_r_after_tracing:
+
 	/* At this point, our stack looks like this:
 	 * %rbx = %rsp
 	 * 0(%rsp):                                                 struct rpc_syscall_info sc_info;

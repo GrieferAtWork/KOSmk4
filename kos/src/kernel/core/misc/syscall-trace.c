@@ -80,14 +80,19 @@
 DECL_BEGIN
 
 PUBLIC void FCALL
-syscall_trace(struct syscall_trace_args const *__restrict args) {
+syscall_trace(struct rpc_syscall_info const *__restrict args) {
 #if 1
-	if (args->ta_sysno == SYS_syslog)
+#ifdef __ARCH_HAVE_COMPAT
+	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(args->rsi_flags)
+	    ? args->rsi_sysno == COMPAT_NR(_syslog)
+	    : args->rsi_sysno == SYS_syslog)
 		return; /* Don't trace this one! */
+#else /* __ARCH_HAVE_COMPAT */
+	if (args->rsi_sysno == SYS_syslog)
+		return; /* Don't trace this one! */
+#endif /* !__ARCH_HAVE_COMPAT */
 #endif
-	syscall_printtrace(&syslog_printer,
-	                   SYSLOG_LEVEL_TRACE,
-	                   args);
+	syscall_printtrace(args, &syslog_printer, SYSLOG_LEVEL_TRACE);
 }
 
 
@@ -102,97 +107,90 @@ syscall_trace(struct syscall_trace_args const *__restrict args) {
 #undef linux_stat64
 #undef linux_oldstat
 
-PUBLIC ssize_t KCALL
-syscall_printtrace(pformatprinter printer, void *arg,
-                   struct syscall_trace_args const *__restrict args) {
+PUBLIC ssize_t FCALL
+syscall_printtrace(struct rpc_syscall_info const *__restrict args,
+                   pformatprinter printer, void *arg) {
 	ssize_t result, temp;
-	result = format_printf(printer, arg, "task[%u].sys_", task_gettid_s());
-	if unlikely(result < 0)
-		goto done;
-
 	/* Trace system calls. */
-	switch (args->ta_sysno) {
-
-#define __SYSCALL(name)                                                  \
-	case SYS_##name:                                                     \
-		temp = format_printf(printer,                                    \
-		                     arg,                                        \
-		                     #name "(" SYSCALL_TRACE_ARGS_FORMAT_L(name) \
-		                     SYSCALL_TRACE_ARGS_ARGS(name,               \
-		                         (__NRAM_##name(args->ta_args[0],        \
-		                                        args->ta_args[1],        \
-		                                        args->ta_args[2],        \
-		                                        args->ta_args[3],        \
-		                                        args->ta_args[4],        \
-		                                        args->ta_args[5]))       \
-		                     ));                                         \
-		break;
-#include <asm/ls-syscalls.h>
-#undef __SYSCALL
-
-	default:
-		/* Unknown system call... */
-		temp = format_printf(printer, arg, "break:%#Ix?\n", args->ta_sysno);
-		goto done_check_and_account_temp;
-	}
-	if unlikely(temp < 0)
-		goto err_temp;
-	result += temp;
-	temp = (*printer)(arg, ")\n", 2);
-done_check_and_account_temp:
-	if unlikely(temp < 0)
-		goto err_temp;
-	result += temp;
-done:
-	return result;
-err_temp:
-	return temp;
-}
-
 #ifdef __ARCH_HAVE_COMPAT
-PUBLIC void FCALL
-syscall_trace_compat(struct syscall_trace_args const *__restrict args) {
-#if 1
-	if (args->ta_sysno == COMPAT_NR(_syslog))
-		return; /* Don't trace this one! */
-#endif
-	syscall_printtrace_compat(&syslog_printer,
-	                          SYSLOG_LEVEL_TRACE,
-	                          args);
-}
-
-PUBLIC ssize_t KCALL
-syscall_printtrace_compat(pformatprinter printer, void *arg,
-                          struct syscall_trace_args const *__restrict args) {
-	ssize_t result, temp;
-	result = format_printf(printer, arg, "task[%u].compat_sys_", task_gettid_s());
-	if unlikely(result < 0)
-		goto done;
-
-	/* Trace system calls. */
-	switch (args->ta_sysno) {
-
-#define __SYSCALL(name)                                                          \
-	case COMPAT_NR(_##name):                                                     \
-		temp = format_printf(printer,                                            \
-		                     arg,                                                \
-		                     #name "(" COMPAT_SYSCALL(TRACE_ARGS_FORMAT_L)(name) \
-		                     COMPAT_SYSCALL(TRACE_ARGS_ARGS)(name,               \
-		                         (COMPAT_NR(AM_##name)(args->ta_args[0],         \
-		                                               args->ta_args[1],         \
-		                                               args->ta_args[2],         \
-		                                               args->ta_args[3],         \
-		                                               args->ta_args[4],         \
-		                                               args->ta_args[5]))        \
-		                     ));                                                 \
-		break;
+	if (RPC_SYSCALL_INFO_METHOD_ISCOMPAT(args->rsi_flags)) {
+#if __ARCH_COMPAT_SIZEOF_POINTER == 4
+		result = format_printf(printer, arg, "task[%u].sys32_", task_gettid_s());
+#else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
+		result = format_printf(printer, arg, "task[%u].sys64_", task_gettid_s());
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER != 4 */
+		if unlikely(result < 0)
+			goto done;
+		if (args->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
+			temp = (*printer)(arg, "X", 1);
+			if unlikely(temp < 0)
+				goto err_temp;
+			result += temp;
+		}
+		switch (args->rsi_sysno) {
+	
+#define __SYSCALL(name)                                                              \
+		case COMPAT_NR(_##name):                                                     \
+			temp = format_printf(printer,                                            \
+			                     arg,                                                \
+			                     #name "(" COMPAT_SYSCALL(TRACE_ARGS_FORMAT_L)(name) \
+			                     COMPAT_SYSCALL(TRACE_ARGS_ARGS)(name,               \
+			                         (COMPAT_NR(AM_##name)(args->rsi_regs[0],        \
+			                                               args->rsi_regs[1],        \
+			                                               args->rsi_regs[2],        \
+			                                               args->rsi_regs[3],        \
+			                                               args->rsi_regs[4],        \
+			                                               args->rsi_regs[5]))       \
+			                     ));                                                 \
+			break;
+#ifndef __INTELLISENSE__
 #include COMPAT_LS_SYSCALLS
+#endif /* !__INTELLISENSE__ */
 #undef __SYSCALL
-
-	default:
-		/* Unknown system call... */
-		temp = format_printf(printer, arg, "break:%#Ix?\n", args->ta_sysno);
-		goto done_check_and_account_temp;
+	
+		default:
+			/* Unknown system call... */
+			goto done_unknown_system_call;
+		}
+	} else
+#endif /* __ARCH_HAVE_COMPAT */
+	{
+		result = format_printf(printer, arg, "task[%u].sys_", task_gettid_s());
+		if unlikely(result < 0)
+			goto done;
+		if (args->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
+			temp = (*printer)(arg, "X", 1);
+			if unlikely(temp < 0)
+				goto err_temp;
+			result += temp;
+		}
+		switch (args->rsi_sysno) {
+	
+#define __SYSCALL(name)                                                      \
+		case SYS_##name:                                                     \
+			temp = format_printf(printer,                                    \
+			                     arg,                                        \
+			                     #name "(" SYSCALL_TRACE_ARGS_FORMAT_L(name) \
+			                     SYSCALL_TRACE_ARGS_ARGS(name,               \
+			                         (__NRAM_##name(args->rsi_regs[0],       \
+			                                        args->rsi_regs[1],       \
+			                                        args->rsi_regs[2],       \
+			                                        args->rsi_regs[3],       \
+			                                        args->rsi_regs[4],       \
+			                                        args->rsi_regs[5]))      \
+			                     ));                                         \
+			break;
+#ifndef __INTELLISENSE__
+#include <asm/ls-syscalls.h>
+#endif /* !__INTELLISENSE__ */
+#undef __SYSCALL
+	
+		default:
+			/* Unknown system call... */
+done_unknown_system_call:
+			temp = format_printf(printer, arg, "break:%#Ix?\n", args->rsi_sysno);
+			goto done_check_and_account_temp;
+		}
 	}
 	if unlikely(temp < 0)
 		goto err_temp;
@@ -207,8 +205,6 @@ done:
 err_temp:
 	return temp;
 }
-#endif /* __ARCH_HAVE_COMPAT */
-
 
 
 /* Provide a kernel commandline option to enable system call tracing. */

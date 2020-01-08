@@ -149,31 +149,16 @@ FUNDEF bool (KCALL syscall_tracing_setenabled)(bool enable);
 FUNDEF WUNUSED bool NOTHROW(KCALL syscall_tracing_getenabled)(void);
 
 
-/* TODO: Instead of doing its own thing, `rpc_syscall_info' should be used instead of `syscall_trace_args'!
- *       Additionally, `syscall_trace()' should be refactored into:
- *       >> FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) struct icpustate *FCALL
- *       >> syscall_trace(struct icpustate *__restrict state,
- *       >>               struct rpc_syscall_info *__restrict info);
- *       With all of these changes, we could also get rid of `syscall_trace_compat()',
- *       since `struct rpc_syscall_info' already includes meta-data about the call being
- *       made from compatibility-mode.
- */
-struct syscall_trace_args {
-	syscall_ulong_t ta_sysno;
-	syscall_ulong_t ta_args[__NRFEAT_SYSCALL_REGISTER_MAX_COUNT];
-};
-
-FUNDEF void FCALL syscall_trace(struct syscall_trace_args const *__restrict args);
-FUNDEF ssize_t KCALL
-syscall_printtrace(__pformatprinter printer, void *arg,
-                   struct syscall_trace_args const *__restrict args);
+struct rpc_syscall_info;
+FUNDEF void FCALL syscall_trace(struct rpc_syscall_info const *__restrict args);
+FUNDEF ssize_t FCALL syscall_printtrace(struct rpc_syscall_info const *__restrict args, __pformatprinter printer, void *arg);
 
 #ifdef __ARCH_HAVE_COMPAT
 FUNDEF void FCALL
-syscall_trace_compat(struct syscall_trace_args const *__restrict args);
+syscall_trace_compat(struct rpc_syscall_info const *__restrict args);
 FUNDEF ssize_t KCALL
 syscall_printtrace_compat(__pformatprinter printer, void *arg,
-                          struct syscall_trace_args const *__restrict args);
+                          struct rpc_syscall_info const *__restrict args);
 #endif /* __ARCH_HAVE_COMPAT */
 
 #else /* !CONFIG_NO_SYSCALL_TRACING */

@@ -2164,9 +2164,7 @@
 #define __CRT_HAVE_syscall_emulate64 1
 #define __CRT_HAVE_syscall_emulate_r 1
 #define __CRT_HAVE_syscall_printtrace 1
-#define __CRT_HAVE_syscall_printtrace_compat 1
 #define __CRT_HAVE_syscall_trace 1
-#define __CRT_HAVE_syscall_trace_compat 1
 #define __CRT_HAVE_syscall_tracing_getenabled 1
 #define __CRT_HAVE_syscall_tracing_setenabled 1
 #define __CRT_HAVE_syslog_levels 1

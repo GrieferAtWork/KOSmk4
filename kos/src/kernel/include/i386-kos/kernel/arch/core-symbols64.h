@@ -1583,9 +1583,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, pagedir_unmap; .int 0
 	.int 0x21808f0
 	.quad .Lname395 /* index: 395 */
-	.weak syscall_trace_compat; .quad syscall_trace_compat
-	.reloc ., R_X86_64_SIZE32, syscall_trace_compat; .int 0
-	.int 0x3c5b9a4
+	.weak thisvm_x86_dr7; .quad thisvm_x86_dr7
+	.reloc ., R_X86_64_SIZE32, thisvm_x86_dr7; .int 0
+	.int 0x4b28d97
 	.quad 0 /* index: 396 */
 	.quad 0
 	.int 0
@@ -6394,10 +6394,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_delete_module; .quad sys_delete_module
 	.reloc ., R_X86_64_SIZE32, sys_delete_module; .int 0
 	.int 0xfc8035
-	.quad .Lname1598 /* index: 1598 */
-	.weak zlib_reader_read; .quad zlib_reader_read
-	.reloc ., R_X86_64_SIZE32, zlib_reader_read; .int 0
-	.int 0x4262e24
+	.quad 0 /* index: 1598 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname1599 /* index: 1599 */
 	.weak kernel_terminal_raise; .quad kernel_terminal_raise
 	.reloc ., R_X86_64_SIZE32, kernel_terminal_raise; .int 0
@@ -7315,9 +7315,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, tty_device_alloc; .int 0
 	.int 0xfd6723
 	.quad .Lname1828 /* index: 1828 */
-	.weak syscall_printtrace_compat; .quad syscall_printtrace_compat
-	.reloc ., R_X86_64_SIZE32, syscall_printtrace_compat; .int 0
-	.int 0x5542724
+	.weak task_raisesignalthread; .quad task_raisesignalthread
+	.reloc ., R_X86_64_SIZE32, task_raisesignalthread; .int 0
+	.int 0xe5fc724
 	.quad .Lname1829 /* index: 1829 */
 	.weak json_parser_state; .quad json_parser_state
 	.reloc ., R_X86_64_SIZE32, json_parser_state; .int 0
@@ -8930,10 +8930,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak rwlock_reading; .quad rwlock_reading
 	.reloc ., R_X86_64_SIZE32, rwlock_reading; .int 0
 	.int 0x68208b7
-	.quad .Lname2232 /* index: 2232 */
-	.weak thisvm_x86_dr7; .quad thisvm_x86_dr7
-	.reloc ., R_X86_64_SIZE32, thisvm_x86_dr7; .int 0
-	.int 0x4b28d97
+	.quad 0 /* index: 2232 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname2233 /* index: 2233 */
 	.weak sys32_inotify_init; .quad sys32_inotify_init
 	.reloc ., R_X86_64_SIZE32, sys32_inotify_init; .int 0
@@ -11111,9 +11111,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2777 /* index: 2777 */
-	.weak task_raisesignalthread; .quad task_raisesignalthread
-	.reloc ., R_X86_64_SIZE32, task_raisesignalthread; .int 0
-	.int 0xe5fc724
+	.weak zlib_reader_read; .quad zlib_reader_read
+	.reloc ., R_X86_64_SIZE32, zlib_reader_read; .int 0
+	.int 0x4262e24
 	.quad 0 /* index: 2778 */
 	.quad 0
 	.int 0
@@ -16959,7 +16959,7 @@ END(kernel_symbol_table)
 .Lname394:
 	.string "pagedir_unmap"
 .Lname395:
-	.string "syscall_trace_compat"
+	.string "thisvm_x86_dr7"
 .Lname397:
 	.string "kernel_syscall1_restartmode32"
 .Lname399:
@@ -18632,8 +18632,6 @@ END(kernel_symbol_table)
 	.string "character_device_ioctl"
 .Lname1597:
 	.string "sys_delete_module"
-.Lname1598:
-	.string "zlib_reader_read"
 .Lname1599:
 	.string "kernel_terminal_raise"
 .Lname1602:
@@ -18925,7 +18923,7 @@ END(kernel_symbol_table)
 .Lname1827:
 	.string "tty_device_alloc"
 .Lname1828:
-	.string "syscall_printtrace_compat"
+	.string "task_raisesignalthread"
 .Lname1829:
 	.string "json_parser_state"
 .Lname1830:
@@ -19464,8 +19462,6 @@ END(kernel_symbol_table)
 	.string "vm_datapart_write_nopf"
 .Lname2231:
 	.string "rwlock_reading"
-.Lname2232:
-	.string "thisvm_x86_dr7"
 .Lname2233:
 	.string "sys32_inotify_init"
 .Lname2235:
@@ -20223,7 +20219,7 @@ END(kernel_symbol_table)
 .Lname2774:
 	.string "vm_read"
 .Lname2777:
-	.string "task_raisesignalthread"
+	.string "zlib_reader_read"
 .Lname2780:
 	.string "json_writer_putnull"
 .Lname2783:

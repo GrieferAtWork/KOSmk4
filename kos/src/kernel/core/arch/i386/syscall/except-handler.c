@@ -133,7 +133,7 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
 #ifdef __x86_64__
 PUBLIC WUNUSED struct icpustate *FCALL
 x86_userexcept_callhandler(struct icpustate *__restrict state,
-                           struct rpc_syscall_info *sc_info)
+                           struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {
 	struct icpustate *result;
 	if (icpustate_is64bit(state)) {
@@ -146,7 +146,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 
 PUBLIC WUNUSED struct icpustate *FCALL
 x86_userexcept_callhandler64(struct icpustate *__restrict state,
-                             struct rpc_syscall_info *sc_info)
+                             struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {
 	/* Call a 64-bit exception handler. */
 	uintptr_t mode;
@@ -210,12 +210,12 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 
 PUBLIC WUNUSED struct icpustate *FCALL
 x86_userexcept_callhandler32(struct icpustate *__restrict state,
-                             struct rpc_syscall_info *sc_info)
+                             struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT)
 #else /* __x86_64__ */
 PUBLIC WUNUSED struct icpustate *FCALL
 x86_userexcept_callhandler(struct icpustate *__restrict state,
-                           struct rpc_syscall_info *sc_info)
+                           struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT)
 #endif /* !__x86_64__ */
 {
@@ -316,7 +316,7 @@ NOTHROW(FCALL process_exit_for_exception_after_coredump)(void) {
  *                  resumes. */
 PUBLIC WUNUSED ATTR_RETNONNULL struct icpustate *FCALL
 x86_userexcept_raisesignal(struct icpustate *__restrict state,
-                           struct rpc_syscall_info *sc_info,
+                           struct rpc_syscall_info const *sc_info,
                            siginfo_t const *__restrict siginfo,
                            bool derived_from_exception) {
 	struct icpustate *result;
@@ -422,7 +422,7 @@ again_gethand:
  *                  resumes. */
 PUBLIC WUNUSED struct icpustate *FCALL
 x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
-                                          struct rpc_syscall_info *sc_info) {
+                                          struct rpc_syscall_info const *sc_info) {
 	siginfo_t siginfo;
 	/* Try to translate the current exception into a signal. */
 	if (!error_as_signal(error_data(), &siginfo))
@@ -479,7 +479,7 @@ NOTHROW(FCALL x86_userexcept_set_error_flag)(struct icpustate *__restrict state,
 #ifdef __x86_64__
 PUBLIC WUNUSED struct icpustate *FCALL
 x86_userexcept_seterrno(struct icpustate *__restrict state,
-                        struct rpc_syscall_info *__restrict sc_info) {
+                        struct rpc_syscall_info const *__restrict sc_info) {
 	struct icpustate *result;
 	if (icpustate_is64bit(state)) {
 		result = x86_userexcept_seterrno64(state, sc_info);
@@ -491,7 +491,7 @@ x86_userexcept_seterrno(struct icpustate *__restrict state,
 
 PUBLIC WUNUSED struct icpustate *FCALL
 x86_userexcept_seterrno64(struct icpustate *__restrict state,
-                          struct rpc_syscall_info *__restrict sc_info) {
+                          struct rpc_syscall_info const *__restrict sc_info) {
 	errno_t errval;
 	struct exception_data *data;
 	(void)sc_info;
@@ -510,11 +510,11 @@ x86_userexcept_seterrno64(struct icpustate *__restrict state,
 
 PUBLIC WUNUSED struct icpustate *FCALL
 x86_userexcept_seterrno32(struct icpustate *__restrict state,
-                          struct rpc_syscall_info *__restrict sc_info)
+                          struct rpc_syscall_info const *__restrict sc_info)
 #else /* __x86_64__ */
 PUBLIC WUNUSED struct icpustate *FCALL
 x86_userexcept_seterrno(struct icpustate *__restrict state,
-                        struct rpc_syscall_info *__restrict sc_info)
+                        struct rpc_syscall_info const *__restrict sc_info)
 #endif /* !__x86_64__ */
 {
 	errno_t errval;
@@ -541,7 +541,7 @@ x86_userexcept_seterrno(struct icpustate *__restrict state,
  * from the `RPC_SYSCALL_INFO_FEXCEPT' bit in `sc_info->rsi_flags'). */
 PUBLIC WUNUSED ATTR_RETNONNULL struct icpustate *FCALL
 x86_userexcept_propagate(struct icpustate *__restrict state,
-                         struct rpc_syscall_info *sc_info) {
+                         struct rpc_syscall_info const *sc_info) {
 	struct icpustate *result;
 	error_code_t code;
 
@@ -662,7 +662,7 @@ NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state
  * and finally fully unwind into user-space by use of `'. */
 PUBLIC ATTR_NORETURN void FCALL
 x86_userexcept_unwind(struct ucpustate *__restrict ustate,
-                      struct rpc_syscall_info *sc_info) {
+                      struct rpc_syscall_info const *sc_info) {
 	struct icpustate *return_state;
 	assert(!(PERTASK_GET(this_task.t_flags) & TASK_FKERNTHREAD));
 	/* Disable interrupts to prevent Async-RPCs from doing even more re-directions! */
@@ -784,7 +784,7 @@ x86_userexcept_unwind(struct ucpustate *__restrict ustate,
  * of constructing a `struct icpustate *' at the base of the current thread's kernel stack. */
 PUBLIC ATTR_NORETURN void FCALL
 x86_userexcept_unwind_i(struct icpustate *__restrict state,
-                        struct rpc_syscall_info *sc_info) {
+                        struct rpc_syscall_info const *sc_info) {
 	/* Service RPCs before returning to user-space. */
 	if (sc_info) {
 		bool must_restart_syscall;

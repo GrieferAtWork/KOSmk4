@@ -28,6 +28,7 @@
 #include <asm/instr/movzxq.h>
 #include <asm/syscalls64_d.h>
 #include <kos/kernel/gdt.h>
+#include <librpc/rpc.h>
 #include <libunwind/cfi.h>
 
 
@@ -155,10 +156,19 @@ __ASM_L(	.cfi_escape 0x10,0x07,0x04,0x90,0x3b,0x23,(this_x86_rpc_redirection_ire
 	pushq_cfi_r %rdi /* ARG[0] */
 	pushq_cfi_r %rax /* SYSNO */
 
+	pushq_cfi $(RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
+	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
+	            RPC_SYSCALL_INFO_FREGVALID(4) | RPC_SYSCALL_INFO_FREGVALID(5) | \
+	            RPC_SYSCALL_INFO_METHOD_INT80H_64)
+	/* Check if exceptions are enabled. */
+	jnc    1f
+	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%rsp)
+1:
 	movq   %rsp, %rdi
 	EXTERN(syscall_trace)
 	call   syscall_trace
 
+	popq_cfi %rax /* flags (pop_void) */
 	popq_cfi_r %rax /* SYSNO */
 	popq_cfi_r %rdi /* ARG[0] */
 	popq_cfi_r %rsi /* ARG[1] */

@@ -179,6 +179,8 @@ x86_syscall_emulate_sysvabi_r(struct icpustate *__restrict state,
 typedef syscall_ulong_t (__ARCH_SYSCALLCC *syscall_proto_t)(syscall_ulong_t arg0, syscall_ulong_t arg1, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5);
 typedef u64 (__ARCH_SYSCALLCC *syscall_proto64_t)(syscall_ulong_t arg0, syscall_ulong_t arg1, syscall_ulong_t arg2, syscall_ulong_t arg3, syscall_ulong_t arg4, syscall_ulong_t arg5);
 
+INTDEF bool syscall_tracing_enabled;
+
 INTDEF struct icpustate *
 NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state,
                                               unsigned int reason,
@@ -192,7 +194,7 @@ NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state
 #ifdef __x86_64__
 PUBLIC ATTR_RETNONNULL WUNUSED struct icpustate *FCALL
 syscall_emulate(struct icpustate *__restrict state,
-                struct rpc_syscall_info *__restrict sc_info) {
+                struct rpc_syscall_info const *__restrict sc_info) {
 	struct icpustate *result;
 	if (icpustate_is64bit(state)) {
 		result = syscall_emulate64(state, sc_info);
@@ -204,12 +206,14 @@ syscall_emulate(struct icpustate *__restrict state,
 
 PUBLIC ATTR_RETNONNULL WUNUSED struct icpustate *FCALL
 syscall_emulate64(struct icpustate *__restrict state,
-                  struct rpc_syscall_info *__restrict sc_info) {
+                  struct rpc_syscall_info const *__restrict sc_info) {
 	void *proto;
 	syscall_ulong_t sysno;
 	assert(icpustate_isuser(state));
 again:
 	sysno = sc_info->rsi_sysno;
+	if (syscall_tracing_enabled)
+		syscall_trace(sc_info);
 	TRY {
 		if (sysno <= __NR_syscall0_max) {
 			u64 result;
@@ -273,16 +277,17 @@ done:
 	return state;
 }
 
-typedef u32 (__ARCH_SYSCALLCC *syscall_run32_32_t)(u64 *regv);
-typedef u64 (__ARCH_SYSCALLCC *syscall_run32_64_t)(u64 *regv);
+typedef u32 (__ARCH_SYSCALLCC *syscall_run32_32_t)(u64 const *regv);
+typedef u64 (__ARCH_SYSCALLCC *syscall_run32_64_t)(u64 const *regv);
 
 PUBLIC ATTR_RETNONNULL WUNUSED struct icpustate *FCALL
 syscall_emulate32(struct icpustate *__restrict state,
-                  struct rpc_syscall_info *__restrict sc_info) {
+                  struct rpc_syscall_info const *__restrict sc_info) {
 	void *proto;
 	syscall_ulong_t sysno;
 	assert(icpustate_isuser(state));
-	/* TODO: This function doesn't (yet) do any form of system call tracing! */
+	if (syscall_tracing_enabled)
+		syscall_trace(sc_info);
 again:
 	sysno = sc_info->rsi_sysno;
 	TRY {
@@ -356,11 +361,12 @@ done:
 #else /* __x86_64__ */
 PUBLIC WUNUSED struct icpustate *FCALL
 syscall_emulate(struct icpustate *__restrict state,
-                struct rpc_syscall_info *__restrict sc_info) {
+                struct rpc_syscall_info const *__restrict sc_info) {
 	void *proto;
 	syscall_ulong_t sysno;
 	assert(icpustate_isuser(state));
-	/* TODO: This function doesn't (yet) do any form of system call tracing! */
+	if (syscall_tracing_enabled)
+		syscall_trace(sc_info);
 again:
 	sysno = sc_info->rsi_sysno;
 	TRY {

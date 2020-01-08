@@ -129,18 +129,18 @@ FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate_cdecl_r(struct icpustate *__
  *       of RPC function handling, as well as system call restarting) */
 FUNDEF WUNUSED struct icpustate *FCALL
 syscall_emulate(struct icpustate *__restrict state,
-                struct rpc_syscall_info *__restrict sc_info);
+                struct rpc_syscall_info const *__restrict sc_info);
 FUNDEF ATTR_NORETURN void FCALL
 syscall_emulate_r(struct icpustate *__restrict state,
-                  struct rpc_syscall_info *__restrict sc_info);
+                  struct rpc_syscall_info const *__restrict sc_info);
 
 #ifdef __x86_64__
 FUNDEF WUNUSED struct icpustate *FCALL
 syscall_emulate32(struct icpustate *__restrict state,
-                  struct rpc_syscall_info *__restrict sc_info);
+                  struct rpc_syscall_info const *__restrict sc_info);
 FUNDEF WUNUSED struct icpustate *FCALL
 syscall_emulate64(struct icpustate *__restrict state,
-                  struct rpc_syscall_info *__restrict sc_info);
+                  struct rpc_syscall_info const *__restrict sc_info);
 #define syscall_emulate32_r syscall_emulate_r
 #define syscall_emulate64_r syscall_emulate_r
 #else /* __x86_64__ */

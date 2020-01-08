@@ -142,7 +142,6 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 .Ldo_prepared_sysenter_traced:
 
 	/* Trace this system call invocation! */
-	pushfl_cfi_r
 
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -8
@@ -151,13 +150,23 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	pushl_cfi %fs
 	.cfi_restore_iret_fs_or_offset -16
 
-	pushl_cfi   $(0)   /* ARG[5] */
-	pushl_cfi   $(0)   /* ARG[4] */
+	pushl_cfi   $(0) /* ARG[5] */
+	pushl_cfi   $(0) /* ARG[4] */
 	pushl_cfi_r %esi /* ARG[3] */
 	pushl_cfi_r %edx /* ARG[2] */
 	pushl_cfi_r %ecx /* ARG[1] */
 	pushl_cfi_r %ebx /* ARG[0] */
 	pushl_cfi_r %eax /* SYSNO */
+
+	pushl_cfi $(RPC_SYSCALL_INFO_FREGVALID(0) | RPC_SYSCALL_INFO_FREGVALID(1) | \
+	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
+	            RPC_SYSCALL_INFO_METHOD_SYSENTER_32)
+	/* Check if exceptions are enabled. */
+	testb  $(EFLAGS_CF), (44 + OFFSET_IRREGS_EFLAGS)(%esp)
+	jz     1f
+	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%esp)
+1:
+
 
 	/* Load kernel segments. */
 	movl   $(SEGMENT_USER_DATA_RPL), %ecx
@@ -193,13 +202,17 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    .Lbad_args_pointer
 	movl   0(%ebp), %eax
-	movl   %eax, 20(%esp) /* ARG[4] */
+	movl   %eax, 24(%esp) /* ARG[4] */
+	orw    $(RPC_SYSCALL_INFO_FREGVALID(4)), 0(%esp)
 	cmpb   $(5), %cl
 	jbe    .Lgot_sysenter_args
 	/* Must also load the six'th argument! */
 	movl   4(%ebp), %eax
-	movl   %eax, 24(%esp) /* ARG[5] */
+	movl   %eax, 28(%esp) /* ARG[5] */
+	orw    $(RPC_SYSCALL_INFO_FREGVALID(5)), 0(%esp)
 .Lgot_sysenter_args:
+
+
 
 	/* Actually call through to the system call tracer. */
 	movl   %esp, %ecx
@@ -207,6 +220,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	call   syscall_trace
 
 	.cfi_remember_state
+	popl_cfi %eax /* flags (pop_void) */
 	popl_cfi_r %eax /* SYSNO */
 	popl_cfi_r %ebx /* ARG[0] */
 	popl_cfi_r %ecx /* ARG[1] */
@@ -222,7 +236,6 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	popl_cfi %ds
 	.cfi_restore_iret_ds
 
-	popfl_cfi_r
 
 	cmpl   $(__NR_syscall0_max), %eax
 	ja     1f
