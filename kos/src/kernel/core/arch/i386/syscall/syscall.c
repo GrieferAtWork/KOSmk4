@@ -134,8 +134,11 @@ PUBLIC bool KCALL syscall_tracing_setenabled(bool enable) {
 	addr = enable ? (void *)&x86_syscall32_int80_traced
 	              : (void *)&x86_syscall32_int80;
 #ifdef __x86_64__
-	newsyscall.i_seg.s_u = SEGMENT_INTRGATE_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
-	newsyscall.i_ext.s_u = SEGMENT_INTRGATE_HI_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
+	/* NOTE: On x86_64, we must use `SEGMENT_DESCRIPTOR_TYPE_INTRGATE' as gate type
+	 *       for int80h because we always _need_ to enter the kernel with #IF disabled
+	 *       in order to account for `swapgs' if `(IRET.CS AND 3) != 0' */
+	newsyscall.i_seg.s_u = SEGMENT_INTRGATE_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_INTRGATE, 3, 1);
+	newsyscall.i_ext.s_u = SEGMENT_INTRGATE_HI_INIT_U((uintptr_t)addr, SEGMENT_KERNEL_CODE, 0, SEGMENT_DESCRIPTOR_TYPE_INTRGATE, 3, 1);
 #else /* __x86_64__ */
 	newsyscall.i_seg.s_ul = SEGMENT_INTRGATE_INIT_UL((uintptr_t)addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);
 	newsyscall.i_seg.s_uh = SEGMENT_INTRGATE_INIT_UH((uintptr_t)addr, SEGMENT_KERNEL_CODE, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE, 3, 1);

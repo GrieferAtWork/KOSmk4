@@ -21,6 +21,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <hybrid/compiler.h>
+#include <hybrid/host.h>
 
 #include <kernel/idt-names.h>
 
@@ -79,16 +80,17 @@
 	DEFINE_INTRGATE_EX(id, SYMBOL(idt_, id), TYPE, SYMBOL(idtdpl_, id), SYMBOL(idtist_, id))
 
 #define INTR(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
+#define TRAP(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE)
+
 #ifdef __x86_64__
 /* Can't safely make use of traps on x86_64, since only entry to any
  * kind of interrupt, we need to check if the interrupt originated from
  * user-space, and if it did, need to invoke `swapgs', which would't
  * work properly if another interrupt could happen before then, making
  * us think that `swapgs' was already invoked when it actually wasn't */
+#undef TRAP
 #define TRAP(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_INTRGATE)
-#else /* __x86_64__ */
-#define TRAP(id) DEFINE_INTRGATE(id, SEGMENT_DESCRIPTOR_TYPE_TRAPGATE)
-#endif /* !__x86_64__ */
+#endif /* __x86_64__ */
 
 
 /* TRAP: Leave EFLAGS.IF unchanged */
