@@ -67,14 +67,10 @@ PUBLIC_FUNCTION(x86_fpustate_init)
 	 * >>          FCW_UM | FCW_PM | 0x40 (???) | \
 	 * >>          FCW_PC_EXTEND | FCW_RC_NEAREST),  \
 	 * >>        OFFSET_XFPUSTATE_FCW(%rdi) */
-	movw   $(FCW_IM | FCW_DM | FCW_ZM | FCW_OM | \
-	         FCW_UM | FCW_PM | 0x40 | \
-	         FCW_PC_EXTEND | FCW_RC_NEAREST),  \
-	       OFFSET_XFPUSTATE_FCW(%rdi) /* TODO: Remove me */
 #if OFFSET_XFPUSTATE_FCW == 0
-	.byte  0x66, 0xc7, 0x01
+	.byte  0x66, 0xc7, 0x07
 #else /* OFFSET_XFPUSTATE_FCW == 0 */
-	.byte  0x66, 0xc7, 0x41
+	.byte  0x66, 0xc7, 0x47
 	.byte  OFFSET_XFPUSTATE_FCW
 #endif /* OFFSET_XFPUSTATE_FCW != 0 */
 	.word  (FCW_IM | FCW_DM | FCW_ZM | FCW_OM | \
@@ -82,8 +78,7 @@ PUBLIC_FUNCTION(x86_fpustate_init)
 	        FCW_PC_EXTEND | FCW_RC_NEAREST)
 
 	/* movw   $(FTW_ALLEMPTY),  OFFSET_XFPUSTATE_FTW(%rdi) */
-	movw   $(FTW_ALLEMPTY),  OFFSET_XFPUSTATE_FTW(%rdi) /* TODO: Remove me */
-	.byte  0x66, 0xc7, 0x41
+	.byte  0x66, 0xc7, 0x47
 INTERN_FUNCTION(x86_fpustate_init_ftw_offset_byte)
 	.byte  OFFSET_XFPUSTATE_FTW
 END(x86_fpustate_init_ftw_offset_byte)
@@ -92,9 +87,8 @@ INTERN_FUNCTION(x86_fpustate_init_ftw_value)
 END(x86_fpustate_init_ftw_value)
 
 	/* movw   $(MXCSR_...),  OFFSET_XFPUSTATE_MXCSR(%rdi) */
-	movw   $(0x1234),  OFFSET_XFPUSTATE_MXCSR(%rdi) /* TODO: Remove me */
 INTERN_FUNCTION(x86_fpustate_init_mxcsr)
-	.byte  0xc7, 0x41
+	.byte  0xc7, 0x47
 	.byte  OFFSET_XFPUSTATE_MXCSR
 INTERN_FUNCTION(x86_fpustate_init_mxcsr_value)
 	.long  (MXCSR_IM | MXCSR_DM | MXCSR_ZM | MXCSR_OM | MXCSR_UM | MXCSR_PM)
@@ -159,11 +153,10 @@ INTERN_FUNCTION(x86_fxsave_section_stmxcsr)
 END(x86_fxsave_section_stmxcsr)
 
 	/* movl $*x86_fxsave_mxcsr_mask, OFFSET_XFPUSTATE_MXCSR_MASK(%rdi) */
-	movl   $0x12345678, OFFSET_XFPUSTATE_MXCSR_MASK(%rdi) /* TODO: Remove me */
 #if OFFSET_XFPUSTATE_MXCSR_MASK <= 0x7f
-	.byte  0xc7, 0x41, OFFSET_XFPUSTATE_MXCSR_MASK
+	.byte  0xc7, 0x47, OFFSET_XFPUSTATE_MXCSR_MASK
 #else /* OFFSET_XFPUSTATE_MXCSR_MASK <= 0x7f */
-	.byte  0xc7, 0x81
+	.byte  0xc7, 0x87
 	.long  OFFSET_XFPUSTATE_MXCSR_MASK
 #endif /* OFFSET_XFPUSTATE_MXCSR_MASK > 0x7f */
 PUBLIC_FUNCTION(x86_fxsave_mxcsr_mask)
