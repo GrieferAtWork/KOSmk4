@@ -195,7 +195,7 @@
 #define __CRT_HAVE_coredump_create 1
 #define __CRT_HAVE_coredump_create_for_exception 1
 #define __CRT_HAVE_coredump_create_for_signal 1
-#define __CRT_HAVE_cpu_add_quantum_offset 1
+#define __CRT_HAVE_cpu_add_quantum_offset_nopr 1
 #define __CRT_HAVE_cpu_addpendingtask 1
 #define __CRT_HAVE_cpu_addrunningtask_nopr 1
 #define __CRT_HAVE_cpu_addsleepingtask_nopr 1
@@ -718,7 +718,6 @@
 #define __CRT_HAVE_isr_usage_of 1
 #define __CRT_HAVE_isr_vector_state_destroy 1
 #define __CRT_HAVE_isr_vector_trigger 1
-#define __CRT_HAVE_jiffies 1
 #define __CRT_HAVE_json_decode 1
 #define __CRT_HAVE_json_encode 1
 #define __CRT_HAVE_json_parser_enter 1
@@ -1136,10 +1135,6 @@
 #define __CRT_HAVE_print_traceback_ucpustate 1
 #define __CRT_HAVE_printk 1
 #define __CRT_HAVE_pty_alloc 1
-#define __CRT_HAVE_qtime_to_timespec 1
-#define __CRT_HAVE_quantum_global_to_local 1
-#define __CRT_HAVE_quantum_local_to_global 1
-#define __CRT_HAVE_quantum_time 1
 #define __CRT_HAVE_ramfs_dev_type 1
 #define __CRT_HAVE_ramfs_directory_type 1
 #define __CRT_HAVE_ramfs_regular_type 1
@@ -2335,7 +2330,6 @@
 #define __CRT_HAVE_thisvm_x86_dr2 1
 #define __CRT_HAVE_thisvm_x86_dr3 1
 #define __CRT_HAVE_thisvm_x86_dr7 1
-#define __CRT_HAVE_timespec_to_qtime 1
 #define __CRT_HAVE_tty_device_alloc 1
 #define __CRT_HAVE_tty_device_forward_destroy 1
 #define __CRT_HAVE_tty_device_poll 1

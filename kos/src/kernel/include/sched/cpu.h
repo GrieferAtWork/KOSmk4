@@ -21,6 +21,7 @@
 
 #include <kernel/compiler.h>
 
+#include <sched/arch/cpu.h>
 #include <sched/pertask.h>
 
 #include <hybrid/__bit.h>
@@ -147,12 +148,9 @@ DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length;
 /* Returns the cpu-local quantum time. */
 FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void);
 
-/* Returns the global quantum time, adjusted for the calling CPU. */
-FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL quantum_time)(void);
-
 /* TODO: Instead of using `qtime_t' as timeout type in system APIs, make
- *       use of `realtime()' instead. Then, get rid of `quantum_time()'
- * As it stands right now, `quantum_time()' can't account for time spans
+ *       use of `realtime()' instead. Then, get rid of `cpu_quantum_time()'
+ * As it stands right now, `cpu_quantum_time()' can't account for time spans
  * during which the boot cpu's clock is halted. */
 
 /* Returns the highly precise current real time derived from the current CPU time.
@@ -166,22 +164,6 @@ NOTHROW(FCALL cpu_quantum_time_to_realtime_nopr)(qtime_t const *__restrict qtime
 FUNDEF NOBLOCK NOPREEMPT WUNUSED ATTR_PURE qtime_t
 NOTHROW(FCALL realtime_to_cpu_quantum_time_nopr)(struct timespec const *__restrict tms);
 
-/* Convert to/from quantum time and regular timespecs */
-FUNDEF NOBLOCK WUNUSED ATTR_PURE struct timespec NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime);
-FUNDEF NOBLOCK WUNUSED ATTR_PURE qtime_t NOTHROW(FCALL timespec_to_qtime)(struct timespec const *__restrict tms);
-
-/* Convert between global (the boot cpu's) and global (the current cpu's) quantum time.
- * WARNING: Unless the caller has disabled preemption or has set the
- *          KEEPCORE flag, these functions may not operate properly.
- * @param: tmp: [quantum_local_to_global] IN:  A timestamp in per-cpu local time
- *                                        OUT: A timestamp in global system time
- * @param: tmp: [quantum_global_to_local] IN:  A timestamp in global system time
- *                                        OUT: A timestamp in per-cpu local time
- * @return: * : [quantum_local_to_global] The current global system time
- * @return: * : [quantum_global_to_local] The current per-cpu local time */
-FUNDEF NOBLOCK NONNULL((1)) qtime_t NOTHROW(FCALL quantum_local_to_global)(qtime_t *__restrict tmp);
-FUNDEF NOBLOCK NONNULL((1)) qtime_t NOTHROW(FCALL quantum_global_to_local)(qtime_t *__restrict tmp);
-
 /* Increment `thiscpu_quantum_offset' by `diff' incrementing the `thiscpu_jiffies' counter
  * when the resulting value turns out to be greater than `thiscpu_quantum_length',
  * in which case the value will also be truncated.
@@ -189,12 +171,8 @@ FUNDEF NOBLOCK NONNULL((1)) qtime_t NOTHROW(FCALL quantum_global_to_local)(qtime
  * tasks to time out, and if so, re-schedule them for execution.
  * WARNING: This function may only be called when preemption is disabled!
  * @return: * : Always returns `PERCPU(thiscpu_quantum_length)' */
-FUNDEF NOBLOCK quantum_diff_t NOTHROW(FCALL cpu_add_quantum_offset)(quantum_diff_t diff);
-
-/* == FORCPU(&_bootcpu,thiscpu_jiffies)
- * The global jiffies counter, aliasing the one from the boot CPU. */
-DATDEF jtime_t volatile jiffies; /* TODO: Get rid of this global variable! */
-
+FUNDEF NOBLOCK NOPREEMPT quantum_diff_t
+NOTHROW(FCALL cpu_add_quantum_offset_nopr)(quantum_diff_t diff);
 
 /* [!0][<= CONFIG_MAX_CPU_COUNT][const] The total number of known CPUs. */
 DATDEF cpuid_t const cpu_count;
@@ -427,7 +405,8 @@ FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 2)) quantum_diff_t
 NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict mycpu,
                                         jtime_t *__restrict preal_jtime);
 
-/* Same as the function above, however don't account for lazy/delayed interrupt handling. */
+/* Same as the function above, however don't
+ * account for lazy/delayed interrupt handling. */
 FUNDEF NOBLOCK NOPREEMPT WUNUSED quantum_diff_t
 NOTHROW(KCALL arch_cpu_quantum_elapsed_nopr)(void);
 

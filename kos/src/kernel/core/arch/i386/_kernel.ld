@@ -510,8 +510,6 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_free_numpages = ABSOLUTE(ABSOLUTE(__kernel_free_endpageid) - ABSOLUTE(__kernel_free_startpageid)));
 	}
 
-	PROVIDE(jiffies = ABSOLUTE(_bootcpu + thiscpu_jiffies));
-
 	PROVIDE_HIDDEN(__x86_template_gdt = ABSOLUTE(__kernel_percpu_start + thiscpu_x86_gdt));
 	PROVIDE_HIDDEN(__x86_bootcpu_dfstack_node = ABSOLUTE(_bootcpu + thiscpu_x86_dfstacknode));
 	PROVIDE_HIDDEN(__x86_bootcpu_dfstack_part = ABSOLUTE(_bootcpu + thiscpu_x86_dfstackpart));

@@ -320,7 +320,7 @@ NOTHROW(KCALL cpu_quantum_end_nopr)(void) {
 		FORCPU(mycpu, thiscpu_last_qtime_q) = elapsed;
 	}
 	arch_cpu_quantum_reset_nopr();
-	length = cpu_add_quantum_offset(elapsed);
+	length = cpu_add_quantum_offset_nopr(elapsed);
 	THIS_TASK->t_atime.add_quantum(elapsed, length);
 }
 
@@ -350,7 +350,7 @@ NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
 		FORCPU(mycpu, thiscpu_last_qtime_j) = FORCPU(mycpu, thiscpu_jiffies);
 		FORCPU(mycpu, thiscpu_last_qtime_q) = elapsed;
 	}
-	length = cpu_add_quantum_offset(elapsed);
+	length = cpu_add_quantum_offset_nopr(elapsed);
 	THIS_TASK->t_atime.add_quantum(elapsed, length);
 }
 

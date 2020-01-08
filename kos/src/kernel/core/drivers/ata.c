@@ -46,7 +46,6 @@
 #include <kos/dev.h>
 #include <kos/except-inval.h>
 #include <kos/except-io.h>
-#include <kos/jiffies.h>
 #include <linux/hdreg.h>
 #include <sys/io.h>
 
@@ -487,14 +486,18 @@ NOTHROW(KCALL Ata_WaitForBusy)(port_t ctrl) {
 PRIVATE errr_t
 NOTHROW(KCALL Ata_WaitForBusyTimeout)(port_t ctrl) {
 	u8 status;
-	jtime_t abs_timeout;
-	if (!(inb(ctrl) & ATA_DCR_BSY))
+	struct timespec abs_timeout;
+	status = inb(ctrl);
+	if (!(status & ATA_DCR_BSY))
 		return ERRR_OK;
-	abs_timeout = jiffies + JIFFIES_FROM_SECONDS(3);
+	if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
+		return ATA_GetErrrForStatusRegister(status);
+	abs_timeout = realtime();
+	abs_timeout.tv_sec += 3;
 	while ((status = inb(ctrl)) & ATA_DCR_BSY) {
 		if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
 			return ATA_GetErrrForStatusRegister(status);
-		if unlikely(jiffies >= abs_timeout)
+		if unlikely(realtime() >= abs_timeout)
 			return ERRR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_DCR_BSY);
 		task_tryyield_or_pause();
 		io_delay();
@@ -505,13 +508,14 @@ NOTHROW(KCALL Ata_WaitForBusyTimeout)(port_t ctrl) {
 PRIVATE errr_t
 NOTHROW(KCALL Ata_WaitForDrq)(port_t ctrl) {
 	u8 status;
-	jtime_t abs_timeout;
+	struct timespec abs_timeout;
 	if (((status = inb(ctrl)) & ATA_DCR_BSY) == 0) {
-		abs_timeout = jiffies + JIFFIES_FROM_SECONDS(3);
+		abs_timeout = realtime();
+		abs_timeout.tv_sec += 3;
 		while ((status = inb(ctrl)) & ATA_DCR_BSY) {
 			if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
 				return ATA_GetErrrForStatusRegister(status);
-			if unlikely(jiffies >= abs_timeout)
+			if unlikely(realtime() >= abs_timeout)
 				return ERRR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_DCR_BSY);
 			task_tryyield_or_pause();
 			io_delay();
@@ -521,14 +525,15 @@ NOTHROW(KCALL Ata_WaitForDrq)(port_t ctrl) {
 		return ATA_GetErrrForStatusRegister(status);
 	if (status & ATA_DCR_DRQ)
 		return ERRR_OK;
-	abs_timeout = jiffies + JIFFIES_FROM_SECONDS(3);
+	abs_timeout = realtime();
+	abs_timeout.tv_sec += 3;
 	for (;;) {
 		task_tryyield_or_pause();
 		io_delay();
 		status = inb(ctrl);
 		if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
 			return ATA_GetErrrForStatusRegister(status);
-		if unlikely(jiffies >= abs_timeout)
+		if unlikely(realtime() >= abs_timeout)
 			return ERRR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_DCR_BSY);
 		if (status & ATA_DCR_DRQ)
 			break;

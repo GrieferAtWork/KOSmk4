@@ -484,180 +484,6 @@ NOTHROW(KCALL cpu_quantum_time)(void) {
 	return result;
 }
 
-PUBLIC NOBLOCK WUNUSED qtime_t
-NOTHROW(KCALL quantum_time)(void) {
-	qtime_t result;
-	struct cpu *me;
-	pflag_t was;
-	quantum_diff_t elapsed, my_qoff, my_qlen;
-	/* BOOT_JIFFIES + (BOOT_QUANTUM_OFFSET - MY_QUANTUM_OFFSET + cpu_quantum_elapsed_nopr()) */
-	was = PREEMPTION_PUSHOFF();
-	me  = THIS_CPU;
-	if (me == &_bootcpu) {
-		result.q_qtime = FORCPU(me, thiscpu_quantum_offset);
-		result.q_qsize = FORCPU(me, thiscpu_quantum_length);
-		elapsed        = cpu_quantum_elapsed_nopr(me, &result.q_jtime);
-		PREEMPTION_POP(was);
-		if (OVERFLOW_UADD(result.q_qtime, elapsed, &result.q_qtime)) {
-			result.q_jtime += ((quantum_diff_t)-1) / result.q_qsize;
-			result.q_qtime += elapsed;
-			result.q_qtime -= (quantum_diff_t)-1;
-		}
-		if (result.q_qtime >= result.q_qsize) {
-			result.q_jtime += result.q_qtime / result.q_qsize;
-			result.q_qtime = result.q_qtime % result.q_qsize;
-		}
-		return result;
-	}
-	result.q_jtime = FORCPU(&_bootcpu, thiscpu_jiffies);
-	result.q_qtime = FORCPU(&_bootcpu, thiscpu_quantum_offset);
-	result.q_qsize = FORCPU(&_bootcpu, thiscpu_quantum_length);
-	my_qoff        = FORCPU(me, thiscpu_quantum_offset);
-	my_qlen        = FORCPU(me, thiscpu_quantum_length);
-	elapsed        = arch_cpu_quantum_elapsed_nopr();
-	PREEMPTION_POP(was);
-	if (my_qlen > result.q_qsize) {
-		result.q_qtime = (quantum_diff_t)(((u64)result.q_qtime * result.q_qsize) / my_qlen);
-		result.q_qsize = my_qlen;
-	} else if (my_qlen < result.q_qsize) {
-		my_qoff = (quantum_diff_t)(((u64)my_qoff * my_qlen) / result.q_qsize);
-		elapsed = (quantum_diff_t)(((u64)elapsed * my_qlen) / result.q_qsize);
-	}
-
-	if (OVERFLOW_UADD(result.q_qtime, elapsed, &result.q_qtime)) {
-		result.q_jtime += ((quantum_diff_t)-1) / result.q_qsize;
-		result.q_qtime += elapsed;
-		result.q_qtime -= (quantum_diff_t)-1;
-	}
-	if (OVERFLOW_USUB(result.q_qtime, my_qoff, &result.q_qtime)) {
-		result.q_jtime -= ((quantum_diff_t)-1) / result.q_qsize;
-		result.q_qtime -= my_qoff;
-		result.q_qtime += (quantum_diff_t)-1;
-	}
-	if (result.q_qtime >= result.q_qsize) {
-		result.q_jtime += result.q_qtime / result.q_qsize;
-		result.q_qtime = result.q_qtime % result.q_qsize;
-	}
-	return result;
-}
-
-PUBLIC NOBLOCK NONNULL((1)) qtime_t
-NOTHROW(FCALL quantum_local_to_global)(qtime_t *__restrict tmp) {
-	qtime_t boot_time, locl_time;
-	struct cpu *me = THIS_CPU;
-	quantum_diff_t elapsed;
-	locl_time.q_qtime = FORCPU(me, thiscpu_quantum_offset);
-	locl_time.q_qsize = FORCPU(me, thiscpu_quantum_length);
-	elapsed           = cpu_quantum_elapsed_nopr(me, &locl_time.q_jtime);
-	if (OVERFLOW_UADD(locl_time.q_qtime, elapsed, &locl_time.q_qtime)) {
-		locl_time.q_jtime += ((quantum_diff_t)-1) / locl_time.q_qsize;
-		locl_time.q_qtime += elapsed;
-		locl_time.q_qtime -= (quantum_diff_t)-1;
-	}
-	if (me == &_bootcpu)
-		return locl_time;
-	boot_time.q_jtime = FORCPU(&_bootcpu, thiscpu_jiffies);
-	boot_time.q_qtime = FORCPU(&_bootcpu, thiscpu_quantum_offset);
-	boot_time.q_qsize = FORCPU(&_bootcpu, thiscpu_quantum_length);
-	if (locl_time.q_qtime >= locl_time.q_qsize) {
-		locl_time.q_jtime += locl_time.q_qtime / locl_time.q_qsize;
-		locl_time.q_qtime = locl_time.q_qtime % locl_time.q_qsize;
-	}
-	if (locl_time.q_qsize < boot_time.q_qsize) {
-		locl_time.q_qtime = (locl_time.q_qtime * boot_time.q_qsize) / locl_time.q_qsize;
-		locl_time.q_qsize = boot_time.q_qsize;
-	} else if (locl_time.q_qsize > boot_time.q_qsize) {
-		boot_time.q_qtime = (boot_time.q_qtime * locl_time.q_qsize) / boot_time.q_qsize;
-		boot_time.q_qsize = locl_time.q_qsize;
-	}
-	if (tmp->q_qsize < boot_time.q_qsize) {
-		tmp->q_qtime = (tmp->q_qtime * boot_time.q_qsize) / tmp->q_qsize;
-		tmp->q_qsize = boot_time.q_qsize;
-	} else if (tmp->q_qsize > boot_time.q_qsize) {
-		boot_time.q_qtime = (boot_time.q_qtime * tmp->q_qsize) / boot_time.q_qsize;
-		boot_time.q_qsize = tmp->q_qsize;
-		locl_time.q_qtime = (locl_time.q_qtime * tmp->q_qsize) / locl_time.q_qsize;
-		locl_time.q_qsize = tmp->q_qsize;
-	}
-	/* TMP = (TMP - LOCAL) + BOOT */
-	tmp->q_jtime -= locl_time.q_jtime;
-	tmp->q_jtime += boot_time.q_jtime;
-	if (OVERFLOW_USUB(tmp->q_qtime, locl_time.q_qtime, &tmp->q_qtime)) {
-		tmp->q_jtime -= ((quantum_diff_t)-1 / tmp->q_qsize);
-		tmp->q_qtime += (quantum_diff_t)-1;
-		tmp->q_qtime -= locl_time.q_qtime;
-	}
-	if (OVERFLOW_UADD(tmp->q_qtime, boot_time.q_qtime, &tmp->q_qtime)) {
-		tmp->q_jtime += ((quantum_diff_t)-1 / tmp->q_qsize);
-		tmp->q_qtime -= (quantum_diff_t)-1;
-		tmp->q_qtime += boot_time.q_qtime;
-	}
-	if (tmp->q_qtime >= tmp->q_qsize) {
-		tmp->q_jtime += tmp->q_qtime / tmp->q_qsize;
-		tmp->q_qtime = tmp->q_qtime % tmp->q_qsize;
-	}
-	return boot_time;
-}
-
-PUBLIC NOBLOCK NONNULL((1)) qtime_t
-NOTHROW(FCALL quantum_global_to_local)(qtime_t *__restrict tmp) {
-	qtime_t boot_time, locl_time;
-	struct cpu *me = THIS_CPU;
-	quantum_diff_t elapsed;
-	locl_time.q_jtime = FORCPU(me, thiscpu_jiffies);
-	locl_time.q_qtime = FORCPU(me, thiscpu_quantum_offset);
-	locl_time.q_qsize = FORCPU(me, thiscpu_quantum_length);
-	elapsed = arch_cpu_quantum_elapsed_nopr();
-	if (OVERFLOW_UADD(locl_time.q_qtime, elapsed, &locl_time.q_qtime)) {
-		locl_time.q_jtime += ((quantum_diff_t)-1) / locl_time.q_qsize;
-		locl_time.q_qtime += elapsed;
-		locl_time.q_qtime -= (quantum_diff_t)-1;
-	}
-	if (me == &_bootcpu)
-		return locl_time;
-	boot_time.q_jtime = FORCPU(&_bootcpu, thiscpu_jiffies);
-	boot_time.q_qtime = FORCPU(&_bootcpu, thiscpu_quantum_offset);
-	boot_time.q_qsize = FORCPU(&_bootcpu, thiscpu_quantum_length);
-	if (locl_time.q_qtime >= locl_time.q_qsize) {
-		locl_time.q_jtime += locl_time.q_qtime / locl_time.q_qsize;
-		locl_time.q_qtime = locl_time.q_qtime % locl_time.q_qsize;
-	}
-	if (locl_time.q_qsize < boot_time.q_qsize) {
-		locl_time.q_qtime = (locl_time.q_qtime * boot_time.q_qsize) / locl_time.q_qsize;
-		locl_time.q_qsize = boot_time.q_qsize;
-	} else if (locl_time.q_qsize > boot_time.q_qsize) {
-		boot_time.q_qtime = (boot_time.q_qtime * locl_time.q_qsize) / boot_time.q_qsize;
-		boot_time.q_qsize = locl_time.q_qsize;
-	}
-	if (tmp->q_qsize < boot_time.q_qsize) {
-		tmp->q_qtime = (tmp->q_qtime * boot_time.q_qsize) / tmp->q_qsize;
-		tmp->q_qsize = boot_time.q_qsize;
-	} else if (tmp->q_qsize > boot_time.q_qsize) {
-		boot_time.q_qtime = (boot_time.q_qtime * tmp->q_qsize) / boot_time.q_qsize;
-		boot_time.q_qsize = tmp->q_qsize;
-		locl_time.q_qtime = (locl_time.q_qtime * tmp->q_qsize) / locl_time.q_qsize;
-		locl_time.q_qsize = tmp->q_qsize;
-	}
-	/* TMP = (TMP - BOOT) + LOCAL */
-	tmp->q_jtime -= boot_time.q_jtime;
-	tmp->q_jtime += locl_time.q_jtime;
-	if (OVERFLOW_USUB(tmp->q_qtime, boot_time.q_qtime, &tmp->q_qtime)) {
-		tmp->q_jtime -= ((quantum_diff_t)-1 / tmp->q_qsize);
-		tmp->q_qtime += (quantum_diff_t)-1;
-		tmp->q_qtime -= boot_time.q_qtime;
-	}
-	if (OVERFLOW_UADD(tmp->q_qtime, locl_time.q_qtime, &tmp->q_qtime)) {
-		tmp->q_jtime += ((quantum_diff_t)-1 / tmp->q_qsize);
-		tmp->q_qtime -= (quantum_diff_t)-1;
-		tmp->q_qtime += locl_time.q_qtime;
-	}
-	if (tmp->q_qtime >= tmp->q_qsize) {
-		tmp->q_jtime += tmp->q_qtime / tmp->q_qsize;
-		tmp->q_qtime = tmp->q_qtime % tmp->q_qsize;
-	}
-	return locl_time;
-}
-
 
 
 
@@ -666,8 +492,8 @@ NOTHROW(FCALL quantum_global_to_local)(qtime_t *__restrict tmp) {
  * in which case the value will also be truncated.
  * When `thiscpu_jiffies' is incremented, also check if this causes additional
  * tasks to time out, and if so, re-schedule them for execution. */
-PUBLIC NOBLOCK quantum_diff_t
-NOTHROW(FCALL cpu_add_quantum_offset)(quantum_diff_t diff) {
+PUBLIC NOBLOCK NOPREEMPT quantum_diff_t
+NOTHROW(FCALL cpu_add_quantum_offset_nopr)(quantum_diff_t diff) {
 	struct cpu *me = THIS_CPU;
 	quantum_diff_t new_diff, more_jiffies = 0;
 	quantum_diff_t length = FORCPU(me, thiscpu_quantum_length);
@@ -839,8 +665,6 @@ wait_a_bit:
 
 	/* Continue execution in the next thread. */
 	cpu_run_current_and_remember_nopr(me);
-
-	assert(PREEMPTION_ENABLED());
 
 	/* HINT: If your debugger break here, it means that your
 	 *       thread is probably waiting on some kind of signal. */
@@ -1054,31 +878,6 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	/* Good bye... */
 	cpu_run_current_nopr();
 }
-
-
-
-/* Convert to/from quantum time and regular timespecs */
-PUBLIC NOBLOCK WUNUSED ATTR_PURE struct timespec
-NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime) {
-	struct timespec result;
-	result.tv_sec  = qtime->q_jtime / HZ;
-	result.tv_nsec = ((qtime->q_jtime % HZ) * (__NSECS_PER_SEC / HZ)) +
-	                 (syscall_ulong_t)((u64)((u64)qtime->q_qtime *
-	                                         (__NSECS_PER_SEC / HZ)) /
-	                                   qtime->q_qsize);
-	return result;
-}
-
-PUBLIC NOBLOCK WUNUSED ATTR_PURE qtime_t
-NOTHROW(FCALL timespec_to_qtime)(struct timespec const *__restrict tms) {
-	qtime_t result;
-	result.q_jtime  = tms->tv_sec * HZ;
-	result.q_jtime += tms->tv_nsec / (__NSECS_PER_SEC / HZ);
-	result.q_qtime  = tms->tv_nsec % (__NSECS_PER_SEC / HZ);
-	result.q_qsize  = __NSECS_PER_SEC / HZ;
-	return result;
-}
-
 
 
 

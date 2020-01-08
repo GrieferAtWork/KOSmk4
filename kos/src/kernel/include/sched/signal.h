@@ -268,7 +268,7 @@ struct timespec;
 /* Wait for the first signal to be delivered,
  * disconnecting all connected signals thereafter.
  * NOTE: Prior to fully starting to block, this function will call `task_serve()'
- * @param: abs_timeout:  The global (s.a. `quantum_time()') timeout for the wait.
+ * @param: abs_timeout:  The `realtime()' timeout for the wait.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked.
  * @throw: * :          [task_waitfor] An error was thrown by an RPC function.
  *                       NOTE: In this case, `task_disconnectall()' will have been called.

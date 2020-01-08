@@ -36,8 +36,6 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/jiffies.h>
-
 #include <assert.h>
 #include <string.h>
 

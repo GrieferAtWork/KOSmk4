@@ -124,7 +124,7 @@ struct task {
 #endif /* !CONFIG_NO_SMP */
 		};
 	}               t_sched;
-	WEAK qtime_t    t_ctime;                 /* [const] `quantum_time()' timestamp of when the thread was started. */
+	WEAK qtime_t    t_ctime;                 /* [const] `cpu_quantum_time()' timestamp of when the thread was started. */
 	WEAK qtime_t    t_atime;                 /* [lock(PRIVATE(THIS_TASK))] Amount of time that this task has spent running. */
 	/* per-task data goes here. */
 };

@@ -34,6 +34,7 @@
 #define __FREE          /* Annotation for functions / data that are apart of the .free section. */
 #define __NOBLOCK       /* Annotation for functions that are guarantied to never block,
                          * making them safe to-be called from any asynchronous context. */
+#define __NOPREEMPT     /* Annotation for functions that may only be called with preemption disabled. */
 #define __NOCONNECT     /* Annotation for functions which may only be called when
                          * the calling thread isn't already connected to a signal. */
 #define __NOBLOCK_IF(x) /* Annotation for functions that are conditionally non-blocking. */

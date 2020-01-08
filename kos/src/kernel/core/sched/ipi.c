@@ -827,7 +827,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		printk(KERN_INFO "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
 		       (unsigned int)target_cpu->c_id, thread,
 		       (unsigned int)task_getroottid_of_s(thread));
-		thread->t_ctime = quantum_time();
+		thread->t_ctime = cpu_quantum_time();
 #ifndef NDEBUG
 		{
 			bool ok = cpu_addpendingtask(target_cpu, thread);
@@ -865,7 +865,7 @@ done_pop_preemption:
 		printk(KERN_INFO "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
 		       (unsigned int)target_cpu->c_id, thread,
 		       (unsigned int)task_getroottid_of_s(thread));
-		thread->t_ctime = quantum_time();
+		thread->t_ctime = cpu_quantum_time();
 		caller = THIS_TASK;
 		next   = caller->t_sched.s_running.sr_runnxt;
 		caller->t_sched.s_running.sr_runnxt = thread;
