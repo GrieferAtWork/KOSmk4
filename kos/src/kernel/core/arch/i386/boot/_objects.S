@@ -47,7 +47,7 @@ EXPORT_AS_OBJECT_EX(this_x86_kernel_psp0, __SIZEOF_POINTER__)
 EXPORT_AS_OBJECT_EX(x86_bootcpu_cpufeatures, 2)
 EXPORT_AS_OBJECT_EX(x86_bootcpu_cpuid, SIZEOF_CPUID_CPUINFO)
 EXPORT_AS_OBJECT_EX(x86_bootcpu_gdt, SEGMENT_COUNT * 8)
-EXPORT_AS_OBJECT_EX(this_idle_sched_state, __SIZEOF_POINTER__)
+EXPORT_AS_OBJECT_EX(thiscpu_idle_sched_state, __SIZEOF_POINTER__)
 EXPORT_AS_OBJECT_EX(thiscpu_idle_x86_kernel_psp0, __SIZEOF_POINTER__)
 #undef EXPORT_AS_OBJECT_EX
 #undef EXPORT_AS_OBJECT

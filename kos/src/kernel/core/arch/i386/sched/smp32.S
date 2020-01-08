@@ -761,8 +761,8 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	EXTERN(cpu_online_count)
 	lock;  decl cpu_online_count
 
-	EXTERN(this_idle_sched_state)
-	movl   %esp, this_idle_sched_state(%ecx)
+	EXTERN(thiscpu_idle_sched_state)
+	movl   %esp, thiscpu_idle_sched_state(%ecx)
 
 	/* Flush all caches before actually commiting to beginning to dream */
 	wbinvd /* TODO: Only available since 486. - Must be replaced with `nop' no 386 */

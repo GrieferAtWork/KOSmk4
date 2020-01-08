@@ -1414,10 +1414,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 353 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname353 /* index: 353 */
+	.weak thisvm_x86_dr0; .quad thisvm_x86_dr0
+	.reloc ., R_X86_64_SIZE32, thisvm_x86_dr0; .int 0
+	.int 0x4b28d90
 	.quad .Lname354 /* index: 354 */
 	.weak sys32_unlinkat; .quad sys32_unlinkat
 	.reloc ., R_X86_64_SIZE32, sys32_unlinkat; .int 0
@@ -9579,9 +9579,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, json_parser_enterobject; .int 0
 	.int 0xb1c6ee4
 	.quad .Lname2394 /* index: 2394 */
-	.weak this_idle_sched_state; .quad this_idle_sched_state
-	.reloc ., R_X86_64_SIZE32, this_idle_sched_state; .int 0
-	.int 0x396b7c5
+	.weak unwind_emulator_exec_autostack; .quad unwind_emulator_exec_autostack
+	.reloc ., R_X86_64_SIZE32, unwind_emulator_exec_autostack; .int 0
+	.int 0x49816fb
 	.quad 0 /* index: 2395 */
 	.quad 0
 	.int 0
@@ -10050,10 +10050,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad .Lname2512 /* index: 2512 */
-	.weak unwind_emulator_exec_autostack; .quad unwind_emulator_exec_autostack
-	.reloc ., R_X86_64_SIZE32, unwind_emulator_exec_autostack; .int 0
-	.int 0x49816fb
+	.quad 0 /* index: 2512 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad .Lname2513 /* index: 2513 */
 	.weak vm_writephysq; .quad vm_writephysq
 	.reloc ., R_X86_64_SIZE32, vm_writephysq; .int 0
@@ -13891,9 +13891,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys_quotactl; .int 0
 	.int 0xddaec2c
 	.quad .Lname3472 /* index: 3472 */
-	.weak thisvm_x86_dr0; .quad thisvm_x86_dr0
-	.reloc ., R_X86_64_SIZE32, thisvm_x86_dr0; .int 0
-	.int 0x4b28d90
+	.weak thiscpu_idle_sched_state; .quad thiscpu_idle_sched_state
+	.reloc ., R_X86_64_SIZE32, thiscpu_idle_sched_state; .int 0
+	.int 0x319c295
 	.quad .Lname3473 /* index: 3473 */
 	.weak thisvm_x86_dr1; .quad thisvm_x86_dr1
 	.reloc ., R_X86_64_SIZE32, thisvm_x86_dr1; .int 0
@@ -16898,6 +16898,8 @@ END(kernel_symbol_table)
 	.string "dbg_main"
 .Lname351:
 	.string "sys_timerfd_create"
+.Lname353:
+	.string "thisvm_x86_dr0"
 .Lname354:
 	.string "sys32_unlinkat"
 .Lname355:
@@ -19677,7 +19679,7 @@ END(kernel_symbol_table)
 .Lname2393:
 	.string "json_parser_enterobject"
 .Lname2394:
-	.string "this_idle_sched_state"
+	.string "unwind_emulator_exec_autostack"
 .Lname2396:
 	.string "ttybase_device_tryioctl"
 .Lname2398:
@@ -19828,8 +19830,6 @@ END(kernel_symbol_table)
 	.string "sys32_geteuid32"
 .Lname2510:
 	.string "mouse_device_button"
-.Lname2512:
-	.string "unwind_emulator_exec_autostack"
 .Lname2513:
 	.string "vm_writephysq"
 .Lname2514:
@@ -21209,7 +21209,7 @@ END(kernel_symbol_table)
 .Lname3471:
 	.string "sys_quotactl"
 .Lname3472:
-	.string "thisvm_x86_dr0"
+	.string "thiscpu_idle_sched_state"
 .Lname3473:
 	.string "thisvm_x86_dr1"
 .Lname3474:

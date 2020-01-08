@@ -564,7 +564,7 @@ SECTIONS {
 #undef GDT_DB
 #undef GDT_L
 
-	PROVIDE(this_idle_sched_state = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_sched_state)));
+	PROVIDE(thiscpu_idle_sched_state = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_sched_state)));
 	PROVIDE(thiscpu_idle_x86_kernel_psp0 = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_x86_kernel_psp0)));
 
 	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b0 = (ABSOLUTE(dbg_cpu_temporary) & 0x000000ff) >> 0);

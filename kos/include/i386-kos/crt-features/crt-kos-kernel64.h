@@ -2274,7 +2274,6 @@
 #define __CRT_HAVE_this_exception_trace 1
 #define __CRT_HAVE_this_fs 1
 #define __CRT_HAVE_this_handle_manager 1
-#define __CRT_HAVE_this_idle_sched_state 1
 #define __CRT_HAVE_this_kernel_stacknode 1
 #define __CRT_HAVE_this_kernel_stackpart 1
 #define __CRT_HAVE_this_read_locks 1
@@ -2299,6 +2298,7 @@
 #define __CRT_HAVE_thiscpu_current 1
 #define __CRT_HAVE_thiscpu_id 1
 #define __CRT_HAVE_thiscpu_idle 1
+#define __CRT_HAVE_thiscpu_idle_sched_state 1
 #define __CRT_HAVE_thiscpu_idle_x86_kernel_psp0 1
 #define __CRT_HAVE_thiscpu_jiffies 1
 #define __CRT_HAVE_thiscpu_override 1

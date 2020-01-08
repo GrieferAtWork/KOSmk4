@@ -754,8 +754,8 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	EXTERN(cpu_online_count)
 	lock;  decq cpu_online_count
 
-	EXTERN(this_idle_sched_state)
-	movq   %rsp, this_idle_sched_state(%rdi)
+	EXTERN(thiscpu_idle_sched_state)
+	movq   %rsp, thiscpu_idle_sched_state(%rdi)
 
 	/* Flush all caches before actually commiting to beginning to dream */
 	wbinvd

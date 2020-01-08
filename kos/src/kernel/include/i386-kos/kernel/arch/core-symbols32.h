@@ -1414,10 +1414,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long 0 /* index: 353 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname353 /* index: 353 */
+	.weak thisvm_x86_dr0; .long thisvm_x86_dr0
+	.reloc ., R_386_SIZE32, thisvm_x86_dr0; .int 0
+	.int 0x4b28d90
 	.long 0 /* index: 354 */
 	.long 0
 	.int 0
@@ -9578,10 +9578,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak json_parser_enterobject; .long json_parser_enterobject
 	.reloc ., R_386_SIZE32, json_parser_enterobject; .int 0
 	.int 0xb1c6ee4
-	.long .Lname2394 /* index: 2394 */
-	.weak this_idle_sched_state; .long this_idle_sched_state
-	.reloc ., R_386_SIZE32, this_idle_sched_state; .int 0
-	.int 0x396b7c5
+	.long 0 /* index: 2394 */
+	.long 0
+	.int 0
+	.int 0
 	.long 0 /* index: 2395 */
 	.long 0
 	.int 0
@@ -13891,9 +13891,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.long .Lname3472 /* index: 3472 */
-	.weak thisvm_x86_dr0; .long thisvm_x86_dr0
-	.reloc ., R_386_SIZE32, thisvm_x86_dr0; .int 0
-	.int 0x4b28d90
+	.weak thiscpu_idle_sched_state; .long thiscpu_idle_sched_state
+	.reloc ., R_386_SIZE32, thiscpu_idle_sched_state; .int 0
+	.int 0x319c295
 	.long .Lname3473 /* index: 3473 */
 	.weak thisvm_x86_dr1; .long thisvm_x86_dr1
 	.reloc ., R_386_SIZE32, thisvm_x86_dr1; .int 0
@@ -16800,6 +16800,8 @@ END(kernel_symbol_table)
 	.string "dbg_main"
 .Lname351:
 	.string "vm_datapart_decref_and_merge"
+.Lname353:
+	.string "thisvm_x86_dr0"
 .Lname355:
 	.string "handle_get_vfs"
 .Lname357:
@@ -19206,8 +19208,6 @@ END(kernel_symbol_table)
 	.string "vpage_alloc_untraced_nx"
 .Lname2393:
 	.string "json_parser_enterobject"
-.Lname2394:
-	.string "this_idle_sched_state"
 .Lname2396:
 	.string "ttybase_device_tryioctl"
 .Lname2398:
@@ -20519,7 +20519,7 @@ END(kernel_symbol_table)
 .Lname3469:
 	.string "format_sprintf_printer"
 .Lname3472:
-	.string "thisvm_x86_dr0"
+	.string "thiscpu_idle_sched_state"
 .Lname3473:
 	.string "thisvm_x86_dr1"
 .Lname3474:
