@@ -286,6 +286,7 @@ set_noncanon_pc_exception:
 			case 0x0fbf:  /* movsx r/m16, r32 */
 			case 0x0fb6:  /* movzx r/m8, r16 / movzx r/m8, r32 */
 			case 0x0fb7:  /* movzx r/m16, r32 */
+			case 0x63:    /* movsx r/m16, r16 / movsx r/m32, r32 / movsx r/m32, r64 */
 			/* All of the following are technically read+write, but since the read comes first... */
 			case 0x12:    /* adc r/m8, r8 */
 			case 0x13:    /* adc r/m16, r16 / adc r/m32, r32 */
