@@ -1417,7 +1417,7 @@ try_next_step:
 			}
 			continue;
 do_reset_step:
-			printStepStatus(LOG_UPDATE_MARKER, s, "Restarting: {}" + recheck_reason);
+			printStepStatus(LOG_UPDATE_MARKER, s, "Restarting: " + recheck_reason);
 			missingSteps.insert(s);
 			finishedSteps.remove(s);
 			s.reset();
