@@ -33,8 +33,10 @@
 #include <unistd.h> /* preadall */
 
 #if defined(__i386__) && !defined(__x86_64__)
-#include <kos/syscalls.h>
-#include <sys/mman.h>
+#include <kos/syscalls.h> /* sys_uname() */
+#include <sys/utsname.h> /* uname */
+
+#include <string.h> /* preadall */
 #endif /* __i386__ && !__x86_64__ */
 
 #include "sys.auxv.h"
@@ -57,23 +59,13 @@ elf_host_platform_string_x86_64[] = "x86_64";
 
 /* Check if the kernel is running in 64-bit mode */
 PRIVATE bool LIBCCALL libc_has_kernel64(void) {
-	void *addr;
-	/* Check if we're allowed to map memory past the end of the 32-bit address space.
-	 * On i386:
-	 *     We should get EINVAL from an exception `E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_MMAP_LENGTH'
-	 *     that's caused by the fact that the combined base+size is greater than the max possible address
-	 * On x86_64:
-	 *     We should either get `0xfffff000' back (indicating success), or ENOMEM caused by an exception
-	 *     `E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY:2' (2 being the number of pages we attempted to map)
-	 *     when for some reason that address range has been mapped by something
-	 */
-	addr = sys_mmap((void *)0xfffff000, 2 * OS_PAGESIZE,
-	                PROT_READ | PROT_WRITE,
-	                MAP_FIXED | MAP_DONT_MAP | MAP_ANONYMOUS,
-	                -1, 0);
-	if (addr == (void *)0xfffff000 || addr == (void *)-ENOMEM)
-		return true; /* 64-bit kernel */
-	/* 32-bit kernel */
+	struct utsname uname;
+	errno_t error;
+	error = sys_uname(&uname);
+	if unlikely(E_ISERR(error))
+		return false; /* Shouldn't happen... */
+	if (strcmp(uname.machine, elf_host_platform_string_x86_64) == 0)
+		return true; /* Yup. It's an x86_64-kernel. */
 	return false;
 }
 #endif /* __i386__ && !__x86_64__ */

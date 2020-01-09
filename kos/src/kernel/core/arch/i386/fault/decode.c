@@ -561,7 +561,7 @@ next_byte:
 #define VEX3B_W        0x0080 /* FLAG:  3-byte VEX.B */
 #ifdef __x86_64__
 #define VEX3B_VVVV_M64 0x0078 /* MASK:  3-byte VEX.VVVV */
-#endif
+#endif /* __x86_64__ */
 #define VEX3B_VVVV_M   0x0038 /* MASK:  3-byte VEX.VVVV (The most significant bit is ignored) */
 #define VEX3B_VVVV_S   3      /* SHIFT: 3-byte VEX.VVVV */
 #define VEX3B_L        0x0004 /* FLAG:  3-byte VEX.L */
