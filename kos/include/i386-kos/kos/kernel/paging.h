@@ -33,10 +33,14 @@
 #undef KERNELSPACE_LOWMEM
 #define KERNELSPACE_HIGHMEM 1
 
+
 #ifdef __x86_64__
 #define USERSPACE_END    __UINT64_C(0x0000800000000000) /* Upper address space limit for user-space (first invalid address) */
 #define KERNELSPACE_BASE __UINT64_C(0xffff800000000000) /* Lower address space limit for kernel-space */
 #define KERNEL_CORE_BASE __UINT64_C(0xffffffff80000000) /* Load address of the kernel core. (-2GB) */
+
+#define COMPAT_USERSPACE_END    __UINT32_C(0xc0000000) /* Upper address space limit for user-space (as exposed to programs running in compatibility mode) */
+#define COMPAT_KERNELSPACE_BASE __UINT32_C(0xc0000000) /* lower address space limit for kernel-space (as exposed to programs running in compatibility mode) */
 
 /* Check if a given physical address range is identity mapped. */
 #if 0 /* TODO: Add a configuration option for this.
@@ -45,7 +49,7 @@
 /* First first half of the kernel address space is used as identity mapping
  * for the first 64TiB (yes: that is Terrabyte) of physical memory. */
 #define KERNEL_PHYS2VIRT_BASE __UINT64_C(0xffff880000000000) /* Start of the physical identity mapping */
-#define KERNEL_PHYS2VIRT_SIZE     __UINT64_C(0x400000000000) /* Size of the physical identity mapping (== 64TiB) */
+#define KERNEL_PHYS2VIRT_SIZE __UINT64_C(0x0000400000000000) /* Size of the physical identity mapping (== 64TiB) */
 #define KERNEL_PHYS2VIRT_MIN  KERNEL_PHYS2VIRT_BASE          /* Lowest address apart of the physical identity mapping */
 #define KERNEL_PHYS2VIRT_MAX  __UINT64_C(0xffffc7ffffffffff) /* Greatest address apart of the physical identity mapping */
 
@@ -74,9 +78,9 @@
 	 __CCAST(__UINT64_TYPE__)(addr) > X86_64_ADDRBUS_NONCANON_MAX)
 
 #else /* __x86_64__ */
-#define USERSPACE_END         __UINT32_C(0xc0000000)         /* Upper address space limit for user-space */
-#define KERNELSPACE_BASE           __UINT32_C(0xc0000000)         /* lower address space limit for kernel-space */
-#define KERNEL_CORE_BASE      __UINT32_C(0xc0000000)         /* Load address of the kernel core. */
+#define USERSPACE_END         __UINT32_C(0xc0000000) /* Upper address space limit for user-space */
+#define KERNELSPACE_BASE      __UINT32_C(0xc0000000) /* lower address space limit for kernel-space */
+#define KERNEL_CORE_BASE      __UINT32_C(0xc0000000) /* Load address of the kernel core. */
 #define ADDR_IS_NONCANON(addr)  0
 #define ADDR_IS_CANON(addr)     1
 #endif /* !__x86_64__ */

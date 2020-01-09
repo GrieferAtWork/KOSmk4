@@ -114,6 +114,8 @@ FUNDEF ATTR_NORETURN void FCALL x86_syscall_emulate_cdecl_r(struct icpustate *__
 #define syscall_emulate32_callback_r x86_syscall_emulate32_cdecl_r
 #define syscall_emulate64_callback   x86_syscall_emulate_sysvabi
 #define syscall_emulate64_callback_r x86_syscall_emulate_sysvabi_r
+#define syscall_emulate_callback_compat   x86_syscall_emulate32_cdecl
+#define syscall_emulate_callback_compat_r x86_syscall_emulate32_cdecl_r
 #else /* __x86_64__ */
 #define syscall_emulate_callback     x86_syscall_emulate_cdecl
 #define syscall_emulate_callback_r   x86_syscall_emulate_cdecl_r

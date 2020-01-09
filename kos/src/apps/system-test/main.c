@@ -48,6 +48,7 @@ NOTHROW_NCX(__LIBCCALL ctest_vsubtestf)(char const *__restrict format,
 	va_copy(args_copy, args);
 	format_vprintf(&syslog_printer, (void *)(uintptr_t)LOG_DEBUG, format, args_copy);
 	va_end(args_copy);
+	syslog_printer((void *)(uintptr_t)LOG_DEBUG, "\n", 1);
 	printf("\tTesting if: ");
 	vprintf(format, args);
 	putchar('\n');

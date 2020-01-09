@@ -1395,14 +1395,15 @@ compat_sigaction_to_sigaction(CHECKED USER struct compat_sigaction const *self,
 PRIVATE void KCALL
 sigaction_to_compat_sigaction(struct sigaction const *__restrict self,
                               CHECKED USER struct compat_sigaction *result) {
-	*(compat_ptr(void) *)&result->sa_handler  = (compat_ptr(void))(void *)self->sa_handler;
+	typedef compat_funptr(void, , compat_sa_restorer_t, (void));
+	result->sa_handler = (__sighandler32_t)(uintptr_t)(void *)self->sa_handler;
 	memcpy(&result->sa_mask, &self->sa_mask, MIN(sizeof(sigset_t), sizeof(compat_sigset_t)));
 	__STATIC_IF(sizeof(compat_sigset_t) > sizeof(sigset_t)) {
 		memset((byte_t *)&result->sa_mask + sizeof(sigset_t), 0,
 		       sizeof(compat_sigset_t) - sizeof(sigset_t));
 	}
 	result->sa_flags = self->sa_flags;
-	*(compat_ptr(void) *)&result->sa_restorer  = (compat_ptr(void))(void *)self->sa_restorer;
+	result->sa_restorer = (compat_sa_restorer_t)(uintptr_t)(void *)self->sa_restorer;
 }
 
 PRIVATE errno_t KCALL

@@ -37,6 +37,7 @@
 #include <sched/iobm.h>
 #include <sched/pid.h>
 #include <sched/tss.h>
+#include <sched/userkern.h>
 
 #include <hybrid/atomic.h>
 
@@ -48,6 +49,7 @@
 
 #include <assert.h>
 #include <signal.h>
+#include <stdint.h>
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
@@ -360,25 +362,105 @@ again_lookup_node_already_locked:
 			node = vm_getnodeofpageid(effective_vm, pageid);
 			if unlikely(!node) {
 				sync_endread(effective_vm);
-				if (pageid >= PAGEID_ENCODE(KERNELSPACE_BASE) &&
-				    effective_vm != &vm_kernel && isuser()) {
-					/* This can happen depending on what the CPU does when
-					 * attempting to access the IOB vector associated with
-					 * the calling thread.
-					 * In this case, we must re-attempt the lookup within kernel-space. */
-					sync_read(&vm_kernel);
-					node = vm_getnodeofpageid(&vm_kernel, pageid);
-					if (node && !node->vn_part) {
+				if (pageid >= PAGEID_ENCODE(KERNELSPACE_BASE)) {
+					if (effective_vm != &vm_kernel && isuser()) {
+						/* This can happen depending on what the CPU does when
+						 * attempting to access the IOB vector associated with
+						 * the calling thread.
+						 * In this case, we must re-attempt the lookup within kernel-space. */
+						sync_read(&vm_kernel);
+						node = vm_getnodeofpageid(&vm_kernel, pageid);
+						if (node && !node->vn_part) {
+							sync_endread(&vm_kernel);
+							/* Reservation node. */
+							if (is_iob_node(node))
+								goto do_handle_iob_node_access;
+							goto pop_connections_and_throw_segfault;
+						}
 						sync_endread(&vm_kernel);
-						/* Reservation node. */
-						if (is_iob_node(node))
-							goto do_handle_iob_node_access;
-						goto pop_connections_and_throw_segfault;
 					}
-					sync_endread(&vm_kernel);
 				}
+#if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__x86_64__)
+				else {
+					/* We can get here if the calling program is running in compatibility
+					 * mode, and has just attempted to perform a memory access/call to its
+					 * ukern segment.
+					 * NOTE: At this point we already know that `addr < KERNELSPACE_BASE',
+					 *       and because any non-canonical CR2 would have instead caused
+					 *       a GPF, we actually also know that `addr <= 0x0000ffffffffffff' */
+					if (icpustate_getcs(state) == SEGMENT_USER_CODE32_RPL &&
+					    addr >= (void *)(uintptr_t)COMPAT_KERNELSPACE_BASE &&
+					    /* NOTE: The addr <= 32-bit is necessary since the hosted
+					     *       application may have done something like `*(u32 *)0xffffffff = 0',
+					     *       which would (among other addresses) have also accessed
+					     *       memory beyond the 32-bit address space, and I'm not entirely
+					     *       sure if a processor would wrap the pointer in this case...
+					     * Also: There may be other ways for 32-bit programs to deref 64-bit
+					     *       pointers that I can't think of right now. */
+					    addr <= (void *)(uintptr_t)UINT32_C(0xffffffff)) {
+						/* The access is of a 32-bit program trying to reach into
+						 * what it ~thinks~ is the location of its kernel-space.
+						 * -> Try to handle this case by re-sizing the `v_kernreserve'
+						 *    to instead start at +3GiB, but only do so if there isn't
+						 *    anything else mapped within that address range.
+						 * Technically, it would be more correct if'd had already done
+						 * this during the exec() that spawned the calling application,
+						 * especially since prior to this being done, the application
+						 * would have been able to map something else into the +3GiB...+4GiB
+						 * address space range, however given that this is highly kos-specific
+						 * behavior, I do think that doing this lazily should be ok (especially
+						 * since a 32-bit program trying to map into +3GiB...+4GiB would already
+						 * be doing something that it shouldn't, as attempting to map that area
+						 * of memory is something that cannot be done when hosted by a 32-bit
+						 * kernel) */
+						sync_write(effective_vm);
+						node = vm_getnodeofpageid(effective_vm, pageid);
+						/* Re-check that there is no mapping at the accessed address. */
+						if unlikely(node != NULL) {
+							sync_downgrade(effective_vm);
+							goto got_node_and_effective_vm_lock;
+						}
+						/* Make sure that `v_kernreserve' hasn't already been extended. */
+						assert(effective_vm->v_kernreserve.vn_node.a_vmin == KERNELSPACE_MINPAGEID ||
+						       effective_vm->v_kernreserve.vn_node.a_vmin == PAGEID_ENCODE(COMPAT_KERNELSPACE_BASE));
+						if (effective_vm->v_kernreserve.vn_node.a_vmin == KERNELSPACE_MINPAGEID) {
+							/* Make sure that the +3GiB...+4GiB region is currently unmapped. */
+							if (!vm_isused(effective_vm,
+							               (void *)(uintptr_t)COMPAT_KERNELSPACE_BASE,
+							               ((uintptr_t)UINT64_C(0x100000000) -
+							                (uintptr_t)COMPAT_KERNELSPACE_BASE))) {
+								/* All right! Let's extend the `v_kernreserve' node! */
+								printk(KERN_DEBUG "[x32] Extend v_kernreserve to include +3GiB...+4GiB\n");
+								node = &effective_vm->v_kernreserve;
+								assert(node->vn_vm == effective_vm);
+#ifdef NDEBUG
+								vm_node_remove(effective_vm, (void *)KERNELSPACE_BASE);
+#else /* NDEBUG */
+								{
+									struct vm_node *removed_node;
+									removed_node = vm_node_remove(effective_vm, (void *)KERNELSPACE_BASE);
+									assert(removed_node == node);
+								}
+#endif /* !NDEBUG */
+								node->vn_node.a_vmin = PAGEID_ENCODE(COMPAT_KERNELSPACE_BASE);
+								node->vn_part  = &userkern_segment_part_compat;
+								node->vn_block = &userkern_segment_block_compat;
+								/* Re-insert the node and continue operating as if we'd found
+								 * everything as it has been changed into from the get-go. */
+								vm_node_insert(node);
+								sync_downgrade(effective_vm);
+								goto got_node_and_effective_vm_lock;
+							}
+						}
+						sync_endwrite(effective_vm);
+					}
+				}
+#endif /* !CONFIG_NO_USERKERN_SEGMENT && __x86_64__ */
 				goto pop_connections_and_throw_segfault;
 			}
+#if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__x86_64__)
+got_node_and_effective_vm_lock:
+#endif /* !CONFIG_NO_USERKERN_SEGMENT && __x86_64__ */
 			if unlikely(!node->vn_part) {
 				struct cpu *mycpu;
 				sync_endread(effective_vm);
@@ -526,12 +608,25 @@ do_handle_iob_node_access:
 							pos_t vio_addr;
 							uintptr_t callsite_pc;
 							uintptr_t sp;
+#ifdef __x86_64__
+							bool is_compat;
+#endif /* __x86_64__ */
 							/* Must unwind the stack to restore the IP of the VIO call-site. */
 							sp = icpustate_getsp(state);
 							if (sp >= KERNELSPACE_BASE && isuser())
 								goto do_normal_vio; /* Validate the stack-pointer for user-space. */
+#ifdef __x86_64__
+							is_compat = icpustate_is32bit(state);
+#endif /* __x86_64__ */
 							TRY {
-								callsite_pc = *(uintptr_t *)sp;
+#ifdef __x86_64__
+								if (is_compat) {
+									callsite_pc = (uintptr_t)*(u32 *)sp;
+								} else
+#endif /* __x86_64__ */
+								{
+									callsite_pc = *(uintptr_t *)sp;
+								}
 							} EXCEPT {
 								if (!was_thrown(E_SEGFAULT))
 									RETHROW();
@@ -543,7 +638,7 @@ do_handle_iob_node_access:
 							             : (callsite_pc < KERNELSPACE_BASE))
 								goto do_normal_vio;
 							icpustate_setpc(state, callsite_pc);
-							icpustate_setsp(state, sp + 8);
+							icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
 #else /* __x86_64__ */
 							if (sp != (uintptr_t)(&state->ics_irregs_k + 1) ||
 							    isuser()) {
@@ -1058,12 +1153,25 @@ throw_segfault:
 	if (pc == (uintptr_t)addr) {
 		/* This can happen when trying to call an invalid function pointer.
 		 * -> Try to unwind this happening. */
+#ifdef __x86_64__
+		bool is_compat;
+#endif /* __x86_64__ */
 		uintptr_t callsite_pc;
 		uintptr_t sp = icpustate_getsp(state);
 		if (sp >= KERNELSPACE_BASE && (sp != (uintptr_t)(&state->ics_irregs + 1) || isuser()))
 			goto not_a_badcall;
+#ifdef __x86_64__
+		is_compat = icpustate_is32bit(state);
+#endif /* __x86_64__ */
 		TRY {
-			callsite_pc = *(uintptr_t *)sp;
+#ifdef __x86_64__
+			if (is_compat) {
+				callsite_pc = (uintptr_t)*(u32 *)sp;
+			} else
+#endif /* __x86_64__ */
+			{
+				callsite_pc = *(uintptr_t *)sp;
+			}
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT)) {
 				if (isuser())
@@ -1077,7 +1185,7 @@ throw_segfault:
 		             : (callsite_pc < KERNELSPACE_BASE))
 			goto not_a_badcall;
 		icpustate_setpc(state, callsite_pc);
-		icpustate_setsp(state, sp + 8);
+		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
 #else /* __x86_64__ */
 		if (sp != (uintptr_t)(&state->ics_irregs_k + 1) || isuser()) {
 			if (callsite_pc >= KERNELSPACE_BASE)
@@ -1109,8 +1217,8 @@ throw_segfault:
 		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
 		PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
-#if X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
-    X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING
+#if (X86_PAGEFAULT_ECODE_USERSPACE == E_SEGFAULT_CONTEXT_USERCODE && \
+     X86_PAGEFAULT_ECODE_WRITING == E_SEGFAULT_CONTEXT_WRITING)
 		PERTASK_SET(this_exception_pointers[1],
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT) |
 		            (uintptr_t)(ecode & (X86_PAGEFAULT_ECODE_USERSPACE | X86_PAGEFAULT_ECODE_WRITING)));

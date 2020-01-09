@@ -178,8 +178,19 @@ NOTHROW(KCALL vm_destroy)(struct vm *__restrict self) {
 		iter = next;
 	}
 #ifndef CONFIG_NO_USERKERN_SEGMENT
+#ifndef NDEBUG
+#ifdef __ARCH_HAVE_COMPAT
+	if (self->v_kernreserve.vn_part == &userkern_segment_part_compat) {
+		assert(self->v_kernreserve.vn_block == &userkern_segment_block_compat);
+	} else {
+		assert(self->v_kernreserve.vn_part == &userkern_segment_part);
+		assert(self->v_kernreserve.vn_block == &userkern_segment_block);
+	}
+#else /* __ARCH_HAVE_COMPAT */
 	assert(self->v_kernreserve.vn_part == &userkern_segment_part);
 	assert(self->v_kernreserve.vn_block == &userkern_segment_block);
+#endif /* !__ARCH_HAVE_COMPAT */
+#endif /* !NDEBUG */
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 	/* Finalize the underlying page directory. */
 	pagedir_fini2(&self->v_pagedir, self->v_pdir_phys);

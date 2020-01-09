@@ -116,11 +116,16 @@ struct elfexec_info64 /*[PREFIX(ei_)]*/ {
 
 
 #ifdef __KERNEL__
+/* TODO: Mode these init functions into a header in /kos/src/kernel/include/i386-kos/... */
 LOCAL struct icpustate *KCALL
 elfexec_init_entry64(struct icpustate *__restrict user_state,
                      USER void *peb_address, USER void *ustack_base,
                      __size_t ustack_size, USER void *entry_pc) {
+#ifdef __x86_64__
+	set_user_gsbase(x86_get_random_userkern_address64()); /* re-roll the ukern address. */
+#else /* __x86_64__ */
 	set_user_gsbase(x86_get_random_userkern_address()); /* re-roll the ukern address. */
+#endif /* !__x86_64__ */
 	gpregs_setpdx(&user_state->ics_gpregs, (__uintptr_t)peb_address); /* ELF_ARCHX86_64_PEB_REGISTER */
 	gpregs_setpbp(&user_state->ics_gpregs, (__uintptr_t)peb_address); /* ELF_ARCHX86_64_PEB_REGISTER2 */
 	icpustate_setpc(user_state, (__uintptr_t)entry_pc);

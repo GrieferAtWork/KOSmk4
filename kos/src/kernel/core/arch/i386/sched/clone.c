@@ -114,6 +114,19 @@ NOTHROW(KCALL x86_get_random_userkern_address)(void) {
 	offset += KERNELSPACE_BASE;
 	return offset;
 }
+
+#ifdef __x86_64__
+PUBLIC NOBLOCK u32
+NOTHROW(KCALL x86_get_random_userkern_address32)(void) {
+	u32 offset;
+	/* Assign a random (pointer-aligned) offset into (compatibility-mode)
+	 * kernel-space as the base address for the userkern segment. */
+	offset = (u32)(krand32() * USERKERN_SEGMENT_ALIGN);
+	offset %= ((u32)0 - COMPAT_KERNELSPACE_BASE) - (USERKERN_SYSCALL_MAXVALID + 1);
+	offset += COMPAT_KERNELSPACE_BASE;
+	return offset;
+}
+#endif /* __x86_64__ */
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
 

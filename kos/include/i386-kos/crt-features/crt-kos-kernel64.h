@@ -2412,8 +2412,11 @@
 #define __CRT_HAVE_unwind_setreg_xfpustate 1
 #define __CRT_HAVE_unwind_setreg_xfpustate_exclusive 1
 #define __CRT_HAVE_userkern_segment_block 1
+#define __CRT_HAVE_userkern_segment_block_compat 1
 #define __CRT_HAVE_userkern_segment_part 1
+#define __CRT_HAVE_userkern_segment_part_compat 1
 #define __CRT_HAVE_userkern_segment_vio 1
+#define __CRT_HAVE_userkern_segment_vio_compat 1
 #define __CRT_HAVE_validate_executable 1
 #define __CRT_HAVE_validate_executable_opt 1
 #define __CRT_HAVE_validate_readable 1
@@ -2801,6 +2804,7 @@
 #define __CRT_HAVE_x86_fxsave 1
 #define __CRT_HAVE_x86_fxsave_mxcsr_mask 1
 #define __CRT_HAVE_x86_get_random_userkern_address 1
+#define __CRT_HAVE_x86_get_random_userkern_address32 1
 #define __CRT_HAVE_x86_getiopl 1
 #define __CRT_HAVE_x86_idt 1
 #define __CRT_HAVE_x86_idt_modify_begin 1

@@ -363,9 +363,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, pagedir_ismapped; .int 0
 	.int 0x38f5564
 	.quad .Lname90 /* index: 90 */
-	.weak vio_readw_aligned; .quad vio_readw_aligned
-	.reloc ., R_X86_64_SIZE32, vio_readw_aligned; .int 0
-	.int 0xe57ef4
+	.weak userkern_segment_part_compat; .quad userkern_segment_part_compat
+	.reloc ., R_X86_64_SIZE32, userkern_segment_part_compat; .int 0
+	.int 0xf65aef4
 	.quad .Lname91 /* index: 91 */
 	.weak vpage_alloc_untraced; .quad vpage_alloc_untraced
 	.reloc ., R_X86_64_SIZE32, vpage_alloc_untraced; .int 0
@@ -2546,10 +2546,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 636 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname636 /* index: 636 */
+	.weak vmb_find_last_node_lower_equal; .quad vmb_find_last_node_lower_equal
+	.reloc ., R_X86_64_SIZE32, vmb_find_last_node_lower_equal; .int 0
+	.int 0xe02545c
 	.quad .Lname637 /* index: 637 */
 	.weak unwind_getreg_icpustate; .quad unwind_getreg_icpustate
 	.reloc ., R_X86_64_SIZE32, unwind_getreg_icpustate; .int 0
@@ -5290,10 +5290,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 1322 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1322 /* index: 1322 */
+	.weak x86_syscall_emulate32_sysenter_r; .quad x86_syscall_emulate32_sysenter_r
+	.reloc ., R_X86_64_SIZE32, x86_syscall_emulate32_sysenter_r; .int 0
+	.int 0xb5b70d2
 	.quad .Lname1323 /* index: 1323 */
 	.weak x86_fpustate_init; .quad x86_fpustate_init
 	.reloc ., R_X86_64_SIZE32, x86_fpustate_init; .int 0
@@ -7146,10 +7146,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pidns_root; .quad pidns_root
 	.reloc ., R_X86_64_SIZE32, pidns_root; .int 0
 	.int 0x591fbd4
-	.quad 0 /* index: 1786 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1786 /* index: 1786 */
+	.weak userkern_segment_block_compat; .quad userkern_segment_block_compat
+	.reloc ., R_X86_64_SIZE32, userkern_segment_block_compat; .int 0
+	.int 0x5a10144
 	.quad .Lname1787 /* index: 1787 */
 	.weak strto32; .quad strto32
 	.reloc ., R_X86_64_SIZE32, strto32; .int 0
@@ -8635,9 +8635,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2158 /* index: 2158 */
-	.weak x86_syscall_emulate32_sysenter_r; .quad x86_syscall_emulate32_sysenter_r
-	.reloc ., R_X86_64_SIZE32, x86_syscall_emulate32_sysenter_r; .int 0
-	.int 0xb5b70d2
+	.weak x86_get_random_userkern_address32; .quad x86_get_random_userkern_address32
+	.reloc ., R_X86_64_SIZE32, x86_get_random_userkern_address32; .int 0
+	.int 0x50810d2
 	.quad 0 /* index: 2159 */
 	.quad 0
 	.int 0
@@ -12359,9 +12359,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname3089 /* index: 3089 */
-	.weak x86_dbggdt; .quad x86_dbggdt
-	.reloc ., R_X86_64_SIZE32, x86_dbggdt; .int 0
-	.int 0x5af6674
+	.weak vio_readw_aligned; .quad vio_readw_aligned
+	.reloc ., R_X86_64_SIZE32, vio_readw_aligned; .int 0
+	.int 0xe57ef4
 	.quad .Lname3090 /* index: 3090 */
 	.weak sys_umount2; .quad sys_umount2
 	.reloc ., R_X86_64_SIZE32, sys_umount2; .int 0
@@ -12634,10 +12634,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak x86_lapicbase; .quad x86_lapicbase
 	.reloc ., R_X86_64_SIZE32, x86_lapicbase; .int 0
 	.int 0xd45ea65
-	.quad 0 /* index: 3158 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3158 /* index: 3158 */
+	.weak x86_dbggdt; .quad x86_dbggdt
+	.reloc ., R_X86_64_SIZE32, x86_dbggdt; .int 0
+	.int 0x5af6674
 	.quad .Lname3159 /* index: 3159 */
 	.weak inode_readk_blocking; .quad inode_readk_blocking
 	.reloc ., R_X86_64_SIZE32, inode_readk_blocking; .int 0
@@ -13211,9 +13211,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, json_writer_addfield; .int 0
 	.int 0x64d8f4
 	.quad .Lname3302 /* index: 3302 */
-	.weak vmb_find_last_node_lower_equal; .quad vmb_find_last_node_lower_equal
-	.reloc ., R_X86_64_SIZE32, vmb_find_last_node_lower_equal; .int 0
-	.int 0xe02545c
+	.weak vm_datablock_read_unsafe; .quad vm_datablock_read_unsafe
+	.reloc ., R_X86_64_SIZE32, vm_datablock_read_unsafe; .int 0
+	.int 0x881af05
 	.quad 0 /* index: 3303 */
 	.quad 0
 	.int 0
@@ -15751,9 +15751,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys_setrlimit; .int 0
 	.int 0x9babb4
 	.quad .Lname3937 /* index: 3937 */
-	.weak vm_datablock_read_unsafe; .quad vm_datablock_read_unsafe
-	.reloc ., R_X86_64_SIZE32, vm_datablock_read_unsafe; .int 0
-	.int 0x881af05
+	.weak userkern_segment_vio_compat; .quad userkern_segment_vio_compat
+	.reloc ., R_X86_64_SIZE32, userkern_segment_vio_compat; .int 0
+	.int 0xa4afce4
 	.quad .Lname3938 /* index: 3938 */
 	.weak isr_vector_trigger; .quad isr_vector_trigger
 	.reloc ., R_X86_64_SIZE32, isr_vector_trigger; .int 0
@@ -16513,7 +16513,7 @@ END(kernel_symbol_table)
 .Lname89:
 	.string "pagedir_ismapped"
 .Lname90:
-	.string "vio_readw_aligned"
+	.string "userkern_segment_part_compat"
 .Lname91:
 	.string "vpage_alloc_untraced"
 .Lname92:
@@ -17316,6 +17316,8 @@ END(kernel_symbol_table)
 	.string "mouse_device_read"
 .Lname634:
 	.string "oneshot_directory_file_destroy"
+.Lname636:
+	.string "vmb_find_last_node_lower_equal"
 .Lname637:
 	.string "unwind_getreg_icpustate"
 .Lname639:
@@ -18242,6 +18244,8 @@ END(kernel_symbol_table)
 	.string "inode_pathconf"
 .Lname1320:
 	.string "block_device_autopart_ex"
+.Lname1322:
+	.string "x86_syscall_emulate32_sysenter_r"
 .Lname1323:
 	.string "x86_fpustate_init"
 .Lname1324:
@@ -18868,6 +18872,8 @@ END(kernel_symbol_table)
 	.string "get_stack_inuse"
 .Lname1785:
 	.string "pidns_root"
+.Lname1786:
+	.string "userkern_segment_block_compat"
 .Lname1787:
 	.string "strto32"
 .Lname1788:
@@ -19353,7 +19359,7 @@ END(kernel_symbol_table)
 .Lname2153:
 	.string "vm_futex_destroy"
 .Lname2158:
-	.string "x86_syscall_emulate32_sysenter_r"
+	.string "x86_get_random_userkern_address32"
 .Lname2160:
 	.string "pagedir_unmap_p"
 .Lname2161:
@@ -20619,7 +20625,7 @@ END(kernel_symbol_table)
 .Lname3087:
 	.string "error_as_errno"
 .Lname3089:
-	.string "x86_dbggdt"
+	.string "vio_readw_aligned"
 .Lname3090:
 	.string "sys_umount2"
 .Lname3091:
@@ -20730,6 +20736,8 @@ END(kernel_symbol_table)
 	.string "cred_require_mmap_uninitialized"
 .Lname3157:
 	.string "x86_lapicbase"
+.Lname3158:
+	.string "x86_dbggdt"
 .Lname3159:
 	.string "inode_readk_blocking"
 .Lname3160:
@@ -20953,7 +20961,7 @@ END(kernel_symbol_table)
 .Lname3301:
 	.string "json_writer_addfield"
 .Lname3302:
-	.string "vmb_find_last_node_lower_equal"
+	.string "vm_datablock_read_unsafe"
 .Lname3304:
 	.string "heap_realloc_untraced_nx"
 .Lname3305:
@@ -21883,7 +21891,7 @@ END(kernel_symbol_table)
 .Lname3936:
 	.string "sys_setrlimit"
 .Lname3937:
-	.string "vm_datablock_read_unsafe"
+	.string "userkern_segment_vio_compat"
 .Lname3938:
 	.string "isr_vector_trigger"
 .Lname3939:

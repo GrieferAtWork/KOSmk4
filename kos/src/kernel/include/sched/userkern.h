@@ -35,6 +35,7 @@
 #include <kernel/vm.h>
 #include <sched/pertask.h>
 
+#include <compat/config.h>
 #include <kos/ukern.h>
 
 #ifdef __CC__
@@ -45,6 +46,12 @@ DECL_BEGIN
 DATDEF struct vm_datablock_type_vio userkern_segment_vio;
 DATDEF struct vm_datablock userkern_segment_block;
 DATDEF struct vm_datapart userkern_segment_part;
+
+#ifdef __ARCH_HAVE_COMPAT
+DATDEF struct vm_datablock_type_vio userkern_segment_vio_compat;
+DATDEF struct vm_datablock userkern_segment_block_compat;
+DATDEF struct vm_datapart userkern_segment_part_compat;
+#endif /* __ARCH_HAVE_COMPAT */
 
 DECL_END
 

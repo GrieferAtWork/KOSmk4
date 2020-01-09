@@ -31,10 +31,12 @@
 #include <kernel/vm/exec.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/userkern.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
+#include <compat/config.h>
 #include <sys/wait.h>
 
 #include <assert.h>
@@ -833,7 +835,7 @@ handle_remove_write_error:
 			                         task_terminate_rpcs,
 			                         /* Low priority: We don't care when the thread actually gets terminated,
 			                          *               so we instruction the scheduler that our termination RPC
-			                          *               is allowed to be serviced asynchronously. */
+			                          *               is allowed to be serviced at a later point in time. */
 			                         TASK_RPC_FLOWPRIO |
 			                         /* Wait for IPI: If the thread is hosted by a different CPU, we need to wait
 			                          *               for that CPU to acknowledge the IPI before we can commence.
@@ -916,6 +918,54 @@ handle_remove_write_error:
 
 		/* Re-insert the kernel-reserve node. */
 		assert(target->v_kernreserve.vn_vm == target);
+		/* In compatibility-mode, there is a chance that `v_kernreserve' was
+		 * resized to span a larger region of memory in order to simulate an
+		 * address space that may be found on the emulated architecture.
+		 * This happens mainly as the result of attempting to access ukern
+		 * at an address that should have been apart of kernel-space, but
+		 * wasn't because kernel-space was actually allocated elsewhere:
+		 * >> PF_HANDLER:
+		 * >>     if (ATTEMTED_TO_ACCESS_UNMAPPED_ADDRESS) {
+		 * >> #if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__ARCH_HAVE_COMPAT)
+		 * >>         if (IN_COMPAT_MODE() &&
+		 * >>             FAULT_ADDR < KERNELSPACE_BASE &&
+		 * >>             FAULT_ADDR >= COMPAT_KERNELSPACE_BASE) {
+		 * >>             sync_write(THIS_VM);
+		 * >>             if (!vm_isused(THIS_VM, COMPAT_KERNELSPACE_BASE,
+		 * >>                            KERNELSPACE_BASE - COMPAT_KERNELSPACE_BASE)) {
+		 * >>                 struct vm_node *kr = vm_node_remove(THIS_VM, KERNELSPACE_BASE);
+		 * >>                 assert(kr == &THIS_VM->v_kernreserve);
+		 * >>                 // Extend the kern-reserve node to fill the
+		 * >>                 // entire compat-mode kernel address space.
+		 * >>                 kr->vn_node.a_vmin = PAGEID_ENCODE(COMPAT_KERNELSPACE_BASE);
+		 * >>                 vm_node_insert(kr);
+		 * >>                 sync_endwrite(THIS_VM);
+		 * >>                 goto try_lookup_node_at_accessed_address;
+		 * >>             }
+		 * >>             sync_endwrite(THIS_VM);
+		 * >>         }
+		 * >> #endif // ...
+		 * >>     }
+		 */
+#if defined(__ARCH_HAVE_COMPAT) && !defined(CONFIG_NO_USERKERN_SEGMENT)
+		if (target->v_kernreserve.vn_part == &userkern_segment_part_compat) {
+			assert(target->v_kernreserve.vn_block == &userkern_segment_block_compat);
+#ifdef KERNELSPACE_HIGHMEM
+#if defined(COMPAT_KERNELSPACE_BASE) && COMPAT_KERNELSPACE_BASE != KERNELSPACE_BASE
+			target->v_kernreserve.vn_node.a_vmin = KERNELSPACE_MINPAGEID;
+			assert(target->v_kernreserve.vn_node.a_vmax == KERNELSPACE_MAXPAGEID);
+#endif /* COMPAT_KERNELSPACE_BASE && COMPAT_KERNELSPACE_BASE != KERNELSPACE_BASE */
+#else /* KERNELSPACE_HIGHMEM */
+#if defined(COMPAT_KERNELSPACE_END) && COMPAT_KERNELSPACE_END != KERNELSPACE_END
+			assert(target->v_kernreserve.vn_node.a_vmin == KERNELSPACE_MINPAGEID);
+			target->v_kernreserve.vn_node.a_vmax = KERNELSPACE_MAXPAGEID;
+#endif /* COMPAT_KERNELSPACE_END && COMPAT_KERNELSPACE_END != KERNELSPACE_END */
+#endif /* !KERNELSPACE_HIGHMEM */
+			target->v_kernreserve.vn_part  = &userkern_segment_part;
+			target->v_kernreserve.vn_block = &userkern_segment_block;
+		}
+#endif /* __ARCH_HAVE_COMPAT && !CONFIG_NO_USERKERN_SEGMENT */
+
 		vm_node_insert(&target->v_kernreserve);
 
 		/* Delete all user-space mappings within the specified target VM.

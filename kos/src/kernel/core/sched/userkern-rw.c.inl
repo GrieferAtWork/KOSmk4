@@ -73,7 +73,12 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 	VALUE_TYPE result;
 #endif /* DEFINE_IO_READ */
 	uintptr_t reladdr;
-	uintptr_t base = get_userkern_base();
+	uintptr_t base;
+#if USERKERN_WIDTH == __SIZEOF_POINTER__
+	base = get_userkern_base();
+#else /* USERKERN_WIDTH == __SIZEOF_POINTER__ */
+	base = get_compat_userkern_base();
+#endif /* USERKERN_WIDTH != __SIZEOF_POINTER__ */
 	if (!ADDR_ISKERN(base))
 		goto err_invalid_addr;
 #ifdef KERNELSPACE_HIGHMEM
@@ -93,7 +98,11 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_USERKERN_BASE,
 			      value);
+#if USERKERN_WIDTH == __SIZEOF_POINTER__
 		set_userkern_base(value);
+#else /* USERKERN_WIDTH == __SIZEOF_POINTER__ */
+		set_compat_userkern_base(value);
+#endif /* USERKERN_WIDTH != __SIZEOF_POINTER__ */
 #endif /* !DEFINE_IO_READ */
 		break;
 

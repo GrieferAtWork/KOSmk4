@@ -101,11 +101,17 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 		uintptr_t callsite_pc;
 		uintptr_t sp = icpustate_getsp(state);
 		unsigned int i;
+		bool is_compat;
 		callsite_pc = (uintptr_t)pc;
 		if (sp >= KERNELSPACE_BASE && isuser())
 			goto set_noncanon_pc_exception;
+		is_compat = icpustate_is32bit(state);
 		TRY {
-			callsite_pc = *(uintptr_t *)sp;
+			if (is_compat) {
+				callsite_pc = (uintptr_t)*(u32 *)sp;
+			} else {
+				callsite_pc = *(uintptr_t *)sp;
+			}
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT)) {
 				if (isuser())
@@ -120,7 +126,7 @@ x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is
 			goto set_noncanon_pc_exception;
 		}
 		icpustate_setpc(state, callsite_pc);
-		icpustate_setsp(state, sp + 8);
+		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
 		TRY {
 			void const *call_instr;
 			call_instr = instruction_pred((void *)callsite_pc);
