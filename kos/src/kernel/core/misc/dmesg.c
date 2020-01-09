@@ -20,6 +20,7 @@
 #define GUARD_KERNEL_SRC_MISC_DMESG_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 #define _KOS_SOURCE 1
+#define SYSLOG_LINEMAX CONFIG_SYSLOG_LINEMAX
 
 /* NOTE: Don't add any assertion checks to this file!
  *       The syslog is used excessively by all kernel panic/assert/check
@@ -31,11 +32,19 @@
 #include <debugger/config.h>
 #include <debugger/function.h>
 #include <kernel/dmesg.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <inttypes.h>
 #include <stddef.h>
+#include <string.h>
+
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <time.h>
+#include <debugger/io.h>
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 DECL_BEGIN
 
@@ -119,7 +128,7 @@ again:
 		oldest_packet_start = offset_from_start + 1;
 	}
 #undef getb
-	if unlikely(oldest_packet_start == (size_t)-1)
+	if unlikely(oldest_packet_start >= total_size)
 		return;
 	/* Decode the seconds offset of the oldest packet. */
 	decode_rel_seconds(oldest_packet_start, &seconds_diff);
@@ -176,11 +185,17 @@ NOTHROW(FCALL dmesg_post)(struct syslog_packet const *__restrict packet,
                           unsigned int level) {
 	s64 rel_seconds;
 	u8 rel_seconds_neg;
+	u8 checksum;
 	u32 nano;
 	size_t offset = dmesg_size;
 	u16 i, len;
 	i   = 0;
 	len = packet->sp_len;
+	if unlikely(!len)
+		return; /* Ignore empty messages. */
+	--len; /* Trim the trailing \n-character. */
+	if unlikely(len > CONFIG_SYSLOG_LINEMAX)
+		return; /* Disallow messages longer than `CONFIG_SYSLOG_LINEMAX' */
 	COMPILER_BARRIER();
 #define putb(byte) (dmesg_buffer[offset % CONFIG_DMESG_BUFFER_SIZE] = (byte), ++offset)
 again_header:
@@ -214,6 +229,7 @@ again_header:
 	putb(0x80 | ((nano >> 14) & 0x7f));
 	putb(0x80 | ((nano >> 21) & 0x7f));
 	putb(0x80 | ((nano >> 28) & 0x3) | ((level << 2) & 0x7c));
+	checksum = 0;
 	for (; i < len; ++i) {
 		char ch = packet->sp_msg[i];
 		if (ch == '\n')
@@ -221,8 +237,14 @@ again_header:
 		putb(ch);
 		if unlikely(!ch)
 			goto again_header; /* May happen due to race conditions (just write another header) */
+		checksum += (u8)ch;
 	}
-	putb(0); /* Terminate the packet */
+	checksum = 0xff - checksum;
+	if (!checksum)
+		checksum = 0xff;
+	putb(checksum); /* Checksum */
+	putb(0); /* Terminate the message */
+
 #undef putb
 	COMPILER_BARRIER();
 	dmesg_size = offset;
@@ -252,6 +274,255 @@ PUBLIC struct syslog_sink dmesg_sink = {
  * from within the debugger: more messages get added, maybe even override the
  * ones you were trying to look at. */
 DEFINE_DBG_BZERO_OBJECT(dmesg_sink.ss_levels);
+/* While inside of the debugger, don't make dmesg appear inconsistent. */
+DEFINE_DBG_BZERO_OBJECT(dmesg_consistent);
+
+
+/* Try to load a system log message into `buffer' and
+ * validate that the message's checksum is in-tact.
+ * WARNING: Even with the checksum check in place, there is a 1/256
+ *          chance that a corrupted system log message could be read.
+ *          And even beyond this, there is a chance that a corrupted
+ *          message had previously been written to the dmesg buffer.
+ *          These chances are extremely slim, however still non-zero,
+ *          so be aware that the produced message may not be what was
+ *          originally written!
+ * HINT: Please note that while this function technically allows you
+ *       to extract messages that are longer than `CONFIG_SYSLOG_LINEMAX'
+ *       bytes of raw text, it is impossible to write messages longer than
+ *       this to the dmesg buffer
+ * @param: buffer:         The target buffer (with enough space for at least `message_length' bytes)
+ * @param: message_offset: Offset into the dmesg buffer where the message starts.
+ * @param: message_length: The length of the written message.
+ * @return: true:  Successfully extracted the message.
+ * @return: false: The message's checksum did not match (this likely means that
+ *                 the end of the dmesg backlog was reached, since another entry
+ *                 was probably responsible for overwriting this one's message) */
+PUBLIC bool KCALL
+dmesg_getmessage(USER CHECKED char *buffer,
+                 size_t message_offset,
+                 size_t message_length)
+		THROWS(E_SEGFAULT) {
+	size_t i;
+	u8 nul, chksum, real_chksum = 0;
+	for (i = 0; i < message_length; ++i, ++message_offset) {
+		byte_t b;
+		b = dmesg_buffer[message_offset % CONFIG_DMESG_BUFFER_SIZE];
+		real_chksum += b;
+		buffer[i] = (char)b;
+	}
+	chksum = dmesg_buffer[(message_offset++) % CONFIG_DMESG_BUFFER_SIZE]; /* checksum */
+	nul    = dmesg_buffer[(message_offset++) % CONFIG_DMESG_BUFFER_SIZE]; /* trailing NUL-byte */
+	if unlikely(nul != '\0')
+		return false; /* Missing trailing NUL-byte */
+	real_chksum = 0xff - real_chksum;
+	if (!real_chksum)
+		real_chksum = 0xff;
+	if unlikely(chksum != real_chksum)
+		return false; /* Miss-matching checksums. */
+	return true; /* Success! */
+}
+
+
+/* Enumerate up to `limit' recently written system log entries.
+ * s.a. The simplified variant of this function `dmesg_enum()' with automatically
+ *      handles message extraction and checksum verification, as well as automatically
+ *      stopping enumeration once a bad checksum is encountered.
+ * NOTE: Log messages are enumerated from most-recent to least-recent
+ * @param: callback: Enumeration callback.
+ * @param: arg:      Argument to-be passed to `*callback'
+ * @param: limit:    The max number of messages to enumerate
+ * @param: offset:   The number of leading messages to skip
+ * @return: >= 0:    The sum of all invocations of `*callback'
+ *                   If `*callback' was never invoked, or always returned
+ *                   `0', `0' will also be returned by this function.
+ * @return: < 0:     The propagation of the first negative return value of `*callback'. */
+PUBLIC NONNULL((1)) ssize_t KCALL
+dmesg_enum(dmesg_enum_t callback, void *arg,
+           unsigned int offset, unsigned int limit) {
+	ssize_t callback_temp, result = 0;
+	struct syslog_packet packet;
+	size_t message_end_offset;
+	size_t message_start_offset;
+	size_t packet_start_offset;
+	size_t offset_from_end = 0;
+	size_t message_length;
+	unsigned int level, nth;
+	byte_t temp, nano[5];
+	s64 rel_seconds;
+	/* Try to wait for inconsistencies to go away. */
+	while (ATOMIC_READ(dmesg_consistent)) {
+		if (task_tryyield_or_pause() != TASK_TRYYIELD_SUCCESS)
+			break;
+	}
+	limit += offset;
+	message_end_offset = ATOMIC_READ(dmesg_size);
+#define getb() (++offset_from_end, --message_end_offset, dmesg_buffer[message_end_offset % CONFIG_DMESG_BUFFER_SIZE])
+	temp = getb(); /* NUL-temrinator */
+	if (temp != 0)
+		goto done; /* Missing NUL packet-terminator. */
+	for (nth = 0; limit; --limit, ++nth) {
+		getb(); /* checksum */
+		if (offset_from_end >= CONFIG_DMESG_BUFFER_SIZE)
+			goto done;
+#undef getb
+		packet_start_offset = message_end_offset;
+#define getb() (++offset_from_end, --packet_start_offset, dmesg_buffer[packet_start_offset % CONFIG_DMESG_BUFFER_SIZE])
+		for (;;) {
+			byte_t b;
+			b = getb();
+			if (!b)
+				break;
+			if (offset_from_end >= CONFIG_DMESG_BUFFER_SIZE)
+				goto done;
+		}
+		++packet_start_offset;
+		message_start_offset = packet_start_offset;
+		/* Decode the message's timestamp. */
+		message_start_offset = decode_rel_seconds(message_start_offset, &rel_seconds);
+		packet.sp_time = dmesg_secondsbase + rel_seconds;
+		nano[0] = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
+		nano[1] = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
+		nano[2] = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
+		nano[3] = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
+		nano[4] = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
+		/* Decode the message's level. */
+		level = (nano[4] & 0x7c) >> 2;
+		if (level > SYSLOG_LEVEL_COUNT)
+			goto done; /* Invalid syslog level */
+		/* Decode the message's nanosecond timestamp. */
+		packet.sp_nsec = ((u32)(nano[0] & 0x7f)) |
+		                 ((u32)(nano[1] & 0x7f) << 7) |
+		                 ((u32)(nano[2] & 0x7f) << 14) |
+		                 ((u32)(nano[3] & 0x7f) << 21) |
+		                 ((u32)(nano[4] & 0x3) << 28);
+		if unlikely(packet.sp_nsec >= 1000000000)
+			goto done; /* Invalid nano seconds timestamp. */
+		message_length = message_end_offset - message_start_offset;
+		if unlikely(!message_length)
+			goto done; /* Message empty */
+		if unlikely(message_length > CONFIG_SYSLOG_LINEMAX)
+			goto done; /* Message too long */
+		/* Extract the entry's message and verify its checksum. */
+		if (!dmesg_getmessage(packet.sp_msg,
+		                      message_start_offset,
+		                      message_length))
+			goto done;
+#undef getb
+		message_end_offset = packet_start_offset - 1;
+		if (offset) {
+			--offset;
+			continue;
+		}
+		/* Enumerate this packet. */
+		packet.sp_len = (u16)message_length;
+		callback_temp = (*callback)(arg, &packet, level, nth);
+		if unlikely(callback_temp < 0)
+			goto err;
+		result += callback_temp;
+	}
+done:
+	return result;
+err:
+	return callback_temp;
+}
+
+
+
+
+struct dmesg_getpacket_data {
+	USER CHECKED struct syslog_packet *dg_buf;        /* [1..1] Buffer */
+	USER CHECKED unsigned int         *dp_plevel;     /* [0..1] Level pointer. */
+	u16                                dg_msg_buflen; /* Message buffer length. */
+};
+
+PRIVATE NONNULL((2)) ssize_t KCALL
+dmesg_getpacket_callback(void *arg, struct syslog_packet *__restrict packet,
+                         unsigned int level, unsigned int UNUSED(nth)) {
+	struct dmesg_getpacket_data *data;
+	data = (struct dmesg_getpacket_data *)arg;
+	if (data->dg_msg_buflen >= packet->sp_len) {
+		memcpy(data->dg_buf, packet,
+		       offsetof(struct syslog_packet, sp_msg) +
+		       packet->sp_len);
+		if (data->dp_plevel)
+			*data->dp_plevel = level;
+	}
+	return (ssize_t)packet->sp_len;
+}
+
+/* Lookup the `nth' latest dmesg packet, and store it within `buf'
+ * @param: msg_buflen: The size of `buf->sp_msg' (in bytes)
+ * @return: > msg_buflen:  The required buffer size for `buf->sp_msg'
+ * @return: <= msg_buflen: [== buf->sp_len] Success 
+ * @return: 0:             No such syslog packet. */
+PUBLIC u16 KCALL
+dmesg_getpacket(USER CHECKED struct syslog_packet *buf,
+                USER CHECKED unsigned int *plevel,
+                u16 msg_buflen, unsigned int nth) {
+	struct dmesg_getpacket_data data;
+	data.dg_buf        = buf;
+	data.dp_plevel     = plevel;
+	data.dg_msg_buflen = msg_buflen;
+	return (u16)dmesg_enum(&dmesg_getpacket_callback, &data, nth, 1);
+}
+
+
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_DBGRODATA char const dbg_dmesg_colors[SYSLOG_LEVEL_COUNT][10] = {
+	/* [(unsigned int)SYSLOG_LEVEL_EMERG  ] */ DF_SETCOLOR(DBG_COLOR_RED, DBG_COLOR_WHITE),
+	/* [(unsigned int)SYSLOG_LEVEL_ALERT  ] */ DF_SETCOLOR(DBG_COLOR_RED, DBG_COLOR_WHITE),
+	/* [(unsigned int)SYSLOG_LEVEL_CRIT   ] */ DF_SETCOLOR(DBG_COLOR_RED, DBG_COLOR_WHITE),
+	/* [(unsigned int)SYSLOG_LEVEL_ERR    ] */ DF_SETFGCOLOR(DBG_COLOR_MAROON),
+	/* [(unsigned int)SYSLOG_LEVEL_WARNING] */ DF_SETFGCOLOR(DBG_COLOR_YELLOW),
+	/* [(unsigned int)SYSLOG_LEVEL_NOTICE ] */ DF_SETFGCOLOR(DBG_COLOR_NAVY),
+	/* [(unsigned int)SYSLOG_LEVEL_INFO   ] */ DF_SETFGCOLOR(DBG_COLOR_BLUE),
+	/* [(unsigned int)SYSLOG_LEVEL_TRACE  ] */ DF_SETFGCOLOR(DBG_COLOR_CYAN),
+	/* [(unsigned int)SYSLOG_LEVEL_DEBUG  ] */ DF_SETFGCOLOR(DBG_COLOR_OLIVE),
+	/* [(unsigned int)SYSLOG_LEVEL_DEFAULT] */ "",
+	/* [(unsigned int)SYSLOG_LEVEL_RAW    ] */ "",
+};
+
+PRIVATE ATTR_DBGTEXT void KCALL
+dmesg_print_packet(struct syslog_packet *__restrict packet,
+                   unsigned int level) {
+	struct tm tms;
+	gmtime_r(&packet->sp_time, &tms);
+	dbg_printf(DBGSTR("%.2u:%.2u:%.2u.%.4" PRIu32 " "),
+	           tms.tm_hour, tms.tm_min, tms.tm_sec,
+	           packet->sp_nsec / 100000);
+	dbg_printf(DBGSTR("%s%$s" DF_RESETATTR "\n"),
+	           dbg_dmesg_colors[level],
+	           (size_t)packet->sp_len,
+	           (size_t)packet->sp_msg);
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"dmesg",
+		"dmesg\n"
+		"\tEnumerate most recent system log messages\n",
+		argc, argv) {
+	unsigned int nth;
+	/* TODO: Options to filter the log, etc... */
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	(void)argv;
+	for (nth = 0;; ++nth) {
+		if (!dmesg_getpacket(NULL, NULL, 0, nth))
+			break;
+	}
+	while (nth) {
+		struct syslog_packet packet;
+		unsigned int level;
+		--nth;
+		if (!dmesg_getpacket(&packet, &level, sizeof(packet.sp_msg), nth))
+			continue;
+		dmesg_print_packet(&packet, level);
+	}
+	return 0;
+}
+
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 
 DECL_END

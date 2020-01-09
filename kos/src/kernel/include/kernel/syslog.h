@@ -26,6 +26,10 @@
 
 DECL_BEGIN
 
+#ifndef CONFIG_SYSLOG_LINEMAX
+#define CONFIG_SYSLOG_LINEMAX 498 /* Max length of a single syslog line */
+#endif /* !CONFIG_SYSLOG_LINEMAX */
+
 #define SYSLOG_LEVEL_EMERG   __CCAST(void *)0
 #define SYSLOG_LEVEL_ALERT   __CCAST(void *)1
 #define SYSLOG_LEVEL_CRIT    __CCAST(void *)2
@@ -49,8 +53,8 @@ DECL_BEGIN
 
 struct syslog_packet {
 	time_t sp_time;                        /* Seconds since 01.01.1970T00:00:00 */
-	u32    sp_nsec;                        /* Nano seconds added to `sp_time'. */
-	u16    sp_len;                         /* Syslog message length. */
+	u32    sp_nsec;                        /* Nano seconds added to `sp_time' (< 1_000_000_000). */
+	u16    sp_len;                         /* Syslog message length (including the trailing '\n'-character). */
 #ifdef SYSLOG_LINEMAX
 	char   sp_msg[SYSLOG_LINEMAX];         /* Syslog message. */
 #else /* SYSLOG_LINEMAX */

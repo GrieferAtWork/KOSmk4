@@ -24,12 +24,14 @@
 #include <kernel/syslog.h>
 #include <kernel/types.h>
 
+#include <bits/format-printer.h>
+
 DECL_BEGIN
 
 #ifdef __CC__
 
 #ifndef CONFIG_DMESG_BUFFER_SIZE
-#define CONFIG_DMESG_BUFFER_SIZE 16384
+#define CONFIG_DMESG_BUFFER_SIZE 8192
 #endif /* !CONFIG_DMESG_BUFFER_SIZE */
 
 /* The dmesg buffer is a wrap-around buffer of tightly packed, consecutive packets
@@ -47,7 +49,14 @@ DECL_BEGIN
  *    0x80 | nano3         Nano seconds
  *    0x80 | level_nano4   Nano seconds and level
  *    message...           The log message (in ASCII and without trailing line-feeds)
- *    0x00                 NUL packet terminator (you )
+ *    message_chksum       Checksum for `message' (never 0):
+ *                         >> if (message_chksum != 0xff) {
+ *                         >>     ok = (u8)(sum(message.bytes) + message_chksum) == 0;
+ *                         >> } else {
+ *                         >>     u8 temp = (u8)sum(message.bytes);
+ *                         >>     ok = temp == 0 || temp == 1;
+ *                         >> }
+ *    0x00                 NUL packet terminator
  * >> // 30-bit nano second timer
  * >> nano = ((nano0 & 0x7f)) | ((nano1 & 0x7f) << 7) |
  * >>        ((nano2 & 0x7f) << 14) | ((nano3 & 0x7f) << 21) |
@@ -76,6 +85,77 @@ DATDEF WEAK unsigned int dmesg_consistent;
  * This sink is part of the default set of syslog sinks, alongside
  * the optional, arch-specific `ARCH_DEFAULT_SYSLOG_SINK' */
 DATDEF struct syslog_sink dmesg_sink;
+
+
+/* Try to load a system log message into `buffer' and
+ * validate that the message's checksum is in-tact.
+ * WARNING: Even with the checksum check in place, there is a 1/256
+ *          chance that a corrupted system log message could be read.
+ *          And even beyond this, there is a chance that a corrupted
+ *          message had previously been written to the dmesg buffer.
+ *          These chances are extremely slim, however still non-zero,
+ *          so be aware that the produced message may not be what was
+ *          originally written!
+ * HINT: Please note that while this function technically allows you
+ *       to extract messages that are longer than `CONFIG_SYSLOG_LINEMAX'
+ *       bytes of raw text (without the trailing \n-character), it is
+ *       impossible to write messages longer than this to the dmesg buffer
+ * @param: buffer:         The target buffer (with enough space for at least `message_length' bytes)
+ * @param: message_offset: Offset into the dmesg buffer where the message starts.
+ * @param: message_length: The length of the written message.
+ * @return: true:  Successfully extracted the message.
+ * @return: false: The message's checksum did not match (this likely means that
+ *                 the end of the dmesg backlog was reached, since another entry
+ *                 was probably responsible for overwriting this one's message) */
+FUNDEF bool KCALL
+dmesg_getmessage(USER CHECKED char *buffer,
+                 size_t message_offset,
+                 size_t message_length)
+		THROWS(E_SEGFAULT);
+
+struct timespec;
+
+/* Callback for `dmesg_enum()'
+ * @param: arg:    The same value originally given to `dmesg_enum()'
+ * @param: packet: A non-volatile and verified copy of the original system log packet.
+ * @param: level:  The syslog level under which `packet' was posted.
+ * @param: nth:    Specifies the N in N'th most recently posted system log
+ *                 message, with counting starting with `0', but including any
+ *                 messages that may have been skipped due to `offset'
+ * @return: >= 0:  Success (continue enumeration)
+ * @return: < 0:   Error (stop enumeration and have `dmesg_enum()' return this same value) */
+typedef NONNULL((2)) ssize_t
+(KCALL *dmesg_enum_t)(void *arg, struct syslog_packet *__restrict packet,
+                      unsigned int level, unsigned int nth);
+
+/* Enumerate up to `limit' recently written system log entries.
+ * s.a. The simplified variant of this function `dmesg_enum()' with automatically
+ *      handles message extraction and checksum verification, as well as automatically
+ *      stopping enumeration once a bad checksum is encountered.
+ * NOTE: Log messages are enumerated from most-recent to least-recent
+ * @param: callback: Enumeration callback.
+ * @param: arg:      Argument to-be passed to `*callback'
+ * @param: limit:    The max number of messages to enumerate
+ * @param: offset:   The number of leading messages to skip
+ * @return: >= 0:    The sum of all invocations of `*callback'
+ *                   If `*callback' was never invoked, or always returned
+ *                   `0', `0' will also be returned by this function.
+ * @return: < 0:     The propagation of the first negative return value of `*callback'. */
+FUNDEF NONNULL((1)) ssize_t KCALL
+dmesg_enum(dmesg_enum_t callback, void *arg,
+           unsigned int offset DFL(0),
+           unsigned int limit DFL((unsigned int)-1));
+
+/* Lookup the `nth' latest dmesg packet, and store it within `buf'
+ * @param: msg_buflen: The size of `buf->sp_msg' (in bytes)
+ * @return: > msg_buflen:  The required buffer size for `buf->sp_msg'
+ * @return: <= msg_buflen: [== buf->sp_len] Success 
+ * @return: 0:             No such syslog packet. */
+FUNDEF u16 KCALL
+dmesg_getpacket(USER CHECKED struct syslog_packet *buf,
+                USER CHECKED unsigned int *plevel,
+                u16 msg_buflen, unsigned int nth);
+
 
 
 #endif /* __CC__ */

@@ -20,6 +20,7 @@
 #define GUARD_KERNEL_SRC_MISC_SYSLOG_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 #define _KOS_SOURCE 1
+#define SYSLOG_LINEMAX CONFIG_SYSLOG_LINEMAX
 
 /* NOTE: Don't add any assertion checks to this file!
  *       The syslog is used excessively by all kernel panic/assert/check
@@ -27,13 +28,6 @@
  *       must be fully re-entrant and non-blocking! */
 
 #include <kernel/compiler.h>
-
-#ifndef CONFIG_SYSLOG_LINEMAX
-#define CONFIG_SYSLOG_LINEMAX 498 /* Max length of a single syslog line */
-#endif /* !CONFIG_SYSLOG_LINEMAX */
-
-#define SYSLOG_LINEMAX  CONFIG_SYSLOG_LINEMAX
-
 #include <kernel/arch/syslog.h> /* ARCH_DEFAULT_SYSLOG_SINK */
 #include <kernel/dmesg.h>
 #include <kernel/except.h>

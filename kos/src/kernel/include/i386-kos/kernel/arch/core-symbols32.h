@@ -3718,10 +3718,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm86_outl; .long vm86_outl
 	.reloc ., R_386_SIZE32, vm86_outl; .int 0
 	.int 0xbc611ac
-	.long 0 /* index: 929 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname929 /* index: 929 */
+	.weak sys_rename; .long sys_rename
+	.reloc ., R_386_SIZE32, sys_rename; .int 0
+	.int 0x68df8a5
 	.long .Lname930 /* index: 930 */
 	.weak cpu_disable_preemptive_interrupts_nopr; .long cpu_disable_preemptive_interrupts_nopr
 	.reloc ., R_386_SIZE32, cpu_disable_preemptive_interrupts_nopr; .int 0
@@ -3967,9 +3967,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, thiscpu_x86_lapicversion; .int 0
 	.int 0xaf843de
 	.long .Lname991 /* index: 991 */
-	.weak sys_rename; .long sys_rename
-	.reloc ., R_386_SIZE32, sys_rename; .int 0
-	.int 0x68df8a5
+	.weak dmesg_getmessage; .long dmesg_getmessage
+	.reloc ., R_386_SIZE32, dmesg_getmessage; .int 0
+	.int 0xa19f8a5
 	.long .Lname992 /* index: 992 */
 	.weak unregister_filesystem_type; .long unregister_filesystem_type
 	.reloc ., R_386_SIZE32, unregister_filesystem_type; .int 0
@@ -4118,10 +4118,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak block_device_partition_read; .long block_device_partition_read
 	.reloc ., R_386_SIZE32, block_device_partition_read; .int 0
 	.int 0x6052404
-	.long 0 /* index: 1029 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname1029 /* index: 1029 */
+	.weak vm_writephysb; .long vm_writephysb
+	.reloc ., R_386_SIZE32, vm_writephysb; .int 0
+	.int 0x7f029e2
 	.long 0 /* index: 1030 */
 	.long 0
 	.int 0
@@ -6646,10 +6646,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak rawmemrlenl; .long rawmemrlenl
 	.reloc ., R_386_SIZE32, rawmemrlenl; .int 0
 	.int 0xc31a67c
-	.long 0 /* index: 1661 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname1661 /* index: 1661 */
+	.weak dmesg_enum; .long dmesg_enum
+	.reloc ., R_386_SIZE32, dmesg_enum; .int 0
+	.int 0x9d3167d
 	.long 0 /* index: 1662 */
 	.long 0
 	.int 0
@@ -7379,9 +7379,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, task_popconnections; .int 0
 	.int 0x74eb733
 	.long .Lname1844 /* index: 1844 */
-	.weak vm_writephysb; .long vm_writephysb
-	.reloc ., R_386_SIZE32, vm_writephysb; .int 0
-	.int 0x7f029e2
+	.weak dmesg_getpacket; .long dmesg_getpacket
+	.reloc ., R_386_SIZE32, dmesg_getpacket; .int 0
+	.int 0x7fab734
 	.long .Lname1845 /* index: 1845 */
 	.weak system_rtld_file; .long system_rtld_file
 	.reloc ., R_386_SIZE32, system_rtld_file; .int 0
@@ -17512,6 +17512,8 @@ END(kernel_symbol_table)
 	.string "path_lock_endwrite"
 .Lname928:
 	.string "vm86_outl"
+.Lname929:
+	.string "sys_rename"
 .Lname930:
 	.string "cpu_disable_preemptive_interrupts_nopr"
 .Lname931:
@@ -17587,7 +17589,7 @@ END(kernel_symbol_table)
 .Lname990:
 	.string "thiscpu_x86_lapicversion"
 .Lname991:
-	.string "sys_rename"
+	.string "dmesg_getmessage"
 .Lname992:
 	.string "unregister_filesystem_type"
 .Lname994:
@@ -17632,6 +17634,8 @@ END(kernel_symbol_table)
 	.string "task_connect_ghost_c"
 .Lname1028:
 	.string "block_device_partition_read"
+.Lname1029:
+	.string "vm_writephysb"
 .Lname1031:
 	.string "memcmpw"
 .Lname1032:
@@ -18368,6 +18372,8 @@ END(kernel_symbol_table)
 	.string "handle_manager_destroy"
 .Lname1660:
 	.string "rawmemrlenl"
+.Lname1661:
+	.string "dmesg_enum"
 .Lname1663:
 	.string "fs_filesystems_lock_upgrade"
 .Lname1664:
@@ -18569,7 +18575,7 @@ END(kernel_symbol_table)
 .Lname1843:
 	.string "task_popconnections"
 .Lname1844:
-	.string "vm_writephysb"
+	.string "dmesg_getpacket"
 .Lname1845:
 	.string "system_rtld_file"
 .Lname1846:
