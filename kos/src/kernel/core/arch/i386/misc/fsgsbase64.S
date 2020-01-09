@@ -16,6 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_S 1
 
 #include <kernel/compiler.h>
 #include <asm/cfi.h>
@@ -48,10 +50,10 @@
 /* #define TARGET_REGISTER rsp */
 /* #include "fsgsbase64-impl.S.inl" */
 
-#define TARGET_REGISTER rdi
+#define TARGET_REGISTER rsi
 #include "fsgsbase64-impl.S.inl"
 
-#define TARGET_REGISTER rsi
+#define TARGET_REGISTER rdi
 #include "fsgsbase64-impl.S.inl"
 
 #define TARGET_REGISTER r8
@@ -80,3 +82,5 @@
 
 #endif /* !__INTELLISENSE__ */
 #endif /* !CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE */
+
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_S */

@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_C
-#define GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE_C
+#define GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 #define _KOS_SOURCE 1
 
@@ -48,9 +48,10 @@ DECL_BEGIN
 	callback(rcx)                         \
 	callback(rdx)                         \
 	callback(rbx)                         \
+/*	callback(rsp) */                      \
 	callback(rbp)                         \
-	callback(rdi)                         \
 	callback(rsi)                         \
+	callback(rdi)                         \
 	callback(r8)                          \
 	callback(r9)                          \
 	callback(r10)                         \
@@ -189,4 +190,4 @@ NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 DECL_END
 #endif /* __x86_64__ */
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE_C */
