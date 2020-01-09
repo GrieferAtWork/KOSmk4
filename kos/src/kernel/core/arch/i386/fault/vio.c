@@ -683,6 +683,98 @@ NOTHROW(FCALL x86_vio_main)(/*inherit(always)*/ vio_main_args_t *__restrict args
 
 
 		/* ======================================================================== */
+		/*    MOVZX                                                                 */
+		/* ======================================================================== */
+		case 0x0fb6:
+			/*         0F B6 /r     MOVZX r16, r/m8     Move byte to word with zero-extension.
+			 *         0F B6 /r     MOVZX r32, r/m8     Move byte to doubleword, zero-extension.
+			 * REX.W + 0F B6 /r     MOVZX r64, r/m8*    Move byte to quadword, zero-extension. */
+			MOD_DECODE();
+			if (IS_MODVIO()) {
+				u8 byte = RD_VIOB();
+				IF_X86_64(if (op_flags & F_REX_W) {
+					WR_REGQ((u64)byte);
+				} else) if (op_flags & F_OP16) {
+					WR_REGW((u16)byte);
+				} else {
+					WR_REGL((u32)byte);
+				}
+				goto done;
+			}
+			break;
+
+		case 0x0fb7:
+			/*         0F B7 /r     MOVZX r32, r/m16    Move word to doubleword, zero-extension.
+			 * REX.W + 0F B7 /r     MOVZX r64, r/m16    Move word to quadword, zero-extension. */
+			MOD_DECODE();
+			if (IS_MODVIO()) {
+				u16 word = RD_VIOW();
+				IF_X86_64(if (op_flags & F_REX_W) {
+					WR_REGQ((u64)word);
+				} else) {
+					WR_REGL((u32)word);
+				}
+				goto done;
+			}
+			break;
+
+
+		/* ======================================================================== */
+		/*    MOVSX                                                                 */
+		/* ======================================================================== */
+		case 0x0fbe:
+			/*         0F B6 /r     MOVSX r16, r/m8     Move byte to word with sign-extension.
+			 *         0F B6 /r     MOVSX r32, r/m8     Move byte to doubleword, sign-extension.
+			 * REX.W + 0F B6 /r     MOVSX r64, r/m8*    Move byte to quadword, sign-extension. */
+			MOD_DECODE();
+			if (IS_MODVIO()) {
+				s8 byte = (s8)RD_VIOB();
+				IF_X86_64(if (op_flags & F_REX_W) {
+					WR_REGQ((u64)(s64)byte);
+				} else) if (op_flags & F_OP16) {
+					WR_REGW((u16)(s16)byte);
+				} else {
+					WR_REGL((u32)(s32)byte);
+				}
+				goto done;
+			}
+			break;
+
+		case 0x0fbf:
+			/*         0F B7 /r     MOVSX r32, r/m16    Move word to doubleword, sign-extension.
+			 * REX.W + 0F B7 /r     MOVSX r64, r/m16    Move word to quadword, sign-extension. */
+			MOD_DECODE();
+			if (IS_MODVIO()) {
+				s16 word = (s16)RD_VIOW();
+				IF_X86_64(if (op_flags & F_REX_W) {
+					WR_REGQ((u64)(s64)word);
+				} else) {
+					WR_REGL((u32)(s32)word);
+				}
+				goto done;
+			}
+			break;
+
+		case 0x63:
+			/*         63 /r*       MOVSXD r16, r/m16   Move word to word with sign-extension.
+			 *         63 /r*       MOVSXD r32, r/m32   Move doubleword to doubleword with sign-extension.
+			 * REX.W + 63 /r        MOVSXD r64, r/m32   Move doubleword to quadword with sign-extension. */
+			MOD_DECODE();
+			if (IS_MODVIO()) {
+				IF_X86_64(if (op_flags & F_REX_W) {
+					s32 dword = (s32)RD_VIOL();
+					WR_REGQ((u64)(s64)dword);
+				} else) if (op_flags & F_OP16) {
+					WR_REGW(RD_VIOW());
+				} else {
+					WR_REGL(RD_VIOL());
+				}
+				goto done;
+			}
+			break;
+
+
+		/* ======================================================================== */
 		/*    BINARY ARITHMATIC                                                     */
 		/* ======================================================================== */
 		case 0x80:
@@ -4478,7 +4570,7 @@ undefined_instruction:
 			fixed_pc = (uintptr_t)instruction_succ((void const *)end_pc);
 			if (fixed_pc > (uintptr_t)end_pc)
 				end_pc = (byte_t *)fixed_pc;
-			printk(KERN_WARNING "[vio] unrecognized instruction %#I32x (accessing %p)\n", opcode, cr2);
+			printk(KERN_WARNING "[vio] Unrecognized instruction %#I32x (accessing %p)\n", opcode, cr2);
 			icpustate_setpc(state, (uintptr_t)end_pc);
 			PERTASK_SET(this_exception_code, ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE));
 			PERTASK_SET(this_exception_pointers[0], (uintptr_t)opcode);
