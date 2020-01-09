@@ -617,6 +617,14 @@ STATIC_ASSERT(IO_CLOEXEC == IO_FROM_OPENFLAG(O_CLOEXEC));
 STATIC_ASSERT(IO_CLOFORK == IO_FROM_OPENFLAG(O_CLOFORK));
 STATIC_ASSERT(IO_NONBLOCK == IO_FROM_OPENFLAG(O_NONBLOCK));
 
+
+
+
+
+/************************************************************************/
+/* pipe2(), pipe()                                                      */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_PIPE2
 DEFINE_SYSCALL2(errno_t, pipe2,
                 USER UNCHECKED fd_t *, pipedes,
                 oflag_t, flags) {
@@ -660,12 +668,19 @@ DEFINE_SYSCALL2(errno_t, pipe2,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_PIPE2 */
 
-#ifdef __NR_pipe
+#ifdef __ARCH_WANT_SYSCALL_PIPE
 DEFINE_SYSCALL1(errno_t, pipe, USER UNCHECKED fd_t *, pipedes) {
 	return sys_pipe2(pipedes, 0);
 }
-#endif /* __NR_pipe */
+#endif /* __ARCH_WANT_SYSCALL_PIPE */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PIPE
+DEFINE_COMPAT_SYSCALL1(errno_t, pipe, USER UNCHECKED fd_t *, pipedes) {
+	return sys_pipe2(pipedes, 0);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PIPE */
 
 
 DECL_END
