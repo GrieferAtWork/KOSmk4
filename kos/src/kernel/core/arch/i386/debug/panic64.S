@@ -134,6 +134,10 @@ PUBLIC_FUNCTION(kernel_panic)
 	ASM_PUSH_SGBASE_CFI_R
 	ASM_PUSH_SGREGS_CFI_R(%rax)
 
+	/* Reload RCX and RDX, as they have been clobbered by `ASM_PUSH_SGBASE_CFI_R' */
+	movq   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_RCX)(%rsp), %rcx
+	movq   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_RDX)(%rsp), %rdx
+
 	/* struct x86_64_va_list_reg_save_area */
 	pushq_cfi %r9
 	pushq_cfi %r8
