@@ -40,6 +40,10 @@
 %[typecompat(i386:linux_olduname = *:linux_olduname)]
 %[typecompat(i386:linux_uname = *:linux_uname)]
 %[typecompat(i386:utsname = *:utsname)]
+%[typecompat(i386:termio = *:termio)]
+%[typecompat(i386:termios = *:termios)]
+%[typecompat(i386:termios2 = *:termios2)]
+%[typecompat(i386:winsize = *:winsize)]
 
 
 @@Restore the specified register state when returning from a signal handler

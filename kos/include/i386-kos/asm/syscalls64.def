@@ -37,6 +37,10 @@
 %[typecompat(x86_64:linux_olduname = *:linux_olduname)]
 %[typecompat(x86_64:linux_uname = *:linux_uname)]
 %[typecompat(x86_64:utsname = *:utsname)]
+%[typecompat(x86_64:termio = *:termio)]
+%[typecompat(x86_64:termios = *:termios)]
+%[typecompat(x86_64:termios2 = *:termios2)]
+%[typecompat(x86_64:winsize = *:winsize)]
 
 /* Define type compatibilities between x86_64 and i386 */
 %[typecompat(x86_64:[timeb,__timebx64] = i386:[__timebx32_64])]

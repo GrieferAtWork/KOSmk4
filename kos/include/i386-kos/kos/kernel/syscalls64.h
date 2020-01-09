@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7fa06d0 */
+/* HASH CRC-32:0x30d0ab4b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -467,7 +467,6 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_OLDOLDUNAME             1
 #define __ARCH_WANT_COMPAT_SYSCALL_OLDUNAME                1
 #define __ARCH_WANT_COMPAT_SYSCALL_OPEN_BY_HANDLE_AT       1
-#define __ARCH_WANT_COMPAT_SYSCALL_OPENPTY                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_PPOLL                   1
 #define __ARCH_WANT_COMPAT_SYSCALL_PPOLL64                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_PREADV                  1

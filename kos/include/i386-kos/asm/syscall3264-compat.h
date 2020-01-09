@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd4296dc */
+/* HASH CRC-32:0xf859ae57 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,6 +172,7 @@
 #define __NR3264COMPAT_nfsservctl             1(nfsservctl)
 #define __NR3264COMPAT_open                   1(open)
 #define __NR3264COMPAT_openat                 1(openat)
+#define __NR3264COMPAT_openpty                1(openpty)
 #define __NR3264COMPAT_pause                  1(pause)
 #define __NR3264COMPAT_perf_event_open        1(perf_event_open)
 #define __NR3264COMPAT_personality            1(personality)

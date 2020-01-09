@@ -359,6 +359,13 @@ pty_alloc(REF struct pty_master **__restrict pmaster,
 }
 
 
+
+
+
+/************************************************************************/
+/* openpty()                                                            */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_OPENPTY
 DEFINE_SYSCALL5(errno_t, openpty,
                 USER UNCHECKED fd_t *, amaster,
                 USER UNCHECKED fd_t *, aslave,
@@ -401,6 +408,7 @@ DEFINE_SYSCALL5(errno_t, openpty,
 	}
 	return -EOK;
 }
+#endif /* __ARCH_WANT_SYSCALL_OPENPTY */
 
 DECL_END
 
