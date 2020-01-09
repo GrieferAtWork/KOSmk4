@@ -41,6 +41,7 @@ PUBLIC_FUNCTION(kernel_panic_here)
 	leal   4(%esp), %ecx /* struct ucpustate *state */
 	PUBLIC(kernel_vpanic_ucpustate)
 	call   kernel_vpanic_ucpustate
+	nop /* For tracebacks... */
 	.cfi_endproc
 END(kernel_panic_here)
 
@@ -61,6 +62,7 @@ PUBLIC_FUNCTION(kernel_vpanic)
 	leal   4(%esp), %ecx /* struct ucpustate *state */
 	PUBLIC(kernel_vpanic_ucpustate)
 	call   kernel_vpanic_ucpustate
+	nop /* For tracebacks... */
 	.cfi_endproc
 END(kernel_vpanic)
 
@@ -82,6 +84,7 @@ PUBLIC_FUNCTION(kernel_panic)
 	pushl_cfi %eax                          /* va_list args */
 	PUBLIC(kernel_vpanic_ucpustate)
 	call   kernel_vpanic_ucpustate
+	nop /* For tracebacks... */
 	.cfi_endproc
 END(kernel_panic)
 

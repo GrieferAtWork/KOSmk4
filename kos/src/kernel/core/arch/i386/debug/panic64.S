@@ -63,6 +63,7 @@ PUBLIC_FUNCTION(kernel_panic_here)
 	movq   %rsp, %rdi /* struct ucpustate *__restrict state */
 	PUBLIC(kernel_vpanic_ucpustate)
 	call   kernel_vpanic_ucpustate
+	nop /* For tracebacks... */
 	.cfi_endproc
 END(kernel_panic_here)
 
@@ -100,6 +101,7 @@ PUBLIC_FUNCTION(kernel_vpanic)
 	movq   %rsp, %rdi /* struct ucpustate *__restrict state */
 	PUBLIC(kernel_vpanic_ucpustate)
 	call   kernel_vpanic_ucpustate
+	nop /* For tracebacks... */
 	.cfi_endproc
 END(kernel_vpanic)
 
@@ -154,6 +156,7 @@ PUBLIC_FUNCTION(kernel_panic)
 
 	PUBLIC(kernel_vpanic_ucpustate)
 	call   kernel_vpanic_ucpustate
+	nop /* For tracebacks... */
 	.cfi_endproc
 END(kernel_panic)
 
