@@ -1613,8 +1613,8 @@ vio_cmpxch128(struct vio_args *__restrict args,
 		result.v64[0] = vio_readq(args, addr + 0);
 		result.v64[1] = vio_readq(args, addr + 8);
 		if (memcmp(&result, &oldvalue, 16) == 0) {
-			vio_writeq(args, addr + 0, ((u64 *)&newvalue)[0]);
-			vio_writeq(args, addr + 8, ((u64 *)&newvalue)[1]);
+			vio_writeq(args, addr + 0, uint128_vec64(newvalue)[0]);
+			vio_writeq(args, addr + 8, uint128_vec64(newvalue)[1]);
 		}
 #else /* CONFIG_VIO_HAS_QWORD */
 		result.v32[0] = vio_readl(args, addr + 0);
@@ -1622,10 +1622,10 @@ vio_cmpxch128(struct vio_args *__restrict args,
 		result.v32[2] = vio_readl(args, addr + 8);
 		result.v32[3] = vio_readl(args, addr + 12);
 		if (memcmp(&result, &oldvalue, 16) == 0) {
-			vio_writel(args, addr + 0,  ((u32 *)&newvalue)[0]);
-			vio_writel(args, addr + 4,  ((u32 *)&newvalue)[1]);
-			vio_writel(args, addr + 8,  ((u32 *)&newvalue)[2]);
-			vio_writel(args, addr + 12, ((u32 *)&newvalue)[3]);
+			vio_writel(args, addr + 0,  uint128_vec32(newvalue)[0]);
+			vio_writel(args, addr + 4,  uint128_vec32(newvalue)[1]);
+			vio_writel(args, addr + 8,  uint128_vec32(newvalue)[2]);
+			vio_writel(args, addr + 12, uint128_vec32(newvalue)[3]);
 		}
 #endif /* !CONFIG_VIO_HAS_QWORD */
 		return result.v128;

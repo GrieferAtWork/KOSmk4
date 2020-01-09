@@ -321,7 +321,7 @@ END(x86_syscall_emulate64_int80h_r)
 .section .text.cold
 INTERN_FUNCTION(__x86_asm64_syscall_break)
 	/* For `int 80h' system calls:
-	 *   Called when a system call number hasn't been assigned (%eax:sysno) */
+	 *   Called when a system call number hasn't been assigned (%rax:sysno) */
 	.cfi_startproc simple
 	EXTERN(x86_syscall_personality_asm64_syscall_break)
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall_break
@@ -329,7 +329,7 @@ INTERN_FUNCTION(__x86_asm64_syscall_break)
 	.cfi_def_cfa %rsp, 0
 
 	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	testq  $(EFLAGS_CF), OFFSET_IRREGS_RFLAGS(%rsp)
+	testb  $(EFLAGS_CF), OFFSET_IRREGS_RFLAGS(%rsp)
 	jnz    1f
 	movq   $-ENOSYS, %rax
 	intr_exit

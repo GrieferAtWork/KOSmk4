@@ -156,22 +156,22 @@ SECTIONS {
 		KEEP(*(.rodata.cold.debug_functions))
 		PROVIDE_HIDDEN(__kernel_debug_functions_end = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_debug_functions_size = ABSOLUTE(ABSOLUTE(__kernel_debug_functions_end) - ABSOLUTE(__kernel_debug_functions_start)));
-		DEFINE_CALLBACK_VECTOR(dbg_init,.rodata.cold.callback.dbg_init)
-		DEFINE_CALLBACK_VECTOR(dbg_reset,.rodata.cold.callback.dbg_reset)
-		DEFINE_CALLBACK_VECTOR(dbg_fini,.rodata.cold.callback.dbg_fini)
+		DEFINE_CALLBACK_VECTOR(dbg_init, .rodata.cold.callback.dbg_init)
+		DEFINE_CALLBACK_VECTOR(dbg_reset, .rodata.cold.callback.dbg_reset)
+		DEFINE_CALLBACK_VECTOR(dbg_fini, .rodata.cold.callback.dbg_fini)
 #endif /* !CONFIG_NO_DEBUGGER */
-		DEFINE_CALLBACK_VECTOR(system_clearcaches,.rodata.cold.callback.system_clearcaches)
+		DEFINE_CALLBACK_VECTOR(system_clearcaches, .rodata.cold.callback.system_clearcaches)
 
-		DEFINE_CALLBACK_VECTOR(idle_job,.rodata.callback.idle_job)
-		DEFINE_CALLBACK_VECTOR(pertask_init,.rodata.callback.pertask.init)
-		DEFINE_CALLBACK_VECTOR(pertask_fini,.rodata.callback.pertask.fini)
-		DEFINE_CALLBACK_VECTOR(pertask_clone,.rodata.callback.pertask.clone)
-		DEFINE_CALLBACK_VECTOR(pertask_onexit,.rodata.callback.pertask.onexit)
-		DEFINE_CALLBACK_VECTOR(pervm_init,.rodata.callback.pervm.init)
-		DEFINE_CALLBACK_VECTOR(pervm_fini,.rodata.callback.pervm.fini)
-		DEFINE_CALLBACK_VECTOR(pervm_clone,.rodata.callback.pervm.clone)
-		DEFINE_CALLBACK_VECTOR(pervm_onexec,.rodata.callback.pervm.onexec)
-		DEFINE_CALLBACK_VECTOR(validatable_heaps,.rodata.heaps.validatable)
+		DEFINE_CALLBACK_VECTOR(idle_job, .rodata.callback.idle_job)
+		DEFINE_CALLBACK_VECTOR(pertask_init, .rodata.callback.pertask.init)
+		DEFINE_CALLBACK_VECTOR(pertask_fini, .rodata.callback.pertask.fini)
+		DEFINE_CALLBACK_VECTOR(pertask_clone, .rodata.callback.pertask.clone)
+		DEFINE_CALLBACK_VECTOR(pertask_onexit, .rodata.callback.pertask.onexit)
+		DEFINE_CALLBACK_VECTOR(pervm_init, .rodata.callback.pervm.init)
+		DEFINE_CALLBACK_VECTOR(pervm_fini, .rodata.callback.pervm.fini)
+		DEFINE_CALLBACK_VECTOR(pervm_clone, .rodata.callback.pervm.clone)
+		DEFINE_CALLBACK_VECTOR(pervm_onexec, .rodata.callback.pervm.onexec)
+		DEFINE_CALLBACK_VECTOR(validatable_heaps, .rodata.heaps.validatable)
 
 		*(.rodata.cold .rodata.unlikely .rodata.cold.*)
 	}

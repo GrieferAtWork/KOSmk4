@@ -43,7 +43,7 @@ __DECL_BEGIN
 #define VM86_EFLAGS_NT          0x4000 /* [bit(14)] Nested Task Flag (System). */
 
 
-#define VM86_ADDR(segment,offset) (((segment) << 4) + (offset))
+#define VM86_ADDR(segment, offset) (((segment) << 4) + (offset))
 
 
 #ifdef __CC__

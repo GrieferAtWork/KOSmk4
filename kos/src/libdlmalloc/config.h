@@ -55,9 +55,9 @@
 #undef FOOTERS
 #ifdef NDEBUG
 #define INSECURE 1
-#else
+#else /* NDEBUG */
 #undef INSECURE
-#endif
+#endif /* !NDEBUG */
 #define USE_DL_PREFIX 1
 #undef MALLOC_INSPECT_ALL
 #undef ABORT
