@@ -36,6 +36,7 @@
 
 #include <fs/node.h>
 #include <fs/vfs.h>
+#include <kernel/gdt.h>
 #include <kernel/types.h>
 #include <sched/arch/posix-signal.h>
 
@@ -121,6 +122,7 @@ LOCAL struct icpustate *KCALL
 elfexec_init_entry32(struct icpustate *__restrict user_state,
                      USER void *peb_address, USER void *ustack_base,
                      __size_t ustack_size, USER void *entry_pc) {
+	set_user_fsbase(x86_get_random_userkern_address()); /* re-roll the ukern address. */
 	gpregs_setpbp(&user_state->ics_gpregs, (__uintptr_t)peb_address); /* ELF_ARCH386_PEB_REGISTER */
 	icpustate_setpc(user_state, (__uintptr_t)entry_pc);
 	icpustate_setuserpsp(user_state, (__uintptr_t)ustack_base + ustack_size);

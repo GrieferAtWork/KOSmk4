@@ -74,9 +74,6 @@ INTERN FREE void NOTHROW(KCALL x86_initialize_debugger_textfont)(void);
 #ifndef CONFIG_NO_FPU
 INTDEF FREE void NOTHROW(KCALL x86_initialize_fpu)(void);
 #endif /* !CONFIG_NO_FPU */
-#ifndef CONFIG_NO_USERKERN_SEGMENT
-INTDEF uintptr_t NOTHROW(KCALL x86_get_random_userkern_address)(void);
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
 #ifndef __x86_64__
 INTDEF FREE void NOTHROW(KCALL x86_initialize_atomic64)(void);
 #endif /* !__x86_64__ */

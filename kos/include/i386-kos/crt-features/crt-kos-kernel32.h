@@ -2413,6 +2413,7 @@
 #define __CRT_HAVE_x86_fxsave 1
 #define __CRT_HAVE_x86_fxsave_mxcsr_mask 1
 #define __CRT_HAVE_x86_get_irregs 1
+#define __CRT_HAVE_x86_get_random_userkern_address 1
 #define __CRT_HAVE_x86_getiopl 1
 #define __CRT_HAVE_x86_idt 1
 #define __CRT_HAVE_x86_idt_modify_begin 1

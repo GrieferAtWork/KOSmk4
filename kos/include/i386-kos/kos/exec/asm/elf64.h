@@ -37,6 +37,7 @@
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/types.h>
+#include <kernel/gdt.h>
 #include <sched/arch/posix-signal.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
@@ -119,6 +120,7 @@ LOCAL struct icpustate *KCALL
 elfexec_init_entry64(struct icpustate *__restrict user_state,
                      USER void *peb_address, USER void *ustack_base,
                      __size_t ustack_size, USER void *entry_pc) {
+	set_user_gsbase(x86_get_random_userkern_address()); /* re-roll the ukern address. */
 	gpregs_setpdx(&user_state->ics_gpregs, (__uintptr_t)peb_address); /* ELF_ARCHX86_64_PEB_REGISTER */
 	gpregs_setpbp(&user_state->ics_gpregs, (__uintptr_t)peb_address); /* ELF_ARCHX86_64_PEB_REGISTER2 */
 	icpustate_setpc(user_state, (__uintptr_t)entry_pc);

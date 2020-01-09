@@ -463,9 +463,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname115 /* index: 115 */
-	.weak x86_sysroute1_c; .quad x86_sysroute1_c
-	.reloc ., R_X86_64_SIZE32, x86_sysroute1_c; .int 0
-	.int 0xaa1f813
+	.weak x86_get_random_userkern_address; .quad x86_get_random_userkern_address
+	.reloc ., R_X86_64_SIZE32, x86_get_random_userkern_address; .int 0
+	.int 0x6b50813
 	.quad .Lname116 /* index: 116 */
 	.weak driver_delmod; .quad driver_delmod
 	.reloc ., R_X86_64_SIZE32, driver_delmod; .int 0
@@ -12378,10 +12378,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak cpu_apply_fcpustate; .quad cpu_apply_fcpustate
 	.reloc ., R_X86_64_SIZE32, cpu_apply_fcpustate; .int 0
 	.int 0xa8cac15
-	.quad 0 /* index: 3094 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3094 /* index: 3094 */
+	.weak x86_sysroute1_c; .quad x86_sysroute1_c
+	.reloc ., R_X86_64_SIZE32, x86_sysroute1_c; .int 0
+	.int 0xaa1f813
 	.quad .Lname3095 /* index: 3095 */
 	.weak json_parser_eqstring; .quad json_parser_eqstring
 	.reloc ., R_X86_64_SIZE32, json_parser_eqstring; .int 0
@@ -16553,7 +16553,7 @@ END(kernel_symbol_table)
 .Lname113:
 	.string "sys32_fsync"
 .Lname115:
-	.string "x86_sysroute1_c"
+	.string "x86_get_random_userkern_address"
 .Lname116:
 	.string "driver_delmod"
 .Lname117:
@@ -20628,6 +20628,8 @@ END(kernel_symbol_table)
 	.string "unwind_setreg_fcpustate"
 .Lname3093:
 	.string "cpu_apply_fcpustate"
+.Lname3094:
+	.string "x86_sysroute1_c"
 .Lname3095:
 	.string "json_parser_eqstring"
 .Lname3096:

@@ -27,11 +27,6 @@
 #include <kernel/vm.h>
 #include <sched/pertask.h>
 #include <sched/task.h>
-#include <sched/userkern.h>
-
-#ifndef CONFIG_NO_USERKERN_SEGMENT
-#include <kernel/rand.h>
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
 DECL_BEGIN
 
@@ -132,20 +127,6 @@ NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self) {
 PUBLIC ATTR_PERTASK uintptr_t this_x86_user_fsbase = 0;
 PUBLIC ATTR_PERTASK uintptr_t this_x86_user_gsbase = 0;
 #endif /* !__x86_64__ */
-
-#ifndef CONFIG_NO_USERKERN_SEGMENT
-INTERN NOBLOCK uintptr_t
-NOTHROW(KCALL x86_get_random_userkern_address)(void) {
-	uintptr_t offset;
-	/* Assign a random (pointer-aligned) offset into kernel-space
-	 * as the base address for the userkern segment. */
-	offset = (uintptr_t)(krand() * USERKERN_SEGMENT_ALIGN);
-	offset %= ((uintptr_t)0 - KERNELSPACE_BASE) - (USERKERN_SYSCALL_MAXVALID + 1);
-	offset += KERNELSPACE_BASE;
-	return offset;
-}
-
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
 
 DECL_END

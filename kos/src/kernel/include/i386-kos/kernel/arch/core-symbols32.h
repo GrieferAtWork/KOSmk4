@@ -12378,10 +12378,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak cpu_apply_fcpustate; .long cpu_apply_fcpustate
 	.reloc ., R_386_SIZE32, cpu_apply_fcpustate; .int 0
 	.int 0xa8cac15
-	.long 0 /* index: 3094 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname3094 /* index: 3094 */
+	.weak x86_sysroute1_c; .long x86_sysroute1_c
+	.reloc ., R_386_SIZE32, x86_sysroute1_c; .int 0
+	.int 0xaa1f813
 	.long .Lname3095 /* index: 3095 */
 	.weak json_parser_eqstring; .long json_parser_eqstring
 	.reloc ., R_386_SIZE32, json_parser_eqstring; .int 0
@@ -12815,9 +12815,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, block_device_areadv_sector; .int 0
 	.int 0x1855c82
 	.long .Lname3203 /* index: 3203 */
-	.weak x86_sysroute1_c; .long x86_sysroute1_c
-	.reloc ., R_386_SIZE32, x86_sysroute1_c; .int 0
-	.int 0xaa1f813
+	.weak x86_get_random_userkern_address; .long x86_get_random_userkern_address
+	.reloc ., R_386_SIZE32, x86_get_random_userkern_address; .int 0
+	.int 0x6b50813
 	.long .Lname3204 /* index: 3204 */
 	.weak vm_paged_sync_end; .long vm_paged_sync_end
 	.reloc ., R_386_SIZE32, vm_paged_sync_end; .int 0
@@ -20044,6 +20044,8 @@ END(kernel_symbol_table)
 	.string "unwind_setreg_fcpustate"
 .Lname3093:
 	.string "cpu_apply_fcpustate"
+.Lname3094:
+	.string "x86_sysroute1_c"
 .Lname3095:
 	.string "json_parser_eqstring"
 .Lname3096:
@@ -20183,7 +20185,7 @@ END(kernel_symbol_table)
 .Lname3202:
 	.string "block_device_areadv_sector"
 .Lname3203:
-	.string "x86_sysroute1_c"
+	.string "x86_get_random_userkern_address"
 .Lname3204:
 	.string "vm_paged_sync_end"
 .Lname3205:

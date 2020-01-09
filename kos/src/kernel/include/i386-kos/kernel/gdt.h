@@ -40,6 +40,10 @@ DATDEF ATTR_PERCPU struct segment thiscpu_x86_gdt[SEGMENT_COUNT];
 DATDEF ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT];
 DATDEF struct segment x86_bootcpu_gdt[SEGMENT_COUNT];
 
+#ifndef CONFIG_NO_USERKERN_SEGMENT
+FUNDEF uintptr_t NOTHROW(KCALL x86_get_random_userkern_address)(void);
+#endif /* !CONFIG_NO_USERKERN_SEGMENT */
+
 #ifndef ___this_x86_kernel_psp0_defined
 #define ___this_x86_kernel_psp0_defined 1
 /* [== vm_node_getend(THIS_KERNEL_STACK)]
