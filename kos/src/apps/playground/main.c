@@ -306,6 +306,22 @@ int main_sysenter(int argc, char *argv[], char *envp[]) {
 
 
 
+#if defined(__i386__) || defined(__x86_64__)
+#define HAVE_MAIN_SGBASE 1
+/************************************************************************/
+int main_sgbase(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	printf("%%fs.base = %p\n", __rdfsbase());
+	printf("%%gs.base = %p\n", __rdgsbase());
+	return 0;
+}
+/************************************************************************/
+#endif /* __i386__ || __x86_64__ */
+
+
+
+
+
 /************************************************************************/
 PRIVATE ssize_t __LIBCCALL
 debug_printer(void *UNUSED(arg), char const *message, size_t len) {
@@ -389,6 +405,9 @@ PRIVATE DEF defs[] = {
 #ifdef HAVE_MAIN_SYSENTER
 	{ "sysenter", &main_sysenter },
 #endif /* HAVE_MAIN_SYSENTER */
+#ifdef HAVE_MAIN_SGBASE
+	{ "sgbase", &main_sgbase },
+#endif /* HAVE_MAIN_SGBASE */
 	{ NULL, NULL }
 };
 

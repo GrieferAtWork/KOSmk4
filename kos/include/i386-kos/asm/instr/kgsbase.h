@@ -202,6 +202,7 @@ __ASM_L(.macro popq_cfi_kgsbase)
 __ASM_L(	movl   $(0xc0000102), %ecx) /* 0xc0000102 = IA32_KERNEL_GS_BASE */
 __ASM_L(	movl   0(%rsp), %eax)
 __ASM_L(	movl   4(%rsp), %edx)
+__ASM_L(	wrmsr)
 __ASM_L(	addq   $(8), %rsp)
 __ASM_L(	.cfi_adjust_cfa_offset -8)
 __ASM_L(.endm)
