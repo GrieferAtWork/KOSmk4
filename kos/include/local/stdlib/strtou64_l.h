@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc10bcbd4 */
+/* HASH CRC-32:0xde3fef2f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,12 +41,12 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__loca
 #endif /* !____localdep_strtou64_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtou64_l) __ATTR_NONNULL((1)) __UINT64_TYPE__
+__LOCAL_LIBC(strtou64_l) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou64_l))(char const *__restrict __nptr,
                                                         char **__endptr,
                                                         int __base,
                                                         __locale_t __locale) {
-#line 3031 "kos/src/libc/magic/stdlib.c"
+#line 1092 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_strtou64(__nptr, __endptr, __base);
 }

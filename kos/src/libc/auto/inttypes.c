@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbb5d532 */
+/* HASH CRC-32:0x691109b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,7 +130,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoimax_l)(char const *__restrict nptr,
                                        char **endptr,
                                        int base,
                                        locale_t locale) {
-#line 551 "kos/src/libc/magic/inttypes.c"
+#line 550 "kos/src/libc/magic/inttypes.c"
 	(void)locale;
 	return libc_strtoimax(nptr, endptr, base);
 }
@@ -141,7 +141,7 @@ NOTHROW_NCX(LIBCCALL libc_strtoumax_l)(char const *__restrict nptr,
                                        char **endptr,
                                        int base,
                                        locale_t locale) {
-#line 564 "kos/src/libc/magic/inttypes.c"
+#line 562 "kos/src/libc/magic/inttypes.c"
 	(void)locale;
 	return libc_strtoumax(nptr, endptr, base);
 }
@@ -152,7 +152,7 @@ NOTHROW_NCX(LIBCCALL libc_wcstoimax_l)(char32_t const *__restrict nptr,
                                        char32_t **endptr,
                                        int base,
                                        locale_t locale) {
-#line 551 "kos/src/libc/magic/inttypes.c"
+#line 550 "kos/src/libc/magic/inttypes.c"
 	(void)locale;
 	return libc_wcstoimax(nptr, endptr, base);
 }
@@ -162,7 +162,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoimax_l)(char16_t const *__restrict nptr,
                                        char16_t **endptr,
                                        int base,
                                        locale_t locale) {
-#line 551 "kos/src/libc/magic/inttypes.c"
+#line 550 "kos/src/libc/magic/inttypes.c"
 	(void)locale;
 	return libd_wcstoimax(nptr, endptr, base);
 }
@@ -173,7 +173,7 @@ NOTHROW_NCX(LIBCCALL libc_wcstoumax_l)(char32_t const *__restrict nptr,
                                        char32_t **endptr,
                                        int base,
                                        locale_t locale) {
-#line 564 "kos/src/libc/magic/inttypes.c"
+#line 562 "kos/src/libc/magic/inttypes.c"
 	(void)locale;
 	return libc_wcstoumax(nptr, endptr, base);
 }
@@ -183,7 +183,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstoumax_l)(char16_t const *__restrict nptr,
                                        char16_t **endptr,
                                        int base,
                                        locale_t locale) {
-#line 564 "kos/src/libc/magic/inttypes.c"
+#line 562 "kos/src/libc/magic/inttypes.c"
 	(void)locale;
 	return libd_wcstoumax(nptr, endptr, base);
 }

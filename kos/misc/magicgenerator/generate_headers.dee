@@ -2795,6 +2795,16 @@ again_enum_name:
 					 *     code to be generated. */
 					break;
 
+				case "alt_variant_of": {
+					local cond, none, base_func = get_tag_operand().partition(",")...;
+					cond = cond.strip();
+					base_func = base_func.strip();
+					intern_aliases.append(( cond, Cell(base_func) ));
+					aliases.append((cond, base_func));
+					if (doc is string && doc == "")
+						doc = CopyFunctionBody(base_func, identitiyConverter);
+				}	break;
+
 				default: {
 					local attr_name = tag_name.lstrip("_");
 					if (attr_name.startswith("ATTR_")) {
@@ -4532,7 +4542,7 @@ class Function {
 			return resfp;
 		}
 	}
-	
+
 
 	function generate_local_impl(
 			fp: File, with_copyright: bool = true,
@@ -4880,11 +4890,11 @@ do_return_crt:
 	function generate_libc_user_impl_proto_head(fp: File, key: Callable) {
 		if (intern_aliases) {
 			local myname = key(name);
-			fp << "#if";
+			fp << "#";
 			for (local cond, alias_name: intern_aliases) {
 				if (alias_name is Cell)
 					alias_name = key(alias_name.value);
-				fp << " " << cond << "\n";
+				fp << "if " << cond << "\n";
 				fp << "DEFINE_INTERN_ALIAS("
 				   << key_asmname(myname) << ", "
 				   << alias_name << ");\n";

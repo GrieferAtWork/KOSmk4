@@ -446,6 +446,9 @@
 #define __CRT_HAVE_disasm_single 1
 #define __CRT_HAVE_dmesg_buffer 1
 #define __CRT_HAVE_dmesg_consistent 1
+#define __CRT_HAVE_dmesg_enum 1
+#define __CRT_HAVE_dmesg_getmessage 1
+#define __CRT_HAVE_dmesg_getpacket 1
 #define __CRT_HAVE_dmesg_secondsbase 1
 #define __CRT_HAVE_dmesg_sink 1
 #define __CRT_HAVE_dmesg_size 1

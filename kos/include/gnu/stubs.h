@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86f23452 */
+/* HASH CRC-32:0xdfda5bcb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,6 +46,7 @@
 #define __stub___p__crtAssertBusy 1
 #define __stub___p__crtBreakAlloc 1
 #define __stub___p__crtDbgFlag 1
+#define __stub___p__fmode 1
 #define __stub___p__wenviron 1
 #define __stub___p__wpgmptr 1
 #define __stub___pthread_register_cancel 1
@@ -56,13 +57,6 @@
 #define __stub___signbit 1
 #define __stub___wcserror 1
 #define __stub___wcserror_s 1
-#define __stub__aligned_free 1
-#define __stub__aligned_malloc 1
-#define __stub__aligned_offset_malloc 1
-#define __stub__aligned_offset_realloc 1
-#define __stub__aligned_offset_recalloc 1
-#define __stub__aligned_realloc 1
-#define __stub__aligned_recalloc 1
 #define __stub__beep 1
 #define __stub__beginthread 1
 #define __stub__beginthreadex 1
@@ -84,30 +78,41 @@
 #define __stub__findnext64 1
 #define __stub__fpclass 1
 #define __stub__fullpath 1
+#define __stub__get_fmode 1
+#define __stub__get_invalid_parameter_handler 1
 #define __stub__get_output_format 1
+#define __stub__get_pgmptr 1
 #define __stub__get_printf_count_output 1
+#define __stub__get_purecall_handler 1
+#define __stub__get_wpgmptr 1
 #define __stub__getdiskfree 1
 #define __stub__getmaxstdio 1
 #define __stub__isctype 1
 #define __stub__isctype_l 1
 #define __stub__mktemp_s 1
-#define __stub__recalloc 1
 #define __stub__rmtmp 1
 #define __stub__searchenv_s 1
+#define __stub__set_abort_behavior 1
 #define __stub__set_controlfp 1
 #define __stub__set_error_mode 1
+#define __stub__set_fmode 1
+#define __stub__set_invalid_parameter_handler 1
 #define __stub__set_output_format 1
 #define __stub__set_printf_count_output 1
+#define __stub__set_purecall_handler 1
 #define __stub__seterrormode 1
 #define __stub__setmaxstdio 1
 #define __stub__statusfp 1
 #define __stub__statusfp2 1
 #define __stub__wcserror 1
 #define __stub__wcserror_s 1
+#define __stub__wdupenv_s 1
 #define __stub__wfdopen 1
 #define __stub__wfopen_s 1
 #define __stub__wfreopen_s 1
 #define __stub__wfsopen 1
+#define __stub__wgetenv 1
+#define __stub__wgetenv_s 1
 #define __stub__wtempnam 1
 #define __stub__wtmpnam_s 1
 #define __stub_a64l 1

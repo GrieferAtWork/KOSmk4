@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc49694f4 */
+/* HASH CRC-32:0xdf77dac1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,11 @@
 #ifndef ____localdep__ultoa_s_defined
 #define ____localdep__ultoa_s_defined 1
 #ifdef __CRT_HAVE__ultoa_s
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_ultoa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultoa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE_ultoa_s)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),ultoa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),ultoa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE__ui64toa_s) && (__SIZEOF_LONG__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_ui64toa_s,(__val,__buf,__bufsize,__radix))
-#elif defined(__CRT_HAVE_ui64toa_s) && (__SIZEOF_LONG__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),ui64toa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ui64toa_s,(__val,__buf,__buflen,__radix))
 #else /* LIBC: _ultoa_s */
 #include <local/stdlib/_ultoa_s.h>
 #define __localdep__ultoa_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ultoa_s))
@@ -39,11 +37,11 @@ __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(uns
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ultoa) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ultoa))(unsigned long __val,
-                                                   char *__dst,
+                                                   char *__buf,
                                                    int __radix) {
-#line 2990 "kos/src/libc/magic/stdlib.c"
-	__localdep__ultoa_s(__val, __dst, (__SIZE_TYPE__)-1, __radix);
-	return __dst;
+#line 3142 "kos/src/libc/magic/stdlib.c"
+	__localdep__ultoa_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
+	return __buf;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_ultoa_defined */

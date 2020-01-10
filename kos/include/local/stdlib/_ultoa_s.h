@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb579749b */
+/* HASH CRC-32:0xb70ff513 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ultoa_s) __ATTR_NONNULL((2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultoa_s))(unsigned long __val,
                                                       char *__buf,
-                                                      __SIZE_TYPE__ __bufsize,
+                                                      __SIZE_TYPE__ __buflen,
                                                       int __radix) {
-#line 2224 "kos/src/libc/magic/stdlib.c"
+#line 2284 "kos/src/libc/magic/stdlib.c"
 	char *__p;
 	unsigned long __temp;
 	if (__radix < 2)
@@ -35,7 +35,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultoa_s))(unsigned long __val,
 	__temp = __val;
 	do ++__p;
 	while ((__temp /= (unsigned int)__radix) != 0);
-	if (__bufsize <= (__SIZE_TYPE__)(__p - __buf))
+	if (__buflen <= (__SIZE_TYPE__)(__p - __buf))
 		return __ERANGE;
 	__temp = __val;
 	*__p = '\0';

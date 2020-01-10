@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x601e5201 */
+/* HASH CRC-32:0x27652fea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_c32ncasecmp_l))(__CHAR32_TYPE__
                                                                  __CHAR32_TYPE__ const *__s2,
                                                                  __SIZE_TYPE__ __s2_maxlen,
                                                                  __locale_t __locale) {
-#line 1591 "kos/src/libc/magic/wchar.c"
+#line 1600 "kos/src/libc/magic/wchar.c"
 	return __localdep_fuzzy_c32memcasecmp_l(__s1, __localdep_c32nlen(__s1, __s1_maxlen), __s2, __localdep_c32nlen(__s2, __s2_maxlen), __locale);
 }
 __NAMESPACE_LOCAL_END

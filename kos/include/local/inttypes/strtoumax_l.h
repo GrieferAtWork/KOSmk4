@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45613561 */
+/* HASH CRC-32:0xbfaff4f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,8 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__loc
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, int __base),strtouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtou64) && (__SIZEOF_INTMAX_T__ == 8)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, int __base),strtou64,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE__strtoui64) && (__SIZEOF_INTMAX_T__ == 8)
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, int __base),_strtoui64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtou32) && (__SIZEOF_INTMAX_T__ == 4)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, int __base),strtou32,(__nptr,__endptr,__base))
 #else /* LIBC: strtoumax */
@@ -46,7 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoumax_l))(char const *__restrict 
                                                          char **__endptr,
                                                          int __base,
                                                          __locale_t __locale) {
-#line 564 "kos/src/libc/magic/inttypes.c"
+#line 562 "kos/src/libc/magic/inttypes.c"
 	(void)__locale;
 	return __localdep_strtoumax(__nptr, __endptr, __base);
 }

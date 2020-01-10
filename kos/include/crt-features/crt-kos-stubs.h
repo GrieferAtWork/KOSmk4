@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b76f546 */
+/* HASH CRC-32:0xf4ee4347 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,6 +46,7 @@
 #define __CRT_STUB___p__crtAssertBusy 1
 #define __CRT_STUB___p__crtBreakAlloc 1
 #define __CRT_STUB___p__crtDbgFlag 1
+#define __CRT_STUB___p__fmode 1
 #define __CRT_STUB___p__wenviron 1
 #define __CRT_STUB___p__wpgmptr 1
 #define __CRT_STUB___pthread_register_cancel 1
@@ -56,13 +57,6 @@
 #define __CRT_STUB___signbit 1
 #define __CRT_STUB___wcserror 1
 #define __CRT_STUB___wcserror_s 1
-#define __CRT_STUB__aligned_free 1
-#define __CRT_STUB__aligned_malloc 1
-#define __CRT_STUB__aligned_offset_malloc 1
-#define __CRT_STUB__aligned_offset_realloc 1
-#define __CRT_STUB__aligned_offset_recalloc 1
-#define __CRT_STUB__aligned_realloc 1
-#define __CRT_STUB__aligned_recalloc 1
 #define __CRT_STUB__beep 1
 #define __CRT_STUB__beginthread 1
 #define __CRT_STUB__beginthreadex 1
@@ -84,30 +78,41 @@
 #define __CRT_STUB__findnext64 1
 #define __CRT_STUB__fpclass 1
 #define __CRT_STUB__fullpath 1
+#define __CRT_STUB__get_fmode 1
+#define __CRT_STUB__get_invalid_parameter_handler 1
 #define __CRT_STUB__get_output_format 1
+#define __CRT_STUB__get_pgmptr 1
 #define __CRT_STUB__get_printf_count_output 1
+#define __CRT_STUB__get_purecall_handler 1
+#define __CRT_STUB__get_wpgmptr 1
 #define __CRT_STUB__getdiskfree 1
 #define __CRT_STUB__getmaxstdio 1
 #define __CRT_STUB__isctype 1
 #define __CRT_STUB__isctype_l 1
 #define __CRT_STUB__mktemp_s 1
-#define __CRT_STUB__recalloc 1
 #define __CRT_STUB__rmtmp 1
 #define __CRT_STUB__searchenv_s 1
+#define __CRT_STUB__set_abort_behavior 1
 #define __CRT_STUB__set_controlfp 1
 #define __CRT_STUB__set_error_mode 1
+#define __CRT_STUB__set_fmode 1
+#define __CRT_STUB__set_invalid_parameter_handler 1
 #define __CRT_STUB__set_output_format 1
 #define __CRT_STUB__set_printf_count_output 1
+#define __CRT_STUB__set_purecall_handler 1
 #define __CRT_STUB__seterrormode 1
 #define __CRT_STUB__setmaxstdio 1
 #define __CRT_STUB__statusfp 1
 #define __CRT_STUB__statusfp2 1
 #define __CRT_STUB__wcserror 1
 #define __CRT_STUB__wcserror_s 1
+#define __CRT_STUB__wdupenv_s 1
 #define __CRT_STUB__wfdopen 1
 #define __CRT_STUB__wfopen_s 1
 #define __CRT_STUB__wfreopen_s 1
 #define __CRT_STUB__wfsopen 1
+#define __CRT_STUB__wgetenv 1
+#define __CRT_STUB__wgetenv_s 1
 #define __CRT_STUB__wtempnam 1
 #define __CRT_STUB__wtmpnam_s 1
 #define __CRT_STUB_a64l 1

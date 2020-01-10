@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22e8c792 */
+/* HASH CRC-32:0x90c6f93d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,29 @@
  */
 #ifndef __local__splitpath_s_defined
 #define __local__splitpath_s_defined 1
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <optimized/string.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <parts/errno.h>
+/* Dependency: "memcpyc" from "string" */
+#ifndef ____localdep_memcpyc_defined
+#define ____localdep_memcpyc_defined 1
+#ifdef __fast_memcpyc_defined
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))
+#elif defined(__CRT_HAVE_memcpyc)
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: memcpyc */
+#include <local/string/memcpyc.h>
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
+#define __localdep_memcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpyc))
+#endif /* memcpyc... */
+#endif /* !____localdep_memcpyc_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_splitpath_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath_s))(char const *__restrict __abspath,
@@ -31,19 +53,89 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath_s))(char const *__restrict
                                                           __SIZE_TYPE__ __filelen,
                                                           char *__ext,
                                                           __SIZE_TYPE__ __extlen) {
-#line 2885 "kos/src/libc/magic/stdlib.c"
-	/* TODO */
-	(void)__abspath;
-	(void)__drive;
-	(void)__drivelen;
-	(void)__dir;
-	(void)__dirlen;
-	(void)__file;
-	(void)__filelen;
-	(void)__ext;
-	(void)__extlen;
-	__COMPILER_IMPURE();
+#line 2966 "kos/src/libc/magic/stdlib.c"
+	__SIZE_TYPE__ __len, __last_slash, __last_dot;
+	if __unlikely(!__abspath)
+		goto __err_inval;
+	if __unlikely((__drive != __NULLPTR) != (__drivelen != 0))
+		goto __err_inval;
+	if __unlikely((__dir != __NULLPTR) != (__dirlen != 0))
+		goto __err_inval;
+	if __unlikely((__file != __NULLPTR) != (__filelen != 0))
+		goto __err_inval;
+	if __unlikely((__ext != __NULLPTR) != (__extlen != 0))
+		goto __err_inval;
+	for (__len = 0; __len < 3; ++__len) {
+		if (__abspath[__len] == ':') {
+			if (__drive) {
+				if __unlikely(__drivelen <= __len)
+					goto __err_range;
+				__localdep_memcpyc(__drive, __abspath, __len, sizeof(char));
+				__drive[__len] = 0;
+			}
+			__abspath += __len + 1;
+			goto __got_drive;
+		}
+	}
+	if (__drive)
+		*__drive = 0;
+__got_drive:
+	__last_slash = 0;
+	__last_dot = (__SIZE_TYPE__)-1;
+	for (__len = 0;; ++__len) {
+		char __ch = __abspath[__len];
+		if (!__ch)
+			break;
+		if (__ch == '/' || __ch == '\\')
+			__last_slash = __len + 1;
+		if (__ch == '.')
+			__last_dot = __len;
+	}
+	if (__last_slash) {
+		if (__dir) {
+			if __unlikely(__dirlen <= __last_slash)
+				goto __err_range;
+			__localdep_memcpyc(__dir, __abspath, __last_slash, sizeof(char));
+			__dir[__last_slash] = 0;
+		}
+	} else {
+		if (__dir)
+			*__dir = 0;
+	}
+	if (__last_dot != (__SIZE_TYPE__)-1) {
+		if (__ext) {
+			__SIZE_TYPE__ __path_extlen = __len - __last_dot;
+			if __unlikely(__extlen <= __path_extlen)
+				goto __err_range;
+			__localdep_memcpyc(__ext, __abspath + __last_dot, __path_extlen, sizeof(char));
+			__ext[__path_extlen] = 0;
+		}
+	} else {
+		if (__ext)
+			*__ext = 0;
+		__last_dot = __len;
+	}
+	if (__file) {
+		__len = __last_dot - __last_slash;
+		if __unlikely(__filelen <= __len)
+			goto __err_range;
+		__localdep_memcpyc(__file, __abspath + __last_slash, __len, sizeof(char));
+		__file[__len] = 0;
+	}
 	return 0;
+__err_inval:
+#ifdef __EINVAL
+	return __EINVAL;
+#else /* __EINVAL */
+	return -1;
+#endif /* !__EINVAL */
+__err_range:
+#ifdef __ERANGE
+	__libc_seterrno(__ERANGE);
+	return __ERANGE;
+#else /* __ERANGE */
+	return -1;
+#endif /* !__ERANGE */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local__splitpath_s_defined */

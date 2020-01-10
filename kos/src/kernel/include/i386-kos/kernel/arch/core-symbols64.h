@@ -3719,9 +3719,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, vm86_outl; .int 0
 	.int 0xbc611ac
 	.quad .Lname929 /* index: 929 */
-	.weak sys_rename; .quad sys_rename
-	.reloc ., R_X86_64_SIZE32, sys_rename; .int 0
-	.int 0x68df8a5
+	.weak sys32_madvise; .quad sys32_madvise
+	.reloc ., R_X86_64_SIZE32, sys32_madvise; .int 0
+	.int 0x87db8a5
 	.quad .Lname930 /* index: 930 */
 	.weak cpu_disable_preemptive_interrupts_nopr; .quad cpu_disable_preemptive_interrupts_nopr
 	.reloc ., R_X86_64_SIZE32, cpu_disable_preemptive_interrupts_nopr; .int 0
@@ -3967,9 +3967,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, thiscpu_x86_lapicversion; .int 0
 	.int 0xaf843de
 	.quad .Lname991 /* index: 991 */
-	.weak sys32_madvise; .quad sys32_madvise
-	.reloc ., R_X86_64_SIZE32, sys32_madvise; .int 0
-	.int 0x87db8a5
+	.weak dmesg_getmessage; .quad dmesg_getmessage
+	.reloc ., R_X86_64_SIZE32, dmesg_getmessage; .int 0
+	.int 0xa19f8a5
 	.quad .Lname992 /* index: 992 */
 	.weak sys32_mmap; .quad sys32_mmap
 	.reloc ., R_X86_64_SIZE32, sys32_mmap; .int 0
@@ -6646,10 +6646,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak rawmemrlenl; .quad rawmemrlenl
 	.reloc ., R_X86_64_SIZE32, rawmemrlenl; .int 0
 	.int 0xc31a67c
-	.quad 0 /* index: 1661 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1661 /* index: 1661 */
+	.weak dmesg_enum; .quad dmesg_enum
+	.reloc ., R_X86_64_SIZE32, dmesg_enum; .int 0
+	.int 0x9d3167d
 	.quad .Lname1662 /* index: 1662 */
 	.weak sys_kexec_file_load; .quad sys_kexec_file_load
 	.reloc ., R_X86_64_SIZE32, sys_kexec_file_load; .int 0
@@ -7379,9 +7379,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, task_popconnections; .int 0
 	.int 0x74eb733
 	.quad .Lname1844 /* index: 1844 */
-	.weak sys32_sched_rr_get_interval64; .quad sys32_sched_rr_get_interval64
-	.reloc ., R_X86_64_SIZE32, sys32_sched_rr_get_interval64; .int 0
-	.int 0x2626734
+	.weak dmesg_getpacket; .quad dmesg_getpacket
+	.reloc ., R_X86_64_SIZE32, dmesg_getpacket; .int 0
+	.int 0x7fab734
 	.quad .Lname1845 /* index: 1845 */
 	.weak system_rtld_file; .quad system_rtld_file
 	.reloc ., R_X86_64_SIZE32, system_rtld_file; .int 0
@@ -8799,9 +8799,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, vm_datablock_readv; .int 0
 	.int 0xec43896
 	.quad .Lname2199 /* index: 2199 */
-	.weak vm_datapart_lock_tryread; .quad vm_datapart_lock_tryread
-	.reloc ., R_X86_64_SIZE32, vm_datapart_lock_tryread; .int 0
-	.int 0x220df34
+	.weak sys32_setresgid; .quad sys32_setresgid
+	.reloc ., R_X86_64_SIZE32, sys32_setresgid; .int 0
+	.int 0xde48f34
 	.quad .Lname2200 /* index: 2200 */
 	.weak task_schedule_user_rpc_nx; .quad task_schedule_user_rpc_nx
 	.reloc ., R_X86_64_SIZE32, task_schedule_user_rpc_nx; .int 0
@@ -10922,10 +10922,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 2730 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2730 /* index: 2730 */
+	.weak sys_settimeofday; .quad sys_settimeofday
+	.reloc ., R_X86_64_SIZE32, sys_settimeofday; .int 0
+	.int 0x53ec0f9
 	.quad 0 /* index: 2731 */
 	.quad 0
 	.int 0
@@ -11230,10 +11230,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 2807 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2807 /* index: 2807 */
+	.weak vm_datapart_lock_tryread; .quad vm_datapart_lock_tryread
+	.reloc ., R_X86_64_SIZE32, vm_datapart_lock_tryread; .int 0
+	.int 0x220df34
 	.quad .Lname2808 /* index: 2808 */
 	.weak keyboard_buffer_putkey_nopr; .quad keyboard_buffer_putkey_nopr
 	.reloc ., R_X86_64_SIZE32, keyboard_buffer_putkey_nopr; .int 0
@@ -11495,9 +11495,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2873 /* index: 2873 */
-	.weak sys32_setresgid; .quad sys32_setresgid
-	.reloc ., R_X86_64_SIZE32, sys32_setresgid; .int 0
-	.int 0xde48f34
+	.weak sys32_sched_rr_get_interval64; .quad sys32_sched_rr_get_interval64
+	.reloc ., R_X86_64_SIZE32, sys32_sched_rr_get_interval64; .int 0
+	.int 0x2626734
 	.quad 0 /* index: 2874 */
 	.quad 0
 	.int 0
@@ -13983,9 +13983,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, error_vprintf; .int 0
 	.int 0x1e1ada6
 	.quad .Lname3495 /* index: 3495 */
-	.weak sys_settimeofday; .quad sys_settimeofday
-	.reloc ., R_X86_64_SIZE32, sys_settimeofday; .int 0
-	.int 0x53ec0f9
+	.weak sys_rename; .quad sys_rename
+	.reloc ., R_X86_64_SIZE32, sys_rename; .int 0
+	.int 0x68df8a5
 	.quad 0 /* index: 3496 */
 	.quad 0
 	.int 0
@@ -17725,7 +17725,7 @@ END(kernel_symbol_table)
 .Lname928:
 	.string "vm86_outl"
 .Lname929:
-	.string "sys_rename"
+	.string "sys32_madvise"
 .Lname930:
 	.string "cpu_disable_preemptive_interrupts_nopr"
 .Lname931:
@@ -17807,7 +17807,7 @@ END(kernel_symbol_table)
 .Lname990:
 	.string "thiscpu_x86_lapicversion"
 .Lname991:
-	.string "sys32_madvise"
+	.string "dmesg_getmessage"
 .Lname992:
 	.string "sys32_mmap"
 .Lname994:
@@ -18710,6 +18710,8 @@ END(kernel_symbol_table)
 	.string "vm_node_free"
 .Lname1660:
 	.string "rawmemrlenl"
+.Lname1661:
+	.string "dmesg_enum"
 .Lname1662:
 	.string "sys_kexec_file_load"
 .Lname1663:
@@ -18957,7 +18959,7 @@ END(kernel_symbol_table)
 .Lname1843:
 	.string "task_popconnections"
 .Lname1844:
-	.string "sys32_sched_rr_get_interval64"
+	.string "dmesg_getpacket"
 .Lname1845:
 	.string "system_rtld_file"
 .Lname1846:
@@ -19417,7 +19419,7 @@ END(kernel_symbol_table)
 .Lname2198:
 	.string "vm_datablock_readv"
 .Lname2199:
-	.string "vm_datapart_lock_tryread"
+	.string "sys32_setresgid"
 .Lname2200:
 	.string "task_schedule_user_rpc_nx"
 .Lname2201:
@@ -20164,6 +20166,8 @@ END(kernel_symbol_table)
 	.string "slab_kmalloc_nx64"
 .Lname2728:
 	.string "path_sprintentex"
+.Lname2730:
+	.string "sys_settimeofday"
 .Lname2732:
 	.string "sys32_tgkill"
 .Lname2733:
@@ -20264,6 +20268,8 @@ END(kernel_symbol_table)
 	.string "json_writer_putuint64"
 .Lname2805:
 	.string "kernel_debugtrap_ucpustate"
+.Lname2807:
+	.string "vm_datapart_lock_tryread"
 .Lname2808:
 	.string "keyboard_buffer_putkey_nopr"
 .Lname2810:
@@ -20337,7 +20343,7 @@ END(kernel_symbol_table)
 .Lname2870:
 	.string "json_parser_prev"
 .Lname2873:
-	.string "sys32_setresgid"
+	.string "sys32_sched_rr_get_interval64"
 .Lname2875:
 	.string "sys_rt_tgsigqueueinfo"
 .Lname2876:
@@ -21253,7 +21259,7 @@ END(kernel_symbol_table)
 .Lname3494:
 	.string "error_vprintf"
 .Lname3495:
-	.string "sys_settimeofday"
+	.string "sys_rename"
 .Lname3497:
 	.string "sys32_getpriority"
 .Lname3499:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9379d620 */
+/* HASH CRC-32:0xfe4b2903 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,39 @@
  */
 #ifndef __local__makepath_s_defined
 #define __local__makepath_s_defined 1
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <optimized/string.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <parts/errno.h>
+/* Dependency: "mempcpyc" from "string" */
+#ifndef ____localdep_mempcpyc_defined
+#define ____localdep_mempcpyc_defined 1
+#ifdef __fast_mempcpyc_defined
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+#define __localdep_mempcpyc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyc))
+#elif defined(__CRT_HAVE_mempcpyc)
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpyc,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),mempcpyc,(__dst,__src,__elem_count,__elem_size))
+#else /* LIBC: mempcpyc */
+#include <local/string/mempcpyc.h>
+/* Same as `memcpyc', but return `DST + (ELEM_COUNT * ELEM_SIZE)', rather than `DST' */
+#define __localdep_mempcpyc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpyc))
+#endif /* mempcpyc... */
+#endif /* !____localdep_mempcpyc_defined */
+
+/* Dependency: "strlen" from "string" */
+#ifndef ____localdep_strlen_defined
+#define ____localdep_strlen_defined 1
+#ifdef __CRT_HAVE_strlen
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
+#else /* LIBC: strlen */
+#include <local/string/strlen.h>
+/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+#define __localdep_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
+#endif /* strlen... */
+#endif /* !____localdep_strlen_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_makepath_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath_s))(char *__buf,
@@ -28,16 +60,49 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_makepath_s))(char *__buf,
                                                          char const *__dir,
                                                          char const *__file,
                                                          char const *__ext) {
-#line 2868 "kos/src/libc/magic/stdlib.c"
-	/* TODO */
-	(void)__buf;
-	(void)__buflen;
-	(void)__drive;
-	(void)__dir;
-	(void)__file;
-	(void)__ext;
-	__COMPILER_IMPURE();
+#line 2916 "kos/src/libc/magic/stdlib.c"
+#define __path_putn(__p, __n)                                  \
+	do {                                                 \
+		if __unlikely(__buflen < __n)                          \
+			goto __err_buflen;                             \
+		__buf = (char *)__localdep_mempcpyc(__buf, __p, __n, sizeof(char)); \
+	} __WHILE0
+#define __path_putc(__ch)          \
+	do {                       \
+		if __unlikely(!__buflen--) \
+			goto __err_buflen;   \
+		*__buf++ = (__ch);         \
+	} __WHILE0
+	if (__drive && *__drive) {
+		__path_putc(*__drive);
+		__path_putc(':');
+	}
+	if (__dir && *__dir) {
+		__SIZE_TYPE__ __len = __localdep_strlen(__dir);
+		__path_putn(__dir, __len);
+		if (__dir[__len - 1] != '/' && __dir[__len - 1] != '\\')
+			__path_putc('\\');
+	}
+	if (__file && *__file) {
+		__SIZE_TYPE__ __len = __localdep_strlen(__file);
+		__path_putn(__file, __len);
+	}
+	if (__ext && *__ext) {
+		__SIZE_TYPE__ __len = __localdep_strlen(__ext);
+		if (*__ext != ':')
+			__path_putc('.');
+		__path_putn(__ext, __len);
+	}
+	__path_putc('\0');
 	return 0;
+__err_buflen:
+#ifdef __EINVAL
+	return __EINVAL;
+#else /* __EINVAL */
+	return -1;
+#endif /* !__EINVAL */
+#undef __path_putn
+#undef __path_putc
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local__makepath_s_defined */

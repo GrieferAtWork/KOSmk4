@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf65dd9e6 */
+/* HASH CRC-32:0x6a10a729 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -908,10 +908,13 @@
 #define __CRT_SECTION__fread_nolock_s                       __CRT_SECTINFO_dos_FILE_unlocked_read_read              /* .text.crt.dos.FILE.unlocked.read.read._fread_nolock_s */
 
 /* .text.crt.dos.FILE.utility.* */
+#define __CRT_SECTION___p__fmode                            __CRT_SECTINFO_dos_FILE_utility                         /* .text.crt.dos.FILE.utility.__p__fmode */
+#define __CRT_SECTION__get_fmode                            __CRT_SECTINFO_dos_FILE_utility                         /* .text.crt.dos.FILE.utility._get_fmode */
 #define __CRT_SECTION__get_output_format                    __CRT_SECTINFO_dos_FILE_utility                         /* .text.crt.dos.FILE.utility._get_output_format */
 #define __CRT_SECTION__get_printf_count_output              __CRT_SECTINFO_dos_FILE_utility                         /* .text.crt.dos.FILE.utility._get_printf_count_output */
 #define __CRT_SECTION__getmaxstdio                          __CRT_SECTINFO_dos_FILE_utility                         /* .text.crt.dos.FILE.utility._getmaxstdio */
 #define __CRT_SECTION__rmtmp                                __CRT_SECTINFO_dos_FILE_utility                         /* .text.crt.dos.FILE.utility._rmtmp */
+#define __CRT_SECTION__set_fmode                            __CRT_SECTINFO_dos_FILE_utility                         /* .text.crt.dos.FILE.utility._set_fmode */
 #define __CRT_SECTION__set_output_format                    __CRT_SECTINFO_dos_FILE_utility                         /* .text.crt.dos.FILE.utility._set_output_format */
 #define __CRT_SECTION__set_printf_count_output              __CRT_SECTINFO_dos_FILE_utility                         /* .text.crt.dos.FILE.utility._set_printf_count_output */
 #define __CRT_SECTION__setmaxstdio                          __CRT_SECTINFO_dos_FILE_utility                         /* .text.crt.dos.FILE.utility._setmaxstdio */
@@ -930,13 +933,20 @@
 #define __CRT_SECTION___p__pgmptr                           __CRT_SECTINFO_dos_application_init                     /* .text.crt.dos.application.init.__p__pgmptr */
 #define __CRT_SECTION___p__wenviron                         __CRT_SECTINFO_dos_application_init                     /* .text.crt.dos.application.init.__p__wenviron */
 #define __CRT_SECTION___p__wpgmptr                          __CRT_SECTINFO_dos_application_init                     /* .text.crt.dos.application.init.__p__wpgmptr */
+#define __CRT_SECTION__get_pgmptr                           __CRT_SECTINFO_dos_application_init                     /* .text.crt.dos.application.init._get_pgmptr */
+#define __CRT_SECTION__get_wpgmptr                          __CRT_SECTINFO_dos_application_init                     /* .text.crt.dos.application.init._get_wpgmptr */
 
 /* .text.crt.dos.errno.* */
 #define __CRT_DOS_SECTION__strerror_s                       __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._strerror_s */
 #define __CRT_SECTION___doserrno                            __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno.__doserrno */
 #define __CRT_SECTION__get_doserrno                         __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._get_doserrno */
+#define __CRT_SECTION__get_invalid_parameter_handler        __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._get_invalid_parameter_handler */
+#define __CRT_SECTION__get_purecall_handler                 __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._get_purecall_handler */
+#define __CRT_SECTION__set_abort_behavior                   __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._set_abort_behavior */
 #define __CRT_SECTION__set_doserrno                         __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._set_doserrno */
 #define __CRT_SECTION__set_error_mode                       __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._set_error_mode */
+#define __CRT_SECTION__set_invalid_parameter_handler        __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._set_invalid_parameter_handler */
+#define __CRT_SECTION__set_purecall_handler                 __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._set_purecall_handler */
 #define __CRT_SECTION__seterrormode                         __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._seterrormode */
 #define __CRT_SECTION__strerror                             __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._strerror */
 #define __CRT_SECTION__strerror_s                           __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._strerror_s */
@@ -1555,12 +1565,20 @@
 #define __CRT_SECTION_wmemmove_s                            __CRT_SECTINFO_dos_wchar_string_memory                  /* .text.crt.dos.wchar.string.memory.wmemmove_s */
 
 /* .text.crt.dos.wchar.unicode.locale.convert.* */
+#define __CRT_DOS_SECTION__wtoi64_l                         __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert._wtoi64_l */
+#define __CRT_DOS_SECTION__wtoi_l                           __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert._wtoi_l */
+#define __CRT_DOS_SECTION__wtol_l                           __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert._wtol_l */
+#define __CRT_DOS_SECTION__wtoll_l                          __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert._wtoll_l */
+#define __CRT_DOS_SECTION_wcsto32_l                         __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcsto32_l */
+#define __CRT_DOS_SECTION_wcsto64_l                         __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcsto64_l */
 #define __CRT_DOS_SECTION_wcstod_l                          __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstod_l */
 #define __CRT_DOS_SECTION_wcstof_l                          __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstof_l */
 #define __CRT_DOS_SECTION_wcstoimax_l                       __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstoimax_l */
 #define __CRT_DOS_SECTION_wcstol_l                          __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstol_l */
 #define __CRT_DOS_SECTION_wcstold_l                         __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstold_l */
 #define __CRT_DOS_SECTION_wcstoll_l                         __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstoll_l */
+#define __CRT_DOS_SECTION_wcstou32_l                        __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstou32_l */
+#define __CRT_DOS_SECTION_wcstou64_l                        __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstou64_l */
 #define __CRT_DOS_SECTION_wcstoul_l                         __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstoul_l */
 #define __CRT_DOS_SECTION_wcstoull_l                        __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstoull_l */
 #define __CRT_DOS_SECTION_wcstoumax_l                       __CRT_SECTINFO_dos_wchar_unicode_locale_convert         /* .text.crt.dos.wchar.unicode.locale.convert.wcstoumax_l */
@@ -1591,6 +1609,20 @@
 #define __CRT_SECTION__wcsupr_s_l                           __CRT_SECTINFO_dos_wchar_unicode_locale_memory          /* .text.crt.dos.wchar.unicode.locale.memory._wcsupr_s_l */
 
 /* .text.crt.dos.wchar.unicode.static.convert.* */
+#define __CRT_DOS_SECTION__i64tow                           __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._i64tow */
+#define __CRT_DOS_SECTION__i64tow_s                         __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._i64tow_s */
+#define __CRT_DOS_SECTION__itow                             __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._itow */
+#define __CRT_DOS_SECTION__itow_s                           __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._itow_s */
+#define __CRT_DOS_SECTION__ltow                             __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._ltow */
+#define __CRT_DOS_SECTION__ltow_s                           __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._ltow_s */
+#define __CRT_DOS_SECTION__ui64tow                          __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._ui64tow */
+#define __CRT_DOS_SECTION__ui64tow_s                        __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._ui64tow_s */
+#define __CRT_DOS_SECTION__ultow                            __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._ultow */
+#define __CRT_DOS_SECTION__ultow_s                          __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._ultow_s */
+#define __CRT_DOS_SECTION__wtoi                             __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._wtoi */
+#define __CRT_DOS_SECTION__wtoi64                           __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._wtoi64 */
+#define __CRT_DOS_SECTION__wtol                             __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._wtol */
+#define __CRT_DOS_SECTION__wtoll                            __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert._wtoll */
 #define __CRT_DOS_SECTION_wcsto32                           __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert.wcsto32 */
 #define __CRT_DOS_SECTION_wcsto64                           __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert.wcsto64 */
 #define __CRT_DOS_SECTION_wcstod                            __CRT_SECTINFO_dos_wchar_unicode_static_convert         /* .text.crt.dos.wchar.unicode.static.convert.wcstod */
@@ -1673,6 +1705,8 @@
 
 /* .text.crt.errno_access.* */
 #define __CRT_SECTION___errno_location                      __CRT_SECTINFO_errno_access                             /* .text.crt.errno_access.__errno_location */
+#define __CRT_SECTION__get_errno                            __CRT_SECTINFO_errno_access                             /* .text.crt.errno_access._get_errno */
+#define __CRT_SECTION__set_errno                            __CRT_SECTINFO_errno_access                             /* .text.crt.errno_access._set_errno */
 
 /* .text.crt.error.* */
 #define __CRT_SECTION_err                                   __CRT_SECTINFO_error                                    /* .text.crt.error.err */
@@ -3588,6 +3622,11 @@
 #define __CRT_SECTION_mbrtoc32                              __CRT_SECTINFO_unicode_mbr                              /* .text.crt.unicode.mbr.mbrtoc32 */
 
 /* .text.crt.unicode.static.convert.* */
+#define __CRT_DOS_SECTION__wdupenv_s                        __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._wdupenv_s */
+#define __CRT_DOS_SECTION__wgetenv                          __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._wgetenv */
+#define __CRT_DOS_SECTION__wgetenv_s                        __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._wgetenv_s */
+#define __CRT_DOS_SECTION__wtof                             __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._wtof */
+#define __CRT_DOS_SECTION__wtof_l                           __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._wtof_l */
 #define __CRT_SECTION__atodbl                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._atodbl */
 #define __CRT_SECTION__atodbl_l                             __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._atodbl_l */
 #define __CRT_SECTION__atoflt                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._atoflt */
@@ -3597,6 +3636,11 @@
 #define __CRT_SECTION__ecvt_s                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._ecvt_s */
 #define __CRT_SECTION__fcvt_s                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._fcvt_s */
 #define __CRT_SECTION__gcvt_s                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._gcvt_s */
+#define __CRT_SECTION__wdupenv_s                            __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._wdupenv_s */
+#define __CRT_SECTION__wgetenv                              __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._wgetenv */
+#define __CRT_SECTION__wgetenv_s                            __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._wgetenv_s */
+#define __CRT_SECTION__wtof                                 __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._wtof */
+#define __CRT_SECTION__wtof_l                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert._wtof_l */
 #define __CRT_SECTION_atof                                  __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.atof */
 #define __CRT_SECTION_atoi                                  __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.atoi */
 #define __CRT_SECTION_atol                                  __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.atol */
@@ -3615,6 +3659,7 @@
 #define __CRT_SECTION_qfcvt_r                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.qfcvt_r */
 #define __CRT_SECTION_qgcvt                                 __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.qgcvt */
 #define __CRT_SECTION_strto32                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strto32 */
+#define __CRT_SECTION_strto32_l                             __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strto32_l */
 #define __CRT_SECTION_strto64                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strto64 */
 #define __CRT_SECTION_strto64_l                             __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strto64_l */
 #define __CRT_SECTION_strtod                                __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strtod */
@@ -3629,6 +3674,7 @@
 #define __CRT_SECTION_strtoll                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strtoll */
 #define __CRT_SECTION_strtoll_l                             __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strtoll_l */
 #define __CRT_SECTION_strtou32                              __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strtou32 */
+#define __CRT_SECTION_strtou32_l                            __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strtou32_l */
 #define __CRT_SECTION_strtou64                              __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strtou64 */
 #define __CRT_SECTION_strtou64_l                            __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strtou64_l */
 #define __CRT_SECTION_strtoul                               __CRT_SECTINFO_unicode_static_convert                   /* .text.crt.unicode.static.convert.strtoul */
@@ -4005,12 +4051,20 @@
 #define __CRT_SECTION_wmemset                               __CRT_SECTINFO_wchar_string_memory                      /* .text.crt.wchar.string.memory.wmemset */
 
 /* .text.crt.wchar.unicode.locale.convert.* */
+#define __CRT_SECTION__wtoi64_l                             __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert._wtoi64_l */
+#define __CRT_SECTION__wtoi_l                               __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert._wtoi_l */
+#define __CRT_SECTION__wtol_l                               __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert._wtol_l */
+#define __CRT_SECTION__wtoll_l                              __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert._wtoll_l */
+#define __CRT_SECTION_wcsto32_l                             __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcsto32_l */
+#define __CRT_SECTION_wcsto64_l                             __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcsto64_l */
 #define __CRT_SECTION_wcstod_l                              __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstod_l */
 #define __CRT_SECTION_wcstof_l                              __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstof_l */
 #define __CRT_SECTION_wcstoimax_l                           __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstoimax_l */
 #define __CRT_SECTION_wcstol_l                              __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstol_l */
 #define __CRT_SECTION_wcstold_l                             __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstold_l */
 #define __CRT_SECTION_wcstoll_l                             __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstoll_l */
+#define __CRT_SECTION_wcstou32_l                            __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstou32_l */
+#define __CRT_SECTION_wcstou64_l                            __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstou64_l */
 #define __CRT_SECTION_wcstoul_l                             __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstoul_l */
 #define __CRT_SECTION_wcstoull_l                            __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstoull_l */
 #define __CRT_SECTION_wcstoumax_l                           __CRT_SECTINFO_wchar_unicode_locale_convert             /* .text.crt.wchar.unicode.locale.convert.wcstoumax_l */
@@ -4062,6 +4116,20 @@
 #define __CRT_SECTION_wildwcscasecmp_l                      __CRT_SECTINFO_wchar_unicode_locale_memory              /* .text.crt.wchar.unicode.locale.memory.wildwcscasecmp_l */
 
 /* .text.crt.wchar.unicode.static.convert.* */
+#define __CRT_SECTION__i64tow                               __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._i64tow */
+#define __CRT_SECTION__i64tow_s                             __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._i64tow_s */
+#define __CRT_SECTION__itow                                 __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._itow */
+#define __CRT_SECTION__itow_s                               __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._itow_s */
+#define __CRT_SECTION__ltow                                 __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._ltow */
+#define __CRT_SECTION__ltow_s                               __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._ltow_s */
+#define __CRT_SECTION__ui64tow                              __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._ui64tow */
+#define __CRT_SECTION__ui64tow_s                            __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._ui64tow_s */
+#define __CRT_SECTION__ultow                                __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._ultow */
+#define __CRT_SECTION__ultow_s                              __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._ultow_s */
+#define __CRT_SECTION__wtoi                                 __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._wtoi */
+#define __CRT_SECTION__wtoi64                               __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._wtoi64 */
+#define __CRT_SECTION__wtol                                 __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._wtol */
+#define __CRT_SECTION__wtoll                                __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert._wtoll */
 #define __CRT_SECTION_wcsto32                               __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert.wcsto32 */
 #define __CRT_SECTION_wcsto64                               __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert.wcsto64 */
 #define __CRT_SECTION_wcstod                                __CRT_SECTINFO_wchar_unicode_static_convert             /* .text.crt.wchar.unicode.static.convert.wcstod */

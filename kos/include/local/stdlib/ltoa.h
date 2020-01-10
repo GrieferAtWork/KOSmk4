@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7bc8209 */
+/* HASH CRC-32:0x869e82fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,17 +23,13 @@
 #ifndef ____localdep__ltoa_s_defined
 #define ____localdep__ltoa_s_defined 1
 #ifdef __CRT_HAVE__ltoa_s
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_ltoa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ltoa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE_ltoa_s)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),ltoa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),ltoa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE__itoa_s) && (__SIZEOF_LONG__ == __SIZEOF_INT__)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_itoa_s,(__val,__buf,__bufsize,__radix))
-#elif defined(__CRT_HAVE_itoa_s) && (__SIZEOF_LONG__ == __SIZEOF_INT__)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),itoa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_itoa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE__i64toa_s) && (__SIZEOF_LONG__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_i64toa_s,(__val,__buf,__bufsize,__radix))
-#elif defined(__CRT_HAVE_i64toa_s) && (__SIZEOF_LONG__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),i64toa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64toa_s,(__val,__buf,__buflen,__radix))
 #else /* LIBC: _ltoa_s */
 #include <local/stdlib/_ltoa_s.h>
 #define __localdep__ltoa_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ltoa_s))
@@ -43,11 +39,11 @@ __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ltoa_s,(long
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ltoa) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ltoa))(long __val,
-                                                  char *__dst,
+                                                  char *__buf,
                                                   int __radix) {
-#line 2983 "kos/src/libc/magic/stdlib.c"
-	__localdep__ltoa_s(__val, __dst, (__SIZE_TYPE__)-1, __radix);
-	return __dst;
+#line 3135 "kos/src/libc/magic/stdlib.c"
+	__localdep__ltoa_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
+	return __buf;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_ltoa_defined */

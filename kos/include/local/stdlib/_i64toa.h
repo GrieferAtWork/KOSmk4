@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf86d5573 */
+/* HASH CRC-32:0x23d18de7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,17 +23,11 @@
 #ifndef ____localdep__i64toa_s_defined
 #define ____localdep__i64toa_s_defined 1
 #ifdef __CRT_HAVE__i64toa_s
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_i64toa_s,(__val,__buf,__bufsize,__radix))
-#elif defined(__CRT_HAVE_i64toa_s)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),i64toa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_i64toa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE__ltoa_s) && (__SIZEOF_LONG__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_ltoa_s,(__val,__buf,__bufsize,__radix))
-#elif defined(__CRT_HAVE_ltoa_s) && (__SIZEOF_LONG__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),ltoa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ltoa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE__itoa_s) && (__SIZEOF_INT__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_itoa_s,(__val,__buf,__bufsize,__radix))
-#elif defined(__CRT_HAVE_itoa_s) && (__SIZEOF_INT__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),itoa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__i64toa_s,(__INT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_itoa_s,(__val,__buf,__buflen,__radix))
 #else /* LIBC: _i64toa_s */
 #include <local/stdlib/_i64toa_s.h>
 #define __localdep__i64toa_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64toa_s))
@@ -45,7 +39,7 @@ __LOCAL_LIBC(_i64toa) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64toa))(__INT64_TYPE__ __val,
                                                      char *__buf,
                                                      int __radix) {
-#line 2251 "kos/src/libc/magic/stdlib.c"
+#line 2313 "kos/src/libc/magic/stdlib.c"
 	__localdep__i64toa_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }

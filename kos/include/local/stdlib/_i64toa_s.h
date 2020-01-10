@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98a3f2 */
+/* HASH CRC-32:0x34b0cbcd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,16 +24,16 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_i64toa_s) __ATTR_NONNULL((2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64toa_s))(__INT64_TYPE__ __val,
                                                        char *__buf,
-                                                       __SIZE_TYPE__ __bufsize,
+                                                       __SIZE_TYPE__ __buflen,
                                                        int __radix) {
-#line 2267 "kos/src/libc/magic/stdlib.c"
+#line 2328 "kos/src/libc/magic/stdlib.c"
 	char *__p;
 	__INT64_TYPE__ __temp;
 	if (__radix < 2)
 		__radix = 10;
 	__p = __buf;
 	if (__val < 0) {
-		if (!__bufsize--)
+		if (!__buflen--)
 			return __ERANGE;
 		*__p++ = '-';
 		__val = -__val;
@@ -41,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64toa_s))(__INT64_TYPE__ __val,
 	__temp = __val;
 	do ++__p;
 	while ((__temp /= (unsigned int)__radix) != 0);
-	if (__bufsize <= (__SIZE_TYPE__)(__p - __buf))
+	if (__buflen <= (__SIZE_TYPE__)(__p - __buf))
 		return __ERANGE;
 	__temp = __val;
 	*__p = '\0';

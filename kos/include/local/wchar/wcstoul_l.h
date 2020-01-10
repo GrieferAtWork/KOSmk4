@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfde4865 */
+/* HASH CRC-32:0xf7563216 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,9 @@
 /* Dependency: "wcstoul" from "wchar" */
 #ifndef ____localdep_wcstoul_defined
 #define ____localdep_wcstoul_defined 1
-#ifdef __CRT_HAVE_wcstoul
+#ifdef __std___localdep_wcstoul_defined
+__NAMESPACE_STD_USING(__localdep_wcstoul)
+#elif defined(__CRT_HAVE_wcstoul)
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,__localdep_wcstoul,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, int __base),wcstoul,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_wcstoull) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,__localdep_wcstoul,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, int __base),wcstoull,(__nptr,__endptr,__base))
@@ -48,7 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstoul_l))(__WCHAR_TYPE__ const *__r
                                                        __WCHAR_TYPE__ **__restrict __endptr,
                                                        int __base,
                                                        __locale_t __locale) {
-#line 1599 "kos/src/libc/magic/stdlib.c"
+#line 1639 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_wcstoul(__nptr, __endptr, __base);
 }

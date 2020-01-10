@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa524d897 */
+/* HASH CRC-32:0xf1db4ba2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,9 @@
 #ifndef ____localdep__ui64toa_s_defined
 #define ____localdep__ui64toa_s_defined 1
 #ifdef __CRT_HAVE__ui64toa_s
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_ui64toa_s,(__val,__buf,__bufsize,__radix))
-#elif defined(__CRT_HAVE_ui64toa_s)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),ui64toa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ui64toa_s,(__val,__buf,__buflen,__radix))
 #elif defined(__CRT_HAVE__ultoa_s) && (__SIZEOF_LONG__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_ultoa_s,(__val,__buf,__bufsize,__radix))
-#elif defined(__CRT_HAVE_ultoa_s) && (__SIZEOF_LONG__ == 8)
-__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),ultoa_s,(__val,__buf,__bufsize,__radix))
+__CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix),_ultoa_s,(__val,__buf,__buflen,__radix))
 #else /* LIBC: _ui64toa_s */
 #include <local/stdlib/_ui64toa_s.h>
 #define __localdep__ui64toa_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64toa_s))
@@ -41,7 +37,7 @@ __LOCAL_LIBC(_ui64toa) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ui64toa))(__UINT64_TYPE__ __val,
                                                       char *__buf,
                                                       int __radix) {
-#line 2258 "kos/src/libc/magic/stdlib.c"
+#line 2320 "kos/src/libc/magic/stdlib.c"
 	__localdep__ui64toa_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60023497 */
+/* HASH CRC-32:0x98e079f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@
 #ifdef __std___localdep_malloc_defined
 __NAMESPACE_STD_USING(__localdep_malloc)
 #elif __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
-__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL __localdep_malloc)(__SIZE_TYPE__ __n_bytes) { return __builtin_malloc(__n_bytes); }
+__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL __localdep_malloc)(__SIZE_TYPE__ __num_bytes) { return __builtin_malloc(__num_bytes); }
 #elif defined(__CRT_HAVE_malloc)
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __n_bytes),malloc,(__n_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
 #elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
 #include <local/stdlib/malloc.h>
 #define __localdep_malloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc))
@@ -63,12 +63,12 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(calloc) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(calloc))(__SIZE_TYPE__ __count,
-                                                    __SIZE_TYPE__ __n_bytes) {
+                                                    __SIZE_TYPE__ __num_bytes) {
 #line 757 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__SIZE_TYPE__ __total_bytes;
-	if (__hybrid_overflow_umul(__count, __n_bytes, &__total_bytes))
-		return __NULLPTR;
+	if __unlikely(__hybrid_overflow_umul(__count, __num_bytes, &__total_bytes))
+		__total_bytes = (__SIZE_TYPE__)-1; /* Force down-stream failure */
 	__result = __localdep_malloc(__total_bytes);
 	if __likely(__result)
 		__localdep_memset(__result, 0, __total_bytes);

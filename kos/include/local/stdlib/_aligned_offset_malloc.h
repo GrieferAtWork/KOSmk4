@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1476e38f */
+/* HASH CRC-32:0x6e45ef4f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 #ifdef __std___localdep_malloc_defined
 __NAMESPACE_STD_USING(__localdep_malloc)
 #elif __has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)
-__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL __localdep_malloc)(__SIZE_TYPE__ __n_bytes) { return __builtin_malloc(__n_bytes); }
+__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *__NOTHROW_NCX(__LIBCCALL __localdep_malloc)(__SIZE_TYPE__ __num_bytes) { return __builtin_malloc(__num_bytes); }
 #elif defined(__CRT_HAVE_malloc)
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __n_bytes),malloc,(__n_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __num_bytes),malloc,(__num_bytes))
 #elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
 #include <local/stdlib/malloc.h>
 #define __localdep_malloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc))
@@ -42,7 +42,7 @@ __LOCAL_LIBC(_aligned_offset_malloc) __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_S
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_malloc))(__SIZE_TYPE__ __num_bytes,
                                                                     __SIZE_TYPE__ __min_alignment,
                                                                     __SIZE_TYPE__ __offset) {
-#line 2580 "kos/src/libc/magic/stdlib.c"
+#line 2618 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__offset &= (__min_alignment - 1);
 	__result = __localdep_malloc(__num_bytes + 2 * sizeof(void *) + __min_alignment - 1 + (__min_alignment - __offset));

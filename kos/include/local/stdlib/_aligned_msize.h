@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x741799f0 */
+/* HASH CRC-32:0x36d5d49b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,15 +21,15 @@
 #define __local__aligned_msize_defined 1
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_aligned_msize) __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_msize))(void *__mptr,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_msize))(void *__aligned_mallptr,
                                                             __SIZE_TYPE__ __min_alignment,
                                                             __SIZE_TYPE__ __offset) {
-#line 2662 "kos/src/libc/magic/stdlib.c"
+#line 2704 "kos/src/libc/magic/stdlib.c"
 	(void)__min_alignment;
 	(void)__offset;
-	if (!__mptr)
+	if (!__aligned_mallptr)
 		return 0;
-	return (__SIZE_TYPE__)(__UINTPTR_TYPE__)((void **)__mptr)[-2];
+	return (__SIZE_TYPE__)(__UINTPTR_TYPE__)((void **)__aligned_mallptr)[-2];
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local__aligned_msize_defined */

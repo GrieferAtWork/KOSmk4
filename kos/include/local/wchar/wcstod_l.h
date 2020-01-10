@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cc7e4fe */
+/* HASH CRC-32:0xf090bd68 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,9 @@
 /* Dependency: "wcstod" from "wchar" */
 #ifndef ____localdep_wcstod_defined
 #define ____localdep_wcstod_defined 1
-#ifdef __CRT_HAVE_wcstod
+#ifdef __std___localdep_wcstod_defined
+__NAMESPACE_STD_USING(__localdep_wcstod)
+#elif defined(__CRT_HAVE_wcstod)
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstod,(__nptr,__endptr))
 #else /* LIBC: wcstod */
 #include <local/wchar/wcstod.h>
@@ -35,7 +37,7 @@ __LOCAL_LIBC(wcstod_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstod_l))(__WCHAR_TYPE__ const *__restrict __nptr,
                                                       __WCHAR_TYPE__ **__endptr,
                                                       __locale_t __locale) {
-#line 1630 "kos/src/libc/magic/stdlib.c"
+#line 1672 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_wcstod(__nptr, __endptr);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb635f38b */
+/* HASH CRC-32:0xf23fd783 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) __ATTR_ALLOC_ALI
 #ifndef ____localdep__aligned_msize_defined
 #define ____localdep__aligned_msize_defined 1
 #ifdef __CRT_HAVE__aligned_msize
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__mptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__mptr,__min_alignment,__offset))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__aligned_mallptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__aligned_mallptr,__min_alignment,__offset))
 #else /* LIBC: _aligned_msize */
 #include <local/stdlib/_aligned_msize.h>
 #define __localdep__aligned_msize (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_msize))
@@ -70,7 +70,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 #ifndef ____localdep__aligned_free_defined
 #define ____localdep__aligned_free_defined 1
 #ifdef __CRT_HAVE__aligned_free
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__mptr),_aligned_free,(__mptr))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__aligned_mallptr),_aligned_free,(__aligned_mallptr))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <local/stdlib/_aligned_free.h>
 #define __localdep__aligned_free (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_free))
@@ -81,18 +81,18 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__mptr),_aligned
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_aligned_realloc) __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(3) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_realloc))(void *__mptr,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_realloc))(void *__aligned_mallptr,
                                                               __SIZE_TYPE__ __newsize,
                                                               __SIZE_TYPE__ __min_alignment) {
-#line 2596 "kos/src/libc/magic/stdlib.c"
+#line 2635 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__result = __localdep__aligned_malloc(__newsize, __min_alignment);
-	if (__result && __mptr) {
-		__SIZE_TYPE__ __temp = __localdep__aligned_msize(__mptr, __min_alignment, 0);
+	if (__result && __aligned_mallptr) {
+		__SIZE_TYPE__ __temp = __localdep__aligned_msize(__aligned_mallptr, __min_alignment, 0);
 		if (__temp > __newsize)
 			__temp = __newsize;
-		__localdep_memcpy(__result, __mptr, __temp);
-		__localdep__aligned_free(__mptr);
+		__localdep_memcpy(__result, __aligned_mallptr, __temp);
+		__localdep__aligned_free(__aligned_mallptr);
 	}
 	return __result;
 }

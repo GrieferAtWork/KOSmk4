@@ -43,6 +43,7 @@
 #include <unistd.h>
 
 #include "../libc/init.h"
+#include "malloc.h"
 #include "stdlib.h"
 
 DECL_BEGIN
@@ -1713,12 +1714,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_malloc") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes,
                                            size_t min_alignment)
 /*[[[body:_aligned_malloc]]]*/
-{
-	(void)num_bytes;
-	(void)min_alignment;
-	CRT_UNIMPLEMENTED("_aligned_malloc"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+/*AUTO*/{
+	void *result = libc_malloc(num_bytes + 2 * sizeof(void *) + min_alignment - 1);
+	if (result) {
+		void *base = (void *)(((uintptr_t)result + (min_alignment - 1)) & ~(min_alignment - 1));
+		((void **)base)[-1] = result;
+		((void **)base)[-2] = (void *)num_bytes;
+		result = base;
+	}
+	return result;
 }
 /*[[[end:_aligned_malloc]]]*/
 
@@ -1836,36 +1840,43 @@ NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf,
 }
 /*[[[end:_fullpath]]]*/
 
-/*[[[head:_aligned_free,hash:CRC-32=0xf8bd5941]]]*/
+/*[[[head:_aligned_free,hash:CRC-32=0x4008441f]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_free") void
-NOTHROW_NCX(LIBCCALL libc__aligned_free)(void *mptr)
+NOTHROW_NCX(LIBCCALL libc__aligned_free)(void *aligned_mallptr)
 /*[[[body:_aligned_free]]]*/
-{
-	(void)mptr;
-	CRT_UNIMPLEMENTED("_aligned_free"); /* TODO */
-	libc_seterrno(ENOSYS);
+/*AUTO*/{
+	if (aligned_mallptr)
+		libc_free(((void **)aligned_mallptr)[-1]);
 }
 /*[[[end:_aligned_free]]]*/
 
-/*[[[head:_aligned_recalloc,hash:CRC-32=0x3628bac6]]]*/
+/*[[[head:_aligned_recalloc,hash:CRC-32=0x28057369]]]*/
 INTERN WUNUSED ATTR_ALLOC_SIZE((2, 3)) ATTR_ALLOC_ALIGN(4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_recalloc") void *
-NOTHROW_NCX(LIBCCALL libc__aligned_recalloc)(void *mptr,
+NOTHROW_NCX(LIBCCALL libc__aligned_recalloc)(void *aligned_mallptr,
                                              size_t count,
                                              size_t num_bytes,
                                              size_t min_alignment)
 /*[[[body:_aligned_recalloc]]]*/
-{
-	(void)mptr;
-	(void)count;
-	(void)num_bytes;
-	(void)min_alignment;
-	CRT_UNIMPLEMENTED("_aligned_recalloc"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+/*AUTO*/{
+	void *result;
+	num_bytes *= count;
+	result = libc__aligned_malloc(num_bytes, min_alignment);
+	if (result) {
+		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, 0);
+		if (temp > num_bytes)
+			temp = num_bytes;
+		memcpy(result, aligned_mallptr, temp);
+		memset((byte_t *)result + temp, 0, num_bytes - temp);
+		libc__aligned_free(aligned_mallptr);
+	}
+	return result;
 }
 /*[[[end:_aligned_recalloc]]]*/
 
+/* All of these are implemented in libc/libc/errno.c */
+/*[[[skip:_get_errno]]]*/
+/*[[[skip:_set_errno]]]*/
 /*[[[skip:__doserrno]]]*/
 /*[[[skip:_get_doserrno]]]*/
 /*[[[skip:_set_doserrno]]]*/
@@ -1900,87 +1911,106 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes,
                                                   size_t min_alignment,
                                                   size_t offset)
 /*[[[body:_aligned_offset_malloc]]]*/
-{
-	(void)num_bytes;
-	(void)min_alignment;
-	(void)offset;
-	CRT_UNIMPLEMENTED("_aligned_offset_malloc"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+/*AUTO*/{
+	void *result;
+	offset &= (min_alignment - 1);
+	result = libc_malloc(num_bytes + 2 * sizeof(void *) + min_alignment - 1 + (min_alignment - offset));
+	if (result) {
+		void *base = (void *)((((uintptr_t)result + (min_alignment - 1)) & ~(min_alignment - 1)) + offset);
+		((void **)base)[-1] = result;
+		((void **)base)[-2] = (void *)num_bytes;
+		result = base;
+	}
+	return result;
 }
 /*[[[end:_aligned_offset_malloc]]]*/
 
-/*[[[head:_aligned_offset_realloc,hash:CRC-32=0x776dc7c4]]]*/
+/*[[[head:_aligned_offset_realloc,hash:CRC-32=0x2efa4de1]]]*/
 INTERN WUNUSED ATTR_ALLOC_SIZE((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_offset_realloc") void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc)(void *mptr,
+NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc)(void *aligned_mallptr,
                                                    size_t newsize,
                                                    size_t min_alignment,
                                                    size_t offset)
 /*[[[body:_aligned_offset_realloc]]]*/
-{
-	(void)mptr;
-	(void)newsize;
-	(void)min_alignment;
-	(void)offset;
-	CRT_UNIMPLEMENTED("_aligned_offset_realloc"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+/*AUTO*/{
+	void *result;
+	result = libc__aligned_offset_malloc(newsize, min_alignment, offset);
+	if (result) {
+		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, offset);
+		if (temp > newsize)
+			temp = newsize;
+		memcpy(result, aligned_mallptr, temp);
+		libc__aligned_free(aligned_mallptr);
+	}
+	return result;
 }
 /*[[[end:_aligned_offset_realloc]]]*/
 
-/*[[[head:_aligned_offset_recalloc,hash:CRC-32=0xb2922b1c]]]*/
+/*[[[head:_aligned_offset_recalloc,hash:CRC-32=0x7ba0218d]]]*/
 INTERN WUNUSED ATTR_ALLOC_SIZE((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_offset_recalloc") void *
-NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc)(void *mptr,
+NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc)(void *aligned_mallptr,
                                                     size_t count,
                                                     size_t num_bytes,
                                                     size_t min_alignment,
                                                     size_t offset)
 /*[[[body:_aligned_offset_recalloc]]]*/
-{
-	(void)mptr;
-	(void)count;
-	(void)num_bytes;
-	(void)min_alignment;
-	(void)offset;
-	CRT_UNIMPLEMENTED("_aligned_offset_recalloc"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+/*AUTO*/{
+	void *result;
+	num_bytes *= count;
+	result = libc__aligned_offset_malloc(num_bytes, min_alignment, offset);
+	if (result) {
+		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, offset);
+		if (temp > num_bytes)
+			temp = num_bytes;
+		memcpy(result, aligned_mallptr, temp);
+		memset((byte_t *)result + temp, 0, num_bytes - temp);
+		libc__aligned_free(aligned_mallptr);
+	}
+	return result;
 }
 /*[[[end:_aligned_offset_recalloc]]]*/
 
-/*[[[head:_recalloc,hash:CRC-32=0x87d5769]]]*/
+/*[[[head:_recalloc,hash:CRC-32=0x844ba1af]]]*/
 INTERN ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._recalloc") void *
-NOTHROW_NCX(LIBCCALL libc__recalloc)(void *mptr,
+NOTHROW_NCX(LIBCCALL libc__recalloc)(void *mallptr,
                                      size_t count,
                                      size_t num_bytes)
 /*[[[body:_recalloc]]]*/
-{
-	(void)mptr;
-	(void)count;
-	(void)num_bytes;
-	CRT_UNIMPLEMENTED("_recalloc"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+/*AUTO*/{
+	void *result;
+	size_t total_bytes, oldsize = libc_malloc_usable_size(mallptr);
+	if unlikely(__hybrid_overflow_umul(count, num_bytes, &total_bytes))
+		total_bytes = (size_t)-1; /* Force down-stream failure */
+	result = libc_realloc(mallptr, total_bytes);
+	if likely(result) {
+		if (total_bytes > oldsize)
+			memset((byte_t *)result + oldsize, 0, total_bytes - oldsize);
+	}
+	return result;
 }
 /*[[[end:_recalloc]]]*/
 
-/*[[[head:_aligned_realloc,hash:CRC-32=0x6bdbbaea]]]*/
+/*[[[head:_aligned_realloc,hash:CRC-32=0xce4cb3a0]]]*/
 INTERN WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_ALIGN(3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_realloc") void *
-NOTHROW_NCX(LIBCCALL libc__aligned_realloc)(void *mptr,
+NOTHROW_NCX(LIBCCALL libc__aligned_realloc)(void *aligned_mallptr,
                                             size_t newsize,
                                             size_t min_alignment)
 /*[[[body:_aligned_realloc]]]*/
-{
-	(void)mptr;
-	(void)newsize;
-	(void)min_alignment;
-	CRT_UNIMPLEMENTED("_aligned_realloc"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+/*AUTO*/{
+	void *result;
+	result = libc__aligned_malloc(newsize, min_alignment);
+	if (result && aligned_mallptr) {
+		size_t temp = libc__aligned_msize(aligned_mallptr, min_alignment, 0);
+		if (temp > newsize)
+			temp = newsize;
+		memcpy(result, aligned_mallptr, temp);
+		libc__aligned_free(aligned_mallptr);
+	}
+	return result;
 }
 /*[[[end:_aligned_realloc]]]*/
 
@@ -2016,11 +2046,229 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
 /*[[[skip:calloc]]]*/
 /*[[[skip:realloc]]]*/
 
+/*[[[head:_set_purecall_handler,hash:CRC-32=0x33e1e92f]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_purecall_handler") _purecall_handler
+NOTHROW_NCX(LIBCCALL libc__set_purecall_handler)(_purecall_handler __handler)
+/*[[[body:_set_purecall_handler]]]*/
+{
+	(void)__handler;
+	CRT_UNIMPLEMENTED("_set_purecall_handler"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_set_purecall_handler]]]*/
+
+/*[[[head:_get_purecall_handler,hash:CRC-32=0x3eb6a390]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._get_purecall_handler") _purecall_handler
+NOTHROW_NCX(LIBCCALL libc__get_purecall_handler)(void)
+/*[[[body:_get_purecall_handler]]]*/
+{
+	CRT_UNIMPLEMENTED("_get_purecall_handler"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_get_purecall_handler]]]*/
+
+/*[[[head:_set_invalid_parameter_handler,hash:CRC-32=0x456a68ba]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_invalid_parameter_handler") _invalid_parameter_handler
+NOTHROW_NCX(LIBCCALL libc__set_invalid_parameter_handler)(_invalid_parameter_handler __handler)
+/*[[[body:_set_invalid_parameter_handler]]]*/
+{
+	(void)__handler;
+	CRT_UNIMPLEMENTED("_set_invalid_parameter_handler"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_set_invalid_parameter_handler]]]*/
+
+/*[[[head:_get_invalid_parameter_handler,hash:CRC-32=0xc589f926]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._get_invalid_parameter_handler") _invalid_parameter_handler
+NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
+/*[[[body:_get_invalid_parameter_handler]]]*/
+{
+	CRT_UNIMPLEMENTED("_get_invalid_parameter_handler"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_get_invalid_parameter_handler]]]*/
+
+/*[[[head:_get_pgmptr,hash:CRC-32=0xea63c11c]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init._get_pgmptr") errno_t
+NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue)
+/*[[[body:_get_pgmptr]]]*/
+{
+	(void)pvalue;
+	CRT_UNIMPLEMENTED("_get_pgmptr"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_get_pgmptr]]]*/
+
+/*[[[head:_get_wpgmptr,hash:CRC-32=0xf0bed458]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init._get_wpgmptr") errno_t
+NOTHROW_NCX(LIBCCALL libc__get_wpgmptr)(char32_t **pvalue)
+/*[[[body:_get_wpgmptr]]]*/
+{
+	(void)pvalue;
+	CRT_UNIMPLEMENTED("_get_wpgmptr"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_get_wpgmptr]]]*/
+
+/*[[[head:__p__fmode,hash:CRC-32=0x21cb19d3]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.utility.__p__fmode") int *
+NOTHROW_NCX(LIBCCALL libc___p__fmode)(void)
+/*[[[body:__p__fmode]]]*/
+{
+	CRT_UNIMPLEMENTED("__p__fmode"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:__p__fmode]]]*/
+
+/*[[[head:_set_fmode,hash:CRC-32=0x86ca3f17]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.utility._set_fmode") errno_t
+NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode)
+/*[[[body:_set_fmode]]]*/
+{
+	(void)mode;
+	CRT_UNIMPLEMENTED("_set_fmode"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_set_fmode]]]*/
+
+/*[[[head:_get_fmode,hash:CRC-32=0xeb5b8056]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.utility._get_fmode") errno_t
+NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode)
+/*[[[body:_get_fmode]]]*/
+{
+	(void)pmode;
+	CRT_UNIMPLEMENTED("_get_fmode"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_get_fmode]]]*/
+
+/*[[[head:_set_abort_behavior,hash:CRC-32=0xb1b4da51]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_abort_behavior") unsigned int
+NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags,
+                                               unsigned int mask)
+/*[[[body:_set_abort_behavior]]]*/
+{
+	(void)flags;
+	(void)mask;
+	CRT_UNIMPLEMENTED("_set_abort_behavior"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_set_abort_behavior]]]*/
+
+/*[[[head:_wgetenv,hash:CRC-32=0x9ff0fc00]]]*/
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wgetenv") char32_t *
+NOTHROW_NCX(LIBCCALL libc__wgetenv)(char32_t const *varname)
+/*[[[body:_wgetenv]]]*/
+{
+	(void)varname;
+	CRT_UNIMPLEMENTED("_wgetenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:_wgetenv]]]*/
+
+/*[[[head:DOS$_wgetenv,hash:CRC-32=0x1c30dad]]]*/
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wgetenv") char16_t *
+NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
+/*[[[body:DOS$_wgetenv]]]*/
+{
+	(void)varname;
+	CRT_UNIMPLEMENTED("_wgetenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:DOS$_wgetenv]]]*/
+
+/*[[[head:_wgetenv_s,hash:CRC-32=0x4950b936]]]*/
+INTERN NONNULL((1, 4))
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wgetenv_s") errno_t
+NOTHROW_NCX(LIBCCALL libc__wgetenv_s)(size_t *return_size,
+                                      char32_t *buf,
+                                      size_t buflen,
+                                      char32_t const *varname)
+/*[[[body:_wgetenv_s]]]*/
+{
+	(void)return_size;
+	(void)buf;
+	(void)buflen;
+	(void)varname;
+	CRT_UNIMPLEMENTED("_wgetenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_wgetenv_s]]]*/
+
+/*[[[head:DOS$_wgetenv_s,hash:CRC-32=0x547755c1]]]*/
+INTERN NONNULL((1, 4))
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wgetenv_s") errno_t
+NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *return_size,
+                                      char16_t *buf,
+                                      size_t buflen,
+                                      char16_t const *varname)
+/*[[[body:DOS$_wgetenv_s]]]*/
+{
+	(void)return_size;
+	(void)buf;
+	(void)buflen;
+	(void)varname;
+	CRT_UNIMPLEMENTED("_wgetenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:DOS$_wgetenv_s]]]*/
+
+/*[[[head:_wdupenv_s,hash:CRC-32=0x51f44189]]]*/
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wdupenv_s") errno_t
+NOTHROW_NCX(LIBCCALL libc__wdupenv_s)(char32_t **pbuf,
+                                      size_t *pbuflen,
+                                      char32_t const *varname)
+/*[[[body:_wdupenv_s]]]*/
+{
+	(void)pbuf;
+	(void)pbuflen;
+	(void)varname;
+	CRT_UNIMPLEMENTED("_wdupenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_wdupenv_s]]]*/
+
+/*[[[head:DOS$_wdupenv_s,hash:CRC-32=0x9b4edd03]]]*/
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wdupenv_s") errno_t
+NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
+                                      size_t *pbuflen,
+                                      char16_t const *varname)
+/*[[[body:DOS$_wdupenv_s]]]*/
+{
+	(void)pbuf;
+	(void)pbuflen;
+	(void)varname;
+	CRT_UNIMPLEMENTED("_wdupenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:DOS$_wdupenv_s]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x18fa2fd0]]]*/
+/*[[[start:exports,hash:CRC-32=0x6df42ba3]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_WEAK_ALIAS(system, libc_system);
 DEFINE_PUBLIC_WEAK_ALIAS(abort, libc_abort);
@@ -2108,6 +2356,16 @@ DEFINE_PUBLIC_WEAK_ALIAS(__p_program_invocation_name, libc___p__pgmptr);
 DEFINE_PUBLIC_WEAK_ALIAS(__p___initenv, libc___p___initenv);
 DEFINE_PUBLIC_WEAK_ALIAS(__p___winitenv, libc___p___winitenv);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$__p___winitenv, libd___p___winitenv);
+DEFINE_PUBLIC_WEAK_ALIAS(_set_purecall_handler, libc__set_purecall_handler);
+DEFINE_PUBLIC_WEAK_ALIAS(_get_purecall_handler, libc__get_purecall_handler);
+DEFINE_PUBLIC_WEAK_ALIAS(_set_invalid_parameter_handler, libc__set_invalid_parameter_handler);
+DEFINE_PUBLIC_WEAK_ALIAS(_get_invalid_parameter_handler, libc__get_invalid_parameter_handler);
+DEFINE_PUBLIC_WEAK_ALIAS(_get_pgmptr, libc__get_pgmptr);
+DEFINE_PUBLIC_WEAK_ALIAS(_get_wpgmptr, libc__get_wpgmptr);
+DEFINE_PUBLIC_WEAK_ALIAS(__p__fmode, libc___p__fmode);
+DEFINE_PUBLIC_WEAK_ALIAS(_set_fmode, libc__set_fmode);
+DEFINE_PUBLIC_WEAK_ALIAS(_get_fmode, libc__get_fmode);
+DEFINE_PUBLIC_WEAK_ALIAS(_set_abort_behavior, libc__set_abort_behavior);
 DEFINE_PUBLIC_WEAK_ALIAS(getenv_s, libc_getenv_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_dupenv_s, libc__dupenv_s);
 DEFINE_PUBLIC_WEAK_ALIAS(rand_s, libc_rand_s);
@@ -2129,6 +2387,12 @@ DEFINE_PUBLIC_WEAK_ALIAS(_set_error_mode, libc__set_error_mode);
 DEFINE_PUBLIC_WEAK_ALIAS(_beep, libc__beep);
 DEFINE_PUBLIC_WEAK_ALIAS(onexit, libc_onexit);
 DEFINE_PUBLIC_WEAK_ALIAS(_onexit, libc_onexit);
+DEFINE_PUBLIC_WEAK_ALIAS(_wgetenv, libc__wgetenv);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wgetenv, libd__wgetenv);
+DEFINE_PUBLIC_WEAK_ALIAS(_wgetenv_s, libc__wgetenv_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wgetenv_s, libd__wgetenv_s);
+DEFINE_PUBLIC_WEAK_ALIAS(_wdupenv_s, libc__wdupenv_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wdupenv_s, libd__wdupenv_s);
 /*[[[end:exports]]]*/
 
 DECL_END

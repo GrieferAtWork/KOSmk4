@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc14261eb */
+/* HASH CRC-32:0x9945456c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstombs_s))(__SIZE_TYPE__ *__presult
                                                         __SIZE_TYPE__ __buflen,
                                                         __WCHAR_TYPE__ const *__src,
                                                         __SIZE_TYPE__ __maxlen) {
-#line 2546 "kos/src/libc/magic/stdlib.c"
+#line 2571 "kos/src/libc/magic/stdlib.c"
 	if (!__presult || !__buf || !__src)
 		return __EINVAL;
 	if (__buflen < __localdep_wcstombs(__NULLPTR, __src, __maxlen))

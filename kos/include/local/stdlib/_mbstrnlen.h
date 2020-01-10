@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde001386 */
+/* HASH CRC-32:0x848bbd65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_mbstrnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstrnlen))(char const *__str,
                                                         __SIZE_TYPE__ __maxlen) {
-#line 2365 "kos/src/libc/magic/stdlib.c"
+#line 2413 "kos/src/libc/magic/stdlib.c"
 	__SIZE_TYPE__ __result = 0;
 	char const *__endptr = __str + __maxlen;
 	while (__localdep_unicode_readutf8_n((char const **)&__str, __endptr))

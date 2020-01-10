@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52e8d2d3 */
+/* HASH CRC-32:0xcc17472c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -521,11 +521,16 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) intptr_t __NOTHROW_RPC(__VLIBCCA
 
 #ifndef _CRT_WSYSTEM_DEFINED
 #define _CRT_WSYSTEM_DEFINED 1
+#ifndef ___wsystem_defined
+#define ___wsystem_defined 1
 #ifdef __CRT_HAVE__wsystem
 __CDECLARE(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),(__cmd))
 #elif defined(__CRT_HAVE_wsystem)
 __CREDIRECT(,int,__NOTHROW_RPC,_wsystem,(wchar_t const *__cmd),wsystem,(__cmd))
+#else /* LIBC: _wsystem */
+#undef ___wsystem_defined
 #endif /* _wsystem... */
+#endif /* !___wsystem_defined */
 #endif /* !_CRT_WSYSTEM_DEFINED */
 
 #endif /* __CC__ */

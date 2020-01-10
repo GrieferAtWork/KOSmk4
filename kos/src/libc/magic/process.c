@@ -197,7 +197,7 @@ typedef __intptr_t intptr_t;
 %
 %#ifndef _CRT_WSYSTEM_DEFINED
 %#define _CRT_WSYSTEM_DEFINED 1
-[alias(*)][attribute(*)] _wsystem:(*) = wsystem;
+[guard][alias(*)][attribute(*)] _wsystem:(*) = wsystem;
 %#endif /* !_CRT_WSYSTEM_DEFINED */
 
 

@@ -313,7 +313,7 @@ wcsrtombs:([outp(dstlen)] char *dst,
 	return result;
 }
 
-[std][wchar]
+[std][wchar][guard][std_guard]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(wcstoll), alias(wcstoq)]
 [if(__SIZEOF_LONG__ == 4), alias(wcsto32)]
 [if(__SIZEOF_LONG__ == 8), alias(wcsto64, _wcstoi64)]
@@ -321,7 +321,7 @@ wcsrtombs:([outp(dstlen)] char *dst,
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
 wcstol:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> long %{copy(%auto, str2wcs)}
 
-[std][wchar]
+[std][wchar][guard][std_guard]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(wcstoull), alias(wcstouq)]
 [if(__SIZEOF_LONG__ == 4), alias(wcstou32)]
 [if(__SIZEOF_LONG__ == 8), alias(wcstou64, _wcstoui64)]
@@ -693,30 +693,30 @@ swprintf:([outp_opt(min(return+1,buflen))] wchar_t *__restrict buf, size_t bufle
 %(std)
 
 %(std,c,ccompat)#ifndef __NO_FPU
-[std][wchar]
+[std][wchar][guard][std_guard]
 wcstod:([notnull] wchar_t const *__restrict nptr,
         [nullable] wchar_t **endptr) -> double %{copy(%auto, str2wcs)}
 %(std,c,ccompat)#endif /* !__NO_FPU */
 %(std)#ifdef __USE_ISOC99
 %(std,c,compat)#ifndef __NO_FPU
-[std][std_guard][ATTR_PURE][wchar]
+[std][guard][std_guard][ATTR_PURE][wchar]
 wcstof:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr) -> float
 	%{copy(%auto, str2wcs)}
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][std_guard][ATTR_PURE][wchar]
+[std][guard][std_guard][ATTR_PURE][wchar]
 wcstold:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr) -> long double
 	%{copy(%auto, str2wcs)}
 %(std,c,compat)#endif /* !__NO_FPU */
 %(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
-[std][std_guard][wchar][alias(wcstoq)]
+[std][guard][std_guard][wchar][alias(wcstoq)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstol)]
-[if(__SIZEOF_LONG_LONG__ == 4), alias(wcsto32)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcsto64, _wcstoi64)]
+[if(__SIZEOF_LONG_LONG__ == 4), alias(wcsto32)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoimax)]
 wcstoll:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> __LONGLONG %{copy(%auto, str2wcs)}
 
-[std][std_guard][wchar][alias(wcstouq)]
+[std][guard][std_guard][wchar][alias(wcstouq)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstoul)]
 [if(__SIZEOF_LONG_LONG__ == 4), alias(wcstou32)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcstou64, _wcstoui64)]
@@ -960,10 +960,10 @@ wmempmove:([outp(num_chars)] wchar_t *dst,
 #endif
 }
 
-[ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(__wcstol_l)]
+[ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstol_l, __wcstol_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
 wcstol_l:([notnull] wchar_t const *__restrict nptr, wchar_t **__restrict endptr, int base, $locale_t locale) -> long %{copy(%auto, str2wcs)}
-[ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(__wcstoul_l)]
+[ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstoul_l, __wcstoul_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
 wcstoul_l:([notnull] wchar_t const *__restrict nptr, wchar_t **__restrict endptr, int base, $locale_t locale) -> unsigned long %{copy(%auto, str2wcs)}
 
@@ -983,31 +983,31 @@ wcstoq:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, i
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
 wcstouq:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> __ULONGLONG = wcstoull;
 
-[wchar][export_alias(__wcstoll_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstol_l, _wcstol_l)]
+[wchar][export_alias(_wcstoll_l, __wcstoll_l)]
+[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstol_l, _wcstol_l, __wcstol_l)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(_wcstoi64_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoimax_l, _wcstoimax_l)]
+[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoimax_l, _wcstoimax_l, __wcstoimax_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
 wcstoll_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> __LONGLONG %{copy(%auto, str2wcs)}
 
 [wchar][export_alias(__wcstoull_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstoul_l, _wcstoul_l)]
+[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(wcstoul_l, _wcstoul_l, __wcstoul_l)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(_wcstoui64_l)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoumax_l, _wcstoumax_l)]
+[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(wcstoumax_l, _wcstoumax_l, __wcstoumax_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
 wcstoull_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> __ULONGLONG %{copy(%auto, str2wcs)}
 
 %#ifndef __NO_FPU
-[alias(_wcstof_l)][ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(__wcstof_l)]
+[alias(_wcstof_l)][ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstof_l, __wcstof_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
 wcstof_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, $locale_t locale) -> float %{copy(%auto, str2wcs)}
 
-[alias(_wcstod_l)][ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(__wcstod_l)]
+[alias(_wcstod_l)][ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstod_l, __wcstod_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
 wcstod_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, $locale_t locale) -> double %{copy(%auto, str2wcs)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[alias(_wcstold_l)][ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(__wcstold_l)]
+[alias(_wcstold_l)][ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstold_l, __wcstold_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
 wcstold_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, $locale_t locale) -> long double %{copy(%auto, str2wcs)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -1246,63 +1246,72 @@ wcsnend:([inp(maxlen)] wchar_t const *__restrict string, $size_t maxlen) -> wcha
 
 
 [wchar][ATTR_LEAF][ATTR_WUNUSED]
-[if(__SIZEOF_LONG__ == 4), alias(wcstoul)]
-[if(__SIZEOF_LONG_LONG__ == 4), alias(wcstoull, wcstouq)]
-[if(__SIZEOF_INTMAX_T__ == 4), alias(wcstoumax)]
-[section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-wcstou32:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> $uint32_t %{copy(%auto, str2wcs)}
-
-[wchar][ATTR_LEAF][ATTR_WUNUSED]
 [if(__SIZEOF_LONG__ == 4), alias(wcstol)]
 [if(__SIZEOF_LONG_LONG__ == 4), alias(wcstoll, wcstoq)]
 [if(__SIZEOF_INTMAX_T__ == 4), alias(wcstoimax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
 wcsto32:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> $int32_t %{copy(%auto, str2wcs)}
 
+[wchar][ATTR_LEAF][ATTR_WUNUSED]
+[if(__SIZEOF_LONG__ == 4), alias(wcstoul)]
+[if(__SIZEOF_LONG_LONG__ == 4), alias(wcstoull, wcstouq)]
+[if(__SIZEOF_INTMAX_T__ == 4), alias(wcstoumax)]
+[section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
+wcstou32:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> $uint32_t %{copy(%auto, str2wcs)}
+
+%
 %#ifdef __UINT64_TYPE__
-[wchar][ATTR_LEAF][ATTR_WUNUSED][alias(_wcstoui64)]
+[wchar][ATTR_LEAF][ATTR_WUNUSED][export_alias(_wcstoui64)]
 [if(__SIZEOF_LONG__ == 8), alias(wcstoul)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcstoull), alias(wcstouq)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(wcstoumax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
 wcstou64:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> $uint64_t %{copy(%auto, str2wcs)}
 
-[wchar][ATTR_LEAF][ATTR_WUNUSED][alias(_wcstoi64)]
+[wchar][ATTR_LEAF][ATTR_WUNUSED][export_alias(_wcstoi64)]
 [if(__SIZEOF_LONG__ == 8), alias(wcstol)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(wcstoll), alias(wcstoq)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(wcstoimax)]
 [section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
 wcsto64:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base) -> $int64_t %{copy(%auto, str2wcs)}
 %#endif /* __UINT64_TYPE__ */
+
 %
-%#ifdef _PROCESS_H
-%#ifndef __TWARGV
-%#ifdef __USE_DOS
-%#   define __TWARGV wchar_t const *const *__restrict ___argv
-%#   define __TWENVP wchar_t const *const *__restrict ___envp
-%#else
-%#   define __TWARGV wchar_t *const ___argv[__restrict_arr]
-%#   define __TWENVP wchar_t *const ___envp[__restrict_arr]
-%#endif
-%#endif /* !__TWARGV */
-%[insert:extern(wexecv)]
-%[insert:extern(wexecve)]
-%[insert:extern(wexecvp)]
-%[insert:extern(wexecvpe)]
-%[insert:extern(wexecl)]
-%[insert:extern(wexecle)]
-%[insert:extern(wexeclp)]
-%[insert:extern(wexeclpe)]
-%[insert:extern(wspawnv)]
-%[insert:extern(wspawnve)]
-%[insert:extern(wspawnvp)]
-%[insert:extern(wspawnvpe)]
-%[insert:extern(wspawnl)]
-%[insert:extern(wspawnle)]
-%[insert:extern(wspawnlp)]
-%[insert:extern(wspawnlpe)]
-%[insert:extern(wsystem)]
-%#endif /* _PROCESS_H */
+%#ifdef __USE_XOPEN2K8
+[wchar][ATTR_LEAF][ATTR_WUNUSED]
+[if(__SIZEOF_LONG__ == 4), alias(wcstol_l, _wcstol_l, __wcstol_l)]
+[if(__SIZEOF_LONG_LONG__ == 4), alias(wcstoll_l, _wcstoll_l, __wcstoll_l)]
+[if(__SIZEOF_INTMAX_T__ == 4), alias(wcstoimax_l, _wcstoimax_l, __wcstoimax_l)]
+[section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
+wcsto32_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> $int32_t %{copy(%auto, str2wcs)}
+
+[wchar][ATTR_LEAF][ATTR_WUNUSED]
+[if(__SIZEOF_LONG__ == 4), alias(wcstoul_l, _wcstoul_l, __wcstoul_l)]
+[if(__SIZEOF_LONG_LONG__ == 4), alias(wcstoull_l, _wcstoull_l, __wcstoull_l)]
+[if(__SIZEOF_INTMAX_T__ == 4), alias(wcstoumax_l, _wcstoumax_l, __wcstoumax_l)]
+[section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
+wcstou32_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> $uint32_t %{copy(%auto, str2wcs)}
+
+%
+%#ifdef __UINT64_TYPE__
+[wchar][ATTR_LEAF][ATTR_WUNUSED][alias(_wcstoi64_l)]
+[if(__SIZEOF_LONG__ == 8), alias(wcstol_l, _wcstol_l, __wcstol_l)]
+[if(__SIZEOF_LONG_LONG__ == 8), alias(wcstoll_l, _wcstoll_l, __wcstoll_l)]
+[if(__SIZEOF_INTMAX_T__ == 8), alias(wcstoimax_l, _wcstoimax_l, __wcstoimax_l)]
+[section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
+wcsto64_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> $int64_t %{copy(%auto, str2wcs)}
+
+[wchar][ATTR_LEAF][ATTR_WUNUSED][alias(_wcstoui64_l)]
+[if(__SIZEOF_LONG__ == 8), alias(wcstoul_l, _wcstoul_l, __wcstoul_l)]
+[if(__SIZEOF_LONG_LONG__ == 8), alias(wcstoull_l, _wcstoull_l, __wcstoull_l)]
+[if(__SIZEOF_INTMAX_T__ == 8), alias(wcstoumax_l, _wcstoumax_l, __wcstoumax_l)]
+[section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
+wcstou64_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, int base, $locale_t locale) -> $uint64_t %{copy(%auto, str2wcs)}
+%#endif /* __UINT64_TYPE__ */
+%#endif /* __USE_XOPEN2K8 */
+
+
+
 
 %
 [alias(_wcsncoll)][ATTR_WUNUSED][ATTR_PURE][wchar]
@@ -2218,6 +2227,52 @@ _wtmpnam_s:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count) -> $errno_t;
 [guard][wchar][attribute(*)][alias(*)] _putwc_nolock:(*) = fputwc_unlocked;
 
 %#endif /* !_WSTDIO_DEFINED */
+
+
+%#ifndef _WSTDLIB_DEFINED
+%#define _WSTDLIB_DEFINED
+%[insert:extern(_wcstol_l)]
+%[insert:extern(_wcstoll_l)]
+%[insert:extern(_wcstoul_l)]
+%[insert:extern(_wcstoull_l)]
+%#ifndef __NO_FPU
+%[insert:extern(_wcstof_l)]
+%[insert:extern(_wcstod_l)]
+%#ifdef __COMPILER_HAVE_LONGDOUBLE
+%[insert:extern(_wcstold_l)]
+%#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%[insert:extern(_wtof)]
+%[insert:extern(_wtof_l)]
+%#endif /* !__NO_FPU */
+%[insert:extern(_itow)]
+%[insert:extern(_ltow)]
+%[insert:extern(_ultow)]
+%[insert:extern(_i64tow)]
+%[insert:extern(_ui64tow)]
+%[insert:extern(_itow_s)]
+%[insert:extern(_ltow_s)]
+%[insert:extern(_ultow_s)]
+%[insert:extern(_i64tow_s)]
+%[insert:extern(_ui64tow_s)]
+%[insert:extern(_wgetenv)]
+%[insert:extern(_wgetenv_s)]
+%[insert:extern(_wdupenv_s)]
+%[insert:extern(_wsystem)]
+%[insert:extern(_wtoi)]
+%[insert:extern(_wtol)]
+%[insert:extern(_wtoll)]
+%[insert:extern(_wtoi64)]
+%[insert:extern(_wcstoi64)]
+%[insert:extern(_wcstoui64)]
+%[insert:extern(_wtoi_l)]
+%[insert:extern(_wtol_l)]
+%[insert:extern(_wtoll_l)]
+%[insert:extern(_wtoi64_l)]
+%[insert:extern(_wcstoi64_l)]
+%[insert:extern(_wcstoui64_l)]
+%#endif /* !_WSTDLIB_DEFINED */
+
+
 %#endif /* __USE_DOS */
 
 

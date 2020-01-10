@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfe1ce16 */
+/* HASH CRC-32:0xed8ecbf0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep__aligned_free_defined
 #define ____localdep__aligned_free_defined 1
 #ifdef __CRT_HAVE__aligned_free
-__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__mptr),_aligned_free,(__mptr))
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__aligned_mallptr),_aligned_free,(__aligned_mallptr))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <local/stdlib/_aligned_free.h>
 #define __localdep__aligned_free (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_free))

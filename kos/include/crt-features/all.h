@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6810273d */
+/* HASH CRC-32:0x932da95f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,11 +34,13 @@
 #define __CRT_HAVE_DOS$__wcsncasecmp_l 1
 #define __CRT_HAVE_DOS$__wcstod_l 1
 #define __CRT_HAVE_DOS$__wcstof_l 1
+#define __CRT_HAVE_DOS$__wcstoimax_l 1
 #define __CRT_HAVE_DOS$__wcstol_l 1
 #define __CRT_HAVE_DOS$__wcstold_l 1
 #define __CRT_HAVE_DOS$__wcstoll_l 1
 #define __CRT_HAVE_DOS$__wcstoul_l 1
 #define __CRT_HAVE_DOS$__wcstoull_l 1
+#define __CRT_HAVE_DOS$__wcstoumax_l 1
 #define __CRT_HAVE_DOS$__wcsxfrm_l 1
 #define __CRT_HAVE_DOS$_fgetwc_nolock 1
 #define __CRT_HAVE_DOS$_fgetwchar 1
@@ -773,6 +775,7 @@
 #define __CRT_HAVE___p__crtAssertBusy 1
 #define __CRT_HAVE___p__crtBreakAlloc 1
 #define __CRT_HAVE___p__crtDbgFlag 1
+#define __CRT_HAVE___p__fmode 1
 #define __CRT_HAVE___p__pgmptr 1
 #define __CRT_HAVE___p__wenviron 1
 #define __CRT_HAVE___p__wpgmptr 1
@@ -875,12 +878,14 @@
 #define __CRT_HAVE___strndup 1
 #define __CRT_HAVE___strtod_l 1
 #define __CRT_HAVE___strtof_l 1
+#define __CRT_HAVE___strtoimax_l 1
 #define __CRT_HAVE___strtok_r 1
 #define __CRT_HAVE___strtol_l 1
 #define __CRT_HAVE___strtold_l 1
 #define __CRT_HAVE___strtoll_l 1
 #define __CRT_HAVE___strtoul_l 1
 #define __CRT_HAVE___strtoull_l 1
+#define __CRT_HAVE___strtoumax_l 1
 #define __CRT_HAVE___strverscmp 1
 #define __CRT_HAVE___strxfrm_l 1
 #define __CRT_HAVE___sysconf 1
@@ -924,11 +929,13 @@
 #define __CRT_HAVE___wcsncasecmp_l 1
 #define __CRT_HAVE___wcstod_l 1
 #define __CRT_HAVE___wcstof_l 1
+#define __CRT_HAVE___wcstoimax_l 1
 #define __CRT_HAVE___wcstol_l 1
 #define __CRT_HAVE___wcstold_l 1
 #define __CRT_HAVE___wcstoll_l 1
 #define __CRT_HAVE___wcstoul_l 1
 #define __CRT_HAVE___wcstoull_l 1
+#define __CRT_HAVE___wcstoumax_l 1
 #define __CRT_HAVE___wcsxfrm_l 1
 #define __CRT_HAVE___wctrans_l 1
 #define __CRT_HAVE___wctype_l 1
@@ -1113,9 +1120,15 @@
 #define __CRT_HAVE__gcvt 1
 #define __CRT_HAVE__gcvt_s 1
 #define __CRT_HAVE__get_doserrno 1
+#define __CRT_HAVE__get_errno 1
+#define __CRT_HAVE__get_fmode 1
+#define __CRT_HAVE__get_invalid_parameter_handler 1
 #define __CRT_HAVE__get_osfhandle 1
 #define __CRT_HAVE__get_output_format 1
+#define __CRT_HAVE__get_pgmptr 1
 #define __CRT_HAVE__get_printf_count_output 1
+#define __CRT_HAVE__get_purecall_handler 1
+#define __CRT_HAVE__get_wpgmptr 1
 #define __CRT_HAVE__getc_nolock 1
 #define __CRT_HAVE__getchar_nolock 1
 #define __CRT_HAVE__getcwd 1
@@ -1140,6 +1153,8 @@
 #define __CRT_HAVE__heapmin 1
 #define __CRT_HAVE__i64toa 1
 #define __CRT_HAVE__i64toa_s 1
+#define __CRT_HAVE__i64tow 1
+#define __CRT_HAVE__i64tow_s 1
 #define __CRT_HAVE__isatty 1
 #define __CRT_HAVE__isctype 1
 #define __CRT_HAVE__isctype_l 1
@@ -1162,6 +1177,8 @@
 #define __CRT_HAVE__iswxdigit_l 1
 #define __CRT_HAVE__itoa 1
 #define __CRT_HAVE__itoa_s 1
+#define __CRT_HAVE__itow 1
+#define __CRT_HAVE__itow_s 1
 #define __CRT_HAVE__ldclass 1
 #define __CRT_HAVE__ldpcomp 1
 #define __CRT_HAVE__ldsign 1
@@ -1179,6 +1196,8 @@
 #define __CRT_HAVE__lseeki64 1
 #define __CRT_HAVE__ltoa 1
 #define __CRT_HAVE__ltoa_s 1
+#define __CRT_HAVE__ltow 1
+#define __CRT_HAVE__ltow_s 1
 #define __CRT_HAVE__makepath 1
 #define __CRT_HAVE__makepath_s 1
 #define __CRT_HAVE__malloc_dbg 1
@@ -1245,11 +1264,16 @@
 #define __CRT_HAVE__scwprintf_p_l 1
 #define __CRT_HAVE__searchenv 1
 #define __CRT_HAVE__searchenv_s 1
+#define __CRT_HAVE__set_abort_behavior 1
 #define __CRT_HAVE__set_controlfp 1
 #define __CRT_HAVE__set_doserrno 1
+#define __CRT_HAVE__set_errno 1
 #define __CRT_HAVE__set_error_mode 1
+#define __CRT_HAVE__set_fmode 1
+#define __CRT_HAVE__set_invalid_parameter_handler 1
 #define __CRT_HAVE__set_output_format 1
 #define __CRT_HAVE__set_printf_count_output 1
+#define __CRT_HAVE__set_purecall_handler 1
 #define __CRT_HAVE__seterrormode 1
 #define __CRT_HAVE__setmaxstdio 1
 #define __CRT_HAVE__setmode 1
@@ -1368,8 +1392,12 @@
 #define __CRT_HAVE__towupper_l 1
 #define __CRT_HAVE__ui64toa 1
 #define __CRT_HAVE__ui64toa_s 1
+#define __CRT_HAVE__ui64tow 1
+#define __CRT_HAVE__ui64tow_s 1
 #define __CRT_HAVE__ultoa 1
 #define __CRT_HAVE__ultoa_s 1
+#define __CRT_HAVE__ultow 1
+#define __CRT_HAVE__ultow_s 1
 #define __CRT_HAVE__umask 1
 #define __CRT_HAVE__ungetc_nolock 1
 #define __CRT_HAVE__ungetwc_nolock 1
@@ -1501,6 +1529,7 @@
 #define __CRT_HAVE__wcsxfrm_l 1
 #define __CRT_HAVE__wctomb_l 1
 #define __CRT_HAVE__wctomb_s_l 1
+#define __CRT_HAVE__wdupenv_s 1
 #define __CRT_HAVE__wdupenv_s_dbg 1
 #define __CRT_HAVE__wexecl 1
 #define __CRT_HAVE__wexecle 1
@@ -1521,6 +1550,8 @@
 #define __CRT_HAVE__wgetcwd_dbg 1
 #define __CRT_HAVE__wgetdcwd_dbg 1
 #define __CRT_HAVE__wgetdcwd_lk_dbg 1
+#define __CRT_HAVE__wgetenv 1
+#define __CRT_HAVE__wgetenv_s 1
 #define __CRT_HAVE__wperror 1
 #define __CRT_HAVE__wpopen 1
 #define __CRT_HAVE__wprintf_l 1
@@ -1548,6 +1579,16 @@
 #define __CRT_HAVE__wtempnam 1
 #define __CRT_HAVE__wtempnam_dbg 1
 #define __CRT_HAVE__wtmpnam_s 1
+#define __CRT_HAVE__wtof 1
+#define __CRT_HAVE__wtof_l 1
+#define __CRT_HAVE__wtoi 1
+#define __CRT_HAVE__wtoi64 1
+#define __CRT_HAVE__wtoi64_l 1
+#define __CRT_HAVE__wtoi_l 1
+#define __CRT_HAVE__wtol 1
+#define __CRT_HAVE__wtol_l 1
+#define __CRT_HAVE__wtoll 1
+#define __CRT_HAVE__wtoll_l 1
 #define __CRT_HAVE__wunlink 1
 #define __CRT_HAVE__wutime32 1
 #define __CRT_HAVE__wutime64 1
@@ -2351,7 +2392,6 @@
 #define __CRT_HAVE_hypotf 1
 #define __CRT_HAVE_hypotl 1
 #define __CRT_HAVE_i64toa 1
-#define __CRT_HAVE_i64toa_s 1
 #define __CRT_HAVE_if_freenameindex 1
 #define __CRT_HAVE_if_indextoname 1
 #define __CRT_HAVE_if_nameindex 1
@@ -3451,7 +3491,6 @@
 #define __CRT_HAVE_strtoll 1
 #define __CRT_HAVE_strtoll_l 1
 #define __CRT_HAVE_strtoq 1
-#define __CRT_HAVE_strtoq_l 1
 #define __CRT_HAVE_strtou32 1
 #define __CRT_HAVE_strtou32_l 1
 #define __CRT_HAVE_strtou64 1
@@ -3463,7 +3502,6 @@
 #define __CRT_HAVE_strtoumax 1
 #define __CRT_HAVE_strtoumax_l 1
 #define __CRT_HAVE_strtouq 1
-#define __CRT_HAVE_strtouq_l 1
 #define __CRT_HAVE_strupr 1
 #define __CRT_HAVE_strupr_l 1
 #define __CRT_HAVE_strverscmp 1
@@ -3580,8 +3618,6 @@
 #define __CRT_HAVE_twalk 1
 #define __CRT_HAVE_tzset 1
 #define __CRT_HAVE_ualarm 1
-#define __CRT_HAVE_ui64toa 1
-#define __CRT_HAVE_ui64toa_s 1
 #define __CRT_HAVE_ulckpwdf 1
 #define __CRT_HAVE_ulimit 1
 #define __CRT_HAVE_ultoa 1
