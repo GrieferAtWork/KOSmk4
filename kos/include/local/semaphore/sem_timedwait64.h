@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ae6bd99 */
+/* HASH CRC-32:0x93b23745 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,9 +36,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sem_timedwait64) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait64))(sem_t *__restrict __sem,
                                                              struct __timespec64 const *__restrict __abstime) {
-#line 106 "kos/src/libc/magic/semaphore.c"
+#line 111 "kos/src/libc/magic/semaphore.c"
 	struct __timespec32 __ts32;
-	__ts32.tv_sec = (__time32_t)__abstime->tv_sec;
+	__ts32.tv_sec  = (__time32_t)__abstime->tv_sec;
 	__ts32.tv_nsec = __abstime->tv_nsec;
 	return __localdep_sem_timedwait32(__sem, &__ts32);
 }

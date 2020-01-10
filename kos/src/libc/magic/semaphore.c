@@ -19,6 +19,8 @@
 
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]
+%[define_replacement(timespec32 = __timespec32)]
+%[define_replacement(timespec64 = __timespec64)]
 %[default_impl_section(.text.crt.sched.semaphore)]
 
 %{
@@ -75,7 +77,8 @@ sem_close:([nonnull] sem_t *sem) -> int;
 [cp] sem_wait:([nonnull] sem_t *sem) -> int;
 
 [ignore][cp][doc_alias(sem_timedwait)]
-sem_timedwait32:([nonnull] sem_t *__restrict sem, [nonnull] struct __timespec32 const *__restrict abstime) -> int = sem_timedwait?;
+sem_timedwait32:([nonnull] sem_t *__restrict sem,
+                 [nonnull] struct $timespec32 const *__restrict abstime) -> int = sem_timedwait?;
 
 
 %
@@ -83,28 +86,30 @@ sem_timedwait32:([nonnull] sem_t *__restrict sem, [nonnull] struct __timespec32 
 @@Similar to `sem_wait' but wait only until ABSTIME
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(sem_timedwait)]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(sem_timedwait64)]
-[cp][requires(defined(__CRT_HAVE_sem_timedwait) || defined(__CRT_HAVE_sem_timedwait64))]
-sem_timedwait:([nonnull] sem_t *__restrict sem, [nonnull] struct timespec const *__restrict abstime) -> int {
-#ifdef __CRT_HAVE_sem_timedwait
-	struct __timespec32 ts32;
+[cp][requires($has_function(sem_timedwait32) || $has_function(sem_timedwait64))]
+sem_timedwait:([nonnull] sem_t *__restrict sem,
+               [nonnull] struct timespec const *__restrict abstime) -> int {
+@@if_has_function(sem_timedwait32)@@
+	struct timespec32 ts32;
 	ts32.@tv_sec@ = (time32_t)abstime->@tv_sec@;
 	ts32.@tv_nsec@ = abstime->@tv_nsec@;
 	return sem_timedwait32(sem, &ts32);
-#else /* __CRT_HAVE_sem_timedwait */
-	struct __timespec64 ts64;
+@@else_has_function(sem_timedwait32)@@
+	struct timespec64 ts64;
 	ts64.@tv_sec@ = (time64_t)abstime->@tv_sec@;
 	ts64.@tv_nsec@ = abstime->@tv_nsec@;
 	return sem_timedwait64(sem, &ts64);
-#endif /* !__CRT_HAVE_sem_timedwait */
+@@endif_has_function(sem_timedwait32)@@
 }
 
 %
 %#ifdef __USE_TIME64
 [cp][time64_variant_of(sem_timedwait)]
-[requires(defined(__CRT_HAVE_sem_timedwait))]
-sem_timedwait64:([nonnull] sem_t *__restrict sem, [nonnull] struct timespec64 const *__restrict abstime) -> int {
-	struct __timespec32 ts32;
-	ts32.@tv_sec@ = (time32_t)abstime->@tv_sec@;
+[requires($has_function(sem_timedwait32))]
+sem_timedwait64:([nonnull] sem_t *__restrict sem,
+                 [nonnull] struct timespec64 const *__restrict abstime) -> int {
+	struct timespec32 ts32;
+	ts32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	ts32.@tv_nsec@ = abstime->@tv_nsec@;
 	return sem_timedwait32(sem, &ts32);
 }
@@ -118,7 +123,8 @@ sem_trywait:([nonnull] sem_t *sem) -> int;
 sem_post:([nonnull] sem_t *sem) -> int;
 
 @@Get current value of SEM and store it in *SVAL
-sem_getvalue:([nonnull] sem_t *__restrict sem, [nonnull] int *__restrict sval) -> int;
+sem_getvalue:([nonnull] sem_t *__restrict sem,
+              [nonnull] int *__restrict sval) -> int;
 
 
 %{
