@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcfb46800 */
+/* HASH CRC-32:0x8de4c99 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,32 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_scanf_s_defined
-#ifdef __CRT_HAVE_vscanf_s
-#define __local_scanf_s_defined 1
-#include <kos/anno.h>
-/* Dependency: "vscanf_s" */
-#ifndef ____localdep_vscanf_s_defined
-#define ____localdep_vscanf_s_defined 1
-#ifdef __CRT_HAVE_vscanf_s
-__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep_vscanf_s,(char const *__restrict __format, __builtin_va_list __args),vscanf_s,(__format,__args)) __THROWS(...)
-#else /* LIBC: vscanf_s */
-#undef ____localdep_vscanf_s_defined
-#endif /* vscanf_s... */
-#endif /* !____localdep_vscanf_s_defined */
+#ifndef GUARD_LIBC_AUTO_PARTS_WCHAR_STDLIB_H
+#define GUARD_LIBC_AUTO_PARTS_WCHAR_STDLIB_H 1
 
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(scanf_s) __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T
-(__VLIBCCALL __LIBC_LOCAL_NAME(scanf_s))(char const *__restrict __format,
-                                         ...) __THROWS(...) {
-#line 2682 "kos/src/libc/magic/stdio.c"
-	__STDC_INT_AS_SIZE_T __result;
-	__builtin_va_list __args;
-	__builtin_va_start(__args, __format);
-	__result = __localdep_vscanf_s(__format, __args);
-	__builtin_va_end(__args);
-	return __result;
-}
-__NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_vscanf_s) */
-#endif /* !__local_scanf_s_defined */
+#include "../api.h"
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <parts/wchar/stdlib.h>
+
+DECL_BEGIN
+
+#ifndef __KERNEL__
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wtoi)(char32_t const *nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wtoi)(char16_t const *nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_wtol)(char32_t const *nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd_wtol)(char16_t const *nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBCCALL libc_wtoll)(char32_t const *nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBDCALL libd_wtoll)(char16_t const *nptr);
+#endif /* !__KERNEL__ */
+
+DECL_END
+
+#endif /* !GUARD_LIBC_AUTO_PARTS_WCHAR_STDLIB_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf77dac1 */
+/* HASH CRC-32:0xab358369 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __LOCAL_LIBC(ultoa) __ATTR_NONNULL((2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ultoa))(unsigned long __val,
                                                    char *__buf,
                                                    int __radix) {
-#line 3142 "kos/src/libc/magic/stdlib.c"
+#line 3126 "kos/src/libc/magic/stdlib.c"
 	__localdep__ultoa_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }

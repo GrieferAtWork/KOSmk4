@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc348e8e9 */
+/* HASH CRC-32:0x69d99711 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2062,7 +2062,6 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkostemps64,(ch
 __SYSDECL_END
 
 #include <hybrid/__minmax.h>
-/* TODO: All of the different <parts/...> components */
 
 __SYSDECL_BEGIN
 
@@ -3839,47 +3838,65 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow_s, __FORCELOCAL errno_t __NOTHROW_NCX(_
 #endif /* !___ui64tow_s_defined */
 #ifndef ___wtoi_defined
 #define ___wtoi_defined 1
-#ifdef __CRT_HAVE__wtoi
+#ifdef __CRT_HAVE_wtoi
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi,(wchar_t const *__nptr),wtoi,(__nptr))
+#elif defined(__CRT_HAVE__wtoi)
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi,(wchar_t const *__nptr),(__nptr))
+#elif defined(__CRT_HAVE_wtol) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi,(wchar_t const *__nptr),wtol,(__nptr))
 #elif defined(__CRT_HAVE__wtol) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi,(wchar_t const *__nptr),_wtol,(__nptr))
+#elif defined(__CRT_HAVE_wtoll) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi,(wchar_t const *__nptr),wtoll,(__nptr))
 #elif defined(__CRT_HAVE__wtoll) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi,(wchar_t const *__nptr),_wtoll,(__nptr))
 #elif defined(__CRT_HAVE__wtoi64) && (__SIZEOF_INT__ == 8)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wtoi,(wchar_t const *__nptr),_wtoi64,(__nptr))
-#else /* LIBC: _wtoi */
-#include <local/stdlib/_wtoi.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtoi, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _wtoi)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtoi))(__nptr); })
+#else /* LIBC: wtoi */
+#include <local/parts.wchar.stdlib/wtoi.h>
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _wtoi)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoi))(__nptr); }
 #endif /* _wtoi... */
 #endif /* !___wtoi_defined */
 #ifndef ___wtol_defined
 #define ___wtol_defined 1
-#ifdef __CRT_HAVE__wtol
+#ifdef __CRT_HAVE_wtol
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wtol,(wchar_t const *__nptr),wtol,(__nptr))
+#elif defined(__CRT_HAVE__wtol)
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wtol,(wchar_t const *__nptr),(__nptr))
+#elif defined(__CRT_HAVE_wtoi) && (__SIZEOF_LONG__ == __SIZEOF_INT__)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wtol,(wchar_t const *__nptr),wtoi,(__nptr))
 #elif defined(__CRT_HAVE__wtoi) && (__SIZEOF_LONG__ == __SIZEOF_INT__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wtol,(wchar_t const *__nptr),_wtoi,(__nptr))
+#elif defined(__CRT_HAVE_wtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wtol,(wchar_t const *__nptr),wtoll,(__nptr))
 #elif defined(__CRT_HAVE__wtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wtol,(wchar_t const *__nptr),_wtoll,(__nptr))
 #elif defined(__CRT_HAVE__wtoi64) && (__SIZEOF_LONG__ == 8)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,_wtol,(wchar_t const *__nptr),_wtoi64,(__nptr))
-#else /* LIBC: _wtol */
-#include <local/stdlib/_wtol.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtol, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _wtol)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtol))(__nptr); })
+#else /* LIBC: wtol */
+#include <local/parts.wchar.stdlib/wtol.h>
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL _wtol)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtol))(__nptr); }
 #endif /* _wtol... */
 #endif /* !___wtol_defined */
 #ifndef ___wtoll_defined
 #define ___wtoll_defined 1
-#ifdef __CRT_HAVE__wtoll
+#ifdef __CRT_HAVE_wtoll
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll,(wchar_t const *__nptr),wtoll,(__nptr))
+#elif defined(__CRT_HAVE__wtoll)
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll,(wchar_t const *__nptr),(__nptr))
+#elif defined(__CRT_HAVE_wtoi) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll,(wchar_t const *__nptr),wtoi,(__nptr))
 #elif defined(__CRT_HAVE__wtoi) && (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll,(wchar_t const *__nptr),_wtoi,(__nptr))
+#elif defined(__CRT_HAVE_wtol) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll,(wchar_t const *__nptr),wtol,(__nptr))
 #elif defined(__CRT_HAVE__wtol) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll,(wchar_t const *__nptr),_wtol,(__nptr))
 #elif defined(__CRT_HAVE__wtoi64) && (__SIZEOF_LONG_LONG__ == 8)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,_wtoll,(wchar_t const *__nptr),_wtoi64,(__nptr))
-#else /* LIBC: _wtoll */
-#include <local/stdlib/_wtoll.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_wtoll, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _wtoll)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_wtoll))(__nptr); })
+#else /* LIBC: wtoll */
+#include <local/parts.wchar.stdlib/wtoll.h>
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL _wtoll)(wchar_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoll))(__nptr); }
 #endif /* _wtoll... */
 #endif /* !___wtoll_defined */
 #ifndef ___wtoi64_defined
@@ -4067,6 +4084,12 @@ __SYSDECL_END
 #include <parts/uchar/stdlib.h>
 #endif /* _UCHAR_H && !_PARTS_UCHAR_STDLIB_H */
 #endif /* __USE_UTF */
+
+#ifdef __USE_KOS
+#if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_STDLIB_H)
+#include <parts/wchar/stdlib.h>
+#endif /* _WCHAR_H && !_PARTS_WCHAR_STDLIB_H */
+#endif /* __USE_KOS */
 
 #ifdef __CXX_SYSTEM_HEADER
 #define _CXX_STDONLY_CSTDLIB 1

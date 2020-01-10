@@ -2300,6 +2300,10 @@ __SYSDECL_END
 #include <parts/wchar/unistd.h>
 #endif /* _UNISTD_H && !_PARTS_WCHAR_UNISTD_H */
 
+#if defined(_STDLIB_H) && !defined(_PARTS_WCHAR_STDLIB_H)
+#include <parts/wchar/stdlib.h>
+#endif /* _STDLIB_H && !_PARTS_WCHAR_STDLIB_H */
+
 #endif /* __USE_KOS */
 
 }

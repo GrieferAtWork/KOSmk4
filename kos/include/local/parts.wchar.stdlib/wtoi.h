@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f856f6e */
+/* HASH CRC-32:0xf4ae2388 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__wtoi_defined
-#define __local__wtoi_defined 1
+#ifndef __local_wtoi_defined
+#define __local_wtoi_defined 1
 /* Dependency: "wcsto32" from "wchar" */
 #ifndef ____localdep_wcsto32_defined
 #define ____localdep_wcsto32_defined 1
@@ -60,8 +60,8 @@ __CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTH
 #endif /* !____localdep_wcsto64_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wtoi) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtoi))(__WCHAR_TYPE__ const *__nptr) {
+__LOCAL_LIBC(wtoi) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wtoi))(__WCHAR_TYPE__ const *__nptr) {
 #line 800 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_INT__ <= 4
 	return (int)__localdep_wcsto32(__nptr, __NULLPTR, 10);
@@ -70,4 +70,4 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtoi))(__WCHAR_TYPE__ const *__nptr)
 #endif /* __SIZEOF_INT__ > 4 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__local__wtoi_defined */
+#endif /* !__local_wtoi_defined */

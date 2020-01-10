@@ -1235,7 +1235,8 @@ qfcvt_r:(long double val, int ndigit,
 	return 0;
 #endif
 }
-[dependency_prefix(
+
+%[define(DEFINE_QCVT_BUFFER =
 #ifndef __CRT_QCVT_BUFFER_DEFINED
 #define __CRT_QCVT_BUFFER_DEFINED 1
 __NAMESPACE_LOCAL_BEGIN
@@ -1243,6 +1244,9 @@ __LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = {0};
 __NAMESPACE_LOCAL_END
 #endif /* !__CRT_QCVT_BUFFER_DEFINED */
 )]
+
+
+[dependency_prefix(DEFINE_QCVT_BUFFER)]
 [ATTR_WUNUSED][alias(_ecvt)]
 qecvt:(long double val, int ndigit,
        [nonnull] int *__restrict decptr,
@@ -1252,14 +1256,7 @@ qecvt:(long double val, int ndigit,
 	return @__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@;
 }
 
-[dependency_prefix(
-#ifndef __CRT_QCVT_BUFFER_DEFINED
-#define __CRT_QCVT_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = {0};
-__NAMESPACE_LOCAL_END
-#endif /* !__CRT_QCVT_BUFFER_DEFINED */
-)]
+[dependency_prefix(DEFINE_QCVT_BUFFER)]
 [ATTR_WUNUSED][alias(_fcvt)]
 qfcvt:(long double val, int ndigit,
        [nonnull] int *__restrict decptr,
@@ -1532,36 +1529,24 @@ mktemp:([nonnull] char *template_) -> char *;
 %   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
 %[default_impl_section(.text.crt.unicode.static.convert)]
 %#ifndef __NO_FPU
-[dependency_prefix(
-#ifndef __CRT_QCVT_BUFFER_DEFINED
-#define __CRT_QCVT_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = {0};
-__NAMESPACE_LOCAL_END
-#endif /* !__CRT_QCVT_BUFFER_DEFINED */
-)]
+[dependency_prefix(DEFINE_QCVT_BUFFER)]
 [ATTR_WUNUSED][alias(_ecvt)]
 ecvt:(double val, int ndigit,
       [nonnull] int *__restrict decptr,
       [nonnull] int *__restrict sign) -> char * {
-	if (ecvt_r(val, ndigit, decptr, sign, @__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@, sizeof(@__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@)))
+	if (ecvt_r(val, ndigit, decptr, sign, @__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@,
+	           sizeof(@__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@)))
 		return NULL;
 	return @__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@;
 }
 
-[dependency_prefix(
-#ifndef __CRT_QCVT_BUFFER_DEFINED
-#define __CRT_QCVT_BUFFER_DEFINED 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_DATA(__qcvt_buffer) char __qcvt_buffer[32] = {0};
-__NAMESPACE_LOCAL_END
-#endif /* !__CRT_QCVT_BUFFER_DEFINED */
-)]
+[dependency_prefix(DEFINE_QCVT_BUFFER)]
 [ATTR_WUNUSED][alias(_ecvt)]
 fcvt:(double val, int ndigit,
       [nonnull] int *__restrict decptr,
       [nonnull] int *__restrict sign) -> char * {
-	if (fcvt_r(val, ndigit, decptr, sign, @__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@, sizeof(@__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@)))
+	if (fcvt_r(val, ndigit, decptr, sign, @__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@,
+	           sizeof(@__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@)))
 		return NULL;
 	return @__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@;
 }
@@ -1747,7 +1732,6 @@ mkostemps64:([nonnull] char *template_, int suffixlen, int flags) -> int;
 __SYSDECL_END
 
 #include <hybrid/__minmax.h>
-/* TODO: All of the different <parts/...> components */
 
 __SYSDECL_BEGIN
 
@@ -3197,28 +3181,14 @@ _wtof_l:([nonnull] wchar_t const *nptr, [nullable] $locale_t locale) -> double {
 [guard][wchar] _ui64tow_s:($uint64_t val, [outp_opt(buflen)] wchar_t *buf, size_t buflen, int radix) -> errno_t %{copy(_ui64toa_s, str2wcs)}
 
 %[default_impl_section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
-[guard][wchar][ATTR_WUNUSED][ATTR_PURE]
-[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(_wtol)]
-[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(_wtoll)]
-[if(__SIZEOF_INT__ == 8), alias(_wtoi64)]
-_wtoi:([nonnull] wchar_t const *nptr) -> int %{copy(atoi, str2wcs)}
+[guard][wchar][attribute(*)][alias(*)] _wtoi:(*) = wtoi;
+[guard][wchar][attribute(*)][alias(*)] _wtol:(*) = wtol;
+[guard][wchar][attribute(*)][alias(*)] _wtoll:(*) = wtoll;
 
 [guard][wchar][ATTR_WUNUSED][ATTR_PURE]
-[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, _wtoi)]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(_wtoll)]
-[if(__SIZEOF_LONG__ == 8), alias(_wtoi64)]
-_wtol:([nonnull] wchar_t const *nptr) -> long %{copy(atol, str2wcs)}
-
-[guard][wchar][ATTR_WUNUSED][ATTR_PURE]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, _wtoi)]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, _wtol)]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(_wtoi64)]
-_wtoll:([nonnull] wchar_t const *nptr) -> __LONGLONG %{copy(atoll, str2wcs)}
-
-[guard][wchar][ATTR_WUNUSED][ATTR_PURE]
-[alt_variant_of(__SIZEOF_INT__ == 8, _wtoi)]
-[alt_variant_of(__SIZEOF_LONG__ == 8, _wtol)]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, _wtoll)]
+[if(__SIZEOF_INT__ == 8), alias(_wtoi)]
+[if(__SIZEOF_LONG__ == 8), alias(_wtol)]
+[if(__SIZEOF_LONG_LONG__ == 8), alias(_wtoll)]
 _wtoi64:([nonnull] wchar_t const *nptr) -> $int64_t %{copy(_atoi64, str2wcs)}
 
 [guard][alias(*)][attribute(*)] _wcstoi64:(*) = wcsto64;
@@ -3269,6 +3239,12 @@ __SYSDECL_END
 #include <parts/uchar/stdlib.h>
 #endif /* _UCHAR_H && !_PARTS_UCHAR_STDLIB_H */
 #endif /* __USE_UTF */
+
+#ifdef __USE_KOS
+#if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_STDLIB_H)
+#include <parts/wchar/stdlib.h>
+#endif /* _WCHAR_H && !_PARTS_WCHAR_STDLIB_H */
+#endif /* __USE_KOS */
 
 }
 

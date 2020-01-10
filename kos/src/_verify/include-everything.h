@@ -223,7 +223,14 @@ incdir("", "../../include");
 #include <bits/sockaddr.h>
 #include <bits/socket.h>
 #include <bits/socket_type.h>
+#include <bits/stat-bits.h>
+#include <bits/stat-cyg.h>
+#include <bits/stat-dos.h>
+#include <bits/stat-gen.h>
+#include <bits/stat-glc.h>
+#include <bits/stat-kos.h>
 #include <bits/stat.h>
+#include <bits/statfs-convert.h>
 #include <bits/statfs.h>
 #include <bits/statvfs.h>
 #include <bits/stdio_lim.h>
@@ -297,6 +304,9 @@ incdir("", "../../include");
 #include <compat/bits/sigset.h>
 #include <compat/bits/sigstack.h>
 #include <compat/bits/sigval.h>
+#include <compat/bits/stat-convert.h>
+#include <compat/bits/stat.h>
+#include <compat/bits/statfs.h>
 #include <compat/bits/timeb.h>
 #include <compat/bits/timespec.h>
 #include <compat/bits/timeval.h>
@@ -304,7 +314,13 @@ incdir("", "../../include");
 #include <compat/bits/typesizes.h>
 #include <compat/bits/va_list-struct.h>
 #include <compat/config.h>
+#include <compat/kos/bits/except-handler.h>
+#include <compat/kos/bits/futex-expr.h>
+#include <compat/kos/bits/futex.h>
+#include <compat/kos/except-handler.h>
+#include <compat/kos/futex.h>
 #include <compat/kos/types.h>
+#include <compat/pointer.h>
 #include <compat/signal.h>
 #include <cpio.h>
 #include <crtdbg.h>
@@ -676,6 +692,7 @@ incdir("", "../../include");
 #include <parts/wchar/format-printer.h>
 #include <parts/wchar/process.h>
 #include <parts/wchar/stdio.h>
+#include <parts/wchar/stdlib.h>
 #include <parts/wchar/sys/stat.h>
 #include <parts/wchar/unistd.h>
 #include <parts/wchar/utime.h>

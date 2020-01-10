@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeaa34f60 */
+/* HASH CRC-32:0xac957d53 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1520,9 +1520,12 @@
 #define __CRT_ATTR_NOTHROW_NCX_c16symlink 1
 #define __CRT_ATTR_NOTHROW_NCX_c16symlinkat 1
 #define __CRT_ATTR_NOTHROW_NCX_c16system 1
+#define __CRT_ATTR_NOTHROW_NCX_c16toi 1
 #define __CRT_ATTR_NOTHROW_NCX_c16toimax 1
 #define __CRT_ATTR_NOTHROW_NCX_c16toimax_l 1
 #define __CRT_ATTR_NOTHROW_NCX_c16tok 1
+#define __CRT_ATTR_NOTHROW_NCX_c16tol 1
+#define __CRT_ATTR_NOTHROW_NCX_c16toll 1
 #define __CRT_ATTR_NOTHROW_NCX_c16toumax 1
 #define __CRT_ATTR_NOTHROW_NCX_c16toumax_l 1
 #define __CRT_ATTR_NOTHROW_NCX_c16truncate 1
@@ -1662,9 +1665,12 @@
 #define __CRT_ATTR_NOTHROW_NCX_c32symlink 1
 #define __CRT_ATTR_NOTHROW_NCX_c32symlinkat 1
 #define __CRT_ATTR_NOTHROW_NCX_c32system 1
+#define __CRT_ATTR_NOTHROW_NCX_c32toi 1
 #define __CRT_ATTR_NOTHROW_NCX_c32toimax 1
 #define __CRT_ATTR_NOTHROW_NCX_c32toimax_l 1
 #define __CRT_ATTR_NOTHROW_NCX_c32tok 1
+#define __CRT_ATTR_NOTHROW_NCX_c32tol 1
+#define __CRT_ATTR_NOTHROW_NCX_c32toll 1
 #define __CRT_ATTR_NOTHROW_NCX_c32toumax 1
 #define __CRT_ATTR_NOTHROW_NCX_c32toumax_l 1
 #define __CRT_ATTR_NOTHROW_NCX_c32truncate 1
@@ -3157,6 +3163,9 @@
 #define __CRT_ATTR_NOTHROW_NCX_wsetlogin 1
 #define __CRT_ATTR_NOTHROW_NCX_wsymlink 1
 #define __CRT_ATTR_NOTHROW_NCX_wsymlinkat 1
+#define __CRT_ATTR_NOTHROW_NCX_wtoi 1
+#define __CRT_ATTR_NOTHROW_NCX_wtol 1
+#define __CRT_ATTR_NOTHROW_NCX_wtoll 1
 #define __CRT_ATTR_NOTHROW_NCX_wtruncate 1
 #define __CRT_ATTR_NOTHROW_NCX_wtruncate32 1
 #define __CRT_ATTR_NOTHROW_NCX_wtruncate64 1
@@ -4149,6 +4158,9 @@
 #define __CRT_ATTR_PURE_c16stold_l 1
 #define __CRT_ATTR_PURE_c16stoul_l 1
 #define __CRT_ATTR_PURE_c16str 1
+#define __CRT_ATTR_PURE_c16toi 1
+#define __CRT_ATTR_PURE_c16tol 1
+#define __CRT_ATTR_PURE_c16toll 1
 #define __CRT_ATTR_PURE_c16verscmp 1
 #define __CRT_ATTR_PURE_c32casecmp 1
 #define __CRT_ATTR_PURE_c32casecmp_l 1
@@ -4193,6 +4205,9 @@
 #define __CRT_ATTR_PURE_c32stold_l 1
 #define __CRT_ATTR_PURE_c32stoul_l 1
 #define __CRT_ATTR_PURE_c32str 1
+#define __CRT_ATTR_PURE_c32toi 1
+#define __CRT_ATTR_PURE_c32tol 1
+#define __CRT_ATTR_PURE_c32toll 1
 #define __CRT_ATTR_PURE_c32verscmp 1
 #define __CRT_ATTR_PURE_cfgetispeed 1
 #define __CRT_ATTR_PURE_cfgetospeed 1
@@ -4515,6 +4530,9 @@
 #define __CRT_ATTR_PURE_wildwcscmp 1
 #define __CRT_ATTR_PURE_wmemchr 1
 #define __CRT_ATTR_PURE_wmemcmp 1
+#define __CRT_ATTR_PURE_wtoi 1
+#define __CRT_ATTR_PURE_wtol 1
+#define __CRT_ATTR_PURE_wtoll 1
 
 
 /* ATTR_CONST */

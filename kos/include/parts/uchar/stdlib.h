@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a84f419 */
+/* HASH CRC-32:0x832b40de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -768,6 +768,66 @@ __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NO
 #include <local/wchar/c32stou64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32stou64, __FORCELOCAL __ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL c32stou64)(char32_t const *__restrict __nptr, char32_t **__endptr, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32stou64))(__nptr, __endptr, __base); })
 #endif /* c32stou64... */
+#if defined(__CRT_HAVE_wtoi) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16toi,(char16_t const *__nptr),wtoi,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoi)
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16toi,(char16_t const *__nptr),_wtoi,(__nptr))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <local/parts.wchar.stdlib/wtoi.h>
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL c16toi)(char16_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoi))((__WCHAR_TYPE__ const *)__nptr); }
+#else /* LIBC: c16toi */
+#include <local/parts.wchar.stdlib/c16toi.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16toi, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL c16toi)(char16_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16toi))(__nptr); })
+#endif /* c16toi... */
+#if defined(__CRT_HAVE_wtoi) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32toi,(char32_t const *__nptr),wtoi,(__nptr))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <local/parts.wchar.stdlib/wtoi.h>
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL c32toi)(char32_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoi))((__WCHAR_TYPE__ const *)__nptr); }
+#else /* LIBC: c32toi */
+#include <local/parts.wchar.stdlib/c32toi.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32toi, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL c32toi)(char32_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32toi))(__nptr); })
+#endif /* c32toi... */
+#if defined(__CRT_HAVE_wtol) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,c16tol,(char16_t const *__nptr),wtol,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtol)
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,c16tol,(char16_t const *__nptr),_wtol,(__nptr))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <local/parts.wchar.stdlib/wtol.h>
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL c16tol)(char16_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtol))((__WCHAR_TYPE__ const *)__nptr); }
+#else /* LIBC: c16tol */
+#include <local/parts.wchar.stdlib/c16tol.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16tol, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL c16tol)(char16_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16tol))(__nptr); })
+#endif /* c16tol... */
+#if defined(__CRT_HAVE_wtol) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),long,__NOTHROW_NCX,c32tol,(char32_t const *__nptr),wtol,(__nptr))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <local/parts.wchar.stdlib/wtol.h>
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL c32tol)(char32_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtol))((__WCHAR_TYPE__ const *)__nptr); }
+#else /* LIBC: c32tol */
+#include <local/parts.wchar.stdlib/c32tol.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32tol, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long __NOTHROW_NCX(__LIBCCALL c32tol)(char32_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32tol))(__nptr); })
+#endif /* c32tol... */
+#if defined(__CRT_HAVE_wtoll) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,c16toll,(char16_t const *__nptr),wtoll,(__nptr))
+#elif defined(__CRT_HAVE_DOS$_wtoll)
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,c16toll,(char16_t const *__nptr),_wtoll,(__nptr))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <local/parts.wchar.stdlib/wtoll.h>
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL c16toll)(char16_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoll))((__WCHAR_TYPE__ const *)__nptr); }
+#else /* LIBC: c16toll */
+#include <local/parts.wchar.stdlib/c16toll.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16toll, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL c16toll)(char16_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16toll))(__nptr); })
+#endif /* c16toll... */
+#if defined(__CRT_HAVE_wtoll) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,c32toll,(char32_t const *__nptr),wtoll,(__nptr))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <local/parts.wchar.stdlib/wtoll.h>
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL c32toll)(char32_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtoll))((__WCHAR_TYPE__ const *)__nptr); }
+#else /* LIBC: c32toll */
+#include <local/parts.wchar.stdlib/c32toll.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32toll, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG __NOTHROW_NCX(__LIBCCALL c32toll)(char32_t const *__nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32toll))(__nptr); })
+#endif /* c32toll... */
 #endif /* __USE_KOS */
 
 #endif /* __CC__ */

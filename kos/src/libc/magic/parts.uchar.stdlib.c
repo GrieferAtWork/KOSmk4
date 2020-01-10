@@ -97,6 +97,13 @@ __SYSDECL_BEGIN
 [attribute(*)] c32sto64:(*) %{uchar32(wcsto64)}
 [attribute(*)] c16stou64:(*) %{uchar16(wcstou64)}
 [attribute(*)] c32stou64:(*) %{uchar32(wcstou64)}
+
+[attribute(*)] c16toi:(*) %{uchar16(wtoi)}
+[attribute(*)] c32toi:(*) %{uchar32(wtoi)}
+[attribute(*)] c16tol:(*) %{uchar16(wtol)}
+[attribute(*)] c32tol:(*) %{uchar32(wtol)}
+[attribute(*)] c16toll:(*) %{uchar16(wtoll)}
+[attribute(*)] c32toll:(*) %{uchar32(wtoll)}
 %#endif /* __USE_KOS */
 
 

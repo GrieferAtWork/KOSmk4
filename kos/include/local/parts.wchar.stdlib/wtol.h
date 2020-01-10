@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x499632d8 */
+/* HASH CRC-32:0x51a885fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__wtoll_defined
-#define __local__wtoll_defined 1
+#ifndef __local_wtol_defined
+#define __local_wtol_defined 1
 /* Dependency: "wcsto32" from "wchar" */
 #ifndef ____localdep_wcsto32_defined
 #define ____localdep_wcsto32_defined 1
@@ -60,14 +60,14 @@ __CREDIRECT(__ATTR_LEAF __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTH
 #endif /* !____localdep_wcsto64_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wtoll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGLONG
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtoll))(__WCHAR_TYPE__ const *__nptr) {
-#line 821 "kos/src/libc/magic/stdlib.c"
-#if __SIZEOF_LONG_LONG__ <= 4
-	return (__LONGLONG)__localdep_wcsto32(__nptr, __NULLPTR, 10);
-#else /* __SIZEOF_LONG_LONG__ <= 4 */
-	return (__LONGLONG)__localdep_wcsto64(__nptr, __NULLPTR, 10);
-#endif /* __SIZEOF_LONG_LONG__ > 4 */
+__LOCAL_LIBC(wtol) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wtol))(__WCHAR_TYPE__ const *__nptr) {
+#line 810 "kos/src/libc/magic/stdlib.c"
+#if __SIZEOF_LONG__ <= 4
+	return (long)__localdep_wcsto32(__nptr, __NULLPTR, 10);
+#else /* __SIZEOF_LONG__ <= 4 */
+	return (long)__localdep_wcsto64(__nptr, __NULLPTR, 10);
+#endif /* __SIZEOF_LONG__ > 4 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__local__wtoll_defined */
+#endif /* !__local_wtol_defined */

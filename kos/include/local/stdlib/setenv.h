@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b19037f */
+/* HASH CRC-32:0x38583c3e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __LOCAL_LIBC(setenv) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setenv))(char const *__varname,
                                                     char const *__val,
                                                     int __replace) {
-#line 1494 "kos/src/libc/magic/stdlib.c"
+#line 1491 "kos/src/libc/magic/stdlib.c"
 	if (!__replace && __localdep_getenv(__varname))
 		return 0;
 	return __localdep_dos_putenv_s(__varname, __val);

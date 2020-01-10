@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36d5d49b */
+/* HASH CRC-32:0xc19212f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@ __LOCAL_LIBC(_aligned_msize) __ATTR_PURE __ATTR_WUNUSED __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_msize))(void *__aligned_mallptr,
                                                             __SIZE_TYPE__ __min_alignment,
                                                             __SIZE_TYPE__ __offset) {
-#line 2704 "kos/src/libc/magic/stdlib.c"
+#line 2688 "kos/src/libc/magic/stdlib.c"
 	(void)__min_alignment;
 	(void)__offset;
 	if (!__aligned_mallptr)

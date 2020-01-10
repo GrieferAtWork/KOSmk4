@@ -4915,6 +4915,9 @@
 #define __CRT_HAVE_wsymlink 1
 #define __CRT_HAVE_wsymlinkat 1
 #define __CRT_HAVE_wsystem 1
+#define __CRT_HAVE_wtoi 1
+#define __CRT_HAVE_wtol 1
+#define __CRT_HAVE_wtoll 1
 #define __CRT_HAVE_wtruncate 1
 #define __CRT_HAVE_wtruncate64 1
 #define __CRT_HAVE_wttyname 1

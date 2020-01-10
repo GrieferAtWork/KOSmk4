@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bf14852 */
+/* HASH CRC-32:0xe94b80b2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,12 +208,12 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__i64tow_s)(int64_t val, char32_t *buf, 
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__i64tow_s)(int64_t val, char16_t *buf, size_t buflen, int radix);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__ui64tow_s)(uint64_t val, char32_t *buf, size_t buflen, int radix);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(uint64_t val, char16_t *buf, size_t buflen, int radix);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc__wtoi)(char32_t const *nptr);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd__wtoi)(char16_t const *nptr);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc__wtol)(char32_t const *nptr);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd__wtol)(char16_t const *nptr);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBCCALL libc__wtoll)(char32_t const *nptr);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBDCALL libd__wtoll)(char16_t const *nptr);
+#define libc__wtoi libc_wtoi
+#define libd__wtoi libd_wtoi
+#define libc__wtol libc_wtol
+#define libd__wtol libd_wtol
+#define libc__wtoll libc_wtoll
+#define libd__wtoll libd_wtoll
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int64_t NOTHROW_NCX(LIBCCALL libc__wtoi64)(char32_t const *nptr);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int64_t NOTHROW_NCX(LIBDCALL libd__wtoi64)(char16_t const *nptr);
 #define libc__wcstoi64 libc_wcsto64

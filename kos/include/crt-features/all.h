@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x932da95f */
+/* HASH CRC-32:0xb77188dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,6 +114,9 @@
 #define __CRT_HAVE_DOS$_wspawnvp 1
 #define __CRT_HAVE_DOS$_wspawnvpe 1
 #define __CRT_HAVE_DOS$_wsystem 1
+#define __CRT_HAVE_DOS$_wtoi 1
+#define __CRT_HAVE_DOS$_wtol 1
+#define __CRT_HAVE_DOS$_wtoll 1
 #define __CRT_HAVE_DOS$_wunlink 1
 #define __CRT_HAVE_DOS$_wutime32 1
 #define __CRT_HAVE_DOS$_wutime64 1
@@ -3933,6 +3936,9 @@
 #define __CRT_HAVE_wsymlink 1
 #define __CRT_HAVE_wsymlinkat 1
 #define __CRT_HAVE_wsystem 1
+#define __CRT_HAVE_wtoi 1
+#define __CRT_HAVE_wtol 1
+#define __CRT_HAVE_wtoll 1
 #define __CRT_HAVE_wtruncate 1
 #define __CRT_HAVE_wtruncate32 1
 #define __CRT_HAVE_wtruncate64 1
