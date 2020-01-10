@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x234e512c */
+/* HASH CRC-32:0xd222cf09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bsearch))(void const *__pkey,
                                                      __SIZE_TYPE__ __item_count,
                                                      __SIZE_TYPE__ __item_size,
                                                      __compar_fn_t __cmp) {
-#line 445 "kos/src/libc/magic/stdlib.c"
+#line 446 "kos/src/libc/magic/stdlib.c"
 	return __localdep_bsearch_r(__pkey, __pbase, __item_count, __item_size, &__invoke_compare_helper, (void *)__cmp);
 }
 __NAMESPACE_LOCAL_END

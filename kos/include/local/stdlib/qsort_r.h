@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf03f2cbb */
+/* HASH CRC-32:0x2afa4068 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,14 +55,15 @@ __LOCAL_LIBC(qsort_r) __ATTR_NONNULL((1, 4)) void
 	   You should have received a copy of the GNU Lesser General Public
 	   License along with the GNU C Library; if not, see
 	   <http://www.gnu.org/licenses/>.  */
-#define __SWAP(__a, __b, __size) \
-do{	__SIZE_TYPE__ __size = (__size); \
-	__BYTE_TYPE__ *__a = (__a), *__b = (__b); \
-	do{ __BYTE_TYPE__ __tmp = *__a; \
-		*__a++ = *__b; \
-		*__b++ = __tmp; \
-	} while (--__size > 0); \
-}while(0)
+#define __SWAP(__a, __b, __size)               \
+	do {                               \
+		__SIZE_TYPE__ __size = (__size);        \
+		__BYTE_TYPE__ *__a = (__a), *__b = (__b); \
+		do{ __BYTE_TYPE__ __tmp = *__a;       \
+			*__a++ = *__b;             \
+			*__b++ = __tmp;            \
+		} while (--__size > 0);        \
+	} __WHILE0
 #define __MAX_THRESH 4
 	typedef struct { __BYTE_TYPE__ *__lo, *__hi; } __stack_node;
 #define __STACK_SIZE      (8*sizeof(__SIZE_TYPE__))

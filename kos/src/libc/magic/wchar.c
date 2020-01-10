@@ -2232,9 +2232,7 @@ _wtmpnam_s:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count) -> $errno_t;
 %#ifndef _WSTDLIB_DEFINED
 %#define _WSTDLIB_DEFINED
 %[insert:extern(_wcstol_l)]
-%[insert:extern(_wcstoll_l)]
 %[insert:extern(_wcstoul_l)]
-%[insert:extern(_wcstoull_l)]
 %#ifndef __NO_FPU
 %[insert:extern(_wcstof_l)]
 %[insert:extern(_wcstod_l)]
@@ -2260,16 +2258,20 @@ _wtmpnam_s:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count) -> $errno_t;
 %[insert:extern(_wsystem)]
 %[insert:extern(_wtoi)]
 %[insert:extern(_wtol)]
-%[insert:extern(_wtoll)]
 %[insert:extern(_wtoi64)]
 %[insert:extern(_wcstoi64)]
 %[insert:extern(_wcstoui64)]
 %[insert:extern(_wtoi_l)]
 %[insert:extern(_wtol_l)]
-%[insert:extern(_wtoll_l)]
 %[insert:extern(_wtoi64_l)]
 %[insert:extern(_wcstoi64_l)]
 %[insert:extern(_wcstoui64_l)]
+%#ifdef __LONGLONG
+%[insert:extern(_wcstoll_l)]
+%[insert:extern(_wcstoull_l)]
+%[insert:extern(_wtoll)]
+%[insert:extern(_wtoll_l)]
+%#endif /* __LONGLONG */
 %#endif /* !_WSTDLIB_DEFINED */
 
 

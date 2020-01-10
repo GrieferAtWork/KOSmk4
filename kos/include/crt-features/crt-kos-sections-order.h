@@ -356,6 +356,7 @@
 	CB(PREFIX.dos.utility.*) \
 	CB(PREFIX.dos.system.utility.* PREFIX.dos.system.*) \
 	CB(PREFIX.dos.unsorted.*) \
+	CB(PREFIX.dos.wchar.application.init.*) \
 	CB(PREFIX.dos.wchar.fs.exec.exec.*) \
 	CB(PREFIX.dos.wchar.heap.strdup.*) \
 	CB(PREFIX.dos.wchar.FILE.locked.access.*) \

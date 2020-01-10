@@ -1641,6 +1641,12 @@ NOTHROW_RPC(LIBCCALL libc_mkostemps64)(char *template_,
 #endif /* MAGIC:alias */
 /*[[[end:mkostemps64]]]*/
 
+/*[[[skip:malloc]]]*/
+/*[[[skip:free]]]*/
+/*[[[skip:calloc]]]*/
+/*[[[skip:realloc]]]*/
+
+
 /* `__errno_location' is provided in libc/errno.c */
 /*[[[skip:__errno_location]]]*/
 
@@ -2026,7 +2032,35 @@ NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func)
 }
 /*[[[end:onexit]]]*/
 
+/*[[[head:_get_pgmptr,hash:CRC-32=0xea63c11c]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init._get_pgmptr") errno_t
+NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue)
+/*[[[body:_get_pgmptr]]]*/
+{
+	*pvalue = *libc___p__pgmptr();
+	return 0;
+}
+/*[[[end:_get_pgmptr]]]*/
 
+/*[[[head:_get_wpgmptr,hash:CRC-32=0x4cfa0529]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.application.init._get_wpgmptr") errno_t
+NOTHROW_NCX(LIBCCALL libc__get_wpgmptr)(char32_t **pvalue)
+/*[[[body:_get_wpgmptr]]]*/
+{
+	*pvalue = *libc___p__wpgmptr();
+	return 0;
+}
+/*[[[end:_get_wpgmptr]]]*/
+
+/*[[[head:DOS$_get_wpgmptr,hash:CRC-32=0x9ca8da30]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.application.init._get_wpgmptr") errno_t
+NOTHROW_NCX(LIBDCALL libd__get_wpgmptr)(char16_t **pvalue)
+/*[[[body:DOS$_get_wpgmptr]]]*/
+{
+	*pvalue = *libd___p__wpgmptr();
+	return 0;
+}
+/*[[[end:DOS$_get_wpgmptr]]]*/
 
 /*[[[head:_beep,hash:CRC-32=0xac9f7eb3]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.system._beep") void
@@ -2040,11 +2074,6 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:_beep]]]*/
-
-/*[[[skip:malloc]]]*/
-/*[[[skip:free]]]*/
-/*[[[skip:calloc]]]*/
-/*[[[skip:realloc]]]*/
 
 /*[[[head:_set_purecall_handler,hash:CRC-32=0x33e1e92f]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._set_purecall_handler") _purecall_handler
@@ -2091,30 +2120,6 @@ NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void)
 	return 0;
 }
 /*[[[end:_get_invalid_parameter_handler]]]*/
-
-/*[[[head:_get_pgmptr,hash:CRC-32=0xea63c11c]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init._get_pgmptr") errno_t
-NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue)
-/*[[[body:_get_pgmptr]]]*/
-{
-	(void)pvalue;
-	CRT_UNIMPLEMENTED("_get_pgmptr"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:_get_pgmptr]]]*/
-
-/*[[[head:_get_wpgmptr,hash:CRC-32=0xf0bed458]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init._get_wpgmptr") errno_t
-NOTHROW_NCX(LIBCCALL libc__get_wpgmptr)(char32_t **pvalue)
-/*[[[body:_get_wpgmptr]]]*/
-{
-	(void)pvalue;
-	CRT_UNIMPLEMENTED("_get_wpgmptr"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:_get_wpgmptr]]]*/
 
 /*[[[head:__p__fmode,hash:CRC-32=0x21cb19d3]]]*/
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
@@ -2268,7 +2273,7 @@ NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6df42ba3]]]*/
+/*[[[start:exports,hash:CRC-32=0x92d521a9]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_WEAK_ALIAS(system, libc_system);
 DEFINE_PUBLIC_WEAK_ALIAS(abort, libc_abort);
@@ -2362,6 +2367,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(_set_invalid_parameter_handler, libc__set_invalid_param
 DEFINE_PUBLIC_WEAK_ALIAS(_get_invalid_parameter_handler, libc__get_invalid_parameter_handler);
 DEFINE_PUBLIC_WEAK_ALIAS(_get_pgmptr, libc__get_pgmptr);
 DEFINE_PUBLIC_WEAK_ALIAS(_get_wpgmptr, libc__get_wpgmptr);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_get_wpgmptr, libd__get_wpgmptr);
 DEFINE_PUBLIC_WEAK_ALIAS(__p__fmode, libc___p__fmode);
 DEFINE_PUBLIC_WEAK_ALIAS(_set_fmode, libc__set_fmode);
 DEFINE_PUBLIC_WEAK_ALIAS(_get_fmode, libc__get_fmode);

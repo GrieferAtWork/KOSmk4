@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe94b80b2 */
+/* HASH CRC-32:0xc790e1bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,12 +178,15 @@ INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_itoa)(int val, char *buf, in
 INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_ltoa)(long val, char *buf, int radix);
 INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_ultoa)(unsigned long val, char *buf, int radix);
 #define libc__wcstol_l libc_wcstol_l
-#define libc__wcstoll_l libc_wcstoll_l
+#define libd__wcstol_l libd_wcstol_l
 #define libc__wcstoul_l libc_wcstoul_l
-#define libc__wcstoull_l libc_wcstoull_l
+#define libd__wcstoul_l libd_wcstoul_l
 #define libc__wcstof_l libc_wcstof_l
+#define libd__wcstof_l libd_wcstof_l
 #define libc__wcstod_l libc_wcstod_l
+#define libd__wcstod_l libd_wcstod_l
 #define libc__wcstold_l libc_wcstold_l
+#define libd__wcstold_l libd_wcstold_l
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) double NOTHROW_NCX(LIBCCALL libc__wtof)(char32_t const *nptr);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) double NOTHROW_NCX(LIBDCALL libd__wtof)(char16_t const *nptr);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) double NOTHROW_NCX(LIBCCALL libc__wtof_l)(char32_t const *nptr, locale_t locale);
@@ -212,22 +215,30 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(uint64_t val, char16_t *buf
 #define libd__wtoi libd_wtoi
 #define libc__wtol libc_wtol
 #define libd__wtol libd_wtol
-#define libc__wtoll libc_wtoll
-#define libd__wtoll libd_wtoll
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int64_t NOTHROW_NCX(LIBCCALL libc__wtoi64)(char32_t const *nptr);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int64_t NOTHROW_NCX(LIBDCALL libd__wtoi64)(char16_t const *nptr);
 #define libc__wcstoi64 libc_wcsto64
+#define libd__wcstoi64 libd_wcsto64
 #define libc__wcstoui64 libc_wcstou64
+#define libd__wcstoui64 libd_wcstou64
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc__wtoi_l)(char32_t const *nptr, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd__wtoi_l)(char16_t const *nptr, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc__wtol_l)(char32_t const *nptr, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBDCALL libd__wtol_l)(char16_t const *nptr, locale_t locale);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBCCALL libc__wtoll_l)(char32_t const *nptr, locale_t locale);
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBDCALL libd__wtoll_l)(char16_t const *nptr, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int64_t NOTHROW_NCX(LIBCCALL libc__wtoi64_l)(char32_t const *nptr, locale_t locale);
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int64_t NOTHROW_NCX(LIBDCALL libd__wtoi64_l)(char16_t const *nptr, locale_t locale);
 #define libc__wcstoi64_l libc_wcsto64_l
+#define libd__wcstoi64_l libd_wcsto64_l
 #define libc__wcstoui64_l libc_wcstou64_l
+#define libd__wcstoui64_l libd_wcstou64_l
+#define libc__wcstoll_l libc_wcstoll_l
+#define libd__wcstoll_l libd_wcstoll_l
+#define libc__wcstoull_l libc_wcstoull_l
+#define libd__wcstoull_l libd_wcstoull_l
+#define libc__wtoll libc_wtoll
+#define libd__wtoll libd_wtoll
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBCCALL libc__wtoll_l)(char32_t const *nptr, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBDCALL libd__wtoll_l)(char16_t const *nptr, locale_t locale);
 #endif /* !__KERNEL__ */
 
 DECL_END

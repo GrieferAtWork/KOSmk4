@@ -240,14 +240,15 @@ qsort_r:([nonnull] void *pbase, $size_t item_count, $size_t item_size, [nonnull]
 	   You should have received a copy of the GNU Lesser General Public
 	   License along with the GNU C Library; if not, see
 	   <http://www.gnu.org/licenses/>.  */
-#define SWAP(a, b, size) \
-do{	size_t __size = (size); \
-	byte_t *__a = (a), *__b = (b); \
-	do{ byte_t __tmp = *__a; \
-		*__a++ = *__b; \
-		*__b++ = __tmp; \
-	} while (--__size > 0); \
-}while(0)
+#define SWAP(a, b, size)               \
+	do {                               \
+		size_t __size = (size);        \
+		byte_t *__a = (a), *__b = (b); \
+		do{ byte_t __tmp = *__a;       \
+			*__a++ = *__b;             \
+			*__b++ = __tmp;            \
+		} while (--__size > 0);        \
+	} __WHILE0
 #define MAX_THRESH 4
 	typedef struct { byte_t *lo, *hi; } stack_node;
 #define STACK_SIZE      (8*sizeof(size_t))
@@ -449,18 +450,20 @@ bsearch:([nonnull] void const *pkey, [nonnull] void const *pbase, size_t item_co
 %[default_impl_section(.text.crt.math.utility)]
 
 [ATTR_CONST][ATTR_WUNUSED][nothrow][std][crtbuiltin]
-[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias(abs)]
+[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, abs)]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(llabs)]
 [if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias(imaxabs)]
+[if(__SIZEOF_LONG__ == 8), alias(_abs64)]
 labs:(long x) -> long {
 	return x < 0 ? -x : x;
 }
 
 %(std, c, ccompat)#ifdef __USE_ISOC99
 [ATTR_CONST][ATTR_WUNUSED][nothrow][std][crtbuiltin]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias(abs)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(labs)]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, abs)]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, labs)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(imaxabs)]
+[if(__SIZEOF_LONG_LONG__ == 8), alias(_abs64)]
 llabs:(__LONGLONG x) -> __LONGLONG {
 	return x < 0 ? -x : x;
 }
@@ -524,7 +527,7 @@ llabs:(__LONGLONG x) -> __LONGLONG {
  */
 
 [ATTR_CONST][ATTR_WUNUSED][std]
-[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias(div)]
+[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_INT__, div)]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(lldiv)]
 [if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias(imaxdiv)]
 ldiv:(long numer, long denom) -> $ldiv_t {
@@ -536,8 +539,8 @@ ldiv:(long numer, long denom) -> $ldiv_t {
 
 %(std, c, ccompat)#ifdef __USE_ISOC99
 [ATTR_CONST][ATTR_WUNUSED][std]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias(div)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(ldiv)]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, div)]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, ldiv)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(imaxdiv)]
 lldiv:(__LONGLONG numer, __LONGLONG denom) -> $lldiv_t {
 	lldiv_t result;
@@ -558,6 +561,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),labs,(__x))
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),llabs,(__x))
 #elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_INT__ == __SIZEOF_INTMAX_T__
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),imaxabs,(__x))
+#elif defined(__CRT_HAVE__abs64) && __SIZEOF_INT__ == 8
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),_abs64,(__x))
 #elif __has_builtin(__builtin_abs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_abs)
 __LOCAL __ATTR_CONST __ATTR_WUNUSED int (__LIBCCALL abs)(int __x) { return __builtin_abs(__x); }
 #else /* abs... */
@@ -571,6 +576,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),abs,(__x))
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),llabs,(__x))
 #elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),imaxabs,(__x))
+#elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG__ == 8
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),_abs64,(__x))
 #else /* lbas... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED long (__LIBCCALL abs)(long __x) { return (labs)(__x); }
 #endif /* !lbas... */
@@ -605,6 +612,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),labs,(__x))
 #elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),imaxabs,(__x))
+#elif defined(__CRT_HAVE__abs64) && __SIZEOF_LONG_LONG__ == 8
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),_abs64,(__x))
 #else /* llabs... */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG (__LIBCCALL abs)(__LONGLONG __x) { return (llabs)(__x); }
 #endif /* !llabs... */
@@ -627,6 +636,7 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED struct __lldiv_struct (__LIBCCALL div)(
 [if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(labs)]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(llabs)]
 [if(__SIZEOF_INT__ == __SIZEOF_INTMAX_T__), alias(imaxabs)]
+[if(__SIZEOF_INT__ == 8), alias(_abs64)]
 abs:(int x) -> int {
 	return x < 0 ? -x : x;
 }
@@ -717,11 +727,11 @@ typedef void (*__LIBCCALL __atexit_func_t)(void);
 )]
 
 %[default_impl_section(.text.crt.sched.process)]
-[dependency_prefix(DEFINE_ATEXIT_FUNC_T)]
+[decl_prefix(DEFINE_ATEXIT_FUNC_T)]
 [std][alias(at_quick_exit)] atexit:([nonnull] __atexit_func_t func) -> int;
 %(std, c, ccompat)#if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 [std][alias(exit)][alias(_exit)][alias(_Exit)][ATTR_NORETURN][throws] quick_exit:(int status);
-[dependency_prefix(DEFINE_ATEXIT_FUNC_T)]
+[decl_prefix(DEFINE_ATEXIT_FUNC_T)]
 [std][alias(atexit)] at_quick_exit:([nonnull] __atexit_func_t func) -> int;
 %(std, c, ccompat)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 %(std, c, ccompat)#ifdef __USE_ISOC99
@@ -828,9 +838,10 @@ atoll:([nonnull] char const *__restrict nptr) -> __LONGLONG {
 
 
 [std][ATTR_LEAF]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(strtoull), alias(strtouq)]
-[if(__SIZEOF_LONG__ == 4), alias(strtou32)]
-[if(__SIZEOF_LONG__ == 8), alias(strtou64, _strtoui64)]
+[alt_variant_of(__SIZEOF_LONG__ == 4, strtou32)]
+[alt_variant_of(__SIZEOF_LONG__ == 8, strtou64)]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(strtoull, strtouq)]
+[if(__SIZEOF_LONG__ == 8), alias(_strtoui64)]
 [if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias(strtoumax)]
 strtoul:([nonnull] char const *__restrict nptr, char **endptr, int base) -> unsigned long {
 #if __SIZEOF_LONG__ <= 4
@@ -841,9 +852,10 @@ strtoul:([nonnull] char const *__restrict nptr, char **endptr, int base) -> unsi
 }
 
 [std][ATTR_LEAF]
-[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(strtoll), alias(strtoq)]
-[if(__SIZEOF_LONG__ == 4), alias(strto32)]
-[if(__SIZEOF_LONG__ == 8), alias(strto64, _strtoi64)]
+[alt_variant_of(__SIZEOF_LONG__ == 4, strto32)]
+[alt_variant_of(__SIZEOF_LONG__ == 8, strto64)]
+[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(strtoll, strtoq)]
+[if(__SIZEOF_LONG__ == 8), alias(_strtoi64)]
 [if(__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__), alias(strtoimax)]
 strtol:([nonnull] char const *__restrict nptr, char **endptr, int base) -> long {
 #if __SIZEOF_LONG__ <= 4
@@ -856,9 +868,11 @@ strtol:([nonnull] char const *__restrict nptr, char **endptr, int base) -> long 
 %(std)#ifdef __ULONGLONG
 %(std)#ifdef __USE_ISOC99
 [std][std_guard][ATTR_LEAF][alias(strtouq)]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(strtou64, _strtoui64)]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strtou64)]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strtou32)]
+[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(strtoul)]
+[if(__SIZEOF_LONG_LONG__ == 8), alias(_strtoui64)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(strtoumax)]
-[if(__SIZEOF_LONG_LONG__ == 4), alias(strtou32)]
 strtoull:([nonnull] char const *__restrict nptr, char **endptr, int base) -> __ULONGLONG {
 #if @__SIZEOF_LONG_LONG__@ <= 4
 	return (@__ULONGLONG@)strtou32(nptr, endptr, base);
@@ -867,9 +881,11 @@ strtoull:([nonnull] char const *__restrict nptr, char **endptr, int base) -> __U
 #endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 [std][std_guard][ATTR_LEAF][alias(strtoq)]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(strto64, _strtoi64)]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, strto64)]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == 4, strto32)]
+[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(strtol)]
+[if(__SIZEOF_LONG_LONG__ == 8), alias(_strtoi64)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(strtoimax)]
-[if(__SIZEOF_LONG_LONG__ == 4), alias(strto32)]
 strtoll:([nonnull] char const *__restrict nptr, char **endptr, int base) -> __LONGLONG {
 #if @__SIZEOF_LONG_LONG__@ <= 4
 	return (@__LONGLONG@)strto32(nptr, endptr, base);
@@ -908,7 +924,7 @@ strtof:([nonnull] char const *__restrict nptr, char **endptr) -> float {
 
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std_guard][std][ATTR_LEAF]
-[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(strtod)]
+[alt_variant_of(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod)]
 strtold:([nonnull] char const *__restrict nptr, char **endptr) -> long double {
 	/* TODO */
 	COMPILER_IMPURE();
@@ -923,21 +939,12 @@ strtold:([nonnull] char const *__restrict nptr, char **endptr) -> long double {
 
 
 %
-%#ifdef __ULONGLONG
 %#ifdef __USE_MISC
-[ATTR_LEAF][guard]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(strto64, _strtoi64)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(strtoimax)]
-[if(__SIZEOF_LONG_LONG__ == 4), alias(strto32)]
-strtoq:([nonnull] char const *__restrict nptr, char **endptr, int base) -> __LONGLONG = strtoll;
-
-[ATTR_LEAF][guard]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(strtou64, _strtoui64)]
-[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__), alias(strtoumax)]
-[if(__SIZEOF_LONG_LONG__ == 4), alias(strtou32)]
-strtouq:([nonnull] char const *__restrict nptr, char **endptr, int base) -> __ULONGLONG = strtoull;
-%#endif /* __USE_MISC */
+%#ifdef __ULONGLONG
+[alias(*)][attribute(*)] strtoq:(*) = strtoll;
+[alias(*)][attribute(*)] strtouq:(*) = strtoull;
 %#endif /* __ULONGLONG */
+%#endif /* __USE_MISC */
 
 
 
@@ -1006,7 +1013,7 @@ strto32:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $int
 %#ifdef __UINT64_TYPE__
 [kernel][ATTR_LEAF][alias(_strtoui64)]
 [if(__SIZEOF_LONG__ == 8), alias(strtoul)]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(strtoull), alias(strtouq)]
+[if(__SIZEOF_LONG_LONG__ == 8), alias(strtoull, strtouq)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(strtoumax)]
 strtou64:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $uint64_t {
 	u64 result, temp;
@@ -1050,7 +1057,7 @@ strtou64:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $ui
 }
 [kernel][ATTR_LEAF][alias(_strtoi64)]
 [if(__SIZEOF_LONG__ == 8), alias(strtol)]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(strtoll), alias(strtoq)]
+[if(__SIZEOF_LONG_LONG__ == 8), alias(strtoll, strtoq)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(strtoimax)]
 strto64:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $int64_t {
 	u64 result;
@@ -2011,9 +2018,10 @@ _set_invalid_parameter_handler:(_invalid_parameter_handler __handler) -> _invali
 _get_invalid_parameter_handler:() -> _invalid_parameter_handler;
 
 %
-%[default_impl_section(.text.crt.dos.application.init)]
+[section(.text.crt.dos.application.init)]
 _get_pgmptr:(char **pvalue) -> errno_t; /* TODO: Implement using `_pgmptr' */
-_get_wpgmptr:(wchar_t **pvalue) -> errno_t; /* TODO: Implement using `_wpgmptr' */
+[section(.text.crt.dos.wchar.application.init)]
+[wchar] _get_wpgmptr:(wchar_t **pvalue) -> errno_t; /* TODO: Implement using `_wpgmptr' */
 
 %
 %[default_impl_section(.text.crt.dos.FILE.utility)]
@@ -2028,8 +2036,8 @@ _get_wpgmptr:(wchar_t **pvalue) -> errno_t; /* TODO: Implement using `_wpgmptr' 
 _set_fmode:(int mode) -> errno_t;
 _get_fmode:(int *pmode) -> errno_t;
 
-%[default_impl_section(.text.crt.dos.errno)]
 %
+%[default_impl_section(.text.crt.dos.errno)]
 _set_abort_behavior:(unsigned int flags, unsigned int mask) -> unsigned int;
 
 %
@@ -2040,17 +2048,17 @@ _set_abort_behavior:(unsigned int flags, unsigned int mask) -> unsigned int;
 %#else /* _MSC_VER */
 %[default_impl_section(.text.crt.dos.math.utility)]
 [ATTR_CONST][ATTR_WUNUSED][nothrow]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(llabs)]
+[alt_variant_of(__SIZEOF_INT__ == 8, abs)]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == 8, llabs)]
 [if(__SIZEOF_INTMAX_T__ == 8), alias(imaxabs)]
-[if(__SIZEOF_INT__ == 8), alias(abs)]
 _abs64:(__INT64_TYPE__ x) -> __INT64_TYPE__ {
 	return x < 0 ? -x : x;
 }
 %#endif /* !_MSC_VER */
 %#endif /* __INT64_TYPE__ */
 
-%[default_impl_section(.text.crt.dos.unicode.locale.convert)]
 
+%[default_impl_section(.text.crt.dos.unicode.locale.convert)]
 %#ifndef __NO_FPU
 [ATTR_WUNUSED][ATTR_PURE]
 _atof_l:([nonnull] char const *__restrict nptr, $locale_t locale) -> double {
@@ -3143,20 +3151,19 @@ ultoa:(unsigned long val, [nonnull] char *buf, int radix) -> char * {
 %[insert:extern(wcstoll)]
 %[insert:extern(wcstoul)]
 %[insert:extern(wcstoull)]
-[guard][attribute(*)][alias(*)] _wcstol_l:(*) = wcstol_l;
-[guard][attribute(*)][alias(*)] _wcstoll_l:(*) = wcstoll_l;
-[guard][attribute(*)][alias(*)] _wcstoul_l:(*) = wcstoul_l;
-[guard][attribute(*)][alias(*)] _wcstoull_l:(*) = wcstoull_l;
+[guard][wchar][attribute(*)][alias(*)] _wcstol_l:(*) = wcstol_l;
+[guard][wchar][attribute(*)][alias(*)] _wcstoul_l:(*) = wcstoul_l;
 
 %#ifndef __NO_FPU
 %[insert:extern(wcstof)]
 %[insert:extern(wcstod)]
-[guard][attribute(*)][alias(*)] _wcstof_l:(*) = wcstof_l;
-[guard][attribute(*)][alias(*)] _wcstod_l:(*) = wcstod_l;
+[guard][wchar][attribute(*)][alias(*)] _wcstof_l:(*) = wcstof_l;
+[guard][wchar][attribute(*)][alias(*)] _wcstod_l:(*) = wcstod_l;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 %[insert:extern(wcstold)]
-[guard][attribute(*)][alias(*)] _wcstold_l:(*) = wcstold_l;
+[guard][wchar][attribute(*)][alias(*)] _wcstold_l:(*) = wcstold_l;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
+
 [guard][wchar][ATTR_WUNUSED][ATTR_PURE]
 _wtof:([nonnull] wchar_t const *nptr) -> double {
 	return wcstod(nptr, NULL);
@@ -3168,7 +3175,7 @@ _wtof_l:([nonnull] wchar_t const *nptr, [nullable] $locale_t locale) -> double {
 }
 %#endif /* !__NO_FPU */
 
-%[default_impl_section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
+%[default_impl_section(.text.crt.dos.wchar.unicode.static.convert)]
 [guard][wchar] _itow:(int val, [nonnull] wchar_t *buf, int radix) -> wchar_t * %{copy(itoa, str2wcs)}
 [guard][wchar] _ltow:(long val, [nonnull] wchar_t *buf, int radix) -> wchar_t * %{copy(ltoa, str2wcs)}
 [guard][wchar] _ultow:(unsigned long val, [nonnull] wchar_t *buf, int radix) -> wchar_t * %{copy(ultoa, str2wcs)}
@@ -3180,10 +3187,9 @@ _wtof_l:([nonnull] wchar_t const *nptr, [nullable] $locale_t locale) -> double {
 [guard][wchar] _i64tow_s:($int64_t val, [outp_opt(buflen)] wchar_t *buf, size_t buflen, int radix) -> errno_t %{copy(_i64toa_s, str2wcs)}
 [guard][wchar] _ui64tow_s:($uint64_t val, [outp_opt(buflen)] wchar_t *buf, size_t buflen, int radix) -> errno_t %{copy(_ui64toa_s, str2wcs)}
 
-%[default_impl_section({.text.crt.wchar.unicode.static.convert|.text.crt.dos.wchar.unicode.static.convert})]
+%[default_impl_section(.text.crt.dos.wchar.unicode.static.convert)]
 [guard][wchar][attribute(*)][alias(*)] _wtoi:(*) = wtoi;
 [guard][wchar][attribute(*)][alias(*)] _wtol:(*) = wtol;
-[guard][wchar][attribute(*)][alias(*)] _wtoll:(*) = wtoll;
 
 [guard][wchar][ATTR_WUNUSED][ATTR_PURE]
 [if(__SIZEOF_INT__ == 8), alias(_wtoi)]
@@ -3191,10 +3197,10 @@ _wtof_l:([nonnull] wchar_t const *nptr, [nullable] $locale_t locale) -> double {
 [if(__SIZEOF_LONG_LONG__ == 8), alias(_wtoll)]
 _wtoi64:([nonnull] wchar_t const *nptr) -> $int64_t %{copy(_atoi64, str2wcs)}
 
-[guard][alias(*)][attribute(*)] _wcstoi64:(*) = wcsto64;
-[guard][alias(*)][attribute(*)] _wcstoui64:(*) = wcstou64;
+[guard][wchar][alias(*)][attribute(*)] _wcstoi64:(*) = wcsto64;
+[guard][wchar][alias(*)][attribute(*)] _wcstoui64:(*) = wcstou64;
 
-%[default_impl_section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
+%[default_impl_section(.text.crt.dos.wchar.unicode.locale.convert)]
 [guard][wchar][ATTR_WUNUSED][ATTR_PURE]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(_wtol_l)]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(_wtoll_l)]
@@ -3208,20 +3214,28 @@ _wtoi_l:([nonnull] wchar_t const *nptr, [nullable] $locale_t locale) -> int %{co
 _wtol_l:([nonnull] wchar_t const *nptr, [nullable] $locale_t locale) -> long %{copy(_atol_l, str2wcs)}
 
 [guard][wchar][ATTR_WUNUSED][ATTR_PURE]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, _wtoi_l)]
-[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, _wtol_l)]
-[if(__SIZEOF_LONG_LONG__ == 8), alias(_wtoi64_l)]
-_wtoll_l:([nonnull] wchar_t const *nptr, [nullable] $locale_t locale) -> __LONGLONG %{copy(_atoll_l, str2wcs)}
-
-[guard][wchar][ATTR_WUNUSED][ATTR_PURE]
 [alt_variant_of(__SIZEOF_INT__ == 8, _wtoi_l)]
 [alt_variant_of(__SIZEOF_LONG__ == 8, _wtol_l)]
 [alt_variant_of(__SIZEOF_LONG_LONG__ == 8, _wtoll_l)]
 _wtoi64_l:([nonnull] wchar_t const *nptr, [nullable] $locale_t locale) -> $int64_t %{copy(_atoi64_l, str2wcs)}
 
+[guard][wchar][alias(*)][attribute(*)] _wcstoi64_l:(*) = wcsto64_l;
+[guard][wchar][alias(*)][attribute(*)] _wcstoui64_l:(*) = wcstou64_l;
 
-[guard][alias(*)][attribute(*)] _wcstoi64_l:(*) = wcsto64_l;
-[guard][alias(*)][attribute(*)] _wcstoui64_l:(*) = wcstou64_l;
+
+%#ifdef __LONGLONG
+%[default_impl_section(.text.crt.dos.wchar.unicode.static.convert)]
+[guard][wchar][attribute(*)][alias(*)] _wcstoll_l:(*) = wcstoll_l;
+[guard][wchar][attribute(*)][alias(*)] _wcstoull_l:(*) = wcstoull_l;
+[guard][wchar][attribute(*)][alias(*)] _wtoll:(*) = wtoll;
+
+%[default_impl_section(.text.crt.dos.wchar.unicode.locale.convert)]
+[guard][wchar][ATTR_WUNUSED][ATTR_PURE]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, _wtoi_l)]
+[alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, _wtol_l)]
+[if(__SIZEOF_LONG_LONG__ == 8), alias(_wtoi64_l)]
+_wtoll_l:([nonnull] wchar_t const *nptr, [nullable] $locale_t locale) -> __LONGLONG %{copy(_atoll_l, str2wcs)}
+%#endif /* __LONGLONG */
 
 %#endif /* !_WSTDLIB_DEFINED */
 

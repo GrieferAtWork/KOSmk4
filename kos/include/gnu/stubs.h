@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfda5bcb */
+/* HASH CRC-32:0x61190f42 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,10 +81,8 @@
 #define __stub__get_fmode 1
 #define __stub__get_invalid_parameter_handler 1
 #define __stub__get_output_format 1
-#define __stub__get_pgmptr 1
 #define __stub__get_printf_count_output 1
 #define __stub__get_purecall_handler 1
-#define __stub__get_wpgmptr 1
 #define __stub__getdiskfree 1
 #define __stub__getmaxstdio 1
 #define __stub__isctype 1

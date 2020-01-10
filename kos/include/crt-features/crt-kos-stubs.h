@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4ee4347 */
+/* HASH CRC-32:0x8952795b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,10 +81,8 @@
 #define __CRT_STUB__get_fmode 1
 #define __CRT_STUB__get_invalid_parameter_handler 1
 #define __CRT_STUB__get_output_format 1
-#define __CRT_STUB__get_pgmptr 1
 #define __CRT_STUB__get_printf_count_output 1
 #define __CRT_STUB__get_purecall_handler 1
-#define __CRT_STUB__get_wpgmptr 1
 #define __CRT_STUB__getdiskfree 1
 #define __CRT_STUB__getmaxstdio 1
 #define __CRT_STUB__isctype 1

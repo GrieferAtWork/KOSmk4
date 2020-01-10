@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c602653 */
+/* HASH CRC-32:0x35d92840 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,6 +156,7 @@ INTDEF _invalid_parameter_handler NOTHROW_NCX(LIBCCALL libc__set_invalid_paramet
 INTDEF _invalid_parameter_handler NOTHROW_NCX(LIBCCALL libc__get_invalid_parameter_handler)(void);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_wpgmptr)(char32_t **pvalue);
+INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__get_wpgmptr)(char16_t **pvalue);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBCCALL libc___p__fmode)(void);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_fmode)(int mode);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_fmode)(int *pmode);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb175d796 */
+/* HASH CRC-32:0xf3c9a647 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,7 @@ __LOCAL_LIBC(_aligned_realloc) __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLO
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_realloc))(void *__aligned_mallptr,
                                                               __SIZE_TYPE__ __newsize,
                                                               __SIZE_TYPE__ __min_alignment) {
-#line 2619 "kos/src/libc/magic/stdlib.c"
+#line 2627 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__result = __localdep__aligned_malloc(__newsize, __min_alignment);
 	if (__result && __aligned_mallptr) {

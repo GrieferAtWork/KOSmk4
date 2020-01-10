@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57dc4327 */
+/* HASH CRC-32:0xc3d81f5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,14 +24,14 @@
 #define ____localdep_strtoul_defined 1
 #ifdef __CRT_HAVE_strtoul
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,__localdep_strtoul,(char const *__restrict __nptr, char **__endptr, int __base),strtoul,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtoull) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,__localdep_strtoul,(char const *__restrict __nptr, char **__endptr, int __base),strtoull,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_strtouq) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,__localdep_strtoul,(char const *__restrict __nptr, char **__endptr, int __base),strtouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtou32) && (__SIZEOF_LONG__ == 4)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,__localdep_strtoul,(char const *__restrict __nptr, char **__endptr, int __base),strtou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtou64) && (__SIZEOF_LONG__ == 8)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,__localdep_strtoul,(char const *__restrict __nptr, char **__endptr, int __base),strtou64,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strtoull) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,__localdep_strtoul,(char const *__restrict __nptr, char **__endptr, int __base),strtoull,(__nptr,__endptr,__base))
+#elif defined(__CRT_HAVE_strtouq) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,__localdep_strtoul,(char const *__restrict __nptr, char **__endptr, int __base),strtouq,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoui64) && (__SIZEOF_LONG__ == 8)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,__localdep_strtoul,(char const *__restrict __nptr, char **__endptr, int __base),_strtoui64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoumax) && (__SIZEOF_LONG__ == __SIZEOF_INTMAX_T__)
@@ -48,7 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoul_l))(char const *__restrict __
                                                        char **__endptr,
                                                        int __base,
                                                        __locale_t __locale) {
-#line 1624 "kos/src/libc/magic/stdlib.c"
+#line 1631 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_strtoul(__nptr, __endptr, __base);
 }

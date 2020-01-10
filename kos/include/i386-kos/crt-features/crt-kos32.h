@@ -66,6 +66,7 @@
 #define __CRT_HAVE_DOS$_fwprintf_p_l 1
 #define __CRT_HAVE_DOS$_fwprintf_s_l 1
 #define __CRT_HAVE_DOS$_fwscanf_l 1
+#define __CRT_HAVE_DOS$_get_wpgmptr 1
 #define __CRT_HAVE_DOS$_getws_s 1
 #define __CRT_HAVE_DOS$_i64tow 1
 #define __CRT_HAVE_DOS$_i64tow_s 1

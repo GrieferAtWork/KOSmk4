@@ -50,6 +50,7 @@ wtoi:([nonnull] wchar_t const *nptr) -> int %{copy(atoi, str2wcs)}
 [if(__SIZEOF_LONG__ == 8), alias(_wtoi64)]
 wtol:([nonnull] wchar_t const *nptr) -> long %{copy(atol, str2wcs)}
 
+%#ifdef __LONGLONG
 [wchar][ATTR_WUNUSED][ATTR_PURE][dosname(_wtoll)]
 [alt_variant_of(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, wtoi)]
 [if (__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias(_wtoi)]
@@ -57,6 +58,7 @@ wtol:([nonnull] wchar_t const *nptr) -> long %{copy(atol, str2wcs)}
 [if (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(_wtol)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(_wtoi64)]
 wtoll:([nonnull] wchar_t const *nptr) -> __LONGLONG %{copy(atoll, str2wcs)}
+%#endif /* __LONGLONG */
 %#endif /* __USE_KOS */
 
 %{

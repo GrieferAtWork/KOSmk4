@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea2d6137 */
+/* HASH CRC-32:0x607b175f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT_VOID(,__NOTHROW,__localdep_srand,(long __seed),srandom,(__seed))
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(srandom) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(srandom))(unsigned int __seed) {
-#line 1424 "kos/src/libc/magic/stdlib.c"
+#line 1431 "kos/src/libc/magic/stdlib.c"
 	__localdep_srand((long)__seed);
 }
 __NAMESPACE_LOCAL_END
