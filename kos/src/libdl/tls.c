@@ -85,7 +85,7 @@ PRIVATE size_t static_tls_size_no_segment = 0;
 /* Initializer for the first `static_tls_size_no_segment' bytes of the static TLS segment. */
 PRIVATE void const *static_tls_init = NULL;
 
-INTERN NONNULL((1)) void LIBCCALL
+INTERN NONNULL((1)) void CC
 DlModule_RemoveTLSExtension(DlModule *__restrict self) {
 	struct tls_segment *iter;
 	struct dtls_extension *chain, *next;
@@ -116,7 +116,7 @@ again:
 
 
 /* Initialize the static TLS bindings table from the set of currently loaded modules. */
-INTERN WUNUSED int LIBCCALL
+INTERN WUNUSED int CC
 DlModule_InitStaticTLSBindings(void) {
 	DlModule *iter;
 	ptrdiff_t endptr = 0;
@@ -176,6 +176,95 @@ err:
 	return -1;
 }
 
+PRIVATE NONNULL((1)) void CC
+try_incref_extension_table_modules(struct dtls_extension *__restrict self) {
+again:
+	if (!DlModule_TryIncref((DlModule *)self->te_tree.a_vaddr))
+		self->te_tree.a_vaddr = 0;
+	if (self->te_tree.a_min) {
+		if (self->te_tree.a_max)
+			try_incref_extension_table_modules(self->te_tree.a_max);
+		self = self->te_tree.a_min;
+		goto again;
+	}
+	if (self->te_tree.a_max) {
+		self = self->te_tree.a_max;
+		goto again;
+	}
+}
+
+PRIVATE NONNULL((1)) void CC
+decref_tls_extension_modules(struct dtls_extension *__restrict self) {
+	struct dtls_extension *minptr, *maxptr;
+again:
+	if (self->te_tree.a_vaddr)
+		DlModule_Decref((DlModule *)self->te_tree.a_vaddr);
+	minptr = self->te_tree.a_min;
+	maxptr = self->te_tree.a_max;
+	free(self);
+	if (minptr) {
+		if (maxptr)
+			decref_tls_extension_modules(maxptr);
+		self = minptr;
+		goto again;
+	}
+	if (maxptr) {
+		self = maxptr;
+		goto again;
+	}
+}
+
+PRIVATE NONNULL((1)) void CC
+fini_tls_extension_tables(struct dtls_extension *__restrict self) {
+	struct dtls_extension *minptr, *maxptr;
+again:
+	if (self->te_tree.a_vaddr) {
+		void (*callback)(void *arg, void *base);
+		callback = ((DlModule *)self->te_tree.a_vaddr)->dm_tls_fini;
+		if (callback) {
+			TRY {
+				(*callback)(((DlModule *)self->te_tree.a_vaddr)->dm_tls_arg, self->te_data);
+			} EXCEPT {
+				decref_tls_extension_modules(self);
+				RETHROW();
+			}
+		}
+		DlModule_Decref((DlModule *)self->te_tree.a_vaddr);
+	}
+	minptr = self->te_tree.a_min;
+	maxptr = self->te_tree.a_max;
+	free(self);
+	if (minptr) {
+		if (maxptr)
+			fini_tls_extension_tables(maxptr);
+		self = minptr;
+		goto again;
+	}
+	if (maxptr) {
+		self = maxptr;
+		goto again;
+	}
+}
+
+/* Run finalizers for all TLS segments allocated within the calling thread. */
+INTERN void CC DlModule_RunAllTlsFinalizers(void) {
+	struct tls_segment *self;
+	struct dtls_extension *ext_free;
+	self = (struct tls_segment *)RD_TLS_BASE_REGISTER();
+	if unlikely(!self)
+		return;
+	atomic_rwlock_write(&self->ts_exlock);
+	ext_free = self->ts_extree;
+	if (ext_free) {
+		try_incref_extension_table_modules(ext_free);
+		atomic_rwlock_endwrite(&self->ts_exlock);
+		/* Free the extension tables, and invoke finalizers. */
+		fini_tls_extension_tables(ext_free);
+	} else {
+		atomic_rwlock_endwrite(&self->ts_exlock);
+	}
+}
+
 
 /* Allocate/Free a static TLS segment
  * These functions are called by by libc in order to safely create a new thread, such that
@@ -205,23 +294,6 @@ err_nomem:
 }
 
 PRIVATE NONNULL((1)) void CC
-try_incref_extension_table_modules(struct dtls_extension *__restrict self) {
-again:
-	if (!DlModule_TryIncref((DlModule *)self->te_tree.a_vaddr))
-		self->te_tree.a_vaddr = 0;
-	if (self->te_tree.a_min) {
-		if (self->te_tree.a_max)
-			try_incref_extension_table_modules(self->te_tree.a_max);
-		self = self->te_tree.a_min;
-		goto again;
-	}
-	if (self->te_tree.a_max) {
-		self = self->te_tree.a_max;
-		goto again;
-	}
-}
-
-PRIVATE NONNULL((1)) void CC
 delete_extension_tables(struct dtls_extension *__restrict self) {
 	struct dtls_extension *minptr, *maxptr;
 again:
@@ -229,8 +301,12 @@ again:
 		void (*callback)(void *arg, void *base);
 		callback = ((DlModule *)self->te_tree.a_vaddr)->dm_tls_fini;
 		if (callback) {
-			/* TODO: Guard against exceptions and discard whatever may have been thrown. */
-			(*callback)(((DlModule *)self->te_tree.a_vaddr)->dm_tls_arg, self->te_data);
+			TRY {
+				(*callback)(((DlModule *)self->te_tree.a_vaddr)->dm_tls_arg, self->te_data);
+			} EXCEPT {
+				decref_tls_extension_modules(self);
+				RETHROW();
+			}
 		}
 		DlModule_Decref((DlModule *)self->te_tree.a_vaddr);
 	}
@@ -239,7 +315,7 @@ again:
 	free(self);
 	if (minptr) {
 		if (maxptr)
-			try_incref_extension_table_modules(maxptr);
+			delete_extension_tables(maxptr);
 		self = minptr;
 		goto again;
 	}

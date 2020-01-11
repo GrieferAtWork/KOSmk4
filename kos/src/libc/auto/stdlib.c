@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41b0341b */
+/* HASH CRC-32:0x48313067 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2152,30 +2152,30 @@ NOTHROW_NCX(LIBCCALL libc_ultoa)(unsigned long val,
 }
 
 INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wtof") double
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert._wtof") double
 NOTHROW_NCX(LIBCCALL libc__wtof)(char32_t const *nptr) {
-#line 3171 "kos/src/libc/magic/stdlib.c"
+#line 3175 "kos/src/libc/magic/stdlib.c"
 	return libc_wcstod(nptr, NULL);
 }
 INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wtof") double
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert._wtof") double
 NOTHROW_NCX(LIBDCALL libd__wtof)(char16_t const *nptr) {
-#line 3171 "kos/src/libc/magic/stdlib.c"
+#line 3175 "kos/src/libc/magic/stdlib.c"
 	return libd_wcstod(nptr, NULL);
 }
 
 INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wtof_l") double
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert._wtof_l") double
 NOTHROW_NCX(LIBCCALL libc__wtof_l)(char32_t const *nptr,
                                    locale_t locale) {
-#line 3176 "kos/src/libc/magic/stdlib.c"
+#line 3180 "kos/src/libc/magic/stdlib.c"
 	return libc_wcstod_l(nptr, NULL, locale);
 }
 INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wtof_l") double
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert._wtof_l") double
 NOTHROW_NCX(LIBDCALL libd__wtof_l)(char16_t const *nptr,
                                    locale_t locale) {
-#line 3176 "kos/src/libc/magic/stdlib.c"
+#line 3180 "kos/src/libc/magic/stdlib.c"
 	return libd_wcstod_l(nptr, NULL, locale);
 }
 

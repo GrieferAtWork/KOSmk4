@@ -144,6 +144,18 @@ DlSection_TryIncref(DlSection *__restrict self) {
 INTDEF NONNULL((1)) void CC
 DlSection_Destroy(DlSection *__restrict self);
 
+struct dlmodule_finalizer {
+	void (__LIBCCALL *df_func)(void *arg); /* [1..1] Finalizer callback. */
+	void             *df_arg;              /* [?..?] Callback argument. */
+};
+
+struct dlmodule_finalizers {
+	struct atomic_rwlock       df_lock; /* Lock for finalizer callbacks (left dangling in read-mode for finalizer invocation) */
+	size_t                     df_size; /* [lock(df_lock)] # of registered callbacks. */
+	struct dlmodule_finalizer *df_list; /* [lock(df_lock)][1..df_size][owned] Vector of callbacks. */
+};
+
+INTDEF NONNULL((1)) void CC dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self);
 
 /* The actual data-structure to which a pointer is returned by `dlopen()' */
 struct elf_dlmodule {
@@ -229,7 +241,8 @@ struct elf_dlmodule {
 #ifndef CONFIG_NO_DANGLING_DL_SECTIONS
 	REF DlSection            *dm_sections_dangling; /* [0..1][lock(dm_sections_lock))] Chain of dangling sections. */
 #endif /* !CONFIG_NO_DANGLING_DL_SECTIONS */
-	char                     *dm_shstrtab;   /* [lock(WRITE_ONCE)][0..1][owned] Section headers name table (or `NULL' if not loaded). */
+	char                     *dm_shstrtab;   /* [0..1][lock(WRITE_ONCE)][owned] Section headers name table (or `NULL' if not loaded). */
+	struct dlmodule_finalizers *dm_finalize; /* [0..1][lock(WRITE_ONCE)][owned] Lazily allocated vector of dynamic finalizer callbacks (for `__cxa_atexit()') */
 	unsigned char             dm_abi;        /* [const] The value of `EI_OSABI' */
 	unsigned char             dm_abiver;     /* [const] The value of `EI_ABIVERSION' */
 
@@ -452,7 +465,7 @@ INTDEF char const *LIBCCALL libdl_dlsectionname(DlSection *sect);
 INTDEF size_t LIBCCALL libdl_dlsectionindex(DlSection *sect);
 INTDEF DlModule *LIBCCALL libdl_dlsectionmodule(DlSection *sect, unsigned int flags);
 INTDEF int LIBCCALL libdl_dlclearcaches(void);
-INTDEF void *LIBCCALL libdl_dlauxctrl(DlModule *self, unsigned int type, void *buf, size_t *pauxvlen);
+INTDEF void *LIBCCALL libdl_dlauxctrl(DlModule *self, unsigned int type, ...);
 INTDEF void *LIBCCALL libdl____tls_get_addr(void);
 INTDEF void *LIBCCALL libdl___tls_get_addr(void);
 
@@ -547,13 +560,16 @@ INTDEF WUNUSED void *LIBCCALL libdl_dltlsaddr(DlModule *self);
  * appearing within `DlModule_AllList', meaning that the primary
  * application's __attribute__((constructor)) functions are invoked
  * _AFTER_ those from (e.g.) libc. */
-INTDEF void LIBCCALL DlModule_RunAllStaticInitializers(void);
+INTDEF void CC DlModule_RunAllStaticInitializers(void);
 
 /* Initialize the static TLS bindings table from the set of currently loaded modules. */
-INTDEF WUNUSED int LIBCCALL DlModule_InitStaticTLSBindings(void);
+INTDEF WUNUSED int CC DlModule_InitStaticTLSBindings(void);
 
 /* Remove the given module from the table of static TLS bindings. */
-INTDEF NONNULL((1)) void LIBCCALL DlModule_RemoveTLSExtension(DlModule *__restrict self);
+INTDEF NONNULL((1)) void CC DlModule_RemoveTLSExtension(DlModule *__restrict self);
+
+/* Run finalizers for all TLS segments allocated within the calling thread. */
+INTDEF void CC DlModule_RunAllTlsFinalizers(void);
 
 #ifdef ELF_ARCH_IS_R_JMP_SLOT
 /* Called from JMP_SLOT relocations (s.a. `arch/i386/rt32.S') */

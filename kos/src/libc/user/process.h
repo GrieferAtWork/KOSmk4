@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31a41112 */
+/* HASH CRC-32:0x8bd9dbb5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #define GUARD_LIBC_USER_PROCESS_H 1
 
 #include "../api.h"
+#include "../auto/process.h"
 #include <kos/anno.h>
 #include <hybrid/typecore.h>
 #include <kos/types.h>
@@ -33,7 +34,6 @@ INTDEF uintptr_t NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec, u32 stacks
 INTDEF void NOTHROW_NCX(LIBCCALL libc__endthread)(void);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode);
 INTDEF void (LIBCCALL libc__cexit)(void) __THROWS(...);
-INTDEF void (LIBCCALL libc__c_exit)(void) __THROWS(...);
 INTDEF intptr_t (LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file) __THROWS(...);
 INTDEF int (LIBCCALL libc__unloaddll)(intptr_t hnd) __THROWS(...);
 INTDEF __procfun (LIBCCALL libc__getdllprocaddr)(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) __THROWS(...);

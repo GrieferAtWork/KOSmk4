@@ -55,9 +55,8 @@ FUNC(unmap_range)(struct vm *__restrict v,
 		addr   = ATOMIC_READ(headers[count].p_vaddr);
 		size   = ATOMIC_READ(headers[count].p_memsz);
 		offset = ATOMIC_READ(headers[count].p_offset);
-		if
-			unlikely(!size)
-		continue;
+		if unlikely(!size)
+			continue;
 		if (ATOMIC_READ(headers[count].p_filesz)) {
 			uintptr_t alignment;
 			alignment = offset & PAGEMASK;

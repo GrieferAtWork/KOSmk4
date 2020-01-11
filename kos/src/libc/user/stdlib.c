@@ -39,6 +39,7 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <malloc.h>
+#include <sched.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -123,24 +124,49 @@ DEFINE_NOREL_GLOBAL_META(struct process_peb, __peb, ".crt.glibc.application.init
 
 
 DEFINE_PUBLIC_ALIAS(__cxa_atexit, libc___cxa_atexit);
+
+struct cxa_atexit_callback {
+	void (LIBCCALL *ac_func)(void *arg); /* [1..1] Function */
+	void           *ac_arg;              /* [?..?] Argument */
+};
+
+struct cxa_atexit_list {
+	struct atomic_rwlock        al_lock; /*  */
+	size_t                      al_size; /*  */
+	struct cxa_atexit_callback *al_list; /* [] */
+};
+
 INTERN ATTR_SECTION(".text.crt.sched.process.__cxa_atexit") int
 NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
                                         void *arg, void *dso_handle) {
+	void *dl_handle, *error;
 	/* NOTE: I don't really understand why this function is even necessary...
 	 *       I mean sure: it allows c++ to register destructor callbacks lazily
 	 *       for local statics, however the same effect could be achieved by using
 	 *       an __attribute__((destructor)), where its callback checks some kind of
 	 *       was-initialized flag and invokes that callback when this is true. */
-	/* HINT: `dso_handle' is `NULL' for the primary module (in which case
-	 *       the registered function must be called alongside atexit()), or
-	 *       is some arbitrary pointer apart of the static image of the
-	 *       associated binary (which can be resolved using `dlgethandle()') */
-	/* TODO */
-	(void)func;
-	(void)arg;
-	(void)dso_handle;
-	COMPILER_IMPURE();
-	return -1;
+	if (dso_handle == NULL) {
+		/* Special case: When `dso_handle' is `NULL', register the callback for the
+		 *               primary module, in which case the registered function must be called
+		 *               alongside atexit() */
+		dl_handle = NULL;
+	} else {
+		/* `dso_handle' is actually a pointer somewhere inside of the static memory segment
+		 * of some module (either dynamically allocated, or part of the primary module)
+		 * As such, we can make use of `dlgethandle()' in order to look-up the associated
+		 * shared object, which which we can then register the given callback. */
+		dl_handle = dlgethandle(dso_handle, DLGETHANDLE_FINCREF);
+		if unlikely(!dl_handle) {
+			libc_seterrno(EFAULT); /* `dso_handle' doesn't map to any known module. */
+			return -1;
+		}
+	}
+	/* Call into libdl to register the finalizer with the associated shared object. */
+	error = dlauxctrl(dl_handle, DLAUXCTRL_ADD_FINALIZER, func, arg);
+	dlclose(dl_handle);
+	if unlikely(!error)
+		return -1;
+	return 0;
 }
 
 
@@ -736,21 +762,79 @@ ATTR_WEAK ATTR_SECTION(".text.crt.application.exit.abort") void
 }
 /*[[[end:abort]]]*/
 
-/*[[[head:exit,hash:CRC-32=0x14509474]]]*/
-INTERN ATTR_NORETURN
-ATTR_WEAK ATTR_SECTION(".text.crt.application.exit.exit") void
-(LIBCCALL libc_exit)(int status)
-		__THROWS(...)
-/*[[[body:exit]]]*/
-{
-	/* TODO: Run at-exit */
 
-	/* Run library finalizers (NOTE: This will also call back to invoke
-	 * `libc_fini()' because libc is compiled with `-fini=libc_fini') */
-	dlauxctrl(NULL, DLAUXCTRL_RUNFINI, NULL, NULL);
-	_Exit(status);
+struct atexit_callback {
+	__on_exit_func_t ac_func; /* [1..1] The function to-be invoked. */
+	void            *ac_arg;  /* Argument for `ac_func'. */
+};
+
+struct atexit_vector_struct {
+	struct atomic_rwlock    av_lock; /* Lock for this vector. */
+	size_t                  av_size; /* [lock(av_lock)] Number of registered functions. */
+	struct atexit_callback *av_vect; /* [0..av_size][owned][lock(av_lock)] Array of functions. */
+	int                     av_stat; /* Process exit status. */
+};
+
+PRIVATE ATTR_SECTION(".bss.crt.application.exit.atexit_vector")
+struct atexit_vector_struct atexit_vector = {
+	/* .av_lock = */ ATOMIC_RWLOCK_INIT,
+	/* .av_size = */ 0,
+	/* .av_vect = */ NULL,
+	/* .av_stat = */ 0
+};
+
+
+INTERN ATTR_SECTION(".text.crt.application.exit.libc_run_atexit")
+void LIBCCALL libc_run_atexit(int status) {
+	size_t length;
+	ATOMIC_WRITE(atexit_vector.av_stat, status);
+	atomic_rwlock_read(&atexit_vector.av_lock);
+	length = ATOMIC_XCH(atexit_vector.av_size, 0);
+	while (length) {
+		struct atexit_callback *ent;
+		--length;
+		ent = &atexit_vector.av_vect[length];
+		(*ent->ac_func)(status, ent->ac_arg);
+	}
 }
-/*[[[end:exit]]]*/
+
+/*[[[head:on_exit,hash:CRC-32=0xcd734836]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.on_exit") int
+NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func,
+                                   void *arg)
+/*[[[body:on_exit]]]*/
+{
+	struct atexit_callback *new_vector;
+	while (!atomic_rwlock_trywrite(&atexit_vector.av_lock)) {
+		if (atomic_rwlock_reading(&atexit_vector.av_lock)) {
+			/* atexit functions have already been invoked. -> Do so ourself as well. */
+			(*func)(atexit_vector.av_stat, arg);
+			return 0;
+		}
+		sched_yield();
+	}
+	new_vector = (struct atexit_callback *)realloc(atexit_vector.av_vect,
+	                                               (atexit_vector.av_size + 1) *
+	                                               sizeof(struct atexit_callback));
+	if unlikely(!new_vector) {
+		atomic_rwlock_endwrite(&atexit_vector.av_lock);
+		return -1;
+	}
+	atexit_vector.av_vect = new_vector;
+	new_vector += atexit_vector.av_size++;
+	new_vector->ac_func = func;
+	new_vector->ac_arg  = arg;
+	atomic_rwlock_endwrite(&atexit_vector.av_lock);
+	return 0;
+}
+/*[[[end:on_exit]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.sched.process.libc_atexit_wrapper") void
+NOTHROW_NCX(LIBCCALL libc_atexit_wrapper)(int status, void *arg) {
+	(void)status;
+	(*(__atexit_func_t)arg)();
+}
 
 /*[[[head:atexit,hash:CRC-32=0x7b9caa0b]]]*/
 INTERN NONNULL((1))
@@ -758,12 +842,88 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.atexit") int
 NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func)
 /*[[[body:atexit]]]*/
 {
-	(void)func;
-	CRT_UNIMPLEMENTED("atexit"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return on_exit(&libc_atexit_wrapper, (void *)func);
 }
 /*[[[end:atexit]]]*/
+
+
+
+struct at_quick_exit_callback {
+	__atexit_func_t aqc_func; /* [1..1] The function to-be invoked. */
+};
+
+struct at_quick_exit_vector_struct {
+	size_t                         aqv_size; /* [lock(atexit_vector.av_lock)] Number of registered functions. */
+	struct at_quick_exit_callback *aqv_vect; /* [0..av_size][owned][lock(atexit_vector.av_lock)] Array of functions. */
+};
+
+PRIVATE ATTR_SECTION(".bss.crt.application.exit.at_quick_exit_vector")
+struct at_quick_exit_vector_struct at_quick_exit_vector = {
+	/* .av_size = */ 0,
+	/* .av_vect = */ NULL
+};
+
+INTERN ATTR_SECTION(".text.crt.application.exit.libc_run_at_quick_exit")
+void LIBCCALL libc_run_at_quick_exit(int status) {
+	size_t length;
+	ATOMIC_WRITE(atexit_vector.av_stat, status);
+	atomic_rwlock_read(&atexit_vector.av_lock);
+	length = ATOMIC_XCH(at_quick_exit_vector.aqv_size, 0);
+	while (length) {
+		struct at_quick_exit_callback *ent;
+		--length;
+		ent = &at_quick_exit_vector.aqv_vect[length];
+		(*ent->aqc_func)();
+	}
+}
+
+/*[[[head:at_quick_exit,hash:CRC-32=0x8671a9ef]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.at_quick_exit") int
+NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func)
+/*[[[body:at_quick_exit]]]*/
+{
+	struct at_quick_exit_callback *new_vector;
+	while (!atomic_rwlock_trywrite(&atexit_vector.av_lock)) {
+		if (atomic_rwlock_reading(&atexit_vector.av_lock)) {
+			/* atexit functions have already been invoked. -> Do so ourself as well. */
+			(*func)();
+			return 0;
+		}
+		sched_yield();
+	}
+	new_vector = (struct at_quick_exit_callback *)realloc(at_quick_exit_vector.aqv_vect,
+	                                                      (at_quick_exit_vector.aqv_size + 1) *
+	                                                      sizeof(struct at_quick_exit_callback));
+	if unlikely(!new_vector) {
+		atomic_rwlock_endwrite(&atexit_vector.av_lock);
+		return -1;
+	}
+	at_quick_exit_vector.aqv_vect = new_vector;
+	new_vector += at_quick_exit_vector.aqv_size++;
+	new_vector->aqc_func = func;
+	atomic_rwlock_endwrite(&atexit_vector.av_lock);
+	return 0;
+}
+/*[[[end:at_quick_exit]]]*/
+
+/*[[[head:exit,hash:CRC-32=0x14509474]]]*/
+INTERN ATTR_NORETURN
+ATTR_WEAK ATTR_SECTION(".text.crt.application.exit.exit") void
+(LIBCCALL libc_exit)(int status)
+		__THROWS(...)
+/*[[[body:exit]]]*/
+{
+	/* Finalizer TLS objects for the calling thread (c++11-specific) */
+	dlauxctrl(NULL, DLAUXCTRL_RUNTLSFINI, NULL, NULL);
+	/* Run functions registered with `atexit()' or `on_exit()'. */
+	libc_run_atexit(status);
+	/* Run library finalizers (NOTE: This will also call back to invoke
+	 * `libc_fini()' because libc is compiled with `-fini=libc_fini') */
+	dlauxctrl(NULL, DLAUXCTRL_RUNFINI, NULL, NULL);
+	_Exit(status);
+}
+/*[[[end:exit]]]*/
 
 /*[[[head:quick_exit,hash:CRC-32=0xfa3c2759]]]*/
 INTERN ATTR_NORETURN
@@ -772,24 +932,17 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.quick_exit") void
 		__THROWS(...)
 /*[[[body:quick_exit]]]*/
 {
-	/* TODO: Run quick-at-exit */
-	/* TODO: Run library finalizers */
+	/* Run at_quick_exit() functions */
+	libc_run_at_quick_exit(status);
+	/* Don't run library finalizers, but still run libc_fini() to
+	 * at least flush open file streams, ensuring that no open
+	 * file is left in an undefined state, and any potential error
+	 * message written prior to quick_exit() being called will also
+	 * be printed on-screen. */
+	libc_fini();
 	_Exit(status);
 }
 /*[[[end:quick_exit]]]*/
-
-/*[[[head:at_quick_exit,hash:CRC-32=0x8671a9ef]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.at_quick_exit") int
-NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func)
-/*[[[body:at_quick_exit]]]*/
-{
-	(void)func;
-	CRT_UNIMPLEMENTED("at_quick_exit"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:at_quick_exit]]]*/
 
 /*[[[head:_Exit,hash:CRC-32=0x2a36c796]]]*/
 INTERN ATTR_NORETURN
@@ -800,6 +953,24 @@ ATTR_WEAK ATTR_SECTION(".text.crt.application.exit._Exit") void
 	sys_exit_group((syscall_ulong_t)(unsigned int)status);
 }
 /*[[[end:_Exit]]]*/
+
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.process.libc_onexit_wrapper")
+void LIBCCALL libc_onexit_wrapper(void *arg) {
+	(*(onexit_t)arg)();
+}
+
+/*[[[head:onexit,hash:CRC-32=0xd0591068]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.process.onexit") onexit_t
+NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func)
+/*[[[body:onexit]]]*/
+{
+	int error;
+	error = libc___cxa_atexit(&libc_onexit_wrapper,
+	                          (void *)func,
+	                          __builtin_return_address(0));
+	return error ? NULL : func;
+}
+/*[[[end:onexit]]]*/
 
 /*[[[head:drand48_r,hash:CRC-32=0x739469fd]]]*/
 INTERN NONNULL((1, 2))
@@ -1005,21 +1176,6 @@ NOTHROW_NCX(LIBCCALL libc_setstate_r)(char *__restrict statebuf,
 	return -1;
 }
 /*[[[end:setstate_r]]]*/
-
-/*[[[head:on_exit,hash:CRC-32=0xcd734836]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.on_exit") int
-NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func,
-                                   void *arg)
-/*[[[body:on_exit]]]*/
-{
-	(void)func;
-	(void)arg;
-	CRT_UNIMPLEMENTED("on_exit"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:on_exit]]]*/
 
 /*[[[head:mkstemps,hash:CRC-32=0x78f97579]]]*/
 INTERN WUNUSED NONNULL((1))
@@ -2027,18 +2183,6 @@ NOTHROW_NCX(LIBCCALL libc__aligned_realloc)(void *aligned_mallptr,
 }
 /*[[[end:_aligned_realloc]]]*/
 
-/*[[[head:onexit,hash:CRC-32=0x51f0023a]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.onexit") onexit_t
-NOTHROW_NCX(LIBCCALL libc_onexit)(onexit_t func)
-/*[[[body:onexit]]]*/
-{
-	(void)func;
-	CRT_UNIMPLEMENTED("onexit"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:onexit]]]*/
-
 /*[[[head:_get_pgmptr,hash:CRC-32=0xea63c11c]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init._get_pgmptr") errno_t
 NOTHROW_NCX(LIBCCALL libc__get_pgmptr)(char **pvalue)
@@ -2178,9 +2322,9 @@ NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags,
 }
 /*[[[end:_set_abort_behavior]]]*/
 
-/*[[[head:_wgetenv,hash:CRC-32=0x9ff0fc00]]]*/
+/*[[[head:_wgetenv,hash:CRC-32=0x25bbc61f]]]*/
 INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wgetenv") char32_t *
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wgetenv") char32_t *
 NOTHROW_NCX(LIBCCALL libc__wgetenv)(char32_t const *varname)
 /*[[[body:_wgetenv]]]*/
 {
@@ -2191,9 +2335,9 @@ NOTHROW_NCX(LIBCCALL libc__wgetenv)(char32_t const *varname)
 }
 /*[[[end:_wgetenv]]]*/
 
-/*[[[head:DOS$_wgetenv,hash:CRC-32=0x1c30dad]]]*/
+/*[[[head:DOS$_wgetenv,hash:CRC-32=0xbb8837b2]]]*/
 INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wgetenv") char16_t *
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wgetenv") char16_t *
 NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
 /*[[[body:DOS$_wgetenv]]]*/
 {
@@ -2204,9 +2348,9 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv)(char16_t const *varname)
 }
 /*[[[end:DOS$_wgetenv]]]*/
 
-/*[[[head:_wgetenv_s,hash:CRC-32=0x4950b936]]]*/
+/*[[[head:_wgetenv_s,hash:CRC-32=0x5bf3d15e]]]*/
 INTERN NONNULL((1, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wgetenv_s") errno_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wgetenv_s") errno_t
 NOTHROW_NCX(LIBCCALL libc__wgetenv_s)(size_t *return_size,
                                       char32_t *buf,
                                       size_t buflen,
@@ -2223,9 +2367,9 @@ NOTHROW_NCX(LIBCCALL libc__wgetenv_s)(size_t *return_size,
 }
 /*[[[end:_wgetenv_s]]]*/
 
-/*[[[head:DOS$_wgetenv_s,hash:CRC-32=0x547755c1]]]*/
+/*[[[head:DOS$_wgetenv_s,hash:CRC-32=0x46d43da9]]]*/
 INTERN NONNULL((1, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wgetenv_s") errno_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wgetenv_s") errno_t
 NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *return_size,
                                       char16_t *buf,
                                       size_t buflen,
@@ -2242,9 +2386,9 @@ NOTHROW_NCX(LIBDCALL libd__wgetenv_s)(size_t *return_size,
 }
 /*[[[end:DOS$_wgetenv_s]]]*/
 
-/*[[[head:_wdupenv_s,hash:CRC-32=0x51f44189]]]*/
+/*[[[head:_wdupenv_s,hash:CRC-32=0x22db3b45]]]*/
 INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wdupenv_s") errno_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wdupenv_s") errno_t
 NOTHROW_NCX(LIBCCALL libc__wdupenv_s)(char32_t **pbuf,
                                       size_t *pbuflen,
                                       char32_t const *varname)
@@ -2259,9 +2403,9 @@ NOTHROW_NCX(LIBCCALL libc__wdupenv_s)(char32_t **pbuf,
 }
 /*[[[end:_wdupenv_s]]]*/
 
-/*[[[head:DOS$_wdupenv_s,hash:CRC-32=0x9b4edd03]]]*/
+/*[[[head:DOS$_wdupenv_s,hash:CRC-32=0xe861a7cf]]]*/
 INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._wdupenv_s") errno_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.environ._wdupenv_s") errno_t
 NOTHROW_NCX(LIBDCALL libd__wdupenv_s)(char16_t **pbuf,
                                       size_t *pbuflen,
                                       char16_t const *varname)

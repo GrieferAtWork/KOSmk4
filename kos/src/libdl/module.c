@@ -40,6 +40,32 @@ DECL_BEGIN
 
 INTERN ElfW(Shdr) empty_shdr[1] = { 0 };
 
+
+/* Module finalizer functions. */
+INTDEF NONNULL((1)) void CC
+dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self) {
+	size_t count;
+	atomic_rwlock_read(&self->df_lock);
+	count = ATOMIC_XCH(self->df_size, 0);
+	/* Ensure that only a single thread may invoke finalizers. */
+	if (count) {
+		TRY {
+			do {
+				struct dlmodule_finalizer *ent;
+				--count;
+				ent = &self->df_list[count];
+				(*ent->df_func)(ent->df_arg);
+			} while (count);
+		} EXCEPT {
+			free(self->df_list);
+			RETHROW();
+		}
+		free(self->df_list);
+	}
+}
+
+
+
 /* DlModule functions */
 INTERN NONNULL((1)) void CC
 DlModule_Destroy(DlModule *__restrict self) {
@@ -70,6 +96,12 @@ DlModule_Destroy(DlModule *__restrict self) {
 		DlModule_RemoveFromGlobals(self);
 		LLIST_UNBIND(self, dm_globals);
 		atomic_rwlock_endwrite(&DlModule_GlobalLock);
+	}
+
+	/* Invoke dynamically regsitered module finalizers (s.a. `__cxa_atexit()') */
+	if (self->dm_finalize) {
+		dlmodule_finalizers_run(self->dm_finalize);
+		free(self->dm_finalize);
 	}
 
 	/* Skip finalizers if the library was never initialized. */

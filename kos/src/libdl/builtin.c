@@ -1246,19 +1246,14 @@ again:
 		uintptr_t *fini_array_base;
 		/* Skip finalizers if the module was never
 		 * initialized or has already been finalized. */
-		if (ATOMIC_FETCHOR(mod->dm_flags, (RTLD_NOINIT | RTLD_NODELETE)) & RTLD_NOINIT)
+		if (ATOMIC_FETCHOR(mod->dm_flags, (RTLD_NOINIT /*| RTLD_NODELETE*/)) & RTLD_NOINIT)
 			continue;
-		/* Try to get another reference now that NODELETE was set.
-		 * This way, we ensure that no other thread may currently
-		 * be in the process of running finalizers for this module.
-		 * NOTE: We keep this reference dangling because our function
-		 *       only gets called as part of `exit()', so there's be
-		 *       no point in trying to maintain the proper reference
-		 *       counts when everything has to be clean up by the
-		 *       kernel no matter what. */
 		if unlikely(!DlModule_TryIncref(mod))
 			continue;
 		atomic_rwlock_endread(&DlModule_AllLock);
+		/* Invoke dynamically regsitered module finalizers (s.a. `__cxa_atexit()') */
+		if (mod->dm_finalize)
+			dlmodule_finalizers_run(mod->dm_finalize);
 		fini_func       = 0;
 		fini_array_base = NULL;
 		fini_array_size = 0;
@@ -1286,11 +1281,17 @@ again:
 		}
 done_dyntag:
 		/* Service fini-array functions in reverse order. */
-		while (fini_array_size--)
-			(*(void (*)(void))(fini_array_base[fini_array_size] /* + self->dm_loadaddr*/))();
-		/* Service a fini function, if one was specified. */
-		if (fini_func)
-			(*(void (*)(void))(fini_func + mod->dm_loadaddr))();
+		TRY {
+			while (fini_array_size--)
+				(*(void (*)(void))(fini_array_base[fini_array_size] /* + self->dm_loadaddr*/))();
+			/* Service a fini function, if one was specified. */
+			if (fini_func)
+				(*(void (*)(void))(fini_func + mod->dm_loadaddr))();
+		} EXCEPT {
+			DlModule_Decref(mod);
+			RETHROW();
+		}
+		DlModule_Decref(mod);
 		goto again;
 	}
 	atomic_rwlock_endread(&DlModule_AllLock);
@@ -1298,14 +1299,19 @@ done_dyntag:
 
 
 INTERN void *LIBCCALL
-libdl_dlauxctrl(DlModule *self, unsigned int cmd,
-                void *buf, size_t *pauxvlen) {
+libdl_dlauxctrl(DlModule *self, unsigned int cmd, ...) {
 	void *result;
+	va_list args;
+	va_start(args, cmd);
 	switch (cmd) {
 
 	case DLAUXCTRL_RUNFINI:
 		DlModule_RunAllModuleFinalizers();
-		break;
+		goto err;
+
+	case DLAUXCTRL_RUNTLSFINI:
+		DlModule_RunAllTlsFinalizers();
+		goto err;
 
 	default:
 		break;
@@ -1316,35 +1322,98 @@ libdl_dlauxctrl(DlModule *self, unsigned int cmd,
 		elf_setdlerror_badmodule(self);
 		goto err;
 	}
-	(void)buf;
 	switch (cmd) {
 
-	case DLAUXCTRL_ELF_GET_PHDR:
-		result = self->dm_phdr;
-		if (pauxvlen)
-			*pauxvlen = (size_t)self->dm_phnum;
-		break;
-
-	case DLAUXCTRL_ELF_GET_SHDR:
-		result = DlModule_GetShdrs(self);
-		if (pauxvlen)
-			*pauxvlen = (size_t)self->dm_phnum;
-		break;
-
-	case DLAUXCTRL_ELF_GET_DYN:
-		result = self->dm_dynhdr;
-		if (pauxvlen)
-			*pauxvlen = (size_t)self->dm_dyncnt;
-		break;
-
-	case DLAUXCTRL_ELF_GET_DYNSYM:
-		result = self->dm_dynsym_tab;
-		if (pauxvlen) {
-			*pauxvlen = self->dm_hashtab
-			            ? (size_t)self->dm_hashtab->ht_nchains
-			            : (size_t)-1;
+	case DLAUXCTRL_ADD_FINALIZER: {
+		struct dlmodule_finalizers *flz;
+		void (__LIBCCALL *func)(void *);
+		void *arg;
+		func = va_arg(args, void (__LIBCCALL *)(void *));
+		arg  = va_arg(args, void *);
+again_add_finalizer_read_list:
+		flz = ATOMIC_READ(self->dm_finalize);
+		if (!flz) {
+			/* Lazily allocate dynamic finalizers. */
+			flz = (struct dlmodule_finalizers *)malloc(sizeof(struct dlmodule_finalizers));
+			if unlikely(!flz)
+				goto err_nomem;
+			flz->df_list = (struct dlmodule_finalizer *)malloc(1 * sizeof(struct dlmodule_finalizer));
+			if unlikely(!flz->df_list) {
+				free(flz);
+				goto err_nomem;
+			}
+			atomic_rwlock_init(&flz->df_lock);
+			flz->df_list[0].df_func = func;
+			flz->df_list[0].df_arg  = arg;
+			flz->df_size            = 1;
+			if (!ATOMIC_CMPXCH(self->dm_finalize, NULL, flz)) {
+				free(flz);
+				goto again_add_finalizer_read_list;
+			}
+		} else {
+			struct dlmodule_finalizer *new_vector;
+			/* Append to an existing finalizer list. */
+			while (!atomic_rwlock_trywrite(&flz->df_lock)) {
+				if (atomic_rwlock_reading(&flz->df_lock)) {
+					/* Callbacks have already been serviced!
+					 * -> Invoke the one given immediatly. */
+					(*func)(arg);
+					goto done_add_finalizer;
+				}
+				sys_sched_yield();
+			}
+			new_vector = (struct dlmodule_finalizer *)realloc(flz->df_list,
+			                                                  (flz->df_size + 1) *
+			                                                  sizeof(struct dlmodule_finalizer));
+			if unlikely(!new_vector) {
+				atomic_rwlock_endwrite(&flz->df_lock);
+				goto err_nomem;
+			}
+			flz->df_list = new_vector;
+			/* Append to the end. */
+			new_vector += flz->df_size++;
+			new_vector->df_func = func;
+			new_vector->df_arg  = arg;
+			atomic_rwlock_endwrite(&flz->df_lock);
 		}
-		break;
+done_add_finalizer:
+		result = self;
+	}	break;
+
+	case DLAUXCTRL_ELF_GET_PHDR: {
+		size_t *pcount;
+		pcount = va_arg(args, size_t *);
+		result = self->dm_phdr;
+		if (pcount)
+			*pcount = (size_t)self->dm_phnum;
+	}	break;
+
+	case DLAUXCTRL_ELF_GET_SHDR: {
+		size_t *pcount;
+		pcount = va_arg(args, size_t *);
+		result = DlModule_GetShdrs(self);
+		if (result && pcount)
+			*pcount = (size_t)self->dm_phnum;
+	}	break;
+
+	case DLAUXCTRL_ELF_GET_DYN: {
+		size_t *pcount;
+		pcount = va_arg(args, size_t *);
+		result = self->dm_dynhdr;
+		if (pcount)
+			*pcount = (size_t)self->dm_dyncnt;
+	}	break;
+
+	case DLAUXCTRL_ELF_GET_DYNSYM: {
+		size_t *pcount;
+		pcount = va_arg(args, size_t *);
+		result = self->dm_dynsym_tab;
+		if (pcount) {
+			*pcount = self->dm_hashtab
+			          ? (size_t)self->dm_hashtab->ht_nchains
+			          : (size_t)-1;
+		}
+	}	break;
 
 	case DLAUXCTRL_ELF_GET_DYNSTR:
 		result = self->dm_dynstr;
@@ -1354,19 +1423,26 @@ libdl_dlauxctrl(DlModule *self, unsigned int cmd,
 		result = DlModule_GetShstrtab(self);
 		break;
 
-	case DLAUXCTRL_ELF_GET_DEPENDS:
+	case DLAUXCTRL_ELF_GET_DEPENDS: {
+		size_t *pcount;
+		pcount = va_arg(args, size_t *);
 		result = self->dm_depvec;
-		if (pauxvlen)
-			*pauxvlen = self->dm_depcnt;
-		break;
+		if (pcount)
+			*pcount = self->dm_depcnt;
+	}	break;
 
 	default:
 		elf_setdlerrorf("Invalid auxctrl command %#x", cmd);
 		goto err;
 	}
+done:
+	va_end(args);
 	return result;
+err_nomem:
+	elf_setdlerror_nomem();
 err:
-	return NULL;
+	result = NULL;
+	goto done;
 }
 
 

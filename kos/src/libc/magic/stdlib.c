@@ -3137,6 +3137,7 @@ ultoa:(unsigned long val, [nonnull] char *buf, int radix) -> char * {
 	return buf;
 }
 
+%[default_impl_section(.text.crt.dos.sched.process)]
 [alias(*)][attribute(*)] _onexit:(*) = onexit;
 [alias(_onexit)] onexit:(onexit_t func) -> onexit_t;
 
@@ -3144,11 +3145,14 @@ ultoa:(unsigned long val, [nonnull] char *buf, int radix) -> char * {
 %#ifndef _WSTDLIB_DEFINED
 %#define _WSTDLIB_DEFINED
 
+%[default_impl_section(.text.crt.dos.wchar.fs.environ)]
 [guard][wchar][ATTR_WUNUSED] _wgetenv:([nonnull] wchar_t const *varname) -> wchar_t *;
 [guard][wchar] _wgetenv_s:([nonnull] $size_t *return_size, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, [nonnull] wchar_t const *varname) -> errno_t;
 [guard][wchar] _wdupenv_s:([nonnull] wchar_t **pbuf, [nonnull] $size_t *pbuflen, [nonnull] wchar_t const *varname) -> errno_t;
+
 %[insert:extern(_wsystem)]
 
+%[default_impl_section(.text.crt.dos.wchar.unicode.static.convert)]
 %[insert:extern(wcstol)]
 %[insert:extern(wcstoll)]
 %[insert:extern(wcstoul)]

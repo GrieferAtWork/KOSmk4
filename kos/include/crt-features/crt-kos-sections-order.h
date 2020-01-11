@@ -329,6 +329,7 @@
 	CB(PREFIX.except.system.utility.* PREFIX.except.system.configuration.*) \
 	CB(PREFIX.dos.application.init.*) \
 	CB(PREFIX.dos.sched.thread.*) \
+	CB(PREFIX.dos.sched.process.*) \
 	CB(PREFIX.dos.sched.signal.*) \
 	CB(PREFIX.dos.heap.debug_malloc.* PREFIX.dos.heap.*) \
 	CB(PREFIX.dos.FILE.locked.access.*) \
@@ -374,6 +375,7 @@
 	CB(PREFIX.dos.wchar.FILE.unlocked.write.write.*) \
 	CB(PREFIX.dos.wchar.FILE.unlocked.write.printf.*) \
 	CB(PREFIX.dos.wchar.FILE.unlocked.write.putc.*) \
+	CB(PREFIX.dos.wchar.fs.environ.*) \
 	CB(PREFIX.dos.wchar.fs.exec.system.* PREFIX.dos.wchar.fs.exec.spawn.*) \
 	CB(PREFIX.dos.wchar.fs.modify.*) \
 	CB(PREFIX.dos.wchar.fs.stat.*) \

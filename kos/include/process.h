@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc17472c */
+/* HASH CRC-32:0xf00a3a70 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -158,6 +158,9 @@ __CDECLARE_VOID(,,_cexit,(void),()) __THROWS(...)
 #endif /* _cexit... */
 #ifdef __CRT_HAVE__c_exit
 __CDECLARE_VOID(,,_c_exit,(void),()) __THROWS(...)
+#else /* LIBC: _c_exit */
+#include <local/process/_c_exit.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_c_exit, __FORCELOCAL void (__LIBCCALL _c_exit)(void) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_c_exit))(); })
 #endif /* _c_exit... */
 #ifndef ___getpid_defined
 #define ___getpid_defined 1

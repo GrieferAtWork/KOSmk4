@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61190f42 */
+/* HASH CRC-32:0x4e12ac67 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,8 +60,6 @@
 #define __stub__beep 1
 #define __stub__beginthread 1
 #define __stub__beginthreadex 1
-#define __stub__c_exit 1
-#define __stub__cexit 1
 #define __stub__clearfp 1
 #define __stub__control87 1
 #define __stub__controlfp 1
@@ -121,11 +119,9 @@
 #define __stub_adjtimex64 1
 #define __stub_asin 1
 #define __stub_asinh 1
-#define __stub_at_quick_exit 1
 #define __stub_atan 1
 #define __stub_atan2 1
 #define __stub_atanh 1
-#define __stub_atexit 1
 #define __stub_bindresvport 1
 #define __stub_bindresvport6 1
 #define __stub_cbrt 1
@@ -392,8 +388,6 @@
 #define __stub_ntp_gettime 1
 #define __stub_ntp_gettime64 1
 #define __stub_obstack_vprintf 1
-#define __stub_on_exit 1
-#define __stub_onexit 1
 #define __stub_open_wmemstream 1
 #define __stub_openlog 1
 #define __stub_pathconf 1

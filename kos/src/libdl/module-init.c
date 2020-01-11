@@ -70,7 +70,7 @@ INTERN char *ld_library_path_env = NULL;
  * appearing within `DlModule_AllList', meaning that the primary
  * application's __attribute__((constructor)) functions are invoked
  * _AFTER_ those from (e.g.) libc. */
-INTERN void LIBCCALL DlModule_RunAllStaticInitializers(void) {
+INTERN void CC DlModule_RunAllStaticInitializers(void) {
 	REF DlModule *primary;
 	DlModule *last;
 	primary = DlModule_GlobalList;

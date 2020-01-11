@@ -97,27 +97,21 @@ NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode)
 }
 /*[[[end:_endthreadex]]]*/
 
-/*[[[head:_cexit,hash:CRC-32=0xe78f4ddf]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.process._cexit") void
+INTDEF void LIBCCALL libc_run_atexit(int status);
+
+/*[[[head:_cexit,hash:CRC-32=0x980bd302]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.process._cexit") void
 (LIBCCALL libc__cexit)(void)
 		__THROWS(...)
 /*[[[body:_cexit]]]*/
 {
-	CRT_UNIMPLEMENTED("_cexit"); /* TODO */
-	libc_seterrno(ENOSYS);
+	/* Same as `exit()', but without actually exiting... */
+	dlauxctrl(NULL, DLAUXCTRL_RUNTLSFINI, NULL, NULL);
+	libc_run_atexit(0);
+	dlauxctrl(NULL, DLAUXCTRL_RUNFINI, NULL, NULL);
 }
 /*[[[end:_cexit]]]*/
 
-/*[[[head:_c_exit,hash:CRC-32=0x83b36421]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.process._c_exit") void
-(LIBCCALL libc__c_exit)(void)
-		__THROWS(...)
-/*[[[body:_c_exit]]]*/
-{
-	CRT_UNIMPLEMENTED("_c_exit"); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:_c_exit]]]*/
 
 /*[[[head:_loaddll,hash:CRC-32=0x122b8fc8]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dlfcn._loaddll") intptr_t
@@ -315,7 +309,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2ca13327]]]*/
+/*[[[start:exports,hash:CRC-32=0x4a13c599]]]*/
 #undef spawnl
 #undef _spawnl
 #undef spawnlp
@@ -329,7 +323,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(_beginthreadex, libc__beginthreadex);
 DEFINE_PUBLIC_WEAK_ALIAS(_endthread, libc__endthread);
 DEFINE_PUBLIC_WEAK_ALIAS(_endthreadex, libc__endthreadex);
 DEFINE_PUBLIC_WEAK_ALIAS(_cexit, libc__cexit);
-DEFINE_PUBLIC_WEAK_ALIAS(_c_exit, libc__c_exit);
 DEFINE_PUBLIC_WEAK_ALIAS(_loaddll, libc__loaddll);
 DEFINE_PUBLIC_WEAK_ALIAS(_unloaddll, libc__unloaddll);
 DEFINE_PUBLIC_WEAK_ALIAS(_getdllprocaddr, libc__getdllprocaddr);

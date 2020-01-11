@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ada494a */
+/* HASH CRC-32:0x429dee05 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,26 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__wtof_defined
-#define __local__wtof_defined 1
-/* Dependency: "wcstod" from "wchar" */
-#ifndef ____localdep_wcstod_defined
-#define ____localdep_wcstod_defined 1
-#ifdef __std___localdep_wcstod_defined
-__NAMESPACE_STD_USING(__localdep_wcstod)
-#elif defined(__CRT_HAVE_wcstod)
-__CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstod,(__nptr,__endptr))
-#else /* LIBC: wcstod */
-#include <local/wchar/wcstod.h>
-#define __localdep_wcstod (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstod))
-#endif /* wcstod... */
-#endif /* !____localdep_wcstod_defined */
+#ifndef GUARD_LIBC_AUTO_PROCESS_H
+#define GUARD_LIBC_AUTO_PROCESS_H 1
 
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_wtof) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wtof))(__WCHAR_TYPE__ const *__nptr) {
-#line 3175 "kos/src/libc/magic/stdlib.c"
-	return __localdep_wcstod(__nptr, __NULLPTR);
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local__wtof_defined */
+#include "../api.h"
+#include <hybrid/typecore.h>
+#include <kos/types.h>
+#include <process.h>
+#include <kos/anno.h>
+
+DECL_BEGIN
+
+#ifndef __KERNEL__
+INTDEF void (LIBCCALL libc__c_exit)(void) __THROWS(...);
+#endif /* !__KERNEL__ */
+
+DECL_END
+
+#endif /* !GUARD_LIBC_AUTO_PROCESS_H */

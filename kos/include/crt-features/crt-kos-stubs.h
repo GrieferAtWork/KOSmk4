@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8952795b */
+/* HASH CRC-32:0x4bc774a9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,8 +60,6 @@
 #define __CRT_STUB__beep 1
 #define __CRT_STUB__beginthread 1
 #define __CRT_STUB__beginthreadex 1
-#define __CRT_STUB__c_exit 1
-#define __CRT_STUB__cexit 1
 #define __CRT_STUB__clearfp 1
 #define __CRT_STUB__control87 1
 #define __CRT_STUB__controlfp 1
@@ -121,11 +119,9 @@
 #define __CRT_STUB_adjtimex64 1
 #define __CRT_STUB_asin 1
 #define __CRT_STUB_asinh 1
-#define __CRT_STUB_at_quick_exit 1
 #define __CRT_STUB_atan 1
 #define __CRT_STUB_atan2 1
 #define __CRT_STUB_atanh 1
-#define __CRT_STUB_atexit 1
 #define __CRT_STUB_bindresvport 1
 #define __CRT_STUB_bindresvport6 1
 #define __CRT_STUB_cbrt 1
@@ -392,8 +388,6 @@
 #define __CRT_STUB_ntp_gettime 1
 #define __CRT_STUB_ntp_gettime64 1
 #define __CRT_STUB_obstack_vprintf 1
-#define __CRT_STUB_on_exit 1
-#define __CRT_STUB_onexit 1
 #define __CRT_STUB_open_wmemstream 1
 #define __CRT_STUB_openlog 1
 #define __CRT_STUB_pathconf 1

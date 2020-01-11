@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a8251f8 */
+/* HASH CRC-32:0xf24fd8a4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,31 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_spawnl_defined
-#if defined(__CRT_HAVE_spawnv) || defined(__CRT_HAVE__spawnv)
-#define __local_spawnl_defined 1
-#include <parts/redirect-exec.h>
-/* Dependency: "spawnv" */
-#ifndef ____localdep_spawnv_defined
-#define ____localdep_spawnv_defined 1
-#ifdef __CRT_HAVE_spawnv
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_spawnv,(int __mode, char const *__restrict __path, __TARGV),spawnv,(__mode,__path,___argv))
-#elif defined(__CRT_HAVE__spawnv)
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_spawnv,(int __mode, char const *__restrict __path, __TARGV),_spawnv,(__mode,__path,___argv))
-#else /* LIBC: spawnv */
-#undef ____localdep_spawnv_defined
-#endif /* spawnv... */
-#endif /* !____localdep_spawnv_defined */
-
+#ifndef __local__c_exit_defined
+#define __local__c_exit_defined 1
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(spawnl) __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t
-__NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(spawnl))(int __mode,
-                                                     char const *__restrict __path,
-                                                     char const *__args,
-                                                     ... /*, (char *)NULL*/) {
-#line 241 "kos/src/libc/magic/process.c"
-	__REDIRECT_SPAWNL(char, __localdep_spawnv, __mode, __path, __args)
+__LOCAL_LIBC(_c_exit) void
+(__LIBCCALL __LIBC_LOCAL_NAME(_c_exit))(void) __THROWS(...) {
+#line 109 "kos/src/libc/magic/process.c"
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_spawnv || __CRT_HAVE__spawnv */
-#endif /* !__local_spawnl_defined */
+#endif /* !__local__c_exit_defined */
