@@ -40,6 +40,6 @@
 //#define LIBNSS_TEST1_SO                 "libnss_test1.so"
 //#define LIBPTHREAD_SO                   "libpthread.so"
 //#define LIBRESOLV_SO                    "libresolv.so"
-//#define LIBRT_SO                        "librt.so"
+#define LIBRT_SO                        "librt.so"
 //#define LIBTHREAD_DB_SO                 "libthread_db.so"
 //#define LIBUTIL_SO                      "libutil.so"
