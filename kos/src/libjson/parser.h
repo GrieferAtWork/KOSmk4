@@ -175,7 +175,7 @@ NOTHROW_NCX(CC libjson_parser_printstring)(struct json_parser *__restrict self,
  * specifically designed to be able to hold a NUL-terminated utf-8 string token:
  * BEFORE:  \"foo\\nbar\"
  * AFTER:   \0foo\nbar\0\0
- * NOTE: If the source input uses a multi-byte format, the width leading \0 matches
+ * NOTE: If the source input uses a multi-byte format, the leading \0's width matches
  *       that format's width, while the remainder of the string always follows UTF-8
  * NOTE: Another special encoding also exists for an empty string:
  * BEFORE:  \"\"

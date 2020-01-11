@@ -1077,11 +1077,11 @@ INTERN_CONST char const libjson_empty_string[1] = { 0 };
  * specifically designed to be able to hold a NUL-terminated utf-8 string token:
  * BEFORE:  \"foo\\nbar\"
  * AFTER:   \0foo\nbar\0\0
- * NOTE: If the source input uses a multi-byte format, the width leading \0 matches
+ * NOTE: If the source input uses a multi-byte format, the leading \0's width matches
  *       that format's width, while the remainder of the string always follows UTF-8
  * NOTE: Another special encoding also exists for an empty string:
  * BEFORE:  \"\"
- * AFTER:   \xff\xff -- Additional \xff character may follow
+ * AFTER:   \1\1 -- Additional \1 character may follow
  * @param: plength: When non-NULL, write the length of the returned string here.
  * @return: * :     A pointer to the start of the inlined utf-8 string
  * @return: NULL:   An error occurred; when `perror` is non-NULL, that error is stored there:
@@ -1205,9 +1205,9 @@ NOTHROW_NCX(CC libjson_parser_getnumber)(struct json_parser *__restrict self,
 	return JSON_ERROR_OK;
 }
 
-#if __SIZEOF_POINTER__ == 8
+#if __SIZEOF_POINTER__ >= 8
 DEFINE_INTERN_ALIAS(libjson_parser_getint64, libjson_parser_getnumber);
-#else /* __SIZEOF_POINTER__ == 8 */
+#else /* __SIZEOF_POINTER__ >= 8 */
 INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
                                         int64_t *__restrict presult) {
@@ -1261,7 +1261,7 @@ NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
 	*presult = result;
 	return JSON_ERROR_OK;
 }
-#endif /* __SIZEOF_POINTER__ != 8 */
+#endif /* __SIZEOF_POINTER__ < 8 */
 DEFINE_INTERN_ALIAS(libjson_parser_getuint64, libjson_parser_getint64);
 
 INTERN NONNULL((1, 2)) int

@@ -95,6 +95,9 @@ struct json_parser {
 	 * a requirement for proper execution. (Not depending on a heap allows this library
 	 * to function entirely portable, as well as be entirely freestanding with absolutely
 	 * 0 hard ABI/library dependencies)
+	 * However, when using `json_decode()' for parsing json strings, this problem doesn't
+	 * surface, as that function uses the C-stack itself to keep track of the stack of
+	 * array/object scopes, meaning that it would actually be able to detect such errors.
 	 */
 };
 
@@ -301,7 +304,7 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_printstring)(struct json_parser *__restrict
  * specifically designed to be able to hold a NUL-terminated utf-8 string token:
  * BEFORE:  \"foo\\nbar\"
  * AFTER:   \0foo\nbar\0\0
- * NOTE: If the source input uses a multi-byte format, the width leading \0 matches
+ * NOTE: If the source input uses a multi-byte format, the leading \0's width matches
  *       that format's width, while the remainder of the string always follows UTF-8
  * NOTE: Another special encoding also exists for an empty string:
  * BEFORE:  \"\"

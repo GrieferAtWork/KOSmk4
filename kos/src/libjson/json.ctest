@@ -21,13 +21,15 @@
 #define _KOS_SOURCE 1
 
 #include <hybrid/compiler.h>
-#include <kos/types.h>
 
+#include <kos/types.h>
 #include <system-test/ctest.h>
 
-#include <string.h>
+#include <assert.h>
 #include <dlfcn.h>
 #include <format-printer.h>
+#include <string.h>
+
 #include <libjson/generator.h>
 #include <libjson/parser.h>
 #include <libjson/writer.h>
