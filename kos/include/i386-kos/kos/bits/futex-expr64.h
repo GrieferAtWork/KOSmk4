@@ -29,11 +29,11 @@
 __DECL_BEGIN
 
 #ifdef __x86_64__
-#define lfutexexpr64    lfutexexpr
-#define LFUTEXEXPR_INIT LFUTEXEXPR64_INIT
+#define lfutexexprx64   lfutexexpr
+#define LFUTEXEXPR_INIT LFUTEXEXPRX64_INIT
 #endif /* __x86_64__ */
 
-struct lfutexexpr64 {
+struct lfutexexprx64 {
 	/* The definition structure of expression-based futex waiting.
 	 * Using this, you can specify arbitrarily complex expressions
 	 * that all have to be true in order for a wait to take place. */
@@ -43,7 +43,7 @@ struct lfutexexpr64 {
 	__uint64_t fe_val2;      /* Second condition operand (depending on `fe_condition') */
 };
 
-#define LFUTEXEXPR64_INIT(offset, cond, val, val2)  { offset, cond, val, val2 }
+#define LFUTEXEXPRX64_INIT(offset, cond, val, val2)  { offset, cond, val, val2 }
 
 __DECL_END
 #endif /* __CC__ */

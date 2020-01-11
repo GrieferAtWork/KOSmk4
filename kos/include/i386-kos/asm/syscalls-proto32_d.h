@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28e0b8ec */
+/* HASH CRC-32:0xb439b23d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1972,12 +1972,12 @@
 #define __NR32AT0_lfutexlockexpr          (uint32_t *, __uint32_t *)
 #define __NR32AT1_lfutexlockexpr          (void *, void *)
 #define __NR32AT2_lfutexlockexpr          (size_t, __size_t)
-#define __NR32AT3_lfutexlockexpr          (struct lfutexexpr32 const *, struct lfutexexpr32 const *)
+#define __NR32AT3_lfutexlockexpr          (struct lfutexexprx32 const *, struct lfutexexprx32 const *)
 #define __NR32AT4_lfutexlockexpr          (struct __timespecx32_64 const *, struct __timespecx32_64 const *)
 #define __NR32AT5_lfutexlockexpr          (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_lfutexexpr              (void *, void *)
 #define __NR32AT1_lfutexexpr              (size_t, __size_t)
-#define __NR32AT2_lfutexexpr              (struct lfutexexpr32 const *, struct lfutexexpr32 const *)
+#define __NR32AT2_lfutexexpr              (struct lfutexexprx32 const *, struct lfutexexprx32 const *)
 #define __NR32AT3_lfutexexpr              (struct __timespecx32_64 const *, struct __timespecx32_64 const *)
 #define __NR32AT4_lfutexexpr              (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_lseek64                 (fd_t, __fd_t)
@@ -2474,8 +2474,8 @@
 #define __NR32AM_coredump(a, b, c, d, e, f)                (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void) const *)c, (__size_t)d, (struct exception_data32 const *)e, (__syscall_ulong_t)f
 #define __NR32AM_raiseat(a, b, c, d, e, f)                 (struct ucpustate32 const *)a, (struct __siginfo32_struct const *)b
 #define __NR32AM_mktty(a, b, c, d, e, f)                   (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
-#define __NR32AM_lfutexlockexpr(a, b, c, d, e, f)          (__uint32_t *)a, (void *)b, (__size_t)c, (struct lfutexexpr32 const *)d, (struct __timespecx32_64 const *)e, (__syscall_ulong_t)f
-#define __NR32AM_lfutexexpr(a, b, c, d, e, f)              (void *)a, (__size_t)b, (struct lfutexexpr32 const *)c, (struct __timespecx32_64 const *)d, (__syscall_ulong_t)e
+#define __NR32AM_lfutexlockexpr(a, b, c, d, e, f)          (__uint32_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx32 const *)d, (struct __timespecx32_64 const *)e, (__syscall_ulong_t)f
+#define __NR32AM_lfutexexpr(a, b, c, d, e, f)              (void *)a, (__size_t)b, (struct lfutexexprx32 const *)c, (struct __timespecx32_64 const *)d, (__syscall_ulong_t)e
 #define __NR32AM_lseek64(a, b, c, d, e, f)                 (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__syscall_ulong_t)d
 #define __NR32AM_lfutex(a, b, c, d, e, f)                  (__uint32_t *)a, (__syscall_ulong_t)b, (__uint32_t)c, (struct __timespecx32_64 const *)d, (__uint32_t)e
 #define __NR32AM_debugtrap(a, b, c, d, e, f)               (struct ucpustate32 const *)a, (struct debugtrap_reason32 const *)b

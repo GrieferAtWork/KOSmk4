@@ -64,18 +64,21 @@
 #define __statfsx32    __statfs32
 #define __statfsx32_64 statfs
 #define __statfs32     __statfs32
-#define __statfs64     statfs
 #define __statfs_alt   __statfs32
 #ifdef __USE_KOS
 #define statfs32 __statfs32
 #endif /* !__USE_KOS */
 #ifdef __USE_LARGEFILE64
 #ifdef __USE_STRUCT64_MACRO
-#define statfs64 statfs
+#define statfs64   statfs
+#define __statfs64 statfs
 #else /* __USE_STRUCT64_MACRO */
 #define __statfsx32_64_alt statfs64
+#define __statfs64         statfs64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_LARGEFILE64 */
+#else /* __USE_LARGEFILE64 */
+#define __statfs64 statfs
+#endif /* !__USE_LARGEFILE64 */
 
 #define __OFFSET_STATFS_TYPE    __OFFSET_STATFSX32_64_TYPE
 #define __OFFSET_STATFS_BSIZE   __OFFSET_STATFSX32_64_BSIZE

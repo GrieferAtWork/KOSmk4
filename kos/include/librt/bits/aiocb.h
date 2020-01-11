@@ -46,35 +46,22 @@
    <http://www.gnu.org/licenses/>.  */
 
 
-#ifdef __USE_LARGEFILE64
-#define __aiocb64 aiocb
-#ifdef __USE_LARGEFILE64
-#define aiocb64   aiocb
-#endif /* __USE_LARGEFILE64 */
-#ifdef __USE_KOS
-#define __aiocb32 aiocb32
-#else /* __USE_KOS */
-#define __aiocb32 __aiocb32
-#endif /* !__USE_KOS */
-#else /* __USE_LARGEFILE64 */
-#define __aiocb32 aiocb
-#define __aiocb64 __aiocb64
-#ifdef __USE_LARGEFILE64
-#define __aiocb64 aiocb64
-#endif /* __USE_LARGEFILE64 */
-#ifdef __USE_KOS
-#define aiocb32   aiocb
-#endif /* __USE_KOS */
-#endif /* !__USE_LARGEFILE64 */
 
-
-__SYSDECL_BEGIN
-
-/* Asynchronous I/O control block. */
-/*[[[struct]]]*/
 #ifdef __CC__
-struct __aiocb32 /*[PREFIX(aio_)]*/ {
-	__INT32_TYPE__      aio_fildes;     /* File desriptor. */
+__SYSDECL_BEGIN
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("aiocb")
+#pragma push_macro("tv_sec")
+#pragma push_macro("tv_nsec")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef aiocb
+#undef tv_sec
+#undef tv_nsec
+
+#ifndef __aiocb_defined
+#define __aiocb_defined 1
+struct aiocb /*[PREFIX(aio_)]*/ {
+	__INT32_TYPE__      aio_fildes;     /* File descriptor. */
 	__INT32_TYPE__      aio_lio_opcode; /* Operation to be performed. */
 	__INT32_TYPE__      aio_reqprio;    /* Request priority offset. */
 #if __SIZEOF_POINTER__ > 4
@@ -93,19 +80,34 @@ struct __aiocb32 /*[PREFIX(aio_)]*/ {
 #endif /* __SIZEOF_SIZE_T__ > 4 */
 	__ssize_t         __return_value;
 #ifdef __USE_KOS
-	__pos32_t           aio_offset;     /* File offset. */
+	__FS_TYPE(pos)      aio_offset;     /* File offset. */
 #else /* __USE_KOS */
-	__off32_t           aio_offset;     /* File offset. */
+	__FS_TYPE(off)      aio_offset;     /* File offset. */
 #endif /* !__USE_KOS */
 	char              __glibc_reserved[32];
 };
-#endif /* __CC__ */
-/*[[[end]]]*/
+#endif /* !__aiocb_defined */
 
-/*[[[struct]]]*/
-#ifdef __CC__
-struct __aiocb64 /*[PREFIX(aio_)]*/ {
-	__INT32_TYPE__      aio_fildes;     /* File desriptor. */
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#define _AIOCB_MATCHES_AIOCB64 1
+#endif /* __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
+
+#ifdef __USE_LARGEFILE64
+#ifndef __aiocb64_defined
+#define __aiocb64_defined 1
+#if (defined(__USE_FILE_OFFSET64) || defined(_AIOCB_MATCHES_AIOCB64)) && defined(__USE_STRUCT64_MACRO)
+#define aiocb64 aiocb
+#else /* (__USE_FILE_OFFSET64 || _AIOCB_MATCHES_AIOCB64) && __USE_STRUCT64_MACRO */
+#define __aiocb64 aiocb64
+#endif /* (!__USE_FILE_OFFSET64 && !_AIOCB_MATCHES_AIOCB64) || !__USE_STRUCT64_MACRO */
+#endif /* !__aiocb64_defined */
+#endif /* __USE_LARGEFILE64 */
+
+#if (defined(__USE_FILE_OFFSET64) || defined(_AIOCB_MATCHES_AIOCB64)) && defined(__USE_STRUCT64_MACRO)
+#define __aiocb64 aiocb
+#else /* (__USE_FILE_OFFSET64 || _AIOCB_MATCHES_AIOCB64) && __USE_STRUCT64_MACRO */
+struct __aiocb64 /*[NAME(aiocb64)][PREFIX(tv_)]*/ {
+	__INT32_TYPE__      aio_fildes;     /* File descriptor. */
 	__INT32_TYPE__      aio_lio_opcode; /* Operation to be performed. */
 	__INT32_TYPE__      aio_reqprio;    /* Request priority offset. */
 #if __SIZEOF_POINTER__ > 4
@@ -130,9 +132,58 @@ struct __aiocb64 /*[PREFIX(aio_)]*/ {
 #endif /* !__USE_KOS */
 	char              __glibc_reserved[32];
 };
-#endif /* __CC__ */
-/*[[[end]]]*/
+#endif /* (!__USE_FILE_OFFSET64 && !_AIOCB_MATCHES_AIOCB64) || !__USE_STRUCT64_MACRO */
+
+#ifdef __USE_KOS
+#ifndef __aiocb32_defined
+#define __aiocb32_defined 1
+#if !defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#define aiocb32 aiocb
+#else /* !__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
+#define __aiocb32 aiocb32
+#endif /* __USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
+#endif /* !__aiocb32_defined */
+#endif /* __USE_KOS */
+
+#if !defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+#define __aiocb32 aiocb
+#else /* !__USE_FILE_OFFSET64 || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__ */
+struct __aiocb32 /*[NAME(aiocb32)][PREFIX(tv_)]*/ {
+	__INT32_TYPE__      aio_fildes;     /* File descriptor. */
+	__INT32_TYPE__      aio_lio_opcode; /* Operation to be performed. */
+	__INT32_TYPE__      aio_reqprio;    /* Request priority offset. */
+#if __SIZEOF_POINTER__ > 4
+	__INT32_TYPE__    __aio_pad0;       /* ... */
+#endif /* __SIZEOF_POINTER__ > 4 */
+	void volatile      *aio_buf;        /* Location of buffer. */
+	__size_t            aio_nbytes;     /* Length of transfer. */
+	struct sigevent     aio_sigevent;   /* Signal number and value. */
+	/* Internal members. */
+	struct __aiocb32 *__next_prio;
+	__INT32_TYPE__    __abs_prio;
+	__INT32_TYPE__    __policy;
+	__INT32_TYPE__    __error_code;
+#if __SIZEOF_SIZE_T__ > 4
+	__INT32_TYPE__    __aio_pad1;       /* ... */
+#endif /* __SIZEOF_SIZE_T__ > 4 */
+	__ssize_t         __return_value;
+#ifdef __USE_KOS
+	__pos32_t           aio_offset;     /* File offset. */
+#else /* __USE_KOS */
+	__off32_t           aio_offset;     /* File offset. */
+#endif /* !__USE_KOS */
+	char              __glibc_reserved[32];
+};
+#endif /* __USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("tv_nsec")
+#pragma pop_macro("tv_sec")
+#pragma pop_macro("aiocb")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 __SYSDECL_END
+#endif /* __CC__ */
+
 
 #endif /* !_LIBRT_BITS_AIOCB_H */

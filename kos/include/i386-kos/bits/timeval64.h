@@ -62,7 +62,6 @@
 #define timevalx64              timeval
 #define __timevalx64            timeval
 #define __timeval32             timeval
-#define __timeval64             timeval
 #define __timeval_alt           timeval
 #define _TIMEVAL_MATCHES_TIMEVAL64 1
 #ifdef __USE_KOS
@@ -70,11 +69,15 @@
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
 #ifdef __USE_STRUCT64_MACRO
-#define timeval64 timeval
+#define timeval64   timeval
+#define __timeval64 timeval
 #else /* __USE_STRUCT64_MACRO */
 #define __timevalx64_alt timeval64
+#define __timeval64      timeval64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_TIME64 */
+#else /* __USE_TIME64 */
+#define __timeval64 timeval
+#endif /* !__USE_TIME64 */
 #define __timeval_defined 1
 #endif /* __x86_64__ */
 /*[[[end]]]*/

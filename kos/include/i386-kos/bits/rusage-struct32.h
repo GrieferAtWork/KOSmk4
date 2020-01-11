@@ -64,18 +64,21 @@
 #define __rusagex32    __rusage32
 #define __rusagex32_64 rusage
 #define __rusage32     __rusage32
-#define __rusage64     rusage
 #define __rusage_alt   __rusage32
 #ifdef __USE_KOS
 #define rusage32 __rusage32
 #endif /* !__USE_KOS */
 #ifdef __USE_TIME64
 #ifdef __USE_STRUCT64_MACRO
-#define rusage64 rusage
+#define rusage64   rusage
+#define __rusage64 rusage
 #else /* __USE_STRUCT64_MACRO */
 #define __rusagex32_64_alt rusage64
+#define __rusage64         rusage64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_TIME64 */
+#else /* __USE_TIME64 */
+#define __rusage64 rusage
+#endif /* !__USE_TIME64 */
 
 #define __OFFSET_RUSAGE_UTIME    __OFFSET_RUSAGEX32_64_UTIME
 #define __OFFSET_RUSAGE_STIME    __OFFSET_RUSAGEX32_64_STIME

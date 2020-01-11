@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94e20886 */
+/* HASH CRC-32:0xf9d653fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1598,12 +1598,12 @@
 #define __NR64AT0_lfutexlockexpr         (uint64_t *, __uint64_t *)
 #define __NR64AT1_lfutexlockexpr         (void *, void *)
 #define __NR64AT2_lfutexlockexpr         (size_t, __size_t)
-#define __NR64AT3_lfutexlockexpr         (struct lfutexexpr64 const *, struct lfutexexpr64 const *)
+#define __NR64AT3_lfutexlockexpr         (struct lfutexexprx64 const *, struct lfutexexprx64 const *)
 #define __NR64AT4_lfutexlockexpr         (struct __timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT5_lfutexlockexpr         (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_lfutexexpr             (void *, void *)
 #define __NR64AT1_lfutexexpr             (size_t, __size_t)
-#define __NR64AT2_lfutexexpr             (struct lfutexexpr64 const *, struct lfutexexpr64 const *)
+#define __NR64AT2_lfutexexpr             (struct lfutexexprx64 const *, struct lfutexexprx64 const *)
 #define __NR64AT3_lfutexexpr             (struct __timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT4_lfutexexpr             (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_lfutex                 (uint64_t *, __uint64_t *)
@@ -2035,8 +2035,8 @@
 #define __NR64AM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
 #define __NR64AM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfo64_struct const *)b
 #define __NR64AM_mktty(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
-#define __NR64AM_lfutexlockexpr(a, b, c, d, e, f)         (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexpr64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
-#define __NR64AM_lfutexexpr(a, b, c, d, e, f)             (void *)a, (__size_t)b, (struct lfutexexpr64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
+#define __NR64AM_lfutexlockexpr(a, b, c, d, e, f)         (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f
+#define __NR64AM_lfutexexpr(a, b, c, d, e, f)             (void *)a, (__size_t)b, (struct lfutexexprx64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
 #define __NR64AM_lfutex(a, b, c, d, e, f)                 (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e
 #define __NR64AM_rpc_service(a, b, c, d, e, f)            /* nothing */
 #define __NR64AM_debugtrap(a, b, c, d, e, f)              (struct ucpustate64 const *)a, (struct debugtrap_reason64 const *)b

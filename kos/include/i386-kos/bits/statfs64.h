@@ -93,7 +93,6 @@
 #define statfsx64                 statfs
 #define __statfsx64               statfs
 #define __statfs32                statfs
-#define __statfs64                statfs
 #define __statfs_alt              statfs
 #define _STATFS_MATCHES_STATFS64 1
 #ifdef __USE_KOS
@@ -101,11 +100,15 @@
 #endif /* __USE_KOS */
 #ifdef __USE_LARGEFILE64
 #ifdef __USE_STRUCT64_MACRO
-#define statfs64 statfs
+#define statfs64   statfs
+#define __statfs64 statfs
 #else /* __USE_STRUCT64_MACRO */
 #define __statfsx64_alt statfs64
+#define __statfs64      statfs64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_LARGEFILE64 */
+#else /* __USE_LARGEFILE64 */
+#define __statfs64 statfs
+#endif /* !__USE_LARGEFILE64 */
 #define __statfs_defined 1
 #endif /* __x86_64__ */
 /*[[[end]]]*/

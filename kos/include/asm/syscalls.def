@@ -168,8 +168,8 @@
 %[typeorg(<kos/exec/bits/library-listdef32.h>: library_listdef32)]
 %[typeorg(<kos/exec/bits/library-listdef64.h>: library_listdef64)]
 %[typeorg(<kos/bits/futex-expr.h>: lfutexexpr)]
-%[typeorg(<kos/bits/futex-expr32.h>: lfutexexpr32)]
-%[typeorg(<kos/bits/futex-expr64.h>: lfutexexpr64)]
+%[typeorg(<kos/bits/futex-expr32.h>: lfutexexprx32)]
+%[typeorg(<kos/bits/futex-expr64.h>: lfutexexprx64)]
 %[typeorg(<librt/bits/aiocb.h>: aiocb, aiocb32, aiocb64, __aiocb32, __aiocb64)]
 %[typeorg(<librt/bits/aioinit.h>: aioinit)]
 %[typeorg(<librt/bits/mqueue.h>: mq_attr)]
@@ -1718,9 +1718,9 @@ debugtrap:(struct ucpustate const *state, struct debugtrap_reason const *reason)
 [restart(dont)][cp] lfutexexpr:(void *base, size_t exprc, struct lfutexexpr const *exprv, struct timespec const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
 [restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexpr32:(void *base, size_t exprc, struct lfutexexpr const *exprv, struct __timespec32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
 [restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexpr64:(void *base, size_t exprc, struct lfutexexpr const *exprv, struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx32:(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx32_64:(void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx64:(void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx32:(void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct __timespecx32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx32_64:(void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexexpr)] lfutexexprx64:(void *base, size_t exprc, struct lfutexexprx64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
 %[endgroup]
 
 
@@ -1757,9 +1757,9 @@ lfutexlockexpr:(uintptr_t *ulockaddr, void *base, size_t exprc, struct lfutexexp
                 struct timespec const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
 [restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexpr32:(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr const *exprv, struct __timespec32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
 [restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexpr64:(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr const *exprv, struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx32:(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx32_64:(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
-[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx64:(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx32:(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct __timespecx32 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx32_64:(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
+[restart(dont)][cp][doc_alias(lfutexlockexpr)] lfutexlockexprx64:(uint64_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx64 const *exprv, struct __timespecx64 const *timeout, syscall_ulong_t timeout_flags) -> errno_t;
 %[endgroup]
 
 @@Create and return a new tty terminal controller connected to the given keyboard and display

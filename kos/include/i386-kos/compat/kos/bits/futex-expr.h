@@ -23,7 +23,7 @@
 
 #ifdef __x86_64__
 #include <kos/bits/futex-expr32.h>
-#define compat_lfutexexpr lfutexexpr32
+#define compat_lfutexexpr lfutexexprx32
 #endif /* __x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_KOS_BITS_FUTEX_EXPR_H */

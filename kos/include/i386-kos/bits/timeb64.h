@@ -65,7 +65,6 @@
 #define timebx64                  timeb
 #define __timebx64                timeb
 #define __timeb32                 timeb
-#define __timeb64                 timeb
 #define __timeb_alt               timeb
 #define _TIMEB_MATCHES_TIMEB64 1
 #ifdef __USE_KOS
@@ -73,11 +72,15 @@
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
 #ifdef __USE_STRUCT64_MACRO
-#define timeb64 timeb
+#define timeb64   timeb
+#define __timeb64 timeb
 #else /* __USE_STRUCT64_MACRO */
 #define __timebx64_alt timeb64
+#define __timeb64      timeb64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_TIME64 */
+#else /* __USE_TIME64 */
+#define __timeb64 timeb
+#endif /* !__USE_TIME64 */
 #define __timeb_defined 1
 #endif /* __x86_64__ */
 /*[[[end]]]*/

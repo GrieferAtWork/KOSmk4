@@ -62,7 +62,6 @@
 #define timespecx64              timespec
 #define __timespecx64            timespec
 #define __timespec32             timespec
-#define __timespec64             timespec
 #define __timespec_alt           timespec
 #define _TIMESPEC_MATCHES_TIMESPEC64 1
 #ifdef __USE_KOS
@@ -70,11 +69,15 @@
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
 #ifdef __USE_STRUCT64_MACRO
-#define timespec64 timespec
+#define timespec64   timespec
+#define __timespec64 timespec
 #else /* __USE_STRUCT64_MACRO */
 #define __timespecx64_alt timespec64
+#define __timespec64      timespec64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_TIME64 */
+#else /* __USE_TIME64 */
+#define __timespec64 timespec
+#endif /* !__USE_TIME64 */
 #define __timespec_defined 1
 #endif /* __x86_64__ */
 /*[[[end]]]*/

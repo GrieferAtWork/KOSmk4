@@ -103,7 +103,6 @@
 #define rusagex64                  rusage
 #define __rusagex64                rusage
 #define __rusage32                 rusage
-#define __rusage64                 rusage
 #define __rusage_alt               rusage
 #define _RUSAGE_MATCHES_RUSAGE64 1
 #ifdef __USE_KOS
@@ -111,11 +110,15 @@
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
 #ifdef __USE_STRUCT64_MACRO
-#define rusage64 rusage
+#define rusage64   rusage
+#define __rusage64 rusage
 #else /* __USE_STRUCT64_MACRO */
 #define __rusagex64_alt rusage64
+#define __rusage64      rusage64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_TIME64 */
+#else /* __USE_TIME64 */
+#define __rusage64 rusage
+#endif /* !__USE_TIME64 */
 #define __rusage_defined 1
 #endif /* __x86_64__ */
 /*[[[end]]]*/

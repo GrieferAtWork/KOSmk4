@@ -62,7 +62,6 @@
 #define itimerspecx64                  itimerspec
 #define __itimerspecx64                itimerspec
 #define __itimerspec32                 itimerspec
-#define __itimerspec64                 itimerspec
 #define __itimerspec_alt               itimerspec
 #define _ITIMERSPEC_MATCHES_ITIMERSPEC64 1
 #ifdef __USE_KOS
@@ -70,11 +69,15 @@
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
 #ifdef __USE_STRUCT64_MACRO
-#define itimerspec64 itimerspec
+#define itimerspec64   itimerspec
+#define __itimerspec64 itimerspec
 #else /* __USE_STRUCT64_MACRO */
 #define __itimerspecx64_alt itimerspec64
+#define __itimerspec64      itimerspec64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_TIME64 */
+#else /* __USE_TIME64 */
+#define __itimerspec64 itimerspec
+#endif /* !__USE_TIME64 */
 #define __itimerspec_defined 1
 #endif /* __x86_64__ */
 /*[[[end]]]*/

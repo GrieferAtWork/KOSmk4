@@ -63,18 +63,21 @@
 #define __itimervalx32    __itimerval32
 #define __itimervalx32_64 itimerval
 #define __itimerval32     __itimerval32
-#define __itimerval64     itimerval
 #define __itimerval_alt   __itimerval32
 #ifdef __USE_KOS
 #define itimerval32 __itimerval32
 #endif /* !__USE_KOS */
 #ifdef __USE_TIME64
 #ifdef __USE_STRUCT64_MACRO
-#define itimerval64 itimerval
+#define itimerval64   itimerval
+#define __itimerval64 itimerval
 #else /* __USE_STRUCT64_MACRO */
 #define __itimervalx32_64_alt itimerval64
+#define __itimerval64         itimerval64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_TIME64 */
+#else /* __USE_TIME64 */
+#define __itimerval64 itimerval
+#endif /* !__USE_TIME64 */
 
 #define __OFFSET_ITIMERVAL_INTERVAL __OFFSET_ITIMERVALX32_64_INTERVAL
 #define __OFFSET_ITIMERVAL_VALUE    __OFFSET_ITIMERVALX32_64_VALUE

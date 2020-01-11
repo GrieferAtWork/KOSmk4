@@ -62,18 +62,21 @@
 #define __timebx32    __timeb32
 #define __timebx32_64 timeb
 #define __timeb32     __timeb32
-#define __timeb64     timeb
 #define __timeb_alt   __timeb32
 #ifdef __USE_KOS
 #define timeb32 __timeb32
 #endif /* !__USE_KOS */
 #ifdef __USE_TIME64
 #ifdef __USE_STRUCT64_MACRO
-#define timeb64 timeb
+#define timeb64   timeb
+#define __timeb64 timeb
 #else /* __USE_STRUCT64_MACRO */
 #define __timebx32_64_alt timeb64
+#define __timeb64         timeb64
 #endif /* !__USE_STRUCT64_MACRO */
-#endif /* __USE_TIME64 */
+#else /* __USE_TIME64 */
+#define __timeb64 timeb
+#endif /* !__USE_TIME64 */
 
 #define __OFFSET_TIMEB_TIME     __OFFSET_TIMEBX32_64_TIME
 #define __OFFSET_TIMEB_MILLITM  __OFFSET_TIMEBX32_64_MILLITM
