@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71fe0b04 */
+/* HASH CRC-32:0x42e2a831 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -930,10 +930,10 @@
 #define __NRAT0_nanosleep              (struct timespec const *, struct timespec const *)
 #define __NRAT1_nanosleep              (struct timespec *, struct timespec *)
 #define __NRAT0_getitimer              (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_getitimer              (struct __itimerval32 *, struct __itimerval32 *)
+#define __NRAT1_getitimer              (struct itimerval *, struct itimerval *)
 #define __NRAT0_setitimer              (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_setitimer              (struct __itimerval32 const *, struct __itimerval32 const *)
-#define __NRAT2_setitimer              (struct __itimerval32 *, struct __itimerval32 *)
+#define __NRAT1_setitimer              (struct itimerval const *, struct itimerval const *)
+#define __NRAT2_setitimer              (struct itimerval *, struct itimerval *)
 #define __NRAT0_kexec_load             (int, int)
 #define __NRAT0_init_module            (int, int)
 #define __NRAT0_delete_module          (int, int)
@@ -1504,8 +1504,8 @@
 #define __NRAM_set_robust_list(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (int)a
 #define __NRAM_get_robust_list(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (int)a
 #define __NRAM_nanosleep(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (struct timespec const *)a, (struct timespec *)b
-#define __NRAM_getitimer(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__syscall_ulong_t)a, (struct __itimerval32 *)b
-#define __NRAM_setitimer(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__syscall_ulong_t)a, (struct __itimerval32 const *)b, (struct __itimerval32 *)c
+#define __NRAM_getitimer(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__syscall_ulong_t)a, (struct itimerval *)b
+#define __NRAM_setitimer(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__syscall_ulong_t)a, (struct itimerval const *)b, (struct itimerval *)c
 #define __NRAM_kexec_load(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (int)a
 #define __NRAM_init_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (int)a
 #define __NRAM_delete_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a

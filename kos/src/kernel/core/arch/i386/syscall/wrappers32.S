@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebc831ff */
+/* HASH CRC-32:0x86fbbf8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3869,7 +3869,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_syslog)
 	.cfi_endproc
 END(__x86_asm32_int80_syslog)
 
-/* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
+/* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
 .section .text.x86.asm32_syscall_int80.setitimer
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer)
 	.cfi_startproc simple
@@ -3906,7 +3906,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer)
 	.cfi_endproc
 END(__x86_asm32_int80_setitimer)
 
-/* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
+/* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
 .section .text.x86.asm32_syscall_int80.getitimer
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer)
 	.cfi_startproc simple
@@ -15664,7 +15664,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
 	.cfi_endproc
 END(__x86_asm32_int80_wait4_64)
 
-/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+/* errno_t getitimer64(syscall_ulong_t which, struct __itimervalx32_64 *curr_value) */
 .section .text.x86.asm32_syscall_int80.getitimer64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
 	.cfi_startproc simple
@@ -15701,7 +15701,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer64)
 	.cfi_endproc
 END(__x86_asm32_int80_getitimer64)
 
-/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
+/* errno_t setitimer64(syscall_ulong_t which, struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) */
 .section .text.x86.asm32_syscall_int80.setitimer64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_setitimer64)
 	.cfi_startproc simple
@@ -21115,7 +21115,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_syslog)
 	.cfi_endproc
 END(__x86_asm32_sysenter_syslog)
 
-/* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
+/* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
 .section .text.x86.asm32_syscall_sysenter.setitimer
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setitimer)
 	.cfi_startproc simple
@@ -21152,7 +21152,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setitimer)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setitimer)
 
-/* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
+/* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
 .section .text.x86.asm32_syscall_sysenter.getitimer
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getitimer)
 	.cfi_startproc simple
@@ -33010,7 +33010,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_wait4_64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_wait4_64)
 
-/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+/* errno_t getitimer64(syscall_ulong_t which, struct __itimervalx32_64 *curr_value) */
 .section .text.x86.asm32_syscall_sysenter.getitimer64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getitimer64)
 	.cfi_startproc simple
@@ -33047,7 +33047,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getitimer64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getitimer64)
 
-/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
+/* errno_t setitimer64(syscall_ulong_t which, struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) */
 .section .text.x86.asm32_syscall_sysenter.setitimer64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setitimer64)
 	.cfi_startproc simple

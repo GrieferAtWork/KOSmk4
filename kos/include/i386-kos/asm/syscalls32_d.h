@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70fdc0b5 */
+/* HASH CRC-32:0x359a5788 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -144,8 +144,8 @@
 #define __NR32_ioperm                  0x65                   /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
 #define __NR32_socketcall              0x66                   /* errno_t socketcall(int call, unsigned long *args) */
 #define __NR32_syslog                  0x67                   /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
-#define __NR32_setitimer               0x68                   /* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
-#define __NR32_getitimer               0x69                   /* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
+#define __NR32_setitimer               0x68                   /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
+#define __NR32_getitimer               0x69                   /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
 #define __NR32_linux_stat              0x6a                   /* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
 #define __NR32_linux_lstat             0x6b                   /* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
 #define __NR32_linux_fstat             0x6c                   /* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
@@ -507,8 +507,8 @@
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 #define __NR32_wait4_64                __UINT32_C(0xffffff8e) /* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
-#define __NR32_getitimer64             __UINT32_C(0xffffff97) /* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
-#define __NR32_setitimer64             __UINT32_C(0xffffff98) /* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
+#define __NR32_getitimer64             __UINT32_C(0xffffff97) /* errno_t getitimer64(syscall_ulong_t which, struct __itimervalx32_64 *curr_value) */
+#define __NR32_setitimer64             __UINT32_C(0xffffff98) /* errno_t setitimer64(syscall_ulong_t which, struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) */
 /* Map the segments of a given library into memory
  * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
  * @param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|

@@ -92,19 +92,21 @@
 %[typeorg(<bits/types.h>: __time32_t, __time64_t)]
 %[typeorg(<bits/types.h>: __quantum_diff_t, __clock_t, __suseconds_t, __clockid_t)]
 %[typeorg(<bits/types.h>: __gid_t, __uid_t, __useconds_t, __jtime_t, __timer_t)]
-%[typeorg(<bits/itimerspec.h>: itimerspec, __itimerspec32, __itimerspec64)]
-%[typeorg(<bits/itimerspec32.h>: __itimerspecx32, __itimerspecx32_64)]
-%[typeorg(<bits/itimerspec64.h>: __itimerspecx64)]
-%[typeorg(<bits/timespec.h>: timespec, __timespec32, __timespec64)]
-%[typeorg(<bits/timespec32.h>: __timespecx32, __timespecx32_64)]
-%[typeorg(<bits/timespec64.h>: __timespecx64)]
-%[typeorg(<bits/timeval.h>: timeval, __timeval32, __timeval64)]
-%[typeorg(<bits/timeval32.h>: __timevalx32, __timevalx32_64)]
-%[typeorg(<bits/timeval64.h>: __timevalx64)]
+%[typeorg(<bits/itimerspec.h>: itimerspec, itimerspec32, itimerspec64, __itimerspec32, __itimerspec64)]
+%[typeorg(<bits/itimerspec32.h>: __itimerspecx32, __itimerspecx32_64, itimerspecx32, itimerspecx32_64)]
+%[typeorg(<bits/itimerspec64.h>: __itimerspecx64, itimerspecx64)]
+%[typeorg(<bits/itimerval.h>: itimerval, itimerval32, itimerval64, __itimerval32, __itimerval64)]
+%[typeorg(<bits/itimerval32.h>: __itimervalx32, __itimervalx32_64, itimervalx32, itimervalx32_64)]
+%[typeorg(<bits/itimerval64.h>: __itimervalx64, itimervalx64)]
+%[typeorg(<bits/timespec.h>: timespec, timespec32, timespec64, __timespec32, __timespec64)]
+%[typeorg(<bits/timespec32.h>: __timespecx32, __timespecx32_64, timespecx32, timespecx32_64)]
+%[typeorg(<bits/timespec64.h>: __timespecx64, timespecx64)]
+%[typeorg(<bits/timeval.h>: timeval, timeval32, timeval64, __timeval32, __timeval64)]
+%[typeorg(<bits/timeval32.h>: __timevalx32, __timevalx32_64, timevalx32, timevalx32_64)]
+%[typeorg(<bits/timeval64.h>: __timevalx64, timevalx64)]
 %[typeorg(<bits/rusage-struct.h>: rusage, __rusage32, __rusage64)]
 %[typeorg(<bits/rusage-struct32.h>: __rusagex32, __rusagex32_64)]
 %[typeorg(<bits/rusage-struct64.h>: __rusagex64)]
-%[typeorg(<bits/itimerval.h>: __itimerval32, __itimerval64)]
 %[typeorg(<bits/stat-kos.h>: __kos_stat)]
 %[typeorg(<bits/stat-kos32.h>: __kos_statx32)]
 %[typeorg(<bits/stat-kos64.h>: __kos_statx64)]
@@ -646,13 +648,21 @@ socketcall:(int call, unsigned long *args) -> errno_t;
 [restart(must)][cp] syslog:([tostr("%Iu",(uintptr_t)({me}))] syscall_ulong_t level, [tostr("%$q",len,(validate_readable({me},len),{me}))] char const *str, size_t len) -> ssize_t;
 
 %[startgroup]
-setitimer:(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) -> errno_t;
+setitimer:(syscall_ulong_t which, struct itimerval const *newval, struct itimerval *oldval) -> errno_t;
+setitimer32:(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) -> errno_t;
 setitimer64:(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) -> errno_t;
+setitimerx32:(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) -> errno_t;
+setitimerx64:(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) -> errno_t;
+setitimerx32_64:(syscall_ulong_t which, struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-getitimer:(syscall_ulong_t which, struct __itimerval32 *curr_value) -> errno_t;
+getitimer:(syscall_ulong_t which, struct itimerval *curr_value) -> errno_t;
+getitimer32:(syscall_ulong_t which, struct __itimerval32 *curr_value) -> errno_t;
 getitimer64:(syscall_ulong_t which, struct __itimerval64 *curr_value) -> errno_t;
+getitimerx32:(syscall_ulong_t which, struct __itimervalx32 *curr_value) -> errno_t;
+getitimerx32_64:(syscall_ulong_t which, struct __itimervalx32_64 *curr_value) -> errno_t;
+getitimerx64:(syscall_ulong_t which, struct __itimervalx64 *curr_value) -> errno_t;
 %[endgroup]
 
 iopl:(syscall_ulong_t level) -> errno_t;

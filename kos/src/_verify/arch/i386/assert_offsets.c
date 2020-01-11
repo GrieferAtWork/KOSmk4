@@ -73,6 +73,8 @@ local files = {
 	"../../../../include/i386-kos/bits/sigval64.h",
 	"../../../../include/i386-kos/bits/itimerspec32.h",
 	"../../../../include/i386-kos/bits/itimerspec64.h",
+	"../../../../include/i386-kos/bits/itimerval32.h",
+	"../../../../include/i386-kos/bits/itimerval64.h",
 	"../../../../include/i386-kos/bits/timeb32.h",
 	"../../../../include/i386-kos/bits/timeb64.h",
 	"../../../../include/i386-kos/bits/stat-kos32.h",
@@ -629,6 +631,42 @@ STATIC_ASSERT(sizeof(struct itimerspecx64) == __SIZEOF_ITIMERSPECX64);
 STATIC_ASSERT(alignof(struct itimerspecx64) == __ALIGNOF_ITIMERSPECX64);
 
 /* struct __itimerspecx64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/itimerval32.h>
+
+/* struct itimervalx32 */
+STATIC_ASSERT(offsetof(struct itimervalx32, it_value) == __OFFSET_ITIMERVALX32_VALUE);
+STATIC_ASSERT(offsetof(struct itimervalx32, it_interval) == __OFFSET_ITIMERVALX32_INTERVAL);
+STATIC_ASSERT(sizeof(struct itimervalx32) == __SIZEOF_ITIMERVALX32);
+STATIC_ASSERT(alignof(struct itimervalx32) == __ALIGNOF_ITIMERVALX32);
+
+/* struct itimervalx32_64 */
+STATIC_ASSERT(offsetof(struct itimervalx32_64, it_value) == __OFFSET_ITIMERVALX32_64_VALUE);
+STATIC_ASSERT(offsetof(struct itimervalx32_64, it_interval) == __OFFSET_ITIMERVALX32_64_INTERVAL);
+STATIC_ASSERT(sizeof(struct itimervalx32_64) == __SIZEOF_ITIMERVALX32_64);
+STATIC_ASSERT(alignof(struct itimervalx32_64) == __ALIGNOF_ITIMERVALX32_64);
+
+/* struct __itimervalx32_64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/itimerval64.h>
+
+/* struct itimervalx64 */
+STATIC_ASSERT(offsetof(struct itimervalx64, it_value) == __OFFSET_ITIMERVALX64_VALUE);
+STATIC_ASSERT(offsetof(struct itimervalx64, it_interval) == __OFFSET_ITIMERVALX64_INTERVAL);
+STATIC_ASSERT(sizeof(struct itimervalx64) == __SIZEOF_ITIMERVALX64);
+STATIC_ASSERT(alignof(struct itimervalx64) == __ALIGNOF_ITIMERVALX64);
+
+/* struct __itimervalx64_alt */
 /* ... */
 
 

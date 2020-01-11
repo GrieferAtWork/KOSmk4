@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb393703 */
+/* HASH CRC-32:0xffa5db50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -923,7 +923,7 @@ INTERN_FUNCTION(libc_sys_Xnanosleep)
 END(libc_sys_Xnanosleep)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xnanosleep, libc_sys_Xnanosleep)
 
-/* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
+/* errno_t getitimer(syscall_ulong_t which, struct __itimervalx64 *curr_value) */
 .section .text.crt.syscall.getitimer
 INTERN_FUNCTION(libc_sys_getitimer)
 	.cfi_startproc
@@ -935,7 +935,7 @@ INTERN_FUNCTION(libc_sys_getitimer)
 END(libc_sys_getitimer)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getitimer, libc_sys_getitimer)
 
-/* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
+/* errno_t getitimer(syscall_ulong_t which, struct __itimervalx64 *curr_value) */
 .section .text.crt.syscall.Xgetitimer
 INTERN_FUNCTION(libc_sys_Xgetitimer)
 	.cfi_startproc
@@ -971,7 +971,7 @@ INTERN_FUNCTION(libc_sys_Xalarm)
 END(libc_sys_Xalarm)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xalarm, libc_sys_Xalarm)
 
-/* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
+/* errno_t setitimer(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) */
 .section .text.crt.syscall.setitimer
 INTERN_FUNCTION(libc_sys_setitimer)
 	.cfi_startproc
@@ -983,7 +983,7 @@ INTERN_FUNCTION(libc_sys_setitimer)
 END(libc_sys_setitimer)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_setitimer, libc_sys_setitimer)
 
-/* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
+/* errno_t setitimer(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) */
 .section .text.crt.syscall.Xsetitimer
 INTERN_FUNCTION(libc_sys_Xsetitimer)
 	.cfi_startproc

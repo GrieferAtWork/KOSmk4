@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e994ee1 */
+/* HASH CRC-32:0x8e4b0e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,8 +131,8 @@
 #define __NR_set_robust_list        0x63  /* errno_t set_robust_list(int TODO_PROTOTYPE) */
 #define __NR_get_robust_list        0x64  /* errno_t get_robust_list(int TODO_PROTOTYPE) */
 #define __NR_nanosleep              0x65  /* errno_t nanosleep(struct timespec const *req, struct timespec *rem) */
-#define __NR_getitimer              0x66  /* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
-#define __NR_setitimer              0x67  /* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
+#define __NR_getitimer              0x66  /* errno_t getitimer(syscall_ulong_t which, struct itimerval *curr_value) */
+#define __NR_setitimer              0x67  /* errno_t setitimer(syscall_ulong_t which, struct itimerval const *newval, struct itimerval *oldval) */
 #define __NR_kexec_load             0x68  /* errno_t kexec_load(int TODO_PROTOTYPE) */
 #define __NR_init_module            0x69  /* errno_t init_module(int TODO_PROTOTYPE) */
 #define __NR_delete_module          0x6a  /* errno_t delete_module(int TODO_PROTOTYPE) */

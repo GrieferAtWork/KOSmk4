@@ -112,6 +112,10 @@ linux_lstat64 = linux_lstatx32_64;
 linux_stat = linux_statx32;
 linux_stat64 = linux_statx32_64;
 
+getitimer = getitimerx32;
+getitimer64 = getitimerx32_64;
+setitimer = setitimerx32;
+setitimer64 = setitimerx32_64;
 getrusage = getrusagex32;
 getrusage64 = getrusagex32_64;
 wait4 = wait4_x32;

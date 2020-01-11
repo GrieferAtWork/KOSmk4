@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c7b4ebe */
+/* HASH CRC-32:0x827414bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,9 +82,9 @@
 #define __NR_dup2                   0x21                           /* fd_t dup2(fd_t oldfd, fd_t newfd) */
 #define __NR_pause                  0x22                           /* errno_t pause(void) */
 #define __NR_nanosleep              0x23                           /* errno_t nanosleep(struct __timespecx64 const *req, struct __timespecx64 *rem) */
-#define __NR_getitimer              0x24                           /* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
+#define __NR_getitimer              0x24                           /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx64 *curr_value) */
 #define __NR_alarm                  0x25                           /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
-#define __NR_setitimer              0x26                           /* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
+#define __NR_setitimer              0x26                           /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) */
 #define __NR_getpid                 0x27                           /* pid_t getpid(void) */
 #define __NR_sendfile               0x28                           /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
 #define __NR_socket                 0x29                           /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */

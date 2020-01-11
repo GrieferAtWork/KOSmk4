@@ -224,7 +224,7 @@ function do_wrap3264_x32_and_x32_64(
 		macroName,
 	)));
 	fp << "\n";
-	fp << "#define __itimerspec_defined 1\n";
+	fp << "#define __" << name << "_defined 1\n";
 	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(linkIf) << "*/\n";
 }
 

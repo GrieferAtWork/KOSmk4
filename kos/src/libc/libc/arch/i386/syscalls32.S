@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80a920f8 */
+/* HASH CRC-32:0xfb43d6df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2205,7 +2205,7 @@ INTERN_FUNCTION(libc_sys_Xsyslog)
 END(libc_sys_Xsyslog)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsyslog, libc_sys_Xsyslog)
 
-/* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
+/* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
 .section .text.crt.syscall.setitimer
 INTERN_FUNCTION(libc_sys_setitimer)
 	movl   $(0x68), %eax
@@ -2213,7 +2213,7 @@ INTERN_FUNCTION(libc_sys_setitimer)
 END(libc_sys_setitimer)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_setitimer, libc_sys_setitimer)
 
-/* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
+/* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
 .section .text.crt.syscall.Xsetitimer
 INTERN_FUNCTION(libc_sys_Xsetitimer)
 	movl   $(0x68), %eax
@@ -2221,7 +2221,7 @@ INTERN_FUNCTION(libc_sys_Xsetitimer)
 END(libc_sys_Xsetitimer)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsetitimer, libc_sys_Xsetitimer)
 
-/* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
+/* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
 .section .text.crt.syscall.getitimer
 INTERN_FUNCTION(libc_sys_getitimer)
 	movl   $(0x69), %eax
@@ -2229,7 +2229,7 @@ INTERN_FUNCTION(libc_sys_getitimer)
 END(libc_sys_getitimer)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getitimer, libc_sys_getitimer)
 
-/* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
+/* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
 .section .text.crt.syscall.Xgetitimer
 INTERN_FUNCTION(libc_sys_Xgetitimer)
 	movl   $(0x69), %eax
@@ -7249,7 +7249,7 @@ INTERN_FUNCTION(libc_sys_Xwait4_64)
 END(libc_sys_Xwait4_64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xwait4_64, libc_sys_Xwait4_64)
 
-/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+/* errno_t getitimer64(syscall_ulong_t which, struct __itimervalx32_64 *curr_value) */
 .section .text.crt.syscall.getitimer64
 INTERN_FUNCTION(libc_sys_getitimer64)
 	movl   $(0xffffff97), %eax
@@ -7257,7 +7257,7 @@ INTERN_FUNCTION(libc_sys_getitimer64)
 END(libc_sys_getitimer64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getitimer64, libc_sys_getitimer64)
 
-/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+/* errno_t getitimer64(syscall_ulong_t which, struct __itimervalx32_64 *curr_value) */
 .section .text.crt.syscall.Xgetitimer64
 INTERN_FUNCTION(libc_sys_Xgetitimer64)
 	movl   $(0xffffff97), %eax
@@ -7265,7 +7265,7 @@ INTERN_FUNCTION(libc_sys_Xgetitimer64)
 END(libc_sys_Xgetitimer64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetitimer64, libc_sys_Xgetitimer64)
 
-/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
+/* errno_t setitimer64(syscall_ulong_t which, struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) */
 .section .text.crt.syscall.setitimer64
 INTERN_FUNCTION(libc_sys_setitimer64)
 	movl   $(0xffffff98), %eax
@@ -7273,7 +7273,7 @@ INTERN_FUNCTION(libc_sys_setitimer64)
 END(libc_sys_setitimer64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_setitimer64, libc_sys_setitimer64)
 
-/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
+/* errno_t setitimer64(syscall_ulong_t which, struct __itimervalx32_64 const *newval, struct __itimervalx32_64 *oldval) */
 .section .text.crt.syscall.Xsetitimer64
 INTERN_FUNCTION(libc_sys_Xsetitimer64)
 	movl   $(0xffffff98), %eax

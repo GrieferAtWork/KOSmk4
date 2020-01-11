@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2f79445 */
+/* HASH CRC-32:0xbdaa5874 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1129,10 +1129,10 @@
 #define __NRAT1_syslog                  (char const *, char const *)
 #define __NRAT2_syslog                  (size_t, __size_t)
 #define __NRAT0_setitimer               (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_setitimer               (struct __itimerval32 const *, struct __itimerval32 const *)
-#define __NRAT2_setitimer               (struct __itimerval32 *, struct __itimerval32 *)
+#define __NRAT1_setitimer               (struct __itimervalx32 const *, struct __itimervalx32 const *)
+#define __NRAT2_setitimer               (struct __itimervalx32 *, struct __itimervalx32 *)
 #define __NRAT0_getitimer               (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_getitimer               (struct __itimerval32 *, struct __itimerval32 *)
+#define __NRAT1_getitimer               (struct __itimervalx32 *, struct __itimervalx32 *)
 #define __NRAT0_linux_stat              (char const *, char const *)
 #define __NRAT1_linux_stat              (struct linux_statx32 *, struct linux_statx32 *)
 #define __NRAT0_linux_lstat             (char const *, char const *)
@@ -1928,10 +1928,10 @@
 #define __NRAT2_wait4_64                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT3_wait4_64                (struct __rusagex32_64 *, struct __rusagex32_64 *)
 #define __NRAT0_getitimer64             (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_getitimer64             (struct __itimerval64 *, struct __itimerval64 *)
+#define __NRAT1_getitimer64             (struct __itimervalx32_64 *, struct __itimervalx32_64 *)
 #define __NRAT0_setitimer64             (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_setitimer64             (struct __itimerval64 const *, struct __itimerval64 const *)
-#define __NRAT2_setitimer64             (struct __itimerval64 *, struct __itimerval64 *)
+#define __NRAT1_setitimer64             (struct __itimervalx32_64 const *, struct __itimervalx32_64 const *)
+#define __NRAT2_setitimer64             (struct __itimervalx32_64 *, struct __itimervalx32_64 *)
 #define __NRAT0_maplibrary              (void *, void *)
 #define __NRAT1_maplibrary              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_maplibrary              (fd_t, __fd_t)
@@ -2149,8 +2149,8 @@
 #define __NRAM_ioperm(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAM_socketcall(a, b, c, d, e, f)              (int)a, (unsigned long *)b
 #define __NRAM_syslog(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (char const *)b, (__size_t)c
-#define __NRAM_setitimer(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __itimerval32 const *)b, (struct __itimerval32 *)c
-#define __NRAM_getitimer(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __itimerval32 *)b
+#define __NRAM_setitimer(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __itimervalx32 const *)b, (struct __itimervalx32 *)c
+#define __NRAM_getitimer(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __itimervalx32 *)b
 #define __NRAM_linux_stat(a, b, c, d, e, f)              (char const *)a, (struct linux_statx32 *)b
 #define __NRAM_linux_lstat(a, b, c, d, e, f)             (char const *)a, (struct linux_statx32 *)b
 #define __NRAM_linux_fstat(a, b, c, d, e, f)             (__fd_t)a, (struct linux_statx32 *)b
@@ -2459,8 +2459,8 @@
 #define __NRAM_readvf(a, b, c, d, e, f)                  (__fd_t)a, (struct iovec32 const *)b, (__size_t)c, (__iomode_t)d
 #define __NRAM_kreaddir(a, b, c, d, e, f)                (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_wait4_64(a, b, c, d, e, f)                (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusagex32_64 *)d
-#define __NRAM_getitimer64(a, b, c, d, e, f)             (__syscall_ulong_t)a, (struct __itimerval64 *)b
-#define __NRAM_setitimer64(a, b, c, d, e, f)             (__syscall_ulong_t)a, (struct __itimerval64 const *)b, (struct __itimerval64 *)c
+#define __NRAM_getitimer64(a, b, c, d, e, f)             (__syscall_ulong_t)a, (struct __itimervalx32_64 *)b
+#define __NRAM_setitimer64(a, b, c, d, e, f)             (__syscall_ulong_t)a, (struct __itimervalx32_64 const *)b, (struct __itimervalx32_64 *)c
 #define __NRAM_maplibrary(a, b, c, d, e, f)              (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf32_phdr *)d, (__size_t)e
 #define __NRAM_select64(a, b, c, d, e, f)                (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timevalx32_64 *)e
 #define __NRAM_settimeofday64(a, b, c, d, e, f)          (struct __timevalx32_64 const *)a, (struct timezone const *)b

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x776e4aca */
+/* HASH CRC-32:0xe9ea9e8f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,8 +134,8 @@
 #define SYS_set_robust_list        __NR_set_robust_list        /* errno_t set_robust_list(int TODO_PROTOTYPE) */
 #define SYS_get_robust_list        __NR_get_robust_list        /* errno_t get_robust_list(int TODO_PROTOTYPE) */
 #define SYS_nanosleep              __NR_nanosleep              /* errno_t nanosleep(struct timespec const *req, struct timespec *rem) */
-#define SYS_getitimer              __NR_getitimer              /* errno_t getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value) */
-#define SYS_setitimer              __NR_setitimer              /* errno_t setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval) */
+#define SYS_getitimer              __NR_getitimer              /* errno_t getitimer(syscall_ulong_t which, struct itimerval *curr_value) */
+#define SYS_setitimer              __NR_setitimer              /* errno_t setitimer(syscall_ulong_t which, struct itimerval const *newval, struct itimerval *oldval) */
 #define SYS_kexec_load             __NR_kexec_load             /* errno_t kexec_load(int TODO_PROTOTYPE) */
 #define SYS_init_module            __NR_init_module            /* errno_t init_module(int TODO_PROTOTYPE) */
 #define SYS_delete_module          __NR_delete_module          /* errno_t delete_module(int TODO_PROTOTYPE) */

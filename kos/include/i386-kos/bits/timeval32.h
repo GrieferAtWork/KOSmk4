@@ -120,7 +120,7 @@
 #define __SIZEOF_TIMEVAL64      __SIZEOF_TIMEVALX32_64
 #define __ALIGNOF_TIMEVAL64     __ALIGNOF_TIMEVALX32_64
 
-#define __itimerspec_defined 1
+#define __timeval_defined 1
 #endif /* __i386__ && !__x86_64__*/
 /*[[[end]]]*/
 

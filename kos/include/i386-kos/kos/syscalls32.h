@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b3650bf */
+/* HASH CRC-32:0xa5df5b56 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 
 #include <bits/iovec-struct32.h>
 #include <bits/itimerspec32.h>
-#include <bits/itimerval.h>
+#include <bits/itimerval32.h>
 #include <bits/rusage-struct32.h>
 #include <bits/sigaction-struct.h>
 #include <bits/sigaction-struct32.h>
@@ -90,8 +90,8 @@ struct __cpu_set_struct;
 struct __fd_set_struct;
 struct __itimerspecx32;
 struct __itimerspecx32_64;
-struct __itimerval32;
-struct __itimerval64;
+struct __itimervalx32;
+struct __itimervalx32_64;
 struct __kos_statx32;
 struct __rusagex32;
 struct __rusagex32_64;
@@ -653,10 +653,10 @@ __CDECLARE_SC(,__errno_t,getgroups,(__size_t __size, __uint16_t *__list),(__size
 __CDECLARE_SC(,__errno_t,getgroups32,(__size_t __size, __uint32_t *__list),(__size,__list))
 #endif /* __CRT_HAVE_SC(getgroups32) */
 #if __CRT_HAVE_SC(getitimer)
-__CDECLARE_SC(,__errno_t,getitimer,(__syscall_ulong_t __which, struct __itimerval32 *__curr_value),(__which,__curr_value))
+__CDECLARE_SC(,__errno_t,getitimer,(__syscall_ulong_t __which, struct __itimervalx32 *__curr_value),(__which,__curr_value))
 #endif /* __CRT_HAVE_SC(getitimer) */
 #if __CRT_HAVE_SC(getitimer64)
-__CDECLARE_SC(,__errno_t,getitimer64,(__syscall_ulong_t __which, struct __itimerval64 *__curr_value),(__which,__curr_value))
+__CDECLARE_SC(,__errno_t,getitimer64,(__syscall_ulong_t __which, struct __itimervalx32_64 *__curr_value),(__which,__curr_value))
 #endif /* __CRT_HAVE_SC(getitimer64) */
 #if __CRT_HAVE_SC(getpeername)
 __CDECLARE_SC(,__errno_t,getpeername,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
@@ -1483,10 +1483,10 @@ __CDECLARE_SC(,__errno_t,setgroups32,(__size_t __count, __uint32_t const *__grou
 __CDECLARE_SC(,__errno_t,sethostname,(char const *__name, __size_t __len),(__name,__len))
 #endif /* __CRT_HAVE_SC(sethostname) */
 #if __CRT_HAVE_SC(setitimer)
-__CDECLARE_SC(,__errno_t,setitimer,(__syscall_ulong_t __which, struct __itimerval32 const *__newval, struct __itimerval32 *__oldval),(__which,__newval,__oldval))
+__CDECLARE_SC(,__errno_t,setitimer,(__syscall_ulong_t __which, struct __itimervalx32 const *__newval, struct __itimervalx32 *__oldval),(__which,__newval,__oldval))
 #endif /* __CRT_HAVE_SC(setitimer) */
 #if __CRT_HAVE_SC(setitimer64)
-__CDECLARE_SC(,__errno_t,setitimer64,(__syscall_ulong_t __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),(__which,__newval,__oldval))
+__CDECLARE_SC(,__errno_t,setitimer64,(__syscall_ulong_t __which, struct __itimervalx32_64 const *__newval, struct __itimervalx32_64 *__oldval),(__which,__newval,__oldval))
 #endif /* __CRT_HAVE_SC(setitimer64) */
 #if __CRT_HAVE_SC(setns)
 __CDECLARE_SC(,__errno_t,setns,(__fd_t __fd, __syscall_ulong_t __nstype),(__fd,__nstype))
@@ -2337,10 +2337,10 @@ __CDECLARE_XSC(,__errno_t,getgroups,(__size_t __size, __uint16_t *__list),(__siz
 __CDECLARE_XSC(,__errno_t,getgroups32,(__size_t __size, __uint32_t *__list),(__size,__list))
 #endif /* __CRT_HAVE_XSC(getgroups32) */
 #if __CRT_HAVE_XSC(getitimer)
-__CDECLARE_XSC(,__errno_t,getitimer,(__syscall_ulong_t __which, struct __itimerval32 *__curr_value),(__which,__curr_value))
+__CDECLARE_XSC(,__errno_t,getitimer,(__syscall_ulong_t __which, struct __itimervalx32 *__curr_value),(__which,__curr_value))
 #endif /* __CRT_HAVE_XSC(getitimer) */
 #if __CRT_HAVE_XSC(getitimer64)
-__CDECLARE_XSC(,__errno_t,getitimer64,(__syscall_ulong_t __which, struct __itimerval64 *__curr_value),(__which,__curr_value))
+__CDECLARE_XSC(,__errno_t,getitimer64,(__syscall_ulong_t __which, struct __itimervalx32_64 *__curr_value),(__which,__curr_value))
 #endif /* __CRT_HAVE_XSC(getitimer64) */
 #if __CRT_HAVE_XSC(getpeername)
 __CDECLARE_XSC(,__errno_t,getpeername,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__addr,__addr_len))
@@ -3164,10 +3164,10 @@ __CDECLARE_XSC(,__errno_t,setgroups32,(__size_t __count, __uint32_t const *__gro
 __CDECLARE_XSC(,__errno_t,sethostname,(char const *__name, __size_t __len),(__name,__len))
 #endif /* __CRT_HAVE_XSC(sethostname) */
 #if __CRT_HAVE_XSC(setitimer)
-__CDECLARE_XSC(,__errno_t,setitimer,(__syscall_ulong_t __which, struct __itimerval32 const *__newval, struct __itimerval32 *__oldval),(__which,__newval,__oldval))
+__CDECLARE_XSC(,__errno_t,setitimer,(__syscall_ulong_t __which, struct __itimervalx32 const *__newval, struct __itimervalx32 *__oldval),(__which,__newval,__oldval))
 #endif /* __CRT_HAVE_XSC(setitimer) */
 #if __CRT_HAVE_XSC(setitimer64)
-__CDECLARE_XSC(,__errno_t,setitimer64,(__syscall_ulong_t __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),(__which,__newval,__oldval))
+__CDECLARE_XSC(,__errno_t,setitimer64,(__syscall_ulong_t __which, struct __itimervalx32_64 const *__newval, struct __itimervalx32_64 *__oldval),(__which,__newval,__oldval))
 #endif /* __CRT_HAVE_XSC(setitimer64) */
 #if __CRT_HAVE_XSC(setns)
 __CDECLARE_XSC(,__errno_t,setns,(__fd_t __fd, __syscall_ulong_t __nstype),(__fd,__nstype))

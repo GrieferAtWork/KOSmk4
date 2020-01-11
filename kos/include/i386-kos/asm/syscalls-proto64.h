@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9946e2f4 */
+/* HASH CRC-32:0xe2150028 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -885,11 +885,11 @@
 #define __NRAT0_nanosleep              (struct __timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT1_nanosleep              (struct __timespecx64 *, struct __timespecx64 *)
 #define __NRAT0_getitimer              (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_getitimer              (struct __itimerval32 *, struct __itimerval32 *)
+#define __NRAT1_getitimer              (struct __itimervalx64 *, struct __itimervalx64 *)
 #define __NRAT0_alarm                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_setitimer              (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_setitimer              (struct __itimerval32 const *, struct __itimerval32 const *)
-#define __NRAT2_setitimer              (struct __itimerval32 *, struct __itimerval32 *)
+#define __NRAT1_setitimer              (struct __itimervalx64 const *, struct __itimervalx64 const *)
+#define __NRAT2_setitimer              (struct __itimervalx64 *, struct __itimervalx64 *)
 #define __NRAT0_sendfile               (fd_t, __fd_t)
 #define __NRAT1_sendfile               (fd_t, __fd_t)
 #define __NRAT2_sendfile               (syscall_ulong_t *, __syscall_ulong_t *)
@@ -1728,9 +1728,9 @@
 #define __NRAM_dup2(a, b, c, d, e, f)                   (__fd_t)a, (__fd_t)b
 #define __NRAM_pause(a, b, c, d, e, f)                  /* nothing */
 #define __NRAM_nanosleep(a, b, c, d, e, f)              (struct __timespecx64 const *)a, (struct __timespecx64 *)b
-#define __NRAM_getitimer(a, b, c, d, e, f)              (__syscall_ulong_t)a, (struct __itimerval32 *)b
+#define __NRAM_getitimer(a, b, c, d, e, f)              (__syscall_ulong_t)a, (struct __itimervalx64 *)b
 #define __NRAM_alarm(a, b, c, d, e, f)                  (__syscall_ulong_t)a
-#define __NRAM_setitimer(a, b, c, d, e, f)              (__syscall_ulong_t)a, (struct __itimerval32 const *)b, (struct __itimerval32 *)c
+#define __NRAM_setitimer(a, b, c, d, e, f)              (__syscall_ulong_t)a, (struct __itimervalx64 const *)b, (struct __itimervalx64 *)c
 #define __NRAM_getpid(a, b, c, d, e, f)                 /* nothing */
 #define __NRAM_sendfile(a, b, c, d, e, f)               (__fd_t)a, (__fd_t)b, (__syscall_ulong_t *)c, (__size_t)d
 #define __NRAM_socket(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
