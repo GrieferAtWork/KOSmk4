@@ -348,6 +348,25 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
 				*presult = (ElfW(Addr))addr;
 				return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND;
 			}
+			continue;
+		}
+		if (symbol.ds_mod->dm_ops) {
+			int error;
+			error = (*symbol.ds_mod->dm_ops->df_dlsym)(symbol.ds_mod, name,
+			                                           (void **)&symbol.ds_sym, NULL);
+			if (error >= 0) {
+				/* Found a symbol! */
+				if (error > 0) {
+					/* Weak definition (remember if this is the first one) */
+					if (!pweak_symbol->ds_mod)
+						*pweak_symbol = symbol;
+				} else {
+					/* Found the real, actual symbol! */
+					*presult = (ElfW(Addr))symbol.ds_sym;
+					return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND;
+				}
+			}
+			continue;
 		}
 		symbol.ds_sym = DlModule_ElfGetLocalSymbol(symbol.ds_mod,
 		                                           name,
