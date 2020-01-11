@@ -22,7 +22,7 @@
 #define _GNU_SOURCE 1
 
 /* Keep this one the first */
-#include "elf.h"
+#include "dl.h"
 /**/
 
 #include <hybrid/minmax.h>
@@ -149,12 +149,12 @@ DlModule_InitStaticTLSBindings(void) {
 				goto err;
 			if (preadall(fd, dst, iter->dm_tlsfsize, iter->dm_tlsoff) <= 0) {
 				__STATIC_IF(sizeof(ElfW(Off)) >= 8) {
-					elf_setdlerrorf("%q: Failed to read %Iu bytes of TLS template data from %I64u",
+					dl_seterrorf("%q: Failed to read %Iu bytes of TLS template data from %I64u",
 					                iter->dm_filename,
 					                iter->dm_tlsfsize,
 					                (uint64_t)iter->dm_tlsoff);
 				} __STATIC_ELSE(sizeof(ElfW(Off)) >= 8) {
-					elf_setdlerrorf("%q: Failed to read %Iu bytes of TLS template data from %I32u",
+					dl_seterrorf("%q: Failed to read %Iu bytes of TLS template data from %I32u",
 					                iter->dm_filename,
 					                iter->dm_tlsfsize,
 					                (uint32_t)iter->dm_tlsoff);
@@ -171,7 +171,7 @@ DlModule_InitStaticTLSBindings(void) {
 	static_tls_size += sizeof(struct tls_segment);
 	return 0;
 err_nomem:
-	elf_setdlerror_nomem();
+	dl_seterror_nomem();
 err:
 	return -1;
 }
@@ -289,7 +289,7 @@ libdl_dltlsallocseg(void) {
 	atomic_rwlock_endwrite(&static_tls_lock);
 	return result;
 err_nomem:
-	elf_setdlerror_nomem();
+	dl_seterror_nomem();
 	return NULL;
 }
 
@@ -353,7 +353,7 @@ libdl_dltlsfreeseg(void *ptr) {
 	free((byte_t *)ptr - static_tls_size_no_segment);
 	return 0;
 err_badptr:
-	return elf_setdlerror_badptr(ptr);
+	return dl_seterror_badptr(ptr);
 }
 
 
@@ -420,12 +420,12 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
                  void *perthread_callback_arg) {
 	DlModule *result;
 	if unlikely(template_size > num_bytes) {
-		elf_setdlerrorf("TLS template size (%Iu) is greater than TLS memory size (%Iu)",
+		dl_seterrorf("TLS template size (%Iu) is greater than TLS memory size (%Iu)",
 		                template_size, num_bytes);
 		goto err;
 	}
 	if unlikely(min_alignment & (min_alignment - 1)) {
-		elf_setdlerrorf("TLS alignment %Iu isn't a power-of-2",
+		dl_seterrorf("TLS alignment %Iu isn't a power-of-2",
 		                min_alignment);
 		goto err;
 	}
@@ -457,7 +457,7 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
 err_nomem_r:
 	free(result);
 err_nomem:
-	elf_setdlerror_nomem();
+	dl_seterror_nomem();
 err:
 	return NULL;
 }
@@ -467,7 +467,7 @@ err:
 /* Free a TLS segment previously allocated with `dltlsalloc' */
 INTERN WUNUSED int LIBCCALL
 libdl_dltlsfree(DlModule *self) {
-	if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
+	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_nullmodule;
 	DlModule_RemoveTLSExtension(self);
 	/* Wait for other threads to complete finalization (which may happen
@@ -481,7 +481,7 @@ libdl_dltlsfree(DlModule *self) {
 	free(self);
 	return 0;
 err_nullmodule:
-	return elf_setdlerror_badmodule(self);
+	return dl_seterror_badmodule(self);
 }
 
 DEFINE_PUBLIC_ALIAS(dltlsallocseg, libdl_dltlsallocseg);

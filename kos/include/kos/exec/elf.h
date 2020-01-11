@@ -228,9 +228,11 @@
 #if ELF_ARCH_CLASS == ELFCLASS32
 #define ELFW(x) ELF32_##x
 #define ElfW(x) Elf32_##x
+#define elfW(x) elf32_##x
 #elif ELF_ARCH_CLASS == ELFCLASS64
 #define ELFW(x) ELF64_##x
 #define ElfW(x) Elf64_##x
+#define elfW(x) elf64_##x
 #endif
 #endif /* !ELFW */
 

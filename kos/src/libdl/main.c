@@ -20,9 +20,10 @@
 #define GUARD_LIBDL_MAIN_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#define DL_FIXED_PHDR_COUNT 1
 
 /* Keep this one the first */
-#include "elf.h"
+#include "dl.h"
 /**/
 
 #include <asm/intrin.h>
@@ -43,7 +44,7 @@
 
 DECL_BEGIN
 
-INTERN DlModule ld_rtld_module = {
+INTERN DlModule dl_rtld_module = {
 	.dm_tlsoff        = 0,
 	.dm_tlsinit       = NULL,
 	.dm_tlsfsize      = 0,
@@ -53,7 +54,7 @@ INTERN DlModule ld_rtld_module = {
 	.dm_tls_init      = NULL,
 	.dm_tls_fini      = NULL,
 	.dm_tls_arg       = NULL,
-	.dm_refcnt        = 2, /* ld_rtld_module, DlModule_GlobalList */
+	.dm_refcnt        = 2, /* dl_rtld_module, DlModule_GlobalList */
 	.dm_modules       = LLIST_INITNODE,
 	.dm_globals       = LLIST_INITNODE,
 	.dm_filename      = NULL,
@@ -62,47 +63,50 @@ INTERN DlModule ld_rtld_module = {
 	.dm_loadaddr      = 0,
 	.dm_loadstart     = 0,
 	.dm_loadend       = (uintptr_t)0,
-	.dm_pltgot        = NULL,
-#if !ELF_ARCH_USESRELA
-	.dm_jmprel        = NULL,
-#else /* !ELF_ARCH_USESRELA */
-	{
-		.dm_jmprel    = NULL,
-	},
-#endif /* ELF_ARCH_USESRELA */
-#if ELF_ARCH_LAZYINDX
-	.dm_jmpcount      = 0,
-#else /* ELF_ARCH_LAZYINDX */
-	.dm_jmpsize       = 0,
-#endif /* !ELF_ARCH_LAZYINDX */
+	.dm_finalize      = NULL,
 	.dm_depcnt        = 0,
 	.dm_depvec        = NULL,
-	.dm_dyncnt        = 0,
-	.dm_dynhdr        = NULL,
-	.dm_dynsym_tab    = NULL,
-	.dm_hashtab       = NULL,
-	.dm_dynstr        = NULL,
-	.dm_runpath       = NULL,
-	.dm_shoff         = 0,
-	.dm_shstrndx      = (ElfW(Half))-1,
-	.dm_shnum         = (ElfW(Half))BUILTIN_SECTIONS_COUNT,
-	.dm_shdr          = (ElfW(Shdr) *)(uintptr_t)-1,
 	.dm_sections_lock = ATOMIC_RWLOCK_INIT,
 	.dm_sections      = (DlSection **)(uintptr_t)-1,
 #ifndef CONFIG_NO_DANGLING_DL_SECTIONS
 	.dm_sections_dangling = (DlSection *)(uintptr_t)-1,
 #endif /* !CONFIG_NO_DANGLING_DL_SECTIONS */
-	.dm_shstrtab = (char *)(uintptr_t)-1,
-	.dm_phnum    = 1,
-	.dm_phdr     = {
-		ELFW(PHDR_INIT)(/* type:   */ PT_LOAD,
-		                /* offset: */ __ARCH_PAGESIZE,
-		                /* vaddr:  */ 0,
-		                /* paddr:  */ 0,
-		                /* filesz: */ (ElfW(Word))0,
-		                /* memsz:  */ (ElfW(Word))0,
-		                /* flags:  */ PF_R | PF_X | PF_W,
-		                /* align:  */ __ARCH_PAGESIZE)
+	.dm_shnum         = BUILTIN_SECTIONS_COUNT,
+	.dm_elf = {
+		.de_pltgot        = NULL,
+#if !ELF_ARCH_USESRELA
+		.de_jmprel        = NULL,
+#else /* !ELF_ARCH_USESRELA */
+		{
+			.de_jmprel    = NULL,
+		},
+#endif /* ELF_ARCH_USESRELA */
+#if ELF_ARCH_LAZYINDX
+		.de_jmpcount      = 0,
+#else /* ELF_ARCH_LAZYINDX */
+		.de_jmpsize       = 0,
+#endif /* !ELF_ARCH_LAZYINDX */
+		.de_dyncnt        = 0,
+		.de_dynhdr        = NULL,
+		.de_dynsym_tab    = NULL,
+		.de_hashtab       = NULL,
+		.de_dynstr        = NULL,
+		.de_runpath       = NULL,
+		.de_shoff         = 0,
+		.de_shstrndx      = (ElfW(Half))-1,
+		.de_shdr          = (ElfW(Shdr) *)(uintptr_t)-1,
+		.de_shstrtab = (char *)(uintptr_t)-1,
+		.de_phnum    = 1,
+		.de_phdr     = {
+			ELFW(PHDR_INIT)(/* type:   */ PT_LOAD,
+			                /* offset: */ __ARCH_PAGESIZE,
+			                /* vaddr:  */ 0,
+			                /* paddr:  */ 0,
+			                /* filesz: */ (ElfW(Word))0,
+			                /* memsz:  */ (ElfW(Word))0,
+			                /* flags:  */ PF_R | PF_X | PF_W,
+			                /* align:  */ __ARCH_PAGESIZE)
+		}
 	}
 };
 
@@ -148,15 +152,15 @@ linker_main(struct elfexec_info *__restrict info,
 
 	/* Initialize globals (not done statically because we can't have relocations). */
 	root_peb                    = peb;
-	ld_rtld_module.dm_filename  = (char *)ld_rtld_module_filename;
-	ld_rtld_module.dm_loadaddr  = info->ei_rtldaddr;
-	ld_rtld_module.dm_loadstart = info->ei_rtldaddr;
-	ld_rtld_module.dm_loadend   = (uintptr_t)rtld_size;
-	ld_rtld_module.dm_loadend  += info->ei_rtldaddr;
-	ld_rtld_module.dm_phdr[0].p_filesz = (ElfW(Word))rtld_size;
-	ld_rtld_module.dm_phdr[0].p_memsz  = (ElfW(Word))rtld_size;
-	ld_rtld_module.dm_modules.ln_pself = &DlModule_AllList;
-	DlModule_AllList                   = &ld_rtld_module;
+	dl_rtld_module.dm_filename  = (char *)ld_rtld_module_filename;
+	dl_rtld_module.dm_loadaddr  = info->ei_rtldaddr;
+	dl_rtld_module.dm_loadstart = info->ei_rtldaddr;
+	dl_rtld_module.dm_loadend   = (uintptr_t)rtld_size;
+	dl_rtld_module.dm_loadend  += info->ei_rtldaddr;
+	dl_rtld_module.dm_elf.de_phdr[0].p_filesz = (ElfW(Word))rtld_size;
+	dl_rtld_module.dm_elf.de_phdr[0].p_memsz  = (ElfW(Word))rtld_size;
+	dl_rtld_module.dm_modules.ln_pself = &DlModule_AllList;
+	DlModule_AllList                   = &dl_rtld_module;
 
 	/* Tell the kernel how it can enumerate loaded libraries in user-space. */
 	dl_library_layout.lld_first = &DlModule_AllList;
@@ -168,19 +172,19 @@ linker_main(struct elfexec_info *__restrict info,
 
 	filename = strdup(filename);
 	if unlikely(!filename) {
-		elf_setdlerror_nomem();
+		dl_seterror_nomem();
 		goto err;
 	}
 
 	/* Check for LD-specific environment variables. */
-	ld_library_path_env = process_peb_getenv(peb, "LD_LIBRARY_PATH");
-	if (!ld_library_path_env)
-		ld_library_path_env = (char *)RTLD_LIBRARY_PATH;
+	dl_library_path = process_peb_getenv(peb, "LD_LIBRARY_PATH");
+	if (!dl_library_path)
+		dl_library_path = (char *)RTLD_LIBRARY_PATH;
 
 	/* User-level initializers must be run _after_ we've initialized static TLS!
 	 * NOTE: this is done in `_start32.S' by manually calling `DlModule_RunAllStaticInitializers'
 	 *       just prior to jumping to the primary application's _start() function. */
-	base_module = DlModule_OpenLoadedProgramHeaders(filename, info, loadaddr);
+	base_module = DlModule_ElfOpenLoadedProgramHeaders(filename, info, loadaddr);
 	if unlikely(!base_module)
 		goto err;
 	assert(base_module->dm_flags & RTLD_NOINIT);
@@ -197,12 +201,10 @@ linker_main(struct elfexec_info *__restrict info,
 		WR_TLS_BASE_REGISTER(tls);
 	}
 	assert(DlModule_GlobalList == base_module);
-	assert(DlModule_AllList == &ld_rtld_module);
-	assert(ld_rtld_module.dm_modules.ln_next == base_module);
+	assert(DlModule_AllList == &dl_rtld_module);
+	assert(dl_rtld_module.dm_modules.ln_next == base_module);
 
 	/*DlModule_Decref(base_module);*/ /* Intentionally left dangling! */
-
-	if (base_module->dm_depcnt)
 
 	return result;
 err:

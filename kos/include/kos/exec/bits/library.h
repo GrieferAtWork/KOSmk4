@@ -33,10 +33,10 @@ typedef struct driver *library_handle_t;
 typedef struct driver_section *section_handle_t;
 #else /* __KERNEL__ */
 #ifdef GUARD_LIBDL_API_H
-struct elf_dlmodule;
-struct elf_dlsection;
-typedef struct elf_dlmodule *library_handle_t;
-typedef struct elf_dlsection *section_handle_t;
+struct dlmodule;
+struct dlsection;
+typedef struct dlmodule *library_handle_t;
+typedef struct dlsection *section_handle_t;
 #else /* GUARD_LIBDL_API_H */
 #ifdef __INTELLISENSE__
 struct __library_handle_struct;

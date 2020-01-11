@@ -4925,6 +4925,7 @@
 #define __CRT_HAVE_lfutex 1
 #define __CRT_HAVE_lfutex64 1
 #define __CRT_HAVE_lfutexexpr 1
+#define __CRT_HAVE_lfutexexpr64 1
 #define __CRT_HAVE_lfutexlock 1
 #define __CRT_HAVE_lfutexlock64 1
 #define __CRT_HAVE_lfutexlockexpr 1

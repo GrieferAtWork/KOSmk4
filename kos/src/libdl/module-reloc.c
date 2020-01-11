@@ -22,7 +22,7 @@
 #define _GNU_SOURCE 1
 
 /* Keep this one the first */
-#include "elf.h"
+#include "dl.h"
 /**/
 
 #include <hybrid/typecore.h>
@@ -111,7 +111,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 		symbol.ds_mod = self->dm_depvec[i];
 		if (symbol.ds_mod->dm_flags & RTLD_GLOBAL)
 			continue; /* Already scanned! */
-		if (symbol.ds_mod == &ld_rtld_module) {
+		if (symbol.ds_mod == &dl_rtld_module) {
 			/* Special case: Search the RTLD module itself. */
 			void *addr;
 			addr = dlsym_builtin(name);
@@ -120,7 +120,7 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 				if unlikely(psize)
 					*psize = builtin_symbol_size(name);
 				if unlikely(pmodule)
-					*pmodule = &ld_rtld_module;
+					*pmodule = &dl_rtld_module;
 				return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND;
 			}
 		}
@@ -174,7 +174,7 @@ DlModule_FindSymbol(DlModule *__restrict self, uintptr_t symid,
 	ElfW(Addr) result;
 	char *name;
 	weak_symbol.ds_mod = NULL;
-	symbol = self->dm_dynsym_tab + symid;
+	symbol = self->dm_elf.de_dynsym_tab + symid;
 	if ((symbol->st_shndx != SHN_UNDEF) && (self->dm_flags & RTLD_DEEPBIND)) {
 		/* Symbol has been defined locally. */
 		if (ELFW(ST_BIND)(symbol->st_info) == STB_WEAK) {
@@ -197,7 +197,7 @@ got_local_symbol:
 		REF DlModule *iter, *next;
 		uintptr_t hash_elf, hash_gnu;
 search_external_symbol:
-		name = self->dm_dynstr + symbol->st_name;
+		name = self->dm_elf.de_dynstr + symbol->st_name;
 
 		/* Search the symbol tables of already loaded modules. */
 		hash_elf = hash_gnu = DLMODULE_GETLOCALSYMBOL_HASH_UNSET;
@@ -217,7 +217,7 @@ again_search_globals_next:
 			atomic_rwlock_endread(&DlModule_GlobalLock);
 again_search_globals_module:
 			assert(iter != self);
-			if (iter == &ld_rtld_module) {
+			if (iter == &dl_rtld_module) {
 				result = (ElfW(Addr))dlsym_builtin(name);
 				if (result) {
 					if (weak_symbol.ds_mod)
@@ -225,7 +225,7 @@ again_search_globals_module:
 					if unlikely(psize)
 						*psize = builtin_symbol_size(name);
 					if unlikely(pmodule)
-						*pmodule = &ld_rtld_module;
+						*pmodule = &dl_rtld_module;
 					goto done_result;
 				}
 			} else {
@@ -329,7 +329,7 @@ again_search_globals_module:
 
 		/* Lastly: Check if the module itself has a valid definition,
 		 *         or if the module allows for weak definitions... */
-		symbol = self->dm_dynsym_tab + symid;
+		symbol = self->dm_elf.de_dynsym_tab + symid;
 		if (symbol->st_shndx != SHN_UNDEF)
 			goto got_local_symbol;
 		if (ELFW(ST_BIND)(symbol->st_info) == STB_WEAK) {
@@ -341,7 +341,7 @@ again_search_globals_module:
 			goto done_result;
 		}
 		/* If the symbol continues to be undefined, set an error. */
-		elf_setdlerrorf("Could not find symbol %q required by %q",
+		dl_seterrorf("Could not find symbol %q required by %q",
 		                name, self->dm_filename);
 		return false;
 	}
@@ -375,7 +375,7 @@ STATIC_ASSERT(offsetof(Elf64_Rel, r_info) == offsetof(Elf64_Rela, r_info));
 #endif /* !ELF_ARCH_NAME_R_JMP_SLOT */
 
 INTERN WUNUSED NONNULL((1)) ElfW(Addr) ATTR_FASTCALL
-libdl_bind_lazy_relocation(DlModule *__restrict self,
+dl_bind_lazy_relocation(DlModule *__restrict self,
 #if ELF_ARCH_LAZYINDX
                            uintptr_t jmp_rel_index
 #else /* ELF_ARCH_LAZYINDX */
@@ -389,32 +389,32 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 	DlModule *link_module;
 #endif /* LAZY_TRACE */
 #if ELF_ARCH_LAZYINDX
-	if unlikely(jmp_rel_index >= self->dm_jmpcount)
+	if unlikely(jmp_rel_index >= self->dm_elf.de_jmpcount)
 #else /* ELF_ARCH_LAZYINDX */
-	if unlikely(jmp_rel_offset >= self->dm_jmpsize)
+	if unlikely(jmp_rel_offset >= self->dm_elf.de_jmpsize)
 #endif /* !ELF_ARCH_LAZYINDX */
 	{
 #if ELF_ARCH_LAZYINDX
 		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation index %Iu > %Iu in %q\n",
-		       jmp_rel_index, self->dm_jmpcount, self->dm_filename);
+		       jmp_rel_index, self->dm_elf.de_jmpcount, self->dm_filename);
 #else /* ELF_ARCH_LAZYINDX */
 		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation offset %Iu > %Iu in %q\n",
-		       jmp_rel_offset, self->dm_jmpsize, self->dm_filename);
+		       jmp_rel_offset, self->dm_elf.de_jmpsize, self->dm_filename);
 #endif /* !ELF_ARCH_LAZYINDX */
 		sys_exit_group(EXIT_FAILURE);
 	}
 #if ELF_ARCH_LAZYINDX
 #if ELF_ARCH_USESRELA
-	rel = (ElfW(Rel) *)((uintptr_t)self->dm_jmprel +
+	rel = (ElfW(Rel) *)((uintptr_t)self->dm_elf.de_jmprel +
 	                    (self->dm_flags & RTLD_JMPRELA
 	                     ? (jmp_rel_index * sizeof(ElfW(Rela)))
 	                     : (jmp_rel_index * sizeof(ElfW(Rel)))));
 #else /* ELF_ARCH_USESRELA */
-	rel = (ElfW(Rel) *)((uintptr_t)self->dm_jmprel +
+	rel = (ElfW(Rel) *)((uintptr_t)self->dm_elf.de_jmprel +
 	                    (jmp_rel_index * sizeof(ElfW(Rel))));
 #endif /* !ELF_ARCH_USESRELA */
 #else /* ELF_ARCH_LAZYINDX */
-	rel = (ElfW(Rel) *)((uintptr_t)self->dm_jmprel + jmp_rel_offset);
+	rel = (ElfW(Rel) *)((uintptr_t)self->dm_elf.de_jmprel + jmp_rel_offset);
 #endif /* !ELF_ARCH_LAZYINDX */
 	if unlikely(!ELF_ARCH_IS_R_JMP_SLOT(ELFW(R_TYPE)(rel->r_info))) {
 		syslog(LOG_ERROR, "[rtld] Invalid jmp-relocation at DT_JMPREL+%Iu (index:%Iu) "
@@ -424,15 +424,15 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 #endif /* !ELF_ARCH_USESRELA */
 		       ,
 #if ELF_ARCH_LAZYINDX
-		       (size_t)((byte_t *)rel - (byte_t *)self->dm_jmprel),
+		       (size_t)((byte_t *)rel - (byte_t *)self->dm_elf.de_jmprel),
 		       jmp_rel_index,
 #else /* ELF_ARCH_LAZYINDX */
 		       (size_t)jmp_rel_offset,
 #if ELF_ARCH_USESRELA
-		       self->dm_flags & RTLD_JMPRELA ? (size_t)((ElfW(Rela) *)rel - self->dm_jmprela)
-		                                     : (size_t)(rel - self->dm_jmprel),
+		       self->dm_flags & RTLD_JMPRELA ? (size_t)((ElfW(Rela) *)rel - self->dm_elf.de_jmprela)
+		                                     : (size_t)(rel - self->dm_elf.de_jmprel),
 #else /* ELF_ARCH_USESRELA */
-		       (size_t)(rel - self->dm_jmprel),
+		       (size_t)(rel - self->dm_elf.de_jmprel),
 #endif /* ELF_ARCH_USESRELA */
 #endif /* !ELF_ARCH_LAZYINDX */
 		       rel->r_offset, rel->r_info
@@ -458,9 +458,9 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 	                                 NULL, NULL))
 #endif /* !LAZY_TRACE */
 	{
-		ElfW(Sym) *sym = self->dm_dynsym_tab + ELFW(R_SYM)(rel->r_info);
+		ElfW(Sym) *sym = self->dm_elf.de_dynsym_tab + ELFW(R_SYM)(rel->r_info);
 		syslog(LOG_ERROR, "[rtld] Unable to resolve symbol %q in %q\n",
-		       self->dm_dynstr + sym->st_name,
+		       self->dm_elf.de_dynstr + sym->st_name,
 		       self->dm_filename);
 		sys_exit_group(EXIT_FAILURE);
 	}
@@ -471,7 +471,7 @@ libdl_bind_lazy_relocation(DlModule *__restrict self,
 #endif /* ELF_ARCH_USESRELA */
 #ifdef LAZY_TRACE
 	syslog(LOG_DEBUG, "[rtld] Lazy resolve %q in %q (to %p from %q)\n",
-	       self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel->r_info)].st_name,
+	       self->dm_elf.de_dynstr + self->dm_elf.de_dynsym_tab[ELFW(R_SYM)(rel->r_info)].st_name,
 	       self->dm_filename, result, link_module->dm_filename);
 #endif /* LAZY_TRACE */
 	*(ElfW(Addr) *)reladdr = result;

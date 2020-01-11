@@ -98,7 +98,7 @@ DEFINE_PUBLIC_ALIAS(___tls_get_addr, libdl____tls_get_addr)
 	 *     relocation is accessed, at which point the relocation is resolved.
 	 *   - See the explaination about `PLTGOT' below for how this actually works.
 	 */
-INTERN_FUNCTION(libdl_load_lazy_relocation)
+INTERN_FUNCTION(dl_load_lazy_relocation)
 	/* Called from PLTGOT:
 	 * >> 00025ad0 <.plt>:
 	 * >>    25ad0:	ff b3 04 00 00 00    	pushl  0x4(%ebx)
@@ -112,9 +112,9 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	 * >>    25b2b:	e9 a0 ff ff ff       	jmp    25ad0 <.plt>
 	 *
 	 * DL Initialization:
-	 *  - *(u32 *)((byte_t *)MODULE->dm_pltgot + 0x4) == MODULE
-	 *  - *(u32 *)((byte_t *)MODULE->dm_pltgot + 0x8) == &libdl_load_lazy_relocation
-	 *  - *(u32 *)((byte_t *)MODULE->dm_pltgot + 0xc) == 0x25b26 (Pointer to the `push   $0x20')
+	 *  - *(u32 *)((byte_t *)MODULE->dm_elf.de_pltgot + 0x4) == MODULE
+	 *  - *(u32 *)((byte_t *)MODULE->dm_elf.de_pltgot + 0x8) == &dl_load_lazy_relocation
+	 *  - *(u32 *)((byte_t *)MODULE->dm_elf.de_pltgot + 0xc) == 0x25b26 (Pointer to the `push   $0x20')
 	 *
 	 * Lazy linkage procedure:
 	 *  - User-code calls `dlsym()', which is compiled as `call dlsym@plt'
@@ -132,7 +132,7 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	 *      of the PLT/GOT entry to that push instruction.
 	 *  - `push   $0x20' will then store 0x20 ontop of the stack
 	 *    - This is an offset into the vector of jmp-relocations,
-	 *      which we store in `module->dm_jmprel', and can be read from the
+	 *      which we store in `module->dm_elf.de_jmprel', and can be read from the
 	 *      module's .dynamic section, where it is stored within a `DT_JMPREL'
 	 *      tag.
 	 *  - Next, execution jumps to the start of the PLT, where a piece of code
@@ -143,7 +143,7 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	 *       to be the address of the `DlModule' structure of the associated module.
 	 *  - Finally, execution jumps to an address stored within `8(%ebp)', which
 	 *    is another fixed location which we've already filled in to contain the
-	 *    address of this very function (`&libdl_load_lazy_relocation')
+	 *    address of this very function (`&dl_load_lazy_relocation')
 	 *  - During the process of this function, we override `*0x1c(%ebx)' such
 	 *    that the next call to `dlsym@plt' will immediately jump to the linked
 	 *    symbol, rather than having to jump through all of the hoops to get here.
@@ -151,10 +151,10 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	 * So on other words, when we get here, our
 	 * register/stack state looks like this:
 	 *  - 0(%esp)      == MODULE
-	 *  - 4(%esp)      == 0x20   (Offset added to `self->dm_jmprel' for the associated jump relocation)
+	 *  - 4(%esp)      == 0x20   (Offset added to `self->dm_elf.de_jmprel' for the associated jump relocation)
 	 *  - 8(%esp)      == User-return-address
 	 *  - 12 + ?(%esp) == Undefined/user-owned
-	 *  - %ebx         == MODULE->dm_pltgot   (Though this detail is unimportant)
+	 *  - %ebx         == MODULE->dm_elf.de_pltgot   (Though this detail is unimportant)
 	 *
 	 * Also note that since we don't know anything about the calling convention
 	 * within which the user intends to invoke the lazily linked function, we must
@@ -176,8 +176,8 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	movl   20(%esp), %edx /* JMPREL_offset */
 
 	/* Patch the relocation. */
-	INTERN(libdl_bind_lazy_relocation)
-	call   libdl_bind_lazy_relocation
+	INTERN(dl_bind_lazy_relocation)
+	call   dl_bind_lazy_relocation
 
 	popfl_cfi_r
 	.cfi_register %eip, %eax
@@ -191,6 +191,6 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	ret    $(8)         /* EIP = [ESP]; ESP += (4 + 8);
 	                     * Cleanup: RESOLVED_ADDRESS + MODULE + JMPREL_offset */
 	.cfi_endproc
-END(libdl_load_lazy_relocation)
+END(dl_load_lazy_relocation)
 
 #endif /* !GUARD_LIBDL_ARCH_I386_RT32_S */

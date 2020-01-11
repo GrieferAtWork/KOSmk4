@@ -22,7 +22,7 @@
 #define _GNU_SOURCE 1
 
 /* Keep this one the first */
-#include "elf.h"
+#include "dl.h"
 /**/
 
 #include <string.h>
@@ -53,7 +53,7 @@ DlModule_GetLocalSymbol(DlModule *__restrict self,
                         uintptr_t *__restrict phash_gnu) {
 	ElfW(Sym) *result;
 	ElfW(HashTable) *elf_ht;
-	if ((elf_ht = self->dm_hashtab) != NULL) {
+	if ((elf_ht = self->dm_elf.de_hashtab) != NULL) {
 		ElfW(Word) *ht_chains;
 		ElfW(Word) max_attempts, chain;
 		uintptr_t hash = *phash_elf;
@@ -69,8 +69,8 @@ DlModule_GetLocalSymbol(DlModule *__restrict self,
 				break; /* End of chain. */
 			if unlikely(chain >= elf_ht->ht_nchains)
 				goto nosym_no_elf_ht; /* Corrupted hash-table */
-			result = self->dm_dynsym_tab + chain;
-			if (strcmp(name, self->dm_dynstr + result->st_name) == 0)
+			result = self->dm_elf.de_dynsym_tab + chain;
+			if (strcmp(name, self->dm_elf.de_dynstr + result->st_name) == 0)
 				return result; /* Found it! */
 			/* Load the next chain entry. */
 			chain = ht_chains[chain];
@@ -85,7 +85,7 @@ nosym:
 nosym_no_elf_ht:
 	syslog(LOG_WARNING, "[rtld] Elf symbol hash table of %q is corrupt\n",
 	       self->dm_filename);
-	self->dm_hashtab = NULL;
+	self->dm_elf.de_hashtab = NULL;
 	goto nosym;
 }
 

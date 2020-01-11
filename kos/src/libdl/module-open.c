@@ -22,7 +22,7 @@
 #define _GNU_SOURCE 1
 
 /* Keep this one the first */
-#include "elf.h"
+#include "dl.h"
 /**/
 
 #include <hybrid/minmax.h>
@@ -238,7 +238,7 @@ DlModule_OpenFilenameInPath(char const *__restrict path,
 	buf = (char *)malloca((pathlen + 1 + filenamelen + 1) *
 	                      sizeof(char));
 	if unlikely(!buf) {
-		elf_setdlerror_nomem();
+		dl_seterror_nomem();
 		return NULL;
 	}
 	memcpy(buf, path, pathlen, sizeof(char));
@@ -263,7 +263,7 @@ DlModule_FindFilenameInPathFromAll(char const *__restrict path,
 	buf = (char *)malloca((pathlen + 1 + filenamelen + 1) *
 	                      sizeof(char));
 	if unlikely(!buf) {
-		elf_setdlerror_nomem();
+		dl_seterror_nomem();
 		return NULL;
 	}
 	memcpy(buf, path, pathlen, sizeof(char));
@@ -279,7 +279,7 @@ INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule
 DlModule_FindFilenameInPathListFromAll(char const *__restrict filename) {
 	REF DlModule *result;
 	char const *sep;
-	char const *path   = ld_library_path_env;
+	char const *path   = dl_library_path;
 	size_t filenamelen = strlen(filename);
 	for (;;) {
 		sep    = strchrnul(path, ':');
@@ -287,7 +287,7 @@ DlModule_FindFilenameInPathListFromAll(char const *__restrict filename) {
 		                                            (size_t)(sep - path),
 		                                            filename,
 		                                            filenamelen);
-		if (result || elf_dlerror_message != NULL)
+		if (result || dl_error_message != NULL)
 			break;
 		if (!*sep)
 			break;
@@ -332,7 +332,7 @@ again:
 		                                     filename,
 		                                     filenamelen,
 		                                     mode);
-		if (result || elf_dlerror_message != NULL)
+		if (result || dl_error_message != NULL)
 			goto done;
 		if (!ch)
 			break;
@@ -359,19 +359,19 @@ done:
 
 
 PRIVATE NONNULL((1)) int CC
-DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
+DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
 	uint16_t pidx;
-	for (pidx = 0; pidx < self->dm_phnum; ++pidx) {
-		uintptr_t base = self->dm_loadaddr + self->dm_phdr[pidx].p_vaddr;
-		switch (self->dm_phdr[pidx].p_type) {
+	for (pidx = 0; pidx < self->dm_elf.de_phnum; ++pidx) {
+		uintptr_t base = self->dm_loadaddr + self->dm_elf.de_phdr[pidx].p_vaddr;
+		switch (self->dm_elf.de_phdr[pidx].p_type) {
 
 		case PT_DYNAMIC: {
 			size_t i;
-			self->dm_dynhdr = (ElfW(Dyn) *)base;
-			self->dm_dyncnt = self->dm_phdr[pidx].p_memsz / sizeof(ElfW(Dyn));
+			self->dm_elf.de_dynhdr = (ElfW(Dyn) *)base;
+			self->dm_elf.de_dyncnt = self->dm_elf.de_phdr[pidx].p_memsz / sizeof(ElfW(Dyn));
 			self->dm_depcnt = 0;
 			/* Load dynamic tag meta-data. */
-			for (i = 0; i < self->dm_dyncnt; ++i) {
+			for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
 				ElfW(Dyn) tag;
 				tag = ((ElfW(Dyn) *)base)[i];
 
@@ -382,29 +382,29 @@ DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 					break;
 
 				case DT_RPATH:
-					if (!self->dm_runpath)
-						self->dm_runpath = (char *)tag.d_un.d_ptr;
+					if (!self->dm_elf.de_runpath)
+						self->dm_elf.de_runpath = (char *)tag.d_un.d_ptr;
 					break;
 
 				case DT_RUNPATH:
-					self->dm_runpath = (char *)tag.d_un.d_ptr;
+					self->dm_elf.de_runpath = (char *)tag.d_un.d_ptr;
 					break;
 
 				case DT_HASH:
-					self->dm_hashtab = (ElfW(HashTable) *)(self->dm_loadaddr + tag.d_un.d_ptr);
+					self->dm_elf.de_hashtab = (ElfW(HashTable) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 					break;
 
 				case DT_STRTAB:
-					self->dm_dynstr = (char *)(self->dm_loadaddr + tag.d_un.d_ptr);
+					self->dm_elf.de_dynstr = (char *)(self->dm_loadaddr + tag.d_un.d_ptr);
 					break;
 
 				case DT_SYMTAB:
-					self->dm_dynsym_tab = (ElfW(Sym) *)(self->dm_loadaddr + tag.d_un.d_ptr);
+					self->dm_elf.de_dynsym_tab = (ElfW(Sym) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 					break;
 
 				case DT_SYMENT:
 					if (tag.d_un.d_val != sizeof(ElfW(Sym))) {
-						elf_setdlerrorf("%q: Invalid `DT_SYMENT' %Iu != %Iu",
+						dl_seterrorf("%q: Invalid `DT_SYMENT' %Iu != %Iu",
 						                (size_t)tag.d_un.d_val,
 						                (size_t)sizeof(ElfW(Sym)));
 						goto err;
@@ -414,7 +414,7 @@ DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 #if ELF_ARCH_USESRELA
 				case DT_RELAENT:
 					if (tag.d_un.d_val != sizeof(ElfW(Rela))) {
-						elf_setdlerrorf("%q: Invalid `DT_RELAENT' %Iu != %Iu",
+						dl_seterrorf("%q: Invalid `DT_RELAENT' %Iu != %Iu",
 						                (size_t)tag.d_un.d_val,
 						                (size_t)sizeof(ElfW(Rela)));
 						goto err;
@@ -424,7 +424,7 @@ DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 
 				case DT_RELENT:
 					if (tag.d_un.d_val != sizeof(ElfW(Rel))) {
-						elf_setdlerrorf("%q: Invalid `DT_RELENT' %Iu != %Iu",
+						dl_seterrorf("%q: Invalid `DT_RELENT' %Iu != %Iu",
 						                (size_t)tag.d_un.d_val,
 						                (size_t)sizeof(ElfW(Rel)));
 						goto err;
@@ -434,15 +434,15 @@ DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 				default: break;
 				}
 			}
-			if (self->dm_runpath)
-				self->dm_runpath = self->dm_dynstr + (uintptr_t)self->dm_runpath;
+			if (self->dm_elf.de_runpath)
+				self->dm_elf.de_runpath = self->dm_elf.de_dynstr + (uintptr_t)self->dm_elf.de_runpath;
 		}	break;
 
 		case PT_TLS:
-			self->dm_tlsoff   = self->dm_phdr[pidx].p_offset;
-			self->dm_tlsfsize = self->dm_phdr[pidx].p_filesz;
-			self->dm_tlsmsize = self->dm_phdr[pidx].p_memsz;
-			self->dm_tlsalign = self->dm_phdr[pidx].p_align;
+			self->dm_tlsoff   = self->dm_elf.de_phdr[pidx].p_offset;
+			self->dm_tlsfsize = self->dm_elf.de_phdr[pidx].p_filesz;
+			self->dm_tlsmsize = self->dm_elf.de_phdr[pidx].p_memsz;
+			self->dm_tlsalign = self->dm_elf.de_phdr[pidx].p_align;
 			if unlikely(self->dm_tlsfsize > self->dm_tlsmsize)
 				self->dm_tlsfsize = self->dm_tlsmsize;
 			/* Validate/Fix the TLS alignment requirements. */
@@ -477,10 +477,10 @@ DlModule_LoadLoadedProgramHeaders(DlModule *__restrict self) {
 	}
 
 	/* Apply relocations and invoke module initializers. */
-	if unlikely(DlModule_Initialize(self,
+	if unlikely(DlModule_ElfInitialize(self,
 	                                (self->dm_flags & RTLD_BINDING_MASK) == RTLD_NOW
-	                                ? DL_MODULE_INITIALIZE_FBINDNOW
-	                                : DL_MODULE_INITIALIZE_FNORMAL))
+	                                ? DL_MODULE_ELF_INITIALIZE_FBINDNOW
+	                                : DL_MODULE_ELF_INITIALIZE_FNORMAL))
 		goto err;
 	/* And with that, we've successfully initialize the module! */
 	ATOMIC_FETCHAND(self->dm_flags, ~RTLD_LOADING);
@@ -491,16 +491,16 @@ err:
 
 
 INTERN WUNUSED NONNULL((1, 2)) REF_IF(!(mode & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
-                                  struct elfexec_info *__restrict info, uintptr_t loadaddr) {
+DlModule_ElfOpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
+                                     struct elfexec_info *__restrict info, uintptr_t loadaddr) {
 	REF DlModule *result;
 	uint16_t pidx;
 	result = (REF DlModule *)calloc(1,
-	                                offsetof(DlModule, dm_phdr) +
+	                                offsetof(DlModule, dm_elf.de_phdr) +
 	                                (info->ei_pnum * sizeof(ElfW(Phdr))));
 	if unlikely(!result)
 		goto err_nomem;
-	memcpy(result->dm_phdr, info->ei_phdr, info->ei_pnum, sizeof(ElfW(Phdr)));
+	memcpy(result->dm_elf.de_phdr, info->ei_phdr, info->ei_pnum, sizeof(ElfW(Phdr)));
 	result->dm_loadstart = (uintptr_t)-1;
 	/*result->dm_loadend = 0;*/
 	for (pidx = 0; pidx < info->ei_pnum; ++pidx) {
@@ -518,18 +518,18 @@ DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict 
 	result->dm_flags    = (uint32_t)(RTLD_LAZY | RTLD_GLOBAL | RTLD_NODELETE | RTLD_NOINIT | RTLD_LOADING);
 	result->dm_filename = filename; /* Inherit data */
 	result->dm_loadaddr = loadaddr;
-	result->dm_phnum    = info->ei_pnum;
-	result->dm_abi      = info->ei_abi;
-	result->dm_abiver   = info->ei_abiver;
-	result->dm_shnum    = (ElfW(Half))-1; /* Unknown */
-	result->dm_shstrndx = (ElfW(Half))-1; /* Unknown */
 	result->dm_loadstart += loadaddr;
-	result->dm_loadend += loadaddr;
-	if unlikely(DlModule_LoadLoadedProgramHeaders(result))
+	result->dm_loadend   += loadaddr;
+	result->dm_elf.de_phnum    = info->ei_pnum;
+	result->dm_elf.de_abi      = info->ei_abi;
+	result->dm_elf.de_abiver   = info->ei_abiver;
+	result->dm_shnum           = (size_t)-1;     /* Unknown */
+	result->dm_elf.de_shstrndx = (ElfW(Half))-1; /* Unknown */
+	if unlikely(DlModule_ElfLoadLoadedProgramHeaders(result))
 		goto err_r;
 	return result;
 err_nomem:
-	elf_setdlerror_nomem();
+	dl_seterror_nomem();
 	return NULL;
 err_r:
 	DlModule_Decref(result);
@@ -538,9 +538,9 @@ err_r:
 
 
 INTERN WUNUSED NONNULL((1, 2)) int CC
-DlModule_VerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
-                    char const *__restrict filename,
-                    bool requires_ET_DYN) {
+DlModule_ElfVerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
+                       char const *__restrict filename,
+                       bool requires_ET_DYN) {
 	char const *reason;
 	reason = "ehdr.e_ident[EI_MAG*] != " PP_STR(ELFMAG);
 	if unlikely(ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
@@ -579,48 +579,48 @@ DlModule_VerifyEhdr(ElfW(Ehdr) const *__restrict ehdr,
 		goto err;
 	return 0;
 err:
-	return elf_setdlerrorf("%q: Faulty ELF header: %q", filename, reason);
+	return dl_seterrorf("%q: Faulty ELF header: %q", filename, reason);
 }
 
 
 PRIVATE WUNUSED NONNULL((1)) REF DlModule *CC
-DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
-                           /*inherit(on_success)*/ fd_t fd) {
+DlModule_ElfMapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
+                              /*inherit(on_success)*/ fd_t fd) {
 	ElfW(Ehdr) ehdr;
 	uint16_t pidx;
 	REF DlModule *result;
 	if unlikely(preadall(fd, &ehdr, sizeof(ehdr), 0) <= 0)
 		goto err_io;
-	if unlikely(DlModule_VerifyEhdr(&ehdr, filename, true))
+	if unlikely(DlModule_ElfVerifyEhdr(&ehdr, filename, true))
 		goto err;
 
 	result = (REF DlModule *)calloc(1,
-	                                offsetof(DlModule, dm_phdr) +
+	                                offsetof(DlModule, dm_elf.de_phdr) +
 	                                (ehdr.e_phnum * sizeof(ElfW(Phdr))));
 	if unlikely(!result)
 		goto err_nomem;
-	if (preadall(fd, result->dm_phdr, ehdr.e_phnum * sizeof(ElfW(Phdr)), ehdr.e_phoff) <= 0)
+	if (preadall(fd, result->dm_elf.de_phdr, ehdr.e_phnum * sizeof(ElfW(Phdr)), ehdr.e_phoff) <= 0)
 		goto err_r_io;
 	result->dm_filename = filename; /* Inherit data */
 	result->dm_file     = fd;       /* Inherit data */
-	result->dm_abi      = ehdr.e_ident[EI_OSABI];
-	result->dm_abiver   = ehdr.e_ident[EI_ABIVERSION];
-	result->dm_phnum    = ehdr.e_phnum;
-	result->dm_shnum    = ehdr.e_shnum;
-	result->dm_shoff    = ehdr.e_shoff;
-	result->dm_shstrndx = ehdr.e_shstrndx;
+	result->dm_elf.de_abi      = ehdr.e_ident[EI_OSABI];
+	result->dm_elf.de_abiver   = ehdr.e_ident[EI_ABIVERSION];
+	result->dm_elf.de_phnum    = ehdr.e_phnum;
+	result->dm_shnum           = ehdr.e_shnum;
+	result->dm_elf.de_shoff    = ehdr.e_shoff;
+	result->dm_elf.de_shstrndx = ehdr.e_shstrndx;
 	if unlikely(ehdr.e_shentsize != sizeof(ElfW(Shdr))) {
-		result->dm_shoff    = 0;
-		result->dm_shnum    = (ElfW(Half))-1;
-		result->dm_shstrndx = (ElfW(Half))-1;
+		result->dm_elf.de_shoff    = 0;
+		result->dm_shnum           = (size_t)-1;
+		result->dm_elf.de_shstrndx = (ElfW(Half))-1;
 	}
 	result->dm_refcnt    = 1;
 	result->dm_loadstart = (uintptr_t)-1;
 	/*result->dm_loadend = 0;*/
-	for (pidx = 0; pidx < result->dm_phnum; ++pidx) {
-		uintptr_t base = result->dm_loadaddr + result->dm_phdr[pidx].p_vaddr;
-		if (result->dm_phdr[pidx].p_type == PT_LOAD) {
-			uintptr_t end = base + result->dm_phdr[pidx].p_memsz;
+	for (pidx = 0; pidx < result->dm_elf.de_phnum; ++pidx) {
+		uintptr_t base = result->dm_loadaddr + result->dm_elf.de_phdr[pidx].p_vaddr;
+		if (result->dm_elf.de_phdr[pidx].p_type == PT_LOAD) {
+			uintptr_t end = base + result->dm_elf.de_phdr[pidx].p_memsz;
 			if (result->dm_loadstart > base)
 				result->dm_loadstart = base;
 			if (result->dm_loadend < end)
@@ -636,11 +636,11 @@ DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 		libbase = sys_maplibrary(NULL,
 		                         0,
 		                         fd,
-		                         result->dm_phdr,
-		                         result->dm_phnum);
+		                         result->dm_elf.de_phdr,
+		                         result->dm_elf.de_phnum);
 		if (E_ISERR(libbase)) {
 			free(result);
-			elf_setdlerrorf("%q: Failed to map library into memory: %u",
+			dl_seterrorf("%q: Failed to map library into memory: %u",
 			                filename, (unsigned int)(uintptr_t)-(intptr_t)libbase);
 			goto err;
 		}
@@ -652,10 +652,10 @@ DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 err_r_io:
 	free(result);
 err_io:
-	elf_setdlerrorf("%q: Failed to read headers", filename);
+	dl_seterrorf("%q: Failed to read headers", filename);
 	goto err;
 err_nomem:
-	elf_setdlerror_nomem();
+	dl_seterror_nomem();
 err:
 	return NULL;
 }
@@ -669,13 +669,14 @@ DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 	result = DlModule_FindFromFilename(filename);
 	if (result)
 		goto done_existing;
+	/* TODO: Support for formats other than ELF. */
 	/* Map the executable into memory. */
-	result = DlModule_MapProgramHeaders(filename, fd);
+	result = DlModule_ElfMapProgramHeaders(filename, fd);
 	if unlikely(!result)
 		goto done;
 	result->dm_flags = (uint32_t)mode | RTLD_LOADING;
 	/* Load the execute via its program headers. */
-	if unlikely(DlModule_LoadLoadedProgramHeaders(result))
+	if unlikely(DlModule_ElfLoadLoadedProgramHeaders(result))
 		goto err_r;
 done:
 	return result;
@@ -713,9 +714,9 @@ DlModule_FindFromFilename(char const *__restrict filename) {
 }
 
 INTERN ATTR_COLD int CC
-elf_setdlerror_nomodataddr(void const *static_pointer) {
-	return elf_setdlerrorf("Address %p does not map to any module",
-	                       static_pointer);
+dl_seterror_no_mod_at_addr(void const *static_pointer) {
+	return dl_seterrorf("Address %p does not map to any module",
+	                    static_pointer);
 }
 
 
@@ -730,15 +731,16 @@ DlModule_FindFromStaticPointer(void const *static_pointer) {
 			continue;
 		if ((uintptr_t)static_pointer >= result->dm_loadend)
 			continue;
+		/* TODO: Support for formats other than ELF. */
 		/* Make sure that `static_pointer' maps to some program segment. */
-		for (i = 0; i < result->dm_phnum; ++i) {
+		for (i = 0; i < result->dm_elf.de_phnum; ++i) {
 			uintptr_t segment_base;
-			if (result->dm_phdr[i].p_type != PT_LOAD)
+			if (result->dm_elf.de_phdr[i].p_type != PT_LOAD)
 				continue;
-			segment_base = result->dm_loadaddr + result->dm_phdr[i].p_vaddr;
+			segment_base = result->dm_loadaddr + result->dm_elf.de_phdr[i].p_vaddr;
 			if ((uintptr_t)static_pointer < segment_base)
 				continue;
-			if ((uintptr_t)static_pointer >= segment_base + result->dm_phdr[i].p_memsz)
+			if ((uintptr_t)static_pointer >= segment_base + result->dm_elf.de_phdr[i].p_memsz)
 				continue;
 			/* Found the segment! */
 			/*DlModule_Incref(result);*/ /* This function doesn't return an address! */
@@ -746,7 +748,7 @@ DlModule_FindFromStaticPointer(void const *static_pointer) {
 		}
 	}
 	atomic_rwlock_endread(&DlModule_AllLock);
-	elf_setdlerror_nomodataddr(static_pointer);
+	dl_seterror_no_mod_at_addr(static_pointer);
 	return NULL;
 got_result:
 	atomic_rwlock_endread(&DlModule_GlobalLock);

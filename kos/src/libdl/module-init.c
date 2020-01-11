@@ -22,7 +22,7 @@
 #define _GNU_SOURCE 1
 
 /* Keep this one the first */
-#include "elf.h"
+#include "dl.h"
 /**/
 
 #include <kos/debugtrap.h>
@@ -60,60 +60,12 @@ again_old_flags:
 
 
 /* [1..1][const] The library path set when the program was started */
-INTERN char *ld_library_path_env = NULL;
-
-
-/* Invoke the static initializers of all currently loaded modules.
- * This is called late during initial module startup once the initial
- * set of libraries, + the initial application have been loaded.
- * Note that initializers are invoked in reverse order of those modules
- * appearing within `DlModule_AllList', meaning that the primary
- * application's __attribute__((constructor)) functions are invoked
- * _AFTER_ those from (e.g.) libc. */
-INTERN void CC DlModule_RunAllStaticInitializers(void) {
-	REF DlModule *primary;
-	DlModule *last;
-	primary = DlModule_GlobalList;
-	assert(primary != &ld_rtld_module);
-	DlModule_Incref(primary);
-again_search_noinit:
-	atomic_rwlock_read(&DlModule_GlobalLock);
-	last = primary;
-	while (last->dm_globals.ln_next != NULL)
-		last = last->dm_globals.ln_next;
-	while (!(last->dm_flags & RTLD_NOINIT)) {
-		if (last == primary) {
-			atomic_rwlock_endread(&DlModule_GlobalLock);
-			goto done;
-		}
-		last = LLIST_PREV(DlModule, last, dm_globals);
-	}
-	assert(last != &ld_rtld_module);
-	last->dm_flags &= ~RTLD_NOINIT;
-	DlModule_Incref(last);
-	atomic_rwlock_endread(&DlModule_GlobalLock);
-#if 1 /* This is called during init. - If an exception happens here, it wouldn't even matter... */
-	DlModule_RunInitializers(last);
-#else
-	TRY {
-		DlModule_RunInitializers(last);
-	} EXCEPT {
-		DlModule_Decref(last);
-		DlModule_Decref(primary);
-		RETHROW();
-	}
-#endif
-	DlModule_Decref(last);
-	if (last != primary)
-		goto again_search_noinit;
-done:
-	DlModule_Decref(primary);
-}
+INTERN char *dl_library_path = NULL;
 
 
 /* Run library initializers for `self' */
-INTERN NONNULL((1)) void CC
-DlModule_RunInitializers(DlModule *__restrict self) {
+PRIVATE NONNULL((1)) void CC
+DlModule_ElfRunInitializers(DlModule *__restrict self) {
 	uint16_t dyni;
 	size_t i;
 	uintptr_t init_func           = 0;
@@ -121,26 +73,26 @@ DlModule_RunInitializers(DlModule *__restrict self) {
 	size_t preinit_array_size     = 0;
 	uintptr_t *init_array_base    = NULL;
 	size_t init_array_size        = 0;
-	for (dyni = 0; dyni < self->dm_dyncnt; ++dyni) {
-		switch (self->dm_dynhdr[dyni].d_tag) {
+	for (dyni = 0; dyni < self->dm_elf.de_dyncnt; ++dyni) {
+		switch (self->dm_elf.de_dynhdr[dyni].d_tag) {
 		case DT_NULL:
 			goto done_dyntag;
 		case DT_INIT:
-			init_func = (uintptr_t)self->dm_dynhdr[dyni].d_un.d_ptr;
+			init_func = (uintptr_t)self->dm_elf.de_dynhdr[dyni].d_un.d_ptr;
 			break;
 		case DT_PREINIT_ARRAY:
 			preinit_array_base = (uintptr_t *)(self->dm_loadaddr +
-			                                   self->dm_dynhdr[dyni].d_un.d_ptr);
+			                                   self->dm_elf.de_dynhdr[dyni].d_un.d_ptr);
 			break;
 		case DT_PREINIT_ARRAYSZ:
-			preinit_array_size = (size_t)self->dm_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
+			preinit_array_size = (size_t)self->dm_elf.de_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
 			break;
 		case DT_INIT_ARRAY:
 			init_array_base = (uintptr_t *)(self->dm_loadaddr +
-			                                self->dm_dynhdr[dyni].d_un.d_ptr);
+			                                self->dm_elf.de_dynhdr[dyni].d_un.d_ptr);
 			break;
 		case DT_INIT_ARRAYSZ:
-			init_array_size = (size_t)self->dm_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
+			init_array_size = (size_t)self->dm_elf.de_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
 			break;
 		default: break;
 		}
@@ -157,6 +109,55 @@ done_dyntag:
 		(*(void (*)(void))(init_array_base[i] /* + self->dm_loadaddr*/))();
 	}
 }
+
+/* Invoke the static initializers of all currently loaded modules.
+ * This is called late during initial module startup once the initial
+ * set of libraries, + the initial application have been loaded.
+ * Note that initializers are invoked in reverse order of those modules
+ * appearing within `DlModule_AllList', meaning that the primary
+ * application's __attribute__((constructor)) functions are invoked
+ * _AFTER_ those from (e.g.) libc. */
+INTERN void CC DlModule_RunAllStaticInitializers(void) {
+	REF DlModule *primary;
+	DlModule *last;
+	primary = DlModule_GlobalList;
+	assert(primary != &dl_rtld_module);
+	DlModule_Incref(primary);
+again_search_noinit:
+	atomic_rwlock_read(&DlModule_GlobalLock);
+	last = primary;
+	while (last->dm_globals.ln_next != NULL)
+		last = last->dm_globals.ln_next;
+	while (!(last->dm_flags & RTLD_NOINIT)) {
+		if (last == primary) {
+			atomic_rwlock_endread(&DlModule_GlobalLock);
+			goto done;
+		}
+		last = LLIST_PREV(DlModule, last, dm_globals);
+	}
+	assert(last != &dl_rtld_module);
+	last->dm_flags &= ~RTLD_NOINIT;
+	DlModule_Incref(last);
+	atomic_rwlock_endread(&DlModule_GlobalLock);
+	/* TODO: Support for formats other than ELF. */
+#if 1 /* This is called during init. - If an exception happens here, it wouldn't even matter... */
+	DlModule_ElfRunInitializers(last);
+#else
+	TRY {
+		DlModule_ElfRunInitializers(last);
+	} EXCEPT {
+		DlModule_Decref(last);
+		DlModule_Decref(primary);
+		RETHROW();
+	}
+#endif
+	DlModule_Decref(last);
+	if (last != primary)
+		goto again_search_noinit;
+done:
+	DlModule_Decref(primary);
+}
+
 
 #if PF_X == PROT_EXEC && PF_W == PROT_WRITE && PF_R == PROT_READ
 #define ELF_PF_FLAGS_TO_PROT_FLAGS(x) ((x) & (PF_X | PF_W | PF_R))
@@ -175,45 +176,45 @@ done_dyntag:
 #endif /* !ELF_PF_FLAGS_TO_PROT_FLAGS_PLUS_WRITE */
 
 
-INTERN NONNULL((1)) int CC
-DlModule_MakeTextWritable(DlModule *__restrict self) {
+PRIVATE NONNULL((1)) int CC
+DlModule_ElfMakeTextWritable(DlModule *__restrict self) {
 	ElfW(Half) i;
 	errno_t error;
-	for (i = 0; i < self->dm_phnum; ++i) {
-		if (self->dm_phdr[i].p_type != PT_LOAD)
+	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
+		if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
 			continue;
-		if (self->dm_phdr[i].p_flags & PF_W)
+		if (self->dm_elf.de_phdr[i].p_flags & PF_W)
 			continue; /* Already writable */
-		error = sys_mprotect((void *)(self->dm_phdr[i].p_vaddr + self->dm_loadaddr),
-		                     self->dm_phdr[i].p_memsz,
-		                     ELF_PF_FLAGS_TO_PROT_FLAGS_PLUS_WRITE(self->dm_phdr[i].p_flags));
+		error = sys_mprotect((void *)(self->dm_elf.de_phdr[i].p_vaddr + self->dm_loadaddr),
+		                     self->dm_elf.de_phdr[i].p_memsz,
+		                     ELF_PF_FLAGS_TO_PROT_FLAGS_PLUS_WRITE(self->dm_elf.de_phdr[i].p_flags));
 		if unlikely(E_ISERR(error))
 			goto err_mprotect_failed;
 	}
 	return 0;
 err_mprotect_failed:
-	return elf_setdlerrorf("%q: Failed to make text writable (errno=%d)",
+	return dl_seterrorf("%q: Failed to make text writable (errno=%d)",
 	                       self->dm_filename, -error);
 }
 
-INTERN NONNULL((1)) void CC
-DlModule_MakeTextReadonly(DlModule *__restrict self) {
+PRIVATE NONNULL((1)) void CC
+DlModule_ElfMakeTextReadonly(DlModule *__restrict self) {
 	ElfW(Half) i;
-	for (i = 0; i < self->dm_phnum; ++i) {
-		if (self->dm_phdr[i].p_type != PT_LOAD)
+	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
+		if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
 			continue;
-		if (self->dm_phdr[i].p_flags & PF_W)
+		if (self->dm_elf.de_phdr[i].p_flags & PF_W)
 			continue; /* Already writable */
-		sys_mprotect((void *)(self->dm_phdr[i].p_vaddr + self->dm_loadaddr),
-		             self->dm_phdr[i].p_memsz,
-		             ELF_PF_FLAGS_TO_PROT_FLAGS(self->dm_phdr[i].p_flags));
+		sys_mprotect((void *)(self->dm_elf.de_phdr[i].p_vaddr + self->dm_loadaddr),
+		             self->dm_elf.de_phdr[i].p_memsz,
+		             ELF_PF_FLAGS_TO_PROT_FLAGS(self->dm_elf.de_phdr[i].p_flags));
 	}
 }
 
 /* Apply relocations & execute library initialized within `self'
  * @param: flags: Set of `DL_MODULE_INITIALIZE_F*' */
 INTERN NONNULL((1)) int CC
-DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
+DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
 #if ELF_ARCH_USESRELA
 	ElfW(Rela) *rela_base = NULL;
 	size_t rela_count   = 0;
@@ -233,27 +234,27 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 		if unlikely(!self->dm_depvec)
 			goto err_nomem;
 		dep_flags = RTLD_GLOBAL | (self->dm_flags & RTLD_NOINIT);
-		for (i = 0; i < self->dm_dyncnt; ++i) {
+		for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
 			char *filename;
 			REF DlModule *dependency;
-			if (self->dm_dynhdr[i].d_tag == DT_NULL)
+			if (self->dm_elf.de_dynhdr[i].d_tag == DT_NULL)
 				break;
-			if (self->dm_dynhdr[i].d_tag != DT_NEEDED)
+			if (self->dm_elf.de_dynhdr[i].d_tag != DT_NEEDED)
 				continue;
 			assert(self->dm_depcnt < count);
-			filename = self->dm_dynstr + self->dm_dynhdr[i].d_un.d_ptr;
+			filename = self->dm_elf.de_dynstr + self->dm_elf.de_dynhdr[i].d_un.d_ptr;
 			/* Load the dependent library. */
-			if (self->dm_runpath) {
-				dependency = DlModule_OpenFilenameInPathList(self->dm_runpath,
+			if (self->dm_elf.de_runpath) {
+				dependency = DlModule_OpenFilenameInPathList(self->dm_elf.de_runpath,
 				                                             filename,
 				                                             dep_flags);
-				if (!dependency && ATOMIC_READ(elf_dlerror_message) == NULL) {
+				if (!dependency && ATOMIC_READ(dl_error_message) == NULL) {
 					/* Before doing more open() system calls, check to see if we've
 					 * already loaded a matching candidate of this library!
-					 * We can do this because `ld_library_path_env' never changes. */
+					 * We can do this because `dl_library_path' never changes. */
 					dependency = DlModule_FindFilenameInPathListFromAll(filename);
 					if (!dependency) {
-						dependency = DlModule_OpenFilenameInPathList(ld_library_path_env,
+						dependency = DlModule_OpenFilenameInPathList(dl_library_path,
 						                                             filename,
 						                                             dep_flags);
 					} else {
@@ -263,10 +264,10 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 			} else {
 				/* Before doing more open() system calls, check to see if we've
 				 * already loaded a matching candidate of this library!
-				 * We can do this because `ld_library_path_env' never changes. */
+				 * We can do this because `dl_library_path' never changes. */
 				dependency = DlModule_FindFilenameInPathListFromAll(filename);
 				if (!dependency) {
-					dependency = DlModule_OpenFilenameInPathList(ld_library_path_env,
+					dependency = DlModule_OpenFilenameInPathList(dl_library_path,
 					                                             filename,
 					                                             dep_flags);
 				} else {
@@ -274,36 +275,36 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 				}
 			}
 			if (!dependency) {
-				if (ATOMIC_READ(elf_dlerror_message) == NULL)
-					elf_setdlerrorf("Failed to load dependency %q of %q", filename, self->dm_filename);
+				if (ATOMIC_READ(dl_error_message) == NULL)
+					dl_seterrorf("Failed to load dependency %q of %q", filename, self->dm_filename);
 				goto err;
 			}
 			self->dm_depvec[self->dm_depcnt++] = dependency;
 		}
 	}
 	/* Service relocations of the module. */
-	for (i = 0; i < self->dm_dyncnt; ++i) {
-		ElfW(Dyn) tag = self->dm_dynhdr[i];
+	for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
+		ElfW(Dyn) tag = self->dm_elf.de_dynhdr[i];
 		switch (tag.d_tag) {
 
 		case DT_NULL:
 			goto done_dynamic;
 
 		case DT_TEXTREL:
-			flags |= DL_MODULE_INITIALIZE_FTEXTREL;
+			flags |= DL_MODULE_ELF_INITIALIZE_FTEXTREL;
 			break;
 
 		case DT_BIND_NOW:
-			flags |= DL_MODULE_INITIALIZE_FBINDNOW;
+			flags |= DL_MODULE_ELF_INITIALIZE_FBINDNOW;
 			break;
 
 		case DT_FLAGS:
 			if (tag.d_un.d_val & DF_SYMBOLIC)
 				self->dm_flags |= RTLD_DEEPBIND;
 			if (tag.d_un.d_val & DF_TEXTREL)
-				flags |= DL_MODULE_INITIALIZE_FTEXTREL;
+				flags |= DL_MODULE_ELF_INITIALIZE_FTEXTREL;
 			if (tag.d_un.d_val & DF_BIND_NOW)
-				flags |= DL_MODULE_INITIALIZE_FBINDNOW;
+				flags |= DL_MODULE_ELF_INITIALIZE_FBINDNOW;
 			break;
 
 		case DT_SYMBOLIC:
@@ -327,7 +328,7 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 			break;
 
 		case DT_PLTGOT:
-			self->dm_pltgot = (ElfW(Addr) *)(self->dm_loadaddr + tag.d_un.d_ptr);
+			self->dm_elf.de_pltgot = (ElfW(Addr) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 			break;
 
 #if ELF_ARCH_USESRELA
@@ -349,9 +350,9 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 		}
 	}
 done_dynamic:
-	if (flags & DL_MODULE_INITIALIZE_FTEXTREL) {
+	if (flags & DL_MODULE_ELF_INITIALIZE_FTEXTREL) {
 		/* Make all sections writable! */
-		if unlikely(DlModule_MakeTextWritable(self))
+		if unlikely(DlModule_ElfMakeTextWritable(self))
 			goto err;
 	}
 
@@ -361,17 +362,17 @@ done_dynamic:
 		char *ld_bind_now;
 		ld_bind_now = process_peb_getenv(root_peb, "LD_BIND_NOW");
 		if (ld_bind_now && *ld_bind_now)
-			flags |= DL_MODULE_INITIALIZE_FBINDNOW;
+			flags |= DL_MODULE_ELF_INITIALIZE_FBINDNOW;
 	}
 #endif /* ELF_ARCH_IS_R_JMP_SLOT */
 
 	/* Apply relocations. */
 	if unlikely(DlModule_ApplyRelocations(self, rel_base, rel_count,
-	                                      flags | DL_MODULE_INITIALIZE_FBINDNOW))
+	                                      flags | DL_MODULE_ELF_INITIALIZE_FBINDNOW))
 		goto err;
 #if ELF_ARCH_USESRELA
 	if unlikely(DlModule_ApplyRelocationsWithAddend(self, rela_base, rela_count,
-		                                            flags | DL_MODULE_INITIALIZE_FBINDNOW))
+		                                            flags | DL_MODULE_ELF_INITIALIZE_FBINDNOW))
 		goto err;
 #endif /* !ELF_ARCH_USESRELA */
 
@@ -379,15 +380,15 @@ done_dynamic:
 #if ELF_ARCH_USESRELA
 		if (jmp_rels_have_addend) {
 #ifdef ELF_ARCH_IS_R_JMP_SLOT
-			if (self->dm_pltgot && !(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
+			if (self->dm_elf.de_pltgot && !(flags & DL_MODULE_ELF_INITIALIZE_FBINDNOW)) {
 				/* Lazy binding of jump-relocations! */
-				self->dm_pltgot[1] = (ElfW(Addr))self;
-				self->dm_pltgot[2] = (ElfW(Addr))&libdl_load_lazy_relocation;
-				self->dm_jmprela   = (ElfW(Rela) *)jmp_base;
+				self->dm_elf.de_pltgot[1] = (ElfW(Addr))self;
+				self->dm_elf.de_pltgot[2] = (ElfW(Addr))&dl_load_lazy_relocation;
+				self->dm_elf.de_jmprela   = (ElfW(Rela) *)jmp_base;
 #if ELF_ARCH_LAZYINDX
-				self->dm_jmpcount  = jmp_size / sizeof(ElfW(Rela));
+				self->dm_elf.de_jmpcount  = jmp_size / sizeof(ElfW(Rela));
 #else /* ELF_ARCH_LAZYINDX */
-				self->dm_jmpsize   = jmp_size;
+				self->dm_elf.de_jmpsize   = jmp_size;
 #endif /* !ELF_ARCH_LAZYINDX */
 				self->dm_flags    |= RTLD_JMPRELA;
 				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (ElfW(Rela) *)jmp_base,
@@ -400,22 +401,22 @@ done_dynamic:
 				/* Directly bind jump-relocations. */
 				if unlikely(DlModule_ApplyRelocationsWithAddend(self, (ElfW(Rela) *)jmp_base,
 				                                                jmp_size / sizeof(ElfW(Rela)),
-				                                                flags | DL_MODULE_INITIALIZE_FBINDNOW))
+				                                                flags | DL_MODULE_ELF_INITIALIZE_FBINDNOW))
 					goto err;
 			}
 		} else
 #endif /* ELF_ARCH_USESRELA */
 		{
 #ifdef ELF_ARCH_IS_R_JMP_SLOT
-			if (self->dm_pltgot && !(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
+			if (self->dm_elf.de_pltgot && !(flags & DL_MODULE_ELF_INITIALIZE_FBINDNOW)) {
 				/* Lazy binding of jump-relocations! */
-				self->dm_pltgot[1] = (ElfW(Addr))self;
-				self->dm_pltgot[2] = (ElfW(Addr))&libdl_load_lazy_relocation;
-				self->dm_jmprel    = jmp_base;
+				self->dm_elf.de_pltgot[1] = (ElfW(Addr))self;
+				self->dm_elf.de_pltgot[2] = (ElfW(Addr))&dl_load_lazy_relocation;
+				self->dm_elf.de_jmprel    = jmp_base;
 #if ELF_ARCH_LAZYINDX
-				self->dm_jmpcount  = jmp_size / sizeof(ElfW(Rel));
+				self->dm_elf.de_jmpcount  = jmp_size / sizeof(ElfW(Rel));
 #else /* ELF_ARCH_LAZYINDX */
-				self->dm_jmpsize   = jmp_size;
+				self->dm_elf.de_jmpsize   = jmp_size;
 #endif /* !ELF_ARCH_LAZYINDX */
 				if unlikely(DlModule_ApplyRelocations(self, jmp_base,
 				                                      jmp_size / sizeof(ElfW(Rel)),
@@ -427,15 +428,15 @@ done_dynamic:
 				/* Directly bind jump-relocations. */
 				if unlikely(DlModule_ApplyRelocations(self, jmp_base,
 				                                      jmp_size / sizeof(ElfW(Rel)),
-				                                      flags | DL_MODULE_INITIALIZE_FBINDNOW))
+				                                      flags | DL_MODULE_ELF_INITIALIZE_FBINDNOW))
 					goto err;
 			}
 		}
 	}
 
 	/* Remove writable from read-only sections! */
-	if (flags & DL_MODULE_INITIALIZE_FTEXTREL)
-		DlModule_MakeTextReadonly(self);
+	if (flags & DL_MODULE_ELF_INITIALIZE_FTEXTREL)
+		DlModule_ElfMakeTextReadonly(self);
 
 	/* Signal the initialization of the library to GDB _after_ relocations have been
 	 * applied. - Otherwise, GDB may place a breakpoint on an instruction that's going
@@ -454,11 +455,11 @@ done_dynamic:
 
 	if (!(self->dm_flags & RTLD_NOINIT)) {
 		/* Execute module initializers. */
-		DlModule_RunInitializers(self);
+		DlModule_ElfRunInitializers(self);
 	}
 	return 0;
 err_nomem:
-	elf_setdlerror_nomem();
+	dl_seterror_nomem();
 err:
 	return -1;
 }

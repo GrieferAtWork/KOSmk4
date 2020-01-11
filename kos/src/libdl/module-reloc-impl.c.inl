@@ -61,7 +61,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #endif /* !APPLY_RELA */
 		byte_t *reladdr = loadaddr + rel.r_offset;
 		switch (ELFW(R_TYPE)(rel.r_info)) {
-#define LOOKUP_SYMBOL() \
+#define LOOKUP_SYMBOL()                                                                      \
 		if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel.r_info), &value, NULL, NULL)) \
 			goto err
 
@@ -128,7 +128,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			ElfW(Sym) *dst_sym;
 			size_t src_size;
 			DlModule *src_module;
-			dst_sym = self->dm_dynsym_tab + ELFW(R_SYM)(rel.r_info);
+			dst_sym = self->dm_elf.de_dynsym_tab + ELFW(R_SYM)(rel.r_info);
 			if unlikely(!DlModule_FindSymbol(self,
 			                                 ELFW(R_SYM)(rel.r_info),
 			                                 &value,
@@ -140,11 +140,11 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				 * Since builtin symbols don't have size information associated with themself,
 				 * we ignore import sizes and solely rely on whatever the hosted application
 				 * is telling us to be expecting. */
-				if (src_size == 0 && src_module == &ld_rtld_module)
+				if (src_size == 0 && src_module == &dl_rtld_module)
 					src_size = dst_sym->st_size;
 				else {
 					syslog(LOG_WARN, "[rtld] %q: Symbol %q imported with %Iu bytes, but exported with %Iu from %q\n",
-					       self->dm_filename, self->dm_dynstr + dst_sym->st_name,
+					       self->dm_filename, self->dm_elf.de_dynstr + dst_sym->st_name,
 					       dst_sym->st_info, src_size, src_module->dm_filename);
 					/* NOTE: When `src_size' is ZERO(0), then always copy the size information
 					 *       that is expected by the hosted module (though still emit the warning
@@ -250,7 +250,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 #ifdef ELF_ARCH_CASE_R_JMP_SLOT
 		ELF_ARCH_CASE_R_JMP_SLOT:
-			if (!(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
+			if (!(flags & DL_MODULE_ELF_INITIALIZE_FBINDNOW)) {
 				/* Lazy binding. */
 				*(uintptr_t *)reladdr += (uintptr_t)loadaddr;
 				break;
@@ -302,10 +302,11 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			if unlikely(tls_module->dm_tlsstoff == 0) {
 				/* Symbol points to a module that isn't apart of the static TLS segment.
 				 * -> This relocation can _only_ be used for static TLS symbols. */
-				elf_setdlerrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_NEG_TPOFF32 "' to %q stored in the dynamic TLS segment of %q",
-				                self->dm_filename,
-				                self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
-				                tls_module->dm_filename);
+				dl_seterrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_NEG_TPOFF32 "' to %q stored in the dynamic TLS segment of %q",
+				             self->dm_filename,
+				             self->dm_elf.de_dynstr +
+				             self->dm_elf.de_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
+				             tls_module->dm_filename);
 				goto err;
 			}
 			*(s32 *)reladdr SET_OR_INPLACE_ADD (s32)-(tls_module->dm_tlsstoff + (value + REL_ADDEND));
@@ -329,10 +330,11 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			if unlikely(tls_module->dm_tlsstoff == 0) {
 				/* Symbol points to a module that isn't apart of the static TLS segment.
 				 * -> This relocation can _only_ be used for static TLS symbols. */
-				elf_setdlerrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_NEG_TPOFF64 "' to %q stored in the dynamic TLS segment of %q",
-				                self->dm_filename,
-				                self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
-				                tls_module->dm_filename);
+				dl_seterrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_NEG_TPOFF64 "' to %q stored in the dynamic TLS segment of %q",
+				             self->dm_filename,
+				             self->dm_elf.de_dynstr +
+				             self->dm_elf.de_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
+				             tls_module->dm_filename);
 				goto err;
 			}
 			*(s64 *)reladdr SET_OR_INPLACE_ADD (s64)-(tls_module->dm_tlsstoff + (value + REL_ADDEND));
@@ -350,10 +352,11 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			                                 &value, NULL, &tls_module))
 				goto err;
 			if unlikely(tls_module->dm_tlsstoff == 0) {
-				elf_setdlerrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_TPOFF32 "' to %q stored in the dynamic TLS segment of %q",
-				                self->dm_filename,
-				                self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
-				                tls_module->dm_filename);
+				dl_seterrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_TPOFF32 "' to %q stored in the dynamic TLS segment of %q",
+				             self->dm_filename,
+				             self->dm_elf.de_dynstr +
+				             self->dm_elf.de_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
+				             tls_module->dm_filename);
 				goto err;
 			}
 			*(s32 *)reladdr SET_OR_INPLACE_ADD (tls_module->dm_tlsstoff + (value + REL_ADDEND));
@@ -371,10 +374,11 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			                                 &value, NULL, &tls_module))
 				goto err;
 			if unlikely(tls_module->dm_tlsstoff == 0) {
-				elf_setdlerrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_TPOFF64 "' to %q stored in the dynamic TLS segment of %q",
-				                self->dm_filename,
-				                self->dm_dynstr + self->dm_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
-				                tls_module->dm_filename);
+				dl_seterrorf("%q: Cannot apply `" ELF_ARCH_NAME_R_TPOFF64 "' to %q stored in the dynamic TLS segment of %q",
+				             self->dm_filename,
+				             self->dm_elf.de_dynstr +
+				             self->dm_elf.de_dynsym_tab[ELFW(R_SYM)(rel.r_info)].st_name,
+				             tls_module->dm_filename);
 				goto err;
 			}
 			*(s64 *)reladdr SET_OR_INPLACE_ADD (tls_module->dm_tlsstoff + (value + REL_ADDEND));

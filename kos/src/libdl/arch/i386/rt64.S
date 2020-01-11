@@ -99,10 +99,10 @@ DEFINE_PUBLIC_ALIAS(__tls_get_addr, libdl___tls_get_addr)
 	 *     relocation is accessed, at which point the relocation is resolved.
 	 *   - See the explaination about `PLTGOT' below for how this actually works.
 	 */
-INTERN_FUNCTION(libdl_load_lazy_relocation)
+INTERN_FUNCTION(dl_load_lazy_relocation)
 	/* register/stack state:
 	 *  - 0(%rsp)      == MODULE
-	 *  - 8(%rsp)      == Offset added to `self->dm_jmprel' for the associated jump relocation
+	 *  - 8(%rsp)      == Offset added to `self->dm_elf.de_jmprel' for the associated jump relocation
 	 *  - 16(%rsp)     == User-return-address
 	 *  - 24 + ?(%rsp) == Undefined/user-owned
 	 *
@@ -126,8 +126,8 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	movq   88(%rsp), %rsi /* JMPREL_offset */
 
 	/* Patch the relocation. */
-	INTERN(libdl_bind_lazy_relocation)
-	call   libdl_bind_lazy_relocation
+	INTERN(dl_bind_lazy_relocation)
+	call   dl_bind_lazy_relocation
 
 	popfq_cfi_r
 	.cfi_register %rip, %rax
@@ -147,6 +147,6 @@ INTERN_FUNCTION(libdl_load_lazy_relocation)
 	ret    $(16)        /* EIP = [ESP]; ESP += (8 + 16);
 	                     * Cleanup: RESOLVED_ADDRESS + MODULE + JMPREL_offset */
 	.cfi_endproc
-END(libdl_load_lazy_relocation)
+END(dl_load_lazy_relocation)
 
 #endif /* !GUARD_LIBDL_ARCH_I386_RT64_S */

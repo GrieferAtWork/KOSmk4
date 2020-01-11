@@ -18,7 +18,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "tls.c"
-#endif
+#endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 
@@ -47,7 +47,7 @@ libdl_dltlsaddr(DlModule *self)
 #endif /* !FAIL_ON_ERROR */
 {
 #ifndef FAIL_ON_ERROR
-	if unlikely(!ELF_VERIFY_MODULE_HANDLE(self))
+	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_badmodule;
 #endif /* !FAIL_ON_ERROR */
 	byte_t *result;
@@ -78,11 +78,11 @@ libdl_dltlsaddr(DlModule *self)
 			goto err;
 		if (preadall(fd, init, self->dm_tlsfsize, self->dm_tlsoff) <= 0) {
 			__STATIC_IF(sizeof(ElfW(Off)) >= 8) {
-				elf_setdlerrorf("Failed to read %Iu bytes of TLS template data from %I64u",
+				dl_seterrorf("Failed to read %Iu bytes of TLS template data from %I64u",
 				                self->dm_tlsfsize,
 				                (uint64_t)self->dm_tlsoff);
 			} __STATIC_ELSE(sizeof(ElfW(Off)) >= 8) {
-				elf_setdlerrorf("Failed to read %Iu bytes of TLS template data from %I32u",
+				dl_seterrorf("Failed to read %Iu bytes of TLS template data from %I32u",
 				                self->dm_tlsfsize,
 				                (uint32_t)self->dm_tlsoff);
 			}
@@ -148,16 +148,16 @@ libdl_dltlsaddr(DlModule *self)
 	atomic_rwlock_endwrite(&((struct tls_segment *)result)->ts_exlock);
 	return extab->te_data;
 err_nomem:
-	elf_setdlerror_nomem();
+	dl_seterror_nomem();
 err:
 #ifdef FAIL_ON_ERROR
 	syslog(LOG_ERR, "[rtld] Failed to allocate TLS segment for %q: %s\n",
-	       self->dm_filename, elf_dlerror_message);
+	       self->dm_filename, dl_error_message);
 	sys_exit_group(EXIT_FAILURE);
 #else /* FAIL_ON_ERROR */
 	return NULL;
 err_badmodule:
-	elf_setdlerror_badmodule(self);
+	dl_seterror_badmodule(self);
 	goto err;
 #endif /* !FAIL_ON_ERROR */
 }

@@ -229,9 +229,11 @@
 #if COMPAT_ELF_ARCH_CLASS == ELFCLASS32
 #define COMPAT_ELFW(x) ELF32_##x
 #define COMPAT_ElfW(x) Elf32_##x
+#define COMPAT_elfW(x) elf32_##x
 #elif COMPAT_ELF_ARCH_CLASS == ELFCLASS64
 #define COMPAT_ELFW(x) ELF64_##x
 #define COMPAT_ElfW(x) Elf64_##x
+#define COMPAT_elfW(x) elf64_##x
 #endif
 #endif /* !COMPAT_ELFW */
 
