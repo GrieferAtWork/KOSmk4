@@ -32,6 +32,7 @@
 #include <kos/io.h>
 #include <kos/syscalls.h>
 
+#include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -295,6 +296,11 @@ DlModule_FindFilenameInPathListFromAll(char const *__restrict filename) {
 	return result;
 }
 
+#undef CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+#if 1
+#define CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX 1
+#endif
+
 INTERN WUNUSED NONNULL((1, 2)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameInPathList(char const *__restrict path,
                                 char const *__restrict filename,
@@ -302,7 +308,14 @@ DlModule_OpenFilenameInPathList(char const *__restrict path,
 	REF DlModule *result;
 	char const *sep;
 	size_t filenamelen;
+#ifdef CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+	char const *orig_path;
+#endif /* CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
 	filenamelen = strlen(filename);
+#ifdef CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+	orig_path = path;
+again:
+#endif /* CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
 	/* TODO: Check if the one of the paths will be `/lib/libdl.so'.
 	 *       If so, immediately return a pointer to ourself! */
 	for (;;) {
@@ -325,6 +338,20 @@ DlModule_OpenFilenameInPathList(char const *__restrict path,
 			break;
 		path = sep + 1;
 	}
+#ifdef CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+	/* Check if the filename ends with `.<number>'.
+	 * If so, strip that number and try again. */
+	if (filenamelen && isdigit(filename[filenamelen - 1])) {
+		do {
+			--filenamelen;
+		} while (filenamelen && isdigit(filename[filenamelen - 1]));
+		if (filenamelen && filename[filenamelen - 1] == '.') {
+			--filenamelen;
+			path = orig_path;
+			goto again;
+		}
+	}
+#endif /* CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
 	return result;
 }
 
