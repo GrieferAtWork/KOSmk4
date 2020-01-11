@@ -23,11 +23,13 @@
 #include "../api.h"
 /**/
 
+#include <kos/exec/peb.h>
 #include <kos/syscalls.h>
 
-#include "except.h" /* EXCEPT_INITIALIZER_KERNEL_EXCEPTION_HANDLER() */
+#include <stdio.h>  /* flushall() */
+#include <stdlib.h> /* exit() */
 
-#include <stdio.h> /* flushall() */
+#include "except.h" /* EXCEPT_INITIALIZER_KERNEL_EXCEPTION_HANDLER() */
 
 
 DECL_BEGIN
@@ -48,15 +50,48 @@ DECL_BEGIN
  *          init.c file, thus preventing the need of unnecessary relocations,
  *          as well as making it plain and simple to control the order of
  *          initialization/finalization */
-INTERN void LIBCCALL libc_init(void) {
+INTERN ATTR_SECTION(".text.crt.application.init.libc_init")
+void LIBCCALL libc_init(void) {
 	/* sys_set_exception_handler(...) */
 	EXCEPT_INITIALIZER_KERNEL_EXCEPTION_HANDLER();
 }
 
-INTERN void LIBCCALL libc_fini(void) {
+INTERN ATTR_SECTION(".text.crt.application.exit.libc_fini")
+void LIBCCALL libc_fini(void) {
 	/* Flush all file buffers to disk. */
 	flushall();
 }
+
+#undef __peb
+DECLARE_NOREL_GLOBAL_META(struct process_peb, __peb);
+#define __peb GET_NOREL_GLOBAL(__peb)
+
+INTERN ATTR_SECTION(".text.crt.glibc.application.init.libc_start_main")
+NONNULL((1)) int LIBCCALL
+libc_start_main(int (*main)(int, char **, char **),
+                int argc, char **ubp_av,
+                void (*init)(void),
+                void (*fini)(void),
+                void (*rtld_fini)(void),
+                void *stack_end) {
+	int exit_code;
+	struct process_peb *peb;
+	/* All of these will contain garbage... */
+	(void)argc;
+	(void)ubp_av;
+	(void)init;
+	(void)fini;
+	(void)rtld_fini;
+	(void)stack_end;
+	/* Use the PEB to pass the correct information. */
+	peb       = &__peb;
+	exit_code = (*main)(peb->pp_argc,
+	                    peb->pp_argv,
+	                    peb->pp_envp);
+	exit(exit_code);
+}
+
+DEFINE_PUBLIC_ALIAS(__libc_start_main, libc_start_main);
 
 #endif /* __CC__ */
 

@@ -845,6 +845,7 @@
 #define __CRT_HAVE___lgammal_r 1
 #define __CRT_HAVE___libc_current_sigrtmax 1
 #define __CRT_HAVE___libc_current_sigrtmin 1
+#define __CRT_HAVE___libc_start_main 1
 #define __CRT_HAVE___llrint 1
 #define __CRT_HAVE___llrintf 1
 #define __CRT_HAVE___llrintl 1
@@ -1817,7 +1818,7 @@
 #define __CRT_HAVE_dirfd 1
 #define __CRT_HAVE_dirname 1
 #define __CRT_HAVE_div 1
-#define __CRT_HAVE_dlauxinfo 1
+#define __CRT_HAVE_dlauxctrl 1
 #define __CRT_HAVE_dlclose 1
 #define __CRT_HAVE_dlerror 1
 #define __CRT_HAVE_dlexceptaware 1

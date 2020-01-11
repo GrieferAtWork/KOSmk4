@@ -195,7 +195,6 @@ linker_main(struct elfexec_info *__restrict info,
 		if unlikely(!tls)
 			goto err;
 		WR_TLS_BASE_REGISTER(tls);
-		assert(RD_TLS_BASE_REGISTER() == tls);
 	}
 	assert(DlModule_GlobalList == base_module);
 	assert(DlModule_AllList == &ld_rtld_module);

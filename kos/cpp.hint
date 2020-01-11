@@ -492,8 +492,14 @@
 
 #define __HYBRID_FUNCPTR32(return, cc, name, args) return (cc *name)args
 #define __HYBRID_FUNCPTR64(return, cc, name, args) return (cc *name)args
+#define FUNCPTR32(return, cc, name, args) return (cc *name)args
+#define FUNCPTR64(return, cc, name, args) return (cc *name)args
 #define __HYBRID_PTR32(T) T *
 #define __HYBRID_PTR64(T) T *
+#define PTR32(T) T *
+#define PTR64(T) T *
+#define compat_funcptr(return, cc, name, args) return (cc *name)args
+#define compat_ptr(T) T *
 
 #define likely
 #define unlikely

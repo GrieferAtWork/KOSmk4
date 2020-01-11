@@ -25,10 +25,10 @@
 
 __DECL_BEGIN
 
-#define OFFSET_PROCESS_PEB_ARGC    0
-#define OFFSET_PROCESS_PEB_ARGV   (__SIZEOF_POINTER__)
-#define OFFSET_PROCESS_PEB_ENVC (2*__SIZEOF_POINTER__)
-#define OFFSET_PROCESS_PEB_ENVP (3*__SIZEOF_POINTER__)
+#define OFFSET_PROCESS_PEB_ARGC 0
+#define OFFSET_PROCESS_PEB_ARGV (__SIZEOF_POINTER__)
+#define OFFSET_PROCESS_PEB_ENVC (2 * __SIZEOF_POINTER__)
+#define OFFSET_PROCESS_PEB_ENVP (3 * __SIZEOF_POINTER__)
 #ifdef __CC__
 struct process_peb /*[PREFIX(pp_)]*/ {
 	__SIZE_TYPE__  pp_argc;  /* Number of arguments passed to the program. */

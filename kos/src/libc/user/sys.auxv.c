@@ -94,7 +94,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 		break;
 
 	case AT_PHDR:
-		result = (ulongptr_t)dlauxinfo(NULL, DLAUXINFO_ELF_PHDR, NULL, NULL);
+		result = (ulongptr_t)dlauxctrl(NULL, DLAUXCTRL_ELF_GET_PHDR, NULL, NULL);
 		break;
 
 	case AT_PHENT:
@@ -103,7 +103,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 
 	case AT_PHNUM: {
 		size_t count;
-		if (!dlauxinfo(NULL, DLAUXINFO_ELF_PHDR, NULL, &count))
+		if (!dlauxctrl(NULL, DLAUXCTRL_ELF_GET_PHDR, NULL, &count))
 			count = 0;
 		result = (ulongptr_t)count;
 	}	break;
@@ -122,7 +122,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 	case AT_FLAGS: {
 		ElfW(Dyn) *dyn;
 		size_t i, dynum;
-		dyn = (ElfW(Dyn) *)dlauxinfo(NULL, DLAUXINFO_ELF_DYN, NULL, &dynum);
+		dyn = (ElfW(Dyn) *)dlauxctrl(NULL, DLAUXCTRL_ELF_GET_DYN, NULL, &dynum);
 		result = 0;
 		for (i = 0; i < dynum; ++i) {
 			if (dyn[i].d_tag != DT_FLAGS)

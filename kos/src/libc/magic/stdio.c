@@ -2192,7 +2192,7 @@ _fsopen:([nonnull] char const *filename, [nonnull] char const *modes, int sflag)
 
 [attribute(*)][alias(*)] _fdopen:(*) = fdopen;
 
-[section(.text.crt.dos.FILE.locked.write.utility)]
+[section(.text.crt.application.exit)]
 [cp_stdio][userimpl][export_alias(_IO_flush_all)] _flushall:() -> int {
 	return fflush(NULL);
 }

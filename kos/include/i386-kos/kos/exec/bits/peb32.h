@@ -20,9 +20,10 @@
 #define _I386_KOS_KOS_EXEC_BITS_PEB32_H 1
 
 #include <__stdinc.h>
-#include <hybrid/typecore.h>
+
 #include <hybrid/__pointer.h>
 #include <hybrid/host.h>
+#include <hybrid/typecore.h>
 
 __DECL_BEGIN
 

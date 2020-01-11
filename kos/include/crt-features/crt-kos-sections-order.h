@@ -173,11 +173,13 @@
 	.string.encrypt*                  # String encryption
 	.string.match*                    # String matching functions
 	.string.argz*  .string.envz*      # <argz.h> and <envz.h>
+	.glibc*                           # GLibc-specific stuff
 	.unsorted*                        # Everything else...
 
 ]]]*/
 #define __CRT_LINKORDER_SECTIONS(CB, PREFIX) \
 	CB(PREFIX.errno_access.* PREFIX.application.exit.*) \
+	CB(PREFIX.application.init.*) \
 	CB(PREFIX.sched.access.* PREFIX.fs.exec.exec.*) \
 	CB(PREFIX.sched.threads.* PREFIX.sched.thread.*) \
 	CB(PREFIX.sched.pthread.*) \
@@ -275,6 +277,7 @@
 	CB(PREFIX.string.encrypt.*) \
 	CB(PREFIX.string.match.*) \
 	CB(PREFIX.string.envz.* PREFIX.string.argz.*) \
+	CB(PREFIX.glibc.*) \
 	CB(PREFIX.unsorted.*) \
 	CB(PREFIX.wchar.fs.exec.exec.*) \
 	CB(PREFIX.wchar.heap.strdup.*) \
@@ -332,7 +335,6 @@
 	CB(PREFIX.dos.FILE.locked.read.read.*) \
 	CB(PREFIX.dos.FILE.locked.read.scanf.*) \
 	CB(PREFIX.dos.FILE.locked.write.write.*) \
-	CB(PREFIX.dos.FILE.locked.write.utility.*) \
 	CB(PREFIX.dos.FILE.locked.utility.*) \
 	CB(PREFIX.dos.FILE.unlocked.read.read.*) \
 	CB(PREFIX.dos.FILE.utility.*) \

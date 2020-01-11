@@ -114,6 +114,11 @@ DEFINE_NOREL_GLOBAL_META(char *, _pgmptr, ".crt.dos.application.init");
 #define _pgmptr GET_NOREL_GLOBAL(_pgmptr)
 
 
+#undef __peb
+DEFINE_NOREL_GLOBAL_META(struct process_peb, __peb, ".crt.glibc.application.init");
+#define __peb GET_NOREL_GLOBAL(__peb)
+
+
 
 
 
@@ -739,8 +744,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.application.exit.exit") void
 /*[[[body:exit]]]*/
 {
 	/* TODO: Run at-exit */
-	/* TODO: Run library finalizers */
-	libc_fini();
+
+	/* Run library finalizers (NOTE: This will also call back to invoke
+	 * `libc_fini()' because libc is compiled with `-fini=libc_fini') */
+	dlauxctrl(NULL, DLAUXCTRL_RUNFINI, NULL, NULL);
 	_Exit(status);
 }
 /*[[[end:exit]]]*/
@@ -1686,7 +1693,7 @@ ATTR_SECTION(".text.crt.dos.application.init.__p___initenv.get_initenv")
 char **NOTHROW(libc_get_initenv)(void) {
 	struct process_peb *peb;
 	char **result;
-	peb    = (struct process_peb *)dlsym(RTLD_DEFAULT, "__peb");
+	peb = &__peb;
 	/* Construct a pointer to what (presumably) is `pp_envp_vector'
 	 * NOTE: If the hosted application modified `pp_argc' (who's address
 	 *       by the way is aliased by `__argc' and `*__p___argc()'), then

@@ -452,9 +452,10 @@ INTDEF char const *LIBCCALL libdl_dlsectionname(DlSection *sect);
 INTDEF size_t LIBCCALL libdl_dlsectionindex(DlSection *sect);
 INTDEF DlModule *LIBCCALL libdl_dlsectionmodule(DlSection *sect, unsigned int flags);
 INTDEF int LIBCCALL libdl_dlclearcaches(void);
-INTDEF void *LIBCCALL libdl_dlauxinfo(DlModule *self, unsigned int type, void *buf, size_t *pauxvlen);
+INTDEF void *LIBCCALL libdl_dlauxctrl(DlModule *self, unsigned int type, void *buf, size_t *pauxvlen);
 INTDEF void *LIBCCALL libdl____tls_get_addr(void);
 INTDEF void *LIBCCALL libdl___tls_get_addr(void);
+
 
 /* Allocate/Free a static TLS segment
  * These functions are called by by libc in order to safely create a new thread, such that
@@ -578,6 +579,7 @@ INTDEF struct process_peb *root_peb;
 
 INTDEF char elf_dlerror_buffer[128];
 INTDEF char *elf_dlerror_message;
+INTDEF ATTR_COLD int CC elf_setdlerror_badptr(void *ptr);
 INTDEF ATTR_COLD int CC elf_setdlerror_badmodule(void *modptr);
 INTDEF ATTR_COLD int CC elf_setdlerror_badsection(void *sectptr);
 INTDEF ATTR_COLD int CC elf_setdlerror_nomem(void);

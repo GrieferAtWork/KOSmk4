@@ -332,40 +332,42 @@ __IMPDEF __ATTR_WUNUSED int __NOTHROW_NCX(__DLFCN_CALL dltlsfree)(void *__tls_ha
 __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL dltlsaddr)(void *__tls_handle);
 
 
-/* Return auxilary information about a given module `HANDLE'
+/* Perform an auxiliary control command about a given module `HANDLE'
  * This function is used internally, and invocation requirements for different values
- * for `TYPE' may change in the future. - It's purpose is to provide access to binary-
+ * for `CMD' may change in the future. - It's purpose is to provide access to binary-
  * specific information about loaded modules.
  * @param: HANDLE:   Handle of the module for which to query information,
  *                   or NULL to query for the root application.
- * @param: TYPE:     The type of information that is being requested.
- *                   This argument affects how (and if) the BUF and PAUXVLEN arguments are used.
+ *                   Some commands may not make use of this argument.
+ * @param: CMD:      The command with which information should be requested.
  * @param: BUF:      An optional buffer (required for some types of informations)
  * @param: PAUXVLEN: When non-NULL, used as either an IN-field for the given buffer
- *                   size and OUT-field for the used buffer size, or as an OUT-field
- *                   for the number of entires within the returned vector.
+ *                   size and OUT-field for the used buffer size, and/or as an OUT-field
+ *                   for the number of entires/bytes within a returned vector.
  * @return: * :   The base pointer to type-specific aux information.
- * @return: buf:  Information was written to `BUF' (only returned with certain values for `TYPE')
- * @return: NULL: No information available, or no buffer was provided (depending on `TYPE')
- * @return: NULL: Error: Unknown `TYPE' (s.a. dlerror())
+ * @return: buf:  Information was written to `BUF' (only returned with certain values for `CMD')
+ * @return: NULL: No information available, or no buffer was provided (depending on `CMD')
+ * @return: NULL: Error: Unknown `CMD' (s.a. dlerror())
  * @return: NULL: Error: Invalid `HANDLE' (s.a. dlerror()) */
-__IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL dlauxinfo)(void *__handle, unsigned int __type,
-                                                                    void *__buf, __size_t *__pauxvlen);
-#define DLAUXINFO_ELF_PHDR       0xef01 /* Returns the module's vector of program headers (`ElfW(Phdr) *')
-                                         * Does not make use of `BUF' and stores the number of headers in `*PAUXVLEN' */
-#define DLAUXINFO_ELF_SHDR       0xef02 /* Returns the module's vector of section headers (`ElfW(Shdr) *')
-                                         * Does not make use of `BUF' and stores the number of headers in `*PAUXVLEN' */
-#define DLAUXINFO_ELF_DYN        0xef03 /* Returns the module's vector of dynamic tags (`ElfW(Dyn) *')
-                                         * Does not make use of `BUF' and stores the number of headers in `*PAUXVLEN' */
-#define DLAUXINFO_ELF_DYNSYM     0xef04 /* Returns the module's vector of dynamic symbol table (`ElfW(Sym) *')
-                                         * Does not make use of `BUF' and stores the number of symbols in `*PAUXVLEN'
-                                         * If the number of symbols is unknown, store `(size_t)-1' in `*PAUXVLEN' */
-#define DLAUXINFO_ELF_DYNSTR     0xef05 /* Returns the module's dynamic string table (`char const *')
-                                         * Does not make use of `BUF' or `PAUXVLEN' */
-#define DLAUXINFO_ELF_SHSTRTAB   0xef06 /* Returns the module's section header name string table (`char const *')
-                                         * Does not make use of `BUF' or `PAUXVLEN' */
-#define DLAUXINFO_ELF_DEPENDS    0xef07 /* Returns the module's vector of module dependencies (`MODULE **')
-                                         * Does not make use of `BUF' and stores the number of dependencies in `*PAUXVLEN' */
+__IMPDEF void *__NOTHROW_NCX(__DLFCN_CALL dlauxctrl)(void *__handle, unsigned int __cmd,
+                                                     void *__buf, __size_t *__pauxvlen);
+#define DLAUXCTRL_RUNFINI            0xd101 /* Run library finalizers. `HANDLE' should be any valid module handle, or `NULL', and
+                                             * all other arguments are ignored; always returns `NULL', but doesn't set an error */
+#define DLAUXCTRL_ELF_GET_PHDR       0xef01 /* Returns the module's vector of program headers (`ElfW(Phdr) *')
+                                             * Does not make use of `BUF' and stores the number of headers in `*PAUXVLEN' */
+#define DLAUXCTRL_ELF_GET_SHDR       0xef02 /* Returns the module's vector of section headers (`ElfW(Shdr) *')
+                                             * Does not make use of `BUF' and stores the number of headers in `*PAUXVLEN' */
+#define DLAUXCTRL_ELF_GET_DYN        0xef03 /* Returns the module's vector of dynamic tags (`ElfW(Dyn) *')
+                                             * Does not make use of `BUF' and stores the number of headers in `*PAUXVLEN' */
+#define DLAUXCTRL_ELF_GET_DYNSYM     0xef04 /* Returns the module's vector of dynamic symbol table (`ElfW(Sym) *')
+                                             * Does not make use of `BUF' and stores the number of symbols in `*PAUXVLEN'
+                                             * If the number of symbols is unknown, store `(size_t)-1' in `*PAUXVLEN' */
+#define DLAUXCTRL_ELF_GET_DYNSTR     0xef05 /* Returns the module's dynamic string table (`char const *')
+                                             * Does not make use of `BUF' or `PAUXVLEN' */
+#define DLAUXCTRL_ELF_GET_SHSTRTAB   0xef06 /* Returns the module's section header name string table (`char const *')
+                                             * Does not make use of `BUF' or `PAUXVLEN' */
+#define DLAUXCTRL_ELF_GET_DEPENDS    0xef07 /* Returns the module's vector of module dependencies (`MODULE **')
+                                             * Does not make use of `BUF' and stores the number of dependencies in `*PAUXVLEN' */
 
 
 /* Register a cache-clear function to-be invoked

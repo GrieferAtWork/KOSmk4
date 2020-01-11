@@ -91,7 +91,7 @@ BEGIN
 								"dlmodulebase", "dllocksection", "dlunlocksection", "dlsectionname",
 								"dlsectionindex", "dlsectionmodule", "dlclearcaches", "___tls_get_addr",
 								"__tls_get_addr", "dltlsallocseg", "dltlsfreeseg", "dltlsalloc",
-								"dltlsfree", "dltlsaddr", "dlauxinfo",
+								"dltlsfree", "dltlsaddr", "dlauxctrl",
 							} && symbolName !in CRT_DLSUBST_GLOBALS)
 								print "WARNING: Unresolved symbol in libc:",repr symbolName;
 						} else if (symbolName.startswith("libc_"))

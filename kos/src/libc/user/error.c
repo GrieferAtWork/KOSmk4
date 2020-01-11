@@ -35,7 +35,7 @@ DECL_BEGIN
 #define libc_strerror libc_strerror_s
 
 
-typedef void (__LIBCCALL *LPERROR_PRINT_PROGNAME)(void);
+typedef void (__LIBCCALL *PERROR_PRINT_PROGNAME)(void);
 
 #define ERROR_BSS(name) ATTR_SECTION(".bss.crt.error." name) 
 
@@ -48,10 +48,10 @@ typedef void (__LIBCCALL *LPERROR_PRINT_PROGNAME)(void);
 #undef __LOCAL_error_message_count
 #undef __LOCAL_error_one_per_line
 #undef __LOCAL_program_invocation_short_name
-PUBLIC ERROR_BSS("error_print_progname") LPERROR_PRINT_PROGNAME error_print_progname = NULL;
+PUBLIC ERROR_BSS("error_print_progname") PERROR_PRINT_PROGNAME error_print_progname = NULL;
 PUBLIC ERROR_BSS("error_message_count") unsigned int error_message_count = 0;
 PUBLIC ERROR_BSS("error_one_per_line") int error_one_per_line = 0;
-DEFINE_NOREL_GLOBAL_META(LPERROR_PRINT_PROGNAME, error_print_progname, ".crt.error");
+DEFINE_NOREL_GLOBAL_META(PERROR_PRINT_PROGNAME, error_print_progname, ".crt.error");
 DEFINE_NOREL_GLOBAL_META(unsigned int, error_message_count, ".crt.error");
 DEFINE_NOREL_GLOBAL_META(int, error_one_per_line, ".crt.error");
 DECLARE_NOREL_GLOBAL_META(char *, program_invocation_short_name); /* Defined in "errno.c" */

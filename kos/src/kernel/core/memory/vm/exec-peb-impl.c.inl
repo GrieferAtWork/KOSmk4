@@ -207,8 +207,8 @@ again:
 		if unlikely(strings_total_copied > strings_total_size) {
 string_size_changed:
 			vm_unmap_kernel_ram(peb_temp_base,
-			                     peb_total_size,
-			                     false);
+			                    peb_total_size,
+			                    false);
 			goto again;
 		}
 

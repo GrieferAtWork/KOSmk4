@@ -141,6 +141,11 @@ INTERN char *LIBCCALL libdl_dlerror(void) {
 
 
 INTERN ATTR_COLD int CC
+elf_setdlerror_badptr(void *ptr) {
+	return elf_setdlerrorf("Bad pointer: %p", ptr);
+}
+
+INTERN ATTR_COLD int CC
 elf_setdlerror_badmodule(void *modptr) {
 	return elf_setdlerrorf("Bad module handle: %p", modptr);
 }
@@ -1230,10 +1235,81 @@ again_lock_global:
 }
 
 
+PRIVATE void LIBCCALL
+DlModule_RunAllModuleFinalizers(void) {
+	DlModule *mod;
+again:
+	atomic_rwlock_read(&DlModule_AllLock);
+	for (mod = DlModule_AllList; mod; mod = mod->dm_modules.ln_next) {
+		size_t i, fini_array_size;
+		uintptr_t fini_func;
+		uintptr_t *fini_array_base;
+		/* Skip finalizers if the module was never
+		 * initialized or has already been finalized. */
+		if (ATOMIC_FETCHOR(mod->dm_flags, (RTLD_NOINIT | RTLD_NODELETE)) & RTLD_NOINIT)
+			continue;
+		/* Try to get another reference now that NODELETE was set.
+		 * This way, we ensure that no other thread may currently
+		 * be in the process of running finalizers for this module.
+		 * NOTE: We keep this reference dangling because our function
+		 *       only gets called as part of `exit()', so there's be
+		 *       no point in trying to maintain the proper reference
+		 *       counts when everything has to be clean up by the
+		 *       kernel no matter what. */
+		if unlikely(!DlModule_TryIncref(mod))
+			continue;
+		atomic_rwlock_endread(&DlModule_AllLock);
+		fini_func       = 0;
+		fini_array_base = NULL;
+		fini_array_size = 0;
+		for (i = 0; i < mod->dm_dyncnt; ++i) {
+			switch (mod->dm_dynhdr[i].d_tag) {
+	
+			case DT_NULL:
+				goto done_dyntag;
+	
+			case DT_FINI:
+				fini_func = (uintptr_t)mod->dm_dynhdr[i].d_un.d_ptr;
+				break;
+	
+			case DT_FINI_ARRAY:
+				fini_array_base = (uintptr_t *)(mod->dm_loadaddr +
+				                                mod->dm_dynhdr[i].d_un.d_ptr);
+				break;
+	
+			case DT_FINI_ARRAYSZ:
+				fini_array_size = (size_t)mod->dm_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
+				break;
+	
+			default: break;
+			}
+		}
+done_dyntag:
+		/* Service fini-array functions in reverse order. */
+		while (fini_array_size--)
+			(*(void (*)(void))(fini_array_base[fini_array_size] /* + self->dm_loadaddr*/))();
+		/* Service a fini function, if one was specified. */
+		if (fini_func)
+			(*(void (*)(void))(fini_func + mod->dm_loadaddr))();
+		goto again;
+	}
+	atomic_rwlock_endread(&DlModule_AllLock);
+}
+
+
 INTERN void *LIBCCALL
-libdl_dlauxinfo(DlModule *self, unsigned int type,
+libdl_dlauxctrl(DlModule *self, unsigned int cmd,
                 void *buf, size_t *pauxvlen) {
 	void *result;
+	switch (cmd) {
+
+	case DLAUXCTRL_RUNFINI:
+		DlModule_RunAllModuleFinalizers();
+		break;
+
+	default:
+		break;
+	}
 	if (!self)
 		self = DlModule_GlobalList;
 	else if unlikely(!ELF_VERIFY_MODULE_HANDLE(self)) {
@@ -1241,27 +1317,27 @@ libdl_dlauxinfo(DlModule *self, unsigned int type,
 		goto err;
 	}
 	(void)buf;
-	switch (type) {
+	switch (cmd) {
 
-	case DLAUXINFO_ELF_PHDR:
+	case DLAUXCTRL_ELF_GET_PHDR:
 		result = self->dm_phdr;
 		if (pauxvlen)
 			*pauxvlen = (size_t)self->dm_phnum;
 		break;
 
-	case DLAUXINFO_ELF_SHDR:
+	case DLAUXCTRL_ELF_GET_SHDR:
 		result = DlModule_GetShdrs(self);
 		if (pauxvlen)
 			*pauxvlen = (size_t)self->dm_phnum;
 		break;
 
-	case DLAUXINFO_ELF_DYN:
+	case DLAUXCTRL_ELF_GET_DYN:
 		result = self->dm_dynhdr;
 		if (pauxvlen)
 			*pauxvlen = (size_t)self->dm_dyncnt;
 		break;
 
-	case DLAUXINFO_ELF_DYNSYM:
+	case DLAUXCTRL_ELF_GET_DYNSYM:
 		result = self->dm_dynsym_tab;
 		if (pauxvlen) {
 			*pauxvlen = self->dm_hashtab
@@ -1270,22 +1346,22 @@ libdl_dlauxinfo(DlModule *self, unsigned int type,
 		}
 		break;
 
-	case DLAUXINFO_ELF_DYNSTR:
+	case DLAUXCTRL_ELF_GET_DYNSTR:
 		result = self->dm_dynstr;
 		break;
 
-	case DLAUXINFO_ELF_SHSTRTAB:
+	case DLAUXCTRL_ELF_GET_SHSTRTAB:
 		result = DlModule_GetShstrtab(self);
 		break;
 
-	case DLAUXINFO_ELF_DEPENDS:
+	case DLAUXCTRL_ELF_GET_DEPENDS:
 		result = self->dm_depvec;
 		if (pauxvlen)
 			*pauxvlen = self->dm_depcnt;
 		break;
 
 	default:
-		elf_setdlerrorf("Invalid info type %#x", type);
+		elf_setdlerrorf("Invalid auxctrl command %#x", cmd);
 		goto err;
 	}
 	return result;
@@ -1312,7 +1388,7 @@ DEFINE_PUBLIC_ALIAS(dlsectionname, libdl_dlsectionname);
 DEFINE_PUBLIC_ALIAS(dlsectionindex, libdl_dlsectionindex);
 DEFINE_PUBLIC_ALIAS(dlsectionmodule, libdl_dlsectionmodule);
 DEFINE_PUBLIC_ALIAS(dlclearcaches, libdl_dlclearcaches);
-DEFINE_PUBLIC_ALIAS(dlauxinfo, libdl_dlauxinfo);
+DEFINE_PUBLIC_ALIAS(dlauxctrl, libdl_dlauxctrl);
 
 
 
@@ -1351,7 +1427,7 @@ DEFINE_PUBLIC_ALIAS(dlauxinfo, libdl_dlauxinfo);
 		"dltlsalloc"      : "result = (void *)&libdl_dltlsalloc;",        \
 		"dltlsfree"       : "result = (void *)&libdl_dltlsfree;",         \
 		"dltlsaddr"       : "result = (void *)&libdl_dltlsaddr;",         \
-		"dlauxinfo"       : "result = (void *)&libdl_dlauxinfo;",         \
+		"dlauxctrl"       : "result = (void *)&libdl_dlauxctrl;",         \
 		"__peb"           : "result = (void *)root_peb;",                 \
 		"environ"         : "result = (void *)&root_peb->pp_envp;",       \
 		"_environ"        : "result = (void *)&root_peb->pp_envp;",       \
@@ -1493,10 +1569,10 @@ stringSwitch("name",
 
 			case 'a':
 				if (name[3] == 'u') {
-					if (name[4] == 'x' && name[5] == 'i' && name[6] == 'n' &&
-					    name[7] == 'f' && name[8] == 'o' && name[9] == '\0') {
-						/* case "dlauxinfo": ... */
-						result = (void *)&libdl_dlauxinfo;
+					if (name[4] == 'x' && name[5] == 'c' && name[6] == 't' &&
+					    name[7] == 'r' && name[8] == 'l' && name[9] == '\0') {
+						/* case "dlauxctrl": ... */
+						result = (void *)&libdl_dlauxctrl;
 					}
 				} else if (name[3] == 'd') {
 					if (name[4] == 'd' && name[5] == 'r' && name[6] == '\0') {

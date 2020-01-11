@@ -94,9 +94,9 @@ DEFINE_NOREL_GLOBAL_META(FILE *, stderr, ".crt.FILE.locked.write.write.stderr");
 
 /* [0..1][lock(all_files_lock)] Chain of all files.
  * NOTE: This chain excludes the initial stdin, stdout and stderr streams! */
-PRIVATE ATTR_SECTION(".bss.crt.FILE.core.utility.all_files")
+PRIVATE ATTR_SECTION(".bss.crt.application.exit.all_files")
 FILE *all_files = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.FILE.core.utility.all_files_lock")
+PRIVATE ATTR_SECTION(".bss.crt.application.exit.all_files_lock")
 struct atomic_rwlock all_files_lock = ATOMIC_RWLOCK_INIT;
 
 /* Add the given file to the set of all files */
@@ -464,7 +464,7 @@ err:
 	return -1;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.locked.write.utility.file_sync_locked")
+PRIVATE ATTR_SECTION(".text.crt.application.exit.file_sync_locked")
 int LIBCCALL file_sync_locked(FILE *__restrict self) {
 	int result;
 	if (FMUSTLOCK(self)) {
@@ -583,7 +583,7 @@ done:
 	;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.locked.write.utility.file_do_syncall_locked")
+PRIVATE ATTR_SECTION(".text.crt.application.exit.file_do_syncall_locked")
 void LIBCCALL file_do_syncall_locked(uintptr_t version) {
 	for (;;) {
 		FILE *fp, *next_fp;
@@ -653,14 +653,14 @@ do_flush_fp:
 }
 
 
-PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.flushall_lock")
+PRIVATE ATTR_SECTION(".bss.crt.application.exit.flushall_lock")
 struct atomic_owner_rwlock flushall_lock = ATOMIC_OWNER_RWLOCK_INIT;
-PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.flushall_version")
+PRIVATE ATTR_SECTION(".bss.crt.application.exit.flushall_version")
 uintptr_t flushall_version = 0;
-PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.flushall_must_restart")
+PRIVATE ATTR_SECTION(".bss.crt.application.exit.flushall_must_restart")
 bool flushall_must_restart = false;
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.locked.write.utility.file_syncall_locked")
+PRIVATE ATTR_SECTION(".text.crt.application.exit.file_syncall_locked")
 void LIBCCALL file_syncall_locked(void) {
 	/* Check for recursion (as is possible due to file cookies) */
 	if (atomic_owner_rwlock_writing(&flushall_lock)) {
@@ -1785,8 +1785,8 @@ done:
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:_flushall,hash:CRC-32=0x667d3c39]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.write.utility._flushall") int
+/*[[[head:_flushall,hash:CRC-32=0xc6dc9668]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.application.exit._flushall") int
 (LIBCCALL libc__flushall)(void)
 		__THROWS(...)
 /*[[[body:_flushall]]]*/

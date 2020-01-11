@@ -43,7 +43,7 @@ INTERN ElfW(Shdr) empty_shdr[1] = { 0 };
 /* DlModule functions */
 INTERN NONNULL((1)) void CC
 DlModule_Destroy(DlModule *__restrict self) {
-	uint16_t i;
+	size_t i;
 	uintptr_t fini_func        = 0;
 	uintptr_t *fini_array_base = NULL;
 	size_t fini_array_size     = 0;
@@ -72,7 +72,7 @@ DlModule_Destroy(DlModule *__restrict self) {
 		atomic_rwlock_endwrite(&DlModule_GlobalLock);
 	}
 
-	/* Skip finalizers if the library . */
+	/* Skip finalizers if the library was never initialized. */
 	if unlikely(self->dm_flags & RTLD_NOINIT)
 		goto done_fini;
 	for (i = 0; i < self->dm_dyncnt; ++i) {

@@ -43,8 +43,8 @@ DECL_BEGIN
 struct dtls_extension {
 	/* Tree for mapping TLS extensions data tables to modules.
 		* NOTE: These extension tables are allocated lazily! */
-	ATREE_NODE_SINGLE(struct dtls_extension,uintptr_t) te_tree; /* [lock(:ts_exlock)] NOTE: KEY == DlModule */
-	byte_t                                            *te_data; /* Pointer to the base of TLS data. */
+	ATREE_NODE_SINGLE(struct dtls_extension, uintptr_t) te_tree; /* [lock(:ts_exlock)] NOTE: KEY == DlModule */
+	byte_t                                             *te_data; /* Pointer to the base of TLS data. */
 	/* The actual extension data goes here. */
 };
 
@@ -268,16 +268,16 @@ clear_extension_table(struct tls_segment *__restrict self) {
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
 INTERN int LIBCCALL
 libdl_dltlsfreeseg(void *ptr) {
-	if unlikely(!ELF_VERIFY_MODULE_HANDLE(ptr))
-		goto err_nullmodule;
+	if unlikely(!ptr)
+		goto err_badptr;
 	atomic_rwlock_write(&static_tls_lock);
 	LLIST_REMOVE((struct tls_segment *)ptr, ts_threads);
 	atomic_rwlock_endwrite(&static_tls_lock);
 	clear_extension_table((struct tls_segment *)ptr);
 	free((byte_t *)ptr - static_tls_size_no_segment);
 	return 0;
-err_nullmodule:
-	return elf_setdlerror_badmodule(ptr);
+err_badptr:
+	return elf_setdlerror_badptr(ptr);
 }
 
 

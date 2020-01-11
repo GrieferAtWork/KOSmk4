@@ -22,7 +22,7 @@
 #endif /* __INTELLISENSE__ */
 
 #ifdef DEFINE_COMPAT_MAPLIBRARY
-#include <kos/exec/asm/elf-compat.h>
+#include <compat/kos/exec/elf.h>
 #endif /* DEFINE_COMPAT_MAPLIBRARY */
 
 /************************************************************************/
