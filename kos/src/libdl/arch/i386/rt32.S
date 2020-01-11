@@ -24,7 +24,7 @@
 
 #include "../../api.h"
 
-INTERN(require_global)
+INTERN(dl_require_global)
 
 #define DEFINE_GLOBAL_SYMBOL_IMPORT(name)                 \
 	.section .rodata.str.1;                               \
@@ -42,7 +42,7 @@ INTERN(require_global)
 		popl   %ecx;                                      \
 		.cfi_adjust_cfa_offset -4;                        \
 		addl   $(_GLOBAL_OFFSET_TABLE_ - (. - 1b)), %ecx; \
-		call   require_global;                            \
+		call   dl_require_global;                          \
 		movl   %eax, 12(%esp); /* RETURN_PC_OVERRIDE */   \
 		.cfi_rel_offset %eip, 12;                         \
 		popl_cfi_r %edx;                                  \

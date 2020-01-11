@@ -66,6 +66,15 @@ builtin_symbol_size(char const *__restrict name) {
 	return 0;
 }
 
+
+struct dl_symbol {
+	DlModule        *ds_mod; /* [1..1] The associated module */
+	ElfW(Sym) const *ds_sym; /* [1..1] The actual symbol (or its address for custom module). */
+	size_t           ds_siz; /* [valid_if(ds_mod->dm_ops)] Symbol size */
+};
+
+
+
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NOT_FOUND 0
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND     1
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NO_MODULE 2
@@ -123,11 +132,38 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 					*pmodule = &dl_rtld_module;
 				return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND;
 			}
+			continue;
 		}
-		symbol.ds_sym = DlModule_GetLocalSymbol(symbol.ds_mod,
-		                                        name,
-		                                        phash_elf,
-		                                        phash_gnu);
+		if (symbol.ds_mod->dm_ops) {
+			int error;
+			error = (*symbol.ds_mod->dm_ops->df_dlsym)(symbol.ds_mod,
+			                                           name,
+			                                           (void **)&symbol.ds_sym,
+			                                           &symbol.ds_siz);
+			if (error < 0)
+				continue;
+			/* Found a symbol! */
+			if (error > 0) {
+				/* Weak definition (remember if this is the first one) */
+				if (!pweak_symbol->ds_mod) {
+					DlModule_Incref(symbol.ds_mod);
+					*pweak_symbol = symbol;
+				}
+			} else {
+				/* Found the real, actual symbol! */
+				*presult = (ElfW(Addr))(void *)symbol.ds_sym;
+				if unlikely(psize)
+					*psize = symbol.ds_siz;
+				if unlikely(pmodule)
+					*pmodule = symbol.ds_mod;
+				return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND;
+			}
+			continue;
+		}
+		symbol.ds_sym = DlModule_ElfGetLocalSymbol(symbol.ds_mod,
+		                                           name,
+		                                           phash_elf,
+		                                           phash_gnu);
 		if (symbol.ds_sym &&
 		    symbol.ds_sym->st_shndx != SHN_UNDEF) {
 			/* Found a symbol! */
@@ -166,9 +202,9 @@ dlmodule_find_symbol_in_dependencies(DlModule *__restrict self,
 
 
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 3)) bool CC
-DlModule_FindSymbol(DlModule *__restrict self, uintptr_t symid,
-                    ElfW(Addr) *__restrict presult,
-                    size_t *psize, DlModule **pmodule) {
+DlModule_ElfFindSymbol(DlModule *__restrict self, uintptr_t symid,
+                       ElfW(Addr) *__restrict presult,
+                       size_t *psize, DlModule **pmodule) {
 	struct dl_symbol weak_symbol;
 	ElfW(Sym) const *symbol;
 	ElfW(Addr) result;
@@ -228,11 +264,45 @@ again_search_globals_module:
 						*pmodule = &dl_rtld_module;
 					goto done_result;
 				}
+			} else if (iter->dm_ops) {
+				int error;
+				size_t symbol_size;
+				void *symbol_addr;
+				error = (*iter->dm_ops->df_dlsym)(iter, name,
+				                                  &symbol_addr,
+				                                  &symbol_size);
+				if (error >= 0) {
+					if (error > 0) {
+						if (!weak_symbol.ds_mod) {
+							weak_symbol.ds_mod = iter; /* Inherit reference */
+							weak_symbol.ds_sym = (ElfW(Sym) const *)symbol_addr;
+							weak_symbol.ds_siz = symbol_size;
+							atomic_rwlock_read(&DlModule_GlobalLock);
+							iter = iter->dm_globals.ln_next;
+							if unlikely(!iter) {
+								atomic_rwlock_endread(&DlModule_GlobalLock);
+								break;
+							}
+							goto again_search_globals_next;
+						}
+					} else {
+						/* Found it! */
+						if (weak_symbol.ds_mod)
+							DlModule_Decref(weak_symbol.ds_mod);
+						result = (ElfW(Addr))symbol_addr;
+						if unlikely(psize)
+							*psize = symbol_size;
+						if unlikely(pmodule)
+							*pmodule = iter;
+						DlModule_Decref(iter);
+						goto done_result;
+					}
+				}
 			} else {
-				symbol = DlModule_GetLocalSymbol(iter,
-				                                 name,
-				                                 &hash_elf,
-				                                 &hash_gnu);
+				symbol = DlModule_ElfGetLocalSymbol(iter,
+				                                    name,
+				                                    &hash_elf,
+				                                    &hash_gnu);
 				if (symbol && symbol->st_shndx != SHN_UNDEF) {
 					if (ELFW(ST_BIND)(symbol->st_info) == STB_WEAK) {
 						if (!weak_symbol.ds_mod) {
@@ -308,19 +378,25 @@ again_search_globals_module:
 		}
 
 		if (weak_symbol.ds_mod) {
-			result = weak_symbol.ds_sym->st_value;
-			if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
-				result += weak_symbol.ds_mod->dm_loadaddr;
-			if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC) {
-				TRY {
-					result = (*(ElfW(Addr)(*)(void))(void *)result)();
-				} EXCEPT {
-					DlModule_Decref(weak_symbol.ds_mod);
-					RETHROW();
+			if (weak_symbol.ds_mod->dm_ops) {
+				result = (ElfW(Addr))weak_symbol.ds_sym;
+				if unlikely(psize)
+					*psize = weak_symbol.ds_siz;
+			} else {
+				result = weak_symbol.ds_sym->st_value;
+				if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
+					result += weak_symbol.ds_mod->dm_loadaddr;
+				if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC) {
+					TRY {
+						result = (*(ElfW(Addr)(*)(void))(void *)result)();
+					} EXCEPT {
+						DlModule_Decref(weak_symbol.ds_mod);
+						RETHROW();
+					}
 				}
+				if unlikely(psize)
+					*psize = weak_symbol.ds_sym->st_size;
 			}
-			if unlikely(psize)
-				*psize = weak_symbol.ds_sym->st_size;
 			if unlikely(pmodule)
 				*pmodule = weak_symbol.ds_mod;
 			DlModule_Decref(weak_symbol.ds_mod);
@@ -342,7 +418,7 @@ again_search_globals_module:
 		}
 		/* If the symbol continues to be undefined, set an error. */
 		dl_seterrorf("Could not find symbol %q required by %q",
-		                name, self->dm_filename);
+		             name, self->dm_filename);
 		return false;
 	}
 done_result:
@@ -451,10 +527,10 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 	reladdr = (byte_t *)self->dm_loadaddr + rel->r_offset;
 	/* Resolve the symbol now. */
 #ifdef LAZY_TRACE
-	if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel->r_info), &result,
+	if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel->r_info), &result,
 	                                 NULL, &link_module))
 #else /* LAZY_TRACE */
-	if unlikely(!DlModule_FindSymbol(self, ELFW(R_SYM)(rel->r_info), &result,
+	if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel->r_info), &result,
 	                                 NULL, NULL))
 #endif /* !LAZY_TRACE */
 	{

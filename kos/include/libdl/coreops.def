@@ -16,41 +16,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_EXEC_BITS_LIBRARY_H
-#define _KOS_EXEC_BITS_LIBRARY_H 1
+#ifndef DL_COREFIELD
+#define DL_COREFIELD(type, name) /* nothing */
+#endif /* !DL_COREFIELD */
 
-#include <__stdinc.h>
+#ifndef DL_COREOP
+#define DL_COREOP(attr, return, cc, name, args) /* nothing */
+#endif /* !DL_COREOP */
 
-#include <bits/types.h>
+#ifndef DL_COREOPS_SKIP_DLMODULE_DESTROY
+DL_COREOP(NONNULL((1)), void, LIBDL_CC, DlModule_Destroy, (DlModule *__restrict self))
+#endif /* !DL_COREOPS_SKIP_DLMODULE_DESTROY */
+DL_COREOP(NONNULL((1)), void, LIBDL_CC, DlSection_Destroy, (DlSection *__restrict self))
+DL_COREOP(__REF_IF(!(return->dm_flags & RTLD_NODELETE)), DlModule *, LIBDL_CC, DlModule_FindFromFilename, (char const *__restrict filename))
+DL_COREOP(NONNULL((1)), int, LIBDL_VCC, dl_seterrorf, (char const *__restrict format, ...))
+DL_COREOP(NONNULL((1)), int, LIBDL_CC, dl_vseterrorf, (char const *__restrict format, __builtin_va_list args))
+DL_COREOP(WUNUSED ATTR_PURE_P NONNULL((1)), void *, __FCALL, dlsym_builtin, (char const *__restrict name))
+DL_COREOP(WUNUSED ATTR_PURE_P NONNULL((1)), DlSection *, __FCALL, dlsec_builtin, (char const *__restrict name))
+DL_COREOP(WUNUSED ATTR_CONST_P, DlSection *, __FCALL, dlsec_builtin_index, (size_t sect_index))
+DL_COREOP(WUNUSED ATTR_CONST_P, char const *, __FCALL, dlsec_builtin_name, (size_t sect_index))
 
-__DECL_BEGIN
-
-#ifdef __CC__
-
-#ifdef __KERNEL__
-struct driver;
-typedef struct driver *library_handle_t;
-typedef struct driver_section *section_handle_t;
-#else /* __KERNEL__ */
-#ifdef _LIBDL_MODULE_H
-struct dlmodule;
-struct dlsection;
-typedef struct dlmodule *library_handle_t;
-typedef struct dlsection *section_handle_t;
-#else /* _LIBDL_MODULE_H */
-#ifdef __INTELLISENSE__
-struct __library_handle_struct;
-typedef struct __library_handle_struct *library_handle_t;
-#else /* __INTELLISENSE__ */
-typedef void *library_handle_t;
-#endif /* !__INTELLISENSE__ */
-typedef struct dl_section *section_handle_t;
-#endif /* !_LIBDL_MODULE_H */
-typedef __fd_t library_file_t;
-#endif /* !__KERNEL__ */
-
-#endif /* __CC__ */
-
-__DECL_END
-
-#endif /* !_KOS_EXEC_BITS_LIBRARY_H */
+#undef DL_COREFIELD
+#undef DL_COREOP

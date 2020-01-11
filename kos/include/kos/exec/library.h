@@ -135,17 +135,17 @@ __ATTR_NONNULL((1)) void library_decref(library_handle_t __lib);
 #define library_symbol(lib, symname)              dlsym(lib, symname)
 #define library_decref(lib)                       dlclose(lib)
 
-#ifdef GUARD_LIBDL_API_H
+#ifdef _LIBDL_MODULE_H
 #define library_locksection(lib, sectname, flags) ((__REF section_handle_t)dllocksection(lib, sectname, flags))
 #define library_unlocksection(sect)                 dlunlocksection((__REF struct dl_section *)(sect))
 #define library_ataddr(static_pointer)            ((__REF library_handle_t)dlgethandle(static_pointer, DLGETHANDLE_FINCREF))
 #define library_basemodule()                      ((library_handle_t)dlopen(__NULLPTR, 0))
-#else /* GUARD_LIBDL_API_H */
+#else /* _LIBDL_MODULE_H */
 #define library_locksection(lib, sectname, flags)   dllocksection(lib, sectname, flags)
 #define library_unlocksection(sect)                 dlunlocksection(sect)
 #define library_ataddr(static_pointer)              dlgethandle(static_pointer, DLGETHANDLE_FINCREF)
 #define library_basemodule()                        dlopen(__NULLPTR, 0)
-#endif /* !GUARD_LIBDL_API_H */
+#endif /* !_LIBDL_MODULE_H */
 
 
 #endif /* !__KERNEL__ */

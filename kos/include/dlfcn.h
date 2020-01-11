@@ -360,6 +360,21 @@ __IMPDEF void *__NOTHROW_NCX(__DLFCN_VCALL dlauxctrl)(void *__handle, unsigned i
                                              *                  In this case, CALLBACK was invoked prior to returning
                                              * @return: NULL:   Invalid `HANDLE' (dlerror() is modified)
                                              * @return: NULL:   Failed to allocate additional memory for registering `CALLBACK'. */
+#define DLAUXCTRL_REGISTER_EXTENSION 0xd201 /* Register an extension to libdl:
+                                             * >> extension              = va_arg(struct dlmodule_format *);
+                                             * >> sizeof_dlmodule_format = va_arg(size_t);
+                                             * >> sizeof_dlcore_ops      = va_arg(size_t);
+                                             * NOTE: When returning `HANDLE', and `HANDLE' was `NULL', the
+                                             *       handle for the root application is returned instead.
+                                             * @return: HANDLE: Re-returns `HANDLE' upon success.
+                                             * @return: NULL:   Invalid `HANDLE' (dlerror() is modified)
+                                             * @return: NULL:   `extension' is an invalid pointer
+                                             * @return: NULL:   Unsupported value for `sizeof_dlmodule_format' (dlerror() is modified)
+                                             * @return: NULL:   Unsupported value for `sizeof_dlcore_ops' (dlerror() is modified)
+                                             * @return: NULL:   `extension->df_open' does not map to a static memory segment (dlerror() is modified)
+                                             * NOTE: Upon success, the module containing `extension->df_open' becomes undeletable. */
+#define DLAUXCTRL_GET_DEPENDS        0xd202 /* [size_t *pcount [0..1]] Returns the module's vector of module dependencies (`MODULE **') */
+#define DLAUXCTRL_ELF_CHECK          0xef00 /* Check if this module is an ELF module (re-returns `HANDLE' if so, otherwise returns `NULL' but leaves `dlerror()' unmodified) */
 #define DLAUXCTRL_ELF_GET_PHDR       0xef01 /* [size_t *pcount [0..1]] Returns the module's vector of program headers (`ElfW(Phdr) *') */
 #define DLAUXCTRL_ELF_GET_SHDR       0xef02 /* [size_t *pcount [0..1]] Returns the module's vector of section headers (`ElfW(Shdr) *') */
 #define DLAUXCTRL_ELF_GET_DYN        0xef03 /* [size_t *pcount [0..1]] Returns the module's vector of dynamic tags (`ElfW(Dyn) *') */
@@ -367,7 +382,6 @@ __IMPDEF void *__NOTHROW_NCX(__DLFCN_VCALL dlauxctrl)(void *__handle, unsigned i
                                              * If the number of symbols is unknown, `(size_t)-1' written to `*pcount'. */
 #define DLAUXCTRL_ELF_GET_DYNSTR     0xef05 /* Returns the module's dynamic string table (`char const *') */
 #define DLAUXCTRL_ELF_GET_SHSTRTAB   0xef06 /* Returns the module's section header name string table (`char const *') */
-#define DLAUXCTRL_ELF_GET_DEPENDS    0xef07 /* [size_t *pcount [0..1]] Returns the module's vector of module dependencies (`MODULE **') */
 
 
 /* Register a cache-clear function to-be invoked
@@ -405,7 +419,7 @@ __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL fdlopen)(__fd_t __fd, i
 
 #ifdef __USE_GNU
 
-typedef struct {
+typedef struct __dl_info_struct {
 #ifdef __CRT_CYG_PRIMARY
 	char        dli_fname[4096]; /* File name of defining object. */
 #else /* __CRT_CYG_PRIMARY */

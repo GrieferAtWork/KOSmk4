@@ -25,6 +25,8 @@
 #include "dl.h"
 /**/
 
+#include <hybrid/align.h>
+
 #include <kos/debugtrap.h>
 #include <kos/exec/peb.h>
 #include <kos/syscalls.h>
@@ -132,7 +134,7 @@ __afailf(char const *expr, char const *file,
 
 
 
-/* ELF-DL error handling. */
+/* DL error handling. */
 INTERN char dl_error_buffer[128];
 INTERN char *dl_error_message = NULL;
 INTERN char *LIBCCALL libdl_dlerror(void) {
@@ -291,6 +293,12 @@ err_bad_module:
 	return dl_seterror_badmodule(self);
 }
 
+struct dl_symbol {
+	DlModule        *ds_mod; /* [1..1] The associated module */
+	ElfW(Sym) const *ds_sym; /* [1..1] The actual symbol (or its address for custom module). */
+};
+
+
 
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_NOT_FOUND 0
 #define DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND     1
@@ -341,10 +349,10 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
 				return DLMODULE_SEARCH_SYMBOL_IN_DEPENDENCIES_FOUND;
 			}
 		}
-		symbol.ds_sym = DlModule_GetLocalSymbol(symbol.ds_mod,
-		                                        name,
-		                                        phash_elf,
-		                                        phash_gnu);
+		symbol.ds_sym = DlModule_ElfGetLocalSymbol(symbol.ds_mod,
+		                                           name,
+		                                           phash_elf,
+		                                           phash_gnu);
 		if (symbol.ds_sym &&
 		    symbol.ds_sym->st_shndx != SHN_UNDEF) {
 			/* Found a symbol! */
@@ -409,11 +417,32 @@ again_search_globals_module:
 					DlModule_DecrefNoKill(symbol.ds_mod);
 					goto done;
 				}
+			} else if (symbol.ds_mod->dm_ops) {
+				int error;
+				error = (*symbol.ds_mod->dm_ops->df_dlsym)(symbol.ds_mod, name,
+				                                           (void **)&symbol.ds_sym, NULL);
+				if (error >= 0) {
+					if (error > 0) {
+						/* Weak definition. */
+						if (!weak_symbol.ds_mod)
+							weak_symbol = symbol; /* First weak def */
+						else {
+							DlModule_Decref(symbol.ds_mod); /* Second weak def */
+						}
+					} else {
+						/* Found the symbol! */
+						if (weak_symbol.ds_mod)
+							DlModule_Decref(weak_symbol.ds_mod);
+						result = (ElfW(Addr))symbol.ds_sym;
+						DlModule_Decref(symbol.ds_mod);
+						goto done;
+					}
+				}
 			} else {
-				symbol.ds_sym = DlModule_GetLocalSymbol(symbol.ds_mod,
-				                                        name,
-				                                        &hash_elf,
-				                                        &hash_gnu);
+				symbol.ds_sym = DlModule_ElfGetLocalSymbol(symbol.ds_mod,
+				                                           name,
+				                                           &hash_elf,
+				                                           &hash_gnu);
 				if (symbol.ds_sym &&
 				    symbol.ds_sym->st_shndx != SHN_UNDEF) {
 					if (ELFW(ST_BIND)(symbol.ds_sym->st_info) == STB_WEAK) {
@@ -464,22 +493,26 @@ again_search_globals_module:
 		}
 		/* Check if we found a weak symbol at one point! */
 		if likely(weak_symbol.ds_mod) {
-			result = weak_symbol.ds_sym->st_value;
-			if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_TLS) {
-				void *tlsbase;
-				tlsbase = libdl_dltlsaddr(weak_symbol.ds_mod);
-				if unlikely(!tlsbase)
-					goto err_weak_symbol_mod;
-				result += (ElfW(Addr))tlsbase;
+			if (weak_symbol.ds_mod->dm_ops) {
+				result = (ElfW(Addr))weak_symbol.ds_sym;
 			} else {
-				if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
-					result += weak_symbol.ds_mod->dm_loadaddr;
-				if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC) {
-					TRY {
-						result = (*(ElfW(Addr)(*)(void))(void *)result)();
-					} EXCEPT {
-						DlModule_Decref(weak_symbol.ds_mod);
-						RETHROW();
+				result = weak_symbol.ds_sym->st_value;
+				if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_TLS) {
+					void *tlsbase;
+					tlsbase = libdl_dltlsaddr(weak_symbol.ds_mod);
+					if unlikely(!tlsbase)
+						goto err_weak_symbol_mod;
+					result += (ElfW(Addr))tlsbase;
+				} else {
+					if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
+						result += weak_symbol.ds_mod->dm_loadaddr;
+					if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC) {
+						TRY {
+							result = (*(ElfW(Addr)(*)(void))(void *)result)();
+						} EXCEPT {
+							DlModule_Decref(weak_symbol.ds_mod);
+							RETHROW();
+						}
 					}
 				}
 			}
@@ -510,32 +543,49 @@ again_search_globals_module:
 		} else {
 			if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 				goto err_bad_module;
-			/* Scan the given module itself */
-			symbol.ds_sym = DlModule_GetLocalSymbol(self,
-			                                        name,
-			                                        &hash_elf,
-			                                        &hash_gnu);
-			/* Most likely case: The symbol is already apart of the specified module! */
-			if likely(symbol.ds_sym &&
-			          symbol.ds_sym->st_shndx != SHN_ABS) {
-				if (ELFW(ST_BIND)(symbol.ds_sym->st_info) == STB_WEAK) {
-					weak_symbol = symbol;
-				} else {
-					result = symbol.ds_sym->st_value;
-					if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_TLS) {
-						void *tlsbase;
-						tlsbase = libdl_dltlsaddr(self);
-						if unlikely(!tlsbase)
-							goto err;
-						result += (ElfW(Addr))tlsbase;
+			if unlikely(self->dm_ops) {
+				/* Scan the given module itself */
+				int error;
+				error = (*self->dm_ops->df_dlsym)(self, name, (void **)&symbol.ds_sym, NULL);
+				/* Most likely case: The symbol is already apart of the specified module! */
+				if likely(error >= 0) {
+					if (error > 0) {
+						weak_symbol.ds_mod = self;
+						weak_symbol.ds_sym = symbol.ds_sym;
 					} else {
-						if (symbol.ds_sym->st_shndx != SHN_ABS)
-							result += self->dm_loadaddr;
-						if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC)
-							result = (*(ElfW(Addr)(*)(void))(void *)result)();
+						result = (ElfW(Addr))symbol.ds_sym;
+						goto done;
 					}
+				}
+			} else {
+				/* Scan the given module itself */
+				symbol.ds_sym = DlModule_ElfGetLocalSymbol(self,
+				                                           name,
+				                                           &hash_elf,
+				                                           &hash_gnu);
+				/* Most likely case: The symbol is already apart of the specified module! */
+				if likely(symbol.ds_sym &&
+				          symbol.ds_sym->st_shndx != SHN_ABS) {
+					if (ELFW(ST_BIND)(symbol.ds_sym->st_info) == STB_WEAK) {
+						weak_symbol.ds_mod = self;
+						weak_symbol.ds_sym = symbol.ds_sym;
+					} else {
+						result = symbol.ds_sym->st_value;
+						if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_TLS) {
+							void *tlsbase;
+							tlsbase = libdl_dltlsaddr(self);
+							if unlikely(!tlsbase)
+								goto err;
+							result += (ElfW(Addr))tlsbase;
+						} else {
+							if (symbol.ds_sym->st_shndx != SHN_ABS)
+								result += self->dm_loadaddr;
+							if (ELFW(ST_TYPE)(symbol.ds_sym->st_info) == STT_GNU_IFUNC)
+								result = (*(ElfW(Addr)(*)(void))(void *)result)();
+						}
 done:
-					return (void *)result;
+						return (void *)result;
+					}
 				}
 			}
 			/* Search dependencies of the module. */
@@ -561,25 +611,29 @@ done:
 			}
 			/* Check if we found a weak symbol at one point. */
 			if (weak_symbol.ds_mod) {
-				result = weak_symbol.ds_sym->st_value;
-				if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_TLS) {
-					void *tlsbase;
-					tlsbase = libdl_dltlsaddr(weak_symbol.ds_mod);
-					if unlikely(!tlsbase)
-						goto err;
-					result += (ElfW(Addr))tlsbase;
+				if (weak_symbol.ds_mod->dm_ops) {
+					result = (ElfW(Addr))weak_symbol.ds_sym;
 				} else {
-					if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
-						result += weak_symbol.ds_mod->dm_loadaddr;
-					if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC)
-						result = (*(ElfW(Addr)(*)(void))(void *)result)();
+					result = weak_symbol.ds_sym->st_value;
+					if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_TLS) {
+						void *tlsbase;
+						tlsbase = libdl_dltlsaddr(weak_symbol.ds_mod);
+						if unlikely(!tlsbase)
+							goto err;
+						result += (ElfW(Addr))tlsbase;
+					} else {
+						if (weak_symbol.ds_sym->st_shndx != SHN_ABS)
+							result += weak_symbol.ds_mod->dm_loadaddr;
+						if (ELFW(ST_TYPE)(weak_symbol.ds_sym->st_info) == STT_GNU_IFUNC)
+							result = (*(ElfW(Addr)(*)(void))(void *)result)();
+					}
 				}
 				goto done;
 			}
 		}
 		/* Missing symbol... */
 		dl_seterrorf("Failed to find symbol %q in %q",
-		                name, self->dm_filename);
+		             name, self->dm_filename);
 	}
 err:
 	return NULL;
@@ -616,7 +670,14 @@ libdl_dlgethandle(void const *static_pointer, unsigned int flags) {
 			continue;
 		if ((uintptr_t)static_pointer >= result->dm_loadend)
 			continue;
-		/* TODO: Support for formats other than ELF. */
+		/* Support for formats other than ELF. */
+		if (result->dm_ops) {
+			if (!(*result->dm_ops->df_ismapped)(result,
+			                                    (uintptr_t)static_pointer -
+			                                    result->dm_loadaddr))
+				continue;
+			goto got_result;
+		}
 		/* Make sure that `static_pointer' maps to some program segment. */
 		for (i = 0; i < result->dm_elf.de_phnum; ++i) {
 			uintptr_t segment_base;
@@ -627,10 +688,6 @@ libdl_dlgethandle(void const *static_pointer, unsigned int flags) {
 				continue;
 			if ((uintptr_t)static_pointer >= segment_base + result->dm_elf.de_phdr[i].p_memsz)
 				continue;
-			/* Found the segment! */
-			if ((flags & DLGETHANDLE_FINCREF) &&
-			    !(result->dm_flags & RTLD_NODELETE))
-				DlModule_Incref(result);
 			goto got_result;
 		}
 	}
@@ -639,6 +696,10 @@ libdl_dlgethandle(void const *static_pointer, unsigned int flags) {
 err:
 	return NULL;
 got_result:
+	/* Found the module! */
+	if ((flags & DLGETHANDLE_FINCREF) &&
+	    !(result->dm_flags & RTLD_NODELETE))
+		DlModule_Incref(result);
 	atomic_rwlock_endread(&DlModule_AllLock);
 	return result;
 }
@@ -768,7 +829,19 @@ libdl_dladdr(void const *address, Dl_info *info) {
 	info->dli_fbase = (void *)mod->dm_loadaddr;
 	info->dli_sname = NULL;
 	info->dli_saddr = NULL;
-	/* TODO: Support for formats other than ELF. */
+
+	/* Support for formats other than ELF. */
+	if (mod->dm_ops) {
+		int result;
+		if (!mod->dm_ops->df_dladdr)
+			goto done;
+		result = (*mod->dm_ops->df_dladdr)(mod,
+		                                   (uintptr_t)address - mod->dm_loadaddr,
+		                                   info);
+		if (!(mod->dm_flags & RTLD_NODELETE))
+			DlModule_Decref(mod);
+		return result;
+	}
 	/* Search for the closest dynamic symbol. */
 	if (mod->dm_elf.de_dynsym_tab && mod->dm_elf.de_hashtab) {
 		ElfW(Sym) *iter, *end;
@@ -793,6 +866,7 @@ libdl_dladdr(void const *address, Dl_info *info) {
 			}
 		}
 	}
+done:
 	if (!(mod->dm_flags & RTLD_NODELETE))
 		DlModule_Decref(mod);
 	return 0;
@@ -868,8 +942,6 @@ INTERN WUNUSED REF DlSection *LIBCCALL
 libdl_dllocksection(DlModule *self,
                     char const *__restrict name,
                     unsigned int flags) {
-	ElfW(Shdr) *sect;
-	size_t index;
 	REF DlSection *result;
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
@@ -883,117 +955,236 @@ libdl_dllocksection(DlModule *self,
 		if likely(result) {
 			DlSection_Incref(result);
 		} else {
-			dl_seterror_nosect(self, name);
-		}
-		return result;
-	}
-	/* TODO: Support for formats other than ELF. */
-	if (flags & DLLOCKSECTION_FINDEX) {
-		sect = DlModule_ElfGetShdrs(self);
-		if unlikely(!sect)
-			goto err;
-		if unlikely((uintptr_t)name >= self->dm_shnum) {
-			dl_seterrorf("%q: Section index %Iu is greater than %Iu",
-			                self->dm_filename,
-			                (uintptr_t)name,
-			                (uintptr_t)self->dm_shnum);
-			goto err;
-		}
-		sect += (uintptr_t)name;
-	} else {
-		sect = DlModule_ElfGetSection(self, name);
-		if unlikely(!sect)
-			goto err;
-	}
-	assert(sect >= self->dm_elf.de_shdr);
-	assert(sect < self->dm_elf.de_shdr + self->dm_shnum);
-	index = (size_t)(sect - self->dm_elf.de_shdr);
-again_lock_sections:
-	atomic_rwlock_read(&self->dm_sections_lock);
-	if (!self->dm_sections) {
-		DlSection **sec_vec;
-		/* Must allocate the initial sections vector. */
-		atomic_rwlock_endread(&self->dm_sections_lock);
-		sec_vec = (DlSection **)calloc(self->dm_shnum,
-		                               sizeof(DlSection *));
-		if unlikely(!sec_vec)
-			goto err_nomem;
-		atomic_rwlock_write(&self->dm_sections_lock);
-		COMPILER_READ_BARRIER();
-		if likely(!self->dm_sections) {
-			self->dm_sections = sec_vec;
-		} else {
-			atomic_rwlock_endwrite(&self->dm_sections_lock);
-			free(sec_vec);
-			COMPILER_READ_BARRIER();
-			goto again_lock_sections;
-		}
-		atomic_rwlock_downgrade(&self->dm_sections_lock);
-	}
-again_read_section:
-	result = self->dm_sections[index];
-	if (!result || !DlSection_TryIncref(result)) {
-		/* Must allocate a descriptor for this section. */
-		atomic_rwlock_endread(&self->dm_sections_lock);
-		result = (REF DlSection *)malloc(sizeof(DlSection));
-		if unlikely(!result)
-			goto err_nomem;
-		result->ds_size    = sect->sh_size;
-		result->ds_entsize = sect->sh_entsize;
-		result->ds_link    = sect->sh_link;
-		result->ds_info    = sect->sh_info;
-		result->ds_refcnt  = 1;
-		result->ds_module  = self;
-		result->ds_index   = index;
-#ifndef CONFIG_NO_DANGLING_DL_SECTIONS
-		result->ds_dangling = (REF DlSection *)-1;
-#endif /* !CONFIG_NO_DANGLING_DL_SECTIONS */
-		atomic_rwlock_init(&result->ds_module_lock);
-		if (sect->sh_flags & SHF_ALLOC) {
-			/* Section is already allocated in member. */
-			result->ds_data  = (void *)(self->dm_loadaddr + sect->sh_addr);
-			result->ds_flags = DLSECTION_FLAG_NORMAL;
-			DlModule_Incref(self); /* Reference stored in `result->ds_module' */
-		} else {
-			result->ds_data  = (void *)-1;
-			result->ds_flags = DLSECTION_FLAG_OWNED;
-		}
-		atomic_rwlock_write(&self->dm_sections_lock);
-		if likely(!self->dm_sections[index]) {
-			self->dm_sections[index] = result;
-		} else {
-			/* Race condition: The section was already allocated in a different thread. */
-			atomic_rwlock_endwrite(&self->dm_sections_lock);
-			free(result);
-			atomic_rwlock_read(&self->dm_sections_lock);
-			goto again_read_section;
-		}
-		atomic_rwlock_downgrade(&self->dm_sections_lock);
-	}
-	atomic_rwlock_endread(&self->dm_sections_lock);
-	if (result->ds_data == (void *)-1 && !(flags & DLLOCKSECTION_FNODATA) &&
-	    (result->ds_flags & DLSECTION_FLAG_OWNED)) {
-		void *base;
-		/* Must load section data. */
-		base = sys_mmap(NULL,
-		                sect->sh_size,
-		                PROT_READ | PROT_WRITE,
-		                MAP_PRIVATE | MAP_FILE,
-		                self->dm_file,
-		                sect->sh_offset);
-		if (E_ISERR(base)) {
-			DlSection_Decref(result);
-			if (flags & DLLOCKSECTION_FINDEX) {
-				dl_seterrorf("%q: Failed to map section #%Iu into memory",
-				                self->dm_filename, (uintptr_t)name);
+err_unknown_section:
+			if (!(flags & DLLOCKSECTION_FINDEX)) {
+				dl_seterror_nosect_index(self, (size_t)name);
 			} else {
-				dl_seterrorf("%q: Failed to map section %q into memory",
-				                self->dm_filename, name);
+				dl_seterror_nosect(self, name);
 			}
 			goto err;
 		}
-		if unlikely(!ATOMIC_CMPXCH(result->ds_data, (void *)-1, base))
-			sys_munmap(base, sect->sh_size);
+		return result;
+	}
+	/* Support for formats other than ELF. */
+	if unlikely(self->dm_ops) {
+		size_t index;
+		struct dl_sect_info info;
+		if unlikely(!self->dm_ops->df_dlsectindex ||
+		            !self->dm_ops->df_dlsectinfo)
+			goto err_unknown_section;
+		if (!(flags & DLLOCKSECTION_FINDEX)) {
+			index = (*self->dm_ops->df_dlsectindex)(self, name);
+			if (index >= self->dm_shnum)
+				goto err_unknown_section;
+		} else {
+			index = (size_t)name;
+		}
+again_lock_sections:
+		atomic_rwlock_read(&self->dm_sections_lock);
+		if (!self->dm_sections) {
+			DlSection **sec_vec;
+			/* Must allocate the initial sections vector. */
+			atomic_rwlock_endread(&self->dm_sections_lock);
+			sec_vec = (DlSection **)calloc(self->dm_shnum,
+			                               sizeof(DlSection *));
+			if unlikely(!sec_vec)
+				goto err_nomem;
+			atomic_rwlock_write(&self->dm_sections_lock);
+			COMPILER_READ_BARRIER();
+			if likely(!self->dm_sections) {
+				self->dm_sections = sec_vec;
+			} else {
+				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				free(sec_vec);
+				COMPILER_READ_BARRIER();
+				goto again_lock_sections;
+			}
+			atomic_rwlock_downgrade(&self->dm_sections_lock);
+		}
+again_read_section:
+		result = self->dm_sections[index];
+		if (!result || !DlSection_TryIncref(result)) {
+			int error;
+			/* Must allocate a descriptor for this section. */
+			atomic_rwlock_endread(&self->dm_sections_lock);
+			result = (REF DlSection *)malloc(sizeof(DlSection));
+			if unlikely(!result)
+				goto err_nomem;
+			error = (*self->dm_ops->df_dlsectinfo)(self, index, &info);
+			if unlikely(error != 0) {
+				free(result);
+				goto err;
+			}
+
+			result->ds_size    = info.dsi_size;
+			result->ds_entsize = info.dsi_entsize;
+			result->ds_link    = info.dsi_link;
+			result->ds_info    = info.dsi_info;
+			result->ds_refcnt  = 1;
+			result->ds_module  = self;
+			result->ds_index   = index;
+			result->ds_dangling = (REF DlSection *)-1;
+			atomic_rwlock_init(&result->ds_module_lock);
+			if (info.dsi_addr) {
+				/* Section is already allocated in member. */
+				result->ds_data  = info.dsi_addr;
+				result->ds_flags = DLSECTION_FLAG_NORMAL;
+				DlModule_Incref(self); /* Reference stored in `result->ds_module' */
+			} else {
+				result->ds_data  = (void *)-1;
+				result->ds_flags = DLSECTION_FLAG_OWNED;
+			}
+			atomic_rwlock_write(&self->dm_sections_lock);
+			if likely(!self->dm_sections[index]) {
+				self->dm_sections[index] = result;
+			} else {
+				/* Race condition: The section was already allocated in a different thread. */
+				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				free(result);
+				atomic_rwlock_read(&self->dm_sections_lock);
+				goto again_read_section;
+			}
+			atomic_rwlock_downgrade(&self->dm_sections_lock);
+		} else {
+			info.dsi_size = 0;
+		}
+		atomic_rwlock_endread(&self->dm_sections_lock);
+		if (result->ds_data == (void *)-1 && !(flags & DLLOCKSECTION_FNODATA) &&
+		    (result->ds_flags & DLSECTION_FLAG_OWNED)) {
+			void *base;
+			if (info.dsi_size == 0) {
+				int error;
+				error = (*self->dm_ops->df_dlsectinfo)(self, index, &info);
+				if unlikely(error != 0)
+					goto err;
+			}
+
+			/* Must load section data. */
+			base = sys_mmap(NULL,
+			                info.dsi_size,
+			                PROT_READ | PROT_WRITE,
+			                MAP_PRIVATE | MAP_FILE,
+			                self->dm_file,
+			                info.dsi_offset);
+			if (E_ISERR(base)) {
+				DlSection_Decref(result);
+				if (flags & DLLOCKSECTION_FINDEX) {
+					dl_seterrorf("%q: Failed to map section #%Iu into memory",
+					                self->dm_filename, (uintptr_t)name);
+				} else {
+					dl_seterrorf("%q: Failed to map section %q into memory",
+					                self->dm_filename, name);
+				}
+				goto err;
+			}
+			if unlikely(!ATOMIC_CMPXCH(result->ds_data, (void *)-1, base))
+				sys_munmap(base, info.dsi_size);
+		}
+	} else {
+		size_t index;
+		ElfW(Shdr) *sect;
+		if (flags & DLLOCKSECTION_FINDEX) {
+			sect = DlModule_ElfGetShdrs(self);
+			if unlikely(!sect)
+				goto err;
+			if unlikely((uintptr_t)name >= self->dm_shnum) {
+				dl_seterror_nosect_index(self, (size_t)name);
+				goto err;
+			}
+			sect += (uintptr_t)name;
+		} else {
+			sect = DlModule_ElfGetSection(self, name);
+			if unlikely(!sect)
+				goto err;
+		}
+		assert(sect >= self->dm_elf.de_shdr);
+		assert(sect < self->dm_elf.de_shdr + self->dm_shnum);
+		index = (size_t)(sect - self->dm_elf.de_shdr);
+again_lock_elf_sections:
+		atomic_rwlock_read(&self->dm_sections_lock);
+		if (!self->dm_sections) {
+			DlSection **sec_vec;
+			/* Must allocate the initial sections vector. */
+			atomic_rwlock_endread(&self->dm_sections_lock);
+			sec_vec = (DlSection **)calloc(self->dm_shnum,
+			                               sizeof(DlSection *));
+			if unlikely(!sec_vec)
+				goto err_nomem;
+			atomic_rwlock_write(&self->dm_sections_lock);
+			COMPILER_READ_BARRIER();
+			if likely(!self->dm_sections) {
+				self->dm_sections = sec_vec;
+			} else {
+				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				free(sec_vec);
+				COMPILER_READ_BARRIER();
+				goto again_lock_elf_sections;
+			}
+			atomic_rwlock_downgrade(&self->dm_sections_lock);
+		}
+again_read_elf_section:
+		result = self->dm_sections[index];
+		if (!result || !DlSection_TryIncref(result)) {
+			/* Must allocate a descriptor for this section. */
+			atomic_rwlock_endread(&self->dm_sections_lock);
+			result = (REF DlSection *)malloc(sizeof(DlSection));
+			if unlikely(!result)
+				goto err_nomem;
+			result->ds_size    = sect->sh_size;
+			result->ds_entsize = sect->sh_entsize;
+			result->ds_link    = sect->sh_link;
+			result->ds_info    = sect->sh_info;
+			result->ds_refcnt  = 1;
+			result->ds_module  = self;
+			result->ds_index   = index;
+			result->ds_dangling = (REF DlSection *)-1;
+			atomic_rwlock_init(&result->ds_module_lock);
+			if (sect->sh_flags & SHF_ALLOC) {
+				/* Section is already allocated in member. */
+				result->ds_data  = (void *)(self->dm_loadaddr + sect->sh_addr);
+				result->ds_flags = DLSECTION_FLAG_NORMAL;
+				DlModule_Incref(self); /* Reference stored in `result->ds_module' */
+			} else {
+				result->ds_data  = (void *)-1;
+				result->ds_flags = DLSECTION_FLAG_OWNED;
+			}
+			atomic_rwlock_write(&self->dm_sections_lock);
+			if likely(!self->dm_sections[index]) {
+				self->dm_sections[index] = result;
+			} else {
+				/* Race condition: The section was already allocated in a different thread. */
+				atomic_rwlock_endwrite(&self->dm_sections_lock);
+				free(result);
+				atomic_rwlock_read(&self->dm_sections_lock);
+				goto again_read_elf_section;
+			}
+			atomic_rwlock_downgrade(&self->dm_sections_lock);
+		}
+		atomic_rwlock_endread(&self->dm_sections_lock);
+		if (result->ds_data == (void *)-1 && !(flags & DLLOCKSECTION_FNODATA) &&
+		    (result->ds_flags & DLSECTION_FLAG_OWNED)) {
+			void *base;
+			/* Must load section data. */
+			base = sys_mmap(NULL,
+			                sect->sh_size,
+			                PROT_READ | PROT_WRITE,
+			                MAP_PRIVATE | MAP_FILE,
+			                self->dm_file,
+			                sect->sh_offset);
+			if (E_ISERR(base)) {
+				DlSection_Decref(result);
+				if (flags & DLLOCKSECTION_FINDEX) {
+					dl_seterrorf("%q: Failed to map section #%Iu into memory",
+					                self->dm_filename, (uintptr_t)name);
+				} else {
+					dl_seterrorf("%q: Failed to map section %q into memory",
+					                self->dm_filename, name);
+				}
+				goto err;
+			}
+			if unlikely(!ATOMIC_CMPXCH(result->ds_data, (void *)-1, base))
+				sys_munmap(base, sect->sh_size);
+		}
 	}
 	return result;
 err_nomem:
@@ -1013,7 +1204,6 @@ INTERN int LIBCCALL
 libdl_dlunlocksection(REF DlSection *sect) {
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
-#ifndef CONFIG_NO_DANGLING_DL_SECTIONS
 	{
 		refcnt_t refcnt;
 		do {
@@ -1046,7 +1236,6 @@ set_dangling_section:
 			DlModule_Decref(mod);
 		}
 	}
-#endif /* !CONFIG_NO_DANGLING_DL_SECTIONS */
 	DlSection_Decref(sect);
 	return 0;
 err_bad_section:
@@ -1076,11 +1265,19 @@ err_mod_unloaded:
 	} else {
 		/* Regular module. */
 		assert(sect->ds_index < mod->dm_shnum);
-		/* TODO: Support for formats other than ELF. */
-		assert(mod->dm_elf.de_shdr != NULL);
-		assert(mod->dm_elf.de_shstrtab != NULL);
-		result  = mod->dm_elf.de_shstrtab;
-		result += mod->dm_elf.de_shdr[sect->ds_index].sh_name;
+		/* Support for formats other than ELF. */
+		if (mod->dm_ops) {
+			if unlikely(!mod->dm_ops->df_dlsectname)
+				result = "?";
+			else {
+				result = (*mod->dm_ops->df_dlsectname)(mod, sect->ds_index);
+			}
+		} else {
+			assert(mod->dm_elf.de_shdr != NULL);
+			assert(mod->dm_elf.de_shstrtab != NULL);
+			result  = mod->dm_elf.de_shstrtab;
+			result += mod->dm_elf.de_shdr[sect->ds_index].sh_name;
+		}
 	}
 	if unlikely(!DlModule_Decref(mod))
 		goto err_mod_unloaded;
@@ -1113,7 +1310,6 @@ libdl_dlsectionmodule(DlSection *sect, unsigned int flags) {
 		dl_seterrorf("Invalid flags %#x passed to `dlsectionmodule()'", flags);
 		goto err;
 	}
-
 	atomic_rwlock_read(&sect->ds_module_lock);
 	mod = sect->ds_module;
 	if (!mod || ((flags & DLGETHANDLE_FINCREF)
@@ -1192,7 +1388,6 @@ again_try_descref_module_iter:
 		}
 		atomic_rwlock_endread(&DlModule_AllLock);
 	}
-#ifndef CONFIG_NO_DANGLING_DL_SECTIONS
 	{
 		DlModule *module_iter;
 		/* Delete dangling sections. */
@@ -1231,7 +1426,6 @@ again_lock_global:
 		}
 		atomic_rwlock_endread(&DlModule_AllLock);
 	}
-#endif /* !CONFIG_NO_DANGLING_DL_SECTIONS */
 	/* Also trim malloc memory from our heap implementation. */
 	if (malloc_trim(0))
 		result = 1;
@@ -1259,6 +1453,17 @@ again:
 		if (mod->dm_finalize)
 			dlmodule_finalizers_run(mod->dm_finalize);
 		/* TODO: Support for formats other than ELF. */
+		if (mod->dm_ops) {
+			if (mod->dm_ops->df_run_finalizers) {
+				TRY {
+					(*mod->dm_ops->df_run_finalizers)(mod);
+				} EXCEPT {
+					DlModule_Decref(mod);
+					RETHROW();
+				}
+			}
+			goto decref_module_and_continue;
+		}
 		fini_func       = 0;
 		fini_array_base = NULL;
 		fini_array_size = 0;
@@ -1296,11 +1501,13 @@ done_dyntag:
 			DlModule_Decref(mod);
 			RETHROW();
 		}
+decref_module_and_continue:
 		DlModule_Decref(mod);
 		goto again;
 	}
 	atomic_rwlock_endread(&DlModule_AllLock);
 }
+
 
 
 INTERN void *LIBCCALL
@@ -1385,9 +1592,67 @@ done_add_finalizer:
 		result = self;
 	}	break;
 
+	case DLAUXCTRL_REGISTER_EXTENSION: {
+		struct dlmodule_format *extension, *next;
+		size_t sizeof_dlmodule_format;
+		size_t sizeof_dlcore_ops;
+		REF DlModule *extmod;
+		extension              = va_arg(args, struct dlmodule_format *);
+		sizeof_dlmodule_format = va_arg(args, size_t);
+		sizeof_dlcore_ops      = va_arg(args, size_t);
+		if (sizeof_dlmodule_format != sizeof(struct dlmodule_format)) {
+			dl_seterrorf("Invalid `sizeof_dlmodule_format': %Iu; current version is %Iu",
+			             sizeof_dlmodule_format, sizeof(struct dlmodule_format));
+			goto err;
+		}
+		if (sizeof_dlcore_ops != sizeof(struct dlcore_ops)) {
+			dl_seterrorf("Invalid `sizeof_dlcore_ops': %Iu; current version is %Iu",
+			             sizeof_dlcore_ops, sizeof(struct dlcore_ops));
+			goto err;
+		}
+		if unlikely(!extension ||
+		            !IS_ALIGNED((uintptr_t)extension, alignof(struct dlmodule_format))) {
+			dl_seterror_badptr(extension);
+			goto err;
+		}
+		/* Lookup which module it is that defines this extension. */
+		extmod = libdl_dlgethandle((void *)extension->df_open, DLGETHANDLE_FINCREF);
+		if unlikely(!extmod)
+			goto err;
+		/* Mark the declaring module as NODELETE. */
+		ATOMIC_FETCHOR(extmod->dm_flags, RTLD_NODELETE);
+		/* Fill in the coreops V-table pointer. */
+		extension->df_core = dl_getcoreops();
+		/* Register the extension. */
+		COMPILER_BARRIER();
+		do {
+			next = ATOMIC_READ(dl_extensions);
+			extension->df_next = next;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(dl_extensions, next, extension));
+		/* Re-return a pointer to the given handle. */
+		result = self;
+	}	break;
+
+	case DLAUXCTRL_GET_DEPENDS: {
+		size_t *pcount;
+		pcount = va_arg(args, size_t *);
+		result = self->dm_depvec;
+		if (pcount)
+			*pcount = self->dm_depcnt;
+	}	break;
+
+	case DLAUXCTRL_ELF_CHECK: {
+		if (self->dm_ops)
+			goto err;
+		result = self;
+	}	break;
+
 	case DLAUXCTRL_ELF_GET_PHDR: {
 		size_t *pcount;
-		/* TODO: Check that this is an ELF module. */
+		/* Check that this is an ELF module. */
+		if unlikely(self->dm_ops)
+			goto err_notelf;
 		pcount = va_arg(args, size_t *);
 		result = self->dm_elf.de_phdr;
 		if (pcount)
@@ -1396,7 +1661,9 @@ done_add_finalizer:
 
 	case DLAUXCTRL_ELF_GET_SHDR: {
 		size_t *pcount;
-		/* TODO: Check that this is an ELF module. */
+		/* Check that this is an ELF module. */
+		if unlikely(self->dm_ops)
+			goto err_notelf;
 		pcount = va_arg(args, size_t *);
 		result = DlModule_ElfGetShdrs(self);
 		if (result && pcount)
@@ -1405,7 +1672,9 @@ done_add_finalizer:
 
 	case DLAUXCTRL_ELF_GET_DYN: {
 		size_t *pcount;
-		/* TODO: Check that this is an ELF module. */
+		/* Check that this is an ELF module. */
+		if unlikely(self->dm_ops)
+			goto err_notelf;
 		pcount = va_arg(args, size_t *);
 		result = self->dm_elf.de_dynhdr;
 		if (pcount)
@@ -1414,7 +1683,9 @@ done_add_finalizer:
 
 	case DLAUXCTRL_ELF_GET_DYNSYM: {
 		size_t *pcount;
-		/* TODO: Check that this is an ELF module. */
+		/* Check that this is an ELF module. */
+		if unlikely(self->dm_ops)
+			goto err_notelf;
 		pcount = va_arg(args, size_t *);
 		result = self->dm_elf.de_dynsym_tab;
 		if (pcount) {
@@ -1425,22 +1696,18 @@ done_add_finalizer:
 	}	break;
 
 	case DLAUXCTRL_ELF_GET_DYNSTR:
-		/* TODO: Check that this is an ELF module. */
+		/* Check that this is an ELF module. */
+		if unlikely(self->dm_ops)
+			goto err_notelf;
 		result = self->dm_elf.de_dynstr;
 		break;
 
 	case DLAUXCTRL_ELF_GET_SHSTRTAB:
-		/* TODO: Check that this is an ELF module. */
+		/* Check that this is an ELF module. */
+		if unlikely(self->dm_ops)
+			goto err_notelf;
 		result = DlModule_ElfGetShstrtab(self);
 		break;
-
-	case DLAUXCTRL_ELF_GET_DEPENDS: {
-		size_t *pcount;
-		pcount = va_arg(args, size_t *);
-		result = self->dm_depvec;
-		if (pcount)
-			*pcount = self->dm_depcnt;
-	}	break;
 
 	default:
 		dl_seterrorf("Invalid auxctrl command %#x", cmd);
@@ -1449,6 +1716,9 @@ done_add_finalizer:
 done:
 	va_end(args);
 	return result;
+err_notelf:
+	dl_seterror_notelf(self);
+	goto err;
 err_nomem:
 	dl_seterror_nomem();
 err:
@@ -1946,12 +2216,6 @@ stringSwitch("name",
 }
 
 
-#ifndef CONFIG_NO_DANGLING_DL_SECTIONS
-#define IFNDEF_NO_DANGLING_DL_SECTIONS(...) __VA_ARGS__
-#else /* !CONFIG_NO_DANGLING_DL_SECTIONS */
-#define IFNDEF_NO_DANGLING_DL_SECTIONS(...) /* nothing */
-#endif /* CONFIG_NO_DANGLING_DL_SECTIONS */
-
 #define INIT_RTLD_SECTION(index, link_name)                                                                            \
 	{                                                                                                                  \
 		.ds_data        = NULL, /* Initialized later */                                                                \
@@ -1962,8 +2226,8 @@ stringSwitch("name",
 		.ds_refcnt      = 1,                                                                                           \
 		.ds_module_lock = ATOMIC_RWLOCK_INIT,                                                                          \
 		.ds_module      = NULL, /* Initialized later */                                                                \
-		IFNDEF_NO_DANGLING_DL_SECTIONS(.ds_dangling = NULL, )                                                          \
-		.ds_flags = DLSECTION_FLAG_OWNED,                                                                          \
+		.ds_dangling    = NULL,                                                                                        \
+		.ds_flags = DLSECTION_FLAG_OWNED,                                                                              \
 		.ds_index = index,                                                                                             \
 	}
 
@@ -2034,7 +2298,7 @@ dlsec_builtin(char const *__restrict name) {
  * is defined, log an error message to the system log and terminate the hosted
  * application ungracefully. */
 INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) void *FCALL
-require_global(char const *__restrict name) {
+dl_require_global(char const *__restrict name) {
 	void *result;
 	/* Search all globally loaded modules for the symbol. */
 	result = libdl_dlsym((DlModule *)RTLD_DEFAULT, name);

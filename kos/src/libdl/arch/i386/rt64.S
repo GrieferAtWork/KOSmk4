@@ -24,7 +24,7 @@
 
 #include "../../api.h"
 
-INTERN(require_global)
+INTERN(dl_require_global)
 
 #define DEFINE_GLOBAL_SYMBOL_IMPORT(name)                 \
 	.section .rodata.str.1;                               \
@@ -44,7 +44,7 @@ INTERN(require_global)
 		pushq_cfi_r %r10;                                 \
 		pushq_cfi_r %r11;                                 \
 		leaq   991b(%rip), %rdi;                          \
-		call   require_global;                            \
+		call   dl_require_global;                          \
 		movq   %rax, 80(%rsp); /* RETURN_PC_OVERRIDE */   \
 		.cfi_rel_offset %rip, 80;                         \
 		popq_cfi_r %r11;                                  \

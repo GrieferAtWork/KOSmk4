@@ -160,33 +160,12 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 	}	break;
 
 	case AT_NOTELF: {
-		fd_t rootfd;
-		byte_t ehdr_data[offsetafter(ElfW(Ehdr), e_entry)];
-		ElfW(Ehdr) *ehdr = (ElfW(Ehdr) *)ehdr_data;
-		rootfd = dlmodulefd(dlopen(NULL, 0));
-		if (preadall(rootfd, ehdr_data, sizeof(ehdr_data), 0) < (ssize_t)sizeof(ehdr_data)) {
-is_not_elf:
-			result = 1;
-			break;
-		}
-		if (ehdr->e_ident[EI_MAG0] != ELFMAG0 ||
-		    ehdr->e_ident[EI_MAG1] != ELFMAG1 ||
-		    ehdr->e_ident[EI_MAG2] != ELFMAG2 ||
-		    ehdr->e_ident[EI_MAG3] != ELFMAG3)
-			goto is_not_elf;
-		if (ehdr->e_ident[EI_CLASS] != ELF_ARCH_CLASS)
-			goto is_not_elf;
-		if (ehdr->e_ident[EI_DATA] != ELF_ARCH_DATA)
-			goto is_not_elf;
-		if (ehdr->e_ident[EI_VERSION] != EV_CURRENT)
-			goto is_not_elf;
-		if (ehdr->e_version != EV_CURRENT)
-			goto is_not_elf;
-		if (ehdr->e_type != ET_EXEC)
-			goto is_not_elf;
-		if (ehdr->e_machine != ELF_ARCH_MACHINE)
-			goto is_not_elf;
-		goto not_found;
+		/* Check if the main executable image is an ELF image.
+		 * If so, the we don't know the `AT_NOTELF' key.
+		 * Otherwise, the `AT_NOTELF' key has a value of `1' */
+		if (dlauxctrl(dlopen(NULL, 0), DLAUXCTRL_ELF_CHECK))
+			goto not_found;
+		result = 1;
 	}	break;
 
 	case AT_UID:

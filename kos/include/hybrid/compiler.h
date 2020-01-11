@@ -51,8 +51,11 @@
 #define ATTR_SYSVABI            __ATTR_SYSVABI
 #define ATTR_MSABI              __ATTR_MSABI
 #define ATTR_PURE               __ATTR_PURE
+#define ATTR_PURE_P             __ATTR_PURE_P
 #define ATTR_CONST              __ATTR_CONST
+#define ATTR_CONST_P            __ATTR_CONST_P
 #define ATTR_LEAF               __ATTR_LEAF
+#define ATTR_LEAF_P             __ATTR_LEAF_P
 #define ATTR_FLATTEN            __ATTR_FLATTEN
 #define ATTR_MALLOC             __ATTR_MALLOC
 #define ATTR_HOT                __ATTR_HOT

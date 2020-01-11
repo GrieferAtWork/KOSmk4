@@ -68,10 +68,9 @@ INTERN DlModule dl_rtld_module = {
 	.dm_depvec        = NULL,
 	.dm_sections_lock = ATOMIC_RWLOCK_INIT,
 	.dm_sections      = (DlSection **)(uintptr_t)-1,
-#ifndef CONFIG_NO_DANGLING_DL_SECTIONS
 	.dm_sections_dangling = (DlSection *)(uintptr_t)-1,
-#endif /* !CONFIG_NO_DANGLING_DL_SECTIONS */
 	.dm_shnum         = BUILTIN_SECTIONS_COUNT,
+	.dm_ops = NULL,
 	.dm_elf = {
 		.de_pltgot        = NULL,
 #if !ELF_ARCH_USESRELA
@@ -181,13 +180,15 @@ linker_main(struct elfexec_info *__restrict info,
 	if (!dl_library_path)
 		dl_library_path = (char *)RTLD_LIBRARY_PATH;
 
-	/* User-level initializers must be run _after_ we've initialized static TLS!
-	 * NOTE: this is done in `_start32.S' by manually calling `DlModule_RunAllStaticInitializers'
-	 *       just prior to jumping to the primary application's _start() function. */
+	/* TODO: Support for executable formats other than ELF */
 	base_module = DlModule_ElfOpenLoadedProgramHeaders(filename, info, loadaddr);
 	if unlikely(!base_module)
 		goto err;
 	assert(base_module->dm_flags & RTLD_NOINIT);
+
+	/* User-level initializers must be run _after_ we've initialized static TLS!
+	 * NOTE: this is done in `_start32.S' by manually calling `DlModule_RunAllStaticInitializers'
+	 *       just prior to jumping to the primary application's _start() function. */
 
 	/* Initialize the static TLS table. */
 	if unlikely(DlModule_InitStaticTLSBindings())

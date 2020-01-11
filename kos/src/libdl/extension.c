@@ -16,41 +16,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_EXEC_BITS_LIBRARY_H
-#define _KOS_EXEC_BITS_LIBRARY_H 1
+#ifndef GUARD_LIBDL_EXTENSION_C
+#define GUARD_LIBDL_EXTENSION_C 1
+#define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
-#include <__stdinc.h>
+/* Keep this one the first */
+#include "dl.h"
+/**/
 
-#include <bits/types.h>
+DECL_BEGIN
 
-__DECL_BEGIN
+/* [0..1][ATOMIC(APPEND)] Chain of registered DL extensions.
+ * NOTE: Once registered, a DL extension cannot be deleted! */
+INTERN struct dlmodule_format *dl_extensions = NULL;
 
-#ifdef __CC__
+PRIVATE struct dlcore_ops dl_coreops;
 
-#ifdef __KERNEL__
-struct driver;
-typedef struct driver *library_handle_t;
-typedef struct driver_section *section_handle_t;
-#else /* __KERNEL__ */
-#ifdef _LIBDL_MODULE_H
-struct dlmodule;
-struct dlsection;
-typedef struct dlmodule *library_handle_t;
-typedef struct dlsection *section_handle_t;
-#else /* _LIBDL_MODULE_H */
-#ifdef __INTELLISENSE__
-struct __library_handle_struct;
-typedef struct __library_handle_struct *library_handle_t;
-#else /* __INTELLISENSE__ */
-typedef void *library_handle_t;
-#endif /* !__INTELLISENSE__ */
-typedef struct dl_section *section_handle_t;
-#endif /* !_LIBDL_MODULE_H */
-typedef __fd_t library_file_t;
-#endif /* !__KERNEL__ */
+/* Lazily initialize and return the libdl core ops V-table. */
+INTERN WUNUSED ATTR_RETNONNULL struct dlcore_ops *CC dl_getcoreops(void) {
+	struct dlcore_ops *result;
+	result = &dl_coreops;
+	if (!result->DlModule_Destroy) {
+		COMPILER_WRITE_BARRIER();
+#define DL_COREOPS_SKIP_DLMODULE_DESTROY 1
+#define DL_COREOP(attr, return, cc, name, args) result->name = &name;
+#define DL_COREFIELD(type, name)                result->name = &name;
+#include <libdl/coreops.def>
+#undef DL_COREOPS_SKIP_DLMODULE_DESTROY
+		COMPILER_WRITE_BARRIER();
+		ATOMIC_WRITE(result->DlModule_Destroy, &DlModule_Destroy);
+	}
+	return result;
+}
 
-#endif /* __CC__ */
 
-__DECL_END
+DECL_END
 
-#endif /* !_KOS_EXEC_BITS_LIBRARY_H */
+#endif /* !GUARD_LIBDL_EXTENSION_C */

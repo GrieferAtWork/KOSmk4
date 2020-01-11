@@ -57,7 +57,7 @@ INTERN LLIST(DlModule) DlModule_AllList = LLIST_INIT;
 INTERN DEFINE_ATOMIC_RWLOCK(DlModule_AllLock);
 
 
-INTERN WUNUSED fd_t CC reopen_bigfs(fd_t fd) {
+INTERN WUNUSED fd_t CC reopen_bigfd(fd_t fd) {
 	enum {
 		MAX_RESERVED_FD_2 = STDIN_FILENO > STDOUT_FILENO
 		                    ? STDIN_FILENO
@@ -206,7 +206,7 @@ DlModule_OpenFilename(char const *__restrict filename,
 	/* Make sure to only use big file descriptor indices, so-as
 	 * to prevent use of reserved file numbers, as used by the
 	 * standard I/O handles (aka. `STD(IN|OUT|ERR)_FILENO') */
-	fd     = reopen_bigfs(fd);
+	fd     = reopen_bigfd(fd);
 	result = DlModule_OpenFd(fd, mode);
 	if unlikely(!result)
 		sys_close(fd);
@@ -490,7 +490,7 @@ err:
 }
 
 
-INTERN WUNUSED NONNULL((1, 2)) REF_IF(!(mode & RTLD_NODELETE)) DlModule *CC
+INTERN WUNUSED NONNULL((1, 2)) REF DlModule *CC
 DlModule_ElfOpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
                                      struct elfexec_info *__restrict info, uintptr_t loadaddr) {
 	REF DlModule *result;
@@ -501,6 +501,7 @@ DlModule_ElfOpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restri
 	if unlikely(!result)
 		goto err_nomem;
 	memcpy(result->dm_elf.de_phdr, info->ei_phdr, info->ei_pnum, sizeof(ElfW(Phdr)));
+	/*result->dm_ops     = NULL;*/ /* Implicitly done by `calloc()' */
 	result->dm_loadstart = (uintptr_t)-1;
 	/*result->dm_loadend = 0;*/
 	for (pidx = 0; pidx < info->ei_pnum; ++pidx) {
@@ -583,33 +584,31 @@ err:
 }
 
 
-PRIVATE WUNUSED NONNULL((1)) REF DlModule *CC
-DlModule_ElfMapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
+PRIVATE WUNUSED NONNULL((1, 2)) REF DlModule *CC
+DlModule_ElfMapProgramHeaders(ElfW(Ehdr) const *__restrict ehdr,
+                              /*inherit(on_success,HEAP)*/ char *__restrict filename,
                               /*inherit(on_success)*/ fd_t fd) {
-	ElfW(Ehdr) ehdr;
 	uint16_t pidx;
 	REF DlModule *result;
-	if unlikely(preadall(fd, &ehdr, sizeof(ehdr), 0) <= 0)
-		goto err_io;
-	if unlikely(DlModule_ElfVerifyEhdr(&ehdr, filename, true))
+	if unlikely(DlModule_ElfVerifyEhdr(ehdr, filename, true))
 		goto err;
-
 	result = (REF DlModule *)calloc(1,
 	                                offsetof(DlModule, dm_elf.de_phdr) +
-	                                (ehdr.e_phnum * sizeof(ElfW(Phdr))));
+	                                (ehdr->e_phnum * sizeof(ElfW(Phdr))));
 	if unlikely(!result)
 		goto err_nomem;
-	if (preadall(fd, result->dm_elf.de_phdr, ehdr.e_phnum * sizeof(ElfW(Phdr)), ehdr.e_phoff) <= 0)
+	if (preadall(fd, result->dm_elf.de_phdr, ehdr->e_phnum * sizeof(ElfW(Phdr)), ehdr->e_phoff) <= 0)
 		goto err_r_io;
-	result->dm_filename = filename; /* Inherit data */
-	result->dm_file     = fd;       /* Inherit data */
-	result->dm_elf.de_abi      = ehdr.e_ident[EI_OSABI];
-	result->dm_elf.de_abiver   = ehdr.e_ident[EI_ABIVERSION];
-	result->dm_elf.de_phnum    = ehdr.e_phnum;
-	result->dm_shnum           = ehdr.e_shnum;
-	result->dm_elf.de_shoff    = ehdr.e_shoff;
-	result->dm_elf.de_shstrndx = ehdr.e_shstrndx;
-	if unlikely(ehdr.e_shentsize != sizeof(ElfW(Shdr))) {
+	/*result->dm_ops           = NULL;*/   /* Implicitly done by `calloc()' */
+	result->dm_filename        = filename; /* Inherit data */
+	result->dm_file            = fd;       /* Inherit data */
+	result->dm_elf.de_abi      = ehdr->e_ident[EI_OSABI];
+	result->dm_elf.de_abiver   = ehdr->e_ident[EI_ABIVERSION];
+	result->dm_elf.de_phnum    = ehdr->e_phnum;
+	result->dm_shnum           = ehdr->e_shnum;
+	result->dm_elf.de_shoff    = ehdr->e_shoff;
+	result->dm_elf.de_shstrndx = ehdr->e_shstrndx;
+	if unlikely(ehdr->e_shentsize != sizeof(ElfW(Shdr))) {
 		result->dm_elf.de_shoff    = 0;
 		result->dm_shnum           = (size_t)-1;
 		result->dm_elf.de_shstrndx = (ElfW(Half))-1;
@@ -651,8 +650,8 @@ DlModule_ElfMapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict file
 	return result;
 err_r_io:
 	free(result);
-err_io:
-	dl_seterrorf("%q: Failed to read headers", filename);
+/*err_io:*/
+	dl_seterror_header_read_error(filename);
 	goto err;
 err_nomem:
 	dl_seterror_nomem();
@@ -660,18 +659,53 @@ err:
 	return NULL;
 }
 
+INTERN ATTR_COLD int CC
+dl_seterror_header_read_error(char const *__restrict filename) {
+	return dl_seterrorf("%q: Failed to read headers", filename);
+}
+
+INTERN ATTR_COLD int CC
+dl_seterror_notelf(DlModule *__restrict self) {
+	return dl_seterrorf("%q: Not an ELF object", self->dm_filename);
+}
 
 
 INTERN WUNUSED NONNULL((1)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filename,
                            /*inherit(on_success)*/ fd_t fd, unsigned int mode) {
+	ElfW(Ehdr) ehdr;
 	REF DlModule *result;
 	result = DlModule_FindFromFilename(filename);
-	if (result)
-		goto done_existing;
-	/* TODO: Support for formats other than ELF. */
+	if (result) {
+		sys_close(fd);
+		free(filename);
+		update_module_flags(result, mode);
+		goto done;
+	}
+	if unlikely(preadall(fd, &ehdr, sizeof(ehdr), 0) <= 0)
+		goto err_io;
+	/* Support for formats other than ELF. */
+	if unlikely(ehdr.e_ident[EI_MAG0] != ELFMAG0 ||
+	            ehdr.e_ident[EI_MAG1] != ELFMAG1 ||
+	            ehdr.e_ident[EI_MAG2] != ELFMAG2 ||
+	            ehdr.e_ident[EI_MAG3] != ELFMAG3) {
+		struct dlmodule_format *ext;
+		ext = ATOMIC_READ(dl_extensions);
+		for (; ext; ext = ext->df_next) {
+			if (memcmp(&ehdr, ext->df_magic, ext->df_magsz) != 0)
+				continue; /* Non-matching magic. */
+			/* Found the format! */
+			result = (*ext->df_open)((byte_t const *)&ehdr, filename, fd);
+			if unlikely(result == NULL)
+				goto err;
+			if unlikely(result == DLMODULE_FORMAT_OPEN_BAD_MAGIC)
+				continue; /* Continue searching */
+			/* Got it! */
+			goto done;
+		}
+	}
 	/* Map the executable into memory. */
-	result = DlModule_ElfMapProgramHeaders(filename, fd);
+	result = DlModule_ElfMapProgramHeaders(&ehdr, filename, fd);
 	if unlikely(!result)
 		goto done;
 	result->dm_flags = (uint32_t)mode | RTLD_LOADING;
@@ -680,16 +714,16 @@ DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 		goto err_r;
 done:
 	return result;
-done_existing:
-	sys_close(fd);
-	free(filename);
-	update_module_flags(result, mode);
-	goto done;
+err_io:
+	dl_seterror_header_read_error(filename);
+	goto err;
 err_r:
 	result->dm_file     = -1;
 	result->dm_filename = NULL;
 	DlModule_Destroy(result);
-	return NULL;
+err:
+	result = NULL;
+	goto done;
 }
 
 
@@ -731,7 +765,14 @@ DlModule_FindFromStaticPointer(void const *static_pointer) {
 			continue;
 		if ((uintptr_t)static_pointer >= result->dm_loadend)
 			continue;
-		/* TODO: Support for formats other than ELF. */
+		/* Support for formats other than ELF. */
+		if (result->dm_ops) {
+			if (!(*result->dm_ops->df_ismapped)(result,
+			                                    (uintptr_t)static_pointer -
+			                                    result->dm_loadaddr))
+				continue;
+			goto got_result;
+		}
 		/* Make sure that `static_pointer' maps to some program segment. */
 		for (i = 0; i < result->dm_elf.de_phnum; ++i) {
 			uintptr_t segment_base;
@@ -743,7 +784,6 @@ DlModule_FindFromStaticPointer(void const *static_pointer) {
 			if ((uintptr_t)static_pointer >= segment_base + result->dm_elf.de_phdr[i].p_memsz)
 				continue;
 			/* Found the segment! */
-			/*DlModule_Incref(result);*/ /* This function doesn't return an address! */
 			goto got_result;
 		}
 	}
@@ -751,9 +791,11 @@ DlModule_FindFromStaticPointer(void const *static_pointer) {
 	dl_seterror_no_mod_at_addr(static_pointer);
 	return NULL;
 got_result:
+	/*DlModule_Incref(result);*/ /* This function doesn't return a reference! */
 	atomic_rwlock_endread(&DlModule_GlobalLock);
 	return result;
 }
+
 
 
 DECL_END

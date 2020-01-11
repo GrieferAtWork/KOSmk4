@@ -21,6 +21,8 @@
 
 #include <__stdinc.h>
 
+#include <compat/config.h>
+#ifdef __ARCH_HAVE_COMPAT
 #include <compat/kos/exec/asm/elf.h>
 #include <compat/kos/exec/bits/elf.h>
 #include <kos/exec/elf.h>
@@ -227,13 +229,17 @@
 
 #ifndef COMPAT_ELFW
 #if COMPAT_ELF_ARCH_CLASS == ELFCLASS32
-#define COMPAT_ELFW(x) ELF32_##x
-#define COMPAT_ElfW(x) Elf32_##x
-#define COMPAT_elfW(x) elf32_##x
+#define COMPAT_ELFW(x)          ELF32_##x
+#define COMPAT_ElfW(x)          Elf32_##x
+#define COMPAT_elfW(x)          elf32_##x
+#define __OFFSET_COMPAT_ELFW(x) __OFFSET_ELF32_##x
+#define __SIZEOF_COMPAT_ELFW(x) __SIZEOF_ELF32_##x
 #elif COMPAT_ELF_ARCH_CLASS == ELFCLASS64
-#define COMPAT_ELFW(x) ELF64_##x
-#define COMPAT_ElfW(x) Elf64_##x
-#define COMPAT_elfW(x) elf64_##x
+#define COMPAT_ELFW(x)          ELF64_##x
+#define COMPAT_ElfW(x)          Elf64_##x
+#define COMPAT_elfW(x)          elf64_##x
+#define __OFFSET_COMPAT_ELFW(x) __OFFSET_ELF64_##x
+#define __SIZEOF_COMPAT_ELFW(x) __SIZEOF_ELF64_##x
 #endif
 #endif /* !COMPAT_ELFW */
 
@@ -274,5 +280,6 @@ __DECL_END
 #endif /* !compat_elfexec_info_getentry */
 
 #endif /* __CC__ */
+#endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_KOS_EXEC_ELF_H */

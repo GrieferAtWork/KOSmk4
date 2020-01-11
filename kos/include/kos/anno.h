@@ -31,6 +31,7 @@
 #define __KERNEL        /* Annotation for kernel-space memory (default within kernel). */
 #define __WEAK          /* Annotation for weakly referenced data/data updated randomly with both the old/new state remaining valid forever. */
 #define __REF           /* Annotation for reference holders. */
+#define __REF_IF(x)     /* Annotation for reference holders. */
 #define __FREE          /* Annotation for functions / data that are apart of the .free section. */
 #define __NOBLOCK       /* Annotation for functions that are guarantied to never block,
                          * making them safe to-be called from any asynchronous context. */

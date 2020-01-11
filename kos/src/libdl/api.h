@@ -19,6 +19,7 @@
 #ifndef GUARD_LIBDL_API_H
 #define GUARD_LIBDL_API_H 1
 
+#define __BUILDING_LIBDL 1
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 #define _KOS_KERNEL_SOURCE 1
@@ -98,14 +99,10 @@
 #include <hybrid/compiler.h>
 #include <hybrid/host.h>
 #include <kos/types.h>
+#include <libdl/api.h>
 
-#if defined(__i386__) && !defined(__x86_64__)
-#define CC   ATTR_STDCALL
-#define VCC  ATTR_CDECL
-#else /* __i386__ && !__x86_64__ */
-#define CC   /* nothing */
-#define VCC  /* nothing */
-#endif /* !__i386__ || __x86_64__ */
+#define CC   LIBDL_CC
+#define VCC  LIBDL_VCC
 
 #ifndef FCALL
 #define FCALL __FCALL

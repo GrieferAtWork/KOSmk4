@@ -16,41 +16,31 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_EXEC_BITS_LIBRARY_H
-#define _KOS_EXEC_BITS_LIBRARY_H 1
+#ifndef _LIBDL_API_H
+#define _LIBDL_API_H 1
 
+#include <__crt.h>
 #include <__stdinc.h>
 
-#include <bits/types.h>
+#if defined(__i386__) && !defined(__x86_64__)
+#define LIBDL_CC  __ATTR_STDCALL
+#define LIBDL_VCC __ATTR_CDECL
+#else /* __i386__ && !__x86_64__ */
+#define LIBDL_CC  __LIBCCALL
+#define LIBDL_VCC __VLIBCCALL
+#endif /* !__i386__ || __x86_64__ */
 
-__DECL_BEGIN
+#if 0
+#define LIBDL_WANT_PROTOTYPES 1
+#endif
 
-#ifdef __CC__
+#ifdef __LIBDL_STATIC
+#define LIBDL_DECL __INTDEF
+#else
+#define LIBDL_DECL __IMPDEF
+#endif
 
-#ifdef __KERNEL__
-struct driver;
-typedef struct driver *library_handle_t;
-typedef struct driver_section *section_handle_t;
-#else /* __KERNEL__ */
-#ifdef _LIBDL_MODULE_H
-struct dlmodule;
-struct dlsection;
-typedef struct dlmodule *library_handle_t;
-typedef struct dlsection *section_handle_t;
-#else /* _LIBDL_MODULE_H */
-#ifdef __INTELLISENSE__
-struct __library_handle_struct;
-typedef struct __library_handle_struct *library_handle_t;
-#else /* __INTELLISENSE__ */
-typedef void *library_handle_t;
-#endif /* !__INTELLISENSE__ */
-typedef struct dl_section *section_handle_t;
-#endif /* !_LIBDL_MODULE_H */
-typedef __fd_t library_file_t;
-#endif /* !__KERNEL__ */
+/* Library name for use with `dlopen()' */
+#define LIBDL_LIBRARY_NAME "libdl.so"
 
-#endif /* __CC__ */
-
-__DECL_END
-
-#endif /* !_KOS_EXEC_BITS_LIBRARY_H */
+#endif /* !_LIBDL_API_H */

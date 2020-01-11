@@ -69,10 +69,6 @@ dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self) {
 /* DlModule functions */
 INTERN NONNULL((1)) void CC
 DlModule_Destroy(DlModule *__restrict self) {
-	size_t i;
-	uintptr_t fini_func        = 0;
-	uintptr_t *fini_array_base = NULL;
-	size_t fini_array_size     = 0;
 
 	/* Unbind the module from the list of all modules. */
 	atomic_rwlock_write(&DlModule_AllLock);
@@ -104,63 +100,82 @@ DlModule_Destroy(DlModule *__restrict self) {
 		free(self->dm_finalize);
 	}
 
-	/* TODO: Support for formats other than ELF. */
 	/* Skip finalizers if the library was never initialized. */
 	if unlikely(self->dm_flags & RTLD_NOINIT)
 		goto done_fini;
-	for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
-		switch (self->dm_elf.de_dynhdr[i].d_tag) {
-
-		case DT_NULL:
-			goto done_dyntag;
-
-		case DT_FINI:
-			fini_func = (uintptr_t)self->dm_elf.de_dynhdr[i].d_un.d_ptr;
-			break;
-
-		case DT_FINI_ARRAY:
-			fini_array_base = (uintptr_t *)(self->dm_loadaddr +
-			                                self->dm_elf.de_dynhdr[i].d_un.d_ptr);
-			break;
-
-		case DT_FINI_ARRAYSZ:
-			fini_array_size = (size_t)self->dm_elf.de_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
-			break;
-
-		default: break;
+	/* Support for formats other than ELF. */
+	if (self->dm_ops) {
+		if (self->dm_ops->df_run_finalizers)
+			(*self->dm_ops->df_run_finalizers)(self);
+	} else {
+		size_t i;
+		uintptr_t fini_func        = 0;
+		uintptr_t *fini_array_base = NULL;
+		size_t fini_array_size     = 0;
+		for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
+			switch (self->dm_elf.de_dynhdr[i].d_tag) {
+	
+			case DT_NULL:
+				goto done_dyntag;
+	
+			case DT_FINI:
+				fini_func = (uintptr_t)self->dm_elf.de_dynhdr[i].d_un.d_ptr;
+				break;
+	
+			case DT_FINI_ARRAY:
+				fini_array_base = (uintptr_t *)(self->dm_loadaddr +
+				                                self->dm_elf.de_dynhdr[i].d_un.d_ptr);
+				break;
+	
+			case DT_FINI_ARRAYSZ:
+				fini_array_size = (size_t)self->dm_elf.de_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
+				break;
+	
+			default: break;
+			}
 		}
-	}
 done_dyntag:
-	/* Service fini-array functions in reverse order. */
-	while (fini_array_size--)
-		(*(void (*)(void))(fini_array_base[fini_array_size] /* + self->dm_loadaddr*/))();
-	/* Service a fini function, if one was specified. */
-	if (fini_func)
-		(*(void (*)(void))(fini_func + self->dm_loadaddr))();
+		/* Service fini-array functions in reverse order. */
+		while (fini_array_size--)
+			(*(void (*)(void))(fini_array_base[fini_array_size] /* + self->dm_loadaddr*/))();
+		/* Service a fini function, if one was specified. */
+		if (fini_func)
+			(*(void (*)(void))(fini_func + self->dm_loadaddr))();
+	}
 done_fini:
-	/* Delete memory mappings of the module. */
-	COMPILER_BARRIER();
-	for (i = 0; i < self->dm_elf.de_phnum; ++i) {
-		if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
-			continue;
-		sys_munmap((void *)(self->dm_elf.de_phdr[i].p_vaddr + self->dm_loadaddr),
-		           self->dm_elf.de_phdr[i].p_memsz);
+	if (self->dm_ops) {
+		(*self->dm_ops->df_fini)(self);
+	} else {
+		ElfW(Half) i;
+		/* Delete memory mappings of the module. */
+		COMPILER_BARRIER();
+		for (i = 0; i < self->dm_elf.de_phnum; ++i) {
+			if (self->dm_elf.de_phdr[i].p_type != PT_LOAD)
+				continue;
+			sys_munmap((void *)(self->dm_elf.de_phdr[i].p_vaddr + self->dm_loadaddr),
+			           self->dm_elf.de_phdr[i].p_memsz);
+		}
+		if (self->dm_elf.de_shdr != empty_shdr)
+			free(self->dm_elf.de_shdr);
+		free(self->dm_elf.de_shstrtab);
 	}
 	COMPILER_BARRIER();
 	/* Drop references from dependent modules. */
-	for (i = 0; i < self->dm_depcnt; ++i) {
-		DlModule *temp;
-		temp = self->dm_depvec[i];
-		if (!(temp->dm_flags & RTLD_NODELETE))
-			DlModule_Decref(temp);
+	{
+		size_t i;
+		for (i = 0; i < self->dm_depcnt; ++i) {
+			DlModule *temp;
+			temp = self->dm_depvec[i];
+			if (!(temp->dm_flags & RTLD_NODELETE))
+				DlModule_Decref(temp);
+		}
 	}
 	if (self->dm_file > 0)
 		sys_close(self->dm_file);
 	/* TODO: Support for formats other than ELF. */
 	/* Free dynamically allocated heap-memory. */
-	if (self->dm_elf.de_shdr != empty_shdr)
-		free(self->dm_elf.de_shdr);
 	if (self->dm_sections) {
+		size_t i;
 again_free_sections:
 		atomic_rwlock_write(&self->dm_sections_lock);
 		for (i = 0; i < self->dm_shnum; ++i) {
@@ -187,7 +202,6 @@ again_free_sections:
 			memset(&self->dm_sections[i], 0xcc, sizeof(self->dm_sections[i]));
 #endif /* !NDEBUG */
 		}
-#ifndef CONFIG_NO_DANGLING_DL_SECTIONS
 		{
 			REF DlSection *dangle, *next;
 			dangle = self->dm_sections_dangling;
@@ -199,9 +213,6 @@ again_free_sections:
 				dangle = next;
 			}
 		}
-#else /* !CONFIG_NO_DANGLING_DL_SECTIONS */
-		atomic_rwlock_endwrite(&self->dm_sections_lock);
-#endif /* CONFIG_NO_DANGLING_DL_SECTIONS */
 		free(self->dm_sections);
 	}
 	if (self->dm_tlsmsize) {
@@ -212,14 +223,13 @@ again_free_sections:
 	} else {
 		assert(!self->dm_tlsfsize);
 	}
-	free(self->dm_elf.de_shstrtab);
 	free(self->dm_depvec);
 	free(self->dm_filename);
 	free(self);
 }
 
 
-INTDEF WUNUSED fd_t CC reopen_bigfs(fd_t fd);
+INTDEF WUNUSED fd_t CC reopen_bigfd(fd_t fd);
 
 /* Lazily allocate if necessary, and return the file descriptor for `self' */
 INTERN WUNUSED NONNULL((1)) fd_t CC
@@ -234,7 +244,7 @@ DlModule_GetFd(DlModule *__restrict self) {
 		/* Make sure to only use big file descriptor indices, so-as
 		 * to prevent use of reserved file numbers, as used by the
 		 * standard I/O handles (aka. `STD(IN|OUT|ERR)_FILENO') */
-		result    = reopen_bigfs(result);
+		result    = reopen_bigfd(result);
 		newresult = ATOMIC_CMPXCH_VAL(self->dm_file, -1, result);
 		if unlikely(newresult != -1) {
 			sys_close(result);
@@ -258,6 +268,7 @@ INTERN WUNUSED NONNULL((1)) ElfW(Shdr) *CC
 DlModule_ElfGetShdrs(DlModule *__restrict self) {
 	fd_t fd;
 	ElfW(Shdr) *result;
+	assert(!self->dm_ops);
 	result = self->dm_elf.de_shdr;
 	if (result != NULL)
 		return result;
@@ -328,6 +339,7 @@ INTERN WUNUSED NONNULL((1)) char *CC
 DlModule_ElfGetShstrtab(DlModule *__restrict self) {
 	char *result;
 	ElfW(Shdr) *shdrs;
+	assert(!self->dm_ops);
 	result = self->dm_elf.de_shstrtab;
 	if (result)
 		return result;
@@ -362,11 +374,11 @@ DlModule_ElfGetShstrtab(DlModule *__restrict self) {
 	return result;
 err_read_shstrtab:
 	dl_seterrorf("%q: Failed to read contents of `e_shstrndx=%u' (`sh_offset=%I64u')",
-	                self->dm_filename, self->dm_elf.de_shstrndx, (u64)shdrs->sh_offset);
+	             self->dm_filename, self->dm_elf.de_shstrndx, (u64)shdrs->sh_offset);
 	goto err;
 err_nomem:
 	dl_seterrorf("%q: Failed to allocate section header string table",
-	                self->dm_filename);
+	             self->dm_filename);
 err:
 	return NULL;
 }
@@ -379,12 +391,20 @@ dl_seterror_nosect(DlModule *__restrict self,
 	                    self->dm_filename, name);
 }
 
+INTERN ATTR_COLD NONNULL((1)) int CC
+dl_seterror_nosect_index(DlModule *__restrict self, size_t index) {
+	return dl_seterrorf("%q: Section index %Iu is greater than %Iu",
+	                    self->dm_filename, index, self->dm_shnum);
+}
+
 INTERN WUNUSED NONNULL((1, 2)) ElfW(Shdr) *CC
 DlModule_ElfGetSection(DlModule *__restrict self,
                        char const *__restrict name) {
 	ElfW(Shdr) *result;
 	uint16_t i;
-	char *strtab = DlModule_ElfGetShstrtab(self);
+	char *strtab;
+	assert(!self->dm_ops);
+	strtab = DlModule_ElfGetShstrtab(self);
 	if unlikely(!strtab)
 		goto err;
 	result = self->dm_elf.de_shdr;
