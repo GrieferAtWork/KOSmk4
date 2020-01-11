@@ -20,11 +20,9 @@
 #include "exec.c"
 #if defined(__x86_64__) && 1
 #define MY_PTR(x) __HYBRID_PTR32(x)
-#define MY_FUNC(x) x##32
+#define MY_FUNC(x) compat_##x
 #define MY_ELFW COMPAT_ELFW
 #define MY_ElfW COMPAT_ElfW
-#define MY_SYSTEM_RTLD_SIZE system_rtld32_size
-#define MY_SYSTEM_RTLD_FILE system_rtld32_file
 #define MY_EXEC_ARGV_SIZE 1
 #define MY_POINTERSIZE 4
 #else
@@ -32,8 +30,6 @@
 #define MY_FUNC(x) x
 #define MY_ELFW ELFW
 #define MY_ElfW ElfW
-#define MY_SYSTEM_RTLD_SIZE system_rtld_size
-#define MY_SYSTEM_RTLD_FILE system_rtld_file
 #define MY_POINTERSIZE __SIZEOF_POINTER__
 #endif
 #endif /* __INTELLISENSE__ */
@@ -215,14 +211,14 @@ err_overlap:
 			if (need_dyn_linker) {
 				linker_base = vmb_map(&builder,
 				                      HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
-				                      MY_SYSTEM_RTLD_SIZE,
+				                      MY_FUNC(elfexec_system_rtld_size),
 				                      PAGESIZE,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
 				                      VM_GETFREE_ABOVE,
 #else
 				                      HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
 #endif
-				                      &MY_SYSTEM_RTLD_FILE.rf_block,
+				                      &MY_FUNC(elfexec_system_rtld_file).rf_block,
 				                      0,
 				                      VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC | VM_PROT_PRIVATE,
 				                      VM_NODE_FLAG_NORMAL,
@@ -323,11 +319,11 @@ err_overlap:
 			                                        /* exec_path:            */ exec_path,
 			                                        /* exec_dentry:          */ exec_dentry,
 			                                        /* exec_node:            */ exec_node,
-			                                        /* application_loadaddr: */ (void *)0,
-			                                        /* linker_loadaddr:      */ linker_base,
 			                                        /* ehdr:                 */ ehdr,
 			                                        /* phdr_vec:             */ phdr_vector,
-			                                        /* phdr_cnt:             */ ehdr->e_phnum);
+			                                        /* phdr_cnt:             */ ehdr->e_phnum,
+			                                        /* application_loadaddr: */ (void *)0,
+			                                        /* linker_loadaddr:      */ linker_base);
 		}
 		{
 			/* Initialize the library definitions list to use the PEB

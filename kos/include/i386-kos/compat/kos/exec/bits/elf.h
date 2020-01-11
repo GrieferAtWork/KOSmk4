@@ -16,19 +16,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_RTLD_LIBDL_COMPAT_S
-#define GUARD_KERNEL_CORE_ARCH_I386_RTLD_LIBDL_COMPAT_S 1
+#ifndef _I386_KOS_COMPAT_KOS_EXEC_BITS_ELF_H
+#define _I386_KOS_COMPAT_KOS_EXEC_BITS_ELF_H 1
 
-.section .rodata.system_rtld32
-	.global system_rtld32
-	.type   system_rtld32, @object
-	.align  4096 /* PAGESIZE */
-system_rtld32:
-	.incbin "bin/x86_64-kos/lib/libdl.rtld-flat.bin"
-	.align  4096 /* PAGESIZE */
-.global system_rtld32_size
-.type   system_rtld32_size, @object
-	system_rtld32_size = . - system_rtld32
-.size system_rtld32, . - system_rtld32
+#include <hybrid/host.h>
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_RTLD_LIBDL_COMPAT_S */
+#ifdef __x86_64__
+#include <kos/exec/bits/elf32.h>
+#define __compat_elfexec_info_defined 1
+#define compat_elfexec_info             elfexec_info32
+#define compat_elfexec_info_getfilename elfexec_info32_getfilename
+#define compat_elfexec_info_getentry    elfexec_info32_getentry
+#endif /* __x86_64__ */
+
+#endif /* !_I386_KOS_COMPAT_KOS_EXEC_BITS_ELF_H */

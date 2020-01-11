@@ -496,6 +496,11 @@
 #define __CRT_HAVE_driver_with_name 1
 #define __CRT_HAVE_driver_with_namel 1
 #define __CRT_HAVE_dump_branch_stats 1
+#define __CRT_HAVE_elfexec_init_entry 1
+#define __CRT_HAVE_elfexec_init_rtld 1
+#define __CRT_HAVE_elfexec_system_rtld 1
+#define __CRT_HAVE_elfexec_system_rtld_file 1
+#define __CRT_HAVE_elfexec_system_rtld_size 1
 #define __CRT_HAVE_empty_directory_entry 1
 #define __CRT_HAVE_empty_kernel_sigmask 1
 #define __CRT_HAVE_error_active 1
@@ -1802,9 +1807,6 @@
 #define __CRT_HAVE_syslog_sink_unregister 1
 #define __CRT_HAVE_system_clearcaches 1
 #define __CRT_HAVE_system_clearcaches_s 1
-#define __CRT_HAVE_system_rtld 1
-#define __CRT_HAVE_system_rtld_file 1
-#define __CRT_HAVE_system_rtld_size 1
 #define __CRT_HAVE_system_trimheaps 1
 #define __CRT_HAVE_task_alloc 1
 #define __CRT_HAVE_task_alloc_synchronous_rpc 1

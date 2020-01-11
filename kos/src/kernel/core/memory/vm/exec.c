@@ -23,10 +23,11 @@
 #include <kernel/compiler.h>
 
 #include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
-#include <kernel/rtld.h>
+#include <kernel/exec.h>
 #include <kernel/vm.h>
 #include <kernel/vm/builder.h>
 #include <kernel/vm/exec.h>
@@ -49,7 +50,7 @@
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <kos/exec/asm/elf-compat.h>
+#include <compat/kos/exec/elf.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
 #include "vm-nodeapi.h"
@@ -129,7 +130,7 @@ NOTHROW(KCALL elf_validate_ehdr)(ElfW(Ehdr) *__restrict ehdr) {
 	if unlikely(ehdr->e_machine != ELF_ARCH_MACHINE)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER;
-	if unlikely(ehdr->e_ehsize < offsetafter(ElfW(Ehdr),e_phnum))
+	if unlikely(ehdr->e_ehsize < offsetafter(ElfW(Ehdr), e_phnum))
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS;
 	if unlikely(!ehdr->e_phnum)
@@ -147,13 +148,13 @@ done:
 
 #ifdef __ARCH_HAVE_COMPAT
 LOCAL NOBLOCK WUNUSED NONNULL((1)) uintptr_t
-NOTHROW(KCALL __ARCH_COMPAT(elf_validate_ehdr))(COMPAT_ElfW(Ehdr) *__restrict ehdr) {
+NOTHROW(KCALL compat_elf_validate_ehdr)(COMPAT_ElfW(Ehdr) *__restrict ehdr) {
 	uintptr_t result;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS;
-	if unlikely(ehdr->e_ident[EI_CLASS] != ELF_ARCHCOMPAT_CLASS)
+	if unlikely(ehdr->e_ident[EI_CLASS] != COMPAT_ELF_ARCH_CLASS)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADORDER;
-	if unlikely(ehdr->e_ident[EI_DATA] != ELF_ARCHCOMPAT_DATA)
+	if unlikely(ehdr->e_ident[EI_DATA] != COMPAT_ELF_ARCH_DATA)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION;
 	if unlikely(ehdr->e_ident[EI_VERSION] != EV_CURRENT)
@@ -165,10 +166,10 @@ NOTHROW(KCALL __ARCH_COMPAT(elf_validate_ehdr))(COMPAT_ElfW(Ehdr) *__restrict eh
 	if unlikely(ehdr->e_type != ET_EXEC)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH;
-	if unlikely(ehdr->e_machine != ELF_ARCHCOMPAT_MACHINE)
+	if unlikely(ehdr->e_machine != COMPAT_ELF_ARCH_MACHINE)
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER;
-	if unlikely(ehdr->e_ehsize < offsetafter(COMPAT_ElfW(Ehdr),e_phnum))
+	if unlikely(ehdr->e_ehsize < offsetafter(COMPAT_ElfW(Ehdr), e_phnum))
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS;
 	if unlikely(!ehdr->e_phnum)
@@ -177,7 +178,7 @@ NOTHROW(KCALL __ARCH_COMPAT(elf_validate_ehdr))(COMPAT_ElfW(Ehdr) *__restrict eh
 	if unlikely(ehdr->e_phentsize != sizeof(COMPAT_ElfW(Phdr)))
 		goto done;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS;
-	if unlikely(ehdr->e_phnum > ELF_ARCH_MAXPHCOUNT)
+	if unlikely(ehdr->e_phnum > COMPAT_ELF_ARCH_MAXPHCOUNT)
 		goto done; /* Too many program headers. */
 	result = 0;
 done:
@@ -259,8 +260,6 @@ DECL_END
 #define MY_FUNC(x) x
 #define MY_ELFW ELFW
 #define MY_ElfW ElfW
-#define MY_SYSTEM_RTLD_SIZE system_rtld_size
-#define MY_SYSTEM_RTLD_FILE system_rtld_file
 #define MY_POINTERSIZE __SIZEOF_POINTER__
 #ifdef __ARCH_HAVE_COMPAT
 #define MY_EXEC_ARGV_SIZE 1
@@ -269,11 +268,9 @@ DECL_END
 
 #ifdef __ARCH_HAVE_COMPAT
 #define MY_PTR              __ARCH_COMPAT_PTR
-#define MY_FUNC             __ARCH_COMPAT
+#define MY_FUNC(x)          compat_##x
 #define MY_ELFW             COMPAT_ELFW
 #define MY_ElfW             COMPAT_ElfW
-#define MY_SYSTEM_RTLD_SIZE PP_CAT2(__ARCH_COMPAT(system_rtld), _size)
-#define MY_SYSTEM_RTLD_FILE PP_CAT2(__ARCH_COMPAT(system_rtld), _file)
 #define MY_POINTERSIZE      __ARCH_COMPAT_SIZEOF_POINTER
 #define MY_EXEC_ARGV_SIZE 1
 #include "exec-impl.c.inl"
@@ -304,16 +301,16 @@ vm_exec_impl(struct vm *__restrict effective_vm,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
 #ifdef __ARCH_HAVE_COMPAT
 LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4, 5, 10)) struct icpustate *KCALL
-__ARCH_COMPAT(vm_exec_impl)(struct vm *__restrict effective_vm,
-                            struct icpustate *__restrict user_state,
-                            struct path *__restrict exec_path,
-                            struct directory_entry *__restrict exec_dentry,
-                            struct regular_node *__restrict exec_node,
-                            size_t argc_inject, KERNEL char const *const *argv_inject,
-                            USER CHECKED void const *argv,
-                            USER CHECKED void const *envp,
-                            COMPAT_ElfW(Ehdr) const *__restrict ehdr,
-                            bool argv_is_compat)
+compat_vm_exec_impl(struct vm *__restrict effective_vm,
+                    struct icpustate *__restrict user_state,
+                    struct path *__restrict exec_path,
+                    struct directory_entry *__restrict exec_dentry,
+                    struct regular_node *__restrict exec_node,
+                    size_t argc_inject, KERNEL char const *const *argv_inject,
+                    USER CHECKED void const *argv,
+                    USER CHECKED void const *envp,
+                    COMPAT_ElfW(Ehdr) const *__restrict ehdr,
+                    bool argv_is_compat)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
 #endif /* __ARCH_HAVE_COMPAT */
 #endif /* __INTELLISENSE__ */
@@ -404,9 +401,9 @@ vm_exec(struct vm *__restrict effective_vm,
 		return user_state;
 	}
 #ifdef __ARCH_HAVE_COMPAT
-	reason = __ARCH_COMPAT(elf_validate_ehdr)(&ehdr.c);
+	reason = compat_elf_validate_ehdr(&ehdr.c);
 	if (reason == 0) {
-		user_state = __ARCH_COMPAT(vm_exec_impl)(effective_vm,
+		user_state = compat_vm_exec_impl(effective_vm,
 		                                         user_state,
 		                                         exec_path,
 		                                         exec_dentry,

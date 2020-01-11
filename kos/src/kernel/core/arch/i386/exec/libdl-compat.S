@@ -16,38 +16,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_RTLD_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_RTLD_H 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S
+#define GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S 1
 
-#include <kernel/compiler.h>
+.section .rodata.elfexec_system_rtld32
+	.global elfexec_system_rtld32
+	.type   elfexec_system_rtld32, @object
+	.align  4096 /* PAGESIZE */
+elfexec_system_rtld32:
+	.incbin "bin/x86_64-kos/lib/libdl.rtld-flat.bin"
+	.align  4096 /* PAGESIZE */
+.global elfexec_system_rtld32_size
+.type   elfexec_system_rtld32_size, @object
+	elfexec_system_rtld32_size = . - elfexec_system_rtld32
+.size elfexec_system_rtld32, . - elfexec_system_rtld32
 
-#include <kernel/arch/rtld.h>
-#include <kernel/types.h>
-#include <kernel/vm.h> /* struct vm_ramfile */
-
-DECL_BEGIN
-
-#ifdef __CC__
-
-/* A static VM file blob for the building RTLD user-space program.
- * This is a raw ELF binary blob that is hard-linked into the kernel
- * core, and is mapped via copy-on-write into any user-space process
- * that requests the use of a dynamic linker
- * NOTE: The associated source code can be found in `/kos/src/libdl/...' */
-DATDEF struct vm_ramfile system_rtld_file;
-
-/* Base address and size symbols for the system RTLD */
-DATDEF byte_t system_rtld[];
-#undef system_rtld_size
-#ifdef __INTELLISENSE__
-DATDEF size_t const system_rtld_size;
-#else /* __INTELLISENSE__ */
-DATDEF byte_t system_rtld_size[];
-#define system_rtld_size  ((size_t)system_rtld_size)
-#endif /* !__INTELLISENSE__ */
-
-#endif /* __CC__ */
-
-DECL_END
-
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_RTLD_H */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S */

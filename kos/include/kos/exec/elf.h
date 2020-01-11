@@ -22,6 +22,7 @@
 #include <__stdinc.h>
 
 #include <kos/exec/asm/elf.h>
+#include <kos/exec/bits/elf.h>
 
 #include <elf.h>
 
@@ -233,15 +234,12 @@
 #endif
 #endif /* !ELFW */
 
-#ifdef __KERNEL__
-#include <kernel/compiler.h>
-#endif /* __KERNEL__ */
+
 
 #ifdef __CC__
-__DECL_BEGIN
-
 #ifndef __elfexec_info_defined
 #define __elfexec_info_defined 1
+__DECL_BEGIN
 struct elfexec_info /*[PREFIX(pr_)]*/ {
 	ElfW(Addr)  ei_rtldaddr;    /* Load address of the RTLD itself. */
 	ElfW(Half)  ei_pnum;        /* Amount of ELF program headers. */
@@ -255,43 +253,8 @@ struct elfexec_info /*[PREFIX(pr_)]*/ {
 //	byte_t      ei_entry_sp[];  /* Entry stack address (set the address of this field as
 //	                             * stack-pointer when handing control to the hosted application) */
 };
-#endif /* !__elfexec_info_defined */
-
-#ifdef __KERNEL__
-
-/* Initialize the given `user_state' for execution */
-#ifndef elfexec_init_entry
-#define elfexec_init_entry elfexec_init_entry
-struct icpustate;
-FUNDEF struct icpustate *__KCALL
-elfexec_init_entry(struct icpustate *__restrict user_state,
-                   __KERNEL ElfW(Ehdr) const *__restrict ehdr,
-                   __USER void *peb_address, __USER void *ustack_base,
-                   __size_t ustack_size, __USER void *entry_pc,
-                   __BOOL has_rtld);
-#endif /* !elfexec_init_entry */
-
-/* Update the given `user_state' for invoking the RTLD */
-#ifndef elfexec_init_rtld
-#define elfexec_init_rtld  elfexec_init_rtld
-struct icpustate;
-struct path;
-struct directory_entry;
-struct regular_node;
-FUNDEF struct icpustate *__KCALL
-elfexec_init_rtld(struct icpustate *__restrict user_state,
-                  struct path *__restrict exec_path,
-                  struct directory_entry *__restrict exec_dentry,
-                  struct regular_node *__restrict exec_node,
-                  __USER void *application_loadaddr,
-                  __USER void *linker_loadaddr,
-                  __KERNEL ElfW(Ehdr) const *__restrict ehdr,
-                  __KERNEL ElfW(Phdr) *__restrict phdr_vec,
-                  ElfW(Half) phdr_cnt);
-#endif /* !elfexec_init_rtld */
-#endif /* __KERNEL__ */
-
 __DECL_END
+#endif /* !__elfexec_info_defined */
 
 /* Return the filename of the primary application */
 #ifndef elfexec_info_getfilename
@@ -306,7 +269,6 @@ __DECL_END
 	                          sizeof(__uintptr_t)) &                       \
 	            ~(sizeof(__uintptr_t) - 1)))
 #endif /* !elfexec_info_getentry */
-
 #endif /* __CC__ */
 
 #endif /* !_KOS_EXEC_ELF_H */

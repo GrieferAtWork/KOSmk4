@@ -333,7 +333,7 @@ again:
 		                                     filenamelen,
 		                                     mode);
 		if (result || elf_dlerror_message != NULL)
-			break;
+			goto done;
 		if (!ch)
 			break;
 		path = sep + 1;
@@ -352,6 +352,7 @@ again:
 		}
 	}
 #endif /* CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
+done:
 	return result;
 }
 

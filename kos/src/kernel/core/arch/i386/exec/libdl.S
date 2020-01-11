@@ -16,32 +16,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_RTLD_RTLD_C
-#define GUARD_KERNEL_CORE_ARCH_I386_RTLD_RTLD_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_S
+#define GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_S 1
 
-#include <kernel/compiler.h>
 #include <hybrid/host.h>
 
-#include <kernel/rtld.h>
-#include <kernel/vm.h>
-
-DECL_BEGIN
-
-/* Define the RTLD file(s). */
-INTDEF byte_t system_rtld_startpageptr[];
-INTDEF byte_t system_rtld_numpages[];
-PUBLIC struct vm_ramfile system_rtld_file =
-	VM_RAMFILE_INIT((pageptr_t)system_rtld_startpageptr,
-	                (size_t)system_rtld_numpages);
-
+.section .rodata.elfexec_system_rtld
+	.global elfexec_system_rtld
+	.type   elfexec_system_rtld, @object
+	.align  4096 /* PAGESIZE */
+elfexec_system_rtld:
 #ifdef __x86_64__
-INTDEF byte_t system_rtld32_startpageptr[];
-INTDEF byte_t system_rtld32_numpages[];
-PUBLIC struct vm_ramfile system_rtld32_file =
-	VM_RAMFILE_INIT((pageptr_t)system_rtld32_startpageptr,
-	                (size_t)system_rtld32_numpages);
-#endif /* __x86_64__ */
+	.incbin "bin/x86_64-kos/lib64/libdl.rtld-flat.bin"
+#else /* __x86_64__ */
+	.incbin "bin/i386-kos/lib/libdl.rtld-flat.bin"
+#endif /* !__x86_64__ */
+	.align  4096 /* PAGESIZE */
+.global elfexec_system_rtld_size
+.type   elfexec_system_rtld_size, @object
+	elfexec_system_rtld_size = . - elfexec_system_rtld
+.size elfexec_system_rtld, . - elfexec_system_rtld
 
-DECL_END
-
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_RTLD_RTLD_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_S */

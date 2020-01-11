@@ -16,25 +16,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_RTLD_LIBDL_S
-#define GUARD_KERNEL_CORE_ARCH_I386_RTLD_LIBDL_S 1
+#ifndef _I386_KOS_COMPAT_KOS_EXEC_ASM_ELF_H
+#define _I386_KOS_COMPAT_KOS_EXEC_ASM_ELF_H 1
 
 #include <hybrid/host.h>
 
-.section .rodata.system_rtld
-	.global system_rtld
-	.type   system_rtld, @object
-	.align  4096 /* PAGESIZE */
-system_rtld:
 #ifdef __x86_64__
-	.incbin "bin/x86_64-kos/lib64/libdl.rtld-flat.bin"
-#else /* __x86_64__ */
-	.incbin "bin/i386-kos/lib/libdl.rtld-flat.bin"
-#endif /* !__x86_64__ */
-	.align  4096 /* PAGESIZE */
-.global system_rtld_size
-.type   system_rtld_size, @object
-	system_rtld_size = . - system_rtld
-.size system_rtld, . - system_rtld
+#include <kos/exec/asm/elf32.h>
+#define COMPAT_ELF_ARCH_CLASS    ELF_ARCH386_CLASS
+#define COMPAT_ELF_ARCH_MACHINE  ELF_ARCH386_MACHINE
+#define COMPAT_ELF_ARCH_DATA     ELF_ARCH386_DATA
+#define COMPAT_ELF_ARCH_USESRELA ELF_ARCH386_USESRELA
+#define COMPAT_ELF_ARCH_LAZYINDX ELF_ARCH386_LAZYINDX
+#endif /* __x86_64__ */
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_RTLD_LIBDL_S */
+#endif /* !_I386_KOS_COMPAT_KOS_EXEC_ASM_ELF_H */

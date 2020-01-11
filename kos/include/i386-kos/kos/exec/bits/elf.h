@@ -16,39 +16,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_RTLD_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_RTLD_H 1
-
-#include <kernel/compiler.h>
-
-#include <kernel/types.h>
+#ifndef _I386_KOS_KOS_EXEC_BITS_ELF_H
+#define _I386_KOS_KOS_EXEC_BITS_ELF_H 1
 
 #include <hybrid/host.h>
 
-DECL_BEGIN
+#ifdef __x86_64__
+#include "elf64.h"
+#else /* __x86_64__ */
+#include "elf32.h"
+#endif /* !__x86_64__ */
 
-#ifdef __CC__
-
-/* A static VM file blob for the building RTLD user-space program.
- * This is a raw ELF binary blob that is hard-linked into the kernel
- * core, and is mapped via copy-on-write into any user-space process
- * that requests the use of a dynamic linker
- * NOTE: The associated source code can be found in `/kos/src/libdl/...' */
-DATDEF struct vm_ramfile system_rtld32_file;
-
-/* Base address and size symbols for the system RTLD */
-DATDEF byte_t system_rtld32[];
-#undef system_rtld32_size
-#ifdef __INTELLISENSE__
-DATDEF size_t const system_rtld32_size;
-#else /* __INTELLISENSE__ */
-DATDEF byte_t system_rtld32_size[];
-#define system_rtld32_size ((size_t)system_rtld32_size)
-#endif /* !__INTELLISENSE__ */
-
-#endif /* __CC__ */
-
-
-DECL_END
-
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_RTLD_H */
+#endif /* !_I386_KOS_KOS_EXEC_BITS_ELF_H */

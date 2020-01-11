@@ -138,14 +138,14 @@ SECTIONS {
 	SECTION(.rodata) {
 		*(.rodata.hot .rodata.likely .rodata.hot.*)
 		*(.rodata.x86.*)
-		KEEP(*(.rodata.system_rtld))
-		PROVIDE_HIDDEN(system_rtld_startpageptr = addr2pageptr(ABSOLUTE(system_rtld)));
-		PROVIDE_HIDDEN(system_rtld_numpages     = ABSOLUTE(system_rtld_size) / PAGESIZE);
+		KEEP(*(.rodata.elfexec_system_rtld))
+		PROVIDE_HIDDEN(elfexec_system_rtld_startpageptr = addr2pageptr(ABSOLUTE(elfexec_system_rtld)));
+		PROVIDE_HIDDEN(elfexec_system_rtld_numpages     = ABSOLUTE(elfexec_system_rtld_size) / PAGESIZE);
 #ifdef __x86_64__
 		/* Compatibility-mode libdl.so binary (32-bit application) */
-		KEEP(*(.rodata.system_rtld32))
-		PROVIDE_HIDDEN(system_rtld32_startpageptr = addr2pageptr(ABSOLUTE(system_rtld32)));
-		PROVIDE_HIDDEN(system_rtld32_numpages     = ABSOLUTE(system_rtld32_size) / PAGESIZE);
+		KEEP(*(.rodata.elfexec_system_rtld32))
+		PROVIDE_HIDDEN(elfexec_system_rtld32_startpageptr = addr2pageptr(ABSOLUTE(elfexec_system_rtld32)));
+		PROVIDE_HIDDEN(elfexec_system_rtld32_numpages     = ABSOLUTE(elfexec_system_rtld32_size) / PAGESIZE);
 #endif /* __x86_64__ */
 		*(.rodata .rodata.kernel_symtab .rodata.cst*)
 		*(.rodata.str* .rodata.*.str* .rodata.kernel_strtab)

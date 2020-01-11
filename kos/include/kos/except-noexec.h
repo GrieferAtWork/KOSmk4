@@ -55,6 +55,8 @@ enum {
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS,  /* e_phnum > ... (hard limit imposed by the host; i386/x86_64 uses 64 for this) */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT, /* (p_offset & (getpagesize() - 1)) != (p_vaddr & (getpagesize() - 1)) */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP,   /* Loading of static binary failed due to overlapping segments */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABI,           /* [unsigned char abi] Unsupported `EI_OSABI' for the indicated architecture */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION,    /* [unsigned char abi, unsigned char abiver] Unsupported `EI_ABIVERSION' for the indicated `EI_OSABI' */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS,      /* Only when loading drivers: The program headers pointer is out-of-bounds */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC,       /* Only when loading drivers: No `PT_DYNAMIC' program header found */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC,      /* Only when loading drivers: The `PT_DYNAMIC' program header is out-of-bounds */
@@ -97,6 +99,8 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS  E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS  /* e_phnum > ... (hard limit imposed by the host; i386/x86_64 uses 64 for this) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT /* (p_offset & (getpagesize() - 1)) != (p_vaddr & (getpagesize() - 1)) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP   E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP   /* Loading of static binary failed due to overlapping segments */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABI           E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABI           /* [unsigned char abi] Unsupported `EI_OSABI' for the indicated architecture */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION    E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION    /* [unsigned char abi, unsigned char abiver] Unsupported `EI_ABIVERSION' for the indicated `EI_OSABI' */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS      /* Only when loading drivers: The program headers pointer is out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC       E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC       /* Only when loading drivers: No `PT_DYNAMIC' program header found */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC      /* Only when loading drivers: The `PT_DYNAMIC' program header is out-of-bounds */
@@ -136,32 +140,34 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS  10 /* e_phnum > ... (hard limit imposed by the host; i386/x86_64 uses 64 for this) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT 11 /* (p_offset & (getpagesize() - 1)) != (p_vaddr & (getpagesize() - 1)) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP   12 /* Loading of static binary failed due to overlapping segments */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS      13 /* Only when loading drivers: The program headers pointer is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC       14 /* Only when loading drivers: No `PT_DYNAMIC' program header found */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC      15 /* Only when loading drivers: The `PT_DYNAMIC' program header is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SONAME        16 /* Only when loading drivers: No `DT_SONAME' or `DT_STRTAB' tag found */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME       17 /* Only when loading drivers: The `DT_STRTAB' tag isn't mapped, or the `DT_SONAME' tag is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT        18 /* Only when loading drivers: The `e_shentsize' fields doesn't equal `sizeof(ElfW(Shdr))' */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX     19 /* Only when loading drivers: The `e_shstrndx' field of the header is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF        20 /* Only when loading drivers: The `e_shoff' / `e_shnum' fields of the header are out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB  21 /* Only when loading drivers: The `.shstrtab' section header has a type `SHT_NOBITS' */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRTAB     22 /* Only when loading drivers: The `.shstrtab' section header points out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_VADDR   23 /* Only when loading drivers: The virtual address bounds for one of the program headers overflow */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_OFFSET  24 /* Only when loading drivers: The file offset one of the program headers is out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_ALIGN   25 /* Only when loading drivers: The alignment requirement of a program header isn't a power-of-2 */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_EH_FRAME  26 /* Only when loading drivers: The `.eh_frame' section doesn't have the `SHF_ALLOC' flag set. */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME     27 /* Only when loading drivers: The `.eh_frame' section address points out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR       28 /* Only when loading drivers: The `DT_STRTAB' tag is mapped out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH      29 /* Only when loading drivers: The `DT_HASH' tag is mapped out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM       30 /* Only when loading drivers: The `DT_DYNSYM' tag is mapped out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT       31 /* Only when loading drivers: The `DT_SYMENT' tag contains an invalid value */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT      32 /* Only when loading drivers: The `DT_RELAENT' tag contains an invalid value */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELENT       33 /* Only when loading drivers: The `DT_RELENT' tag contains an invalid value */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC    34 /* Only when loading drivers: A constructor callback is located out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED       35 /* Only when loading drivers: Bad dependency (either an index miss-match, or a bad filename) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL       36 /* Only when loading drivers: Bad symbol index (symbol index is out-of-bounds) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMNAME      37 /* Only when loading drivers: Bad symbol name (symbol name is out-of-bounds) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL        38 /* Only when loading drivers: Relocation against unknown symbol (s.a. system log) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABI           13 /* [unsigned char abi] Unsupported `EI_OSABI' for the indicated architecture */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION    14 /* [unsigned char abi, unsigned char abiver] Unsupported `EI_ABIVERSION' for the indicated `EI_OSABI' */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS      15 /* Only when loading drivers: The program headers pointer is out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC       16 /* Only when loading drivers: No `PT_DYNAMIC' program header found */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC      17 /* Only when loading drivers: The `PT_DYNAMIC' program header is out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SONAME        18 /* Only when loading drivers: No `DT_SONAME' or `DT_STRTAB' tag found */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME       19 /* Only when loading drivers: The `DT_STRTAB' tag isn't mapped, or the `DT_SONAME' tag is out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT        20 /* Only when loading drivers: The `e_shentsize' fields doesn't equal `sizeof(ElfW(Shdr))' */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX     21 /* Only when loading drivers: The `e_shstrndx' field of the header is out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF        22 /* Only when loading drivers: The `e_shoff' / `e_shnum' fields of the header are out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB  23 /* Only when loading drivers: The `.shstrtab' section header has a type `SHT_NOBITS' */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRTAB     24 /* Only when loading drivers: The `.shstrtab' section header points out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_VADDR   25 /* Only when loading drivers: The virtual address bounds for one of the program headers overflow */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_OFFSET  26 /* Only when loading drivers: The file offset one of the program headers is out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_ALIGN   27 /* Only when loading drivers: The alignment requirement of a program header isn't a power-of-2 */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_EH_FRAME  28 /* Only when loading drivers: The `.eh_frame' section doesn't have the `SHF_ALLOC' flag set. */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME     29 /* Only when loading drivers: The `.eh_frame' section address points out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR       30 /* Only when loading drivers: The `DT_STRTAB' tag is mapped out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH      31 /* Only when loading drivers: The `DT_HASH' tag is mapped out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM       32 /* Only when loading drivers: The `DT_DYNSYM' tag is mapped out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT       33 /* Only when loading drivers: The `DT_SYMENT' tag contains an invalid value */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT      34 /* Only when loading drivers: The `DT_RELAENT' tag contains an invalid value */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELENT       35 /* Only when loading drivers: The `DT_RELENT' tag contains an invalid value */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC    36 /* Only when loading drivers: A constructor callback is located out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED       37 /* Only when loading drivers: Bad dependency (either an index miss-match, or a bad filename) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL       38 /* Only when loading drivers: Bad symbol index (symbol index is out-of-bounds) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMNAME      39 /* Only when loading drivers: Bad symbol name (symbol name is out-of-bounds) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL        40 /* Only when loading drivers: Relocation against unknown symbol (s.a. system log) */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

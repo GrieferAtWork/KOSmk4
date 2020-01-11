@@ -22,7 +22,7 @@ BEGIN
 	DEFINE({ "CONFIG_BUILDING_KERNEL_CORE" : "1" })
 	SET_NOSTDLIB()
 
-	local KENREL_LIBDL_BINARY_SOURCE = "arch/" + XARCH + "/rtld/libdl.S";
+	local KENREL_LIBDL_BINARY_SOURCE = "arch/" + XARCH + "/exec/libdl.S";
 	local KERNEL_ASM_SOURCES = [
 		"../../libc/hybrid/arch/" + XARCH_ASMFILES,
 		"../../libunwind/arch/" + XARCH_ASMFILES,
@@ -147,7 +147,7 @@ BEGIN
 				stepWithDependencies(COMPILE, {
 					TARGET_BINPATH + "/lib/libdl.rtld-flat.bin" }) };
 			SET_LANGUAGE("assembler-with-cpp")
-			SOURCE({ "arch/" + XARCH + "/rtld/libdl-compat.S" })
+			SOURCE({ "arch/" + XARCH + "/exec/libdl-compat.S" })
 		END
 	}
 
@@ -263,7 +263,7 @@ BEGIN
 		SOURCE({ KENREL_LIBDL_BINARY_SOURCE })
 		if (TARGET_ARCH == "x86_64") {
 			/* For compatibility-mode (include the 32-bit version of libdl.so) */
-			SOURCE({ "arch/" + XARCH + "/rtld/libdl-compat.S" })
+			SOURCE({ "arch/" + XARCH + "/exec/libdl-compat.S" })
 		}
 	END
 

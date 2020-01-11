@@ -16,22 +16,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_EXEC_BITS_ELF_COMPAT_H
-#define _I386_KOS_KOS_EXEC_BITS_ELF_COMPAT_H 1
+#ifndef _COMPAT_KOS_EXEC_BITS_ELF_H
+#define _COMPAT_KOS_EXEC_BITS_ELF_H 1
 
-#include <__stdinc.h>
+#include <compat/config.h>
 
-#include <hybrid/host.h>
+#ifdef __ARCH_HAVE_COMPAT
+//#include <kos/exec/bits/elf.h>
+//#define __compat_elfexec_info_defined   1
+//#define compat_elfexec_info             elfexec_info
+//#define compat_elfexec_info_getfilename elfexec_info_getfilename
+//#define compat_elfexec_info_getentry    elfexec_info_getentry
+#endif /* __ARCH_HAVE_COMPAT */
 
-#include "elf32.h"
-#include "elf64.h"
-
-#ifdef __x86_64__
-#define ELF_ARCHCOMPAT_CLASS   ELF_ARCH386_CLASS
-#define ELF_ARCHCOMPAT_MACHINE ELF_ARCH386_MACHINE
-#define ELF_ARCHCOMPAT_DATA    ELF_ARCH386_DATA
-#define COMPAT_ElfW(x) Elf32_##x
-#define COMPAT_ELFW(x) ELF32_##x
-#endif /* __x86_64__ */
-
-#endif /* !_I386_KOS_KOS_EXEC_BITS_ELF_COMPAT_H */
+#endif /* !_COMPAT_KOS_EXEC_BITS_ELF_H */
