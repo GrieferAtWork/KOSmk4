@@ -32,6 +32,57 @@
 #include <elf.h>
 #include <stdbool.h>
 
+/* Writing a DL extension:
+ *
+ * ./my_libdl_extension.c:
+ * >> #include <libdl/module.h>
+ * >> #include <libdl/extension.h>
+ * >> #include <dlfcn.h>
+ * >>
+ * >> ...
+ * >>
+ * >> PRIVATE struct dlmodule_format my_module_format = {
+ * >>     .df_magic = { '1', '2', '3', '4', '5', '\n' },
+ * >>     .df_magsz = 6,
+ * >>     .df_open  = ...,
+ * >>     ...
+ * >> };
+ * >>
+ * >> PRIVATE __attribute__((constructor)) void init(void) {
+ * >>     if (dlauxctrl(NULL,
+ * >>                   DLAUXCTRL_REGISTER_EXTENSION,
+ * >>                   &my_module_format,
+ * >>                   sizeof(struct dlmodule_format),
+ * >>                   sizeof(struct dlcore_ops))) {
+ * >>         // At this point, `my_module_format.df_core' has been initialized,
+ * >>         // and any future library loaded by `dlopen()' will be check
+ * >>         // for a magic header equal to `MY_MAGIC', and be processed
+ * >>         // by `my_module_format.df_open' should that be the case.
+ * >>     }
+ * >> }
+ *
+ * Compile & install such an extension as (from a perspective within KOS itself):
+ * KOS$ cc -o mydlext.so -shared my_libdl_extension.c
+ *
+ * ./file_using_mydlext.format:
+ * >> 12345
+ * >> This file will be recognized as a shared library by `mydlext.so'
+ *
+ * ./main.c:
+ * >> #include <dlfcn.h>
+ * >> int main() {
+ * >>     void *mod;
+ * >>     // Enable support for mydlext
+ * >>     dlopen("./mydlext.so", RTLD_GLOBAL);
+ * >>     // Open the custom dl extension ~library~
+ * >>     mod = dlopen("./file_using_mydlext.format", RTLD_GLOBAL);
+ * >>     ...
+ * >> }
+ *
+ *
+ */
+
+
 DECL_BEGIN
 
 /* Max number of ~magic~ bytes that a RTLD extension may require */
