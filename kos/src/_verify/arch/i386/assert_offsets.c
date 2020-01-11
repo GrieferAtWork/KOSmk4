@@ -200,6 +200,9 @@ STATIC_ASSERT(offsetof(struct timespecx32_64, tv_nsec) == __OFFSET_TIMESPECX32_6
 STATIC_ASSERT(sizeof(struct timespecx32_64) == __SIZEOF_TIMESPECX32_64);
 STATIC_ASSERT(alignof(struct timespecx32_64) == __ALIGNOF_TIMESPECX32_64);
 
+/* struct __timespecx32_64_alt */
+/* ... */
+
 
 
 
@@ -211,6 +214,9 @@ STATIC_ASSERT(offsetof(struct timespecx64, tv_sec) == __OFFSET_TIMESPECX64_SEC);
 STATIC_ASSERT(offsetof(struct timespecx64, tv_nsec) == __OFFSET_TIMESPECX64_NSEC);
 STATIC_ASSERT(sizeof(struct timespecx64) == __SIZEOF_TIMESPECX64);
 STATIC_ASSERT(alignof(struct timespecx64) == __ALIGNOF_TIMESPECX64);
+
+/* struct __timespecx64_alt */
+/* ... */
 
 
 
@@ -230,6 +236,9 @@ STATIC_ASSERT(offsetof(struct timevalx32_64, tv_sec) == __OFFSET_TIMEVALX32_64_S
 STATIC_ASSERT(sizeof(struct timevalx32_64) == __SIZEOF_TIMEVALX32_64);
 STATIC_ASSERT(alignof(struct timevalx32_64) == __ALIGNOF_TIMEVALX32_64);
 
+/* struct __timevalx32_64_alt */
+/* ... */
+
 
 
 
@@ -241,6 +250,9 @@ STATIC_ASSERT(offsetof(struct timevalx64, tv_usec) == __OFFSET_TIMEVALX64_USEC);
 STATIC_ASSERT(offsetof(struct timevalx64, tv_sec) == __OFFSET_TIMEVALX64_SEC);
 STATIC_ASSERT(sizeof(struct timevalx64) == __SIZEOF_TIMEVALX64);
 STATIC_ASSERT(alignof(struct timevalx64) == __ALIGNOF_TIMEVALX64);
+
+/* struct __timevalx64_alt */
+/* ... */
 
 
 
@@ -288,6 +300,9 @@ STATIC_ASSERT(offsetof(struct rusagex32_64, ru_utime) == __OFFSET_RUSAGEX32_64_U
 STATIC_ASSERT(sizeof(struct rusagex32_64) == __SIZEOF_RUSAGEX32_64);
 STATIC_ASSERT(alignof(struct rusagex32_64) == __ALIGNOF_RUSAGEX32_64);
 
+/* struct __rusagex32_64_alt */
+/* ... */
+
 
 
 
@@ -313,6 +328,9 @@ STATIC_ASSERT(offsetof(struct rusagex64, ru_stime) == __OFFSET_RUSAGEX64_STIME);
 STATIC_ASSERT(offsetof(struct rusagex64, ru_utime) == __OFFSET_RUSAGEX64_UTIME);
 STATIC_ASSERT(sizeof(struct rusagex64) == __SIZEOF_RUSAGEX64);
 STATIC_ASSERT(alignof(struct rusagex64) == __ALIGNOF_RUSAGEX64);
+
+/* struct __rusagex64_alt */
+/* ... */
 
 
 
@@ -595,6 +613,9 @@ STATIC_ASSERT(offsetof(struct itimerspecx32_64, it_interval) == __OFFSET_ITIMERS
 STATIC_ASSERT(sizeof(struct itimerspecx32_64) == __SIZEOF_ITIMERSPECX32_64);
 STATIC_ASSERT(alignof(struct itimerspecx32_64) == __ALIGNOF_ITIMERSPECX32_64);
 
+/* struct __itimerspecx32_64_alt */
+/* ... */
+
 
 
 
@@ -606,6 +627,9 @@ STATIC_ASSERT(offsetof(struct itimerspecx64, it_value) == __OFFSET_ITIMERSPECX64
 STATIC_ASSERT(offsetof(struct itimerspecx64, it_interval) == __OFFSET_ITIMERSPECX64_INTERVAL);
 STATIC_ASSERT(sizeof(struct itimerspecx64) == __SIZEOF_ITIMERSPECX64);
 STATIC_ASSERT(alignof(struct itimerspecx64) == __ALIGNOF_ITIMERSPECX64);
+
+/* struct __itimerspecx64_alt */
+/* ... */
 
 
 
@@ -629,6 +653,9 @@ STATIC_ASSERT(offsetof(struct timebx32_64, timezone) == __OFFSET_TIMEBX32_64_TIM
 STATIC_ASSERT(sizeof(struct timebx32_64) == __SIZEOF_TIMEBX32_64);
 STATIC_ASSERT(alignof(struct timebx32_64) == __ALIGNOF_TIMEBX32_64);
 
+/* struct __timebx32_64_alt */
+/* ... */
+
 
 
 
@@ -642,6 +669,9 @@ STATIC_ASSERT(offsetof(struct timebx64, time) == __OFFSET_TIMEBX64_TIME);
 STATIC_ASSERT(offsetof(struct timebx64, timezone) == __OFFSET_TIMEBX64_TIMEZONE);
 STATIC_ASSERT(sizeof(struct timebx64) == __SIZEOF_TIMEBX64);
 STATIC_ASSERT(alignof(struct timebx64) == __ALIGNOF_TIMEBX64);
+
+/* struct __timebx64_alt */
+/* ... */
 
 
 
@@ -817,6 +847,9 @@ STATIC_ASSERT(offsetof(struct statfsx32_64, f_type) == __OFFSET_STATFSX32_64_TYP
 STATIC_ASSERT(sizeof(struct statfsx32_64) == __SIZEOF_STATFSX32_64);
 STATIC_ASSERT(alignof(struct statfsx32_64) == __ALIGNOF_STATFSX32_64);
 
+/* struct __statfsx32_64_alt */
+/* ... */
+
 
 
 
@@ -838,6 +871,9 @@ STATIC_ASSERT(offsetof(struct statfsx64, f_spare) == __OFFSET_STATFSX64_SPARE);
 STATIC_ASSERT(offsetof(struct statfsx64, f_type) == __OFFSET_STATFSX64_TYPE);
 STATIC_ASSERT(sizeof(struct statfsx64) == __SIZEOF_STATFSX64);
 STATIC_ASSERT(alignof(struct statfsx64) == __ALIGNOF_STATFSX64);
+
+/* struct __statfsx64_alt */
+/* ... */
 
 
 

@@ -33,11 +33,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /*[[[autogen:wrap3264_x64(
-	linkIf:   "defined(__x86_64__)",
-	name:     "rusage",
-	name64:   "rusagex64",
-	name32If: "defined(__USE_KOS)",
-	name64If: "defined(__USE_TIME64)",
+	linkIf:    "defined(__x86_64__)",
+	name:      "rusage",
+	name64:    "rusagex64",
+	altname64: "__rusagex64_alt",
+	name32If:  "defined(__USE_KOS)",
+	name64If:  "defined(__USE_TIME64)",
+	macro64If: "defined(__USE_STRUCT64_MACRO)",
 )]]]*/
 #undef rusagex64
 #ifndef __x86_64__
@@ -108,7 +110,11 @@
 #define rusage32 rusage
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
+#ifdef __USE_STRUCT64_MACRO
 #define rusage64 rusage
+#else /* __USE_STRUCT64_MACRO */
+#define __rusagex64_alt rusage64
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_TIME64 */
 #define __rusage_defined 1
 #endif /* __x86_64__ */
@@ -160,6 +166,32 @@ struct rusagex64 /*[PREFIX(ru_)]*/ {
 	__LONG64_TYPE__     ru_nivcsw;   /* Number of involuntary context switches, i.e. a higher priority process
 	                                  * became runnable or the current process used up its time slice. */
 };
+
+#ifdef __rusagex64_alt
+struct __rusagex64_alt {
+	struct __timevalx64 ru_utime;    /* Total amount of user time used. */
+	struct __timevalx64 ru_stime;    /* Total amount of system time used. */
+	__LONG64_TYPE__     ru_maxrss;   /* Maximum resident set size (in kilobytes). */
+	/* Amount of sharing of text segment memory with other processes (kilobyte-seconds). */
+	__LONG64_TYPE__     ru_ixrss;    /* Maximum resident set size (in kilobytes). */
+	__LONG64_TYPE__     ru_idrss;    /* Amount of data segment memory used (kilobyte-seconds). */
+	__LONG64_TYPE__     ru_isrss;    /* Amount of stack memory used (kilobyte-seconds). */
+	__LONG64_TYPE__     ru_minflt;   /* Number of soft page faults (i.e. those serviced by reclaiming a page from the list of pages awaiting reallocation. */
+	__LONG64_TYPE__     ru_majflt;   /* Number of hard page faults (i.e. those that required I/O). */
+	__LONG64_TYPE__     ru_nswap;    /* Number of times a process was swapped out of physical memory. */
+	__LONG64_TYPE__     ru_inblock;  /* Number of input operations via the file system.
+	                                  * NOTE: This and `ru_oublock' do not include operations with the cache. */
+	__LONG64_TYPE__     ru_oublock;  /* Number of output operations via the file system. */
+	__LONG64_TYPE__     ru_msgsnd;   /* Number of IPC messages sent. */
+	__LONG64_TYPE__     ru_msgrcv;   /* Number of IPC messages received. */
+	__LONG64_TYPE__     ru_nsignals; /* Number of signals delivered. */
+	__LONG64_TYPE__     ru_nvcsw;    /* Number of voluntary context switches, i.e. because the process gave up the
+	                                  * process before it had to (usually to wait for some resource to be available). */
+	__LONG64_TYPE__     ru_nivcsw;   /* Number of involuntary context switches, i.e. a higher priority process
+	                                  * became runnable or the current process used up its time slice. */
+};
+#undef __rusagex64_alt
+#endif /* __rusagex64_alt */
 
 __DECL_END
 #endif /* __CC__ */

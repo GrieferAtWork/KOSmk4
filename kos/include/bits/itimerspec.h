@@ -29,15 +29,13 @@
 
 #define __OFFSET_ITIMERSPEC_INTERVAL   0
 #define __OFFSET_ITIMERSPEC_VALUE      __SIZEOF_TIMESPEC
-#define __SIZEOF_ITIMERSPEC            (2 * __SIZEOF_TIMESPEC)
+#define __SIZEOF_ITIMERSPEC            (__SIZEOF_TIMESPEC * 2)
+#define __OFFSET_ITIMERSPEC32_INTERVAL 0
+#define __OFFSET_ITIMERSPEC32_VALUE    __SIZEOF_TIMESPEC32
+#define __SIZEOF_ITIMERSPEC32          (__SIZEOF_TIMESPEC32 * 2)
 #define __OFFSET_ITIMERSPEC64_INTERVAL 0
 #define __OFFSET_ITIMERSPEC64_VALUE    __SIZEOF_TIMESPEC64
-#define __SIZEOF_ITIMERSPEC64          (2 * __SIZEOF_TIMESPEC64)
-
-#if 0
-struct itimerspec /*[PREFIX(it_)]*/ {};
-struct itimerspec64 /*[PREFIX(it_)]*/ {};
-#endif
+#define __SIZEOF_ITIMERSPEC64          (__SIZEOF_TIMESPEC64 * 2)
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -50,41 +48,57 @@ __SYSDECL_BEGIN
 #undef it_interval
 #undef it_value
 
-struct itimerspec {
+#ifndef __itimerspec_defined
+#define __itimerspec_defined 1
+struct itimerspec /*[PREFIX(it_)]*/ {
 	struct timespec it_interval;
 	struct timespec it_value;
 };
-
-#if __TM_SIZEOF(TIME) <= 4
-#define __itimerspec64  __itimerspec_alt
-#define __itimerspec32  itimerspec
-#else /* __TM_SIZEOF(TIME) <= 4 */
-#define __itimerspec64  itimerspec
-#define __itimerspec32  __itimerspec_alt
-#endif /* __TM_SIZEOF(TIME) > 4 */
-
-#ifdef __USE_TIME64
-#if __TM_SIZEOF(TIME) <= 4
-#define __itimerspec_alt itimerspec64
-#else /* __TM_SIZEOF(TIME) <= 4 */
-#define itimerspec64     itimerspec
-#endif /* __TM_SIZEOF(TIME) > 4 */
-#endif /* __USE_TIME64 */
+#endif /* !__itimerspec_defined */
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-#if defined(__USE_TIME64) && __TM_SIZEOF(TIME) <= 4
-#define itimerspec64     itimerspec
-#else /* __USE_TIME64 && __TM_SIZEOF(TIME) <= 4 */
-#define __itimerspec_alt itimerspec
-#endif /* !__USE_TIME64 || __TM_SIZEOF(TIME) > 4 */
-#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-struct __itimerspec_alt
-/*Keep an empty line here*/
-{
-	struct __timespec_alt it_interval;
-	struct __timespec_alt it_value;
+#define _ITIMERSPEC_MATCHES_ITIMERSPEC64 1
+#endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+
+#ifdef __USE_TIME64
+#ifndef __itimerspec64_defined
+#define __itimerspec64_defined 1
+#if (defined(__USE_TIME_BITS64) || defined(_ITIMERSPEC_MATCHES_ITIMERSPEC64)) && defined(__USE_STRUCT64_MACRO)
+#define itimerspec64 itimerspec
+#else /* (__USE_TIME_BITS64 || _ITIMERSPEC_MATCHES_ITIMERSPEC64) && __USE_STRUCT64_MACRO */
+#define __itimerspec64 itimerspec64
+#endif /* (!__USE_TIME_BITS64 && !_ITIMERSPEC_MATCHES_ITIMERSPEC64) || !__USE_STRUCT64_MACRO */
+#endif /* !__itimerspec64_defined */
+#endif /* __USE_TIME64 */
+
+#if (defined(__USE_TIME_BITS64) || defined(_ITIMERSPEC_MATCHES_ITIMERSPEC64)) && defined(__USE_STRUCT64_MACRO)
+#define __itimerspec64 itimerspec
+#else /* (__USE_TIME_BITS64 || _ITIMERSPEC_MATCHES_ITIMERSPEC64) && __USE_STRUCT64_MACRO */
+struct __itimerspec64 /*[NAME(itimerspec64)][PREFIX(it_)]*/ {
+	struct __timespec64 it_interval;
+	struct __timespec64 it_value;
 };
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#endif /* (!__USE_TIME_BITS64 && !_ITIMERSPEC_MATCHES_ITIMERSPEC64) || !__USE_STRUCT64_MACRO */
+
+#ifdef __USE_KOS
+#ifndef __itimerspec32_defined
+#define __itimerspec32_defined 1
+#if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define itimerspec32 itimerspec
+#else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#define __itimerspec32 itimerspec32
+#endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#endif /* !__itimerspec32_defined */
+#endif /* __USE_KOS */
+
+#if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define __itimerspec32 itimerspec
+#else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+struct __itimerspec32 /*[NAME(itimerspec32)][PREFIX(it_)]*/ {
+	struct __timespec32 it_interval;
+	struct __timespec32 it_value;
+};
+#endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("it_value")
@@ -94,6 +108,5 @@ struct __itimerspec_alt
 
 __SYSDECL_END
 #endif /* __CC__ */
-
 
 #endif /* !_BITS_ITIMERSPEC_H */

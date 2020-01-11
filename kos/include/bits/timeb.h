@@ -31,6 +31,11 @@
 #define __OFFSET_TIMEB_TIMEZONE   (__TM_SIZEOF(TIME) + 2)
 #define __OFFSET_TIMEB_DSTFLAG    (__TM_SIZEOF(TIME) + 4)
 #define __SIZEOF_TIMEB            (__TM_SIZEOF(TIME) + 8)
+#define __OFFSET_TIMEB32_TIME     0
+#define __OFFSET_TIMEB32_MILLITM  __SIZEOF_TIME32_T__
+#define __OFFSET_TIMEB32_TIMEZONE (__SIZEOF_TIME32_T__ + 2)
+#define __OFFSET_TIMEB32_DSTFLAG  (__SIZEOF_TIME32_T__ + 4)
+#define __SIZEOF_TIMEB32          (__SIZEOF_TIME32_T__ + 8)
 #define __OFFSET_TIMEB64_TIME     0
 #define __OFFSET_TIMEB64_MILLITM  __SIZEOF_TIME64_T__
 #define __OFFSET_TIMEB64_TIMEZONE (__SIZEOF_TIME64_T__ + 2)
@@ -52,57 +57,66 @@ __SYSDECL_BEGIN
 #undef timezone
 #undef dstflag
 
-#if 0 /* For assert_types.c */
-struct timeb /*[PREFIX()]*/ {};
-struct timeb32 /*[PREFIX()]*/ {};
-struct timeb64 /*[PREFIX()]*/ {};
-#endif
-
-struct timeb {
+#ifndef __timeb_defined
+#define __timeb_defined 1
+struct timeb /*[PREFIX()]*/ {
 	__TM_TYPE(time) time;     /* Seconds since epoch, as from `time'. */
 	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
 	__INT16_TYPE__  timezone; /* Minutes west of GMT. */
 	__INT16_TYPE__  dstflag;  /* Nonzero if Daylight Savings Time used. */
 	__INT16_TYPE__  __tb_pad; /* ... */
 };
-
-#if __TM_SIZEOF(TIME) <= 4
-#define __timeb64  __timeb_alt
-#define __timeb32  timeb
-#else /* __TM_SIZEOF(TIME) <= 4 */
-#define __timeb64  timeb
-#define __timeb32  __timeb_alt
-#endif /* __TM_SIZEOF(TIME) > 4 */
-
-#ifdef __USE_TIME64
-#if __TM_SIZEOF(TIME) <= 4
-#define __timeb_alt timeb64
-#else /* __TM_SIZEOF(TIME) <= 4 */
-#define timeb64     timeb
-#endif /* __TM_SIZEOF(TIME) > 4 */
-#endif /* __USE_TIME64 */
+#endif /* !__timeb_defined */
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-#if defined(__USE_TIME64) && __TM_SIZEOF(TIME) <= 4
-#define timeb64     timeb
-#else /* __USE_TIME64 && __TM_SIZEOF(TIME) <= 4 */
-#define __timeb_alt timeb
-#endif /* !__USE_TIME64 || __TM_SIZEOF(TIME) > 4 */
-#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-struct __timeb_alt
-/*Keep an empty line here*/
-{
-#if __TM_SIZEOF(TIME) <= 4
+#define _TIMEB_MATCHES_TIMEB64 1
+#endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+
+#ifdef __USE_TIME64
+#ifndef __timeb64_defined
+#define __timeb64_defined 1
+#if (defined(__USE_TIME_BITS64) || defined(_TIMEB_MATCHES_TIMEB64)) && defined(__USE_STRUCT64_MACRO)
+#define timeb64 timeb
+#else /* (__USE_TIME_BITS64 || _TIMEB_MATCHES_TIMEB64) && __USE_STRUCT64_MACRO */
+#define __timeb64 timeb64
+#endif /* (!__USE_TIME_BITS64 && !_TIMEB_MATCHES_TIMEB64) || !__USE_STRUCT64_MACRO */
+#endif /* !__timeb64_defined */
+#endif /* __USE_TIME64 */
+
+#if (defined(__USE_TIME_BITS64) || defined(_TIMEB_MATCHES_TIMEB64)) && defined(__USE_STRUCT64_MACRO)
+#define __timeb64 timeb
+#else /* (__USE_TIME_BITS64 || _TIMEB_MATCHES_TIMEB64) && __USE_STRUCT64_MACRO */
+struct __timeb64 /*[NAME(timeb64)][PREFIX()]*/ {
 	__time64_t      time;     /* Seconds since epoch, as from `time'. */
-#else /* __TM_SIZEOF(TIME) <= 4 */
-	__time32_t      time;     /* Seconds since epoch, as from `time'. */
-#endif /* __TM_SIZEOF(TIME) > 4 */
 	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
 	__INT16_TYPE__  timezone; /* Minutes west of GMT. */
 	__INT16_TYPE__  dstflag;  /* Nonzero if Daylight Savings Time used. */
 	__INT16_TYPE__  __tb_pad; /* ... */
 };
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#endif /* (!__USE_TIME_BITS64 && !_TIMEB_MATCHES_TIMEB64) || !__USE_STRUCT64_MACRO */
+
+#ifdef __USE_KOS
+#ifndef __timeb32_defined
+#define __timeb32_defined 1
+#if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define timeb32 timeb
+#else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#define __timeb32 timeb32
+#endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#endif /* !__timeb32_defined */
+#endif /* __USE_KOS */
+
+#if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define __timeb32 timeb
+#else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+struct __timeb32 /*[NAME(timeb32)][PREFIX()]*/ {
+	__time32_t      time;     /* Seconds since epoch, as from `time'. */
+	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
+	__INT16_TYPE__  timezone; /* Minutes west of GMT. */
+	__INT16_TYPE__  dstflag;  /* Nonzero if Daylight Savings Time used. */
+	__INT16_TYPE__  __tb_pad; /* ... */
+};
+#endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("dstflag")

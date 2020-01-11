@@ -35,11 +35,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /*[[[autogen:wrap3264_x64(
-	linkIf:   "defined(__x86_64__)",
-	name:     "statfs",
-	name64:   "statfsx64",
-	name32If: "defined(__USE_KOS)",
-	name64If: "defined(__USE_LARGEFILE64)",
+	linkIf:    "defined(__x86_64__)",
+	name:      "statfs",
+	name64:    "statfsx64",
+	altname64: "__statfsx64_alt",
+	name32If:  "defined(__USE_KOS)",
+	name64If:  "defined(__USE_LARGEFILE64)",
+	macro64If: "defined(__USE_STRUCT64_MACRO)",
 )]]]*/
 #undef statfsx64
 #ifndef __x86_64__
@@ -98,7 +100,11 @@
 #define statfs32 statfs
 #endif /* __USE_KOS */
 #ifdef __USE_LARGEFILE64
+#ifdef __USE_STRUCT64_MACRO
 #define statfs64 statfs
+#else /* __USE_STRUCT64_MACRO */
+#define __statfsx64_alt statfs64
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_LARGEFILE64 */
 #define __statfs_defined 1
 #endif /* __x86_64__ */
@@ -138,12 +144,30 @@ struct statfsx64 /*[PREFIX(f_)]*/ {
 	__ULONG64_TYPE__ f_spare[4]; /* ??? */
 };
 
+#ifdef __statfsx64_alt
+struct __statfsx64_alt {
+	__ULONG64_TYPE__ f_type;     /* Type of file system (one of the constants from <linux/magic.h>) */
+	__ULONG64_TYPE__ f_bsize;    /* Optimal transfer block size */
+	__ULONG64_TYPE__ f_blocks;   /* Total data blocks in file system */
+	__ULONG64_TYPE__ f_bfree;    /* Free blocks in fs */
+	__ULONG64_TYPE__ f_bavail;   /* Free blocks available to unprivileged user */
+	__ULONG64_TYPE__ f_files;    /* Total file nodes in file system */
+	__ULONG64_TYPE__ f_ffree;    /* Free file nodes in fs */
+	__fsid_t         f_fsid;     /* File system id */
+	__ULONG64_TYPE__ f_namelen;  /* Maximum length of filenames */
+	__ULONG64_TYPE__ f_frsize;   /* Fragment size (since Linux 2.6) */
+	__ULONG64_TYPE__ f_flags;    /* Mount flags (set of `ST_*' from <sys/statvfs.h>) */
+	__ULONG64_TYPE__ f_spare[4]; /* ??? */
+};
+#undef __statfsx64_alt
+#endif /* __statfsx64_alt */
+
 __DECL_END
 #endif /* __CC__ */
 
-#ifndef __USE_KOS
+#ifndef __USE_KOS_KERNEL
 #undef statfsx64
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef __PRIVATE_DID_PUSH_STATFSX64

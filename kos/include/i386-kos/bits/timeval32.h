@@ -38,13 +38,15 @@
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
  /*[[[autogen:wrap3264_x32_and_x32_64(
-	linkIf:   "defined(__i386__) && !defined(__x86_64__)",
-	name:     "timeval",
-	name32:   "timevalx32",
-	name64:   "timevalx32_64",
-	name32If: "defined(__USE_KOS)",
-	name64If: "defined(__USE_TIME64)",
-	link64If: "defined(__USE_TIME_BITS64)",
+	linkIf:    "defined(__i386__) && !defined(__x86_64__)",
+	name:      "timeval",
+	name32:    "timevalx32",
+	name64:    "timevalx32_64",
+	altname64: "__timevalx32_64_alt",
+	name32If:  "defined(__USE_KOS)",
+	name64If:  "defined(__USE_TIME64)",
+	link64If:  "defined(__USE_TIME_BITS64)",
+	macro64If: "defined(__USE_STRUCT64_MACRO)",
 )]]]*/
 #undef timevalx32
 #undef timevalx32_64
@@ -66,9 +68,13 @@
 #define __timeval_alt   __timeval32
 #ifdef __USE_KOS
 #define timeval32 __timeval32
-#endif /* __USE_KOS */
+#endif /* !__USE_KOS */
 #ifdef __USE_TIME64
+#ifdef __USE_STRUCT64_MACRO
 #define timeval64 timeval
+#else /* __USE_STRUCT64_MACRO */
+#define __timevalx32_64_alt timeval64
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_TIME64 */
 
 #define __OFFSET_TIMEVAL_SEC  __OFFSET_TIMEVALX32_64_SEC
@@ -149,14 +155,24 @@ struct timevalx32_64 /*[PREFIX(tv_)]*/ {
 };
 __TIMEVAL_CXX_SUPPORT2(struct timevalx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 
+#ifdef __timevalx32_64_alt
+struct __timevalx32_64_alt {
+	__INT64_TYPE__    tv_sec;   /* Seconds */
+	__UINT32_TYPE__   tv_usec;  /* Micro seconds (<= 1000000 == 1_000_000) */
+	__UINT32_TYPE__ __tv_pad;   /* ... */
+	__TIMEVAL_CXX_SUPPORT(struct __timevalx32_64_alt, __INT64_TYPE__, __UINT32_TYPE__)
+};
+__TIMEVAL_CXX_SUPPORT2(struct __timevalx32_64_alt, __INT64_TYPE__, __UINT32_TYPE__)
+#endif /* __timevalx32_64_alt */
+
 __TIMEVAL_CXX_DECL_END
 __DECL_END
 #endif /* __CC__ */
 
-#ifndef __USE_KOS
+#ifndef __USE_KOS_KERNEL
 #undef timevalx32
 #undef timevalx32_64
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef __PRIVATE_DID_PUSH_TIMEVALX32_64

@@ -38,13 +38,15 @@
 
 
 /*[[[autogen:wrap3264_x32_and_x32_64(
-	linkIf:   "defined(__i386__) && !defined(__x86_64__)",
-	name:     "rusage",
-	name32:   "rusagex32",
-	name64:   "rusagex32_64",
-	name32If: "defined(__USE_KOS)",
-	name64If: "defined(__USE_TIME64)",
-	link64If: "defined(__USE_TIME_BITS64)",
+	linkIf:    "defined(__i386__) && !defined(__x86_64__)",
+	name:      "rusage",
+	name32:    "rusagex32",
+	name64:    "rusagex32_64",
+	altname64: "__rusagex32_64_alt",
+	name32If:  "defined(__USE_KOS)",
+	name64If:  "defined(__USE_TIME64)",
+	link64If:  "defined(__USE_TIME_BITS64)",
+	macro64If: "defined(__USE_STRUCT64_MACRO)",
 )]]]*/
 #undef rusagex32
 #undef rusagex32_64
@@ -66,9 +68,13 @@
 #define __rusage_alt   __rusage32
 #ifdef __USE_KOS
 #define rusage32 __rusage32
-#endif /* __USE_KOS */
+#endif /* !__USE_KOS */
 #ifdef __USE_TIME64
+#ifdef __USE_STRUCT64_MACRO
 #define rusage64 rusage
+#else /* __USE_STRUCT64_MACRO */
+#define __rusagex32_64_alt rusage64
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_TIME64 */
 
 #define __OFFSET_RUSAGE_UTIME    __OFFSET_RUSAGEX32_64_UTIME
@@ -281,6 +287,32 @@ struct rusagex32_64 /*[PREFIX(ru_)]*/ {
 	__LONG32_TYPE__        ru_nivcsw;   /* Number of involuntary context switches, i.e. a higher priority process
 	                                     * became runnable or the current process used up its time slice. */
 };
+
+#ifdef __rusagex32_64_alt
+struct __rusagex32_64_alt {
+	struct __timevalx32_64 ru_utime;    /* Total amount of user time used. */
+	struct __timevalx32_64 ru_stime;    /* Total amount of system time used. */
+	__LONG32_TYPE__        ru_maxrss;   /* Maximum resident set size (in kilobytes). */
+	/* Amount of sharing of text segment memory with other processes (kilobyte-seconds). */
+	__LONG32_TYPE__        ru_ixrss;    /* Maximum resident set size (in kilobytes). */
+	__LONG32_TYPE__        ru_idrss;    /* Amount of data segment memory used (kilobyte-seconds). */
+	__LONG32_TYPE__        ru_isrss;    /* Amount of stack memory used (kilobyte-seconds). */
+	__LONG32_TYPE__        ru_minflt;   /* Number of soft page faults (i.e. those serviced by reclaiming a page from the list of pages awaiting reallocation. */
+	__LONG32_TYPE__        ru_majflt;   /* Number of hard page faults (i.e. those that required I/O). */
+	__LONG32_TYPE__        ru_nswap;    /* Number of times a process was swapped out of physical memory. */
+	__LONG32_TYPE__        ru_inblock;  /* Number of input operations via the file system.
+	                                     * NOTE: This and `ru_oublock' do not include operations with the cache. */
+	__LONG32_TYPE__        ru_oublock;  /* Number of output operations via the file system. */
+	__LONG32_TYPE__        ru_msgsnd;   /* Number of IPC messages sent. */
+	__LONG32_TYPE__        ru_msgrcv;   /* Number of IPC messages received. */
+	__LONG32_TYPE__        ru_nsignals; /* Number of signals delivered. */
+	__LONG32_TYPE__        ru_nvcsw;    /* Number of voluntary context switches, i.e. because the process gave up the
+	                                     * process before it had to (usually to wait for some resource to be available). */
+	__LONG32_TYPE__        ru_nivcsw;   /* Number of involuntary context switches, i.e. a higher priority process
+	                                     * became runnable or the current process used up its time slice. */
+};
+#undef __rusagex32_64_alt
+#endif /* __rusagex32_64_alt */
 
 __DECL_END
 #endif /* __CC__ */

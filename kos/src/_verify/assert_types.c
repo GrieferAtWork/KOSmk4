@@ -280,6 +280,7 @@ STATIC_ASSERT(sizeof(Elf64_Versym) == __SIZEOF_ELF64_VERSYM__);
 import * from ...misc.libgen.assert_offsetof;
 local files = {
 	"../../include/bits/itimerspec.h",
+	"../../include/bits/itimerval.h",
 	"../../include/bits/timespec.h",
 	"../../include/bits/timeval.h",
 	"../../include/bits/timeb.h",
@@ -330,10 +331,36 @@ STATIC_ASSERT(offsetof(struct itimerspec, it_value) == __OFFSET_ITIMERSPEC_VALUE
 STATIC_ASSERT(offsetof(struct itimerspec, it_interval) == __OFFSET_ITIMERSPEC_INTERVAL);
 STATIC_ASSERT(sizeof(struct itimerspec) == __SIZEOF_ITIMERSPEC);
 
-/* struct itimerspec64 */
-STATIC_ASSERT(offsetof(struct itimerspec64, it_value) == __OFFSET_ITIMERSPEC64_VALUE);
-STATIC_ASSERT(offsetof(struct itimerspec64, it_interval) == __OFFSET_ITIMERSPEC64_INTERVAL);
-STATIC_ASSERT(sizeof(struct itimerspec64) == __SIZEOF_ITIMERSPEC64);
+/* struct __itimerspec64 */
+STATIC_ASSERT(offsetof(struct __itimerspec64, it_value) == __OFFSET_ITIMERSPEC64_VALUE);
+STATIC_ASSERT(offsetof(struct __itimerspec64, it_interval) == __OFFSET_ITIMERSPEC64_INTERVAL);
+STATIC_ASSERT(sizeof(struct __itimerspec64) == __SIZEOF_ITIMERSPEC64);
+
+/* struct __itimerspec32 */
+STATIC_ASSERT(offsetof(struct __itimerspec32, it_value) == __OFFSET_ITIMERSPEC32_VALUE);
+STATIC_ASSERT(offsetof(struct __itimerspec32, it_interval) == __OFFSET_ITIMERSPEC32_INTERVAL);
+STATIC_ASSERT(sizeof(struct __itimerspec32) == __SIZEOF_ITIMERSPEC32);
+
+
+
+
+
+#include <bits/itimerval.h>
+
+/* struct itimerval */
+STATIC_ASSERT(offsetof(struct itimerval, it_value) == __OFFSET_ITIMERVAL_VALUE);
+STATIC_ASSERT(offsetof(struct itimerval, it_interval) == __OFFSET_ITIMERVAL_INTERVAL);
+STATIC_ASSERT(sizeof(struct itimerval) == __SIZEOF_ITIMERVAL);
+
+/* struct __itimerval64 */
+STATIC_ASSERT(offsetof(struct __itimerval64, it_value) == __OFFSET_ITIMERVAL64_VALUE);
+STATIC_ASSERT(offsetof(struct __itimerval64, it_interval) == __OFFSET_ITIMERVAL64_INTERVAL);
+STATIC_ASSERT(sizeof(struct __itimerval64) == __SIZEOF_ITIMERVAL64);
+
+/* struct __itimerval32 */
+STATIC_ASSERT(offsetof(struct __itimerval32, it_value) == __OFFSET_ITIMERVAL32_VALUE);
+STATIC_ASSERT(offsetof(struct __itimerval32, it_interval) == __OFFSET_ITIMERVAL32_INTERVAL);
+STATIC_ASSERT(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
 
 
 
@@ -346,15 +373,15 @@ STATIC_ASSERT(offsetof(struct timespec, tv_sec) == __OFFSET_TIMESPEC_SEC);
 STATIC_ASSERT(offsetof(struct timespec, tv_nsec) == __OFFSET_TIMESPEC_NSEC);
 STATIC_ASSERT(sizeof(struct timespec) == __SIZEOF_TIMESPEC);
 
-/* struct timespec32 */
-STATIC_ASSERT(offsetof(struct timespec32, tv_sec) == __OFFSET_TIMESPEC32_SEC);
-STATIC_ASSERT(offsetof(struct timespec32, tv_nsec) == __OFFSET_TIMESPEC32_NSEC);
-STATIC_ASSERT(sizeof(struct timespec32) == __SIZEOF_TIMESPEC32);
+/* struct __timespec64 */
+STATIC_ASSERT(offsetof(struct __timespec64, tv_sec) == __OFFSET_TIMESPEC64_SEC);
+STATIC_ASSERT(offsetof(struct __timespec64, tv_nsec) == __OFFSET_TIMESPEC64_NSEC);
+STATIC_ASSERT(sizeof(struct __timespec64) == __SIZEOF_TIMESPEC64);
 
-/* struct timespec64 */
-STATIC_ASSERT(offsetof(struct timespec64, tv_sec) == __OFFSET_TIMESPEC64_SEC);
-STATIC_ASSERT(offsetof(struct timespec64, tv_nsec) == __OFFSET_TIMESPEC64_NSEC);
-STATIC_ASSERT(sizeof(struct timespec64) == __SIZEOF_TIMESPEC64);
+/* struct __timespec32 */
+STATIC_ASSERT(offsetof(struct __timespec32, tv_sec) == __OFFSET_TIMESPEC32_SEC);
+STATIC_ASSERT(offsetof(struct __timespec32, tv_nsec) == __OFFSET_TIMESPEC32_NSEC);
+STATIC_ASSERT(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
 
 
 
@@ -367,13 +394,15 @@ STATIC_ASSERT(offsetof(struct timeval, tv_usec) == __OFFSET_TIMEVAL_USEC);
 STATIC_ASSERT(offsetof(struct timeval, tv_sec) == __OFFSET_TIMEVAL_SEC);
 STATIC_ASSERT(sizeof(struct timeval) == __SIZEOF_TIMEVAL);
 
-/* struct timeval32 */
-/* ... */
+/* struct __timeval64 */
+STATIC_ASSERT(offsetof(struct __timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
+STATIC_ASSERT(offsetof(struct __timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
+STATIC_ASSERT(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
 
-/* struct timeval64 */
-STATIC_ASSERT(offsetof(struct timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
-STATIC_ASSERT(offsetof(struct timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
-STATIC_ASSERT(sizeof(struct timeval64) == __SIZEOF_TIMEVAL64);
+/* struct __timeval32 */
+STATIC_ASSERT(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
+STATIC_ASSERT(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
+STATIC_ASSERT(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
 
 
 
@@ -388,15 +417,19 @@ STATIC_ASSERT(offsetof(struct timeb, time) == __OFFSET_TIMEB_TIME);
 STATIC_ASSERT(offsetof(struct timeb, timezone) == __OFFSET_TIMEB_TIMEZONE);
 STATIC_ASSERT(sizeof(struct timeb) == __SIZEOF_TIMEB);
 
-/* struct timeb32 */
-/* ... */
+/* struct __timeb64 */
+STATIC_ASSERT(offsetof(struct __timeb64, dstflag) == __OFFSET_TIMEB64_DSTFLAG);
+STATIC_ASSERT(offsetof(struct __timeb64, millitm) == __OFFSET_TIMEB64_MILLITM);
+STATIC_ASSERT(offsetof(struct __timeb64, time) == __OFFSET_TIMEB64_TIME);
+STATIC_ASSERT(offsetof(struct __timeb64, timezone) == __OFFSET_TIMEB64_TIMEZONE);
+STATIC_ASSERT(sizeof(struct __timeb64) == __SIZEOF_TIMEB64);
 
-/* struct timeb64 */
-STATIC_ASSERT(offsetof(struct timeb64, dstflag) == __OFFSET_TIMEB64_DSTFLAG);
-STATIC_ASSERT(offsetof(struct timeb64, millitm) == __OFFSET_TIMEB64_MILLITM);
-STATIC_ASSERT(offsetof(struct timeb64, time) == __OFFSET_TIMEB64_TIME);
-STATIC_ASSERT(offsetof(struct timeb64, timezone) == __OFFSET_TIMEB64_TIMEZONE);
-STATIC_ASSERT(sizeof(struct timeb64) == __SIZEOF_TIMEB64);
+/* struct __timeb32 */
+STATIC_ASSERT(offsetof(struct __timeb32, dstflag) == __OFFSET_TIMEB32_DSTFLAG);
+STATIC_ASSERT(offsetof(struct __timeb32, millitm) == __OFFSET_TIMEB32_MILLITM);
+STATIC_ASSERT(offsetof(struct __timeb32, time) == __OFFSET_TIMEB32_TIME);
+STATIC_ASSERT(offsetof(struct __timeb32, timezone) == __OFFSET_TIMEB32_TIMEZONE);
+STATIC_ASSERT(sizeof(struct __timeb32) == __SIZEOF_TIMEB32);
 
 
 
@@ -451,13 +484,61 @@ STATIC_ASSERT(alignof(struct sigaction) == __ALIGNOF_SIGACTION);
 #include <bits/rusage-struct.h>
 
 /* struct rusage */
-/* ... */
+STATIC_ASSERT(offsetof(struct rusage, ru_idrss) == __OFFSET_RUSAGE_IDRSS);
+STATIC_ASSERT(offsetof(struct rusage, ru_inblock) == __OFFSET_RUSAGE_INBLOCK);
+STATIC_ASSERT(offsetof(struct rusage, ru_isrss) == __OFFSET_RUSAGE_ISRSS);
+STATIC_ASSERT(offsetof(struct rusage, ru_ixrss) == __OFFSET_RUSAGE_IXRSS);
+STATIC_ASSERT(offsetof(struct rusage, ru_majflt) == __OFFSET_RUSAGE_MAJFLT);
+STATIC_ASSERT(offsetof(struct rusage, ru_maxrss) == __OFFSET_RUSAGE_MAXRSS);
+STATIC_ASSERT(offsetof(struct rusage, ru_minflt) == __OFFSET_RUSAGE_MINFLT);
+STATIC_ASSERT(offsetof(struct rusage, ru_msgrcv) == __OFFSET_RUSAGE_MSGRCV);
+STATIC_ASSERT(offsetof(struct rusage, ru_msgsnd) == __OFFSET_RUSAGE_MSGSND);
+STATIC_ASSERT(offsetof(struct rusage, ru_nivcsw) == __OFFSET_RUSAGE_NIVCSW);
+STATIC_ASSERT(offsetof(struct rusage, ru_nsignals) == __OFFSET_RUSAGE_NSIGNALS);
+STATIC_ASSERT(offsetof(struct rusage, ru_nswap) == __OFFSET_RUSAGE_NSWAP);
+STATIC_ASSERT(offsetof(struct rusage, ru_nvcsw) == __OFFSET_RUSAGE_NVCSW);
+STATIC_ASSERT(offsetof(struct rusage, ru_oublock) == __OFFSET_RUSAGE_OUBLOCK);
+STATIC_ASSERT(offsetof(struct rusage, ru_stime) == __OFFSET_RUSAGE_STIME);
+STATIC_ASSERT(offsetof(struct rusage, ru_utime) == __OFFSET_RUSAGE_UTIME);
+STATIC_ASSERT(sizeof(struct rusage) == __SIZEOF_RUSAGE);
 
-/* struct rusage32 */
-/* ... */
+/* struct __rusage64 */
+STATIC_ASSERT(offsetof(struct __rusage64, ru_idrss) == __OFFSET_RUSAGE64_IDRSS);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_inblock) == __OFFSET_RUSAGE64_INBLOCK);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_isrss) == __OFFSET_RUSAGE64_ISRSS);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_ixrss) == __OFFSET_RUSAGE64_IXRSS);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_majflt) == __OFFSET_RUSAGE64_MAJFLT);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_maxrss) == __OFFSET_RUSAGE64_MAXRSS);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_minflt) == __OFFSET_RUSAGE64_MINFLT);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_msgrcv) == __OFFSET_RUSAGE64_MSGRCV);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_msgsnd) == __OFFSET_RUSAGE64_MSGSND);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_nivcsw) == __OFFSET_RUSAGE64_NIVCSW);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_nsignals) == __OFFSET_RUSAGE64_NSIGNALS);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_nswap) == __OFFSET_RUSAGE64_NSWAP);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_nvcsw) == __OFFSET_RUSAGE64_NVCSW);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_oublock) == __OFFSET_RUSAGE64_OUBLOCK);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_stime) == __OFFSET_RUSAGE64_STIME);
+STATIC_ASSERT(offsetof(struct __rusage64, ru_utime) == __OFFSET_RUSAGE64_UTIME);
+STATIC_ASSERT(sizeof(struct __rusage64) == __SIZEOF_RUSAGE64);
 
-/* struct rusage64 */
-/* ... */
+/* struct __rusage32 */
+STATIC_ASSERT(offsetof(struct __rusage32, ru_idrss) == __OFFSET_RUSAGE32_IDRSS);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_inblock) == __OFFSET_RUSAGE32_INBLOCK);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_isrss) == __OFFSET_RUSAGE32_ISRSS);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_ixrss) == __OFFSET_RUSAGE32_IXRSS);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_majflt) == __OFFSET_RUSAGE32_MAJFLT);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_maxrss) == __OFFSET_RUSAGE32_MAXRSS);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_minflt) == __OFFSET_RUSAGE32_MINFLT);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_msgrcv) == __OFFSET_RUSAGE32_MSGRCV);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_msgsnd) == __OFFSET_RUSAGE32_MSGSND);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_nivcsw) == __OFFSET_RUSAGE32_NIVCSW);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_nsignals) == __OFFSET_RUSAGE32_NSIGNALS);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_nswap) == __OFFSET_RUSAGE32_NSWAP);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_nvcsw) == __OFFSET_RUSAGE32_NVCSW);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_oublock) == __OFFSET_RUSAGE32_OUBLOCK);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_stime) == __OFFSET_RUSAGE32_STIME);
+STATIC_ASSERT(offsetof(struct __rusage32, ru_utime) == __OFFSET_RUSAGE32_UTIME);
+STATIC_ASSERT(sizeof(struct __rusage32) == __SIZEOF_RUSAGE32);
 
 
 

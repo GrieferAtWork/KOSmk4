@@ -38,13 +38,15 @@
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /*[[[autogen:wrap3264_x32_and_x32_64(
-	linkIf:   "defined(__i386__) && !defined(__x86_64__)",
-	name:     "statfs",
-	name32:   "statfsx32",
-	name64:   "statfsx32_64",
-	name32If: "defined(__USE_KOS)",
-	name64If: "defined(__USE_LARGEFILE64)",
-	link64If: "defined(__USE_FILE_OFFSET64)",
+	linkIf:    "defined(__i386__) && !defined(__x86_64__)",
+	name:      "statfs",
+	name32:    "statfsx32",
+	name64:    "statfsx32_64",
+	altname64: "__statfsx32_64_alt",
+	name32If:  "defined(__USE_KOS)",
+	name64If:  "defined(__USE_LARGEFILE64)",
+	link64If:  "defined(__USE_FILE_OFFSET64)",
+	macro64If: "defined(__USE_STRUCT64_MACRO)",
 )]]]*/
 #undef statfsx32
 #undef statfsx32_64
@@ -66,9 +68,13 @@
 #define __statfs_alt   __statfs32
 #ifdef __USE_KOS
 #define statfs32 __statfs32
-#endif /* __USE_KOS */
+#endif /* !__USE_KOS */
 #ifdef __USE_LARGEFILE64
+#ifdef __USE_STRUCT64_MACRO
 #define statfs64 statfs
+#else /* __USE_STRUCT64_MACRO */
+#define __statfsx32_64_alt statfs64
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_LARGEFILE64 */
 
 #define __OFFSET_STATFS_TYPE    __OFFSET_STATFSX32_64_TYPE
@@ -224,13 +230,32 @@ struct statfsx32_64 /*[PREFIX(f_)]*/ {
 	__byte_t       __f_pad[4];
 };
 
+#ifdef __statfsx32_64_alt
+struct __statfsx32_64_alt {
+	__ULONG32_TYPE__ f_type;     /* Type of file system (one of the constants from <linux/magic.h>) */
+	__ULONG32_TYPE__ f_bsize;    /* Optimal transfer block size */
+	__ULONG64_TYPE__ f_blocks;   /* Total data blocks in file system */
+	__ULONG64_TYPE__ f_bfree;    /* Free blocks in fs */
+	__ULONG64_TYPE__ f_bavail;   /* Free blocks available to unprivileged user */
+	__ULONG64_TYPE__ f_files;    /* Total file nodes in file system */
+	__ULONG64_TYPE__ f_ffree;    /* Free file nodes in fs */
+	__fsid_t         f_fsid;     /* File system id */
+	__ULONG32_TYPE__ f_namelen;  /* Maximum length of filenames */
+	__ULONG32_TYPE__ f_frsize;   /* Fragment size (since Linux 2.6) */
+	__ULONG32_TYPE__ f_flags;    /* Mount flags (set of `ST_*' from <sys/statvfs.h>) */
+	__ULONG32_TYPE__ f_spare[4]; /* ??? */
+	__byte_t       __f_pad[4];
+};
+#undef __statfsx32_64_alt
+#endif /* __statfsx32_64_alt */
+
 __DECL_END
 #endif /* __CC__ */
 
-#ifndef __USE_KOS
+#ifndef __USE_KOS_KERNEL
 #undef statfsx32
 #undef statfsx32_64
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef __PRIVATE_DID_PUSH_STATFSX32_64

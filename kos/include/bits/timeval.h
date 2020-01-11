@@ -28,16 +28,41 @@
 #include <bits/types.h>
 
 #define __OFFSET_TIMEVAL_SEC     0
-#if __TM_SIZEOF(TIME) >= 8 || __SIZEOF_SYSCALL_LONG_T__ >= 8
-#define __OFFSET_TIMEVAL_USEC    8
-#define __SIZEOF_TIMEVAL         16
-#else
-#define __OFFSET_TIMEVAL_USEC    4
-#define __SIZEOF_TIMEVAL         8
-#endif
-#define __OFFSET_TIMEVAL64_SEC   0
-#define __OFFSET_TIMEVAL64_USEC  8
-#define __SIZEOF_TIMEVAL64       16
+#if __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
+#define __OFFSET_TIMEVAL_USEC    (__TM_SIZEOF(TIME) + 4)
+#else /* __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
+#define __OFFSET_TIMEVAL_USEC    __TM_SIZEOF(TIME)
+#endif /* __TM_SIZEOF(TIME) > 4 || __SIZEOF_SYSCALL_LONG_T__ <= 4 */
+#if __TM_SIZEOF(TIME) > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
+#define __SIZEOF_TIMEVAL         (__OFFSET_TIMEVAL_USEC + __SIZEOF_SYSCALL_LONG_T__ + 4)
+#else /* __TM_SIZEOF(TIME) > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
+#define __SIZEOF_TIMEVAL         (__OFFSET_TIMEVAL_USEC + __SIZEOF_SYSCALL_LONG_T__)
+#endif /* __TM_SIZEOF(TIME) <= 4 || __SIZEOF_SYSCALL_LONG_T__ > 4 */
+
+#define __OFFSET_TIMEVAL32_SEC     0
+#if __SIZEOF_TIME32_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
+#define __OFFSET_TIMEVAL32_USEC    (__SIZEOF_TIME32_T__ + 4)
+#else /* __SIZEOF_TIME32_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
+#define __OFFSET_TIMEVAL32_USEC    __SIZEOF_TIME32_T__
+#endif /* __SIZEOF_TIME32_T__ > 4 || __SIZEOF_SYSCALL_LONG_T__ <= 4 */
+#if __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
+#define __SIZEOF_TIMEVAL32         (__OFFSET_TIMEVAL32_USEC + __SIZEOF_SYSCALL_LONG_T__ + 4)
+#else /* __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
+#define __SIZEOF_TIMEVAL32         (__OFFSET_TIMEVAL32_USEC + __SIZEOF_SYSCALL_LONG_T__)
+#endif /* __SIZEOF_TIME32_T__ <= 4 || __SIZEOF_SYSCALL_LONG_T__ > 4 */
+
+#define __OFFSET_TIMEVAL64_SEC     0
+#if __SIZEOF_TIME64_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
+#define __OFFSET_TIMEVAL64_USEC    (__SIZEOF_TIME64_T__ + 4)
+#else /* __SIZEOF_TIME64_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
+#define __OFFSET_TIMEVAL64_USEC    __SIZEOF_TIME64_T__
+#endif /* __SIZEOF_TIME64_T__ > 4 || __SIZEOF_SYSCALL_LONG_T__ <= 4 */
+#if __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
+#define __SIZEOF_TIMEVAL64         (__OFFSET_TIMEVAL64_USEC + __SIZEOF_SYSCALL_LONG_T__ + 4)
+#else /* __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
+#define __SIZEOF_TIMEVAL64         (__OFFSET_TIMEVAL64_USEC + __SIZEOF_SYSCALL_LONG_T__)
+#endif /* __SIZEOF_TIME64_T__ <= 4 || __SIZEOF_SYSCALL_LONG_T__ > 4 */
+
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -50,80 +75,85 @@ __SYSDECL_BEGIN
 #undef tv_sec
 #undef tv_usec
 
-#if 0 /* For assert_types.c */
-struct timeval /*[PREFIX(tv_)]*/ {};
-struct timeval32 /*[PREFIX(tv_)]*/ {};
-struct timeval64 /*[PREFIX(tv_)]*/ {};
-#endif
-
 __TIMEVAL_CXX_DECL_BEGIN
-struct timeval {
+
+#ifndef __timeval_defined
+#define __timeval_defined 1
+struct timeval /*[PREFIX(tv_)]*/ {
 	__TM_TYPE(time)   tv_sec;   /* Seconds */
 #if __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
-#endif
+#endif /* __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
 	__syscall_ulong_t tv_usec;  /* Micro seconds (<= 1000000 == 1_000_000) */
 #if __TM_SIZEOF(TIME) > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
-#endif
+#endif /* __TM_SIZEOF(TIME) > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
 	__TIMEVAL_CXX_SUPPORT(struct timeval, __TM_TYPE(time), __syscall_ulong_t)
 };
 __TIMEVAL_CXX_SUPPORT2(struct timeval, __TM_TYPE(time), __syscall_ulong_t)
-__TIMEVAL_CXX_DECL_END
-
-
-#if __TM_SIZEOF(TIME) <= 4
-#define __timeval64  __timeval_alt
-#define __timeval32  timeval
-#else
-#define __timeval64  timeval
-#define __timeval32  __timeval_alt
-#endif
-
-#ifdef __USE_TIME64
-#if __TM_SIZEOF(TIME) <= 4
-#define __timeval_alt timeval64
-#else
-#define timeval64     timeval
-#endif
-#endif /* __USE_TIME64 */
+#endif /* !__timeval_defined */
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-#if defined(__USE_TIME64) && __TM_SIZEOF(TIME) <= 4
-#define timeval64     timeval
-#else
-#define __timeval_alt timeval
-#endif
-#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-__TIMEVAL_CXX_DECL_BEGIN
-struct __timeval_alt
-/*Keep an empty line here*/
-{
-#if __TM_SIZEOF(TIME) <= 4
+#define _TIMEVAL_MATCHES_TIMEVAL64 1
+#endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+
+#ifdef __USE_TIME64
+#ifndef __timeval64_defined
+#define __timeval64_defined 1
+#if (defined(__USE_TIME_BITS64) || defined(_TIMEVAL_MATCHES_TIMEVAL64)) && defined(__USE_STRUCT64_MACRO)
+#define timeval64 timeval
+#else /* (__USE_TIME_BITS64 || _TIMEVAL_MATCHES_TIMEVAL64) && __USE_STRUCT64_MACRO */
+#define __timeval64 timeval64
+#endif /* (!__USE_TIME_BITS64 && !_TIMEVAL_MATCHES_TIMEVAL64) || !__USE_STRUCT64_MACRO */
+#endif /* !__timeval64_defined */
+#endif /* __USE_TIME64 */
+
+#if (defined(__USE_TIME_BITS64) || defined(_TIMEVAL_MATCHES_TIMEVAL64)) && defined(__USE_STRUCT64_MACRO)
+#define __timeval64 timeval
+#else /* (__USE_TIME_BITS64 || _TIMEVAL_MATCHES_TIMEVAL64) && __USE_STRUCT64_MACRO */
+struct __timeval64 /*[NAME(timeval64)][PREFIX(tv_)]*/ {
 	__time64_t        tv_sec;   /* Seconds */
-#else
-	__time32_t        tv_sec;   /* Seconds */
-#if __SIZEOF_SYSCALL_LONG_T__ > 4
-	__UINT32_TYPE__ __tv_pad;   /* ... */
-#endif
-#endif
+#if __SIZEOF_TIME64_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
+	__UINT32_TYPE__ __tv_pad; /* ... */
+#endif /* __SIZEOF_TIME64_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
 	__syscall_ulong_t tv_usec;  /* Micro seconds (<= 1000000 == 1_000_000) */
-#if __SIZEOF_SYSCALL_LONG_T__ <= 4 && __TM_SIZEOF(TIME) <= 4
-	__UINT32_TYPE__ __tv_pad;   /* ... */
-#endif
-#if __TM_SIZEOF(TIME) <= 4
-	__TIMEVAL_CXX_SUPPORT(struct __timeval_alt, __time64_t, __syscall_ulong_t)
-#else
-	__TIMEVAL_CXX_SUPPORT(struct __timeval_alt, __time32_t, __syscall_ulong_t)
-#endif
+#if __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
+	__UINT32_TYPE__ __tv_pad; /* ... */
+#endif /* __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
+	__TIMEVAL_CXX_SUPPORT(struct __timeval64, __time64_t, __syscall_ulong_t)
 };
-#if __TM_SIZEOF(TIME) <= 4
-__TIMEVAL_CXX_SUPPORT2(struct __timeval_alt, __time64_t, __syscall_ulong_t)
-#else
-__TIMEVAL_CXX_SUPPORT2(struct __timeval_alt, __time32_t, __syscall_ulong_t)
-#endif
+__TIMEVAL_CXX_SUPPORT2(struct __timeval64, __time64_t, __syscall_ulong_t)
+#endif /* (!__USE_TIME_BITS64 && !_TIMEVAL_MATCHES_TIMEVAL64) || !__USE_STRUCT64_MACRO */
+
+#ifdef __USE_KOS
+#ifndef __timeval32_defined
+#define __timeval32_defined 1
+#if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define timeval32 timeval
+#else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#define __timeval32 timeval32
+#endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#endif /* !__timeval32_defined */
+#endif /* __USE_KOS */
+
+#if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define __timeval32 timeval
+#else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+struct __timeval32 /*[NAME(timeval32)][PREFIX(tv_)]*/ {
+	__time32_t        tv_sec;   /* Seconds */
+#if __SIZEOF_TIME32_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4
+	__UINT32_TYPE__ __tv_pad; /* ... */
+#endif /* __SIZEOF_TIME32_T__ <= 4 && __SIZEOF_SYSCALL_LONG_T__ > 4 */
+	__syscall_ulong_t tv_usec;  /* Micro seconds (<= 1000000 == 1_000_000) */
+#if __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4
+	__UINT32_TYPE__ __tv_pad; /* ... */
+#endif /* __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
+	__TIMEVAL_CXX_SUPPORT(struct __timeval32, __time32_t, __syscall_ulong_t)
+};
+__TIMEVAL_CXX_SUPPORT2(struct __timeval32, __time32_t, __syscall_ulong_t)
+#endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+
 __TIMEVAL_CXX_DECL_END
-#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("tv_usec")

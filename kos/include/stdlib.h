@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x250052db */
+/* HASH CRC-32:0x2d260ad0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2384,7 +2384,7 @@ __CDECLARE(,_purecall_handler,__NOTHROW_NCX,_set_purecall_handler,(_purecall_han
 __CDECLARE(,_purecall_handler,__NOTHROW_NCX,_get_purecall_handler,(void),())
 #endif /* _get_purecall_handler... */
 
-typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, uintptr_t);
+typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
 #ifdef __CRT_HAVE__set_invalid_parameter_handler
 __CDECLARE(,_invalid_parameter_handler,__NOTHROW_NCX,_set_invalid_parameter_handler,(_invalid_parameter_handler ____handler),(____handler))
 #endif /* _set_invalid_parameter_handler... */
@@ -3465,7 +3465,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,_wgetenv,(
 #ifndef ___wgetenv_s_defined
 #define ___wgetenv_s_defined 1
 #ifdef __CRT_HAVE__wgetenv_s
-__CDECLARE(__ATTR_NONNULL((1, 4)),errno_t,__NOTHROW_NCX,_wgetenv_s,(size_t *__return_size, wchar_t *__buf, size_t __buflen, wchar_t const *__varname),(__return_size,__buf,__buflen,__varname))
+__CDECLARE(__ATTR_NONNULL((1, 4)),errno_t,__NOTHROW_NCX,_wgetenv_s,(__SIZE_TYPE__ *__return_size, wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__varname),(__return_size,__buf,__buflen,__varname))
 #else /* LIBC: _wgetenv_s */
 #undef ___wgetenv_s_defined
 #endif /* _wgetenv_s... */
@@ -3473,7 +3473,7 @@ __CDECLARE(__ATTR_NONNULL((1, 4)),errno_t,__NOTHROW_NCX,_wgetenv_s,(size_t *__re
 #ifndef ___wdupenv_s_defined
 #define ___wdupenv_s_defined 1
 #ifdef __CRT_HAVE__wdupenv_s
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_wdupenv_s,(wchar_t **__pbuf, size_t *__pbuflen, wchar_t const *__varname),(__pbuf,__pbuflen,__varname))
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_wdupenv_s,(wchar_t **__pbuf, __SIZE_TYPE__ *__pbuflen, wchar_t const *__varname),(__pbuf,__pbuflen,__varname))
 #else /* LIBC: _wdupenv_s */
 #undef ___wdupenv_s_defined
 #endif /* _wdupenv_s... */
@@ -3754,46 +3754,46 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow, __FORCELOCAL __ATTR_NONNULL((2)) wchar
 #ifndef ___itow_s_defined
 #define ___itow_s_defined 1
 #ifdef __CRT_HAVE__itow_s
-__CDECLARE(,errno_t,__NOTHROW_NCX,_itow_s,(int __val, wchar_t *__buf, size_t __buflen, int __radix),(__val,__buf,__buflen,__radix))
+__CDECLARE(,errno_t,__NOTHROW_NCX,_itow_s,(int __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* LIBC: _itow_s */
 #include <local/stdlib/_itow_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_itow_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _itow_s)(int __val, wchar_t *__buf, size_t __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_itow_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_itow_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _itow_s)(int __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_itow_s))(__val, __buf, __buflen, __radix); })
 #endif /* _itow_s... */
 #endif /* !___itow_s_defined */
 #ifndef ___ltow_s_defined
 #define ___ltow_s_defined 1
 #ifdef __CRT_HAVE__ltow_s
-__CDECLARE(,errno_t,__NOTHROW_NCX,_ltow_s,(long __val, wchar_t *__buf, size_t __buflen, int __radix),(__val,__buf,__buflen,__radix))
+__CDECLARE(,errno_t,__NOTHROW_NCX,_ltow_s,(long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* LIBC: _ltow_s */
 #include <local/stdlib/_ltow_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ltow_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _ltow_s)(long __val, wchar_t *__buf, size_t __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ltow_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ltow_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _ltow_s)(long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ltow_s))(__val, __buf, __buflen, __radix); })
 #endif /* _ltow_s... */
 #endif /* !___ltow_s_defined */
 #ifndef ___ultow_s_defined
 #define ___ultow_s_defined 1
 #ifdef __CRT_HAVE__ultow_s
-__CDECLARE(,errno_t,__NOTHROW_NCX,_ultow_s,(unsigned long __val, wchar_t *__buf, size_t __buflen, int __radix),(__val,__buf,__buflen,__radix))
+__CDECLARE(,errno_t,__NOTHROW_NCX,_ultow_s,(unsigned long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* LIBC: _ultow_s */
 #include <local/stdlib/_ultow_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ultow_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _ultow_s)(unsigned long __val, wchar_t *__buf, size_t __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ultow_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ultow_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _ultow_s)(unsigned long __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ultow_s))(__val, __buf, __buflen, __radix); })
 #endif /* _ultow_s... */
 #endif /* !___ultow_s_defined */
 #ifndef ___i64tow_s_defined
 #define ___i64tow_s_defined 1
 #ifdef __CRT_HAVE__i64tow_s
-__CDECLARE(,errno_t,__NOTHROW_NCX,_i64tow_s,(__INT64_TYPE__ __val, wchar_t *__buf, size_t __buflen, int __radix),(__val,__buf,__buflen,__radix))
+__CDECLARE(,errno_t,__NOTHROW_NCX,_i64tow_s,(__INT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* LIBC: _i64tow_s */
 #include <local/stdlib/_i64tow_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_i64tow_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _i64tow_s)(__INT64_TYPE__ __val, wchar_t *__buf, size_t __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64tow_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_i64tow_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _i64tow_s)(__INT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_i64tow_s))(__val, __buf, __buflen, __radix); })
 #endif /* _i64tow_s... */
 #endif /* !___i64tow_s_defined */
 #ifndef ___ui64tow_s_defined
 #define ___ui64tow_s_defined 1
 #ifdef __CRT_HAVE__ui64tow_s
-__CDECLARE(,errno_t,__NOTHROW_NCX,_ui64tow_s,(__UINT64_TYPE__ __val, wchar_t *__buf, size_t __buflen, int __radix),(__val,__buf,__buflen,__radix))
+__CDECLARE(,errno_t,__NOTHROW_NCX,_ui64tow_s,(__UINT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix),(__val,__buf,__buflen,__radix))
 #else /* LIBC: _ui64tow_s */
 #include <local/stdlib/_ui64tow_s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _ui64tow_s)(__UINT64_TYPE__ __val, wchar_t *__buf, size_t __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64tow_s))(__val, __buf, __buflen, __radix); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_ui64tow_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _ui64tow_s)(__UINT64_TYPE__ __val, wchar_t *__buf, __SIZE_TYPE__ __buflen, int __radix) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ui64tow_s))(__val, __buf, __buflen, __radix); })
 #endif /* _ui64tow_s... */
 #endif /* !___ui64tow_s_defined */
 #ifndef ___wtoi_defined

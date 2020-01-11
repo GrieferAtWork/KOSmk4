@@ -34,11 +34,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /*[[[autogen:wrap3264_x64(
-	linkIf:   "defined(__x86_64__)",
-	name:     "timespec",
-	name64:   "timespecx64",
-	name32If: "defined(__USE_KOS)",
-	name64If: "defined(__USE_TIME64)",
+	linkIf:    "defined(__x86_64__)",
+	name:      "timespec",
+	name64:    "timespecx64",
+	altname64: "__timespecx64_alt",
+	name32If:  "defined(__USE_KOS)",
+	name64If:  "defined(__USE_TIME64)",
+	macro64If: "defined(__USE_STRUCT64_MACRO)",
 )]]]*/
 #undef timespecx64
 #ifndef __x86_64__
@@ -67,7 +69,11 @@
 #define timespec32 timespec
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
+#ifdef __USE_STRUCT64_MACRO
 #define timespec64 timespec
+#else /* __USE_STRUCT64_MACRO */
+#define __timespecx64_alt timespec64
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_TIME64 */
 #define __timespec_defined 1
 #endif /* __x86_64__ */
@@ -90,13 +96,23 @@ struct timespecx64 /*[PREFIX(tv_)]*/ {
 };
 __TIMESPEC_CXX_SUPPORT2(struct timespecx64, __INT64_TYPE__, __UINT64_TYPE__)
 
+#ifdef __timespecx64_alt
+struct __timespecx64_alt {
+	__INT64_TYPE__  tv_sec;   /* Seconds */
+	__UINT64_TYPE__ tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+	__TIMESPEC_CXX_SUPPORT(struct __timespecx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
+};
+__TIMESPEC_CXX_SUPPORT2(struct __timespecx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
+#undef __timespecx64_alt
+#endif /* __timespecx64_alt */
+
 __TIMESPEC_CXX_DECL_END
 __DECL_END
 #endif /* __CC__ */
 
-#ifndef __USE_KOS
+#ifndef __USE_KOS_KERNEL
 #undef timespecx64
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef __PRIVATE_DID_PUSH_TIMESPECX64

@@ -38,13 +38,15 @@
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /*[[[autogen:wrap3264_x32_and_x32_64(
-	linkIf:   "defined(__i386__) && !defined(__x86_64__)",
-	name:     "timespec",
-	name32:   "timespecx32",
-	name64:   "timespecx32_64",
-	name32If: "defined(__USE_KOS)",
-	name64If: "defined(__USE_TIME64)",
-	link64If: "defined(__USE_TIME_BITS64)",
+	linkIf:    "defined(__i386__) && !defined(__x86_64__)",
+	name:      "timespec",
+	name32:    "timespecx32",
+	name64:    "timespecx32_64",
+	altname64: "__timespecx32_64_alt",
+	name32If:  "defined(__USE_KOS)",
+	name64If:  "defined(__USE_TIME64)",
+	link64If:  "defined(__USE_TIME_BITS64)",
+	macro64If: "defined(__USE_STRUCT64_MACRO)",
 )]]]*/
 #undef timespecx32
 #undef timespecx32_64
@@ -66,9 +68,13 @@
 #define __timespec_alt   __timespec32
 #ifdef __USE_KOS
 #define timespec32 __timespec32
-#endif /* __USE_KOS */
+#endif /* !__USE_KOS */
 #ifdef __USE_TIME64
+#ifdef __USE_STRUCT64_MACRO
 #define timespec64 timespec
+#else /* __USE_STRUCT64_MACRO */
+#define __timespecx32_64_alt timespec64
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_TIME64 */
 
 #define __OFFSET_TIMESPEC_SEC  __OFFSET_TIMESPECX32_64_SEC
@@ -149,14 +155,25 @@ struct timespecx32_64 /*[PREFIX(tv_)]*/ {
 };
 __TIMESPEC_CXX_SUPPORT2(struct timespecx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 
+#ifdef __timespecx32_64_alt
+struct __timespecx32_64_alt {
+	__INT64_TYPE__    tv_sec;   /* Seconds */
+	__UINT32_TYPE__   tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
+	__UINT32_TYPE__ __tv_pad;   /* ... */
+	__TIMESPEC_CXX_SUPPORT(struct __timespecx32_64_alt, __INT64_TYPE__, __UINT32_TYPE__)
+};
+__TIMESPEC_CXX_SUPPORT2(struct __timespecx32_64_alt, __INT64_TYPE__, __UINT32_TYPE__)
+#undef __timespecx32_64_alt
+#endif /* __timespecx32_64_alt */
+
 __TIMESPEC_CXX_DECL_END
 __DECL_END
 #endif /* __CC__ */
 
-#ifndef __USE_KOS
+#ifndef __USE_KOS_KERNEL
 #undef timespecx32
 #undef timespecx32_64
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef __PRIVATE_DID_PUSH_TIMESPECX32_64

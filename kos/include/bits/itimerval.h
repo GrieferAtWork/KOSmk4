@@ -21,39 +21,92 @@
 
 #include <__stdinc.h>
 #include <features.h>
+
+#include <hybrid/typecore.h>
+
 #include <bits/timeval.h>
+#include <bits/types.h>
+
+#define __OFFSET_ITIMERVAL_INTERVAL   0
+#define __OFFSET_ITIMERVAL_VALUE      __SIZEOF_TIMEVAL
+#define __SIZEOF_ITIMERVAL            (__SIZEOF_TIMEVAL * 2)
+#define __OFFSET_ITIMERVAL32_INTERVAL 0
+#define __OFFSET_ITIMERVAL32_VALUE    __SIZEOF_TIMEVAL32
+#define __SIZEOF_ITIMERVAL32          (__SIZEOF_TIMEVAL32 * 2)
+#define __OFFSET_ITIMERVAL64_INTERVAL 0
+#define __OFFSET_ITIMERVAL64_VALUE    __SIZEOF_TIMEVAL64
+#define __SIZEOF_ITIMERVAL64          (__SIZEOF_TIMEVAL64 * 2)
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("itimerval")
+#pragma push_macro("it_interval")
+#pragma push_macro("it_value")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef itimerval
+#undef it_interval
+#undef it_value
 
-#if __TM_SIZEOF(TIME) <= __SIZEOF_TIME32_T__
-#define __itimerval64   __itimerval_alt
-#define __itimerval32   itimerval
-#else /* __TM_SIZEOF(TIME) <= __SIZEOF_TIME32_T__ */
-#define __itimerval64   itimerval
-#define __itimerval32   __itimerval_alt
-#endif /* __TM_SIZEOF(TIME) > __SIZEOF_TIME32_T__ */
+#ifndef __itimerval_defined
+#define __itimerval_defined 1
+struct itimerval /*[PREFIX(it_)]*/ {
+	struct timeval it_interval;
+	struct timeval it_value;
+};
+#endif /* !__itimerval_defined */
+
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define _ITIMERVAL_MATCHES_ITIMERVAL64 1
+#endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 
 #ifdef __USE_TIME64
-#if __TM_SIZEOF(TIME) <= __SIZEOF_TIME32_T__
-#define __itimerval_alt itimerval64
-#else /* __TM_SIZEOF(TIME) <= __SIZEOF_TIME32_T__ */
-#define itimerval64     itimerval
-#endif /* __TM_SIZEOF(TIME) > __SIZEOF_TIME32_T__ */
+#ifndef __itimerval64_defined
+#define __itimerval64_defined 1
+#if (defined(__USE_TIME_BITS64) || defined(_ITIMERVAL_MATCHES_ITIMERVAL64)) && defined(__USE_STRUCT64_MACRO)
+#define itimerval64 itimerval
+#else /* (__USE_TIME_BITS64 || _ITIMERVAL_MATCHES_ITIMERVAL64) && __USE_STRUCT64_MACRO */
+#define __itimerval64 itimerval64
+#endif /* (!__USE_TIME_BITS64 && !_ITIMERVAL_MATCHES_ITIMERVAL64) || !__USE_STRUCT64_MACRO */
+#endif /* !__itimerval64_defined */
 #endif /* __USE_TIME64 */
 
-struct itimerval {
-	struct timeval       it_interval; /* Value to put into `it_value' when the timer expires. */
-	struct timeval       it_value;    /* Time to the next timer expiration. */
+#if (defined(__USE_TIME_BITS64) || defined(_ITIMERVAL_MATCHES_ITIMERVAL64)) && defined(__USE_STRUCT64_MACRO)
+#define __itimerval64 itimerval
+#else /* (__USE_TIME_BITS64 || _ITIMERVAL_MATCHES_ITIMERVAL64) && __USE_STRUCT64_MACRO */
+struct __itimerval64 /*[NAME(itimerval64)][PREFIX(it_)]*/ {
+	struct __timeval64 it_interval;
+	struct __timeval64 it_value;
 };
+#endif /* (!__USE_TIME_BITS64 && !_ITIMERVAL_MATCHES_ITIMERVAL64) || !__USE_STRUCT64_MACRO */
 
-struct __itimerval_alt {
-	struct __timeval_alt it_interval; /* Value to put into `it_value' when the timer expires. */
-	struct __timeval_alt it_value;    /* Time to the next timer expiration. */
+#ifdef __USE_KOS
+#ifndef __itimerval32_defined
+#define __itimerval32_defined 1
+#if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define itimerval32 itimerval
+#else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+#define __itimerval32 itimerval32
+#endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+#endif /* !__itimerval32_defined */
+#endif /* __USE_KOS */
+
+#if !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define __itimerval32 itimerval
+#else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+struct __itimerval32 /*[NAME(itimerval32)][PREFIX(it_)]*/ {
+	struct __timeval32 it_interval;
+	struct __timeval32 it_value;
 };
+#endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("it_value")
+#pragma pop_macro("it_interval")
+#pragma pop_macro("itimerval")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 __SYSDECL_END
 #endif /* __CC__ */
-
 
 #endif /* !_BITS_ITIMERVAL_H */

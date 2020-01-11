@@ -34,11 +34,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /*[[[autogen:wrap3264_x64(
-	linkIf:   "defined(__x86_64__)",
-	name:     "itimerspec",
-	name64:   "itimerspecx64",
-	name32If: "defined(__USE_KOS)",
-	name64If: "defined(__USE_TIME64)",
+	linkIf:    "defined(__x86_64__)",
+	name:      "itimerspec",
+	name64:    "itimerspecx64",
+	altname64: "__itimerspecx64_alt",
+	name32If:  "defined(__USE_KOS)",
+	name64If:  "defined(__USE_TIME64)",
+	macro64If: "defined(__USE_STRUCT64_MACRO)",
 )]]]*/
 #undef itimerspecx64
 #ifndef __x86_64__
@@ -67,7 +69,11 @@
 #define itimerspec32 itimerspec
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
+#ifdef __USE_STRUCT64_MACRO
 #define itimerspec64 itimerspec
+#else /* __USE_STRUCT64_MACRO */
+#define __itimerspecx64_alt itimerspec64
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_TIME64 */
 #define __itimerspec_defined 1
 #endif /* __x86_64__ */
@@ -94,6 +100,14 @@ struct itimerspecx64 /*[PREFIX(it_)]*/ {
 	struct __timespecx64 it_value;
 };
 
+#ifdef __itimerspecx64_alt
+struct __itimerspecx64_alt {
+	struct __timespecx64 it_interval;
+	struct __timespecx64 it_value;
+};
+#undef __itimerspecx64_alt
+#endif /* __itimerspecx64_alt */
+
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("it_value")
 #pragma pop_macro("it_interval")
@@ -102,9 +116,9 @@ struct itimerspecx64 /*[PREFIX(it_)]*/ {
 __DECL_END
 #endif /* __CC__ */
 
-#ifndef __USE_KOS
+#ifndef __USE_KOS_KERNEL
 #undef itimerspecx64
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef __PRIVATE_DID_PUSH_ITIMERSPECX64

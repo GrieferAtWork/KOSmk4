@@ -430,6 +430,76 @@
 #endif /* _GLIBC_SOURCE */
 
 
+/* Some system headers may define secondary variants of certain
+ * struct types (often ending with *64, hence the name of this
+ * feature test macro), that extend the non-suffixed types in some
+ * way (usually related to `__USE_LARGEFILE64' or `__USE_TIME64')
+ *
+ * According to existing standards and conventions, user-code should
+ * always be able to forward-declare all structure types declared in
+ * system headers. And this behavior extends to include such special
+ * struct types:
+ * >> // Declared before <sys/stat.h> was #included
+ * >> struct stat64;
+ * >> void my_print_stat64(struct stat64 *st);
+ * >> ...
+ * >> #include <sys/stat.h>
+ * >> ...
+ * >> void print_fileinfo(char const *filename) {
+ * >>     struct stat64 st;
+ * >>     stat64(filename, &st);
+ * >>     my_print_stat64(&st);
+ * >> }
+ *
+ * Long story short. When `__USE_STRUCT64_MACRO' is enabled (it isn't
+ * enabled by default), the above code would not be guarantied to compile
+ * without errors. In order to fix the code to work with `__USE_STRUCT64_MACRO'
+ * enabled, one mustn't forward-declare struct types found in system headers
+ * before the respective header has already been included.
+ *
+ * The longer story is this:
+ *   - Take `struct timespec' and `struct timespec64' as an example
+ *   - When `_TIME_T_BITS=64', then they are mandated to share binary
+ *     compatibility, such that the offsetof for each field, and sizeof
+ *     of the structures as a whole will be identical between the two.
+ *   - Knowing this, it stands to reason to simply have the header define
+ *     `struct timespec64' as `#define timespec64 timespec'
+ *   - The only problem with this is that this would break any forward
+ *     declarations of `struct timespec64' prior to the declaring header
+ *     being included.
+ *   - That is where this feature test macro comes into play, essentially
+ *     allowing headers to be configured as such:
+ *     >> // In <bits/timespec.h>:
+ *     >> ...    (#if SHOULD_DEFINE_TIMESPEC64_AS_ALIAS_FOR_TIMESPEC)
+ *     >> #ifdef __USE_STRUCT64_MACRO
+ *     >> #define timespec64 timespec
+ *     >> #else // __USE_STRUCT64_MACRO
+ *     >> struct timespec64 {
+ *     >>     __time64_t        tv_sec;
+ *     >>     __syscall_ulong_t tv_nsec;
+ *     >>     ... // Potentially some more fields...
+ *     >> };
+ *     >> #endif // !__USE_STRUCT64_MACRO
+ *   - As you can see, when `__USE_STRUCT64_MACRO' isn't defined (which
+ *     is the case by default when `_KOS_KERNEL_SOURCE' isn't enabled, and
+ *     the dedicated `_STRUCT64_MACRO_SOURCE' feature request is disabled
+ *     as well), then `struct timespec' and `struct timespec64' continue
+ *     to remain distinct types such that `struct timespec64' can still
+ *     both be forward-declared prior to the header being included.
+ *   - However, when `__USE_STRUCT64_MACRO' is enabled, then headers are
+ *     allowed to simply macro-alias binary-compatible struct-types with
+ *     each other, and the hosted source file is responsible not to forward-
+ *     declare special variants of struct types (such as `timespec64')
+ *     before the declaring header has also been included.
+ * WARNING: KOS-specific types such as `timespec32' are _not_ affect by
+ *          this and may _always_ be declared as `#define timespec32 ...'!
+ */
+#if defined(__USE_KOS_KERNEL) || defined(_STRUCT64_MACRO_SOURCE)
+#undef __USE_STRUCT64_MACRO
+#define __USE_STRUCT64_MACRO 1
+#endif /* __USE_KOS_KERNEL || _STRUCT64_MACRO_SOURCE */
+
+
 #ifdef _ALL_SOURCE
 #undef __USE_KOS
 #undef __USE_STRING_BWLQ

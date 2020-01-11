@@ -2013,7 +2013,7 @@ _get_purecall_handler:() -> _purecall_handler;
 
 %
 %[default_impl_section(.text.crt.dos.errno)]
-%typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, uintptr_t);
+%typedef void (__LIBCCALL *_invalid_parameter_handler)(wchar_t const *, wchar_t const *, wchar_t const *, unsigned int, __UINTPTR_TYPE__);
 _set_invalid_parameter_handler:(_invalid_parameter_handler __handler) -> _invalid_parameter_handler;
 _get_invalid_parameter_handler:() -> _invalid_parameter_handler;
 
@@ -3143,8 +3143,8 @@ ultoa:(unsigned long val, [nonnull] char *buf, int radix) -> char * {
 %#define _WSTDLIB_DEFINED
 
 [guard][wchar][ATTR_WUNUSED] _wgetenv:([nonnull] wchar_t const *varname) -> wchar_t *;
-[guard][wchar] _wgetenv_s:([nonnull] size_t *return_size, [outp_opt(buflen)] wchar_t *buf, size_t buflen, [nonnull] wchar_t const *varname) -> errno_t;
-[guard][wchar] _wdupenv_s:([nonnull] wchar_t **pbuf, [nonnull] size_t *pbuflen, [nonnull] wchar_t const *varname) -> errno_t;
+[guard][wchar] _wgetenv_s:([nonnull] $size_t *return_size, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, [nonnull] wchar_t const *varname) -> errno_t;
+[guard][wchar] _wdupenv_s:([nonnull] wchar_t **pbuf, [nonnull] $size_t *pbuflen, [nonnull] wchar_t const *varname) -> errno_t;
 %[insert:extern(_wsystem)]
 
 %[insert:extern(wcstol)]
@@ -3181,11 +3181,11 @@ _wtof_l:([nonnull] wchar_t const *nptr, [nullable] $locale_t locale) -> double {
 [guard][wchar] _ultow:(unsigned long val, [nonnull] wchar_t *buf, int radix) -> wchar_t * %{copy(ultoa, str2wcs)}
 [guard][wchar] _i64tow:($int64_t val, [nonnull] wchar_t *buf, int radix) -> wchar_t * %{copy(_i64toa, str2wcs)}
 [guard][wchar] _ui64tow:($uint64_t val, [nonnull] wchar_t *buf, int radix) -> wchar_t * %{copy(_ui64toa, str2wcs)}
-[guard][wchar] _itow_s:(int val, [outp_opt(buflen)] wchar_t *buf, size_t buflen, int radix) -> errno_t %{copy(_itoa_s, str2wcs)}
-[guard][wchar] _ltow_s:(long val, [outp_opt(buflen)] wchar_t *buf, size_t buflen, int radix) -> errno_t %{copy(_ltoa_s, str2wcs)}
-[guard][wchar] _ultow_s:(unsigned long val, [outp_opt(buflen)] wchar_t *buf, size_t buflen, int radix) -> errno_t %{copy(_ultoa_s, str2wcs)}
-[guard][wchar] _i64tow_s:($int64_t val, [outp_opt(buflen)] wchar_t *buf, size_t buflen, int radix) -> errno_t %{copy(_i64toa_s, str2wcs)}
-[guard][wchar] _ui64tow_s:($uint64_t val, [outp_opt(buflen)] wchar_t *buf, size_t buflen, int radix) -> errno_t %{copy(_ui64toa_s, str2wcs)}
+[guard][wchar] _itow_s:(int val, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{copy(_itoa_s, str2wcs)}
+[guard][wchar] _ltow_s:(long val, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{copy(_ltoa_s, str2wcs)}
+[guard][wchar] _ultow_s:(unsigned long val, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{copy(_ultoa_s, str2wcs)}
+[guard][wchar] _i64tow_s:($int64_t val, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{copy(_i64toa_s, str2wcs)}
+[guard][wchar] _ui64tow_s:($uint64_t val, [outp_opt(buflen)] wchar_t *buf, $size_t buflen, int radix) -> errno_t %{copy(_ui64toa_s, str2wcs)}
 
 %[default_impl_section(.text.crt.dos.wchar.unicode.static.convert)]
 [guard][wchar][attribute(*)][alias(*)] _wtoi:(*) = wtoi;

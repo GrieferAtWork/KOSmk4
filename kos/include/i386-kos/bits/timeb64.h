@@ -31,11 +31,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /*[[[autogen:wrap3264_x64(
-	linkIf:   "defined(__x86_64__)",
-	name:     "timeb",
-	name64:   "timebx64",
-	name32If: "defined(__USE_KOS)",
-	name64If: "defined(__USE_TIME64)",
+	linkIf:    "defined(__x86_64__)",
+	name:      "timeb",
+	name64:    "timebx64",
+	altname64: "__timebx64_alt",
+	name32If:  "defined(__USE_KOS)",
+	name64If:  "defined(__USE_TIME64)",
+	macro64If: "defined(__USE_STRUCT64_MACRO)",
 )]]]*/
 #undef timebx64
 #ifndef __x86_64__
@@ -70,7 +72,11 @@
 #define timeb32 timeb
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
+#ifdef __USE_STRUCT64_MACRO
 #define timeb64 timeb
+#else /* __USE_STRUCT64_MACRO */
+#define __timebx64_alt timeb64
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_TIME64 */
 #define __timeb_defined 1
 #endif /* __x86_64__ */
@@ -106,6 +112,17 @@ struct timebx64 /*[PREFIX()]*/ {
 	__INT16_TYPE__  __tb_pad; /* ... */
 };
 
+#ifdef __timebx64_alt
+struct __timebx64_alt {
+	__INT64_TYPE__  time;     /* Seconds since epoch, as from `time'. */
+	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
+	__INT16_TYPE__  timezone; /* Minutes west of GMT. */
+	__INT16_TYPE__  dstflag;  /* Nonzero if Daylight Savings Time used. */
+	__INT16_TYPE__  __tb_pad; /* ... */
+};
+#undef __timebx64_alt
+#endif /* __timebx64_alt */
+
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("dstflag")
 #pragma pop_macro("timezone")
@@ -116,9 +133,9 @@ struct timebx64 /*[PREFIX()]*/ {
 __DECL_END
 #endif /* __CC__ */
 
-#ifndef __USE_KOS
+#ifndef __USE_KOS_KERNEL
 #undef timebx64
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef __PRIVATE_DID_PUSH_TIMEBX64

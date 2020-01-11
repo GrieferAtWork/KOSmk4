@@ -34,11 +34,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 /*[[[autogen:wrap3264_x64(
-	linkIf:   "defined(__x86_64__)",
-	name:     "timeval",
-	name64:   "timevalx64",
-	name32If: "defined(__USE_KOS)",
-	name64If: "defined(__USE_TIME64)",
+	linkIf:    "defined(__x86_64__)",
+	name:      "timeval",
+	name64:    "timevalx64",
+	altname64: "__timevalx64_alt",
+	name32If:  "defined(__USE_KOS)",
+	name64If:  "defined(__USE_TIME64)",
+	macro64If: "defined(__USE_STRUCT64_MACRO)",
 )]]]*/
 #undef timevalx64
 #ifndef __x86_64__
@@ -67,7 +69,11 @@
 #define timeval32 timeval
 #endif /* __USE_KOS */
 #ifdef __USE_TIME64
+#ifdef __USE_STRUCT64_MACRO
 #define timeval64 timeval
+#else /* __USE_STRUCT64_MACRO */
+#define __timevalx64_alt timeval64
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_TIME64 */
 #define __timeval_defined 1
 #endif /* __x86_64__ */
@@ -90,13 +96,23 @@ struct timevalx64 /*[PREFIX(tv_)]*/ {
 };
 __TIMEVAL_CXX_SUPPORT2(struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
 
+#ifdef __timevalx64_alt
+struct __timevalx64_alt {
+	__INT64_TYPE__  tv_sec;   /* Seconds */
+	__UINT64_TYPE__ tv_usec;  /* Micro seconds (<= 1000000 == 1_000_000) */
+	__TIMEVAL_CXX_SUPPORT(struct __timevalx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
+};
+__TIMEVAL_CXX_SUPPORT2(struct __timevalx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
+#undef __timevalx64_alt
+#endif /* __timevalx64_alt */
+
 __TIMEVAL_CXX_DECL_END
 __DECL_END
 #endif /* __CC__ */
 
-#ifndef __USE_KOS
+#ifndef __USE_KOS_KERNEL
 #undef timevalx64
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef __PRIVATE_DID_PUSH_TIMEVALX64
