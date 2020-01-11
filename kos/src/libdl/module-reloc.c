@@ -332,7 +332,14 @@ again_search_globals_module:
 		symbol = self->dm_dynsym_tab + symid;
 		if (symbol->st_shndx != SHN_UNDEF)
 			goto got_local_symbol;
-
+		if (ELFW(ST_BIND)(symbol->st_info) == STB_WEAK) {
+			result = 0;
+			if unlikely(psize)
+				*psize = symbol->st_size; /* Return 0 instead? */
+			if unlikely(pmodule)
+				*pmodule = self;
+			goto done_result;
+		}
 		/* If the symbol continues to be undefined, set an error. */
 		elf_setdlerrorf("Could not find symbol %q required by %q",
 		                name, self->dm_filename);
