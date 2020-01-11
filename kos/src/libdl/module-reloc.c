@@ -174,7 +174,7 @@ DlModule_FindSymbol(DlModule *__restrict self, uintptr_t symid,
 	ElfW(Addr) result;
 	char *name;
 	weak_symbol.ds_mod = NULL;
-	symbol             = self->dm_dynsym_tab + symid;
+	symbol = self->dm_dynsym_tab + symid;
 	if ((symbol->st_shndx != SHN_UNDEF) && (self->dm_flags & RTLD_DEEPBIND)) {
 		/* Symbol has been defined locally. */
 		if (ELFW(ST_BIND)(symbol->st_info) == STB_WEAK) {
@@ -327,7 +327,8 @@ again_search_globals_module:
 			goto done_result;
 		}
 
-		/* Lastly: Check if the module itself has a valid definition... */
+		/* Lastly: Check if the module itself has a valid definition,
+		 *         or if the module allows for weak definitions... */
 		symbol = self->dm_dynsym_tab + symid;
 		if (symbol->st_shndx != SHN_UNDEF)
 			goto got_local_symbol;

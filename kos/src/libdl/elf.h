@@ -230,6 +230,8 @@ struct elf_dlmodule {
 	REF DlSection            *dm_sections_dangling; /* [0..1][lock(dm_sections_lock))] Chain of dangling sections. */
 #endif /* !CONFIG_NO_DANGLING_DL_SECTIONS */
 	char                     *dm_shstrtab;   /* [lock(WRITE_ONCE)][0..1][owned] Section headers name table (or `NULL' if not loaded). */
+	unsigned char             dm_abi;        /* [const] The value of `EI_OSABI' */
+	unsigned char             dm_abiver;     /* [const] The value of `EI_ABIVERSION' */
 
 	/* Module program headers */
 	ElfW(Half)                dm_phnum;      /* [const] (Max) number of program headers. */
@@ -333,10 +335,9 @@ DlModule_OpenFilenameInPathList(char const *__restrict path,
 INTDEF WUNUSED NONNULL((1)) REF DlModule *CC
 DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filename,
                            /*inherit(on_success)*/ fd_t fd, unsigned int mode);
-INTDEF WUNUSED NONNULL((1, 3)) REF DlModule *CC
+INTDEF WUNUSED NONNULL((1, 2)) REF DlModule *CC
 DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
-                                  uint16_t pnum, ElfW(Phdr) * __restrict phdr,
-                                  uintptr_t loadaddr, unsigned int mode);
+                                  struct elfexec_info *__restrict info, uintptr_t loadaddr);
 
 /* Try to find an already-loaded module. */
 INTDEF WUNUSED NONNULL((1, 3)) REF DlModule *CC

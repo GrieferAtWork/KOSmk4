@@ -462,24 +462,23 @@ err:
 }
 
 
-INTERN WUNUSED NONNULL((1, 3)) REF_IF(!(mode & RTLD_NODELETE)) DlModule *CC
+INTERN WUNUSED NONNULL((1, 2)) REF_IF(!(mode & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
-                                  uint16_t pnum, ElfW(Phdr) *__restrict phdr,
-                                  uintptr_t loadaddr, unsigned int mode) {
+                                  struct elfexec_info *__restrict info, uintptr_t loadaddr) {
 	REF DlModule *result;
 	uint16_t pidx;
 	result = (REF DlModule *)calloc(1,
 	                                offsetof(DlModule, dm_phdr) +
-	                                (pnum * sizeof(ElfW(Phdr))));
+	                                (info->ei_pnum * sizeof(ElfW(Phdr))));
 	if unlikely(!result)
 		goto err_nomem;
-	memcpy(result->dm_phdr, phdr, pnum, sizeof(ElfW(Phdr)));
+	memcpy(result->dm_phdr, info->ei_phdr, info->ei_pnum, sizeof(ElfW(Phdr)));
 	result->dm_loadstart = (uintptr_t)-1;
 	/*result->dm_loadend = 0;*/
-	for (pidx = 0; pidx < pnum; ++pidx) {
-		uintptr_t base = result->dm_loadaddr + phdr[pidx].p_vaddr;
-		if (phdr[pidx].p_type == PT_LOAD) {
-			uintptr_t end = base + phdr[pidx].p_memsz;
+	for (pidx = 0; pidx < info->ei_pnum; ++pidx) {
+		uintptr_t base = result->dm_loadaddr + info->ei_phdr[pidx].p_vaddr;
+		if (info->ei_phdr[pidx].p_type == PT_LOAD) {
+			uintptr_t end = base + info->ei_phdr[pidx].p_memsz;
 			if (result->dm_loadstart > base)
 				result->dm_loadstart = base;
 			if (result->dm_loadend < end)
@@ -488,10 +487,12 @@ DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict 
 	}
 	result->dm_refcnt   = 1;
 	result->dm_file     = (fd_t)-1;
-	result->dm_flags    = (uint32_t)mode | RTLD_LOADING;
+	result->dm_flags    = (uint32_t)(RTLD_LAZY | RTLD_GLOBAL | RTLD_NODELETE | RTLD_NOINIT | RTLD_LOADING);
 	result->dm_filename = filename; /* Inherit data */
 	result->dm_loadaddr = loadaddr;
-	result->dm_phnum    = pnum;
+	result->dm_phnum    = info->ei_pnum;
+	result->dm_abi      = info->ei_abi;
+	result->dm_abiver   = info->ei_abiver;
 	result->dm_shnum    = (ElfW(Half))-1; /* Unknown */
 	result->dm_shstrndx = (ElfW(Half))-1; /* Unknown */
 	result->dm_loadstart += loadaddr;
@@ -574,6 +575,8 @@ DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 		goto err_r_io;
 	result->dm_filename = filename; /* Inherit data */
 	result->dm_file     = fd;       /* Inherit data */
+	result->dm_abi      = ehdr.e_ident[EI_OSABI];
+	result->dm_abiver   = ehdr.e_ident[EI_ABIVERSION];
 	result->dm_phnum    = ehdr.e_phnum;
 	result->dm_shnum    = ehdr.e_shnum;
 	result->dm_shoff    = ehdr.e_shoff;

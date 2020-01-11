@@ -55,9 +55,11 @@
 #define ELF_ARCH_DATA     ELF_ARCH386_DATA
 #define ELF_ARCH_USESRELA ELF_ARCH386_USESRELA
 #define ELF_ARCH_LAZYINDX ELF_ARCH386_LAZYINDX
-#define __OFFSET_PROCESS_RTLD_ELF_RTLDADDR  __OFFSET_PROCESS_RTLD_ELF32_RTLDADDR
-#define __OFFSET_PROCESS_RTLD_ELF_NUM       __OFFSET_PROCESS_RTLD_ELF32_NUM
-#define __OFFSET_PROCESS_RTLD_ELF_PHDR      __OFFSET_PROCESS_RTLD_ELF32_PHDR
+#define __OFFSET_PROCESS_RTLD_ELF_RTLDADDR __OFFSET_PROCESS_RTLD_ELF32_RTLDADDR
+#define __OFFSET_PROCESS_RTLD_ELF_NUM      __OFFSET_PROCESS_RTLD_ELF32_NUM
+#define __OFFSET_PROCESS_RTLD_ELF_ABI      __OFFSET_PROCESS_RTLD_ELF32_ABI
+#define __OFFSET_PROCESS_RTLD_ELF_ABIVER   __OFFSET_PROCESS_RTLD_ELF32_ABIVER
+#define __OFFSET_PROCESS_RTLD_ELF_PHDR     __OFFSET_PROCESS_RTLD_ELF32_PHDR
 #define __elfexec_info_defined   1
 #define elfexec_info32           elfexec_info
 #define elfexec_info_getfilename elfexec_info32_getfilename
@@ -95,13 +97,16 @@ __DECL_BEGIN
 
 #define __OFFSET_PROCESS_RTLD_ELF32_RTLDADDR 0
 #define __OFFSET_PROCESS_RTLD_ELF32_PNUM     4
+#define __OFFSET_PROCESS_RTLD_ELF32_ABI      6
+#define __OFFSET_PROCESS_RTLD_ELF32_ABIVER   7
 #define __OFFSET_PROCESS_RTLD_ELF32_PHDR     8
 
 #ifdef __CC__
 struct elfexec_info32 /*[PREFIX(ei_)]*/ {
 	__uint32_t ei_rtldaddr;    /* Load address of the RTLD itself. */
 	Elf32_Half ei_pnum;        /* Amount of ELF program headers. */
-	Elf32_Half ei_ppad;        /* ... */
+	__uint8_t  ei_abi;         /* [const] The value of `EI_OSABI' */
+	__uint8_t  ei_abiver;      /* [const] The value of `EI_ABIVERSION' */
 	Elf32_Phdr ei_phdr[1024];  /* [ei_pnum] Vector of ELF program headers.
 	                            * All of these have already been loaded into memory. */
 //	char       ei_filename[*]; /* NUL-terminated filename of the loaded binary. */
@@ -121,8 +126,12 @@ struct elfexec_info32 /*[PREFIX(ei_)]*/ {
 /* TODO: Mode these init functions into a header in /kos/src/kernel/include/i386-kos/... */
 LOCAL struct icpustate *KCALL
 elfexec_init_entry32(struct icpustate *__restrict user_state,
+                     KERNEL Elf32_Ehdr const *__restrict ehdr,
                      USER void *peb_address, USER void *ustack_base,
-                     __size_t ustack_size, USER void *entry_pc) {
+                     __size_t ustack_size, USER void *entry_pc,
+                     __BOOL has_rtld) {
+	(void)ehdr;
+	(void)has_rtld;
 	set_user_fsbase(x86_get_random_userkern_address32()); /* re-roll the ukern address. */
 	gpregs_setpbp(&user_state->ics_gpregs, (__uintptr_t)peb_address); /* ELF_ARCH386_PEB_REGISTER */
 	icpustate_setpc(user_state, (__uintptr_t)entry_pc);
@@ -147,6 +156,7 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
                     struct regular_node *__restrict UNUSED(exec_node),
                     void *application_loadaddr,
                     void *linker_loadaddr,
+                    KERNEL Elf32_Ehdr const *__restrict ehdr,
                     KERNEL Elf32_Phdr const *__restrict phdr_vec,
                     Elf32_Half phdr_cnt) {
 	/* The application-level entry point is stored
@@ -176,6 +186,8 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 	__libc_memcpyc(dl_data->ei_phdr, phdr_vec, phdr_cnt, sizeof(Elf32_Phdr));
 	dl_data->ei_rtldaddr = (__uint32_t)(__uintptr_t)linker_loadaddr;
 	dl_data->ei_pnum     = phdr_cnt;
+	dl_data->ei_abi      = ehdr->e_ident[EI_OSABI];
+	dl_data->ei_abiver   = ehdr->e_ident[EI_ABIVERSION];
 	gpregs_setpcx(&user_state->ics_gpregs, (__uintptr_t)dl_data);              /* ELF_ARCH386_DL_RTLDDATA_REGISTER */
 	gpregs_setpdx(&user_state->ics_gpregs, (__uintptr_t)application_loadaddr); /* ELF_ARCH386_DL_LOADADDR_REGISTER */
 	icpustate_setuserpsp(user_state, (__uintptr_t)dl_data);

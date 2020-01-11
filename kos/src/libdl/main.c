@@ -180,12 +180,7 @@ linker_main(struct elfexec_info *__restrict info,
 	/* User-level initializers must be run _after_ we've initialized static TLS!
 	 * NOTE: this is done in `_start32.S' by manually calling `DlModule_RunAllStaticInitializers'
 	 *       just prior to jumping to the primary application's _start() function. */
-	base_module = DlModule_OpenLoadedProgramHeaders(filename,
-	                                                info->ei_pnum,
-	                                                info->ei_phdr,
-	                                                loadaddr,
-	                                                RTLD_LAZY | RTLD_GLOBAL |
-	                                                RTLD_NODELETE | RTLD_NOINIT);
+	base_module = DlModule_OpenLoadedProgramHeaders(filename, info, loadaddr);
 	if unlikely(!base_module)
 		goto err;
 	assert(base_module->dm_flags & RTLD_NOINIT);
@@ -207,6 +202,9 @@ linker_main(struct elfexec_info *__restrict info,
 	assert(ld_rtld_module.dm_modules.ln_next == base_module);
 
 	/*DlModule_Decref(base_module);*/ /* Intentionally left dangling! */
+
+	if (base_module->dm_depcnt)
+
 	return result;
 err:
 	syslog(LOG_ERR, "DL Initialization failed: %s\n", libdl_dlerror());

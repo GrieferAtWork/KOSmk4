@@ -245,7 +245,8 @@ __DECL_BEGIN
 struct elfexec_info /*[PREFIX(pr_)]*/ {
 	ElfW(Addr)  ei_rtldaddr;    /* Load address of the RTLD itself. */
 	ElfW(Half)  ei_pnum;        /* Amount of ELF program headers. */
-	ElfW(Half)  ei_ppad;        /* ... */
+	__uint8_t   ei_abi;         /* [const] The value of `EI_OSABI' */
+	__uint8_t   ei_abiver;      /* [const] The value of `EI_ABIVERSION' */
 	ElfW(Phdr)  ei_phdr[1024];  /* [ei_pnum] Vector of ELF program headers.
 	                             * All of these have already been loaded into memory. */
 //	char        ei_filename[*]; /* NUL-terminated filename of the loaded binary. */
@@ -264,8 +265,10 @@ struct elfexec_info /*[PREFIX(pr_)]*/ {
 struct icpustate;
 FUNDEF struct icpustate *__KCALL
 elfexec_init_entry(struct icpustate *__restrict user_state,
+                   __KERNEL ElfW(Ehdr) const *__restrict ehdr,
                    __USER void *peb_address, __USER void *ustack_base,
-                   __size_t ustack_size, __USER void *entry_pc);
+                   __size_t ustack_size, __USER void *entry_pc,
+                   __BOOL has_rtld);
 #endif /* !elfexec_init_entry */
 
 /* Update the given `user_state' for invoking the RTLD */
@@ -282,6 +285,7 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
                   struct regular_node *__restrict exec_node,
                   __USER void *application_loadaddr,
                   __USER void *linker_loadaddr,
+                  __KERNEL ElfW(Ehdr) const *__restrict ehdr,
                   __KERNEL ElfW(Phdr) *__restrict phdr_vec,
                   ElfW(Half) phdr_cnt);
 #endif /* !elfexec_init_rtld */

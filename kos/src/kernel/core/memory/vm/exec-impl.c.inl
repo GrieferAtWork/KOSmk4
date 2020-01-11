@@ -310,10 +310,12 @@ err_overlap:
 
 		/* Set the entry point for the loaded binary. */
 		user_state = MY_FUNC(elfexec_init_entry)(user_state,
+		                                         ehdr,
 		                                         peb_base,
 		                                         stack_base,
 		                                         USER_STACK_NUM_PAGES * PAGESIZE,
-		                                         (USER void *)(uintptr_t)ehdr->e_entry);
+		                                         (USER void *)(uintptr_t)ehdr->e_entry,
+		                                         linker_base != (void *)-1);
 
 		/* Initialize the RTLD portion of the user-space bootstrap process. */
 		if (linker_base != (void *)-1) {
@@ -323,6 +325,7 @@ err_overlap:
 			                                        /* exec_node:            */ exec_node,
 			                                        /* application_loadaddr: */ (void *)0,
 			                                        /* linker_loadaddr:      */ linker_base,
+			                                        /* ehdr:                 */ ehdr,
 			                                        /* phdr_vec:             */ phdr_vector,
 			                                        /* phdr_cnt:             */ ehdr->e_phnum);
 		}
