@@ -54,47 +54,49 @@ STATIC_ASSERT(sizeof(union ieee854_float80) == 10);
 /*[[[deemon
 import * from .....misc.libgen.assert_offsetof;
 local files = {
-	"../../../../include/i386-kos/bits/timespec32.h",
-	"../../../../include/i386-kos/bits/timespec64.h",
-	"../../../../include/i386-kos/bits/timeval32.h",
-	"../../../../include/i386-kos/bits/timeval64.h",
-	"../../../../include/i386-kos/bits/rusage-struct32.h",
-	"../../../../include/i386-kos/bits/rusage-struct64.h",
-	"../../../../include/i386-kos/bits/sigevent32.h",
-	"../../../../include/i386-kos/bits/sigevent64.h",
-	"../../../../include/i386-kos/bits/siginfo-struct32.h",
-	"../../../../include/i386-kos/bits/siginfo-struct64.h",
-	"../../../../include/i386-kos/bits/sigaction-struct-cygwin.h",
-	"../../../../include/i386-kos/bits/sigaction-struct32.h",
-	"../../../../include/i386-kos/bits/sigaction-struct64.h",
-	"../../../../include/i386-kos/bits/sigstack32.h",
-	"../../../../include/i386-kos/bits/sigstack64.h",
-	"../../../../include/i386-kos/bits/sigval32.h",
-	"../../../../include/i386-kos/bits/sigval64.h",
+	"../../../../include/i386-kos/bits/flock-struct32.h",
+	"../../../../include/i386-kos/bits/flock-struct64.h",
 	"../../../../include/i386-kos/bits/itimerspec32.h",
 	"../../../../include/i386-kos/bits/itimerspec64.h",
 	"../../../../include/i386-kos/bits/itimerval32.h",
 	"../../../../include/i386-kos/bits/itimerval64.h",
-	"../../../../include/i386-kos/bits/timeb32.h",
-	"../../../../include/i386-kos/bits/timeb64.h",
+	"../../../../include/i386-kos/bits/rusage-struct32.h",
+	"../../../../include/i386-kos/bits/rusage-struct64.h",
+	"../../../../include/i386-kos/bits/sigaction-struct-cygwin.h",
+	"../../../../include/i386-kos/bits/sigaction-struct32.h",
+	"../../../../include/i386-kos/bits/sigaction-struct64.h",
+	"../../../../include/i386-kos/bits/sigevent32.h",
+	"../../../../include/i386-kos/bits/sigevent64.h",
+	"../../../../include/i386-kos/bits/siginfo-struct32.h",
+	"../../../../include/i386-kos/bits/siginfo-struct64.h",
+	"../../../../include/i386-kos/bits/sigstack32.h",
+	"../../../../include/i386-kos/bits/sigstack64.h",
+	"../../../../include/i386-kos/bits/sigval32.h",
+	"../../../../include/i386-kos/bits/sigval64.h",
 	"../../../../include/i386-kos/bits/stat-kos32.h",
 	"../../../../include/i386-kos/bits/stat-kos64.h",
 	"../../../../include/i386-kos/bits/statfs32.h",
 	"../../../../include/i386-kos/bits/statfs64.h",
+	"../../../../include/i386-kos/bits/timeb32.h",
+	"../../../../include/i386-kos/bits/timeb64.h",
+	"../../../../include/i386-kos/bits/timespec32.h",
+	"../../../../include/i386-kos/bits/timespec64.h",
+	"../../../../include/i386-kos/bits/timeval32.h",
+	"../../../../include/i386-kos/bits/timeval64.h",
 	"../../../../include/i386-kos/bits/va_list-struct32.h",
 	"../../../../include/i386-kos/bits/va_list-struct64.h",
 	"../../../../include/i386-kos/kos/bits/debugtrap32.h",
 	"../../../../include/i386-kos/kos/bits/debugtrap64.h",
 	"../../../../include/i386-kos/kos/bits/exception_data32.h",
 	"../../../../include/i386-kos/kos/bits/exception_data64.h",
-	"../../../../include/i386-kos/kos/exec/bits/peb32.h",
-	"../../../../include/i386-kos/kos/exec/bits/peb64.h",
-	"../../../../include/i386-kos/kos/exec/bits/library-listdef32.h",
-	"../../../../include/i386-kos/kos/exec/bits/library-listdef64.h",
-	"../../../../include/i386-kos/kos/exec/asm/elf32.h",
-	"../../../../include/i386-kos/kos/exec/asm/elf64.h",
 	"../../../../include/i386-kos/kos/bits/ukern-struct32.h",
 	"../../../../include/i386-kos/kos/bits/ukern-struct64.h",
+	"../../../../include/i386-kos/kos/exec/asm/elf32.h",
+	"../../../../include/i386-kos/kos/exec/asm/elf64.h",
+	"../../../../include/i386-kos/kos/exec/bits/library-listdef32.h",
+	"../../../../include/i386-kos/kos/exec/bits/library-listdef64.h",
+	"../../../../include/i386-kos/kos/exec/bits/peb32.h",
+	"../../../../include/i386-kos/kos/exec/bits/peb64.h",
 	"../../../../include/i386-kos/kos/kernel/cpu-state32.h",
 	"../../../../include/i386-kos/kos/kernel/cpu-state64.h",
 	"../../../../include/i386-kos/kos/kernel/fpu-sstate.h",
@@ -188,72 +190,114 @@ for (local i: [:16]) {
 }
 
 ]]]*/
-#include <bits/timespec32.h>
+#include <bits/flock-struct32.h>
 
-/* struct timespecx32 */
-STATIC_ASSERT(offsetof(struct timespecx32, tv_sec) == __OFFSET_TIMESPECX32_SEC);
-STATIC_ASSERT(offsetof(struct timespecx32, tv_nsec) == __OFFSET_TIMESPECX32_NSEC);
-STATIC_ASSERT(sizeof(struct timespecx32) == __SIZEOF_TIMESPECX32);
-STATIC_ASSERT(alignof(struct timespecx32) == __ALIGNOF_TIMESPECX32);
+/* struct flockx32 */
+STATIC_ASSERT(offsetof(struct flockx32, l_len) == __OFFSET_FLOCKX32_LEN);
+STATIC_ASSERT(offsetof(struct flockx32, l_pid) == __OFFSET_FLOCKX32_PID);
+STATIC_ASSERT(offsetof(struct flockx32, l_start) == __OFFSET_FLOCKX32_START);
+STATIC_ASSERT(offsetof(struct flockx32, l_type) == __OFFSET_FLOCKX32_TYPE);
+STATIC_ASSERT(offsetof(struct flockx32, l_whence) == __OFFSET_FLOCKX32_WHENCE);
+STATIC_ASSERT(sizeof(struct flockx32) == __SIZEOF_FLOCKX32);
 
-/* struct timespecx32_64 */
-STATIC_ASSERT(offsetof(struct timespecx32_64, tv_sec) == __OFFSET_TIMESPECX32_64_SEC);
-STATIC_ASSERT(offsetof(struct timespecx32_64, tv_nsec) == __OFFSET_TIMESPECX32_64_NSEC);
-STATIC_ASSERT(sizeof(struct timespecx32_64) == __SIZEOF_TIMESPECX32_64);
-STATIC_ASSERT(alignof(struct timespecx32_64) == __ALIGNOF_TIMESPECX32_64);
+/* struct flockx32_64 */
+STATIC_ASSERT(offsetof(struct flockx32_64, l_len) == __OFFSET_FLOCKX32_64_LEN);
+STATIC_ASSERT(offsetof(struct flockx32_64, l_pid) == __OFFSET_FLOCKX32_64_PID);
+STATIC_ASSERT(offsetof(struct flockx32_64, l_start) == __OFFSET_FLOCKX32_64_START);
+STATIC_ASSERT(offsetof(struct flockx32_64, l_type) == __OFFSET_FLOCKX32_64_TYPE);
+STATIC_ASSERT(offsetof(struct flockx32_64, l_whence) == __OFFSET_FLOCKX32_64_WHENCE);
+STATIC_ASSERT(sizeof(struct flockx32_64) == __SIZEOF_FLOCKX32_64);
 
-/* struct __timespecx32_64_alt */
+/* struct __flockx32_64_alt */
 /* ... */
 
 
 
 
 
-#include <bits/timespec64.h>
+#include <bits/flock-struct64.h>
 
-/* struct timespecx64 */
-STATIC_ASSERT(offsetof(struct timespecx64, tv_sec) == __OFFSET_TIMESPECX64_SEC);
-STATIC_ASSERT(offsetof(struct timespecx64, tv_nsec) == __OFFSET_TIMESPECX64_NSEC);
-STATIC_ASSERT(sizeof(struct timespecx64) == __SIZEOF_TIMESPECX64);
-STATIC_ASSERT(alignof(struct timespecx64) == __ALIGNOF_TIMESPECX64);
+/* struct flockx64 */
+STATIC_ASSERT(offsetof(struct flockx64, l_len) == __OFFSET_FLOCKX64_LEN);
+STATIC_ASSERT(offsetof(struct flockx64, l_pid) == __OFFSET_FLOCKX64_PID);
+STATIC_ASSERT(offsetof(struct flockx64, l_start) == __OFFSET_FLOCKX64_START);
+STATIC_ASSERT(offsetof(struct flockx64, l_type) == __OFFSET_FLOCKX64_TYPE);
+STATIC_ASSERT(offsetof(struct flockx64, l_whence) == __OFFSET_FLOCKX64_WHENCE);
+STATIC_ASSERT(sizeof(struct flockx64) == __SIZEOF_FLOCKX64);
 
-/* struct __timespecx64_alt */
+/* struct __flockx64_alt */
 /* ... */
 
 
 
 
 
-#include <bits/timeval32.h>
+#include <bits/itimerspec32.h>
 
-/* struct timevalx32 */
-STATIC_ASSERT(offsetof(struct timevalx32, tv_usec) == __OFFSET_TIMEVALX32_USEC);
-STATIC_ASSERT(offsetof(struct timevalx32, tv_sec) == __OFFSET_TIMEVALX32_SEC);
-STATIC_ASSERT(sizeof(struct timevalx32) == __SIZEOF_TIMEVALX32);
-STATIC_ASSERT(alignof(struct timevalx32) == __ALIGNOF_TIMEVALX32);
+/* struct itimerspecx32 */
+STATIC_ASSERT(offsetof(struct itimerspecx32, it_value) == __OFFSET_ITIMERSPECX32_VALUE);
+STATIC_ASSERT(offsetof(struct itimerspecx32, it_interval) == __OFFSET_ITIMERSPECX32_INTERVAL);
+STATIC_ASSERT(sizeof(struct itimerspecx32) == __SIZEOF_ITIMERSPECX32);
+STATIC_ASSERT(alignof(struct itimerspecx32) == __ALIGNOF_ITIMERSPECX32);
 
-/* struct timevalx32_64 */
-STATIC_ASSERT(offsetof(struct timevalx32_64, tv_usec) == __OFFSET_TIMEVALX32_64_USEC);
-STATIC_ASSERT(offsetof(struct timevalx32_64, tv_sec) == __OFFSET_TIMEVALX32_64_SEC);
-STATIC_ASSERT(sizeof(struct timevalx32_64) == __SIZEOF_TIMEVALX32_64);
-STATIC_ASSERT(alignof(struct timevalx32_64) == __ALIGNOF_TIMEVALX32_64);
+/* struct itimerspecx32_64 */
+STATIC_ASSERT(offsetof(struct itimerspecx32_64, it_value) == __OFFSET_ITIMERSPECX32_64_VALUE);
+STATIC_ASSERT(offsetof(struct itimerspecx32_64, it_interval) == __OFFSET_ITIMERSPECX32_64_INTERVAL);
+STATIC_ASSERT(sizeof(struct itimerspecx32_64) == __SIZEOF_ITIMERSPECX32_64);
+STATIC_ASSERT(alignof(struct itimerspecx32_64) == __ALIGNOF_ITIMERSPECX32_64);
 
-/* struct __timevalx32_64_alt */
+/* struct __itimerspecx32_64_alt */
 /* ... */
 
 
 
 
 
-#include <bits/timeval64.h>
+#include <bits/itimerspec64.h>
 
-/* struct timevalx64 */
-STATIC_ASSERT(offsetof(struct timevalx64, tv_usec) == __OFFSET_TIMEVALX64_USEC);
-STATIC_ASSERT(offsetof(struct timevalx64, tv_sec) == __OFFSET_TIMEVALX64_SEC);
-STATIC_ASSERT(sizeof(struct timevalx64) == __SIZEOF_TIMEVALX64);
-STATIC_ASSERT(alignof(struct timevalx64) == __ALIGNOF_TIMEVALX64);
+/* struct itimerspecx64 */
+STATIC_ASSERT(offsetof(struct itimerspecx64, it_value) == __OFFSET_ITIMERSPECX64_VALUE);
+STATIC_ASSERT(offsetof(struct itimerspecx64, it_interval) == __OFFSET_ITIMERSPECX64_INTERVAL);
+STATIC_ASSERT(sizeof(struct itimerspecx64) == __SIZEOF_ITIMERSPECX64);
+STATIC_ASSERT(alignof(struct itimerspecx64) == __ALIGNOF_ITIMERSPECX64);
 
-/* struct __timevalx64_alt */
+/* struct __itimerspecx64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/itimerval32.h>
+
+/* struct itimervalx32 */
+STATIC_ASSERT(offsetof(struct itimervalx32, it_value) == __OFFSET_ITIMERVALX32_VALUE);
+STATIC_ASSERT(offsetof(struct itimervalx32, it_interval) == __OFFSET_ITIMERVALX32_INTERVAL);
+STATIC_ASSERT(sizeof(struct itimervalx32) == __SIZEOF_ITIMERVALX32);
+STATIC_ASSERT(alignof(struct itimervalx32) == __ALIGNOF_ITIMERVALX32);
+
+/* struct itimervalx32_64 */
+STATIC_ASSERT(offsetof(struct itimervalx32_64, it_value) == __OFFSET_ITIMERVALX32_64_VALUE);
+STATIC_ASSERT(offsetof(struct itimervalx32_64, it_interval) == __OFFSET_ITIMERVALX32_64_INTERVAL);
+STATIC_ASSERT(sizeof(struct itimervalx32_64) == __SIZEOF_ITIMERVALX32_64);
+STATIC_ASSERT(alignof(struct itimervalx32_64) == __ALIGNOF_ITIMERVALX32_64);
+
+/* struct __itimervalx32_64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/itimerval64.h>
+
+/* struct itimervalx64 */
+STATIC_ASSERT(offsetof(struct itimervalx64, it_value) == __OFFSET_ITIMERVALX64_VALUE);
+STATIC_ASSERT(offsetof(struct itimervalx64, it_interval) == __OFFSET_ITIMERVALX64_INTERVAL);
+STATIC_ASSERT(sizeof(struct itimervalx64) == __SIZEOF_ITIMERVALX64);
+STATIC_ASSERT(alignof(struct itimervalx64) == __ALIGNOF_ITIMERVALX64);
+
+/* struct __itimervalx64_alt */
 /* ... */
 
 
@@ -333,6 +377,53 @@ STATIC_ASSERT(alignof(struct rusagex64) == __ALIGNOF_RUSAGEX64);
 
 /* struct __rusagex64_alt */
 /* ... */
+
+
+
+
+
+#include <bits/sigaction-struct-cygwin.h>
+
+/* struct __sigaction_cygwin */
+STATIC_ASSERT(offsetof(struct __sigaction_cygwin, sa_flags) == __OFFSET_SIGACTION_CYGWIN_FLAGS);
+STATIC_ASSERT(offsetof(struct __sigaction_cygwin, sa_handler) == __OFFSET_SIGACTION_CYGWIN_HANDLER);
+STATIC_ASSERT(offsetof(struct __sigaction_cygwin, sa_mask) == __OFFSET_SIGACTION_CYGWIN_MASK);
+STATIC_ASSERT(offsetof(struct __sigaction_cygwin, sa_sigaction) == __OFFSET_SIGACTION_CYGWIN_SIGACTION);
+STATIC_ASSERT(sizeof(struct __sigaction_cygwin) == __SIZEOF_SIGACTION_CYGWIN);
+STATIC_ASSERT(alignof(struct __sigaction_cygwin) == __ALIGNOF_SIGACTION_CYGWIN);
+
+
+
+
+
+#include <bits/sigaction-struct32.h>
+
+/* struct __sigset_struct32 */
+/* ... */
+
+/* struct sigaction32 */
+STATIC_ASSERT(offsetof(struct sigaction32, sa_flags) == __OFFSET_SIGACTION32_FLAGS);
+STATIC_ASSERT(offsetof(struct sigaction32, sa_handler) == __OFFSET_SIGACTION32_HANDLER);
+STATIC_ASSERT(offsetof(struct sigaction32, sa_mask) == __OFFSET_SIGACTION32_MASK);
+STATIC_ASSERT(offsetof(struct sigaction32, sa_restorer) == __OFFSET_SIGACTION32_RESTORER);
+STATIC_ASSERT(offsetof(struct sigaction32, sa_sigaction) == __OFFSET_SIGACTION32_SIGACTION);
+STATIC_ASSERT(sizeof(struct sigaction32) == __SIZEOF_SIGACTION32);
+STATIC_ASSERT(alignof(struct sigaction32) == __ALIGNOF_SIGACTION32);
+
+
+
+
+
+#include <bits/sigaction-struct64.h>
+
+/* struct sigaction64 */
+STATIC_ASSERT(offsetof(struct sigaction64, sa_flags) == __OFFSET_SIGACTION64_FLAGS);
+STATIC_ASSERT(offsetof(struct sigaction64, sa_handler) == __OFFSET_SIGACTION64_HANDLER);
+STATIC_ASSERT(offsetof(struct sigaction64, sa_mask) == __OFFSET_SIGACTION64_MASK);
+STATIC_ASSERT(offsetof(struct sigaction64, sa_restorer) == __OFFSET_SIGACTION64_RESTORER);
+STATIC_ASSERT(offsetof(struct sigaction64, sa_sigaction) == __OFFSET_SIGACTION64_SIGACTION);
+STATIC_ASSERT(sizeof(struct sigaction64) == __SIZEOF_SIGACTION64);
+STATIC_ASSERT(alignof(struct sigaction64) == __ALIGNOF_SIGACTION64);
 
 
 
@@ -502,53 +593,6 @@ STATIC_ASSERT(sizeof(struct __siginfo64_struct) == __SIZEOF_SIGINFO64);
 
 
 
-#include <bits/sigaction-struct-cygwin.h>
-
-/* struct __sigaction_cygwin */
-STATIC_ASSERT(offsetof(struct __sigaction_cygwin, sa_flags) == __OFFSET_SIGACTION_CYGWIN_FLAGS);
-STATIC_ASSERT(offsetof(struct __sigaction_cygwin, sa_handler) == __OFFSET_SIGACTION_CYGWIN_HANDLER);
-STATIC_ASSERT(offsetof(struct __sigaction_cygwin, sa_mask) == __OFFSET_SIGACTION_CYGWIN_MASK);
-STATIC_ASSERT(offsetof(struct __sigaction_cygwin, sa_sigaction) == __OFFSET_SIGACTION_CYGWIN_SIGACTION);
-STATIC_ASSERT(sizeof(struct __sigaction_cygwin) == __SIZEOF_SIGACTION_CYGWIN);
-STATIC_ASSERT(alignof(struct __sigaction_cygwin) == __ALIGNOF_SIGACTION_CYGWIN);
-
-
-
-
-
-#include <bits/sigaction-struct32.h>
-
-/* struct __sigset_struct32 */
-/* ... */
-
-/* struct sigaction32 */
-STATIC_ASSERT(offsetof(struct sigaction32, sa_flags) == __OFFSET_SIGACTION32_FLAGS);
-STATIC_ASSERT(offsetof(struct sigaction32, sa_handler) == __OFFSET_SIGACTION32_HANDLER);
-STATIC_ASSERT(offsetof(struct sigaction32, sa_mask) == __OFFSET_SIGACTION32_MASK);
-STATIC_ASSERT(offsetof(struct sigaction32, sa_restorer) == __OFFSET_SIGACTION32_RESTORER);
-STATIC_ASSERT(offsetof(struct sigaction32, sa_sigaction) == __OFFSET_SIGACTION32_SIGACTION);
-STATIC_ASSERT(sizeof(struct sigaction32) == __SIZEOF_SIGACTION32);
-STATIC_ASSERT(alignof(struct sigaction32) == __ALIGNOF_SIGACTION32);
-
-
-
-
-
-#include <bits/sigaction-struct64.h>
-
-/* struct sigaction64 */
-STATIC_ASSERT(offsetof(struct sigaction64, sa_flags) == __OFFSET_SIGACTION64_FLAGS);
-STATIC_ASSERT(offsetof(struct sigaction64, sa_handler) == __OFFSET_SIGACTION64_HANDLER);
-STATIC_ASSERT(offsetof(struct sigaction64, sa_mask) == __OFFSET_SIGACTION64_MASK);
-STATIC_ASSERT(offsetof(struct sigaction64, sa_restorer) == __OFFSET_SIGACTION64_RESTORER);
-STATIC_ASSERT(offsetof(struct sigaction64, sa_sigaction) == __OFFSET_SIGACTION64_SIGACTION);
-STATIC_ASSERT(sizeof(struct sigaction64) == __SIZEOF_SIGACTION64);
-STATIC_ASSERT(alignof(struct sigaction64) == __ALIGNOF_SIGACTION64);
-
-
-
-
-
 #include <bits/sigstack32.h>
 
 /* struct sigstack32 */
@@ -596,120 +640,6 @@ STATIC_ASSERT(alignof(union sigval32) == __ALIGNOF_SIGVAL32);
 /* union sigval64 */
 STATIC_ASSERT(sizeof(union sigval64) == __SIZEOF_SIGVAL64);
 STATIC_ASSERT(alignof(union sigval64) == __ALIGNOF_SIGVAL64);
-
-
-
-
-
-#include <bits/itimerspec32.h>
-
-/* struct itimerspecx32 */
-STATIC_ASSERT(offsetof(struct itimerspecx32, it_value) == __OFFSET_ITIMERSPECX32_VALUE);
-STATIC_ASSERT(offsetof(struct itimerspecx32, it_interval) == __OFFSET_ITIMERSPECX32_INTERVAL);
-STATIC_ASSERT(sizeof(struct itimerspecx32) == __SIZEOF_ITIMERSPECX32);
-STATIC_ASSERT(alignof(struct itimerspecx32) == __ALIGNOF_ITIMERSPECX32);
-
-/* struct itimerspecx32_64 */
-STATIC_ASSERT(offsetof(struct itimerspecx32_64, it_value) == __OFFSET_ITIMERSPECX32_64_VALUE);
-STATIC_ASSERT(offsetof(struct itimerspecx32_64, it_interval) == __OFFSET_ITIMERSPECX32_64_INTERVAL);
-STATIC_ASSERT(sizeof(struct itimerspecx32_64) == __SIZEOF_ITIMERSPECX32_64);
-STATIC_ASSERT(alignof(struct itimerspecx32_64) == __ALIGNOF_ITIMERSPECX32_64);
-
-/* struct __itimerspecx32_64_alt */
-/* ... */
-
-
-
-
-
-#include <bits/itimerspec64.h>
-
-/* struct itimerspecx64 */
-STATIC_ASSERT(offsetof(struct itimerspecx64, it_value) == __OFFSET_ITIMERSPECX64_VALUE);
-STATIC_ASSERT(offsetof(struct itimerspecx64, it_interval) == __OFFSET_ITIMERSPECX64_INTERVAL);
-STATIC_ASSERT(sizeof(struct itimerspecx64) == __SIZEOF_ITIMERSPECX64);
-STATIC_ASSERT(alignof(struct itimerspecx64) == __ALIGNOF_ITIMERSPECX64);
-
-/* struct __itimerspecx64_alt */
-/* ... */
-
-
-
-
-
-#include <bits/itimerval32.h>
-
-/* struct itimervalx32 */
-STATIC_ASSERT(offsetof(struct itimervalx32, it_value) == __OFFSET_ITIMERVALX32_VALUE);
-STATIC_ASSERT(offsetof(struct itimervalx32, it_interval) == __OFFSET_ITIMERVALX32_INTERVAL);
-STATIC_ASSERT(sizeof(struct itimervalx32) == __SIZEOF_ITIMERVALX32);
-STATIC_ASSERT(alignof(struct itimervalx32) == __ALIGNOF_ITIMERVALX32);
-
-/* struct itimervalx32_64 */
-STATIC_ASSERT(offsetof(struct itimervalx32_64, it_value) == __OFFSET_ITIMERVALX32_64_VALUE);
-STATIC_ASSERT(offsetof(struct itimervalx32_64, it_interval) == __OFFSET_ITIMERVALX32_64_INTERVAL);
-STATIC_ASSERT(sizeof(struct itimervalx32_64) == __SIZEOF_ITIMERVALX32_64);
-STATIC_ASSERT(alignof(struct itimervalx32_64) == __ALIGNOF_ITIMERVALX32_64);
-
-/* struct __itimervalx32_64_alt */
-/* ... */
-
-
-
-
-
-#include <bits/itimerval64.h>
-
-/* struct itimervalx64 */
-STATIC_ASSERT(offsetof(struct itimervalx64, it_value) == __OFFSET_ITIMERVALX64_VALUE);
-STATIC_ASSERT(offsetof(struct itimervalx64, it_interval) == __OFFSET_ITIMERVALX64_INTERVAL);
-STATIC_ASSERT(sizeof(struct itimervalx64) == __SIZEOF_ITIMERVALX64);
-STATIC_ASSERT(alignof(struct itimervalx64) == __ALIGNOF_ITIMERVALX64);
-
-/* struct __itimervalx64_alt */
-/* ... */
-
-
-
-
-
-#include <bits/timeb32.h>
-
-/* struct timebx32 */
-STATIC_ASSERT(offsetof(struct timebx32, dstflag) == __OFFSET_TIMEBX32_DSTFLAG);
-STATIC_ASSERT(offsetof(struct timebx32, millitm) == __OFFSET_TIMEBX32_MILLITM);
-STATIC_ASSERT(offsetof(struct timebx32, time) == __OFFSET_TIMEBX32_TIME);
-STATIC_ASSERT(offsetof(struct timebx32, timezone) == __OFFSET_TIMEBX32_TIMEZONE);
-STATIC_ASSERT(sizeof(struct timebx32) == __SIZEOF_TIMEBX32);
-STATIC_ASSERT(alignof(struct timebx32) == __ALIGNOF_TIMEBX32);
-
-/* struct timebx32_64 */
-STATIC_ASSERT(offsetof(struct timebx32_64, dstflag) == __OFFSET_TIMEBX32_64_DSTFLAG);
-STATIC_ASSERT(offsetof(struct timebx32_64, millitm) == __OFFSET_TIMEBX32_64_MILLITM);
-STATIC_ASSERT(offsetof(struct timebx32_64, time) == __OFFSET_TIMEBX32_64_TIME);
-STATIC_ASSERT(offsetof(struct timebx32_64, timezone) == __OFFSET_TIMEBX32_64_TIMEZONE);
-STATIC_ASSERT(sizeof(struct timebx32_64) == __SIZEOF_TIMEBX32_64);
-STATIC_ASSERT(alignof(struct timebx32_64) == __ALIGNOF_TIMEBX32_64);
-
-/* struct __timebx32_64_alt */
-/* ... */
-
-
-
-
-
-#include <bits/timeb64.h>
-
-/* struct timebx64 */
-STATIC_ASSERT(offsetof(struct timebx64, dstflag) == __OFFSET_TIMEBX64_DSTFLAG);
-STATIC_ASSERT(offsetof(struct timebx64, millitm) == __OFFSET_TIMEBX64_MILLITM);
-STATIC_ASSERT(offsetof(struct timebx64, time) == __OFFSET_TIMEBX64_TIME);
-STATIC_ASSERT(offsetof(struct timebx64, timezone) == __OFFSET_TIMEBX64_TIMEZONE);
-STATIC_ASSERT(sizeof(struct timebx64) == __SIZEOF_TIMEBX64);
-STATIC_ASSERT(alignof(struct timebx64) == __ALIGNOF_TIMEBX64);
-
-/* struct __timebx64_alt */
-/* ... */
 
 
 
@@ -917,6 +847,120 @@ STATIC_ASSERT(alignof(struct statfsx64) == __ALIGNOF_STATFSX64);
 
 
 
+#include <bits/timeb32.h>
+
+/* struct timebx32 */
+STATIC_ASSERT(offsetof(struct timebx32, dstflag) == __OFFSET_TIMEBX32_DSTFLAG);
+STATIC_ASSERT(offsetof(struct timebx32, millitm) == __OFFSET_TIMEBX32_MILLITM);
+STATIC_ASSERT(offsetof(struct timebx32, time) == __OFFSET_TIMEBX32_TIME);
+STATIC_ASSERT(offsetof(struct timebx32, timezone) == __OFFSET_TIMEBX32_TIMEZONE);
+STATIC_ASSERT(sizeof(struct timebx32) == __SIZEOF_TIMEBX32);
+STATIC_ASSERT(alignof(struct timebx32) == __ALIGNOF_TIMEBX32);
+
+/* struct timebx32_64 */
+STATIC_ASSERT(offsetof(struct timebx32_64, dstflag) == __OFFSET_TIMEBX32_64_DSTFLAG);
+STATIC_ASSERT(offsetof(struct timebx32_64, millitm) == __OFFSET_TIMEBX32_64_MILLITM);
+STATIC_ASSERT(offsetof(struct timebx32_64, time) == __OFFSET_TIMEBX32_64_TIME);
+STATIC_ASSERT(offsetof(struct timebx32_64, timezone) == __OFFSET_TIMEBX32_64_TIMEZONE);
+STATIC_ASSERT(sizeof(struct timebx32_64) == __SIZEOF_TIMEBX32_64);
+STATIC_ASSERT(alignof(struct timebx32_64) == __ALIGNOF_TIMEBX32_64);
+
+/* struct __timebx32_64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/timeb64.h>
+
+/* struct timebx64 */
+STATIC_ASSERT(offsetof(struct timebx64, dstflag) == __OFFSET_TIMEBX64_DSTFLAG);
+STATIC_ASSERT(offsetof(struct timebx64, millitm) == __OFFSET_TIMEBX64_MILLITM);
+STATIC_ASSERT(offsetof(struct timebx64, time) == __OFFSET_TIMEBX64_TIME);
+STATIC_ASSERT(offsetof(struct timebx64, timezone) == __OFFSET_TIMEBX64_TIMEZONE);
+STATIC_ASSERT(sizeof(struct timebx64) == __SIZEOF_TIMEBX64);
+STATIC_ASSERT(alignof(struct timebx64) == __ALIGNOF_TIMEBX64);
+
+/* struct __timebx64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/timespec32.h>
+
+/* struct timespecx32 */
+STATIC_ASSERT(offsetof(struct timespecx32, tv_sec) == __OFFSET_TIMESPECX32_SEC);
+STATIC_ASSERT(offsetof(struct timespecx32, tv_nsec) == __OFFSET_TIMESPECX32_NSEC);
+STATIC_ASSERT(sizeof(struct timespecx32) == __SIZEOF_TIMESPECX32);
+STATIC_ASSERT(alignof(struct timespecx32) == __ALIGNOF_TIMESPECX32);
+
+/* struct timespecx32_64 */
+STATIC_ASSERT(offsetof(struct timespecx32_64, tv_sec) == __OFFSET_TIMESPECX32_64_SEC);
+STATIC_ASSERT(offsetof(struct timespecx32_64, tv_nsec) == __OFFSET_TIMESPECX32_64_NSEC);
+STATIC_ASSERT(sizeof(struct timespecx32_64) == __SIZEOF_TIMESPECX32_64);
+STATIC_ASSERT(alignof(struct timespecx32_64) == __ALIGNOF_TIMESPECX32_64);
+
+/* struct __timespecx32_64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/timespec64.h>
+
+/* struct timespecx64 */
+STATIC_ASSERT(offsetof(struct timespecx64, tv_sec) == __OFFSET_TIMESPECX64_SEC);
+STATIC_ASSERT(offsetof(struct timespecx64, tv_nsec) == __OFFSET_TIMESPECX64_NSEC);
+STATIC_ASSERT(sizeof(struct timespecx64) == __SIZEOF_TIMESPECX64);
+STATIC_ASSERT(alignof(struct timespecx64) == __ALIGNOF_TIMESPECX64);
+
+/* struct __timespecx64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/timeval32.h>
+
+/* struct timevalx32 */
+STATIC_ASSERT(offsetof(struct timevalx32, tv_usec) == __OFFSET_TIMEVALX32_USEC);
+STATIC_ASSERT(offsetof(struct timevalx32, tv_sec) == __OFFSET_TIMEVALX32_SEC);
+STATIC_ASSERT(sizeof(struct timevalx32) == __SIZEOF_TIMEVALX32);
+STATIC_ASSERT(alignof(struct timevalx32) == __ALIGNOF_TIMEVALX32);
+
+/* struct timevalx32_64 */
+STATIC_ASSERT(offsetof(struct timevalx32_64, tv_usec) == __OFFSET_TIMEVALX32_64_USEC);
+STATIC_ASSERT(offsetof(struct timevalx32_64, tv_sec) == __OFFSET_TIMEVALX32_64_SEC);
+STATIC_ASSERT(sizeof(struct timevalx32_64) == __SIZEOF_TIMEVALX32_64);
+STATIC_ASSERT(alignof(struct timevalx32_64) == __ALIGNOF_TIMEVALX32_64);
+
+/* struct __timevalx32_64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/timeval64.h>
+
+/* struct timevalx64 */
+STATIC_ASSERT(offsetof(struct timevalx64, tv_usec) == __OFFSET_TIMEVALX64_USEC);
+STATIC_ASSERT(offsetof(struct timevalx64, tv_sec) == __OFFSET_TIMEVALX64_SEC);
+STATIC_ASSERT(sizeof(struct timevalx64) == __SIZEOF_TIMEVALX64);
+STATIC_ASSERT(alignof(struct timevalx64) == __ALIGNOF_TIMEVALX64);
+
+/* struct __timevalx64_alt */
+/* ... */
+
+
+
+
+
 #include <bits/va_list-struct32.h>
 
 /* struct i386_va_list_struct */
@@ -1004,86 +1048,6 @@ STATIC_ASSERT(sizeof(struct exception_data64) == __SIZEOF_EXCEPTION_DATA64);
 
 
 
-#include <kos/exec/bits/peb32.h>
-
-/* struct process_peb32 */
-STATIC_ASSERT(offsetof(struct process_peb32, pp_argc) == OFFSET_PROCESS_PEB32_ARGC);
-STATIC_ASSERT(offsetof(struct process_peb32, pp_argv) == OFFSET_PROCESS_PEB32_ARGV);
-STATIC_ASSERT(offsetof(struct process_peb32, pp_envc) == OFFSET_PROCESS_PEB32_ENVC);
-STATIC_ASSERT(offsetof(struct process_peb32, pp_envp) == OFFSET_PROCESS_PEB32_ENVP);
-
-
-
-
-
-#include <kos/exec/bits/peb64.h>
-
-/* struct process_peb64 */
-STATIC_ASSERT(offsetof(struct process_peb64, pp_argc) == OFFSET_PROCESS_PEB64_ARGC);
-STATIC_ASSERT(offsetof(struct process_peb64, pp_argv) == OFFSET_PROCESS_PEB64_ARGV);
-STATIC_ASSERT(offsetof(struct process_peb64, pp_envc) == OFFSET_PROCESS_PEB64_ENVC);
-STATIC_ASSERT(offsetof(struct process_peb64, pp_envp) == OFFSET_PROCESS_PEB64_ENVP);
-
-
-
-
-
-#include <kos/exec/bits/library-listdef32.h>
-
-/* struct library_listdef32 */
-STATIC_ASSERT(offsetof(struct library_listdef32, lld_count) == __OFFSET_LIBRARY_LISTDEF32_COUNT);
-STATIC_ASSERT(offsetof(struct library_listdef32, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF32_ENTRY_OFFSETOF_MODULE);
-STATIC_ASSERT(offsetof(struct library_listdef32, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF32_ENTRY_OFFSETOF_NEXT);
-STATIC_ASSERT(offsetof(struct library_listdef32, lld_first) == __OFFSET_LIBRARY_LISTDEF32_FIRST);
-STATIC_ASSERT(offsetof(struct library_listdef32, lld_flags) == __OFFSET_LIBRARY_LISTDEF32_FLAGS);
-STATIC_ASSERT(offsetof(struct library_listdef32, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF32_MODULE_OFFSETOF_FILENAME);
-STATIC_ASSERT(offsetof(struct library_listdef32, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF32_MODULE_OFFSETOF_LOADADDR);
-STATIC_ASSERT(offsetof(struct library_listdef32, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF32_MODULE_OFFSETOF_LOADSTART);
-STATIC_ASSERT(offsetof(struct library_listdef32, lld_size) == __OFFSET_LIBRARY_LISTDEF32_SIZE);
-STATIC_ASSERT(offsetof(struct library_listdef32, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF32_SIZEOF_POINTER);
-STATIC_ASSERT(sizeof(struct library_listdef32) == __SIZEOF_LIBRARY_LISTDEF32);
-
-
-
-
-
-#include <kos/exec/bits/library-listdef64.h>
-
-/* struct library_listdef64 */
-STATIC_ASSERT(offsetof(struct library_listdef64, lld_count) == __OFFSET_LIBRARY_LISTDEF64_COUNT);
-STATIC_ASSERT(offsetof(struct library_listdef64, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF64_ENTRY_OFFSETOF_MODULE);
-STATIC_ASSERT(offsetof(struct library_listdef64, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF64_ENTRY_OFFSETOF_NEXT);
-STATIC_ASSERT(offsetof(struct library_listdef64, lld_first) == __OFFSET_LIBRARY_LISTDEF64_FIRST);
-STATIC_ASSERT(offsetof(struct library_listdef64, lld_flags) == __OFFSET_LIBRARY_LISTDEF64_FLAGS);
-STATIC_ASSERT(offsetof(struct library_listdef64, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF64_MODULE_OFFSETOF_FILENAME);
-STATIC_ASSERT(offsetof(struct library_listdef64, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF64_MODULE_OFFSETOF_LOADADDR);
-STATIC_ASSERT(offsetof(struct library_listdef64, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF64_MODULE_OFFSETOF_LOADSTART);
-STATIC_ASSERT(offsetof(struct library_listdef64, lld_size) == __OFFSET_LIBRARY_LISTDEF64_SIZE);
-STATIC_ASSERT(offsetof(struct library_listdef64, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF64_SIZEOF_POINTER);
-STATIC_ASSERT(sizeof(struct library_listdef64) == __SIZEOF_LIBRARY_LISTDEF64);
-
-
-
-
-
-#include <kos/exec/asm/elf32.h>
-
-/* struct elfexec_info32 */
-/* ... */
-
-
-
-
-
-#include <kos/exec/asm/elf64.h>
-
-/* struct elfexec_info64 */
-/* ... */
-
-
-
-
-
 #include <kos/bits/ukern-struct32.h>
 
 /* struct userkern32 */
@@ -1127,6 +1091,80 @@ STATIC_ASSERT(offsetof(struct userkern64, uk_tid) == OFFSET_USERKERN64_TID);
 STATIC_ASSERT(offsetof(struct userkern64, uk_uid) == OFFSET_USERKERN64_UID);
 STATIC_ASSERT(offsetof(struct userkern64, uk_xfpu) == OFFSET_USERKERN64_XFPU);
 STATIC_ASSERT(sizeof(struct userkern64) == SIZEOF_USERKERN64);
+
+
+
+
+
+#include <kos/exec/asm/elf32.h>
+
+
+
+
+
+#include <kos/exec/asm/elf64.h>
+
+
+
+
+
+#include <kos/exec/bits/library-listdef32.h>
+
+/* struct library_listdef32 */
+STATIC_ASSERT(offsetof(struct library_listdef32, lld_count) == __OFFSET_LIBRARY_LISTDEF32_COUNT);
+STATIC_ASSERT(offsetof(struct library_listdef32, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF32_ENTRY_OFFSETOF_MODULE);
+STATIC_ASSERT(offsetof(struct library_listdef32, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF32_ENTRY_OFFSETOF_NEXT);
+STATIC_ASSERT(offsetof(struct library_listdef32, lld_first) == __OFFSET_LIBRARY_LISTDEF32_FIRST);
+STATIC_ASSERT(offsetof(struct library_listdef32, lld_flags) == __OFFSET_LIBRARY_LISTDEF32_FLAGS);
+STATIC_ASSERT(offsetof(struct library_listdef32, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF32_MODULE_OFFSETOF_FILENAME);
+STATIC_ASSERT(offsetof(struct library_listdef32, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF32_MODULE_OFFSETOF_LOADADDR);
+STATIC_ASSERT(offsetof(struct library_listdef32, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF32_MODULE_OFFSETOF_LOADSTART);
+STATIC_ASSERT(offsetof(struct library_listdef32, lld_size) == __OFFSET_LIBRARY_LISTDEF32_SIZE);
+STATIC_ASSERT(offsetof(struct library_listdef32, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF32_SIZEOF_POINTER);
+STATIC_ASSERT(sizeof(struct library_listdef32) == __SIZEOF_LIBRARY_LISTDEF32);
+
+
+
+
+
+#include <kos/exec/bits/library-listdef64.h>
+
+/* struct library_listdef64 */
+STATIC_ASSERT(offsetof(struct library_listdef64, lld_count) == __OFFSET_LIBRARY_LISTDEF64_COUNT);
+STATIC_ASSERT(offsetof(struct library_listdef64, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF64_ENTRY_OFFSETOF_MODULE);
+STATIC_ASSERT(offsetof(struct library_listdef64, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF64_ENTRY_OFFSETOF_NEXT);
+STATIC_ASSERT(offsetof(struct library_listdef64, lld_first) == __OFFSET_LIBRARY_LISTDEF64_FIRST);
+STATIC_ASSERT(offsetof(struct library_listdef64, lld_flags) == __OFFSET_LIBRARY_LISTDEF64_FLAGS);
+STATIC_ASSERT(offsetof(struct library_listdef64, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF64_MODULE_OFFSETOF_FILENAME);
+STATIC_ASSERT(offsetof(struct library_listdef64, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF64_MODULE_OFFSETOF_LOADADDR);
+STATIC_ASSERT(offsetof(struct library_listdef64, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF64_MODULE_OFFSETOF_LOADSTART);
+STATIC_ASSERT(offsetof(struct library_listdef64, lld_size) == __OFFSET_LIBRARY_LISTDEF64_SIZE);
+STATIC_ASSERT(offsetof(struct library_listdef64, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF64_SIZEOF_POINTER);
+STATIC_ASSERT(sizeof(struct library_listdef64) == __SIZEOF_LIBRARY_LISTDEF64);
+
+
+
+
+
+#include <kos/exec/bits/peb32.h>
+
+/* struct process_peb32 */
+STATIC_ASSERT(offsetof(struct process_peb32, pp_argc) == OFFSET_PROCESS_PEB32_ARGC);
+STATIC_ASSERT(offsetof(struct process_peb32, pp_argv) == OFFSET_PROCESS_PEB32_ARGV);
+STATIC_ASSERT(offsetof(struct process_peb32, pp_envc) == OFFSET_PROCESS_PEB32_ENVC);
+STATIC_ASSERT(offsetof(struct process_peb32, pp_envp) == OFFSET_PROCESS_PEB32_ENVP);
+
+
+
+
+
+#include <kos/exec/bits/peb64.h>
+
+/* struct process_peb64 */
+STATIC_ASSERT(offsetof(struct process_peb64, pp_argc) == OFFSET_PROCESS_PEB64_ARGC);
+STATIC_ASSERT(offsetof(struct process_peb64, pp_argv) == OFFSET_PROCESS_PEB64_ARGV);
+STATIC_ASSERT(offsetof(struct process_peb64, pp_envc) == OFFSET_PROCESS_PEB64_ENVC);
+STATIC_ASSERT(offsetof(struct process_peb64, pp_envp) == OFFSET_PROCESS_PEB64_ENVP);
 
 
 

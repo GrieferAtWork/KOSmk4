@@ -16,13 +16,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _COMPAT_BITS_IOVEC_STRUCT_H
-#define _COMPAT_BITS_IOVEC_STRUCT_H 1
+#ifndef _COMPAT_BITS_FLOCK_STRUCT_H
+#define _COMPAT_BITS_FLOCK_STRUCT_H 1
 
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
-#include <bits/iovec-struct.h>
-#define compat_iovec iovec
+#include <bits/flock-struct.h>
+#define compat_flock32 __flock32
+#define compat_flock64 __flock64
 #endif /* __ARCH_HAVE_COMPAT */
 
-#endif /* !_COMPAT_BITS_IOVEC_STRUCT_H */
+#endif /* !_COMPAT_BITS_FLOCK_STRUCT_H */

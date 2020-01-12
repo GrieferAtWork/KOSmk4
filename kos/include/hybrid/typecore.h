@@ -1142,6 +1142,19 @@
 #endif /* !__ALIGNOF_INT16__ */
 
 
+#define __ALIGNOF_INTN_1 1
+#define __ALIGNOF_INTN_2 __ALIGNOF_INT16__
+#define __ALIGNOF_INTN_4 __ALIGNOF_INT32__
+#ifdef __ALIGNOF_INT64__
+#define __ALIGNOF_INTN_8 __ALIGNOF_INT64__
+#endif /* __ALIGNOF_INT64__ */
+#ifdef __ALIGNOF_INT128__
+#define __ALIGNOF_INTN_16 __ALIGNOF_INT128__
+#endif /* __ALIGNOF_INT128__ */
+#define __ALIGNOF_INTN2(sizeof) __ALIGNOF_INTN_##sizeof
+#define __ALIGNOF_INTN(sizeof) __ALIGNOF_INTN2(sizeof)
+
+
 #if (defined(_NATIVE_CHAR16_T_DEFINED) ||                                                                               \
      (defined(__cpp_unicode_characters) && __cpp_unicode_characters + 0 >= 200704) ||                                   \
      (defined(_HAS_CHAR16_T_LANGUAGE_SUPPORT) && _HAS_CHAR16_T_LANGUAGE_SUPPORT + 0) ||                                 \

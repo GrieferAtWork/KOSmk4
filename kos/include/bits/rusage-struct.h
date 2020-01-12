@@ -26,8 +26,6 @@
 #include <bits/timeval.h>
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
-
 /* Documentation taken from GLibc /usr/include/i386-linux-gnu/bits/resource.h */
 /* Bit values & structures for resource limits.  Linux version.
    Copyright (C) 1994-2016 Free Software Foundation, Inc.
@@ -102,6 +100,7 @@ __SYSDECL_BEGIN
 #define __SIZEOF_RUSAGE64          (__SIZEOF_TIMEVAL64 * 2 + __SIZEOF_SYSCALL_LONG_T__ * 14)
 
 #ifdef __CC__
+__DECL_BEGIN
 
 #ifndef __rusage_defined
 #define __rusage_defined 1
@@ -190,8 +189,8 @@ struct __rusage64 /*[NAME(rusage64)][PREFIX(ru_)]*/ {
 #define __rusage32 rusage
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 struct __rusage32 /*[NAME(rusage32)][PREFIX(ru_)]*/ {
-	struct timeval32 ru_utime;  /* Total amount of user time used. */
-	struct timeval32 ru_stime;  /* Total amount of system time used. */
+	struct __timeval32 ru_utime;  /* Total amount of user time used. */
+	struct __timeval32 ru_stime;  /* Total amount of system time used. */
 #define __RU_MEMBER(x) __extension__ union { __LONGPTR_TYPE__ x; __syscall_slong_t __##x##_word; }
 	__RU_MEMBER(ru_maxrss);   /* Maximum resident set size (in kilobytes). */
 	/* Amount of sharing of text segment memory with other processes (kilobyte-seconds). */
@@ -215,7 +214,7 @@ struct __rusage32 /*[NAME(rusage32)][PREFIX(ru_)]*/ {
 };
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
-__SYSDECL_END
+__DECL_END
 #endif /* __CC__ */
 
 #endif /* !_BITS_RUSAGE_STRUCT_H */

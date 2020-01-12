@@ -25,6 +25,7 @@
 
 #include <hybrid/typecore.h>
 
+#include <bits/flock-struct.h>
 #include <bits/oflags.h>
 #include <bits/types.h>
 
@@ -34,31 +35,11 @@
 
 __SYSDECL_BEGIN
 
-#ifdef __CC__
-struct flock {
-	__INT16_TYPE__ l_type;   /* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK.	*/
-	__INT16_TYPE__ l_whence; /* Where `l_start' is relative to (like `lseek'). */
-	__FS_TYPE(off) l_start;  /* Offset where the lock begins. */
-	__FS_TYPE(off) l_len;    /* Size of the locked area; zero means until EOF. */
-	__pid_t        l_pid;    /* Process holding the lock. */
-};
-#ifdef __USE_LARGEFILE64
-struct flock64 {
-	__INT16_TYPE__ l_type;   /* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK. */
-	__INT16_TYPE__ l_whence; /* Where `l_start' is relative to (like `lseek'). */
-	__off64_t      l_start;  /* Offset where the lock begins. */
-	__off64_t      l_len;    /* Size of the locked area; zero means until EOF. */
-	__pid_t        l_pid;    /* Process holding the lock. */
-};
-#endif /* __USE_LARGEFILE64 */
-#endif /* __CC__ */
-
 #define O_ACCMODE     __O_ACCMODE
 #define O_RDONLY      __O_RDONLY 
 #define O_WRONLY      __O_WRONLY 
 #define O_RDWR        __O_RDWR   
 #define O_TRUNC       __O_TRUNC
-
 
 #ifdef __USE_DOS
 /* DOS extension flags. */
@@ -100,10 +81,10 @@ struct flock64 {
 #define O_SYNC       __O_SYNC     /* ??? */
 #define O_ASYNC      __O_ASYNC    /* ??? */
 
-
 #ifdef __USE_KOS
 #define O_ANYTHING   __O_ANYTHING
-#endif
+#endif /* __USE_KOS */
+
 
 /* Aliases */
 #define O_NDELAY     __O_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
@@ -522,9 +503,9 @@ struct file_handle {
  * >> fsmode(mask);
  * >>
  * >> // Mount some filesystem locations as DOS drives.
- * >> dup2(open("/"),AT_FDDRIVE_ROOT('C'));
- * >> dup2(open("/bin"),AT_FDDRIVE_ROOT('D'));
- * >> dup2(open("/home"),AT_FDDRIVE_ROOT('E'));
+ * >> dup2(open("/"), AT_FDDRIVE_ROOT('C'));
+ * >> dup2(open("/bin"), AT_FDDRIVE_ROOT('D'));
+ * >> dup2(open("/home"), AT_FDDRIVE_ROOT('E'));
  * >>
  * >> // Open a file on a dos-path.
  * >> open("D:\\ls"); // open("/bin/ls")
@@ -532,7 +513,7 @@ struct file_handle {
  * >> // Explicitly set the current-working directory of a specific drive.
  * >> // NOTE: Requires that the opened path be reachable from `AT_FDDRIVE_ROOT('E')'
  * >> //       If it isn't, an `ERROR_FS_CROSSDEVICE_LINK' error is thrown.
- * >> dup2(open("/home/me/Downloads"),AT_FDDRIVE_CWD('E'));
+ * >> dup2(open("/home/me/Downloads"), AT_FDDRIVE_CWD('E'));
  * >>
  * >> chdir("C:\\bin"); // AT_FDCWD = "/bin"; AT_FDDRIVE_CWD('C') = AT_FDCWD;
  * >> chdir("E:");      // AT_FDCWD = AT_FDDRIVE_CWD('E'); (`/home/me/Downloads')
@@ -555,7 +536,7 @@ struct file_handle {
  *     actually mount a superblock to some filesystem location, but rather mirror a
  *     filesystem path, meaning that DOS drives can be thought of as the equivalent
  *     of the `dfd' argument of `*at' system calls:
- *     >> open("C:\\foo.txt"); // Same as `openat(AT_FDDRIVE_ROOT('C'),"foo.txt")'
+ *     >> open("C:\\foo.txt"); // Same as `openat(AT_FDDRIVE_ROOT('C'), "foo.txt")'
  *     If `mount()' is used to create a new (real) mounting point, it will appear
  *     in all DOS drives that are mounting the location where the mount happened,
  *     or any location further up the tree immediately (it's the same data object
@@ -572,8 +553,8 @@ struct file_handle {
  *     If a symbolic link starts with a '/' or '\\' character, the remainder
  *     of its text is relative to the first DOS drive mounting point
  *     encountered while walking up the chain of parent directories. */
-#define AT_FDDRIVE_CWD(drivechar)  ((-350)+((drivechar)-'A'))
-#define AT_FDDRIVE_ROOT(drivechar) ((-300)+((drivechar)-'A'))
+#define AT_FDDRIVE_CWD(drivechar)  ((-350) + ((drivechar) - 'A'))
+#define AT_FDDRIVE_ROOT(drivechar) ((-300) + ((drivechar) - 'A'))
 #define AT_DOS_DRIVEMIN            'A'
 #define AT_DOS_DRIVEMAX            'Z'
 #endif /* __KOS_VERSION__ >= 300 */

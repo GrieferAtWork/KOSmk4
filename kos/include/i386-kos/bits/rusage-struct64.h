@@ -20,6 +20,7 @@
 #define _I386_KOS_BITS_RUSAGE_STRUCT64_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
 #include <hybrid/typecore.h>
 
@@ -199,9 +200,9 @@ struct __rusagex64_alt {
 __DECL_END
 #endif /* __CC__ */
 
-#ifndef __USE_KOS
+#ifndef __USE_KOS_KERNEL
 #undef rusagex64
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef __PRIVATE_DID_PUSH_RUSAGEX64

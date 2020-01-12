@@ -23,7 +23,7 @@
 #include <hybrid/__byteorder.h>
 
 #ifndef __BYTE_ORDER
-#define __BYTE_ORDER   __BYTE_ORDER__
+#define __BYTE_ORDER __BYTE_ORDER__
 #endif /* !__BYTE_ORDER */
 
 #endif /* !_BITS_ENDIAN_H */

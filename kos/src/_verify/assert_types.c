@@ -279,24 +279,25 @@ STATIC_ASSERT(sizeof(Elf64_Versym) == __SIZEOF_ELF64_VERSYM__);
 /*[[[deemon
 import * from ...misc.libgen.assert_offsetof;
 local files = {
+	"../../include/bits/flock-struct.h",
 	"../../include/bits/itimerspec.h",
 	"../../include/bits/itimerval.h",
-	"../../include/bits/timespec.h",
-	"../../include/bits/timeval.h",
-	"../../include/bits/timeb.h",
-	"../../include/bits/siginfo-struct.h",
-	"../../include/bits/sigaction-struct.h",
 	"../../include/bits/rusage-struct.h",
+	"../../include/bits/sigaction-struct.h",
+	"../../include/bits/siginfo-struct.h",
 	"../../include/bits/stat-kos.h",
 	"../../include/bits/statfs.h",
+	"../../include/bits/timeb.h",
+	"../../include/bits/timespec.h",
+	"../../include/bits/timeval.h",
 	"../../include/elf.h",
+	"../../include/kos/bits/debugtrap.h",
+	"../../include/kos/bits/ukern-struct.h",
+	"../../include/kos/exec/bits/library-listdef.h",
+	"../../include/kos/exec/bits/peb.h",
+	"../../include/kos/exec/elf.h",
 	"../../include/kos/hop.h",
 	"../../include/kos/ksysctl.h",
-	"../../include/kos/exec/elf.h",
-	"../../include/kos/exec/bits/peb.h",
-	"../../include/kos/exec/bits/library-listdef.h",
-	"../../include/kos/bits/ukern-struct.h",
-	"../../include/kos/bits/debugtrap.h",
 };
 
 local include_prefixes = {
@@ -324,6 +325,36 @@ for (local f: files)
 	genAsserts(f);
 
 ]]]*/
+#include <bits/flock-struct.h>
+
+/* struct flock */
+STATIC_ASSERT(offsetof(struct flock, l_len) == __OFFSET_FLOCK_LEN);
+STATIC_ASSERT(offsetof(struct flock, l_pid) == __OFFSET_FLOCK_PID);
+STATIC_ASSERT(offsetof(struct flock, l_start) == __OFFSET_FLOCK_START);
+STATIC_ASSERT(offsetof(struct flock, l_type) == __OFFSET_FLOCK_TYPE);
+STATIC_ASSERT(offsetof(struct flock, l_whence) == __OFFSET_FLOCK_WHENCE);
+STATIC_ASSERT(sizeof(struct flock) == __SIZEOF_FLOCK);
+
+/* struct __flock64 */
+STATIC_ASSERT(offsetof(struct __flock64, l_len) == __OFFSET_FLOCK64_LEN);
+STATIC_ASSERT(offsetof(struct __flock64, l_pid) == __OFFSET_FLOCK64_PID);
+STATIC_ASSERT(offsetof(struct __flock64, l_start) == __OFFSET_FLOCK64_START);
+STATIC_ASSERT(offsetof(struct __flock64, l_type) == __OFFSET_FLOCK64_TYPE);
+STATIC_ASSERT(offsetof(struct __flock64, l_whence) == __OFFSET_FLOCK64_WHENCE);
+STATIC_ASSERT(sizeof(struct __flock64) == __SIZEOF_FLOCK64);
+
+/* struct __flock32 */
+STATIC_ASSERT(offsetof(struct __flock32, l_len) == __OFFSET_FLOCK32_LEN);
+STATIC_ASSERT(offsetof(struct __flock32, l_pid) == __OFFSET_FLOCK32_PID);
+STATIC_ASSERT(offsetof(struct __flock32, l_start) == __OFFSET_FLOCK32_START);
+STATIC_ASSERT(offsetof(struct __flock32, l_type) == __OFFSET_FLOCK32_TYPE);
+STATIC_ASSERT(offsetof(struct __flock32, l_whence) == __OFFSET_FLOCK32_WHENCE);
+STATIC_ASSERT(sizeof(struct __flock32) == __SIZEOF_FLOCK32);
+
+
+
+
+
 #include <bits/itimerspec.h>
 
 /* struct itimerspec */
@@ -361,121 +392,6 @@ STATIC_ASSERT(sizeof(struct __itimerval64) == __SIZEOF_ITIMERVAL64);
 STATIC_ASSERT(offsetof(struct __itimerval32, it_value) == __OFFSET_ITIMERVAL32_VALUE);
 STATIC_ASSERT(offsetof(struct __itimerval32, it_interval) == __OFFSET_ITIMERVAL32_INTERVAL);
 STATIC_ASSERT(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
-
-
-
-
-
-#include <bits/timespec.h>
-
-/* struct timespec */
-STATIC_ASSERT(offsetof(struct timespec, tv_sec) == __OFFSET_TIMESPEC_SEC);
-STATIC_ASSERT(offsetof(struct timespec, tv_nsec) == __OFFSET_TIMESPEC_NSEC);
-STATIC_ASSERT(sizeof(struct timespec) == __SIZEOF_TIMESPEC);
-
-/* struct __timespec64 */
-STATIC_ASSERT(offsetof(struct __timespec64, tv_sec) == __OFFSET_TIMESPEC64_SEC);
-STATIC_ASSERT(offsetof(struct __timespec64, tv_nsec) == __OFFSET_TIMESPEC64_NSEC);
-STATIC_ASSERT(sizeof(struct __timespec64) == __SIZEOF_TIMESPEC64);
-
-/* struct __timespec32 */
-STATIC_ASSERT(offsetof(struct __timespec32, tv_sec) == __OFFSET_TIMESPEC32_SEC);
-STATIC_ASSERT(offsetof(struct __timespec32, tv_nsec) == __OFFSET_TIMESPEC32_NSEC);
-STATIC_ASSERT(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
-
-
-
-
-
-#include <bits/timeval.h>
-
-/* struct timeval */
-STATIC_ASSERT(offsetof(struct timeval, tv_usec) == __OFFSET_TIMEVAL_USEC);
-STATIC_ASSERT(offsetof(struct timeval, tv_sec) == __OFFSET_TIMEVAL_SEC);
-STATIC_ASSERT(sizeof(struct timeval) == __SIZEOF_TIMEVAL);
-
-/* struct __timeval64 */
-STATIC_ASSERT(offsetof(struct __timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
-STATIC_ASSERT(offsetof(struct __timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
-STATIC_ASSERT(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
-
-/* struct __timeval32 */
-STATIC_ASSERT(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
-STATIC_ASSERT(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
-STATIC_ASSERT(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
-
-
-
-
-
-#include <bits/timeb.h>
-
-/* struct timeb */
-STATIC_ASSERT(offsetof(struct timeb, dstflag) == __OFFSET_TIMEB_DSTFLAG);
-STATIC_ASSERT(offsetof(struct timeb, millitm) == __OFFSET_TIMEB_MILLITM);
-STATIC_ASSERT(offsetof(struct timeb, time) == __OFFSET_TIMEB_TIME);
-STATIC_ASSERT(offsetof(struct timeb, timezone) == __OFFSET_TIMEB_TIMEZONE);
-STATIC_ASSERT(sizeof(struct timeb) == __SIZEOF_TIMEB);
-
-/* struct __timeb64 */
-STATIC_ASSERT(offsetof(struct __timeb64, dstflag) == __OFFSET_TIMEB64_DSTFLAG);
-STATIC_ASSERT(offsetof(struct __timeb64, millitm) == __OFFSET_TIMEB64_MILLITM);
-STATIC_ASSERT(offsetof(struct __timeb64, time) == __OFFSET_TIMEB64_TIME);
-STATIC_ASSERT(offsetof(struct __timeb64, timezone) == __OFFSET_TIMEB64_TIMEZONE);
-STATIC_ASSERT(sizeof(struct __timeb64) == __SIZEOF_TIMEB64);
-
-/* struct __timeb32 */
-STATIC_ASSERT(offsetof(struct __timeb32, dstflag) == __OFFSET_TIMEB32_DSTFLAG);
-STATIC_ASSERT(offsetof(struct __timeb32, millitm) == __OFFSET_TIMEB32_MILLITM);
-STATIC_ASSERT(offsetof(struct __timeb32, time) == __OFFSET_TIMEB32_TIME);
-STATIC_ASSERT(offsetof(struct __timeb32, timezone) == __OFFSET_TIMEB32_TIMEZONE);
-STATIC_ASSERT(sizeof(struct __timeb32) == __SIZEOF_TIMEB32);
-
-
-
-
-
-#include <bits/siginfo-struct.h>
-
-/* struct __siginfo_struct */
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_addr) == __OFFSET_SIGINFO_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_addr_lsb) == __OFFSET_SIGINFO_ADDR_LSB);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_arch) == __OFFSET_SIGINFO_ARCH);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_band) == __OFFSET_SIGINFO_BAND);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_call_addr) == __OFFSET_SIGINFO_CALL_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_code) == __OFFSET_SIGINFO_CODE);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_errno) == __OFFSET_SIGINFO_ERRNO);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_fd) == __OFFSET_SIGINFO_FD);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_int) == __OFFSET_SIGINFO_INT);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_lower) == __OFFSET_SIGINFO_LOWER);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_overrun) == __OFFSET_SIGINFO_OVERRUN);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_pid) == __OFFSET_SIGINFO_PID);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_ptr) == __OFFSET_SIGINFO_PTR);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_signo) == __OFFSET_SIGINFO_SIGNO);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_status) == __OFFSET_SIGINFO_STATUS);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_stime) == __OFFSET_SIGINFO_STIME);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_syscall) == __OFFSET_SIGINFO_SYSCALL);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_timerid) == __OFFSET_SIGINFO_TIMERID);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_uid) == __OFFSET_SIGINFO_UID);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_upper) == __OFFSET_SIGINFO_UPPER);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_utime) == __OFFSET_SIGINFO_UTIME);
-STATIC_ASSERT(offsetof(struct __siginfo_struct, si_value) == __OFFSET_SIGINFO_VALUE);
-STATIC_ASSERT(sizeof(struct __siginfo_struct) == __SIZEOF_SIGINFO);
-
-
-
-
-
-#include <bits/sigaction-struct.h>
-
-/* struct sigaction */
-STATIC_ASSERT(offsetof(struct sigaction, sa_flags) == __OFFSET_SIGACTION_FLAGS);
-STATIC_ASSERT(offsetof(struct sigaction, sa_handler) == __OFFSET_SIGACTION_HANDLER);
-STATIC_ASSERT(offsetof(struct sigaction, sa_mask) == __OFFSET_SIGACTION_MASK);
-STATIC_ASSERT(offsetof(struct sigaction, sa_restorer) == __OFFSET_SIGACTION_RESTORER);
-STATIC_ASSERT(offsetof(struct sigaction, sa_sigaction) == __OFFSET_SIGACTION_SIGACTION);
-STATIC_ASSERT(sizeof(struct sigaction) == __SIZEOF_SIGACTION);
-STATIC_ASSERT(alignof(struct sigaction) == __ALIGNOF_SIGACTION);
 
 
 
@@ -539,6 +455,52 @@ STATIC_ASSERT(offsetof(struct __rusage32, ru_oublock) == __OFFSET_RUSAGE32_OUBLO
 STATIC_ASSERT(offsetof(struct __rusage32, ru_stime) == __OFFSET_RUSAGE32_STIME);
 STATIC_ASSERT(offsetof(struct __rusage32, ru_utime) == __OFFSET_RUSAGE32_UTIME);
 STATIC_ASSERT(sizeof(struct __rusage32) == __SIZEOF_RUSAGE32);
+
+
+
+
+
+#include <bits/sigaction-struct.h>
+
+/* struct sigaction */
+STATIC_ASSERT(offsetof(struct sigaction, sa_flags) == __OFFSET_SIGACTION_FLAGS);
+STATIC_ASSERT(offsetof(struct sigaction, sa_handler) == __OFFSET_SIGACTION_HANDLER);
+STATIC_ASSERT(offsetof(struct sigaction, sa_mask) == __OFFSET_SIGACTION_MASK);
+STATIC_ASSERT(offsetof(struct sigaction, sa_restorer) == __OFFSET_SIGACTION_RESTORER);
+STATIC_ASSERT(offsetof(struct sigaction, sa_sigaction) == __OFFSET_SIGACTION_SIGACTION);
+STATIC_ASSERT(sizeof(struct sigaction) == __SIZEOF_SIGACTION);
+STATIC_ASSERT(alignof(struct sigaction) == __ALIGNOF_SIGACTION);
+
+
+
+
+
+#include <bits/siginfo-struct.h>
+
+/* struct __siginfo_struct */
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_addr) == __OFFSET_SIGINFO_ADDR);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_addr_lsb) == __OFFSET_SIGINFO_ADDR_LSB);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_arch) == __OFFSET_SIGINFO_ARCH);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_band) == __OFFSET_SIGINFO_BAND);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_call_addr) == __OFFSET_SIGINFO_CALL_ADDR);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_code) == __OFFSET_SIGINFO_CODE);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_errno) == __OFFSET_SIGINFO_ERRNO);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_fd) == __OFFSET_SIGINFO_FD);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_int) == __OFFSET_SIGINFO_INT);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_lower) == __OFFSET_SIGINFO_LOWER);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_overrun) == __OFFSET_SIGINFO_OVERRUN);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_pid) == __OFFSET_SIGINFO_PID);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_ptr) == __OFFSET_SIGINFO_PTR);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_signo) == __OFFSET_SIGINFO_SIGNO);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_status) == __OFFSET_SIGINFO_STATUS);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_stime) == __OFFSET_SIGINFO_STIME);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_syscall) == __OFFSET_SIGINFO_SYSCALL);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_timerid) == __OFFSET_SIGINFO_TIMERID);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_uid) == __OFFSET_SIGINFO_UID);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_upper) == __OFFSET_SIGINFO_UPPER);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_utime) == __OFFSET_SIGINFO_UTIME);
+STATIC_ASSERT(offsetof(struct __siginfo_struct, si_value) == __OFFSET_SIGINFO_VALUE);
+STATIC_ASSERT(sizeof(struct __siginfo_struct) == __SIZEOF_SIGINFO);
 
 
 
@@ -716,6 +678,75 @@ STATIC_ASSERT(alignof(struct __statfs64) == __ALIGNOF_STATFS64);
 
 
 
+#include <bits/timeb.h>
+
+/* struct timeb */
+STATIC_ASSERT(offsetof(struct timeb, dstflag) == __OFFSET_TIMEB_DSTFLAG);
+STATIC_ASSERT(offsetof(struct timeb, millitm) == __OFFSET_TIMEB_MILLITM);
+STATIC_ASSERT(offsetof(struct timeb, time) == __OFFSET_TIMEB_TIME);
+STATIC_ASSERT(offsetof(struct timeb, timezone) == __OFFSET_TIMEB_TIMEZONE);
+STATIC_ASSERT(sizeof(struct timeb) == __SIZEOF_TIMEB);
+
+/* struct __timeb64 */
+STATIC_ASSERT(offsetof(struct __timeb64, dstflag) == __OFFSET_TIMEB64_DSTFLAG);
+STATIC_ASSERT(offsetof(struct __timeb64, millitm) == __OFFSET_TIMEB64_MILLITM);
+STATIC_ASSERT(offsetof(struct __timeb64, time) == __OFFSET_TIMEB64_TIME);
+STATIC_ASSERT(offsetof(struct __timeb64, timezone) == __OFFSET_TIMEB64_TIMEZONE);
+STATIC_ASSERT(sizeof(struct __timeb64) == __SIZEOF_TIMEB64);
+
+/* struct __timeb32 */
+STATIC_ASSERT(offsetof(struct __timeb32, dstflag) == __OFFSET_TIMEB32_DSTFLAG);
+STATIC_ASSERT(offsetof(struct __timeb32, millitm) == __OFFSET_TIMEB32_MILLITM);
+STATIC_ASSERT(offsetof(struct __timeb32, time) == __OFFSET_TIMEB32_TIME);
+STATIC_ASSERT(offsetof(struct __timeb32, timezone) == __OFFSET_TIMEB32_TIMEZONE);
+STATIC_ASSERT(sizeof(struct __timeb32) == __SIZEOF_TIMEB32);
+
+
+
+
+
+#include <bits/timespec.h>
+
+/* struct timespec */
+STATIC_ASSERT(offsetof(struct timespec, tv_sec) == __OFFSET_TIMESPEC_SEC);
+STATIC_ASSERT(offsetof(struct timespec, tv_nsec) == __OFFSET_TIMESPEC_NSEC);
+STATIC_ASSERT(sizeof(struct timespec) == __SIZEOF_TIMESPEC);
+
+/* struct __timespec64 */
+STATIC_ASSERT(offsetof(struct __timespec64, tv_sec) == __OFFSET_TIMESPEC64_SEC);
+STATIC_ASSERT(offsetof(struct __timespec64, tv_nsec) == __OFFSET_TIMESPEC64_NSEC);
+STATIC_ASSERT(sizeof(struct __timespec64) == __SIZEOF_TIMESPEC64);
+
+/* struct __timespec32 */
+STATIC_ASSERT(offsetof(struct __timespec32, tv_sec) == __OFFSET_TIMESPEC32_SEC);
+STATIC_ASSERT(offsetof(struct __timespec32, tv_nsec) == __OFFSET_TIMESPEC32_NSEC);
+STATIC_ASSERT(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
+
+
+
+
+
+#include <bits/timeval.h>
+
+/* struct timeval */
+STATIC_ASSERT(offsetof(struct timeval, tv_usec) == __OFFSET_TIMEVAL_USEC);
+STATIC_ASSERT(offsetof(struct timeval, tv_sec) == __OFFSET_TIMEVAL_SEC);
+STATIC_ASSERT(sizeof(struct timeval) == __SIZEOF_TIMEVAL);
+
+/* struct __timeval64 */
+STATIC_ASSERT(offsetof(struct __timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
+STATIC_ASSERT(offsetof(struct __timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
+STATIC_ASSERT(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
+
+/* struct __timeval32 */
+STATIC_ASSERT(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
+STATIC_ASSERT(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
+STATIC_ASSERT(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
+
+
+
+
+
 #include <elf.h>
 
 /* struct elf32_ehdr */
@@ -839,6 +870,82 @@ STATIC_ASSERT(offsetof(struct elf64_chdr, ch_addralign) == __OFFSET_ELF64_CHDR_A
 STATIC_ASSERT(offsetof(struct elf64_chdr, ch_size) == __OFFSET_ELF64_CHDR_SIZE);
 STATIC_ASSERT(offsetof(struct elf64_chdr, ch_type) == __OFFSET_ELF64_CHDR_TYPE);
 STATIC_ASSERT(sizeof(struct elf64_chdr) == __SIZEOF_ELF64_CHDR);
+
+
+
+
+
+#include <kos/bits/debugtrap.h>
+
+/* struct debugtrap_reason */
+STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_intarg) == __OFFSET_DEBUGTRAP_REASON_INTARG);
+STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_ptrarg) == __OFFSET_DEBUGTRAP_REASON_PTRARG);
+STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_reason) == __OFFSET_DEBUGTRAP_REASON_REASON);
+STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_signo) == __OFFSET_DEBUGTRAP_REASON_SIGNO);
+STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_strarg) == __OFFSET_DEBUGTRAP_REASON_STRARG);
+STATIC_ASSERT(sizeof(struct debugtrap_reason) == __SIZEOF_DEBUGTRAP_REASON);
+
+
+
+
+
+#include <kos/bits/ukern-struct.h>
+
+/* struct userkern */
+STATIC_ASSERT(offsetof(struct userkern, uk_base) == OFFSET_USERKERN_BASE);
+STATIC_ASSERT(offsetof(struct userkern, uk_egid) == OFFSET_USERKERN_EGID);
+STATIC_ASSERT(offsetof(struct userkern, uk_euid) == OFFSET_USERKERN_EUID);
+STATIC_ASSERT(offsetof(struct userkern, uk_gid) == OFFSET_USERKERN_GID);
+STATIC_ASSERT(offsetof(struct userkern, uk_pgid) == OFFSET_USERKERN_PGID);
+STATIC_ASSERT(offsetof(struct userkern, uk_pid) == OFFSET_USERKERN_PID);
+STATIC_ASSERT(offsetof(struct userkern, uk_ppid) == OFFSET_USERKERN_PPID);
+STATIC_ASSERT(offsetof(struct userkern, uk_regs) == OFFSET_USERKERN_REGS);
+STATIC_ASSERT(offsetof(struct userkern, uk_sgid) == OFFSET_USERKERN_SGID);
+STATIC_ASSERT(offsetof(struct userkern, uk_sid) == OFFSET_USERKERN_SID);
+STATIC_ASSERT(offsetof(struct userkern, uk_suid) == OFFSET_USERKERN_SUID);
+STATIC_ASSERT(offsetof(struct userkern, uk_tid) == OFFSET_USERKERN_TID);
+STATIC_ASSERT(offsetof(struct userkern, uk_uid) == OFFSET_USERKERN_UID);
+STATIC_ASSERT(sizeof(struct userkern) == SIZEOF_USERKERN);
+
+
+
+
+
+#include <kos/exec/bits/library-listdef.h>
+
+/* struct library_listdef */
+STATIC_ASSERT(offsetof(struct library_listdef, lld_count) == __OFFSET_LIBRARY_LISTDEF_COUNT);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_MODULE);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_NEXT);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_first) == __OFFSET_LIBRARY_LISTDEF_FIRST);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_flags) == __OFFSET_LIBRARY_LISTDEF_FLAGS);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_FILENAME);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADADDR);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADSTART);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_size) == __OFFSET_LIBRARY_LISTDEF_SIZE);
+STATIC_ASSERT(offsetof(struct library_listdef, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF_SIZEOF_POINTER);
+STATIC_ASSERT(sizeof(struct library_listdef) == __SIZEOF_LIBRARY_LISTDEF);
+
+
+
+
+
+#include <kos/exec/bits/peb.h>
+
+/* struct process_peb */
+STATIC_ASSERT(offsetof(struct process_peb, pp_argc) == OFFSET_PROCESS_PEB_ARGC);
+STATIC_ASSERT(offsetof(struct process_peb, pp_argv) == OFFSET_PROCESS_PEB_ARGV);
+STATIC_ASSERT(offsetof(struct process_peb, pp_envc) == OFFSET_PROCESS_PEB_ENVC);
+STATIC_ASSERT(offsetof(struct process_peb, pp_envp) == OFFSET_PROCESS_PEB_ENVP);
+
+
+
+
+
+#include <kos/exec/elf.h>
+
+/* struct elfexec_info */
+/* ... */
 
 
 
@@ -1181,82 +1288,6 @@ STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_newpath) == _
 STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_oldpath) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_OLDPATH);
 STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_struct_size) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_STRUCT_SIZE);
 STATIC_ASSERT(sizeof(struct ksysctl_driver_set_library_path) == __SIZEOF_KSYSCTL_DRIVER_SET_LIBRARY_PATH);
-
-
-
-
-
-#include <kos/exec/elf.h>
-
-/* struct elfexec_info */
-/* ... */
-
-
-
-
-
-#include <kos/exec/bits/peb.h>
-
-/* struct process_peb */
-STATIC_ASSERT(offsetof(struct process_peb, pp_argc) == OFFSET_PROCESS_PEB_ARGC);
-STATIC_ASSERT(offsetof(struct process_peb, pp_argv) == OFFSET_PROCESS_PEB_ARGV);
-STATIC_ASSERT(offsetof(struct process_peb, pp_envc) == OFFSET_PROCESS_PEB_ENVC);
-STATIC_ASSERT(offsetof(struct process_peb, pp_envp) == OFFSET_PROCESS_PEB_ENVP);
-
-
-
-
-
-#include <kos/exec/bits/library-listdef.h>
-
-/* struct library_listdef */
-STATIC_ASSERT(offsetof(struct library_listdef, lld_count) == __OFFSET_LIBRARY_LISTDEF_COUNT);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_entry_offsetof_module) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_MODULE);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_entry_offsetof_next) == __OFFSET_LIBRARY_LISTDEF_ENTRY_OFFSETOF_NEXT);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_first) == __OFFSET_LIBRARY_LISTDEF_FIRST);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_flags) == __OFFSET_LIBRARY_LISTDEF_FLAGS);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_filename) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_FILENAME);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_loadaddr) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADADDR);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_module_offsetof_loadstart) == __OFFSET_LIBRARY_LISTDEF_MODULE_OFFSETOF_LOADSTART);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_size) == __OFFSET_LIBRARY_LISTDEF_SIZE);
-STATIC_ASSERT(offsetof(struct library_listdef, lld_sizeof_pointer) == __OFFSET_LIBRARY_LISTDEF_SIZEOF_POINTER);
-STATIC_ASSERT(sizeof(struct library_listdef) == __SIZEOF_LIBRARY_LISTDEF);
-
-
-
-
-
-#include <kos/bits/ukern-struct.h>
-
-/* struct userkern */
-STATIC_ASSERT(offsetof(struct userkern, uk_base) == OFFSET_USERKERN_BASE);
-STATIC_ASSERT(offsetof(struct userkern, uk_egid) == OFFSET_USERKERN_EGID);
-STATIC_ASSERT(offsetof(struct userkern, uk_euid) == OFFSET_USERKERN_EUID);
-STATIC_ASSERT(offsetof(struct userkern, uk_gid) == OFFSET_USERKERN_GID);
-STATIC_ASSERT(offsetof(struct userkern, uk_pgid) == OFFSET_USERKERN_PGID);
-STATIC_ASSERT(offsetof(struct userkern, uk_pid) == OFFSET_USERKERN_PID);
-STATIC_ASSERT(offsetof(struct userkern, uk_ppid) == OFFSET_USERKERN_PPID);
-STATIC_ASSERT(offsetof(struct userkern, uk_regs) == OFFSET_USERKERN_REGS);
-STATIC_ASSERT(offsetof(struct userkern, uk_sgid) == OFFSET_USERKERN_SGID);
-STATIC_ASSERT(offsetof(struct userkern, uk_sid) == OFFSET_USERKERN_SID);
-STATIC_ASSERT(offsetof(struct userkern, uk_suid) == OFFSET_USERKERN_SUID);
-STATIC_ASSERT(offsetof(struct userkern, uk_tid) == OFFSET_USERKERN_TID);
-STATIC_ASSERT(offsetof(struct userkern, uk_uid) == OFFSET_USERKERN_UID);
-STATIC_ASSERT(sizeof(struct userkern) == SIZEOF_USERKERN);
-
-
-
-
-
-#include <kos/bits/debugtrap.h>
-
-/* struct debugtrap_reason */
-STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_intarg) == __OFFSET_DEBUGTRAP_REASON_INTARG);
-STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_ptrarg) == __OFFSET_DEBUGTRAP_REASON_PTRARG);
-STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_reason) == __OFFSET_DEBUGTRAP_REASON_REASON);
-STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_signo) == __OFFSET_DEBUGTRAP_REASON_SIGNO);
-STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_strarg) == __OFFSET_DEBUGTRAP_REASON_STRARG);
-STATIC_ASSERT(sizeof(struct debugtrap_reason) == __SIZEOF_DEBUGTRAP_REASON);
 //[[[end]]]
 
 

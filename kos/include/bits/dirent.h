@@ -21,6 +21,7 @@
 
 #include <__stdinc.h>
 #include <features.h>
+
 #include <bits/types.h>
 
 __SYSDECL_BEGIN
@@ -65,6 +66,9 @@ struct dirent {
 };
 
 #ifdef __USE_LARGEFILE64
+#ifdef __USE_STRUCT64_MACRO
+#define dirent64 dirent
+#else /* __USE_STRUCT64_MACRO */
 struct dirent64 {
 #ifdef __USE_KOS
 #undef d_ino
@@ -97,6 +101,7 @@ struct dirent64 {
 	char               d_name[256];
 #endif
 };
+#endif /* !__USE_STRUCT64_MACRO */
 #endif /* __USE_LARGEFILE64 */
 
 #undef d_fileno
