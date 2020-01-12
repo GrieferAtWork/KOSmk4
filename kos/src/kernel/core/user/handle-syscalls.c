@@ -2376,6 +2376,27 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 #endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
 
 
+
+
+
+/************************************************************************/
+/* pause()                                                              */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_PAUSE
+DEFINE_SYSCALL0(errno_t, pause) {
+	for (;;) {
+		assert(!task_isconnected());
+		/* Wait forever (equivalent to `select(0, NULL, NULL, NULL, NULL)')
+		 * NOTE: `task_waitfor()' calls `task_serve()', which may in turn throw
+		 *       `E_INTERRUPT' when a signal gets delivered to our thread. */
+		task_waitfor();
+	}
+	/* Can't get here... */
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_PAUSE */
+
+
 DECL_END
 
 #endif /* !GUARD_KERNEL_SRC_USER_HANDLE_SYSCALLS_C */
