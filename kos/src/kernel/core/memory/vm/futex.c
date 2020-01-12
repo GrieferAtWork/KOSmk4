@@ -32,13 +32,14 @@
 
 #include "vm-nodeapi.h"
 
-#define ATREE(x)                 vm_futextree_##x
-#define ATREE_FUN                INTDEF
-#define ATREE_IMP                INTERN
-#define ATREE_CALL               KCALL
-#define Tkey                     uintptr_t
-#define T                        struct vm_futex
-#define N_NODEPATH               f_tree
+#define ATREE(x)      vm_futextree_##x
+#define ATREE_FUN     INTDEF
+#define ATREE_IMP     INTERN
+#define ATREE_CALL    KCALL
+#define ATREE_NOTHROW NOTHROW
+#define Tkey          uintptr_t
+#define T             struct vm_futex
+#define N_NODEPATH    f_tree
 #define ATREE_IMPLEMENTATION_ONLY 1
 #define ATREE_SINGLE 1
 #include <hybrid/sequence/atree-abi.h>
@@ -131,14 +132,14 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
 	 * -> At this point, we must remove ourself from the tree of known futex objects. */
 #ifdef NDEBUG
 	vm_futextree_remove(&fc->fc_tree, self->f_tree.a_vaddr,
-	                    fc->fc_semi0, fc->fc_level0);
+	                    fc->fc_semi0, fc->fc_leve0);
 #else /* NDEBUG */
 	{
 		struct vm_futex *removed;
 		removed = vm_futextree_remove_at(&fc->fc_tree,
 		                                 self->f_tree.a_vaddr,
 		                                 fc->fc_semi0,
-		                                 fc->fc_level0);
+		                                 fc->fc_leve0);
 		assert(removed == self);
 	}
 #endif /* !NDEBUG */
@@ -152,6 +153,16 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
 	decref_unlikely(part);
 }
 
+
+/* Fill in `fc_semi0' and `fc_leve0' of `self' with appropriate values. */
+LOCAL NONNULL((1, 2)) void
+NOTHROW(KCALL vm_futex_controller_init)(struct vm_futex_controller *__restrict self,
+                                        struct vm_datapart *__restrict part) {
+	(void)part;
+	/* TODO: Calculate best-fit semi/level values. */
+	self->fc_semi0 = ATREE_SEMI0(uintptr_t);
+	self->fc_leve0 = ATREE_LEVEL0(uintptr_t);
+}
 
 
 
@@ -176,6 +187,7 @@ again:
 		/* Allocate the controller. */
 do_alloc_fc:
 		fc = vm_futex_controller_alloc();
+		vm_futex_controller_init(fc, self);
 		TRY {
 			sync_write(self);
 		} EXCEPT {
@@ -188,7 +200,19 @@ do_alloc_fc:
 		} else {
 			self->dp_futex = fc;
 		}
+#if 1
+		/* We can't use the normal `sync_downgrade(self)' here, since that may
+		 * call into `vm_datapart_service_stale()', which is allowed to invoke
+		 * `vm_datapart_maybe_delete_futex_controller()', which in turn could
+		 * think that given the fact that `fc' is currently empty, it may as
+		 * well get rid of it for that reason.
+		 * In other words: `sync_downgrade(self)' would be allowed to `kfree(fc)',
+		 *                 which would end up with a fault in `vm_futextree_locate_at()'
+		 *                 caused by the attempt to access kfree()'d memory. */
+		sync_downgrade(&self->dp_lock);
+#else
 		sync_downgrade(self);
+#endif
 	} else {
 		sync_read(self);
 		if ((fc = self->dp_futex) == NULL) {
@@ -202,9 +226,10 @@ do_alloc_fc:
 		return VM_DATAPART_GETFUTEX_OUTOFRANGE;
 	}
 	/* Search for an existing futex. */
-	result = vm_futextree_locate_at(fc->fc_tree, datapart_offset,
+	result = vm_futextree_locate_at(fc->fc_tree,
+	                                datapart_offset,
 	                                fc->fc_semi0,
-	                                fc->fc_level0);
+	                                fc->fc_leve0);
 	if (result) {
 		bool refok;
 		/* Futex already exists (try to get a reference) */
@@ -222,8 +247,22 @@ yield_and_again:
 	result = vm_futex_allocf_nx(GFP_ATOMIC);
 	if (!result) {
 		/* Must perform the allocation while blocking. */
+
+#if 0 /* This may `sync_endread(self)' may kfree() an empty futex controller. */
 		sync_endread(self);
 		result = vm_futex_alloc();
+#else /* We don't want it to do that. Instead, we do this: */
+		sync_endread(&self->dp_lock);
+		TRY {
+			result = vm_futex_alloc();
+		} EXCEPT {
+			if (sync_trywrite(self)) {
+				vm_datapart_maybe_delete_futex_controller(self);
+				sync_endwrite(self);
+			}
+			RETHROW();
+		}
+#endif
 		TRY {
 			sync_write(self);
 		} EXCEPT {
@@ -248,6 +287,7 @@ do_recheck_existing_futex_and_controller:
 				/* Must allocate the controller. */
 				fc = vm_futex_controller_allocf_nx(GFP_ATOMIC);
 				if (fc) {
+					vm_futex_controller_init(fc, self);
 					self->dp_futex = fc;
 				} else {
 					/* Must allocate the controller while blocking. */
@@ -269,6 +309,7 @@ do_recheck_existing_futex_and_controller:
 						fc = self->dp_futex;
 					} else {
 						self->dp_futex = fc;
+						vm_futex_controller_init(fc, self);
 					}
 				}
 			}
@@ -281,7 +322,7 @@ do_recheck_existing_futex_and_controller:
 			new_result = vm_futextree_locate_at(fc->fc_tree,
 			                                    datapart_offset,
 			                                    fc->fc_semi0,
-			                                    fc->fc_level0);
+			                                    fc->fc_leve0);
 			if unlikely(new_result) {
 				/* Return an existing futex, or wait for an existing futex to go away. */
 				bool refok;
@@ -308,7 +349,7 @@ do_recheck_existing_futex_and_controller:
 	vm_futextree_insert_at(&fc->fc_tree,
 	                       result,
 	                       fc->fc_semi0,
-	                       fc->fc_level0);
+	                       fc->fc_leve0);
 	/* And we're done! Now just to release the lock held on `self' */
 	sync_endwrite(self);
 	/* Return the newly allocated futex. */
@@ -341,7 +382,7 @@ PUBLIC WUNUSED NONNULL((1)) REF struct vm_futex *
 	result = vm_futextree_locate_at(fc->fc_tree,
 	                                datapart_offset,
 	                                fc->fc_semi0,
-	                                fc->fc_level0);
+	                                fc->fc_leve0);
 	if (result) {
 		/* Try to acquire a reference to the futex. */
 		if unlikely(!tryincref(result))
@@ -496,7 +537,7 @@ again:
 	 * we were able to acquire a reference to the associated futex (if any) */
 	if unlikely(result == VM_DATAPART_GETFUTEX_OUTOFRANGE)
 		goto again;
-	return NULL;
+	return result;
 }
 
 /* Same as `vm_getfutex()', but don't allocate a new
@@ -533,7 +574,7 @@ again:
 	 * we were able to acquire a reference to the associated futex (if any) */
 	if unlikely(result == VM_DATAPART_GETFUTEX_OUTOFRANGE)
 		goto again;
-	return NULL;
+	return result;
 }
 
 /* Broadcast to all thread waiting for a futex at `futex_address' within the current VM */

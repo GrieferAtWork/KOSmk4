@@ -35,6 +35,7 @@
 #define ATREE(x)                 vm_nodetree_##x
 #define ATREE_FUN                INTDEF
 #define ATREE_CALL               KCALL
+#define ATREE_NOTHROW            NOTHROW
 #define Tkey                     pageid_t
 #define T                        struct vm_node
 #define N_NODEPATH               vn_node
@@ -48,6 +49,7 @@
 #define ATREE(x)                 vm_parttree_##x
 #define ATREE_FUN                INTDEF
 #define ATREE_CALL               KCALL
+#define ATREE_NOTHROW            NOTHROW
 #define Tkey                     datapage_t
 #define T                        struct vm_datapart
 #define N_NODEPATH               dp_tree
@@ -59,6 +61,7 @@
 #define ATREE(x)                 vm_futextree_##x
 #define ATREE_FUN                INTDEF
 #define ATREE_CALL               KCALL
+#define ATREE_NOTHROW            NOTHROW
 #define Tkey                     uintptr_t
 #define T                        struct vm_futex
 #define N_NODEPATH               f_tree

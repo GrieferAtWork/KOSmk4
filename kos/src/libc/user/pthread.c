@@ -163,7 +163,7 @@ NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
 		destroy(me);
 	}
 	/* Free our thread's TLS segment. */
-	dltlsfreeseg(tls);
+	dltlsfreeseg(tls); /* TODO: Use dlsym() to lookup `dltlsallocseg()' and `dltlsfreeseg()' lazily */
 }
 
 INTDEF ATTR_NORETURN void __FCALL
@@ -234,9 +234,8 @@ INTDEF pid_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thre
                                                  __pthread_start_routine_t start);
 
 
-
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_dp_create") int
+PRIVATE NONNULL((1, 2, 3))
+ATTR_SECTION(".text.crt.sched.pthread.pthread_dp_create") int
 NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
                                              pthread_attr_t const *__restrict attr,
                                              __pthread_start_routine_t start_routine,
@@ -248,7 +247,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	if unlikely(!pt)
 		goto err_nomem;
 	/* Allocate the DL TLS segment */
-	pt->pt_tls = dltlsallocseg();
+	pt->pt_tls = dltlsallocseg(); /* TODO: Use dlsym() to lookup `dltlsallocseg()' and `dltlsfreeseg()' lazily */
 	if unlikely(!pt->pt_tls)
 		goto err_nomem_pt;
 	pt->pt_refcnt    = 2;
@@ -286,7 +285,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	cpid = libc_pthread_clone(pt, start_routine);
 	if unlikely(E_ISERR(cpid)) {
 		/* The clone() system call failed. */
-		dltlsfreeseg(pt->pt_tls);
+		dltlsfreeseg(pt->pt_tls); /* TODO: Use dlsym() to lookup `dltlsallocseg()' and `dltlsfreeseg()' lazily */
 		if (pt->pt_cpuset != (cpu_set_t *)&pt->pt_cpusetsize)
 			free(pt->pt_cpuset);
 		free(pt);
@@ -414,9 +413,9 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t pthread,
 		if unlikely(pt == pthread_self_p)
 			return EDEADLK;
 		/* >> wait_while(pt->pt_tid == tid) */
-		result = sys_futex((unsigned int *)&pt->pt_tid,
-		                   FUTEX_WAIT_BITSET, tid,
-		                   abstime, NULL, (unsigned int)-3);
+		result = sys_futex((uint32_t *)&pt->pt_tid,
+		                   FUTEX_WAIT, tid,
+		                   abstime, NULL, 0);
 		if (result == -ETIMEDOUT)
 			return (int)-result;
 	}
@@ -485,7 +484,6 @@ NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
 			syslog(LOG_ERR, message);
 			exit(EXIT_FAILURE);
 		}
-		pthread_self_p       = result;
 		result->pt_tid       = sys_set_tid_address(&result->pt_tid);
 		result->pt_refcnt    = 1;
 		result->pt_retval    = NULL;
@@ -493,6 +491,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
 		result->pt_stackaddr = NULL;
 		result->pt_stacksize = 0;
 		result->pt_flags     = PTHREAD_FNOSTACK;
+		COMPILER_WRITE_BARRIER();
+		pthread_self_p = result;
 	}
 	return (pthread_t)result;
 }
@@ -507,8 +507,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread)
 /*[[[body:pthread_gettid_np]]]*/
 {
 	pid_t result;
-	struct pthread *pt = (struct pthread *)target_thread;
-	result = ATOMIC_READ(pt->pt_tid);
+	struct pthread *pt;
+	pt     = (struct pthread *)target_thread;
+	result = pt->pt_tid;
 	return result;
 }
 /*[[[end:pthread_gettid_np]]]*/
@@ -1140,7 +1141,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t target_thread,
 	result = sys_sched_setscheduler(tid, policy, param);
 	if (E_ISERR(result))
 		return -result;
-	if unlikely(tid != ATOMIC_READ(pt->pt_tid)) {
+	if unlikely(ATOMIC_READ(pt->pt_tid) == 0) {
 		/* The thread has terminated in the mean time, and we've accidentally
 		 * modified the scheduler parameters of some unrelated thread.
 		 * Try to undo the damage we've caused...
@@ -1175,7 +1176,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getschedparam)(pthread_t target_thread,
 	result = sys_sched_getparam(tid, param);
 	if (E_ISERR(result))
 		return (int)-result;
-	if unlikely(tid != ATOMIC_READ(pt->pt_tid)) {
+	if unlikely(ATOMIC_READ(pt->pt_tid) == 0) {
 		/* The thread has terminated in the mean time.
 		 * Note: This is a race condition that Glibc
 		 *       doesn't even check and simply ignores! */
@@ -1204,7 +1205,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t target_thread,
 	error = sys_setpriority(PRIO_PROCESS, tid, (syscall_ulong_t)(20 - prio));
 	if (E_ISERR(error))
 		return (int)-error;
-	if unlikely(tid != ATOMIC_READ(pt->pt_tid)) {
+	if unlikely(ATOMIC_READ(pt->pt_tid) == 0) {
 		/* The thread has terminated in the mean time.
 		 * Note: This is a race condition that Glibc
 		 *       doesn't even check and simply ignores! */
@@ -1230,7 +1231,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t target_thread,
 		return ESRCH;
 	if (snprintf(buf, buflen, "tid{%u}", tid) >= buflen)
 		return ERANGE;
-	if (tid != ATOMIC_READ(pt->pt_tid))
+	if (ATOMIC_READ(pt->pt_tid) == 0)
 		return ESRCH;
 	return EOK;
 }
@@ -1248,6 +1249,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
 	pid_t tid = ATOMIC_READ(pt->pt_tid);
 	if (tid == 0)
 		return ESRCH;
+	COMPILER_IMPURE();
 	/* Unsupported */
 	(void)name;
 	return ENOSYS;
@@ -1349,7 +1351,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setaffinity_np)(pthread_t pthread,
 got_old_affinity:
 	error = sys_sched_setaffinity(tid, cpusetsize, cpuset);
 	if (E_ISOK(error)) {
-		if unlikely(tid != ATOMIC_READ(pt->pt_tid)) {
+		if unlikely(ATOMIC_READ(pt->pt_tid) == 0) {
 			/* The thread has terminated in the mean time.
 			 * Note: This is a race condition that Glibc
 			 *       doesn't even check and simply ignores! */
@@ -1379,7 +1381,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthread_t pthread,
 		return ESRCH;
 	error = sys_sched_getaffinity(tid, cpusetsize, cpuset);
 	if (E_ISOK(error)) {
-		if unlikely(tid != ATOMIC_READ(pt->pt_tid)) {
+		if unlikely(ATOMIC_READ(pt->pt_tid) == 0) {
 			/* The thread has terminated in the mean time.
 			 * Note: This is a race condition that Glibc
 			 *       doesn't even check and simply ignores! */
@@ -1469,7 +1471,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 	 *       unmapped its stack within `libc_pthread_unmap_stack_and_exit()'
 	 *       The reason for this is the `RPC_SCHEDULE_SYNC' which only allows
 	 *       the RPC to be executed as the result of a blocking operation! */
-	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC, (void (*)())&pthread_cancel_self, 0))
+	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC, (void (*)())&pthread_cancel_self, 0) != 0)
 		return libc_geterrno();
 	return EOK;
 }

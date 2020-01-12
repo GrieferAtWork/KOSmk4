@@ -50,12 +50,14 @@
 #include <string.h>
 
 /* Define the ABI for the address tree used by heaps. */
-#define ATREE(x)            mfree_tree_##x
-#define ATREE_NODE_MIN      MFREE_MIN
-#define ATREE_NODE_MAX      MFREE_MAX
-#define Tkey                VIRT uintptr_t
-#define T                   struct mfree
-#define N_NODEPATH          mf_laddr
+#define ATREE(x)       mfree_tree_##x
+#define ATREE_CALL     KCALL
+#define ATREE_NOTHROW  NOTHROW
+#define ATREE_NODE_MIN MFREE_MIN
+#define ATREE_NODE_MAX MFREE_MAX
+#define Tkey           VIRT uintptr_t
+#define T              struct mfree
+#define N_NODEPATH     mf_laddr
 #include <hybrid/sequence/atree-abi.h>
 
 #if 0 /* Quick toggle to disable all debugging aids. */

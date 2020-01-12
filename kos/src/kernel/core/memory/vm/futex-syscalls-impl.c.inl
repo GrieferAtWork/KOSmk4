@@ -334,6 +334,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,
 		      futex_op);
+		break;
 	}
 	return result;
 }

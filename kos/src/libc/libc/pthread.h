@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 
-#define OFFSET_PTHREAD_TID       (__SIZEOF_POINTER__ * 0)
+#define OFFSET_PTHREAD_TID       0
 #define OFFSET_PTHREAD_REFCNT    (__SIZEOF_POINTER__ * 1)
 #define OFFSET_PTHREAD_RETVAL    (__SIZEOF_POINTER__ * 2)
 #define OFFSET_PTHREAD_TLS       (__SIZEOF_POINTER__ * 3)
@@ -41,10 +41,10 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct pthread {
-	pid_t           pt_tid;       /* [lock(EXIT_FUTEX)] Thread ID (this is the address passed to `set_tid_address()') */
+	pid_t           pt_tid;       /* [const] Secondary TID (filled in by the kernel as the PTID and CTID) */
 #if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
-	byte_t        __pt_align[__SIZEOF_POINTER__ - __SIZEOF_PID_T__];
-#endif /* __SIZEOF_PID_T__ < __SIZEOF_POINTER__ */
+	byte_t __pt_pad[__SIZEOF_POINTER__ - __SIZEOF_PID_T__];
+#endif
 	__WEAK refcnt_t pt_refcnt;    /* Reference counter for this control structure. */
 	void           *pt_retval;    /* [lock(WRITE_ONCE)] Thread return value (as passed to `pthread_exit()') (also used as argument for `pt_start') */
 	void           *pt_tls;       /* [const] TLS segment base address (allocated by `dltlsallocseg()', freed in `pthread_exit()') */

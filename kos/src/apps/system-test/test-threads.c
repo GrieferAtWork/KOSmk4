@@ -16,25 +16,49 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_PARTAPI_H
-#define GUARD_KERNEL_SRC_MEMORY_VM_PARTAPI_H 1
+#ifndef GUARD_APPS_SYSTEM_TEST_TEST_THREADS_C
+#define GUARD_APPS_SYSTEM_TEST_TEST_THREADS_C 1
+#define _KOS_SOURCE 1
 
-#include <kernel/compiler.h>
+#include <hybrid/compiler.h>
 
-#include <kernel/memory.h>
-#include <kernel/paging.h>
-#include <kernel/vm.h>
+#include <kos/except.h>
+#include <kos/types.h>
+#include <system-test/ctest.h>
 
-/* Define the ABI for the address tree used by vm. */
-#define ATREE(x)      vm_datapart_tree_##x
-#define ATREE_FUN     INTDEF
-#define ATREE_CALL    KCALL
-#define ATREE_NOTHROW NOTHROW
-#define Tkey          datapage_t
-#define T             struct vm_datapart
-#define N_NODEPATH    dp_tree
-#define ATREE_HEADER_ONLY 1
-#include <hybrid/sequence/atree-abi.h>
-#undef ATREE_HEADER_ONLY
+#include <assert.h>
+#include <threads.h>
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_PARTAPI_H */
+DECL_BEGIN
+
+PRIVATE char message_pointer[] = "Hello!";
+PRIVATE bool did_run_my_thread_main = false;
+
+PRIVATE int my_thread_main(void *ptr) {
+	assertf(!did_run_my_thread_main,
+	        "Thread main already executed");
+	assertf((char *)ptr == message_pointer,
+	        "ptr = %p, message_pointer = %p",
+	        ptr, message_pointer);
+	did_run_my_thread_main = true;
+	return 1234;
+}
+
+DEFINE_TEST(multi_threading) {
+	thrd_t thread;
+	int error, result;
+	did_run_my_thread_main = false;
+	COMPILER_BARRIER();
+	error = thrd_create(&thread, &my_thread_main, (void *)message_pointer);
+	assertf(error == thrd_success, "error = %d", error);
+	COMPILER_BARRIER();
+	error = thrd_join(thread, &result);
+	assertf(error == thrd_success, "error = %d", error);
+	assertf(did_run_my_thread_main, "Thread not actually executed");
+	assertf(result == 1234, "result = %d", result);
+}
+
+
+DECL_END
+
+#endif /* !GUARD_APPS_SYSTEM_TEST_TEST_THREADS_C */

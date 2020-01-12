@@ -71,10 +71,11 @@
 
 
 /* Define the ABI for the address tree used by vm. */
-#define ATREE(x)   inode_tree_##x
-#define ATREE_FUN  INTDEF
-#define ATREE_IMP  INTERN
-#define ATREE_CALL KCALL
+#define ATREE(x)      inode_tree_##x
+#define ATREE_FUN     INTDEF
+#define ATREE_IMP     INTERN
+#define ATREE_CALL    KCALL
+#define ATREE_NOTHROW NOTHROW
 #define Tkey       ino_t
 #define T          struct inode
 #define N_NODEPATH i_filetree

@@ -50,11 +50,12 @@ struct dtls_extension {
 
 DECL_END
 
-#define ATREE(x)            dtls_extension_tree_##x
-#define Tkey                uintptr_t
-#define T                   struct dtls_extension
-#define N_NODEPATH          te_tree
-#define ATREE_SINGLE        1
+#define ATREE(x)      dtls_extension_tree_##x
+#define ATREE_NOTHROW /* nothing */
+#define Tkey          uintptr_t
+#define T             struct dtls_extension
+#define N_NODEPATH    te_tree
+#define ATREE_SINGLE  1
 #include <hybrid/sequence/atree-abi.h>
 
 DECL_BEGIN

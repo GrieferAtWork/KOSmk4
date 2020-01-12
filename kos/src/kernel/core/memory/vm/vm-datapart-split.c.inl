@@ -632,7 +632,7 @@ again_lock_datapart:
 		                            (uintptr_t)vpage_offset * PAGESIZE,
 		                            (uintptr_t)-1,
 		                            self->dp_futex->fc_semi0,
-		                            self->dp_futex->fc_level0) != NULL) {
+		                            self->dp_futex->fc_leve0) != NULL) {
 			struct vm_futex_controller *hifc;
 			hifc = vm_futex_controller_allocf_nx(GFP_ATOMIC | GFP_PREFLT | GFP_VCBASE);
 			if (!hifc) {
@@ -935,14 +935,14 @@ again_incref_futexes:
 						next = dead->f_ndead;
 #ifdef NDEBUG
 						vm_futextree_remove(&lofc->fc_tree, dead->f_tree.a_vaddr,
-						                    lofc->fc_semi0, lofc->fc_level0);
+						                    lofc->fc_semi0, lofc->fc_leve0);
 #else /* NDEBUG */
 						{
 							struct vm_futex *removed;
 							removed = vm_futextree_remove_at(&lofc->fc_tree,
 							                                 dead->f_tree.a_vaddr,
 							                                 lofc->fc_semi0,
-							                                 lofc->fc_level0);
+							                                 lofc->fc_leve0);
 							assertf(removed == dead, "%p != %p (addr: %p)",
 							        removed, dead, dead->f_tree.a_vaddr);
 						}
@@ -981,15 +981,15 @@ again_incref_futexes:
 				result->dp_futex = lofc;
 				self->dp_futex   = NULL; /* Stolen by `result->dp_futex'. */
 				assert(lofc->fc_tree != NULL);
-				/* TODO: Calculate best-fit semi/level values for the tree. */
-				lofc->fc_semi0  = ATREE_SEMI0(uintptr_t);
-				lofc->fc_level0 = ATREE_LEVEL0(uintptr_t);
+				/* TODO: Calculate best-fit semi/level values. */
+				lofc->fc_semi0 = ATREE_SEMI0(uintptr_t);
+				lofc->fc_leve0 = ATREE_LEVEL0(uintptr_t);
 				/* Reform the futex tree. */
 				vm_futextree_subtract_addr_and_reform_tree(lofc->fc_tree,
 				                                           &lofc->fc_tree,
 				                                           lofc_maxaddr + 1,
 				                                           lofc->fc_semi0,
-				                                           lofc->fc_level0);
+				                                           lofc->fc_leve0);
 				goto done_futex;
 			}
 		}
@@ -1004,17 +1004,17 @@ again_incref_futexes:
 		hifc = result->dp_futex;
 		assertf(hifc != NULL,
 		        "Earlier code must pre-allocate the futex controller for this case!");
-		/* TODO: Calculate best-fit semi/level values for the tree. */
-		hifc->fc_semi0  = ATREE_SEMI0(uintptr_t);
-		hifc->fc_level0 = ATREE_LEVEL0(uintptr_t);
+		/* TODO: Calculate best-fit semi/level values. */
+		hifc->fc_semi0 = ATREE_SEMI0(uintptr_t);
+		hifc->fc_leve0 = ATREE_LEVEL0(uintptr_t);
 		/* Remove all affected  */
 		while ((transfer_futex = vm_futextree_rremove_at_not_destroyed(&lofc->fc_tree,
 		                                                               lofc_maxaddr + 1, (uintptr_t)-1,
-		                                                               lofc->fc_semi0, lofc->fc_level0)) != NULL) {
+		                                                               lofc->fc_semi0, lofc->fc_leve0)) != NULL) {
 			assert(transfer_futex->f_tree.a_vaddr > lofc_maxaddr);
 			transfer_futex->f_tree.a_vaddr -= lofc_maxaddr + 1;
 			vm_futextree_insert_at(&hifc->fc_tree, transfer_futex,
-			                       hifc->fc_semi0, hifc->fc_level0);
+			                       hifc->fc_semi0, hifc->fc_leve0);
 		}
 		/* And we're done! (though some more cleanup will be happening further down below...) */
 	}

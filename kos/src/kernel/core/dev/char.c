@@ -59,6 +59,7 @@
 /* Implement the ABI for the address tree used by character_device. */
 #define ATREE(x)                  cdev_tree_##x
 #define ATREE_CALL                KCALL
+#define ATREE_NOTHROW            NOTHROW
 #define Tkey                      dev_t
 #define T                         struct character_device
 #define N_NODEPATH                cd_devlink

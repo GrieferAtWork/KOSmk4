@@ -66,7 +66,7 @@ struct vm_futex_controller {
 	                                             *       though more futex objects can die even while
 	                                             *       a lock to `dp_lock' is being held. */
 	uintptr_t                        fc_semi0;  /* [lock(:dp_lock)] Futex tree SEMI0 value. */
-	unsigned int                     fc_level0; /* [lock(:dp_lock)] Futex tree LEVEL0 value. */
+	unsigned int                     fc_leve0;  /* [lock(:dp_lock)] Futex tree LEVEL0 value. */
 	WEAK struct vm_futex            *fc_dead;   /* [0..1][LINK(->f_ndead)] Chain of dead futex objects.
 	                                             * This chain is serviced at the same time as `dp_stale' */
 };

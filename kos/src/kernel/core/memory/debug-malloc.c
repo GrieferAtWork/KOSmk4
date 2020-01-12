@@ -278,10 +278,12 @@ STATIC_ASSERT(CONFIG_MALL_PREFIX_SIZE >= __SIZEOF_SIZE_T__);
 DECL_END
 
 /* Define the ABI for the address tree used by mall nodes. */
-#define ATREE(x)            mallnode_tree_##x
-#define Tkey                VIRT uintptr_t
-#define T                   struct mallnode
-#define N_NODEPATH          m_tree
+#define ATREE(x)      mallnode_tree_##x
+#define ATREE_CALL    KCALL
+#define ATREE_NOTHROW NOTHROW
+#define Tkey          VIRT uintptr_t
+#define T             struct mallnode
+#define N_NODEPATH    m_tree
 #include <hybrid/sequence/atree-abi.h>
 
 DECL_BEGIN

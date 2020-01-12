@@ -48,22 +48,21 @@ INTERN_FUNCTION(libc_pthread_clone)
 	movq   %rdi, %r14 /* struct pthread *__restrict thread */
 	movq   %rsi, %r15 /* __pthread_start_routine_t start */
 
-	movq   OFFSET_PTHREAD_TLS(%ecx), %r8        /* void *newtls */
-	movq   OFFSET_PTHREAD_TID(%ecx), %r10       /* pid_t *ctid */
-	xorq   %rdx, %rdx                           /* pid_t *ptid */
+	movq   OFFSET_PTHREAD_TLS(%rdi), %r8        /* void *newtls */
+	leaq   OFFSET_PTHREAD_TID(%rdi), %rdx       /* pid_t *ptid */
+	movq   %rdx, %r10                           /* pid_t *ctid */
 	movq   OFFSET_PTHREAD_STACKADDR(%rdi), %rsi
 	addq   OFFSET_PTHREAD_STACKSIZE(%rdi), %rsi /* void *child_stack */
 	movq       $(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | \
-	             CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS | \
-	             CLONE_CHILD_CLEARTID | CLONE_DETACHED  | CLONE_CHILD_SETTID | \
-	             CLONE_IO), %rdi /* int flags */
+	             CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS |       \
+	             CLONE_CHILD_CLEARTID | CLONE_DETACHED  | CLONE_CHILD_SETTID |      \
+	             CLONE_IO | CLONE_PARENT_SETTID), %rdi /* int flags */
+	/* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, pid_t *ctid, uintptr_t newtls) */
 	movq   $(SYS_clone), %rax
 	syscall
 
 	/* Check if we're inside of the child thread
-	 * If so, just to pthread's thread entry point.
-	 * Note that `%ecx' and `%edx' weren't clobbered, so the new
-	 * thread will have automatically inherited them from us! */
+	 * If so, just to pthread's thread entry point. */
 	testq  %rax, %rax
 	jnz    1f
 	movq   %r14, %rdi /* struct pthread *__restrict thread */

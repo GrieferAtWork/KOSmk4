@@ -56,6 +56,7 @@
 #define ATREE_FUN                INTDEF
 #define ATREE_IMP                INTERN
 #define ATREE_CALL               KCALL
+#define ATREE_NOTHROW            NOTHROW
 #define Tkey                     pageid_t
 #define T                        struct vm_node
 #define N_NODEPATH               vn_node
@@ -66,13 +67,14 @@
 #undef ATREE_IMPLEMENTATION_ONLY
 
 /* Implement the ABI for the address tree used by vm. */
-#define ATREE(x)                 vm_parttree_##x
-#define ATREE_FUN                INTDEF
-#define ATREE_IMP                INTERN
-#define ATREE_CALL               KCALL
-#define Tkey                     datapage_t
-#define T                        struct vm_datapart
-#define N_NODEPATH               dp_tree
+#define ATREE(x)      vm_parttree_##x
+#define ATREE_FUN     INTDEF
+#define ATREE_IMP     INTERN
+#define ATREE_CALL    KCALL
+#define ATREE_NOTHROW NOTHROW
+#define Tkey          datapage_t
+#define T             struct vm_datapart
+#define N_NODEPATH    dp_tree
 #define ATREE_IMPLEMENTATION_ONLY 1
 #include <hybrid/sequence/atree-abi.h>
 #undef ATREE_IMPLEMENTATION_ONLY
@@ -133,6 +135,8 @@ NOTHROW(KCALL vm_futex_controller_destroy)(struct vm_futex_controller *__restric
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_destroy)(struct vm_datapart *__restrict self,
                                    bool is_zero) {
+	assert(!sync_writing(self));
+	assert(!sync_reading(self));
 	assert(!self->dp_crefs);
 	assert(!self->dp_srefs);
 	assert(!self->dp_stale);
@@ -201,6 +205,7 @@ NOTHROW(KCALL vm_datapart_maybe_delete_futex_controller)(struct vm_datapart *__r
 PRIVATE NOBLOCK void
 NOTHROW(KCALL vm_datapart_service_stale)(struct vm_datapart *__restrict self) {
 	struct vm_node *chain, *next;
+	struct vm_futex_controller *fc;
 	chain = ATOMIC_XCH(self->dp_stale, NULL);
 	while (chain) {
 		next = chain->vn_byaddr.ln_next;
@@ -211,33 +216,33 @@ NOTHROW(KCALL vm_datapart_service_stale)(struct vm_datapart *__restrict self) {
 		vm_node_free(chain);
 		chain = next;
 	}
-	if (self->dp_futex) {
+	if ((fc = self->dp_futex) != NULL) {
 		/* Also check for servicing dead futex objects. */
-		struct vm_futex_controller *fc;
 		struct vm_futex *dead, *next;
-		fc   = self->dp_futex;
 		dead = ATOMIC_XCH(fc->fc_dead, NULL);
-		while (dead) {
-			next = dead->f_ndead;
+		if (dead) {
+			while (dead) {
+				next = dead->f_ndead;
 #ifdef NDEBUG
-			vm_futextree_remove(&fc->fc_tree, dead->f_tree.a_vaddr,
-			                    fc->fc_semi0, fc->fc_level0);
+				vm_futextree_remove(&fc->fc_tree, dead->f_tree.a_vaddr,
+				                    fc->fc_semi0, fc->fc_leve0);
 #else /* NDEBUG */
-			{
-				struct vm_futex *removed;
-				removed = vm_futextree_remove_at(&fc->fc_tree,
-				                                 dead->f_tree.a_vaddr,
-				                                 fc->fc_semi0,
-				                                 fc->fc_level0);
-				assertf(removed == dead, "%p != %p (addr: %p)",
-				        removed, dead, dead->f_tree.a_vaddr);
-			}
+				{
+					struct vm_futex *removed;
+					removed = vm_futextree_remove_at(&fc->fc_tree,
+					                                 dead->f_tree.a_vaddr,
+					                                 fc->fc_semi0,
+					                                 fc->fc_leve0);
+					assertf(removed == dead, "%p != %p (addr: %p)",
+					        removed, dead, dead->f_tree.a_vaddr);
+				}
 #endif /* !NDEBUG */
-			vm_futex_free(dead);
-			dead = next;
+				vm_futex_free(dead);
+				dead = next;
+			}
+			/* Check if we should (possibly) delete the futex controller. */
+			vm_datapart_maybe_delete_futex_controller(self);
 		}
-		/* Check if we should (possibly) delete the futex controller. */
-		vm_datapart_maybe_delete_futex_controller(self);
 	}
 }
 

@@ -83,19 +83,79 @@ PRIVATE syscall_slong_t KCALL
 sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
                syscall_ulong_t futex_op,
                uint32_t val,
-               struct timespec const *timeout,
+               struct timespec *timeout,
                uint32_t val2,
                USER UNCHECKED uint32_t *uaddr2,
                uint32_t val3) {
-	(void)uaddr;
-	(void)futex_op;
-	(void)val;
-	(void)timeout;
-	(void)val2;
-	(void)uaddr2;
-	(void)val3;
-	COMPILER_IMPURE();
-	kernel_panic("TODO");
+	syscall_slong_t result;
+	REF struct vm_futex *f;
+	assert(!task_isconnected());
+	switch (futex_op & 127) {
+
+	case FUTEX_WAIT_BITSET: /* XXX: Channel support? */
+	case FUTEX_WAIT: {
+		/* while(*uaddr == val) wait(uaddr, rel_timeout); */
+		validate_user(uaddr, sizeof(*uaddr));
+		f = vm_getfutex(THIS_VM, uaddr);
+		FINALLY_DECREF(f);
+		task_connect(&f->f_signal);
+		result = 0;
+		if (ATOMIC_READ(*uaddr) == val) {
+			/* `FUTEX_WAIT' takes a relative timeout, while `FUTEX_WAIT_BITSET' takes an absolute one. */
+			if (timeout && (futex_op & 127) == FUTEX_WAIT)
+				*timeout += realtime();
+			if (!task_waitfor(timeout))
+				result = -ETIMEDOUT;
+		}
+	}	break;
+
+	case FUTEX_WAKE_BITSET: /* XXX: Channel support? */
+	case FUTEX_WAKE: /* wake(uaddr); */
+		validate_user(uaddr, 1);
+		f = vm_getfutex_existing(THIS_VM, uaddr);
+		result = 0;
+		if (f) {
+			if (val == (uint32_t)-1) {
+				result = sig_broadcast(&f->f_signal);
+			} else {
+				/* Only signal at most `count' connected threads.
+				 * TODO: Make sure that when a already received signal connection is discarded
+				 *      (such as is the case when `task_popconnections()' appears in an except-
+				 *       path), the already delivered signal gets broadcast, thus ensuring that
+				 *       sending a signal to a single thread (like we do here), don't end up
+				 *       being ignored because the thread that was chosen ended up terminating!
+				 */
+				while (val) {
+					if (!sig_send(&f->f_signal))
+						break;
+					++result;
+					--val;
+				}
+			}
+			decref_unlikely(f);
+		}
+		break;
+
+	// TODO: case FUTEX_FD:
+	// TODO: case FUTEX_REQUEUE:
+	// TODO: case FUTEX_CMP_REQUEUE:
+	// TODO: case FUTEX_WAKE_OP:
+	// TODO: case FUTEX_LOCK_PI:
+	// TODO: case FUTEX_UNLOCK_PI:
+	// TODO: case FUTEX_TRYLOCK_PI:
+	// TODO: case FUTEX_WAIT_REQUEUE_PI:
+	// TODO: case FUTEX_CMP_REQUEUE_PI:
+		(void)val2;
+		(void)uaddr2;
+		(void)val3;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP,
+		      futex_op);
+		break;
+	}
+	return result;
 }
 #endif /* WANT_FUTEX */
 
@@ -108,7 +168,7 @@ DEFINE_SYSCALL6(syscall_slong_t, futex,
                 USER UNCHECKED uint32_t *, uaddr2,
                 uint32_t, val3) {
 	syscall_slong_t result;
-	if (LINUX_FUTEX_USES_TIMEOUT(futex_op)) {
+	if (LINUX_FUTEX_USES_TIMEOUT(futex_op) && timeout_or_val2) {
 		struct timespec ts;
 		validate_readable(timeout_or_val2, sizeof(*timeout_or_val2));
 		COMPILER_READ_BARRIER();
@@ -134,7 +194,7 @@ DEFINE_COMPAT_SYSCALL6(syscall_slong_t, futex,
                        USER UNCHECKED uint32_t *, uaddr2,
                        uint32_t, val3) {
 	syscall_slong_t result;
-	if (LINUX_FUTEX_USES_TIMEOUT(futex_op)) {
+	if (LINUX_FUTEX_USES_TIMEOUT(futex_op) && timeout_or_val2) {
 		struct timespec ts;
 		validate_readable(timeout_or_val2, sizeof(*timeout_or_val2));
 		COMPILER_READ_BARRIER();

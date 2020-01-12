@@ -83,6 +83,7 @@ DECL_END
 
 #define ATREE(x)          driver_fde_cachetree_##x
 #define ATREE_CALL        KCALL
+#define ATREE_NOTHROW            NOTHROW
 #define ATREE_NODE_MIN(x) ((uintptr_t)(x)->cn_fde.f_pcstart)
 #define ATREE_NODE_MAX(x) ((uintptr_t)(x)->cn_fde.f_pcend - 1)
 #define Tkey              uintptr_t
@@ -3730,7 +3731,7 @@ done_tags_for_soname:
 					            result->d_eh_frame_start < (byte_t *)result->d_loadstart ||
 					            result->d_eh_frame_end > (byte_t *)result->d_loadend)
 						THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME);
-					/* TODO: Calculate best-fit semi/level values for the eh_frame cache. */
+					/* TODO: Calculate best-fit semi/level values. */
 					result->d_eh_frame_cache_semi0 = ATREE_SEMI0(uintptr_t);
 					result->d_eh_frame_cache_leve0 = ATREE_LEVEL0(uintptr_t);
 					break;

@@ -61,6 +61,7 @@
 /* Implement the ABI for the address tree used by block_device. */
 #define ATREE(x)                  bdev_tree_##x
 #define ATREE_CALL                KCALL
+#define ATREE_NOTHROW            NOTHROW
 #define Tkey                      dev_t
 #define T                         struct basic_block_device
 #define N_NODEPATH                bd_devlink

@@ -43,17 +43,18 @@ INTERN_FUNCTION(libc_pthread_clone)
 	/* Perform the system call with `lcall', since `int $0x80' would clobber all registers
 	 * except for %ebp, however we need 2 registers to pass both `fn' and `arg' to the child
 	 * thread. */
-	pushl_cfi  OFFSET_PTHREAD_TID(%ecx) /* pid_t *ctid */
-	pushl_cfi  OFFSET_PTHREAD_TLS(%ecx) /* void *newtls */
-	pushl_cfi  $(0)                       /* pid_t *ptid */
-	movl       OFFSET_PTHREAD_STACKADDR(%ecx), %eax
-	addl       OFFSET_PTHREAD_STACKSIZE(%ecx), %eax
-	pushl_cfi  %eax                     /* void *child_stack */
+	leal   OFFSET_PTHREAD_TID(%ecx), %eax /* pid_t *ctid */
+	pushl_cfi %eax                        /* ... */
+	pushl_cfi OFFSET_PTHREAD_TLS(%ecx)    /* void *newtls */
+	pushl_cfi %eax                        /* pid_t *ptid */
+	movl   OFFSET_PTHREAD_STACKADDR(%ecx), %eax
+	addl   OFFSET_PTHREAD_STACKSIZE(%ecx), %eax
+	pushl_cfi %eax                        /* void *child_stack */
 	/* int flags */
-	pushl_cfi  $(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | \
-	             CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS | \
-	             CLONE_CHILD_CLEARTID | CLONE_DETACHED  | CLONE_CHILD_SETTID | \
-	             CLONE_IO)
+	pushl_cfi $(CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_PTRACE | \
+	            CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS |       \
+	            CLONE_CHILD_CLEARTID | CLONE_DETACHED  | CLONE_CHILD_SETTID |      \
+	            CLONE_IO | CLONE_PARENT_SETTID)
 	lcall  $(7), $(SYS_clone)
 
 	/* Check if we're inside of the child thread
