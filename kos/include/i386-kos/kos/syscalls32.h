@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7585b6b7 */
+/* HASH CRC-32:0xcd10ee29 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1409,10 +1409,10 @@ __CDECLARE_SC(,__ssize_t,select,(__size_t __nfds, struct __fd_set_struct *__read
 __CDECLARE_SC(,__ssize_t,select64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timevalx32_64 *__timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #endif /* __CRT_HAVE_SC(select64) */
 #if __CRT_HAVE_SC(sendfile)
-__CDECLARE_SC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __syscall_ulong_t *__offset, __size_t __count),(__out_fd,__in_fd,__offset,__count))
+__CDECLARE_SC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __ULONG32_TYPE__ *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_SC(sendfile) */
 #if __CRT_HAVE_SC(sendfile64)
-__CDECLARE_SC(,__ssize_t,sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __uint64_t *__offset, __size_t __count),(__out_fd,__in_fd,__offset,__count))
+__CDECLARE_SC(,__ssize_t,sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __ULONG64_TYPE__ *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_SC(sendfile64) */
 #if __CRT_HAVE_SC(sendmmsg)
 __CDECLARE_SC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags),(__sockfd,__vmessages,__vlen,__flags))
@@ -3090,10 +3090,10 @@ __CDECLARE_XSC(,__ssize_t,select,(__size_t __nfds, struct __fd_set_struct *__rea
 __CDECLARE_XSC(,__ssize_t,select64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timevalx32_64 *__timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #endif /* __CRT_HAVE_XSC(select64) */
 #if __CRT_HAVE_XSC(sendfile)
-__CDECLARE_XSC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __syscall_ulong_t *__offset, __size_t __count),(__out_fd,__in_fd,__offset,__count))
+__CDECLARE_XSC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __ULONG32_TYPE__ *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_XSC(sendfile) */
 #if __CRT_HAVE_XSC(sendfile64)
-__CDECLARE_XSC(,__ssize_t,sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __uint64_t *__offset, __size_t __count),(__out_fd,__in_fd,__offset,__count))
+__CDECLARE_XSC(,__ssize_t,sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __ULONG64_TYPE__ *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_XSC(sendfile64) */
 #if __CRT_HAVE_XSC(sendmmsg)
 __CDECLARE_XSC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags),(__sockfd,__vmessages,__vlen,__flags))

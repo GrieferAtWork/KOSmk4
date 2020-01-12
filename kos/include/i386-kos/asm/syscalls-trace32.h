@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c909889 */
+/* HASH CRC-32:0xc49d7068 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -363,8 +363,8 @@
 #define __NRAN1_sigaltstack             oss
 #define __NRAN0_sendfile                out_fd
 #define __NRAN1_sendfile                in_fd
-#define __NRAN2_sendfile                offset
-#define __NRAN3_sendfile                count
+#define __NRAN2_sendfile                pin_offset
+#define __NRAN3_sendfile                num_bytes
 #define __NRAN0_getpmsg                 TODO_PROTOTYPE
 #define __NRAN0_putpmsg                 TODO_PROTOTYPE
 #define __NRAN0_ugetrlimit              TODO_PROTOTYPE
@@ -479,8 +479,8 @@
 #define __NRAN1_tkill                   signo
 #define __NRAN0_sendfile64              out_fd
 #define __NRAN1_sendfile64              in_fd
-#define __NRAN2_sendfile64              offset
-#define __NRAN3_sendfile64              count
+#define __NRAN2_sendfile64              pin_offset
+#define __NRAN3_sendfile64              num_bytes
 #define __NRAN0_futex                   uaddr
 #define __NRAN1_futex                   futex_op
 #define __NRAN2_futex                   val
@@ -1864,13 +1864,13 @@
 #define __NRATRF1_sigaltstack             "%p"
 #define __NRATRA1_sigaltstack(ss, oss)    ,oss
 #define __NRATRF0_sendfile                "%d"
-#define __NRATRA0_sendfile(out_fd, in_fd, offset, count) ,(int)(out_fd)
+#define __NRATRA0_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,(int)(out_fd)
 #define __NRATRF1_sendfile                "%d"
-#define __NRATRA1_sendfile(out_fd, in_fd, offset, count) ,(int)(in_fd)
+#define __NRATRA1_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,(int)(in_fd)
 #define __NRATRF2_sendfile                "%p"
-#define __NRATRA2_sendfile(out_fd, in_fd, offset, count) ,offset
+#define __NRATRA2_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,pin_offset
 #define __NRATRF3_sendfile                "%" PRIuSIZ
-#define __NRATRA3_sendfile(out_fd, in_fd, offset, count) ,count
+#define __NRATRA3_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,num_bytes
 #define __NRATRF0_getpmsg                 "%d"
 #define __NRATRA0_getpmsg(TODO_PROTOTYPE) ,TODO_PROTOTYPE
 #define __NRATRF0_putpmsg                 "%d"
@@ -2096,13 +2096,13 @@
 #define __NRATRF1_tkill                   "%#" PRIxSIZ
 #define __NRATRA1_tkill(tid, signo)       ,(uintptr_t)(signo)
 #define __NRATRF0_sendfile64              "%d"
-#define __NRATRA0_sendfile64(out_fd, in_fd, offset, count) ,(int)(out_fd)
+#define __NRATRA0_sendfile64(out_fd, in_fd, pin_offset, num_bytes) ,(int)(out_fd)
 #define __NRATRF1_sendfile64              "%d"
-#define __NRATRA1_sendfile64(out_fd, in_fd, offset, count) ,(int)(in_fd)
+#define __NRATRA1_sendfile64(out_fd, in_fd, pin_offset, num_bytes) ,(int)(in_fd)
 #define __NRATRF2_sendfile64              "%p"
-#define __NRATRA2_sendfile64(out_fd, in_fd, offset, count) ,offset
+#define __NRATRA2_sendfile64(out_fd, in_fd, pin_offset, num_bytes) ,pin_offset
 #define __NRATRF3_sendfile64              "%" PRIuSIZ
-#define __NRATRA3_sendfile64(out_fd, in_fd, offset, count) ,count
+#define __NRATRA3_sendfile64(out_fd, in_fd, pin_offset, num_bytes) ,num_bytes
 #define __NRATRF0_futex                   "%p"
 #define __NRATRA0_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,uaddr
 #define __NRATRF1_futex                   "%#" PRIxSIZ

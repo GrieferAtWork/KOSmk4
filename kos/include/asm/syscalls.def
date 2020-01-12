@@ -25,10 +25,11 @@
 %[typecompat(
 	*:void = *:void,
 )]
-%[typesize(*:[u8,s8,uint8_t,u_int8_t,int8_t] = 1)]
-%[typesize(*:[u16,s16,uint16_t,u_int16_t,int16_t] = 2)]
-%[typesize(*:[u32,s32,uint32_t,u_int32_t,int32_t] = 4)]
-%[typesize(*:[u64,s64,uint64_t,u_int64_t,int64_t] = 8)]
+%[typesize(*:[u8,s8,uint8_t,u_int8_t,int8_t,__INT8_TYPE__,__UINT8_TYPE__] = 1)]
+%[typesize(*:[u16,s16,uint16_t,u_int16_t,int16_t,__INT16_TYPE__,__UINT16_TYPE__] = 2)]
+%[typesize(*:[u32,s32,uint32_t,u_int32_t,int32_t,ulong32_t,long32_t,__INT32_TYPE__,__UINT32_TYPE__,__LONG32_TYPE__,__ULONG32_TYPE__] = 4)]
+%[typesize(*:[u64,s64,uint64_t,u_int64_t,int64_t,ulong64_t,long64_t,__INT64_TYPE__,__UINT64_TYPE__,__LONG64_TYPE__,__ULONG64_TYPE__] = 8)]
+%[typesize(*:[u128,s128,uint128_t,u_int128_t,int128_t,ulong128_t,long128_t,__INT128_TYPE__,__UINT128_TYPE__,__LONG128_TYPE__,__ULONG128_TYPE__] = 16)]
 %[typesize(*:[uid_t] = 4)]
 %[typesize(*:[gid_t] = uid_t)]
 %[typesize(*:[pid_t] = 4)]
@@ -856,7 +857,12 @@ sigaltstackx32:(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) -> er
 sigaltstackx64:(struct sigaltstack64 const *ss, struct sigaltstack64 *oss) -> errno_t;
 %[endgroup]
 
-[restart(dont)][cp] sendfile:(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) -> ssize_t;
+%[startgroup]
+[restart(dont)][cp] sendfile:(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) -> ssize_t;
+[restart(dont)][cp] sendfile32:(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) -> ssize_t;
+[restart(dont)][cp] sendfile64:(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) -> ssize_t;
+%[endgroup]
+
 [cp] getpmsg:(int TODO_PROTOTYPE) -> errno_t;
 [cp] putpmsg:(int TODO_PROTOTYPE) -> errno_t;
 vfork:() -> pid_t;
@@ -966,7 +972,6 @@ readahead:(fd_t fd, [reg64] uint64_t offset, size_t count) -> ssize_t;
 [cp] fremovexattr:(int fd, char const *name) -> errno_t;
 
 tkill:(pid_t tid, syscall_ulong_t signo) -> errno_t;
-sendfile64:(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) -> ssize_t;
 
 %[startgroup]
 [cp] futex:(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespec const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) -> syscall_slong_t;

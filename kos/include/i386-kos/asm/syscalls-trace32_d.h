@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcf63937 */
+/* HASH CRC-32:0xcbcb9876 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -363,8 +363,8 @@
 #define __NR32AN1_sigaltstack             oss
 #define __NR32AN0_sendfile                out_fd
 #define __NR32AN1_sendfile                in_fd
-#define __NR32AN2_sendfile                offset
-#define __NR32AN3_sendfile                count
+#define __NR32AN2_sendfile                pin_offset
+#define __NR32AN3_sendfile                num_bytes
 #define __NR32AN0_getpmsg                 TODO_PROTOTYPE
 #define __NR32AN0_putpmsg                 TODO_PROTOTYPE
 #define __NR32AN0_ugetrlimit              TODO_PROTOTYPE
@@ -479,8 +479,8 @@
 #define __NR32AN1_tkill                   signo
 #define __NR32AN0_sendfile64              out_fd
 #define __NR32AN1_sendfile64              in_fd
-#define __NR32AN2_sendfile64              offset
-#define __NR32AN3_sendfile64              count
+#define __NR32AN2_sendfile64              pin_offset
+#define __NR32AN3_sendfile64              num_bytes
 #define __NR32AN0_futex                   uaddr
 #define __NR32AN1_futex                   futex_op
 #define __NR32AN2_futex                   val
@@ -1864,13 +1864,13 @@
 #define __NR32ATRF1_sigaltstack             "%p"
 #define __NR32ATRA1_sigaltstack(ss, oss)    ,oss
 #define __NR32ATRF0_sendfile                "%d"
-#define __NR32ATRA0_sendfile(out_fd, in_fd, offset, count) ,(int)(out_fd)
+#define __NR32ATRA0_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,(int)(out_fd)
 #define __NR32ATRF1_sendfile                "%d"
-#define __NR32ATRA1_sendfile(out_fd, in_fd, offset, count) ,(int)(in_fd)
+#define __NR32ATRA1_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,(int)(in_fd)
 #define __NR32ATRF2_sendfile                "%p"
-#define __NR32ATRA2_sendfile(out_fd, in_fd, offset, count) ,offset
+#define __NR32ATRA2_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,pin_offset
 #define __NR32ATRF3_sendfile                "%" PRIuSIZ
-#define __NR32ATRA3_sendfile(out_fd, in_fd, offset, count) ,count
+#define __NR32ATRA3_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,num_bytes
 #define __NR32ATRF0_getpmsg                 "%d"
 #define __NR32ATRA0_getpmsg(TODO_PROTOTYPE) ,TODO_PROTOTYPE
 #define __NR32ATRF0_putpmsg                 "%d"
@@ -2096,13 +2096,13 @@
 #define __NR32ATRF1_tkill                   "%#" PRIxSIZ
 #define __NR32ATRA1_tkill(tid, signo)       ,(uintptr_t)(signo)
 #define __NR32ATRF0_sendfile64              "%d"
-#define __NR32ATRA0_sendfile64(out_fd, in_fd, offset, count) ,(int)(out_fd)
+#define __NR32ATRA0_sendfile64(out_fd, in_fd, pin_offset, num_bytes) ,(int)(out_fd)
 #define __NR32ATRF1_sendfile64              "%d"
-#define __NR32ATRA1_sendfile64(out_fd, in_fd, offset, count) ,(int)(in_fd)
+#define __NR32ATRA1_sendfile64(out_fd, in_fd, pin_offset, num_bytes) ,(int)(in_fd)
 #define __NR32ATRF2_sendfile64              "%p"
-#define __NR32ATRA2_sendfile64(out_fd, in_fd, offset, count) ,offset
+#define __NR32ATRA2_sendfile64(out_fd, in_fd, pin_offset, num_bytes) ,pin_offset
 #define __NR32ATRF3_sendfile64              "%" PRIuSIZ
-#define __NR32ATRA3_sendfile64(out_fd, in_fd, offset, count) ,count
+#define __NR32ATRA3_sendfile64(out_fd, in_fd, pin_offset, num_bytes) ,num_bytes
 #define __NR32ATRF0_futex                   "%p"
 #define __NR32ATRA0_futex(uaddr, futex_op, val, timeout_or_val2, uaddr2, val3) ,uaddr
 #define __NR32ATRF1_futex                   "%#" PRIxSIZ

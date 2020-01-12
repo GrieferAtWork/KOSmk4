@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b11f351 */
+/* HASH CRC-32:0x65b252ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@
 #define __NR64_alarm                  0x25                           /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
 #define __NR64_setitimer              0x26                           /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) */
 #define __NR64_getpid                 0x27                           /* pid_t getpid(void) */
-#define __NR64_sendfile               0x28                           /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+#define __NR64_sendfile               0x28                           /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 #define __NR64_socket                 0x29                           /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 #define __NR64_connect                0x2a                           /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define __NR64_accept                 0x2b                           /* errno_t accept(int TODO_PROTOTYPE) */

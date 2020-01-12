@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf859ae57 */
+/* HASH CRC-32:0x5aece832 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -215,6 +215,7 @@
 #define __NR3264COMPAT_sched_setattr          1(sched_setattr)
 #define __NR3264COMPAT_sched_yield            1(sched_yield)
 #define __NR3264COMPAT_seccomp                1(seccomp)
+#define __NR3264COMPAT_sendfile               1(sendfile64)
 #define __NR3264COMPAT_sendto                 1(sendto)
 #define __NR3264COMPAT_set_exception_handler  1(set_exception_handler)
 #define __NR3264COMPAT_set_mempolicy          1(set_mempolicy)

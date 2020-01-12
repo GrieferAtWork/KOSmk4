@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb439b23d */
+/* HASH CRC-32:0xdcbb504b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1294,7 +1294,7 @@
 #define __NR32AT1_sigaltstack             (struct sigaltstack32 *, struct sigaltstack32 *)
 #define __NR32AT0_sendfile                (fd_t, __fd_t)
 #define __NR32AT1_sendfile                (fd_t, __fd_t)
-#define __NR32AT2_sendfile                (syscall_ulong_t *, __syscall_ulong_t *)
+#define __NR32AT2_sendfile                (__ULONG32_TYPE__ *, __ULONG32_TYPE__ *)
 #define __NR32AT3_sendfile                (size_t, __size_t)
 #define __NR32AT0_getpmsg                 (int, int)
 #define __NR32AT0_putpmsg                 (int, int)
@@ -1410,7 +1410,7 @@
 #define __NR32AT1_tkill                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_sendfile64              (fd_t, __fd_t)
 #define __NR32AT1_sendfile64              (fd_t, __fd_t)
-#define __NR32AT2_sendfile64              (uint64_t *, __uint64_t *)
+#define __NR32AT2_sendfile64              (__ULONG64_TYPE__ *, __ULONG64_TYPE__ *)
 #define __NR32AT3_sendfile64              (size_t, __size_t)
 #define __NR32AT0_futex                   (uint32_t *, __uint32_t *)
 #define __NR32AT1_futex                   (syscall_ulong_t, __syscall_ulong_t)
@@ -2232,7 +2232,7 @@
 #define __NR32AM_capget(a, b, c, d, e, f)                  (int)a
 #define __NR32AM_capset(a, b, c, d, e, f)                  (int)a
 #define __NR32AM_sigaltstack(a, b, c, d, e, f)             (struct sigaltstack32 const *)a, (struct sigaltstack32 *)b
-#define __NR32AM_sendfile(a, b, c, d, e, f)                (__fd_t)a, (__fd_t)b, (__syscall_ulong_t *)c, (__size_t)d
+#define __NR32AM_sendfile(a, b, c, d, e, f)                (__fd_t)a, (__fd_t)b, (__ULONG32_TYPE__ *)c, (__size_t)d
 #define __NR32AM_getpmsg(a, b, c, d, e, f)                 (int)a
 #define __NR32AM_putpmsg(a, b, c, d, e, f)                 (int)a
 #define __NR32AM_vfork(a, b, c, d, e, f)                   /* nothing */
@@ -2282,7 +2282,7 @@
 #define __NR32AM_lremovexattr(a, b, c, d, e, f)            (char const *)a, (char const *)b
 #define __NR32AM_fremovexattr(a, b, c, d, e, f)            (int)a, (char const *)b
 #define __NR32AM_tkill(a, b, c, d, e, f)                   (__pid_t)a, (__syscall_ulong_t)b
-#define __NR32AM_sendfile64(a, b, c, d, e, f)              (__fd_t)a, (__fd_t)b, (__uint64_t *)c, (__size_t)d
+#define __NR32AM_sendfile64(a, b, c, d, e, f)              (__fd_t)a, (__fd_t)b, (__ULONG64_TYPE__ *)c, (__size_t)d
 #define __NR32AM_futex(a, b, c, d, e, f)                   (__uint32_t *)a, (__syscall_ulong_t)b, (__uint32_t)c, (struct __timespecx32 const *)d, (__uint32_t *)e, (__uint32_t)f
 #define __NR32AM_sched_setaffinity(a, b, c, d, e, f)       (__pid_t)a, (__size_t)b, (struct __cpu_set_struct const *)c
 #define __NR32AM_sched_getaffinity(a, b, c, d, e, f)       (__pid_t)a, (__size_t)b, (struct __cpu_set_struct *)c

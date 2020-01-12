@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30d0ab4b */
+/* HASH CRC-32:0x70c4be19 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -504,7 +504,6 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_SELECT                  1
 #define __ARCH_WANT_COMPAT_SYSCALL_SELECT64                1
 #define __ARCH_WANT_COMPAT_SYSCALL_SENDFILE                1
-#define __ARCH_WANT_COMPAT_SYSCALL_SENDFILE64              1
 #define __ARCH_WANT_COMPAT_SYSCALL_SENDMMSG                1
 #define __ARCH_WANT_COMPAT_SYSCALL_SENDMSG                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_SET_LIBRARY_LISTDEF     1

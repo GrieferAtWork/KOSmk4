@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa926fec7 */
+/* HASH CRC-32:0x400810b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1268,7 +1268,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getpid)
 	.cfi_endproc
 END(__x86_asm64_syscall_getpid)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 .section .text.x86.asm64_syscall.sendfile
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendfile)
 	.cfi_startproc simple
@@ -17543,7 +17543,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	.cfi_endproc
 END(__x86_asm32_int80_sigaltstack)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_int80.sendfile
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile)
 	.cfi_startproc simple
@@ -19177,7 +19177,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tkill)
 	.cfi_endproc
 END(__x86_asm32_int80_tkill)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
+/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_int80.sendfile64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile64)
 	.cfi_startproc simple
@@ -27518,7 +27518,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_capset, __x86_asm32_int80_capset)
 /* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigaltstack, __x86_asm32_int80_sigaltstack)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sendfile, __x86_asm32_int80_sendfile)
 
 /* errno_t getpmsg(int TODO_PROTOTYPE) */
@@ -27805,7 +27805,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fremovexattr, __x86_asm32_int80_fr
 /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_tkill, __x86_asm32_int80_tkill)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
+/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sendfile64, __x86_asm32_int80_sendfile64)
 
 /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
@@ -32340,7 +32340,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigaltstack)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sigaltstack)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_sysrun32.sendfile
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendfile)
 	.cfi_startproc
@@ -32879,7 +32879,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tkill)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_tkill)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
+/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_sysrun32.sendfile64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendfile64)
 	.cfi_startproc

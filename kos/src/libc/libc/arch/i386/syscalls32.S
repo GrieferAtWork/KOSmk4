@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb21379bb */
+/* HASH CRC-32:0x12c64bb9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3537,7 +3537,7 @@ INTERN_FUNCTION(libc_sys_Xsigaltstack)
 END(libc_sys_Xsigaltstack)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsigaltstack, libc_sys_Xsigaltstack)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.crt.syscall.sendfile
 INTERN_FUNCTION(libc_sys_sendfile)
 	movl   $(0xbb), %eax
@@ -3545,7 +3545,7 @@ INTERN_FUNCTION(libc_sys_sendfile)
 END(libc_sys_sendfile)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sendfile, libc_sys_sendfile)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.crt.syscall.Xsendfile
 INTERN_FUNCTION(libc_sys_Xsendfile)
 	movl   $(0xbb), %eax
@@ -4337,7 +4337,7 @@ INTERN_FUNCTION(libc_sys_Xtkill)
 END(libc_sys_Xtkill)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtkill, libc_sys_Xtkill)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
+/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.crt.syscall.sendfile64
 INTERN_FUNCTION(libc_sys_sendfile64)
 	movl   $(0xef), %eax
@@ -4345,7 +4345,7 @@ INTERN_FUNCTION(libc_sys_sendfile64)
 END(libc_sys_sendfile64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sendfile64, libc_sys_sendfile64)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
+/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.crt.syscall.Xsendfile64
 INTERN_FUNCTION(libc_sys_Xsendfile64)
 	movl   $(0xef), %eax

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3adc18 */
+/* HASH CRC-32:0xb40fd16f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -243,7 +243,7 @@
 #define SYS_capget                  __NR_capget                  /* errno_t capget(int TODO_PROTOTYPE) */
 #define SYS_capset                  __NR_capset                  /* errno_t capset(int TODO_PROTOTYPE) */
 #define SYS_sigaltstack             __NR_sigaltstack             /* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
-#define SYS_sendfile                __NR_sendfile                /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+#define SYS_sendfile                __NR_sendfile                /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 #define SYS_getpmsg                 __NR_getpmsg                 /* errno_t getpmsg(int TODO_PROTOTYPE) */
 #define SYS_putpmsg                 __NR_putpmsg                 /* errno_t putpmsg(int TODO_PROTOTYPE) */
 #define SYS_vfork                   __NR_vfork                   /* pid_t vfork(void) */
@@ -293,7 +293,7 @@
 #define SYS_lremovexattr            __NR_lremovexattr            /* errno_t lremovexattr(char const *path, char const *name) */
 #define SYS_fremovexattr            __NR_fremovexattr            /* errno_t fremovexattr(int fd, char const *name) */
 #define SYS_tkill                   __NR_tkill                   /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
-#define SYS_sendfile64              __NR_sendfile64              /* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
+#define SYS_sendfile64              __NR_sendfile64              /* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 #define SYS_futex                   __NR_futex                   /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 #define SYS_sched_setaffinity       __NR_sched_setaffinity       /* errno_t sched_setaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset) */
 #define SYS_sched_getaffinity       __NR_sched_getaffinity       /* errno_t sched_getaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct *cpuset) */

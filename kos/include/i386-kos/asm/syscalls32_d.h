@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f0413b9 */
+/* HASH CRC-32:0xa62efc63 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -240,7 +240,7 @@
 #define __NR32_capget                  0xb8                   /* errno_t capget(int TODO_PROTOTYPE) */
 #define __NR32_capset                  0xb9                   /* errno_t capset(int TODO_PROTOTYPE) */
 #define __NR32_sigaltstack             0xba                   /* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
-#define __NR32_sendfile                0xbb                   /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+#define __NR32_sendfile                0xbb                   /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 #define __NR32_getpmsg                 0xbc                   /* errno_t getpmsg(int TODO_PROTOTYPE) */
 #define __NR32_putpmsg                 0xbd                   /* errno_t putpmsg(int TODO_PROTOTYPE) */
 #define __NR32_vfork                   0xbe                   /* pid_t vfork(void) */
@@ -290,7 +290,7 @@
 #define __NR32_lremovexattr            0xec                   /* errno_t lremovexattr(char const *path, char const *name) */
 #define __NR32_fremovexattr            0xed                   /* errno_t fremovexattr(int fd, char const *name) */
 #define __NR32_tkill                   0xee                   /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
-#define __NR32_sendfile64              0xef                   /* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
+#define __NR32_sendfile64              0xef                   /* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 #define __NR32_futex                   0xf0                   /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 #define __NR32_sched_setaffinity       0xf1                   /* errno_t sched_setaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset) */
 #define __NR32_sched_getaffinity       0xf2                   /* errno_t sched_getaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct *cpuset) */
@@ -1100,7 +1100,7 @@
 #define __NR32RM_lremovexattr            0
 #define __NR32RM_fremovexattr            0
 #define __NR32RM_tkill                   0
-#define __NR32RM_sendfile64              0
+#define __NR32RM_sendfile64              1
 #define __NR32RM_futex                   0
 #define __NR32RM_sched_setaffinity       0
 #define __NR32RM_sched_getaffinity       0
@@ -1401,6 +1401,7 @@
 #define __NR32CP_removexattr             1
 #define __NR32CP_lremovexattr            1
 #define __NR32CP_fremovexattr            1
+#define __NR32CP_sendfile64              1
 #define __NR32CP_futex                   1
 #define __NR32CP_epoll_wait              1
 #define __NR32CP_clock_nanosleep         1

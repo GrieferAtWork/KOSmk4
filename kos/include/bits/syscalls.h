@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9ea9e8f */
+/* HASH CRC-32:0x94938db4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -340,7 +340,7 @@
 #define SYS_inotify_init           __NR_inotify_init           /* errno_t inotify_init(int TODO_PROTOTYPE) */
 #define SYS_eventfd                __NR_eventfd                /* fd_t eventfd(syscall_ulong_t initval) */
 #define SYS_signalfd               __NR_signalfd               /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-#define SYS_sendfile               __NR_sendfile               /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+#define SYS_sendfile               __NR_sendfile               /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 #define SYS_ftruncate              __NR_ftruncate              /* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */
 #define SYS_truncate               __NR_truncate               /* errno_t truncate(char const *filename, syscall_ulong_t length) */
 #define SYS_linux_stat             __NR_linux_stat             /* errno_t linux_stat(char const *filename, struct linux_stat *statbuf) */

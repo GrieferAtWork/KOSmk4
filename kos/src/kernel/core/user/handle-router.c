@@ -67,8 +67,13 @@ for (local l: File.open("../../../../include/kos/kernel/handle.h")) {
 #define ARGS   name,attr,return_type,nothrow,cc,argv,throws,default_impl
 local ops = HANDLE_OPERATOR_PROTOTYPES;
 
+function needsPerTypeImpl(default_impl) {
+	return "{HANDLE_TYPE}" in default_impl;
+}
+
 print "/" "* Fallback handle operators *" "/";
 for (local ARGS: ops) {
+	local needPerType = needsPerTypeImpl(default_impl);
 	print "INTERN",;
 	if (attr) {
 		print " ",;
@@ -95,7 +100,7 @@ for (local ARGS: ops) {
 		print t,;
 		if (!t.endswith("*"))
 			print " ",;
-		if (n !in ["cmd"] || name !in ["ioctl", "hop"]) {
+		if (!needPerType && (n !in ["cmd"] || name !in ["ioctl", "hop"])) {
 			print "UNUSED(",;
 			print n,;
 			print ")",;
@@ -110,7 +115,13 @@ for (local ARGS: ops) {
 		print " ",;
 	}
 	print "{ ",;
-	print default_impl,;
+	if (needPerType) {
+		print default_impl.format({
+			"HANDLE_TYPE" : "HANDLE_TYPE_UNDEFINED"
+		}),;
+	} else {
+		print default_impl,;
+	}
 	print " }";
 }
 print;
@@ -193,6 +204,56 @@ for (local h_name, h_typ: handle_types) {
 	}
 	print " *" "/";
 	for (local ARGS: ops) {
+		if (needsPerTypeImpl(default_impl)) {
+			print "INTERN",;
+			if (attr) {
+				print " ",;
+				print attr,;
+			}
+			print " ATTR_WEAK ATTR_SECTION(\".text.kernel.handle_",;
+			print h_name,;
+			print ".",;
+			print name,;
+			print "\") ",;
+			print return_type,;
+			if (!return_type.endswith("*"))
+				print " ",;
+			print nothrow,;
+			if (nothrow)
+				print "(",;
+			print cc;
+			print "handle_",;
+			print h_name,;
+			print "_",;
+			print name,;
+			if (nothrow)
+				print ")",;
+			print "(",;
+			local is_first = true;
+			for (local t, n: argv) {
+				if (n == "self")
+					t = h_typ + t.lsstrip("void");
+				if (!is_first)
+					print ", ",;
+				print t,;
+				if (!t.endswith("*"))
+					print " ",;
+				print n,;
+				is_first = false;
+			}
+			print ") ",;
+			if (throws) {
+				print throws,;
+				print " ",;
+			}
+			print "{";
+			print "\t",;
+			print default_impl.format({
+				"HANDLE_TYPE" : "HANDLE_TYPE_" + h_name.upper()
+			});
+			print "}";
+			continue;
+		}
 		print "DEFINE_INTERN_WEAK_ALIAS(handle_",;
 		print h_name,;
 		print "_",;

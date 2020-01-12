@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaede6034 */
+/* HASH CRC-32:0x6fdb42be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6980,7 +6980,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	.cfi_endproc
 END(__x86_asm32_int80_sigaltstack)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_int80.sendfile
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile)
 	.cfi_startproc simple
@@ -8845,7 +8845,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tkill)
 	.cfi_endproc
 END(__x86_asm32_int80_tkill)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
+/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_int80.sendfile64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendfile64)
 	.cfi_startproc simple
@@ -24238,7 +24238,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigaltstack)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sigaltstack)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_sysenter.sendfile
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendfile)
 	.cfi_startproc simple
@@ -26111,7 +26111,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_tkill)
 	.cfi_endproc
 END(__x86_asm32_sysenter_tkill)
 
-/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count) */
+/* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
 .section .text.x86.asm32_syscall_sysenter.sendfile64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendfile64)
 	.cfi_startproc simple

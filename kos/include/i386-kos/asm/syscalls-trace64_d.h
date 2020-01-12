@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2449eccd */
+/* HASH CRC-32:0x31e6a085 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,8 +121,8 @@
 #define __NR64AN2_setitimer              oldval
 #define __NR64AN0_sendfile               out_fd
 #define __NR64AN1_sendfile               in_fd
-#define __NR64AN2_sendfile               offset
-#define __NR64AN3_sendfile               count
+#define __NR64AN2_sendfile               pin_offset
+#define __NR64AN3_sendfile               num_bytes
 #define __NR64AN0_socket                 domain
 #define __NR64AN1_socket                 type
 #define __NR64AN2_socket                 protocol
@@ -1159,13 +1159,13 @@
 #define __NR64ATRF2_setitimer              "%p"
 #define __NR64ATRA2_setitimer(which, newval, oldval) ,oldval
 #define __NR64ATRF0_sendfile               "%d"
-#define __NR64ATRA0_sendfile(out_fd, in_fd, offset, count) ,(int)(out_fd)
+#define __NR64ATRA0_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,(int)(out_fd)
 #define __NR64ATRF1_sendfile               "%d"
-#define __NR64ATRA1_sendfile(out_fd, in_fd, offset, count) ,(int)(in_fd)
+#define __NR64ATRA1_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,(int)(in_fd)
 #define __NR64ATRF2_sendfile               "%p"
-#define __NR64ATRA2_sendfile(out_fd, in_fd, offset, count) ,offset
+#define __NR64ATRA2_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,pin_offset
 #define __NR64ATRF3_sendfile               "%" PRIuSIZ
-#define __NR64ATRA3_sendfile(out_fd, in_fd, offset, count) ,count
+#define __NR64ATRA3_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,num_bytes
 #define __NR64ATRF0_socket                 "%#" PRIxSIZ
 #define __NR64ATRA0_socket(domain, type, protocol) ,(uintptr_t)(domain)
 #define __NR64ATRF1_socket                 "%#" PRIxSIZ

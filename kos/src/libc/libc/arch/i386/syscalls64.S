@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa868f31 */
+/* HASH CRC-32:0x42995c4c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1019,7 +1019,7 @@ INTERN_FUNCTION(libc_sys_Xgetpid)
 END(libc_sys_Xgetpid)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetpid, libc_sys_Xgetpid)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 .section .text.crt.syscall.sendfile
 INTERN_FUNCTION(libc_sys_sendfile)
 	.cfi_startproc
@@ -1032,7 +1032,7 @@ INTERN_FUNCTION(libc_sys_sendfile)
 END(libc_sys_sendfile)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sendfile, libc_sys_sendfile)
 
-/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+/* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 .section .text.crt.syscall.Xsendfile
 INTERN_FUNCTION(libc_sys_Xsendfile)
 	.cfi_startproc

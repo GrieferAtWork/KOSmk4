@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c099e90 */
+/* HASH CRC-32:0x8d5631f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -827,7 +827,7 @@ __CDECLARE_SC(,__errno_t,semtimedop,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__ssize_t,send,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__sockfd,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_SC(send) */
 #if __CRT_HAVE_SC(sendfile)
-__CDECLARE_SC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __syscall_ulong_t *__offset, __size_t __count),(__out_fd,__in_fd,__offset,__count))
+__CDECLARE_SC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __syscall_ulong_t *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_SC(sendfile) */
 #if __CRT_HAVE_SC(sendmmsg)
 __CDECLARE_SC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags),(__sockfd,__vmessages,__vlen,__flags))
@@ -1803,7 +1803,7 @@ __CDECLARE_XSC(,__errno_t,semtimedop,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__ssize_t,send,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__sockfd,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_XSC(send) */
 #if __CRT_HAVE_XSC(sendfile)
-__CDECLARE_XSC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __syscall_ulong_t *__offset, __size_t __count),(__out_fd,__in_fd,__offset,__count))
+__CDECLARE_XSC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __syscall_ulong_t *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_XSC(sendfile) */
 #if __CRT_HAVE_XSC(sendmmsg)
 __CDECLARE_XSC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags),(__sockfd,__vmessages,__vlen,__flags))

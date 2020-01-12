@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25318783 */
+/* HASH CRC-32:0x87eb0b0b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@
 #define SYS_alarm                  __NR_alarm                  /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
 #define SYS_setitimer              __NR_setitimer              /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx64 const *newval, struct __itimervalx64 *oldval) */
 #define SYS_getpid                 __NR_getpid                 /* pid_t getpid(void) */
-#define SYS_sendfile               __NR_sendfile               /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */
+#define SYS_sendfile               __NR_sendfile               /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 #define SYS_socket                 __NR_socket                 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 #define SYS_connect                __NR_connect                /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define SYS_accept                 __NR_accept                 /* errno_t accept(int TODO_PROTOTYPE) */

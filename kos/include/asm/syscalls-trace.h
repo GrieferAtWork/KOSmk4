@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee251931 */
+/* HASH CRC-32:0x6ddbd2ac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -669,8 +669,8 @@
 #define __NRAN2_signalfd               sigsetsize
 #define __NRAN0_sendfile               out_fd
 #define __NRAN1_sendfile               in_fd
-#define __NRAN2_sendfile               offset
-#define __NRAN3_sendfile               count
+#define __NRAN2_sendfile               pin_offset
+#define __NRAN3_sendfile               num_bytes
 #define __NRAN0_ftruncate              fd
 #define __NRAN1_ftruncate              length
 #define __NRAN0_truncate               filename
@@ -2227,13 +2227,13 @@
 #define __NRATRF2_signalfd               "%" PRIuSIZ
 #define __NRATRA2_signalfd(fd, sigmask, sigsetsize) ,sigsetsize
 #define __NRATRF0_sendfile               "%d"
-#define __NRATRA0_sendfile(out_fd, in_fd, offset, count) ,(int)(out_fd)
+#define __NRATRA0_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,(int)(out_fd)
 #define __NRATRF1_sendfile               "%d"
-#define __NRATRA1_sendfile(out_fd, in_fd, offset, count) ,(int)(in_fd)
+#define __NRATRA1_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,(int)(in_fd)
 #define __NRATRF2_sendfile               "%p"
-#define __NRATRA2_sendfile(out_fd, in_fd, offset, count) ,offset
+#define __NRATRA2_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,pin_offset
 #define __NRATRF3_sendfile               "%" PRIuSIZ
-#define __NRATRA3_sendfile(out_fd, in_fd, offset, count) ,count
+#define __NRATRA3_sendfile(out_fd, in_fd, pin_offset, num_bytes) ,num_bytes
 #define __NRATRF0_ftruncate              "%d"
 #define __NRATRA0_ftruncate(fd, length)  ,(int)(fd)
 #define __NRATRF1_ftruncate              "%#" PRIxSIZ
