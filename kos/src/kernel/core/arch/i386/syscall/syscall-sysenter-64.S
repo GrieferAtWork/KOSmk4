@@ -182,8 +182,8 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	ja     1f
 	movq   %rax, %rcx
 	shrq   $(1), %rcx
-	EXTERN(kernel_syscall0_regcnt)
-	movb   kernel_syscall0_regcnt(,%rcx,1), %cl
+	EXTERN(kernel_syscall0_regcnt32)
+	movb   kernel_syscall0_regcnt32(,%rcx,1), %cl
 	jmp   .Lgot_mask
 1:	subl   $(__NR32_syscall1_min), %eax
 	jb    .Lgot_sysenter_args
@@ -191,8 +191,8 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	ja    .Lgot_sysenter_args
 	movq   %rax, %rcx
 	shrq   $(1), %rcx
-	EXTERN(kernel_syscall1_regcnt)
-	movb   kernel_syscall1_regcnt(,%rcx,1), %cl
+	EXTERN(kernel_syscall1_regcnt32)
+	movb   kernel_syscall1_regcnt32(,%rcx,1), %cl
 .Lgot_mask:
 	testl  $(1), %eax
 	jz     1f
