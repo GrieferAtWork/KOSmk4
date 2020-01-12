@@ -90,20 +90,20 @@ __NR32FEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_TABLES_METADATA)
 #define kernel_syscall32_restartmode(sysno) \
 	__kernel_syscall32_withtable(sysno, 0, __kernel_syscall32_restartmode_impl, sysno)
 #define __kernel_syscall32_restartmode_impl(table, sysno) \
-	__kernel_syscall_restartmode(kernel_syscall##table##_restartmode, (sysno)-__NR32_syscall##table##_min)
+	__kernel_syscall_restartmode(kernel_syscall##table##_restartmode32, (sysno)-__NR32_syscall##table##_min)
 
 /* Return the number of registers table by `sysno' (<= `__NR32FEAT_SYSCALL_REGISTER_MAX_COUNT') */
 #define kernel_syscall32_regcnt(sysno) \
 	__kernel_syscall32_withtable(sysno, __NR32FEAT_SYSCALL_REGISTER_MAX_COUNT, __kernel_syscall32_regcnt_impl, sysno)
 #define __kernel_syscall32_regcnt_impl(table, sysno) \
-	__kernel_syscall_regcnt(kernel_syscall##table##_regcnt, (sysno)-__NR32_syscall##table##_min)
+	__kernel_syscall_regcnt(kernel_syscall##table##_regcnt32, (sysno)-__NR32_syscall##table##_min)
 
 /* Check if a given system call `sysno' has a double-wide return
  * value (i.e. the return value is passed in 2 registers) */
 #define kernel_syscall32_doublewide(sysno) \
 	__kernel_syscall32_withtable(sysno, 0, __kernel_syscall32_doublewide_impl, sysno)
 #define __kernel_syscall32_doublewide_impl(table, sysno) \
-	__kernel_syscall_doublewide(kernel_syscall##table##_regcnt, (sysno)-__NR32_syscall##table##_min)
+	__kernel_syscall_doublewide(kernel_syscall##table##_regcnt32, (sysno)-__NR32_syscall##table##_min)
 
 #define kernel_syscall64_iscp        kernel_syscall_iscp
 #define kernel_syscall64_restartmode kernel_syscall_restartmode
