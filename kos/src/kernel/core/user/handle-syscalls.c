@@ -754,6 +754,201 @@ DEFINE_SYSCALL5(ssize_t, pwrite64f,
 
 
 /************************************************************************/
+/* readv(), writev()                                                  */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_PREADV
+DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
+                USER UNCHECKED struct iovec const *, iov,
+                size_t, count) {
+	size_t result, num_bytes;
+	struct handle hand;
+	struct aio_buffer dst;
+	validate_readablem(iov, count, sizeof(*iov));
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANREAD(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+		if unlikely(!count)
+			result = 0;
+		else {
+			dst.ab_entc = count;
+			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
+			                                                 sizeof(struct aio_buffer_entry));
+			TRY {
+				size_t i;
+				for (i = 0, num_bytes = 0; i < count; ++i) {
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
+					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
+					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+				}
+				dst.ab_head = dst.ab_entv[0];
+				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				result = handle_readv(hand,
+				                      &dst,
+				                      num_bytes);
+			} EXCEPT {
+				freea((void *)dst.ab_entv);
+				RETHROW();
+			}
+			freea((void *)dst.ab_entv);
+		}
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PREADV */
+
+#ifdef __ARCH_WANT_SYSCALL_PWRITEV
+DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
+                USER UNCHECKED struct iovec const *, iov,
+                size_t, count) {
+	size_t result, num_bytes;
+	struct handle hand;
+	struct aio_buffer dst;
+	validate_readablem(iov, count, sizeof(*iov));
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANWRITE(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+		if unlikely(!count)
+			result = 0;
+		else {
+			dst.ab_entc = count;
+			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
+			                                                 sizeof(struct aio_buffer_entry));
+			TRY {
+				size_t i;
+				for (i = 0, num_bytes = 0; i < count; ++i) {
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
+					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
+					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+				}
+				dst.ab_head = dst.ab_entv[0];
+				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				result = handle_writev(hand,
+				                       &dst,
+				                       num_bytes);
+			} EXCEPT {
+				freea((void *)dst.ab_entv);
+				RETHROW();
+			}
+			freea((void *)dst.ab_entv);
+		}
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_PWRITEV */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PREADV
+DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
+                       USER UNCHECKED struct compat_iovec const *, iov,
+                       size_t, count) {
+	size_t result, num_bytes;
+	struct handle hand;
+	struct aio_buffer dst;
+	compat_validate_readablem(iov, count, sizeof(*iov));
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANREAD(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
+		if unlikely(!count)
+			result = 0;
+		else {
+			dst.ab_entc = count;
+			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
+			                                                 sizeof(struct aio_buffer_entry));
+			TRY {
+				size_t i;
+				for (i = 0, num_bytes = 0; i < count; ++i) {
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
+					compat_validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
+					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+				}
+				dst.ab_head = dst.ab_entv[0];
+				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				result = handle_readv(hand,
+				                      &dst,
+				                      num_bytes);
+			} EXCEPT {
+				freea((void *)dst.ab_entv);
+				RETHROW();
+			}
+			freea((void *)dst.ab_entv);
+		}
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PREADV */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_PWRITEV
+DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
+                       USER UNCHECKED struct compat_iovec const *, iov,
+                       size_t, count) {
+	size_t result, num_bytes;
+	struct handle hand;
+	struct aio_buffer dst;
+	compat_validate_readablem(iov, count, sizeof(*iov));
+	hand = handle_lookup((unsigned int)fd);
+	TRY {
+		if (!IO_CANWRITE(hand.h_mode))
+			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
+		if unlikely(!count)
+			result = 0;
+		else {
+			dst.ab_entc = count;
+			dst.ab_entv = (struct aio_buffer_entry *)malloca(count *
+			                                                 sizeof(struct aio_buffer_entry));
+			TRY {
+				size_t i;
+				for (i = 0, num_bytes = 0; i < count; ++i) {
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
+					compat_validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
+					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
+					num_bytes += ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size;
+				}
+				dst.ab_head = dst.ab_entv[0];
+				dst.ab_last = dst.ab_entv[count - 1].ab_size;
+				result = handle_writev(hand,
+				                       &dst,
+				                       num_bytes);
+			} EXCEPT {
+				freea((void *)dst.ab_entv);
+				RETHROW();
+			}
+			freea((void *)dst.ab_entv);
+		}
+	} EXCEPT {
+		decref(hand);
+		RETHROW();
+	}
+	decref(hand);
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PWRITEV */
+
+
+
+
+
+/************************************************************************/
 /* preadv(), pwritev()                                                  */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_PREADV
