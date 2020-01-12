@@ -528,10 +528,10 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 	/* Resolve the symbol now. */
 #ifdef LAZY_TRACE
 	if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel->r_info), &result,
-	                                 NULL, &link_module))
+	                                    NULL, &link_module))
 #else /* LAZY_TRACE */
 	if unlikely(!DlModule_ElfFindSymbol(self, ELFW(R_SYM)(rel->r_info), &result,
-	                                 NULL, NULL))
+	                                    NULL, NULL))
 #endif /* !LAZY_TRACE */
 	{
 		ElfW(Sym) *sym = self->dm_elf.de_dynsym_tab + ELFW(R_SYM)(rel->r_info);

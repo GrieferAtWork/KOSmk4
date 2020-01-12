@@ -210,7 +210,7 @@ thrd_detach:(thrd_t thr) -> int {
 [same_impl][requires($has_function(pthread_join))]
 thrd_join:(thrd_t thr, int *res) -> int {
 	int error;
-#if __SIZEOF_POINTER__ == __SIZEOF_INT__
+#if __SIZEOF_POINTER__ != __SIZEOF_INT__
 	void *resptr;
 	error = pthread_join((pthread_t)thr, res ? &resptr : NULL);
 	if likely(!error) {
@@ -218,11 +218,11 @@ thrd_join:(thrd_t thr, int *res) -> int {
 			*res = (int)(unsigned int)(uintptr_t)resptr;
 		return 0; /* thrd_success */
 	}
-#else /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
+#else /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
 	error = pthread_join((pthread_t)thr, (void **)res);
 	if likely(!error)
 		return 0; /* thrd_success */
-#endif /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
+#endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
 	return 2; /* thrd_error */
 }
 

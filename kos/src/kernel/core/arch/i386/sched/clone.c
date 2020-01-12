@@ -133,6 +133,7 @@ NOTHROW(KCALL x86_get_random_userkern_address32)(void) {
 INTERN pid_t KCALL
 x86_task_clone(struct icpustate const *__restrict init_state,
                uintptr_t clone_flags,
+               USER UNCHECKED void *child_stack,
                USER UNCHECKED pid_t *parent_tidptr,
                USER UNCHECKED pid_t *child_tidptr,
                uintptr_t gsbase, uintptr_t fsbase)
@@ -264,6 +265,9 @@ again_lock_vm:
 		FORTASK(result, this_x86_user_gsbase) = gsbase;
 		FORTASK(result, this_x86_user_fsbase) = fsbase;
 #endif /* !__x86_64__ */
+		/* Assign the given stack pointer for the new thread. */
+		scpustate_setuserpsp(state, (uintptr_t)child_stack);
+
 
 		/* Reset iopl() for the child thread/process */
 		if ((clone_flags & CLONE_THREAD) ? !x86_iopl_keep_after_clone
@@ -280,7 +284,7 @@ again_lock_vm:
 			 * the child actually existing in a different VM when `CLONE_VM' isn't given. */
 			state = task_push_asynchronous_rpc(state,
 			                                   &task_srpc_set_child_tid,
-			                                   child_tidptr);
+			                                   child_tidptr, false);
 		}
 		result->t_sched.s_state = state;
 	}
@@ -366,6 +370,7 @@ task_clone64_rpc(void *UNUSED(arg),
 		pid_t child_tid;
 		child_tid = x86_task_clone(state,
 		                           sc_info->rsi_regs[0],                         /* clone_flags */
+		                           (USER UNCHECKED void *)sc_info->rsi_regs[1],  /* child_stack */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[2], /* parent_tidptr */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[3], /* child_tidptr */
 		                           get_user_gsbase(),
@@ -413,6 +418,7 @@ task_clone32_rpc(void *UNUSED(arg),
 		pid_t child_tid;
 		child_tid = x86_task_clone(state,
 		                           sc_info->rsi_regs[0],                         /* clone_flags */
+		                           (USER UNCHECKED void *)sc_info->rsi_regs[1],  /* child_stack */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[2], /* parent_tidptr */
 		                           (USER UNCHECKED pid_t *)sc_info->rsi_regs[4], /* child_tidptr */
 		                           sc_info->rsi_regs[0] & CLONE_SETTLS ? sc_info->rsi_regs[3]
@@ -464,6 +470,7 @@ task_fork_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
 		pid_t child_tid;
 		child_tid = x86_task_clone(state,
 		                           SIGCHLD,
+		                           (USER UNCHECKED void *)icpustate_getuserpsp(state),
 		                           NULL,
 		                           NULL,
 		                           get_user_gsbase(),

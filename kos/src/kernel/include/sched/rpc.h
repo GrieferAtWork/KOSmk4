@@ -343,7 +343,8 @@ task_rpc_exec_here_onexit(task_rpc_t func, void *arg DFL(__NULLPTR));
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
                                           task_rpc_t func,
-                                          void *arg DFL(__NULLPTR));
+                                          void *arg DFL(__NULLPTR),
+                                          bool disabled_preemption DFL(false));
 
 /* Same as `task_push_asynchronous_rpc()', but pass a copy
  * of the given buffer as value for `arg' to the given `func'. */
@@ -351,7 +352,8 @@ FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
                                             task_rpc_t func,
                                             void const *buf DFL(__NULLPTR),
-                                            size_t bufsize DFL(0));
+                                            size_t bufsize DFL(0),
+                                            bool disabled_preemption DFL(false));
 
 /* An arch-specific function used to re-direct the given task's user-space
  * return target to instead point back towards a kernel-space function which is then

@@ -25,6 +25,7 @@
 #include <parts/errno.h>
 
 #include <pthread.h>
+#include <syslog.h>
 
 #include "pthread.h"
 #include "threads.h"
@@ -144,7 +145,7 @@ NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
 /*[[[body:thrd_join]]]*/
 /*AUTO*/{
 	int error;
-#if __SIZEOF_POINTER__ == __SIZEOF_INT__
+#if __SIZEOF_POINTER__ != __SIZEOF_INT__
 	void *resptr;
 	error = libc_pthread_join((pthread_t)thr, res ? &resptr : NULL);
 	if likely(!error) {
@@ -152,11 +153,11 @@ NOTHROW_RPC(LIBCCALL libc_thrd_join)(thrd_t thr,
 			*res = (int)(unsigned int)(uintptr_t)resptr;
 		return 0; /* thrd_success */
 	}
-#else /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
+#else /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
 	error = libc_pthread_join((pthread_t)thr, (void **)res);
 	if likely(!error)
 		return 0; /* thrd_success */
-#endif /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
+#endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
 	return 2; /* thrd_error */
 }
 /*[[[end:thrd_join]]]*/

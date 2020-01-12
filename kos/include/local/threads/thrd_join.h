@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5ca8701 */
+/* HASH CRC-32:0x6a05e48a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr,
                                                        int *__res) {
 #line 212 "kos/src/libc/magic/threads.c"
 	int __error;
-#if __SIZEOF_POINTER__ == __SIZEOF_INT__
+#if __SIZEOF_POINTER__ != __SIZEOF_INT__
 	void *__resptr;
 	__error = __localdep_pthread_join((__pthread_t)__thr, __res ? &__resptr : __NULLPTR);
 	if __likely(!__error) {
@@ -54,11 +54,11 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr,
 			*__res = (int)(unsigned int)(__UINTPTR_TYPE__)__resptr;
 		return 0; /* thrd_success */
 	}
-#else /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
+#else /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
 	__error = __localdep_pthread_join((__pthread_t)__thr, (void **)__res);
 	if __likely(!__error)
 		return 0; /* thrd_success */
-#endif /* __SIZEOF_POINTER__ != __SIZEOF_INT__ */
+#endif /* __SIZEOF_POINTER__ == __SIZEOF_INT__ */
 	return 2; /* thrd_error */
 }
 __NAMESPACE_LOCAL_END
