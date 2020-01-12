@@ -178,20 +178,12 @@ File.stdout = File.open("kos/misc/scripts/routes-x86_64.txt", "w");
  * including all of the system call compatibility checks done by generate_syscalls.dee,
  * along to the way that system call tables are generated, along to system calls being
  * implemented, alongside possibly aliasing entires in various other tables) */
-dumpTables("bin/x86_64-kos-nOD/os/kernel.bin", {
+dumpTables("bin/x86_64-kos-OD/os/kernel.bin", {
 
 	/* 64-bit, high-level SYSVABI-compatible tables
 	 * In general, entires of this table are `sys_*' */
 	"x86_sysroute0_c",
 	"x86_sysroute1_c",
-
-	/* 32-bit, high-level SYSVABI-compatible tables, with double-wide
-	 * and < 32-bit arguments already zero-extended/merged
-	 * This table isn't actually used by the kernel and may be removed
-	 * in the furture, however for now it is here for the sake of completion
-	 * In general, entires of this table are `sys32_*' */
-	"x86_sysroute0_c32",
-	"x86_sysroute1_c32",
 
 	/* 32-bit, high-level SYSVABI-compatible tables, each on taking
 	 * a single argument `u64 *regv = %rdi' that points to a vector

@@ -1,6 +1,6 @@
 
 ### Conventions
-- In places where code should compile for both i386 and x86_64, registers should be addressed using `p` instead of the `e` in their names:  
+- In places where code should compile for both i386 and x86_64, registers should be addressed using `p` instead of the `e` or `r` in their names:  
 
   ```c
   #include <kos/kernel/cpu-state.h>
@@ -24,16 +24,16 @@
   <TAB>movl   $42, %eax
   ```
 
-	- Here, the first operand always starts 7 characters after the start of the mnemonic. Since this is somewhat difficult to remember, once can easily check if the correct alignment is used by code like this:  
+	- Here, the first operand always starts 7 characters after the start of the mnemonic. Since this is somewhat difficult to remember, one can easily check if the correct alignment is used by code like this:  
 
     ```asm
     <TAB>EXTERN(foo)
     <TAB>movl   $foo, %eax
     <TAB>INTERN(bar)
-    <TAB>movl   $bar, %eax
+    <TAB>call   bar
     ```
 
-	  You can easily tell that the operands always start after the left-parenthesis of properly indented `EXTERN()` or `INTERN()` annotations
+	  You can easily tell that the operands always start after the left-parenthesis of properly indented `EXTERN()` annotations
 
 ### Changes made to i386 ABI specifications in kernel-space
 

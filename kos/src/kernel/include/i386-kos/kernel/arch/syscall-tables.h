@@ -103,7 +103,6 @@ DECL_BEGIN
 #ifdef __x86_64__
 #define DEFINE_KERNEL_SYSCALL_ROUTES(id)                                                                           \
 	DATDEF void *const x86_sysroute##id##_c[__NR_syscall##id##_cnt];                /* sys_XXX */                  \
-	DATDEF void *const x86_sysroute##id##_c32[__NR32_syscall##id##_cnt];            /* sys32_XXX */                \
 	DATDEF void *const x86_sysroute##id##_asm64_syscall[__NR32_syscall##id##_cnt];  /* __x86_asm64_syscall_XXX */  \
 	DATDEF void *const x86_sysroute##id##_runc32[__NR32_syscall##id##_cnt];         /* __x86_asm32_sysrun32_XXX */ \
 	DATDEF void *const x86_sysroute##id##_asm32_int80[__NR32_syscall##id##_cnt];    /* __x86_asm32_int80_XXX */    \
