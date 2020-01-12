@@ -118,6 +118,9 @@ __SYSDECL_BEGIN
 /************************************************************************/
 
 
+/* TODO: Because of stuff like `mov $0, %ax; mov %ax, %fs;', `0' must also
+ *       be allowed as user-space segment index (except for %ss or %ss, which
+ *       aren't allowed to be loaded with a zero-selector) */
 #ifdef __x86_64__
 #define SEGMENT_IS_VALID_USERCODE(x)   ((x) == SEGMENT_USER_CODE64_RPL || (x) == SEGMENT_USER_CODE32_RPL)
 #define SEGMENT_IS_VALID_USERCODE32(x) ((x) == SEGMENT_USER_CODE32_RPL)

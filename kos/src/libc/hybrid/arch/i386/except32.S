@@ -503,6 +503,23 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
 	testl  $(EFLAGS_VM), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS(%esp)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
+	/* Another special case: If the interrupt state was re-directed, then we must
+	 *                       load it immediatly (and have `x86_rpc_user_redirection'
+	 *                       take care of propagating the exception), since it still
+	 *                       actually points into user-space.
+	 * This is necessrary because otherwise we'd not be restoring the original user-space
+	 * register that aren't also found in `struct kcpustate' (because the kernel-space
+	 * variant uses `.Ldo_unwind_esp', which work with that cpu state variant)
+	 * These registers are:
+	 *   - %fs: Would be 0 during `iret', since it used to contain SEGMENT_KERNEL_FSBASE,
+	 *          which cannot be accessed by ring#3 code, causing the CPU to clear it as a
+	 *          safely precaution.
+	 *   - %ds: Would become `SEGMENT_USER_DATA32_RPL'
+	 *   - %es: Would become `SEGMENT_USER_DATA32_RPL'
+	 * NOTE: %gs wouldn't be clobbered since it is never used by the kernel. */
+	cmpl   $(x86_rpc_user_redirection), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EIP(%esp)
+	EXTERN(cpu_apply_icpustate_esp)
+	je     cpu_apply_icpustate_esp
 	.cfi_endproc
 
 
@@ -536,12 +553,12 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_kernel_esp)
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 
 	/* Turn the icpustate into a kcpustate and set it as exception origin */
-#define COPYSTATE(reg, src, dst)                  \
-	movl   src(%esp), %eax;                       \
+#define COPYSTATE(reg, src, dst)                 \
+	movl   src(%esp), %eax;                      \
 	movl   %eax, %fs:this_exception_state + dst; \
-.if src != dst;                                   \
-	.cfi_rel_offset reg, dst;                     \
-	movl   %eax, dst(%esp);                       \
+.if src != dst;                                  \
+	.cfi_rel_offset reg, dst;                    \
+	movl   %eax, dst(%esp);                      \
 .endif
 	COPYSTATE(%eip, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EIP, OFFSET_KCPUSTATE_EIP)
 	COPYSTATE(%eflags, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EFLAGS, OFFSET_KCPUSTATE_EFLAGS)

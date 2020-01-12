@@ -535,6 +535,20 @@ PUBLIC_FUNCTION(x86_userexcept_unwind_interrupt_rsp)
 	EXTERN(x86_serve_user_rpc_and_propagate_exceptions)
 	jnz    x86_serve_user_rpc_and_propagate_exceptions
 
+#if 0 /* Not required, since icpustate64 (excluding the iret tail portion) doesn't
+       * contain any registers that can't also be found in kcpustate64 */
+	/* Another special case: If the interrupt state was re-directed, then we must
+	 *                       load it immediatly (and have `x86_rpc_user_redirection'
+	 *                       take care of propagating the exception), since it still
+	 *                       actually points into user-space.
+	 * This is necessrary because otherwise we'd not be restoring the original user-space
+	 * register that aren't also found in `struct kcpustate' (because the kernel-space
+	 * variant uses `.Ldo_unwind_rsp', which work with that cpu state variant) */
+	cmpq   $(x86_rpc_user_redirection), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_RIP(%rsp)
+	EXTERN(cpu_apply_icpustate_rsp)
+	je     cpu_apply_icpustate_rsp
+#endif
+
 	/* The interrupt points into kernel-space (or possibly towards
 	 * `x86_rpc_user_redirection', which is also kernel-space). */
 	.cfi_same_value %cs

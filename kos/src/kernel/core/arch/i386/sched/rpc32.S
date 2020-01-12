@@ -220,7 +220,7 @@ INTERN_FUNCTION(x86_serve_user_rpc_and_propagate_exceptions)
 
 	/* Check if the only reason we're still directed to kernel-space
 	 * was another IRET redirection to `x86_rpc_user_redirection' */
-	cmpl   $x86_rpc_user_redirection, OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EIP(%esp)
+	cmpl   $(x86_rpc_user_redirection), OFFSET_ICPUSTATE_IRREGS + OFFSET_IRREGS_EIP(%esp)
 	/* Load the saved CPU state, which will bring us back up to the
 	 * start of `x86_rpc_user_redirection'.
 	 * From there, we automatically restore the actual user-space
