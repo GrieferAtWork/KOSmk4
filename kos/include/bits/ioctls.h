@@ -41,8 +41,6 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-__SYSDECL_BEGIN
-
 /* Routing table calls. */
 #define SIOCADDRT      0x890b /* add routing table entry. */
 #define SIOCDELRT      0x890c /* delete routing table entry. */
@@ -117,6 +115,5 @@ __SYSDECL_BEGIN
 /* These 16 ioctl calls are protocol private */
 #define SIOCPROTOPRIVATE 0x89e0 /* to 89EF */
 
- __SYSDECL_END
 
 #endif /* !_BITS_IOCTLS_H */

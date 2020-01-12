@@ -62,9 +62,9 @@ struct semid_ds {
 	struct ipc_perm     sem_perm; /* operation permission struct */
 	__TM_TYPE(time)     sem_otime;       /* last semop() time */
 #if __TM_SIZEOF(TIME) > __SIZEOF_SYSCALL_LONG_T__
-#if __TM_SIZEOF(TIME) != __SIZEOF_SYSCALL_LONG_T__*2
+#if __TM_SIZEOF(TIME) != __SIZEOF_SYSCALL_LONG_T__ * 2
 #error "Unsupported configuration"
-#endif
+#endif /* __TM_SIZEOF(TIME) != __SIZEOF_SYSCALL_LONG_T__ * 2 */
 #else /* __TM_SIZEOF(TIME) > __SIZEOF_SYSCALL_LONG_T__ */
 	__syscall_ulong_t __glibc_reserved1;
 #endif /* __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__ */

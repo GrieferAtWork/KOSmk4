@@ -63,11 +63,9 @@ typedef struct __ATTR_PACKED __mbstate {
 #define __MBSTATE_TYPE_UTF16_LO    0x40000000 /* expect the low-surrogate value of a 2-uint16_t utf-16 sequence. `RESULT_CHAR = ((WORD & 0x000003ff) << 10) + 0x10000 + (SECOND_U16 - 0xdc00);' */
 #define __MBSTATE_TYPE_WR_UTF16_LO 0xc0000000 /* Write the low-surrogate value of a 2-uint16_t utf-16 sequence. `OUT_CHAR = 0xdc00 + (WORD & 0x000003ff)' */
 
-
 #define __MBSTATE_NBIT_MASK   0xf8000000
 #define __MBSTATE_NBIT_SHFT   27
 #define __MBSTATE_DATA_MASK   0x07ffffff
-
 #endif /* !____mbstate_t_defined */
 
 #ifdef __USE_KOS

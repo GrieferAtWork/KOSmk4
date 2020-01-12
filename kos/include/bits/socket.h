@@ -38,11 +38,16 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <__stdinc.h>
-#include <sys/types.h>
-#include <bits/types.h>
-#include <bits/socket_type.h>
-#include <bits/sockaddr.h>
+#include <features.h>
+
 #include <asm/socket.h>
+#include <bits/sockaddr.h>
+#include <bits/socket_type.h>
+#include <bits/types.h>
+
+#ifdef __USE_GLIBC
+#include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
@@ -483,6 +488,7 @@ enum {
 #ifdef __CC__
 #ifndef __msghdr_defined
 #define __msghdr_defined 1
+struct iovec;
 struct msghdr {
 	void          *msg_name;       /* [TYPE(struct sockaddr *)] Address to send to/receive from. */
 	socklen_t      msg_namelen;    /* Length of address data. */

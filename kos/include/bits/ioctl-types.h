@@ -22,7 +22,9 @@
 /* DISCLAIMER: _STRONGLY_ Based on '/usr/include/i386-linux-gnu/bits/ioctl-types.h' */
 
 #include <__stdinc.h>
+
 #include <hybrid/typecore.h>
+
 #include <asm/ioctls.h>
 
 /* Structure types for pre-termios terminal ioctls.  Linux version.

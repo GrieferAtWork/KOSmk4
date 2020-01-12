@@ -30,14 +30,14 @@
 #define __SIZEOF_IOVEC      (__SIZEOF_POINTER__ + __SIZEOF_SIZE_T__)
 
 #ifdef __CC__
-__SYSDECL_BEGIN
+__DECL_BEGIN
 
 struct iovec {
 	void         *iov_base; /* Pointer to data. */
 	__SIZE_TYPE__ iov_len;  /* Length of data. */
 };
 
-__SYSDECL_END
+__DECL_END
 #endif /* __CC__ */
 
 #endif /* !__iovec_defined */

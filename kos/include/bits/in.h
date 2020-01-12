@@ -20,13 +20,18 @@
 #define _BITS_IN_H 1
 
 #include <__stdinc.h>
+#include <hybrid/typecore.h>
+#include <features.h>
+
+#ifdef __USE_GLIBC
 #include <stdint.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
 /* Internet address. */
 #ifdef __CC__
-typedef uint32_t in_addr_t;
+typedef __UINT32_TYPE__ in_addr_t;
 struct in_addr {
 	in_addr_t s_addr;
 };
@@ -298,16 +303,16 @@ struct ip_opts {
 struct ip_mreqn {
 	struct in_addr imr_multiaddr; /* IP multicast address of group */
 	struct in_addr imr_address;   /* local IP address of interface */
-	int            imr_ifindex;   /* Interface index */
+	__INT32_TYPE__ imr_ifindex;   /* Interface index */
 };
 
 /* Structure used for IP_PKTINFO. */
 struct in_pktinfo {
-	int            ipi_ifindex;  /* Interface index. */
+	__INT32_TYPE__ ipi_ifindex;  /* Interface index. */
 	struct in_addr ipi_spec_dst; /* Routing destination address. */
 	struct in_addr ipi_addr;     /* Header destination address. */
 };
-#endif
+#endif /* __USE_MISC */
 #endif /* __CC__ */
 
 /* Options for use with `getsockopt' and `setsockopt' at the IPv6 level.
@@ -484,7 +489,7 @@ struct in_pktinfo {
 #endif /* !SOL_IPV6 */
 #ifndef SOL_ICMPV6
 #define SOL_ICMPV6          58
-#endif /* ! */
+#endif /* !SOL_ICMPV6 */
 
 /* Routing header options for IPv6. */
 #ifndef IPV6_RTHDR_LOOSE
