@@ -142,7 +142,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     "cld\n\t"
 #endif /* __KERNEL__ */
 				                     "rep; movsq\n\t"
-				                     ".if (%a8 & 3)\n\t"
+				                     ".if (%a8 & 4)\n\t"
 				                     "movsl\n\t"
 				                     ".endif\n\t"
 				                     ".if (%a8 & 2)\n\t"
@@ -151,11 +151,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     ".if (%a8 & 1)\n\t"
 				                     "movsb\n\t"
 				                     ".endif"
-				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst))
+				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst))
 				                     , "=&c" (__386_ecx)
 				                     , "=&D" (__386_edi)
 				                     , "=&S" (__386_esi)
-				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))
+				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__n_bytes >> 3)
 				                     , "2" (__386_edi)
 				                     , "3" (__386_esi)
@@ -178,7 +178,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     ".if (%a6 >= 8)\n\t"
 				                     "movsq\n\t"
 				                     ".endif\n\t"
-				                     ".if (%a6 & 3)\n\t"
+				                     ".if (%a6 & 4)\n\t"
 				                     "movsl\n\t"
 				                     ".endif\n\t"
 				                     ".if (%a6 & 2)\n\t"
@@ -187,10 +187,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     ".if (%a6 & 1)\n\t"
 				                     "movsb\n\t"
 				                     ".endif"
-				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst))
+				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst))
 				                     , "=&D" (__386_edi)
 				                     , "=&S" (__386_esi)
-				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))
+				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__386_edi)
 				                     , "2" (__386_esi)
 				                     , "i" (__n_bytes)
@@ -210,11 +210,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     ".if (%a8 & 1)\n\t"
 				                     "movsb\n\t"
 				                     ".endif"
-				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst))
+				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst))
 				                     , "=&c" (__386_ecx)
 				                     , "=&D" (__386_edi)
 				                     , "=&S" (__386_esi)
-				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))
+				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__n_bytes >> 2)
 				                     , "2" (__386_edi)
 				                     , "3" (__386_esi)
@@ -243,10 +243,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     ".if (%a6 & 1)\n\t"
 				                     "movsb\n\t"
 				                     ".endif"
-				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst))
+				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst))
 				                     , "=&D" (__386_edi)
 				                     , "=&S" (__386_esi)
-				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))
+				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__386_edi)
 				                     , "2" (__386_esi)
 				                     , "i" (__n_bytes)
@@ -259,7 +259,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 		/* XXX: Implement using intrinsic functions? */
 #endif /* !__COMPILER_HAVE_GCC_ASM */
 	}
-	return __libc_slow_memcpy(__dst,__src,__n_bytes);
+	return __libc_slow_memcpy(__dst, __src, __n_bytes);
 }
 
 #define __fast_mempcpy_defined 1
@@ -326,7 +326,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     "cld\n\t"
 #endif /* __KERNEL__ */
 				                     "rep; movsq\n\t"
-				                     ".if (%a8 & 3)\n\t"
+				                     ".if (%a8 & 4)\n\t"
 				                     "movsl\n\t"
 				                     ".endif\n\t"
 				                     ".if (%a8 & 2)\n\t"
@@ -335,11 +335,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     ".if (%a8 & 1)\n\t"
 				                     "movsb\n\t"
 				                     ".endif"
-				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst))
+				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst))
 				                     , "=&c" (__386_ecx)
 				                     , "=&D" (__386_edi)
 				                     , "=&S" (__386_esi)
-				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))
+				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__n_bytes >> 3)
 				                     , "2" (__386_edi)
 				                     , "3" (__386_esi)
@@ -362,7 +362,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     ".if (%a6 >= 8)\n\t"
 				                     "movsq\n\t"
 				                     ".endif\n\t"
-				                     ".if (%a6 & 3)\n\t"
+				                     ".if (%a6 & 4)\n\t"
 				                     "movsl\n\t"
 				                     ".endif\n\t"
 				                     ".if (%a6 & 2)\n\t"
@@ -371,10 +371,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     ".if (%a6 & 1)\n\t"
 				                     "movsb\n\t"
 				                     ".endif"
-				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst))
+				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst))
 				                     , "=&D" (__386_edi)
 				                     , "=&S" (__386_esi)
-				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))
+				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__386_edi)
 				                     , "2" (__386_esi)
 				                     , "i" (__n_bytes)
@@ -394,11 +394,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     ".if (%a8 & 1)\n\t"
 				                     "movsb\n\t"
 				                     ".endif"
-				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst))
+				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst))
 				                     , "=&c" (__386_ecx)
 				                     , "=&D" (__386_edi)
 				                     , "=&S" (__386_esi)
-				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))
+				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__n_bytes >> 2)
 				                     , "2" (__386_edi)
 				                     , "3" (__386_esi)
@@ -427,10 +427,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     ".if (%a6 & 1)\n\t"
 				                     "movsb\n\t"
 				                     ".endif"
-				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__dst))
+				                     : "=m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __dst))
 				                     , "=&D" (__386_edi)
 				                     , "=&S" (__386_esi)
-				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__,__n_bytes,__src))
+				                     : "m" (__COMPILER_ASM_BUFFER(__UINT8_TYPE__, __n_bytes, __src))
 				                     , "1" (__386_edi)
 				                     , "2" (__386_esi)
 				                     , "i" (__n_bytes)
@@ -444,7 +444,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 		/* XXX: Implement using intrinsic functions? */
 #endif /* !__COMPILER_HAVE_GCC_ASM */
 	}
-	return __libc_slow_mempcpy(__dst,__src,__n_bytes);
+	return __libc_slow_mempcpy(__dst, __src, __n_bytes);
 }
 
 /* TODO: memcpy[w/l/q] */
