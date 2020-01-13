@@ -207,3 +207,7 @@ BEGIN_ANONYMOUS GROUP("libs.libstdc++") { MCOPY };
 	options[OPT_MCOPY_OUTPUT] = DISK_LIBPATH + "libstdc++.so.6";
 	options[OPT_MCOPY_INPUT]  = "/bin/" + TARGET_ARCH + "-kos-common" + DISK_LIBPATH + "libstdc++.so.6";
 END
+
+#if __has_include("ammend.sources")
+#include "ammend.sources"
+#endif
