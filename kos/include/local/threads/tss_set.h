@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32a40571 */
+/* HASH CRC-32:0xe1d851bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tss_set) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tss_set))(__tss_t __tss_id,
                                                      void *__val) {
-#line 500 "kos/src/libc/magic/threads.c"
+#line 529 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_setspecific((__pthread_key_t)__tss_id, __val);
 	if __likely(!__error)

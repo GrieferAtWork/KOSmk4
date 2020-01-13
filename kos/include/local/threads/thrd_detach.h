@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3402a83d */
+/* HASH CRC-32:0x17fa3e30 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_detach()' */
 __LOCAL_LIBC(thrd_detach) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_detach))(__thrd_t __thr) {
-#line 198 "kos/src/libc/magic/threads.c"
+#line 227 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_detach((__pthread_t)__thr);
 	if __likely(!__error)

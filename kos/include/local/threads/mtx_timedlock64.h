@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe741b38c */
+/* HASH CRC-32:0xb2bb065d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mtx_timedlock64) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_timedlock64))(__mtx_t *__restrict __mutex,
                                                              struct __timespec64 const *__restrict __time_point) {
-#line 309 "kos/src/libc/magic/threads.c"
+#line 338 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_mutex_timedlock64((__pthread_mutex_t *)__mutex, __time_point);
 	if __likely(!__error)

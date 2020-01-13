@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x176f95c7 */
+/* HASH CRC-32:0xac34d7cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,17 @@ DECL_BEGIN
 /* Create a new thread executing the function FUNC.  Arguments for FUNC
  * are passed through ARG. If successful, THR is set to new thread identifier */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_thrd_create)(thrd_t *thr, thrd_start_t func, void *arg);
-/* Block current thread execution for at least the time pointed by TIME_POINT.
+/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
- * @return:     0: The given `time_point' has passed
+ * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_thrd_sleep)(struct timespec const *time_point, struct timespec *remaining);
-/* Block current thread execution for at least the time pointed by TIME_POINT.
+/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
- * @return:     0: The given `time_point' has passed
+ * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_thrd_sleep64)(struct timespec64 const *time_point, struct timespec64 *remaining);

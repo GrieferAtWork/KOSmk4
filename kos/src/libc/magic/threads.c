@@ -121,18 +121,20 @@ thrd_equal:(thrd_t lhs, thrd_t rhs) -> int = pthread_equal;
 [decl_include(<bits/threads.h>)]
 thrd_current:() -> thrd_t = pthread_self;
 
-@@Block current thread execution for at least the time pointed by TIME_POINT.
+@@Block current thread execution for at least the (relative) time pointed by TIME_POINT.
 @@The current thread may resume if receives a signal. In that case, if REMAINING
 @@is not NULL, the remaining time is stored in the object pointed by it
-@@@return:     0: The given `time_point' has passed
+@@@return:     0: The (relative) time specified by `time_point' has elapsed
 @@@return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
 @@@return: <= -2: Some other error occurred
 [if(defined(__USE_TIME_BITS64)), preferred_alias(thrd_sleep64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(thrd_sleep)]
-[requires(defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64))]
-[decl_include(<bits/timespec.h>)][cp]
-thrd_sleep:([nonnull] struct timespec const *time_point, struct timespec *remaining) -> int {
-#ifdef __CRT_HAVE_thrd_sleep
+[requires($has_function(thrd_sleep32) || $has_function(crt_thrd_sleep64) || $has_function(nanosleep))]
+[decl_include(<bits/timespec.h>)]
+[dependency_include(<parts/errno.h>)][cp]
+thrd_sleep:([nonnull] struct timespec const *time_point,
+            [nullable] struct timespec *remaining) -> int {
+@@if_has_function(thrd_sleep32)@@
 	int result;
 	struct timespec32 tp32, rem32;
 	tp32.@tv_sec@  = (time32_t)time_point->@tv_sec@;
@@ -143,30 +145,56 @@ thrd_sleep:([nonnull] struct timespec const *time_point, struct timespec *remain
 		remaining->@tv_nsec@ = rem32.@tv_nsec@;
 	}
 	return result;
-#else /* __CRT_HAVE_thrd_sleep */
+@@elif_has_function(crt_thrd_sleep64)@@
 	int result;
 	struct timespec64 tp64, rem64;
 	tp64.@tv_sec@  = (time64_t)time_point->@tv_sec@;
 	tp64.@tv_nsec@ = time_point->@tv_nsec@;
-	result = thrd_sleep64(&tp64, remaining ? &rem64 : NULL);
+	result = crt_thrd_sleep64(&tp64, remaining ? &rem64 : NULL);
 	if (result == -1 && remaining) {
 		remaining->@tv_sec@ = (time32_t)rem64.@tv_sec@;
 		remaining->@tv_nsec@ = rem64.@tv_nsec@;
 	}
 	return result;
-#endif /* !__CRT_HAVE_thrd_sleep */
+@@else_has_function(crt_thrd_sleep64)@@
+	int error;
+	error = nanosleep(time_point, remaining);
+	if likely(error == 0)
+		return 0;
+#if defined(__errno) && defined(__EINTR)
+	if (@__errno@ == @__EINTR@)
+		return -1; /* thrd_nomem */
+#endif /* __errno && __EINTR */
+	return -2;
+@@endif_has_function(crt_thrd_sleep64)@@
 }
 
 %#ifdef __USE_TIME64
 [ignore][doc_alias(thrd_sleep)]
 [decl_include(<bits/timespec.h>)][cp]
 thrd_sleep32:([nonnull] struct $timespec32 const *time_point,
-              struct $timespec32 *remaining) -> int = thrd_sleep?;
+              [nullable] struct $timespec32 *remaining) -> int = thrd_sleep?;
+[ignore][doc_alias(thrd_sleep)]
+[decl_include(<bits/timespec.h>)][cp]
+crt_thrd_sleep64:([nonnull] struct timespec64 const *time_point,
+                  [nullable] struct timespec64 *remaining) -> int = thrd_sleep64?;
 
-[doc_alias(thrd_sleep)][requires($has_function(thrd_sleep32))]
+[doc_alias(thrd_sleep)]
+[requires($has_function(thrd_sleep32) || $has_function(nanosleep64))]
 [decl_include(<bits/timespec.h>)][cp][time64_variant_of(thrd_sleep)]
 thrd_sleep64:([nonnull] struct timespec64 const *time_point,
-              struct timespec64 *remaining) -> int {
+              [nullable] struct timespec64 *remaining) -> int {
+@@if_has_function(nanosleep64)@@
+	int error;
+	error = nanosleep64(time_point, remaining);
+	if likely(error == 0)
+		return 0;
+#if defined(__errno) && defined(__EINTR)
+	if (@__errno@ == @__EINTR@)
+		return -1; /* thrd_nomem */
+#endif /* __errno && __EINTR */
+	return -2;
+@@else_has_function(nanosleep64)@@
 	int result;
 	struct timespec32 tp32;
 	struct timespec32 rem32;
@@ -178,6 +206,7 @@ thrd_sleep64:([nonnull] struct timespec64 const *time_point,
 		remaining->@tv_nsec@ = rem32.@tv_nsec@;
 	}
 	return result;
+@@endif_has_function(nanosleep64)@@
 }
 %#endif /* __USE_TIME64 */
 

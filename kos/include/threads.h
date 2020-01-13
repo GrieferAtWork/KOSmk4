@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x327b995a */
+/* HASH CRC-32:0xd19f7ceb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -153,54 +153,54 @@ __CDECLARE(,thrd_t,__NOTHROW_NCX,thrd_current,(void),())
 __CREDIRECT(,thrd_t,__NOTHROW_NCX,thrd_current,(void),pthread_self,())
 #endif /* thrd_current... */
 #if defined(__CRT_HAVE_thrd_sleep64) && defined(__USE_TIME_BITS64)
-/* Block current thread execution for at least the time pointed by TIME_POINT.
+/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
- * @return:     0: The given `time_point' has passed
+ * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec const *__time_point, struct timespec *__remaining),thrd_sleep64,(__time_point,__remaining))
 #elif defined(__CRT_HAVE_thrd_sleep) && !defined(__USE_TIME_BITS64)
-/* Block current thread execution for at least the time pointed by TIME_POINT.
+/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
- * @return:     0: The given `time_point' has passed
+ * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep,(struct timespec const *__time_point, struct timespec *__remaining),(__time_point,__remaining))
-#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64)
+#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_thrd_sleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE_nanosleep64)
 #include <local/threads/thrd_sleep.h>
-/* Block current thread execution for at least the time pointed by TIME_POINT.
+/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
- * @return:     0: The given `time_point' has passed
+ * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL thrd_sleep)(struct timespec const *__time_point, struct timespec *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_sleep))(__time_point, __remaining); })
 #endif /* thrd_sleep... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_thrd_sleep64
-/* Block current thread execution for at least the time pointed by TIME_POINT.
+/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
- * @return:     0: The given `time_point' has passed
+ * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec64 const *__time_point, struct timespec64 *__remaining),(__time_point,__remaining))
 #elif defined(__CRT_HAVE_thrd_sleep) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Block current thread execution for at least the time pointed by TIME_POINT.
+/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
- * @return:     0: The given `time_point' has passed
+ * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,thrd_sleep64,(struct timespec64 const *__time_point, struct timespec64 *__remaining),thrd_sleep,(__time_point,__remaining))
-#elif defined(__CRT_HAVE_thrd_sleep)
+#elif defined(__CRT_HAVE_thrd_sleep) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE_nanosleep64)
 #include <local/threads/thrd_sleep64.h>
-/* Block current thread execution for at least the time pointed by TIME_POINT.
+/* Block current thread execution for at least the (relative) time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
- * @return:     0: The given `time_point' has passed
+ * @return:     0: The (relative) time specified by `time_point' has elapsed
  * @return:    -1: A signal was received while waiting, and `remaining' was filled in (if given)
  * @return: <= -2: Some other error occurred */
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep64, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL thrd_sleep64)(struct timespec64 const *__time_point, struct timespec64 *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_sleep64))(__time_point, __remaining); })

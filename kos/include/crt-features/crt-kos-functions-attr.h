@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac957d53 */
+/* HASH CRC-32:0x86851328 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3377,6 +3377,7 @@
 #define __CRT_ATTR_NOTHROW_RPC_crt_futime64 1
 #define __CRT_ATTR_NOTHROW_RPC_crt_gai_suspend 1
 #define __CRT_ATTR_NOTHROW_RPC_crt_locking 1
+#define __CRT_ATTR_NOTHROW_RPC_crt_thrd_sleep64 1
 #define __CRT_ATTR_NOTHROW_RPC_crt_utime32 1
 #define __CRT_ATTR_NOTHROW_RPC_crt_utime64 1
 #define __CRT_ATTR_NOTHROW_RPC_crt_wutime32 1

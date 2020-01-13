@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf96a22f */
+/* HASH CRC-32:0x631e594a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mtx_init) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mtx_init))(__mtx_t *__restrict __mutex,
                                                       int __type) {
-#line 250 "kos/src/libc/magic/threads.c"
+#line 279 "kos/src/libc/magic/threads.c"
 	int __error;
 	if (__type == 0 /*mtx_plain*/) {
 		__error = __localdep_pthread_mutex_init((__pthread_mutex_t *)__mutex, __NULLPTR);

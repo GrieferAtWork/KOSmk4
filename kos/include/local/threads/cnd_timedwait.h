@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8c41807 */
+/* HASH CRC-32:0x233ec6c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __LOCAL_LIBC(cnd_timedwait) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_timedwait))(__cnd_t *__restrict __cond,
                                                            __mtx_t *__restrict __mutex,
                                                            struct timespec const *__restrict __time_point) {
-#line 432 "kos/src/libc/magic/threads.c"
+#line 461 "kos/src/libc/magic/threads.c"
 	int __error;
 	__error = __localdep_pthread_cond_timedwait((__pthread_cond_t *)__cond,
 	                               (__pthread_mutex_t *)__mutex,

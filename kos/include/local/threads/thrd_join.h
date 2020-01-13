@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a05e48a */
+/* HASH CRC-32:0x89b87097 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(thrd_join) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thrd_join))(__thrd_t __thr,
                                                        int *__res) {
-#line 212 "kos/src/libc/magic/threads.c"
+#line 241 "kos/src/libc/magic/threads.c"
 	int __error;
 #if __SIZEOF_POINTER__ != __SIZEOF_INT__
 	void *__resptr;
