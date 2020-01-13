@@ -179,6 +179,8 @@ __NOTHROW_NCX(gpregs64_to_gpregsnsp64)(struct gpregs64 const *__restrict __self,
 #endif /* !__KERNEL__ || !__x86_64__ */
 #define irregs64_is32bit(self)           __KOS64_IS_CS32BIT(irregs64_getcs(self))
 #define irregs64_is64bit(self)           __KOS64_IS_CS64BIT(irregs64_getcs(self))
+#define irregs64_getpreemption(self)     (irregs64_getrflags(self) & 0x200)
+#define irregs64_setpreemption(self, turn_on) irregs64_mskrflags(self, ~0x200, (turn_on) ? 0x200 : 0)
 #define irregs64_getuserrsp              irregs64_getrsp
 #define irregs64_setuserrsp              irregs64_setrsp
 #define irregs64_getuserss               irregs64_getss
@@ -445,6 +447,8 @@ __NOTHROW_NCX(kcpustate64_to_icpustate64_p)(struct kcpustate64 const *__restrict
 #define icpustate64_iskernel(self)               irregs64_iskernel(&(self)->ics_irregs)
 #define icpustate64_is32bit(self)                irregs64_is32bit(&(self)->ics_irregs)
 #define icpustate64_is64bit(self)                irregs64_is64bit(&(self)->ics_irregs)
+#define icpustate64_getpreemption(self)          irregs64_getpreemption(&(self)->ics_irregs)
+#define icpustate64_setpreemption(self, turn_on) irregs64_setpreemption(&(self)->ics_irregs, turn_on)
 #define icpustate64_getrip(self)                 irregs64_getrip(&(self)->ics_irregs)
 #define icpustate64_setrip(self, value)          irregs64_setrip(&(self)->ics_irregs, value)
 #define icpustate64_getrsp(self)                 irregs64_getrsp(&(self)->ics_irregs)
@@ -587,6 +591,8 @@ __NOTHROW_NCX(icpustate64_to_scpustate64_p)(struct icpustate64 const *__restrict
 #define scpustate64_iskernel(self)               (!((self)->scs_irregs.ir_cs16 & 3))
 #define scpustate64_is32bit(self)                __KOS64_IS_CS32BIT(scpustate64_getcs(self))
 #define scpustate64_is64bit(self)                __KOS64_IS_CS64BIT(scpustate64_getcs(self))
+#define scpustate64_getpreemption(self)          ((self)->scs_irregs.ir_rflags & 0x200)
+#define scpustate64_setpreemption(self, turn_on) (turn_on ? (void)((self)->scs_irregs.ir_rflags |= 0x200) : (void)((self)->scs_irregs.ir_rflags &= ~0x200))
 #define scpustate64_getrip(self)                 ((__u64)(self)->scs_irregs.ir_rip)
 #define scpustate64_setrip(self, value)          ((self)->scs_irregs.ir_rip = (value))
 #define scpustate64_getds(self)                  ((self)->scs_sgregs.sg_ds16)
@@ -994,6 +1000,8 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define irregs_is64bit(self)                irregs64_is64bit(self)
 #define irregs_isnative(self)               irregs64_is64bit(self)
 #define irregs_iscompat(self)               irregs64_is32bit(self)
+#define irregs_getpreemption                irregs64_getpreemption
+#define irregs_setpreemption                irregs64_setpreemption
 #define irregs_getpc                        irregs64_getrip
 #define irregs_setpc                        irregs64_setrip
 #define irregs_getcs                        irregs64_getcs
@@ -1079,6 +1087,8 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define icpustate_is64bit                   icpustate64_is64bit
 #define icpustate_isnative                  icpustate64_is64bit
 #define icpustate_iscompat                  icpustate64_is32bit
+#define icpustate_getpreemption             icpustate64_getpreemption
+#define icpustate_setpreemption             icpustate64_setpreemption
 #define icpustate_getpc                     icpustate64_getrip
 #define icpustate_setpc                     icpustate64_setrip
 #define icpustate_getsp                     icpustate64_getrsp
@@ -1161,6 +1171,8 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define scpustate_is64bit                   scpustate64_is64bit
 #define scpustate_isnative                  scpustate64_is64bit
 #define scpustate_iscompat                  scpustate64_is32bit
+#define scpustate_getpreemption             scpustate64_getpreemption
+#define scpustate_setpreemption             scpustate64_setpreemption
 #define scpustate_getpc                     scpustate64_getrip
 #define scpustate_setpc                     scpustate64_setrip
 #define scpustate_getsp                     scpustate64_getrsp

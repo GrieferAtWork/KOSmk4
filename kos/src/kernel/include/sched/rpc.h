@@ -87,6 +87,9 @@ struct sig;
 struct rpc_syscall_info;
 
 /* Prototype for RPC callbacks being executed in remote threads.
+ * NOTE: When executing an RPC callback, the preemption enabled/disable
+ *       state is _NOT_ changed prior to execution! As such, preemption
+ *       may or may not be enabled when a callback is invoked.
  * WARNING: This function is required to always return normally, or by throwing
  *          an exception. - It is not allowed to return by any other means, or
  *          not return at all (don't call `task_exit()'. - throw E_EXIT_THREAD).
@@ -343,8 +346,7 @@ task_rpc_exec_here_onexit(task_rpc_t func, void *arg DFL(__NULLPTR));
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
                                           task_rpc_t func,
-                                          void *arg DFL(__NULLPTR),
-                                          bool disabled_preemption DFL(false));
+                                          void *arg DFL(__NULLPTR));
 
 /* Same as `task_push_asynchronous_rpc()', but pass a copy
  * of the given buffer as value for `arg' to the given `func'. */
@@ -352,8 +354,7 @@ FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
                                             task_rpc_t func,
                                             void const *buf DFL(__NULLPTR),
-                                            size_t bufsize DFL(0),
-                                            bool disabled_preemption DFL(false));
+                                            size_t bufsize DFL(0));
 
 /* An arch-specific function used to re-direct the given task's user-space
  * return target to instead point back towards a kernel-space function which is then

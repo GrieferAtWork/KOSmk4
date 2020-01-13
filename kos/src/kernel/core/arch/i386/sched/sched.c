@@ -191,8 +191,7 @@ INTDEF void ASMCALL x86_rpc_kernel_redirection_handler(void);
  * old state points into user-space, or `TASK_RPC_REASON_ASYNC' if not. */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
-                                          task_rpc_t func, void *arg,
-                                          bool disabled_preemption) {
+                                          task_rpc_t func, void *arg) {
 	struct icpustate *rpc_state;   /* The state used/returned by `func()' */
 	struct scpustate *sched_state; /* The new scheduler state that we will return (and that will invoke `x86_rpc_kernel_redirection') */
 	unsigned int reason;
@@ -210,8 +209,6 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 	sched_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
 	sched_state->scs_irregs.ir_rsp    = (u64)rpc_state;
 	sched_state->scs_irregs.ir_rflags = rpc_state->ics_irregs.ir_rflags;
-	if (disabled_preemption)
-		sched_state->scs_irregs.ir_rflags &= ~EFLAGS_IF;
 	sched_state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
 	sched_state->scs_irregs.ir_rip    = (u64)(void *)&x86_rpc_kernel_redirection;
 	sched_state->scs_gpregs.gp_rax    = (u64)(void *)func;
@@ -229,8 +226,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
                                             task_rpc_t func,
-                                            void const *buf, size_t bufsize,
-                                            bool disabled_preemption) {
+                                            void const *buf, size_t bufsize) {
 	struct icpustate *rpc_state;   /* The state used/returned by `func()' */
 	struct scpustate *sched_state; /* The new scheduler state that we will return (and that will invoke `x86_rpc_kernel_redirection') */
 	unsigned int reason;
@@ -251,8 +247,6 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	sched_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
 	sched_state->scs_irregs.ir_rsp    = (u64)rpc_state;
 	sched_state->scs_irregs.ir_rflags = rpc_state->ics_irregs.ir_rflags;
-	if (disabled_preemption)
-		sched_state->scs_irregs.ir_rflags &= ~EFLAGS_IF;
 	sched_state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
 	sched_state->scs_irregs.ir_rip    = (u64)(void *)&x86_rpc_kernel_redirection;
 	sched_state->scs_gpregs.gp_rax    = (u64)(void *)func;
@@ -342,8 +336,7 @@ INTDEF void ASMCALL x86_rpc_kernel_redirection_handler(void);
  * old state points into user-space, or `TASK_RPC_REASON_ASYNC' if not. */
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
-                                          task_rpc_t func, void *arg,
-                                          bool disabled_preemption) {
+                                          task_rpc_t func, void *arg) {
 	struct ATTR_PACKED buffer {
 		struct gpregs b_gpregs; /* General purpose registers. */
 		u32           b_gs;     /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
@@ -378,8 +371,6 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 	result->scs_irregs.ir_eip    = (uintptr_t)&x86_rpc_kernel_redirection;
 	result->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
 	result->scs_irregs.ir_eflags = istate->ics_irregs.ir_eflags;
-	if (disabled_preemption)
-		result->scs_irregs.ir_eflags &= ~EFLAGS_IF;
 #undef SUBSP
 	return result;
 }
@@ -390,8 +381,7 @@ NOTHROW(FCALL task_push_asynchronous_rpc)(struct scpustate *__restrict state,
 PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct scpustate *
 NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
                                             task_rpc_t func,
-                                            void const *buf, size_t bufsize,
-                                            bool disabled_preemption) {
+                                            void const *buf, size_t bufsize) {
 	struct ATTR_PACKED buffer {
 		struct gpregs b_gpregs; /* General purpose registers. */
 		u32 b_gs;               /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
@@ -431,8 +421,6 @@ NOTHROW(FCALL task_push_asynchronous_rpc_v)(struct scpustate *__restrict state,
 	result->scs_irregs.ir_eip = (uintptr_t)&x86_rpc_kernel_redirection;
 	result->scs_irregs.ir_cs  = SEGMENT_KERNEL_CODE;
 	result->scs_irregs.ir_eflags = istate->ics_irregs.ir_eflags;
-	if (disabled_preemption)
-		result->scs_irregs_k.ir_eflags &= ~EFLAGS_IF;
 #undef SUBSP
 	return result;
 }

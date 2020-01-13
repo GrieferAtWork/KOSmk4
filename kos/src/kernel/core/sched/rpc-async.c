@@ -336,11 +336,12 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc)(struct icpustate *__restrict state,
 		COMPILER_BARRIER();
 		ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CORECHANGE);
 		COMPILER_BARRIER();
-		return (*func)(arg, state,
-		               icpustate_isuser(state)
-		               ? TASK_RPC_REASON_ASYNCUSER
-		               : TASK_RPC_REASON_ASYNC,
-		               NULL);
+		state = (*func)(arg, state,
+		                icpustate_isuser(state)
+		                ? TASK_RPC_REASON_ASYNCUSER
+		                : TASK_RPC_REASON_ASYNC,
+		                NULL);
+		return state;
 	}
 	target_flags = ATOMIC_READ(target->t_flags);
 	if unlikely(target_flags & TASK_FTERMINATED) {
@@ -547,11 +548,12 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc_v)(struct icpustate *__restrict state,
 		COMPILER_BARRIER();
 		ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CORECHANGE);
 		COMPILER_BARRIER();
-		return (*func)(buf,
-		               state,
-		               icpustate_isuser(state) ? TASK_RPC_REASON_ASYNCUSER
-		                                       : TASK_RPC_REASON_ASYNC,
-		               NULL);
+		state = (*func)(buf,
+		                state,
+		                icpustate_isuser(state) ? TASK_RPC_REASON_ASYNCUSER
+		                                        : TASK_RPC_REASON_ASYNC,
+		                NULL);
+		return state;
 	}
 	target_flags = ATOMIC_READ(target->t_flags);
 	if unlikely(target_flags & TASK_FTERMINATED) {

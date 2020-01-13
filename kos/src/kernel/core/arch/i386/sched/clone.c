@@ -284,7 +284,7 @@ again_lock_vm:
 			 * the child actually existing in a different VM when `CLONE_VM' isn't given. */
 			state = task_push_asynchronous_rpc(state,
 			                                   &task_srpc_set_child_tid,
-			                                   child_tidptr, false);
+			                                   child_tidptr);
 		}
 		result->t_sched.s_state = state;
 	}

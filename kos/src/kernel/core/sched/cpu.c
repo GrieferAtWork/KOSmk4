@@ -848,7 +848,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	 * caused if we tried to decref (and possibly destroy) ourself. */
 	next->t_sched.s_state = task_push_asynchronous_rpc(next->t_sched.s_state,
 	                                                   &task_decref_for_exit,
-	                                                   caller, false);
+	                                                   caller);
 
 	/* Set the flag to indicate that we've been fully terminated.
 	 * NOTE: Also ensure that a couple of other flags are set/cleared correctly. */

@@ -101,6 +101,8 @@ __DECL_BEGIN
 #define irregs32_mskeflags(self, mask, flags) ((self)->ir_eflags = ((self)->ir_eflags & (mask)) | (flags))
 #define irregs32_getesp(self)            (irregs32_isuser(self) ? irregs32_getuseresp(self) : irregs32_getkernelesp(self))
 #endif /* !__KERNEL__ || __x86_64__ */
+#define irregs32_getpreemption(self)     (irregs32_geteflags(self) & 0x200)
+#define irregs32_setpreemption(self, turn_on) irregs32_mskeflags(self, ~0x200, (turn_on) ? 0x200 : 0)
 #define irregs32_getuseresp(self)        ((struct irregs32_user const *)(self))->ir_esp
 #define irregs32_setuseresp(self, value) (((struct irregs32_user *)(self))->ir_esp=(value))
 #define irregs32_getuserss(self)         ((struct irregs32_user const *)(self))->ir_ss16
@@ -439,6 +441,8 @@ __NOTHROW_NCX(kcpustate32_to_icpustate32_p)(struct kcpustate32 const *__restrict
 #define icpustate32_isuser_novm86(self)          irregs32_isuser_novm86(&(self)->ics_irregs)
 #define icpustate32_isuser(self)                 irregs32_isuser(&(self)->ics_irregs)
 #define icpustate32_iskernel(self)               irregs32_iskernel(&(self)->ics_irregs)
+#define icpustate32_getpreemption(self)          irregs32_getpreemption(&(self)->ics_irregs)
+#define icpustate32_setpreemption(self, turn_on) irregs32_setpreemption(&(self)->ics_irregs, turn_on)
 #define icpustate32_geteip(self)                 irregs32_geteip(&(self)->ics_irregs)
 #define icpustate32_seteip(self, value)          irregs32_seteip(&(self)->ics_irregs, value)
 #define icpustate32_getesp(self)                 irregs32_getesp(&(self)->ics_irregs)
@@ -752,6 +756,8 @@ __NOTHROW_NCX(icpustate32_user_to_icpustate32_p)(struct icpustate32 const *__res
 #define scpustate32_isuser_novm86(self)          ((self)->scs_irregs.ir_cs16 & 3)
 #define scpustate32_isuser(self)                 (((self)->scs_irregs.ir_cs16 & 3) || scpustate32_isvm86(self))
 #define scpustate32_iskernel(self)               (!((self)->scs_irregs.ir_cs16 & 3) && !scpustate32_isvm86(self))
+#define scpustate32_getpreemption(self)          ((self)->scs_irregs.ir_eflags & 0x200)
+#define scpustate32_setpreemption(self, turn_on) (turn_on ? (void)((self)->scs_irregs.ir_eflags |= 0x200) : (void)((self)->scs_irregs.ir_eflags &= ~0x200))
 #define scpustate32_geteip(self)                 ((__u32)(self)->scs_irregs.ir_eip)
 #define scpustate32_seteip(self, value)          ((self)->scs_irregs.ir_eip = (value))
 #define scpustate32_getuseresp(self)             ((__u32)(self)->scs_irregs_u.ir_esp)
@@ -1414,6 +1420,8 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define irregs_is64bit(self)                0
 #define irregs_isnative(self)               1
 #define irregs_iscompat(self)               0
+#define irregs_getpreemption                irregs32_getpreemption
+#define irregs_setpreemption                irregs32_setpreemption
 #define irregs_getpc                        irregs32_geteip
 #define irregs_setpc                        irregs32_seteip
 #define irregs_getcs                        irregs32_getcs
@@ -1529,6 +1537,8 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define icpustate_is64bit(self)             0
 #define icpustate_isnative(self)            1
 #define icpustate_iscompat(self)            0
+#define icpustate_getpreemption             icpustate32_getpreemption
+#define icpustate_setpreemption             icpustate32_setpreemption
 #define icpustate_getuserpsp                icpustate32_getuseresp
 #define icpustate_setuserpsp                icpustate32_setuseresp
 #define icpustate_getuserss                 icpustate32_getuserss
@@ -1612,6 +1622,8 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define scpustate_is64bit(self)             0
 #define scpustate_isnative(self)            1
 #define scpustate_iscompat(self)            0
+#define scpustate_getpreemption             scpustate32_getpreemption
+#define scpustate_setpreemption             scpustate32_setpreemption
 #define scpustate_getuserpsp                scpustate32_getuseresp
 #define scpustate_setuserpsp                scpustate32_setuseresp
 #define scpustate_getuserss                 scpustate32_getuserss

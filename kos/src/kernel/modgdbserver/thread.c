@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/except.h>
 #include <kernel/fpu.h>
 #include <kernel/printk.h>
 #include <sched/cpu.h>
@@ -109,9 +110,9 @@ again_gdb_main:
 	sig_broadcast(&GDBServer_HostUnlocked);
 }
 
-PRIVATE struct icpustate *FCALL
-GDBThread_StopRPCImpl(uintptr_t flags,
-                      struct icpustate *__restrict state) {
+PRIVATE NOPREEMPT struct icpustate *
+NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
+                                     struct icpustate *__restrict state) {
 	struct gdb_thread_stop_event_with_reason stop_event;
 	uintptr_t old_flags;
 	assert(!PREEMPTION_ENABLED());
@@ -279,15 +280,19 @@ do_normal_stop:
 	return (struct icpustate *)stop_event.e.tse_state;
 }
 
-PRIVATE struct icpustate *FCALL
-GDBThread_StopRPC(void *arg,
-                  struct icpustate *__restrict state,
-                  unsigned int UNUSED(reason),
-                  struct rpc_syscall_info const *UNUSED(sc_info)) {
-	return GDBThread_StopRPCImpl((uintptr_t)arg, state);
+PRIVATE struct icpustate *
+NOTHROW(FCALL GDBThread_StopRPC)(void *arg,
+                                 struct icpustate *__restrict state,
+                                 unsigned int UNUSED(reason),
+                                 struct rpc_syscall_info const *UNUSED(sc_info)) {
+	pflag_t was;
+	was   = PREEMPTION_PUSHOFF();
+	state = GDBThread_StopRPCImpl((uintptr_t)arg, state);
+	PREEMPTION_POP(was);
+	return state;
 }
 
-PRIVATE NOBLOCK NONNULL((1, 2)) struct icpustate *
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL GDBThread_StopAllCpusIPI)(struct icpustate *__restrict state,
                                         void *args[CPU_IPI_ARGCOUNT]) {
 	(void)args;
@@ -487,16 +492,21 @@ NOTHROW(FCALL GDBThread_HasTerminated)(struct task *__restrict thread) {
 
 
 /* arg == (struct task *)old_scheduling_override */
-PRIVATE struct icpustate *FCALL
-GDBThread_StopWithAsyncNotificationRPC(void *arg,
-                                       struct icpustate *__restrict state,
-                                       unsigned int UNUSED(reason),
-                                       struct rpc_syscall_info const *UNUSED(sc_info)) {
+PRIVATE struct icpustate *
+NOTHROW(FCALL GDBThread_StopWithAsyncNotificationRPC)(void *arg,
+                                                      struct icpustate *__restrict state,
+                                                      unsigned int UNUSED(reason),
+                                                      struct rpc_syscall_info const *UNUSED(sc_info)) {
 	/* Restore the old CPU override. */
-	struct cpu *mycpu = THIS_CPU;
+	struct cpu *mycpu;
+	pflag_t was;
+	was = PREEMPTION_PUSHOFF();
+	mycpu = THIS_CPU;
 	mycpu->c_override = (REF struct task *)arg;
-	return GDBThread_StopRPCImpl(GDBTHREAD_STOPRPCIMPL_F_SETREASON,
-	                             state);
+	state = GDBThread_StopRPCImpl(GDBTHREAD_STOPRPCIMPL_F_SETREASON,
+	                              state);
+	PREEMPTION_POP(was);
+	return state;
 }
 
 
