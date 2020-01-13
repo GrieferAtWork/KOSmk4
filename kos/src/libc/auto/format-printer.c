@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4158c80f */
+/* HASH CRC-32:0x6fc0e76f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,10 +32,10 @@ DECL_BEGIN
 
 #include <hybrid/__assert.h>
 
-#include "../libc/string.h"   /* Dependency of `#include <local/format-printf.h>' */
-#include "../libc/unicode.h"  /* Dependency of `#include <local/format-scanf.h>' */
+#include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
+#include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
+#include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
 
-#include <dlfcn.h>
 #include <libdisasm/disassembler.h>
 #define CONFIG_USE_LIBDISASM 1
 #ifdef __KERNEL__

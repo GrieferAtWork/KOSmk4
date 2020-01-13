@@ -20,10 +20,14 @@
 #define GUARD_LIBC_USER_PROCESS_C 1
 
 #include "../api.h"
-#include "process.h"
-#include <dlfcn.h>
-#include <stdlib.h>
+/**/
+
 #include <sys/wait.h>
+
+#include <stdlib.h>
+
+#include "../libc/dl.h"
+#include "process.h"
 
 DECL_BEGIN
 

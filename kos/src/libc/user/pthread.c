@@ -30,7 +30,6 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/anno.h>
-#include <syslog.h>
 #include <kos/except.h>
 #include <kos/syscalls.h>
 #include <kos/thread.h>
@@ -40,7 +39,6 @@
 #include <sys/resource.h>
 
 #include <assert.h>
-#include <dlfcn.h>
 #include <errno.h>
 #include <limits.h>
 #include <malloc.h>
@@ -48,12 +46,14 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <syslog.h>
 #include <unistd.h>
 
 #include <librpc/rpc.h>
 
+#include "../libc/dl.h"
 #include "pthread.h"
 
 DECL_BEGIN
@@ -147,6 +147,8 @@ PRIVATE DEFINE_ATOMIC_RWLOCK(pthread_default_attr_lock);
 PRIVATE ATTR_THREAD __REF struct pthread *pthread_self_p = NULL;
 
 
+
+
 /* Called just before a thread exists (used to destroy() the thread's
  * `pthread_self' structure in case the thread was detached) */
 INTERN ATTR_SECTION(".text.crt.sched.pthread.pthread_onexit") void
@@ -163,7 +165,7 @@ NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
 		destroy(me);
 	}
 	/* Free our thread's TLS segment. */
-	dltlsfreeseg(tls); /* TODO: Use dlsym() to lookup `dltlsallocseg()' and `dltlsfreeseg()' lazily */
+	dltlsfreeseg(tls);
 }
 
 INTDEF ATTR_NORETURN void __FCALL
@@ -247,7 +249,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	if unlikely(!pt)
 		goto err_nomem;
 	/* Allocate the DL TLS segment */
-	pt->pt_tls = dltlsallocseg(); /* TODO: Use dlsym() to lookup `dltlsallocseg()' and `dltlsfreeseg()' lazily */
+	pt->pt_tls = dltlsallocseg();
 	if unlikely(!pt->pt_tls)
 		goto err_nomem_pt;
 	pt->pt_refcnt    = 2;
@@ -285,7 +287,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	cpid = libc_pthread_clone(pt, start_routine);
 	if unlikely(E_ISERR(cpid)) {
 		/* The clone() system call failed. */
-		dltlsfreeseg(pt->pt_tls); /* TODO: Use dlsym() to lookup `dltlsallocseg()' and `dltlsfreeseg()' lazily */
+		dltlsfreeseg(pt->pt_tls);
 		if (pt->pt_cpuset != (cpu_set_t *)&pt->pt_cpusetsize)
 			free(pt->pt_cpuset);
 		free(pt);

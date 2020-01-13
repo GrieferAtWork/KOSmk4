@@ -28,7 +28,6 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
-#include <dlfcn.h>
 #include <format-printer.h>
 #include <stdbool.h>
 #include <string.h>
@@ -37,6 +36,7 @@
 #include <libdebuginfo/addr2line.h>
 #include <libunwind/unwind.h>
 
+#include "../libc/dl.h"
 #include "execinfo.h"
 
 DECL_BEGIN

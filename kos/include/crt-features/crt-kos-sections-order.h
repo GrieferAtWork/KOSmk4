@@ -164,6 +164,7 @@
 	.io.stropts*                      # stream operations
 	.io.sgtty*                        # gtty / stty
 	.obstack*                         # obstack
+	.system.auxv*                     # <sys/auxv.h>
 	.utility*                         # Misc. utility functions
 	.system*                          # Misc. system functions
 	.debug*                           # Misc. debug functions
@@ -269,8 +270,9 @@
 	CB(PREFIX.database.utmpx.*) \
 	CB(PREFIX.io.stropts.*) \
 	CB(PREFIX.obstack.*) \
+	CB(PREFIX.system.auxv.*) \
 	CB(PREFIX.utility.glob.* PREFIX.utility.klog.* PREFIX.utility.monetary.* PREFIX.utility.regex.* PREFIX.utility.search.* PREFIX.utility.shm.* PREFIX.utility.stdlib.*) \
-	CB(PREFIX.system.*) \
+	CB(PREFIX.system.adjtime.* PREFIX.system.configuration.* PREFIX.system.info.* PREFIX.system.ioperm.* PREFIX.system.mman.* PREFIX.system.ptrace.* PREFIX.system.reboot.* PREFIX.system.syslog.* PREFIX.system.utility.*) \
 	CB(PREFIX.debug.*) \
 	CB(PREFIX.sched.resource.*) \
 	CB(PREFIX.sched.msg.*) \

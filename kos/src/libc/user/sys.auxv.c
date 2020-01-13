@@ -27,19 +27,19 @@
 #include <kos/exec/elf.h>  /* ELF_ARCH_DATA */
 #include <kos/exec/rtld.h> /* RTLD_PLATFORM */
 
-#include <dlfcn.h>
 #include <stddef.h> /* offsetafter */
 #include <time.h>   /* CLK_TCK */
 #include <unistd.h> /* preadall */
 
+#include "../libc/dl.h"
+#include "sys.auxv.h"
+
 #if defined(__i386__) && !defined(__x86_64__)
 #include <kos/syscalls.h> /* sys_uname() */
-#include <sys/utsname.h> /* uname */
+#include <sys/utsname.h>  /* uname */
 
 #include <string.h> /* preadall */
 #endif /* __i386__ && !__x86_64__ */
-
-#include "sys.auxv.h"
 
 DECL_BEGIN
 
@@ -75,11 +75,11 @@ PRIVATE bool LIBCCALL libc_has_kernel64(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getauxval,hash:CRC-32=0x2c70736a]]]*/
+/*[[[head:getauxval,hash:CRC-32=0xc1a5766c]]]*/
 /* Return the value associated with an Elf*_auxv_t type from the auxv list
  * passed to the program on startup.  If TYPE was not present in the auxv
  * list, returns zero and sets errno to ENOENT */
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.getauxval") ulongptr_t
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.auxv.getauxval") ulongptr_t
 NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 /*[[[body:getauxval]]]*/
 {
@@ -114,9 +114,8 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 
 	case AT_BASE: {
 		void *libdl;
-		libdl  = dlgetmodule("libdl", DLGETHANDLE_FINCREF);
+		libdl  = dlgetmodule("libdl", DLGETHANDLE_FNORMAL);
 		result = (ulongptr_t)dlmodulebase(libdl);
-		dlclose(libdl);
 	}	break;
 
 	case AT_FLAGS: {

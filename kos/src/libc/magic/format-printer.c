@@ -37,10 +37,10 @@
 %(auto_source){
 #include <hybrid/__assert.h>
 
-#include "../libc/string.h"   /* Dependency of `#include <local/format-printf.h>' */
-#include "../libc/unicode.h"  /* Dependency of `#include <local/format-scanf.h>' */
+#include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
+#include "../libc/string.h"  /* Dependency of `#include <local/format-printf.h>' */
+#include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
 
-#include <dlfcn.h>
 #include <libdisasm/disassembler.h>
 #define CONFIG_USE_LIBDISASM 1
 #ifdef __KERNEL__

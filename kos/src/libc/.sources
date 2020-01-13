@@ -83,16 +83,18 @@ BEGIN
 						if (symbolName.startswith("kernel_") && (symbolName.endswith("_start") ||
 							symbolName.endswith("_end") || symbolName.endswith("_size")))
 							print "WARNING: Potentially unwanted kernel export:",repr symbolName;
+						final local libdlSymbols = {
+							"dlopen", "dlfopen", "dlclose", "dlsym", "dlerror", "dlgethandle",
+							"dlgetmodule", "dladdr", "dlmodulefd", "dlmodulename", "dlexceptaware",
+							"dlmodulebase", "dllocksection", "dlunlocksection", "dlsectionname",
+							"dlsectionindex", "dlsectionmodule", "dlclearcaches", "___tls_get_addr",
+							"__tls_get_addr", "dltlsallocseg", "dltlsfreeseg", "dltlsalloc",
+							"dltlsfree", "dltlsaddr", "dlauxctrl",
+						};
 						if (symbolSect == "UND") {
-							if (symbolName !in {
-								/* Don't warn about stuff that's defined by `libdl.so' */
-								"dlopen", "dlfopen", "dlclose", "dlsym", "dlerror", "dlgethandle",
-								"dlgetmodule", "dladdr", "dlmodulefd", "dlmodulename", "dlexceptaware",
-								"dlmodulebase", "dllocksection", "dlunlocksection", "dlsectionname",
-								"dlsectionindex", "dlsectionmodule", "dlclearcaches", "___tls_get_addr",
-								"__tls_get_addr", "dltlsallocseg", "dltlsfreeseg", "dltlsalloc",
-								"dltlsfree", "dltlsaddr", "dlauxctrl",
-							} && symbolName !in CRT_DLSUBST_GLOBALS)
+							if (symbolName in libdlSymbols)
+								continue;
+							if (symbolName !in CRT_DLSUBST_GLOBALS)
 								print "WARNING: Unresolved symbol in libc:",repr symbolName;
 						} else if (symbolName.startswith("libc_"))
 							print "WARNING: Potentially unwanted libc export:",repr symbolName;

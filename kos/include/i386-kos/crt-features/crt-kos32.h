@@ -607,7 +607,6 @@
 #define __CRT_HAVE__Unwind_SetGR 1
 #define __CRT_HAVE__Unwind_SetIP 1
 #define __CRT_HAVE__ZSt9terminatev 1
-#define __CRT_HAVE____tls_get_addr 1
 #define __CRT_HAVE___acos 1
 #define __CRT_HAVE___acosf 1
 #define __CRT_HAVE___acosh 1
@@ -1818,18 +1817,6 @@
 #define __CRT_HAVE_dirfd 1
 #define __CRT_HAVE_dirname 1
 #define __CRT_HAVE_div 1
-#define __CRT_HAVE_dlauxctrl 1
-#define __CRT_HAVE_dlclose 1
-#define __CRT_HAVE_dlerror 1
-#define __CRT_HAVE_dlexceptaware 1
-#define __CRT_HAVE_dlgethandle 1
-#define __CRT_HAVE_dlgetmodule 1
-#define __CRT_HAVE_dlmodulebase 1
-#define __CRT_HAVE_dlmodulefd 1
-#define __CRT_HAVE_dlopen 1
-#define __CRT_HAVE_dlsym 1
-#define __CRT_HAVE_dltlsallocseg 1
-#define __CRT_HAVE_dltlsfreeseg 1
 #define __CRT_HAVE_dprintf 1
 #define __CRT_HAVE_drand48 1
 #define __CRT_HAVE_drand48_r 1

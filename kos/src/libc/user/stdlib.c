@@ -35,7 +35,6 @@
 #include <sys/wait.h>
 
 #include <assert.h>
-#include <dlfcn.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <malloc.h>
@@ -43,6 +42,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "../libc/dl.h"
 #include "../libc/init.h"
 #include "malloc.h"
 #include "stdlib.h"

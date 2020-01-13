@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60f84e84 */
+/* HASH CRC-32:0x8fe68038 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -244,8 +244,8 @@
 #define __CRT_SECTINFO_string_format                            (222, .string.format, string_format)
 #define __CRT_SECTINFO_string_match                             (223, .string.match, string_match)
 #define __CRT_SECTINFO_string_memory                            (224, .string.memory, string_memory)
-#define __CRT_SECTINFO_system                                   (225, .system, system)
-#define __CRT_SECTINFO_system_adjtime                           (226, .system.adjtime, system_adjtime)
+#define __CRT_SECTINFO_system_adjtime                           (225, .system.adjtime, system_adjtime)
+#define __CRT_SECTINFO_system_auxv                              (226, .system.auxv, system_auxv)
 #define __CRT_SECTINFO_system_configuration                     (227, .system.configuration, system_configuration)
 #define __CRT_SECTINFO_system_info                              (228, .system.info, system_info)
 #define __CRT_SECTINFO_system_ioperm                            (229, .system.ioperm, system_ioperm)
@@ -535,8 +535,8 @@
 	CB(__CRT_SECTINFO_string_format)                            \
 	CB(__CRT_SECTINFO_string_match)                             \
 	CB(__CRT_SECTINFO_string_memory)                            \
-	CB(__CRT_SECTINFO_system)                                   \
 	CB(__CRT_SECTINFO_system_adjtime)                           \
+	CB(__CRT_SECTINFO_system_auxv)                              \
 	CB(__CRT_SECTINFO_system_configuration)                     \
 	CB(__CRT_SECTINFO_system_info)                              \
 	CB(__CRT_SECTINFO_system_ioperm)                            \
@@ -3437,14 +3437,14 @@
 #define __CRT_SECTION_swab                                  __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.swab */
 #define __CRT_SECTION_wildstrcmp                            __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.wildstrcmp */
 
-/* .text.crt.system.* */
-#define __CRT_SECTION_getauxval                             __CRT_SECTINFO_system                                   /* .text.crt.system.getauxval */
-
 /* .text.crt.system.adjtime.* */
 #define __CRT_SECTION_adjtime                               __CRT_SECTINFO_system_adjtime                           /* .text.crt.system.adjtime.adjtime */
 #define __CRT_SECTION_adjtime64                             __CRT_SECTINFO_system_adjtime                           /* .text.crt.system.adjtime.adjtime64 */
 #define __CRT_SECTION_settimeofday                          __CRT_SECTINFO_system_adjtime                           /* .text.crt.system.adjtime.settimeofday */
 #define __CRT_SECTION_settimeofday64                        __CRT_SECTINFO_system_adjtime                           /* .text.crt.system.adjtime.settimeofday64 */
+
+/* .text.crt.system.auxv.* */
+#define __CRT_SECTION_getauxval                             __CRT_SECTINFO_system_auxv                              /* .text.crt.system.auxv.getauxval */
 
 /* .text.crt.system.configuration.* */
 #define __CRT_SECTION_confstr                               __CRT_SECTINFO_system_configuration                     /* .text.crt.system.configuration.confstr */

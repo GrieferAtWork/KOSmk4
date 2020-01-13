@@ -24,6 +24,8 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/atomic.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>
@@ -33,13 +35,8 @@
 
 #include <libregex/regex.h>
 
+#include "../libc/dl.h"
 #include "regex.h"
-
-#ifndef LIBREGEX_WANT_PROTOTYPES
-#include <hybrid/atomic.h>
-
-#include <dlfcn.h>
-#endif /* !LIBREGEX_WANT_PROTOTYPES */
 
 DECL_BEGIN
 

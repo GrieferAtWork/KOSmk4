@@ -267,14 +267,14 @@ DlModule *LIBCCALL libdl_dlgethandle(void const *static_pointer, unsigned int fl
 INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF))
 DlModule *LIBCCALL libdl_dlgetmodule(char const *name, unsigned int flags);
 INTDEF NONNULL((2)) int LIBCCALL libdl_dladdr(void const *address, Dl_info *info);
-INTDEF WUNUSED fd_t LIBCCALL libdl_dlmodulefd(DlModule *self);
-INTDEF WUNUSED char const *LIBCCALL libdl_dlmodulename(DlModule *self);
-INTDEF WUNUSED void *LIBCCALL libdl_dlmodulebase(DlModule *self);
+INTDEF NONNULL((1)) WUNUSED fd_t LIBCCALL libdl_dlmodulefd(DlModule *self);
+INTDEF NONNULL((1)) WUNUSED char const *LIBCCALL libdl_dlmodulename(DlModule *self);
+INTDEF NONNULL((1)) WUNUSED void *LIBCCALL libdl_dlmodulebase(DlModule *self);
 INTDEF WUNUSED REF DlSection *LIBCCALL libdl_dllocksection(DlModule *self, char const *__restrict name, unsigned int flags);
-INTDEF int LIBCCALL libdl_dlunlocksection(REF DlSection *sect);
-INTDEF char const *LIBCCALL libdl_dlsectionname(DlSection *sect);
-INTDEF size_t LIBCCALL libdl_dlsectionindex(DlSection *sect);
-INTDEF DlModule *LIBCCALL libdl_dlsectionmodule(DlSection *sect, unsigned int flags);
+INTDEF NONNULL((1)) int LIBCCALL libdl_dlunlocksection(REF DlSection *sect);
+INTDEF NONNULL((1)) char const *LIBCCALL libdl_dlsectionname(DlSection *sect);
+INTDEF NONNULL((1)) size_t LIBCCALL libdl_dlsectionindex(DlSection *sect);
+INTDEF NONNULL((1)) DlModule *LIBCCALL libdl_dlsectionmodule(DlSection *sect, unsigned int flags);
 INTDEF int LIBCCALL libdl_dlclearcaches(void);
 INTDEF void *LIBCCALL libdl_dlauxctrl(DlModule *self, unsigned int type, ...);
 INTDEF void *LIBCCALL libdl____tls_get_addr(void);
@@ -290,14 +290,14 @@ INTDEF void *LIBCCALL libdl___tls_get_addr(void);
 INTDEF WUNUSED ATTR_MALLOC void *LIBCCALL libdl_dltlsallocseg(void);
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
-INTDEF int LIBCCALL libdl_dltlsfreeseg(void *ptr);
+INTDEF NONNULL((1)) int LIBCCALL libdl_dltlsfreeseg(void *ptr);
 
 /* Return a pointer to the base of the given module's
  * TLS segment, as seen form the calling thread.
  * In the case of dynamic TLS, allocate missing segments lazily,
  * logging a system error and exiting the calling application if
  * doing so fails. */
-INTDEF WUNUSED ATTR_RETNONNULL void *ATTR_FASTCALL
+INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) void *ATTR_FASTCALL
 libdl_dltlsbase(DlModule *__restrict self);
 
 /* DL-based TLS memory management API.
@@ -349,7 +349,7 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
                  void *perthread_callback_arg);
 
 /* Free a TLS segment previously allocated with `dltlsalloc' */
-INTDEF WUNUSED int LIBCCALL libdl_dltlsfree(DlModule *self);
+INTDEF WUNUSED NONNULL((1)) int LIBCCALL libdl_dltlsfree(DlModule *self);
 
 /* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
@@ -362,7 +362,7 @@ INTDEF WUNUSED int LIBCCALL libdl_dltlsfree(DlModule *self);
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
-INTDEF WUNUSED void *LIBCCALL libdl_dltlsaddr(DlModule *self);
+INTDEF WUNUSED NONNULL((1)) void *LIBCCALL libdl_dltlsaddr(DlModule *self);
 
 /* Invoke the static initializers of all currently loaded modules.
  * This is called late during initial module startup once the initial

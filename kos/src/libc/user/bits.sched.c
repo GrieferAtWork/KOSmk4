@@ -26,8 +26,6 @@
 #include <kos/thread.h>
 #include <sys/syscall.h>
 
-#include <dlfcn.h>
-
 #include "bits.sched.h"
 
 DECL_BEGIN

@@ -28,7 +28,7 @@ DECL_BEGIN
  * In the case of dynamic TLS, allocate missing segments lazily,
  * logging a system error and exiting the calling application if
  * doing so fails. */
-INTERN WUNUSED ATTR_RETNONNULL void *ATTR_FASTCALL
+INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) void *ATTR_FASTCALL
 libdl_dltlsbase(DlModule *__restrict self)
 #else /* FAIL_ON_ERROR */
 /* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
@@ -42,7 +42,7 @@ libdl_dltlsbase(DlModule *__restrict self)
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
-INTERN WUNUSED void *LIBCCALL
+INTERN WUNUSED NONNULL((1)) void *LIBCCALL
 libdl_dltlsaddr(DlModule *self)
 #endif /* !FAIL_ON_ERROR */
 {

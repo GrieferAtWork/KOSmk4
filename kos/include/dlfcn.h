@@ -92,7 +92,7 @@ typedef long int Lmid_t;
 __IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL dlopen)(char const *__filename, int __mode);
 __IMPDEF __ATTR_NONNULL((1)) int __NOTHROW_NCX(__DLFCN_CALL dlclose)(void *__handle);
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) void *__NOTHROW_NCX(__DLFCN_CALL dlsym)(void *__handle, char const *__restrict __symbol_name);
-__IMPDEF char *__NOTHROW_NCX(__DLFCN_CALL dlerror)(void);
+__IMPDEF __ATTR_WUNUSED char *__NOTHROW_NCX(__DLFCN_CALL dlerror)(void);
 
 #ifdef __USE_BSD
 struct __dlfunc_arg { int __dlfunc_dummy; };
@@ -164,14 +164,16 @@ __NOTHROW_NCX(__DLFCN_CALL dlgetmodule)(char const *__name,
  *              WARNING: Attempting to close() this handle may cause future
  *                       operations performed with the associated module to fail!
  * @return: -1: Error (s.a. `dlerror()') */
-__IMPDEF __ATTR_WUNUSED __fd_t __NOTHROW_NCX(__DLFCN_CALL dlmodulefd)(void *__handle);
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
+__NOTHROW_NCX(__DLFCN_CALL dlmodulefd)(void *__handle);
 
 /* Return the internally used filename for the given module `HANDLE'
  * Note that this path is an absolute, canonical (realpath()) filename.
  * @param: HANDLE: A handle returned by `dlopen()'.
  * @return: * :    The absolute, unambiguous filename for the given module `HANDLE'
  * @return: NULL:  Error (s.a. `dlerror()') */
-__IMPDEF __ATTR_WUNUSED char const *__NOTHROW_NCX(__DLFCN_CALL dlmodulename)(void *__handle);
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *
+__NOTHROW_NCX(__DLFCN_CALL dlmodulename)(void *__handle);
 
 /* Return the base address offset chosen by ASLR, which is added to addresses of the given module `HANDLE'.
  * WARNING: This function usually returns `NULL' for the root executable, in which case dlerror()
@@ -184,7 +186,8 @@ __IMPDEF __ATTR_WUNUSED char const *__NOTHROW_NCX(__DLFCN_CALL dlmodulename)(voi
  * @param: HANDLE: A handle returned by `dlopen()'.
  * @return: * :    The load address / module base for the given `HANDLE'.
  * @return: NULL:  Error (s.a. `dlerror()') */
-__IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL dlmodulebase)(void *__handle);
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+__NOTHROW_NCX(__DLFCN_CALL dlmodulebase)(void *__handle);
 
 
 struct dl_section {
@@ -207,7 +210,7 @@ struct dl_section {
  *                 and allows the user to access the contents of the section, as it is loaded in memory.
  *                 Note however that the actual section data is usually mapped as read-only!
  * @return: NULL:  Error (s.a. `dlerror()'; usually: unknown section) */
-__IMPDEF __ATTR_WUNUSED /*REF*/ struct dl_section *
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) /*REF*/ struct dl_section *
 __NOTHROW_NCX(__DLFCN_CALL dllocksection)(void *__handle,
                                           char const *__restrict __name,
                                           unsigned int __flags __DFL(DLLOCKSECTION_FNORMAL));
@@ -217,7 +220,7 @@ __NOTHROW_NCX(__DLFCN_CALL dllocksection)(void *__handle,
  *       returns a reference you inherit as the caller
  * @return: 0 : Successfully unlocked the given section `SECT'
  * @return: -1: Error (s.a. `dlerror()') */
-__IMPDEF int
+__IMPDEF __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__DLFCN_CALL dlunlocksection)(/*REF*/ struct dl_section *__sect);
 
 /* Return the name of a given section, or NULL on error
@@ -234,18 +237,18 @@ __NOTHROW_NCX(__DLFCN_CALL dlunlocksection)(/*REF*/ struct dl_section *__sect);
  *          >> // will probably also be NULL if the module had already been unloaded)
  *          >> ...
  *          >> dlclose(mod); */
-__IMPDEF __ATTR_WUNUSED char const *
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *
 __NOTHROW_NCX(__DLFCN_CALL dlsectionname)(struct dl_section *__sect);
 
 /* Returns the index of a given section, or (size_t)-1 on error. */
-__IMPDEF __ATTR_WUNUSED __size_t
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) __size_t
 __NOTHROW_NCX(__DLFCN_CALL dlsectionindex)(struct dl_section *__sect);
 
 /* Return the module associated with a given section, or NULL on error.
  * @param: FLAGS: Set of `DLGETHANDLE_F*' 
  * @return: * :   A pointer, or reference to the module handle (when `DLGETHANDLE_FINCREF' was given)
  * @return: NULL: Error (s.a. `dlerror()'; usually, the module was already unloaded) */
-__IMPDEF __ATTR_WUNUSED void *
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__DLFCN_CALL dlsectionmodule)(struct dl_section *__sect,
                                             unsigned int __flags __DFL(DLGETHANDLE_FNORMAL));
 
@@ -266,7 +269,8 @@ __IMPDEF int __NOTHROW_NCX(__DLFCN_CALL dlclearcaches)(void);
 __IMPDEF void *__NOTHROW_NCX(__DLFCN_CALL dltlsallocseg)(void);
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
-__IMPDEF int __NOTHROW_NCX(__DLFCN_CALL dltlsfreeseg)(void *__ptr);
+__IMPDEF __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(__DLFCN_CALL dltlsfreeseg)(void *__ptr);
 
 /* DL-based TLS memory management API.
  * These functions may be used to dynamically allocate TLS memory that works everywhere where
@@ -317,7 +321,8 @@ __NOTHROW_NCX(__DLFCN_CALL dltlsalloc)(__size_t __num_bytes, __size_t __min_alig
                                        void *__perthread_callback_arg);
 
 /* Free a TLS segment previously allocated with `dltlsalloc' */
-__IMPDEF __ATTR_WUNUSED int __NOTHROW_NCX(__DLFCN_CALL dltlsfree)(void *__tls_handle);
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(__DLFCN_CALL dltlsfree)(void *__tls_handle);
 
 /* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
@@ -330,7 +335,8 @@ __IMPDEF __ATTR_WUNUSED int __NOTHROW_NCX(__DLFCN_CALL dltlsfree)(void *__tls_ha
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
-__IMPDEF __ATTR_WUNUSED void *__NOTHROW_NCX(__DLFCN_CALL dltlsaddr)(void *__tls_handle);
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+__NOTHROW_NCX(__DLFCN_CALL dltlsaddr)(void *__tls_handle);
 
 
 /* Perform an auxiliary control command about a given module `HANDLE'

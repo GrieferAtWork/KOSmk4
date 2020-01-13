@@ -28,34 +28,28 @@
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
 
-#include <kos/except.h>
 #include <kos/debugtrap.h>
+#include <kos/except-handler.h>
+#include <kos/except.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/syscalls.h>
 #include <sys/syslog.h>
+
+#include <assert.h>
+#include <malloc.h>
+#include <sched.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/except.h>
 #include <libunwind/unwind.h>
-#include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state-helpers.h>
 
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sched.h>
-
+#include "dl.h"
 #include "except.h"
-
-#include <assert.h>
-#include <dlfcn.h>
-#include <malloc.h>
-#include <kos/syscalls.h>
-#include <kos/except-handler.h>
-
-#if 1
-#include <asm/intrin.h>
-#endif
 
 DECL_BEGIN
 

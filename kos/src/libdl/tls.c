@@ -343,7 +343,7 @@ clear_extension_table(struct tls_segment *__restrict self) {
 }
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
-INTERN int LIBCCALL
+INTERN NONNULL((1)) int LIBCCALL
 libdl_dltlsfreeseg(void *ptr) {
 	if unlikely(!ptr)
 		goto err_badptr;
@@ -466,7 +466,7 @@ err:
 
 
 /* Free a TLS segment previously allocated with `dltlsalloc' */
-INTERN WUNUSED int LIBCCALL
+INTERN WUNUSED NONNULL((1)) int LIBCCALL
 libdl_dltlsfree(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_nullmodule;

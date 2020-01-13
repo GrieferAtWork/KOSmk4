@@ -893,7 +893,7 @@ err:
 	return -1;
 }
 
-INTERN WUNUSED fd_t LIBCCALL
+INTERN WUNUSED NONNULL((1)) fd_t LIBCCALL
 libdl_dlmodulefd(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
@@ -902,7 +902,7 @@ err_bad_module:
 	return dl_seterror_badmodule(self);
 }
 
-INTERN WUNUSED char const *LIBCCALL
+INTERN WUNUSED NONNULL((1)) char const *LIBCCALL
 libdl_dlmodulename(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
@@ -912,7 +912,7 @@ err_bad_module:
 	return NULL;
 }
 
-INTERN WUNUSED void *LIBCCALL
+INTERN WUNUSED NONNULL((1)) void *LIBCCALL
 libdl_dlmodulebase(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_bad_module;
@@ -1219,7 +1219,7 @@ err_bad_flags:
 }
 
 
-INTERN int LIBCCALL
+INTERN NONNULL((1)) int LIBCCALL
 libdl_dlunlocksection(REF DlSection *sect) {
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
@@ -1261,7 +1261,7 @@ err_bad_section:
 	return dl_seterror_badsection(sect);
 }
 
-INTERN char const *LIBCCALL
+INTERN NONNULL((1)) char const *LIBCCALL
 libdl_dlsectionname(DlSection *sect) {
 	char const *result;
 	REF DlModule *mod;
@@ -1307,7 +1307,7 @@ err:
 	return NULL;
 }
 
-INTERN size_t LIBCCALL
+INTERN NONNULL((1)) size_t LIBCCALL
 libdl_dlsectionindex(DlSection *sect) {
 	size_t result;
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
@@ -1320,7 +1320,7 @@ err_bad_section:
 }
 
 
-INTERN DlModule *LIBCCALL
+INTERN NONNULL((1)) DlModule *LIBCCALL
 libdl_dlsectionmodule(DlSection *sect, unsigned int flags) {
 	DlModule *mod;
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))

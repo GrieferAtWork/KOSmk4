@@ -23,6 +23,7 @@
 
 #include "../api.h"
 /**/
+
 #include <hybrid/align.h>
 #include <hybrid/host.h>
 #include <hybrid/sync/atomic-rwlock.h>
@@ -40,7 +41,6 @@
 
 #include <assert.h>
 #include <dirent.h>
-#include <dlfcn.h>
 #include <fcntl.h>
 #include <grp.h>
 #include <limits.h>
@@ -55,6 +55,7 @@
 #include <unistd.h>
 
 #include "../libc/capture-varargs.h"
+#include "../libc/dl.h"
 #include "stdlib.h"
 #include "unistd.h"
 

@@ -34,6 +34,22 @@ DECL_BEGIN
 #undef libc_strerror
 #define libc_strerror libc_strerror_s
 
+#undef stdin
+#undef stdout
+#undef stderr
+#undef __LOCAL_stdin
+#undef __LOCAL_stdout
+#undef __LOCAL_stderr
+DECLARE_NOREL_GLOBAL_META(FILE *, stdin);
+DECLARE_NOREL_GLOBAL_META(FILE *, stdout);
+DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
+#define __LOCAL_stdin  GET_NOREL_GLOBAL(stdin)
+#define __LOCAL_stdout GET_NOREL_GLOBAL(stdout)
+#define __LOCAL_stderr GET_NOREL_GLOBAL(stderr)
+#define stdin          GET_NOREL_GLOBAL(stdin)
+#define stdout         GET_NOREL_GLOBAL(stdout)
+#define stderr         GET_NOREL_GLOBAL(stderr)
+
 
 typedef void (__LIBCCALL *PERROR_PRINT_PROGNAME)(void);
 
