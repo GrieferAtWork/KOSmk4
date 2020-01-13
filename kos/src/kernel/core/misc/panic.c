@@ -268,9 +268,12 @@ panic_assert_chk_print_message(void *arg) {
 	if (args->aa_func)
 		dbg_printf(DBGSTR("func: " DF_FGCOLOR(DBG_COLOR_WHITE, "%s") "\n"), args->aa_func);
 	if (args->aa_format) {
+		va_list vargs;
 		dbg_print(DBGSTR("mesg: " DF_SETCOLOR(DBG_COLOR_TEAL, DBG_COLOR_BLACK)));
 		dbg_indent += 6;
-		format_vprintf(&dbg_printer, NULL, args->aa_format, args->aa_args);
+		va_copy(vargs, args->aa_args);
+		format_vprintf(&dbg_printer, NULL, args->aa_format, vargs);
+		va_end(vargs);
 		dbg_indent -= 6;
 		dbg_print(DBGSTR(DF_DEFCOLOR "\n"));
 	}
