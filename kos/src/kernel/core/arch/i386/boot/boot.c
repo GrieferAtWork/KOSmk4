@@ -340,10 +340,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	printk("After waiting on signal\n");
 #endif
 
-	/* TODO: Place all of libc's data that requires runtime relocations into a dedicated section `.data.reloc',
-	 *       and have that section be page-aligned. That way, only a minimal number of pages need to be faulted
-	 *       for libc to be loaded. */
-
 	/* TODO: libdebuginfo freezes with -gdwarf-2
 	 * TODO: Check if it still does this (it's been quite a while since I wrote that TODO) */
 
