@@ -493,7 +493,7 @@ do_handle_iob_node_access:
 								goto pop_connections_and_throw_segfault;
 							}
 						}
-						allow_preemption = (icpustate_getpflags(state) & EFLAGS_IF) != 0;
+						allow_preemption = icpustate_getpreemption(state);
 						/* Make special checks if the access itself seems to
 						 * originate from a direct user-space access. */
 						if ((ecode & X86_PAGEFAULT_ECODE_USERSPACE) && isuser()) {
@@ -508,7 +508,9 @@ do_handle_iob_node_access:
 							if (!is_io_instruction_and_not_memory_access((byte_t *)pc, state, (uintptr_t)addr))
 								goto pop_connections_and_throw_segfault;
 						}
-						if (!handle_iob_access(mycpu, (ecode & X86_PAGEFAULT_ECODE_WRITING) != 0, allow_preemption)) {
+						if (!handle_iob_access(mycpu,
+						                       (ecode & X86_PAGEFAULT_ECODE_WRITING) != 0,
+						                       allow_preemption)) {
 							assert(PREEMPTION_ENABLED());
 							goto again_lookup_node;
 						}
@@ -516,7 +518,7 @@ do_handle_iob_node_access:
 							__sti();
 						goto done_before_pop_connections;
 					}
-					IF_SMP(if (icpustate_getpflags(state) & EFLAGS_IF) __sti());
+					IF_SMP(if (icpustate_getpreemption(state)) __sti());
 				}
 				/* Either this is an access to the IOB vector of a different CPU,
 				 * or the accessed node is just some random, reservation node.
@@ -532,7 +534,7 @@ do_handle_iob_node_access:
 #ifndef CONFIG_NO_SMP
 				if (is_iob_node(node)) {
 					/* If we didn't actually re-enable preemption, then no cpu-transfer could have happened! */
-					if (!(icpustate_getpflags(state) & EFLAGS_IF))
+					if (!icpustate_getpreemption(state))
 						goto pop_connections_and_throw_segfault;
 					if (!isuser())
 						goto pop_connections_and_throw_segfault;

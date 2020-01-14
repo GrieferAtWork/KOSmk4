@@ -44,7 +44,7 @@ x86_handle_ms_fastfail(struct icpustate *__restrict state) {
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGNO);
 	/* Use the fastfail code as exitcode for the program (not
-	 * exactly what window does, but still close enough...) */
+	 * exactly what windows does, but still close enough...) */
 	THROW(E_EXIT_PROCESS,
 	      W_EXITCODE(gpregs_getpcx(&state->ics_gpregs),
 	                 SIGNO));

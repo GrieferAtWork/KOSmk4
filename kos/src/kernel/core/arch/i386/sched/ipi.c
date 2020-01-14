@@ -304,7 +304,7 @@ NOTHROW(KCALL cpu_sendipi)(struct cpu *__restrict target,
 			x86_execute_direct_ipi_nopr(func, args);
 			goto done_success;
 		}
-		if (was & EFLAGS_IF) {
+		if (PREEMPTION_WASENABLED(was)) {
 			x86_execute_direct_ipi(func, args);
 			assert(PREEMPTION_ENABLED());
 			goto done_success;
