@@ -651,8 +651,9 @@ extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; };
 #define __ATTR_FORCEINLINE    /* Nothing */
 #endif
 
-#define __LOCAL       static __ATTR_INLINE
-#define __FORCELOCAL  static __ATTR_FORCEINLINE
+#define __LOCAL        static __ATTR_INLINE
+#define __FORCELOCAL   static __ATTR_FORCEINLINE
+#define __EXTERNINLINE extern __ATTR_INLINE __attribute__((__gnu_inline__)) /* XXX: When did this become available? */
 
 #ifndef __LONGLONG
 #ifdef __CC__

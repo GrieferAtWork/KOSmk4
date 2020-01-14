@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20ff3edc */
+/* HASH CRC-32:0xa9dd07fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_erfc_defined
 #define ____localdep_erfc_defined 1
 #if __has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_erfc)(double __x) { return __builtin_erfc(__x); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_erfc)(double __x) { return __builtin_erfc(__x); }
 #elif defined(__CRT_HAVE_erfc)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_erfc,(double __x),erfc,(__x))
 #elif defined(__CRT_HAVE___erfc)

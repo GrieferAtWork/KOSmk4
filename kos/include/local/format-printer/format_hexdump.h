@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde337ca0 */
+/* HASH CRC-32:0x3f733372 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_repeat,(__pfor
 #ifndef ____localdep_isprint_defined
 #define ____localdep_isprint_defined 1
 #if __has_builtin(__builtin_isprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isprint)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isprint)(int __ch) { return __builtin_isprint(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isprint)(int __ch) { return __builtin_isprint(__ch); }
 #elif defined(__CRT_HAVE_isprint)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isprint,(int __ch),isprint,(__ch))
 #else /* LIBC: isprint */

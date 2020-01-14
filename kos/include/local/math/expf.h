@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x560c30af */
+/* HASH CRC-32:0xd4a63605 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #define ____localdep_exp_defined 1
 #if __has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)
 /* Exponential function of X */
-__FORCELOCAL __DECL_SIMD_exp __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_exp)(double __x) { return __builtin_exp(__x); }
+__EXTERNINLINE __DECL_SIMD_exp __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_exp)(double __x) { return __builtin_exp(__x); }
 #elif defined(__CRT_HAVE_exp)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__localdep_exp,(double __x),exp,(__x))

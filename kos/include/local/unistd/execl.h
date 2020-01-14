@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89ac8c5a */
+/* HASH CRC-32:0x23a79b46 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL __localdep_execv)(char const *__restrict __path, __TARGV) { return __builtin_execv(__path, (char *const *)___argv); }
+__LOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL __localdep_execv)(char const *__restrict __path, __TARGV) { return __builtin_execv(__path, (char *const *)___argv); }
 #elif defined(__CRT_HAVE_execv)
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'

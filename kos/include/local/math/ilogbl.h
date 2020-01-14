@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc2186d0 */
+/* HASH CRC-32:0xcd324664 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_ilogb_defined 1
 #if __has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)
 /* Return the binary exponent of X, which must be nonzero */
-__FORCELOCAL __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_ilogb)(double __x) { return __builtin_ilogb(__x); }
+__EXTERNINLINE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_ilogb)(double __x) { return __builtin_ilogb(__x); }
 #elif defined(__CRT_HAVE_ilogb)
 /* Return the binary exponent of X, which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogb,(double __x),ilogb,(__x))

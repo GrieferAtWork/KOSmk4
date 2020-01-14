@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f44c9c0 */
+/* HASH CRC-32:0x2c178f86 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_iswalpha_defined
 #define ____localdep_iswalpha_defined 1
 #if __has_builtin(__builtin_iswalpha) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswalpha)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswalpha)(__WINT_TYPE__ __wc) { return __builtin_iswalpha(__wc); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswalpha)(__WINT_TYPE__ __wc) { return __builtin_iswalpha(__wc); }
 #elif defined(__CRT_HAVE_iswalpha)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswalpha,(__WINT_TYPE__ __wc),iswalpha,(__wc))
 #else /* LIBC: iswalpha */

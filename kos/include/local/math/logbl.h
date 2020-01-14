@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc78f1ff6 */
+/* HASH CRC-32:0x16aa8293 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_logb_defined 1
 #if __has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)
 /* Return the base 2 signed integral exponent of X */
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_logb)(double __x) { return __builtin_logb(__x); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_logb)(double __x) { return __builtin_logb(__x); }
 #elif defined(__CRT_HAVE_logb)
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_logb,(double __x),logb,(__x))

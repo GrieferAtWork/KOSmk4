@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b7da26d */
+/* HASH CRC-32:0x7a3c7c3c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_strdup_defined
 #define ____localdep_strdup_defined 1
 #if __has_builtin(__builtin_strdup) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strdup)
-__FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL __localdep_strdup)(char const *__restrict __string) { return __builtin_strdup(__string); }
+__EXTERNINLINE __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL __localdep_strdup)(char const *__restrict __string) { return __builtin_strdup(__string); }
 #elif defined(__CRT_HAVE_strdup)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strdup,(char const *__restrict __string),strdup,(__string))
 #elif defined(__CRT_HAVE__strdup)

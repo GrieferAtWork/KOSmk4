@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45ce2144 */
+/* HASH CRC-32:0x511ec3b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_fabsf_defined 1
 #if __has_builtin(__builtin_fabsf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsf)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __localdep_fabsf)(float __x) { return __builtin_fabsf(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __localdep_fabsf)(float __x) { return __builtin_fabsf(__x); }
 #elif defined(__CRT_HAVE_fabsf)
 /* Absolute value of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_fabsf,(float __x),fabsf,(__x))

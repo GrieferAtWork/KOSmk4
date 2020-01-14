@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9dd020e7 */
+/* HASH CRC-32:0x727f69d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_exp2_defined 1
 #if __has_builtin(__builtin_exp2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp2)
 /* Compute base-2 exponential of X */
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_exp2)(double __x) { return __builtin_exp2(__x); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_exp2)(double __x) { return __builtin_exp2(__x); }
 #elif defined(__CRT_HAVE_exp2)
 /* Compute base-2 exponential of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),exp2,(__x))

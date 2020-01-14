@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fd52187 */
+/* HASH CRC-32:0x28e88260 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -260,7 +260,7 @@ __CDECLARE(,int *,__NOTHROW_NCX,__fpecode,(void),())
 #ifdef __CC__
 #if __has_builtin(__builtin_copysign) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysign)
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _copysign)(double __num, double __sign) { return __builtin_copysign(__num, __sign); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _copysign)(double __num, double __sign) { return __builtin_copysign(__num, __sign); }
 #elif defined(__CRT_HAVE_copysign)
 /* Return X with its signed changed to Y's */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_copysign,(double __num, double __sign),copysign,(__num,__sign))
@@ -313,7 +313,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x,
 #endif /* _nextafter... */
 #if __has_builtin(__builtin_finite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _finite)(double __val) { return __builtin_finite(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _finite)(double __val) { return __builtin_finite(__val); }
 #elif defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __val),finite,(__val))
@@ -330,7 +330,7 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _finite)(doubl
 #endif /* _finite... */
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isnan)(double __val) { return __builtin_isnan(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isnan)(double __val) { return __builtin_isnan(__val); }
 #elif defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __val),isnan,(__val))
@@ -351,7 +351,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_fpclass,(double __x),(__x)
 #if defined(__x86_64__) || defined(__i386__)
 #if __has_builtin(__builtin_scalbf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbf)
 /* Return X times (2 to the Nth power) */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float __n) { return __builtin_scalbf(__x, __n); }
+__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float __n) { return __builtin_scalbf(__x, __n); }
 #elif defined(__CRT_HAVE_scalbf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __n),scalbf,(__x,__n))

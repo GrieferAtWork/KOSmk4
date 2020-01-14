@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd56ec201 */
+/* HASH CRC-32:0x6cbb87e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_strncmp_defined 1
 #if __has_builtin(__builtin_strncmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncmp)
 /* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL __localdep_strncmp)(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen) { return __builtin_strncmp(__s1, __s2, __maxlen); }
+__EXTERNINLINE __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL __localdep_strncmp)(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen) { return __builtin_strncmp(__s1, __s2, __maxlen); }
 #elif defined(__CRT_HAVE_strncmp)
 /* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncmp,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncmp,(__s1,__s2,__maxlen))

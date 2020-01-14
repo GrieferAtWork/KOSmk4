@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x453cce70 */
+/* HASH CRC-32:0xe8fc776c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_modf_defined 1
 #if __has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)
 /* Break VALUE into integral and fractional parts */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL __localdep_modf)(double __x, double *__iptr) { return __builtin_modf(__x, __iptr); }
+__EXTERNINLINE __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL __localdep_modf)(double __x, double *__iptr) { return __builtin_modf(__x, __iptr); }
 #elif defined(__CRT_HAVE_modf)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),modf,(__x,__iptr))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0a34d16 */
+/* HASH CRC-32:0xbe7cb8af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_scalb_defined 1
 #if __has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_scalb)(double __x, double __n) { return __builtin_scalb(__x, __n); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_scalb)(double __x, double __n) { return __builtin_scalb(__x, __n); }
 #elif defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __n),scalb,(__x,__n))

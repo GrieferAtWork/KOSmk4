@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc41c865b */
+/* HASH CRC-32:0xd0f1b980 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #if __has_builtin(__builtin_fputs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs)
 /* Print a given string `STR' to `STREAM'. This is identical to:
  * >> fwrite(str, sizeof(char), strlen(str), stream); */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__LIBCCALL __localdep_fputs)(char const *__restrict __str, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputs(__str, __stream); }
+__EXTERNINLINE __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (__LIBCCALL __localdep_fputs)(char const *__restrict __str, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputs(__str, __stream); }
 #elif defined(__CRT_HAVE_fputs_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Print a given string `STR' to `STREAM'. This is identical to:
  * >> fwrite(str, sizeof(char), strlen(str), stream); */
@@ -60,7 +60,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,__localdep_fputs,(char
 #define ____localdep_fputc_defined 1
 #if __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
 /* Write a single character `CH' to `STREAM' */
-__FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL __localdep_fputc)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputc(__ch, __stream); }
+__EXTERNINLINE __ATTR_NONNULL((2)) int (__LIBCCALL __localdep_fputc)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputc(__ch, __stream); }
 #elif defined(__CRT_HAVE_fputc_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Write a single character `CH' to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,,__localdep_fputc,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream)) __THROWS(...)

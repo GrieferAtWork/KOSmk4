@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71375bad */
+/* HASH CRC-32:0x1da61c09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #define ____localdep_cos_defined 1
 #if __has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)
 /* Cosine of X */
-__FORCELOCAL __DECL_SIMD_cos __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_cos)(double __x) { return __builtin_cos(__x); }
+__EXTERNINLINE __DECL_SIMD_cos __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_cos)(double __x) { return __builtin_cos(__x); }
 #elif defined(__CRT_HAVE_cos)
 /* Cosine of X */
 __CREDIRECT(__DECL_SIMD_cos __ATTR_WUNUSED,double,__NOTHROW,__localdep_cos,(double __x),cos,(__x))

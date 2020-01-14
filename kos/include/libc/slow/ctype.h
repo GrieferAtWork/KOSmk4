@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ad8faa8 */
+/* HASH CRC-32:0x43a6a856 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 __SYSDECL_BEGIN
 
 #if __has_builtin(__builtin_iscntrl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iscntrl)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_iscntrl)(int __ch) { return __builtin_iscntrl(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_iscntrl)(int __ch) { return __builtin_iscntrl(__ch); }
 #elif defined(__CRT_HAVE_iscntrl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_iscntrl,(int __ch),iscntrl,(__ch))
 #else /* LIBC: iscntrl */
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_iscntrl,(int _
 #define __libc_slow_iscntrl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iscntrl))
 #endif /* iscntrl... */
 #if __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isspace)(int __ch) { return __builtin_isspace(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isspace)(int __ch) { return __builtin_isspace(__ch); }
 #elif defined(__CRT_HAVE_isspace)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isspace,(int __ch),isspace,(__ch))
 #else /* LIBC: isspace */
@@ -45,7 +45,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isspace,(int _
 #define __libc_slow_isspace (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isspace))
 #endif /* isspace... */
 #if __has_builtin(__builtin_isupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isupper)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isupper)(int __ch) { return __builtin_isupper(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isupper)(int __ch) { return __builtin_isupper(__ch); }
 #elif defined(__CRT_HAVE_isupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isupper,(int __ch),isupper,(__ch))
 #else /* LIBC: isupper */
@@ -53,7 +53,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isupper,(int _
 #define __libc_slow_isupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isupper))
 #endif /* isupper... */
 #if __has_builtin(__builtin_islower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_islower)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_islower)(int __ch) { return __builtin_islower(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_islower)(int __ch) { return __builtin_islower(__ch); }
 #elif defined(__CRT_HAVE_islower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_islower,(int __ch),islower,(__ch))
 #else /* LIBC: islower */
@@ -61,7 +61,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_islower,(int _
 #define __libc_slow_islower (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(islower))
 #endif /* islower... */
 #if __has_builtin(__builtin_isalpha) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isalpha)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isalpha)(int __ch) { return __builtin_isalpha(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isalpha)(int __ch) { return __builtin_isalpha(__ch); }
 #elif defined(__CRT_HAVE_isalpha)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isalpha,(int __ch),isalpha,(__ch))
 #else /* LIBC: isalpha */
@@ -69,7 +69,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isalpha,(int _
 #define __libc_slow_isalpha (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalpha))
 #endif /* isalpha... */
 #if __has_builtin(__builtin_isdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isdigit)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isdigit)(int __ch) { return __builtin_isdigit(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isdigit)(int __ch) { return __builtin_isdigit(__ch); }
 #elif defined(__CRT_HAVE_isdigit)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isdigit,(int __ch),isdigit,(__ch))
 #else /* LIBC: isdigit */
@@ -77,7 +77,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isdigit,(int _
 #define __libc_slow_isdigit (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isdigit))
 #endif /* isdigit... */
 #if __has_builtin(__builtin_isxdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isxdigit)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isxdigit)(int __ch) { return __builtin_isxdigit(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isxdigit)(int __ch) { return __builtin_isxdigit(__ch); }
 #elif defined(__CRT_HAVE_isxdigit)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isxdigit,(int __ch),isxdigit,(__ch))
 #else /* LIBC: isxdigit */
@@ -85,7 +85,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isxdigit,(int 
 #define __libc_slow_isxdigit (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isxdigit))
 #endif /* isxdigit... */
 #if __has_builtin(__builtin_isalnum) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isalnum)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isalnum)(int __ch) { return __builtin_isalnum(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isalnum)(int __ch) { return __builtin_isalnum(__ch); }
 #elif defined(__CRT_HAVE_isalnum)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isalnum,(int __ch),isalnum,(__ch))
 #else /* LIBC: isalnum */
@@ -93,7 +93,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isalnum,(int _
 #define __libc_slow_isalnum (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isalnum))
 #endif /* isalnum... */
 #if __has_builtin(__builtin_ispunct) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ispunct)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_ispunct)(int __ch) { return __builtin_ispunct(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_ispunct)(int __ch) { return __builtin_ispunct(__ch); }
 #elif defined(__CRT_HAVE_ispunct)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_ispunct,(int __ch),ispunct,(__ch))
 #else /* LIBC: ispunct */
@@ -101,7 +101,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_ispunct,(int _
 #define __libc_slow_ispunct (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ispunct))
 #endif /* ispunct... */
 #if __has_builtin(__builtin_isgraph) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isgraph)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isgraph)(int __ch) { return __builtin_isgraph(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isgraph)(int __ch) { return __builtin_isgraph(__ch); }
 #elif defined(__CRT_HAVE_isgraph)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isgraph,(int __ch),isgraph,(__ch))
 #else /* LIBC: isgraph */
@@ -109,7 +109,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isgraph,(int _
 #define __libc_slow_isgraph (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isgraph))
 #endif /* isgraph... */
 #if __has_builtin(__builtin_isprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isprint)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isprint)(int __ch) { return __builtin_isprint(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isprint)(int __ch) { return __builtin_isprint(__ch); }
 #elif defined(__CRT_HAVE_isprint)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isprint,(int __ch),isprint,(__ch))
 #else /* LIBC: isprint */
@@ -117,7 +117,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isprint,(int _
 #define __libc_slow_isprint (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isprint))
 #endif /* isprint... */
 #if __has_builtin(__builtin_tolower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tolower)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_tolower)(int __ch) { return __builtin_tolower(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_tolower)(int __ch) { return __builtin_tolower(__ch); }
 #elif defined(__CRT_HAVE_tolower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_tolower,(int __ch),tolower,(__ch))
 #elif defined(__CRT_HAVE__tolower)
@@ -127,7 +127,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_tolower,(int _
 #define __libc_slow_tolower (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower))
 #endif /* tolower... */
 #if __has_builtin(__builtin_toupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_toupper)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_toupper)(int __ch) { return __builtin_toupper(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_toupper)(int __ch) { return __builtin_toupper(__ch); }
 #elif defined(__CRT_HAVE_toupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_toupper,(int __ch),toupper,(__ch))
 #elif defined(__CRT_HAVE__toupper)
@@ -137,7 +137,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_toupper,(int _
 #define __libc_slow_toupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper))
 #endif /* toupper... */
 #if __has_builtin(__builtin_isblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isblank)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isblank)(int __ch) { return __builtin_isblank(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_isblank)(int __ch) { return __builtin_isblank(__ch); }
 #elif defined(__CRT_HAVE_isblank)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isblank,(int __ch),isblank,(__ch))
 #else /* LIBC: isblank */

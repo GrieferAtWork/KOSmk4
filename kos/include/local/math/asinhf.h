@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f38522a */
+/* HASH CRC-32:0xea5c9b4f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_asinh_defined 1
 #if __has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)
 /* Hyperbolic arc sine of X */
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_asinh)(double __x) { return __builtin_asinh(__x); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_asinh)(double __x) { return __builtin_asinh(__x); }
 #elif defined(__CRT_HAVE_asinh)
 /* Hyperbolic arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),asinh,(__x))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb928c13 */
+/* HASH CRC-32:0xca01092f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_isalpha_defined
 #define ____localdep_isalpha_defined 1
 #if __has_builtin(__builtin_isalpha) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isalpha)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isalpha)(int __ch) { return __builtin_isalpha(__ch); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isalpha)(int __ch) { return __builtin_isalpha(__ch); }
 #elif defined(__CRT_HAVE_isalpha)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isalpha,(int __ch),isalpha,(__ch))
 #else /* LIBC: isalpha */

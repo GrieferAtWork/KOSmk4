@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f83806b */
+/* HASH CRC-32:0x5b7681b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_STD_USING(__localdep_vsnprintf)
 #elif __has_builtin(__builtin_vsnprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsnprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
-__FORCELOCAL __ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL __localdep_vsnprintf)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args) { return __builtin_vsnprintf(__buf, __buflen, __format, __args); }
+__EXTERNINLINE __ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF(3, 0) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL __localdep_vsnprintf)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args) { return __builtin_vsnprintf(__buf, __buflen, __format, __args); }
 #elif defined(__CRT_HAVE_vsnprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */

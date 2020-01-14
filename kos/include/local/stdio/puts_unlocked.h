@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f85ae3c */
+/* HASH CRC-32:0xf2a1ec85 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #define ____localdep_fputs_unlocked_defined 1
 #if __has_builtin(__builtin_fputs_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs_unlocked)
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__LIBCCALL __localdep_fputs_unlocked)(char const *__restrict __string, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputs_unlocked(__string, __stream); }
+__EXTERNINLINE __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__LIBCCALL __localdep_fputs_unlocked)(char const *__restrict __string, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputs_unlocked(__string, __stream); }
 #elif defined(__CRT_HAVE_fputs_unlocked)
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs_unlocked,(__string,__stream)) __THROWS(...)
@@ -48,7 +48,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,__localdep_fputs_unlock
 #define ____localdep_fputc_unlocked_defined 1
 #if __has_builtin(__builtin_fputc_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc_unlocked)
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
-__FORCELOCAL __ATTR_NONNULL((2)) int (__LIBCCALL __localdep_fputc_unlocked)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputc_unlocked(__ch, __stream); }
+__EXTERNINLINE __ATTR_NONNULL((2)) int (__LIBCCALL __localdep_fputc_unlocked)(int __ch, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputc_unlocked(__ch, __stream); }
 #elif defined(__CRT_HAVE_fputc_unlocked)
 /* Same as `fputc()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,,__localdep_fputc_unlocked,(int __ch, __FILE *__restrict __stream),fputc_unlocked,(__ch,__stream)) __THROWS(...)

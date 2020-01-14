@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cbaeca2 */
+/* HASH CRC-32:0xee7ae0d4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_log2_defined 1
 #if __has_builtin(__builtin_log2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log2)
 /* Compute base-2 logarithm of X */
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_log2)(double __x) { return __builtin_log2(__x); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_log2)(double __x) { return __builtin_log2(__x); }
 #elif defined(__CRT_HAVE_log2)
 /* Compute base-2 logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_log2,(double __x),log2,(__x))

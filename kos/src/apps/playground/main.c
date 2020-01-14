@@ -32,8 +32,8 @@
 #include <kos/debugtrap.h>
 #include <kos/except.h>
 #include <kos/kernel/types.h>
-#include <kos/syscalls.h>
 #include <kos/ksysctl.h>
+#include <kos/syscalls.h>
 #include <kos/types.h>
 #include <kos/ukern.h>
 #include <kos/unistd.h>
@@ -46,6 +46,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <dlfcn.h>
 #include <err.h>
 #include <errno.h>
 #include <format-printer.h>
@@ -291,6 +292,22 @@ int main_logtime(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+static int my_static = 0;
+int main_dl(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	printf("stdout   @ %p\n", &stdout);
+	printf("my_state @ %p\n", &my_static);
+	printf("printf   @ %p\n", (void *)&printf);
+	printf("printf   @ %p (dlsym)\n", dlsym(RTLD_DEFAULT, "printf"));
+	printf("vprintf  @ %p (dlsym)\n", dlsym(RTLD_DEFAULT, "vprintf"));
+ 	return 0;
+}
+/************************************************************************/
+
+
+
+
 #if defined(__i386__) || defined(__x86_64__)
 #define HAVE_MAIN_SYSENTER 1
 /************************************************************************/
@@ -402,6 +419,7 @@ PRIVATE DEF defs[] = {
 	{ "fpu", &main_fpu },
 	{ "fork", &main_fork },
 	{ "logtime", &main_logtime },
+	{ "dl", &main_dl },
 #ifdef HAVE_MAIN_SYSENTER
 	{ "sysenter", &main_sysenter },
 #endif /* HAVE_MAIN_SYSENTER */

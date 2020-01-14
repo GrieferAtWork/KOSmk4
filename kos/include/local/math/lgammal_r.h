@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x468b9eff */
+/* HASH CRC-32:0x75ff8d5a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 /* Reentrant version of lgamma. This function uses the global variable
  * `signgam'.  The reentrant version instead takes a pointer and stores
  * the value through it */
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL __localdep_lgamma_r)(double __x, int *__signgamp) { return __builtin_lgamma_r(__x, __signgamp); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL __localdep_lgamma_r)(double __x, int *__signgamp) { return __builtin_lgamma_r(__x, __signgamp); }
 #elif defined(__CRT_HAVE_lgamma_r)
 /* Reentrant version of lgamma. This function uses the global variable
  * `signgam'.  The reentrant version instead takes a pointer and stores

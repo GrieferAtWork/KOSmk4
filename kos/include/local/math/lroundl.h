@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a2d726 */
+/* HASH CRC-32:0x9813d360 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_roundl_defined 1
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __localdep_roundl)(long double __x) { return __builtin_roundl(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __localdep_roundl)(long double __x) { return __builtin_roundl(__x); }
 #elif defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__localdep_roundl,(long double __x),roundl,(__x))

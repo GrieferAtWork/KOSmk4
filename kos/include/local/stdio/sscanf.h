@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe39d4437 */
+/* HASH CRC-32:0xa1e1d8fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_STD_USING(__localdep_vsscanf)
 #elif __has_builtin(__builtin_vsscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsscanf)
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL __localdep_vsscanf)(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args) { return __builtin_vsscanf(__input, __format, __args); }
+__EXTERNINLINE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 0) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL __localdep_vsscanf)(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args) { return __builtin_vsscanf(__input, __format, __args); }
 #elif defined(__CRT_HAVE_vsscanf)
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */

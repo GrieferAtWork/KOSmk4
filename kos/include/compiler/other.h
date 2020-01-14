@@ -259,6 +259,8 @@
 #define __builtin_unreachable()  /* nothing */
 #define __LOCAL                  /* nothing */
 #define __FORCELOCAL             /* nothing */
+#define __NO_EXTERNINLINE        1
+#define __EXTERNINLINE           /* nothing */
 #define __NO_builtin_constant_p  1
 
 #ifdef __LINKER__

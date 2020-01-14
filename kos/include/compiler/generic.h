@@ -714,13 +714,20 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 
 #if __has_attribute(__always_inline__)
 #define __ATTR_FORCEINLINE __ATTR_INLINE __attribute__((__always_inline__))
-#else
+#else /* __always_inline__ */
 #define __NO_ATTR_FORCEINLINE 1
 #define __ATTR_FORCEINLINE __ATTR_INLINE /* Nothing */
-#endif
+#endif /* !__always_inline__ */
 
-#define __LOCAL      static __ATTR_INLINE
-#define __FORCELOCAL static __ATTR_FORCEINLINE
+#define __LOCAL        static __ATTR_INLINE
+#define __FORCELOCAL   static __ATTR_FORCEINLINE
+
+#if __has_attribute(__gnu_inline__)
+#define __EXTERNINLINE extern __ATTR_INLINE __attribute__((__gnu_inline__))
+#else /* __gnu_inline__ */
+#define __NO_EXTERNINLINE 1
+#define __EXTERNINLINE __LOCAL
+#endif /* !__gnu_inline__ */
 
 #ifdef __COMPILER_HAVE_LONGLONG
 #define __LONGLONG   signed long long

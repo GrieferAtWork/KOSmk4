@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82b72d0a */
+/* HASH CRC-32:0x77c6ce89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_drem_defined 1
 #if __has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)
 /* Return the remainder of X/Y */
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_drem)(double __x, double __y) { return __builtin_drem(__x, __y); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_drem)(double __x, double __y) { return __builtin_drem(__x, __y); }
 #elif defined(__CRT_HAVE_drem)
 /* Return the remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_drem,(double __x, double __y),drem,(__x,__y))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bab66ab */
+/* HASH CRC-32:0x69e9a5b3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #if __has_builtin(__builtin_vsprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vsprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL __localdep_vsprintf)(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args) { return __builtin_vsprintf(__dest, __format, __args); }
+__EXTERNINLINE __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0) __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__LIBCCALL __localdep_vsprintf)(char *__restrict __dest, char const *__restrict __format, __builtin_va_list __args) { return __builtin_vsprintf(__dest, __format, __args); }
 #elif defined(__CRT_HAVE_vsprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */

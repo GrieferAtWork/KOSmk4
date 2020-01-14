@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fa45ae3 */
+/* HASH CRC-32:0xf552ee1c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_iswgraph_defined
 #define ____localdep_iswgraph_defined 1
 #if __has_builtin(__builtin_iswgraph) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswgraph)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswgraph)(__WINT_TYPE__ __wc) { return __builtin_iswgraph(__wc); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswgraph)(__WINT_TYPE__ __wc) { return __builtin_iswgraph(__wc); }
 #elif defined(__CRT_HAVE_iswgraph)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswgraph,(__WINT_TYPE__ __wc),iswgraph,(__wc))
 #else /* LIBC: iswgraph */

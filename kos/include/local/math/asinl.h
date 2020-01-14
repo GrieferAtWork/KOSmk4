@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87591c */
+/* HASH CRC-32:0x825b7bb1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_asin_defined 1
 #if __has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)
 /* Arc sine of X */
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_asin)(double __x) { return __builtin_asin(__x); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_asin)(double __x) { return __builtin_asin(__x); }
 #elif defined(__CRT_HAVE_asin)
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asin,(double __x),asin,(__x))

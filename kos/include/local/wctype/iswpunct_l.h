@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd21d950a */
+/* HASH CRC-32:0x48171300 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_iswpunct_defined
 #define ____localdep_iswpunct_defined 1
 #if __has_builtin(__builtin_iswpunct) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswpunct)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswpunct)(__WINT_TYPE__ __wc) { return __builtin_iswpunct(__wc); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswpunct)(__WINT_TYPE__ __wc) { return __builtin_iswpunct(__wc); }
 #elif defined(__CRT_HAVE_iswpunct)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswpunct,(__WINT_TYPE__ __wc),iswpunct,(__wc))
 #else /* LIBC: iswpunct */

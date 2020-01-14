@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc23649c */
+/* HASH CRC-32:0x6af7e771 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_ldexp_defined 1
 #if __has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)
 /* X times (two to the EXP power) */
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_ldexp)(double __x, int __exponent) { return __builtin_ldexp(__x, __exponent); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_ldexp)(double __x, int __exponent) { return __builtin_ldexp(__x, __exponent); }
 #elif defined(__CRT_HAVE_ldexp)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_ldexp,(double __x, int __exponent),ldexp,(__x,__exponent))

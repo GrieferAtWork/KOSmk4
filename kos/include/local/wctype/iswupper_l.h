@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12afc23d */
+/* HASH CRC-32:0xdfef6668 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_iswupper_defined
 #define ____localdep_iswupper_defined 1
 #if __has_builtin(__builtin_iswupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswupper)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswupper)(__WINT_TYPE__ __wc) { return __builtin_iswupper(__wc); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswupper)(__WINT_TYPE__ __wc) { return __builtin_iswupper(__wc); }
 #elif defined(__CRT_HAVE_iswupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswupper,(__WINT_TYPE__ __wc),iswupper,(__wc))
 #else /* LIBC: iswupper */

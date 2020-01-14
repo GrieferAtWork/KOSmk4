@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x670386b0 */
+/* HASH CRC-32:0x461ebdea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_isinf_defined 1
 #if __has_builtin(__builtin_isinf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isinf)(double __val) { return __builtin_isinf(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isinf)(double __val) { return __builtin_isinf(__val); }
 #elif defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __val),isinf,(__val))
@@ -43,7 +43,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double _
 #define ____localdep_isnan_defined 1
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isnan)(double __val) { return __builtin_isnan(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isnan)(double __val) { return __builtin_isnan(__val); }
 #elif defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __val),isnan,(__val))

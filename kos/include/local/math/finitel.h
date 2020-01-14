@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea62fa0 */
+/* HASH CRC-32:0xe0f9b50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_isinfl_defined
 #define ____localdep_isinfl_defined 1
 #if __has_builtin(__builtin_isinfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinfl)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isinfl)(long double __val) { return __builtin_isinfl(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isinfl)(long double __val) { return __builtin_isinfl(__val); }
 #elif defined(__CRT_HAVE_isinfl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(long double __val),isinfl,(__val))
 #elif defined(__CRT_HAVE___isinfl)
@@ -42,7 +42,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(long do
 #ifndef ____localdep_isnanl_defined
 #define ____localdep_isnanl_defined 1
 #if __has_builtin(__builtin_isnanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanl)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isnanl)(long double __val) { return __builtin_isnanl(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isnanl)(long double __val) { return __builtin_isnanl(__val); }
 #elif defined(__CRT_HAVE_isnanl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),isnanl,(__val))
 #elif defined(__CRT_HAVE___isnanl)

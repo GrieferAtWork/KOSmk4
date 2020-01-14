@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44f87762 */
+/* HASH CRC-32:0x49fe490c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #define ____localdep_nextafter_defined 1
 #if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_nextafter)(double __x, double __y) { return __builtin_nextafter(__x, __y); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_nextafter)(double __x, double __y) { return __builtin_nextafter(__x, __y); }
 #elif defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nextafter,(__x,__y))

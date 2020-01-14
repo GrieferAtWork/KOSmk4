@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x527dd5c1 */
+/* HASH CRC-32:0x9416b098 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_iswxdigit_defined
 #define ____localdep_iswxdigit_defined 1
 #if __has_builtin(__builtin_iswxdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswxdigit)
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswxdigit)(__WINT_TYPE__ __wc) { return __builtin_iswxdigit(__wc); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswxdigit)(__WINT_TYPE__ __wc) { return __builtin_iswxdigit(__wc); }
 #elif defined(__CRT_HAVE_iswxdigit)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswxdigit,(__WINT_TYPE__ __wc),iswxdigit,(__wc))
 #else /* LIBC: iswxdigit */

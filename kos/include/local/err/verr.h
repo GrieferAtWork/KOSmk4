@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9c096b6 */
+/* HASH CRC-32:0x807aa759 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __CREDIRECT_VOID(__ATTR_LIBC_PRINTF(1, 0),,__localdep_vwarn,(char const *__forma
 #ifdef __std___localdep_exit_defined
 __NAMESPACE_STD_USING(__localdep_exit)
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
-__FORCELOCAL __ATTR_NORETURN void (__LIBCCALL __localdep_exit)(int __status) __THROWS(...) { __builtin_exit(__status); }
+__EXTERNINLINE __ATTR_NORETURN void (__LIBCCALL __localdep_exit)(int __status) __THROWS(...) { __builtin_exit(__status); }
 #elif defined(__CRT_HAVE_exit)
 __CREDIRECT_VOID(__ATTR_NORETURN,,__localdep_exit,(int __status),exit,(__status)) __THROWS(...)
 #elif defined(__CRT_HAVE_quick_exit)

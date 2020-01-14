@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8ad1473 */
+/* HASH CRC-32:0xc7d25bd4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #define ____localdep_log_defined 1
 #if __has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)
 /* Natural logarithm of X */
-__FORCELOCAL __DECL_SIMD_log __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_log)(double __x) { return __builtin_log(__x); }
+__EXTERNINLINE __DECL_SIMD_log __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_log)(double __x) { return __builtin_log(__x); }
 #elif defined(__CRT_HAVE_log)
 /* Natural logarithm of X */
 __CREDIRECT(__DECL_SIMD_log __ATTR_WUNUSED,double,__NOTHROW,__localdep_log,(double __x),log,(__x))

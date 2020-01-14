@@ -2509,7 +2509,7 @@ again_enum_name:
 					define_as_builtin = false;
 					break;
 				case "preferred_impl":
-					preferred_impl.append((" && ".join(conditions), get_tag_operand().strip()));
+					preferred_impl.append(("__LOCAL", " && ".join(conditions), get_tag_operand().strip()));
 					break;
 				case "allow_macros":
 					allow_macros = true;
@@ -3407,7 +3407,7 @@ again_enum_name:
 				local builtin_name = name ? name : "__builtin_" + funname;
 				local cond = "__has_builtin({})".format({ builtin_name });
 				if (fun.args_is_varargs)
-					cond = cond + " && __has_builtin(__builtin_va_arg_pack)";
+					cond = cond + " && __has_builtin(__builtin_va_arg_pack) && !defined(__NO_EXTERNINLINE)";
 				if (needcrt) {
 					cond = cond + " && defined(__LIBC_BIND_CRTBUILTINS) && " + key_crt_have(funname);
 #ifdef WARN_KNOWN_BUILTINS
@@ -3448,7 +3448,7 @@ again_enum_name:
 				if (fun.args_is_varargs)
 					blockfp << "__builtin_va_arg_pack()";
 				blockfp << "); }";
-				fun.preferred_impl.append((cond, blockfp.string));
+				fun.preferred_impl.append(("__EXTERNINLINE", cond, blockfp.string));
 			}
 #ifdef WARN_KNOWN_BUILTINS
 			else if (!overload_alias) {
@@ -3783,8 +3783,8 @@ class Function {
 	@@:true if @this function has a fast variant, optionally defined in <optimized/[component_name].h>
 	member has_fast_implementation: bool;
 
-	@@List of (condition_expr, impl) of preferred, inline implementations
-	member preferred_impl: {(string, string)...};
+	@@List of (decl, condition_expr, impl) of preferred, inline implementations
+	member preferred_impl: {(string, string, string)...};
 
 	@@:true if @this function's base name isn't a valid alias
 	member nocrt: bool;
@@ -3952,7 +3952,7 @@ class Function {
 		if (symbol_has_fast_implementation)
 			yield (symbol_name, "defined(__fast_{}_defined)".format({ symbol_name }));
 		if (symbol_preferred_impl) {
-			for (local cond, none: symbol_preferred_impl)
+			for (local none, cond, none: symbol_preferred_impl)
 				yield (symbol_name, cond);
 		}
 		for (local cond, alias_name: preferred_aliases) {
@@ -5133,7 +5133,7 @@ do_return_crt:
 				if (is_nothrow) args_prefix = "__" + is_nothrow + args_prefix;
 				if (symbol_preferred_impl) {
 					local is_first = true;
-					for (local cond, impl: symbol_preferred_impl) {
+					for (local decl, cond, impl: symbol_preferred_impl) {
 						printIfdefCond(fp, is_first, cond);
 						is_first = false;
 						fp << "extern \"C++\" {\n";
@@ -5154,7 +5154,7 @@ do_return_crt:
 							function_decl_fp << ")";
 							printThrowsAnnotation(function_decl_fp);
 							print_doc(fp);
-							fp << decl_prefix;
+							fp << decl << decl_prefix[12:];
 							fp << join_variable_name(return_type_fp.string, function_decl_fp.string);
 							fp << " ";
 							do_transform_block(
@@ -5654,11 +5654,11 @@ skip_alias_redirections:
 			}
 		}
 		if (symbol_preferred_impl) {
-			for (local cond, impl: symbol_preferred_impl) {
+			for (local decl, cond, impl: symbol_preferred_impl) {
 				printIfdefCond(fp, is_first, cond);
 				is_first = false;
 				print_doc(fp);
-				fp << "__FORCELOCAL ";
+				fp << decl << " ";
 				local is_nothrow = "";
 				for (local at: attr_tags) {
 					at = at.strip();
