@@ -315,7 +315,7 @@ public:
 		hline((TU)__y, __x1, __x2, __color);
 	}
 
-	/* Fill an area with a solid __color. */
+	/* Fill an area with a solid color. */
 	template<class TX, class TY>
 	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_unsigned<TY>::value, void>::type
 	LIBVIDEO_GFX_CC fill(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
@@ -326,16 +326,16 @@ public:
 	LIBVIDEO_GFX_CC fill(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
 		if (__x < 0) {
 			__x = -__x;
-			if (__size_x <= (__uintptr_t)__x)
+			if (__size_x <= (__size_t)__x)
 				return;
-			__size_x -= (__uintptr_t)__x;
+			__size_x -= (__size_t)__x;
 			__x = 0;
 		}
 		if (__y < 0) {
 			__y = -__y;
-			if (__size_y <= (__uintptr_t)__y)
+			if (__size_y <= (__size_t)__y)
 				return;
-			__size_y -= (__uintptr_t)__y;
+			__size_y -= (__size_t)__y;
 			__y = 0;
 		}
 		fill((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
@@ -345,9 +345,9 @@ public:
 	LIBVIDEO_GFX_CC fill(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
 		if (__x < 0) {
 			__x = -__x;
-			if (__size_x <= (__uintptr_t)__x)
+			if (__size_x <= (__size_t)__x)
 				return;
-			__size_x -= (__uintptr_t)__x;
+			__size_x -= (__size_t)__x;
 			__x = 0;
 		}
 		fill((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
@@ -357,35 +357,59 @@ public:
 	LIBVIDEO_GFX_CC fill(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
 		if (__y < 0) {
 			__y = -__y;
-			if (__size_y <= (__uintptr_t)__y)
+			if (__size_y <= (__size_t)__y)
 				return;
-			__size_y -= (__uintptr_t)__y;
+			__size_y -= (__size_t)__y;
 			__y = 0;
 		}
 		fill((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
 	}
 
 	/* Outline an area with a rectangle. */
-	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC rect(__uintptr_t __x, __uintptr_t __y,
-	                                            __size_t __size_x, __size_t __size_y,
-	                                            video_color_t __color) {
-		(*bfx_ops.fxo_rect)(this, __x, __y, __size_x, __size_y, __color);
+	template<class TX, class TY>
+	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_unsigned<TY>::value, void>::type
+	LIBVIDEO_GFX_CC rect(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
+		(*bfx_ops.fxo_rect)(this, (__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
 	}
-	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC rect(__intptr_t __x, __intptr_t __y,
-	                                            __size_t __size_x, __size_t __size_y,
-	                                            video_color_t __color) {
+	template<class TX, class TY>
+	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_signed<TY>::value, void>::type
+	LIBVIDEO_GFX_CC rect(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
 		if (__x < 0) {
 			__x = -__x;
-			if (__size_x <= (__uintptr_t)__x)
+			if (__size_x <= (__size_t)__x)
 				return;
-			__size_x -= (__uintptr_t)__x;
+			__size_x -= (__size_t)__x;
 			__x = 0;
 		}
 		if (__y < 0) {
 			__y = -__y;
-			if (__size_y <= (__uintptr_t)__y)
+			if (__size_y <= (__size_t)__y)
 				return;
-			__size_y -= (__uintptr_t)__y;
+			__size_y -= (__size_t)__y;
+			__y = 0;
+		}
+		rect((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
+	}
+	template<class TX, class TY>
+	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_unsigned<TY>::value, void>::type
+	LIBVIDEO_GFX_CC rect(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
+		if (__x < 0) {
+			__x = -__x;
+			if (__size_x <= (__size_t)__x)
+				return;
+			__size_x -= (__size_t)__x;
+			__x = 0;
+		}
+		rect((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
+	}
+	template<class TX, class TY>
+	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_signed<TY>::value, void>::type
+	LIBVIDEO_GFX_CC rect(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
+		if (__y < 0) {
+			__y = -__y;
+			if (__size_y <= (__size_t)__y)
+				return;
+			__size_y -= (__size_t)__y;
 			__y = 0;
 		}
 		rect((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
