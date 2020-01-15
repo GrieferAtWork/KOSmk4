@@ -284,7 +284,6 @@ copyblit_perpixel_fixed(struct video_buffer_gfx *self,
 LOCAL video_color_t CC
 colorfactor(video_color_t color, double part) {
 	uint8_t r, g, b, a;
-	assert(part >= 0.0 && part <= 1.0);
 	/* Load color channels. */
 	r = VIDEO_COLOR_GET_RED(color);
 	g = VIDEO_COLOR_GET_GREEN(color);

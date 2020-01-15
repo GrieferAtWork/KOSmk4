@@ -22,7 +22,7 @@
 #include <hybrid/compiler.h>
 #include <libvideo/gfx/api.h>
 
-#define CC   LIBVIDEO_GFX_CC
+#define CC LIBVIDEO_GFX_CC
 
 /* Our library is linked against libvideo-codec.so */
 #define LIBVIDEO_CODEC_WANT_PROTOTYPES 1
