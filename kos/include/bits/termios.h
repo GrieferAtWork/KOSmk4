@@ -271,9 +271,9 @@ struct termios2 {
 #define TCIOFLUSH  2
 
 /* tcsetattr uses these */
-#define TCSANOW    0
-#define TCSADRAIN  1
-#define TCSAFLUSH  2
+#define TCSANOW    0 /* Set terminal attributes (s.a. `TCSETA') */
+#define TCSADRAIN  1 /* Wait for all unwritten data to be transmitted, discard all unread data, then set terminal attributes (s.a. `TCSETAW') */
+#define TCSAFLUSH  2 /* Wait for all unwritten data to be transmitted, then set terminal attributes (s.a. `TCSETAF') */
 
 #define _IOT_termios /* Hurd ioctl type field. */ \
 	_IOT(_IOTS(cflag_t), 4, _IOTS(cc_t), NCCS, _IOTS(speed_t), 2)

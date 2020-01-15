@@ -108,7 +108,7 @@ libvideo_gfx_defaultgfx_line(struct video_buffer_gfx *__restrict self,
                              intptr_t x1, intptr_t y1,
                              intptr_t x2, intptr_t y2,
                              video_color_t color) {
-	/* >> Cohen–Sutherland algorithm
+	/* >> Cohen-Sutherland algorithm
 	 * https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm */
 	intptr_t xmax, ymax, temp, x, y;
 	int outcode0, outcode1, outcodeOut;
@@ -263,9 +263,9 @@ libvideo_gfx_defaultgfx_rect(struct video_buffer_gfx *__restrict self,
 }
 
 LOCAL void CC
-copyblit_perpixel_fixed(struct video_buffer_gfx *__restrict self,
+copyblit_perpixel_fixed(struct video_buffer_gfx *self,
                         uintptr_t dst_x, uintptr_t dst_y,
-                        struct video_buffer_gfx *__restrict src,
+                        struct video_buffer_gfx const *src,
                         uintptr_t src_x, uintptr_t src_y,
                         size_t size_x, size_t size_y) {
 	size_t x, y;
@@ -300,7 +300,7 @@ colorfactor(video_color_t color, double part) {
 }
 
 LOCAL video_color_t CC
-getlinearcolor(struct video_buffer_gfx *__restrict src,
+getlinearcolor(struct video_buffer_gfx const *__restrict self,
                double x, double y) {
 	video_color_t result;
 	video_color_t c[2][2];
@@ -309,10 +309,10 @@ getlinearcolor(struct video_buffer_gfx *__restrict src,
 	base_x = (uintptr_t)x;
 	base_y = (uintptr_t)y;
 	/* Load source colors. */
-	c[0][0] = src->getcolor(base_x + 0, base_y + 0);
-	c[0][1] = src->getcolor(base_x + 0, base_y + 1);
-	c[1][0] = src->getcolor(base_x + 1, base_y + 0);
-	c[1][1] = src->getcolor(base_x + 1, base_y + 1);
+	c[0][0] = self->getcolor(base_x + 0, base_y + 0);
+	c[0][1] = self->getcolor(base_x + 0, base_y + 1);
+	c[1][0] = self->getcolor(base_x + 1, base_y + 0);
+	c[1][1] = self->getcolor(base_x + 1, base_y + 1);
 	/* Figure out the sub-pixel relation. */
 	rel_x = x - (double)base_x;
 	rel_y = y - (double)base_y;
@@ -327,10 +327,10 @@ getlinearcolor(struct video_buffer_gfx *__restrict src,
 
 
 LOCAL void CC
-stretchblit_perpixel_fixed(struct video_buffer_gfx *__restrict self,
+stretchblit_perpixel_fixed(struct video_buffer_gfx *self,
                            uintptr_t dst_x, uintptr_t dst_y,
                            size_t dst_size_x, size_t dst_size_y,
-                           struct video_buffer_gfx *__restrict src,
+                           struct video_buffer_gfx const *src,
                            uintptr_t src_x, uintptr_t src_y,
                            size_t src_size_x, size_t src_size_y) {
 	size_t x, y;
@@ -371,9 +371,9 @@ stretchblit_perpixel_fixed(struct video_buffer_gfx *__restrict self,
 }
 
 INTERN void CC
-libvideo_gfx_defaultgfx_blit(struct video_buffer_gfx *__restrict self,
+libvideo_gfx_defaultgfx_blit(struct video_buffer_gfx *self,
                              intptr_t dst_x, intptr_t dst_y,
-                             struct video_buffer_gfx *__restrict src,
+                             struct video_buffer_gfx const *src,
                              intptr_t src_x, intptr_t src_y,
                              size_t size_x, size_t size_y) {
 	size_t dst_sx, dst_sy;
@@ -439,10 +439,10 @@ libvideo_gfx_defaultgfx_blit(struct video_buffer_gfx *__restrict self,
 
 
 INTERN void CC
-libvideo_gfx_defaultgfx_stretch(struct video_buffer_gfx *__restrict self,
+libvideo_gfx_defaultgfx_stretch(struct video_buffer_gfx *self,
                                 intptr_t dst_x, intptr_t dst_y,
                                 size_t dst_size_x, size_t dst_size_y,
-                                struct video_buffer_gfx *__restrict src,
+                                struct video_buffer_gfx const *src,
                                 intptr_t src_x, intptr_t src_y,
                                 size_t src_size_x, size_t src_size_y) {
 	size_t dst_sx, dst_sy;

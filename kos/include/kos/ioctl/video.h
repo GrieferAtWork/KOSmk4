@@ -63,9 +63,10 @@ struct vd_lsfmt_struct {
 };
 
 struct vd_pal_struct {
-	vd_codec_t         vp_codec; /* The current codec */
-	struct vd_palette *vp_pal;   /* [0..1] User-buffer for the palette to apply/fill
-	                              * NOTE: When `NULL' during set, reset to use the default palette. */
+	vd_codec_t         vp_codec;  /* The current codec */
+	__uint16_t       __vp_pad[3]; /* ... */
+	struct vd_palette *vp_pal;    /* [0..1] User-buffer for the palette to apply/fill
+	                               * NOTE: When `NULL' during set, reset to use the default palette. */
 };
 
 #endif /* __CC__ */

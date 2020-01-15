@@ -122,7 +122,7 @@ struct video_gfx_ops {
 	/* All of the following callbacks are [1..1] */
 
 	/* Get the __color of a pixel */
-	video_color_t (LIBVIDEO_GFX_CC *fxo_getcolor)(struct video_buffer_gfx *__restrict __self,
+	video_color_t (LIBVIDEO_GFX_CC *fxo_getcolor)(struct video_buffer_gfx const *__restrict __self,
 	                                              __uintptr_t __x, __uintptr_t __y);
 	/* Place a colored pixel ontop of the graphic */
 	void (LIBVIDEO_GFX_CC *fxo_putcolor)(struct video_buffer_gfx *__restrict __self,
@@ -149,16 +149,16 @@ struct video_gfx_ops {
 	                                 __size_t __size_x, __size_t __size_y,
 	                                 video_color_t __color);
 	/* Blit the contents of another video buffer into this one. */
-	void (LIBVIDEO_GFX_CC *fxo_blit)(struct video_buffer_gfx *__restrict __self,
+	void (LIBVIDEO_GFX_CC *fxo_blit)(struct video_buffer_gfx *__self,
 	                                 __intptr_t __dst_x, __intptr_t __dst_y,
-	                                 struct video_buffer_gfx *__restrict __src,
+	                                 struct video_buffer_gfx const *__src,
 	                                 __intptr_t __src_x, __intptr_t __src_y,
 	                                 __size_t __size_x, __size_t __size_y);
 	/* Same as `fxo_blit', but stretch the contents */
-	void (LIBVIDEO_GFX_CC *fxo_stretch)(struct video_buffer_gfx *__restrict __self,
+	void (LIBVIDEO_GFX_CC *fxo_stretch)(struct video_buffer_gfx *__self,
 	                                    __intptr_t __dst_x, __intptr_t __dst_y,
 	                                    __size_t __dst_size_x, __size_t __dst_size_y,
-	                                    struct video_buffer_gfx *__restrict __src,
+	                                    struct video_buffer_gfx const *__src,
 	                                    __intptr_t __src_x, __intptr_t __src_y,
 	                                    __size_t __src_size_x, __size_t __src_size_y);
 };
@@ -169,16 +169,16 @@ typedef void (LIBVIDEO_GFX_CC *PVIDEO_GFX_DEFAULTGFX_VLINE)(struct video_buffer_
 typedef void (LIBVIDEO_GFX_CC *PVIDEO_GFX_DEFAULTGFX_HLINE)(struct video_buffer_gfx *__restrict __self, __uintptr_t __y, __uintptr_t __x1, __uintptr_t __x2, video_color_t __color);
 typedef void (LIBVIDEO_GFX_CC *PVIDEO_GFX_DEFAULTGFX_FILL)(struct video_buffer_gfx *__restrict __self, __uintptr_t __x, __uintptr_t __y, __size_t __size_x, __size_t __size_y, video_color_t __color);
 typedef void (LIBVIDEO_GFX_CC *PVIDEO_GFX_DEFAULTGFX_RECT)(struct video_buffer_gfx *__restrict __self, __uintptr_t __x, __uintptr_t __y, __size_t __size_x, __size_t __size_y, video_color_t __color);
-typedef void (LIBVIDEO_GFX_CC *PVIDEO_GFX_DEFAULTGFX_BLIT)(struct video_buffer_gfx *__restrict __self, __intptr_t __dst_x, __intptr_t __dst_y, struct video_buffer_gfx *__restrict __src, __intptr_t __src_x, __intptr_t __src_y, __size_t __size_x, __size_t __size_y);
-typedef void (LIBVIDEO_GFX_CC *PVIDEO_GFX_DEFAULTGFX_STRETCH)(struct video_buffer_gfx *__restrict __self, __intptr_t __dst_x, __intptr_t __dst_y, __size_t __dst_size_x, __size_t __dst_size_y, struct video_buffer_gfx *__restrict __src, __intptr_t __src_x, __intptr_t __src_y, __size_t __src_size_x, __size_t __src_size_y);
+typedef void (LIBVIDEO_GFX_CC *PVIDEO_GFX_DEFAULTGFX_BLIT)(struct video_buffer_gfx *__self, __intptr_t __dst_x, __intptr_t __dst_y, struct video_buffer_gfx const *__src, __intptr_t __src_x, __intptr_t __src_y, __size_t __size_x, __size_t __size_y);
+typedef void (LIBVIDEO_GFX_CC *PVIDEO_GFX_DEFAULTGFX_STRETCH)(struct video_buffer_gfx *__self, __intptr_t __dst_x, __intptr_t __dst_y, __size_t __dst_size_x, __size_t __dst_size_y, struct video_buffer_gfx const *__src, __intptr_t __src_x, __intptr_t __src_y, __size_t __src_size_x, __size_t __src_size_y);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL void LIBVIDEO_GFX_CC video_gfx_defaultgfx_line(struct video_buffer_gfx *__restrict __self, __intptr_t __x1, __intptr_t __y1, __intptr_t __x2, __intptr_t __y2, video_color_t __color);
 LIBVIDEO_GFX_DECL void LIBVIDEO_GFX_CC video_gfx_defaultgfx_vline(struct video_buffer_gfx *__restrict __self, __uintptr_t __x, __uintptr_t __y1, __uintptr_t __y2, video_color_t __color);
 LIBVIDEO_GFX_DECL void LIBVIDEO_GFX_CC video_gfx_defaultgfx_hline(struct video_buffer_gfx *__restrict __self, __uintptr_t __y, __uintptr_t __x1, __uintptr_t __x2, video_color_t __color);
 LIBVIDEO_GFX_DECL void LIBVIDEO_GFX_CC video_gfx_defaultgfx_fill(struct video_buffer_gfx *__restrict __self, __uintptr_t __x, __uintptr_t __y, __size_t __size_x, __size_t __size_y, video_color_t __color);
 LIBVIDEO_GFX_DECL void LIBVIDEO_GFX_CC video_gfx_defaultgfx_rect(struct video_buffer_gfx *__restrict __self, __uintptr_t __x, __uintptr_t __y, __size_t __size_x, __size_t __size_y, video_color_t __color);
-LIBVIDEO_GFX_DECL void LIBVIDEO_GFX_CC video_gfx_defaultgfx_blit(struct video_buffer_gfx *__restrict __self, __intptr_t __dst_x, __intptr_t __dst_y, struct video_buffer_gfx *__restrict __src, __intptr_t __src_x, __intptr_t __src_y, __size_t __size_x, __size_t __size_y);
-LIBVIDEO_GFX_DECL void LIBVIDEO_GFX_CC video_gfx_defaultgfx_stretch(struct video_buffer_gfx *__restrict __self, __intptr_t __dst_x, __intptr_t __dst_y, __size_t __dst_size_x, __size_t __dst_size_y, struct video_buffer_gfx *__restrict __src, __intptr_t __src_x, __intptr_t __src_y, __size_t __src_size_x, __size_t __src_size_y);
+LIBVIDEO_GFX_DECL void LIBVIDEO_GFX_CC video_gfx_defaultgfx_blit(struct video_buffer_gfx *__self, __intptr_t __dst_x, __intptr_t __dst_y, struct video_buffer_gfx const *__src, __intptr_t __src_x, __intptr_t __src_y, __size_t __size_x, __size_t __size_y);
+LIBVIDEO_GFX_DECL void LIBVIDEO_GFX_CC video_gfx_defaultgfx_stretch(struct video_buffer_gfx *__self, __intptr_t __dst_x, __intptr_t __dst_y, __size_t __dst_size_x, __size_t __dst_size_y, struct video_buffer_gfx const *__src, __intptr_t __src_x, __intptr_t __src_y, __size_t __src_size_x, __size_t __src_size_y);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 
@@ -220,12 +220,12 @@ public:
 	/* Get a pixel */
 	template<class T>
 	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<T>::value, video_color_t>::type
-	LIBVIDEO_GFX_CC getcolor(T __x, T __y) {
+	LIBVIDEO_GFX_CC getcolor(T __x, T __y) const {
 		return (*bfx_ops.fxo_getcolor)(this, (__uintptr_t)__x, (__uintptr_t)__y);
 	}
 	template<class T>
 	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<T>::value, video_color_t>::type
-	LIBVIDEO_GFX_CC getcolor(T __x, T __y) {
+	LIBVIDEO_GFX_CC getcolor(T __x, T __y) const {
 		typedef typename std::make_unsigned<T>::type TU;
 		if (__x < 0 || __y < 0)
 			return 0;
@@ -393,22 +393,22 @@ public:
 
 	/* Blit the contents of another video buffer into this one. */
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC blit(__intptr_t __dst_x, __intptr_t __dst_y,
-	                                            struct video_buffer_gfx *__restrict __src,
+	                                            struct video_buffer_gfx const &__src,
 	                                            __intptr_t __src_x, __intptr_t __src_y,
 	                                            __size_t __size_x, __size_t __size_y) {
 		(*bfx_ops.fxo_blit)(this, __dst_x, __dst_y,
-		                    __src, __src_x, __src_y,
+		                    &__src, __src_x, __src_y,
 		                    __size_x, __size_y);
 	}
 
 	/* Same as `fxo_blit', but stretch the contents */
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC stretch(__intptr_t __dst_x, __intptr_t __dst_y,
 	                                               __size_t __dst_size_x, __size_t __dst_size_y,
-	                                               struct video_buffer_gfx *__restrict __src,
+	                                               struct video_buffer_gfx const &__src,
 	                                               __intptr_t __src_x, __intptr_t __src_y,
 	                                               __size_t __src_size_x, __size_t __src_size_y) {
 		(*bfx_ops.fxo_stretch)(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
-		                       __src, __src_x, __src_y, __src_size_x, __src_size_y);
+		                       &__src, __src_x, __src_y, __src_size_x, __src_size_y);
 	}
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

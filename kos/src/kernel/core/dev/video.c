@@ -101,7 +101,8 @@ video_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd
 		memcpy(&data, arg, sizeof(struct vd_pal_struct));
 		COMPILER_READ_BARRIER();
 		validate_writablem(data.vp_pal, VIDEO_CODEC_PALSIZ(data.vp_codec), sizeof(vd_color_t));
-		(me->vd_ops.vdf_getpal)(me, data.vp_codec, data.vp_pal);
+		(*me->vd_ops.vdf_getpal)(me, data.vp_codec, data.vp_pal);
+		asm("nop");
 	}	break;
 
 	case VIDEOIO_SETPAL: {
@@ -112,7 +113,7 @@ video_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd
 		memcpy(&data, arg, sizeof(struct vd_pal_struct));
 		COMPILER_READ_BARRIER();
 		validate_readablem_opt(data.vp_pal, VIDEO_CODEC_PALSIZ(data.vp_codec), sizeof(vd_color_t));
-		(me->vd_ops.vdf_setpal)(me, data.vp_codec, data.vp_pal);
+		(*me->vd_ops.vdf_setpal)(me, data.vp_codec, data.vp_pal);
 	}	break;
 
 	case KDSETMODE: {

@@ -1708,10 +1708,10 @@ do_return_tty_mode:
 		}
 		VGA_DoGetMode(me, &mode);
 		sync_endwrite_both(me);
-		if (memcmp(&mode, &vga_mode_gfx320x200_256, sizeof(mode)) == 0) {
-			VGA_GetFmtByIndex(me, fmt, 1);
-		} else {
+		if (memcmp(&mode, &vga_mode_gfx640x480_16, sizeof(mode)) == 0) {
 			VGA_GetFmtByIndex(me, fmt, 2);
+		} else {
+			VGA_GetFmtByIndex(me, fmt, 1);
 		}
 	}
 }

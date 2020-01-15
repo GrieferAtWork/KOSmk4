@@ -67,7 +67,11 @@ cfsetispeed:([nonnull] struct termios *__restrict termios_p, speed_t speed) -> i
 	return 0;
 }
 
+@@Get terminal attributes
 tcgetattr:($fd_t fd, [nonnull] struct termios *__restrict termios_p) -> int;
+
+@@Set terminal attributes
+@@@param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH'
 tcsetattr:($fd_t fd, int optional_actions, [nonnull] struct termios const *__restrict termios_p) -> int;
 
 tcsendbreak:($fd_t fd, int duration) -> int;

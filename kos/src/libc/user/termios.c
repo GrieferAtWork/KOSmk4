@@ -36,7 +36,8 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:tcgetattr,hash:CRC-32=0x4b35219d]]]*/
+/*[[[head:tcgetattr,hash:CRC-32=0x7f67402b]]]*/
+/* Get terminal attributes */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcgetattr") int
 NOTHROW_NCX(LIBCCALL libc_tcgetattr)(fd_t fd,
@@ -47,7 +48,9 @@ NOTHROW_NCX(LIBCCALL libc_tcgetattr)(fd_t fd,
 }
 /*[[[end:tcgetattr]]]*/
 
-/*[[[head:tcsetattr,hash:CRC-32=0x75180a0f]]]*/
+/*[[[head:tcsetattr,hash:CRC-32=0x950e80ba]]]*/
+/* Set terminal attributes
+ * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
 INTERN NONNULL((3))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcsetattr") int
 NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd,

@@ -49,7 +49,7 @@ PRIVATE byte_t const empty_video_buffer_data[1] = { 0 };
 
 /* Stub GFX functions for the empty video buffer. */
 PRIVATE video_color_t CC
-empty_video_buffer_gfx_getcolor(struct video_buffer_gfx *__restrict self,
+empty_video_buffer_gfx_getcolor(struct video_buffer_gfx const *__restrict self,
                                 uintptr_t UNUSED(x), uintptr_t UNUSED(y)) {
 	assert(self->bfx_buffer == &empty_video_buffer);
 	(void)self;
@@ -110,9 +110,9 @@ empty_video_buffer_gfx_rect(struct video_buffer_gfx *__restrict self,
 }
 
 PRIVATE void CC
-empty_video_buffer_gfx_blit(struct video_buffer_gfx *__restrict self,
+empty_video_buffer_gfx_blit(struct video_buffer_gfx *self,
                             intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
-                            struct video_buffer_gfx *__restrict UNUSED(src),
+                            struct video_buffer_gfx const *UNUSED(src),
                             intptr_t UNUSED(src_x), intptr_t UNUSED(src_y),
                             size_t UNUSED(size_x), size_t UNUSED(size_y)) {
 	assert(self->bfx_buffer == &empty_video_buffer);
@@ -120,10 +120,10 @@ empty_video_buffer_gfx_blit(struct video_buffer_gfx *__restrict self,
 }
 
 PRIVATE void CC
-empty_video_buffer_gfx_stretch(struct video_buffer_gfx *__restrict self,
+empty_video_buffer_gfx_stretch(struct video_buffer_gfx *self,
                                intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
                                size_t UNUSED(dst_size_x), size_t UNUSED(dst_size_y),
-                               struct video_buffer_gfx *__restrict UNUSED(src),
+                               struct video_buffer_gfx const *UNUSED(src),
                                intptr_t UNUSED(src_x), intptr_t UNUSED(src_y),
                                size_t UNUSED(src_size_x), size_t UNUSED(src_size_y)) {
 	assert(self->bfx_buffer == &empty_video_buffer);

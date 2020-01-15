@@ -36,8 +36,8 @@ INTDEF void CC libvideo_gfx_defaultgfx_vline(struct video_buffer_gfx *__restrict
 INTDEF void CC libvideo_gfx_defaultgfx_hline(struct video_buffer_gfx *__restrict self, uintptr_t y, uintptr_t x1, uintptr_t x2, video_color_t color);
 INTDEF void CC libvideo_gfx_defaultgfx_fill(struct video_buffer_gfx *__restrict self, uintptr_t x, uintptr_t y, size_t size_x, size_t size_y, video_color_t color);
 INTDEF void CC libvideo_gfx_defaultgfx_rect(struct video_buffer_gfx *__restrict self, uintptr_t x, uintptr_t y, size_t size_x, size_t size_y, video_color_t color);
-INTDEF void CC libvideo_gfx_defaultgfx_blit(struct video_buffer_gfx *__restrict self, intptr_t dst_x, intptr_t dst_y, struct video_buffer_gfx *__restrict src, intptr_t src_x, intptr_t src_y, size_t size_x, size_t size_y);
-INTDEF void CC libvideo_gfx_defaultgfx_stretch(struct video_buffer_gfx *__restrict self, intptr_t dst_x, intptr_t dst_y, size_t dst_size_x, size_t dst_size_y, struct video_buffer_gfx *__restrict src, intptr_t src_x, intptr_t src_y, size_t src_size_x, size_t src_size_y);
+INTDEF void CC libvideo_gfx_defaultgfx_blit(struct video_buffer_gfx *self, intptr_t dst_x, intptr_t dst_y, struct video_buffer_gfx const *src, intptr_t src_x, intptr_t src_y, size_t size_x, size_t size_y);
+INTDEF void CC libvideo_gfx_defaultgfx_stretch(struct video_buffer_gfx *self, intptr_t dst_x, intptr_t dst_y, size_t dst_size_x, size_t dst_size_y, struct video_buffer_gfx const *src, intptr_t src_x, intptr_t src_y, size_t src_size_x, size_t src_size_y);
 
 DECL_END
 

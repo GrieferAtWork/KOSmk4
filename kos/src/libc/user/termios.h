@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4119dcb8 */
+/* HASH CRC-32:0x1c2718f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,10 @@
 
 DECL_BEGIN
 
+/* Get terminal attributes */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_tcgetattr)(fd_t fd, struct termios *__restrict termios_p);
+/* Set terminal attributes
+ * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd, int optional_actions, struct termios const *__restrict termios_p);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsendbreak)(fd_t fd, int duration);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_tcdrain)(fd_t fd);

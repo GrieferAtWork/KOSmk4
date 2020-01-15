@@ -117,7 +117,7 @@ public:
 #ifdef __INTELLISENSE__
 #define __DEFINE_REFCNT_FUNCTIONS(T, field, destroy_)                                                                                               \
 	extern "C++" {                                                                                                                                  \
-	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                                                        \
+	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                                                 \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE(T, field) __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(T const *__restrict self); \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC isshared)(T const *__restrict self);                           \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC wasdestroyed)(T const *__restrict self);                       \
@@ -136,7 +136,7 @@ public:
 	}
 #define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_)                                                                                               \
 	extern "C++" {                                                                                                                                      \
-	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                                                        \
+	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                                                 \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE(T, field) __REFCNT_NOTHROW(__REFCNT_CC getweakrefcnt)(T const *__restrict self); \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC isweakshared)(T const *__restrict self);                           \
 	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC wasweakdestroyed)(T const *__restrict self);                       \
@@ -204,7 +204,7 @@ public:
 #ifdef NDEBUG
 #define __DEFINE_REFCNT_FUNCTIONS(T, field, destroy_)                                                      \
 	extern "C++" {                                                                                         \
-	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                               \
+	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                        \
 	template<> class refcnt_methods< T > {                                                                 \
 	public:                                                                                                \
 		typedef __PRIVATE_REFCNT_TYPE(T, field) __PRIVATE_REFCNT_NAME(refcnt_t);                           \
@@ -254,7 +254,7 @@ public:
 	}
 #define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_)                                                  \
 	extern "C++" {                                                                                         \
-	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                           \
+	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                    \
 	template<> class weakrefcnt_methods< T > {                                                             \
 	public:                                                                                                \
 		typedef __PRIVATE_REFCNT_TYPE(T, field) __PRIVATE_REFCNT_NAME(refcnt_t);                           \
@@ -309,7 +309,7 @@ extern "C++" {
 
 #define __DEFINE_REFCNT_FUNCTIONS(T, field, destroy_)                                                                 \
 	extern "C++" {                                                                                                    \
-	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                          \
+	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                   \
 	template<> class __PRIVATE_REFCNT_NAME(refcnt_methods)< T > {                                                     \
 	public:                                                                                                           \
 		typedef __PRIVATE_REFCNT_TYPE(T, field) __PRIVATE_REFCNT_NAME(refcnt_t);                                      \
@@ -370,7 +370,7 @@ extern "C++" {
 	}
 #define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_)                                                             \
 	extern "C++" {                                                                                                    \
-	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                      \
+	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                               \
 	template<> class weakrefcnt_methods< T > {                                                                        \
 	public:                                                                                                           \
 		typedef __PRIVATE_REFCNT_TYPE(T, field) __PRIVATE_REFCNT_NAME(refcnt_t);                                      \

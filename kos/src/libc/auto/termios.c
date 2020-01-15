@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc37a91a3 */
+/* HASH CRC-32:0xc1dd840 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfmakesane") void
 NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p) {
-#line 121 "kos/src/libc/magic/termios.c"
+#line 125 "kos/src/libc/magic/termios.c"
 	/* Set sane values. */
 	memset(termios_p, 0, sizeof(*termios_p));
 #ifdef TTYDEF_CFLAG
@@ -228,7 +228,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfsetspeed") int
 NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p,
                                       speed_t speed) {
-#line 91 "kos/src/libc/magic/termios.c"
+#line 95 "kos/src/libc/magic/termios.c"
 	termios_p->c_ospeed = speed;
 	termios_p->c_ispeed = speed;
 	return 0;
@@ -240,7 +240,7 @@ NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p,
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.cfmakeraw") void
 NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p) {
-#line 100 "kos/src/libc/magic/termios.c"
+#line 104 "kos/src/libc/magic/termios.c"
 	/* As documented here: http://man7.org/linux/man-pages/man3/termios.3.html
 	 * Note that the following additions were made:
 	 *  - Clear `IXOFF' (ensuring that TTY output can be streamed)

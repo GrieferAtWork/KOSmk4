@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9df4b612 */
+/* HASH CRC-32:0x90a53fa6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,9 +75,12 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetispeed,(struct termios *__
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfsetispeed, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cfsetispeed)(struct termios *__restrict __termios_p, speed_t __speed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfsetispeed))(__termios_p, __speed); })
 #endif /* cfsetispeed... */
 #ifdef __CRT_HAVE_tcgetattr
+/* Get terminal attributes */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,tcgetattr,(__fd_t __fd, struct termios *__restrict __termios_p),(__fd,__termios_p))
 #endif /* tcgetattr... */
 #ifdef __CRT_HAVE_tcsetattr
+/* Set terminal attributes
+ * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
 __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,tcsetattr,(__fd_t __fd, int __optional_actions, struct termios const *__restrict __termios_p),(__fd,__optional_actions,__termios_p))
 #endif /* tcsetattr... */
 #ifdef __CRT_HAVE_tcsendbreak

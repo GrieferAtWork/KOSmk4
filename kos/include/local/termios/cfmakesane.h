@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76d427db */
+/* HASH CRC-32:0xdb440dde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
 __LOCAL_LIBC(cfmakesane) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restrict __termios_p) {
-#line 121 "kos/src/libc/magic/termios.c"
+#line 125 "kos/src/libc/magic/termios.c"
 	/* Set sane values. */
 	__localdep_memset(__termios_p, 0, sizeof(*__termios_p));
 #ifdef TTYDEF_CFLAG
