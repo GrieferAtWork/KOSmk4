@@ -1639,6 +1639,9 @@ again_readstate_multi:
 			case VM_DATAPART_PPP_INITIALIZING:
 				/* Wait for the initialization to be completed. */
 				task_tryyield_or_pause();
+#if 0 /* Some other thread may currently be blocking within `dt_loadpart()', however `task_isonlythread()'
+       * doesn't consider sleeping threads, and if one would consider those, this check would never trigger
+       * when something actually goes wrong, because a running system _always_ has more than 1 thread */
 				assertf(vm_datapart_getstate(self, starting_data_page) != VM_DATAPART_PPP_INITIALIZING ||
 				        !task_isonlythread() ||
 				        vm_datapart_getstate(self, starting_data_page) != VM_DATAPART_PPP_INITIALIZING,
@@ -1659,6 +1662,7 @@ again_readstate_multi:
 				        self->dp_flags & VM_DATAPART_FLAG_HEAPPPP
 				        ? (void *)self->dp_pprop_p
 				        : (void *)&self->dp_pprop);
+#endif
 				goto again_readstate_multi;
 
 			case VM_DATAPART_PPP_HASCHANGED:
