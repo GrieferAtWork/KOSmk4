@@ -1412,7 +1412,6 @@ NOTHROW(LIBANSITTY_CC VGA_FillCell)(struct ansitty *__restrict self,
 }
 
 
-
 PRIVATE struct ansitty_operators const vga_ansi_operators = {
 	/* .ato_putc         = */ &VGA_Putc,
 	/* .ato_setcursor    = */ &VGA_SetCursor,
@@ -1450,10 +1449,22 @@ NOTHROW(KCALL sync_endwrite_both)(VGA *__restrict self) {
 }
 
 PRIVATE void KCALL
-VGA_EnableGraphicsMode(VGA *__restrict self, bool savefont DFL(true)) {
+VGA_EnableGraphicsMode(VGA *__restrict self,
+                       struct vga_mode const *__restrict mode,
+                       void const *__restrict pal, size_t color_count,
+                       bool savefont DFL(true)) {
 	struct vga_font *oldfont = NULL;
-	if (self->v_state & VGA_STATE_FGRAPHICS)
-		return;
+	if (self->v_state & VGA_STATE_FGRAPHICS) {
+		sync_write_both(self);
+		COMPILER_READ_BARRIER();
+		if (self->v_state & VGA_STATE_FGRAPHICS) {
+			VGA_DoSetMode(self, mode);
+			VGA_DoSetPalette(self, pal, color_count);
+			sync_endwrite_both(self);
+			return;
+		}
+		sync_endwrite_both(self);
+	}
 	if (savefont) {
 		oldfont = (struct vga_font *)kmalloc(sizeof(struct vga_font),
 		                                     GFP_NORMAL | GFP_LOCKED | GFP_PREFLT);
@@ -1513,11 +1524,14 @@ again:
 #undef REL
 			if (oldfont)
 				VGA_DoGetFont(self, oldfont);
-			VGA_DoSetMode(self, &vga_mode_gfx320x200_256);
-			VGA_DoSetPalette(self, &vga_pal_gfx256, COMPILER_LENOF(vga_pal_gfx256.vp_pal));
+			VGA_DoSetMode(self, mode);
+			VGA_DoSetPalette(self, pal, color_count);
 			self->v_savedfont = oldfont;
 			oldfont           = NULL;
 			self->v_state |= VGA_STATE_FGRAPHICS;
+		} else {
+			VGA_DoSetMode(self, mode);
+			VGA_DoSetPalette(self, pal, color_count);
 		}
 		sync_endwrite_both(self);
 	} EXCEPT {
@@ -1580,7 +1594,10 @@ VGA_Ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
 		if ((uintptr_t)arg == KD_TEXT) {
 			VGA_DisableGraphicsMode(me);
 		} else if ((uintptr_t)arg == KD_GRAPHICS) {
-			VGA_EnableGraphicsMode(me);
+			VGA_EnableGraphicsMode(me,
+			                       &vga_mode_gfx320x200_256,
+			                       &vga_pal_gfx256,
+			                       COMPILER_LENOF(vga_pal_gfx256.vp_pal));
 		} else {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_GENERIC,
@@ -1600,8 +1617,8 @@ VGA_Ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
 //TODO:		break;
 
 	default:
-		/* Fallback: Try to service a generic ANSITTY ioctl() */
-		return ansitty_device_ioctl(self, cmd, arg, mode);
+		/* Fallback: Try to service a generic video ioctl() */
+		return video_device_ioctl(self, cmd, arg, mode);
 		break;
 	}
 	return 0;
@@ -1616,6 +1633,218 @@ VGA_MMap(struct character_device *__restrict self,
 	*pnumbytes  = (pos_t)me->v_vram_size;
 	return incref(&vm_datablock_physical);
 }
+
+PRIVATE bool KCALL
+VGA_GetFmtByIndex(VGA *__restrict self,
+                  USER CHECKED struct vd_format *fmt,
+                  size_t id) THROWS(E_SEGFAULT) {
+	switch (id) {
+
+	case 0: /* vga_ansitty_mode */
+		fmt->vdf_codec = VIDEO_CODEC_NONE;
+		fmt->vdf_resx  = self->v_textsizex;
+		fmt->vdf_resy  = self->v_textsizey;
+		fmt->vdf_scan  = self->v_textsizex * 2;
+		fmt->vdf_dpix  = 8;
+		fmt->vdf_dpiy  = 16;
+		break;
+
+	case 1: /* vga_mode_gfx320x200_256  */
+		fmt->vdf_codec = VIDEO_CODEC_PAL256;
+		fmt->vdf_resx  = 320;
+		fmt->vdf_resy  = 200;
+		fmt->vdf_scan  = 320;
+		fmt->vdf_dpix  = 0;
+		fmt->vdf_dpiy  = 0;
+		break;
+
+	case 2: /* vga_mode_gfx640x480_16  */
+		fmt->vdf_codec = VIDEO_CODEC_PAL16_LSB;
+		fmt->vdf_resx  = 640;
+		fmt->vdf_resy  = 480;
+		fmt->vdf_scan  = 320;
+		fmt->vdf_dpix  = 0;
+		fmt->vdf_dpiy  = 0;
+		break;
+
+	default:
+		return false;
+		break;
+	}
+	return true;
+}
+
+PRIVATE size_t KCALL
+VGA_ListFmt(struct video_device *__restrict self,
+            USER CHECKED struct vd_format *fmt,
+            size_t offset, size_t limit)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	VGA *me = (VGA *)self;
+	size_t i, result = 0;
+	for (i = offset; i < offset + limit; ++i, ++fmt, ++result) {
+		if (!VGA_GetFmtByIndex(me, fmt, i))
+			break;
+	}
+	return result;
+}
+
+PRIVATE void KCALL
+VGA_GetFmt(struct video_device *__restrict self,
+           USER CHECKED struct vd_format *fmt)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	VGA *me = (VGA *)self;
+	u16 state;
+	state = ATOMIC_READ(me->v_state);
+	if (!(state & VGA_STATE_FGRAPHICS)) {
+do_return_tty_mode:
+		VGA_GetFmtByIndex(me, fmt, 0);
+	} else {
+		struct vga_mode mode;
+		sync_write_both(me);
+		state = ATOMIC_READ(me->v_state);
+		if unlikely(!(state & VGA_STATE_FGRAPHICS)) {
+			sync_endwrite_both(me);
+			goto do_return_tty_mode;
+		}
+		VGA_DoGetMode(me, &mode);
+		sync_endwrite_both(me);
+		if (memcmp(&mode, &vga_mode_gfx320x200_256, sizeof(mode)) == 0) {
+			VGA_GetFmtByIndex(me, fmt, 1);
+		} else {
+			VGA_GetFmtByIndex(me, fmt, 2);
+		}
+	}
+}
+
+PRIVATE void KCALL
+VGA_SetFmt(struct video_device *__restrict self,
+           USER CHECKED struct vd_format const *fmt)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	VGA *me = (VGA *)self;
+	struct vd_format new_format;
+	memcpy(&new_format, fmt, sizeof(new_format));
+	COMPILER_READ_BARRIER();
+	if (new_format.vdf_codec == VIDEO_CODEC_NONE) {
+		if (new_format.vdf_dpix != 8 ||
+		    new_format.vdf_dpiy != 16 ||
+		    new_format.vdf_resx != me->v_textsizex ||
+		    new_format.vdf_resy != me->v_textsizey ||
+		    new_format.vdf_scan != me->v_textsizex * 2)
+			goto badcodec;
+		VGA_DisableGraphicsMode(me);
+	} else if (new_format.vdf_codec == VIDEO_CODEC_PAL256) {
+		if (new_format.vdf_resx != 320 ||
+		    new_format.vdf_resy != 200 ||
+		    new_format.vdf_scan != 320)
+			goto badcodec;
+		VGA_EnableGraphicsMode(me,
+		                       &vga_mode_gfx320x200_256,
+		                       &vga_pal_gfx256,
+		                       COMPILER_LENOF(vga_pal_gfx256.vp_pal));
+	} else if (new_format.vdf_codec == VIDEO_CODEC_PAL16_LSB) {
+		if (new_format.vdf_resx != 640 ||
+		    new_format.vdf_resy != 480 ||
+		    new_format.vdf_scan != 320)
+			goto badcodec;
+		VGA_EnableGraphicsMode(me,
+		                       &vga_mode_gfx640x480_16,
+		                       &vga_pal_gfx16,
+		                       COMPILER_LENOF(vga_pal_gfx16.vp_pal));
+	} else {
+badcodec:
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC,
+		      new_format.vdf_codec);
+	}
+}
+
+PRIVATE void KCALL
+VGA_GetPal(struct video_device *__restrict self,
+           vd_codec_t codec, USER CHECKED struct vd_palette *pal)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	VGA *me = (VGA *)self;
+	size_t i, count;
+	count = VIDEO_CODEC_PALSIZ(codec);
+	if (count > 256)
+		count = 256;
+	i = 0;
+	sync_write(&me->v_lock);
+	TRY {
+		vga_w(VGA_PEL_MSK, 0xff);
+		vga_w(VGA_PEL_IR, 0x00);
+		for (; i < count; ++i) {
+			u8 r, g, b;
+			vd_color_t color;
+			r     = vga_r(VGA_PEL_D) << 2;
+			g     = vga_r(VGA_PEL_D) << 2;
+			b     = vga_r(VGA_PEL_D) << 2;
+			color = VIDEO_COLOR_RGB(r, g, b);
+			ATOMIC_WRITE(pal->vdp_pal[i], color);
+		}
+	} EXCEPT {
+		/* Must complete the operation. - VGA wouldn't understand otherwise. */
+		for (i *= 3; i < 768; ++i)
+			vga_r(VGA_PEL_D);
+		sync_endwrite(&me->v_lock);
+		RETHROW();
+	}
+	for (i *= 3; i < 768; ++i)
+		vga_r(VGA_PEL_D);
+	sync_endwrite(&me->v_lock);
+}
+
+PRIVATE void KCALL
+VGA_SetPal(struct video_device *__restrict self,
+           vd_codec_t codec, USER CHECKED struct vd_palette const *pal)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	VGA *me = (VGA *)self;
+	size_t i, count;
+	count = VIDEO_CODEC_PALSIZ(codec);
+	if (count > 256)
+		count = 256;
+	if (!pal) {
+		if (codec == VIDEO_CODEC_PAL256) {
+			VGA_SetPalette(me, &vga_pal_gfx256, COMPILER_LENOF(vga_pal_gfx256.vp_pal));
+		} else if (codec == VIDEO_CODEC_PAL16_LSB ||
+		           codec == VIDEO_CODEC_PAL16_MSB) {
+			VGA_SetPalette(me, &vga_pal_gfx16, COMPILER_LENOF(vga_pal_gfx16.vp_pal));
+		} else {
+			VGA_SetPalette(me, &vga_ansitty_pal, COMPILER_LENOF(vga_ansitty_pal.vp_pal));
+		}
+		return;
+	}
+	i = 0;
+	sync_write(&me->v_lock);
+	TRY {
+		vga_w(VGA_PEL_MSK, 0xff);
+		vga_w(VGA_PEL_IW, 0x00);
+		for (; i < count; ++i) {
+			vd_color_t color = ATOMIC_READ(pal->vdp_pal[i]);
+			vga_w(VGA_PEL_D, VIDEO_COLOR_GET_RED(color) >> 2);
+			vga_w(VGA_PEL_D, VIDEO_COLOR_GET_GREEN(color) >> 2);
+			vga_w(VGA_PEL_D, VIDEO_COLOR_GET_BLUE(color) >> 2);
+		}
+	} EXCEPT {
+		/* Must complete the operation. - VGA wouldn't understand otherwise. */
+		for (i *= 3; i < 768; ++i)
+			vga_w(VGA_PEL_D, 0);
+		sync_endwrite(&me->v_lock);
+		RETHROW();
+	}
+	for (i *= 3; i < 768; ++i)
+		vga_w(VGA_PEL_D, 0);
+	sync_endwrite(&me->v_lock);
+}
+
+
+PRIVATE struct video_device_ops const vga_video_operators = {
+	/* .vdf_listfmt = */ &VGA_ListFmt,
+	/* .vdf_getfmt  = */ &VGA_GetFmt,
+	/* .vdf_setfmt  = */ &VGA_SetFmt,
+	/* .vdf_getpal  = */ &VGA_GetPal,
+	/* .vdf_setpal  = */ &VGA_SetPal,
+};
+
 
 
 
@@ -1677,8 +1906,11 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 				vga_device->v_crt_d = VGA_CRT_DM;
 				vga_device->v_is1_r = VGA_IS1_RM;
 			}
-			/* Initialize the ANSI layer */
-			ansitty_device_cinit(vga_device, &vga_ansi_operators);
+			/* Initialize the video and ansi layers */
+			video_device_cinit(vga_device,
+			                   &vga_video_operators,
+			                   &vga_ansi_operators);
+
 			vga_device->cd_type.ct_ioctl = &VGA_Ioctl;
 			vga_device->cd_type.ct_mmap  = &VGA_MMap;
 

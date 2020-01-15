@@ -18,64 +18,90 @@
  */
 #ifndef GUARD_APPS_GFX_MAIN_C
 #define GUARD_APPS_GFX_MAIN_C 1
+#define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
+#define LIBVIDEO_GFX_WANT_PROTOTYPES 1
 
 #include <hybrid/compiler.h>
 
+#include <kos/ioctl/video.h>
+#include <kos/types.h>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
-#include <sys/wait.h>
 #include <sys/mman.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <time.h>
+#include <sys/wait.h>
+
+#include <dlfcn.h>
+#include <err.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <termios.h>
+#include <time.h>
+#include <unistd.h>
+
+#include <libvideo/gfx/buffer.h>
 
 DECL_BEGIN
 
+PRIVATE void enable_graphics_mode(void) {
+	fd_t driver;
+	struct vd_format format;
+	driver = video_driver();
+	if (driver < 0)
+		err(EXIT_FAILURE, "Failed to open driver driver");
+	if (ioctl(driver, VIDEOIO_GETFORMAT, &format) < 0)
+		err(EXIT_FAILURE, "ioctl(VIDEOIO_GETFORMAT) failed");
+	if (format.vdf_codec == VIDEO_CODEC_NONE) {
+		pid_t cpid;
+		/* Video driver is still in TTY-mode
+		 * -> Switch to video mode */
+		if (ioctl(driver, KDSETMODE, KD_GRAPHICS) < 0)
+			err(EXIT_FAILURE, "ioctl(KDSETMODE, KD_GRAPHICS) failed");
+		cpid = fork();
+		if (cpid < 0)
+			err(EXIT_FAILURE, "fork() failed");
+		if (cpid != 0) {
+			/* Parent process... */
+			int status;
+			waitpid(cpid, &status, 0);
+			ioctl(STDOUT_FILENO, KDSETMODE, KD_TEXT); /* Restore text mode */
+			exit(WEXITSTATUS(status));
+		}
+	}
+}
+
 int main(int argc, char *argv[]) {
-	struct termios oios, nios;
-	pid_t cpid;
-	int status;
+	/*REF*/ struct video_buffer *screen;
+	struct video_buffer_gfx gfx;
 	(void)argc;
 	(void)argv;
-
 	srand(time(NULL));
-	tcgetattr(STDOUT_FILENO, &oios);
-	nios = oios;
-	cfmakeraw(&nios);
-	tcsetattr(STDOUT_FILENO, TCSADRAIN, &nios); /* Enable raw terminal mode */
-	ioctl(STDOUT_FILENO, KDSETMODE, KD_GRAPHICS); /* Enable VGA graphics mode */
 
-	/* Have the main loop run in a separate process, so that
-	 * in the case of a crash, we're still able to restore
-	 * display settings to terminal to the commandline. */
-	cpid = fork();
-	if (cpid == 0) {
-		void *blob;
-		size_t blob_size = 320 * 200 * 1;
-		char buf[1];
-		ssize_t len;
-		blob = mmap(NULL,
-		            blob_size,
-		            PROT_READ | PROT_WRITE, MAP_SHARED,
-		            STDOUT_FILENO,
-		            0);
-		while ((len = read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
-			uint8_t color;
-			if (buf[0] == 'q')
-				break;
-			color = rand() & 0xff;
-			memset(blob, color, blob_size);
-		}
-		return EXIT_SUCCESS;
+	/* Enable graphics mode. */
+	enable_graphics_mode();
+
+	/* Bind the screen buffer. */
+	screen = video_buffer_screen();
+	screen->gfx(gfx);
+
+	gfx.fill(0, 0,
+	         screen->vb_size_x,
+	         screen->vb_size_y,
+	         VIDEO_COLOR_WHITE);
+	for (;;) {
+		gfx.line(rand() % screen->vb_size_x,
+		         rand() % screen->vb_size_y,
+		         rand() % screen->vb_size_x,
+		         rand() % screen->vb_size_y,
+		         VIDEO_COLOR_RGBA(rand() % 256,
+		                          rand() % 256,
+		                          rand() % 256,
+		                          rand() % 256));
 	}
 
-	waitpid(cpid, &status, 0);
-	ioctl(STDOUT_FILENO, KDSETMODE, KD_TEXT); /* Enable text mode */
-	tcsetattr(STDOUT_FILENO, TCSADRAIN, &oios); /* Restore old terminal mode */
-	return WEXITSTATUS(status);
+	return 0;
 }
 
 DECL_END

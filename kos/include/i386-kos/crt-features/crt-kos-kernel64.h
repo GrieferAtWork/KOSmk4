@@ -2440,6 +2440,8 @@
 #define __CRT_HAVE_vfs_clearmounts 1
 #define __CRT_HAVE_vfs_clone 1
 #define __CRT_HAVE_vfs_kernel 1
+#define __CRT_HAVE_video_device_cinit 1
+#define __CRT_HAVE_video_device_ioctl 1
 #define __CRT_HAVE_vio_addb 1
 #define __CRT_HAVE_vio_addl 1
 #define __CRT_HAVE_vio_addq 1

@@ -21,7 +21,7 @@
 
 #include <kernel/compiler.h>
 
-#include <dev/ansitty.h>
+#include <dev/video.h>
 #include <kernel/types.h>
 
 #include <hybrid/sync/atomic-rwlock.h>
@@ -107,13 +107,13 @@ LOCAL void KCALL vga_wattr(u8 reg, u8 val) {
 
 
 #ifdef __cplusplus
-typedef struct: ansitty_device
+typedef struct: video_device
 #else
 typedef struct
 #endif
 {
 #ifndef __cplusplus
-	struct ansitty_device   v_dev;       /* The underlying ansi TTY device. */
+	struct video_device     v_dev;       /* The underlying ansi video device. */
 #endif
 	struct atomic_rwlock    v_lock;      /* Lock for accessing the VGA Hardware. */
 	PHYS vm_phys_t          v_vram_addr; /* [const] VRAM base address (physical). */
@@ -154,6 +154,7 @@ INTDEF struct vga_mode       const vga_mode_gfx320x200_256;
 INTDEF struct vga_mode       const vga_mode_gfx640x480_16;
 INTDEF struct vga_palette256 const vga_pal_gfx256;
 INTDEF struct vga_palette64  const vga_pal_gfx16;
+
 
 INTDEF void KCALL VGA_SetMode(VGA *__restrict self, struct vga_mode const *__restrict mode);
 INTDEF void KCALL VGA_GetMode(VGA *__restrict self, struct vga_mode *__restrict mode);

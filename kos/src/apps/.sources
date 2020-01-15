@@ -44,8 +44,8 @@ END
 
 
 BEGIN GROUP("apps.gfx") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
 	SET_OUTPUT("/bin/gfx")
+	USELIB("libvideo-gfx")
 	SOURCE({ "gfx/*.c" })
 END
 }

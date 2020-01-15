@@ -26,6 +26,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/refcnt.h>
 #include <bits/types.h>
 
 #include <libvideo/codec/format.h>
@@ -156,35 +157,13 @@ public:
 #endif /* __cplusplus */
 };
 
-#define video_buffer_incref(self)  __hybrid_atomic_fetchinc((self)->vb_refcnt, __ATOMIC_SEQ_CST)
-#define video_buffer_decref(self) (__hybrid_atomic_decfetch((self)->vb_refcnt, __ATOMIC_SEQ_CST) || \
-                                   ((*(self)->vb_ops->vi_destroy)(self), 0))
-
-#if defined(__cplusplus) && defined(__USE_KOS)
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("incref")
-#pragma push_macro("decref")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef incref
-#undef decref
-extern "C++" {
-
-__FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct video_buffer *
-(LIBVIDEO_GFX_CC incref)(struct video_buffer *__restrict self) {
-	video_buffer_incref(self);
-	return self;
-}
-__FORCELOCAL __ATTR_NONNULL((1)) void
-(LIBVIDEO_GFX_CC decref)(struct video_buffer *__restrict self) {
-	video_buffer_decref(self);
-}
-
-}
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("decref")
-#pragma pop_macro("incref")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* __cplusplus && __USE_KOS */
+#define video_buffer_destroy(self) (*(self)->vb_ops->vi_destroy)(self)
+#define video_buffer_incref(self) \
+	__hybrid_atomic_fetchinc((self)->vb_refcnt, __ATOMIC_SEQ_CST)
+#define video_buffer_decref(self)                                     \
+	(__hybrid_atomic_decfetch((self)->vb_refcnt, __ATOMIC_SEQ_CST) || \
+	 (video_buffer_destroy(self), 0))
+__DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
 #endif /* __CC__ */
 
 
@@ -220,9 +199,16 @@ LIBVIDEO_GFX_DECL __ATTR_WUNUSED /*REF*/ struct video_buffer *LIBVIDEO_GFX_CC vi
  * If possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
  * other, common format will be returned instead. */
-typedef __ATTR_RETNONNULL struct video_format const *(LIBVIDEO_GFX_CC *PVIDEO_PREFERRED_FORMAT)(void);
+typedef __ATTR_WUNUSED __ATTR_RETNONNULL struct video_format const *(LIBVIDEO_GFX_CC *PVIDEO_PREFERRED_FORMAT)(void);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_RETNONNULL struct video_format const *LIBVIDEO_GFX_CC video_preferred_format(void);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __ATTR_RETNONNULL struct video_format const *LIBVIDEO_GFX_CC video_preferred_format(void);
+#endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
+
+/* Return a handle for the video device driver that is being used.
+ * @return: -1:errno=ENODEV: No video driver found */
+typedef __ATTR_WUNUSED __fd_t (LIBVIDEO_GFX_CC *PVIDEO_DRIVER)(void);
+#ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __fd_t LIBVIDEO_GFX_CC video_driver(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 #endif /* __CC__ */

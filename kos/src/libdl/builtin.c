@@ -583,6 +583,7 @@ again_search_globals_module:
 				                                           &hash_elf,
 				                                           &hash_gnu);
 				/* Most likely case: The symbol is already apart of the specified module! */
+				syslog(LOG_DEBUG, "symbol.ds_sym = %p\n", symbol.ds_sym);
 				if likely(symbol.ds_sym &&
 				          symbol.ds_sym->st_shndx != SHN_ABS) {
 					if (ELFW(ST_BIND)(symbol.ds_sym->st_info) == STB_WEAK) {

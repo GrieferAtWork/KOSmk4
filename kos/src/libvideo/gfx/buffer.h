@@ -43,6 +43,9 @@ libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
  * Note that screen buffer access is only granted to ROOT and the window server */
 INTDEF WUNUSED /*REF*/ struct video_buffer *CC libvideo_buffer_screen(void);
 
+/* Return a handle for the video device driver that is being used.
+ * @return: -1:errno=ENODEV: No video driver found */
+INTDEF WUNUSED fd_t LIBVIDEO_GFX_CC libvideo_driver(void);
 
 
 DECL_END

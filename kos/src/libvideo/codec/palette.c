@@ -58,12 +58,12 @@ calculate_best_matching_palette_pixel(struct video_palette const *__restrict sel
 	uint8_t r = (uint8_t)((color & VIDEO_COLOR_RED_MASK) >> VIDEO_COLOR_RED_SHIFT);
 	uint8_t g = (uint8_t)((color & VIDEO_COLOR_GREEN_MASK) >> VIDEO_COLOR_GREEN_SHIFT);
 	uint8_t b = (uint8_t)((color & VIDEO_COLOR_BLUE_MASK) >> VIDEO_COLOR_BLUE_SHIFT);
-	assert(self->vp_count != 0);
-	for (i = 0; i < self->vp_count; ++i) {
+	assert(self->vp_cnt != 0);
+	for (i = 0; i < self->vp_cnt; ++i) {
 		size_t delta;
 		video_color_t color2;
 		uint8_t r2, g2, b2;
-		color2 = self->vp_palette[i];
+		color2 = self->vp_pal.vdp_pal[i];
 		r2     = (uint8_t)((color2 & VIDEO_COLOR_RED_MASK) >> VIDEO_COLOR_RED_SHIFT);
 		g2     = (uint8_t)((color2 & VIDEO_COLOR_GREEN_MASK) >> VIDEO_COLOR_GREEN_SHIFT);
 		b2     = (uint8_t)((color2 & VIDEO_COLOR_BLUE_MASK) >> VIDEO_COLOR_BLUE_SHIFT);
@@ -124,7 +124,7 @@ libvideo_palette_getpixel(struct video_palette *__restrict self,
 	if (known >= 0) {
 		/* Check the known color cache. */
 		result = self->vp_colors[known];
-		if (result != (size_t)-1)
+		if (result != (video_pixel_t)-1)
 			return result;
 	}
 	result = calculate_best_matching_palette_pixel(self, color);

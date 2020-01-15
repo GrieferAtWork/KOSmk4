@@ -150,6 +150,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE,                       /* E_INVALID_ARGUMENT_BAD_VALUE: At least one of the ports specified by the given range lies outside the valid port bounds */
 	E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON,                      /* E_INVALID_ARGUMENT_BAD_VALUE: The `turn_on' argument is neither `0' nor `1' */
 	E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP,                           /* E_INVALID_ARGUMENT_BAD_VALUE: The `futex_op' given to one of `futex()' is invalid. */
+	E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE,                         /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
+	E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC,                        /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -276,6 +278,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       /* E_INVALID_ARGUMENT_BAD_VALUE: At least one of the ports specified by the given range lies outside the valid port bounds */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                      E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                      /* E_INVALID_ARGUMENT_BAD_VALUE: The `turn_on' argument is neither `0' nor `1' */
 #define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           /* E_INVALID_ARGUMENT_BAD_VALUE: The `futex_op' given to one of `futex()' is invalid. */
+#define E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
+#define E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG                        1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFD' */
@@ -399,6 +403,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_RANGE                       105 /* E_INVALID_ARGUMENT_BAD_VALUE: At least one of the ports specified by the given range lies outside the valid port bounds */
 #define E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON                      106 /* E_INVALID_ARGUMENT_BAD_VALUE: The `turn_on' argument is neither `0' nor `1' */
 #define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           107 /* E_INVALID_ARGUMENT_BAD_VALUE: The `futex_op' given to one of `futex()' is invalid. */
+#define E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         108 /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
+#define E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        109 /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

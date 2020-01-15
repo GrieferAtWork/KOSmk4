@@ -27,6 +27,7 @@
 #include <hybrid/atomic.h>
 
 #include <bits/types.h>
+#include <kos/ioctl/video.h>
 
 #include "pixel.h"
 
@@ -57,17 +58,20 @@ __DECL_BEGIN
 
 struct video_palette {
 	/* [1..1][const] Destruction callback (invoked when `vp_refcnt' reaches `0') */
-	__ATTR_NONNULL((1)) void (LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
-	__uintptr_t                             vp_refcnt;     /* Reference counter. */
-	video_pixel_t                           vp_colors[16]; /* Pre-computed palette indices for the best match for one of `VIDEO_PALCOLOR_*'
-	                                                        * These are lazily populated when `video_palette_getpixel()' is called. */
-	__size_t                                vp_count;      /* [const][!0] Number of colors in this palette */
-	__COMPILER_FLEXIBLE_ARRAY(video_color_t,vp_palette);   /* [vp_count] Palette colors. */
+	__ATTR_NONNULL((1)) void
+	(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
+	__uintptr_t       vp_refcnt;     /* Reference counter. */
+	video_pixel_t     vp_colors[16]; /* Pre-computed palette indices for the best match for one of `VIDEO_PALCOLOR_*'
+	                                  * These are lazily populated when `video_palette_getpixel()' is called. */
+	__size_t          vp_cnt;        /* [const] # of colors (== VIDEO_CODEC_PALSIZ(...)). */
+	struct vd_palette vp_pal;        /* [const] OS palette data. */
 };
 
-#define video_palette_incref(self)  __hybrid_atomic_fetchinc((self)->vp_refcnt, __ATOMIC_SEQ_CST)
-#define video_palette_decref(self) (__hybrid_atomic_decfetch((self)->vp_refcnt, __ATOMIC_SEQ_CST) || \
-                                   ((*(self)->vp_destroy)(self), 0))
+#define video_palette_incref(self) \
+	__hybrid_atomic_fetchinc((self)->vp_refcnt, __ATOMIC_SEQ_CST)
+#define video_palette_decref(self)                                    \
+	(__hybrid_atomic_decfetch((self)->vp_refcnt, __ATOMIC_SEQ_CST) || \
+	 ((*(self)->vp_destroy)(self), 0))
 
 #if defined(__cplusplus) && defined(__USE_KOS)
 extern "C++" {
@@ -76,6 +80,7 @@ __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct video_palette *
 	video_palette_incref(self);
 	return self;
 }
+
 __FORCELOCAL __ATTR_NONNULL((1)) void
 (LIBVIDEO_CODEC_CC decref)(struct video_palette *__restrict self) {
 	video_palette_decref(self);
@@ -91,9 +96,9 @@ __FORCELOCAL __ATTR_NONNULL((1)) void
  * thus producing the best-looking results for those bipedal fellas.
  * NOTE: If the given `color' is one of `VIDEO_COLOR_*', `vp_colors'
  *       is used to quickly lookup the associated palette index.
- *       If the associated index is set to `(size_t)-1', the index
- *       will be calculated like any other color given would, and
- *       the result will be cached within the `vp_colors' vector. */
+ *       If the associated index is set to `(video_pixel_t)-1', the
+ *       index will be calculated like any other color given would,
+ *       and the result will be cached within the `vp_colors' vector. */
 typedef __ATTR_NONNULL((1)) video_pixel_t
 (LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_GETPIXEL)(struct video_palette *__restrict self, video_color_t color);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES

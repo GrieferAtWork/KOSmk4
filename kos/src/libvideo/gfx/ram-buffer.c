@@ -24,9 +24,13 @@
 #include "api.h"
 
 #include <hybrid/compiler.h>
-#include <stddef.h>
-#include <minmax.h>
+
+#include <sys/mman.h>
+
+#include <assert.h>
 #include <malloc.h>
+#include <minmax.h>
+#include <stddef.h>
 
 #include "buffer.h"
 
@@ -244,35 +248,47 @@ INTDEF void CC libvideo_gfx_ramgfx_stretch(struct video_buffer_gfx *__restrict s
 
 
 PRIVATE struct video_buffer_ops rambuffer_ops;
+PRIVATE struct video_buffer_ops rambuffer_ops_munmap;
 
-PRIVATE void CC
+INTERN NONNULL((1)) void CC
 rambuffer_destroy(struct video_buffer *__restrict self) {
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
 	assert(me->vb_ops == &rambuffer_ops);
+	if (me->vb_format.vf_pal)
+		video_palette_decref(me->vb_format.vf_pal);
 	free(me->vb_data);
 	free(me);
 }
 
-PRIVATE NONNULL((1, 2)) int CC
+INTERN NONNULL((1)) void CC
+rambuffer_destroy_munmap(struct video_buffer *__restrict self) {
+	struct video_rambuffer *me;
+	me = (struct video_rambuffer *)self;
+	assert(me->vb_ops == &rambuffer_ops_munmap);
+	if (me->vb_format.vf_pal)
+		video_palette_decref(me->vb_format.vf_pal);
+	munmap(me->vb_data, me->vb_total);
+	free(me);
+}
+
+INTERN NONNULL((1, 2)) int CC
 rambuffer_lock(struct video_buffer *__restrict self,
                struct video_lock *__restrict result) {
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
-	assert(me->vb_ops == &rambuffer_ops);
 	result->vl_stride = me->vb_stride;
 	result->vl_size   = me->vb_total;
 	result->vl_data   = me->vb_data;
 	return 0;
 }
 
-PRIVATE NONNULL((1, 2)) void CC
+INTERN NONNULL((1, 2)) void CC
 rambuffer_unlock(struct video_buffer *__restrict self,
                  struct video_lock const *__restrict lock) {
 #ifndef NDEBUG
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
-	assert(me->vb_ops == &rambuffer_ops);
 	assert(lock->vl_stride == me->vb_stride);
 	assert(lock->vl_size == me->vb_total);
 	assert(lock->vl_data == me->vb_data);
@@ -281,7 +297,7 @@ rambuffer_unlock(struct video_buffer *__restrict self,
 	(void)lock;
 }
 
-LOCAL bool CC is_add_subtract_or_max(unsigned int func) {
+LOCAL bool CC is_add_or_subtract_or_max(unsigned int func) {
 	return func == GFX_BLENDFUNC_ADD ||
 	       func == GFX_BLENDFUNC_SUBTRACT ||
 	       func == GFX_BLENDFUNC_MAX;
@@ -294,7 +310,6 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
                  video_color_t colorkey) {
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
-	assert(me->vb_ops == &rambuffer_ops);
 	result->bfx_ops.fxo_getcolor = (colorkey & VIDEO_COLOR_ALPHA_MASK) != 0
 	                               ? &libvideo_gfx_ramgfx_getcolor_with_key
 	                               : &libvideo_gfx_ramgfx_getcolor;
@@ -307,12 +322,14 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	           GFX_BLENDINFO_GET_SRCA(blendmode) == GFX_BLENDMODE_ONE &&
 	           GFX_BLENDINFO_GET_DSTRGB(blendmode) == GFX_BLENDMODE_ZERO &&
 	           GFX_BLENDINFO_GET_DSTA(blendmode) == GFX_BLENDMODE_ZERO &&
-	           is_add_subtract_or_max(GFX_BLENDINFO_GET_FUNRGB(blendmode)) &&
-	           is_add_subtract_or_max(GFX_BLENDINFO_GET_FUNA(blendmode))) {
+	           is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNRGB(blendmode)) &&
+	           is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNA(blendmode))) {
 		result->bfx_ops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor_noblend;
 	} else {
 		result->bfx_ops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor;
 	}
+
+	/* TODO: Add optimizations for same-codec blits */
 	result->bfx_ops.fxo_line     = &libvideo_gfx_ramgfx_line;
 	result->bfx_ops.fxo_vline    = &libvideo_gfx_ramgfx_vline;
 	result->bfx_ops.fxo_hline    = &libvideo_gfx_ramgfx_hline;
@@ -334,7 +351,8 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 
 
 
-LOCAL struct video_buffer_ops *CC get_rambuffer_ops(void) {
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
+struct video_buffer_ops *CC rambuffer_getops(void) {
 	struct video_buffer_ops *result;
 	result = &rambuffer_ops;
 	if (!result->vi_destroy) {
@@ -343,6 +361,20 @@ LOCAL struct video_buffer_ops *CC get_rambuffer_ops(void) {
 		result->vi_getgfx = &rambuffer_getgfx;
 		COMPILER_WRITE_BARRIER();
 		result->vi_destroy = &rambuffer_destroy;
+	}
+	return result;
+}
+
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
+struct video_buffer_ops *CC rambuffer_getops_munmap(void) {
+	struct video_buffer_ops *result;
+	result = &rambuffer_ops_munmap;
+	if (!result->vi_destroy) {
+		result->vi_lock   = &rambuffer_lock;
+		result->vi_unlock = &rambuffer_unlock;
+		result->vi_getgfx = &rambuffer_getgfx;
+		COMPILER_WRITE_BARRIER();
+		result->vi_destroy = &rambuffer_destroy_munmap;
 	}
 	return result;
 }
@@ -370,11 +402,13 @@ libvideo_rambuffer_create(size_t size_x, size_t size_y,
 	result->vb_stride          = req.vbs_stride;
 	result->vb_total           = req.vbs_bufsize;
 	result->vb_refcnt          = 1;
-	result->vb_ops             = get_rambuffer_ops();
+	result->vb_ops             = rambuffer_getops();
 	result->vb_format.vf_codec = codec;
 	result->vb_format.vf_pal   = palette;
 	result->vb_size_x          = size_x;
 	result->vb_size_y          = size_y;
+	if (palette)
+		video_palette_incref(palette);
 	return result;
 err_result:
 	free(result);

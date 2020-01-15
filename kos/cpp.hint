@@ -560,3 +560,16 @@
 #define COMPAT_ElfW(x) Elf32_##x
 #define COMPAT_ELFW(x) ELF32_##x
 #define __ARCH_COMPAT(x) x##32
+
+#define SLIST_FOREACH(elem,l,key) for(;;)
+#define SLIST_FOREACH_P(elem,l,getpath) for(;;)
+#define SLIST_PFOREACH(pelem,elem,l,key) for(;;)
+#define SLIST_PFOREACH_P(pelem,elem,l,getpath) for(;;)
+#define LLIST_FOREACH(elem,l,key) for(;;)
+#define LLIST_FOREACH_P(elem,l,getpath) for(;;)
+#define LLIST_RFOREACH(T,elem,l,start,key) for(;;)
+#define DLIST_FOREACH(elem,l,key) for(;;)
+#define DLIST_FOREACH_P(elem,l,getpath) for(;;)
+#define DLIST_RFOREACH(elem,l,key) for(;;)
+#define DLIST_RFOREACH_P(elem,l,getpath) for(;;)
+

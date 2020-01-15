@@ -1243,9 +1243,9 @@ pal_pixel2color(struct video_format const *__restrict format,
 	assert(format);
 	pal = format->vf_pal;
 	assert(pal);
-	if (pixel >= pal->vp_count)
+	if (pixel >= pal->vp_cnt)
 		return VIDEO_COLOR_RGB(0, 0, 0);
-	return pal->vp_palette[pixel];
+	return pal->vp_pal.vdp_pal[pixel];
 }
 
 PRIVATE WUNUSED ATTR_PURE NONNULL((1)) video_pixel_t CC

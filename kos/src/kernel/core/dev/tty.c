@@ -261,6 +261,8 @@ tty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
 		if (_IOC_ISKOS(cmd)) {
 			if (_IOC_TYPE(cmd) == 'K') /* KBDIO_* */
 				goto predict_input_device_command;
+			if (_IOC_TYPE(cmd) == 'V') /* VIDEOIO_* */
+				goto predict_output_device_command;
 		} else {
 			if (_IOC_TYPE(cmd) == 'K') /* <linux/kd.h> */
 				goto predict_input_device_command;

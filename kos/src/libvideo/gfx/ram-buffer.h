@@ -45,6 +45,14 @@ struct video_rambuffer: video_buffer {
 	byte_t *vb_data;   /* [1..1][owned][const] Buffer data */
 };
 
+/* Ram-buffer operator callbacks. */
+INTDEF NONNULL((1)) void CC rambuffer_destroy(struct video_buffer *__restrict self);
+INTDEF NONNULL((1)) void CC rambuffer_destroy_munmap(struct video_buffer *__restrict self);
+INTDEF NONNULL((1, 2)) int CC rambuffer_lock(struct video_buffer *__restrict self, struct video_lock *__restrict result);
+INTDEF NONNULL((1, 2)) void CC rambuffer_unlock(struct video_buffer *__restrict self, struct video_lock const *__restrict lock);
+
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops(void);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops_munmap(void);
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
@@ -66,12 +74,11 @@ libvideo_rambuffer_create(size_t size_x, size_t size_y,
                           struct video_codec *__restrict codec,
                           struct video_palette *palette);
 
-
 /* Return the preferred video format.
  * If possible, this format will match the format used by the host's graphics card.
  * If no graphics card exists, or the card isn't clear on its preferred format, some
  * other, common format will be returned instead. */
-INTDEF ATTR_RETNONNULL struct video_format const *CC libvideo_preferred_format(void);
+INTDEF WUNUSED ATTR_RETNONNULL struct video_format const *CC libvideo_preferred_format(void);
 
 
 DECL_END

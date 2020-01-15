@@ -42,18 +42,18 @@ struct video_palette;
 
 
 struct video_format {
-	struct video_codec   *vf_codec;  /* [1..1] Video codec. */
-	struct video_palette *vf_pal;    /* [0..1] Color palette (if applicable) */
+	struct video_codec           *vf_codec;  /* [1..1] Video codec. */
+	/*REF*/ struct video_palette *vf_pal;    /* [0..1] Color palette (if applicable) */
 #ifdef __cplusplus
 public: /* Low-level, memory-based pixel accessor functions. */
 
 	/* Get a pixel (The caller must ensure that the given x/y are in-bounds) */
 	__CXX_CLASSMEMBER video_pixel_t LIBVIDEO_CODEC_CC getpixel(__byte_t const *__restrict line,
-	                                                          __uintptr_t x) const {
+	                                                           __uintptr_t x) const {
 		return (*vf_codec->vc_getpixel)(line, x);
 	}
 	__CXX_CLASSMEMBER video_color_t LIBVIDEO_CODEC_CC getcolor(__byte_t const *__restrict line,
-	                                                          __uintptr_t x) const {
+	                                                           __uintptr_t x) const {
 		return pixel2color(getpixel(line, x));
 	}
 

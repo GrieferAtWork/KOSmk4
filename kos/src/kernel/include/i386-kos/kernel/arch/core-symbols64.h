@@ -8303,9 +8303,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, this_tid_address; .int 0
 	.int 0xec6dbf3
 	.quad .Lname2075 /* index: 2075 */
-	.weak vm_ramfile_type; .quad vm_ramfile_type
-	.reloc ., R_X86_64_SIZE32, vm_ramfile_type; .int 0
-	.int 0x43f01b5
+	.weak vm_protect; .quad vm_protect
+	.reloc ., R_X86_64_SIZE32, vm_protect; .int 0
+	.int 0x79178c4
 	.quad .Lname2076 /* index: 2076 */
 	.weak json_parser_getbool; .quad json_parser_getbool
 	.reloc ., R_X86_64_SIZE32, json_parser_getbool; .int 0
@@ -8739,9 +8739,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, task_exec_asynchronous_rpc; .int 0
 	.int 0x1640cf3
 	.quad .Lname2184 /* index: 2184 */
-	.weak x86_getiopl; .quad x86_getiopl
-	.reloc ., R_X86_64_SIZE32, x86_getiopl; .int 0
-	.int 0xdb15a3c
+	.weak vm_ramfile_type; .quad vm_ramfile_type
+	.reloc ., R_X86_64_SIZE32, vm_ramfile_type; .int 0
+	.int 0x43f01b5
 	.quad 0 /* index: 2185 */
 	.quad 0
 	.int 0
@@ -9231,9 +9231,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2307 /* index: 2307 */
-	.weak vm_protect; .quad vm_protect
-	.reloc ., R_X86_64_SIZE32, vm_protect; .int 0
-	.int 0x79178c4
+	.weak vm_datablock_debugheap_type; .quad vm_datablock_debugheap_type
+	.reloc ., R_X86_64_SIZE32, vm_datablock_debugheap_type; .int 0
+	.int 0xb4f91b5
 	.quad .Lname2308 /* index: 2308 */
 	.weak heap_allat; .quad heap_allat
 	.reloc ., R_X86_64_SIZE32, heap_allat; .int 0
@@ -9650,10 +9650,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak json_parser_yield; .quad json_parser_yield
 	.reloc ., R_X86_64_SIZE32, json_parser_yield; .int 0
 	.int 0x276c5a4
-	.quad 0 /* index: 2412 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2412 /* index: 2412 */
+	.weak video_device_ioctl; .quad video_device_ioctl
+	.reloc ., R_X86_64_SIZE32, video_device_ioctl; .int 0
+	.int 0x93d396c
 	.quad 0 /* index: 2413 */
 	.quad 0
 	.int 0
@@ -10918,10 +10918,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak path_sprintentex; .quad path_sprintentex
 	.reloc ., R_X86_64_SIZE32, path_sprintentex; .int 0
 	.int 0xbc74aa8
-	.quad 0 /* index: 2729 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname2729 /* index: 2729 */
+	.weak x86_getiopl; .quad x86_getiopl
+	.reloc ., R_X86_64_SIZE32, x86_getiopl; .int 0
+	.int 0xdb15a3c
 	.quad .Lname2730 /* index: 2730 */
 	.weak sys_settimeofday; .quad sys_settimeofday
 	.reloc ., R_X86_64_SIZE32, sys_settimeofday; .int 0
@@ -14955,9 +14955,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, x86_idt; .int 0
 	.int 0xbbc5fc4
 	.quad .Lname3738 /* index: 3738 */
-	.weak vm_datablock_debugheap_type; .quad vm_datablock_debugheap_type
-	.reloc ., R_X86_64_SIZE32, vm_datablock_debugheap_type; .int 0
-	.int 0xb4f91b5
+	.weak video_device_cinit; .quad video_device_cinit
+	.reloc ., R_X86_64_SIZE32, video_device_cinit; .int 0
+	.int 0x93aa8c4
 	.quad .Lname3739 /* index: 3739 */
 	.weak sys_flock; .quad sys_flock
 	.reloc ., R_X86_64_SIZE32, sys_flock; .int 0
@@ -19261,7 +19261,7 @@ END(kernel_symbol_table)
 .Lname2074:
 	.string "this_tid_address"
 .Lname2075:
-	.string "vm_ramfile_type"
+	.string "vm_protect"
 .Lname2076:
 	.string "json_parser_getbool"
 .Lname2077:
@@ -19407,7 +19407,7 @@ END(kernel_symbol_table)
 .Lname2183:
 	.string "task_exec_asynchronous_rpc"
 .Lname2184:
-	.string "x86_getiopl"
+	.string "vm_ramfile_type"
 .Lname2187:
 	.string "vm_clrhwbreak"
 .Lname2188:
@@ -19573,7 +19573,7 @@ END(kernel_symbol_table)
 .Lname2302:
 	.string "krealign"
 .Lname2307:
-	.string "vm_protect"
+	.string "vm_datablock_debugheap_type"
 .Lname2308:
 	.string "heap_allat"
 .Lname2310:
@@ -19720,6 +19720,8 @@ END(kernel_symbol_table)
 	.string "task_sethandlemanager"
 .Lname2411:
 	.string "json_parser_yield"
+.Lname2412:
+	.string "video_device_ioctl"
 .Lname2415:
 	.string "sys_get_robust_list"
 .Lname2417:
@@ -20174,6 +20176,8 @@ END(kernel_symbol_table)
 	.string "slab_kmalloc_nx64"
 .Lname2728:
 	.string "path_sprintentex"
+.Lname2729:
+	.string "x86_getiopl"
 .Lname2730:
 	.string "sys_settimeofday"
 .Lname2732:
@@ -21615,7 +21619,7 @@ END(kernel_symbol_table)
 .Lname3737:
 	.string "x86_idt"
 .Lname3738:
-	.string "vm_datablock_debugheap_type"
+	.string "video_device_cinit"
 .Lname3739:
 	.string "sys_flock"
 .Lname3740:

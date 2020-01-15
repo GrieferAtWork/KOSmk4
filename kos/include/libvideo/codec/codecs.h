@@ -19,19 +19,22 @@
 #ifndef _LIBVIDEO_CODEC_CODECS_H
 #define _LIBVIDEO_CODEC_CODECS_H 1
 
+#include "api.h"
+
 #include <__stdinc.h>
 
-#include <bits/types.h>
 #include <hybrid/typecore.h>
 
-#include "api.h"
+#include <bits/types.h>
+#include <kos/ioctl/video.h>
+
 #include "pixel.h"
 
 __DECL_BEGIN
 
 #define VIDEO_CODEC_NONE       0x0000 /* Invalid codec. */
 
-/* Grayscale */
+/* Gray-scale */
 #define VIDEO_CODEC_GRAY2_LSB  0x1001 /* 1-bit-per-pixel, least-significant-bit-first, black/white */
 #define VIDEO_CODEC_GRAY2_MSB  0x1002 /* 1-bit-per-pixel, most-significant-bit-first, black/white */
 #define VIDEO_CODEC_GRAY4_LSB  0x1003 /* 2-bit-per-pixel, least-significant-bit-first, 4-color grayscale (0=black; 3=white) */
@@ -70,19 +73,23 @@ __DECL_BEGIN
 #define VIDEO_CODEC_BGRA5551   0x2027
 #define VIDEO_CODEC_BGRX5551   0x2028
 
-
 /* Palette-driven */
 #define VIDEO_CODEC_PAL2_LSB   0xf001 /* 2-color palette, least-significant-bit-first, (1-bit pixels) */
-#define VIDEO_CODEC_PAL2_MSB   0xf002 /* 2-color palette, most-significant-bit-first, (1-bit pixels) */
-#define VIDEO_CODEC_PAL4_LSB   0xf003 /* 4-color palette, least-significant-bit-first, (2-bit pixels) */
-#define VIDEO_CODEC_PAL4_MSB   0xf004 /* 4-color palette, most-significant-bit-first, (2-bit pixels) */
-#define VIDEO_CODEC_PAL16_LSB  0xf005 /* 16-color palette, least-significant-bit-first, (4-bit pixels) */
-#define VIDEO_CODEC_PAL16_MSB  0xf006 /* 16-color palette, most-significant-bit-first, (4-bit pixels) */
-#define VIDEO_CODEC_PAL256     0xf007 /* 256-color palette (8-bit pixels) */
+#define VIDEO_CODEC_PAL2_MSB   0xf011 /* 2-color palette, most-significant-bit-first, (1-bit pixels) */
+#define VIDEO_CODEC_PAL4_LSB   0xf002 /* 4-color palette, least-significant-bit-first, (2-bit pixels) */
+#define VIDEO_CODEC_PAL4_MSB   0xf012 /* 4-color palette, most-significant-bit-first, (2-bit pixels) */
+#define VIDEO_CODEC_PAL16_LSB  0xf004 /* 16-color palette, least-significant-bit-first, (4-bit pixels) */
+#define VIDEO_CODEC_PAL16_MSB  0xf014 /* 16-color palette, most-significant-bit-first, (4-bit pixels) */
+#define VIDEO_CODEC_PAL256     0xf008 /* 256-color palette (8-bit pixels) */
+
+/* Check if a given video codec uses a palette */
+#define VIDEO_CODEC_HASPAL(x) (((x) & 0xf000) == 0xf000)
+/* Returns the number of colors used by a palette-driven video codec. */
+#define VIDEO_CODEC_PALSIZ(x) (__CCAST(__size_t)1 << ((x) & 0xf))
 
 
 #ifdef __CC__
-typedef __UINTPTR_HALF_TYPE__ video_codec_t;
+typedef vd_codec_t video_codec_t; /* One of `VIDEO_CODEC_*' */
 
 struct video_rambuffer_requirements {
 	__size_t  vbs_bufsize;  /* Minimal buffer size (in bytes) */
@@ -92,8 +99,9 @@ struct video_rambuffer_requirements {
 struct video_format;
 struct video_codec {
 	/* Video format operations. */
-	video_codec_t           vc_codec; /* [const] Video format codec (One of `VIDEO_FORMAT_*') */
-	__UINTPTR_HALF_TYPE__   vc_align; /* [!0][const] Byte alignment requirements for base_addr/stride of buffers using this codec. */
+	video_codec_t vc_codec; /* [const] Video format codec (One of `VIDEO_FORMAT_*') */
+	__uint16_t   _vc_flags; /* [const] Video format flags (Set of `VD_FORMAT_FLAG_*') */
+	__uint32_t    vc_align; /* [!0][const] Byte alignment requirements for base_addr/stride of buffers using this codec. */
 	/* NOTE: _ALL_ Callbacks are always [1..1] */
 
 	/* Calculate minimal ram-buffer requirements for a graphic with the given dimensions.
