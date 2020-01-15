@@ -26,6 +26,7 @@
 
 #include <kos/ioctl/video.h>
 #include <kos/types.h>
+#include <kos/refptr.h>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -86,7 +87,7 @@ PRIVATE void enable_graphics_mode(void) {
 
 int main(int argc, char *argv[]) {
 	bool is_blocking = false;
-	/*REF*/ struct video_buffer *screen;
+	kos::refptr<struct video_buffer> screen;
 	struct video_buffer_gfx gfx;
 	(void)argc;
 	(void)argv;
@@ -100,7 +101,7 @@ int main(int argc, char *argv[]) {
 	      O_NONBLOCK);
 
 	/* Bind the screen buffer. */
-	screen = video_buffer_screen();
+	screen = kos::inherit(video_buffer_screen());
 	screen->gfx(gfx);
 
 	gfx.fill(0, 0,
@@ -192,7 +193,6 @@ step:
 			break;
 		}
 	}
-	decref(screen);
 	return 0;
 }
 
