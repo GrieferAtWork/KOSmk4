@@ -24,6 +24,8 @@
 
 #include <hybrid/__atomic.h>
 
+#include <kos/refcnt.h>
+
 #include "compiler-branch-tracer.h"
 
 #if defined(__CC__) && defined(__cplusplus) && defined(__GNUC__) && __GNUC__ >= 6
@@ -179,53 +181,8 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 #endif
 
 
-
 extern "C++" {
-template<class T> class refcnt_methods
-#ifdef __INTELLISENSE__
-{
-public:
-	typedef __UINTPTR_TYPE__ refcnt_t;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL incref)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) __BOOL (KCALL tryincref)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL decref)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL destroy)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL decref_nokill)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL decref_likely)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL decref_unlikely)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) refcnt_t (KCALL getrefcnt)(T *__restrict self) __CXX_NOEXCEPT;
-}
-#endif
-;
-template<class T> class weakrefcnt_methods
-#ifdef __INTELLISENSE__
-{
-public:
-	typedef __UINTPTR_TYPE__ refcnt_t;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL incref)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) __BOOL (KCALL tryincref)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL decref)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL destroy)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL decref_nokill)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL decref_likely)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void (KCALL decref_unlikely)(T *__restrict self) __CXX_NOEXCEPT;
-	static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) refcnt_t (KCALL getrefcnt)(T *__restrict self) __CXX_NOEXCEPT;
-}
-#endif
-;
-
-#define REFCNT_METHODS(T)                ::refcnt_methods<decltype(((*(T *)0), __NAMESPACE_INT_SYM __refcnt_select_tag()))>
-#define REFCNT_METHODS_I(i)              ::refcnt_methods<decltype(((i), __NAMESPACE_INT_SYM __refcnt_select_tag()))>
-#define REFCNT_METHODS_BASE(T)                            decltype(((*(T *)0), __NAMESPACE_INT_SYM __refcnt_select_tag()))
-#define REFCNT_METHODS_BASE_I(i)                          decltype(((i), __NAMESPACE_INT_SYM __refcnt_select_tag()))
-#define WEAKREFCNT_METHODS(T)        ::weakrefcnt_methods<decltype(((*(T *)0), __NAMESPACE_INT_SYM __weakrefcnt_select_tag()))>
-#define WEAKREFCNT_METHODS_I(i)      ::weakrefcnt_methods<decltype(((i), __NAMESPACE_INT_SYM __weakrefcnt_select_tag()))>
-#define WEAKREFCNT_METHODS_BASE(T)                        decltype(((*(T *)0), __NAMESPACE_INT_SYM __weakrefcnt_select_tag()))
-#define WEAKREFCNT_METHODS_BASE_I(i)                      decltype(((i), __NAMESPACE_INT_SYM __weakrefcnt_select_tag()))
 __NAMESPACE_INT_BEGIN
-class __refcnt_select_tag {};
-class __weakrefcnt_select_tag {};
-
 template<class T> class _finally_decref {
 	__CXX_DELETE_CTOR(_finally_decref);
 	__CXX_DELETE_COPY(_finally_decref);
@@ -330,489 +287,20 @@ public:
 
 __NAMESPACE_INT_END
 
-#define FINALLY_DECREF(ptr)           __NAMESPACE_INT_SYM _finally_decref<REFCNT_METHODS_BASE_I(*(ptr))> __COMPILER_UNIQUE(__fdecref)(*(ptr))
-#define FINALLY_DECREF_LIKELY(ptr)    __NAMESPACE_INT_SYM _finally_decref_likely<REFCNT_METHODS_BASE_I(*(ptr))> __COMPILER_UNIQUE(__fdecref_l)(*(ptr))
-#define FINALLY_DECREF_UNLIKELY(ptr)  __NAMESPACE_INT_SYM _finally_decref_unlikely<REFCNT_METHODS_BASE_I(*(ptr))> __COMPILER_UNIQUE(__fdecref_u)(*(ptr))
-#define FINALLY_DECREF_NOKILL(ptr)    __NAMESPACE_INT_SYM _finally_decref_nokill<REFCNT_METHODS_BASE_I(*(ptr))> __COMPILER_UNIQUE(__fdecref_nk)(*(ptr))
-#define FINALLY_DESTROY(ptr)          __NAMESPACE_INT_SYM _finally_destroy<REFCNT_METHODS_BASE_I(*(ptr))> __COMPILER_UNIQUE(__fdestroy)(*(ptr))
-#define FINALLY_XDECREF(ptr)          __NAMESPACE_INT_SYM _finally_xdecref<REFCNT_METHODS_BASE_I(*(ptr))> __COMPILER_UNIQUE(__fxdecref)(ptr)
-#define FINALLY_XDECREF_LIKELY(ptr)   __NAMESPACE_INT_SYM _finally_xdecref_likely<REFCNT_METHODS_BASE_I(*(ptr))> __COMPILER_UNIQUE(__fxdecref_l)(ptr)
-#define FINALLY_XDECREF_UNLIKELY(ptr) __NAMESPACE_INT_SYM _finally_xdecref_unlikely<REFCNT_METHODS_BASE_I(*(ptr))> __COMPILER_UNIQUE(__fxdecref_u)(ptr)
+#define FINALLY_DECREF(ptr)           __NAMESPACE_INT_SYM _finally_decref<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fdecref)(*(ptr))
+#define FINALLY_DECREF_LIKELY(ptr)    __NAMESPACE_INT_SYM _finally_decref_likely<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fdecref_l)(*(ptr))
+#define FINALLY_DECREF_UNLIKELY(ptr)  __NAMESPACE_INT_SYM _finally_decref_unlikely<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fdecref_u)(*(ptr))
+#define FINALLY_DECREF_NOKILL(ptr)    __NAMESPACE_INT_SYM _finally_decref_nokill<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fdecref_nk)(*(ptr))
+#define FINALLY_DESTROY(ptr)          __NAMESPACE_INT_SYM _finally_destroy<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fdestroy)(*(ptr))
+#define FINALLY_XDECREF(ptr)          __NAMESPACE_INT_SYM _finally_xdecref<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fxdecref)(ptr)
+#define FINALLY_XDECREF_LIKELY(ptr)   __NAMESPACE_INT_SYM _finally_xdecref_likely<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fxdecref_l)(ptr)
+#define FINALLY_XDECREF_UNLIKELY(ptr) __NAMESPACE_INT_SYM _finally_xdecref_unlikely<REFCNT_METHODS_BASE_P(*(ptr))> __COMPILER_UNIQUE(__fxdecref_u)(ptr)
 
 
 #define DEFINE_REFCOUNT_TYPE_SUBCLASS(subclass, baseclass)                          \
 	extern "C++" {                                                                  \
 	template<> class refcnt_methods<subclass>: public refcnt_methods<baseclass> {}; \
 	}
-
-#ifdef __INTELLISENSE__
-#define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                              \
-	extern "C++" {                                                                                              \
-	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                    \
-	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getrefcnt)(T const *__restrict self); \
-	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL isshared)(T const *__restrict self);            \
-	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL wasdestroyed)(T const *__restrict self);        \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryincref)(T *__restrict self);                           \
-	NOBLOCK T *NOTHROW(KCALL xincref)(T *__restrict self);                                                      \
-	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL incref)(T *__restrict self);                          \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL destroy)(T *__restrict self);                                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref)(T *__restrict self);                                        \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_nokill)(T *__restrict self);                                 \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_likely)(T *__restrict self);                                 \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_unlikely)(T *__restrict self);                               \
-	NOBLOCK void NOTHROW(KCALL xdecref)(T * self);                                                              \
-	NOBLOCK void NOTHROW(KCALL xdecref_nokill)(T * self);                                                       \
-	NOBLOCK void NOTHROW(KCALL xdecref_likely)(T * self);                                                       \
-	NOBLOCK void NOTHROW(KCALL xdecref_unlikely)(T * self);                                                     \
-	}
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                              \
-	extern "C++" {                                                                                                  \
-	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                    \
-	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getweakrefcnt)(T const *__restrict self); \
-	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL isweakshared)(T const *__restrict self);            \
-	NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL NOTHROW(KCALL wasweakdestroyed)(T const *__restrict self);        \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryweakincref)(T *__restrict self);                           \
-	NOBLOCK T *NOTHROW(KCALL xweakincref)(T *__restrict self);                                                      \
-	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL weakincref)(T *__restrict self);                          \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdestroy)(T *__restrict self);                                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref)(T *__restrict self);                                        \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_nokill)(T *__restrict self);                                 \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_likely)(T *__restrict self);                                 \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_unlikely)(T *__restrict self);                               \
-	NOBLOCK void NOTHROW(KCALL xweakdecref)(T * self);                                                              \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_nokill)(T * self);                                                       \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_likely)(T * self);                                                       \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_unlikely)(T * self);                                                     \
-	}
-#else /* __INTELLISENSE__ */
-
-#ifdef NDEBUG
-#define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                   \
-	extern "C++" {                                                                                   \
-	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                         \
-	template<> class refcnt_methods< T > {                                                           \
-	public:                                                                                          \
-		typedef __typeof__(((T *)0)->field) refcnt_t;                                                \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_PURE NONNULL((1)) refcnt_t                             \
-		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                 \
-			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                              \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL incref)(T *__restrict self) __CXX_NOEXCEPT {                                          \
-			__hybrid_atomic_fetchinc(self->field, __ATOMIC_SEQ_CST);                                 \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) __BOOL                                         \
-		(KCALL tryincref)(T *__restrict self) __CXX_NOEXCEPT {                                       \
-			refcnt_t __old_refcnt;                                                                   \
-			do {                                                                                     \
-				__old_refcnt = __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                  \
-				if unlikely(__old_refcnt == 0)                                                       \
-					return false;                                                                    \
-			} while (!__hybrid_atomic_cmpxch_weak(self->field, __old_refcnt, __old_refcnt + 1,       \
-			                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));              \
-			return true;                                                                             \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL decref)(T *__restrict self) __CXX_NOEXCEPT {                                          \
-			if (__hybrid_atomic_decfetch(self->field, __ATOMIC_SEQ_CST) == 0)                        \
-				destroy_((Tdestroy *)self);                                                          \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL destroy)(T *__restrict self) __CXX_NOEXCEPT {                                         \
-			destroy_((Tdestroy *)self);                                                              \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL decref_nokill)(T *__restrict self) __CXX_NOEXCEPT {                                   \
-			__hybrid_atomic_fetchdec(self->field, __ATOMIC_SEQ_CST);                                 \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL decref_likely)(T *__restrict self) __CXX_NOEXCEPT {                                   \
-			if __likely(__hybrid_atomic_decfetch(self->field, __ATOMIC_SEQ_CST) == 0)                \
-				destroy_((Tdestroy *)self);                                                          \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL decref_unlikely)(T *__restrict self) __CXX_NOEXCEPT {                                 \
-			if __unlikely(__hybrid_atomic_decfetch(self->field, __ATOMIC_SEQ_CST) == 0)              \
-				destroy_((Tdestroy *)self);                                                          \
-		}                                                                                            \
-	};                                                                                               \
-	}
-
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                               \
-	extern "C++" {                                                                                   \
-	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                     \
-	template<> class weakrefcnt_methods< T > {                                                       \
-	public:                                                                                          \
-		typedef __typeof__(((T *)0)->field) refcnt_t;                                                \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_PURE NONNULL((1)) refcnt_t                             \
-		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                 \
-			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                              \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL incref)(T *__restrict self) __CXX_NOEXCEPT {                                          \
-			__hybrid_atomic_fetchinc(self->field, __ATOMIC_SEQ_CST);                                 \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) __BOOL                                         \
-		(KCALL tryincref)(T *__restrict self) __CXX_NOEXCEPT {                                       \
-			refcnt_t __old_refcnt;                                                                   \
-			do {                                                                                     \
-				__old_refcnt = __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                  \
-				if unlikely(__old_refcnt == 0)                                                       \
-					return false;                                                                    \
-			} while (!__hybrid_atomic_cmpxch_weak(self->field, __old_refcnt,__old_refcnt + 1,        \
-			                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));              \
-			return true;                                                                             \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL decref)(T *__restrict self) __CXX_NOEXCEPT {                                          \
-			if (__hybrid_atomic_decfetch(self->field, __ATOMIC_SEQ_CST) == 0)                        \
-				destroy_((Tdestroy *)self);                                                          \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL destroy)(T *__restrict self) __CXX_NOEXCEPT {                                         \
-			destroy_((Tdestroy *)self);                                                              \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL decref_nokill)(T *__restrict self) __CXX_NOEXCEPT {                                   \
-			__hybrid_atomic_fetchdec(self->field, __ATOMIC_SEQ_CST);                                 \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL decref_likely)(T *__restrict self) __CXX_NOEXCEPT {                                   \
-			if __likely(__hybrid_atomic_decfetch(self->field, __ATOMIC_SEQ_CST) == 0)                \
-				destroy_((Tdestroy *)self);                                                          \
-		}                                                                                            \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
-		(KCALL decref_unlikely)(T *__restrict self) __CXX_NOEXCEPT {                                 \
-			if __unlikely(__hybrid_atomic_decfetch(self->field, __ATOMIC_SEQ_CST) == 0)              \
-				destroy_((Tdestroy *)self);                                                          \
-		}                                                                                            \
-	};                                                                                               \
-	}
-#else /* NDEBUG */
-#include <hybrid/__assert.h>
-
-#define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                            \
-	extern "C++" {                                                                                            \
-	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                  \
-	template<> class refcnt_methods< T > {                                                                    \
-	public:                                                                                                   \
-		typedef __typeof__(((T *)0)->field) refcnt_t;                                                         \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_PURE NONNULL((1)) refcnt_t                                      \
-		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                          \
-			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                                       \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL incref)(T *__restrict self) __CXX_NOEXCEPT {                                                   \
-			refcnt_t __old_refcnt = __hybrid_atomic_fetchinc(self->field, __ATOMIC_SEQ_CST);                  \
-			__hybrid_assertf(__old_refcnt > 0, "incref(%p): Object was already destroyed", self);             \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) __BOOL                                                  \
-		(KCALL tryincref)(T *__restrict self) __CXX_NOEXCEPT {                                                \
-			refcnt_t __old_refcnt;                                                                            \
-			do {                                                                                              \
-				__old_refcnt = __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                           \
-				if unlikely(__old_refcnt == 0)                                                                \
-					return false;                                                                             \
-			} while (!__hybrid_atomic_cmpxch_weak(self->field, __old_refcnt, __old_refcnt + 1,                \
-			                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));                       \
-			return true;                                                                                      \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL decref)(T *__restrict self) __CXX_NOEXCEPT {                                                   \
-			refcnt_t __old_refcnt;                                                                            \
-			__old_refcnt = __hybrid_atomic_fetchdec(self->field, __ATOMIC_SEQ_CST);                           \
-			__hybrid_assertf(__old_refcnt > 0, "decref(%p): Object was already destroyed", self);             \
-			if (__old_refcnt == 1)                                                                            \
-				destroy_((Tdestroy *)self);                                                                   \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL destroy)(T *__restrict self) __CXX_NOEXCEPT {                                                  \
-			__hybrid_atomic_store(self->field, (refcnt_t)0, __ATOMIC_RELEASE);                                \
-			destroy_((Tdestroy *)self);                                                                       \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL decref_nokill)(T *__restrict self) __CXX_NOEXCEPT {                                            \
-			refcnt_t __old_refcnt = __hybrid_atomic_fetchdec(self->field, __ATOMIC_SEQ_CST);                  \
-			__hybrid_assertf(__old_refcnt > 0, "decref_nokill(%p): Object was already destroyed", self);      \
-			__hybrid_assertf(__old_refcnt > 1, "decref_nokill(%p): Object should have been destroyed", self); \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL decref_likely)(T *__restrict self) __CXX_NOEXCEPT {                                            \
-			refcnt_t __old_refcnt = __hybrid_atomic_fetchdec(self->field, __ATOMIC_SEQ_CST);                  \
-			__hybrid_assertf(__old_refcnt > 0, "decref_likely(%p): Object was already destroyed", self);      \
-			if __likely(__old_refcnt == 1)                                                                    \
-				destroy_((Tdestroy *)self);                                                                   \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL decref_unlikely)(T *__restrict self) __CXX_NOEXCEPT {                                          \
-			refcnt_t __old_refcnt = __hybrid_atomic_fetchdec(self->field, __ATOMIC_SEQ_CST);                  \
-			__hybrid_assertf(__old_refcnt > 0, "decref_unlikely(%p): Object was already destroyed", self);    \
-			if __unlikely(__old_refcnt == 1)                                                                  \
-				destroy_((Tdestroy *)self);                                                                   \
-		}                                                                                                     \
-	};                                                                                                        \
-	}
-
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                        \
-	extern "C++" {                                                                                            \
-	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                              \
-	template<> class weakrefcnt_methods< T > {                                                                \
-	public:                                                                                                   \
-		typedef __typeof__(((T *)0)->field) refcnt_t;                                                         \
-		static __CXX_FORCEINLINE NOBLOCK ATTR_PURE NONNULL((1)) refcnt_t                                      \
-		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                          \
-			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                                       \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL incref)(T *__restrict self) __CXX_NOEXCEPT {                                                   \
-			refcnt_t __old_refcnt = __hybrid_atomic_fetchinc(self->field, __ATOMIC_SEQ_CST);                  \
-			__hybrid_assertf(__old_refcnt > 0, "incref(%p): Object was already destroyed", self);             \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) __BOOL                                                  \
-		(KCALL tryincref)(T *__restrict self) __CXX_NOEXCEPT {                                                \
-			refcnt_t __old_refcnt;                                                                            \
-			do {                                                                                              \
-				__old_refcnt = __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                           \
-				if unlikely(__old_refcnt == 0)                                                                \
-					return false;                                                                             \
-			} while (!__hybrid_atomic_cmpxch_weak(self->field, __old_refcnt,__old_refcnt + 1,                 \
-			                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));                       \
-			return true;                                                                                      \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL decref)(T *__restrict self) __CXX_NOEXCEPT {                                                   \
-			refcnt_t __old_refcnt;                                                                            \
-			__old_refcnt = __hybrid_atomic_fetchdec(self->field, __ATOMIC_SEQ_CST);                           \
-			__hybrid_assertf(__old_refcnt > 0, "decref(%p): Object was already destroyed", self);             \
-			if (__old_refcnt == 1)                                                                            \
-				destroy_((Tdestroy *)self);                                                                   \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL destroy)(T *__restrict self) __CXX_NOEXCEPT {                                                  \
-			__hybrid_atomic_store(self->field, (refcnt_t)0, __ATOMIC_RELEASE);                                \
-			destroy_((Tdestroy *)self);                                                                       \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL decref_nokill)(T *__restrict self) __CXX_NOEXCEPT {                                            \
-			refcnt_t __old_refcnt = __hybrid_atomic_fetchdec(self->field, __ATOMIC_SEQ_CST);                  \
-			__hybrid_assertf(__old_refcnt > 0, "decref_nokill(%p): Object was already destroyed", self);      \
-			__hybrid_assertf(__old_refcnt > 1, "decref_nokill(%p): Object should have been destroyed", self); \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL decref_likely)(T *__restrict self) __CXX_NOEXCEPT {                                            \
-			refcnt_t __old_refcnt = __hybrid_atomic_fetchdec(self->field, __ATOMIC_SEQ_CST);                  \
-			__hybrid_assertf(__old_refcnt > 0, "decref_likely(%p): Object was already destroyed", self);      \
-			if __likely(__old_refcnt == 1)                                                                    \
-				destroy_((Tdestroy *)self);                                                                   \
-		}                                                                                                     \
-		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
-		(KCALL decref_unlikely)(T *__restrict self) __CXX_NOEXCEPT {                                          \
-			refcnt_t __old_refcnt = __hybrid_atomic_fetchdec(self->field, __ATOMIC_SEQ_CST);                  \
-			__hybrid_assertf(__old_refcnt > 0, "decref_unlikely(%p): Object was already destroyed", self);    \
-			if __unlikely(__old_refcnt == 1)                                                                  \
-				destroy_((Tdestroy *)self);                                                                   \
-		}                                                                                                     \
-	};                                                                                                        \
-	}
-#endif /* !NDEBUG */
-
-
-template<class T>
-FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __UINTPTR_TYPE__
-NOTHROW(KCALL getrefcnt)(T const *__restrict self) {
-	return REFCNT_METHODS(T)::getrefcnt(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
-NOTHROW(KCALL isshared)(T const *__restrict self) {
-	return REFCNT_METHODS(T)::getrefcnt(self) > 1;
-}
-
-template<class T>
-FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
-NOTHROW(KCALL wasdestroyed)(T const *__restrict self) {
-	return REFCNT_METHODS(T)::getrefcnt(self) == 0;
-}
-
-template<class T>
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
-NOTHROW(KCALL tryincref)(T *__restrict self) {
-	return REFCNT_METHODS(T)::tryincref(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *
-NOTHROW(KCALL incref)(T *__restrict self) {
-	REFCNT_METHODS(T)::incref(self);
-	return self;
-}
-
-template<class T>
-FORCELOCAL NOBLOCK T *
-NOTHROW(KCALL xincref)(T *__restrict self) {
-	if (self)
-		REFCNT_METHODS(T)::incref(self);
-	return self;
-}
-
-template<class T>
-FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL destroy)(T *__restrict self) {
-	REFCNT_METHODS(T)::destroy(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref)(T *__restrict self) {
-	REFCNT_METHODS(T)::decref(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_nokill)(T *__restrict self) {
-	REFCNT_METHODS(T)::decref_nokill(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_likely)(T *__restrict self) {
-	REFCNT_METHODS(T)::decref_likely(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_unlikely)(T *__restrict self) {
-	REFCNT_METHODS(T)::decref_unlikely(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK void
-NOTHROW(KCALL xdecref)(T *self) {
-	if (self)
-		REFCNT_METHODS(T)::decref(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK void
-NOTHROW(KCALL xdecref_nokill)(T *self) {
-	if (self)
-		REFCNT_METHODS(T)::decref_nokill(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK void
-NOTHROW(KCALL xdecref_likely)(T *self) {
-	if (self)
-		REFCNT_METHODS(T)::decref_likely(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK void
-NOTHROW(KCALL xdecref_unlikely)(T *self) {
-	if (self)
-		REFCNT_METHODS(T)::decref_unlikely(self);
-}
-
-
-template<class T>
-FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __UINTPTR_TYPE__
-NOTHROW(KCALL getweakrefcnt)(T const *__restrict self) {
-	return WEAKREFCNT_METHODS(T)::getrefcnt(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
-NOTHROW(KCALL isweakshared)(T const *__restrict self) {
-	return WEAKREFCNT_METHODS(T)::getrefcnt(self) > 1;
-}
-
-template<class T>
-FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) __BOOL
-NOTHROW(KCALL wasweakdestroyed)(T const *__restrict self) {
-	return WEAKREFCNT_METHODS(T)::getrefcnt(self) == 0;
-}
-
-template<class T>
-FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
-NOTHROW(KCALL tryweakincref)(T *__restrict self) {
-	return WEAKREFCNT_METHODS(T)::tryincref(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *
-NOTHROW(KCALL weakincref)(T *__restrict self) {
-	WEAKREFCNT_METHODS(T)::incref(self);
-	return self;
-}
-
-template<class T>
-FORCELOCAL NOBLOCK T *
-NOTHROW(KCALL xweakincref)(T *__restrict self) {
-	if (self)
-		WEAKREFCNT_METHODS(T)::incref(self);
-	return self;
-}
-
-template<class T>
-FORCELOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL weakdestroy)(T *__restrict self) {
-	WEAKREFCNT_METHODS(T)::destroy(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL weakdecref)(T *__restrict self) {
-	WEAKREFCNT_METHODS(T)::decref(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL weakdecref_nokill)(T *__restrict self) {
-	WEAKREFCNT_METHODS(T)::decref_nokill(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL weakdecref_likely)(T *__restrict self) {
-	WEAKREFCNT_METHODS(T)::decref_likely(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL weakdecref_unlikely)(T *__restrict self) {
-	WEAKREFCNT_METHODS(T)::decref_unlikely(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK void
-NOTHROW(KCALL xweakdecref)(T *self) {
-	if (self)
-		WEAKREFCNT_METHODS(T)::decref(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK void
-NOTHROW(KCALL xweakdecref_nokill)(T *self) {
-	if (self)
-		WEAKREFCNT_METHODS(T)::decref_nokill(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK void
-NOTHROW(KCALL xweakdecref_likely)(T *self) {
-	if (self)
-		WEAKREFCNT_METHODS(T)::decref_likely(self);
-}
-
-template<class T>
-FORCELOCAL NOBLOCK void
-NOTHROW(KCALL xweakdecref_unlikely)(T *self) {
-	if (self)
-		WEAKREFCNT_METHODS(T)::decref_unlikely(self);
-}
-
-#endif /* !__INTELLISENSE__ */
-
-#define DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy_) \
-	DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, T)
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_) \
-	DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, T)
 
 #ifdef __INTELLISENSE__
 template<class T> class sync_methods {
@@ -904,6 +392,7 @@ public:
 	}
 };
 __NAMESPACE_INT_END
+} /* extern "C++" */
 
 #define SCOPED_READLOCK(lock)   __NAMESPACE_INT_SYM _sync_reader< __typeof__(*(lock)) > __COMPILER_UNIQUE(__rlock)(*(lock))
 #define SCOPED_WRITELOCK(lock)  __NAMESPACE_INT_SYM _sync_writer< __typeof__(*(lock)) > __COMPILER_UNIQUE(__wlock)(*(lock))
@@ -1117,15 +606,10 @@ __NAMESPACE_INT_END
 	};                                                                                                                                                    \
 	}
 
-} /* extern "C++" */
 
 
 #else /* __cplusplus */
-#define DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy)                   /* nothing */
-#define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy, Tdestroy)      /* nothing */
 #define DEFINE_REFCOUNT_TYPE_SUBCLASS(subclass, baseclass)             /* nothing */
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy) /* nothing */
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_)              /* nothing */
 #define __DEFINE_SYNC_PROXY(T, field)                                  /* nothing */
 #define __DEFINE_SYNC_RWLOCK(T, _tryread, _read, _read_nx, _endread, _reading, _canread,   \
                              _trywrite, _write, _write_nx, _endwrite, _writing, _canwrite, \
@@ -1133,6 +617,9 @@ __NAMESPACE_INT_END
 #define __DEFINE_SYNC_MUTEX(T, _tryacquire, _acquire, _acquire_nx, _release, _acquired, _available) /* nothing */
 #define __DEFINE_SYNC_SEMAPHORE(T, _trywait, _wait, _wait_nx, _post, _available)                    /* nothing */
 #endif /* !__cplusplus */
+
+#define DEFINE_REFCOUNT_FUNCTIONS     __DEFINE_REFCNT_FUNCTIONS
+#define DEFINE_WEAKREFCOUNT_FUNCTIONS __DEFINE_WEAKREFCNT_FUNCTIONS
 
 #include <kernel/arch/compiler.h>
 

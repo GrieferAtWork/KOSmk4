@@ -380,10 +380,10 @@
 #define __DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new() {}
 #define __DEFINE_INTERN_WEAK_ALIAS(new,old) int new() {}
 
+#define __DEFINE_REFCNT_FUNCTIONS(...)
+#define __DEFINE_WEAKREFCNT_FUNCTIONS(...)
 #define DEFINE_REFCOUNT_FUNCTIONS(...)
-#define DEFINE_REFCOUNT_FUNCTIONS_EX(...)
 #define DEFINE_WEAKREFCOUNT_FUNCTIONS(...)
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(...)
 #define __DEFINE_SYNC_PROXY(...)
 #define __DEFINE_SYNC_RWLOCK(...)
 #define __DEFINE_SYNC_MUTEX(...)
@@ -490,15 +490,15 @@
 #define _GLIBCXX_TXN_SAFE
 #define _GLIBCXX_TXN_SAFE_DYN
 
-#define __HYBRID_FUNCPTR32(return, cc, name, args) return (cc *name)args
-#define __HYBRID_FUNCPTR64(return, cc, name, args) return (cc *name)args
-#define FUNCPTR32(return, cc, name, args) return (cc *name)args
-#define FUNCPTR64(return, cc, name, args) return (cc *name)args
+#define __HYBRID_FUNCPTR32(return,cc,name,args) return (cc *name)args
+#define __HYBRID_FUNCPTR64(return,cc,name,args) return (cc *name)args
+#define FUNCPTR32(return,cc,name,args) return (cc *name)args
+#define FUNCPTR64(return,cc,name,args) return (cc *name)args
 #define __HYBRID_PTR32(T) T *
 #define __HYBRID_PTR64(T) T *
 #define PTR32(T) T *
 #define PTR64(T) T *
-#define compat_funcptr(return, cc, name, args) return (cc *name)args
+#define compat_funcptr(return,cc,name,args) return (cc *name)args
 #define compat_ptr(T) T *
 
 #define likely
@@ -525,20 +525,20 @@
 #define __TM_ALTSIZEOF(x) __SIZEOF_##x##_T__
 
 
-#define DEFINE_CMDLINE_FLAG_VAR(flagname, parname) bool flagname;
-#define DEFINE_CMDLINE_PARAM_STRING_VAR(string_name, parname) char string_name[];
-#define DEFINE_CMDLINE_PARAM_INT8_VAR(varname, parname, defl) int8_t varname;
-#define DEFINE_CMDLINE_PARAM_INT16_VAR(varname, parname, defl) int16_t varname;
-#define DEFINE_CMDLINE_PARAM_INT32_VAR(varname, parname, defl) int32_t varname;
-#define DEFINE_CMDLINE_PARAM_INT64_VAR(varname, parname, defl) int64_t varname;
-#define DEFINE_CMDLINE_PARAM_UINT8_VAR(varname, parname, defl) uint8_t varname;
-#define DEFINE_CMDLINE_PARAM_UINT16_VAR(varname, parname, defl) uint16_t varname;
-#define DEFINE_CMDLINE_PARAM_UINT32_VAR(varname, parname, defl) uint32_t varname;
-#define DEFINE_CMDLINE_PARAM_UINT64_VAR(varname, parname, defl) uint64_t varname;
-#define DEFINE_CMDLINE_PARAM_INT_VAR(varname, parname, defl) int varname;
-#define DEFINE_CMDLINE_PARAM_UINT_VAR(varname, parname, defl) unsigned int varname;
-#define DEFINE_CMDLINE_PARAM_INTPTR_VAR(varname, parname, defl) intptr_t varname;
-#define DEFINE_CMDLINE_PARAM_UINTPTR_VAR(varname, parname, defl) uintptr_t varname;
+#define DEFINE_CMDLINE_FLAG_VAR(flagname,parname) bool flagname;
+#define DEFINE_CMDLINE_PARAM_STRING_VAR(string_name,parname) char string_name[];
+#define DEFINE_CMDLINE_PARAM_INT8_VAR(varname,parname,defl) int8_t varname;
+#define DEFINE_CMDLINE_PARAM_INT16_VAR(varname,parname,defl) int16_t varname;
+#define DEFINE_CMDLINE_PARAM_INT32_VAR(varname,parname,defl) int32_t varname;
+#define DEFINE_CMDLINE_PARAM_INT64_VAR(varname,parname,defl) int64_t varname;
+#define DEFINE_CMDLINE_PARAM_UINT8_VAR(varname,parname,defl) uint8_t varname;
+#define DEFINE_CMDLINE_PARAM_UINT16_VAR(varname,parname,defl) uint16_t varname;
+#define DEFINE_CMDLINE_PARAM_UINT32_VAR(varname,parname,defl) uint32_t varname;
+#define DEFINE_CMDLINE_PARAM_UINT64_VAR(varname,parname,defl) uint64_t varname;
+#define DEFINE_CMDLINE_PARAM_INT_VAR(varname,parname,defl) int varname;
+#define DEFINE_CMDLINE_PARAM_UINT_VAR(varname,parname,defl) unsigned int varname;
+#define DEFINE_CMDLINE_PARAM_INTPTR_VAR(varname,parname,defl) intptr_t varname;
+#define DEFINE_CMDLINE_PARAM_UINTPTR_VAR(varname,parname,defl) uintptr_t varname;
 
 #define CASE(x) case x:
 
@@ -550,10 +550,10 @@
 #define DBG_CALL
 #define DEFINE_DEBUG_FUNCTION(name, help, argc, argv) uintptr_t _debug_main_xxx(size_t argc, char *argv[])
 
-#define __HYBRID_ALTINT(UID, allow_int_ops, ...) __VA_ARGS__
+#define __HYBRID_ALTINT(UID,allow_int_ops,...) __VA_ARGS__
 #define __HYBRID_ALTINT_UID(UID)
-#define __HYBRID_ALTINT_COMPAT(Ta, Tb)
-#define __HYBRID_ALTINT_TYPEDEF(Told, Tnew, allow_int_ops) typedef Told Tnew
+#define __HYBRID_ALTINT_COMPAT(Ta,Tb)
+#define __HYBRID_ALTINT_TYPEDEF(Told,Tnew,allow_int_ops) typedef Told Tnew
 
 #define ELFW(x) ELF64_##x
 #define ElfW(x) Elf64_##x
