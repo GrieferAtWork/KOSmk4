@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
+#include <errno.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -57,18 +58,28 @@ PRIVATE void enable_graphics_mode(void) {
 		pid_t cpid;
 		/* Video driver is still in TTY-mode
 		 * -> Switch to video mode */
-		if (ioctl(driver, KDSETMODE, KD_GRAPHICS) < 0)
-			err(EXIT_FAILURE, "ioctl(KDSETMODE, KD_GRAPHICS) failed");
 		cpid = fork();
 		if (cpid < 0)
 			err(EXIT_FAILURE, "fork() failed");
 		if (cpid != 0) {
-			/* Parent process... */
+			/* Parent process...
+			 * -> Wait for the child to exit (likely to the user pressing CTRL+C) */
 			int status;
-			waitpid(cpid, &status, 0);
+			while (waitpid(cpid, &status, 0) == -1 && errno == EINTR);
+			tcsetpgrp(STDIN_FILENO, 0);
 			ioctl(STDOUT_FILENO, KDSETMODE, KD_TEXT); /* Restore text mode */
 			exit(WEXITSTATUS(status));
 		}
+		/* Become our own process group. */
+		setpgrp();
+		/* Make ourself the foreground process (so we'll receive CTRL+C). */
+		tcsetpgrp(STDIN_FILENO, 0);
+		/* Actually do the switch to graphics mode.
+		 * NOTE: The proper way of doing this would be to use `VIDEOIO_SETFORMAT',
+		 *       however then we'd have to decide on which graphics mode to use
+		 *       ourself, rather than simply letting the kernel decide on one. */
+		if (ioctl(driver, KDSETMODE, KD_GRAPHICS) < 0)
+			err(EXIT_FAILURE, "ioctl(KDSETMODE, KD_GRAPHICS) failed");
 	}
 }
 
