@@ -331,6 +331,22 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
 			self->dm_elf.de_pltgot = (ElfW(Addr) *)(self->dm_loadaddr + tag.d_un.d_ptr);
 			break;
 
+		case DT_FLAGS_1:
+			if (tag.d_un.d_val & DF_1_NOW)
+				flags |= DL_MODULE_ELF_INITIALIZE_FBINDNOW;
+			if (tag.d_un.d_val & DF_1_GLOBAL) {
+				if (!(self->dm_flags & RTLD_GLOBAL)) {
+					atomic_rwlock_write(&DlModule_GlobalLock);
+					self->dm_flags |= RTLD_GLOBAL;
+					if (!self->dm_globals.ln_pself)
+						DlModule_AddToGlobals(self);
+					atomic_rwlock_endwrite(&DlModule_GlobalLock);
+				}
+			}
+			if (tag.d_un.d_val & DF_1_NODELETE)
+				self->dm_flags |= RTLD_NODELETE;
+			break;
+
 #if ELF_ARCH_USESRELA
 		case DT_RELA:
 			rela_base = (ElfW(Rela) *)(self->dm_loadaddr + tag.d_un.d_ptr);

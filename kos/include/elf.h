@@ -40,6 +40,9 @@
 
 __DECL_BEGIN
 
+/* The contents of this file are based on GLibc /usr/include/elf.h
+ * Note however that additions were made and more documentation was added,
+ * meaning that the original should be retrieved from a glibc instead. */
 /* This file defines standard ELF types, structures, and macros.
    Copyright (C) 1995-2003,2004,2005,2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -891,8 +894,8 @@ typedef struct {
 #define DT_PROCNUM      DT_MIPS_NUM     /* Most used by any processor */
 
 /* DT_* entries which fall between DT_VALRNGHI & DT_VALRNGLO use the
-   Dyn.d_un.d_val field of the Elf*_Dyn structure.  This follows Sun's
-   approach. */
+ * Dyn.d_un.d_val field of the Elf*_Dyn structure.  This follows Sun's
+ * approach. */
 #define DT_VALRNGLO     0x6ffffd00
 #define DT_GNU_PRELINKED 0x6ffffdf5     /* Prelinking timestamp */
 #define DT_GNU_CONFLICTSZ 0x6ffffdf6    /* Size of conflict section */
