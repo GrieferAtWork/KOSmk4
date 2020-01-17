@@ -236,8 +236,10 @@ again_header:
 		if (ch == '\n')
 			break; /* Don't include the trailing line-feed characters in dmesg */
 		putb(ch);
-		if unlikely(!ch)
+		if unlikely(!ch) {
+			++i;
 			goto again_header; /* May happen due to race conditions (just write another header) */
+		}
 		checksum += (u8)ch;
 	}
 	checksum = 0xff - checksum;
