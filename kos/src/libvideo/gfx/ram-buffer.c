@@ -54,13 +54,13 @@ libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self,
                              uintptr_t x, uintptr_t y) {
 	byte_t *line;
 	assertf(x < self->vx_size_x,
-	        "x         = %Iu\n"
-	        "vx_size_x = %Iu",
-	        x, self->vx_size_x);
+	        "x         = %Iu (%#Ix)\n"
+	        "vx_size_x = %Iu (%#Ix)",
+	        x, x, self->vx_size_x, self->vx_size_x);
 	assertf(y < self->vx_size_y,
-	        "y         = %Iu\n"
-	        "vx_size_y = %Iu",
-	        y, self->vx_size_y);
+	        "y         = %Iu (%#Ix)\n"
+	        "vx_size_y = %Iu (%#Ix)",
+	        y, y, self->vx_size_y, self->vx_size_y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
 	return self->vx_buffer->vb_format.getcolor(line, x);
 }
@@ -71,13 +71,13 @@ libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self,
 	byte_t *line;
 	video_color_t result;
 	assertf(x < self->vx_size_x,
-	        "x         = %Iu\n"
-	        "vx_size_x = %Iu",
-	        x, self->vx_size_x);
+	        "x         = %Iu (%#Ix)\n"
+	        "vx_size_x = %Iu (%#Ix)",
+	        x, x, self->vx_size_x, self->vx_size_x);
 	assertf(y < self->vx_size_y,
-	        "y         = %Iu\n"
-	        "vx_size_y = %Iu",
-	        y, self->vx_size_y);
+	        "y         = %Iu (%#Ix)\n"
+	        "vx_size_y = %Iu (%#Ix)",
+	        y, y, self->vx_size_y, self->vx_size_y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
 	result = self->vx_buffer->vb_format.getcolor(line, x);
 	if (result == self->vx_colorkey)
@@ -212,13 +212,13 @@ libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self,
 	struct video_buffer *buffer;
 	video_color_t o, n;
 	assertf(x < self->vx_size_x,
-	        "x         = %Iu\n"
-	        "vx_size_x = %Iu",
-	        x, self->vx_size_x);
+	        "x         = %Iu (%#Ix)\n"
+	        "vx_size_x = %Iu (%#Ix)",
+	        x, x, self->vx_size_x, self->vx_size_x);
 	assertf(y < self->vx_size_y,
-	        "y         = %Iu\n"
-	        "vx_size_y = %Iu",
-	        y, self->vx_size_y);
+	        "y         = %Iu (%#Ix)\n"
+	        "vx_size_y = %Iu (%#Ix)",
+	        y, y, self->vx_size_y, self->vx_size_y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
 	buffer = self->vx_buffer;
 	/* Perform full color blending. */
@@ -232,8 +232,14 @@ libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self,
                                      uintptr_t x, uintptr_t y, video_color_t color) {
 	byte_t *line;
 	struct video_buffer *buffer;
-	if (x >= self->vx_size_x || y >= self->vx_size_x)
-		return;
+	assertf(x < self->vx_size_x,
+	        "x         = %Iu (%#Ix)\n"
+	        "vx_size_x = %Iu (%#Ix)",
+	        x, x, self->vx_size_x, self->vx_size_x);
+	assertf(y < self->vx_size_y,
+	        "y         = %Iu (%#Ix)\n"
+	        "vx_size_y = %Iu (%#Ix)",
+	        y, y, self->vx_size_y, self->vx_size_y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
 	buffer = self->vx_buffer;
 	buffer->vb_format.setcolor(line, x, color);
@@ -245,8 +251,14 @@ libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self,
 	byte_t *line;
 	struct video_buffer *buffer;
 	video_color_t o, n;
-	if (x >= self->vx_size_x || y >= self->vx_size_x)
-		return;
+	assertf(x < self->vx_size_x,
+	        "x         = %Iu (%#Ix)\n"
+	        "vx_size_x = %Iu (%#Ix)",
+	        x, x, self->vx_size_x, self->vx_size_x);
+	assertf(y < self->vx_size_y,
+	        "y         = %Iu (%#Ix)\n"
+	        "vx_size_y = %Iu (%#Ix)",
+	        y, y, self->vx_size_y, self->vx_size_y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
 	buffer = self->vx_buffer;
 	o = buffer->vb_format.getcolor(line, x);

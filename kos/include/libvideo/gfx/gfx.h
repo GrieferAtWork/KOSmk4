@@ -185,6 +185,32 @@ struct video_gfx_ops {
 	                                    __intptr_t __src_x, __intptr_t __src_y,
 	                                    __size_t __size_x, __size_t __size_y,
 	                                    void const *__restrict __bitmask);
+	/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask.
+	 * The resulting image will be similar (but not necessarily identical) to:
+	 * >> struct video_buffer *temp;
+	 * >> struct video_gfx temp_gfx;
+	 * >> temp = video_buffer_create(VIDEO_BUFFER_AUTO, SRC_SIZE_X, SRC_SIZE_Y,
+	 * >>                            video_codec_lookup(VIDEO_CODEC_RGBA8888),
+	 * >>                            NULL);
+	 * >> temp->gfx(temp_gfx, GFX_BLENDINFO_OVERRIDE);
+	 * >> temp_gfx.bitfill(0, 0, SRC_SIZE_X, SRC_SIZE_Y, COLOR, BITMASK);
+	 * >> // NOTE: Pixels that aren't masked by BITMASK may not necessary get blended during this call!
+	 * >> SELF->stretch(DST_X, DST_Y, DST_SIZE_X, DST_SIZE_Y, &temp_gfx, 0, 0, SRC_SIZE_X, SRC_SIZE_Y);
+	 * >> destroy(temp); */
+	void (LIBVIDEO_GFX_CC *fxo_bitstretchfill)(struct video_gfx *__restrict __self,
+	                                           __intptr_t __dst_x, __intptr_t __dst_y,
+	                                           __size_t __dst_size_x, __size_t __dst_size_y,
+	                                           video_color_t __color,
+	                                           __size_t __src_size_x, __size_t __src_size_y,
+	                                           void const *__restrict __bitmask);
+	/* Same as `fxo_bitstretchfill()' is for `fxo_bitfill()', but instead here for `fxo_bitblit()' */
+	void (LIBVIDEO_GFX_CC *fxo_bitstretchblit)(struct video_gfx *__self,
+	                                           __intptr_t __dst_x, __intptr_t __dst_y,
+	                                           __size_t __dst_size_x, __size_t __dst_size_y,
+	                                           struct video_gfx const *__src,
+	                                           __intptr_t __src_x, __intptr_t __src_y,
+	                                           __size_t __src_size_x, __size_t __src_size_y,
+	                                           void const *__restrict __bitmask);
 };
 
 
@@ -509,6 +535,28 @@ public:
 		                        &__src, __src_x, __src_y,
 		                        __size_x, __size_y, __bitmask);
 	}
+
+	/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask. */
+	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC bitstretchfill(__intptr_t __dst_x, __intptr_t __dst_y,
+	                                                      __size_t __dst_size_x, __size_t __dst_size_y,
+	                                                      video_color_t __color,
+	                                                      __size_t __src_size_x, __size_t __src_size_y,
+	                                                      void const *__restrict __bitmask) {
+		(*vx_ops->fxo_bitstretchfill)(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
+		                              __color, __src_size_x, __src_size_y, __bitmask);
+	}
+
+	/* Same as `fxo_bitstretchfill()' is for `fxo_bitfill()', but instead here for `fxo_bitblit()' */
+	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC bitstretchblit(__intptr_t __dst_x, __intptr_t __dst_y,
+	                                                      __size_t __dst_size_x, __size_t __dst_size_y,
+	                                                      struct video_gfx const *__src,
+	                                                      __intptr_t __src_x, __intptr_t __src_y,
+	                                                      __size_t __src_size_x, __size_t __src_size_y,
+	                                                      void const *__restrict __bitmask) {
+		(*vx_ops->fxo_bitstretchblit)(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
+		                              __src, __src_x, __src_y, __src_size_x, __src_size_y, __bitmask);
+	}
+
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("bitblit")

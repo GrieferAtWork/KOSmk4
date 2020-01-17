@@ -208,6 +208,15 @@ install_path_hardcopy() {
 	done
 }
 
+# Invoke `deemon $*`
+rundeemon() {
+	if which deemon > /dev/null 2>&1; then
+		deemon $*
+	else
+		"${KOS_ROOT}/binutils/deemon/deemon" $*
+	fi
+}
+
 
 # download_file  <DST_FILE>  <URL>
 download_file() {
@@ -255,6 +264,7 @@ case $UTILITY_NAME in
 		if [ "$MODE_FORCE_CONF" == yes ]; then OPTS="$OPTS --force-configure"; fi
 		if [ "$MODE_FORCE_MAKE" == yes ]; then OPTS="$OPTS --force-make"; fi
 		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" busybox
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" fonts
 		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" vitetris
 		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" tcc
 		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" ncurses
@@ -301,6 +311,16 @@ case $UTILITY_NAME in
 		fi
 		# Install busybox in KOS
 		install_file /bin/busybox "${OPTPATH}/busybox_unstripped"
+		;;
+##############################################################################
+
+
+##############################################################################
+	fonts)
+		# Build and install KOS graphics mode fonts
+		cd "$KOS_ROOT"
+		rundeemon "kos/misc/fonts/tlft/build_u_vga16.dee"
+		install_file /lib/fonts/u_vga16 "$KOS_ROOT/kos/misc/fonts/tlft/u_vga16"
 		;;
 ##############################################################################
 

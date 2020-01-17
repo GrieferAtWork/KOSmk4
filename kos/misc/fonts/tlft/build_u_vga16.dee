@@ -1,0 +1,50 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import ipc;
+import * from deemon;
+import * from ...libtlft.compiler;
+
+fs.chdir(fs.headof(__FILE__));
+
+function runBashProcess(cmdline: string) {
+	local p = ipc.Process("bash", ["-c", cmdline]);
+	p.start();
+	local err = p.join();
+	if (err != 0)
+		throw Error("Process {!r} returned {}".format({ p, err }));
+}
+
+local bdf = try fs.stat("uni_vga/u_vga16.bdf") catch (...) none;
+if (bdf is none) {
+	if (!fs.stat.exists("uni-vga.tgz"))
+		runBashProcess("wget http://www.inp.nsk.su/~bolkhov/files/fonts/univga/uni-vga.tgz");
+	runBashProcess("tar -xvf uni-vga.tgz");
+}
+
+local st = try fs.stat("u_vga16") catch (...) none;
+if (st is none || bdf is none || st.st_mtime < bdf.st_mtime)
+	tlftCompileAndLinkBDF("uni_vga/u_vga16.bdf", "u_vga16");
+
+
+
+
+

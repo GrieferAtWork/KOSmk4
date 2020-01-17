@@ -27,8 +27,9 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/refcnt.h>
 #include <bits/types.h>
+#include <kos/anno.h>
+#include <kos/refcnt.h>
 
 #include <libvideo/codec/format.h>
 #include <libvideo/codec/pixel.h>
@@ -180,8 +181,9 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
 
 
 /* Video buffer types. */
-#define VIDEO_BUFFER_RAM 0x0000  /* RAM buffer. */
-#define VIDEO_BUFFER_GPU 0x0001  /* GPU buffer. */
+#define VIDEO_BUFFER_AUTO 0x0000  /* Type doesn't matter. */
+#define VIDEO_BUFFER_RAM  0x0001  /* RAM buffer. */
+#define VIDEO_BUFFER_GPU  0x0002  /* GPU buffer. */
 
 
 #ifdef __CC__
@@ -191,20 +193,20 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
  *       which may not necessarily use the given, or default `codec' and `palette'
  * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
  * @param: palette: The palette to use (only needed if used by `codec') */
-typedef __ATTR_WUNUSED /*REF*/ struct video_buffer *
+typedef __ATTR_WUNUSED __REF struct video_buffer *
 (LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CREATE)(unsigned int type, __size_t size_x, __size_t size_y,
                                         struct video_codec *codec, struct video_palette *palette);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED /*REF*/ struct video_buffer *LIBVIDEO_GFX_CC
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC
 video_buffer_create(unsigned int type, __size_t size_x, __size_t size_y,
                     struct video_codec *codec, struct video_palette *palette);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)
  * Note that screen buffer access is only granted to ROOT and the window server */
-typedef __ATTR_WUNUSED /*REF*/ struct video_buffer *(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_SCREEN)(void);
+typedef __ATTR_WUNUSED __REF struct video_buffer *(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_SCREEN)(void);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_WUNUSED /*REF*/ struct video_buffer *LIBVIDEO_GFX_CC video_buffer_screen(void);
+LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC video_buffer_screen(void);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Return the preferred video format.

@@ -29,6 +29,7 @@
 
 #include <bits/types.h>
 #include <kos/ioctl/video.h>
+#include <kos/refcnt.h>
 
 #include "pixel.h"
 
@@ -68,26 +69,13 @@ struct video_palette {
 	struct vd_palette vp_pal;        /* [const] OS palette data. */
 };
 
+#define video_palette_destroy(self) (*(self)->vp_destroy)(self)
 #define video_palette_incref(self) \
 	__hybrid_atomic_fetchinc((self)->vp_refcnt, __ATOMIC_SEQ_CST)
 #define video_palette_decref(self)                                    \
 	(__hybrid_atomic_decfetch((self)->vp_refcnt, __ATOMIC_SEQ_CST) || \
-	 ((*(self)->vp_destroy)(self), 0))
-
-#if defined(__cplusplus) && defined(__USE_KOS)
-extern "C++" {
-__FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct video_palette *
-(LIBVIDEO_CODEC_CC incref)(struct video_palette *__restrict self) {
-	video_palette_incref(self);
-	return self;
-}
-
-__FORCELOCAL __ATTR_NONNULL((1)) void
-(LIBVIDEO_CODEC_CC decref)(struct video_palette *__restrict self) {
-	video_palette_decref(self);
-}
-}
-#endif /* __cplusplus && __USE_KOS */
+	 (video_palette_destroy(self), 0))
+__DEFINE_REFCNT_FUNCTIONS(struct video_palette, vp_refcnt, video_palette_destroy)
 
 
 

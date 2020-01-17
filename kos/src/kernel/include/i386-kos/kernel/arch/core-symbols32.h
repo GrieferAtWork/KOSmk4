@@ -8979,9 +8979,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, error_subclass; .int 0
 	.int 0x220a8c3
 	.long .Lname2244 /* index: 2244 */
-	.weak vm_protect; .long vm_protect
-	.reloc ., R_386_SIZE32, vm_protect; .int 0
-	.int 0x79178c4
+	.weak video_device_cinit; .long video_device_cinit
+	.reloc ., R_386_SIZE32, video_device_cinit; .int 0
+	.int 0x93aa8c4
 	.long .Lname2245 /* index: 2245 */
 	.weak superblock_opennode; .long superblock_opennode
 	.reloc ., R_386_SIZE32, superblock_opennode; .int 0
@@ -9650,10 +9650,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak json_parser_yield; .long json_parser_yield
 	.reloc ., R_386_SIZE32, json_parser_yield; .int 0
 	.int 0x276c5a4
-	.long 0 /* index: 2412 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname2412 /* index: 2412 */
+	.weak video_device_ioctl; .long video_device_ioctl
+	.reloc ., R_386_SIZE32, video_device_ioctl; .int 0
+	.int 0x93d396c
 	.long 0 /* index: 2413 */
 	.long 0
 	.int 0
@@ -14954,10 +14954,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_linux_oldstat; .long sys_linux_oldstat
 	.reloc ., R_386_SIZE32, sys_linux_oldstat; .int 0
 	.int 0x8b56fc4
-	.long 0 /* index: 3738 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname3738 /* index: 3738 */
+	.weak vm_protect; .long vm_protect
+	.reloc ., R_386_SIZE32, vm_protect; .int 0
+	.int 0x79178c4
 	.long .Lname3739 /* index: 3739 */
 	.weak sys_flock; .long sys_flock
 	.reloc ., R_386_SIZE32, sys_flock; .int 0
@@ -19047,7 +19047,7 @@ END(kernel_symbol_table)
 .Lname2243:
 	.string "error_subclass"
 .Lname2244:
-	.string "vm_protect"
+	.string "video_device_cinit"
 .Lname2245:
 	.string "superblock_opennode"
 .Lname2246:
@@ -19234,6 +19234,8 @@ END(kernel_symbol_table)
 	.string "path_newchild"
 .Lname2411:
 	.string "json_parser_yield"
+.Lname2412:
+	.string "video_device_ioctl"
 .Lname2417:
 	.string "setreg_lcpustate"
 .Lname2418:
@@ -20872,6 +20874,8 @@ END(kernel_symbol_table)
 	.string "vm_copyfromphys_onepage_nopf"
 .Lname3737:
 	.string "sys_linux_oldstat"
+.Lname3738:
+	.string "vm_protect"
 .Lname3739:
 	.string "sys_flock"
 .Lname3740:

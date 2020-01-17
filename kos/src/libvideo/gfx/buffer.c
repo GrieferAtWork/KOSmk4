@@ -72,6 +72,7 @@ libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
 	}
 	switch (type) {
 
+	case VIDEO_BUFFER_AUTO:
 	case VIDEO_BUFFER_RAM:
 		result = libvideo_rambuffer_create(size_x, size_y,
 		                                   codec, palette);
