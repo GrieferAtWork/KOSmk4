@@ -839,7 +839,7 @@ typedef struct {
 
 typedef struct {
 	Elf64_Sxword d_tag; /* Dynamic entry type */
-	union{
+	union {
 		Elf64_Xword d_val; /* Integer value */
 		Elf64_Addr  d_ptr; /* Address value */
 	} d_un;

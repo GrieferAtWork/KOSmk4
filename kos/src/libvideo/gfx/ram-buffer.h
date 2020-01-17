@@ -33,12 +33,9 @@
 
 DECL_BEGIN
 
-/* Indices into `video_buffer_gfx::bfx_driver' for RAM gfx buffers. */
+/* Indices into `video_gfx::bfx_driver' for RAM gfx buffers. */
 #define VIDEO_BUFFER_RAMGFX_DATA   0
 #define VIDEO_BUFFER_RAMGFX_STRIDE 1
-#define VIDEO_BUFFER_RAMGFX_SIZEX  2
-#define VIDEO_BUFFER_RAMGFX_SIZEY  3
-
 
 struct video_rambuffer: video_buffer {
 	size_t  vb_stride; /* [const] Buffer stride */
@@ -57,16 +54,11 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_g
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
-INTDEF video_color_t CC libvideo_gfx_ramgfx_getcolor(struct video_buffer_gfx const *__restrict self, uintptr_t x, uintptr_t y);
-INTDEF video_color_t CC libvideo_gfx_ramgfx_getcolor_with_key(struct video_buffer_gfx const *__restrict self, uintptr_t x, uintptr_t y);
-INTDEF void CC libvideo_gfx_ramgfx_putcolor(struct video_buffer_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
-INTDEF void CC libvideo_gfx_ramgfx_line(struct video_buffer_gfx *__restrict self, intptr_t x1, intptr_t y1, intptr_t x2, intptr_t y2, video_color_t color);
-INTDEF void CC libvideo_gfx_ramgfx_vline(struct video_buffer_gfx *__restrict self, uintptr_t x, uintptr_t y1, uintptr_t y2, video_color_t color);
-INTDEF void CC libvideo_gfx_ramgfx_hline(struct video_buffer_gfx *__restrict self, uintptr_t y, uintptr_t x1, uintptr_t x2, video_color_t color);
-INTDEF void CC libvideo_gfx_ramgfx_fill(struct video_buffer_gfx *__restrict self, uintptr_t x, uintptr_t y, size_t size_x, size_t size_y, video_color_t color);
-INTDEF void CC libvideo_gfx_ramgfx_rect(struct video_buffer_gfx *__restrict self, uintptr_t x, uintptr_t y, size_t size_x, size_t size_y, video_color_t color);
-INTDEF void CC libvideo_gfx_ramgfx_blit(struct video_buffer_gfx *self, intptr_t dst_x, intptr_t dst_y, struct video_buffer_gfx const *src, intptr_t src_x, intptr_t src_y, size_t size_x, size_t size_y);
-INTDEF void CC libvideo_gfx_ramgfx_stretch(struct video_buffer_gfx *self, intptr_t dst_x, intptr_t dst_y, size_t dst_size_x, size_t dst_size_y, struct video_buffer_gfx const *src, intptr_t src_x, intptr_t src_y, size_t src_size_x, size_t src_size_y);
+INTDEF video_color_t CC libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
+INTDEF video_color_t CC libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
+INTDEF void CC libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
+INTDEF void CC libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
+INTDEF void CC libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
 
 
 /* Create a new RAM-based video buffer */

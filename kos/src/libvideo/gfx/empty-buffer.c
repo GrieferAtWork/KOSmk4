@@ -42,171 +42,195 @@
 
 DECL_BEGIN
 
-
-PRIVATE struct video_buffer_ops empty_video_buffer_ops;
-PRIVATE struct video_buffer empty_video_buffer;
-PRIVATE byte_t const empty_video_buffer_data[1] = { 0 };
-
-
 /* Stub GFX functions for the empty video buffer. */
-PRIVATE video_color_t CC
-empty_video_buffer_gfx_getcolor(struct video_buffer_gfx const *__restrict self,
-                                uintptr_t UNUSED(x), uintptr_t UNUSED(y)) {
-	assert(self->bfx_buffer == &empty_video_buffer);
-	(void)self;
+INTERN video_color_t CC
+video_gfx_empty_getcolor(struct video_gfx const *__restrict UNUSED(self),
+                         uintptr_t UNUSED(x), uintptr_t UNUSED(y)) {
 	return 0;
 }
 
-PRIVATE void CC
-empty_video_buffer_gfx_putcolor(struct video_buffer_gfx *__restrict self,
-                                uintptr_t UNUSED(x), uintptr_t UNUSED(y),
-                                video_color_t UNUSED(color)) {
-	assert(self->bfx_buffer == &empty_video_buffer);
-	(void)self;
+INTERN void CC
+video_gfx_empty_putcolor(struct video_gfx *__restrict UNUSED(self),
+                         uintptr_t UNUSED(x), uintptr_t UNUSED(y),
+                         video_color_t UNUSED(color)) {
 }
 
 PRIVATE void CC
-empty_video_buffer_gfx_line(struct video_buffer_gfx *__restrict self,
-                            intptr_t UNUSED(x1), intptr_t UNUSED(y1),
-                            intptr_t UNUSED(x2), intptr_t UNUSED(y2),
-                            video_color_t UNUSED(color)) {
-	assert(self->bfx_buffer == &empty_video_buffer);
-	(void)self;
+video_gfx_empty_line(struct video_gfx *__restrict UNUSED(self),
+                     intptr_t UNUSED(x1), intptr_t UNUSED(y1),
+                     intptr_t UNUSED(x2), intptr_t UNUSED(y2),
+                     video_color_t UNUSED(color)) {
 }
 
 PRIVATE void CC
-empty_video_buffer_gfx_vline(struct video_buffer_gfx *__restrict self,
-                             uintptr_t UNUSED(x),
-                             uintptr_t UNUSED(y1), uintptr_t UNUSED(y2),
-                             video_color_t UNUSED(color)) {
-	assert(self->bfx_buffer == &empty_video_buffer);
-	(void)self;
+video_gfx_empty_vline(struct video_gfx *__restrict UNUSED(self),
+                      uintptr_t UNUSED(x),
+                      uintptr_t UNUSED(y1), uintptr_t UNUSED(y2),
+                      video_color_t UNUSED(color)) {
 }
 
 PRIVATE void CC
-empty_video_buffer_gfx_hline(struct video_buffer_gfx *__restrict self,
-                             uintptr_t UNUSED(y),
-                             uintptr_t UNUSED(x1), uintptr_t UNUSED(x2),
-                             video_color_t UNUSED(color)) {
-	assert(self->bfx_buffer == &empty_video_buffer);
-	(void)self;
+video_gfx_empty_hline(struct video_gfx *__restrict UNUSED(self),
+                      uintptr_t UNUSED(y),
+                      uintptr_t UNUSED(x1), uintptr_t UNUSED(x2),
+                      video_color_t UNUSED(color)) {
 }
 
 PRIVATE void CC
-empty_video_buffer_gfx_fill(struct video_buffer_gfx *__restrict self,
-                            uintptr_t UNUSED(x), uintptr_t UNUSED(y),
-                            size_t UNUSED(size_x), size_t UNUSED(size_y),
-                            video_color_t UNUSED(color)) {
-	assert(self->bfx_buffer == &empty_video_buffer);
-	(void)self;
+video_gfx_empty_fill(struct video_gfx *__restrict UNUSED(self),
+                     uintptr_t UNUSED(x), uintptr_t UNUSED(y),
+                     size_t UNUSED(size_x), size_t UNUSED(size_y),
+                     video_color_t UNUSED(color)) {
 }
 
 PRIVATE void CC
-empty_video_buffer_gfx_rect(struct video_buffer_gfx *__restrict self,
-                            uintptr_t UNUSED(x), uintptr_t UNUSED(y),
-                            size_t UNUSED(size_x), size_t UNUSED(size_y),
-                            video_color_t UNUSED(color)) {
-	assert(self->bfx_buffer == &empty_video_buffer);
-	(void)self;
+video_gfx_empty_rect(struct video_gfx *__restrict UNUSED(self),
+                     uintptr_t UNUSED(x), uintptr_t UNUSED(y),
+                     size_t UNUSED(size_x), size_t UNUSED(size_y),
+                     video_color_t UNUSED(color)) {
 }
 
 PRIVATE void CC
-empty_video_buffer_gfx_blit(struct video_buffer_gfx *self,
-                            intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
-                            struct video_buffer_gfx const *UNUSED(src),
-                            intptr_t UNUSED(src_x), intptr_t UNUSED(src_y),
-                            size_t UNUSED(size_x), size_t UNUSED(size_y)) {
-	assert(self->bfx_buffer == &empty_video_buffer);
-	(void)self;
+video_gfx_empty_blit(struct video_gfx *UNUSED(self),
+                     intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
+                     struct video_gfx const *UNUSED(src),
+                     intptr_t UNUSED(src_x), intptr_t UNUSED(src_y),
+                     size_t UNUSED(size_x), size_t UNUSED(size_y)) {
 }
 
 PRIVATE void CC
-empty_video_buffer_gfx_stretch(struct video_buffer_gfx *self,
-                               intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
-                               size_t UNUSED(dst_size_x), size_t UNUSED(dst_size_y),
-                               struct video_buffer_gfx const *UNUSED(src),
-                               intptr_t UNUSED(src_x), intptr_t UNUSED(src_y),
-                               size_t UNUSED(src_size_x), size_t UNUSED(src_size_y)) {
-	assert(self->bfx_buffer == &empty_video_buffer);
-	(void)self;
+video_gfx_empty_stretch(struct video_gfx *UNUSED(self),
+                        intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
+                        size_t UNUSED(dst_size_x), size_t UNUSED(dst_size_y),
+                        struct video_gfx const *UNUSED(src),
+                        intptr_t UNUSED(src_x), intptr_t UNUSED(src_y),
+                        size_t UNUSED(src_size_x), size_t UNUSED(src_size_y)) {
+}
+
+PRIVATE void CC
+video_gfx_empty_bitfill(struct video_gfx *__restrict UNUSED(self),
+                        intptr_t UNUSED(x), intptr_t UNUSED(y),
+                        size_t UNUSED(size_x), size_t UNUSED(size_y),
+                        video_color_t UNUSED(color),
+                        void const *__restrict UNUSED(bitmask)) {
+}
+
+PRIVATE void CC
+video_gfx_empty_bitblit(struct video_gfx *UNUSED(self),
+                        intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
+                        struct video_gfx const *UNUSED(src),
+                        intptr_t UNUSED(src_x), intptr_t UNUSED(src_y),
+                        size_t UNUSED(size_x), size_t UNUSED(size_y),
+                        void const *__restrict UNUSED(bitmask)) {
+}
+
+
+
+PRIVATE struct video_gfx_ops video_gfx_empty_ops = {};
+
+/* Return GFX operators for an empty video buffer. */
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
+struct video_gfx_ops *CC libvideo_getemptygfxops(void) {
+	if unlikely(!video_gfx_empty_ops.fxo_line) {
+		video_gfx_empty_ops.fxo_vline   = &video_gfx_empty_vline;
+		video_gfx_empty_ops.fxo_hline   = &video_gfx_empty_hline;
+		video_gfx_empty_ops.fxo_fill    = &video_gfx_empty_fill;
+		video_gfx_empty_ops.fxo_rect    = &video_gfx_empty_rect;
+		video_gfx_empty_ops.fxo_blit    = &video_gfx_empty_blit;
+		video_gfx_empty_ops.fxo_stretch = &video_gfx_empty_stretch;
+		video_gfx_empty_ops.fxo_bitfill = &video_gfx_empty_bitfill;
+		video_gfx_empty_ops.fxo_bitblit = &video_gfx_empty_bitblit;
+		COMPILER_WRITE_BARRIER();
+		video_gfx_empty_ops.fxo_line = &video_gfx_empty_line;
+	}
+	return &video_gfx_empty_ops;
 }
 
 
 
 
 PRIVATE void LIBVIDEO_GFX_CC
-empty_video_buffer_destroy(struct video_buffer *__restrict self) {
+video_buffer_empty_destroy(struct video_buffer *__restrict self) {
 	(void)self;
-	__assertion_failedf("empty_video_buffer_destroy()",
+	__assertion_failedf("video_buffer_empty_destroy()",
 	                    "Must never get here!");
 }
 
+PRIVATE byte_t const video_buffer_empty_data[1] = { 0 };
+
 PRIVATE NONNULL((1, 2)) int CC
-empty_video_buffer_lock(struct video_buffer *__restrict self,
+video_buffer_empty_lock(struct video_buffer *__restrict UNUSED(self),
                         struct video_lock *__restrict result) {
-	assert(self == &empty_video_buffer);
 	/* Must assign a valid, non-NULL, but empty buffer.
 	 * Technically, any arbitrary non-NULL address would work, but
 	 * set an actual, read-only buffer so-as to catch bad writes. */
-	(void)self;
-	result->vl_data   = (byte_t *)empty_video_buffer_data;
+	result->vl_data   = (byte_t *)video_buffer_empty_data;
 	result->vl_size   = 0;
 	result->vl_stride = 0;
 	return 0;
 }
 
 PRIVATE NONNULL((1, 2)) void CC
-empty_video_buffer_unlock(struct video_buffer *__restrict self,
+video_buffer_empty_unlock(struct video_buffer *__restrict UNUSED(self),
                           struct video_lock const *__restrict lock) {
-	assert(self == &empty_video_buffer);
-	assert(lock->vl_data == (byte_t *)empty_video_buffer_data);
+	(void)lock;
+	assert(lock->vl_data == (byte_t *)video_buffer_empty_data);
 	assert(lock->vl_size == 0);
 	assert(lock->vl_stride == 0);
-	(void)self;
-	(void)lock;
 }
 
 PRIVATE void CC
-empty_video_buffer_getgfx(struct video_buffer *__restrict self,
-                          struct video_buffer_gfx *__restrict result,
+video_buffer_empty_getgfx(struct video_buffer *__restrict self,
+                          struct video_gfx *__restrict result,
                           gfx_blendmode_t blendmode, uintptr_t flags,
-                          video_color_t colorkey) {
-	assert(self == &empty_video_buffer);
-	result->bfx_ops.fxo_getcolor = &empty_video_buffer_gfx_getcolor;
-	result->bfx_ops.fxo_putcolor = &empty_video_buffer_gfx_putcolor;
-	result->bfx_ops.fxo_line     = &empty_video_buffer_gfx_line;
-	result->bfx_ops.fxo_vline    = &empty_video_buffer_gfx_vline;
-	result->bfx_ops.fxo_hline    = &empty_video_buffer_gfx_hline;
-	result->bfx_ops.fxo_fill     = &empty_video_buffer_gfx_fill;
-	result->bfx_ops.fxo_rect     = &empty_video_buffer_gfx_rect;
-	result->bfx_ops.fxo_blit     = &empty_video_buffer_gfx_blit;
-	result->bfx_ops.fxo_stretch  = &empty_video_buffer_gfx_stretch;
-	result->bfx_buffer           = self;
-	result->bfx_blend            = blendmode;
-	result->bfx_flags            = flags;
-	result->bfx_colorkey         = colorkey;
-	memset(result->bfx_driver, 0, sizeof(result->bfx_driver));
+                          video_color_t colorkey,
+                          struct video_buffer_rect *UNUSED(clip)) {
+	result->vx_pxops.fxo_getcolor = &video_gfx_empty_getcolor;
+	result->vx_pxops.fxo_putcolor = &video_gfx_empty_putcolor;
+	result->vx_ops                = libvideo_getemptygfxops();
+	result->vx_buffer             = self;
+	result->vx_blend              = blendmode;
+	result->vx_flags              = flags;
+	result->vx_colorkey           = colorkey;
+	result->vx_offt_x             = 0;
+	result->vx_offt_y             = 0;
+	result->vx_size_x             = 0;
+	result->vx_size_y             = 0;
 }
 
-INTERN ATTR_RETNONNULL struct video_buffer *CC
-get_empty_video_buffer(void) {
-	struct video_buffer *result;
-	result = &empty_video_buffer;
-	if (!result->vb_ops) {
-		empty_video_buffer_ops.vi_destroy = &empty_video_buffer_destroy;
-		empty_video_buffer_ops.vi_lock    = &empty_video_buffer_lock;
-		empty_video_buffer_ops.vi_unlock  = &empty_video_buffer_unlock;
-		empty_video_buffer_ops.vi_getgfx  = &empty_video_buffer_getgfx;
-		result->vb_refcnt                 = 1;
-		result->vb_size_x                 = 0;
-		result->vb_size_y                 = 0;
-		/* The codec doesn't really matter, but use the most common one (RGBA8888) */
-		result->vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
-		result->vb_format.vf_pal   = NULL;
+PRIVATE struct video_buffer_ops video_buffer_empty_ops = {};
+
+/* Return operators for an empty video buffer. */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED
+struct video_buffer_ops *CC libvideo_getemptybufferops(void) {
+	if unlikely(!video_buffer_empty_ops.vi_getgfx) {
+		video_buffer_empty_ops.vi_destroy = &video_buffer_empty_destroy;
+		video_buffer_empty_ops.vi_lock    = &video_buffer_empty_lock;
+		video_buffer_empty_ops.vi_unlock  = &video_buffer_empty_unlock;
 		COMPILER_WRITE_BARRIER();
-		result->vb_ops = &empty_video_buffer_ops;
+		video_buffer_empty_ops.vi_getgfx = &video_buffer_empty_getgfx;
 	}
-	return result;
+	return &video_buffer_empty_ops;
+}
+
+
+PRIVATE struct video_buffer video_buffer_empty = {};
+
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
+struct video_buffer *CC libvideo_getemptybuffer(void) {
+	if unlikely(!video_buffer_empty.vb_ops) {
+		struct video_buffer_ops *ops;
+		video_buffer_empty.vb_refcnt = 1;
+		video_buffer_empty.vb_size_x = 0;
+		video_buffer_empty.vb_size_y = 0;
+		/* The codec doesn't really matter, but use the most common one (RGBA8888) */
+		video_buffer_empty.vb_format.vf_codec = video_codec_lookup(VIDEO_CODEC_RGBA8888);
+		video_buffer_empty.vb_format.vf_pal   = NULL;
+		ops = libvideo_getemptybufferops();
+		COMPILER_WRITE_BARRIER();
+		video_buffer_empty.vb_ops = ops;
+	}
+	return &video_buffer_empty;
 }
 
 

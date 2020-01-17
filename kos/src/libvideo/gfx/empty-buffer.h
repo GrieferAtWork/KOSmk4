@@ -28,8 +28,17 @@
 
 DECL_BEGIN
 
+INTDEF video_color_t CC video_gfx_empty_getcolor(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
+INTDEF void CC video_gfx_empty_putcolor(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
+
+/* Return GFX operators for an empty video buffer. */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct video_gfx_ops *CC libvideo_getemptygfxops(void);
+
+/* Return operators for an empty video buffer. */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC libvideo_getemptybufferops(void);
+
 /* Return the empty video buffer. */
-INTDEF ATTR_RETNONNULL struct video_buffer *CC get_empty_video_buffer(void);
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct video_buffer *CC libvideo_getemptybuffer(void);
 
 DECL_END
 

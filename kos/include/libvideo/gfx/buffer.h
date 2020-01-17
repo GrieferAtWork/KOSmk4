@@ -49,7 +49,12 @@ struct video_lock {
 	__size_t  vl_size;   /* Total image size (>= vl_stride * :vb_size_y) */
 	__byte_t *vl_data;   /* [1..1] Memory-mapped video data. */
 };
-
+struct video_buffer_rect {
+	__uintptr_t vbr_startx; /* Starting X */
+	__uintptr_t vbr_starty; /* Starting Y */
+	__uintptr_t vbr_sizex;  /* Rect size in X */
+	__uintptr_t vbr_sizey;  /* Rect size in Y */
+};
 
 struct video_buffer_ops {
 	/* [1..1] Buffer finalization. */
@@ -76,11 +81,15 @@ struct video_buffer_ops {
 	 * registers its video API. */
 
 	/* Get graphics functions for use with the given buffer
-	 * @param: flags: Set of `VIDEO_GFX_F*' */
+	 * @param: flags: Set of `VIDEO_GFX_F*'
+	 * @param: clip:  When non-NULL, specify a clip-rect to which drawing should be restricted.
+	 *                All canvas coords will be relative to this rectangle, and and attempt to
+	 *                access a pixel outside this rect will be a no-op / appear to be fully opaque. */
 	void (LIBVIDEO_GFX_CC *vi_getgfx)(struct video_buffer *__restrict self,
-	                                  struct video_buffer_gfx *__restrict result,
+	                                  struct video_gfx *__restrict result,
 	                                  gfx_blendmode_t blendmode, __uintptr_t flags,
-	                                  video_color_t colorkey);
+	                                  video_color_t colorkey,
+	                                  struct video_buffer_rect *clip);
 };
 #endif /* __CC__ */
 
@@ -130,23 +139,25 @@ public:
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
-	__CXX_CLASSMEMBER struct video_buffer_gfx &LIBVIDEO_GFX_CC
-	gfx(struct video_buffer_gfx &__result,
-	    gfx_blendmode_t __blendmode = GFX_BLENDINFO_ALPHA,
-	    __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
-	    video_color_t __colorkey    = 0) {
-		(*vb_ops->vi_getgfx)(this, &__result, __blendmode, __flags, __colorkey);
+	__CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
+	gfx(struct video_gfx &__result,
+	    gfx_blendmode_t __blendmode    = GFX_BLENDINFO_ALPHA,
+	    __uintptr_t __flags            = VIDEO_GFX_FNORMAL,
+	    video_color_t __colorkey       = 0,
+		struct video_buffer_rect *clip = __NULLPTR) {
+		(*vb_ops->vi_getgfx)(this, &__result, __blendmode, __flags, __colorkey, clip);
 		return __result;
 	}
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
-	__CXX_CLASSMEMBER struct video_buffer_gfx LIBVIDEO_GFX_CC
-	gfx(gfx_blendmode_t __blendmode = GFX_BLENDINFO_ALPHA,
-	    __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
-	    video_color_t __colorkey    = 0) {
-		struct video_buffer_gfx __result;
-		gfx(__result, __blendmode, __flags, __colorkey);
+	__CXX_CLASSMEMBER struct video_gfx LIBVIDEO_GFX_CC
+	gfx(gfx_blendmode_t __blendmode    = GFX_BLENDINFO_ALPHA,
+	    __uintptr_t __flags            = VIDEO_GFX_FNORMAL,
+	    video_color_t __colorkey       = 0,
+		struct video_buffer_rect *clip = __NULLPTR) {
+		struct video_gfx __result;
+		gfx(__result, __blendmode, __flags, __colorkey, clip);
 		return __result;
 	}
 

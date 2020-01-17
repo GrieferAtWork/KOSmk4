@@ -62,7 +62,7 @@ libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
 	struct video_buffer *result;
 	/* Check for special case: empty video buffer. */
 	if unlikely(!size_x || !size_y)
-		return incref(get_empty_video_buffer());
+		return incref(libvideo_getemptybuffer());
 	if (!codec) {
 		/* Lookup the default format. */
 		struct video_format const *default_format;

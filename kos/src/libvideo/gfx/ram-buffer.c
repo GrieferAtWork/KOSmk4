@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_RAM_BUFFER_C
 #define GUARD_LIBVIDEO_GFX_RAM_BUFFER_C 1
+#define _KOS_SOURCE 1
 
 #include "ram-buffer.h"
 
@@ -26,45 +27,60 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/overflow.h>
+
 #include <sys/mman.h>
 
 #include <assert.h>
 #include <malloc.h>
+#include <string.h>
 #include <minmax.h>
 #include <stddef.h>
 
 #include "buffer.h"
+#include "empty-buffer.h"
+#include "gfx.h"
 
 DECL_BEGIN
 
 
-#define RAMGFX_DATA   (byte_t *)self->bfx_driver[VIDEO_BUFFER_RAMGFX_DATA]
-#define RAMGFX_STRIDE (size_t)self->bfx_driver[VIDEO_BUFFER_RAMGFX_STRIDE]
-#define RAMGFX_SIZEX  (size_t)self->bfx_driver[VIDEO_BUFFER_RAMGFX_SIZEX]
-#define RAMGFX_SIZEY  (size_t)self->bfx_driver[VIDEO_BUFFER_RAMGFX_SIZEY]
+#define RAMGFX_DATA   (byte_t *)self->vx_driver[VIDEO_BUFFER_RAMGFX_DATA]
+#define RAMGFX_STRIDE (size_t)self->vx_driver[VIDEO_BUFFER_RAMGFX_STRIDE]
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
 INTERN video_color_t CC
-libvideo_gfx_ramgfx_getcolor(struct video_buffer_gfx const *__restrict self,
+libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self,
                              uintptr_t x, uintptr_t y) {
 	byte_t *line;
-	if (x >= RAMGFX_SIZEX || y >= RAMGFX_SIZEX)
-		return 0;
+	assertf(x < self->vx_size_x,
+	        "x         = %Iu\n"
+	        "vx_size_x = %Iu",
+	        x, self->vx_size_x);
+	assertf(y < self->vx_size_y,
+	        "y         = %Iu\n"
+	        "vx_size_y = %Iu",
+	        y, self->vx_size_y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
-	return self->bfx_buffer->vb_format.getcolor(line, x);
+	return self->vx_buffer->vb_format.getcolor(line, x);
 }
 
 INTERN video_color_t CC
-libvideo_gfx_ramgfx_getcolor_with_key(struct video_buffer_gfx const *__restrict self,
+libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self,
                                       uintptr_t x, uintptr_t y) {
 	byte_t *line;
 	video_color_t result;
-	if (x >= RAMGFX_SIZEX || y >= RAMGFX_SIZEX)
-		return 0;
+	assertf(x < self->vx_size_x,
+	        "x         = %Iu\n"
+	        "vx_size_x = %Iu",
+	        x, self->vx_size_x);
+	assertf(y < self->vx_size_y,
+	        "y         = %Iu\n"
+	        "vx_size_y = %Iu",
+	        y, self->vx_size_y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
-	result = self->bfx_buffer->vb_format.getcolor(line, x);
-	if (result == self->bfx_colorkey)
+	result = self->vx_buffer->vb_format.getcolor(line, x);
+	if (result == self->vx_colorkey)
 		result = 0;
 	return result;
 }
@@ -142,23 +158,23 @@ blend_color(video_color_t dst, video_color_t src, gfx_blendmode_t mode) {
 	src_g = VIDEO_COLOR_GET_GREEN(src);
 	src_b = VIDEO_COLOR_GET_BLUE(src);
 	src_a = VIDEO_COLOR_GET_ALPHA(src);
-#define blend_rgb_src(fun) \
+#define blend_rgb_src(fun)                                                                                                            \
 	{                                                                                                                                 \
 		new_lhs_r = (uint8_t)(fun(src_r, dst_r, src_r, dst_r, src_a, dst_a, GFX_BLENDINFO_GET_CR(mode), GFX_BLENDINFO_GET_CA(mode))); \
 		new_lhs_g = (uint8_t)(fun(src_g, dst_g, src_g, dst_g, src_a, dst_a, GFX_BLENDINFO_GET_CG(mode), GFX_BLENDINFO_GET_CA(mode))); \
 		new_lhs_b = (uint8_t)(fun(src_b, dst_b, src_b, dst_b, src_a, dst_a, GFX_BLENDINFO_GET_CB(mode), GFX_BLENDINFO_GET_CA(mode))); \
 	}
-#define blend_a_src(fun) \
+#define blend_a_src(fun)                                                                                                              \
 	{                                                                                                                                 \
 		new_lhs_a = (uint8_t)(fun(src_a, dst_a, src_a, dst_a, src_a, dst_a, GFX_BLENDINFO_GET_CA(mode), GFX_BLENDINFO_GET_CA(mode))); \
 	}
-#define blend_rgb_dst(fun) \
+#define blend_rgb_dst(fun)                                                                                                            \
 	{                                                                                                                                 \
 		new_rhs_r = (uint8_t)(fun(dst_r, src_r, src_r, dst_r, src_a, dst_a, GFX_BLENDINFO_GET_CR(mode), GFX_BLENDINFO_GET_CA(mode))); \
 		new_rhs_g = (uint8_t)(fun(dst_g, src_g, src_g, dst_g, src_a, dst_a, GFX_BLENDINFO_GET_CG(mode), GFX_BLENDINFO_GET_CA(mode))); \
 		new_rhs_b = (uint8_t)(fun(dst_b, src_b, src_b, dst_b, src_a, dst_a, GFX_BLENDINFO_GET_CB(mode), GFX_BLENDINFO_GET_CA(mode))); \
 	}
-#define blend_a_dst(fun) \
+#define blend_a_dst(fun)                                                                                                              \
 	{                                                                                                                                 \
 		new_rhs_a = (uint8_t)(fun(dst_a, src_a, src_a, dst_a, src_a, dst_a, GFX_BLENDINFO_GET_CA(mode), GFX_BLENDINFO_GET_CA(mode))); \
 	}
@@ -170,13 +186,13 @@ blend_color(video_color_t dst, video_color_t src, gfx_blendmode_t mode) {
 #undef blend_rgb_dst
 #undef blend_a_src
 #undef blend_rgb_src
-#define func_rgb(fun) \
+#define func_rgb(fun)                                 \
 	{                                                 \
 		dst_r = (uint8_t)(fun(new_lhs_r, new_rhs_r)); \
 		dst_g = (uint8_t)(fun(new_lhs_g, new_rhs_g)); \
 		dst_b = (uint8_t)(fun(new_lhs_b, new_rhs_b)); \
 	}
-#define func_a(fun) \
+#define func_a(fun)                                   \
 	{                                                 \
 		dst_a = (uint8_t)(fun(new_lhs_a, new_rhs_a)); \
 	}
@@ -190,47 +206,55 @@ blend_color(video_color_t dst, video_color_t src, gfx_blendmode_t mode) {
 
 
 INTERN void CC
-libvideo_gfx_ramgfx_putcolor(struct video_buffer_gfx *__restrict self,
+libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self,
                              uintptr_t x, uintptr_t y, video_color_t color) {
 	byte_t *line;
 	struct video_buffer *buffer;
 	video_color_t o, n;
-	if (x >= RAMGFX_SIZEX || y >= RAMGFX_SIZEX)
-		return;
+	assertf(x < self->vx_size_x,
+	        "x         = %Iu\n"
+	        "vx_size_x = %Iu",
+	        x, self->vx_size_x);
+	assertf(y < self->vx_size_y,
+	        "y         = %Iu\n"
+	        "vx_size_y = %Iu",
+	        y, self->vx_size_y);
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
-	buffer = self->bfx_buffer;
+	buffer = self->vx_buffer;
 	/* Perform full color blending. */
 	o = buffer->vb_format.getcolor(line, x);
-	n = blend_color(o, color, self->bfx_blend);
+	n = blend_color(o, color, self->vx_blend);
 	buffer->vb_format.setcolor(line, x, n);
 }
 
 INTERN void CC
-libvideo_gfx_ramgfx_putcolor_noblend(struct video_buffer_gfx *__restrict self,
+libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self,
                                      uintptr_t x, uintptr_t y, video_color_t color) {
 	byte_t *line;
 	struct video_buffer *buffer;
-	if (x >= RAMGFX_SIZEX || y >= RAMGFX_SIZEX)
+	if (x >= self->vx_size_x || y >= self->vx_size_x)
 		return;
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
-	buffer = self->bfx_buffer;
+	buffer = self->vx_buffer;
 	buffer->vb_format.setcolor(line, x, color);
 }
 
 INTERN void CC
-libvideo_gfx_ramgfx_putcolor_alphablend(struct video_buffer_gfx *__restrict self,
+libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self,
                                         uintptr_t x, uintptr_t y, video_color_t color) {
 	byte_t *line;
 	struct video_buffer *buffer;
 	video_color_t o, n;
-	if (x >= RAMGFX_SIZEX || y >= RAMGFX_SIZEX)
+	if (x >= self->vx_size_x || y >= self->vx_size_x)
 		return;
 	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
-	buffer = self->bfx_buffer;
+	buffer = self->vx_buffer;
 	o = buffer->vb_format.getcolor(line, x);
 	n = blend_color(o, color, GFX_BLENDINFO_ALPHA);
 	buffer->vb_format.setcolor(line, x, n);
 }
+
+
 
 
 PRIVATE struct video_buffer_ops rambuffer_ops;
@@ -291,80 +315,100 @@ LOCAL bool CC is_add_or_subtract_or_max(unsigned int func) {
 
 PRIVATE NONNULL((1, 2)) void CC
 rambuffer_getgfx(struct video_buffer *__restrict self,
-                 struct video_buffer_gfx *__restrict result,
+                 struct video_gfx *__restrict result,
                  gfx_blendmode_t blendmode, uintptr_t flags,
-                 video_color_t colorkey) {
+                 video_color_t colorkey,
+                 struct video_buffer_rect *clip) {
 	struct video_rambuffer *me;
 	me = (struct video_rambuffer *)self;
-	result->bfx_ops.fxo_getcolor = (colorkey & VIDEO_COLOR_ALPHA_MASK) != 0
-	                               ? &libvideo_gfx_ramgfx_getcolor_with_key
-	                               : &libvideo_gfx_ramgfx_getcolor;
+
+	result->vx_buffer                             = self;
+	result->vx_blend                              = blendmode;
+	result->vx_flags                              = flags;
+	result->vx_colorkey                           = colorkey;
+	result->vx_driver[VIDEO_BUFFER_RAMGFX_DATA]   = me->vb_data;
+	result->vx_driver[VIDEO_BUFFER_RAMGFX_STRIDE] = (void *)(uintptr_t)me->vb_stride;
+
+	if (clip) {
+		size_t temp;
+		result->vx_offt_x = clip->vbr_startx;
+		result->vx_offt_y = clip->vbr_starty;
+		result->vx_size_x = clip->vbr_sizex;
+		result->vx_size_y = clip->vbr_sizey;
+		if (OVERFLOW_UADD(result->vx_offt_x, result->vx_size_x, &temp) || temp > self->vb_size_x) {
+			if (result->vx_offt_x >= self->vb_size_x)
+				goto empty_clip;
+			result->vx_size_x = self->vb_size_x - result->vx_offt_x;
+		}
+		if (OVERFLOW_UADD(result->vx_offt_y, result->vx_size_y, &temp) || temp > self->vb_size_y) {
+			if (result->vx_offt_y >= self->vb_size_y)
+				goto empty_clip;
+			result->vx_size_y = self->vb_size_y - result->vx_offt_y;
+		}
+	} else {
+		result->vx_offt_x = 0;
+		result->vx_offt_y = 0;
+		result->vx_size_x = self->vb_size_x;
+		result->vx_size_y = self->vb_size_y;
+	}
+
+	result->vx_pxops.fxo_getcolor = (colorkey & VIDEO_COLOR_ALPHA_MASK) != 0
+	                                ? &libvideo_gfx_ramgfx_getcolor_with_key
+	                                : &libvideo_gfx_ramgfx_getcolor;
 	/* Detect special blend modes. */
 	if (blendmode == GFX_BLENDINFO_OVERRIDE) {
-		result->bfx_ops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor_noblend;
+		result->vx_pxops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor_noblend;
 	} else if (blendmode == GFX_BLENDINFO_ALPHA) {
-		result->bfx_ops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor_alphablend;
+		result->vx_pxops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor_alphablend;
 	} else if (GFX_BLENDINFO_GET_SRCRGB(blendmode) == GFX_BLENDMODE_ONE &&
 	           GFX_BLENDINFO_GET_SRCA(blendmode) == GFX_BLENDMODE_ONE &&
 	           GFX_BLENDINFO_GET_DSTRGB(blendmode) == GFX_BLENDMODE_ZERO &&
 	           GFX_BLENDINFO_GET_DSTA(blendmode) == GFX_BLENDMODE_ZERO &&
 	           is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNRGB(blendmode)) &&
 	           is_add_or_subtract_or_max(GFX_BLENDINFO_GET_FUNA(blendmode))) {
-		result->bfx_ops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor_noblend;
+		result->vx_pxops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor_noblend;
 	} else {
-		result->bfx_ops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor;
+		result->vx_pxops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor;
 	}
-	/* NOTE: GFX functions not implemented explicitly
-	 *       use the default implementations from `gfx.c' */
 
 	/* TODO: Add optimizations for same-codec blits */
-	result->bfx_ops.fxo_line     = &libvideo_gfx_ramgfx_line;
-	result->bfx_ops.fxo_vline    = &libvideo_gfx_ramgfx_vline;
-	result->bfx_ops.fxo_hline    = &libvideo_gfx_ramgfx_hline;
-	result->bfx_ops.fxo_fill     = &libvideo_gfx_ramgfx_fill;
-	result->bfx_ops.fxo_rect     = &libvideo_gfx_ramgfx_rect;
-	result->bfx_ops.fxo_blit     = &libvideo_gfx_ramgfx_blit;
-	result->bfx_ops.fxo_stretch  = &libvideo_gfx_ramgfx_stretch;
+	result->vx_ops = libvideo_gfx_defaultgfx_getops();
 
-	result->bfx_buffer   = me;
-	result->bfx_blend    = blendmode;
-	result->bfx_flags    = flags;
-	result->bfx_colorkey = colorkey;
-
-	result->bfx_driver[VIDEO_BUFFER_RAMGFX_DATA]   = me->vb_data;
-	result->bfx_driver[VIDEO_BUFFER_RAMGFX_STRIDE] = (void *)(uintptr_t)me->vb_stride;
-	result->bfx_driver[VIDEO_BUFFER_RAMGFX_SIZEX]  = (void *)(uintptr_t)me->vb_size_x;
-	result->bfx_driver[VIDEO_BUFFER_RAMGFX_SIZEY]  = (void *)(uintptr_t)me->vb_size_y;
+	return;
+empty_clip:
+	result->vx_pxops.fxo_getcolor = &video_gfx_empty_getcolor;
+	result->vx_pxops.fxo_putcolor = &video_gfx_empty_putcolor;
+	result->vx_ops                = libvideo_getemptygfxops();
+	result->vx_offt_x             = 0;
+	result->vx_offt_y             = 0;
+	result->vx_size_x             = 0;
+	result->vx_size_y             = 0;
 }
 
 
 
 INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC rambuffer_getops(void) {
-	struct video_buffer_ops *result;
-	result = &rambuffer_ops;
-	if (!result->vi_destroy) {
-		result->vi_lock   = &rambuffer_lock;
-		result->vi_unlock = &rambuffer_unlock;
-		result->vi_getgfx = &rambuffer_getgfx;
+	if unlikely(!rambuffer_ops.vi_destroy) {
+		rambuffer_ops.vi_lock   = &rambuffer_lock;
+		rambuffer_ops.vi_unlock = &rambuffer_unlock;
+		rambuffer_ops.vi_getgfx = &rambuffer_getgfx;
 		COMPILER_WRITE_BARRIER();
-		result->vi_destroy = &rambuffer_destroy;
+		rambuffer_ops.vi_destroy = &rambuffer_destroy;
 	}
-	return result;
+	return &rambuffer_ops;
 }
 
 INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC rambuffer_getops_munmap(void) {
-	struct video_buffer_ops *result;
-	result = &rambuffer_ops_munmap;
-	if (!result->vi_destroy) {
-		result->vi_lock   = &rambuffer_lock;
-		result->vi_unlock = &rambuffer_unlock;
-		result->vi_getgfx = &rambuffer_getgfx;
+	if unlikely(!rambuffer_ops.vi_destroy) {
+		rambuffer_ops.vi_lock   = &rambuffer_lock;
+		rambuffer_ops.vi_unlock = &rambuffer_unlock;
+		rambuffer_ops.vi_getgfx = &rambuffer_getgfx;
 		COMPILER_WRITE_BARRIER();
-		result->vi_destroy = &rambuffer_destroy_munmap;
+		rambuffer_ops.vi_destroy = &rambuffer_destroy_munmap;
 	}
-	return result;
+	return &rambuffer_ops;
 }
 
 

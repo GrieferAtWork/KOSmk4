@@ -89,7 +89,7 @@ PRIVATE void enable_graphics_mode(void) {
 int main(int argc, char *argv[]) {
 	bool is_blocking = false;
 	kos::refptr<struct video_buffer> screen;
-	struct video_buffer_gfx gfx;
+	struct video_gfx gfx;
 	(void)argc;
 	(void)argv;
 	srand(time(NULL));

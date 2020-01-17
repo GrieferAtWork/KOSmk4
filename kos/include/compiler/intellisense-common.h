@@ -276,41 +276,41 @@ template<class __T> struct ____INTELLISENSE_enableif<false, __T> {};
 
 template<class __TA, class __TB, class __TR>
 typename ____INTELLISENSE_enableif<
-	____INTELLISENSE_issigned<__TA>::__value &&
-	____INTELLISENSE_issigned<__TB>::__value &&
+	____INTELLISENSE_isarith<__TA>::__value &&
+	____INTELLISENSE_isarith<__TB>::__value &&
 	____INTELLISENSE_issigned<__TR>::__value,
 bool>::__type __intellisense_overflow_sadd(__TA __lhs, __TB __rhs, __TR *__res);
 template<class __TA, class __TB, class __TR>
 typename ____INTELLISENSE_enableif<
-	____INTELLISENSE_isunsigned<__TA>::__value &&
-	____INTELLISENSE_isunsigned<__TB>::__value &&
+	____INTELLISENSE_isarith<__TA>::__value &&
+	____INTELLISENSE_isarith<__TB>::__value &&
 	____INTELLISENSE_isunsigned<__TR>::__value,
 bool>::__type __intellisense_overflow_uadd(__TA __lhs, __TB __rhs, __TR *__res);
 
 
 template<class __TA, class __TB, class __TR>
 typename ____INTELLISENSE_enableif<
-	____INTELLISENSE_issigned<__TA>::__value &&
-	____INTELLISENSE_issigned<__TB>::__value &&
+	____INTELLISENSE_isarith<__TA>::__value &&
+	____INTELLISENSE_isarith<__TB>::__value &&
 	____INTELLISENSE_issigned<__TR>::__value,
 bool>::__type __intellisense_overflow_ssub(__TA __lhs, __TB __rhs, __TR *__res);
 template<class __TA, class __TB, class __TR>
 typename ____INTELLISENSE_enableif<
-	____INTELLISENSE_isunsigned<__TA>::__value &&
-	____INTELLISENSE_isunsigned<__TB>::__value &&
+	____INTELLISENSE_isarith<__TA>::__value &&
+	____INTELLISENSE_isarith<__TB>::__value &&
 	____INTELLISENSE_isunsigned<__TR>::__value,
 bool>::__type __intellisense_overflow_usub(__TA __lhs, __TB __rhs, __TR *__res);
 
 template<class __TA, class __TB, class __TR>
 typename ____INTELLISENSE_enableif<
-	____INTELLISENSE_issigned<__TA>::__value &&
-	____INTELLISENSE_issigned<__TB>::__value &&
+	____INTELLISENSE_isarith<__TA>::__value &&
+	____INTELLISENSE_isarith<__TB>::__value &&
 	____INTELLISENSE_issigned<__TR>::__value,
 bool>::__type __intellisense_overflow_smul(__TA __lhs, __TB __rhs, __TR *__res);
 template<class __TA, class __TB, class __TR>
 typename ____INTELLISENSE_enableif<
-	____INTELLISENSE_isunsigned<__TA>::__value &&
-	____INTELLISENSE_isunsigned<__TB>::__value &&
+	____INTELLISENSE_isarith<__TA>::__value &&
+	____INTELLISENSE_isarith<__TB>::__value &&
 	____INTELLISENSE_isunsigned<__TR>::__value,
 bool>::__type __intellisense_overflow_umul(__TA __lhs, __TB __rhs, __TR *__res);
 
