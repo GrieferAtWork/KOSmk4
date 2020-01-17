@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacc7ee46 */
+/* HASH CRC-32:0x339f54f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -35,7 +36,7 @@ INTERN ATTR_PURE
 ATTR_WEAK ATTR_SECTION(".text.crt.string.argz.argz_count") size_t
 NOTHROW_NCX(LIBCCALL libc_argz_count)(char const *argz,
                                       size_t argz_len) {
-#line 181 "kos/src/libc/magic/argz.c"
+#line 182 "kos/src/libc/magic/argz.c"
 	size_t result = 0;
 	if likely(argz_len) {
 		for (;;) {
@@ -58,7 +59,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.argz.argz_extract") void
 NOTHROW_NCX(LIBCCALL libc_argz_extract)(char const *__restrict argz,
                                         size_t argz_len,
                                         char **__restrict argv) {
-#line 205 "kos/src/libc/magic/argz.c"
+#line 206 "kos/src/libc/magic/argz.c"
 	size_t i;
 	if unlikely(!argz_len)
 		return;
@@ -79,7 +80,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.string.argz.argz_stringify") void
 NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz,
                                           size_t len,
                                           int sep) {
-#line 225 "kos/src/libc/magic/argz.c"
+#line 226 "kos/src/libc/magic/argz.c"
 	/* replace(base: argz, count: len - 1, old: '\0', new: sep); */
 	if unlikely(!len)
 		return;
@@ -109,7 +110,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.argz.argz_next") char *
 NOTHROW_NCX(LIBCCALL libc_argz_next)(char const *__restrict argz,
                                      size_t argz_len,
                                      char const *__restrict entry) {
-#line 552 "kos/src/libc/magic/argz.c"
+#line 553 "kos/src/libc/magic/argz.c"
 	char const *argz_end;
 	if (!entry)
 		return argz_len ? (char *)argz : NULL;

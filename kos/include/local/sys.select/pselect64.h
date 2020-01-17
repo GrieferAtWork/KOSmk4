@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65cafa48 */
+/* HASH CRC-32:0x42213544 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -38,7 +39,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect64))(__STDC_INT_AS_SIZE_T __nf
                                                        fd_set *__restrict __exceptfds,
                                                        struct __timespec64 const *__restrict __timeout,
                                                        struct __sigset_struct const *__restrict __sigmask) {
-#line 188 "kos/src/libc/magic/sys.select.c"
+#line 189 "kos/src/libc/magic/sys.select.c"
 	struct __timespec32 __tms;
 	if (!__timeout)
 		return __localdep_pselect32(__nfds, __readfds, __writefds, __exceptfds, __NULLPTR, __sigmask);

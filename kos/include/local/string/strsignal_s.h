@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef432722 */
+/* HASH CRC-32:0x6ceb381e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -52,7 +53,7 @@ __LIBC char const *const _sys_siglist[___NSIG];
 #endif /* !___local_sys_siglist_defined */
 __LOCAL_LIBC(strsignal_s) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strsignal_s))(int __signum) {
-#line 3885 "kos/src/libc/magic/string.c"
+#line 3886 "kos/src/libc/magic/string.c"
 #if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
 	return (unsigned int)__errnum < ___NSIG ? _sys_siglist[__signum] : __NULLPTR;
 #else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70402c85 */
+/* HASH CRC-32:0xec49165f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -113,7 +114,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetpos) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetpos))(__FILE *__restrict __stream,
                                         __FS_TYPE(pos) *__restrict __pos) __THROWS(...) {
-#line 756 "kos/src/libc/magic/stdio.c"
+#line 757 "kos/src/libc/magic/stdio.c"
 #if defined(__USE_FILE_OFFSET64) && (defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE__ftelli64))
 	return (__INT32_TYPE__)(*__pos = (__FS_TYPE(pos))__localdep_crt_ftello64(__stream)) < 0 ? -1 : 0;
 #elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22c6162d */
+/* HASH CRC-32:0x49d963e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -43,7 +44,7 @@ __LOCAL_LIBC(Execlpe) __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) v
 (__VLIBCCALL __LIBC_LOCAL_NAME(Execlpe))(char const *__restrict __file,
                                          char const *__args,
                                          ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) {
-#line 75 "kos/src/libc/magic/kos.unistd.c"
+#line 76 "kos/src/libc/magic/kos.unistd.c"
 	__REDIRECT_XEXECLE(char, __localdep_Execvpe, __file, __args)
 }
 __NAMESPACE_LOCAL_END

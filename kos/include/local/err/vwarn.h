@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2c8ad0f */
+/* HASH CRC-32:0x126e7964 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -148,7 +149,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vwarn) __ATTR_LIBC_PRINTF(1, 0) void
 (__LIBCCALL __LIBC_LOCAL_NAME(vwarn))(char const *__format,
                                       __builtin_va_list __args) __THROWS(...) {
-#line 44 "kos/src/libc/magic/err.c"
+#line 45 "kos/src/libc/magic/err.c"
 	int __errval = __libc_geterrno_or(0);
 #if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	__localdep_flockfile(__LOCAL_stderr);

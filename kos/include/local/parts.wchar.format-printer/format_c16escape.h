@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73fbfa5c */
+/* HASH CRC-32:0x5e961815 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -53,7 +54,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16escape))(__pc16formatprinte
                                                               /*utf-8*/ __CHAR16_TYPE__ const *__restrict __text,
                                                               __SIZE_TYPE__ __textlen,
                                                               unsigned int __flags) {
-#line 184 "kos/src/libc/magic/format-printer.c"
+#line 185 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_ESCAPE_FNORMAL
 #define __FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
 #define __FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */

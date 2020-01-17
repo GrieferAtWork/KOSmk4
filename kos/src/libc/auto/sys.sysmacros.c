@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6a332f8 */
+/* HASH CRC-32:0x6bb03b40 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -31,14 +32,14 @@ DECL_BEGIN
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.gnu_dev_major") major_t
 NOTHROW(LIBCCALL libc_gnu_dev_major)(dev_t dev) {
-#line 37 "kos/src/libc/magic/sys.sysmacros.c"
+#line 38 "kos/src/libc/magic/sys.sysmacros.c"
 	return (major_t)((uintptr_t)dev >> 20);
 }
 
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.gnu_dev_minor") minor_t
 NOTHROW(LIBCCALL libc_gnu_dev_minor)(dev_t dev) {
-#line 42 "kos/src/libc/magic/sys.sysmacros.c"
+#line 43 "kos/src/libc/magic/sys.sysmacros.c"
 	return (minor_t)((uintptr_t)dev & ((1 << 20) - 1));
 }
 
@@ -46,7 +47,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.gnu_dev_makedev") dev_t
 NOTHROW(LIBCCALL libc_gnu_dev_makedev)(major_t major,
                                        minor_t minor) {
-#line 47 "kos/src/libc/magic/sys.sysmacros.c"
+#line 48 "kos/src/libc/magic/sys.sysmacros.c"
 	return (dev_t)major << 20 | (dev_t)minor;
 }
 

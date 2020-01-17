@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb74a8e6d */
+/* HASH CRC-32:0x9855d265 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -27,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
  * b)  the number is small because the table must fit in the core */
 __LOCAL_LIBC(isprime) __ATTR_CONST int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(isprime))(unsigned int __number) {
-#line 255 "kos/src/libc/magic/search.c"
+#line 256 "kos/src/libc/magic/search.c"
 	/* no even number will be passed */
 	for (unsigned int __div = 3; __div <= __number / __div; __div += 2) {
 		if (__number % __div == 0)

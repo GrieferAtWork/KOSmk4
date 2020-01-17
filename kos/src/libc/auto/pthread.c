@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d53e70f */
+/* HASH CRC-32:0x80f3d103 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -33,7 +34,7 @@ INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_equal") int
 NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t pthread1,
                                          pthread_t pthread2) {
-#line 316 "kos/src/libc/magic/pthread.c"
+#line 317 "kos/src/libc/magic/pthread.c"
 	return pthread1 == pthread2;
 }
 
@@ -43,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t pthread1,
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_cleanup_routine") void
 NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_frame *frame) {
-#line 641 "kos/src/libc/magic/pthread.c"
+#line 642 "kos/src/libc/magic/pthread.c"
 	if (frame->__do_it)
 		(*frame->__cancel_routine)(frame->__cancel_arg);
 }

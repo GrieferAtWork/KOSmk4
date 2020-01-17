@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92b1488c */
+/* HASH CRC-32:0xc7d1ba7d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -45,7 +46,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isupper,(int __
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tolower) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tolower))(int __ch) {
-#line 290 "kos/src/libc/magic/ctype.c"
+#line 291 "kos/src/libc/magic/ctype.c"
 #if (defined(__CRT_HAVE___ctype_tolower_loc)) && defined(__CRT_CYG)
 	return __ch >= -128 && __ch < 256 ? (*__localdep___ctype_tolower_loc())[__ch] : __ch;
 #else

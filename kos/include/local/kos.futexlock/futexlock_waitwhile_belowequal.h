@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f4d0bf2 */
+/* HASH CRC-32:0x294a651f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -128,7 +129,7 @@ __LOCAL_LIBC(futexlock_waitwhile_belowequal) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_waitwhile_belowequal))(__uintptr_t *__ulockaddr,
                                                                             __uintptr_t *__uaddr,
                                                                             __uintptr_t __below_equal_value) {
-#line 224 "kos/src/libc/magic/kos.futexlock.c"
+#line 225 "kos/src/libc/magic/kos.futexlock.c"
 	if __unlikely(__below_equal_value == (__uintptr_t)-1)
 		return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT, 0, (struct __timespec64 const *)__NULLPTR);
 	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, (struct __timespec64 const *)__NULLPTR);

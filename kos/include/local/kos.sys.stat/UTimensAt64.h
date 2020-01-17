@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa23d46ef */
+/* HASH CRC-32:0x30bcac49 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -39,7 +40,7 @@ __LOCAL_LIBC(UTimensAt64) __ATTR_NONNULL((2)) void
                                             char const *__filename,
                                             struct __timespec64 const __times[2 /*or:3*/],
                                             __atflag_t __flags) __THROWS(...) {
-#line 227 "kos/src/libc/magic/kos.sys.stat.c"
+#line 228 "kos/src/libc/magic/kos.sys.stat.c"
 #if defined(__KOS__) && __KOS_VERSION__ >= 300
 	struct __timespec32 __tms[3];
 	if (!__times) {

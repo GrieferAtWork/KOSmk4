@@ -16,8 +16,9 @@ opt.append("-O3");
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -281,7 +282,7 @@ copyblit_perpixel_fixed(struct video_buffer_gfx *self,
 	}
 }
 
-LOCAL video_color_t CC
+LOCAL ATTR_CONST video_color_t CC
 colorfactor(video_color_t color, double part) {
 	uint8_t r, g, b, a;
 	/* Load color channels. */

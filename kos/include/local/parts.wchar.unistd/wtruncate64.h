@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f723831 */
+/* HASH CRC-32:0x88a630cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -131,7 +132,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wtruncate64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wtruncate64))(__WCHAR_TYPE__ const *__file,
                                                          __PIO_OFFSET64 __length) {
-#line 1296 "kos/src/libc/magic/unistd.c"
+#line 1297 "kos/src/libc/magic/unistd.c"
 #if defined(__CRT_HAVE_wtruncate) && (!defined(__CRT_HAVE_open) || !defined(__CRT_HAVE_open64) || !defined(__CRT_HAVE__open) || (!defined(__CRT_HAVE__chsize_s) && !defined(__CRT_HAVE_ftruncate64)))
 	return __localdep_wtruncate32(__file, (__PIO_OFFSET)__length);
 #else

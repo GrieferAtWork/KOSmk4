@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97e71353 */
+/* HASH CRC-32:0xbe933ba0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -40,7 +41,7 @@ __LOCAL_LIBC(_fscanf_l) __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 4) __STDC_IN
                                            char const *__restrict __format,
                                            __locale_t __locale,
                                            ...) __THROWS(...) {
-#line 2344 "kos/src/libc/magic/stdio.c"
+#line 2345 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __locale);

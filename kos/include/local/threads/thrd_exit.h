@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c2aa2a2 */
+/* HASH CRC-32:0xbbedbdc7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -38,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
  * s.a. `pthread_exit()' */
 __LOCAL_LIBC(thrd_exit) __ATTR_NORETURN void
 (__LIBCCALL __LIBC_LOCAL_NAME(thrd_exit))(int __res) {
-#line 218 "kos/src/libc/magic/threads.c"
+#line 219 "kos/src/libc/magic/threads.c"
 	__localdep_pthread_exit((void *)(__UINTPTR_TYPE__)(unsigned int)__res);
 }
 __NAMESPACE_LOCAL_END

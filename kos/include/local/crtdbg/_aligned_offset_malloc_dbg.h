@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf41219f */
+/* HASH CRC-32:0xf62a356e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -40,7 +41,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_malloc_dbg))(__SIZE_T
                                                                         __SIZE_TYPE__ __offset,
                                                                         char const *__filename,
                                                                         int __line) {
-#line 379 "kos/src/libc/magic/crtdbg.c"
+#line 380 "kos/src/libc/magic/crtdbg.c"
 	(void)__filename;
 	(void)__line;
 	return __localdep__aligned_offset_malloc(__num_bytes, __min_alignment, __offset);

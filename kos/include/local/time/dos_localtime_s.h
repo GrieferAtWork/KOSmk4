@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29207ebf */
+/* HASH CRC-32:0xa68bee7c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -81,7 +82,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(dos_localtime_s) __ATTR_NONNULL((1, 2)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dos_localtime_s))(__STRUCT_TM *__restrict __tp,
                                                              __TM_TYPE(time) const *__restrict __timer) {
-#line 291 "kos/src/libc/magic/time.c"
+#line 292 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE__localtime32_s) || defined(__CRT_HAVE__localtime64_s)
 	__time64_t __tm64 = *__timer;
 	return __localdep_dos_localtime64_s(__tp, &__tm64);

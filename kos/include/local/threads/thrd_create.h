@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53ba51b9 */
+/* HASH CRC-32:0xace435c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -48,7 +49,7 @@ __LOCAL_LIBC(thrd_create) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_create))(__thrd_t *__thr,
                                                          __thrd_start_t __func,
                                                          void *__arg) {
-#line 100 "kos/src/libc/magic/threads.c"
+#line 101 "kos/src/libc/magic/threads.c"
 	int __error;
 	__STATIC_ASSERT(sizeof(int) <= sizeof(void *));
 	__error = __localdep_pthread_create((__pthread_t *)__thr, __NULLPTR,

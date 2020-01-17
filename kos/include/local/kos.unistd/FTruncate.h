@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea4568e8 */
+/* HASH CRC-32:0x629ec22c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -60,7 +61,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(FTruncate) void
 (__LIBCCALL __LIBC_LOCAL_NAME(FTruncate))(__fd_t __fd,
                                           __FS_TYPE(pos) __length) __THROWS(...) {
-#line 605 "kos/src/libc/magic/kos.unistd.c"
+#line 606 "kos/src/libc/magic/kos.unistd.c"
 #ifdef __CRT_HAVE_FTruncate
 	__localdep_FTruncate32(__fd, (__pos32_t)__length);
 #else /* __CRT_HAVE_FTruncate */

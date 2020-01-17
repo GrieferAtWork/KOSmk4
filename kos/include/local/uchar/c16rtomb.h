@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa72da1c3 */
+/* HASH CRC-32:0xe421d394 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -43,7 +44,7 @@ __LOCAL_LIBC(c16rtomb) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16rtomb))(char *__restrict __s,
                                                       __CHAR16_TYPE__ __c16,
                                                       __mbstate_t *__restrict __mbs) {
-#line 151 "kos/src/libc/magic/uchar.c"
+#line 152 "kos/src/libc/magic/uchar.c"
 	__CHAR32_TYPE__ __ch32;
 	if (!__s) {
 		if (__mbs)

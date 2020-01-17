@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19e4d376 */
+/* HASH CRC-32:0x6dd9286c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -57,7 +58,7 @@ __LOCAL_LIBC(argz_add) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add))(char **__restrict __pargz,
                                                       __SIZE_TYPE__ *__restrict __pargz_len,
                                                       char const *__restrict __str) {
-#line 270 "kos/src/libc/magic/argz.c"
+#line 271 "kos/src/libc/magic/argz.c"
 	return __localdep_argz_append(__pargz, __pargz_len, __str, __localdep_strlen(__str) + 1);
 }
 __NAMESPACE_LOCAL_END

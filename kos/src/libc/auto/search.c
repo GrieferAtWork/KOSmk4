@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a5e9907 */
+/* HASH CRC-32:0x7e7b72c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -35,7 +36,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.insque") void
 NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
                                   void *prev) {
-#line 108 "kos/src/libc/magic/search.c"
+#line 109 "kos/src/libc/magic/search.c"
 	struct libc_link {
 		struct libc_link *l_forw; /* [0..1] Forward link */
 		struct libc_link *l_back; /* [0..1] Backward link */
@@ -58,7 +59,7 @@ NOTHROW_NCX(LIBCCALL libc_insque)(void *__restrict elem,
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.remque") void
 NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem) {
-#line 128 "kos/src/libc/magic/search.c"
+#line 129 "kos/src/libc/magic/search.c"
 	struct libc_link {
 		struct libc_link *l_forw; /* [0..1] Forward link */
 		struct libc_link *l_back; /* [0..1] Backward link */
@@ -80,7 +81,7 @@ NOTHROW_NCX(LIBCCALL libc_remque)(void *__restrict elem) {
 INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.isprime") int
 NOTHROW_NCX(LIBCCALL libc_isprime)(unsigned int number) {
-#line 255 "kos/src/libc/magic/search.c"
+#line 256 "kos/src/libc/magic/search.c"
 	/* no even number will be passed */
 	for (unsigned int div = 3; div <= number / div; div += 2) {
 		if (number % div == 0)
@@ -96,7 +97,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
                                      ACTION action,
                                      ENTRY **retval,
                                      struct hsearch_data *htab) {
-#line 266 "kos/src/libc/magic/search.c"
+#line 267 "kos/src/libc/magic/search.c"
 	typedef struct {
 		unsigned int used;
 		ENTRY        entry;
@@ -168,7 +169,7 @@ NOTHROW_NCX(LIBCCALL libc_maybe_split_for_insert)(void **rootp,
                                                   int p_r,
                                                   int gp_r,
                                                   int mode) {
-#line 391 "kos/src/libc/magic/search.c"
+#line 392 "kos/src/libc/magic/search.c"
 	typedef struct node_struct {
 		void const         *key;
 		struct node_struct *left_node;
@@ -229,7 +230,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.tfind") void *
 NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key,
                                  void *const *vrootp,
                                  __compar_fn_t compar) {
-#line 501 "kos/src/libc/magic/search.c"
+#line 502 "kos/src/libc/magic/search.c"
 	typedef struct node_struct {
 		void const         *key;
 		struct node_struct *left_node;
@@ -258,7 +259,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.trecurse") void
 NOTHROW_NCX(LIBCCALL libc_trecurse)(void const *root,
                                     __action_fn_t action,
                                     int level) {
-#line 715 "kos/src/libc/magic/search.c"
+#line 716 "kos/src/libc/magic/search.c"
 	void *l, *r;
 	l = ((void **)root)[1];
 	r = ((void **)root)[2];
@@ -279,7 +280,7 @@ NOTHROW_NCX(LIBCCALL libc_trecurse)(void const *root,
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.twalk") void
 NOTHROW_NCX(LIBCCALL libc_twalk)(void const *root,
                                  __action_fn_t action) {
-#line 734 "kos/src/libc/magic/search.c"
+#line 735 "kos/src/libc/magic/search.c"
 	if (root && action)
 		libc_trecurse(root, action, 0);
 }
@@ -291,7 +292,7 @@ NOTHROW_NCX(LIBCCALL libc_lfind)(void const *key,
                                  size_t *nmemb,
                                  size_t size,
                                  __compar_fn_t compar) {
-#line 775 "kos/src/libc/magic/search.c"
+#line 776 "kos/src/libc/magic/search.c"
 	size_t i, count = *nmemb;
 	void const *result = base;
 	for (i = 0; i < count; ++i) {
@@ -310,7 +311,7 @@ NOTHROW_NCX(LIBCCALL libc_lsearch)(void const *key,
                                    size_t *nmemb,
                                    size_t size,
                                    __compar_fn_t compar) {
-#line 788 "kos/src/libc/magic/search.c"
+#line 789 "kos/src/libc/magic/search.c"
 	void *result;
 	result = libc_lfind(key, base, nmemb, size, compar);
 	if (result == NULL) {

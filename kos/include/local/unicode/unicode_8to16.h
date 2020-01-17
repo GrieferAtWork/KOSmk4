@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff8a4c3c */
+/* HASH CRC-32:0x92136eab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -57,7 +58,7 @@ __LOCAL_LIBC(unicode_8to16) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR16_TY
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_8to16))(/*utf-16*/ __CHAR16_TYPE__ *__restrict __utf16_dst,
                                                            /*utf-8*/ char const *__restrict __utf8_text,
                                                            __SIZE_TYPE__ __utf8_characters) {
-#line 961 "kos/src/libc/magic/unicode.c"
+#line 962 "kos/src/libc/magic/unicode.c"
 	char const *__utf8_end = __utf8_text + __utf8_characters;
 	while (__utf8_text < __utf8_end) {
 		__CHAR32_TYPE__ __ch;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee37bf9e */
+/* HASH CRC-32:0x11009700 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -36,7 +37,7 @@ NOTHROW_NCX(LIBCCALL libc_mbrtoc16)(char16_t *__restrict pc16,
                                     char const *__restrict s,
                                     size_t n,
                                     __mbstate_t *__restrict mbs) {
-#line 96 "kos/src/libc/magic/uchar.c"
+#line 97 "kos/src/libc/magic/uchar.c"
 	char16_t c16;
 	size_t result;
 	if (!s) {
@@ -65,7 +66,7 @@ NOTHROW_NCX(LIBCCALL libc_mbrtoc32)(char32_t *__restrict pc32,
                                     char const *__restrict s,
                                     size_t n,
                                     __mbstate_t *__restrict mbs) {
-#line 125 "kos/src/libc/magic/uchar.c"
+#line 126 "kos/src/libc/magic/uchar.c"
 	char32_t c32;
 	size_t result;
 	if (!s) {
@@ -93,7 +94,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.mbr.c16rtomb") size_t
 NOTHROW_NCX(LIBCCALL libc_c16rtomb)(char *__restrict s,
                                     char16_t c16,
                                     __mbstate_t *__restrict mbs) {
-#line 151 "kos/src/libc/magic/uchar.c"
+#line 152 "kos/src/libc/magic/uchar.c"
 	char32_t ch32;
 	if (!s) {
 		if (mbs)
@@ -137,7 +138,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.mbr.c32rtomb") size_t
 NOTHROW_NCX(LIBCCALL libc_c32rtomb)(char *__restrict s,
                                     char32_t c32,
                                     __mbstate_t *__restrict mbs) {
-#line 191 "kos/src/libc/magic/uchar.c"
+#line 192 "kos/src/libc/magic/uchar.c"
 	if (!s) {
 		if (mbs)
 			mbs->__word = __MBSTATE_TYPE_EMPTY;

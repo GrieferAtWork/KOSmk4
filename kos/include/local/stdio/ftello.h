@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd60be8be */
+/* HASH CRC-32:0x8c4204bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -111,7 +112,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the current in-file position of `STREAM' */
 __LOCAL_LIBC(ftello) __ATTR_WUNUSED __ATTR_NONNULL((1)) __FS_TYPE(off)
 (__LIBCCALL __LIBC_LOCAL_NAME(ftello))(__FILE *__restrict __stream) __THROWS(...) {
-#line 1558 "kos/src/libc/magic/stdio.c"
+#line 1559 "kos/src/libc/magic/stdio.c"
 #if defined(__USE_FILE_OFFSET64) && (defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked))
 	__pos64_t __pos;
 	if (__localdep_crt_fgetpos64(__stream, &__pos))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x319cf3d2 */
+/* HASH CRC-32:0x3955fdc0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -75,7 +76,7 @@ __LOCAL_LIBC(format_c32aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32aprintf_printer))(/*struct format_waprintf_data **/ void *__arg,
                                                                        __CHAR32_TYPE__ const *__restrict __data,
                                                                        __SIZE_TYPE__ __datalen) {
-#line 317 "kos/src/libc/magic/parts.wchar.format-printer.c"
+#line 318 "kos/src/libc/magic/parts.wchar.format-printer.c"
 	__CHAR32_TYPE__ *__buf;
 	__buf = __localdep_format_c32aprintf_alloc((struct format_c32aprintf_data *)__arg, __datalen);
 	if __unlikely(!__buf)

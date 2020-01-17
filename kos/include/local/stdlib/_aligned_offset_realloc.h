@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x905f79de */
+/* HASH CRC-32:0x5617f629 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -85,7 +86,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_realloc))(void *__ali
                                                                      __SIZE_TYPE__ __newsize,
                                                                      __SIZE_TYPE__ __min_alignment,
                                                                      __SIZE_TYPE__ __offset) {
-#line 2665 "kos/src/libc/magic/stdlib.c"
+#line 2666 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__result = __localdep__aligned_offset_malloc(__newsize, __min_alignment, __offset);
 	if (__result) {

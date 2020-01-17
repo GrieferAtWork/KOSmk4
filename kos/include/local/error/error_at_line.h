@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1333abc */
+/* HASH CRC-32:0xa97cccea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -268,7 +269,7 @@ __LOCAL_LIBC(error_at_line) __ATTR_LIBC_PRINTF(5, 6) void
                                                unsigned int __line,
                                                char const *__format,
                                                ...) __THROWS(...) {
-#line 147 "kos/src/libc/magic/error.c"
+#line 148 "kos/src/libc/magic/error.c"
 #ifdef __LOCAL_error_one_per_line
 	static char const *__last_filename = __NULLPTR;
 	static unsigned int __last_line = 0;

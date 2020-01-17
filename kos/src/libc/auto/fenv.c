@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d3b0666 */
+/* HASH CRC-32:0x19ca922f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -32,7 +33,7 @@ DECL_BEGIN
 /* Clear the supported exceptions represented by EXCEPTS */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feclearexcept") int
 NOTHROW(LIBCCALL libc_feclearexcept)(int excepts) {
-#line 85 "kos/src/libc/magic/fenv.c"
+#line 86 "kos/src/libc/magic/fenv.c"
 	__inline_feclearexcept(excepts);
 	return 0;
 }
@@ -41,7 +42,7 @@ NOTHROW(LIBCCALL libc_feclearexcept)(int excepts) {
 /* Raise the supported exceptions represented by EXCEPTS */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feraiseexcept") int
 (LIBCCALL libc_feraiseexcept)(int excepts) __THROWS(...) {
-#line 92 "kos/src/libc/magic/fenv.c"
+#line 93 "kos/src/libc/magic/fenv.c"
 	__inline_feraiseexcept(excepts);
 	return 0;
 }
@@ -53,7 +54,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fegetexceptflag") int
 NOTHROW_NCX(LIBCCALL libc_fegetexceptflag)(fexcept_t *flagp,
                                            int excepts) {
-#line 100 "kos/src/libc/magic/fenv.c"
+#line 101 "kos/src/libc/magic/fenv.c"
 #ifdef __inline_fegetexceptflag
 	__inline_fegetexceptflag(flagp, excepts);
 #else /* __inline_fegetexceptflag */
@@ -70,7 +71,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fesetexceptflag") int
 NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp,
                                            int excepts) {
-#line 113 "kos/src/libc/magic/fenv.c"
+#line 114 "kos/src/libc/magic/fenv.c"
 #ifdef __inline_fesetexceptflag
 	__inline_fesetexceptflag(flagp, excepts);
 #else /* __inline_fesetexceptflag */
@@ -87,7 +88,7 @@ NOTHROW_NCX(LIBCCALL libc_fesetexceptflag)(fexcept_t const *flagp,
 INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fetestexcept") int
 NOTHROW(LIBCCALL libc_fetestexcept)(int excepts) {
-#line 128 "kos/src/libc/magic/fenv.c"
+#line 129 "kos/src/libc/magic/fenv.c"
 	return __inline_fetestexcept(excepts);
 }
 
@@ -96,7 +97,7 @@ NOTHROW(LIBCCALL libc_fetestexcept)(int excepts) {
 INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fegetround") int
 NOTHROW(LIBCCALL libc_fegetround)(void) {
-#line 135 "kos/src/libc/magic/fenv.c"
+#line 136 "kos/src/libc/magic/fenv.c"
 	return __inline_fegetround();
 }
 
@@ -104,7 +105,7 @@ NOTHROW(LIBCCALL libc_fegetround)(void) {
 /* Establish the rounding direction represented by ROUND */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fesetround") int
 NOTHROW(LIBCCALL libc_fesetround)(int rounding_direction) {
-#line 142 "kos/src/libc/magic/fenv.c"
+#line 143 "kos/src/libc/magic/fenv.c"
 	return __inline_fesetround(rounding_direction);
 }
 
@@ -113,7 +114,7 @@ NOTHROW(LIBCCALL libc_fesetround)(int rounding_direction) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fegetenv") int
 NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp) {
-#line 148 "kos/src/libc/magic/fenv.c"
+#line 149 "kos/src/libc/magic/fenv.c"
 	__inline_fegetenv(envp);
 	return 0;
 }
@@ -124,7 +125,7 @@ NOTHROW_NCX(LIBCCALL libc_fegetenv)(fenv_t *envp) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feholdexcept") int
 NOTHROW_NCX(LIBCCALL libc_feholdexcept)(fenv_t *envp) {
-#line 156 "kos/src/libc/magic/fenv.c"
+#line 157 "kos/src/libc/magic/fenv.c"
 	__inline_feholdexcept(envp);
 	return 0;
 }
@@ -134,7 +135,7 @@ NOTHROW_NCX(LIBCCALL libc_feholdexcept)(fenv_t *envp) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fesetenv") int
 NOTHROW_NCX(LIBCCALL libc_fesetenv)(fenv_t const *envp) {
-#line 163 "kos/src/libc/magic/fenv.c"
+#line 164 "kos/src/libc/magic/fenv.c"
 	__inline_fesetenv(envp);
 	return 0;
 }
@@ -146,7 +147,7 @@ NOTHROW_NCX(LIBCCALL libc_fesetenv)(fenv_t const *envp) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feupdateenv") int
 NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp) {
-#line 172 "kos/src/libc/magic/fenv.c"
+#line 173 "kos/src/libc/magic/fenv.c"
 	__inline_feupdateenv(envp);
 	return 0;
 }
@@ -157,7 +158,7 @@ NOTHROW_NCX(LIBCCALL libc_feupdateenv)(fenv_t const *envp) {
  * exceptions are successfully set, otherwise returns -1 */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.feenableexcept") int
 NOTHROW(LIBCCALL libc_feenableexcept)(int excepts) {
-#line 184 "kos/src/libc/magic/fenv.c"
+#line 185 "kos/src/libc/magic/fenv.c"
 	return __inline_feenableexcept(excepts);
 }
 
@@ -167,7 +168,7 @@ NOTHROW(LIBCCALL libc_feenableexcept)(int excepts) {
  * exceptions are successfully disabled, otherwise returns -1 */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fedisableexcept") int
 NOTHROW(LIBCCALL libc_fedisableexcept)(int excepts) {
-#line 192 "kos/src/libc/magic/fenv.c"
+#line 193 "kos/src/libc/magic/fenv.c"
 	return __inline_fedisableexcept(excepts);
 }
 
@@ -176,7 +177,7 @@ NOTHROW(LIBCCALL libc_fedisableexcept)(int excepts) {
 INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.fenv.fegetexcept") int
 NOTHROW(LIBCCALL libc_fegetexcept)(void) {
-#line 199 "kos/src/libc/magic/fenv.c"
+#line 200 "kos/src/libc/magic/fenv.c"
 	return __inline_fegetexcept();
 }
 

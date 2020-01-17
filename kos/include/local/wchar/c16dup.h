@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b36b713 */
+/* HASH CRC-32:0xe467b2e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -82,7 +83,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16dup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16dup))(__CHAR16_TYPE__ const *__restrict __string) {
-#line 532 "kos/src/libc/magic/string.c"
+#line 533 "kos/src/libc/magic/string.c"
 	__SIZE_TYPE__ __resultsize = (__localdep_c16len(__string) + 1) * sizeof(__CHAR16_TYPE__);
 	__CHAR16_TYPE__ *__result = (__CHAR16_TYPE__ *)__localdep_malloc(__resultsize);
 	if __likely(__result)

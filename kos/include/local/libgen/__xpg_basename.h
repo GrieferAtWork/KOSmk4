@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88bceef7 */
+/* HASH CRC-32:0x71cf63af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11,8 +11,9 @@
  *                                                                            *
  * 1. The origin of this software must not be misrepresented; you must not    *
  *    claim that you wrote the original software. If you use this software    *
- *    in a product, an acknowledgement in the product documentation would be  *
- *    appreciated but is not required.                                        *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
@@ -43,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
  * version available under the real name */
 __LOCAL_LIBC(__xpg_basename) __ATTR_RETNONNULL char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_basename))(char *__filename) {
-#line 91 "kos/src/libc/magic/libgen.c"
+#line 92 "kos/src/libc/magic/libgen.c"
 	/* NOTE: This implementation is taken from GLibc */
 	/* Return basename of given pathname according to the weird XPG specification.
 	   Copyright (C) 1997-2017 Free Software Foundation, Inc.
