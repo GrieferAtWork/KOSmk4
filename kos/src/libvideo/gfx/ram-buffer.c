@@ -399,7 +399,7 @@ empty_clip:
 
 
 
-INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
+INTERN ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC rambuffer_getops(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {
 		rambuffer_ops.vi_lock   = &rambuffer_lock;
@@ -407,11 +407,12 @@ struct video_buffer_ops *CC rambuffer_getops(void) {
 		rambuffer_ops.vi_getgfx = &rambuffer_getgfx;
 		COMPILER_WRITE_BARRIER();
 		rambuffer_ops.vi_destroy = &rambuffer_destroy;
+		COMPILER_WRITE_BARRIER();
 	}
 	return &rambuffer_ops;
 }
 
-INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
+INTERN ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC rambuffer_getops_munmap(void) {
 	if unlikely(!rambuffer_ops.vi_destroy) {
 		rambuffer_ops.vi_lock   = &rambuffer_lock;
@@ -419,6 +420,7 @@ struct video_buffer_ops *CC rambuffer_getops_munmap(void) {
 		rambuffer_ops.vi_getgfx = &rambuffer_getgfx;
 		COMPILER_WRITE_BARRIER();
 		rambuffer_ops.vi_destroy = &rambuffer_destroy_munmap;
+		COMPILER_WRITE_BARRIER();
 	}
 	return &rambuffer_ops;
 }

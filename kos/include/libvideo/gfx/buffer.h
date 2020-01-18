@@ -48,8 +48,9 @@ struct video_format;
 struct video_lock {
 	__size_t  vl_stride; /* Scanline width (in bytes) */
 	__size_t  vl_size;   /* Total image size (>= vl_stride * :vb_size_y) */
-	__byte_t *vl_data;   /* [1..1] Memory-mapped video data. */
+	__byte_t *vl_data;   /* [1..vl_size] Memory-mapped video data. */
 };
+
 struct video_buffer_rect {
 	__uintptr_t vbr_startx; /* Starting X */
 	__uintptr_t vbr_starty; /* Starting Y */
@@ -82,10 +83,20 @@ struct video_buffer_ops {
 	 * registers its video API. */
 
 	/* Get graphics functions for use with the given buffer
-	 * @param: flags: Set of `VIDEO_GFX_F*'
-	 * @param: clip:  When non-NULL, specify a clip-rect to which drawing should be restricted.
-	 *                All canvas coords will be relative to this rectangle, and and attempt to
-	 *                access a pixel outside this rect will be a no-op / appear to be fully opaque. */
+	 * @param: blendmode: Pixel blending mode for graphics operations targeting this buffer.
+	 *                    This argument should be constructed using `GFX_BLENDINFO()'.
+	 *                    Usually, you will want to use `GFX_BLENDINFO_ALPHA' as blending mode
+	 *                    when you wish to make use of alpha-blending. However, if you know for
+	 *                    certain that alpha-blending isn't required, graphics performance can
+	 *                    be improved by passing `GFX_BLENDINFO_OVERRIDE' in order to prevent
+	 *                    any overhead that would normally incur from blending operations.
+	 * @param: flags:     Set of `VIDEO_GFX_F*'
+	 * @param: colorkey:  A specific color that should always return fully opaque when read
+	 *                    To disable colorkey-ing, simply pass some color with ALPHA=0 (or
+	 *                    alternatively, just pass `0' (which would be one such color))
+	 * @param: clip:      When non-NULL, specify a clip-rect to which drawing should be restricted.
+	 *                    All canvas coords will be relative to this rectangle, and and attempt to
+	 *                    access a pixel outside this rect will be a no-op / appear to be fully opaque. */
 	void (LIBVIDEO_GFX_CC *vi_getgfx)(struct video_buffer *__restrict self,
 	                                  struct video_gfx *__restrict result,
 	                                  gfx_blendmode_t blendmode, __uintptr_t flags,

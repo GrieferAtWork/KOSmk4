@@ -68,10 +68,18 @@ struct video_font {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #undef drawglyph
 
+	/* Draw a single glyph at the given coords and return its width.
+	 * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
 	__CXX_CLASSMEMBER __uintptr_t LIBVIDEO_GFX_CC
 	drawglyph(struct video_gfx *__restrict __gfx, __intptr_t __x, __intptr_t __y,
 	          __uintptr_t __height, __CHAR32_TYPE__ __ord, video_color_t __color) {
 		return (*vf_ops->vfo_drawglyph)(this, __gfx, __x, __y, __height, __ord, __color);
+	}
+
+	/* Return the width (in pixels) of a glyph, given its height (in pixels). */
+	__CXX_CLASSMEMBER __uintptr_t LIBVIDEO_GFX_CC
+	glyphsize(__uintptr_t __height, __CHAR32_TYPE__ __ord) {
+		return (*vf_ops->vfo_glyphsize)(this, __height, __ord);
 	}
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -90,8 +98,6 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_font, vf_refcnt, video_font_destroy)
 
 
 /* Lookup and return a reference to a video font, given its name.
- * NOTE: This function maintains an internal cache of loaded fonts,
- *       such that consecutive calls are quite acceptable.
  * @param: NAME: The font's name (the name of a file in `/lib/fonts/')
  *               Else, you may pass one of `VIDEO_FONT_*'
  * @return: NULL:errno=ENOENT: Unknown font `NAME' */
@@ -119,10 +125,9 @@ struct video_fontprinter_data {
 	__intptr_t         vfp_lnstart;  /* Starting X coord for additional lines (when >= `vfp_lnend', new lines are disabled) */
 	__intptr_t         vfp_lnend;    /* Ending X coord for additional lines (when `> vfp_lnstart',
 	                                  * wrap to a new line when a glyph would exceed this position) */
-	__uintptr_t        vfp_lnheight; /* Height (in pixels) of a line (should usually be `>= vfp_height+1'
-	                                  * to prevent separate lines from being printed on-top of each other) */
 	video_color_t      vfp_color;    /* Output color for the next glyph. */
-	__uint32_t         vfp_u8word;   /* Incomplete utf-8 word (used by `format_8to32_data::fd_incomplete') */
+	__uint32_t         vfp_u8word;   /* Incomplete utf-8 word (used by `format_8to32_data::fd_incomplete') (initialize to 0) */
+	/* TODO: Special character attribute flags (underline, cross-out, mirrored?, bold?, cursive?) */
 };
 
 /* Print text into a graphics context through use of this pformatprinter-compatible function. */

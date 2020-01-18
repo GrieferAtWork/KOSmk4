@@ -33,8 +33,6 @@
 DECL_BEGIN
 
 /* Lookup and return a reference to a video font, given its name.
- * NOTE: This function maintains an internal cache of loaded fonts,
- *       such that consecutive calls are quite acceptable.
  * @param: NAME: The font's name (the name of a file in `/lib/fonts/')
  *               When `NULL', (try to) return the default system font.
  * @return: NULL:errno=ENOENT: Unknown font `NAME' */

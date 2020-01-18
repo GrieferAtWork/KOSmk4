@@ -26,14 +26,14 @@
 #include <hybrid/compiler.h>
 
 #include <kos/ioctl/video.h>
-#include <kos/types.h>
 #include <kos/refptr.h>
+#include <kos/types.h>
 #include <linux/kd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/wait.h>
 
-#include <dlfcn.h>
+#include <format-printer.h>
 #include <err.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -46,6 +46,8 @@
 #include <unistd.h>
 
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/font.h>
+#include <libvideo/gfx/gfx.h>
 
 DECL_BEGIN
 
@@ -89,17 +91,20 @@ PRIVATE void enable_graphics_mode(void) {
 int main(int argc, char *argv[]) {
 	bool is_blocking = false;
 	kos::refptr<struct video_buffer> screen;
+	kos::refptr<struct video_font> font;
+	struct video_fontprinter_data fontprinter_data;
 	struct video_gfx gfx;
 	(void)argc;
 	(void)argv;
 	srand(time(NULL));
 
+	/* Load the video-mode font. */
+	font = kos::inherit(video_font_lookup(VIDEO_FONT_FIXEDWIDTH));
+	if (!font)
+		err(EXIT_FAILURE, "Failed to load VIDEO_FONT_FIXEDWIDTH");
+
 	/* Enable graphics mode. */
 	enable_graphics_mode();
-
-	fcntl(STDIN_FILENO, F_SETFL,
-	      fcntl(STDIN_FILENO, F_GETFL) |
-	      O_NONBLOCK);
 
 	/* Bind the screen buffer. */
 	screen = kos::inherit(video_buffer_screen());
@@ -109,6 +114,28 @@ int main(int argc, char *argv[]) {
 	         screen->vb_size_x,
 	         screen->vb_size_y,
 	         VIDEO_COLOR_WHITE);
+
+	fontprinter_data.vfp_font    = font;
+	fontprinter_data.vfp_gfx     = &gfx;
+	fontprinter_data.vfp_height  = 16;
+	fontprinter_data.vfp_curx    = 0;
+	fontprinter_data.vfp_cury    = 0;
+	fontprinter_data.vfp_lnstart = 0;
+	fontprinter_data.vfp_lnend   = gfx.vx_size_x;
+	fontprinter_data.vfp_color   = VIDEO_COLOR_BLACK;
+	fontprinter_data.vfp_u8word  = 0;
+
+	format_printf(&video_fontprinter,
+	              &fontprinter_data,
+	              "Hello World!\n"
+	              "Second line");
+
+	{ char buf[1]; read(STDIN_FILENO, buf, 1); }
+
+	fcntl(STDIN_FILENO, F_SETFL,
+	      fcntl(STDIN_FILENO, F_GETFL) |
+	      O_NONBLOCK);
+
 	for (;;) {
 		ssize_t error;
 		char buf[1];

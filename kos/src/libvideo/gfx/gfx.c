@@ -340,8 +340,8 @@ fillbitblit_perpixel(struct video_gfx *self,
 					bits    = 8;
 				}
 				--bits;
-				bit = byte & 1;
-				byte >>= 1;
+				bit = byte & 0x80;
+				byte <<= 1;
 				if (!bit)
 					continue;
 				video_gfx_putabscolor(self,
@@ -357,7 +357,7 @@ fillbitblit_perpixel(struct video_gfx *self,
 				uint8_t byte;
 				bitno = bitmask_base_offset + y * bitmask_size_x + x;
 				byte = ((uint8_t *)bitmask)[bitno / 8];
-				if (!(byte & (bitno % 8)))
+				if (!(byte & ((uint8_t)1 << (7 - (bitno % 8)))))
 					continue;
 				video_gfx_putabscolor(self,
 				                      dst_x + x,
@@ -636,7 +636,7 @@ libvideo_gfx_defaultgfx_bitstretchblit_o(struct video_gfx *self,
 
 
 PRIVATE struct video_gfx_ops libvideo_gfx_defaultgfx_ops = {};
-INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
+INTERN ATTR_RETNONNULL WUNUSED
 struct video_gfx_ops *CC libvideo_gfx_defaultgfx_getops(void) {
 	if (!libvideo_gfx_defaultgfx_ops.fxo_line) {
 		libvideo_gfx_defaultgfx_ops.fxo_vline          = &libvideo_gfx_defaultgfx_vline;
@@ -651,12 +651,13 @@ struct video_gfx_ops *CC libvideo_gfx_defaultgfx_getops(void) {
 		libvideo_gfx_defaultgfx_ops.fxo_bitstretchblit = &libvideo_gfx_defaultgfx_bitstretchblit;
 		COMPILER_WRITE_BARRIER();
 		libvideo_gfx_defaultgfx_ops.fxo_line = &libvideo_gfx_defaultgfx_line;
+		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_gfx_defaultgfx_ops;
 }
 
 PRIVATE struct video_gfx_ops libvideo_gfx_defaultgfx_ops_o = {};
-INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
+INTERN ATTR_RETNONNULL WUNUSED
 struct video_gfx_ops *CC libvideo_gfx_defaultgfx_getops_o(void) {
 	if (!libvideo_gfx_defaultgfx_ops_o.fxo_line) {
 		libvideo_gfx_defaultgfx_ops_o.fxo_vline          = &libvideo_gfx_defaultgfx_vline_o;
@@ -671,6 +672,7 @@ struct video_gfx_ops *CC libvideo_gfx_defaultgfx_getops_o(void) {
 		libvideo_gfx_defaultgfx_ops_o.fxo_bitstretchblit = &libvideo_gfx_defaultgfx_bitstretchblit_o;
 		COMPILER_WRITE_BARRIER();
 		libvideo_gfx_defaultgfx_ops_o.fxo_line = &libvideo_gfx_defaultgfx_line_o;
+		COMPILER_WRITE_BARRIER();
 	}
 	return &libvideo_gfx_defaultgfx_ops_o;
 }

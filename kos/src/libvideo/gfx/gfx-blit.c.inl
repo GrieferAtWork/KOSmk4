@@ -69,8 +69,8 @@ FUNC(copy_perpixel_fixed)(struct video_gfx *self,
 					bits    = 8;
 				}
 				--bits;
-				bit = byte & 1;
-				byte >>= 1;
+				bit = byte & 0x80;
+				byte <<= 1;
 				if (!bit)
 					continue;
 				color = video_gfx_getabscolor(src,
@@ -91,9 +91,9 @@ FUNC(copy_perpixel_fixed)(struct video_gfx *self,
 #ifdef DEFINE_BITBLIT
 				size_t bitno;
 				uint8_t byte;
-				bitno = bitmask_base_offset + y * bitmask_size_x + x;
+				bitno = bitmask_base_offset + x + y * bitmask_size_x;
 				byte = ((uint8_t *)bitmask)[bitno / 8];
-				if (!(byte & (bitno % 8)))
+				if (!(byte & ((uint8_t)1 << (7 - (bitno % 8)))))
 					continue;
 #endif /* DEFINE_BITBLIT */
 				color = video_gfx_getabscolor(src,

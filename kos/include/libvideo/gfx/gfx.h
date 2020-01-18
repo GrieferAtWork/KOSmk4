@@ -66,16 +66,16 @@ __DECL_BEGIN
 /*      GFX_BLENDFUNC_...                      0x06  * ... */
 /*      GFX_BLENDFUNC_...                      0x07  * ... */
 
-#define GFX_BLENDINFO_GET_SRCRGB(info) (__CCAST(__uint8_t)((info)&0xf))        /* Source color (One of `GFX_BLENDMODE_*') */
-#define GFX_BLENDINFO_GET_SRCA(info)   (__CCAST(__uint8_t)(((info)>>4)&0xf))   /* Source alpha (One of `GFX_BLENDMODE_*') */
-#define GFX_BLENDINFO_GET_DSTRGB(info) (__CCAST(__uint8_t)(((info)>>8)&0xf))   /* Destination color (One of `GFX_BLENDMODE_*') */
-#define GFX_BLENDINFO_GET_DSTA(info)   (__CCAST(__uint8_t)(((info)>>12)&0xf))  /* Destination alpha (One of `GFX_BLENDMODE_*') */
-#define GFX_BLENDINFO_GET_FUNRGB(info) (__CCAST(__uint8_t)(((info)>>15)&0x7))  /* Color blend function (One of `GFX_BLENDFUNC_*') */
-#define GFX_BLENDINFO_GET_FUNA(info)   (__CCAST(__uint8_t)(((info)>>18)&0x7))  /* Alpha blend function (One of `GFX_BLENDFUNC_*') */
-#define GFX_BLENDINFO_GET_CR(info)     (__CCAST(__uint8_t)(((info)>>56)&0xff)) /* Constant color red */
-#define GFX_BLENDINFO_GET_CG(info)     (__CCAST(__uint8_t)(((info)>>48)&0xff)) /* Constant color green */
-#define GFX_BLENDINFO_GET_CB(info)     (__CCAST(__uint8_t)(((info)>>40)&0xff)) /* Constant color blue */
-#define GFX_BLENDINFO_GET_CA(info)     (__CCAST(__uint8_t)(((info)>>32)&0xff)) /* Constant color alpha */
+#define GFX_BLENDINFO_GET_SRCRGB(info) (__CCAST(__uint8_t)((info) & 0xf))          /* Source color (One of `GFX_BLENDMODE_*') */
+#define GFX_BLENDINFO_GET_SRCA(info)   (__CCAST(__uint8_t)(((info) >> 4) & 0xf))   /* Source alpha (One of `GFX_BLENDMODE_*') */
+#define GFX_BLENDINFO_GET_DSTRGB(info) (__CCAST(__uint8_t)(((info) >> 8) & 0xf))   /* Destination color (One of `GFX_BLENDMODE_*') */
+#define GFX_BLENDINFO_GET_DSTA(info)   (__CCAST(__uint8_t)(((info) >> 12) & 0xf))  /* Destination alpha (One of `GFX_BLENDMODE_*') */
+#define GFX_BLENDINFO_GET_FUNRGB(info) (__CCAST(__uint8_t)(((info) >> 15) & 0x7))  /* Color blend function (One of `GFX_BLENDFUNC_*') */
+#define GFX_BLENDINFO_GET_FUNA(info)   (__CCAST(__uint8_t)(((info) >> 18) & 0x7))  /* Alpha blend function (One of `GFX_BLENDFUNC_*') */
+#define GFX_BLENDINFO_GET_CR(info)     (__CCAST(__uint8_t)(((info) >> 56) & 0xff)) /* Constant color red */
+#define GFX_BLENDINFO_GET_CG(info)     (__CCAST(__uint8_t)(((info) >> 48) & 0xff)) /* Constant color green */
+#define GFX_BLENDINFO_GET_CB(info)     (__CCAST(__uint8_t)(((info) >> 40) & 0xff)) /* Constant color blue */
+#define GFX_BLENDINFO_GET_CA(info)     (__CCAST(__uint8_t)(((info) >> 32) & 0xff)) /* Constant color alpha */
 
 /* Helper macros for creating blend modes.
  * @param: src:  Source color/alpha (One of `GFX_BLENDMODE_*')
@@ -85,16 +85,16 @@ __DECL_BEGIN
 	GFX_BLENDINFO_EX(src, src, dst, dst, func, func, 0, 0, 0, 0)
 #define GFX_BLENDINFO_EX(rgb_src, a_src, rgb_dst, a_dst, \
                          rgb_fun, a_fun, cr, cg, cb, ca) \
-	(__CCAST(gfx_blendmode_t)((rgb_src)&0xf) |           \
-	 (__CCAST(gfx_blendmode_t)((a_src)&0xf) << 4) |      \
-	 (__CCAST(gfx_blendmode_t)((rgb_dst)&0xf) << 8) |    \
-	 (__CCAST(gfx_blendmode_t)((a_dst)&0xf) << 12) |     \
-	 (__CCAST(gfx_blendmode_t)((rgb_fun)&0x7) << 15) |   \
-	 (__CCAST(gfx_blendmode_t)((a_fun)&0x7) << 18) |     \
-	 (__CCAST(gfx_blendmode_t)((cr)&0xff) << 56) |       \
-	 (__CCAST(gfx_blendmode_t)((cg)&0xff) << 48) |       \
-	 (__CCAST(gfx_blendmode_t)((cb)&0xff) << 40) |       \
-	 (__CCAST(gfx_blendmode_t)((ca)&0xff) << 32))
+	(__CCAST(gfx_blendmode_t)((rgb_src) & 0xf) |         \
+	 (__CCAST(gfx_blendmode_t)((a_src) & 0xf) << 4) |    \
+	 (__CCAST(gfx_blendmode_t)((rgb_dst) & 0xf) << 8) |  \
+	 (__CCAST(gfx_blendmode_t)((a_dst) & 0xf) << 12) |   \
+	 (__CCAST(gfx_blendmode_t)((rgb_fun) & 0x7) << 15) | \
+	 (__CCAST(gfx_blendmode_t)((a_fun) & 0x7) << 18) |   \
+	 (__CCAST(gfx_blendmode_t)((cr) & 0xff) << 56) |     \
+	 (__CCAST(gfx_blendmode_t)((cg) & 0xff) << 48) |     \
+	 (__CCAST(gfx_blendmode_t)((cb) & 0xff) << 40) |     \
+	 (__CCAST(gfx_blendmode_t)((ca) & 0xff) << 32))
 #ifdef __CC__
 typedef __uint64_t gfx_blendmode_t;
 #endif /* __CC__ */
@@ -122,7 +122,7 @@ struct video_gfx;
 struct video_gfx_pxops {
 	/* All of the following callbacks are [1..1]
 	 * NOTE: None of these functions will add `vx_offt_(x|y)' to the given X/Y,
-	 *       as well as always assume that the given coods are in-bounds of the
+	 *       as well as always assume that the given coords are in-bounds of the
 	 *       underlying buffer. */
 	/* Get the color of a pixel */
 	video_color_t (LIBVIDEO_GFX_CC *fxo_getcolor)(struct video_gfx const *__restrict __self, __uintptr_t __abs_x, __uintptr_t __abs_y);
@@ -169,7 +169,7 @@ struct video_gfx_ops {
 	                                    __size_t __src_size_x, __size_t __src_size_y);
 	/* Same as `fxo_fill()', but only fill in a pixel if:
 	 * >> offset = (FINAL_Y - DST_Y) * DST_SIZE_X + (FINAL_X - DST_X);
-	 * >> if ((((u8 *)BITMASK)[offset / 8] & (1 << (offset % 8))) != 0) {
+	 * >> if ((((u8 *)BITMASK)[offset / 8] & (1 << (7 - (offset % 8)))) != 0) {
 	 * >>     FILL_PIXEL();
 	 * >> }
 	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */

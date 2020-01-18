@@ -19,6 +19,8 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_FONT_C
 #define GUARD_LIBVIDEO_GFX_FONT_C 1
+#define _GNU_SOURCE 1
+#define _FILE_OFFSET_BITS 64
 
 #include "api.h"
 /**/
@@ -26,28 +28,116 @@
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 
+#include <alloca.h>
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 #include <unicode.h>
+#include <unistd.h>
 
 #include <libvideo/gfx/font.h>
 
 #include "font.h"
+#include "fonts/tlft.h"
 
 DECL_BEGIN
 
+
+PRIVATE WUNUSED __REF struct video_font *CC
+libvideo_font_openfd(fd_t fd) {
+	void *base;
+	struct stat st;
+	__REF struct video_font *result;
+	if unlikely(fstat(fd, &st))
+		goto err;
+#if __SIZEOF_OFF64_T__ > __SIZEOF_SIZE_T__
+	if unlikely(st.st_size > SIZE_MAX) {
+		errno = EINVAL;
+		goto err;
+	}
+#endif /* __SIZEOF_OFF64_T__ > __SIZEOF_SIZE_T__ */
+	/* Map the font file into memory. */
+	base = mmap(NULL, (size_t)st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	if unlikely(base == MAP_FAILED)
+		goto err;
+	result = libvideo_font_tryopen_tlft(base, (size_t)st.st_size);
+	if (!result)
+		goto err_unmap;
+	if (result != (__REF struct video_font *)-1)
+		return result; /* Success */
+	/* Add other file formats here! */
+	/* ... */
+	errno = EINVAL; /* Bad file format. */
+err_unmap:
+	munmap(base, (size_t)st.st_size);
+err:
+	return NULL;
+}
+
+
+PRIVATE WUNUSED __REF struct video_font *CC
+libvideo_font_create(char const *__restrict name) {
+	__REF struct video_font *result;
+	fd_t fd;
+	char *full_name;
+	if (strchr(name, '/')) {
+		full_name = (char *)name;
+	} else {
+		size_t namelen;
+		PRIVATE char const prefix[] = "/lib/fonts/";
+		char *p;
+		namelen = strlen(name);
+		full_name = (char *)alloca((COMPILER_STRLEN(prefix) + namelen + 1) *
+		                           sizeof(char));
+		p = (char *)mempcpy(full_name, prefix, COMPILER_STRLEN(prefix) * sizeof(char));
+		p = (char *)mempcpy(p, name, namelen * sizeof(char));
+		*p = 0;
+	}
+	fd = open(full_name, O_RDONLY | O_CLOEXEC);
+	if unlikely(fd < 0)
+		goto err;
+	result = libvideo_font_openfd(fd);
+	close(fd);
+	return result;
+err:
+	return NULL;
+}
+
+
+
 /* Lookup and return a reference to a video font, given its name.
- * NOTE: This function maintains an internal cache of loaded fonts,
- *       such that consecutive calls are quite acceptable.
  * @param: NAME: The font's name (the name of a file in `/lib/fonts/')
  *               When `NULL', (try to) return the default system font.
  * @return: NULL:errno=ENOENT: Unknown font `NAME' */
 INTERN WUNUSED __REF struct video_font *CC
 libvideo_font_lookup(char const *name) {
-	COMPILER_IMPURE();
-	(void)name;
-	/* TODO */
-	return NULL;
+	__REF struct video_font *result;
+	if (VIDEO_FONT_ISPECIAL(name)) {
+		if (name == VIDEO_FONT_DEFAULT ||
+		    name == VIDEO_FONT_FIXEDWIDTH) {
+			name = "u_vga16";
+		} else {
+			errno = ENOENT;
+			return NULL;
+		}
+	} else {
+		if unlikely(!name) {
+			errno = EINVAL;
+			return NULL;
+		}
+	}
+	result = libvideo_font_create(name);
+	assert(!result || result->vf_ops);
+	assert(!result || result->vf_ops->vfo_destroy);
+	assert(!result || result->vf_ops->vfo_drawglyph);
+	assert(!result || result->vf_ops->vfo_glyphsize);
+	return result;
 }
 
 /* Print text into a graphics context through use of this pformatprinter-compatible function. */
@@ -87,28 +177,50 @@ libvideo_fontprinter32(/*struct video_fontprinter_data **/ void *arg,
 INTERN NONNULL((1)) uintptr_t CC
 libvideo_fontprinterch(struct video_fontprinter_data *__restrict self,
                        char32_t ch) {
+	uintptr_t result;
 	switch (ch) {
 
 	case '\r':
-		/* TODO */
+		self->vfp_curx = self->vfp_lnstart;
+		result = 0;
 		break;
 
 	case '\n':
-		/* TODO */
+		self->vfp_curx = self->vfp_lnstart;
+		self->vfp_cury += self->vfp_height;
+		result = 0;
 		break;
 
 	default: {
+again_do_render:
 		if (self->vfp_lnstart < self->vfp_lnend) {
 			/* Must force wrap-around when a line grows too long. */
-			COMPILER_IMPURE();
-			/* TODO */
-		} else {
-			/* Can just render text without worrying about anything! */
-			/* TODO */
+			result = self->vfp_font->glyphsize(self->vfp_height, ch);
+			if (self->vfp_curx + (intptr_t)result > self->vfp_lnend) {
+				self->vfp_curx  = self->vfp_lnstart;
+				self->vfp_cury += self->vfp_height;
+			}
 		}
+		/* Can just render text without worrying about anything! */
+		result = self->vfp_font->drawglyph(self->vfp_gfx,
+		                                   self->vfp_curx,
+		                                   self->vfp_cury,
+		                                   self->vfp_height,
+		                                   ch,
+		                                   self->vfp_color);
+		if (!result && self->vfp_height != 0) {
+			/* Try a bunch of substitution characters */
+			switch (ch) {
+			default: ch = 0xfffd; goto again_do_render;
+			case 0xfffd: ch = 0x1a; goto again_do_render;
+			case 0x1a: ch = '?'; goto again_do_render;
+			case '?': break;
+			}
+		}
+		self->vfp_curx += result;
 	}	break;
 	}
-	return 0;
+	return result;
 }
 
 

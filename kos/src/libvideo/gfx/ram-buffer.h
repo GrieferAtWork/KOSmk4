@@ -49,8 +49,8 @@ INTDEF NONNULL((1)) void CC rambuffer_destroy_munmap(struct video_buffer *__rest
 INTDEF NONNULL((1, 2)) int CC rambuffer_lock(struct video_buffer *__restrict self, struct video_lock *__restrict result);
 INTDEF NONNULL((1, 2)) void CC rambuffer_unlock(struct video_buffer *__restrict self, struct video_lock const *__restrict lock);
 
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops(void);
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops_munmap(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops_munmap(void);
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */

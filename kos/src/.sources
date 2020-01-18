@@ -120,7 +120,10 @@ BEGIN
 	BEGIN GROUP("libs.libvideo-gfx") { COMPILE, LINK, ARCHIVE, MCOPY };
 		SET_OUTPUT_LIBDLL("libvideo-gfx")
 		USELIB("libvideo-codec")
-		SOURCE({ "libvideo/gfx/*.c" })
+		SOURCE({
+			"libvideo/gfx/*.c",
+			"libvideo/gfx/fonts/*.c",
+		})
 	END
 END
 

@@ -84,7 +84,7 @@ typedef struct {
  *       as well as that `stat::st_size >= TLFT_Hdr_GetSizeOfFile()' */
 #define TLFT_Hdr_GetOffsetOfGroups(self) (__CCAST(__uint32_t)(self)->h_hdrsize)
 #define TLFT_Hdr_GetOffsetOfAscii(self)  (TLFT_Hdr_GetOffsetOfGroups(self) + __CCAST(__uint32_t)((self)->h_ngroups * 8))
-#define TLFT_Hdr_GetOffsetOfChars(self)  (TLFT_Hdr_GetOffsetOfAscii(self) + __CCAST(__uint32_t)(95 << (self)->h_log2chsize))
+#define TLFT_Hdr_GetOffsetOfChars(self)  (TLFT_Hdr_GetOffsetOfAscii(self) + (__CCAST(__uint32_t)95 << (self)->h_log2chsize))
 #define TLFT_Hdr_GetSizeOfFile(self)     (TLFT_Hdr_GetOffsetOfAscii(self) + __CCAST(__uint32_t)((__CCAST(__uint32_t)(self)->h_nchars + 95) << (self)->h_log2chsize))
 
 typedef struct {
@@ -102,7 +102,7 @@ typedef struct {
  * bitmap for `ch', or `NULL' if the character is not printable. */
 __LOCAL __uint8_t const *
 tlft_lookup(TLFT_Hdr const *__restrict self, __uint32_t ch) {
-	__uint8_t const *bitmap, *ascii;
+	__uint8_t const *chars, *ascii;
 	TLFT_UniGroup *groups;
 	__uint8_t i, step;
 	groups = (TLFT_UniGroup *)((__byte_t *)self + self->h_hdrsize);
@@ -110,7 +110,7 @@ tlft_lookup(TLFT_Hdr const *__restrict self, __uint32_t ch) {
 	/* Check for simple case: ASCII character */
 	if (ch >= 0x0020 && ch <= 0x007e)
 		return ascii + ((ch - 0x0020) << self->h_log2chsize);
-	bitmap = ascii + (95 << self->h_log2chsize);
+	chars = ascii + (95 << self->h_log2chsize);
 	/* bsearch-style lookup */
 	for (i = self->h_ngroups / 2, step = i / 2;; step = (step + 1) / 2) {
 		if (ch < groups[i].ug_minuni) {
@@ -123,7 +123,7 @@ tlft_lookup(TLFT_Hdr const *__restrict self, __uint32_t ch) {
 				break;
 			continue;
 		}
-		return bitmap + (groups[i].ug_offset << self->h_log2chsize);
+		return chars + (groups[i].ug_offset << self->h_log2chsize);
 	}
 	return __NULLPTR;
 }

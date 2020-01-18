@@ -56,8 +56,8 @@ INTDEF void CC libvideo_gfx_defaultgfx_bitblit_o(struct video_gfx *self, intptr_
 INTDEF void CC libvideo_gfx_defaultgfx_bitstretchfill_o(struct video_gfx *__restrict self, intptr_t dst_x, intptr_t dst_y, size_t dst_size_x, size_t dst_size_y, video_color_t color, size_t src_size_x, size_t src_size_y, void const *__restrict bitmask);
 INTDEF void CC libvideo_gfx_defaultgfx_bitstretchblit_o(struct video_gfx *self, intptr_t dst_x, intptr_t dst_y, size_t dst_size_x, size_t dst_size_y, struct video_gfx const *src, intptr_t src_x, intptr_t src_y, size_t src_size_x, size_t src_size_y, void const *__restrict bitmask);
 
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct video_gfx_ops *CC libvideo_gfx_defaultgfx_getops(void);
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED struct video_gfx_ops *CC libvideo_gfx_defaultgfx_getops_o(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops *CC libvideo_gfx_defaultgfx_getops(void);
+INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops *CC libvideo_gfx_defaultgfx_getops_o(void);
 
 
 DECL_END

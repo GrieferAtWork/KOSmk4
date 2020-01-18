@@ -90,6 +90,10 @@ public: /* Helper functions */
 		if (__optr)
 			__refctrl::decref_unlikely(__optr);
 	}
+public: /* conversion */
+	__NOBLOCK __CXX_CLASSMEMBER operator __T*() const __CXX_NOEXCEPT {
+		return __m_ptr;
+	}
 public: /* Deref */
 	__NOBLOCK __CXX_CLASSMEMBER __T &operator*() const __CXX_NOEXCEPT {
 		return *__m_ptr;

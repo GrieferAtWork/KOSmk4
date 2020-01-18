@@ -132,6 +132,7 @@ function tlftParseBDF(fp: File): TLFT {
 			l = fp.readline().strip();
 			if (l == "ENDCHAR")
 				break;
+			/*  */
 			bytes.append(int(l, 16));
 		}
 		map[ord] = Bytes(bytes);

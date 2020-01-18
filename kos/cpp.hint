@@ -194,17 +194,20 @@
 
 #define __CXX_DEDUCE_TYPENAME typename
 #define __CXX_FORCEINLINE
+#define __CXX_CLASSMEMBER
 #define __CXX_INLINE_CONSTEXPR
 #define __CXX_DEFAULT_CTOR(T) T()
 #define __CXX_DEFAULT_DTOR(T) ~T()
-#define __CXX_DEFAULT_CTOR_NOEXCEPT(T) T()
-#define __CXX_DEFAULT_DTOR_NOEXCEPT(T) ~T()
+#define __CXX_DEFAULT_COPY(T,...) T(T const&)=default
+#define __CXX_DEFAULT_CTOR_NOEXCEPT(T) T()noexcept
+#define __CXX_DEFAULT_DTOR_NOEXCEPT(T) ~T()noexcept
+#define __CXX_DEFAULT_COPY_NOEXCEPT(T,...) T(T const&)noexcept=default
 #define __CXX_STATIC_CONST(T,decl) static T decl
 #define __CXX_DELETE_CTOR(T) T()
 #define __CXX_DELETE_DTOR(T) ~T()
 #define __CXX_DELETE_COPY(T) T(T const&)
-#define __CXX_DELETE_COPY_ASSIGN(T) T &operator = (T const&)
-#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) T &operator = (T const&) volatile
+#define __CXX_DELETE_COPY_ASSIGN(T) T&operator=(T const&)
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) T&operator=(T const&)volatile
 #define __CXXDECL_BEGIN
 #define __CXXDECL_END
 #define __CXX_THROWS(...)

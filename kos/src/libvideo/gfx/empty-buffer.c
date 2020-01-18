@@ -43,7 +43,7 @@
 DECL_BEGIN
 
 /* Stub GFX functions for the empty video buffer. */
-INTERN video_color_t CC
+INTERN ATTR_CONST video_color_t CC
 video_gfx_empty_getcolor(struct video_gfx const *__restrict UNUSED(self),
                          uintptr_t UNUSED(x), uintptr_t UNUSED(y)) {
 	return 0;
@@ -149,7 +149,7 @@ video_gfx_empty_bitstretchblit(struct video_gfx *UNUSED(self),
 PRIVATE struct video_gfx_ops video_gfx_empty_ops = {};
 
 /* Return GFX operators for an empty video buffer. */
-INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
+INTERN ATTR_RETNONNULL WUNUSED
 struct video_gfx_ops *CC libvideo_getemptygfxops(void) {
 	if unlikely(!video_gfx_empty_ops.fxo_line) {
 		video_gfx_empty_ops.fxo_vline          = &video_gfx_empty_vline;
@@ -164,6 +164,7 @@ struct video_gfx_ops *CC libvideo_getemptygfxops(void) {
 		video_gfx_empty_ops.fxo_bitstretchblit = &video_gfx_empty_bitstretchblit;
 		COMPILER_WRITE_BARRIER();
 		video_gfx_empty_ops.fxo_line = &video_gfx_empty_line;
+		COMPILER_WRITE_BARRIER();
 	}
 	return &video_gfx_empty_ops;
 }
@@ -174,8 +175,7 @@ struct video_gfx_ops *CC libvideo_getemptygfxops(void) {
 PRIVATE void LIBVIDEO_GFX_CC
 video_buffer_empty_destroy(struct video_buffer *__restrict self) {
 	(void)self;
-	__assertion_failedf("video_buffer_empty_destroy()",
-	                    "Must never get here!");
+	assert_failed("Must never get here!");
 }
 
 PRIVATE byte_t const video_buffer_empty_data[1] = { 0 };
@@ -223,7 +223,7 @@ video_buffer_empty_getgfx(struct video_buffer *__restrict self,
 PRIVATE struct video_buffer_ops video_buffer_empty_ops = {};
 
 /* Return operators for an empty video buffer. */
-INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED
+INTDEF ATTR_RETNONNULL WUNUSED
 struct video_buffer_ops *CC libvideo_getemptybufferops(void) {
 	if unlikely(!video_buffer_empty_ops.vi_getgfx) {
 		video_buffer_empty_ops.vi_destroy = &video_buffer_empty_destroy;
@@ -231,6 +231,7 @@ struct video_buffer_ops *CC libvideo_getemptybufferops(void) {
 		video_buffer_empty_ops.vi_unlock  = &video_buffer_empty_unlock;
 		COMPILER_WRITE_BARRIER();
 		video_buffer_empty_ops.vi_getgfx = &video_buffer_empty_getgfx;
+		COMPILER_WRITE_BARRIER();
 	}
 	return &video_buffer_empty_ops;
 }
@@ -238,7 +239,7 @@ struct video_buffer_ops *CC libvideo_getemptybufferops(void) {
 
 PRIVATE struct video_buffer video_buffer_empty = {};
 
-INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED
+INTERN ATTR_RETNONNULL WUNUSED
 struct video_buffer *CC libvideo_getemptybuffer(void) {
 	if unlikely(!video_buffer_empty.vb_ops) {
 		struct video_buffer_ops *ops;
@@ -251,6 +252,7 @@ struct video_buffer *CC libvideo_getemptybuffer(void) {
 		ops = libvideo_getemptybufferops();
 		COMPILER_WRITE_BARRIER();
 		video_buffer_empty.vb_ops = ops;
+		COMPILER_WRITE_BARRIER();
 	}
 	return &video_buffer_empty;
 }

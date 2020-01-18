@@ -17,29 +17,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIDEO_GFX_EMPTY_BUFFER_H
-#define GUARD_LIBVIDEO_GFX_EMPTY_BUFFER_H 1
+#ifndef GUARD_LIBVIDEO_GFX_FONTS_TLFT_H
+#define GUARD_LIBVIDEO_GFX_FONTS_TLFT_H 1
 
-#include "api.h"
+#include "../api.h"
 
 #include <hybrid/compiler.h>
 
-#include "buffer.h"
+#include <kos/types.h>
+
+#include <uchar.h>
+
+#include <libvideo/gfx/font.h>
+#include <libvideo/gfx/fonts/tlft.h>
 
 DECL_BEGIN
 
-INTDEF video_color_t CC video_gfx_empty_getcolor(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
-INTDEF void CC video_gfx_empty_putcolor(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
+struct tlft_font: video_font {
+	TLFT_Hdr      *tf_hdr;        /* [1..tf_siz][owned][const] mmaped file base */
+	size_t         tf_siz;        /* [const] mmap-ed file size */
+	TLFT_UniGroup *tf_grps;       /* [0..tf_hdr->h_ngroups][const] Unicode groups. */
+	byte_t        *tf_ascii;      /* [1..1][const] Ascii character bitmaps (`h_ascii'). */
+	byte_t        *tf_chars;      /* [1..1][const] Unicode character bitmaps (`h_chars'). */
+	uintptr_t      tf_bestheight; /* [const] Font height for best results. */
+};
 
-/* Return GFX operators for an empty video buffer. */
-INTDEF ATTR_RETNONNULL WUNUSED struct video_gfx_ops *CC libvideo_getemptygfxops(void);
+/* Return the V-table used by `struct tlft_font' */
+INTDEF ATTR_RETNONNULL WUNUSED
+struct video_font_ops *CC libvideo_tlft_getops(void);
 
-/* Return operators for an empty video buffer. */
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC libvideo_getemptybufferops(void);
+/* Returns `(__REF struct video_font *)-1' if not a tlft file.
+ * Upon success, the mmap-ed region `base...+=size' is inherited. */
+INTDEF WUNUSED __REF struct video_font *CC
+libvideo_font_tryopen_tlft(void *base, size_t size);
 
-/* Return the empty video buffer. */
-INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer *CC libvideo_getemptybuffer(void);
 
 DECL_END
 
-#endif /* !GUARD_LIBVIDEO_GFX_EMPTY_BUFFER_H */
+#endif /* !GUARD_LIBVIDEO_GFX_FONTS_TLFT_H */

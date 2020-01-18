@@ -120,14 +120,14 @@ getlinearbit(void const *__restrict bitmask,
 	base_x = (uintptr_t)x;
 	base_y = (uintptr_t)y;
 	/* Load source colors. */
-	bitno = bitmask_base_offset + base_x * bitmask_size_x + base_y;
-	c[0][0] = (((uint8_t *)bitmask)[bitno / 8] & (bitno % 8)) != 0;
+	bitno = bitmask_base_offset + base_x + base_y * bitmask_size_x;
+	c[0][0] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
 	++bitno;
-	c[1][0] = (((uint8_t *)bitmask)[bitno / 8] & (bitno % 8)) != 0;
+	c[1][0] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
 	bitno += bitmask_size_x;
-	c[1][1] = (((uint8_t *)bitmask)[bitno / 8] & (bitno % 8)) != 0;
+	c[1][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
 	--bitno;
-	c[0][1] = (((uint8_t *)bitmask)[bitno / 8] & (bitno % 8)) != 0;
+	c[0][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
 
 	/* Figure out the sub-pixel relation. */
 	rel_x = x - (double)base_x;
@@ -221,8 +221,8 @@ FUNC(stretch_perpixel_fixed)(struct video_gfx *self,
 				rel_y = (uintptr_t)round((double)y * y_scale);
 #ifndef DEFINE_STRETCH
 				size_t bitno;
-				bitno = bitmask_base_offset + rel_x * bitmask_size_x + rel_y;
-				if (!(((uint8_t *)bitmask)[bitno / 8] & (bitno % 8)))
+				bitno = bitmask_base_offset + rel_x + rel_y * bitmask_size_x;
+				if (!(((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))))
 					continue;
 #endif /* !DEFINE_STRETCH */
 #ifndef DEFINE_BITSTRETCHFILL
