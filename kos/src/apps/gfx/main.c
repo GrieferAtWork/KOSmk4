@@ -159,6 +159,7 @@ again_font:
 	      O_NONBLOCK);
 
 	for (;;) {
+		unsigned int action;
 		ssize_t error;
 		char buf[1];
 		video_color_t color;
@@ -192,6 +193,11 @@ again_font:
 			}	break;
 
 			case 's':
+				action = rand() % 4;
+				goto step;
+
+			case '0' ... '9':
+				action = buf[0] - '0';
 				goto step;
 
 			default: break;
@@ -199,40 +205,45 @@ again_font:
 		}
 		if (is_blocking)
 			continue;
+		action = rand() % 4;
 step:
 		color = VIDEO_COLOR_RGBA(rand() % 256,
 		                         rand() % 256,
 		                         rand() % 256,
 		                         rand() % 256);
-		switch (rand() % 4) {
+		switch (action) {
 
-		case 0:
-			gfx.rect(rand() % screen->vb_size_x,
-			         rand() % screen->vb_size_y,
-			         rand() % screen->vb_size_x,
-			         rand() % screen->vb_size_y,
+		case 0: {
+			uintptr_t x = rand() % screen->vb_size_x;
+			uintptr_t y = rand() % screen->vb_size_y;
+			gfx.rect(x, y,
+			         rand() % (screen->vb_size_x - x),
+			         rand() % (screen->vb_size_y - y),
 			         color);
-			break;
+		}	break;
 
-		case 1:
-			gfx.fill(rand() % screen->vb_size_x,
-			         rand() % screen->vb_size_y,
-			         rand() % screen->vb_size_x,
-			         rand() % screen->vb_size_y,
+		case 1: {
+			uintptr_t x = rand() % screen->vb_size_x;
+			uintptr_t y = rand() % screen->vb_size_y;
+			gfx.fill(x, y,
+			         rand() % (screen->vb_size_x - x),
+			         rand() % (screen->vb_size_y - y),
 			         color);
-			break;
+		}	break;
 
-		case 2:
-			gfx.stretch(rand() % screen->vb_size_x,
-			            rand() % screen->vb_size_y,
-			            rand() % screen->vb_size_x,
-			            rand() % screen->vb_size_y,
+		case 2: {
+			uintptr_t x = rand() % screen->vb_size_x;
+			uintptr_t y = rand() % screen->vb_size_y;
+			uintptr_t x2 = rand() % screen->vb_size_x;
+			uintptr_t y2 = rand() % screen->vb_size_y;
+			gfx.stretch(x, y,
+			            rand() % (screen->vb_size_x - x),
+			            rand() % (screen->vb_size_y - y),
 			            gfx,
-			            rand() % screen->vb_size_x,
-			            rand() % screen->vb_size_y,
-			            rand() % screen->vb_size_x,
-			            rand() % screen->vb_size_y);
-			break;
+			            x2, y2,
+			            rand() % (screen->vb_size_x - x2),
+			            rand() % (screen->vb_size_y - y2));
+		}	break;
 
 		default:
 			gfx.line(rand() % screen->vb_size_x,

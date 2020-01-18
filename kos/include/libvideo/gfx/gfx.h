@@ -139,11 +139,13 @@ struct video_gfx_ops {
 	                                 __intptr_t __x2, __intptr_t __y2,
 	                                 video_color_t __color);
 	/* Vertical line */
-	void (LIBVIDEO_GFX_CC *fxo_vline)(struct video_gfx *__restrict __self, __uintptr_t __x,
-	                                  __uintptr_t __y1, __uintptr_t __y2, video_color_t __color);
+	void (LIBVIDEO_GFX_CC *fxo_vline)(struct video_gfx *__restrict __self,
+	                                  __uintptr_t __x, __uintptr_t __y,
+	                                  __size_t __length, video_color_t __color);
 	/* Horizontal line */
-	void (LIBVIDEO_GFX_CC *fxo_hline)(struct video_gfx *__restrict __self, __uintptr_t __y,
-	                                  __uintptr_t __x1, __uintptr_t __x2, video_color_t __color);
+	void (LIBVIDEO_GFX_CC *fxo_hline)(struct video_gfx *__restrict __self,
+	                                  __uintptr_t __x, __uintptr_t __y,
+	                                  __size_t __length, video_color_t __color);
 	/* Fill an area with a solid __color. */
 	void (LIBVIDEO_GFX_CC *fxo_fill)(struct video_gfx *__restrict __self,
 	                                 __uintptr_t __x, __uintptr_t __y,
@@ -151,7 +153,7 @@ struct video_gfx_ops {
 	                                 video_color_t __color);
 	/* Outline an area with a rectangle. */
 	void (LIBVIDEO_GFX_CC *fxo_rect)(struct video_gfx *__restrict __self,
-	                                 __uintptr_t __x, __uintptr_t __y,
+	                                 __intptr_t __x, __intptr_t __y,
 	                                 __size_t __size_x, __size_t __size_y,
 	                                 video_color_t __color);
 	/* Blit the contents of another video buffer into this one. */
@@ -290,65 +292,53 @@ public:
 	}
 
 	/* Vertical line */
-	template<class T>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<T>::value, void>::type
-	LIBVIDEO_GFX_CC vline(T __x, T __y1, T __y2, video_color_t __color) {
-		(*vx_ops->fxo_vline)(this, (__uintptr_t)__x, (__uintptr_t)__y1, (__uintptr_t)__y2, __color);
+	template<class TX, class TY>
+	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_unsigned<TY>::value, void>::type
+	LIBVIDEO_GFX_CC vline(TX __x, TY __y, __size_t __length, video_color_t __color) {
+		(*vx_ops->fxo_vline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
 	}
 	template<class TX, class TY>
 	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC vline(TX __x, TY __y1, TY __y2, video_color_t __color) {
-		if (__x < 0)
-			return;
-		vline((__uintptr_t)__x, (__uintptr_t)__y1, (__uintptr_t)__y2, __color);
+	LIBVIDEO_GFX_CC vline(TX __x, TY __y, __size_t __length, video_color_t __color) {
+		if (__x >= 0)
+			(*vx_ops->fxo_vline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
 	}
 	template<class TX, class TY>
 	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC vline(TX __x, TY __y1, TY __y2, video_color_t __color) {
-		if (__y1 < 0)
-			__y1 = 0;
-		if (__y2 < 0)
-			__y2 = 0;
-		vline((__uintptr_t)__x, (__uintptr_t)__y1, (__uintptr_t)__y2, __color);
+	LIBVIDEO_GFX_CC vline(TX __x, TY __y, __size_t __length, video_color_t __color) {
+		if (__y >= 0)
+			(*vx_ops->fxo_vline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
 	}
-	template<class T>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<T>::value, void>::type
-	LIBVIDEO_GFX_CC vline(T __x, T __y1, T __y2, video_color_t __color) {
-		typedef typename std::make_unsigned<T>::type TU;
-		if (__x < 0)
-			return;
-		vline((TU)__x, __y1, __y2, __color);
+	template<class TX, class TY>
+	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_signed<TY>::value, void>::type
+	LIBVIDEO_GFX_CC vline(TX __x, TY __y, __size_t __length, video_color_t __color) {
+		if (__x >= 0 && __y >= 0)
+			(*vx_ops->fxo_vline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
 	}
 
 	/* Horizontal line */
-	template<class T>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<T>::value, void>::type
-	LIBVIDEO_GFX_CC hline(T __y, T __x1, T __x2, video_color_t __color) {
-		(*vx_ops->fxo_hline)(this, (__uintptr_t)__y, (__uintptr_t)__x1, (__uintptr_t)__x2, __color);
+	template<class TX, class TY>
+	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_unsigned<TY>::value, void>::type
+	LIBVIDEO_GFX_CC hline(TX __x, TY __y, __size_t __length, video_color_t __color) {
+		(*vx_ops->fxo_hline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
 	}
-	template<class TY, class TX>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TY>::value && std::is_unsigned<TX>::value, void>::type
-	LIBVIDEO_GFX_CC hline(TY __y, TX __x1, TX __x2, video_color_t __color) {
-		if (__y < 0)
-			return;
-		hline((__uintptr_t)__y, (__uintptr_t)__x1, (__uintptr_t)__x2, __color);
+	template<class TX, class TY>
+	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_unsigned<TY>::value, void>::type
+	LIBVIDEO_GFX_CC hline(TX __x, TY __y, __size_t __length, video_color_t __color) {
+		if (__x >= 0)
+			(*vx_ops->fxo_hline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
 	}
-	template<class TY, class TX>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TY>::value && std::is_signed<TX>::value, void>::type
-	LIBVIDEO_GFX_CC hline(TY __y, TX __x1, TX __x2, video_color_t __color) {
-		if (__x1 < 0)
-			__x1 = 0;
-		if (__x2 < 0)
-			__x2 = 0;
-		hline((__uintptr_t)__y, (__uintptr_t)__x1, (__uintptr_t)__x2, __color);
+	template<class TX, class TY>
+	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_signed<TY>::value, void>::type
+	LIBVIDEO_GFX_CC hline(TX __x, TY __y, __size_t __length, video_color_t __color) {
+		if (__y >= 0)
+			(*vx_ops->fxo_hline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
 	}
-	template<class T>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<T>::value, void>::type
-	LIBVIDEO_GFX_CC hline(T __y, T __x1, T __x2, video_color_t __color) {
-		typedef typename std::make_unsigned<T>::type TU;
-		if (__y < 0)
-			return;
-		hline((TU)__y, __x1, __x2, __color);
+	template<class TX, class TY>
+	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_signed<TY>::value, void>::type
+	LIBVIDEO_GFX_CC hline(TX __x, TY __y, __size_t __length, video_color_t __color) {
+		if (__x >= 0 && __y >= 0)
+			(*vx_ops->fxo_hline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
 	}
 
 	/* Fill an area with a solid color. */
@@ -402,53 +392,9 @@ public:
 	}
 
 	/* Outline an area with a rectangle. */
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC rect(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
-		(*vx_ops->fxo_rect)(this, (__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC rect(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
-		if (__x < 0) {
-			__x = -__x;
-			if (__size_x <= (__size_t)__x)
-				return;
-			__size_x -= (__size_t)__x;
-			__x = 0;
-		}
-		if (__y < 0) {
-			__y = -__y;
-			if (__size_y <= (__size_t)__y)
-				return;
-			__size_y -= (__size_t)__y;
-			__y = 0;
-		}
-		rect((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC rect(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
-		if (__x < 0) {
-			__x = -__x;
-			if (__size_x <= (__size_t)__x)
-				return;
-			__size_x -= (__size_t)__x;
-			__x = 0;
-		}
-		rect((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC rect(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
-		if (__y < 0) {
-			__y = -__y;
-			if (__size_y <= (__size_t)__y)
-				return;
-			__size_y -= (__size_t)__y;
-			__y = 0;
-		}
-		rect((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
+	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC
+	rect(__intptr_t __x, __intptr_t __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
+		(*vx_ops->fxo_rect)(this, __x, __y, __size_x, __size_y, __color);
 	}
 
 	/* Blit the contents of another video buffer into this one. */

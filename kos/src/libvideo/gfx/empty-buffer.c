@@ -63,17 +63,9 @@ video_gfx_empty_line(struct video_gfx *__restrict UNUSED(self),
 }
 
 PRIVATE void CC
-video_gfx_empty_vline(struct video_gfx *__restrict UNUSED(self),
-                      uintptr_t UNUSED(x),
-                      uintptr_t UNUSED(y1), uintptr_t UNUSED(y2),
-                      video_color_t UNUSED(color)) {
-}
-
-PRIVATE void CC
-video_gfx_empty_hline(struct video_gfx *__restrict UNUSED(self),
-                      uintptr_t UNUSED(y),
-                      uintptr_t UNUSED(x1), uintptr_t UNUSED(x2),
-                      video_color_t UNUSED(color)) {
+video_gfx_empty_vhline(struct video_gfx *__restrict UNUSED(self),
+                       uintptr_t UNUSED(x), uintptr_t UNUSED(y),
+                       size_t UNUSED(length), video_color_t UNUSED(color)) {
 }
 
 PRIVATE void CC
@@ -85,7 +77,7 @@ video_gfx_empty_fill(struct video_gfx *__restrict UNUSED(self),
 
 PRIVATE void CC
 video_gfx_empty_rect(struct video_gfx *__restrict UNUSED(self),
-                     uintptr_t UNUSED(x), uintptr_t UNUSED(y),
+                     intptr_t UNUSED(x), intptr_t UNUSED(y),
                      size_t UNUSED(size_x), size_t UNUSED(size_y),
                      video_color_t UNUSED(color)) {
 }
@@ -152,8 +144,8 @@ PRIVATE struct video_gfx_ops video_gfx_empty_ops = {};
 INTERN ATTR_RETNONNULL WUNUSED
 struct video_gfx_ops *CC libvideo_getemptygfxops(void) {
 	if unlikely(!video_gfx_empty_ops.fxo_line) {
-		video_gfx_empty_ops.fxo_vline          = &video_gfx_empty_vline;
-		video_gfx_empty_ops.fxo_hline          = &video_gfx_empty_hline;
+		video_gfx_empty_ops.fxo_vline          = &video_gfx_empty_vhline;
+		video_gfx_empty_ops.fxo_hline          = &video_gfx_empty_vhline;
 		video_gfx_empty_ops.fxo_fill           = &video_gfx_empty_fill;
 		video_gfx_empty_ops.fxo_rect           = &video_gfx_empty_rect;
 		video_gfx_empty_ops.fxo_blit           = &video_gfx_empty_blit;

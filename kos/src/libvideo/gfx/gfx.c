@@ -197,26 +197,51 @@ libvideo_gfx_defaultgfx_line(struct video_gfx *__restrict self,
 	}
 	/* Coords are clamped! --> Now select the proper line algorithm */
 	if (x1 > x2) {
-		temp = x2, x2 = x1, x1 = temp;
-		temp = y2, y2 = y1, y1 = temp;
-	} else if (x2 == x1) {
-		if (y1 > y2)
-			temp = y2, y2 = y1, y1 = temp;
-		else if (y2 == y1)
-			return;
-		self->vline(x1, y1, y2, color);
+		temp = x2;
+		x2   = x1;
+		x1   = temp;
+		temp = y2;
+		y2   = y1;
+		y1   = temp;
+	} else if (x1 == x2) {
+		if (y1 > y2) {
+			libvideo_gfx_defaultgfx_vline(self,
+			                              x1,
+			                              y2,
+			                              (y1 - y2) + 1,
+			                              color);
+		} else if (y1 < y2) {
+			libvideo_gfx_defaultgfx_vline(self,
+			                              x1,
+			                              y1,
+			                              (y2 - y1) + 1,
+			                              color);
+		} else {
+			video_gfx_putabscolor(self, x1, y1, color);
+		}
 		return;
 	}
+	assert(x2 > x1);
 	if (y2 > y1) {
-		line_llhh(self, (size_t)x1, (size_t)y1,
+		line_llhh(self,
+		          (size_t)x1,
+		          (size_t)y1,
 		          (size_t)(x2 - x1) + 1,
-		          (size_t)(y2 - y1) + 1, color);
+		          (size_t)(y2 - y1) + 1,
+		          color);
 	} else if (y2 < y1) {
-		line_lhhl(self, (size_t)x1, (size_t)y1,
+		line_lhhl(self,
+		          (size_t)x1,
+		          (size_t)y1,
 		          (size_t)(x2 - x1) + 1,
-		          (size_t)(y1 - y2) + 1, color);
-	} else if (x1 != x2) {
-		self->hline(y1, x1, x2, color);
+		          (size_t)(y1 - y2) + 1,
+		          color);
+	} else {
+		libvideo_gfx_defaultgfx_hline(self,
+		                              x1,
+		                              y1,
+		                              (x2 - x1) + 1,
+		                              color);
 	}
 #undef COHSUTH_COMPUTEOUTCODE
 #undef COHSUTH_INSIDE
@@ -229,49 +254,39 @@ libvideo_gfx_defaultgfx_line(struct video_gfx *__restrict self,
 
 INTERN void CC
 libvideo_gfx_defaultgfx_vline(struct video_gfx *__restrict self,
-                              uintptr_t x, uintptr_t from_y, uintptr_t to_y,
+                              uintptr_t x, uintptr_t y, size_t length,
                               video_color_t color) {
-	uintptr_t y;
-	if (x >= self->vx_size_x)
+	uintptr_t i, end;
+	if unlikely(x >= self->vx_size_x)
 		return;
-	if (from_y > to_y) {
-		uintptr_t temp;
-		temp = from_y;
-		from_y = to_y;
-		to_y = temp;
+	if unlikely(OVERFLOW_UADD(y, length, &end) || end >= self->vx_size_y) {
+		if unlikely(y >= self->vx_size_y)
+			return;
+		length = self->vx_size_y - y;
 	}
-	if (from_y >= self->vx_size_y)
-		return;
-	if (to_y > self->vx_size_y)
-		to_y = self->vx_size_y;
-	for (y = from_y; y < to_y; ++y) {
+	for (i = 0; i < length; ++i) {
 		video_gfx_putabscolor(self,
 		                      x,
-		                      y,
+		                      y + i,
 		                      color);
 	}
 }
 
 INTERN void CC
 libvideo_gfx_defaultgfx_hline(struct video_gfx *__restrict self,
-                              uintptr_t y, uintptr_t from_x, uintptr_t to_x,
+                              uintptr_t x, uintptr_t y, size_t length,
                               video_color_t color) {
-	uintptr_t x;
-	if (y >= self->vx_size_y)
+	uintptr_t i, end;
+	if unlikely(y >= self->vx_size_y)
 		return;
-	if (from_x > to_x) {
-		uintptr_t temp;
-		temp = from_x;
-		from_x = to_x;
-		to_x = temp;
+	if unlikely(OVERFLOW_UADD(x, length, &end) || end >= self->vx_size_x) {
+		if unlikely(x >= self->vx_size_x)
+			return;
+		length = self->vx_size_x - x;
 	}
-	if (from_x >= self->vx_size_x)
-		return;
-	if (to_x > self->vx_size_x)
-		to_x = self->vx_size_x;
-	for (x = from_x; x < to_x; ++x) {
+	for (i = 0; i < length; ++i) {
 		video_gfx_putabscolor(self,
-		                      x,
+		                      x + i,
 		                      y,
 		                      color);
 	}
@@ -282,34 +297,77 @@ libvideo_gfx_defaultgfx_fill(struct video_gfx *__restrict self,
                              uintptr_t x, uintptr_t y,
                              size_t size_x, size_t size_y,
                              video_color_t color) {
-	uintptr_t end_x, end_y;
-	uintptr_t yi;
-	if unlikely(!size_x || !size_y)
+	uintptr_t i, temp;
+	if unlikely(!size_x)
 		return;
-	if unlikely(x >= self->vx_size_x)
-		return;
-	if unlikely(y >= self->vx_size_y)
-		return;
-	if (OVERFLOW_UADD(x, size_x, &end_x) || end_x >= self->vx_size_x)
+	if (OVERFLOW_UADD(x, size_x, &temp) || temp >= self->vx_size_x) {
+		if unlikely(x >= self->vx_size_x)
+			return;
 		size_x = self->vx_size_x - x;
-	if (OVERFLOW_UADD(y, size_y, &end_y) || end_y >= self->vx_size_y)
-		end_y = self->vx_size_y;
-	for (yi = y; yi < end_y; ++yi) {
-		self->hline(yi, x, end_x, color);
 	}
+	if (OVERFLOW_UADD(y, size_y, &temp) || temp >= self->vx_size_y) {
+		if unlikely(y >= self->vx_size_y)
+			return;
+		size_y = self->vx_size_y - y;
+	}
+	for (i = 0; i < size_y; ++i)
+		self->hline(x, y + i, size_x, color);
 }
 
 INTERN void CC
 libvideo_gfx_defaultgfx_rect(struct video_gfx *__restrict self,
-                             uintptr_t x, uintptr_t y,
+                             intptr_t x, intptr_t y,
                              size_t size_x, size_t size_y,
                              video_color_t color) {
-	self->hline(y, x, (uintptr_t)(x + size_x), color);
-	self->hline((uintptr_t)(y + size_y), x, (uintptr_t)(x + size_x), color);
-	if (size_y > 2) {
-		self->vline(x, y + 1, (uintptr_t)(y + size_y) - 1, color);
-		self->vline((uintptr_t)(x + size_x), y + 1, (uintptr_t)(y + size_y) - 1, color);
+#define HLINE(x, y, length) libvideo_gfx_defaultgfx_hline(self, x, y, length, color)
+#define VLINE(x, y, length) libvideo_gfx_defaultgfx_vline(self, x, y, length, color)
+	if unlikely(x < 0) {
+		x = -x;
+		if unlikely((uintptr_t)x >= size_x)
+			return;
+		size_x -= (uintptr_t)x;
+		/*x = 0;*/
+		if unlikely(y < 0) {
+			y = -y;
+			if unlikely((uintptr_t)y >= size_y)
+				return;
+			size_y -= (uintptr_t)y;
+			/*y = 0;*/
+			HLINE(0, (uintptr_t)size_y - 1, size_x);
+			if (size_y >= 3)
+				VLINE((uintptr_t)size_x - 1, 0, size_y - 2);
+		} else {
+			HLINE(0, (uintptr_t)y, size_x);
+			if (size_y >= 2) {
+				HLINE(0, (uintptr_t)y + size_y - 1, size_x);
+				if (size_y >= 3)
+					VLINE(size_x - 1, (uintptr_t)y + 1, size_y - 2);
+			}
+		}
+	} else if unlikely(y < 0) {
+		y = -y;
+		if unlikely((uintptr_t)y >= size_y)
+			return;
+		size_y -= (uintptr_t)y;
+		/*y = 0;*/
+		HLINE((uintptr_t)x, (uintptr_t)y + size_y - 1, size_x);
+		if (size_y >= 2) {
+			VLINE((uintptr_t)x, 0, size_y - 1);
+			if (size_x >= 2)
+				VLINE((uintptr_t)x + size_x - 1, 0, size_y - 1);
+		}
+	} else {
+		HLINE((uintptr_t)x, (uintptr_t)y, size_x);
+		if (size_y >= 2) {
+			HLINE((uintptr_t)x, (uintptr_t)y + size_y - 1, size_x);
+			if (size_y >= 3) {
+				VLINE((uintptr_t)x, (uintptr_t)y + 1, size_y - 2);
+				VLINE((uintptr_t)x + size_x - 1, (uintptr_t)y + 1, size_y - 2);
+			}
+		}
 	}
+#undef VLINE
+#undef HLINE
 }
 
 
@@ -472,32 +530,32 @@ libvideo_gfx_defaultgfx_line_o(struct video_gfx *__restrict self,
                                intptr_t x2, intptr_t y2,
                                video_color_t color) {
 	libvideo_gfx_defaultgfx_line(self,
-	                             x1 + self->vx_offt_x,
-	                             y1 + self->vx_offt_y,
-	                             x2 + self->vx_offt_x,
-	                             y2 + self->vx_offt_y,
+	                             x1 + (intptr_t)self->vx_offt_x,
+	                             y1 + (intptr_t)self->vx_offt_y,
+	                             x2 + (intptr_t)self->vx_offt_x,
+	                             y2 + (intptr_t)self->vx_offt_y,
 	                             color);
 }
 
 INTERN void CC
 libvideo_gfx_defaultgfx_vline_o(struct video_gfx *__restrict self,
-                                uintptr_t x, uintptr_t y1, uintptr_t y2,
+                                uintptr_t x, uintptr_t y, size_t length,
                                 video_color_t color) {
 	libvideo_gfx_defaultgfx_vline(self,
 	                              x + self->vx_offt_x,
-	                              y1 + self->vx_offt_y,
-	                              y2 + self->vx_offt_y,
+	                              y + self->vx_offt_y,
+	                              length,
 	                              color);
 }
 
 INTERN void CC
 libvideo_gfx_defaultgfx_hline_o(struct video_gfx *__restrict self,
-                                uintptr_t y, uintptr_t x1, uintptr_t x2,
+                                uintptr_t x, uintptr_t y, size_t length,
                                 video_color_t color) {
 	libvideo_gfx_defaultgfx_hline(self,
+	                              x + self->vx_offt_x,
 	                              y + self->vx_offt_y,
-	                              x1 + self->vx_offt_x,
-	                              x2 + self->vx_offt_x,
+	                              length,
 	                              color);
 }
 
@@ -516,12 +574,12 @@ libvideo_gfx_defaultgfx_fill_o(struct video_gfx *__restrict self,
 
 INTERN void CC
 libvideo_gfx_defaultgfx_rect_o(struct video_gfx *__restrict self,
-                               uintptr_t x, uintptr_t y,
+                               intptr_t x, intptr_t y,
                                size_t size_x, size_t size_y,
                                video_color_t color) {
-	libvideo_gfx_defaultgfx_fill(self,
-	                             x + self->vx_offt_x,
-	                             y + self->vx_offt_y,
+	libvideo_gfx_defaultgfx_rect(self,
+	                             x + (intptr_t)self->vx_offt_x,
+	                             y + (intptr_t)self->vx_offt_y,
 	                             size_x,
 	                             size_y,
 	                             color);
@@ -534,8 +592,8 @@ libvideo_gfx_defaultgfx_blit_o(struct video_gfx *self,
                                intptr_t src_x, intptr_t src_y,
                                size_t size_x, size_t size_y) {
 	libvideo_gfx_defaultgfx_blit(self,
-	                             dst_x + self->vx_offt_x,
-	                             dst_y + self->vx_offt_y,
+	                             dst_x + (intptr_t)self->vx_offt_x,
+	                             dst_y + (intptr_t)self->vx_offt_y,
 	                             src,
 	                             src_x,
 	                             src_y,
@@ -551,8 +609,8 @@ libvideo_gfx_defaultgfx_stretch_o(struct video_gfx *self,
                                   intptr_t src_x, intptr_t src_y,
                                   size_t src_size_x, size_t src_size_y) {
 	libvideo_gfx_defaultgfx_stretch(self,
-	                                dst_x + self->vx_offt_x,
-	                                dst_y + self->vx_offt_y,
+	                                dst_x + (intptr_t)self->vx_offt_x,
+	                                dst_y + (intptr_t)self->vx_offt_y,
 	                                dst_size_x,
 	                                dst_size_y,
 	                                src,
@@ -569,8 +627,8 @@ libvideo_gfx_defaultgfx_bitfill_o(struct video_gfx *__restrict self,
                                   video_color_t color,
                                   void const *__restrict bitmask) {
 	libvideo_gfx_defaultgfx_bitfill(self,
-	                                x + self->vx_offt_x,
-	                                y + self->vx_offt_y,
+	                                x + (intptr_t)self->vx_offt_x,
+	                                y + (intptr_t)self->vx_offt_y,
 	                                size_x,
 	                                size_y,
 	                                color,
@@ -585,8 +643,8 @@ libvideo_gfx_defaultgfx_bitblit_o(struct video_gfx *self,
                                   size_t size_x, size_t size_y,
                                   void const *__restrict bitmask) {
 	libvideo_gfx_defaultgfx_bitblit(self,
-	                                dst_x + self->vx_offt_x,
-	                                dst_y + self->vx_offt_y,
+	                                dst_x + (intptr_t)self->vx_offt_x,
+	                                dst_y + (intptr_t)self->vx_offt_y,
 	                                src,
 	                                src_x,
 	                                src_y,
@@ -603,8 +661,8 @@ libvideo_gfx_defaultgfx_bitstretchfill_o(struct video_gfx *__restrict self,
                                          size_t src_size_x, size_t src_size_y,
                                          void const *__restrict bitmask) {
 	libvideo_gfx_defaultgfx_bitstretchfill(self,
-	                                       dst_x,
-	                                       dst_y,
+	                                       dst_x + (intptr_t)self->vx_offt_x,
+	                                       dst_y + (intptr_t)self->vx_offt_y,
 	                                       dst_size_x,
 	                                       dst_size_y,
 	                                       color,
@@ -622,8 +680,8 @@ libvideo_gfx_defaultgfx_bitstretchblit_o(struct video_gfx *self,
                                          size_t src_size_x, size_t src_size_y,
                                          void const *__restrict bitmask) {
 	libvideo_gfx_defaultgfx_bitstretchblit(self,
-	                                       dst_x,
-	                                       dst_y,
+	                                       dst_x + (intptr_t)self->vx_offt_x,
+	                                       dst_y + (intptr_t)self->vx_offt_y,
 	                                       dst_size_x,
 	                                       dst_size_y,
 	                                       src,
