@@ -20,8 +20,8 @@
 #ifdef __INTELLISENSE__
 #include "gfx.c"
 //#define DEFINE_STRETCH 1
-//#define DEFINE_BITSTRETCHBLIT 1
-#define DEFINE_BITSTRETCHFILL 1
+#define DEFINE_BITSTRETCHBLIT 1
+//#define DEFINE_BITSTRETCHFILL 1
 #endif /* __INTELLISENSE__ */
 
 #if (defined(DEFINE_STRETCH) + defined(DEFINE_BITSTRETCHBLIT) + defined(DEFINE_BITSTRETCHFILL)) != 1
@@ -57,10 +57,10 @@ colorfactor(video_color_t color, double part) {
 	b = VIDEO_COLOR_GET_BLUE(color);
 	a = VIDEO_COLOR_GET_ALPHA(color);
 	/* Apply color parts */
-	r = (uint8_t)(part * r);
-	g = (uint8_t)(part * g);
-	b = (uint8_t)(part * b);
-	a = (uint8_t)(part * a);
+	r = (uint8_t)((double)r * part);
+	g = (uint8_t)((double)g * part);
+	b = (uint8_t)((double)b * part);
+	a = (uint8_t)((double)a * part);
 	/* Pack the color back together. */
 	return VIDEO_COLOR_RGBA(r, g, b, a);
 }
@@ -73,23 +73,88 @@ getlinearcolor(struct video_gfx const *__restrict self,
                double x, double y) {
 	video_color_t result;
 	video_color_t c[2][2];
-	uintptr_t base_x, base_y;
+	intptr_t base_x, base_y;
+	double base_xf, base_yf;
 	double rel_x, rel_y;
-	base_x = (uintptr_t)x;
-	base_y = (uintptr_t)y;
-	/* Load source colors. */
-	c[0][0] = self->getcolor(base_x + 0, base_y + 0);
-	c[0][1] = self->getcolor(base_x + 0, base_y + 1);
-	c[1][0] = self->getcolor(base_x + 1, base_y + 0);
-	c[1][1] = self->getcolor(base_x + 1, base_y + 1);
+	x -= 0.5;
+	y -= 0.5;
+	base_xf = floor(x);
+	base_yf = floor(y);
+	base_x = (intptr_t)base_xf;
+	base_y = (intptr_t)base_yf;
+	if (base_x < 0) {
+		if (base_x <= -2)
+			return 0; /* This can happen because of rounding */
+		c[0][0] = 0;
+		c[0][1] = 0;
+		if (base_y < 0) {
+			if (base_y <= -2)
+				return 0; /* This can happen because of rounding */
+			c[1][0] = 0;
+			c[1][1] = video_gfx_getabscolor(self, self->vx_offt_x, self->vx_offt_y);
+		} else {
+			if unlikely((uintptr_t)base_y >= self->vx_size_y)
+				return 0; /* This can happen because of rounding */
+			c[1][0] = video_gfx_getabscolor(self, self->vx_offt_x, self->vx_offt_y + base_y);
+			if unlikely((uintptr_t)base_y == self->vx_size_y - 1) {
+				c[1][1] = 0;
+			} else {
+				c[1][1] = video_gfx_getabscolor(self, self->vx_offt_x, self->vx_offt_y + base_y + 1);
+			}
+		}
+	} else if (base_y < 0) {
+		if (base_y <= -2)
+			return 0; /* This can happen because of rounding */
+		c[0][0] = 0;
+		c[1][0] = 0;
+		c[0][1] = video_gfx_getabscolor(self, self->vx_offt_x + base_x, self->vx_offt_y);
+		if unlikely((uintptr_t)base_x == self->vx_size_x - 1) {
+			c[1][1] = 0;
+		} else {
+			c[1][1] = video_gfx_getabscolor(self, self->vx_offt_x + base_x + 1, self->vx_offt_y);
+		}
+	} else {
+		if unlikely((uintptr_t)base_x >= self->vx_size_x)
+			return 0; /* This can happen because of rounding */
+		if unlikely((uintptr_t)base_y >= self->vx_size_y)
+			return 0; /* This can happen because of rounding */
+		/* Load source colors. */
+		c[0][0] = video_gfx_getabscolor(self,
+		                                self->vx_offt_x + base_x,
+		                                self->vx_offt_y + base_y);
+		if unlikely((uintptr_t)base_x == self->vx_size_x - 1) {
+			/* This can happen because of rounding */
+			c[1][0] = 0;
+			c[1][1] = 0;
+			if unlikely((uintptr_t)base_y == self->vx_size_y - 1) {
+				c[0][1] = false; /* This can happen because of rounding */
+			} else {
+				c[0][1] = video_gfx_getabscolor(self,
+				                                self->vx_offt_x + base_x,
+				                                self->vx_offt_y + base_y + 1);
+			}
+		} else {
+			c[1][0] = video_gfx_getabscolor(self,
+			                                self->vx_offt_x + base_x + 1,
+			                                self->vx_offt_y + base_y);
+			if unlikely((uintptr_t)base_y == self->vx_size_y - 1) {
+				c[0][1] = 0; /* This can happen because of rounding */
+				c[1][1] = 0;
+			} else {
+				c[0][1] = video_gfx_getabscolor(self, self->vx_offt_x + base_x, self->vx_offt_y + base_y + 1);
+				c[1][1] = video_gfx_getabscolor(self, self->vx_offt_x + base_x + 1, self->vx_offt_y + base_y + 1);
+			}
+		}
+	}
+
 	/* Figure out the sub-pixel relation. */
-	rel_x = x - (double)base_x;
-	rel_y = y - (double)base_y;
+	rel_x = x - base_xf;
+	rel_y = y - base_yf;
 	/* Calculate color affinity */
-	result  = colorfactor(c[0][0], ((1.0 - rel_x) + (1.0 - rel_y)) / 2.0);
-	result += colorfactor(c[0][1], ((1.0 - rel_x) + rel_y) / 2.0);
-	result += colorfactor(c[1][0], (rel_x + (1.0 - rel_y)) / 2.0);
-	result += colorfactor(c[1][1], (rel_x + rel_y) / 2.0);
+	result  = colorfactor(c[0][0], ((1.0 - rel_x) + (1.0 - rel_y)) / 4.0);
+	result += colorfactor(c[0][1], ((1.0 - rel_x) + rel_y) / 4.0);
+	result += colorfactor(c[1][0], (rel_x + (1.0 - rel_y)) / 4.0);
+	result += colorfactor(c[1][1], (rel_x + rel_y) / 4.0);
 	return result;
 }
 #endif /* !GETLINEARCOLOR_DEFINED */
@@ -113,56 +178,96 @@ getlinearbit(void const *__restrict bitmask,
              size_t bitmask_size_x,
              size_t bitmask_size_y,
              double x, double y) {
-	uint16_t result;
+	uint8_t result;
 	bool c[2][2];
-	uintptr_t base_x, base_y;
+	intptr_t base_x, base_y;
+	double base_xf, base_yf;
 	double rel_x, rel_y;
 	size_t bitno;
-	base_x = (uintptr_t)x;
-	base_y = (uintptr_t)y;
-	if unlikely(base_x >= bitmask_size_x)
-		return 0; /* This can happen because of rounding */
-	if unlikely(base_y >= bitmask_size_y)
-		return 0; /* This can happen because of rounding */
-
-	/* Load source colors. */
-	bitno = bitmask_base_offset + base_x + base_y * bitmask_size_x;
-	c[0][0] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
-	if unlikely(base_x == bitmask_size_x - 1) {
-		/* This can happen because of rounding */
-		c[1][0] = false;
-		c[1][1] = false;
-		if unlikely(base_y == bitmask_size_y - 1) {
-			c[0][1] = false; /* This can happen because of rounding */
+	x -= 0.5;
+	y -= 0.5;
+	base_xf = floor(x);
+	base_yf = floor(y);
+	base_x = (intptr_t)base_xf;
+	base_y = (intptr_t)base_yf;
+	if (base_x < 0) {
+		if (base_x <= -2)
+			return 0; /* This can happen because of rounding */
+		c[0][0] = false;
+		c[0][1] = false;
+		if (base_y < 0) {
+			if (base_y <= -2)
+				return 0; /* This can happen because of rounding */
+			c[1][0] = false;
+			c[1][1] = (((uint8_t *)bitmask)[0] & 0x80) != 0;
 		} else {
-			bitno += bitmask_size_x;
-			c[0][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+			if unlikely((uintptr_t)base_y >= bitmask_size_y)
+				return 0; /* This can happen because of rounding */
+			bitno = bitmask_base_offset + (uintptr_t)base_y * bitmask_size_x;
+			c[1][0] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+			if unlikely((uintptr_t)base_y == bitmask_size_y - 1) {
+				c[1][1] = false;
+			} else {
+				bitno += bitmask_size_x;
+				c[1][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+			}
+		}
+	} else if (base_y < 0) {
+		if (base_y <= -2)
+			return 0; /* This can happen because of rounding */
+		c[0][0] = false;
+		c[1][0] = false;
+		bitno = bitmask_base_offset + (uintptr_t)base_x;
+		c[0][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+		if unlikely((uintptr_t)base_x == bitmask_size_x - 1) {
+			c[1][1] = false;
+		} else {
+			++bitno;
+			c[1][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
 		}
 	} else {
-		++bitno;
-		c[1][0] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
-		if unlikely(base_y == bitmask_size_y - 1) {
-			c[1][1] = false; /* This can happen because of rounding */
-			c[0][1] = false;
+		if unlikely((uintptr_t)base_x >= bitmask_size_x)
+			return 0; /* This can happen because of rounding */
+		if unlikely((uintptr_t)base_y >= bitmask_size_y)
+			return 0; /* This can happen because of rounding */
+	
+		/* Load source colors. */
+		bitno = bitmask_base_offset + (uintptr_t)base_x + (uintptr_t)base_y * bitmask_size_x;
+		c[0][0] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+		if unlikely((uintptr_t)base_x == bitmask_size_x - 1) {
+			/* This can happen because of rounding */
+			c[1][0] = false;
+			c[1][1] = false;
+			if unlikely((uintptr_t)base_y == bitmask_size_y - 1) {
+				c[0][1] = false; /* This can happen because of rounding */
+			} else {
+				bitno += bitmask_size_x;
+				c[0][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+			}
 		} else {
-			bitno += bitmask_size_x;
-			c[1][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
-			--bitno;
-			c[0][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+			++bitno;
+			c[1][0] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+			if unlikely((uintptr_t)base_y == bitmask_size_y - 1) {
+				c[1][1] = false; /* This can happen because of rounding */
+				c[0][1] = false;
+			} else {
+				bitno += bitmask_size_x;
+				c[1][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+				--bitno;
+				c[0][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+			}
 		}
 	}
 
 	/* Figure out the sub-pixel relation. */
-	rel_x = x - (double)base_x;
-	rel_y = y - (double)base_y;
+	rel_x = x - base_xf;
+	rel_y = y - base_yf;
 	/* Calculate color affinity */
-	result  = bitfactor(c[0][0], ((1.0 - rel_x) + (1.0 - rel_y)) / 2.0);
-	result += bitfactor(c[0][1], ((1.0 - rel_x) + rel_y) / 2.0);
-	result += bitfactor(c[1][0], (rel_x + (1.0 - rel_y)) / 2.0);
-	result += bitfactor(c[1][1], (rel_x + rel_y) / 2.0);
-	if (result > 0xff)
-		result = 0xff;
-	return (uint8_t)result;
+	result  = bitfactor(c[0][0], ((1.0 - rel_x) + (1.0 - rel_y)) / 4.0);
+	result += bitfactor(c[0][1], ((1.0 - rel_x) + rel_y) / 4.0);
+	result += bitfactor(c[1][0], (rel_x + (1.0 - rel_y)) / 4.0);
+	result += bitfactor(c[1][1], (rel_x + rel_y) / 4.0);
+	return result;
 }
 #endif /* !GETLINEARBIT_DEFINED */
 #endif /* !DEFINE_STRETCH */
@@ -200,17 +305,19 @@ FUNC(stretch_perpixel_fixed)(struct video_gfx *self,
 			for (x = 0; x < dst_size_x; ++x) {
 				video_color_t used_color;
 				double rel_x, rel_y;
+#ifndef DEFINE_STRETCH
+				uint8_t opacity;
+#endif /* !DEFINE_STRETCH */
 				rel_x = (double)x * x_scale;
 				rel_y = (double)y * y_scale;
 #ifndef DEFINE_STRETCH
-				uint8_t bit;
-				bit = getlinearbit(bitmask,
-				                   bitmask_base_offset,
-				                   bitmask_size_x,
-				                   bitmask_size_y,
-				                   rel_x,
-				                   rel_y);
-				if (!bit)
+				opacity = getlinearbit(bitmask,
+				                       bitmask_base_offset,
+				                       bitmask_size_x,
+				                       bitmask_size_y,
+				                       rel_x,
+				                       rel_y);
+				if (!opacity)
 					continue;
 #endif /* !DEFINE_STRETCH */
 #ifndef DEFINE_BITSTRETCHFILL
@@ -221,9 +328,9 @@ FUNC(stretch_perpixel_fixed)(struct video_gfx *self,
 				used_color = color;
 #endif /* DEFINE_BITSTRETCHFILL */
 #ifndef DEFINE_STRETCH
-				bit = (((uint32_t)VIDEO_COLOR_GET_ALPHA(used_color) * bit) / 255);
+				opacity = (((uint32_t)VIDEO_COLOR_GET_ALPHA(used_color) * opacity) / 255);
 				used_color &= ~VIDEO_COLOR_ALPHA_MASK;
-				used_color |= (video_color_t)bit << VIDEO_COLOR_ALPHA_SHIFT;
+				used_color |= (video_color_t)opacity << VIDEO_COLOR_ALPHA_SHIFT;
 #endif /* !DEFINE_STRETCH */
 				video_gfx_putabscolor(self,
 				                      dst_x + x,
