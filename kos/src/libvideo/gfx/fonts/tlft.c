@@ -76,49 +76,12 @@ libvideo_tlft_lookup(struct tlft_font const *__restrict self,
 	return NULL;
 }
 
-/* Draw a single glyph at the given coords and return its width.
- * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-PRIVATE uintptr_t CC
-libvideo_tlft_drawglyph(struct video_font *__restrict self,
-                        struct video_gfx *__restrict gfx,
-                        intptr_t x, intptr_t y,
-                        uintptr_t height, char32_t ord,
-                        video_color_t color) {
-	void *bm;
-	uintptr_t result;
-	struct tlft_font *me;
-	if unlikely(ord > 0xffff)
-		goto unknown;
-	me = (struct tlft_font *)self;
-	bm = libvideo_tlft_lookup(me, (char16_t)ord);
-	if unlikely(!bm)
-		goto unknown;
-	if (height == me->tf_bestheight) {
-		/* Can just directly blit the glyph */
-		result = me->tf_hdr->h_chwidth;
-		gfx->bitfill(x, y, result, height, color, bm);
-	} else {
-		/* Must stretch the glyph somehow... */
-		result = ((height * me->tf_hdr->h_chwidth) +
-		          (me->tf_bestheight / 2)) /
-		         me->tf_bestheight;
-		if unlikely(!result)
-			result = 1;
-		gfx->bitstretchfill(x, y, result, height, color,
-		                    me->tf_hdr->h_chwidth,
-		                    me->tf_bestheight, bm);
-	}
-	return result;
-unknown:
-	return 0;
-}
-
 /* Return the width (in pixels) of a glyph, given its height (in pixels). */
-PRIVATE ATTR_PURE uintptr_t CC
+PRIVATE ATTR_PURE size_t CC
 libvideo_tlft_glyphsize(struct video_font *__restrict self,
-                        uintptr_t height, char32_t UNUSED(ord)) {
+                        size_t height, char32_t UNUSED(ord)) {
 	struct tlft_font *me;
-	uintptr_t result;
+	size_t result;
 	me = (struct tlft_font *)self;
 	if (height == me->tf_bestheight) {
 		result = me->tf_hdr->h_chwidth;
@@ -132,6 +95,60 @@ libvideo_tlft_glyphsize(struct video_font *__restrict self,
 	return result;
 }
 
+/* Draw a single glyph at the given coords and return its width.
+ * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
+PRIVATE size_t CC
+libvideo_tlft_drawglyph(struct video_font *__restrict self,
+                        struct video_gfx *__restrict gfx,
+                        intptr_t x,
+                        intptr_t y,
+                        size_t height,
+                        char32_t ord,
+                        video_color_t color) {
+	void *bm;
+	size_t result;
+	struct tlft_font *me;
+	if unlikely(ord > 0xffff)
+		goto unknown;
+	me = (struct tlft_font *)self;
+	bm = libvideo_tlft_lookup(me, (char16_t)ord);
+	if unlikely(!bm)
+		goto unknown;
+	if (height == me->tf_bestheight) {
+		/* Can just directly blit the glyph */
+		result = me->tf_hdr->h_chwidth;
+		gfx->bitfill(/* x:       */ x,
+		             /* y:       */ y,
+		             /* color:   */ color,
+		             /* size_x:  */ result,
+		             /* size_y:  */ height,
+		             /* bitmask: */ bm,
+		             /* bitskip: */ 0,
+		             /* bitscan: */ result);
+	} else {
+		/* Must stretch the glyph somehow... */
+		result = ((height * me->tf_hdr->h_chwidth) +
+		          (me->tf_bestheight / 2)) /
+		         me->tf_bestheight;
+		if unlikely(!result)
+			result = 1;
+		gfx->bitstretchfill(/* dst_x:      */ x,
+		                    /* dst_y:      */ y,
+		                    /* dst_size_x: */ result,
+		                    /* dst_size_y: */ height,
+		                    /* color:      */ color,
+		                    /* src_size_x: */ me->tf_hdr->h_chwidth,
+		                    /* src_size_y: */ me->tf_bestheight,
+		                    /* bitmask:    */ bm,
+		                    /* bitskip:    */ 0,
+		                    /* bitscan:    */ me->tf_hdr->h_chwidth);
+	}
+	return result;
+unknown:
+	return 0;
+}
+
+
 
 PRIVATE struct video_font_ops libvideo_tlft_ops = { NULL, NULL, NULL };
 
@@ -139,8 +156,8 @@ PRIVATE struct video_font_ops libvideo_tlft_ops = { NULL, NULL, NULL };
 INTERN ATTR_RETNONNULL WUNUSED
 struct video_font_ops *CC libvideo_tlft_getops(void) {
 	if unlikely(!libvideo_tlft_ops.vfo_destroy) {
-		libvideo_tlft_ops.vfo_drawglyph = &libvideo_tlft_drawglyph;
-		libvideo_tlft_ops.vfo_glyphsize = &libvideo_tlft_glyphsize;
+		libvideo_tlft_ops.vfo_drawglyph    = &libvideo_tlft_drawglyph;
+		libvideo_tlft_ops.vfo_glyphsize    = &libvideo_tlft_glyphsize;
 		COMPILER_WRITE_BARRIER();
 		libvideo_tlft_ops.vfo_destroy = &libvideo_tlft_destroy;
 		COMPILER_WRITE_BARRIER();

@@ -121,13 +121,16 @@ struct video_gfx;
 
 struct video_gfx_pxops {
 	/* All of the following callbacks are [1..1]
-	 * NOTE: None of these functions will add `vx_offt_(x|y)' to the given X/Y,
-	 *       as well as always assume that the given coords are in-bounds of the
-	 *       underlying buffer. */
+	 * WARNING: None of these functions will add `vx_offt_(x|y)' to the given X/Y,
+	 *          as well as always assume that the given coords are in-bounds of the
+	 *          underlying buffer. */
 	/* Get the color of a pixel */
-	video_color_t (LIBVIDEO_GFX_CC *fxo_getcolor)(struct video_gfx const *__restrict __self, __uintptr_t __abs_x, __uintptr_t __abs_y);
+	video_color_t (LIBVIDEO_GFX_CC *fxo_getcolor)(struct video_gfx const *__restrict __self,
+	                                              __uintptr_t __abs_x, __uintptr_t __abs_y);
 	/* Place a colored pixel ontop of the graphic */
-	void (LIBVIDEO_GFX_CC *fxo_putcolor)(struct video_gfx *__restrict __self, __uintptr_t __abs_x, __uintptr_t __abs_y, video_color_t __color);
+	void (LIBVIDEO_GFX_CC *fxo_putcolor)(struct video_gfx *__restrict __self,
+	                                     __uintptr_t __abs_x, __uintptr_t __abs_y,
+	                                     video_color_t __color);
 };
 
 struct video_gfx_ops {
@@ -140,15 +143,15 @@ struct video_gfx_ops {
 	                                 video_color_t __color);
 	/* Vertical line */
 	void (LIBVIDEO_GFX_CC *fxo_vline)(struct video_gfx *__restrict __self,
-	                                  __uintptr_t __x, __uintptr_t __y,
+	                                  __intptr_t __x, __intptr_t __y,
 	                                  __size_t __length, video_color_t __color);
 	/* Horizontal line */
 	void (LIBVIDEO_GFX_CC *fxo_hline)(struct video_gfx *__restrict __self,
-	                                  __uintptr_t __x, __uintptr_t __y,
+	                                  __intptr_t __x, __intptr_t __y,
 	                                  __size_t __length, video_color_t __color);
 	/* Fill an area with a solid __color. */
 	void (LIBVIDEO_GFX_CC *fxo_fill)(struct video_gfx *__restrict __self,
-	                                 __uintptr_t __x, __uintptr_t __y,
+	                                 __intptr_t __x, __intptr_t __y,
 	                                 __size_t __size_x, __size_t __size_y,
 	                                 video_color_t __color);
 	/* Outline an area with a rectangle. */
@@ -170,23 +173,27 @@ struct video_gfx_ops {
 	                                    __intptr_t __src_x, __intptr_t __src_y,
 	                                    __size_t __src_size_x, __size_t __src_size_y);
 	/* Same as `fxo_fill()', but only fill in a pixel if:
-	 * >> offset = (FINAL_Y - DST_Y) * DST_SIZE_X + (FINAL_X - DST_X);
+	 * >> offset = BITSKIP + (FINAL_Y - DST_Y) * BITSCAN + (FINAL_X - DST_X);
 	 * >> if ((((u8 *)BITMASK)[offset / 8] & (1 << (7 - (offset % 8)))) != 0) {
 	 * >>     FILL_PIXEL();
 	 * >> }
+	 * @param: BITSKIP: Number of leading bits to skip
+	 * @param: BITSCAN: Length of a scanline within BITMASK (in bits)
 	 * This function is mainly here to facilitate the rendering of glyphs (s.a. fonts/tlft.h) */
 	void (LIBVIDEO_GFX_CC *fxo_bitfill)(struct video_gfx *__restrict __self,
 	                                    __intptr_t __x, __intptr_t __y,
-	                                    __size_t __size_x, __size_t __size_y,
 	                                    video_color_t __color,
-	                                    void const *__restrict __bitmask);
+	                                    __size_t __size_x, __size_t __size_y,
+	                                    void const *__restrict __bitmask,
+	                                    __uintptr_t __bitskip, __size_t __bitscan);
 	/* Same as `fxo_bitfill()', but take source colors from `SRC' */
 	void (LIBVIDEO_GFX_CC *fxo_bitblit)(struct video_gfx *__self,
 	                                    __intptr_t __dst_x, __intptr_t __dst_y,
 	                                    struct video_gfx const *__src,
 	                                    __intptr_t __src_x, __intptr_t __src_y,
 	                                    __size_t __size_x, __size_t __size_y,
-	                                    void const *__restrict __bitmask);
+	                                    void const *__restrict __bitmask,
+	                                    __uintptr_t __bitskip, __size_t __bitscan);
 	/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask.
 	 * The resulting image will be similar (but not necessarily identical) to:
 	 * >> struct video_buffer *temp;
@@ -195,7 +202,7 @@ struct video_gfx_ops {
 	 * >>                            video_codec_lookup(VIDEO_CODEC_RGBA8888),
 	 * >>                            NULL);
 	 * >> temp->gfx(temp_gfx, GFX_BLENDINFO_OVERRIDE);
-	 * >> temp_gfx.bitfill(0, 0, SRC_SIZE_X, SRC_SIZE_Y, COLOR, BITMASK);
+	 * >> temp_gfx.bitfill(0, 0, SRC_SIZE_X, SRC_SIZE_Y, COLOR, BITMASK, BITSKIP);
 	 * >> // NOTE: Pixels that aren't masked by BITMASK may not necessary get blended during this call!
 	 * >> SELF->stretch(DST_X, DST_Y, DST_SIZE_X, DST_SIZE_Y, &temp_gfx, 0, 0, SRC_SIZE_X, SRC_SIZE_Y);
 	 * >> destroy(temp); */
@@ -204,7 +211,8 @@ struct video_gfx_ops {
 	                                           __size_t __dst_size_x, __size_t __dst_size_y,
 	                                           video_color_t __color,
 	                                           __size_t __src_size_x, __size_t __src_size_y,
-	                                           void const *__restrict __bitmask);
+	                                           void const *__restrict __bitmask,
+	                                           __uintptr_t __bitskip, __size_t __bitscan);
 	/* Same as `fxo_bitstretchfill()' is for `fxo_bitfill()', but instead here for `fxo_bitblit()' */
 	void (LIBVIDEO_GFX_CC *fxo_bitstretchblit)(struct video_gfx *__self,
 	                                           __intptr_t __dst_x, __intptr_t __dst_y,
@@ -212,14 +220,15 @@ struct video_gfx_ops {
 	                                           struct video_gfx const *__src,
 	                                           __intptr_t __src_x, __intptr_t __src_y,
 	                                           __size_t __src_size_x, __size_t __src_size_y,
-	                                           void const *__restrict __bitmask);
+	                                           void const *__restrict __bitmask,
+	                                           __uintptr_t __bitskip, __size_t __bitscan);
 };
 
 
 
 
 #ifdef __cplusplus
-extern "C++" {
+__CXXDECL_BEGIN
 #endif /* __cplusplus */
 
 struct video_gfx {
@@ -229,14 +238,22 @@ struct video_gfx {
 	gfx_blendmode_t        vx_blend;     /* [const] Blending mode. */
 	__uintptr_t            vx_flags;     /* [const] Additional rendering flags (Set of `VIDEO_GFX_F*'). */
 	video_color_t          vx_colorkey;  /* [const] Transparent __color key (or any __color with alpha=0 when disabled). */
-	__uintptr_t            vx_offt_x;    /* [const] Buffer starting offset in X (<= `vx_buffer->vb_size_x') */
-	__uintptr_t            vx_offt_y;    /* [const] Buffer starting offset in Y (<= `vx_buffer->vb_size_y') */
-	__uintptr_t            vx_size_x;    /* [const] Buffer size in X (<= `vx_buffer->vb_size_x') */
-	__uintptr_t            vx_size_y;    /* [const] Buffer size in Y (<= `vx_buffer->vb_size_y') */
+	__intptr_t             vx_offt_x;    /* [const] Buffer starting offset in X (<= `vx_buffer->vb_size_x') */
+	__intptr_t             vx_offt_y;    /* [const] Buffer starting offset in Y (<= `vx_buffer->vb_size_y') */
+	__uintptr_t            vx_xmin;      /* [const] == vx_offt_x <= 0 ? 0 : vx_offt_x */
+	__uintptr_t            vx_ymin;      /* [const] == vx_offt_y <= 0 ? 0 : vx_offt_y */
+	__uintptr_t            vx_xend;      /* [const] Absolute buffer end coord in X (<= `vx_buffer->vb_size_x') */
+	__uintptr_t            vx_yend;      /* [const] Absolute buffer end coord in Y (<= `vx_buffer->vb_size_y') */
 	void                  *vx_driver[4]; /* [?..?] Driver-specific graphics data. */
+
+	/* Return the API-visible clip rect size in X or Y */
+#define video_gfx_sizex(self) ((__size_t)((__intptr_t)(self)->vx_xend - (self)->vx_offt_x))
+#define video_gfx_sizey(self) ((__size_t)((__intptr_t)(self)->vx_yend - (self)->vx_offt_y))
+
 
 #ifdef __cplusplus
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("clip")
 #pragma push_macro("getcolor")
 #pragma push_macro("putcolor")
 #pragma push_macro("line")
@@ -248,7 +265,10 @@ struct video_gfx {
 #pragma push_macro("stretch")
 #pragma push_macro("bitfill")
 #pragma push_macro("bitblit")
+#pragma push_macro("bitstretchfill")
+#pragma push_macro("bitstretchblit")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef clip
 #undef getcolor
 #undef putcolor
 #undef line
@@ -260,17 +280,37 @@ struct video_gfx {
 #undef stretch
 #undef bitfill
 #undef bitblit
+#undef bitstretchfill
+#undef bitstretchblit
 
 public:
+	/* Create a secondary GFX context for a given clip rectangle
+	 * that is interpreted relative to the clip rectangle of this
+	 * GFX object.
+	 * NOTE: Implemented in ./buffer.h because the implementation
+	 *       requries use of `struct video_buffer', which may not
+	 *       have been defined yet at this point! */
+	__CXX_CLASSMEMBER struct video_gfx &
+	LIBVIDEO_GFX_CC clip(struct video_gfx &__result,
+	                     __intptr_t __start_x, __intptr_t __start_y,
+	                     __size_t __size_x, __size_t __size_y) const;
+	/* Modify the clip-rect of `this' GFX context. (always returns `*this') */
+	__CXX_CLASSMEMBER struct video_gfx &
+	LIBVIDEO_GFX_CC clip(__intptr_t __start_x, __intptr_t __start_y,
+	                     __size_t __size_x, __size_t __size_y);
+
+
 	/* Get a pixel */
 	template<class TX, class TY>
 	__CXX_CLASSMEMBER typename std::enable_if<(std::is_signed<TX>::value || std::is_unsigned<TX>::value) &&
 	                                          (std::is_signed<TY>::value || std::is_unsigned<TY>::value),
 	                                          video_color_t>::type
 	LIBVIDEO_GFX_CC getcolor(TX __x, TY __y) const {
-		if __unlikely((__uintptr_t)__x >= vx_size_x || (__uintptr_t)__y >= vx_size_y)
+		__uintptr_t __used_x = (__uintptr_t)__x + (__uintptr_t)vx_offt_x;
+		__uintptr_t __used_y = (__uintptr_t)__y + (__uintptr_t)vx_offt_y;
+		if __unlikely(__used_x >= vx_xend || __used_y >= vx_yend)
 			return 0;
-		return (*vx_pxops.fxo_getcolor)(this, (__uintptr_t)__x + vx_offt_x, (__uintptr_t)__y + vx_offt_y);
+		return (*vx_pxops.fxo_getcolor)(this, __used_x, __used_y);
 	}
 
 	/* Place a colored pixel ontop of the graphic */
@@ -279,9 +319,11 @@ public:
 	                                          (std::is_signed<TY>::value || std::is_unsigned<TY>::value),
 	                                          void>::type
 	LIBVIDEO_GFX_CC putcolor(TX __x, TY __y, video_color_t __color) {
-		if __unlikely((__uintptr_t)__x >= vx_size_x || (__uintptr_t)__y >= vx_size_y)
-			return 0;
-		(*vx_pxops.fxo_putcolor)(this, (__uintptr_t)__x + vx_offt_x, (__uintptr_t)__y + vx_offt_y, __color);
+		__uintptr_t __used_x = (__uintptr_t)__x + (__uintptr_t)vx_offt_x;
+		__uintptr_t __used_y = (__uintptr_t)__y + (__uintptr_t)vx_offt_y;
+		if __unlikely(__used_x >= vx_xend || __used_y >= vx_yend)
+			return;
+		(*vx_pxops.fxo_putcolor)(this, __used_x, __used_y, __color);
 	}
 
 	/* Draw a line */
@@ -292,103 +334,22 @@ public:
 	}
 
 	/* Vertical line */
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC vline(TX __x, TY __y, __size_t __length, video_color_t __color) {
-		(*vx_ops->fxo_vline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC vline(TX __x, TY __y, __size_t __length, video_color_t __color) {
-		if (__x >= 0)
-			(*vx_ops->fxo_vline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC vline(TX __x, TY __y, __size_t __length, video_color_t __color) {
-		if (__y >= 0)
-			(*vx_ops->fxo_vline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC vline(TX __x, TY __y, __size_t __length, video_color_t __color) {
-		if (__x >= 0 && __y >= 0)
-			(*vx_ops->fxo_vline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
+	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC vline(__intptr_t __x, __intptr_t __y,
+	                                             __size_t __length, video_color_t __color) {
+		(*vx_ops->fxo_vline)(this, __x, __y, __length, __color);
 	}
 
 	/* Horizontal line */
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC hline(TX __x, TY __y, __size_t __length, video_color_t __color) {
-		(*vx_ops->fxo_hline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC hline(TX __x, TY __y, __size_t __length, video_color_t __color) {
-		if (__x >= 0)
-			(*vx_ops->fxo_hline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC hline(TX __x, TY __y, __size_t __length, video_color_t __color) {
-		if (__y >= 0)
-			(*vx_ops->fxo_hline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC hline(TX __x, TY __y, __size_t __length, video_color_t __color) {
-		if (__x >= 0 && __y >= 0)
-			(*vx_ops->fxo_hline)(this, (__uintptr_t)__x, (__uintptr_t)__y, __length, __color);
+	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC hline(__intptr_t __x, __intptr_t __y,
+	                                             __size_t __length, video_color_t __color) {
+		(*vx_ops->fxo_hline)(this, __x, __y, __length, __color);
 	}
 
 	/* Fill an area with a solid color. */
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC fill(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
-		(*vx_ops->fxo_fill)(this, (__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC fill(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
-		if (__x < 0) {
-			__x = -__x;
-			if (__size_x <= (__size_t)__x)
-				return;
-			__size_x -= (__size_t)__x;
-			__x = 0;
-		}
-		if (__y < 0) {
-			__y = -__y;
-			if (__size_y <= (__size_t)__y)
-				return;
-			__size_y -= (__size_t)__y;
-			__y = 0;
-		}
-		fill((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC fill(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
-		if (__x < 0) {
-			__x = -__x;
-			if (__size_x <= (__size_t)__x)
-				return;
-			__size_x -= (__size_t)__x;
-			__x = 0;
-		}
-		fill((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC fill(TX __x, TY __y, __size_t __size_x, __size_t __size_y, video_color_t __color) {
-		if (__y < 0) {
-			__y = -__y;
-			if (__size_y <= (__size_t)__y)
-				return;
-			__size_y -= (__size_t)__y;
-			__y = 0;
-		}
-		fill((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color);
+	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC fill(__intptr_t __x, __intptr_t __y,
+	                                            __size_t __size_x, __size_t __size_y,
+	                                            video_color_t __color) {
+		(*vx_ops->fxo_fill)(this, __x, __y, __size_x, __size_y, __color);
 	}
 
 	/* Outline an area with a rectangle. */
@@ -418,57 +379,13 @@ public:
 	}
 
 	/* Fill an area with a solid color. */
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC bitfill(TX __x, TY __y, __size_t __size_x, __size_t __size_y,
-	                        video_color_t __color, void const *__restrict __bitmask) {
-		(*vx_ops->fxo_bitfill)(this, (__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color, __bitmask);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC bitfill(TX __x, TY __y, __size_t __size_x, __size_t __size_y,
-	                        video_color_t __color, void const *__restrict __bitmask) {
-		if (__x < 0) {
-			__x = -__x;
-			if (__size_x <= (__size_t)__x)
-				return;
-			__size_x -= (__size_t)__x;
-			__x = 0;
-		}
-		if (__y < 0) {
-			__y = -__y;
-			if (__size_y <= (__size_t)__y)
-				return;
-			__size_y -= (__size_t)__y;
-			__y = 0;
-		}
-		bitfill((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color, __bitmask);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_signed<TX>::value && std::is_unsigned<TY>::value, void>::type
-	LIBVIDEO_GFX_CC bitfill(TX __x, TY __y, __size_t __size_x, __size_t __size_y,
-	                        video_color_t __color, void const *__restrict __bitmask) {
-		if (__x < 0) {
-			__x = -__x;
-			if (__size_x <= (__size_t)__x)
-				return;
-			__size_x -= (__size_t)__x;
-			__x = 0;
-		}
-		bitfill((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color, __bitmask);
-	}
-	template<class TX, class TY>
-	__CXX_CLASSMEMBER typename std::enable_if<std::is_unsigned<TX>::value && std::is_signed<TY>::value, void>::type
-	LIBVIDEO_GFX_CC bitfill(TX __x, TY __y, __size_t __size_x, __size_t __size_y,
-	                        video_color_t __color, void const *__restrict __bitmask) {
-		if (__y < 0) {
-			__y = -__y;
-			if (__size_y <= (__size_t)__y)
-				return;
-			__size_y -= (__size_t)__y;
-			__y = 0;
-		}
-		bitfill((__uintptr_t)__x, (__uintptr_t)__y, __size_x, __size_y, __color, __bitmask);
+	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC bitfill(__intptr_t __x, __intptr_t __y,
+	                                               video_color_t __color,
+	                                               __size_t __size_x, __size_t __size_y,
+	                                               void const *__restrict __bitmask,
+	                                               __uintptr_t __bitskip, __size_t __bitscan) {
+		(*vx_ops->fxo_bitfill)(this, __x, __y, __color, __size_x, __size_y,
+		                       __bitmask, __bitskip, __bitscan);
 	}
 
 	/* Blit the contents of another video buffer into this one. */
@@ -476,10 +393,10 @@ public:
 	                                               struct video_gfx const &__src,
 	                                               __intptr_t __src_x, __intptr_t __src_y,
 	                                               __size_t __size_x, __size_t __size_y,
-	                                               void const *__restrict __bitmask) {
-		(*vx_ops->fxo_bitblit)(this, __dst_x, __dst_y,
-		                        &__src, __src_x, __src_y,
-		                        __size_x, __size_y, __bitmask);
+	                                               void const *__restrict __bitmask,
+	                                               __uintptr_t __bitskip, __size_t __bitscan) {
+		(*vx_ops->fxo_bitblit)(this, __dst_x, __dst_y, &__src, __src_x, __src_y,
+		                       __size_x, __size_y, __bitmask, __bitskip, __bitscan);
 	}
 
 	/* Same as `fxo_bitfill()', however perform the blit while up-scaling the given bitmask. */
@@ -487,9 +404,11 @@ public:
 	                                                      __size_t __dst_size_x, __size_t __dst_size_y,
 	                                                      video_color_t __color,
 	                                                      __size_t __src_size_x, __size_t __src_size_y,
-	                                                      void const *__restrict __bitmask) {
+	                                                      void const *__restrict __bitmask,
+	                                                      __uintptr_t __bitskip, __size_t __bitscan) {
 		(*vx_ops->fxo_bitstretchfill)(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
-		                              __color, __src_size_x, __src_size_y, __bitmask);
+		                              __color, __src_size_x, __src_size_y,
+		                              __bitmask, __bitskip, __bitscan);
 	}
 
 	/* Same as `fxo_bitstretchfill()' is for `fxo_bitfill()', but instead here for `fxo_bitblit()' */
@@ -498,13 +417,17 @@ public:
 	                                                      struct video_gfx const *__src,
 	                                                      __intptr_t __src_x, __intptr_t __src_y,
 	                                                      __size_t __src_size_x, __size_t __src_size_y,
-	                                                      void const *__restrict __bitmask) {
+	                                                      void const *__restrict __bitmask,
+	                                                      __uintptr_t __bitskip, __size_t __bitscan) {
 		(*vx_ops->fxo_bitstretchblit)(this, __dst_x, __dst_y, __dst_size_x, __dst_size_y,
-		                              __src, __src_x, __src_y, __src_size_x, __src_size_y, __bitmask);
+		                              __src, __src_x, __src_y, __src_size_x, __src_size_y,
+		                              __bitmask, __bitskip, __bitscan);
 	}
 
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("bitstretchblit")
+#pragma pop_macro("bitstretchfill")
 #pragma pop_macro("bitblit")
 #pragma pop_macro("bitfill")
 #pragma pop_macro("stretch")
@@ -516,12 +439,16 @@ public:
 #pragma pop_macro("line")
 #pragma pop_macro("putcolor")
 #pragma pop_macro("getcolor")
+#pragma pop_macro("clip")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __cplusplus */
 };
 
+
+
+
 #ifdef __cplusplus
-} /* extern "C++" */
+__CXXDECL_END
 #endif /* __cplusplus */
 #endif /* __CC__ */
 

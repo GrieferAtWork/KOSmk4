@@ -174,10 +174,10 @@ libvideo_fontprinter32(/*struct video_fontprinter_data **/ void *arg,
  * @return: * : The width of the printed character (unrecognized characters
  *              are replaced with substitution characters, and control characters
  *              such as '\n' will cause `0' to be returned) */
-INTERN NONNULL((1)) uintptr_t CC
+INTERN NONNULL((1)) size_t CC
 libvideo_fontprinterch(struct video_fontprinter_data *__restrict self,
                        char32_t ch) {
-	uintptr_t result;
+	size_t result;
 	switch (ch) {
 
 	case '\r':

@@ -64,13 +64,13 @@ video_gfx_empty_line(struct video_gfx *__restrict UNUSED(self),
 
 PRIVATE void CC
 video_gfx_empty_vhline(struct video_gfx *__restrict UNUSED(self),
-                       uintptr_t UNUSED(x), uintptr_t UNUSED(y),
+                       intptr_t UNUSED(x), intptr_t UNUSED(y),
                        size_t UNUSED(length), video_color_t UNUSED(color)) {
 }
 
 PRIVATE void CC
 video_gfx_empty_fill(struct video_gfx *__restrict UNUSED(self),
-                     uintptr_t UNUSED(x), uintptr_t UNUSED(y),
+                     intptr_t UNUSED(x), intptr_t UNUSED(y),
                      size_t UNUSED(size_x), size_t UNUSED(size_y),
                      video_color_t UNUSED(color)) {
 }
@@ -102,9 +102,10 @@ video_gfx_empty_stretch(struct video_gfx *UNUSED(self),
 PRIVATE void CC
 video_gfx_empty_bitfill(struct video_gfx *__restrict UNUSED(self),
                         intptr_t UNUSED(x), intptr_t UNUSED(y),
-                        size_t UNUSED(size_x), size_t UNUSED(size_y),
                         video_color_t UNUSED(color),
-                        void const *__restrict UNUSED(bitmask)) {
+                        size_t UNUSED(size_x), size_t UNUSED(size_y),
+                        void const *__restrict UNUSED(bitmask),
+                        uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
 }
 
 PRIVATE void CC
@@ -113,7 +114,8 @@ video_gfx_empty_bitblit(struct video_gfx *UNUSED(self),
                         struct video_gfx const *UNUSED(src),
                         intptr_t UNUSED(src_x), intptr_t UNUSED(src_y),
                         size_t UNUSED(size_x), size_t UNUSED(size_y),
-                        void const *__restrict UNUSED(bitmask)) {
+                        void const *__restrict UNUSED(bitmask),
+                        uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
 }
 
 PRIVATE void CC
@@ -122,7 +124,8 @@ video_gfx_empty_bitstretchfill(struct video_gfx *__restrict UNUSED(self),
                                size_t UNUSED(dst_size_x), size_t UNUSED(dst_size_y),
                                video_color_t UNUSED(color),
                                size_t UNUSED(src_size_x), size_t UNUSED(src_size_y),
-                               void const *__restrict UNUSED(bitmask)) {
+                               void const *__restrict UNUSED(bitmask),
+                               uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
 }
 
 PRIVATE void CC
@@ -132,7 +135,8 @@ video_gfx_empty_bitstretchblit(struct video_gfx *UNUSED(self),
                                struct video_gfx const *UNUSED(src),
                                intptr_t UNUSED(src_x), intptr_t UNUSED(src_y),
                                size_t UNUSED(src_size_x), size_t UNUSED(src_size_y),
-                               void const *__restrict UNUSED(bitmask)) {
+                               void const *__restrict UNUSED(bitmask),
+                               uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
 }
 
 
@@ -198,7 +202,7 @@ video_buffer_empty_getgfx(struct video_buffer *__restrict self,
                           struct video_gfx *__restrict result,
                           gfx_blendmode_t blendmode, uintptr_t flags,
                           video_color_t colorkey,
-                          struct video_buffer_rect *UNUSED(clip)) {
+                          struct video_buffer_rect const *UNUSED(clip)) {
 	result->vx_pxops.fxo_getcolor = &video_gfx_empty_getcolor;
 	result->vx_pxops.fxo_putcolor = &video_gfx_empty_putcolor;
 	result->vx_ops                = libvideo_getemptygfxops();
@@ -208,8 +212,30 @@ video_buffer_empty_getgfx(struct video_buffer *__restrict self,
 	result->vx_colorkey           = colorkey;
 	result->vx_offt_x             = 0;
 	result->vx_offt_y             = 0;
-	result->vx_size_x             = 0;
-	result->vx_size_y             = 0;
+	result->vx_xmin               = 0;
+	result->vx_ymin               = 0;
+	result->vx_xend               = 0;
+	result->vx_yend               = 0;
+}
+
+PRIVATE void CC
+video_buffer_empty_clipgfx(struct video_gfx const *gfx,
+                           struct video_gfx *result,
+                           intptr_t UNUSED(start_x), intptr_t UNUSED(start_y),
+                           size_t UNUSED(size_x), size_t UNUSED(size_y)) {
+	result->vx_pxops.fxo_getcolor = &video_gfx_empty_getcolor;
+	result->vx_pxops.fxo_putcolor = &video_gfx_empty_putcolor;
+	result->vx_ops                = libvideo_getemptygfxops();
+	result->vx_buffer             = gfx->vx_buffer;
+	result->vx_blend              = gfx->vx_blend;
+	result->vx_flags              = gfx->vx_flags;
+	result->vx_colorkey           = gfx->vx_colorkey;
+	result->vx_offt_x             = 0;
+	result->vx_offt_y             = 0;
+	result->vx_xmin               = 0;
+	result->vx_ymin               = 0;
+	result->vx_xend               = 0;
+	result->vx_yend               = 0;
 }
 
 PRIVATE struct video_buffer_ops video_buffer_empty_ops = {};
@@ -221,6 +247,7 @@ struct video_buffer_ops *CC libvideo_getemptybufferops(void) {
 		video_buffer_empty_ops.vi_destroy = &video_buffer_empty_destroy;
 		video_buffer_empty_ops.vi_lock    = &video_buffer_empty_lock;
 		video_buffer_empty_ops.vi_unlock  = &video_buffer_empty_unlock;
+		video_buffer_empty_ops.vi_clipgfx = &video_buffer_empty_clipgfx;
 		COMPILER_WRITE_BARRIER();
 		video_buffer_empty_ops.vi_getgfx = &video_buffer_empty_getgfx;
 		COMPILER_WRITE_BARRIER();

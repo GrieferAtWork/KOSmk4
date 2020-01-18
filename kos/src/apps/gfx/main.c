@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
 	fontprinter_data.vfp_font    = font;
 	fontprinter_data.vfp_gfx     = &gfx;
 	fontprinter_data.vfp_lnstart = 0;
-	fontprinter_data.vfp_lnend   = gfx.vx_size_x;
+	fontprinter_data.vfp_lnend   = video_gfx_sizex(&gfx);
 	fontprinter_data.vfp_color   = VIDEO_COLOR_BLACK;
 	fontprinter_data.vfp_u8word  = 0;
 
@@ -157,6 +157,11 @@ again_font:
 	fcntl(STDIN_FILENO, F_SETFL,
 	      fcntl(STDIN_FILENO, F_GETFL) |
 	      O_NONBLOCK);
+
+	gfx.clip(16,
+	         16,
+	         video_gfx_sizex(&gfx) - 32,
+	         video_gfx_sizey(&gfx) - 32);
 
 	for (;;) {
 		unsigned int action;
@@ -216,7 +221,8 @@ step:
 		case 0: {
 			uintptr_t x = rand() % screen->vb_size_x;
 			uintptr_t y = rand() % screen->vb_size_y;
-			gfx.rect(x, y,
+			gfx.rect((intptr_t)x - gfx.vx_offt_x,
+			         (intptr_t)y - gfx.vx_offt_y,
 			         rand() % (screen->vb_size_x - x),
 			         rand() % (screen->vb_size_y - y),
 			         color);
@@ -225,7 +231,8 @@ step:
 		case 1: {
 			uintptr_t x = rand() % screen->vb_size_x;
 			uintptr_t y = rand() % screen->vb_size_y;
-			gfx.fill(x, y,
+			gfx.fill((intptr_t)x - gfx.vx_offt_x,
+			         (intptr_t)y - gfx.vx_offt_y,
 			         rand() % (screen->vb_size_x - x),
 			         rand() % (screen->vb_size_y - y),
 			         color);
@@ -236,11 +243,13 @@ step:
 			uintptr_t y = rand() % screen->vb_size_y;
 			uintptr_t x2 = rand() % screen->vb_size_x;
 			uintptr_t y2 = rand() % screen->vb_size_y;
-			gfx.stretch(x, y,
+			gfx.stretch((intptr_t)x - gfx.vx_offt_x,
+			            (intptr_t)y - gfx.vx_offt_y,
 			            rand() % (screen->vb_size_x - x),
 			            rand() % (screen->vb_size_y - y),
 			            gfx,
-			            x2, y2,
+			            (intptr_t)x2 - gfx.vx_offt_x,
+			            (intptr_t)y2 - gfx.vx_offt_y,
 			            rand() % (screen->vb_size_x - x2),
 			            rand() % (screen->vb_size_y - y2));
 		}	break;

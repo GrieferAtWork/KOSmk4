@@ -45,16 +45,16 @@ struct video_font_ops {
 	void (LIBVIDEO_GFX_CC *vfo_destroy)(struct video_font *__restrict __self);
 	/* Draw a single glyph at the given coords and return its width.
 	 * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-	__uintptr_t (LIBVIDEO_GFX_CC *vfo_drawglyph)(struct video_font *__restrict __self,
-	                                             struct video_gfx *__restrict __gfx,
-	                                             __intptr_t __x, __intptr_t __y,
-	                                             __uintptr_t __height,
-	                                             __CHAR32_TYPE__ __ord,
-	                                             video_color_t __color);
+	__size_t (LIBVIDEO_GFX_CC *vfo_drawglyph)(struct video_font *__restrict __self,
+	                                          struct video_gfx *__restrict __gfx,
+	                                          __intptr_t __x, __intptr_t __y,
+	                                          __size_t __height,
+	                                          __CHAR32_TYPE__ __ord,
+	                                          video_color_t __color);
 	/* Return the width (in pixels) of a glyph, given its height (in pixels). */
-	__uintptr_t (LIBVIDEO_GFX_CC *vfo_glyphsize)(struct video_font *__restrict __self,
-	                                             __uintptr_t __height,
-	                                             __CHAR32_TYPE__ __ord);
+	__size_t (LIBVIDEO_GFX_CC *vfo_glyphsize)(struct video_font *__restrict __self,
+	                                          __size_t __height,
+	                                          __CHAR32_TYPE__ __ord);
 };
 
 struct video_font {
@@ -70,15 +70,15 @@ struct video_font {
 
 	/* Draw a single glyph at the given coords and return its width.
 	 * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-	__CXX_CLASSMEMBER __uintptr_t LIBVIDEO_GFX_CC
+	__CXX_CLASSMEMBER __size_t LIBVIDEO_GFX_CC
 	drawglyph(struct video_gfx *__restrict __gfx, __intptr_t __x, __intptr_t __y,
-	          __uintptr_t __height, __CHAR32_TYPE__ __ord, video_color_t __color) {
+	          __size_t __height, __CHAR32_TYPE__ __ord, video_color_t __color) {
 		return (*vf_ops->vfo_drawglyph)(this, __gfx, __x, __y, __height, __ord, __color);
 	}
 
 	/* Return the width (in pixels) of a glyph, given its height (in pixels). */
-	__CXX_CLASSMEMBER __uintptr_t LIBVIDEO_GFX_CC
-	glyphsize(__uintptr_t __height, __CHAR32_TYPE__ __ord) {
+	__CXX_CLASSMEMBER __size_t LIBVIDEO_GFX_CC
+	glyphsize(__size_t __height, __CHAR32_TYPE__ __ord) {
 		return (*vf_ops->vfo_glyphsize)(this, __height, __ord);
 	}
 
@@ -154,11 +154,11 @@ video_fontprinter32(/*struct video_fontprinter_data **/ void *__arg,
  * @return: * : The width of the printed character (unrecognized characters
  *              are replaced with substitution characters, and control characters
  *              such as '\n' will cause `0' to be returned) */
-typedef __ATTR_NONNULL((1)) __uintptr_t
+typedef __ATTR_NONNULL((1)) __size_t
 (LIBVIDEO_GFX_CC *PVIDEO_FONTPRINTCHAR)(struct video_fontprinter_data *__restrict __self,
                                         __CHAR32_TYPE__ __ch);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ATTR_NONNULL((1)) __uintptr_t LIBVIDEO_GFX_CC
+LIBVIDEO_GFX_DECL __ATTR_NONNULL((1)) __size_t LIBVIDEO_GFX_CC
 video_fontprinterch(struct video_fontprinter_data *__restrict __self,
                     __CHAR32_TYPE__ __ch);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */

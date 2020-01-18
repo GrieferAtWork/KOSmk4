@@ -52,27 +52,27 @@ struct video_lock {
 };
 
 struct video_buffer_rect {
-	__uintptr_t vbr_startx; /* Starting X */
-	__uintptr_t vbr_starty; /* Starting Y */
-	__uintptr_t vbr_sizex;  /* Rect size in X */
-	__uintptr_t vbr_sizey;  /* Rect size in Y */
+	__intptr_t vbr_startx; /* Starting X coord */
+	__intptr_t vbr_starty; /* Starting Y coord */
+	__size_t   vbr_sizex;  /* Rect size in X */
+	__size_t   vbr_sizey;  /* Rect size in Y */
 };
 
 struct video_buffer_ops {
 	/* [1..1] Buffer finalization. */
-	void (LIBVIDEO_GFX_CC *vi_destroy)(struct video_buffer *__restrict self);
+	void (LIBVIDEO_GFX_CC *vi_destroy)(struct video_buffer *__restrict __self);
 
 	/* [1..1] Lock the video buffer into memory.
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
 	__ATTR_NONNULL((1, 2))
-	int (LIBVIDEO_GFX_CC *vi_lock)(struct video_buffer *__restrict self,
-	                               struct video_lock *__restrict result);
+	int (LIBVIDEO_GFX_CC *vi_lock)(struct video_buffer *__restrict __self,
+	                               struct video_lock *__restrict __result);
 
 	/* [1..1] Unlock a video buffer that has previously been mapped into memory. */
 	__ATTR_NONNULL((1, 2))
-	void (LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict self,
-	                                  struct video_lock const *__restrict lock);
+	void (LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict __self,
+	                                  struct video_lock const *__restrict __lock);
 
 	/* All of the following functions can optionally be implemented by drivers.
 	 * When not implemented, they are substituted during the driver installation
@@ -97,17 +97,27 @@ struct video_buffer_ops {
 	 * @param: clip:      When non-NULL, specify a clip-rect to which drawing should be restricted.
 	 *                    All canvas coords will be relative to this rectangle, and and attempt to
 	 *                    access a pixel outside this rect will be a no-op / appear to be fully opaque. */
-	void (LIBVIDEO_GFX_CC *vi_getgfx)(struct video_buffer *__restrict self,
-	                                  struct video_gfx *__restrict result,
-	                                  gfx_blendmode_t blendmode, __uintptr_t flags,
-	                                  video_color_t colorkey,
-	                                  struct video_buffer_rect *clip);
+	void (LIBVIDEO_GFX_CC *vi_getgfx)(struct video_buffer *__restrict __self,
+	                                  struct video_gfx *__restrict __result,
+	                                  gfx_blendmode_t __blendmode, __uintptr_t __flags,
+	                                  video_color_t __colorkey,
+	                                  struct video_buffer_rect const *__clip);
+	/* Clip the given `GFX', given a set of coords relative to the current clip state `GFX',
+	 * and store the newly  */
+	void (LIBVIDEO_GFX_CC *vi_clipgfx)(struct video_gfx const *__gfx,
+	                                   struct video_gfx *__result,
+	                                   __intptr_t __start_x, __intptr_t __start_y,
+	                                   __size_t __size_x, __size_t __size_y);
 };
 #endif /* __CC__ */
 
 
 
 #ifdef __CC__
+#ifdef __cplusplus
+__CXXDECL_BEGIN
+#endif /* __cplusplus */
+
 struct video_buffer {
 	__uintptr_t              vb_refcnt; /* Reference counter. */
 	struct video_buffer_ops *vb_ops;    /* [1..1][const] Buffer operations. */
@@ -180,6 +190,42 @@ public:
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __cplusplus */
 };
+
+#ifdef __cplusplus
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("clip")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef clip
+
+__CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
+video_gfx::clip(struct video_gfx &__result,
+                __intptr_t __start_x, __intptr_t __start_y,
+                __size_t __size_x, __size_t __size_y) const {
+	(*vx_buffer->vb_ops->vi_clipgfx)(this, &__result,
+	                                 __start_x, __start_y,
+	                                 __size_x, __size_y);
+	return __result;
+}
+
+__CXX_CLASSMEMBER struct video_gfx &LIBVIDEO_GFX_CC
+video_gfx::clip(__intptr_t __start_x, __intptr_t __start_y,
+                __size_t __size_x, __size_t __size_y) {
+	(*vx_buffer->vb_ops->vi_clipgfx)(this, this,
+	                                 __start_x, __start_y,
+	                                 __size_x, __size_y);
+	return *this;
+}
+
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("clip")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* __cplusplus */
+
+#ifdef __cplusplus
+__CXXDECL_END
+#endif /* __cplusplus */
+
 
 #define video_buffer_destroy(self) (*(self)->vb_ops->vi_destroy)(self)
 #define video_buffer_incref(self) \
