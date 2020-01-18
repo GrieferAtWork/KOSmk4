@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBVIDEO_CODEC_PALETTE_C
 #define GUARD_LIBVIDEO_CODEC_PALETTE_C 1
+#define _KOS_SOURCE 1
 
 #include "palette.h"
 
@@ -29,6 +30,9 @@
 #include <kos/types.h>
 
 #include <assert.h>
+#include <malloc.h>
+#include <stddef.h>
+#include <string.h>
 
 #include <libvideo/codec/palette.h>
 
@@ -53,21 +57,18 @@ color_delta(uint8_t r1, uint8_t g1, uint8_t b1,
 
 LOCAL video_pixel_t CC
 calculate_best_matching_palette_pixel(struct video_palette const *__restrict self,
-                                      video_color_t color) {
+                                      uint8_t r, uint8_t g, uint8_t b) {
 	video_pixel_t result = 0, i;
 	size_t best_delta = (size_t)-1;
-	uint8_t r = (uint8_t)((color & VIDEO_COLOR_RED_MASK) >> VIDEO_COLOR_RED_SHIFT);
-	uint8_t g = (uint8_t)((color & VIDEO_COLOR_GREEN_MASK) >> VIDEO_COLOR_GREEN_SHIFT);
-	uint8_t b = (uint8_t)((color & VIDEO_COLOR_BLUE_MASK) >> VIDEO_COLOR_BLUE_SHIFT);
 	assert(self->vp_cnt != 0);
 	for (i = 0; i < self->vp_cnt; ++i) {
 		size_t delta;
 		video_color_t color2;
 		uint8_t r2, g2, b2;
 		color2 = self->vp_pal.vdp_pal[i];
-		r2     = (uint8_t)((color2 & VIDEO_COLOR_RED_MASK) >> VIDEO_COLOR_RED_SHIFT);
-		g2     = (uint8_t)((color2 & VIDEO_COLOR_GREEN_MASK) >> VIDEO_COLOR_GREEN_SHIFT);
-		b2     = (uint8_t)((color2 & VIDEO_COLOR_BLUE_MASK) >> VIDEO_COLOR_BLUE_SHIFT);
+		r2     = VIDEO_COLOR_GET_RED(color2);
+		g2     = VIDEO_COLOR_GET_GREEN(color2);
+		b2     = VIDEO_COLOR_GET_BLUE(color2);
 		delta  = color_delta(r, g, b, r2, g2, b2);
 		if (best_delta > delta) {
 			best_delta = delta;
@@ -78,34 +79,32 @@ calculate_best_matching_palette_pixel(struct video_palette const *__restrict sel
 }
 
 
+#define VPC_SIZE     8
+#define VPC_SIGRBITS 2
+#define VPC_SIGGBITS 3 /* Give a bit more bits to green. */
+#define VPC_SIGBBITS 2
 
+union video_palette_cachepair {
+	struct {
+		uint8_t cp_r; /* Color R */
+		uint8_t cp_g; /* Color G */
+		uint8_t cp_b; /* Color B */
+		uint8_t cp_i; /* Palette index */
+	};
+	uint32_t cp_word;
+};
 
-LOCAL int CC
-get_known_color_index(video_color_t color) {
-	int result;
-	switch (color | VIDEO_COLOR_ALPHA_MASK) {
-	case VIDEO_COLOR_BLACK:   result = VIDEO_PALCOLOR_BLACK; break;
-	case VIDEO_COLOR_NAVY:    result = VIDEO_PALCOLOR_NAVY; break;
-	case VIDEO_COLOR_GREEN:   result = VIDEO_PALCOLOR_GREEN; break;
-	case VIDEO_COLOR_TEAL:    result = VIDEO_PALCOLOR_TEAL; break;
-	case VIDEO_COLOR_MAROON:  result = VIDEO_PALCOLOR_MAROON; break;
-	case VIDEO_COLOR_PURPLE:  result = VIDEO_PALCOLOR_PURPLE; break;
-	case VIDEO_COLOR_OLIVE:   result = VIDEO_PALCOLOR_OLIVE; break;
-	case VIDEO_COLOR_SILVER:  result = VIDEO_PALCOLOR_SILVER; break;
-	case VIDEO_COLOR_GREY:    result = VIDEO_PALCOLOR_GREY; break;
-	case VIDEO_COLOR_BLUE:    result = VIDEO_PALCOLOR_BLUE; break;
-	case VIDEO_COLOR_LIME:    result = VIDEO_PALCOLOR_LIME; break;
-	case VIDEO_COLOR_AQUA:    result = VIDEO_PALCOLOR_AQUA; break;
-	case VIDEO_COLOR_RED:     result = VIDEO_PALCOLOR_RED; break;
-	case VIDEO_COLOR_FUCHSIA: result = VIDEO_PALCOLOR_FUCHSIA; break;
-	case VIDEO_COLOR_YELLOW:  result = VIDEO_PALCOLOR_YELLOW; break;
-	case VIDEO_COLOR_WHITE:   result = VIDEO_PALCOLOR_WHITE; break;
-	default:
-		result = -1;
-		break;
-	}
-	return result;
-}
+struct video_palette_cacheset {
+	union video_palette_cachepair cs_pairs[VPC_SIZE];
+};
+
+struct video_palette_cache {
+	struct video_palette_cacheset vpc_sets[/*r:*/ 1 << VPC_SIGRBITS]
+	                                      [/*g:*/ 1 << VPC_SIGGBITS]
+	                                      [/*b:*/ 1 << VPC_SIGBBITS];
+};
+
+enum { x = sizeof(struct video_palette_cache) };
 
 
 /* Return the best-matching pixel for a given color.
@@ -121,18 +120,59 @@ INTERN NONNULL((1)) video_pixel_t CC
 libvideo_palette_getpixel(struct video_palette *__restrict self,
                           video_color_t color) {
 	video_pixel_t result;
-	int known = get_known_color_index(color);
-	if (known >= 0) {
-		/* Check the known color cache. */
-		result = self->vp_colors[known];
-		if (result != (video_pixel_t)-1)
-			return result;
+	struct video_palette_cache *cache;
+	struct video_palette_cacheset *cs;
+	uint8_t r, g, b;
+	r = VIDEO_COLOR_GET_RED(color);
+	g = VIDEO_COLOR_GET_GREEN(color);
+	b = VIDEO_COLOR_GET_BLUE(color);
+#if 0 /* TODO: Palette index caching support for larger palettes? */
+	if unlikely(self->vp_cnt > 0xff) {
 	}
-	result = calculate_best_matching_palette_pixel(self, color);
-	if (known >= 0) {
-		/* Save the known color cache. */
-		self->vp_colors[known] = result;
+#endif
+	cache = self->vp_cache;
+	if likely(cache) {
+		unsigned int i;
+		/* Search the cache for know translations. */
+		cs = &cache->vpc_sets[r >> (8 - VPC_SIGRBITS)]
+		                     [g >> (8 - VPC_SIGGBITS)]
+		                     [b >> (8 - VPC_SIGBBITS)];
+		for (i = 0; i < VPC_SIZE; ++i) {
+			union video_palette_cachepair ent;
+			ent.cp_word = ATOMIC_READ(cs->cs_pairs[i].cp_word);
+			if (ent.cp_r == r &&
+			    ent.cp_g == g &&
+			    ent.cp_b == b)
+				return ent.cp_i;
+		}
+	} else {
+		cache = (struct video_palette_cache *)calloc(1, sizeof(struct video_palette_cache));
+		if unlikely(!cache) {
+			result = calculate_best_matching_palette_pixel(self, r, g, b);
+			goto done;
+		}
+		COMPILER_WRITE_BARRIER();
+		if unlikely(!ATOMIC_CMPXCH(self->vp_cache, NULL, cache)) {
+			free(cache);
+			cache = self->vp_cache;
+			assert(cache);
+		}
+		cs = &cache->vpc_sets[r >> (8 - VPC_SIGRBITS)]
+		                     [g >> (8 - VPC_SIGGBITS)]
+		                     [b >> (8 - VPC_SIGBBITS)];
 	}
+	result = calculate_best_matching_palette_pixel(self, r, g, b);
+	if likely(result <= 0xff) {
+		/* Remember the result. */
+		union video_palette_cachepair ent;
+		ent.cp_r = r;
+		ent.cp_g = g;
+		ent.cp_b = b;
+		ent.cp_i = (uint8_t)result;
+		memmoveupl(cs->cs_pairs + 1, cs->cs_pairs, VPC_SIZE);
+		ATOMIC_WRITE(cs->cs_pairs[0].cp_word, ent.cp_word);
+	}
+done:
 	return result;
 }
 

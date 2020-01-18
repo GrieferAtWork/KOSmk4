@@ -58,15 +58,15 @@ __DECL_BEGIN
 
 #ifdef __CC__
 
+struct video_palette_cache;
 struct video_palette {
 	/* [1..1][const] Destruction callback (invoked when `vp_refcnt' reaches `0') */
 	__ATTR_NONNULL((1)) void
 	(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
-	__uintptr_t       vp_refcnt;     /* Reference counter. */
-	video_pixel_t     vp_colors[16]; /* Pre-computed palette indices for the best match for one of `VIDEO_PALCOLOR_*'
-	                                  * These are lazily populated when `video_palette_getpixel()' is called. */
-	__size_t          vp_cnt;        /* [const] # of colors (== VIDEO_CODEC_PALSIZ(...)). */
-	struct vd_palette vp_pal;        /* [const] OS palette data. */
+	__uintptr_t                 vp_refcnt; /* Reference counter. */
+	struct video_palette_cache *vp_cache;  /* [0..1][owned(malloc)] Color->pixel converter cache */
+	__size_t                    vp_cnt;    /* [const] # of colors (== VIDEO_CODEC_PALSIZ(...)). */
+	struct vd_palette           vp_pal;    /* [const] OS palette data. */
 };
 
 #define video_palette_destroy(self) (*(self)->vp_destroy)(self)

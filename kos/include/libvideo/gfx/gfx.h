@@ -362,6 +362,9 @@ public:
 	                                            video_color_t __color) {
 		(*vx_ops->fxo_fill)(this, __x, __y, __size_x, __size_y, __color);
 	}
+	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC fill(video_color_t __color) {
+		(*vx_ops->fxo_fill)(this, 0, 0, (size_t)-1, (size_t)-1, __color);
+	}
 
 	/* Outline an area with a rectangle. */
 	__CXX_CLASSMEMBER void LIBVIDEO_GFX_CC

@@ -123,10 +123,7 @@ int main(int argc, char *argv[]) {
 	fontprinter_data.vfp_u8word  = 0;
 
 again_font:
-	gfx.fill(0, 0,
-	         screen->vb_size_x,
-	         screen->vb_size_y,
-	         VIDEO_COLOR_WHITE);
+	gfx.fill(VIDEO_COLOR_WHITE);
 	fontprinter_data.vfp_curx = 0;
 	fontprinter_data.vfp_cury = 0;
 	format_printf(&video_fontprinter,
@@ -176,17 +173,11 @@ again_font:
 				exit(0);
 
 			case 'c':
-				gfx.fill(0, 0,
-				         screen->vb_size_x,
-				         screen->vb_size_y,
-				         VIDEO_COLOR_WHITE);
+				gfx.fill(VIDEO_COLOR_WHITE);
 				continue;
 
 			case 'v':
-				gfx.fill(0, 0,
-				         screen->vb_size_x,
-				         screen->vb_size_y,
-				         VIDEO_COLOR_BLACK);
+				gfx.fill(VIDEO_COLOR_BLACK);
 				continue;
 
 			case 'w': {

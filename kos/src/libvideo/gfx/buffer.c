@@ -92,6 +92,7 @@ libvideo_buffer_create(unsigned int type, size_t size_x, size_t size_y,
 
 PRIVATE NONNULL((1)) void LIBVIDEO_CODEC_CC
 screen_pal_destroy(struct video_palette *__restrict self) {
+	free(self->vp_cache);
 	free(self);
 }
 
@@ -138,7 +139,7 @@ libvideo_buffer_screen(void) {
 		result->vb_format.vf_pal = pal;
 		pal->vp_destroy = &screen_pal_destroy;
 		pal->vp_refcnt  = 1;
-		memsetl(pal->vp_colors, (uint32_t)-1, count);
+		pal->vp_cache   = NULL;
 		pal->vp_cnt = count;
 		/* Load the current palette. */
 		getpal.vp_codec = format.vdf_codec;
