@@ -260,8 +260,6 @@ step:
 			size_t dst_size_x, dst_size_y;
 			uintptr_t x = rand() % screen->vb_size_x;
 			uintptr_t y = rand() % screen->vb_size_y;
-			uintptr_t x2 = rand() % screen->vb_size_x;
-			uintptr_t y2 = rand() % screen->vb_size_y;
 			dst_size_x = rand() % (screen->vb_size_x - x);
 			dst_size_y = rand() % (screen->vb_size_y - y);
 			clip.vbr_startx = video_gfx_startx(&gfx);
@@ -273,15 +271,13 @@ step:
 			            gfx.vx_flags | VIDEO_GFX_FBLUR,
 			            gfx.vx_colorkey,
 			            &clip);
-			gfx.stretch((intptr_t)x - gfx.vx_offt_x,
-			            (intptr_t)y - gfx.vx_offt_y,
-			            dst_size_x,
-			            dst_size_y,
-			            blurgfx,
-			            (intptr_t)x2 - gfx.vx_offt_x,
-			            (intptr_t)y2 - gfx.vx_offt_y,
-			            rand() % (screen->vb_size_x - x2),
-			            rand() % (screen->vb_size_y - y2));
+			gfx.blit((intptr_t)x - gfx.vx_offt_x,
+			         (intptr_t)y - gfx.vx_offt_y,
+			         blurgfx,
+			         (intptr_t)x - gfx.vx_offt_x,
+			         (intptr_t)y - gfx.vx_offt_y,
+			         dst_size_x,
+			         dst_size_y);
 			gfx.rect((intptr_t)x - gfx.vx_offt_x,
 			         (intptr_t)y - gfx.vx_offt_y,
 			         dst_size_x,
