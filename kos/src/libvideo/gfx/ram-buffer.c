@@ -81,6 +81,231 @@ libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self,
 }
 
 INTERN video_color_t CC
+libvideo_gfx_ramgfx_getcolor_blur(struct video_gfx const *__restrict self,
+                                  uintptr_t x, uintptr_t y) {
+	byte_t *line;
+	video_color_t result;
+	video_color_t colors[8];
+	uint32_t r, g, b, a;
+	unsigned int i, color_count;
+#define MODE_XMIN 0x1
+#define MODE_XMAX 0x2
+#define MODE_YMIN 0x4
+#define MODE_YMAX 0x8
+	uint8_t mode = 0x0;
+	ASSERT_ABS_COORDS(self, x, y);
+	line = RAMGFX_DATA + y * RAMGFX_STRIDE;
+	/* Figure out how we're situated in relation to bounds. */
+	if unlikely(x == self->vx_xmin)
+		mode |= MODE_XMIN;
+	if unlikely(y == self->vx_ymin)
+		mode |= MODE_YMIN;
+	if unlikely(x == self->vx_xend - 1)
+		mode |= MODE_XMAX;
+	if unlikely(y == self->vx_yend - 1)
+		mode |= MODE_YMAX;
+	/* Load colors as needed. */
+	switch (__builtin_expect(mode, 0x0)) {
+#define GETCOLOR(xoff, yoff) \
+		self->vx_buffer->vb_format.getcolor(line + (RAMGFX_STRIDE * (yoff)), x - (xoff))
+
+	case 0x0:
+		/* +++ */
+		/* +.+ */
+		/* +++ */
+		color_count = 8;
+		colors[0] = GETCOLOR(-1, -1);
+		colors[1] = GETCOLOR(0, -1);
+		colors[2] = GETCOLOR(1, -1);
+
+		colors[3] = GETCOLOR(-1, 0);
+		colors[4] = GETCOLOR(1, 0);
+
+		colors[5] = GETCOLOR(-1, 1);
+		colors[6] = GETCOLOR(0, 1);
+		colors[7] = GETCOLOR(1, 1);
+		break;
+
+	case MODE_XMIN:
+		/* -++ */
+		/* -.+ */
+		/* -++ */
+		color_count = 5;
+		colors[0] = GETCOLOR(0, -1);
+		colors[1] = GETCOLOR(1, -1);
+
+		colors[2] = GETCOLOR(1, 0);
+
+		colors[3] = GETCOLOR(0, 1);
+		colors[4] = GETCOLOR(1, 1);
+		break;
+
+	case MODE_XMAX:
+		/* ++- */
+		/* +.- */
+		/* ++- */
+		color_count = 5;
+		colors[0] = GETCOLOR(-1, -1);
+		colors[1] = GETCOLOR(0, -1);
+
+		colors[2] = GETCOLOR(-1, 0);
+
+		colors[3] = GETCOLOR(-1, 1);
+		colors[4] = GETCOLOR(0, 1);
+		break;
+
+	case MODE_YMIN:
+		/* --- */
+		/* +.+ */
+		/* +++ */
+		color_count = 5;
+		colors[0] = GETCOLOR(-1, 0);
+		colors[1] = GETCOLOR(1, 0);
+		colors[2] = GETCOLOR(-1, 1);
+		colors[3] = GETCOLOR(0, 1);
+		colors[4] = GETCOLOR(1, 1);
+		break;
+
+	case MODE_YMAX:
+		/* +++ */
+		/* +.+ */
+		/* --- */
+		color_count = 5;
+		colors[0] = GETCOLOR(-1, -1);
+		colors[1] = GETCOLOR(0, -1);
+		colors[2] = GETCOLOR(1, -1);
+		colors[3] = GETCOLOR(-1, 0);
+		colors[4] = GETCOLOR(1, 0);
+		break;
+
+	case MODE_YMIN | MODE_YMAX:
+		/* --- */
+		/* +.+ */
+		/* --- */
+		color_count = 2;
+		colors[0] = GETCOLOR(-1, 0);
+		colors[1] = GETCOLOR(1, 0);
+		break;
+
+	case MODE_XMIN | MODE_XMAX:
+		/* -+- */
+		/* -.- */
+		/* -+- */
+		color_count = 2;
+		colors[0] = GETCOLOR(0, -1);
+		colors[1] = GETCOLOR(0, 1);
+		break;
+
+	case MODE_YMIN | MODE_XMIN:
+		/* --- */
+		/* -.+ */
+		/* -++ */
+		color_count = 3;
+		colors[0] = GETCOLOR(1, 0);
+		colors[1] = GETCOLOR(0, 1);
+		colors[2] = GETCOLOR(1, 1);
+		break;
+
+	case MODE_YMIN | MODE_XMAX:
+		/* --- */
+		/* +.- */
+		/* ++- */
+		color_count = 3;
+		colors[0] = GETCOLOR(-1, 0);
+		colors[1] = GETCOLOR(-1, 1);
+		colors[2] = GETCOLOR(0, 1);
+		break;
+
+	case MODE_YMAX | MODE_XMIN:
+		/* -++ */
+		/* -.+ */
+		/* --- */
+		color_count = 3;
+		colors[0] = GETCOLOR(0, -1);
+		colors[1] = GETCOLOR(1, -1);
+		colors[2] = GETCOLOR(1, 0);
+		break;
+
+	case MODE_YMAX | MODE_XMAX:
+		/* ++- */
+		/* +.- */
+		/* --- */
+		color_count = 3;
+		colors[0] = GETCOLOR(-1, -1);
+		colors[1] = GETCOLOR(0, -1);
+		colors[2] = GETCOLOR(-1, 0);
+		break;
+
+	case MODE_XMIN | MODE_XMAX | MODE_YMIN:
+		/* --- */
+		/* -.- */
+		/* -+- */
+		color_count = 1;
+		colors[0] = GETCOLOR(0, 1);
+		break;
+
+	case MODE_XMIN | MODE_XMAX | MODE_YMAX:
+		/* -+- */
+		/* -.- */
+		/* --- */
+		color_count = 1;
+		colors[0] = GETCOLOR(0, -1);
+		break;
+
+	case MODE_YMIN | MODE_YMAX | MODE_XMIN:
+		/* --- */
+		/* -.+ */
+		/* --- */
+		color_count = 1;
+		colors[0] = GETCOLOR(1, 0);
+		break;
+
+	case MODE_YMIN | MODE_YMAX | MODE_XMAX:
+		/* --- */
+		/* +.- */
+		/* --- */
+		color_count = 1;
+		colors[0] = GETCOLOR(-1, 0);
+		break;
+
+	case MODE_XMIN | MODE_YMIN | MODE_XMAX | MODE_YMAX:
+		/* --- */
+		/* -.- */
+		/* --- */
+		color_count = 0;
+		break;
+
+#undef GETCOLOR
+	default: __builtin_unreachable();
+	}
+#undef MODE_XMIN
+#undef MODE_XMAX
+#undef MODE_YMIN
+#undef MODE_YMAX
+	result = self->vx_buffer->vb_format.getcolor(line, x);
+	r = VIDEO_COLOR_GET_RED(result);
+	g = VIDEO_COLOR_GET_GREEN(result);
+	b = VIDEO_COLOR_GET_BLUE(result);
+	a = VIDEO_COLOR_GET_ALPHA(result);
+	for (i = 0; i < color_count; ++i) {
+		r += VIDEO_COLOR_GET_RED(colors[i]);
+		g += VIDEO_COLOR_GET_GREEN(colors[i]);
+		b += VIDEO_COLOR_GET_BLUE(colors[i]);
+		a += VIDEO_COLOR_GET_ALPHA(colors[i]);
+	}
+	++color_count;
+	r /= color_count;
+	g /= color_count;
+	b /= color_count;
+	a /= color_count;
+	result = VIDEO_COLOR_RGBA((uint8_t)r,
+	                          (uint8_t)g,
+	                          (uint8_t)b,
+	                          (uint8_t)a);
+	return result;
+}
+
+INTERN video_color_t CC
 libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self,
                                       uintptr_t x, uintptr_t y) {
 	byte_t *line;
@@ -395,9 +620,15 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 		result->vx_yend   = self->vb_size_y;
 	}
 
-	result->vx_pxops.fxo_getcolor = (colorkey & VIDEO_COLOR_ALPHA_MASK) != 0
-	                                ? &libvideo_gfx_ramgfx_getcolor_with_key
-	                                : &libvideo_gfx_ramgfx_getcolor;
+	/* Select how pixels should be read. */
+	if (flags & VIDEO_GFX_FBLUR) {
+		result->vx_pxops.fxo_getcolor = &libvideo_gfx_ramgfx_getcolor_blur;
+	} else if ((colorkey & VIDEO_COLOR_ALPHA_MASK) != 0) {
+		result->vx_pxops.fxo_getcolor = &libvideo_gfx_ramgfx_getcolor_with_key;
+	} else {
+		result->vx_pxops.fxo_getcolor = &libvideo_gfx_ramgfx_getcolor;
+	}
+
 	/* Detect special blend modes. */
 	if (blendmode == GFX_BLENDINFO_OVERRIDE) {
 		result->vx_pxops.fxo_putcolor = &libvideo_gfx_ramgfx_putcolor_noblend;

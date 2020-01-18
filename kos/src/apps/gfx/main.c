@@ -198,8 +198,7 @@ again_font:
 			}	break;
 
 			case 's':
-				action = rand() % 4;
-				goto step;
+				goto random_step;
 
 			case '0' ... '9':
 				action = buf[0] - '0';
@@ -210,7 +209,8 @@ again_font:
 		}
 		if (is_blocking)
 			continue;
-		action = rand() % 4;
+random_step:
+		action = rand() % 5;
 step:
 		color = VIDEO_COLOR_RGBA(rand() % 256,
 		                         rand() % 256,
@@ -252,6 +252,41 @@ step:
 			            (intptr_t)y2 - gfx.vx_offt_y,
 			            rand() % (screen->vb_size_x - x2),
 			            rand() % (screen->vb_size_y - y2));
+		}	break;
+
+		case 3: {
+			struct video_gfx blurgfx;
+			struct video_buffer_rect clip;
+			size_t dst_size_x, dst_size_y;
+			uintptr_t x = rand() % screen->vb_size_x;
+			uintptr_t y = rand() % screen->vb_size_y;
+			uintptr_t x2 = rand() % screen->vb_size_x;
+			uintptr_t y2 = rand() % screen->vb_size_y;
+			dst_size_x = rand() % (screen->vb_size_x - x);
+			dst_size_y = rand() % (screen->vb_size_y - y);
+			clip.vbr_startx = video_gfx_startx(&gfx);
+			clip.vbr_starty = video_gfx_starty(&gfx);
+			clip.vbr_sizex  = video_gfx_sizex(&gfx);
+			clip.vbr_sizey  = video_gfx_sizey(&gfx);
+			screen->gfx(blurgfx,
+			            gfx.vx_blend,
+			            gfx.vx_flags | VIDEO_GFX_FBLUR,
+			            gfx.vx_colorkey,
+			            &clip);
+			gfx.stretch((intptr_t)x - gfx.vx_offt_x,
+			            (intptr_t)y - gfx.vx_offt_y,
+			            dst_size_x,
+			            dst_size_y,
+			            blurgfx,
+			            (intptr_t)x2 - gfx.vx_offt_x,
+			            (intptr_t)y2 - gfx.vx_offt_y,
+			            rand() % (screen->vb_size_x - x2),
+			            rand() % (screen->vb_size_y - y2));
+			gfx.rect((intptr_t)x - gfx.vx_offt_x,
+			         (intptr_t)y - gfx.vx_offt_y,
+			         dst_size_x,
+			         dst_size_y,
+			         VIDEO_COLOR_BLACK);
 		}	break;
 
 		default:

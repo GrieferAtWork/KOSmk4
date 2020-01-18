@@ -154,6 +154,34 @@ line_lhhl(struct video_gfx *__restrict self,
 	}
 }
 
+#if 0
+#define line_hori(self, x, y, length, color) \
+	do {                                     \
+		uintptr_t _x = (x);                  \
+		uintptr_t _y = (y);                  \
+		size_t _len  = (length);             \
+		uintptr_t _i;                        \
+		for (_i = 0; _i < _len; ++_i) {      \
+			video_gfx_putabscolor(self,      \
+			                      _x + _i,   \
+			                      _y,        \
+			                      color);    \
+		}                                    \
+	} __WHILE0
+#define line_vert(self, x, y, length, color) \
+	do {                                     \
+		uintptr_t _x = (x);                  \
+		uintptr_t _y = (y);                  \
+		size_t _len  = (length);             \
+		uintptr_t _i;                        \
+		for (_i = 0; _i < _len; ++_i) {      \
+			video_gfx_putabscolor(self,      \
+			                      _x,        \
+			                      _y + _i,   \
+			                      color);    \
+		}                                    \
+	} __WHILE0
+#else
 LOCAL void CC
 line_hori(struct video_gfx *__restrict self,
           uintptr_t x, uintptr_t y, size_t length,
@@ -166,7 +194,6 @@ line_hori(struct video_gfx *__restrict self,
 		                      color);
 	}
 }
-
 LOCAL void CC
 line_vert(struct video_gfx *__restrict self,
           uintptr_t x, uintptr_t y, size_t length,
@@ -179,6 +206,7 @@ line_vert(struct video_gfx *__restrict self,
 		                      color);
 	}
 }
+#endif
 
 LOCAL void CC
 line_fill(struct video_gfx *__restrict self,

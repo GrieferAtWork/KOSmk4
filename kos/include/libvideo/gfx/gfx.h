@@ -109,10 +109,18 @@ typedef __uint64_t gfx_blendmode_t;
 
 
 
-/* Video graphic flags. */
+/* Video graphic flags.
+ * [READ]:  Indicates a flag that affects the results when the associated
+ *          GFX context is used as source, or when reading pixel data.
+ * [WRITE]: Indicates a flag that affects the results of graphics operations
+ *          that use the associated GFX context as destination, or when
+ *          writing pixel data. */
 #define VIDEO_GFX_FNORMAL     0x0000 /* Normal render flags. */
-#define VIDEO_GFX_FAALINES    0x0001 /* Render smooth lines. */
-#define VIDEO_GFX_FLINEARBLIT 0x0002 /* Use linear interpolation for stretch() (else: use nearest) */
+#define VIDEO_GFX_FAALINES    0x0001 /* [WRITE] Render smooth lines. */
+#define VIDEO_GFX_FLINEARBLIT 0x0002 /* [WRITE] Use linear interpolation for stretch() (else: use nearest) */
+#define VIDEO_GFX_FBLUR       0x0004 /* [READ]  Pixel reads will return the average of the surrounding 9 pixels.
+                                      *         For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
+                                      * The behavior is weak undefined if this flag is used alongside a non-zero color key */
 
 
 #ifdef __CC__
@@ -246,9 +254,12 @@ struct video_gfx {
 	__uintptr_t            vx_yend;      /* [const] Absolute buffer end coord in Y (<= `vx_buffer->vb_size_y') */
 	void                  *vx_driver[4]; /* [?..?] Driver-specific graphics data. */
 
+	/* Return the API-visible clip rect offset in X or Y */
+#define video_gfx_startx(self) (self)->vx_offt_x
+#define video_gfx_starty(self) (self)->vx_offt_y
 	/* Return the API-visible clip rect size in X or Y */
-#define video_gfx_sizex(self) ((__size_t)((__intptr_t)(self)->vx_xend - (self)->vx_offt_x))
-#define video_gfx_sizey(self) ((__size_t)((__intptr_t)(self)->vx_yend - (self)->vx_offt_y))
+#define video_gfx_sizex(self)  ((__size_t)((__intptr_t)(self)->vx_xend - (self)->vx_offt_x))
+#define video_gfx_sizey(self)  ((__size_t)((__intptr_t)(self)->vx_yend - (self)->vx_offt_y))
 
 
 #ifdef __cplusplus

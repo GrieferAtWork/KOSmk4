@@ -121,23 +121,21 @@ GFX_FUNC(libvideo_gfx_defaultgfx_line)(struct video_gfx *__restrict self,
 		temp = y2, y2 = y1, y1 = temp;
 	} else if (x1 == x2) {
 		if (y1 > y2) {
-			libvideo_gfx_defaultgfx_vline(self,
-			                              (uintptr_t)x1,
-			                              (uintptr_t)y2,
-			                              (size_t)((uintptr_t)y1 - (uintptr_t)y2) + 1,
-			                              color);
-		} else if (y1 < y2) {
-			libvideo_gfx_defaultgfx_vline(self,
-			                              (uintptr_t)x1,
-			                              (uintptr_t)y1,
-			                              (size_t)((uintptr_t)y2 - (uintptr_t)y1) + 1,
-			                              color);
-		} else {
+			temp = y2;
+			y2   = y1;
+			y1   = temp;
+		} else if (y1 == y2) {
 			video_gfx_putabscolor(self,
 			                      (uintptr_t)x1,
 			                      (uintptr_t)y1,
 			                      color);
+			return;
 		}
+		line_vert(self,
+		          (uintptr_t)x1,
+		          (uintptr_t)y1,
+		          (size_t)((uintptr_t)y2 - (uintptr_t)y1) + 1,
+		          color);
 		return;
 	}
 	assert(x2 > x1);
@@ -156,11 +154,11 @@ GFX_FUNC(libvideo_gfx_defaultgfx_line)(struct video_gfx *__restrict self,
 		          (size_t)((uintptr_t)y1 - (uintptr_t)y2) + 1,
 		          color);
 	} else {
-		libvideo_gfx_defaultgfx_hline(self,
-		                              (uintptr_t)x1,
-		                              (uintptr_t)y1,
-		                              (size_t)((uintptr_t)x2 - (uintptr_t)x1) + 1,
-		                              color);
+		line_hori(self,
+		          (uintptr_t)x1,
+		          (uintptr_t)y1,
+		          (size_t)((uintptr_t)x2 - (uintptr_t)x1) + 1,
+		          color);
 	}
 #undef COHSUTH_COMPUTEOUTCODE
 #undef COHSUTH_INSIDE
@@ -326,8 +324,11 @@ GFX_FUNC(libvideo_gfx_defaultgfx_rect)(struct video_gfx *__restrict self,
 		HLINE((uintptr_t)x, (uintptr_t)y, size_x); /* YMIN / YMAX */
 		break;
 
-	default:
+	case 0: /* Completely out-of-bounds */
 		break;
+
+	default:
+		__builtin_unreachable();
 	}
 #undef VLINE
 #undef HLINE

@@ -55,6 +55,7 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops_munm
 
 /* GFX functions for memory-based video buffers (without GPU support) */
 INTDEF video_color_t CC libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
+INTDEF video_color_t CC libvideo_gfx_ramgfx_getcolor_blur(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
 INTDEF video_color_t CC libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
 INTDEF void CC libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
 INTDEF void CC libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
