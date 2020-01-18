@@ -104,9 +104,6 @@ struct video_palette_cache {
 	                                      [/*b:*/ 1 << VPC_SIGBBITS];
 };
 
-enum { x = sizeof(struct video_palette_cache) };
-
-
 /* Return the best-matching pixel for a given color.
  * For the purpose of determining the best match, this algorithm
  * leans towards emphasizing colors best viewed by the human eye,
