@@ -60,8 +60,6 @@ INTERN byte_t *(KCALL x86_decode_modrm)(byte_t *__restrict text,
 #ifdef __x86_64__
 	if (flags & F_REX_R)
 		info->mi_reg |= 0x8;
-	if (flags & F_REX_B)
-		info->mi_rm |= 0x8;
 #endif /* __x86_64__ */
 	switch (rmbyte & MODRM_MOD_MASK) {
 	case 0x0 << MODRM_MOD_SHIFT:
@@ -126,6 +124,10 @@ parse_sib_byte:
 		break;
 	default: __builtin_unreachable();
 	}
+#ifdef __x86_64__
+	if (flags & F_REX_B)
+		info->mi_rm |= 0x8;
+#endif /* __x86_64__ */
 	return text;
 }
 
@@ -545,7 +547,6 @@ INTERN u32
 	u32 result;
 	byte_t *text = *ptext;
 	*pflags = 0;
-	result = 0;
 #ifdef __x86_64__
 	if (irregs_iscompat(&state->ics_irregs))
 		*pflags |= F_IS_X32;

@@ -1215,7 +1215,7 @@ null_segment_error:
 			PERTASK_SET(this_exception_pointers[1],
 			            (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
 		}
-		printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? [pc=%p,%p,opcode=%I32u] [tid=%u]\n",
+		printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? [pc=%p,%p,opcode=%I32x] [tid=%u]\n",
 		       orig_pc, pc, opcode, (unsigned int)task_getroottid_s());
 		goto unwind_state;
 	}

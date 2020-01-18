@@ -444,8 +444,6 @@ decode_modrm(struct disassembler *__restrict self,
 		info->mi_rm = MODRM_GETRM(rmbyte);
 		if (flags & F_REX_R)
 			info->mi_reg |= 0x8;
-		if (flags & F_REX_B)
-			info->mi_rm |= 0x8;
 		switch (rmbyte & MODRM_MOD_MASK) {
 
 		case 0x0 << MODRM_MOD_SHIFT:
@@ -517,6 +515,8 @@ parse_sib_byte:
 
 		default: __builtin_unreachable();
 		}
+		if (flags & F_REX_B)
+			info->mi_rm |= 0x8;
 	}
 }
 
