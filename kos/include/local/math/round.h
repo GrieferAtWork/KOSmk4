@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2e0b748 */
+/* HASH CRC-32:0xe9a5b4c8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,11 +31,11 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(round))(double __x) {
 	if (__x < 0) {
 		/* result >= x */
 		if ((__result - __x) >= 0.5)
-			__result += 1.0;
+			__result -= 1.0;
 	} else {
 		/* result <= x */
 		if ((__x - __result) >= 0.5)
-			__result -= 1.0;
+			__result += 1.0;
 	}
 	return __result;
 }

@@ -20,8 +20,8 @@
 #ifdef __INTELLISENSE__
 #include "gfx.c"
 //#define DEFINE_STRETCH 1
-#define DEFINE_BITSTRETCHBLIT 1
-//#define DEFINE_BITSTRETCHFILL 1
+//#define DEFINE_BITSTRETCHBLIT 1
+#define DEFINE_BITSTRETCHFILL 1
 #endif /* __INTELLISENSE__ */
 
 #if (defined(DEFINE_STRETCH) + defined(DEFINE_BITSTRETCHBLIT) + defined(DEFINE_BITSTRETCHFILL)) != 1
@@ -86,10 +86,10 @@ getlinearcolor(struct video_gfx const *__restrict self,
 	rel_x = x - (double)base_x;
 	rel_y = y - (double)base_y;
 	/* Calculate color affinity */
-	result  = colorfactor(c[0][0], (rel_x + rel_y) / 2.0);
-	result += colorfactor(c[0][1], (rel_x + (1.0 - rel_y)) / 2.0);
-	result += colorfactor(c[1][0], ((1.0 - rel_x) + rel_y) / 2.0);
-	result += colorfactor(c[1][1], ((1.0 - rel_x) + (1.0 - rel_y)) / 2.0);
+	result  = colorfactor(c[0][0], ((1.0 - rel_x) + (1.0 - rel_y)) / 2.0);
+	result += colorfactor(c[0][1], ((1.0 - rel_x) + rel_y) / 2.0);
+	result += colorfactor(c[1][0], (rel_x + (1.0 - rel_y)) / 2.0);
+	result += colorfactor(c[1][1], (rel_x + rel_y) / 2.0);
 	return result;
 }
 #endif /* !GETLINEARCOLOR_DEFINED */
@@ -113,7 +113,7 @@ getlinearbit(void const *__restrict bitmask,
              size_t bitmask_size_x,
              size_t bitmask_size_y,
              double x, double y) {
-	video_color_t result;
+	uint16_t result;
 	bool c[2][2];
 	uintptr_t base_x, base_y;
 	double rel_x, rel_y;
@@ -156,11 +156,13 @@ getlinearbit(void const *__restrict bitmask,
 	rel_x = x - (double)base_x;
 	rel_y = y - (double)base_y;
 	/* Calculate color affinity */
-	result  = bitfactor(c[0][0], (rel_x + rel_y) / 2.0);
-	result += bitfactor(c[0][1], (rel_x + (1.0 - rel_y)) / 2.0);
-	result += bitfactor(c[1][0], ((1.0 - rel_x) + rel_y) / 2.0);
-	result += bitfactor(c[1][1], ((1.0 - rel_x) + (1.0 - rel_y)) / 2.0);
-	return result;
+	result  = bitfactor(c[0][0], ((1.0 - rel_x) + (1.0 - rel_y)) / 2.0);
+	result += bitfactor(c[0][1], ((1.0 - rel_x) + rel_y) / 2.0);
+	result += bitfactor(c[1][0], (rel_x + (1.0 - rel_y)) / 2.0);
+	result += bitfactor(c[1][1], (rel_x + rel_y) / 2.0);
+	if (result > 0xff)
+		result = 0xff;
+	return (uint8_t)result;
 }
 #endif /* !GETLINEARBIT_DEFINED */
 #endif /* !DEFINE_STRETCH */
@@ -197,26 +199,24 @@ FUNC(stretch_perpixel_fixed)(struct video_gfx *self,
 		for (y = 0; y < dst_size_y; ++y) {
 			for (x = 0; x < dst_size_x; ++x) {
 				video_color_t used_color;
-#ifndef DEFINE_BITSTRETCHFILL
-				double src_xr, src_yr;
-#endif /* !DEFINE_BITSTRETCHFILL */
+				double rel_x, rel_y;
+				rel_x = (double)x * x_scale;
+				rel_y = (double)y * y_scale;
 #ifndef DEFINE_STRETCH
 				uint8_t bit;
-				double bit_xr, bit_yr;
-				bit_xr = round((double)x * x_scale);
-				bit_yr = round((double)y * y_scale);
 				bit = getlinearbit(bitmask,
 				                   bitmask_base_offset,
 				                   bitmask_size_x,
 				                   bitmask_size_y,
-				                   bit_xr, bit_yr);
+				                   rel_x,
+				                   rel_y);
 				if (!bit)
 					continue;
 #endif /* !DEFINE_STRETCH */
 #ifndef DEFINE_BITSTRETCHFILL
-				src_xr = (double)x * x_scale + (double)src_x;
-				src_yr = (double)y * y_scale + (double)src_y;
-				used_color = getlinearcolor(src, src_xr, src_yr);
+				rel_x += (double)src_x;
+				rel_y += (double)src_y;
+				used_color = getlinearcolor(src, rel_x, rel_y);
 #else /* !DEFINE_BITSTRETCHFILL */
 				used_color = color;
 #endif /* DEFINE_BITSTRETCHFILL */

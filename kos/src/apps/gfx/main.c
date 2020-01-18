@@ -108,29 +108,51 @@ int main(int argc, char *argv[]) {
 
 	/* Bind the screen buffer. */
 	screen = kos::inherit(video_buffer_screen());
-	screen->gfx(gfx);
+	screen->gfx(gfx,
+	            GFX_BLENDINFO_ALPHA,
+	            VIDEO_GFX_FLINEARBLIT,
+	            0,
+	            NULL);
 
-	gfx.fill(0, 0,
-	         screen->vb_size_x,
-	         screen->vb_size_y,
-	         VIDEO_COLOR_WHITE);
-
+	fontprinter_data.vfp_height  = 20;
 	fontprinter_data.vfp_font    = font;
 	fontprinter_data.vfp_gfx     = &gfx;
-	fontprinter_data.vfp_height  = 16;
-	fontprinter_data.vfp_curx    = 0;
-	fontprinter_data.vfp_cury    = 0;
 	fontprinter_data.vfp_lnstart = 0;
 	fontprinter_data.vfp_lnend   = gfx.vx_size_x;
 	fontprinter_data.vfp_color   = VIDEO_COLOR_BLACK;
 	fontprinter_data.vfp_u8word  = 0;
 
+again_font:
+	gfx.fill(0, 0,
+	         screen->vb_size_x,
+	         screen->vb_size_y,
+	         VIDEO_COLOR_WHITE);
+	fontprinter_data.vfp_curx = 0;
+	fontprinter_data.vfp_cury = 0;
 	format_printf(&video_fontprinter,
 	              &fontprinter_data,
 	              "Hello World!\n"
 	              "Second line");
 
-	{ char buf[1]; read(STDIN_FILENO, buf, 1); }
+	for (;;) {
+		char buf[1];
+		if (read(STDIN_FILENO, buf, 1) < 1)
+			break;
+		if (buf[0] == '+') {
+			++fontprinter_data.vfp_height;
+		} else if (buf[0] == '-') {
+			--fontprinter_data.vfp_height;
+		} else if (buf[0] == 's') {
+			screen->gfx(gfx,
+			            GFX_BLENDINFO_ALPHA,
+			            gfx.vx_flags ^ VIDEO_GFX_FLINEARBLIT,
+			            0,
+			            NULL);
+		} else if (buf[0] == 'q') {
+			break;
+		}
+		goto again_font;
+	}
 
 	fcntl(STDIN_FILENO, F_SETFL,
 	      fcntl(STDIN_FILENO, F_GETFL) |

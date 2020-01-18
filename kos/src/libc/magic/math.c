@@ -490,11 +490,11 @@ round:(double x) -> double {
 	if (x < 0) {
 		/* result >= x */
 		if ((result - x) >= 0.5)
-			result += 1.0;
+			result -= 1.0;
 	} else {
 		/* result <= x */
 		if ((x - result) >= 0.5)
-			result -= 1.0;
+			result += 1.0;
 	}
 	return result;
 }

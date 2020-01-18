@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbae6c5c4 */
+/* HASH CRC-32:0xe26c8376 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -205,11 +205,11 @@ NOTHROW(LIBCCALL libc_round)(double x) {
 	if (x < 0) {
 		/* result >= x */
 		if ((result - x) >= 0.5)
-			result += 1.0;
+			result -= 1.0;
 	} else {
 		/* result <= x */
 		if ((x - result) >= 0.5)
-			result -= 1.0;
+			result += 1.0;
 	}
 	return result;
 }
@@ -288,11 +288,11 @@ NOTHROW(LIBCCALL libc_roundf)(float x) {
 	if (x < 0) {
 		/* result >= x */
 		if ((result - x) >= 0.5)
-			result += 1.0;
+			result -= 1.0;
 	} else {
 		/* result <= x */
 		if ((x - result) >= 0.5)
-			result -= 1.0;
+			result += 1.0;
 	}
 	return result;
 }
@@ -371,11 +371,11 @@ NOTHROW(LIBCCALL libc_roundl)(long double x) {
 	if (x < 0) {
 		/* result >= x */
 		if ((result - x) >= 0.5)
-			result += 1.0;
+			result -= 1.0;
 	} else {
 		/* result <= x */
 		if ((x - result) >= 0.5)
-			result -= 1.0;
+			result += 1.0;
 	}
 	return result;
 }
