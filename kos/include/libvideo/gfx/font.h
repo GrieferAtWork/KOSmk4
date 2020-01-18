@@ -119,7 +119,7 @@ LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_font *LIBVIDEO_GFX_CC video_
 struct video_fontprinter_data {
 	struct video_font *vfp_font;     /* [1..1][const] The font used for printing. */
 	struct video_gfx  *vfp_gfx;      /* [1..1][const] Target graphics context. */
-	__uintptr_t        vfp_height;   /* Glyph height. */
+	__size_t           vfp_height;   /* Glyph height. */
 	__intptr_t         vfp_curx;     /* X coord for the top-left corner of the next glyph */
 	__intptr_t         vfp_cury;     /* Y coord for the top-left corner of the next glyph */
 	__intptr_t         vfp_lnstart;  /* Starting X coord for additional lines (when >= `vfp_lnend', new lines are disabled) */

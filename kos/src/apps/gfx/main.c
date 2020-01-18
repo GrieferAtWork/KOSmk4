@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 	            0,
 	            NULL);
 
-	fontprinter_data.vfp_height  = 20;
+	fontprinter_data.vfp_height  = 16;
 	fontprinter_data.vfp_font    = font;
 	fontprinter_data.vfp_gfx     = &gfx;
 	fontprinter_data.vfp_lnstart = 0;

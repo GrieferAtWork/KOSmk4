@@ -384,6 +384,15 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	}
 
 	/* TODO: Add optimizations for same-codec blits */
+	/* TODO: Add optimizations `vc_linefill()' and `vc_linecopy()'
+	 * NOTE: `vc_linecopy()' can only be used when no blending might ever
+	 *       be required during same-codec blit operations. This can be
+	 *       determined by the combination of `blendmode', as well as the
+	 *       selected video codec/palette (e.g. with generic alpha-blending,
+	 *       a palette-based codec, and a palette with all colors specifying
+	 *       an alpha-channel set to 255, `vc_linecopy()' can still be used
+	 *       as though `GFX_BLENDINFO_OVERRIDE' was given (at least for
+	 *       same-codec bliz operations)) */
 	result->vx_ops = (result->vx_offt_x || result->vx_offt_y)
 	                 ? libvideo_gfx_defaultgfx_getops_o()
 	                 : libvideo_gfx_defaultgfx_getops();

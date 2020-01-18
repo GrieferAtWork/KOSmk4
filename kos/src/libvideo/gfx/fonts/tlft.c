@@ -99,7 +99,11 @@ libvideo_tlft_drawglyph(struct video_font *__restrict self,
 		gfx->bitfill(x, y, result, height, color, bm);
 	} else {
 		/* Must stretch the glyph somehow... */
-		result = (height * me->tf_hdr->h_chwidth) / me->tf_bestheight;
+		result = ((height * me->tf_hdr->h_chwidth) +
+		          (me->tf_bestheight / 2)) /
+		         me->tf_bestheight;
+		if unlikely(!result)
+			result = 1;
 		gfx->bitstretchfill(x, y, result, height, color,
 		                    me->tf_hdr->h_chwidth,
 		                    me->tf_bestheight, bm);
@@ -114,8 +118,18 @@ PRIVATE ATTR_PURE uintptr_t CC
 libvideo_tlft_glyphsize(struct video_font *__restrict self,
                         uintptr_t height, char32_t UNUSED(ord)) {
 	struct tlft_font *me;
+	uintptr_t result;
 	me = (struct tlft_font *)self;
-	return (height * me->tf_hdr->h_chwidth) / me->tf_bestheight;
+	if (height == me->tf_bestheight) {
+		result = me->tf_hdr->h_chwidth;
+	} else {
+		result = ((height * me->tf_hdr->h_chwidth) +
+		          (me->tf_bestheight / 2)) /
+		         me->tf_bestheight;
+	}
+	if unlikely(!result)
+		result = 1;
+	return result;
 }
 
 

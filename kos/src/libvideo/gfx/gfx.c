@@ -311,7 +311,7 @@ libvideo_gfx_defaultgfx_fill(struct video_gfx *__restrict self,
 		size_y = self->vx_size_y - y;
 	}
 	for (i = 0; i < size_y; ++i)
-		self->hline(x, y + i, size_x, color);
+		libvideo_gfx_defaultgfx_hline(self, x, y + i, size_x, color);
 }
 
 INTERN void CC
