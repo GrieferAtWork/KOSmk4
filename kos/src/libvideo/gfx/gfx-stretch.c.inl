@@ -111,6 +111,7 @@ LOCAL ATTR_PURE uint8_t CC
 getlinearbit(void const *__restrict bitmask,
              size_t bitmask_base_offset,
              size_t bitmask_size_x,
+             size_t bitmask_size_y,
              double x, double y) {
 	video_color_t result;
 	bool c[2][2];
@@ -119,15 +120,37 @@ getlinearbit(void const *__restrict bitmask,
 	size_t bitno;
 	base_x = (uintptr_t)x;
 	base_y = (uintptr_t)y;
+	if unlikely(base_x >= bitmask_size_x)
+		return 0; /* This can happen because of rounding */
+	if unlikely(base_y >= bitmask_size_y)
+		return 0; /* This can happen because of rounding */
+
 	/* Load source colors. */
 	bitno = bitmask_base_offset + base_x + base_y * bitmask_size_x;
 	c[0][0] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
-	++bitno;
-	c[1][0] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
-	bitno += bitmask_size_x;
-	c[1][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
-	--bitno;
-	c[0][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+	if unlikely(base_x == bitmask_size_x - 1) {
+		/* This can happen because of rounding */
+		c[1][0] = false;
+		c[1][1] = false;
+		if unlikely(base_y == bitmask_size_y - 1) {
+			c[0][1] = false; /* This can happen because of rounding */
+		} else {
+			bitno += bitmask_size_x;
+			c[0][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+		}
+	} else {
+		++bitno;
+		c[1][0] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+		if unlikely(base_y == bitmask_size_y - 1) {
+			c[1][1] = false; /* This can happen because of rounding */
+			c[0][1] = false;
+		} else {
+			bitno += bitmask_size_x;
+			c[1][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+			--bitno;
+			c[0][1] = (((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))) != 0;
+		}
+	}
 
 	/* Figure out the sub-pixel relation. */
 	rel_x = x - (double)base_x;
@@ -158,7 +181,8 @@ FUNC(stretch_perpixel_fixed)(struct video_gfx *self,
                              ,
                              void const *__restrict bitmask,
                              size_t bitmask_base_offset,
-                             size_t bitmask_size_x
+                             size_t bitmask_size_x,
+                             size_t bitmask_size_y
 #endif /* !DEFINE_STRETCH */
                              ) {
 	size_t x, y;
@@ -184,6 +208,7 @@ FUNC(stretch_perpixel_fixed)(struct video_gfx *self,
 				bit = getlinearbit(bitmask,
 				                   bitmask_base_offset,
 				                   bitmask_size_x,
+				                   bitmask_size_y,
 				                   bit_xr, bit_yr);
 				if (!bit)
 					continue;
@@ -217,10 +242,16 @@ FUNC(stretch_perpixel_fixed)(struct video_gfx *self,
 				video_color_t color;
 #endif /* DEFINE_BITSTRETCHFILL */
 				uintptr_t rel_x, rel_y;
+#ifndef DEFINE_STRETCH
+				size_t bitno;
+#endif /* !DEFINE_STRETCH */
 				rel_x = (uintptr_t)round((double)x * x_scale);
 				rel_y = (uintptr_t)round((double)y * y_scale);
 #ifndef DEFINE_STRETCH
-				size_t bitno;
+				if unlikely(rel_x >= bitmask_size_x)
+					continue; /* This can happen because of rounding */
+				if unlikely(rel_y >= bitmask_size_y)
+					continue; /* This can happen because of rounding */
 				bitno = bitmask_base_offset + rel_x + rel_y * bitmask_size_x;
 				if (!(((uint8_t *)bitmask)[bitno / 8] & ((uint8_t)1 << (7 - (bitno % 8)))))
 					continue;
@@ -266,10 +297,12 @@ FUNC(libvideo_gfx_defaultgfx)(struct video_gfx *self,
 	uintptr_t temp;
 	IF_BITBLIT(size_t bitmask_base_offset);
 	IF_BITBLIT(size_t bitmask_size_x);
+	IF_BITBLIT(size_t bitmask_size_y);
 	if (!dst_size_x || !dst_size_y || !src_size_x || !src_size_y)
 		return;
 	IF_BITBLIT(bitmask_base_offset = 0);
 	IF_BITBLIT(bitmask_size_x = src_size_x);
+	IF_BITBLIT(bitmask_size_y = src_size_y);
 	if (dst_x < 0) {
 		double portion;
 		size_t srcpart;
@@ -468,7 +501,8 @@ FUNC(libvideo_gfx_defaultgfx)(struct video_gfx *self,
 		                             ,
 		                             bitmask,
 		                             bitmask_base_offset,
-		                             bitmask_size_x
+		                             bitmask_size_x,
+		                             bitmask_size_y
 #endif /* !DEFINE_STRETCH */
 		                             );
 	}

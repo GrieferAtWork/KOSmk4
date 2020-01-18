@@ -384,7 +384,9 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	}
 
 	/* TODO: Add optimizations for same-codec blits */
-	result->vx_ops = libvideo_gfx_defaultgfx_getops();
+	result->vx_ops = (result->vx_offt_x || result->vx_offt_y)
+	                 ? libvideo_gfx_defaultgfx_getops_o()
+	                 : libvideo_gfx_defaultgfx_getops();
 
 	return;
 empty_clip:
