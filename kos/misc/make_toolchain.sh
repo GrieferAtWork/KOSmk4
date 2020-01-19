@@ -475,6 +475,7 @@ remove_bad_fixinclude() {
 	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/float.h"
 	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/iso646.h"
 	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include-fixed/limits.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include-fixed/syslimits.h"
 	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/varargs.h"
 }
 

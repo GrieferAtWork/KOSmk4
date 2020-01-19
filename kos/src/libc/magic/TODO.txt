@@ -1,42 +1,45 @@
 
 Add support for *_chk variants (using __builtin_object_size())
 
-argp.c
-langinfo.c
-nl_types.c
+<a.out.h>
 
-rpc.auth.c
-rpc.auth_des.c
-rpc.auth_unix.c
-rpc.clnt.c
-rpc.des_crypt.c
-rpc.pmap_clnt.c
-rpc.pmap_prot.c
-rpc.pmap_rmt.c
-rpc.rpc.c
-rpc.rpc_des.c
-rpc.rpc_msg.c
-rpc.svc.c
-rpc.svc_auth.c
-rpc.types.c
-rpc.xdr.c
+<argp.h>
+<langinfo.h>
+<nl_types.h>
+<tgmath.h>
 
-sys.capability.c  (found in /usr/include/sys/capability.h; aka not in arch-headers!)
-sys.fanotify.c
-sys.gmon.c
-sys.gmon_out.c  (Only some macros, and structs)
-sys.inotify.c
-sys.mtio.c  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
-sys.perm.c  (i386-only header)
-sys.prctl.c
-sys.profil.c
-sys.queue.c (It's just like our <hybrid/sequence/list.h>)
-sys.quota.c
-sys.raw.c  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
-sys.reg.c  (It only contains some macros, but those interact with sys/ucontext.h)
-sys.signalfd.c
-sys.sysctl.c
-sys.vtimes.c
+<rpc/auth.h>
+<rpc/auth_des.h>
+<rpc/auth_unix.h>
+<rpc/clnt.h>
+<rpc/des_crypt.h>
+<rpc/pmap_clnt.h>
+<rpc/pmap_prot.h>
+<rpc/pmap_rmt.h>
+<rpc/rpc.h>
+<rpc/rpc_des.h>
+<rpc/rpc_msg.h>
+<rpc/svc.h>
+<rpc/svc_auth.h>
+<rpc/types.h>
+<rpc/xdr.h>
 
-gnu.libc-version.c
+<sys/capability.h>  (found in /usr/include/sys/capability.h; aka not in arch-headers!)
+<sys/fanotify.h>
+<sys/gmon.h>
+<sys/gmon_out.h>  (Only some macros, and structs)
+<sys/inotify.h>
+<sys/mtio.h>  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
+<sys/perm.h>  (i386-only header)
+<sys/prctl.h>
+<sys/profil.h>
+<sys/queue.h> (It's just like our <hybrid/sequence/list.h>)
+<sys/quota.h>
+<sys/raw.h>  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
+<sys/reg.h>  (It only contains some macros, but those interact with sys/ucontext.h)
+<sys/signalfd.h>
+<sys/sysctl.h>
+<sys/vtimes.h>
+
+<gnu/libc-version.h>
 
