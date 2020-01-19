@@ -111,7 +111,7 @@ struct video_palette_cache {
  * NOTE: This function may lazily allocate `self->vp_cache', meaning
  *       that once used, the caller is responsible to eventually
  *       cleanup that field using `free(self->vp_cache)'. */
-INTERN NONNULL((1)) video_pixel_t CC
+INTERN WUNUSED NONNULL((1)) video_pixel_t CC
 libvideo_palette_getpixel(struct video_palette *__restrict self,
                           video_color_t color) {
 	video_pixel_t result;

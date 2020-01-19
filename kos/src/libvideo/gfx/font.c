@@ -141,7 +141,7 @@ libvideo_font_lookup(char const *name) {
 }
 
 /* Print text into a graphics context through use of this pformatprinter-compatible function. */
-INTERN ssize_t __LIBCCALL
+INTERN NONNULL((1, 2)) ssize_t __LIBCCALL
 libvideo_fontprinter(/*struct video_fontprinter_data **/ void *arg,
                      /*utf-8*/ char const *__restrict data, size_t datalen) {
 	struct video_fontprinter_data *context;
@@ -156,7 +156,7 @@ libvideo_fontprinter(/*struct video_fontprinter_data **/ void *arg,
 }
 
 /* Same as `video_fontprinter()', but used to directly print UTF-32 text. */
-INTERN ssize_t __LIBCCALL
+INTERN NONNULL((1, 2)) ssize_t __LIBCCALL
 libvideo_fontprinter32(/*struct video_fontprinter_data **/ void *arg,
                        char32_t const *__restrict data, size_t datalen) {
 	size_t i;

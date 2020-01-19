@@ -55,7 +55,7 @@ DECL_BEGIN
 #define GFX_XMAX (self->vx_xend - 1)
 #define GFX_YMAX (self->vx_yend - 1)
 
-INTERN void CC
+INTERN NONNULL((1)) void CC
 GFX_FUNC(libvideo_gfx_defaultgfx_line)(struct video_gfx *__restrict self,
                                        intptr_t x1, intptr_t y1,
                                        intptr_t x2, intptr_t y2,
@@ -175,7 +175,7 @@ GFX_FUNC(libvideo_gfx_defaultgfx_line)(struct video_gfx *__restrict self,
 /************************************************************************/
 /* RECT()                                                               */
 /************************************************************************/
-INTERN void CC
+INTERN NONNULL((1)) void CC
 GFX_FUNC(libvideo_gfx_defaultgfx_rect)(struct video_gfx *__restrict self,
                                        intptr_t x, intptr_t y,
                                        size_t size_x, size_t size_y,
@@ -345,7 +345,7 @@ GFX_FUNC(libvideo_gfx_defaultgfx_rect)(struct video_gfx *__restrict self,
 /************************************************************************/
 /* HLINE()                                                              */
 /************************************************************************/
-INTERN void CC
+INTERN NONNULL((1)) void CC
 GFX_FUNC(libvideo_gfx_defaultgfx_hline)(struct video_gfx *__restrict self,
                                         intptr_t x, intptr_t y, size_t length,
                                         video_color_t color) {
@@ -377,7 +377,7 @@ GFX_FUNC(libvideo_gfx_defaultgfx_hline)(struct video_gfx *__restrict self,
 /************************************************************************/
 /* VLINE()                                                              */
 /************************************************************************/
-INTERN void CC
+INTERN NONNULL((1)) void CC
 GFX_FUNC(libvideo_gfx_defaultgfx_vline)(struct video_gfx *__restrict self,
                                         intptr_t x, intptr_t y, size_t length,
                                         video_color_t color) {
@@ -409,7 +409,7 @@ GFX_FUNC(libvideo_gfx_defaultgfx_vline)(struct video_gfx *__restrict self,
 /************************************************************************/
 /* FILL()                                                               */
 /************************************************************************/
-INTERN void CC
+INTERN NONNULL((1)) void CC
 GFX_FUNC(libvideo_gfx_defaultgfx_fill)(struct video_gfx *__restrict self,
                                        intptr_t x, intptr_t y,
                                        size_t size_x, size_t size_y,

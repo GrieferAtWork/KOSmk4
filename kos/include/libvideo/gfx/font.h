@@ -42,19 +42,24 @@ struct video_font_ops {
 	/* All operators within this structure are [1..1] */
 
 	/* Destroy the given video font object. */
-	void (LIBVIDEO_GFX_CC *vfo_destroy)(struct video_font *__restrict __self);
+	__ATTR_NONNULL((1)) void
+	(LIBVIDEO_GFX_CC *vfo_destroy)(struct video_font *__restrict __self);
+
 	/* Draw a single glyph at the given coords and return its width.
 	 * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-	__size_t (LIBVIDEO_GFX_CC *vfo_drawglyph)(struct video_font *__restrict __self,
-	                                          struct video_gfx *__restrict __gfx,
-	                                          __intptr_t __x, __intptr_t __y,
-	                                          __size_t __height,
-	                                          __CHAR32_TYPE__ __ord,
-	                                          video_color_t __color);
+	__ATTR_NONNULL((1, 2)) __size_t
+	(LIBVIDEO_GFX_CC *vfo_drawglyph)(struct video_font *__restrict __self,
+	                                 struct video_gfx *__restrict __gfx,
+	                                 __intptr_t __x, __intptr_t __y,
+	                                 __size_t __height,
+	                                 __CHAR32_TYPE__ __ord,
+	                                 video_color_t __color);
+
 	/* Return the width (in pixels) of a glyph, given its height (in pixels). */
-	__size_t (LIBVIDEO_GFX_CC *vfo_glyphsize)(struct video_font *__restrict __self,
-	                                          __size_t __height,
-	                                          __CHAR32_TYPE__ __ord);
+	__ATTR_NONNULL((1)) __size_t
+	(LIBVIDEO_GFX_CC *vfo_glyphsize)(struct video_font *__restrict __self,
+	                                 __size_t __height,
+	                                 __CHAR32_TYPE__ __ord);
 };
 
 struct video_font {
@@ -131,23 +136,25 @@ struct video_fontprinter_data {
 };
 
 /* Print text into a graphics context through use of this pformatprinter-compatible function. */
-typedef __ssize_t (__LIBCCALL *PVIDEO_FONTPRINTER)(/*struct video_fontprinter_data **/ void *__arg,
-                                                   /*utf-8*/ char const *__restrict __data,
-                                                   size_t __datalen);
+typedef __ATTR_NONNULL((1, 2)) __ssize_t
+(__LIBCCALL *PVIDEO_FONTPRINTER)(/*struct video_fontprinter_data **/ void *__arg,
+                                 /*utf-8*/ char const *__restrict __data,
+                                 __size_t __datalen);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
-LIBVIDEO_GFX_DECL __ssize_t __LIBCCALL
+LIBVIDEO_GFX_DECL __ATTR_NONNULL((1, 2)) __ssize_t __LIBCCALL
 video_fontprinter(/*struct video_fontprinter_data **/ void *__arg,
-                  /*utf-8*/ char const *__restrict __data, size_t __datalen);
+                  /*utf-8*/ char const *__restrict __data, __size_t __datalen);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Same as `video_fontprinter()', but used to directly print UTF-32 text. */
-typedef __ssize_t (__LIBCCALL *PVIDEO_FONTPRINTER32)(/*struct video_fontprinter_data **/ void *__arg,
-                                                     __CHAR32_TYPE__ const *__restrict __data,
-                                                     size_t __datalen);
+typedef __ATTR_NONNULL((1, 2)) __ssize_t
+(__LIBCCALL *PVIDEO_FONTPRINTER32)(/*struct video_fontprinter_data **/ void *__arg,
+                                   __CHAR32_TYPE__ const *__restrict __data,
+                                   __size_t __datalen);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ssize_t __LIBCCALL
 video_fontprinter32(/*struct video_fontprinter_data **/ void *__arg,
-                    __CHAR32_TYPE__ const *__restrict __data, size_t __datalen);
+                    __CHAR32_TYPE__ const *__restrict __data, __size_t __datalen);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Same as `video_fontprinter()', but only print a single UTF-32 character.

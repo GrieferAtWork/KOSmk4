@@ -88,7 +88,7 @@ DECL_BEGIN
 #endif /* ASSERT_ABS_COORDS_IS_NOOP */
 
 
-LOCAL void CC
+LOCAL NONNULL((1)) void CC
 line_llhh(struct video_gfx *__restrict self,
           uintptr_t x, uintptr_t y,
           size_t sizex, size_t sizey,
@@ -121,7 +121,7 @@ line_llhh(struct video_gfx *__restrict self,
 	}
 }
 
-LOCAL void CC
+LOCAL NONNULL((1)) void CC
 line_lhhl(struct video_gfx *__restrict self,
           uintptr_t x, uintptr_t y,
           size_t sizex, size_t sizey,
@@ -182,7 +182,8 @@ line_lhhl(struct video_gfx *__restrict self,
 		}                                    \
 	} __WHILE0
 #else
-LOCAL void CC
+
+LOCAL NONNULL((1)) void CC
 line_hori(struct video_gfx *__restrict self,
           uintptr_t x, uintptr_t y, size_t length,
           video_color_t color) {
@@ -194,7 +195,8 @@ line_hori(struct video_gfx *__restrict self,
 		                      color);
 	}
 }
-LOCAL void CC
+
+LOCAL NONNULL((1)) void CC
 line_vert(struct video_gfx *__restrict self,
           uintptr_t x, uintptr_t y, size_t length,
           video_color_t color) {
@@ -208,7 +210,7 @@ line_vert(struct video_gfx *__restrict self,
 }
 #endif
 
-LOCAL void CC
+LOCAL NONNULL((1)) void CC
 line_fill(struct video_gfx *__restrict self,
           uintptr_t x, uintptr_t y,
           size_t size_x, size_t size_y,

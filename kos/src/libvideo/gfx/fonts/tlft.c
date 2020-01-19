@@ -44,7 +44,7 @@
 DECL_BEGIN
 
 /* Destroy the given video font object. */
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 libvideo_tlft_destroy(struct video_font *__restrict self) {
 	struct tlft_font *me;
 	me = (struct tlft_font *)self;
@@ -73,7 +73,7 @@ libvideo_tlft_lookup(struct tlft_font const *__restrict self,
 }
 
 /* Return the width (in pixels) of a glyph, given its height (in pixels). */
-PRIVATE ATTR_PURE size_t CC
+PRIVATE ATTR_PURE NONNULL((1)) size_t CC
 libvideo_tlft_glyphsize(struct video_font *__restrict self,
                         size_t height, char32_t UNUSED(ord)) {
 	struct tlft_font *me;
@@ -93,7 +93,7 @@ libvideo_tlft_glyphsize(struct video_font *__restrict self,
 
 /* Draw a single glyph at the given coords and return its width.
  * If the glyph was not recognized (or when `HEIGHT' was `0'), return 0 instead. */
-PRIVATE size_t CC
+PRIVATE NONNULL((1, 2)) size_t CC
 libvideo_tlft_drawglyph(struct video_font *__restrict self,
                         struct video_gfx *__restrict gfx,
                         intptr_t x,
@@ -165,7 +165,7 @@ struct video_font_ops *CC libvideo_tlft_getops(void) {
 
 /* Returns `(__REF struct video_font *)-1' if not a tlft file.
  * Upon success, the mmap-ed region `base...+=size' is inherited. */
-INTERN WUNUSED __REF struct video_font *CC
+INTERN WUNUSED NONNULL((1)) __REF struct video_font *CC
 libvideo_font_tryopen_tlft(void *base, size_t size) {
 	TLFT_Hdr *hdr;
 	__REF struct tlft_font *result;

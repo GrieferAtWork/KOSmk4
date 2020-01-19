@@ -100,7 +100,7 @@ typedef struct {
  * lookup for a given TLFT file that has been mapped into memory.
  * Upon success, return the `1 << self->h_log2chsize'-byte large
  * bitmap for `ch', or `NULL' if the character is not printable. */
-__LOCAL __uint8_t const *
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __uint8_t const *
 tlft_lookup(TLFT_Hdr const *__restrict self, __uint32_t ch) {
 	__uint8_t const *chars, *ascii;
 	TLFT_UniGroup *groups;

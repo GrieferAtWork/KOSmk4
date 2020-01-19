@@ -24,12 +24,12 @@
 
 #include <hybrid/compiler.h>
 
-#include "buffer.h"
-
 #include <libvideo/codec/codecs.h>
 #include <libvideo/codec/palette.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
+
+#include "buffer.h"
 
 DECL_BEGIN
 
@@ -54,16 +54,16 @@ INTDEF ATTR_RETNONNULL WUNUSED struct video_buffer_ops *CC rambuffer_getops_munm
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
-INTDEF video_color_t CC libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
-INTDEF video_color_t CC libvideo_gfx_ramgfx_getcolor_blur(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
-INTDEF video_color_t CC libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
-INTDEF void CC libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
-INTDEF void CC libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
-INTDEF void CC libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
+INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
+INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor_blur(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
+INTDEF NONNULL((1)) video_color_t CC libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self, uintptr_t x, uintptr_t y);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
+INTDEF NONNULL((1)) void CC libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self, uintptr_t x, uintptr_t y, video_color_t color);
 
 
 /* Create a new RAM-based video buffer */
-INTDEF WUNUSED /*REF*/ struct video_buffer *CC
+INTDEF WUNUSED NONNULL((3)) /*REF*/ struct video_buffer *CC
 libvideo_rambuffer_create(size_t size_x, size_t size_y,
                           struct video_codec *__restrict codec,
                           struct video_palette *palette);

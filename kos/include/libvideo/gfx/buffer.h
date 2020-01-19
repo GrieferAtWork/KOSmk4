@@ -62,7 +62,8 @@ struct video_buffer_ops {
 	/* NOTE: _ALL_ Callbacks are always [1..1] */
 
 	/* Buffer finalization. */
-	void (LIBVIDEO_GFX_CC *vi_destroy)(struct video_buffer *__restrict __self);
+	__ATTR_NONNULL((1)) void
+	(LIBVIDEO_GFX_CC *vi_destroy)(struct video_buffer *__restrict __self);
 
 	/* Lock the video buffer into memory.
 	 * @return: 0:  Success
@@ -91,17 +92,20 @@ struct video_buffer_ops {
 	 * @param: clip:      When non-NULL, specify a clip-rect to which drawing should be restricted.
 	 *                    All canvas coords will be relative to this rectangle, and and attempt to
 	 *                    access a pixel outside this rect will be a no-op / appear to be fully opaque. */
-	void (LIBVIDEO_GFX_CC *vi_getgfx)(struct video_buffer *__restrict __self,
-	                                  struct video_gfx *__restrict __result,
-	                                  gfx_blendmode_t __blendmode, __uintptr_t __flags,
-	                                  video_color_t __colorkey,
-	                                  struct video_buffer_rect const *__clip);
+	__ATTR_NONNULL((1, 2)) void
+	(LIBVIDEO_GFX_CC *vi_getgfx)(struct video_buffer *__restrict __self,
+	                             struct video_gfx *__restrict __result,
+	                             gfx_blendmode_t __blendmode, __uintptr_t __flags,
+	                             video_color_t __colorkey,
+	                             struct video_buffer_rect const *__clip);
+
 	/* Clip the given `GFX', given a set of coords relative to the current clip state `GFX',
 	 * and store the newly  */
-	void (LIBVIDEO_GFX_CC *vi_clipgfx)(struct video_gfx const *__gfx,
-	                                   struct video_gfx *__result,
-	                                   __intptr_t __start_x, __intptr_t __start_y,
-	                                   __size_t __size_x, __size_t __size_y);
+	__ATTR_NONNULL((1, 2)) void
+	(LIBVIDEO_GFX_CC *vi_clipgfx)(struct video_gfx const *__gfx,
+	                              struct video_gfx *__result,
+	                              __intptr_t __start_x, __intptr_t __start_y,
+	                              __size_t __size_x, __size_t __size_y);
 };
 #endif /* __CC__ */
 

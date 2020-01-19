@@ -40,12 +40,12 @@ INTDEF WUNUSED __REF struct video_font *CC
 libvideo_font_lookup(char const *name);
 
 /* Print text into a graphics context through use of this pformatprinter-compatible function. */
-INTDEF ssize_t __LIBCCALL
+INTDEF NONNULL((1, 2)) ssize_t __LIBCCALL
 libvideo_fontprinter(/*struct video_fontprinter_data **/ void *arg,
                      /*utf-8*/ char const *__restrict data, size_t datalen);
 
 /* Same as `video_fontprinter()', but used to directly print UTF-32 text. */
-INTDEF ssize_t __LIBCCALL
+INTDEF NONNULL((1, 2)) ssize_t __LIBCCALL
 libvideo_fontprinter32(/*struct video_fontprinter_data **/ void *arg,
                        char32_t const *__restrict data, size_t datalen);
 

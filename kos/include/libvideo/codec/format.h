@@ -80,13 +80,13 @@ public: /* Low-level, memory-based pixel accessor functions. */
 	/* Copy `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
 	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC linecopy(__byte_t *__restrict dst_line, __uintptr_t dst_x,
 	                                                  __byte_t const *__restrict src_line, __uintptr_t src_x,
-	                                                  __size_t num_pixels) {
+	                                                  __size_t num_pixels) const {
 		(*vf_codec->vc_linecopy)(dst_line, dst_x, src_line, src_x, num_pixels);
 	}
 
 	/* Fill `num_pixels' neighboring (the caller must ensure that all coords are in-bounds) */
 	__CXX_CLASSMEMBER void LIBVIDEO_CODEC_CC linefill(__byte_t *__restrict line, __uintptr_t dst_x,
-	                                                  video_pixel_t pixel, __size_t num_pixels) {
+	                                                  video_pixel_t pixel, __size_t num_pixels) const {
 		(*vf_codec->vc_linefill)(line, dst_x, pixel, num_pixels);
 	}
 

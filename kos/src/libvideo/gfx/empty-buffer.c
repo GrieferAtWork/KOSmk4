@@ -43,46 +43,46 @@
 DECL_BEGIN
 
 /* Stub GFX functions for the empty video buffer. */
-INTERN ATTR_CONST video_color_t CC
+INTERN ATTR_CONST NONNULL((1)) video_color_t CC
 video_gfx_empty_getcolor(struct video_gfx const *__restrict UNUSED(self),
                          uintptr_t UNUSED(x), uintptr_t UNUSED(y)) {
 	return 0;
 }
 
-INTERN void CC
+INTERN NONNULL((1)) void CC
 video_gfx_empty_putcolor(struct video_gfx *__restrict UNUSED(self),
                          uintptr_t UNUSED(x), uintptr_t UNUSED(y),
                          video_color_t UNUSED(color)) {
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 video_gfx_empty_line(struct video_gfx *__restrict UNUSED(self),
                      intptr_t UNUSED(x1), intptr_t UNUSED(y1),
                      intptr_t UNUSED(x2), intptr_t UNUSED(y2),
                      video_color_t UNUSED(color)) {
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 video_gfx_empty_vhline(struct video_gfx *__restrict UNUSED(self),
                        intptr_t UNUSED(x), intptr_t UNUSED(y),
                        size_t UNUSED(length), video_color_t UNUSED(color)) {
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 video_gfx_empty_fill(struct video_gfx *__restrict UNUSED(self),
                      intptr_t UNUSED(x), intptr_t UNUSED(y),
                      size_t UNUSED(size_x), size_t UNUSED(size_y),
                      video_color_t UNUSED(color)) {
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1)) void CC
 video_gfx_empty_rect(struct video_gfx *__restrict UNUSED(self),
                      intptr_t UNUSED(x), intptr_t UNUSED(y),
                      size_t UNUSED(size_x), size_t UNUSED(size_y),
                      video_color_t UNUSED(color)) {
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1, 4)) void CC
 video_gfx_empty_blit(struct video_gfx *UNUSED(self),
                      intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
                      struct video_gfx const *UNUSED(src),
@@ -90,7 +90,7 @@ video_gfx_empty_blit(struct video_gfx *UNUSED(self),
                      size_t UNUSED(size_x), size_t UNUSED(size_y)) {
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1, 6)) void CC
 video_gfx_empty_stretch(struct video_gfx *UNUSED(self),
                         intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
                         size_t UNUSED(dst_size_x), size_t UNUSED(dst_size_y),
@@ -99,7 +99,7 @@ video_gfx_empty_stretch(struct video_gfx *UNUSED(self),
                         size_t UNUSED(src_size_x), size_t UNUSED(src_size_y)) {
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1, 7)) void CC
 video_gfx_empty_bitfill(struct video_gfx *__restrict UNUSED(self),
                         intptr_t UNUSED(x), intptr_t UNUSED(y),
                         video_color_t UNUSED(color),
@@ -108,7 +108,7 @@ video_gfx_empty_bitfill(struct video_gfx *__restrict UNUSED(self),
                         uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1, 4, 9)) void CC
 video_gfx_empty_bitblit(struct video_gfx *UNUSED(self),
                         intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
                         struct video_gfx const *UNUSED(src),
@@ -118,7 +118,7 @@ video_gfx_empty_bitblit(struct video_gfx *UNUSED(self),
                         uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1, 9)) void CC
 video_gfx_empty_bitstretchfill(struct video_gfx *__restrict UNUSED(self),
                                intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
                                size_t UNUSED(dst_size_x), size_t UNUSED(dst_size_y),
@@ -128,7 +128,7 @@ video_gfx_empty_bitstretchfill(struct video_gfx *__restrict UNUSED(self),
                                uintptr_t UNUSED(bitskip), size_t UNUSED(bitscan)) {
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1, 6, 11)) void CC
 video_gfx_empty_bitstretchblit(struct video_gfx *UNUSED(self),
                                intptr_t UNUSED(dst_x), intptr_t UNUSED(dst_y),
                                size_t UNUSED(dst_size_x), size_t UNUSED(dst_size_y),
@@ -168,7 +168,7 @@ struct video_gfx_ops *CC libvideo_getemptygfxops(void) {
 
 
 
-PRIVATE void LIBVIDEO_GFX_CC
+PRIVATE NONNULL((1)) void LIBVIDEO_GFX_CC
 video_buffer_empty_destroy(struct video_buffer *__restrict self) {
 	(void)self;
 	assert_failed("Must never get here!");
@@ -197,7 +197,7 @@ video_buffer_empty_unlock(struct video_buffer *__restrict UNUSED(self),
 	assert(lock->vl_stride == 0);
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1, 2)) void CC
 video_buffer_empty_getgfx(struct video_buffer *__restrict self,
                           struct video_gfx *__restrict result,
                           gfx_blendmode_t blendmode, uintptr_t flags,
@@ -218,7 +218,7 @@ video_buffer_empty_getgfx(struct video_buffer *__restrict self,
 	result->vx_yend               = 0;
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1, 2)) void CC
 video_buffer_empty_clipgfx(struct video_gfx const *gfx,
                            struct video_gfx *result,
                            intptr_t UNUSED(start_x), intptr_t UNUSED(start_y),

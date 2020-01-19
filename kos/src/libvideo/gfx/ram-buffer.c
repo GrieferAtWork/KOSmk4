@@ -71,7 +71,7 @@ DECL_BEGIN
 
 
 /* GFX functions for memory-based video buffers (without GPU support) */
-INTERN video_color_t CC
+INTERN NONNULL((1)) video_color_t CC
 libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self,
                              uintptr_t x, uintptr_t y) {
 	byte_t *line;
@@ -80,7 +80,7 @@ libvideo_gfx_ramgfx_getcolor(struct video_gfx const *__restrict self,
 	return self->vx_buffer->vb_format.getcolor(line, x);
 }
 
-INTERN video_color_t CC
+INTERN NONNULL((1)) video_color_t CC
 libvideo_gfx_ramgfx_getcolor_blur(struct video_gfx const *__restrict self,
                                   uintptr_t x, uintptr_t y) {
 	byte_t *line;
@@ -305,7 +305,7 @@ libvideo_gfx_ramgfx_getcolor_blur(struct video_gfx const *__restrict self,
 	return result;
 }
 
-INTERN video_color_t CC
+INTERN NONNULL((1)) video_color_t CC
 libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self,
                                       uintptr_t x, uintptr_t y) {
 	byte_t *line;
@@ -377,7 +377,7 @@ libvideo_gfx_ramgfx_getcolor_with_key(struct video_gfx const *__restrict self,
 	} __WHILE0
 
 
-LOCAL video_color_t CC
+LOCAL ATTR_CONST WUNUSED video_color_t CC
 blend_color(video_color_t dst, video_color_t src, gfx_blendmode_t mode) {
 	uint8_t new_lhs_r, new_lhs_g, new_lhs_b, new_lhs_a;
 	uint8_t new_rhs_r, new_rhs_g, new_rhs_b, new_rhs_a;
@@ -437,7 +437,7 @@ blend_color(video_color_t dst, video_color_t src, gfx_blendmode_t mode) {
 }
 
 
-INTERN void CC
+INTERN NONNULL((1)) void CC
 libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self,
                              uintptr_t x, uintptr_t y, video_color_t color) {
 	byte_t *line;
@@ -452,7 +452,7 @@ libvideo_gfx_ramgfx_putcolor(struct video_gfx *__restrict self,
 	buffer->vb_format.setcolor(line, x, n);
 }
 
-INTERN void CC
+INTERN NONNULL((1)) void CC
 libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self,
                                      uintptr_t x, uintptr_t y, video_color_t color) {
 	byte_t *line;
@@ -463,7 +463,7 @@ libvideo_gfx_ramgfx_putcolor_noblend(struct video_gfx *__restrict self,
 	buffer->vb_format.setcolor(line, x, color);
 }
 
-INTERN void CC
+INTERN NONNULL((1)) void CC
 libvideo_gfx_ramgfx_putcolor_alphablend(struct video_gfx *__restrict self,
                                         uintptr_t x, uintptr_t y, video_color_t color) {
 	byte_t *line;
@@ -530,7 +530,8 @@ rambuffer_unlock(struct video_buffer *__restrict self,
 	(void)lock;
 }
 
-LOCAL bool CC is_add_or_subtract_or_max(unsigned int func) {
+LOCAL ATTR_CONST WUNUSED bool CC
+is_add_or_subtract_or_max(unsigned int func) {
 	return func == GFX_BLENDFUNC_ADD ||
 	       func == GFX_BLENDFUNC_SUBTRACT ||
 	       func == GFX_BLENDFUNC_MAX;
@@ -745,7 +746,7 @@ struct video_buffer_ops *CC rambuffer_getops_munmap(void) {
 
 
 /* Create a new RAM-based video buffer */
-INTERN WUNUSED /*REF*/ struct video_buffer *CC
+INTERN WUNUSED NONNULL((3)) /*REF*/ struct video_buffer *CC
 libvideo_rambuffer_create(size_t size_x, size_t size_y,
                           struct video_codec *__restrict codec,
                           struct video_palette *palette) {
