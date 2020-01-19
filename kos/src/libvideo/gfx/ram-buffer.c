@@ -601,10 +601,10 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	result->vx_driver[VIDEO_BUFFER_RAMGFX_DATA]   = me->vb_data;
 	result->vx_driver[VIDEO_BUFFER_RAMGFX_STRIDE] = (void *)(uintptr_t)me->vb_stride;
 	if (clip) {
-		if unlikely(!clip->vbr_sizex || !clip->vbr_sizey)
-			goto empty_clip;
 		result->vx_offt_x = clip->vbr_startx;
 		result->vx_offt_y = clip->vbr_starty;
+		if unlikely(!clip->vbr_sizex || !clip->vbr_sizey)
+			goto empty_clip;
 		if unlikely(OVERFLOW_UADD(result->vx_offt_x, clip->vbr_sizex, &result->vx_xend) ||
 		            result->vx_xend > self->vb_size_x) {
 			if unlikely(result->vx_offt_x >= (intptr_t)self->vb_size_x ||
@@ -619,6 +619,8 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 				goto empty_clip;
 			result->vx_yend = self->vb_size_y;
 		}
+		if unlikely(!result->vx_xend || !result->vx_yend)
+			goto empty_clip;
 	} else {
 		result->vx_offt_x = 0;
 		result->vx_offt_y = 0;
@@ -693,6 +695,8 @@ rambuffer_clipgfx(struct video_gfx const *gfx,
 			goto empty_clip;
 		result->vx_yend = old_size_y;
 	}
+	if unlikely(!result->vx_xend || !result->vx_yend)
+		goto empty_clip;
 	/* Select the best-fitting GFX operations table. */
 	rambuffer_gfx_select_gfxops(result);
 	return;
