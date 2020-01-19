@@ -180,8 +180,13 @@ coredump_create(struct ucpustate const *curr_ustate,
 		siginfo_t siginfo;
 		if (!error_as_signal(error_data(), &siginfo))
 			siginfo.si_signo = SIGABRT;
+#if 1
+		/* Trigger a debugger trap at last valid text location. */
+		orig_ustate = kernel_debugtrap_r((struct ucpustate *)orig_ustate, siginfo.si_signo);
+#else
 		/* Trigger a debugger trap at last valid text location. */
 		curr_ustate = kernel_debugtrap_r((struct ucpustate *)curr_ustate, siginfo.si_signo);
+#endif
 	}
 	/* TODO */
 	(void)unwind_error;

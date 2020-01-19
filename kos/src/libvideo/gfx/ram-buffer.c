@@ -107,7 +107,7 @@ libvideo_gfx_ramgfx_getcolor_blur(struct video_gfx const *__restrict self,
 	/* Load colors as needed. */
 	switch (__builtin_expect(mode, 0x0)) {
 #define GETCOLOR(xoff, yoff) \
-		self->vx_buffer->vb_format.getcolor(line + (RAMGFX_STRIDE * (yoff)), x - (xoff))
+		self->vx_buffer->vb_format.getcolor(line + (RAMGFX_STRIDE * (yoff)), x + (xoff))
 
 	case 0x0:
 		/* +++ */
