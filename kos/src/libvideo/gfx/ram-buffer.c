@@ -541,12 +541,12 @@ LOCAL NONNULL((1)) void CC
 rambuffer_gfx_select_gfxops(struct video_gfx *__restrict self) {
 	self->vx_xmin = self->vx_offt_x <= 0 ? (uintptr_t)0 : (uintptr_t)self->vx_offt_x;
 	self->vx_ymin = self->vx_offt_y <= 0 ? (uintptr_t)0 : (uintptr_t)self->vx_offt_y;
-	assertf(self->vx_xmin < self->vx_xend,
+	assertf(self->vx_xmin <= self->vx_xend,
 	        "self->vx_xmin = %Iu (%#Ix)\n"
 	        "self->vx_xend = %Iu (%#Ix)",
 	        self->vx_xmin, self->vx_xmin,
 	        self->vx_xend, self->vx_xend);
-	assertf(self->vx_ymin < self->vx_yend,
+	assertf(self->vx_ymin <= self->vx_yend,
 	        "self->vx_ymin = %Iu (%#Ix)\n"
 	        "self->vx_yend = %Iu (%#Ix)",
 	        self->vx_ymin, self->vx_ymin,
@@ -603,13 +603,15 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 		result->vx_offt_y = clip->vbr_starty;
 		if unlikely(OVERFLOW_UADD(result->vx_offt_x, clip->vbr_sizex, &result->vx_xend) ||
 		            result->vx_xend > self->vb_size_x) {
-			if unlikely(result->vx_offt_x >= (intptr_t)self->vb_size_x || result->vx_offt_x < 0)
+			if unlikely(result->vx_offt_x >= (intptr_t)self->vb_size_x ||
+			            (result->vx_offt_x < 0 && ((uintptr_t)-result->vx_offt_x >= clip->vbr_sizex)))
 				goto empty_clip;
 			result->vx_xend = self->vb_size_x;
 		}
 		if unlikely(OVERFLOW_UADD(result->vx_offt_y, clip->vbr_sizey, &result->vx_yend) ||
 		            result->vx_yend > self->vb_size_y) {
-			if unlikely(result->vx_offt_y >= (intptr_t)self->vb_size_y || result->vx_offt_y < 0)
+			if unlikely(result->vx_offt_y >= (intptr_t)self->vb_size_y ||
+			            (result->vx_offt_y < 0 && ((uintptr_t)-result->vx_offt_y >= clip->vbr_sizey)))
 				goto empty_clip;
 			result->vx_yend = self->vb_size_y;
 		}
@@ -673,13 +675,15 @@ rambuffer_clipgfx(struct video_gfx const *gfx,
 	result->vx_offt_y += start_y;
 	if unlikely(OVERFLOW_UADD(result->vx_offt_x, size_x, &result->vx_xend) ||
 	            result->vx_xend > old_size_x) {
-		if unlikely(result->vx_offt_x >= (intptr_t)old_size_x || result->vx_offt_x < 0)
+		if unlikely(result->vx_offt_x >= (intptr_t)old_size_x ||
+		            (result->vx_offt_x < 0 && ((uintptr_t)-result->vx_offt_x >= size_x)))
 			goto empty_clip;
 		result->vx_xend = old_size_x;
 	}
 	if unlikely(OVERFLOW_UADD(result->vx_offt_y, size_y, &result->vx_yend) ||
 	            result->vx_yend > old_size_y) {
-		if unlikely(result->vx_offt_y >= (intptr_t)old_size_y || result->vx_offt_y < 0)
+		if unlikely(result->vx_offt_y >= (intptr_t)old_size_y ||
+		            (result->vx_offt_y < 0 && ((uintptr_t)-result->vx_offt_y >= size_y)))
 			goto empty_clip;
 		result->vx_yend = old_size_y;
 	}

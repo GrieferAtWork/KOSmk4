@@ -156,10 +156,10 @@ again_font:
 	      fcntl(STDIN_FILENO, F_GETFL) |
 	      O_NONBLOCK);
 
-	gfx.clip(80,
-	         16,
+	gfx.clip(-16,
+	         -16,
 	         (size_t)-1,
-	         video_gfx_sizey(&gfx) - 32);
+	         (size_t)-1);
 
 	for (;;) {
 		unsigned int action;
