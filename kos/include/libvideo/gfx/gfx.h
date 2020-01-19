@@ -115,12 +115,13 @@ typedef __uint64_t gfx_blendmode_t;
  * [WRITE]: Indicates a flag that affects the results of graphics operations
  *          that use the associated GFX context as destination, or when
  *          writing pixel data. */
-#define VIDEO_GFX_FNORMAL     0x0000 /* Normal render flags. */
-#define VIDEO_GFX_FAALINES    0x0001 /* [WRITE] Render smooth lines. */
-#define VIDEO_GFX_FLINEARBLIT 0x0002 /* [WRITE] Use linear interpolation for stretch() (else: use nearest) */
-#define VIDEO_GFX_FBLUR       0x0004 /* [READ]  Pixel reads will return the average of the surrounding 9 pixels.
-                                      *         For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
-                                      * The behavior is weak undefined if this flag is used alongside a non-zero color key */
+#define VIDEO_GFX_FNORMAL      0x0000 /* Normal render flags. */
+#define VIDEO_GFX_FAALINES     0x0001 /* [WRITE] Render smooth lines. */
+#define VIDEO_GFX_FNEARESTBLIT 0x0000 /* [WRITE] Use nearest interpolation for stretch() */
+#define VIDEO_GFX_FLINEARBLIT  0x0002 /* [WRITE] Use linear interpolation for stretch() (else: use nearest) */
+#define VIDEO_GFX_FBLUR        0x0004 /* [READ]  Pixel reads will return the average of the surrounding 9 pixels.
+                                       *         For this purpose, out-of-bounds pixels are ignored (and not part of the average taken)
+                                       * The behavior is weak undefined if this flag is used alongside a non-zero color key */
 
 
 #ifdef __CC__
