@@ -56,22 +56,18 @@ libvideo_tlft_destroy(struct video_font *__restrict self) {
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) void *CC
 libvideo_tlft_lookup(struct tlft_font const *__restrict self,
                      char16_t ord) {
-	uint8_t i, step;
+	uint8_t i;
 	if (ord >= 0x0020 && ord <= 0x007e)
 		return self->tf_ascii + ((ord - 0x0020) << self->tf_hdr->h_log2chsize);
-	/* bsearch-style lookup */
-	for (i = self->tf_hdr->h_ngroups / 2, step = i / 2;; step = (step + 1) / 2) {
-		if (ord < self->tf_grps[i].ug_minuni) {
-			if (OVERFLOW_USUB(i, step, &i))
-				break;
+	/* TODO: Do what bsearch() does here! */
+	for (i = 0; i < self->tf_hdr->h_ngroups; ++i) {
+		if ((uint16_t)ord < self->tf_grps[i].ug_minuni)
 			continue;
-		}
-		if (ord > self->tf_grps[i].ug_minuni) {
-			if (OVERFLOW_UADD(i, step, &i) || i >= self->tf_hdr->h_ngroups)
-				break;
+		if ((uint16_t)ord > self->tf_grps[i].ug_maxuni)
 			continue;
-		}
-		return self->tf_chars + (self->tf_grps[i].ug_offset << self->tf_hdr->h_log2chsize);
+		return self->tf_chars + ((self->tf_grps[i].ug_offset +
+		                          ((uint16_t)ord - self->tf_grps[i].ug_minuni))
+		                         << self->tf_hdr->h_log2chsize);
 	}
 	return NULL;
 }

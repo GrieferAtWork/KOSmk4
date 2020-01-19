@@ -129,7 +129,8 @@ again_font:
 	format_printf(&video_fontprinter,
 	              &fontprinter_data,
 	              "Hello World!\n"
-	              "Second line");
+	              "ℋℌℍℎℏ\n"
+	              "⌚⌛\n");
 
 	for (;;) {
 		char buf[1];
