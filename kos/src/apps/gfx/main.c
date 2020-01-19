@@ -114,18 +114,37 @@ int main(int argc, char *argv[]) {
 	            0,
 	            NULL);
 
-	fontprinter_data.vfp_height  = 16;
+	fontprinter_data.vfp_height  = 32;
 	fontprinter_data.vfp_font    = font;
-	fontprinter_data.vfp_gfx     = &gfx;
 	fontprinter_data.vfp_lnstart = 0;
-	fontprinter_data.vfp_lnend   = video_gfx_sizex(&gfx);
 	fontprinter_data.vfp_color   = VIDEO_COLOR_BLACK;
 	fontprinter_data.vfp_u8word  = 0;
 
+	int render_mode = 0;
 again_font:
+
+	struct video_gfx fontgfx;
+	if (render_mode == 0) {
+		/* Upper half + lower half */
+		gfx.clip(fontgfx, 0, 0, (size_t)-1, (size_t)-1);
+		fontprinter_data.vfp_cury = 0;
+	} else if (render_mode == 1) {
+		/* lower half only (plus additional lines) */
+		gfx.clip(fontgfx,
+		         0,
+		         (intptr_t)(fontprinter_data.vfp_height / 2),
+		         (size_t)-1,
+		         (size_t)-1);
+		fontprinter_data.vfp_cury = -(intptr_t)(fontprinter_data.vfp_height / 2);
+	} else {
+		/* upper half only */
+		gfx.clip(fontgfx, 0, 0, (size_t)-1, fontprinter_data.vfp_height / 2);
+		fontprinter_data.vfp_cury = 0;
+	}
+	fontprinter_data.vfp_gfx   = &fontgfx;
+	fontprinter_data.vfp_lnend = video_gfx_sizex(&fontgfx);
+	fontprinter_data.vfp_curx  = 0;
 	gfx.fill(VIDEO_COLOR_WHITE);
-	fontprinter_data.vfp_curx = 0;
-	fontprinter_data.vfp_cury = 0;
 	format_printf(&video_fontprinter,
 	              &fontprinter_data,
 	              "Hello World!\n"
@@ -140,6 +159,8 @@ again_font:
 			++fontprinter_data.vfp_height;
 		} else if (buf[0] == '-') {
 			--fontprinter_data.vfp_height;
+		} else if (buf[0] == 'm') {
+			render_mode = (render_mode + 1) % 3;
 		} else if (buf[0] == 's') {
 			screen->gfx(gfx,
 			            GFX_BLENDINFO_ALPHA,

@@ -193,15 +193,15 @@ BLIT_FUNC(libvideo_gfx_defaultgfx)(struct video_gfx *IF_BITFILL(__restrict) self
 	}
 #endif /* !DEFINE_BITFILL */
 	/* Truncate copy-rect to src/dst buffer limits (out-of-bounds pixels aren't rendered) */
-	if unlikely(OVERFLOW_UADD((uintptr_t)dst_x, size_x, &temp) || temp > self->vx_xend) {
-		if unlikely((uintptr_t)dst_x >= self->vx_xend)
+	if unlikely(OVERFLOW_UADD((uintptr_t)dst_x, size_x, &temp) || temp > GFX_XEND) {
+		if unlikely((uintptr_t)dst_x >= GFX_XEND)
 			return;
-		size_x = self->vx_xend - (uintptr_t)dst_x;
+		size_x = GFX_XEND - (uintptr_t)dst_x;
 	}
-	if unlikely(OVERFLOW_UADD((uintptr_t)dst_y, size_y, &temp) || temp > self->vx_yend) {
-		if unlikely((uintptr_t)dst_y >= self->vx_yend)
+	if unlikely(OVERFLOW_UADD((uintptr_t)dst_y, size_y, &temp) || temp > GFX_YEND) {
+		if unlikely((uintptr_t)dst_y >= GFX_YEND)
 			return;
-		size_y = self->vx_yend - (uintptr_t)dst_y;
+		size_y = GFX_YEND - (uintptr_t)dst_y;
 	}
 #ifndef DEFINE_BITFILL
 	if unlikely(OVERFLOW_UADD((uintptr_t)src_x, size_x, &temp) || temp > src->vx_xend) {
@@ -663,26 +663,26 @@ STRETCH_FUNC(libvideo_gfx_defaultgfx)(struct video_gfx *IF_BITFILL(__restrict) s
 	}
 #endif /* !DEFINE_BITFILL */
 	/* Truncate copy-rect to src/dst buffer limits (out-of-bounds pixels aren't rendered) */
-	if unlikely(OVERFLOW_UADD((uintptr_t)dst_x, dst_size_x, &temp) || temp > self->vx_xend) {
+	if unlikely(OVERFLOW_UADD((uintptr_t)dst_x, dst_size_x, &temp) || temp > GFX_XEND) {
 		size_t newdstsize, overflow;
-		if unlikely((uintptr_t)dst_x >= self->vx_xend)
+		if unlikely((uintptr_t)dst_x >= GFX_XEND)
 			return;
-		newdstsize = self->vx_xend - (uintptr_t)dst_x;
+		newdstsize = GFX_XEND - (uintptr_t)dst_x;
 		overflow   = dst_size_x - newdstsize;
+		overflow   = (overflow * src_size_x) / dst_size_x;
 		dst_size_x = newdstsize;
-		overflow = (overflow * src_size_x) / dst_size_x;
 		if unlikely(overflow >= src_size_x)
 			return;
 		src_size_x -= overflow;
 	}
-	if unlikely(OVERFLOW_UADD((uintptr_t)dst_y, dst_size_y, &temp) || temp > self->vx_yend) {
+	if unlikely(OVERFLOW_UADD((uintptr_t)dst_y, dst_size_y, &temp) || temp > GFX_YEND) {
 		size_t newdstsize, overflow;
-		if unlikely((uintptr_t)dst_y >= self->vx_yend)
+		if unlikely((uintptr_t)dst_y >= GFX_YEND)
 			return;
-		newdstsize = self->vx_yend - (uintptr_t)dst_y;
+		newdstsize = GFX_YEND - (uintptr_t)dst_y;
 		overflow   = dst_size_y - newdstsize;
+		overflow   = (overflow * src_size_y) / dst_size_y;
 		dst_size_y = newdstsize;
-		overflow = (overflow * src_size_y) / dst_size_y;
 		if unlikely(overflow >= src_size_y)
 			return;
 		src_size_y -= overflow;
@@ -694,8 +694,8 @@ STRETCH_FUNC(libvideo_gfx_defaultgfx)(struct video_gfx *IF_BITFILL(__restrict) s
 			return;
 		newsrcsize = src->vx_xend - (uintptr_t)src_x;
 		overflow   = src_size_x - newsrcsize;
-		src_size_x = newsrcsize;
 		overflow   = (overflow * dst_size_x) / src_size_x;
+		src_size_x = newsrcsize;
 		if unlikely(overflow >= dst_size_x)
 			return;
 		dst_size_x -= overflow;
@@ -706,8 +706,8 @@ STRETCH_FUNC(libvideo_gfx_defaultgfx)(struct video_gfx *IF_BITFILL(__restrict) s
 			return;
 		newsrcsize = src->vx_yend - (uintptr_t)src_y;
 		overflow   = src_size_y - newsrcsize;
-		src_size_y = newsrcsize;
 		overflow   = (overflow * dst_size_y) / src_size_y;
+		src_size_y = newsrcsize;
 		if unlikely(overflow >= dst_size_y)
 			return;
 		dst_size_y -= overflow;
