@@ -35,26 +35,6 @@
 
 __DECL_BEGIN
 
-/* Video palette colors. */
-#define VIDEO_PALCOLOR_BLACK         0x0 /* RGBA(0x00, 0x00, 0x00, 0xff) */
-#define VIDEO_PALCOLOR_NAVY          0x1 /* RGBA(0x00, 0x00, 0xa8, 0xff) */
-#define VIDEO_PALCOLOR_GREEN         0x2 /* RGBA(0x00, 0xa8, 0x00, 0xff) */
-#define VIDEO_PALCOLOR_TEAL          0x3 /* RGBA(0x00, 0xa8, 0xa8, 0xff) */
-#define VIDEO_PALCOLOR_MAROON        0x4 /* RGBA(0xa8, 0x00, 0x00, 0xff) */
-#define VIDEO_PALCOLOR_PURPLE        0x5 /* RGBA(0xa8, 0x00, 0xa8, 0xff) */
-#define VIDEO_PALCOLOR_OLIVE         0x6 /* RGBA(0xa8, 0x57, 0x00, 0xff) */
-#define VIDEO_PALCOLOR_SILVER        0x7 /* RGBA(0xa8, 0xa8, 0xa8, 0xff) */
-#define VIDEO_PALCOLOR_GREY          0x8 /* RGBA(0x57, 0x57, 0x57, 0xff) */
-#define VIDEO_PALCOLOR_BLUE          0x9 /* RGBA(0x57, 0x57, 0xff, 0xff) */
-#define VIDEO_PALCOLOR_LIME          0xa /* RGBA(0x57, 0xff, 0x57, 0xff) */
-#define VIDEO_PALCOLOR_AQUA          0xb /* RGBA(0x57, 0xff, 0xff, 0xff) */
-#define VIDEO_PALCOLOR_RED           0xc /* RGBA(0xff, 0x57, 0x57, 0xff) */
-#define VIDEO_PALCOLOR_FUCHSIA       0xd /* RGBA(0xff, 0x57, 0xff, 0xff) */
-#define VIDEO_PALCOLOR_YELLOW        0xe /* RGBA(0xff, 0xff, 0x57, 0xff) */
-#define VIDEO_PALCOLOR_WHITE         0xf /* RGBA(0xff, 0xff, 0xff, 0xff) */
-#define VIDEO_PALCOLOR_LIGHT_GRAY    VIDEO_PALCOLOR_SILVER
-#define VIDEO_PALCOLOR_DARK_GRAY     VIDEO_PALCOLOR_GREY
-
 
 #ifdef __CC__
 
@@ -64,7 +44,7 @@ struct video_palette {
 	__ATTR_NONNULL((1)) void
 	(LIBVIDEO_CODEC_CC *vp_destroy)(struct video_palette *__restrict self);
 	__uintptr_t                 vp_refcnt; /* Reference counter. */
-	struct video_palette_cache *vp_cache;  /* [0..1][owned(malloc)] Color->pixel converter cache */
+	struct video_palette_cache *vp_cache;  /* [0..1][owned(malloc)][lock(WRITE_ONCE)] Color->pixel converter cache */
 	__size_t                    vp_cnt;    /* [const] # of colors (== VIDEO_CODEC_PALSIZ(...)). */
 	struct vd_palette           vp_pal;    /* [const] OS palette data. */
 };
@@ -78,16 +58,13 @@ struct video_palette {
 __DEFINE_REFCNT_FUNCTIONS(struct video_palette, vp_refcnt, video_palette_destroy)
 
 
-
 /* Return the best-matching pixel for a given color.
  * For the purpose of determining the best match, this algorithm
  * leans towards emphasizing colors best viewed by the human eye,
  * thus producing the best-looking results for those bipedal fellas.
- * NOTE: If the given `color' is one of `VIDEO_COLOR_*', `vp_colors'
- *       is used to quickly lookup the associated palette index.
- *       If the associated index is set to `(video_pixel_t)-1', the
- *       index will be calculated like any other color given would,
- *       and the result will be cached within the `vp_colors' vector. */
+ * NOTE: This function may lazily allocate `self->vp_cache', meaning
+ *       that once used, the caller is responsible to eventually
+ *       cleanup that field using `free(self->vp_cache)'. */
 typedef __ATTR_NONNULL((1)) video_pixel_t
 (LIBVIDEO_CODEC_CC *PVIDEO_PALETTE_GETPIXEL)(struct video_palette *__restrict self, video_color_t color);
 #ifdef LIBVIDEO_CODEC_WANT_PROTOTYPES

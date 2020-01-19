@@ -93,8 +93,8 @@ __DECL_BEGIN
 typedef vd_codec_t video_codec_t; /* One of `VIDEO_CODEC_*' */
 
 struct video_rambuffer_requirements {
-	__size_t  vbs_bufsize;  /* Minimal buffer size (in bytes) */
-	__size_t  vbs_stride;   /* Required scanline stride (in bytes) */
+	__size_t vbs_bufsize; /* Minimal buffer size (in bytes) */
+	__size_t vbs_stride;  /* Required scanline stride (in bytes) */
 };
 
 struct video_format;

@@ -59,28 +59,22 @@ struct video_buffer_rect {
 };
 
 struct video_buffer_ops {
-	/* [1..1] Buffer finalization. */
+	/* NOTE: _ALL_ Callbacks are always [1..1] */
+
+	/* Buffer finalization. */
 	void (LIBVIDEO_GFX_CC *vi_destroy)(struct video_buffer *__restrict __self);
 
-	/* [1..1] Lock the video buffer into memory.
+	/* Lock the video buffer into memory.
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
 	__ATTR_NONNULL((1, 2))
 	int (LIBVIDEO_GFX_CC *vi_lock)(struct video_buffer *__restrict __self,
 	                               struct video_lock *__restrict __result);
 
-	/* [1..1] Unlock a video buffer that has previously been mapped into memory. */
+	/* Unlock a video buffer that has previously been mapped into memory. */
 	__ATTR_NONNULL((1, 2))
 	void (LIBVIDEO_GFX_CC *vi_unlock)(struct video_buffer *__restrict __self,
 	                                  struct video_lock const *__restrict __lock);
-
-	/* All of the following functions can optionally be implemented by drivers.
-	 * When not implemented, they are substituted during the driver installation
-	 * process.
-	 * In other words, then actually used, all of these functions are [1..1],
-	 * but when a video driver needs to provide this interface, it can leave
-	 * out these functions and have them filled automatically once the driver
-	 * registers its video API. */
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: blendmode: Pixel blending mode for graphics operations targeting this buffer.
@@ -238,9 +232,9 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
 
 
 /* Video buffer types. */
-#define VIDEO_BUFFER_AUTO 0x0000  /* Type doesn't matter. */
-#define VIDEO_BUFFER_RAM  0x0001  /* RAM buffer. */
-#define VIDEO_BUFFER_GPU  0x0002  /* GPU buffer. */
+#define VIDEO_BUFFER_AUTO 0x0000 /* Type doesn't matter. */
+#define VIDEO_BUFFER_RAM  0x0001 /* RAM buffer. */
+#define VIDEO_BUFFER_GPU  0x0002 /* GPU buffer. */
 
 
 #ifdef __CC__
@@ -251,12 +245,12 @@ __DEFINE_REFCNT_FUNCTIONS(struct video_buffer, vb_refcnt, video_buffer_destroy)
  * @param: codec:   The preferred video codec, or NULL to use `video_preferred_format()'.
  * @param: palette: The palette to use (only needed if used by `codec') */
 typedef __ATTR_WUNUSED __REF struct video_buffer *
-(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CREATE)(unsigned int type, __size_t size_x, __size_t size_y,
-                                        struct video_codec *codec, struct video_palette *palette);
+(LIBVIDEO_GFX_CC *PVIDEO_BUFFER_CREATE)(unsigned int __type, __size_t __size_x, __size_t __size_y,
+                                        struct video_codec *__codec, struct video_palette *__palette);
 #ifdef LIBVIDEO_GFX_WANT_PROTOTYPES
 LIBVIDEO_GFX_DECL __ATTR_WUNUSED __REF struct video_buffer *LIBVIDEO_GFX_CC
-video_buffer_create(unsigned int type, __size_t size_x, __size_t size_y,
-                    struct video_codec *codec, struct video_palette *palette);
+video_buffer_create(unsigned int __type, __size_t __size_x, __size_t __size_y,
+                    struct video_codec *__codec, struct video_palette *__palette);
 #endif /* LIBVIDEO_GFX_WANT_PROTOTYPES */
 
 /* Returns a video buffer for the entire screen (or return NULL and set errno on error)

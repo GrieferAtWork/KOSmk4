@@ -300,7 +300,7 @@ public:
 	 * that is interpreted relative to the clip rectangle of this
 	 * GFX object.
 	 * NOTE: Implemented in ./buffer.h because the implementation
-	 *       requries use of `struct video_buffer', which may not
+	 *       requires use of `struct video_buffer', which may not
 	 *       have been defined yet at this point! */
 	__CXX_CLASSMEMBER struct video_gfx &
 	LIBVIDEO_GFX_CC clip(struct video_gfx &__result,
@@ -318,11 +318,14 @@ public:
 	                                          (std::is_signed<TY>::value || std::is_unsigned<TY>::value),
 	                                          video_color_t>::type
 	LIBVIDEO_GFX_CC getcolor(TX __x, TY __y) const {
-		__uintptr_t __used_x = (__uintptr_t)__x + (__uintptr_t)vx_offt_x;
-		__uintptr_t __used_y = (__uintptr_t)__y + (__uintptr_t)vx_offt_y;
-		if __unlikely(__used_x >= vx_xend || __used_y >= vx_yend)
+		__intptr_t __used_x = (__intptr_t)__x + vx_offt_x;
+		__intptr_t __used_y = (__intptr_t)__y + vx_offt_y;
+		if __unlikely(__used_x < (__intptr_t)vx_xmin || __used_y < (__intptr_t)vx_ymin ||
+		              __used_x >= (__intptr_t)vx_xend || __used_y >= (__intptr_t)vx_yend)
 			return 0;
-		return (*vx_pxops.fxo_getcolor)(this, __used_x, __used_y);
+		return (*vx_pxops.fxo_getcolor)(this,
+		                                (__uintptr_t)__used_x,
+		                                (__uintptr_t)__used_y);
 	}
 
 	/* Place a colored pixel ontop of the graphic */
@@ -331,11 +334,15 @@ public:
 	                                          (std::is_signed<TY>::value || std::is_unsigned<TY>::value),
 	                                          void>::type
 	LIBVIDEO_GFX_CC putcolor(TX __x, TY __y, video_color_t __color) {
-		__uintptr_t __used_x = (__uintptr_t)__x + (__uintptr_t)vx_offt_x;
-		__uintptr_t __used_y = (__uintptr_t)__y + (__uintptr_t)vx_offt_y;
-		if __unlikely(__used_x >= vx_xend || __used_y >= vx_yend)
+		__intptr_t __used_x = (__intptr_t)__x + vx_offt_x;
+		__intptr_t __used_y = (__intptr_t)__y + vx_offt_y;
+		if __unlikely(__used_x < (__intptr_t)vx_xmin || __used_y < (__intptr_t)vx_ymin ||
+		              __used_x >= (__intptr_t)vx_xend || __used_y >= (__intptr_t)vx_yend)
 			return;
-		(*vx_pxops.fxo_putcolor)(this, __used_x, __used_y, __color);
+		(*vx_pxops.fxo_putcolor)(this,
+		                         (__uintptr_t)__used_x,
+		                         (__uintptr_t)__used_y,
+		                         __color);
 	}
 
 	/* Draw a line */

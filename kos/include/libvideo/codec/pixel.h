@@ -29,7 +29,7 @@
 
 __DECL_BEGIN
 
-/* Encoding of the general-purpose color_t datatype.
+/* Encoding of the general-purpose video_color_t datatype.
  * NOTE: video_color_t is always encoded to match the memory-layout of `VIDEO_CODEC_RGBA8888' */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define VIDEO_COLOR_RED_MASK     __UINT32_C(0x000000ff)
@@ -56,13 +56,13 @@ __DECL_BEGIN
 #define VIDEO_COLOR_GET_BLUE(color)  __CCAST(__uint8_t)(((color) & VIDEO_COLOR_BLUE_MASK) >> VIDEO_COLOR_BLUE_SHIFT)
 #define VIDEO_COLOR_GET_ALPHA(color) __CCAST(__uint8_t)(((color) & VIDEO_COLOR_ALPHA_MASK) >> VIDEO_COLOR_ALPHA_SHIFT)
 
-#define VIDEO_COLOR_RGBA(r, g, b, a) \
+#define VIDEO_COLOR_RGBA(r, g, b, a)                          \
 	((__CCAST(video_color_t)(r) << VIDEO_COLOR_RED_SHIFT) |   \
 	 (__CCAST(video_color_t)(g) << VIDEO_COLOR_GREEN_SHIFT) | \
 	 (__CCAST(video_color_t)(b) << VIDEO_COLOR_BLUE_SHIFT) |  \
 	 (__CCAST(video_color_t)(a) << VIDEO_COLOR_ALPHA_SHIFT))
 
-#define VIDEO_COLOR_RGB(r, g, b) \
+#define VIDEO_COLOR_RGB(r, g, b)                              \
 	((__CCAST(video_color_t)(r) << VIDEO_COLOR_RED_SHIFT) |   \
 	 (__CCAST(video_color_t)(g) << VIDEO_COLOR_GREEN_SHIFT) | \
 	 (__CCAST(video_color_t)(b) << VIDEO_COLOR_BLUE_SHIFT) |  \
@@ -70,24 +70,24 @@ __DECL_BEGIN
 
 
 /* Standard video colors */
-#define VIDEO_COLOR_BLACK         VIDEO_COLOR_RGB(0x00, 0x00, 0x00)
-#define VIDEO_COLOR_NAVY          VIDEO_COLOR_RGB(0x00, 0x00, 0xa8)
-#define VIDEO_COLOR_GREEN         VIDEO_COLOR_RGB(0x00, 0xa8, 0x00)
-#define VIDEO_COLOR_TEAL          VIDEO_COLOR_RGB(0x00, 0xa8, 0xa8)
-#define VIDEO_COLOR_MAROON        VIDEO_COLOR_RGB(0xa8, 0x00, 0x00)
-#define VIDEO_COLOR_PURPLE        VIDEO_COLOR_RGB(0xa8, 0x00, 0xa8)
-#define VIDEO_COLOR_OLIVE         VIDEO_COLOR_RGB(0xa8, 0x57, 0x00)
-#define VIDEO_COLOR_SILVER        VIDEO_COLOR_RGB(0xa8, 0xa8, 0xa8)
-#define VIDEO_COLOR_GREY          VIDEO_COLOR_RGB(0x57, 0x57, 0x57)
-#define VIDEO_COLOR_BLUE          VIDEO_COLOR_RGB(0x57, 0x57, 0xff)
-#define VIDEO_COLOR_LIME          VIDEO_COLOR_RGB(0x57, 0xff, 0x57)
-#define VIDEO_COLOR_AQUA          VIDEO_COLOR_RGB(0x57, 0xff, 0xff)
-#define VIDEO_COLOR_RED           VIDEO_COLOR_RGB(0xff, 0x57, 0x57)
-#define VIDEO_COLOR_FUCHSIA       VIDEO_COLOR_RGB(0xff, 0x57, 0xff)
-#define VIDEO_COLOR_YELLOW        VIDEO_COLOR_RGB(0xff, 0xff, 0x57)
-#define VIDEO_COLOR_WHITE         VIDEO_COLOR_RGB(0xff, 0xff, 0xff)
-#define VIDEO_COLOR_LIGHT_GRAY    VIDEO_COLOR_SILVER
-#define VIDEO_COLOR_DARK_GRAY     VIDEO_COLOR_GREY
+#define VIDEO_COLOR_BLACK      VIDEO_COLOR_RGB(0x00, 0x00, 0x00)
+#define VIDEO_COLOR_NAVY       VIDEO_COLOR_RGB(0x00, 0x00, 0xa8)
+#define VIDEO_COLOR_GREEN      VIDEO_COLOR_RGB(0x00, 0xa8, 0x00)
+#define VIDEO_COLOR_TEAL       VIDEO_COLOR_RGB(0x00, 0xa8, 0xa8)
+#define VIDEO_COLOR_MAROON     VIDEO_COLOR_RGB(0xa8, 0x00, 0x00)
+#define VIDEO_COLOR_PURPLE     VIDEO_COLOR_RGB(0xa8, 0x00, 0xa8)
+#define VIDEO_COLOR_OLIVE      VIDEO_COLOR_RGB(0xa8, 0x57, 0x00)
+#define VIDEO_COLOR_SILVER     VIDEO_COLOR_RGB(0xa8, 0xa8, 0xa8)
+#define VIDEO_COLOR_GREY       VIDEO_COLOR_RGB(0x57, 0x57, 0x57)
+#define VIDEO_COLOR_BLUE       VIDEO_COLOR_RGB(0x57, 0x57, 0xff)
+#define VIDEO_COLOR_LIME       VIDEO_COLOR_RGB(0x57, 0xff, 0x57)
+#define VIDEO_COLOR_AQUA       VIDEO_COLOR_RGB(0x57, 0xff, 0xff)
+#define VIDEO_COLOR_RED        VIDEO_COLOR_RGB(0xff, 0x57, 0x57)
+#define VIDEO_COLOR_FUCHSIA    VIDEO_COLOR_RGB(0xff, 0x57, 0xff)
+#define VIDEO_COLOR_YELLOW     VIDEO_COLOR_RGB(0xff, 0xff, 0x57)
+#define VIDEO_COLOR_WHITE      VIDEO_COLOR_RGB(0xff, 0xff, 0xff)
+#define VIDEO_COLOR_LIGHT_GRAY VIDEO_COLOR_SILVER
+#define VIDEO_COLOR_DARK_GRAY  VIDEO_COLOR_GREY
 
 #ifdef __CC__
 typedef vd_color_t video_color_t; /* General-purpose */

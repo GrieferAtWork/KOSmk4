@@ -108,11 +108,9 @@ struct video_palette_cache {
  * For the purpose of determining the best match, this algorithm
  * leans towards emphasizing colors best viewed by the human eye,
  * thus producing the best-looking results for those bipedal fellas.
- * NOTE: If the given `color' is one of `VIDEO_COLOR_*', `vp_colors'
- *       is used to quickly lookup the associated palette index.
- *       If the associated index is set to `(size_t)-1', the index
- *       will be calculated like any other color given would, and
- *       the result will be cached within the `vp_colors' vector. */
+ * NOTE: This function may lazily allocate `self->vp_cache', meaning
+ *       that once used, the caller is responsible to eventually
+ *       cleanup that field using `free(self->vp_cache)'. */
 INTERN NONNULL((1)) video_pixel_t CC
 libvideo_palette_getpixel(struct video_palette *__restrict self,
                           video_color_t color) {
@@ -173,6 +171,7 @@ done:
 	return result;
 }
 
+DEFINE_PUBLIC_ALIAS(video_palette_getpixel, libvideo_palette_getpixel);
 
 DECL_END
 

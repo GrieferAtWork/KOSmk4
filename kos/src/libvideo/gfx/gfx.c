@@ -49,7 +49,7 @@ opt.append("-O3");
 DECL_BEGIN
 
 #undef ASSERT_ABS_COORDS_IS_NOOP
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 #define ASSERT_ABS_COORDS(self, x, y)           \
 	(assertf((x) >= (self)->vx_xmin &&          \
 	         (x) < (self)->vx_xend,             \
