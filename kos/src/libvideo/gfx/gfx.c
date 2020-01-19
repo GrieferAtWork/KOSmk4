@@ -213,14 +213,9 @@ line_fill(struct video_gfx *__restrict self,
           uintptr_t x, uintptr_t y,
           size_t size_x, size_t size_y,
           video_color_t color) {
-	uintptr_t ix, iy;
+	uintptr_t iy;
 	for (iy = 0; iy < size_y; ++iy) {
-		for (ix = 0; ix < size_x; ++ix) {
-			video_gfx_putabscolor(self,
-			                      x + ix,
-			                      y + iy,
-			                      color);
-		}
+		line_hori(self, x, y + iy, size_x, color);
 	}
 }
 

@@ -185,7 +185,10 @@ GFX_FUNC(libvideo_gfx_defaultgfx_rect)(struct video_gfx *__restrict self,
 #define LINE_YMIN 0x2
 #define LINE_XMAX 0x4
 #define LINE_YMAX 0x8
-	uint8_t draw_lines = 0xf;
+	uint8_t draw_lines;
+	if unlikely(!size_x || !size_y)
+		return;
+	draw_lines = 0xf;
 	IF_OFFSET(x += self->vx_offt_x);
 	IF_OFFSET(y += self->vx_offt_y);
 	if unlikely(x < (intptr_t)GFX_XMIN) {

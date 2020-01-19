@@ -155,9 +155,9 @@ again_font:
 	      fcntl(STDIN_FILENO, F_GETFL) |
 	      O_NONBLOCK);
 
-	gfx.clip(16,
+	gfx.clip(80,
 	         16,
-	         video_gfx_sizex(&gfx) - 32,
+	         (size_t)-1,
 	         video_gfx_sizey(&gfx) - 32);
 
 	for (;;) {
@@ -210,49 +210,41 @@ step:
 		switch (action) {
 
 		case 0: {
-			uintptr_t x = rand() % screen->vb_size_x;
-			uintptr_t y = rand() % screen->vb_size_y;
-			gfx.rect((intptr_t)x - gfx.vx_offt_x,
-			         (intptr_t)y - gfx.vx_offt_y,
-			         rand() % (screen->vb_size_x - x),
-			         rand() % (screen->vb_size_y - y),
+			gfx.rect((rand() % screen->vb_size_x) - 16,
+			         (rand() % screen->vb_size_y) - 16,
+			         rand() % screen->vb_size_x,
+			         rand() % screen->vb_size_y,
 			         color);
 		}	break;
 
 		case 1: {
-			uintptr_t x = rand() % screen->vb_size_x;
-			uintptr_t y = rand() % screen->vb_size_y;
-			gfx.fill((intptr_t)x - gfx.vx_offt_x,
-			         (intptr_t)y - gfx.vx_offt_y,
-			         rand() % (screen->vb_size_x - x),
-			         rand() % (screen->vb_size_y - y),
+			gfx.fill((rand() % screen->vb_size_x) - 16,
+			         (rand() % screen->vb_size_y) - 16,
+			         rand() % screen->vb_size_x,
+			         rand() % screen->vb_size_y,
 			         color);
 		}	break;
 
 		case 2: {
-			uintptr_t x = rand() % screen->vb_size_x;
-			uintptr_t y = rand() % screen->vb_size_y;
-			uintptr_t x2 = rand() % screen->vb_size_x;
-			uintptr_t y2 = rand() % screen->vb_size_y;
-			gfx.stretch((intptr_t)x - gfx.vx_offt_x,
-			            (intptr_t)y - gfx.vx_offt_y,
-			            rand() % (screen->vb_size_x - x),
-			            rand() % (screen->vb_size_y - y),
+			gfx.stretch((rand() % screen->vb_size_x) - 16,
+			            (rand() % screen->vb_size_y) - 16,
+			            rand() % screen->vb_size_x,
+			            rand() % screen->vb_size_y,
 			            gfx,
-			            (intptr_t)x2 - gfx.vx_offt_x,
-			            (intptr_t)y2 - gfx.vx_offt_y,
-			            rand() % (screen->vb_size_x - x2),
-			            rand() % (screen->vb_size_y - y2));
+			            (rand() % screen->vb_size_x) - 16,
+			            (rand() % screen->vb_size_y) - 16,
+			            rand() % screen->vb_size_x,
+			            rand() % screen->vb_size_y);
 		}	break;
 
 		case 3: {
 			struct video_gfx blurgfx;
 			struct video_buffer_rect clip;
 			size_t dst_size_x, dst_size_y;
-			uintptr_t x = rand() % screen->vb_size_x;
-			uintptr_t y = rand() % screen->vb_size_y;
-			dst_size_x = rand() % (screen->vb_size_x - x);
-			dst_size_y = rand() % (screen->vb_size_y - y);
+			intptr_t x = (rand() % screen->vb_size_x) - 16;
+			intptr_t y = (rand() % screen->vb_size_y) - 16;
+			dst_size_x = rand() % screen->vb_size_x;
+			dst_size_y = rand() % screen->vb_size_y;
 			clip.vbr_startx = video_gfx_startx(&gfx);
 			clip.vbr_starty = video_gfx_starty(&gfx);
 			clip.vbr_sizex  = video_gfx_sizex(&gfx);
