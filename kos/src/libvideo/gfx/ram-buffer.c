@@ -601,6 +601,8 @@ rambuffer_getgfx(struct video_buffer *__restrict self,
 	result->vx_driver[VIDEO_BUFFER_RAMGFX_DATA]   = me->vb_data;
 	result->vx_driver[VIDEO_BUFFER_RAMGFX_STRIDE] = (void *)(uintptr_t)me->vb_stride;
 	if (clip) {
+		if unlikely(!clip->vbr_sizex || !clip->vbr_sizey)
+			goto empty_clip;
 		result->vx_offt_x = clip->vbr_startx;
 		result->vx_offt_y = clip->vbr_starty;
 		if unlikely(OVERFLOW_UADD(result->vx_offt_x, clip->vbr_sizex, &result->vx_xend) ||
@@ -675,6 +677,8 @@ rambuffer_clipgfx(struct video_gfx const *gfx,
 		memcpy(result, gfx, sizeof(struct video_gfx));
 	result->vx_offt_x += start_x;
 	result->vx_offt_y += start_y;
+	if unlikely(!size_x || !size_y)
+		goto empty_clip;
 	if unlikely(OVERFLOW_UADD(result->vx_offt_x, size_x, &result->vx_xend) ||
 	            result->vx_xend > old_size_x) {
 		if unlikely(result->vx_offt_x >= (intptr_t)old_size_x ||
