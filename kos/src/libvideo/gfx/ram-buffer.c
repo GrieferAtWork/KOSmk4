@@ -541,12 +541,14 @@ LOCAL NONNULL((1)) void CC
 rambuffer_gfx_select_gfxops(struct video_gfx *__restrict self) {
 	self->vx_xmin = self->vx_offt_x <= 0 ? (uintptr_t)0 : (uintptr_t)self->vx_offt_x;
 	self->vx_ymin = self->vx_offt_y <= 0 ? (uintptr_t)0 : (uintptr_t)self->vx_offt_y;
-	assertf(self->vx_xmin <= self->vx_xend,
+	/* Compare < because empty clip rects aren't allowed / are
+	 * handled separately by setting stub/empty GFX pixel ops. */
+	assertf(self->vx_xmin < self->vx_xend,
 	        "self->vx_xmin = %Iu (%#Ix)\n"
 	        "self->vx_xend = %Iu (%#Ix)",
 	        self->vx_xmin, self->vx_xmin,
 	        self->vx_xend, self->vx_xend);
-	assertf(self->vx_ymin <= self->vx_yend,
+	assertf(self->vx_ymin < self->vx_yend,
 	        "self->vx_ymin = %Iu (%#Ix)\n"
 	        "self->vx_yend = %Iu (%#Ix)",
 	        self->vx_ymin, self->vx_ymin,
