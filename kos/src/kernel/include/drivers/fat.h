@@ -150,10 +150,10 @@ typedef struct ATTR_PACKED {
 			le32                  f_size;        /* File size. */
 		};
 /* Sizes of the three name portions. */
-#define LFN_NAME1      5
-#define LFN_NAME2      6
-#define LFN_NAME3      2
-#define LFN_NAME      (LFN_NAME1+LFN_NAME2+LFN_NAME3)
+#define LFN_NAME1 5
+#define LFN_NAME2 6
+#define LFN_NAME3 2
+#define LFN_NAME  (LFN_NAME1 + LFN_NAME2 + LFN_NAME3)
 		struct ATTR_PACKED {
 			/* Long filename entry. */
 #define LFN_SEQNUM_MIN        0x01

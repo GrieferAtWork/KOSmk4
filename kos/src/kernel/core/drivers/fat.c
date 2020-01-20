@@ -734,7 +734,7 @@ continue_reading:
 				for (i = 0; i < LFN_NAME3; ++i)
 					fatfile.lfn_name_3[i] = (le16)LESWAP16(fatfile.lfn_name_3[i]);
 			}
-#endif
+#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 			textend = (char16_t *)memchrw(fatfile.lfn_name_1, 0xffff, LFN_NAME1);
 			if (textend) {
 				dst = unicode_16to8(dst, (char16_t *)fatfile.lfn_name_1,
@@ -2624,7 +2624,8 @@ Fat_WriteFatIndirectionTableSegment(FatSuperblock *__restrict self,
 	FatSectorIndex sector_start;
 	void *sector_buffer;
 	size_t sector_bytes;
-	u8 n = self->f_fat_count;
+	u8 i;
+	assert(num_sectors != 0);
 	assertf(fat_sector_index + num_sectors <= self->f_sec4fat,
 	        "Out-of-bounds FAT sector index: %I32u+%I32u(%I32u) > %I32u",
 	        fat_sector_index, num_sectors, fat_sector_index + num_sectors, self->f_sec4fat);
@@ -2635,9 +2636,13 @@ Fat_WriteFatIndirectionTableSegment(FatSuperblock *__restrict self,
 	       fat_sector_index, fat_sector_index + num_sectors - 1, self->f_sec4fat - 1,
 	       sector_start, sector_start + num_sectors - 1);
 	/* Write to all redundant FAT copies. */
-	while (n--) {
-		block_device_write(self->s_device, sector_buffer, sector_bytes,
-		                   FAT_SECTORADDR(self, sector_start + n * self->f_sec4fat));
+	for (i = 0; i < self->f_fat_count; ++i) {
+		block_device_write(self->s_device,
+		                   sector_buffer,
+		                   sector_bytes,
+		                   FAT_SECTORADDR(self,
+		                                  sector_start +
+		                                  i * self->f_sec4fat));
 	}
 }
 
@@ -2665,30 +2670,27 @@ Fat_SynchronizeSuperblock(FatSuperblock *__restrict self)
 	SCOPED_WRITELOCK(&self->f_fat_lock);
 	COMPILER_READ_BARRIER();
 	if (self->f_flags & FAT_FCHANGED) {
-		FatSectorIndex changed_begin;
+		FatSectorIndex changed_start;
 		/* Let's do this! */
-		changed_begin = 0;
+		changed_start = 0;
 		for (;;) {
 			FatSectorIndex changed_end;
 			/* Search for chains for changed FAT entries and save them. */
-			while (changed_begin != self->f_sec4fat &&
-			       !FAT_META_GTCHNG(self, changed_begin))
-				++changed_begin;
-			changed_end = changed_begin;
-			while (changed_end != self->f_sec4fat &&
-			       FAT_META_GTCHNG(self, changed_end))
+			while (changed_start < self->f_sec4fat && !FAT_META_GTCHNG(self, changed_start))
+				++changed_start;
+			changed_end = changed_start;
+			while (changed_end < self->f_sec4fat && FAT_META_GTCHNG(self, changed_end))
 				++changed_end;
-			if (changed_end == changed_begin) {
-				assert(changed_begin == self->f_sec4fat);
+			if (changed_end == changed_start) {
+				assert(changed_start == self->f_sec4fat);
 				assert(changed_end == self->f_sec4fat);
 				break;
 			}
-			Fat_WriteFatIndirectionTableSegment(self, changed_begin,
-			                                    (size_t)(changed_end - changed_begin));
+			Fat_WriteFatIndirectionTableSegment(self, changed_start,
+			                                    (size_t)(changed_end - changed_start));
 			/* If changes have been saved successfully, delete all the change bits. */
-			while (changed_begin != changed_end) {
-				FAT_META_UTCHNG(self, changed_begin);
-				++changed_begin;
+			for (; changed_start < changed_end; ++changed_start) {
+				FAT_META_UTCHNG(self, changed_start);
 			}
 		}
 		self->f_flags &= ~FAT_FCHANGED;
