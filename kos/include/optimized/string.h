@@ -5463,7 +5463,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveupl))(/*aligned(4)*/ void *__ds
 			return (__UINT32_TYPE__ *)__dst;
 		case 3:
 			__ASSERT_MEMMOVEUP_RT(__dst, __src);
-			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
+			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			return (__UINT32_TYPE__ *)__dst;
 		case 4:
@@ -5605,7 +5605,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveupw))(/*aligned(2)*/ void *__ds
 			return (__UINT16_TYPE__ *)__dst;
 		case 6:
 			__ASSERT_MEMMOVEUP_RT(__dst, __src);
-			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
+			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			return (__UINT16_TYPE__ *)__dst;
 		case 8:
@@ -5825,7 +5825,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveup))(/*aligned(1)*/ void *__dst
 			return __dst;
 		case 12:
 			__ASSERT_MEMMOVEUP_RT(__dst, __src);
-			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
+			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			return __dst;
 		case 16:
@@ -6174,7 +6174,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveupl))(/*aligned(4)*/ void *__d
 			return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 8);
 		case 3:
 			__ASSERT_MEMMOVEUP_RT(__dst, __src);
-			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
+			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 12);
 		case 4:
@@ -6316,7 +6316,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveupw))(/*aligned(2)*/ void *__d
 			return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 10);
 		case 6:
 			__ASSERT_MEMMOVEUP_RT(__dst, __src);
-			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
+			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 12);
 		case 8:
@@ -6536,7 +6536,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__ds
 			return (__UINT8_TYPE__ *)__dst + 10;
 		case 12:
 			__ASSERT_MEMMOVEUP_RT(__dst, __src);
-			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
+			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			return (__UINT8_TYPE__ *)__dst + 12;
 		case 16:
