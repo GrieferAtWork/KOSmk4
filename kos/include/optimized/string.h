@@ -23,8 +23,8 @@
 #include <__stdinc.h>
 
 /* Platform-independent, optimized string.h functions. */
-#if !defined(__NO_ATTR_FORCEINLINE) && \
-    !defined(__NO_builtin_constant_p)
+#if (!defined(__NO_ATTR_FORCEINLINE) && \
+     !defined(__NO_builtin_constant_p))
 #include <hybrid/__assert.h>
 #include <hybrid/host.h>
 
@@ -3112,9 +3112,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__
 	{                                \
 		T __x1 = *((T *)__s1 + off), \
 		  __x2 = *((T *)__s2 + off); \
-		if __untraced(__x1 < __x2)             \
+		if __untraced(__x1 < __x2)   \
 			return -1;               \
-		if __untraced(__x1 > __x2)             \
+		if __untraced(__x1 > __x2)   \
 			return 1;                \
 	}
 #define __DO_COMPARE8(off)  __DO_COMPARE(__UINT8_TYPE__, off)
@@ -3128,85 +3128,85 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__
 	{                                                          \
 		__UINT8_TYPE__ __x1 = *((__UINT8_TYPE__ *)__s1 + off), \
 		               __x2 = *((__UINT8_TYPE__ *)__s2 + off); \
-		if __untraced(__x1 < __x2)                                       \
+		if __untraced(__x1 < __x2)                             \
 			return -1;                                         \
-		if __untraced(__x1 > __x2)                                       \
+		if __untraced(__x1 > __x2)                             \
 			return 1;                                          \
 	}
-#define __DO_COMPARE16(off)                                          \
-	{                                                                \
-		__UINT16_TYPE__ __x1 = *((__UINT16_TYPE__ *)__s1 + off),     \
-		                __x2 = *((__UINT16_TYPE__ *)__s2 + off);     \
+#define __DO_COMPARE16(off)                                                    \
+	{                                                                          \
+		__UINT16_TYPE__ __x1 = *((__UINT16_TYPE__ *)__s1 + off),               \
+		                __x2 = *((__UINT16_TYPE__ *)__s2 + off);               \
 		if __untraced(__x1 != __x2) {                                          \
 			if __untraced((__x1 & __UINT8_C(0xff)) < (__x2 & __UINT8_C(0xff))) \
-				return -1;                                           \
+				return -1;                                                     \
 			if __untraced((__x1 & __UINT8_C(0xff)) > (__x2 & __UINT8_C(0xff))) \
-				return 1;                                            \
+				return 1;                                                      \
 			if __untraced(__x1 < __x2)                                         \
-				return -1;                                           \
-			return 1;                                                \
-		}                                                            \
-	}
-#define __DO_COMPARE32(off)                                                    \
-	{                                                                          \
-		__UINT32_TYPE__ __x1 = *((__UINT32_TYPE__ *)__s1 + off),               \
-		                __x2 = *((__UINT32_TYPE__ *)__s2 + off);               \
-		if __untraced(__x1 != __x2) {                                                    \
-			if __untraced((__x1 & __UINT8_C(0xff)) < (__x2 & __UINT8_C(0xff)))           \
-				return -1;                                                     \
-			if __untraced((__x1 & __UINT8_C(0xff)) > (__x2 & __UINT8_C(0xff)))           \
-				return 1;                                                      \
-			if __untraced((__x1 & __UINT16_C(0xff00)) < (__x2 & __UINT16_C(0xff00)))     \
-				return -1;                                                     \
-			if __untraced((__x1 & __UINT16_C(0xff00)) > (__x2 & __UINT16_C(0xff00)))     \
-				return 1;                                                      \
-			if __untraced((__x1 & __UINT32_C(0xff0000)) < (__x2 & __UINT32_C(0xff0000))) \
-				return -1;                                                     \
-			if __untraced((__x1 & __UINT32_C(0xff0000)) > (__x2 & __UINT32_C(0xff0000))) \
-				return 1;                                                      \
-			if __untraced(__x1 < __x2)                                                   \
 				return -1;                                                     \
 			return 1;                                                          \
 		}                                                                      \
 	}
+#define __DO_COMPARE32(off)                                                              \
+	{                                                                                    \
+		__UINT32_TYPE__ __x1 = *((__UINT32_TYPE__ *)__s1 + off),                         \
+		                __x2 = *((__UINT32_TYPE__ *)__s2 + off);                         \
+		if __untraced(__x1 != __x2) {                                                    \
+			if __untraced((__x1 & __UINT8_C(0xff)) < (__x2 & __UINT8_C(0xff)))           \
+				return -1;                                                               \
+			if __untraced((__x1 & __UINT8_C(0xff)) > (__x2 & __UINT8_C(0xff)))           \
+				return 1;                                                                \
+			if __untraced((__x1 & __UINT16_C(0xff00)) < (__x2 & __UINT16_C(0xff00)))     \
+				return -1;                                                               \
+			if __untraced((__x1 & __UINT16_C(0xff00)) > (__x2 & __UINT16_C(0xff00)))     \
+				return 1;                                                                \
+			if __untraced((__x1 & __UINT32_C(0xff0000)) < (__x2 & __UINT32_C(0xff0000))) \
+				return -1;                                                               \
+			if __untraced((__x1 & __UINT32_C(0xff0000)) > (__x2 & __UINT32_C(0xff0000))) \
+				return 1;                                                                \
+			if __untraced(__x1 < __x2)                                                   \
+				return -1;                                                               \
+			return 1;                                                                    \
+		}                                                                                \
+	}
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
-#define __DO_COMPARE64(off)                                                                    \
-	{                                                                                          \
-		__UINT64_TYPE__ __x1 = *((__UINT64_TYPE__ *)__s1 + off),                               \
-		                __x2 = *((__UINT64_TYPE__ *)__s2 + off);                               \
+#define __DO_COMPARE64(off)                                                                              \
+	{                                                                                                    \
+		__UINT64_TYPE__ __x1 = *((__UINT64_TYPE__ *)__s1 + off),                                         \
+		                __x2 = *((__UINT64_TYPE__ *)__s2 + off);                                         \
 		if __untraced(__x1 != __x2) {                                                                    \
 			if __untraced((__x1 & __UINT8_C(0xff)) < (__x2 & __UINT8_C(0xff)))                           \
-				return -1;                                                                     \
+				return -1;                                                                               \
 			if __untraced((__x1 & __UINT8_C(0xff)) > (__x2 & __UINT8_C(0xff)))                           \
-				return 1;                                                                      \
+				return 1;                                                                                \
 			if __untraced((__x1 & __UINT16_C(0xff00)) < (__x2 & __UINT16_C(0xff00)))                     \
-				return -1;                                                                     \
+				return -1;                                                                               \
 			if __untraced((__x1 & __UINT16_C(0xff00)) > (__x2 & __UINT16_C(0xff00)))                     \
-				return 1;                                                                      \
+				return 1;                                                                                \
 			if __untraced((__x1 & __UINT32_C(0xff0000)) < (__x2 & __UINT32_C(0xff0000)))                 \
-				return -1;                                                                     \
+				return -1;                                                                               \
 			if __untraced((__x1 & __UINT32_C(0xff0000)) > (__x2 & __UINT32_C(0xff0000)))                 \
-				return 1;                                                                      \
+				return 1;                                                                                \
 			if __untraced((__x1 & __UINT32_C(0xff000000)) < (__x2 & __UINT32_C(0xff000000)))             \
-				return -1;                                                                     \
+				return -1;                                                                               \
 			if __untraced((__x1 & __UINT32_C(0xff000000)) > (__x2 & __UINT32_C(0xff000000)))             \
-				return 1;                                                                      \
+				return 1;                                                                                \
 			if __untraced((__x1 & __UINT64_C(0xff00000000)) < (__x2 & __UINT64_C(0xff00000000)))         \
-				return -1;                                                                     \
+				return -1;                                                                               \
 			if __untraced((__x1 & __UINT64_C(0xff00000000)) > (__x2 & __UINT64_C(0xff00000000)))         \
-				return 1;                                                                      \
+				return 1;                                                                                \
 			if __untraced((__x1 & __UINT64_C(0xff0000000000)) < (__x2 & __UINT64_C(0xff0000000000)))     \
-				return -1;                                                                     \
+				return -1;                                                                               \
 			if __untraced((__x1 & __UINT64_C(0xff0000000000)) > (__x2 & __UINT64_C(0xff0000000000)))     \
-				return 1;                                                                      \
+				return 1;                                                                                \
 			if __untraced((__x1 & __UINT64_C(0xff000000000000)) < (__x2 & __UINT64_C(0xff000000000000))) \
-				return -1;                                                                     \
+				return -1;                                                                               \
 			if __untraced((__x1 & __UINT64_C(0xff000000000000)) > (__x2 & __UINT64_C(0xff000000000000))) \
-				return 1;                                                                      \
+				return 1;                                                                                \
 			if __untraced(__x1 < __x2)                                                                   \
-				return -1;                                                                     \
-			return 1;                                                                          \
-		}                                                                                      \
+				return -1;                                                                               \
+			return 1;                                                                                    \
+		}                                                                                                \
 	}
 #endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
@@ -3442,9 +3442,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpw))(/*aligned(2)*/ void const *_
 	{                                \
 		T __x1 = *((T *)__s1 + off), \
 		  __x2 = *((T *)__s2 + off); \
-		if __untraced(__x1 < __x2)             \
+		if __untraced(__x1 < __x2)   \
 			return -1;               \
-		if __untraced(__x1 > __x2)             \
+		if __untraced(__x1 > __x2)   \
 			return 1;                \
 	}
 #define __DO_COMPARE16(off) __DO_COMPARE(__UINT16_TYPE__, off)
@@ -3457,48 +3457,48 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpw))(/*aligned(2)*/ void const *_
 	{                                                            \
 		__UINT16_TYPE__ __x1 = *((__UINT16_TYPE__ *)__s1 + off), \
 		                __x2 = *((__UINT16_TYPE__ *)__s2 + off); \
-		if __untraced(__x1 != __x2) {                                      \
-			if __untraced(__x1 < __x2)                                     \
+		if __untraced(__x1 != __x2) {                            \
+			if __untraced(__x1 < __x2)                           \
 				return -1;                                       \
 			return 1;                                            \
 		}                                                        \
 	}
-#define __DO_COMPARE32(off)                                                \
-	{                                                                      \
-		__UINT32_TYPE__ __x1 = *((__UINT32_TYPE__ *)__s1 + off),           \
-		                __x2 = *((__UINT32_TYPE__ *)__s2 + off);           \
+#define __DO_COMPARE32(off)                                                          \
+	{                                                                                \
+		__UINT32_TYPE__ __x1 = *((__UINT32_TYPE__ *)__s1 + off),                     \
+		                __x2 = *((__UINT32_TYPE__ *)__s2 + off);                     \
 		if __untraced(__x1 != __x2) {                                                \
 			if __untraced((__x1 & __UINT16_C(0xffff)) < (__x2 & __UINT16_C(0xffff))) \
-				return -1;                                                 \
+				return -1;                                                           \
 			if __untraced((__x1 & __UINT16_C(0xffff)) > (__x2 & __UINT16_C(0xffff))) \
-				return 1;                                                  \
+				return 1;                                                            \
 			if __untraced(__x1 < __x2)                                               \
-				return -1;                                                 \
-			return 1;                                                      \
-		}                                                                  \
+				return -1;                                                           \
+			return 1;                                                                \
+		}                                                                            \
 	}
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
-#define __DO_COMPARE64(off)                                                                \
-	{                                                                                      \
-		__UINT64_TYPE__ __x1 = *((__UINT64_TYPE__ *)__s1 + off),                           \
-		                __x2 = *((__UINT64_TYPE__ *)__s2 + off);                           \
+#define __DO_COMPARE64(off)                                                                          \
+	{                                                                                                \
+		__UINT64_TYPE__ __x1 = *((__UINT64_TYPE__ *)__s1 + off),                                     \
+		                __x2 = *((__UINT64_TYPE__ *)__s2 + off);                                     \
 		if __untraced(__x1 != __x2) {                                                                \
 			if __untraced((__x1 & __UINT16_C(0xffff)) < (__x2 & __UINT16_C(0xffff)))                 \
-				return -1;                                                                 \
+				return -1;                                                                           \
 			if __untraced((__x1 & __UINT16_C(0xffff)) > (__x2 & __UINT16_C(0xffff)))                 \
-				return 1;                                                                  \
+				return 1;                                                                            \
 			if __untraced((__x1 & __UINT32_C(0xffff0000)) < (__x2 & __UINT32_C(0xffff0000)))         \
-				return -1;                                                                 \
+				return -1;                                                                           \
 			if __untraced((__x1 & __UINT32_C(0xffff0000)) > (__x2 & __UINT32_C(0xffff0000)))         \
-				return 1;                                                                  \
+				return 1;                                                                            \
 			if __untraced((__x1 & __UINT64_C(0xffff00000000)) < (__x2 & __UINT64_C(0xffff00000000))) \
-				return -1;                                                                 \
+				return -1;                                                                           \
 			if __untraced((__x1 & __UINT64_C(0xffff00000000)) > (__x2 & __UINT64_C(0xffff00000000))) \
-				return 1;                                                                  \
+				return 1;                                                                            \
 			if __untraced(__x1 < __x2)                                                               \
-				return -1;                                                                 \
-			return 1;                                                                      \
-		}                                                                                  \
+				return -1;                                                                           \
+			return 1;                                                                                \
+		}                                                                                            \
 	}
 #endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
@@ -3657,9 +3657,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpl))(/*aligned(4)*/ void const *_
 	{                                \
 		T __x1 = *((T *)__s1 + off), \
 		  __x2 = *((T *)__s2 + off); \
-		if __untraced(__x1 < __x2)             \
+		if __untraced(__x1 < __x2)   \
 			return -1;               \
-		if __untraced(__x1 > __x2)             \
+		if __untraced(__x1 > __x2)   \
 			return 1;                \
 	}
 #define __DO_COMPARE32(off) __DO_COMPARE(__UINT32_TYPE__, off)
@@ -3671,26 +3671,26 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpl))(/*aligned(4)*/ void const *_
 	{                                                            \
 		__UINT32_TYPE__ __x1 = *((__UINT32_TYPE__ *)__s1 + off), \
 		                __x2 = *((__UINT32_TYPE__ *)__s2 + off); \
-		if __untraced(__x1 != __x2) {                                      \
-			if __untraced(__x1 < __x2)                                     \
+		if __untraced(__x1 != __x2) {                            \
+			if __untraced(__x1 < __x2)                           \
 				return -1;                                       \
 			return 1;                                            \
 		}                                                        \
 	}
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
-#define __DO_COMPARE64(off)                                                        \
-	{                                                                              \
-		__UINT64_TYPE__ __x1 = *((__UINT64_TYPE__ *)__s1 + off),                   \
-		                __x2 = *((__UINT64_TYPE__ *)__s2 + off);                   \
+#define __DO_COMPARE64(off)                                                                  \
+	{                                                                                        \
+		__UINT64_TYPE__ __x1 = *((__UINT64_TYPE__ *)__s1 + off),                             \
+		                __x2 = *((__UINT64_TYPE__ *)__s2 + off);                             \
 		if __untraced(__x1 != __x2) {                                                        \
 			if __untraced((__x1 & __UINT32_C(0xffffffff)) < (__x2 & __UINT32_C(0xffffffff))) \
-				return -1;                                                         \
+				return -1;                                                                   \
 			if __untraced((__x1 & __UINT32_C(0xffffffff)) > (__x2 & __UINT32_C(0xffffffff))) \
-				return 1;                                                          \
+				return 1;                                                                    \
 			if __untraced(__x1 < __x2)                                                       \
-				return -1;                                                         \
-			return 1;                                                              \
-		}                                                                          \
+				return -1;                                                                   \
+			return 1;                                                                        \
+		}                                                                                    \
 	}
 #endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
@@ -3806,9 +3806,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpq))(/*aligned(8)*/ void const *_
 	{                                \
 		T __x1 = *((T *)__s1 + off), \
 		  __x2 = *((T *)__s2 + off); \
-		if __untraced(__x1 < __x2)             \
+		if __untraced(__x1 < __x2)   \
 			return -1;               \
-		if __untraced(__x1 > __x2)             \
+		if __untraced(__x1 > __x2)   \
 			return 1;                \
 	}
 #define __DO_COMPARE32(off) __DO_COMPARE(__UINT32_TYPE__, off)
@@ -3820,26 +3820,26 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpq))(/*aligned(8)*/ void const *_
 	{                                                            \
 		__UINT32_TYPE__ __x1 = *((__UINT32_TYPE__ *)__s1 + off), \
 		                __x2 = *((__UINT32_TYPE__ *)__s2 + off); \
-		if __untraced(__x1 != __x2) {                                      \
-			if __untraced(__x1 < __x2)                                     \
+		if __untraced(__x1 != __x2) {                            \
+			if __untraced(__x1 < __x2)                           \
 				return -1;                                       \
 			return 1;                                            \
 		}                                                        \
 	}
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
-#define __DO_COMPARE64(off)                                                        \
-	{                                                                              \
-		__UINT64_TYPE__ __x1 = *((__UINT64_TYPE__ *)__s1 + off),                   \
-		                __x2 = *((__UINT64_TYPE__ *)__s2 + off);                   \
+#define __DO_COMPARE64(off)                                                                  \
+	{                                                                                        \
+		__UINT64_TYPE__ __x1 = *((__UINT64_TYPE__ *)__s1 + off),                             \
+		                __x2 = *((__UINT64_TYPE__ *)__s2 + off);                             \
 		if __untraced(__x1 != __x2) {                                                        \
 			if __untraced((__x1 & __UINT32_C(0xffffffff)) < (__x2 & __UINT32_C(0xffffffff))) \
-				return -1;                                                         \
+				return -1;                                                                   \
 			if __untraced((__x1 & __UINT32_C(0xffffffff)) > (__x2 & __UINT32_C(0xffffffff))) \
-				return 1;                                                          \
+				return 1;                                                                    \
 			if __untraced(__x1 < __x2)                                                       \
-				return -1;                                                         \
-			return 1;                                                              \
-		}                                                                          \
+				return -1;                                                                   \
+			return 1;                                                                        \
+		}                                                                                    \
 	}
 #endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */

@@ -563,5 +563,20 @@ __DECL_END
 #include <gnu/stubs.h>
 #endif /* __CRT_KOS_NATIVE */
 
+/* Configure SSP *_chk bindings
+ * NOTE: SSP requires compiler support in the form of `__builtin_object_size()'
+ *       If this builtin isn't available, SSP is disabled in headers! */
+#ifdef __SSP_FORTIFY_LEVEL
+#if (__SSP_FORTIFY_LEVEL + 0) > 0
+#if !__has_builtin(__builtin_object_size)
+#ifdef __PREPROCESSOR_HAVE_WARNING
+#warning "__SSP_FORTIFY_LEVEL enabled, but `__builtin_object_size()' not supported"
+#endif /* __PREPROCESSOR_HAVE_WARNING */
+#undef __SSP_FORTIFY_LEVEL
+#endif /* !__has_builtin(__builtin_object_size) */
+#else /* __SSP_FORTIFY_LEVEL > 0 */
+#undef __SSP_FORTIFY_LEVEL
+#endif /* __SSP_FORTIFY_LEVEL <= 0 */
+#endif /* __SSP_FORTIFY_LEVEL */
 
 #endif /* !___CRT_H */

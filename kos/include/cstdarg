@@ -16,7 +16,8 @@
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
- */#ifndef _CXX_CSTDARG
+ */
+#ifndef _CXX_CSTDARG
 #define _CXX_CSTDARG 1
 #ifndef _STDARG_H
 #ifdef __CXX_SYSTEM_HEADER

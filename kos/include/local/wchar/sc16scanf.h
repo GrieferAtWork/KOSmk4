@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdce95462 */
+/* HASH CRC-32:0xfb170252 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sc16scanf_defined
-#if 1
 #define __local_sc16scanf_defined 1
 /* Dependency: "vswscanf" from "wchar" */
 #ifndef ____localdep_vsc16scanf_defined
@@ -51,5 +50,4 @@ __NOTHROW_NCX(__VLIBDCALL __LIBC_LOCAL_NAME(sc16scanf))(__CHAR16_TYPE__ const *_
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* 1 */
 #endif /* !__local_sc16scanf_defined */

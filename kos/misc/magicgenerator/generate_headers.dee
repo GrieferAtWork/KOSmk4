@@ -492,6 +492,20 @@ function form_has_function_expression(name: string): string {
 	throw "Unknown function " + repr name;
 }
 
+function form_crt_has_function_expression(name: string): string {
+	if ("," in name) {
+		return " && ".join(
+			for (local x: name.split(","))
+				form_crt_has_function_expression(x.strip()));
+	}
+	local func = functions_prototypes.get(name.rstrip("?"));
+	if (func !is none)
+		return func.get_crt_dependency_string();
+	if (name.endswith("?"))
+		return key_crt_have(name.rstrip("?"));
+	throw "Unknown function " + repr name;
+}
+
 function form_not_has_function_expression(name: string): string {
 	if ("," in name) {
 		return " || ".join(
@@ -506,9 +520,25 @@ function form_not_has_function_expression(name: string): string {
 	throw Error("Unknown function " + repr name);
 }
 
+function form_not_crt_has_function_expression(name: string): string {
+	if ("," in name) {
+		return " || ".join(
+			for (local x: name.split(","))
+				form_not_crt_has_function_expression(x.strip()));
+	}
+	local func = functions_prototypes.get(name.rstrip("?"));
+	if (func !is none)
+		return "!({})".format({ func.get_crt_dependency_string() });
+	if (name.endswith("?"))
+		return "!" + key_crt_have(name.rstrip("?"));
+	throw Error("Unknown function " + repr name);
+}
+
 global directivesEnvironmentFunctions = {
-	"has_function"     : form_has_function_expression,
-	"not_has_function" : form_not_has_function_expression,
+	"has_function"         : form_has_function_expression,
+	"crt_has_function"     : form_crt_has_function_expression,
+	"not_has_function"     : form_not_has_function_expression,
+	"not_crt_has_function" : form_not_crt_has_function_expression,
 };
 
 class DirectivesEnvironment {
@@ -619,6 +649,14 @@ function split_words(
 							form_has_function_expression(directive),
 							env, for_copy)...;
 						break;
+					case "crt_has_function":
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Argument of @@crt_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+						directive = directive[1:-1].strip();
+						yield split_words(
+							form_crt_has_function_expression(directive),
+							env, for_copy)...;
+						break;
 					case "if_has_function":
 						if (!directive.startswith("(") || !directive.endswith(")"))
 							throw Error("Argument of @@if_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
@@ -668,6 +706,55 @@ function split_words(
 								env, for_copy)...;
 						}
 						break;
+					case "if_crt_has_function":
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Argument of @@if_crt_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+						directive = directive[1:-1].strip();
+						yield split_words(
+							wrapProcessorExpressionForIf(
+								form_crt_has_function_expression(directive)),
+							env, for_copy)...;
+						did_encounter_else_if_has_function = false;
+						break;
+					case "elif_crt_has_function":
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Argument of @@elif_crt_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+						directive = directive[1:-1].strip();
+						yield split_words(
+							"#elif " + form_crt_has_function_expression(directive),
+							env, for_copy)...;
+						did_encounter_else_if_has_function = false;
+						break;
+					case "else_crt_has_function":
+						if (!directive) {
+							yield split_words("#else", env, for_copy)...;
+						} else {
+							if (!directive.startswith("(") || !directive.endswith(")"))
+								throw Error("Argument of @@else_crt_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+							directive = directive[1:-1].strip();
+							yield split_words(
+								"#else /* {} */".format({
+									optimizePreprocessorExpressionAndRemoveDefined(
+										form_crt_has_function_expression(directive))
+								}), env, for_copy)...;
+						}
+						did_encounter_else_if_has_function = true;
+						break;
+					case "endif_crt_has_function":
+						if (!directive) {
+							yield split_words("#endif", env, for_copy)...;
+						} else {
+							if (!directive.startswith("(") || !directive.endswith(")"))
+								throw Error("Argument of @@endif_crt_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+							directive = form_crt_has_function_expression(directive[1:-1].strip());
+							if (did_encounter_else_if_has_function)
+								directive = "!({})".format({ directive });
+							yield split_words(
+								"#endif /* {} */".format({
+									optimizePreprocessorExpressionAndRemoveDefined(directive) }),
+								env, for_copy)...;
+						}
+						break;
 					case "if_not_has_function":
 						if (!directive.startswith("(") || !directive.endswith(")"))
 							throw Error("Argument of @@if_not_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
@@ -709,6 +796,55 @@ function split_words(
 							if (!directive.startswith("(") || !directive.endswith(")"))
 								throw Error("Argument of @@endif_not_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
 							directive = form_not_has_function_expression(directive[1:-1].strip());
+							if (did_encounter_else_if_has_function)
+								directive = "!({})".format({ directive });
+							yield split_words(
+								"#endif /* {} */".format({
+									optimizePreprocessorExpressionAndRemoveDefined(directive) }),
+								env, for_copy)...;
+						}
+						break;
+					case "if_not_crt_has_function":
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Argument of @@if_not_crt_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+						directive = directive[1:-1].strip();
+						yield split_words(
+							wrapProcessorExpressionForIf(
+								form_not_crt_has_function_expression(directive)),
+							env, for_copy)...;
+						did_encounter_else_if_has_function = false;
+						break;
+					case "elif_not_crt_has_function":
+						if (!directive.startswith("(") || !directive.endswith(")"))
+							throw Error("Argument of @@elif_not_crt_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+						directive = directive[1:-1].strip();
+						yield split_words(
+							"#elif " + form_not_crt_has_function_expression(directive),
+							env, for_copy)...;
+						did_encounter_else_if_has_function = false;
+						break;
+					case "else_not_crt_has_function":
+						if (!directive) {
+							yield split_words("#else", env, for_copy)...;
+						} else {
+							if (!directive.startswith("(") || !directive.endswith(")"))
+								throw Error("Argument of @@else_not_crt_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+							directive = directive[1:-1].strip();
+							yield split_words(
+								"#else /* {} */".format({
+									optimizePreprocessorExpressionAndRemoveDefined(
+										form_not_crt_has_function_expression(directive))
+								}), env, for_copy)...;
+						}
+						did_encounter_else_if_has_function = true;
+						break;
+					case "endif_not_crt_has_function":
+						if (!directive) {
+							yield split_words("#endif", env, for_copy)...;
+						} else {
+							if (!directive.startswith("(") || !directive.endswith(")"))
+								throw Error("Argument of @@endif_not_crt_has_function(...)@@ to start/end with (...), but is actually {!r}".format({ directive }));
+							directive = form_not_crt_has_function_expression(directive[1:-1].strip());
 							if (did_encounter_else_if_has_function)
 								directive = "!({})".format({ directive });
 							yield split_words(
@@ -1561,7 +1697,7 @@ class CrtBuiltin {
 }
 
 function removeLineFeedAndDuplicateSpaces(text: string): string {
-	text = text.replace("\n", " ");
+	text = text.replace("\n", " ").replace("\t", " ");
 	for (;;) {
 		local n = text.replace("  ", " ");
 		if (text == n)
@@ -1884,6 +2020,49 @@ got_section_prefix:
 							err(directive_begin, "Conflicting str2wcs replacement definition for `" + repr a + "' (new: " + repr b + ", old: " + repr replacement_words[a] + ")'");
 					}
 					str2wcs_keyword_replacements[a] = b;
+				} else if (directive.startswith("define_ssp")) {
+					directive = directive[#"define_ssp":];
+					local define_builtin = directive.startswith("_builtin");
+					if (define_builtin)
+						directive = directive[#"_builtin":];
+					local undef_existing = directive.startswith("_undef");
+					if (undef_existing)
+						directive = directive[#"_undef":];
+					if (!directive.startswith("("))
+						err(directive_begin, "Expected `(' after `%[define_ssp[_builtin][_undef]' in " + repr directive);
+					local defend = directive.findmatch("(", ")", 1);
+					if (defend < 0)
+						err(directive_begin, "Missing `)' after `%[define_ssp[_builtin][_undef]" + repr directive + "'");
+					if (directive[defend + 1:].strip() != "")
+						err(directive_begin, "Trailing text after `%[define_ssp[_builtin][_undef](...)': " + repr directive[defend:].strip());
+					directive = directive[1:defend].strip();
+					if ("=" !in directive)
+						err(directive_begin, "Missing `=' in `%[define_ssp[_builtin][_undef](" + repr directive + ")'");
+					local a, none, b = directive.partition("=")...;
+					a = a.strip();
+					b = b.strip();
+					local aName = a.partition("(")[0].strip();
+					local baseFunctionName = b.lstrip("_").partition("_chk")[0];
+					File.Writer fp;
+					if (define_builtin) {
+						fp << "#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_" << baseFunctionName << ") && \\\n";
+						fp << "     defined(__CRT_HAVE___" << baseFunctionName << "_chk) && __has_builtin(__builtin___" << baseFunctionName << "_chk))\n";
+						if (undef_existing)
+							fp << "#undef " << aName << "\n";
+						local bos_start = b.index("__ssp_bos0");
+						local bos = b[bos_start:b.index(")", bos_start) + 1].strip();
+						fp << "#define " << a << (" " * ((#b + #bos + 31) - #a)) << " \\\n";
+						fp << "\t(" << bos << " != (__SIZE_TYPE__)-1 ? __builtin_" << b << " \\\n";
+						fp << "\t" << (" " * (#bos + 23)) << ": " << b << ")\n";
+						fp << "#elif defined(__CRT_HAVE___" << baseFunctionName << "_chk)\n";
+					} else {
+						fp << "#ifdef __CRT_HAVE___" << baseFunctionName << "_chk\n";
+					}
+					if (undef_existing)
+						fp << "#undef " << aName << "\n";
+					fp << "#define " << a << " " << b << "\n";
+					fp << "#endif /* ... */\n";
+					yield IntermediateString(fp.string, pack "c");
 				} else if (directive.startswith("push_macro")) {
 					/* 'push_macro' ['(' groups ')'] [@option...] '(' macros... ')' */
 					/* 'push_macro' ['(' groups ')'] [@option...] '{' macros... '}' */
@@ -2512,6 +2691,9 @@ again_enum_name:
 				case "preferred_impl":
 					preferred_impl.append(("__LOCAL", " && ".join(conditions), get_tag_operand().strip()));
 					break;
+				case "preferred_impl_extern":
+					preferred_impl.append(("__EXTERNINLINE", " && ".join(conditions), get_tag_operand().strip()));
+					break;
 				case "allow_macros":
 					allow_macros = true;
 					break;
@@ -3127,6 +3309,70 @@ again_enum_name:
 						if (user_impl is none)
 							user_impl = block;
 						break;
+					case "chk": {
+						local info = get_mode_arg();
+						local baseName, none, checkExpr = info.partition(",")...;
+						baseName = baseName.strip();
+						checkExpr = checkExpr.strip();
+						if (baseName == "%auto") {
+							if (!funname.startswith("__") || !funname.endswith("_chk"))
+								err(i, "Unable to determine underlying *_chk function for {!r}".format({ funname }));
+							baseName = funname[2:-4];
+						}
+						local arglist = Tuple(split_argument_list(argument_list));
+						if (checkExpr == "%auto") {
+							function arglistContainsName(arglist: {(string, string)...}, name: string): bool {
+								for (local none, argname: arglist) {
+									if (name == argname)
+										return true;
+								}
+								return false;
+							}
+							local checkExprVariants: {({string...}, string)...} = {
+								({ "dst", "n_bytes", "dst_objsize" },
+									"__ssp_chk_dstbuf({funname!r}, dst, n_bytes, dst_objsize)"),
+								({ "dst", "n_words", "dst_objsize" },
+									"__ssp_chk_dstbuf({funname!r}, dst, n_words * 2, dst_objsize)"),
+								({ "dst", "n_dwords", "dst_objsize" },
+									"__ssp_chk_dstbuf({funname!r}, dst, n_dwords * 4, dst_objsize)"),
+								({ "dst", "n_qwords", "dst_objsize" },
+									"__ssp_chk_dstbuf({funname!r}, dst, n_qwords * 8, dst_objsize)"),
+								({ "dst", "elem_count", "elem_size", "dst_objsize" },
+									"__ssp_chk_dstbuf({funname!r}, dst, elem_count * elem_size, dst_objsize)"),
+							};
+							for (local argnames, text: checkExprVariants) {
+								for (local name: argnames) {
+									if (!arglistContainsName(arglist, name))
+										goto next_chk_checkexpr_auto;
+								}
+								checkExpr = text.format({ "funname": funname });
+								goto got_chk_checkexpr;
+next_chk_checkexpr_auto:
+								;
+							}
+							err(i, "Unable to determine check expression for {!r}".format({ funname }));
+						}
+got_chk_checkexpr:
+						if (dependency_prefix)
+							dependency_prefix += "\n";
+						if (!define_require_string) {
+							/* Auto-define requirements to require the underlying function */
+							define_require_string = "$has_function({})".format({ baseName });
+#ifndef EXPORTS_USE_USER_HEADERS
+							if (dont_export_symbol is none)
+								dont_export_symbol = "auto";
+#endif
+						}
+						dependency_prefix += "#include @<ssp/chk.h>@\n";
+						File.Writer fp;
+						fp << "{\n";
+						fp << "\t(void)" << arglist.last[1] << ";\n";
+						fp << "\t" << checkExpr << ";\n";
+						fp << "\treturn " << baseName << "(" << ", ".join(arglist[:-1].each[1]) << ");\n";
+						fp << "}\n";
+						block = fp.string;
+					}	break;
+					
 					case "memcpyc": {
 						local pattern =
 						"{{\n"
@@ -3393,9 +3639,8 @@ again_enum_name:
 #ifndef EXPORTS_USE_USER_HEADERS
 			if (dont_export_symbol is none)
 				dont_export_symbol = "auto";
-#endif
+#endif /* !EXPORTS_USE_USER_HEADERS */
 			fun.dont_export_symbol = dont_export_symbol;
-
 			if (define_as_builtin === false)
 				; /* Don't provide builtin function support */
 			else if (define_as_builtin !is none) {
@@ -3635,6 +3880,22 @@ function format_define_require_string(fp: File, text: string) {
 					(old_string && !old_string.endswith("||") && !old_string.endswith("(")) ||
 					(i < len && !new_string.startswith("||") && !new_string.startswith(")")));
 			}	break;
+			case "crt_has_function": {
+				local name = get_tag_operand();
+				local func = functions_prototypes.get(name.rstrip("?"));
+				if (func is none) {
+					if (name.endswith("?")) {
+						fp << key_crt_have(name.rstrip("?"));
+						break;
+					}
+					throw "Unknown function " + repr name;
+				}
+				local old_string = fp.string.rstrip();
+				local new_string = text.substr(i).lstrip();
+				fp << add_paren_if_necessary(func.get_crt_dependency_string(),
+					(old_string && !old_string.endswith("||") && !old_string.endswith("(")) ||
+					(i < len && !new_string.startswith("||") && !new_string.startswith(")")));
+			}	break;
 			default:
 				throw "Unknown requires directive " + repr cmd + " in [requires(" + repr text + ")]";
 			}
@@ -3698,7 +3959,7 @@ function enumerateFormatRequireFunctionDependencies(text: string): {string...} {
 				}
 				return block.substr(1, #block - 1).strip();
 			}
-			if (cmd == "has_function") {
+			if (cmd in ["has_function", "crt_has_function"]) {
 				yield get_tag_operand();
 			}
 			continue;
@@ -4031,7 +4292,7 @@ class Function {
 					} else {
 						fp << " && ";
 					}
-					fp add_paren_if_necessary(temp, false);
+					fp << add_paren_if_necessary(temp, false);
 				}
 				if (!is_first)
 					fp << ")";
@@ -4043,6 +4304,54 @@ class Function {
 			    result.findmatch("(", ")", 1) == #result - 1)
 				result = result[1:-1];
 		}
+		result = optimizePreprocessorExpression(result);
+		dependency_string = result;
+		return result;
+	}
+
+	@@Returns or generate the dependency string of @this function when provided by libc
+	@@>> #if $get_crt_dependency_string(foo)$
+	@@>> #define FOO_IS_PROVIDED_BY_LIBC 1
+	@@>> #endif
+	public function get_crt_dependency_string(): string {
+		File.Writer fp;
+		local result;
+		fp << "1";
+		for (local none, cond: enum_link_conditions())
+			fp << " || " << add_paren_if_necessary(cond, false);
+		if (define_require_string) {
+			File.Writer tempfp;
+			format_define_require_string(tempfp, define_require_string);
+			fp << " || " << add_paren_if_necessary(tempfp.string, false);
+		} else if (this.block is FunctionAlias) {
+			local temp = this.block.func.get_dependency_string();
+			if (temp in ["", "1"])
+				return "1";
+			fp << " || " << temp;
+		} else {
+			local is_first = true;
+			for (local d: this.dependencies) {
+				local temp;
+				temp = d.get_dependency_string();
+				if (temp in ["", "1"])
+					continue;
+				if (is_first) {
+					fp << " || (";
+					is_first = false;
+				} else {
+					fp << " && ";
+				}
+				fp << add_paren_if_necessary(temp, false);
+			}
+			if (!is_first)
+				fp << ")";
+		}
+		result = fp.string;
+		if (result.startswith("1 || "))
+			result = result[#"1 || ":];
+		if (result.startswith("(") &&
+		    result.findmatch("(", ")", 1) == #result - 1)
+			result = result[1:-1];
 		result = optimizePreprocessorExpression(result);
 		dependency_string = result;
 		return result;
@@ -4559,12 +4868,15 @@ class Function {
 		if (with_copyright)
 			fp << copyright << "\n";
 		fp << "#ifndef __local_" << used_name << "_defined\n";
-		if (define_require_string) {
-			fp << full_requires_prefix;
+		local formatedDefineRequireString = define_require_string;
+		if (formatedDefineRequireString) {
 			File.Writer tempfp;
-			format_define_require_string(tempfp, define_require_string);
-			fp << optimizeAndWrapProcessorExpressionForIf(tempfp.string);
-			fp << "\n";
+			format_define_require_string(tempfp, formatedDefineRequireString);
+			formatedDefineRequireString = optimizePreprocessorExpression(tempfp.string);
+		}
+		if (formatedDefineRequireString !in ["", "1"]) {
+			fp << full_requires_prefix;
+			fp << optimizeAndWrapProcessorExpressionForIf(formatedDefineRequireString) << "\n";
 		}
 		fp << "#define __local_" << used_name << "_defined 1\n";
 		/* Include dependencies. */
@@ -4674,11 +4986,9 @@ class Function {
 		fp << " ";
 		transform_block(fp, key_dependency, key_libclocal, key_underscore, REPLACE_TYPE_WORDS_LOCAL, wchar_t_replacement);
 		fp << "\n__NAMESPACE_LOCAL_END\n";
-		if (define_require_string) {
+		if (formatedDefineRequireString !in ["", "1"]) {
 			fp << "#endif /* ";
-			File.Writer tempfp;
-			format_define_require_string_comment(tempfp, define_require_string);
-			fp << optimizePreprocessorExpressionAndRemoveDefined(tempfp.string);
+			fp << optimizePreprocessorExpressionAndRemoveDefined(formatedDefineRequireString);
 			fp << " */\n";
 		}
 		fp << "#endif /* !__local_" << used_name << "_defined */\n";
@@ -4860,7 +5170,7 @@ do_return_crt:
 				continue;
 			fp << "\t(void)" << nm << ";\n";
 		}
-		fp << "\tCRT_UNIMPLEMENTED(" << repr(name) << "); /* TO"  "DO */\n";
+		fp << "\tCRT_UNIMPLEMENTED(" << repr(name) << "); /* TO" "DO */\n";
 		if (nosys_errno !is none)
 			fp << "\tlibc_seterrno(" << nosys_errno << ");\n";
 		if (get_is_noreturn()) {

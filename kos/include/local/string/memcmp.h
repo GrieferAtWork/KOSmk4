@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd91bea1 */
+/* HASH CRC-32:0x8c1d274d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __LOCAL_LIBC(memcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmp))(void const *__s1,
                                                     void const *__s2,
                                                     __SIZE_TYPE__ __n_bytes) {
-#line 221 "kos/src/libc/magic/string.c"
+#line 225 "kos/src/libc/magic/string.c"
 	__BYTE_TYPE__ *__p1 = (__BYTE_TYPE__ *)__s1;
 	__BYTE_TYPE__ *__p2 = (__BYTE_TYPE__ *)__s2;
 	__BYTE_TYPE__ __v1, __v2;

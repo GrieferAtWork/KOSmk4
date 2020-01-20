@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ac043f7 */
+/* HASH CRC-32:0x5e3368a2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -788,11 +788,55 @@
 #define __CRT_ATTR_NOTHROW_NCX___mbrlen 1
 #define __CRT_ATTR_NOTHROW_NCX___memcdup 1
 #define __CRT_ATTR_NOTHROW_NCX___memcpy_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memcpyc_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memcpyl_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memcpyq_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memcpyw_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___memdup 1
 #define __CRT_ATTR_NOTHROW_NCX___memmove_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmovec_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmovedown_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmovedownc_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmovedownl_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmovedownq_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmovedownw_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmovel_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmoveq_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmoveup_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmoveupc_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmoveupl_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmoveupq_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmoveupw_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memmovew_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___mempcpy 1
 #define __CRT_ATTR_NOTHROW_NCX___mempcpy_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempcpyc_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempcpyl_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempcpyq_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempcpyw_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmove_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmovec_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmovedown_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmovedownc_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmovedownl_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmovedownq_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmovedownw_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmovel_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmoveq_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmoveup_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmoveupc_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmoveupl_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmoveupq_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmoveupw_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempmovew_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempset_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempsetl_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempsetq_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___mempsetw_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___memset_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memsetl_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memsetq_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memsetw_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___modf 1
 #define __CRT_ATTR_NOTHROW_NCX___modff 1
 #define __CRT_ATTR_NOTHROW_NCX___modfl 1
@@ -874,6 +918,7 @@
 #define __CRT_ATTR_NOTHROW_NCX___stpcpy 1
 #define __CRT_ATTR_NOTHROW_NCX___stpcpy_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___stpncpy 1
+#define __CRT_ATTR_NOTHROW_NCX___stpncpy_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___strcat_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___strcpy_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___strncat_chk 1

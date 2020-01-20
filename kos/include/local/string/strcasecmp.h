@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a87067d */
+/* HASH CRC-32:0x996a8c71 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strcasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcasecmp))(char const *__s1,
                                                         char const *__s2) {
-#line 866 "kos/src/libc/magic/string.c"
+#line 870 "kos/src/libc/magic/string.c"
 	char __c1, __c2;
 	do {
 		if ((__c1 = *__s1++) != (__c2 = *__s2++) && ((__c1 = __localdep_tolower(__c1)) != (__c2 = __localdep_tolower(__c2))))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7386e1da */
+/* HASH CRC-32:0xa0776ce6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local___stpcpy_chk_defined
 #define __local___stpcpy_chk_defined 1
+#include <ssp/chk.h>
 /* Dependency: "stpcpy" from "string" */
 #ifndef ____localdep_stpcpy_defined
 #define ____localdep_stpcpy_defined 1
@@ -43,10 +44,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__stpcpy_chk) __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__stpcpy_chk))(char *__restrict __dst,
                                                           char const *__restrict __src,
-                                                          __SIZE_TYPE__ __dst_bufsize) {
-#line 77 "kos/src/libc/magic/ssp.string.c"
-	(void)__dst_bufsize;
+                                                          __SIZE_TYPE__ __dst_objsize) {
+#line 52 "kos/src/libc/magic/ssp.string.c"
+	(void)__dst_objsize;
+	(void)__dst_objsize; /* TODO */;
 	return __localdep_stpcpy(__dst, __src);
 }
+
 __NAMESPACE_LOCAL_END
 #endif /* !__local___stpcpy_chk_defined */

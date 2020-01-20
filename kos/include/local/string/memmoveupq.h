@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11bba5ed */
+/* HASH CRC-32:0x44889521 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __LOCAL_LIBC(memmoveupq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveupq))(/*aligned(8)*/ void *__dst,
                                                         /*aligned(8)*/ void const *__src,
                                                         __SIZE_TYPE__ __n_qwords) {
-#line 1667 "kos/src/libc/magic/string.c"
+#line 1671 "kos/src/libc/magic/string.c"
 #if __SIZEOF_POINTER__ >= 8
 	__UINT64_TYPE__ *__pdst, *__psrc;
 	__pdst = (__UINT64_TYPE__ *)__dst + __n_qwords;

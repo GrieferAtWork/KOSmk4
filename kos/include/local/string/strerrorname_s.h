@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35d81537 */
+/* HASH CRC-32:0x69cc4342 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerrorname_s) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrorname_s))(int __errnum) {
-#line 3430 "kos/src/libc/magic/string.c"
+#line 3434 "kos/src/libc/magic/string.c"
 	char const *__result;
 	switch (__errnum) {
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8b076 */
+/* HASH CRC-32:0x638268ac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hsearch_defined
-#if 1
 #define __local_hsearch_defined 1
 #ifndef __hsearch_data_defined
 #define __hsearch_data_defined 1
@@ -60,5 +59,4 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch))(ENTRY __item,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* 1 */
 #endif /* !__local_hsearch_defined */

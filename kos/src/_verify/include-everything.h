@@ -80,7 +80,10 @@ function incdir(prefix, path) {
 	for (local x: fs.dir(path).sorted()) {
 		local total = fs.joinpath(path, x);
 		if (fs.stat.isdir(total)) {
-			if (x in ["i386-kos", "c++", "local", "compiler", "crt-features", "__ice__", "system-test"])
+			if (x in [
+					"i386-kos", "c++", "local", "compiler",
+					"crt-features", "__ice__", "system-test",
+					"libdl"])
 				continue;
 			incdir(prefix + x + "/", total);
 			continue;
@@ -120,6 +123,7 @@ incdir("", "../../include");
 #include <__crt.h>
 #include <__stdinc.h>
 #include <_ansi.h>
+#include <_lfs_64.h>
 #include <_newlib_version.h>
 #include <aio.h>
 #include <aliases.h>
@@ -166,6 +170,7 @@ incdir("", "../../include");
 #include <bits/fcntl.h>
 #include <bits/fenv-inline.h>
 #include <bits/fenv.h>
+#include <bits/flock-struct.h>
 #include <bits/format-printer.h>
 #include <bits/huge_val.h>
 #include <bits/huge_valf.h>
@@ -295,8 +300,10 @@ incdir("", "../../include");
 #include <bits/xopen_lim.h>
 #include <bits/xtitypes.h>
 #include <byteswap.h>
+#include <compat/bits/flock-struct.h>
 #include <compat/bits/iovec-struct.h>
 #include <compat/bits/itimerspec.h>
+#include <compat/bits/itimerval.h>
 #include <compat/bits/rusage-convert.h>
 #include <compat/bits/rusage-struct.h>
 #include <compat/bits/sigaction-struct.h>
@@ -319,6 +326,9 @@ incdir("", "../../include");
 #include <compat/kos/bits/futex-expr.h>
 #include <compat/kos/bits/futex.h>
 #include <compat/kos/except-handler.h>
+#include <compat/kos/exec/asm/elf.h>
+#include <compat/kos/exec/bits/elf.h>
+#include <compat/kos/exec/elf.h>
 #include <compat/kos/futex.h>
 #include <compat/kos/types.h>
 #include <compat/pointer.h>
@@ -472,6 +482,7 @@ incdir("", "../../include");
 #include <kos/ioctl/clock.h>
 #include <kos/ioctl/keyboard.h>
 #include <kos/ioctl/mouse.h>
+#include <kos/ioctl/video.h>
 #include <kos/jiffies.h>
 #include <kos/kernel/handle.h>
 #include <kos/kernel/syscalls.h>
@@ -480,6 +491,8 @@ incdir("", "../../include");
 #include <kos/ksysctl.h>
 #include <kos/malloc.h>
 #include <kos/personality.h>
+#include <kos/refcnt.h>
+#include <kos/refptr.h>
 #include <kos/sys/stat.h>
 #include <kos/sys/ioctl.h>
 #include <kos/syscalls.h>
@@ -501,9 +514,11 @@ incdir("", "../../include");
 #include <libc/slow/error.h>
 #include <libc/slow/malloc.h>
 #include <libc/slow/parts.uchar.string.h>
+#include <libc/slow/ssp.string.h>
 #include <libc/slow/stdlib.h>
 #include <libc/slow/string.h>
 #include <libc/slow/unicode.h>
+#include <libc/ssp.string.h>
 #include <libc/stdlib.h>
 #include <libc/string.h>
 #include <libc/unicode.h>
@@ -568,6 +583,8 @@ incdir("", "../../include");
 #include <libvideo/codec/pixel.h>
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
+#include <libvideo/gfx/font.h>
+#include <libvideo/gfx/fonts/tlft.h>
 #include <libvideo/gfx/gfx.h>
 #include <libvideo/window/window.h>
 #include <libvideo/window/api.h>
@@ -663,6 +680,7 @@ incdir("", "../../include");
 #include <newlib.h>
 #include <optimized/error.h>
 #include <optimized/fenv.h>
+#include <optimized/ssp.string.h>
 #include <optimized/string.h>
 #include <osfcn.h>
 #if __has_include(<panel.h>)
@@ -716,10 +734,15 @@ incdir("", "../../include");
 #include <share.h>
 #include <signal.h>
 #include <spawn.h>
+#include <ssp/chk.h>
+#include <ssp/ssp.h>
+#include <ssp/string.h>
 #include <std.h>
 #include <stdalign.h>
 #include <stdarg.h>
+#include <stdatomic.h>
 #include <stdbool.h>
+#include <stdc-predef.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -800,6 +823,7 @@ incdir("", "../../include");
 #include <sys/wait.h>
 #include <sys/xattr.h>
 #include <syscall.h>
+#include <syslimits.h>
 #include <syslog.h>
 #if __has_include(<term.h>)
 #include <term.h>

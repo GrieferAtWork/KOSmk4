@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb47d3600 */
+/* HASH CRC-32:0xd884ac35 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
+#include <ssp/chk.h>
 /* Dependency: "memmove" from "string" */
 #ifndef ____localdep_memmove_defined
 #define ____localdep_memmove_defined 1
@@ -46,11 +47,13 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__memmove_chk) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memmove_chk))(void *__dst,
                                                            void const *__src,
-                                                           __SIZE_TYPE__ __num_bytes,
-                                                           __SIZE_TYPE__ __dst_bufsize) {
-#line 51 "kos/src/libc/magic/ssp.string.c"
-	(void)__dst_bufsize;
-	return __localdep_memmove(__dst, __src, __num_bytes);
+                                                           __SIZE_TYPE__ __n_bytes,
+                                                           __SIZE_TYPE__ __dst_objsize) {
+#line 38 "kos/src/libc/magic/ssp.string.c"
+	(void)__dst_objsize;
+	__ssp_chk_dstbuf("__memmove_chk", __dst, __n_bytes, __dst_objsize);
+	return __localdep_memmove(__dst, __src, __n_bytes);
 }
+
 __NAMESPACE_LOCAL_END
 #endif /* !__local___memmove_chk_defined */

@@ -16,7 +16,8 @@
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
- */#ifndef _CXX_CASSERT
+ */
+#ifndef _CXX_CASSERT
 #define _CXX_CASSERT 1
 #include <assert.h>
 #endif /* !_CXX_CASSERT */

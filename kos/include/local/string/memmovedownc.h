@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa79553dd */
+/* HASH CRC-32:0x6db70ae5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,7 +114,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownc))(void *__dst,
                                                           void const *__src,
                                                           __SIZE_TYPE__ __elem_count,
                                                           __SIZE_TYPE__ __elem_size) {
-#line 2487 "kos/src/libc/magic/string.c"
+#line 2491 "kos/src/libc/magic/string.c"
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 	switch (__elem_size) {
 

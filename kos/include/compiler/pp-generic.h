@@ -22,13 +22,14 @@
 #if 1 || defined(_MSC_VER) || defined(__GNUC__) || \
     defined(__TPP_VERSION__) || defined(__DCC_VERSION__) || \
     defined(__DEEMON__)
-#define __PREPROCESSOR_HAVE_CAT     1
-#define __PREPROCESSOR_HAVE_STR     1
-#define __PREPROCESSOR_HAVE_VA_ARGS 1
+#define __PREPROCESSOR_HAVE_CAT     1 /* #define CAT(a, b) a##b */
+#define __PREPROCESSOR_HAVE_STR     1 /* #define STR(x) #x */
+#define __PREPROCESSOR_HAVE_VA_ARGS 1 /* __VA_ARGS__ */
 #endif
 #if !defined(__INTELLISENSE__) && \
     (defined(__TPP_VERSION__) || defined(__GNUC__))
-#define __PREPROCESSOR_HAVE_INCLUDE_NEXT 1
+#define __PREPROCESSOR_HAVE_INCLUDE_NEXT 1 /* #include_next */
+#define __PREPROCESSOR_HAVE_WARNING 1 /* #warning */
 #endif
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6527bf1a */
+/* HASH CRC-32:0x2b9ca36f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strstr))(char const *__haystack,
                                                     char const *__needle) {
-#line 316 "kos/src/libc/magic/string.c"
+#line 320 "kos/src/libc/magic/string.c"
 	char const *__hay2, *__ned_iter;
 	char __ch, __needle_start = *__needle++;
 	while ((__ch = *__haystack++) != '\0') {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa68382f9 */
+/* HASH CRC-32:0x5d4b0209 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __LIBC char const *const _sys_siglist[___NSIG];
 #endif /* !___local_sys_siglist_defined */
 __LOCAL_LIBC(strsignal_s) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strsignal_s))(int __signum) {
-#line 3899 "kos/src/libc/magic/string.c"
+#line 3903 "kos/src/libc/magic/string.c"
 #if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
 	return (unsigned int)__errnum < ___NSIG ? _sys_siglist[__signum] : __NULLPTR;
 #else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */

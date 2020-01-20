@@ -109,7 +109,7 @@ __NAMESPACE_STD_USING(atomic_fetch_xor_explicit)
 __NAMESPACE_STD_USING(atomic_fetch_and)
 __NAMESPACE_STD_USING(atomic_fetch_and_explicit)
 
-#ifdef __USE_KOS
+#if defined(__USE_KOS) && defined(_CXX_ATOMIC)
 __NAMESPACE_STD_USING(atomic_cmpxch_explicit)
 __NAMESPACE_STD_USING(atomic_cmpxch)
 __NAMESPACE_STD_USING(atomic_cmpxch_val_explicit)
@@ -120,7 +120,7 @@ __NAMESPACE_STD_USING(atomic_cmpxch_val_weak_explicit)
 __NAMESPACE_STD_USING(atomic_cmpxch_val_weak)
 __NAMESPACE_STD_USING(atomic_fetch_nand)
 __NAMESPACE_STD_USING(atomic_fetch_nand_explicit)
-#endif /* __USE_KOS */
+#endif /* __USE_KOS && _CXX_ATOMIC */
 
 __NAMESPACE_STD_USING(atomic_flag)
 __NAMESPACE_STD_USING(atomic_flag_test_and_set_explicit)

@@ -16,7 +16,8 @@
  * 2. Altered source versions must be plainly marked as such, and must not be *
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
- */#ifndef _CXX_CSETJMP
+ */
+#ifndef _CXX_CSETJMP
 #define _CXX_CSETJMP 1
 #ifndef _SETJMP_H
 #ifdef __CXX_SYSTEM_HEADER

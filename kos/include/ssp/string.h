@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6ad5214 */
+/* HASH CRC-32:0x1e03f700 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,71 +28,918 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <optimized/ssp.string.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include <features.h>
+
+#include <hybrid/typecore.h>
+
+#include <ssp/ssp.h>
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifndef __size_t_defined
-#define __size_t_defined 1
-typedef __SIZE_TYPE__ size_t;
-#endif /* !__size_t_defined */
-
-#ifdef __CRT_HAVE___memcpy_chk
-__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__memcpy_chk,(void *__restrict __dst, void const *__restrict __src, size_t __num_bytes, size_t __dst_bufsize),(__dst,__src,__num_bytes,__dst_bufsize))
+#ifdef __fast___memcpy_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memcpy_chk)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memcpy_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#elif defined(__CRT_HAVE___memcpy_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__memcpy_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_bytes,__dst_objsize))
 #else /* LIBC: __memcpy_chk */
 #include <local/ssp.string/__memcpy_chk.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__memcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memcpy_chk)(void *__restrict __dst, void const *__restrict __src, size_t __num_bytes, size_t __dst_bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memcpy_chk))(__dst, __src, __num_bytes, __dst_bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memcpy_chk)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memcpy_chk))(__dst, __src, __n_bytes, __dst_objsize); })
 #endif /* __memcpy_chk... */
-#ifdef __CRT_HAVE___memmove_chk
-__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__memmove_chk,(void *__dst, void const *__src, size_t __num_bytes, size_t __dst_bufsize),(__dst,__src,__num_bytes,__dst_bufsize))
+#ifdef __fast___memmove_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmove_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmove_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmove_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmove_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__memmove_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_bytes,__dst_objsize))
 #else /* LIBC: __memmove_chk */
 #include <local/ssp.string/__memmove_chk.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__memmove_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmove_chk)(void *__dst, void const *__src, size_t __num_bytes, size_t __dst_bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmove_chk))(__dst, __src, __num_bytes, __dst_bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmove_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmove_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmove_chk))(__dst, __src, __n_bytes, __dst_objsize); })
 #endif /* __memmove_chk... */
-#ifdef __CRT_HAVE___mempcpy_chk
-__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempcpy_chk,(void *__restrict __dst, void const *__restrict __src, size_t __num_bytes, size_t __dst_bufsize),(__dst,__src,__num_bytes,__dst_bufsize))
-#else /* LIBC: __mempcpy_chk */
-#include <local/ssp.string/__mempcpy_chk.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__mempcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempcpy_chk)(void *__restrict __dst, void const *__restrict __src, size_t __num_bytes, size_t __dst_bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempcpy_chk))(__dst, __src, __num_bytes, __dst_bufsize); })
-#endif /* __mempcpy_chk... */
-#ifdef __CRT_HAVE___memset_chk
-__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__memset_chk,(void *__restrict __dst, int __byte, size_t __num_bytes, size_t __dst_bufsize),(__dst,__byte,__num_bytes,__dst_bufsize))
+#ifdef __fast___memset_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memset_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL __memset_chk)(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memset_chk))(__dst, __byte, __n_bytes, __dst_objsize); })
+#elif defined(__CRT_HAVE___memset_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__memset_chk,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize),(__dst,__byte,__n_bytes,__dst_objsize))
 #else /* LIBC: __memset_chk */
 #include <local/ssp.string/__memset_chk.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__memset_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL __memset_chk)(void *__restrict __dst, int __byte, size_t __num_bytes, size_t __dst_bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memset_chk))(__dst, __byte, __num_bytes, __dst_bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memset_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL __memset_chk)(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memset_chk))(__dst, __byte, __n_bytes, __dst_objsize); })
 #endif /* __memset_chk... */
-#ifdef __CRT_HAVE___stpcpy_chk
-__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__stpcpy_chk,(char *__restrict __dst, char const *__restrict __src, size_t __dst_bufsize),(__dst,__src,__dst_bufsize))
-#else /* LIBC: __stpcpy_chk */
-#include <local/ssp.string/__stpcpy_chk.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__stpcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __stpcpy_chk)(char *__restrict __dst, char const *__restrict __src, size_t __dst_bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__stpcpy_chk))(__dst, __src, __dst_bufsize); })
-#endif /* __stpcpy_chk... */
-#ifdef __CRT_HAVE___strcat_chk
-__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__strcat_chk,(char *__restrict __dst, char const *__restrict __src, size_t __dst_bufsize),(__dst,__src,__dst_bufsize))
+#ifdef __fast___strcat_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__strcat_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strcat_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__strcat_chk))(__dst, __src, __dst_objsize); })
+#elif defined(__CRT_HAVE___strcat_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__strcat_chk,(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__dst_objsize))
 #else /* LIBC: __strcat_chk */
 #include <local/ssp.string/__strcat_chk.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__strcat_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strcat_chk)(char *__restrict __dst, char const *__restrict __src, size_t __dst_bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__strcat_chk))(__dst, __src, __dst_bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__strcat_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strcat_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__strcat_chk))(__dst, __src, __dst_objsize); })
 #endif /* __strcat_chk... */
-#ifdef __CRT_HAVE___strcpy_chk
-__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__strcpy_chk,(char *__restrict __dst, char const *__restrict __src, size_t __dst_bufsize),(__dst,__src,__dst_bufsize))
+#ifdef __fast___strcpy_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__strcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strcpy_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__strcpy_chk))(__dst, __src, __dst_objsize); })
+#elif defined(__CRT_HAVE___strcpy_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__strcpy_chk,(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__dst_objsize))
 #else /* LIBC: __strcpy_chk */
 #include <local/ssp.string/__strcpy_chk.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__strcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strcpy_chk)(char *__restrict __dst, char const *__restrict __src, size_t __dst_bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__strcpy_chk))(__dst, __src, __dst_bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__strcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strcpy_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__strcpy_chk))(__dst, __src, __dst_objsize); })
 #endif /* __strcpy_chk... */
-#ifdef __CRT_HAVE___strncat_chk
-__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__strncat_chk,(char *__restrict __dst, char const *__restrict __src, size_t __buflen, size_t __dst_bufsize),(__dst,__src,__buflen,__dst_bufsize))
+#ifdef __fast___strncat_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__strncat_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strncat_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __buflen, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__strncat_chk))(__dst, __src, __buflen, __dst_objsize); })
+#elif defined(__CRT_HAVE___strncat_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__strncat_chk,(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __buflen, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__buflen,__dst_objsize))
 #else /* LIBC: __strncat_chk */
 #include <local/ssp.string/__strncat_chk.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__strncat_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strncat_chk)(char *__restrict __dst, char const *__restrict __src, size_t __buflen, size_t __dst_bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__strncat_chk))(__dst, __src, __buflen, __dst_bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__strncat_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strncat_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __buflen, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__strncat_chk))(__dst, __src, __buflen, __dst_objsize); })
 #endif /* __strncat_chk... */
-#ifdef __CRT_HAVE___strncpy_chk
-__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__strncpy_chk,(char *__restrict __dst, char const *__restrict __src, size_t __buflen, size_t __dst_bufsize),(__dst,__src,__buflen,__dst_bufsize))
+#ifdef __fast___strncpy_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__strncpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strncpy_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __buflen, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__strncpy_chk))(__dst, __src, __buflen, __dst_objsize); })
+#elif defined(__CRT_HAVE___strncpy_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__strncpy_chk,(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __buflen, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__buflen,__dst_objsize))
 #else /* LIBC: __strncpy_chk */
 #include <local/ssp.string/__strncpy_chk.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__strncpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strncpy_chk)(char *__restrict __dst, char const *__restrict __src, size_t __buflen, size_t __dst_bufsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__strncpy_chk))(__dst, __src, __buflen, __dst_bufsize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__strncpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __strncpy_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __buflen, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__strncpy_chk))(__dst, __src, __buflen, __dst_objsize); })
 #endif /* __strncpy_chk... */
+
+#ifdef __USE_GNU
+#ifdef __fast___mempcpy_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempcpy_chk)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempcpy_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempcpy_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempcpy_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_bytes,__dst_objsize))
+#else /* LIBC: __mempcpy_chk */
+#include <local/ssp.string/__mempcpy_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempcpy_chk)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempcpy_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#endif /* __mempcpy_chk... */
+#endif /* __USE_GNU */
+
+#ifdef __USE_XOPEN2K8
+#ifdef __fast___stpcpy_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__stpcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __stpcpy_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__stpcpy_chk))(__dst, __src, __dst_objsize); })
+#elif defined(__CRT_HAVE___stpcpy_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__stpcpy_chk,(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__dst_objsize))
+#else /* LIBC: __stpcpy_chk */
+#include <local/ssp.string/__stpcpy_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__stpcpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __stpcpy_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__stpcpy_chk))(__dst, __src, __dst_objsize); })
+#endif /* __stpcpy_chk... */
+#ifdef __fast___stpncpy_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__stpncpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __stpncpy_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __buflen, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__stpncpy_chk))(__dst, __src, __buflen, __dst_objsize); })
+#elif defined(__CRT_HAVE___stpncpy_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__stpncpy_chk,(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __buflen, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__buflen,__dst_objsize))
+#else /* LIBC: __stpncpy_chk */
+#include <local/ssp.string/__stpncpy_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__stpncpy_chk, __FORCELOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __stpncpy_chk)(char *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __buflen, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__stpncpy_chk))(__dst, __src, __buflen, __dst_objsize); })
+#endif /* __stpncpy_chk... */
+#endif /* __USE_XOPEN2K8 */
+
+#ifdef __USE_KOS
+#ifdef __fast___mempmove_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmove_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmove_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmove_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmove_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempmove_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_bytes,__dst_objsize))
+#else /* LIBC: __mempmove_chk */
+#include <local/ssp.string/__mempmove_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmove_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmove_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmove_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#endif /* __mempmove_chk... */
+#ifdef __fast___mempset_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempset_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL __mempset_chk)(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempset_chk))(__dst, __byte, __n_bytes, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempset_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__mempset_chk,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize),(__dst,__byte,__n_bytes,__dst_objsize))
+#else /* LIBC: __mempset_chk */
+#include <local/ssp.string/__mempset_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempset_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL __mempset_chk)(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempset_chk))(__dst, __byte, __n_bytes, __dst_objsize); })
+#endif /* __mempset_chk... */
+#ifdef __fast___memmoveup_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmoveup_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmoveup_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmoveup_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmoveup_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__memmoveup_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_bytes,__dst_objsize))
+#else /* LIBC: __memmoveup_chk */
+#include <local/ssp.string/__memmoveup_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmoveup_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmoveup_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmoveup_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#endif /* __memmoveup_chk... */
+#ifdef __fast___memmovedown_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmovedown_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmovedown_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmovedown_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmovedown_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__memmovedown_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_bytes,__dst_objsize))
+#else /* LIBC: __memmovedown_chk */
+#include <local/ssp.string/__memmovedown_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmovedown_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmovedown_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmovedown_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#endif /* __memmovedown_chk... */
+#ifdef __fast___mempmoveup_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmoveup_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmoveup_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmoveup_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmoveup_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempmoveup_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_bytes,__dst_objsize))
+#else /* LIBC: __mempmoveup_chk */
+#include <local/ssp.string/__mempmoveup_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmoveup_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmoveup_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmoveup_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#endif /* __mempmoveup_chk... */
+#ifdef __fast___mempmovedown_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmovedown_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmovedown_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmovedown_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmovedown_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempmovedown_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_bytes,__dst_objsize))
+#else /* LIBC: __mempmovedown_chk */
+#include <local/ssp.string/__mempmovedown_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedown_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmovedown_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmovedown_chk))(__dst, __src, __n_bytes, __dst_objsize); })
+#endif /* __mempmovedown_chk... */
+#ifdef __fast___memcpyc_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memcpyc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memcpyc_chk)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memcpyc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#elif defined(__CRT_HAVE___memcpyc_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__memcpyc_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__elem_count,__elem_size,__dst_objsize))
+#else /* LIBC: __memcpyc_chk */
+#include <local/ssp.string/__memcpyc_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memcpyc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memcpyc_chk)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memcpyc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#endif /* __memcpyc_chk... */
+#ifdef __fast___memmovec_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmovec_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmovec_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmovec_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmovec_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__memmovec_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__elem_count,__elem_size,__dst_objsize))
+#else /* LIBC: __memmovec_chk */
+#include <local/ssp.string/__memmovec_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmovec_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmovec_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmovec_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#endif /* __memmovec_chk... */
+#ifdef __fast___mempcpyc_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempcpyc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempcpyc_chk)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempcpyc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempcpyc_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempcpyc_chk,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__elem_count,__elem_size,__dst_objsize))
+#else /* LIBC: __mempcpyc_chk */
+#include <local/ssp.string/__mempcpyc_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempcpyc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempcpyc_chk)(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempcpyc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#endif /* __mempcpyc_chk... */
+#ifdef __fast___mempmovec_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmovec_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmovec_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmovec_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmovec_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempmovec_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__elem_count,__elem_size,__dst_objsize))
+#else /* LIBC: __mempmovec_chk */
+#include <local/ssp.string/__mempmovec_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovec_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmovec_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmovec_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#endif /* __mempmovec_chk... */
+#ifdef __fast___memmoveupc_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmoveupc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmoveupc_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmoveupc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmoveupc_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__memmoveupc_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__elem_count,__elem_size,__dst_objsize))
+#else /* LIBC: __memmoveupc_chk */
+#include <local/ssp.string/__memmoveupc_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmoveupc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmoveupc_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmoveupc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#endif /* __memmoveupc_chk... */
+#ifdef __fast___memmovedownc_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmovedownc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmovedownc_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmovedownc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmovedownc_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__memmovedownc_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__elem_count,__elem_size,__dst_objsize))
+#else /* LIBC: __memmovedownc_chk */
+#include <local/ssp.string/__memmovedownc_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmovedownc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __memmovedownc_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmovedownc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#endif /* __memmovedownc_chk... */
+#ifdef __fast___mempmoveupc_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmoveupc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmoveupc_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmoveupc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmoveupc_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempmoveupc_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__elem_count,__elem_size,__dst_objsize))
+#else /* LIBC: __mempmoveupc_chk */
+#include <local/ssp.string/__mempmoveupc_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmoveupc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmoveupc_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmoveupc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#endif /* __mempmoveupc_chk... */
+#ifdef __fast___mempmovedownc_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmovedownc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmovedownc_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmovedownc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmovedownc_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__mempmovedownc_chk,(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__elem_count,__elem_size,__dst_objsize))
+#else /* LIBC: __mempmovedownc_chk */
+#include <local/ssp.string/__mempmovedownc_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedownc_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL __mempmovedownc_chk)(void *__dst, void const *__src, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmovedownc_chk))(__dst, __src, __elem_count, __elem_size, __dst_objsize); })
+#endif /* __mempmovedownc_chk... */
+#endif /* __USE_KOS */
+#ifdef __USE_STRING_BWLQ
+#ifdef __fast___memcpyw_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memcpyw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memcpyw_chk)(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memcpyw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#elif defined(__CRT_HAVE___memcpyw_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memcpyw_chk,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_words,__dst_objsize))
+#elif defined(__CRT_HAVE___wmemcpy_chk) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memcpyw_chk,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__wmemcpy_chk,(__dst,__src,__n_words,__dst_objsize))
+#else /* LIBC: __memcpyw_chk */
+#include <local/ssp.string/__memcpyw_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memcpyw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memcpyw_chk)(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memcpyw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#endif /* __memcpyw_chk... */
+#ifdef __fast___mempcpyw_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempcpyw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempcpyw_chk)(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempcpyw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempcpyw_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__mempcpyw_chk,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_words,__dst_objsize))
+#elif defined(__CRT_HAVE___wmempcpy_chk) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__mempcpyw_chk,(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__wmempcpy_chk,(__dst,__src,__n_words,__dst_objsize))
+#else /* LIBC: __mempcpyw_chk */
+#include <local/ssp.string/__mempcpyw_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempcpyw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempcpyw_chk)(/*aligned(2)*/ void *__restrict __dst, /*aligned(2)*/ void const *__restrict __src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempcpyw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#endif /* __mempcpyw_chk... */
+#ifdef __fast___memmovew_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmovew_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmovew_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmovew_chk))(__dst, __src, __n_words, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmovew_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memmovew_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_words,__dst_objsize))
+#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memmovew_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_words,__dst_objsize))
+#else /* LIBC: __memmovew_chk */
+#include <local/ssp.string/__memmovew_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmovew_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmovew_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmovew_chk))(__dst, __src, __n_words, __dst_objsize); })
+#endif /* __memmovew_chk... */
+#ifdef __fast___memcpyl_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memcpyl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memcpyl_chk)(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memcpyl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___memcpyl_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memcpyl_chk,(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_dwords,__dst_objsize))
+#elif defined(__CRT_HAVE___wmemcpy_chk) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memcpyl_chk,(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__wmemcpy_chk,(__dst,__src,__n_dwords,__dst_objsize))
+#else /* LIBC: __memcpyl_chk */
+#include <local/ssp.string/__memcpyl_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memcpyl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memcpyl_chk)(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memcpyl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#endif /* __memcpyl_chk... */
+#ifdef __fast___mempcpyl_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempcpyl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempcpyl_chk)(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempcpyl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempcpyl_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__mempcpyl_chk,(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_dwords,__dst_objsize))
+#elif defined(__CRT_HAVE___wmempcpy_chk) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__mempcpyl_chk,(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__wmempcpy_chk,(__dst,__src,__n_dwords,__dst_objsize))
+#else /* LIBC: __mempcpyl_chk */
+#include <local/ssp.string/__mempcpyl_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempcpyl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempcpyl_chk)(/*aligned(4)*/ void *__restrict __dst, /*aligned(4)*/ void const *__restrict __src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempcpyl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#endif /* __mempcpyl_chk... */
+#ifdef __fast___memmovel_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmovel_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmovel_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmovel_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmovel_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memmovel_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_dwords,__dst_objsize))
+#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memmovel_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_dwords,__dst_objsize))
+#else /* LIBC: __memmovel_chk */
+#include <local/ssp.string/__memmovel_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmovel_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmovel_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmovel_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#endif /* __memmovel_chk... */
+#ifdef __fast___mempmovew_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmovew_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmovew_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmovew_chk))(__dst, __src, __n_words, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmovew_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__mempmovew_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_words,__dst_objsize))
+#else /* LIBC: __mempmovew_chk */
+#include <local/ssp.string/__mempmovew_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovew_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmovew_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmovew_chk))(__dst, __src, __n_words, __dst_objsize); })
+#endif /* __mempmovew_chk... */
+#ifdef __fast___mempmovel_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmovel_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmovel_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmovel_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmovel_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__mempmovel_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_dwords,__dst_objsize))
+#else /* LIBC: __mempmovel_chk */
+#include <local/ssp.string/__mempmovel_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovel_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmovel_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmovel_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#endif /* __mempmovel_chk... */
+#ifdef __fast___memsetw_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memsetw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memsetw_chk)(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memsetw_chk))(__dst, __word, __n_words, __dst_objsize); })
+#elif defined(__CRT_HAVE___memsetw_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memsetw_chk,(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),(__dst,__word,__n_words,__dst_objsize))
+#else /* LIBC: __memsetw_chk */
+#include <local/ssp.string/__memsetw_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memsetw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memsetw_chk)(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memsetw_chk))(__dst, __word, __n_words, __dst_objsize); })
+#endif /* __memsetw_chk... */
+#ifdef __fast___mempsetw_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempsetw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempsetw_chk)(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempsetw_chk))(__dst, __word, __n_words, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempsetw_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__mempsetw_chk,(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),(__dst,__word,__n_words,__dst_objsize))
+#else /* LIBC: __mempsetw_chk */
+#include <local/ssp.string/__mempsetw_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempsetw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempsetw_chk)(/*aligned(2)*/ void *__restrict __dst, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempsetw_chk))(__dst, __word, __n_words, __dst_objsize); })
+#endif /* __mempsetw_chk... */
+#ifdef __fast___memsetl_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memsetl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memsetl_chk)(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memsetl_chk))(__dst, __dword, __n_dwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___memsetl_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memsetl_chk,(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),(__dst,__dword,__n_dwords,__dst_objsize))
+#else /* LIBC: __memsetl_chk */
+#include <local/ssp.string/__memsetl_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memsetl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memsetl_chk)(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memsetl_chk))(__dst, __dword, __n_dwords, __dst_objsize); })
+#endif /* __memsetl_chk... */
+#ifdef __fast___mempsetl_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempsetl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempsetl_chk)(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempsetl_chk))(__dst, __dword, __n_dwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempsetl_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__mempsetl_chk,(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),(__dst,__dword,__n_dwords,__dst_objsize))
+#else /* LIBC: __mempsetl_chk */
+#include <local/ssp.string/__mempsetl_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempsetl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempsetl_chk)(/*aligned(4)*/ void *__restrict __dst, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempsetl_chk))(__dst, __dword, __n_dwords, __dst_objsize); })
+#endif /* __mempsetl_chk... */
+#ifdef __USE_KOS
+#ifdef __fast___memmoveupw_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmoveupw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmoveupw_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmoveupw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmoveupw_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memmoveupw_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_words,__dst_objsize))
+#elif defined(__CRT_HAVE___memmovew_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memmoveupw_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__memmovew_chk,(__dst,__src,__n_words,__dst_objsize))
+#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memmoveupw_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_words,__dst_objsize))
+#else /* LIBC: __memmoveupw_chk */
+#include <local/ssp.string/__memmoveupw_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmoveupw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmoveupw_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmoveupw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#endif /* __memmoveupw_chk... */
+#ifdef __fast___memmovedownw_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmovedownw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmovedownw_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmovedownw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmovedownw_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memmovedownw_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_words,__dst_objsize))
+#elif defined(__CRT_HAVE___memmovew_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memmovedownw_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__memmovew_chk,(__dst,__src,__n_words,__dst_objsize))
+#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 2)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__memmovedownw_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_words,__dst_objsize))
+#else /* LIBC: __memmovedownw_chk */
+#include <local/ssp.string/__memmovedownw_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmovedownw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmovedownw_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmovedownw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#endif /* __memmovedownw_chk... */
+#ifdef __fast___memmoveupl_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmoveupl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmoveupl_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmoveupl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmoveupl_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memmoveupl_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_dwords,__dst_objsize))
+#elif defined(__CRT_HAVE___memmovel_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memmoveupl_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__memmovel_chk,(__dst,__src,__n_dwords,__dst_objsize))
+#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memmoveupl_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_dwords,__dst_objsize))
+#else /* LIBC: __memmoveupl_chk */
+#include <local/ssp.string/__memmoveupl_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmoveupl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmoveupl_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmoveupl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#endif /* __memmoveupl_chk... */
+#ifdef __fast___memmovedownl_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmovedownl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmovedownl_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmovedownl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmovedownl_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memmovedownl_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_dwords,__dst_objsize))
+#elif defined(__CRT_HAVE___memmovel_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memmovedownl_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__memmovel_chk,(__dst,__src,__n_dwords,__dst_objsize))
+#elif defined(__CRT_HAVE___wmemmove_chk) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__memmovedownl_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__wmemmove_chk,(__dst,__src,__n_dwords,__dst_objsize))
+#else /* LIBC: __memmovedownl_chk */
+#include <local/ssp.string/__memmovedownl_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmovedownl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmovedownl_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmovedownl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#endif /* __memmovedownl_chk... */
+#ifdef __fast___mempmoveupw_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmoveupw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmoveupw_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmoveupw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmoveupw_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__mempmoveupw_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_words,__dst_objsize))
+#elif defined(__CRT_HAVE___mempmovew_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__mempmoveupw_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__mempmovew_chk,(__dst,__src,__n_words,__dst_objsize))
+#else /* LIBC: __mempmoveupw_chk */
+#include <local/ssp.string/__mempmoveupw_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmoveupw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmoveupw_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmoveupw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#endif /* __mempmoveupw_chk... */
+#ifdef __fast___mempmovedownw_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmovedownw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmovedownw_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmovedownw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmovedownw_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__mempmovedownw_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_words,__dst_objsize))
+#elif defined(__CRT_HAVE___mempmovew_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW_NCX,__mempmovedownw_chk,(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize),__mempmovew_chk,(__dst,__src,__n_words,__dst_objsize))
+#else /* LIBC: __mempmovedownw_chk */
+#include <local/ssp.string/__mempmovedownw_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedownw_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmovedownw_chk)(/*aligned(2)*/ void *__dst, /*aligned(2)*/ void const *__src, __SIZE_TYPE__ __n_words, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmovedownw_chk))(__dst, __src, __n_words, __dst_objsize); })
+#endif /* __mempmovedownw_chk... */
+#ifdef __fast___mempmoveupl_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmoveupl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmoveupl_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmoveupl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmoveupl_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__mempmoveupl_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_dwords,__dst_objsize))
+#elif defined(__CRT_HAVE___mempmovel_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__mempmoveupl_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__mempmovel_chk,(__dst,__src,__n_dwords,__dst_objsize))
+#else /* LIBC: __mempmoveupl_chk */
+#include <local/ssp.string/__mempmoveupl_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmoveupl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmoveupl_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmoveupl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#endif /* __mempmoveupl_chk... */
+#ifdef __fast___mempmovedownl_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmovedownl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmovedownl_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmovedownl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmovedownl_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__mempmovedownl_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_dwords,__dst_objsize))
+#elif defined(__CRT_HAVE___mempmovel_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__ *,__NOTHROW_NCX,__mempmovedownl_chk,(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize),__mempmovel_chk,(__dst,__src,__n_dwords,__dst_objsize))
+#else /* LIBC: __mempmovedownl_chk */
+#include <local/ssp.string/__mempmovedownl_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedownl_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmovedownl_chk)(/*aligned(4)*/ void *__dst, /*aligned(4)*/ void const *__src, __SIZE_TYPE__ __n_dwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmovedownl_chk))(__dst, __src, __n_dwords, __dst_objsize); })
+#endif /* __mempmovedownl_chk... */
+#endif /* __USE_KOS */
+#ifdef __UINT64_TYPE__
+#ifdef __fast___memcpyq_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memcpyq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memcpyq_chk)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memcpyq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___memcpyq_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__memcpyq_chk,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_qwords,__dst_objsize))
+#else /* LIBC: __memcpyq_chk */
+#include <local/ssp.string/__memcpyq_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memcpyq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memcpyq_chk)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memcpyq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#endif /* __memcpyq_chk... */
+#ifdef __fast___mempcpyq_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempcpyq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempcpyq_chk)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempcpyq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempcpyq_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__mempcpyq_chk,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_qwords,__dst_objsize))
+#else /* LIBC: __mempcpyq_chk */
+#include <local/ssp.string/__mempcpyq_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempcpyq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempcpyq_chk)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempcpyq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#endif /* __mempcpyq_chk... */
+#ifdef __fast___memmoveq_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmoveq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmoveq_chk)(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmoveq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmoveq_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__memmoveq_chk,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_qwords,__dst_objsize))
+#else /* LIBC: __memmoveq_chk */
+#include <local/ssp.string/__memmoveq_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmoveq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmoveq_chk)(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmoveq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#endif /* __memmoveq_chk... */
+#ifdef __fast___mempmoveq_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmoveq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmoveq_chk)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmoveq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmoveq_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__mempmoveq_chk,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_qwords,__dst_objsize))
+#else /* LIBC: __mempmoveq_chk */
+#include <local/ssp.string/__mempmoveq_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmoveq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmoveq_chk)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmoveq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#endif /* __mempmoveq_chk... */
+#ifdef __fast___memsetq_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memsetq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memsetq_chk)(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memsetq_chk))(__dst, __qword, __n_qwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___memsetq_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__memsetq_chk,(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),(__dst,__qword,__n_qwords,__dst_objsize))
+#else /* LIBC: __memsetq_chk */
+#include <local/ssp.string/__memsetq_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memsetq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memsetq_chk)(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memsetq_chk))(__dst, __qword, __n_qwords, __dst_objsize); })
+#endif /* __memsetq_chk... */
+#ifdef __fast___mempsetq_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempsetq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempsetq_chk)(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempsetq_chk))(__dst, __qword, __n_qwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempsetq_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__mempsetq_chk,(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),(__dst,__qword,__n_qwords,__dst_objsize))
+#else /* LIBC: __mempsetq_chk */
+#include <local/ssp.string/__mempsetq_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempsetq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempsetq_chk)(/*aligned(8)*/ void *__restrict __dst, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempsetq_chk))(__dst, __qword, __n_qwords, __dst_objsize); })
+#endif /* __mempsetq_chk... */
+#ifdef __USE_KOS
+#ifdef __fast___memmoveupq_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmoveupq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmoveupq_chk)(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmoveupq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmoveupq_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__memmoveupq_chk,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_qwords,__dst_objsize))
+#elif defined(__CRT_HAVE___memmoveq_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__memmoveupq_chk,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),__memmoveq_chk,(__dst,__src,__n_qwords,__dst_objsize))
+#else /* LIBC: __memmoveupq_chk */
+#include <local/ssp.string/__memmoveupq_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmoveupq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmoveupq_chk)(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmoveupq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#endif /* __memmoveupq_chk... */
+#ifdef __fast___memmovedownq_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__memmovedownq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmovedownq_chk)(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__memmovedownq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___memmovedownq_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__memmovedownq_chk,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_qwords,__dst_objsize))
+#elif defined(__CRT_HAVE___memmoveq_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__memmovedownq_chk,(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),__memmoveq_chk,(__dst,__src,__n_qwords,__dst_objsize))
+#else /* LIBC: __memmovedownq_chk */
+#include <local/ssp.string/__memmovedownq_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__memmovedownq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __memmovedownq_chk)(/*aligned(8)*/ void *__dst, /*aligned(8)*/ void const *__src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__memmovedownq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#endif /* __memmovedownq_chk... */
+#ifdef __fast___mempmoveupq_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmoveupq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmoveupq_chk)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmoveupq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmoveupq_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__mempmoveupq_chk,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_qwords,__dst_objsize))
+#elif defined(__CRT_HAVE___mempmoveq_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__mempmoveupq_chk,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),__mempmoveq_chk,(__dst,__src,__n_qwords,__dst_objsize))
+#else /* LIBC: __mempmoveupq_chk */
+#include <local/ssp.string/__mempmoveupq_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmoveupq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmoveupq_chk)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmoveupq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#endif /* __mempmoveupq_chk... */
+#ifdef __fast___mempmovedownq_chk_defined
+__NAMESPACE_FAST_USING_OR_IMPL(__mempmovedownq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmovedownq_chk)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(__mempmovedownq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#elif defined(__CRT_HAVE___mempmovedownq_chk)
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__mempmovedownq_chk,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),(__dst,__src,__n_qwords,__dst_objsize))
+#elif defined(__CRT_HAVE___mempmoveq_chk)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__ *,__NOTHROW_NCX,__mempmovedownq_chk,(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize),__mempmoveq_chk,(__dst,__src,__n_qwords,__dst_objsize))
+#else /* LIBC: __mempmovedownq_chk */
+#include <local/ssp.string/__mempmovedownq_chk.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedownq_chk, __FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *__NOTHROW_NCX(__LIBCCALL __mempmovedownq_chk)(/*aligned(8)*/ void *__restrict __dst, /*aligned(8)*/ void const *__restrict __src, __SIZE_TYPE__ __n_qwords, __SIZE_TYPE__ __dst_objsize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__mempmovedownq_chk))(__dst, __src, __n_qwords, __dst_objsize); })
+#endif /* __mempmovedownq_chk... */
+#endif /* __USE_KOS */
+#endif /* __UINT64_TYPE__ */
+#endif /* __USE_STRING_BWLQ */
+
+
+
+/* Bind SSP function variants if necessary */
+#ifdef __SSP_FORTIFY_LEVEL
+#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_memset) && \
+     defined(__CRT_HAVE___memset_chk) && __has_builtin(__builtin___memset_chk))
+#undef memset
+#define memset(dst, byte, n_bytes)                                                                      \
+	(__ssp_bos0(dst) != (__SIZE_TYPE__)-1 ? __builtin___memset_chk(dst, byte, n_bytes, __ssp_bos0(dst)) \
+	                                      : __memset_chk(dst, byte, n_bytes, __ssp_bos0(dst)))
+#elif defined(__CRT_HAVE___memset_chk)
+#undef memset
+#define memset(dst, byte, n_bytes) __memset_chk(dst, byte, n_bytes, __ssp_bos0(dst))
+#endif /* ... */
+#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_memcpy) && \
+     defined(__CRT_HAVE___memcpy_chk) && __has_builtin(__builtin___memcpy_chk))
+#undef __PRIVATE_memcpy_3
+#define __PRIVATE_memcpy_3(dst, src, n_bytes)                                                          \
+	(__ssp_bos0(dst) != (__SIZE_TYPE__)-1 ? __builtin___memcpy_chk(dst, src, n_bytes, __ssp_bos0(dst)) \
+	                                      : __memcpy_chk(dst, src, n_bytes, __ssp_bos0(dst)))
+#elif defined(__CRT_HAVE___memcpy_chk)
+#undef __PRIVATE_memcpy_3
+#define __PRIVATE_memcpy_3(dst, src, n_bytes) __memcpy_chk(dst, src, n_bytes, __ssp_bos0(dst))
+#endif /* ... */
+#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_memmove) && \
+     defined(__CRT_HAVE___memmove_chk) && __has_builtin(__builtin___memmove_chk))
+#undef __PRIVATE_memmove_3
+#define __PRIVATE_memmove_3(dst, src, n_bytes)                                                          \
+	(__ssp_bos0(dst) != (__SIZE_TYPE__)-1 ? __builtin___memmove_chk(dst, src, n_bytes, __ssp_bos0(dst)) \
+	                                      : __memmove_chk(dst, src, n_bytes, __ssp_bos0(dst)))
+#elif defined(__CRT_HAVE___memmove_chk)
+#undef __PRIVATE_memmove_3
+#define __PRIVATE_memmove_3(dst, src, n_bytes) __memmove_chk(dst, src, n_bytes, __ssp_bos0(dst))
+#endif /* ... */
+
+#ifdef __USE_STRING_OVERLOADS
+#ifdef __CRT_HAVE___memcpyc_chk
+#undef __PRIVATE_memcpy_4
+#define __PRIVATE_memcpy_4(dst, src, elem_count, elem_size) __memcpyc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmovec_chk
+#undef __PRIVATE_memmove_4
+#define __PRIVATE_memmove_4(dst, src, elem_count, elem_size) __memmovec_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#endif /* __USE_STRING_OVERLOADS */
+
+#ifdef __USE_GNU
+#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_mempcpy) && \
+     defined(__CRT_HAVE___mempcpy_chk) && __has_builtin(__builtin___mempcpy_chk))
+#undef __PRIVATE_mempcpy_3
+#define __PRIVATE_mempcpy_3(dst, src, n_bytes)                                                          \
+	(__ssp_bos0(dst) != (__SIZE_TYPE__)-1 ? __builtin___mempcpy_chk(dst, src, n_bytes, __ssp_bos0(dst)) \
+	                                      : __mempcpy_chk(dst, src, n_bytes, __ssp_bos0(dst)))
+#elif defined(__CRT_HAVE___mempcpy_chk)
+#undef __PRIVATE_mempcpy_3
+#define __PRIVATE_mempcpy_3(dst, src, n_bytes) __mempcpy_chk(dst, src, n_bytes, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __USE_STRING_OVERLOADS
+#ifdef __CRT_HAVE___mempcpyc_chk
+#undef __PRIVATE_mempcpy_4
+#define __PRIVATE_mempcpy_4(dst, src, elem_count, elem_size) __mempcpyc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#endif /* __USE_STRING_OVERLOADS */
+#endif /* __USE_GNU */
+
+#ifdef __USE_KOS
+#ifdef __CRT_HAVE___mempset_chk
+#undef mempset
+#define mempset(dst, byte, n_bytes) __mempset_chk(dst, byte, n_bytes, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memcpyc_chk
+#undef memcpyc
+#define memcpyc(dst, src, elem_count, elem_size) __memcpyc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmovec_chk
+#undef memmovec
+#define memmovec(dst, src, elem_count, elem_size) __memmovec_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempcpyc_chk
+#undef mempcpyc
+#define mempcpyc(dst, src, elem_count, elem_size) __mempcpyc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmovec_chk
+#undef mempmovec
+#define mempmovec(dst, src, elem_count, elem_size) __mempmovec_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmoveupc_chk
+#undef memmoveupc
+#define memmoveupc(dst, src, elem_count, elem_size) __memmoveupc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmoveupc_chk
+#undef mempmoveupc
+#define mempmoveupc(dst, src, elem_count, elem_size) __mempmoveupc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmovedownc_chk
+#undef memmovedownc
+#define memmovedownc(dst, src, elem_count, elem_size) __memmovedownc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmovedownc_chk
+#undef mempmovedownc
+#define mempmovedownc(dst, src, elem_count, elem_size) __mempmovedownc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmove_chk
+#undef __PRIVATE_mempmove_3
+#define __PRIVATE_mempmove_3(dst, src, n_bytes) __mempmove_chk(dst, src, n_bytes, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmoveup_chk
+#undef __PRIVATE_memmoveup_3
+#define __PRIVATE_memmoveup_3(dst, src, n_bytes) __memmoveup_chk(dst, src, n_bytes, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmoveup_chk
+#undef __PRIVATE_mempmoveup_3
+#define __PRIVATE_mempmoveup_3(dst, src, n_bytes) __mempmoveup_chk(dst, src, n_bytes, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmovedown_chk
+#undef __PRIVATE_memmovedown_3
+#define __PRIVATE_memmovedown_3(dst, src, n_bytes) __memmovedown_chk(dst, src, n_bytes, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmovedown_chk
+#undef __PRIVATE_mempmovedown_3
+#define __PRIVATE_mempmovedown_3(dst, src, n_bytes) __mempmovedown_chk(dst, src, n_bytes, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __USE_STRING_OVERLOADS
+#ifdef __CRT_HAVE___mempmovec_chk
+#undef __PRIVATE_mempmove_4
+#define __PRIVATE_mempmove_4(dst, src, elem_count, elem_size) __mempmovec_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmoveupc_chk
+#undef __PRIVATE_memmoveup_4
+#define __PRIVATE_memmoveup_4(dst, src, elem_count, elem_size) __memmoveupc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmoveupc_chk
+#undef __PRIVATE_mempmoveup_4
+#define __PRIVATE_mempmoveup_4(dst, src, elem_count, elem_size) __mempmoveupc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmovedownc_chk
+#undef __PRIVATE_memmovedown_4
+#define __PRIVATE_memmovedown_4(dst, src, elem_count, elem_size) __memmovedownc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmovedownc_chk
+#undef __PRIVATE_mempmovedown_4
+#define __PRIVATE_mempmovedown_4(dst, src, elem_count, elem_size) __mempmovedownc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
+#endif /* ... */
+#endif /* __USE_STRING_OVERLOADS */
+#endif /* __USE_KOS */
+#ifdef __USE_STRING_BWLQ
+#ifdef __CRT_HAVE___memcpyw_chk
+#undef memcpyw
+#define memcpyw(dst, src, n_words) __memcpyw_chk(dst, src, n_words, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempcpyw_chk
+#undef mempcpyw
+#define mempcpyw(dst, src, n_words) __mempcpyw_chk(dst, src, n_words, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmovew_chk
+#undef memmovew
+#define memmovew(dst, src, n_words) __memmovew_chk(dst, src, n_words, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memcpyl_chk
+#undef memcpyl
+#define memcpyl(dst, src, n_dwords) __memcpyl_chk(dst, src, n_dwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempcpyl_chk
+#undef mempcpyl
+#define mempcpyl(dst, src, n_dwords) __mempcpyl_chk(dst, src, n_dwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmovel_chk
+#undef memmovel
+#define memmovel(dst, src, n_dwords) __memmovel_chk(dst, src, n_dwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmovew_chk
+#undef mempmovew
+#define mempmovew(dst, src, n_words) __mempmovew_chk(dst, src, n_words, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmovel_chk
+#undef mempmovel
+#define mempmovel(dst, src, n_dwords) __mempmovel_chk(dst, src, n_dwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memsetw_chk
+#undef memsetw
+#define memsetw(dst, word, n_words) __memsetw_chk(dst, word, n_words, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempsetw_chk
+#undef mempsetw
+#define mempsetw(dst, word, n_words) __mempsetw_chk(dst, word, n_words, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memsetl_chk
+#undef memsetl
+#define memsetl(dst, dword, n_dwords) __memsetl_chk(dst, dword, n_dwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempsetl_chk
+#undef mempsetl
+#define mempsetl(dst, dword, n_dwords) __mempsetl_chk(dst, dword, n_dwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __USE_KOS
+#ifdef __CRT_HAVE___memmoveupw_chk
+#undef memmoveupw
+#define memmoveupw(dst, src, n_words) __memmoveupw_chk(dst, src, n_words, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmovedownw_chk
+#undef memmovedownw
+#define memmovedownw(dst, src, n_words) __memmovedownw_chk(dst, src, n_words, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmoveupl_chk
+#undef memmoveupl
+#define memmoveupl(dst, src, n_dwords) __memmoveupl_chk(dst, src, n_dwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmovedownl_chk
+#undef memmovedownl
+#define memmovedownl(dst, src, n_dwords) __memmovedownl_chk(dst, src, n_dwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmoveupw_chk
+#undef mempmoveupw
+#define mempmoveupw(dst, src, n_words) __mempmoveupw_chk(dst, src, n_words, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmovedownw_chk
+#undef mempmovedownw
+#define mempmovedownw(dst, src, n_words) __mempmovedownw_chk(dst, src, n_words, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmoveupl_chk
+#undef mempmoveupl
+#define mempmoveupl(dst, src, n_dwords) __mempmoveupl_chk(dst, src, n_dwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmovedownl_chk
+#undef mempmovedownl
+#define mempmovedownl(dst, src, n_dwords) __mempmovedownl_chk(dst, src, n_dwords, __ssp_bos0(dst))
+#endif /* ... */
+#endif /* __USE_KOS */
+#ifdef __UINT64_TYPE__
+#ifdef __CRT_HAVE___memcpyq_chk
+#undef memcpyq
+#define memcpyq(dst, src, n_qwords) __memcpyq_chk(dst, src, n_qwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempcpyq_chk
+#undef mempcpyq
+#define mempcpyq(dst, src, n_qwords) __mempcpyq_chk(dst, src, n_qwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmoveq_chk
+#undef memmoveq
+#define memmoveq(dst, src, n_qwords) __memmoveq_chk(dst, src, n_qwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmoveq_chk
+#undef mempmoveq
+#define mempmoveq(dst, src, n_qwords) __mempmoveq_chk(dst, src, n_qwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memsetq_chk
+#undef memsetq
+#define memsetq(dst, qword, n_qwords) __memsetq_chk(dst, qword, n_qwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempsetq_chk
+#undef mempsetq
+#define mempsetq(dst, qword, n_qwords) __mempsetq_chk(dst, qword, n_qwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __USE_KOS
+#ifdef __CRT_HAVE___memmoveupq_chk
+#undef memmoveupq
+#define memmoveupq(dst, src, n_qwords) __memmoveupq_chk(dst, src, n_qwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___memmovedownq_chk
+#undef memmovedownq
+#define memmovedownq(dst, src, n_qwords) __memmovedownq_chk(dst, src, n_qwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmoveupq_chk
+#undef mempmoveupq
+#define mempmoveupq(dst, src, n_qwords) __mempmoveupq_chk(dst, src, n_qwords, __ssp_bos0(dst))
+#endif /* ... */
+#ifdef __CRT_HAVE___mempmovedownq_chk
+#undef mempmovedownq
+#define mempmovedownq(dst, src, n_qwords) __mempmovedownq_chk(dst, src, n_qwords, __ssp_bos0(dst))
+#endif /* ... */
+#endif /* __USE_KOS */
+#endif /* __UINT64_TYPE__ */
+#endif /* __USE_STRING_BWLQ */
+
+#if defined(__cplusplus) || !defined(__USE_STRING_OVERLOADS)
+#ifdef __cplusplus
+#ifndef __std___forward_voidp_defined
+#define __std___forward_voidp_defined 1
+__NAMESPACE_STD_BEGIN
+#ifdef __forward_voidp_defined
+__NAMESPACE_GLB_USING(__forward_voidp)
+#else /* __forward_voidp_defined */
+__FORCELOCAL __ATTR_CONST void *__NOTHROW(__LIBCCALL __forward_voidp)(void *__x) { return __x; }
+#endif /* !__forward_voidp_defined */
+__NAMESPACE_STD_END
+#ifndef __forward_voidp_defined
+#define __forward_voidp_defined 1
+__NAMESPACE_STD_USING(__forward_voidp)
+#endif /* !__forward_voidp_defined */
+#endif /* !__std___forward_voidp_defined */
+#endif /* __cplusplus */
+#undef memcpy
+#undef memmove
+#ifdef __USE_STRING_OVERLOADS
+#ifdef __cplusplus
+#define memcpy(...)  __forward_voidp(__HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (__VA_ARGS__))(__VA_ARGS__))
+#define memmove(...) __forward_voidp(__HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (__VA_ARGS__))(__VA_ARGS__))
+#else /* __cplusplus */
+#define memcpy(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (__VA_ARGS__))(__VA_ARGS__)
+#define memmove(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* !__cplusplus */
+#ifdef __USE_GNU
+#undef mempcpy
+#define mempcpy(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempcpy_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __USE_GNU */
+#ifdef __USE_KOS
+#undef mempmove
+#undef mempmoveup
+#undef mempmovedown
+#undef memmoveup
+#undef memmovedown
+#define mempmove(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmove_, (__VA_ARGS__))(__VA_ARGS__)
+#define mempmoveup(...)   __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmoveup_, (__VA_ARGS__))(__VA_ARGS__)
+#define mempmovedown(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmovedown_, (__VA_ARGS__))(__VA_ARGS__)
+#define memmoveup(...)    __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmoveup_, (__VA_ARGS__))(__VA_ARGS__)
+#define memmovedown(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmovedown_, (__VA_ARGS__))(__VA_ARGS__)
+#endif /* __USE_KOS */
+#else /* __USE_STRING_OVERLOADS */
+#define memcpy(dst, src, n_bytes)  __forward_voidp(__PRIVATE_memcpy_3(dst, src, n_bytes))
+#define memmove(dst, src, n_bytes) __forward_voidp(__PRIVATE_memmove_3(dst, src, n_bytes))
+#ifdef __USE_GNU
+#undef mempcpy
+#define mempcpy(dst, src, n_bytes) __PRIVATE_mempcpy_3(dst, src, n_bytes)
+#endif /* __USE_GNU */
+#ifdef __USE_KOS
+#undef mempmove
+#undef mempmoveup
+#undef mempmovedown
+#undef memmoveup
+#undef memmovedown
+#define mempmove(dst, src, n_bytes)     __PRIVATE_mempmove_3(dst, src, n_bytes)
+#define mempmoveup(dst, src, n_bytes)   __PRIVATE_mempmoveup_3(dst, src, n_bytes)
+#define mempmovedown(dst, src, n_bytes) __PRIVATE_mempmovedown_3(dst, src, n_bytes)
+#define memmoveup(dst, src, n_bytes)    __PRIVATE_memmoveup_3(dst, src, n_bytes)
+#define memmovedown(dst, src, n_bytes)  __PRIVATE_memmovedown_3(dst, src, n_bytes)
+#endif /* __USE_KOS */
+#endif /* !__USE_STRING_OVERLOADS */
+#endif /* __cplusplus || !__USE_STRING_OVERLOADS */
+
+
+#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcpy) && \
+     defined(__CRT_HAVE___strcpy_chk) && __has_builtin(__builtin___strcpy_chk))
+#undef strcpy
+#define strcpy(buf, src)                                                                      \
+	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___strcpy_chk(buf, src, __ssp_bos0(buf)) \
+	                                      : __strcpy_chk(buf, src, __ssp_bos0(buf)))
+#elif defined(__CRT_HAVE___strcpy_chk)
+#undef strcpy
+#define strcpy(buf, src) __strcpy_chk(buf, src, __ssp_bos0(buf))
+#endif /* ... */
+#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcat) && \
+     defined(__CRT_HAVE___strcat_chk) && __has_builtin(__builtin___strcat_chk))
+#undef strcat
+#define strcat(buf, src)                                                                      \
+	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___strcat_chk(buf, src, __ssp_bos0(buf)) \
+	                                      : __strcat_chk(buf, src, __ssp_bos0(buf)))
+#elif defined(__CRT_HAVE___strcat_chk)
+#undef strcat
+#define strcat(buf, src) __strcat_chk(buf, src, __ssp_bos0(buf))
+#endif /* ... */
+#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy) && \
+     defined(__CRT_HAVE___strncpy_chk) && __has_builtin(__builtin___strncpy_chk))
+#undef strncpy
+#define strncpy(buf, src, buflen)                                                                      \
+	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___strncpy_chk(buf, src, buflen, __ssp_bos0(buf)) \
+	                                      : __strncpy_chk(buf, src, buflen, __ssp_bos0(buf)))
+#elif defined(__CRT_HAVE___strncpy_chk)
+#undef strncpy
+#define strncpy(buf, src, buflen) __strncpy_chk(buf, src, buflen, __ssp_bos0(buf))
+#endif /* ... */
+#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncat) && \
+     defined(__CRT_HAVE___strncat_chk) && __has_builtin(__builtin___strncat_chk))
+#undef strncat
+#define strncat(buf, src, buflen)                                                                      \
+	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___strncat_chk(buf, src, buflen, __ssp_bos0(buf)) \
+	                                      : __strncat_chk(buf, src, buflen, __ssp_bos0(buf)))
+#elif defined(__CRT_HAVE___strncat_chk)
+#undef strncat
+#define strncat(buf, src, buflen) __strncat_chk(buf, src, buflen, __ssp_bos0(buf))
+#endif /* ... */
+#ifdef __USE_XOPEN2K8
+#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpcpy) && \
+     defined(__CRT_HAVE___stpcpy_chk) && __has_builtin(__builtin___stpcpy_chk))
+#undef stpcpy
+#define stpcpy(buf, src)                                                                      \
+	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___stpcpy_chk(buf, src, __ssp_bos0(buf)) \
+	                                      : __stpcpy_chk(buf, src, __ssp_bos0(buf)))
+#elif defined(__CRT_HAVE___stpcpy_chk)
+#undef stpcpy
+#define stpcpy(buf, src) __stpcpy_chk(buf, src, __ssp_bos0(buf))
+#endif /* ... */
+#if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpncpy) && \
+     defined(__CRT_HAVE___stpncpy_chk) && __has_builtin(__builtin___stpncpy_chk))
+#undef stpncpy
+#define stpncpy(buf, src, buflen)                                                                      \
+	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___stpncpy_chk(buf, src, buflen, __ssp_bos0(buf)) \
+	                                      : __stpncpy_chk(buf, src, buflen, __ssp_bos0(buf)))
+#elif defined(__CRT_HAVE___stpncpy_chk)
+#undef stpncpy
+#define stpncpy(buf, src, buflen) __stpncpy_chk(buf, src, buflen, __ssp_bos0(buf))
+#endif /* ... */
+#endif /* __USE_XOPEN2K8 */
+
+#endif /* __SSP_FORTIFY_LEVEL */
+
 
 #endif /* __CC__ */
 

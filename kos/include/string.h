@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbe875a1 */
+/* HASH CRC-32:0x619dfa89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,10 @@
 #define __size_t_defined 1
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
+#if defined(__std___forward_size_defined) && !defined(____forward_size_defined)
+#define ____forward_size_defined 1
+__NAMESPACE_STD_USING(__forward_size)
+#endif /* __std___forward_size_defined && !____forward_size_defined */
 __NAMESPACE_STD_USING(memcpy)
 __NAMESPACE_STD_USING(memmove)
 __NAMESPACE_STD_USING(memset)
@@ -99,6 +103,10 @@ __NAMESPACE_STD_END
 #define __size_t_defined 1
 __NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
+#if defined(__std___forward_size_defined) && !defined(____forward_size_defined)
+#define ____forward_size_defined 1
+__NAMESPACE_STD_USING(__forward_size)
+#endif /* __std___forward_size_defined && !____forward_size_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifndef NULL
@@ -6599,9 +6607,12 @@ __SIZE_TYPE__ __NOTHROW_NCX((__LIBCCALL wcsnlen_s)(wchar_t const *__str, __SIZE_
 #ifndef __INTELLISENSE__
 #if __has_builtin(__builtin_strlen)
 #ifdef __cplusplus
+#ifndef __std___forward_size_defined
+#define __std___forward_size_defined 1
 __NAMESPACE_STD_BEGIN
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__LIBCCALL __forward_size)(size_t __x) { return __x; }
 __NAMESPACE_STD_END
+#endif /* !__std___forward_size_defined */
 #ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(__forward_size)
 #endif /* !__CXX_SYSTEM_HEADER */
@@ -6696,6 +6707,11 @@ __SYSDECL_BEGIN
 #define __PRIVATE_mempmovedown_3 (mempmovedown)
 #define __PRIVATE_memmoveup_3    (memmoveup)
 #define __PRIVATE_memmovedown_3  (memmovedown)
+#undef mempmove
+#undef mempmoveup
+#undef mempmovedown
+#undef memmoveup
+#undef memmovedown
 #define mempmove(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmove_, (__VA_ARGS__))(__VA_ARGS__)
 #define mempmoveup(...)   __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmoveup_, (__VA_ARGS__))(__VA_ARGS__)
 #define mempmovedown(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmovedown_, (__VA_ARGS__))(__VA_ARGS__)
@@ -6714,6 +6730,10 @@ __SYSDECL_END
 #include <parts/uchar/string.h>
 #endif /* _UCHAR_H && !_PARTS_UCHAR_STRING_H */
 #endif /* __USE_UTF */
+
+#ifdef __SSP_FORTIFY_LEVEL
+#include <ssp/string.h>
+#endif /* __SSP_FORTIFY_LEVEL */
 
 #ifdef __CXX_SYSTEM_HEADER
 #define _CXX_STDONLY_CSTRING 1

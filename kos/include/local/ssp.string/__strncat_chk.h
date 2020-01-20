@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1aaba3b */
+/* HASH CRC-32:0xb6b71495 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 #ifndef __local___strncat_chk_defined
 #define __local___strncat_chk_defined 1
+#include <ssp/chk.h>
 /* Dependency: "strncat" from "string" */
 #ifndef ____localdep_strncat_defined
 #define ____localdep_strncat_defined 1
@@ -38,10 +39,12 @@ __LOCAL_LIBC(__strncat_chk) __ATTR_LEAF __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__strncat_chk))(char *__restrict __dst,
                                                            char const *__restrict __src,
                                                            __SIZE_TYPE__ __buflen,
-                                                           __SIZE_TYPE__ __dst_bufsize) {
-#line 104 "kos/src/libc/magic/ssp.string.c"
-	(void)__dst_bufsize;
+                                                           __SIZE_TYPE__ __dst_objsize) {
+#line 42 "kos/src/libc/magic/ssp.string.c"
+	(void)__dst_objsize;
+	(void)__dst_objsize; /* TODO */;
 	return __localdep_strncat(__dst, __src, __buflen);
 }
+
 __NAMESPACE_LOCAL_END
 #endif /* !__local___strncat_chk_defined */

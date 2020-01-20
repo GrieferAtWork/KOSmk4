@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3709d22 */
+/* HASH CRC-32:0xa6084aef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__aligned_msize_dbg_defined
-#if 1
 #define __local__aligned_msize_dbg_defined 1
 /* Dependency: "_aligned_msize" from "stdlib" */
 #ifndef ____localdep__aligned_msize_defined
@@ -41,5 +40,4 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_msize_dbg))(void *__ptr,
 	return __localdep__aligned_msize(__ptr, __min_alignment, __offset);
 }
 __NAMESPACE_LOCAL_END
-#endif /* 1 */
 #endif /* !__local__aligned_msize_dbg_defined */
