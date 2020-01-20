@@ -169,6 +169,7 @@
 	.utility*                         # Misc. utility functions
 	.system*                          # Misc. system functions
 	.debug*                           # Misc. debug functions
+	.ssp*                             # Stack smash protection
 	.fs*                              # All other filesystem functions
 	.sched.resource*                  # Resource limit functions
 	.sched.msg*                       # <sys/msg.h>
@@ -275,6 +276,7 @@
 	CB(PREFIX.utility.glob.* PREFIX.utility.klog.* PREFIX.utility.monetary.* PREFIX.utility.regex.* PREFIX.utility.search.* PREFIX.utility.shm.* PREFIX.utility.stdlib.*) \
 	CB(PREFIX.system.adjtime.* PREFIX.system.configuration.* PREFIX.system.info.* PREFIX.system.ioperm.* PREFIX.system.mman.* PREFIX.system.ptrace.* PREFIX.system.reboot.* PREFIX.system.syslog.* PREFIX.system.utility.*) \
 	CB(PREFIX.debug.*) \
+	CB(PREFIX.ssp.string.memory.*) \
 	CB(PREFIX.sched.resource.*) \
 	CB(PREFIX.sched.msg.*) \
 	CB(PREFIX.string.encrypt.*) \

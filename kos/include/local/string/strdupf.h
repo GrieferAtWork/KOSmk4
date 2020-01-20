@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x341d72ca */
+/* HASH CRC-32:0x4221ac7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strdupf) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0) char *
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(strdupf))(char const *__restrict __format,
                                                       ...) {
-#line 4032 "kos/src/libc/magic/string.c"
+#line 4045 "kos/src/libc/magic/string.c"
 	char * __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

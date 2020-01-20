@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b48b2b */
+/* HASH CRC-32:0x1ee85068 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __LOCAL_LIBC(c32len) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32len))(__CHAR32_TYPE__ const *__restrict __string) {
-#line 248 "kos/src/libc/magic/string.c"
+#line 252 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_c32end(__string) - __string);
 }
 __NAMESPACE_LOCAL_END

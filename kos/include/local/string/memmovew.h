@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe588d19c */
+/* HASH CRC-32:0xcd5469c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __LOCAL_LIBC(memmovew) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UI
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovew))(/*aligned(2)*/ void *__dst,
                                                       /*aligned(2)*/ void const *__src,
                                                       __SIZE_TYPE__ __n_words) {
-#line 1040 "kos/src/libc/magic/string.c"
+#line 1053 "kos/src/libc/magic/string.c"
 	__UINT16_TYPE__ *__pdst, *__psrc;
 	if (__dst <= __src) {
 		__pdst = (__UINT16_TYPE__ *)__dst;

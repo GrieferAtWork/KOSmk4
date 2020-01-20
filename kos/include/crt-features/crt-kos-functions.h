@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f7ea19c */
+/* HASH CRC-32:0xc6f10388 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,6 +208,10 @@ __CRT_FUNCTION(__libc_current_sigrtmin,0,(),0,(),int)
 __CRT_FUNCTION(__locale_ctype_ptr,0,(),0,(),char const *)
 __CRT_FUNCTION(__locale_ctype_ptr_l,0,(),1,(locale_t,locale),char const *)
 __CRT_FUNCTION(__lock_fhandle,0,(),1,(fd_t,fd),int)
+__CRT_FUNCTION(__memcpy_chk,0,(),4,(void *__restrict,dst,void const *__restrict,src,size_t,num_bytes,size_t,dst_bufsize),void *)
+__CRT_FUNCTION(__memmove_chk,0,(),4,(void *,dst,void const *,src,size_t,num_bytes,size_t,dst_bufsize),void *)
+__CRT_FUNCTION(__mempcpy_chk,0,(),4,(void *__restrict,dst,void const *__restrict,src,size_t,num_bytes,size_t,dst_bufsize),void *)
+__CRT_FUNCTION(__memset_chk,0,(),4,(void *__restrict,dst,int,byte,size_t,num_bytes,size_t,dst_bufsize),void *)
 __CRT_FUNCTION(__p___argc,0,(),0,(),int *)
 __CRT_FUNCTION(__p___argv,0,(),0,(),char ***)
 __CRT_FUNCTION(__p___initenv,0,(),0,(),char ***)
@@ -226,6 +230,11 @@ __CRT_FUNCTION(__pthread_unwind_next,0,(),1,(__pthread_unwind_buf_t *,buf),void)
 __CRT_FUNCTION(__signbit,0,(),1,(double,val),int)
 __CRT_FUNCTION(__signbitf,0,(),1,(float,val),int)
 __CRT_FUNCTION(__signbitl,0,(),1,(long double,val),int)
+__CRT_FUNCTION(__stpcpy_chk,0,(),3,(char *__restrict,dst,char const *__restrict,src,size_t,dst_bufsize),char *)
+__CRT_FUNCTION(__strcat_chk,0,(),3,(char *__restrict,dst,char const *__restrict,src,size_t,dst_bufsize),char *)
+__CRT_FUNCTION(__strcpy_chk,0,(),3,(char *__restrict,dst,char const *__restrict,src,size_t,dst_bufsize),char *)
+__CRT_FUNCTION(__strncat_chk,0,(),4,(char *__restrict,dst,char const *__restrict,src,size_t,buflen,size_t,dst_bufsize),char *)
+__CRT_FUNCTION(__strncpy_chk,0,(),4,(char *__restrict,dst,char const *__restrict,src,size_t,buflen,size_t,dst_bufsize),char *)
 __CRT_FUNCTION(__xpg_basename,0,(),1,(char *,filename),char *)
 __CRT_FUNCTION(_abs64,2,(__SIZEOF_INT__ == 8,abs,__SIZEOF_LONG_LONG__ == 8,llabs),1,(__INT64_TYPE__,x),__INT64_TYPE__)
 __CRT_FUNCTION(_access_s,0,(),2,(char const *,filename,int,type),errno_t)

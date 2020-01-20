@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66c1aedb */
+/* HASH CRC-32:0x5ac043f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -787,8 +787,12 @@
 #define __CRT_ATTR_NOTHROW_NCX___lroundl 1
 #define __CRT_ATTR_NOTHROW_NCX___mbrlen 1
 #define __CRT_ATTR_NOTHROW_NCX___memcdup 1
+#define __CRT_ATTR_NOTHROW_NCX___memcpy_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___memdup 1
+#define __CRT_ATTR_NOTHROW_NCX___memmove_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___mempcpy 1
+#define __CRT_ATTR_NOTHROW_NCX___mempcpy_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___memset_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___modf 1
 #define __CRT_ATTR_NOTHROW_NCX___modff 1
 #define __CRT_ATTR_NOTHROW_NCX___modfl 1
@@ -868,7 +872,12 @@
 #define __CRT_ATTR_NOTHROW_NCX___sqrtf 1
 #define __CRT_ATTR_NOTHROW_NCX___sqrtl 1
 #define __CRT_ATTR_NOTHROW_NCX___stpcpy 1
+#define __CRT_ATTR_NOTHROW_NCX___stpcpy_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___stpncpy 1
+#define __CRT_ATTR_NOTHROW_NCX___strcat_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___strcpy_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___strncat_chk 1
+#define __CRT_ATTR_NOTHROW_NCX___strncpy_chk 1
 #define __CRT_ATTR_NOTHROW_NCX___strtok_r 1
 #define __CRT_ATTR_NOTHROW_NCX___sysv_signal 1
 #define __CRT_ATTR_NOTHROW_NCX___tan 1

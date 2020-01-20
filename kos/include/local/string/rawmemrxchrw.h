@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e1fe905 */
+/* HASH CRC-32:0x2e0cc271 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(rawmemrxchrw) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrxchrw))(/*aligned(2)*/ void const *__restrict __haystack,
                                                           __UINT16_TYPE__ __word) {
-#line 2097 "kos/src/libc/magic/string.c"
+#line 2110 "kos/src/libc/magic/string.c"
 	__UINT16_TYPE__ *__iter = (__UINT16_TYPE__ *)__haystack;
 	for (;;) {
 		if __unlikely(*--__iter != __word)

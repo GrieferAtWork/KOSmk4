@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x821839ca */
+/* HASH CRC-32:0x2ec3ef60 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fuzzy_strcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strcmp))(char const *__s1,
                                                           char const *__s2) {
-#line 4193 "kos/src/libc/magic/string.c"
+#line 4206 "kos/src/libc/magic/string.c"
 	return __localdep_fuzzy_memcmp(__s1, __localdep_strlen(__s1), __s2, __localdep_strlen(__s2));
 }
 __NAMESPACE_LOCAL_END

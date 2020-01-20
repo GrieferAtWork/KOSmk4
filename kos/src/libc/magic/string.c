@@ -182,7 +182,9 @@ memcpy:([nonnull] void *__restrict dst,
 @@Move memory between potentially overlapping memory blocks.
 @@@return: * : Always re-returns `dst'
 [fast][libc][kernel][std][nobuiltin][ATTR_LEAF]
-memmove:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> [== dst] void * {
+memmove:([nonnull] void *dst,
+         [nonnull] void const *src,
+         size_t n_bytes) -> [== dst] void * {
 	byte_t *pdst, *psrc;
 	if (dst <= src) {
 		pdst = (byte_t *)dst;
@@ -201,7 +203,8 @@ memmove:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> [== 
 @@Fill memory with a given byte
 @@@return: * : Always re-returns `dst'
 [fast][libc][kernel][std][nobuiltin][ATTR_LEAF]
-memset:([nonnull] void *__restrict dst, int byte, size_t n_bytes) -> [== dst] void * {
+memset:([nonnull] void *__restrict dst,
+        int byte, size_t n_bytes) -> [== dst] void * {
 	byte_t *pdst = (byte_t *)dst;
 	while (n_bytes--)
 		*pdst++ = (byte_t)byte;
@@ -213,7 +216,8 @@ memset:([nonnull] void *__restrict dst, int byte, size_t n_bytes) -> [== dst] vo
 @@@return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
 @@@return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes'
 [fast][libc][kernel][alias(bcmp)][std][ATTR_WUNUSED][ATTR_PURE][nobuiltin]
-memcmp:([nonnull] void const *s1, [nonnull] void const *s2, size_t n_bytes) -> int {
+memcmp:([nonnull] void const *s1,
+        [nonnull] void const *s2, size_t n_bytes) -> int {
 	byte_t *p1 = (byte_t *)s1;
 	byte_t *p2 = (byte_t *)s2;
 	byte_t v1, v2;
@@ -278,7 +282,8 @@ strrchr:([nonnull] char const *__restrict haystack, int needle) -> char *
 
 @@Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical
 [libc][kernel][std][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
-strcmp:([nonnull] char const *s1, [nonnull] char const *s2) -> int {
+strcmp:([nonnull] char const *s1,
+        [nonnull] char const *s2) -> int {
 	char c1, c2;
 	do {
 		if unlikely((c1 = *s1++) != (c2 = *s2++))
@@ -289,7 +294,8 @@ strcmp:([nonnull] char const *s1, [nonnull] char const *s2) -> int {
 
 @@Same as `strcmp', but compare at most `MAXLEN' characters from either string
 [std][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
-strncmp:([nonnull] char const *s1, [nonnull] char const *s2, size_t maxlen) -> int {
+strncmp:([nonnull] char const *s1,
+         [nonnull] char const *s2, size_t maxlen) -> int {
 	char c1, c2;
 	do {
 		if (!maxlen--)
@@ -327,12 +333,14 @@ miss:
 
 
 [std][crtbuiltin][ATTR_LEAF]
-strcpy:([nonnull] char *__restrict buf, [nonnull] char const *__restrict src) -> [== buf] char * {
+strcpy:([nonnull] char *__restrict buf,
+        [nonnull] char const *__restrict src) -> [== buf] char * {
 	return (char *)memcpy(buf, src, (strlen(src) + 1) * sizeof(char));
 }
 
 [std][crtbuiltin][ATTR_LEAF]
-strncpy:([nonnull] char *__restrict buf, [nonnull] char const *__restrict src, size_t buflen) -> [== buf] char * {
+strncpy:([nonnull] char *__restrict buf,
+         [nonnull] char const *__restrict src, size_t buflen) -> [== buf] char * {
 	size_t srclen = strnlen(src, buflen);
 	memcpy(buf, src, srclen * sizeof(char));
 	memset(buf + srclen, '\0', (buflen - srclen) * sizeof(char));
@@ -340,13 +348,16 @@ strncpy:([nonnull] char *__restrict buf, [nonnull] char const *__restrict src, s
 }
 
 [std][crtbuiltin][ATTR_LEAF]
-strcat:([nonnull] char *__restrict buf, [nonnull] char const *__restrict src) -> [== buf] char * {
+strcat:([nonnull] char *__restrict buf,
+        [nonnull] char const *__restrict src) -> [== buf] char * {
 	memcpy(strend(buf), src, (strlen(src) + 1) * sizeof(char));
 	return buf;
 }
 
 [std][crtbuiltin][ATTR_LEAF]
-strncat:([nonnull] char *__restrict buf, [nonnull] char const *__restrict src, size_t buflen) -> [== buf] char * {
+strncat:([nonnull] char *__restrict buf,
+         [nonnull] char const *__restrict src,
+         size_t buflen) -> [== buf] char * {
 	size_t srclen = strnlen(src, buflen);
 	char *dst = strend(buf);
 	memcpy(dst, src, srclen * sizeof(char));
@@ -355,7 +366,8 @@ strncat:([nonnull] char *__restrict buf, [nonnull] char const *__restrict src, s
 }
 
 [std][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
-strcspn:([nonnull] char const *haystack, [nonnull] char const *reject) -> size_t {
+strcspn:([nonnull] char const *haystack,
+         [nonnull] char const *reject) -> size_t {
 	char const *iter = haystack;
 	while (*iter && !strchr(reject, *iter))
 		++iter;
@@ -363,7 +375,8 @@ strcspn:([nonnull] char const *haystack, [nonnull] char const *reject) -> size_t
 }
 
 [std][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
-strspn:([nonnull] char const *haystack, [nonnull] char const *accept) -> size_t {
+strspn:([nonnull] char const *haystack,
+        [nonnull] char const *accept) -> size_t {
 	char const *iter = haystack;
 	while (strchr(accept, *iter))
 		++iter;
