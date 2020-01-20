@@ -41,6 +41,7 @@ BEGIN
 	LD_FLAGS({
 		"-init=libc_init",
 		"-fini=libc_fini",
+		"--hash-style=gnu",
 	})
 
 	DEFINE({ "__BUILDING_LIBC" : "1" })

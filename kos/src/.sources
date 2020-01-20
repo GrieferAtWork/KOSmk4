@@ -64,6 +64,8 @@ BEGIN
 	USELIB("libc")
 	STATIC_USELIBGCC()
 	STATIC_USELIB("libssp")
+	LD_FLAGS({ "--hash-style=gnu" })
+
 #define DEFINE_SIMPLE_LIBRARY(name, ...)                         \
 	BEGIN GROUP("libs." name) { COMPILE, LINK, ARCHIVE, MCOPY }; \
 		SET_OUTPUT_LIBDLL(name)                                  \
@@ -134,6 +136,7 @@ BEGIN GROUP("libs.libdlmalloc") { COMPILE, LINK, ARCHIVE, MCOPY };
 	SET_LANGUAGE("c")
 	/* dlmalloc() has been heavily tested. - no need to turn on stack-smash protection! */
 	REMOVE_GCC_FLAGS({ "-fstack-protector-strong" })
+	LD_FLAGS({ "--hash-style=gnu" })
 	SET_OUTPUT_LIBDLL("libdlmalloc")
 	SET_SHARED()
 	SET_NOSTDLIB()
@@ -156,6 +159,7 @@ BEGIN GROUP("libs.libssp") { COMPILE, LINK, ARCHIVE, MCOPY };
 	/* Libssp is the one responsible for stack-smash-protection, so prevent
 	 * a dependency loop by getting rid of SSP within the library itself. */
 	REMOVE_GCC_FLAGS({ "-fstack-protector-strong" })
+	LD_FLAGS({ "--hash-style=gnu" })
 	SET_OUTPUT_LIBDLL("libssp")
 	SET_SHARED()
 	SET_NOSTDLIB()

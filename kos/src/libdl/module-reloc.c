@@ -209,7 +209,7 @@ DlModule_ElfFindSymbol(DlModule *__restrict self, uintptr_t symid,
 	struct dl_symbol weak_symbol;
 	ElfW(Sym) const *symbol;
 	ElfW(Addr) result;
-	char *name;
+	char const *name;
 	weak_symbol.ds_mod = NULL;
 	symbol = self->dm_elf.de_dynsym_tab + symid;
 	if ((symbol->st_shndx != SHN_UNDEF) && (self->dm_flags & RTLD_DEEPBIND)) {
@@ -535,7 +535,7 @@ dl_bind_lazy_relocation(DlModule *__restrict self,
 	                                    NULL, NULL))
 #endif /* !LAZY_TRACE */
 	{
-		ElfW(Sym) *sym = self->dm_elf.de_dynsym_tab + ELFW(R_SYM)(rel->r_info);
+		ElfW(Sym) const *sym = self->dm_elf.de_dynsym_tab + ELFW(R_SYM)(rel->r_info);
 		syslog(LOG_ERROR, "[rtld] Unable to resolve symbol %q in %q\n",
 		       self->dm_elf.de_dynstr + sym->st_name,
 		       self->dm_filename);

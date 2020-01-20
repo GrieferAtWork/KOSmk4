@@ -192,12 +192,12 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags);
  * @param: flags: Set of `DL_MODULE_INITIALIZE_F*' */
 INTDEF WUNUSED NONNULL((1)) int CC
 DlModule_ApplyRelocations(DlModule *__restrict self,
-                          ElfW(Rel) *__restrict vector,
+                          ElfW(Rel) const *__restrict vector,
                           size_t count, unsigned int flags);
 #if ELF_ARCH_USESRELA
 INTDEF WUNUSED NONNULL((1)) int CC
 DlModule_ApplyRelocationsWithAddend(DlModule *__restrict self,
-                                    ElfW(Rela) *__restrict vector,
+                                    ElfW(Rela) const *__restrict vector,
                                     size_t count, unsigned int flags);
 #endif /* ELF_ARCH_USESRELA */
 
@@ -235,7 +235,18 @@ INTDEF WUNUSED NONNULL((1, 2)) ElfW(Shdr) *CC
 DlModule_ElfGetSection(DlModule *__restrict self,
                        char const *__restrict name);
 
-/* Same as the functions above, but only return symbols defined within the same module! */
+/* Lazily calculates and returns the # of symbols in `de_dynsym_tab'
+ * NOTE: This function may only be called with `de_dynsym_tab' is non-NULL!
+ * @return: * : The # of symbols in `de_dynsym_tab'
+ * @return: 0 : Error (dlerror() was modified) */
+INTDEF WUNUSED NONNULL((1)) size_t CC
+DlModule_ElfGetDynSymCnt(DlModule *__restrict self);
+
+/* Return a pointer to the Elf_Sym object assigned with `name'.
+ * WARNING: The returned symbol may not necessarily be defined by `self'.
+ *          This function merely returns the associated entry from `.dynsym'
+ * NOTE: This function ~may~ set `dlerror()' when returning `NULL' in
+ *       case of the error is the result of a corrupted hash table. */
 INTDEF ElfW(Sym) const *CC
 DlModule_ElfGetLocalSymbol(DlModule *__restrict self,
                            char const *__restrict name,

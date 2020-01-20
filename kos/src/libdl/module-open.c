@@ -384,23 +384,27 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
 
 				case DT_RPATH:
 					if (!self->dm_elf.de_runpath)
-						self->dm_elf.de_runpath = (char *)tag.d_un.d_ptr;
+						self->dm_elf.de_runpath = (char const*)tag.d_un.d_ptr;
 					break;
 
 				case DT_RUNPATH:
-					self->dm_elf.de_runpath = (char *)tag.d_un.d_ptr;
+					self->dm_elf.de_runpath = (char const*)tag.d_un.d_ptr;
 					break;
 
 				case DT_HASH:
-					self->dm_elf.de_hashtab = (ElfW(HashTable) *)(self->dm_loadaddr + tag.d_un.d_ptr);
+					self->dm_elf.de_hashtab = (ElfW(HashTable) const*)(self->dm_loadaddr + tag.d_un.d_ptr);
+					break;
+
+				case DT_GNU_HASH:
+					self->dm_elf.de_gnuhashtab = (ElfW(GnuHashTable) const*)(self->dm_loadaddr + tag.d_un.d_ptr);
 					break;
 
 				case DT_STRTAB:
-					self->dm_elf.de_dynstr = (char *)(self->dm_loadaddr + tag.d_un.d_ptr);
+					self->dm_elf.de_dynstr = (char const*)(self->dm_loadaddr + tag.d_un.d_ptr);
 					break;
 
 				case DT_SYMTAB:
-					self->dm_elf.de_dynsym_tab = (ElfW(Sym) *)(self->dm_loadaddr + tag.d_un.d_ptr);
+					self->dm_elf.de_dynsym_tab = (ElfW(Sym) const*)(self->dm_loadaddr + tag.d_un.d_ptr);
 					break;
 
 				case DT_SYMENT:

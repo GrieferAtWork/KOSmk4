@@ -89,6 +89,7 @@ INTERN DlModule dl_rtld_module = {
 		.de_dyncnt        = 0,
 		.de_dynhdr        = NULL,
 		.de_dynsym_tab    = NULL,
+		.de_gnuhashtab    = NULL,
 		.de_hashtab       = NULL,
 		.de_dynstr        = NULL,
 		.de_runpath       = NULL,

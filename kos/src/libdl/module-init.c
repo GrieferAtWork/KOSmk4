@@ -76,25 +76,32 @@ DlModule_ElfRunInitializers(DlModule *__restrict self) {
 	size_t init_array_size        = 0;
 	for (dyni = 0; dyni < self->dm_elf.de_dyncnt; ++dyni) {
 		switch (self->dm_elf.de_dynhdr[dyni].d_tag) {
+
 		case DT_NULL:
 			goto done_dyntag;
+
 		case DT_INIT:
 			init_func = (uintptr_t)self->dm_elf.de_dynhdr[dyni].d_un.d_ptr;
 			break;
+
 		case DT_PREINIT_ARRAY:
 			preinit_array_base = (uintptr_t *)(self->dm_loadaddr +
 			                                   self->dm_elf.de_dynhdr[dyni].d_un.d_ptr);
 			break;
+
 		case DT_PREINIT_ARRAYSZ:
 			preinit_array_size = (size_t)self->dm_elf.de_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
 			break;
+
 		case DT_INIT_ARRAY:
 			init_array_base = (uintptr_t *)(self->dm_loadaddr +
 			                                self->dm_elf.de_dynhdr[dyni].d_un.d_ptr);
 			break;
+
 		case DT_INIT_ARRAYSZ:
 			init_array_size = (size_t)self->dm_elf.de_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
 			break;
+
 		default: break;
 		}
 	}
@@ -236,7 +243,7 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
 			goto err_nomem;
 		dep_flags = RTLD_GLOBAL | (self->dm_flags & RTLD_NOINIT);
 		for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
-			char *filename;
+			char const *filename;
 			REF DlModule *dependency;
 			if (self->dm_elf.de_dynhdr[i].d_tag == DT_NULL)
 				break;

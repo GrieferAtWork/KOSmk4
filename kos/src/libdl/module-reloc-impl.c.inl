@@ -38,13 +38,13 @@ DECL_BEGIN
 #ifdef APPLY_RELA
 INTERN WUNUSED NONNULL((1)) int CC
 DlModule_ApplyRelocationsWithAddend(DlModule *__restrict self,
-                                    ElfW(Rela) *__restrict vector,
+                                    ElfW(Rela) const *__restrict vector,
                                     size_t count,
                                     unsigned int flags)
 #else /* APPLY_RELA */
 INTERN WUNUSED NONNULL((1)) int CC
 DlModule_ApplyRelocations(DlModule *__restrict self,
-                          ElfW(Rel) *__restrict vector,
+                          ElfW(Rel) const *__restrict vector,
                           size_t count,
                           unsigned int flags)
 #endif /* !APPLY_RELA */
@@ -126,7 +126,7 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 
 #ifdef ELF_ARCH_CASE_R_COPY
 		ELF_ARCH_CASE_R_COPY: {
-			ElfW(Sym) *dst_sym;
+			ElfW(Sym) const *dst_sym;
 			size_t src_size;
 			DlModule *src_module;
 			dst_sym = self->dm_elf.de_dynsym_tab + ELFW(R_SYM)(rel.r_info);

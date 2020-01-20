@@ -863,11 +863,11 @@ libdl_dladdr(void const *address, Dl_info *info) {
 		return result;
 	}
 	/* Search for the closest dynamic symbol. */
-	if (mod->dm_elf.de_dynsym_tab && mod->dm_elf.de_hashtab) {
-		ElfW(Sym) *iter, *end;
+	if (mod->dm_elf.de_dynsym_tab) {
+		ElfW(Sym) const *iter, *end;
 		uintptr_t winner_distance = (uintptr_t)-1;
 		iter = mod->dm_elf.de_dynsym_tab;
-		end  = iter + mod->dm_elf.de_hashtab->ht_nchains;
+		end  = iter + DlModule_ElfGetDynSymCnt(mod);
 		for (; iter < end; ++iter) {
 			uintptr_t addr, distance;
 			if (iter->st_shndx == SHN_UNDEF)
@@ -1696,7 +1696,7 @@ done_add_finalizer:
 		if unlikely(self->dm_ops)
 			goto err_notelf;
 		pcount = va_arg(args, size_t *);
-		result = self->dm_elf.de_dynhdr;
+		result = (void *)self->dm_elf.de_dynhdr;
 		if (pcount)
 			*pcount = (size_t)self->dm_elf.de_dyncnt;
 	}	break;
@@ -1707,11 +1707,18 @@ done_add_finalizer:
 		if unlikely(self->dm_ops)
 			goto err_notelf;
 		pcount = va_arg(args, size_t *);
-		result = self->dm_elf.de_dynsym_tab;
+		result = (void *)self->dm_elf.de_dynsym_tab;
 		if (pcount) {
-			*pcount = self->dm_elf.de_hashtab
-			          ? (size_t)self->dm_elf.de_hashtab->ht_nchains
-			          : (size_t)-1;
+			if unlikely(!result) {
+				/* Special case: No `.dynsym' table. */
+				*pcount = 0;
+			} else {
+				size_t count;
+				count = DlModule_ElfGetDynSymCnt(self);
+				if unlikely(!count)
+					goto err;
+				*pcount = count;
+			}
 		}
 	}	break;
 
@@ -1719,7 +1726,7 @@ done_add_finalizer:
 		/* Check that this is an ELF module. */
 		if unlikely(self->dm_ops)
 			goto err_notelf;
-		result = self->dm_elf.de_dynstr;
+		result = (void *)self->dm_elf.de_dynstr;
 		break;
 
 	case DLAUXCTRL_ELF_GET_SHSTRTAB:

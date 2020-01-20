@@ -384,6 +384,79 @@ err:
 	return NULL;
 }
 
+/* Lazily calculates and returns the # of symbols in `de_dynsym_tab'
+ * NOTE: This function may only be called with `de_dynsym_tab' is non-NULL!
+ * @return: * : The # of symbols in `de_dynsym_tab'
+ * @return: 0 : Error (dlerror() was modified) */
+INTERN WUNUSED NONNULL((1)) size_t CC
+DlModule_ElfGetDynSymCnt(DlModule *__restrict self) {
+	size_t result;
+	assert(!self->dm_ops);
+	assert(self->dm_elf.de_dynsym_tab);
+	result = self->dm_elf.de_dynsym_cnt;
+	if unlikely(!result) {
+		/* Lazily calculate. */
+		if (self->dm_elf.de_hashtab) {
+			/* Legacy (ELF) hash tables contain a field for the # of symbols. */
+			result = self->dm_elf.de_hashtab->ht_nchains;
+		} else if (self->dm_elf.de_gnuhashtab) {
+			ElfW(GnuHashTable) const *ht;
+			ElfW(Word) const *buckets, *chains;
+			/* GNU hash tables are a bit more complicated, since we need to
+			 * find the symbol with the greatest index, then add +1 to that. */
+			ht      = self->dm_elf.de_gnuhashtab;
+			buckets = (ElfW(Word) const *)(ht->gh_bloom + ht->gh_bloom_size);
+			chains  = (ElfW(Word) const *)(buckets + ht->gh_nbuckets);
+			result  = chains[-1];
+			while ((chains[result - ht->gh_symoffset] & 1) == 0)
+				++result;
+		} else {
+			/* Lastly, we can figure out the # of symbols by looking
+			 * as section headers. We only do this as a last resort,
+			 * since the presence of section headers isn't actually
+			 * something that would be necessary to parse in a normal
+			 * ELF binary, and as such KOS's libdl tries to make as
+			 * few demands about its behavior as possible.
+			 * Also: Section headers don't get loaded into memory by
+			 *       default, so accessing them carries the risk of
+			 *       causing some kind of I/O or NOMEM error. */
+			ElfW(Shdr) *sh;
+			sh = DlModule_ElfGetShdrs(self);
+			/* NOTE: Section headers may not be present, or we may have failed to load them... */
+			if likely(sh) {
+				ElfW(Addr) modrel_dynsym;
+				size_t i, count;
+				modrel_dynsym = ((ElfW(Addr))self->dm_elf.de_dynsym_tab -
+				                 self->dm_loadaddr);
+				/* Find the section header that contains `.dynsym'.
+				 * We could look at section names here, or even just
+				 * search for a section that starts with `modrel_dynsym'.
+				 * However to minimize our expectations on what section
+				 * headers are actually present, simply assume that we're
+				 * looking for a `SHF_ALLOC' section containing `modrel_dynsym' */
+				count = self->dm_shnum;
+				for (i = 0; i < count; ++i) {
+					if (!(sh[i].sh_flags & SHF_ALLOC))
+						continue;
+					if (modrel_dynsym < sh[i].sh_addr)
+						continue;
+					if (modrel_dynsym >= sh[i].sh_addr + sh[i].sh_size)
+						continue;
+					/* Found it! */
+					result = ((sh[i].sh_addr + sh[i].sh_size) - modrel_dynsym) /
+					         sizeof(ElfW(Sym));
+					break;
+				}
+			}
+		}
+		COMPILER_WRITE_BARRIER();
+		self->dm_elf.de_dynsym_cnt = result;
+		COMPILER_WRITE_BARRIER();
+	}
+	return result;
+}
+
+
 
 INTERN NONNULL((1, 2)) __attribute__((__cold__)) int CC
 dl_seterror_nosect(DlModule *__restrict self,

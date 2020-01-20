@@ -116,11 +116,21 @@ struct dlmodule_finalizers {
 };
 
 typedef struct elfW(hashtable) {
-	ElfW(Word) ht_nbuckts;      /* Total number of buckets. */
-	ElfW(Word) ht_nchains;      /* Total number of symbols. */
+	ElfW(Word) ht_nbuckts;      /* # of buckets. */
+	ElfW(Word) ht_nchains;      /* # of symbols. */
 	ElfW(Word) ht_table[1024];  /* [ht_nbuckts] Hash table. */
-//	ElfW(Word) ht_chains[1024]; /* [ht_nchains] Hash chains. */
+/*	ElfW(Word) ht_chains[1024]; /* [ht_nchains] Hash chains. */
 } ElfW(HashTable);
+
+typedef struct elfW(gnu_hashtable) {
+	ElfW(Word) gh_nbuckets;      /* # of buckets. */
+	ElfW(Word) gh_symoffset;     /* Offset of symbol indices. */
+	ElfW(Word) gh_bloom_size;    /* # of elements in the bloom table. */
+	ElfW(Word) gh_bloom_shift;   /* Shift for bloom masks */
+	ElfW(Addr) gh_bloom[1024];   /* [gh_bloom_size] Bloom filter */
+/*	ElfW(Word) gh_buckets[1024]; /* [gh_nbuckets] Hash buckest. */
+/*	ElfW(Word) gh_chains[];      /* Hash chains */
+} ElfW(GnuHashTable);
 
 struct dlmodule_elf {
 	/* Lazy relocations (JMPREL). */
@@ -149,12 +159,13 @@ struct dlmodule_elf {
 
 	/* The module's .dynamic section, and derivatives (.dynsym + .dynstr). */
 	size_t                    de_dyncnt;     /* [const] Number of dynamic definition headers. */
-	ElfW(Dyn)                *de_dynhdr;     /* [0..de_dyncnt][const] Vector of dynamic definition entries. */
-	ElfW(Sym)                *de_dynsym_tab; /* [0..1][const] Vector of dynamic symbols defined by this module.
-	                                          * HINT: If also non-NULL, the number of symbols is `de_hashtab->ht_nchains' */
-	ElfW(HashTable)          *de_hashtab;    /* [0..1][const] Symbol hash table. */
-	char                     *de_dynstr;     /* [0..1][const] Dynamic string table. */
-	char                     *de_runpath;    /* [0..1][const] Library path of this module. */
+	ElfW(Dyn) const          *de_dynhdr;     /* [0..de_dyncnt][const] Vector of dynamic definition entries. */
+	ElfW(Sym) const          *de_dynsym_tab; /* [0..1][const] Vector of dynamic symbols defined by this module. */
+	size_t                    de_dynsym_cnt; /* [lock(WRITE_ONCE)][const] # of symbols in `de_dynsym_tab' (or `0' if not calculated) */
+	ElfW(GnuHashTable) const *de_gnuhashtab; /* [0..1][const] GNU Symbol hash table. */
+	ElfW(HashTable) const    *de_hashtab;    /* [0..1][const] Symbol hash table. */
+	char const               *de_dynstr;     /* [0..1][const] Dynamic string table. */
+	char const               *de_runpath;    /* [0..1][const] Library path of this module. */
 
 	/* ELF-specific Named data sections of the module (for use with `dllocksection()'). */
 	ElfW(Off)                 de_shoff;      /* File offset to section headers (or `0' if unknown). */

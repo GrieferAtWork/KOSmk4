@@ -26,18 +26,31 @@
 #include "dl.h"
 /**/
 
+#include <hybrid/typecore.h>
+
+#include <kos/exec/elf.h>
+
+#include <elf.h>
 #include <string.h>
 #include <syslog.h>
 
 DECL_BEGIN
 
+LOCAL WUNUSED ATTR_PURE NONNULL((1)) u32 CC
+gnu_symhash(char const *__restrict name) {
+	u32 h = 5381;
+	for (; *name; ++name) {
+		h = h * 33 + (u8)*name;
+	}
+	return h;
+}
 
 LOCAL WUNUSED ATTR_PURE NONNULL((1)) u32 CC
 elf_symhash(char const *__restrict name) {
 	u32 h = 0;
-	while (*name) {
+	for (; *name; ++name) {
 		u32 g;
-		h = (h << 4) + *name++;
+		h = (h << 4) + (u8)*name;
 		g = h & 0xf0000000;
 		if (g)
 			h ^= g >> 24;
@@ -46,48 +59,137 @@ elf_symhash(char const *__restrict name) {
 	return h;
 }
 
-/* Same as the functions above, but only return symbols defined within the same module! */
+#if ELF_ARCH_CLASS == ELFCLASS32
+#define ELF_CLASSBITS 32
+#elif ELF_ARCH_CLASS == ELFCLASS64
+#define ELF_CLASSBITS 64
+#else
+#define ELF_CLASSBITS (__SIZEOF_POINTER__ * 8)
+#endif
+
+
+
+/* Return a pointer to the Elf_Sym object assigned with `name'.
+ * WARNING: The returned symbol may not necessarily be defined by `self'.
+ *          This function merely returns the associated entry from `.dynsym'
+ * NOTE: This function ~may~ set `dlerror()' when returning `NULL' in
+ *       case of the error is the result of a corrupted hash table. */
 INTERN ElfW(Sym) const *CC
 DlModule_ElfGetLocalSymbol(DlModule *__restrict self,
                            char const *__restrict name,
                            uintptr_t *__restrict phash_elf,
                            uintptr_t *__restrict phash_gnu) {
-	ElfW(Sym) *result;
-	ElfW(HashTable) *elf_ht;
-	if ((elf_ht = self->dm_elf.de_hashtab) != NULL) {
-		ElfW(Word) *ht_chains;
-		ElfW(Word) max_attempts, chain;
-		uintptr_t hash = *phash_elf;
-		if (hash == DLMODULE_GETLOCALSYMBOL_HASH_UNSET)
-			hash = *phash_elf = elf_symhash(name);
-		if unlikely(!elf_ht->ht_nbuckts || !elf_ht->ht_nchains)
-			goto nosym_no_elf_ht;
-		max_attempts = elf_ht->ht_nchains;
-		ht_chains    = elf_ht->ht_table + elf_ht->ht_nbuckts;
-		chain        = elf_ht->ht_table[hash % elf_ht->ht_nbuckts];
-		do {
-			if unlikely(chain == STN_UNDEF)
-				break; /* End of chain. */
-			if unlikely(chain >= elf_ht->ht_nchains)
-				goto nosym_no_elf_ht; /* Corrupted hash-table */
-			result = self->dm_elf.de_dynsym_tab + chain;
-			if (strcmp(name, self->dm_elf.de_dynstr + result->st_name) == 0)
-				return result; /* Found it! */
-			/* Load the next chain entry. */
-			chain = ht_chains[chain];
-		} while likely(--max_attempts);
-		goto nosym;
+	ElfW(Sym) const *result;
+	/************************************************************************/
+	/* GNU hash table support                                               */
+	/************************************************************************/
+	{
+		ElfW(GnuHashTable) const *gnu_ht;
+		if ((gnu_ht = self->dm_elf.de_gnuhashtab) != NULL) {
+			/* This implementation is derived from:
+			 * https://flapenguin.me/2017/05/10/elf-lookup-dt-gnu-hash/
+			 * https://sourceware.org/ml/binutils/2006-10/msg00377.html
+			 */
+			ElfW(Word) symid, gh_symoffset;
+			ElfW(Word) const *gh_buckets;
+			ElfW(Word) const *gh_chains;
+			ElfW(Addr) bloom_word, bloom_mask;
+			uintptr_t hash = *phash_gnu;
+			if (hash == DLMODULE_GETLOCALSYMBOL_HASH_UNSET)
+				hash = *phash_gnu = gnu_symhash(name);
+			if unlikely(!gnu_ht->gh_bloom_size || !gnu_ht->gh_bloom_size)
+				goto nosym_no_gnu_ht;
+			gh_symoffset = gnu_ht->gh_symoffset;
+			gh_buckets   = (ElfW(Word) const *)(gnu_ht->gh_bloom + gnu_ht->gh_bloom_size);
+			gh_chains    = (ElfW(Word) const *)(gh_buckets + gnu_ht->gh_nbuckets);
+			bloom_word   = gnu_ht->gh_bloom[(hash / ELF_CLASSBITS) % gnu_ht->gh_bloom_size];
+			bloom_mask   = ((ElfW(Addr))1 << (hash % ELF_CLASSBITS)) |
+			               ((ElfW(Addr))1 << ((hash >> gnu_ht->gh_bloom_shift) % ELF_CLASSBITS));
+			if ((bloom_word & bloom_mask) != bloom_mask)
+				goto nosym;
+			symid = gh_buckets[hash % gnu_ht->gh_nbuckets];
+			if unlikely(symid < gh_symoffset)
+				goto nosym;
+			/* Search for the symbol. */
+			for (;; ++symid) {
+				ElfW(Word) enthash;
+				result  = self->dm_elf.de_dynsym_tab + symid;
+				enthash = gh_chains[symid - gh_symoffset];
+				if likely((hash | 1) == (enthash | 1)) {
+					if likely(strcmp(name, self->dm_elf.de_dynstr + result->st_name) == 0)
+						return result; /* Found it! */
+				}
+				if unlikely(enthash & 1)
+					break; /* End of chain */
+			}
+			goto nosym;
+		}
 	}
-	/* TODO: GNU hash table support */
-	(void)phash_gnu;
+
+search_elf_table:
+	/************************************************************************/
+	/* ELF hash table support                                               */
+	/************************************************************************/
+	{
+		ElfW(HashTable) const *elf_ht;
+		if ((elf_ht = self->dm_elf.de_hashtab) != NULL) {
+			ElfW(Word) const *ht_chains;
+			ElfW(Word) max_attempts, chain;
+			uintptr_t hash = *phash_elf;
+			if (hash == DLMODULE_GETLOCALSYMBOL_HASH_UNSET)
+				hash = *phash_elf = elf_symhash(name);
+			if unlikely(!elf_ht->ht_nbuckts || !elf_ht->ht_nchains)
+				goto nosym_no_elf_ht;
+			max_attempts = elf_ht->ht_nchains;
+			ht_chains    = elf_ht->ht_table + elf_ht->ht_nbuckts;
+			chain        = elf_ht->ht_table[hash % elf_ht->ht_nbuckts];
+			do {
+				if unlikely(chain == STN_UNDEF)
+					break; /* End of chain. */
+				if unlikely(chain >= elf_ht->ht_nchains)
+					goto nosym_no_elf_ht; /* Corrupted hash-table */
+				result = self->dm_elf.de_dynsym_tab + chain;
+				if likely(strcmp(name, self->dm_elf.de_dynstr + result->st_name) == 0)
+					return result; /* Found it! */
+				/* Load the next chain entry. */
+				chain = ht_chains[chain];
+			} while likely(--max_attempts);
+			goto nosym;
+		}
+	}
+
+search_dynsym:
+	/************************************************************************/
+	/* Do a linear search over the symbol table.                            */
+	/************************************************************************/
+	{
+		size_t i, dyncnt;
+		ElfW(Sym) const *dynsym;
+		if ((dynsym = self->dm_elf.de_dynsym_tab) != NULL) {
+			dyncnt = DlModule_ElfGetDynSymCnt(self);
+			for (i = 0; i < dyncnt; ++i) {
+				char const *symname;
+				symname = self->dm_elf.de_dynstr + dynsym[i].st_name;
+				if (strcmp(name, symname) != 0)
+					continue;
+				/* Found it! */
+				return &dynsym[i];
+			}
+		}
+	}
 
 nosym:
 	return NULL;
+nosym_no_gnu_ht:
+	syslog(LOG_WARNING, "[rtld] GNU symbol hash table of %q is corrupt\n",
+	       self->dm_filename);
+	self->dm_elf.de_gnuhashtab = NULL;
+	goto search_elf_table;
 nosym_no_elf_ht:
 	syslog(LOG_WARNING, "[rtld] Elf symbol hash table of %q is corrupt\n",
 	       self->dm_filename);
 	self->dm_elf.de_hashtab = NULL;
-	goto nosym;
+	goto search_dynsym;
 }
 
 
