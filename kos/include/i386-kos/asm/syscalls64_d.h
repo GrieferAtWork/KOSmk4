@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8aa5aae */
+/* HASH CRC-32:0xf429d4e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
 #define __NR64_linux_fstat            0x5                            /* errno_t linux_fstat(fd_t fd, struct linux_statx64 *statbuf) */
 #define __NR64_linux_lstat            0x6                            /* errno_t linux_lstat(char const *filename, struct linux_statx64 *statbuf) */
 #define __NR64_poll                   0x7                            /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
-#define __NR64_lseek64                0x8                            /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
+#define __NR64_lseek                  0x8                            /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
@@ -783,7 +783,7 @@
 #define __NR64RM_linux_fstat            0
 #define __NR64RM_linux_lstat            0
 #define __NR64RM_poll                   1
-#define __NR64RM_lseek64                0
+#define __NR64RM_lseek                  0
 #define __NR64RM_mmap                   0
 #define __NR64RM_mprotect               2
 #define __NR64RM_munmap                 2
@@ -1162,7 +1162,7 @@
 #define __NR64CP_linux_fstat            1
 #define __NR64CP_linux_lstat            1
 #define __NR64CP_poll                   1
-#define __NR64CP_lseek64                1
+#define __NR64CP_lseek                  1
 #define __NR64CP_ioctl                  1
 #define __NR64CP_pread64                1
 #define __NR64CP_pwrite64               1
@@ -1316,7 +1316,7 @@
 #define __NR64RC_linux_fstat            2
 #define __NR64RC_linux_lstat            2
 #define __NR64RC_poll                   3
-#define __NR64RC_lseek64                3
+#define __NR64RC_lseek                  3
 #define __NR64RC_mmap                   6
 #define __NR64RC_mprotect               3
 #define __NR64RC_munmap                 2

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdab8889 */
+/* HASH CRC-32:0xfdfd970c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -279,9 +279,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_poll)
 	.cfi_endproc
 END(__x86_asm64_syscall_poll)
 
-/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-.section .text.x86.asm64_syscall.lseek64
-INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lseek64)
+/* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
+.section .text.x86.asm64_syscall.lseek
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lseek)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm64_syscall
 	.cfi_lsda 0, 0x8
@@ -295,8 +295,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lseek64)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	EXTERN(sys_lseek64)
-	call   sys_lseek64
+	EXTERN(sys_lseek)
+	call   sys_lseek
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -307,7 +307,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lseek64)
 	popq_cfi_r %rcx
 	intr_exit_sysret
 	.cfi_endproc
-END(__x86_asm64_syscall_lseek64)
+END(__x86_asm64_syscall_lseek)
 
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd

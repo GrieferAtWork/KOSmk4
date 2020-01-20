@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79faf439 */
+/* HASH CRC-32:0xd0103c47 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1874,6 +1874,7 @@
 #define __CRT_HAVE_fcvt 1
 #define __CRT_HAVE_fcvt_r 1
 #define __CRT_HAVE_fdatasync 1
+#define __CRT_HAVE_fdclosedir 1
 #define __CRT_HAVE_fdetach 1
 #define __CRT_HAVE_fdim 1
 #define __CRT_HAVE_fdimf 1

@@ -807,6 +807,7 @@
 #define __CRT_HAVE_DOS$fcvt 1
 #define __CRT_HAVE_DOS$fcvt_r 1
 #define __CRT_HAVE_DOS$fdatasync 1
+#define __CRT_HAVE_DOS$fdclosedir 1
 #define __CRT_HAVE_DOS$fdetach 1
 #define __CRT_HAVE_DOS$fdim 1
 #define __CRT_HAVE_DOS$fdimf 1
@@ -4240,6 +4241,7 @@
 #define __CRT_HAVE_fcvt 1
 #define __CRT_HAVE_fcvt_r 1
 #define __CRT_HAVE_fdatasync 1
+#define __CRT_HAVE_fdclosedir 1
 #define __CRT_HAVE_fdetach 1
 #define __CRT_HAVE_fdim 1
 #define __CRT_HAVE_fdimf 1
@@ -6054,7 +6056,7 @@
 #define __CRT_HAVE_sys_Xllistxattr 1
 #define __CRT_HAVE_sys_Xlookup_dcookie 1
 #define __CRT_HAVE_sys_Xlremovexattr 1
-#define __CRT_HAVE_sys_Xlseek64 1
+#define __CRT_HAVE_sys_Xlseek 1
 #define __CRT_HAVE_sys_Xlsetxattr 1
 #define __CRT_HAVE_sys_Xmadvise 1
 #define __CRT_HAVE_sys_Xmaplibrary 1
@@ -6422,7 +6424,7 @@
 #define __CRT_HAVE_sys_llistxattr 1
 #define __CRT_HAVE_sys_lookup_dcookie 1
 #define __CRT_HAVE_sys_lremovexattr 1
-#define __CRT_HAVE_sys_lseek64 1
+#define __CRT_HAVE_sys_lseek 1
 #define __CRT_HAVE_sys_lsetxattr 1
 #define __CRT_HAVE_sys_madvise 1
 #define __CRT_HAVE_sys_maplibrary 1

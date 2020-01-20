@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66ab5aa9 */
+/* HASH CRC-32:0x8d2a4d90 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,9 +44,9 @@
 #define __NRAN0_poll                   fds
 #define __NRAN1_poll                   nfds
 #define __NRAN2_poll                   timeout
-#define __NRAN0_lseek64                fd
-#define __NRAN1_lseek64                offset
-#define __NRAN2_lseek64                whence
+#define __NRAN0_lseek                  fd
+#define __NRAN1_lseek                  offset
+#define __NRAN2_lseek                  whence
 #define __NRAN0_mmap                   addr
 #define __NRAN1_mmap                   len
 #define __NRAN2_mmap                   prot
@@ -981,12 +981,12 @@
 #define __NRATRA1_poll(fds, nfds, timeout) ,nfds
 #define __NRATRF2_poll                   "%" PRIdSIZ
 #define __NRATRA2_poll(fds, nfds, timeout) ,(intptr_t)(timeout)
-#define __NRATRF0_lseek64                "%d"
-#define __NRATRA0_lseek64(fd, offset, whence) ,(int)(fd)
-#define __NRATRF1_lseek64                "%" PRId64
-#define __NRATRA1_lseek64(fd, offset, whence) ,offset
-#define __NRATRF2_lseek64                "%#Ix=%s"
-#define __NRATRA2_lseek64(fd, offset, whence) ,(whence),(whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
+#define __NRATRF0_lseek                  "%d"
+#define __NRATRA0_lseek(fd, offset, whence) ,(int)(fd)
+#define __NRATRF1_lseek                  "%" PRIdSIZ
+#define __NRATRA1_lseek(fd, offset, whence) ,(intptr_t)(offset)
+#define __NRATRF2_lseek                  "%#Ix=%s"
+#define __NRATRA2_lseek(fd, offset, whence) ,(whence),(whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
 #define __NRATRF0_mmap                   "%p"
 #define __NRATRA0_mmap(addr, len, prot, flags, fd, offset) ,addr
 #define __NRATRF1_mmap                   "%" PRIuSIZ

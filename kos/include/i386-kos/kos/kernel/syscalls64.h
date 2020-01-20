@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43e6e40a */
+/* HASH CRC-32:0x1deb7b1b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -181,7 +181,7 @@
 #define __ARCH_WANT_SYSCALL_LLISTXATTR                     1
 #define __ARCH_WANT_SYSCALL_LOOKUP_DCOOKIE                 1
 #define __ARCH_WANT_SYSCALL_LREMOVEXATTR                   1
-#define __ARCH_WANT_SYSCALL_LSEEK64                        1
+#define __ARCH_WANT_SYSCALL_LSEEK                          1
 #define __ARCH_WANT_SYSCALL_LSETXATTR                      1
 #define __ARCH_WANT_SYSCALL_MADVISE                        1
 #define __ARCH_WANT_SYSCALL_MAPLIBRARY                     1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9747d9b4 */
+/* HASH CRC-32:0x64d9bef1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1938,6 +1938,7 @@
 #define __CRT_SECTION_alphasort64                           __CRT_SECTINFO_fs_dir                                   /* .text.crt.fs.dir.alphasort64 */
 #define __CRT_SECTION_closedir                              __CRT_SECTINFO_fs_dir                                   /* .text.crt.fs.dir.closedir */
 #define __CRT_SECTION_dirfd                                 __CRT_SECTINFO_fs_dir                                   /* .text.crt.fs.dir.dirfd */
+#define __CRT_SECTION_fdclosedir                            __CRT_SECTINFO_fs_dir                                   /* .text.crt.fs.dir.fdclosedir */
 #define __CRT_SECTION_fdopendir                             __CRT_SECTINFO_fs_dir                                   /* .text.crt.fs.dir.fdopendir */
 #define __CRT_SECTION_fopendirat                            __CRT_SECTINFO_fs_dir                                   /* .text.crt.fs.dir.fopendirat */
 #define __CRT_SECTION_getdirentries                         __CRT_SECTINFO_fs_dir                                   /* .text.crt.fs.dir.getdirentries */

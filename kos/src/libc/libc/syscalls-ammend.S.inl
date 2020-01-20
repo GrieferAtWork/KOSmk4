@@ -17,12 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+
 #include <hybrid/compiler.h>
+
 #include <hybrid/host.h>
+
 #include <asm/unistd.h>
 #include <bits/types.h>
 
-#define DEFINE_XSYSCALL_EXPORT(name, sys_Xname) \
+#include <syscall.h>
+
+#define DEFINE_XSYSCALL_EXPORT(name, sys_Xname)        \
 	DEFINE_INTERN_ALIAS(libc_##name, libc_##sys_Xname) \
 	DEFINE_PUBLIC_ALIAS(name, libc_##sys_Xname)
 
@@ -94,65 +99,71 @@ DEFINE_XSYSCALL_EXPORT(FMknodAt, sys_Xfmknodat)
 DEFINE_XSYSCALL_EXPORT(MkdirAt, sys_Xmkdirat)
 DEFINE_XSYSCALL_EXPORT(MknodAt, sys_Xmknodat)
 
-#ifdef __NR_getresuid32
+#ifdef SYS_getresuid32
 DEFINE_XSYSCALL_EXPORT(GetResUid, sys_Xgetresuid32)
 DEFINE_XSYSCALL_EXPORT(GetResGid, sys_Xgetresgid32)
 DEFINE_XSYSCALL_EXPORT(SetResUid, sys_Xsetresuid32)
 DEFINE_XSYSCALL_EXPORT(SetResGid, sys_Xsetresgid32)
 DEFINE_XSYSCALL_EXPORT(SetReUid, sys_Xsetreuid32)
 DEFINE_XSYSCALL_EXPORT(SetReGid, sys_Xsetregid32)
-#else /* __NR_getresuid32 */
+#else /* SYS_getresuid32 */
 DEFINE_XSYSCALL_EXPORT(GetResUid, sys_Xgetresuid)
 DEFINE_XSYSCALL_EXPORT(GetResGid, sys_Xgetresgid)
 DEFINE_XSYSCALL_EXPORT(SetResUid, sys_Xsetresuid)
 DEFINE_XSYSCALL_EXPORT(SetResGid, sys_Xsetresgid)
 DEFINE_XSYSCALL_EXPORT(SetReUid, sys_Xsetreuid)
 DEFINE_XSYSCALL_EXPORT(SetReGid, sys_Xsetregid)
-#endif /* !__NR_getresuid32 */
+#endif /* !SYS_getresuid32 */
 
-#ifdef __NR_setuid32
+#ifdef SYS_setuid32
 DEFINE_XSYSCALL_EXPORT(SetUid, sys_Xsetuid32)
 DEFINE_XSYSCALL_EXPORT(SetGid, sys_Xsetgid32)
-#else /* __NR_setuid32 */
+#else /* SYS_setuid32 */
 DEFINE_XSYSCALL_EXPORT(SetUid, sys_Xsetuid)
 DEFINE_XSYSCALL_EXPORT(SetGid, sys_Xsetgid)
-#endif /* !__NR_setuid32 */
+#endif /* !SYS_setuid32 */
 
-#ifdef __NR_chown32
+#ifdef SYS_chown32
 DEFINE_XSYSCALL_EXPORT(Chown, sys_Xchown32)
 DEFINE_XSYSCALL_EXPORT(FChown, sys_Xfchown32)
 DEFINE_XSYSCALL_EXPORT(LChown, sys_Xlchown32)
-#else /* __NR_chown32 */
+#else /* SYS_chown32 */
 DEFINE_XSYSCALL_EXPORT(Chown, sys_Xchown)
 DEFINE_XSYSCALL_EXPORT(FChown, sys_Xfchown)
 DEFINE_XSYSCALL_EXPORT(LChown, sys_Xlchown)
-#endif /* !__NR_chown32 */
+#endif /* !SYS_chown32 */
 
-#ifdef __NR_fchownat32
+#ifdef SYS_fchownat32
 DEFINE_XSYSCALL_EXPORT(FChownAt, sys_Xfchownat32)
-#else /* __NR_fchownat32 */
+#else /* SYS_fchownat32 */
 DEFINE_XSYSCALL_EXPORT(FChownAt, sys_Xfchownat)
-#endif /* !__NR_fchownat32 */
+#endif /* !SYS_fchownat32 */
 
-#ifdef __NR_truncate64
+#ifdef SYS_truncate64
 DEFINE_XSYSCALL_EXPORT(Truncate, sys_Xtruncate)
 DEFINE_XSYSCALL_EXPORT(Truncate64, sys_Xtruncate64)
 DEFINE_XSYSCALL_EXPORT(FTruncate, sys_Xftruncate)
 DEFINE_XSYSCALL_EXPORT(FTruncate64, sys_Xftruncate64)
-DEFINE_XSYSCALL_EXPORT(LSeek, sys_Xlseek)
-DEFINE_XSYSCALL_EXPORT(LSeek64, sys_Xlseek64)
 #elif __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_XSYSCALL_EXPORT(Truncate, sys_Xtruncate)
 DEFINE_XSYSCALL_EXPORT(Truncate64, sys_Xtruncate)
 DEFINE_XSYSCALL_EXPORT(FTruncate, sys_Xftruncate)
 DEFINE_XSYSCALL_EXPORT(FTruncate64, sys_Xftruncate)
-DEFINE_XSYSCALL_EXPORT(LSeek, sys_Xlseek64)
-DEFINE_XSYSCALL_EXPORT(LSeek64, sys_Xlseek64)
 #else
 #error "Invalid configuration"
 #endif
 
-#ifdef __NR_utimensat64
+#ifdef SYS_lseek64
+DEFINE_XSYSCALL_EXPORT(LSeek, sys_Xlseek)
+DEFINE_XSYSCALL_EXPORT(LSeek64, sys_Xlseek64)
+#elif __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_XSYSCALL_EXPORT(LSeek, sys_Xlseek)
+DEFINE_XSYSCALL_EXPORT(LSeek64, sys_Xlseek)
+#else
+#error "Invalid configuration"
+#endif
+
+#ifdef SYS_utimensat64
 DEFINE_XSYSCALL_EXPORT(UTimensAt64, sys_Xutimensat64)
 #elif __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_XSYSCALL_EXPORT(UTimensAt64, sys_Xutimensat)

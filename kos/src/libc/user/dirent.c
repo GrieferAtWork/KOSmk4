@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <syscall.h>
 #include <unistd.h>
 
 #include "dirent.h"
@@ -53,10 +54,12 @@ struct __dirstream {
 	 (self)->ds_bufsize = sizeof((self)->ds_sbuf),          \
 	 (self)->ds_next    = (struct dirent *)(self)->ds_sbuf, \
 	 (self)->ds_buf     = (struct dirent *)(self)->ds_sbuf)
-#define dirstream_fini(self)                              \
+#define dirstream_fini_keepfd(self)                       \
 	(((self)->ds_buf != (struct dirent *)(self)->ds_sbuf) \
 	 ? free((self)->ds_buf)                               \
-	 : (void)0,                                           \
+	 : (void)0)
+#define dirstream_fini(self)      \
+	(dirstream_fini_keepfd(self), \
 	 sys_close((self)->ds_fd))
 
 
@@ -138,6 +141,129 @@ err_null:
 }
 /*[[[end:closedir]]]*/
 
+/*[[[head:fdclosedir,hash:CRC-32=0x71604758]]]*/
+/* Same as `closedir()', but instead of closing the underlying file descriptor, return it */
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.fdclosedir") fd_t
+NOTHROW_NCX(LIBCCALL libc_fdclosedir)(DIR *dirp)
+/*[[[body:fdclosedir]]]*/
+{
+	fd_t result;
+	if unlikely(!dirp)
+		goto err_null;
+	result = dirp->ds_fd;
+	dirstream_fini_keepfd(dirp);
+	free(dirp);
+	return result;
+err_null:
+	return (fd_t)libc_seterrno(EINVAL);
+}
+/*[[[end:fdclosedir]]]*/
+
+/*[[[head:rewinddir,hash:CRC-32=0xcdb2c099]]]*/
+/* Rewind the given directory stream in such a way that the next call
+ * to `readdir(3)' will once again return the first directory entry */
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.rewinddir") void
+NOTHROW_NCX(LIBCCALL libc_rewinddir)(DIR *__restrict dirp)
+/*[[[body:rewinddir]]]*/
+{
+	if likely(dirp) {
+#if defined(SYS_lseek)
+		sys_lseek(dirp->ds_fd, 0, SEEK_SET);
+#elif defined(SYS_lseek64)
+		sys_lseek64(dirp->ds_fd, 0, SEEK_SET);
+#elif defined(SYS__llseek)
+		{
+			uint64_t res;
+			sys__llseek(dirp->ds_fd, 0, &res, SEEK_SET);
+		}
+#else
+#error "No suitable sys_lseek() function"
+#endif
+		dirp->ds_lodsize = 0;
+	}
+}
+/*[[[end:rewinddir]]]*/
+
+/*[[[head:fdopendir,hash:CRC-32=0x2e2ba4d3]]]*/
+/* Create a new directory stream by inheriting the given `FD' as stream handle */
+INTERN WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.fdopendir") DIR *
+NOTHROW_NCX(LIBCCALL libc_fdopendir)(fd_t fd)
+/*[[[body:fdopendir]]]*/
+{
+	DIR *result = (DIR *)malloc(sizeof(DIR));
+	if unlikely(!result)
+		goto done;
+	dirstream_init(result, fd);
+done:
+	return result;
+}
+/*[[[end:fdopendir]]]*/
+
+/*[[[head:seekdir,hash:CRC-32=0x31f23e16]]]*/
+/* Get the directory stream position */
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.seekdir") void
+NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp,
+                                   long int pos)
+/*[[[body:seekdir]]]*/
+{
+	if likely(dirp) {
+		dirp->ds_lodsize = 0;
+#if defined(SYS_lseek) && (__SIZEOF_LONG__ <= __SIZEOF_OFF32_T__)
+		sys_lseek(dirp->ds_fd, (off32_t)pos, SEEK_SET);
+#elif defined(SYS_lseek64) && (__SIZEOF_LONG__ <= __SIZEOF_OFF64_T__)
+		sys_lseek64(dirp->ds_fd, (off32_t)pos, SEEK_SET);
+#elif defined(SYS_lseek64)
+		sys_lseek64(dirp->ds_fd, (off32_t)pos, SEEK_SET);
+#elif defined(SYS_lseek)
+		sys_lseek(dirp->ds_fd, (off32_t)pos, SEEK_SET);
+#elif defined(SYS__llseek)
+		{
+			uint64_t res;
+			sys__llseek(dirp->ds_fd, (int64_t)pos, &res, SEEK_SET);
+		}
+#else
+#error "No suitable sys_lseek() function"
+#endif
+	}
+}
+/*[[[end:seekdir]]]*/
+
+/*[[[head:telldir,hash:CRC-32=0x17cc87aa]]]*/
+/* Get the directory stream position */
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.telldir") long int
+NOTHROW_NCX(LIBCCALL libc_telldir)(DIR *__restrict dirp)
+/*[[[body:telldir]]]*/
+{
+	if unlikely(!dirp)
+		goto err_null;
+	/* XXX: Adjust for unread, but pre-cached directory entries? */
+#if __SIZEOF_LONG__ == 4
+	return (long int)lseek(dirp->ds_fd, 0, SEEK_CUR);
+#else
+	return (long int)lseek64(dirp->ds_fd, 0, SEEK_CUR);
+#endif
+err_null:
+	libc_seterrno(EINVAL);
+	return -1;
+}
+/*[[[end:telldir]]]*/
+
+/*[[[head:dirfd,hash:CRC-32=0xa79788a]]]*/
+/* Return the underlying file descriptor of the given directory stream */
+INTERN ATTR_PURE NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.dirfd") fd_t
+NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp)
+/*[[[body:dirfd]]]*/
+{
+	return dirp->ds_fd;
+}
+/*[[[end:dirfd]]]*/
+
 /*[[[head:readdir,hash:CRC-32=0x60024c5a]]]*/
 /* Read and return the next pending directory entry of the given directory stream `DIRP'
  * @EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong */
@@ -202,41 +328,6 @@ err_null:
 /*[[[impl:readdir64]]]*/
 DEFINE_INTERN_WEAK_ALIAS(libc_readdir64,libc_readdir);
 
-/*[[[head:rewinddir,hash:CRC-32=0xcdb2c099]]]*/
-/* Rewind the given directory stream in such a way that the next call
- * to `readdir(3)' will once again return the first directory entry */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.rewinddir") void
-NOTHROW_NCX(LIBCCALL libc_rewinddir)(DIR *__restrict dirp)
-/*[[[body:rewinddir]]]*/
-{
-	if likely(dirp) {
-#ifdef __NR_lseek
-		sys_lseek(dirp->ds_fd, 0, SEEK_SET);
-#else
-		sys_lseek64(dirp->ds_fd, 0, SEEK_SET);
-#endif
-		dirp->ds_lodsize = 0;
-	}
-}
-/*[[[end:rewinddir]]]*/
-
-/*[[[head:fdopendir,hash:CRC-32=0x2e2ba4d3]]]*/
-/* Create a new directory stream by inheriting the given `FD' as stream handle */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.fdopendir") DIR *
-NOTHROW_NCX(LIBCCALL libc_fdopendir)(fd_t fd)
-/*[[[body:fdopendir]]]*/
-{
-	DIR *result = (DIR *)malloc(sizeof(DIR));
-	if unlikely(!result)
-		goto done;
-	dirstream_init(result, fd);
-done:
-	return result;
-}
-/*[[[end:fdopendir]]]*/
-
 /*[[[head:readdir_r,hash:CRC-32=0x898461b5]]]*/
 /* Reentrant version of `readdir(3)' (Using this is not recommended in KOS) */
 INTERN NONNULL((1, 2, 3))
@@ -279,57 +370,6 @@ NOTHROW_RPC(LIBCCALL libc_readdir64_r)(DIR *__restrict dirp,
 }
 #endif /* MAGIC:alias */
 /*[[[end:readdir64_r]]]*/
-
-/*[[[head:seekdir,hash:CRC-32=0x31f23e16]]]*/
-/* Get the directory stream position */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.seekdir") void
-NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp,
-                                   long int pos)
-/*[[[body:seekdir]]]*/
-{
-	if likely(dirp) {
-		dirp->ds_lodsize = 0;
-#if __SIZEOF_LONG__ == 4
-		sys_lseek(dirp->ds_fd, (off32_t)pos, SEEK_SET);
-#else
-		sys_lseek64(dirp->ds_fd, (off64_t)pos, SEEK_SET);
-#endif
-	}
-}
-/*[[[end:seekdir]]]*/
-
-/*[[[head:telldir,hash:CRC-32=0x17cc87aa]]]*/
-/* Get the directory stream position */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.telldir") long int
-NOTHROW_NCX(LIBCCALL libc_telldir)(DIR *__restrict dirp)
-/*[[[body:telldir]]]*/
-{
-	if unlikely(!dirp)
-		goto err_null;
-	/* XXX: Adjust for unread, but pre-cached directory entries? */
-#if __SIZEOF_LONG__ == 4
-	return (long int)lseek(dirp->ds_fd, 0, SEEK_CUR);
-#else
-	return (long int)lseek64(dirp->ds_fd, 0, SEEK_CUR);
-#endif
-err_null:
-	libc_seterrno(EINVAL);
-	return -1;
-}
-/*[[[end:telldir]]]*/
-
-/*[[[head:dirfd,hash:CRC-32=0xa79788a]]]*/
-/* Return the underlying file descriptor of the given directory stream */
-INTERN ATTR_PURE NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.dirfd") fd_t
-NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR __KOS_FIXED_CONST *__restrict dirp)
-/*[[[body:dirfd]]]*/
-{
-	return dirp->ds_fd;
-}
-/*[[[end:dirfd]]]*/
 
 /*[[[head:scandir,hash:CRC-32=0xde1a0c61]]]*/
 /* Scan a directory `DIR' for all contained directory entries */
@@ -483,11 +523,12 @@ NOTHROW_RPC(LIBCCALL libc_kreaddir)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc35b741c]]]*/
+/*[[[start:exports,hash:CRC-32=0x4cb9453f]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(opendir, libc_opendir);
 DEFINE_PUBLIC_WEAK_ALIAS(fopendirat, libc_fopendirat);
 DEFINE_PUBLIC_WEAK_ALIAS(opendirat, libc_opendirat);
 DEFINE_PUBLIC_WEAK_ALIAS(closedir, libc_closedir);
+DEFINE_PUBLIC_WEAK_ALIAS(fdclosedir, libc_fdclosedir);
 DEFINE_PUBLIC_WEAK_ALIAS(readdir, libc_readdir);
 DEFINE_PUBLIC_WEAK_ALIAS(rewinddir, libc_rewinddir);
 DEFINE_PUBLIC_WEAK_ALIAS(fdopendir, libc_fdopendir);

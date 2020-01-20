@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bf0359 */
+/* HASH CRC-32:0xc472ff71 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@
 #define __NRAC_linux_fstat            2
 #define __NRAC_linux_lstat            2
 #define __NRAC_poll                   3
-#define __NRAC_lseek64                3
+#define __NRAC_lseek                  3
 #define __NRAC_mmap                   6
 #define __NRAC_mprotect               3
 #define __NRAC_munmap                 2
@@ -425,7 +425,7 @@
 #define __NRRT_linux_fstat            (errno_t, __errno_t)
 #define __NRRT_linux_lstat            (errno_t, __errno_t)
 #define __NRRT_poll                   (ssize_t, __ssize_t)
-#define __NRRT_lseek64                (int64_t, __int64_t)
+#define __NRRT_lseek                  (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_mmap                   (void *, void *)
 #define __NRRT_mprotect               (errno_t, __errno_t)
 #define __NRRT_munmap                 (errno_t, __errno_t)
@@ -815,9 +815,9 @@
 #define __NRAT0_poll                   (struct pollfd *, struct pollfd *)
 #define __NRAT1_poll                   (size_t, __size_t)
 #define __NRAT2_poll                   (syscall_slong_t, __syscall_slong_t)
-#define __NRAT0_lseek64                (fd_t, __fd_t)
-#define __NRAT1_lseek64                (int64_t, __int64_t)
-#define __NRAT2_lseek64                (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_lseek                  (fd_t, __fd_t)
+#define __NRAT1_lseek                  (syscall_slong_t, __syscall_slong_t)
+#define __NRAT2_lseek                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_mmap                   (void *, void *)
 #define __NRAT1_mmap                   (size_t, __size_t)
 #define __NRAT2_mmap                   (syscall_ulong_t, __syscall_ulong_t)
@@ -1701,7 +1701,7 @@
 #define __NRAM_linux_fstat(a, b, c, d, e, f)            (__fd_t)a, (struct linux_statx64 *)b
 #define __NRAM_linux_lstat(a, b, c, d, e, f)            (char const *)a, (struct linux_statx64 *)b
 #define __NRAM_poll(a, b, c, d, e, f)                   (struct pollfd *)a, (__size_t)b, (__syscall_slong_t)c
-#define __NRAM_lseek64(a, b, c, d, e, f)                (__fd_t)a, (__int64_t)b, (__syscall_ulong_t)c
+#define __NRAM_lseek(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_slong_t)b, (__syscall_ulong_t)c
 #define __NRAM_mmap(a, b, c, d, e, f)                   (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__fd_t)e, (__syscall_ulong_t)f
 #define __NRAM_mprotect(a, b, c, d, e, f)               (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_munmap(a, b, c, d, e, f)                 (void *)a, (__size_t)b
@@ -2080,7 +2080,7 @@
 #define __NRAP_linux_fstat(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_linux_lstat(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_poll(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_lseek64(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_lseek(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_mmap(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_mprotect(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_munmap(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b

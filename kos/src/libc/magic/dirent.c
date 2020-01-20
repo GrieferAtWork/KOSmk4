@@ -141,6 +141,13 @@ opendirat:($fd_t dirfd, [nonnull] char const *name) -> DIR * {
 @@Close a directory stream previously returned by `opendir(3)' and friends
 closedir:([nonnull] DIR *dirp) -> int;
 
+
+%
+%#ifdef __USE_BSD
+@@Same as `closedir()', but instead of closing the underlying file descriptor, return it
+[ATTR_WUNUSED] fdclosedir:([nonnull] DIR *dirp) -> $fd_t;
+%#endif /* __USE_BSD */
+
 %
 @@Read and return the next pending directory entry of the given directory stream `DIRP'
 @@@EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong

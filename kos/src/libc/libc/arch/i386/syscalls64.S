@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d1c38fd */
+/* HASH CRC-32:0xa526ad96 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -218,29 +218,29 @@ INTERN_FUNCTION(libc_sys_Xpoll)
 END(libc_sys_Xpoll)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpoll, libc_sys_Xpoll)
 
-/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-.section .text.crt.syscall.lseek64
-INTERN_FUNCTION(libc_sys_lseek64)
+/* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
+.section .text.crt.syscall.lseek
+INTERN_FUNCTION(libc_sys_lseek)
 	.cfi_startproc
 	movq   $(0x8), %rax
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_lseek64)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_lseek64, libc_sys_lseek64)
+END(libc_sys_lseek)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_lseek, libc_sys_lseek)
 
-/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-.section .text.crt.syscall.Xlseek64
-INTERN_FUNCTION(libc_sys_Xlseek64)
+/* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
+.section .text.crt.syscall.Xlseek
+INTERN_FUNCTION(libc_sys_Xlseek)
 	.cfi_startproc
 	movq   $(0x8), %rax
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xlseek64)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlseek64, libc_sys_Xlseek64)
+END(libc_sys_Xlseek)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlseek, libc_sys_Xlseek)
 
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd

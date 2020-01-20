@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21cd3c77 */
+/* HASH CRC-32:0xeec8a6da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(kreaddir64))(__fd_t __fd,
                                                         struct dirent64 *__buf,
                                                         __SIZE_TYPE__ __bufsize,
                                                         unsigned int __mode) {
-#line 345 "kos/src/libc/magic/dirent.c"
+#line 352 "kos/src/libc/magic/dirent.c"
 	return __localdep_kreaddirf64(__fd, __buf, __bufsize, __mode, 0);
 }
 __NAMESPACE_LOCAL_END

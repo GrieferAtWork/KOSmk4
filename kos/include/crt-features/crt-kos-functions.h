@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9721c077 */
+/* HASH CRC-32:0x5f7ea19c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -699,6 +699,7 @@ __CRT_FUNCTION(fcntl,0,(),VA(2),(fd_t,fd,int,cmd),__STDC_INT_AS_SSIZE_T)
 __CRT_FUNCTION(fcvt,0,(),4,(double,val,int,ndigit,int *__restrict,decptr,int *__restrict,sign),char *)
 __CRT_FUNCTION(fcvt_r,0,(),6,(double,val,int,ndigit,int *__restrict,decptr,int *__restrict,sign,char *__restrict,buf,size_t,len),int)
 __CRT_FUNCTION(fdatasync,0,(),1,(fd_t,fd),int)
+__CRT_FUNCTION(fdclosedir,0,(),1,(DIR *,dirp),fd_t)
 __CRT_FUNCTION(fdetach,0,(),1,(char const *__restrict,path),int)
 __CRT_FUNCTION(fdim,0,(),2,(double,x,double,y),double)
 __CRT_FUNCTION(fdimf,0,(),2,(float,x,float,y),float)

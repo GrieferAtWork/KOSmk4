@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x147332b7 */
+/* HASH CRC-32:0xbe53f9b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,9 +44,9 @@
 #define __NR64AN0_poll                   fds
 #define __NR64AN1_poll                   nfds
 #define __NR64AN2_poll                   timeout
-#define __NR64AN0_lseek64                fd
-#define __NR64AN1_lseek64                offset
-#define __NR64AN2_lseek64                whence
+#define __NR64AN0_lseek                  fd
+#define __NR64AN1_lseek                  offset
+#define __NR64AN2_lseek                  whence
 #define __NR64AN0_mmap                   addr
 #define __NR64AN1_mmap                   len
 #define __NR64AN2_mmap                   prot
@@ -981,12 +981,12 @@
 #define __NR64ATRA1_poll(fds, nfds, timeout) ,nfds
 #define __NR64ATRF2_poll                   "%" PRIdSIZ
 #define __NR64ATRA2_poll(fds, nfds, timeout) ,(intptr_t)(timeout)
-#define __NR64ATRF0_lseek64                "%d"
-#define __NR64ATRA0_lseek64(fd, offset, whence) ,(int)(fd)
-#define __NR64ATRF1_lseek64                "%" PRId64
-#define __NR64ATRA1_lseek64(fd, offset, whence) ,offset
-#define __NR64ATRF2_lseek64                "%#Ix=%s"
-#define __NR64ATRA2_lseek64(fd, offset, whence) ,(whence),(whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
+#define __NR64ATRF0_lseek                  "%d"
+#define __NR64ATRA0_lseek(fd, offset, whence) ,(int)(fd)
+#define __NR64ATRF1_lseek                  "%" PRIdSIZ
+#define __NR64ATRA1_lseek(fd, offset, whence) ,(intptr_t)(offset)
+#define __NR64ATRF2_lseek                  "%#Ix=%s"
+#define __NR64ATRA2_lseek(fd, offset, whence) ,(whence),(whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
 #define __NR64ATRF0_mmap                   "%p"
 #define __NR64ATRA0_mmap(addr, len, prot, flags, fd, offset) ,addr
 #define __NR64ATRF1_mmap                   "%" PRIuSIZ

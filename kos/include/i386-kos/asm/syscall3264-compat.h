@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbba77a95 */
+/* HASH CRC-32:0xfc640916 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,7 +142,7 @@
 #define __NR3264COMPAT_llistxattr             1(llistxattr)
 #define __NR3264COMPAT_lookup_dcookie         1(lookup_dcookie)
 #define __NR3264COMPAT_lremovexattr           1(lremovexattr)
-#define __NR3264COMPAT_lseek64                2(lseek64,lseek)
+#define __NR3264COMPAT_lseek                  2(lseek64,lseek)
 #define __NR3264COMPAT_lsetxattr              1(lsetxattr)
 #define __NR3264COMPAT_madvise                1(madvise)
 #define __NR3264COMPAT_mbind                  1(mbind)

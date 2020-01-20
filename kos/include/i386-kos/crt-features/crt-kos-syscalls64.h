@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55cd2b7d */
+/* HASH CRC-32:0x3517457a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -180,7 +180,7 @@
 #define __CRT_HAVE_sys_llistxattr 1
 #define __CRT_HAVE_sys_lookup_dcookie 1
 #define __CRT_HAVE_sys_lremovexattr 1
-#define __CRT_HAVE_sys_lseek64 1
+#define __CRT_HAVE_sys_lseek 1
 #define __CRT_HAVE_sys_lsetxattr 1
 #define __CRT_HAVE_sys_madvise 1
 #define __CRT_HAVE_sys_maplibrary 1
@@ -549,7 +549,7 @@
 #define __CRT_HAVE_sys_Xllistxattr 1
 #define __CRT_HAVE_sys_Xlookup_dcookie 1
 #define __CRT_HAVE_sys_Xlremovexattr 1
-#define __CRT_HAVE_sys_Xlseek64 1
+#define __CRT_HAVE_sys_Xlseek 1
 #define __CRT_HAVE_sys_Xlsetxattr 1
 #define __CRT_HAVE_sys_Xmadvise 1
 #define __CRT_HAVE_sys_Xmaplibrary 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd93aa3b */
+/* HASH CRC-32:0x1b3060ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -853,9 +853,9 @@ __CDECLARE_SC(,__errno_t,lookup_dcookie,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE
 #if __CRT_HAVE_SC(lremovexattr)
 __CDECLARE_SC(,__errno_t,lremovexattr,(char const *__path, char const *__name),(__path,__name))
 #endif /* __CRT_HAVE_SC(lremovexattr) */
-#if __CRT_HAVE_SC(lseek64)
-__CDECLARE_SC(,__int64_t,lseek64,(__fd_t __fd, __int64_t __offset, __syscall_ulong_t __whence),(__fd,__offset,__whence))
-#endif /* __CRT_HAVE_SC(lseek64) */
+#if __CRT_HAVE_SC(lseek)
+__CDECLARE_SC(,__syscall_slong_t,lseek,(__fd_t __fd, __syscall_slong_t __offset, __syscall_ulong_t __whence),(__fd,__offset,__whence))
+#endif /* __CRT_HAVE_SC(lseek) */
 #if __CRT_HAVE_SC(lsetxattr)
 __CDECLARE_SC(,__errno_t,lsetxattr,(char const *__path, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__path,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_SC(lsetxattr) */
@@ -2288,9 +2288,9 @@ __CDECLARE_XSC(,__errno_t,lookup_dcookie,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
 #if __CRT_HAVE_XSC(lremovexattr)
 __CDECLARE_XSC(,__errno_t,lremovexattr,(char const *__path, char const *__name),(__path,__name))
 #endif /* __CRT_HAVE_XSC(lremovexattr) */
-#if __CRT_HAVE_XSC(lseek64)
-__CDECLARE_XSC(,__int64_t,lseek64,(__fd_t __fd, __int64_t __offset, __syscall_ulong_t __whence),(__fd,__offset,__whence))
-#endif /* __CRT_HAVE_XSC(lseek64) */
+#if __CRT_HAVE_XSC(lseek)
+__CDECLARE_XSC(,__syscall_slong_t,lseek,(__fd_t __fd, __syscall_slong_t __offset, __syscall_ulong_t __whence),(__fd,__offset,__whence))
+#endif /* __CRT_HAVE_XSC(lseek) */
 #if __CRT_HAVE_XSC(lsetxattr)
 __CDECLARE_XSC(,__errno_t,lsetxattr,(char const *__path, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__path,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_XSC(lsetxattr) */

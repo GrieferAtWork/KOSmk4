@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf24a135 */
+/* HASH CRC-32:0x3c8cda59 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -169,6 +169,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(opendirat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NO
 /* Close a directory stream previously returned by `opendir(3)' and friends */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,closedir,(DIR *__dirp),(__dirp))
 #endif /* closedir... */
+
+#ifdef __USE_BSD
+#ifdef __CRT_HAVE_fdclosedir
+/* Same as `closedir()', but instead of closing the underlying file descriptor, return it */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,fdclosedir,(DIR *__dirp),(__dirp))
+#endif /* fdclosedir... */
+#endif /* __USE_BSD */
 
 #if defined(__CRT_HAVE_readdir) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))
 /* Read and return the next pending directory entry of the given directory stream `DIRP'

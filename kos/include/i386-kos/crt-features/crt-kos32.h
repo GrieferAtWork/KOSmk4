@@ -1955,6 +1955,7 @@
 #define __CRT_HAVE_fcvt 1
 #define __CRT_HAVE_fcvt_r 1
 #define __CRT_HAVE_fdatasync 1
+#define __CRT_HAVE_fdclosedir 1
 #define __CRT_HAVE_fdetach 1
 #define __CRT_HAVE_fdim 1
 #define __CRT_HAVE_fdimf 1

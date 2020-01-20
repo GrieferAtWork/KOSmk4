@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x977b703d */
+/* HASH CRC-32:0xf8d67bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@
 #define SYS_linux_fstat            __NR_linux_fstat            /* errno_t linux_fstat(fd_t fd, struct linux_statx64 *statbuf) */
 #define SYS_linux_lstat            __NR_linux_lstat            /* errno_t linux_lstat(char const *filename, struct linux_statx64 *statbuf) */
 #define SYS_poll                   __NR_poll                   /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
-#define SYS_lseek64                __NR_lseek64                /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
+#define SYS_lseek                  __NR_lseek                  /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|

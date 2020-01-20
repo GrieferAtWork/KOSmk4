@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a07cc76 */
+/* HASH CRC-32:0xfc399b03 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,8 @@ INTDEF WUNUSED NONNULL((2)) DIR *NOTHROW_RPC(LIBCCALL libc_fopendirat)(fd_t dirf
 INTDEF WUNUSED NONNULL((2)) DIR *NOTHROW_RPC(LIBCCALL libc_opendirat)(fd_t dirfd, char const *name);
 /* Close a directory stream previously returned by `opendir(3)' and friends */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_closedir)(DIR *dirp);
+/* Same as `closedir()', but instead of closing the underlying file descriptor, return it */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_fdclosedir)(DIR *dirp);
 /* Read and return the next pending directory entry of the given directory stream `DIRP'
  * @EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong */
 INTDEF NONNULL((1)) struct dirent *NOTHROW_RPC(LIBCCALL libc_readdir)(DIR *__restrict dirp);

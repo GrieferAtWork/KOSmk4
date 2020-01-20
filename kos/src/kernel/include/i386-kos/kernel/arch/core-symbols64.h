@@ -750,10 +750,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 187 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname187 /* index: 187 */
+	.weak sys_lseek; .quad sys_lseek
+	.reloc ., R_X86_64_SIZE32, sys_lseek; .int 0
+	.int 0x963e0bb
 	.quad .Lname188 /* index: 188 */
 	.weak sys_nfsservctl; .quad sys_nfsservctl
 	.reloc ., R_X86_64_SIZE32, sys_nfsservctl; .int 0
@@ -16656,6 +16656,8 @@ END(kernel_symbol_table)
 	.string "task_alloc_synchronous_rpc_nx"
 .Lname185:
 	.string "superblock_set_unmounted"
+.Lname187:
+	.string "sys_lseek"
 .Lname188:
 	.string "sys_nfsservctl"
 .Lname190:
