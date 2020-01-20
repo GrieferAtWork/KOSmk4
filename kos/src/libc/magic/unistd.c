@@ -1702,12 +1702,12 @@ swab:([nonnull] void const *__restrict from,
 %#endif /* __USE_XOPEN */
 
 %
-%#if defined(_ALL_SOURCE) || \
-%   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+%#if (defined(_EVERY_SOURCE) || \
+%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 %/* ... */
 [section(.text.crt.io.tty)]
 [guard] ctermid:(char *s) -> char *;
-%#endif /* _ALL_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
+%#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 %
 %#if defined(__USE_REENTRANT)

@@ -23,6 +23,5 @@ gcc_opt.append("-fexceptions");
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define __CRT_FREESTANDING 1
-#define _ALL_SOURCE 1
+#define _EVERY_SOURCE 1
 #include "include-everything.h"

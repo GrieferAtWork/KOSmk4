@@ -17,5 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define _ALL_SOURCE 1
+#define _EVERY_SOURCE 1
+#define _ISOC_PURE_SOURCE 1
 #include "include-everything.h"

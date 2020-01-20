@@ -42,9 +42,9 @@
 
 
 
-#if defined(__cplusplus) && !defined(_NO_IMPLICIT_GNU_SOURCE) && \
-   !defined(__USE_ISOC_PURE) && !defined(_ALL_SOURCE) && \
-   (defined(__GNUC__) || __has_include(<bits/vector.tcc>))
+#if (defined(__cplusplus) && !defined(_NO_IMPLICIT_GNU_SOURCE) && \
+     !defined(__USE_ISOC_PURE) && !defined(_EVERY_SOURCE) &&      \
+     (defined(__GNUC__) || __has_include(<bits/vector.tcc>)))
 /* Hacky work-around to satisfy header requirements for libstdc++
  * And before you say that this is a bad way of doing it, know that
  * on linux, g++ will _always_ pre-define `_GNU_SOURCE' straight
@@ -501,7 +501,7 @@
 #endif /* __USE_KOS_KERNEL || _STRUCT64_MACRO_SOURCE */
 
 
-#ifdef _ALL_SOURCE
+#ifdef _EVERY_SOURCE
 #undef __USE_KOS
 #undef __USE_STRING_BWLQ
 #undef __USE_STRING_XCHR
@@ -569,7 +569,7 @@
 #define __USE_GNU 1
 #define __USE_REENTRANT 1
 #define __USE_UTF 1
-#endif /* _ALL_SOURCE */
+#endif /* _EVERY_SOURCE */
 
 /* You may `#define _DOS_SOURCE_CLEAN 1' alongside `_DOS_SOURCE' in order
  * to exclude select symbol definitions done by DOS that were only there

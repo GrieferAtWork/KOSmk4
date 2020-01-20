@@ -26,29 +26,29 @@
 /* In order to ensure that all of our system headers work nice with each other,
  * try to include every single one at the same time in the following configurations:
  *   - <nothing>
- *   - _ALL_SOURCE
+ *   - _EVERY_SOURCE
  *   - __cplusplus
- *   - __cplusplus, _ALL_SOURCE
+ *   - __cplusplus, _EVERY_SOURCE
  *   - __CRT_FREESTANDING
- *   - __CRT_FREESTANDING, _ALL_SOURCE
+ *   - __CRT_FREESTANDING, _EVERY_SOURCE
  *   - __CRT_FREESTANDING, __cplusplus
- *   - __CRT_FREESTANDING, __cplusplus, _ALL_SOURCE
+ *   - __CRT_FREESTANDING, __cplusplus, _EVERY_SOURCE
  *   - _ISOC_PURE_SOURCE
- *   - _ISOC_PURE_SOURCE, _ALL_SOURCE
+ *   - _ISOC_PURE_SOURCE, _EVERY_SOURCE
  *   - _ISOC_PURE_SOURCE, __cplusplus
- *   - _ISOC_PURE_SOURCE, __cplusplus, _ALL_SOURCE
+ *   - _ISOC_PURE_SOURCE, __cplusplus, _EVERY_SOURCE
  *   - __KERNEL__
- *   - __KERNEL__, _ALL_SOURCE
+ *   - __KERNEL__, _EVERY_SOURCE
  *   - __KERNEL__, __cplusplus
- *   - __KERNEL__, __cplusplus, _ALL_SOURCE
+ *   - __KERNEL__, __cplusplus, _EVERY_SOURCE
  *   - __CRT_FREESTANDING, __KERNEL__
- *   - __CRT_FREESTANDING, __KERNEL__, _ALL_SOURCE
+ *   - __CRT_FREESTANDING, __KERNEL__, _EVERY_SOURCE
  *   - __CRT_FREESTANDING, __KERNEL__, __cplusplus
- *   - __CRT_FREESTANDING, __KERNEL__, __cplusplus, _ALL_SOURCE
+ *   - __CRT_FREESTANDING, __KERNEL__, __cplusplus, _EVERY_SOURCE
  *   - _ISOC_PURE_SOURCE, __KERNEL__
- *   - _ISOC_PURE_SOURCE, __KERNEL__, _ALL_SOURCE
+ *   - _ISOC_PURE_SOURCE, __KERNEL__, _EVERY_SOURCE
  *   - _ISOC_PURE_SOURCE, __KERNEL__, __cplusplus
- *   - _ISOC_PURE_SOURCE, __KERNEL__, __cplusplus, _ALL_SOURCE
+ *   - _ISOC_PURE_SOURCE, __KERNEL__, __cplusplus, _EVERY_SOURCE
  * NOTE: The __KERNEL__ variants are achieved by include all *.c files
  *       twice, once as part of the kernel core, and once again as part
  *       of /bin/system-test

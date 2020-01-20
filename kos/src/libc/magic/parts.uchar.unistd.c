@@ -163,11 +163,11 @@ __SYSDECL_BEGIN
 %#endif /* ... */
 
 %
-%#if defined(_ALL_SOURCE) || \
-%   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+%#if (defined(_EVERY_SOURCE) || \
+%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 [attribute(*)] c16ctermid:(*) %{uchar(wctermid)}
 [attribute(*)] c32ctermid:(*) %{uchar(wctermid)}
-%#endif /* _ALL_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
+%#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 
 

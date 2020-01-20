@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd689507b */
+/* HASH CRC-32:0x3f002bed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,13 +51,13 @@
 #define FNM_PATHNAME    (1 << 0) /* No wildcard can ever match '/'. */
 #define FNM_NOESCAPE    (1 << 1) /* Backslashes don't quote special chars. */
 #define FNM_PERIOD      (1 << 2) /* Leading '.' is matched only explicitly. */
-#if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 2 || \
-     defined(_GNU_SOURCE) || defined(_ALL_SOURCE)
+#if (!defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 2 || \
+     defined(_GNU_SOURCE) || defined(_EVERY_SOURCE))
 #define FNM_FILE_NAME   FNM_PATHNAME /* Preferred GNU name. */
 #define FNM_LEADING_DIR (1 << 3)     /* Ignore '/...' after a match. */
 #define FNM_CASEFOLD    (1 << 4)     /* Compare without regard to case. */
 #define FNM_EXTMATCH    (1 << 5)     /* Use ksh-like extended matching. */
-#endif /* !_POSIX_C_SOURCE || _POSIX_C_SOURCE < 2 || _GNU_SOURCE || _ALL_SOURCE */
+#endif /* !_POSIX_C_SOURCE || _POSIX_C_SOURCE < 2 || _GNU_SOURCE || _EVERY_SOURCE */
 #define FNM_NOMATCH      1 /* Value returned by 'fnmatch' if STRING does not match PATTERN. */
 #ifdef _XOPEN_SOURCE
 #define FNM_NOSYS      (-1)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe90ad21e */
+/* HASH CRC-32:0x7543c8e9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1977,8 +1977,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_NONNULL((1, 2)) void _
 #endif /* !__swab_defined */
 #endif /* __USE_XOPEN */
 
-#if defined(_ALL_SOURCE) || \
-   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+#if (defined(_EVERY_SOURCE) || \
+     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 /* ... */
 #ifndef __ctermid_defined
 #define __ctermid_defined 1
@@ -1988,7 +1988,7 @@ __CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
 #undef __ctermid_defined
 #endif /* ctermid... */
 #endif /* !__ctermid_defined */
-#endif /* _ALL_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
+#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 #if defined(__USE_REENTRANT)
 #ifdef __CRT_HAVE_ctermid_r

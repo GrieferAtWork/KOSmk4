@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_APPS_PLAYGROUND_MAIN_C
 #define GUARD_APPS_PLAYGROUND_MAIN_C 1
-#define _ALL_SOURCE 1
+#define _EVERY_SOURCE 1
 
 /* This program isn't actually meant to do anything. It is however meant to be used
  * for quickly testing out new features, or checking the behavior of system functions

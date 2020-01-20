@@ -129,10 +129,10 @@ wtruncate64:(*) %{copy(truncate64, str2wcs)}
 %#endif /* ... */
 
 %
-%#if defined(_ALL_SOURCE) || \
-%   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+%#if (defined(_EVERY_SOURCE) || \
+%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 [wchar][attribute(*)] wctermid:(*) %{copy(ctermid, str2wcs)}
-%#endif /* _ALL_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
+%#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 
 

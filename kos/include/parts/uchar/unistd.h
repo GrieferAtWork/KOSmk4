@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7608214 */
+/* HASH CRC-32:0xbfe9862c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -920,8 +920,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chroot,(char32_t const *__r
 #endif /* c32chroot... */
 #endif /* ... */
 
-#if defined(_ALL_SOURCE) || \
-   (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
+#if (defined(_EVERY_SOURCE) || \
+     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 #if defined(__CRT_HAVE_wctermid) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(,char16_t *,__NOTHROW_NCX,c16ctermid,(char16_t *__s),wctermid,(__s))
 #elif defined(__CRT_HAVE_DOS$wctermid)
@@ -930,7 +930,7 @@ __CREDIRECT_DOS(,char16_t *,__NOTHROW_NCX,c16ctermid,(char16_t *__s),wctermid,(_
 #if defined(__CRT_HAVE_wctermid) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(,char32_t *,__NOTHROW_NCX,c32ctermid,(char32_t *__s),wctermid,(__s))
 #endif /* c32ctermid... */
-#endif /* _ALL_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
+#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 #endif /* __CC__ */
 

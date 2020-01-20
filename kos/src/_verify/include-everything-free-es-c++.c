@@ -1,9 +1,3 @@
-/*[[[magic
-options["COMPILE.language"] = "c";
-local gcc_opt = options.setdefault("GCC.options", []);
-gcc_opt.remove("-fno-rtti");
-gcc_opt.append("-fexceptions");
-]]]*/
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +17,6 @@ gcc_opt.append("-fexceptions");
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define _ALL_SOURCE 1
-#define _ISOC_PURE_SOURCE 1
+#define __CRT_FREESTANDING 1
+#define _EVERY_SOURCE 1
 #include "include-everything.h"
