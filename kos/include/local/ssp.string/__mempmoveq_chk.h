@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe96f21ce */
+/* HASH CRC-32:0xbe752ccf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,8 +47,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__mempmoveq_chk))(/*aligned(8)*/ void
                                                              __SIZE_TYPE__ __n_qwords,
                                                              __SIZE_TYPE__ __dst_objsize) {
 #line 102 "kos/src/libc/magic/ssp.string.c"
-	(void)__dst_objsize;
-	__ssp_chk_dstbuf("__mempmoveq_chk", __dst, __n_qwords * 8, __dst_objsize);
+	__ssp_chk_dstbuf("mempmoveq", __dst, __n_qwords * 8, __dst_objsize);
 	return __localdep_mempmoveq(__dst, __src, __n_qwords);
 }
 

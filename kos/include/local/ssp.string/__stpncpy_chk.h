@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3e8b34f */
+/* HASH CRC-32:0xf052e8da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__stpncpy_chk))(char *__restrict __ds
                                                            __SIZE_TYPE__ __buflen,
                                                            __SIZE_TYPE__ __dst_objsize) {
 #line 53 "kos/src/libc/magic/ssp.string.c"
-	(void)__dst_objsize;
 	(void)__dst_objsize; /* TODO */;
 	return __localdep_stpncpy(__dst, __src, __buflen);
 }

@@ -159,17 +159,17 @@ __SYSDECL_BEGIN
 
 
 %#ifdef __USE_STRING_BWLQ
-%[define_ssp_undef(memcpyw(dst, src, n_words)    = __memcpyw_chk(dst, src, n_words, __ssp_bos0(dst)))]
-%[define_ssp_undef(mempcpyw(dst, src, n_words)   = __mempcpyw_chk(dst, src, n_words, __ssp_bos0(dst)))]
-%[define_ssp_undef(memmovew(dst, src, n_words)   = __memmovew_chk(dst, src, n_words, __ssp_bos0(dst)))]
-%[define_ssp_undef(memcpyl(dst, src, n_dwords)   = __memcpyl_chk(dst, src, n_dwords, __ssp_bos0(dst)))]
-%[define_ssp_undef(mempcpyl(dst, src, n_dwords)  = __mempcpyl_chk(dst, src, n_dwords, __ssp_bos0(dst)))]
-%[define_ssp_undef(memmovel(dst, src, n_dwords)  = __memmovel_chk(dst, src, n_dwords, __ssp_bos0(dst)))]
-%[define_ssp_undef(mempmovew(dst, src, n_words)  = __mempmovew_chk(dst, src, n_words, __ssp_bos0(dst)))]
-%[define_ssp_undef(mempmovel(dst, src, n_dwords) = __mempmovel_chk(dst, src, n_dwords, __ssp_bos0(dst)))]
-%[define_ssp_undef(memsetw(dst, word, n_words) = __memsetw_chk(dst, word, n_words, __ssp_bos0(dst)))]
-%[define_ssp_undef(mempsetw(dst, word, n_words) = __mempsetw_chk(dst, word, n_words, __ssp_bos0(dst)))]
-%[define_ssp_undef(memsetl(dst, dword, n_dwords) = __memsetl_chk(dst, dword, n_dwords, __ssp_bos0(dst)))]
+%[define_ssp_undef(memcpyw(dst, src, n_words)     = __memcpyw_chk(dst, src, n_words, __ssp_bos0(dst)))]
+%[define_ssp_undef(mempcpyw(dst, src, n_words)    = __mempcpyw_chk(dst, src, n_words, __ssp_bos0(dst)))]
+%[define_ssp_undef(memmovew(dst, src, n_words)    = __memmovew_chk(dst, src, n_words, __ssp_bos0(dst)))]
+%[define_ssp_undef(memcpyl(dst, src, n_dwords)    = __memcpyl_chk(dst, src, n_dwords, __ssp_bos0(dst)))]
+%[define_ssp_undef(mempcpyl(dst, src, n_dwords)   = __mempcpyl_chk(dst, src, n_dwords, __ssp_bos0(dst)))]
+%[define_ssp_undef(memmovel(dst, src, n_dwords)   = __memmovel_chk(dst, src, n_dwords, __ssp_bos0(dst)))]
+%[define_ssp_undef(mempmovew(dst, src, n_words)   = __mempmovew_chk(dst, src, n_words, __ssp_bos0(dst)))]
+%[define_ssp_undef(mempmovel(dst, src, n_dwords)  = __mempmovel_chk(dst, src, n_dwords, __ssp_bos0(dst)))]
+%[define_ssp_undef(memsetw(dst, word, n_words)    = __memsetw_chk(dst, word, n_words, __ssp_bos0(dst)))]
+%[define_ssp_undef(mempsetw(dst, word, n_words)   = __mempsetw_chk(dst, word, n_words, __ssp_bos0(dst)))]
+%[define_ssp_undef(memsetl(dst, dword, n_dwords)  = __memsetl_chk(dst, dword, n_dwords, __ssp_bos0(dst)))]
 %[define_ssp_undef(mempsetl(dst, dword, n_dwords) = __mempsetl_chk(dst, dword, n_dwords, __ssp_bos0(dst)))]
 %#ifdef __USE_KOS
 %[define_ssp_undef(memmoveupw(dst, src, n_words)     = __memmoveupw_chk(dst, src, n_words, __ssp_bos0(dst)))]

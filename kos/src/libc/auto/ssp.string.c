@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd228e88f */
+/* HASH CRC-32:0x6ae0de66 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,8 +38,7 @@ NOTHROW_NCX(LIBCCALL libc___memcpy_chk)(void *__restrict dst,
                                         size_t n_bytes,
                                         size_t dst_objsize) {
 #line 37 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memcpy_chk", dst, n_bytes, dst_objsize);
+	__ssp_chk_dstbuf("memcpy", dst, n_bytes, dst_objsize);
 	return memcpy(dst, src, n_bytes);
 }
 
@@ -52,8 +51,7 @@ NOTHROW_NCX(LIBCCALL libc___memmove_chk)(void *dst,
                                          size_t n_bytes,
                                          size_t dst_objsize) {
 #line 38 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmove_chk", dst, n_bytes, dst_objsize);
+	__ssp_chk_dstbuf("memmove", dst, n_bytes, dst_objsize);
 	return memmove(dst, src, n_bytes);
 }
 
@@ -66,8 +64,7 @@ NOTHROW_NCX(LIBCCALL libc___memset_chk)(void *__restrict dst,
                                         size_t n_bytes,
                                         size_t dst_objsize) {
 #line 39 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memset_chk", dst, n_bytes, dst_objsize);
+	__ssp_chk_dstbuf("memset", dst, n_bytes, dst_objsize);
 	return memset(dst, byte, n_bytes);
 }
 
@@ -79,7 +76,6 @@ NOTHROW_NCX(LIBCCALL libc___strcat_chk)(char *__restrict dst,
                                         char const *__restrict src,
                                         size_t dst_objsize) {
 #line 40 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
 	(void)dst_objsize; /* TODO */;
 	return libc_strcat(dst, src);
 }
@@ -92,7 +88,6 @@ NOTHROW_NCX(LIBCCALL libc___strcpy_chk)(char *__restrict dst,
                                         char const *__restrict src,
                                         size_t dst_objsize) {
 #line 41 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
 	(void)dst_objsize; /* TODO */;
 	return libc_strcpy(dst, src);
 }
@@ -106,7 +101,6 @@ NOTHROW_NCX(LIBCCALL libc___strncat_chk)(char *__restrict dst,
                                          size_t buflen,
                                          size_t dst_objsize) {
 #line 42 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
 	(void)dst_objsize; /* TODO */;
 	return libc_strncat(dst, src, buflen);
 }
@@ -120,7 +114,6 @@ NOTHROW_NCX(LIBCCALL libc___strncpy_chk)(char *__restrict dst,
                                          size_t buflen,
                                          size_t dst_objsize) {
 #line 43 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
 	(void)dst_objsize; /* TODO */;
 	return libc_strncpy(dst, src, buflen);
 }
@@ -134,8 +127,7 @@ NOTHROW_NCX(LIBCCALL libc___mempcpy_chk)(void *__restrict dst,
                                          size_t n_bytes,
                                          size_t dst_objsize) {
 #line 47 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempcpy_chk", dst, n_bytes, dst_objsize);
+	__ssp_chk_dstbuf("mempcpy", dst, n_bytes, dst_objsize);
 	return mempcpy(dst, src, n_bytes);
 }
 
@@ -147,7 +139,6 @@ NOTHROW_NCX(LIBCCALL libc___stpcpy_chk)(char *__restrict dst,
                                         char const *__restrict src,
                                         size_t dst_objsize) {
 #line 52 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
 	(void)dst_objsize; /* TODO */;
 	return libc_stpcpy(dst, src);
 }
@@ -161,7 +152,6 @@ NOTHROW_NCX(LIBCCALL libc___stpncpy_chk)(char *__restrict dst,
                                          size_t buflen,
                                          size_t dst_objsize) {
 #line 53 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
 	(void)dst_objsize; /* TODO */;
 	return libc_stpncpy(dst, src, buflen);
 }
@@ -175,8 +165,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmove_chk)(void *dst,
                                           size_t n_bytes,
                                           size_t dst_objsize) {
 #line 58 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmove_chk", dst, n_bytes, dst_objsize);
+	__ssp_chk_dstbuf("mempmove", dst, n_bytes, dst_objsize);
 	return mempmove(dst, src, n_bytes);
 }
 
@@ -189,8 +178,7 @@ NOTHROW_NCX(LIBCCALL libc___mempset_chk)(void *__restrict dst,
                                          size_t n_bytes,
                                          size_t dst_objsize) {
 #line 59 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempset_chk", dst, n_bytes, dst_objsize);
+	__ssp_chk_dstbuf("mempset", dst, n_bytes, dst_objsize);
 	return mempset(dst, byte, n_bytes);
 }
 
@@ -203,8 +191,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveup_chk)(void *dst,
                                            size_t n_bytes,
                                            size_t dst_objsize) {
 #line 60 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmoveup_chk", dst, n_bytes, dst_objsize);
+	__ssp_chk_dstbuf("memmoveup", dst, n_bytes, dst_objsize);
 	return memmoveup(dst, src, n_bytes);
 }
 
@@ -217,8 +204,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovedown_chk)(void *dst,
                                              size_t n_bytes,
                                              size_t dst_objsize) {
 #line 61 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmovedown_chk", dst, n_bytes, dst_objsize);
+	__ssp_chk_dstbuf("memmovedown", dst, n_bytes, dst_objsize);
 	return memmovedown(dst, src, n_bytes);
 }
 
@@ -231,8 +217,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveup_chk)(void *dst,
                                             size_t n_bytes,
                                             size_t dst_objsize) {
 #line 62 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmoveup_chk", dst, n_bytes, dst_objsize);
+	__ssp_chk_dstbuf("mempmoveup", dst, n_bytes, dst_objsize);
 	return mempmoveup(dst, src, n_bytes);
 }
 
@@ -245,8 +230,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovedown_chk)(void *dst,
                                               size_t n_bytes,
                                               size_t dst_objsize) {
 #line 63 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmovedown_chk", dst, n_bytes, dst_objsize);
+	__ssp_chk_dstbuf("mempmovedown", dst, n_bytes, dst_objsize);
 	return mempmovedown(dst, src, n_bytes);
 }
 
@@ -260,8 +244,7 @@ NOTHROW_NCX(LIBCCALL libc___memcpyc_chk)(void *__restrict dst,
                                          size_t elem_size,
                                          size_t dst_objsize) {
 #line 64 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memcpyc_chk", dst, elem_count * elem_size, dst_objsize);
+	__ssp_chk_dstbuf("memcpyc", dst, elem_count * elem_size, dst_objsize);
 	return memcpyc(dst, src, elem_count, elem_size);
 }
 
@@ -275,8 +258,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovec_chk)(void *dst,
                                           size_t elem_size,
                                           size_t dst_objsize) {
 #line 65 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmovec_chk", dst, elem_count * elem_size, dst_objsize);
+	__ssp_chk_dstbuf("memmovec", dst, elem_count * elem_size, dst_objsize);
 	return memmovec(dst, src, elem_count, elem_size);
 }
 
@@ -290,8 +272,7 @@ NOTHROW_NCX(LIBCCALL libc___mempcpyc_chk)(void *__restrict dst,
                                           size_t elem_size,
                                           size_t dst_objsize) {
 #line 66 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempcpyc_chk", dst, elem_count * elem_size, dst_objsize);
+	__ssp_chk_dstbuf("mempcpyc", dst, elem_count * elem_size, dst_objsize);
 	return mempcpyc(dst, src, elem_count, elem_size);
 }
 
@@ -305,8 +286,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovec_chk)(void *dst,
                                            size_t elem_size,
                                            size_t dst_objsize) {
 #line 67 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmovec_chk", dst, elem_count * elem_size, dst_objsize);
+	__ssp_chk_dstbuf("mempmovec", dst, elem_count * elem_size, dst_objsize);
 	return mempmovec(dst, src, elem_count, elem_size);
 }
 
@@ -320,8 +300,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveupc_chk)(void *dst,
                                             size_t elem_size,
                                             size_t dst_objsize) {
 #line 68 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmoveupc_chk", dst, elem_count * elem_size, dst_objsize);
+	__ssp_chk_dstbuf("memmoveupc", dst, elem_count * elem_size, dst_objsize);
 	return memmoveupc(dst, src, elem_count, elem_size);
 }
 
@@ -335,8 +314,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovedownc_chk)(void *dst,
                                               size_t elem_size,
                                               size_t dst_objsize) {
 #line 69 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmovedownc_chk", dst, elem_count * elem_size, dst_objsize);
+	__ssp_chk_dstbuf("memmovedownc", dst, elem_count * elem_size, dst_objsize);
 	return memmovedownc(dst, src, elem_count, elem_size);
 }
 
@@ -350,8 +328,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveupc_chk)(void *dst,
                                              size_t elem_size,
                                              size_t dst_objsize) {
 #line 70 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmoveupc_chk", dst, elem_count * elem_size, dst_objsize);
+	__ssp_chk_dstbuf("mempmoveupc", dst, elem_count * elem_size, dst_objsize);
 	return mempmoveupc(dst, src, elem_count, elem_size);
 }
 
@@ -365,8 +342,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovedownc_chk)(void *dst,
                                                size_t elem_size,
                                                size_t dst_objsize) {
 #line 71 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmovedownc_chk", dst, elem_count * elem_size, dst_objsize);
+	__ssp_chk_dstbuf("mempmovedownc", dst, elem_count * elem_size, dst_objsize);
 	return mempmovedownc(dst, src, elem_count, elem_size);
 }
 
@@ -379,8 +355,7 @@ NOTHROW_NCX(LIBCCALL libc___memcpyw_chk)(/*aligned(2)*/ void *__restrict dst,
                                          size_t n_words,
                                          size_t dst_objsize) {
 #line 76 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memcpyw_chk", dst, n_words * 2, dst_objsize);
+	__ssp_chk_dstbuf("memcpyw", dst, n_words * 2, dst_objsize);
 	return memcpyw(dst, src, n_words);
 }
 
@@ -393,8 +368,7 @@ NOTHROW_NCX(LIBCCALL libc___mempcpyw_chk)(/*aligned(2)*/ void *__restrict dst,
                                           size_t n_words,
                                           size_t dst_objsize) {
 #line 77 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempcpyw_chk", dst, n_words * 2, dst_objsize);
+	__ssp_chk_dstbuf("mempcpyw", dst, n_words * 2, dst_objsize);
 	return mempcpyw(dst, src, n_words);
 }
 
@@ -407,8 +381,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovew_chk)(/*aligned(2)*/ void *dst,
                                           size_t n_words,
                                           size_t dst_objsize) {
 #line 78 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmovew_chk", dst, n_words * 2, dst_objsize);
+	__ssp_chk_dstbuf("memmovew", dst, n_words * 2, dst_objsize);
 	return memmovew(dst, src, n_words);
 }
 
@@ -421,8 +394,7 @@ NOTHROW_NCX(LIBCCALL libc___memcpyl_chk)(/*aligned(4)*/ void *__restrict dst,
                                          size_t n_dwords,
                                          size_t dst_objsize) {
 #line 79 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memcpyl_chk", dst, n_dwords * 4, dst_objsize);
+	__ssp_chk_dstbuf("memcpyl", dst, n_dwords * 4, dst_objsize);
 	return memcpyl(dst, src, n_dwords);
 }
 
@@ -435,8 +407,7 @@ NOTHROW_NCX(LIBCCALL libc___mempcpyl_chk)(/*aligned(4)*/ void *__restrict dst,
                                           size_t n_dwords,
                                           size_t dst_objsize) {
 #line 80 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempcpyl_chk", dst, n_dwords * 4, dst_objsize);
+	__ssp_chk_dstbuf("mempcpyl", dst, n_dwords * 4, dst_objsize);
 	return mempcpyl(dst, src, n_dwords);
 }
 
@@ -449,8 +420,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovel_chk)(/*aligned(4)*/ void *dst,
                                           size_t n_dwords,
                                           size_t dst_objsize) {
 #line 81 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmovel_chk", dst, n_dwords * 4, dst_objsize);
+	__ssp_chk_dstbuf("memmovel", dst, n_dwords * 4, dst_objsize);
 	return memmovel(dst, src, n_dwords);
 }
 
@@ -463,8 +433,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovew_chk)(/*aligned(2)*/ void *dst,
                                            size_t n_words,
                                            size_t dst_objsize) {
 #line 82 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmovew_chk", dst, n_words * 2, dst_objsize);
+	__ssp_chk_dstbuf("mempmovew", dst, n_words * 2, dst_objsize);
 	return mempmovew(dst, src, n_words);
 }
 
@@ -477,8 +446,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovel_chk)(/*aligned(4)*/ void *dst,
                                            size_t n_dwords,
                                            size_t dst_objsize) {
 #line 83 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmovel_chk", dst, n_dwords * 4, dst_objsize);
+	__ssp_chk_dstbuf("mempmovel", dst, n_dwords * 4, dst_objsize);
 	return mempmovel(dst, src, n_dwords);
 }
 
@@ -491,8 +459,7 @@ NOTHROW_NCX(LIBCCALL libc___memsetw_chk)(/*aligned(2)*/ void *__restrict dst,
                                          size_t n_words,
                                          size_t dst_objsize) {
 #line 84 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memsetw_chk", dst, n_words * 2, dst_objsize);
+	__ssp_chk_dstbuf("memsetw", dst, n_words * 2, dst_objsize);
 	return memsetw(dst, word, n_words);
 }
 
@@ -505,8 +472,7 @@ NOTHROW_NCX(LIBCCALL libc___mempsetw_chk)(/*aligned(2)*/ void *__restrict dst,
                                           size_t n_words,
                                           size_t dst_objsize) {
 #line 85 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempsetw_chk", dst, n_words * 2, dst_objsize);
+	__ssp_chk_dstbuf("mempsetw", dst, n_words * 2, dst_objsize);
 	return mempsetw(dst, word, n_words);
 }
 
@@ -519,8 +485,7 @@ NOTHROW_NCX(LIBCCALL libc___memsetl_chk)(/*aligned(4)*/ void *__restrict dst,
                                          size_t n_dwords,
                                          size_t dst_objsize) {
 #line 86 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memsetl_chk", dst, n_dwords * 4, dst_objsize);
+	__ssp_chk_dstbuf("memsetl", dst, n_dwords * 4, dst_objsize);
 	return memsetl(dst, dword, n_dwords);
 }
 
@@ -533,8 +498,7 @@ NOTHROW_NCX(LIBCCALL libc___mempsetl_chk)(/*aligned(4)*/ void *__restrict dst,
                                           size_t n_dwords,
                                           size_t dst_objsize) {
 #line 87 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempsetl_chk", dst, n_dwords * 4, dst_objsize);
+	__ssp_chk_dstbuf("mempsetl", dst, n_dwords * 4, dst_objsize);
 	return mempsetl(dst, dword, n_dwords);
 }
 
@@ -547,8 +511,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveupw_chk)(/*aligned(2)*/ void *dst,
                                             size_t n_words,
                                             size_t dst_objsize) {
 #line 89 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmoveupw_chk", dst, n_words * 2, dst_objsize);
+	__ssp_chk_dstbuf("memmoveupw", dst, n_words * 2, dst_objsize);
 	return memmoveupw(dst, src, n_words);
 }
 
@@ -561,8 +524,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovedownw_chk)(/*aligned(2)*/ void *dst,
                                               size_t n_words,
                                               size_t dst_objsize) {
 #line 90 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmovedownw_chk", dst, n_words * 2, dst_objsize);
+	__ssp_chk_dstbuf("memmovedownw", dst, n_words * 2, dst_objsize);
 	return memmovedownw(dst, src, n_words);
 }
 
@@ -575,8 +537,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveupl_chk)(/*aligned(4)*/ void *dst,
                                             size_t n_dwords,
                                             size_t dst_objsize) {
 #line 91 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmoveupl_chk", dst, n_dwords * 4, dst_objsize);
+	__ssp_chk_dstbuf("memmoveupl", dst, n_dwords * 4, dst_objsize);
 	return memmoveupl(dst, src, n_dwords);
 }
 
@@ -589,8 +550,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovedownl_chk)(/*aligned(4)*/ void *dst,
                                               size_t n_dwords,
                                               size_t dst_objsize) {
 #line 92 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmovedownl_chk", dst, n_dwords * 4, dst_objsize);
+	__ssp_chk_dstbuf("memmovedownl", dst, n_dwords * 4, dst_objsize);
 	return memmovedownl(dst, src, n_dwords);
 }
 
@@ -603,8 +563,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveupw_chk)(/*aligned(2)*/ void *dst,
                                              size_t n_words,
                                              size_t dst_objsize) {
 #line 93 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmoveupw_chk", dst, n_words * 2, dst_objsize);
+	__ssp_chk_dstbuf("mempmoveupw", dst, n_words * 2, dst_objsize);
 	return mempmoveupw(dst, src, n_words);
 }
 
@@ -617,8 +576,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovedownw_chk)(/*aligned(2)*/ void *dst,
                                                size_t n_words,
                                                size_t dst_objsize) {
 #line 94 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmovedownw_chk", dst, n_words * 2, dst_objsize);
+	__ssp_chk_dstbuf("mempmovedownw", dst, n_words * 2, dst_objsize);
 	return mempmovedownw(dst, src, n_words);
 }
 
@@ -631,8 +589,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveupl_chk)(/*aligned(4)*/ void *dst,
                                              size_t n_dwords,
                                              size_t dst_objsize) {
 #line 95 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmoveupl_chk", dst, n_dwords * 4, dst_objsize);
+	__ssp_chk_dstbuf("mempmoveupl", dst, n_dwords * 4, dst_objsize);
 	return mempmoveupl(dst, src, n_dwords);
 }
 
@@ -645,8 +602,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovedownl_chk)(/*aligned(4)*/ void *dst,
                                                size_t n_dwords,
                                                size_t dst_objsize) {
 #line 96 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmovedownl_chk", dst, n_dwords * 4, dst_objsize);
+	__ssp_chk_dstbuf("mempmovedownl", dst, n_dwords * 4, dst_objsize);
 	return mempmovedownl(dst, src, n_dwords);
 }
 
@@ -659,8 +615,7 @@ NOTHROW_NCX(LIBCCALL libc___memcpyq_chk)(/*aligned(8)*/ void *__restrict dst,
                                          size_t n_qwords,
                                          size_t dst_objsize) {
 #line 99 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memcpyq_chk", dst, n_qwords * 8, dst_objsize);
+	__ssp_chk_dstbuf("memcpyq", dst, n_qwords * 8, dst_objsize);
 	return memcpyq(dst, src, n_qwords);
 }
 
@@ -673,8 +628,7 @@ NOTHROW_NCX(LIBCCALL libc___mempcpyq_chk)(/*aligned(8)*/ void *__restrict dst,
                                           size_t n_qwords,
                                           size_t dst_objsize) {
 #line 100 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempcpyq_chk", dst, n_qwords * 8, dst_objsize);
+	__ssp_chk_dstbuf("mempcpyq", dst, n_qwords * 8, dst_objsize);
 	return mempcpyq(dst, src, n_qwords);
 }
 
@@ -687,8 +641,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveq_chk)(/*aligned(8)*/ void *dst,
                                           size_t n_qwords,
                                           size_t dst_objsize) {
 #line 101 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmoveq_chk", dst, n_qwords * 8, dst_objsize);
+	__ssp_chk_dstbuf("memmoveq", dst, n_qwords * 8, dst_objsize);
 	return memmoveq(dst, src, n_qwords);
 }
 
@@ -701,8 +654,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveq_chk)(/*aligned(8)*/ void *__restrict dst,
                                            size_t n_qwords,
                                            size_t dst_objsize) {
 #line 102 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmoveq_chk", dst, n_qwords * 8, dst_objsize);
+	__ssp_chk_dstbuf("mempmoveq", dst, n_qwords * 8, dst_objsize);
 	return mempmoveq(dst, src, n_qwords);
 }
 
@@ -715,8 +667,7 @@ NOTHROW_NCX(LIBCCALL libc___memsetq_chk)(/*aligned(8)*/ void *__restrict dst,
                                          size_t n_qwords,
                                          size_t dst_objsize) {
 #line 103 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memsetq_chk", dst, n_qwords * 8, dst_objsize);
+	__ssp_chk_dstbuf("memsetq", dst, n_qwords * 8, dst_objsize);
 	return memsetq(dst, qword, n_qwords);
 }
 
@@ -729,8 +680,7 @@ NOTHROW_NCX(LIBCCALL libc___mempsetq_chk)(/*aligned(8)*/ void *__restrict dst,
                                           size_t n_qwords,
                                           size_t dst_objsize) {
 #line 104 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempsetq_chk", dst, n_qwords * 8, dst_objsize);
+	__ssp_chk_dstbuf("mempsetq", dst, n_qwords * 8, dst_objsize);
 	return mempsetq(dst, qword, n_qwords);
 }
 
@@ -743,8 +693,7 @@ NOTHROW_NCX(LIBCCALL libc___memmoveupq_chk)(/*aligned(8)*/ void *dst,
                                             size_t n_qwords,
                                             size_t dst_objsize) {
 #line 106 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmoveupq_chk", dst, n_qwords * 8, dst_objsize);
+	__ssp_chk_dstbuf("memmoveupq", dst, n_qwords * 8, dst_objsize);
 	return memmoveupq(dst, src, n_qwords);
 }
 
@@ -757,8 +706,7 @@ NOTHROW_NCX(LIBCCALL libc___memmovedownq_chk)(/*aligned(8)*/ void *dst,
                                               size_t n_qwords,
                                               size_t dst_objsize) {
 #line 107 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__memmovedownq_chk", dst, n_qwords * 8, dst_objsize);
+	__ssp_chk_dstbuf("memmovedownq", dst, n_qwords * 8, dst_objsize);
 	return memmovedownq(dst, src, n_qwords);
 }
 
@@ -771,8 +719,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmoveupq_chk)(/*aligned(8)*/ void *__restrict dst
                                              size_t n_qwords,
                                              size_t dst_objsize) {
 #line 108 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmoveupq_chk", dst, n_qwords * 8, dst_objsize);
+	__ssp_chk_dstbuf("mempmoveupq", dst, n_qwords * 8, dst_objsize);
 	return mempmoveupq(dst, src, n_qwords);
 }
 
@@ -785,8 +732,7 @@ NOTHROW_NCX(LIBCCALL libc___mempmovedownq_chk)(/*aligned(8)*/ void *__restrict d
                                                size_t n_qwords,
                                                size_t dst_objsize) {
 #line 109 "kos/src/libc/magic/ssp.string.c"
-	(void)dst_objsize;
-	__ssp_chk_dstbuf("__mempmovedownq_chk", dst, n_qwords * 8, dst_objsize);
+	__ssp_chk_dstbuf("mempmovedownq", dst, n_qwords * 8, dst_objsize);
 	return mempmovedownq(dst, src, n_qwords);
 }
 

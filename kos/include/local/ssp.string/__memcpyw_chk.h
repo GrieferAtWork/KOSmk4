@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5157837d */
+/* HASH CRC-32:0xd9bcc171 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,8 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memcpyw_chk))(/*aligned(2)*/ void *
                                                            __SIZE_TYPE__ __n_words,
                                                            __SIZE_TYPE__ __dst_objsize) {
 #line 76 "kos/src/libc/magic/ssp.string.c"
-	(void)__dst_objsize;
-	__ssp_chk_dstbuf("__memcpyw_chk", __dst, __n_words * 2, __dst_objsize);
+	__ssp_chk_dstbuf("memcpyw", __dst, __n_words * 2, __dst_objsize);
 	return __localdep_memcpyw(__dst, __src, __n_words);
 }
 

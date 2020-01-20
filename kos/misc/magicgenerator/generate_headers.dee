@@ -2028,16 +2028,19 @@ got_section_prefix:
 					local undef_existing = directive.startswith("_undef");
 					if (undef_existing)
 						directive = directive[#"_undef":];
+					local check_crt = directive.startswith("_crt");
+					if (check_crt)
+						directive = directive[#"_crt":];
 					if (!directive.startswith("("))
-						err(directive_begin, "Expected `(' after `%[define_ssp[_builtin][_undef]' in " + repr directive);
+						err(directive_begin, "Expected `(' after `%[define_ssp[_builtin][_undef][_crt]' in " + repr directive);
 					local defend = directive.findmatch("(", ")", 1);
 					if (defend < 0)
-						err(directive_begin, "Missing `)' after `%[define_ssp[_builtin][_undef]" + repr directive + "'");
+						err(directive_begin, "Missing `)' after `%[define_ssp[_builtin][_undef][_crt]" + repr directive + "'");
 					if (directive[defend + 1:].strip() != "")
-						err(directive_begin, "Trailing text after `%[define_ssp[_builtin][_undef](...)': " + repr directive[defend:].strip());
+						err(directive_begin, "Trailing text after `%[define_ssp[_builtin][_undef][_crt](...)': " + repr directive[defend:].strip());
 					directive = directive[1:defend].strip();
 					if ("=" !in directive)
-						err(directive_begin, "Missing `=' in `%[define_ssp[_builtin][_undef](" + repr directive + ")'");
+						err(directive_begin, "Missing `=' in `%[define_ssp[_builtin][_undef][_crt](" + repr directive + ")'");
 					local a, none, b = directive.partition("=")...;
 					a = a.strip();
 					b = b.strip();
@@ -2049,19 +2052,32 @@ got_section_prefix:
 						fp << "     defined(__CRT_HAVE___" << baseFunctionName << "_chk) && __has_builtin(__builtin___" << baseFunctionName << "_chk))\n";
 						if (undef_existing)
 							fp << "#undef " << aName << "\n";
-						local bos_start = b.index("__ssp_bos0");
-						local bos = b[bos_start:b.index(")", bos_start) + 1].strip();
+						local bos_start = b.index("__ssp_bos");
+						local bos = b[bos_start:b.indexmatch("(", ")", b.index("(", bos_start) + 1) + 1].strip();
 						fp << "#define " << a << (" " * ((#b + #bos + 31) - #a)) << " \\\n";
 						fp << "\t(" << bos << " != (__SIZE_TYPE__)-1 ? __builtin_" << b << " \\\n";
 						fp << "\t" << (" " * (#bos + 23)) << ": " << b << ")\n";
-						fp << "#elif defined(__CRT_HAVE___" << baseFunctionName << "_chk)\n";
+						if (check_crt)
+							fp << "#elif defined(__CRT_HAVE___" << baseFunctionName << "_chk)\n";
+						else {
+							fp << "#else /* ... */\n";
+						}
 					} else {
-						fp << "#ifdef __CRT_HAVE___" << baseFunctionName << "_chk\n";
+						if (check_crt)
+							fp << "#ifdef __CRT_HAVE___" << baseFunctionName << "_chk\n";
 					}
 					if (undef_existing)
 						fp << "#undef " << aName << "\n";
 					fp << "#define " << a << " " << b << "\n";
-					fp << "#endif /* ... */\n";
+					if (define_builtin) {
+						if (check_crt) {
+							fp << "#endif /* ... */\n";
+						} else {
+							fp << "#endif /* !... */\n";
+						}
+					} else if (check_crt) {
+						fp << "#endif /* __CRT_HAVE___" << baseFunctionName << "_chk */\n";
+					}
 					yield IntermediateString(fp.string, pack "c");
 				} else if (directive.startswith("push_macro")) {
 					/* 'push_macro' ['(' groups ')'] [@option...] '(' macros... ')' */
@@ -3330,22 +3346,22 @@ again_enum_name:
 							}
 							local checkExprVariants: {({string...}, string)...} = {
 								({ "dst", "n_bytes", "dst_objsize" },
-									"__ssp_chk_dstbuf({funname!r}, dst, n_bytes, dst_objsize)"),
+									"__ssp_chk_dstbuf({baseName!r}, dst, n_bytes, dst_objsize)"),
 								({ "dst", "n_words", "dst_objsize" },
-									"__ssp_chk_dstbuf({funname!r}, dst, n_words * 2, dst_objsize)"),
+									"__ssp_chk_dstbuf({baseName!r}, dst, n_words * 2, dst_objsize)"),
 								({ "dst", "n_dwords", "dst_objsize" },
-									"__ssp_chk_dstbuf({funname!r}, dst, n_dwords * 4, dst_objsize)"),
+									"__ssp_chk_dstbuf({baseName!r}, dst, n_dwords * 4, dst_objsize)"),
 								({ "dst", "n_qwords", "dst_objsize" },
-									"__ssp_chk_dstbuf({funname!r}, dst, n_qwords * 8, dst_objsize)"),
+									"__ssp_chk_dstbuf({baseName!r}, dst, n_qwords * 8, dst_objsize)"),
 								({ "dst", "elem_count", "elem_size", "dst_objsize" },
-									"__ssp_chk_dstbuf({funname!r}, dst, elem_count * elem_size, dst_objsize)"),
+									"__ssp_chk_dstbuf({baseName!r}, dst, elem_count * elem_size, dst_objsize)"),
 							};
 							for (local argnames, text: checkExprVariants) {
 								for (local name: argnames) {
 									if (!arglistContainsName(arglist, name))
 										goto next_chk_checkexpr_auto;
 								}
-								checkExpr = text.format({ "funname": funname });
+								checkExpr = text.format({ "baseName": baseName });
 								goto got_chk_checkexpr;
 next_chk_checkexpr_auto:
 								;
@@ -3366,7 +3382,6 @@ got_chk_checkexpr:
 						dependency_prefix += "#include @<ssp/chk.h>@\n";
 						File.Writer fp;
 						fp << "{\n";
-						fp << "\t(void)" << arglist.last[1] << ";\n";
 						fp << "\t" << checkExpr << ";\n";
 						fp << "\treturn " << baseName << "(" << ", ".join(arglist[:-1].each[1]) << ");\n";
 						fp << "}\n";

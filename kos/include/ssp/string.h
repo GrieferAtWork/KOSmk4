@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e03f700 */
+/* HASH CRC-32:0xe35b355e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -545,40 +545,36 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedownq_chk, __FORCELOCAL __ATTR_LEAF __
 #define memset(dst, byte, n_bytes)                                                                      \
 	(__ssp_bos0(dst) != (__SIZE_TYPE__)-1 ? __builtin___memset_chk(dst, byte, n_bytes, __ssp_bos0(dst)) \
 	                                      : __memset_chk(dst, byte, n_bytes, __ssp_bos0(dst)))
-#elif defined(__CRT_HAVE___memset_chk)
+#else /* ... */
 #undef memset
 #define memset(dst, byte, n_bytes) __memset_chk(dst, byte, n_bytes, __ssp_bos0(dst))
-#endif /* ... */
+#endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_memcpy) && \
      defined(__CRT_HAVE___memcpy_chk) && __has_builtin(__builtin___memcpy_chk))
 #undef __PRIVATE_memcpy_3
 #define __PRIVATE_memcpy_3(dst, src, n_bytes)                                                          \
 	(__ssp_bos0(dst) != (__SIZE_TYPE__)-1 ? __builtin___memcpy_chk(dst, src, n_bytes, __ssp_bos0(dst)) \
 	                                      : __memcpy_chk(dst, src, n_bytes, __ssp_bos0(dst)))
-#elif defined(__CRT_HAVE___memcpy_chk)
+#else /* ... */
 #undef __PRIVATE_memcpy_3
 #define __PRIVATE_memcpy_3(dst, src, n_bytes) __memcpy_chk(dst, src, n_bytes, __ssp_bos0(dst))
-#endif /* ... */
+#endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_memmove) && \
      defined(__CRT_HAVE___memmove_chk) && __has_builtin(__builtin___memmove_chk))
 #undef __PRIVATE_memmove_3
 #define __PRIVATE_memmove_3(dst, src, n_bytes)                                                          \
 	(__ssp_bos0(dst) != (__SIZE_TYPE__)-1 ? __builtin___memmove_chk(dst, src, n_bytes, __ssp_bos0(dst)) \
 	                                      : __memmove_chk(dst, src, n_bytes, __ssp_bos0(dst)))
-#elif defined(__CRT_HAVE___memmove_chk)
+#else /* ... */
 #undef __PRIVATE_memmove_3
 #define __PRIVATE_memmove_3(dst, src, n_bytes) __memmove_chk(dst, src, n_bytes, __ssp_bos0(dst))
-#endif /* ... */
+#endif /* !... */
 
 #ifdef __USE_STRING_OVERLOADS
-#ifdef __CRT_HAVE___memcpyc_chk
 #undef __PRIVATE_memcpy_4
 #define __PRIVATE_memcpy_4(dst, src, elem_count, elem_size) __memcpyc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmovec_chk
 #undef __PRIVATE_memmove_4
 #define __PRIVATE_memmove_4(dst, src, elem_count, elem_size) __memmovec_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
 #endif /* __USE_STRING_OVERLOADS */
 
 #ifdef __USE_GNU
@@ -588,223 +584,123 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__mempmovedownq_chk, __FORCELOCAL __ATTR_LEAF __
 #define __PRIVATE_mempcpy_3(dst, src, n_bytes)                                                          \
 	(__ssp_bos0(dst) != (__SIZE_TYPE__)-1 ? __builtin___mempcpy_chk(dst, src, n_bytes, __ssp_bos0(dst)) \
 	                                      : __mempcpy_chk(dst, src, n_bytes, __ssp_bos0(dst)))
-#elif defined(__CRT_HAVE___mempcpy_chk)
+#else /* ... */
 #undef __PRIVATE_mempcpy_3
 #define __PRIVATE_mempcpy_3(dst, src, n_bytes) __mempcpy_chk(dst, src, n_bytes, __ssp_bos0(dst))
-#endif /* ... */
+#endif /* !... */
 #ifdef __USE_STRING_OVERLOADS
-#ifdef __CRT_HAVE___mempcpyc_chk
 #undef __PRIVATE_mempcpy_4
 #define __PRIVATE_mempcpy_4(dst, src, elem_count, elem_size) __mempcpyc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
 #endif /* __USE_STRING_OVERLOADS */
 #endif /* __USE_GNU */
 
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE___mempset_chk
 #undef mempset
 #define mempset(dst, byte, n_bytes) __mempset_chk(dst, byte, n_bytes, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memcpyc_chk
 #undef memcpyc
 #define memcpyc(dst, src, elem_count, elem_size) __memcpyc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmovec_chk
 #undef memmovec
 #define memmovec(dst, src, elem_count, elem_size) __memmovec_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempcpyc_chk
 #undef mempcpyc
 #define mempcpyc(dst, src, elem_count, elem_size) __mempcpyc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmovec_chk
 #undef mempmovec
 #define mempmovec(dst, src, elem_count, elem_size) __mempmovec_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmoveupc_chk
 #undef memmoveupc
 #define memmoveupc(dst, src, elem_count, elem_size) __memmoveupc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmoveupc_chk
 #undef mempmoveupc
 #define mempmoveupc(dst, src, elem_count, elem_size) __mempmoveupc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmovedownc_chk
 #undef memmovedownc
 #define memmovedownc(dst, src, elem_count, elem_size) __memmovedownc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmovedownc_chk
 #undef mempmovedownc
 #define mempmovedownc(dst, src, elem_count, elem_size) __mempmovedownc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmove_chk
 #undef __PRIVATE_mempmove_3
 #define __PRIVATE_mempmove_3(dst, src, n_bytes) __mempmove_chk(dst, src, n_bytes, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmoveup_chk
 #undef __PRIVATE_memmoveup_3
 #define __PRIVATE_memmoveup_3(dst, src, n_bytes) __memmoveup_chk(dst, src, n_bytes, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmoveup_chk
 #undef __PRIVATE_mempmoveup_3
 #define __PRIVATE_mempmoveup_3(dst, src, n_bytes) __mempmoveup_chk(dst, src, n_bytes, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmovedown_chk
 #undef __PRIVATE_memmovedown_3
 #define __PRIVATE_memmovedown_3(dst, src, n_bytes) __memmovedown_chk(dst, src, n_bytes, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmovedown_chk
 #undef __PRIVATE_mempmovedown_3
 #define __PRIVATE_mempmovedown_3(dst, src, n_bytes) __mempmovedown_chk(dst, src, n_bytes, __ssp_bos0(dst))
-#endif /* ... */
 #ifdef __USE_STRING_OVERLOADS
-#ifdef __CRT_HAVE___mempmovec_chk
 #undef __PRIVATE_mempmove_4
 #define __PRIVATE_mempmove_4(dst, src, elem_count, elem_size) __mempmovec_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmoveupc_chk
 #undef __PRIVATE_memmoveup_4
 #define __PRIVATE_memmoveup_4(dst, src, elem_count, elem_size) __memmoveupc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmoveupc_chk
 #undef __PRIVATE_mempmoveup_4
 #define __PRIVATE_mempmoveup_4(dst, src, elem_count, elem_size) __mempmoveupc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmovedownc_chk
 #undef __PRIVATE_memmovedown_4
 #define __PRIVATE_memmovedown_4(dst, src, elem_count, elem_size) __memmovedownc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmovedownc_chk
 #undef __PRIVATE_mempmovedown_4
 #define __PRIVATE_mempmovedown_4(dst, src, elem_count, elem_size) __mempmovedownc_chk(dst, src, elem_count, elem_size, __ssp_bos0(dst))
-#endif /* ... */
 #endif /* __USE_STRING_OVERLOADS */
 #endif /* __USE_KOS */
 #ifdef __USE_STRING_BWLQ
-#ifdef __CRT_HAVE___memcpyw_chk
 #undef memcpyw
 #define memcpyw(dst, src, n_words) __memcpyw_chk(dst, src, n_words, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempcpyw_chk
 #undef mempcpyw
 #define mempcpyw(dst, src, n_words) __mempcpyw_chk(dst, src, n_words, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmovew_chk
 #undef memmovew
 #define memmovew(dst, src, n_words) __memmovew_chk(dst, src, n_words, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memcpyl_chk
 #undef memcpyl
 #define memcpyl(dst, src, n_dwords) __memcpyl_chk(dst, src, n_dwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempcpyl_chk
 #undef mempcpyl
 #define mempcpyl(dst, src, n_dwords) __mempcpyl_chk(dst, src, n_dwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmovel_chk
 #undef memmovel
 #define memmovel(dst, src, n_dwords) __memmovel_chk(dst, src, n_dwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmovew_chk
 #undef mempmovew
 #define mempmovew(dst, src, n_words) __mempmovew_chk(dst, src, n_words, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmovel_chk
 #undef mempmovel
 #define mempmovel(dst, src, n_dwords) __mempmovel_chk(dst, src, n_dwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memsetw_chk
 #undef memsetw
 #define memsetw(dst, word, n_words) __memsetw_chk(dst, word, n_words, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempsetw_chk
 #undef mempsetw
 #define mempsetw(dst, word, n_words) __mempsetw_chk(dst, word, n_words, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memsetl_chk
 #undef memsetl
 #define memsetl(dst, dword, n_dwords) __memsetl_chk(dst, dword, n_dwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempsetl_chk
 #undef mempsetl
 #define mempsetl(dst, dword, n_dwords) __mempsetl_chk(dst, dword, n_dwords, __ssp_bos0(dst))
-#endif /* ... */
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE___memmoveupw_chk
 #undef memmoveupw
 #define memmoveupw(dst, src, n_words) __memmoveupw_chk(dst, src, n_words, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmovedownw_chk
 #undef memmovedownw
 #define memmovedownw(dst, src, n_words) __memmovedownw_chk(dst, src, n_words, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmoveupl_chk
 #undef memmoveupl
 #define memmoveupl(dst, src, n_dwords) __memmoveupl_chk(dst, src, n_dwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmovedownl_chk
 #undef memmovedownl
 #define memmovedownl(dst, src, n_dwords) __memmovedownl_chk(dst, src, n_dwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmoveupw_chk
 #undef mempmoveupw
 #define mempmoveupw(dst, src, n_words) __mempmoveupw_chk(dst, src, n_words, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmovedownw_chk
 #undef mempmovedownw
 #define mempmovedownw(dst, src, n_words) __mempmovedownw_chk(dst, src, n_words, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmoveupl_chk
 #undef mempmoveupl
 #define mempmoveupl(dst, src, n_dwords) __mempmoveupl_chk(dst, src, n_dwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmovedownl_chk
 #undef mempmovedownl
 #define mempmovedownl(dst, src, n_dwords) __mempmovedownl_chk(dst, src, n_dwords, __ssp_bos0(dst))
-#endif /* ... */
 #endif /* __USE_KOS */
 #ifdef __UINT64_TYPE__
-#ifdef __CRT_HAVE___memcpyq_chk
 #undef memcpyq
 #define memcpyq(dst, src, n_qwords) __memcpyq_chk(dst, src, n_qwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempcpyq_chk
 #undef mempcpyq
 #define mempcpyq(dst, src, n_qwords) __mempcpyq_chk(dst, src, n_qwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmoveq_chk
 #undef memmoveq
 #define memmoveq(dst, src, n_qwords) __memmoveq_chk(dst, src, n_qwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmoveq_chk
 #undef mempmoveq
 #define mempmoveq(dst, src, n_qwords) __mempmoveq_chk(dst, src, n_qwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memsetq_chk
 #undef memsetq
 #define memsetq(dst, qword, n_qwords) __memsetq_chk(dst, qword, n_qwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempsetq_chk
 #undef mempsetq
 #define mempsetq(dst, qword, n_qwords) __mempsetq_chk(dst, qword, n_qwords, __ssp_bos0(dst))
-#endif /* ... */
 #ifdef __USE_KOS
-#ifdef __CRT_HAVE___memmoveupq_chk
 #undef memmoveupq
 #define memmoveupq(dst, src, n_qwords) __memmoveupq_chk(dst, src, n_qwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___memmovedownq_chk
 #undef memmovedownq
 #define memmovedownq(dst, src, n_qwords) __memmovedownq_chk(dst, src, n_qwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmoveupq_chk
 #undef mempmoveupq
 #define mempmoveupq(dst, src, n_qwords) __mempmoveupq_chk(dst, src, n_qwords, __ssp_bos0(dst))
-#endif /* ... */
-#ifdef __CRT_HAVE___mempmovedownq_chk
 #undef mempmovedownq
 #define mempmovedownq(dst, src, n_qwords) __mempmovedownq_chk(dst, src, n_qwords, __ssp_bos0(dst))
-#endif /* ... */
 #endif /* __USE_KOS */
 #endif /* __UINT64_TYPE__ */
 #endif /* __USE_STRING_BWLQ */
@@ -881,40 +777,40 @@ __NAMESPACE_STD_USING(__forward_voidp)
 #define strcpy(buf, src)                                                                      \
 	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___strcpy_chk(buf, src, __ssp_bos0(buf)) \
 	                                      : __strcpy_chk(buf, src, __ssp_bos0(buf)))
-#elif defined(__CRT_HAVE___strcpy_chk)
+#else /* ... */
 #undef strcpy
 #define strcpy(buf, src) __strcpy_chk(buf, src, __ssp_bos0(buf))
-#endif /* ... */
+#endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcat) && \
      defined(__CRT_HAVE___strcat_chk) && __has_builtin(__builtin___strcat_chk))
 #undef strcat
 #define strcat(buf, src)                                                                      \
 	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___strcat_chk(buf, src, __ssp_bos0(buf)) \
 	                                      : __strcat_chk(buf, src, __ssp_bos0(buf)))
-#elif defined(__CRT_HAVE___strcat_chk)
+#else /* ... */
 #undef strcat
 #define strcat(buf, src) __strcat_chk(buf, src, __ssp_bos0(buf))
-#endif /* ... */
+#endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy) && \
      defined(__CRT_HAVE___strncpy_chk) && __has_builtin(__builtin___strncpy_chk))
 #undef strncpy
 #define strncpy(buf, src, buflen)                                                                      \
 	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___strncpy_chk(buf, src, buflen, __ssp_bos0(buf)) \
 	                                      : __strncpy_chk(buf, src, buflen, __ssp_bos0(buf)))
-#elif defined(__CRT_HAVE___strncpy_chk)
+#else /* ... */
 #undef strncpy
 #define strncpy(buf, src, buflen) __strncpy_chk(buf, src, buflen, __ssp_bos0(buf))
-#endif /* ... */
+#endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncat) && \
      defined(__CRT_HAVE___strncat_chk) && __has_builtin(__builtin___strncat_chk))
 #undef strncat
 #define strncat(buf, src, buflen)                                                                      \
 	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___strncat_chk(buf, src, buflen, __ssp_bos0(buf)) \
 	                                      : __strncat_chk(buf, src, buflen, __ssp_bos0(buf)))
-#elif defined(__CRT_HAVE___strncat_chk)
+#else /* ... */
 #undef strncat
 #define strncat(buf, src, buflen) __strncat_chk(buf, src, buflen, __ssp_bos0(buf))
-#endif /* ... */
+#endif /* !... */
 #ifdef __USE_XOPEN2K8
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpcpy) && \
      defined(__CRT_HAVE___stpcpy_chk) && __has_builtin(__builtin___stpcpy_chk))
@@ -922,20 +818,20 @@ __NAMESPACE_STD_USING(__forward_voidp)
 #define stpcpy(buf, src)                                                                      \
 	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___stpcpy_chk(buf, src, __ssp_bos0(buf)) \
 	                                      : __stpcpy_chk(buf, src, __ssp_bos0(buf)))
-#elif defined(__CRT_HAVE___stpcpy_chk)
+#else /* ... */
 #undef stpcpy
 #define stpcpy(buf, src) __stpcpy_chk(buf, src, __ssp_bos0(buf))
-#endif /* ... */
+#endif /* !... */
 #if (defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_stpncpy) && \
      defined(__CRT_HAVE___stpncpy_chk) && __has_builtin(__builtin___stpncpy_chk))
 #undef stpncpy
 #define stpncpy(buf, src, buflen)                                                                      \
 	(__ssp_bos0(buf) != (__SIZE_TYPE__)-1 ? __builtin___stpncpy_chk(buf, src, buflen, __ssp_bos0(buf)) \
 	                                      : __stpncpy_chk(buf, src, buflen, __ssp_bos0(buf)))
-#elif defined(__CRT_HAVE___stpncpy_chk)
+#else /* ... */
 #undef stpncpy
 #define stpncpy(buf, src, buflen) __stpncpy_chk(buf, src, buflen, __ssp_bos0(buf))
-#endif /* ... */
+#endif /* !... */
 #endif /* __USE_XOPEN2K8 */
 
 #endif /* __SSP_FORTIFY_LEVEL */

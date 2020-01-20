@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c0a3eca */
+/* HASH CRC-32:0x2ae87e4c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,8 +51,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__memmovec_chk))(void *__dst,
                                                             __SIZE_TYPE__ __elem_size,
                                                             __SIZE_TYPE__ __dst_objsize) {
 #line 65 "kos/src/libc/magic/ssp.string.c"
-	(void)__dst_objsize;
-	__ssp_chk_dstbuf("__memmovec_chk", __dst, __elem_count * __elem_size, __dst_objsize);
+	__ssp_chk_dstbuf("memmovec", __dst, __elem_count * __elem_size, __dst_objsize);
 	return __localdep_memmovec(__dst, __src, __elem_count, __elem_size);
 }
 
