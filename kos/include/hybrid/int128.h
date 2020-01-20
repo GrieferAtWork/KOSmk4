@@ -160,20 +160,27 @@
 #define __hybrid_uint128_isone(var)                  ((var) == (__UINT128_TYPE__)1)
 #define __hybrid_int128_setminusone(var)             (void)((var) = (__INT128_TYPE__)-1)
 #define __hybrid_int128_isminusone(var)              ((var) == (__INT128_TYPE__)-1)
-#define __hybrid_int128_setmin(var)                  (void)((var) = (__INT128_TYPE__)__PRIVATE_MIN_S16)
-#define __hybrid_int128_ismin(var)                   ((var) == (__INT128_TYPE__)__PRIVATE_MIN_S16)
-#define __hybrid_int128_setmax(var)                  (void)((var) = (__INT128_TYPE__)__PRIVATE_MIN_S16)
-#define __hybrid_int128_ismax(var)                   ((var) == (__INT128_TYPE__)__PRIVATE_MAX_S16)
-#define __hybrid_int128_setzero_minus_min(var)       (void)((var) = (__INT128_TYPE__)((__UINT128_TYPE__)0 - __PRIVATE_MIN_S16))
-#define __hybrid_int128_iszero_minus_min(var)        ((var) == (__INT128_TYPE__)((__UINT128_TYPE__)0 - __PRIVATE_MIN_S16))
+#ifdef __PRIVATE_MIN_S16
+#define __PRIVATE_HYBRID_INT128_SMIN (__INT128_TYPE__)__PRIVATE_MIN_S16
+#define __PRIVATE_HYBRID_INT128_SMAX (__INT128_TYPE__)__PRIVATE_MAX_S16
+#else /* __PRIVATE_MIN_S16 */
+#define __PRIVATE_HYBRID_INT128_SMIN ((__INT128_TYPE__)__INT64_C(0x8000000000000000) << 64)
+#define __PRIVATE_HYBRID_INT128_SMAX (((__INT128_TYPE__)__INT64_C(0x7fffffffffffffff) << 64) | (__INT128_TYPE__)__UINT64_C(0xffffffffffffffff))
+#endif /* !__PRIVATE_MIN_S16 */
+#define __hybrid_int128_setmin(var)                  (void)((var) = __PRIVATE_HYBRID_INT128_SMIN)
+#define __hybrid_int128_ismin(var)                   ((var) == __PRIVATE_HYBRID_INT128_SMIN)
+#define __hybrid_int128_setmax(var)                  (void)((var) = __PRIVATE_HYBRID_INT128_SMAX)
+#define __hybrid_int128_ismax(var)                   ((var) == __PRIVATE_HYBRID_INT128_SMAX)
+#define __hybrid_int128_setzero_minus_min(var)       (void)((var) = (__INT128_TYPE__)((__UINT128_TYPE__)0 - __PRIVATE_HYBRID_INT128_SMIN))
+#define __hybrid_int128_iszero_minus_min(var)        ((var) == (__INT128_TYPE__)((__UINT128_TYPE__)0 - __PRIVATE_HYBRID_INT128_SMIN))
 #define __hybrid_uint128_setmin                      __hybrid_uint128_setzero
 #define __hybrid_uint128_ismax(var)                  ((var) == (__UINT128_TYPE__)-1)
 #define __hybrid_uint128_ismin                       __hybrid_uint128_iszero
 #define __hybrid_uint128_setmax(var)                 ((var) == (__UINT128_TYPE__)-1)
 #define __hybrid_uint128_is8bit(var)                 ((__UINT128_TYPE__)(var) <= __UINT8_C(0xff))
-#define __hybrid_uint128_is16bit(var)                ((__UINT128_TYPE__)(var) <= __UINT8_C(0xffff))
-#define __hybrid_uint128_is32bit(var)                ((__UINT128_TYPE__)(var) <= __UINT8_C(0xffffff))
-#define __hybrid_uint128_is64bit(var)                ((__UINT128_TYPE__)(var) <= __UINT8_C(0xffffffff))
+#define __hybrid_uint128_is16bit(var)                ((__UINT128_TYPE__)(var) <= __UINT16_C(0xffff))
+#define __hybrid_uint128_is32bit(var)                ((__UINT128_TYPE__)(var) <= __UINT32_C(0xffffffff))
+#define __hybrid_uint128_is64bit(var)                ((__UINT128_TYPE__)(var) <= __UINT64_C(0xffffffffffffffff))
 #define __hybrid_int128_is8bit(var)                  ((__INT128_TYPE__)(var) >= __PRIVATE_MIN_S1 && (__INT128_TYPE__)(var) <= __PRIVATE_MAX_S1)
 #define __hybrid_int128_is16bit(var)                 ((__INT128_TYPE__)(var) >= __PRIVATE_MIN_S2 && (__INT128_TYPE__)(var) <= __PRIVATE_MAX_S2)
 #define __hybrid_int128_is32bit(var)                 ((__INT128_TYPE__)(var) >= __PRIVATE_MIN_S4 && (__INT128_TYPE__)(var) <= __PRIVATE_MAX_S4)
