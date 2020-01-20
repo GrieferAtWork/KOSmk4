@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8b7b942 */
+/* HASH CRC-32:0x4fb3b82a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -266,13 +266,18 @@ __NAMESPACE_STD_USING(wmempmove)
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
 #include <bits/mbstate.h>
+
 #ifdef __USE_KOS
 #include <parts/malloca.h>
 #endif /* __USE_KOS */
+
 #ifdef __USE_DOS
-#include <crtdefs.h>
+#include <bits/types.h>
 #include <parts/errno.h>
+
+#include <crtdefs.h>
 #endif /* __USE_DOS */
 
 __SYSDECL_BEGIN

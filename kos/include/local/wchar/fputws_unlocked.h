@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd752b5b5 */
+/* HASH CRC-32:0x2d519dcc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fputws_unlocked) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(fputws_unlocked))(__WCHAR_TYPE__ const *__restrict __string,
                                                 __FILE *__restrict __stream) __THROWS(...) {
-#line 1100 "kos/src/libc/magic/wchar.c"
+#line 1105 "kos/src/libc/magic/wchar.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__result = __localdep_file_wprinter_unlocked(__stream, __string, __localdep_wcslen(__string));
 	return __result;

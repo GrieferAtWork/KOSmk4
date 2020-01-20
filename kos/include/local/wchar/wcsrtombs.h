@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbe9b867 */
+/* HASH CRC-32:0xba22c3ec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsrtombs))(char *__dst,
                                                        __WCHAR_TYPE__ const **__restrict __psrc,
                                                        __SIZE_TYPE__ __dstlen,
                                                        __mbstate_t *__ps) {
-#line 296 "kos/src/libc/magic/wchar.c"
+#line 301 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __result = 0;
 	__WCHAR_TYPE__ const *__src = *__psrc;
 	while (__dstlen) {

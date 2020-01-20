@@ -40,13 +40,18 @@ typedef size_t rsize_t;
 
 %{
 #include <features.h>
+
 #include <bits/mbstate.h>
+
 #ifdef __USE_KOS
 #include <parts/malloca.h>
 #endif /* __USE_KOS */
+
 #ifdef __USE_DOS
-#include <crtdefs.h>
+#include <bits/types.h>
 #include <parts/errno.h>
+
+#include <crtdefs.h>
 #endif /* __USE_DOS */
 
 __SYSDECL_BEGIN

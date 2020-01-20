@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba8f2c41 */
+/* HASH CRC-32:0xeb066f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __LOCAL_LIBC(file_c16printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBDCALL __LIBC_LOCAL_NAME(file_c16printer))(void *__arg,
                                                 __CHAR16_TYPE__ const *__restrict __data,
                                                 __SIZE_TYPE__ __datalen) __THROWS(...) {
-#line 1142 "kos/src/libc/magic/wchar.c"
+#line 1147 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
 		if (__localdep_fputc16(__data[__i], (__FILE *)__arg) == __WEOF)
