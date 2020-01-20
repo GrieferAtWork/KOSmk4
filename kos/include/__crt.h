@@ -552,10 +552,16 @@ __DECL_END
 #undef __builtin_unreachable
 #if __has_builtin(__builtin_unreachable)
 #define __builtin_unreachable() (__crt_unreachable(), __builtin_unreachable())
-#else /* __builtin_unreachable */
+#else /* __has_builtin(__builtin_unreachable) */
 #define __builtin_unreachable() __crt_unreachable()
-#endif /* !__builtin_unreachable */
+#endif /* !__has_builtin(__builtin_unreachable) */
 #endif /* __BUILDING_LIBC || __CRT_HAVE___crt_unreachable */
 #endif /* __CC__ */
+
+/* Include __stub_XXX definitions (checked by configure scripts) */
+#ifdef __CRT_KOS_NATIVE
+#include <gnu/stubs.h>
+#endif /* __CRT_KOS_NATIVE */
+
 
 #endif /* !___CRT_H */

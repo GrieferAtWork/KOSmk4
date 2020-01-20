@@ -20,6 +20,7 @@
 #ifndef _LIMITS_H
 #define _LIMITS_H 1
 
+#include <__crt.h> /* Must be here because some programs need <limits.h> to `#define __stub_XXX' macros. */
 #include <__stdinc.h>
 #include <features.h>
 
