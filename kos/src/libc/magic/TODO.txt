@@ -7,6 +7,16 @@ Add support for *_chk variants (using __builtin_object_size())
 <langinfo.h>
 <nl_types.h>
 <tgmath.h>
+<fts.h>
+<ftw.h>
+<iconv.h>
+<lastlog.h>
+<link.h>
+<regexp.h>
+<resolv.h>
+<stab.h>
+<tar.h>
+<wordexp.h>
 
 <rpc/auth.h>
 <rpc/auth_des.h>
@@ -25,6 +35,7 @@ Add support for *_chk variants (using __builtin_object_size())
 <rpc/xdr.h>
 
 <sys/capability.h>  (found in /usr/include/sys/capability.h; aka not in arch-headers!)
+<sys/kdaemon.h>
 <sys/fanotify.h>
 <sys/gmon.h>
 <sys/gmon_out.h>  (Only some macros, and structs)
@@ -33,6 +44,7 @@ Add support for *_chk variants (using __builtin_object_size())
 <sys/perm.h>  (i386-only header)
 <sys/prctl.h>
 <sys/profil.h>
+<sys/personality.h>
 <sys/queue.h> (It's just like our <hybrid/sequence/list.h>)
 <sys/quota.h>
 <sys/raw.h>  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
@@ -40,6 +52,8 @@ Add support for *_chk variants (using __builtin_object_size())
 <sys/signalfd.h>
 <sys/sysctl.h>
 <sys/vtimes.h>
+<sys/soundcard.h>
+<sys/termios.h>
 
 <gnu/libc-version.h>
 
