@@ -32,12 +32,21 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <link.h>
 #include <malloc.h>
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
 
 DECL_BEGIN
+
+/* Make sure that offsets in `struct link_map' are correct. */
+STATIC_ASSERT(offsetof(struct link_map, l_addr) == offsetof(DlModule, dm_loadaddr));
+STATIC_ASSERT(offsetof(struct link_map, l_name) == offsetof(DlModule, dm_filename));
+STATIC_ASSERT(offsetof(struct link_map, l_ld) == offsetof(DlModule, dm_dynhdr));
+STATIC_ASSERT(offsetof(struct link_map, l_next) == offsetof(DlModule, dm_modules_next));
+STATIC_ASSERT(offsetof(struct link_map, l_prev) == offsetof(DlModule, dm_modules_prev));
+
 
 INTERN ElfW(Shdr) empty_shdr[1] = { 0 };
 
