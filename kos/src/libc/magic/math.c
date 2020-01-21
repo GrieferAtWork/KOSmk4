@@ -24,15 +24,21 @@
 %(c, ccompat)#ifndef __NO_FPU
 %{
 #include <features.h>
+
 #include <hybrid/typecore.h>
-#include <bits/math-vector.h>
+
 #include <bits/huge_val.h>
+#include <bits/math-vector.h>
+
+#include <ieee754.h>
+
 #ifdef __USE_ISOC99
 #include <bits/huge_valf.h>
 #include <bits/huge_vall.h>
 #include <bits/inf.h>
 #include <bits/nan.h>
 #endif /* __USE_ISOC99 */
+
 #include <bits/mathdef.h>
 
 /* Documentation comments have been taken from GLIBc */
@@ -101,33 +107,33 @@ __SYSDECL_BEGIN
 
 @@Arc cosine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acos)][nothrow]
-[crtbuiltin] acos:(double x) -> double;
+[crtbuiltin] acos:(double x) -> double; /* TODO */
 
 @@Arc sine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asin)][nothrow]
-[crtbuiltin] asin:(double x) -> double;
+[crtbuiltin] asin:(double x) -> double; /* TODO */
 
 @@Arc tangent of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan)][nothrow]
-[crtbuiltin] atan:(double x) -> double;
+[crtbuiltin] atan:(double x) -> double; /* TODO */
 
 @@Arc tangent of Y/X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan2)][nothrow]
-[crtbuiltin] atan2:(double y, double x) -> double;
+[crtbuiltin] atan2:(double y, double x) -> double; /* TODO */
 
 @@Cosine of X
 [attribute(@__DECL_SIMD_cos@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__cos)][nothrow]
-[crtbuiltin] cos:(double x) -> double;
+[crtbuiltin] cos:(double x) -> double; /* TODO */
 
 @@Sine of X
 [attribute(@__DECL_SIMD_sin@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__sin)][nothrow]
-[crtbuiltin] sin:(double x) -> double;
+[crtbuiltin] sin:(double x) -> double; /* TODO */
 
 @@Tangent of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__tan)][nothrow]
-[crtbuiltin] tan:(double x) -> double;
+[crtbuiltin] tan:(double x) -> double; /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosf)][nothrow][crtbuiltin] acosf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinf)][nothrow][crtbuiltin] asinf:(float x) -> float %{auto_block(math)}
@@ -151,15 +157,15 @@ __SYSDECL_BEGIN
 
 @@Hyperbolic cosine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__cosh)][nothrow]
-[crtbuiltin] cosh:(double x) -> double;
+[crtbuiltin] cosh:(double x) -> double; /* TODO */
 
 @@Hyperbolic sine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinh)][nothrow]
-[crtbuiltin] sinh:(double x) -> double;
+[crtbuiltin] sinh:(double x) -> double; /* TODO */
 
 @@Hyperbolic tangent of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanh)][nothrow]
-[crtbuiltin] tanh:(double x) -> double;
+[crtbuiltin] tanh:(double x) -> double; /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__coshf)][nothrow][crtbuiltin] coshf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinhf)][nothrow][crtbuiltin] sinhf:(float x) -> float %{auto_block(math)}
@@ -174,15 +180,15 @@ __SYSDECL_BEGIN
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Hyperbolic arc cosine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosh)][nothrow]
-[crtbuiltin] acosh:(double x) -> double;
+[crtbuiltin] acosh:(double x) -> double; /* TODO */
 
 @@Hyperbolic arc sine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinh)][nothrow]
-[crtbuiltin] asinh:(double x) -> double;
+[crtbuiltin] asinh:(double x) -> double; /* TODO */
 
 @@Hyperbolic arc tangent of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanh)][nothrow]
-[crtbuiltin] atanh:(double x) -> double;
+[crtbuiltin] atanh:(double x) -> double; /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acoshf)][nothrow][crtbuiltin] acoshf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinhf)][nothrow][crtbuiltin] asinhf:(float x) -> float %{auto_block(math)}
@@ -200,28 +206,28 @@ __SYSDECL_BEGIN
 @@Exponential function of X
 [attribute(@__DECL_SIMD_exp@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp)][nothrow]
-[crtbuiltin] exp:(double x) -> double;
+[crtbuiltin] exp:(double x) -> double; /* TODO */
 
 @@Break VALUE into a normalized fraction and an integral power of 2
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__frexp)]
-[crtbuiltin] frexp:(double x, int *pexponent) -> double;
+[crtbuiltin] frexp:(double x, int *pexponent) -> double; /* TODO */
 
 @@X times (two to the EXP power)
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexp)][nothrow]
-[crtbuiltin] ldexp:(double x, int exponent) -> double;
+[crtbuiltin] ldexp:(double x, int exponent) -> double; /* TODO */
 
 @@Natural logarithm of X
 [attribute(@__DECL_SIMD_log@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log)][nothrow]
-[crtbuiltin] log:(double x) -> double;
+[crtbuiltin] log:(double x) -> double; /* TODO */
 
 @@Base-ten logarithm of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log10)][nothrow]
-[crtbuiltin] log10:(double x) -> double;
+[crtbuiltin] log10:(double x) -> double; /* TODO */
 
 @@Break VALUE into integral and fractional parts
 [std][ATTR_WUNUSED][alias(__modf)]
-[crtbuiltin] modf:(double x, [nonnull] double *iptr) -> double;
+[crtbuiltin] modf:(double x, [nonnull] double *iptr) -> double; /* TODO */
 
 [attribute(@__DECL_SIMD_expf@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expf)][nothrow]
@@ -250,7 +256,7 @@ modff:(float x, [nonnull] float *iptr) -> float
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__logl)][nothrow][crtbuiltin] logl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log10l)][nothrow][crtbuiltin] log10l:(long double x) -> long double %{auto_block(math)}
 [std][alias(__modfl)]
-[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(__modf, modf)]
+[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__modf, modf)]
 [doc_alias(modf)][requires($has_function(modf))][crtbuiltin]
 modfl:(long double x, [nonnull] long double *iptr) -> long double
 %{auto_block(any({
@@ -265,13 +271,16 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Return exp(X) - 1
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1)][nothrow][crtbuiltin] expm1:(double x) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1)][nothrow]
+[crtbuiltin] expm1:(double x) -> double; /* TODO */
 
 @@Return log(1 + X)
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1p)][nothrow][crtbuiltin] log1p:(double x) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1p)][nothrow]
+[crtbuiltin] log1p:(double x) -> double; /* TODO */
 
 @@Return the base 2 signed integral exponent of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logb, _logb)][nothrow][crtbuiltin] logb:(double x) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logb, _logb)][nothrow]
+[crtbuiltin] logb:(double x) -> double; /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1f)][nothrow][crtbuiltin] expm1f:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pf)][nothrow][crtbuiltin] log1pf:(float x) -> float %{auto_block(math)}
@@ -286,10 +295,12 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 %(std, c)
 %(std, c, ccompat)#ifdef __USE_ISOC99
 @@Compute base-2 exponential of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2)][nothrow][crtbuiltin] exp2:(double x) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2)][nothrow]
+[crtbuiltin] exp2:(double x) -> double; /* TODO */
 
 @@Compute base-2 logarithm of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2)][nothrow][crtbuiltin] log2:(double x) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2)][nothrow]
+[crtbuiltin] log2:(double x) -> double; /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2f)][nothrow][crtbuiltin] exp2f:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2f)][nothrow][crtbuiltin] log2f:(float x) -> float %{auto_block(math)}
@@ -303,10 +314,12 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 %(std, c)/* Power functions. */
 @@Return X to the Y power
 [attribute(@__DECL_SIMD_pow@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__pow)][nothrow][crtbuiltin] pow:(double x, double y) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__pow)][nothrow]
+[crtbuiltin] pow:(double x, double y) -> double; /* TODO */
 
 @@Return the square root of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sqrt)][nothrow][crtbuiltin] sqrt:(double x) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sqrt)][nothrow]
+[crtbuiltin] sqrt:(double x) -> double; /* TODO */
 
 [attribute(@__DECL_SIMD_powf@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__powf)][nothrow][crtbuiltin] powf:(float x, float y) -> float %{auto_block(math)}
@@ -320,7 +333,7 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 @@Return `sqrt(X*X + Y*Y)'
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__hypot)][nothrow][crtbuiltin] hypot:(double x, double y) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__hypot)][nothrow][crtbuiltin] hypot:(double x, double y) -> double; /* TODO */
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__hypotf)][nothrow][crtbuiltin] hypotf:(float x, float y) -> float %{auto_block(math)}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__hypotl)][nothrow][crtbuiltin] hypotl:(long double x, long double y) -> long double %{auto_block(math)}
@@ -330,7 +343,9 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Return the cube root of X
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__cbrt)][crtbuiltin] cbrt:(double x) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__cbrt)]
+[crtbuiltin] cbrt:(double x) -> double; /* TODO */
+
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__cbrtf)][crtbuiltin] cbrtf:(float x) -> float %{auto_block(math)}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__cbrtl)][crtbuiltin] cbrtl:(long double x) -> long double %{auto_block(math)}
@@ -369,18 +384,44 @@ floor:(double x) -> double {
 }
 
 @@Floating-point modulo remainder of X/Y
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__fmod)][crtbuiltin]
-fmod:(double x, double y) -> double;
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmod)][crtbuiltin]
+[requires_include(<ieee754.h>)][decl_include(<libm/fmod.h>)][userimpl]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+fmod:(double x, double y) -> double {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+}
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__ceilf)][crtbuiltin] ceilf:(float x) -> float %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fabsf)][crtbuiltin] fabsf:(float x) -> float %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__floorf)][crtbuiltin] floorf:(float x) -> float %{copy(%auto, math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__fmodf)][crtbuiltin] fmodf:(float x, float y) -> float %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmodf)]
+[requires_include(<ieee754.h>)][decl_include(<libm/fmod.h>)][userimpl]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+[crtbuiltin] fmodf:(float x, float y) -> float {
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+}
+
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__ceill)][crtbuiltin] ceill:(long double x) -> long double %{copy(%auto, math)}
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fabsl)][crtbuiltin] fabsl:(long double x) -> long double %{copy(%auto, math)}
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__floorl)][crtbuiltin] floorl:(long double x) -> long double %{copy(%auto, math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__fmodl)][crtbuiltin] fmodl:(long double x, long double y) -> long double %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__ceill)]
+[crtbuiltin] ceill:(long double x) -> long double %{copy(%auto, math)}
+
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fabsl)]
+[crtbuiltin] fabsl:(long double x) -> long double %{copy(%auto, math)}
+
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__floorl)]
+[crtbuiltin] floorl:(long double x) -> long double %{copy(%auto, math)}
+
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmodl)]
+[crtbuiltin] fmodl:(long double x, long double y) -> long double %{auto_block(math)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 
@@ -413,9 +454,14 @@ fmod:(double x, double y) -> double;
 %(std, c)
 %(std, c)/* Error and gamma functions. */
 %(std, c, ccompat)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erf)][crtbuiltin] erf:(double x) -> double;
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfc)][crtbuiltin] erfc:(double x) -> double;
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lgamma, __gamma, gamma)][crtbuiltin] lgamma:(double x) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erf)]
+[crtbuiltin] erf:(double x) -> double; /* TODO */
+
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfc)]
+[crtbuiltin] erfc:(double x) -> double; /* TODO */
+
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lgamma, __gamma, gamma)]
+[crtbuiltin] lgamma:(double x) -> double; /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erff)][crtbuiltin] erff:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfcf)][crtbuiltin] erfcf:(float x) -> float %{auto_block(math)}
@@ -429,7 +475,9 @@ fmod:(double x, double y) -> double;
 
 %(std, c, ccompat)#ifdef __USE_ISOC99
 @@True gamma function
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgamma)][crtbuiltin] tgamma:(double x) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgamma)]
+[crtbuiltin] tgamma:(double x) -> double; /* TODO */
+
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgammaf)][crtbuiltin] tgammaf:(float x) -> float %{auto_block(math)}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgammal)][crtbuiltin] tgammal:(long double x) -> long double %{auto_block(math)}
@@ -439,16 +487,20 @@ fmod:(double x, double y) -> double;
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Return the integer nearest X in the direction of the prevailing rounding mode
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__rint)][crtbuiltin] rint:(double x) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__rint)]
+[crtbuiltin] rint:(double x) -> double; /* TODO */
 
 @@Return X + epsilon if X < Y, X - epsilon if X > Y
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafter, _nextafter)][crtbuiltin] nextafter:(double x, double y) -> double;
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafter, _nextafter)]
+[crtbuiltin] nextafter:(double x, double y) -> double; /* TODO */
 
 @@Return the remainder of integer divison X / Y with infinite precision
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainder)][crtbuiltin] remainder:(double x, double y) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainder)]
+[crtbuiltin] remainder:(double x, double y) -> double; /* TODO */
 
 @@Return the binary exponent of X, which must be nonzero
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogb)][crtbuiltin] ilogb:(double x) -> int;
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogb)]
+[crtbuiltin] ilogb:(double x) -> int; /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__rintf)][crtbuiltin] rintf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterf)][crtbuiltin] nextafterf:(float x, float y) -> float %{auto_block(math)}
@@ -465,26 +517,26 @@ fmod:(double x, double y) -> double;
 %(std, c)
 %(std, c, ccompat)#ifdef __USE_ISOC99
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttoward)][crtbuiltin]
-nexttoward:(double x, long double y) -> double;
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttoward)]
+[crtbuiltin] nexttoward:(double x, long double y) -> double; /* TODO */
 
 @@Return X times (2 to the Nth power)
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbn)][crtbuiltin]
-scalbn:(double x, int n) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbn)]
+[crtbuiltin] scalbn:(double x, int n) -> double; /* TODO */
 
 @@Return X times (2 to the Nth power)
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbln)][crtbuiltin]
-scalbln:(double x, long int n) -> double;
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbln)]
+[crtbuiltin] scalbln:(double x, long int n) -> double; /* TODO */
 
 @@Round X to integral value in floating-point format using current
 @@rounding direction, but do not raise inexact exception
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__nearbyint)][crtbuiltin]
-nearbyint:(double x) -> double;
+nearbyint:(double x) -> double; /* TODO */
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__round)]
-[dependency_include(<hybrid/typecore.h>)][crtbuiltin]
-round:(double x) -> double {
+[dependency_include(<hybrid/typecore.h>)]
+[crtbuiltin] round:(double x) -> double {
 	double result;
 	result = (double)(__INTMAX_TYPE__)x;
 	if (x < 0) {
@@ -511,14 +563,15 @@ trunc:(double x) -> double {
 @@of x/y and magnitude congruent `mod 2^n' to the magnitude of
 @@the integral quotient x/y, with n >= 3
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remquo)]
-[crtbuiltin] remquo:(double x, double y, int *pquo) -> double;
+[crtbuiltin] remquo:(double x, double y, int *pquo) -> double; /* TODO */
 
 @@Round X to nearest integral value according to current rounding direction
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lrint)][crtbuiltin] lrint:(double x) -> long int;
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lrint)]
+[crtbuiltin] lrint:(double x) -> long int; /* TODO */
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lround)][crtbuiltin]
-lround:(double x) -> long int {
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__lround)]
+[crtbuiltin] lround:(double x) -> long int {
 	return (long int)round(x);
 }
 
@@ -548,12 +601,12 @@ fdim:(double x, double y) -> double {
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 @@Round X to nearest integral value according to current rounding direction
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llrint)][crtbuiltin]
-llrint:(double x) -> __LONGLONG;
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llrint)]
+[crtbuiltin] llrint:(double x) -> __LONGLONG; /* TODO */
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llround)][crtbuiltin]
-llround:(double x) -> __LONGLONG {
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__llround)]
+[crtbuiltin] llround:(double x) -> __LONGLONG {
 	return (__LONGLONG)round(x);
 }
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
@@ -750,16 +803,17 @@ llround:(double x) -> __LONGLONG {
 %
 %#ifdef __USE_GNU
 @@Cosine and sine of X
-[alias(__sincos)][nothrow][crtbuiltin]
+[alias(__sincos)][nothrow]
 [attribute(@__DECL_SIMD_sincos@)][decl_include(<bits/math-vector.h>)]
-sincos:(double x, [nonnull] double *psinx, [nonnull] double *pcosx);
-
+[crtbuiltin] sincos:(double x, [nonnull] double *psinx, [nonnull] double *pcosx); /* TODO */
 
 @@A function missing in all standards: compute exponent to base ten
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10)] exp10:(double x) -> double;
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10)]
+[crtbuiltin] exp10:(double x) -> double; /* TODO */
 
 @@Another name occasionally used
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10)] pow10:(double x) -> double;
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10)]
+[crtbuiltin] pow10:(double x) -> double; /* TODO */
 
 [alias(__sincosf)][nothrow][doc_alias(sincos)]
 [attribute(@__DECL_SIMD_sincosf@)][decl_include(<bits/math-vector.h>)]
@@ -776,7 +830,7 @@ sincosf:(float x, [nonnull] float *psinx, [nonnull] float *pcosx)
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [alias(__sincosl)][nothrow][doc_alias(sincos)]
 [attribute(@__DECL_SIMD_sincosl@)][decl_include(<bits/math-vector.h>)]
-[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(__sincos, sincos)]
+[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__sincos, sincos)]
 [requires($has_function(sincos))][crtbuiltin]
 sincosl:(long double x, [nonnull] long double *psinx, [nonnull] long double *pcosx)
 %{auto_block(any({
@@ -810,27 +864,29 @@ isinff:(float val) -> int {
 }
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isinfl)]
-[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(__isinf, isinf)]
-[dependency_include(<bits/huge_vall.h>)][crtbuiltin]
-isinfl:(long double val) -> int {
+[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__isinf, isinf)]
+[dependency_include(<bits/huge_vall.h>)]
+[crtbuiltin] isinfl:(long double val) -> int {
 	return val == @HUGE_VALL@;
 }
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 @@Return nonzero if VALUE is finite and not NaN
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finite, _finite)][crtbuiltin]
-finite:(double val) -> int {
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finite, _finite)]
+[crtbuiltin] finite:(double val) -> int {
 	return !isinf(val) && !isnan(val);
 }
 
 @@Return the remainder of X/Y
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__drem)] drem:(double x, double y) -> double;
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__drem)]
+[crtbuiltin] drem:(double x, double y) -> double; /* TODO */
 
 @@Return the fractional part of X after dividing out `ilogb (X)'
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significand)] significand:(double x) -> double;
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significand)]
+[crtbuiltin] significand:(double x) -> double; /* TODO */
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitef)][crtbuiltin]
-finitef:(float val) -> int  {
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitef)]
+[crtbuiltin] finitef:(float val) -> int  {
 	return !isinff(val) && !isnanf(val);
 }
 
@@ -839,7 +895,7 @@ finitef:(float val) -> int  {
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitel)][crtbuiltin]
-[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(__finite, finite)]
+[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__finite, finite)]
 finitel:(long double val) -> int {
 	return !isinfl(val) && !isnanl(val);
 }
@@ -866,7 +922,7 @@ isnanf:(float val) -> int {
 }
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isnanl)]
-[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(__isnan, _isnan, isnan)]
+[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__isnan, _isnan, isnan)]
 [dependency_include(<bits/nan.h>)][crtbuiltin]
 isnanl:(long double val) -> int  {
 	return val == (long double)@NAN@;
@@ -877,12 +933,24 @@ isnanl:(long double val) -> int  {
 %
 %/* Bessel functions. */
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && __MATH_DECLARING_DOUBLE)
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j0)] j0:(double x) -> double;
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j1)] j1:(double x) -> double;
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__jn)] jn:(int n, double x) -> double;
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__y0)] y0:(double x) -> double;
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__y1)] y1:(double x) -> double;
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__yn)] yn:(int n, double x) -> double;
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j0)]
+[crtbuiltin] j0:(double x) -> double; /* TODO */
+
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j1)]
+[crtbuiltin] j1:(double x) -> double; /* TODO */
+
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__jn)]
+[crtbuiltin] jn:(int n, double x) -> double; /* TODO */
+
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__y0)]
+[crtbuiltin] y0:(double x) -> double; /* TODO */
+
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__y1)]
+[crtbuiltin] y1:(double x) -> double; /* TODO */
+
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__yn)]
+[crtbuiltin] yn:(int n, double x) -> double; /* TODO */
+
 
 [crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j0f)] j0f:(float x) -> float %{auto_block(math)}
 [crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__j1f)] j1f:(float x) -> float %{auto_block(math)}
@@ -912,9 +980,11 @@ isnanl:(long double val) -> int  {
 
 %#ifdef __USE_MISC
 @@Reentrant version of lgamma. This function uses the global variable
-@@`signgam'.  The reentrant version instead takes a pointer and stores
+@@`signgam'. The reentrant version instead takes a pointer and stores
 @@the value through it
-[crtbuiltin][ATTR_WUNUSED][alias(__lgamma_r)] lgamma_r:(double x, int *signgamp) -> double;
+[crtbuiltin][ATTR_WUNUSED][alias(__lgamma_r)]
+lgamma_r:(double x, int *signgamp) -> double; /* TODO */
+
 [crtbuiltin][ATTR_WUNUSED][alias(__lgammaf_r)] lgammaf_r:(float x, int *signgamp) -> float %{auto_block(math(float, lgamma_r))}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [crtbuiltin][ATTR_WUNUSED][alias(__lgammal_r)] lgammal_r:(long double x, int *signgamp) -> long double %{auto_block(math(long double, lgamma_r))}
@@ -924,15 +994,16 @@ isnanl:(long double val) -> int  {
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
 @@Return X times (2 to the Nth power)
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalb, _scalb)] scalb:(double x, double n) -> double;
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalb, _scalb)]
+[crtbuiltin] scalb:(double x, double n) -> double; /* TODO */
+
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 %#ifdef __USE_MISC
-@@Return X times (2 to the Nth power)
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbf, _scalbf)] scalbf:(float x, float n) -> float %{auto_block(math)}
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbf, _scalbf)]
+scalbf:(float x, float n) -> float %{auto_block(math)}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-@@Return X times (2 to the Nth power)
 [crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbl)]
-[if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(_scalb)]
+[if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(_scalb)]
 scalbl:(long double x, long double n) -> long double %{auto_block(math)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
@@ -1304,8 +1375,12 @@ scalbl:(long double x, long double n) -> long double %{auto_block(math)}
 %
 %/* Floating point classification */
 %#ifdef __USE_ISOC99
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_dclass)] __fpclassify:(double val) -> int;
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_dsign)] __signbit:(double val) -> int;
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_dclass)]
+__fpclassify:(double val) -> int; /* TODO */
+
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_dsign)]
+__signbit:(double val) -> int; /* TODO */
+
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_fdclass)] __fpclassifyf:(float val) -> int %{auto_block(math)}
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_fdsign)] __signbitf:(float val) -> int %{auto_block(math)}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -1316,16 +1391,22 @@ scalbl:(long double x, long double n) -> long double %{auto_block(math)}
 
 %
 %#ifdef __USE_GNU
-[ATTR_WUNUSED][ATTR_CONST][nothrow] __issignaling:(double val) -> int;
+[ATTR_WUNUSED][ATTR_CONST][nothrow]
+__issignaling:(double val) -> int; /* TODO */
+
 [ATTR_WUNUSED][ATTR_CONST][nothrow] __issignalingf:(float val) -> int %{auto_block(math)}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow] __issignalingl:(long double val) -> int %{auto_block(math)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
-[ignore][nouser][noexport][ATTR_WUNUSED][ATTR_CONST] _dpcomp:(double x, double y) -> int;
-[ignore][nouser][noexport][ATTR_WUNUSED][ATTR_CONST] _fdpcomp:(float x, float y) -> int %{auto_block(math(float, _dpcomp))}
-[ignore][nouser][noexport][ATTR_WUNUSED][ATTR_CONST] _ldpcomp:(long double x, long double y) -> int %{auto_block(math(long double, _dpcomp))}
+[ignore][nouser][noexport][ATTR_WUNUSED][ATTR_CONST]
+_dpcomp:(double x, double y) -> int; /* TODO */
+
+[ignore][nouser][noexport][ATTR_WUNUSED][ATTR_CONST]
+_fdpcomp:(float x, float y) -> int %{auto_block(math(float, _dpcomp))}
+[ignore][nouser][noexport][ATTR_WUNUSED][ATTR_CONST]
+_ldpcomp:(long double x, long double y) -> int %{auto_block(math(long double, _dpcomp))}
 
 [nocrt][nouser][noexport][attribute(*)] __dos_dpcomp:(*) = _dpcomp;
 [nocrt][nouser][noexport][attribute(*)] __dos_fdpcomp:(*) = _fdpcomp;
@@ -1373,10 +1454,10 @@ __LIBC int (signgam);
                                   sizeof((x) + (double)0) == sizeof(double) ? d((double)(x)) : l((long double)(x)))
 #define __FPFUNC2(x, y, f, d, l) (sizeof((x) + (y) + (float)0) == sizeof(float) ? f((float)(x), (float)(y)) : \
                                   sizeof((x) + (y) + (double)0) == sizeof(double) ? d((double)(x), (double)(y)) : l((long double)(x), (long double)(y)))
-#else
+#else /* ... */
 #define __FPFUNC(x, f, d, l)     (sizeof((x) + (float)0) == sizeof(float) ? f((float)(x)) : d((double)(x)))
 #define __FPFUNC2(x, y, f, d, l) (sizeof((x) + (y) + (float)0) == sizeof(float) ? f((float)(x), (float)(y)) : d((double)(x), (double)(y)))
-#endif
+#endif /* !... */
 
 #ifdef __USE_ISOC99
 /* Get the architecture specific values describing the floating-point
@@ -1433,16 +1514,16 @@ __LIBC int (signgam);
 #define fpclassify(x) __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x)
 #endif /* __builtin_fpclassify */
 #if __has_builtin(__builtin_isfinite)
-#define isfinite(x)   __builtin_isfinite(x)
+#define isfinite(x) __builtin_isfinite(x)
 #endif /* __builtin_isfinite */
 #if __has_builtin(__builtin_isnormal)
-#define isnormal(x)   __builtin_isnormal(x)
+#define isnormal(x) __builtin_isnormal(x)
 #endif /* __builtin_isnormal */
 #if __has_builtin(__builtin_isnan)
-#define isnan(x)      __builtin_isnan(x)
+#define isnan(x) __builtin_isnan(x)
 #endif /* __builtin_isnan */
 #if __has_builtin(__builtin_isinf_sign)
-#define isinf(x)      __builtin_isinf_sign(x)
+#define isinf(x) __builtin_isinf_sign(x)
 #endif /* __builtin_isinf_sign */
 #endif /* !__SUPPORT_SNAN__ */
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -1455,7 +1536,7 @@ __LIBC int (signgam);
 
 #ifndef signbit
 #if defined(__CRT_HAVE___signbit) || defined(__CRT_HAVE__dsign)
-#define signbit(x)    __FPFUNC(x, __signbitf, __signbit, __signbitl)
+#define signbit(x) __FPFUNC(x, __signbitf, __signbit, __signbitl)
 #endif /* __CRT_HAVE___signbit || __CRT_HAVE__dsign */
 #endif /* !signbit */
 
@@ -1467,25 +1548,25 @@ __LIBC int (signgam);
 
 #ifndef isfinite
 #if defined(__CRT_HAVE___finite)
-#   define isfinite(x)   __FPFUNC(x, __finitef, __finite, __finitel)
+#define isfinite(x) __FPFUNC(x, __finitef, __finite, __finitel)
 #elif defined(fpclassify) && defined(__CRT_DOS)
-#   define isfinite(x)  (fpclassify(x) <= 0)
+#define isfinite(x) (fpclassify(x) <= 0)
 #endif
 #endif /* !isfinite */
 
 #ifndef isnan
 #if defined(__CRT_HAVE___isnan)
-#   define isnan(x)      __FPFUNC(x, __isnanf, __isnan, __isnanl)
+#define isnan(x) __FPFUNC(x, __isnanf, __isnan, __isnanl)
 #elif defined(fpclassify)
-#   define isnan(x)     (fpclassify(x) == FP_NAN)
+#define isnan(x) (fpclassify(x) == FP_NAN)
 #endif
 #endif /* !isnan */
 
 #ifndef isinf
 #if defined(__CRT_HAVE___isinfo)
-#   define isinf(x)      __FPFUNC(x, __isinff, __isinf, __isinfl)
+#define isinf(x) __FPFUNC(x, __isinff, __isinf, __isinfl)
 #elif defined(fpclassify)
-#   define isinf(x)     (fpclassify(x) == FP_INFINITE)
+#define isinf(x) (fpclassify(x) == FP_INFINITE)
 #endif
 #endif /* !isinf */
 
@@ -1506,24 +1587,24 @@ __LIBC int (signgam);
 #define isless(x, y)         ((__DOS_FPCOMPARE(x, y)&1) != 0)
 #define islessequal(x, y)    ((__DOS_FPCOMPARE(x, y)&3) != 0)
 #define islessgreater(x, y)  ((__DOS_FPCOMPARE(x, y)&5) != 0)
-#define isunordered(x, y)     (__DOS_FPCOMPARE(x, y) == 0)
+#define isunordered(x, y)    (__DOS_FPCOMPARE(x, y) == 0)
 #endif
 
 
 /* Generic... */
 #ifndef isunordered
 #ifdef fpclassify
-#define isunordered(u, v)   (fpclassify(u) == FP_NAN || fpclassify(v) == FP_NAN)
+#define isunordered(u, v) (fpclassify(u) == FP_NAN || fpclassify(v) == FP_NAN)
 #else /* fpclassify */
-#define isunordered(u, v)    0
+#define isunordered(u, v) 0
 #endif /* !fpclassify */
 #endif /* !isunordered */
 
 #ifndef isgreater
 #ifdef __NO_XBLOCK
-#define isgreater(x, y)      (!isunordered(x, y) && (x) > (y))
+#define isgreater(x, y) (!isunordered(x, y) && (x) > (y))
 #else /* __NO_XBLOCK */
-#define isgreater(x, y)      __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x > __y; })
+#define isgreater(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x > __y; })
 #endif /* !__NO_XBLOCK */
 #endif /* !isgreater */
 
@@ -1537,25 +1618,25 @@ __LIBC int (signgam);
 
 #ifndef isless
 #ifdef __NO_XBLOCK
-#define isless(x, y)         (!isunordered(x, y) && (x) < (y))
+#define isless(x, y) (!isunordered(x, y) && (x) < (y))
 #else /* __NO_XBLOCK */
-#define isless(x, y)         __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x < __y; })
+#define isless(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x < __y; })
 #endif /* !__NO_XBLOCK */
 #endif /* !isless */
 
 #ifndef islessequal
 #ifdef __NO_XBLOCK
-#define islessequal(x, y)    (!isunordered(x, y) && (x) <= (y))
+#define islessequal(x, y) (!isunordered(x, y) && (x) <= (y))
 #else /* __NO_XBLOCK */
-#define islessequal(x, y)    __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x <= __y; })
+#define islessequal(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) && __x <= __y; })
 #endif /* !__NO_XBLOCK */
 #endif /* !islessequal */
 
 #ifndef islessgreater
 #ifdef __NO_XBLOCK
-#define islessgreater(x, y)  (!isunordered(x, y) && ((x) < (y) || (y) < (x)))
+#define islessgreater(x, y) (!isunordered(x, y) && ((x) < (y) || (y) < (x)))
 #else /* __NO_XBLOCK */
-#define islessgreater(x, y)  __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) &&(__x < __y || __y < __x); })
+#define islessgreater(x, y) __XBLOCK({ __typeof__(x) __x = (x); __typeof__(y) __y = (y); __XRETURN !isunordered(__x, __y) &&(__x < __y || __y < __x); })
 #endif /* !__NO_XBLOCK */
 #endif /* !islessgreater */
 #endif /* __USE_ISOC99 */
@@ -1794,10 +1875,10 @@ __LIBC _LIB_VERSION_TYPE _LIB_VERSION;
  * We have a problem when using C++ since `exception' is a reserved name in C++. */
 #ifdef __cplusplus
 struct __exception
-#else
+#else /* __cplusplus */
 }%[push_macro @undef { exception }]%{
 struct exception
-#endif
+#endif /* !__cplusplus */
 }%[push_macro @undef { type name arg1 arg2 retval err }]%{
 {
 	int    type;
@@ -1808,7 +1889,7 @@ struct exception
 	int    err;
 #ifdef __CRT_DOS
 	int    __pad;
-#endif
+#endif /* __CRT_DOS */
 };
 }%[pop_macro]%{
 

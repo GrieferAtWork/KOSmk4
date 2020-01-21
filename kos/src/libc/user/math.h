@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1178014d */
+/* HASH CRC-32:0x9c0a83fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -198,11 +198,10 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_cbrtf)(float x);
 /* Return the cube root of X */
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_cbrtl)(long double x);
 /* Floating-point modulo remainder of X/Y */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_fmod)(double x, double y);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fmod)(double x, double y);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fmodf)(float x, float y);
 /* Floating-point modulo remainder of X/Y */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_fmodf)(float x, float y);
-/* Floating-point modulo remainder of X/Y */
-INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_fmodl)(long double x, long double y);
+INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_fmodl)(long double x, long double y);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erf)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erfc)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_lgamma)(double x);
@@ -339,15 +338,15 @@ INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_y0l)(long double x);
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_y1l)(long double x);
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_ynl)(int n, long double x);
 /* Reentrant version of lgamma. This function uses the global variable
- * `signgam'.  The reentrant version instead takes a pointer and stores
+ * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 INTDEF WUNUSED double NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x, int *signgamp);
 /* Reentrant version of lgamma. This function uses the global variable
- * `signgam'.  The reentrant version instead takes a pointer and stores
+ * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 INTDEF WUNUSED float NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x, int *signgamp);
 /* Reentrant version of lgamma. This function uses the global variable
- * `signgam'.  The reentrant version instead takes a pointer and stores
+ * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 INTDEF WUNUSED long double NOTHROW_NCX(LIBCCALL libc_lgammal_r)(long double x, int *signgamp);
 /* Return X times (2 to the Nth power) */

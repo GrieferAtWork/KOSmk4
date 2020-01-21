@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b2fadd6 */
+/* HASH CRC-32:0x72e6fa6c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(copysignf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(copysignf))(float __num,
                                                    float __sign) {
-#line 392 "kos/src/libc/magic/math.c"
+#line 433 "kos/src/libc/magic/math.c"
 	if ((__num < 0.0) != (__sign < 0.0))
 		__num = -__num;
 	return __num;

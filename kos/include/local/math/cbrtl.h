@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67bd603d */
+/* HASH CRC-32:0x7c378874 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the cube root of X */
 __LOCAL_LIBC(cbrtl) __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cbrtl))(long double __x) {
-#line 337 "kos/src/libc/magic/math.c"
+#line 352 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_cbrt((double)__x);
 }
 __NAMESPACE_LOCAL_END

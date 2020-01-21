@@ -2001,12 +2001,7 @@ NOTHROW_RPC(LIBCCALL libc__fullpath)(char *buf,
                                      size_t buflen)
 /*[[[body:_fullpath]]]*/
 {
-	(void)buf;
-	(void)path;
-	(void)buflen;
-	CRT_UNIMPLEMENTED("_fullpath"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	return frealpathat(AT_FDCWD, path, buf, buflen, AT_DOSPATH);
 }
 /*[[[end:_fullpath]]]*/
 

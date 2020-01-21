@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85c86ac2 */
+/* HASH CRC-32:0xddc029a8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,33 +19,42 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fmodl_defined
-#if defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
 #define __local_fmodl_defined 1
-/* Dependency: "fmod" */
+#include <libm/fmod.h>
+/* Dependency: "fmod" from "math" */
 #ifndef ____localdep_fmod_defined
 #define ____localdep_fmod_defined 1
 #if __has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)
 /* Floating-point modulo remainder of X/Y */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_fmod)(double __x, double __y) { return __builtin_fmod(__x, __y); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_fmod)(double __x, double __y) { return __builtin_fmod(__x, __y); }
 #elif defined(__CRT_HAVE_fmod)
 /* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),fmod,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),fmod,(__x,__y))
 #elif defined(__CRT_HAVE___fmod)
 /* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),__fmod,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),__fmod,(__x,__y))
 #else /* LIBC: fmod */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/fmod.h>
+/* Floating-point modulo remainder of X/Y */
+#define __localdep_fmod (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmod))
+#else /* CUSTOM: fmod */
 #undef ____localdep_fmod_defined
+#endif /* fmod... */
 #endif /* fmod... */
 #endif /* !____localdep_fmod_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Floating-point modulo remainder of X/Y */
-__LOCAL_LIBC(fmodl) __ATTR_WUNUSED long double
+__LOCAL_LIBC(fmodl) __ATTR_CONST __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmodl))(long double __x,
                                                long double __y) {
-#line 384 "kos/src/libc/magic/math.c"
+#line 425 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_fmod((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_fmod || __CRT_HAVE___fmod */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_fmod || __CRT_HAVE___fmod */
 #endif /* !__local_fmodl_defined */

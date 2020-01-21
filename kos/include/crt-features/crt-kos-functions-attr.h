@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e3368a2 */
+/* HASH CRC-32:0x85ad6948 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4625,6 +4625,9 @@
 #define __CRT_ATTR_CONST___fmin 1
 #define __CRT_ATTR_CONST___fminf 1
 #define __CRT_ATTR_CONST___fminl 1
+#define __CRT_ATTR_CONST___fmod 1
+#define __CRT_ATTR_CONST___fmodf 1
+#define __CRT_ATTR_CONST___fmodl 1
 #define __CRT_ATTR_CONST___fpclassify 1
 #define __CRT_ATTR_CONST___fpclassifyf 1
 #define __CRT_ATTR_CONST___fpclassifyl 1
@@ -4735,6 +4738,9 @@
 #define __CRT_ATTR_CONST_fmin 1
 #define __CRT_ATTR_CONST_fminf 1
 #define __CRT_ATTR_CONST_fminl 1
+#define __CRT_ATTR_CONST_fmod 1
+#define __CRT_ATTR_CONST_fmodf 1
+#define __CRT_ATTR_CONST_fmodl 1
 #define __CRT_ATTR_CONST_format_length 1
 #define __CRT_ATTR_CONST_format_wlength 1
 #define __CRT_ATTR_CONST_gai_strerror 1

@@ -21,6 +21,10 @@
 #define GUARD_LIBC_USER_MATH_C 1
 
 #include "../api.h"
+/**/
+
+#include <libm/fmod.h>
+
 #include "math.h"
 
 DECL_BEGIN
@@ -1071,37 +1075,40 @@ NOTHROW(LIBCCALL libc_cbrtl)(long double x)
 }
 /*[[[end:cbrtl]]]*/
 
-/*[[[head:fmod,hash:CRC-32=0x123ff152]]]*/
+/*[[[head:fmod,hash:CRC-32=0x359b4658]]]*/
 /* Floating-point modulo remainder of X/Y */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmod") double
 NOTHROW(LIBCCALL libc_fmod)(double x,
                             double y)
 /*[[[body:fmod]]]*/
-{
-	(void)x;
-	(void)y;
-	CRT_UNIMPLEMENTED("fmod"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
 }
 /*[[[end:fmod]]]*/
 
-/*[[[head:fmodf,hash:CRC-32=0xde5505a8]]]*/
-/* Floating-point modulo remainder of X/Y */
-INTERN WUNUSED
+/*[[[head:fmodf,hash:CRC-32=0xb58fcfac]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmodf") float
 NOTHROW(LIBCCALL libc_fmodf)(float x,
                              float y)
 /*[[[body:fmodf]]]*/
 /*AUTO*/{
-	return (float)libc_fmod((double)x, (double)y);
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 /*[[[end:fmodf]]]*/
 
-/*[[[head:fmodl,hash:CRC-32=0xa29bf110]]]*/
+/*[[[head:fmodl,hash:CRC-32=0x9fc5c331]]]*/
 /* Floating-point modulo remainder of X/Y */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmodl") long double
 NOTHROW(LIBCCALL libc_fmodl)(long double x,
                              long double y)
@@ -2091,9 +2098,9 @@ NOTHROW(LIBCCALL libc_ynl)(int n,
 }
 /*[[[end:ynl]]]*/
 
-/*[[[head:lgamma_r,hash:CRC-32=0x73e4b102]]]*/
+/*[[[head:lgamma_r,hash:CRC-32=0xec6b91c5]]]*/
 /* Reentrant version of lgamma. This function uses the global variable
- * `signgam'.  The reentrant version instead takes a pointer and stores
+ * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lgamma_r") double
@@ -2109,9 +2116,9 @@ NOTHROW_NCX(LIBCCALL libc_lgamma_r)(double x,
 }
 /*[[[end:lgamma_r]]]*/
 
-/*[[[head:lgammaf_r,hash:CRC-32=0xcbceb0ca]]]*/
+/*[[[head:lgammaf_r,hash:CRC-32=0xce5168f9]]]*/
 /* Reentrant version of lgamma. This function uses the global variable
- * `signgam'.  The reentrant version instead takes a pointer and stores
+ * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lgammaf_r") float
@@ -2123,9 +2130,9 @@ NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
 }
 /*[[[end:lgammaf_r]]]*/
 
-/*[[[head:lgammal_r,hash:CRC-32=0x73706da2]]]*/
+/*[[[head:lgammal_r,hash:CRC-32=0xdf6c1683]]]*/
 /* Reentrant version of lgamma. This function uses the global variable
- * `signgam'.  The reentrant version instead takes a pointer and stores
+ * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lgammal_r") long double

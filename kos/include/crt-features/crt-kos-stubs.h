@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46bf819 */
+/* HASH CRC-32:0x9dd749fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,6 @@
 #define __CRT_STUB__controlfp_s 1
 #define __CRT_STUB__dupenv_s 1
 #define __CRT_STUB__fpclass 1
-#define __CRT_STUB__fullpath 1
 #define __CRT_STUB__get_fmode 1
 #define __CRT_STUB__get_invalid_parameter_handler 1
 #define __CRT_STUB__get_output_format 1
@@ -166,7 +165,6 @@
 #define __CRT_STUB_fgetpwent_r 1
 #define __CRT_STUB_fgetspent 1
 #define __CRT_STUB_fgetspent_r 1
-#define __CRT_STUB_fmod 1
 #define __CRT_STUB_fpathconf 1
 #define __CRT_STUB_fpreset 1
 #define __CRT_STUB_freeaddrinfo 1

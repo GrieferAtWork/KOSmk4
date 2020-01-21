@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4be73d04 */
+/* HASH CRC-32:0x4376750f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,6 @@
 #define __stub__controlfp_s 1
 #define __stub__dupenv_s 1
 #define __stub__fpclass 1
-#define __stub__fullpath 1
 #define __stub__get_fmode 1
 #define __stub__get_invalid_parameter_handler 1
 #define __stub__get_output_format 1
@@ -166,7 +165,6 @@
 #define __stub_fgetpwent_r 1
 #define __stub_fgetspent 1
 #define __stub_fgetspent_r 1
-#define __stub_fmod 1
 #define __stub_fpathconf 1
 #define __stub_fpreset 1
 #define __stub_freeaddrinfo 1

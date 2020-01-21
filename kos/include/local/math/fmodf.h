@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16e11daa */
+/* HASH CRC-32:0x62a19240 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,33 +19,21 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fmodf_defined
-#if defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #define __local_fmodf_defined 1
-/* Dependency: "fmod" */
-#ifndef ____localdep_fmod_defined
-#define ____localdep_fmod_defined 1
-#if __has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)
-/* Floating-point modulo remainder of X/Y */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_fmod)(double __x, double __y) { return __builtin_fmod(__x, __y); }
-#elif defined(__CRT_HAVE_fmod)
-/* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),fmod,(__x,__y))
-#elif defined(__CRT_HAVE___fmod)
-/* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),__fmod,(__x,__y))
-#else /* LIBC: fmod */
-#undef ____localdep_fmod_defined
-#endif /* fmod... */
-#endif /* !____localdep_fmod_defined */
-
+#include <libm/fmod.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Floating-point modulo remainder of X/Y */
-__LOCAL_LIBC(fmodf) __ATTR_WUNUSED float
+__LOCAL_LIBC(fmodf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmodf))(float __x,
                                                float __y) {
-#line 379 "kos/src/libc/magic/math.c"
-	return (float)__localdep_fmod((double)__x, (double)__y);
+#line 406 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__y);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__y);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_fmod || __CRT_HAVE___fmod */
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ */
 #endif /* !__local_fmodf_defined */

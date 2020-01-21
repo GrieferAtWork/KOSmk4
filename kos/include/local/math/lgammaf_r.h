@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcbf17e4 */
+/* HASH CRC-32:0xeb26966b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,17 +26,17 @@
 #define ____localdep_lgamma_r_defined 1
 #if __has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)
 /* Reentrant version of lgamma. This function uses the global variable
- * `signgam'.  The reentrant version instead takes a pointer and stores
+ * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 __EXTERNINLINE __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL __localdep_lgamma_r)(double __x, int *__signgamp) { return __builtin_lgamma_r(__x, __signgamp); }
 #elif defined(__CRT_HAVE_lgamma_r)
 /* Reentrant version of lgamma. This function uses the global variable
- * `signgam'.  The reentrant version instead takes a pointer and stores
+ * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),lgamma_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgamma_r)
 /* Reentrant version of lgamma. This function uses the global variable
- * `signgam'.  The reentrant version instead takes a pointer and stores
+ * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
 #else /* LIBC: lgamma_r */
@@ -46,12 +46,12 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_lgamma_r,(double __x,
 
 __NAMESPACE_LOCAL_BEGIN
 /* Reentrant version of lgamma. This function uses the global variable
- * `signgam'.  The reentrant version instead takes a pointer and stores
+ * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 __LOCAL_LIBC(lgammaf_r) __ATTR_WUNUSED float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgammaf_r))(float __x,
                                                        int *__signgamp) {
-#line 919 "kos/src/libc/magic/math.c"
+#line 989 "kos/src/libc/magic/math.c"
 	return (float)__localdep_lgamma_r((double)__x, __signgamp);
 }
 __NAMESPACE_LOCAL_END

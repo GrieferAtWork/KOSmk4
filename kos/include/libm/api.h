@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xfd8cc002 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,26 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_roundl_defined
-#define __local_roundl_defined 1
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-__LOCAL_LIBC(roundl) __ATTR_CONST __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundl))(long double __x) {
-#line 540 "kos/src/libc/magic/math.c"
-	long double __result;
-	__result = (long double)(__INTMAX_TYPE__)__x;
-	if (__x < 0) {
-		/* result >= x */
-		if ((__result - __x) >= 0.5)
-			__result -= 1.0;
-	} else {
-		/* result <= x */
-		if ((__x - __result) >= 0.5)
-			__result += 1.0;
-	}
-	return __result;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local_roundl_defined */
+#ifndef _LIBM_API_H
+#define _LIBM_API_H 1
+
+#include <__crt.h>
+
+#define LIBM_CC           __LIBCCALL
+#define LIBM_VCC          __VLIBCCALL
+#define LIBM_DECL         __LIBC
+#define LIBM_LIBRARY_NAME "libm.so"
+
+#endif /* !_LIBM_API_H */

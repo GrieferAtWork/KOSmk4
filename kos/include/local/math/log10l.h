@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19011f9 */
+/* HASH CRC-32:0xd9a9b656 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Base-ten logarithm of X */
 __LOCAL_LIBC(log10l) __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log10l))(long double __x) {
-#line 252 "kos/src/libc/magic/math.c"
+#line 258 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_log10((double)__x);
 }
 __NAMESPACE_LOCAL_END

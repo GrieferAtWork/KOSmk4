@@ -1043,6 +1043,11 @@
 #endif
 #endif /* !__SIZEOF_LONG_DOUBLE__ */
 
+#undef __ARCH_LONG_DOUBLE_IS_DOUBLE
+#if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#define __ARCH_LONG_DOUBLE_IS_DOUBLE 1
+#endif /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
+
 
 #ifndef __MAX_ALIGN_TYPE__
 #define __MAX_ALIGN_TYPE__ long double

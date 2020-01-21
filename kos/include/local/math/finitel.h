@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3072f79 */
+/* HASH CRC-32:0xa3cdcc48 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_i
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(long double __val),isinfl,(__val))
 #elif defined(__CRT_HAVE___isinfl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(long double __val),__isinfl,(__val))
-#elif defined(__CRT_HAVE___isinf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
+#elif defined(__CRT_HAVE___isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(long double __val),__isinf,(__val))
-#elif defined(__CRT_HAVE_isinf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
+#elif defined(__CRT_HAVE_isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(long double __val),isinf,(__val))
 #else /* LIBC: isinfl */
 #include <local/math/isinfl.h>
@@ -48,11 +48,11 @@ __EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_i
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),isnanl,(__val))
 #elif defined(__CRT_HAVE___isnanl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),__isnanl,(__val))
-#elif defined(__CRT_HAVE___isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
+#elif defined(__CRT_HAVE___isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),__isnan,(__val))
-#elif defined(__CRT_HAVE__isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
+#elif defined(__CRT_HAVE__isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),_isnan,(__val))
-#elif defined(__CRT_HAVE_isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
+#elif defined(__CRT_HAVE_isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),isnan,(__val))
 #else /* LIBC: isnanl */
 #include <local/math/isnanl.h>
@@ -63,7 +63,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long do
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(finitel) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finitel))(long double __val) {
-#line 844 "kos/src/libc/magic/math.c"
+#line 900 "kos/src/libc/magic/math.c"
 	return !__localdep_isinfl(__val) && !__localdep_isnanl(__val);
 }
 __NAMESPACE_LOCAL_END

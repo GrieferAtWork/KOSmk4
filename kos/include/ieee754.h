@@ -74,30 +74,75 @@ __SYSDECL_BEGIN
 #ifndef __IEEE754_FLOAT_TYPE__
 #if __SIZEOF_FLOAT__ == 4
 #define __IEEE754_FLOAT_TYPE__ float
+#define __IEEE754_FLOAT_TYPE_IS_FLOAT__ 1
+#define __IEEE754_FLOAT_C(x) x##f
+#if __SIZEOF_DOUBLE__ == 4
+#define __IEEE754_FLOAT_TYPE_IS_DOUBLE__ 1
+#endif /* __SIZEOF_DOUBLE__ == 4 */
+#if defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 4
+#define __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ 1
+#endif /* defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 4 */
 #elif __SIZEOF_DOUBLE__ == 4
 #define __IEEE754_FLOAT_TYPE__ double
+#define __IEEE754_FLOAT_TYPE_IS_DOUBLE__ 1
+#define __IEEE754_FLOAT_C(x) x
+#if defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 4
+#define __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ 1
+#endif /* defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 4 */
 #elif defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 4
 #define __IEEE754_FLOAT_TYPE__ long double
+#define __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ 1
+#define __IEEE754_FLOAT_C(x) x##L
 #endif
 #endif /* !__IEEE754_FLOAT_TYPE__ */
 
 #ifndef __IEEE754_DOUBLE_TYPE__
 #if __SIZEOF_FLOAT__ == 8
 #define __IEEE754_DOUBLE_TYPE__ float
+#define __IEEE754_DOUBLE_TYPE_IS_FLOAT__ 1
+#define __IEEE754_DOUBLE_C(x) x##f
+#if __SIZEOF_DOUBLE__ == 8
+#define __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ 1
+#endif /* __SIZEOF_DOUBLE__ == 8 */
+#if defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 8
+#define __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ 1
+#endif /* defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 8 */
 #elif __SIZEOF_DOUBLE__ == 8
 #define __IEEE754_DOUBLE_TYPE__ double
+#define __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ 1
+#define __IEEE754_DOUBLE_C(x) x
+#if defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 8
+#define __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ 1
+#endif /* defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 8 */
 #elif defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 8
 #define __IEEE754_DOUBLE_TYPE__ long double
+#define __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ 1
+#define __IEEE754_DOUBLE_C(x) x##L
 #endif
 #endif /* !__IEEE754_DOUBLE_TYPE__ */
 
 #ifndef __IEEE854_LONG_DOUBLE_TYPE__
 #if __SIZEOF_FLOAT__ == 12
 #define __IEEE854_LONG_DOUBLE_TYPE__ float
+#define __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ 1
+#define __IEEE854_LONG_DOUBLE_C(x) x##f
+#if __SIZEOF_DOUBLE__ == 12
+#define __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ 1
+#endif /* __SIZEOF_DOUBLE__ == 12 */
+#if defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 12
+#define __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ 1
+#endif /* defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 12 */
 #elif __SIZEOF_DOUBLE__ == 12
 #define __IEEE854_LONG_DOUBLE_TYPE__ double
+#define __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ 1
+#define __IEEE854_LONG_DOUBLE_C(x) x
+#if defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 12
+#define __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ 1
+#endif /* defined(__COMPILER_HAVE_LONGDOUBLE) && __SIZEOF_LONG_DOUBLE__ == 12 */
 #elif __SIZEOF_LONG_DOUBLE__ == 12
 #define __IEEE854_LONG_DOUBLE_TYPE__ long double
+#define __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ 1
+#define __IEEE854_LONG_DOUBLE_C(x) x##L
 #endif
 #endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
 
