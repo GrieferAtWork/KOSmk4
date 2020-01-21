@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76df26e8 */
+/* HASH CRC-32:0x9e1b48e6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -324,20 +324,14 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isinff)(float x);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isinfl)(__LONGDOUBLE x);
 /* Return nonzero if VALUE is finite and not NaN */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_finite)(double x);
-/* Return the remainder of X/Y */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_drem)(double x, double y);
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_significand)(double x);
 /* Return nonzero if VALUE is finite and not NaN */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_finitef)(float x);
-/* Return the remainder of X/Y */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_dremf)(float x, float y);
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_significandf)(float x);
 /* Return nonzero if VALUE is finite and not NaN */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x);
-/* Return the remainder of X/Y */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_dreml)(__LONGDOUBLE x, __LONGDOUBLE y);
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_significandl)(__LONGDOUBLE x);
 /* Return nonzero if VALUE is not a number */

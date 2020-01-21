@@ -768,9 +768,6 @@
 #define __CRT_HAVE_DOS$div 1
 #define __CRT_HAVE_DOS$drand48 1
 #define __CRT_HAVE_DOS$drand48_r 1
-#define __CRT_HAVE_DOS$drem 1
-#define __CRT_HAVE_DOS$dremf 1
-#define __CRT_HAVE_DOS$dreml 1
 #define __CRT_HAVE_DOS$dup 1
 #define __CRT_HAVE_DOS$dup2 1
 #define __CRT_HAVE_DOS$dup3 1

@@ -1842,21 +1842,6 @@ NOTHROW(LIBCCALL libc_pow10l)(__LONGDOUBLE x)
 }
 /*[[[end:pow10l]]]*/
 
-/*[[[head:drem,hash:CRC-32=0x61a10eba]]]*/
-/* Return the remainder of X/Y */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.drem") double
-NOTHROW(LIBCCALL libc_drem)(double x,
-                            double y)
-/*[[[body:drem]]]*/
-{
-	(void)x;
-	(void)y;
-	CRT_UNIMPLEMENTED("drem"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:drem]]]*/
 
 /*[[[head:significand,hash:CRC-32=0x12c908f2]]]*/
 /* Return the fractional part of X after dividing out `ilogb (X)' */
@@ -1872,17 +1857,6 @@ NOTHROW(LIBCCALL libc_significand)(double x)
 }
 /*[[[end:significand]]]*/
 
-/*[[[head:dremf,hash:CRC-32=0xadcbfa40]]]*/
-/* Return the remainder of X/Y */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.dremf") float
-NOTHROW(LIBCCALL libc_dremf)(float x,
-                             float y)
-/*[[[body:dremf]]]*/
-/*AUTO*/{
-	return (float)libc_drem((double)x, (double)y);
-}
-/*[[[end:dremf]]]*/
 
 /*[[[head:significandf,hash:CRC-32=0x4c835be]]]*/
 /* Return the fractional part of X after dividing out `ilogb (X)' */
@@ -1895,17 +1869,6 @@ NOTHROW(LIBCCALL libc_significandf)(float x)
 }
 /*[[[end:significandf]]]*/
 
-/*[[[head:dreml,hash:CRC-32=0xcc7bfc91]]]*/
-/* Return the remainder of X/Y */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.dreml") __LONGDOUBLE
-NOTHROW(LIBCCALL libc_dreml)(__LONGDOUBLE x,
-                             __LONGDOUBLE y)
-/*[[[body:dreml]]]*/
-/*AUTO*/{
-	return (__LONGDOUBLE)libc_drem((double)x, (double)y);
-}
-/*[[[end:dreml]]]*/
 
 /*[[[head:significandl,hash:CRC-32=0xea4d2596]]]*/
 /* Return the fractional part of X after dividing out `ilogb (X)' */
@@ -2624,7 +2587,7 @@ NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3b76993f]]]*/
+/*[[[start:exports,hash:CRC-32=0x17bac800]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(__acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(asin, libc_asin);
@@ -2850,6 +2813,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(nextafter, libc_nextafter);
 DEFINE_PUBLIC_WEAK_ALIAS(_nextafter, libc_nextafter);
 DEFINE_PUBLIC_WEAK_ALIAS(__nextafter, libc_nextafter);
 DEFINE_PUBLIC_WEAK_ALIAS(remainder, libc_remainder);
+DEFINE_PUBLIC_WEAK_ALIAS(drem, libc_remainder);
+DEFINE_PUBLIC_WEAK_ALIAS(__drem, libc_remainder);
 DEFINE_PUBLIC_WEAK_ALIAS(__remainder, libc_remainder);
 DEFINE_PUBLIC_WEAK_ALIAS(ilogb, libc_ilogb);
 DEFINE_PUBLIC_WEAK_ALIAS(__ilogb, libc_ilogb);
@@ -2859,6 +2824,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(__rintf, libc_rintf);
 DEFINE_PUBLIC_WEAK_ALIAS(nextafterf, libc_nextafterf);
 DEFINE_PUBLIC_WEAK_ALIAS(__nextafterf, libc_nextafterf);
 DEFINE_PUBLIC_WEAK_ALIAS(remainderf, libc_remainderf);
+DEFINE_PUBLIC_WEAK_ALIAS(dremf, libc_remainderf);
+DEFINE_PUBLIC_WEAK_ALIAS(__dremf, libc_remainderf);
 DEFINE_PUBLIC_WEAK_ALIAS(__remainderf, libc_remainderf);
 DEFINE_PUBLIC_WEAK_ALIAS(ilogbf, libc_ilogbf);
 DEFINE_PUBLIC_WEAK_ALIAS(__ilogbf, libc_ilogbf);
@@ -2868,6 +2835,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(__rintl, libc_rintl);
 DEFINE_PUBLIC_WEAK_ALIAS(nextafterl, libc_nextafterl);
 DEFINE_PUBLIC_WEAK_ALIAS(__nextafterl, libc_nextafterl);
 DEFINE_PUBLIC_WEAK_ALIAS(remainderl, libc_remainderl);
+DEFINE_PUBLIC_WEAK_ALIAS(dreml, libc_remainderl);
+DEFINE_PUBLIC_WEAK_ALIAS(__dreml, libc_remainderl);
 DEFINE_PUBLIC_WEAK_ALIAS(__remainderl, libc_remainderl);
 DEFINE_PUBLIC_WEAK_ALIAS(ilogbl, libc_ilogbl);
 DEFINE_PUBLIC_WEAK_ALIAS(__ilogbl, libc_ilogbl);
@@ -2940,20 +2909,14 @@ DEFINE_PUBLIC_WEAK_ALIAS(__isinfl, libc_isinfl);
 DEFINE_PUBLIC_WEAK_ALIAS(finite, libc_finite);
 DEFINE_PUBLIC_WEAK_ALIAS(_finite, libc_finite);
 DEFINE_PUBLIC_WEAK_ALIAS(__finite, libc_finite);
-DEFINE_PUBLIC_WEAK_ALIAS(drem, libc_drem);
-DEFINE_PUBLIC_WEAK_ALIAS(__drem, libc_drem);
 DEFINE_PUBLIC_WEAK_ALIAS(significand, libc_significand);
 DEFINE_PUBLIC_WEAK_ALIAS(__significand, libc_significand);
 DEFINE_PUBLIC_WEAK_ALIAS(finitef, libc_finitef);
 DEFINE_PUBLIC_WEAK_ALIAS(__finitef, libc_finitef);
-DEFINE_PUBLIC_WEAK_ALIAS(dremf, libc_dremf);
-DEFINE_PUBLIC_WEAK_ALIAS(__dremf, libc_dremf);
 DEFINE_PUBLIC_WEAK_ALIAS(significandf, libc_significandf);
 DEFINE_PUBLIC_WEAK_ALIAS(__significandf, libc_significandf);
 DEFINE_PUBLIC_WEAK_ALIAS(finitel, libc_finitel);
 DEFINE_PUBLIC_WEAK_ALIAS(__finitel, libc_finitel);
-DEFINE_PUBLIC_WEAK_ALIAS(dreml, libc_dreml);
-DEFINE_PUBLIC_WEAK_ALIAS(__dreml, libc_dreml);
 DEFINE_PUBLIC_WEAK_ALIAS(significandl, libc_significandl);
 DEFINE_PUBLIC_WEAK_ALIAS(__significandl, libc_significandl);
 DEFINE_PUBLIC_WEAK_ALIAS(isnan, libc_isnan);

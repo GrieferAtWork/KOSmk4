@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fe1e57b */
+/* HASH CRC-32:0x79b40ff0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -651,9 +651,6 @@ __CRT_FUNCTION(div,0,(),2,(int,numer,int,denom),struct __div_struct)
 __CRT_FUNCTION(dprintf,0,(),VA(2),(fd_t,fd,char const *__restrict,format),__STDC_INT_AS_SSIZE_T)
 __CRT_FUNCTION(drand48,0,(),0,(),double)
 __CRT_FUNCTION(drand48_r,0,(),2,(struct drand48_data *__restrict,buffer,double *__restrict,result),int)
-__CRT_FUNCTION(drem,0,(),2,(double,x,double,y),double)
-__CRT_FUNCTION(dremf,0,(),2,(float,x,float,y),float)
-__CRT_FUNCTION(dreml,0,(),2,(__LONGDOUBLE,x,__LONGDOUBLE,y),__LONGDOUBLE)
 __CRT_FUNCTION(dup,0,(),1,(fd_t,fd),fd_t)
 __CRT_FUNCTION(dup2,0,(),2,(fd_t,oldfd,fd_t,newfd),fd_t)
 __CRT_FUNCTION(dup3,0,(),3,(fd_t,oldfd,fd_t,newfd,oflag_t,flags),fd_t)
@@ -3277,6 +3274,9 @@ __CRT_FAKE_FUNCTION(chsize,0,(),2,(fd_t,fd,__LONG32_TYPE__,$size),int)
 __CRT_FAKE_FUNCTION(clearerr_unlocked,0,(),1,(FILE *__restrict,stream),void)
 __CRT_FAKE_FUNCTION(cnd_destroy,0,(),1,(cnd_t *,COND),void)
 __CRT_FAKE_FUNCTION(crt_posix_memalign,0,(),3,(void **__restrict,pp,size_t,alignment,size_t,n_bytes),int)
+__CRT_FAKE_FUNCTION(drem,0,(),2,(double,x,double,y),double)
+__CRT_FAKE_FUNCTION(dremf,0,(),2,(float,x,float,y),float)
+__CRT_FAKE_FUNCTION(dreml,0,(),2,(__LONGDOUBLE,x,__LONGDOUBLE,y),__LONGDOUBLE)
 __CRT_FAKE_FUNCTION(eaccess,0,(),2,(char const *,file,int,type),int)
 __CRT_FAKE_FUNCTION(fc16printf,0,(),VA(2),(FILE *__restrict,stream,char16_t const *__restrict,format),__STDC_INT_AS_SIZE_T)
 __CRT_FAKE_FUNCTION(fc16printf_unlocked,0,(),VA(2),(FILE *__restrict,stream,char16_t const *__restrict,format),__STDC_INT_AS_SIZE_T)

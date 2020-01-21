@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe42557bb */
+/* HASH CRC-32:0x2eed515a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,7 +119,6 @@
 #define __stub_crypt_r 1
 #define __stub_drand48 1
 #define __stub_drand48_r 1
-#define __stub_drem 1
 #define __stub_duplocale 1
 #define __stub_encrypt 1
 #define __stub_encrypt_r 1

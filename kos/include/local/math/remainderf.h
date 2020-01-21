@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3c6c88 */
+/* HASH CRC-32:0x9546c43c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_remainderf_defined
-#if defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
+#if defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
 #define __local_remainderf_defined 1
 /* Dependency: "remainder" */
 #ifndef ____localdep_remainder_defined
@@ -33,6 +33,12 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, do
 #elif defined(__CRT_HAVE___remainder)
 /* Return the remainder of integer divison X / Y with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __y),__remainder,(__x,__y))
+#elif defined(__CRT_HAVE_drem)
+/* Return the remainder of integer divison X / Y with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __y),drem,(__x,__y))
+#elif defined(__CRT_HAVE___drem)
+/* Return the remainder of integer divison X / Y with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __y),__drem,(__x,__y))
 #else /* LIBC: remainder */
 #undef ____localdep_remainder_defined
 #endif /* remainder... */
@@ -47,5 +53,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderf))(float __x,
 	return (float)__localdep_remainder((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_remainder || __CRT_HAVE___remainder */
+#endif /* __CRT_HAVE_remainder || __CRT_HAVE___remainder || __CRT_HAVE_drem || __CRT_HAVE___drem */
 #endif /* !__local_remainderf_defined */

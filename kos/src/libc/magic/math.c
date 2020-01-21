@@ -811,7 +811,7 @@ nextafter:(double x, double y) -> double {
 }
 
 @@Return the remainder of integer divison X / Y with infinite precision
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainder)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainder, drem, __drem)][crtbuiltin]
 remainder:(double x, double y) -> double; /* TODO */
 
 @@Return the binary exponent of X, which must be nonzero
@@ -840,7 +840,7 @@ nextafterf:(float x, float y) -> float {
 #endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderf)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderf, dremf, __dremf)][crtbuiltin]
 remainderf:(float x, float y) -> float %{auto_block(math)}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogbf)][crtbuiltin]
@@ -854,7 +854,7 @@ rintl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterl)][crtbuiltin]
 nextafterl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderl)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderl, dreml, __dreml)][crtbuiltin]
 remainderl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{auto_block(math)}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogbl)][crtbuiltin]
@@ -1376,8 +1376,8 @@ finite:(double x) -> int {
 }
 
 @@Return the remainder of X/Y
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__drem)][crtbuiltin]
-drem:(double x, double y) -> double; /* TODO */
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__drem, __remainder)][crtbuiltin]
+drem:(double x, double y) -> double = remainder;
 
 @@Return the fractional part of X after dividing out `ilogb (X)'
 [ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significand)][crtbuiltin]
@@ -1397,8 +1397,8 @@ finitef:(float x) -> int  {
 #endif /* !... */
 }
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__dremf)][crtbuiltin]
-dremf:(float x, float y) -> float %{auto_block(math)}
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__dremf, __remainderf)][crtbuiltin]
+dremf:(float x, float y) -> float = remainderf;
 
 [ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significandf)][crtbuiltin]
 significandf:(float x) -> float %{auto_block(math)}
@@ -1421,8 +1421,8 @@ finitel:(__LONGDOUBLE x) -> int {
 #endif /* !... */
 }
 
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__dreml)][crtbuiltin]
-dreml:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{auto_block(math)}
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__dreml, __remainderl)][crtbuiltin]
+dreml:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE = remainderl;
 
 [ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significandl)][crtbuiltin]
 significandl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
@@ -1793,12 +1793,12 @@ scalbl:(__LONGDOUBLE x, __LONGDOUBLE n) -> __LONGDOUBLE %{auto_block(math)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %#ifdef __USE_MISC
-[attribute(*)][alias(*)] __drem:(*) = drem;
+[attribute(*)][alias(*)] __drem:(*) = remainder;
 [attribute(*)][alias(*)] __significand:(*) = significand;
-[attribute(*)][alias(*)] __dremf:(*) = dremf;
+[attribute(*)][alias(*)] __dremf:(*) = remainderf;
 [attribute(*)][alias(*)] __significandf:(*) = significandf;
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __dreml:(*) = dreml;
+[attribute(*)][alias(*)] __dreml:(*) = remainderl;
 [attribute(*)][alias(*)] __significandl:(*) = significandl;
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
