@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18e84fcc */
+/* HASH CRC-32:0x8e7bf70a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,6 @@
 #define __CRT_STUB___pthread_unregister_cancel 1
 #define __CRT_STUB___pthread_unregister_cancel_restore 1
 #define __CRT_STUB___pthread_unwind_next 1
-#define __CRT_STUB___signbit 1
 #define __CRT_STUB___wcserror 1
 #define __CRT_STUB___wcserror_s 1
 #define __CRT_STUB__beep 1
@@ -515,13 +514,11 @@
 #define __CRT_STUB_revoke 1
 #define __CRT_STUB_rexec 1
 #define __CRT_STUB_rexec_af 1
-#define __CRT_STUB_rint 1
 #define __CRT_STUB_rpmatch 1
 #define __CRT_STUB_rresvport 1
 #define __CRT_STUB_rresvport_af 1
 #define __CRT_STUB_ruserok 1
 #define __CRT_STUB_ruserok_af 1
-#define __CRT_STUB_scalb 1
 #define __CRT_STUB_scandir 1
 #define __CRT_STUB_scandirat 1
 #define __CRT_STUB_seed48 1

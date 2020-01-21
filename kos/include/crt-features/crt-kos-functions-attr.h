@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65b1227b */
+/* HASH CRC-32:0xf119920a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4673,6 +4673,9 @@
 #define __CRT_ATTR_CONST___p__wenviron 1
 #define __CRT_ATTR_CONST___p__wpgmptr 1
 #define __CRT_ATTR_CONST___p_program_invocation_short_name 1
+#define __CRT_ATTR_CONST___rint 1
+#define __CRT_ATTR_CONST___rintf 1
+#define __CRT_ATTR_CONST___rintl 1
 #define __CRT_ATTR_CONST___round 1
 #define __CRT_ATTR_CONST___roundf 1
 #define __CRT_ATTR_CONST___roundl 1
@@ -4821,6 +4824,9 @@
 #define __CRT_ATTR_CONST_pthread_equal 1
 #define __CRT_ATTR_CONST_pthread_gettid_np 1
 #define __CRT_ATTR_CONST_pthread_self 1
+#define __CRT_ATTR_CONST_rint 1
+#define __CRT_ATTR_CONST_rintf 1
+#define __CRT_ATTR_CONST_rintl 1
 #define __CRT_ATTR_CONST_round 1
 #define __CRT_ATTR_CONST_roundf 1
 #define __CRT_ATTR_CONST_roundl 1

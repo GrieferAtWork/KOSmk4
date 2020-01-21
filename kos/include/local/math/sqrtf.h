@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f0146ca */
+/* HASH CRC-32:0xe34135c5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the square root of X */
 __LOCAL_LIBC(sqrtf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sqrtf))(float __x) {
-#line 362 "kos/src/libc/magic/math.c"
+#line 384 "kos/src/libc/magic/math.c"
 	__COMPILER_IMPURE(); /* TODO: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_sqrtf((__IEEE754_FLOAT_TYPE__)__x);

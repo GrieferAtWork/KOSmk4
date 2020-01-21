@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2389bee0 */
+/* HASH CRC-32:0xf1d5508f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,12 +20,21 @@
  */
 #ifndef __local_isnanf_defined
 #define __local_isnanf_defined 1
+#include <libm/isnan.h>
+
 #include <bits/nan.h>
 __NAMESPACE_LOCAL_BEGIN
+/* Return nonzero if VALUE is not a number */
 __LOCAL_LIBC(isnanf) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnanf))(float __val) {
-#line 1145 "kos/src/libc/magic/math.c"
-	return __val == (float)NAN;
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnanf))(float __x) {
+#line 1276 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)__x);
+#else /* ... */
+	return __x == (float)NAN;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_isnanf_defined */

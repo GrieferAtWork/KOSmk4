@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c55d543 */
+/* HASH CRC-32:0xc252efda */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,26 +19,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___signbitf_defined
-#if defined(__CRT_HAVE___signbit) || defined(__CRT_HAVE__dsign)
 #define __local___signbitf_defined 1
-/* Dependency: "__signbit" */
-#ifndef ____localdep___signbit_defined
-#define ____localdep___signbit_defined 1
-#ifdef __CRT_HAVE___signbit
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbit,(double __val),__signbit,(__val))
-#elif defined(__CRT_HAVE__dsign)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbit,(double __val),_dsign,(__val))
-#else /* LIBC: __signbit */
-#undef ____localdep___signbit_defined
-#endif /* __signbit... */
-#endif /* !____localdep___signbit_defined */
-
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__signbitf) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitf))(float __val) {
-#line 1610 "kos/src/libc/magic/math.c"
-	return (int)__localdep___signbit((double)__val);
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitf))(float __x) {
+#line 1786 "kos/src/libc/magic/math.c"
+	return __x < 0.0f;
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE___signbit || __CRT_HAVE__dsign */
 #endif /* !__local___signbitf_defined */

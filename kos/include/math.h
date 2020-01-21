@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x966d6c54 */
+/* HASH CRC-32:0xff40513 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3203,15 +3203,24 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tgammal, __FORCELOCAL __ATTR_WUNUSED long double
 #define __std_rint_defined 1
 #if __has_builtin(__builtin_rint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL rint)(double __x) { return __builtin_rint(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL rint)(double __x) { return __builtin_rint(__x); }
 #elif defined(__CRT_HAVE_rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,rint,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,rint,(double __x),(__x))
 #elif defined(__CRT_HAVE___rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,rint,(double __x),__rint,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,rint,(double __x),__rint,(__x))
 #else /* LIBC: rint */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/rint.h>
+__NAMESPACE_STD_BEGIN
+/* Return the integer nearest X in the direction of the prevailing rounding mode */
+__NAMESPACE_LOCAL_USING_OR_IMPL(rint, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL rint)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rint))(__x); })
+#else /* CUSTOM: rint */
 #undef __std_rint_defined
+#endif /* rint... */
 #endif /* rint... */
 #endif /* !__std_rint_defined */
 #ifndef __std_nextafter_defined
@@ -3266,21 +3275,24 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(double __x),__ilogb,(__x))
 #define __std_rintf_defined 1
 #if __has_builtin(__builtin_rintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL rintf)(float __x) { return __builtin_rintf(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL rintf)(float __x) { return __builtin_rintf(__x); }
 #elif defined(__CRT_HAVE_rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,rintf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,rintf,(float __x),(__x))
 #elif defined(__CRT_HAVE___rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,rintf,(float __x),__rintf,(__x))
-#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,rintf,(float __x),__rintf,(__x))
+#else /* LIBC: rintf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 __NAMESPACE_STD_END
 #include <local/math/rintf.h>
 __NAMESPACE_STD_BEGIN
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__NAMESPACE_LOCAL_USING_OR_IMPL(rintf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL rintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rintf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL rintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); })
 #else /* CUSTOM: rintf */
 #undef __std_rintf_defined
+#endif /* rintf... */
 #endif /* rintf... */
 #endif /* !__std_rintf_defined */
 #ifndef __std_nextafterf_defined
@@ -3351,27 +3363,30 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ilogbf, __FORCELOCAL __ATTR_WUNUSED int __NOTHRO
 #define __std_rintl_defined 1
 #if __has_builtin(__builtin_rintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__EXTERNINLINE __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL rintl)(long double __x) { return __builtin_rintl(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL rintl)(long double __x) { return __builtin_rintl(__x); }
 #elif defined(__CRT_HAVE_rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,rintl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,rintl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,rintl,(long double __x),__rintl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,rintl,(long double __x),__rintl,(__x))
 #elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,rintl,(long double __x),rint,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,rintl,(long double __x),rint,(__x))
 #elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,rintl,(long double __x),__rint,(__x))
-#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,rintl,(long double __x),__rint,(__x))
+#else /* LIBC: rintl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 __NAMESPACE_STD_END
 #include <local/math/rintl.h>
 __NAMESPACE_STD_BEGIN
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__NAMESPACE_LOCAL_USING_OR_IMPL(rintl, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL rintl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rintl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL rintl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); })
 #else /* CUSTOM: rintl */
 #undef __std_rintl_defined
+#endif /* rintl... */
 #endif /* rintl... */
 #endif /* !__std_rintl_defined */
 #ifndef __std_nextafterl_defined
@@ -5420,21 +5435,26 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL cbrt)(float 
 #endif /* cbrt... */
 #if __has_builtin(__builtin_rintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL rint)(float __x) { return __builtin_rintf(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL rint)(float __x) { return __builtin_rintf(__x); }
 #elif defined(__CRT_HAVE_rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,rint,(float __x),rintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,rint,(float __x),rintf,(__x))
 #elif defined(__CRT_HAVE___rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,rint,(float __x),__rintf,(__x))
-#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,rint,(float __x),__rintf,(__x))
+#else /* LIBC: rintf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/rintf.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL rint)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL rint)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); }
+#else /* CUSTOM: rintf */
+#undef none
+#endif /* rint... */
 #endif /* rint... */
 #if __has_builtin(__builtin_nextafterf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
@@ -5661,27 +5681,27 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL cbrt)(
 #endif /* cbrt... */
 #if __has_builtin(__builtin_rintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__EXTERNINLINE __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL rint)(long double __x) { return __builtin_rintl(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL rint)(long double __x) { return __builtin_rintl(__x); }
 #elif defined(__CRT_HAVE_rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,rint,(long double __x),rintl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,rint,(long double __x),rintl,(__x))
 #elif defined(__CRT_HAVE___rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,rint,(long double __x),__rintl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,rint,(long double __x),__rintl,(__x))
 #elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,rint,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,rint,(long double __x),(__x))
 #elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,rint,(long double __x),__rint,(__x))
-#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,rint,(long double __x),__rint,(__x))
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/rintl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL rint)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL rint)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); }
 #endif /* rint... */
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
@@ -7573,61 +7593,71 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pow10l, __FORCELOCAL __ATTR_WUNUSED long double 
 #if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isinf conflicts with C++11. */
 #if __has_builtin(__builtin_isinf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinf)(double __val) { return __builtin_isinf(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinf)(double __x) { return __builtin_isinf(__x); }
 #elif defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinf,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinf,(double __x),(__x))
 #elif defined(__CRT_HAVE___isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinf,(double __val),__isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinf,(double __x),__isinf,(__x))
 #else /* LIBC: isinf */
 #include <local/math/isinf.h>
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isinf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinf)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isinf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinf)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))(__x); })
 #endif /* isinf... */
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 #if __has_builtin(__builtin_isinff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinff)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinff)(float __val) { return __builtin_isinff(__val); }
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinff)(float __x) { return __builtin_isinff(__x); }
 #elif defined(__CRT_HAVE_isinff)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinff,(float __val),(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinff,(float __x),(__x))
 #elif defined(__CRT_HAVE___isinff)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinff,(float __val),__isinff,(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinff,(float __x),__isinff,(__x))
 #else /* LIBC: isinff */
 #include <local/math/isinff.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(isinff, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinff)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinff))(__val); })
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__NAMESPACE_LOCAL_USING_OR_IMPL(isinff, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinff)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinff))(__x); })
 #endif /* isinff... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_isinfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinfl)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinfl)(long double __val) { return __builtin_isinfl(__val); }
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinfl)(long double __x) { return __builtin_isinfl(__x); }
 #elif defined(__CRT_HAVE_isinfl)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __val),(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___isinfl)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __val),__isinfl,(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __x),__isinfl,(__x))
 #elif defined(__CRT_HAVE___isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __val),__isinf,(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __x),__isinf,(__x))
 #elif defined(__CRT_HAVE_isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __val),isinf,(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __x),isinf,(__x))
 #else /* LIBC: isinfl */
 #include <local/math/isinfl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(isinfl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinfl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinfl))(__val); })
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__NAMESPACE_LOCAL_USING_OR_IMPL(isinfl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinfl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinfl))(__x); })
 #endif /* isinfl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #if __has_builtin(__builtin_finite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finite)(double __val) { return __builtin_finite(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finite)(double __x) { return __builtin_finite(__x); }
 #elif defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finite,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finite,(double __x),(__x))
 #elif defined(__CRT_HAVE___finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finite,(double __val),__finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finite,(double __x),__finite,(__x))
 #elif defined(__CRT_HAVE__finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finite,(double __val),_finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finite,(double __x),_finite,(__x))
 #else /* LIBC: finite */
 #include <local/math/finite.h>
 /* Return nonzero if VALUE is finite and not NaN */
-__NAMESPACE_LOCAL_USING_OR_IMPL(finite, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finite)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(finite, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finite)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__x); })
 #endif /* finite... */
 #if __has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)
 /* Return the remainder of X/Y */
@@ -7650,14 +7680,18 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),__significand,(__x))
 #endif /* significand... */
 #if __has_builtin(__builtin_finitef) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitef)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitef)(float __val) { return __builtin_finitef(__val); }
+/* Return nonzero if VALUE is finite and not NaN */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitef)(float __x) { return __builtin_finitef(__x); }
 #elif defined(__CRT_HAVE_finitef)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitef,(float __val),(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitef,(float __x),(__x))
 #elif defined(__CRT_HAVE___finitef)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitef,(float __val),__finitef,(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitef,(float __x),__finitef,(__x))
 #else /* LIBC: finitef */
 #include <local/math/finitef.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(finitef, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitef)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitef))(__val); })
+/* Return nonzero if VALUE is finite and not NaN */
+__NAMESPACE_LOCAL_USING_OR_IMPL(finitef, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitef)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitef))(__x); })
 #endif /* finitef... */
 #if __has_builtin(__builtin_dremf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_dremf)
 /* Return the remainder of X/Y */
@@ -7689,18 +7723,24 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(significandf, __FORCELOCAL __ATTR_WUNUSED float 
 #endif /* significandf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_finitel) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitel)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitel)(long double __val) { return __builtin_finitel(__val); }
+/* Return nonzero if VALUE is finite and not NaN */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitel)(long double __x) { return __builtin_finitel(__x); }
 #elif defined(__CRT_HAVE_finitel)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __val),(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __x),(__x))
 #elif defined(__CRT_HAVE___finitel)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __val),__finitel,(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __x),__finitel,(__x))
 #elif defined(__CRT_HAVE___finite) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __val),__finite,(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __x),__finite,(__x))
 #elif defined(__CRT_HAVE_finite) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __val),finite,(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __x),finite,(__x))
 #else /* LIBC: finitel */
 #include <local/math/finitel.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(finitel, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitel)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitel))(__val); })
+/* Return nonzero if VALUE is finite and not NaN */
+__NAMESPACE_LOCAL_USING_OR_IMPL(finitel, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitel)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitel))(__x); })
 #endif /* finitel... */
 #if __has_builtin(__builtin_dreml) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_dreml)
 /* Return the remainder of X/Y */
@@ -7749,48 +7789,59 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(significandl, __FORCELOCAL __ATTR_WUNUSED long d
 #if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isnan conflicts with C++11. */
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnan)(double __val) { return __builtin_isnan(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnan)(double __x) { return __builtin_isnan(__x); }
 #elif defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnan,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnan,(double __x),(__x))
 #elif defined(__CRT_HAVE___isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnan,(double __val),__isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnan,(double __x),__isnan,(__x))
 #elif defined(__CRT_HAVE__isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnan,(double __val),_isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnan,(double __x),_isnan,(__x))
 #else /* LIBC: isnan */
 #include <local/math/isnan.h>
 /* Return nonzero if VALUE is not a number */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isnan, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnan)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isnan, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__x); })
 #endif /* isnan... */
 #endif /* !cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 #if __has_builtin(__builtin_isnanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanf)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanf)(float __val) { return __builtin_isnanf(__val); }
+/* Return nonzero if VALUE is not a number */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanf)(float __x) { return __builtin_isnanf(__x); }
 #elif defined(__CRT_HAVE_isnanf)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanf,(float __val),(__val))
+/* Return nonzero if VALUE is not a number */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanf,(float __x),(__x))
 #elif defined(__CRT_HAVE___isnanf)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanf,(float __val),__isnanf,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanf,(float __x),__isnanf,(__x))
 #else /* LIBC: isnanf */
 #include <local/math/isnanf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(isnanf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanf))(__val); })
+/* Return nonzero if VALUE is not a number */
+__NAMESPACE_LOCAL_USING_OR_IMPL(isnanf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanf))(__x); })
 #endif /* isnanf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_isnanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanl)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanl)(long double __val) { return __builtin_isnanl(__val); }
+/* Return nonzero if VALUE is not a number */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanl)(long double __x) { return __builtin_isnanl(__x); }
 #elif defined(__CRT_HAVE_isnanl)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __val),(__val))
+/* Return nonzero if VALUE is not a number */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___isnanl)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __val),__isnanl,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __x),__isnanl,(__x))
 #elif defined(__CRT_HAVE___isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __val),__isnan,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __x),__isnan,(__x))
 #elif defined(__CRT_HAVE__isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __val),_isnan,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __x),_isnan,(__x))
 #elif defined(__CRT_HAVE_isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __val),isnan,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __x),isnan,(__x))
 #else /* LIBC: isnanl */
 #include <local/math/isnanl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(isnanl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))(__val); })
+/* Return nonzero if VALUE is not a number */
+__NAMESPACE_LOCAL_USING_OR_IMPL(isnanl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))(__x); })
 #endif /* isnanl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
@@ -8108,35 +8159,49 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lgammal_r, __FORCELOCAL __ATTR_WUNUSED long doub
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
 #if __has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL scalb)(double __x, double __n) { return __builtin_scalb(__x, __n); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL scalb)(double __x, double __fn) { return __builtin_scalb(__x, __fn); }
 #elif defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,scalb,(double __x, double __n),(__x,__n))
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,scalb,(double __x, double __fn),(__x,__fn))
 #elif defined(__CRT_HAVE___scalb)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,scalb,(double __x, double __n),__scalb,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,scalb,(double __x, double __fn),__scalb,(__x,__fn))
 #elif defined(__CRT_HAVE__scalb)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,scalb,(double __x, double __n),_scalb,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,scalb,(double __x, double __fn),_scalb,(__x,__fn))
+#else /* LIBC: scalb */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/scalb.h>
+/* Return X times (2 to the Nth power) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(scalb, __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL scalb)(double __x, double __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalb))(__x, __fn); })
+#else /* CUSTOM: scalb */
+#undef none
+#endif /* scalb... */
 #endif /* scalb... */
 #endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 #ifdef __USE_MISC
 #if __has_builtin(__builtin_scalbf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbf)
 /* Return X times (2 to the Nth power) */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL scalbf)(float __x, float __n) { return __builtin_scalbf(__x, __n); }
+__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL scalbf)(float __x, float __fn) { return __builtin_scalbf(__x, __fn); }
 #elif defined(__CRT_HAVE_scalbf)
 /* Return X times (2 to the Nth power) */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,scalbf,(float __x, float __n),(__x,__n))
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,scalbf,(float __x, float __fn),(__x,__fn))
 #elif defined(__CRT_HAVE___scalbf)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbf,(float __x, float __n),__scalbf,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbf,(float __x, float __fn),__scalbf,(__x,__fn))
 #elif defined(__CRT_HAVE__scalbf)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbf,(float __x, float __n),_scalbf,(__x,__n))
-#elif defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbf,(float __x, float __fn),_scalbf,(__x,__fn))
+#else /* LIBC: scalbf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/scalbf.h>
 /* Return X times (2 to the Nth power) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(scalbf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL scalbf)(float __x, float __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __n); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(scalbf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL scalbf)(float __x, float __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __fn); })
+#else /* CUSTOM: scalbf */
+#undef none
+#endif /* scalbf... */
 #endif /* scalbf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_scalbl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbl)
@@ -8157,10 +8222,15 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,scalbl,(long double __x, long d
 #elif defined(__CRT_HAVE___scalb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,scalbl,(long double __x, long double __n),__scalb,(__x,__n))
-#elif defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+#else /* LIBC: scalbl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #include <local/math/scalbl.h>
 /* Return X times (2 to the Nth power) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(scalbl, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL scalbl)(long double __x, long double __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbl))(__x, __n); })
+#else /* CUSTOM: scalbl */
+#undef none
+#endif /* scalbl... */
 #endif /* scalbl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_MISC */
@@ -9610,34 +9680,34 @@ __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fmod)(double __x, doub
 #endif /* __fmod... */
 #if __has_builtin(__builtin_isinf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinf)(double __val) { return __builtin_isinf(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinf)(double __x) { return __builtin_isinf(__x); }
 #elif defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinf,(double __val),isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinf,(double __x),isinf,(__x))
 #elif defined(__CRT_HAVE___isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinf,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinf,(double __x),(__x))
 #else /* LIBC: isinf */
 #include <local/math/isinf.h>
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinf)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinf)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))(__x); }
 #endif /* __isinf... */
 #if __has_builtin(__builtin_finite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finite)(double __val) { return __builtin_finite(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finite)(double __x) { return __builtin_finite(__x); }
 #elif defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finite,(double __val),finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finite,(double __x),finite,(__x))
 #elif defined(__CRT_HAVE___finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finite,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finite,(double __x),(__x))
 #elif defined(__CRT_HAVE__finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finite,(double __val),_finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finite,(double __x),_finite,(__x))
 #else /* LIBC: finite */
 #include <local/math/finite.h>
 /* Return nonzero if VALUE is finite and not NaN */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finite)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finite)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__x); }
 #endif /* __finite... */
 #if __has_builtin(__builtin_ceilf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceilf)
 /* Smallest integral value not less than X */
@@ -9701,24 +9771,32 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fmodf)(float __x, float
 #endif /* __fmodf... */
 #endif /* __fmodf... */
 #if __has_builtin(__builtin_isinff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinff)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinff)(float __val) { return __builtin_isinff(__val); }
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinff)(float __x) { return __builtin_isinff(__x); }
 #elif defined(__CRT_HAVE_isinff)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinff,(float __val),isinff,(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinff,(float __x),isinff,(__x))
 #elif defined(__CRT_HAVE___isinff)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinff,(float __val),(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinff,(float __x),(__x))
 #else /* LIBC: isinff */
 #include <local/math/isinff.h>
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinff)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinff))(__val); }
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinff)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinff))(__x); }
 #endif /* __isinff... */
 #if __has_builtin(__builtin_finitef) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitef)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitef)(float __val) { return __builtin_finitef(__val); }
+/* Return nonzero if VALUE is finite and not NaN */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitef)(float __x) { return __builtin_finitef(__x); }
 #elif defined(__CRT_HAVE_finitef)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitef,(float __val),finitef,(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitef,(float __x),finitef,(__x))
 #elif defined(__CRT_HAVE___finitef)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitef,(float __val),(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitef,(float __x),(__x))
 #else /* LIBC: finitef */
 #include <local/math/finitef.h>
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitef)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitef))(__val); }
+/* Return nonzero if VALUE is finite and not NaN */
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitef)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitef))(__x); }
 #endif /* __finitef... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_ceill) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceill)
@@ -9789,32 +9867,44 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fmod
 #endif /* __fmodl... */
 #endif /* __fmodl... */
 #if __has_builtin(__builtin_isinfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinfl)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinfl)(long double __val) { return __builtin_isinfl(__val); }
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinfl)(long double __x) { return __builtin_isinfl(__x); }
 #elif defined(__CRT_HAVE_isinfl)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __val),isinfl,(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __x),isinfl,(__x))
 #elif defined(__CRT_HAVE___isinfl)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __val),(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __val),__isinf,(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __x),__isinf,(__x))
 #elif defined(__CRT_HAVE_isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __val),isinf,(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __x),isinf,(__x))
 #else /* LIBC: isinfl */
 #include <local/math/isinfl.h>
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinfl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinfl))(__val); }
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinfl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinfl))(__x); }
 #endif /* __isinfl... */
 #if __has_builtin(__builtin_finitel) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitel)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitel)(long double __val) { return __builtin_finitel(__val); }
+/* Return nonzero if VALUE is finite and not NaN */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitel)(long double __x) { return __builtin_finitel(__x); }
 #elif defined(__CRT_HAVE_finitel)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __val),finitel,(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __x),finitel,(__x))
 #elif defined(__CRT_HAVE___finitel)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __val),(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __x),(__x))
 #elif defined(__CRT_HAVE___finite) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __val),__finite,(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __x),__finite,(__x))
 #elif defined(__CRT_HAVE_finite) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __val),finite,(__val))
+/* Return nonzero if VALUE is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __x),finite,(__x))
 #else /* LIBC: finitel */
 #include <local/math/finitel.h>
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitel)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitel))(__val); }
+/* Return nonzero if VALUE is finite and not NaN */
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitel)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitel))(__x); }
 #endif /* __finitel... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifdef __USE_MISC
@@ -9998,47 +10088,58 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nanl
 
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnan)(double __val) { return __builtin_isnan(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnan)(double __x) { return __builtin_isnan(__x); }
 #elif defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnan,(double __val),isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnan,(double __x),isnan,(__x))
 #elif defined(__CRT_HAVE___isnan)
 /* Return nonzero if VALUE is not a number */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnan,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnan,(double __x),(__x))
 #elif defined(__CRT_HAVE__isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnan,(double __val),_isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnan,(double __x),_isnan,(__x))
 #else /* LIBC: isnan */
 #include <local/math/isnan.h>
 /* Return nonzero if VALUE is not a number */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnan)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__x); }
 #endif /* __isnan... */
 #if __has_builtin(__builtin_isnanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanf)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanf)(float __val) { return __builtin_isnanf(__val); }
+/* Return nonzero if VALUE is not a number */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanf)(float __x) { return __builtin_isnanf(__x); }
 #elif defined(__CRT_HAVE_isnanf)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanf,(float __val),isnanf,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanf,(float __x),isnanf,(__x))
 #elif defined(__CRT_HAVE___isnanf)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanf,(float __val),(__val))
+/* Return nonzero if VALUE is not a number */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanf,(float __x),(__x))
 #else /* LIBC: isnanf */
 #include <local/math/isnanf.h>
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanf))(__val); }
+/* Return nonzero if VALUE is not a number */
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanf))(__x); }
 #endif /* __isnanf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_isnanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanl)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanl)(long double __val) { return __builtin_isnanl(__val); }
+/* Return nonzero if VALUE is not a number */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanl)(long double __x) { return __builtin_isnanl(__x); }
 #elif defined(__CRT_HAVE_isnanl)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __val),isnanl,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __x),isnanl,(__x))
 #elif defined(__CRT_HAVE___isnanl)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __val),(__val))
+/* Return nonzero if VALUE is not a number */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __val),__isnan,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __x),__isnan,(__x))
 #elif defined(__CRT_HAVE__isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __val),_isnan,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __x),_isnan,(__x))
 #elif defined(__CRT_HAVE_isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __val),isnan,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __x),isnan,(__x))
 #else /* LIBC: isnanl */
 #include <local/math/isnanl.h>
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))(__val); }
+/* Return nonzero if VALUE is not a number */
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))(__x); }
 #endif /* __isnanl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -10493,12 +10594,24 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW_NCX(__LIBCCALL __lgammal_r)(lo
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-#ifdef __CRT_HAVE___rint
+#if __has_builtin(__builtin_rint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__rint,(double __x),(__x))
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __rint)(double __x) { return __builtin_rint(__x); }
 #elif defined(__CRT_HAVE_rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__rint,(double __x),rint,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__rint,(double __x),rint,(__x))
+#elif defined(__CRT_HAVE___rint)
+/* Return the integer nearest X in the direction of the prevailing rounding mode */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__rint,(double __x),(__x))
+#else /* LIBC: rint */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/rint.h>
+/* Return the integer nearest X in the direction of the prevailing rounding mode */
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __rint)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rint))(__x); }
+#else /* CUSTOM: rint */
+#undef none
+#endif /* __rint... */
 #endif /* __rint... */
 #ifdef __CRT_HAVE___nextafter
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
@@ -10526,17 +10639,22 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogb,(double __x),ilogb,(__x))
 #endif /* __ilogb... */
 #if __has_builtin(__builtin_rintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __rintf)(float __x) { return __builtin_rintf(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __rintf)(float __x) { return __builtin_rintf(__x); }
 #elif defined(__CRT_HAVE_rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__rintf,(float __x),rintf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__rintf,(float __x),rintf,(__x))
 #elif defined(__CRT_HAVE___rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__rintf,(float __x),(__x))
-#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__rintf,(float __x),(__x))
+#else /* LIBC: rintf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/rintf.h>
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __rintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __rintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); }
+#else /* CUSTOM: rintf */
+#undef none
+#endif /* __rintf... */
 #endif /* __rintf... */
 #if __has_builtin(__builtin_nextafterf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
@@ -10583,23 +10701,28 @@ __FORCELOCAL __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __ilogbf)(float __x) { retu
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_rintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__EXTERNINLINE __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __rintl)(long double __x) { return __builtin_rintl(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __rintl)(long double __x) { return __builtin_rintl(__x); }
 #elif defined(__CRT_HAVE_rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__rintl,(long double __x),rintl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__rintl,(long double __x),rintl,(__x))
 #elif defined(__CRT_HAVE___rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,__rintl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__rintl,(long double __x),(__x))
 #elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__rintl,(long double __x),rint,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__rintl,(long double __x),rint,(__x))
 #elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__rintl,(long double __x),__rint,(__x))
-#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__rintl,(long double __x),__rint,(__x))
+#else /* LIBC: rintl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 #include <local/math/rintl.h>
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
-__FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __rintl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __rintl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); }
+#else /* CUSTOM: rintl */
+#undef none
+#endif /* __rintl... */
 #endif /* __rintl... */
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
@@ -11377,34 +11500,51 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL __llrou
 #endif /* __USE_ISOC99 */
 
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
-#ifdef __CRT_HAVE___scalb
+#if __has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__scalb,(double __x, double __n),(__x,__n))
-#elif defined(__CRT_HAVE__scalb)
-/* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__scalb,(double __x, double __n),_scalb,(__x,__n))
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __scalb)(double __x, double __fn) { return __builtin_scalb(__x, __fn); }
 #elif defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__scalb,(double __x, double __n),scalb,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__scalb,(double __x, double __fn),scalb,(__x,__fn))
+#elif defined(__CRT_HAVE___scalb)
+/* Return X times (2 to the Nth power) */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__scalb,(double __x, double __fn),(__x,__fn))
+#elif defined(__CRT_HAVE__scalb)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__scalb,(double __x, double __fn),_scalb,(__x,__fn))
+#else /* LIBC: scalb */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/scalb.h>
+/* Return X times (2 to the Nth power) */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __scalb)(double __x, double __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalb))(__x, __fn); }
+#else /* CUSTOM: scalb */
+#undef none
+#endif /* __scalb... */
 #endif /* __scalb... */
 #endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 #ifdef __USE_MISC
 #if __has_builtin(__builtin_scalbf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbf)
 /* Return X times (2 to the Nth power) */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __scalbf)(float __x, float __n) { return __builtin_scalbf(__x, __n); }
+__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __scalbf)(float __x, float __fn) { return __builtin_scalbf(__x, __fn); }
 #elif defined(__CRT_HAVE_scalbf)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__scalbf,(float __x, float __n),scalbf,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__scalbf,(float __x, float __fn),scalbf,(__x,__fn))
 #elif defined(__CRT_HAVE___scalbf)
 /* Return X times (2 to the Nth power) */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__scalbf,(float __x, float __n),(__x,__n))
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__scalbf,(float __x, float __fn),(__x,__fn))
 #elif defined(__CRT_HAVE__scalbf)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__scalbf,(float __x, float __n),_scalbf,(__x,__n))
-#elif defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__scalbf,(float __x, float __fn),_scalbf,(__x,__fn))
+#else /* LIBC: scalbf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/scalbf.h>
 /* Return X times (2 to the Nth power) */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __scalbf)(float __x, float __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __n); }
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __scalbf)(float __x, float __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __fn); }
+#else /* CUSTOM: scalbf */
+#undef none
+#endif /* __scalbf... */
 #endif /* __scalbf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_scalbl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbl)
@@ -11425,10 +11565,15 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__scalbl,(long double __x, long
 #elif defined(__CRT_HAVE___scalb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__scalbl,(long double __x, long double __n),__scalb,(__x,__n))
-#elif defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+#else /* LIBC: scalbl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #include <local/math/scalbl.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __scalbl)(long double __x, long double __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbl))(__x, __n); }
+#else /* CUSTOM: scalbl */
+#undef none
+#endif /* __scalbl... */
 #endif /* __scalbl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_MISC */
@@ -11438,73 +11583,74 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __scalbl)(long doub
 /* Floating point classification */
 #ifdef __USE_ISOC99
 #ifdef __CRT_HAVE___fpclassify
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __x),(__x))
 #elif defined(__CRT_HAVE__dclass)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __val),_dclass,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __x),_dclass,(__x))
 #endif /* __fpclassify... */
 #ifdef __CRT_HAVE___signbit
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbit,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbit,(double __x),(__x))
 #elif defined(__CRT_HAVE__dsign)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbit,(double __val),_dsign,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbit,(double __x),_dsign,(__x))
+#else /* LIBC: __signbit */
+#include <local/math/__signbit.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__signbit, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __signbit)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbit))(__x); })
 #endif /* __signbit... */
 #ifdef __CRT_HAVE___fpclassifyf
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __x),(__x))
 #elif defined(__CRT_HAVE__fdclass)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __val),_fdclass,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __x),_fdclass,(__x))
 #elif defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass)
 #include <local/math/__fpclassifyf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyf))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyf))(__x); })
 #endif /* __fpclassifyf... */
 #ifdef __CRT_HAVE___signbitf
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __x),(__x))
 #elif defined(__CRT_HAVE__fdsign)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __val),_fdsign,(__val))
-#elif defined(__CRT_HAVE___signbit) || defined(__CRT_HAVE__dsign)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __x),_fdsign,(__x))
+#else /* LIBC: __signbitf */
 #include <local/math/__signbitf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__signbitf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __signbitf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbitf))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__signbitf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __signbitf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbitf))(__x); })
 #endif /* __signbitf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE___fpclassifyl
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __x),(__x))
 #elif defined(__CRT_HAVE__ldclass)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __val),_ldclass,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __x),_ldclass,(__x))
 #elif defined(__CRT_HAVE___fpclassify) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __val),__fpclassify,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __x),__fpclassify,(__x))
 #elif defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass)
 #include <local/math/__fpclassifyl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyl))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyl))(__x); })
 #endif /* __fpclassifyl... */
 #ifdef __CRT_HAVE___signbitl
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(long double __x),(__x))
 #elif defined(__CRT_HAVE__ldsign)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(long double __val),_ldsign,(__val))
-#elif defined(__CRT_HAVE___signbit) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(long double __val),__signbit,(__val))
-#elif defined(__CRT_HAVE___signbit) || defined(__CRT_HAVE__dsign)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(long double __x),_ldsign,(__x))
+#else /* LIBC: __signbitl */
 #include <local/math/__signbitl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__signbitl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __signbitl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbitl))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__signbitl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __signbitl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbitl))(__x); })
 #endif /* __signbitl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
 
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE___issignaling
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignaling,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignaling,(double __x),(__x))
 #endif /* __issignaling... */
 #ifdef __CRT_HAVE___issignalingf
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingf,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingf,(float __x),(__x))
 #elif defined(__CRT_HAVE___issignaling)
 #include <local/math/__issignalingf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __issignalingf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingf))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __issignalingf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingf))(__x); })
 #endif /* __issignalingf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE___issignalingl
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___issignaling) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(long double __val),__issignaling,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(long double __x),__issignaling,(__x))
 #elif defined(__CRT_HAVE___issignaling)
 #include <local/math/__issignalingl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __issignalingl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingl))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __issignalingl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingl))(__x); })
 #endif /* __issignalingl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_GNU */
@@ -11677,27 +11823,15 @@ enum {
 #endif /* !isnormal */
 
 #ifndef isfinite
-#if defined(__CRT_HAVE___finite)
 #define isfinite(x) __FPFUNC(x, __finitef, __finite, __finitel)
-#elif defined(fpclassify) && defined(__CRT_DOS)
-#define isfinite(x) (fpclassify(x) <= 0)
-#endif
 #endif /* !isfinite */
 
 #ifndef isnan
-#if defined(__CRT_HAVE___isnan)
 #define isnan(x) __FPFUNC(x, __isnanf, __isnan, __isnanl)
-#elif defined(fpclassify)
-#define isnan(x) (fpclassify(x) == FP_NAN)
-#endif
 #endif /* !isnan */
 
 #ifndef isinf
-#if defined(__CRT_HAVE___isinfo)
 #define isinf(x) __FPFUNC(x, __isinff, __isinf, __isinfl)
-#elif defined(fpclassify)
-#define isinf(x) (fpclassify(x) == FP_INFINITE)
-#endif
 #endif /* !isinf */
 
 

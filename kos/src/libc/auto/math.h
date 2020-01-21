@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x627246e */
+/* HASH CRC-32:0x4b6501d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,18 +92,6 @@ INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_fminl)(long double x
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_fmal)(long double x, long double y, long double z);
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llroundl)(long double x);
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isinf)(double val);
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isinff)(float val);
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isinfl)(long double val);
-/* Return nonzero if VALUE is finite and not NaN */
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_finite)(double val);
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_finitef)(float val);
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_finitel)(long double val);
-/* Return nonzero if VALUE is not a number */
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isnan)(double val);
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isnanf)(float val);
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isnanl)(long double val);
 /* Smallest integral value not less than X */
 #define libc___ceil libc_ceil
 /* Absolute value of X */
@@ -120,7 +108,9 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isnanl)(long double val);
 #define libc___fabsf libc_fabsf
 /* Largest integer not greater than X */
 #define libc___floorf libc_floorf
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 #define libc___isinff libc_isinff
+/* Return nonzero if VALUE is finite and not NaN */
 #define libc___finitef libc_finitef
 /* Smallest integral value not less than X */
 #define libc___ceill libc_ceill
@@ -128,7 +118,9 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isnanl)(long double val);
 #define libc___fabsl libc_fabsl
 /* Largest integer not greater than X */
 #define libc___floorl libc_floorl
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 #define libc___isinfl libc_isinfl
+/* Return nonzero if VALUE is finite and not NaN */
 #define libc___finitel libc_finitel
 /* Return X with its signed changed to Y's */
 #define libc___copysign libc_copysign
@@ -144,7 +136,9 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isnanl)(long double val);
 #define libc___nanl libc_nanl
 /* Return nonzero if VALUE is not a number */
 #define libc___isnan libc_isnan
+/* Return nonzero if VALUE is not a number */
 #define libc___isnanf libc_isnanf
+/* Return nonzero if VALUE is not a number */
 #define libc___isnanl libc_isnanl
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___round libc_round
@@ -197,6 +191,9 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isnanl)(long double val);
 #define libc___fmal libc_fmal
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___llroundl libc_llroundl
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbit)(double x);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbitf)(float x);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbitl)(long double x);
 #endif /* !__KERNEL__ */
 
 DECL_END

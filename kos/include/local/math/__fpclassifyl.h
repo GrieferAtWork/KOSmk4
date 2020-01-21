@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd4c4755 */
+/* HASH CRC-32:0xc7529b03 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #ifndef ____localdep___fpclassify_defined
 #define ____localdep___fpclassify_defined 1
 #ifdef __CRT_HAVE___fpclassify
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __val),__fpclassify,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),__fpclassify,(__x))
 #elif defined(__CRT_HAVE__dclass)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __val),_dclass,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),_dclass,(__x))
 #else /* LIBC: __fpclassify */
 #undef ____localdep___fpclassify_defined
 #endif /* __fpclassify... */
@@ -35,9 +35,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(d
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__fpclassifyl) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyl))(long double __val) {
-#line 1612 "kos/src/libc/magic/math.c"
-	return (int)__localdep___fpclassify((double)__val);
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyl))(long double __x) {
+#line 1791 "kos/src/libc/magic/math.c"
+	return (int)__localdep___fpclassify((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE___fpclassify || __CRT_HAVE__dclass */

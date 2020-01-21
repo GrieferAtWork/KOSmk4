@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e4ffe5c */
+/* HASH CRC-32:0xb8adc71b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,18 +20,19 @@
  */
 #ifndef __local_finite_defined
 #define __local_finite_defined 1
+#include <libm/finite.h>
 /* Dependency: "isinf" from "math" */
 #ifndef ____localdep_isinf_defined
 #define ____localdep_isinf_defined 1
 #if __has_builtin(__builtin_isinf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isinf)(double __val) { return __builtin_isinf(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isinf)(double __x) { return __builtin_isinf(__x); }
 #elif defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __val),isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __x),isinf,(__x))
 #elif defined(__CRT_HAVE___isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __val),__isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __x),__isinf,(__x))
 #else /* LIBC: isinf */
 #include <local/math/isinf.h>
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
@@ -44,16 +45,16 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double _
 #define ____localdep_isnan_defined 1
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isnan)(double __val) { return __builtin_isnan(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isnan)(double __x) { return __builtin_isnan(__x); }
 #elif defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __val),isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),isnan,(__x))
 #elif defined(__CRT_HAVE___isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __val),__isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),__isnan,(__x))
 #elif defined(__CRT_HAVE__isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __val),_isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),_isnan,(__x))
 #else /* LIBC: isnan */
 #include <local/math/isnan.h>
 /* Return nonzero if VALUE is not a number */
@@ -64,9 +65,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double _
 __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is finite and not NaN */
 __LOCAL_LIBC(finite) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finite))(double __val) {
-#line 1101 "kos/src/libc/magic/math.c"
-	return !__localdep_isinf(__val) && !__localdep_isnan(__val);
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finite))(double __x) {
+#line 1195 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)__x);
+#else /* ... */
+	return !__localdep_isinf(__x) && !__localdep_isnan(__x);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_finite_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72cf5a5a */
+/* HASH CRC-32:0x44ce147c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,25 +19,34 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scalbl_defined
-#if defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #define __local_scalbl_defined 1
-/* Dependency: "scalb" */
+#include <libm/scalb.h>
+/* Dependency: "scalb" from "math" */
 #ifndef ____localdep_scalb_defined
 #define ____localdep_scalb_defined 1
 #if __has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_scalb)(double __x, double __n) { return __builtin_scalb(__x, __n); }
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_scalb)(double __x, double __fn) { return __builtin_scalb(__x, __fn); }
 #elif defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __n),scalb,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __fn),scalb,(__x,__fn))
 #elif defined(__CRT_HAVE___scalb)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __n),__scalb,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __fn),__scalb,(__x,__fn))
 #elif defined(__CRT_HAVE__scalb)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __n),_scalb,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __fn),_scalb,(__x,__fn))
 #else /* LIBC: scalb */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/scalb.h>
+/* Return X times (2 to the Nth power) */
+#define __localdep_scalb (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalb))
+#else /* CUSTOM: scalb */
 #undef ____localdep_scalb_defined
+#endif /* scalb... */
 #endif /* scalb... */
 #endif /* !____localdep_scalb_defined */
 
@@ -46,9 +55,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(scalbl) __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbl))(long double __x,
                                                 long double __n) {
-#line 1232 "kos/src/libc/magic/math.c"
+#line 1403 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_scalb((double)__x, (double)__n);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_scalb || __CRT_HAVE___scalb || __CRT_HAVE__scalb */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_scalb || __CRT_HAVE___scalb || __CRT_HAVE__scalb */
 #endif /* !__local_scalbl_defined */

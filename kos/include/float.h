@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x959e3f7a */
+/* HASH CRC-32:0xe799b854 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -282,15 +282,27 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_chgsign,(double __x),(_
 #include <local/float/_chgsign.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_chgsign, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _chgsign)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_chgsign))(__x); })
 #endif /* _chgsign... */
-#ifdef __CRT_HAVE___scalb
+#if __has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __n),__scalb,(__x,__n))
-#elif defined(__CRT_HAVE__scalb)
-/* Return X times (2 to the Nth power) */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __n),(__x,__n))
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _scalb)(double __x, double __fn) { return __builtin_scalb(__x, __fn); }
 #elif defined(__CRT_HAVE_scalb)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __n),scalb,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),scalb,(__x,__fn))
+#elif defined(__CRT_HAVE___scalb)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),__scalb,(__x,__fn))
+#elif defined(__CRT_HAVE__scalb)
+/* Return X times (2 to the Nth power) */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),(__x,__fn))
+#else /* LIBC: scalb */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/scalb.h>
+/* Return X times (2 to the Nth power) */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _scalb)(double __x, double __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalb))(__x, __fn); }
+#else /* CUSTOM: scalb */
+#undef none
+#endif /* _scalb... */
 #endif /* _scalb... */
 #ifdef __CRT_HAVE___logb
 /* Return the base 2 signed integral exponent of X */
@@ -314,37 +326,37 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x,
 #endif /* _nextafter... */
 #if __has_builtin(__builtin_finite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _finite)(double __val) { return __builtin_finite(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _finite)(double __x) { return __builtin_finite(__x); }
 #elif defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __val),finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __x),finite,(__x))
 #elif defined(__CRT_HAVE___finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __val),__finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __x),__finite,(__x))
 #elif defined(__CRT_HAVE__finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_finite,(double __x),(__x))
 #else /* LIBC: finite */
 #include <local/math/finite.h>
 /* Return nonzero if VALUE is finite and not NaN */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _finite)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _finite)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__x); }
 #endif /* _finite... */
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isnan)(double __val) { return __builtin_isnan(__val); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isnan)(double __x) { return __builtin_isnan(__x); }
 #elif defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __val),isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),isnan,(__x))
 #elif defined(__CRT_HAVE___isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __val),__isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),__isnan,(__x))
 #elif defined(__CRT_HAVE__isnan)
 /* Return nonzero if VALUE is not a number */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __x),(__x))
 #else /* LIBC: isnan */
 #include <local/math/isnan.h>
 /* Return nonzero if VALUE is not a number */
-__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isnan)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isnan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__x); }
 #endif /* _isnan... */
 #ifdef __CRT_HAVE__fpclass
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_fpclass,(double __x),(__x))
@@ -352,20 +364,25 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_fpclass,(double __x),(__x)
 #if defined(__x86_64__) || defined(__i386__)
 #if __has_builtin(__builtin_scalbf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbf)
 /* Return X times (2 to the Nth power) */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float __n) { return __builtin_scalbf(__x, __n); }
+__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float __fn) { return __builtin_scalbf(__x, __fn); }
 #elif defined(__CRT_HAVE_scalbf)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __n),scalbf,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),scalbf,(__x,__fn))
 #elif defined(__CRT_HAVE___scalbf)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __n),__scalbf,(__x,__n))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),__scalbf,(__x,__fn))
 #elif defined(__CRT_HAVE__scalbf)
 /* Return X times (2 to the Nth power) */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __n),(__x,__n))
-#elif defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),(__x,__fn))
+#else /* LIBC: scalbf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/scalbf.h>
 /* Return X times (2 to the Nth power) */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __n); }
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __fn); }
+#else /* CUSTOM: scalbf */
+#undef none
+#endif /* _scalbf... */
 #endif /* _scalbf... */
 #endif
 #endif /* __CC__ */

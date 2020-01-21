@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f881341 */
+/* HASH CRC-32:0x5db88efe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,17 +20,22 @@
  */
 #ifndef __local_finitef_defined
 #define __local_finitef_defined 1
+#include <libm/finite.h>
 /* Dependency: "isinff" from "math" */
 #ifndef ____localdep_isinff_defined
 #define ____localdep_isinff_defined 1
 #if __has_builtin(__builtin_isinff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinff)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isinff)(float __val) { return __builtin_isinff(__val); }
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isinff)(float __x) { return __builtin_isinff(__x); }
 #elif defined(__CRT_HAVE_isinff)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinff,(float __val),isinff,(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinff,(float __x),isinff,(__x))
 #elif defined(__CRT_HAVE___isinff)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinff,(float __val),__isinff,(__val))
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinff,(float __x),__isinff,(__x))
 #else /* LIBC: isinff */
 #include <local/math/isinff.h>
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 #define __localdep_isinff (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinff))
 #endif /* isinff... */
 #endif /* !____localdep_isinff_defined */
@@ -39,22 +44,33 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinff,(float _
 #ifndef ____localdep_isnanf_defined
 #define ____localdep_isnanf_defined 1
 #if __has_builtin(__builtin_isnanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanf)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isnanf)(float __val) { return __builtin_isnanf(__val); }
+/* Return nonzero if VALUE is not a number */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isnanf)(float __x) { return __builtin_isnanf(__x); }
 #elif defined(__CRT_HAVE_isnanf)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanf,(float __val),isnanf,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanf,(float __x),isnanf,(__x))
 #elif defined(__CRT_HAVE___isnanf)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanf,(float __val),__isnanf,(__val))
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanf,(float __x),__isnanf,(__x))
 #else /* LIBC: isnanf */
 #include <local/math/isnanf.h>
+/* Return nonzero if VALUE is not a number */
 #define __localdep_isnanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanf))
 #endif /* isnanf... */
 #endif /* !____localdep_isnanf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
+/* Return nonzero if VALUE is finite and not NaN */
 __LOCAL_LIBC(finitef) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finitef))(float __val) {
-#line 1114 "kos/src/libc/magic/math.c"
-	return !__localdep_isinff(__val) && !__localdep_isnanf(__val);
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finitef))(float __x) {
+#line 1215 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)__x);
+#else /* ... */
+	return !__localdep_isinff(__x) && !__localdep_isnanf(__x);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_finitef_defined */

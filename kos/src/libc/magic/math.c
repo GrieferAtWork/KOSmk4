@@ -282,13 +282,26 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__logb, _logb)][nothrow]
 [crtbuiltin] logb:(double x) -> double; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1f)][nothrow][crtbuiltin] expm1f:(float x) -> float %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pf)][nothrow][crtbuiltin] log1pf:(float x) -> float %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logbf)][nothrow][crtbuiltin] logbf:(float x) -> float %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1f)][nothrow][crtbuiltin]
+expm1f:(float x) -> float %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pf)][nothrow][crtbuiltin]
+log1pf:(float x) -> float %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logbf)][nothrow][crtbuiltin]
+logbf:(float x) -> float %{auto_block(math)}
+
+
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1l)][nothrow][crtbuiltin] expm1l:(long double x) -> long double %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pl)][nothrow][crtbuiltin] log1pl:(long double x) -> long double %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logbl)][nothrow][crtbuiltin] logbl:(long double x) -> long double %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1l)][nothrow][crtbuiltin]
+expm1l:(long double x) -> long double %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pl)][nothrow][crtbuiltin]
+log1pl:(long double x) -> long double %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__logbl)][nothrow][crtbuiltin]
+logbl:(long double x) -> long double %{auto_block(math)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
@@ -302,11 +315,20 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2)][nothrow]
 [crtbuiltin] log2:(double x) -> double; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2f)][nothrow][crtbuiltin] exp2f:(float x) -> float %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2f)][nothrow][crtbuiltin] log2f:(float x) -> float %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2f)][nothrow][crtbuiltin]
+exp2f:(float x) -> float %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2f)][nothrow][crtbuiltin]
+log2f:(float x) -> float %{auto_block(math)}
+
+
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2l)][nothrow][crtbuiltin] exp2l:(long double x) -> long double %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2l)][nothrow][crtbuiltin] log2l:(long double x) -> long double %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2l)][nothrow][crtbuiltin]
+exp2l:(long double x) -> long double %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2l)][nothrow][crtbuiltin]
+log2l:(long double x) -> long double %{auto_block(math)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
@@ -611,17 +633,30 @@ nanl:(char const *tagb) -> long double %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgamma)]
 [crtbuiltin] tgamma:(double x) -> double; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgammaf)][crtbuiltin] tgammaf:(float x) -> float %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgammaf)][crtbuiltin]
+tgammaf:(float x) -> float %{auto_block(math)}
+
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgammal)][crtbuiltin] tgammal:(long double x) -> long double %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgammal)][crtbuiltin]
+tgammal:(long double x) -> long double %{auto_block(math)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
+
 @@Return the integer nearest X in the direction of the prevailing rounding mode
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__rint)]
-[crtbuiltin] rint:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__rint)][crtbuiltin]
+[requires_include(<ieee754.h>)][decl_include(<libm/rint.h>)][userimpl]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+rint:(double x) -> double {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+}
+
 
 @@Return X + epsilon if X < Y, X - epsilon if X > Y
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafter, _nextafter)]
@@ -635,15 +670,40 @@ nanl:(char const *tagb) -> long double %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogb)]
 [crtbuiltin] ilogb:(double x) -> int; /* TODO */
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__rintf)][crtbuiltin] rintf:(float x) -> float %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterf)][crtbuiltin] nextafterf:(float x, float y) -> float %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderf)][crtbuiltin] remainderf:(float x, float y) -> float %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogbf)][crtbuiltin] ilogbf:(float x) -> int %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__rintf)][crtbuiltin]
+[requires_include(<ieee754.h>)][decl_include(<libm/rint.h>)][userimpl][doc_alias(rint)]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+rintf:(float x) -> float {
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (double)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)x);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (double)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)x);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+}
+
+
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterf)][crtbuiltin]
+nextafterf:(float x, float y) -> float %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderf)][crtbuiltin]
+remainderf:(float x, float y) -> float %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogbf)][crtbuiltin]
+ilogbf:(float x) -> int %{auto_block(math)}
+
+
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__rintl)][crtbuiltin] rintl:(long double x) -> long double %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterl)][crtbuiltin] nextafterl:(long double x, long double y) -> long double %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderl)][crtbuiltin] remainderl:(long double x, long double y) -> long double %{auto_block(math)}
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogbl)][crtbuiltin] ilogbl:(long double x) -> int %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__rintl)][crtbuiltin]
+rintl:(long double x) -> long double %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterl)][crtbuiltin]
+nextafterl:(long double x, long double y) -> long double %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderl)][crtbuiltin]
+remainderl:(long double x, long double y) -> long double %{auto_block(math)}
+
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogbl)][crtbuiltin]
+ilogbl:(long double x) -> int %{auto_block(math)}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
@@ -1049,8 +1109,13 @@ sincosf:(float x, [nonnull] float *psinx, [nonnull] float *pcosx)
 	*psinx = (float)sinx;
 	*pcosx = (float)cosx;
 }))}
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10f)] exp10f:(float x) -> float %{auto_block(math)}
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10f)] pow10f:(float x) -> float %{auto_block(math)}
+
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10f)]
+exp10f:(float x) -> float %{auto_block(math)}
+
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10f)]
+pow10f:(float x) -> float %{auto_block(math)}
+
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [alias(__sincosl)][nothrow][doc_alias(sincos)]
 [attribute(@__DECL_SIMD_sincosl@)][decl_include(<bits/math-vector.h>)]
@@ -1064,8 +1129,11 @@ sincosl:(long double x, [nonnull] long double *psinx, [nonnull] long double *pco
 	*pcosx = (long double)cosx;
 }))}
 
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10l)] exp10l:(long double x) -> long double %{auto_block(math)}
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10l)] pow10l:(long double x) -> long double %{auto_block(math)}
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10l)]
+exp10l:(long double x) -> long double %{auto_block(math)}
+
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10l)]
+pow10l:(long double x) -> long double %{auto_block(math)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
@@ -1076,29 +1144,61 @@ sincosl:(long double x, [nonnull] long double *psinx, [nonnull] long double *pco
 %#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isinf conflicts with C++11. */
 @@Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isinf)]
+[dependency_include(<libm/isinf.h>)][userimpl]
 [dependency_include(<bits/huge_val.h>)][crtbuiltin]
-isinf:(double val) -> int {
-	return val == @HUGE_VAL@;
+isinf:(double x) -> int {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return x == @HUGE_VAL@;
+#endif /* !... */
 }
 %#endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isinff)]
+[dependency_include(<libm/isinf.h>)][userimpl][doc_alias(isinf)]
 [dependency_include(<bits/huge_valf.h>)][crtbuiltin]
-isinff:(float val) -> int {
-	return val == @HUGE_VALF@;
+isinff:(float x) -> int {
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
+#else /* ... */
+	return x == @HUGE_VALF@;
+#endif /* !... */
 }
+
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isinfl)]
 [if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__isinf, isinf)]
-[dependency_include(<bits/huge_vall.h>)]
-[crtbuiltin] isinfl:(long double val) -> int {
-	return val == @HUGE_VALL@;
+[dependency_include(<libm/isinf.h>)][userimpl][doc_alias(isinf)]
+[dependency_include(<bits/huge_vall.h>)][crtbuiltin]
+isinfl:(long double x) -> int {
+#ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
+	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
+#elif 1
+	return isinf((double)x);
+#else /* ... */
+	return x == @HUGE_VALL@;
+#endif /* !... */
 }
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 @@Return nonzero if VALUE is finite and not NaN
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finite, _finite)]
-[crtbuiltin] finite:(double val) -> int {
-	return !isinf(val) && !isnan(val);
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finite, _finite)][crtbuiltin]
+[dependency_include(<libm/finite.h>)][userimpl]
+finite:(double x) -> int {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return !isinf(x) && !isnan(x);
+#endif /* !... */
 }
 
 @@Return the remainder of X/Y
@@ -1109,23 +1209,45 @@ isinff:(float val) -> int {
 [ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significand)]
 [crtbuiltin] significand:(double x) -> double; /* TODO */
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitef)]
-[crtbuiltin] finitef:(float val) -> int  {
-	return !isinff(val) && !isnanf(val);
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitef)][crtbuiltin]
+[dependency_include(<libm/finite.h>)][userimpl][doc_alias(finite)]
+finitef:(float x) -> int  {
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
+#else /* ... */
+	return !isinff(x) && !isnanf(x);
+#endif /* !... */
 }
 
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__dremf)] dremf:(float x, float y) -> float %{auto_block(math)}
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significandf)] significandf:(float x) -> float %{auto_block(math)}
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__dremf)]
+dremf:(float x, float y) -> float %{auto_block(math)}
+
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significandf)]
+significandf:(float x) -> float %{auto_block(math)}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitel)][crtbuiltin]
 [if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__finite, finite)]
-finitel:(long double val) -> int {
-	return !isinfl(val) && !isnanl(val);
+[dependency_include(<libm/finite.h>)][userimpl][doc_alias(finite)]
+finitel:(long double x) -> int {
+#ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
+	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
+#elif 1
+	return finite((double)x);
+#else /* ... */
+	return !isinfl(x) && !isnanl(x);
+#endif /* !... */
 }
 
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__dreml)] dreml:(long double x, long double y) -> long double %{auto_block(math)}
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significandl)] significandl:(long double x) -> long double %{auto_block(math)}
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__dreml)]
+dreml:(long double x, long double y) -> long double %{auto_block(math)}
+
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significandl)]
+significandl:(long double x) -> long double %{auto_block(math)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
@@ -1134,24 +1256,50 @@ finitel:(long double val) -> int {
 %#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isnan conflicts with C++11. */
 @@Return nonzero if VALUE is not a number
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isnan, _isnan)]
+[dependency_include(<libm/isnan.h>)][userimpl]
 [dependency_include(<bits/nan.h>)][crtbuiltin]
-isnan:(double val) -> int {
-	return val == (double)@NAN@;
+isnan:(double x) -> int {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return x == (double)@NAN@;
+#endif /* !... */
 }
 %#endif /* !cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isnanf)]
+[dependency_include(<libm/isnan.h>)][userimpl][doc_alias(isnan)]
 [dependency_include(<bits/nan.h>)][crtbuiltin]
-isnanf:(float val) -> int {
-	return val == (float)@NAN@;
+isnanf:(float x) -> int {
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
+#else /* ... */
+	return x == (float)@NAN@;
+#endif /* !... */
 }
+
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isnanl)]
 [if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__isnan, _isnan, isnan)]
+[dependency_include(<libm/isnan.h>)][userimpl][doc_alias(isnan)]
 [dependency_include(<bits/nan.h>)][crtbuiltin]
-isnanl:(long double val) -> int  {
-	return val == (long double)@NAN@;
+isnanl:(long double x) -> int {
+#ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
+	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
+#elif 1
+	return isnan((double)x);
+#else /* ... */
+	return x == (long double)@NAN@;
+#endif /* !... */
 }
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
+
 %#endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 %
@@ -1209,22 +1357,45 @@ isnanl:(long double val) -> int  {
 [crtbuiltin][ATTR_WUNUSED][alias(__lgamma_r)]
 lgamma_r:(double x, int *signgamp) -> double; /* TODO */
 
-[crtbuiltin][ATTR_WUNUSED][alias(__lgammaf_r)] lgammaf_r:(float x, int *signgamp) -> float %{auto_block(math(float, lgamma_r))}
+[crtbuiltin][ATTR_WUNUSED][alias(__lgammaf_r)]
+lgammaf_r:(float x, int *signgamp) -> float %{auto_block(math(float, lgamma_r))}
+
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[crtbuiltin][ATTR_WUNUSED][alias(__lgammal_r)] lgammal_r:(long double x, int *signgamp) -> long double %{auto_block(math(long double, lgamma_r))}
+[crtbuiltin][ATTR_WUNUSED][alias(__lgammal_r)]
+lgammal_r:(long double x, int *signgamp) -> long double %{auto_block(math(long double, lgamma_r))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
 %
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
 @@Return X times (2 to the Nth power)
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalb, _scalb)]
-[crtbuiltin] scalb:(double x, double n) -> double; /* TODO */
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalb, _scalb)][crtbuiltin]
+[requires_include(<ieee754.h>)][decl_include(<libm/scalb.h>)][userimpl]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+scalb:(double x, double fn) -> double {
+	COMPILER_IMPURE(); /* TODO: Math error handling */
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_scalb((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)fn);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_scalbf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)fn);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+}
 
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 %#ifdef __USE_MISC
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbf, _scalbf)]
-scalbf:(float x, float n) -> float %{auto_block(math)}
+[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbf, _scalbf)][doc_alias(scalb)]
+[requires_include(<ieee754.h>)][decl_include(<libm/scalb.h>)][userimpl]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+scalbf:(float x, float fn) -> float {
+	COMPILER_IMPURE(); /* TODO: Math error handling */
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_scalbf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)fn);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_scalb((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)fn);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+}
+
+
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbl)]
 [if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(_scalb)]
@@ -1600,27 +1771,39 @@ scalbl:(long double x, long double n) -> long double %{auto_block(math)}
 %/* Floating point classification */
 %#ifdef __USE_ISOC99
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_dclass)]
-__fpclassify:(double val) -> int; /* TODO */
+__fpclassify:(double x) -> int; /* TODO */
 
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_dsign)]
-__signbit:(double val) -> int; /* TODO */
+__signbit:(double x) -> int {
+	return x < 0.0;
+}
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_fdclass)] __fpclassifyf:(float val) -> int %{auto_block(math)}
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_fdsign)] __signbitf:(float val) -> int %{auto_block(math)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_fdclass)]
+__fpclassifyf:(float x) -> int %{auto_block(math)}
+
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_fdsign)]
+__signbitf:(float x) -> int  {
+	return x < 0.0f;
+}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_ldclass)] __fpclassifyl:(long double val) -> int %{auto_block(math)}
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_ldsign)] __signbitl:(long double val) -> int %{auto_block(math)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_ldclass)]
+__fpclassifyl:(long double x) -> int %{auto_block(math)}
+
+[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_ldsign)]
+__signbitl:(long double x) -> int  {
+	return x < 0.0L;
+}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
 
 %
 %#ifdef __USE_GNU
 [ATTR_WUNUSED][ATTR_CONST][nothrow]
-__issignaling:(double val) -> int; /* TODO */
+__issignaling:(double x) -> int; /* TODO */
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow] __issignalingf:(float val) -> int %{auto_block(math)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow] __issignalingf:(float x) -> int %{auto_block(math)}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[ATTR_WUNUSED][ATTR_CONST][nothrow] __issignalingl:(long double val) -> int %{auto_block(math)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow] __issignalingl:(long double x) -> int %{auto_block(math)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
@@ -1771,27 +1954,15 @@ __LIBC int (signgam);
 #endif /* !isnormal */
 
 #ifndef isfinite
-#if defined(__CRT_HAVE___finite)
 #define isfinite(x) __FPFUNC(x, __finitef, __finite, __finitel)
-#elif defined(fpclassify) && defined(__CRT_DOS)
-#define isfinite(x) (fpclassify(x) <= 0)
-#endif
 #endif /* !isfinite */
 
 #ifndef isnan
-#if defined(__CRT_HAVE___isnan)
 #define isnan(x) __FPFUNC(x, __isnanf, __isnan, __isnanl)
-#elif defined(fpclassify)
-#define isnan(x) (fpclassify(x) == FP_NAN)
-#endif
 #endif /* !isnan */
 
 #ifndef isinf
-#if defined(__CRT_HAVE___isinfo)
 #define isinf(x) __FPFUNC(x, __isinff, __isinf, __isinfl)
-#elif defined(fpclassify)
-#define isinf(x) (fpclassify(x) == FP_INFINITE)
-#endif
 #endif /* !isinf */
 
 

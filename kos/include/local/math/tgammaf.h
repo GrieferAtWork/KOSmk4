@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf292674f */
+/* HASH CRC-32:0xda3f3bb2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* True gamma function */
 __LOCAL_LIBC(tgammaf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tgammaf))(float __x) {
-#line 615 "kos/src/libc/magic/math.c"
+#line 638 "kos/src/libc/magic/math.c"
 	return (float)__localdep_tgamma((double)__x);
 }
 __NAMESPACE_LOCAL_END

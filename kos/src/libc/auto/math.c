@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb08a4c79 */
+/* HASH CRC-32:0xfe6621c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceil") double
 NOTHROW(LIBCCALL libc_ceil)(double x) {
-#line 427 "kos/src/libc/magic/math.c"
+#line 449 "kos/src/libc/magic/math.c"
 	double result;
 	result = (double)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result < x)
@@ -47,7 +47,7 @@ NOTHROW(LIBCCALL libc_ceil)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floor") double
 NOTHROW(LIBCCALL libc_floor)(double x) {
-#line 451 "kos/src/libc/magic/math.c"
+#line 473 "kos/src/libc/magic/math.c"
 	double result;
 	result = (double)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result > x)
@@ -60,7 +60,7 @@ NOTHROW(LIBCCALL libc_floor)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceilf") float
 NOTHROW(LIBCCALL libc_ceilf)(float x) {
-#line 427 "kos/src/libc/magic/math.c"
+#line 449 "kos/src/libc/magic/math.c"
 	float result;
 	result = (float)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result < x)
@@ -73,7 +73,7 @@ NOTHROW(LIBCCALL libc_ceilf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floorf") float
 NOTHROW(LIBCCALL libc_floorf)(float x) {
-#line 451 "kos/src/libc/magic/math.c"
+#line 473 "kos/src/libc/magic/math.c"
 	float result;
 	result = (float)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result > x)
@@ -86,7 +86,7 @@ NOTHROW(LIBCCALL libc_floorf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceill") long double
 NOTHROW(LIBCCALL libc_ceill)(long double x) {
-#line 427 "kos/src/libc/magic/math.c"
+#line 449 "kos/src/libc/magic/math.c"
 	long double result;
 	result = (long double)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result < x)
@@ -99,7 +99,7 @@ NOTHROW(LIBCCALL libc_ceill)(long double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floorl") long double
 NOTHROW(LIBCCALL libc_floorl)(long double x) {
-#line 451 "kos/src/libc/magic/math.c"
+#line 473 "kos/src/libc/magic/math.c"
 	long double result;
 	result = (long double)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result > x)
@@ -112,7 +112,7 @@ NOTHROW(LIBCCALL libc_floorl)(long double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nan") double
 NOTHROW(LIBCCALL libc_nan)(char const *tagb) {
-#line 546 "kos/src/libc/magic/math.c"
+#line 568 "kos/src/libc/magic/math.c"
 	(void)tagb;
 	return (double)NAN;
 }
@@ -122,7 +122,7 @@ NOTHROW(LIBCCALL libc_nan)(char const *tagb) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nanf") float
 NOTHROW(LIBCCALL libc_nanf)(char const *tagb) {
-#line 546 "kos/src/libc/magic/math.c"
+#line 568 "kos/src/libc/magic/math.c"
 	(void)tagb;
 	return (float)NAN;
 }
@@ -132,7 +132,7 @@ NOTHROW(LIBCCALL libc_nanf)(char const *tagb) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nanl") long double
 NOTHROW(LIBCCALL libc_nanl)(char const *tagb) {
-#line 546 "kos/src/libc/magic/math.c"
+#line 568 "kos/src/libc/magic/math.c"
 	(void)tagb;
 	return (long double)NAN;
 }
@@ -142,7 +142,7 @@ NOTHROW(LIBCCALL libc_nanl)(char const *tagb) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.round") double
 NOTHROW(LIBCCALL libc_round)(double x) {
-#line 689 "kos/src/libc/magic/math.c"
+#line 749 "kos/src/libc/magic/math.c"
 	double result;
 	result = (double)(__INTMAX_TYPE__)x;
 	if (x < 0) {
@@ -163,7 +163,7 @@ NOTHROW(LIBCCALL libc_round)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.trunc") double
 NOTHROW(LIBCCALL libc_trunc)(double x) {
-#line 708 "kos/src/libc/magic/math.c"
+#line 768 "kos/src/libc/magic/math.c"
 	return (double)(__INTMAX_TYPE__)x;
 }
 
@@ -171,7 +171,7 @@ NOTHROW(LIBCCALL libc_trunc)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lround") long int
 NOTHROW(LIBCCALL libc_lround)(double x) {
-#line 724 "kos/src/libc/magic/math.c"
+#line 784 "kos/src/libc/magic/math.c"
 	return (long int)libc_round(x);
 }
 
@@ -180,7 +180,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmax") double
 NOTHROW(LIBCCALL libc_fmax)(double x,
                             double y) {
-#line 736 "kos/src/libc/magic/math.c"
+#line 796 "kos/src/libc/magic/math.c"
 	return x < y ? y : x;
 }
 
@@ -189,7 +189,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmin") double
 NOTHROW(LIBCCALL libc_fmin)(double x,
                             double y) {
-#line 742 "kos/src/libc/magic/math.c"
+#line 802 "kos/src/libc/magic/math.c"
 	return x < y ? x : y;
 }
 
@@ -199,7 +199,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fma") double
 NOTHROW(LIBCCALL libc_fma)(double x,
                            double y,
                            double z) {
-#line 748 "kos/src/libc/magic/math.c"
+#line 808 "kos/src/libc/magic/math.c"
 	return (x * y) + z;
 }
 
@@ -207,7 +207,7 @@ NOTHROW(LIBCCALL libc_fma)(double x,
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llround") __LONGLONG
 NOTHROW(LIBCCALL libc_llround)(double x) {
-#line 759 "kos/src/libc/magic/math.c"
+#line 819 "kos/src/libc/magic/math.c"
 	return (__LONGLONG)libc_round(x);
 }
 
@@ -216,7 +216,7 @@ NOTHROW(LIBCCALL libc_llround)(double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundf") float
 NOTHROW(LIBCCALL libc_roundf)(float x) {
-#line 689 "kos/src/libc/magic/math.c"
+#line 749 "kos/src/libc/magic/math.c"
 	float result;
 	result = (float)(__INTMAX_TYPE__)x;
 	if (x < 0) {
@@ -237,7 +237,7 @@ NOTHROW(LIBCCALL libc_roundf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncf") float
 NOTHROW(LIBCCALL libc_truncf)(float x) {
-#line 708 "kos/src/libc/magic/math.c"
+#line 768 "kos/src/libc/magic/math.c"
 	return (float)(__INTMAX_TYPE__)x;
 }
 
@@ -245,7 +245,7 @@ NOTHROW(LIBCCALL libc_truncf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundf") long int
 NOTHROW(LIBCCALL libc_lroundf)(float x) {
-#line 724 "kos/src/libc/magic/math.c"
+#line 784 "kos/src/libc/magic/math.c"
 	return (long int)libc_roundf(x);
 }
 
@@ -254,7 +254,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaxf") float
 NOTHROW(LIBCCALL libc_fmaxf)(float x,
                              float y) {
-#line 736 "kos/src/libc/magic/math.c"
+#line 796 "kos/src/libc/magic/math.c"
 	return x < y ? y : x;
 }
 
@@ -263,7 +263,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fminf") float
 NOTHROW(LIBCCALL libc_fminf)(float x,
                              float y) {
-#line 742 "kos/src/libc/magic/math.c"
+#line 802 "kos/src/libc/magic/math.c"
 	return x < y ? x : y;
 }
 
@@ -273,7 +273,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaf") float
 NOTHROW(LIBCCALL libc_fmaf)(float x,
                             float y,
                             float z) {
-#line 748 "kos/src/libc/magic/math.c"
+#line 808 "kos/src/libc/magic/math.c"
 	return (x * y) + z;
 }
 
@@ -281,7 +281,7 @@ NOTHROW(LIBCCALL libc_fmaf)(float x,
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundf") __LONGLONG
 NOTHROW(LIBCCALL libc_llroundf)(float x) {
-#line 759 "kos/src/libc/magic/math.c"
+#line 819 "kos/src/libc/magic/math.c"
 	return (__LONGLONG)libc_roundf(x);
 }
 
@@ -290,7 +290,7 @@ NOTHROW(LIBCCALL libc_llroundf)(float x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundl") long double
 NOTHROW(LIBCCALL libc_roundl)(long double x) {
-#line 689 "kos/src/libc/magic/math.c"
+#line 749 "kos/src/libc/magic/math.c"
 	long double result;
 	result = (long double)(__INTMAX_TYPE__)x;
 	if (x < 0) {
@@ -311,7 +311,7 @@ NOTHROW(LIBCCALL libc_roundl)(long double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncl") long double
 NOTHROW(LIBCCALL libc_truncl)(long double x) {
-#line 708 "kos/src/libc/magic/math.c"
+#line 768 "kos/src/libc/magic/math.c"
 	return (long double)(__INTMAX_TYPE__)x;
 }
 
@@ -319,7 +319,7 @@ NOTHROW(LIBCCALL libc_truncl)(long double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundl") long int
 NOTHROW(LIBCCALL libc_lroundl)(long double x) {
-#line 724 "kos/src/libc/magic/math.c"
+#line 784 "kos/src/libc/magic/math.c"
 	return (long int)libc_roundl(x);
 }
 
@@ -328,7 +328,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaxl") long double
 NOTHROW(LIBCCALL libc_fmaxl)(long double x,
                              long double y) {
-#line 736 "kos/src/libc/magic/math.c"
+#line 796 "kos/src/libc/magic/math.c"
 	return x < y ? y : x;
 }
 
@@ -337,7 +337,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fminl") long double
 NOTHROW(LIBCCALL libc_fminl)(long double x,
                              long double y) {
-#line 742 "kos/src/libc/magic/math.c"
+#line 802 "kos/src/libc/magic/math.c"
 	return x < y ? x : y;
 }
 
@@ -347,7 +347,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmal") long double
 NOTHROW(LIBCCALL libc_fmal)(long double x,
                             long double y,
                             long double z) {
-#line 748 "kos/src/libc/magic/math.c"
+#line 808 "kos/src/libc/magic/math.c"
 	return (x * y) + z;
 }
 
@@ -355,80 +355,29 @@ NOTHROW(LIBCCALL libc_fmal)(long double x,
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundl") __LONGLONG
 NOTHROW(LIBCCALL libc_llroundl)(long double x) {
-#line 759 "kos/src/libc/magic/math.c"
+#line 819 "kos/src/libc/magic/math.c"
 	return (__LONGLONG)libc_roundl(x);
 }
 
-#include <bits/huge_val.h>
-/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinf") int
-NOTHROW(LIBCCALL libc_isinf)(double val) {
-#line 1081 "kos/src/libc/magic/math.c"
-	return val == HUGE_VAL;
-}
-
-#include <bits/huge_valf.h>
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinff") int
-NOTHROW(LIBCCALL libc_isinff)(float val) {
-#line 1087 "kos/src/libc/magic/math.c"
-	return val == HUGE_VALF;
-}
-
-#include <bits/huge_vall.h>
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinfl") int
-NOTHROW(LIBCCALL libc_isinfl)(long double val) {
-#line 1094 "kos/src/libc/magic/math.c"
-	return val == HUGE_VALL;
-}
-
-/* Return nonzero if VALUE is finite and not NaN */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finite") int
-NOTHROW(LIBCCALL libc_finite)(double val) {
-#line 1101 "kos/src/libc/magic/math.c"
-	return !libc_isinf(val) && !libc_isnan(val);
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbit") int
+NOTHROW(LIBCCALL libc___signbit)(double x) {
+#line 1778 "kos/src/libc/magic/math.c"
+	return x < 0.0;
 }
 
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitef") int
-NOTHROW(LIBCCALL libc_finitef)(float val) {
-#line 1114 "kos/src/libc/magic/math.c"
-	return !libc_isinff(val) && !libc_isnanf(val);
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitf") int
+NOTHROW(LIBCCALL libc___signbitf)(float x) {
+#line 1786 "kos/src/libc/magic/math.c"
+	return x < 0.0f;
 }
 
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitel") int
-NOTHROW(LIBCCALL libc_finitel)(long double val) {
-#line 1124 "kos/src/libc/magic/math.c"
-	return !libc_isinfl(val) && !libc_isnanl(val);
-}
-
-#include <bits/nan.h>
-/* Return nonzero if VALUE is not a number */
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnan") int
-NOTHROW(LIBCCALL libc_isnan)(double val) {
-#line 1139 "kos/src/libc/magic/math.c"
-	return val == (double)NAN;
-}
-
-#include <bits/nan.h>
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanf") int
-NOTHROW(LIBCCALL libc_isnanf)(float val) {
-#line 1145 "kos/src/libc/magic/math.c"
-	return val == (float)NAN;
-}
-
-#include <bits/nan.h>
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanl") int
-NOTHROW(LIBCCALL libc_isnanl)(long double val) {
-#line 1152 "kos/src/libc/magic/math.c"
-	return val == (long double)NAN;
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitl") int
+NOTHROW(LIBCCALL libc___signbitl)(long double x) {
+#line 1794 "kos/src/libc/magic/math.c"
+	return x < 0.0L;
 }
 
 #endif /* !__KERNEL__ */
@@ -493,26 +442,9 @@ DEFINE_PUBLIC_WEAK_ALIAS(fmal, libc_fmal);
 DEFINE_PUBLIC_WEAK_ALIAS(__fmal, libc_fmal);
 DEFINE_PUBLIC_WEAK_ALIAS(llroundl, libc_llroundl);
 DEFINE_PUBLIC_WEAK_ALIAS(__llroundl, libc_llroundl);
-DEFINE_PUBLIC_WEAK_ALIAS(isinf, libc_isinf);
-DEFINE_PUBLIC_WEAK_ALIAS(__isinf, libc_isinf);
-DEFINE_PUBLIC_WEAK_ALIAS(isinff, libc_isinff);
-DEFINE_PUBLIC_WEAK_ALIAS(__isinff, libc_isinff);
-DEFINE_PUBLIC_WEAK_ALIAS(isinfl, libc_isinfl);
-DEFINE_PUBLIC_WEAK_ALIAS(__isinfl, libc_isinfl);
-DEFINE_PUBLIC_WEAK_ALIAS(finite, libc_finite);
-DEFINE_PUBLIC_WEAK_ALIAS(_finite, libc_finite);
-DEFINE_PUBLIC_WEAK_ALIAS(__finite, libc_finite);
-DEFINE_PUBLIC_WEAK_ALIAS(finitef, libc_finitef);
-DEFINE_PUBLIC_WEAK_ALIAS(__finitef, libc_finitef);
-DEFINE_PUBLIC_WEAK_ALIAS(finitel, libc_finitel);
-DEFINE_PUBLIC_WEAK_ALIAS(__finitel, libc_finitel);
-DEFINE_PUBLIC_WEAK_ALIAS(isnan, libc_isnan);
-DEFINE_PUBLIC_WEAK_ALIAS(_isnan, libc_isnan);
-DEFINE_PUBLIC_WEAK_ALIAS(__isnan, libc_isnan);
-DEFINE_PUBLIC_WEAK_ALIAS(isnanf, libc_isnanf);
-DEFINE_PUBLIC_WEAK_ALIAS(__isnanf, libc_isnanf);
-DEFINE_PUBLIC_WEAK_ALIAS(isnanl, libc_isnanl);
-DEFINE_PUBLIC_WEAK_ALIAS(__isnanl, libc_isnanl);
+DEFINE_PUBLIC_WEAK_ALIAS(__signbit, libc___signbit);
+DEFINE_PUBLIC_WEAK_ALIAS(__signbitf, libc___signbitf);
+DEFINE_PUBLIC_WEAK_ALIAS(__signbitl, libc___signbitl);
 #endif /* !__KERNEL__ */
 
 DECL_END

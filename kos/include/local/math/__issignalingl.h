@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce758caf */
+/* HASH CRC-32:0x73c0f00f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifndef ____localdep___issignaling_defined
 #define ____localdep___issignaling_defined 1
 #ifdef __CRT_HAVE___issignaling
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___issignaling,(double __val),__issignaling,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___issignaling,(double __x),__issignaling,(__x))
 #else /* LIBC: __issignaling */
 #undef ____localdep___issignaling_defined
 #endif /* __issignaling... */
@@ -33,9 +33,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___issignaling,(
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__issignalingl) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__issignalingl))(long double __val) {
-#line 1624 "kos/src/libc/magic/math.c"
-	return (int)__localdep___issignaling((double)__val);
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__issignalingl))(long double __x) {
+#line 1807 "kos/src/libc/magic/math.c"
+	return (int)__localdep___issignaling((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE___issignaling */

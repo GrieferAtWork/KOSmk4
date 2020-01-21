@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x982d1dec */
+/* HASH CRC-32:0x7891701d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,36 +19,23 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scalbf_defined
-#if defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #define __local_scalbf_defined 1
-/* Dependency: "scalb" */
-#ifndef ____localdep_scalb_defined
-#define ____localdep_scalb_defined 1
-#if __has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)
-/* Return X times (2 to the Nth power) */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_scalb)(double __x, double __n) { return __builtin_scalb(__x, __n); }
-#elif defined(__CRT_HAVE_scalb)
-/* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __n),scalb,(__x,__n))
-#elif defined(__CRT_HAVE___scalb)
-/* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __n),__scalb,(__x,__n))
-#elif defined(__CRT_HAVE__scalb)
-/* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_scalb,(double __x, double __n),_scalb,(__x,__n))
-#else /* LIBC: scalb */
-#undef ____localdep_scalb_defined
-#endif /* scalb... */
-#endif /* !____localdep_scalb_defined */
-
+#include <libm/scalb.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X times (2 to the Nth power) */
 __LOCAL_LIBC(scalbf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbf))(float __x,
-                                                float __n) {
-#line 1228 "kos/src/libc/magic/math.c"
-	return (float)__localdep_scalb((double)__x, (double)__n);
+                                                float __fn) {
+#line 1390 "kos/src/libc/magic/math.c"
+	__COMPILER_IMPURE(); /* TODO: Math error handling */
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_scalbf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__fn);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_scalb((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__fn);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_scalb || __CRT_HAVE___scalb || __CRT_HAVE__scalb */
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ */
 #endif /* !__local_scalbf_defined */
