@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3391724c */
+/* HASH CRC-32:0x4be73d04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,13 +64,6 @@
 #define __stub__controlfp 1
 #define __stub__controlfp_s 1
 #define __stub__dupenv_s 1
-#define __stub__findclose 1
-#define __stub__findfirst32 1
-#define __stub__findfirst32i64 1
-#define __stub__findfirst64i32 1
-#define __stub__findnext32 1
-#define __stub__findnext32i64 1
-#define __stub__findnext64 1
 #define __stub__fpclass 1
 #define __stub__fullpath 1
 #define __stub__get_fmode 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67186403 */
+/* HASH CRC-32:0xe4af5a8a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -599,6 +599,14 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfir
 #elif defined(__CRT_HAVE__findfirsti64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32i64,(char const *__restrict __filename, struct _finddata32i64_t *__restrict __finddata),_findfirsti64,(__filename,__finddata))
 #endif /* _findfirst32i64... */
+#ifdef __CRT_HAVE__findfirst64
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),(__filename,__finddata))
+#endif /* _findfirst64... */
+#ifdef __CRT_HAVE__findfirst64i32
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),(__filename,__finddata))
+#elif defined(__CRT_HAVE__findfirst64)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),_findfirst64,(__filename,__finddata))
+#endif /* _findfirst64i32... */
 #ifdef __CRT_HAVE__findnext32
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32,(intptr_t __findfd, struct _finddata32_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnext)
@@ -609,20 +617,8 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32i64,(intptr_t __find
 #elif defined(__CRT_HAVE__findnexti64)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32i64,(intptr_t __findfd, struct _finddata32i64_t *__restrict __finddata),_findnexti64,(__findfd,__finddata))
 #endif /* _findnext32i64... */
-#ifdef __CRT_HAVE__findfirst64i32
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),(__filename,__finddata))
-#elif defined(__CRT_HAVE__findfirst64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),_findfirst64,(__filename,__finddata))
-#endif /* _findfirst64i32... */
-#ifdef __CRT_HAVE__findfirst64
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),(__filename,__finddata))
-#elif defined(__CRT_HAVE__findfirst64i32)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),_findfirst64i32,(__filename,__finddata))
-#endif /* _findfirst64... */
 #ifdef __CRT_HAVE__findnext64
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd, struct __finddata64_t *__restrict __finddata),(__findfd,__finddata))
-#elif defined(__CRT_HAVE__findnext64i32)
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd, struct __finddata64_t *__restrict __finddata),_findnext64i32,(__findfd,__finddata))
 #endif /* _findnext64... */
 #ifdef __CRT_HAVE__findnext64i32
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __findfd, struct _finddata64i32_t *__restrict __finddata),(__findfd,__finddata))
@@ -814,17 +810,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(eof, __FORCELOCAL __ATTR_WUNUSED int __NOTHROW_N
 #define _FINDDATA_T_DEFINED 1
 struct _finddata32_t {
 	__UINT32_TYPE__      attrib;
-	__time32_t           time_create;
-	__time32_t           time_access;
-	__time32_t           time_write;
+	__INT32_TYPE__       time_create;
+	__INT32_TYPE__       time_access;
+	__INT32_TYPE__       time_write;
 	_fsize_t             size;
 	char                 name[260];
 };
 struct _finddata32i64_t {
 	__UINT32_TYPE__      attrib;
-	__time32_t           time_create;
-	__time32_t           time_access;
-	__time32_t           time_write;
+	__INT32_TYPE__       time_create;
+	__INT32_TYPE__       time_access;
+	__INT32_TYPE__       time_write;
 	/* Microsoft:
 	 * A: "I mean: we could use an unsigned type for this, seeing as how _fsize_t is also unsigned."
 	 * B: "Nah! - Lets rather p1$$ off anyone that notices. - That'll be way more fun." */
@@ -833,9 +829,9 @@ struct _finddata32i64_t {
 };
 struct _finddata64i32_t {
 	__UINT32_TYPE__      attrib;
-	__time64_t           time_create;
-	__time64_t           time_access;
-	__time64_t           time_write;
+	__INT64_TYPE__       time_create;
+	__INT64_TYPE__       time_access;
+	__INT64_TYPE__       time_write;
 	union {
 		_fsize_t         size;
 		__INT64_TYPE__ __pad; /* I think this is correct? */
@@ -844,9 +840,9 @@ struct _finddata64i32_t {
 };
 struct __finddata64_t {
 	__UINT32_TYPE__      attrib;
-	__time64_t           time_create;
-	__time64_t           time_access;
-	__time64_t           time_write;
+	__INT64_TYPE__       time_create;
+	__INT64_TYPE__       time_access;
+	__INT64_TYPE__       time_write;
 	__INT64_TYPE__       size;
 	char                 name[260];
 };

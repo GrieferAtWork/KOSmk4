@@ -351,7 +351,7 @@
 #define __CRT_HAVE_DOS$_findclose 1
 #define __CRT_HAVE_DOS$_findfirst32 1
 #define __CRT_HAVE_DOS$_findfirst32i64 1
-#define __CRT_HAVE_DOS$_findfirst64i32 1
+#define __CRT_HAVE_DOS$_findfirst64 1
 #define __CRT_HAVE_DOS$_findnext32 1
 #define __CRT_HAVE_DOS$_findnext32i64 1
 #define __CRT_HAVE_DOS$_findnext64 1
@@ -3581,14 +3581,18 @@
 #define __CRT_HAVE__filelengthi64 1
 #define __CRT_HAVE__fileno 1
 #define __CRT_HAVE__findclose 1
+#define __CRT_HAVE__findfirst 1
 #define __CRT_HAVE__findfirst32 1
 #define __CRT_HAVE__findfirst32i64 1
 #define __CRT_HAVE__findfirst64 1
 #define __CRT_HAVE__findfirst64i32 1
+#define __CRT_HAVE__findfirsti64 1
+#define __CRT_HAVE__findnext 1
 #define __CRT_HAVE__findnext32 1
 #define __CRT_HAVE__findnext32i64 1
 #define __CRT_HAVE__findnext64 1
 #define __CRT_HAVE__findnext64i32 1
+#define __CRT_HAVE__findnexti64 1
 #define __CRT_HAVE__finite 1
 #define __CRT_HAVE__flsbuf 1
 #define __CRT_HAVE__flushall 1

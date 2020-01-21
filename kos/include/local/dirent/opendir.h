@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a485d7a */
+/* HASH CRC-32:0xcc1b4b3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,14 @@
 #ifndef __local_opendir_defined
 #if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_fopendirat) || defined(__CRT_HAVE_opendirat))
 #define __local_opendir_defined 1
+struct __dirstream;
+struct __dirstream;
 /* Dependency: "opendirat" from "dirent" */
 #ifndef ____localdep_opendirat_defined
 #define ____localdep_opendirat_defined 1
 #ifdef __CRT_HAVE_opendirat
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,__localdep_opendirat,(__fd_t __dirfd, char const *__name),opendirat,(__dirfd,__name))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),struct __dirstream *,__NOTHROW_RPC,__localdep_opendirat,(__fd_t __dirfd, char const *__name),opendirat,(__dirfd,__name))
 #elif defined(__CRT_HAVE_fopendirat)
 #include <local/dirent/opendirat.h>
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
@@ -38,9 +40,9 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,__localdep_op
 
 __NAMESPACE_LOCAL_BEGIN
 /* Open and return a new directory stream for reading, referring to `name' */
-__LOCAL_LIBC(opendir) __ATTR_WUNUSED __ATTR_NONNULL((1)) DIR *
+__LOCAL_LIBC(opendir) __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendir))(char const *__name) {
-#line 121 "kos/src/libc/magic/dirent.c"
+#line 125 "kos/src/libc/magic/dirent.c"
 	return __localdep_opendirat(__CRT_AT_FDCWD, __name);
 }
 __NAMESPACE_LOCAL_END

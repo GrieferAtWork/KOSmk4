@@ -182,19 +182,19 @@ _umask:($mode_t mode) -> $mode_t = umask;
 _isatty:($fd_t fd) -> int = isatty;
 
 
+%
+%
 %[default_impl_section(.text.crt.dos.fs.dir)]
-%
-%
 [dos_function] _findclose:(intptr_t findfd) -> int;
-[cp][dos_function][ATTR_WUNUSED][alias(_findfirst)]
-[cp][dos_function] _findfirst32:([nonnull] char const *__restrict filename, [nonnull] struct _finddata32_t *__restrict finddata) -> intptr_t;
-[cp][dos_function][ATTR_WUNUSED][alias(_findfirsti64)]
-[cp][dos_function] _findfirst32i64:([nonnull] char const *__restrict filename, [nonnull] struct _finddata32i64_t *__restrict finddata) -> intptr_t;
-[cp][dos_function][alias(_findnext)] _findnext32:(intptr_t findfd, [nonnull] struct _finddata32_t *__restrict finddata) -> int;
-[cp][dos_function][alias(_findnexti64)] _findnext32i64:(intptr_t findfd, [nonnull] struct _finddata32i64_t *__restrict finddata) -> int;
-[cp][dos_function][alias(_findfirst64)][ATTR_WUNUSED] _findfirst64i32:([nonnull] char const *__restrict filename, [nonnull] struct _finddata64i32_t *__restrict finddata) -> intptr_t;
-[cp][dos_function][ATTR_WUNUSED] _findfirst64:([nonnull] char const *__restrict filename, [nonnull] struct __finddata64_t *__restrict finddata) -> intptr_t = _findfirst64i32;
-[cp][dos_function][alias(_findnext64i32)] _findnext64:(intptr_t findfd, [nonnull] struct __finddata64_t *__restrict finddata) -> int;
+
+[cp][dos_function][ATTR_WUNUSED][export_alias(_findfirst)] _findfirst32:([nonnull] char const *__restrict filename, [nonnull] struct _finddata32_t *__restrict finddata) -> intptr_t;
+[cp][dos_function][ATTR_WUNUSED][export_alias(_findfirsti64)] _findfirst32i64:([nonnull] char const *__restrict filename, [nonnull] struct _finddata32i64_t *__restrict finddata) -> intptr_t;
+[cp][dos_function][ATTR_WUNUSED] _findfirst64:([nonnull] char const *__restrict filename, [nonnull] struct __finddata64_t *__restrict finddata) -> intptr_t;
+[cp][dos_function][ATTR_WUNUSED] _findfirst64i32:([nonnull] char const *__restrict filename, [nonnull] struct _finddata64i32_t *__restrict finddata) -> intptr_t = _findfirst64;
+
+[cp][dos_function][export_alias(_findnext)] _findnext32:(intptr_t findfd, [nonnull] struct _finddata32_t *__restrict finddata) -> int;
+[cp][dos_function][export_alias(_findnexti64)] _findnext32i64:(intptr_t findfd, [nonnull] struct _finddata32i64_t *__restrict finddata) -> int;
+[cp][dos_function] _findnext64:(intptr_t findfd, [nonnull] struct __finddata64_t *__restrict finddata) -> int;
 [cp][dos_function] _findnext64i32:(intptr_t findfd, [nonnull] struct _finddata64i32_t *__restrict finddata) -> int = _findnext64;
 
 %[default_impl_section(.text.crt.dos.fs.io)]
@@ -383,17 +383,17 @@ eof:($fd_t fd) -> int {
 #define _FINDDATA_T_DEFINED 1
 struct _finddata32_t {
 	__UINT32_TYPE__      attrib;
-	__time32_t           time_create;
-	__time32_t           time_access;
-	__time32_t           time_write;
+	__INT32_TYPE__       time_create;
+	__INT32_TYPE__       time_access;
+	__INT32_TYPE__       time_write;
 	_fsize_t             size;
 	char                 name[260];
 };
 struct _finddata32i64_t {
 	__UINT32_TYPE__      attrib;
-	__time32_t           time_create;
-	__time32_t           time_access;
-	__time32_t           time_write;
+	__INT32_TYPE__       time_create;
+	__INT32_TYPE__       time_access;
+	__INT32_TYPE__       time_write;
 	/* Microsoft:
 	 * A: "I mean: we could use an unsigned type for this, seeing as how _fsize_t is also unsigned."
 	 * B: "Nah! - Lets rather p1$$ off anyone that notices. - That'll be way more fun." */
@@ -402,9 +402,9 @@ struct _finddata32i64_t {
 };
 struct _finddata64i32_t {
 	__UINT32_TYPE__      attrib;
-	__time64_t           time_create;
-	__time64_t           time_access;
-	__time64_t           time_write;
+	__INT64_TYPE__       time_create;
+	__INT64_TYPE__       time_access;
+	__INT64_TYPE__       time_write;
 	union {
 		_fsize_t         size;
 		__INT64_TYPE__ __pad; /* I think this is correct? */
@@ -413,9 +413,9 @@ struct _finddata64i32_t {
 };
 struct __finddata64_t {
 	__UINT32_TYPE__      attrib;
-	__time64_t           time_create;
-	__time64_t           time_access;
-	__time64_t           time_write;
+	__INT64_TYPE__       time_create;
+	__INT64_TYPE__       time_access;
+	__INT64_TYPE__       time_write;
 	__INT64_TYPE__       size;
 	char                 name[260];
 };

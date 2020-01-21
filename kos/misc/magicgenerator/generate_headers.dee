@@ -2748,10 +2748,12 @@ again_enum_name:
 					impl_section = none;
 					break;
 				case "dos_function":
-					impl_section = "$dos";
+					if (impl_section is none)
+						impl_section = "$dos";
 					break;
 				case "kos_function":
-					impl_section = "$kos";
+					if (impl_section is none)
+						impl_section = "$kos";
 					break;
 				case "dependency_string":
 					dependency_string = get_tag_operand();

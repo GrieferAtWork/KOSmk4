@@ -27,6 +27,7 @@
 %[define_replacement(pos64_t    = __pos64_t)]
 %[define_replacement(atflag_t   = __atflag_t)]
 %[define_replacement(oflag_t    = __oflag_t)]
+%[define_replacement(DIR        = struct __dirstream)]
 %[default_impl_section(.text.crt.fs.dir)]
 
 
@@ -114,8 +115,11 @@ typedef struct __dirstream DIR;
 
 }
 
+%[define(DEFINE_STRUCT_DIRSTREAM = struct __dirstream;)]
+
+
 @@Open and return a new directory stream for reading, referring to `name'
-[cp][ATTR_WUNUSED][noexport]
+[cp][ATTR_WUNUSED][noexport][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(opendirat))]
 opendir:([nonnull] char const *name) -> DIR * {
 	return opendirat(__CRT_AT_FDCWD, name);
@@ -126,11 +130,11 @@ opendir:([nonnull] char const *name) -> DIR * {
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
-[cp][ATTR_WUNUSED]
+[cp][ATTR_WUNUSED][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 fopendirat:($fd_t dirfd, [nonnull] char const *name, $oflag_t oflags) -> DIR *;
 
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
-[cp][ATTR_WUNUSED][noexport]
+[cp][ATTR_WUNUSED][noexport][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 [requires($has_function(fopendirat))]
 opendirat:($fd_t dirfd, [nonnull] char const *name) -> DIR * {
 	return fopendirat(dirfd, name, 0);
@@ -139,19 +143,21 @@ opendirat:($fd_t dirfd, [nonnull] char const *name) -> DIR * {
 
 %
 @@Close a directory stream previously returned by `opendir(3)' and friends
+[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 closedir:([nonnull] DIR *dirp) -> int;
 
 
 %
 %#ifdef __USE_BSD
 @@Same as `closedir()', but instead of closing the underlying file descriptor, return it
-[ATTR_WUNUSED] fdclosedir:([nonnull] DIR *dirp) -> $fd_t;
+[ATTR_WUNUSED][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
+fdclosedir:([nonnull] DIR *dirp) -> $fd_t;
 %#endif /* __USE_BSD */
 
 %
 @@Read and return the next pending directory entry of the given directory stream `DIRP'
 @@@EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong
-[cp]
+[cp][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 [if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(readdir)]
 [if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(readdir64)]
 readdir:([nonnull] DIR *__restrict dirp) -> struct dirent *;
@@ -159,19 +165,20 @@ readdir:([nonnull] DIR *__restrict dirp) -> struct dirent *;
 %
 @@Rewind the given directory stream in such a way that the next call
 @@to `readdir(3)' will once again return the first directory entry
+[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 rewinddir:([nonnull] DIR *__restrict dirp);
 
 %
 %#ifdef __USE_XOPEN2K8
 @@Create a new directory stream by inheriting the given `FD' as stream handle
-[ATTR_WUNUSED] fdopendir:($fd_t fd) -> DIR *;
+[ATTR_WUNUSED][decl_prefix(DEFINE_STRUCT_DIRSTREAM)] fdopendir:($fd_t fd) -> DIR *;
 %#endif /* __USE_XOPEN2K8 */
 
 %
 %#ifdef __USE_LARGEFILE64
 @@64-bit equivalent of `readdir(3)'
 @@@EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong
-[cp][dirent64_variant_of(readdir)]
+[cp][dirent64_variant_of(readdir)][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 readdir64:([nonnull] DIR *__restrict dirp) -> struct dirent64 *;
 %#endif /* __USE_LARGEFILE64 */
 
@@ -180,10 +187,10 @@ readdir64:([nonnull] DIR *__restrict dirp) -> struct dirent64 *;
 @@Reentrant version of `readdir(3)' (Using this is not recommended in KOS)
 [if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(readdir_r)]
 [if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(readdir64_r)]
-[cp] readdir_r:(
-	[nonnull] DIR *__restrict dirp,
-	[nonnull] struct dirent *__restrict entry,
-	[nonnull] struct dirent **__restrict result) -> int;
+[cp][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
+readdir_r:([nonnull] DIR *__restrict dirp,
+           [nonnull] struct dirent *__restrict entry,
+           [nonnull] struct dirent **__restrict result) -> int;
 
 %
 %#ifdef __USE_LARGEFILE64
@@ -191,11 +198,10 @@ readdir64:([nonnull] DIR *__restrict dirp) -> struct dirent64 *;
 @@      kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
 @@>> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
 @@   per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT')
-[cp][dirent64_variant_of(readdir_r)]
-readdir64_r:(
-	[nonnull] DIR *__restrict dirp,
-	[nonnull] struct dirent64 *__restrict entry,
-	[nonnull] struct dirent64 **__restrict result) -> int;
+[cp][decl_prefix(DEFINE_STRUCT_DIRSTREAM)][dirent64_variant_of(readdir_r)]
+readdir64_r:([nonnull] DIR *__restrict dirp,
+             [nonnull] struct dirent64 *__restrict entry,
+             [nonnull] struct dirent64 **__restrict result) -> int;
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_POSIX */
 
@@ -203,9 +209,11 @@ readdir64_r:(
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
 
 @@Get the directory stream position
+[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 seekdir:([nonnull] DIR *__restrict dirp, long int pos);
 
 @@Get the directory stream position
+[decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 telldir:([nonnull] DIR *__restrict dirp) -> long int;
 
 %#endif /* __USE_MISC || __USE_XOPEN */
@@ -213,7 +221,8 @@ telldir:([nonnull] DIR *__restrict dirp) -> long int;
 %
 %#ifdef __USE_XOPEN2K8
 @@Return the underlying file descriptor of the given directory stream
-[ATTR_PURE] dirfd:([nonnull] DIR __KOS_FIXED_CONST *__restrict dirp) -> $fd_t;
+[ATTR_PURE][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
+dirfd:([nonnull] DIR __KOS_FIXED_CONST *__restrict dirp) -> $fd_t;
 
 
 %typedef int (*__scandir_selector_t)(struct dirent const *);
@@ -225,10 +234,9 @@ telldir:([nonnull] DIR *__restrict dirp) -> long int;
 [if(!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(scandir)]
 [if(defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)),preferred_alias(scandir64)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(scandirat))]
-scandir:(
-	[nonnull] char const *__restrict dir,
-	[nonnull] struct dirent ***__restrict namelist,
-	__scandir_selector_t selector, __scandir_cmp_t cmp) -> int {
+scandir:([nonnull] char const *__restrict dir,
+         [nonnull] struct dirent ***__restrict namelist,
+         __scandir_selector_t selector, __scandir_cmp_t cmp) -> int {
 	return scandirat(__CRT_AT_FDCWD, dir, namelist, selector, cmp);
 }
 

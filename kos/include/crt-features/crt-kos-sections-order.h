@@ -344,11 +344,12 @@
 	CB(PREFIX.dos.FILE.locked.utility.*) \
 	CB(PREFIX.dos.FILE.unlocked.read.read.*) \
 	CB(PREFIX.dos.FILE.utility.*) \
-	CB(PREFIX.dos.fs.property.*) \
+	CB(PREFIX.dos.fs.property.* PREFIX.dos.fs.basic_property.*) \
 	CB(PREFIX.dos.fs.environ.*) \
 	CB(PREFIX.dos.fs.exec.spawn.*) \
 	CB(PREFIX.dos.fs.modify.*) \
-	CB(PREFIX.dos.fs.utility.* PREFIX.dos.fs.dlfcn.*) \
+	CB(PREFIX.dos.fs.dir.*) \
+	CB(PREFIX.dos.fs.dlfcn.* PREFIX.dos.fs.io.* PREFIX.dos.fs.utility.*) \
 	CB(PREFIX.dos.string.memory.*) \
 	CB(PREFIX.dos.unicode.static.memory.*) \
 	CB(PREFIX.dos.unicode.static.convert.*) \

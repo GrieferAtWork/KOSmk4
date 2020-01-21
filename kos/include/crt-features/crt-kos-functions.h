@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83fb097e */
+/* HASH CRC-32:0xbe6e3689 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -338,7 +338,7 @@ __CRT_FUNCTION(_filelengthi64,0,(),1,(fd_t,fd),int64_t)
 __CRT_FUNCTION(_findclose,0,(),1,(intptr_t,findfd),int)
 __CRT_FUNCTION(_findfirst32,0,(),2,(char const *__restrict,filename,struct _finddata32_t *__restrict,finddata),intptr_t)
 __CRT_FUNCTION(_findfirst32i64,0,(),2,(char const *__restrict,filename,struct _finddata32i64_t *__restrict,finddata),intptr_t)
-__CRT_FUNCTION(_findfirst64i32,0,(),2,(char const *__restrict,filename,struct _finddata64i32_t *__restrict,finddata),intptr_t)
+__CRT_FUNCTION(_findfirst64,0,(),2,(char const *__restrict,filename,struct __finddata64_t *__restrict,finddata),intptr_t)
 __CRT_FUNCTION(_findnext32,0,(),2,(intptr_t,findfd,struct _finddata32_t *__restrict,finddata),int)
 __CRT_FUNCTION(_findnext32i64,0,(),2,(intptr_t,findfd,struct _finddata32i64_t *__restrict,finddata),int)
 __CRT_FUNCTION(_findnext64,0,(),2,(intptr_t,findfd,struct __finddata64_t *__restrict,finddata),int)
@@ -2765,7 +2765,7 @@ __CRT_FAKE_FUNCTION(_fgetwc_nolock,0,(),1,(FILE *__restrict,stream),wint_t)
 __CRT_FAKE_FUNCTION(_fgetwchar,0,(),0,(),wint_t)
 __CRT_FAKE_FUNCTION(_filelength,0,(),1,(fd_t,fd),__LONG32_TYPE__)
 __CRT_FAKE_FUNCTION(_fileno,0,(),1,(FILE *__restrict,stream),fd_t)
-__CRT_FAKE_FUNCTION(_findfirst64,0,(),2,(char const *__restrict,filename,struct __finddata64_t *__restrict,finddata),intptr_t)
+__CRT_FAKE_FUNCTION(_findfirst64i32,0,(),2,(char const *__restrict,filename,struct _finddata64i32_t *__restrict,finddata),intptr_t)
 __CRT_FAKE_FUNCTION(_findnext64i32,0,(),2,(intptr_t,findfd,struct _finddata64i32_t *__restrict,finddata),int)
 __CRT_FAKE_FUNCTION(_finite,0,(),1,(double,val),int)
 __CRT_FAKE_FUNCTION(_fpreset,0,(),0,(),void)

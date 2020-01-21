@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fc337dc */
+/* HASH CRC-32:0xa0b9e68a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,12 +21,14 @@
 #ifndef __local_opendirat_defined
 #ifdef __CRT_HAVE_fopendirat
 #define __local_opendirat_defined 1
+struct __dirstream;
+struct __dirstream;
 /* Dependency: "fopendirat" */
 #ifndef ____localdep_fopendirat_defined
 #define ____localdep_fopendirat_defined 1
 #ifdef __CRT_HAVE_fopendirat
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,__localdep_fopendirat,(__fd_t __dirfd, char const *__name, __oflag_t __oflags),fopendirat,(__dirfd,__name,__oflags))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),struct __dirstream *,__NOTHROW_RPC,__localdep_fopendirat,(__fd_t __dirfd, char const *__name, __oflag_t __oflags),fopendirat,(__dirfd,__name,__oflags))
 #else /* LIBC: fopendirat */
 #undef ____localdep_fopendirat_defined
 #endif /* fopendirat... */
@@ -34,10 +36,10 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,__localdep_fo
 
 __NAMESPACE_LOCAL_BEGIN
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
-__LOCAL_LIBC(opendirat) __ATTR_WUNUSED __ATTR_NONNULL((2)) DIR *
+__LOCAL_LIBC(opendirat) __ATTR_WUNUSED __ATTR_NONNULL((2)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendirat))(__fd_t __dirfd,
                                                        char const *__name) {
-#line 136 "kos/src/libc/magic/dirent.c"
+#line 140 "kos/src/libc/magic/dirent.c"
 	return __localdep_fopendirat(__dirfd, __name, 0);
 }
 __NAMESPACE_LOCAL_END

@@ -23,16 +23,166 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/minmax.h>
+
+#include <kos/syscalls.h>
+#include <parts/dos/errno.h>
+#include <sys/stat.h>
+
+#include <alloca.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <io.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "../libc/errno.h"
 #include "io.h"
 
-#include <fcntl.h>
-#include <io.h>
-#include <kos/syscalls.h>
-#include <stdio.h>
-#include <unistd.h>
-
 DECL_BEGIN
+
+struct dfind {
+	DIR  *df_dir;   /* [1..1][owned] The underlying directory stream. */
+	char *df_query; /* [1..1][owned] The wildcard-enabled query pattern. */
+};
+
+#define DFIND_INVALID ((struct dfind *)-1)
+
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_open")
+struct dfind *LIBCCALL dfind_open(char const *__restrict filename) {
+	char const *pathend;
+	struct dfind *result;
+	result = (struct dfind *)malloc(sizeof(struct dfind));
+	if unlikely(!result)
+		goto err;
+	pathend = strend(filename);
+	while (pathend > filename &&
+	       (pathend[-1] != '/' && pathend[-1] != '\\'))
+		--pathend;
+	if unlikely(pathend <= filename) {
+		PRIVATE ATTR_SECTION(".rodata.crt.dos.fs.dir.pwd") char const pwd[] = ".";
+		result->df_dir = fopendirat(AT_FDCWD, pwd, O_DOSPATH);
+	} else {
+		char *path;
+		size_t pathlen;
+		pathlen = (size_t)(pathend - filename);
+		path    = (char *)alloca((pathlen + 1) * sizeof(char));
+		memcpy(path, filename, pathlen, sizeof(char));
+		path[pathlen] = '\0';
+		result->df_dir = fopendirat(AT_FDCWD, path, O_DOSPATH);
+	}
+	if unlikely(!result->df_dir)
+		goto err_r;
+	result->df_query = strdup(pathend);
+	if unlikely(!result->df_query)
+		goto err_r_dir;
+done:
+	return result;
+err_r_dir:
+	closedir(result->df_dir);
+err_r:
+	free(result);
+err:
+	result = DFIND_INVALID;
+	goto done;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.dos.fs.dir.dfind_close")
+void LIBCCALL dfind_close(struct dfind *__restrict self) {
+	closedir(self->df_dir);
+	free(self->df_query);
+	free(self);
+}
+
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_readdir")
+struct dirent *LIBCCALL dfind_readdir(struct dfind *__restrict self) {
+	struct dirent *result;
+	while ((result = readdir(self->df_dir)) != NULL) {
+		if (wildstrcasecmp(self->df_query, result->d_name) == 0)
+			break;
+	}
+	return result;
+}
+
+#define dfind_attrib(ent, st) \
+	((ent)->d_type == DT_DIR ? _A_SUBDIR : _A_NORMAL)
+
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_read32") int LIBCCALL
+dfind_read32(struct dfind *__restrict self,
+             struct _finddata32_t *__restrict finddata) {
+	struct stat st;
+	struct dirent *ent;
+	ent = dfind_readdir(self);
+	if (!ent)
+		goto err;
+	if (fstatat(dirfd(self->df_dir), ent->d_name, &st,
+	            AT_DOSPATH | AT_SYMLINK_NOFOLLOW))
+		goto err;
+	finddata->attrib      = dfind_attrib(ent, &st);
+	finddata->time_create = (s32)st.st_ctime32;
+	finddata->time_access = (s32)st.st_atime32;
+	finddata->time_write  = (s32)st.st_mtime32;
+	finddata->size        = (_fsize_t)st.st_size;
+	memcpy(finddata->name, ent->d_name,
+	       MIN(ent->d_namlen, COMPILER_LENOF(finddata->name)),
+	       sizeof(char));
+	finddata->name[COMPILER_LENOF(finddata->name) - 1] = 0;
+	return 0;
+err:
+	return -1;
+}
+
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_read32i64") int LIBCCALL
+dfind_read32i64(struct dfind *__restrict self,
+                struct _finddata32i64_t *__restrict finddata) {
+	struct stat st;
+	struct dirent *ent;
+	ent = dfind_readdir(self);
+	if (!ent)
+		goto err;
+	if (fstatat(dirfd(self->df_dir), ent->d_name, &st,
+	            AT_DOSPATH | AT_SYMLINK_NOFOLLOW))
+		goto err;
+	finddata->attrib      = dfind_attrib(ent, &st);
+	finddata->time_create = (s32)st.st_ctime32;
+	finddata->time_access = (s32)st.st_atime32;
+	finddata->time_write  = (s32)st.st_mtime32;
+	finddata->size        = (s64)st.st_size64;
+	memcpy(finddata->name, ent->d_name,
+	       MIN(ent->d_namlen, COMPILER_LENOF(finddata->name)),
+	       sizeof(char));
+	finddata->name[COMPILER_LENOF(finddata->name) - 1] = 0;
+	return 0;
+err:
+	return -1;
+}
+
+PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_read64") int LIBCCALL
+dfind_read64(struct dfind *__restrict self,
+             struct __finddata64_t *__restrict finddata) {
+	struct stat st;
+	struct dirent *ent;
+	ent = dfind_readdir(self);
+	if (!ent)
+		goto err;
+	if (fstatat(dirfd(self->df_dir), ent->d_name, &st,
+	            AT_DOSPATH | AT_SYMLINK_NOFOLLOW))
+		goto err;
+	finddata->attrib      = dfind_attrib(ent, &st);
+	finddata->time_create = (s64)st.st_ctime64;
+	finddata->time_access = (s64)st.st_atime64;
+	finddata->time_write  = (s64)st.st_mtime64;
+	finddata->size        = (s64)st.st_size64;
+	memcpy(finddata->name, ent->d_name,
+	       MIN(ent->d_namlen, COMPILER_LENOF(finddata->name)),
+	       sizeof(char));
+	finddata->name[COMPILER_LENOF(finddata->name) - 1] = 0;
+	return 0;
+err:
+	return -1;
+}
 
 
 
@@ -54,111 +204,139 @@ NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename,
 }
 /*[[[end:_access_s]]]*/
 
-/*[[[head:_findclose,hash:CRC-32=0x6ff1c05d]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findclose") int
+/*[[[head:_findclose,hash:CRC-32=0x8eedab75]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dir._findclose") int
 NOTHROW_NCX(LIBCCALL libc__findclose)(intptr_t findfd)
 /*[[[body:_findclose]]]*/
 {
-	(void)findfd;
-	CRT_UNIMPLEMENTED("_findclose"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct dfind *f;
+	f = (struct dfind *)(uintptr_t)findfd;
+	if unlikely(f == DFIND_INVALID) {
+		libd_seterrno(__DOS_EINVAL);
+		return -1;
+	}
+	dfind_close(f);
+	return 0;
 }
 /*[[[end:_findclose]]]*/
 
-/*[[[head:_findfirst32,hash:CRC-32=0x75e2a634]]]*/
+/*[[[head:_findfirst32,hash:CRC-32=0xc346019a]]]*/
 INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findfirst32") intptr_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dir._findfirst32") intptr_t
 NOTHROW_RPC(LIBCCALL libc__findfirst32)(char const *__restrict filename,
                                         struct _finddata32_t *__restrict finddata)
 /*[[[body:_findfirst32]]]*/
 {
-	(void)filename;
-	(void)finddata;
-	CRT_UNIMPLEMENTED("_findfirst32"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	struct dfind *result;
+	result = dfind_open(filename);
+	if likely(result != DFIND_INVALID) {
+		if (dfind_read32(result, finddata) != 0) {
+			dfind_close(result);
+			result = DFIND_INVALID;
+		}
+	}
+	return (intptr_t)(uintptr_t)result;
 }
 /*[[[end:_findfirst32]]]*/
 
-/*[[[head:_findfirst32i64,hash:CRC-32=0xff334ba1]]]*/
+/*[[[head:_findfirst32i64,hash:CRC-32=0x2d7f90d0]]]*/
 INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findfirst32i64") intptr_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dir._findfirst32i64") intptr_t
 NOTHROW_RPC(LIBCCALL libc__findfirst32i64)(char const *__restrict filename,
                                            struct _finddata32i64_t *__restrict finddata)
 /*[[[body:_findfirst32i64]]]*/
 {
-	(void)filename;
-	(void)finddata;
-	CRT_UNIMPLEMENTED("_findfirst32i64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	struct dfind *result;
+	result = dfind_open(filename);
+	if likely(result != DFIND_INVALID) {
+		if (dfind_read32i64(result, finddata) != 0) {
+			dfind_close(result);
+			result = DFIND_INVALID;
+		}
+	}
+	return (intptr_t)(uintptr_t)result;
 }
 /*[[[end:_findfirst32i64]]]*/
 
-/*[[[head:_findnext32,hash:CRC-32=0xe91e0889]]]*/
+/*[[[head:_findfirst64,hash:CRC-32=0x7c8dcd1b]]]*/
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dir._findfirst64") intptr_t
+NOTHROW_RPC(LIBCCALL libc__findfirst64)(char const *__restrict filename,
+                                        struct __finddata64_t *__restrict finddata)
+/*[[[body:_findfirst64]]]*/
+{
+	struct dfind *result;
+	result = dfind_open(filename);
+	if likely(result != DFIND_INVALID) {
+		if (dfind_read64(result, finddata) != 0) {
+			dfind_close(result);
+			result = DFIND_INVALID;
+		}
+	}
+	return (intptr_t)(uintptr_t)result;
+}
+/*[[[end:_findfirst64]]]*/
+
+/*[[[head:_findnext32,hash:CRC-32=0x663d78f4]]]*/
 INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findnext32") int
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dir._findnext32") int
 NOTHROW_RPC(LIBCCALL libc__findnext32)(intptr_t findfd,
                                        struct _finddata32_t *__restrict finddata)
 /*[[[body:_findnext32]]]*/
 {
-	(void)findfd;
-	(void)finddata;
-	CRT_UNIMPLEMENTED("_findnext32"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result;
+	struct dfind *f;
+	f = (struct dfind *)(uintptr_t)findfd;
+	if unlikely(f == DFIND_INVALID) {
+		libd_seterrno(__DOS_EINVAL);
+		return -1;
+	}
+	result = dfind_read32(f, finddata);
+	return result;
 }
 /*[[[end:_findnext32]]]*/
 
-/*[[[head:_findnext32i64,hash:CRC-32=0xd60a4584]]]*/
+/*[[[head:_findnext32i64,hash:CRC-32=0x8f4be020]]]*/
 INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findnext32i64") int
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dir._findnext32i64") int
 NOTHROW_RPC(LIBCCALL libc__findnext32i64)(intptr_t findfd,
                                           struct _finddata32i64_t *__restrict finddata)
 /*[[[body:_findnext32i64]]]*/
 {
-	(void)findfd;
-	(void)finddata;
-	CRT_UNIMPLEMENTED("_findnext32i64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result;
+	struct dfind *f;
+	f = (struct dfind *)(uintptr_t)findfd;
+	if unlikely(f == DFIND_INVALID) {
+		libd_seterrno(__DOS_EINVAL);
+		return -1;
+	}
+	result = dfind_read32i64(f, finddata);
+	return result;
 }
 /*[[[end:_findnext32i64]]]*/
 
-/*[[[head:_findfirst64i32,hash:CRC-32=0x9e9b42dd]]]*/
-INTERN WUNUSED NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findfirst64i32") intptr_t
-NOTHROW_RPC(LIBCCALL libc__findfirst64i32)(char const *__restrict filename,
-                                           struct _finddata64i32_t *__restrict finddata)
-/*[[[body:_findfirst64i32]]]*/
-{
-	(void)filename;
-	(void)finddata;
-	CRT_UNIMPLEMENTED("_findfirst64i32"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:_findfirst64i32]]]*/
-
-/*[[[head:_findnext64,hash:CRC-32=0x43dd2bae]]]*/
+/*[[[head:_findnext64,hash:CRC-32=0x6de6055f]]]*/
 INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findnext64") int
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dir._findnext64") int
 NOTHROW_RPC(LIBCCALL libc__findnext64)(intptr_t findfd,
                                        struct __finddata64_t *__restrict finddata)
 /*[[[body:_findnext64]]]*/
 {
-	(void)findfd;
-	(void)finddata;
-	CRT_UNIMPLEMENTED("_findnext64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result;
+	struct dfind *f;
+	f = (struct dfind *)(uintptr_t)findfd;
+	if unlikely(f == DFIND_INVALID) {
+		libd_seterrno(__DOS_EINVAL);
+		return -1;
+	}
+	result = dfind_read64(f, finddata);
+	return result;
 }
 /*[[[end:_findnext64]]]*/
 
-/*[[[head:_sopen_s,hash:CRC-32=0x840ebcbd]]]*/
+/*[[[head:_sopen_s,hash:CRC-32=0x8bf43ee2]]]*/
 INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._sopen_s") errno_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.io._sopen_s") errno_t
 NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
                                     char const *filename,
                                     oflag_t oflags,
@@ -180,9 +358,9 @@ NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
 }
 /*[[[end:_sopen_s]]]*/
 
-/*[[[head:_mktemp_s,hash:CRC-32=0x7367b64e]]]*/
+/*[[[head:_mktemp_s,hash:CRC-32=0x14c62739]]]*/
 INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._mktemp_s") errno_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._mktemp_s") errno_t
 NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
                                      size_t size)
 /*[[[body:_mktemp_s]]]*/
@@ -195,9 +373,9 @@ NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
 }
 /*[[[end:_mktemp_s]]]*/
 
-/*[[[head:_pipe,hash:CRC-32=0x6797ad3b]]]*/
+/*[[[head:_pipe,hash:CRC-32=0x701f875d]]]*/
 INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._pipe") int
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.io._pipe") int
 NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
                                  uint32_t pipesize,
                                  oflag_t textmode)
@@ -209,9 +387,9 @@ NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
 }
 /*[[[end:_pipe]]]*/
 
-/*[[[head:_filelengthi64,hash:CRC-32=0x73b5b47f]]]*/
+/*[[[head:_filelengthi64,hash:CRC-32=0xb2791f4c]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._filelengthi64") int64_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._filelengthi64") int64_t
 NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd)
 /*[[[body:_filelengthi64]]]*/
 {
@@ -228,9 +406,9 @@ err:
 }
 /*[[[end:_filelengthi64]]]*/
 
-/*[[[head:_telli64,hash:CRC-32=0x30de0469]]]*/
+/*[[[head:_telli64,hash:CRC-32=0x5e4104e5]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._telli64") int64_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._telli64") int64_t
 NOTHROW_NCX(LIBCCALL libc__telli64)(fd_t fd)
 /*[[[body:_telli64]]]*/
 {
@@ -238,8 +416,8 @@ NOTHROW_NCX(LIBCCALL libc__telli64)(fd_t fd)
 }
 /*[[[end:_telli64]]]*/
 
-/*[[[head:umask_s,hash:CRC-32=0x47378268]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.umask_s") errno_t
+/*[[[head:umask_s,hash:CRC-32=0x11245d13]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.basic_property.umask_s") errno_t
 NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode,
                                    mode_t *oldmode)
 /*[[[body:umask_s]]]*/
@@ -255,8 +433,8 @@ NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode,
 }
 /*[[[end:umask_s]]]*/
 
-/*[[[head:__lock_fhandle,hash:CRC-32=0x60cafd83]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.__lock_fhandle") int
+/*[[[head:__lock_fhandle,hash:CRC-32=0x6d20771c]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility.__lock_fhandle") int
 NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd)
 /*[[[body:__lock_fhandle]]]*/
 {
@@ -266,8 +444,8 @@ NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd)
 }
 /*[[[end:__lock_fhandle]]]*/
 
-/*[[[head:_unlock_fhandle,hash:CRC-32=0x193465]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._unlock_fhandle") void
+/*[[[head:_unlock_fhandle,hash:CRC-32=0x77e5b002]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._unlock_fhandle") void
 NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd)
 /*[[[body:_unlock_fhandle]]]*/
 {
@@ -276,9 +454,9 @@ NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd)
 }
 /*[[[end:_unlock_fhandle]]]*/
 
-/*[[[head:sopen,hash:CRC-32=0xfbce2e5f]]]*/
+/*[[[head:sopen,hash:CRC-32=0x69befb88]]]*/
 INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.sopen") fd_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.io.sopen") fd_t
 NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename,
                                   oflag_t oflags,
                                   int sflags,
@@ -297,9 +475,9 @@ NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename,
 }
 /*[[[end:sopen]]]*/
 
-/*[[[head:filelength,hash:CRC-32=0xcac6b817]]]*/
+/*[[[head:filelength,hash:CRC-32=0xb0a1324]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.filelength") __LONG32_TYPE__
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility.filelength") __LONG32_TYPE__
 NOTHROW_NCX(LIBCCALL libc_filelength)(fd_t fd)
 /*[[[body:filelength]]]*/
 {
@@ -316,9 +494,9 @@ err:
 }
 /*[[[end:filelength]]]*/
 
-/*[[[head:eof,hash:CRC-32=0x9371f1dd]]]*/
+/*[[[head:eof,hash:CRC-32=0xbbbe9720]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.eof") int
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility.eof") int
 NOTHROW_NCX(LIBCCALL libc_eof)(fd_t fd)
 /*[[[body:eof]]]*/
 {
@@ -336,9 +514,9 @@ NOTHROW_NCX(LIBCCALL libc_eof)(fd_t fd)
 }
 /*[[[end:eof]]]*/
 
-/*[[[head:tell,hash:CRC-32=0x204b7140]]]*/
+/*[[[head:tell,hash:CRC-32=0x4ed471cc]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.tell") __LONG32_TYPE__
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility.tell") __LONG32_TYPE__
 NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd)
 /*[[[body:tell]]]*/
 {
@@ -346,8 +524,8 @@ NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd)
 }
 /*[[[end:tell]]]*/
 
-/*[[[head:setmode,hash:CRC-32=0x65542c1d]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.setmode") oflag_t
+/*[[[head:setmode,hash:CRC-32=0x9d8ef2ab]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.io.setmode") oflag_t
 NOTHROW_NCX(LIBCCALL libc_setmode)(fd_t fd,
                                    oflag_t mode)
 /*[[[body:setmode]]]*/
@@ -360,17 +538,27 @@ NOTHROW_NCX(LIBCCALL libc_setmode)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc0b8c3f2]]]*/
+
+#undef _findfirst
+#undef _findfirsti64
+#undef _findnext
+#undef _findnexti64
+
+/*[[[start:exports,hash:CRC-32=0x68124529]]]*/
 #undef sopen
 #undef _sopen
 DEFINE_PUBLIC_WEAK_ALIAS(_access_s, libc__access_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_findclose, libc__findclose);
 DEFINE_PUBLIC_WEAK_ALIAS(_findfirst32, libc__findfirst32);
+DEFINE_PUBLIC_WEAK_ALIAS(_findfirst, libc__findfirst32);
 DEFINE_PUBLIC_WEAK_ALIAS(_findfirst32i64, libc__findfirst32i64);
+DEFINE_PUBLIC_WEAK_ALIAS(_findfirsti64, libc__findfirst32i64);
+DEFINE_PUBLIC_WEAK_ALIAS(_findfirst64, libc__findfirst64);
+DEFINE_PUBLIC_WEAK_ALIAS(_findfirst64i32, libc__findfirst64);
 DEFINE_PUBLIC_WEAK_ALIAS(_findnext32, libc__findnext32);
+DEFINE_PUBLIC_WEAK_ALIAS(_findnext, libc__findnext32);
 DEFINE_PUBLIC_WEAK_ALIAS(_findnext32i64, libc__findnext32i64);
-DEFINE_PUBLIC_WEAK_ALIAS(_findfirst64i32, libc__findfirst64i32);
-DEFINE_PUBLIC_WEAK_ALIAS(_findfirst64, libc__findfirst64i32);
+DEFINE_PUBLIC_WEAK_ALIAS(_findnexti64, libc__findnext32i64);
 DEFINE_PUBLIC_WEAK_ALIAS(_findnext64, libc__findnext64);
 DEFINE_PUBLIC_WEAK_ALIAS(_findnext64i32, libc__findnext64);
 DEFINE_PUBLIC_WEAK_ALIAS(_sopen_s, libc__sopen_s);

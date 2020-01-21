@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3bcd160 */
+/* HASH CRC-32:0x800f4133 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(versionsort64) __ATTR_PURE __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(versionsort64))(struct dirent64 const **__e1,
                                                            struct dirent64 const **__e2) {
-#line 312 "kos/src/libc/magic/dirent.c"
+#line 320 "kos/src/libc/magic/dirent.c"
 	return __localdep_strverscmp((*__e1)->d_name, (*__e2)->d_name);
 }
 __NAMESPACE_LOCAL_END
