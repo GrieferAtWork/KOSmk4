@@ -1967,7 +1967,6 @@
 #define __CRT_HAVE_sys_lookup_dcookie 1
 #define __CRT_HAVE_sys_lremovexattr 1
 #define __CRT_HAVE_sys_lseek 1
-#define __CRT_HAVE_sys_lseek64 1
 #define __CRT_HAVE_sys_lsetxattr 1
 #define __CRT_HAVE_sys_madvise 1
 #define __CRT_HAVE_sys_maplibrary 1

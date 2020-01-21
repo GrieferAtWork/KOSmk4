@@ -15222,10 +15222,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad .Lname3805 /* index: 3805 */
-	.weak sys_lseek64; .quad sys_lseek64
-	.reloc ., R_X86_64_SIZE32, sys_lseek64; .int 0
-	.int 0x3e0b7f4
+	.quad 0 /* index: 3805 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad 0 /* index: 3806 */
 	.quad 0
 	.int 0
@@ -21716,8 +21716,6 @@ END(kernel_symbol_table)
 	.string "json_parser_enterarray"
 .Lname3802:
 	.string "vm_node_insert"
-.Lname3805:
-	.string "sys_lseek64"
 .Lname3807:
 	.string "block_device_write"
 .Lname3808:

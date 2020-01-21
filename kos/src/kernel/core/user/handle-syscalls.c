@@ -532,7 +532,11 @@ DEFINE_COMPAT_SYSCALL4(errno_t, _llseek,
                        syscall_ulong_t, whence) {
 	uint64_t retpos;
 	compat_validate_writable(result, sizeof(uint64_t));
+#ifdef __ARCH_WANT_SYSCALL_LSEEK64
 	retpos  = (uint64_t)sys_lseek64(fd, offset, whence);
+#else /* __ARCH_WANT_SYSCALL_LSEEK64 */
+	retpos  = (uint64_t)sys_lseek(fd, offset, whence);
+#endif /* !__ARCH_WANT_SYSCALL_LSEEK64 */
 	*result = retpos;
 	return -EOK;
 }
