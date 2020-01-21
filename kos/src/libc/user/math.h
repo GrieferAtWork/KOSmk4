@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e1b48e6 */
+/* HASH CRC-32:0x7befa274 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -207,7 +207,6 @@ INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fabsf)(float x);
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_fmodf)(float x, float y);
 /* Return X with its signed changed to Y's */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x);
-/* Floating-point modulo remainder of X/Y */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fmodl)(__LONGDOUBLE x, __LONGDOUBLE y);
 /* Return X with its signed changed to Y's */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_copysign)(double num, double sign);
@@ -234,24 +233,22 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_tgammal)(__LONGDOUBLE x);
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_rint)(double x);
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_nextafter)(double x, double y);
-/* Return the remainder of integer divison X / Y with infinite precision */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_remainder)(double x, double y);
+/* Return the remainder of integer divison X/P with infinite precision */
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_remainder)(double x, double p);
 /* Return the binary exponent of X, which must be nonzero */
 INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogb)(double x);
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_rintf)(float x);
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_nextafterf)(float x, float y);
-/* Return the remainder of integer divison X / Y with infinite precision */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remainderf)(float x, float y);
+INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remainderf)(float x, float p);
 /* Return the binary exponent of X, which must be nonzero */
 INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogbf)(float x);
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x);
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x, __LONGDOUBLE y);
-/* Return the remainder of integer divison X / Y with infinite precision */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x, __LONGDOUBLE y);
+INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x, __LONGDOUBLE p);
 /* Return the binary exponent of X, which must be nonzero */
 INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogbl)(__LONGDOUBLE x);
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_nexttoward)(double x, __LONGDOUBLE y);

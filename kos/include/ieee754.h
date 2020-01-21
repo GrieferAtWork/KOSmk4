@@ -43,10 +43,17 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>. */
 
+#define IEEE754_FLOAT_MAXEXP 0xff
+#define IEEE754_FLOAT_BIAS   0x7f /* Added to exponent. */
+#define IEEE754_FLOAT_SHIFT  23
 
-#define IEEE754_FLOAT_BIAS       0x7f   /* Added to exponent. */
-#define IEEE754_DOUBLE_BIAS      0x3ff  /* Added to exponent. */
-#define IEEE854_LONG_DOUBLE_BIAS 0x3fff /* Added to exponent. */
+#define IEEE754_DOUBLE_MAXEXP 0x7ff
+#define IEEE754_DOUBLE_BIAS   0x3ff /* Added to exponent. */
+#define IEEE754_DOUBLE_SHIFT  20
+
+#define IEEE854_LONG_DOUBLE_MAXEXP 0x7fff
+#define IEEE854_LONG_DOUBLE_BIAS   0x3fff /* Added to exponent. */
+#define IEEE854_LONG_DOUBLE_SHIFT  0
 
 __SYSDECL_BEGIN
 

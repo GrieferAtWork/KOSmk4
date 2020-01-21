@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd58cf00 */
+/* HASH CRC-32:0xa79b080 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1726,7 +1726,16 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,modf,(double 
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,modf,(double __x, double *__iptr),__modf,(__x,__iptr))
 #else /* LIBC: modf */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/modf.h>
+__NAMESPACE_STD_BEGIN
+/* Break VALUE into integral and fractional parts */
+__NAMESPACE_LOCAL_USING_OR_IMPL(modf, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL modf)(double __x, double *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modf))(__x, __iptr); })
+#else /* CUSTOM: modf */
 #undef __std_modf_defined
+#endif /* modf... */
 #endif /* modf... */
 #endif /* !__std_modf_defined */
 #ifndef __std_expf_defined
@@ -1845,7 +1854,9 @@ __CDECLARE(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modff,(float __x, float *__ip
 #elif defined(__CRT_HAVE___modff)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modff,(float __x, float *__iptr),__modff,(__x,__iptr))
-#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#else /* LIBC: modff */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 __NAMESPACE_STD_END
 #include <local/math/modff.h>
 __NAMESPACE_STD_BEGIN
@@ -1853,6 +1864,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(modff, __FORCELOCAL __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL modff)(float __x, float *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modff))(__x, __iptr); })
 #else /* CUSTOM: modff */
 #undef __std_modff_defined
+#endif /* modff... */
 #endif /* modff... */
 #endif /* !__std_modff_defined */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -2002,13 +2014,9 @@ __CDECLARE(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modfl,(__LONGDOUBLE __
 #elif defined(__CRT_HAVE___modfl)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modfl,(__x,__iptr))
-#elif defined(__CRT_HAVE___modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into integral and fractional parts */
-__CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modf,(__x,__iptr))
-#elif defined(__CRT_HAVE_modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into integral and fractional parts */
-__CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),modf,(__x,__iptr))
-#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#else /* LIBC: modfl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/modfl.h>
 __NAMESPACE_STD_BEGIN
@@ -2016,6 +2024,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(modfl, __FORCELOCAL __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL modfl)(__LONGDOUBLE __x, __LONGDOUBLE *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modfl))(__x, __iptr); })
 #else /* CUSTOM: modfl */
 #undef __std_modfl_defined
+#endif /* modfl... */
 #endif /* modfl... */
 #endif /* !__std_modfl_defined */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -2721,7 +2730,7 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,fmod,(double __x, double __y),(__x,__
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,fmod,(double __x, double __y),__fmod,(__x,__y))
 #else /* LIBC: fmod */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/fmod.h>
 __NAMESPACE_STD_BEGIN
@@ -2793,7 +2802,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,fmodf,(float __x, float __y),(__x,__y)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,fmodf,(float __x, float __y),__fmodf,(__x,__y))
 #else /* LIBC: fmodf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 __NAMESPACE_STD_END
 #include <local/math/fmodf.h>
 __NAMESPACE_STD_BEGIN
@@ -2856,27 +2865,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(floorl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED
 #ifndef __std_fmodl_defined
 #define __std_fmodl_defined 1
 #if __has_builtin(__builtin_fmodl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodl)
-/* Floating-point modulo remainder of X/Y */
 __EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fmodl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_fmodl(__x, __y); }
 #elif defined(__CRT_HAVE_fmodl)
-/* Floating-point modulo remainder of X/Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
 #elif defined(__CRT_HAVE___fmodl)
-/* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmodl,(__x,__y))
-#elif defined(__CRT_HAVE_fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmod,(__x,__y))
-#elif defined(__CRT_HAVE___fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmod,(__x,__y))
 #else /* LIBC: fmodl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/fmodl.h>
 __NAMESPACE_STD_BEGIN
-/* Floating-point modulo remainder of X/Y */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fmodl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fmodl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodl))(__x, __y); })
 #else /* CUSTOM: fmodl */
 #undef __std_fmodl_defined
@@ -3283,22 +3282,31 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nextafter, __FORCELOCAL __ATTR_CONST __ATTR_WUNU
 #ifndef __std_remainder_defined
 #define __std_remainder_defined 1
 #if __has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL remainder)(double __x, double __y) { return __builtin_remainder(__x, __y); }
+/* Return the remainder of integer divison X/P with infinite precision */
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL remainder)(double __x, double __p) { return __builtin_remainder(__x, __p); }
 #elif defined(__CRT_HAVE_remainder)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,remainder,(double __x, double __y),(__x,__y))
+/* Return the remainder of integer divison X/P with infinite precision */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,remainder,(double __x, double __p),(__x,__p))
 #elif defined(__CRT_HAVE___remainder)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,remainder,(double __x, double __y),__remainder,(__x,__y))
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,remainder,(double __x, double __p),__remainder,(__x,__p))
 #elif defined(__CRT_HAVE_drem)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,remainder,(double __x, double __y),drem,(__x,__y))
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,remainder,(double __x, double __p),drem,(__x,__p))
 #elif defined(__CRT_HAVE___drem)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,remainder,(double __x, double __y),__drem,(__x,__y))
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,remainder,(double __x, double __p),__drem,(__x,__p))
 #else /* LIBC: remainder */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/remainder.h>
+__NAMESPACE_STD_BEGIN
+/* Return the remainder of integer divison X/P with infinite precision */
+__NAMESPACE_LOCAL_USING_OR_IMPL(remainder, __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL remainder)(double __x, double __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainder))(__x, __p); })
+#else /* CUSTOM: remainder */
 #undef __std_remainder_defined
+#endif /* remainder... */
 #endif /* remainder... */
 #endif /* !__std_remainder_defined */
 #ifndef __std_ilogb_defined
@@ -3367,28 +3375,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nextafterf, __FORCELOCAL __ATTR_CONST __ATTR_WUN
 #ifndef __std_remainderf_defined
 #define __std_remainderf_defined 1
 #if __has_builtin(__builtin_remainderf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL remainderf)(float __x, float __y) { return __builtin_remainderf(__x, __y); }
+__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL remainderf)(float __x, float __p) { return __builtin_remainderf(__x, __p); }
 #elif defined(__CRT_HAVE_remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,remainderf,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,remainderf,(float __x, float __p),(__x,__p))
 #elif defined(__CRT_HAVE___remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainderf,(float __x, float __y),__remainderf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainderf,(float __x, float __p),__remainderf,(__x,__p))
 #elif defined(__CRT_HAVE_dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainderf,(float __x, float __y),dremf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainderf,(float __x, float __p),dremf,(__x,__p))
 #elif defined(__CRT_HAVE___dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainderf,(float __x, float __y),__dremf,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainderf,(float __x, float __p),__dremf,(__x,__p))
+#else /* LIBC: remainderf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 __NAMESPACE_STD_END
 #include <local/math/remainderf.h>
 __NAMESPACE_STD_BEGIN
-/* Return the remainder of integer divison X / Y with infinite precision */
-__NAMESPACE_LOCAL_USING_OR_IMPL(remainderf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL remainderf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(remainderf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL remainderf)(float __x, float __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __p); })
 #else /* CUSTOM: remainderf */
 #undef __std_remainderf_defined
+#endif /* remainderf... */
 #endif /* remainderf... */
 #endif /* !__std_remainderf_defined */
 #ifndef __std_ilogbf_defined
@@ -3476,40 +3481,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nextafterl, __FORCELOCAL __ATTR_CONST __ATTR_WUN
 #ifndef __std_remainderl_defined
 #define __std_remainderl_defined 1
 #if __has_builtin(__builtin_remainderl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL remainderl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_remainderl(__x, __y); }
+__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL remainderl)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return __builtin_remainderl(__x, __p); }
 #elif defined(__CRT_HAVE_remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),(__x,__p))
 #elif defined(__CRT_HAVE___remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__remainderl,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),__remainderl,(__x,__p))
 #elif defined(__CRT_HAVE_dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),dreml,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),dreml,(__x,__p))
 #elif defined(__CRT_HAVE___dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__dreml,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),remainder,(__x,__y))
-#elif defined(__CRT_HAVE___remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__remainder,(__x,__y))
-#elif defined(__CRT_HAVE_drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),drem,(__x,__y))
-#elif defined(__CRT_HAVE___drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__drem,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),__dreml,(__x,__p))
+#else /* LIBC: remainderl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/remainderl.h>
 __NAMESPACE_STD_BEGIN
-/* Return the remainder of integer divison X / Y with infinite precision */
-__NAMESPACE_LOCAL_USING_OR_IMPL(remainderl, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL remainderl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(remainderl, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL remainderl)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __p); })
 #else /* CUSTOM: remainderl */
 #undef __std_remainderl_defined
+#endif /* remainderl... */
 #endif /* remainderl... */
 #endif /* !__std_remainderl_defined */
 #ifndef __std_ilogbl_defined
@@ -4756,7 +4746,9 @@ __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modf,(float __x, float *__ip
 #elif defined(__CRT_HAVE___modff)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modf,(float __x, float *__iptr),__modff,(__x,__iptr))
-#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#else /* LIBC: modff */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/modff.h>
@@ -4764,6 +4756,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Break VALUE into integral and fractional parts */
 __FORCELOCAL __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL modf)(float __x, float *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modff))(__x, __iptr); }
+#else /* CUSTOM: modff */
+#undef none
+#endif /* modf... */
 #endif /* modf... */
 #if __has_builtin(__builtin_powf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_powf)
 /* Return X to the Y power */
@@ -4876,7 +4871,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,fmod,(float __x, float __y),fmodf,(__
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,fmod,(float __x, float __y),__fmodf,(__x,__y))
 #else /* LIBC: fmodf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/fmodf.h>
@@ -5258,13 +5253,9 @@ __CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONGDOUBLE __
 #elif defined(__CRT_HAVE___modfl)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modfl,(__x,__iptr))
-#elif defined(__CRT_HAVE___modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into integral and fractional parts */
-__CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modf,(__x,__iptr))
-#elif defined(__CRT_HAVE_modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into integral and fractional parts */
-__CDECLARE(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),(__x,__iptr))
-#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#else /* LIBC: modfl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/modfl.h>
@@ -5272,6 +5263,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Break VALUE into integral and fractional parts */
 __FORCELOCAL __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL modf)(__LONGDOUBLE __x, __LONGDOUBLE *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modfl))(__x, __iptr); }
+#else /* CUSTOM: modfl */
+#undef none
+#endif /* modf... */
 #endif /* modf... */
 #if __has_builtin(__builtin_powl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_powl)
 /* Return X to the Y power */
@@ -5376,28 +5370,23 @@ extern "C++" {
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL floor)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); }
 #endif /* floor... */
 #if __has_builtin(__builtin_fmodl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodl)
-/* Floating-point modulo remainder of X/Y */
 __EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fmod)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_fmodl(__x, __y); }
 #elif defined(__CRT_HAVE_fmodl)
-/* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmodl,(__x,__y))
 #elif defined(__CRT_HAVE___fmodl)
-/* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmodl,(__x,__y))
-#elif defined(__CRT_HAVE_fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Floating-point modulo remainder of X/Y */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
-#elif defined(__CRT_HAVE___fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmod,(__x,__y))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#else /* LIBC: fmodl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/fmodl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-/* Floating-point modulo remainder of X/Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL fmod)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodl))(__x, __y); }
+#else /* CUSTOM: fmodl */
+#undef none
+#endif /* fmod... */
 #endif /* fmod... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
@@ -5579,28 +5568,27 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nextafter)(f
 #endif /* nextafter... */
 #endif /* nextafter... */
 #if __has_builtin(__builtin_remainderf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL remainder)(float __x, float __y) { return __builtin_remainderf(__x, __y); }
+__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL remainder)(float __x, float __p) { return __builtin_remainderf(__x, __p); }
 #elif defined(__CRT_HAVE_remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __y),remainderf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __p),remainderf,(__x,__p))
 #elif defined(__CRT_HAVE___remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __y),__remainderf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __p),__remainderf,(__x,__p))
 #elif defined(__CRT_HAVE_dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __y),dremf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __p),dremf,(__x,__p))
 #elif defined(__CRT_HAVE___dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __y),__dremf,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __p),__dremf,(__x,__p))
+#else /* LIBC: remainderf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/remainderf.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-/* Return the remainder of integer divison X / Y with infinite precision */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL remainder)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL remainder)(float __x, float __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __p); }
+#else /* CUSTOM: remainderf */
+#undef none
+#endif /* remainder... */
 #endif /* remainder... */
 #if __has_builtin(__builtin_ilogbf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogbf)
 /* Return the binary exponent of X, which must be nonzero */
@@ -5838,40 +5826,27 @@ extern "C++" {
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nextafter)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
 #endif /* nextafter... */
 #if __has_builtin(__builtin_remainderl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL remainder)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_remainderl(__x, __y); }
+__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL remainder)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return __builtin_remainderl(__x, __p); }
 #elif defined(__CRT_HAVE_remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __y),remainderl,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __p),remainderl,(__x,__p))
 #elif defined(__CRT_HAVE___remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __y),__remainderl,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __p),__remainderl,(__x,__p))
 #elif defined(__CRT_HAVE_dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __y),dreml,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __p),dreml,(__x,__p))
 #elif defined(__CRT_HAVE___dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __y),__dreml,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
-#elif defined(__CRT_HAVE___remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __y),__remainder,(__x,__y))
-#elif defined(__CRT_HAVE_drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __y),drem,(__x,__y))
-#elif defined(__CRT_HAVE___drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __y),__drem,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __p),__dreml,(__x,__p))
+#else /* LIBC: remainderl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/remainderl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-/* Return the remainder of integer divison X / Y with infinite precision */
-__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL remainder)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL remainder)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __p); }
+#else /* CUSTOM: remainderl */
+#undef none
+#endif /* remainder... */
 #endif /* remainder... */
 #if __has_builtin(__builtin_ilogbl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogbl)
 /* Return the binary exponent of X, which must be nonzero */
@@ -7799,20 +7774,29 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finite,(double __x),_finit
 __NAMESPACE_LOCAL_USING_OR_IMPL(finite, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finite)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__x); })
 #endif /* finite... */
 #if __has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)
-/* Return the remainder of X/Y */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL drem)(double __x, double __y) { return __builtin_drem(__x, __y); }
-#elif defined(__CRT_HAVE_drem)
-/* Return the remainder of X/Y */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,drem,(double __x, double __y),(__x,__y))
-#elif defined(__CRT_HAVE___drem)
-/* Return the remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,drem,(double __x, double __y),__drem,(__x,__y))
-#elif defined(__CRT_HAVE___remainder)
-/* Return the remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,drem,(double __x, double __y),__remainder,(__x,__y))
+/* Return the remainder of integer divison X/P with infinite precision */
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL drem)(double __x, double __p) { return __builtin_drem(); }
 #elif defined(__CRT_HAVE_remainder)
-/* Return the remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,drem,(double __x, double __y),remainder,(__x,__y))
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,drem,(double __x, double __p),remainder,(__x,__p))
+#elif defined(__CRT_HAVE___remainder)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,drem,(double __x, double __p),__remainder,(__x,__p))
+#elif defined(__CRT_HAVE_drem)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,drem,(double __x, double __p),(__x,__p))
+#elif defined(__CRT_HAVE___drem)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,drem,(double __x, double __p),__drem,(__x,__p))
+#else /* LIBC: remainder */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/remainder.h>
+/* Return the remainder of integer divison X/P with infinite precision */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL drem)(double __x, double __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainder))(__x, __p); }
+#else /* CUSTOM: remainder */
+#undef none
+#endif /* drem... */
 #endif /* drem... */
 #if __has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)
 /* Return the fractional part of X after dividing out `ilogb (X)' */
@@ -7839,24 +7823,23 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitef,(float __x),__fini
 __NAMESPACE_LOCAL_USING_OR_IMPL(finitef, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitef)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitef))(__x); })
 #endif /* finitef... */
 #if __has_builtin(__builtin_dremf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL dremf)(float __x, float __y) { return __builtin_dremf(__x, __y); }
-#elif defined(__CRT_HAVE_dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,dremf,(float __x, float __y),(__x,__y))
+__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL dremf)(float __x, float __p) { return __builtin_dremf(); }
 #elif defined(__CRT_HAVE_remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,dremf,(float __x, float __y),remainderf,(__x,__y))
-#elif defined(__CRT_HAVE___dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,dremf,(float __x, float __y),__dremf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,dremf,(float __x, float __p),remainderf,(__x,__p))
 #elif defined(__CRT_HAVE___remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,dremf,(float __x, float __y),__remainderf,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,dremf,(float __x, float __p),__remainderf,(__x,__p))
+#elif defined(__CRT_HAVE_dremf)
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,dremf,(float __x, float __p),(__x,__p))
+#elif defined(__CRT_HAVE___dremf)
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,dremf,(float __x, float __p),__dremf,(__x,__p))
+#else /* LIBC: remainderf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/remainderf.h>
-/* Return the remainder of integer divison X / Y with infinite precision */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL dremf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL dremf)(float __x, float __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __p); }
+#else /* CUSTOM: remainderf */
+#undef none
+#endif /* dremf... */
 #endif /* dremf... */
 #if __has_builtin(__builtin_significandf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandf)
 /* Return the fractional part of X after dividing out `ilogb (X)' */
@@ -7894,24 +7877,23 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(__LONGDOUBLE __x)
 __NAMESPACE_LOCAL_USING_OR_IMPL(finitel, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitel)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitel))(__x); })
 #endif /* finitel... */
 #if __has_builtin(__builtin_dreml) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL dreml)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_dreml(__x, __y); }
-#elif defined(__CRT_HAVE_dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL dreml)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return __builtin_dreml(); }
 #elif defined(__CRT_HAVE_remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),remainderl,(__x,__y))
-#elif defined(__CRT_HAVE___dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),__dreml,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),remainderl,(__x,__p))
 #elif defined(__CRT_HAVE___remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),__remainderl,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),__remainderl,(__x,__p))
+#elif defined(__CRT_HAVE_dreml)
+__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),(__x,__p))
+#elif defined(__CRT_HAVE___dreml)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),__dreml,(__x,__p))
+#else /* LIBC: remainderl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 #include <local/math/remainderl.h>
-/* Return the remainder of integer divison X / Y with infinite precision */
-__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL dreml)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL dreml)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __p); }
+#else /* CUSTOM: remainderl */
+#undef none
+#endif /* dreml... */
 #endif /* dreml... */
 #if __has_builtin(__builtin_significandl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandl)
 /* Return the fractional part of X after dividing out `ilogb (X)' */
@@ -9052,12 +9034,24 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__log10,(double __x),(__x))
 /* Base-ten logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__log10,(double __x),log10,(__x))
 #endif /* __log10... */
-#ifdef __CRT_HAVE___modf
+#if __has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)
 /* Break VALUE into integral and fractional parts */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__modf,(double __x, double *__iptr),(__x,__iptr))
+__EXTERNINLINE __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL __modf)(double __x, double *__iptr) { return __builtin_modf(__x, __iptr); }
 #elif defined(__CRT_HAVE_modf)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__modf,(double __x, double *__iptr),modf,(__x,__iptr))
+#elif defined(__CRT_HAVE___modf)
+/* Break VALUE into integral and fractional parts */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__modf,(double __x, double *__iptr),(__x,__iptr))
+#else /* LIBC: modf */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/modf.h>
+/* Break VALUE into integral and fractional parts */
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL __modf)(double __x, double *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modf))(__x, __iptr); }
+#else /* CUSTOM: modf */
+#undef none
+#endif /* __modf... */
 #endif /* __modf... */
 #if __has_builtin(__builtin_expf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expf)
 /* Exponential function of X */
@@ -9138,10 +9132,15 @@ __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,__modff,(float __x, float *_
 #elif defined(__CRT_HAVE___modff)
 /* Break VALUE into integral and fractional parts */
 __CDECLARE(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,__modff,(float __x, float *__iptr),(__x,__iptr))
-#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#else /* LIBC: modff */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/modff.h>
 /* Break VALUE into integral and fractional parts */
 __FORCELOCAL __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL __modff)(float __x, float *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modff))(__x, __iptr); }
+#else /* CUSTOM: modff */
+#undef none
+#endif /* __modff... */
 #endif /* __modff... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_expl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expl)
@@ -9253,16 +9252,15 @@ __CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__modfl,(__LONGDOUBLE
 #elif defined(__CRT_HAVE___modfl)
 /* Break VALUE into integral and fractional parts */
 __CDECLARE(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),(__x,__iptr))
-#elif defined(__CRT_HAVE___modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into integral and fractional parts */
-__CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modf,(__x,__iptr))
-#elif defined(__CRT_HAVE_modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into integral and fractional parts */
-__CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),modf,(__x,__iptr))
-#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#else /* LIBC: modfl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 #include <local/math/modfl.h>
 /* Break VALUE into integral and fractional parts */
 __FORCELOCAL __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL __modfl)(__LONGDOUBLE __x, __LONGDOUBLE *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modfl))(__x, __iptr); }
+#else /* CUSTOM: modfl */
+#undef none
+#endif /* __modfl... */
 #endif /* __modfl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -9883,7 +9881,7 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__fmod,(double __x, double __y),fmod
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__fmod,(double __x, double __y),(__x,__y))
 #else /* LIBC: fmod */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/fmod.h>
 /* Floating-point modulo remainder of X/Y */
 __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fmod)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmod))(__x, __y); }
@@ -9975,7 +9973,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__fmodf,(float __x, float __y),fmodf,
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__fmodf,(float __x, float __y),(__x,__y))
 #else /* LIBC: fmodf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/fmodf.h>
 /* Floating-point modulo remainder of X/Y */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fmodf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodf))(__x, __y); }
@@ -10055,25 +10053,15 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__floorl,(__LONGDO
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __floorl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); }
 #endif /* __floorl... */
 #if __has_builtin(__builtin_fmodl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodl)
-/* Floating-point modulo remainder of X/Y */
 __EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __fmodl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_fmodl(__x, __y); }
 #elif defined(__CRT_HAVE_fmodl)
-/* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmodl,(__x,__y))
 #elif defined(__CRT_HAVE___fmodl)
-/* Floating-point modulo remainder of X/Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
-#elif defined(__CRT_HAVE_fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmod,(__x,__y))
-#elif defined(__CRT_HAVE___fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmod,(__x,__y))
 #else /* LIBC: fmodl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 #include <local/math/fmodl.h>
-/* Floating-point modulo remainder of X/Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __fmodl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodl))(__x, __y); }
 #else /* CUSTOM: fmodl */
 #undef none
@@ -10121,18 +10109,30 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitel)(__L
 #endif /* __finitel... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifdef __USE_MISC
-#ifdef __CRT_HAVE___remainder
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __y),__remainder,(__x,__y))
-#elif defined(__CRT_HAVE_drem)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __y),drem,(__x,__y))
-#elif defined(__CRT_HAVE___drem)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __y),(__x,__y))
+#if __has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)
+/* Return the remainder of integer divison X/P with infinite precision */
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __drem)(double __x, double __p) { return __builtin_remainder(__x, __p); }
 #elif defined(__CRT_HAVE_remainder)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __y),remainder,(__x,__y))
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __p),remainder,(__x,__p))
+#elif defined(__CRT_HAVE___remainder)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __p),__remainder,(__x,__p))
+#elif defined(__CRT_HAVE_drem)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __p),drem,(__x,__p))
+#elif defined(__CRT_HAVE___drem)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __p),(__x,__p))
+#else /* LIBC: remainder */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/remainder.h>
+/* Return the remainder of integer divison X/P with infinite precision */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __drem)(double __x, double __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainder))(__x, __p); }
+#else /* CUSTOM: remainder */
+#undef none
+#endif /* __drem... */
 #endif /* __drem... */
 #ifdef __CRT_HAVE___significand
 /* Return the fractional part of X after dividing out `ilogb (X)' */
@@ -10142,24 +10142,23 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__significand,(double __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__significand,(double __x),significand,(__x))
 #endif /* __significand... */
 #if __has_builtin(__builtin_remainderf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __dremf)(float __x, float __y) { return __builtin_remainderf(__x, __y); }
+__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __dremf)(float __x, float __p) { return __builtin_remainderf(__x, __p); }
 #elif defined(__CRT_HAVE_remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__dremf,(float __x, float __y),remainderf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__dremf,(float __x, float __p),remainderf,(__x,__p))
 #elif defined(__CRT_HAVE___remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__dremf,(float __x, float __y),__remainderf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__dremf,(float __x, float __p),__remainderf,(__x,__p))
 #elif defined(__CRT_HAVE_dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__dremf,(float __x, float __y),dremf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__dremf,(float __x, float __p),dremf,(__x,__p))
 #elif defined(__CRT_HAVE___dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__dremf,(float __x, float __y),(__x,__y))
-#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__dremf,(float __x, float __p),(__x,__p))
+#else /* LIBC: remainderf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/remainderf.h>
-/* Return the remainder of integer divison X / Y with infinite precision */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __dremf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __dremf)(float __x, float __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __p); }
+#else /* CUSTOM: remainderf */
+#undef none
+#endif /* __dremf... */
 #endif /* __dremf... */
 #if __has_builtin(__builtin_significandf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandf)
 /* Return the fractional part of X after dividing out `ilogb (X)' */
@@ -10177,36 +10176,23 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __significandf)(float __x
 #endif /* __significandf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_remainderl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __dreml)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_remainderl(__x, __y); }
+__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __dreml)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return __builtin_remainderl(__x, __p); }
 #elif defined(__CRT_HAVE_remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),remainderl,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),remainderl,(__x,__p))
 #elif defined(__CRT_HAVE___remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),__remainderl,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),__remainderl,(__x,__p))
 #elif defined(__CRT_HAVE_dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),dreml,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),dreml,(__x,__p))
 #elif defined(__CRT_HAVE___dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
-#elif defined(__CRT_HAVE_remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),remainder,(__x,__y))
-#elif defined(__CRT_HAVE___remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),__remainder,(__x,__y))
-#elif defined(__CRT_HAVE_drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),drem,(__x,__y))
-#elif defined(__CRT_HAVE___drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __y),__drem,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),(__x,__p))
+#else /* LIBC: remainderl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 #include <local/math/remainderl.h>
-/* Return the remainder of integer divison X / Y with infinite precision */
-__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __dreml)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __dreml)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __p); }
+#else /* CUSTOM: remainderl */
+#undef none
+#endif /* __dreml... */
 #endif /* __dreml... */
 #if __has_builtin(__builtin_significandl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandl)
 /* Return the fractional part of X after dividing out `ilogb (X)' */
@@ -10872,18 +10858,30 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __nextafter
 #undef none
 #endif /* __nextafter... */
 #endif /* __nextafter... */
-#ifdef __CRT_HAVE___remainder
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__remainder,(double __x, double __y),(__x,__y))
-#elif defined(__CRT_HAVE_drem)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__remainder,(double __x, double __y),drem,(__x,__y))
-#elif defined(__CRT_HAVE___drem)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__remainder,(double __x, double __y),__drem,(__x,__y))
+#if __has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)
+/* Return the remainder of integer divison X/P with infinite precision */
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __remainder)(double __x, double __p) { return __builtin_remainder(__x, __p); }
 #elif defined(__CRT_HAVE_remainder)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__remainder,(double __x, double __y),remainder,(__x,__y))
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__remainder,(double __x, double __p),remainder,(__x,__p))
+#elif defined(__CRT_HAVE___remainder)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__remainder,(double __x, double __p),(__x,__p))
+#elif defined(__CRT_HAVE_drem)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__remainder,(double __x, double __p),drem,(__x,__p))
+#elif defined(__CRT_HAVE___drem)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__remainder,(double __x, double __p),__drem,(__x,__p))
+#else /* LIBC: remainder */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/remainder.h>
+/* Return the remainder of integer divison X/P with infinite precision */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __remainder)(double __x, double __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainder))(__x, __p); }
+#else /* CUSTOM: remainder */
+#undef none
+#endif /* __remainder... */
 #endif /* __remainder... */
 #ifdef __CRT_HAVE___ilogb
 /* Return the binary exponent of X, which must be nonzero */
@@ -10931,24 +10929,23 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nextafterf
 #endif /* __nextafterf... */
 #endif /* __nextafterf... */
 #if __has_builtin(__builtin_remainderf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __remainderf)(float __x, float __y) { return __builtin_remainderf(__x, __y); }
+__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __remainderf)(float __x, float __p) { return __builtin_remainderf(__x, __p); }
 #elif defined(__CRT_HAVE_remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__remainderf,(float __x, float __y),remainderf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__remainderf,(float __x, float __p),remainderf,(__x,__p))
 #elif defined(__CRT_HAVE___remainderf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__remainderf,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__remainderf,(float __x, float __p),(__x,__p))
 #elif defined(__CRT_HAVE_dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__remainderf,(float __x, float __y),dremf,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__remainderf,(float __x, float __p),dremf,(__x,__p))
 #elif defined(__CRT_HAVE___dremf)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__remainderf,(float __x, float __y),__dremf,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__remainderf,(float __x, float __p),__dremf,(__x,__p))
+#else /* LIBC: remainderf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/remainderf.h>
-/* Return the remainder of integer divison X / Y with infinite precision */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __remainderf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __remainderf)(float __x, float __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __p); }
+#else /* CUSTOM: remainderf */
+#undef none
+#endif /* __remainderf... */
 #endif /* __remainderf... */
 #if __has_builtin(__builtin_ilogbf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogbf)
 /* Return the binary exponent of X, which must be nonzero */
@@ -11016,36 +11013,23 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __nex
 #endif /* __nextafterl... */
 #endif /* __nextafterl... */
 #if __has_builtin(__builtin_remainderl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __remainderl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_remainderl(__x, __y); }
+__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __remainderl)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return __builtin_remainderl(__x, __p); }
 #elif defined(__CRT_HAVE_remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),remainderl,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),remainderl,(__x,__p))
 #elif defined(__CRT_HAVE___remainderl)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),(__x,__p))
 #elif defined(__CRT_HAVE_dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),dreml,(__x,__y))
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),dreml,(__x,__p))
 #elif defined(__CRT_HAVE___dreml)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__dreml,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),remainder,(__x,__y))
-#elif defined(__CRT_HAVE___remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__remainder,(__x,__y))
-#elif defined(__CRT_HAVE_drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),drem,(__x,__y))
-#elif defined(__CRT_HAVE___drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__drem,(__x,__y))
-#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),__dreml,(__x,__p))
+#else /* LIBC: remainderl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 #include <local/math/remainderl.h>
-/* Return the remainder of integer divison X / Y with infinite precision */
-__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __remainderl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __remainderl)(__LONGDOUBLE __x, __LONGDOUBLE __p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __p); }
+#else /* CUSTOM: remainderl */
+#undef none
+#endif /* __remainderl... */
 #endif /* __remainderl... */
 #if __has_builtin(__builtin_ilogbl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogbl)
 /* Return the binary exponent of X, which must be nonzero */

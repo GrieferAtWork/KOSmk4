@@ -28,6 +28,12 @@
 
 #include <libm/fdlibm.h>
 
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#include <libm/fabs.h>
+#include <libm/isinf.h>
+#include <libm/modf.h>
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -307,6 +313,36 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 }
 
 #endif /* __IEEE754_DOUBLE_TYPE__ */
+
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/*
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice 
+ * is preserved.
+ * ====================================================
+ */
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_fmodl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
+                             __IEEE854_LONG_DOUBLE_TYPE__ __y) {
+	__IEEE854_LONG_DOUBLE_TYPE__ __intpart;
+	if (__ieee854_isinfl(__y)) {
+		if (__ieee854_isinfl(__x))
+			return __x < 0 ? -0.0L : 0.0L;
+		return __x;
+	}
+	if (__ieee854_fabsl(__x) <= __ieee854_fabsl(__y))
+		return __x;
+	__COMPILER_UNUSED(__ieee854_modfl(__x / __y, &__intpart));
+	return __x - __y * __intpart;
+}
+
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END
 #endif /* __CC__ */

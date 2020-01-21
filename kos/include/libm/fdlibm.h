@@ -141,6 +141,7 @@ typedef union {
 } __libm_ieee_double_shape_type;
 
 /* Get two 32 bit ints from a double.  */
+#define __LIBM_GET_DOUBLE_WORDS __LIBM_EXTRACT_WORDS
 #define __LIBM_EXTRACT_WORDS(ix0, ix1, d)            \
 	do {                                             \
 		__libm_ieee_double_shape_type __ew_u;        \
@@ -246,7 +247,7 @@ typedef union {
 	do {                                            \
 		__libm_ieee_long_double_shape_type __iw_u;  \
 		__iw_u.__l_parts.__l_sign_exponent = (exp); \
-		SET_LDOUBLE_EMPTY(__iw_u);                  \
+		__LIBM_SET_LDOUBLE_EMPTY(__iw_u);           \
 		__iw_u.__l_parts.__l_msw = (ix0);           \
 		__iw_u.__l_parts.__l_lsw = (ix1);           \
 		(d) = __iw_u.__l_value;                     \

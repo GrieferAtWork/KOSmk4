@@ -33,8 +33,10 @@
 #include <libm/fmod.h>
 #include <libm/isinf.h>
 #include <libm/isnan.h>
+#include <libm/modf.h>
 #include <libm/nextafter.h>
 #include <libm/pow.h>
+#include <libm/remainder.h>
 #include <libm/rint.h>
 #include <libm/scalb.h>
 #include <libm/scalbn.h>
@@ -616,12 +618,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.modf") double
 NOTHROW_NCX(LIBCCALL libc_modf)(double x,
                                 double *iptr)
 /*[[[body:modf]]]*/
-{
-	(void)x;
-	(void)iptr;
-	CRT_UNIMPLEMENTED("modf"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
+#else /* ... */
+	return (double)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
+#endif /* !... */
 }
 /*[[[end:modf]]]*/
 
@@ -690,11 +694,13 @@ NOTHROW_NCX(LIBCCALL libc_modff)(float x,
                                  float *iptr)
 /*[[[body:modff]]]*/
 /*AUTO*/{
-	double ipart;
-	float result;
-	result = (float)libc_modf(x, &ipart);
-	*iptr  = (float)ipart;
-	return result;
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
+#else /* ... */
+	return (float)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
+#endif /* !... */
 }
 /*[[[end:modff]]]*/
 
@@ -763,11 +769,13 @@ NOTHROW_NCX(LIBCCALL libc_modfl)(__LONGDOUBLE x,
                                  __LONGDOUBLE *iptr)
 /*[[[body:modfl]]]*/
 /*AUTO*/{
-	double ipart;
-	__LONGDOUBLE result;
-	result = (__LONGDOUBLE)libc_modf(x, &ipart);
-	*iptr  = (__LONGDOUBLE)ipart;
-	return result;
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
+#else /* ... */
+	return (__LONGDOUBLE)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
+#endif /* !... */
 }
 /*[[[end:modfl]]]*/
 
@@ -1132,9 +1140,11 @@ NOTHROW(LIBCCALL libc_fmod)(double x,
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_fmodl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#endif /* !... */
 }
 /*[[[end:fmod]]]*/
 
@@ -1149,21 +1159,28 @@ NOTHROW(LIBCCALL libc_fmodf)(float x,
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#else /* ... */
+	return (float)__ieee854_fmodl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#endif /* !... */
 }
 /*[[[end:fmodf]]]*/
 
-/*[[[head:fmodl,hash:CRC-32=0xf7efc4d6]]]*/
-/* Floating-point modulo remainder of X/Y */
+/*[[[head:fmodl,hash:CRC-32=0x17742b39]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmodl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fmodl)(__LONGDOUBLE x,
                              __LONGDOUBLE y)
 /*[[[body:fmodl]]]*/
 /*AUTO*/{
-	return (__LONGDOUBLE)libc_fmod((double)x, (double)y);
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_fmodl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#else /* ... */
+	return (__LONGDOUBLE)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#endif /* !... */
 }
 /*[[[end:fmodl]]]*/
 
@@ -1333,19 +1350,22 @@ NOTHROW(LIBCCALL libc_nextafter)(double x,
 }
 /*[[[end:nextafter]]]*/
 
-/*[[[head:remainder,hash:CRC-32=0x1ad8a24a]]]*/
-/* Return the remainder of integer divison X / Y with infinite precision */
+/*[[[head:remainder,hash:CRC-32=0x75550a40]]]*/
+/* Return the remainder of integer divison X/P with infinite precision */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.remainder") double
 NOTHROW(LIBCCALL libc_remainder)(double x,
-                                 double y)
+                                 double p)
 /*[[[body:remainder]]]*/
-{
-	(void)x;
-	(void)y;
-	CRT_UNIMPLEMENTED("remainder"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)p);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)p);
+#else /* ... */
+	return (double)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)p);
+#endif /* !... */
 }
 /*[[[end:remainder]]]*/
 
@@ -1394,15 +1414,21 @@ NOTHROW(LIBCCALL libc_nextafterf)(float x,
 }
 /*[[[end:nextafterf]]]*/
 
-/*[[[head:remainderf,hash:CRC-32=0x3c40b6d0]]]*/
-/* Return the remainder of integer divison X / Y with infinite precision */
+/*[[[head:remainderf,hash:CRC-32=0xbe9242fc]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.remainderf") float
 NOTHROW(LIBCCALL libc_remainderf)(float x,
-                                  float y)
+                                  float p)
 /*[[[body:remainderf]]]*/
 /*AUTO*/{
-	return (float)libc_remainder((double)x, (double)y);
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)p);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)p);
+#else /* ... */
+	return (float)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)p);
+#endif /* !... */
 }
 /*[[[end:remainderf]]]*/
 
@@ -1440,15 +1466,21 @@ NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x,
 }
 /*[[[end:nextafterl]]]*/
 
-/*[[[head:remainderl,hash:CRC-32=0x65924aa0]]]*/
-/* Return the remainder of integer divison X / Y with infinite precision */
+/*[[[head:remainderl,hash:CRC-32=0x7ed704c2]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.remainderl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
-                                  __LONGDOUBLE y)
+                                  __LONGDOUBLE p)
 /*[[[body:remainderl]]]*/
 /*AUTO*/{
-	return (__LONGDOUBLE)libc_remainder((double)x, (double)y);
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)p);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)p);
+#else /* ... */
+	return (__LONGDOUBLE)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)p);
+#endif /* !... */
 }
 /*[[[end:remainderl]]]*/
 
@@ -2259,6 +2291,8 @@ NOTHROW(LIBCCALL libc_fabs)(double x)
 	return (double)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return (double)__ieee854_fabsl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #else /* ... */
 	return x < 0.0 ? -x : x;
 #endif /* !... */
@@ -2276,6 +2310,8 @@ NOTHROW(LIBCCALL libc_fabsf)(float x)
 	return (float)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (float)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_fabsl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #else /* ... */
 	return x < 0.0f ? -x : x;
 #endif /* !... */
@@ -2289,7 +2325,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x)
 /*[[[body:fabsl]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_fabsl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif define(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);

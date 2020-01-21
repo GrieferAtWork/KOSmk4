@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31b21b76 */
+/* HASH CRC-32:0x56d45034 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,33 +18,26 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_lrintf_defined
-#if defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
-#define __local_lrintf_defined 1
-/* Dependency: "lrint" */
-#ifndef ____localdep_lrint_defined
-#define ____localdep_lrint_defined 1
-#if __has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)
-/* Round X to nearest integral value according to current rounding direction */
-__EXTERNINLINE __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __localdep_lrint)(double __x) { return __builtin_lrint(__x); }
-#elif defined(__CRT_HAVE_lrint)
-/* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,__localdep_lrint,(double __x),lrint,(__x))
-#elif defined(__CRT_HAVE___lrint)
-/* Round X to nearest integral value according to current rounding direction */
-__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,__localdep_lrint,(double __x),__lrint,(__x))
-#else /* LIBC: lrint */
-#undef ____localdep_lrint_defined
-#endif /* lrint... */
-#endif /* !____localdep_lrint_defined */
-
+#ifndef __local_remainder_defined
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#define __local_remainder_defined 1
+#include <libm/remainder.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round X to nearest integral value according to current rounding direction */
-__LOCAL_LIBC(lrintf) __ATTR_WUNUSED long int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lrintf))(float __x) {
-#line 1108 "kos/src/libc/magic/math.c"
-	return (long int)__localdep_lrint((double)__x);
+/* Return the remainder of integer divison X/P with infinite precision */
+__LOCAL_LIBC(remainder) __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainder))(double __x,
+                                                   double __p) {
+#line 869 "kos/src/libc/magic/math.c"
+	__COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__p);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__p);
+#else /* ... */
+	return (double)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__p);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_lrint || __CRT_HAVE___lrint */
-#endif /* !__local_lrintf_defined */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__local_remainder_defined */

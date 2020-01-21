@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77cb8771 */
+/* HASH CRC-32:0x1d885dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,41 +20,22 @@
  */
 #ifndef __local_fmodl_defined
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 #define __local_fmodl_defined 1
 #include <libm/fmod.h>
-/* Dependency: "fmod" from "math" */
-#ifndef ____localdep_fmod_defined
-#define ____localdep_fmod_defined 1
-#if __has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)
-/* Floating-point modulo remainder of X/Y */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_fmod)(double __x, double __y) { return __builtin_fmod(__x, __y); }
-#elif defined(__CRT_HAVE_fmod)
-/* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),fmod,(__x,__y))
-#elif defined(__CRT_HAVE___fmod)
-/* Floating-point modulo remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double __y),__fmod,(__x,__y))
-#else /* LIBC: fmod */
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-#include <local/math/fmod.h>
-/* Floating-point modulo remainder of X/Y */
-#define __localdep_fmod (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmod))
-#else /* CUSTOM: fmod */
-#undef ____localdep_fmod_defined
-#endif /* fmod... */
-#endif /* fmod... */
-#endif /* !____localdep_fmod_defined */
-
 __NAMESPACE_LOCAL_BEGIN
-/* Floating-point modulo remainder of X/Y */
 __LOCAL_LIBC(fmodl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmodl))(__LONGDOUBLE __x,
                                                __LONGDOUBLE __y) {
-#line 665 "kos/src/libc/magic/math.c"
-	return (__LONGDOUBLE)__localdep_fmod((double)__x, (double)__y);
+#line 705 "kos/src/libc/magic/math.c"
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_fmodl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__y);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__y);
+#else /* ... */
+	return (__LONGDOUBLE)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__y);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_fmod || __CRT_HAVE___fmod */
+#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ */
 #endif /* !__local_fmodl_defined */

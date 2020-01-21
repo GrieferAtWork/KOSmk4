@@ -75,6 +75,33 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 }
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/*
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ * ====================================================
+ */
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_fabsl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
+#ifdef __mc68000__
+	__libm_ieee_long_double_shape_type *__sh_u = (__libm_ieee_long_double_shape_type *)&__x;
+	__sh_u->__l_parts.__l_sign_exponent &= 0x7fff;
+#else /* __mc68000__ */
+	__uint32_t __exp;
+	__LIBM_GET_LDOUBLE_EXP(__exp, __x);
+	__LIBM_SET_LDOUBLE_EXP(__x, __exp & 0x7fff);
+#endif /* !__mc68000__ */
+	return __x;
+}
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
 __DECL_END
 #endif /* __CC__ */
 

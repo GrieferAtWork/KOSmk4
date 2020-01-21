@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12527a4b */
+/* HASH CRC-32:0x765daa81 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Largest integer not greater than X */
 __LOCAL_LIBC(floorf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floorf))(float __x) {
-#line 594 "kos/src/libc/magic/math.c"
+#line 618 "kos/src/libc/magic/math.c"
 	float __result;
 	__result = (float)(__INTMAX_TYPE__)__x; /* Round towards 0 */
 	if (__result > __x)

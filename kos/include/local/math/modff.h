@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8af349c7 */
+/* HASH CRC-32:0x506fd20d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,37 +19,24 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_modff_defined
-#if defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #define __local_modff_defined 1
-/* Dependency: "modf" */
-#ifndef ____localdep_modf_defined
-#define ____localdep_modf_defined 1
-#if __has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)
-/* Break VALUE into integral and fractional parts */
-__EXTERNINLINE __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL __localdep_modf)(double __x, double *__iptr) { return __builtin_modf(__x, __iptr); }
-#elif defined(__CRT_HAVE_modf)
-/* Break VALUE into integral and fractional parts */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),modf,(__x,__iptr))
-#elif defined(__CRT_HAVE___modf)
-/* Break VALUE into integral and fractional parts */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_modf,(double __x, double *__iptr),__modf,(__x,__iptr))
-#else /* LIBC: modf */
-#undef ____localdep_modf_defined
-#endif /* modf... */
-#endif /* !____localdep_modf_defined */
-
+#include <libm/modf.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Break VALUE into integral and fractional parts */
 __LOCAL_LIBC(modff) __ATTR_NONNULL((2)) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modff))(float __x,
                                                    float *__iptr) {
-#line 345 "kos/src/libc/magic/math.c"
-	double __ipart;
-	float __result;
-	__result = (float)__localdep_modf(__x, &__ipart);
-	*__iptr  = (float)__ipart;
-	return __result;
+#line 361 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_modff((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__ *)__iptr);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__ *)__iptr);
+#else /* ... */
+	return (float)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__ *)__iptr);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_modf || __CRT_HAVE___modf */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 #endif /* !__local_modff_defined */

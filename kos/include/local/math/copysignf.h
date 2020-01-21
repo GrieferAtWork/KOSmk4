@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed013d47 */
+/* HASH CRC-32:0x6ef3e7a9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(copysignf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(copysignf))(float __num,
                                                    float __sign) {
-#line 698 "kos/src/libc/magic/math.c"
+#line 747 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)__num, (__IEEE754_FLOAT_TYPE__)__sign);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)

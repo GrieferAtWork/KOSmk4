@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9546c43c */
+/* HASH CRC-32:0x60b84201 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,39 +19,24 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_remainderf_defined
-#if defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 #define __local_remainderf_defined 1
-/* Dependency: "remainder" */
-#ifndef ____localdep_remainder_defined
-#define ____localdep_remainder_defined 1
-#if __has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_remainder)(double __x, double __y) { return __builtin_remainder(__x, __y); }
-#elif defined(__CRT_HAVE_remainder)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __y),remainder,(__x,__y))
-#elif defined(__CRT_HAVE___remainder)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __y),__remainder,(__x,__y))
-#elif defined(__CRT_HAVE_drem)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __y),drem,(__x,__y))
-#elif defined(__CRT_HAVE___drem)
-/* Return the remainder of integer divison X / Y with infinite precision */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __y),__drem,(__x,__y))
-#else /* LIBC: remainder */
-#undef ____localdep_remainder_defined
-#endif /* remainder... */
-#endif /* !____localdep_remainder_defined */
-
+#include <libm/remainder.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the remainder of integer divison X / Y with infinite precision */
 __LOCAL_LIBC(remainderf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderf))(float __x,
-                                                    float __y) {
-#line 845 "kos/src/libc/magic/math.c"
-	return (float)__localdep_remainder((double)__x, (double)__y);
+                                                    float __p) {
+#line 911 "kos/src/libc/magic/math.c"
+	__COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__p);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__p);
+#else /* ... */
+	return (float)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__p);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_remainder || __CRT_HAVE___remainder || __CRT_HAVE_drem || __CRT_HAVE___drem */
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ */
 #endif /* !__local_remainderf_defined */
