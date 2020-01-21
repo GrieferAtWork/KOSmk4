@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe357b00d */
+/* HASH CRC-32:0x3391724c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,15 +59,11 @@
 #define __stub___wcserror 1
 #define __stub___wcserror_s 1
 #define __stub__beep 1
-#define __stub__beginthread 1
-#define __stub__beginthreadex 1
 #define __stub__clearfp 1
 #define __stub__control87 1
 #define __stub__controlfp 1
 #define __stub__controlfp_s 1
 #define __stub__dupenv_s 1
-#define __stub__endthread 1
-#define __stub__endthreadex 1
 #define __stub__findclose 1
 #define __stub__findfirst32 1
 #define __stub__findfirst32i64 1

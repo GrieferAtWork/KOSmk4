@@ -23,9 +23,13 @@
 #include "../api.h"
 /**/
 
+#include <kos/syscalls.h>
 #include <sys/wait.h>
 
+#include <malloc.h>
+#include <sched.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../libc/dl.h"
 #include "process.h"
@@ -43,6 +47,22 @@ DECLARE_NOREL_GLOBAL_META(char **, environ);
 
 /*[[[start:implementation]]]*/
 
+
+struct simple_thread_data {
+	void (LIBCCALL *std_entry)(void *arg); /* [1..1] Entry callback. */
+	void           *std_arg;               /* Entry argument. */
+};
+
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.thread.simple_thread_entry") u32
+ATTR_STDCALL simple_thread_entry(void *arg) {
+	struct simple_thread_data data;
+	memcpy(&data, arg, sizeof(struct simple_thread_data));
+	free(arg);
+	(*data.std_entry)(data.std_arg);
+	return 0;
+}
+
+
 /*[[[head:_beginthread,hash:CRC-32=0x6b63b655]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.thread._beginthread") uintptr_t
 NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry,
@@ -50,14 +70,40 @@ NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry,
                                         void *arg)
 /*[[[body:_beginthread]]]*/
 {
-	(void)entry;
-	(void)stacksz;
-	(void)arg;
-	CRT_UNIMPLEMENTED("_beginthread"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	struct simple_thread_data *data;
+	uintptr_t result;
+	data = (struct simple_thread_data *)malloc(sizeof(struct simple_thread_data));
+	if unlikely(!data)
+		return (uintptr_t)-1;
+	data->std_entry = entry;
+	data->std_arg   = arg;
+	result = _beginthreadex(NULL,
+	                        stacksz,
+	                        &simple_thread_entry,
+	                        data,
+	                        0,
+	                        NULL);
+	if unlikely(!result)
+		free(data);
+	return result;
 }
 /*[[[end:_beginthread]]]*/
+
+
+
+struct dos_thread_data {
+	u32 (ATTR_STDCALL *dtd_entry)(void *arg); /* [1..1] Entry callback. */
+	void              *dtd_arg;               /* Entry argument. */
+};
+PRIVATE ATTR_SECTION(".text.crt.dos.sched.thread.dos_thread_entry")
+int LIBCCALL dos_thread_entry(void *arg) {
+	int result;
+	struct dos_thread_data data;
+	memcpy(&data, arg, sizeof(struct dos_thread_data));
+	free(arg);
+	result = (int)(*data.dtd_entry)(data.dtd_arg);
+	return result;
+}
 
 /*[[[head:_beginthreadex,hash:CRC-32=0x5be0a6dc]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.thread._beginthreadex") uintptr_t
@@ -69,15 +115,28 @@ NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec,
                                           u32 *threadaddr)
 /*[[[body:_beginthreadex]]]*/
 {
+	pid_t result;
+	struct dos_thread_data *data;
 	(void)sec;
 	(void)stacksz;
-	(void)entry;
-	(void)arg;
 	(void)flags;
-	(void)threadaddr;
-	CRT_UNIMPLEMENTED("_beginthreadex"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	data = (struct dos_thread_data *)malloc(sizeof(struct dos_thread_data));
+	if unlikely(!data)
+		return (uintptr_t)-1;
+	data->dtd_entry = entry;
+	data->dtd_arg   = arg;
+	result = clone(&dos_thread_entry,
+	               CLONE_CHILDSTACK_AUTO,
+	               CLONE_VM | CLONE_FS | CLONE_FILES |
+	               CLONE_SIGHAND | CLONE_THREAD,
+	               arg);
+	if unlikely(result == -1) {
+		free(data);
+		result = 0;
+	}
+	if (threadaddr)
+		*threadaddr = (u32)result;
+	return result;
 }
 /*[[[end:_beginthreadex]]]*/
 
@@ -85,9 +144,8 @@ NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec,
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.thread._endthread") void
 NOTHROW_NCX(LIBCCALL libc__endthread)(void)
 /*[[[body:_endthread]]]*/
-{
-	CRT_UNIMPLEMENTED("_endthread"); /* TODO */
-	libc_seterrno(ENOSYS);
+/*AUTO*/{
+	libc__endthreadex(0);
 }
 /*[[[end:_endthread]]]*/
 
@@ -96,9 +154,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.thread._endthreadex") void
 NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode)
 /*[[[body:_endthreadex]]]*/
 {
-	(void)exitcode;
-	CRT_UNIMPLEMENTED("_endthreadex"); /* TODO */
-	libc_seterrno(ENOSYS);
+	sys_exit((int)exitcode);
 }
 /*[[[end:_endthreadex]]]*/
 

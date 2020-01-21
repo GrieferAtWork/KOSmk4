@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e460e87 */
+/* HASH CRC-32:0xa37a2b4b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__c_exit_defined
-#define __local__c_exit_defined 1
-#include <kos/anno.h>
+#ifndef __local__endthread_defined
+#ifdef __CRT_HAVE__endthreadex
+#define __local__endthread_defined 1
+/* Dependency: "_endthreadex" */
+#ifndef ____localdep__endthreadex_defined
+#define ____localdep__endthreadex_defined 1
+#ifdef __CRT_HAVE__endthreadex
+__CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__endthreadex,(__UINT32_TYPE__ __exitcode),_endthreadex,(__exitcode))
+#else /* LIBC: _endthreadex */
+#undef ____localdep__endthreadex_defined
+#endif /* _endthreadex... */
+#endif /* !____localdep__endthreadex_defined */
+
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_c_exit) void
-(__LIBCCALL __LIBC_LOCAL_NAME(_c_exit))(void) __THROWS(...) {
-#line 112 "kos/src/libc/magic/process.c"
+__LOCAL_LIBC(_endthread) void
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_endthread))(void) {
+#line 94 "kos/src/libc/magic/process.c"
+	__localdep__endthreadex(0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__local__c_exit_defined */
+#endif /* __CRT_HAVE__endthreadex */
+#endif /* !__local__endthread_defined */

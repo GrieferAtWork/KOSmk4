@@ -90,7 +90,9 @@ typedef __WCHAR_TYPE__ wchar_t;
 %
 _beginthread:(__dos_beginthread_entry_t entry, $u32 stacksz, void *arg) -> uintptr_t;
 _beginthreadex:(void *sec, $u32 stacksz, __dos_beginthreadex_entry_t entry, void *arg, $u32 flags, $u32 *threadaddr) -> uintptr_t;
-_endthread:();
+[userimpl][requires($has_function(_endthreadex))] _endthread:() {
+	_endthreadex(0);
+}
 _endthreadex:($u32 exitcode);
 
 %[default_impl_section(.text.crt.sched.process)]

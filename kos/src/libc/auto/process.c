@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf10a2837 */
+/* HASH CRC-32:0x12cd59b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.process._c_exit") void
 (LIBCCALL libc__c_exit)(void) __THROWS(...) {
-#line 110 "kos/src/libc/magic/process.c"
+#line 112 "kos/src/libc/magic/process.c"
 }
 
 #endif /* !__KERNEL__ */

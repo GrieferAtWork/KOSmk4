@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab11311e */
+/* HASH CRC-32:0x7fa2b34b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,6 +96,9 @@ __CDECLARE(,uintptr_t,__NOTHROW_NCX,_beginthreadex,(void *__sec, __UINT32_TYPE__
 #endif /* _beginthreadex... */
 #ifdef __CRT_HAVE__endthread
 __CDECLARE_VOID(,__NOTHROW_NCX,_endthread,(void),())
+#elif defined(__CRT_HAVE__endthreadex)
+#include <local/process/_endthread.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_endthread, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL _endthread)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_endthread))(); })
 #endif /* _endthread... */
 #ifdef __CRT_HAVE__endthreadex
 __CDECLARE_VOID(,__NOTHROW_NCX,_endthreadex,(__UINT32_TYPE__ __exitcode),(__exitcode))
