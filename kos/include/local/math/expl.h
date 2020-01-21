@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f2c6d26 */
+/* HASH CRC-32:0x7907121a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,10 +42,10 @@ __CREDIRECT(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__localdep_exp,(doub
 
 __NAMESPACE_LOCAL_BEGIN
 /* Exponential function of X */
-__LOCAL_LIBC(expl) __DECL_SIMD_expl __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(expl))(long double __x) {
+__LOCAL_LIBC(expl) __DECL_SIMD_expl __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(expl))(__LONGDOUBLE __x) {
 #line 357 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_exp((double)__x);
+	return (__LONGDOUBLE)__localdep_exp((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_exp || __CRT_HAVE___exp */

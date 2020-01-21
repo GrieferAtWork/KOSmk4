@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f36cbee */
+/* HASH CRC-32:0x52831639 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_PReadAll_defined
-#if defined(__CRT_HAVE_PReadAll) || defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PReadAll64) || (defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#if defined(__CRT_HAVE_PReadAll) || defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64) || defined(__CRT_HAVE_PReadAll64)
 #define __local_PReadAll_defined 1
 #include <kos/anno.h>
 #include <parts/errno.h>
@@ -40,10 +40,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,,__localdep_PReadAll32,(__fd_t __f
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PReadAll64,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
-#elif defined(__CRT_HAVE_preadall) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif defined(__CRT_HAVE_PReadAll) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
-__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),preadall,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,,__localdep_PReadAll64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PReadAll,(__fd,__buf,__bufsize,__offset)) __THROWS(...)
 #elif defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64)
 #include <local/kos.unistd/PReadAll64.h>
 /* >> preadall64(3)
@@ -70,5 +70,5 @@ __LOCAL_LIBC(PReadAll) __ATTR_NONNULL((2)) __SIZE_TYPE__
 #endif /* !__CRT_HAVE_PReadAll */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_PReadAll || __CRT_HAVE_PRead || __CRT_HAVE_PRead64 || __CRT_HAVE_PReadAll64 || (__CRT_HAVE_preadall && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) */
+#endif /* __CRT_HAVE_PReadAll || __CRT_HAVE_PRead || __CRT_HAVE_PRead64 || __CRT_HAVE_PReadAll64 */
 #endif /* !__local_PReadAll_defined */

@@ -46,11 +46,11 @@ __SYSDECL_BEGIN
 
 #if defined(__x86_64__) || \
    (defined(__FLT_EVAL_METHOD__) && __FLT_EVAL_METHOD__ == 0)
-typedef float       float_t;  /* `float' expressions are evaluated as `float'.  */
-typedef double      double_t; /* `double' expressions are evaluated as `double'.  */
+typedef float        float_t;  /* `float' expressions are evaluated as `float'.  */
+typedef double       double_t; /* `double' expressions are evaluated as `double'.  */
 #else
-typedef long double float_t;  /* `float' expressions are evaluated as `long double'.  */
-typedef long double double_t; /* `double' expressions are evaluated as `long double'.  */
+typedef __LONGDOUBLE float_t;  /* `float' expressions are evaluated as `long double'.  */
+typedef __LONGDOUBLE double_t; /* `double' expressions are evaluated as `long double'.  */
 #endif
 /* The values returned by `ilogb' for 0 and NaN respectively.  */
 #   define FP_ILOGB0    (-2147483647-1)

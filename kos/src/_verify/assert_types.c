@@ -58,7 +58,7 @@ STATIC_ASSERT(sizeof(unsigned long long) == __SIZEOF_LONG_LONG__);
 STATIC_ASSERT(sizeof(float) == __SIZEOF_FLOAT__);
 STATIC_ASSERT(sizeof(double) == __SIZEOF_DOUBLE__);
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-STATIC_ASSERT(sizeof(long double) == __SIZEOF_LONG_DOUBLE__);
+STATIC_ASSERT(sizeof(__LONGDOUBLE) == __SIZEOF_LONG_DOUBLE__);
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifdef __native_wchar_t_defined
 STATIC_ASSERT(sizeof(wchar_t) == __SIZEOF_WCHAR_T__);
@@ -97,6 +97,11 @@ STATIC_ASSERT(alignof(__INT128_TYPE__) == __ALIGNOF_INT128__);
 STATIC_ASSERT(alignof(__UINT128_TYPE__) == __ALIGNOF_INT128__);
 #endif /* __UINT128_TYPE__ */
 
+STATIC_ASSERT(alignof(float) == __ALIGNOF_FLOAT__);
+STATIC_ASSERT(alignof(double) == __ALIGNOF_DOUBLE__);
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+STATIC_ASSERT(alignof(__LONGDOUBLE) == __ALIGNOF_LONG_DOUBLE__);
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 #include <stdint.h>
 

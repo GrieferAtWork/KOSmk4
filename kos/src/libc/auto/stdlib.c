@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47408e2b */
+/* HASH CRC-32:0x1e72878f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -696,7 +696,7 @@ NOTHROW_NCX(LIBCCALL libc_strtof)(char const *__restrict nptr,
 DEFINE_INTERN_ALIAS(libc_strtold, libc_strtod);
 #else
 INTERN ATTR_LEAF NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.strtold") long double
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.strtold") __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
                                    char **endptr) {
 #line 932 "kos/src/libc/magic/stdlib.c"
@@ -827,7 +827,7 @@ NOTHROW_NCX(LIBCCALL libc_fcvt_r)(double val,
 #include <hybrid/floatcore.h>
 INTERN NONNULL((3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.qgcvt") char *
-NOTHROW_NCX(LIBCCALL libc_qgcvt)(long double val,
+NOTHROW_NCX(LIBCCALL libc_qgcvt)(__LONGDOUBLE val,
                                  int ndigit,
                                  char *buf) {
 #line 1193 "kos/src/libc/magic/stdlib.c"
@@ -851,7 +851,7 @@ NOTHROW_NCX(LIBCCALL libc_qgcvt)(long double val,
 
 INTERN NONNULL((3, 4, 5))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.qecvt_r") int
-NOTHROW_NCX(LIBCCALL libc_qecvt_r)(long double val,
+NOTHROW_NCX(LIBCCALL libc_qecvt_r)(__LONGDOUBLE val,
                                    int ndigit,
                                    int *__restrict decptr,
                                    int *__restrict sign,
@@ -875,7 +875,7 @@ NOTHROW_NCX(LIBCCALL libc_qecvt_r)(long double val,
 
 INTERN NONNULL((3, 4, 5))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.qfcvt_r") int
-NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(long double val,
+NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(__LONGDOUBLE val,
                                    int ndigit,
                                    int *__restrict decptr,
                                    int *__restrict sign,
@@ -905,7 +905,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__CRT_QCVT_BUFFER_DEFINED */
 INTERN WUNUSED NONNULL((3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.qecvt") char *
-NOTHROW_NCX(LIBCCALL libc_qecvt)(long double val,
+NOTHROW_NCX(LIBCCALL libc_qecvt)(__LONGDOUBLE val,
                                  int ndigit,
                                  int *__restrict decptr,
                                  int *__restrict sign) {
@@ -923,7 +923,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__CRT_QCVT_BUFFER_DEFINED */
 INTERN WUNUSED NONNULL((3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.qfcvt") char *
-NOTHROW_NCX(LIBCCALL libc_qfcvt)(long double val,
+NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
                                  int ndigit,
                                  int *__restrict decptr,
                                  int *__restrict sign) {
@@ -1099,7 +1099,7 @@ NOTHROW_NCX(LIBCCALL libc_strtof_l)(char const *__restrict nptr,
 DEFINE_INTERN_ALIAS(libc_strtold_l, libc_strtod_l);
 #else
 INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.strtold_l") long double
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.strtold_l") __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
                                      char **endptr,
                                      locale_t locale) {
@@ -1870,7 +1870,7 @@ NOTHROW_NCX(LIBCCALL libc__atodbl_l)(double *__restrict result,
 
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._atoldbl") int
-NOTHROW_NCX(LIBCCALL libc__atoldbl)(long double *__restrict result,
+NOTHROW_NCX(LIBCCALL libc__atoldbl)(__LONGDOUBLE *__restrict result,
                                     char __KOS_FIXED_CONST *__restrict nptr) {
 #line 2787 "kos/src/libc/magic/stdlib.c"
 	*result = libc_strtold(nptr, NULL);
@@ -1879,7 +1879,7 @@ NOTHROW_NCX(LIBCCALL libc__atoldbl)(long double *__restrict result,
 
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert._atoldbl_l") int
-NOTHROW_NCX(LIBCCALL libc__atoldbl_l)(long double *__restrict result,
+NOTHROW_NCX(LIBCCALL libc__atoldbl_l)(__LONGDOUBLE *__restrict result,
                                       char __KOS_FIXED_CONST *__restrict nptr,
                                       locale_t locale) {
 #line 2795 "kos/src/libc/magic/stdlib.c"

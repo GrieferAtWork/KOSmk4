@@ -2104,12 +2104,12 @@ generic_print_address:
 		case DW_ATE_float:
 			result = 0;
 			FORMAT(DEBUGINFO_PRINT_FORMAT_FLOAT_PREFIX);
-			if (datasize >= sizeof(long double)) {
+			if (datasize >= sizeof(__LONGDOUBLE)) {
 				union {
-					long double flt;
-					byte_t bytes[sizeof(long double)];
+					__LONGDOUBLE flt;
+					byte_t bytes[sizeof(__LONGDOUBLE)];
 				} value;
-				memcpy(value.bytes, data, sizeof(long double));
+				memcpy(value.bytes, data, sizeof(__LONGDOUBLE));
 				temp = format_printf(printer, arg, "%Lf", value.flt);
 			} else if (datasize >= sizeof(double)) {
 				union {

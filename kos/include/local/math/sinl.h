@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac897b9c */
+/* HASH CRC-32:0x5ce0b51f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,10 +41,10 @@ __CREDIRECT(__DECL_SIMD_sin __ATTR_WUNUSED,double,__NOTHROW,__localdep_sin,(doub
 
 __NAMESPACE_LOCAL_BEGIN
 /* Sine of X */
-__LOCAL_LIBC(sinl) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sinl))(long double __x) {
+__LOCAL_LIBC(sinl) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sinl))(__LONGDOUBLE __x) {
 #line 216 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_sin((double)__x);
+	return (__LONGDOUBLE)__localdep_sin((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_sin || __CRT_HAVE___sin */

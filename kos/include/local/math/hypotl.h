@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3b484b5 */
+/* HASH CRC-32:0xaa3c7da5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,11 +40,11 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_hypot,(double __x, double
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return `sqrt(X*X + Y*Y)' */
-__LOCAL_LIBC(hypotl) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(hypotl))(long double __x,
-                                                long double __y) {
+__LOCAL_LIBC(hypotl) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(hypotl))(__LONGDOUBLE __x,
+                                                __LONGDOUBLE __y) {
 #line 528 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_hypot((double)__x, (double)__y);
+	return (__LONGDOUBLE)__localdep_hypot((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_hypot || __CRT_HAVE___hypot */

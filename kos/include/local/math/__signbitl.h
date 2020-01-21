@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3062071 */
+/* HASH CRC-32:0x41611ae4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,8 @@
 #define __local___signbitl_defined 1
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__signbitl) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitl))(long double __x) {
-#line 1982 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitl))(__LONGDOUBLE __x) {
+#line 1988 "kos/src/libc/magic/math.c"
 	return __x < 0.0L;
 }
 __NAMESPACE_LOCAL_END

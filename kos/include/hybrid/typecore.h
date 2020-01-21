@@ -1028,11 +1028,13 @@
 #ifndef __SIZEOF_DOUBLE__
 #define __SIZEOF_DOUBLE__      8
 #endif /* !__SIZEOF_DOUBLE__ */
+
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifndef __SIZEOF_LONG_DOUBLE__
 #ifdef _MSC_VER
 #define __SIZEOF_LONG_DOUBLE__ 8
-#elif defined(__C67__) || defined(__i386__) || \
-      defined(__i386) || defined(i386)
+#elif (defined(__C67__) || defined(__i386__) || \
+       defined(__i386) || defined(i386))
 #define __SIZEOF_LONG_DOUBLE__ 12
 #elif defined(__X86_64__)
 #define __SIZEOF_LONG_DOUBLE__ 16
@@ -1047,25 +1049,6 @@
 #if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 #define __ARCH_LONG_DOUBLE_IS_DOUBLE 1
 #endif /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
-
-
-#ifndef __MAX_ALIGN_TYPE__
-#define __MAX_ALIGN_TYPE__ long double
-#ifdef __BIGGEST_ALIGNMENT__
-#   define __ALIGNOF_MAX_ALIGN_T__ __BIGGEST_ALIGNMENT__
-#   define __SIZEOF_MAX_ALIGN_T__  __BIGGEST_ALIGNMENT__
-#elif defined(__SIZEOF_LONG_DOUBLE__)
-#   define __ALIGNOF_MAX_ALIGN_T__ 8
-#   define __SIZEOF_MAX_ALIGN_T__  8
-#elif __SIZEOF_LONG_DOUBLE__ == 12
-#   define __ALIGNOF_MAX_ALIGN_T__ 16
-#   define __SIZEOF_MAX_ALIGN_T__  12
-#else
-#   define __ALIGNOF_MAX_ALIGN_T__ __SIZEOF_LONG_DOUBLE__
-#   define __SIZEOF_MAX_ALIGN_T__  __SIZEOF_LONG_DOUBLE__
-#endif
-#endif /* !__MAX_ALIGN_TYPE__ */
-
 
 #if __SIZEOF_LONG__ == __SIZEOF_SIZE_T__
 #   define __LONGSIZE_TYPE__  __ATTR_W64 unsigned long int
@@ -1146,6 +1129,45 @@
 #define __ALIGNOF_INT16__ 2
 #endif /* __SIZEOF_REGISTER__ >= 2 */
 #endif /* !__ALIGNOF_INT16__ */
+
+#ifndef __ALIGNOF_FLOAT__
+#define __ALIGNOF_FLOAT__ __SIZEOF_FLOAT__
+#endif /* !__ALIGNOF_FLOAT__ */
+
+#ifndef __ALIGNOF_DOUBLE__
+#if __SIZEOF_DOUBLE__ == 8
+#define __ALIGNOF_DOUBLE__ __ALIGNOF_INT64__
+#else /* __SIZEOF_DOUBLE__ == 8 */
+#define __ALIGNOF_DOUBLE__ __SIZEOF_DOUBLE__
+#endif /* __SIZEOF_DOUBLE__ != 8 */
+#endif /* !__ALIGNOF_DOUBLE__ */
+
+#ifndef __ALIGNOF_LONG_DOUBLE__
+#if __ALIGNOF_INT64__ < 8
+#define __ALIGNOF_LONG_DOUBLE__ __ALIGNOF_INT64__
+#elif __SIZEOF_LONG_DOUBLE__ == 12
+#define __ALIGNOF_LONG_DOUBLE__ 16
+#else /* __SIZEOF_LONG_DOUBLE__ == 12 */
+#define __ALIGNOF_LONG_DOUBLE__ __SIZEOF_LONG_DOUBLE__
+#endif /* __SIZEOF_LONG_DOUBLE__ != 12 */
+#endif /* !__ALIGNOF_LONG_DOUBLE__ */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+
+
+#ifndef __MAX_ALIGN_TYPE__
+#define __MAX_ALIGN_TYPE__ __LONGDOUBLE
+#ifdef __BIGGEST_ALIGNMENT__
+#   define __ALIGNOF_MAX_ALIGN_T__ __BIGGEST_ALIGNMENT__
+#   define __SIZEOF_MAX_ALIGN_T__  __BIGGEST_ALIGNMENT__
+#elif !defined(__ALIGNOF_LONG_DOUBLE__)
+#   define __ALIGNOF_MAX_ALIGN_T__ 8
+#   define __SIZEOF_MAX_ALIGN_T__  8
+#else
+#   define __ALIGNOF_MAX_ALIGN_T__ __ALIGNOF_LONG_DOUBLE__
+#   define __SIZEOF_MAX_ALIGN_T__  __ALIGNOF_LONG_DOUBLE__
+#endif
+#endif /* !__MAX_ALIGN_TYPE__ */
+
 
 
 #define __ALIGNOF_INTN_1 1

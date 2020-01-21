@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25f3fa77 */
+/* HASH CRC-32:0x97110090 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_c32stold_defined
 #define ____localdep_c32stold_defined 1
 #if defined(__CRT_HAVE_wcstold) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep_c32stold,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstold,(__nptr,__endptr))
+__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_c32stold,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr),wcstold,(__nptr,__endptr))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcstold.h>
 #define __localdep_c32stold(nptr, endptr) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstold))((__WCHAR_TYPE__ const *)(nptr), (__WCHAR_TYPE__ **)(endptr))
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep
 #endif /* !____localdep_c32stold_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c32stold_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long double
+__LOCAL_LIBC(c32stold_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32stold_l))(__CHAR32_TYPE__ const *__restrict __nptr,
                                                         __CHAR32_TYPE__ **__endptr,
                                                         __locale_t __locale) {

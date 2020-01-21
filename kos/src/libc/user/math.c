@@ -241,81 +241,81 @@ NOTHROW(LIBCCALL libc_tanf)(float x)
 }
 /*[[[end:tanf]]]*/
 
-/*[[[head:acosl,hash:CRC-32=0x5a1e754e]]]*/
+/*[[[head:acosl,hash:CRC-32=0x1bcf08e9]]]*/
 /* Arc cosine of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.acosl") long double
-NOTHROW(LIBCCALL libc_acosl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.acosl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_acosl)(__LONGDOUBLE x)
 /*[[[body:acosl]]]*/
 /*AUTO*/{
-	return (long double)libc_acos((double)x);
+	return (__LONGDOUBLE)libc_acos((double)x);
 }
 /*[[[end:acosl]]]*/
 
-/*[[[head:asinl,hash:CRC-32=0x4df61848]]]*/
+/*[[[head:asinl,hash:CRC-32=0x9c656361]]]*/
 /* Arc sine of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.asinl") long double
-NOTHROW(LIBCCALL libc_asinl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.asinl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_asinl)(__LONGDOUBLE x)
 /*[[[body:asinl]]]*/
 /*AUTO*/{
-	return (long double)libc_asin((double)x);
+	return (__LONGDOUBLE)libc_asin((double)x);
 }
 /*[[[end:asinl]]]*/
 
-/*[[[head:atanl,hash:CRC-32=0x685d6abb]]]*/
+/*[[[head:atanl,hash:CRC-32=0xa9e88378]]]*/
 /* Arc tangent of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atanl") long double
-NOTHROW(LIBCCALL libc_atanl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atanl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_atanl)(__LONGDOUBLE x)
 /*[[[body:atanl]]]*/
 /*AUTO*/{
-	return (long double)libc_atan((double)x);
+	return (__LONGDOUBLE)libc_atan((double)x);
 }
 /*[[[end:atanl]]]*/
 
-/*[[[head:atan2l,hash:CRC-32=0x4f4d6e56]]]*/
+/*[[[head:atan2l,hash:CRC-32=0x2a01a815]]]*/
 /* Arc tangent of Y/X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atan2l") long double
-NOTHROW(LIBCCALL libc_atan2l)(long double y,
-                              long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atan2l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_atan2l)(__LONGDOUBLE y,
+                              __LONGDOUBLE x)
 /*[[[body:atan2l]]]*/
 /*AUTO*/{
-	return (long double)libc_atan2((double)y, (double)x);
+	return (__LONGDOUBLE)libc_atan2((double)y, (double)x);
 }
 /*[[[end:atan2l]]]*/
 
-/*[[[head:cosl,hash:CRC-32=0xa69df706]]]*/
+/*[[[head:cosl,hash:CRC-32=0x2f167ad6]]]*/
 /* Cosine of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.cosl") long double
-NOTHROW(LIBCCALL libc_cosl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.cosl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_cosl)(__LONGDOUBLE x)
 /*[[[body:cosl]]]*/
 /*AUTO*/{
-	return (long double)libc_cos((double)x);
+	return (__LONGDOUBLE)libc_cos((double)x);
 }
 /*[[[end:cosl]]]*/
 
-/*[[[head:sinl,hash:CRC-32=0x83d7d10f]]]*/
+/*[[[head:sinl,hash:CRC-32=0xce2aa72b]]]*/
 /* Sine of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sinl") long double
-NOTHROW(LIBCCALL libc_sinl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sinl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_sinl)(__LONGDOUBLE x)
 /*[[[body:sinl]]]*/
 /*AUTO*/{
-	return (long double)libc_sin((double)x);
+	return (__LONGDOUBLE)libc_sin((double)x);
 }
 /*[[[end:sinl]]]*/
 
-/*[[[head:tanl,hash:CRC-32=0x30bcaef9]]]*/
+/*[[[head:tanl,hash:CRC-32=0xf861590a]]]*/
 /* Tangent of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.tanl") long double
-NOTHROW(LIBCCALL libc_tanl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.tanl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_tanl)(__LONGDOUBLE x)
 /*[[[body:tanl]]]*/
 /*AUTO*/{
-	return (long double)libc_tan((double)x);
+	return (__LONGDOUBLE)libc_tan((double)x);
 }
 /*[[[end:tanl]]]*/
 
@@ -394,36 +394,36 @@ NOTHROW(LIBCCALL libc_tanhf)(float x)
 }
 /*[[[end:tanhf]]]*/
 
-/*[[[head:coshl,hash:CRC-32=0xad6fd731]]]*/
+/*[[[head:coshl,hash:CRC-32=0xbe81e355]]]*/
 /* Hyperbolic cosine of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.coshl") long double
-NOTHROW(LIBCCALL libc_coshl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.coshl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_coshl)(__LONGDOUBLE x)
 /*[[[body:coshl]]]*/
 /*AUTO*/{
-	return (long double)libc_cosh((double)x);
+	return (__LONGDOUBLE)libc_cosh((double)x);
 }
 /*[[[end:coshl]]]*/
 
-/*[[[head:sinhl,hash:CRC-32=0x5d90214]]]*/
+/*[[[head:sinhl,hash:CRC-32=0x39201f23]]]*/
 /* Hyperbolic sine of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sinhl") long double
-NOTHROW(LIBCCALL libc_sinhl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sinhl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_sinhl)(__LONGDOUBLE x)
 /*[[[body:sinhl]]]*/
 /*AUTO*/{
-	return (long double)libc_sinh((double)x);
+	return (__LONGDOUBLE)libc_sinh((double)x);
 }
 /*[[[end:sinhl]]]*/
 
-/*[[[head:tanhl,hash:CRC-32=0x451ab1a5]]]*/
+/*[[[head:tanhl,hash:CRC-32=0x1947abb7]]]*/
 /* Hyperbolic tangent of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.tanhl") long double
-NOTHROW(LIBCCALL libc_tanhl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.tanhl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_tanhl)(__LONGDOUBLE x)
 /*[[[body:tanhl]]]*/
 /*AUTO*/{
-	return (long double)libc_tanh((double)x);
+	return (__LONGDOUBLE)libc_tanh((double)x);
 }
 /*[[[end:tanhl]]]*/
 
@@ -502,36 +502,36 @@ NOTHROW(LIBCCALL libc_atanhf)(float x)
 }
 /*[[[end:atanhf]]]*/
 
-/*[[[head:acoshl,hash:CRC-32=0x4b3782bc]]]*/
+/*[[[head:acoshl,hash:CRC-32=0x9e7246e8]]]*/
 /* Hyperbolic arc cosine of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.acoshl") long double
-NOTHROW(LIBCCALL libc_acoshl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.acoshl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_acoshl)(__LONGDOUBLE x)
 /*[[[body:acoshl]]]*/
 /*AUTO*/{
-	return (long double)libc_acosh((double)x);
+	return (__LONGDOUBLE)libc_acosh((double)x);
 }
 /*[[[end:acoshl]]]*/
 
-/*[[[head:asinhl,hash:CRC-32=0xff2fdca7]]]*/
+/*[[[head:asinhl,hash:CRC-32=0x227ce7e5]]]*/
 /* Hyperbolic arc sine of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.asinhl") long double
-NOTHROW(LIBCCALL libc_asinhl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.asinhl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x)
 /*[[[body:asinhl]]]*/
 /*AUTO*/{
-	return (long double)libc_asinh((double)x);
+	return (__LONGDOUBLE)libc_asinh((double)x);
 }
 /*[[[end:asinhl]]]*/
 
-/*[[[head:atanhl,hash:CRC-32=0xf363c33]]]*/
+/*[[[head:atanhl,hash:CRC-32=0x188a3302]]]*/
 /* Hyperbolic arc tangent of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atanhl") long double
-NOTHROW(LIBCCALL libc_atanhl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atanhl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_atanhl)(__LONGDOUBLE x)
 /*[[[body:atanhl]]]*/
 /*AUTO*/{
-	return (long double)libc_atanh((double)x);
+	return (__LONGDOUBLE)libc_atanh((double)x);
 }
 /*[[[end:atanhl]]]*/
 
@@ -698,75 +698,75 @@ NOTHROW_NCX(LIBCCALL libc_modff)(float x,
 }
 /*[[[end:modff]]]*/
 
-/*[[[head:expl,hash:CRC-32=0xdb9a9ae9]]]*/
+/*[[[head:expl,hash:CRC-32=0x6e41f830]]]*/
 /* Exponential function of X */
 INTERN __DECL_SIMD_expl WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.expl") long double
-NOTHROW(LIBCCALL libc_expl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.expl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x)
 /*[[[body:expl]]]*/
 /*AUTO*/{
-	return (long double)libc_exp((double)x);
+	return (__LONGDOUBLE)libc_exp((double)x);
 }
 /*[[[end:expl]]]*/
 
-/*[[[head:frexpl,hash:CRC-32=0xdcecfaa1]]]*/
+/*[[[head:frexpl,hash:CRC-32=0x2966641a]]]*/
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.frexpl") long double
-NOTHROW_NCX(LIBCCALL libc_frexpl)(long double x,
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.frexpl") __LONGDOUBLE
+NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x,
                                   int *pexponent)
 /*[[[body:frexpl]]]*/
 /*AUTO*/{
-	return (long double)libc_frexp((double)x, pexponent);
+	return (__LONGDOUBLE)libc_frexp((double)x, pexponent);
 }
 /*[[[end:frexpl]]]*/
 
-/*[[[head:ldexpl,hash:CRC-32=0x5488a605]]]*/
+/*[[[head:ldexpl,hash:CRC-32=0xcbd713d6]]]*/
 /* X times (two to the EXP power) */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ldexpl") long double
-NOTHROW(LIBCCALL libc_ldexpl)(long double x,
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ldexpl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
                               int exponent)
 /*[[[body:ldexpl]]]*/
 /*AUTO*/{
-	return (long double)libc_ldexp((double)x, exponent);
+	return (__LONGDOUBLE)libc_ldexp((double)x, exponent);
 }
 /*[[[end:ldexpl]]]*/
 
-/*[[[head:logl,hash:CRC-32=0x62bea645]]]*/
+/*[[[head:logl,hash:CRC-32=0x2ca022ab]]]*/
 /* Natural logarithm of X */
 INTERN __DECL_SIMD_logl WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.logl") long double
-NOTHROW(LIBCCALL libc_logl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.logl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x)
 /*[[[body:logl]]]*/
 /*AUTO*/{
-	return (long double)libc_log((double)x);
+	return (__LONGDOUBLE)libc_log((double)x);
 }
 /*[[[end:logl]]]*/
 
-/*[[[head:log10l,hash:CRC-32=0x35a0da4f]]]*/
+/*[[[head:log10l,hash:CRC-32=0xec406993]]]*/
 /* Base-ten logarithm of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.log10l") long double
-NOTHROW(LIBCCALL libc_log10l)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.log10l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x)
 /*[[[body:log10l]]]*/
 /*AUTO*/{
-	return (long double)libc_log10((double)x);
+	return (__LONGDOUBLE)libc_log10((double)x);
 }
 /*[[[end:log10l]]]*/
 
-/*[[[head:modfl,hash:CRC-32=0xa7330b50]]]*/
+/*[[[head:modfl,hash:CRC-32=0x40e74fdc]]]*/
 /* Break VALUE into integral and fractional parts */
 INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.modfl") long double
-NOTHROW_NCX(LIBCCALL libc_modfl)(long double x,
-                                 long double *iptr)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.modfl") __LONGDOUBLE
+NOTHROW_NCX(LIBCCALL libc_modfl)(__LONGDOUBLE x,
+                                 __LONGDOUBLE *iptr)
 /*[[[body:modfl]]]*/
 /*AUTO*/{
 	double ipart;
-	long double result;
-	result = (long double)libc_modf(x, &ipart);
-	*iptr  = (long double)ipart;
+	__LONGDOUBLE result;
+	result = (__LONGDOUBLE)libc_modf(x, &ipart);
+	*iptr  = (__LONGDOUBLE)ipart;
 	return result;
 }
 /*[[[end:modfl]]]*/
@@ -846,36 +846,36 @@ NOTHROW(LIBCCALL libc_logbf)(float x)
 }
 /*[[[end:logbf]]]*/
 
-/*[[[head:expm1l,hash:CRC-32=0xc076b59f]]]*/
+/*[[[head:expm1l,hash:CRC-32=0x11dc80b8]]]*/
 /* Return exp(X) - 1 */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.expm1l") long double
-NOTHROW(LIBCCALL libc_expm1l)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.expm1l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_expm1l)(__LONGDOUBLE x)
 /*[[[body:expm1l]]]*/
 /*AUTO*/{
-	return (long double)libc_expm1((double)x);
+	return (__LONGDOUBLE)libc_expm1((double)x);
 }
 /*[[[end:expm1l]]]*/
 
-/*[[[head:log1pl,hash:CRC-32=0x721c599e]]]*/
+/*[[[head:log1pl,hash:CRC-32=0x782244d5]]]*/
 /* Return log(1 + X) */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.log1pl") long double
-NOTHROW(LIBCCALL libc_log1pl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.log1pl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_log1pl)(__LONGDOUBLE x)
 /*[[[body:log1pl]]]*/
 /*AUTO*/{
-	return (long double)libc_log1p((double)x);
+	return (__LONGDOUBLE)libc_log1p((double)x);
 }
 /*[[[end:log1pl]]]*/
 
-/*[[[head:logbl,hash:CRC-32=0x7e6d1ac5]]]*/
+/*[[[head:logbl,hash:CRC-32=0x5c28844a]]]*/
 /* Return the base 2 signed integral exponent of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.logbl") long double
-NOTHROW(LIBCCALL libc_logbl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.logbl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_logbl)(__LONGDOUBLE x)
 /*[[[body:logbl]]]*/
 /*AUTO*/{
-	return (long double)libc_logb((double)x);
+	return (__LONGDOUBLE)libc_logb((double)x);
 }
 /*[[[end:logbl]]]*/
 
@@ -929,25 +929,25 @@ NOTHROW(LIBCCALL libc_log2f)(float x)
 }
 /*[[[end:log2f]]]*/
 
-/*[[[head:exp2l,hash:CRC-32=0x3bd5eb11]]]*/
+/*[[[head:exp2l,hash:CRC-32=0xbf4df7]]]*/
 /* Compute base-2 exponential of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.exp2l") long double
-NOTHROW(LIBCCALL libc_exp2l)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.exp2l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_exp2l)(__LONGDOUBLE x)
 /*[[[body:exp2l]]]*/
 /*AUTO*/{
-	return (long double)libc_exp2((double)x);
+	return (__LONGDOUBLE)libc_exp2((double)x);
 }
 /*[[[end:exp2l]]]*/
 
-/*[[[head:log2l,hash:CRC-32=0xa89e9f05]]]*/
+/*[[[head:log2l,hash:CRC-32=0x81742e49]]]*/
 /* Compute base-2 logarithm of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.log2l") long double
-NOTHROW(LIBCCALL libc_log2l)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.log2l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_log2l)(__LONGDOUBLE x)
 /*[[[body:log2l]]]*/
 /*AUTO*/{
-	return (long double)libc_log2((double)x);
+	return (__LONGDOUBLE)libc_log2((double)x);
 }
 /*[[[end:log2l]]]*/
 
@@ -1017,26 +1017,26 @@ NOTHROW(LIBCCALL libc_sqrtf)(float x)
 }
 /*[[[end:sqrtf]]]*/
 
-/*[[[head:powl,hash:CRC-32=0xa719e4ff]]]*/
+/*[[[head:powl,hash:CRC-32=0x3fdd2d60]]]*/
 /* Return X to the Y power */
 INTERN __DECL_SIMD_powl WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.powl") long double
-NOTHROW(LIBCCALL libc_powl)(long double x,
-                            long double y)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.powl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_powl)(__LONGDOUBLE x,
+                            __LONGDOUBLE y)
 /*[[[body:powl]]]*/
 /*AUTO*/{
-	return (long double)libc_pow((double)x, (double)y);
+	return (__LONGDOUBLE)libc_pow((double)x, (double)y);
 }
 /*[[[end:powl]]]*/
 
-/*[[[head:sqrtl,hash:CRC-32=0xe08e1c84]]]*/
+/*[[[head:sqrtl,hash:CRC-32=0x43a80e9a]]]*/
 /* Return the square root of X */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sqrtl") long double
-NOTHROW(LIBCCALL libc_sqrtl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sqrtl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_sqrtl)(__LONGDOUBLE x)
 /*[[[body:sqrtl]]]*/
 /*AUTO*/{
-	return (long double)libc_sqrt((double)x);
+	return (__LONGDOUBLE)libc_sqrt((double)x);
 }
 /*[[[end:sqrtl]]]*/
 
@@ -1068,15 +1068,15 @@ NOTHROW(LIBCCALL libc_hypotf)(float x,
 }
 /*[[[end:hypotf]]]*/
 
-/*[[[head:hypotl,hash:CRC-32=0x93edfa1b]]]*/
+/*[[[head:hypotl,hash:CRC-32=0x97575fa7]]]*/
 /* Return `sqrt(X*X + Y*Y)' */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.hypotl") long double
-NOTHROW(LIBCCALL libc_hypotl)(long double x,
-                              long double y)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.hypotl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_hypotl)(__LONGDOUBLE x,
+                              __LONGDOUBLE y)
 /*[[[body:hypotl]]]*/
 /*AUTO*/{
-	return (long double)libc_hypot((double)x, (double)y);
+	return (__LONGDOUBLE)libc_hypot((double)x, (double)y);
 }
 /*[[[end:hypotl]]]*/
 
@@ -1110,14 +1110,14 @@ NOTHROW(LIBCCALL libc_cbrtf)(float x)
 }
 /*[[[end:cbrtf]]]*/
 
-/*[[[head:cbrtl,hash:CRC-32=0x392834e8]]]*/
+/*[[[head:cbrtl,hash:CRC-32=0xb7a5e06e]]]*/
 /* Return the cube root of X */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.cbrtl") long double
-NOTHROW(LIBCCALL libc_cbrtl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.cbrtl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_cbrtl)(__LONGDOUBLE x)
 /*[[[body:cbrtl]]]*/
 /*AUTO*/{
-	return (long double)libc_cbrt((double)x);
+	return (__LONGDOUBLE)libc_cbrt((double)x);
 }
 /*[[[end:cbrtl]]]*/
 
@@ -1155,15 +1155,15 @@ NOTHROW(LIBCCALL libc_fmodf)(float x,
 }
 /*[[[end:fmodf]]]*/
 
-/*[[[head:fmodl,hash:CRC-32=0x9fc5c331]]]*/
+/*[[[head:fmodl,hash:CRC-32=0xf7efc4d6]]]*/
 /* Floating-point modulo remainder of X/Y */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmodl") long double
-NOTHROW(LIBCCALL libc_fmodl)(long double x,
-                             long double y)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmodl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_fmodl)(__LONGDOUBLE x,
+                             __LONGDOUBLE y)
 /*[[[body:fmodl]]]*/
 /*AUTO*/{
-	return (long double)libc_fmod((double)x, (double)y);
+	return (__LONGDOUBLE)libc_fmod((double)x, (double)y);
 }
 /*[[[end:fmodl]]]*/
 
@@ -1236,33 +1236,33 @@ NOTHROW(LIBCCALL libc_lgammaf)(float x)
 }
 /*[[[end:lgammaf]]]*/
 
-/*[[[head:erfl,hash:CRC-32=0x63df9e93]]]*/
+/*[[[head:erfl,hash:CRC-32=0xc0a4bbcc]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.erfl") long double
-NOTHROW(LIBCCALL libc_erfl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.erfl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_erfl)(__LONGDOUBLE x)
 /*[[[body:erfl]]]*/
 /*AUTO*/{
-	return (long double)libc_erf((double)x);
+	return (__LONGDOUBLE)libc_erf((double)x);
 }
 /*[[[end:erfl]]]*/
 
-/*[[[head:erfcl,hash:CRC-32=0x6524ca7c]]]*/
+/*[[[head:erfcl,hash:CRC-32=0x2a6db7ec]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.erfcl") long double
-NOTHROW(LIBCCALL libc_erfcl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.erfcl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_erfcl)(__LONGDOUBLE x)
 /*[[[body:erfcl]]]*/
 /*AUTO*/{
-	return (long double)libc_erfc((double)x);
+	return (__LONGDOUBLE)libc_erfc((double)x);
 }
 /*[[[end:erfcl]]]*/
 
-/*[[[head:lgammal,hash:CRC-32=0x63650f84]]]*/
+/*[[[head:lgammal,hash:CRC-32=0xbfd91ba7]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lgammal") long double
-NOTHROW(LIBCCALL libc_lgammal)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lgammal") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_lgammal)(__LONGDOUBLE x)
 /*[[[body:lgammal]]]*/
 /*AUTO*/{
-	return (long double)libc_lgamma((double)x);
+	return (__LONGDOUBLE)libc_lgamma((double)x);
 }
 /*[[[end:lgammal]]]*/
 
@@ -1291,14 +1291,14 @@ NOTHROW(LIBCCALL libc_tgammaf)(float x)
 }
 /*[[[end:tgammaf]]]*/
 
-/*[[[head:tgammal,hash:CRC-32=0xe1147c70]]]*/
+/*[[[head:tgammal,hash:CRC-32=0xdf7f6ab3]]]*/
 /* True gamma function */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.tgammal") long double
-NOTHROW(LIBCCALL libc_tgammal)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.tgammal") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_tgammal)(__LONGDOUBLE x)
 /*[[[body:tgammal]]]*/
 /*AUTO*/{
-	return (long double)libc_tgamma((double)x);
+	return (__LONGDOUBLE)libc_tgamma((double)x);
 }
 /*[[[end:tgammal]]]*/
 
@@ -1417,57 +1417,57 @@ NOTHROW(LIBCCALL libc_ilogbf)(float x)
 }
 /*[[[end:ilogbf]]]*/
 
-/*[[[head:rintl,hash:CRC-32=0xa5e05053]]]*/
+/*[[[head:rintl,hash:CRC-32=0x4f5d65b7]]]*/
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.rintl") long double
-NOTHROW(LIBCCALL libc_rintl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.rintl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x)
 /*[[[body:rintl]]]*/
 /*AUTO*/{
-	return (long double)libc_rint((double)x);
+	return (__LONGDOUBLE)libc_rint((double)x);
 }
 /*[[[end:rintl]]]*/
 
-/*[[[head:nextafterl,hash:CRC-32=0xa31c91f0]]]*/
+/*[[[head:nextafterl,hash:CRC-32=0xf6e943fd]]]*/
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nextafterl") long double
-NOTHROW(LIBCCALL libc_nextafterl)(long double x,
-                                  long double y)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nextafterl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x,
+                                  __LONGDOUBLE y)
 /*[[[body:nextafterl]]]*/
 /*AUTO*/{
-	return (long double)libc_nextafter((double)x, (double)y);
+	return (__LONGDOUBLE)libc_nextafter((double)x, (double)y);
 }
 /*[[[end:nextafterl]]]*/
 
-/*[[[head:remainderl,hash:CRC-32=0x87040f7a]]]*/
+/*[[[head:remainderl,hash:CRC-32=0x65924aa0]]]*/
 /* Return the remainder of integer divison X / Y with infinite precision */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.remainderl") long double
-NOTHROW(LIBCCALL libc_remainderl)(long double x,
-                                  long double y)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.remainderl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
+                                  __LONGDOUBLE y)
 /*[[[body:remainderl]]]*/
 /*AUTO*/{
-	return (long double)libc_remainder((double)x, (double)y);
+	return (__LONGDOUBLE)libc_remainder((double)x, (double)y);
 }
 /*[[[end:remainderl]]]*/
 
-/*[[[head:ilogbl,hash:CRC-32=0x9773b0cb]]]*/
+/*[[[head:ilogbl,hash:CRC-32=0xc4a73328]]]*/
 /* Return the binary exponent of X, which must be nonzero */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ilogbl") int
-NOTHROW(LIBCCALL libc_ilogbl)(long double x)
+NOTHROW(LIBCCALL libc_ilogbl)(__LONGDOUBLE x)
 /*[[[body:ilogbl]]]*/
 /*AUTO*/{
 	return (int)libc_ilogb((double)x);
 }
 /*[[[end:ilogbl]]]*/
 
-/*[[[head:nexttoward,hash:CRC-32=0x9585ce4d]]]*/
+/*[[[head:nexttoward,hash:CRC-32=0xd8a7b835]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nexttoward") double
 NOTHROW(LIBCCALL libc_nexttoward)(double x,
-                                  long double y)
+                                  __LONGDOUBLE y)
 /*[[[body:nexttoward]]]*/
 {
 	(void)x;
@@ -1563,11 +1563,11 @@ NOTHROW(LIBCCALL libc_llrint)(double x)
 /*[[[end:llrint]]]*/
 
 
-/*[[[head:nexttowardf,hash:CRC-32=0x4aed3157]]]*/
+/*[[[head:nexttowardf,hash:CRC-32=0x251a29b0]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nexttowardf") float
 NOTHROW(LIBCCALL libc_nexttowardf)(float x,
-                                   long double y)
+                                   __LONGDOUBLE y)
 /*[[[body:nexttowardf]]]*/
 /*AUTO*/{
 	return (float)libc_nexttoward((double)x, y);
@@ -1648,62 +1648,62 @@ NOTHROW(LIBCCALL libc_llrintf)(float x)
 /*[[[end:llrintf]]]*/
 
 
-/*[[[head:nexttowardl,hash:CRC-32=0x99b1b1f]]]*/
+/*[[[head:nexttowardl,hash:CRC-32=0x56d0e2cf]]]*/
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nexttowardl") long double
-NOTHROW(LIBCCALL libc_nexttowardl)(long double x,
-                                   long double y)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nexttowardl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_nexttowardl)(__LONGDOUBLE x,
+                                   __LONGDOUBLE y)
 /*[[[body:nexttowardl]]]*/
 /*AUTO*/{
-	return (long double)libc_nexttoward((double)x, (double)y);
+	return (__LONGDOUBLE)libc_nexttoward((double)x, (double)y);
 }
 /*[[[end:nexttowardl]]]*/
 
-/*[[[head:scalbnl,hash:CRC-32=0x3aa69181]]]*/
+/*[[[head:scalbnl,hash:CRC-32=0x457ed1cf]]]*/
 /* Return X times (2 to the Nth power) */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.scalbnl") long double
-NOTHROW(LIBCCALL libc_scalbnl)(long double x,
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.scalbnl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_scalbnl)(__LONGDOUBLE x,
                                int n)
 /*[[[body:scalbnl]]]*/
 /*AUTO*/{
-	return (long double)libc_scalbn((double)x, n);
+	return (__LONGDOUBLE)libc_scalbn((double)x, n);
 }
 /*[[[end:scalbnl]]]*/
 
-/*[[[head:scalblnl,hash:CRC-32=0x44445740]]]*/
+/*[[[head:scalblnl,hash:CRC-32=0x7272c9a]]]*/
 /* Return X times (2 to the Nth power) */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.scalblnl") long double
-NOTHROW(LIBCCALL libc_scalblnl)(long double x,
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.scalblnl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_scalblnl)(__LONGDOUBLE x,
                                 long int n)
 /*[[[body:scalblnl]]]*/
 /*AUTO*/{
-	return (long double)libc_scalbln((double)x, n);
+	return (__LONGDOUBLE)libc_scalbln((double)x, n);
 }
 /*[[[end:scalblnl]]]*/
 
 
-/*[[[head:remquol,hash:CRC-32=0x2a8287b2]]]*/
+/*[[[head:remquol,hash:CRC-32=0xd91f3acc]]]*/
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.remquol") long double
-NOTHROW(LIBCCALL libc_remquol)(long double x,
-                               long double y,
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.remquol") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x,
+                               __LONGDOUBLE y,
                                int *pquo)
 /*[[[body:remquol]]]*/
 /*AUTO*/{
-	return (long double)libc_remquo((double)x, (double)y, pquo);
+	return (__LONGDOUBLE)libc_remquo((double)x, (double)y, pquo);
 }
 /*[[[end:remquol]]]*/
 
-/*[[[head:lrintl,hash:CRC-32=0xc2810d9]]]*/
+/*[[[head:lrintl,hash:CRC-32=0x378519c0]]]*/
 /* Round X to nearest integral value according to current rounding direction */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lrintl") long int
-NOTHROW(LIBCCALL libc_lrintl)(long double x)
+NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x)
 /*[[[body:lrintl]]]*/
 /*AUTO*/{
 	return (long int)libc_lrint((double)x);
@@ -1713,11 +1713,11 @@ NOTHROW(LIBCCALL libc_lrintl)(long double x)
 
 
 
-/*[[[head:llrintl,hash:CRC-32=0x65c1458b]]]*/
+/*[[[head:llrintl,hash:CRC-32=0xb289c04d]]]*/
 /* Round X to nearest integral value according to current rounding direction */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llrintl") __LONGLONG
-NOTHROW(LIBCCALL libc_llrintl)(long double x)
+NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x)
 /*[[[body:llrintl]]]*/
 /*AUTO*/{
 	return (__LONGLONG)libc_llrint((double)x);
@@ -1804,41 +1804,41 @@ NOTHROW(LIBCCALL libc_pow10f)(float x)
 }
 /*[[[end:pow10f]]]*/
 
-/*[[[head:sincosl,hash:CRC-32=0x3eca8b77]]]*/
+/*[[[head:sincosl,hash:CRC-32=0xf1bf5862]]]*/
 /* Cosine and sine of X */
 INTERN __DECL_SIMD_sincosl NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sincosl") void
-NOTHROW(LIBCCALL libc_sincosl)(long double x,
-                               long double *psinx,
-                               long double *pcosx)
+NOTHROW(LIBCCALL libc_sincosl)(__LONGDOUBLE x,
+                               __LONGDOUBLE *psinx,
+                               __LONGDOUBLE *pcosx)
 /*[[[body:sincosl]]]*/
 /*AUTO*/{
 	double sinx, cosx;
 	libc_sincos((double)x, &sinx, &cosx);
-	*psinx = (long double)sinx;
-	*pcosx = (long double)cosx;
+	*psinx = (__LONGDOUBLE)sinx;
+	*pcosx = (__LONGDOUBLE)cosx;
 }
 /*[[[end:sincosl]]]*/
 
-/*[[[head:exp10l,hash:CRC-32=0x532de8f9]]]*/
+/*[[[head:exp10l,hash:CRC-32=0xb222d9d]]]*/
 /* A function missing in all standards: compute exponent to base ten */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.exp10l") long double
-NOTHROW(LIBCCALL libc_exp10l)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.exp10l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_exp10l)(__LONGDOUBLE x)
 /*[[[body:exp10l]]]*/
 /*AUTO*/{
-	return (long double)libc_exp10((double)x);
+	return (__LONGDOUBLE)libc_exp10((double)x);
 }
 /*[[[end:exp10l]]]*/
 
-/*[[[head:pow10l,hash:CRC-32=0x8f9a1dab]]]*/
+/*[[[head:pow10l,hash:CRC-32=0xf4b653da]]]*/
 /* Another name occasionally used */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.pow10l") long double
-NOTHROW(LIBCCALL libc_pow10l)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.pow10l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_pow10l)(__LONGDOUBLE x)
 /*[[[body:pow10l]]]*/
 /*AUTO*/{
-	return (long double)libc_pow10((double)x);
+	return (__LONGDOUBLE)libc_pow10((double)x);
 }
 /*[[[end:pow10l]]]*/
 
@@ -1895,26 +1895,26 @@ NOTHROW(LIBCCALL libc_significandf)(float x)
 }
 /*[[[end:significandf]]]*/
 
-/*[[[head:dreml,hash:CRC-32=0x4479566d]]]*/
+/*[[[head:dreml,hash:CRC-32=0xcc7bfc91]]]*/
 /* Return the remainder of X/Y */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.dreml") long double
-NOTHROW(LIBCCALL libc_dreml)(long double x,
-                             long double y)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.dreml") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_dreml)(__LONGDOUBLE x,
+                             __LONGDOUBLE y)
 /*[[[body:dreml]]]*/
 /*AUTO*/{
-	return (long double)libc_drem((double)x, (double)y);
+	return (__LONGDOUBLE)libc_drem((double)x, (double)y);
 }
 /*[[[end:dreml]]]*/
 
-/*[[[head:significandl,hash:CRC-32=0x603e4b39]]]*/
+/*[[[head:significandl,hash:CRC-32=0xea4d2596]]]*/
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.significandl") long double
-NOTHROW(LIBCCALL libc_significandl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.significandl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_significandl)(__LONGDOUBLE x)
 /*[[[body:significandl]]]*/
 /*AUTO*/{
-	return (long double)libc_significand((double)x);
+	return (__LONGDOUBLE)libc_significand((double)x);
 }
 /*[[[end:significandl]]]*/
 
@@ -2062,65 +2062,65 @@ NOTHROW(LIBCCALL libc_ynf)(int n,
 }
 /*[[[end:ynf]]]*/
 
-/*[[[head:j0l,hash:CRC-32=0x78e97068]]]*/
+/*[[[head:j0l,hash:CRC-32=0x70d665db]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.j0l") long double
-NOTHROW(LIBCCALL libc_j0l)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.j0l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_j0l)(__LONGDOUBLE x)
 /*[[[body:j0l]]]*/
 /*AUTO*/{
-	return (long double)libc_j0((double)x);
+	return (__LONGDOUBLE)libc_j0((double)x);
 }
 /*[[[end:j0l]]]*/
 
-/*[[[head:j1l,hash:CRC-32=0xdd7cc91a]]]*/
+/*[[[head:j1l,hash:CRC-32=0x6de76b0c]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.j1l") long double
-NOTHROW(LIBCCALL libc_j1l)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.j1l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_j1l)(__LONGDOUBLE x)
 /*[[[body:j1l]]]*/
 /*AUTO*/{
-	return (long double)libc_j1((double)x);
+	return (__LONGDOUBLE)libc_j1((double)x);
 }
 /*[[[end:j1l]]]*/
 
-/*[[[head:jnl,hash:CRC-32=0x690c871]]]*/
+/*[[[head:jnl,hash:CRC-32=0x541b52b3]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.jnl") long double
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.jnl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_jnl)(int n,
-                           long double x)
+                           __LONGDOUBLE x)
 /*[[[body:jnl]]]*/
 /*AUTO*/{
-	return (long double)libc_jn(n, (double)x);
+	return (__LONGDOUBLE)libc_jn(n, (double)x);
 }
 /*[[[end:jnl]]]*/
 
-/*[[[head:y0l,hash:CRC-32=0x515c838d]]]*/
+/*[[[head:y0l,hash:CRC-32=0x8fe9e81]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.y0l") long double
-NOTHROW(LIBCCALL libc_y0l)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.y0l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_y0l)(__LONGDOUBLE x)
 /*[[[body:y0l]]]*/
 /*AUTO*/{
-	return (long double)libc_y0((double)x);
+	return (__LONGDOUBLE)libc_y0((double)x);
 }
 /*[[[end:y0l]]]*/
 
-/*[[[head:y1l,hash:CRC-32=0xf4c93aff]]]*/
+/*[[[head:y1l,hash:CRC-32=0x15cf9056]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.y1l") long double
-NOTHROW(LIBCCALL libc_y1l)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.y1l") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_y1l)(__LONGDOUBLE x)
 /*[[[body:y1l]]]*/
 /*AUTO*/{
-	return (long double)libc_y1((double)x);
+	return (__LONGDOUBLE)libc_y1((double)x);
 }
 /*[[[end:y1l]]]*/
 
-/*[[[head:ynl,hash:CRC-32=0xeb5299da]]]*/
+/*[[[head:ynl,hash:CRC-32=0x369c3478]]]*/
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ynl") long double
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ynl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_ynl)(int n,
-                           long double x)
+                           __LONGDOUBLE x)
 /*[[[body:ynl]]]*/
 /*AUTO*/{
-	return (long double)libc_yn(n, (double)x);
+	return (__LONGDOUBLE)libc_yn(n, (double)x);
 }
 /*[[[end:ynl]]]*/
 
@@ -2156,17 +2156,17 @@ NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
 }
 /*[[[end:lgammaf_r]]]*/
 
-/*[[[head:lgammal_r,hash:CRC-32=0xdf6c1683]]]*/
+/*[[[head:lgammal_r,hash:CRC-32=0x7008619e]]]*/
 /* Reentrant version of lgamma. This function uses the global variable
  * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lgammal_r") long double
-NOTHROW_NCX(LIBCCALL libc_lgammal_r)(long double x,
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lgammal_r") __LONGDOUBLE
+NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x,
                                      int *signgamp)
 /*[[[body:lgammal_r]]]*/
 /*AUTO*/{
-	return (long double)libc_lgamma_r((double)x, signgamp);
+	return (__LONGDOUBLE)libc_lgamma_r((double)x, signgamp);
 }
 /*[[[end:lgammal_r]]]*/
 
@@ -2204,15 +2204,15 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 }
 /*[[[end:scalbf]]]*/
 
-/*[[[head:scalbl,hash:CRC-32=0x96d23798]]]*/
+/*[[[head:scalbl,hash:CRC-32=0xa70200b]]]*/
 /* Return X times (2 to the Nth power) */
 INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.scalbl") long double
-NOTHROW(LIBCCALL libc_scalbl)(long double x,
-                              long double n)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.scalbl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
+                              __LONGDOUBLE n)
 /*[[[body:scalbl]]]*/
 /*AUTO*/{
-	return (long double)libc_scalb((double)x, (double)n);
+	return (__LONGDOUBLE)libc_scalb((double)x, (double)n);
 }
 /*[[[end:scalbl]]]*/
 
@@ -2241,10 +2241,10 @@ NOTHROW(LIBCCALL libc___fpclassifyf)(float x)
 /*[[[end:__fpclassifyf]]]*/
 
 
-/*[[[head:__fpclassifyl,hash:CRC-32=0x746462c7]]]*/
+/*[[[head:__fpclassifyl,hash:CRC-32=0xcdf268d1]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__fpclassifyl") int
-NOTHROW(LIBCCALL libc___fpclassifyl)(long double x)
+NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x)
 /*[[[body:__fpclassifyl]]]*/
 /*AUTO*/{
 	return (int)libc___fpclassify((double)x);
@@ -2275,10 +2275,10 @@ NOTHROW(LIBCCALL libc___issignalingf)(float x)
 }
 /*[[[end:__issignalingf]]]*/
 
-/*[[[head:__issignalingl,hash:CRC-32=0xf22be825]]]*/
+/*[[[head:__issignalingl,hash:CRC-32=0x8370a40f]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__issignalingl") int
-NOTHROW(LIBCCALL libc___issignalingl)(long double x)
+NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x)
 /*[[[body:__issignalingl]]]*/
 /*AUTO*/{
 	return (int)libc___issignaling((double)x);
@@ -2319,17 +2319,17 @@ NOTHROW(LIBCCALL libc_fabsf)(float x)
 }
 /*[[[end:fabsf]]]*/
 
-/*[[[head:fabsl,hash:CRC-32=0xc55a6108]]]*/
+/*[[[head:fabsl,hash:CRC-32=0x60424dbe]]]*/
 /* Return X with its signed changed to Y's */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsl") long double
-NOTHROW(LIBCCALL libc_fabsl)(long double x)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x)
 /*[[[body:fabsl]]]*/
 /*AUTO*/{
 #ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (long double)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
+	return (__LONGDOUBLE)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (long double)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);
+	return (__LONGDOUBLE)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)x);
 #else /* ... */
 	return x < 0.0L ? -x : x;
 #endif /* !... */
@@ -2401,30 +2401,30 @@ NOTHROW(LIBCCALL libc_fdimf)(float x,
 }
 /*[[[end:fdimf]]]*/
 
-/*[[[head:fdiml,hash:CRC-32=0x305e9932]]]*/
+/*[[[head:fdiml,hash:CRC-32=0x2fc01736]]]*/
 /* Return positive difference between X and Y */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdiml") long double
-NOTHROW(LIBCCALL libc_fdiml)(long double x,
-                             long double y)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdiml") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_fdiml)(__LONGDOUBLE x,
+                             __LONGDOUBLE y)
 /*[[[body:fdiml]]]*/
 /*AUTO*/{
 	return libc_fabs(y - x);
 }
 /*[[[end:fdiml]]]*/
 
-/*[[[head:copysignl,hash:CRC-32=0x9f3989b5]]]*/
+/*[[[head:copysignl,hash:CRC-32=0x943c1a35]]]*/
 /* Return X with its signed changed to Y's */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysignl") long double
-NOTHROW(LIBCCALL libc_copysignl)(long double num,
-                                 long double sign)
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysignl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_copysignl)(__LONGDOUBLE num,
+                                 __LONGDOUBLE sign)
 /*[[[body:copysignl]]]*/
 /*AUTO*/{
 #ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (long double)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
+	return (__LONGDOUBLE)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (long double)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
+	return (__LONGDOUBLE)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
 #else /* ... */
 	if ((num < 0.0L) != (sign < 0.0L))
 		num = -num;
@@ -2444,6 +2444,8 @@ NOTHROW(LIBCCALL libc_isinf)(double x)
 	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #else /* ... */
 	return x == HUGE_VAL;
 #endif /* !... */
@@ -2461,20 +2463,24 @@ NOTHROW(LIBCCALL libc_isinff)(float x)
 	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #else /* ... */
 	return x == HUGE_VALF;
 #endif /* !... */
 }
 /*[[[end:isinff]]]*/
 
-/*[[[head:isinfl,hash:CRC-32=0x38b16bfc]]]*/
+/*[[[head:isinfl,hash:CRC-32=0x7cb554fc]]]*/
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinfl") int
-NOTHROW(LIBCCALL libc_isinfl)(long double x)
+NOTHROW(LIBCCALL libc_isinfl)(__LONGDOUBLE x)
 /*[[[body:isinfl]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
@@ -2520,11 +2526,11 @@ NOTHROW(LIBCCALL libc_finitef)(float x)
 }
 /*[[[end:finitef]]]*/
 
-/*[[[head:finitel,hash:CRC-32=0xbdfd9fb8]]]*/
+/*[[[head:finitel,hash:CRC-32=0xd819d81]]]*/
 /* Return nonzero if VALUE is finite and not NaN */
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitel") int
-NOTHROW(LIBCCALL libc_finitel)(long double x)
+NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x)
 /*[[[body:finitel]]]*/
 /*AUTO*/{
 #ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
@@ -2573,11 +2579,11 @@ NOTHROW(LIBCCALL libc_isnanf)(float x)
 }
 /*[[[end:isnanf]]]*/
 
-/*[[[head:isnanl,hash:CRC-32=0x7151ed07]]]*/
+/*[[[head:isnanl,hash:CRC-32=0x56939fee]]]*/
 /* Return nonzero if VALUE is not a number */
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanl") int
-NOTHROW(LIBCCALL libc_isnanl)(long double x)
+NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x)
 /*[[[body:isnanl]]]*/
 /*AUTO*/{
 #ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
@@ -2587,7 +2593,7 @@ NOTHROW(LIBCCALL libc_isnanl)(long double x)
 #elif 1
 	return libc_isnan((double)x);
 #else /* ... */
-	return x == (long double)NAN;
+	return x == (__LONGDOUBLE)NAN;
 #endif /* !... */
 }
 /*[[[end:isnanl]]]*/

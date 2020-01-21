@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22dde6ee */
+/* HASH CRC-32:0x7f3cdfaa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,13 @@
 #include <libm/fabs.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return X with its signed changed to Y's */
-__LOCAL_LIBC(fabsl) __ATTR_CONST __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabsl))(long double __x) {
+__LOCAL_LIBC(fabsl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabsl))(__LONGDOUBLE __x) {
 #line 651 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
-	return (long double)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)__x);
+	return (__LONGDOUBLE)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return (long double)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)__x);
+	return (__LONGDOUBLE)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)__x);
 #else /* ... */
 	return __x < 0.0L ? -__x : __x;
 #endif /* !... */

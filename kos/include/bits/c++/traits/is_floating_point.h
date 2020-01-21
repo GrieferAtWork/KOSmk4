@@ -31,7 +31,7 @@ template<class __T> struct __is_floating_point_helper: public __NAMESPACE_STD_SY
 template<> struct __is_floating_point_helper<float>: public __NAMESPACE_STD_SYM true_type {};
 template<> struct __is_floating_point_helper<double>: public __NAMESPACE_STD_SYM true_type {};
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-template<> struct __is_floating_point_helper<long double>: public __NAMESPACE_STD_SYM true_type {};
+template<> struct __is_floating_point_helper<__LONGDOUBLE>: public __NAMESPACE_STD_SYM true_type {};
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifdef __COMPILER_HAVE_FLOAT128
 template<> struct __is_floating_point_helper<__float128>: public __NAMESPACE_STD_SYM true_type {};

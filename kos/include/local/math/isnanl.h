@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40eb7dc5 */
+/* HASH CRC-32:0x7a47d625 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,8 +48,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double _
 __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is not a number */
 __LOCAL_LIBC(isnanl) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnanl))(long double __x) {
-#line 1449 "kos/src/libc/magic/math.c"
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnanl))(__LONGDOUBLE __x) {
+#line 1455 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
 	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
@@ -57,7 +57,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnanl))(long double __x) {
 #elif 1
 	return __localdep_isnan((double)__x);
 #else /* ... */
-	return __x == (long double)NAN;
+	return __x == (__LONGDOUBLE)NAN;
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END

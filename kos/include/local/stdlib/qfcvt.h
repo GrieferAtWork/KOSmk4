@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8f63987 */
+/* HASH CRC-32:0x60be2cb6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_END
 #ifndef ____localdep_qfcvt_r_defined
 #define ____localdep_qfcvt_r_defined 1
 #ifdef __CRT_HAVE_qfcvt_r
-__CREDIRECT(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,__localdep_qfcvt_r,(long double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),qfcvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
+__CREDIRECT(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,__localdep_qfcvt_r,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),qfcvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
 #else /* LIBC: qfcvt_r */
 #include <local/stdlib/qfcvt_r.h>
 #define __localdep_qfcvt_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qfcvt_r))
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,__localdep_qfcvt_r,(long
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qfcvt) __ATTR_WUNUSED __ATTR_NONNULL((3, 4)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt))(long double __val,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt))(__LONGDOUBLE __val,
                                                    int __ndigit,
                                                    int *__restrict __decptr,
                                                    int *__restrict __sign) {

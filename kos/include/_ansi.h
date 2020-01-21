@@ -85,7 +85,7 @@
 
 #ifndef _LONG_DOUBLE
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#define _LONG_DOUBLE long double
+#define _LONG_DOUBLE __LONGDOUBLE
 #else /* __COMPILER_HAVE_LONGDOUBLE */
 #define _LONG_DOUBLE double
 #endif /* !__COMPILER_HAVE_LONGDOUBLE */

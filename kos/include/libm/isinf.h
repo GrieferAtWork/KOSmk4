@@ -76,6 +76,25 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
 }
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/*
+ * Written by J.T. Conklin <jtc@netbsd.org>.
+ * Change for long double by Jakub Jelinek <jj@ultra.linux.cz>
+ * Public domain.
+ */
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+(__LIBCCALL __ieee854_isinfl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
+	__int32_t __se, __hx, __lx;
+	__LIBM_GET_LDOUBLE_WORDS(__se, __hx, __lx, __x);
+	__lx |= (__hx & __UINT32_C(0x7fffffff)) | ((__se & 0x7fff) ^ 0x7fff);
+	__lx |= -__lx;
+	__se &= 0x8000;
+	return (int)(~(__lx >> 31) & (1 - (__se >> 14)));
+}
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
 __DECL_END
 #endif /* __CC__ */
 

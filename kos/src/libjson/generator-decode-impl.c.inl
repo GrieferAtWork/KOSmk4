@@ -153,7 +153,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 				float temp = (float)value;
 				memcpy(dst, &temp, sizeof(temp));
 			} else {
-				long double temp = (long double)value;
+				__LONGDOUBLE temp = (__LONGDOUBLE)value;
 				memcpy(dst, &temp, sizeof(temp));
 			}
 		}
@@ -194,7 +194,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 	}	break;
 
 	case JSON_TYPE_LDOUBLE: {
-		long double temp;
+		__LONGDOUBLE temp;
 		temp = 0.0L;
 		memcpy(dst, &temp, sizeof(temp));
 	}	break;

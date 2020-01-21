@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f0c6c05 */
+/* HASH CRC-32:0x9071fbab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #ifdef __std___localdep_wcstold_defined
 __NAMESPACE_STD_USING(__localdep_wcstold)
 #elif defined(__CRT_HAVE_wcstold)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep_wcstold,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstold,(__nptr,__endptr))
+__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_wcstold,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstold,(__nptr,__endptr))
 #else /* LIBC: wcstold */
 #include <local/wchar/wcstold.h>
 #define __localdep_wcstold (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstold))
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep
 #endif /* !____localdep_wcstold_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcstold_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) long double
+__LOCAL_LIBC(wcstold_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstold_l))(__WCHAR_TYPE__ const *__restrict __nptr,
                                                        __WCHAR_TYPE__ **__endptr,
                                                        __locale_t __locale) {

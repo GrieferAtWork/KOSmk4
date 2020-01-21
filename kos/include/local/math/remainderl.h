@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0aa1e50 */
+/* HASH CRC-32:0xf65c6e44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,11 +40,11 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, do
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return the remainder of integer divison X / Y with infinite precision */
-__LOCAL_LIBC(remainderl) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderl))(long double __x,
-                                                    long double __y) {
+__LOCAL_LIBC(remainderl) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderl))(__LONGDOUBLE __x,
+                                                    __LONGDOUBLE __y) {
 #line 853 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_remainder((double)__x, (double)__y);
+	return (__LONGDOUBLE)__localdep_remainder((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_remainder || __CRT_HAVE___remainder */

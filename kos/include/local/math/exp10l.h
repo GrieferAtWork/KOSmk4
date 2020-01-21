@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32fe151b */
+/* HASH CRC-32:0xa2d1c41b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,10 +40,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp10,(double __x),__exp1
 
 __NAMESPACE_LOCAL_BEGIN
 /* A function missing in all standards: compute exponent to base ten */
-__LOCAL_LIBC(exp10l) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp10l))(long double __x) {
+__LOCAL_LIBC(exp10l) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp10l))(__LONGDOUBLE __x) {
 #line 1292 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_exp10((double)__x);
+	return (__LONGDOUBLE)__localdep_exp10((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_exp10 || __CRT_HAVE___exp10 */

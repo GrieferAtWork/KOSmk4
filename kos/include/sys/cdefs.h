@@ -66,7 +66,7 @@
 #   define __CONCAT(x,y)   x##y
 #   define __STRING(x)     #x
 #   define __ptr_t         void *
-#   define __long_double_t long double
+#   define __long_double_t __LONGDOUBLE
 #ifdef __cplusplus
 #   define __BEGIN_DECLS extern "C" {
 #   define __END_DECLS   }

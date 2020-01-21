@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd53465b */
+/* HASH CRC-32:0x4c04f547 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,10 +41,10 @@ __CREDIRECT(__DECL_SIMD_cos __ATTR_WUNUSED,double,__NOTHROW,__localdep_cos,(doub
 
 __NAMESPACE_LOCAL_BEGIN
 /* Cosine of X */
-__LOCAL_LIBC(cosl) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cosl))(long double __x) {
+__LOCAL_LIBC(cosl) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cosl))(__LONGDOUBLE __x) {
 #line 213 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_cos((double)__x);
+	return (__LONGDOUBLE)__localdep_cos((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_cos || __CRT_HAVE___cos */

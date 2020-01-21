@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x648790e9 */
+/* HASH CRC-32:0xb5a5a2ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,9 +42,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return positive difference between X and Y */
-__LOCAL_LIBC(fdiml) __ATTR_CONST __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdiml))(long double __x,
-                                               long double __y) {
+__LOCAL_LIBC(fdiml) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdiml))(__LONGDOUBLE __x,
+                                               __LONGDOUBLE __y) {
 #line 940 "kos/src/libc/magic/math.c"
 	return __localdep_fabs(__y - __x);
 }

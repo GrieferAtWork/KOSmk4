@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9eb9cea2 */
+/* HASH CRC-32:0x708b421 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,10 +36,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_y0,(double __x),__y0,(__x
 #endif /* !____localdep_y0_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(y0l) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(y0l))(long double __x) {
-#line 1516 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_y0((double)__x);
+__LOCAL_LIBC(y0l) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(y0l))(__LONGDOUBLE __x) {
+#line 1522 "kos/src/libc/magic/math.c"
+	return (__LONGDOUBLE)__localdep_y0((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_y0 || __CRT_HAVE___y0 */

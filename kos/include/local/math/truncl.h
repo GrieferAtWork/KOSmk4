@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81164cba */
+/* HASH CRC-32:0xad4f219f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__LOCAL_LIBC(truncl) __ATTR_CONST __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(truncl))(long double __x) {
+__LOCAL_LIBC(truncl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(truncl))(__LONGDOUBLE __x) {
 #line 918 "kos/src/libc/magic/math.c"
-	return (long double)(__INTMAX_TYPE__)__x;
+	return (__LONGDOUBLE)(__INTMAX_TYPE__)__x;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_truncl_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65177454 */
+/* HASH CRC-32:0xe98a0ab1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,10 +40,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),__cosh,
 
 __NAMESPACE_LOCAL_BEGIN
 /* Hyperbolic cosine of X */
-__LOCAL_LIBC(coshl) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(coshl))(long double __x) {
+__LOCAL_LIBC(coshl) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(coshl))(__LONGDOUBLE __x) {
 #line 250 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_cosh((double)__x);
+	return (__LONGDOUBLE)__localdep_cosh((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_cosh || __CRT_HAVE___cosh */

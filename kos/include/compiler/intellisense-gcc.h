@@ -117,14 +117,6 @@ static_assert(sizeof(__UINT_FAST64_TYPE__) == __SIZEOF_FAST64_TYPE__, "WTF Intel
 
 
 #if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
-static_assert(sizeof(long double) == __SIZEOF_LONG_DOUBLE__, "WTF Intellisense?");
-#else
-#undef __SIZEOF_LONG_DOUBLE__
-#define __SIZEOF_LONG_DOUBLE__ __SIZEOF_DOUBLE__
-#endif
-
-
-#if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
 static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #else
 #undef __SIZEOF_WCHAR_T__
@@ -352,7 +344,7 @@ public:
 	operator char32_t() const throw();
 #endif /* _WCHAR_T_DEFINED || __GNUC__ */
 };
-}
+} /* namespace __intern */
 #define __INT128_TYPE__  ::__intern::__intellisense_int128
 #define __UINT128_TYPE__ ::__intern::__intellisense_uint128
 template<class __T> __T *operator+(__T *, __INT128_TYPE__ const &) throw();
@@ -434,6 +426,44 @@ template<class T, class S> typename ____INTELLISENSE_enableif<____INTELLISENSE_i
 #define __atomic_fetch_or           ::__intern::__intellisense_atomic_fetch_or
 #define __atomic_fetch_nand         ::__intern::__intellisense_atomic_fetch_nand
 
-}
+
+#if 0 /* How can Intellisense be this stupid? - I mean: this is linux 101! */
+static_assert(sizeof(long double) == __SIZEOF_LONG_DOUBLE__, "WTF Intellisense?");
+#elif 1
+
+#ifndef __SIZEOF_LONG_DOUBLE__
+#ifdef __i386__
+#define __SIZEOF_LONG_DOUBLE__ 12
+#elif defined(__x86_64__)
+#define __SIZEOF_LONG_DOUBLE__ 16
+#elif defined(__arm__)
+#define __SIZEOF_LONG_DOUBLE__ 8
+#else
+#define __SIZEOF_LONG_DOUBLE__ 12
+#endif
+#endif /* !__SIZEOF_LONG_DOUBLE__ */
+
+#define __LONGDOUBLE ::__intern::__intellisense_long_double
+#if __SIZEOF_LONG_DOUBLE__ == 12
+class __attribute__((__aligned__(16))) __intellisense_long_double
+#else /* __SIZEOF_LONG_DOUBLE__ == 12 */
+class __attribute__((__aligned__(__SIZEOF_LONG_DOUBLE__))) __intellisense_long_double
+#endif /* __SIZEOF_LONG_DOUBLE__ != 12 */
+{
+private:
+	unsigned char __ld_data[__SIZEOF_LONG_DOUBLE__];
+public:
+	/* TODO */
+
+
+};
+
+
+#else
+#undef __SIZEOF_LONG_DOUBLE__
+#define __SIZEOF_LONG_DOUBLE__ __SIZEOF_DOUBLE__
+#endif
+
+} /* namespace __intern */
 
 #endif /* !____INTELLISENSE_STDINC_SYNTAX_GCC_H */

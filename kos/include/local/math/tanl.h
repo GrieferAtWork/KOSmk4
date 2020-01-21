@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5469d969 */
+/* HASH CRC-32:0xaad1d732 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,10 +40,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_tan,(double __x),__tan,(_
 
 __NAMESPACE_LOCAL_BEGIN
 /* Tangent of X */
-__LOCAL_LIBC(tanl) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tanl))(long double __x) {
+__LOCAL_LIBC(tanl) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tanl))(__LONGDOUBLE __x) {
 #line 219 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_tan((double)__x);
+	return (__LONGDOUBLE)__localdep_tan((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_tan || __CRT_HAVE___tan */

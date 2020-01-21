@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1041f926 */
+/* HASH CRC-32:0x13ffb16c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,11 +40,11 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_drem,(double __x, double 
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return the remainder of X/Y */
-__LOCAL_LIBC(dreml) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(dreml))(long double __x,
-                                               long double __y) {
-#line 1406 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_drem((double)__x, (double)__y);
+__LOCAL_LIBC(dreml) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(dreml))(__LONGDOUBLE __x,
+                                               __LONGDOUBLE __y) {
+#line 1412 "kos/src/libc/magic/math.c"
+	return (__LONGDOUBLE)__localdep_drem((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_drem || __CRT_HAVE___drem */

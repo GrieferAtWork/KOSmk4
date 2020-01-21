@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c1752ed */
+/* HASH CRC-32:0x77cb8771 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,11 +49,11 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_fmod,(double __x, double 
 
 __NAMESPACE_LOCAL_BEGIN
 /* Floating-point modulo remainder of X/Y */
-__LOCAL_LIBC(fmodl) __ATTR_CONST __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmodl))(long double __x,
-                                               long double __y) {
+__LOCAL_LIBC(fmodl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmodl))(__LONGDOUBLE __x,
+                                               __LONGDOUBLE __y) {
 #line 665 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_fmod((double)__x, (double)__y);
+	return (__LONGDOUBLE)__localdep_fmod((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_fmod || __CRT_HAVE___fmod */

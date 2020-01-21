@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1f949f6 */
+/* HASH CRC-32:0x9727d6fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,14 +40,14 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_m
 
 __NAMESPACE_LOCAL_BEGIN
 /* Break VALUE into integral and fractional parts */
-__LOCAL_LIBC(modfl) __ATTR_NONNULL((2)) long double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modfl))(long double __x,
-                                                   long double *__iptr) {
+__LOCAL_LIBC(modfl) __ATTR_NONNULL((2)) __LONGDOUBLE
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modfl))(__LONGDOUBLE __x,
+                                                   __LONGDOUBLE *__iptr) {
 #line 376 "kos/src/libc/magic/math.c"
 	double __ipart;
-	long double __result;
-	__result = (long double)__localdep_modf(__x, &__ipart);
-	*__iptr  = (long double)__ipart;
+	__LONGDOUBLE __result;
+	__result = (__LONGDOUBLE)__localdep_modf(__x, &__ipart);
+	*__iptr  = (__LONGDOUBLE)__ipart;
 	return __result;
 }
 __NAMESPACE_LOCAL_END

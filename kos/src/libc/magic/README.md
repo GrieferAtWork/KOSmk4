@@ -141,7 +141,7 @@ strchr:(char const *s, int c) -> char *
 		  Copy from `name`, but convert `double` to `float` (used for functions from `<math.h>`).  
 		  When `name` is `%auto`, strip a trailing `f` from the function name (`powf` derives from `pow`)
 		- `foo:() %{copy(name, double2ldouble)}`  
-		  Copy from `name`, but convert `double` to `long double` (used for functions from `<math.h>`).  
+		  Copy from `name`, but convert `double` to `__LONGDOUBLE` (used for functions from `<math.h>`).  
 		  When `name` is `%auto`, strip a trailing `l` from the function name (`powl` derives from `pow`)
 		- `foo:() %{uchar}`, `foo:() %{uchar16}`, `foo:() %{uchar32}`, `foo:() %{uchar(base)}`, `foo:() %{uchar16(base)}`, `foo:() %{uchar32(base)}`  
 		  Declare the 16- or 32-bit uchar-variant of a wchar function  

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc51a9cdd */
+/* HASH CRC-32:0x8e64ed67 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NO
 __NAMESPACE_LOCAL_BEGIN
 #include <hybrid/floatcore.h>
 __LOCAL_LIBC(qgcvt) __ATTR_NONNULL((3)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qgcvt))(long double __val,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qgcvt))(__LONGDOUBLE __val,
                                                    int __ndigit,
                                                    char *__buf) {
 #line 1193 "kos/src/libc/magic/stdlib.c"

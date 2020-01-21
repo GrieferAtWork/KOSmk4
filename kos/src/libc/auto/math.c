@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e959089 */
+/* HASH CRC-32:0xa434db97 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,27 +84,27 @@ NOTHROW(LIBCCALL libc_floorf)(float x) {
 #include <hybrid/typecore.h>
 /* Smallest integral value not less than X */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceill") long double
-NOTHROW(LIBCCALL libc_ceill)(long double x) {
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceill") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_ceill)(__LONGDOUBLE x) {
 #line 570 "kos/src/libc/magic/math.c"
-	long double result;
-	result = (long double)(__INTMAX_TYPE__)x; /* Round towards 0 */
+	__LONGDOUBLE result;
+	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result < x)
 		result += 1.0;
-	return (long double)result;
+	return (__LONGDOUBLE)result;
 }
 
 #include <hybrid/typecore.h>
 /* Largest integer not greater than X */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floorl") long double
-NOTHROW(LIBCCALL libc_floorl)(long double x) {
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floorl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_floorl)(__LONGDOUBLE x) {
 #line 594 "kos/src/libc/magic/math.c"
-	long double result;
-	result = (long double)(__INTMAX_TYPE__)x; /* Round towards 0 */
+	__LONGDOUBLE result;
+	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x; /* Round towards 0 */
 	if (result > x)
 		result -= 1.0;
-	return (long double)result;
+	return (__LONGDOUBLE)result;
 }
 
 #include <bits/nan.h>
@@ -130,11 +130,11 @@ NOTHROW(LIBCCALL libc_nanf)(char const *tagb) {
 #include <bits/nan.h>
 /* Return representation of qNaN for double type */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nanl") long double
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nanl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_nanl)(char const *tagb) {
 #line 689 "kos/src/libc/magic/math.c"
 	(void)tagb;
-	return (long double)NAN;
+	return (__LONGDOUBLE)NAN;
 }
 
 #include <hybrid/typecore.h>
@@ -288,11 +288,11 @@ NOTHROW(LIBCCALL libc_llroundf)(float x) {
 #include <hybrid/typecore.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundl") long double
-NOTHROW(LIBCCALL libc_roundl)(long double x) {
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x) {
 #line 899 "kos/src/libc/magic/math.c"
-	long double result;
-	result = (long double)(__INTMAX_TYPE__)x;
+	__LONGDOUBLE result;
+	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x;
 	if (x < 0) {
 		/* result >= x */
 		if ((result - x) >= 0.5)
@@ -309,44 +309,44 @@ NOTHROW(LIBCCALL libc_roundl)(long double x) {
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncl") long double
-NOTHROW(LIBCCALL libc_truncl)(long double x) {
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x) {
 #line 918 "kos/src/libc/magic/math.c"
-	return (long double)(__INTMAX_TYPE__)x;
+	return (__LONGDOUBLE)(__INTMAX_TYPE__)x;
 }
 
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundl") long int
-NOTHROW(LIBCCALL libc_lroundl)(long double x) {
+NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x) {
 #line 934 "kos/src/libc/magic/math.c"
 	return (long int)libc_roundl(x);
 }
 
 /* Return maximum numeric value from X and Y */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaxl") long double
-NOTHROW(LIBCCALL libc_fmaxl)(long double x,
-                             long double y) {
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaxl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_fmaxl)(__LONGDOUBLE x,
+                             __LONGDOUBLE y) {
 #line 946 "kos/src/libc/magic/math.c"
 	return x < y ? y : x;
 }
 
 /* Return minimum numeric value from X and Y */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fminl") long double
-NOTHROW(LIBCCALL libc_fminl)(long double x,
-                             long double y) {
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fminl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_fminl)(__LONGDOUBLE x,
+                             __LONGDOUBLE y) {
 #line 952 "kos/src/libc/magic/math.c"
 	return x < y ? x : y;
 }
 
 /* Multiply-add function computed as a ternary operation */
 INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmal") long double
-NOTHROW(LIBCCALL libc_fmal)(long double x,
-                            long double y,
-                            long double z) {
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmal") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE x,
+                            __LONGDOUBLE y,
+                            __LONGDOUBLE z) {
 #line 958 "kos/src/libc/magic/math.c"
 	return (x * y) + z;
 }
@@ -354,7 +354,7 @@ NOTHROW(LIBCCALL libc_fmal)(long double x,
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundl") __LONGLONG
-NOTHROW(LIBCCALL libc_llroundl)(long double x) {
+NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x) {
 #line 969 "kos/src/libc/magic/math.c"
 	return (__LONGLONG)libc_roundl(x);
 }
@@ -362,21 +362,21 @@ NOTHROW(LIBCCALL libc_llroundl)(long double x) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbit") int
 NOTHROW(LIBCCALL libc___signbit)(double x) {
-#line 1966 "kos/src/libc/magic/math.c"
+#line 1972 "kos/src/libc/magic/math.c"
 	return x < 0.0;
 }
 
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitf") int
 NOTHROW(LIBCCALL libc___signbitf)(float x) {
-#line 1974 "kos/src/libc/magic/math.c"
+#line 1980 "kos/src/libc/magic/math.c"
 	return x < 0.0f;
 }
 
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitl") int
-NOTHROW(LIBCCALL libc___signbitl)(long double x) {
-#line 1982 "kos/src/libc/magic/math.c"
+NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x) {
+#line 1988 "kos/src/libc/magic/math.c"
 	return x < 0.0L;
 }
 

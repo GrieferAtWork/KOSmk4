@@ -710,7 +710,7 @@ wcstof:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr) -
 	%{copy(%auto, str2wcs)}
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][guard][std_guard][ATTR_PURE][wchar]
-wcstold:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr) -> long double
+wcstold:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr) -> __LONGDOUBLE
 	%{copy(%auto, str2wcs)}
 %(std,c,compat)#endif /* !__NO_FPU */
 %(std)#endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -1015,7 +1015,7 @@ wcstod_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr,
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [alias(_wcstold_l)][ATTR_PURE][ATTR_WUNUSED][wchar][export_alias(_wcstold_l, __wcstold_l)]
 [section({.text.crt.wchar.unicode.locale.convert|.text.crt.dos.wchar.unicode.locale.convert})]
-wcstold_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, $locale_t locale) -> long double %{copy(%auto, str2wcs)}
+wcstold_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr, $locale_t locale) -> __LONGDOUBLE %{copy(%auto, str2wcs)}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 

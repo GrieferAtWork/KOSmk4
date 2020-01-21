@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2254123e */
+/* HASH CRC-32:0x4f2e5914 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1097,7 +1097,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstof)(char16_t const *__restrict nptr,
 }
 
 INTERN ATTR_PURE NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstold") long double
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.convert.wcstold") __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_wcstold)(char32_t const *__restrict nptr,
                                    char32_t **endptr) {
 #line 932 "kos/src/libc/magic/stdlib.c"
@@ -1108,7 +1108,7 @@ NOTHROW_NCX(LIBCCALL libc_wcstold)(char32_t const *__restrict nptr,
 	return 0;
 }
 INTERN ATTR_PURE NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstold") long double
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert.wcstold") __LONGDOUBLE
 NOTHROW_NCX(LIBDCALL libd_wcstold)(char16_t const *__restrict nptr,
                                    char16_t **endptr) {
 #line 932 "kos/src/libc/magic/stdlib.c"
@@ -1593,7 +1593,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstod_l)(char16_t const *__restrict nptr,
 }
 
 INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.locale.convert.wcstold_l") long double
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.locale.convert.wcstold_l") __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_wcstold_l)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      locale_t locale) {
@@ -1602,7 +1602,7 @@ NOTHROW_NCX(LIBCCALL libc_wcstold_l)(char32_t const *__restrict nptr,
 	return libc_wcstold(nptr, endptr);
 }
 INTERN ATTR_PURE WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert.wcstold_l") long double
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.convert.wcstold_l") __LONGDOUBLE
 NOTHROW_NCX(LIBDCALL libd_wcstold_l)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      locale_t locale) {

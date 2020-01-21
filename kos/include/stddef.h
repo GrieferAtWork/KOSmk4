@@ -51,7 +51,7 @@ __NAMESPACE_STD_USING(max_align_t)
 __SYSDECL_BEGIN
 
 #ifndef __MAX_ALIGN_TYPE__
-#define __MAX_ALIGN_TYPE__ long double
+#define __MAX_ALIGN_TYPE__ __LONGDOUBLE
 #endif /* !__MAX_ALIGN_TYPE__ */
 
 #ifdef __CC__

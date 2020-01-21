@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3c8c788 */
+/* HASH CRC-32:0xc256ffe7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 #ifdef __std___localdep_strtold_defined
 __NAMESPACE_STD_USING(__localdep_strtold)
 #elif defined(__CRT_HAVE_strtold)
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtold,(__nptr,__endptr))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtold,(__nptr,__endptr))
 #elif defined(__CRT_HAVE_strtod) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
+__CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__LONGDOUBLE,__NOTHROW_NCX,__localdep_strtold,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
 #else /* LIBC: strtold */
 #include <local/stdlib/strtold.h>
 #define __localdep_strtold (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtold))
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep
 #endif /* !____localdep_strtold_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strtold_l) __ATTR_NONNULL((1)) long double
+__LOCAL_LIBC(strtold_l) __ATTR_NONNULL((1)) __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtold_l))(char const *__restrict __nptr,
                                                        char **__endptr,
                                                        __locale_t __locale) {

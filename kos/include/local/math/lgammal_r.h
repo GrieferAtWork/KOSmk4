@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5221115 */
+/* HASH CRC-32:0xd4ae61b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,11 +48,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Reentrant version of lgamma. This function uses the global variable
  * `signgam'. The reentrant version instead takes a pointer and stores
  * the value through it */
-__LOCAL_LIBC(lgammal_r) __ATTR_WUNUSED long double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgammal_r))(long double __x,
+__LOCAL_LIBC(lgammal_r) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgammal_r))(__LONGDOUBLE __x,
                                                        int *__signgamp) {
-#line 1554 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_lgamma_r((double)__x, __signgamp);
+#line 1560 "kos/src/libc/magic/math.c"
+	return (__LONGDOUBLE)__localdep_lgamma_r((double)__x, __signgamp);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_lgamma_r || __CRT_HAVE___lgamma_r */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58027822 */
+/* HASH CRC-32:0xa46741e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,12 +48,12 @@ __NAMESPACE_LOCAL_BEGIN
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
-__LOCAL_LIBC(remquol) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remquol))(long double __x,
-                                                 long double __y,
+__LOCAL_LIBC(remquol) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remquol))(__LONGDOUBLE __x,
+                                                 __LONGDOUBLE __y,
                                                  int *__pquo) {
 #line 1059 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_remquo((double)__x, (double)__y, __pquo);
+	return (__LONGDOUBLE)__localdep_remquo((double)__x, (double)__y, __pquo);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_remquo || __CRT_HAVE___remquo */

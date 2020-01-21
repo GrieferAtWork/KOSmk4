@@ -671,9 +671,9 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL abs)(double
 #endif /* !__builtin_fabs || !__LIBC_BIND_CRTBUILTINS || !__CRT_HAVE_fabs */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_fabsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL abs)(long double __x) { return __builtin_fabsl(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __LONGDOUBLE __NOTHROW(__LIBCCALL abs)(__LONGDOUBLE __x) { return __builtin_fabsl(__x); }
 #else /* __builtin_fabsl && __LIBC_BIND_CRTBUILTINS && __CRT_HAVE_fabsl */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL abs)(long double __x) { return __x < 0 ? -__x : __x; }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __LONGDOUBLE __NOTHROW(__LIBCCALL abs)(__LONGDOUBLE __x) { return __x < 0 ? -__x : __x; }
 #endif /* !__builtin_fabsl || !__LIBC_BIND_CRTBUILTINS || !__CRT_HAVE_fabsl */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifdef __COMPILER_HAVE_FLOAT128
@@ -928,7 +928,7 @@ strtof:([nonnull] char const *__restrict nptr, char **endptr) -> float {
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std_guard][std][ATTR_LEAF]
 [alt_variant_of(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod)]
-strtold:([nonnull] char const *__restrict nptr, char **endptr) -> long double {
+strtold:([nonnull] char const *__restrict nptr, char **endptr) -> __LONGDOUBLE {
 	/* TODO */
 	COMPILER_IMPURE();
 	if (endptr)
@@ -1189,7 +1189,7 @@ fcvt_r:(double val, int ndigit,
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [impl_include(<hybrid/floatcore.h>)]
 [if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(_gcvt)]
-qgcvt:(long double val, int ndigit, [nonnull] char *buf) -> char * {
+qgcvt:(__LONGDOUBLE val, int ndigit, [nonnull] char *buf) -> char * {
 #ifndef LDBG_NDIGIT_MAX
 #if @__LDBL_MANT_DIG__@ == 53
 #define LDBG_NDIGIT_MAX 17
@@ -1208,7 +1208,7 @@ qgcvt:(long double val, int ndigit, [nonnull] char *buf) -> char * {
 	return buf;
 }
 
-qecvt_r:(long double val, int ndigit,
+qecvt_r:(__LONGDOUBLE val, int ndigit,
          [nonnull] int *__restrict decptr,
          [nonnull] int *__restrict sign,
          [nonnull] char *__restrict buf, $size_t len) -> int {
@@ -1227,7 +1227,7 @@ qecvt_r:(long double val, int ndigit,
 #endif
 }
 
-qfcvt_r:(long double val, int ndigit,
+qfcvt_r:(__LONGDOUBLE val, int ndigit,
          [nonnull] int *__restrict decptr,
          [nonnull] int *__restrict sign,
          [nonnull] char *__restrict buf, $size_t len) -> int {
@@ -1258,7 +1258,7 @@ __NAMESPACE_LOCAL_END
 
 [dependency_prefix(DEFINE_QCVT_BUFFER)]
 [ATTR_WUNUSED][alias(_ecvt)]
-qecvt:(long double val, int ndigit,
+qecvt:(__LONGDOUBLE val, int ndigit,
        [nonnull] int *__restrict decptr,
        [nonnull] int *__restrict sign) -> char * {
 	if (qecvt_r(val, ndigit, decptr, sign, @__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@, sizeof(@__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@)))
@@ -1268,7 +1268,7 @@ qecvt:(long double val, int ndigit,
 
 [dependency_prefix(DEFINE_QCVT_BUFFER)]
 [ATTR_WUNUSED][alias(_fcvt)]
-qfcvt:(long double val, int ndigit,
+qfcvt:(__LONGDOUBLE val, int ndigit,
        [nonnull] int *__restrict decptr,
        [nonnull] int *__restrict sign) -> char * {
 	if (qfcvt_r(val, ndigit, decptr, sign, @__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@, sizeof(@__NAMESPACE_LOCAL_SYM@ @__qcvt_buffer@)))
@@ -1679,7 +1679,7 @@ strtof_l:([nonnull] char const *__restrict nptr,
 [alt_variant_of(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod_l)]
 [if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(_strtod_l)]
 strtold_l:([nonnull] char const *__restrict nptr,
-           char **endptr, $locale_t locale) -> long double {
+           char **endptr, $locale_t locale) -> __LONGDOUBLE {
 	(void)locale;
 	return strtold(nptr, endptr);
 }
@@ -2782,7 +2782,7 @@ _atodbl_l:([nonnull] double *__restrict result,
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [requires_include(<hybrid/typecore.h>)]
 [if(__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias(_atodbl)]
-_atoldbl:([nonnull] long double *__restrict result,
+_atoldbl:([nonnull] __LONGDOUBLE *__restrict result,
           [nonnull] char __KOS_FIXED_CONST *__restrict nptr) -> int {
 	*result = strtold(nptr, NULL);
 	return 0;
@@ -2790,7 +2790,7 @@ _atoldbl:([nonnull] long double *__restrict result,
 
 [requires_include(<hybrid/typecore.h>)]
 [if(__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias(_atodbl_l)]
-_atoldbl_l:([nonnull] long double *__restrict result,
+_atoldbl_l:([nonnull] __LONGDOUBLE *__restrict result,
             [nonnull] char __KOS_FIXED_CONST *__restrict nptr, $locale_t locale) -> int {
 	*result = strtold_l(nptr, NULL, locale);
 	return 0;

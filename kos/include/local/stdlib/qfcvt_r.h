@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa822486e */
+/* HASH CRC-32:0xca68f62f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 5, 6)),__errno_t,__NOTHROW_NCX,__localdep_dos_fcv
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(qfcvt_r) __ATTR_NONNULL((3, 4, 5)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt_r))(long double __val,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt_r))(__LONGDOUBLE __val,
                                                      int __ndigit,
                                                      int *__restrict __decptr,
                                                      int *__restrict __sign,

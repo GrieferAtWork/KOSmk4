@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0bd14a2 */
+/* HASH CRC-32:0x448497a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,10 +40,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp2,(double __x),__exp2,
 
 __NAMESPACE_LOCAL_BEGIN
 /* Compute base-2 exponential of X */
-__LOCAL_LIBC(exp2l) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp2l))(long double __x) {
+__LOCAL_LIBC(exp2l) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(exp2l))(__LONGDOUBLE __x) {
 #line 443 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_exp2((double)__x);
+	return (__LONGDOUBLE)__localdep_exp2((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_exp2 || __CRT_HAVE___exp2 */

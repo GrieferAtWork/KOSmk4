@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf35d2ced */
+/* HASH CRC-32:0xbd67e473 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,10 +40,10 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_asinh,(double __x),__asin
 
 __NAMESPACE_LOCAL_BEGIN
 /* Hyperbolic arc sine of X */
-__LOCAL_LIBC(asinhl) __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(asinhl))(long double __x) {
+__LOCAL_LIBC(asinhl) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(asinhl))(__LONGDOUBLE __x) {
 #line 290 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_asinh((double)__x);
+	return (__LONGDOUBLE)__localdep_asinh((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_asinh || __CRT_HAVE___asinh */

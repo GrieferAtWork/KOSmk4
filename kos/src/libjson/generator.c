@@ -154,7 +154,7 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 	}	break;
 
 	case JSON_TYPE_LDOUBLE: {
-		long double value;
+		__LONGDOUBLE value;
 		memcpy(&value, src, sizeof(value));
 		result = libjson_writer_putfloat(writer, (double)value);
 	}	break;

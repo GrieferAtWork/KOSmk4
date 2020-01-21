@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16e6ba73 */
+/* HASH CRC-32:0x6ba47cf9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_wcstold_defined
 #define __local_wcstold_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcstold) __ATTR_PURE __ATTR_NONNULL((1)) long double
+__LOCAL_LIBC(wcstold) __ATTR_PURE __ATTR_NONNULL((1)) __LONGDOUBLE
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstold))(__WCHAR_TYPE__ const *__restrict __nptr,
                                                      __WCHAR_TYPE__ **__endptr) {
 #line 932 "kos/src/libc/magic/stdlib.c"

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2965257c */
+/* HASH CRC-32:0xe71ac965 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,10 +42,10 @@ __CREDIRECT(__DECL_SIMD_log __ATTR_WUNUSED,double,__NOTHROW,__localdep_log,(doub
 
 __NAMESPACE_LOCAL_BEGIN
 /* Natural logarithm of X */
-__LOCAL_LIBC(logl) __DECL_SIMD_logl __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logl))(long double __x) {
+__LOCAL_LIBC(logl) __DECL_SIMD_logl __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logl))(__LONGDOUBLE __x) {
 #line 367 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_log((double)__x);
+	return (__LONGDOUBLE)__localdep_log((double)__x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_log || __CRT_HAVE___log */

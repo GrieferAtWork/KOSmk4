@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x558a90e8 */
+/* HASH CRC-32:0x34515085 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,22 +25,22 @@
 #ifndef ____localdep_nexttoward_defined
 #define ____localdep_nexttoward_defined 1
 #if __has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_nexttoward)(double __x, long double __y) { return __builtin_nexttoward(__x, __y); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_nexttoward)(double __x, __LONGDOUBLE __y) { return __builtin_nexttoward(__x, __y); }
 #elif defined(__CRT_HAVE_nexttoward)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nexttoward,(double __x, long double __y),nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nexttoward,(double __x, __LONGDOUBLE __y),nexttoward,(__x,__y))
 #elif defined(__CRT_HAVE___nexttoward)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nexttoward,(double __x, long double __y),__nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nexttoward,(double __x, __LONGDOUBLE __y),__nexttoward,(__x,__y))
 #else /* LIBC: nexttoward */
 #undef ____localdep_nexttoward_defined
 #endif /* nexttoward... */
 #endif /* !____localdep_nexttoward_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(nexttowardl) __ATTR_CONST __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nexttowardl))(long double __x,
-                                                     long double __y) {
+__LOCAL_LIBC(nexttowardl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nexttowardl))(__LONGDOUBLE __x,
+                                                     __LONGDOUBLE __y) {
 #line 1040 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_nexttoward((double)__x, (double)__y);
+	return (__LONGDOUBLE)__localdep_nexttoward((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_nexttoward || __CRT_HAVE___nexttoward */

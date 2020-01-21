@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fb587e3 */
+/* HASH CRC-32:0xc68ac87c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,14 +23,14 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Smallest integral value not less than X */
-__LOCAL_LIBC(ceill) __ATTR_CONST __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ceill))(long double __x) {
+__LOCAL_LIBC(ceill) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ceill))(__LONGDOUBLE __x) {
 #line 570 "kos/src/libc/magic/math.c"
-	long double __result;
-	__result = (long double)(__INTMAX_TYPE__)__x; /* Round towards 0 */
+	__LONGDOUBLE __result;
+	__result = (__LONGDOUBLE)(__INTMAX_TYPE__)__x; /* Round towards 0 */
 	if (__result < __x)
 		__result += 1.0;
-	return (long double)__result;
+	return (__LONGDOUBLE)__result;
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_ceill_defined */

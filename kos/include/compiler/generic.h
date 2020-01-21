@@ -111,6 +111,9 @@
 #define __COMPILER_HAVE_LONGLONG 1
 #endif /* long long... */
 #define __COMPILER_HAVE_LONGDOUBLE 1
+#ifndef __LONGDOUBLE
+#define __LONGDOUBLE long double
+#endif /* !__LONGDOUBLE */
 #define __COMPILER_HAVE_TRANSPARENT_STRUCT 1
 #define __COMPILER_HAVE_TRANSPARENT_UNION 1
 

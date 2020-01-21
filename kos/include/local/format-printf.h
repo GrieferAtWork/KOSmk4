@@ -1221,7 +1221,7 @@ __err_vinfo:
 	case 'g': case 'G':
 	{
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#define __USED_FLOAT_TYPE  long double
+#define __USED_FLOAT_TYPE  __LONGDOUBLE
 #else /* __COMPILER_HAVE_LONGDOUBLE */
 #define __USED_FLOAT_TYPE  double
 #endif /* !__COMPILER_HAVE_LONGDOUBLE */

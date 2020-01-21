@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fb60b36 */
+/* HASH CRC-32:0xe8bad6e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,11 +40,11 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_frexp,(double __x, in
 
 __NAMESPACE_LOCAL_BEGIN
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__LOCAL_LIBC(frexpl) __ATTR_WUNUSED long double
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpl))(long double __x,
+__LOCAL_LIBC(frexpl) __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpl))(__LONGDOUBLE __x,
                                                     int *__pexponent) {
 #line 360 "kos/src/libc/magic/math.c"
-	return (long double)__localdep_frexp((double)__x, __pexponent);
+	return (__LONGDOUBLE)__localdep_frexp((double)__x, __pexponent);
 }
 __NAMESPACE_LOCAL_END
 #endif /* __CRT_HAVE_frexp || __CRT_HAVE___frexp */

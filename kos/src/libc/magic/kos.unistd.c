@@ -371,7 +371,7 @@ PWrite64:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, pos64_t offset) -
 PReadAll32:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, $pos32_t offset) -> size_t = PReadAll?;
 
 [throws][doc_alias(preadall64)]
-[off64_variant_of(preadall)][cp][requires($has_function(PRead64))]
+[off64_variant_of(PReadAll)][cp][requires($has_function(PRead64))]
 [section(.text.crt.except.io.large.read)]
 PReadAll64:($fd_t fd, [inp(bufsize)] void *buf, size_t bufsize, pos64_t offset) -> size_t {
 	size_t result, temp;

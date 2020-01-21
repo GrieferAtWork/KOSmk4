@@ -208,6 +208,9 @@
 #endif /* __has_feature(__tpp_pragma_deprecated__) */
 #ifdef __CC__
 #define __COMPILER_HAVE_LONGDOUBLE 1
+#ifndef __LONGDOUBLE
+#define __LONGDOUBLE long double
+#endif /* !__LONGDOUBLE */
 #define __COMPILER_HAVE_GCC_ASM 1
 #define __COMPILER_HAVE_REGISTER_VARS 1
 #define __COMPILER_HAVE_PRAGMA_PACK 1

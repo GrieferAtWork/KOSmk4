@@ -451,11 +451,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.io.read.PReadAll") size_t
 }
 /*[[[end:PReadAll]]]*/
 
-/*[[[head:PReadAll64,hash:CRC-32=0xbce3330a]]]*/
+/*[[[head:PReadAll64,hash:CRC-32=0x25e9c92b]]]*/
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_PReadAll64, libc_preadall);
+DEFINE_INTERN_ALIAS(libc_PReadAll64, libc_PReadAll);
 #else
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.io.large.read.PReadAll64") size_t

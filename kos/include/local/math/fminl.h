@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14aa85b7 */
+/* HASH CRC-32:0xd0502135 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,9 @@
 #define __local_fminl_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Return minimum numeric value from X and Y */
-__LOCAL_LIBC(fminl) __ATTR_CONST __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fminl))(long double __x,
-                                               long double __y) {
+__LOCAL_LIBC(fminl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fminl))(__LONGDOUBLE __x,
+                                               __LONGDOUBLE __y) {
 #line 952 "kos/src/libc/magic/math.c"
 	return __x < __y ? __x : __y;
 }

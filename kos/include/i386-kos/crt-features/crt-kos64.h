@@ -2827,6 +2827,7 @@
 #define __CRT_HAVE_PRead 1
 #define __CRT_HAVE_PRead64 1
 #define __CRT_HAVE_PReadAll 1
+#define __CRT_HAVE_PReadAll64 1
 #define __CRT_HAVE_PValloc 1
 #define __CRT_HAVE_PWrite 1
 #define __CRT_HAVE_PWrite64 1
