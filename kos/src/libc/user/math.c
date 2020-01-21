@@ -33,6 +33,7 @@
 #include <libm/fmod.h>
 #include <libm/isinf.h>
 #include <libm/isnan.h>
+#include <libm/nextafter.h>
 #include <libm/pow.h>
 #include <libm/rint.h>
 #include <libm/scalb.h>
@@ -1323,12 +1324,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nextafter") double
 NOTHROW(LIBCCALL libc_nextafter)(double x,
                                  double y)
 /*[[[body:nextafter]]]*/
-{
-	(void)x;
-	(void)y;
-	CRT_UNIMPLEMENTED("nextafter"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
 }
 /*[[[end:nextafter]]]*/
 
@@ -1385,7 +1386,11 @@ NOTHROW(LIBCCALL libc_nextafterf)(float x,
                                   float y)
 /*[[[body:nextafterf]]]*/
 /*AUTO*/{
-	return (float)libc_nextafter((double)x, (double)y);
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (double)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (double)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 /*[[[end:nextafterf]]]*/
 
@@ -1505,20 +1510,6 @@ NOTHROW(LIBCCALL libc_scalbln)(double x,
 }
 /*[[[end:scalbln]]]*/
 
-/*[[[head:nearbyint,hash:CRC-32=0x2322fd6e]]]*/
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nearbyint") double
-NOTHROW(LIBCCALL libc_nearbyint)(double x)
-/*[[[body:nearbyint]]]*/
-{
-	(void)x;
-	CRT_UNIMPLEMENTED("nearbyint"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:nearbyint]]]*/
 
 /*[[[head:remquo,hash:CRC-32=0xd01fffc4]]]*/
 /* Compute remainder of X and Y and put in *QUO a value with sign
@@ -1615,17 +1606,6 @@ NOTHROW(LIBCCALL libc_scalblnf)(float x,
 }
 /*[[[end:scalblnf]]]*/
 
-/*[[[head:nearbyintf,hash:CRC-32=0x7207853c]]]*/
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nearbyintf") float
-NOTHROW(LIBCCALL libc_nearbyintf)(float x)
-/*[[[body:nearbyintf]]]*/
-/*AUTO*/{
-	return (float)libc_nearbyint((double)x);
-}
-/*[[[end:nearbyintf]]]*/
 
 /*[[[head:remquof,hash:CRC-32=0x4f335ffe]]]*/
 /* Compute remainder of X and Y and put in *QUO a value with sign
@@ -1703,17 +1683,6 @@ NOTHROW(LIBCCALL libc_scalblnl)(long double x,
 }
 /*[[[end:scalblnl]]]*/
 
-/*[[[head:nearbyintl,hash:CRC-32=0x34907788]]]*/
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nearbyintl") long double
-NOTHROW(LIBCCALL libc_nearbyintl)(long double x)
-/*[[[body:nearbyintl]]]*/
-/*AUTO*/{
-	return (long double)libc_nearbyint((double)x);
-}
-/*[[[end:nearbyintl]]]*/
 
 /*[[[head:remquol,hash:CRC-32=0x2a8287b2]]]*/
 /* Compute remainder of X and Y and put in *QUO a value with sign
@@ -1793,11 +1762,8 @@ INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.pow10") double
 NOTHROW(LIBCCALL libc_pow10)(double x)
 /*[[[body:pow10]]]*/
-{
-	(void)x;
-	CRT_UNIMPLEMENTED("pow10"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+	return libc_pow(10.0, x);
 }
 /*[[[end:pow10]]]*/
 
@@ -1828,14 +1794,13 @@ NOTHROW(LIBCCALL libc_exp10f)(float x)
 }
 /*[[[end:exp10f]]]*/
 
-/*[[[head:pow10f,hash:CRC-32=0x275c376f]]]*/
-/* Another name occasionally used */
+/*[[[head:pow10f,hash:CRC-32=0xdf47fc1a]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.pow10f") float
 NOTHROW(LIBCCALL libc_pow10f)(float x)
 /*[[[body:pow10f]]]*/
 /*AUTO*/{
-	return (float)libc_pow10((double)x);
+	return libc_powf(10.0f, x);
 }
 /*[[[end:pow10f]]]*/
 
@@ -2631,7 +2596,7 @@ NOTHROW(LIBCCALL libc_isnanl)(long double x)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x710b289b]]]*/
+/*[[[start:exports,hash:CRC-32=0x3b76993f]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(__acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(asin, libc_asin);
@@ -2851,6 +2816,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(__tgammaf, libc_tgammaf);
 DEFINE_PUBLIC_WEAK_ALIAS(tgammal, libc_tgammal);
 DEFINE_PUBLIC_WEAK_ALIAS(__tgammal, libc_tgammal);
 DEFINE_PUBLIC_WEAK_ALIAS(rint, libc_rint);
+DEFINE_PUBLIC_WEAK_ALIAS(nearbyint, libc_rint);
 DEFINE_PUBLIC_WEAK_ALIAS(__rint, libc_rint);
 DEFINE_PUBLIC_WEAK_ALIAS(nextafter, libc_nextafter);
 DEFINE_PUBLIC_WEAK_ALIAS(_nextafter, libc_nextafter);
@@ -2860,6 +2826,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(__remainder, libc_remainder);
 DEFINE_PUBLIC_WEAK_ALIAS(ilogb, libc_ilogb);
 DEFINE_PUBLIC_WEAK_ALIAS(__ilogb, libc_ilogb);
 DEFINE_PUBLIC_WEAK_ALIAS(rintf, libc_rintf);
+DEFINE_PUBLIC_WEAK_ALIAS(nearbyintf, libc_rintf);
 DEFINE_PUBLIC_WEAK_ALIAS(__rintf, libc_rintf);
 DEFINE_PUBLIC_WEAK_ALIAS(nextafterf, libc_nextafterf);
 DEFINE_PUBLIC_WEAK_ALIAS(__nextafterf, libc_nextafterf);
@@ -2868,6 +2835,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(__remainderf, libc_remainderf);
 DEFINE_PUBLIC_WEAK_ALIAS(ilogbf, libc_ilogbf);
 DEFINE_PUBLIC_WEAK_ALIAS(__ilogbf, libc_ilogbf);
 DEFINE_PUBLIC_WEAK_ALIAS(rintl, libc_rintl);
+DEFINE_PUBLIC_WEAK_ALIAS(nearbyintl, libc_rintl);
 DEFINE_PUBLIC_WEAK_ALIAS(__rintl, libc_rintl);
 DEFINE_PUBLIC_WEAK_ALIAS(nextafterl, libc_nextafterl);
 DEFINE_PUBLIC_WEAK_ALIAS(__nextafterl, libc_nextafterl);
@@ -2881,8 +2849,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(scalbn, libc_scalbn);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbn, libc_scalbn);
 DEFINE_PUBLIC_WEAK_ALIAS(scalbln, libc_scalbln);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbln, libc_scalbln);
-DEFINE_PUBLIC_WEAK_ALIAS(nearbyint, libc_nearbyint);
-DEFINE_PUBLIC_WEAK_ALIAS(__nearbyint, libc_nearbyint);
 DEFINE_PUBLIC_WEAK_ALIAS(remquo, libc_remquo);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquo, libc_remquo);
 DEFINE_PUBLIC_WEAK_ALIAS(lrint, libc_lrint);
@@ -2897,8 +2863,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(scalbnf, libc_scalbnf);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbnf, libc_scalbnf);
 DEFINE_PUBLIC_WEAK_ALIAS(scalblnf, libc_scalblnf);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalblnf, libc_scalblnf);
-DEFINE_PUBLIC_WEAK_ALIAS(nearbyintf, libc_nearbyintf);
-DEFINE_PUBLIC_WEAK_ALIAS(__nearbyintf, libc_nearbyintf);
 DEFINE_PUBLIC_WEAK_ALIAS(remquof, libc_remquof);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquof, libc_remquof);
 DEFINE_PUBLIC_WEAK_ALIAS(lrintf, libc_lrintf);
@@ -2913,8 +2877,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(scalbnl, libc_scalbnl);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbnl, libc_scalbnl);
 DEFINE_PUBLIC_WEAK_ALIAS(scalblnl, libc_scalblnl);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalblnl, libc_scalblnl);
-DEFINE_PUBLIC_WEAK_ALIAS(nearbyintl, libc_nearbyintl);
-DEFINE_PUBLIC_WEAK_ALIAS(__nearbyintl, libc_nearbyintl);
 DEFINE_PUBLIC_WEAK_ALIAS(remquol, libc_remquol);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquol, libc_remquol);
 DEFINE_PUBLIC_WEAK_ALIAS(lrintl, libc_lrintl);

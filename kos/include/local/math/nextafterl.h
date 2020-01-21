@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa28bb586 */
+/* HASH CRC-32:0x7f75f534 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,9 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nextafterl_defined
-#if defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #define __local_nextafterl_defined 1
-/* Dependency: "nextafter" */
+#include <libm/nextafter.h>
+/* Dependency: "nextafter" from "math" */
 #ifndef ____localdep_nextafter_defined
 #define ____localdep_nextafter_defined 1
 #if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
@@ -37,7 +39,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(d
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),_nextafter,(__x,__y))
 #else /* LIBC: nextafter */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/nextafter.h>
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+#define __localdep_nextafter (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafter))
+#else /* CUSTOM: nextafter */
 #undef ____localdep_nextafter_defined
+#endif /* nextafter... */
 #endif /* nextafter... */
 #endif /* !____localdep_nextafter_defined */
 
@@ -46,9 +55,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(nextafterl) __ATTR_CONST __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafterl))(long double __x,
                                                     long double __y) {
-#line 835 "kos/src/libc/magic/math.c"
+#line 850 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_nextafter((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_nextafter || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_nextafter || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter */
 #endif /* !__local_nextafterl_defined */

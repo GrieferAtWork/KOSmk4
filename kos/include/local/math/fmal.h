@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f6649ef */
+/* HASH CRC-32:0x3fdd27bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __LOCAL_LIBC(fmal) __ATTR_CONST __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmal))(long double __x,
                                               long double __y,
                                               long double __z) {
-#line 943 "kos/src/libc/magic/math.c"
+#line 958 "kos/src/libc/magic/math.c"
 	return (__x * __y) + __z;
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46de0fc1 */
+/* HASH CRC-32:0x2c948d01 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -361,9 +361,7 @@
 #define __CRT_STUB_msgget 1
 #define __CRT_STUB_msgrcv 1
 #define __CRT_STUB_msgsnd 1
-#define __CRT_STUB_nearbyint 1
 #define __CRT_STUB_newlocale 1
-#define __CRT_STUB_nextafter 1
 #define __CRT_STUB_nexttoward 1
 #define __CRT_STUB_nrand48 1
 #define __CRT_STUB_nrand48_r 1
@@ -401,7 +399,6 @@
 #define __CRT_STUB_posix_spawnattr_setsigdefault 1
 #define __CRT_STUB_posix_spawnattr_setsigmask 1
 #define __CRT_STUB_posix_spawnp 1
-#define __CRT_STUB_pow10 1
 #define __CRT_STUB_preadv 1
 #define __CRT_STUB_preadv64 1
 #define __CRT_STUB_process_vm_readv 1

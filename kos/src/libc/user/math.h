@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb570a87 */
+/* HASH CRC-32:0x154868a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -259,9 +259,6 @@ INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_nexttoward)(double x, lon
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_scalbn)(double x, int n);
 /* Return X times (2 to the Nth power) */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_scalbln)(double x, long int n);
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_nearbyint)(double x);
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
@@ -277,9 +274,6 @@ INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_nexttowardf)(float x, long
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_scalbnf)(float x, int n);
 /* Return X times (2 to the Nth power) */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_scalblnf)(float x, long int n);
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_nearbyintf)(float x);
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
@@ -295,9 +289,6 @@ INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_nexttowardl)(long do
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_scalbnl)(long double x, int n);
 /* Return X times (2 to the Nth power) */
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_scalblnl)(long double x, long int n);
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_nearbyintl)(long double x);
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
@@ -318,7 +309,6 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_pow10)(double x);
 INTDEF __DECL_SIMD_sincosf NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincosf)(float x, float *psinx, float *pcosx);
 /* A function missing in all standards: compute exponent to base ten */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_exp10f)(float x);
-/* Another name occasionally used */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_pow10f)(float x);
 /* Cosine and sine of X */
 INTDEF __DECL_SIMD_sincosl NONNULL((2, 3)) void NOTHROW(LIBCCALL libc_sincosl)(long double x, long double *psinx, long double *pcosx);

@@ -1747,9 +1747,6 @@
 #define __CRT_HAVE_DOS$nanl 1
 #define __CRT_HAVE_DOS$nanosleep 1
 #define __CRT_HAVE_DOS$nanosleep64 1
-#define __CRT_HAVE_DOS$nearbyint 1
-#define __CRT_HAVE_DOS$nearbyintf 1
-#define __CRT_HAVE_DOS$nearbyintl 1
 #define __CRT_HAVE_DOS$newlocale 1
 #define __CRT_HAVE_DOS$nextafter 1
 #define __CRT_HAVE_DOS$nextafterf 1
@@ -3281,9 +3278,6 @@
 #define __CRT_HAVE___nanf 1
 #define __CRT_HAVE___nanl 1
 #define __CRT_HAVE___nanosleep 1
-#define __CRT_HAVE___nearbyint 1
-#define __CRT_HAVE___nearbyintf 1
-#define __CRT_HAVE___nearbyintl 1
 #define __CRT_HAVE___newlocale 1
 #define __CRT_HAVE___nextafter 1
 #define __CRT_HAVE___nextafterf 1

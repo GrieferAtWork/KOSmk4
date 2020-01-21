@@ -106,12 +106,12 @@ __SYSDECL_BEGIN
 %[insert:std]
 
 @@Arc cosine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__acos)][nothrow]
-[crtbuiltin] acos:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__acos)][nothrow][crtbuiltin]
+ acos:(double x) -> double; /* TODO */
 
 @@Arc sine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__asin)][nothrow]
-[crtbuiltin] asin:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__asin)][nothrow][crtbuiltin]
+ asin:(double x) -> double; /* TODO */
 
 @@Arc tangent of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan)][nothrow][crtbuiltin]
@@ -141,17 +141,17 @@ atan2:(double y, double x) -> double {
 
 @@Cosine of X
 [attribute(@__DECL_SIMD_cos@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__cos)][nothrow]
-[crtbuiltin] cos:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__cos)][nothrow][crtbuiltin]
+cos:(double x) -> double; /* TODO */
 
 @@Sine of X
 [attribute(@__DECL_SIMD_sin@)][decl_include(<bits/math-vector.h>)]
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sin)][nothrow]
-[crtbuiltin] sin:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sin)][nothrow][crtbuiltin]
+sin:(double x) -> double; /* TODO */
 
 @@Tangent of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__tan)][nothrow]
-[crtbuiltin] tan:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__tan)][nothrow][crtbuiltin]
+tan:(double x) -> double; /* TODO */
 
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosf)][nothrow][crtbuiltin]
@@ -222,16 +222,16 @@ tanl:(long double x) -> long double %{auto_block(math)}
 %(std, c)/* Hyperbolic functions. */
 
 @@Hyperbolic cosine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__cosh)][nothrow]
-[crtbuiltin] cosh:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__cosh)][nothrow][crtbuiltin]
+ cosh:(double x) -> double; /* TODO */
 
 @@Hyperbolic sine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinh)][nothrow]
-[crtbuiltin] sinh:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinh)][nothrow][crtbuiltin]
+ sinh:(double x) -> double; /* TODO */
 
 @@Hyperbolic tangent of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanh)][nothrow]
-[crtbuiltin] tanh:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanh)][nothrow][crtbuiltin]
+ tanh:(double x) -> double; /* TODO */
 
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__coshf)][nothrow][crtbuiltin]
@@ -259,16 +259,16 @@ tanhl:(long double x) -> long double %{auto_block(math)}
 %(std, c)
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Hyperbolic arc cosine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosh)][nothrow]
-[crtbuiltin] acosh:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosh)][nothrow][crtbuiltin]
+ acosh:(double x) -> double; /* TODO */
 
 @@Hyperbolic arc sine of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinh)][nothrow]
-[crtbuiltin] asinh:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinh)][nothrow][crtbuiltin]
+ asinh:(double x) -> double; /* TODO */
 
 @@Hyperbolic arc tangent of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanh)][nothrow]
-[crtbuiltin] atanh:(double x) -> double; /* TODO */
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanh)][nothrow][crtbuiltin]
+ atanh:(double x) -> double; /* TODO */
 
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acoshf)][nothrow][crtbuiltin]
@@ -794,7 +794,15 @@ rint:(double x) -> double {
 
 @@Return X + epsilon if X < Y, X - epsilon if X > Y
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafter, _nextafter)][crtbuiltin]
-nextafter:(double x, double y) -> double; /* TODO */
+[requires_include(<ieee754.h>)][decl_include(<libm/nextafter.h>)][userimpl]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+nextafter:(double x, double y) -> double {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+}
 
 @@Return the remainder of integer divison X / Y with infinite precision
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainder)][crtbuiltin]
@@ -815,9 +823,16 @@ rintf:(float x) -> float {
 #endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 
-
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterf)][crtbuiltin]
-nextafterf:(float x, float y) -> float %{auto_block(math)}
+[requires_include(<ieee754.h>)][decl_include(<libm/nextafter.h>)][userimpl][doc_alias(nextafter)]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+nextafterf:(float x, float y) -> float {
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (double)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (double)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderf)][crtbuiltin]
 remainderf:(float x, float y) -> float %{auto_block(math)}
@@ -875,7 +890,7 @@ scalbln:(double x, long int n) -> double {
 @@Round X to integral value in floating-point format using current
 @@rounding direction, but do not raise inexact exception
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__nearbyint)][crtbuiltin]
-nearbyint:(double x) -> double; /* TODO */
+nearbyint:(double x) -> double = rint;
 
 @@Round X to nearest integral value, rounding halfway cases away from zero
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__round)]
@@ -980,8 +995,9 @@ scalblnf:(float x, long int n) -> float {
 #endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__nearbyintf)][crtbuiltin]
-nearbyintf:(float x) -> float %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow]
+[alias(__nearbyintf)][doc_alias(nearbyint)][crtbuiltin]
+nearbyintf:(float x) -> float = rintf;
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__roundf)][crtbuiltin]
 roundf:(float x) -> float %{copy(%auto, double2float)}
@@ -1028,8 +1044,9 @@ scalbnl:(long double x, int n) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalblnl)][crtbuiltin]
 scalblnl:(long double x, long int n) -> long double %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__nearbyintl)][crtbuiltin]
-nearbyintl:(long double x) -> long double %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_MCONST][nothrow]
+[alias(__nearbyintl)][doc_alias(nearbyint)][crtbuiltin]
+nearbyintl:(long double x) -> long double = rintl;
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__roundl)][crtbuiltin]
 roundl:(long double x) -> long double %{copy(%auto, math)}
@@ -1231,8 +1248,11 @@ sincos:(double x, [nonnull] double *psinx, [nonnull] double *pcosx); /* TODO */
 exp10:(double x) -> double; /* TODO */
 
 @@Another name occasionally used
-[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10)][crtbuiltin]
-pow10:(double x) -> double; /* TODO */
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10)]
+[requires($has_function(pow))][userimpl][crtbuiltin]
+pow10:(double x) -> double {
+	return pow(10.0, x);
+}
 
 [alias(__sincosf)][nothrow][doc_alias(sincos)]
 [attribute(@__DECL_SIMD_sincosf@)][decl_include(<bits/math-vector.h>)]
@@ -1245,11 +1265,14 @@ sincosf:(float x, [nonnull] float *psinx, [nonnull] float *pcosx)
 	*pcosx = (float)cosx;
 }))}
 
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10f)]
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__exp10f)][crtbuiltin]
 exp10f:(float x) -> float %{auto_block(math)}
 
-[crtbuiltin][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10f)]
-pow10f:(float x) -> float %{auto_block(math)}
+[ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__pow10f)]
+[requires($has_function(powf))][userimpl][crtbuiltin]
+pow10f:(float x) -> float {
+	return powf(10.0f, x);
+}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [alias(__sincosl)][nothrow][doc_alias(sincos)]

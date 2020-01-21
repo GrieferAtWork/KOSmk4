@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b308b7d */
+/* HASH CRC-32:0xef9dc59 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1604,9 +1604,6 @@ __CRT_FUNCTION(nanf,0,(),1,(char const *,tagb),float)
 __CRT_FUNCTION(nanl,0,(),1,(char const *,tagb),long double)
 __CRT_FUNCTION(nanosleep,0,(),2,(struct timespec const *,requested_time,struct timespec *,remaining),int)
 __CRT_FUNCTION(nanosleep64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,nanosleep),2,(struct timespec64 const *__restrict,requested_time,struct timespec64 *,remaining),int)
-__CRT_FUNCTION(nearbyint,0,(),1,(double,x),double)
-__CRT_FUNCTION(nearbyintf,0,(),1,(float,x),float)
-__CRT_FUNCTION(nearbyintl,0,(),1,(long double,x),long double)
 __CRT_FUNCTION(newlocale,0,(),3,(int,category_mask,char const *,locale,locale_t,base),locale_t)
 __CRT_FUNCTION(nextafter,0,(),2,(double,x,double,y),double)
 __CRT_FUNCTION(nextafterf,0,(),2,(float,x,float,y),float)
@@ -3429,6 +3426,9 @@ __CRT_FAKE_FUNCTION(memxendb,0,(),3,(/*aligned(1)*/ void const *__restrict,hayst
 __CRT_FAKE_FUNCTION(memxlenb,0,(),3,(/*aligned(1)*/ void const *__restrict,haystack,int,byte,size_t,n_bytes),size_t)
 __CRT_FAKE_FUNCTION(mkstemp64,1,(!IS_DEFINED(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0,mkstemp),1,(char *,template_),int)
 __CRT_FAKE_FUNCTION(mtx_destroy,0,(),1,(mtx_t *__restrict,mutex),void)
+__CRT_FAKE_FUNCTION(nearbyint,0,(),1,(double,x),double)
+__CRT_FAKE_FUNCTION(nearbyintf,0,(),1,(float,x),float)
+__CRT_FAKE_FUNCTION(nearbyintl,0,(),1,(long double,x),long double)
 __CRT_FAKE_FUNCTION(open_c16memstream,0,(),2,(char16_t **,bufloc,size_t *,sizeloc),FILE *)
 __CRT_FAKE_FUNCTION(open_c32memstream,0,(),2,(char32_t **,bufloc,size_t *,sizeloc),FILE *)
 __CRT_FAKE_FUNCTION(printf_s,0,(),VA(1),(char const *__restrict,format),__STDC_INT_AS_SIZE_T)

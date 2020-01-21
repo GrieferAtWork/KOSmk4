@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42a7b005 */
+/* HASH CRC-32:0x83107d56 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,26 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_roundl_defined
-#define __local_roundl_defined 1
-#include <hybrid/typecore.h>
+#ifndef __local_nextafter_defined
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#define __local_nextafter_defined 1
+#include <libm/nextafter.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-__LOCAL_LIBC(roundl) __ATTR_CONST __ATTR_WUNUSED long double
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundl))(long double __x) {
-#line 899 "kos/src/libc/magic/math.c"
-	long double __result;
-	__result = (long double)(__INTMAX_TYPE__)__x;
-	if (__x < 0) {
-		/* result >= x */
-		if ((__result - __x) >= 0.5)
-			__result -= 1.0;
-	} else {
-		/* result <= x */
-		if ((__x - __result) >= 0.5)
-			__result += 1.0;
-	}
-	return __result;
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__LOCAL_LIBC(nextafter) __ATTR_CONST __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafter))(double __x,
+                                                   double __y) {
+#line 800 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__y);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__local_roundl_defined */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#endif /* !__local_nextafter_defined */

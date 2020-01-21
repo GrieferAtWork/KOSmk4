@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x248fac1e */
+/* HASH CRC-32:0xaa36b70e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3268,7 +3268,16 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nextafter,(double __x, 
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nextafter,(double __x, double __y),_nextafter,(__x,__y))
 #else /* LIBC: nextafter */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/nextafter.h>
+__NAMESPACE_STD_BEGIN
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextafter, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL nextafter)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafter))(__x, __y); })
+#else /* CUSTOM: nextafter */
 #undef __std_nextafter_defined
+#endif /* nextafter... */
 #endif /* nextafter... */
 #endif /* !__std_nextafter_defined */
 #ifndef __std_remainder_defined
@@ -3336,7 +3345,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafterf,(float __x, fl
 #elif defined(__CRT_HAVE___nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafterf,(float __x, float __y),__nextafterf,(__x,__y))
-#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#else /* LIBC: nextafterf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 __NAMESPACE_STD_END
 #include <local/math/nextafterf.h>
 __NAMESPACE_STD_BEGIN
@@ -3344,6 +3355,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(nextafterf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nextafterf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); })
 #else /* CUSTOM: nextafterf */
 #undef __std_nextafterf_defined
+#endif /* nextafterf... */
 #endif /* nextafterf... */
 #endif /* !__std_nextafterf_defined */
 #ifndef __std_remainderf_defined
@@ -3436,7 +3448,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafterl,(long d
 #elif defined(__CRT_HAVE___nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafterl,(long double __x, long double __y),__nextafter,(__x,__y))
-#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#else /* LIBC: nextafterl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 __NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
 __NAMESPACE_STD_BEGIN
@@ -3444,6 +3458,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(nextafterl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nextafterl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); })
 #else /* CUSTOM: nextafterl */
 #undef __std_nextafterl_defined
+#endif /* nextafterl... */
 #endif /* nextafterl... */
 #endif /* !__std_nextafterl_defined */
 #ifndef __std_remainderl_defined
@@ -3574,12 +3589,26 @@ __EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL nearbyint)(double __x)
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,nearbyint,(double __x),(__x))
+#elif defined(__CRT_HAVE_rint)
+/* Round X to integral value in floating-point format using current
+ * rounding direction, but do not raise inexact exception */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,nearbyint,(double __x),rint,(__x))
 #elif defined(__CRT_HAVE___nearbyint)
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,nearbyint,(double __x),__nearbyint,(__x))
-#else /* LIBC: nearbyint */
+#else /* LIBC: rint */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/rint.h>
+__NAMESPACE_STD_BEGIN
+/* Round X to integral value in floating-point format using current
+ * rounding direction, but do not raise inexact exception */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL nearbyint)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rint))(__x); }
+#else /* CUSTOM: rint */
 #undef __std_nearbyint_defined
+#endif /* nearbyint... */
 #endif /* nearbyint... */
 #endif /* !__std_nearbyint_defined */
 #if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
@@ -3842,19 +3871,26 @@ __EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nearbyintf)(float __x) 
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,nearbyintf,(float __x),(__x))
+#elif defined(__CRT_HAVE_rintf)
+/* Round X to integral value in floating-point format using current
+ * rounding direction, but do not raise inexact exception */
+__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyintf,(float __x),rintf,(__x))
 #elif defined(__CRT_HAVE___nearbyintf)
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyintf,(float __x),__nearbyintf,(__x))
-#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#else /* LIBC: rintf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 __NAMESPACE_STD_END
-#include <local/math/nearbyintf.h>
+#include <local/math/rintf.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nearbyintf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nearbyintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nearbyintf))(__x); })
-#else /* CUSTOM: nearbyintf */
+__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nearbyintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); }
+#else /* CUSTOM: rintf */
 #undef __std_nearbyintf_defined
+#endif /* nearbyintf... */
 #endif /* nearbyintf... */
 #endif /* !__std_nearbyintf_defined */
 #if __has_builtin(__builtin_roundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundf)
@@ -4154,27 +4190,26 @@ __EXTERNINLINE __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nearbyintl)(long 
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,nearbyintl,(long double __x),(__x))
+#elif defined(__CRT_HAVE_rintl)
+/* Round X to integral value in floating-point format using current
+ * rounding direction, but do not raise inexact exception */
+__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,nearbyintl,(long double __x),rintl,(__x))
 #elif defined(__CRT_HAVE___nearbyintl)
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,nearbyintl,(long double __x),__nearbyintl,(__x))
-#elif defined(__CRT_HAVE_nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,nearbyintl,(long double __x),nearbyint,(__x))
-#elif defined(__CRT_HAVE___nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,nearbyintl,(long double __x),__nearbyint,(__x))
-#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#else /* LIBC: rintl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 __NAMESPACE_STD_END
-#include <local/math/nearbyintl.h>
+#include <local/math/rintl.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nearbyintl, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nearbyintl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nearbyintl))(__x); })
-#else /* CUSTOM: nearbyintl */
+__FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nearbyintl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); }
+#else /* CUSTOM: rintl */
 #undef __std_nearbyintl_defined
+#endif /* nearbyintl... */
 #endif /* nearbyintl... */
 #endif /* !__std_nearbyintl_defined */
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
@@ -5505,7 +5540,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafter,(float __x, fl
 #elif defined(__CRT_HAVE___nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafter,(float __x, float __y),__nextafterf,(__x,__y))
-#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#else /* LIBC: nextafterf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nextafterf.h>
@@ -5513,6 +5550,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nextafter)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); }
+#else /* CUSTOM: nextafterf */
+#undef none
+#endif /* nextafter... */
 #endif /* nextafter... */
 #if __has_builtin(__builtin_remainderf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderf)
 /* Return the remainder of integer divison X / Y with infinite precision */
@@ -5758,7 +5798,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafter,(long dou
 #elif defined(__CRT_HAVE___nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafter,(long double __x, long double __y),__nextafter,(__x,__y))
-#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
@@ -5962,7 +6002,9 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyint,(float __x),nearbyintf,(__x
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyint,(float __x),__nearbyintf,(__x))
-#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#else /* LIBC: nearbyintf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nearbyintf.h>
@@ -5971,6 +6013,9 @@ extern "C++" {
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nearbyint)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nearbyintf))(__x); }
+#else /* CUSTOM: nearbyintf */
+#undef none
+#endif /* nearbyint... */
 #endif /* nearbyint... */
 #if __has_builtin(__builtin_roundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -6353,15 +6398,9 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,nearbyint,(long double __x),nea
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,nearbyint,(long double __x),__nearbyintl,(__x))
-#elif defined(__CRT_HAVE_nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-__CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,nearbyint,(long double __x),(__x))
-#elif defined(__CRT_HAVE___nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,nearbyint,(long double __x),__nearbyint,(__x))
-#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#else /* LIBC: nearbyintl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nearbyintl.h>
@@ -6370,6 +6409,9 @@ extern "C++" {
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nearbyint)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nearbyintl))(__x); }
+#else /* CUSTOM: nearbyintl */
+#undef none
+#endif /* nearbyint... */
 #endif /* nearbyint... */
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -7522,6 +7564,15 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,pow10,(double __x),(__x))
 #elif defined(__CRT_HAVE___pow10)
 /* Another name occasionally used */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,pow10,(double __x),__pow10,(__x))
+#else /* LIBC: pow10 */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#include <local/math/pow10.h>
+/* Another name occasionally used */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pow10, __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL pow10)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10))(__x); })
+#else /* CUSTOM: pow10 */
+#undef none
+#endif /* pow10... */
 #endif /* pow10... */
 #if __has_builtin(__builtin_sincosf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincosf)
 /* Cosine and sine of X */
@@ -7552,18 +7603,19 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp10f,(float __x),__exp10f,(__x))
 __NAMESPACE_LOCAL_USING_OR_IMPL(exp10f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL exp10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10f))(__x); })
 #endif /* exp10f... */
 #if __has_builtin(__builtin_pow10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10f)
-/* Another name occasionally used */
 __EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL pow10f)(float __x) { return __builtin_pow10f(__x); }
 #elif defined(__CRT_HAVE_pow10f)
-/* Another name occasionally used */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,pow10f,(float __x),(__x))
 #elif defined(__CRT_HAVE___pow10f)
-/* Another name occasionally used */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,pow10f,(float __x),__pow10f,(__x))
-#elif defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
+#else /* LIBC: pow10f */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_powf) || defined(__CRT_HAVE___powf)
 #include <local/math/pow10f.h>
-/* Another name occasionally used */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pow10f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL pow10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10f))(__x); })
+#else /* CUSTOM: pow10f */
+#undef none
+#endif /* pow10f... */
 #endif /* pow10f... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_sincosl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincosl)
@@ -7621,10 +7673,15 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,pow10l,(long double __x),pow10,
 #elif defined(__CRT_HAVE___pow10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Another name occasionally used */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,pow10l,(long double __x),__pow10,(__x))
-#elif defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
+#else /* LIBC: pow10l */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
 #include <local/math/pow10l.h>
 /* Another name occasionally used */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pow10l, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL pow10l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10l))(__x); })
+#else /* CUSTOM: pow10l */
+#undef none
+#endif /* pow10l... */
 #endif /* pow10l... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_GNU */
@@ -9163,12 +9220,24 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__exp10,(double __x),(__x))
 /* A function missing in all standards: compute exponent to base ten */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__exp10,(double __x),exp10,(__x))
 #endif /* __exp10... */
-#ifdef __CRT_HAVE___pow10
+#if __has_builtin(__builtin_pow10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10)
 /* Another name occasionally used */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__pow10,(double __x),(__x))
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __pow10)(double __x) { return __builtin_pow10(__x); }
 #elif defined(__CRT_HAVE_pow10)
 /* Another name occasionally used */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__pow10,(double __x),pow10,(__x))
+#elif defined(__CRT_HAVE___pow10)
+/* Another name occasionally used */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__pow10,(double __x),(__x))
+#else /* LIBC: pow10 */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#include <local/math/pow10.h>
+/* Another name occasionally used */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __pow10)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10))(__x); }
+#else /* CUSTOM: pow10 */
+#undef none
+#endif /* __pow10... */
 #endif /* __pow10... */
 #if __has_builtin(__builtin_exp10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10f)
 /* A function missing in all standards: compute exponent to base ten */
@@ -9185,18 +9254,19 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__exp10f,(float __x),(__x))
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __exp10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10f))(__x); }
 #endif /* __exp10f... */
 #if __has_builtin(__builtin_pow10f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10f)
-/* Another name occasionally used */
 __EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __pow10f)(float __x) { return __builtin_pow10f(__x); }
 #elif defined(__CRT_HAVE_pow10f)
-/* Another name occasionally used */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__pow10f,(float __x),pow10f,(__x))
 #elif defined(__CRT_HAVE___pow10f)
-/* Another name occasionally used */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__pow10f,(float __x),(__x))
-#elif defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
+#else /* LIBC: pow10f */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__CRT_HAVE_powf) || defined(__CRT_HAVE___powf)
 #include <local/math/pow10f.h>
-/* Another name occasionally used */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __pow10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10f))(__x); }
+#else /* CUSTOM: pow10f */
+#undef none
+#endif /* __pow10f... */
 #endif /* __pow10f... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_exp10l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10l)
@@ -9234,10 +9304,15 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__pow10l,(long double __x),pow1
 #elif defined(__CRT_HAVE___pow10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Another name occasionally used */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__pow10l,(long double __x),__pow10,(__x))
-#elif defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
+#else /* LIBC: pow10l */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
 #include <local/math/pow10l.h>
 /* Another name occasionally used */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __pow10l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10l))(__x); }
+#else /* CUSTOM: pow10l */
+#undef none
+#endif /* __pow10l... */
 #endif /* __pow10l... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_GNU */
@@ -10697,15 +10772,27 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __rint)(dou
 #undef none
 #endif /* __rint... */
 #endif /* __rint... */
-#ifdef __CRT_HAVE___nextafter
+#if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __nextafter)(double __x, double __y) { return __builtin_nextafter(__x, __y); }
+#elif defined(__CRT_HAVE_nextafter)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nextafter,(double __x, double __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE___nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nextafter,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE__nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nextafter,(double __x, double __y),_nextafter,(__x,__y))
-#elif defined(__CRT_HAVE_nextafter)
+#else /* LIBC: nextafter */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/nextafter.h>
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nextafter,(double __x, double __y),nextafter,(__x,__y))
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __nextafter)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafter))(__x, __y); }
+#else /* CUSTOM: nextafter */
+#undef none
+#endif /* __nextafter... */
 #endif /* __nextafter... */
 #ifdef __CRT_HAVE___remainder
 /* Return the remainder of integer divison X / Y with infinite precision */
@@ -10749,10 +10836,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nextafterf,(float __x,
 #elif defined(__CRT_HAVE___nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nextafterf,(float __x, float __y),(__x,__y))
-#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#else /* LIBC: nextafterf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/nextafterf.h>
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nextafterf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); }
+#else /* CUSTOM: nextafterf */
+#undef none
+#endif /* __nextafterf... */
 #endif /* __nextafterf... */
 #if __has_builtin(__builtin_remainderf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderf)
 /* Return the remainder of integer divison X / Y with infinite precision */
@@ -10823,10 +10915,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nextafterl,(long
 #elif defined(__CRT_HAVE___nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nextafterl,(long double __x, long double __y),__nextafter,(__x,__y))
-#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#else /* LIBC: nextafterl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #include <local/math/nextafterl.h>
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nextafterl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
+#else /* CUSTOM: nextafterl */
+#undef none
+#endif /* __nextafterl... */
 #endif /* __nextafterl... */
 #if __has_builtin(__builtin_remainderl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderl)
 /* Return the remainder of integer divison X / Y with infinite precision */
@@ -10915,14 +11012,28 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __scalbln)(
 #undef none
 #endif /* __scalbln... */
 #endif /* __scalbln... */
-#ifdef __CRT_HAVE___nearbyint
+#if __has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyint)
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__nearbyint,(double __x),(__x))
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __nearbyint)(double __x) { return __builtin_nearbyint(__x); }
 #elif defined(__CRT_HAVE_nearbyint)
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__nearbyint,(double __x),nearbyint,(__x))
+#elif defined(__CRT_HAVE___nearbyint)
+/* Round X to integral value in floating-point format using current
+ * rounding direction, but do not raise inexact exception */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__nearbyint,(double __x),(__x))
+#else /* LIBC: nearbyint */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/nearbyint.h>
+/* Round X to integral value in floating-point format using current
+ * rounding direction, but do not raise inexact exception */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __nearbyint)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nearbyint))(__x); }
+#else /* CUSTOM: nearbyint */
+#undef none
+#endif /* __nearbyint... */
 #endif /* __nearbyint... */
 #if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -11104,11 +11215,16 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__nearbyintf,(float __x),nearbyintf,(
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__nearbyintf,(float __x),(__x))
-#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#else /* LIBC: nearbyintf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/nearbyintf.h>
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nearbyintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nearbyintf))(__x); }
+#else /* CUSTOM: nearbyintf */
+#undef none
+#endif /* __nearbyintf... */
 #endif /* __nearbyintf... */
 #if __has_builtin(__builtin_roundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -11376,19 +11492,16 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__nearbyintl,(long double __x),
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,__nearbyintl,(long double __x),(__x))
-#elif defined(__CRT_HAVE_nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__nearbyintl,(long double __x),nearbyint,(__x))
-#elif defined(__CRT_HAVE___nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Round X to integral value in floating-point format using current
- * rounding direction, but do not raise inexact exception */
-__CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__nearbyintl,(long double __x),__nearbyint,(__x))
-#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#else /* LIBC: nearbyintl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 #include <local/math/nearbyintl.h>
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nearbyintl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nearbyintl))(__x); }
+#else /* CUSTOM: nearbyintl */
+#undef none
+#endif /* __nearbyintl... */
 #endif /* __nearbyintl... */
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */

@@ -940,9 +940,6 @@
 #define __CRT_HAVE___nanf 1
 #define __CRT_HAVE___nanl 1
 #define __CRT_HAVE___nanosleep 1
-#define __CRT_HAVE___nearbyint 1
-#define __CRT_HAVE___nearbyintf 1
-#define __CRT_HAVE___nearbyintl 1
 #define __CRT_HAVE___newlocale 1
 #define __CRT_HAVE___nextafter 1
 #define __CRT_HAVE___nextafterf 1

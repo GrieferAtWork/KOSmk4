@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe799b854 */
+/* HASH CRC-32:0x4782f2f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -314,15 +314,27 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),(__x))
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),logb,(__x))
 #endif /* _logb... */
-#ifdef __CRT_HAVE___nextafter
+#if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _nextafter)(double __x, double __y) { return __builtin_nextafter(__x, __y); }
+#elif defined(__CRT_HAVE_nextafter)
+/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE___nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),__nextafter,(__x,__y))
 #elif defined(__CRT_HAVE__nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),(__x,__y))
-#elif defined(__CRT_HAVE_nextafter)
+#else /* LIBC: nextafter */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/nextafter.h>
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),nextafter,(__x,__y))
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _nextafter)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafter))(__x, __y); }
+#else /* CUSTOM: nextafter */
+#undef none
+#endif /* _nextafter... */
 #endif /* _nextafter... */
 #if __has_builtin(__builtin_finite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
