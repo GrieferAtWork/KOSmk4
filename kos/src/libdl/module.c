@@ -114,22 +114,22 @@ DlModule_Destroy(DlModule *__restrict self) {
 		uintptr_t *fini_array_base = NULL;
 		size_t fini_array_size     = 0;
 		for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
-			switch (self->dm_elf.de_dynhdr[i].d_tag) {
+			switch (self->dm_dynhdr[i].d_tag) {
 	
 			case DT_NULL:
 				goto done_dyntag;
 	
 			case DT_FINI:
-				fini_func = (uintptr_t)self->dm_elf.de_dynhdr[i].d_un.d_ptr;
+				fini_func = (uintptr_t)self->dm_dynhdr[i].d_un.d_ptr;
 				break;
 	
 			case DT_FINI_ARRAY:
 				fini_array_base = (uintptr_t *)(self->dm_loadaddr +
-				                                self->dm_elf.de_dynhdr[i].d_un.d_ptr);
+				                                self->dm_dynhdr[i].d_un.d_ptr);
 				break;
 	
 			case DT_FINI_ARRAYSZ:
-				fini_array_size = (size_t)self->dm_elf.de_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
+				fini_array_size = (size_t)self->dm_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
 				break;
 	
 			default: break;

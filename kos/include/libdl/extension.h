@@ -128,6 +128,15 @@ struct dl_sect_info {
 	pos64_t   dsi_offset;  /* Absolute file offset where section data starts. */
 };
 
+#ifndef ____dl_iterator_callback_defined
+#define ____dl_iterator_callback_defined 1
+struct dl_phdr_info;
+/* Callback prototype for `dl_iterate_phdr()' */
+typedef int (__LIBCCALL *__dl_iterator_callback)(struct dl_phdr_info *__info,
+                                                 __size_t __info_size, void *__arg);
+#endif /* !____dl_iterator_callback_defined */
+
+
 /* Module extension format.
  * NOTE: Module format extensions cannot be unloaded once loaded! */
 struct dlmodule_format {
@@ -185,6 +194,18 @@ struct dlmodule_format {
 	 *        If necessary, lazily initialize `self->dm_shnum'
 	 * @return: NULL: Invalid section index (dlerror() was modified) */
 	NONNULL((1)) char const *(LIBDL_CC *df_dlsectname)(DlModule *__restrict self, uintptr_t index);
+	/* [0..1] Enumerate individual program headers in an ELF-like way.
+	 *        This operator should fill in:
+	 *        >> info->dlpi_phdr
+	 *        >> info->dlpi_phnum
+	 *        Then invoke `(*callback)(info, sizeof(*info), arg)' and
+	 *        propagate its return value.
+	 * If this operator isn't provided, the module will be enumerated as though
+	 * it only had a single program header spanning `dm_loadstart...dm_loadend' */
+	NONNULL((1, 2, 3)) int
+	(LIBDL_CC *df_lsphdrs)(DlModule *__restrict self,
+	                       struct dl_phdr_info *__restrict info,
+	                       __dl_iterator_callback callback, void *arg);
 
 	/* Add more functions here. */
 

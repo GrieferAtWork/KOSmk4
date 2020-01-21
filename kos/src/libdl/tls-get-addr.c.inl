@@ -47,12 +47,12 @@ INTERN WUNUSED NONNULL((1)) void *LIBCCALL
 libdl_dltlsaddr(DlModule *self)
 #endif /* !FAIL_ON_ERROR */
 {
+	byte_t *result;
+	struct dtls_extension *extab;
 #ifndef FAIL_ON_ERROR
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_badmodule;
 #endif /* !FAIL_ON_ERROR */
-	byte_t *result;
-	struct dtls_extension *extab;
 	result = (byte_t *)RD_TLS_BASE_REGISTER();
 	/* Simple case: Static TLS, and special case: Empty TLS */
 	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))

@@ -46,6 +46,11 @@
 DECL_BEGIN
 
 INTERN DlModule dl_rtld_module = {
+	.dm_loadaddr      = 0,
+	.dm_filename      = NULL,
+	.dm_dynhdr        = NULL,
+	.dm_modules_next  = NULL,
+	.dm_modules_prev  = NULL,
 	.dm_tlsoff        = 0,
 	.dm_tlsinit       = NULL,
 	.dm_tlsfsize      = 0,
@@ -56,12 +61,9 @@ INTERN DlModule dl_rtld_module = {
 	.dm_tls_fini      = NULL,
 	.dm_tls_arg       = NULL,
 	.dm_refcnt        = 2, /* dl_rtld_module, DlModule_GlobalList */
-	.dm_modules       = LLIST_INITNODE,
 	.dm_globals       = LLIST_INITNODE,
-	.dm_filename      = NULL,
 	.dm_file          = -1,
 	.dm_flags         = RTLD_LOCAL | RTLD_NODELETE,
-	.dm_loadaddr      = 0,
 	.dm_loadstart     = 0,
 	.dm_loadend       = (uintptr_t)0,
 	.dm_finalize      = NULL,
@@ -73,33 +75,32 @@ INTERN DlModule dl_rtld_module = {
 	.dm_shnum         = BUILTIN_SECTIONS_COUNT,
 	.dm_ops = NULL,
 	.dm_elf = {
-		.de_pltgot        = NULL,
+		.de_pltgot     = NULL,
 #if !ELF_ARCH_USESRELA
-		.de_jmprel        = NULL,
+		.de_jmprel     = NULL,
 #else /* !ELF_ARCH_USESRELA */
 		{
-			.de_jmprel    = NULL,
+			.de_jmprel = NULL,
 		},
 #endif /* ELF_ARCH_USESRELA */
 #if ELF_ARCH_LAZYINDX
-		.de_jmpcount      = 0,
+		.de_jmpcount   = 0,
 #else /* ELF_ARCH_LAZYINDX */
-		.de_jmpsize       = 0,
+		.de_jmpsize    = 0,
 #endif /* !ELF_ARCH_LAZYINDX */
-		.de_dyncnt        = 0,
-		.de_dynhdr        = NULL,
-		.de_dynsym_tab    = NULL,
-		.de_dynsym_cnt    = 0,
-		.de_gnuhashtab    = NULL,
-		.de_hashtab       = NULL,
-		.de_dynstr        = NULL,
-		.de_runpath       = NULL,
-		.de_shoff         = 0,
-		.de_shstrndx      = (ElfW(Half))-1,
-		.de_shdr          = (ElfW(Shdr) *)(uintptr_t)-1,
-		.de_shstrtab = (char *)(uintptr_t)-1,
-		.de_phnum    = 1,
-		.de_phdr     = {
+		.de_dyncnt     = 0,
+		.de_dynsym_tab = NULL,
+		.de_dynsym_cnt = 0,
+		.de_gnuhashtab = NULL,
+		.de_hashtab    = NULL,
+		.de_dynstr     = NULL,
+		.de_runpath    = NULL,
+		.de_shoff      = 0,
+		.de_shstrndx   = (ElfW(Half))-1,
+		.de_shdr       = (ElfW(Shdr) *)(uintptr_t)-1,
+		.de_shstrtab   = (char *)(uintptr_t)-1,
+		.de_phnum      = 1,
+		.de_phdr       = {
 			ELFW(PHDR_INIT)(/* type:   */ PT_LOAD,
 			                /* offset: */ __ARCH_PAGESIZE,
 			                /* vaddr:  */ 0,
@@ -129,7 +130,7 @@ PRIVATE struct library_listdef dl_library_layout = {
 	.lld_module_offsetof_filename  = offsetof(DlModule, dm_filename),
 	.lld_module_offsetof_loadaddr  = offsetof(DlModule, dm_loadaddr),
 	.lld_module_offsetof_loadstart = offsetof(DlModule, dm_loadstart),
-	.lld_entry_offsetof_next       = offsetof(DlModule, dm_modules.ln_next),
+	.lld_entry_offsetof_next       = offsetof(DlModule, dm_modules_next),
 	.lld_entry_offsetof_module     = 0, /* Unused */
 };
 
@@ -161,8 +162,7 @@ linker_main(struct elfexec_info *__restrict info,
 	dl_rtld_module.dm_loadend  += info->ei_rtldaddr;
 	dl_rtld_module.dm_elf.de_phdr[0].p_filesz = (ElfW(Word))rtld_size;
 	dl_rtld_module.dm_elf.de_phdr[0].p_memsz  = (ElfW(Word))rtld_size;
-	dl_rtld_module.dm_modules.ln_pself = &DlModule_AllList;
-	DlModule_AllList                   = &dl_rtld_module;
+	DlModule_AllList = &dl_rtld_module;
 
 	/* Tell the kernel how it can enumerate loaded libraries in user-space. */
 	dl_library_layout.lld_first = &DlModule_AllList;
@@ -206,7 +206,7 @@ linker_main(struct elfexec_info *__restrict info,
 	}
 	assert(DlModule_GlobalList == base_module);
 	assert(DlModule_AllList == &dl_rtld_module);
-	assert(dl_rtld_module.dm_modules.ln_next == base_module);
+	assert(dl_rtld_module.dm_modules_next == base_module);
 
 	/*DlModule_Decref(base_module);*/ /* Intentionally left dangling! */
 

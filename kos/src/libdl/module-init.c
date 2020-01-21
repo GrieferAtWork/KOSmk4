@@ -75,31 +75,31 @@ DlModule_ElfRunInitializers(DlModule *__restrict self) {
 	uintptr_t *init_array_base    = NULL;
 	size_t init_array_size        = 0;
 	for (dyni = 0; dyni < self->dm_elf.de_dyncnt; ++dyni) {
-		switch (self->dm_elf.de_dynhdr[dyni].d_tag) {
+		switch (self->dm_dynhdr[dyni].d_tag) {
 
 		case DT_NULL:
 			goto done_dyntag;
 
 		case DT_INIT:
-			init_func = (uintptr_t)self->dm_elf.de_dynhdr[dyni].d_un.d_ptr;
+			init_func = (uintptr_t)self->dm_dynhdr[dyni].d_un.d_ptr;
 			break;
 
 		case DT_PREINIT_ARRAY:
 			preinit_array_base = (uintptr_t *)(self->dm_loadaddr +
-			                                   self->dm_elf.de_dynhdr[dyni].d_un.d_ptr);
+			                                   self->dm_dynhdr[dyni].d_un.d_ptr);
 			break;
 
 		case DT_PREINIT_ARRAYSZ:
-			preinit_array_size = (size_t)self->dm_elf.de_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
+			preinit_array_size = (size_t)self->dm_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
 			break;
 
 		case DT_INIT_ARRAY:
 			init_array_base = (uintptr_t *)(self->dm_loadaddr +
-			                                self->dm_elf.de_dynhdr[dyni].d_un.d_ptr);
+			                                self->dm_dynhdr[dyni].d_un.d_ptr);
 			break;
 
 		case DT_INIT_ARRAYSZ:
-			init_array_size = (size_t)self->dm_elf.de_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
+			init_array_size = (size_t)self->dm_dynhdr[dyni].d_un.d_val / sizeof(void (*)(void));
 			break;
 
 		default: break;
@@ -245,12 +245,12 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
 		for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
 			char const *filename;
 			REF DlModule *dependency;
-			if (self->dm_elf.de_dynhdr[i].d_tag == DT_NULL)
+			if (self->dm_dynhdr[i].d_tag == DT_NULL)
 				break;
-			if (self->dm_elf.de_dynhdr[i].d_tag != DT_NEEDED)
+			if (self->dm_dynhdr[i].d_tag != DT_NEEDED)
 				continue;
 			assert(self->dm_depcnt < count);
-			filename = self->dm_elf.de_dynstr + self->dm_elf.de_dynhdr[i].d_un.d_ptr;
+			filename = self->dm_elf.de_dynstr + self->dm_dynhdr[i].d_un.d_ptr;
 			/* Load the dependent library. */
 			if (self->dm_elf.de_runpath) {
 				dependency = DlModule_OpenFilenameInPathList(self->dm_elf.de_runpath,
@@ -292,7 +292,7 @@ DlModule_ElfInitialize(DlModule *__restrict self, unsigned int flags) {
 	}
 	/* Service relocations of the module. */
 	for (i = 0; i < self->dm_elf.de_dyncnt; ++i) {
-		ElfW(Dyn) tag = self->dm_elf.de_dynhdr[i];
+		ElfW(Dyn) tag = self->dm_dynhdr[i];
 		switch (tag.d_tag) {
 
 		case DT_NULL:

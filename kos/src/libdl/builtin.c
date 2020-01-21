@@ -221,6 +221,7 @@ LIBCCALL libdl_dlopen(char const *filename, int mode) {
 	if unlikely(!filename) {
 		/* ... If filename is NULL, then the returned handle is for the main program... */
 		result = DlModule_GlobalList;
+		assert(result);
 		assert(result->dm_flags & RTLD_NODELETE);
 		/* Don't incref() the returned module for this case:
 		 *   - The main module itself was loaded with `RTLD_NODELETE', meaning
@@ -684,7 +685,7 @@ libdl_dlgethandle(void const *static_pointer, unsigned int flags) {
 		goto err;
 	}
 	atomic_rwlock_read(&DlModule_AllLock);
-	LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+	DlModule_AllList_FOREACH(result) {
 		uint16_t i;
 		if ((uintptr_t)static_pointer < result->dm_loadstart)
 			continue;
@@ -738,18 +739,18 @@ DlModule *LIBCCALL libdl_dlgetmodule(char const *name, unsigned int flags) {
 		goto err;
 	}
 	atomic_rwlock_read(&DlModule_AllLock);
-	LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+	DlModule_AllList_FOREACH(result) {
 		if (strcmp(result->dm_filename, name) == 0)
 			goto got_result;
 	}
-	LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+	DlModule_AllList_FOREACH(result) {
 		char *sep = strrchr(result->dm_filename, '/');
 		if (!sep)
 			continue;
 		if (strcmp(sep + 1, name) == 0)
 			goto got_result;
 	}
-	LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+	DlModule_AllList_FOREACH(result) {
 		char *sep = strrchr(result->dm_filename, '/');
 		char *col;
 		size_t namelen;
@@ -764,7 +765,7 @@ DlModule *LIBCCALL libdl_dlgetmodule(char const *name, unsigned int flags) {
 		    name[namelen] == '\0')
 			goto got_result;
 	}
-	LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+	DlModule_AllList_FOREACH(result) {
 		char *sep = strrchr(result->dm_filename, '/');
 		char *col;
 		size_t namelen;
@@ -782,18 +783,18 @@ DlModule *LIBCCALL libdl_dlgetmodule(char const *name, unsigned int flags) {
 			goto got_result;
 	}
 	if (flags & DLGETHANDLE_FNOCASE) {
-		LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+		DlModule_AllList_FOREACH(result) {
 			if (strcasecmp(result->dm_filename, name) == 0)
 				goto got_result;
 		}
-		LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+		DlModule_AllList_FOREACH(result) {
 			char *sep = strrchr(result->dm_filename, '/');
 			if (!sep)
 				continue;
 			if (strcasecmp(sep + 1, name) == 0)
 				goto got_result;
 		}
-		LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+		DlModule_AllList_FOREACH(result) {
 			char *sep = strrchr(result->dm_filename, '/');
 			char *col;
 			size_t namelen;
@@ -808,7 +809,7 @@ DlModule *LIBCCALL libdl_dlgetmodule(char const *name, unsigned int flags) {
 			    name[namelen] == '\0')
 				goto got_result;
 		}
-		LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+		DlModule_AllList_FOREACH(result) {
 			char *sep = strrchr(result->dm_filename, '/');
 			char *col;
 			size_t namelen;
@@ -1386,8 +1387,7 @@ INTERN int LIBCCALL libdl_dlclearcaches(void) {
 		DlModule *module_iter;
 again_clear_modules:
 		atomic_rwlock_read(&DlModule_AllLock);
-		for (module_iter = DlModule_AllList; module_iter;
-		     module_iter = module_iter->dm_modules.ln_next) {
+		DlModule_AllList_FOREACH(module_iter) {
 			refcnt_t refcnt;
 			if (!DlModule_TryIncref(module_iter))
 				continue;
@@ -1413,8 +1413,7 @@ again_try_descref_module_iter:
 		/* Delete dangling sections. */
 again_lock_global:
 		atomic_rwlock_read(&DlModule_AllLock);
-		for (module_iter = DlModule_AllList; module_iter;
-		     module_iter = module_iter->dm_modules.ln_next) {
+		DlModule_AllList_FOREACH(module_iter) {
 			REF DlSection *temp;
 			if (!ATOMIC_READ(module_iter->dm_sections_dangling))
 				continue;
@@ -1458,7 +1457,7 @@ DlModule_RunAllModuleFinalizers(void) {
 	DlModule *mod;
 again:
 	atomic_rwlock_read(&DlModule_AllLock);
-	for (mod = DlModule_AllList; mod; mod = mod->dm_modules.ln_next) {
+	DlModule_AllList_FOREACH(mod) {
 		size_t i, fini_array_size;
 		uintptr_t fini_func;
 		uintptr_t *fini_array_base;
@@ -1488,22 +1487,22 @@ again:
 		fini_array_base = NULL;
 		fini_array_size = 0;
 		for (i = 0; i < mod->dm_elf.de_dyncnt; ++i) {
-			switch (mod->dm_elf.de_dynhdr[i].d_tag) {
+			switch (mod->dm_dynhdr[i].d_tag) {
 	
 			case DT_NULL:
 				goto done_dyntag;
 	
 			case DT_FINI:
-				fini_func = (uintptr_t)mod->dm_elf.de_dynhdr[i].d_un.d_ptr;
+				fini_func = (uintptr_t)mod->dm_dynhdr[i].d_un.d_ptr;
 				break;
 	
 			case DT_FINI_ARRAY:
 				fini_array_base = (uintptr_t *)(mod->dm_loadaddr +
-				                                mod->dm_elf.de_dynhdr[i].d_un.d_ptr);
+				                                mod->dm_dynhdr[i].d_un.d_ptr);
 				break;
 	
 			case DT_FINI_ARRAYSZ:
-				fini_array_size = (size_t)mod->dm_elf.de_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
+				fini_array_size = (size_t)mod->dm_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
 				break;
 	
 			default: break;
@@ -1696,7 +1695,7 @@ done_add_finalizer:
 		if unlikely(self->dm_ops)
 			goto err_notelf;
 		pcount = va_arg(args, size_t *);
-		result = (void *)self->dm_elf.de_dynhdr;
+		result = (void *)self->dm_dynhdr;
 		if (pcount)
 			*pcount = (size_t)self->dm_elf.de_dyncnt;
 	}	break;
@@ -1753,6 +1752,89 @@ err:
 	goto done;
 }
 
+PRIVATE int CC
+DlModule_IteratePhdr(DlModule *__restrict self,
+                     __dl_iterator_callback callback, void *arg) {
+	int result;
+	struct dl_phdr_info info;
+	info.dlpi_addr      = self->dm_loadaddr;
+	info.dlpi_name      = self->dm_filename;
+	info.dlpi_adds      = 0; /* ??? */
+	info.dlpi_subs      = 0; /* ??? */
+	info.dlpi_tls_modid = (size_t)(uintptr_t)self;
+	info.dlpi_tls_data  = DlModule_TryGetTLSAddr(self);
+	if likely(!self->dm_ops) {
+		info.dlpi_phdr  = self->dm_elf.de_phdr;
+		info.dlpi_phnum = self->dm_elf.de_phnum;
+		result = (*callback)(&info, sizeof(info), arg);
+	} else if (self->dm_ops->df_lsphdrs) {
+		result = (*self->dm_ops->df_lsphdrs)(self, &info, callback, arg);
+	} else {
+		/* Single-program-header emulation. */
+		ElfW(Phdr) ph[1];
+		ph[0].p_type    = PT_LOAD;
+		ph[0].p_offset  = 0;
+		ph[0].p_vaddr   = self->dm_loadstart - self->dm_loadaddr;
+		ph[0].p_paddr   = ph[0].p_vaddr;
+		ph[0].p_filesz  = self->dm_loadend - self->dm_loadstart;
+		ph[0].p_memsz   = ph[0].p_filesz;
+		ph[0].p_flags   = PF_X | PF_W | PF_R;
+		ph[0].p_align   = 1;
+		info.dlpi_phdr  = ph;
+		info.dlpi_phnum = COMPILER_LENOF(ph);
+		result = (*self->dm_ops->df_lsphdrs)(self, &info, callback, arg);
+	}
+	return result;
+}
+
+
+/* Enumerate all loaded modules, as well as information about them.
+ * Enumeration stops when `*CALLBACK' returns a non-zero value, which
+ * will then also be returned by this function. Otherwise, `0' will
+ * be returned after all modules have been enumerated. */
+INTERN int LIBCCALL
+libdl_iterate_phdr(__dl_iterator_callback callback, void *arg) {
+	int result = 0;
+	REF DlModule *current, *next;
+	atomic_rwlock_read(&DlModule_AllLock);
+	current = DlModule_AllList;
+	while (current) {
+		if (!tryincref(current)) {
+			current = current->dm_modules_next;
+			continue;
+		}
+		atomic_rwlock_endread(&DlModule_AllLock);
+got_current:
+		TRY {
+			result = DlModule_IteratePhdr(current, callback, arg);
+		} EXCEPT {
+			decref_unlikely(current);
+			RETHROW();
+		}
+		if (result != 0) {
+			decref_unlikely(current);
+			break;
+		}
+		/* Try to lock the next module. */
+		atomic_rwlock_read(&DlModule_AllLock);
+		next = current->dm_modules_next;
+		while (next && !tryincref(next))
+			next = next->dm_modules_next;
+		atomic_rwlock_endread(&DlModule_AllLock);
+		/* Continue enumerating the next module. */
+		decref_unlikely(current);
+		if (!next)
+			break;
+		current = next;
+		goto got_current;
+	}
+	atomic_rwlock_endread(&DlModule_AllLock);
+	return result;
+}
+
+
+
+
 
 
 DEFINE_PUBLIC_ALIAS(dlopen, libdl_dlopen);
@@ -1773,6 +1855,7 @@ DEFINE_PUBLIC_ALIAS(dlsectionindex, libdl_dlsectionindex);
 DEFINE_PUBLIC_ALIAS(dlsectionmodule, libdl_dlsectionmodule);
 DEFINE_PUBLIC_ALIAS(dlclearcaches, libdl_dlclearcaches);
 DEFINE_PUBLIC_ALIAS(dlauxctrl, libdl_dlauxctrl);
+DEFINE_PUBLIC_ALIAS(dl_iterate_phdr, libdl_iterate_phdr);
 
 
 
@@ -1812,6 +1895,7 @@ DEFINE_PUBLIC_ALIAS(dlauxctrl, libdl_dlauxctrl);
 		"dltlsfree"       : "result = (void *)&libdl_dltlsfree;",         \
 		"dltlsaddr"       : "result = (void *)&libdl_dltlsaddr;",         \
 		"dlauxctrl"       : "result = (void *)&libdl_dlauxctrl;",         \
+		"dl_iterate_phdr" : "result = (void *)&libdl_iterate_phdr;",      \
 		"__peb"           : "result = (void *)root_peb;",                 \
 		"environ"         : "result = (void *)&root_peb->pp_envp;",       \
 		"_environ"        : "result = (void *)&root_peb->pp_envp;",       \
@@ -1950,6 +2034,17 @@ stringSwitch("name",
 	} else if (name[0] == 'd') {
 		if (name[1] == 'l') {
 			switch (name[2]) {
+
+			case '_':
+				if (name[3] == 'i' && name[4] == 't' && name[5] == 'e' &&
+				    name[6] == 'r' && name[7] == 'a' && name[8] == 't' &&
+				    name[9] == 'e' && name[10] == '_' && name[11] == 'p' &&
+				    name[12] == 'h' && name[13] == 'd' && name[14] == 'r' &&
+				    name[15] == '\0') {
+					/* case "dl_iterate_phdr": ... */
+					result = (void *)&libdl_iterate_phdr;
+				}
+				break;
 
 			case 'a':
 				if (name[3] == 'u') {

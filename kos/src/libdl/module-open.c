@@ -54,7 +54,7 @@ INTERN LLIST(DlModule) DlModule_GlobalList = LLIST_INIT;
 INTERN DEFINE_ATOMIC_RWLOCK(DlModule_GlobalLock);
 
 /* [1..1] List of all loaded modules. */
-INTERN LLIST(DlModule) DlModule_AllList = LLIST_INIT;
+INTERN DlModule *DlModule_AllList = NULL;
 INTERN DEFINE_ATOMIC_RWLOCK(DlModule_AllLock);
 
 
@@ -368,7 +368,7 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
 
 		case PT_DYNAMIC: {
 			size_t i;
-			self->dm_elf.de_dynhdr = (ElfW(Dyn) *)base;
+			self->dm_dynhdr        = (ElfW(Dyn) *)base;
 			self->dm_elf.de_dyncnt = self->dm_elf.de_phdr[pidx].p_memsz / sizeof(ElfW(Dyn));
 			self->dm_depcnt = 0;
 			/* Load dynamic tag meta-data. */
@@ -474,9 +474,9 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
 		atomic_rwlock_endwrite(&DlModule_GlobalLock);
 	}
 
-	if (!self->dm_modules.ln_pself) {
+	if (!self->dm_modules_prev) {
 		atomic_rwlock_write(&DlModule_AllLock);
-		if likely(!ATOMIC_READ(self->dm_modules.ln_pself))
+		if likely(!ATOMIC_READ(self->dm_modules_prev))
 			DlModule_AddToAll(self);
 		atomic_rwlock_endwrite(&DlModule_AllLock);
 	}
@@ -741,7 +741,7 @@ REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_FindFromFilename(char const *__restrict filename) {
 	REF DlModule *result;
 	atomic_rwlock_read(&DlModule_AllLock);
-	LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+	DlModule_AllList_FOREACH(result) {
 		if (strcmp(result->dm_filename, filename) != 0)
 			continue;
 		if (!(result->dm_flags & RTLD_NODELETE))
@@ -764,7 +764,7 @@ INTERN WUNUSED DlModule *CC
 DlModule_FindFromStaticPointer(void const *static_pointer) {
 	REF DlModule *result;
 	atomic_rwlock_read(&DlModule_AllLock);
-	LLIST_FOREACH(result, DlModule_AllList, dm_modules) {
+	DlModule_AllList_FOREACH(result) {
 		uint16_t i;
 		if ((uintptr_t)static_pointer < result->dm_loadstart)
 			continue;

@@ -44,8 +44,10 @@
 #include <assert.h>
 #include <dlfcn.h>
 #include <elf.h>
+#include <link.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <libdl/extension.h>
 #include <libdl/module.h>
@@ -102,8 +104,13 @@ INTDEF LLIST(DlModule) DlModule_GlobalList;
 INTDEF struct atomic_rwlock DlModule_GlobalLock;
 
 /* [1..1] List of all loaded modules. */
-INTDEF LLIST(DlModule) DlModule_AllList;
+INTDEF DlModule *DlModule_AllList;
 INTDEF struct atomic_rwlock DlModule_AllLock;
+
+#define DlModule_GlobalList_FOREACH(mod) \
+	for ((mod) = DlModule_GlobalList; (mod); (mod) = (mod)->dm_globals.ln_next)
+#define DlModule_AllList_FOREACH(mod) \
+	for ((mod) = DlModule_AllList; (mod); (mod) = (mod)->dm_modules_next)
 
 /* The module describing the RTLD library itself. */
 INTDEF DlModule dl_rtld_module;
@@ -127,19 +134,28 @@ DlModule_RemoveFromGlobals(DlModule *__restrict self) {
 
 LOCAL NONNULL((1)) void CC
 DlModule_AddToAll(DlModule *__restrict self) {
-	DlModule **plist, *next;
-	plist = &DlModule_AllList;
-	while ((next = *plist) != NULL)
-		plist = &next->dm_modules.ln_next;
-	self->dm_modules.ln_pself = plist;
-	self->dm_modules.ln_next  = NULL;
-	*plist                    = self;
+	DlModule *prev;
+	assert(self);
+	assert(!self->dm_modules_prev);
+	prev = DlModule_AllList;
+	assert(prev);
+	while (prev->dm_modules_next)
+		prev = prev->dm_modules_next;
+	prev->dm_modules_next = self;
+	self->dm_modules_prev = prev;
+	self->dm_modules_next = NULL;
 }
 
 LOCAL NONNULL((1)) void CC
 DlModule_RemoveFromAll(DlModule *__restrict self) {
 	assert(self != &dl_rtld_module);
-	*self->dm_modules.ln_pself = self->dm_modules.ln_next;
+	assert(self->dm_modules_prev);
+	if ((self->dm_modules_prev->dm_modules_next = self->dm_modules_next) != NULL)
+		self->dm_modules_next->dm_modules_prev = self->dm_modules_prev;
+#ifndef NDEBUG
+	memset(&self->dm_modules_next, 0xcc, sizeof(self->dm_modules_next));
+	memset(&self->dm_modules_prev, 0xcc, sizeof(self->dm_modules_prev));
+#endif /* !NDEBUG */
 }
 
 
@@ -360,7 +376,7 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
                  void (LIBCCALL *perthread_fini)(void *__arg, void *__base),
                  void *perthread_callback_arg);
 
-/* Free a TLS segment previously allocated with `dltlsalloc' */
+/* Free a TLS segment previously allocated with `dltlsalloc()' */
 INTDEF WUNUSED NONNULL((1)) int LIBCCALL libdl_dltlsfree(DlModule *self);
 
 /* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
@@ -375,6 +391,16 @@ INTDEF WUNUSED NONNULL((1)) int LIBCCALL libdl_dltlsfree(DlModule *self);
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
 INTDEF WUNUSED NONNULL((1)) void *LIBCCALL libdl_dltlsaddr(DlModule *self);
+
+/* Similar to `libdl_dltlsaddr()', but do no lazy allocation
+ * and return NULL if the module doesn't have a TLS segment. */
+INTDEF WUNUSED NONNULL((1)) void *CC DlModule_TryGetTLSAddr(DlModule *__restrict self);
+
+/* Enumerate all loaded modules, as well as information about them.
+ * Enumeration stops when `*CALLBACK' returns a non-zero value, which
+ * will then also be returned by this function. Otherwise, `0' will
+ * be returned after all modules have been enumerated. */
+INTDEF int LIBCCALL libdl_iterate_phdr(__dl_iterator_callback callback, void *arg);
 
 /* Invoke the static initializers of all currently loaded modules.
  * This is called late during initial module startup once the initial

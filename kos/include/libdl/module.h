@@ -28,6 +28,7 @@
 #include <hybrid/typecore.h>
 
 #include <kos/kernel/types.h>
+#include <kos/refcnt.h>
 #include <kos/types.h>
 
 #ifndef __BUILDING_LIBDL
@@ -159,7 +160,6 @@ struct dlmodule_elf {
 
 	/* The module's .dynamic section, and derivatives (.dynsym + .dynstr). */
 	size_t                    de_dyncnt;     /* [const] Number of dynamic definition headers. */
-	ElfW(Dyn) const          *de_dynhdr;     /* [0..de_dyncnt][const] Vector of dynamic definition entries. */
 	ElfW(Sym) const          *de_dynsym_tab; /* [0..1][const] Vector of dynamic symbols defined by this module. */
 	size_t                    de_dynsym_cnt; /* [lock(WRITE_ONCE)][const] # of symbols in `de_dynsym_tab' (or `0' if not calculated) */
 	ElfW(GnuHashTable) const *de_gnuhashtab; /* [0..1][const] GNU Symbol hash table. */
@@ -189,6 +189,17 @@ struct dlmodule_format;
 
 /* The actual data-structure to which a pointer is returned by `dlopen()' */
 struct dlmodule {
+	/* Fields from `struct link_map' (for binary compatibility... *ugh*) */
+	uintptr_t                 dm_loadaddr;     /* [const] Load address of the module. */
+	char                     *dm_filename;     /* [1..1][owned] Name of the executable binary file (absolute path). */
+	ElfW(Dyn) const          *dm_dynhdr;       /* [0..dm_elf.de_dyncnt][const] Vector of dynamic ELF definition entries.
+	                                            * WARNING: This field is ELF-only! Other module formats must keep this
+	                                            *          field set to NULL (it only has to be ~here~ because of binary
+	                                            *          compatibility with GNU's `struct link_map') */
+	WEAK DlModule            *dm_modules_next; /* [0..1][lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
+	WEAK DlModule            *dm_modules_prev; /* [0..1][lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
+	/* --- End of `struct link_map' emulation --- */
+
 	/* TLS variables (PT_TLS). */
 	ElfW(Off)                 dm_tlsoff;     /* [valid_if(dm_tlsfsize != 0)] File offset to the TLS template. */
 	byte_t const             *dm_tlsinit;    /* [valid_if(dm_tlsfsize != 0)][0..dm_tlsfsize][lock(WRITE_ONCE)][owned] Non-BSS TLS template data. */
@@ -209,17 +220,14 @@ struct dlmodule {
 	WEAK refcnt_t             dm_refcnt;     /* Reference counter. */
 
 	/* Module global binding. */
-	LLIST_NODE(WEAK DlModule) dm_modules;    /* [lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
 	LLIST_NODE(WEAK DlModule) dm_globals;    /* [lock(DlModule_GlobalLock)][valid_if(dm_flags & RTLD_GLOBAL)]
 	                                          * Link entry in the chain of global modules. */
 
 	/* Module identification / data accessor. */
-	char                     *dm_filename;   /* [1..1][owned] Name of the executable binary file (absolute path). */
 	fd_t                      dm_file;       /* [0..1][lock(WRITE_ONCE)] Readable handle towards the module's file (or -1 if unset). */
 	uint32_t                  dm_flags;      /* Module flags (Set of `RTLD_*'). */
 
 	/* Module load location. */
-	uintptr_t                 dm_loadaddr;   /* [const] Load address of the module. */
 	uintptr_t                 dm_loadstart;  /* [const] Lowest address mapped by this module (already adjusted for `dm_loadaddr'). */
 	uintptr_t                 dm_loadend;    /* [const] Greatest address mapped by this module (already adjusted for `dm_loadaddr'). */
 
@@ -238,7 +246,7 @@ struct dlmodule {
 
 	/* [0..1] Module operations V-table (or `NULL' for ELF modules)
 	 *        Used by libdl extensions for other formats. */
-	struct dlmodule_format      *dm_ops;
+	struct dlmodule_format   *dm_ops;
 
 #ifdef __BUILDING_LIBDL
 	struct dlmodule_elf       dm_elf; /* ELF-specific module data. */
@@ -247,6 +255,12 @@ struct dlmodule {
 #endif /* !__BUILDING_LIBDL */
 };
 
+#ifdef __BUILDING_LIBDL
+INTDEF NONNULL((1)) void LIBDL_CC DlModule_Destroy(DlModule *__restrict self);
+#else /* __BUILDING_LIBDL */
+#define DlModule_Destroy(self) DL_API_SYMBOL(DlModule_Destroy)(self)
+#endif /* !__BUILDING_LIBDL */
+__DEFINE_REFCNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
 
 /* Dl Module reference control. */
 #ifdef __INTELLISENSE__
@@ -270,10 +284,6 @@ DlModule_TryIncref(DlModule *__restrict self) {
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 	return true;
 }
-
-#ifdef __BUILDING_LIBDL
-INTDEF NONNULL((1)) void LIBDL_CC DlModule_Destroy(DlModule *__restrict self);
-#endif /* __BUILDING_LIBDL */
 
 
 #endif /* __CC__ */

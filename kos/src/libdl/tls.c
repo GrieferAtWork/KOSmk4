@@ -126,7 +126,7 @@ DlModule_InitStaticTLSBindings(void) {
 	 * NOTE: Since we've yet to invoke a user-defined code (other than IFUNC selectors),
 	 *       we are allowed to assume that no threads other than the calling (main) thread
 	 *       are currently running, meaning we don't have to do any sort of lock for this! */
-	LLIST_FOREACH(iter, DlModule_AllList, dm_modules) {
+	DlModule_AllList_FOREACH(iter) {
 		if (!iter->dm_tlsmsize)
 			continue;
 		if (static_tls_align < iter->dm_tlsalign)
@@ -140,7 +140,7 @@ DlModule_InitStaticTLSBindings(void) {
 	if unlikely(!static_tls_init)
 		goto err_nomem;
 	/* Load static TLS template data */
-	LLIST_FOREACH(iter, DlModule_AllList, dm_modules) {
+	DlModule_AllList_FOREACH(iter) {
 		byte_t *dst;
 		if (!iter->dm_tlsmsize)
 			continue;
@@ -360,16 +360,28 @@ err_badptr:
 
 
 #define SIZEOF_DL_MODULE_FOR_TLS \
-	MAX(COMPILER_OFFSETAFTER(DlModule, dm_refcnt),   \
-	MAX(COMPILER_OFFSETAFTER(DlModule, dm_tls_arg),  \
-	MAX(COMPILER_OFFSETAFTER(DlModule, dm_tls_fini), \
-	MAX(COMPILER_OFFSETAFTER(DlModule, dm_tls_init), \
-	MAX(COMPILER_OFFSETAFTER(DlModule, dm_tlsstoff), \
-	MAX(COMPILER_OFFSETAFTER(DlModule, dm_tlsalign), \
-	MAX(COMPILER_OFFSETAFTER(DlModule, dm_tlsmsize), \
-	MAX(COMPILER_OFFSETAFTER(DlModule, dm_tlsfsize), \
-	MAX(COMPILER_OFFSETAFTER(DlModule, dm_tlsinit),  \
-	    COMPILER_OFFSETAFTER(DlModule, dm_tlsoff))))))))))
+	MAX(offsetafter(DlModule, dm_refcnt),   \
+	MAX(offsetafter(DlModule, dm_tls_arg),  \
+	MAX(offsetafter(DlModule, dm_tls_fini), \
+	MAX(offsetafter(DlModule, dm_tls_init), \
+	MAX(offsetafter(DlModule, dm_tlsstoff), \
+	MAX(offsetafter(DlModule, dm_tlsalign), \
+	MAX(offsetafter(DlModule, dm_tlsmsize), \
+	MAX(offsetafter(DlModule, dm_tlsfsize), \
+	MAX(offsetafter(DlModule, dm_tlsinit),  \
+	    offsetafter(DlModule, dm_tlsoff))))))))))
+
+#define OFFSETOF_DL_MODULE_FOR_TLS \
+	MIN(offsetof(DlModule, dm_refcnt),   \
+	MIN(offsetof(DlModule, dm_tls_arg),  \
+	MIN(offsetof(DlModule, dm_tls_fini), \
+	MIN(offsetof(DlModule, dm_tls_init), \
+	MIN(offsetof(DlModule, dm_tlsstoff), \
+	MIN(offsetof(DlModule, dm_tlsalign), \
+	MIN(offsetof(DlModule, dm_tlsmsize), \
+	MIN(offsetof(DlModule, dm_tlsfsize), \
+	MIN(offsetof(DlModule, dm_tlsinit),  \
+	    offsetof(DlModule, dm_tlsoff))))))))))
 
 
 
@@ -434,6 +446,10 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
 	result = (DlModule *)malloc(SIZEOF_DL_MODULE_FOR_TLS);
 	if unlikely(!result)
 		goto err_nomem;
+#ifndef NDEBUG
+	/* Invalid all of the `struct link_map' emulation garbage. */
+	memset(result, 0xcc, OFFSETOF_DL_MODULE_FOR_TLS);
+#endif /* !NDEBUG */
 	result->dm_tlsoff   = 0;
 	result->dm_tlsinit  = NULL;
 	result->dm_tlsfsize = template_size;
@@ -466,7 +482,7 @@ err:
 
 
 
-/* Free a TLS segment previously allocated with `dltlsalloc' */
+/* Free a TLS segment previously allocated with `dltlsalloc()' */
 INTERN WUNUSED NONNULL((1)) int LIBCCALL
 libdl_dltlsfree(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
@@ -492,6 +508,28 @@ DEFINE_PUBLIC_ALIAS(dltlsalloc, libdl_dltlsalloc);
 DEFINE_PUBLIC_ALIAS(dltlsfree, libdl_dltlsfree);
 DEFINE_PUBLIC_ALIAS(dltlsaddr, libdl_dltlsaddr);
 
+
+/* Similar to `libdl_dltlsaddr()', but do no lazy allocation
+ * and return NULL if the module doesn't have a TLS segment. */
+INTERN WUNUSED NONNULL((1)) void *CC
+DlModule_TryGetTLSAddr(DlModule *__restrict self) {
+	byte_t *result;
+	struct tls_segment *tls;
+	struct dtls_extension *extab;
+	if unlikely(!self->dm_tlsmsize)
+		return NULL; /* No TLS segment. */
+	tls = (struct tls_segment *)RD_TLS_BASE_REGISTER();
+	/* Simple case: Static TLS */
+	if (self->dm_tlsstoff)
+		return (byte_t *)tls + self->dm_tlsstoff;
+	atomic_rwlock_read(&tls->ts_exlock);
+	extab  = dtls_extension_tree_locate(tls->ts_extree, (uintptr_t)self);
+	result = extab ? extab->te_data : NULL;
+	atomic_rwlock_endread(&tls->ts_exlock);
+	return result;
+}
+
+
 DECL_END
 
 
@@ -499,6 +537,6 @@ DECL_END
 #include "tls-get-addr.c.inl"
 #define FAIL_ON_ERROR 1
 #include "tls-get-addr.c.inl"
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_LIBDL_TLS_C */
