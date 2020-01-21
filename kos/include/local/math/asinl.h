@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0497378 */
+/* HASH CRC-32:0xf9c1dde6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Arc sine of X */
 __LOCAL_LIBC(asinl) __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(asinl))(long double __x) {
-#line 148 "kos/src/libc/magic/math.c"
+#line 204 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_asin((double)__x);
 }
 __NAMESPACE_LOCAL_END

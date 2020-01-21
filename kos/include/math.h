@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff40513 */
+/* HASH CRC-32:0x248fac1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -819,7 +819,16 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),(__x))
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),__atan,(__x))
 #else /* LIBC: atan */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/atan.h>
+__NAMESPACE_STD_BEGIN
+/* Arc tangent of X */
+__NAMESPACE_LOCAL_USING_OR_IMPL(atan, __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL atan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))(__x); })
+#else /* CUSTOM: atan */
 #undef __std_atan_defined
+#endif /* atan... */
 #endif /* atan... */
 #endif /* !__std_atan_defined */
 #ifndef __std_atan2_defined
@@ -834,7 +843,16 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,atan2,(double __y, double __x),(__y,_
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,atan2,(double __y, double __x),__atan2,(__y,__x))
 #else /* LIBC: atan2 */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/atan2.h>
+__NAMESPACE_STD_BEGIN
+/* Arc tangent of Y/X */
+__NAMESPACE_LOCAL_USING_OR_IMPL(atan2, __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL atan2)(double __y, double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2))(__y, __x); })
+#else /* CUSTOM: atan2 */
 #undef __std_atan2_defined
+#endif /* atan2... */
 #endif /* atan2... */
 #endif /* !__std_atan2_defined */
 #ifndef __std_cos_defined
@@ -935,7 +953,9 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,atanf,(float __x),(__x))
 #elif defined(__CRT_HAVE___atanf)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanf,(float __x),__atanf,(__x))
-#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#else /* LIBC: atanf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 __NAMESPACE_STD_END
 #include <local/math/atanf.h>
 __NAMESPACE_STD_BEGIN
@@ -943,6 +963,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(atanf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); })
 #else /* CUSTOM: atanf */
 #undef __std_atanf_defined
+#endif /* atanf... */
 #endif /* atanf... */
 #endif /* !__std_atanf_defined */
 #ifndef __std_atan2f_defined
@@ -956,7 +977,9 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,atan2f,(float __y, float __x),(__y,__x
 #elif defined(__CRT_HAVE___atan2f)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2f,(float __y, float __x),__atan2f,(__y,__x))
-#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#else /* LIBC: atan2f */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 __NAMESPACE_STD_END
 #include <local/math/atan2f.h>
 __NAMESPACE_STD_BEGIN
@@ -964,6 +987,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(atan2f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atan2f)(float __y, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2f))(__y, __x); })
 #else /* CUSTOM: atan2f */
 #undef __std_atan2f_defined
+#endif /* atan2f... */
 #endif /* atan2f... */
 #endif /* !__std_atan2f_defined */
 #ifndef __std_cosf_defined
@@ -1101,7 +1125,9 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atanl,(long double __x),atan,(_
 #elif defined(__CRT_HAVE___atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atanl,(long double __x),__atan,(__x))
-#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#else /* LIBC: atanl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 __NAMESPACE_STD_END
 #include <local/math/atanl.h>
 __NAMESPACE_STD_BEGIN
@@ -1109,6 +1135,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(atanl, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL atanl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanl))(__x); })
 #else /* CUSTOM: atanl */
 #undef __std_atanl_defined
+#endif /* atanl... */
 #endif /* atanl... */
 #endif /* !__std_atanl_defined */
 #ifndef __std_atan2l_defined
@@ -1128,7 +1155,9 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atan2l,(long double __y, long d
 #elif defined(__CRT_HAVE___atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atan2l,(long double __y, long double __x),__atan2,(__y,__x))
-#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#else /* LIBC: atan2l */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 __NAMESPACE_STD_END
 #include <local/math/atan2l.h>
 __NAMESPACE_STD_BEGIN
@@ -1136,6 +1165,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(atan2l, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL atan2l)(long double __y, long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2l))(__y, __x); })
 #else /* CUSTOM: atan2l */
 #undef __std_atan2l_defined
+#endif /* atan2l... */
 #endif /* atan2l... */
 #endif /* !__std_atan2l_defined */
 #ifndef __std_cosl_defined
@@ -4423,7 +4453,9 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan,(float __x),atanf,(__x))
 #elif defined(__CRT_HAVE___atanf)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan,(float __x),__atanf,(__x))
-#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#else /* LIBC: atanf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atanf.h>
@@ -4431,6 +4463,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atan)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); }
+#else /* CUSTOM: atanf */
+#undef none
+#endif /* atan... */
 #endif /* atan... */
 #if __has_builtin(__builtin_atan2f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2f)
 /* Arc tangent of Y/X */
@@ -4441,7 +4476,9 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2,(float __y, float __x),atan2f,(
 #elif defined(__CRT_HAVE___atan2f)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2,(float __y, float __x),__atan2f,(__y,__x))
-#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#else /* LIBC: atan2f */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atan2f.h>
@@ -4449,6 +4486,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atan2)(float __y, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2f))(__y, __x); }
+#else /* CUSTOM: atan2f */
+#undef none
+#endif /* atan2... */
 #endif /* atan2... */
 #if __has_builtin(__builtin_cosf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosf)
 /* Cosine of X */
@@ -4853,7 +4893,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,atan,(long double __x),(__x))
 #elif defined(__CRT_HAVE___atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atan,(long double __x),__atan,(__x))
-#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atanl.h>
@@ -4877,7 +4917,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,atan2,(long double __y, long dou
 #elif defined(__CRT_HAVE___atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atan2,(long double __y, long double __x),__atan2,(__y,__x))
-#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atan2l.h>
@@ -8252,19 +8292,43 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__asin,(double __x),(__x))
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__asin,(double __x),asin,(__x))
 #endif /* __asin... */
-#ifdef __CRT_HAVE___atan
+#if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),(__x))
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan)(double __x) { return __builtin_atan(__x); }
 #elif defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),atan,(__x))
+#elif defined(__CRT_HAVE___atan)
+/* Arc tangent of X */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),(__x))
+#else /* LIBC: atan */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/atan.h>
+/* Arc tangent of X */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))(__x); }
+#else /* CUSTOM: atan */
+#undef none
 #endif /* __atan... */
-#ifdef __CRT_HAVE___atan2
+#endif /* __atan... */
+#if __has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)
 /* Arc tangent of Y/X */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atan2,(double __y, double __x),(__y,__x))
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan2)(double __y, double __x) { return __builtin_atan2(__y, __x); }
 #elif defined(__CRT_HAVE_atan2)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__atan2,(double __y, double __x),atan2,(__y,__x))
+#elif defined(__CRT_HAVE___atan2)
+/* Arc tangent of Y/X */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atan2,(double __y, double __x),(__y,__x))
+#else /* LIBC: atan2 */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/atan2.h>
+/* Arc tangent of Y/X */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan2)(double __y, double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2))(__y, __x); }
+#else /* CUSTOM: atan2 */
+#undef none
+#endif /* __atan2... */
 #endif /* __atan2... */
 #ifdef __CRT_HAVE___cos
 /* Cosine of X */
@@ -8345,10 +8409,15 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__atanf,(float __x),atanf,(__x))
 #elif defined(__CRT_HAVE___atanf)
 /* Arc tangent of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__atanf,(float __x),(__x))
-#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#else /* LIBC: atanf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/atanf.h>
 /* Arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); }
+#else /* CUSTOM: atanf */
+#undef none
+#endif /* __atanf... */
 #endif /* __atanf... */
 #if __has_builtin(__builtin_atan2f) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2f)
 /* Arc tangent of Y/X */
@@ -8359,10 +8428,15 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__atan2f,(float __y, float __x),atan2
 #elif defined(__CRT_HAVE___atan2f)
 /* Arc tangent of Y/X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__atan2f,(float __y, float __x),(__y,__x))
-#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#else /* LIBC: atan2f */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #include <local/math/atan2f.h>
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atan2f)(float __y, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2f))(__y, __x); }
+#else /* CUSTOM: atan2f */
+#undef none
+#endif /* __atan2f... */
 #endif /* __atan2f... */
 #if __has_builtin(__builtin_cosf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosf)
 /* Cosine of X */
@@ -8504,10 +8578,15 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__atanl,(long double __x),atan,
 #elif defined(__CRT_HAVE___atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__atanl,(long double __x),__atan,(__x))
-#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#else /* LIBC: atanl */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 #include <local/math/atanl.h>
 /* Arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __atanl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanl))(__x); }
+#else /* CUSTOM: atanl */
+#undef none
+#endif /* __atanl... */
 #endif /* __atanl... */
 #if __has_builtin(__builtin_atan2l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2l)
 /* Arc tangent of Y/X */
@@ -8524,10 +8603,15 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__atan2l,(long double __y, long
 #elif defined(__CRT_HAVE___atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__atan2l,(long double __y, long double __x),__atan2,(__y,__x))
-#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#else /* LIBC: atan2l */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 #include <local/math/atan2l.h>
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __atan2l)(long double __y, long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2l))(__y, __x); }
+#else /* CUSTOM: atan2l */
+#undef none
+#endif /* __atan2l... */
 #endif /* __atan2l... */
 #if __has_builtin(__builtin_cosl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosl)
 /* Cosine of X */

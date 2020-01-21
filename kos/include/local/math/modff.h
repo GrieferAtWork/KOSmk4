@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53f8a296 */
+/* HASH CRC-32:0x8af349c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(modff) __ATTR_NONNULL((2)) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modff))(float __x,
                                                    float *__iptr) {
-#line 244 "kos/src/libc/magic/math.c"
+#line 345 "kos/src/libc/magic/math.c"
 	double __ipart;
 	float __result;
 	__result = (float)__localdep_modf(__x, &__ipart);

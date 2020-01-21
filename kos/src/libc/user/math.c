@@ -23,6 +23,8 @@
 #include "../api.h"
 /**/
 
+#include <libm/atan.h>
+#include <libm/atan2.h>
 #include <libm/cbrt.h>
 #include <libm/copysign.h>
 #include <libm/fabs.h>
@@ -81,11 +83,13 @@ INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atan") double
 NOTHROW(LIBCCALL libc_atan)(double x)
 /*[[[body:atan]]]*/
-{
-	(void)x;
-	CRT_UNIMPLEMENTED("atan"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
 }
 /*[[[end:atan]]]*/
 
@@ -96,12 +100,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atan2") double
 NOTHROW(LIBCCALL libc_atan2)(double y,
                              double x)
 /*[[[body:atan2]]]*/
-{
-	(void)y;
-	(void)x;
-	CRT_UNIMPLEMENTED("atan2"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
 }
 /*[[[end:atan2]]]*/
 
@@ -176,7 +181,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atanf") float
 NOTHROW(LIBCCALL libc_atanf)(float x)
 /*[[[body:atanf]]]*/
 /*AUTO*/{
-	return (float)libc_atan((double)x);
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 /*[[[end:atanf]]]*/
 
@@ -188,7 +198,12 @@ NOTHROW(LIBCCALL libc_atan2f)(float y,
                               float x)
 /*[[[body:atan2f]]]*/
 /*AUTO*/{
-	return (float)libc_atan2((double)y, (double)x);
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 /*[[[end:atan2f]]]*/
 
@@ -943,7 +958,7 @@ NOTHROW(LIBCCALL libc_pow)(double x,
                            double y)
 /*[[[body:pow]]]*/
 /*AUTO*/{
-	COMPILER_IMPURE(); /* TODO: Math error handling */
+	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_pow((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -959,7 +974,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sqrt") double
 NOTHROW(LIBCCALL libc_sqrt)(double x)
 /*[[[body:sqrt]]]*/
 /*AUTO*/{
-	COMPILER_IMPURE(); /* TODO: Math error handling */
+	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_sqrt((__IEEE754_DOUBLE_TYPE__)x);
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -976,7 +991,7 @@ NOTHROW(LIBCCALL libc_powf)(float x,
                             float y)
 /*[[[body:powf]]]*/
 /*AUTO*/{
-	COMPILER_IMPURE(); /* TODO: Math error handling */
+	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_powf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
 #else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
@@ -992,7 +1007,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sqrtf") float
 NOTHROW(LIBCCALL libc_sqrtf)(float x)
 /*[[[body:sqrtf]]]*/
 /*AUTO*/{
-	COMPILER_IMPURE(); /* TODO: Math error handling */
+	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_sqrtf((__IEEE754_FLOAT_TYPE__)x);
 #else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
@@ -1113,7 +1128,7 @@ NOTHROW(LIBCCALL libc_fmod)(double x,
                             double y)
 /*[[[body:fmod]]]*/
 /*AUTO*/{
-	COMPILER_IMPURE(); /* TODO: Math error handling */
+	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -1130,7 +1145,7 @@ NOTHROW(LIBCCALL libc_fmodf)(float x,
                              float y)
 /*[[[body:fmodf]]]*/
 /*AUTO*/{
-	COMPILER_IMPURE(); /* TODO: Math error handling */
+	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
 #else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
@@ -2198,7 +2213,7 @@ NOTHROW(LIBCCALL libc_scalb)(double x,
                              double fn)
 /*[[[body:scalb]]]*/
 /*AUTO*/{
-	COMPILER_IMPURE(); /* TODO: Math error handling */
+	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_scalb((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)fn);
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -2215,7 +2230,7 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
                               float fn)
 /*[[[body:scalbf]]]*/
 /*AUTO*/{
-	COMPILER_IMPURE(); /* TODO: Math error handling */
+	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_scalbf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)fn);
 #else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */

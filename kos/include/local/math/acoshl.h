@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbf457e3 */
+/* HASH CRC-32:0xf5ec562b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Hyperbolic arc cosine of X */
 __LOCAL_LIBC(acoshl) __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(acoshl))(long double __x) {
-#line 198 "kos/src/libc/magic/math.c"
+#line 287 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_acosh((double)__x);
 }
 __NAMESPACE_LOCAL_END

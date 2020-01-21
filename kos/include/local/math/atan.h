@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x477133cd */
+/* HASH CRC-32:0xd47d1ff4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,27 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local___fpclassifyl_defined
-#if defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass)
-#define __local___fpclassifyl_defined 1
-/* Dependency: "__fpclassify" */
-#ifndef ____localdep___fpclassify_defined
-#define ____localdep___fpclassify_defined 1
-#ifdef __CRT_HAVE___fpclassify
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),__fpclassify,(__x))
-#elif defined(__CRT_HAVE__dclass)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),_dclass,(__x))
-#else /* LIBC: __fpclassify */
-#undef ____localdep___fpclassify_defined
-#endif /* __fpclassify... */
-#endif /* !____localdep___fpclassify_defined */
-
+#ifndef __local_atan_defined
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#define __local_atan_defined 1
+#include <libm/atan.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__fpclassifyl) __ATTR_CONST __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyl))(long double __x) {
-#line 1956 "kos/src/libc/magic/math.c"
-	return (int)__localdep___fpclassify((double)__x);
+/* Arc tangent of X */
+__LOCAL_LIBC(atan) __ATTR_WUNUSED double
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan))(double __x) {
+#line 121 "kos/src/libc/magic/math.c"
+	__COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)__x);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)__x);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE___fpclassify || __CRT_HAVE__dclass */
-#endif /* !__local___fpclassifyl_defined */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
+#endif /* !__local_atan_defined */

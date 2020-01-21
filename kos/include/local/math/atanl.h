@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d02bac0 */
+/* HASH CRC-32:0x1e6e70dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,9 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_atanl_defined
-#if defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 #define __local_atanl_defined 1
-/* Dependency: "atan" */
+#include <libm/atan.h>
+/* Dependency: "atan" from "math" */
 #ifndef ____localdep_atan_defined
 #define ____localdep_atan_defined 1
 #if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
@@ -34,7 +36,14 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),atan,(_
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),__atan,(__x))
 #else /* LIBC: atan */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/atan.h>
+/* Arc tangent of X */
+#define __localdep_atan (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))
+#else /* CUSTOM: atan */
 #undef ____localdep_atan_defined
+#endif /* atan... */
 #endif /* atan... */
 #endif /* !____localdep_atan_defined */
 
@@ -42,9 +51,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Arc tangent of X */
 __LOCAL_LIBC(atanl) __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanl))(long double __x) {
-#line 149 "kos/src/libc/magic/math.c"
+#line 207 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_atan((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_atan || __CRT_HAVE___atan */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_atan || __CRT_HAVE___atan */
 #endif /* !__local_atanl_defined */

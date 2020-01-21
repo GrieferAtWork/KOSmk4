@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe463aaf6 */
+/* HASH CRC-32:0x25e2ee7b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,22 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_atanf_defined
-#if defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #define __local_atanf_defined 1
-/* Dependency: "atan" */
-#ifndef ____localdep_atan_defined
-#define ____localdep_atan_defined 1
-#if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
-/* Arc tangent of X */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_atan)(double __x) { return __builtin_atan(__x); }
-#elif defined(__CRT_HAVE_atan)
-/* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),atan,(__x))
-#elif defined(__CRT_HAVE___atan)
-/* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan,(double __x),__atan,(__x))
-#else /* LIBC: atan */
-#undef ____localdep_atan_defined
-#endif /* atan... */
-#endif /* !____localdep_atan_defined */
-
+#include <libm/atan.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Arc tangent of X */
 __LOCAL_LIBC(atanf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atanf))(float __x) {
-#line 141 "kos/src/libc/magic/math.c"
-	return (float)__localdep_atan((double)__x);
+#line 167 "kos/src/libc/magic/math.c"
+	__COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)__x);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)__x);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_atan || __CRT_HAVE___atan */
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ */
 #endif /* !__local_atanf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x998bb07d */
+/* HASH CRC-32:0x18861c08 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,9 +19,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_atan2l_defined
-#if defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 #define __local_atan2l_defined 1
-/* Dependency: "atan2" */
+#include <libm/atan2.h>
+/* Dependency: "atan2" from "math" */
 #ifndef ____localdep_atan2_defined
 #define ____localdep_atan2_defined 1
 #if __has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)
@@ -34,7 +36,14 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan2,(double __y, double
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan2,(double __y, double __x),__atan2,(__y,__x))
 #else /* LIBC: atan2 */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/atan2.h>
+/* Arc tangent of Y/X */
+#define __localdep_atan2 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2))
+#else /* CUSTOM: atan2 */
 #undef ____localdep_atan2_defined
+#endif /* atan2... */
 #endif /* atan2... */
 #endif /* !____localdep_atan2_defined */
 
@@ -43,9 +52,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(atan2l) __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atan2l))(long double __y,
                                                 long double __x) {
-#line 150 "kos/src/libc/magic/math.c"
+#line 210 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_atan2((double)__y, (double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_atan2 || __CRT_HAVE___atan2 */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_atan2 || __CRT_HAVE___atan2 */
 #endif /* !__local_atan2l_defined */

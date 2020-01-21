@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5d5a982 */
+/* HASH CRC-32:0x12ada067 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fmod) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmod))(double __x,
                                               double __y) {
-#line 485 "kos/src/libc/magic/math.c"
-	__COMPILER_IMPURE(); /* TODO: Math error handling */
+#line 606 "kos/src/libc/magic/math.c"
+	__COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_fmod((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__y);
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */

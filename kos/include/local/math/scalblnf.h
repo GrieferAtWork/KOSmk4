@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ce4874c */
+/* HASH CRC-32:0x409251c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(scalblnf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalblnf))(float __x,
                                                   long int __n) {
-#line 841 "kos/src/libc/magic/math.c"
+#line 976 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)__x, __n);
 #else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
