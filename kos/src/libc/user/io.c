@@ -106,8 +106,10 @@ struct dirent *LIBCCALL dfind_readdir(struct dfind *__restrict self) {
 	return result;
 }
 
-#define dfind_attrib(ent, st) \
-	((ent)->d_type == DT_DIR ? _A_SUBDIR : _A_NORMAL)
+#define dfind_attrib(ent, st)                            \
+	(((ent)->d_type == DT_DIR ? _A_SUBDIR : _A_NORMAL) | \
+	 (((st)->st_mode & 0222) ? 0 : _A_RDONLY) |          \
+	 ((ent)->d_name[0] == '.' ? _A_HIDDEN : 0))
 
 PRIVATE WUNUSED ATTR_SECTION(".text.crt.dos.fs.dir.dfind_read32") int LIBCCALL
 dfind_read32(struct dfind *__restrict self,
