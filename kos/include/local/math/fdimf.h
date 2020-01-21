@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c61a927 */
+/* HASH CRC-32:0x7d2cec42 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,32 +20,33 @@
  */
 #ifndef __local_fdimf_defined
 #define __local_fdimf_defined 1
-/* Dependency: "fabsf" from "math" */
-#ifndef ____localdep_fabsf_defined
-#define ____localdep_fabsf_defined 1
-#if __has_builtin(__builtin_fabsf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsf)
+#include <libm/fabs.h>
+/* Dependency: "fabs" from "math" */
+#ifndef ____localdep_fabs_defined
+#define ____localdep_fabs_defined 1
+#if __has_builtin(__builtin_fabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabs)
 /* Absolute value of X */
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __localdep_fabsf)(float __x) { return __builtin_fabsf(__x); }
-#elif defined(__CRT_HAVE_fabsf)
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_fabs)(double __x) { return __builtin_fabs(__x); }
+#elif defined(__CRT_HAVE_fabs)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_fabsf,(float __x),fabsf,(__x))
-#elif defined(__CRT_HAVE___fabsf)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),fabs,(__x))
+#elif defined(__CRT_HAVE___fabs)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__localdep_fabsf,(float __x),__fabsf,(__x))
-#else /* LIBC: fabsf */
-#include <local/math/fabsf.h>
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),__fabs,(__x))
+#else /* LIBC: fabs */
+#include <local/math/fabs.h>
 /* Absolute value of X */
-#define __localdep_fabsf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))
-#endif /* fabsf... */
-#endif /* !____localdep_fabsf_defined */
+#define __localdep_fabs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))
+#endif /* fabs... */
+#endif /* !____localdep_fabs_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return positive difference between X and Y */
 __LOCAL_LIBC(fdimf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdimf))(float __x,
                                                float __y) {
-#line 581 "kos/src/libc/magic/math.c"
-	return __localdep_fabsf(__y - __x);
+#line 730 "kos/src/libc/magic/math.c"
+	return __localdep_fabs(__y - __x);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_fdimf_defined */

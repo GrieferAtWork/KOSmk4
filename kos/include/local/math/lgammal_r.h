@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e9802d7 */
+/* HASH CRC-32:0x6bf5be1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(lgammal_r) __ATTR_WUNUSED long double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgammal_r))(long double __x,
                                                        int *__signgamp) {
-#line 991 "kos/src/libc/magic/math.c"
+#line 1215 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_lgamma_r((double)__x, __signgamp);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67a5e174 */
+/* HASH CRC-32:0x7143732a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(lroundf) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lroundf))(float __x) {
-#line 575 "kos/src/libc/magic/math.c"
+#line 724 "kos/src/libc/magic/math.c"
 	return (long int)__localdep_roundf(__x);
 }
 __NAMESPACE_LOCAL_END

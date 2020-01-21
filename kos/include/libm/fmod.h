@@ -50,21 +50,13 @@ __DECL_BEGIN
  * Method: shift and subtract
  */
 
-#ifndef __local_libm_onef_defined
-#define __local_libm_onef_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_CONST_DATA(libm_onef) __IEEE754_FLOAT_TYPE__ const
-__libm_onef = __IEEE754_FLOAT_C(1.0);
-__NAMESPACE_LOCAL_END
-#endif /* !__local_libm_onef_defined */
-
-#ifndef __local_libm_zerof_defined
-#define __local_libm_zerof_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_CONST_DATA(libm_zerof) __IEEE754_FLOAT_TYPE__ const
-__libm_zerof[2] = { __IEEE754_FLOAT_C(0.0), __IEEE754_FLOAT_C(-0.0) };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_libm_zerof_defined */
+__LIBM_LOCAL_DECLARE_BEGIN
+#ifndef __libm_onef_defined
+#define __libm_onef_defined 1
+__LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, onef, __IEEE754_FLOAT_C(1.0))
+#endif /* !__libm_onef_defined */
+__LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_FLOAT_TYPE__, zero2f, 2, { __IEEE754_FLOAT_C(0.0), __IEEE754_FLOAT_C(-0.0) })
+__LIBM_LOCAL_DECLARE_END
 
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 (__LIBCCALL __ieee754_fmodf)(__IEEE754_FLOAT_TYPE__ __x,
@@ -84,7 +76,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	if (__hx < __hy)
 		return __x; /* |x|<|y| return x */
 	if (__hx == __hy)
-		return __NAMESPACE_LOCAL_SYM __libm_zerof[(__uint32_t)__sx >> 31]; /* |x|=|y| return x*0*/
+		return __LIBM_LOCAL_VALUE(zero2f)[(__uint32_t)__sx >> 31]; /* |x|=|y| return x*0*/
 
 	/* Note: y cannot be zero if we reach here. */
 
@@ -126,7 +118,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 			__hx = __hx + __hx;
 		} else {
 			if (__hz == 0) /* return sign(x)*0 */
-				return __NAMESPACE_LOCAL_SYM __libm_zerof[(__uint32_t)__sx >> 31];
+				return __LIBM_LOCAL_VALUE(zero2f)[(__uint32_t)__sx >> 31];
 			__hx = __hz + __hz;
 		}
 	}
@@ -137,7 +129,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 
 	/* convert back to floating value and restore the sign */
 	if (__hx == 0) /* return sign(x)*0 */
-		return __NAMESPACE_LOCAL_SYM __libm_zerof[(__uint32_t)__sx >> 31];
+		return __LIBM_LOCAL_VALUE(zero2f)[(__uint32_t)__sx >> 31];
 	while (__hx < 0x00800000) { /* normalize x */
 		__hx = __hx + __hx;
 		__iy -= 1;
@@ -150,7 +142,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		__n = -126 - __iy;
 		__hx >>= __n;
 		__LIBM_SET_FLOAT_WORD(__x, __hx | __sx);
-		__x *= __NAMESPACE_LOCAL_SYM __libm_onef; /* create necessary signal */
+		__x *= __LIBM_LOCAL_VALUE(onef); /* create necessary signal */
 	}
 	return __x; /* exact output */
 }
@@ -176,48 +168,41 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  * Method: shift and subtract
  */
 
-#ifndef __local_libm_one_defined
-#define __local_libm_one_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_CONST_DATA(libm_one) __IEEE754_DOUBLE_TYPE__ const
-__libm_one = __IEEE754_DOUBLE_C(1.0);
-__NAMESPACE_LOCAL_END
-#endif /* !__local_libm_one_defined */
+__LIBM_LOCAL_DECLARE_BEGIN
+#ifndef __libm_one_defined
+#define __libm_one_defined 1
+__LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, one, __IEEE754_DOUBLE_C(1.0))
+#endif /* !__libm_one_defined */
+__LIBM_LOCAL_DECLARE_ARRAY(__IEEE754_DOUBLE_TYPE__, zero2, 2, { __IEEE754_DOUBLE_C(0.0), __IEEE754_DOUBLE_C(-0.0) })
+__LIBM_LOCAL_DECLARE_END
 
-#ifndef __local_libm_zero_defined
-#define __local_libm_zero_defined 1
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC_CONST_DATA(libm_zero) __IEEE754_DOUBLE_TYPE__ const
-__libm_zero[2] = { __IEEE754_DOUBLE_C(0.0), __IEEE754_DOUBLE_C(-0.0) };
-__NAMESPACE_LOCAL_END
-#endif /* !__local_libm_zero_defined */
 
 __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 (__LIBCCALL __ieee754_fmod)(__IEEE754_DOUBLE_TYPE__ __x,
                             __IEEE754_DOUBLE_TYPE__ __y) {
 	__int32_t __n, __hx, __hy, __hz, __ix, __iy, __sx, __i;
-	__uint32_t lx, ly, lz;
-	__LIBM_EXTRACT_WORDS(__hx, lx, __x);
-	__LIBM_EXTRACT_WORDS(__hy, ly, __y);
+	__uint32_t __lx, __ly, __lz;
+	__LIBM_EXTRACT_WORDS(__hx, __lx, __x);
+	__LIBM_EXTRACT_WORDS(__hy, __ly, __y);
 	__sx = __hx & 0x80000000; /* sign of x */
 	__hx ^= __sx;             /* |x| */
 	__hy &= 0x7fffffff;       /* |y| */
 
 	/* purge off exception values */
-	if ((__hy | ly) == 0 || (__hx >= 0x7ff00000) || /* y=0,or x not finite */
-	    ((__hy | ((ly | -ly) >> 31)) > 0x7ff00000)) /* or y is NaN */
+	if ((__hy | __ly) == 0 || (__hx >= 0x7ff00000) || /* y=0,or x not finite */
+	    ((__hy | ((__ly | -__ly) >> 31)) > 0x7ff00000)) /* or y is NaN */
 		return (__x * __y) / (__x * __y);
 	if (__hx <= __hy) {
-		if ((__hx < __hy) || (lx < ly))
+		if ((__hx < __hy) || (__lx < __ly))
 			return __x; /* |x|<|y| return x */
-		if (lx == ly)
-			return __NAMESPACE_LOCAL_SYM __libm_zero[(__uint32_t)__sx >> 31]; /* |x|=|y| return x*0*/
+		if (__lx == __ly)
+			return __LIBM_LOCAL_VALUE(zero2)[(__uint32_t)__sx >> 31]; /* |x|=|y| return x*0*/
 	}
 
 	/* determine ix = ilogb(x) */
 	if (__hx < 0x00100000) { /* subnormal x */
 		if (__hx == 0) {
-			for (__ix = -1043, __i = lx; __i > 0; __i <<= 1)
+			for (__ix = -1043, __i = __lx; __i > 0; __i <<= 1)
 				__ix -= 1;
 		} else {
 			for (__ix = -1022, __i = (__hx << 11); __i > 0; __i <<= 1)
@@ -230,7 +215,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	/* determine iy = ilogb(y) */
 	if (__hy < 0x00100000) { /* subnormal y */
 		if (__hy == 0) {
-			for (__iy = -1043, __i = ly; __i > 0; __i <<= 1)
+			for (__iy = -1043, __i = __ly; __i > 0; __i <<= 1)
 				__iy -= 1;
 		} else {
 			for (__iy = -1022, __i = (__hy << 11); __i > 0; __i <<= 1)
@@ -246,11 +231,11 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	else { /* subnormal x, shift x to normal */
 		__n = -1022 - __ix;
 		if (__n <= 31) {
-			__hx = (__hx << __n) | (lx >> (32 - __n));
-			lx <<= __n;
+			__hx = (__hx << __n) | (__lx >> (32 - __n));
+			__lx <<= __n;
 		} else {
-			__hx = lx << (__n - 32);
-			lx   = 0;
+			__hx = __lx << (__n - 32);
+			__lx   = 0;
 		}
 	}
 	if (__iy >= -1022)
@@ -258,11 +243,11 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	else { /* subnormal y, shift y to normal */
 		__n = -1022 - __iy;
 		if (__n <= 31) {
-			__hy = (__hy << __n) | (ly >> (32 - __n));
-			ly <<= __n;
+			__hy = (__hy << __n) | (__ly >> (32 - __n));
+			__ly <<= __n;
 		} else {
-			__hy = ly << (__n - 32);
-			ly   = 0;
+			__hy = __ly << (__n - 32);
+			__ly   = 0;
 		}
 	}
 
@@ -270,53 +255,53 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	__n = __ix - __iy;
 	while (__n--) {
 		__hz = __hx - __hy;
-		lz   = lx - ly;
-		if (lx < ly)
+		__lz   = __lx - __ly;
+		if (__lx < __ly)
 			__hz -= 1;
 		if (__hz < 0) {
-			__hx = __hx + __hx + (lx >> 31);
-			lx   = lx + lx;
+			__hx = __hx + __hx + (__lx >> 31);
+			__lx   = __lx + __lx;
 		} else {
-			if ((__hz | lz) == 0) /* return sign(x)*0 */
-				return __NAMESPACE_LOCAL_SYM __libm_zero[(__uint32_t)__sx >> 31];
-			__hx = __hz + __hz + (lz >> 31);
-			lx   = lz + lz;
+			if ((__hz | __lz) == 0) /* return sign(x)*0 */
+				return __LIBM_LOCAL_VALUE(zero2)[(__uint32_t)__sx >> 31];
+			__hx = __hz + __hz + (__lz >> 31);
+			__lx   = __lz + __lz;
 		}
 	}
 	__hz = __hx - __hy;
-	lz   = lx - ly;
-	if (lx < ly)
+	__lz   = __lx - __ly;
+	if (__lx < __ly)
 		__hz -= 1;
 	if (__hz >= 0) {
 		__hx = __hz;
-		lx   = lz;
+		__lx   = __lz;
 	}
 
 	/* convert back to floating value and restore the sign */
-	if ((__hx | lx) == 0) /* return sign(x)*0 */
-		return __NAMESPACE_LOCAL_SYM __libm_zero[(__uint32_t)__sx >> 31];
+	if ((__hx | __lx) == 0) /* return sign(x)*0 */
+		return __LIBM_LOCAL_VALUE(zero2)[(__uint32_t)__sx >> 31];
 	while (__hx < 0x00100000) { /* normalize x */
-		__hx = __hx + __hx + (lx >> 31);
-		lx   = lx + lx;
+		__hx = __hx + __hx + (__lx >> 31);
+		__lx   = __lx + __lx;
 		__iy -= 1;
 	}
 	if (__iy >= -1022) { /* normalize output */
 		__hx = ((__hx - 0x00100000) | ((__iy + 1023) << 20));
-		__LIBM_INSERT_WORDS(__x, __hx | __sx, lx);
+		__LIBM_INSERT_WORDS(__x, __hx | __sx, __lx);
 	} else { /* subnormal output */
 		__n = -1022 - __iy;
 		if (__n <= 20) {
-			lx = (lx >> __n) | ((__uint32_t)__hx << (32 - __n));
+			__lx = (__lx >> __n) | ((__uint32_t)__hx << (32 - __n));
 			__hx >>= __n;
 		} else if (__n <= 31) {
-			lx   = (__hx << (32 - __n)) | (lx >> __n);
+			__lx   = (__hx << (32 - __n)) | (__lx >> __n);
 			__hx = __sx;
 		} else {
-			lx   = __hx >> (__n - 32);
+			__lx   = __hx >> (__n - 32);
 			__hx = __sx;
 		}
-		__LIBM_INSERT_WORDS(__x, __hx | __sx, lx);
-		__x *= __NAMESPACE_LOCAL_SYM __libm_one; /* create necessary signal */
+		__LIBM_INSERT_WORDS(__x, __hx | __sx, __lx);
+		__x *= __LIBM_LOCAL_VALUE(one); /* create necessary signal */
 	}
 	return __x; /* exact output */
 }

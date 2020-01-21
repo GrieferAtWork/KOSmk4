@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4376750f */
+/* HASH CRC-32:0x7c404e3a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,7 +113,6 @@
 #define __stub_atanh 1
 #define __stub_bindresvport 1
 #define __stub_bindresvport6 1
-#define __stub_cbrt 1
 #define __stub_clock 1
 #define __stub_clock_getcpuclockid 1
 #define __stub_closelog 1
@@ -405,7 +404,6 @@
 #define __stub_posix_spawnattr_setsigdefault 1
 #define __stub_posix_spawnattr_setsigmask 1
 #define __stub_posix_spawnp 1
-#define __stub_pow 1
 #define __stub_pow10 1
 #define __stub_preadv 1
 #define __stub_preadv64 1
@@ -524,8 +522,6 @@
 #define __stub_ruserok 1
 #define __stub_ruserok_af 1
 #define __stub_scalb 1
-#define __stub_scalbln 1
-#define __stub_scalbn 1
 #define __stub_scandir 1
 #define __stub_scandirat 1
 #define __stub_seed48 1
@@ -582,7 +578,6 @@
 #define __stub_spawnve 1
 #define __stub_spawnvp 1
 #define __stub_spawnvpe 1
-#define __stub_sqrt 1
 #define __stub_srand48 1
 #define __stub_srand48_r 1
 #define __stub_srandom_r 1

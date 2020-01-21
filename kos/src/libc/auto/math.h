@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x286ce05d */
+/* HASH CRC-32:0x627246e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,32 +31,20 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* Smallest integral value not less than X */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_ceil)(double x);
-/* Absolute value of X */
-INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fabs)(double x);
 /* Largest integer not greater than X */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_floor)(double x);
 /* Smallest integral value not less than X */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_ceilf)(float x);
-/* Absolute value of X */
-INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fabsf)(float x);
 /* Largest integer not greater than X */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_floorf)(float x);
 /* Smallest integral value not less than X */
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_ceill)(long double x);
-/* Absolute value of X */
-INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_fabsl)(long double x);
 /* Largest integer not greater than X */
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_floorl)(long double x);
-/* Return X with its signed changed to Y's */
-INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_copysign)(double num, double sign);
 /* Return representation of qNaN for double type */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_nan)(char const *tagb);
-/* Return X with its signed changed to Y's */
-INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_copysignf)(float num, float sign);
 /* Return representation of qNaN for double type */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_nanf)(char const *tagb);
-/* Return X with its signed changed to Y's */
-INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_copysignl)(long double num, long double sign);
 /* Return representation of qNaN for double type */
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_nanl)(char const *tagb);
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -66,8 +54,6 @@ INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_round)(double x);
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_trunc)(double x);
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lround)(double x);
-/* Return positive difference between X and Y */
-INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fdim)(double x, double y);
 /* Return maximum numeric value from X and Y */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fmax)(double x, double y);
 /* Return minimum numeric value from X and Y */
@@ -83,8 +69,6 @@ INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_roundf)(float x);
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_truncf)(float x);
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lroundf)(float x);
-/* Return positive difference between X and Y */
-INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fdimf)(float x, float y);
 /* Return maximum numeric value from X and Y */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fmaxf)(float x, float y);
 /* Return minimum numeric value from X and Y */
@@ -100,8 +84,6 @@ INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_roundl)(long double 
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_truncl)(long double x);
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lroundl)(long double x);
-/* Return positive difference between X and Y */
-INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_fdiml)(long double x, long double y);
 /* Return maximum numeric value from X and Y */
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_fmaxl)(long double x, long double y);
 /* Return minimum numeric value from X and Y */
@@ -142,7 +124,7 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isnanl)(long double val);
 #define libc___finitef libc_finitef
 /* Smallest integral value not less than X */
 #define libc___ceill libc_ceill
-/* Absolute value of X */
+/* Return X with its signed changed to Y's */
 #define libc___fabsl libc_fabsl
 /* Largest integer not greater than X */
 #define libc___floorl libc_floorl

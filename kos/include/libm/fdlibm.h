@@ -32,6 +32,17 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#define __LIBM_LOCAL_DECLARE_BEGIN __NAMESPACE_LOCAL_BEGIN
+#define __LIBM_LOCAL_DECLARE_END   __NAMESPACE_LOCAL_END
+#define __LIBM_LOCAL_DECLARE(T, name, value) \
+	__LOCAL_LIBC_CONST_DATA(libm_##name)     \
+	T const __libm_##name = value;
+#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n, ...) \
+	__LOCAL_LIBC_CONST_DATA(libm_##name)            \
+	T const __libm_##name[n] = __VA_ARGS__;
+#define __LIBM_LOCAL_VALUE(name) \
+	__NAMESPACE_LOCAL_SYM __libm_##name
+
 /* NOTE: Heavy modifications were made to the original fdlibm! */
 /*
  * ====================================================
@@ -191,6 +202,12 @@ typedef union {
 
 
 __DECL_END
-#endif /* __CC__ */
+#else /* __CC__ */
+#define __LIBM_LOCAL_DECLARE_BEGIN                      /* nothing */
+#define __LIBM_LOCAL_DECLARE_END                        /* nothing */
+#define __LIBM_LOCAL_DECLARE(T, name, value)            /* nothing */
+#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, array, ...) /* nothing */
+#define __LIBM_LOCAL_VALUE(name)                        /* nothing */
+#endif /* !__CC__ */
 
 #endif /* !_LIBM_FDLIBM_H */

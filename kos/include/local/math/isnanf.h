@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa76a8eec */
+/* HASH CRC-32:0x2389bee0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(isnanf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnanf))(float __val) {
-#line 921 "kos/src/libc/magic/math.c"
+#line 1145 "kos/src/libc/magic/math.c"
 	return __val == (float)NAN;
 }
 __NAMESPACE_LOCAL_END

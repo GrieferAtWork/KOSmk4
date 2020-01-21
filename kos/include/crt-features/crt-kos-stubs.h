@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9dd749fe */
+/* HASH CRC-32:0x18e84fcc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,7 +113,6 @@
 #define __CRT_STUB_atanh 1
 #define __CRT_STUB_bindresvport 1
 #define __CRT_STUB_bindresvport6 1
-#define __CRT_STUB_cbrt 1
 #define __CRT_STUB_clock 1
 #define __CRT_STUB_clock_getcpuclockid 1
 #define __CRT_STUB_closelog 1
@@ -405,7 +404,6 @@
 #define __CRT_STUB_posix_spawnattr_setsigdefault 1
 #define __CRT_STUB_posix_spawnattr_setsigmask 1
 #define __CRT_STUB_posix_spawnp 1
-#define __CRT_STUB_pow 1
 #define __CRT_STUB_pow10 1
 #define __CRT_STUB_preadv 1
 #define __CRT_STUB_preadv64 1
@@ -524,8 +522,6 @@
 #define __CRT_STUB_ruserok 1
 #define __CRT_STUB_ruserok_af 1
 #define __CRT_STUB_scalb 1
-#define __CRT_STUB_scalbln 1
-#define __CRT_STUB_scalbn 1
 #define __CRT_STUB_scandir 1
 #define __CRT_STUB_scandirat 1
 #define __CRT_STUB_seed48 1
@@ -582,7 +578,6 @@
 #define __CRT_STUB_spawnve 1
 #define __CRT_STUB_spawnvp 1
 #define __CRT_STUB_spawnvpe 1
-#define __CRT_STUB_sqrt 1
 #define __CRT_STUB_srand48 1
 #define __CRT_STUB_srand48_r 1
 #define __CRT_STUB_srandom_r 1

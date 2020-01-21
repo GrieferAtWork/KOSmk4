@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58445a2a */
+/* HASH CRC-32:0x79a7cdd3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the binary exponent of X, which must be nonzero */
 __LOCAL_LIBC(ilogbf) __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ilogbf))(float __x) {
-#line 509 "kos/src/libc/magic/math.c"
+#line 642 "kos/src/libc/magic/math.c"
 	return (int)__localdep_ilogb((double)__x);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62a19240 */
+/* HASH CRC-32:0xe5f3bcdc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,12 @@
 #define __local_fmodf_defined 1
 #include <libm/fmod.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fmodf) __ATTR_CONST __ATTR_WUNUSED float
+/* Floating-point modulo remainder of X/Y */
+__LOCAL_LIBC(fmodf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmodf))(float __x,
                                                float __y) {
-#line 406 "kos/src/libc/magic/math.c"
+#line 493 "kos/src/libc/magic/math.c"
+	__COMPILER_IMPURE(); /* TODO: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_fmodf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__y);
 #else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf07cb715 */
+/* HASH CRC-32:0x182a8ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,12 +20,19 @@
  */
 #ifndef __local_fabs_defined
 #define __local_fabs_defined 1
+#include <libm/fabs.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Absolute value of X */
 __LOCAL_LIBC(fabs) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabs))(double __x) {
-#line 372 "kos/src/libc/magic/math.c"
-	return __x < 0 ? -__x : __x;
+#line 438 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_fabs((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_fabsf((__IEEE754_FLOAT_TYPE__)__x);
+#else /* ... */
+	return __x < 0.0 ? -__x : __x;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_fabs_defined */

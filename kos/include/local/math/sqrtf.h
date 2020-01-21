@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e17f9cd */
+/* HASH CRC-32:0x1f0146ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,32 +19,22 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sqrtf_defined
-#if defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 #define __local_sqrtf_defined 1
-/* Dependency: "sqrt" */
-#ifndef ____localdep_sqrt_defined
-#define ____localdep_sqrt_defined 1
-#if __has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)
-/* Return the square root of X */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_sqrt)(double __x) { return __builtin_sqrt(__x); }
-#elif defined(__CRT_HAVE_sqrt)
-/* Return the square root of X */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sqrt,(double __x),sqrt,(__x))
-#elif defined(__CRT_HAVE___sqrt)
-/* Return the square root of X */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_sqrt,(double __x),__sqrt,(__x))
-#else /* LIBC: sqrt */
-#undef ____localdep_sqrt_defined
-#endif /* sqrt... */
-#endif /* !____localdep_sqrt_defined */
-
+#include <libm/sqrt.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the square root of X */
 __LOCAL_LIBC(sqrtf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sqrtf))(float __x) {
-#line 327 "kos/src/libc/magic/math.c"
-	return (float)__localdep_sqrt((double)__x);
+#line 362 "kos/src/libc/magic/math.c"
+	__COMPILER_IMPURE(); /* TODO: Math error handling */
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_sqrtf((__IEEE754_FLOAT_TYPE__)__x);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_sqrt((__IEEE754_DOUBLE_TYPE__)__x);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_sqrt || __CRT_HAVE___sqrt */
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ */
 #endif /* !__local_sqrtf_defined */

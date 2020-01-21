@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c0a83fa */
+/* HASH CRC-32:0xdbaea3aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -192,16 +192,29 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_hypotf)(float x, float y);
 /* Return `sqrt(X*X + Y*Y)' */
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_hypotl)(long double x, long double y);
 /* Return the cube root of X */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_cbrt)(double x);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_cbrt)(double x);
 /* Return the cube root of X */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_cbrtf)(float x);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_cbrtf)(float x);
 /* Return the cube root of X */
-INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_cbrtl)(long double x);
+INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_cbrtl)(long double x);
+/* Absolute value of X */
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fabs)(double x);
 /* Floating-point modulo remainder of X/Y */
-INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fmod)(double x, double y);
-INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fmodf)(float x, float y);
+INTDEF WUNUSED double NOTHROW(LIBCCALL libc_fmod)(double x, double y);
+/* Absolute value of X */
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fabsf)(float x);
+/* Floating-point modulo remainder of X/Y */
+INTDEF WUNUSED float NOTHROW(LIBCCALL libc_fmodf)(float x, float y);
+/* Return X with its signed changed to Y's */
+INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_fabsl)(long double x);
 /* Floating-point modulo remainder of X/Y */
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_fmodl)(long double x, long double y);
+/* Return X with its signed changed to Y's */
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_copysign)(double num, double sign);
+/* Return X with its signed changed to Y's */
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_copysignf)(float num, float sign);
+/* Return X with its signed changed to Y's */
+INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_copysignl)(long double num, long double sign);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erf)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_erfc)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_lgamma)(double x);
@@ -243,9 +256,9 @@ INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_remainderl)(long double x, long
 INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogbl)(long double x);
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_nexttoward)(double x, long double y);
 /* Return X times (2 to the Nth power) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_scalbn)(double x, int n);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_scalbn)(double x, int n);
 /* Return X times (2 to the Nth power) */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_scalbln)(double x, long int n);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_scalbln)(double x, long int n);
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_nearbyint)(double x);
@@ -255,13 +268,15 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_nearbyint)(double x);
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_remquo)(double x, double y, int *pquo);
 /* Round X to nearest integral value according to current rounding direction */
 INTDEF WUNUSED long int NOTHROW(LIBCCALL libc_lrint)(double x);
+/* Return positive difference between X and Y */
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fdim)(double x, double y);
 /* Round X to nearest integral value according to current rounding direction */
 INTDEF WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrint)(double x);
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_nexttowardf)(float x, long double y);
 /* Return X times (2 to the Nth power) */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_scalbnf)(float x, int n);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_scalbnf)(float x, int n);
 /* Return X times (2 to the Nth power) */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_scalblnf)(float x, long int n);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_scalblnf)(float x, long int n);
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_nearbyintf)(float x);
@@ -271,13 +286,15 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_nearbyintf)(float x);
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remquof)(float x, float y, int *pquo);
 /* Round X to nearest integral value according to current rounding direction */
 INTDEF WUNUSED long int NOTHROW(LIBCCALL libc_lrintf)(float x);
+/* Return positive difference between X and Y */
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fdimf)(float x, float y);
 /* Round X to nearest integral value according to current rounding direction */
 INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrintf)(float x);
 INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_nexttowardl)(long double x, long double y);
 /* Return X times (2 to the Nth power) */
-INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_scalbnl)(long double x, int n);
+INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_scalbnl)(long double x, int n);
 /* Return X times (2 to the Nth power) */
-INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_scalblnl)(long double x, long int n);
+INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_scalblnl)(long double x, long int n);
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_nearbyintl)(long double x);
@@ -287,6 +304,8 @@ INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_nearbyintl)(long double x);
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_remquol)(long double x, long double y, int *pquo);
 /* Round X to nearest integral value according to current rounding direction */
 INTDEF WUNUSED long int NOTHROW(LIBCCALL libc_lrintl)(long double x);
+/* Return positive difference between X and Y */
+INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_fdiml)(long double x, long double y);
 /* Round X to nearest integral value according to current rounding direction */
 INTDEF WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrintl)(long double x);
 /* Cosine and sine of X */

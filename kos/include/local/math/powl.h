@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5ddc939 */
+/* HASH CRC-32:0xa91ae87f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_powl_defined
-#if defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 #define __local_powl_defined 1
 #include <bits/math-vector.h>
+#include <libm/pow.h>
 #include <bits/math-vector.h>
-/* Dependency: "pow" */
+/* Dependency: "pow" from "math" */
 #ifndef ____localdep_pow_defined
 #define ____localdep_pow_defined 1
 #if __has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)
@@ -36,7 +38,14 @@ __CREDIRECT(__DECL_SIMD_pow __ATTR_WUNUSED,double,__NOTHROW,__localdep_pow,(doub
 /* Return X to the Y power */
 __CREDIRECT(__DECL_SIMD_pow __ATTR_WUNUSED,double,__NOTHROW,__localdep_pow,(double __x, double __y),__pow,(__x,__y))
 #else /* LIBC: pow */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#include <local/math/pow.h>
+/* Return X to the Y power */
+#define __localdep_pow (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow))
+#else /* CUSTOM: pow */
 #undef ____localdep_pow_defined
+#endif /* pow... */
 #endif /* pow... */
 #endif /* !____localdep_pow_defined */
 
@@ -45,9 +54,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(powl) __DECL_SIMD_powl __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powl))(long double __x,
                                               long double __y) {
-#line 330 "kos/src/libc/magic/math.c"
+#line 374 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_pow((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_pow || __CRT_HAVE___pow */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_pow || __CRT_HAVE___pow */
 #endif /* !__local_powl_defined */

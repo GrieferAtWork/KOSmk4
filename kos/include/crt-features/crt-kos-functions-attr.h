@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85ad6948 */
+/* HASH CRC-32:0x65b1227b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4593,6 +4593,9 @@
 
 
 /* ATTR_CONST */
+#define __CRT_ATTR_CONST___cbrt 1
+#define __CRT_ATTR_CONST___cbrtf 1
+#define __CRT_ATTR_CONST___cbrtl 1
 #define __CRT_ATTR_CONST___ceil 1
 #define __CRT_ATTR_CONST___ceilf 1
 #define __CRT_ATTR_CONST___ceill 1
@@ -4625,8 +4628,6 @@
 #define __CRT_ATTR_CONST___fmin 1
 #define __CRT_ATTR_CONST___fminf 1
 #define __CRT_ATTR_CONST___fminl 1
-#define __CRT_ATTR_CONST___fmod 1
-#define __CRT_ATTR_CONST___fmodf 1
 #define __CRT_ATTR_CONST___fmodl 1
 #define __CRT_ATTR_CONST___fpclassify 1
 #define __CRT_ATTR_CONST___fpclassifyf 1
@@ -4675,6 +4676,12 @@
 #define __CRT_ATTR_CONST___round 1
 #define __CRT_ATTR_CONST___roundf 1
 #define __CRT_ATTR_CONST___roundl 1
+#define __CRT_ATTR_CONST___scalbln 1
+#define __CRT_ATTR_CONST___scalblnf 1
+#define __CRT_ATTR_CONST___scalblnl 1
+#define __CRT_ATTR_CONST___scalbn 1
+#define __CRT_ATTR_CONST___scalbnf 1
+#define __CRT_ATTR_CONST___scalbnl 1
 #define __CRT_ATTR_CONST___signbit 1
 #define __CRT_ATTR_CONST___signbitf 1
 #define __CRT_ATTR_CONST___signbitl 1
@@ -4703,6 +4710,9 @@
 #define __CRT_ATTR_CONST__rotr64 1
 #define __CRT_ATTR_CONST_abs 1
 #define __CRT_ATTR_CONST_btowc 1
+#define __CRT_ATTR_CONST_cbrt 1
+#define __CRT_ATTR_CONST_cbrtf 1
+#define __CRT_ATTR_CONST_cbrtl 1
 #define __CRT_ATTR_CONST_ceil 1
 #define __CRT_ATTR_CONST_ceilf 1
 #define __CRT_ATTR_CONST_ceill 1
@@ -4738,8 +4748,6 @@
 #define __CRT_ATTR_CONST_fmin 1
 #define __CRT_ATTR_CONST_fminf 1
 #define __CRT_ATTR_CONST_fminl 1
-#define __CRT_ATTR_CONST_fmod 1
-#define __CRT_ATTR_CONST_fmodf 1
 #define __CRT_ATTR_CONST_fmodl 1
 #define __CRT_ATTR_CONST_format_length 1
 #define __CRT_ATTR_CONST_format_wlength 1
@@ -4816,6 +4824,12 @@
 #define __CRT_ATTR_CONST_round 1
 #define __CRT_ATTR_CONST_roundf 1
 #define __CRT_ATTR_CONST_roundl 1
+#define __CRT_ATTR_CONST_scalbln 1
+#define __CRT_ATTR_CONST_scalblnf 1
+#define __CRT_ATTR_CONST_scalblnl 1
+#define __CRT_ATTR_CONST_scalbn 1
+#define __CRT_ATTR_CONST_scalbnf 1
+#define __CRT_ATTR_CONST_scalbnl 1
 #define __CRT_ATTR_CONST_strerror_s 1
 #define __CRT_ATTR_CONST_strerrorname_s 1
 #define __CRT_ATTR_CONST_strsignal_s 1

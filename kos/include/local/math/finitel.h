@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3cdcc48 */
+/* HASH CRC-32:0xc390ddc3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long do
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(finitel) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finitel))(long double __val) {
-#line 900 "kos/src/libc/magic/math.c"
+#line 1124 "kos/src/libc/magic/math.c"
 	return !__localdep_isinfl(__val) && !__localdep_isnanl(__val);
 }
 __NAMESPACE_LOCAL_END

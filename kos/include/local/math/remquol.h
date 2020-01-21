@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79ea540b */
+/* HASH CRC-32:0xf96ee7c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __LOCAL_LIBC(remquol) __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remquol))(long double __x,
                                                  long double __y,
                                                  int *__pquo) {
-#line 639 "kos/src/libc/magic/math.c"
+#line 847 "kos/src/libc/magic/math.c"
 	return (long double)__localdep_remquo((double)__x, (double)__y, __pquo);
 }
 __NAMESPACE_LOCAL_END
