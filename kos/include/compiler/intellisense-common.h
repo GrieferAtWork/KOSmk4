@@ -236,6 +236,7 @@ public:
 template<class __T> struct ____INTELLISENSE_isarith { enum { __value = false }; };
 template<class __T> struct ____INTELLISENSE_issigned { enum { __value = false }; };
 template<class __T> struct ____INTELLISENSE_isunsigned { enum { __value = false }; };
+template<class __T> struct ____INTELLISENSE_isfloat { enum { __value = false }; };
 template<> struct ____INTELLISENSE_isarith<bool> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isarith<wchar_t> { enum { __value = true }; };
 #if defined(_WCHAR_T_DEFINED) || defined(__GNUC__)
@@ -266,6 +267,9 @@ template<> struct ____INTELLISENSE_issigned<long> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isunsigned<unsigned long> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_issigned<long long> { enum { __value = true }; };
 template<> struct ____INTELLISENSE_isunsigned<unsigned long long> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isfloat<float> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isfloat<double> { enum { __value = true }; };
+template<> struct ____INTELLISENSE_isfloat<long double> { enum { __value = true }; };
 
 template<class __UID, bool __ALLOW_INT_OPS, class __T> struct ____INTELLISENSE_isarith<____intellisense_altint<__UID, __ALLOW_INT_OPS, __T> > { enum{__value=____INTELLISENSE_isarith<__T>::__value}; };
 template<class __UID, bool __ALLOW_INT_OPS, class __T> struct ____INTELLISENSE_issigned<____intellisense_altint<__UID, __ALLOW_INT_OPS, __T> > { enum{__value=____INTELLISENSE_issigned<__T>::__value}; };

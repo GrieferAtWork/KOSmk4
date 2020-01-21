@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x517cb6ba */
+/* HASH CRC-32:0xfcefe112 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,8 +26,10 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(copysignl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(copysignl))(__LONGDOUBLE __num,
                                                    __LONGDOUBLE __sign) {
-#line 714 "kos/src/libc/magic/math.c"
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
+#line 718 "kos/src/libc/magic/math.c"
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)__num, (__IEEE854_LONG_DOUBLE_TYPE__)__sign);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)__num, (__IEEE754_DOUBLE_TYPE__)__sign);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)__num, (__IEEE754_FLOAT_TYPE__)__sign);

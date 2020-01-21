@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6591c448 */
+/* HASH CRC-32:0x72774ef7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,15 +23,41 @@
 #include <libm/isnan.h>
 
 #include <bits/nan.h>
+/* Dependency: "isnan" from "math" */
+#ifndef ____localdep_isnan_defined
+#define ____localdep_isnan_defined 1
+#if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
+/* Return nonzero if VALUE is not a number */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isnan)(double __x) { return __builtin_isnan(__x); }
+#elif defined(__CRT_HAVE_isnan)
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),isnan,(__x))
+#elif defined(__CRT_HAVE___isnan)
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),__isnan,(__x))
+#elif defined(__CRT_HAVE__isnan)
+/* Return nonzero if VALUE is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnan,(double __x),_isnan,(__x))
+#else /* LIBC: isnan */
+#include <local/math/isnan.h>
+/* Return nonzero if VALUE is not a number */
+#define __localdep_isnan (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))
+#endif /* isnan... */
+#endif /* !____localdep_isnan_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is not a number */
 __LOCAL_LIBC(isnanf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnanf))(float __x) {
-#line 1440 "kos/src/libc/magic/math.c"
+#line 1456 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#elif 1
+	return __localdep_isnan((double)__x);
 #else /* ... */
 	return __x == (float)NAN;
 #endif /* !... */

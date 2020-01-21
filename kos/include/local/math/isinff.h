@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45d0024e */
+/* HASH CRC-32:0x4127f8bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,17 +23,38 @@
 #include <libm/isinf.h>
 
 #include <bits/huge_valf.h>
+/* Dependency: "isinf" from "math" */
+#ifndef ____localdep_isinf_defined
+#define ____localdep_isinf_defined 1
+#if __has_builtin(__builtin_isinf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinf)
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isinf)(double __x) { return __builtin_isinf(__x); }
+#elif defined(__CRT_HAVE_isinf)
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __x),isinf,(__x))
+#elif defined(__CRT_HAVE___isinf)
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinf,(double __x),__isinf,(__x))
+#else /* LIBC: isinf */
+#include <local/math/isinf.h>
+/* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+#define __localdep_isinf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))
+#endif /* isinf... */
+#endif /* !____localdep_isinf_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __LOCAL_LIBC(isinff) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isinff))(float __x) {
-#line 1324 "kos/src/libc/magic/math.c"
+#line 1330 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#elif 1
+	return __localdep_isinf((double)__x);
 #else /* ... */
 	return __x == HUGE_VALF;
 #endif /* !... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb39b7ff9 */
+/* HASH CRC-32:0xd42ac355 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,8 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(copysign))(double __num,
 	return (double)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)__num, (__IEEE754_DOUBLE_TYPE__)__sign);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)__num, (__IEEE754_FLOAT_TYPE__)__sign);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return (double)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)__num, (__IEEE854_LONG_DOUBLE_TYPE__)__sign);
 #else /* ... */
 	if ((__num < 0.0) != (__sign < 0.0))
 		__num = -__num;

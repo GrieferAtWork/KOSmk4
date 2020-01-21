@@ -166,9 +166,9 @@ class __attribute__((__aligned__(16))) __intellisense_int128 {
 private:
 	signed char __data[__SIZEOF_INT128__];
 public:
-	__intellisense_int128() throw();
-	__intellisense_int128(__intellisense_int128 const &) throw();
-	__intellisense_int128(__intellisense_int128 &&) throw();
+	__intellisense_int128() throw() = default;
+	__intellisense_int128(__intellisense_int128 const &) throw() = default;
+	__intellisense_int128(__intellisense_int128 &&) throw() = default;
 	__intellisense_int128(bool) throw();
 	__intellisense_int128(char) throw();
 	__intellisense_int128(signed char) throw();
@@ -258,9 +258,9 @@ class __attribute__((__aligned__(16))) __intellisense_uint128 {
 private:
 	unsigned char __data[__SIZEOF_INT128__];
 public:
-	__intellisense_uint128() throw();
-	__intellisense_uint128(__intellisense_uint128 const &) throw();
-	__intellisense_uint128(__intellisense_uint128 &&) throw();
+	__intellisense_uint128() throw() = default;
+	__intellisense_uint128(__intellisense_uint128 const &) throw() = default;
+	__intellisense_uint128(__intellisense_uint128 &&) throw() = default;
 	__intellisense_uint128(bool) throw();
 	__intellisense_uint128(char) throw();
 	__intellisense_uint128(signed char) throw();
@@ -443,6 +443,9 @@ static_assert(sizeof(long double) == __SIZEOF_LONG_DOUBLE__, "WTF Intellisense?"
 #endif
 #endif /* !__SIZEOF_LONG_DOUBLE__ */
 
+class __intellisense_long_double;
+template<> struct ____INTELLISENSE_isfloat<__intellisense_long_double> { enum { __value = true }; };
+
 #define __LONGDOUBLE ::__intern::__intellisense_long_double
 #if __SIZEOF_LONG_DOUBLE__ == 12
 class __attribute__((__aligned__(16))) __intellisense_long_double
@@ -453,9 +456,87 @@ class __attribute__((__aligned__(__SIZEOF_LONG_DOUBLE__))) __intellisense_long_d
 private:
 	unsigned char __ld_data[__SIZEOF_LONG_DOUBLE__];
 public:
-	/* TODO */
-
-
+	__intellisense_long_double() throw() = default;
+	__intellisense_long_double(__intellisense_long_double const &) throw() = default;
+	__intellisense_long_double(__intellisense_long_double &&) throw() = default;
+	__intellisense_long_double(bool) throw();
+	__intellisense_long_double(char) throw();
+	__intellisense_long_double(signed char) throw();
+	__intellisense_long_double(unsigned char) throw();
+	__intellisense_long_double(short) throw();
+	__intellisense_long_double(unsigned short) throw();
+	__intellisense_long_double(int) throw();
+	__intellisense_long_double(unsigned int) throw();
+	__intellisense_long_double(long) throw();
+	__intellisense_long_double(unsigned long) throw();
+	__intellisense_long_double(long long) throw();
+	__intellisense_long_double(unsigned long long) throw();
+	__intellisense_long_double(wchar_t) throw();
+	__intellisense_long_double(float) throw();
+	__intellisense_long_double(double) throw();
+	__intellisense_long_double(long double) throw();
+	__intellisense_long_double(__intellisense_int128) throw();
+	__intellisense_long_double(__intellisense_uint128) throw();
+	__intellisense_long_double &operator = (__intellisense_long_double const &) throw();
+	__intellisense_long_double &operator = (__intellisense_long_double &&) throw();
+	__intellisense_long_double &operator = (bool) throw();
+	__intellisense_long_double &operator = (char) throw();
+	__intellisense_long_double &operator = (signed char) throw();
+	__intellisense_long_double &operator = (unsigned char) throw();
+	__intellisense_long_double &operator = (short) throw();
+	__intellisense_long_double &operator = (unsigned short) throw();
+	__intellisense_long_double &operator = (int) throw();
+	__intellisense_long_double &operator = (unsigned int) throw();
+	__intellisense_long_double &operator = (long) throw();
+	__intellisense_long_double &operator = (unsigned long) throw();
+	__intellisense_long_double &operator = (long long) throw();
+	__intellisense_long_double &operator = (unsigned long long) throw();
+	__intellisense_long_double &operator = (wchar_t) throw();
+	__intellisense_long_double &operator = (float) throw();
+	__intellisense_long_double &operator = (double) throw();
+	__intellisense_long_double &operator = (long double) throw();
+	__intellisense_long_double &operator = (__intellisense_int128) throw();
+	__intellisense_long_double &operator = (__intellisense_uint128) throw();
+	__intellisense_long_double operator-() const throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, __intellisense_long_double>::__type operator + (__VT const &) const throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, __intellisense_long_double>::__type operator - (__VT const &) const throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, __intellisense_long_double>::__type operator * (__VT const &) const throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, __intellisense_long_double>::__type operator / (__VT const &) const throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, __intellisense_long_double &>::__type operator += (__VT const &) throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, __intellisense_long_double &>::__type operator -= (__VT const &) throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, __intellisense_long_double &>::__type operator *= (__VT const &) throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, __intellisense_long_double &>::__type operator /= (__VT const &) throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, bool>::__type operator == (__VT const &) const throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, bool>::__type operator != (__VT const &) const throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, bool>::__type operator < (__VT const &) const throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, bool>::__type operator > (__VT const &) const throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, bool>::__type operator <= (__VT const &) const throw();
+	template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigned<__VT>::__value || ____INTELLISENSE_isunsigned<__VT>::__value || ____INTELLISENSE_isfloat<__VT>::__value, bool>::__type operator >= (__VT const &) const throw();
+	bool operator!() const throw();
+	operator bool() const throw();
+	operator char() const throw();
+	operator signed char() const throw();
+	operator unsigned char() const throw();
+	operator short() const throw();
+	operator unsigned short() const throw();
+	operator int() const throw();
+	operator unsigned int() const throw();
+	operator long() const throw();
+	operator unsigned long() const throw();
+	operator long long() const throw();
+	operator unsigned long long() const throw();
+	operator wchar_t() const throw();
+	operator float() const throw();
+	operator double() const throw();
+	operator long double() const throw();
+	operator __intellisense_int128() const throw();
+	operator __intellisense_uint128() const throw();
+#if defined(_WCHAR_T_DEFINED) || defined(__GNUC__)
+	__intellisense_long_double(char16_t) throw();
+	__intellisense_long_double(char32_t) throw();
+	operator char16_t() const throw();
+	operator char32_t() const throw();
+#endif /* _WCHAR_T_DEFINED || __GNUC__ */
 };
 
 

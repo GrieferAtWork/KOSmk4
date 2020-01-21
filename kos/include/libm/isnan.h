@@ -76,6 +76,22 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
 }
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+(__LIBCCALL __ieee854_isnanl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
+	__int32_t __se, __hx, __lx;
+	__LIBM_GET_LDOUBLE_WORDS(__se, __hx, __lx, __x);
+	__se = (__se & 0x7fff) << 1;
+	__lx |= __hx & __UINT32_C(0x7fffffff);
+	__se |= (__uint32_t)(__lx | (-__lx)) >> 31;
+	__se = 0xfffe - __se;
+	return (int)(((__uint32_t)(__se)) >> 31);
+}
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
 __DECL_END
 #endif /* __CC__ */
 

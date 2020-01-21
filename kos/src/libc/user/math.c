@@ -2348,6 +2348,8 @@ NOTHROW(LIBCCALL libc_copysign)(double num,
 	return (double)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return (double)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
 #else /* ... */
 	if ((num < 0.0) != (sign < 0.0))
 		num = -num;
@@ -2366,8 +2368,10 @@ NOTHROW(LIBCCALL libc_copysignf)(float num,
 /*AUTO*/{
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
 #else /* ... */
 	if ((num < 0.0f) != (sign < 0.0f))
 		num = -num;
@@ -2421,7 +2425,9 @@ NOTHROW(LIBCCALL libc_copysignl)(__LONGDOUBLE num,
                                  __LONGDOUBLE sign)
 /*[[[body:copysignl]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
@@ -2465,6 +2471,8 @@ NOTHROW(LIBCCALL libc_isinff)(float x)
 	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif 1
+	return libc_isinf((double)x);
 #else /* ... */
 	return x == HUGE_VALF;
 #endif /* !... */
@@ -2480,10 +2488,10 @@ NOTHROW(LIBCCALL libc_isinfl)(__LONGDOUBLE x)
 /*AUTO*/{
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
 #elif 1
 	return libc_isinf((double)x);
 #else /* ... */
@@ -2503,6 +2511,8 @@ NOTHROW(LIBCCALL libc_finite)(double x)
 	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #else /* ... */
 	return !libc_isinf(x) && !libc_isnan(x);
 #endif /* !... */
@@ -2520,6 +2530,8 @@ NOTHROW(LIBCCALL libc_finitef)(float x)
 	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #else /* ... */
 	return !libc_isinff(x) && !libc_isnanf(x);
 #endif /* !... */
@@ -2533,7 +2545,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitel") int
 NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x)
 /*[[[body:finitel]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
@@ -2556,6 +2570,8 @@ NOTHROW(LIBCCALL libc_isnan)(double x)
 	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #else /* ... */
 	return x == (double)NAN;
 #endif /* !... */
@@ -2573,6 +2589,10 @@ NOTHROW(LIBCCALL libc_isnanf)(float x)
 	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif 1
+	return libc_isnan((double)x);
 #else /* ... */
 	return x == (float)NAN;
 #endif /* !... */
@@ -2586,7 +2606,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanl") int
 NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x)
 /*[[[body:isnanl]]]*/
 /*AUTO*/{
-#ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);

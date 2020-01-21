@@ -675,6 +675,8 @@ copysign:(double num, double sign) -> double {
 	return (double)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return (double)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
 #else /* ... */
 	if ((num < 0.0) != (sign < 0.0))
 		num = -num;
@@ -695,8 +697,10 @@ nan:(char const *tagb) -> double {
 copysignf:(float num, float sign) -> float {
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
 #else /* ... */
 	if ((num < 0.0f) != (sign < 0.0f))
 		num = -num;
@@ -711,7 +715,9 @@ nanf:(char const *tagb) -> float %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__copysignl)][crtbuiltin]
 [decl_include(<libm/copysign.h>)][userimpl][doc_alias(copysign)]
 copysignl:(__LONGDOUBLE num, __LONGDOUBLE sign) -> __LONGDOUBLE {
-#ifdef __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_copysignl((__IEEE854_LONG_DOUBLE_TYPE__)num, (__IEEE854_LONG_DOUBLE_TYPE__)sign);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_copysign((__IEEE754_DOUBLE_TYPE__)num, (__IEEE754_DOUBLE_TYPE__)sign);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_copysignf((__IEEE754_FLOAT_TYPE__)num, (__IEEE754_FLOAT_TYPE__)sign);
@@ -1327,6 +1333,8 @@ isinff:(float x) -> int {
 	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif 1
+	return isinf((double)x);
 #else /* ... */
 	return x == @HUGE_VALF@;
 #endif /* !... */
@@ -1340,10 +1348,10 @@ isinff:(float x) -> int {
 isinfl:(__LONGDOUBLE x) -> int {
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee854_isinfl((__IEEE854_LONG_DOUBLE_TYPE__)x);
-#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
-	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_isinf((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_isinff((__IEEE754_FLOAT_TYPE__)x);
 #elif 1
 	return isinf((double)x);
 #else /* ... */
@@ -1360,6 +1368,8 @@ finite:(double x) -> int {
 	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #else /* ... */
 	return !isinf(x) && !isnan(x);
 #endif /* !... */
@@ -1380,6 +1390,8 @@ finitef:(float x) -> int  {
 	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #else /* ... */
 	return !isinff(x) && !isnanf(x);
 #endif /* !... */
@@ -1396,7 +1408,9 @@ significandf:(float x) -> float %{auto_block(math)}
 [if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__finite, finite)]
 [dependency_include(<libm/finite.h>)][userimpl][doc_alias(finite)]
 finitel:(__LONGDOUBLE x) -> int {
-#ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
@@ -1427,6 +1441,8 @@ isnan:(double x) -> int {
 	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
 #else /* ... */
 	return x == (double)@NAN@;
 #endif /* !... */
@@ -1441,6 +1457,10 @@ isnanf:(float x) -> int {
 	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif 1
+	return isnan((double)x);
 #else /* ... */
 	return x == (float)@NAN@;
 #endif /* !... */
@@ -1452,7 +1472,9 @@ isnanf:(float x) -> int {
 [dependency_include(<libm/isnan.h>)][userimpl][doc_alias(isnan)]
 [dependency_include(<bits/nan.h>)][crtbuiltin]
 isnanl:(__LONGDOUBLE x) -> int {
-#ifdef __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_isnanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_isnanf((__IEEE754_FLOAT_TYPE__)x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return __ieee754_isnan((__IEEE754_DOUBLE_TYPE__)x);

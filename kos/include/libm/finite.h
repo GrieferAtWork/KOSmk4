@@ -73,6 +73,27 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST int
 }
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/*
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ * ====================================================
+ */
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST int
+(__LIBCCALL __ieee854_finitel)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
+	__uint32_t __exp;
+	__LIBM_GET_LDOUBLE_EXP(__exp, __x);
+	return (int)(((__exp & 0x7fff) - 0x7fff) >> 31);
+}
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
 __DECL_END
 #endif /* __CC__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8af59e0 */
+/* HASH CRC-32:0xe0f9a6c5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,11 +63,13 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is finite and not NaN */
 __LOCAL_LIBC(finitef) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finitef))(float __x) {
-#line 1379 "kos/src/libc/magic/math.c"
+#line 1389 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)__x);
 #else /* ... */
 	return !__localdep_isinff(__x) && !__localdep_isnanf(__x);
 #endif /* !... */

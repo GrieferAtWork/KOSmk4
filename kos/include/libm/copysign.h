@@ -79,6 +79,21 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 }
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/* <<<No copyright notice found in the original file, but was part of fdlibm>>> */
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_copysignl)(__IEEE854_LONG_DOUBLE_TYPE__ __num,
+                                 __IEEE854_LONG_DOUBLE_TYPE__ __sign) {
+	__uint32_t __es1, __es2;
+	__LIBM_GET_LDOUBLE_EXP(__es1, __num);
+	__LIBM_GET_LDOUBLE_EXP(__es2, __sign);
+	__LIBM_SET_LDOUBLE_EXP(__num, (__es1 & 0x7fff) | (__es2 & 0x8000));
+	return __num;
+}
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
 __DECL_END
 #endif /* __CC__ */
 

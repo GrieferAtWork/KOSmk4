@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0ebc02e */
+/* HASH CRC-32:0xdcf8f4bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __LOCAL_LIBC(rint) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(rint))(double __x) {
-#line 787 "kos/src/libc/magic/math.c"
+#line 793 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)__x);
 #else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
