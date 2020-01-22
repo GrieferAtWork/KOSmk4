@@ -28,6 +28,12 @@
 
 #include <libm/fdlibm.h>
 
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#include <libm/isnan.h>
+#include <libm/frexp.h>
+#include <libm/ldexp.h>
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -248,6 +254,58 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 }
 
 #endif /* __IEEE754_DOUBLE_TYPE__ */
+
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/* Emulation for sqrtl.
+   Contributed by Paolo Bonzini
+
+   Copyright 2002-2003, 2007, 2009-2013 Free Software Foundation, Inc.
+
+   This file was taken from gnulib.
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_sqrtl)(__IEEE854_LONG_DOUBLE_TYPE__ __x) {
+	__IEEE854_LONG_DOUBLE_TYPE__ __delta, __y;
+	int __exponent;
+	/* Check for NaN */
+	if (__ieee854_isnanl(__x))
+		return __x;
+	/* Check for negative numbers */
+	if (__x < __IEEE854_LONG_DOUBLE_C(0.0)) {
+#ifdef __IEEE754_DOUBLE_C
+		return (long double)__ieee754_sqrt(-__IEEE754_DOUBLE_C(1.0));
+#else /* __IEEE754_DOUBLE_C */
+		return (long double)__ieee754_sqrtf(-__IEEE754_FLOAT_C(1.0));
+#endif /* !__IEEE754_DOUBLE_C */
+	}
+	/* Check for zero and infinites */
+	if (__x + __x == __x)
+		return __x;
+	__ieee854_frexpl(__x, &__exponent);
+	__y = __ieee854_ldexpl(__x, -__exponent / 2);
+	do {
+		__delta = __y;
+		__y     = (__y + __x / __y) * 0.5L;
+		__delta -= __y;
+	} while (__delta != 0.0L);
+	return __y;
+}
+
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END
 #endif /* __CC__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8ae83e3 */
+/* HASH CRC-32:0xfb1048d2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,6 @@
 #define __CRT_STUB___control87_2 1
 #define __CRT_STUB___fpecode 1
 #define __CRT_STUB___h_errno_location 1
-#define __CRT_STUB___issignaling 1
 #define __CRT_STUB___locale_ctype_ptr 1
 #define __CRT_STUB___locale_ctype_ptr_l 1
 #define __CRT_STUB___p___wargv 1

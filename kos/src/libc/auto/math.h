@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffcb542a */
+/* HASH CRC-32:0x665aac70 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,51 +47,24 @@ INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_nan)(char const *tagb);
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_nanf)(char const *tagb);
 /* Return representation of qNaN for double type */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_nanl)(char const *tagb);
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_round)(double x);
-/* Round X to the integral value in floating-point
- * format nearest but not larger in magnitude */
-INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_trunc)(double x);
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lround)(double x);
 /* Return maximum numeric value from X and Y */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fmax)(double x, double y);
 /* Return minimum numeric value from X and Y */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fmin)(double x, double y);
 /* Multiply-add function computed as a ternary operation */
 INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_fma)(double x, double y, double z);
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llround)(double x);
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_roundf)(float x);
-/* Round X to the integral value in floating-point
- * format nearest but not larger in magnitude */
-INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_truncf)(float x);
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lroundf)(float x);
 /* Return maximum numeric value from X and Y */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fmaxf)(float x, float y);
 /* Return minimum numeric value from X and Y */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fminf)(float x, float y);
 /* Multiply-add function computed as a ternary operation */
 INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_fmaf)(float x, float y, float z);
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llroundf)(float x);
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x);
-/* Round X to the integral value in floating-point
- * format nearest but not larger in magnitude */
-INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x);
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTDEF ATTR_CONST WUNUSED long int NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x);
 /* Return maximum numeric value from X and Y */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fmaxl)(__LONGDOUBLE x, __LONGDOUBLE y);
 /* Return minimum numeric value from X and Y */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fminl)(__LONGDOUBLE x, __LONGDOUBLE y);
 /* Multiply-add function computed as a ternary operation */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE x, __LONGDOUBLE y, __LONGDOUBLE z);
-/* Round X to nearest integral value, rounding halfway cases away from zero */
-INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x);
 /* Smallest integral value not less than X */
 #define libc___ceil libc_ceil
 /* Absolute value of X */
@@ -155,7 +128,6 @@ INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBL
 #define libc___fmin libc_fmin
 /* Multiply-add function computed as a ternary operation */
 #define libc___fma libc_fma
-/* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___roundf libc_roundf
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
@@ -174,7 +146,6 @@ INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBL
 #define libc___llround libc_llround
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___llroundf libc_llroundf
-/* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___roundl libc_roundl
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
@@ -191,9 +162,6 @@ INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBL
 #define libc___fmal libc_fmal
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 #define libc___llroundl libc_llroundl
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbit)(double x);
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbitf)(float x);
-INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x);
 #endif /* !__KERNEL__ */
 
 DECL_END

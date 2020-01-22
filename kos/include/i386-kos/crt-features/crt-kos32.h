@@ -2617,6 +2617,9 @@
 #define __CRT_HAVE_isprint_l 1
 #define __CRT_HAVE_ispunct 1
 #define __CRT_HAVE_ispunct_l 1
+#define __CRT_HAVE_issignaling 1
+#define __CRT_HAVE_issignalingf 1
+#define __CRT_HAVE_issignalingl 1
 #define __CRT_HAVE_isspace 1
 #define __CRT_HAVE_isspace_l 1
 #define __CRT_HAVE_isupper 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4363518 */
+/* HASH CRC-32:0x2b4ed49c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,11 +20,20 @@
  */
 #ifndef __local___signbitf_defined
 #define __local___signbitf_defined 1
+#include <libm/signbit.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__signbitf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitf))(float __x) {
-#line 2384 "kos/src/libc/magic/math.c"
+#line 2625 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#else /* ... */
 	return __x < 0.0f;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local___signbitf_defined */

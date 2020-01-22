@@ -26,24 +26,30 @@
 #include <libm/atan.h>
 #include <libm/atan2.h>
 #include <libm/cbrt.h>
+#include <libm/ceil.h>
 #include <libm/copysign.h>
 #include <libm/fabs.h>
 #include <libm/fdlibm.h>
 #include <libm/finite.h>
+#include <libm/floor.h>
 #include <libm/fmod.h>
 #include <libm/fpclassify.h>
 #include <libm/frexp.h>
 #include <libm/isinf.h>
 #include <libm/isnan.h>
+#include <libm/issignaling.h>
 #include <libm/ldexp.h>
 #include <libm/modf.h>
 #include <libm/nextafter.h>
 #include <libm/pow.h>
 #include <libm/remainder.h>
 #include <libm/rint.h>
+#include <libm/round.h>
 #include <libm/scalb.h>
 #include <libm/scalbn.h>
+#include <libm/signbit.h>
 #include <libm/sqrt.h>
+#include <libm/trunc.h>
 
 #include "math.h"
 
@@ -1049,9 +1055,11 @@ NOTHROW(LIBCCALL libc_pow)(double x,
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_pow((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_powf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_powl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#endif /* !... */
 }
 /*[[[end:pow]]]*/
 
@@ -1065,9 +1073,11 @@ NOTHROW(LIBCCALL libc_sqrt)(double x)
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_sqrt((__IEEE754_DOUBLE_TYPE__)x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_sqrtf((__IEEE754_FLOAT_TYPE__)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_sqrtl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
 }
 /*[[[end:sqrt]]]*/
 
@@ -1082,9 +1092,13 @@ NOTHROW(LIBCCALL libc_powf)(float x,
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_powf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_pow((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_powl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#else /* ... */
+	return (float)libc_pow((double)x, (double)y);
+#endif /* !... */
 }
 /*[[[end:powf]]]*/
 
@@ -1098,9 +1112,13 @@ NOTHROW(LIBCCALL libc_sqrtf)(float x)
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_sqrtf((__IEEE754_FLOAT_TYPE__)x);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_sqrt((__IEEE754_DOUBLE_TYPE__)x);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_sqrtl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (float)libc_sqrt((double)x);
+#endif /* !... */
 }
 /*[[[end:sqrtf]]]*/
 
@@ -1112,7 +1130,16 @@ NOTHROW(LIBCCALL libc_powl)(__LONGDOUBLE x,
                             __LONGDOUBLE y)
 /*[[[body:powl]]]*/
 /*AUTO*/{
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_powl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_pow((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_powf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#else /* ... */
 	return (__LONGDOUBLE)libc_pow((double)x, (double)y);
+#endif /* !... */
 }
 /*[[[end:powl]]]*/
 
@@ -1123,7 +1150,16 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.sqrtl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_sqrtl)(__LONGDOUBLE x)
 /*[[[body:sqrtl]]]*/
 /*AUTO*/{
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_sqrtl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_sqrt((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_sqrtf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
 	return (__LONGDOUBLE)libc_sqrt((double)x);
+#endif /* !... */
 }
 /*[[[end:sqrtl]]]*/
 
@@ -2421,11 +2457,14 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__issignaling") int
 NOTHROW(LIBCCALL libc___issignaling)(double x)
 /*[[[body:__issignaling]]]*/
-{
-	(void)x;
-	CRT_UNIMPLEMENTED("__issignaling"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
 }
 /*[[[end:__issignaling]]]*/
 
@@ -2435,7 +2474,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__issignalingf") int
 NOTHROW(LIBCCALL libc___issignalingf)(float x)
 /*[[[body:__issignalingf]]]*/
 /*AUTO*/{
-	return (int)libc___issignaling((double)x);
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return libc___issignaling((double)x);
+#endif /* !... */
 }
 /*[[[end:__issignalingf]]]*/
 
@@ -2445,7 +2492,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__issignalingl") int
 NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x)
 /*[[[body:__issignalingl]]]*/
 /*AUTO*/{
-	return (int)libc___issignaling((double)x);
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return libc___issignaling((double)x);
+#endif /* !... */
 }
 /*[[[end:__issignalingl]]]*/
 
@@ -2790,11 +2845,350 @@ NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x)
 }
 /*[[[end:isnanl]]]*/
 
+/*[[[head:__signbit,hash:CRC-32=0x2efd4f1c]]]*/
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbit") int
+NOTHROW(LIBCCALL libc___signbit)(double x)
+/*[[[body:__signbit]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return x < 0.0;
+#endif /* !... */
+}
+/*[[[end:__signbit]]]*/
+
+/*[[[head:__signbitf,hash:CRC-32=0x595889ca]]]*/
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitf") int
+NOTHROW(LIBCCALL libc___signbitf)(float x)
+/*[[[body:__signbitf]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return x < 0.0f;
+#endif /* !... */
+}
+/*[[[end:__signbitf]]]*/
+
+/*[[[head:__signbitl,hash:CRC-32=0xbe5a5fcb]]]*/
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitl") int
+NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x)
+/*[[[body:__signbitl]]]*/
+/*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_signbitl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_signbit((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_signbitf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return x < 0.0L;
+#endif /* !... */
+}
+/*[[[end:__signbitl]]]*/
+
+/*[[[head:round,hash:CRC-32=0x6597c65a]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.round") double
+NOTHROW(LIBCCALL libc_round)(double x)
+/*[[[body:round]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_round((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_roundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return (double)__ieee854_roundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	double result;
+	result = (double)(__INTMAX_TYPE__)x;
+	if (x < 0.0) {
+		/* result >= x */
+		if ((result - x) >= 0.5)
+			result -= 1.0;
+	} else {
+		/* result <= x */
+		if ((x - result) >= 0.5)
+			result += 1.0;
+	}
+	return result;
+#endif /* !... */
+}
+/*[[[end:round]]]*/
+
+/*[[[head:trunc,hash:CRC-32=0x21d4300a]]]*/
+/* Round X to the integral value in floating-point
+ * format nearest but not larger in magnitude */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.trunc") double
+NOTHROW(LIBCCALL libc_trunc)(double x)
+/*[[[body:trunc]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_trunc((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_truncf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return (double)__ieee854_truncl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (double)(__INTMAX_TYPE__)x;
+#endif /* !... */
+}
+/*[[[end:trunc]]]*/
+
+/*[[[head:roundf,hash:CRC-32=0xe9816caa]]]*/
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundf") float
+NOTHROW(LIBCCALL libc_roundf)(float x)
+/*[[[body:roundf]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_roundf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_round((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_roundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	float result;
+	result = (float)(__INTMAX_TYPE__)x;
+	if (x < 0.0f) {
+		/* result >= x */
+		if ((result - x) >= 0.5f)
+			result -= 1.0f;
+	} else {
+		/* result <= x */
+		if ((x - result) >= 0.5f)
+			result += 1.0f;
+	}
+	return result;
+#endif /* !... */
+}
+/*[[[end:roundf]]]*/
+
+/*[[[head:truncf,hash:CRC-32=0xcc614206]]]*/
+/* Round X to the integral value in floating-point
+ * format nearest but not larger in magnitude */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncf") float
+NOTHROW(LIBCCALL libc_truncf)(float x)
+/*[[[body:truncf]]]*/
+/*AUTO*/{
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_truncf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_trunc((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_truncl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (float)(__INTMAX_TYPE__)x;
+#endif /* !... */
+}
+/*[[[end:truncf]]]*/
+
+/*[[[head:roundl,hash:CRC-32=0xa9b7eba7]]]*/
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x)
+/*[[[body:roundl]]]*/
+/*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_roundl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_round((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_roundf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	__LONGDOUBLE result;
+	result = (__LONGDOUBLE)(__INTMAX_TYPE__)x;
+	if (x < 0.0L) {
+		/* result >= x */
+		if ((result - x) >= 0.5L)
+			result -= 1.0L;
+	} else {
+		/* result <= x */
+		if ((x - result) >= 0.5L)
+			result += 1.0L;
+	}
+	return result;
+#endif /* !... */
+}
+/*[[[end:roundl]]]*/
+
+/*[[[head:truncl,hash:CRC-32=0x8aa62a7c]]]*/
+/* Round X to the integral value in floating-point
+ * format nearest but not larger in magnitude */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncl") __LONGDOUBLE
+NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x)
+/*[[[body:truncl]]]*/
+/*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_truncl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_trunc((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_truncf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return (__LONGDOUBLE)(__INTMAX_TYPE__)x;
+#endif /* !... */
+}
+/*[[[end:truncl]]]*/
+
+/*[[[head:lround,hash:CRC-32=0x23fc6eca]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lround") long int
+NOTHROW(LIBCCALL libc_lround)(double x)
+/*[[[body:lround]]]*/
+/*AUTO*/{
+	return (long int)libc_round(x);
+}
+/*[[[end:lround]]]*/
+
+/*[[[head:llround,hash:CRC-32=0x51a79fcc]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llround") __LONGLONG
+NOTHROW(LIBCCALL libc_llround)(double x)
+/*[[[body:llround]]]*/
+/*AUTO*/{
+	return (__LONGLONG)libc_round(x);
+}
+/*[[[end:llround]]]*/
+
+/*[[[head:lroundf,hash:CRC-32=0x8a154dc1]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundf") long int
+NOTHROW(LIBCCALL libc_lroundf)(float x)
+/*[[[body:lroundf]]]*/
+/*AUTO*/{
+	return (long int)libc_round(x);
+}
+/*[[[end:lroundf]]]*/
+
+/*[[[head:llroundf,hash:CRC-32=0x435c8414]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundf") __LONGLONG
+NOTHROW(LIBCCALL libc_llroundf)(float x)
+/*[[[body:llroundf]]]*/
+/*AUTO*/{
+	return (__LONGLONG)libc_round(x);
+}
+/*[[[end:llroundf]]]*/
+
+/*[[[head:lroundl,hash:CRC-32=0x78bfc21c]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundl") long int
+NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x)
+/*[[[body:lroundl]]]*/
+/*AUTO*/{
+	return (long int)libc_round(x);
+}
+/*[[[end:lroundl]]]*/
+
+/*[[[head:llroundl,hash:CRC-32=0xc0d1c438]]]*/
+/* Round X to nearest integral value, rounding halfway cases away from zero */
+INTERN ATTR_CONST WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.math.math.llroundl") __LONGLONG
+NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x)
+/*[[[body:llroundl]]]*/
+/*AUTO*/{
+	return (__LONGLONG)libc_round(x);
+}
+/*[[[end:llroundl]]]*/
+
 /*[[[end:implementation]]]*/
 
 
+#undef acos
+#undef asin
+#undef atan
+#undef atan2
+#undef cos
+#undef sin
+#undef tan
+#undef cosh
+#undef sinh
+#undef tanh
+#undef acosh
+#undef asinh
+#undef atanh
+#undef exp
+#undef frexp
+#undef ldexp
+#undef log
+#undef log10
+#undef modf
+#undef expm1
+#undef log1p
+#undef logb
+#undef exp2
+#undef log2
+#undef pow
+#undef sqrt
+#undef hypot
+#undef cbrt
+#undef fabs
+#undef fmod
+#undef copysign
+#undef erf
+#undef erfc
+#undef lgamma
+#undef gamma
+#undef erff
+#undef tgamma
+#undef rint
+#undef nearbyint
+#undef nextafter
+#undef remainder
+#undef drem
+#undef ilogb
+#undef nexttoward
+#undef scalbn
+#undef scalbln
+#undef round
+#undef trunc
+#undef remquo
+#undef lrint
+#undef lround
+#undef fdim
+#undef llrint
+#undef llround
+#undef sincos
+#undef exp10
+#undef pow10
+#undef isinf
+#undef finite
+#undef significand
+#undef isnan
+#undef j0
+#undef j1
+#undef jn
+#undef y0
+#undef y1
+#undef yn
+#undef lgamma_r
+#undef scalb
+#undef fpclassify
+#undef issignaling
 
-/*[[[start:exports,hash:CRC-32=0x17485346]]]*/
+/*[[[start:exports,hash:CRC-32=0x7550e907]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(__acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(asin, libc_asin);
@@ -3053,42 +3447,66 @@ DEFINE_PUBLIC_WEAK_ALIAS(scalbn, libc_scalbn);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbn, libc_scalbn);
 DEFINE_PUBLIC_WEAK_ALIAS(scalbln, libc_scalbln);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbln, libc_scalbln);
+DEFINE_PUBLIC_WEAK_ALIAS(round, libc_round);
+DEFINE_PUBLIC_WEAK_ALIAS(__round, libc_round);
+DEFINE_PUBLIC_WEAK_ALIAS(trunc, libc_trunc);
+DEFINE_PUBLIC_WEAK_ALIAS(__trunc, libc_trunc);
 DEFINE_PUBLIC_WEAK_ALIAS(remquo, libc_remquo);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquo, libc_remquo);
 DEFINE_PUBLIC_WEAK_ALIAS(lrint, libc_lrint);
 DEFINE_PUBLIC_WEAK_ALIAS(__lrint, libc_lrint);
+DEFINE_PUBLIC_WEAK_ALIAS(lround, libc_lround);
+DEFINE_PUBLIC_WEAK_ALIAS(__lround, libc_lround);
 DEFINE_PUBLIC_WEAK_ALIAS(fdim, libc_fdim);
 DEFINE_PUBLIC_WEAK_ALIAS(__fdim, libc_fdim);
 DEFINE_PUBLIC_WEAK_ALIAS(llrint, libc_llrint);
 DEFINE_PUBLIC_WEAK_ALIAS(__llrint, libc_llrint);
+DEFINE_PUBLIC_WEAK_ALIAS(llround, libc_llround);
+DEFINE_PUBLIC_WEAK_ALIAS(__llround, libc_llround);
 DEFINE_PUBLIC_WEAK_ALIAS(nexttowardf, libc_nexttowardf);
 DEFINE_PUBLIC_WEAK_ALIAS(__nexttowardf, libc_nexttowardf);
 DEFINE_PUBLIC_WEAK_ALIAS(scalbnf, libc_scalbnf);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbnf, libc_scalbnf);
 DEFINE_PUBLIC_WEAK_ALIAS(scalblnf, libc_scalblnf);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalblnf, libc_scalblnf);
+DEFINE_PUBLIC_WEAK_ALIAS(roundf, libc_roundf);
+DEFINE_PUBLIC_WEAK_ALIAS(__roundf, libc_roundf);
+DEFINE_PUBLIC_WEAK_ALIAS(truncf, libc_truncf);
+DEFINE_PUBLIC_WEAK_ALIAS(__truncf, libc_truncf);
 DEFINE_PUBLIC_WEAK_ALIAS(remquof, libc_remquof);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquof, libc_remquof);
 DEFINE_PUBLIC_WEAK_ALIAS(lrintf, libc_lrintf);
 DEFINE_PUBLIC_WEAK_ALIAS(__lrintf, libc_lrintf);
+DEFINE_PUBLIC_WEAK_ALIAS(lroundf, libc_lroundf);
+DEFINE_PUBLIC_WEAK_ALIAS(__lroundf, libc_lroundf);
 DEFINE_PUBLIC_WEAK_ALIAS(fdimf, libc_fdimf);
 DEFINE_PUBLIC_WEAK_ALIAS(__fdimf, libc_fdimf);
 DEFINE_PUBLIC_WEAK_ALIAS(llrintf, libc_llrintf);
 DEFINE_PUBLIC_WEAK_ALIAS(__llrintf, libc_llrintf);
+DEFINE_PUBLIC_WEAK_ALIAS(llroundf, libc_llroundf);
+DEFINE_PUBLIC_WEAK_ALIAS(__llroundf, libc_llroundf);
 DEFINE_PUBLIC_WEAK_ALIAS(nexttowardl, libc_nexttowardl);
 DEFINE_PUBLIC_WEAK_ALIAS(__nexttowardl, libc_nexttowardl);
 DEFINE_PUBLIC_WEAK_ALIAS(scalbnl, libc_scalbnl);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbnl, libc_scalbnl);
 DEFINE_PUBLIC_WEAK_ALIAS(scalblnl, libc_scalblnl);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalblnl, libc_scalblnl);
+DEFINE_PUBLIC_WEAK_ALIAS(roundl, libc_roundl);
+DEFINE_PUBLIC_WEAK_ALIAS(__roundl, libc_roundl);
+DEFINE_PUBLIC_WEAK_ALIAS(truncl, libc_truncl);
+DEFINE_PUBLIC_WEAK_ALIAS(__truncl, libc_truncl);
 DEFINE_PUBLIC_WEAK_ALIAS(remquol, libc_remquol);
 DEFINE_PUBLIC_WEAK_ALIAS(__remquol, libc_remquol);
 DEFINE_PUBLIC_WEAK_ALIAS(lrintl, libc_lrintl);
 DEFINE_PUBLIC_WEAK_ALIAS(__lrintl, libc_lrintl);
+DEFINE_PUBLIC_WEAK_ALIAS(lroundl, libc_lroundl);
+DEFINE_PUBLIC_WEAK_ALIAS(__lroundl, libc_lroundl);
 DEFINE_PUBLIC_WEAK_ALIAS(fdiml, libc_fdiml);
 DEFINE_PUBLIC_WEAK_ALIAS(__fdiml, libc_fdiml);
 DEFINE_PUBLIC_WEAK_ALIAS(llrintl, libc_llrintl);
 DEFINE_PUBLIC_WEAK_ALIAS(__llrintl, libc_llrintl);
+DEFINE_PUBLIC_WEAK_ALIAS(llroundl, libc_llroundl);
+DEFINE_PUBLIC_WEAK_ALIAS(__llroundl, libc_llroundl);
 DEFINE_PUBLIC_WEAK_ALIAS(sincos, libc_sincos);
 DEFINE_PUBLIC_WEAK_ALIAS(__sincos, libc_sincos);
 DEFINE_PUBLIC_WEAK_ALIAS(exp10, libc_exp10);
@@ -3186,15 +3604,24 @@ DEFINE_PUBLIC_WEAK_ALIAS(__scalbl, libc_scalbl);
 DEFINE_PUBLIC_WEAK_ALIAS(__fpclassify, libc___fpclassify);
 DEFINE_PUBLIC_WEAK_ALIAS(_dclass, libc___fpclassify);
 DEFINE_PUBLIC_WEAK_ALIAS(fpclassify, libc___fpclassify);
+DEFINE_PUBLIC_WEAK_ALIAS(__signbit, libc___signbit);
+DEFINE_PUBLIC_WEAK_ALIAS(_dsign, libc___signbit);
 DEFINE_PUBLIC_WEAK_ALIAS(__fpclassifyf, libc___fpclassifyf);
 DEFINE_PUBLIC_WEAK_ALIAS(_fdclass, libc___fpclassifyf);
 DEFINE_PUBLIC_WEAK_ALIAS(fpclassifyf, libc___fpclassifyf);
+DEFINE_PUBLIC_WEAK_ALIAS(__signbitf, libc___signbitf);
+DEFINE_PUBLIC_WEAK_ALIAS(_fdsign, libc___signbitf);
 DEFINE_PUBLIC_WEAK_ALIAS(__fpclassifyl, libc___fpclassifyl);
 DEFINE_PUBLIC_WEAK_ALIAS(_ldclass, libc___fpclassifyl);
 DEFINE_PUBLIC_WEAK_ALIAS(fpclassifyl, libc___fpclassifyl);
+DEFINE_PUBLIC_WEAK_ALIAS(__signbitl, libc___signbitl);
+DEFINE_PUBLIC_WEAK_ALIAS(_ldsign, libc___signbitl);
 DEFINE_PUBLIC_WEAK_ALIAS(__issignaling, libc___issignaling);
+DEFINE_PUBLIC_WEAK_ALIAS(issignaling, libc___issignaling);
 DEFINE_PUBLIC_WEAK_ALIAS(__issignalingf, libc___issignalingf);
+DEFINE_PUBLIC_WEAK_ALIAS(issignalingf, libc___issignalingf);
 DEFINE_PUBLIC_WEAK_ALIAS(__issignalingl, libc___issignalingl);
+DEFINE_PUBLIC_WEAK_ALIAS(issignalingl, libc___issignalingl);
 /*[[[end:exports]]]*/
 
 DECL_END

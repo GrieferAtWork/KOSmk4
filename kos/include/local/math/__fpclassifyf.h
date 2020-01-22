@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf397e2fa */
+/* HASH CRC-32:0x3e8cc99c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,6 @@
 #if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass) || defined(__CRT_HAVE_fpclassify)
 #define __local___fpclassifyf_defined 1
 #include <libm/fpclassify.h>
-#include <libm/fpclassify.h>
 /* Dependency: "__fpclassify" from "math" */
 #ifndef ____localdep___fpclassify_defined
 #define ____localdep___fpclassify_defined 1
@@ -47,7 +46,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(d
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__fpclassifyf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyf))(float __x) {
-#line 2371 "kos/src/libc/magic/math.c"
+#line 2611 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)__x);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)

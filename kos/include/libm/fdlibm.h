@@ -65,7 +65,10 @@ __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
 
-#if defined(_FLT_LARGEST_EXPONENT_IS_NORMAL) /* TODO: ??? */
+//#define __LIBM_HIGH_ORDER_BIT_IS_SET_FOR_SNAN 1 /* TODO: ??? */
+//#define __LIBM_FLT_LARGEST_EXPONENT_IS_NORMAL 1 /* TODO: ??? */
+
+#ifdef __LIBM_FLT_LARGEST_EXPONENT_IS_NORMAL
 #define __LIBM_FLT_UWORD_IS_FINITE(x) 1
 #define __LIBM_FLT_UWORD_IS_NAN(x) 0
 #define __LIBM_FLT_UWORD_IS_INFINITE(x) 0
@@ -74,7 +77,7 @@ __DECL_BEGIN
 #define __LIBM_FLT_UWORD_LOG_MAX 0x42b2d4fc
 #define __LIBM_FLT_UWORD_LOG_2MAX 0x42b437e0
 #define __LIBM_HUGE ((__IEEE754_FLOAT_TYPE__)0X1.FFFFFEP128)
-#else
+#else /* __LIBM_FLT_LARGEST_EXPONENT_IS_NORMAL */
 #define __LIBM_FLT_UWORD_IS_FINITE(x) ((x) < 0x7f800000L)
 #define __LIBM_FLT_UWORD_IS_NAN(x) ((x) > 0x7f800000L)
 #define __LIBM_FLT_UWORD_IS_INFINITE(x) ((x) == 0x7f800000L)
@@ -83,7 +86,7 @@ __DECL_BEGIN
 #define __LIBM_FLT_UWORD_LOG_MAX 0x42b17217
 #define __LIBM_FLT_UWORD_LOG_2MAX 0x42b2d4fc
 #define __LIBM_HUGE ((__IEEE754_FLOAT_TYPE__)3.40282346638528860e+38)
-#endif
+#endif /* !__LIBM_FLT_LARGEST_EXPONENT_IS_NORMAL */
 
 #define __LIBM_FLT_UWORD_HALF_MAX (__LIBM_FLT_UWORD_MAX - (1L << 23))
 #define __LIBM_FLT_LARGEST_EXP (__LIBM_FLT_UWORD_MAX >> 23)
@@ -326,9 +329,11 @@ typedef union {
 #ifdef __COMPILER_HAVE_GCC_ASM
 #define __libm_math_opt_barrier(x, result) do { (result) = (x); __asm__("" : "+m" (result)); } __WHILE0
 #define __libm_math_force_eval(x)          do { __asm__ __volatile__("" : : "m" (x)); } __WHILE0
+#define __libm_math_force_eval_r(T, x)     do { T __x = (x); __asm__ __volatile__("" : : "m" (__x)); } __WHILE0
 #else /* __COMPILER_HAVE_GCC_ASM */
 #define __libm_math_opt_barrier(x, result) ((result) = (x))
 #define __libm_math_force_eval(x)          (void)(x) /* XXX: May not get evaluated... */
+#define __libm_math_force_eval_r(T, x)     (void)(T)(x) /* XXX: May not get evaluated... */
 #endif /* !__COMPILER_HAVE_GCC_ASM */
 #endif /* !__libm_math_opt_barrier */
 

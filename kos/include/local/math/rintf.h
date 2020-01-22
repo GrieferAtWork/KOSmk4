@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3070c83c */
+/* HASH CRC-32:0xefe5150d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __LOCAL_LIBC(rintf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(rintf))(float __x) {
-#line 1067 "kos/src/libc/magic/math.c"
+#line 1210 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (double)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)__x);
 #else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */

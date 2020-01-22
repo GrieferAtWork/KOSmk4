@@ -205,9 +205,9 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	if ((__ix | __hx | __lx) == 0) { /* x == 0 */
 		__IEEE854_LONG_DOUBLE_TYPE__ __u;
 		__LIBM_SET_LDOUBLE_WORDS(__x, __esy & 0x8000, 0, 1); /* return +-minsubnormal */
-		__libm_math_opt_barrier(__x, __u);
+		__libm_math_opt_barrier(__x, __u); /* XXX: What's the point of this? */
 		__u = __u * __u;
-		__libm_math_force_eval(__u); /* raise underflow flag */
+		__libm_math_force_eval_r(__IEEE854_LONG_DOUBLE_TYPE__, __u * __u); /* raise underflow flag */
 		return __x;
 	}
 	if (__esx >= 0) { /* x > 0 */
@@ -266,10 +266,8 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	__esy = __esx & IEEE854_LONG_DOUBLE_MAXEXP;
 	if (__esy == IEEE854_LONG_DOUBLE_MAXEXP)
 		return __x + __x; /* overflow  */
-	if (__esy == 0) {
-		__IEEE854_LONG_DOUBLE_TYPE__ u = __x * __x; /* underflow */
-		__libm_math_force_eval(u);                  /* raise underflow flag */
-	}
+	if (__esy == 0)
+		__libm_math_force_eval_r(__IEEE854_LONG_DOUBLE_TYPE__, __x * __x); /* raise underflow flag */
 	__LIBM_SET_LDOUBLE_WORDS(__x, __esx, __hx, __lx);
 	return __x;
 }

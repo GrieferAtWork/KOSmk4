@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xe8d280ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,30 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBM_SQRT_H
-#define _LIBM_SQRT_H 1
-
-#include <__crt.h>
-
-#include <hybrid/typecore.h>
-
-#include <bits/types.h>
-
-#include <libm/fdlibm.h>
-
-#ifdef __CC__
-__DECL_BEGIN
-
-#ifdef __IEEE754_FLOAT_TYPE__
-
-#endif /* __IEEE754_FLOAT_TYPE__ */
-
-
-#ifdef __IEEE754_DOUBLE_TYPE__
-
-#endif /* __IEEE754_DOUBLE_TYPE__ */
-
-__DECL_END
-#endif /* __CC__ */
-
-#endif /* !_LIBM_SQRT_H */
+#ifndef __local___issignaling_defined
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#define __local___issignaling_defined 1
+#include <libm/issignaling.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(__issignaling) __ATTR_CONST __ATTR_WUNUSED int
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__issignaling))(double __x) {
+#line 2680 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_issignaling((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_issignalingf((__IEEE754_FLOAT_TYPE__)__x);
+#else /* ... */
+	return __ieee854_issignalingl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#endif /* !... */
+}
+__NAMESPACE_LOCAL_END
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
+#endif /* !__local___issignaling_defined */

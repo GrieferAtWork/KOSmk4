@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60b04f01 */
+/* HASH CRC-32:0x192a5fb5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,26 @@
 #ifndef __local_floor_defined
 #define __local_floor_defined 1
 #include <hybrid/typecore.h>
+
+#include <libm/floor.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Largest integer not greater than X */
 __LOCAL_LIBC(floor) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floor))(double __x) {
-#line 794 "kos/src/libc/magic/math.c"
+#line 861 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_floor((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_floorf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return (double)__ieee854_floorl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#else /* ... */
 	double __result;
 	__result = (double)(__INTMAX_TYPE__)__x; /* Round towards 0 */
 	if (__result > __x)
 		__result -= 1.0;
-	return (double)__result;
+	return __result;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_floor_defined */

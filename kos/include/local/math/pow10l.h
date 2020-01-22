@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9be4cd94 */
+/* HASH CRC-32:0x81ab2134 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,7 @@
  */
 #ifndef __local_pow10l_defined
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
 #define __local_pow10l_defined 1
 /* Dependency: "pow10" from "math" */
 #ifndef ____localdep_pow10_defined
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_pow10,(double __x),pow10,
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_pow10,(double __x),__pow10,(__x))
 #else /* LIBC: pow10 */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 #include <local/math/pow10.h>
 /* Another name occasionally used */
 #define __localdep_pow10 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10))
@@ -50,9 +50,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Another name occasionally used */
 __LOCAL_LIBC(pow10l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow10l))(__LONGDOUBLE __x) {
-#line 1658 "kos/src/libc/magic/math.c"
+#line 1888 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_pow10((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_pow || __CRT_HAVE___pow || __CRT_HAVE_pow10 || __CRT_HAVE___pow10 */
+#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_pow || __CRT_HAVE___pow || __CRT_HAVE_pow10 || __CRT_HAVE___pow10 */
 #endif /* !__local_pow10l_defined */

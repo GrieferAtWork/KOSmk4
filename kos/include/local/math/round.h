@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdd6d0b3 */
+/* HASH CRC-32:0x7ef8f1cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,14 +21,23 @@
 #ifndef __local_round_defined
 #define __local_round_defined 1
 #include <hybrid/typecore.h>
+
+#include <libm/round.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(round) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(round))(double __x) {
-#line 1212 "kos/src/libc/magic/math.c"
+#line 1356 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_round((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_roundf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return (double)__ieee854_roundl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#else /* ... */
 	double __result;
 	__result = (double)(__INTMAX_TYPE__)__x;
-	if (__x < 0) {
+	if (__x < 0.0) {
 		/* result >= x */
 		if ((__result - __x) >= 0.5)
 			__result -= 1.0;
@@ -38,6 +47,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(round))(double __x) {
 			__result += 1.0;
 	}
 	return __result;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_round_defined */

@@ -88,7 +88,7 @@ feclearexcept:(int excepts) -> int {
 }
 
 @@Raise the supported exceptions represented by EXCEPTS
-[std][throws][fast][dependency_include(<bits/fenv-inline.h>)]
+[std][throws][fast][dependency_include(<bits/fenv-inline.h>)][libc]
 feraiseexcept:(int excepts) -> int {
 	@__inline_feraiseexcept@(excepts);
 	return 0;

@@ -24,13 +24,15 @@
 
 #include <hybrid/typecore.h>
 
+#include <ieee754.h>
+
 #include <bits/nan.h>
 #include <bits/types.h>
 
+#include <libm/fabs.h>
 #include <libm/fdlibm.h>
 #include <libm/scalbn.h>
 #include <libm/sqrt.h>
-#include <libm/fabs.h>
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -649,6 +651,18 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 }
 
 #endif /* __IEEE754_DOUBLE_TYPE__ */
+
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_powl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
+                            __IEEE854_LONG_DOUBLE_TYPE__ __y) {
+	/* TODO */
+	return (__IEEE854_LONG_DOUBLE_TYPE__)__ieee754_pow((__IEEE754_DOUBLE_TYPE__)__x,
+	                                                   (__IEEE754_DOUBLE_TYPE__)__y);
+}
+
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END
 #endif /* __CC__ */

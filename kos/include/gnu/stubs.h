@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4473d60 */
+/* HASH CRC-32:0x189e5509 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,6 @@
 #define __stub___control87_2 1
 #define __stub___fpecode 1
 #define __stub___h_errno_location 1
-#define __stub___issignaling 1
 #define __stub___locale_ctype_ptr 1
 #define __stub___locale_ctype_ptr_l 1
 #define __stub___p___wargv 1

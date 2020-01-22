@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf053d45a */
+/* HASH CRC-32:0x9f0d8086 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,16 +21,26 @@
 #ifndef __local_ceil_defined
 #define __local_ceil_defined 1
 #include <hybrid/typecore.h>
+
+#include <libm/ceil.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Smallest integral value not less than X */
 __LOCAL_LIBC(ceil) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ceil))(double __x) {
-#line 768 "kos/src/libc/magic/math.c"
+#line 826 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_ceil((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_ceilf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return (double)__ieee854_ceill((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#else /* ... */
 	double __result;
 	__result = (double)(__INTMAX_TYPE__)__x; /* Round towards 0 */
 	if (__result < __x)
 		__result += 1.0;
-	return (double)__result;
+	return __result;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_ceil_defined */

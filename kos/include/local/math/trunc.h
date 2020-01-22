@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6e7e9ea */
+/* HASH CRC-32:0x648c10db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,23 @@
 #ifndef __local_trunc_defined
 #define __local_trunc_defined 1
 #include <hybrid/typecore.h>
+
+#include <libm/trunc.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
 __LOCAL_LIBC(trunc) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(trunc))(double __x) {
-#line 1231 "kos/src/libc/magic/math.c"
+#line 1384 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_trunc((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_truncf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+	return (double)__ieee854_truncl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#else /* ... */
 	return (double)(__INTMAX_TYPE__)__x;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_trunc_defined */

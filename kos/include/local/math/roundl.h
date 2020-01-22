@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f435837 */
+/* HASH CRC-32:0x36ca0be0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,23 +21,32 @@
 #ifndef __local_roundl_defined
 #define __local_roundl_defined 1
 #include <hybrid/typecore.h>
+
+#include <libm/round.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Round X to nearest integral value, rounding halfway cases away from zero */
 __LOCAL_LIBC(roundl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundl))(__LONGDOUBLE __x) {
-#line 1212 "kos/src/libc/magic/math.c"
+#line 1613 "kos/src/libc/magic/math.c"
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_roundl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_round((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_roundf((__IEEE754_FLOAT_TYPE__)__x);
+#else /* ... */
 	__LONGDOUBLE __result;
 	__result = (__LONGDOUBLE)(__INTMAX_TYPE__)__x;
-	if (__x < 0) {
+	if (__x < 0.0L) {
 		/* result >= x */
-		if ((__result - __x) >= 0.5)
-			__result -= 1.0;
+		if ((__result - __x) >= 0.5L)
+			__result -= 1.0L;
 	} else {
 		/* result <= x */
-		if ((__x - __result) >= 0.5)
-			__result += 1.0;
+		if ((__x - __result) >= 0.5L)
+			__result += 1.0L;
 	}
 	return __result;
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_roundl_defined */

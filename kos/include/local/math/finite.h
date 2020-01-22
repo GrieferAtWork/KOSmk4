@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3fb7ca4 */
+/* HASH CRC-32:0xd315c0d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,6 @@
  */
 #ifndef __local_finite_defined
 #define __local_finite_defined 1
-#include <libm/isinf.h>
-#include <libm/isnan.h>
 #include <libm/finite.h>
 /* Dependency: "isinf" from "math" */
 #ifndef ____localdep_isinf_defined
@@ -68,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is finite and not NaN */
 __LOCAL_LIBC(finite) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finite))(double __x) {
-#line 1724 "kos/src/libc/magic/math.c"
+#line 1954 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
