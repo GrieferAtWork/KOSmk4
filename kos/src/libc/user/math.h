@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7befa274 */
+/* HASH CRC-32:0xe0ea9f1f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_acos)(double x);
 /* Arc sine of X */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_asin)(double x);
 /* Arc tangent of X */
-INTDEF WUNUSED double NOTHROW(LIBCCALL libc_atan)(double x);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_atan)(double x);
 /* Arc tangent of Y/X */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_atan2)(double y, double x);
 /* Cosine of X */
@@ -48,7 +48,7 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_acosf)(float x);
 /* Arc sine of X */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_asinf)(float x);
 /* Arc tangent of X */
-INTDEF WUNUSED float NOTHROW(LIBCCALL libc_atanf)(float x);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_atanf)(float x);
 /* Arc tangent of Y/X */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_atan2f)(float y, float x);
 /* Cosine of X */
@@ -62,7 +62,7 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_acosl)(__LONGDOUBLE x);
 /* Arc sine of X */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_asinl)(__LONGDOUBLE x);
 /* Arc tangent of X */
-INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_atanl)(__LONGDOUBLE x);
+INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_atanl)(__LONGDOUBLE x);
 /* Arc tangent of Y/X */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_atan2l)(__LONGDOUBLE y, __LONGDOUBLE x);
 /* Cosine of X */
@@ -321,15 +321,15 @@ INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isinff)(float x);
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isinfl)(__LONGDOUBLE x);
 /* Return nonzero if VALUE is finite and not NaN */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_finite)(double x);
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_significand)(double x);
 /* Return nonzero if VALUE is finite and not NaN */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_finitef)(float x);
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_significandf)(float x);
 /* Return nonzero if VALUE is finite and not NaN */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x);
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_significandl)(__LONGDOUBLE x);
 /* Return nonzero if VALUE is not a number */
 INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_isnan)(double x);

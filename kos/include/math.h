@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa79b080 */
+/* HASH CRC-32:0xec5d0270 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -811,21 +811,21 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,asin,(double __x),__asin,(__x))
 #define __std_atan_defined 1
 #if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL atan)(double __x) { return __builtin_atan(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL atan)(double __x) { return __builtin_atan(__x); }
 #elif defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),(__x))
 #elif defined(__CRT_HAVE___atan)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),__atan,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,atan,(double __x),__atan,(__x))
 #else /* LIBC: atan */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/atan.h>
 __NAMESPACE_STD_BEGIN
 /* Arc tangent of X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atan, __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL atan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atan, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL atan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))(__x); })
 #else /* CUSTOM: atan */
 #undef __std_atan_defined
 #endif /* atan... */
@@ -844,7 +844,7 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,atan2,(double __y, double __x),(__y,_
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,atan2,(double __y, double __x),__atan2,(__y,__x))
 #else /* LIBC: atan2 */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/atan2.h>
 __NAMESPACE_STD_BEGIN
@@ -946,21 +946,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asinf, __FORCELOCAL __ATTR_WUNUSED float __NOTHR
 #define __std_atanf_defined 1
 #if __has_builtin(__builtin_atanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanf)
 /* Arc tangent of X */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atanf)(float __x) { return __builtin_atanf(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atanf)(float __x) { return __builtin_atanf(__x); }
 #elif defined(__CRT_HAVE_atanf)
 /* Arc tangent of X */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,atanf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,atanf,(float __x),(__x))
 #elif defined(__CRT_HAVE___atanf)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanf,(float __x),__atanf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,atanf,(float __x),__atanf,(__x))
 #else /* LIBC: atanf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 __NAMESPACE_STD_END
 #include <local/math/atanf.h>
 __NAMESPACE_STD_BEGIN
 /* Arc tangent of X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atanf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atanf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); })
 #else /* CUSTOM: atanf */
 #undef __std_atanf_defined
 #endif /* atanf... */
@@ -979,7 +979,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,atan2f,(float __y, float __x),(__y,__x
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2f,(float __y, float __x),__atan2f,(__y,__x))
 #else /* LIBC: atan2f */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 __NAMESPACE_STD_END
 #include <local/math/atan2f.h>
 __NAMESPACE_STD_BEGIN
@@ -1112,27 +1112,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asinl, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE 
 #define __std_atanl_defined 1
 #if __has_builtin(__builtin_atanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanl)
 /* Arc tangent of X */
-__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atanl)(__LONGDOUBLE __x) { return __builtin_atanl(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atanl)(__LONGDOUBLE __x) { return __builtin_atanl(__x); }
 #elif defined(__CRT_HAVE_atanl)
 /* Arc tangent of X */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanl,(__LONGDOUBLE __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___atanl)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanl,(__LONGDOUBLE __x),__atanl,(__x))
-#elif defined(__CRT_HAVE_atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanl,(__LONGDOUBLE __x),atan,(__x))
-#elif defined(__CRT_HAVE___atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanl,(__LONGDOUBLE __x),__atan,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanl,(__LONGDOUBLE __x),__atanl,(__x))
 #else /* LIBC: atanl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 __NAMESPACE_STD_END
 #include <local/math/atanl.h>
 __NAMESPACE_STD_BEGIN
 /* Arc tangent of X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atanl, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atanl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atanl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atanl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanl))(__x); })
 #else /* CUSTOM: atanl */
 #undef __std_atanl_defined
 #endif /* atanl... */
@@ -1149,15 +1143,9 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2l,(__LONGDOUBLE __y, __LON
 #elif defined(__CRT_HAVE___atan2l)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2l,(__y,__x))
-#elif defined(__CRT_HAVE_atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of Y/X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),atan2,(__y,__x))
-#elif defined(__CRT_HAVE___atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of Y/X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2,(__y,__x))
 #else /* LIBC: atan2l */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 __NAMESPACE_STD_END
 #include <local/math/atan2l.h>
 __NAMESPACE_STD_BEGIN
@@ -4495,23 +4483,23 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL asin)(float __x) { return
 #endif /* asin... */
 #if __has_builtin(__builtin_atanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanf)
 /* Arc tangent of X */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atan)(float __x) { return __builtin_atanf(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atan)(float __x) { return __builtin_atanf(__x); }
 #elif defined(__CRT_HAVE_atanf)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan,(float __x),atanf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,atan,(float __x),atanf,(__x))
 #elif defined(__CRT_HAVE___atanf)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan,(float __x),__atanf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,atan,(float __x),__atanf,(__x))
 #else /* LIBC: atanf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atanf.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Arc tangent of X */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atan)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL atan)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); }
 #else /* CUSTOM: atanf */
 #undef none
 #endif /* atan... */
@@ -4527,7 +4515,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2,(float __y, float __x),atan2f,(
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2,(float __y, float __x),__atan2f,(__y,__x))
 #else /* LIBC: atan2f */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atan2f.h>
@@ -4934,27 +4922,26 @@ __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL asin)(__LONGDOUBLE
 #endif /* asin... */
 #if __has_builtin(__builtin_atanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanl)
 /* Arc tangent of X */
-__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atan)(__LONGDOUBLE __x) { return __builtin_atanl(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atan)(__LONGDOUBLE __x) { return __builtin_atanl(__x); }
 #elif defined(__CRT_HAVE_atanl)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),atanl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),atanl,(__x))
 #elif defined(__CRT_HAVE___atanl)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),__atanl,(__x))
-#elif defined(__CRT_HAVE_atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of X */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE___atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),__atan,(__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),__atanl,(__x))
+#else /* LIBC: atanl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atanl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Arc tangent of X */
-__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atan)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atan)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanl))(__x); }
+#else /* CUSTOM: atanl */
+#undef none
+#endif /* atan... */
 #endif /* atan... */
 #if __has_builtin(__builtin_atan2l) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2l)
 /* Arc tangent of Y/X */
@@ -4965,13 +4952,9 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2,(__LONGDOUBLE __y, __LON
 #elif defined(__CRT_HAVE___atan2l)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2l,(__y,__x))
-#elif defined(__CRT_HAVE_atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of Y/X */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2,(__LONGDOUBLE __y, __LONGDOUBLE __x),(__y,__x))
-#elif defined(__CRT_HAVE___atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of Y/X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2,(__y,__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#else /* LIBC: atan2l */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atan2l.h>
@@ -4979,6 +4962,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL atan2)(__LONGDOUBLE __y, __LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2l))(__y, __x); }
+#else /* CUSTOM: atan2l */
+#undef none
+#endif /* atan2... */
 #endif /* atan2... */
 #if __has_builtin(__builtin_cosl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosl)
 /* Cosine of X */
@@ -7799,13 +7785,13 @@ __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL drem)(double __x, double
 #endif /* drem... */
 #endif /* drem... */
 #if __has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL significand)(double __x) { return __builtin_significand(__x); }
 #elif defined(__CRT_HAVE_significand)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),(__x))
 #elif defined(__CRT_HAVE___significand)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),__significand,(__x))
 #endif /* significand... */
 #if __has_builtin(__builtin_finitef) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitef)
@@ -7842,17 +7828,17 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL dremf)(float __x, float _
 #endif /* dremf... */
 #endif /* dremf... */
 #if __has_builtin(__builtin_significandf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandf)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL significandf)(float __x) { return __builtin_significandf(__x); }
 #elif defined(__CRT_HAVE_significandf)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,significandf,(float __x),(__x))
 #elif defined(__CRT_HAVE___significandf)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,significandf,(float __x),__significandf,(__x))
 #elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandf.h>
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(significandf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL significandf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandf))(__x); })
 #endif /* significandf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -7896,23 +7882,23 @@ __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL dreml)(__LONGDOUBL
 #endif /* dreml... */
 #endif /* dreml... */
 #if __has_builtin(__builtin_significandl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandl)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL significandl)(__LONGDOUBLE __x) { return __builtin_significandl(__x); }
 #elif defined(__CRT_HAVE_significandl)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___significandl)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),__significandl,(__x))
 #elif defined(__CRT_HAVE_significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),significand,(__x))
 #elif defined(__CRT_HAVE___significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),__significand,(__x))
 #elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandl.h>
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(significandl, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL significandl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandl))(__x); })
 #endif /* significandl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -8387,19 +8373,19 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__asin,(double __x),asin,(__x))
 #endif /* __asin... */
 #if __has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan)(double __x) { return __builtin_atan(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan)(double __x) { return __builtin_atan(__x); }
 #elif defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),atan,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),atan,(__x))
 #elif defined(__CRT_HAVE___atan)
 /* Arc tangent of X */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),(__x))
 #else /* LIBC: atan */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/atan.h>
 /* Arc tangent of X */
-__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan))(__x); }
 #else /* CUSTOM: atan */
 #undef none
 #endif /* __atan... */
@@ -8415,7 +8401,7 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__atan2,(double __y, double __x),ata
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atan2,(double __y, double __x),(__y,__x))
 #else /* LIBC: atan2 */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/atan2.h>
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __atan2)(double __y, double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2))(__y, __x); }
@@ -8495,19 +8481,19 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __asinf)(float __x) { ret
 #endif /* __asinf... */
 #if __has_builtin(__builtin_atanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanf)
 /* Arc tangent of X */
-__EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atanf)(float __x) { return __builtin_atanf(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atanf)(float __x) { return __builtin_atanf(__x); }
 #elif defined(__CRT_HAVE_atanf)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__atanf,(float __x),atanf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__atanf,(float __x),atanf,(__x))
 #elif defined(__CRT_HAVE___atanf)
 /* Arc tangent of X */
-__CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__atanf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__atanf,(float __x),(__x))
 #else /* LIBC: atanf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 #include <local/math/atanf.h>
 /* Arc tangent of X */
-__FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); }
 #else /* CUSTOM: atanf */
 #undef none
 #endif /* __atanf... */
@@ -8523,7 +8509,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__atan2f,(float __y, float __x),atan2
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__atan2f,(float __y, float __x),(__y,__x))
 #else /* LIBC: atan2f */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 #include <local/math/atan2f.h>
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atan2f)(float __y, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2f))(__y, __x); }
@@ -8658,25 +8644,19 @@ __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __asinl)(__LONGDOU
 #endif /* __asinl... */
 #if __has_builtin(__builtin_atanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanl)
 /* Arc tangent of X */
-__EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __atanl)(__LONGDOUBLE __x) { return __builtin_atanl(__x); }
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __atanl)(__LONGDOUBLE __x) { return __builtin_atanl(__x); }
 #elif defined(__CRT_HAVE_atanl)
 /* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanl,(__LONGDOUBLE __x),atanl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanl,(__LONGDOUBLE __x),atanl,(__x))
 #elif defined(__CRT_HAVE___atanl)
 /* Arc tangent of X */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanl,(__LONGDOUBLE __x),atan,(__x))
-#elif defined(__CRT_HAVE___atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanl,(__LONGDOUBLE __x),__atan,(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanl,(__LONGDOUBLE __x),(__x))
 #else /* LIBC: atanl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 #include <local/math/atanl.h>
 /* Arc tangent of X */
-__FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __atanl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __atanl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanl))(__x); }
 #else /* CUSTOM: atanl */
 #undef none
 #endif /* __atanl... */
@@ -8690,15 +8670,9 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atan2l,(__LONGDOUBLE __y, __
 #elif defined(__CRT_HAVE___atan2l)
 /* Arc tangent of Y/X */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),(__y,__x))
-#elif defined(__CRT_HAVE_atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of Y/X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),atan2,(__y,__x))
-#elif defined(__CRT_HAVE___atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Arc tangent of Y/X */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2,(__y,__x))
 #else /* LIBC: atan2l */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 #include <local/math/atan2l.h>
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __atan2l)(__LONGDOUBLE __y, __LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2l))(__y, __x); }
@@ -10135,10 +10109,10 @@ __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __drem)(double __x, doub
 #endif /* __drem... */
 #endif /* __drem... */
 #ifdef __CRT_HAVE___significand
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__significand,(double __x),(__x))
 #elif defined(__CRT_HAVE_significand)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__significand,(double __x),significand,(__x))
 #endif /* __significand... */
 #if __has_builtin(__builtin_remainderf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderf)
@@ -10161,17 +10135,17 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __dremf)(float __x, float
 #endif /* __dremf... */
 #endif /* __dremf... */
 #if __has_builtin(__builtin_significandf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandf)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __EXTERNINLINE __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __significandf)(float __x) { return __builtin_significandf(__x); }
 #elif defined(__CRT_HAVE_significandf)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__significandf,(float __x),significandf,(__x))
 #elif defined(__CRT_HAVE___significandf)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__significandf,(float __x),(__x))
 #elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandf.h>
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __significandf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandf))(__x); }
 #endif /* __significandf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
@@ -10195,23 +10169,23 @@ __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __dreml)(__LONGDOU
 #endif /* __dreml... */
 #endif /* __dreml... */
 #if __has_builtin(__builtin_significandl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significandl)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __EXTERNINLINE __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __significandl)(__LONGDOUBLE __x) { return __builtin_significandl(__x); }
 #elif defined(__CRT_HAVE_significandl)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),significandl,(__x))
 #elif defined(__CRT_HAVE___significandl)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE_significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),significand,(__x))
 #elif defined(__CRT_HAVE___significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),__significand,(__x))
 #elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandl.h>
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __significandl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandl))(__x); }
 #endif /* __significandl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -12024,8 +11998,8 @@ __LIBC int (signgam);
  *      This macro is defined only iff the `fma' function is
  *      implemented directly with a hardware multiply-add instructions.
  *
- *  FP_ILOGB0    Expands to a value returned by `ilogb (0.0)'.
- *  FP_ILOGBNAN    Expands to a value returned by `ilogb (NAN)'.
+ *  FP_ILOGB0    Expands to a value returned by `ilogb(0.0)'.
+ *  FP_ILOGBNAN  Expands to a value returned by `ilogb(NAN)'.
  *
  *  DECIMAL_DIG    Number of decimal digits supported by conversion between
  *      decimal and all internal floating-point formats. */
@@ -12063,9 +12037,9 @@ enum {
 
 
 #ifndef __OPTIMIZE_SIZE__
-#if __has_builtin(__builtin_signbitf) && \
-    __has_builtin(__builtin_signbit) && \
-    __has_builtin(__builtin_signbitl)
+#if (__has_builtin(__builtin_signbitf) && \
+     __has_builtin(__builtin_signbit) &&  \
+     __has_builtin(__builtin_signbitl))
 #define signbit(x) __FPFUNC(x, __builtin_signbitf, __builtin_signbit, __builtin_signbitl)
 #endif /* __builtin_signbitf && __builtin_signbit && __builtin_signbitl */
 #ifndef __SUPPORT_SNAN__

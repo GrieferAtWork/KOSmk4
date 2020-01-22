@@ -80,19 +80,20 @@ NOTHROW(LIBCCALL libc_asin)(double x)
 }
 /*[[[end:asin]]]*/
 
-/*[[[head:atan,hash:CRC-32=0x745b0aa4]]]*/
+/*[[[head:atan,hash:CRC-32=0xe217f05b]]]*/
 /* Arc tangent of X */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atan") double
 NOTHROW(LIBCCALL libc_atan)(double x)
 /*[[[body:atan]]]*/
 /*AUTO*/{
-	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
 }
 /*[[[end:atan]]]*/
 
@@ -107,9 +108,11 @@ NOTHROW(LIBCCALL libc_atan2)(double y,
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)y, (__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
 }
 /*[[[end:atan2]]]*/
 
@@ -177,19 +180,22 @@ NOTHROW(LIBCCALL libc_asinf)(float x)
 }
 /*[[[end:asinf]]]*/
 
-/*[[[head:atanf,hash:CRC-32=0xa7b29e4]]]*/
+/*[[[head:atanf,hash:CRC-32=0x9c37d31b]]]*/
 /* Arc tangent of X */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atanf") float
 NOTHROW(LIBCCALL libc_atanf)(float x)
 /*[[[body:atanf]]]*/
 /*AUTO*/{
-	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (float)libc_atan((double)x);
+#endif /* !... */
 }
 /*[[[end:atanf]]]*/
 
@@ -204,9 +210,13 @@ NOTHROW(LIBCCALL libc_atan2f)(float y,
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)y, (__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (float)libc_atan2((double)y, (double)x);
+#endif /* !... */
 }
 /*[[[end:atan2f]]]*/
 
@@ -265,14 +275,22 @@ NOTHROW(LIBCCALL libc_asinl)(__LONGDOUBLE x)
 }
 /*[[[end:asinl]]]*/
 
-/*[[[head:atanl,hash:CRC-32=0xa9e88378]]]*/
+/*[[[head:atanl,hash:CRC-32=0xb26a95fa]]]*/
 /* Arc tangent of X */
-INTERN WUNUSED
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.atanl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_atanl)(__LONGDOUBLE x)
 /*[[[body:atanl]]]*/
 /*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (__LONGDOUBLE)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
 	return (__LONGDOUBLE)libc_atan((double)x);
+#endif /* !... */
 }
 /*[[[end:atanl]]]*/
 
@@ -284,7 +302,16 @@ NOTHROW(LIBCCALL libc_atan2l)(__LONGDOUBLE y,
                               __LONGDOUBLE x)
 /*[[[body:atan2l]]]*/
 /*AUTO*/{
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)y, (__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (__LONGDOUBLE)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
 	return (__LONGDOUBLE)libc_atan2((double)y, (double)x);
+#endif /* !... */
 }
 /*[[[end:atan2l]]]*/
 
@@ -1875,8 +1902,8 @@ NOTHROW(LIBCCALL libc_pow10l)(__LONGDOUBLE x)
 /*[[[end:pow10l]]]*/
 
 
-/*[[[head:significand,hash:CRC-32=0x12c908f2]]]*/
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/*[[[head:significand,hash:CRC-32=0xd0cb1787]]]*/
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.significand") double
 NOTHROW(LIBCCALL libc_significand)(double x)
@@ -1890,8 +1917,8 @@ NOTHROW(LIBCCALL libc_significand)(double x)
 /*[[[end:significand]]]*/
 
 
-/*[[[head:significandf,hash:CRC-32=0x4c835be]]]*/
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/*[[[head:significandf,hash:CRC-32=0xc6ca2acb]]]*/
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.significandf") float
 NOTHROW(LIBCCALL libc_significandf)(float x)
@@ -1902,8 +1929,8 @@ NOTHROW(LIBCCALL libc_significandf)(float x)
 /*[[[end:significandf]]]*/
 
 
-/*[[[head:significandl,hash:CRC-32=0xea4d2596]]]*/
-/* Return the fractional part of X after dividing out `ilogb (X)' */
+/*[[[head:significandl,hash:CRC-32=0x208807f]]]*/
+/* Return the fractional part of X after dividing out `ilogb(X)' */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.significandl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_significandl)(__LONGDOUBLE x)

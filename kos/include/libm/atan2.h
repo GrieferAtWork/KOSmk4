@@ -257,6 +257,130 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/*
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice 
+ * is preserved.
+ * ====================================================
+ */
+
+__LIBM_LOCAL_DECLARE_BEGIN
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, tinyl, __IEEE854_LONG_DOUBLE_C(1.0e-4900))
+#ifndef __libm_zerol_defined
+#define __libm_zerol_defined 1
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, zerol, __IEEE854_LONG_DOUBLE_C(0.0))
+#endif /* !__libm_zerol_defined */
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, pi_o_4l, __IEEE854_LONG_DOUBLE_C(7.85398163397448309628202E-01)) /* 0x3FFE, 0xC90FDAA2, 0x2168C235 */
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, pi_o_2l, __IEEE854_LONG_DOUBLE_C(1.5707963267948966192564E+00))  /* 0x3FFF, 0xC90FDAA2, 0x2168C235 */
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, pil, __IEEE854_LONG_DOUBLE_C(3.14159265358979323851281E+00))     /* 0x4000, 0xC90FDAA2, 0x2168C235 */
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, pi_lol, -__IEEE854_LONG_DOUBLE_C(5.01655761266833202345176e-20)) /* 0xBFBE, 0xECE675D1, 0xFC8F8CBB */
+__LIBM_LOCAL_DECLARE_END
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_atan2l)(__IEEE854_LONG_DOUBLE_TYPE__ __y,
+                              __IEEE854_LONG_DOUBLE_TYPE__ __x) {
+	__IEEE854_LONG_DOUBLE_TYPE__ __z;
+	__int32_t __k, __m, __hx, __hy, __ix, __iy;
+	__uint32_t __sx, __sy, __lx, __ly;
+	__LIBM_GET_LDOUBLE_WORDS(__sx, __hx, __lx, __x);
+	__ix = __sx & 0x7fff;
+	__lx |= __hx & __INT32_C(0x7fffffff);
+	__LIBM_GET_LDOUBLE_WORDS(__sy, __hy, __ly, __y);
+	__iy = __sy & 0x7fff;
+	__ly |= __hy & __INT32_C(0x7fffffff);
+	if (((2 * __ix | ((__lx | -__lx) >> 31)) > __UINT32_C(0xfffe)) ||
+	    ((2 * __iy | ((__ly | -__ly) >> 31)) > __UINT32_C(0xfffe))) /* x or y is NaN */
+		return __x + __y;
+	if (((__sx - 0x3fff) | __lx) == 0)
+		return __ieee854_atanl(__y);           /* x=1.0 */
+	__m = ((__sy >> 15) & 1) | ((__sx >> 14) & 2); /* 2*sign(x)+sign(y) */
+
+	/* when y = 0 */
+	if ((__iy | __ly) == 0) {
+		switch ((int)__m) {
+		case 0:
+		case 1:
+			return __y; /* atan(+-0,+anything)=+-0 */
+		case 2:
+			return __LIBM_LOCAL_VALUE(pil) + __LIBM_LOCAL_VALUE(tinyl); /* atan(+0,-anything) = pi */
+		case 3:
+			return -__LIBM_LOCAL_VALUE(pil) - __LIBM_LOCAL_VALUE(tinyl); /* atan(-0,-anything) =-pi */
+		}
+	}
+	/* when x = 0 */
+	if ((__ix | __lx) == 0)
+		return (__sy & 0x8000) ? -__LIBM_LOCAL_VALUE(pi_o_2l) - __LIBM_LOCAL_VALUE(tinyl)
+		                       : __LIBM_LOCAL_VALUE(pi_o_2l) + __LIBM_LOCAL_VALUE(tinyl);
+
+	/* when x is INF */
+	if (__ix == 0x7fff) {
+		if (__iy == 0x7fff) {
+			switch ((int)__m) {
+			case 0:
+				return __LIBM_LOCAL_VALUE(pi_o_4l) + __LIBM_LOCAL_VALUE(tinyl); /* atan(+INF,+INF) */
+			case 1:
+				return -__LIBM_LOCAL_VALUE(pi_o_4l) - __LIBM_LOCAL_VALUE(tinyl); /* atan(-INF,+INF) */
+			case 2:
+				return 3.0 * __LIBM_LOCAL_VALUE(pi_o_4l) + __LIBM_LOCAL_VALUE(tinyl); /*atan(+INF,-INF) */
+			case 3:
+				return -3.0 * __LIBM_LOCAL_VALUE(pi_o_4l) - __LIBM_LOCAL_VALUE(tinyl); /*atan(-INF,-INF) */
+			}
+		} else {
+			switch ((int)__m) {
+			case 0:
+				return __LIBM_LOCAL_VALUE(zerol); /* atan(+...,+INF) */
+			case 1:
+				return -__LIBM_LOCAL_VALUE(zerol); /* atan(-...,+INF) */
+			case 2:
+				return __LIBM_LOCAL_VALUE(pil) + __LIBM_LOCAL_VALUE(tinyl); /* atan(+...,-INF) */
+			case 3:
+				return -__LIBM_LOCAL_VALUE(pil) - __LIBM_LOCAL_VALUE(tinyl); /* atan(-...,-INF) */
+			}
+		}
+	}
+	/* when y is INF */
+	if (__iy == 0x7fff)
+		return (__sy & 0x8000) ? -__LIBM_LOCAL_VALUE(pi_o_2l) - __LIBM_LOCAL_VALUE(tinyl)
+		                       : __LIBM_LOCAL_VALUE(pi_o_2l) + __LIBM_LOCAL_VALUE(tinyl);
+
+	/* compute y/x */
+	__k = __iy - __ix;
+	if (__k > 70)
+		__z = __LIBM_LOCAL_VALUE(pi_o_2l) + 0.5L * __LIBM_LOCAL_VALUE(pi_lol); /* |y/x| >  2**70 */
+	else if ((__sx & 0x8000) && __k < -70)
+		__z = 0.0; /* |y|/x < -2**70 */
+	else {
+		__z = __ieee854_atanl(__ieee854_fabsl(__y / __x)); /* safe to do y/x */
+	}
+	switch ((int)__m) {
+
+	case 0:
+		return __z; /* atan(+,+) */
+
+	case 1: {
+		__uint32_t __sz;
+		__LIBM_GET_LDOUBLE_EXP(__sz, __z);
+		__LIBM_SET_LDOUBLE_EXP(__z, __sz ^ __UINT32_C(0x8000));
+		return __z; /* atan(-,+) */
+	}	break;
+
+	case 2:
+		return __LIBM_LOCAL_VALUE(pil) - (__z - __LIBM_LOCAL_VALUE(pi_lol)); /* atan(+,-) */
+
+	default:
+/*	case 3: */
+		return (__z - __LIBM_LOCAL_VALUE(pi_lol)) - __LIBM_LOCAL_VALUE(pil); /* atan(-,-) */
+	}
+}
+
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
 __DECL_END
 #endif /* __CC__ */
 

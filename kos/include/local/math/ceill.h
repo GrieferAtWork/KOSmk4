@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb4c9e55 */
+/* HASH CRC-32:0x4a33a79f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Smallest integral value not less than X */
 __LOCAL_LIBC(ceill) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ceill))(__LONGDOUBLE __x) {
-#line 592 "kos/src/libc/magic/math.c"
+#line 643 "kos/src/libc/magic/math.c"
 	__LONGDOUBLE __result;
 	__result = (__LONGDOUBLE)(__INTMAX_TYPE__)__x; /* Round towards 0 */
 	if (__result < __x)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf3db5fa */
+/* HASH CRC-32:0x459226a3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Compute base-2 logarithm of X */
 __LOCAL_LIBC(log2l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(log2l))(__LONGDOUBLE __x) {
-#line 468 "kos/src/libc/magic/math.c"
+#line 519 "kos/src/libc/magic/math.c"
 	return (__LONGDOUBLE)__localdep_log2((double)__x);
 }
 __NAMESPACE_LOCAL_END

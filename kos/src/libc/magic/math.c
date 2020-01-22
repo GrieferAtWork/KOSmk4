@@ -107,36 +107,43 @@ __SYSDECL_BEGIN
 
 @@Arc cosine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acos)][nothrow][crtbuiltin]
- acos:(double x) -> double; /* TODO */
+acos:(double x) -> double; /* TODO */
 
 @@Arc sine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asin)][nothrow][crtbuiltin]
- asin:(double x) -> double; /* TODO */
+asin:(double x) -> double; /* TODO */
 
 @@Arc tangent of X
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][alias(__atan)][nothrow][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/atan.h>)][userimpl]
-[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
 atan:(double x) -> double {
-	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
 }
 
 @@Arc tangent of Y/X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan2)][nothrow][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/atan2.h>)][userimpl]
-[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
 atan2:(double y, double x) -> double {
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)y, (__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
 }
 
 @@Cosine of X
@@ -160,28 +167,41 @@ acosf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinf)][nothrow][crtbuiltin]
 asinf:(float x) -> float %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanf)][nothrow][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][alias(__atanf)][nothrow][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/atan.h>)][userimpl][doc_alias(atan)]
-[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(atan))]
 atanf:(float x) -> float {
-	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (float)atan((double)x);
+#endif /* !... */
 }
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan2f)][nothrow][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/atan2.h>)][userimpl][doc_alias(atan2)]
-[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(atan2))]
 atan2f:(float y, float x) -> float {
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)y, (__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (float)atan2((double)y, (double)x);
+#endif /* !... */
 }
 
 
@@ -202,11 +222,42 @@ acosl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinl)][nothrow][crtbuiltin]
 asinl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanl)][nothrow][crtbuiltin]
-atanl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_CONST][alias(__atanl)][nothrow][crtbuiltin]
+[requires_include(<ieee754.h>)][decl_include(<libm/atan.h>)][userimpl][doc_alias(atan)]
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(atan))]
+atanl:(__LONGDOUBLE x) -> __LONGDOUBLE {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_atanl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (__LONGDOUBLE)__ieee754_atan((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_atanf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return (__LONGDOUBLE)atan((double)x);
+#endif /* !... */
+}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atan2l)][nothrow][crtbuiltin]
-atan2l:(__LONGDOUBLE y, __LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
+[requires_include(<ieee754.h>)][decl_include(<libm/atan2.h>)][userimpl][doc_alias(atan2)]
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(atan2))]
+atan2l:(__LONGDOUBLE y, __LONGDOUBLE x) -> __LONGDOUBLE {
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_atan2l((__IEEE854_LONG_DOUBLE_TYPE__)y, (__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (__LONGDOUBLE)__ieee754_atan2((__IEEE754_DOUBLE_TYPE__)y, (__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_atan2f((__IEEE754_FLOAT_TYPE__)y, (__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return (__LONGDOUBLE)atan2((double)y, (double)x);
+#endif /* !... */
+}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__cosl)][nothrow][crtbuiltin]
 cosl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
@@ -1466,7 +1517,7 @@ finite:(double x) -> int {
 
 [attribute(*)][alias(*)][crtbuiltin] drem:(*) = remainder;
 
-@@Return the fractional part of X after dividing out `ilogb (X)'
+@@Return the fractional part of X after dividing out `ilogb(X)'
 [ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significand)][crtbuiltin]
 significand:(double x) -> double; /* TODO */
 
@@ -2193,8 +2244,8 @@ __LIBC int (signgam);
  *      This macro is defined only iff the `fma' function is
  *      implemented directly with a hardware multiply-add instructions.
  *
- *  FP_ILOGB0    Expands to a value returned by `ilogb (0.0)'.
- *  FP_ILOGBNAN    Expands to a value returned by `ilogb (NAN)'.
+ *  FP_ILOGB0    Expands to a value returned by `ilogb(0.0)'.
+ *  FP_ILOGBNAN  Expands to a value returned by `ilogb(NAN)'.
  *
  *  DECIMAL_DIG    Number of decimal digits supported by conversion between
  *      decimal and all internal floating-point formats. */
@@ -2212,9 +2263,9 @@ __LIBC int (signgam);
 
 
 #ifndef __OPTIMIZE_SIZE__
-#if __has_builtin(__builtin_signbitf) && \
-    __has_builtin(__builtin_signbit) && \
-    __has_builtin(__builtin_signbitl)
+#if (__has_builtin(__builtin_signbitf) && \
+     __has_builtin(__builtin_signbit) &&  \
+     __has_builtin(__builtin_signbitl))
 #define signbit(x) __FPFUNC(x, __builtin_signbitf, __builtin_signbit, __builtin_signbitl)
 #endif /* __builtin_signbitf && __builtin_signbit && __builtin_signbitl */
 #ifndef __SUPPORT_SNAN__

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x440bf378 */
+/* HASH CRC-32:0xf2ab86ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4596,6 +4596,9 @@
 
 
 /* ATTR_CONST */
+#define __CRT_ATTR_CONST___atan 1
+#define __CRT_ATTR_CONST___atanf 1
+#define __CRT_ATTR_CONST___atanl 1
 #define __CRT_ATTR_CONST___cbrt 1
 #define __CRT_ATTR_CONST___cbrtf 1
 #define __CRT_ATTR_CONST___cbrtl 1
@@ -4715,6 +4718,9 @@
 #define __CRT_ATTR_CONST__rotr 1
 #define __CRT_ATTR_CONST__rotr64 1
 #define __CRT_ATTR_CONST_abs 1
+#define __CRT_ATTR_CONST_atan 1
+#define __CRT_ATTR_CONST_atanf 1
+#define __CRT_ATTR_CONST_atanl 1
 #define __CRT_ATTR_CONST_btowc 1
 #define __CRT_ATTR_CONST_cbrt 1
 #define __CRT_ATTR_CONST_cbrtf 1

@@ -152,6 +152,16 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_DOUBLE_TYPE__
 
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/*
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ * ====================================================
+ */
 
 __LIBM_LOCAL_DECLARE_BEGIN
 #ifndef __libm_onel_defined

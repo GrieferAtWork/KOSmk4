@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe32f39be */
+/* HASH CRC-32:0x544f046c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(frexpf) __ATTR_WUNUSED float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpf))(float __x,
                                                     int *__pexponent) {
-#line 344 "kos/src/libc/magic/math.c"
+#line 395 "kos/src/libc/magic/math.c"
 	return (float)__localdep_frexp((double)__x, __pexponent);
 }
 __NAMESPACE_LOCAL_END
