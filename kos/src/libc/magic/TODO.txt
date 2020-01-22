@@ -11,11 +11,9 @@ Add support for *_chk variants (using __builtin_object_size())
 <ftw.h>
 <iconv.h>
 <lastlog.h>
-<link.h>
 <regexp.h>
 <resolv.h>
 <stab.h>
-<tar.h>
 <wordexp.h>
 
 <rpc/auth.h>
@@ -49,7 +47,6 @@ Add support for *_chk variants (using __builtin_object_size())
 <sys/quota.h>
 <sys/raw.h>  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
 <sys/reg.h>  (It only contains some macros, but those interact with sys/ucontext.h)
-<sys/signalfd.h>
 <sys/sysctl.h>
 <sys/vtimes.h>
 <sys/soundcard.h>
