@@ -21,6 +21,12 @@
 #define GUARD_LIBC_USER_GRP_C 1
 
 #include "../api.h"
+/**/
+
+#include <kos/syscalls.h>
+
+#include <syscall.h>
+
 #include "grp.h"
 
 DECL_BEGIN
@@ -215,11 +221,13 @@ NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
                                      gid_t const *groups)
 /*[[[body:setgroups]]]*/
 {
-	(void)count;
-	(void)groups;
-	CRT_UNIMPLEMENTED("setgroups"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	errno_t error;
+#if defined(SYS_setgroups32) && __SIZEOF_GID_T__ == 4
+	error = sys_setgroups32(count, (u32 const *)groups);
+#else /* SYS_setgroups32 && __SIZEOF_GID_T__ == 4 */
+	error = sys_setgroups(count, groups);
+#endif /* !SYS_setgroups32 || __SIZEOF_GID_T__ != 4 */
+	return libc_seterrno_syserr(error);
 }
 /*[[[end:setgroups]]]*/
 

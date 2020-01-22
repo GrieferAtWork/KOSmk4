@@ -504,11 +504,11 @@ NOTHROW_NCX(LIBCCALL libc_getgroups)(int size,
 /*[[[body:getgroups]]]*/
 {
 	errno_t result;
-#ifdef SYS_getgroups32
+#if defined(SYS_setgroups32) && __SIZEOF_GID_T__ == 4
 	result = sys_getgroups32((size_t)size, (uint32_t *)list);
-#else /* SYS_getgroups32 */
+#else /* SYS_setgroups32 && __SIZEOF_GID_T__ == 4 */
 	result = sys_getgroups((size_t)size, (uint32_t *)list);
-#endif /* !SYS_getgroups32 */
+#endif /* !SYS_setgroups32 || __SIZEOF_GID_T__ != 4 */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:getgroups]]]*/

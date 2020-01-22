@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f506c59 */
+/* HASH CRC-32:0x1c7e4c7c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -510,7 +510,6 @@
 #define __stub_setaliasent 1
 #define __stub_setcontext 1
 #define __stub_setgrent 1
-#define __stub_setgroups 1
 #define __stub_sethostent 1
 #define __stub_setipv4sourcefilter 1
 #define __stub_setkey 1
