@@ -53,7 +53,6 @@ Add support for *_chk variants (using __builtin_object_size())
 <sys/sysctl.h>
 <sys/vtimes.h>
 <sys/soundcard.h>
-<sys/termios.h>
 
 <gnu/libc-version.h>
 
