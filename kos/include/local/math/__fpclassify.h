@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bd06104 */
+/* HASH CRC-32:0xb20ce6dc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__fpclassify) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassify))(double __x) {
-#line 2316 "kos/src/libc/magic/math.c"
+#line 2348 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)__x);
 #elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbef6a598 */
+/* HASH CRC-32:0x7b7bd141 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,23 +20,56 @@
  */
 #ifndef __local_remainderl_defined
 #include <ieee754.h>
-#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
 #define __local_remainderl_defined 1
 #include <libm/remainder.h>
+#include <libm/remainder.h>
+/* Dependency: "remainder" from "math" */
+#ifndef ____localdep_remainder_defined
+#define ____localdep_remainder_defined 1
+#if __has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)
+/* Return the remainder of integer divison X/P with infinite precision */
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_remainder)(double __x, double __p) { return __builtin_remainder(__x, __p); }
+#elif defined(__CRT_HAVE_remainder)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),remainder,(__x,__p))
+#elif defined(__CRT_HAVE___remainder)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),__remainder,(__x,__p))
+#elif defined(__CRT_HAVE_drem)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),drem,(__x,__p))
+#elif defined(__CRT_HAVE___drem)
+/* Return the remainder of integer divison X/P with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),__drem,(__x,__p))
+#else /* LIBC: remainder */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/remainder.h>
+/* Return the remainder of integer divison X/P with infinite precision */
+#define __localdep_remainder (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainder))
+#else /* CUSTOM: remainder */
+#undef ____localdep_remainder_defined
+#endif /* remainder... */
+#endif /* remainder... */
+#endif /* !____localdep_remainder_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(remainderl) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderl))(__LONGDOUBLE __x,
                                                     __LONGDOUBLE __p) {
-#line 1114 "kos/src/libc/magic/math.c"
+#line 1144 "kos/src/libc/magic/math.c"
 	__COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__p);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__p);
-#else /* ... */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__p);
+#else /* ... */
+	return (__LONGDOUBLE)__localdep_remainder((double)__x, (double)__p);
 #endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ */
+#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_remainder || __CRT_HAVE___remainder || __CRT_HAVE_drem || __CRT_HAVE___drem */
 #endif /* !__local_remainderl_defined */

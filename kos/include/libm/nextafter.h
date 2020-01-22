@@ -171,6 +171,111 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 
 #endif /* __IEEE754_DOUBLE_TYPE__ */
 
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/*
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ * ====================================================
+ */
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_nextafterl)(__IEEE854_LONG_DOUBLE_TYPE__ __x,
+                                  __IEEE854_LONG_DOUBLE_TYPE__ __y) {
+	__int32_t __ix, __iy;
+	__int32_t __esx, __esy;
+	__uint32_t __hx, __hy, __lx, __ly;
+
+	__LIBM_GET_LDOUBLE_WORDS(__esx, __hx, __lx, __x);
+	__LIBM_GET_LDOUBLE_WORDS(__esy, __hy, __ly, __y);
+	__ix = __esx & IEEE854_LONG_DOUBLE_MAXEXP; /* |x| */
+	__iy = __esy & IEEE854_LONG_DOUBLE_MAXEXP; /* |y| */
+
+	/* Intel's extended format has the normally implicit 1 explicit present. Sigh! */
+	if (((__ix == IEEE854_LONG_DOUBLE_MAXEXP) && (((__hx & __INT32_C(0x7fffffff)) | __lx) != 0)) || /* x is nan */
+	    ((__iy == IEEE854_LONG_DOUBLE_MAXEXP) && (((__hy & __INT32_C(0x7fffffff)) | __ly) != 0)))   /* y is nan */
+		return __x + __y;
+	if (__x == __y)
+		return __y; /* x=y, return y */
+	if ((__ix | __hx | __lx) == 0) { /* x == 0 */
+		__IEEE854_LONG_DOUBLE_TYPE__ __u;
+		__LIBM_SET_LDOUBLE_WORDS(__x, __esy & 0x8000, 0, 1); /* return +-minsubnormal */
+		__libm_math_opt_barrier(__x, __u);
+		__u = __u * __u;
+		__libm_math_force_eval(__u); /* raise underflow flag */
+		return __x;
+	}
+	if (__esx >= 0) { /* x > 0 */
+		if (__esx > __esy || ((__esx == __esy) && (__hx > __hy || ((__hx == __hy) && (__lx > __ly))))) {
+			/* x > y, x -= ulp */
+			if (__lx == 0) {
+				if (__hx <= __UINT32_C(0x80000000)) {
+					if (__esx == 0) {
+						--__hx;
+					} else {
+						__esx -= 1;
+						__hx = __hx - 1;
+						if (__esx > 0)
+							__hx |= __UINT32_C(0x80000000);
+					}
+				} else {
+					__hx -= 1;
+				}
+			}
+			__lx -= 1;
+		} else { /* x < y, x += ulp */
+			__lx += 1;
+			if (__lx == 0) {
+				__hx += 1;
+				if (__hx == 0 || (__esx == 0 && __hx == __UINT32_C(0x80000000))) {
+					__esx += 1;
+					__hx |= __UINT32_C(0x80000000);
+				}
+			}
+		}
+	} else { /* x < 0 */
+		if (__esy >= 0 || (__esx > __esy || ((__esx == __esy) && (__hx > __hy || ((__hx == __hy) && (__lx > __ly)))))) {
+			/* x < y, x -= ulp */
+			if (__lx == 0) {
+				if (__hx <= __UINT32_C(0x80000000)) {
+					__esx -= 1;
+					__hx = __hx - 1;
+					if ((__esx & IEEE854_LONG_DOUBLE_MAXEXP) > 0)
+						__hx |= __UINT32_C(0x80000000);
+				} else {
+					__hx -= 1;
+				}
+			}
+			__lx -= 1;
+		} else { /* x > y, x += ulp */
+			__lx += 1;
+			if (__lx == 0) {
+				__hx += 1;
+				if (__hx == 0 || (__esx == __INT32_C(0xffff8000) && __hx == __UINT32_C(0x80000000))) {
+					__esx += 1;
+					__hx |= __UINT32_C(0x80000000);
+				}
+			}
+		}
+	}
+	__esy = __esx & IEEE854_LONG_DOUBLE_MAXEXP;
+	if (__esy == IEEE854_LONG_DOUBLE_MAXEXP)
+		return __x + __x; /* overflow  */
+	if (__esy == 0) {
+		__IEEE854_LONG_DOUBLE_TYPE__ u = __x * __x; /* underflow */
+		__libm_math_force_eval(u);                  /* raise underflow flag */
+	}
+	__LIBM_SET_LDOUBLE_WORDS(__x, __esx, __hx, __lx);
+	return __x;
+}
+
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
 __DECL_END
 #endif /* __CC__ */
 

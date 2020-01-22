@@ -1026,13 +1026,17 @@ rint:(double x) -> double {
 @@Return X + epsilon if X < Y, X - epsilon if X > Y
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafter, _nextafter)][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/nextafter.h>)][userimpl]
-[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
 nextafter:(double x, double y) -> double {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_nextafterl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#endif /* !... */
 }
 
 @@Return the remainder of integer divison X/P with infinite precision
@@ -1069,28 +1073,38 @@ rintf:(float x) -> float {
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterf)][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/nextafter.h>)][userimpl][doc_alias(nextafter)]
-[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(nextafter))]
 nextafterf:(float x, float y) -> float {
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (double)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
-	return (double)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_nextafterl((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#else /* ... */
+	return (float)nextafter((double)x, (double)y);
+#endif /* !... */
 }
 
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderf, dremf, __dremf)][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/remainder.h>)][userimpl]
 [requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
           defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
-          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__))]
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(remainder))]
 remainderf:(float x, float p) -> float {
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)p);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)p);
-#else /* ... */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)p);
+#else /* ... */
+	return (float)remainder((double)x, (double)p);
 #endif /* !... */
 }
 
@@ -1103,21 +1117,39 @@ ilogbf:(float x) -> int %{auto_block(math)}
 rintl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterl)][crtbuiltin]
-nextafterl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{auto_block(math)}
+[requires_include(<ieee754.h>)][decl_include(<libm/nextafter.h>)][userimpl]
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(nextafter))]
+nextafterl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_nextafterl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#else /* ... */
+	return (__LONGDOUBLE)nextafter((double)x, (double)y);
+#endif /* !... */
+}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderl, dreml, __dreml)][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/remainder.h>)][userimpl]
 [requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
           defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
-          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__))]
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(remainder))]
 remainderl:(__LONGDOUBLE x, __LONGDOUBLE p) -> __LONGDOUBLE {
 	COMPILER_IMPURE(); /* XXX: Math error handling */
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)p);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)p);
-#else /* ... */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)p);
+#else /* ... */
+	return (__LONGDOUBLE)remainder((double)x, (double)p);
 #endif /* !... */
 }
 

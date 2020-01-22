@@ -1437,9 +1437,11 @@ NOTHROW(LIBCCALL libc_nextafter)(double x,
 /*AUTO*/{
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_nextafterl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#endif /* !... */
 }
 /*[[[end:nextafter]]]*/
 
@@ -1500,10 +1502,14 @@ NOTHROW(LIBCCALL libc_nextafterf)(float x,
 /*[[[body:nextafterf]]]*/
 /*AUTO*/{
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (double)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
-	return (double)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_nextafterl((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#else /* ... */
+	return (float)libc_nextafter((double)x, (double)y);
+#endif /* !... */
 }
 /*[[[end:nextafterf]]]*/
 
@@ -1519,8 +1525,10 @@ NOTHROW(LIBCCALL libc_remainderf)(float x,
 	return (float)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)p);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)p);
-#else /* ... */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)p);
+#else /* ... */
+	return (float)libc_remainder((double)x, (double)p);
 #endif /* !... */
 }
 /*[[[end:remainderf]]]*/
@@ -1547,15 +1555,22 @@ NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x)
 }
 /*[[[end:rintl]]]*/
 
-/*[[[head:nextafterl,hash:CRC-32=0xf6e943fd]]]*/
-/* Return X + epsilon if X < Y, X - epsilon if X > Y */
+/*[[[head:nextafterl,hash:CRC-32=0x20f1f4ff]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nextafterl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x,
                                   __LONGDOUBLE y)
 /*[[[body:nextafterl]]]*/
 /*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_nextafterl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_nextafter((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)y);
+#else /* ... */
 	return (__LONGDOUBLE)libc_nextafter((double)x, (double)y);
+#endif /* !... */
 }
 /*[[[end:nextafterl]]]*/
 
@@ -1571,8 +1586,10 @@ NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
 	return (__LONGDOUBLE)__ieee854_remainderl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)p);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_remainder((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)p);
-#else /* ... */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_remainderf((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__)p);
+#else /* ... */
+	return (__LONGDOUBLE)libc_remainder((double)x, (double)p);
 #endif /* !... */
 }
 /*[[[end:remainderl]]]*/

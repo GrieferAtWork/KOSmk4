@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7367d08d */
+/* HASH CRC-32:0x90d0697 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -246,7 +246,6 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remainderf)(float x, float p);
 INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogbf)(float x);
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x);
-/* Return X + epsilon if X < Y, X - epsilon if X > Y */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x, __LONGDOUBLE y);
 INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x, __LONGDOUBLE p);
 /* Return the binary exponent of X, which must be nonzero */

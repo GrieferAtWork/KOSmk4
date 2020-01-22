@@ -322,14 +322,24 @@ typedef union {
 	(((amt) < 8 * sizeof(op)) ? ((op) >> (amt)) : 0)
 
 
+#ifndef __libm_math_opt_barrier
+#ifdef __COMPILER_HAVE_GCC_ASM
+#define __libm_math_opt_barrier(x, result) do { (result) = (x); __asm__("" : "+m" (result)); } __WHILE0
+#define __libm_math_force_eval(x)          do { __asm__ __volatile__("" : : "m" (x)); } __WHILE0
+#else /* __COMPILER_HAVE_GCC_ASM */
+#define __libm_math_opt_barrier(x, result) ((result) = (x))
+#define __libm_math_force_eval(x)          (void)(x) /* XXX: May not get evaluated... */
+#endif /* !__COMPILER_HAVE_GCC_ASM */
+#endif /* !__libm_math_opt_barrier */
+
 
 __DECL_END
-#else                                                   /* __CC__ */
+#else /* __CC__ */
 #define __LIBM_LOCAL_DECLARE_BEGIN                      /* nothing */
 #define __LIBM_LOCAL_DECLARE_END                        /* nothing */
 #define __LIBM_LOCAL_DECLARE(T, name, value)            /* nothing */
 #define __LIBM_LOCAL_DECLARE_ARRAY(T, name, array, ...) /* nothing */
 #define __LIBM_LOCAL_VALUE(name)                        /* nothing */
-#endif                                                  /* !__CC__ */
+#endif /* !__CC__ */
 
 #endif /* !_LIBM_FDLIBM_H */
