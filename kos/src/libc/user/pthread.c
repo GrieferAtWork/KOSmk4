@@ -1080,7 +1080,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t pthread,
 		at->pa_flags |= ATTR_FLAG_STACKADDR;
 	at->pa_cpuset = (cpu_set_t *)&at->pa_cpusetsize;
 	result = pthread_getaffinity_np(pthread, sizeof(at->pa_cpusetsize), at->pa_cpuset);
-	if (result == EINVAL) {
+	if (result != ESRCH) {
 		/* Buffer too small. */
 		cpu_set_t *buf = NULL, *newbuf;
 		size_t bufsize = sizeof(at->pa_cpusetsize) * 2;
@@ -1136,13 +1136,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t target_thread,
 	if unlikely(tid == 0)
 		return ESRCH; /* The given thread has already terminated. */
 	old_policy = sys_sched_getscheduler(tid);
-	if (E_ISERR(old_policy))
+	if unlikely(E_ISERR(old_policy))
 		return (int)-old_policy;
 	result = sys_sched_getparam(tid, &old_param);
-	if (E_ISERR(result))
+	if unlikely(E_ISERR(result))
 		return (int)-result;
 	result = sys_sched_setscheduler(tid, policy, param);
-	if (E_ISERR(result))
+	if unlikely(E_ISERR(result))
 		return -result;
 	if unlikely(ATOMIC_READ(pt->pt_tid) == 0) {
 		/* The thread has terminated in the mean time, and we've accidentally
@@ -1173,11 +1173,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getschedparam)(pthread_t target_thread,
 	if unlikely(tid == 0)
 		return ESRCH; /* The given thread has already terminated. */
 	sys_policy = sys_sched_getscheduler(tid);
-	if (E_ISERR(sys_policy))
+	if unlikely(E_ISERR(sys_policy))
 		return (int)-sys_policy;
 	*policy = sys_policy;
 	result = sys_sched_getparam(tid, param);
-	if (E_ISERR(result))
+	if unlikely(E_ISERR(result))
 		return (int)-result;
 	if unlikely(ATOMIC_READ(pt->pt_tid) == 0) {
 		/* The thread has terminated in the mean time.
@@ -1200,13 +1200,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t target_thread,
 	syscall_slong_t old_prio;
 	struct pthread *pt = (struct pthread *)target_thread;
 	pid_t tid = ATOMIC_READ(pt->pt_tid);
-	if (tid == 0)
+	if unlikely(tid == 0)
 		return ESRCH;
 	old_prio = sys_getpriority(PRIO_PROCESS, tid);
-	if (E_ISERR(old_prio))
+	if unlikely(E_ISERR(old_prio))
 		return (int)-old_prio;
 	error = sys_setpriority(PRIO_PROCESS, tid, (syscall_ulong_t)(20 - prio));
-	if (E_ISERR(error))
+	if unlikely(E_ISERR(error))
 		return (int)-error;
 	if unlikely(ATOMIC_READ(pt->pt_tid) == 0) {
 		/* The thread has terminated in the mean time.
@@ -1230,11 +1230,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t target_thread,
 {
 	struct pthread *pt = (struct pthread *)target_thread;
 	pid_t tid = ATOMIC_READ(pt->pt_tid);
-	if (tid == 0)
+	if unlikely(tid == 0)
 		return ESRCH;
-	if (snprintf(buf, buflen, "tid{%u}", tid) >= buflen)
+	if unlikely(snprintf(buf, buflen, "tid{%u}", tid) >= buflen)
 		return ERANGE;
-	if (ATOMIC_READ(pt->pt_tid) == 0)
+	if unlikely(ATOMIC_READ(pt->pt_tid) == 0)
 		return ESRCH;
 	return EOK;
 }
@@ -1250,7 +1250,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
 {
 	struct pthread *pt = (struct pthread *)target_thread;
 	pid_t tid = ATOMIC_READ(pt->pt_tid);
-	if (tid == 0)
+	if unlikely(tid == 0)
 		return ESRCH;
 	COMPILER_IMPURE();
 	/* Unsupported */
@@ -1278,7 +1278,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setconcurrency") 
 NOTHROW_NCX(LIBCCALL libc_pthread_setconcurrency)(int level)
 /*[[[body:pthread_setconcurrency]]]*/
 {
-	if (level < 0)
+	if unlikely(level < 0)
 		return EINVAL;
 	pthread_concurrency_level = level;
 	return EOK;
@@ -2320,78 +2320,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setclock)(pthread_condattr_t *attr,
 }
 /*[[[end:pthread_condattr_setclock]]]*/
 
-/*[[[head:pthread_spin_init,hash:CRC-32=0xcf93ebc1]]]*/
-/* Initialize the spinlock LOCK. If PSHARED is nonzero the
- * spinlock can be shared between different processes */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_init") int
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
-                                             int pshared)
-/*[[[body:pthread_spin_init]]]*/
-{
-	(void)lock;
-	(void)pshared;
-	CRT_UNIMPLEMENTED("pthread_spin_init"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:pthread_spin_init]]]*/
 
-/*[[[head:pthread_spin_destroy,hash:CRC-32=0x85b3fe15]]]*/
-/* Destroy the spinlock LOCK */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_destroy") int
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock)
-/*[[[body:pthread_spin_destroy]]]*/
-{
-	(void)lock;
-	CRT_UNIMPLEMENTED("pthread_spin_destroy"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:pthread_spin_destroy]]]*/
 
-/*[[[head:pthread_spin_lock,hash:CRC-32=0xb4bd6d86]]]*/
-/* Wait until spinlock LOCK is retrieved */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_lock") int
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock)
-/*[[[body:pthread_spin_lock]]]*/
-{
-	(void)lock;
-	CRT_UNIMPLEMENTED("pthread_spin_lock"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:pthread_spin_lock]]]*/
 
-/*[[[head:pthread_spin_trylock,hash:CRC-32=0x9a4637d0]]]*/
-/* Try to lock spinlock LOCK */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_trylock") int
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock)
-/*[[[body:pthread_spin_trylock]]]*/
-{
-	(void)lock;
-	CRT_UNIMPLEMENTED("pthread_spin_trylock"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:pthread_spin_trylock]]]*/
 
-/*[[[head:pthread_spin_unlock,hash:CRC-32=0xe8416eef]]]*/
-/* Release spinlock LOCK */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_unlock") int
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock)
-/*[[[body:pthread_spin_unlock]]]*/
-{
-	(void)lock;
-	CRT_UNIMPLEMENTED("pthread_spin_unlock"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:pthread_spin_unlock]]]*/
+
+
+
+
 
 /*[[[head:pthread_barrier_init,hash:CRC-32=0x2d772507]]]*/
 /* Initialize BARRIER with the attributes in ATTR.
@@ -2740,7 +2676,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__rest
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6decb3a4]]]*/
+/*[[[start:exports,hash:CRC-32=0x29caad81]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_create, libc_pthread_create);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_join, libc_pthread_join);
@@ -2855,11 +2791,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_getpshared, libc_pthread_condattr_getp
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_setpshared, libc_pthread_condattr_setpshared);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_getclock, libc_pthread_condattr_getclock);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_setclock, libc_pthread_condattr_setclock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_spin_init, libc_pthread_spin_init);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_spin_destroy, libc_pthread_spin_destroy);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_spin_lock, libc_pthread_spin_lock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_spin_trylock, libc_pthread_spin_trylock);
-DEFINE_PUBLIC_WEAK_ALIAS(pthread_spin_unlock, libc_pthread_spin_unlock);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrier_init, libc_pthread_barrier_init);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrier_destroy, libc_pthread_barrier_destroy);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrier_wait, libc_pthread_barrier_wait);

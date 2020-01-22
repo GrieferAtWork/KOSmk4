@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c8d3dfe */
+/* HASH CRC-32:0x294474dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -286,17 +286,6 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setpshared)(p
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_pthread_condattr_getclock)(pthread_condattr_t const *__restrict attr, clockid_t *__restrict clock_id);
 /* Set the clock selected for the condition variable attribute ATTR */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_condattr_setclock)(pthread_condattr_t *attr, clockid_t clock_id);
-/* Initialize the spinlock LOCK. If PSHARED is nonzero the
- * spinlock can be shared between different processes */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock, int pshared);
-/* Destroy the spinlock LOCK */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock);
-/* Wait until spinlock LOCK is retrieved */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock);
-/* Try to lock spinlock LOCK */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock);
-/* Release spinlock LOCK */
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock);
 /* Initialize BARRIER with the attributes in ATTR.
  * The barrier is opened when COUNT waiters arrived */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict barrier, pthread_barrierattr_t const *__restrict attr, unsigned int count);

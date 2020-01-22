@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c1a9536 */
+/* HASH CRC-32:0xa91f12df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1352,26 +1352,47 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_condattr_setclock,(pthr
 /* Initialize the spinlock LOCK. If PSHARED is nonzero the
  * spinlock can be shared between different processes */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_spin_init,(pthread_spinlock_t *__lock, int __pshared),(__lock,__pshared))
+#else /* LIBC: pthread_spin_init */
+#include <local/pthread/pthread_spin_init.h>
+/* Initialize the spinlock LOCK. If PSHARED is nonzero the
+ * spinlock can be shared between different processes */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_init, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_init)(pthread_spinlock_t *__lock, int __pshared) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_init))(__lock, __pshared); })
 #endif /* pthread_spin_init... */
 
 #ifdef __CRT_HAVE_pthread_spin_destroy
 /* Destroy the spinlock LOCK */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_spin_destroy,(pthread_spinlock_t *__lock),(__lock))
+#else /* LIBC: pthread_spin_destroy */
+#include <local/pthread/pthread_spin_destroy.h>
+/* Destroy the spinlock LOCK */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_destroy, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_destroy)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_destroy))(__lock); })
 #endif /* pthread_spin_destroy... */
 
 #ifdef __CRT_HAVE_pthread_spin_lock
 /* Wait until spinlock LOCK is retrieved */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_spin_lock,(pthread_spinlock_t *__lock),(__lock))
+#else /* LIBC: pthread_spin_lock */
+#include <local/pthread/pthread_spin_lock.h>
+/* Wait until spinlock LOCK is retrieved */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_lock, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_lock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_lock))(__lock); })
 #endif /* pthread_spin_lock... */
 
 #ifdef __CRT_HAVE_pthread_spin_trylock
 /* Try to lock spinlock LOCK */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_spin_trylock,(pthread_spinlock_t *__lock),(__lock))
+#else /* LIBC: pthread_spin_trylock */
+#include <local/pthread/pthread_spin_trylock.h>
+/* Try to lock spinlock LOCK */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_trylock, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_trylock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_trylock))(__lock); })
 #endif /* pthread_spin_trylock... */
 
 #ifdef __CRT_HAVE_pthread_spin_unlock
 /* Release spinlock LOCK */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_spin_unlock,(pthread_spinlock_t *__lock),(__lock))
+#else /* LIBC: pthread_spin_unlock */
+#include <local/pthread/pthread_spin_unlock.h>
+/* Release spinlock LOCK */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pthread_spin_unlock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_unlock))(__lock); })
 #endif /* pthread_spin_unlock... */
 
 /* Functions to handle barriers. */

@@ -39,6 +39,8 @@
 #include "typecore.h"
 #include "../__stdcxx.h"
 
+__CXXDECL_BEGIN
+
 #undef __POINTER_CXX_CV_QUAL
 #undef __POINTER_CXX_IS_VOID
 
@@ -137,6 +139,7 @@ __NAMESPACE_INT_END
 #endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 #endif /* __SIZEOF_POINTER__ == 8 */
 
+__CXXDECL_END
 #else
 
 /* Fallback: Just replace references to pointer with sizes

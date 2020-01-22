@@ -1247,23 +1247,55 @@ pthread_condattr_setclock:([nonnull] pthread_condattr_t *attr, $clockid_t clock_
 %
 @@Initialize the spinlock LOCK. If PSHARED is nonzero the
 @@spinlock can be shared between different processes
-pthread_spin_init:([nonnull] pthread_spinlock_t *lock, int pshared) -> int;
+[dependency_include(<hybrid/__atomic.h>)]
+pthread_spin_init:([nonnull] pthread_spinlock_t *lock, int pshared) -> int {
+	(void)pshared;
+	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELAXED);
+	return 0;
+}
 
 %
 @@Destroy the spinlock LOCK
-pthread_spin_destroy:([nonnull] pthread_spinlock_t *lock) -> int;
+pthread_spin_destroy:([nonnull] pthread_spinlock_t *lock) -> int {
+	(void)lock; /* no-op */
+	return 0;
+}
 
 %
 @@Wait until spinlock LOCK is retrieved
-pthread_spin_lock:([nonnull] pthread_spinlock_t *lock) -> int;
+[dependency_include(<hybrid/__atomic.h>)]
+[dependency_include(<hybrid/sched/__yield.h>)]
+pthread_spin_lock:([nonnull] pthread_spinlock_t *lock) -> int {
+	while (pthread_spin_trylock(lock) != 0)
+		__hybrid_yield();
+	return 0;
+}
 
 %
 @@Try to lock spinlock LOCK
-pthread_spin_trylock:([nonnull] pthread_spinlock_t *lock) -> int;
+[dependency_include(<hybrid/__atomic.h>)]
+[dependency_include(<parts/errno.h>)]
+pthread_spin_trylock:([nonnull] pthread_spinlock_t *lock) -> int {
+	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
+		return 0;
+#ifdef @__EBUSY@
+	return @__EBUSY@;
+#elif defined(@__EWOULDBLOCK@)
+	return @__EWOULDBLOCK@;
+#elif defined(@__EAGAIN@)
+	return @__EAGAIN@;
+#else /* ... */
+	return 1;
+#endif /* !... */
+}
 
 %
 @@Release spinlock LOCK
-pthread_spin_unlock:([nonnull] pthread_spinlock_t *lock) -> int;
+[dependency_include(<hybrid/__atomic.h>)]
+pthread_spin_unlock:([nonnull] pthread_spinlock_t *lock) -> int {
+	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELEASE);
+	return 0;
+}
 
 
 %
