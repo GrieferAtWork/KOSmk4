@@ -1285,7 +1285,7 @@ rintl:(__LONGDOUBLE x) -> __LONGDOUBLE  {
 #endif /* !... */
 }
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterl)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterl, __nexttowardl)][crtbuiltin]
 [requires_include(<ieee754.h>)][dependency_include(<libm/nextafter.h>)][userimpl]
 [requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
           defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
@@ -1333,7 +1333,22 @@ ilogbl:(__LONGDOUBLE x) -> int %{auto_block(math)}
 %(std, c, ccompat)#ifdef __USE_ISOC99
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttoward)][crtbuiltin]
-nexttoward:(double x, __LONGDOUBLE y) -> double; /* TODO */
+[requires_include(<ieee754.h>)][dependency_include(<libm/nexttoward.h>)][userimpl]
+[requires(((defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)) &&
+           defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
+           $has_function(nexttowardl))]
+nexttoward:(double x, __LONGDOUBLE y) -> double {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* __IEEE854_LONG_DOUBLE_TYPE__ */
+	return (double)nexttowardl((__LONGDOUBLE)x, y);
+#endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
+}
 
 @@Return X times (2 to the Nth power)
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbn)][crtbuiltin]
@@ -1471,7 +1486,24 @@ llround:(double x) -> __LONGLONG {
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttowardf)][crtbuiltin]
-nexttowardf:(float x, __LONGDOUBLE y) -> float %{auto_block(math)}
+[requires_include(<ieee754.h>)][dependency_include(<libm/nexttoward.h>)][userimpl]
+[requires(((defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+            defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)) &&
+           defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
+           $has_function(nexttowardl))]
+nexttowardf:(float x, __LONGDOUBLE y) -> float {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#else /* __IEEE854_LONG_DOUBLE_TYPE__ */
+	return (float)nexttowardl((__LONGDOUBLE)x, y);
+#endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
+}
+
+
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbnf)][crtbuiltin][doc_alias(scalbn)]
 [requires_include(<ieee754.h>)][dependency_include(<libm/scalbn.h>)][userimpl]
@@ -1587,7 +1619,7 @@ llroundf:(float x) -> __LONGLONG %{copy(%auto, math)}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttowardl)][crtbuiltin]
-nexttowardl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{auto_block(math)}
+nexttowardl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE = nextafterl;
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbnl)][crtbuiltin][doc_alias(scalbn)]
 [requires_include(<ieee754.h>)][dependency_include(<libm/scalbn.h>)][userimpl]

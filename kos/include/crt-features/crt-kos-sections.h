@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac495d28 */
+/* HASH CRC-32:0x1c3d27c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2513,7 +2513,6 @@
 #define __CRT_SECTION_nextafterl                            __CRT_SECTINFO_math_math                                /* .text.crt.math.math.nextafterl */
 #define __CRT_SECTION_nexttoward                            __CRT_SECTINFO_math_math                                /* .text.crt.math.math.nexttoward */
 #define __CRT_SECTION_nexttowardf                           __CRT_SECTINFO_math_math                                /* .text.crt.math.math.nexttowardf */
-#define __CRT_SECTION_nexttowardl                           __CRT_SECTINFO_math_math                                /* .text.crt.math.math.nexttowardl */
 #define __CRT_SECTION_pow                                   __CRT_SECTINFO_math_math                                /* .text.crt.math.math.pow */
 #define __CRT_SECTION_pow10                                 __CRT_SECTINFO_math_math                                /* .text.crt.math.math.pow10 */
 #define __CRT_SECTION_pow10f                                __CRT_SECTINFO_math_math                                /* .text.crt.math.math.pow10f */

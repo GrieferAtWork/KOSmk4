@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8aba3832 */
+/* HASH CRC-32:0xbd6a76b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1607,7 +1607,6 @@ __CRT_FUNCTION(nextafterf,0,(),2,(float,x,float,y),float)
 __CRT_FUNCTION(nextafterl,0,(),2,(__LONGDOUBLE,x,__LONGDOUBLE,y),__LONGDOUBLE)
 __CRT_FUNCTION(nexttoward,0,(),2,(double,x,__LONGDOUBLE,y),double)
 __CRT_FUNCTION(nexttowardf,0,(),2,(float,x,__LONGDOUBLE,y),float)
-__CRT_FUNCTION(nexttowardl,0,(),2,(__LONGDOUBLE,x,__LONGDOUBLE,y),__LONGDOUBLE)
 __CRT_FUNCTION(nice,0,(),1,(int,inc),int)
 __CRT_FUNCTION(nrand48,0,(),1,(unsigned short[3],xsubi),long)
 __CRT_FUNCTION(nrand48_r,0,(),3,(unsigned short[3],xsubi,struct drand48_data *__restrict,buffer,long *__restrict,result),int)
@@ -3429,6 +3428,7 @@ __CRT_FAKE_FUNCTION(mtx_destroy,0,(),1,(mtx_t *__restrict,mutex),void)
 __CRT_FAKE_FUNCTION(nearbyint,0,(),1,(double,x),double)
 __CRT_FAKE_FUNCTION(nearbyintf,0,(),1,(float,x),float)
 __CRT_FAKE_FUNCTION(nearbyintl,0,(),1,(__LONGDOUBLE,x),__LONGDOUBLE)
+__CRT_FAKE_FUNCTION(nexttowardl,0,(),2,(__LONGDOUBLE,x,__LONGDOUBLE,y),__LONGDOUBLE)
 __CRT_FAKE_FUNCTION(open_c16memstream,0,(),2,(char16_t **,bufloc,size_t *,sizeloc),FILE *)
 __CRT_FAKE_FUNCTION(open_c32memstream,0,(),2,(char32_t **,bufloc,size_t *,sizeloc),FILE *)
 __CRT_FAKE_FUNCTION(printf_s,0,(),VA(1),(char const *__restrict,format),__STDC_INT_AS_SIZE_T)

@@ -41,6 +41,7 @@
 #include <libm/ldexp.h>
 #include <libm/modf.h>
 #include <libm/nextafter.h>
+#include <libm/nexttoward.h>
 #include <libm/pow.h>
 #include <libm/remainder.h>
 #include <libm/rint.h>
@@ -1661,12 +1662,16 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nexttoward") double
 NOTHROW(LIBCCALL libc_nexttoward)(double x,
                                   __LONGDOUBLE y)
 /*[[[body:nexttoward]]]*/
-{
-	(void)x;
-	(void)y;
-	CRT_UNIMPLEMENTED("nexttoward"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+/*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+	return (double)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* __IEEE854_LONG_DOUBLE_TYPE__ */
+	return (double)libc_nexttowardl((__LONGDOUBLE)x, y);
+#endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
 }
 /*[[[end:nexttoward]]]*/
 
@@ -1770,7 +1775,15 @@ NOTHROW(LIBCCALL libc_nexttowardf)(float x,
                                    __LONGDOUBLE y)
 /*[[[body:nexttowardf]]]*/
 /*AUTO*/{
-	return (float)libc_nexttoward((double)x, y);
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
+#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#else /* __IEEE854_LONG_DOUBLE_TYPE__ */
+	return (float)libc_nexttowardl((__LONGDOUBLE)x, y);
+#endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
 }
 /*[[[end:nexttowardf]]]*/
 
@@ -1860,16 +1873,6 @@ NOTHROW(LIBCCALL libc_llrintf)(float x)
 /*[[[end:llrintf]]]*/
 
 
-/*[[[head:nexttowardl,hash:CRC-32=0x56d0e2cf]]]*/
-INTERN ATTR_CONST WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nexttowardl") __LONGDOUBLE
-NOTHROW(LIBCCALL libc_nexttowardl)(__LONGDOUBLE x,
-                                   __LONGDOUBLE y)
-/*[[[body:nexttowardl]]]*/
-/*AUTO*/{
-	return (__LONGDOUBLE)libc_nexttoward((double)x, (double)y);
-}
-/*[[[end:nexttowardl]]]*/
 
 /*[[[head:scalbnl,hash:CRC-32=0x457ed1cf]]]*/
 /* Return X times (2 to the Nth power) */
@@ -3202,7 +3205,7 @@ NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x)
 #undef fpclassify
 #undef issignaling
 
-/*[[[start:exports,hash:CRC-32=0x7550e907]]]*/
+/*[[[start:exports,hash:CRC-32=0xab40cc4a]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(__acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(asin, libc_asin);
@@ -3448,6 +3451,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(rintl, libc_rintl);
 DEFINE_PUBLIC_WEAK_ALIAS(nearbyintl, libc_rintl);
 DEFINE_PUBLIC_WEAK_ALIAS(__rintl, libc_rintl);
 DEFINE_PUBLIC_WEAK_ALIAS(nextafterl, libc_nextafterl);
+DEFINE_PUBLIC_WEAK_ALIAS(nexttowardl, libc_nextafterl);
 DEFINE_PUBLIC_WEAK_ALIAS(__nextafterl, libc_nextafterl);
 DEFINE_PUBLIC_WEAK_ALIAS(remainderl, libc_remainderl);
 DEFINE_PUBLIC_WEAK_ALIAS(dreml, libc_remainderl);
@@ -3499,8 +3503,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(llrintf, libc_llrintf);
 DEFINE_PUBLIC_WEAK_ALIAS(__llrintf, libc_llrintf);
 DEFINE_PUBLIC_WEAK_ALIAS(llroundf, libc_llroundf);
 DEFINE_PUBLIC_WEAK_ALIAS(__llroundf, libc_llroundf);
-DEFINE_PUBLIC_WEAK_ALIAS(nexttowardl, libc_nexttowardl);
-DEFINE_PUBLIC_WEAK_ALIAS(__nexttowardl, libc_nexttowardl);
 DEFINE_PUBLIC_WEAK_ALIAS(scalbnl, libc_scalbnl);
 DEFINE_PUBLIC_WEAK_ALIAS(__scalbnl, libc_scalbnl);
 DEFINE_PUBLIC_WEAK_ALIAS(scalblnl, libc_scalblnl);

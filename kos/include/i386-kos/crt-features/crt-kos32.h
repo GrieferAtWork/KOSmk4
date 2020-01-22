@@ -946,7 +946,6 @@
 #define __CRT_HAVE___nextafterl 1
 #define __CRT_HAVE___nexttoward 1
 #define __CRT_HAVE___nexttowardf 1
-#define __CRT_HAVE___nexttowardl 1
 #define __CRT_HAVE___open 1
 #define __CRT_HAVE___open64 1
 #define __CRT_HAVE___p___argc 1

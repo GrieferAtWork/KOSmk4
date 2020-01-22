@@ -24,7 +24,6 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/nan.h>
 #include <bits/types.h>
 
 #include <libm/fdlibm.h>
