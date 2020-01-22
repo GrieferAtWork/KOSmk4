@@ -243,16 +243,23 @@
 
 #if (defined(_ISOC11_SOURCE) || \
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
+#define __ISO_C_VISIBLE 2011
 #define __USE_ISOC11 1
 #endif
 
 #if (defined(_ISOC99_SOURCE) || defined(_ISOC11_SOURCE) || \
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L))
+#ifndef __ISO_C_VISIBLE
+#define __ISO_C_VISIBLE 1999
+#endif /* !__ISO_C_VISIBLE */
 #define __USE_ISOC99 1
 #endif
 
 #if (defined(_ISOC99_SOURCE) || defined(_ISOC11_SOURCE) || \
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L))
+#ifndef __ISO_C_VISIBLE
+#define __ISO_C_VISIBLE 1995
+#endif /* !__ISO_C_VISIBLE */
 #define __USE_ISOC95 1
 #endif
 
@@ -310,26 +317,31 @@
 #define __USE_POSIX_IMPLICITLY 1
 #endif
 
-#if defined(_POSIX_SOURCE) || \
-   (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 1) || \
-    defined(_XOPEN_SOURCE)
+#if defined(_POSIX_SOURCE) || defined(_POSIX_C_SOURCE) || defined(_XOPEN_SOURCE)
 #define __USE_POSIX 1
 #endif
 
 #if defined(_XOPEN_SOURCE) || \
    (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 2)
+#define __POSIX_VISIBLE 199209
 #define __USE_POSIX2 1
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 199309L
+#undef __POSIX_VISIBLE
+#define __POSIX_VISIBLE 199309
 #define __USE_POSIX199309 1
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 199506L
+#undef __POSIX_VISIBLE
+#define __POSIX_VISIBLE 199506
 #define __USE_POSIX199506 1
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 200112L
+#undef __POSIX_VISIBLE
+#define __POSIX_VISIBLE 200112
 #define __USE_XOPEN2K 1
 #undef __USE_ISOC95
 #define __USE_ISOC95 1
@@ -338,35 +350,45 @@
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 200809L
+#undef __POSIX_VISIBLE
+#define __POSIX_VISIBLE 200809
 #define __USE_XOPEN2K8 1
 #undef _ATFILE_SOURCE
 #define _ATFILE_SOURCE 1
 #endif
 
 #ifdef _XOPEN_SOURCE
-# define __USE_XOPEN 1
-# if _XOPEN_SOURCE+0 >= 500
-#  define __USE_XOPEN_EXTENDED 1
-#  define __USE_UNIX98 1
-#  undef _LARGEFILE_SOURCE
-#  define _LARGEFILE_SOURCE 1
-#  if _XOPEN_SOURCE+0 >= 600
-#   if _XOPEN_SOURCE+0 >= 700
-#    define __USE_XOPEN2K8 1
-#    define __USE_XOPEN2K8XSI 1
-#   endif /* _XOPEN_SOURCE+0 >= 700 */
-#   define __USE_XOPEN2K 1
-#   define __USE_XOPEN2KXSI 1
-#   undef __USE_ISOC95
-#   define __USE_ISOC95  1
-#   undef __USE_ISOC99
-#   define __USE_ISOC99  1
-#  endif /* _XOPEN_SOURCE+0 >= 600 */
-# else /* _XOPEN_SOURCE+0 >= 500 */
-#  ifdef _XOPEN_SOURCE_EXTENDED
-#   define __USE_XOPEN_EXTENDED 1
-#  endif /* _XOPEN_SOURCE_EXTENDED */
-# endif /* _XOPEN_SOURCE+0 < 500 */
+#   define __USE_XOPEN 1
+#   if _XOPEN_SOURCE + 0 >= 500
+#       define __USE_XOPEN_EXTENDED 1
+#       define __USE_UNIX98 1
+#       undef _LARGEFILE_SOURCE
+#       define _LARGEFILE_SOURCE 1
+#       if _XOPEN_SOURCE >= 600
+#           if _XOPEN_SOURCE >= 700
+#               define __XSI_VISIBLE 700
+#               define __USE_XOPEN2K8 1
+#               define __USE_XOPEN2K8XSI 1
+#           else /* _XOPEN_SOURCE >= 700 */
+#               define __XSI_VISIBLE 600
+#           endif /* _XOPEN_SOURCE < 700 */
+#           define __USE_XOPEN2K 1
+#           define __USE_XOPEN2KXSI 1
+#           undef __USE_ISOC95
+#           define __USE_ISOC95  1
+#           undef __USE_ISOC99
+#           define __USE_ISOC99  1
+#       else /* _XOPEN_SOURCE >= 700 */
+#           define __XSI_VISIBLE 500
+#       endif /* _XOPEN_SOURCE+0 >= 600 */
+#   else /* _XOPEN_SOURCE+0 >= 500 */
+#       ifdef _XOPEN_SOURCE_EXTENDED
+#           define __USE_XOPEN_EXTENDED 1
+#           define __XSI_VISIBLE 4
+#       else /* _XOPEN_SOURCE_EXTENDED */
+#           define __XSI_VISIBLE 1
+#       endif /* !_XOPEN_SOURCE_EXTENDED */
+#   endif /* _XOPEN_SOURCE+0 < 500 */
 #endif /* _XOPEN_SOURCE */
 
 #ifdef _LARGEFILE_SOURCE
@@ -386,15 +408,19 @@
 #endif
 
 #ifdef _DEFAULT_SOURCE
+#define __MISC_VISIBLE 1
+#define __SVID_VISIBLE 1
 #define __USE_MISC 1
 #endif /* _DEFAULT_SOURCE */
 
 #ifdef _ATFILE_SOURCE
 #define __USE_ATFILE 1
+#define __ATFILE_VISIBLE 1
 #endif /* _ATFILE_SOURCE */
 
 #ifdef _GNU_SOURCE
 #define __USE_GNU 1
+#define __GNU_VISIBLE 1
 #endif /* _GNU_SOURCE */
 
 #if defined(_REENTRANT) || defined(_THREAD_SAFE)
