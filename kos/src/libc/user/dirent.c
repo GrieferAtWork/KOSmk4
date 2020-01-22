@@ -26,8 +26,10 @@
 #include <kos/syscalls.h>
 
 #include <fcntl.h>
+#include <limits.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <string.h>
 #include <syscall.h>
 #include <unistd.h>
 
@@ -326,7 +328,7 @@ err_null:
 /*[[[end:readdir]]]*/
 
 /*[[[impl:readdir64]]]*/
-DEFINE_INTERN_WEAK_ALIAS(libc_readdir64,libc_readdir);
+DEFINE_INTERN_WEAK_ALIAS(libc_readdir64, libc_readdir);
 
 /*[[[head:readdir_r,hash:CRC-32=0x898461b5]]]*/
 /* Reentrant version of `readdir(3)' (Using this is not recommended in KOS) */
@@ -337,39 +339,33 @@ NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp,
                                      struct dirent **__restrict result)
 /*[[[body:readdir_r]]]*/
 {
-	(void)dirp;
-	(void)entry;
-	(void)result;
-	CRT_UNIMPLEMENTED("readdir_r"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	errno_t old_error;
+	struct dirent *ent;
+	old_error = libc_geterrno();
+	libc_seterrno(EOK);
+	ent = readdir(dirp);
+	if (!ent) {
+		errno_t error;
+		error = libc_geterrno();
+		libc_seterrno(old_error); /* Restore the old error. */
+		*result = NULL;
+		return error;
+	}
+	libc_seterrno(old_error); /* Restore the old error. */
+	if unlikely(ent->d_namlen >= NAME_MAX) {
+		*result = NULL;
+		return ENAMETOOLONG;
+	}
+	memcpy(entry, ent,
+	       offsetof(struct dirent, d_name) +
+	       (ent->d_namlen + 1) * sizeof(char));
+	*result = entry;
+	return 0;
 }
 /*[[[end:readdir_r]]]*/
 
-/*[[[head:readdir64_r,hash:CRC-32=0x6366cd63]]]*/
-/* NOTE: This ~reentrant~ version of readdir() is strongly discouraged from being used in KOS, as the
- *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
- * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
- *    per-directory buffer of sufficient size to house any directory entry (s.a.: `READDIR_DEFAULT') */
-#if defined(_DIRENT_MATCHES_DIRENT64)
-DEFINE_INTERN_ALIAS(libc_readdir64_r, libc_readdir_r);
-#else
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.readdir64_r") int
-NOTHROW_RPC(LIBCCALL libc_readdir64_r)(DIR *__restrict dirp,
-                                       struct dirent64 *__restrict entry,
-                                       struct dirent64 **__restrict result)
-/*[[[body:readdir64_r]]]*/
-{
-	(void)dirp;
-	(void)entry;
-	(void)result;
-	CRT_UNIMPLEMENTED("readdir64_r"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-#endif /* MAGIC:alias */
-/*[[[end:readdir64_r]]]*/
+/*[[[impl:readdir64_r]]]*/
+DEFINE_INTERN_WEAK_ALIAS(libc_readdir64_r, libc_readdir_r);
 
 /*[[[head:scandir,hash:CRC-32=0xde1a0c61]]]*/
 /* Scan a directory `DIR' for all contained directory entries */

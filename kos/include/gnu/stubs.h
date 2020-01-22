@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c7e4c7c */
+/* HASH CRC-32:0x3fe56f93 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -485,8 +485,6 @@
 #define __stub_rcmd_af 1
 #define __stub_re_match_2 1
 #define __stub_re_set_registers 1
-#define __stub_readdir64_r 1
-#define __stub_readdir_r 1
 #define __stub_regcomp 1
 #define __stub_regerror 1
 #define __stub_regexec 1
