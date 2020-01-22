@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2311c343 */
+/* HASH CRC-32:0x5d3eaf46 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 
 #ifdef __CC__
 #include <__crt.h>
-#include "slow/malloc.h"
+#include "core/malloc.h"
 
 #include "stdlib.h"
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad09cd97 */
+/* HASH CRC-32:0x592882e3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,30 +20,30 @@
  */
 #ifndef __local_nexttowardf_defined
 #include <ieee754.h>
-#if ((defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)) && defined(__IEEE854_LONG_DOUBLE_TYPE__)) || defined(__CRT_HAVE_nexttowardl) || defined(__CRT_HAVE_nextafterl) || defined(__CRT_HAVE___nexttowardl) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#if ((defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)) && defined(__IEEE854_LONG_DOUBLE_TYPE__)) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE_nextafterl) || defined(__CRT_HAVE___nextafterl) || defined(__CRT_HAVE___nexttowardl)
 #define __local_nexttowardf_defined 1
 #include <libm/nexttoward.h>
-/* Dependency: "nexttowardl" from "math" */
-#ifndef ____localdep_nexttowardl_defined
-#define ____localdep_nexttowardl_defined 1
-#if __has_builtin(__builtin_nexttowardl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttowardl)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __localdep_nexttowardl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_nexttowardl(__x, __y); }
-#elif defined(__CRT_HAVE_nexttowardl)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nexttowardl,(__x,__y))
+/* Dependency: "nextafterl" from "math" */
+#ifndef ____localdep_nextafterl_defined
+#define ____localdep_nextafterl_defined 1
+#if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __localdep_nextafterl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_nextafterl(__x, __y); }
 #elif defined(__CRT_HAVE_nextafterl)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafterl,(__x,__y))
+#elif defined(__CRT_HAVE___nextafterl)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
 #else /* LIBC: nextafterl */
 #include <ieee754.h>
 #if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #include <local/math/nextafterl.h>
-#define __localdep_nexttowardl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))
+#define __localdep_nextafterl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))
 #else /* CUSTOM: nextafterl */
-#undef ____localdep_nexttowardl_defined
-#endif /* nexttowardl... */
-#endif /* nexttowardl... */
-#endif /* !____localdep_nexttowardl_defined */
+#undef ____localdep_nextafterl_defined
+#endif /* nextafterl... */
+#endif /* nextafterl... */
+#endif /* !____localdep_nextafterl_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(nexttowardf) __ATTR_CONST __ATTR_WUNUSED float
@@ -57,9 +57,9 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nexttowardf))(float __x,
 	return (float)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__y);
 #endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 #else /* __IEEE854_LONG_DOUBLE_TYPE__ */
-	return (float)__localdep_nexttowardl((__LONGDOUBLE)__x, __y);
+	return (float)__localdep_nextafterl((__LONGDOUBLE)__x, __y);
 #endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__) && __IEEE854_LONG_DOUBLE_TYPE__) || __CRT_HAVE_nexttowardl || __CRT_HAVE_nextafterl || __CRT_HAVE___nexttowardl || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_nextafter || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter */
+#endif /* ((__IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__) && __IEEE854_LONG_DOUBLE_TYPE__) || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_nextafter || __CRT_HAVE___nextafter || __CRT_HAVE__nextafter || __CRT_HAVE_nextafterl || __CRT_HAVE___nextafterl || __CRT_HAVE___nexttowardl */
 #endif /* !__local_nexttowardf_defined */

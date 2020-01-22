@@ -1670,7 +1670,7 @@ NOTHROW(LIBCCALL libc_nexttoward)(double x,
 	return (double)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
 #else /* __IEEE854_LONG_DOUBLE_TYPE__ */
-	return (double)libc_nexttowardl((__LONGDOUBLE)x, y);
+	return (double)libc_nextafterl((__LONGDOUBLE)x, y);
 #endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
 }
 /*[[[end:nexttoward]]]*/
@@ -1782,7 +1782,7 @@ NOTHROW(LIBCCALL libc_nexttowardf)(float x,
 	return (float)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 #endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 #else /* __IEEE854_LONG_DOUBLE_TYPE__ */
-	return (float)libc_nexttowardl((__LONGDOUBLE)x, y);
+	return (float)libc_nextafterl((__LONGDOUBLE)x, y);
 #endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
 }
 /*[[[end:nexttowardf]]]*/
@@ -3205,7 +3205,7 @@ NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x)
 #undef fpclassify
 #undef issignaling
 
-/*[[[start:exports,hash:CRC-32=0xab40cc4a]]]*/
+/*[[[start:exports,hash:CRC-32=0x1ebb925d]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(__acos, libc_acos);
 DEFINE_PUBLIC_WEAK_ALIAS(asin, libc_asin);
@@ -3427,6 +3427,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(__tgammal, libc_tgammal);
 DEFINE_PUBLIC_WEAK_ALIAS(rint, libc_rint);
 DEFINE_PUBLIC_WEAK_ALIAS(nearbyint, libc_rint);
 DEFINE_PUBLIC_WEAK_ALIAS(__rint, libc_rint);
+DEFINE_PUBLIC_WEAK_ALIAS(__nearbyint, libc_rint);
 DEFINE_PUBLIC_WEAK_ALIAS(nextafter, libc_nextafter);
 DEFINE_PUBLIC_WEAK_ALIAS(_nextafter, libc_nextafter);
 DEFINE_PUBLIC_WEAK_ALIAS(__nextafter, libc_nextafter);
@@ -3439,6 +3440,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(__ilogb, libc_ilogb);
 DEFINE_PUBLIC_WEAK_ALIAS(rintf, libc_rintf);
 DEFINE_PUBLIC_WEAK_ALIAS(nearbyintf, libc_rintf);
 DEFINE_PUBLIC_WEAK_ALIAS(__rintf, libc_rintf);
+DEFINE_PUBLIC_WEAK_ALIAS(__nearbyintf, libc_rintf);
 DEFINE_PUBLIC_WEAK_ALIAS(nextafterf, libc_nextafterf);
 DEFINE_PUBLIC_WEAK_ALIAS(__nextafterf, libc_nextafterf);
 DEFINE_PUBLIC_WEAK_ALIAS(remainderf, libc_remainderf);
@@ -3450,9 +3452,11 @@ DEFINE_PUBLIC_WEAK_ALIAS(__ilogbf, libc_ilogbf);
 DEFINE_PUBLIC_WEAK_ALIAS(rintl, libc_rintl);
 DEFINE_PUBLIC_WEAK_ALIAS(nearbyintl, libc_rintl);
 DEFINE_PUBLIC_WEAK_ALIAS(__rintl, libc_rintl);
+DEFINE_PUBLIC_WEAK_ALIAS(__nearbyintl, libc_rintl);
 DEFINE_PUBLIC_WEAK_ALIAS(nextafterl, libc_nextafterl);
 DEFINE_PUBLIC_WEAK_ALIAS(nexttowardl, libc_nextafterl);
 DEFINE_PUBLIC_WEAK_ALIAS(__nextafterl, libc_nextafterl);
+DEFINE_PUBLIC_WEAK_ALIAS(__nexttowardl, libc_nextafterl);
 DEFINE_PUBLIC_WEAK_ALIAS(remainderl, libc_remainderl);
 DEFINE_PUBLIC_WEAK_ALIAS(dreml, libc_remainderl);
 DEFINE_PUBLIC_WEAK_ALIAS(__dreml, libc_remainderl);

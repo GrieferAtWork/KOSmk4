@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a647b54 */
+/* HASH CRC-32:0x13480448 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,34 +18,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_dremf_defined
-#if defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
-#define __local_dremf_defined 1
-/* Dependency: "drem" */
-#ifndef ____localdep_drem_defined
-#define ____localdep_drem_defined 1
-#if __has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)
-/* Return the remainder of X/Y */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_drem)(double __x, double __y) { return __builtin_drem(__x, __y); }
-#elif defined(__CRT_HAVE_drem)
-/* Return the remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_drem,(double __x, double __y),drem,(__x,__y))
-#elif defined(__CRT_HAVE___drem)
-/* Return the remainder of X/Y */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_drem,(double __x, double __y),__drem,(__x,__y))
-#else /* LIBC: drem */
-#undef ____localdep_drem_defined
-#endif /* drem... */
-#endif /* !____localdep_drem_defined */
+#ifndef _LIBC_CORE_MALLOC_H
+#define _LIBC_CORE_MALLOC_H 1
 
-__NAMESPACE_LOCAL_BEGIN
-/* Return the remainder of X/Y */
-__LOCAL_LIBC(dremf) __ATTR_WUNUSED float
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(dremf))(float __x,
-                                               float __y) {
-#line 1402 "kos/src/libc/magic/math.c"
-	return (float)__localdep_drem((double)__x, (double)__y);
-}
-__NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_drem || __CRT_HAVE___drem */
-#endif /* !__local_dremf_defined */
+#include <__stdinc.h>
+
+#ifdef __CC__
+#include <__crt.h>
+#include <hybrid/typecore.h>
+
+__SYSDECL_BEGIN
+
+#include "stdlib.h"
+
+__SYSDECL_END
+#endif /* __CC__ */
+
+#endif /* !_LIBC_CORE_MALLOC_H */

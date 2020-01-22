@@ -28,7 +28,7 @@
 #include <hybrid/__assert.h>
 #include <hybrid/host.h>
 
-#include <libc/slow/string.h>
+#include <libc/core/string.h>
 
 __SYSDECL_BEGIN
 __NAMESPACE_FAST_BEGIN
@@ -105,7 +105,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyq))(/*aligned(8)*/ void *__restr
 		default: break;
 		}
 	}
-	return __libc_slow_memcpyq(__dst, __src, __n_qwords);
+	return __libc_core_memcpyq(__dst, __src, __n_qwords);
 }
 #endif /* !__fast_memcpyq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -211,18 +211,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyl))(/*aligned(4)*/ void *__restr
 #if defined(__CRT_HAVE_memcpyq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_memcpyq(__dst, __src, __n_dwords >> 1);
-		__dst = __libc_slow_memcpyq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_memcpyq(__dst, __src, __n_dwords >> 1);
+		__dst = __libc_core_memcpyq(__dst, __src, __n_dwords >> 1);
 		((__UINT32_TYPE__ *)__dst)[__n_dwords-1] = ((__UINT32_TYPE__ const *)__src)[__n_dwords-1];
 		return (__UINT32_TYPE__ *)__dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_memcpyq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_memcpyq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memcpyq && __SIZEOF_BUSINT__ >= 8 */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memcpyl(__dst, __src, __n_dwords);
+	return __libc_core_memcpyl(__dst, __src, __n_dwords);
 }
 #endif /* !__fast_memcpyl_defined */
 
@@ -371,37 +371,37 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyw))(/*aligned(2)*/ void *__restr
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_words & 3) {
 		case 0:
-			return (__UINT16_TYPE__ *)__libc_slow_memcpyq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_memcpyq(__dst, __src, __n_words >> 2);
 		case 1:
-			__dst = __libc_slow_memcpyq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_memcpyq(__dst, __src, __n_words >> 2);
 			((__UINT16_TYPE__ *)__dst)[__n_words-1] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 			return (__UINT16_TYPE__ *)__dst;
 		case 2:
-			__dst = __libc_slow_memcpyq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_memcpyq(__dst, __src, __n_words >> 2);
 			((__UINT32_TYPE__ *)__dst)[(__n_words >> 1)-1] = ((__UINT32_TYPE__ const *)__src)[(__n_words >> 1)-1];
 			return (__UINT16_TYPE__ *)__dst;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 7))
-			return (__UINT16_TYPE__ *)__libc_slow_memcpyq(__dst, __src, __n_words >> 3);
+			return (__UINT16_TYPE__ *)__libc_core_memcpyq(__dst, __src, __n_words >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memcpyl)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_memcpyl(__dst, __src, __n_words >> 1);
-		__dst = __libc_slow_memcpyl(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_memcpyl(__dst, __src, __n_words >> 1);
+		__dst = __libc_core_memcpyl(__dst, __src, __n_words >> 1);
 		((__UINT16_TYPE__ *)__dst)[__n_words-1] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 		return (__UINT16_TYPE__ *)__dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 1))
-			return __libc_slow_memcpyw(__dst, __src, __n_words >> 1);
+			return __libc_core_memcpyw(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memcpyl */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memcpyw(__dst, __src, __n_words);
+	return __libc_core_memcpyw(__dst, __src, __n_words);
 }
 #endif /* !__fast_memcpyw_defined */
 
@@ -627,61 +627,61 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(/*aligned(1)*/ void *__restri
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 7) {
 		case 0:
-			return __libc_slow_memcpyq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_memcpyq(__dst, __src, __n_bytes >> 3);
 		case 1:
-			__dst = __libc_slow_memcpyq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memcpyq(__dst, __src, __n_bytes >> 3);
 			((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return __dst;
 		case 2:
-			__dst = __libc_slow_memcpyq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memcpyq(__dst, __src, __n_bytes >> 3);
 			((__UINT16_TYPE__ *)__dst)[(__n_bytes >> 1)-1] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return __dst;
 		case 4:
-			__dst = __libc_slow_memcpyq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memcpyq(__dst, __src, __n_bytes >> 3);
 			((__UINT32_TYPE__ *)__dst)[(__n_bytes >> 2)-1] = ((__UINT32_TYPE__ const *)__src)[(__n_bytes >> 2)-1];
 			return __dst;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 7))
-			return __libc_slow_memcpyq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_memcpyq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memcpyl)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
 		case 0:
-			return __libc_slow_memcpyl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_memcpyl(__dst, __src, __n_bytes >> 2);
 		case 1:
-			__dst = __libc_slow_memcpyl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_memcpyl(__dst, __src, __n_bytes >> 2);
 			((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return __dst;
 		case 2:
-			__dst = __libc_slow_memcpyl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_memcpyl(__dst, __src, __n_bytes >> 2);
 			((__UINT16_TYPE__ *)__dst)[(__n_bytes >> 1)-1] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return __dst;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 3))
-			return __libc_slow_memcpyl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_memcpyl(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memcpyl */
 #if defined(__CRT_HAVE_memcpyw)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_memcpyw(__dst, __src, __n_bytes >> 1);
-		__dst = __libc_slow_memcpyw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_memcpyw(__dst, __src, __n_bytes >> 1);
+		__dst = __libc_core_memcpyw(__dst, __src, __n_bytes >> 1);
 		((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 		return __dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_memcpyw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_memcpyw(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memcpyw */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memcpy(__dst, __src, __n_bytes);
+	return __libc_core_memcpy(__dst, __src, __n_bytes);
 }
 #endif /* !__fast_memcpy_defined */
 
@@ -742,7 +742,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyq))(/*aligned(8)*/ void *__rest
 		default: break;
 		}
 	}
-	return __libc_slow_mempcpyq(__dst, __src, __n_qwords);
+	return __libc_core_mempcpyq(__dst, __src, __n_qwords);
 }
 #endif /* !__fast_mempcpyq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -848,18 +848,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyl))(/*aligned(4)*/ void *__rest
 #if defined(__CRT_HAVE_mempcpyq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_mempcpyq(__dst, __src, __n_dwords >> 1);
-		__dst = __libc_slow_mempcpyq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_mempcpyq(__dst, __src, __n_dwords >> 1);
+		__dst = __libc_core_mempcpyq(__dst, __src, __n_dwords >> 1);
 		((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[__n_dwords-1];
 		return (__UINT32_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_mempcpyq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_mempcpyq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempcpyq && __SIZEOF_BUSINT__ >= 8 */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempcpyl(__dst, __src, __n_dwords);
+	return __libc_core_mempcpyl(__dst, __src, __n_dwords);
 }
 #endif /* !__fast_mempcpyl_defined */
 
@@ -1009,37 +1009,37 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyw))(/*aligned(2)*/ void *__rest
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_words & 3) {
 		case 0:
-			return (__UINT16_TYPE__ *)__libc_slow_mempcpyq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_mempcpyq(__dst, __src, __n_words >> 2);
 		case 1:
-			__dst = __libc_slow_mempcpyq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_mempcpyq(__dst, __src, __n_words >> 2);
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 			return (__UINT16_TYPE__ *)__dst + 1;
 		case 2:
-			__dst = __libc_slow_mempcpyq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_mempcpyq(__dst, __src, __n_words >> 2);
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[(__n_words >> 1)-1];
 			return (__UINT16_TYPE__ *)__dst + 2;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 3))
-			return (__UINT16_TYPE__ *)__libc_slow_mempcpyq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_mempcpyq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempcpyl)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_mempcpyl(__dst, __src, __n_words >> 1);
-		__dst = __libc_slow_mempcpyl(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_mempcpyl(__dst, __src, __n_words >> 1);
+		__dst = __libc_core_mempcpyl(__dst, __src, __n_words >> 1);
 		((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 		return (__UINT16_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_mempcpyl(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_mempcpyl(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempcpyl */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempcpyw(__dst, __src, __n_words);
+	return __libc_core_mempcpyw(__dst, __src, __n_words);
 }
 #endif /* !__fast_mempcpyw_defined */
 
@@ -1265,61 +1265,61 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(/*aligned(1)*/ void *__restr
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 7) {
 		case 0:
-			return __libc_slow_mempcpyq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_mempcpyq(__dst, __src, __n_bytes >> 3);
 		case 1:
-			__dst = __libc_slow_mempcpyq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempcpyq(__dst, __src, __n_bytes >> 3);
 			((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return (__UINT8_TYPE__ *)__dst + 1;
 		case 2:
-			__dst = __libc_slow_mempcpyq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempcpyq(__dst, __src, __n_bytes >> 3);
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return (__UINT8_TYPE__ *)__dst + 2;
 		case 4:
-			__dst = __libc_slow_mempcpyq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempcpyq(__dst, __src, __n_bytes >> 3);
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[(__n_bytes >> 2)-1];
 			return (__UINT8_TYPE__ *)__dst + 4;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 7))
-			return __libc_slow_mempcpyq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_mempcpyq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempcpyl)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
 		case 0:
-			return __libc_slow_mempcpyl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_mempcpyl(__dst, __src, __n_bytes >> 2);
 		case 1:
-			__dst = __libc_slow_mempcpyl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_mempcpyl(__dst, __src, __n_bytes >> 2);
 			((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return (__UINT8_TYPE__ *)__dst + 1;
 		case 2:
-			__dst = __libc_slow_mempcpyl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_mempcpyl(__dst, __src, __n_bytes >> 2);
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return (__UINT8_TYPE__ *)__dst + 2;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 3))
-			return __libc_slow_mempcpyl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_mempcpyl(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempcpyl */
 #if defined(__CRT_HAVE_mempcpyw)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_mempcpyw(__dst, __src, __n_bytes >> 1);
-		__dst = __libc_slow_mempcpyw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_mempcpyw(__dst, __src, __n_bytes >> 1);
+		__dst = __libc_core_mempcpyw(__dst, __src, __n_bytes >> 1);
 		((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 		return (__UINT8_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_mempcpyw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_mempcpyw(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempcpyw */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempcpy(__dst, __src, __n_bytes);
+	return __libc_core_mempcpy(__dst, __src, __n_bytes);
 }
 #endif /* !__fast_mempcpy_defined */
 
@@ -1388,13 +1388,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetq))(/*aligned(8)*/ void *__restr
 	if __untraced(__builtin_constant_p(__qword)) {
 #ifdef __CRT_HAVE_memsetl
 		if __untraced((__qword & __UINT32_C(0xffffffff)) == ((__qword >> 32) & __UINT32_C(0xffffffff)))
-			return (__UINT64_TYPE__ *)__libc_slow_memsetl(__dst, __qword & __UINT32_C(0xffffffff), __n_qwords * 2);
+			return (__UINT64_TYPE__ *)__libc_core_memsetl(__dst, __qword & __UINT32_C(0xffffffff), __n_qwords * 2);
 #endif /* __CRT_HAVE_memsetl */
 #ifdef __CRT_HAVE_memsetw
 		if __untraced((__qword & __UINT16_C(0xffff)) == ((__qword >> 16) & __UINT16_C(0xffff)) &&
 		    (__qword & __UINT16_C(0xffff)) == ((__qword >> 32) & __UINT16_C(0xffff)) &&
 		    (__qword & __UINT16_C(0xffff)) == ((__qword >> 48) & __UINT16_C(0xffff)))
-			return (__UINT64_TYPE__ *)__libc_slow_memsetw(__dst, __qword & __UINT16_C(0xffff), __n_qwords * 4);
+			return (__UINT64_TYPE__ *)__libc_core_memsetw(__dst, __qword & __UINT16_C(0xffff), __n_qwords * 4);
 #endif /* __CRT_HAVE_memsetw */
 #ifdef __CRT_HAVE_memset
 		if __untraced((__qword & __UINT8_C(0xff)) == ((__qword >> 8) & __UINT8_C(0xff)) &&
@@ -1404,13 +1404,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetq))(/*aligned(8)*/ void *__restr
 		    (__qword & __UINT8_C(0xff)) == ((__qword >> 40) & __UINT8_C(0xff)) &&
 		    (__qword & __UINT8_C(0xff)) == ((__qword >> 48) & __UINT8_C(0xff)) &&
 		    (__qword & __UINT8_C(0xff)) == ((__qword >> 56) & __UINT8_C(0xff)))
-			return (__UINT64_TYPE__ *)__libc_slow_memset(__dst, __qword & __UINT8_C(0xff), __n_qwords * 8);
+			return (__UINT64_TYPE__ *)__libc_core_memset(__dst, __qword & __UINT8_C(0xff), __n_qwords * 8);
 #endif /* __CRT_HAVE_memset */
 	}
 #elif defined(__CRT_HAVE_memsetl) && __SIZEOF_BUSINT__ < 8
 	if __untraced(__builtin_constant_p(__qword) &&
 	   (__qword & __UINT32_C(0xffffffff)) == ((__qword >> 32) & __UINT32_C(0xffffffff)))
-		return (__UINT64_TYPE__ *)__libc_slow_memsetl(__dst, __qword & __UINT32_C(0xffffffff), __n_qwords * 2);
+		return (__UINT64_TYPE__ *)__libc_core_memsetl(__dst, __qword & __UINT32_C(0xffffffff), __n_qwords * 2);
 #endif /* !__CRT_HAVE_memsetq && ... */
 #ifdef __CRT_HAVE_bzero
 	if __untraced(__builtin_constant_p(__qword) && __qword == 0) {
@@ -1418,7 +1418,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetq))(/*aligned(8)*/ void *__restr
 		return (__UINT64_TYPE__ *)__dst;
 	}
 #endif /* __CRT_HAVE_bzero */
-	return __libc_slow_memsetq(__dst, __qword, __n_qwords);
+	return __libc_core_memsetq(__dst, __qword, __n_qwords);
 }
 #endif /* !__fast_memsetq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -1524,7 +1524,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetl))(/*aligned(4)*/ void *__restr
 #ifndef __OPTIMIZE_SIZE__
 #if defined(__CRT_HAVE_mempsetq) && __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		void *__temp;
-		__temp = __libc_slow_mempsetq(__dst,
+		__temp = __libc_core_mempsetq(__dst,
 		                             (__UINT64_TYPE__)((__UINT64_TYPE__)__dword * __UINT64_C(0x0000000100000001)),
 		                              __n_dwords >> 1);
 		if __untraced(__n_dwords & 1)
@@ -1539,13 +1539,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetl))(/*aligned(4)*/ void *__restr
 	if __untraced(__builtin_constant_p(__dword)) {
 #ifdef __CRT_HAVE_memsetw
 		if __untraced((__dword & __UINT16_C(0xffff)) == ((__dword >> 16) & __UINT16_C(0xffff)))
-			return (__UINT32_TYPE__ *)__libc_slow_memsetw(__dst, __dword & __UINT16_C(0xffff), __n_dwords * 2);
+			return (__UINT32_TYPE__ *)__libc_core_memsetw(__dst, __dword & __UINT16_C(0xffff), __n_dwords * 2);
 #endif /* __CRT_HAVE_memsetw */
 #ifdef __CRT_HAVE_memset
 		if __untraced((__dword & __UINT8_C(0xff)) == ((__dword >> 8) & __UINT8_C(0xff)) &&
 		    (__dword & __UINT8_C(0xff)) == ((__dword >> 16) & __UINT8_C(0xff)) &&
 		    (__dword & __UINT8_C(0xff)) == ((__dword >> 24) & __UINT8_C(0xff)))
-			return (__UINT32_TYPE__ *)__libc_slow_memset(__dst, __dword & __UINT8_C(0xff), __n_dwords * 4);
+			return (__UINT32_TYPE__ *)__libc_core_memset(__dst, __dword & __UINT8_C(0xff), __n_dwords * 4);
 #endif /* __CRT_HAVE_memset */
 	}
 #endif /* !__CRT_HAVE_memsetl && (__CRT_HAVE_memsetw || __CRT_HAVE_memset) */
@@ -1555,7 +1555,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetl))(/*aligned(4)*/ void *__restr
 		return (__UINT32_TYPE__ *)__dst;
 	}
 #endif /* __CRT_HAVE_bzero */
-	return __libc_slow_memsetl(__dst, __dword, __n_dwords);
+	return __libc_core_memsetl(__dst, __dword, __n_dwords);
 }
 #endif /* !__fast_memsetl_defined */
 
@@ -1704,7 +1704,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restr
 #ifndef __OPTIMIZE_SIZE__
 #if defined(__CRT_HAVE_mempsetq) && __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		void *__temp;
-		__temp = __libc_slow_mempsetq(__dst,
+		__temp = __libc_core_mempsetq(__dst,
 		                             (__UINT64_TYPE__)((__UINT64_TYPE__)__word * __UINT64_C(0x0001000100010001)),
 		                              __n_words >> 2);
 		switch (__n_words & 3) {
@@ -1723,7 +1723,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restr
 		return (__UINT16_TYPE__ *)__dst;
 #else /* __CRT_HAVE_mempsetq && __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		void *__temp;
-		__temp = __libc_slow_mempsetl(__dst,
+		__temp = __libc_core_mempsetl(__dst,
 		                             (__UINT32_TYPE__)((__UINT32_TYPE__)__word * __UINT32_C(0x00010001)),
 		                              __n_words >> 1);
 		if __untraced(__n_words & 1)
@@ -1736,7 +1736,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restr
 #if !defined(__CRT_HAVE_memsetw) && defined(__CRT_HAVE_memset)
 	if __untraced(__builtin_constant_p(__word)) {
 		if __untraced((__word & __UINT8_C(0xff)) == ((__word >> 8) & __UINT8_C(0xff)))
-			return (__UINT16_TYPE__ *)__libc_slow_memset(__dst, __word & __UINT8_C(0xff), __n_words * 2);
+			return (__UINT16_TYPE__ *)__libc_core_memset(__dst, __word & __UINT8_C(0xff), __n_words * 2);
 	}
 #endif /* !__CRT_HAVE_memsetw && __CRT_HAVE_memset */
 #ifdef __CRT_HAVE_bzero
@@ -1745,7 +1745,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(/*aligned(2)*/ void *__restr
 		return (__UINT16_TYPE__ *)__dst;
 	}
 #endif /* __CRT_HAVE_bzero */
-	return __libc_slow_memsetw(__dst, __word, __n_words);
+	return __libc_core_memsetw(__dst, __word, __n_words);
 }
 #endif /* !__fast_memsetw_defined */
 
@@ -1976,7 +1976,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memset))(/*aligned(1)*/ void *__restri
 		 */
 #if defined(__CRT_HAVE_mempsetq) && __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		void *__temp;
-		__temp = __libc_slow_mempsetq(__dst,
+		__temp = __libc_core_mempsetq(__dst,
 		                             (__UINT64_TYPE__)((__UINT64_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT64_C(0x0101010101010101)),
 		                              __n_bytes >> 3);
 		switch (__n_bytes & 7) {
@@ -2011,7 +2011,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memset))(/*aligned(1)*/ void *__restri
 		return __dst;
 #else /* __CRT_HAVE_mempsetq && __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		void *__temp;
-		__temp = __libc_slow_mempsetl(__dst,
+		__temp = __libc_core_mempsetl(__dst,
 		                             (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101)),
 		                              __n_bytes >> 2);
 		switch (__n_bytes & 3) {
@@ -2038,7 +2038,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memset))(/*aligned(1)*/ void *__restri
 		return __dst;
 	}
 #endif /* __CRT_HAVE_bzero */
-	return __libc_slow_memset(__dst, __byte, __n_bytes);
+	return __libc_core_memset(__dst, __byte, __n_bytes);
 }
 #endif /* !__fast_memset_defined */
 
@@ -2101,13 +2101,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetq))(/*aligned(8)*/ void *__rest
 	if __untraced(__builtin_constant_p(__qword)) {
 #if defined(__CRT_HAVE_memsetl) || defined(__CRT_HAVE_mempsetl)
 		if __untraced((__qword & __UINT32_C(0xffffffff)) == ((__qword >> 32) & __UINT32_C(0xffffffff)))
-			return (__UINT64_TYPE__ *)__libc_slow_mempsetl(__dst, __qword & __UINT32_C(0xffffffff), __n_qwords * 2);
+			return (__UINT64_TYPE__ *)__libc_core_mempsetl(__dst, __qword & __UINT32_C(0xffffffff), __n_qwords * 2);
 #endif /* __CRT_HAVE_memsetl || __CRT_HAVE_mempsetl */
 #if defined(__CRT_HAVE_memsetw) || defined(__CRT_HAVE_mempsetw)
 		if __untraced((__qword & __UINT16_C(0xffff)) == ((__qword >> 16) & __UINT16_C(0xffff)) &&
 		    (__qword & __UINT16_C(0xffff)) == ((__qword >> 32) & __UINT16_C(0xffff)) &&
 		    (__qword & __UINT16_C(0xffff)) == ((__qword >> 48) & __UINT16_C(0xffff)))
-			return (__UINT64_TYPE__ *)__libc_slow_mempsetw(__dst, __qword & __UINT16_C(0xffff), __n_qwords * 4);
+			return (__UINT64_TYPE__ *)__libc_core_mempsetw(__dst, __qword & __UINT16_C(0xffff), __n_qwords * 4);
 #endif /* __CRT_HAVE_memsetw || __CRT_HAVE_mempsetw */
 #if defined(__CRT_HAVE_memset) || defined(__CRT_HAVE_mempset)
 		if __untraced((__qword & __UINT8_C(0xff)) == ((__qword >> 8) & __UINT8_C(0xff)) &&
@@ -2117,13 +2117,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetq))(/*aligned(8)*/ void *__rest
 		    (__qword & __UINT8_C(0xff)) == ((__qword >> 40) & __UINT8_C(0xff)) &&
 		    (__qword & __UINT8_C(0xff)) == ((__qword >> 48) & __UINT8_C(0xff)) &&
 		    (__qword & __UINT8_C(0xff)) == ((__qword >> 56) & __UINT8_C(0xff)))
-			return (__UINT64_TYPE__ *)__libc_slow_mempset(__dst, __qword & __UINT8_C(0xff), __n_qwords * 8);
+			return (__UINT64_TYPE__ *)__libc_core_mempset(__dst, __qword & __UINT8_C(0xff), __n_qwords * 8);
 #endif /* __CRT_HAVE_memset || __CRT_HAVE_mempset */
 	}
 #elif (defined(__CRT_HAVE_memsetl) || defined(__CRT_HAVE_mempsetl)) && __SIZEOF_BUSINT__ < 8
 	if __untraced(__builtin_constant_p(__qword) &&
 	   (__qword & __UINT32_C(0xffffffff)) == ((__qword >> 32) & __UINT32_C(0xffffffff)))
-		return (__UINT64_TYPE__ *)__libc_slow_mempsetl(__dst, __qword & __UINT32_C(0xffffffff), __n_qwords * 2);
+		return (__UINT64_TYPE__ *)__libc_core_mempsetl(__dst, __qword & __UINT32_C(0xffffffff), __n_qwords * 2);
 #endif /* !__CRT_HAVE_memsetq && ... */
 #ifdef __CRT_HAVE_bzero
 	if __untraced(__builtin_constant_p(__qword) && __qword == 0) {
@@ -2131,7 +2131,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetq))(/*aligned(8)*/ void *__rest
 		return (__UINT64_TYPE__ *)__dst + __n_qwords;
 	}
 #endif /* __CRT_HAVE_bzero */
-	return __libc_slow_mempsetq(__dst, __qword, __n_qwords);
+	return __libc_core_mempsetq(__dst, __qword, __n_qwords);
 }
 #endif /* !__fast_mempsetq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -2242,7 +2242,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetl))(/*aligned(4)*/ void *__rest
 		 * >> mempset(mempsetq(p, 0x1212121212121212, s >> 3), 0x12, s & 7);
 		 */
 #if defined(__CRT_HAVE_mempsetq) && __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
-		__dst = __libc_slow_mempsetq(__dst,
+		__dst = __libc_core_mempsetq(__dst,
 		                            (__UINT64_TYPE__)((__UINT64_TYPE__)__dword * __UINT64_C(0x0000000100000001)),
 		                             __n_dwords >> 1);
 		if __untraced(__n_dwords & 1) {
@@ -2260,13 +2260,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetl))(/*aligned(4)*/ void *__rest
 	if __untraced(__builtin_constant_p(__dword)) {
 #if defined(__CRT_HAVE_memsetw) || defined(__CRT_HAVE_mempsetw)
 		if __untraced((__dword & __UINT16_C(0xffff)) == ((__dword >> 16) & __UINT16_C(0xffff)))
-			return (__UINT32_TYPE__ *)__libc_slow_mempsetw(__dst, __dword & __UINT16_C(0xffff), __n_dwords * 2);
+			return (__UINT32_TYPE__ *)__libc_core_mempsetw(__dst, __dword & __UINT16_C(0xffff), __n_dwords * 2);
 #endif /* __CRT_HAVE_memsetw || __CRT_HAVE_mempsetw */
 #if defined(__CRT_HAVE_memset) || defined(__CRT_HAVE_mempset)
 		if __untraced((__dword & __UINT8_C(0xff)) == ((__dword >> 8) & __UINT8_C(0xff)) &&
 		    (__dword & __UINT8_C(0xff)) == ((__dword >> 16) & __UINT8_C(0xff)) &&
 		    (__dword & __UINT8_C(0xff)) == ((__dword >> 24) & __UINT8_C(0xff)))
-			return (__UINT32_TYPE__ *)__libc_slow_mempset(__dst, __dword & __UINT8_C(0xff), __n_dwords * 4);
+			return (__UINT32_TYPE__ *)__libc_core_mempset(__dst, __dword & __UINT8_C(0xff), __n_dwords * 4);
 #endif /* __CRT_HAVE_memset || __CRT_HAVE_mempset */
 	}
 #endif /* !__CRT_HAVE_memsetl && ... */
@@ -2276,7 +2276,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetl))(/*aligned(4)*/ void *__rest
 		return (__UINT32_TYPE__ *)__dst + __n_dwords;
 	}
 #endif /* __CRT_HAVE_bzero */
-	return __libc_slow_mempsetl(__dst, __dword, __n_dwords);
+	return __libc_core_mempsetl(__dst, __dword, __n_dwords);
 }
 #endif /* !__fast_mempsetl_defined */
 
@@ -2430,7 +2430,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(/*aligned(2)*/ void *__rest
 		 * >> mempset(mempsetq(p, 0x1212121212121212, s >> 3), 0x12, s & 7);
 		 */
 #if defined(__CRT_HAVE_mempsetq) && __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
-		__dst = __libc_slow_mempsetq(__dst,
+		__dst = __libc_core_mempsetq(__dst,
 		                            (__UINT64_TYPE__)((__UINT64_TYPE__)__word * __UINT64_C(0x0001000100010001)),
 		                             __n_words >> 2);
 		switch (__n_words & 3) {
@@ -2448,7 +2448,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(/*aligned(2)*/ void *__rest
 		}
 		return (__UINT16_TYPE__ *)__dst;
 #else /* __CRT_HAVE_mempsetq && __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
-		__dst = __libc_slow_mempsetl(__dst,
+		__dst = __libc_core_mempsetl(__dst,
 		                            (__UINT32_TYPE__)((__UINT32_TYPE__)__word * __UINT32_C(0x00010001)),
 		                             __n_words >> 1);
 		if __untraced(__n_words & 1) {
@@ -2464,7 +2464,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(/*aligned(2)*/ void *__rest
     (defined(__CRT_HAVE_memset) || defined(__CRT_HAVE_mempset))
 	if __untraced(__builtin_constant_p(__word)) {
 		if __untraced((__word & __UINT8_C(0xff)) == ((__word >> 8) & __UINT8_C(0xff)))
-			return (__UINT16_TYPE__ *)__libc_slow_mempset(__dst, __word & __UINT8_C(0xff), __n_words * 2);
+			return (__UINT16_TYPE__ *)__libc_core_mempset(__dst, __word & __UINT8_C(0xff), __n_words * 2);
 	}
 #endif /* !__CRT_HAVE_memsetw && ... */
 #ifdef __CRT_HAVE_bzero
@@ -2473,7 +2473,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(/*aligned(2)*/ void *__rest
 		return (__UINT16_TYPE__ *)__dst + __n_words;
 	}
 #endif /* __CRT_HAVE_bzero */
-	return __libc_slow_mempsetw(__dst, __word, __n_words);
+	return __libc_core_mempsetw(__dst, __word, __n_words);
 }
 #endif /* !__fast_mempsetw_defined */
 
@@ -2703,7 +2703,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restr
 		 * >> mempset(mempsetq(p, 0x1212121212121212, s >> 3), 0x12, s & 7);
 		 */
 #if defined(__CRT_HAVE_mempsetq) && __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
-		__dst = __libc_slow_mempsetq(__dst,
+		__dst = __libc_core_mempsetq(__dst,
 		                            (__UINT64_TYPE__)((__UINT64_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT64_C(0x0101010101010101)),
 		                             __n_bytes >> 3);
 		switch (__n_bytes & 7) {
@@ -2737,7 +2737,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restr
 		}
 		return __dst;
 #else /* __CRT_HAVE_mempsetq && __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
-		__dst = __libc_slow_mempsetl(__dst,
+		__dst = __libc_core_mempsetl(__dst,
 		                            (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101)),
 		                             __n_bytes >> 2);
 		switch (__n_bytes & 3) {
@@ -2764,7 +2764,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restr
 		return (__UINT8_TYPE__ *)__dst + __n_bytes;
 	}
 #endif /* __CRT_HAVE_bzero */
-	return __libc_slow_mempset(__dst, __byte, __n_bytes);
+	return __libc_core_mempset(__dst, __byte, __n_bytes);
 }
 #endif /* !__fast_mempset_defined */
 
@@ -2808,7 +2808,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memchr))(/*aligned(1)*/ void const *__
 		default: break;
 		}
 	}
-	return __libc_slow_memchr(__haystack, __needle, __n_bytes);
+	return __libc_core_memchr(__haystack, __needle, __n_bytes);
 }
 #endif /* !__fast_memchr_defined */
 
@@ -2852,7 +2852,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memchrw))(/*aligned(2)*/ void const *_
 		default: break;
 		}
 	}
-	return __libc_slow_memchrw(__haystack, __word, __n_words);
+	return __libc_core_memchrw(__haystack, __word, __n_words);
 }
 #endif /* !__fast_memchrw_defined */
 
@@ -2896,7 +2896,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memchrl))(/*aligned(4)*/ void const *_
 		default: break;
 		}
 	}
-	return __libc_slow_memchrl(__haystack, __dword, __n_dwords);
+	return __libc_core_memchrl(__haystack, __dword, __n_dwords);
 }
 #endif /* !__fast_memchrl_defined */
 
@@ -2942,7 +2942,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memchrq))(/*aligned(8)*/ void const *_
 		default: break;
 		}
 	}
-	return __libc_slow_memchrq(__haystack, __qword, __n_qwords);
+	return __libc_core_memchrq(__haystack, __qword, __n_qwords);
 }
 #endif /* !__fast_memchrq_defined */
 
@@ -2974,7 +2974,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memrchr))(/*aligned(1)*/ void const *_
 		default: break;
 		}
 	}
-	return __libc_slow_memrchr(__haystack, __needle, __n_bytes);
+	return __libc_core_memrchr(__haystack, __needle, __n_bytes);
 }
 #endif /* !__fast_memrchr_defined */
 
@@ -3006,7 +3006,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memrchrw))(/*aligned(2)*/ void const *
 		default: break;
 		}
 	}
-	return __libc_slow_memrchrw(__haystack, __word, __n_words);
+	return __libc_core_memrchrw(__haystack, __word, __n_words);
 }
 #endif /* !__fast_memrchrw_defined */
 
@@ -3038,7 +3038,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memrchrl))(/*aligned(4)*/ void const *
 		default: break;
 		}
 	}
-	return __libc_slow_memrchrl(__haystack, __dword, __n_dwords);
+	return __libc_core_memrchrl(__haystack, __dword, __n_dwords);
 }
 #endif /* !__fast_memrchrl_defined */
 
@@ -3072,7 +3072,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memrchrq))(/*aligned(8)*/ void const *
 		default: break;
 		}
 	}
-	return __libc_slow_memrchrq(__haystack, __qword, __n_qwords);
+	return __libc_core_memrchrq(__haystack, __qword, __n_qwords);
 }
 #endif /* !__fast_memrchrq_defined */
 
@@ -3423,7 +3423,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__
 #undef __DO_COMPARE8
 #undef __DO_COMPARE
 	}
-	return __libc_slow_memcmp(__s1, __s2, __n_bytes);
+	return __libc_core_memcmp(__s1, __s2, __n_bytes);
 }
 #endif /* !__fast_memcmp_defined */
 
@@ -3638,7 +3638,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpw))(/*aligned(2)*/ void const *_
 #undef __DO_COMPARE16
 #undef __DO_COMPARE
 	}
-	return __libc_slow_memcmpw(__s1, __s2, __n_words);
+	return __libc_core_memcmpw(__s1, __s2, __n_words);
 }
 #endif /* !__fast_memcmpw_defined */
 
@@ -3786,7 +3786,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpl))(/*aligned(4)*/ void const *_
 #undef __DO_COMPARE32
 #undef __DO_COMPARE
 	}
-	return __libc_slow_memcmpl(__s1, __s2, __n_dwords);
+	return __libc_core_memcmpl(__s1, __s2, __n_dwords);
 }
 #endif /* !__fast_memcmpl_defined */
 
@@ -3891,7 +3891,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpq))(/*aligned(8)*/ void const *_
 #undef __DO_COMPARE32
 #undef __DO_COMPARE
 	}
-	return __libc_slow_memcmpq(__s1, __s2, __n_qwords);
+	return __libc_core_memcmpq(__s1, __s2, __n_qwords);
 }
 #endif /* !__fast_memcmpq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -3986,7 +3986,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovedownq))(/*aligned(8)*/ void *__
 		default: break;
 		}
 	}
-	return __libc_slow_memmovedownq(__dst, __src, __n_qwords);
+	return __libc_core_memmovedownq(__dst, __src, __n_qwords);
 }
 #endif /* !__fast_memmovedownq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -4104,18 +4104,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovedownl))(/*aligned(4)*/ void *__
 #if defined(__CRT_HAVE_memmovedownq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_memmovedownq(__dst, __src, __n_dwords >> 1);
-		__dst = __libc_slow_memmovedownq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_memmovedownq(__dst, __src, __n_dwords >> 1);
+		__dst = __libc_core_memmovedownq(__dst, __src, __n_dwords >> 1);
 		((__UINT32_TYPE__ *)__dst)[__n_dwords-1] = ((__UINT32_TYPE__ const *)__src)[__n_dwords-1];
 		return (__UINT32_TYPE__ *)__dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_memmovedownq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_memmovedownq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmovedownq && __SIZEOF_BUSINT__ >= 8 */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memmovedownl(__dst, __src, __n_dwords);
+	return __libc_core_memmovedownl(__dst, __src, __n_dwords);
 }
 #endif /* !__fast_memmovedownl_defined */
 
@@ -4285,37 +4285,37 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovedownw))(/*aligned(2)*/ void *__
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_words & 3) {
 		case 0:
-			return (__UINT16_TYPE__ *)__libc_slow_memmovedownq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_memmovedownq(__dst, __src, __n_words >> 2);
 		case 1:
-			__dst = __libc_slow_memmovedownq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_memmovedownq(__dst, __src, __n_words >> 2);
 			((__UINT16_TYPE__ *)__dst)[__n_words-1] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 			return (__UINT16_TYPE__ *)__dst;
 		case 2:
-			__dst = __libc_slow_memmovedownq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_memmovedownq(__dst, __src, __n_words >> 2);
 			((__UINT32_TYPE__ *)__dst)[(__n_words >> 1)-1] = ((__UINT32_TYPE__ const *)__src)[(__n_words >> 1)-1];
 			return (__UINT16_TYPE__ *)__dst;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 7))
-			return (__UINT16_TYPE__ *)__libc_slow_memmovedownq(__dst, __src, __n_words >> 3);
+			return (__UINT16_TYPE__ *)__libc_core_memmovedownq(__dst, __src, __n_words >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmovedownq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmovedownl)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_memmovedownl(__dst, __src, __n_words >> 1);
-		__dst = __libc_slow_memmovedownl(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_memmovedownl(__dst, __src, __n_words >> 1);
+		__dst = __libc_core_memmovedownl(__dst, __src, __n_words >> 1);
 		((__UINT16_TYPE__ *)__dst)[__n_words-1] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 		return (__UINT16_TYPE__ *)__dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 1))
-			return __libc_slow_memmovedownw(__dst, __src, __n_words >> 1);
+			return __libc_core_memmovedownw(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmovedownl */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memmovedownw(__dst, __src, __n_words);
+	return __libc_core_memmovedownw(__dst, __src, __n_words);
 }
 #endif /* !__fast_memmovedownw_defined */
 
@@ -4577,61 +4577,61 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovedown))(/*aligned(1)*/ void *__d
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 7) {
 		case 0:
-			return __libc_slow_memmovedownq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_memmovedownq(__dst, __src, __n_bytes >> 3);
 		case 1:
-			__dst = __libc_slow_memmovedownq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memmovedownq(__dst, __src, __n_bytes >> 3);
 			((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return __dst;
 		case 2:
-			__dst = __libc_slow_memmovedownq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memmovedownq(__dst, __src, __n_bytes >> 3);
 			((__UINT16_TYPE__ *)__dst)[(__n_bytes >> 1)-1] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return __dst;
 		case 4:
-			__dst = __libc_slow_memmovedownq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memmovedownq(__dst, __src, __n_bytes >> 3);
 			((__UINT32_TYPE__ *)__dst)[(__n_bytes >> 2)-1] = ((__UINT32_TYPE__ const *)__src)[(__n_bytes >> 2)-1];
 			return __dst;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 7))
-			return __libc_slow_memmovedownq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_memmovedownq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmovedownq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmovedownl)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
 		case 0:
-			return __libc_slow_memmovedownl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_memmovedownl(__dst, __src, __n_bytes >> 2);
 		case 1:
-			__dst = __libc_slow_memmovedownl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_memmovedownl(__dst, __src, __n_bytes >> 2);
 			((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return __dst;
 		case 2:
-			__dst = __libc_slow_memmovedownl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_memmovedownl(__dst, __src, __n_bytes >> 2);
 			((__UINT16_TYPE__ *)__dst)[(__n_bytes >> 1)-1] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return __dst;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 3))
-			return __libc_slow_memmovedownl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_memmovedownl(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmovedownl */
 #if defined(__CRT_HAVE_memmovedownw)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_memmovedownw(__dst, __src, __n_bytes >> 1);
-		__dst = __libc_slow_memmovedownw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_memmovedownw(__dst, __src, __n_bytes >> 1);
+		__dst = __libc_core_memmovedownw(__dst, __src, __n_bytes >> 1);
 		((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 		return __dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_memmovedownw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_memmovedownw(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmovedownw */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memmovedown(__dst, __src, __n_bytes);
+	return __libc_core_memmovedown(__dst, __src, __n_bytes);
 }
 #endif /* !__fast_memmovedown_defined */
 
@@ -4696,7 +4696,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovedownq))(/*aligned(8)*/ void *_
 		default: break;
 		}
 	}
-	return __libc_slow_mempmovedownq(__dst, __src, __n_qwords);
+	return __libc_core_mempmovedownq(__dst, __src, __n_qwords);
 }
 #endif /* !__fast_mempmovedownq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -4814,18 +4814,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovedownl))(/*aligned(4)*/ void *_
 #if defined(__CRT_HAVE_mempmovedownq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_mempmovedownq(__dst, __src, __n_dwords >> 1);
-		__dst = __libc_slow_mempmovedownq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_mempmovedownq(__dst, __src, __n_dwords >> 1);
+		__dst = __libc_core_mempmovedownq(__dst, __src, __n_dwords >> 1);
 		((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[__n_dwords-1];
 		return (__UINT32_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_mempmovedownq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_mempmovedownq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmovedownq && __SIZEOF_BUSINT__ >= 8 */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempmovedownl(__dst, __src, __n_dwords);
+	return __libc_core_mempmovedownl(__dst, __src, __n_dwords);
 }
 #endif /* !__fast_mempmovedownl_defined */
 
@@ -4996,37 +4996,37 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovedownw))(/*aligned(2)*/ void *_
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_words & 3) {
 		case 0:
-			return (__UINT16_TYPE__ *)__libc_slow_mempmovedownq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_mempmovedownq(__dst, __src, __n_words >> 2);
 		case 1:
-			__dst = __libc_slow_mempmovedownq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_mempmovedownq(__dst, __src, __n_words >> 2);
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 			return (__UINT16_TYPE__ *)__dst + 1;
 		case 2:
-			__dst = __libc_slow_mempmovedownq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_mempmovedownq(__dst, __src, __n_words >> 2);
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[(__n_words >> 1)-1];
 			return (__UINT16_TYPE__ *)__dst + 2;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 3))
-			return (__UINT16_TYPE__ *)__libc_slow_mempmovedownq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_mempmovedownq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmovedownq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmovedownl)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_mempmovedownl(__dst, __src, __n_words >> 1);
-		__dst = __libc_slow_mempmovedownl(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_mempmovedownl(__dst, __src, __n_words >> 1);
+		__dst = __libc_core_mempmovedownl(__dst, __src, __n_words >> 1);
 		((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 		return (__UINT16_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_mempmovedownl(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_mempmovedownl(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmovedownl */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempmovedownw(__dst, __src, __n_words);
+	return __libc_core_mempmovedownw(__dst, __src, __n_words);
 }
 #endif /* !__fast_mempmovedownw_defined */
 
@@ -5288,61 +5288,61 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovedown))(/*aligned(1)*/ void *__
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 7) {
 		case 0:
-			return __libc_slow_mempmovedownq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_mempmovedownq(__dst, __src, __n_bytes >> 3);
 		case 1:
-			__dst = __libc_slow_mempmovedownq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempmovedownq(__dst, __src, __n_bytes >> 3);
 			((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return (__UINT8_TYPE__ *)__dst + 1;
 		case 2:
-			__dst = __libc_slow_mempmovedownq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempmovedownq(__dst, __src, __n_bytes >> 3);
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return (__UINT8_TYPE__ *)__dst + 2;
 		case 4:
-			__dst = __libc_slow_mempmovedownq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempmovedownq(__dst, __src, __n_bytes >> 3);
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[(__n_bytes >> 2)-1];
 			return (__UINT8_TYPE__ *)__dst + 4;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 7))
-			return __libc_slow_mempmovedownq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_mempmovedownq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmovedownq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmovedownl)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
 		case 0:
-			return __libc_slow_mempmovedownl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_mempmovedownl(__dst, __src, __n_bytes >> 2);
 		case 1:
-			__dst = __libc_slow_mempmovedownl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_mempmovedownl(__dst, __src, __n_bytes >> 2);
 			((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return (__UINT8_TYPE__ *)__dst + 1;
 		case 2:
-			__dst = __libc_slow_mempmovedownl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_mempmovedownl(__dst, __src, __n_bytes >> 2);
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return (__UINT8_TYPE__ *)__dst + 2;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 3))
-			return __libc_slow_mempmovedownl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_mempmovedownl(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmovedownl */
 #if defined(__CRT_HAVE_mempmovedownw)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_mempmovedownw(__dst, __src, __n_bytes >> 1);
-		__dst = __libc_slow_mempmovedownw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_mempmovedownw(__dst, __src, __n_bytes >> 1);
+		__dst = __libc_core_mempmovedownw(__dst, __src, __n_bytes >> 1);
 		((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 		return (__UINT8_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_mempmovedownw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_mempmovedownw(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmovedownw */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempmovedown(__dst, __src, __n_bytes);
+	return __libc_core_mempmovedown(__dst, __src, __n_bytes);
 }
 #endif /* !__fast_mempmovedown_defined */
 
@@ -5413,7 +5413,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveupq))(/*aligned(8)*/ void *__ds
 		default: break;
 		}
 	}
-	return __libc_slow_memmoveupq(__dst, __src, __n_qwords);
+	return __libc_core_memmoveupq(__dst, __src, __n_qwords);
 }
 #endif /* !__fast_memmoveupq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -5531,18 +5531,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveupl))(/*aligned(4)*/ void *__ds
 #if defined(__CRT_HAVE_memmoveupq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_memmoveupq(__dst, __src, __n_dwords >> 1);
-		__dst = __libc_slow_memmoveupq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_memmoveupq(__dst, __src, __n_dwords >> 1);
+		__dst = __libc_core_memmoveupq(__dst, __src, __n_dwords >> 1);
 		((__UINT32_TYPE__ *)__dst)[__n_dwords-1] = ((__UINT32_TYPE__ const *)__src)[__n_dwords-1];
 		return (__UINT32_TYPE__ *)__dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_memmoveupq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_memmoveupq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmoveupq && __SIZEOF_BUSINT__ >= 8 */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memmoveupl(__dst, __src, __n_dwords);
+	return __libc_core_memmoveupl(__dst, __src, __n_dwords);
 }
 #endif /* !__fast_memmoveupl_defined */
 
@@ -5712,37 +5712,37 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveupw))(/*aligned(2)*/ void *__ds
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_words & 3) {
 		case 0:
-			return (__UINT16_TYPE__ *)__libc_slow_memmoveupq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_memmoveupq(__dst, __src, __n_words >> 2);
 		case 1:
-			__dst = __libc_slow_memmoveupq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_memmoveupq(__dst, __src, __n_words >> 2);
 			((__UINT16_TYPE__ *)__dst)[__n_words-1] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 			return (__UINT16_TYPE__ *)__dst;
 		case 2:
-			__dst = __libc_slow_memmoveupq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_memmoveupq(__dst, __src, __n_words >> 2);
 			((__UINT32_TYPE__ *)__dst)[(__n_words >> 1)-1] = ((__UINT32_TYPE__ const *)__src)[(__n_words >> 1)-1];
 			return (__UINT16_TYPE__ *)__dst;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 7))
-			return (__UINT16_TYPE__ *)__libc_slow_memmoveupq(__dst, __src, __n_words >> 3);
+			return (__UINT16_TYPE__ *)__libc_core_memmoveupq(__dst, __src, __n_words >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmoveupq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmoveupl)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_memmoveupl(__dst, __src, __n_words >> 1);
-		__dst = __libc_slow_memmoveupl(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_memmoveupl(__dst, __src, __n_words >> 1);
+		__dst = __libc_core_memmoveupl(__dst, __src, __n_words >> 1);
 		((__UINT16_TYPE__ *)__dst)[__n_words-1] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 		return (__UINT16_TYPE__ *)__dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 1))
-			return __libc_slow_memmoveupw(__dst, __src, __n_words >> 1);
+			return __libc_core_memmoveupw(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmoveupl */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memmoveupw(__dst, __src, __n_words);
+	return __libc_core_memmoveupw(__dst, __src, __n_words);
 }
 #endif /* !__fast_memmoveupw_defined */
 
@@ -6004,61 +6004,61 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveup))(/*aligned(1)*/ void *__dst
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 7) {
 		case 0:
-			return __libc_slow_memmoveupq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_memmoveupq(__dst, __src, __n_bytes >> 3);
 		case 1:
-			__dst = __libc_slow_memmoveupq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memmoveupq(__dst, __src, __n_bytes >> 3);
 			((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return __dst;
 		case 2:
-			__dst = __libc_slow_memmoveupq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memmoveupq(__dst, __src, __n_bytes >> 3);
 			((__UINT16_TYPE__ *)__dst)[(__n_bytes >> 1)-1] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return __dst;
 		case 4:
-			__dst = __libc_slow_memmoveupq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memmoveupq(__dst, __src, __n_bytes >> 3);
 			((__UINT32_TYPE__ *)__dst)[(__n_bytes >> 2)-1] = ((__UINT32_TYPE__ const *)__src)[(__n_bytes >> 2)-1];
 			return __dst;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 7))
-			return __libc_slow_memmoveupq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_memmoveupq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmoveupq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmoveupl)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
 		case 0:
-			return __libc_slow_memmoveupl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_memmoveupl(__dst, __src, __n_bytes >> 2);
 		case 1:
-			__dst = __libc_slow_memmoveupl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_memmoveupl(__dst, __src, __n_bytes >> 2);
 			((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return __dst;
 		case 2:
-			__dst = __libc_slow_memmoveupl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_memmoveupl(__dst, __src, __n_bytes >> 2);
 			((__UINT16_TYPE__ *)__dst)[(__n_bytes >> 1)-1] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return __dst;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 3))
-			return __libc_slow_memmoveupl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_memmoveupl(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmoveupl */
 #if defined(__CRT_HAVE_memmoveupw)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_memmoveupw(__dst, __src, __n_bytes >> 1);
-		__dst = __libc_slow_memmoveupw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_memmoveupw(__dst, __src, __n_bytes >> 1);
+		__dst = __libc_core_memmoveupw(__dst, __src, __n_bytes >> 1);
 		((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 		return __dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_memmoveupw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_memmoveupw(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmoveupw */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memmoveup(__dst, __src, __n_bytes);
+	return __libc_core_memmoveup(__dst, __src, __n_bytes);
 }
 #endif /* !__fast_memmoveup_defined */
 
@@ -6123,7 +6123,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveupq))(/*aligned(8)*/ void *__d
 		default: break;
 		}
 	}
-	return __libc_slow_mempmoveupq(__dst, __src, __n_qwords);
+	return __libc_core_mempmoveupq(__dst, __src, __n_qwords);
 }
 #endif /* !__fast_mempmoveupq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -6241,18 +6241,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveupl))(/*aligned(4)*/ void *__d
 #if defined(__CRT_HAVE_mempmoveupq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_mempmoveupq(__dst, __src, __n_dwords >> 1);
-		__dst = __libc_slow_mempmoveupq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_mempmoveupq(__dst, __src, __n_dwords >> 1);
+		__dst = __libc_core_mempmoveupq(__dst, __src, __n_dwords >> 1);
 		((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[__n_dwords-1];
 		return (__UINT32_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_mempmoveupq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_mempmoveupq((__UINT64_TYPE__ *)__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmoveupq && __SIZEOF_BUSINT__ >= 8 */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempmoveupl(__dst, __src, __n_dwords);
+	return __libc_core_mempmoveupl(__dst, __src, __n_dwords);
 }
 #endif /* !__fast_mempmoveupl_defined */
 
@@ -6423,37 +6423,37 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveupw))(/*aligned(2)*/ void *__d
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_words & 3) {
 		case 0:
-			return (__UINT16_TYPE__ *)__libc_slow_mempmoveupq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_mempmoveupq(__dst, __src, __n_words >> 2);
 		case 1:
-			__dst = __libc_slow_mempmoveupq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_mempmoveupq(__dst, __src, __n_words >> 2);
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 			return (__UINT16_TYPE__ *)__dst + 1;
 		case 2:
-			__dst = __libc_slow_mempmoveupq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_mempmoveupq(__dst, __src, __n_words >> 2);
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[(__n_words >> 1)-1];
 			return (__UINT16_TYPE__ *)__dst + 2;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 3))
-			return (__UINT16_TYPE__ *)__libc_slow_mempmoveupq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_mempmoveupq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmoveupq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmoveupl)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_mempmoveupl(__dst, __src, __n_words >> 1);
-		__dst = __libc_slow_mempmoveupl(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_mempmoveupl(__dst, __src, __n_words >> 1);
+		__dst = __libc_core_mempmoveupl(__dst, __src, __n_words >> 1);
 		((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
 		return (__UINT16_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_mempmoveupl(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_mempmoveupl(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmoveupl */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempmoveupw(__dst, __src, __n_words);
+	return __libc_core_mempmoveupw(__dst, __src, __n_words);
 }
 #endif /* !__fast_mempmoveupw_defined */
 
@@ -6715,61 +6715,61 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveup))(/*aligned(1)*/ void *__ds
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 7) {
 		case 0:
-			return __libc_slow_mempmoveupq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_mempmoveupq(__dst, __src, __n_bytes >> 3);
 		case 1:
-			__dst = __libc_slow_mempmoveupq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempmoveupq(__dst, __src, __n_bytes >> 3);
 			((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return (__UINT8_TYPE__ *)__dst + 1;
 		case 2:
-			__dst = __libc_slow_mempmoveupq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempmoveupq(__dst, __src, __n_bytes >> 3);
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return (__UINT8_TYPE__ *)__dst + 2;
 		case 4:
-			__dst = __libc_slow_mempmoveupq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempmoveupq(__dst, __src, __n_bytes >> 3);
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[(__n_bytes >> 2)-1];
 			return (__UINT8_TYPE__ *)__dst + 4;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 7))
-			return __libc_slow_mempmoveupq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_mempmoveupq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmoveupq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmoveupl)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
 		case 0:
-			return __libc_slow_mempmoveupl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_mempmoveupl(__dst, __src, __n_bytes >> 2);
 		case 1:
-			__dst = __libc_slow_mempmoveupl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_mempmoveupl(__dst, __src, __n_bytes >> 2);
 			((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 			return (__UINT8_TYPE__ *)__dst + 1;
 		case 2:
-			__dst = __libc_slow_mempmoveupl(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_mempmoveupl(__dst, __src, __n_bytes >> 2);
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
 			return (__UINT8_TYPE__ *)__dst + 2;
 		default: break;
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 3))
-			return __libc_slow_mempmoveupl(__dst, __src, __n_bytes >> 2);
+			return __libc_core_mempmoveupl(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmoveupl */
 #if defined(__CRT_HAVE_mempmoveupw)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_mempmoveupw(__dst, __src, __n_bytes >> 1);
-		__dst = __libc_slow_mempmoveupw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_mempmoveupw(__dst, __src, __n_bytes >> 1);
+		__dst = __libc_core_mempmoveupw(__dst, __src, __n_bytes >> 1);
 		((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
 		return (__UINT8_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_mempmoveupw(__dst, __src, __n_bytes >> 1);
+			return __libc_core_mempmoveupw(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmoveupw */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempmoveup(__dst, __src, __n_bytes);
+	return __libc_core_mempmoveup(__dst, __src, __n_bytes);
 }
 #endif /* !__fast_mempmoveup_defined */
 
@@ -6868,7 +6868,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveq))(/*aligned(8)*/ void *__dst,
 			break;
 		}
 	}
-	return __libc_slow_memmoveq(__dst, __src, __n_qwords);
+	return __libc_core_memmoveq(__dst, __src, __n_qwords);
 }
 #endif /* !__fast_memmoveq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -7045,22 +7045,22 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovel))(/*aligned(4)*/ void *__dst,
 #if defined(__CRT_HAVE_memmoveq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_memmoveq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_memmoveq(__dst, __src, __n_dwords >> 1);
 		{
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[__n_dwords-1];
-			__dst = __libc_slow_memmoveq(__dst, __src, __n_dwords >> 1);
+			__dst = __libc_core_memmoveq(__dst, __src, __n_dwords >> 1);
 			((__UINT32_TYPE__ *)__dst)[__n_dwords-1] = __temp;
 		}
 		return (__UINT32_TYPE__ *)__dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_memmoveq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_memmoveq(__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmoveq && __SIZEOF_BUSINT__ >= 8 */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memmovel(__dst, __src, __n_dwords);
+	return __libc_core_memmovel(__dst, __src, __n_dwords);
 }
 #endif /* !__fast_memmovel_defined */
 
@@ -7320,11 +7320,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovew))(/*aligned(2)*/ void *__dst,
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_words & 3) {
 		case 0:
-			return (__UINT16_TYPE__ *)__libc_slow_memmoveq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_memmoveq(__dst, __src, __n_words >> 2);
 		case 1: {
 			__UINT16_TYPE__ __temp;
 			__temp = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
-			__dst = __libc_slow_memmoveq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_memmoveq(__dst, __src, __n_words >> 2);
 			((__UINT16_TYPE__ *)__dst)[__n_words-1] = __temp;
 			return (__UINT16_TYPE__ *)__dst;
 		}	break;
@@ -7332,7 +7332,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovew))(/*aligned(2)*/ void *__dst,
 		case 2: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[(__n_words >> 1)-1];
-			__dst = __libc_slow_memmoveq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_memmoveq(__dst, __src, __n_words >> 2);
 			((__UINT32_TYPE__ *)__dst)[(__n_words >> 1)-1] = __temp;
 			return (__UINT16_TYPE__ *)__dst;
 		}
@@ -7340,28 +7340,28 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovew))(/*aligned(2)*/ void *__dst,
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 3))
-			return (__UINT16_TYPE__ *)__libc_slow_memmoveq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_memmoveq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmoveq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmovel)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_memmovel(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_memmovel(__dst, __src, __n_words >> 1);
 		{
 			__UINT16_TYPE__ __temp;
 			__temp = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
-			__dst = __libc_slow_memmovel(__dst, __src, __n_words >> 1);
+			__dst = __libc_core_memmovel(__dst, __src, __n_words >> 1);
 			((__UINT16_TYPE__ *)__dst)[__n_words-1] = __temp;
 		}
 		return (__UINT16_TYPE__ *)__dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_memmovel(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_memmovel(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmovel */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memmovew(__dst, __src, __n_words);
+	return __libc_core_memmovew(__dst, __src, __n_words);
 }
 #endif /* !__fast_memmovew_defined */
 
@@ -7799,11 +7799,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 7) {
 		case 0:
-			return __libc_slow_memmoveq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_memmoveq(__dst, __src, __n_bytes >> 3);
 		case 1: {
 			__UINT8_TYPE__ __temp;
 			__temp = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
-			__dst = __libc_slow_memmoveq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memmoveq(__dst, __src, __n_bytes >> 3);
 			((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = __temp;
 			return __dst;
 		}	break;
@@ -7811,7 +7811,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 		case 2: {
 			__UINT16_TYPE__ __temp;
 			__temp = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
-			__dst = __libc_slow_memmoveq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memmoveq(__dst, __src, __n_bytes >> 3);
 			((__UINT16_TYPE__ *)__dst)[(__n_bytes >> 1)-1] = __temp;
 			return __dst;
 		}	break;
@@ -7819,7 +7819,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 		case 4: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[(__n_bytes >> 2)-1];
-			__dst = __libc_slow_memmoveq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_memmoveq(__dst, __src, __n_bytes >> 3);
 			((__UINT32_TYPE__ *)__dst)[(__n_bytes >> 2)-1] = __temp;
 			return __dst;
 		}
@@ -7828,18 +7828,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 7))
-			return __libc_slow_memmoveq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_memmoveq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmoveq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmovel)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
 		case 0:
-			return __libc_slow_memmovel(__dst, __src, __n_bytes >> 2);
+			return __libc_core_memmovel(__dst, __src, __n_bytes >> 2);
 		case 1: {
 			__UINT8_TYPE__ __temp;
 			__temp = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
-			__dst = __libc_slow_memmovel(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_memmovel(__dst, __src, __n_bytes >> 2);
 			((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = __temp;
 			return __dst;
 		}	break;
@@ -7847,7 +7847,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 		case 2: {
 			__UINT16_TYPE__ __temp;
 			__temp = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
-			__dst = __libc_slow_memmovel(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_memmovel(__dst, __src, __n_bytes >> 2);
 			((__UINT16_TYPE__ *)__dst)[(__n_bytes >> 1)-1] = __temp;
 			return __dst;
 		}
@@ -7856,28 +7856,28 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(/*aligned(1)*/ void *__dst,
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 3))
-			return __libc_slow_memmovel(__dst, __src, __n_bytes >> 2);
+			return __libc_core_memmovel(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmovel */
 #if defined(__CRT_HAVE_memmovew)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_memmovew(__dst, __src, __n_bytes >> 1);
+			return __libc_core_memmovew(__dst, __src, __n_bytes >> 1);
 		{
 			__UINT8_TYPE__ __temp;
 			__temp = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
-			__dst = __libc_slow_memmovew(__dst, __src, __n_bytes >> 1);
+			__dst = __libc_core_memmovew(__dst, __src, __n_bytes >> 1);
 			((__UINT8_TYPE__ *)__dst)[__n_bytes-1] = __temp;
 		}
 		return __dst;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_memmovew(__dst, __src, __n_bytes >> 1);
+			return __libc_core_memmovew(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_memmovew */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_memmove(__dst, __src, __n_bytes);
+	return __libc_core_memmove(__dst, __src, __n_bytes);
 }
 #endif /* !__fast_memmove_defined */
 
@@ -7972,7 +7972,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveq))(/*aligned(8)*/ void *__dst
 			break;
 		}
 	}
-	return __libc_slow_mempmoveq(__dst, __src, __n_qwords);
+	return __libc_core_mempmoveq(__dst, __src, __n_qwords);
 }
 #endif /* !__fast_mempmoveq_defined */
 #endif /* __UINT64_TYPE__ */
@@ -8150,22 +8150,22 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovel))(/*aligned(4)*/ void *__dst
 #if defined(__CRT_HAVE_mempmoveq) && __SIZEOF_BUSINT__ >= 8
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_mempmoveq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_mempmoveq(__dst, __src, __n_dwords >> 1);
 		{
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[__n_dwords-1];
-			__dst = __libc_slow_mempmoveq(__dst, __src, __n_dwords >> 1);
+			__dst = __libc_core_mempmoveq(__dst, __src, __n_dwords >> 1);
 			((__UINT32_TYPE__ *)__dst)[0] = __temp;
 		}
 		return (__UINT32_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_dwords & 1))
-			return (__UINT32_TYPE__ *)__libc_slow_mempmoveq(__dst, __src, __n_dwords >> 1);
+			return (__UINT32_TYPE__ *)__libc_core_mempmoveq(__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmoveq && __SIZEOF_BUSINT__ >= 8 */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempmovel(__dst, __src, __n_dwords);
+	return __libc_core_mempmovel(__dst, __src, __n_dwords);
 }
 #endif /* !__fast_mempmovel_defined */
 
@@ -8425,11 +8425,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovew))(/*aligned(2)*/ void *__dst
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_words & 3) {
 		case 0:
-			return (__UINT16_TYPE__ *)__libc_slow_mempmoveq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_mempmoveq(__dst, __src, __n_words >> 2);
 		case 1: {
 			__UINT16_TYPE__ __temp;
 			__temp = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
-			__dst = __libc_slow_mempmoveq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_mempmoveq(__dst, __src, __n_words >> 2);
 			((__UINT16_TYPE__ *)__dst)[0] = __temp;
 			return (__UINT16_TYPE__ *)__dst + 1;
 		}	break;
@@ -8437,7 +8437,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovew))(/*aligned(2)*/ void *__dst
 		case 2: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[(__n_words >> 1)-1];
-			__dst = __libc_slow_mempmoveq(__dst, __src, __n_words >> 2);
+			__dst = __libc_core_mempmoveq(__dst, __src, __n_words >> 2);
 			((__UINT32_TYPE__ *)__dst)[0] = __temp;
 			return (__UINT16_TYPE__ *)__dst + 2;
 		}
@@ -8445,27 +8445,27 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovew))(/*aligned(2)*/ void *__dst
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 3))
-			return (__UINT16_TYPE__ *)__libc_slow_mempmoveq(__dst, __src, __n_words >> 2);
+			return (__UINT16_TYPE__ *)__libc_core_mempmoveq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmoveq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmovel)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_mempmovel(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_mempmovel(__dst, __src, __n_words >> 1);
 		{
 			__UINT16_TYPE__ __temp = ((__UINT16_TYPE__ const *)__src)[__n_words-1];
-			__dst = __libc_slow_mempmovel(__dst, __src, __n_words >> 1);
+			__dst = __libc_core_mempmovel(__dst, __src, __n_words >> 1);
 			((__UINT16_TYPE__ *)__dst)[0] = __temp;
 		}
 		return (__UINT16_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_words & 1))
-			return (__UINT16_TYPE__ *)__libc_slow_mempmovel(__dst, __src, __n_words >> 1);
+			return (__UINT16_TYPE__ *)__libc_core_mempmovel(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmovel */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempmovew(__dst, __src, __n_words);
+	return __libc_core_mempmovew(__dst, __src, __n_words);
 }
 #endif /* !__fast_mempmovew_defined */
 
@@ -8901,11 +8901,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 7) {
 		case 0:
-			return __libc_slow_mempmoveq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_mempmoveq(__dst, __src, __n_bytes >> 3);
 		case 1: {
 			__UINT8_TYPE__ __temp;
 			__temp = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
-			__dst = __libc_slow_mempmoveq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempmoveq(__dst, __src, __n_bytes >> 3);
 			((__UINT8_TYPE__ *)__dst)[0] = __temp;
 			return (__BYTE_TYPE__ *)__dst + 1;
 		}	break;
@@ -8913,7 +8913,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 		case 2: {
 			__UINT16_TYPE__ __temp;
 			__temp = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
-			__dst = __libc_slow_mempmoveq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempmoveq(__dst, __src, __n_bytes >> 3);
 			((__UINT16_TYPE__ *)__dst)[0] = __temp;
 			return (__BYTE_TYPE__ *)__dst + 2;
 		}	break;
@@ -8921,7 +8921,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 		case 4: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[(__n_bytes >> 2)-1];
-			__dst = __libc_slow_mempmoveq(__dst, __src, __n_bytes >> 3);
+			__dst = __libc_core_mempmoveq(__dst, __src, __n_bytes >> 3);
 			((__UINT32_TYPE__ *)__dst)[0] = __temp;
 			return (__BYTE_TYPE__ *)__dst + 4;
 		}
@@ -8929,18 +8929,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 7))
-			return __libc_slow_mempmoveq(__dst, __src, __n_bytes >> 3);
+			return __libc_core_mempmoveq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmoveq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmovel)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
 		case 0:
-			return __libc_slow_mempmovel(__dst, __src, __n_bytes >> 2);
+			return __libc_core_mempmovel(__dst, __src, __n_bytes >> 2);
 		case 1: {
 			__UINT8_TYPE__ __temp;
 			__temp = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
-			__dst = __libc_slow_mempmovel(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_mempmovel(__dst, __src, __n_bytes >> 2);
 			((__UINT8_TYPE__ *)__dst)[0] = __temp;
 			return (__BYTE_TYPE__ *)__dst + 1;
 		}	break;
@@ -8948,7 +8948,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 		case 2: {
 			__UINT16_TYPE__ __temp;
 			__temp = ((__UINT16_TYPE__ const *)__src)[(__n_bytes >> 1)-1];
-			__dst = __libc_slow_mempmovel(__dst, __src, __n_bytes >> 2);
+			__dst = __libc_core_mempmovel(__dst, __src, __n_bytes >> 2);
 			((__UINT16_TYPE__ *)__dst)[0] = __temp;
 			return (__BYTE_TYPE__ *)__dst + 2;
 		}
@@ -8956,27 +8956,27 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(/*aligned(1)*/ void *__dst,
 		}
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 3))
-			return __libc_slow_mempmovel(__dst, __src, __n_bytes >> 2);
+			return __libc_core_mempmovel(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmovel */
 #if defined(__CRT_HAVE_mempmovew)
 #ifndef __OPTIMIZE_SIZE__
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_mempmovew(__dst, __src, __n_bytes >> 1);
+			return __libc_core_mempmovew(__dst, __src, __n_bytes >> 1);
 		{
 			__UINT8_TYPE__ __temp = ((__UINT8_TYPE__ const *)__src)[__n_bytes-1];
-			__dst = __libc_slow_mempmovew(__dst, __src, __n_bytes >> 1);
+			__dst = __libc_core_mempmovew(__dst, __src, __n_bytes >> 1);
 			((__UINT8_TYPE__ *)__dst)[0] = __temp;
 		}
 		return (__BYTE_TYPE__ *)__dst + 1;
 #else /* !__OPTIMIZE_SIZE__ */
 		if __untraced(!(__n_bytes & 1))
-			return __libc_slow_mempmovew(__dst, __src, __n_bytes >> 1);
+			return __libc_core_mempmovew(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
 #endif /* __CRT_HAVE_mempmovew */
 #endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 	}
-	return __libc_slow_mempmove(__dst, __src, __n_bytes);
+	return __libc_core_mempmove(__dst, __src, __n_bytes);
 }
 #endif /* !__fast_mempmove_defined */
 
@@ -8995,7 +8995,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempatw))(void *__restrict __dst,
 		if __untraced(__n_bytes == 0)
 			return __dst;
 	}
-	return __libc_slow_mempatw(__dst, __pattern, __n_bytes);
+	return __libc_core_mempatw(__dst, __pattern, __n_bytes);
 }
 #endif /* !__fast_mempatw_defined */
 
@@ -9016,7 +9016,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempatl))(void *__restrict __dst,
 		if __untraced(__n_bytes == 0)
 			return __dst;
 	}
-	return __libc_slow_mempatl(__dst, __pattern, __n_bytes);
+	return __libc_core_mempatl(__dst, __pattern, __n_bytes);
 }
 #endif /* !__fast_mempatw_defined */
 
@@ -9042,7 +9042,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 		if __untraced(__n_bytes == 0)
 			return __dst;
 	}
-	return __libc_slow_mempatq(__dst, __pattern, __n_bytes);
+	return __libc_core_mempatq(__dst, __pattern, __n_bytes);
 }
 #endif /* !__fast_mempatw_defined */
 #endif /* __UINT64_TYPE__ */
@@ -9143,7 +9143,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 		}                                                                                                   \
 		if __untraced(__builtin_constant_p(__dst == __src) && (__dst == __src))                             \
 			return noop_return;                                                                             \
-		return (__libc_slow_##memcpyc)(__dst, __src, __elem_count, __elem_size);                            \
+		return (__libc_core_##memcpyc)(__dst, __src, __elem_count, __elem_size);                            \
 	}
 #else /* __OPTIMIZE_SIZE__ */
 #define __DEFINE_FAST_MEMCPYC_FUNCTION(memcpyc, memcpy, memcpyw, memcpyl, memcpyq, __restrict, noop_return) \

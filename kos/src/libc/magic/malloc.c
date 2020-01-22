@@ -23,7 +23,7 @@
 %(libc_fast){
 #include "stdlib.h"
 }
-%(libc_slow){
+%(libc_core){
 #include "stdlib.h"
 }
 

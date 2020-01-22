@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb25c1d79 */
+/* HASH CRC-32:0xcbef42c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,21 +28,21 @@
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/fenv.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include "slow/fenv.h"
+#include "core/fenv.h"
 
 #ifdef __fast_feraiseexcept_defined
 /* Raise the supported exceptions represented by EXCEPTS */
 #define __libc_feraiseexcept (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feraiseexcept))
 #else /* __fast_feraiseexcept_defined */
 /* Raise the supported exceptions represented by EXCEPTS */
-#define __libc_feraiseexcept __libc_slow_feraiseexcept
+#define __libc_feraiseexcept __libc_core_feraiseexcept
 #endif /* !__fast_feraiseexcept_defined */
 #ifdef __fast_fegetround_defined
 /* Get current rounding direction */
 #define __libc_fegetround (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetround))
 #else /* __fast_fegetround_defined */
 /* Get current rounding direction */
-#define __libc_fegetround __libc_slow_fegetround
+#define __libc_fegetround __libc_core_fegetround
 #endif /* !__fast_fegetround_defined */
 
 #endif /* __CC__ */

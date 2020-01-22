@@ -22,6 +22,7 @@
 
 #include <__crt.h>
 
+#ifndef __NO_FPU
 #include <hybrid/limitcore.h> /* __INT_MAX__ */
 #include <hybrid/typecore.h>
 
@@ -123,5 +124,6 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 
 __DECL_END
 #endif /* __CC__ */
+#endif /* !__NO_FPU */
 
 #endif /* !_LIBM_SCALB_H */

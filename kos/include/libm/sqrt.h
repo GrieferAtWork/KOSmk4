@@ -22,6 +22,7 @@
 
 #include <__crt.h>
 
+#ifndef __NO_FPU
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
@@ -309,5 +310,6 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 
 __DECL_END
 #endif /* __CC__ */
+#endif /* !__NO_FPU */
 
 #endif /* !_LIBM_SQRT_H */

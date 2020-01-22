@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2ab86ff */
+/* HASH CRC-32:0xaecc18db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4663,6 +4663,9 @@
 #define __CRT_ATTR_CONST___nan 1
 #define __CRT_ATTR_CONST___nanf 1
 #define __CRT_ATTR_CONST___nanl 1
+#define __CRT_ATTR_CONST___nearbyint 1
+#define __CRT_ATTR_CONST___nearbyintf 1
+#define __CRT_ATTR_CONST___nearbyintl 1
 #define __CRT_ATTR_CONST___nextafter 1
 #define __CRT_ATTR_CONST___nextafterf 1
 #define __CRT_ATTR_CONST___nextafterl 1

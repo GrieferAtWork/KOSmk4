@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a14c810 */
+/* HASH CRC-32:0x4265b9f1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBC_SLOW_UNICODE_H
-#define _LIBC_SLOW_UNICODE_H 1
+#ifndef _LIBC_CORE_UNICODE_H
+#define _LIBC_CORE_UNICODE_H 1
 
 #include <__stdinc.h>
 
@@ -31,52 +31,52 @@ __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_unicode_readutf8
 /* Read a single Unicode character from a given UTF-8 string */
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_unicode_readutf8,(/*utf-8*/ char const **__restrict __ptext),unicode_readutf8,(__ptext))
+__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8,(/*utf-8*/ char const **__restrict __ptext),unicode_readutf8,(__ptext))
 #else /* LIBC: unicode_readutf8 */
 #include <local/unicode/unicode_readutf8.h>
 /* Read a single Unicode character from a given UTF-8 string */
-#define __libc_slow_unicode_readutf8 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8))
+#define __libc_core_unicode_readutf8 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8))
 #endif /* unicode_readutf8... */
 #ifdef __CRT_HAVE_unicode_readutf8_rev
 /* Same as `unicode_readutf8', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_unicode_readutf8_rev,(/*utf-8*/ char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
+__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_rev,(/*utf-8*/ char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
 #else /* LIBC: unicode_readutf8_rev */
 #include <local/unicode/unicode_readutf8_rev.h>
 /* Same as `unicode_readutf8', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
-#define __libc_slow_unicode_readutf8_rev (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev))
+#define __libc_core_unicode_readutf8_rev (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev))
 #endif /* unicode_readutf8_rev... */
 #ifdef __CRT_HAVE_unicode_readutf8_n
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_unicode_readutf8_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* LIBC: unicode_readutf8_n */
 #include <local/unicode/unicode_readutf8_n.h>
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
-#define __libc_slow_unicode_readutf8_n (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_n))
+#define __libc_core_unicode_readutf8_n (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_n))
 #endif /* unicode_readutf8_n... */
 #ifdef __CRT_HAVE_unicode_readutf8_rev_n
 /* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_slow_unicode_readutf8_rev_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__libc_core_unicode_readutf8_rev_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_start),unicode_readutf8_rev_n,(__ptext,__text_start))
 #else /* LIBC: unicode_readutf8_rev_n */
 #include <local/unicode/unicode_readutf8_rev_n.h>
 /* Same as `unicode_readutf8_rev()', but don't read ahead of `text_start' */
-#define __libc_slow_unicode_readutf8_rev_n (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))
+#define __libc_core_unicode_readutf8_rev_n (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_readutf8_rev_n))
 #endif /* unicode_readutf8_rev_n... */
 #ifdef __CRT_HAVE_unicode_writeutf8
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_slow_unicode_writeutf8,(/*utf-8*/ char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_core_unicode_writeutf8,(/*utf-8*/ char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
 #else /* LIBC: unicode_writeutf8 */
 #include <local/unicode/unicode_writeutf8.h>
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-#define __libc_slow_unicode_writeutf8 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8))
+#define __libc_core_unicode_writeutf8 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8))
 #endif /* unicode_writeutf8... */
 
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_LIBC_SLOW_UNICODE_H */
+#endif /* !_LIBC_CORE_UNICODE_H */

@@ -1337,7 +1337,7 @@ ilogbl:(__LONGDOUBLE x) -> int %{auto_block(math)}
 [requires(((defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
             defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)) &&
            defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
-           $has_function(nexttowardl))]
+           $has_function(nextafterl))]
 nexttoward:(double x, __LONGDOUBLE y) -> double {
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
@@ -1346,7 +1346,7 @@ nexttoward:(double x, __LONGDOUBLE y) -> double {
 	return (double)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 #endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
 #else /* __IEEE854_LONG_DOUBLE_TYPE__ */
-	return (double)nexttowardl((__LONGDOUBLE)x, y);
+	return (double)nextafterl((__LONGDOUBLE)x, y);
 #endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
 }
 
@@ -1490,7 +1490,7 @@ llround:(double x) -> __LONGLONG {
 [requires(((defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
             defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)) &&
            defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
-           $has_function(nexttowardl))]
+           $has_function(nextafterl))]
 nexttowardf:(float x, __LONGDOUBLE y) -> float {
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
@@ -1499,7 +1499,7 @@ nexttowardf:(float x, __LONGDOUBLE y) -> float {
 	return (float)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 #endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 #else /* __IEEE854_LONG_DOUBLE_TYPE__ */
-	return (float)nexttowardl((__LONGDOUBLE)x, y);
+	return (float)nextafterl((__LONGDOUBLE)x, y);
 #endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
 }
 
@@ -1826,7 +1826,7 @@ llroundl:(__LONGDOUBLE x) -> __LONGLONG %{copy(%auto, math)}
 [std][overload_alias] nexttoward:(*) = nexttowardf;
 [std][overload_alias] scalbn:(*) = scalbnf;
 [std][overload_alias] scalbln:(*) = scalblnf;
-[std][overload_alias] nearbyint:(*) = nearbyintf;
+[std][overload_alias] nearbyint:(*) = rintf;
 [std][overload_alias] round:(*) = roundf;
 [std][overload_alias] trunc:(*) = truncf;
 [std][overload_alias] remquo:(*) = remquof;
@@ -1845,10 +1845,10 @@ llroundl:(__LONGDOUBLE x) -> __LONGLONG %{copy(%auto, math)}
 [std][overload_alias] log2:(*) = log2l;
 [std][overload_alias] copysign:(*) = copysignl;
 [std][overload_alias] tgamma:(*) = tgammal;
-[std][overload_alias] nexttoward:(*) = nexttowardl;
+[std][overload_alias] nexttoward:(*) = nextafterl;
 [std][overload_alias] scalbn:(*) = scalbnl;
 [std][overload_alias] scalbln:(*) = scalblnl;
-[std][overload_alias] nearbyint:(*) = nearbyintl;
+[std][overload_alias] nearbyint:(*) = rintl;
 [std][overload_alias] round:(*) = roundl;
 [std][overload_alias] trunc:(*) = truncl;
 [std][overload_alias] remquo:(*) = remquol;
@@ -2020,7 +2020,7 @@ finite:(double x) -> int {
 #endif /* !... */
 }
 
-[attribute(*)][alias(*)][crtbuiltin] drem:(*) = remainder;
+[attribute(*)][alias(*)] drem:(*) = remainder;
 
 @@Return the fractional part of X after dividing out `ilogb(X)'
 [ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significand)][crtbuiltin]
@@ -2040,7 +2040,7 @@ finitef:(float x) -> int  {
 #endif /* !... */
 }
 
-[attribute(*)][alias(*)][crtbuiltin] dremf:(*) = remainderf;
+[attribute(*)][alias(*)] dremf:(*) = remainderf;
 
 [ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significandf)][crtbuiltin]
 significandf:(float x) -> float %{auto_block(math)}
@@ -2063,7 +2063,7 @@ finitel:(__LONGDOUBLE x) -> int {
 #endif /* !... */
 }
 
-[attribute(*)][alias(*)][crtbuiltin] dreml:(*) = remainderl;
+[attribute(*)][alias(*)] dreml:(*) = remainderl;
 
 [ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__significandl)][crtbuiltin]
 significandl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
@@ -2556,7 +2556,7 @@ scalbl:(__LONGDOUBLE x, __LONGDOUBLE n) -> __LONGDOUBLE %{auto_block(math)}
 [attribute(*)][alias(*)] __nexttoward:(*) = nexttoward;
 [attribute(*)][alias(*)] __scalbn:(*) = scalbn;
 [attribute(*)][alias(*)] __scalbln:(*) = scalbln;
-[attribute(*)][alias(*)] __nearbyint:(*) = nearbyint;
+[attribute(*)][alias(*)] __nearbyint:(*) = rint;
 [attribute(*)][alias(*)] __round:(*) = round;
 [attribute(*)][alias(*)] __trunc:(*) = trunc;
 [attribute(*)][alias(*)] __remquo:(*) = remquo;
@@ -2570,7 +2570,7 @@ scalbl:(__LONGDOUBLE x, __LONGDOUBLE n) -> __LONGDOUBLE %{auto_block(math)}
 [attribute(*)][alias(*)] __nexttowardf:(*) = nexttowardf;
 [attribute(*)][alias(*)] __scalbnf:(*) = scalbnf;
 [attribute(*)][alias(*)] __scalblnf:(*) = scalblnf;
-[attribute(*)][alias(*)] __nearbyintf:(*) = nearbyintf;
+[attribute(*)][alias(*)] __nearbyintf:(*) = rintf;
 [attribute(*)][alias(*)] __roundf:(*) = roundf;
 [attribute(*)][alias(*)] __truncf:(*) = truncf;
 [attribute(*)][alias(*)] __remquof:(*) = remquof;
@@ -2589,10 +2589,10 @@ scalbl:(__LONGDOUBLE x, __LONGDOUBLE n) -> __LONGDOUBLE %{auto_block(math)}
 %#endif /* __COMPILER_HAVE_LONGLONG */
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[attribute(*)][alias(*)] __nexttowardl:(*) = nexttowardl;
+[attribute(*)][alias(*)] __nexttowardl:(*) = nextafterl;
 [attribute(*)][alias(*)] __scalbnl:(*) = scalbnl;
 [attribute(*)][alias(*)] __scalblnl:(*) = scalblnl;
-[attribute(*)][alias(*)] __nearbyintl:(*) = nearbyintl;
+[attribute(*)][alias(*)] __nearbyintl:(*) = rintl;
 [attribute(*)][alias(*)] __roundl:(*) = roundl;
 [attribute(*)][alias(*)] __truncl:(*) = truncl;
 [attribute(*)][alias(*)] __remquol:(*) = remquol;

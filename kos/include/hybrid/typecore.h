@@ -1029,27 +1029,6 @@
 #define __SIZEOF_DOUBLE__      8
 #endif /* !__SIZEOF_DOUBLE__ */
 
-#ifdef __COMPILER_HAVE_LONGDOUBLE
-#ifndef __SIZEOF_LONG_DOUBLE__
-#ifdef _MSC_VER
-#define __SIZEOF_LONG_DOUBLE__ 8
-#elif (defined(__C67__) || defined(__i386__) || \
-       defined(__i386) || defined(i386))
-#define __SIZEOF_LONG_DOUBLE__ 12
-#elif defined(__X86_64__)
-#define __SIZEOF_LONG_DOUBLE__ 16
-#elif defined(__arm__)
-#define __SIZEOF_LONG_DOUBLE__ 8
-#else
-#define __SIZEOF_LONG_DOUBLE__ 8
-#endif
-#endif /* !__SIZEOF_LONG_DOUBLE__ */
-
-#undef __ARCH_LONG_DOUBLE_IS_DOUBLE
-#if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
-#define __ARCH_LONG_DOUBLE_IS_DOUBLE 1
-#endif /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
-
 #if __SIZEOF_LONG__ == __SIZEOF_SIZE_T__
 #   define __LONGSIZE_TYPE__  __ATTR_W64 unsigned long int
 #   define __LONGSSIZE_TYPE__ __ATTR_W64 signed long int
@@ -1142,6 +1121,29 @@
 #endif /* __SIZEOF_DOUBLE__ != 8 */
 #endif /* !__ALIGNOF_DOUBLE__ */
 
+
+#ifndef __SIZEOF_LONG_DOUBLE__
+#ifdef _MSC_VER
+#define __SIZEOF_LONG_DOUBLE__ 8
+#elif (defined(__C67__) || defined(__i386__) || \
+       defined(__i386) || defined(i386))
+#define __SIZEOF_LONG_DOUBLE__ 12
+#elif defined(__X86_64__)
+#define __SIZEOF_LONG_DOUBLE__ 16
+#elif defined(__arm__)
+#define __SIZEOF_LONG_DOUBLE__ 8
+#elif defined(__COMPILER_HAVE_LONGDOUBLE)
+#define __SIZEOF_LONG_DOUBLE__ 8
+#endif
+#endif /* !__SIZEOF_LONG_DOUBLE__ */
+
+
+#ifdef __SIZEOF_LONG_DOUBLE__
+#undef __ARCH_LONG_DOUBLE_IS_DOUBLE
+#if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#define __ARCH_LONG_DOUBLE_IS_DOUBLE 1
+#endif /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
+
 #ifndef __ALIGNOF_LONG_DOUBLE__
 #if __ALIGNOF_INT64__ < 8
 #define __ALIGNOF_LONG_DOUBLE__ __ALIGNOF_INT64__
@@ -1151,7 +1153,8 @@
 #define __ALIGNOF_LONG_DOUBLE__ __SIZEOF_LONG_DOUBLE__
 #endif /* __SIZEOF_LONG_DOUBLE__ != 12 */
 #endif /* !__ALIGNOF_LONG_DOUBLE__ */
-#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __SIZEOF_LONG_DOUBLE__ */
+
 
 
 #ifndef __MAX_ALIGN_TYPE__

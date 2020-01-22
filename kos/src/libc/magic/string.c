@@ -248,7 +248,7 @@ memchr:([nonnull] void const *__restrict haystack, int needle, size_t n_bytes) -
 
 %(libc_fast)#if defined(__LIBC_BIND_OPTIMIZATIONS) && !defined(__NO_builtin_constant_p) && (__has_builtin(__builtin_strlen) && defined(__CRT_HAVE_strlen))
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-%(libc_fast)#define __libc_strlen(string) (__builtin_constant_p(string) ? __builtin_strlen(string) : __libc_slow_strlen(string))
+%(libc_fast)#define __libc_strlen(string) (__builtin_constant_p(string) ? __builtin_strlen(string) : __libc_core_strlen(string))
 %(libc_fast)#else /* __LIBC_BIND_OPTIMIZATIONS && !__NO_builtin_constant_p && __builtin_strlen && __CRT_HAVE_strlen */
 @@Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')')
 [libc][kernel][std][ATTR_WUNUSED][ATTR_PURE][nobuiltin]

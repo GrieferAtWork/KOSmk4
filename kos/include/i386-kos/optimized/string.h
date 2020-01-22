@@ -27,7 +27,7 @@
     !defined(__NO_builtin_constant_p)
 #include <hybrid/host.h>
 #ifndef _LIBC_SLOW_STRING_H
-#include <libc/slow/string.h>
+#include <libc/core/string.h>
 #endif /* !_LIBC_SLOW_STRING_H */
 #ifndef __COMPILER_HAVE_GCC_ASM
 #include <asm/intrin.h>
@@ -260,7 +260,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 		/* XXX: Implement using intrinsic functions? */
 #endif /* !__COMPILER_HAVE_GCC_ASM */
 	}
-	return __libc_slow_memcpy(__dst, __src, __n_bytes);
+	return __libc_core_memcpy(__dst, __src, __n_bytes);
 }
 
 #define __fast_mempcpy_defined 1
@@ -445,7 +445,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 		/* XXX: Implement using intrinsic functions? */
 #endif /* !__COMPILER_HAVE_GCC_ASM */
 	}
-	return __libc_slow_mempcpy(__dst, __src, __n_bytes);
+	return __libc_core_mempcpy(__dst, __src, __n_bytes);
 }
 
 /* TODO: memcpy[w/l/q] */

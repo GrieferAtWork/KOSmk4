@@ -25,7 +25,7 @@
 #if !defined(__NO_ATTR_FORCEINLINE) && \
     !defined(__NO_builtin_constant_p) && \
      __has_builtin(__builtin_va_arg_pack)
-#include <libc/slow/error.h>
+#include <libc/core/error.h>
 
 __SYSDECL_BEGIN
 __NAMESPACE_FAST_BEGIN

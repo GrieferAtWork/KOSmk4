@@ -24,7 +24,7 @@ local copyright =
  *   - /kos/include/string.h
  *   - /kos/include/local/string/[*].h  (all of them; 222 files at the time of this being written)
  *   - /kos/include/libc/string.h
- *   - /kos/include/libc/slow/string.h
+ *   - /kos/include/libc/core/string.h
  *   - /kos/src/libc/auto/string.h
  *   - /kos/src/libc/auto/string.c
  *   - /kos/src/libc/user/string.h
@@ -139,8 +139,8 @@ function key_underscore(x: string): string {
 function key_libc(x: string): string {
 	return "__libc_" + x;
 }
-function key_libc_slow(x: string): string {
-	return "__libc_slow_" + x;
+function key_libc_core(x: string): string {
+	return "__libc_core_" + x;
 }
 function key_libclocal(x: string): string {
 	return "__LIBC_LOCAL_NAME({})".format({ x.replace("-", "_") });
@@ -157,8 +157,8 @@ function key_sanitize_for_guard(x: string): string {
 function key_libc_guard(x: string): string {
 	return "_LIBC_{}_H".format({ key_sanitize_for_guard(x) });
 }
-function key_libc_slow_guard(x: string): string {
-	return "_LIBC_SLOW_{}_H".format({ key_sanitize_for_guard(x) });
+function key_libc_core_guard(x: string): string {
+	return "_LIBC_CORE_{}_H".format({ key_sanitize_for_guard(x) });
 }
 function key_std_guard(x: string): string {
 	return "_{}_H".format({ key_sanitize_for_guard(x) });
@@ -5381,7 +5381,7 @@ do_return_crt:
 			      "#define " << guard_name << " 1\n";
 		}
 		local is_first = true;
-		if (keyname === key_libc || keyname === key_libc_slow) {
+		if (keyname === key_libc || keyname === key_libc_core) {
 			/* ... */
 		} else if (namespace_name !is none && guarded_function) {
 			fp << "#ifdef __" << my_name << "_defined\n";
@@ -6872,7 +6872,7 @@ for (local comnam, com: components) {
 try fs.mkdir("include"); catch (...);
 try fs.mkdir("include/local"); catch (...);
 try fs.mkdir("include/libc"); catch (...);
-try fs.mkdir("include/libc/slow"); catch (...);
+try fs.mkdir("include/libc/core"); catch (...);
 try fs.mkdir("src"); catch (...);
 try fs.mkdir("src/libc"); catch (...);
 try fs.mkdir("src/libc/auto"); catch (...);
@@ -6919,7 +6919,7 @@ for (local comnam, funcs: components) {
 	}
 }
 
-function write_libc_header(fp, comnam, functions, has_slow_header) {
+function write_libc_header(fp, comnam, functions, has_core_header) {
 	local guard_name = key_libc_guard(comnam);
 	fp << copyright << "\n"
 	      "#ifndef " << guard_name << "\n"
@@ -6947,8 +6947,8 @@ function write_libc_header(fp, comnam, functions, has_slow_header) {
 		      "#include <optimized/" << comnam << ".h>\n"
 		      "#endif /* __LIBC_BIND_OPTIMIZATIONS */\n";
 	}
-	if (has_slow_header)
-		fp << "#include \"slow/" << comnam << ".h\"\n";
+	if (has_core_header)
+		fp << "#include \"core/" << comnam << ".h\"\n";
 	fp << "\n";
 	for (local f: functions) {
 		if (f is IntermediateString) {
@@ -6966,7 +6966,7 @@ function write_libc_header(fp, comnam, functions, has_slow_header) {
 		print "\tfunction:", key_libc(f.name);
 		local hasLibcGuard = f.get_dependency_string() !in ["", "1"];
 		local libc_name = key_libc(f.name);
-		local slow_name = key_libc_slow(f.name);
+		local core_name = key_libc_core(f.name);
 		if (f.has_fast_implementation) {
 			local symbol_name = f.name;
 			if (f.block is FunctionAlias) {
@@ -6983,26 +6983,26 @@ function write_libc_header(fp, comnam, functions, has_slow_header) {
 				"(__NAMESPACE_FAST_SYM {})".format({ key_fastimpl(symbol_name) }),
 				symbol_name, dont_cast: true);
 			if (hasLibcGuard) {
-				fp << "#elif defined(__" << slow_name << "_defined)\n";
-				f.print_macro_alias(fp, libc_name, slow_name, f.name, dont_cast: true);
+				fp << "#elif defined(__" << core_name << "_defined)\n";
+				f.print_macro_alias(fp, libc_name, core_name, f.name, dont_cast: true);
 				fp << "#else /* " << symbol_name << "... */\n";
 				fp << "#undef __" << libc_name << "_defined\n";
 				fp << "#endif /* !" << symbol_name << "... */\n";
 			} else {
 				fp << "#else /* __fast_" << symbol_name << "_defined */\n";
-				f.print_macro_alias(fp, libc_name, slow_name, f.name, dont_cast: true);
+				f.print_macro_alias(fp, libc_name, core_name, f.name, dont_cast: true);
 				fp << "#endif /* !__fast_" << symbol_name << "_defined */\n";
 			}
 			if (hasLibcGuard)
 				fp << "#endif /* !__" << libc_name << "_defined */\n";
 		} else {
 			if (hasLibcGuard) {
-				fp << "#if !defined(__" << libc_name << "_defined) && defined(__" << slow_name << "_defined)\n";
+				fp << "#if !defined(__" << libc_name << "_defined) && defined(__" << core_name << "_defined)\n";
 				fp << "#define __" << libc_name << "_defined 1\n";
 			}
-			f.print_macro_alias(fp, libc_name, slow_name, f.name, dont_cast: true);
+			f.print_macro_alias(fp, libc_name, core_name, f.name, dont_cast: true);
 			if (hasLibcGuard)
-				fp << "#endif /* !__" << libc_name << "_defined && __" << slow_name << "_defined */\n";
+				fp << "#endif /* !__" << libc_name << "_defined && __" << core_name << "_defined */\n";
 		}
 	}
 	fp << "\n"
@@ -7010,8 +7010,8 @@ function write_libc_header(fp, comnam, functions, has_slow_header) {
 	      "\n"
 	      "#endif /* !" << guard_name << " */\n";
 }
-function write_libc_slow_header(fp, comnam, functions) {
-	local guard_name = key_libc_slow_guard(comnam);
+function write_libc_core_header(fp, comnam, functions) {
+	local guard_name = key_libc_core_guard(comnam);
 	fp << copyright << "\n"
 	      "#ifndef " << guard_name << "\n"
 	      "#define " << guard_name << " 1\n"
@@ -7086,7 +7086,7 @@ function write_libc_slow_header(fp, comnam, functions) {
 		f.has_fast_implementation = false;
 		f.generate_header_block(
 			fp: fp,
-			keyname: key_libc_slow,
+			keyname: key_libc_core,
 			namespace_name: none,
 			include_overloads: false,
 			with_guard: f.get_dependency_string() !in ["", "1"],
@@ -7106,13 +7106,13 @@ function write_libc_slow_header(fp, comnam, functions) {
 print;
 for (local comnam, funcs: components) {
 	local libc_fast_functions = [];
-	local libc_slow_functions = [];
+	local libc_core_functions = [];
 	for (local f: funcs) {
 		if (f is IntermediateString) {
 			if ("libc_fast" in f.locations)
 				libc_fast_functions.append(f);
-			if ("libc_slow" in f.locations)
-				libc_slow_functions.append(f);
+			if ("libc_core" in f.locations)
+				libc_core_functions.append(f);
 			continue;
 		}
 //		if (f is ExternFunction)
@@ -7123,22 +7123,22 @@ for (local comnam, funcs: components) {
 			continue;
 		if (f.export_as_libc) {
 			libc_fast_functions.append(f);
-			libc_slow_functions.append(f);
+			libc_core_functions.append(f);
 		}
 	}
-	if (!libc_fast_functions && !libc_slow_functions)
+	if (!libc_fast_functions && !libc_core_functions)
 		continue;
 	local compath = "include/libc/{}.h".format({ comnam });
-	local slow_compath = "include/libc/slow/{}.h".format({ comnam });
+	local core_compath = "include/libc/core/{}.h".format({ comnam });
 	print "Creating combinatory libc-header: ", compath;
-	if (libc_fast_functions || libc_slow_functions) {
+	if (libc_fast_functions || libc_core_functions) {
 		write_hashed_file(compath, [](fp) {
-			write_libc_header(fp, comnam, libc_fast_functions, libc_slow_functions);
+			write_libc_header(fp, comnam, libc_fast_functions, libc_core_functions);
 		});
 	}
-	if (libc_slow_functions) {
-		write_hashed_file(slow_compath, [](fp) {
-			write_libc_slow_header(fp, comnam, libc_slow_functions);
+	if (libc_core_functions) {
+		write_hashed_file(core_compath, [](fp) {
+			write_libc_core_header(fp, comnam, libc_core_functions);
 		});
 	}
 }
