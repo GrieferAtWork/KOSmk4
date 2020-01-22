@@ -1457,9 +1457,11 @@ NOTHROW(LIBCCALL libc_rint)(double x)
 /*AUTO*/{
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_rintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
 }
 /*[[[end:rint]]]*/
 
@@ -1522,10 +1524,14 @@ NOTHROW(LIBCCALL libc_rintf)(float x)
 /*[[[body:rintf]]]*/
 /*AUTO*/{
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (double)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)x);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
-	return (double)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)x);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_rintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (float)libc_rint((double)x);
+#endif /* !... */
 }
 /*[[[end:rintf]]]*/
 
@@ -1587,7 +1593,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.rintl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x)
 /*[[[body:rintl]]]*/
 /*AUTO*/{
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_rintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
 	return (__LONGDOUBLE)libc_rint((double)x);
+#endif /* !... */
 }
 /*[[[end:rintl]]]*/
 

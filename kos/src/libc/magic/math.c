@@ -274,15 +274,15 @@ tanl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 
 @@Hyperbolic cosine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__cosh)][nothrow][crtbuiltin]
- cosh:(double x) -> double; /* TODO */
+cosh:(double x) -> double; /* TODO */
 
 @@Hyperbolic sine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinh)][nothrow][crtbuiltin]
- sinh:(double x) -> double; /* TODO */
+sinh:(double x) -> double; /* TODO */
 
 @@Hyperbolic tangent of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanh)][nothrow][crtbuiltin]
- tanh:(double x) -> double; /* TODO */
+tanh:(double x) -> double; /* TODO */
 
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__coshf)][nothrow][crtbuiltin]
@@ -311,15 +311,15 @@ tanhl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 %(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Hyperbolic arc cosine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosh)][nothrow][crtbuiltin]
- acosh:(double x) -> double; /* TODO */
+acosh:(double x) -> double; /* TODO */
 
 @@Hyperbolic arc sine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinh)][nothrow][crtbuiltin]
- asinh:(double x) -> double; /* TODO */
+asinh:(double x) -> double; /* TODO */
 
 @@Hyperbolic arc tangent of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanh)][nothrow][crtbuiltin]
- atanh:(double x) -> double; /* TODO */
+atanh:(double x) -> double; /* TODO */
 
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acoshf)][nothrow][crtbuiltin]
@@ -1156,13 +1156,17 @@ tgammal:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 @@Return the integer nearest X in the direction of the prevailing rounding mode
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__rint)][crtbuiltin]
 [requires_include(<ieee754.h>)][dependency_include(<libm/rint.h>)][userimpl]
-[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
 rint:(double x) -> double {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_rintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
 }
 
 
@@ -1205,13 +1209,20 @@ ilogb:(double x) -> int; /* TODO */
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__rintf)][crtbuiltin]
 [requires_include(<ieee754.h>)][dependency_include(<libm/rint.h>)][userimpl][doc_alias(rint)]
-[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(rint))]
 rintf:(float x) -> float {
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
-	return (double)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)x);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
-	return (double)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)x);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+	return (float)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_rintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (float)rint((double)x);
+#endif /* !... */
 }
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterf)][crtbuiltin]
@@ -1257,7 +1268,22 @@ ilogbf:(float x) -> int %{auto_block(math)}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__rintl)][crtbuiltin]
-rintl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
+[requires_include(<ieee754.h>)][dependency_include(<libm/rint.h>)][userimpl][doc_alias(rint)]
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(rint))]
+rintl:(__LONGDOUBLE x) -> __LONGDOUBLE  {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_rintl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return (__LONGDOUBLE)rint((double)x);
+#endif /* !... */
+}
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterl)][crtbuiltin]
 [requires_include(<ieee754.h>)][dependency_include(<libm/nextafter.h>)][userimpl]

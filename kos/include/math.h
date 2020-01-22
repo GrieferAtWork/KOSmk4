@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x569e53a1 */
+/* HASH CRC-32:0x57af9fce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3229,7 +3229,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,rint,(double __x),(__x))
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,rint,(double __x),__rint,(__x))
 #else /* LIBC: rint */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/rint.h>
 __NAMESPACE_STD_BEGIN
@@ -3325,7 +3325,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,rintf,(float __x),(__x))
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,rintf,(float __x),__rintf,(__x))
 #else /* LIBC: rintf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 __NAMESPACE_STD_END
 #include <local/math/rintf.h>
 __NAMESPACE_STD_BEGIN
@@ -3417,15 +3417,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rintl,(__LONGDOUBL
 #elif defined(__CRT_HAVE___rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rintl,(__LONGDOUBLE __x),__rintl,(__x))
-#elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rintl,(__LONGDOUBLE __x),rint,(__x))
-#elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rintl,(__LONGDOUBLE __x),__rint,(__x))
 #else /* LIBC: rintl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 __NAMESPACE_STD_END
 #include <local/math/rintl.h>
 __NAMESPACE_STD_BEGIN
@@ -3603,7 +3597,7 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,nearbyint,(double __x),rint,(__x))
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,nearbyint,(double __x),__nearbyint,(__x))
 #else /* LIBC: rint */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/rint.h>
 __NAMESPACE_STD_BEGIN
@@ -3897,7 +3891,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyintf,(float __x),rintf,(__x))
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyintf,(float __x),__nearbyintf,(__x))
 #else /* LIBC: rintf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 __NAMESPACE_STD_END
 #include <local/math/rintf.h>
 __NAMESPACE_STD_BEGIN
@@ -4212,7 +4206,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyintl,(__LONGDOUBLE __x),
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyintl,(__LONGDOUBLE __x),__nearbyintl,(__x))
 #else /* LIBC: rintl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 __NAMESPACE_STD_END
 #include <local/math/rintl.h>
 __NAMESPACE_STD_BEGIN
@@ -5530,7 +5524,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,rint,(float __x),rintf,(
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,rint,(float __x),__rintf,(__x))
 #else /* LIBC: rintf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/rintf.h>
@@ -5783,13 +5777,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBL
 #elif defined(__CRT_HAVE___rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBLE __x),__rintl,(__x))
-#elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBLE __x),__rint,(__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#else /* LIBC: rintl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/rintl.h>
@@ -5797,6 +5787,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL rint)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); }
+#else /* CUSTOM: rintl */
+#undef none
+#endif /* rint... */
 #endif /* rint... */
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
 __EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL nextafter)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return __builtin_nextafterl(__x, __y); }
@@ -6025,7 +6018,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyint,(float __x),nearbyintf,(__x
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyint,(float __x),__nearbyintf,(__x))
 #else /* LIBC: nearbyintf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nearbyintf.h>
@@ -6427,7 +6420,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyint,(__LONGDOUBLE __x),n
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyint,(__LONGDOUBLE __x),__nearbyintl,(__x))
 #else /* LIBC: nearbyintl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nearbyintl.h>
@@ -10836,7 +10829,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__rint,(double __x),rin
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__rint,(double __x),(__x))
 #else /* LIBC: rint */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/rint.h>
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __rint)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rint))(__x); }
@@ -10909,7 +10902,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__rintf,(float __x),rint
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__rintf,(float __x),(__x))
 #else /* LIBC: rintf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 #include <local/math/rintf.h>
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __rintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); }
@@ -10979,15 +10972,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__rintl,(__LONGDO
 #elif defined(__CRT_HAVE___rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__rintl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__rintl,(__LONGDOUBLE __x),rint,(__x))
-#elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the integer nearest X in the direction of the prevailing rounding mode */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__rintl,(__LONGDOUBLE __x),__rint,(__x))
 #else /* LIBC: rintl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 #include <local/math/rintl.h>
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __rintl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); }
@@ -11122,7 +11109,7 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__nearbyint,(double __x),nearbyint,(
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__nearbyint,(double __x),(__x))
 #else /* LIBC: nearbyint */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/nearbyint.h>
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
@@ -11325,7 +11312,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__nearbyintf,(float __x),nearbyintf,(
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__nearbyintf,(float __x),(__x))
 #else /* LIBC: nearbyintf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 #include <local/math/nearbyintf.h>
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
@@ -11598,7 +11585,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nearbyintl,(__LONGDOUBLE __x
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nearbyintl,(__LONGDOUBLE __x),(__x))
 #else /* LIBC: nearbyintl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 #include <local/math/nearbyintl.h>
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */

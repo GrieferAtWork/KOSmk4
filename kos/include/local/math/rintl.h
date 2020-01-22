@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50d8aa09 */
+/* HASH CRC-32:0xf25e9fd7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,9 @@
  */
 #ifndef __local_rintl_defined
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 #define __local_rintl_defined 1
+#include <libm/rint.h>
 /* Dependency: "rint" from "math" */
 #ifndef ____localdep_rint_defined
 #define ____localdep_rint_defined 1
@@ -36,7 +37,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_rint,(double __x),__rint,(__x))
 #else /* LIBC: rint */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/rint.h>
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 #define __localdep_rint (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rint))
@@ -50,9 +51,17 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __LOCAL_LIBC(rintl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(rintl))(__LONGDOUBLE __x) {
-#line 1261 "kos/src/libc/magic/math.c"
+#line 1277 "kos/src/libc/magic/math.c"
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_rintl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_rint((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_rintf((__IEEE754_FLOAT_TYPE__)__x);
+#else /* ... */
 	return (__LONGDOUBLE)__localdep_rint((double)__x);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __CRT_HAVE_rint || __CRT_HAVE___rint */
+#endif /* __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_rint || __CRT_HAVE___rint */
 #endif /* !__local_rintl_defined */

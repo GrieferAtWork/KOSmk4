@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b8cd878 */
+/* HASH CRC-32:0xc410b831 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -202,7 +202,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmax") double
 NOTHROW(LIBCCALL libc_fmax)(double x,
                             double y) {
-#line 1420 "kos/src/libc/magic/math.c"
+#line 1446 "kos/src/libc/magic/math.c"
 	return x < y ? y : x;
 }
 
@@ -211,7 +211,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmin") double
 NOTHROW(LIBCCALL libc_fmin)(double x,
                             double y) {
-#line 1426 "kos/src/libc/magic/math.c"
+#line 1452 "kos/src/libc/magic/math.c"
 	return x < y ? x : y;
 }
 
@@ -221,7 +221,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fma") double
 NOTHROW(LIBCCALL libc_fma)(double x,
                            double y,
                            double z) {
-#line 1432 "kos/src/libc/magic/math.c"
+#line 1458 "kos/src/libc/magic/math.c"
 	return (x * y) + z;
 }
 
@@ -230,7 +230,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaxf") float
 NOTHROW(LIBCCALL libc_fmaxf)(float x,
                              float y) {
-#line 1420 "kos/src/libc/magic/math.c"
+#line 1446 "kos/src/libc/magic/math.c"
 	return x < y ? y : x;
 }
 
@@ -239,7 +239,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fminf") float
 NOTHROW(LIBCCALL libc_fminf)(float x,
                              float y) {
-#line 1426 "kos/src/libc/magic/math.c"
+#line 1452 "kos/src/libc/magic/math.c"
 	return x < y ? x : y;
 }
 
@@ -249,7 +249,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaf") float
 NOTHROW(LIBCCALL libc_fmaf)(float x,
                             float y,
                             float z) {
-#line 1432 "kos/src/libc/magic/math.c"
+#line 1458 "kos/src/libc/magic/math.c"
 	return (x * y) + z;
 }
 
@@ -258,7 +258,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaxl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fmaxl)(__LONGDOUBLE x,
                              __LONGDOUBLE y) {
-#line 1420 "kos/src/libc/magic/math.c"
+#line 1446 "kos/src/libc/magic/math.c"
 	return x < y ? y : x;
 }
 
@@ -267,7 +267,7 @@ INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fminl") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fminl)(__LONGDOUBLE x,
                              __LONGDOUBLE y) {
-#line 1426 "kos/src/libc/magic/math.c"
+#line 1452 "kos/src/libc/magic/math.c"
 	return x < y ? x : y;
 }
 
@@ -277,7 +277,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmal") __LONGDOUBLE
 NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE x,
                             __LONGDOUBLE y,
                             __LONGDOUBLE z) {
-#line 1432 "kos/src/libc/magic/math.c"
+#line 1458 "kos/src/libc/magic/math.c"
 	return (x * y) + z;
 }
 

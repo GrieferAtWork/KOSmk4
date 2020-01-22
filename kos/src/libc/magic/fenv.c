@@ -130,7 +130,7 @@ fetestexcept:(int excepts) -> int {
 }
 
 @@Get current rounding direction
-[std][nothrow][ATTR_PURE][ATTR_WUNUSED]
+[std][nothrow][ATTR_PURE][ATTR_WUNUSED][libc]
 [fast][dependency_include(<bits/fenv-inline.h>)]
 fegetround:() -> int {
 	return @__inline_fegetround@();

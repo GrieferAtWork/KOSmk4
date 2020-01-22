@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x958712ae */
+/* HASH CRC-32:0xe09372c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(nextafterf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafterf))(float __x,
                                                     float __y) {
-#line 1224 "kos/src/libc/magic/math.c"
+#line 1235 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_nextafterf((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_FLOAT_TYPE__)__y);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7db3d385 */
+/* HASH CRC-32:0xb25c1d79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,13 @@
 /* Raise the supported exceptions represented by EXCEPTS */
 #define __libc_feraiseexcept __libc_slow_feraiseexcept
 #endif /* !__fast_feraiseexcept_defined */
+#ifdef __fast_fegetround_defined
+/* Get current rounding direction */
+#define __libc_fegetround (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetround))
+#else /* __fast_fegetround_defined */
+/* Get current rounding direction */
+#define __libc_fegetround __libc_slow_fegetround
+#endif /* !__fast_fegetround_defined */
 
 #endif /* __CC__ */
 

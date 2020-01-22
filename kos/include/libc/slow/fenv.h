@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1ba86da */
+/* HASH CRC-32:0x21931fcc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,14 @@ __CREDIRECT(,int,,__libc_slow_feraiseexcept,(int __excepts),feraiseexcept,(__exc
 /* Raise the supported exceptions represented by EXCEPTS */
 #define __libc_slow_feraiseexcept (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(feraiseexcept))
 #endif /* feraiseexcept... */
+#ifdef __CRT_HAVE_fegetround
+/* Get current rounding direction */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_fegetround,(void),fegetround,())
+#else /* LIBC: fegetround */
+#include <local/fenv/fegetround.h>
+/* Get current rounding direction */
+#define __libc_slow_fegetround (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fegetround))
+#endif /* fegetround... */
 
 __SYSDECL_END
 #endif /* __CC__ */
