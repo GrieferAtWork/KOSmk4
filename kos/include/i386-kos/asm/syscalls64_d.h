@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf429d4e */
+/* HASH CRC-32:0x3015f686 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -387,8 +387,8 @@
 #define __NR64_sendmmsg               0x133                          /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) */
 #define __NR64_setns                  0x134                          /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
 #define __NR64_getcpu                 0x135                          /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
-#define __NR64_process_vm_readv       0x136                          /* ssize_t process_vm_readv(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
-#define __NR64_process_vm_writev      0x137                          /* ssize_t process_vm_writev(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+#define __NR64_process_vm_readv       0x136                          /* ssize_t process_vm_readv(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+#define __NR64_process_vm_writev      0x137                          /* ssize_t process_vm_writev(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 #define __NR64_kcmp                   0x138                          /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
 #define __NR64_finit_module           0x139                          /* errno_t finit_module(int TODO_PROTOTYPE) */
 #define __NR64_sched_setattr          0x13a                          /* errno_t sched_setattr(int TODO_PROTOTYPE) */

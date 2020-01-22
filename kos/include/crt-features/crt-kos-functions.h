@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd6a76b8 */
+/* HASH CRC-32:0xa2fc3635 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1684,7 +1684,7 @@ __CRT_FUNCTION(printf,0,(),VA(1),(char const *__restrict,format),__STDC_INT_AS_S
 __CRT_FUNCTION(printf_unlocked,0,(),VA(1),(char const *__restrict,format),__STDC_INT_AS_SSIZE_T)
 __CRT_FUNCTION(prlimit,0,(),4,(pid_t,pid,__rlimit_resource_t,resource,struct rlimit const *,new_limit,struct rlimit *,old_limit),int)
 __CRT_FUNCTION(prlimit64,1,(__SIZEOF_RLIM32_T__ == __SIZEOF_RLIM64_T__,prlimit),4,(pid_t,pid,__rlimit_resource_t,resource,struct rlimit64 const *,new_limit,struct rlimit64 *,old_limit),int)
-__CRT_FUNCTION(process_vm_readv,0,(),6,(pid_t,pid,struct iovec const *,llocal_iov,unsigned long int,liovcnt,struct iovec const *,remote_iov,unsigned long int,riovcnt,unsigned long int,flags),ssize_t)
+__CRT_FUNCTION(process_vm_readv,0,(),6,(pid_t,pid,struct iovec const *,local_iov,unsigned long int,liovcnt,struct iovec const *,remote_iov,unsigned long int,riovcnt,unsigned long int,flags),ssize_t)
 __CRT_FUNCTION(process_vm_writev,0,(),6,(pid_t,pid,struct iovec const *,local_iov,unsigned long int,liovcnt,struct iovec const *,remote_iov,unsigned long int,riovcnt,unsigned long int,flags),ssize_t)
 __CRT_FUNCTION(profil,0,(),4,(unsigned short int *,sample_buffer,size_t,size,size_t,offset,unsigned int,scale),int)
 __CRT_FUNCTION(pselect,0,(),6,(__STDC_INT_AS_SIZE_T,nfds,fd_set *__restrict,readfds,fd_set *__restrict,writefds,fd_set *__restrict,exceptfds,struct timespec const *__restrict,timeout,sigset_t const *__restrict,sigmask),__STDC_INT_AS_SSIZE_T)

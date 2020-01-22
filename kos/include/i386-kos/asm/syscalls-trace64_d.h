@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe53f9b9 */
+/* HASH CRC-32:0x25703d98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -719,15 +719,15 @@
 #define __NR64AN1_getcpu                 node
 #define __NR64AN2_getcpu                 tcache
 #define __NR64AN0_process_vm_readv       pid
-#define __NR64AN1_process_vm_readv       lvec
+#define __NR64AN1_process_vm_readv       local_iov
 #define __NR64AN2_process_vm_readv       liovcnt
-#define __NR64AN3_process_vm_readv       rvec
+#define __NR64AN3_process_vm_readv       remote_iov
 #define __NR64AN4_process_vm_readv       riovcnt
 #define __NR64AN5_process_vm_readv       flags
 #define __NR64AN0_process_vm_writev      pid
-#define __NR64AN1_process_vm_writev      lvec
+#define __NR64AN1_process_vm_writev      local_iov
 #define __NR64AN2_process_vm_writev      liovcnt
-#define __NR64AN3_process_vm_writev      rvec
+#define __NR64AN3_process_vm_writev      remote_iov
 #define __NR64AN4_process_vm_writev      riovcnt
 #define __NR64AN5_process_vm_writev      flags
 #define __NR64AN0_kcmp                   pid1
@@ -2514,29 +2514,29 @@
 #define __NR64ATRF2_getcpu                 "%p"
 #define __NR64ATRA2_getcpu(cpu, node, tcache) ,tcache
 #define __NR64ATRF0_process_vm_readv       "%" PRIdSIZ
-#define __NR64ATRA0_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(intptr_t)(pid)
+#define __NR64ATRA0_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,(intptr_t)(pid)
 #define __NR64ATRF1_process_vm_readv       "%p"
-#define __NR64ATRA1_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,lvec
+#define __NR64ATRA1_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,local_iov
 #define __NR64ATRF2_process_vm_readv       "%" PRIuSIZ
-#define __NR64ATRA2_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,liovcnt
+#define __NR64ATRA2_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,liovcnt
 #define __NR64ATRF3_process_vm_readv       "%p"
-#define __NR64ATRA3_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,rvec
+#define __NR64ATRA3_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,remote_iov
 #define __NR64ATRF4_process_vm_readv       "%" PRIuSIZ
-#define __NR64ATRA4_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,riovcnt
+#define __NR64ATRA4_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,riovcnt
 #define __NR64ATRF5_process_vm_readv       "%#" PRIxSIZ
-#define __NR64ATRA5_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(uintptr_t)(flags)
+#define __NR64ATRA5_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_process_vm_writev      "%" PRIdSIZ
-#define __NR64ATRA0_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(intptr_t)(pid)
+#define __NR64ATRA0_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,(intptr_t)(pid)
 #define __NR64ATRF1_process_vm_writev      "%p"
-#define __NR64ATRA1_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,lvec
+#define __NR64ATRA1_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,local_iov
 #define __NR64ATRF2_process_vm_writev      "%" PRIuSIZ
-#define __NR64ATRA2_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,liovcnt
+#define __NR64ATRA2_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,liovcnt
 #define __NR64ATRF3_process_vm_writev      "%p"
-#define __NR64ATRA3_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,rvec
+#define __NR64ATRA3_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,remote_iov
 #define __NR64ATRF4_process_vm_writev      "%" PRIuSIZ
-#define __NR64ATRA4_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,riovcnt
+#define __NR64ATRA4_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,riovcnt
 #define __NR64ATRF5_process_vm_writev      "%#" PRIxSIZ
-#define __NR64ATRA5_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(uintptr_t)(flags)
+#define __NR64ATRA5_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,(uintptr_t)(flags)
 #define __NR64ATRF0_kcmp                   "%" PRIdSIZ
 #define __NR64ATRA0_kcmp(pid1, pid2, type, idx1, idx2) ,(intptr_t)(pid1)
 #define __NR64ATRF1_kcmp                   "%" PRIdSIZ

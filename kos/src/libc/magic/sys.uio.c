@@ -42,7 +42,7 @@ __SYSDECL_BEGIN
 %#ifdef __USE_GNU
 [cp][ATTR_WUNUSED]
 process_vm_readv:($pid_t pid,
-                  [inp_opt(liovcnt)] struct iovec const *llocal_iov, unsigned long int liovcnt,
+                  [inp_opt(liovcnt)] struct iovec const *local_iov, unsigned long int liovcnt,
                   [inp_opt(riovcnt)] struct iovec const *remote_iov, unsigned long int riovcnt,
                   unsigned long int flags) -> ssize_t;
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdfd970c */
+/* HASH CRC-32:0x2d569aaa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9455,7 +9455,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getcpu)
 	.cfi_endproc
 END(__x86_asm64_syscall_getcpu)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_readv)
 	.cfi_startproc simple
@@ -9486,7 +9486,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm64_syscall_process_vm_readv)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_writev)
 	.cfi_startproc simple
@@ -22702,7 +22702,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setns)
 	.cfi_endproc
 END(__x86_asm32_int80_setns)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	.cfi_startproc simple
@@ -22739,7 +22739,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_int80_process_vm_readv)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
 	.cfi_startproc simple
@@ -28698,7 +28698,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sendmmsg, __x86_asm32_int80_sendmm
 /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setns, __x86_asm32_int80_setns)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	.cfi_startproc simple
@@ -28736,7 +28736,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_sysenter_process_vm_readv)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_writev)
 	.cfi_startproc simple
@@ -34141,7 +34141,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setns)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setns)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_readv)
 	.cfi_startproc
@@ -34156,7 +34156,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_process_vm_readv)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_writev)
 	.cfi_startproc

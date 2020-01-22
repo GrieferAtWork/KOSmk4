@@ -21,6 +21,10 @@
 #define GUARD_LIBC_USER_SYS_UIO_C 1
 
 #include "../api.h"
+/**/
+
+#include <kos/syscalls.h>
+
 #include "sys.uio.h"
 
 DECL_BEGIN
@@ -31,26 +35,23 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:process_vm_readv,hash:CRC-32=0xd51fcc4]]]*/
+/*[[[head:process_vm_readv,hash:CRC-32=0xa24e8111]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.process_vm_readv") ssize_t
 NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid,
-                                            struct iovec const *llocal_iov,
+                                            struct iovec const *local_iov,
                                             unsigned long int liovcnt,
                                             struct iovec const *remote_iov,
                                             unsigned long int riovcnt,
                                             unsigned long int flags)
 /*[[[body:process_vm_readv]]]*/
 {
-	(void)pid;
-	(void)llocal_iov;
-	(void)liovcnt;
-	(void)remote_iov;
-	(void)riovcnt;
-	(void)flags;
-	CRT_UNIMPLEMENTED("process_vm_readv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	result = sys_process_vm_readv(pid,
+	                              local_iov, (size_t)liovcnt,
+	                              remote_iov, (size_t)riovcnt,
+	                              (syscall_ulong_t)flags);
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:process_vm_readv]]]*/
 
@@ -64,15 +65,12 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
                                              unsigned long int flags)
 /*[[[body:process_vm_writev]]]*/
 {
-	(void)pid;
-	(void)local_iov;
-	(void)liovcnt;
-	(void)remote_iov;
-	(void)riovcnt;
-	(void)flags;
-	CRT_UNIMPLEMENTED("process_vm_writev"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	result = sys_process_vm_writev(pid,
+	                               local_iov, (size_t)liovcnt,
+	                               remote_iov, (size_t)riovcnt,
+	                               (syscall_ulong_t)flags);
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:process_vm_writev]]]*/
 
@@ -84,12 +82,9 @@ NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
                                  __STDC_INT_AS_SIZE_T count)
 /*[[[body:readv]]]*/
 {
-	(void)fd;
-	(void)iovec;
-	(void)count;
-	CRT_UNIMPLEMENTED("readv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	result = sys_readv(fd, iovec, (size_t)count);
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:readv]]]*/
 
@@ -101,12 +96,9 @@ NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
                                   __STDC_INT_AS_SIZE_T count)
 /*[[[body:writev]]]*/
 {
-	(void)fd;
-	(void)iovec;
-	(void)count;
-	CRT_UNIMPLEMENTED("writev"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	result = sys_writev(fd, iovec, (size_t)count);
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:writev]]]*/
 
@@ -119,13 +111,9 @@ NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
                                   off_t offset)
 /*[[[body:preadv]]]*/
 {
-	(void)fd;
-	(void)iovec;
-	(void)count;
-	(void)offset;
-	CRT_UNIMPLEMENTED("preadv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	result = sys_preadv(fd, iovec, (size_t)count, (uint64_t)(pos_t)offset);
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:preadv]]]*/
 
@@ -138,13 +126,9 @@ NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
                                    off_t offset)
 /*[[[body:pwritev]]]*/
 {
-	(void)fd;
-	(void)iovec;
-	(void)count;
-	(void)offset;
-	CRT_UNIMPLEMENTED("pwritev"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	result = sys_pwritev(fd, iovec, (size_t)count, (uint64_t)(pos_t)offset);
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:pwritev]]]*/
 
@@ -160,13 +144,9 @@ NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd,
                                     off64_t offset)
 /*[[[body:preadv64]]]*/
 {
-	(void)fd;
-	(void)iovec;
-	(void)count;
-	(void)offset;
-	CRT_UNIMPLEMENTED("preadv64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	result = sys_preadv(fd, iovec, (size_t)count, (uint64_t)(pos64_t)offset);
+	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
 /*[[[end:preadv64]]]*/
@@ -183,13 +163,9 @@ NOTHROW_RPC(LIBCCALL libc_pwritev64)(fd_t fd,
                                      off64_t offset)
 /*[[[body:pwritev64]]]*/
 {
-	(void)fd;
-	(void)iovec;
-	(void)count;
-	(void)offset;
-	CRT_UNIMPLEMENTED("pwritev64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	result = sys_pwritev(fd, iovec, (size_t)count, (uint64_t)(pos64_t)offset);
+	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
 /*[[[end:pwritev64]]]*/

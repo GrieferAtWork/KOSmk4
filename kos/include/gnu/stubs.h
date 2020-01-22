@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f53d5ba */
+/* HASH CRC-32:0x1f506c59 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -392,10 +392,6 @@
 #define __stub_posix_spawnattr_setsigdefault 1
 #define __stub_posix_spawnattr_setsigmask 1
 #define __stub_posix_spawnp 1
-#define __stub_preadv 1
-#define __stub_preadv64 1
-#define __stub_process_vm_readv 1
-#define __stub_process_vm_writev 1
 #define __stub_psiginfo 1
 #define __stub_psignal 1
 #define __stub_pthread_atfork 1
@@ -484,8 +480,6 @@
 #define __stub_putspent 1
 #define __stub_pututline 1
 #define __stub_pututxline 1
-#define __stub_pwritev 1
-#define __stub_pwritev64 1
 #define __stub_random_r 1
 #define __stub_rcmd 1
 #define __stub_rcmd_af 1
@@ -493,7 +487,6 @@
 #define __stub_re_set_registers 1
 #define __stub_readdir64_r 1
 #define __stub_readdir_r 1
-#define __stub_readv 1
 #define __stub_regcomp 1
 #define __stub_regerror 1
 #define __stub_regexec 1
@@ -593,7 +586,6 @@
 #define __stub_wfreadlinkat 1
 #define __stub_wgetlogin 1
 #define __stub_wgetlogin_r 1
-#define __stub_writev 1
 #define __stub_wttyname 1
 #define __stub_wttyname_r 1
 #define __stub_y0 1

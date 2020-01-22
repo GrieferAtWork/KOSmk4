@@ -10,7 +10,6 @@ Add support for *_chk variants (using __builtin_object_size())
 <fts.h>
 <ftw.h>
 <iconv.h>
-<lastlog.h>
 <regexp.h>
 <resolv.h>
 <stab.h>

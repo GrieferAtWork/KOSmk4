@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x241e3f0f */
+/* HASH CRC-32:0x18d45adf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -592,15 +592,15 @@
 #define __NRAN2_sendmmsg               vlen
 #define __NRAN3_sendmmsg               flags
 #define __NRAN0_process_vm_readv       pid
-#define __NRAN1_process_vm_readv       lvec
+#define __NRAN1_process_vm_readv       local_iov
 #define __NRAN2_process_vm_readv       liovcnt
-#define __NRAN3_process_vm_readv       rvec
+#define __NRAN3_process_vm_readv       remote_iov
 #define __NRAN4_process_vm_readv       riovcnt
 #define __NRAN5_process_vm_readv       flags
 #define __NRAN0_process_vm_writev      pid
-#define __NRAN1_process_vm_writev      lvec
+#define __NRAN1_process_vm_writev      local_iov
 #define __NRAN2_process_vm_writev      liovcnt
-#define __NRAN3_process_vm_writev      rvec
+#define __NRAN3_process_vm_writev      remote_iov
 #define __NRAN4_process_vm_writev      riovcnt
 #define __NRAN5_process_vm_writev      flags
 #define __NRAN0_kcmp                   pid1
@@ -2049,29 +2049,29 @@
 #define __NRATRF3_sendmmsg               "%#" PRIxSIZ
 #define __NRATRA3_sendmmsg(sockfd, vmessages, vlen, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_process_vm_readv       "%" PRIdSIZ
-#define __NRATRA0_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(intptr_t)(pid)
+#define __NRATRA0_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,(intptr_t)(pid)
 #define __NRATRF1_process_vm_readv       "%p"
-#define __NRATRA1_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,lvec
+#define __NRATRA1_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,local_iov
 #define __NRATRF2_process_vm_readv       "%" PRIuSIZ
-#define __NRATRA2_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,liovcnt
+#define __NRATRA2_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,liovcnt
 #define __NRATRF3_process_vm_readv       "%p"
-#define __NRATRA3_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,rvec
+#define __NRATRA3_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,remote_iov
 #define __NRATRF4_process_vm_readv       "%" PRIuSIZ
-#define __NRATRA4_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,riovcnt
+#define __NRATRA4_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,riovcnt
 #define __NRATRF5_process_vm_readv       "%#" PRIxSIZ
-#define __NRATRA5_process_vm_readv(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(uintptr_t)(flags)
+#define __NRATRA5_process_vm_readv(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_process_vm_writev      "%" PRIdSIZ
-#define __NRATRA0_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(intptr_t)(pid)
+#define __NRATRA0_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,(intptr_t)(pid)
 #define __NRATRF1_process_vm_writev      "%p"
-#define __NRATRA1_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,lvec
+#define __NRATRA1_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,local_iov
 #define __NRATRF2_process_vm_writev      "%" PRIuSIZ
-#define __NRATRA2_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,liovcnt
+#define __NRATRA2_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,liovcnt
 #define __NRATRF3_process_vm_writev      "%p"
-#define __NRATRA3_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,rvec
+#define __NRATRA3_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,remote_iov
 #define __NRATRF4_process_vm_writev      "%" PRIuSIZ
-#define __NRATRA4_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,riovcnt
+#define __NRATRA4_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,riovcnt
 #define __NRATRF5_process_vm_writev      "%#" PRIxSIZ
-#define __NRATRA5_process_vm_writev(pid, lvec, liovcnt, rvec, riovcnt, flags) ,(uintptr_t)(flags)
+#define __NRATRA5_process_vm_writev(pid, local_iov, liovcnt, remote_iov, riovcnt, flags) ,(uintptr_t)(flags)
 #define __NRATRF0_kcmp                   "%" PRIdSIZ
 #define __NRATRA0_kcmp(pid1, pid2, type, idx1, idx2) ,(intptr_t)(pid1)
 #define __NRATRF1_kcmp                   "%" PRIdSIZ

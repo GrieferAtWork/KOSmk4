@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8d67bc */
+/* HASH CRC-32:0x11a6098 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -390,8 +390,8 @@
 #define SYS_sendmmsg               __NR_sendmmsg               /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) */
 #define SYS_setns                  __NR_setns                  /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
 #define SYS_getcpu                 __NR_getcpu                 /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
-#define SYS_process_vm_readv       __NR_process_vm_readv       /* ssize_t process_vm_readv(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
-#define SYS_process_vm_writev      __NR_process_vm_writev      /* ssize_t process_vm_writev(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+#define SYS_process_vm_readv       __NR_process_vm_readv       /* ssize_t process_vm_readv(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+#define SYS_process_vm_writev      __NR_process_vm_writev      /* ssize_t process_vm_writev(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 #define SYS_kcmp                   __NR_kcmp                   /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
 #define SYS_finit_module           __NR_finit_module           /* errno_t finit_module(int TODO_PROTOTYPE) */
 #define SYS_sched_setattr          __NR_sched_setattr          /* errno_t sched_setattr(int TODO_PROTOTYPE) */

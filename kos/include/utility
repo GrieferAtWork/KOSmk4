@@ -22,15 +22,16 @@
 
 #include <__stdcxx.h>
 #include <features.h>
+
 #include <initializer_list>
 
 #ifdef __USE_ISOCXX11
 #include <bits/c++/forward.h>
 #include <bits/c++/move.h>
-#include <bits/c++/traits/declval.h>
-#include <bits/c++/traits/conditional.h>
-#include <bits/c++/traits/is_constructible.h>
 #include <bits/c++/traits/andor.h>
+#include <bits/c++/traits/conditional.h>
+#include <bits/c++/traits/declval.h>
+#include <bits/c++/traits/is_constructible.h>
 #endif /* __USE_ISOCXX11 */
 #ifdef __USE_ISOCXX14
 #include <bits/c++/integer_sequence.h>
@@ -38,26 +39,43 @@
 #ifdef __USE_ISOCXX17
 #include <bits/c++/traits/add_cv.h>
 #endif /* __USE_ISOCXX17 */
-#include <bits/c++/tuple.h>
 #include <bits/c++/pair.h>
+#include <bits/c++/tuple.h>
 
 __CXXDECL_BEGIN
 __NAMESPACE_STD_BEGIN
+
 namespace rel_ops {
-template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL operator != (__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)!(lhs == rhs)) { return !(lhs == rhs); }
-template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL operator > (__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)(rhs < lhs)) { return rhs < lhs; }
-template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL operator <= (__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)!(rhs < lhs)) { return !(rhs < lhs); }
-template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL operator >= (__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)!(lhs < rhs)) { return !(lhs < rhs); }
+template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL
+operator!=(__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)!(lhs == rhs)) {
+	return !(lhs == rhs);
 }
+
+template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL
+operator>(__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)(rhs < lhs)) {
+	return rhs < lhs;
+}
+
+template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL
+operator<=(__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)!(rhs < lhs)) {
+	return !(rhs < lhs);
+}
+
+template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL
+operator>=(__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)!(lhs < rhs)) {
+	return !(lhs < rhs);
+}
+
+} /* namespace rel_ops */
 
 #ifdef __USE_ISOCXX11
 #ifdef __COMPILER_HAVE_CXX_RVALUE_REFERENCE
-template<class __T> __CXX14_CONSTEXPR typename conditional<
-    __NAMESPACE_INT_SYM __and_<is_copy_constructible<__T>,
-    __NAMESPACE_INT_SYM __not_<is_nothrow_move_constructible<__T> > >::value,
-    __T const &,__T &&>::type
+template<class __T> __CXX14_CONSTEXPR
+typename conditional<__NAMESPACE_INT_SYM __and_<is_copy_constructible<__T>,
+                                                __NAMESPACE_INT_SYM __not_<is_nothrow_move_constructible<__T> > >::value,
+                     __T const &, __T &&>::type
 move_if_noexcept(__T &__self) __CXX_NOEXCEPT {
-    return move(__self);
+	return move(__self);
 }
 #endif /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 #endif /* __USE_ISOCXX11 */
@@ -67,28 +85,37 @@ move_if_noexcept(__T &__self) __CXX_NOEXCEPT {
 template<class __T, class __U = __T>
 __CXX_FORCEINLINE __T __LIBCCALL
 exchange(__T &__obj, __U &&__new_val) {
-    __T __old_val(move(__obj));
-    __obj.operator = (forward<__U>(__new_val));
-    return __old_val;
+	__T __old_val(move(__obj));
+	__obj.operator=(forward<__U>(__new_val));
+	return __old_val;
 }
 #endif /* __USE_ISOCXX14 */
 
 #ifdef __USE_ISOCXX17
 template<class __T>
-__CXX_FORCEINLINE __CXX11_CONSTEXPR typename add_const<__T>::type &
-__LIBCCALL as_const(__T &__self) __CXX_NOEXCEPT {
-    return __self;
+__CXX_FORCEINLINE __CXX11_CONSTEXPR
+typename add_const<__T>::type &__LIBCCALL
+as_const(__T &__self) __CXX_NOEXCEPT {
+	return __self;
 }
 #endif /* __USE_ISOCXX14 */
 
 #ifdef __USE_ISOCXX17
-struct in_place_t { explicit __CXX_DEFAULT_CTOR(in_place_t); };
+struct in_place_t {
+	explicit __CXX_DEFAULT_CTOR(in_place_t);
+};
+
 static __CXX11_CONSTEXPR in_place_t in_place = in_place_t();
-struct in_place_type_t { explicit __CXX_DEFAULT_CTOR(in_place_type_t); };
+
+struct in_place_type_t {
+	explicit __CXX_DEFAULT_CTOR(in_place_type_t);
+};
+
 static __CXX11_CONSTEXPR in_place_type_t in_place_type = in_place_type_t();
+
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR
-template <__SIZE_TYPE__ __I> struct in_place_index_t { explicit __CXX_DEFAULT_CTOR(in_place_index_t); };
-template <__SIZE_TYPE__ __I> static __CXX11_CONSTEXPR in_place_index in_place_type = {};
+template<__SIZE_TYPE__ __I> struct in_place_index_t { explicit __CXX_DEFAULT_CTOR(in_place_index_t); };
+template<__SIZE_TYPE__ __I> static __CXX11_CONSTEXPR in_place_index in_place_type = {};
 #endif /* __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR */
 #endif /* __USE_ISOCXX17 */
 

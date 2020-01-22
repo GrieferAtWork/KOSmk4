@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xead4c612 */
+/* HASH CRC-32:0xdb5c1e47 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -300,8 +300,8 @@
 #define __NR_syncfs                 0x10b /* errno_t syncfs(fd_t fd) */
 #define __NR_setns                  0x10c /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
 #define __NR_sendmmsg               0x10d /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) */
-#define __NR_process_vm_readv       0x10e /* ssize_t process_vm_readv(pid_t pid, struct iovec const *lvec, size_t liovcnt, struct iovec const *rvec, size_t riovcnt, syscall_ulong_t flags) */
-#define __NR_process_vm_writev      0x10f /* ssize_t process_vm_writev(pid_t pid, struct iovec const *lvec, size_t liovcnt, struct iovec const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+#define __NR_process_vm_readv       0x10e /* ssize_t process_vm_readv(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+#define __NR_process_vm_writev      0x10f /* ssize_t process_vm_writev(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 #define __NR_kcmp                   0x110 /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
 #define __NR_finit_module           0x111 /* errno_t finit_module(int TODO_PROTOTYPE) */
 #define __NR_sched_setattr          0x112 /* errno_t sched_setattr(int TODO_PROTOTYPE) */

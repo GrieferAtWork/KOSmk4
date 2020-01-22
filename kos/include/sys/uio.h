@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87d3763 */
+/* HASH CRC-32:0x66ff6e7b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_process_vm_readv
-__CDECLARE(__ATTR_WUNUSED,ssize_t,__NOTHROW_RPC,process_vm_readv,(__pid_t __pid, struct iovec const *__llocal_iov, unsigned long int __liovcnt, struct iovec const *__remote_iov, unsigned long int __riovcnt, unsigned long int __flags),(__pid,__llocal_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
+__CDECLARE(__ATTR_WUNUSED,ssize_t,__NOTHROW_RPC,process_vm_readv,(__pid_t __pid, struct iovec const *__local_iov, unsigned long int __liovcnt, struct iovec const *__remote_iov, unsigned long int __riovcnt, unsigned long int __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* process_vm_readv... */
 #ifdef __CRT_HAVE_process_vm_writev
 __CDECLARE(,ssize_t,__NOTHROW_RPC,process_vm_writev,(__pid_t __pid, struct iovec const *__local_iov, unsigned long int __liovcnt, struct iovec const *__remote_iov, unsigned long int __riovcnt, unsigned long int __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))

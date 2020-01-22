@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xecfd3d1e */
+/* HASH CRC-32:0xf506c4af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6070,7 +6070,7 @@ INTERN_FUNCTION(libc_sys_Xsetns)
 END(libc_sys_Xsetns)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsetns, libc_sys_Xsetns)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.process_vm_readv
 INTERN_FUNCTION(libc_sys_process_vm_readv)
 	movl   $(0x15b), %eax
@@ -6078,7 +6078,7 @@ INTERN_FUNCTION(libc_sys_process_vm_readv)
 END(libc_sys_process_vm_readv)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_process_vm_readv, libc_sys_process_vm_readv)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xprocess_vm_readv
 INTERN_FUNCTION(libc_sys_Xprocess_vm_readv)
 	movl   $(0x15b), %eax
@@ -6086,7 +6086,7 @@ INTERN_FUNCTION(libc_sys_Xprocess_vm_readv)
 END(libc_sys_Xprocess_vm_readv)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xprocess_vm_readv, libc_sys_Xprocess_vm_readv)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.process_vm_writev
 INTERN_FUNCTION(libc_sys_process_vm_writev)
 	movl   $(0x15c), %eax
@@ -6094,7 +6094,7 @@ INTERN_FUNCTION(libc_sys_process_vm_writev)
 END(libc_sys_process_vm_writev)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_process_vm_writev, libc_sys_process_vm_writev)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xprocess_vm_writev
 INTERN_FUNCTION(libc_sys_Xprocess_vm_writev)
 	movl   $(0x15c), %eax

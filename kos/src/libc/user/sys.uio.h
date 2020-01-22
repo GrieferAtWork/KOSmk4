@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6c83ac2 */
+/* HASH CRC-32:0x1f82e69e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 
 DECL_BEGIN
 
-INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid, struct iovec const *llocal_iov, unsigned long int liovcnt, struct iovec const *remote_iov, unsigned long int riovcnt, unsigned long int flags);
+INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid, struct iovec const *local_iov, unsigned long int liovcnt, struct iovec const *remote_iov, unsigned long int riovcnt, unsigned long int flags);
 INTDEF ssize_t NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid, struct iovec const *local_iov, unsigned long int liovcnt, struct iovec const *remote_iov, unsigned long int riovcnt, unsigned long int flags);
 INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd, struct iovec const *iovec, __STDC_INT_AS_SIZE_T count);
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd, struct iovec const *iovec, __STDC_INT_AS_SIZE_T count);

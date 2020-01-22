@@ -1335,15 +1335,15 @@ clock_adjtime:(int TODO_PROTOTYPE) -> errno_t;
 setns:(fd_t fd, syscall_ulong_t nstype) -> errno_t;
 
 %[startgroup]
-process_vm_readv:(pid_t pid, struct iovec const *lvec, size_t liovcnt, struct iovec const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_readvx32:(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_readvx64:(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_readv:(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_readvx32:(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_readvx64:(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
-process_vm_writev:(pid_t pid, struct iovec const *lvec, size_t liovcnt, struct iovec const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_writevx32:(pid_t pid, struct iovec32 const *lvec, size_t liovcnt, struct iovec32 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_writevx64:(pid_t pid, struct iovec64 const *lvec, size_t liovcnt, struct iovec64 const *rvec, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_writev:(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_writevx32:(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_writevx64:(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
 kcmp:(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) -> syscall_slong_t;

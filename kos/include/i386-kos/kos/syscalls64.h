@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b3060ab */
+/* HASH CRC-32:0x8e74fce7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1051,10 +1051,10 @@ __CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec64 const *__iovec, __
 __CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_SC(prlimit64) */
 #if __CRT_HAVE_SC(process_vm_readv)
-__CDECLARE_SC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec64 const *__lvec, __size_t __liovcnt, struct iovec64 const *__rvec, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__lvec,__liovcnt,__rvec,__riovcnt,__flags))
+__CDECLARE_SC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec64 const *__local_iov, __size_t __liovcnt, struct iovec64 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_SC(process_vm_readv) */
 #if __CRT_HAVE_SC(process_vm_writev)
-__CDECLARE_SC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct iovec64 const *__lvec, __size_t __liovcnt, struct iovec64 const *__rvec, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__lvec,__liovcnt,__rvec,__riovcnt,__flags))
+__CDECLARE_SC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct iovec64 const *__local_iov, __size_t __liovcnt, struct iovec64 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_SC(process_vm_writev) */
 #if __CRT_HAVE_SC(pselect6)
 __CDECLARE_SC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
@@ -2486,10 +2486,10 @@ __CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec64 const *__iovec, _
 __CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_XSC(prlimit64) */
 #if __CRT_HAVE_XSC(process_vm_readv)
-__CDECLARE_XSC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec64 const *__lvec, __size_t __liovcnt, struct iovec64 const *__rvec, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__lvec,__liovcnt,__rvec,__riovcnt,__flags))
+__CDECLARE_XSC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec64 const *__local_iov, __size_t __liovcnt, struct iovec64 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_XSC(process_vm_readv) */
 #if __CRT_HAVE_XSC(process_vm_writev)
-__CDECLARE_XSC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct iovec64 const *__lvec, __size_t __liovcnt, struct iovec64 const *__rvec, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__lvec,__liovcnt,__rvec,__riovcnt,__flags))
+__CDECLARE_XSC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct iovec64 const *__local_iov, __size_t __liovcnt, struct iovec64 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_XSC(process_vm_writev) */
 #if __CRT_HAVE_XSC(pselect6)
 __CDECLARE_XSC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))

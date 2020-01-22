@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2e6b4a9 */
+/* HASH CRC-32:0xbf851902 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -392,10 +392,6 @@
 #define __CRT_STUB_posix_spawnattr_setsigdefault 1
 #define __CRT_STUB_posix_spawnattr_setsigmask 1
 #define __CRT_STUB_posix_spawnp 1
-#define __CRT_STUB_preadv 1
-#define __CRT_STUB_preadv64 1
-#define __CRT_STUB_process_vm_readv 1
-#define __CRT_STUB_process_vm_writev 1
 #define __CRT_STUB_psiginfo 1
 #define __CRT_STUB_psignal 1
 #define __CRT_STUB_pthread_atfork 1
@@ -484,8 +480,6 @@
 #define __CRT_STUB_putspent 1
 #define __CRT_STUB_pututline 1
 #define __CRT_STUB_pututxline 1
-#define __CRT_STUB_pwritev 1
-#define __CRT_STUB_pwritev64 1
 #define __CRT_STUB_random_r 1
 #define __CRT_STUB_rcmd 1
 #define __CRT_STUB_rcmd_af 1
@@ -493,7 +487,6 @@
 #define __CRT_STUB_re_set_registers 1
 #define __CRT_STUB_readdir64_r 1
 #define __CRT_STUB_readdir_r 1
-#define __CRT_STUB_readv 1
 #define __CRT_STUB_regcomp 1
 #define __CRT_STUB_regerror 1
 #define __CRT_STUB_regexec 1
@@ -593,7 +586,6 @@
 #define __CRT_STUB_wfreadlinkat 1
 #define __CRT_STUB_wgetlogin 1
 #define __CRT_STUB_wgetlogin_r 1
-#define __CRT_STUB_writev 1
 #define __CRT_STUB_wttyname 1
 #define __CRT_STUB_wttyname_r 1
 #define __CRT_STUB_y0 1
