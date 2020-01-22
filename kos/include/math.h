@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec5d0270 */
+/* HASH CRC-32:0x3a080212 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1646,15 +1646,24 @@ __CREDIRECT(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,exp,(double __x),__e
 #define __std_frexp_defined 1
 #if __has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL frexp)(double __x, int *__pexponent) { return __builtin_frexp(__x, __pexponent); }
+__EXTERNINLINE __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL frexp)(double __x, int *__pexponent) { return __builtin_frexp(__x, __pexponent); }
 #elif defined(__CRT_HAVE_frexp)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW_NCX,frexp,(double __x, int *__pexponent),(__x,__pexponent))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,frexp,(double __x, int *__pexponent),(__x,__pexponent))
 #elif defined(__CRT_HAVE___frexp)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,frexp,(double __x, int *__pexponent),__frexp,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,frexp,(double __x, int *__pexponent),__frexp,(__x,__pexponent))
 #else /* LIBC: frexp */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/frexp.h>
+__NAMESPACE_STD_BEGIN
+/* Break VALUE into a normalized fraction and an integral power of 2 */
+__NAMESPACE_LOCAL_USING_OR_IMPL(frexp, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL frexp)(double __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexp))(__x, __pexponent); })
+#else /* CUSTOM: frexp */
 #undef __std_frexp_defined
+#endif /* frexp... */
 #endif /* frexp... */
 #endif /* !__std_frexp_defined */
 #ifndef __std_ldexp_defined
@@ -1669,7 +1678,16 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,ldexp,(double __x, int __exponent),(_
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,ldexp,(double __x, int __exponent),__ldexp,(__x,__exponent))
 #else /* LIBC: ldexp */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+__NAMESPACE_STD_END
+#include <local/math/ldexp.h>
+__NAMESPACE_STD_BEGIN
+/* X times (two to the EXP power) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ldexp, __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL ldexp)(double __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexp))(__x, __exponent); })
+#else /* CUSTOM: ldexp */
 #undef __std_ldexp_defined
+#endif /* ldexp... */
 #endif /* ldexp... */
 #endif /* !__std_ldexp_defined */
 #ifndef __std_log_defined
@@ -1758,7 +1776,9 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexpf,(float __x, int *__pexponen
 #elif defined(__CRT_HAVE___frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexpf,(float __x, int *__pexponent),__frexpf,(__x,__pexponent))
-#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#else /* LIBC: frexpf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 __NAMESPACE_STD_END
 #include <local/math/frexpf.h>
 __NAMESPACE_STD_BEGIN
@@ -1766,6 +1786,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(frexpf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL frexpf)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); })
 #else /* CUSTOM: frexpf */
 #undef __std_frexpf_defined
+#endif /* frexpf... */
 #endif /* frexpf... */
 #endif /* !__std_frexpf_defined */
 #ifndef __std_ldexpf_defined
@@ -1779,7 +1800,9 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,ldexpf,(float __x, int __exponent),(__
 #elif defined(__CRT_HAVE___ldexpf)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,ldexpf,(float __x, int __exponent),__ldexpf,(__x,__exponent))
-#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#else /* LIBC: ldexpf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 __NAMESPACE_STD_END
 #include <local/math/ldexpf.h>
 __NAMESPACE_STD_BEGIN
@@ -1787,6 +1810,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(ldexpf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ldexpf)(float __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexpf))(__x, __exponent); })
 #else /* CUSTOM: ldexpf */
 #undef __std_ldexpf_defined
+#endif /* ldexpf... */
 #endif /* ldexpf... */
 #endif /* !__std_ldexpf_defined */
 #ifndef __std_logf_defined
@@ -1844,7 +1868,7 @@ __CDECLARE(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modff,(float __x, float *__ip
 __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modff,(float __x, float *__iptr),__modff,(__x,__iptr))
 #else /* LIBC: modff */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 __NAMESPACE_STD_END
 #include <local/math/modff.h>
 __NAMESPACE_STD_BEGIN
@@ -1894,13 +1918,9 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, i
 #elif defined(__CRT_HAVE___frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),__frexpl,(__x,__pexponent))
-#elif defined(__CRT_HAVE_frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),frexp,(__x,__pexponent))
-#elif defined(__CRT_HAVE___frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),__frexp,(__x,__pexponent))
-#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#else /* LIBC: frexpl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 __NAMESPACE_STD_END
 #include <local/math/frexpl.h>
 __NAMESPACE_STD_BEGIN
@@ -1908,6 +1928,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(frexpl, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL frexpl)(__LONGDOUBLE __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); })
 #else /* CUSTOM: frexpl */
 #undef __std_frexpl_defined
+#endif /* frexpl... */
 #endif /* frexpl... */
 #endif /* !__std_frexpl_defined */
 #ifndef __std_ldexpl_defined
@@ -1921,13 +1942,9 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexpl,(__LONGDOUBLE __x, int _
 #elif defined(__CRT_HAVE___ldexpl)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexpl,(__LONGDOUBLE __x, int __exponent),__ldexpl,(__x,__exponent))
-#elif defined(__CRT_HAVE_ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* X times (two to the EXP power) */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexpl,(__LONGDOUBLE __x, int __exponent),ldexp,(__x,__exponent))
-#elif defined(__CRT_HAVE___ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* X times (two to the EXP power) */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexpl,(__LONGDOUBLE __x, int __exponent),__ldexp,(__x,__exponent))
-#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#else /* LIBC: ldexpl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 __NAMESPACE_STD_END
 #include <local/math/ldexpl.h>
 __NAMESPACE_STD_BEGIN
@@ -1935,6 +1952,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(ldexpl, __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL ldexpl)(__LONGDOUBLE __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexpl))(__x, __exponent); })
 #else /* CUSTOM: ldexpl */
 #undef __std_ldexpl_defined
+#endif /* ldexpl... */
 #endif /* ldexpl... */
 #endif /* !__std_ldexpl_defined */
 #ifndef __std_logl_defined
@@ -2004,7 +2022,7 @@ __CDECLARE(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modfl,(__LONGDOUBLE __
 __CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modfl,(__x,__iptr))
 #else /* LIBC: modfl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 __NAMESPACE_STD_END
 #include <local/math/modfl.h>
 __NAMESPACE_STD_BEGIN
@@ -2587,7 +2605,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,cbrt,(double __x),(__x))
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,cbrt,(double __x),__cbrt,(__x))
 #else /* LIBC: cbrt */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/cbrt.h>
 __NAMESPACE_STD_BEGIN
@@ -2611,7 +2629,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrtf,(float __x),(__x))
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrtf,(float __x),__cbrtf,(__x))
 #else /* LIBC: cbrtf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 __NAMESPACE_STD_END
 #include <local/math/cbrtf.h>
 __NAMESPACE_STD_BEGIN
@@ -2634,15 +2652,9 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBL
 #elif defined(__CRT_HAVE___cbrtl)
 /* Return the cube root of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBLE __x),__cbrtl,(__x))
-#elif defined(__CRT_HAVE_cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the cube root of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBLE __x),cbrt,(__x))
-#elif defined(__CRT_HAVE___cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the cube root of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBLE __x),__cbrt,(__x))
 #else /* LIBC: cbrtl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 __NAMESPACE_STD_END
 #include <local/math/cbrtl.h>
 __NAMESPACE_STD_BEGIN
@@ -3544,9 +3556,15 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,scalbn,(double __x, int 
 #elif defined(__CRT_HAVE___scalbn)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,scalbn,(double __x, int __n),__scalbn,(__x,__n))
+#elif defined(__CRT_HAVE_scalbln) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,scalbn,(double __x, int __n),scalbln,(__x,__n))
+#elif defined(__CRT_HAVE___scalbln) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,scalbn,(double __x, int __n),__scalbln,(__x,__n))
 #else /* LIBC: scalbn */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/scalbn.h>
 __NAMESPACE_STD_BEGIN
@@ -3568,9 +3586,15 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,scalbln,(double __x, lon
 #elif defined(__CRT_HAVE___scalbln)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,scalbln,(double __x, long int __n),__scalbln,(__x,__n))
+#elif defined(__CRT_HAVE_scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,scalbln,(double __x, long int __n),scalbn,(__x,__n))
+#elif defined(__CRT_HAVE___scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,scalbln,(double __x, long int __n),__scalbn,(__x,__n))
 #else /* LIBC: scalbln */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <local/math/scalbln.h>
 __NAMESPACE_STD_BEGIN
@@ -3826,9 +3850,15 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbnf,(float __x, int _
 #elif defined(__CRT_HAVE___scalbnf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbnf,(float __x, int __n),__scalbnf,(__x,__n))
+#elif defined(__CRT_HAVE_scalblnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbnf,(float __x, int __n),scalblnf,(__x,__n))
+#elif defined(__CRT_HAVE___scalblnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbnf,(float __x, int __n),__scalblnf,(__x,__n))
 #else /* LIBC: scalbnf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 __NAMESPACE_STD_END
 #include <local/math/scalbnf.h>
 __NAMESPACE_STD_BEGIN
@@ -3850,9 +3880,15 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalblnf,(float __x, long
 #elif defined(__CRT_HAVE___scalblnf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalblnf,(float __x, long int __n),__scalblnf,(__x,__n))
+#elif defined(__CRT_HAVE_scalbnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalblnf,(float __x, long int __n),scalbnf,(__x,__n))
+#elif defined(__CRT_HAVE___scalbnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalblnf,(float __x, long int __n),__scalbnf,(__x,__n))
 #else /* LIBC: scalblnf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 __NAMESPACE_STD_END
 #include <local/math/scalblnf.h>
 __NAMESPACE_STD_BEGIN
@@ -4133,15 +4169,15 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOU
 #elif defined(__CRT_HAVE___scalbnl)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),__scalbnl,(__x,__n))
-#elif defined(__CRT_HAVE_scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+#elif defined(__CRT_HAVE_scalblnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),scalbn,(__x,__n))
-#elif defined(__CRT_HAVE___scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),scalblnl,(__x,__n))
+#elif defined(__CRT_HAVE___scalblnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),__scalbn,(__x,__n))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),__scalblnl,(__x,__n))
 #else /* LIBC: scalbnl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 __NAMESPACE_STD_END
 #include <local/math/scalbnl.h>
 __NAMESPACE_STD_BEGIN
@@ -4163,15 +4199,15 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDO
 #elif defined(__CRT_HAVE___scalblnl)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),__scalblnl,(__x,__n))
-#elif defined(__CRT_HAVE_scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+#elif defined(__CRT_HAVE_scalbnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),scalbln,(__x,__n))
-#elif defined(__CRT_HAVE___scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE___scalbnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),__scalbln,(__x,__n))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),__scalbnl,(__x,__n))
 #else /* LIBC: scalblnl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 __NAMESPACE_STD_END
 #include <local/math/scalblnl.h>
 __NAMESPACE_STD_BEGIN
@@ -4662,7 +4698,9 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexp,(float __x, int *__pexponen
 #elif defined(__CRT_HAVE___frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexp,(float __x, int *__pexponent),__frexpf,(__x,__pexponent))
-#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#else /* LIBC: frexpf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/frexpf.h>
@@ -4670,6 +4708,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL frexp)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); }
+#else /* CUSTOM: frexpf */
+#undef none
+#endif /* frexp... */
 #endif /* frexp... */
 #if __has_builtin(__builtin_ldexpf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexpf)
 /* X times (two to the EXP power) */
@@ -4680,7 +4721,9 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,ldexp,(float __x, int __exponent),lde
 #elif defined(__CRT_HAVE___ldexpf)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,ldexp,(float __x, int __exponent),__ldexpf,(__x,__exponent))
-#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#else /* LIBC: ldexpf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/ldexpf.h>
@@ -4688,6 +4731,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* X times (two to the EXP power) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ldexp)(float __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexpf))(__x, __exponent); }
+#else /* CUSTOM: ldexpf */
+#undef none
+#endif /* ldexp... */
 #endif /* ldexp... */
 #if __has_builtin(__builtin_logf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logf)
 /* Natural logarithm of X */
@@ -4736,7 +4782,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modf,(float __x, float *__ip
 __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modf,(float __x, float *__iptr),__modff,(__x,__iptr))
 #else /* LIBC: modff */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/modff.h>
@@ -5143,13 +5189,9 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, i
 #elif defined(__CRT_HAVE___frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),__frexpl,(__x,__pexponent))
-#elif defined(__CRT_HAVE_frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into a normalized fraction and an integral power of 2 */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),(__x,__pexponent))
-#elif defined(__CRT_HAVE___frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),__frexp,(__x,__pexponent))
-#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#else /* LIBC: frexpl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/frexpl.h>
@@ -5157,6 +5199,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL frexp)(__LONGDOUBLE __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); }
+#else /* CUSTOM: frexpl */
+#undef none
+#endif /* frexp... */
 #endif /* frexp... */
 #if __has_builtin(__builtin_ldexpl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexpl)
 /* X times (two to the EXP power) */
@@ -5167,13 +5212,9 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexp,(__LONGDOUBLE __x, int _
 #elif defined(__CRT_HAVE___ldexpl)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexp,(__LONGDOUBLE __x, int __exponent),__ldexpl,(__x,__exponent))
-#elif defined(__CRT_HAVE_ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* X times (two to the EXP power) */
-__CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexp,(__LONGDOUBLE __x, int __exponent),(__x,__exponent))
-#elif defined(__CRT_HAVE___ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* X times (two to the EXP power) */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexp,(__LONGDOUBLE __x, int __exponent),__ldexp,(__x,__exponent))
-#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#else /* LIBC: ldexpl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/ldexpl.h>
@@ -5181,6 +5222,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* X times (two to the EXP power) */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL ldexp)(__LONGDOUBLE __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexpl))(__x, __exponent); }
+#else /* CUSTOM: ldexpl */
+#undef none
+#endif /* ldexp... */
 #endif /* ldexp... */
 #if __has_builtin(__builtin_logl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logl)
 /* Natural logarithm of X */
@@ -5241,7 +5285,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONGDOUBLE __
 __CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modfl,(__x,__iptr))
 #else /* LIBC: modfl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/modfl.h>
@@ -5495,7 +5539,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrt,(float __x),cbrtf,(
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,cbrt,(float __x),__cbrtf,(__x))
 #else /* LIBC: cbrtf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/cbrtf.h>
@@ -5748,13 +5792,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBL
 #elif defined(__CRT_HAVE___cbrtl)
 /* Return the cube root of X */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBLE __x),__cbrtl,(__x))
-#elif defined(__CRT_HAVE_cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the cube root of X */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE___cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the cube root of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBLE __x),__cbrt,(__x))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
+#else /* LIBC: cbrtl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/cbrtl.h>
@@ -5762,6 +5802,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return the cube root of X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL cbrt)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtl))(__x); }
+#else /* CUSTOM: cbrtl */
+#undef none
+#endif /* cbrt... */
 #endif /* cbrt... */
 #if __has_builtin(__builtin_rintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rintl)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
@@ -5956,9 +5999,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbn,(float __x, int _
 #elif defined(__CRT_HAVE___scalbnf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbn,(float __x, int __n),__scalbnf,(__x,__n))
+#elif defined(__CRT_HAVE_scalblnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbn,(float __x, int __n),scalblnf,(__x,__n))
+#elif defined(__CRT_HAVE___scalblnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbn,(float __x, int __n),__scalblnf,(__x,__n))
 #else /* LIBC: scalbnf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/scalbnf.h>
@@ -5979,9 +6028,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbln,(float __x, long
 #elif defined(__CRT_HAVE___scalblnf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbln,(float __x, long int __n),__scalblnf,(__x,__n))
+#elif defined(__CRT_HAVE_scalbnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbln,(float __x, long int __n),scalbnf,(__x,__n))
+#elif defined(__CRT_HAVE___scalbnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,scalbln,(float __x, long int __n),__scalbnf,(__x,__n))
 #else /* LIBC: scalblnf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/scalblnf.h>
@@ -6350,13 +6405,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOU
 #elif defined(__CRT_HAVE___scalbnl)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),__scalbnl,(__x,__n))
-#elif defined(__CRT_HAVE_scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+#elif defined(__CRT_HAVE_scalblnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),(__x,__n))
-#elif defined(__CRT_HAVE___scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),scalblnl,(__x,__n))
+#elif defined(__CRT_HAVE___scalblnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),__scalbn,(__x,__n))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),__scalblnl,(__x,__n))
+#else /* LIBC: scalbnl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/scalbnl.h>
@@ -6364,6 +6421,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL scalbn)(__LONGDOUBLE __x, int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbnl))(__x, __n); }
+#else /* CUSTOM: scalbnl */
+#undef none
+#endif /* scalbn... */
 #endif /* scalbn... */
 #if __has_builtin(__builtin_scalblnl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalblnl)
 /* Return X times (2 to the Nth power) */
@@ -6374,13 +6434,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDO
 #elif defined(__CRT_HAVE___scalblnl)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),__scalblnl,(__x,__n))
-#elif defined(__CRT_HAVE_scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+#elif defined(__CRT_HAVE_scalbnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),(__x,__n))
-#elif defined(__CRT_HAVE___scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE___scalbnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),__scalbln,(__x,__n))
-#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),__scalbnl,(__x,__n))
+#else /* LIBC: scalblnl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/scalblnl.h>
@@ -6388,6 +6450,9 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL scalbln)(__LONGDOUBLE __x, long int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalblnl))(__x, __n); }
+#else /* CUSTOM: scalblnl */
+#undef none
+#endif /* scalbln... */
 #endif /* scalbln... */
 #if __has_builtin(__builtin_nearbyintl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyintl)
 /* Round X to integral value in floating-point format using current
@@ -8980,19 +9045,43 @@ __CDECLARE(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__exp,(double __x),(_
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__exp,(double __x),exp,(__x))
 #endif /* __exp... */
-#ifdef __CRT_HAVE___frexp
+#if __has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW_NCX,__frexp,(double __x, int *__pexponent),(__x,__pexponent))
+__EXTERNINLINE __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL __frexp)(double __x, int *__pexponent) { return __builtin_frexp(__x, __pexponent); }
 #elif defined(__CRT_HAVE_frexp)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__frexp,(double __x, int *__pexponent),frexp,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__frexp,(double __x, int *__pexponent),frexp,(__x,__pexponent))
+#elif defined(__CRT_HAVE___frexp)
+/* Break VALUE into a normalized fraction and an integral power of 2 */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__frexp,(double __x, int *__pexponent),(__x,__pexponent))
+#else /* LIBC: frexp */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/frexp.h>
+/* Break VALUE into a normalized fraction and an integral power of 2 */
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL __frexp)(double __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexp))(__x, __pexponent); }
+#else /* CUSTOM: frexp */
+#undef none
 #endif /* __frexp... */
-#ifdef __CRT_HAVE___ldexp
+#endif /* __frexp... */
+#if __has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)
 /* X times (two to the EXP power) */
-__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__ldexp,(double __x, int __exponent),(__x,__exponent))
+__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __ldexp)(double __x, int __exponent) { return __builtin_ldexp(__x, __exponent); }
 #elif defined(__CRT_HAVE_ldexp)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__ldexp,(double __x, int __exponent),ldexp,(__x,__exponent))
+#elif defined(__CRT_HAVE___ldexp)
+/* X times (two to the EXP power) */
+__CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__ldexp,(double __x, int __exponent),(__x,__exponent))
+#else /* LIBC: ldexp */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/ldexp.h>
+/* X times (two to the EXP power) */
+__FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __ldexp)(double __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexp))(__x, __exponent); }
+#else /* CUSTOM: ldexp */
+#undef none
+#endif /* __ldexp... */
 #endif /* __ldexp... */
 #ifdef __CRT_HAVE___log
 /* Natural logarithm of X */
@@ -9050,10 +9139,15 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__frexpf,(float __x, int *__pexpo
 #elif defined(__CRT_HAVE___frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,__frexpf,(float __x, int *__pexponent),(__x,__pexponent))
-#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#else /* LIBC: frexpf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 #include <local/math/frexpf.h>
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL __frexpf)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); }
+#else /* CUSTOM: frexpf */
+#undef none
+#endif /* __frexpf... */
 #endif /* __frexpf... */
 #if __has_builtin(__builtin_ldexpf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexpf)
 /* X times (two to the EXP power) */
@@ -9064,10 +9158,15 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__ldexpf,(float __x, int __exponent),
 #elif defined(__CRT_HAVE___ldexpf)
 /* X times (two to the EXP power) */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__ldexpf,(float __x, int __exponent),(__x,__exponent))
-#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#else /* LIBC: ldexpf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 #include <local/math/ldexpf.h>
 /* X times (two to the EXP power) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __ldexpf)(float __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexpf))(__x, __exponent); }
+#else /* CUSTOM: ldexpf */
+#undef none
+#endif /* __ldexpf... */
 #endif /* __ldexpf... */
 #if __has_builtin(__builtin_logf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logf)
 /* Natural logarithm of X */
@@ -9108,7 +9207,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,__modff,(float __x, float *_
 __CDECLARE(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,__modff,(float __x, float *__iptr),(__x,__iptr))
 #else /* LIBC: modff */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 #include <local/math/modff.h>
 /* Break VALUE into integral and fractional parts */
 __FORCELOCAL __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL __modff)(float __x, float *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modff))(__x, __iptr); }
@@ -9146,16 +9245,15 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x
 #elif defined(__CRT_HAVE___frexpl)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),(__x,__pexponent))
-#elif defined(__CRT_HAVE_frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),frexp,(__x,__pexponent))
-#elif defined(__CRT_HAVE___frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),__frexp,(__x,__pexponent))
-#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#else /* LIBC: frexpl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 #include <local/math/frexpl.h>
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL __frexpl)(__LONGDOUBLE __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); }
+#else /* CUSTOM: frexpl */
+#undef none
+#endif /* __frexpl... */
 #endif /* __frexpl... */
 #if __has_builtin(__builtin_ldexpl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexpl)
 /* X times (two to the EXP power) */
@@ -9166,16 +9264,15 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ldexpl,(__LONGDOUBLE __x, in
 #elif defined(__CRT_HAVE___ldexpl)
 /* X times (two to the EXP power) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ldexpl,(__LONGDOUBLE __x, int __exponent),(__x,__exponent))
-#elif defined(__CRT_HAVE_ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* X times (two to the EXP power) */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ldexpl,(__LONGDOUBLE __x, int __exponent),ldexp,(__x,__exponent))
-#elif defined(__CRT_HAVE___ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* X times (two to the EXP power) */
-__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ldexpl,(__LONGDOUBLE __x, int __exponent),__ldexp,(__x,__exponent))
-#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#else /* LIBC: ldexpl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 #include <local/math/ldexpl.h>
 /* X times (two to the EXP power) */
 __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __ldexpl)(__LONGDOUBLE __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexpl))(__x, __exponent); }
+#else /* CUSTOM: ldexpl */
+#undef none
+#endif /* __ldexpl... */
 #endif /* __ldexpl... */
 #if __has_builtin(__builtin_logl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logl)
 /* Natural logarithm of X */
@@ -9228,7 +9325,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__modfl,(__LONGDOUBLE
 __CDECLARE(__ATTR_NONNULL((2)),__LONGDOUBLE,__NOTHROW_NCX,__modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),(__x,__iptr))
 #else /* LIBC: modfl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 #include <local/math/modfl.h>
 /* Break VALUE into integral and fractional parts */
 __FORCELOCAL __ATTR_NONNULL((2)) __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL __modfl)(__LONGDOUBLE __x, __LONGDOUBLE *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modfl))(__x, __iptr); }
@@ -9747,7 +9844,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__cbrt,(double __x),cbr
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__cbrt,(double __x),(__x))
 #else /* LIBC: cbrt */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/cbrt.h>
 /* Return the cube root of X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __cbrt)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrt))(__x); }
@@ -9766,7 +9863,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__cbrtf,(float __x),cbrt
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__cbrtf,(float __x),(__x))
 #else /* LIBC: cbrtf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 #include <local/math/cbrtf.h>
 /* Return the cube root of X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __cbrtf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtf))(__x); }
@@ -9784,15 +9881,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDO
 #elif defined(__CRT_HAVE___cbrtl)
 /* Return the cube root of X */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDOUBLE __x),(__x))
-#elif defined(__CRT_HAVE_cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the cube root of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDOUBLE __x),cbrt,(__x))
-#elif defined(__CRT_HAVE___cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-/* Return the cube root of X */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDOUBLE __x),__cbrt,(__x))
 #else /* LIBC: cbrtl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 #include <local/math/cbrtl.h>
 /* Return the cube root of X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __cbrtl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtl))(__x); }
@@ -11043,9 +11134,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__scalbn,(double __x, i
 #elif defined(__CRT_HAVE___scalbn)
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__scalbn,(double __x, int __n),(__x,__n))
+#elif defined(__CRT_HAVE_scalbln) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__scalbn,(double __x, int __n),scalbln,(__x,__n))
+#elif defined(__CRT_HAVE___scalbln) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__scalbn,(double __x, int __n),__scalbln,(__x,__n))
 #else /* LIBC: scalbn */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/scalbn.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __scalbn)(double __x, int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbn))(__x, __n); }
@@ -11062,9 +11159,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__scalbln,(double __x, 
 #elif defined(__CRT_HAVE___scalbln)
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__scalbln,(double __x, long int __n),(__x,__n))
+#elif defined(__CRT_HAVE_scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__scalbln,(double __x, long int __n),scalbn,(__x,__n))
+#elif defined(__CRT_HAVE___scalbn) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__scalbln,(double __x, long int __n),__scalbn,(__x,__n))
 #else /* LIBC: scalbln */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <local/math/scalbln.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __scalbln)(double __x, long int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbln))(__x, __n); }
@@ -11234,9 +11337,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__scalbnf,(float __x, in
 #elif defined(__CRT_HAVE___scalbnf)
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__scalbnf,(float __x, int __n),(__x,__n))
+#elif defined(__CRT_HAVE_scalblnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__scalbnf,(float __x, int __n),scalblnf,(__x,__n))
+#elif defined(__CRT_HAVE___scalblnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__scalbnf,(float __x, int __n),__scalblnf,(__x,__n))
 #else /* LIBC: scalbnf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 #include <local/math/scalbnf.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __scalbnf)(float __x, int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbnf))(__x, __n); }
@@ -11253,9 +11362,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__scalblnf,(float __x, l
 #elif defined(__CRT_HAVE___scalblnf)
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__scalblnf,(float __x, long int __n),(__x,__n))
+#elif defined(__CRT_HAVE_scalbnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__scalblnf,(float __x, long int __n),scalbnf,(__x,__n))
+#elif defined(__CRT_HAVE___scalbnf) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
+/* Return X times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__scalblnf,(float __x, long int __n),__scalbnf,(__x,__n))
 #else /* LIBC: scalblnf */
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 #include <local/math/scalblnf.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __scalblnf)(float __x, long int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalblnf))(__x, __n); }
@@ -11499,15 +11614,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONG
 #elif defined(__CRT_HAVE___scalbnl)
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),(__x,__n))
-#elif defined(__CRT_HAVE_scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+#elif defined(__CRT_HAVE_scalblnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),scalbn,(__x,__n))
-#elif defined(__CRT_HAVE___scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),scalblnl,(__x,__n))
+#elif defined(__CRT_HAVE___scalblnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),__scalbn,(__x,__n))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),__scalblnl,(__x,__n))
 #else /* LIBC: scalbnl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 #include <local/math/scalbnl.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __scalbnl)(__LONGDOUBLE __x, int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbnl))(__x, __n); }
@@ -11524,15 +11639,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LON
 #elif defined(__CRT_HAVE___scalblnl)
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),(__x,__n))
-#elif defined(__CRT_HAVE_scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+#elif defined(__CRT_HAVE_scalbnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),scalbln,(__x,__n))
-#elif defined(__CRT_HAVE___scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE___scalbnl) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 /* Return X times (2 to the Nth power) */
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),__scalbln,(__x,__n))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),__scalbnl,(__x,__n))
 #else /* LIBC: scalblnl */
 #include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__)
 #include <local/math/scalblnl.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __scalblnl)(__LONGDOUBLE __x, long int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalblnl))(__x, __n); }
@@ -11843,6 +11958,16 @@ __FORCELOCAL __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL __scalbl)(__LONGDO
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __x),(__x))
 #elif defined(__CRT_HAVE__dclass)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __x),_dclass,(__x))
+#elif defined(__CRT_HAVE_fpclassify)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __x),fpclassify,(__x))
+#else /* LIBC: __fpclassify */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/__fpclassify.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassify, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassify)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassify))(__x); })
+#else /* CUSTOM: __fpclassify */
+#undef none
+#endif /* __fpclassify... */
 #endif /* __fpclassify... */
 #ifdef __CRT_HAVE___signbit
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbit,(double __x),(__x))
@@ -11856,9 +11981,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__signbit, __FORCELOCAL __ATTR_CONST __ATTR_WUNU
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __x),(__x))
 #elif defined(__CRT_HAVE__fdclass)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __x),_fdclass,(__x))
-#elif defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass)
+#elif defined(__CRT_HAVE_fpclassifyf)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __x),fpclassifyf,(__x))
+#else /* LIBC: __fpclassifyf */
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass) || defined(__CRT_HAVE_fpclassify)
 #include <local/math/__fpclassifyf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyf))(__x); })
+#else /* CUSTOM: __fpclassifyf */
+#undef none
+#endif /* __fpclassifyf... */
 #endif /* __fpclassifyf... */
 #ifdef __CRT_HAVE___signbitf
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __x),(__x))
@@ -11873,11 +12005,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__signbitf, __FORCELOCAL __ATTR_CONST __ATTR_WUN
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE__ldclass)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),_ldclass,(__x))
-#elif defined(__CRT_HAVE___fpclassify) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),__fpclassify,(__x))
-#elif defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass)
+#elif defined(__CRT_HAVE_fpclassifyl)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),fpclassifyl,(__x))
+#else /* LIBC: __fpclassifyl */
+#include <ieee754.h>
+#if defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass) || defined(__CRT_HAVE_fpclassify)
 #include <local/math/__fpclassifyl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyl))(__x); })
+#else /* CUSTOM: __fpclassifyl */
+#undef none
+#endif /* __fpclassifyl... */
 #endif /* __fpclassifyl... */
 #ifdef __CRT_HAVE___signbitl
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(__LONGDOUBLE __x),(__x))
@@ -12005,6 +12142,7 @@ __LIBC int (signgam);
  *      decimal and all internal floating-point formats. */
 
 /* All floating-point numbers can be put in one of these categories. */
+/* NOTE: These values must match the declarations from <libm/fdlibm.h>! */
 #undef FP_NAN
 #undef FP_INFINITE
 #undef FP_ZERO

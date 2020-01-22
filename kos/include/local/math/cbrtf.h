@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf26f063 */
+/* HASH CRC-32:0xdac80e3c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,20 +20,49 @@
  */
 #ifndef __local_cbrtf_defined
 #include <ieee754.h>
-#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 #define __local_cbrtf_defined 1
 #include <libm/cbrt.h>
+#include <libm/cbrt.h>
+/* Dependency: "cbrt" from "math" */
+#ifndef ____localdep_cbrt_defined
+#define ____localdep_cbrt_defined 1
+#if __has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)
+/* Return the cube root of X */
+__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_cbrt)(double __x) { return __builtin_cbrt(__x); }
+#elif defined(__CRT_HAVE_cbrt)
+/* Return the cube root of X */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_cbrt,(double __x),cbrt,(__x))
+#elif defined(__CRT_HAVE___cbrt)
+/* Return the cube root of X */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_cbrt,(double __x),__cbrt,(__x))
+#else /* LIBC: cbrt */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/cbrt.h>
+/* Return the cube root of X */
+#define __localdep_cbrt (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrt))
+#else /* CUSTOM: cbrt */
+#undef ____localdep_cbrt_defined
+#endif /* cbrt... */
+#endif /* cbrt... */
+#endif /* !____localdep_cbrt_defined */
+
 __NAMESPACE_LOCAL_BEGIN
 /* Return the cube root of X */
 __LOCAL_LIBC(cbrtf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cbrtf))(float __x) {
-#line 623 "kos/src/libc/magic/math.c"
+#line 729 "kos/src/libc/magic/math.c"
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_cbrtf((__IEEE754_FLOAT_TYPE__)__x);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_cbrt((__IEEE754_DOUBLE_TYPE__)__x);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_cbrtl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#else /* ... */
+	return (float)__localdep_cbrt((double)__x);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ */
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_cbrt || __CRT_HAVE___cbrt */
 #endif /* !__local_cbrtf_defined */

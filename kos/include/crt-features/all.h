@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab549e21 */
+/* HASH CRC-32:0xa7b92ed8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2065,6 +2065,9 @@
 #define __CRT_HAVE_format_wsprintf_printer 1
 #define __CRT_HAVE_format_wwidth 1
 #define __CRT_HAVE_fpathconf 1
+#define __CRT_HAVE_fpclassify 1
+#define __CRT_HAVE_fpclassifyf 1
+#define __CRT_HAVE_fpclassifyl 1
 #define __CRT_HAVE_fpreset 1
 #define __CRT_HAVE_fprintf 1
 #define __CRT_HAVE_fprintf_s 1

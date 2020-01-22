@@ -271,7 +271,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
  */
 
 __LIBM_LOCAL_DECLARE_BEGIN
+#ifndef __libm_tinyl_defined
+#define __libm_tinyl_defined 1
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, tinyl, __IEEE854_LONG_DOUBLE_C(1.0e-4900))
+#endif /* !__libm_tinyl_defined */
 #ifndef __libm_zerol_defined
 #define __libm_zerol_defined 1
 __LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, zerol, __IEEE854_LONG_DOUBLE_C(0.0))

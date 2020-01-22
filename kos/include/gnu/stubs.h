@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf88202f7 */
+/* HASH CRC-32:0xb4473d60 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,6 @@
 #define __stub__CrtSetReportHookW2 1
 #define __stub__CrtSetReportMode 1
 #define __stub___control87_2 1
-#define __stub___fpclassify 1
 #define __stub___fpecode 1
 #define __stub___h_errno_location 1
 #define __stub___issignaling 1
@@ -165,7 +164,6 @@
 #define __stub_freeaddrinfo 1
 #define __stub_freeifaddrs 1
 #define __stub_freelocale 1
-#define __stub_frexp 1
 #define __stub_ftok 1
 #define __stub_gai_cancel 1
 #define __stub_gai_error 1
@@ -324,7 +322,6 @@
 #define __stub_lckpwdf 1
 #define __stub_lcong48 1
 #define __stub_lcong48_r 1
-#define __stub_ldexp 1
 #define __stub_lgamma 1
 #define __stub_lgamma_r 1
 #define __stub_llrint 1

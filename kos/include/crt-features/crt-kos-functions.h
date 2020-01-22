@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d12a8c4 */
+/* HASH CRC-32:0x8aba3832 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1956,9 +1956,9 @@ __CRT_FUNCTION(sbrk,0,(),1,(intptr_t,delta),void *)
 __CRT_FUNCTION(scalb,0,(),2,(double,x,double,fn),double)
 __CRT_FUNCTION(scalbf,0,(),2,(float,x,float,fn),float)
 __CRT_FUNCTION(scalbl,0,(),2,(__LONGDOUBLE,x,__LONGDOUBLE,n),__LONGDOUBLE)
-__CRT_FUNCTION(scalbln,0,(),2,(double,x,long int,n),double)
-__CRT_FUNCTION(scalblnf,0,(),2,(float,x,long int,n),float)
-__CRT_FUNCTION(scalblnl,0,(),2,(__LONGDOUBLE,x,long int,n),__LONGDOUBLE)
+__CRT_FUNCTION(scalbln,1,(__SIZEOF_INT__ == __SIZEOF_LONG__,scalbn),2,(double,x,long int,n),double)
+__CRT_FUNCTION(scalblnf,1,(__SIZEOF_INT__ == __SIZEOF_LONG__,scalbnf),2,(float,x,long int,n),float)
+__CRT_FUNCTION(scalblnl,1,(__SIZEOF_INT__ == __SIZEOF_LONG__,scalbnl),2,(__LONGDOUBLE,x,long int,n),__LONGDOUBLE)
 __CRT_FUNCTION(scalbn,0,(),2,(double,x,int,n),double)
 __CRT_FUNCTION(scalbnf,0,(),2,(float,x,int,n),float)
 __CRT_FUNCTION(scalbnl,0,(),2,(__LONGDOUBLE,x,int,n),__LONGDOUBLE)

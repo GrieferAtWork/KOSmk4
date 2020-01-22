@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x841865bb */
+/* HASH CRC-32:0xd587b745 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,26 +19,45 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___fpclassifyf_defined
-#if defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass)
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass) || defined(__CRT_HAVE_fpclassify)
 #define __local___fpclassifyf_defined 1
-/* Dependency: "__fpclassify" */
+#include <libm/fpclassify.h>
+#include <libm/fpclassify.h>
+/* Dependency: "__fpclassify" from "math" */
 #ifndef ____localdep___fpclassify_defined
 #define ____localdep___fpclassify_defined 1
 #ifdef __CRT_HAVE___fpclassify
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),__fpclassify,(__x))
 #elif defined(__CRT_HAVE__dclass)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),_dclass,(__x))
+#elif defined(__CRT_HAVE_fpclassify)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __x),fpclassify,(__x))
 #else /* LIBC: __fpclassify */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/__fpclassify.h>
+#define __localdep___fpclassify (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassify))
+#else /* CUSTOM: __fpclassify */
 #undef ____localdep___fpclassify_defined
+#endif /* __fpclassify... */
 #endif /* __fpclassify... */
 #endif /* !____localdep___fpclassify_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__fpclassifyf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__fpclassifyf))(float __x) {
-#line 2135 "kos/src/libc/magic/math.c"
-	return (int)__localdep___fpclassify((double)__x);
+#line 2339 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)__x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)__x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)__x);
+#else /* ... */
+	return __localdep___fpclassify((double)__x);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE___fpclassify || __CRT_HAVE__dclass */
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE___fpclassify || __CRT_HAVE__dclass || __CRT_HAVE_fpclassify */
 #endif /* !__local___fpclassifyf_defined */

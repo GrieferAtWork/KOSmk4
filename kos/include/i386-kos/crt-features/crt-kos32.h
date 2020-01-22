@@ -1202,7 +1202,9 @@
 #define __CRT_HAVE__copysign 1
 #define __CRT_HAVE__creat 1
 #define __CRT_HAVE__cwait 1
+#define __CRT_HAVE__dclass 1
 #define __CRT_HAVE__dosmaperr 1
+#define __CRT_HAVE__dsign 1
 #define __CRT_HAVE__dup 1
 #define __CRT_HAVE__dup2 1
 #define __CRT_HAVE__dupenv_s 1
@@ -1228,7 +1230,9 @@
 #define __CRT_HAVE__fcloseall 1
 #define __CRT_HAVE__fcvt 1
 #define __CRT_HAVE__fcvt_s 1
+#define __CRT_HAVE__fdclass 1
 #define __CRT_HAVE__fdopen 1
+#define __CRT_HAVE__fdsign 1
 #define __CRT_HAVE__fflush_nolock 1
 #define __CRT_HAVE__fgetchar 1
 #define __CRT_HAVE__fgetwc_nolock 1
@@ -1350,6 +1354,8 @@
 #define __CRT_HAVE__itoa_s 1
 #define __CRT_HAVE__itow 1
 #define __CRT_HAVE__itow_s 1
+#define __CRT_HAVE__ldclass 1
+#define __CRT_HAVE__ldsign 1
 #define __CRT_HAVE__loaddll 1
 #define __CRT_HAVE__lock_file 1
 #define __CRT_HAVE__locking 1
@@ -2140,6 +2146,9 @@
 #define __CRT_HAVE_format_wsprintf_printer 1
 #define __CRT_HAVE_format_wwidth 1
 #define __CRT_HAVE_fpathconf 1
+#define __CRT_HAVE_fpclassify 1
+#define __CRT_HAVE_fpclassifyf 1
+#define __CRT_HAVE_fpclassifyl 1
 #define __CRT_HAVE_fpreset 1
 #define __CRT_HAVE_fprintf 1
 #define __CRT_HAVE_fprintf_s 1

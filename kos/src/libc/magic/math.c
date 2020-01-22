@@ -353,12 +353,37 @@ atanhl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 exp:(double x) -> double; /* TODO */
 
 @@Break VALUE into a normalized fraction and an integral power of 2
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__frexp)][crtbuiltin]
-frexp:(double x, int *pexponent) -> double; /* TODO */
+[std][ATTR_WUNUSED][alias(__frexp)][crtbuiltin]
+[requires_include(<ieee754.h>)][decl_include(<libm/frexp.h>)][userimpl]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
+frexp:(double x, [nonnull] int *pexponent) -> double {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
+#else /* ... */
+	return (double)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
+#endif /* !... */
+}
 
 @@X times (two to the EXP power)
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexp)][nothrow][crtbuiltin]
-ldexp:(double x, int exponent) -> double; /* TODO */
+[requires_include(<ieee754.h>)][decl_include(<libm/ldexp.h>)][userimpl]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
+ldexp:(double x, int exponent) -> double {
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return (double)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return (double)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
+#else /* ... */
+	return (double)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
+#endif /* !... */
+}
 
 @@Natural logarithm of X
 [attribute(@__DECL_SIMD_log@)][decl_include(<bits/math-vector.h>)]
@@ -390,11 +415,42 @@ modf:(double x, [nonnull] double *iptr) -> double {
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expf)][nothrow][crtbuiltin]
 expf:(float x) -> float %{auto_block(math)}
 
-[std][ATTR_WUNUSED][alias(__frexpf)][crtbuiltin]
-frexpf:(float x, int *pexponent) -> float %{auto_block(math)}
+[std][ATTR_WUNUSED][alias(__frexpf)][crtbuiltin][doc_alias(frexp)]
+[requires_include(<ieee754.h>)][decl_include(<libm/frexp.h>)][userimpl]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(frexp))]
+frexpf:(float x, int *pexponent) -> float {
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
+#else /* ... */
+	return (float)frexp((double)x, pexponent);
+#endif /* !... */
+}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexpf)][nothrow][crtbuiltin]
-ldexpf:(float x, int exponent) -> float %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexpf)][nothrow][crtbuiltin][doc_alias(ldexp)]
+[requires_include(<ieee754.h>)][decl_include(<libm/ldexp.h>)][userimpl]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(ldexp))]
+ldexpf:(float x, int exponent) -> float {
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
+#else /* ... */
+	return (float)ldexp((double)x, exponent);
+#endif /* !... */
+}
 
 [attribute(@__DECL_SIMD_logf@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__logf)][nothrow][crtbuiltin]
@@ -405,16 +461,22 @@ log10f:(float x) -> float %{auto_block(math)}
 
 [std][alias(__modff)][doc_alias(modf)][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/modf.h>)][userimpl]
-[requires(defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
-          defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
-          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__))]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(modf))]
 modff:(float x, [nonnull] float *iptr) -> float {
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
-#else /* ... */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
+#else /* ... */
+	double i, result;
+	result = modf((double)x, &i);
+	*iptr = (float)i;
+	return (float)result;
 #endif /* !... */
 }
 
@@ -424,11 +486,42 @@ modff:(float x, [nonnull] float *iptr) -> float {
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expl)][nothrow][crtbuiltin]
 expl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__frexpl)][crtbuiltin]
-frexpl:(__LONGDOUBLE x, int *pexponent) -> __LONGDOUBLE %{auto_block(math)}
+[std][ATTR_WUNUSED][alias(__frexpl)][crtbuiltin][doc_alias(frexp)]
+[requires_include(<ieee754.h>)][decl_include(<libm/frexp.h>)][userimpl]
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(frexp))]
+frexpl:(__LONGDOUBLE x, int *pexponent) -> __LONGDOUBLE {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, pexponent);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)x, pexponent);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)x, pexponent);
+#else /* ... */
+	return (__LONGDOUBLE)frexp((double)x, pexponent);
+#endif /* !... */
+}
 
-[std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexpl)][nothrow][crtbuiltin]
-ldexpl:(__LONGDOUBLE x, int exponent) -> __LONGDOUBLE %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_MCONST][alias(__ldexpl)][nothrow][crtbuiltin][doc_alias(ldexp)]
+[requires_include(<ieee754.h>)][decl_include(<libm/ldexp.h>)][userimpl]
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(ldexp))]
+ldexpl:(__LONGDOUBLE x, int exponent) -> __LONGDOUBLE {
+	COMPILER_IMPURE(); /* XXX: Math error handling */
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_ldexpl((__IEEE854_LONG_DOUBLE_TYPE__)x, exponent);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_ldexp((__IEEE754_DOUBLE_TYPE__)x, exponent);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_ldexpf((__IEEE754_FLOAT_TYPE__)x, exponent);
+#else /* ... */
+	return (__LONGDOUBLE)ldexp((double)x, exponent);
+#endif /* !... */
+}
 
 [attribute(@__DECL_SIMD_logl@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__logl)][nothrow][crtbuiltin]
@@ -440,16 +533,22 @@ log10l:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 
 [std][alias(__modfl)][doc_alias(modf)][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/modf.h>)][userimpl]
-[requires(defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
           defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
-          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__))]
+          $has_function(modf))]
 modfl:(__LONGDOUBLE x, [nonnull] __LONGDOUBLE *iptr) -> __LONGDOUBLE {
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return (__LONGDOUBLE)__ieee854_modfl((__IEEE854_LONG_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__ *)iptr);
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_modf((__IEEE754_DOUBLE_TYPE__)x, (__IEEE754_DOUBLE_TYPE__ *)iptr);
-#else /* ... */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 	return (__LONGDOUBLE)__ieee754_modff((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_FLOAT_TYPE__ *)iptr);
+#else /* ... */
+	double i, result;
+	result = modf((double)x, &i);
+	*iptr = (float)i;
+	return (float)result;
 #endif /* !... */
 }
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
@@ -607,29 +706,55 @@ hypotl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{auto_block(math)}
 @@Return the cube root of X
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__cbrt)][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/cbrt.h>)][userimpl]
-[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
 cbrt:(double x) -> double {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_cbrt((__IEEE754_DOUBLE_TYPE__)x);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_cbrtf((__IEEE754_FLOAT_TYPE__)x);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_cbrtl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
 }
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__cbrtf)][crtbuiltin][doc_alias(cbrt)]
 [requires_include(<ieee754.h>)][decl_include(<libm/cbrt.h>)][userimpl]
-[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(cbrt))]
 cbrtf:(float x) -> float {
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_cbrtf((__IEEE754_FLOAT_TYPE__)x);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_cbrt((__IEEE754_DOUBLE_TYPE__)x);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_cbrtl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return (float)cbrt((double)x);
+#endif /* !... */
 }
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__cbrtl)][crtbuiltin]
-cbrtl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__cbrtl)][crtbuiltin][doc_alias(cbrt)]
+[requires_include(<ieee754.h>)][decl_include(<libm/cbrt.h>)][userimpl]
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(cbrt))]
+cbrtl:(__LONGDOUBLE x) -> __LONGDOUBLE {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_cbrtl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_cbrt((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_cbrtf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return (__LONGDOUBLE)cbrt((double)x);
+#endif /* !... */
+}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
@@ -1012,25 +1137,35 @@ nexttoward:(double x, __LONGDOUBLE y) -> double; /* TODO */
 @@Return X times (2 to the Nth power)
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbn)][crtbuiltin]
 [requires_include(<ieee754.h>)][decl_include(<libm/scalbn.h>)][userimpl]
-[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(scalbln, __scalbln)]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
 scalbn:(double x, int n) -> double {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_scalbn((__IEEE754_DOUBLE_TYPE__)x, n);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
+#endif /* !... */
 }
 
-@@Return X times (2 to the Nth power)
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbln)][crtbuiltin]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbln)][crtbuiltin][doc_alias(scalbn)]
 [requires_include(<ieee754.h>)][decl_include(<libm/scalbn.h>)][userimpl]
-[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__))]
+[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbn)]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(__scalbn)]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
 scalbln:(double x, long int n) -> double {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return (double)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)x, n);
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 	return (double)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ */
+#else /* ... */
+	return (double)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
+#endif /* !... */
 }
 
 @@Round X to integral value in floating-point format using current
@@ -1121,24 +1256,41 @@ nexttowardf:(float x, __LONGDOUBLE y) -> float %{auto_block(math)}
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbnf)][crtbuiltin][doc_alias(scalbn)]
 [requires_include(<ieee754.h>)][decl_include(<libm/scalbn.h>)][userimpl]
-[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(scalblnf, __scalblnf)]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(scalbn))]
 scalbnf:(float x, int n) -> float {
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_scalbn((__IEEE754_DOUBLE_TYPE__)x, n);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
+#else /* ... */
+	return (float)scalbn((double)x, n);
+#endif /* !... */
 }
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalblnf)][crtbuiltin][doc_alias(scalbln)]
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalblnf)][crtbuiltin][doc_alias(scalbn)]
+[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnf)]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(__scalbnf)]
 [requires_include(<ieee754.h>)][decl_include(<libm/scalbn.h>)][userimpl]
-[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__))]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(scalbln))]
 scalblnf:(float x, long int n) -> float {
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return (float)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
-#else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
 	return (float)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)x, n);
-#endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
+#else /* ... */
+	return (float)scalbln((double)x, n);
+#endif /* !... */
 }
 
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow]
@@ -1184,11 +1336,44 @@ llroundf:(float x) -> __LONGLONG %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttowardl)][crtbuiltin]
 nexttowardl:(__LONGDOUBLE x, __LONGDOUBLE y) -> __LONGDOUBLE %{auto_block(math)}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbnl)][crtbuiltin]
-scalbnl:(__LONGDOUBLE x, int n) -> __LONGDOUBLE %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalbnl)][crtbuiltin][doc_alias(scalbn)]
+[requires_include(<ieee754.h>)][decl_include(<libm/scalbn.h>)][userimpl]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(scalblnl, __scalblnl)]
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(scalbn))]
+scalbnl:(__LONGDOUBLE x, int n) -> __LONGDOUBLE {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_scalbnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_scalbn((__IEEE754_DOUBLE_TYPE__)x, n);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_scalbnf((__IEEE754_FLOAT_TYPE__)x, n);
+#else /* ... */
+	return (__LONGDOUBLE)scalbn((double)x, n);
+#endif /* !... */
+}
 
-[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalblnl)][crtbuiltin]
-scalblnl:(__LONGDOUBLE x, long int n) -> __LONGDOUBLE %{auto_block(math)}
+[std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__scalblnl)][crtbuiltin][doc_alias(scalbn)]
+[requires_include(<ieee754.h>)][decl_include(<libm/scalbn.h>)][userimpl]
+[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnl)]
+[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(__scalbnl)]
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(scalbln))]
+scalblnl:(__LONGDOUBLE x, long int n) -> __LONGDOUBLE {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return (__LONGDOUBLE)__ieee854_scalblnl((__IEEE854_LONG_DOUBLE_TYPE__)x, n);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_scalbln((__IEEE754_DOUBLE_TYPE__)x, n);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return (__LONGDOUBLE)__ieee754_scalblnf((__IEEE754_FLOAT_TYPE__)x, n);
+#else /* ... */
+	return (__LONGDOUBLE)scalbln((double)x, n);
+#endif /* !... */
+}
 
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow]
 [alias(__nearbyintl)][doc_alias(nearbyint)][crtbuiltin]
@@ -1448,7 +1633,7 @@ pow10l:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 %#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isinf conflicts with C++11. */
 @@Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isinf)]
-[dependency_include(<libm/isinf.h>)][userimpl]
+[decl_include(<libm/isinf.h>)][userimpl]
 [dependency_include(<bits/huge_val.h>)][crtbuiltin]
 isinf:(double x) -> int {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
@@ -1464,7 +1649,7 @@ isinf:(double x) -> int {
 %#endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isinff)]
-[dependency_include(<libm/isinf.h>)][userimpl][doc_alias(isinf)]
+[decl_include(<libm/isinf.h>)][userimpl][doc_alias(isinf)]
 [dependency_include(<bits/huge_valf.h>)][crtbuiltin]
 isinff:(float x) -> int {
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
@@ -1483,7 +1668,7 @@ isinff:(float x) -> int {
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isinfl)]
 [if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__isinf, isinf)]
-[dependency_include(<libm/isinf.h>)][userimpl][doc_alias(isinf)]
+[decl_include(<libm/isinf.h>)][userimpl][doc_alias(isinf)]
 [dependency_include(<bits/huge_vall.h>)][crtbuiltin]
 isinfl:(__LONGDOUBLE x) -> int {
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
@@ -1502,7 +1687,7 @@ isinfl:(__LONGDOUBLE x) -> int {
 
 @@Return nonzero if VALUE is finite and not NaN
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finite, _finite)][crtbuiltin]
-[dependency_include(<libm/finite.h>)][userimpl]
+[decl_include(<libm/finite.h>)][userimpl]
 finite:(double x) -> int {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
 	return __ieee754_finite((__IEEE754_DOUBLE_TYPE__)x);
@@ -1522,7 +1707,7 @@ finite:(double x) -> int {
 significand:(double x) -> double; /* TODO */
 
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitef)][crtbuiltin]
-[dependency_include(<libm/finite.h>)][userimpl][doc_alias(finite)]
+[decl_include(<libm/finite.h>)][userimpl][doc_alias(finite)]
 finitef:(float x) -> int  {
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
 	return __ieee754_finitef((__IEEE754_FLOAT_TYPE__)x);
@@ -1543,7 +1728,7 @@ significandf:(float x) -> float %{auto_block(math)}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__finitel)][crtbuiltin]
 [if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__finite, finite)]
-[dependency_include(<libm/finite.h>)][userimpl][doc_alias(finite)]
+[decl_include(<libm/finite.h>)][userimpl][doc_alias(finite)]
 finitel:(__LONGDOUBLE x) -> int {
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 	return __ieee854_finitel((__IEEE854_LONG_DOUBLE_TYPE__)x);
@@ -1570,7 +1755,7 @@ significandl:(__LONGDOUBLE x) -> __LONGDOUBLE %{auto_block(math)}
 %#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isnan conflicts with C++11. */
 @@Return nonzero if VALUE is not a number
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isnan, _isnan)]
-[dependency_include(<libm/isnan.h>)][userimpl]
+[decl_include(<libm/isnan.h>)][userimpl]
 [dependency_include(<bits/nan.h>)][crtbuiltin]
 isnan:(double x) -> int {
 #ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
@@ -1586,7 +1771,7 @@ isnan:(double x) -> int {
 %#endif /* !cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isnanf)]
-[dependency_include(<libm/isnan.h>)][userimpl][doc_alias(isnan)]
+[decl_include(<libm/isnan.h>)][userimpl][doc_alias(isnan)]
 [dependency_include(<bits/nan.h>)][crtbuiltin]
 isnanf:(float x) -> int {
 #ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
@@ -1605,7 +1790,7 @@ isnanf:(float x) -> int {
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__isnanl)]
 [if(defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias(__isnan, _isnan, isnan)]
-[dependency_include(<libm/isnan.h>)][userimpl][doc_alias(isnan)]
+[decl_include(<libm/isnan.h>)][userimpl][doc_alias(isnan)]
 [dependency_include(<bits/nan.h>)][crtbuiltin]
 isnanl:(__LONGDOUBLE x) -> int {
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
@@ -2122,26 +2307,72 @@ scalbl:(__LONGDOUBLE x, __LONGDOUBLE n) -> __LONGDOUBLE %{auto_block(math)}
 %
 %/* Floating point classification */
 %#ifdef __USE_ISOC99
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_dclass)]
-__fpclassify:(double x) -> int; /* TODO */
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(_dclass, fpclassify)]
+[requires_include(<ieee754.h>)][decl_include(<libm/fpclassify.h>)][userimpl]
+[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]
+__fpclassify:(double x) -> int {
+#ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__
+	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
+	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#endif /* !... */
+}
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_dsign)]
+
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(_dsign)]
 __signbit:(double x) -> int {
 	return x < 0.0;
 }
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_fdclass)]
-__fpclassifyf:(float x) -> int %{auto_block(math)}
+[ATTR_WUNUSED][ATTR_CONST][nothrow]
+[export_alias(_fdclass, fpclassifyf)][doc_alias(__fpclassify)]
+[requires_include(<ieee754.h>)][decl_include(<libm/fpclassify.h>)][userimpl]
+[requires(defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) ||
+          defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) ||
+          $has_function(__fpclassify))]
+__fpclassifyf:(float x) -> int {
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#else /* ... */
+	return __fpclassify((double)x);
+#endif /* !... */
+}
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_fdsign)]
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(_fdsign)]
 __signbitf:(float x) -> int  {
 	return x < 0.0f;
 }
-%#ifdef __COMPILER_HAVE_LONGDOUBLE
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_ldclass)]
-__fpclassifyl:(__LONGDOUBLE x) -> int %{auto_block(math)}
 
-[ATTR_WUNUSED][ATTR_CONST][nothrow][alias(_ldsign)]
+%#ifdef __COMPILER_HAVE_LONGDOUBLE
+[ATTR_WUNUSED][ATTR_CONST][nothrow]
+[export_alias(_ldclass, fpclassifyl)][doc_alias(__fpclassify)]
+[requires_include(<ieee754.h>)][decl_include(<libm/fpclassify.h>)][userimpl]
+[requires(defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) ||
+          defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) ||
+          $has_function(__fpclassify))]
+__fpclassifyl:(__LONGDOUBLE x) -> int {
+#ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
+	return __ieee854_fpclassifyl((__IEEE854_LONG_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_fpclassify((__IEEE754_DOUBLE_TYPE__)x);
+#elif defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__)
+	return __ieee754_fpclassifyf((__IEEE754_FLOAT_TYPE__)x);
+#else /* ... */
+	return __fpclassify((double)x);
+#endif /* !... */
+}
+
+[ATTR_WUNUSED][ATTR_CONST][nothrow][export_alias(_ldsign)]
 __signbitl:(__LONGDOUBLE x) -> int  {
 	return x < 0.0L;
 }
@@ -2251,6 +2482,7 @@ __LIBC int (signgam);
  *      decimal and all internal floating-point formats. */
 
 /* All floating-point numbers can be put in one of these categories. */
+/* NOTE: These values must match the declarations from <libm/fdlibm.h>! */
 }%[enum @undef @macro {
 	FP_NAN       = 0,
 	FP_INFINITE  = 1,

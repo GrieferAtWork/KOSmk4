@@ -28,6 +28,13 @@
 
 #include <libm/fdlibm.h>
 
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+#include <libm/fabs.h>
+#include <libm/frexp.h>
+#include <libm/ldexp.h>
+#include <libm/fpclassify.h>
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -174,6 +181,71 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 }
 
 #endif /* __IEEE754_DOUBLE_TYPE__ */
+
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/* Compute cubic root of double value.
+   Copyright (C) 1997-2013 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+   Contributed by Dirk Alboth <dirka@uni-paderborn.de> and
+   Ulrich Drepper <drepper@cygnus.com>, 1997.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+
+__LIBM_LOCAL_DECLARE_BEGIN
+__LIBM_LOCAL_DECLARE_ARRAY(__IEEE854_LONG_DOUBLE_TYPE__, factorl, 5, {
+	__IEEE854_LONG_DOUBLE_C(0.62996052494743658238361), /* 1 / 2^(2/3) */
+	__IEEE854_LONG_DOUBLE_C(0.79370052598409973737585), /* 1 / 2^(1/3) */
+	__IEEE854_LONG_DOUBLE_C(1.0),
+	__IEEE854_LONG_DOUBLE_C(1.2599210498948731647672), /* 2^(1/3) */
+	__IEEE854_LONG_DOUBLE_C(1.5874010519681994747517), /* 2^(2/3) */
+})
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, thirdl, __IEEE854_LONG_DOUBLE_C(0.3333333333333333333333333))
+__LIBM_LOCAL_DECLARE_END
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_cbrtl)(__IEEE854_LONG_DOUBLE_TYPE__ x) {
+	__IEEE854_LONG_DOUBLE_TYPE__ xm, u;
+	int xe;
+	int x_class;
+	/* Reduce X.  XM now is an range 1.0 to 0.5.  */
+	xm = __ieee854_frexpl(__ieee854_fabsl(x), &xe);
+	/* If X is not finite or is null return it (with raising exceptions
+	   if necessary.
+	   Note: *Our* version of `frexp' sets XE to zero if the argument is
+	   Inf or NaN.  This is not portable but faster.  */
+	if (xe == 0 &&
+	    ((x_class = __ieee854_fpclassifyl(x)) == __LIBM_FP_ZERO ||
+	     x_class == __LIBM_FP_NAN || x_class == __LIBM_FP_INFINITE))
+		return x + x;
+	u = (((-__IEEE854_LONG_DOUBLE_C(1.34661104733595206551E-1) * xm +
+	       __IEEE854_LONG_DOUBLE_C(5.46646013663955245034E-1)) *
+	      xm -
+	      __IEEE854_LONG_DOUBLE_C(9.54382247715094465250E-1)) *
+	     xm +
+	     __IEEE854_LONG_DOUBLE_C(1.13999833547172932737E0)) *
+	    xm +
+	    __IEEE854_LONG_DOUBLE_C(4.02389795645447521269E-1);
+	u *= __LIBM_LOCAL_VALUE(factorl)[2 + xe % 3];
+	u = __ieee854_ldexpl(x > __IEEE854_LONG_DOUBLE_C(0.0) ? u : -u, xe / 3);
+	u -= (u - (x / (u * u))) * __LIBM_LOCAL_VALUE(thirdl);
+	u -= (u - (x / (u * u))) * __LIBM_LOCAL_VALUE(thirdl);
+	return u;
+}
+
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END
 #endif /* __CC__ */

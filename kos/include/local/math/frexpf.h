@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x544f046c */
+/* HASH CRC-32:0xf0b4ced8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,22 +19,32 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_frexpf_defined
-#if defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#include <ieee754.h>
+#if defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 #define __local_frexpf_defined 1
-/* Dependency: "frexp" */
+#include <libm/frexp.h>
+#include <libm/frexp.h>
+/* Dependency: "frexp" from "math" */
 #ifndef ____localdep_frexp_defined
 #define ____localdep_frexp_defined 1
 #if __has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW_NCX(__LIBCCALL __localdep_frexp)(double __x, int *__pexponent) { return __builtin_frexp(__x, __pexponent); }
+__EXTERNINLINE __ATTR_WUNUSED __ATTR_NONNULL((2)) double __NOTHROW_NCX(__LIBCCALL __localdep_frexp)(double __x, int *__pexponent) { return __builtin_frexp(__x, __pexponent); }
 #elif defined(__CRT_HAVE_frexp)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_frexp,(double __x, int *__pexponent),frexp,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_frexp,(double __x, int *__pexponent),frexp,(__x,__pexponent))
 #elif defined(__CRT_HAVE___frexp)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-__CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_frexp,(double __x, int *__pexponent),__frexp,(__x,__pexponent))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__localdep_frexp,(double __x, int *__pexponent),__frexp,(__x,__pexponent))
 #else /* LIBC: frexp */
+#include <ieee754.h>
+#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
+#include <local/math/frexp.h>
+/* Break VALUE into a normalized fraction and an integral power of 2 */
+#define __localdep_frexp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexp))
+#else /* CUSTOM: frexp */
 #undef ____localdep_frexp_defined
+#endif /* frexp... */
 #endif /* frexp... */
 #endif /* !____localdep_frexp_defined */
 
@@ -43,9 +53,17 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(frexpf) __ATTR_WUNUSED float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(frexpf))(float __x,
                                                     int *__pexponent) {
-#line 395 "kos/src/libc/magic/math.c"
+#line 425 "kos/src/libc/magic/math.c"
+#ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__
+	return (float)__ieee754_frexpf((__IEEE754_FLOAT_TYPE__)__x, __pexponent);
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee754_frexp((__IEEE754_DOUBLE_TYPE__)__x, __pexponent);
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
+	return (float)__ieee854_frexpl((__IEEE854_LONG_DOUBLE_TYPE__)__x, __pexponent);
+#else /* ... */
 	return (float)__localdep_frexp((double)__x, __pexponent);
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_frexp || __CRT_HAVE___frexp */
+#endif /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __CRT_HAVE_frexp || __CRT_HAVE___frexp */
 #endif /* !__local_frexpf_defined */

@@ -28,6 +28,7 @@
 #include <bits/types.h>
 
 #include <libm/fdlibm.h>
+#include <libm/copysign.h>
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -45,7 +46,10 @@ __DECL_BEGIN
  */
 
 __LIBM_LOCAL_DECLARE_BEGIN
+#ifndef __libm_two25f_defined
+#define __libm_two25f_defined 1
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, two25f, __IEEE754_FLOAT_C(3.355443200e+07))   /* 0x4c000000 */
+#endif /* !__libm_two25f_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_FLOAT_TYPE__, twom25f, __IEEE754_FLOAT_C(2.9802322388e-08)) /* 0x33000000 */
 #ifndef __libm_hugef_defined
 #define __libm_hugef_defined 1
@@ -151,7 +155,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
  */
 
 __LIBM_LOCAL_DECLARE_BEGIN
+#ifndef __libm_two54_defined
+#define __libm_two54_defined 1
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, two54, __IEEE754_DOUBLE_C(1.80143985094819840000e+16)) /* 0x43500000, 0x00000000 */
+#endif /* !__libm_two54_defined */
 __LIBM_LOCAL_DECLARE(__IEEE754_DOUBLE_TYPE__, twom54, __IEEE754_DOUBLE_C(5.55111512312578270212e-17)) /* 0x3C900000, 0x00000000 */
 #ifndef __libm_huge_defined
 #define __libm_huge_defined 1
@@ -229,6 +236,95 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 }
 
 #endif /* __IEEE754_DOUBLE_TYPE__ */
+
+
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
+/*
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice 
+ * is preserved.
+ * ====================================================
+ */
+
+__LIBM_LOCAL_DECLARE_BEGIN
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, two64l, __IEEE854_LONG_DOUBLE_C(1.8446744073709551616e19))
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, twom64l, __IEEE854_LONG_DOUBLE_C(5.421010862427522170037e-20))
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, hugeval4900l, __IEEE854_LONG_DOUBLE_C(1.0e+4900))
+#ifndef __libm_tinyl_defined
+#define __libm_tinyl_defined 1
+__LIBM_LOCAL_DECLARE(__IEEE854_LONG_DOUBLE_TYPE__, tinyl, __IEEE854_LONG_DOUBLE_C(1.0e-4900))
+#endif /* !__libm_tinyl_defined */
+__LIBM_LOCAL_DECLARE_END
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_scalbnl)(__IEEE854_LONG_DOUBLE_TYPE__ __x, int __n) {
+	__int32_t __k, __es, __hx, __lx;
+	__LIBM_GET_LDOUBLE_WORDS(__es, __hx, __lx, __x);
+	__k = __es & IEEE854_LONG_DOUBLE_MAXEXP; /* extract exponent */
+	if (__k == 0) { /* 0 or subnormal x */
+		if ((__lx | (__hx & __UINT32_C(0x7fffffff))) == 0)
+			return __x; /* +-0 */
+		__x *= __LIBM_LOCAL_VALUE(two64l);
+		__LIBM_GET_LDOUBLE_EXP(__hx, __x);
+		__k = (__hx & IEEE854_LONG_DOUBLE_MAXEXP) - 64;
+	}
+	if (__k == IEEE854_LONG_DOUBLE_MAXEXP)
+		return __x + __x; /* NaN or Inf */
+	if ((__int32_t)__n < -__INT32_C(30000))
+		return __LIBM_LOCAL_VALUE(tinyl) * __ieee854_copysignl(__LIBM_LOCAL_VALUE(tinyl), __x);
+	if ((__int32_t)__n > __INT32_C(30000) || (__k + __n) > 0x7ffe)
+		return __LIBM_LOCAL_VALUE(hugeval4900l) * __ieee854_copysignl(__LIBM_LOCAL_VALUE(hugeval4900l), __x); /* overflow  */
+	/* Now k and n are bounded we know that k = k+n does not
+	   overflow.  */
+	__k = __k + __n;
+	if (__k > 0) { /* normal result */
+		__LIBM_SET_LDOUBLE_EXP(__x, (__es & 0x8000) | __k);
+		return __x;
+	}
+	if (__k <= -64)
+		return __LIBM_LOCAL_VALUE(tinyl) * __ieee854_copysignl(__LIBM_LOCAL_VALUE(tinyl), __x); /*underflow */
+	__k += 64;                              /* subnormal result */
+	__LIBM_SET_LDOUBLE_EXP(__x, (__es & 0x8000) | __k);
+	return __x * __LIBM_LOCAL_VALUE(twom64l);
+}
+
+__LOCAL __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
+(__LIBCCALL __ieee854_scalblnl)(__IEEE854_LONG_DOUBLE_TYPE__ x, long int n) {
+	__int32_t k, es, hx, lx;
+	__LIBM_GET_LDOUBLE_WORDS(es, hx, lx, x);
+	k = es & IEEE854_LONG_DOUBLE_MAXEXP; /* extract exponent */
+	if (k == 0) {                        /* 0 or subnormal x */
+		if ((lx | (hx & __UINT32_C(0x7fffffff))) == 0)
+			return x; /* +-0 */
+		x *= __LIBM_LOCAL_VALUE(two64l);
+		__LIBM_GET_LDOUBLE_EXP(hx, x);
+		k = (hx & IEEE854_LONG_DOUBLE_MAXEXP) - 64;
+	}
+	if (k == IEEE854_LONG_DOUBLE_MAXEXP)
+		return x + x; /* NaN or Inf */
+	if (n < __INT32_C(-50000))
+		return __LIBM_LOCAL_VALUE(tiny) * __ieee854_copysignl(__LIBM_LOCAL_VALUE(tiny), x);
+	if (n > __INT32_C(50000) || k + n > 0x7ffe)
+		return __LIBM_LOCAL_VALUE(hugeval4900l) * __ieee854_copysignl(__LIBM_LOCAL_VALUE(hugeval4900l), x); /* overflow  */
+	/* Now k and n are bounded we know that k = k+n does not
+	   overflow.  */
+	k = k + n;
+	if (k > 0) { /* normal result */
+		__LIBM_SET_LDOUBLE_EXP(x, (es & 0x8000) | k);
+		return x;
+	}
+	if (k <= -64)
+		return __LIBM_LOCAL_VALUE(tinyl) * __ieee854_copysignl(__LIBM_LOCAL_VALUE(tinyl), x); /* underflow */
+	k += 64; /* subnormal result */
+	__LIBM_SET_LDOUBLE_EXP(x, (es & 0x8000) | k);
+	return x * __LIBM_LOCAL_VALUE(twom64l);
+}
+
+#endif /* __IEEE854_LONG_DOUBLE_TYPE__ */
 
 __DECL_END
 #endif /* __CC__ */

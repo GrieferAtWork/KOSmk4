@@ -29,6 +29,13 @@
 
 #include <ieee754.h>
 
+/* NOTE: These values must match the declarations from <math.h>! */
+#define __LIBM_FP_NAN       0
+#define __LIBM_FP_INFINITE  1
+#define __LIBM_FP_ZERO      2
+#define __LIBM_FP_SUBNORMAL 3
+#define __LIBM_FP_NORMAL    4
+
 #ifdef __CC__
 __DECL_BEGIN
 

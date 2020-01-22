@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0ea9f1f */
+/* HASH CRC-32:0x7367d08d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,7 +110,7 @@ INTDEF WUNUSED __LONGDOUBLE NOTHROW(LIBCCALL libc_atanhl)(__LONGDOUBLE x);
 /* Exponential function of X */
 INTDEF __DECL_SIMD_exp WUNUSED double NOTHROW(LIBCCALL libc_exp)(double x);
 /* Break VALUE into a normalized fraction and an integral power of 2 */
-INTDEF WUNUSED double NOTHROW_NCX(LIBCCALL libc_frexp)(double x, int *pexponent);
+INTDEF WUNUSED NONNULL((2)) double NOTHROW_NCX(LIBCCALL libc_frexp)(double x, int *pexponent);
 /* X times (two to the EXP power) */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_ldexp)(double x, int exponent);
 /* Natural logarithm of X */
