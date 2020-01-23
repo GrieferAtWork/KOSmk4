@@ -678,7 +678,7 @@
 
 
 #ifndef _STDC_PREDEF_H
-#include <stdc-predef.h>
+#include "stdc-predef.h"
 #endif /* !_STDC_PREDEF_H */
 
 #if 0 /* TODO: Enable this and re-build all utility programs from scratch */
