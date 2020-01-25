@@ -124,7 +124,6 @@ incdir("", "../../include");
 #include <__stdinc.h>
 #include <_ansi.h>
 #include <_lfs_64.h>
-#include <_newlib_version.h>
 #include <aio.h>
 #include <aliases.h>
 #include <alloc.h>
@@ -837,6 +836,7 @@ incdir("", "../../include");
 #include <sys/sysinfo.h>
 #include <sys/syslog.h>
 #include <sys/sysmacros.h>
+#include <sys/termios.h>
 #include <sys/time.h>
 #include <sys/timeb.h>
 #include <sys/timerfd.h>
@@ -858,6 +858,7 @@ incdir("", "../../include");
 #include <syscall.h>
 #include <syslimits.h>
 #include <syslog.h>
+#include <tar.h>
 #if __has_include(<term.h>)
 #include <term.h>
 #endif /* __has_include(<term.h>) */
