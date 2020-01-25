@@ -1257,6 +1257,7 @@ pthread_spin_init:([nonnull] pthread_spinlock_t *lock, int pshared) -> int {
 %
 @@Destroy the spinlock LOCK
 pthread_spin_destroy:([nonnull] pthread_spinlock_t *lock) -> int {
+	COMPILER_IMPURE();
 	(void)lock; /* no-op */
 	return 0;
 }

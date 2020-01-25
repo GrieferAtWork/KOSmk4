@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7e8ed2b */
+/* HASH CRC-32:0x148fe3eb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Try to lock spinlock LOCK */
 __LOCAL_LIBC(pthread_spin_trylock) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_trylock))(__pthread_spinlock_t *__lock) {
-#line 1279 "kos/src/libc/magic/pthread.c"
+#line 1280 "kos/src/libc/magic/pthread.c"
 	if (__hybrid_atomic_xch(*__lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
 #ifdef __EBUSY

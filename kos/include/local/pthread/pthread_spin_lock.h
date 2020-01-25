@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11ec3ae5 */
+/* HASH CRC-32:0x2b5df110 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Wait until spinlock LOCK is retrieved */
 __LOCAL_LIBC(pthread_spin_lock) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_lock))(__pthread_spinlock_t *__lock) {
-#line 1269 "kos/src/libc/magic/pthread.c"
+#line 1270 "kos/src/libc/magic/pthread.c"
 	while (__localdep_pthread_spin_trylock(__lock) != 0)
 		__hybrid_yield();
 	return 0;
