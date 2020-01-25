@@ -348,15 +348,15 @@ INTDEF void KCALL x86_debug_finalize_ps2_keyboard(void);
 /* Flagset of components that could be preserved (used to make the
  * debugger initialization more robust against recursively entering
  * itself) (set of `INITOK_*') */
-PRIVATE ATTR_DBGBSS volatile uintptr_t initok = 0;
-#define INITOK_THIS_EXCEPTION_INFO   0x0001
-#define INITOK_TASKSELF              0x0002
-#define INITOK_TASKFLAGS             0x0004
-#define INITOK_PSP0                  0x0008
-#define INITOK_SCHED_OVERRIDE        0x0010
-#define INITOK_READLOCKS             0x0020
-#define INITOK_CONNECTIONS           0x0040
-#define INITOK_PREEMPTIVE_INTERRUPTS 0x0080
+PRIVATE ATTR_DBGBSS volatile u8 initok = 0;
+#define INITOK_THIS_EXCEPTION_INFO   0x01
+#define INITOK_TASKSELF              0x02
+#define INITOK_TASKFLAGS             0x04
+#define INITOK_PSP0                  0x08
+#define INITOK_SCHED_OVERRIDE        0x10
+#define INITOK_READLOCKS             0x20
+#define INITOK_CONNECTIONS           0x40
+#define INITOK_PREEMPTIVE_INTERRUPTS 0x80
 
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_save_psp0_thread(struct x86_dbg_psp0threadstate *__restrict state,

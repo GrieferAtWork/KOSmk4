@@ -610,9 +610,9 @@ NOTHROW(KCALL isr_vector_trigger_impl)(size_t index) {
 
 /* Trigger the given ISR vector, returning true if any handler returned
  * true, or if a greedy handler was defined. Otherwise, return `false'. */
-PUBLIC NOBLOCK bool
+PUBLIC ATTR_NOINLINE NOBLOCK bool
 NOTHROW(KCALL isr_vector_trigger)(isr_vector_t vector) {
-	if unlikely(!ISR_VECTOR_IS_VALID(vector))
+	if unlikely_untraced(!ISR_VECTOR_IS_VALID(vector))
 		return false;
 	return isr_vector_trigger_impl(ISR_VECTOR_TO_INDEX(vector));
 }
@@ -625,7 +625,7 @@ NOTHROW(KCALL isr_unhandled)(size_t index) {
 
 FORCELOCAL NOBLOCK void
 NOTHROW(KCALL isr_handler)(size_t index) {
-	if unlikely(!isr_vector_trigger_impl(index)) {
+	if unlikely_untraced(!isr_vector_trigger_impl(index)) {
 		isr_unhandled(index);
 	}
 }

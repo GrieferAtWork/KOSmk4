@@ -478,7 +478,7 @@ libansitty_init(struct ansitty *__restrict self,
 }
 
 
-LOCAL void CC
+PRIVATE void CC
 setcolor(struct ansitty *__restrict self,
          uint8_t color) {
 	if (self->at_color == color)
@@ -491,7 +491,7 @@ setcolor(struct ansitty *__restrict self,
 	SETCOLOR(color);
 }
 
-LOCAL void CC
+PRIVATE void CC
 setttymode(struct ansitty *__restrict self, uint16_t new_ttymode) {
 	if (self->at_ttymode == new_ttymode)
 		return;
@@ -499,7 +499,7 @@ setttymode(struct ansitty *__restrict self, uint16_t new_ttymode) {
 	SETTTYMODE(new_ttymode);
 }
 
-LOCAL void CC
+PRIVATE void CC
 setattrib(struct ansitty *__restrict self, uint16_t new_attrib) {
 	if (self->at_attrib == new_attrib)
 		return;
@@ -507,7 +507,7 @@ setattrib(struct ansitty *__restrict self, uint16_t new_attrib) {
 	SETATTRIB(new_attrib);
 }
 
-LOCAL void CC
+PRIVATE void CC
 setflags(struct ansitty *__restrict self, uint16_t new_flags) {
 	if (self->at_ttyflag == new_flags)
 		return;
@@ -668,7 +668,7 @@ cp_decode(uint8_t ch, struct ansitty *__restrict self) {
 	return result;
 }
 
-LOCAL NONNULL((1)) bool CC
+PRIVATE NONNULL((1)) bool CC
 handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 	switch (ch) {
 
@@ -767,7 +767,7 @@ done:
 	return true;
 }
 
-LOCAL NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void CC
 ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
 	switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
 	                            ANSITTY_FLAG_INSDEL_SCRN)) {
@@ -851,7 +851,7 @@ do_putuni_and_break:
 	}
 }
 
-LOCAL NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void CC
 ansitty_do_repeat_unicode(struct ansitty *__restrict self,
                           char32_t ch, unsigned int count) {
 	assert(count != 0);
@@ -869,7 +869,7 @@ ansitty_do_repeat_unicode(struct ansitty *__restrict self,
 	}
 }
 
-LOCAL NONNULL((1)) void CC
+PRIVATE NONNULL((1)) void CC
 ansitty_pututf8_mbs(struct ansitty *__restrict self,
                     uintptr_half_t state, char ch) {
 	char32_t unich;

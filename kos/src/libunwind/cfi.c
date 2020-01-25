@@ -78,7 +78,7 @@ DECL_BEGIN
 	memcpy(error_info(), &old_except, sizeof(struct exception_info))
 
 
-LOCAL WUNUSED NONNULL((2)) bool
+PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 	uint8_t value;
 	EXCEPTION_INFO_SAVE();
@@ -96,7 +96,7 @@ err_segfault:
 	return false;
 }
 
-LOCAL WUNUSED NONNULL((2)) bool
+PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readw)(uint16_t *ptr, uintptr_t *__restrict result) {
 	uint16_t value;
 	EXCEPTION_INFO_SAVE();
@@ -114,7 +114,7 @@ err_segfault:
 	return false;
 }
 
-LOCAL WUNUSED NONNULL((2)) bool
+PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readl)(uint32_t *ptr, uintptr_t *__restrict result) {
 	uint32_t value;
 	EXCEPTION_INFO_SAVE();
@@ -133,7 +133,7 @@ err_segfault:
 }
 
 #if __SIZEOF_POINTER__ > 4
-LOCAL WUNUSED NONNULL((2)) bool
+PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readq)(uint64_t *ptr, uintptr_t *__restrict result) {
 	uint64_t value;
 	EXCEPTION_INFO_SAVE();

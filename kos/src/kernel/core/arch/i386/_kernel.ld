@@ -425,13 +425,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_bootidle_stack_pageptr = addr2pageptr(ABSOLUTE(.)));
 		. += KERNEL_IDLE_STACKSIZE;
 
-#ifndef CONFIG_NO_DEBUGGER
 		IP_ALIGN(PAGESIZE);
-		. += PAGESIZE;
-		PROVIDE(dbg_stack = ABSOLUTE(.));
-		. += KERNEL_DEBUG_STACKSIZE;
-#endif /* !CONFIG_NO_DEBUGGER */
-
 		*(.bss.mall.untracked)
 
 		IP_ALIGN(PAGESIZE);

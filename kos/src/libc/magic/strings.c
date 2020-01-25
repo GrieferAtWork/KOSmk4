@@ -46,9 +46,11 @@ bzero:([nonnull] void *__restrict dst, $size_t num_bytes) {
 	memset(dst, 0, num_bytes);
 }
 
+/* FIXME: This declaration causes `bcmp' to be exported by the kernel (which it shouldn't) */
 [guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
 bcmp:([nonnull] void const *s1,
-      [nonnull] void const *s2, $size_t num_bytes) -> int = memcmp;
+      [nonnull] void const *s2,
+      $size_t num_bytes) -> int = memcmp;
 
 
 [guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]

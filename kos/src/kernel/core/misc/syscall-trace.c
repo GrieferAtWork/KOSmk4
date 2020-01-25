@@ -108,6 +108,9 @@ syscall_trace(struct rpc_syscall_info const *__restrict info) {
 #undef linux_stat64
 #undef linux_oldstat
 
+/* TODO: This function needs to be moved into a driver!
+ *       It's .text size is already almost 100K bytes, and
+ *       that's not even counting all of the strings (sheesh...) */
 PUBLIC ssize_t FCALL
 syscall_printtrace(struct rpc_syscall_info const *__restrict info,
                    pformatprinter printer, void *arg) {

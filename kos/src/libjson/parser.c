@@ -41,7 +41,7 @@ DECL_BEGIN
 #define isradixch(ch) ((ch) == 'x' || (ch) == 'X' || (ch) == 'b' || (ch) == 'B')
 
 
-LOCAL NONNULL((1)) char32_t
+PRIVATE NONNULL((1)) char32_t
 NOTHROW_NCX(CC json_getc)(struct json_parser *__restrict self) {
 	char32_t result;
 	switch (__builtin_expect(self->jp_encoding, JSON_ENCODING_UTF8)) {
@@ -70,7 +70,7 @@ NOTHROW_NCX(CC json_getc)(struct json_parser *__restrict self) {
 	return result;
 }
 
-LOCAL NONNULL((1)) char32_t
+PRIVATE NONNULL((1)) char32_t
 NOTHROW_NCX(CC json_ungetc)(struct json_parser *__restrict self) {
 	char32_t result;
 	switch (__builtin_expect(self->jp_encoding, JSON_ENCODING_UTF8)) {
@@ -657,7 +657,7 @@ check_field_label:
  * @return: JSON_ERROR_OK:    The parser now points at first member/index of the inner object/array.
  * @return: JSON_ERROR_NOOBJ: The parser didn't point at `{' or `[' (its position remains unchanged).
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-LOCAL NONNULL((1)) int
+PRIVATE NONNULL((1)) int
 NOTHROW_NCX(CC libjson_parser_enter_something)(struct json_parser *__restrict self,
                                                bool allow_object,
                                                bool allow_array) {
@@ -695,7 +695,7 @@ NOTHROW_NCX(CC libjson_parser_enterarray)(struct json_parser *__restrict self) {
  *                          the parser exists at the `}' or `]' that is taking its place.
  * @return: JSON_ERROR_EOF: The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-LOCAL NONNULL((1)) int
+PRIVATE NONNULL((1)) int
 NOTHROW_NCX(CC libjson_parser_leave_something)(struct json_parser *__restrict self,
                                                bool allow_object,
                                                bool allow_array) {
