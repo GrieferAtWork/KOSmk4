@@ -965,7 +965,9 @@
 #else
 #   define __WCHAR_TYPE__ __TYPEFOR_INTIB(__SIZEOF_WCHAR_T__)
 #endif
-#elif defined(__cplusplus) && defined(__native_wchar_t_defined)
+#elif (defined(__cplusplus) &&              \
+       defined(__native_wchar_t_defined) && \
+       defined(__KOS_SYSTEM_HEADERS__))
 /*  g++ Seems to pre-define `__WCHAR_TYPE__' incorrectly as its integral value
  * (the same way it does in C; `#define __WCHAR_TYPE__ int'), so fix it here... */
 #   undef __WCHAR_TYPE__
