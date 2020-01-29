@@ -433,6 +433,22 @@ __SYSDECL_BEGIN
 #define SCNuSIZ        __SCAP_PREFIX "u"
 #define SCNoSIZ        __SCAP_PREFIX "o"
 #define SCNxSIZ        __SCAP_PREFIX "x"
+
+#define SCNU8          __SCA1_PREFIX "U"
+#define SCNU16         __SCA2_PREFIX "U"
+#define SCNU32         __SCA4_PREFIX "U"
+#define SCNU64         __SCA8_PREFIX "U"
+#define SCNULEAST8     __SCAL1_PREFIX "U"
+#define SCNULEAST16    __SCAL2_PREFIX "U"
+#define SCNULEAST32    __SCAL4_PREFIX "U"
+#define SCNULEAST64    __SCAL8_PREFIX "U"
+#define SCNUFAST8      __SCAF1_PREFIX "U"
+#define SCNUFAST16     __SCAF2_PREFIX "U"
+#define SCNUFAST32     __SCAF4_PREFIX "U"
+#define SCNUFAST64     __SCAF8_PREFIX "U"
+#define SCNUMAX        __SCA8_PREFIX "U"
+#define SCNUPTR        __SCAP_PREFIX "U"
+#define SCNUSIZ        __SCAP_PREFIX "U"
 #endif /* __USE_KOS */
 
 
