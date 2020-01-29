@@ -28,6 +28,21 @@
 
 #include "gdb.h"
 
+/* To function properly with this driver (and the way it is designed to
+ * debug an entire operating system in a way that makes GDB think it is
+ * debugging a process that has fork()+exec()'ed itself a whole bunch of
+ * times), GDB must be initialized as:
+ * >> set schedule-multiple on     # Allow multiple processes to run at the same time
+ * >> set detach-on-fork off       # Don't detach the child/parent process after fork()
+ * >> set follow-fork-mode child   # (Might be a bug in gdb): Required to prevent GDB from
+ * >>                              # removing breakpoints from the child process after fork()
+ * >>                              # The documentation says that it would, however it also
+ * >>                              # seems to assume that `schedule-multiple' is `off', so
+ * >>                              # I'm just happy that setting `child' here works in my
+ * >>                              # favor. (And I hope that there aren't any cases where
+ * >>                              # GDB would still silently discard breakpoints...)
+ */
+
 #undef HAVE_GDB_DEBUG
 #if 0
 #include <kernel/printk.h>

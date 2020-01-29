@@ -47,7 +47,9 @@
 				{ "text": "set print demangle on", "ignoreFailures": true },
 				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
 				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
-				{ "text": "set detach-on-fork off", "ignoreFailures": false }
+				{ "text": "set detach-on-fork off", "ignoreFailures": false },
+				{ "text": "set schedule-multiple on", "ignoreFailures": false },
+				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			],
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
 			"debugServerArgs": "/c \"deemon ${workspaceRoot}\\..\\magic.dee --run-only --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
@@ -100,7 +102,9 @@
 				{ "text": "set print demangle on", "ignoreFailures": true },
 				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
 				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
-				{ "text": "set detach-on-fork off", "ignoreFailures": false }
+				{ "text": "set detach-on-fork off", "ignoreFailures": false },
+				{ "text": "set schedule-multiple on", "ignoreFailures": false },
+				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			]
 		},
 		{
@@ -148,7 +152,9 @@
 				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
 				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
 				{ "text": "set detach-on-fork off", "ignoreFailures": false },
-				{ "text": "set non-stop on", "ignoreFailures": false }
+				{ "text": "set non-stop on", "ignoreFailures": false },
+				{ "text": "set schedule-multiple on", "ignoreFailures": false },
+				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			],
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
 			"debugServerArgs": "/c \"deemon ${workspaceRoot}\\..\\magic.dee --run-only --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
@@ -202,7 +208,9 @@
 				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
 				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
 				{ "text": "set detach-on-fork off", "ignoreFailures": false },
-				{ "text": "set non-stop on", "ignoreFailures": false }
+				{ "text": "set non-stop on", "ignoreFailures": false },
+				{ "text": "set schedule-multiple on", "ignoreFailures": false },
+				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			]
 		},
 		{
