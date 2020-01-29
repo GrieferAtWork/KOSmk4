@@ -1813,7 +1813,7 @@ send_empty:
 			o = STPCAT(o, ";qXfer:libraries:read+");
 			o = STPCAT(o, ";qXfer:threads:read+");
 			o = STPCAT(o, ";qXfer:osdata:read+");
-/*			o = STPCAT(o, ";qXfer:features:read+"); // I don't really understand what this is good for (yet) */
+			o = STPCAT(o, ";qXfer:features:read+"); /* Allows GDB to handle custom registers */
 			o = STPCAT(o, ";vContSupported+");
 		} else if (nameLen == 1 + COMPILER_STRLEN("ThreadInfo") &&
 		           memcmp(i + 1, "ThreadInfo", COMPILER_STRLEN("ThreadInfo") * sizeof(char)) == 0 &&
@@ -2027,13 +2027,13 @@ do_transmit:
 		return GDB_HANDLECOMMAND_DTCH;
 	return GDB_HANDLECOMMAND_CONT;
 err_unknown_register_get:
-	printk(KERN_WARNING "[gdb] Unknown register accessed by packet: %$q\n",
+	printk(KERN_WARNING "[gdb] Unknown register read by packet: %$q\n",
 	       (size_t)(endptr - GDBRemote_CommandBuffer), GDBRemote_CommandBuffer);
 	/* The docs specify that we should send an empty packet for an invalid query
 	 * I'm just going to assume that this means: unrecognized-register... */
 	goto send_empty;
 err_unknown_register_set:
-	printk(KERN_WARNING "[gdb] Unknown register accessed by packet: %$q\n",
+	printk(KERN_WARNING "[gdb] Unknown register set by packet: %$q\n",
 	       (size_t)(endptr - GDBRemote_CommandBuffer), GDBRemote_CommandBuffer);
 /*err_EPERM:*/
 	o = GDB_EncodeError(o, EPERM);
