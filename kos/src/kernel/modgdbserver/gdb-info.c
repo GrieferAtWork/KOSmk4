@@ -42,6 +42,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include <libcmdline/encode.h>
@@ -242,7 +243,7 @@ GDB_LibraryListPrinter(void *closure,
 	} EXCEPT {
 	}
 	PRINTF("\">"
-	           "<segment address=\"%#Ix\"/>"
+	           "<segment address=\"%#" PRIxPTR "\"/>"
 	       "</library>",
 	       loadstart);
 	return result;
@@ -298,7 +299,7 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 				PRINTF("<library name=\"%#q\">", d->d_name);
 			}
 		}
-		PRINTF("<segment address=\"%#Ix\"/>"
+		PRINTF("<segment address=\"%#" PRIxPTR "\"/>"
 		       "</library>",
 		       d->d_loadstart + alignment_offset);
 	}
@@ -332,7 +333,7 @@ NOTHROW(FCALL GDBInfo_PrintVMLibraryList)(pformatprinter printer, void *arg,
 	       "<!DOCTYPE target SYSTEM \"library-list.dtd\">"
 	       "<library-list>"
 	           "<library name=%q>"
-	               "<segment address=\"%#Ix\"/>"
+	               "<segment address=\"%#" PRIxPTR "\"/>"
 	           "</library>",
 	       kernel_driver.d_filename,
 	       kernel_driver.d_loadstart);
@@ -432,7 +433,7 @@ NOTHROW(FCALL GDBInfo_PrintProcessList_Callback)(void *closure,
 	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
 	pid = task_getrootpid_of_s(thread);
 	PRINTF("<item>"
-	       "<column name=\"pid\">%I32x</column>"
+	       "<column name=\"pid\">%" PRIx32 "</column>"
 	       "<column name=\"user\">root</column>"
 	       "<column name=\"program\">", pid);
 	DO(GDBInfo_PrintThreadExecFile(printer, arg, thread, false));
@@ -458,7 +459,7 @@ NOTHROW(FCALL GDBInfo_PrintProcessList)(pformatprinter printer, void *arg) {
 	      "<!DOCTYPE target SYSTEM \"osdata.dtd\">"
 	      "<osdata type=\"processes\">");
 	PRINTF("<item>"
-	       "<column name=\"pid\">%I32x</column>"
+	       "<column name=\"pid\">%" PRIx32 "</column>"
 	       "<column name=\"user\">root</column>"
 	       "<column name=\"program\">%s</column>"
 	       "<column name=\"command\">",
@@ -557,7 +558,7 @@ NOTHROW(FCALL GDBInfo_PrintFdListEntry)(pformatprinter printer, void *arg,
                                         struct handle *__restrict hnd) {
 	ssize_t temp, result = 0;
 	PRINTF("<item>"
-	       "<column name=\"pid\">%I32x</column>", pid);
+	       "<column name=\"pid\">%" PRIx32 "</column>", pid);
 	PRINT("<column name=\"command\">");
 	DO(GDBInfo_PrintThreadCommandline(printer, arg, thread));
 	PRINTF("</column>"
@@ -604,7 +605,7 @@ NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
 			unsigned int fd, index;
 			fd = hman->hm_hashvector.hm_hashvec[i].hh_handle_id;
 			if (fd == HANDLE_HASHENT_SENTINEL_ID)
-				continue; /* Unused / Sentinal */
+				continue; /* Unused / Sentinel */
 			index = hman->hm_hashvector.hm_hashvec[i].hh_vector_index;
 			if (index == (unsigned int)-1)
 				continue; /* Deleted */
@@ -688,14 +689,14 @@ NOTHROW(FCALL GDBInfo_PrintOSThreadList_Callback)(void *closure,
 		PRINT("-");
 		pid = -pid;
 	}
-	PRINTF("%Ix</column>"
+	PRINTF("%" PRIxPTR "</column>"
 	       "<column name=\"tid\">",
 	       (uintptr_t)pid);
 	if (tid < 0) {
 		PRINT("-");
 		tid = -tid;
 	}
-	PRINTF("%Ix</column>"
+	PRINTF("%" PRIxPTR "</column>"
 	       "<column name=\"program\">",
 	       (uintptr_t)tid);
 	DO(GDBInfo_PrintThreadExecFile(printer, arg, thread, false));
@@ -812,18 +813,18 @@ do_printer_register:
 		DO(GDB_PrintRegisterName(regno, printer, arg));
 		PRINT("</column><column name=\"value\">");
 		if (size == 1) {
-			PRINTF("%#I8x", *(u8 *)buf);
+			PRINTF("%#" PRIx8, *(u8 *)buf);
 		} else if (size == 2) {
-			PRINTF("%#I16x", UNALIGNED_GET16((u16 *)buf));
+			PRINTF("%#" PRIx16, UNALIGNED_GET16((u16 *)buf));
 		} else if (size == 4) {
-			PRINTF("%#I32x", UNALIGNED_GET32((u32 *)buf));
+			PRINTF("%#" PRIx32, UNALIGNED_GET32((u32 *)buf));
 		} else if (size == 8) {
-			PRINTF("%#I64x", UNALIGNED_GET64((u64 *)buf));
+			PRINTF("%#" PRIx64, UNALIGNED_GET64((u64 *)buf));
 		} else {
 			for (i = 0; i < size; ++i) {
 				if (i != 0)
 					PRINT(" ");
-				PRINTF("%.2I8X", buf[i]);
+				PRINTF("%.2" PRIx8, buf[i]);
 			}
 		}
 		PRINT("</column></item>");

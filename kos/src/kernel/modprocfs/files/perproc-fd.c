@@ -156,7 +156,7 @@ ProcFS_PerProc_Fd_Enum(struct directory_node *__restrict self,
 			unsigned int fd;
 			fd = hman->hm_hashvector.hm_hashvec[i].hh_handle_id;
 			if (fd == HANDLE_HASHENT_SENTINEL_ID)
-				continue; /* Unused / Sentinal */
+				continue; /* Unused / Sentinel */
 			if (hman->hm_hashvector.hm_hashvec[i].hh_vector_index == (unsigned int)-1)
 				continue; /* Deleted */
 			if (buflen >= COMPILER_LENOF(buf)) {

@@ -908,7 +908,7 @@ NOTHROW(KCALL task_getsessionleaderpid_of_nx)(struct task *__restrict thread) {
 
 FORCELOCAL WUNUSED ATTR_CONST bool
 NOTHROW(KCALL task_isprocessleader)(void) {
-	return PERTASK(this_taskgroup.tg_process) == THIS_TASK;
+	return PERTASK_GET(this_taskgroup.tg_process) == THIS_TASK;
 }
 
 FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
@@ -919,7 +919,7 @@ NOTHROW(KCALL task_isprocessleader_p)(struct task const *__restrict thread) {
 
 FORCELOCAL WUNUSED ATTR_PURE bool
 NOTHROW(KCALL task_isprocessgroupleader)(void) {
-	return PERTASK(this_taskgroup.tg_proc_group) == THIS_TASK;
+	return PERTASK_GET(this_taskgroup.tg_proc_group) == THIS_TASK;
 }
 
 FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
@@ -930,7 +930,7 @@ NOTHROW(KCALL task_isprocessgroupleader_p)(struct task const *__restrict thread)
 
 FORCELOCAL WUNUSED ATTR_PURE bool
 NOTHROW(KCALL task_issessionleader)(void) {
-	return PERTASK(this_taskgroup.tg_pgrp_session) == THIS_TASK;
+	return PERTASK_GET(this_taskgroup.tg_pgrp_session) == THIS_TASK;
 }
 
 FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool

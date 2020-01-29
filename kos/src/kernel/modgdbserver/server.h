@@ -44,7 +44,7 @@
  */
 
 #undef HAVE_GDB_DEBUG
-#if 0
+#if 1
 #include <kernel/printk.h>
 #define HAVE_GDB_DEBUG 1
 #define GDB_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)

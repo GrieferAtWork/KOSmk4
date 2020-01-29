@@ -44,6 +44,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -269,7 +270,7 @@ NOTHROW(FCALL GDBEncode_IntptrAsHex)(char *buf, intptr_t v) {
 		*buf++ = '-';
 		v = -v;
 	}
-	buf += sprintf(buf, "%Ix", (uintptr_t)v);
+	buf += sprintf(buf, "%" PRIxPTR, (uintptr_t)v);
 	return buf;
 }
 
@@ -585,38 +586,41 @@ NOTHROW(FCALL GDB_ConstructStopReply)(char *ptr,
 		switch (reason->dtr_reason) {
 
 		case DEBUGTRAP_REASON_TEXITED:
-			ptr += sprintf(ptr, "w%x;", reason->dtr_signo);
+			ptr += sprintf(ptr, "w%" PRIx8 ";", signo);
 			ptr = GDBThread_EncodeThreadID(ptr, (struct task *)reason->dtr_ptrarg);
 			goto done;
 
 		case DEBUGTRAP_REASON_PEXITED: {
 			union wait w;
 			w.w_status = (int)(unsigned int)reason->dtr_signo;
-			if (WIFSIGNALED(w)) {
+			if (WIFSIGNALED(w) || 1) {
+				uint8_t signo;
+				signo = WEXITSTATUS(w);
+				signo = SIGSEGV;
 				if (GDBServer_Features & GDB_SERVER_FEATURE_MULTIPROCESS) {
 					intptr_t pid;
-					ptr += sprintf(ptr, "X%x;process:", WTERMSIG(w));
+					ptr += sprintf(ptr, "X%" PRIx8 ";process:", signo);
 					pid = GDBThread_GetPID((struct task *)reason->dtr_ptrarg);
 					ptr = GDBEncode_IntptrAsHex(ptr, pid);
 				} else {
 					*ptr++ = 'X';
-					*ptr++ = GDB_ToHex((WTERMSIG(w) >> 4) & 0xf);
-					*ptr++ = GDB_ToHex(WTERMSIG(w) & 0xf);
+					*ptr++ = GDB_ToHex((signo >> 4) & 0xf);
+					*ptr++ = GDB_ToHex(signo & 0xf);
 				}
 			} else {
+				uint8_t exitcode;
+				exitcode = WEXITSTATUS(w);
 				if (GDBServer_Features & GDB_SERVER_FEATURE_MULTIPROCESS) {
 					intptr_t pid;
-					ptr += sprintf(ptr, "W%x;process:", WEXITSTATUS(w));
+					ptr += sprintf(ptr, "W%" PRIx8 ";process:", exitcode);
 					pid = GDBThread_GetPID((struct task *)reason->dtr_ptrarg);
 					ptr = GDBEncode_IntptrAsHex(ptr, pid);
 				} else {
 					*ptr++ = 'W';
-					*ptr++ = GDB_ToHex((WEXITSTATUS(w) >> 4) & 0xf);
-					*ptr++ = GDB_ToHex(WEXITSTATUS(w) & 0xf);
+					*ptr++ = GDB_ToHex((exitcode >> 4) & 0xf);
+					*ptr++ = GDB_ToHex(exitcode & 0xf);
 				}
-				ptr += sprintf(ptr, "W%x", reason->dtr_signo);
 			}
-			ptr = GDBThread_EncodeThreadID(ptr, (struct task *)reason->dtr_ptrarg);
 		}	goto done;
 
 		/* GDB expects certain signals for specific reasons. */
@@ -725,7 +729,7 @@ do_fork_event:
 		case DEBUGTRAP_REASON_WATCHW:
 do_reason_watch:
 			ptr = STPCAT(ptr, "watch:");
-			ptr += sprintf(ptr, "%x", reason->dtr_ptrarg);
+			ptr += sprintf(ptr, "%" PRIxPTR, reason->dtr_ptrarg);
 			*ptr++ = ';';
 			break;
 
@@ -756,7 +760,8 @@ do_wbreak:
 	ptr = STPCAT(ptr, "thread:");
 	ptr = GDBThread_EncodeThreadID(ptr, thread);
 	*ptr++ = ';';
-	ptr += sprintf(ptr, "core:%x;", thread->t_cpu->c_id);
+	ptr += sprintf(ptr, "core:%" PRIxPTR ";",
+	               (uintptr_t)thread->t_cpu->c_id);
 
 	/* Always include a select number of registers in the response. */
 #ifdef FOREACH_REASON_REGISTER
@@ -1235,7 +1240,7 @@ handle_set_register_error:
 				if ((value & mask) != pattern)
 					continue; /* Different value... */
 				/* The docs don't say how to respond, but try to mirror `qSearch:memory' */
-				o += sprintf(o, "1,%p", pagebase + search_size);
+				o += sprintf(o, "1,%" PRIxPTR, pagebase + search_size);
 				goto do_transmit;
 			}
 		}
@@ -1484,7 +1489,7 @@ send_empty:
 			                        addr, length, &res))
 				ERROR(err_EFAULT);
 			*o++ = 'C';
-			o += sprintf(o, "%I32x", res);
+			o += sprintf(o, "%" PRIx32, res);
 		} else if (ISNAME("Search")) {
 			vm_virt_t haystack, addr;
 			size_t haystack_length, needle_length;
@@ -1510,7 +1515,7 @@ send_empty:
 			else {
 				*o++ = '1';
 				*o++ = ',';
-				o += sprintf(o, "%Ix", (uintptr_t)addr);
+				o += sprintf(o, "%" PRIxPTR, (uintptr_t)addr);
 			}
 		} else if (ISNAME("Xfer")) {
 			char *annex;
@@ -1635,8 +1640,9 @@ send_empty:
 				if (i != endptr)
 					ERROR(err_syntax);
 			}
-#if 0
-			*o++ = '0'; /* Created a new process */
+#if 1
+			/* Created a new process (Otherwise, GDB may terminate the session) */
+			*o++ = '0';
 #else
 			*o++ = '1'; /* Attached to an existing process */
 #endif
@@ -1664,7 +1670,7 @@ send_empty:
 			addr = ATOMIC_READ(FORTASK(newThread.ts_thread, this_x86_user_gsbase));
 #endif /* !__x86_64__ */
 			GDBThreadSel_Fini(&newThread);
-			o += sprintf(o, "%p", addr);
+			o += sprintf(o, "%" PRIxPTR, addr);
 #endif /* __x86_64__ || __i386__ */
 		} else if (i[0] == 'L' && i + 12 == endptr && (i[1] == '0' || i[1] == '1')) {
 			char *pcount; u8 count;
@@ -1680,7 +1686,7 @@ send_empty:
 			*o++ = 'M';
 			pcount = o;
 			o += 3; /* Filled in later. */
-			o += sprintf(o, "%.8I32x", nextThread);
+			o += sprintf(o, "%.8" PRIx32, nextThread);
 			for (count = 0; count < maxCount; ++count) {
 				REF struct task *thread;
 				u32 threadid;
@@ -1691,7 +1697,7 @@ send_empty:
 				}
 				threadid = GDBThread_GetTID(thread);
 				decref_unlikely(thread);
-				o += sprintf(o, "%.8I32x", threadid);
+				o += sprintf(o, "%.8" PRIx32, threadid);
 			}
 			if (hasNext) {
 				REF struct task *thread;
@@ -1724,23 +1730,23 @@ send_empty:
 			mode &= 0x1f;
 			*o++ = 'q';
 			*o++ = 'M';
-			o += sprintf(o, "%.8I32x", mode);
-			o += sprintf(o, "%.8I32x", GDBThread_GetTID(newThread.ts_thread));
+			o += sprintf(o, "%.8" PRIx32, mode);
+			o += sprintf(o, "%.8" PRIx32, GDBThread_GetTID(newThread.ts_thread));
 			if (mode & TAG_THREADID) {
-				o += sprintf(o, "%.8I32x", TAG_THREADID);
+				o += sprintf(o, "%.8" PRIx32, TAG_THREADID);
 				/* The GDB source asserts 16 for length this for some
 				 * reason (even though only 8 bytes are processed) */
-				o += sprintf(o, "%.8I32x", 16);
-				o += sprintf(o, "%.8I32x", GDBThread_GetTID(newThread.ts_thread));
+				o += sprintf(o, "%.8" PRIx32, 16);
+				o += sprintf(o, "%.8" PRIx32, GDBThread_GetTID(newThread.ts_thread));
 			}
 			if (mode & TAG_EXISTS) {
-				o += sprintf(o, "%.8I32x", TAG_EXISTS);
-				o += sprintf(o, "%.8I32x", 8);
-				o += sprintf(o, "%.8I32x", (newThread.ts_thread->t_flags & (TASK_FTERMINATED | TASK_FTERMINATING)) ? 0 : 1);
+				o += sprintf(o, "%.8" PRIx32, TAG_EXISTS);
+				o += sprintf(o, "%.8" PRIx32, 8);
+				o += sprintf(o, "%.8" PRIx32, (newThread.ts_thread->t_flags & (TASK_FTERMINATED | TASK_FTERMINATING)) ? 0 : 1);
 			}
 			if (mode & TAG_THREADNAME) {
 				char *namebuf; ssize_t namelen;
-				o += sprintf(o, "%.8I32x", TAG_THREADNAME);
+				o += sprintf(o, "%.8" PRIx32, TAG_THREADNAME);
 				namebuf = o + 8;
 				namelen = GDBInfo_PrintThreadName(&format_sprintf_printer,
 				                                  &namebuf, newThread.ts_thread);
@@ -1748,7 +1754,7 @@ send_empty:
 					GDBThreadSel_Fini(&newThread);
 					ERROR(err_ESRCH);
 				}
-				sprintf(o, "%.8I32x", namelen);
+				sprintf(o, "%.8" PRIx32, namelen);
 				o = namebuf;
 			}
 			GDBThreadSel_Fini(&newThread);
@@ -1785,7 +1791,7 @@ send_empty:
 			}
 			if (i != endptr)
 				ERRORF(err_syntax, "i=%$q, %Iu\n", (size_t)(endptr - i), i, (size_t)(endptr - i));
-			o += sprintf(o, "PacketSize=%Ix", CONFIG_GDBSERVER_PACKET_MAXLEN/* + 4*/);
+			o += sprintf(o, "PacketSize=%" PRIxSIZ, (size_t)(CONFIG_GDBSERVER_PACKET_MAXLEN/* + 4*/));
 			o = STPCAT(o, ";QNonStop+");
 			/* Always indicate that we support NoAck mode.
 			 * Another option would be to only indicate so when hosted by an emulator (which

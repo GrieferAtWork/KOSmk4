@@ -32,6 +32,7 @@
 #include <kos/io/serial.h>
 #include <sys/io.h>
 
+#include <inttypes.h>
 #include <stdio.h>
 
 #include "gdb.h"
@@ -73,7 +74,7 @@ NOTHROW(FCALL GDBSerial_InterruptHandler)(void *UNUSED(arg)) {
 	}	break;
 
 	default:
-		printk(KERN_WARNING "[gdb] Unexpected serial interrupt: %#.2I8x\n", iir);
+		printk(KERN_WARNING "[gdb] Unexpected serial interrupt: %#.2" PRIx8 "\n", iir);
 		break;
 	}
 	return true;
@@ -105,13 +106,13 @@ NOTHROW(FCALL GDBSerial_PutData)(void const *buf, size_t bufsize) {
 
 
 INTERN void FCALL GDBSerial_Init(char *args) {
-	if (sscanf(args, "%I16U:%I8U",
+	if (sscanf(args, "%" SCNU16 ":%" SCNU8,
 	           &GDBSerial_IO_PortBase,
 	           &GDBSerial_IO_IsrVector) != 2) {
 		printk(KERN_ERR "[gdb] Invalid arguments for serial transport method: %q", args);
 		THROW(E_INVALID_ARGUMENT);
 	}
-	printk(KERN_INFO "[gdb] Enable serial transport on port %#I16x (isr#%#I8x)\n",
+	printk(KERN_INFO "[gdb] Enable serial transport on port %#" PRIx16 " (isr#%#" PRIx8 ")\n",
 	       GDBSerial_IO_PortBase, GDBSerial_IO_IsrVector);
 	isr_register_at((isr_vector_t)GDBSerial_IO_IsrVector,
 	                &GDBSerial_InterruptHandler, NULL);
@@ -136,7 +137,7 @@ INTERN void FCALL GDBSerial_Init(char *args) {
 		if (avail & SERIAL_LSR_DA) {
 			u8 data = inb(SERIAL_IOADDR_RBR(GDBSerial_IO_PortBase));
 			pflag_t was;
-			printk(KERN_INFO "[gdb] Processing initial byte %#.2I8x\n", data);
+			printk(KERN_INFO "[gdb] Processing initial byte %#.2" PRIx8 "\n", data);
 			/* Calls to `GDBRemote_PostByte()' require that preemption be turned off. */
 			was = PREEMPTION_PUSHOFF();
 			GDBRemote_PostByte(data);
