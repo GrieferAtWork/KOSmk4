@@ -89,9 +89,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.error.vwarn") void
 /*[[[body:vwarn]]]*/
 /*AUTO*/{
 	int errval = __libc_geterrno_or(0);
-#if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	libc_flockfile(__LOCAL_stderr);
-#endif
 	libc_fprintf(__LOCAL_stderr, "%s: ", __LOCAL_program_invocation_short_name);
 	if (format) {
 		libc_vfprintf(__LOCAL_stderr, format, args);
@@ -99,9 +97,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.error.vwarn") void
 	} else {
 		libc_fprintf(__LOCAL_stderr, "%s\n", libc_strerror(errval));
 	}
-#if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	libc_funlockfile(__LOCAL_stderr);
-#endif
 }
 /*[[[end:vwarn]]]*/
 
@@ -130,16 +126,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.error.vwarnx") void
 		__THROWS(...)
 /*[[[body:vwarnx]]]*/
 /*AUTO*/{
-#if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	libc_flockfile(__LOCAL_stderr);
-#endif
 	libc_fprintf(__LOCAL_stderr, "%s: ", __LOCAL_program_invocation_short_name);
 	if (format)
 		libc_vfprintf(__LOCAL_stderr, format, args);
 	libc_fputc('\n', __LOCAL_stderr);
-#if (defined(__CRT_HAVE_flockfile) || defined(__CRT_HAVE__lock_file) || defined(__CRT_HAVE__IO_flockfile)) && (defined(__CRT_HAVE_funlockfile) || defined(__CRT_HAVE__unlock_file) || defined(__CRT_HAVE__IO_funlockfile))
 	libc_funlockfile(__LOCAL_stderr);
-#endif
 }
 /*[[[end:vwarnx]]]*/
 

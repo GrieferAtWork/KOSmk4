@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89963ce9 */
+/* HASH CRC-32:0xc2453e3e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __LOCAL_LIBC(errx) __ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 3) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(errx))(int __status,
                                       char const *__format,
                                       ...) __THROWS(...) {
-#line 99 "kos/src/libc/magic/err.c"
+#line 117 "kos/src/libc/magic/err.c"
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
 	__localdep_verrx(__status, __format, __args);

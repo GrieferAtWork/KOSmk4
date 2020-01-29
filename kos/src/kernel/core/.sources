@@ -112,9 +112,10 @@ BEGIN
 		CC_FLAGS({ "-mcmodel=kernel" });
 	}
 
-	/* This flag disables alignment that
-	 * would unnecessarily bloat the kernel. */
+	GCC_FLAGS({ "-gz=zlib" })
 	LD_FLAGS({
+		/* This flag disables alignment that
+		 * would unnecessarily bloat the kernel. */
 		"--nmagic",
 		"--eh-frame-hdr",
 		"--gc-sections",

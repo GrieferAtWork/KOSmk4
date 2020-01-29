@@ -40,23 +40,30 @@
 #define UNCHECKED     /* Annotation for unchecked memory. */
 #define KERNEL        /* Annotation for kernel-space memory (default within kernel). */
 #ifndef WEAK
-#define WEAK          /* Annotation for weakly referenced data/data updated randomly with both the old/new state remaining valid forever. */
+#define WEAK          /* Annotation for weakly referenced data/data updated randomly with both the old/new state remaining valid. */
 #endif /* !WEAK */
-#define REF           /* Annotation for reference holders. */
+#define REF           /* Annotation for reference holders/transfers.
+                       * When used on a struct-field/local/global variable: Reference storage
+                       * When used on a return type: The function returns a reference
+                       * When used on an argument: The function inherited a reference (but look out for `inherit(<condition>)' annotations) */
 #define FREE          /* Annotation for functions / data that are apart of the .free section. */
 #define NOBLOCK       /* Annotation for functions that are guarantied to never block,
                        * making them safe to-be called from any asynchronous context. */
+#define NOBLOCK_IF(x) /* Same as `NOBLOCK', but only when `x' is true. */
 #define NOCONNECT     /* Annotation for functions which may only be called when
                        * the calling thread isn't already connected to a signal. */
 #define NOPREEMPT     /* Annotation for functions that may only be called with preemption disabled. */
-#define NOBLOCK_IF(x) /* Annotation for functions that are conditionally non-blocking. */
 #define THROWS(...)   /* Annotation for the set of error codes/classes/sub-classes that may be thrown by a function.
                        * You may include `...' as a possible error code to indicate that the function
                        * is also allowed to throw any other kind of exception, usually indicative of
                        * the function following a path that includes a call to `task_serve()'
                        * Note however that this is merely for documentation purposes, as well as to
-                       * document the ~expected~ error codes. - Any function that isn't NOTHROW is
-                       * still always allowed to throw any error that isn't apart of the THROWS set. */
+                       * document the ~expected~ error codes (e.g. anything that can throw E_SEGFAULT
+                       * usually does so by accessing user-space memory, which also implies access to
+                       * VIO callbacks, and the fact that VIO is also allowed to throw arbitrary exceptions,
+                       * meaning that technically speaking, `E_SEGFAULT' would also imply `...').
+                       * Any function that isn't `__NOTHROW()' is still always allowed to throw any error
+                       * that isn't apart of the `__THROWS()' set. */
 #define THROWS_INDIRECT(...) /* Similar to `THROWS()', but the error is propgated by non-standard means. */
 
 

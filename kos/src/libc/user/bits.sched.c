@@ -130,7 +130,7 @@ NOTHROW_NCX(LIBCCALL libc_exit_thread)(int exit_code)
 	 *       the current stack, seeing how we cannot know if our current thread actually owns
 	 *       them.
 	 *       Given these facts, it would seem that this function is fairly pointless, as we can
-	 *       only get here if our thread still has a stack, in which case it would see improbable
+	 *       only get here if our thread still has a stack, in which case it would seem improbable
 	 *       that anyone else owns that stack. And given the fact that in order to use libc properly,
 	 *       one has to make use of DL-based TLS segments, it would also seem improbable that the
 	 *       current thread isn't (or wasn't) using a DL-based TLS segment.

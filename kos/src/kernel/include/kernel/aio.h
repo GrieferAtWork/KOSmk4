@@ -500,21 +500,27 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
 /* No-op AIO handle type (intended for synchronous operations) */
 DATDEF struct aio_handle_type aio_noop_type;
 
-/* Initialize the given AIO handle with a type-specific v-table. */
+/* Initialize the given AIO handle with a type-specific v-table.
+ * Must be called by all functions taking an `/ *out* / struct aio_handle *...'
+ * argument for the purpose of initializing said AIO handle. */
 #define aio_handle_init(self, type) \
 	((self)->ah_type = (type))
 
 /* Finalize a fully initialized AIO handle. */
-#define aio_handle_fini(self) (*(self)->ah_type->ht_fini)(self)
+#define aio_handle_fini(self) \
+	(*(self)->ah_type->ht_fini)(self)
 
 /* Cancel execution */
-#define aio_handle_cancel(self) (*(self)->ah_type->ht_cancel)(self)
+#define aio_handle_cancel(self) \
+	(*(self)->ah_type->ht_cancel)(self)
 
 /* Indicate AIO execution completion. */
-#define aio_handle_success(self) (*(self)->ah_func)(self, AIO_COMPLETION_SUCCESS)
+#define aio_handle_success(self) \
+	(*(self)->ah_func)(self, AIO_COMPLETION_SUCCESS)
 
 /* Indicate AIO execution failure due to the currently set exception. */
-#define aio_handle_fail(self) (*(self)->ah_func)(self, AIO_COMPLETION_FAILURE)
+#define aio_handle_fail(self) \
+	(*(self)->ah_func)(self, AIO_COMPLETION_FAILURE)
 
 
 
@@ -548,11 +554,11 @@ DATDEF struct aio_handle_type aio_noop_type;
 struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_generic
 #ifdef __cplusplus
 	: aio_handle
-#endif
+#endif /* __cplusplus */
 {
 #ifndef __cplusplus
 	AIO_HANDLE_HEAD
-#endif
+#endif /* !__cplusplus */
 	struct sig            hg_signal; /* Signal broadcast when `ah_func' is called. */
 	unsigned int          hg_status; /* Acknowledged AIO completion status (or 0 if still in progress) */
 	struct exception_data hg_error;  /* [valid_if(hg_status == AIO_COMPLETION_FAILURE)] AIO failure error. */

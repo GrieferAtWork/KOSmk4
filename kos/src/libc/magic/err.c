@@ -41,7 +41,18 @@ warn:(char const *format, ...) %{auto_block(printf(vwarn))}
 [requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
           $has_function(fprintf) && $has_function(vfprintf) &&
           $has_function(strerror))]
-vwarn:(char const *format, $va_list args) {
+[user_impl({
+	int errval = @__libc_geterrno_or@(0);
+	flockfile(@__LOCAL_stderr@);
+	fprintf(@__LOCAL_stderr@, "%s: ", @__LOCAL_program_invocation_short_name@);
+	if (format) {
+		vfprintf(@__LOCAL_stderr@, format, args);
+		fprintf(@__LOCAL_stderr@, ": %s\n", strerror(errval));
+	} else {
+		fprintf(@__LOCAL_stderr@, "%s\n", strerror(errval));
+	}
+	funlockfile(@__LOCAL_stderr@);
+})] vwarn:(char const *format, $va_list args) {
 	int errval = @__libc_geterrno_or@(0);
 #if (@@has_function(flockfile)@@) && (@@has_function(funlockfile)@@)
 	flockfile(@__LOCAL_stderr@);
@@ -68,7 +79,14 @@ warnx:(char const *format, ...) %{auto_block(printf(vwarnx))}
 [requires_include(<local/program_invocation_name.h>)]
 [requires(!defined(__NO_STDSTREAMS) && defined(__LOCAL_program_invocation_short_name) &&
           $has_function(fprintf) && $has_function(vfprintf) && $has_function(fputc))]
-vwarnx:(char const *format, $va_list args) {
+[user_impl({
+	flockfile(@__LOCAL_stderr@);
+	fprintf(@__LOCAL_stderr@, "%s: ", @__LOCAL_program_invocation_short_name@);
+	if (format)
+		vfprintf(@__LOCAL_stderr@, format, args);
+	fputc('\n', @__LOCAL_stderr@);
+	funlockfile(@__LOCAL_stderr@);
+})] vwarnx:(char const *format, $va_list args) {
 #if (@@has_function(flockfile)@@) && (@@has_function(funlockfile)@@)
 	flockfile(@__LOCAL_stderr@);
 #endif

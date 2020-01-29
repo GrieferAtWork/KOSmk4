@@ -55,7 +55,6 @@
 #define __REF
 #define __REF_IF(x)
 #define FREE
-#define __FREE
 #define NOBLOCK
 #define __NOBLOCK
 #define NOPREEMPT
@@ -68,7 +67,6 @@
 #define THROWS(...)
 #define __THROWS(...)
 #define THROWS_INDIRECT(...)
-#define __THROWS_INDIRECT(...)
 #define KCALL
 #define __KCALL
 #define FCALL
