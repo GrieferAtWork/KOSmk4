@@ -62,6 +62,7 @@ DECL_BEGIN
 #define TASK_FPENDING     0x0100 /* [lock(WRITE_ONCE(OLD_CPU_OR_CREATOR),CLEAR(THIS_CPU))]
                                   * The task is currently pending execution on its associated CPU. */
 #endif /* !CONFIG_NO_SMP */
+#define TASK_FSTARTING    0x0400 /* [lock(WRITE_ONCE)] The thread is currently starting. */
 #define TASK_FSTARTED     0x0800 /* [lock(WRITE_ONCE)] The thread has been started. */
 #define TASK_FCRITICAL    0x1000 /* The thread is critical, and any attempting to task_exit() it causes kernel panic. */
 #define TASK_FGDB_STOPPED 0x2000 /* Used by the gdbserver driver */

@@ -354,48 +354,76 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 	switch (regno) {
 
 	case GDB_REGISTER_X86_64_RSP:
-		GETSET8(icpustate64_getrsp(STATE),
-		        icpustate64_setrsp(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET8(icpustate64_getrsp(STATE),
+			        icpustate64_setrsp(STATE, value));
+		} else {
+			FIELD8(STATE->ics_irregs.ir_rsp);
+		}
 		break;
 
 	case GDB_REGISTER_X86_64_RIP:
-		GETSET8(icpustate64_getrip(STATE),
-		        icpustate64_setrip(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET8(icpustate64_getrip(STATE),
+			        icpustate64_setrip(STATE, value));
+		} else {
+			FIELD8(STATE->ics_irregs.ir_rip);
+		}
 		break;
 
 	case GDB_REGISTER_X86_64_RFLAGS:
-		GETSET4(icpustate64_getrflags(STATE),
-		        icpustate64_setrflags(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate64_getrflags(STATE),
+			        icpustate64_setrflags(STATE, value));
+		} else {
+			FIELD4(STATE->ics_irregs.ir_rflags);
+		}
 		break;
 
 	case GDB_REGISTER_X86_64_CS:
-		GETSET4(icpustate64_getcs(STATE),
-		        icpustate64_setcs(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate64_getcs(STATE),
+			        icpustate64_setcs(STATE, value));
+		} else {
+			FIELD8(STATE->ics_irregs.ir_cs);
+		}
 		break;
 
 	case GDB_REGISTER_X86_64_SS:
-		GETSET4(icpustate64_getss(STATE),
-		        icpustate64_setss(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate64_getss(STATE),
+			        icpustate64_setss(STATE, value));
+		} else {
+			FIELD8(STATE->ics_irregs.ir_ss);
+		}
 		break;
 
 	case GDB_REGISTER_X86_64_DS:
-		GETSET4(icpustate64_getds(STATE),
-		        icpustate64_setds(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate64_getds(STATE),
+			        icpustate64_setds(STATE, value));
+		}
 		break;
 
 	case GDB_REGISTER_X86_64_ES:
-		GETSET4(icpustate64_getes(STATE),
-		        icpustate64_setes(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate64_getes(STATE),
+			        icpustate64_setes(STATE, value));
+		}
 		break;
 
 	case GDB_REGISTER_X86_64_FS:
-		GETSET4(icpustate64_getfs(STATE),
-		        icpustate64_setfs(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate64_getfs(STATE),
+			        icpustate64_setfs(STATE, value));
+		}
 		break;
 
 	case GDB_REGISTER_X86_64_GS:
-		GETSET4(icpustate64_getgs(STATE),
-		        icpustate64_setgs(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate64_getgs(STATE),
+			        icpustate64_setgs(STATE, value));
+		}
 		break;
 
 	default: {

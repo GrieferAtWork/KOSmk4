@@ -325,51 +325,95 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 	switch (regno) {
 
 	case GDB_REGISTER_I386_ESP:
-		GETSET4(icpustate32_getesp(STATE),
-		        *pstate = icpustate32_setesp_p(*pstate, value));
+		GETSET4(thread == THIS_TASK
+		        ? icpustate32_getesp(STATE)
+		        : (((self->ics_irregs.ir_cs16 & 3) ||
+		            (self->ics_irregs.ir_eflags & EFLAGS_VM))
+		           ? irregs32_getuseresp(self)
+		           : irregs32_getkernelesp(self)),
+		        icpustate32_setesp_p(*pstate, value));
 		break;
 
 	case GDB_REGISTER_I386_EIP:
-		GETSET4(icpustate32_geteip(STATE),
-		        icpustate32_seteip(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate32_geteip(STATE),
+			        icpustate32_seteip(STATE, value));
+		} else {
+			FIELD4(STATE->ics_irregs.ir_eip);
+		}
 		break;
 
 	case GDB_REGISTER_I386_EFLAGS:
-		GETSET4(icpustate32_geteflags(STATE),
-		        icpustate32_seteflags(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate32_geteflags(STATE),
+			        icpustate32_seteflags(STATE, value));
+		} else {
+			FIELD4(STATE->ics_irregs.ir_eflags);
+		}
 		break;
 
 	case GDB_REGISTER_I386_CS:
-		GETSET4(icpustate32_getcs(STATE),
-		        icpustate32_setcs(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate32_getcs(STATE),
+			        icpustate32_setcs(STATE, value));
+		} else {
+			FIELD4(STATE->ics_irregs.ir_cs);
+		}
 		break;
 
 	case GDB_REGISTER_I386_SS:
-		if (icpustate32_isuser(STATE)) {
+		if (thread == THIS_TASK) {
+			if (icpustate32_isuser(STATE)) {
+				FIELD4(STATE->ics_irregs_u.ir_ss);
+			} else {
+				GETSET4(__rdss(), __wrss(value));
+			}
+		} else if ((STATE->ics_irregs.ir_cs16 & 3) ||
+		           (STATE->ics_irregs.ir_eflags & EFLAGS_VM)) {
 			FIELD4(STATE->ics_irregs_u.ir_ss);
-		} else {
-			GETSET4(__rdss(), __wrss(value));
 		}
 		break;
 
 	case GDB_REGISTER_I386_DS:
-		GETSET4(icpustate32_getds(STATE),
-		        icpustate32_setds(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate32_getds(STATE),
+			        icpustate32_setds(STATE, value));
+		} else {
+			FIELD4(*((STATE->ics_irregs.ir_eflags & EFLAGS_VM)
+			         ? &STATE->ics_irregs_v.ir_ds
+			         : &STATE->ics_ds));
+		}
 		break;
 
 	case GDB_REGISTER_I386_ES:
-		GETSET4(icpustate32_getes(STATE),
-		        icpustate32_setes(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate32_getes(STATE),
+			        icpustate32_setes(STATE, value));
+		} else {
+			FIELD4(*((STATE->ics_irregs.ir_eflags & EFLAGS_VM)
+			         ? &STATE->ics_irregs_v.ir_es
+			         : &STATE->ics_es));
+		}
 		break;
 
 	case GDB_REGISTER_I386_FS:
-		GETSET4(icpustate32_getfs(STATE),
-		        icpustate32_setfs(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate32_getfs(STATE),
+			        icpustate32_setfs(STATE, value));
+		} else {
+			FIELD4(*((STATE->ics_irregs.ir_eflags & EFLAGS_VM)
+			         ? &STATE->ics_irregs_v.ir_fs
+			         : &STATE->ics_fs));
+		}
 		break;
 
 	case GDB_REGISTER_I386_GS:
-		GETSET4(icpustate32_getgs(STATE),
-		        icpustate32_setgs(STATE, value));
+		if (thread == THIS_TASK) {
+			GETSET4(icpustate32_getgs(STATE),
+			        icpustate32_setgs(STATE, value));
+		} else if (STATE->ics_irregs.ir_eflags & EFLAGS_VM) {
+			FIELD4(STATE->ics_irregs_v.ir_gs);
+		}
 		break;
 
 	default: {

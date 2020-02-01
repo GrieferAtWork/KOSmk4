@@ -28,6 +28,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <kos/debugtrap.h>
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <signal.h>
@@ -120,7 +121,7 @@ GDBX86Interrupt_Int3Handler(struct icpustate *__restrict state) {
 		}
 		if (instr == 0xcc) {
 			/* int3 */
-			irregs_wrip(&state->ics_irregs, pc - 1);
+			icpustate_setpc(state, pc - 1);
 set_swbreak_regs:
 			reason.dtr_reason = DEBUGTRAP_REASON_SWBREAK;
 		} else if (instr == 0x03) {
@@ -131,13 +132,14 @@ set_swbreak_regs:
 			}
 			if (instr == 0xcd) {
 				/* int $3 */
-				irregs_wrip(&state->ics_irregs, pc - 2);
+				icpustate_setpc(state, pc - 2);
 				goto set_swbreak_regs;
 			}
 		}
 	}
 set_trap:
-	return GDBServer_TrapICpuState(state, &reason);
+	state = GDBServer_TrapICpuState(state, &reason);
+	return state;
 restore_except_and_set_trap:
 	memcpy(error_info(), &old_error, sizeof(old_error));
 	goto set_trap;

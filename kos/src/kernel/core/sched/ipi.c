@@ -23,9 +23,12 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/debugtrap.h>
 #include <kernel/printk.h>
+#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
+#include <sched/rpc.h>
 #include <sched/signal.h>
 #include <sched/smp.h>
 #include <sched/task.h>
@@ -34,6 +37,7 @@
 #include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <signal.h>
 
 DECL_BEGIN
 
@@ -794,9 +798,23 @@ yield_and_return:
 }
 
 
+PRIVATE WUNUSED NONNULL((2)) struct icpustate *
+NOTHROW(FCALL trigger_clone_trap)(void *UNUSED(arg),
+                                  struct icpustate *__restrict state,
+                                  unsigned int UNUSED(reason),
+                                  struct rpc_syscall_info const *UNUSED(sc_info)) {
+	struct debugtrap_reason r;
+	/* New process. */
+	r.dtr_signo  = SIGTRAP;
+	r.dtr_reason = DEBUGTRAP_REASON_CLONE;
+	kernel_debugtrap(state, &r);
+	/* <unreachable...> */
+}
+
+/* Default task start flags. */
 PUBLIC unsigned int task_start_default_flags = TASK_START_FNORMAL;
 
-FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
+PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
 NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	pflag_t was;
 #ifndef CONFIG_NO_SMP
@@ -804,6 +822,27 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 #endif /* !CONFIG_NO_SMP */
 	assertf(thread->t_sched.s_state != NULL,
 	        "Task hasn't been given a restore-state at which execution can start");
+	if (!(ATOMIC_FETCHOR(thread->t_flags, TASK_FSTARTING) & TASK_FSTARTING)) {
+		if (kernel_debugtrap_enabled()) {
+			if (thread->t_vm == THIS_VM ||
+			    thread->t_vm == &vm_kernel ||
+			    thread->t_flags & TASK_FKERNTHREAD ||
+			    !task_isprocessleader_p(thread)) {
+				/* New thread.
+				 * -> In this case, we must trigger a clone()
+				 *    trap once the thread begins execution. */
+				thread->t_sched.s_state = task_push_asynchronous_rpc(thread->t_sched.s_state,
+				                                                     &trigger_clone_trap);
+			} else {
+				struct debugtrap_reason r;
+				/* New process. */
+				r.dtr_signo  = SIGTRAP;
+				r.dtr_reason = DEBUGTRAP_REASON_FORK;
+				r.dtr_ptrarg = thread;
+				kernel_debugtrap(&r);
+			}
+		}
+	}
 
 	/* Create the reference that is then inherited
 	 * by the target cpu's scheduler system. */

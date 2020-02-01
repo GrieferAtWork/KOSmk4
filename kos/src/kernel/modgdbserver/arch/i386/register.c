@@ -19,10 +19,12 @@
  */
 #ifndef GUARD_MODGDBSERVER_ARCH_I386_REGISTER_C
 #define GUARD_MODGDBSERVER_ARCH_I386_REGISTER_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/fpu.h>
+#include <sched/pid.h>
 #include <sched/task.h>
 
 #include <hybrid/unaligned.h>
@@ -33,10 +35,12 @@
 #include <kos/kernel/fpu-state.h>
 #include <kos/kernel/gdb-cpu-state.h>
 
+#include <assert.h>
 #include <format-printer.h>
 #include <string.h>
 
 #include "../../gdb.h"
+#include "../../server.h"
 
 #ifndef __INTELLISENSE__
 #ifdef __x86_64__
@@ -80,17 +84,31 @@ NOTHROW(FCALL GDB_GetSingleStep)(struct task *__restrict thread,
 INTERN bool
 NOTHROW(FCALL GDB_SetSingleStep)(struct task *__restrict thread,
                                  bool enabled) {
-	uintptr_t flags, new_flags;
+	u32 flags, new_flags;
 	if (!GDB_GetRegister(thread, FLAGS_REGNO,
 	                     &flags, sizeof(flags)))
 		return false;
 	new_flags = flags & ~EFLAGS_TF;
 	if (enabled)
 		new_flags |= EFLAGS_TF;
+	GDB_DEBUG("[gdb] GDB_SetSingleStep(%p(%u.%u), %s) (was: %s)\n",
+	          thread,
+	          task_getrootpid_of_s(thread),
+	          task_getroottid_of_s(thread),
+	          (new_flags & EFLAGS_TF) ? "true" : "false",
+	          (flags & EFLAGS_TF) ? "true" : "false");
 	if (new_flags != flags) {
-		if (!GDB_SetRegister(thread, FLAGS_REGNO,
-		                     &new_flags, sizeof(new_flags)))
+		if (GDB_SetRegister(thread, FLAGS_REGNO,
+		                    &new_flags, sizeof(new_flags)) != sizeof(new_flags))
 			return false;
+#ifndef NDEBUG
+		assert(GDB_GetRegister(thread, FLAGS_REGNO, &flags, sizeof(flags)));
+		assertf((flags & EFLAGS_TF) == (new_flags & EFLAGS_TF),
+		        "EFLAGS.TF was not applied properly:\n"
+		        "flags     = %#Ix\n"
+		        "new_flags = %#Ix\n",
+		        flags, new_flags);
+#endif /* !NDEBUG */
 	}
 	return true;
 }

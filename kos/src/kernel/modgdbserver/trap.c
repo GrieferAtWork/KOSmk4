@@ -106,6 +106,30 @@ PRIVATE void KCALL GDBServer_RecursiveEntryDebuggerMain(void) {
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 
+LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+NOTHROW(KCALL debugtrap_reason_isenabled)(struct debugtrap_reason const *__restrict self) {
+	switch (self->dtr_reason) {
+
+	case DEBUGTRAP_REASON_FORK:
+		return (GDBRemote_Features & GDB_REMOTE_FEATURE_FORKEVENTS) != 0;
+
+	case DEBUGTRAP_REASON_VFORK:
+	case DEBUGTRAP_REASON_VFORKDONE:
+		return (GDBRemote_Features & GDB_REMOTE_FEATURE_VFORKEVENTS) != 0;
+
+	case DEBUGTRAP_REASON_EXEC:
+		return (GDBRemote_Features & GDB_REMOTE_FEATURE_EXECEVENTS) != 0;
+
+	case DEBUGTRAP_REASON_CLONE:
+		return (GDBRemote_Features & GDB_REMOTE_FEATURE_THREADEVENTS) != 0;
+
+	default:
+		break;
+	}
+	return true;
+}
+
+
 /* Debug trap entry points. */
 INTERN NOBLOCK ATTR_NOINLINE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *FCALL
 GDBServer_TrapCpuState(void *__restrict state,
@@ -121,7 +145,7 @@ again_message:
 		if (ATOMIC_READ(GDBServer_Features) & GDB_SERVER_FEATURE_NONSTOP) {
 do_print_message_in_nonstop_mode:
 			num_printed = GDBServer_PrintMessageInNonStopMode(reason->dtr_strarg,
-			                                          reason->dtr_signo);
+			                                                  reason->dtr_signo);
 		} else {
 			stop_event.tse_thread = THIS_TASK;
 			oldhost = ATOMIC_CMPXCH_VAL(GDBServer_Host, NULL, stop_event.tse_thread);
@@ -159,6 +183,9 @@ do_print_message_in_nonstop_mode:
 		((struct debugtrap_reason *)reason)->dtr_signo = (u32)num_printed;
 		return state;
 	}
+	/* Quick check: Is the stop event for the given reason disabled? */
+	if (!debugtrap_reason_isenabled(reason))
+		return state;
 
 	task_pushconnections(&stop_event.tse_oldcon);
 	stop_event.tse_thread    = THIS_TASK;
@@ -268,6 +295,9 @@ again_waitfor_resume:
 
 	/* Add our own stop event to the set of pending async stop notifications. */
 do_become_gdb_host_notif:
+	/* Check if the trap reason has been disabled... */
+	if (!debugtrap_reason_isenabled(reason))
+		goto done_unlock;
 	do {
 		stop_event.tse_next = ATOMIC_READ(GDBThread_AsyncNotifStopEvents);
 	} while (!ATOMIC_CMPXCH_WEAK(GDBThread_AsyncNotifStopEvents,

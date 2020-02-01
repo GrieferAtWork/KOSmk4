@@ -573,7 +573,7 @@ LOCAL void NOTHROW(FCALL GDBServer_SetRemoteDetached)(void) {
 
 
 
-PRIVATE char *
+PRIVATE ATTR_RETNONNULL NONNULL((1, 2)) char *
 NOTHROW(FCALL GDB_ConstructStopReply)(char *ptr,
                                       GDBThreadStopEvent *__restrict notif) {
 	struct debugtrap_reason *reason;
@@ -593,10 +593,9 @@ NOTHROW(FCALL GDB_ConstructStopReply)(char *ptr,
 		case DEBUGTRAP_REASON_PEXITED: {
 			union wait w;
 			w.w_status = (int)(unsigned int)reason->dtr_signo;
-			if (WIFSIGNALED(w) || 1) {
+			if (WIFSIGNALED(w)) {
 				uint8_t signo;
 				signo = WEXITSTATUS(w);
-				signo = SIGSEGV;
 				if (GDBServer_Features & GDB_SERVER_FEATURE_MULTIPROCESS) {
 					intptr_t pid;
 					ptr += sprintf(ptr, "X%" PRIx8 ";process:", signo);

@@ -376,6 +376,13 @@ NOTHROW(FCALL GDBInfo_PrintThreadList_Callback)(void *closure,
 	char id_buf[GDBTHREAD_ENCODETHREADID_MAXCHARS], *id_end;
 	char const *description;
 	uintptr_t flags;
+	/* Skip dead threads: If this check wasn't here, then GDB would think
+	 *                    that following a thread/process-exited stop event,
+	 *                    the thread's/process's TID/PID had been re-assigned
+	 *                    immediately, and that the still-terminating thread
+	 *                    was actually an entirely different thread. */
+	if (ATOMIC_READ(thread->t_flags) & (TASK_FTERMINATED | TASK_FTERMINATING))
+		return 0;
 	printer = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_printer;
 	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
 	id_end = GDBThread_EncodeThreadID(id_buf, thread);

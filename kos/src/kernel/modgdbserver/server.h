@@ -61,7 +61,7 @@ DECL_BEGIN
 #define GDB_REMOTE_FEATURE_THREADEVENTS 0x0008 /* Enable reporting of thread events. */
 #define GDB_REMOTE_FEATURE_SWBREAK      0x0010 /* `swbreak+' */
 #define GDB_REMOTE_FEATURE_HWBREAK      0x0020 /* `hwbreak+' */
-INTDEF uintptr_t GDBRemote_Features;
+INTDEF uintptr_t GDBRemote_Features; /* Set of `GDB_REMOTE_FEATURE_*' */
 
 #define GDB_SERVER_FEATURE_MULTIPROCESS 0x0001 /* Enable (and use) multiprocess extensions. */
 #define GDB_SERVER_FEATURE_NONSTOP      0x0002 /* GDB_Main() should be invoked in non-stop mode.

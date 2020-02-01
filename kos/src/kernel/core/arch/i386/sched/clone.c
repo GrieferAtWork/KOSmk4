@@ -24,7 +24,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/debugtrap.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/gdt.h>
@@ -331,14 +330,6 @@ again_lock_vm:
 		if (cpu_count > 1)
 			result->t_cpu = cpu_vector[1];
 #endif
-
-		if (kernel_debugtrap_enabled()) {
-			struct debugtrap_reason r;
-			r.dtr_signo  = SIGTRAP;
-			r.dtr_reason = DEBUGTRAP_REASON_FORK;
-			r.dtr_ptrarg = result;
-			kernel_debugtrap(&r);
-		}
 
 		/* Actually start execution of the newly created thread. */
 		task_start(result);

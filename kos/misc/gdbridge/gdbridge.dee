@@ -1,0 +1,141 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import ipc;
+import * from deemon;
+import * from threading;
+
+
+/* When a process (inferior) exits under GDB, the related MI-event send to visual
+ * studio isn't parsed properly.
+ * Essentially, the event says `Inferior #<ID> exited normally/with-error/with-signal',
+ * and Visual Studio doesn't quite get it right by forgetting that there can be more
+ * than one process attached to GDB. So what it ends up doing is terminating GDB after
+ * failing to parse the <ID> part of the event, thinking that any such event indicates
+ * that the primary program has exited (ugh... This is the second time that I've run
+ * into a debugging issue caused by VS not quite getting it right...)
+ * Anyways...
+ * This script and the associated gdbridge.exe program fixes this issue:
+ *       A small pipe-wrapper program for `gdb.exe --interpreter=mi' that simply forwards
+ *       all input/output to the real gdb, but scans the data stream from gdb->vs for
+ *       `Inferior [...] exited [...]' events, then discarding them such that VS never
+ *       gets to seem them. Any such event is then followed by an `-exec-continue --thread 1'
+ *       command send to GDB (since for whatever reason, GDB thinks it to be a good idea to
+ *       stop execution whenever a process exits, and not even give you a configuration
+ *       toggle to change this fact)
+ */
+
+fs.chdir(fs.joinpath(fs.headof(__FILE__), "../../.."));
+
+local gdb = ipc.Process("gdb", ["--interpreter=mi"]);
+local inr, inw = ipc.Pipe.new()...;
+local our, ouw = ipc.Pipe.new()...;
+gdb.stdin  = inr;
+gdb.stdout = ouw;
+gdb.stderr = ouw;
+gdb.start();
+try {
+	inr.close();
+	ouw.close();
+
+	local log = File.open("kos/misc/gdbridge/io.log", "w");
+	local inw_lock = Mutex();
+	local stdout_lock = Mutex();
+	function write2gdb(msg) {
+		print log: ("[hidden]> ", msg),;
+		log.sync();
+		with (inw_lock)
+			inw.write(msg);
+	}
+
+//	write2gdb("set detach-on-fork off\n");
+//	write2gdb("set schedule-multiple on\n");
+//	write2gdb("set follow-fork-mode child\n");
+//	write2gdb("set sysroot bin/x86_64-kos-OD\n");
+//	write2gdb("set solib-search-path bin/x86_64-kos-OD/lib:bin/x86_64-kos-OD/os/drivers\n");
+//	write2gdb("set target-async on\n");
+//	write2gdb("set remote thread-events on\n");
+//	write2gdb("set breakpoint pending on\n");
+//	write2gdb("break /cygdrive/e/c/kls/kos/kos/src/apps/gfx/main.c:79\n");
+//	write2gdb("target remote localhost:1234\n");
+
+	Thread([]{
+		try {
+			for (local l: File.stdin) {
+				if (l == "\r\n")
+					continue;
+				print log: ("> ", l),;
+				log.sync();
+				with (inw_lock)
+					inw.write(l);
+			}
+		} finally {
+			try gdb.terminate(); catch (...);
+		}
+	}).start();
+	our = File.Buffer(our, "ro,c,none");
+	function readline_startswith(st) {
+		for (;;) {
+			local l = our.readline();
+			if (!l)
+				return;
+			if (!l.startswith(st)) {
+				print log: ("< ", l),;
+				log.sync();
+				with (stdout_lock) {
+					File.stdout.write(l);
+					File.stdout.sync();
+				}
+				continue;
+			}
+			print log: ("[hidden]< ", l),;
+			log.sync();
+			return l;
+		}
+	}
+	local token = 0x7fffffff;
+	for (local l: our) {
+		if (l.startswith("*stopped,reason=\"exited")) {
+			print log: ("[hidden]< ", l),;
+			log.sync();
+			local t = str(token++);
+//			write2gdb(t + "-thread-select 1\r\n");
+//			write2gdb(t + "-interpreter-exec console \"inferior 1\"\r\n");
+//			readline_startswith(t);
+			write2gdb(t + "-exec-continue --thread 1\r\n");
+			readline_startswith(t);
+			continue;
+		}
+		print log: ("< ", l),;
+		log.sync();
+		with (stdout_lock) {
+			File.stdout.write(l);
+			File.stdout.sync();
+		}
+	}
+} finally {
+	try gdb.terminate(); catch (...);
+}
+
+
+
+
+

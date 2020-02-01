@@ -221,8 +221,8 @@ if [[ "$1" == i?86-kos ]]; then
 	BINLIBDIRNAME=lib
 	export TARGET=i686-kos
 elif [[ "$1" == x86_64-kos ]]; then
-	if ! [ -f "${KOS_MISC}/../../i386-kos/bin/i686-kos-gcc" ] && \
-	   ! [ -f "${KOS_MISC}/../../i386-kos/bin/i686-kos-gcc.exe" ]; then
+	if ! [ -f "${KOS_MISC}/../../binutils/i386-kos/bin/i686-kos-gcc" ] && \
+	   ! [ -f "${KOS_MISC}/../../binutils/i386-kos/bin/i686-kos-gcc.exe" ]; then
 		# Because of compatibility mode, the x86_64-kos toolchain also requires i386-kos
 		# in order to build stuff such as the 32-bit libdl.so driver, among others.
 		cmd bash "${KOS_MISC}/make_toolchain.sh" i386-kos
@@ -258,7 +258,13 @@ if [ -f "${KOS_ROOT}/kos/misc/config/launch.vs.json" ]; then
 	if [ "${KOS_ROOT}/kos/misc/config/launch.vs.json" -nt "${KOS_ROOT}/kos/.vs/launch.vs.json" ]; then
 		unlink "${KOS_ROOT}/kos/.vs/launch.vs.json" > /dev/null 2>&1
 		cmd cp "${KOS_ROOT}/kos/misc/config/launch.vs.json" "${KOS_ROOT}/kos/.vs/launch.vs.json"
-		cmd sed -i -e "s:ABSOLUTE_KOS_PROJECT_ROOT:${KOS_ROOT}:g" "${KOS_ROOT}/kos/.vs/launch.vs.json"
+		NT_KOS_ROOT="$KOS_ROOT"
+		if [[ `uname -s` == *CYGWIN* ]]; then
+			NT_KOS_ROOT="$(cygpath -w "$KOS_ROOT")"
+		fi
+		NT_KOS_ROOT="${NT_KOS_ROOT//\\/\\\\\\\\}"
+		cmd sed -i -e "s?ABSOLUTE_KOS_PROJECT_ROOT?${KOS_ROOT}?g" "${KOS_ROOT}/kos/.vs/launch.vs.json"
+		cmd sed -i -e "s?ABSOLUTE_KOS_NT_PROJECT_ROOT?${NT_KOS_ROOT}?g" "${KOS_ROOT}/kos/.vs/launch.vs.json"
 	fi
 fi
 
@@ -330,6 +336,7 @@ do_symlink() {
 }
 
 
+ORIG_PATH="$PATH"
 export PREFIX="$KOS_BINUTILS/$NAME"
 export PATH="$PREFIX/bin:$PATH"
 
@@ -728,5 +735,44 @@ symlink_binutil readelf
 symlink_binutil size
 symlink_binutil strings
 symlink_binutil strip
+
+
+
+# On windows, try to build the gdbridge wrapper program
+export PATH="$ORIG_PATH"
+if [[ `uname -s` == *CYGWIN* ]]; then
+	if ! [ -f "$KOS_MISC/gdbridge/gdbridge.exe" ] || \
+	     [ "$KOS_MISC/gdbridge/gdbridge.exe" -ot "$KOS_MISC/gdbridge/gdbridge.c" ]; then
+		echo "Building GDBridge wrapper"
+		GDBRIDGE_FLAGS="-g -Wall"
+		GDBRIDGE_CMDLINE="deemon "
+		if [ -f "$KOS_BINUTILS/deemon/deemon" ] || [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
+			GDBRIDGE_CMDLINE="$(cygpath -w "$KOS_BINUTILS/deemon/deemon.exe")"
+		fi
+		GDBRIDGE_SCRIPT="$(cygpath -w "$KOS_MISC/gdbridge/gdbridge.dee")"
+		GDBRIDGE_CMDLINE="$GDBRIDGE_CMDLINE \"${GDBRIDGE_SCRIPT}\""
+		GDBRIDGE_CMDLINE="${GDBRIDGE_CMDLINE//\\/\\\\}"
+		GDBRIDGE_CMDLINE="${GDBRIDGE_CMDLINE//\"/\\\"}"
+		GDBRIDGE_CMDLINE="\"${GDBRIDGE_CMDLINE}\""
+		echo "cmdline: $GDBRIDGE_CMDLINE"
+		gcc $GDBRIDGE_FLAGS \
+			-DCMDLINE="$GDBRIDGE_CMDLINE" \
+			-o "$KOS_MISC/gdbridge/gdbridge.exe" \
+			"$KOS_MISC/gdbridge/gdbridge.c" || {
+		local error=$?
+		echo "ERROR: Command failed 'gcc $GDBRIDGE_FLAGS -DCMDLINE=\"$GDBRIDGE_CMDLINE\" -o \"$KOS_MISC/gdbridge/gdbridge.exe\" \"$KOS_MISC/gdbridge/gdbridge.c\"' -> '$error'"
+		exit $error
+	}
+	fi
+fi
+
+
+
+
+
+
+
+
+
 
 

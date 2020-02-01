@@ -812,33 +812,12 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		printk(KERN_TRACE "[sched] Exiting thread %p [tid=%u]\n",
 		       caller, task_getroottid_of_s(caller));
 
-#if 0 /* This is entirely correct, but when a process (inferior) exits under GDB, the related
-       * MI-event send to visual studio isn't parsed properly.
-       * Essentially, the event says `Inferior #<ID> exited normally/with-error/with-signal',
-       * and Visual Studio doesn't get it quite right by forgetting that there can be more
-       * than one process attached to GDB. So what it ends up doing is terminating GDB after
-       * failing to parse the <ID> part of the event, thinking that any such event indicates
-       * that the primary program has exited (ugh... This is the second time that I've run
-       * into a debugging issue caused by VS not quite getting it right...)
-       * Anyways...
-       * TODO: Write a small pipe-wrapper program for `gdb.exe --interpreter=mi' (written in
-       *       C) that simply forwards all input/output to the real gdb, but scans the data
-       *       stream from gdb->vs for `Inferior [...] exited [...]' events, then discarding
-       *       them such that VS never gets to seem them (with the exception of events
-       *       originating from `Inferior #1', as that's the ~actual~ primary application
-       *       (or in the case of KOS's modgdbserver, /bin/init)). Additionally, any such
-       *       event will have to be followed up by a `c[\r]\n' command send to GDB (since
-       *       for whatever reason, GDB thinks it to be a good idea to stop execution whenever
-       *       a process exits, and not even give you a configuration toggle to change this fact)
-       *    -> I've already tested this on the commandline, and simply responding with `c'
-       *       is enough to keep the ball rolling after an exit event (note though that it's
-       *       only enough with `--interpreter=mi'. - The regular GDB requires you to select
-       *       a running inferior before allowing you to continue...)
-       */
 		/* Trigger the appropriate debug trap associated with thread/process exits.
 		 * This is required because otherwise GDB will sooner or later hang itself
 		 * when waiting for the exited-notification of a terminated thread once it's
-		 * no longer able to find the thread apart of thread listings. */
+		 * no longer able to find the thread apart of thread listings.
+		 * s.a. /kos/misc/gdbridge/gdbride.dee
+		 */
 		if (kernel_debugtrap_enabled() && pid) {
 			struct debugtrap_reason reason;
 			reason.dtr_reason = task_isprocessleader_p(caller) ? DEBUGTRAP_REASON_PEXITED
@@ -847,7 +826,6 @@ NOTHROW(FCALL task_exit)(int w_status) {
 			reason.dtr_ptrarg = caller;
 			kernel_debugtrap(&reason);
 		}
-#endif
 
 		/* Invoke cleanup callbacks. */
 		iter = __kernel_pertask_onexit_start;
