@@ -9,8 +9,7 @@
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
-				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
-				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
 				"/cygdrive/c": "C:\\",
 				"/cygdrive/d": "D:\\",
 				"/cygdrive/e": "E:\\",
@@ -32,8 +31,8 @@
 			"launchCompleteCommand": "None",
 			"miDebuggerServerAddress": ".",
 			"customLaunchSetupCommands": [
-				{ "text": "cd ${workspaceRoot}\\..\\", "ignoreFailures": false },
-				{ "text": "set sysroot ${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
 				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
 				{ "text": "set auto-solib-add on", "ignoreFailures": false },
 				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
@@ -52,7 +51,7 @@
 				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			],
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ${workspaceRoot}\\..\\magic.dee --run-only --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -64,8 +63,7 @@
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
-				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
-				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
 				"/cygdrive/c": "C:\\",
 				"/cygdrive/d": "D:\\",
 				"/cygdrive/e": "E:\\",
@@ -87,8 +85,8 @@
 			"launchCompleteCommand": "None",
 			"miDebuggerServerAddress": ".",
 			"customLaunchSetupCommands": [
-				{ "text": "cd ${workspaceRoot}\\..\\", "ignoreFailures": false },
-				{ "text": "set sysroot ${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
 				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
 				{ "text": "set auto-solib-add on", "ignoreFailures": false },
 				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
@@ -113,8 +111,7 @@
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
-				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
-				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
 				"/cygdrive/c": "C:\\",
 				"/cygdrive/d": "D:\\",
 				"/cygdrive/e": "E:\\",
@@ -136,8 +133,8 @@
 			"launchCompleteCommand": "None",
 			"miDebuggerServerAddress": ".",
 			"customLaunchSetupCommands": [
-				{ "text": "cd ${workspaceRoot}\\..\\", "ignoreFailures": false },
-				{ "text": "set sysroot ${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
 				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
 				{ "text": "set auto-solib-add on", "ignoreFailures": false },
 				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
@@ -157,7 +154,7 @@
 				{ "text": "set follow-fork-mode child", "ignoreFailures": false }
 			],
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ${workspaceRoot}\\..\\magic.dee --run-only --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -169,8 +166,7 @@
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
-				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
-				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
 				"/cygdrive/c": "C:\\",
 				"/cygdrive/d": "D:\\",
 				"/cygdrive/e": "E:\\",
@@ -192,8 +188,8 @@
 			"launchCompleteCommand": "None",
 			"miDebuggerServerAddress": ".",
 			"customLaunchSetupCommands": [
-				{ "text": "cd ${workspaceRoot}\\..\\", "ignoreFailures": false },
-				{ "text": "set sysroot ${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
 				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
 				{ "text": "set auto-solib-add on", "ignoreFailures": false },
 				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
@@ -219,8 +215,7 @@
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
-				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
-				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
 				"/cygdrive/c": "C:\\",
 				"/cygdrive/d": "D:\\",
 				"/cygdrive/e": "E:\\",
@@ -234,7 +229,7 @@
 				"/cygdrive/y": "Y:\\",
 				"/cygdrive/z": "Z:\\"
 			},
-			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
+			"program": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
 			"MIMode": "gdb",
 			"miDebuggerPath": "gdb.exe",
 			"targetArchitecture": "x86",
@@ -272,7 +267,7 @@
 			 *    >> "D:\FULL\PATH\TO\PROGRAM\PROGRAM.exe" %*
 			 */
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ${workspaceRoot}\\..\\magic.dee --run-only --gdb=qemu --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ABSOLUTE_KOS_NT_PROJECT_ROOT\\magic.dee --run-only --gdb=qemu --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -284,8 +279,7 @@
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
-				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
-				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
 				"/cygdrive/c": "C:\\",
 				"/cygdrive/d": "D:\\",
 				"/cygdrive/e": "E:\\",
@@ -299,7 +293,7 @@
 				"/cygdrive/y": "Y:\\",
 				"/cygdrive/z": "Z:\\"
 			},
-			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
+			"program": "ABSOLUTE_KOS_NT_PROJECT_ROOT\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
 			"MIMode": "gdb",
 			"miDebuggerPath": "gdb.exe",
 			"targetArchitecture": "x86",
