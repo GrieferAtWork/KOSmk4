@@ -113,6 +113,19 @@ try {
 	}
 	local token = 0x7fffffff;
 	for (local l: our) {
+		/* Visual Studio doesn't understand `target-stream-output'
+		 * However, it _does_ understand `console-stream-output',
+		 * so redirect these streams! */
+		if (l.startswith("@\"") && l.endswith("\"\n")) {
+			print log: ("< ", l),;
+			log.sync();
+			with (stdout_lock) {
+				File.stdout.write("~");
+				File.stdout.write(l[1:]);
+				File.stdout.sync();
+			}
+			continue;
+		}
 		if (l.startswith("*stopped,reason=\"exited")) {
 			print log: ("[hidden]< ", l),;
 			log.sync();
