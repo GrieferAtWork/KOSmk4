@@ -58,22 +58,22 @@ struct iovec;
 #else /* __x86_64__ */
 struct iovec64;
 #endif /* !__x86_64__ */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_KERNEL
 struct sockaddr;
 #ifdef __x86_64__
 struct cmsghdr;
 #else /* __x86_64__ */
 struct cmsghdr64;
 #endif /* !__x86_64__ */
-#endif /* __USE_KOS */
+#endif /* __USE_KOS_KERNEL */
 
 /* Structure describing messages sent by `sendmsg' and received by `recvmsg'. */
 struct msghdr64 /*[PREFIX(msg_)]*/ {
-#ifdef __USE_KOS
+#ifdef __USE_KOS_KERNEL
 	__HYBRID_PTR64(struct sockaddr) msg_name;      /* [TYPE(struct sockaddr *)] Address to send to/receive from. */
-#else /* __USE_KOS */
+#else /* __USE_KOS_KERNEL */
 	__HYBRID_PTR64(void)           msg_name;       /* [TYPE(struct sockaddr *)] Address to send to/receive from. */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 	__UINT32_TYPE__                msg_namelen;    /* Length of address data. */
 	__UINT32_TYPE__              __msg_pad1;       /* ... */
 #ifdef __x86_64__
@@ -82,21 +82,21 @@ struct msghdr64 /*[PREFIX(msg_)]*/ {
 	__HYBRID_PTR64(struct iovec64) msg_iov;        /* Vector of data to send/receive into. */
 #endif /* !__x86_64__ */
 	__UINT64_TYPE__                msg_iovlen;     /* Number of elements in the vector. */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_KERNEL
 #ifdef __x86_64__
 	__HYBRID_PTR64(struct cmsghdr) msg_control;    /* [TYPE(struct cmsghdr64 *)] Ancillary data (eg BSD filedesc passing). */
 #else /* __x86_64__ */
 	__HYBRID_PTR64(struct cmsghdr64) msg_control;  /* [TYPE(struct cmsghdr64 *)] Ancillary data (eg BSD filedesc passing). */
 #endif /* !__x86_64__ */
-#else /* __USE_KOS */
+#else /* __USE_KOS_KERNEL */
 	__HYBRID_PTR64(void)           msg_control;    /* [TYPE(struct cmsghdr64 *)] Ancillary data (eg BSD filedesc passing). */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 	__UINT64_TYPE__                msg_controllen; /* Ancillary data buffer length. !! The type should be socklen_t but the definition of the kernel is incompatible with this. */
-#ifdef __USE_KOS
+#ifdef __USE_KOS_KERNEL
 	__UINT32_TYPE__                msg_flags;      /* Flags returned by recvmsg() */
-#else /* __USE_KOS */
+#else /* __USE_KOS_KERNEL */
 	__INT32_TYPE__                 msg_flags;      /* Flags returned by recvmsg() */
-#endif /* !__USE_KOS */
+#endif /* !__USE_KOS_KERNEL */
 	__UINT32_TYPE__              __msg_pad2;       /* ... */
 };
 

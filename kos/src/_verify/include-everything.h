@@ -914,7 +914,7 @@ incdir("", "../../include");
 /* libstdc++ doesn't work in kernel-space:
  *  - missing functions that libstdc++ assumes to be there (locale, etc...)
  *  - The fact that most libc functions are defined as STDCALL,
- *    which breaks assigning them to to prototype pointers. */
+ *    which breaks assigning them to prototype pointers. */
 #ifndef __KERNEL__
 #undef min
 #undef max
