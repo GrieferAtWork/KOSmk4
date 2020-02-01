@@ -133,8 +133,6 @@ GCC_FLAGS({
 //GCC_FLAGS({ "-gz" })
 
 /* TODO: Make use of `-fsanitize=alignment' */
-/* TODO: Make use of `-fsanitize=nonnull-attribute' */
-/* TODO: Make use of `-fsanitize=returns-nonnull-attribute' */
 /* TODO: Also enable `-fsanitize-recover' (which would allow the
  *       `ignore' option of the kernel debugger to function properly) */
 /* TODO: Look into `-fsanitize=kernel-address' */

@@ -118,10 +118,6 @@ __REDIRECT(__IMPDEF,__ATTR_WUNUSED,void *,__NOTHROW_NCX,__DLFCN_CALL,fdlopen,(/*
 #if __KOS_VERSION__ >= 400
 /* New DL Functions added with KOSmk4 */
 
-
-/* TODO: Some function for enumeration all loaded modules. */
-
-
 /* Check if a given module is exception aware.
  * TODO: Figure out how we want to detect this condition...
  * @param: HANDLE: The module to check
