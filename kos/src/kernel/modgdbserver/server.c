@@ -974,6 +974,10 @@ send_ok_and_detach:
 			ERROR(err_syntax);
 		if (pid == -1)
 			goto send_ok_and_detach; /* Detach from everything */
+#if __SIZEOF_POINTER__ > 4
+		if (pid == 0xffffffff) /* 32-bit `-1', cast to unsigned */
+			goto send_ok_and_detach;
+#endif /* __SIZEOF_POINTER__ > 4 */
 		if (pid == 0)
 			goto send_ok_and_detach; /* Detach from anything */
 		if (pid == GDB_KERNEL_PID)
@@ -1630,6 +1634,12 @@ send_empty:
 				pid = strtos(i, &i, 16);
 				if (i != endptr)
 					ERROR(err_syntax);
+				if (pid == -1)
+					goto do_return_attached_everything; /* Detach from everything */
+#if __SIZEOF_POINTER__ > 4
+				if (pid == 0xffffffff) /* 32-bit `-1', cast to unsigned */
+					goto do_return_attached_everything;
+#endif /* __SIZEOF_POINTER__ > 4 */
 				/* Verify that the thread exists. */
 				thread = GDBThread_DoLookupPID(pid);
 				if (!thread)
@@ -1639,6 +1649,7 @@ send_empty:
 				if (i != endptr)
 					ERROR(err_syntax);
 			}
+do_return_attached_everything:
 #if 1
 			/* Created a new process (Otherwise, GDB may terminate the session) */
 			*o++ = '0';
