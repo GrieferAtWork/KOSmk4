@@ -191,6 +191,7 @@ incdir("", "../../include");
 #include <bits/mathdef.h>
 #include <bits/mbstate.h>
 #include <bits/mman.h>
+#include <bits/msghdr-struct.h>
 #include <bits/msq.h>
 #include <bits/nan.h>
 #include <bits/netdb.h>
@@ -304,6 +305,7 @@ incdir("", "../../include");
 #include <compat/bits/iovec-struct.h>
 #include <compat/bits/itimerspec.h>
 #include <compat/bits/itimerval.h>
+#include <compat/bits/msghdr-struct.h>
 #include <compat/bits/rusage-convert.h>
 #include <compat/bits/rusage-struct.h>
 #include <compat/bits/sigaction-struct.h>

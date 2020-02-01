@@ -126,6 +126,9 @@
 %[typeorg(<bits/iovec-struct.h>: iovec)]
 %[typeorg(<bits/iovec-struct32.h>: iovec32)]
 %[typeorg(<bits/iovec-struct64.h>: iovec64)]
+%[typeorg(<bits/msghdr-struct.h>: msghdr)]
+%[typeorg(<bits/msghdr-struct32.h>: msghdr32)]
+%[typeorg(<bits/msghdr-struct64.h>: msghdr64)]
 
 %[typeorg(<librpc/bits/syscall-info.h>: rpc_syscall_info)]
 %[typeorg(<librpc/bits/syscall-info32.h>: rpc_syscall_info32)]
@@ -1407,9 +1410,11 @@ sendto:(fd_t sockfd, void const *buf, size_t bufsize,
         [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t flags,
         struct sockaddr const *addr, socklen_t addr_len) -> ssize_t;
 
-[restart(dont)][cp] /* TODO: `struct msghdr' needs a 32/64-variant */
-sendmsg:(fd_t sockfd, struct msghdr const *message,
-         [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t flags) -> ssize_t;
+%[startgroup]
+[restart(dont)][cp] sendmsg:(fd_t sockfd, struct msghdr const *message, [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t flags) -> ssize_t;
+[restart(dont)][cp] sendmsgx32:(fd_t sockfd, struct msghdr32 const *message, [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t flags) -> ssize_t;
+[restart(dont)][cp] sendmsgx64:(fd_t sockfd, struct msghdr64 const *message, [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t flags) -> ssize_t;
+%[endgroup]
 
 [restart(dont)][cp]
 recv:(fd_t sockfd, void *buf, size_t bufsize,
@@ -1420,9 +1425,11 @@ recvfrom:(fd_t sockfd, void *buf, size_t bufsize,
           [tostr(flagset(MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t flags,
           struct sockaddr *addr, socklen_t *addr_len) -> ssize_t;
 
-[restart(dont)][cp] /* TODO: `struct msghdr' needs a 32/64-variant */
-recvmsg:(fd_t sockfd, struct msghdr *message,
-         [tostr(flagset(MSG_CMSG_CLOEXEC, MSG_CMSG_CLOFORK, MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t flags) -> ssize_t;
+%[startgroup]
+[restart(dont)][cp] recvmsg:(fd_t sockfd, struct msghdr *message, [tostr(flagset(MSG_CMSG_CLOEXEC, MSG_CMSG_CLOFORK, MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t flags) -> ssize_t;
+[restart(dont)][cp] recvmsgx32:(fd_t sockfd, struct msghdr32 *message, [tostr(flagset(MSG_CMSG_CLOEXEC, MSG_CMSG_CLOFORK, MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t flags) -> ssize_t;
+[restart(dont)][cp] recvmsgx64:(fd_t sockfd, struct msghdr64 *message, [tostr(flagset(MSG_CMSG_CLOEXEC, MSG_CMSG_CLOFORK, MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t flags) -> ssize_t;
+%[endgroup]
 
 @@@param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
 shutdown:(fd_t sockfd, [tostr(select(SHUT_RD,SHUT_WR,SHUT_RDWR))] syscall_ulong_t how) -> errno_t;

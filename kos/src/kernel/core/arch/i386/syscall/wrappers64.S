@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d569aaa */
+/* HASH CRC-32:0xe3d473ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1483,7 +1483,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendmsg)
 	.cfi_endproc
 END(__x86_asm64_syscall_sendmsg)
 
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdr64 *message, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmsg)
 	.cfi_startproc simple
@@ -23554,7 +23554,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
 	.cfi_endproc
 END(__x86_asm32_int80_recvfrom)
 
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmsg)
 	.cfi_startproc simple
@@ -29090,7 +29090,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvfrom)
 	.cfi_endproc
 END(__x86_asm32_sysenter_recvfrom)
 
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_recvmsg, __x86_asm32_int80_recvmsg)
 
 /* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
@@ -34457,7 +34457,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvfrom)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_recvfrom)
 
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmsg)
 	.cfi_startproc

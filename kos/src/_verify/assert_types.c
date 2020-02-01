@@ -288,6 +288,7 @@ local files = {
 	"../../include/bits/flock-struct.h",
 	"../../include/bits/itimerspec.h",
 	"../../include/bits/itimerval.h",
+	"../../include/bits/msghdr-struct.h",
 	"../../include/bits/rusage-struct.h",
 	"../../include/bits/sigaction-struct.h",
 	"../../include/bits/siginfo-struct.h",
@@ -398,6 +399,22 @@ STATIC_ASSERT(sizeof(struct __itimerval64) == __SIZEOF_ITIMERVAL64);
 STATIC_ASSERT(offsetof(struct __itimerval32, it_value) == __OFFSET_ITIMERVAL32_VALUE);
 STATIC_ASSERT(offsetof(struct __itimerval32, it_interval) == __OFFSET_ITIMERVAL32_INTERVAL);
 STATIC_ASSERT(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
+
+
+
+
+
+#include <bits/msghdr-struct.h>
+
+/* struct msghdr */
+STATIC_ASSERT(offsetof(struct msghdr, msg_control) == __OFFSET_MSGHDR_CONTROL);
+STATIC_ASSERT(offsetof(struct msghdr, msg_controllen) == __OFFSET_MSGHDR_CONTROLLEN);
+STATIC_ASSERT(offsetof(struct msghdr, msg_flags) == __OFFSET_MSGHDR_FLAGS);
+STATIC_ASSERT(offsetof(struct msghdr, msg_iov) == __OFFSET_MSGHDR_IOV);
+STATIC_ASSERT(offsetof(struct msghdr, msg_iovlen) == __OFFSET_MSGHDR_IOVLEN);
+STATIC_ASSERT(offsetof(struct msghdr, msg_name) == __OFFSET_MSGHDR_NAME);
+STATIC_ASSERT(offsetof(struct msghdr, msg_namelen) == __OFFSET_MSGHDR_NAMELEN);
+STATIC_ASSERT(sizeof(struct msghdr) == __SIZEOF_MSGHDR);
 
 
 
@@ -843,6 +860,18 @@ STATIC_ASSERT(offsetof(struct elf64_syminfo, si_flags) == __OFFSET_ELF64_SYMINFO
 STATIC_ASSERT(offsetof(struct elf64_syminfo, si_boundto) == __OFFSET_ELF64_SYMINFO_BOUNDTO);
 STATIC_ASSERT(sizeof(struct elf64_syminfo) == __SIZEOF_ELF64_SYMINFO);
 
+/* struct elf32_rel */
+/* ... */
+
+/* struct elf64_rel */
+/* ... */
+
+/* struct elf32_rela */
+/* ... */
+
+/* struct elf64_rela */
+/* ... */
+
 /* struct elf32_phdr */
 STATIC_ASSERT(offsetof(struct elf32_phdr, p_align) == __OFFSET_ELF32_PHDR_ALIGN);
 STATIC_ASSERT(offsetof(struct elf32_phdr, p_filesz) == __OFFSET_ELF32_PHDR_FILESZ);
@@ -865,6 +894,12 @@ STATIC_ASSERT(offsetof(struct elf64_phdr, p_type) == __OFFSET_ELF64_PHDR_TYPE);
 STATIC_ASSERT(offsetof(struct elf64_phdr, p_vaddr) == __OFFSET_ELF64_PHDR_VADDR);
 STATIC_ASSERT(sizeof(struct elf64_phdr) == __SIZEOF_ELF64_PHDR);
 
+/* struct elf32_dyn */
+/* ... */
+
+/* struct elf64_dyn */
+/* ... */
+
 /* struct elf32_chdr */
 STATIC_ASSERT(offsetof(struct elf32_chdr, ch_addralign) == __OFFSET_ELF32_CHDR_ADDRALIGN);
 STATIC_ASSERT(offsetof(struct elf32_chdr, ch_size) == __OFFSET_ELF32_CHDR_SIZE);
@@ -876,6 +911,66 @@ STATIC_ASSERT(offsetof(struct elf64_chdr, ch_addralign) == __OFFSET_ELF64_CHDR_A
 STATIC_ASSERT(offsetof(struct elf64_chdr, ch_size) == __OFFSET_ELF64_CHDR_SIZE);
 STATIC_ASSERT(offsetof(struct elf64_chdr, ch_type) == __OFFSET_ELF64_CHDR_TYPE);
 STATIC_ASSERT(sizeof(struct elf64_chdr) == __SIZEOF_ELF64_CHDR);
+
+/* struct elf32_verdef */
+/* ... */
+
+/* struct elf64_verdef */
+/* ... */
+
+/* struct elf32_verdaux */
+/* ... */
+
+/* struct elf64_verdaux */
+/* ... */
+
+/* struct elf32_verneed */
+/* ... */
+
+/* struct elf64_verneed */
+/* ... */
+
+/* struct elf32_vernaux */
+/* ... */
+
+/* struct elf64_vernaux */
+/* ... */
+
+/* struct elf32_auxv_t */
+/* ... */
+
+/* struct elf64_auxv_t */
+/* ... */
+
+/* struct elf32_nhdr */
+/* ... */
+
+/* struct elf64_nhdr */
+/* ... */
+
+/* struct elf32_move */
+/* ... */
+
+/* struct elf64_move */
+/* ... */
+
+/* union elf32_gptab */
+/* ... */
+
+/* struct elf32_reginfo */
+/* ... */
+
+/* struct elf_options */
+/* ... */
+
+/* struct elf_options_hw */
+/* ... */
+
+/* struct elf32_lib */
+/* ... */
+
+/* struct elf64_lib */
+/* ... */
 
 
 

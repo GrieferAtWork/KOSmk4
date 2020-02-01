@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3015f686 */
+/* HASH CRC-32:0xec0ecc16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@
 #define __NR64_sendto                 0x2c                           /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
 #define __NR64_recvfrom               0x2d                           /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
 #define __NR64_sendmsg                0x2e                           /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
-#define __NR64_recvmsg                0x2f                           /* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
+#define __NR64_recvmsg                0x2f                           /* ssize_t recvmsg(fd_t sockfd, struct msghdr64 *message, syscall_ulong_t flags) */
 /* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
 #define __NR64_shutdown               0x30                           /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 #define __NR64_bind                   0x31                           /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */

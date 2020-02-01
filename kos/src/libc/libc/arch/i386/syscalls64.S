@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc0c8602 */
+/* HASH CRC-32:0x955ae808 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1196,7 +1196,7 @@ INTERN_FUNCTION(libc_sys_Xsendmsg)
 END(libc_sys_Xsendmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsendmsg, libc_sys_Xsendmsg)
 
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdr64 *message, syscall_ulong_t flags) */
 .section .text.crt.syscall.recvmsg
 INTERN_FUNCTION(libc_sys_recvmsg)
 	.cfi_startproc
@@ -1208,7 +1208,7 @@ INTERN_FUNCTION(libc_sys_recvmsg)
 END(libc_sys_recvmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_recvmsg, libc_sys_recvmsg)
 
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdr64 *message, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xrecvmsg
 INTERN_FUNCTION(libc_sys_Xrecvmsg)
 	.cfi_startproc

@@ -74,9 +74,9 @@ typedef struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 	__INT32_TYPE__ si_code;  /* Signal code. */
 #if __SIZEOF_POINTER__ > 4
 	__INT32_TYPE__ __si_pad; /* ... */
-#endif
-#if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
-	defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+#endif /* __SIZEOF_POINTER__ > 4 */
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+	 defined(__COMPILER_HAVE_TRANSPARENT_UNION))
 #ifndef __USE_KOS
 	struct {
 #endif /* !__USE_KOS */
@@ -125,9 +125,9 @@ typedef struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 		};
 	};
 #endif /* Transparent struct/union */
-#if !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) || \
-	!defined(__COMPILER_HAVE_TRANSPARENT_UNION) || \
-	!defined(__USE_KOS)
+#if (!defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) || \
+	 !defined(__COMPILER_HAVE_TRANSPARENT_UNION) || \
+	 !defined(__USE_KOS))
 	union {
 		__INT32_TYPE__ _pad[__SI_PAD_SIZE];
 		struct { /* kill(). */
@@ -171,8 +171,8 @@ typedef struct __siginfo_struct /*[NAME(siginfo)][PREFIX(si_)]*/ {
 		} _sigsys;
 	} _sifields;
 #endif /* ... */
-#if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
-	defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+	 defined(__COMPILER_HAVE_TRANSPARENT_UNION))
 #ifndef __USE_KOS
 	};
 #endif /* !__USE_KOS */

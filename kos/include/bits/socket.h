@@ -44,6 +44,7 @@
 #include <asm/socket.h>
 #include <bits/sockaddr.h>
 #include <bits/socket_type.h>
+#include <bits/msghdr-struct.h>
 #include <bits/types.h>
 
 #ifdef __USE_GLIBC
@@ -484,23 +485,6 @@ enum {
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* !MSG_OOB */
-
-/* Structure describing messages sent by `sendmsg' and received by `recvmsg'. */
-#ifdef __CC__
-#ifndef __msghdr_defined
-#define __msghdr_defined 1
-struct iovec;
-struct msghdr {
-	void          *msg_name;       /* [TYPE(struct sockaddr *)] Address to send to/receive from. */
-	socklen_t      msg_namelen;    /* Length of address data. */
-	struct iovec  *msg_iov;        /* Vector of data to send/receive into. */
-	size_t         msg_iovlen;     /* Number of elements in the vector. */
-	void          *msg_control;    /* [TYPE(struct cmsghdr *)] Ancillary data (eg BSD filedesc passing). */
-	size_t         msg_controllen; /* Ancillary data buffer length. !! The type should be socklen_t but the definition of the kernel is incompatible with this. */
-	__INT32_TYPE__ msg_flags;      /* Flags returned by recvmsg() */
-};
-#endif /* !__msghdr_defined */
-#endif /* __CC__ */
 
 /* Structure used for storage of ancillary data object information. */
 #ifdef __CC__

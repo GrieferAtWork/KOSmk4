@@ -76,6 +76,7 @@ clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRA
        pid_t *ctid, uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
+recvmsg = recvmsgx64;
 getitimer = getitimerx64;
 setitimer = setitimerx64;
 statfs = statfsx64;

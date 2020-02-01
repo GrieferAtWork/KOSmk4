@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c57473f */
+/* HASH CRC-32:0xfb6ce2e2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,6 +27,8 @@
 #include <bits/iovec-struct32.h>
 #include <bits/itimerspec32.h>
 #include <bits/itimerval32.h>
+#include <bits/msghdr-struct.h>
+#include <bits/msghdr-struct32.h>
 #include <bits/rusage-struct32.h>
 #include <bits/sigaction-struct.h>
 #include <bits/sigaction-struct32.h>
@@ -130,6 +132,7 @@ struct linux_statx32_64;
 struct mmsghdr;
 struct mq_attr;
 struct msghdr;
+struct msghdr32;
 struct old_linux_dirent;
 struct pollfd;
 struct rlimit;
@@ -1288,7 +1291,7 @@ __CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages,
 __CDECLARE_SC(,__ssize_t,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx32_64 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
 #endif /* __CRT_HAVE_SC(recvmmsg64) */
 #if __CRT_HAVE_SC(recvmsg)
-__CDECLARE_SC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr *__message, __syscall_ulong_t __flags),(__sockfd,__message,__flags))
+__CDECLARE_SC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr32 *__message, __syscall_ulong_t __flags),(__sockfd,__message,__flags))
 #endif /* __CRT_HAVE_SC(recvmsg) */
 #if __CRT_HAVE_SC(remap_file_pages)
 __CDECLARE_SC(,__errno_t,remap_file_pages,(void *__start, __size_t __size, __syscall_ulong_t __prot, __size_t __pgoff, __syscall_ulong_t __flags),(__start,__size,__prot,__pgoff,__flags))
@@ -2972,7 +2975,7 @@ __CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages
 __CDECLARE_XSC(,__ssize_t,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx32_64 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
 #endif /* __CRT_HAVE_XSC(recvmmsg64) */
 #if __CRT_HAVE_XSC(recvmsg)
-__CDECLARE_XSC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr *__message, __syscall_ulong_t __flags),(__sockfd,__message,__flags))
+__CDECLARE_XSC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr32 *__message, __syscall_ulong_t __flags),(__sockfd,__message,__flags))
 #endif /* __CRT_HAVE_XSC(recvmsg) */
 #if __CRT_HAVE_XSC(remap_file_pages)
 __CDECLARE_XSC(,__errno_t,remap_file_pages,(void *__start, __size_t __size, __syscall_ulong_t __prot, __size_t __pgoff, __syscall_ulong_t __flags),(__start,__size,__prot,__pgoff,__flags))

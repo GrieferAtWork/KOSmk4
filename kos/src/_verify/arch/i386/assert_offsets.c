@@ -61,6 +61,8 @@ local files = {
 	"../../../../include/i386-kos/bits/itimerspec64.h",
 	"../../../../include/i386-kos/bits/itimerval32.h",
 	"../../../../include/i386-kos/bits/itimerval64.h",
+	"../../../../include/i386-kos/bits/msghdr-struct32.h",
+	"../../../../include/i386-kos/bits/msghdr-struct64.h",
 	"../../../../include/i386-kos/bits/rusage-struct32.h",
 	"../../../../include/i386-kos/bits/rusage-struct64.h",
 	"../../../../include/i386-kos/bits/sigaction-struct-cygwin.h",
@@ -300,6 +302,38 @@ STATIC_ASSERT(alignof(struct itimervalx64) == __ALIGNOF_ITIMERVALX64);
 
 /* struct __itimervalx64_alt */
 /* ... */
+
+
+
+
+
+#include <bits/msghdr-struct32.h>
+
+/* struct msghdr32 */
+STATIC_ASSERT(offsetof(struct msghdr32, msg_control) == __OFFSET_MSGHDR32_CONTROL);
+STATIC_ASSERT(offsetof(struct msghdr32, msg_controllen) == __OFFSET_MSGHDR32_CONTROLLEN);
+STATIC_ASSERT(offsetof(struct msghdr32, msg_flags) == __OFFSET_MSGHDR32_FLAGS);
+STATIC_ASSERT(offsetof(struct msghdr32, msg_iov) == __OFFSET_MSGHDR32_IOV);
+STATIC_ASSERT(offsetof(struct msghdr32, msg_iovlen) == __OFFSET_MSGHDR32_IOVLEN);
+STATIC_ASSERT(offsetof(struct msghdr32, msg_name) == __OFFSET_MSGHDR32_NAME);
+STATIC_ASSERT(offsetof(struct msghdr32, msg_namelen) == __OFFSET_MSGHDR32_NAMELEN);
+STATIC_ASSERT(sizeof(struct msghdr32) == __SIZEOF_MSGHDR32);
+
+
+
+
+
+#include <bits/msghdr-struct64.h>
+
+/* struct msghdr64 */
+STATIC_ASSERT(offsetof(struct msghdr64, msg_control) == __OFFSET_MSGHDR64_CONTROL);
+STATIC_ASSERT(offsetof(struct msghdr64, msg_controllen) == __OFFSET_MSGHDR64_CONTROLLEN);
+STATIC_ASSERT(offsetof(struct msghdr64, msg_flags) == __OFFSET_MSGHDR64_FLAGS);
+STATIC_ASSERT(offsetof(struct msghdr64, msg_iov) == __OFFSET_MSGHDR64_IOV);
+STATIC_ASSERT(offsetof(struct msghdr64, msg_iovlen) == __OFFSET_MSGHDR64_IOVLEN);
+STATIC_ASSERT(offsetof(struct msghdr64, msg_name) == __OFFSET_MSGHDR64_NAME);
+STATIC_ASSERT(offsetof(struct msghdr64, msg_namelen) == __OFFSET_MSGHDR64_NAMELEN);
+STATIC_ASSERT(sizeof(struct msghdr64) == __SIZEOF_MSGHDR64);
 
 
 

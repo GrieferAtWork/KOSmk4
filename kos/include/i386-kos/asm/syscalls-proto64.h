@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc472ff71 */
+/* HASH CRC-32:0x9bbedc14 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -918,7 +918,7 @@
 #define __NRAT1_sendmsg                (struct msghdr const *, struct msghdr const *)
 #define __NRAT2_sendmsg                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_recvmsg                (fd_t, __fd_t)
-#define __NRAT1_recvmsg                (struct msghdr *, struct msghdr *)
+#define __NRAT1_recvmsg                (struct msghdr64 *, struct msghdr64 *)
 #define __NRAT2_recvmsg                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_shutdown               (fd_t, __fd_t)
 #define __NRAT1_shutdown               (syscall_ulong_t, __syscall_ulong_t)
@@ -1740,7 +1740,7 @@
 #define __NRAM_sendto(a, b, c, d, e, f)                 (__fd_t)a, (void const *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr const *)e, (__socklen_t)f
 #define __NRAM_recvfrom(a, b, c, d, e, f)               (__fd_t)a, (void *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr *)e, (__socklen_t *)f
 #define __NRAM_sendmsg(a, b, c, d, e, f)                (__fd_t)a, (struct msghdr const *)b, (__syscall_ulong_t)c
-#define __NRAM_recvmsg(a, b, c, d, e, f)                (__fd_t)a, (struct msghdr *)b, (__syscall_ulong_t)c
+#define __NRAM_recvmsg(a, b, c, d, e, f)                (__fd_t)a, (struct msghdr64 *)b, (__syscall_ulong_t)c
 #define __NRAM_shutdown(a, b, c, d, e, f)               (__fd_t)a, (__syscall_ulong_t)b
 #define __NRAM_bind(a, b, c, d, e, f)                   (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
 #define __NRAM_listen(a, b, c, d, e, f)                 (__fd_t)a, (__syscall_ulong_t)b

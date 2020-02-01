@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x805d4ca */
+/* HASH CRC-32:0x8c084043 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -450,7 +450,7 @@
 #define SYS_sendto                  __NR_sendto                  /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
 #define SYS_sendmsg                 __NR_sendmsg                 /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
 #define SYS_recvfrom                __NR_recvfrom                /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
-#define SYS_recvmsg                 __NR_recvmsg                 /* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
+#define SYS_recvmsg                 __NR_recvmsg                 /* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t flags) */
 /* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
 #define SYS_shutdown                __NR_shutdown                /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 #define SYS_userfaultfd             __NR_userfaultfd             /* errno_t userfaultfd(int TODO_PROTOTYPE) */

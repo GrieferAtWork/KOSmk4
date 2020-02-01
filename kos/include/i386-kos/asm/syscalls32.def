@@ -89,6 +89,7 @@ setfsuid = setfsuid16;
 setfsgid = setfsgid16;
 
 /* Configure binding of multi-arch types in system calls. */
+recvmsg = recvmsgx32;
 sendfile = sendfile32;
 statfs = statfsx32;
 statfs64 = statfsx32_64;

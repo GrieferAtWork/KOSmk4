@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a3c7f25 */
+/* HASH CRC-32:0x594ddaa3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1771,7 +1771,7 @@
 #define __NR32AT4_recvfrom                (struct sockaddr *, struct sockaddr *)
 #define __NR32AT5_recvfrom                (socklen_t *, __socklen_t *)
 #define __NR32AT0_recvmsg                 (fd_t, __fd_t)
-#define __NR32AT1_recvmsg                 (struct msghdr *, struct msghdr *)
+#define __NR32AT1_recvmsg                 (struct msghdr32 *, struct msghdr32 *)
 #define __NR32AT2_recvmsg                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_shutdown                (fd_t, __fd_t)
 #define __NR32AT1_shutdown                (syscall_ulong_t, __syscall_ulong_t)
@@ -2414,7 +2414,7 @@
 #define __NR32AM_sendto(a, b, c, d, e, f)                  (__fd_t)a, (void const *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr const *)e, (__socklen_t)f
 #define __NR32AM_sendmsg(a, b, c, d, e, f)                 (__fd_t)a, (struct msghdr const *)b, (__syscall_ulong_t)c
 #define __NR32AM_recvfrom(a, b, c, d, e, f)                (__fd_t)a, (void *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr *)e, (__socklen_t *)f
-#define __NR32AM_recvmsg(a, b, c, d, e, f)                 (__fd_t)a, (struct msghdr *)b, (__syscall_ulong_t)c
+#define __NR32AM_recvmsg(a, b, c, d, e, f)                 (__fd_t)a, (struct msghdr32 *)b, (__syscall_ulong_t)c
 #define __NR32AM_shutdown(a, b, c, d, e, f)                (__fd_t)a, (__syscall_ulong_t)b
 #define __NR32AM_userfaultfd(a, b, c, d, e, f)             (int)a
 #define __NR32AM_membarrier(a, b, c, d, e, f)              (int)a
