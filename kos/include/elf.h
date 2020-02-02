@@ -43,7 +43,11 @@ __DECL_BEGIN
 
 /* The contents of this file are based on GLibc /usr/include/elf.h
  * Note however that additions were made and more documentation was added,
- * meaning that the original should be retrieved from glibc instead. */
+ * meaning that the original should be retrieved from glibc instead.
+ * Additional sources:
+ *  - https://docs.oracle.com/cd/E19253-01/817-1984/chapter6-14428/index.html
+ *  - GNU Binutils (internal headers)
+ */
 /* This file defines standard ELF types, structures, and macros.
    Copyright (C) 1995-2003,2004,2005,2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -452,6 +456,8 @@ typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 #define SHT_SYMTAB_SHNDX  18            /* Extended section indices */
 #define SHT_NUM           19            /* Number of defined types. */
 #define SHT_LOOS          0x60000000    /* Start OS-specific. */
+#define SHT_GNU_INCREMENTAL_INPUTS 0x6fff4700 /* Incremental build data */
+#define SHT_GNU_ATTRIBUTES 0x6ffffff5   /* Object attributes */
 #define SHT_GNU_HASH      0x6ffffff6    /* GNU-style hash table. */
 #define SHT_GNU_LIBLIST   0x6ffffff7    /* Prelink library list */
 #define SHT_CHECKSUM      0x6ffffff8    /* Checksum for DSO content. */
@@ -462,6 +468,9 @@ typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 #define SHT_GNU_verdef    0x6ffffffd    /* Version definition section. */
 #define SHT_GNU_verneed   0x6ffffffe    /* Version needs section. */
 #define SHT_GNU_versym    0x6fffffff    /* Version symbol table. */
+#define SHT_SUNW_verdef   SHT_GNU_verdef  /* Versions defined by file. */
+#define SHT_SUNW_verneed  SHT_GNU_verneed /* Versions needed by file. */
+#define SHT_SUNW_versym   SHT_GNU_versym  /* Symbol versions. */
 #define SHT_HISUNW        0x6fffffff    /* Sun-specific high bound. */
 #define SHT_HIOS          0x6fffffff    /* End OS-specific type */
 #define SHT_LOPROC        0x70000000    /* Start of processor-specific */
@@ -482,6 +491,8 @@ typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 #define SHF_TLS              0x00000400 /* Section hold thread-local data. */
 #define SHF_COMPRESSED       0x00000800 /* Section contains compressed data (and a header `Elf32_Chdr' / `Elf64_Chdr') */
 #define SHF_MASKOS           0x0ff00000 /* OS-specific. */
+#define SHF_GNU_BUILD_NOTE   0x00100000 /* Section contains GNU BUILD ATTRIBUTE notes. */
+#define SHF_GNU_MBIND        0x01000000 /* Mbind section. */
 #define SHF_MASKPROC         0xf0000000 /* Processor-specific */
 #define SHF_ORDERED          0x40000000 /* Special ordering requirement (Solaris). */
 #define SHF_EXCLUDE          0x80000000 /* Section is excluded unless referenced or allocated (Solaris).*/
@@ -598,6 +609,8 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 #define STT_COMMON      5               /* Symbol is a common data object */
 #define STT_TLS         6               /* Symbol is thread-local data object*/
 #define STT_NUM         7               /* Number of defined types */
+#define STT_RELC        8               /* Complex relocation expression */
+#define STT_SRELC       9               /* Signed Complex relocation expression */
 #define STT_LOOS        10              /* Start of OS-specific */
 #define STT_GNU_IFUNC   10              /* Symbol is indirect code object */
 #define STT_HIOS        12              /* End of OS-specific */
@@ -736,21 +749,28 @@ typedef struct elf64_phdr /*[PREFIX(p_)]*/ {
 #define PT_NUM          8               /* Number of defined types */
 #define PT_LOOS         0x60000000      /* Start of OS-specific */
 #define PT_GNU_EH_FRAME 0x6474e550      /* GCC .eh_frame_hdr segment */
+#define PT_SUNW_EH_FRAME PT_GNU_EH_FRAME /* Solaris uses the same value */
 #define PT_GNU_STACK    0x6474e551      /* Indicates stack executability */
 #define PT_GNU_RELRO    0x6474e552      /* Read-only after relocation */
+#define PT_GNU_PROPERTY	0x6474e553      /* GNU property */
+#define PT_SUNW_UNWIND  0x6464e550
 #define PT_LOSUNW       0x6ffffffa
 #define PT_SUNWBSS      0x6ffffffa      /* Sun Specific segment */
 #define PT_SUNWSTACK    0x6ffffffb      /* Stack segment */
+#define PT_SUNWDTRACE   0x6ffffffc
+#define PT_SUNWCAP      0x6ffffffd
 #define PT_HISUNW       0x6fffffff
 #define PT_HIOS         0x6fffffff      /* End of OS-specific */
 #define PT_LOPROC       0x70000000      /* Start of processor-specific */
 #define PT_HIPROC       0x7fffffff      /* End of processor-specific */
+#define PT_GNU_MBIND_NUM 4096
+#define PT_GNU_MBIND_LO 0x6474e555
+#define PT_GNU_MBIND_HI 0x6474f554
 
 /* Legal values for p_flags (segment flags). */
-
-#define PF_X            (1 << 0)        /* Segment is executable */
-#define PF_W            (1 << 1)        /* Segment is writable */
-#define PF_R            (1 << 2)        /* Segment is readable */
+#define PF_X            0x00000001      /* Segment is executable */
+#define PF_W            0x00000002      /* Segment is writable */
+#define PF_R            0x00000004      /* Segment is readable */
 #define PF_MASKOS       0x0ff00000      /* OS-specific */
 #define PF_MASKPROC     0xf0000000      /* Processor-specific */
 
@@ -770,38 +790,56 @@ typedef struct elf64_phdr /*[PREFIX(p_)]*/ {
 #define NT_UTSNAME      15              /* Contains copy of utsname struct */
 #define NT_LWPSTATUS    16              /* Contains copy of lwpstatus struct */
 #define NT_LWPSINFO     17              /* Contains copy of lwpinfo struct */
+#define NT_WIN32PSTATUS 18              /* Has a struct win32_pstatus */
 #define NT_PRFPXREG     20              /* Contains copy of fprxregset struct*/
 
 /* Additional note codes, as used by coredumps and the BFD library. (Required for the elf-coredump driver) */
-#define NT_PRXFPREG          0x46e62b7f /* Contains a user_xfpregs_struct; note name must be "LINUX". */
-#define NT_PPC_VMX           0x100      /* PowerPC Altivec/VMX registers; note name must be "LINUX". */
-#define NT_PPC_VSX           0x102      /* PowerPC VSX registers; note name must be "LINUX". */
-#define NT_386_TLS           0x200      /* x86 TLS information; note name must be "LINUX". */
-#define NT_386_IOPERM        0x201      /* x86 io permissions; note name must be "LINUX". */
-#define NT_X86_XSTATE        0x202      /* x86 XSAVE extended state; note name must be "LINUX". */
-#define NT_S390_HIGH_GPRS    0x300      /* S/390 upper halves of GPRs; note name must be "LINUX". */
-#define NT_S390_TIMER        0x301      /* S390 timer; note name must be "LINUX". */
-#define NT_S390_TODCMP       0x302      /* S390 TOD clock comparator; note name must be "LINUX". */
-#define NT_S390_TODPREG      0x303      /* S390 TOD programmable register; note name must be "LINUX". */
-#define NT_S390_CTRS         0x304      /* S390 control registers; note name must be "LINUX". */
-#define NT_S390_PREFIX       0x305      /* S390 prefix register; note name must be "LINUX". */
-#define NT_S390_LAST_BREAK   0x306      /* S390 breaking event address; note name must be "LINUX". */
-#define NT_S390_SYSTEM_CALL  0x307      /* S390 system call restart data; note name must be "LINUX". */
-#define NT_S390_TDB          0x308      /* S390 transaction diagnostic block; note name must be "LINUX". */
-#define NT_S390_VXRS_LOW     0x309      /* S390 vector registers 0-15 upper half; note name must be "LINUX". */
-#define NT_S390_VXRS_HIGH    0x30a      /* S390 vector registers 16-31; note name must be "LINUX". */
-#define NT_ARM_VFP           0x400      /* ARM VFP registers */
-/* The following definitions should really use NT_AARCH_...,
- * but defined this way for compatibility with Linux. */
-#define NT_ARM_TLS           0x401      /* AArch TLS registers; note name must be "LINUX". */
-#define NT_ARM_HW_BREAK      0x402      /* AArch hardware breakpoint registers; note name must be "LINUX". */
-#define NT_ARM_HW_WATCH      0x403      /* AArch hardware watchpoint registers; note name must be "LINUX". */
-#define NT_SIGINFO           0x53494749 /* Fields of siginfo_t. */
-#define NT_FILE              0x46494c45 /* [ElfW(Ntfile)] Description of mapped files. */
-
+#define NT_PRXFPREG     0x46e62b7f      /* Contains a user_xfpregs_struct; note name must be "LINUX". */
+#define NT_SIGINFO      0x53494749      /* Fields of siginfo_t. */
+#define NT_FILE         0x46494c45      /* [ElfW(Ntfile)] Description of mapped files. */
 
 /* Legal values for the note segment descriptor types for object files. */
 #define NT_VERSION      1               /* Contains a version string. */
+#define NT_ARCH         2               /* Contains an architecture string. */
+
+#define NT_FREEBSD_ABI_TAG            1  /* Value for FreeBSD .note.ABI-tag notes. Note name is "FreeBSD". */
+#define NT_FREEBSD_THRMISC            7  /* Thread miscellaneous info; note name must be "FreeBSD". */
+#define NT_FREEBSD_PROCSTAT_PROC      8  /* Procstat proc data; note name must be "FreeBSD". */
+#define NT_FREEBSD_PROCSTAT_FILES     9  /* Procstat files data; note name must be "FreeBSD". */
+#define NT_FREEBSD_PROCSTAT_VMMAP     10 /* Procstat vmmap data; note name must be "FreeBSD". */
+#define NT_FREEBSD_PROCSTAT_GROUPS    11 /* Procstat groups data; note name must be "FreeBSD". */
+#define NT_FREEBSD_PROCSTAT_UMASK     12 /* Procstat umask data; note name must be "FreeBSD". */
+#define NT_FREEBSD_PROCSTAT_RLIMIT    13 /* Procstat rlimit data; note name must be "FreeBSD". */
+#define NT_FREEBSD_PROCSTAT_OSREL     14 /* Procstat osreldate data; note name must be "FreeBSD". */
+#define NT_FREEBSD_PROCSTAT_PSSTRINGS 15 /* Procstat ps_strings data; note name must be "FreeBSD". */
+#define NT_FREEBSD_PROCSTAT_AUXV      16 /* Procstat auxv data; note name must be "FreeBSD". */
+#define NT_FREEBSD_PTLWPINFO          17 /* Thread ptrace miscellaneous info; note name must be "FreeBSD". */
+
+#define NT_NETBSD_IDENT 1 /* Value for NetBSD .note.netbsd.ident notes. Note name is "NetBSD".  */
+#define NT_NETBSD_MARCH 5 /* Value for NetBSD .note.netbsd.ident notes. Note name is "NetBSD".  */
+
+#define NT_NETBSDCORE_PROCINFO  1  /* Has a struct procinfo; note name must be "NetBSD-CORE". */
+#define NT_NETBSDCORE_FIRSTMACH 32 /* start of machdep note types; note name must be "NetBSD-CORE". */
+
+#define NT_OPENBSD_IDENT    1  /* Value for OpenBSD .note.openbsd.ident notes. Note name is "OpenBSD". */
+#define NT_OPENBSD_PROCINFO 10 /* note name must be "OpenBSD". */
+#define NT_OPENBSD_AUXV     11 /* note name must be "OpenBSD". */
+#define NT_OPENBSD_REGS     20 /* note name must be "OpenBSD". */
+#define NT_OPENBSD_FPREGS   21 /* note name must be "OpenBSD". */
+#define NT_OPENBSD_XFPREGS  22 /* note name must be "OpenBSD". */
+#define NT_OPENBSD_WCOOKIE  23 /* note name must be "OpenBSD". */
+
+/* Note segments for core files on SPU systems. */
+#define NT_SPU 1 /* note name must be "SPU/". */
+
+/* Values for notes in non-core files */
+#define NT_GNU_ABI_TAG              1     /* Note name must be "GNU". */
+#define NT_GNU_HWCAP                2     /* Used by ld.so and kernel vDSO; note name must be "GNU". */
+#define NT_GNU_BUILD_ID             3     /* Generated by ld --build-id; note name must be "GNU". */
+#define NT_GNU_GOLD_VERSION         4     /* Generated by gold; note name must be "GNU". */
+#define NT_GNU_PROPERTY_TYPE_0      5     /* Generated by gcc; note name must be "GNU". */
+#define NT_GNU_BUILD_ATTRIBUTE_OPEN 0x100 /* Note name must be "GNU". */
+#define NT_GNU_BUILD_ATTRIBUTE_FUNC 0x101 /* Note name must be "GNU". */
 
 
 /* Dynamic section entry. */
@@ -1359,7 +1397,13 @@ typedef struct elf64_move /*[PREFIX(m_)]*/ {
 #define ELF64_M_INFO(sym, size) ELF32_M_INFO (sym, size)
 
 
-/* Motorola 68k specific definitions. */
+
+
+
+
+/************************************************************************/
+/* Motorola 68k specific definitions.                                   */
+/************************************************************************/
 
 /* Values for Elf32_Ehdr.e_flags. */
 #define EF_CPU32        0x00810000
@@ -1391,7 +1435,19 @@ typedef struct elf64_move /*[PREFIX(m_)]*/ {
 /* Keep this the last entry. */
 #define R_68K_NUM       23
 
-/* Intel 80386 specific definitions. */
+
+
+
+
+
+/************************************************************************/
+/* Intel 80386 specific definitions.                                    */
+/************************************************************************/
+
+/* Legal values for note segment descriptor types for core files. */
+#define NT_386_TLS           0x200      /* x86 TLS information; note name must be "LINUX". */
+#define NT_386_IOPERM        0x201      /* x86 io permissions; note name must be "LINUX". */
+#define NT_X86_XSTATE        0x202      /* x86 XSAVE extended state; note name must be "LINUX". */
 
 /* i386 relocs.
  * NOTE: Only relocations marked as [RTLD] must be handled by the RunTimeLinkDriver.
@@ -1445,7 +1501,13 @@ typedef struct elf64_move /*[PREFIX(m_)]*/ {
 #define R_386_GNU_VTENTRY       251 /* GNU C++ hack  */
 
 
-/* SUN SPARC specific definitions. */
+
+
+
+
+/************************************************************************/
+/* SUN SPARC specific definitions.                                      */
+/************************************************************************/
 
 /* Legal values for ST_TYPE subfield of st_info (symbol type). */
 #define STT_SPARC_REGISTER      13      /* Global register reserved to app. */
@@ -1560,7 +1622,14 @@ typedef struct elf64_move /*[PREFIX(m_)]*/ {
 #define HWCAP_SPARC_ULTRA3      32
 #define HWCAP_SPARC_BLKINIT     64      /* Sun4v with block-init/load-twin. */
 
-/* MIPS R3000 specific definitions. */
+
+
+
+
+
+/************************************************************************/
+/* MIPS R3000 specific definitions.                                     */
+/************************************************************************/
 
 /* Legal values for e_flags field of Elf32_Ehdr. */
 #define EF_MIPS_NOREORDER   1           /* A .noreorder directive was used */
@@ -1647,7 +1716,6 @@ typedef struct elf64_move /*[PREFIX(m_)]*/ {
 #define SHF_MIPS_LOCAL   0x04000000
 #define SHF_MIPS_NAMES   0x02000000
 #define SHF_MIPS_NODUPE  0x01000000
-
 
 /* Symbol tables. */
 
@@ -1947,7 +2015,13 @@ typedef Elf32_Addr Elf32_Conflict;
 #endif /* __CC__ */
 
 
-/* HPPA specific definitions. */
+
+
+
+
+/************************************************************************/
+/* HPPA specific definitions.                                           */
+/************************************************************************/
 
 /* Legal values for e_flags field of Elf32_Ehdr. */
 #define EF_PARISC_TRAPNIL       0x00010000 /* Trap nil pointer dereference. */
@@ -2105,7 +2179,13 @@ typedef Elf32_Addr Elf32_Conflict;
 #define PF_HP_SBP               0x08000000
 
 
-/* Alpha specific definitions. */
+
+
+
+
+/************************************************************************/
+/* Alpha specific definitions.                                          */
+/************************************************************************/
 
 /* Legal values for e_flags field of Elf64_Ehdr. */
 #define EF_ALPHA_32BIT          1       /* All addresses must be < 2GB. */
@@ -2173,7 +2253,14 @@ typedef Elf32_Addr Elf32_Conflict;
 #define DT_ALPHA_PLTRO          (DT_LOPROC + 0)
 #define DT_ALPHA_NUM            1
 
-/* PowerPC specific declarations */
+
+
+
+
+
+/************************************************************************/
+/* PowerPC specific declarations                                        */
+/************************************************************************/
 
 /* Values for Elf32/64_Ehdr.e_flags. */
 #define EF_PPC_EMB              0x80000000      /* PowerPC embedded flag */
@@ -2181,6 +2268,10 @@ typedef Elf32_Addr Elf32_Conflict;
 /* Cygnus local bits below */
 #define EF_PPC_RELOCATABLE      0x00010000      /* PowerPC -mrelocatable flag*/
 #define EF_PPC_RELOCATABLE_LIB  0x00008000      /* PowerPC -mrelocatable-lib flag */
+
+/* Legal values for note segment descriptor types for core files. */
+#define NT_PPC_VMX           0x100      /* PowerPC Altivec/VMX registers; note name must be "LINUX". */
+#define NT_PPC_VSX           0x102      /* PowerPC VSX registers; note name must be "LINUX". */
 
 /* PowerPC relocations defined by the ABIs */
 #define R_PPC_NONE              0
@@ -2417,7 +2508,13 @@ typedef Elf32_Addr Elf32_Conflict;
 #define DT_PPC64_NUM    3
 
 
-/* ARM specific declarations */
+
+
+
+
+/************************************************************************/
+/* ARM specific declarations                                            */
+/************************************************************************/
 
 /* Processor specific flags for the ELF header e_flags field. */
 #define EF_ARM_RELEXEC     0x01
@@ -2459,6 +2556,14 @@ typedef Elf32_Addr Elf32_Conflict;
 
 /* Processor specific values for the Phdr p_type field. */
 #define PT_ARM_EXIDX    0x70000001      /* .ARM.exidx segment */
+
+/* Legal values for note segment descriptor types for core files. */
+#define NT_ARM_VFP           0x400      /* ARM VFP registers */
+/* The following definitions should really use NT_AARCH_...,
+ * but defined this way for compatibility with Linux. */
+#define NT_ARM_TLS           0x401      /* AArch TLS registers; note name must be "LINUX". */
+#define NT_ARM_HW_BREAK      0x402      /* AArch hardware breakpoint registers; note name must be "LINUX". */
+#define NT_ARM_HW_WATCH      0x403      /* AArch hardware watchpoint registers; note name must be "LINUX". */
 
 /* ARM relocs. */
 #define R_ARM_NONE              0       /* No reloc */
@@ -2603,7 +2708,14 @@ typedef Elf32_Addr Elf32_Conflict;
 /* Keep this the last entry. */
 #define R_ARM_NUM               256
 
-/* IA-64 specific declarations. */
+
+
+
+
+
+/************************************************************************/
+/* IA-64 specific declarations.                                         */
+/************************************************************************/
 
 /* Processor specific flags for the Ehdr e_flags field. */
 #define EF_IA_64_MASKOS         0x0000000f      /* os-specific flags */
@@ -2715,7 +2827,14 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_IA64_DTPREL64LSB      0xb7    /* @dtprel(sym + add), data8 LSB */
 #define R_IA64_LTOFF_DTPREL22   0xba    /* @ltoff(@dtprel(s+a)), imm22 */
 
-/* SH specific declarations */
+
+
+
+
+
+/************************************************************************/
+/* SH specific declarations                                             */
+/************************************************************************/
 
 /* SH relocs. */
 #define R_SH_NONE               0
@@ -2758,7 +2877,14 @@ typedef Elf32_Addr Elf32_Conflict;
 /* Keep this the last entry. */
 #define R_SH_NUM                256
 
-/* Additional s390 relocs */
+
+
+
+
+
+/************************************************************************/
+/* Additional s390 relocs                                               */
+/************************************************************************/
 #define R_390_NONE              0       /* No reloc. */
 #define R_390_8                 1       /* Direct 8 bit. */
 #define R_390_12                2       /* Direct 12 bit. */
@@ -2823,8 +2949,27 @@ typedef Elf32_Addr Elf32_Conflict;
 /* Keep this the last entry. */
 #define R_390_NUM               61
 
+/* Legal values for note segment descriptor types for core files. */
+#define NT_S390_HIGH_GPRS    0x300      /* S/390 upper halves of GPRs; note name must be "LINUX". */
+#define NT_S390_TIMER        0x301      /* S390 timer; note name must be "LINUX". */
+#define NT_S390_TODCMP       0x302      /* S390 TOD clock comparator; note name must be "LINUX". */
+#define NT_S390_TODPREG      0x303      /* S390 TOD programmable register; note name must be "LINUX". */
+#define NT_S390_CTRS         0x304      /* S390 control registers; note name must be "LINUX". */
+#define NT_S390_PREFIX       0x305      /* S390 prefix register; note name must be "LINUX". */
+#define NT_S390_LAST_BREAK   0x306      /* S390 breaking event address; note name must be "LINUX". */
+#define NT_S390_SYSTEM_CALL  0x307      /* S390 system call restart data; note name must be "LINUX". */
+#define NT_S390_TDB          0x308      /* S390 transaction diagnostic block; note name must be "LINUX". */
+#define NT_S390_VXRS_LOW     0x309      /* S390 vector registers 0-15 upper half; note name must be "LINUX". */
+#define NT_S390_VXRS_HIGH    0x30a      /* S390 vector registers 16-31; note name must be "LINUX". */
 
-/* CRIS relocations. */
+
+
+
+
+
+/************************************************************************/
+/* CRIS relocations.                                                    */
+/************************************************************************/
 #define R_CRIS_NONE             0
 #define R_CRIS_8                1
 #define R_CRIS_16               2
@@ -2848,7 +2993,13 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_CRIS_NUM              20
 
 
-/* AMD x86-64 relocations. */
+
+
+
+
+/************************************************************************/
+/* AMD x86-64 relocations.                                              */
+/************************************************************************/
 #define R_X86_64_NONE           0       /* [RTLD] No reloc */
 #define R_X86_64_64             1       /* [RTLD] Direct 64 bit  */
 #define R_X86_64_PC32           2       /* [RTLD] PC relative 32 bit signed */
@@ -2902,7 +3053,13 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_X86_64_GNU_VTENTRY    251     /* GNU C++ hack  */
 
 
-/* AM33 relocations. */
+
+
+
+
+/************************************************************************/
+/* AM33 relocations.                                                    */
+/************************************************************************/
 #define R_MN10300_NONE          0       /* No reloc. */
 #define R_MN10300_32            1       /* Direct 32 bit. */
 #define R_MN10300_16            2       /* Direct 16 bit. */
@@ -2930,7 +3087,13 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_MN10300_NUM           24
 
 
-/* M32R relocs. */
+
+
+
+
+/************************************************************************/
+/* M32R relocs.                                                         */
+/************************************************************************/
 #define R_M32R_NONE             0       /* No reloc. */
 #define R_M32R_16               1       /* Direct 16 bit. */
 #define R_M32R_32               2       /* Direct 32 bit. */

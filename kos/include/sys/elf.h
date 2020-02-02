@@ -19,5 +19,9 @@
  */
 #ifndef _SYS_ELF_H
 #define _SYS_ELF_H 1
+
 #include <sys/procfs.h>
+
+#include <elf.h>
+
 #endif /* !_SYS_ELF_H */
