@@ -919,7 +919,7 @@ print_string:
 				__modrel = (__UINTPTR_TYPE__)dlmodulebase(__ptr_module);
 				(*__p_debug_dllocksections)(__ptr_module, &__debug_sections, &__dl_debug_sections);
 				(*__p_debug_sections_addr2line)(&__debug_sections, &__info,
-				                               (__UINTPTR_TYPE__)__p - __modrel,
+				                                (__UINTPTR_TYPE__)__p - __modrel,
 				                                DEBUG_ADDR2LINE_LEVEL_SOURCE,
 				                                DEBUG_ADDR2LINE_FNORMAL);
 #else /* !__KERNEL__ || !__KOS__ */

@@ -230,19 +230,20 @@ struct driver;
 struct driver_section {
 	WEAK refcnt_t          ds_refcnt;      /* Reference counter. */
 	void                  *ds_data;        /* [0..ds_size][lock(WRITE_ONCE)]
-	                                        * [owned_if(ds_flags & DRIVER_DLSECTION_FOWNED)]
+	                                        * [owned_if(ds_sectflags & DRIVER_DLSECTION_FOWNED)]
 	                                        * Memory mapping for the section's contents.
 	                                        * NOTE: Set to `(void *)-1' when section data hasn't been loaded, yet. */
 	size_t DRIVER_CONST    ds_size;        /* [const] Size of the section (in bytes) */
 	size_t DRIVER_CONST    ds_entsize;     /* [const] Section entity size (or 0 if unknown) */
 	uintptr_t DRIVER_CONST ds_link;        /* [const] Index of another section that is linked by this one (or `0' if unused) */
 	uintptr_t DRIVER_CONST ds_info;        /* [const] Index of another section that is linked by this one (or `0' if unused) */
+	uintptr_t DRIVER_CONST ds_flags;       /* [const] ELF section flags (set of `SHF_*') */
 	REF struct driver     *ds_module;      /* [1..1][const] Reference to the associated module */
 	REF struct driver_section
 	                      *ds_dangling;    /* [0..1][lock(INTERN(dangling-sections-lock)))]
 	                                        * Chain of dangling sections. (sections that can be unloaded)
 	                                        * NOTE: Set to `(REF struct driver_section *)-1' if the section isn't dangling. */
-	u16       DRIVER_CONST ds_flags;       /* [const] Section flags (Set of `DRIVER_DLSECTION_F*') */
+	u16       DRIVER_CONST ds_sectflags;   /* [const] Section flags (Set of `DRIVER_DLSECTION_F*') */
 	u16       DRIVER_CONST ds_index;       /* [const] Index of this section. */
 };
 

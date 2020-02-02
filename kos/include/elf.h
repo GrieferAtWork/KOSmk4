@@ -467,20 +467,21 @@ typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 #define SHT_HIUSER        0x8fffffff    /* End of application-specific */
 
 /* Legal values for sh_flags (section flags). */
-#define SHF_WRITE            (1 << 0)   /* Writable */
-#define SHF_ALLOC            (1 << 1)   /* Occupies memory during execution */
-#define SHF_EXECINSTR        (1 << 2)   /* Executable */
-#define SHF_MERGE            (1 << 4)   /* Might be merged */
-#define SHF_STRINGS          (1 << 5)   /* Contains nul-terminated strings */
-#define SHF_INFO_LINK        (1 << 6)   /* `sh_info' contains SHT index */
-#define SHF_LINK_ORDER       (1 << 7)   /* Preserve order after combining */
-#define SHF_OS_NONCONFORMING (1 << 8)   /* Non-standard OS specific handling required */
-#define SHF_GROUP            (1 << 9)   /* Section is member of a group. */
-#define SHF_TLS              (1 << 10)  /* Section hold thread-local data. */
+#define SHF_WRITE            0x00000001 /* Writable */
+#define SHF_ALLOC            0x00000002 /* Occupies memory during execution */
+#define SHF_EXECINSTR        0x00000004 /* Executable */
+#define SHF_MERGE            0x00000010 /* Might be merged */
+#define SHF_STRINGS          0x00000020 /* Contains nul-terminated strings */
+#define SHF_INFO_LINK        0x00000040 /* `sh_info' contains SHT index */
+#define SHF_LINK_ORDER       0x00000080 /* Preserve order after combining */
+#define SHF_OS_NONCONFORMING 0x00000100 /* Non-standard OS specific handling required */
+#define SHF_GROUP            0x00000200 /* Section is member of a group. */
+#define SHF_TLS              0x00000400 /* Section hold thread-local data. */
+#define SHF_COMPRESSED       0x00000800 /* Section contains compressed data (and a header `Elf32_Chdr' / `Elf64_Chdr') */
 #define SHF_MASKOS           0x0ff00000 /* OS-specific. */
 #define SHF_MASKPROC         0xf0000000 /* Processor-specific */
-#define SHF_ORDERED          (1 << 30)  /* Special ordering requirement (Solaris). */
-#define SHF_EXCLUDE          (1 << 31)  /* Section is excluded unless referenced or allocated (Solaris).*/
+#define SHF_ORDERED          0x40000000 /* Special ordering requirement (Solaris). */
+#define SHF_EXCLUDE          0x80000000 /* Section is excluded unless referenced or allocated (Solaris).*/
 
 /* Section group handling. */
 #define GRP_COMDAT      0x1             /* Mark group as COMDAT. */

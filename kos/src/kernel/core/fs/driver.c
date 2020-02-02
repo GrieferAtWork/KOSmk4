@@ -689,7 +689,7 @@ NOTHROW(KCALL driver_section_do_destroy_with_sections_lock_held)(struct driver_s
 	assert(wasdestroyed(self));
 	assert(sync_writing(&drv->d_sections_lock) || wasdestroyed(drv));
 	assert(self->ds_module == drv); /* The reference from `ds_module' was already deleted by the caller. */
-	if (self->ds_flags & DRIVER_DLSECTION_FOWNED) {
+	if (self->ds_sectflags & DRIVER_DLSECTION_FOWNED) {
 		/* Must unmap sections data. */
 		uintptr_t sect_base;
 		size_t sect_size;
@@ -2369,6 +2369,7 @@ again_read_section:
 		result->ds_entsize = sect->sh_entsize;
 		result->ds_link    = sect->sh_link;
 		result->ds_info    = sect->sh_info;
+		result->ds_flags   = sect->sh_flags;
 		result->ds_refcnt  = 1;
 		result->ds_module  = incref(self);
 		result->ds_index   = index;
@@ -2378,10 +2379,10 @@ again_read_section:
 		if (sect->sh_flags & SHF_ALLOC) {
 			/* Section is already allocated in member. */
 			result->ds_data  = (void *)(self->d_loadaddr + sect->sh_addr);
-			result->ds_flags = DRIVER_DLSECTION_FNORMAL;
+			result->ds_sectflags = DRIVER_DLSECTION_FNORMAL;
 		} else {
 			result->ds_data  = (void *)-1;
-			result->ds_flags = DRIVER_DLSECTION_FOWNED;
+			result->ds_sectflags = DRIVER_DLSECTION_FOWNED;
 		}
 		TRY {
 			sync_write(&self->d_sections_lock);
@@ -2421,7 +2422,7 @@ again_lock_sections_after_free_result:
 	}
 	if (result->ds_data == (void *)-1 &&
 	    !(flags & DRIVER_SECTION_LOCK_FNODATA) &&
-	    (result->ds_flags & DRIVER_DLSECTION_FOWNED)) {
+	    (result->ds_sectflags & DRIVER_DLSECTION_FOWNED)) {
 		void *base;
 		size_t num_pages;
 		/* Load section into memory. */

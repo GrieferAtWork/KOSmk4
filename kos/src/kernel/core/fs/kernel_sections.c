@@ -95,9 +95,10 @@ INTERN_CONST ATTR_COLDRODATA ElfW(Shdr) const kernel_shdr[KERNEL_SECTIONS_COUNT]
 		/* .ds_entsize   = */ (size_t)(entsize),                     \
 		/* .ds_link      = */ (link),                                \
 		/* .ds_info      = */ (info),                                \
+		/* .ds_flags     = */ (flags),                               \
 		/* .ds_module    = */ &kernel_driver,                        \
 		/* .ds_dangling  = */ NULL,                                  \
-		/* .ds_flags     = */ DRIVER_DLSECTION_FNORMAL,              \
+		/* .ds_sectflags = */ DRIVER_DLSECTION_FNORMAL,              \
 		/* .ds_index     = */ SECTION_DESCRIPTOR_INDEX               \
 	};
 #include "kernel_sections.def"

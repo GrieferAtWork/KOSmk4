@@ -67,6 +67,7 @@ struct dlsection {
 	size_t               ds_entsize;     /* [const] Section entry size (or 0 if unknown) */
 	uintptr_t            ds_link;        /* [const] Index of another section that is linked by this one (or `0' if unused) */
 	uintptr_t            ds_info;        /* [const] Index of another section that is linked by this one (or `0' if unused) */
+	uintptr_t            ds_elfflags;    /* [const] ELF section flags (Set of `SHF_*') */
 	WEAK refcnt_t        ds_refcnt;      /* Reference counter. */
 	struct atomic_rwlock ds_module_lock; /* Lock for `ds_module' */
 	REF DlModule        *ds_module;      /* [0..1][ref_if(!(ds_flags & DLSECTION_FLAG_OWNED))]

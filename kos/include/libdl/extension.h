@@ -119,13 +119,14 @@ struct dlcore_ops {
 struct __dl_info_struct;
 
 struct dl_sect_info {
-	void     *dsi_addr;    /* [0..1] Allocation section address (when non-NULL, pointer to
-	                        * the static program image to where the section's mapping starts) */
-	size_t    dsi_size;    /* Section size (in bytes) */
-	size_t    dsi_entsize; /* Section entry size (in bytes) (or 0 if unknown) */
-	uintptr_t dsi_link;    /* Index of another section that is linked by this one (or `0' if unused) */
-	uintptr_t dsi_info;    /* Index of another section that is linked by this one (or `0' if unused) */
-	pos64_t   dsi_offset;  /* Absolute file offset where section data starts. */
+	void     *dsi_addr;     /* [0..1] Allocation section address (when non-NULL, pointer to
+	                         * the static program image to where the section's mapping starts) */
+	size_t    dsi_size;     /* Section size (in bytes) */
+	size_t    dsi_entsize;  /* Section entry size (in bytes) (or 0 if unknown) */
+	uintptr_t dsi_link;     /* Index of another section that is linked by this one (or `0' if unused) */
+	uintptr_t dsi_info;     /* Index of another section that is linked by this one (or `0' if unused) */
+	uintptr_t dsi_elfflags; /* ELF section flags (set of `SHF_*') */
+	pos64_t   dsi_offset;   /* Absolute file offset where section data starts. */
 };
 
 #ifndef ____dl_iterator_callback_defined

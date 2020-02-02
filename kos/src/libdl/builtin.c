@@ -1037,13 +1037,14 @@ again_read_section:
 				goto err;
 			}
 
-			result->ds_size    = info.dsi_size;
-			result->ds_entsize = info.dsi_entsize;
-			result->ds_link    = info.dsi_link;
-			result->ds_info    = info.dsi_info;
-			result->ds_refcnt  = 1;
-			result->ds_module  = self;
-			result->ds_index   = index;
+			result->ds_size     = info.dsi_size;
+			result->ds_entsize  = info.dsi_entsize;
+			result->ds_link     = info.dsi_link;
+			result->ds_info     = info.dsi_info;
+			result->ds_elfflags = info.dsi_elfflags;
+			result->ds_refcnt   = 1;
+			result->ds_module   = self;
+			result->ds_index    = index;
 			result->ds_dangling = (REF DlSection *)-1;
 			atomic_rwlock_init(&result->ds_module_lock);
 			if (info.dsi_addr) {
@@ -1151,13 +1152,14 @@ again_read_elf_section:
 			result = (REF DlSection *)malloc(sizeof(DlSection));
 			if unlikely(!result)
 				goto err_nomem;
-			result->ds_size    = sect->sh_size;
-			result->ds_entsize = sect->sh_entsize;
-			result->ds_link    = sect->sh_link;
-			result->ds_info    = sect->sh_info;
-			result->ds_refcnt  = 1;
-			result->ds_module  = self;
-			result->ds_index   = index;
+			result->ds_size     = sect->sh_size;
+			result->ds_entsize  = sect->sh_entsize;
+			result->ds_link     = sect->sh_link;
+			result->ds_info     = sect->sh_info;
+			result->ds_elfflags = sect->sh_flags;
+			result->ds_refcnt   = 1;
+			result->ds_module   = self;
+			result->ds_index    = index;
 			result->ds_dangling = (REF DlSection *)-1;
 			atomic_rwlock_init(&result->ds_module_lock);
 			if (sect->sh_flags & SHF_ALLOC) {
@@ -2338,13 +2340,14 @@ stringSwitch("name",
 }
 
 
-#define INIT_RTLD_SECTION(index, link_name)                                                                            \
+#define INIT_RTLD_SECTION(index, link_name, elf_type, elf_flags)                                                       \
 	{                                                                                                                  \
 		.ds_data        = NULL, /* Initialized later */                                                                \
 		.ds_size        = 0,    /* Initialized later (even though it could be here if ld/gcc weren't quite as dumb) */ \
 		.ds_entsize     = 0,                                                                                           \
 		.ds_link        = 0,                                                                                           \
 		.ds_info        = 0,                                                                                           \
+		.ds_elfflags    = elf_flags,                                                                                   \
 		.ds_refcnt      = 1,                                                                                           \
 		.ds_module_lock = ATOMIC_RWLOCK_INIT,                                                                          \
 		.ds_module      = NULL, /* Initialized later */                                                                \
@@ -2360,18 +2363,18 @@ INTERN WUNUSED ATTR_CONST DlSection *FCALL
 dlsec_builtin_index(size_t sect_index) {
 	DlSection *result;
 	switch (sect_index) {
-#define DEFINE_BUILTIN_SECTION(index, sect_name, link_name)                                    \
-	case index: {                                                                              \
-		INTDEF byte_t __rtld_##link_name##_start[];                                            \
-		INTDEF byte_t __rtld_##link_name##_end[];                                              \
-		PRIVATE DlSection rtld_sect_##link_name = INIT_RTLD_SECTION(index, link_name);         \
-		result = &rtld_sect_##link_name;                                                       \
-		if (!result->ds_module) {                                                              \
-			result->ds_data = (void *)(__rtld_##link_name##_start);                            \
-			result->ds_size = (size_t)(__rtld_##link_name##_end - __rtld_##link_name##_start); \
-			COMPILER_WRITE_BARRIER();                                                          \
-			result->ds_module = &dl_rtld_module;                                               \
-		}                                                                                      \
+#define DEFINE_BUILTIN_SECTION(index, sect_name, link_name, elf_type, elf_flags)                            \
+	case index: {                                                                                           \
+		INTDEF byte_t __rtld_##link_name##_start[];                                                         \
+		INTDEF byte_t __rtld_##link_name##_end[];                                                           \
+		PRIVATE DlSection rtld_sect_##link_name = INIT_RTLD_SECTION(index, link_name, elf_type, elf_flags); \
+		result = &rtld_sect_##link_name;                                                                    \
+		if (!result->ds_module) {                                                                           \
+			result->ds_data = (void *)(__rtld_##link_name##_start);                                         \
+			result->ds_size = (size_t)(__rtld_##link_name##_end - __rtld_##link_name##_start);              \
+			COMPILER_WRITE_BARRIER();                                                                       \
+			result->ds_module = &dl_rtld_module;                                                            \
+		}                                                                                                   \
 	}	break;
 	BUILTIN_SECTIONS_ENUMERATE(DEFINE_BUILTIN_SECTION)
 #undef DEFINE_BUILTIN_SECTION
@@ -2386,9 +2389,9 @@ INTERN WUNUSED ATTR_CONST char const *FCALL
 dlsec_builtin_name(size_t sect_index) {
 	char const *result;
 	switch (sect_index) {
-#define DEFINE_BUILTIN_SECTION(index, sect_name, link_name) \
-	case index:                                             \
-		result = sect_name;                                 \
+#define DEFINE_BUILTIN_SECTION(index, sect_name, link_name, elf_type, elf_flags) \
+	case index:                                                                  \
+		result = sect_name;                                                      \
 		break;
 	BUILTIN_SECTIONS_ENUMERATE(DEFINE_BUILTIN_SECTION)
 #undef DEFINE_BUILTIN_SECTION

@@ -137,13 +137,13 @@
  *       request of a call to `dllocksection()' when given a handle
  *       for the RTLD core library. */
 #define BUILTIN_SECTIONS_COUNT 6
-#define BUILTIN_SECTIONS_ENUMERATE(callback)           \
-	callback(0, ".text", text)                         \
-	callback(1, ".rodata", rodata)                     \
-	callback(2, ".eh_frame", eh_frame)                 \
-	callback(3, ".gcc_except_table", gcc_except_table) \
-	callback(4, ".data", data)                         \
-	callback(5, ".bss", bss)
+#define BUILTIN_SECTIONS_ENUMERATE(callback)                                                    \
+	callback(0, ".text",             text,             SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR) \
+	callback(1, ".rodata",           rodata,           SHT_PROGBITS, SHF_ALLOC)                 \
+	callback(2, ".eh_frame",         eh_frame,         SHT_PROGBITS, SHF_ALLOC)                 \
+	callback(3, ".gcc_except_table", gcc_except_table, SHT_PROGBITS, SHF_ALLOC)                 \
+	callback(4, ".data",             data,             SHT_PROGBITS, SHF_ALLOC | SHF_WRITE)     \
+	callback(5, ".bss",              bss,              SHT_NOBITS,   SHF_ALLOC | SHF_WRITE)
 
 /* For the purpose of being able to safely handle exceptions the same way
  * loaded modules do, a couple of global functions that aren't defined by
