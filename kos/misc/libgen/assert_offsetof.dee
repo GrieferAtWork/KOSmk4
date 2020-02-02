@@ -242,6 +242,8 @@ got_field:
 			for (local f: field) {
 				if (f in ["tv_64_nsec", "tv_64_sec", "tv_64_usec"])
 					continue; /* HACK */
+				if (f in ["hw_flags1", "hw_flags2"])
+					continue; /* HACK */
 				print assertOffsetMacro.format({
 					.typ   = struct_prefix + " " + typ,
 					.field = f.strip(),

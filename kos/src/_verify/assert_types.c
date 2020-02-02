@@ -895,10 +895,18 @@ STATIC_ASSERT(offsetof(struct elf64_phdr, p_vaddr) == __OFFSET_ELF64_PHDR_VADDR)
 STATIC_ASSERT(sizeof(struct elf64_phdr) == __SIZEOF_ELF64_PHDR);
 
 /* struct elf32_dyn */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf32_dyn, d_un.d_ptr) == __OFFSET_ELF32_DYN_PTR);
+STATIC_ASSERT(offsetof(struct elf32_dyn, d_tag) == __OFFSET_ELF32_DYN_TAG);
+STATIC_ASSERT(offsetof(struct elf32_dyn, d_un.d_val) == __OFFSET_ELF32_DYN_VAL);
+STATIC_ASSERT(sizeof(struct elf32_dyn) == __SIZEOF_ELF32_DYN);
+STATIC_ASSERT(alignof(struct elf32_dyn) == __ALIGNOF_ELF32_DYN);
 
 /* struct elf64_dyn */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf64_dyn, d_un.d_ptr) == __OFFSET_ELF64_DYN_PTR);
+STATIC_ASSERT(offsetof(struct elf64_dyn, d_tag) == __OFFSET_ELF64_DYN_TAG);
+STATIC_ASSERT(offsetof(struct elf64_dyn, d_un.d_val) == __OFFSET_ELF64_DYN_VAL);
+STATIC_ASSERT(sizeof(struct elf64_dyn) == __SIZEOF_ELF64_DYN);
+STATIC_ASSERT(alignof(struct elf64_dyn) == __ALIGNOF_ELF64_DYN);
 
 /* struct elf32_chdr */
 STATIC_ASSERT(offsetof(struct elf32_chdr, ch_addralign) == __OFFSET_ELF32_CHDR_ADDRALIGN);
@@ -913,64 +921,162 @@ STATIC_ASSERT(offsetof(struct elf64_chdr, ch_type) == __OFFSET_ELF64_CHDR_TYPE);
 STATIC_ASSERT(sizeof(struct elf64_chdr) == __SIZEOF_ELF64_CHDR);
 
 /* struct elf32_verdef */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf32_verdef, vd_aux) == __OFFSET_ELF32_VERDEF_AUX);
+STATIC_ASSERT(offsetof(struct elf32_verdef, vd_cnt) == __OFFSET_ELF32_VERDEF_CNT);
+STATIC_ASSERT(offsetof(struct elf32_verdef, vd_flags) == __OFFSET_ELF32_VERDEF_FLAGS);
+STATIC_ASSERT(offsetof(struct elf32_verdef, vd_hash) == __OFFSET_ELF32_VERDEF_HASH);
+STATIC_ASSERT(offsetof(struct elf32_verdef, vd_ndx) == __OFFSET_ELF32_VERDEF_NDX);
+STATIC_ASSERT(offsetof(struct elf32_verdef, vd_next) == __OFFSET_ELF32_VERDEF_NEXT);
+STATIC_ASSERT(offsetof(struct elf32_verdef, vd_version) == __OFFSET_ELF32_VERDEF_VERSION);
+STATIC_ASSERT(sizeof(struct elf32_verdef) == __SIZEOF_ELF32_VERDEF);
+STATIC_ASSERT(alignof(struct elf32_verdef) == __ALIGNOF_ELF32_VERDEF);
 
 /* struct elf64_verdef */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf64_verdef, vd_aux) == __OFFSET_ELF64_VERDEF_AUX);
+STATIC_ASSERT(offsetof(struct elf64_verdef, vd_cnt) == __OFFSET_ELF64_VERDEF_CNT);
+STATIC_ASSERT(offsetof(struct elf64_verdef, vd_flags) == __OFFSET_ELF64_VERDEF_FLAGS);
+STATIC_ASSERT(offsetof(struct elf64_verdef, vd_hash) == __OFFSET_ELF64_VERDEF_HASH);
+STATIC_ASSERT(offsetof(struct elf64_verdef, vd_ndx) == __OFFSET_ELF64_VERDEF_NDX);
+STATIC_ASSERT(offsetof(struct elf64_verdef, vd_next) == __OFFSET_ELF64_VERDEF_NEXT);
+STATIC_ASSERT(offsetof(struct elf64_verdef, vd_version) == __OFFSET_ELF64_VERDEF_VERSION);
+STATIC_ASSERT(sizeof(struct elf64_verdef) == __SIZEOF_ELF64_VERDEF);
+STATIC_ASSERT(alignof(struct elf64_verdef) == __ALIGNOF_ELF64_VERDEF);
 
 /* struct elf32_verdaux */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf32_verdaux, vda_next) == __OFFSET_ELF32_VERDAUX_NEXT);
+STATIC_ASSERT(offsetof(struct elf32_verdaux, vda_name) == __OFFSET_ELF32_VERDAUX_NAME);
+STATIC_ASSERT(sizeof(struct elf32_verdaux) == __SIZEOF_ELF32_VERDAUX);
+STATIC_ASSERT(alignof(struct elf32_verdaux) == __ALIGNOF_ELF32_VERDAUX);
 
 /* struct elf64_verdaux */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf64_verdaux, vda_next) == __OFFSET_ELF64_VERDAUX_NEXT);
+STATIC_ASSERT(offsetof(struct elf64_verdaux, vda_name) == __OFFSET_ELF64_VERDAUX_NAME);
+STATIC_ASSERT(sizeof(struct elf64_verdaux) == __SIZEOF_ELF64_VERDAUX);
+STATIC_ASSERT(alignof(struct elf64_verdaux) == __ALIGNOF_ELF64_VERDAUX);
 
 /* struct elf32_verneed */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf32_verneed, vn_aux) == __OFFSET_ELF32_VERNEED_AUX);
+STATIC_ASSERT(offsetof(struct elf32_verneed, vn_cnt) == __OFFSET_ELF32_VERNEED_CNT);
+STATIC_ASSERT(offsetof(struct elf32_verneed, vn_file) == __OFFSET_ELF32_VERNEED_FILE);
+STATIC_ASSERT(offsetof(struct elf32_verneed, vn_next) == __OFFSET_ELF32_VERNEED_NEXT);
+STATIC_ASSERT(offsetof(struct elf32_verneed, vn_version) == __OFFSET_ELF32_VERNEED_VERSION);
+STATIC_ASSERT(sizeof(struct elf32_verneed) == __SIZEOF_ELF32_VERNEED);
+STATIC_ASSERT(alignof(struct elf32_verneed) == __ALIGNOF_ELF32_VERNEED);
 
 /* struct elf64_verneed */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf64_verneed, vn_aux) == __OFFSET_ELF64_VERNEED_AUX);
+STATIC_ASSERT(offsetof(struct elf64_verneed, vn_cnt) == __OFFSET_ELF64_VERNEED_CNT);
+STATIC_ASSERT(offsetof(struct elf64_verneed, vn_file) == __OFFSET_ELF64_VERNEED_FILE);
+STATIC_ASSERT(offsetof(struct elf64_verneed, vn_next) == __OFFSET_ELF64_VERNEED_NEXT);
+STATIC_ASSERT(offsetof(struct elf64_verneed, vn_version) == __OFFSET_ELF64_VERNEED_VERSION);
+STATIC_ASSERT(sizeof(struct elf64_verneed) == __SIZEOF_ELF64_VERNEED);
+STATIC_ASSERT(alignof(struct elf64_verneed) == __ALIGNOF_ELF64_VERNEED);
 
 /* struct elf32_vernaux */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf32_vernaux, vna_flags) == __OFFSET_ELF32_VERNAUX_FLAGS);
+STATIC_ASSERT(offsetof(struct elf32_vernaux, vna_hash) == __OFFSET_ELF32_VERNAUX_HASH);
+STATIC_ASSERT(offsetof(struct elf32_vernaux, vna_name) == __OFFSET_ELF32_VERNAUX_NAME);
+STATIC_ASSERT(offsetof(struct elf32_vernaux, vna_next) == __OFFSET_ELF32_VERNAUX_NEXT);
+STATIC_ASSERT(offsetof(struct elf32_vernaux, vna_other) == __OFFSET_ELF32_VERNAUX_OTHER);
+STATIC_ASSERT(sizeof(struct elf32_vernaux) == __SIZEOF_ELF32_VERNAUX);
+STATIC_ASSERT(alignof(struct elf32_vernaux) == __ALIGNOF_ELF32_VERNAUX);
 
 /* struct elf64_vernaux */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf64_vernaux, vna_flags) == __OFFSET_ELF64_VERNAUX_FLAGS);
+STATIC_ASSERT(offsetof(struct elf64_vernaux, vna_hash) == __OFFSET_ELF64_VERNAUX_HASH);
+STATIC_ASSERT(offsetof(struct elf64_vernaux, vna_name) == __OFFSET_ELF64_VERNAUX_NAME);
+STATIC_ASSERT(offsetof(struct elf64_vernaux, vna_next) == __OFFSET_ELF64_VERNAUX_NEXT);
+STATIC_ASSERT(offsetof(struct elf64_vernaux, vna_other) == __OFFSET_ELF64_VERNAUX_OTHER);
+STATIC_ASSERT(sizeof(struct elf64_vernaux) == __SIZEOF_ELF64_VERNAUX);
+STATIC_ASSERT(alignof(struct elf64_vernaux) == __ALIGNOF_ELF64_VERNAUX);
 
 /* struct elf32_auxv_t */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf32_auxv_t, a_un.a_val) == __OFFSET_ELF32_AUXV_VAL);
+STATIC_ASSERT(offsetof(struct elf32_auxv_t, a_type) == __OFFSET_ELF32_AUXV_TYPE);
+STATIC_ASSERT(sizeof(struct elf32_auxv_t) == __SIZEOF_ELF32_AUXV);
+STATIC_ASSERT(alignof(struct elf32_auxv_t) == __ALIGNOF_ELF32_AUXV);
 
 /* struct elf64_auxv_t */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf64_auxv_t, a_un.a_val) == __OFFSET_ELF64_AUXV_VAL);
+STATIC_ASSERT(offsetof(struct elf64_auxv_t, a_type) == __OFFSET_ELF64_AUXV_TYPE);
+STATIC_ASSERT(sizeof(struct elf64_auxv_t) == __SIZEOF_ELF64_AUXV);
+STATIC_ASSERT(alignof(struct elf64_auxv_t) == __ALIGNOF_ELF64_AUXV);
 
 /* struct elf32_nhdr */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf32_nhdr, n_descsz) == __OFFSET_ELF32_NHDR_DESCSZ);
+STATIC_ASSERT(offsetof(struct elf32_nhdr, n_namesz) == __OFFSET_ELF32_NHDR_NAMESZ);
+STATIC_ASSERT(offsetof(struct elf32_nhdr, n_type) == __OFFSET_ELF32_NHDR_TYPE);
+STATIC_ASSERT(sizeof(struct elf32_nhdr) == __SIZEOF_ELF32_NHDR);
+STATIC_ASSERT(alignof(struct elf32_nhdr) == __ALIGNOF_ELF32_NHDR);
 
 /* struct elf64_nhdr */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf64_nhdr, n_descsz) == __OFFSET_ELF64_NHDR_DESCSZ);
+STATIC_ASSERT(offsetof(struct elf64_nhdr, n_namesz) == __OFFSET_ELF64_NHDR_NAMESZ);
+STATIC_ASSERT(offsetof(struct elf64_nhdr, n_type) == __OFFSET_ELF64_NHDR_TYPE);
+STATIC_ASSERT(sizeof(struct elf64_nhdr) == __SIZEOF_ELF64_NHDR);
+STATIC_ASSERT(alignof(struct elf64_nhdr) == __ALIGNOF_ELF64_NHDR);
 
 /* struct elf32_move */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf32_move, m_info) == __OFFSET_ELF32_MOVE_INFO);
+STATIC_ASSERT(offsetof(struct elf32_move, m_poffset) == __OFFSET_ELF32_MOVE_POFFSET);
+STATIC_ASSERT(offsetof(struct elf32_move, m_repeat) == __OFFSET_ELF32_MOVE_REPEAT);
+STATIC_ASSERT(offsetof(struct elf32_move, m_stride) == __OFFSET_ELF32_MOVE_STRIDE);
+STATIC_ASSERT(offsetof(struct elf32_move, m_value) == __OFFSET_ELF32_MOVE_VALUE);
+STATIC_ASSERT(alignof(struct elf32_move) == __ALIGNOF_ELF32_MOVE);
 
 /* struct elf64_move */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf64_move, m_info) == __OFFSET_ELF64_MOVE_INFO);
+STATIC_ASSERT(offsetof(struct elf64_move, m_poffset) == __OFFSET_ELF64_MOVE_POFFSET);
+STATIC_ASSERT(offsetof(struct elf64_move, m_repeat) == __OFFSET_ELF64_MOVE_REPEAT);
+STATIC_ASSERT(offsetof(struct elf64_move, m_stride) == __OFFSET_ELF64_MOVE_STRIDE);
+STATIC_ASSERT(offsetof(struct elf64_move, m_value) == __OFFSET_ELF64_MOVE_VALUE);
+STATIC_ASSERT(alignof(struct elf64_move) == __ALIGNOF_ELF64_MOVE);
 
 /* union elf32_gptab */
-/* ... */
+STATIC_ASSERT(offsetof(union elf32_gptab, gt_entry.gt_bytes) == __OFFSET_ELF32_GPTAB_ENTRY_BYTES);
+STATIC_ASSERT(offsetof(union elf32_gptab, gt_entry.gt_g_value) == __OFFSET_ELF32_GPTAB_ENTRY_G_VALUE);
+STATIC_ASSERT(offsetof(union elf32_gptab, gt_header.gt_current_g_value) == __OFFSET_ELF32_GPTAB_HEADER_CURRENT_G_VALUE);
+STATIC_ASSERT(sizeof(union elf32_gptab) == __SIZEOF_ELF32_GPTAB);
+STATIC_ASSERT(alignof(union elf32_gptab) == __ALIGNOF_ELF32_GPTAB);
 
 /* struct elf32_reginfo */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf32_reginfo, ri_cprmask) == __OFFSET_ELF32_REGINFO_CPRMASK);
+STATIC_ASSERT(offsetof(struct elf32_reginfo, ri_gprmask) == __OFFSET_ELF32_REGINFO_GPRMASK);
+STATIC_ASSERT(offsetof(struct elf32_reginfo, ri_gp_value) == __OFFSET_ELF32_REGINFO_GP_VALUE);
+STATIC_ASSERT(sizeof(struct elf32_reginfo) == __SIZEOF_ELF32_REGINFO);
+STATIC_ASSERT(alignof(struct elf32_reginfo) == __ALIGNOF_ELF32_REGINFO);
 
 /* struct elf_options */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf_options, info) == __OFFSET_ELF_OPTIONS_INFO);
+STATIC_ASSERT(offsetof(struct elf_options, kind) == __OFFSET_ELF_OPTIONS_KIND);
+STATIC_ASSERT(offsetof(struct elf_options, section) == __OFFSET_ELF_OPTIONS_SECTION);
+STATIC_ASSERT(offsetof(struct elf_options, size) == __OFFSET_ELF_OPTIONS_SIZE);
+STATIC_ASSERT(sizeof(struct elf_options) == __SIZEOF_ELF_OPTIONS);
+STATIC_ASSERT(alignof(struct elf_options) == __ALIGNOF_ELF_OPTIONS);
 
 /* struct elf_options_hw */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf_options_hw, hwp_flags2) == __OFFSET_ELF_OPTIONS_HW_FLAGS2);
+STATIC_ASSERT(offsetof(struct elf_options_hw, hwp_flags1) == __OFFSET_ELF_OPTIONS_HW_FLAGS1);
+STATIC_ASSERT(sizeof(struct elf_options_hw) == __SIZEOF_ELF_OPTIONS_HW);
+STATIC_ASSERT(alignof(struct elf_options_hw) == __ALIGNOF_ELF_OPTIONS_HW);
 
 /* struct elf32_lib */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf32_lib, l_checksum) == __OFFSET_ELF32_LIB_CHECKSUM);
+STATIC_ASSERT(offsetof(struct elf32_lib, l_flags) == __OFFSET_ELF32_LIB_FLAGS);
+STATIC_ASSERT(offsetof(struct elf32_lib, l_name) == __OFFSET_ELF32_LIB_NAME);
+STATIC_ASSERT(offsetof(struct elf32_lib, l_time_stamp) == __OFFSET_ELF32_LIB_TIME_STAMP);
+STATIC_ASSERT(offsetof(struct elf32_lib, l_version) == __OFFSET_ELF32_LIB_VERSION);
+STATIC_ASSERT(sizeof(struct elf32_lib) == __SIZEOF_ELF32_LIB);
+STATIC_ASSERT(alignof(struct elf32_lib) == __ALIGNOF_ELF32_LIB);
 
 /* struct elf64_lib */
-/* ... */
+STATIC_ASSERT(offsetof(struct elf64_lib, l_checksum) == __OFFSET_ELF64_LIB_CHECKSUM);
+STATIC_ASSERT(offsetof(struct elf64_lib, l_flags) == __OFFSET_ELF64_LIB_FLAGS);
+STATIC_ASSERT(offsetof(struct elf64_lib, l_name) == __OFFSET_ELF64_LIB_NAME);
+STATIC_ASSERT(offsetof(struct elf64_lib, l_time_stamp) == __OFFSET_ELF64_LIB_TIME_STAMP);
+STATIC_ASSERT(offsetof(struct elf64_lib, l_version) == __OFFSET_ELF64_LIB_VERSION);
+STATIC_ASSERT(sizeof(struct elf64_lib) == __SIZEOF_ELF64_LIB);
+STATIC_ASSERT(alignof(struct elf64_lib) == __ALIGNOF_ELF64_LIB);
 
 
 

@@ -64,7 +64,6 @@ typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #ifdef __USE_GNU
-
 /* If the first argument of `dlsym' or `dlvsym' is set to RTLD_NEXT
  * the run-time address of the symbol called NAME in the next shared
  * object is returned.  The "next" relation is defined by the order
@@ -78,13 +77,13 @@ typedef __SIZE_TYPE__ size_t;
  *       as seen under /proc/PID/exe. */
 #define RTLD_DEFAULT  ((void *)0)
 
-/* Type for namespace indeces. */
+/* Type for namespace indices. */
 typedef long int Lmid_t;
 
 /* Special namespace ID values. */
 #define LM_ID_BASE    0  /* Initial namespace.  */
 #define LM_ID_NEWLM (-1) /* For dlmopen: request new namespace.  */
-#endif
+#endif /* __USE_GNU */
 
 #ifdef __CC__
 
@@ -98,7 +97,7 @@ __IMPDEF __ATTR_WUNUSED char *__NOTHROW_NCX(__DLFCN_CALL dlerror)(void);
 #ifdef __USE_BSD
 struct __dlfunc_arg { int __dlfunc_dummy; };
 typedef void (*dlfunc_t)(struct __dlfunc_arg);
-/* Alias for `dlsym()' that allows the return value to be cases to a function prototype. */
+/* Alias for `dlsym()' that allows the return value to be cast to a function prototype. */
 __REDIRECT(__IMPDEF,__ATTR_WUNUSED,dlfunc_t,__NOTHROW_NCX,__DLFCN_CALL,
            dlfunc,(void *__handle, char const *__restrict __symbol_name),dlsym,(__handle, __symbol_name))
 #endif /* __USE_BSD */

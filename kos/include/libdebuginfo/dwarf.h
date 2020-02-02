@@ -286,6 +286,43 @@
 #define DW_AT_GNU_pubtypes                   0x2135 /* GNU Fission DWARF5 proposal             GCC             No support  */
 
 
+#define DW_LANG_C89             0x0001
+#define DW_LANG_C               0x0002
+#define DW_LANG_Ada83           0x0003
+#define DW_LANG_C_plus_plus     0x0004
+#define DW_LANG_Cobol74         0x0005
+#define DW_LANG_Cobol85         0x0006
+#define DW_LANG_Fortran77       0x0007
+#define DW_LANG_Fortran90       0x0008
+#define DW_LANG_Pascal83        0x0009
+#define DW_LANG_Modula2         0x000a
+#define DW_LANG_Java            0x000b
+#define DW_LANG_C99             0x000c
+#define DW_LANG_Ada95           0x000d
+#define DW_LANG_Fortran95       0x000e
+#define DW_LANG_PLI             0x000f
+#define DW_LANG_ObjC            0x0010
+#define DW_LANG_ObjC_plus_plus  0x0011
+#define DW_LANG_UPC             0x0012
+#define DW_LANG_D               0x0013
+#define DW_LANG_Python          0x0014
+#define DW_LANG_Go              0x0016
+#define DW_LANG_C_plus_plus_11  0x001a
+#define DW_LANG_C11             0x001d
+#define DW_LANG_C_plus_plus_14  0x0021
+#define DW_LANG_Fortran03       0x0022
+#define DW_LANG_Fortran08       0x0023
+#define DW_LANG_lo_user         0x8000
+#define DW_LANG_hi_user         0xffff
+#define DW_LANG_Mips_Assembler  0x8001
+#define DW_LANG_Upc             0x8765
+#define DW_LANG_HP_Bliss        0x8003
+#define DW_LANG_HP_Basic91      0x8004
+#define DW_LANG_HP_Pascal91     0x8005
+#define DW_LANG_HP_IMacro       0x8006
+#define DW_LANG_HP_Assembler    0x8007
+
+
 #define DW_FORM_addr         0x01 /* address */
 #define DW_FORM_block2       0x03 /* block */
 #define DW_FORM_block4       0x04 /* block */
@@ -339,6 +376,7 @@
 #define DW_EH_PE_udata2   0x02
 #define DW_EH_PE_udata4   0x03
 #define DW_EH_PE_udata8   0x04
+#define DW_EH_PE_signed   0x08
 #define DW_EH_PE_sleb128  0x09
 #define DW_EH_PE_sdata2   0x0a
 #define DW_EH_PE_sdata4   0x0b
