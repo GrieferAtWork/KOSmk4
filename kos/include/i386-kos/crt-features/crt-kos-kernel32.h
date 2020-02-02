@@ -769,7 +769,6 @@
 #define __CRT_HAVE_json_writer_putnumber 1
 #define __CRT_HAVE_json_writer_putstring 1
 #define __CRT_HAVE_json_writer_putuint64 1
-#define __CRT_HAVE_kernel_debug_sections 1
 #define __CRT_HAVE_kernel_debugtrap 1
 #define __CRT_HAVE_kernel_debugtrap_enabled 1
 #define __CRT_HAVE_kernel_debugtrap_fcpustate 1

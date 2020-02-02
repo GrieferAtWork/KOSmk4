@@ -327,11 +327,11 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 	case GDB_REGISTER_I386_ESP:
 		GETSET4(thread == THIS_TASK
 		        ? icpustate32_getesp(STATE)
-		        : (((self->ics_irregs.ir_cs16 & 3) ||
-		            (self->ics_irregs.ir_eflags & EFLAGS_VM))
-		           ? irregs32_getuseresp(self)
-		           : irregs32_getkernelesp(self)),
-		        icpustate32_setesp_p(*pstate, value));
+		        : (((STATE->ics_irregs.ir_cs16 & 3) ||
+		            (STATE->ics_irregs.ir_eflags & EFLAGS_VM))
+		           ? icpustate32_getuseresp(STATE)
+		           : icpustate32_getkernelesp(STATE)),
+		        *pstate = icpustate32_setesp_p(*pstate, value));
 		break;
 
 	case GDB_REGISTER_I386_EIP:
