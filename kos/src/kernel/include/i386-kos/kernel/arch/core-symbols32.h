@@ -8846,10 +8846,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.int 0
 	.int 0
-	.long .Lname2211 /* index: 2211 */
-	.weak kernel_debug_sections; .long kernel_debug_sections
-	.reloc ., R_386_SIZE32, kernel_debug_sections; .int 0
-	.int 0x97d48a3
+	.long 0 /* index: 2211 */
+	.long 0
+	.int 0
+	.int 0
 	.long .Lname2212 /* index: 2212 */
 	.weak sys_fanotify_init; .long sys_fanotify_init
 	.reloc ., R_386_SIZE32, sys_fanotify_init; .int 0
@@ -18996,8 +18996,6 @@ END(kernel_symbol_table)
 	.string "pagedir_haschanged_p"
 .Lname2209:
 	.string "memrchrq"
-.Lname2211:
-	.string "kernel_debug_sections"
 .Lname2212:
 	.string "sys_fanotify_init"
 .Lname2213:

@@ -6718,10 +6718,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak keymap_instrlen; .quad keymap_instrlen
 	.reloc ., R_X86_64_SIZE32, keymap_instrlen; .int 0
 	.int 0x593c68e
-	.quad .Lname1679 /* index: 1679 */
-	.weak x86_memcpy_nopf_ret_pointer; .quad x86_memcpy_nopf_ret_pointer
-	.reloc ., R_X86_64_SIZE32, x86_memcpy_nopf_ret_pointer; .int 0
-	.int 0x8a132d2
+	.quad 0 /* index: 1679 */
+	.quad 0
+	.int 0
+	.int 0
 	.quad 0 /* index: 1680 */
 	.quad 0
 	.int 0
@@ -8847,9 +8847,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, thisvm_x86_dr3; .int 0
 	.int 0x4b28d93
 	.quad .Lname2211 /* index: 2211 */
-	.weak kernel_debug_sections; .quad kernel_debug_sections
-	.reloc ., R_X86_64_SIZE32, kernel_debug_sections; .int 0
-	.int 0x97d48a3
+	.weak this_task; .quad this_task
+	.reloc ., R_X86_64_SIZE32, this_task; .int 0
+	.int 0x96d26b
 	.quad .Lname2212 /* index: 2212 */
 	.weak sys_fanotify_init; .quad sys_fanotify_init
 	.reloc ., R_X86_64_SIZE32, sys_fanotify_init; .int 0
@@ -11459,9 +11459,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2864 /* index: 2864 */
-	.weak this_task; .quad this_task
-	.reloc ., R_X86_64_SIZE32, this_task; .int 0
-	.int 0x96d26b
+	.weak x86_memcpy_nopf_ret_pointer; .quad x86_memcpy_nopf_ret_pointer
+	.reloc ., R_X86_64_SIZE32, x86_memcpy_nopf_ret_pointer; .int 0
+	.int 0x8a132d2
 	.quad 0 /* index: 2865 */
 	.quad 0
 	.int 0
@@ -18740,8 +18740,6 @@ END(kernel_symbol_table)
 	.string "dbg_isholding_ctrl"
 .Lname1678:
 	.string "keymap_instrlen"
-.Lname1679:
-	.string "x86_memcpy_nopf_ret_pointer"
 .Lname1681:
 	.string "sys32_detach"
 .Lname1682:
@@ -19453,7 +19451,7 @@ END(kernel_symbol_table)
 .Lname2210:
 	.string "thisvm_x86_dr3"
 .Lname2211:
-	.string "kernel_debug_sections"
+	.string "this_task"
 .Lname2212:
 	.string "sys_fanotify_init"
 .Lname2213:
@@ -20347,7 +20345,7 @@ END(kernel_symbol_table)
 .Lname2859:
 	.string "sys32_recvmsg"
 .Lname2864:
-	.string "this_task"
+	.string "x86_memcpy_nopf_ret_pointer"
 .Lname2867:
 	.string "slab_kmalloc"
 .Lname2868:

@@ -50,10 +50,6 @@ typedef struct {
 	__byte_t *ds_strtab_end;          /* [0..1] End address of the `.strtab' or `.dynstr' section */
 } di_debug_sections_t;
 
-#ifdef __KERNEL__
-__PUBDEF di_debug_sections_t const kernel_debug_sections;
-#endif /* __KERNEL__ */
-
 typedef struct {
 	/*REF*/ section_handle_t dl_debug_line;    /* [0..1] Reference to the `.debug_line' section */
 	/*REF*/ section_handle_t dl_debug_info;    /* [0..1] Reference to the `.debug_info' section */
