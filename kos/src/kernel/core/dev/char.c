@@ -58,24 +58,24 @@
 #include <string.h>
 
 /* Implement the ABI for the address tree used by character_device. */
-#define ATREE(x)                  cdev_tree_##x
-#define ATREE_CALL                KCALL
-#define ATREE_NOTHROW            NOTHROW
-#define Tkey                      dev_t
-#define T                         struct character_device
-#define N_NODEPATH                cd_devlink
-#define ATREE_SINGLE 1
+#define ATREE(x)      cdev_tree_##x
+#define ATREE_CALL    KCALL
+#define ATREE_NOTHROW NOTHROW
+#define Tkey          dev_t
+#define T             struct character_device
+#define N_NODEPATH    cd_devlink
+#define ATREE_SINGLE  1
 #include <hybrid/sequence/atree-abi.h>
 #undef ATREE_SINGLE
 
 DECL_BEGIN
 
 #define CHARACTER_DEVICE_GFP     GFP_LOCKED
-#if !!(CHARACTER_DEVICE_GFP & GFP_LOCKED)
+#if (CHARACTER_DEVICE_GFP & GFP_LOCKED) != 0
 #define CHARACTER_DEVICE_HEAP   &kernel_locked_heap
-#else
+#else /* (CHARACTER_DEVICE_GFP & GFP_LOCKED) != 0 */
 #define CHARACTER_DEVICE_HEAP   &kernel_default_heap
-#endif
+#endif /* (CHARACTER_DEVICE_GFP & GFP_LOCKED) == 0 */
 
 
 /* The tree used to quickly look up a character device from its ID */

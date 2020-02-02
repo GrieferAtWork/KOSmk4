@@ -111,9 +111,6 @@ done_procfs:
 	KSysctlInsmod("ps2", NULL); /* Keyboard */
 	KSysctlInsmod("vga", NULL); /* Display */
 
-	/* Make sure there aren't any memory leaks. */
-	KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
-
 	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB
 	 *       emulation, such that we only need to load the usb-hid drivers
 	 *       when the ps2 keyboard files are missing from /dev
@@ -176,6 +173,9 @@ done_procfs:
 			close(rfd);
 		}
 	}
+
+	/* Make sure there aren't any memory leaks. */
+	KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
 
 	for (;;) {
 		pid_t cpid;

@@ -84,7 +84,7 @@ DECL_END
 
 #define ATREE(x)          driver_fde_cachetree_##x
 #define ATREE_CALL        KCALL
-#define ATREE_NOTHROW            NOTHROW
+#define ATREE_NOTHROW     NOTHROW
 #define ATREE_NODE_MIN(x) ((uintptr_t)(x)->cn_fde.f_pcstart)
 #define ATREE_NODE_MAX(x) ((uintptr_t)(x)->cn_fde.f_pcend - 1)
 #define Tkey              uintptr_t
@@ -235,9 +235,8 @@ NOTHROW_NCX(KCALL libuw_unwind_fde_find)(void *absolute_pc,
 	REF struct driver *d;
 	/* Figure out which driver is mapped at the given `absolute_pc' */
 	d = driver_at_address(absolute_pc);
-	if unlikely(!d) {
+	if unlikely(!d)
 		return UNWIND_NO_FRAME;
-	}
 	/* Lookup the FDE descriptor within the driver */
 	error = driver_fde_find(d,
 	                        absolute_pc,
@@ -1304,8 +1303,8 @@ driver_getshdrs(struct driver *__restrict self)
 		ElfW(Shdr) *new_result;
 		/* Save the newly loaded section header vector. */
 		new_result = (ElfW(Shdr) *)ATOMIC_CMPXCH_VAL(self->d_shdr,
-		                                           NULL,
-		                                           result);
+		                                             NULL,
+		                                             result);
 		if unlikely(new_result != NULL) {
 			kfree(result);
 			result = new_result;
