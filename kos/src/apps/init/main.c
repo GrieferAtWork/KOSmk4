@@ -107,12 +107,12 @@ done_devfs:
 	}
 done_procfs:
 
-	/* Make sure there aren't any memory leaks. */
-	KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
-
 	/* Load some additional drivers that we need for the I/O console. */
 	KSysctlInsmod("ps2", NULL); /* Keyboard */
 	KSysctlInsmod("vga", NULL); /* Display */
+
+	/* Make sure there aren't any memory leaks. */
+	KSysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
 
 	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB
 	 *       emulation, such that we only need to load the usb-hid drivers

@@ -263,9 +263,15 @@ addr2line_vprintf(pformatprinter printer, void *arg, uintptr_t start_pc,
 		memset(&ainfo, 0, sizeof(ainfo));
 		module_relative_pc = start_pc;
 	} else {
-		/* TODO: `debug_dllocksections()' needs a non-blocking variant! */
-		if (debug_dllocksections(d, &ainfo.ds_info, &ainfo.ds_sect) != DEBUG_INFO_ERROR_SUCCESS)
+#if 1 /* TODO: Temporary work-around for a dead-lock scenario... */
+		if (d != &kernel_driver) {
 			memset(&ainfo, 0, sizeof(ainfo));
+		} else
+#endif
+		{
+			if (debug_dllocksections(d, &ainfo.ds_info, &ainfo.ds_sect) != DEBUG_INFO_ERROR_SUCCESS)
+				memset(&ainfo, 0, sizeof(ainfo));
+		}
 		module_relative_pc = start_pc - d->d_loadaddr;
 	}
 	result = do_addr2line_vprintf(&ainfo,
