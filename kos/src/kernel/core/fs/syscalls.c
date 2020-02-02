@@ -2340,7 +2340,7 @@ check_result_inode_for_symlink:
 				devno = result_inode->i_filerdev;
 				COMPILER_READ_BARRIER();
 				result_handle.h_data = block_device_lookup(devno);
-				if (!result_handle.h_data)
+				if unlikely(!result_handle.h_data)
 					THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_BLOCK_DEVICE, devno);
 				result_handle.h_type = HANDLE_TYPE_BLOCKDEVICE;
 				decref(result_inode);
@@ -2358,7 +2358,7 @@ check_result_inode_for_symlink:
 				devno = result_inode->i_filerdev;
 				COMPILER_READ_BARRIER();
 				cdev = character_device_lookup(devno);
-				if (!cdev)
+				if unlikely(!cdev)
 					THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_CHARACTER_DEVICE, devno);
 				/* Assign a controlling terminal to the calling process. */
 				if (!(oflags & O_NOCTTY) && character_device_isattybase(cdev) &&
