@@ -371,6 +371,10 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		} else if ((STATE->ics_irregs.ir_cs16 & 3) ||
 		           (STATE->ics_irregs.ir_eflags & EFLAGS_VM)) {
 			FIELD4(STATE->ics_irregs_u.ir_ss);
+		} else {
+#ifdef GET_REGISTER
+			GETSET4(SEGMENT_KERNEL_DATA, -);
+#endif /* GET_REGISTER */
 		}
 		break;
 
@@ -458,8 +462,12 @@ NOTHROW(FCALL FUNC(SCpuStateRegister))(struct task *__restrict thread,
 	case GDB_REGISTER_I386_SS:
 		if (scpustate32_isuser(STATE)) {
 			FIELD4(STATE->scs_irregs_u.ir_ss);
-		} else {
+		} else if (thread == THIS_TASK) {
 			GETSET4(__rdss(), __wrss(value));
+		} else {
+#ifdef GET_REGISTER
+			GETSET4(SEGMENT_KERNEL_DATA, -);
+#endif /* GET_REGISTER */
 		}
 		break;
 
@@ -721,7 +729,7 @@ NOTHROW(FCALL FUNC(Registers))(struct task *__restrict thread,
                                struct gdb_cpustate32 BUF_CONST *buf) {
 	uintptr_t regno;
 	for (regno = 0; regno <= sizeof(struct gdb_cpustate32) / 4; ++regno) {
-		if (!FUNC(Register)(thread, regno, (u32 *)buf + regno, 4))
+		if (FUNC(Register)(thread, regno, (u32 *)buf + regno, 4) != 4)
 			return false;
 	}
 	return true;

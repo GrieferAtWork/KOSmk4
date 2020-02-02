@@ -385,7 +385,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 			GETSET4(icpustate64_getcs(STATE),
 			        icpustate64_setcs(STATE, value));
 		} else {
-			FIELD8(STATE->ics_irregs.ir_cs);
+			FIELD4(STATE->ics_irregs.ir_cs);
 		}
 		break;
 
@@ -394,7 +394,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 			GETSET4(icpustate64_getss(STATE),
 			        icpustate64_setss(STATE, value));
 		} else {
-			FIELD8(STATE->ics_irregs.ir_ss);
+			FIELD4(STATE->ics_irregs.ir_ss);
 		}
 		break;
 
@@ -402,6 +402,8 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		if (thread == THIS_TASK) {
 			GETSET4(icpustate64_getds(STATE),
 			        icpustate64_setds(STATE, value));
+		} else {
+			/* TODO */
 		}
 		break;
 
@@ -409,6 +411,8 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		if (thread == THIS_TASK) {
 			GETSET4(icpustate64_getes(STATE),
 			        icpustate64_setes(STATE, value));
+		} else {
+			/* TODO */
 		}
 		break;
 
@@ -416,6 +420,8 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		if (thread == THIS_TASK) {
 			GETSET4(icpustate64_getfs(STATE),
 			        icpustate64_setfs(STATE, value));
+		} else {
+			/* TODO */
 		}
 		break;
 
@@ -423,6 +429,8 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		if (thread == THIS_TASK) {
 			GETSET4(icpustate64_getgs(STATE),
 			        icpustate64_setgs(STATE, value));
+		} else {
+			/* TODO */
 		}
 		break;
 
@@ -505,14 +513,37 @@ NOTHROW(FCALL FUNC(UCpuStateRegister))(struct task *__restrict thread,
                                        struct ucpustate64 STATE_PARAM) {
 	switch (regno) {
 
-	case GDB_REGISTER_X86_64_RIP: FIELD8(STATE->ucs_rip); break;
-	case GDB_REGISTER_X86_64_RFLAGS: FIELD4(STATE->ucs_rflags); break;
-	case GDB_REGISTER_X86_64_CS: FIELD4(STATE->ucs_cs); break;
-	case GDB_REGISTER_X86_64_SS: FIELD4(STATE->ucs_ss); break;
-	case GDB_REGISTER_X86_64_DS: FIELD4(STATE->ucs_sgregs.sg_ds); break;
-	case GDB_REGISTER_X86_64_ES: FIELD4(STATE->ucs_sgregs.sg_es); break;
-	case GDB_REGISTER_X86_64_FS: FIELD4(STATE->ucs_sgregs.sg_fs); break;
-	case GDB_REGISTER_X86_64_GS: FIELD4(STATE->ucs_sgregs.sg_gs); break;
+	case GDB_REGISTER_X86_64_RIP:
+		FIELD8(STATE->ucs_rip);
+		break;
+
+	case GDB_REGISTER_X86_64_RFLAGS:
+		FIELD4(STATE->ucs_rflags);
+		break;
+
+	case GDB_REGISTER_X86_64_CS:
+		FIELD4(STATE->ucs_cs);
+		break;
+
+	case GDB_REGISTER_X86_64_SS:
+		FIELD4(STATE->ucs_ss);
+		break;
+
+	case GDB_REGISTER_X86_64_DS:
+		FIELD4(STATE->ucs_sgregs.sg_ds);
+		break;
+
+	case GDB_REGISTER_X86_64_ES:
+		FIELD4(STATE->ucs_sgregs.sg_es);
+		break;
+
+	case GDB_REGISTER_X86_64_FS:
+		FIELD4(STATE->ucs_sgregs.sg_fs);
+		break;
+
+	case GDB_REGISTER_X86_64_GS:
+		FIELD4(STATE->ucs_sgregs.sg_gs);
+		break;
 
 	default: {
 		size_t result;
@@ -532,12 +563,29 @@ NOTHROW(FCALL FUNC(ActiveSegmentRegister))(uintptr_t regno,
                                            size_t bufsize) {
 	switch (regno) {
 
-	case GDB_REGISTER_X86_64_CS: GETSET4(__rdcs(), __wrcs(value)); break;
-	case GDB_REGISTER_X86_64_SS: GETSET4(__rdss(), __wrss(value)); break;
-	case GDB_REGISTER_X86_64_DS: GETSET4(__rdds(), __wrds(value)); break;
-	case GDB_REGISTER_X86_64_ES: GETSET4(__rdes(), __wres(value)); break;
-	case GDB_REGISTER_X86_64_FS: GETSET4(__rdfs(), __wrfs_keepbase(value)); break;
-	case GDB_REGISTER_X86_64_GS: GETSET4(__rdgs(), __wrgs_keepbase(value)); break;
+	case GDB_REGISTER_X86_64_CS:
+		GETSET4(__rdcs(), __wrcs(value));
+		break;
+
+	case GDB_REGISTER_X86_64_SS:
+		GETSET4(__rdss(), __wrss(value));
+		break;
+
+	case GDB_REGISTER_X86_64_DS:
+		GETSET4(__rdds(), __wrds(value));
+		break;
+
+	case GDB_REGISTER_X86_64_ES:
+		GETSET4(__rdes(), __wres(value));
+		break;
+
+	case GDB_REGISTER_X86_64_FS:
+		GETSET4(__rdfs(), __wrfs_keepbase(value));
+		break;
+
+	case GDB_REGISTER_X86_64_GS:
+		GETSET4(__rdgs(), __wrgs_keepbase(value));
+		break;
 
 	default:
 		break;
@@ -573,15 +621,41 @@ NOTHROW(FCALL FUNC(LCpuStateRegister))(struct task *__restrict thread,
                                        struct lcpustate64 STATE_PARAM) {
 	switch (regno) {
 
-	case GDB_REGISTER_X86_64_R15: FIELD8(STATE->lcs_r15); break;
-	case GDB_REGISTER_X86_64_R14: FIELD8(STATE->lcs_r14); break;
-	case GDB_REGISTER_X86_64_R13: FIELD8(STATE->lcs_r13); break;
-	case GDB_REGISTER_X86_64_R12: FIELD8(STATE->lcs_r12); break;
-	case GDB_REGISTER_X86_64_RBP: FIELD8(STATE->lcs_rbp); break;
-	case GDB_REGISTER_X86_64_RSP: FIELD8(STATE->lcs_rsp); break;
-	case GDB_REGISTER_X86_64_RBX: FIELD8(STATE->lcs_rbx); break;
-	case GDB_REGISTER_X86_64_RIP: FIELD8(STATE->lcs_rip); break;
-	case GDB_REGISTER_X86_64_RFLAGS: GETSET4_NOOP(); break;
+	case GDB_REGISTER_X86_64_R15:
+		FIELD8(STATE->lcs_r15);
+		break;
+
+	case GDB_REGISTER_X86_64_R14:
+		FIELD8(STATE->lcs_r14);
+		break;
+
+	case GDB_REGISTER_X86_64_R13:
+		FIELD8(STATE->lcs_r13);
+		break;
+
+	case GDB_REGISTER_X86_64_R12:
+		FIELD8(STATE->lcs_r12);
+		break;
+
+	case GDB_REGISTER_X86_64_RBP:
+		FIELD8(STATE->lcs_rbp);
+		break;
+
+	case GDB_REGISTER_X86_64_RSP:
+		FIELD8(STATE->lcs_rsp);
+		break;
+
+	case GDB_REGISTER_X86_64_RBX:
+		FIELD8(STATE->lcs_rbx);
+		break;
+
+	case GDB_REGISTER_X86_64_RIP:
+		FIELD8(STATE->lcs_rip);
+		break;
+
+	case GDB_REGISTER_X86_64_RFLAGS:
+		GETSET4_NOOP();
+		break;
 
 	default: {
 		size_t result;
@@ -603,14 +677,37 @@ NOTHROW(FCALL FUNC(FCpuStateRegister))(struct task *__restrict thread,
                                        struct fcpustate64 STATE_PARAM) {
 	switch (regno) {
 
-	case GDB_REGISTER_X86_64_RIP: FIELD8(STATE->fcs_rip); break;
-	case GDB_REGISTER_X86_64_RFLAGS: FIELD4(STATE->fcs_rflags); break;
-	case GDB_REGISTER_X86_64_CS: FIELD4(STATE->fcs_sgregs.sg_cs); break;
-	case GDB_REGISTER_X86_64_SS: FIELD4(STATE->fcs_sgregs.sg_ss); break;
-	case GDB_REGISTER_X86_64_DS: FIELD4(STATE->fcs_sgregs.sg_ds); break;
-	case GDB_REGISTER_X86_64_ES: FIELD4(STATE->fcs_sgregs.sg_es); break;
-	case GDB_REGISTER_X86_64_FS: FIELD4(STATE->fcs_sgregs.sg_fs); break;
-	case GDB_REGISTER_X86_64_GS: FIELD4(STATE->fcs_sgregs.sg_gs); break;
+	case GDB_REGISTER_X86_64_RIP:
+		FIELD8(STATE->fcs_rip);
+		break;
+
+	case GDB_REGISTER_X86_64_RFLAGS:
+		FIELD4(STATE->fcs_rflags);
+		break;
+
+	case GDB_REGISTER_X86_64_CS:
+		FIELD4(STATE->fcs_sgregs.sg_cs);
+		break;
+
+	case GDB_REGISTER_X86_64_SS:
+		FIELD4(STATE->fcs_sgregs.sg_ss);
+		break;
+
+	case GDB_REGISTER_X86_64_DS:
+		FIELD4(STATE->fcs_sgregs.sg_ds);
+		break;
+
+	case GDB_REGISTER_X86_64_ES:
+		FIELD4(STATE->fcs_sgregs.sg_es);
+		break;
+
+	case GDB_REGISTER_X86_64_FS:
+		FIELD4(STATE->fcs_sgregs.sg_fs);
+		break;
+
+	case GDB_REGISTER_X86_64_GS:
+		FIELD4(STATE->fcs_sgregs.sg_gs);
+		break;
 
 	default: {
 		size_t result;
@@ -631,13 +728,17 @@ NOTHROW(FCALL FUNC(Registers))(struct task *__restrict thread,
 	uintptr_t regno;
 	byte_t BUF_CONST *ptr = (byte_t BUF_CONST *)buf;
 	for (regno = 0; regno < GDB_REGISTER_X86_64_RFLAGS; ++regno) {
-		if (!FUNC(Register)(thread, regno, ptr, 8))
+		if (FUNC(Register)(thread, regno, ptr, 8) != 8) {
+			printk(KERN_DEBUG "Failed: %Iu\n", regno);
 			return false;
+		}
 		ptr += 8;
 	}
 	for (; regno < GDB_REGISTER_X86_64_ST0; ++regno) {
-		if (!FUNC(Register)(thread, regno, ptr, 4))
+		if (FUNC(Register)(thread, regno, ptr, 4) != 4) {
+			printk(KERN_DEBUG "Failed: %Iu\n", regno);
 			return false;
+		}
 		ptr += 4;
 	}
 	return true;
