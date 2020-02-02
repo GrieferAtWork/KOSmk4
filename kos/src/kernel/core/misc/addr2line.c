@@ -121,13 +121,13 @@ addr2line_printf(pformatprinter printer, void *arg, uintptr_t start_pc,
 PRIVATE ssize_t KCALL
 do_addr2line_vprintf(struct addr2line_buf const *__restrict ainfo,
                      pformatprinter printer, void *arg, struct driver *d,
-                     uintptr_t module_relative_pc, uintptr_t start_pc,
+                     uintptr_t module_relative_start_pc, uintptr_t start_pc,
                      uintptr_t end_pc, char const *message_format,
                      va_list args) {
 	ssize_t result, temp;
 	di_debug_addr2line_t info;
 	addr2line_errno_t error;
-	error = addr2line(ainfo, module_relative_pc, &info, 0);
+	error = addr2line(ainfo, module_relative_start_pc, &info, 0);
 	if (error != DEBUG_INFO_ERROR_SUCCESS) {
 		if (d) {
 			if (d->d_filename) {
@@ -141,7 +141,7 @@ do_addr2line_vprintf(struct addr2line_buf const *__restrict ainfo,
 				goto done;
 			temp = format_printf(printer, arg,
 			                     "%p:%p:%%f(%%l,%%c) : %%n : %%p",
-			                     module_relative_pc, start_pc);
+			                     module_relative_start_pc, start_pc);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
@@ -204,9 +204,12 @@ again_printlevel:
 		}
 		temp = format_printf(printer, arg, ") : %s+%Iu : %p+%Iu",
 		                     info.al_rawname,
-		                     level == 0 ? (start_pc - info.al_symstart) : (info.al_linestart - info.al_symstart),
-		                     level == 0 ? start_pc : info.al_linestart,
-		                     level == 0 ? (end_pc - start_pc) : (info.al_lineend - info.al_linestart));
+		                     level == 0 ? (module_relative_start_pc - info.al_symstart)
+		                                : (info.al_linestart - info.al_symstart),
+		                     level == 0 ? (start_pc)
+		                                : ((start_pc - module_relative_start_pc) + info.al_linestart),
+		                     level == 0 ? (end_pc - start_pc)
+		                                : (info.al_lineend - info.al_linestart));
 		if unlikely(temp < 0)
 			goto err;
 		result += temp;
@@ -263,7 +266,7 @@ addr2line_vprintf(pformatprinter printer, void *arg, uintptr_t start_pc,
 		memset(&ainfo, 0, sizeof(ainfo));
 		module_relative_pc = start_pc;
 	} else {
-#if 1 /* TODO: Temporary work-around for a dead-lock scenario... */
+#if 0 /* TODO: Temporary work-around for a dead-lock scenario... */
 		if (d != &kernel_driver) {
 			memset(&ainfo, 0, sizeof(ainfo));
 		} else
