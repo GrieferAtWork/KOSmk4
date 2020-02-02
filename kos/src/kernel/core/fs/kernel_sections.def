@@ -57,22 +57,28 @@ INTDEF byte_t __kernel_sect_bss_start[];
 INTDEF byte_t __kernel_sect_bss_size[];
 #endif /* !SECTION_GLOBALS_DEFINED */
 
+#if 0
+#define DEBUG_SECTION_FLAGS SHF_ALLOC | SHF_COMPRESSED
+#else
+#define DEBUG_SECTION_FLAGS SHF_ALLOC
+#endif
 SECTION(".text", SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, __kernel_sect_text_start, __kernel_sect_text_size, 0, 0, 0)
 SECTION(".rodata", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_rodata_start, __kernel_sect_rodata_size, 0, 0, 0)
 SECTION(".gcc_except_table", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_gcc_except_table_start, __kernel_sect_gcc_except_table_size, 0, 0, 0)
 SECTION(".eh_frame", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_eh_frame_start, __kernel_sect_eh_frame_size, 0, 0, 0)
-SECTION(".debug_line", SHT_PROGBITS, SHF_ALLOC, __kernel_debug_line_start, __kernel_debug_line_size, 0, 0, 0)
-SECTION(".debug_info", SHT_PROGBITS, SHF_ALLOC, __kernel_debug_info_start, __kernel_debug_info_size, 0, 0, 0)
-SECTION(".debug_aranges", SHT_PROGBITS, SHF_ALLOC, __kernel_debug_aranges_start, __kernel_debug_aranges_size, 0, 0, 0)
-SECTION(".debug_abbrev", SHT_PROGBITS, SHF_ALLOC, __kernel_debug_abbrev_start, __kernel_debug_abbrev_size, 0, 0, 0)
-SECTION(".debug_str", SHT_PROGBITS, SHF_ALLOC, __kernel_debug_str_start, __kernel_debug_str_size, 0, 0, 0)
-SECTION(".debug_ranges", SHT_PROGBITS, SHF_ALLOC, __kernel_debug_ranges_start, __kernel_debug_ranges_size, 0, 0, 0)
-SECTION(".debug_loc", SHT_PROGBITS, SHF_ALLOC, __kernel_debug_loc_start, __kernel_debug_loc_size, 0, 0, 0)
+SECTION(".debug_line", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_line_start, __kernel_debug_line_size, 0, 0, 0)
+SECTION(".debug_info", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_info_start, __kernel_debug_info_size, 0, 0, 0)
+SECTION(".debug_aranges", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_aranges_start, __kernel_debug_aranges_size, 0, 0, 0)
+SECTION(".debug_abbrev", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_abbrev_start, __kernel_debug_abbrev_size, 0, 0, 0)
+SECTION(".debug_str", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_str_start, __kernel_debug_str_size, 0, 0, 0)
+SECTION(".debug_ranges", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_ranges_start, __kernel_debug_ranges_size, 0, 0, 0)
+SECTION(".debug_loc", SHT_PROGBITS, DEBUG_SECTION_FLAGS, __kernel_debug_loc_start, __kernel_debug_loc_size, 0, 0, 0)
 SECTION(".pertask", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pertask_start, __kernel_pertask_size, 0, 0, 0)
 SECTION(".pervm", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pervm_start, __kernel_pervm_size, 0, 0, 0)
 SECTION(".percpu", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_percpu_start, __kernel_percpu_size, 0, 0, 0)
 SECTION(".data", SHT_PROGBITS, SHF_ALLOC | SHF_WRITE, __kernel_sect_data_start, __kernel_sect_data_size, 0, 0, 0)
 SECTION(".bss", SHT_NOBITS, SHF_ALLOC | SHF_WRITE, __kernel_sect_bss_start, __kernel_sect_bss_size, 0, 0, 0)
+#undef DEBUG_SECTION_FLAGS
 
 /* NOTE: This section _must_ be last! */
 SECTION(".shstrtab", SHT_STRTAB, SHF_ALLOC | SHF_STRINGS, &kernel_shstrtab_data, sizeof(struct kernel_shstrtab) - 1, 0, 0, 0)
