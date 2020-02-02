@@ -44,7 +44,7 @@
  */
 
 #undef HAVE_GDB_DEBUG
-#if 1
+#if 0
 #include <kernel/printk.h>
 #define HAVE_GDB_DEBUG 1
 #define GDB_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)
@@ -153,8 +153,6 @@ INTDEF u8 const GDB_HexValues[256];
 #define GDB_KERNEL_TID_GET(tid) ((struct task *)(intptr_t)(tid))
 #define GDB_KERNEL_TID_CHK(tid) ADDR_ISKERN(intptr_t)(tid))
 #endif /* !KERNELSPACE_HIGHMEM */
-
-
 
 
 DECL_END

@@ -728,17 +728,13 @@ NOTHROW(FCALL FUNC(Registers))(struct task *__restrict thread,
 	uintptr_t regno;
 	byte_t BUF_CONST *ptr = (byte_t BUF_CONST *)buf;
 	for (regno = 0; regno < GDB_REGISTER_X86_64_RFLAGS; ++regno) {
-		if (FUNC(Register)(thread, regno, ptr, 8) != 8) {
-			printk(KERN_DEBUG "Failed: %Iu\n", regno);
+		if (FUNC(Register)(thread, regno, ptr, 8) != 8)
 			return false;
-		}
 		ptr += 8;
 	}
 	for (; regno < GDB_REGISTER_X86_64_ST0; ++regno) {
-		if (FUNC(Register)(thread, regno, ptr, 4) != 4) {
-			printk(KERN_DEBUG "Failed: %Iu\n", regno);
+		if (FUNC(Register)(thread, regno, ptr, 4) != 4)
 			return false;
-		}
 		ptr += 4;
 	}
 	return true;

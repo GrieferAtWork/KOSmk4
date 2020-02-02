@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
@@ -34,6 +35,7 @@
 
 #include <signal.h> /* SIGTRAP */
 
+#include "fsio.h"
 #include "gdb.h"
 #include "server.h" /* GDBServer_Features */
 
@@ -55,6 +57,10 @@ GDBServer_TerminateFallbackHostRPC(void *UNUSED(arg),
 }
 
 PRIVATE DRIVER_FINI void KCALL GDBServer_Fini(void) {
+
+	/* Finalize the filesystem API. */
+	GDBFs_Fini();
+
 	/* Finalize the remote API. */
 	GDBRemote_Fini();
 
@@ -76,6 +82,12 @@ PRIVATE DRIVER_FINI void KCALL GDBServer_Fini(void) {
 }
 
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
+	if (!vfs_kernel.p_inode) {
+		/* TODO: If `modgdbserver' is loaded as a boot module, delay initialization
+		 *       until after the root partition has been mounted. - That way, a remote
+		 *       gdb driver will be able to immediately access the file system, once
+		 *       becoming attached. */
+	}
 	TRY {
 		/* Initialize the remote API. */
 		GDBRemote_Init();

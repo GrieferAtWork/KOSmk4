@@ -26,8 +26,11 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/driver-param.h> /* DEFINE_CMDLINE_FLAG_VAR() */
 #include <kernel/except.h>
+#include <kernel/handle.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
@@ -40,6 +43,7 @@
 #include <hybrid/unaligned.h>
 
 #include <kos/kernel/gdb-cpu-state.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 
 #include <assert.h>
@@ -54,6 +58,7 @@
 #include <kernel/gdt.h>
 #endif /* __x86_64__ || __i386__ */
 
+#include "fsio.h"
 #include "gdb-info.h"
 #include "gdb.h"
 #include "thread-enum.h"
@@ -193,6 +198,37 @@ NOTHROW(KCALL GDB_HexPrinter)(void *arg, char const *__restrict data, size_t dat
 }
 
 
+PRIVATE char *
+NOTHROW(FCALL GDB_DecodeHexInplace)(char *ptr, size_t *pdatalen) {
+	byte_t *dst, *start;
+	dst = start = (byte_t *)ptr;
+	for (;;) {
+		char a, b;
+		byte_t av, bv;
+		a = ptr[0];
+		b = ptr[1];
+		if (((av = GDB_FromHex(a)) != 0 || a == '0') &&
+		    ((bv = GDB_FromHex(b)) != 0 || b == '0')) {
+			*dst++ = av << 4 | bv;
+			ptr += 2;
+		} else {
+			break;
+		}
+	}
+	*pdatalen = (size_t)(dst - start);
+	return ptr;
+}
+
+PRIVATE char *
+NOTHROW(FCALL GDB_DecodeHexInplaceString)(char *ptr) {
+	char *result;
+	size_t len;
+	result   = GDB_DecodeHexInplace(ptr, &len);
+	ptr[len] = 0;
+	return result;
+}
+
+
 
 /* Print a message while in non-stop or all-stop mode.
  * @return: * : The total number of printed bytes. */
@@ -261,6 +297,49 @@ NOTHROW(FCALL GDB_DecodeEscapedBinary)(char *buf, char *endptr) {
 	if (dst != flush_start)
 		memmovedown(dst, flush_start, (size_t)(endptr - flush_start), sizeof(char));
 	return result;
+}
+
+
+/* Encode binary data */
+PRIVATE char *
+NOTHROW(FCALL GDB_EncodeEscapedBinary)(char *buf, void const *data, size_t datalen) {
+	size_t i;
+	for (i = 0; i < datalen; ++i) {
+		byte_t b;
+		b = ((byte_t const *)data)[i];
+		if (b == 0x23 || b == 0x24 ||
+			b == 0x2a || b == 0x7d) {
+			*buf++ = '}';
+			*buf++ = b ^ 0x20;
+		} else {
+			*buf++ = b;
+		}
+	}
+	return buf;
+}
+
+PRIVATE char *
+NOTHROW(FCALL GDB_EncodeEscapedBinaryEx)(char *buf, char *bufend,
+                                         void const *data, size_t datalen,
+                                         size_t *__restrict pwritten_datalen) {
+	size_t i;
+	for (i = 0; i < datalen; ++i) {
+		byte_t b;
+		b = ((byte_t const *)data)[i];
+		if (b == 0x23 || b == 0x24 ||
+			b == 0x2a || b == 0x7d) {
+			if (buf + 2 >= bufend)
+				break;
+			*buf++ = '}';
+			*buf++ = b ^ 0x20;
+		} else {
+			if (buf >= bufend)
+				break;
+			*buf++ = b;
+		}
+	}
+	*pwritten_datalen = i;
+	return buf;
 }
 
 
@@ -853,6 +932,325 @@ NOTHROW(FCALL GDBServer_CreateMissingAsyncStopNotificationForSomeThread)(void) {
 
 
 
+PRIVATE NOBLOCK ATTR_RETNONNULL NONNULL((1)) char *
+NOTHROW(KCALL GDBFs_EncodeErrno)(char *p, gdb_errno_t errno_value) {
+	return p + sprintf(p, "F-1,%x", errno_value);
+}
+
+PRIVATE NOBLOCK ATTR_RETNONNULL NONNULL((1)) char *
+NOTHROW(KCALL GDBFs_EncodeCurrentError)(char *o) {
+	errno_t error;
+	error = error_as_errno(error_data());
+	o = GDBFs_EncodeErrno(o, GDB_ErrnoEncode(error));
+	return o;
+}
+
+
+#if CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x10000000
+#define PACKETLEN_MAX_HEXLEN 8
+#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x1000000
+#define PACKETLEN_MAX_HEXLEN 7
+#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x100000
+#define PACKETLEN_MAX_HEXLEN 6
+#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x10000
+#define PACKETLEN_MAX_HEXLEN 5
+#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x1000
+#define PACKETLEN_MAX_HEXLEN 4
+#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x100
+#define PACKETLEN_MAX_HEXLEN 3
+#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x10
+#define PACKETLEN_MAX_HEXLEN 2
+#else
+#define PACKETLEN_MAX_HEXLEN 1
+#endif
+
+/* Handle a file-system command packet:
+ * >> vFile:<command>:<args...>
+ * @return: * : One of `GDB_HANDLECOMMAND_*' */
+PRIVATE unsigned int KCALL
+GDBFs_HandleCommand(char *command,
+                    char *args,
+                    char *endptr) {
+	char *o = GDBPacket_Start();
+	if (strcmp(command, "setfs") == 0) {
+		intptr_t pid;
+		char *argsend;
+		pid = strtos(args, &argsend, 16);
+		if (argsend != endptr)
+			ERROR(err_syntax);
+#if __SIZEOF_POINTER__ > 4
+		if (pid == 0 || pid == -1 || pid == GDB_KERNEL_PID || pid == 0xffffffff)
+#else /* __SIZEOF_POINTER__ > 4 */
+		if (pid == 0 || pid == -1 || pid == GDB_KERNEL_PID)
+#endif /* __SIZEOF_POINTER__ <= 4 */
+		{
+			/* Use `fs_kernel' */
+			REF struct fs *ofs;
+			ofs = GDBFs.fi_fs;
+			GDBFs.fi_fs = incref(&fs_kernel);
+			xdecref_unlikely(ofs);
+		} else {
+			REF struct fs *ofs;
+			REF struct fs *nfs;
+			REF struct task *proc;
+			proc = GDBThread_DoLookupPID(pid);
+			if unlikely(!proc) {
+				o = GDBFs_EncodeErrno(o, GDB_EUNKNOWN);
+				goto do_transmit;
+			}
+			ofs = GDBFs.fi_fs;
+			nfs = ATOMIC_READ(FORTASK(proc, this_fs));
+			if unlikely(!nfs || !tryincref(nfs))
+				nfs = incref(&fs_kernel);
+			GDBFs.fi_fs = nfs; /* Inherit reference */
+			decref_unlikely(ofs);
+			decref_unlikely(proc);
+		}
+return_zero:
+		*o++ = 'F';
+		*o++ = '0';
+	} else if (strcmp(command, "close") == 0) {
+		intptr_t fdno;
+		char *argsend;
+		fdno = strtos(args, &argsend, 16);
+		if (argsend != endptr)
+			ERROR(err_syntax);
+		if (GDBFs_DeleteHandle((fd_t)fdno))
+			goto return_zero;
+		o = GDBFs_EncodeErrno(o, GDB_EBADF);
+	} else if (strcmp(command, "open") == 0) {
+		struct handle h;
+		gdb_errno_t error;
+		gdb_oflag_t oflags = GDB_O_RDONLY;
+		gdb_mode_t mode = GDB_S_IRUSR | GDB_S_IWUSR | GDB_S_IRGRP | GDB_S_IROTH;
+		char *filename;
+		size_t filename_len;
+		filename = args;
+		args = GDB_DecodeHexInplace(args, &filename_len);
+		if (args != endptr) {
+			if (*args++ != ',')
+				ERROR(err_syntax);
+			oflags = (gdb_oflag_t)strtos(args, &args, 16);
+			if (args != endptr) {
+				if (*args++ != ',')
+					ERROR(err_syntax);
+				mode = (gdb_mode_t)strtos(args, &args, 16);
+				if (args != endptr)
+					ERROR(err_syntax);
+			}
+		}
+		if unlikely(!filename_len)
+			goto err_EINVAL;
+		filename[filename_len] = 0;
+		error = GDBFs_Open(filename, oflags, mode, &h);
+		if unlikely(error != 0) {
+			o = GDBFs_EncodeErrno(o, error);
+		} else {
+			fd_t fd;
+			fd = GDBFs_RegisterHandle(&h);
+			if unlikely(fd == -1) {
+				o = GDBFs_EncodeErrno(o, GDB_EMFILE);
+				decref(h);
+			} else {
+				o += sprintf(o, "F%x", (unsigned int)fd);
+			}
+		}
+	} else if (strcmp(command, "pread") == 0) {
+		char *argsend, *datastart, *dataend;
+		struct handle *h;
+		intptr_t fd;
+		uintptr_t count;
+		size_t used_count;
+		u64 offset;
+		fd = strtos(args, &argsend, 16);
+		if unlikely(*argsend++ != ',')
+			ERROR(err_syntax);
+		count = strtou(argsend, &argsend, 16);
+		if unlikely(*argsend++ != ',')
+			ERROR(err_syntax);
+		offset = strtou64(argsend, &argsend, 16);
+		if unlikely(argsend != endptr)
+			ERROR(err_syntax);
+		h = GDBFs_LookupHandle((fd_t)fd);
+		if unlikely(!h)
+			goto err_BADF;
+		if (count > (CONFIG_GDBSERVER_PACKET_MAXLEN - (2 + PACKETLEN_MAX_HEXLEN)))
+			count = (CONFIG_GDBSERVER_PACKET_MAXLEN - (2 + PACKETLEN_MAX_HEXLEN));
+		if unlikely((h->h_mode & IO_ACCMODE) == IO_WRONLY)
+			goto err_EINVAL; /* `E_INVALID_HANDLE_OPERATION' translates to `EINVAL' */
+		TRY {
+			/* (re-)use the command buffer as temporary storage for un-encoded data. */
+			count = handle_pread(*h, GDBRemote_CommandBuffer, count, (pos_t)offset);
+		} EXCEPT {
+			o = GDBFs_EncodeCurrentError(o);
+			goto do_transmit;
+		}
+		datastart = o + sprintf(o, "F%Ix;", count);
+		dataend = GDB_EncodeEscapedBinaryEx(datastart,
+		                                    o + CONFIG_GDBSERVER_PACKET_MAXLEN,
+		                                    GDBRemote_CommandBuffer, count,
+		                                    &used_count);
+		if unlikely(used_count != count) {
+			/* Because of byte escaping, not all read data could be encoded.
+			 * In this case, re-write the byte-count (i.e. return) field to
+			 * reflect the actual number of encoded bytes. (if the hex-repr
+			 * of the new count is shorter than the old one, pad the return
+			 * value with leading `0'-characters so we don't have to memmove
+			 * the entire outgoing packet buffer!) */
+			char temp[PACKETLEN_MAX_HEXLEN + 1];
+			size_t oldlen, newlen;
+			oldlen = (size_t)(datastart - o) - 2;
+			newlen = sprintf(temp, "%Ix", used_count);
+			assert(newlen <= oldlen);
+			memset(o + 1, '0', (oldlen - newlen) * sizeof(char));
+			memcpy(o + 1 + oldlen - newlen, temp, newlen * sizeof(char));
+		}
+		o = dataend;
+	} else if (strcmp(command, "pwrite") == 0) {
+		char *argsend;
+		struct handle *h;
+		intptr_t fd;
+		size_t count;
+		u64 offset;
+		fd = strtos(args, &argsend, 16);
+		if unlikely(*argsend++ != ',')
+			ERROR(err_syntax);
+		offset = strtou64(argsend, &argsend, 16);
+		if unlikely(*argsend++ != ',')
+			ERROR(err_syntax);
+		h = GDBFs_LookupHandle((fd_t)fd);
+		if unlikely(!h)
+			goto err_BADF;
+		count = GDB_DecodeEscapedBinary(argsend, endptr);
+		if unlikely((h->h_mode & IO_ACCMODE) == IO_RDONLY)
+			goto err_EINVAL; /* `E_INVALID_HANDLE_OPERATION' translates to `EINVAL' */
+		TRY {
+			/* pwrite(fd, argsend, count, offset); */
+			count = handle_pwrite(*h, argsend, count, (pos_t)offset);
+		} EXCEPT {
+			o = GDBFs_EncodeCurrentError(o);
+			goto do_transmit;
+		}
+		o += sprintf(o, "F%Ix", count);
+	} else if (strcmp(command, "fstat") == 0) {
+		char *argsend;
+		struct handle *h;
+		intptr_t fd;
+		struct stat st;
+		struct gdb_stat gst;
+		fd = strtos(args, &argsend, 16);
+		if unlikely(argsend != endptr)
+			ERROR(err_syntax);
+		h = GDBFs_LookupHandle((fd_t)fd);
+		if unlikely(!h)
+			goto err_BADF;
+#ifndef NDEBUG
+		memset(&st, 0xcc, sizeof(st));
+#endif /* !NDEBUG */
+		TRY {
+			handle_stat(*h, &st);
+		} EXCEPT {
+			o = GDBFs_EncodeCurrentError(o);
+			goto do_transmit;
+		}
+		/* Construct GDB's `stat' type. */
+		gst.st_dev     = (gdb_uint_t)st.st_dev;
+		gst.st_ino     = (gdb_uint_t)st.st_ino;
+		gst.st_mode    = (gdb_mode_t)st.st_mode;
+		gst.st_nlink   = (gdb_uint_t)st.st_nlink;
+		gst.st_uid     = (gdb_uint_t)st.st_uid;
+		gst.st_gid     = (gdb_uint_t)st.st_gid;
+		gst.st_rdev    = (gdb_uint_t)st.st_rdev;
+		gst.st_size    = (gdb_ulong_t)st.st_size;
+		gst.st_blksize = (gdb_ulong_t)st.st_blksize;
+		gst.st_blocks  = (gdb_ulong_t)st.st_blocks;
+		gst.st_atime   = (gdb_time_t)st.st_atime;
+		gst.st_mtime   = (gdb_time_t)st.st_mtime;
+		gst.st_ctime   = (gdb_time_t)st.st_ctime;
+		GDB_DEBUG("[gdb] gst.st_size = %#I64x\n", gst.st_size);
+
+		o += sprintf(o, "F%Ix;", sizeof(gst));
+		o = GDB_EncodeEscapedBinary(o, &gst, sizeof(gst));
+	} else if (strcmp(command, "unlink") == 0) {
+		gdb_errno_t error;
+		char *filename;
+		filename = args;
+		args = GDB_DecodeHexInplaceString(args);
+		if unlikely(args != endptr)
+			ERROR(err_syntax);
+		error = GDBFs_Unlink(filename);
+		if likely(error == 0)
+			goto return_zero;
+		o = GDBFs_EncodeErrno(o, error);
+	} else if (strcmp(command, "readlink") == 0) {
+		char *linktext, *filename;
+		size_t buflen;
+		gdb_errno_t error;
+		filename = args;
+		args = GDB_DecodeHexInplaceString(args);
+		if unlikely(args != endptr)
+			ERROR(err_syntax);
+		linktext = o + 4;
+		buflen   = CONFIG_GDBSERVER_PACKET_MAXLEN - 4;
+		error    = GDBFs_Readlink(filename, linktext, &buflen);
+		if unlikely(error != 0) {
+			o = GDBFs_EncodeErrno(o, error);
+			goto do_transmit;
+		}
+		*o++ = 'F';
+		if likely(buflen >= 0x10 && buflen <= 0xff) {
+			*o++ = GDB_ToHex((buflen & 0xf0) >> 4);
+			*o++ = GDB_ToHex(buflen & 0xf);
+			*o++ = ';';
+		} else if (buflen <= 0xf) {
+			*o++ = GDB_ToHex(buflen & 0xf);
+			*o++ = ';';
+			memmovedown(linktext, o, buflen, sizeof(char));
+			linktext = o;
+		} else {
+			char temp[PACKETLEN_MAX_HEXLEN + 1];
+			size_t lenlen;
+			lenlen = sprintf(temp, "%Ix", buflen);
+			assert(lenlen >= 3);
+			if (buflen >= CONFIG_GDBSERVER_PACKET_MAXLEN - 4) {
+				char temp2[PACKETLEN_MAX_HEXLEN + 1];
+				size_t lenlen2;
+				buflen -= lenlen - 2;
+				lenlen2 = sprintf(temp2, "%Ix", buflen);
+				assert(lenlen2 <= lenlen);
+				memcpy(mempset(temp, '0', lenlen - lenlen2), temp2, lenlen2);
+				lenlen = lenlen2;
+			}
+			assert(lenlen >= 3);
+			memmoveup(linktext, linktext + lenlen - 2, buflen, sizeof(char));
+			linktext += lenlen - 2;
+			o = (char *)mempcpy(o, temp, lenlen, sizeof(char));
+			*o++ = ';';
+			assert(o == linktext);
+		}
+		o = linktext + buflen;
+	} else {
+		printk(KERN_WARNING "[gdb] Unknown vFile-command: \"vFile:%#q:%#q\"\n",
+		       command, args);
+	}
+do_transmit:
+	if (!GDBPacket_Transmit(o))
+		return GDB_HANDLECOMMAND_DTCH;
+	return GDB_HANDLECOMMAND_CONT;
+err_syntax:
+	printk(KERN_ERR "[gdb] Syntax error in vFile-command: \"vFile:%#q:%#q\"\n",
+	       command, args);
+err_EINVAL:
+	o = GDBFs_EncodeErrno(o, GDB_EINVAL);
+	goto do_transmit;
+err_BADF:
+	o = GDBFs_EncodeErrno(o, GDB_EBADF);
+	goto do_transmit;
+}
+
+
+
+
 /* Handle a received GDB command
  * @return: * : One of `GDB_HANDLECOMMAND_*' */
 PRIVATE unsigned int
@@ -1263,7 +1661,8 @@ handle_set_register_error:
 		nameEnd = i;
 		for (;;) {
 			char ch = *nameEnd;
-			if (ch == ';' || ch == '?' || (!ch && nameEnd == endptr))
+			if (ch == ';' || ch == '?' ||
+			    ch == ':' || (!ch && nameEnd == endptr))
 				break;
 			++nameEnd;
 		}
@@ -1425,6 +1824,17 @@ done_vCont:
 			/* Make sure that full-stop mode has been activated. */
 			GDBThread_StopAllCpus();
 			goto send_ok;
+		} else if (ISNAME("File") && *nameEnd == ':') {
+			char *cmdend;
+			if unlikely(nameEnd == endptr)
+				ERROR(err_syntax);
+			++nameEnd;
+			cmdend = strchr(nameEnd, ':');
+			if unlikely(!cmdend)
+				ERROR(err_syntax);
+			*cmdend = 0;
+			++cmdend;
+			return GDBFs_HandleCommand(nameEnd, cmdend, endptr);
 		} else if (ISNAME("Kill") && *nameEnd == ';') {
 			intptr_t pid;
 			pid = strtos(nameEnd + 1, &nameEnd, 16);
