@@ -40,9 +40,9 @@ __DECL_BEGIN
 #define MOUSE_PACKET_TYPE_BUTTON  0x2 /* A mouse button was pressed/released */
 #define MOUSE_PACKET_TYPE_VSCROLL 0x3 /* The vertical scroll-wheel was moved */
 #define MOUSE_PACKET_TYPE_HSCROLL 0x4 /* The horizontal scroll-wheel was moved */
-#define MOUSE_PACKET_TYPE_MOVED   0x8 /* The mouse's absolute position has changed (only generated if abs-packets are enabled).
+#define MOUSE_PACKET_TYPE_MOVED   0x9 /* The mouse's absolute position has changed (only generated if abs-packets are enabled).
                                        * When abs-packets are disabled, `MOUSE_PACKET_TYPE_MOTION' is generated instead. */
-#define MOUSE_PACKET_TYPE_IS4FIELD(x) ((x) & 8) /* The packet has 4 6-bit signed integer fields. */
+#define MOUSE_PACKET_TYPE_IS4FIELD(x) ((x) & 8) /* The packet has 4 6-bit signed integer fields. (else: 2 12-bit signed integer fields) */
 
 #define MOUSE_PACKET_SEQMAX  6 /* Limit on the number of packets apart of the same sequence.
                                 * Calculated as: X = 6 FOR X in 12*X >= 64 && 6*X >= 32 */
@@ -172,12 +172,12 @@ mouse_packet_sequence(mouse_packet_sequence_data_t *__restrict data,
 		seqnum *= 6;
 		if (first_packet) {
 			unsigned shift = 32 - seqnum;
-#define SIGN_EXTEND(x) (((__int32_t)((__uint32_t)(x) << (32-6))) >> shift)
-			data->psd_data32[0] = SIGN_EXTEND(packet->mp_data.md_moved.mm_posx);
-			data->psd_data32[1] = SIGN_EXTEND(packet->mp_data.md_moved.mm_posy);
-			data->psd_data32[2] = SIGN_EXTEND(packet->mp_data.md_moved.mm_relx);
-			data->psd_data32[3] = SIGN_EXTEND(packet->mp_data.md_moved.mm_rely);
-#undef SIGN_EXTEND
+#define __PRIVATE_SIGN_EXTEND(x) (((__int32_t)((__uint32_t)(x) << (32 - 6))) >> shift)
+			data->psd_data32[0] = __PRIVATE_SIGN_EXTEND(packet->mp_data.md_moved.mm_posx);
+			data->psd_data32[1] = __PRIVATE_SIGN_EXTEND(packet->mp_data.md_moved.mm_posy);
+			data->psd_data32[2] = __PRIVATE_SIGN_EXTEND(packet->mp_data.md_moved.mm_relx);
+			data->psd_data32[3] = __PRIVATE_SIGN_EXTEND(packet->mp_data.md_moved.mm_rely);
+#undef __PRIVATE_SIGN_EXTEND
 		} else {
 			data->psd_data32[0] |= (__int32_t)((__uint32_t)packet->mp_data.md_moved.mm_posx << seqnum);
 			data->psd_data32[1] |= (__int32_t)((__uint32_t)packet->mp_data.md_moved.mm_posy << seqnum);
@@ -188,10 +188,10 @@ mouse_packet_sequence(mouse_packet_sequence_data_t *__restrict data,
 		seqnum *= 12;
 		if (first_packet) {
 			unsigned shift = 64 - seqnum;
-#define SIGN_EXTEND(x) (((__int64_t)((__uint64_t)(x) << (32-6))) >> shift)
-			data->psd_data64[0] = SIGN_EXTEND(packet->mp_data.md_motion.mm_relx);
-			data->psd_data64[1] = SIGN_EXTEND(packet->mp_data.md_motion.mm_rely);
-#undef SIGN_EXTEND
+#define __PRIVATE_SIGN_EXTEND(x) (((__int64_t)((__uint64_t)(x) << (32 - 6))) >> shift)
+			data->psd_data64[0] = __PRIVATE_SIGN_EXTEND(packet->mp_data.md_motion.mm_relx);
+			data->psd_data64[1] = __PRIVATE_SIGN_EXTEND(packet->mp_data.md_motion.mm_rely);
+#undef __PRIVATE_SIGN_EXTEND
 		} else {
 			data->psd_data64[0] |= (__int64_t)((__uint64_t)packet->mp_data.md_motion.mm_relx << seqnum);
 			data->psd_data64[1] |= (__int64_t)((__uint64_t)packet->mp_data.md_motion.mm_rely << seqnum);
@@ -211,20 +211,22 @@ struct mouse_fake_motion {
 	__int32_t mfm_relx; /* Relative movement in X */
 	__int32_t mfm_rely; /* Relative movement in Y */
 };
+
 struct mouse_position {
 	__int32_t mp_absx; /* Absolute position in X */
 	__int32_t mp_absy; /* Absolute position in Y */
 };
+
 struct mouse_fake_button {
 	/* Set pressed mouse buttons:
-	 * >> mfb_old_buttons = BUTTONS;
+	 * >> mfb_old_buttons = HW_BUTTONS;
 	 * >> mfb_new_buttons = ((mfb_old_buttons & mfb_mask) | mfb_flag) ^ mfb_xflg;
-	 * >> BUTTONS = mfb_new_buttons; */
-	__uint32_t mfb_mask;
-	__uint32_t mfb_flag;
-	__uint32_t mfb_xflg;
-	__uint32_t mfb_old_buttons;
-	__uint32_t mfb_new_buttons;
+	 * >> HW_BUTTONS = mfb_new_buttons; */
+	__uint32_t mfb_mask;        /* [IN] Mask of mouse buttons who's state should be kept */
+	__uint32_t mfb_flag;        /* [IN] Set of mouse buttons that should become pressed */
+	__uint32_t mfb_xflg;        /* [IN] Set of mouse buttons who should change state */
+	__uint32_t mfb_old_buttons; /* [OUT] The set of mouse buttons pressed prior to the call */
+	__uint32_t mfb_new_buttons; /* [OUT] The set of mouse buttons pressed following the call */
 };
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -250,15 +252,15 @@ struct mouse_fake_button {
 #define MOUSEIO_GETABSRECT      _IOR_KOS('M', 0x01, struct mouse_rect) /* Get clip rectangle for absolute mouse mode. */
 #define MOUSEIO_SETABSRECT      _IOW_KOS('M', 0x01, struct mouse_rect) /* Set clip rectangle for absolute mouse mode. */
 /* Inject fake inputs. */
-#define MOUSEIO_PUTMOTION       _IOW_KOS('M', 0x02, struct mouse_fake_motion) /* Inject relative-motion inputs. (return=-EAGAIN: Buffer was full) */
+#define MOUSEIO_PUTMOTION       _IOW_KOS('M', 0x02, struct mouse_fake_motion) /* Inject relative-motion inputs. (errno=EAGAIN: Buffer was full) */
 #define MOUSEIO_GETPOS          _IOR_KOS('M', 0x03, struct mouse_position) /* Return the current, absolute mouse position */
-#define MOUSEIO_SETPOS          _IOW_KOS('M', 0x03, struct mouse_position) /* Inject move-to inputs. (return=-EAGAIN: Buffer was full) */
+#define MOUSEIO_SETPOS          _IOW_KOS('M', 0x03, struct mouse_position) /* Inject move-to inputs. (errno=EAGAIN: Buffer was full) */
 #define MOUSEIO_PUTMOVETO       MOUSEIO_SETPOS
 #define MOUSEIO_GETBUTTONS      _IOR_KOS('M', 0x04, __uint32_t) /* Get the set of currently pressed buttons. */
 #define MOUSEIO_SETBUTTONS      _IOW_KOS('M', 0x04, __uint32_t) /* Set the set of currently pressed buttons. */
-#define MOUSEIO_PUTBUTTON       _IOW_KOS('M', 0x04, struct mouse_fake_button) /* Inject button inputs. (return=-EAGAIN: Buffer was full) */
-#define MOUSEIO_PUTVWHEEL       _IOW_KOS('M', 0x05, __int32_t) /* Inject vertical wheel inputs. (return=-EAGAIN: Buffer was full) */
-#define MOUSEIO_PUTHWHEEL       _IOW_KOS('M', 0x06, __int32_t) /* Inject horizontal wheel inputs. (return=-EAGAIN: Buffer was full) */
+#define MOUSEIO_PUTBUTTON       _IOW_KOS('M', 0x04, struct mouse_fake_button) /* Inject button inputs. (errno=EAGAIN: Buffer was full) */
+#define MOUSEIO_PUTVWHEEL       _IOW_KOS('M', 0x05, __int32_t) /* Inject vertical wheel inputs. (errno=EAGAIN: Buffer was full) */
+#define MOUSEIO_PUTHWHEEL       _IOW_KOS('M', 0x06, __int32_t) /* Inject horizontal wheel inputs. (errno=EAGAIN: Buffer was full) */
 #define MOUSEIO_FLUSHPENDING     _IO_KOS('M', 0x07) /* Clear the buffer of pending mouse packets */
 
 

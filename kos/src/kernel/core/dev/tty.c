@@ -439,7 +439,8 @@ DEFINE_SYSCALL4(fd_t, mktty,
 	if unlikely(namelen >= COMPILER_LENOF(((struct character_device *)0)->cd_name)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME,
-		      name);
+		      namelen,
+		      COMPILER_LENOF(((struct character_device *)0)->cd_name));
 	}
 	hkeyboard = handle_lookup((unsigned int)keyboard);
 	TRY {

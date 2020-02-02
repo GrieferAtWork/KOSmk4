@@ -596,13 +596,13 @@ NOTHROW(KCALL get_control_key)(u8 ch) {
  * same character) (e.g. `\3' for CTRL+C)
  * NOTE: KOS also provides for windows-style CTRL+ALT key modifiers, allowing
  *       e.g. `@' to be written on a European keyboard by pressing CTRL+ALT+Q,
- *       instead of forcing the user to press RIGHT_ALT+Q (since some people (me ;))
+ *       instead of forcing the user to press RIGHT_ALT+Q (since some people (me ;P)
  *       are using such a keyboard if you couldn't have already guessed by the
  *       presence of a de_DE layout preset)
  *       Because of this, certain key combinations are ambiguous, such as
  *       the aforementioned CTRL+ALT+Q.
  *       In these cases, we first try to decode the key through use of the
- *       keymap program, before 
+ *       keymap program, before doing UNIX ascii escape sequencing.
  */
 PRIVATE NOBLOCK size_t
 NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict self,
@@ -613,7 +613,6 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 	result = keymap_translate_buf(&self->kd_map, key, mod, self->kd_map_pend,
 	                              COMPILER_LENOF(self->kd_map_pend));
 	if (!result) {
-
 		/* No layout-specific mapping given for this key.
 		 * Check for special mappings of CONTROL character, as well as
 		 * other special keys that should produce escape sequences. */
@@ -624,7 +623,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 		/* CTRL+ALT+Y -- 0x1b 0x19 */
 		if (KEYMOD_ISCTRL_ALT(mod & ~(KEYMOD_SHIFT))) {
 			result = keymap_translate_buf(&self->kd_map, key,
-			                              mod & ~(KEYMOD_CTRL|KEYMOD_ALT),
+			                              mod & ~(KEYMOD_CTRL | KEYMOD_ALT),
 			                              (char *)&ch, 1);
 			if (result != 1) {
 				if (result == 0)
@@ -660,7 +659,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 		}
 		if (KEYMOD_ISALT(mod & ~(KEYMOD_SHIFT))) {
 			result = keymap_translate_buf(&self->kd_map, key,
-			                              mod & ~(KEYMOD_CTRL|KEYMOD_ALT),
+			                              mod & ~(KEYMOD_CTRL | KEYMOD_ALT),
 			                              &self->kd_map_pend[1],
 			                              COMPILER_LENOF(self->kd_map_pend) - 1);
 			if (result == 0)
@@ -673,7 +672,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
 			goto done;
 		}
 check_misc_key:
-		if (KEYMOD_HASALT(mod & ~(KEYMOD_SHIFT))) {
+		if (KEYMOD_HASALT(mod)) {
 			result = keyboard_device_do_misc_repr(key, mod, &self->kd_map_pend[1]);
 			if (result) {
 				/* Prefix with 0x1b (ESC; aka. `\e') */

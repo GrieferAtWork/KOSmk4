@@ -391,7 +391,8 @@ NOTHROW(KCALL mouse_device_do_motion_nopr_locked)(struct mouse_device *__restric
 	bool result;
 	s32 new_absx, new_absy;
 	if (OVERFLOW_SADD(self->md_state.ms_abs_x, relx, &new_absx)) {
-		new_absx = relx < 0 ? self->md_rect.mr_minx : self->md_rect.mr_maxx;
+		new_absx = relx < 0 ? self->md_rect.mr_minx
+		                    : self->md_rect.mr_maxx;
 	} else {
 		if (new_absx < self->md_rect.mr_minx)
 			new_absx = self->md_rect.mr_minx;
@@ -399,7 +400,8 @@ NOTHROW(KCALL mouse_device_do_motion_nopr_locked)(struct mouse_device *__restric
 			new_absx = self->md_rect.mr_maxx;
 	}
 	if (OVERFLOW_SADD(self->md_state.ms_abs_y, rely, &new_absy)) {
-		new_absy = rely < 0 ? self->md_rect.mr_miny : self->md_rect.mr_maxy;
+		new_absy = rely < 0 ? self->md_rect.mr_miny
+		                    : self->md_rect.mr_maxy;
 	} else {
 		if (new_absy < self->md_rect.mr_miny)
 			new_absy = self->md_rect.mr_miny;
@@ -875,9 +877,10 @@ mouse_device_ioctl(struct character_device *__restrict self,
 		            new_rect.mr_miny > new_rect.mr_maxy ||
 		            new_rect.mr_minx + INT32_MAX < new_rect.mr_maxx ||
 		            new_rect.mr_miny + INT32_MAX < new_rect.mr_maxy) {
-			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSEIO_SETABSRECT_BADBOUNDS,
-			      arg);
+			      new_rect.mr_minx, new_rect.mr_miny,
+			      new_rect.mr_maxx, new_rect.mr_maxy);
 		}
 		for (;;) {
 			was = PREEMPTION_PUSHOFF();
