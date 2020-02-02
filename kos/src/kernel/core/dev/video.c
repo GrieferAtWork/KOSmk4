@@ -29,7 +29,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/except.h>
 #include <kos/ioctl/video.h>
 #include <linux/kd.h>

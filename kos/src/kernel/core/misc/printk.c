@@ -29,7 +29,7 @@
 #include <kernel/syslog.h>
 #include <kernel/user.h>
 
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 
 #include <format-printer.h>
 #include <stdarg.h>

@@ -48,7 +48,7 @@
 #include <bits/siginfo.h>
 #include <bits/timespec.h>
 #include <compat/config.h>
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/hop.h>
 #include <sys/poll.h>
 #include <sys/stat.h>

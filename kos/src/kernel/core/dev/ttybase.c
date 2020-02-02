@@ -37,8 +37,8 @@
 #include <hybrid/atomic.h>
 
 #include <asm/ioctls.h>
-#include <kos/except-inval.h>
-#include <kos/except-io.h>
+#include <kos/except/inval.h>
+#include <kos/except/io.h>
 #include <linux/termios.h> /* struct termiox */
 #include <sys/stat.h>
 #include <sys/types.h> /* loff_t */

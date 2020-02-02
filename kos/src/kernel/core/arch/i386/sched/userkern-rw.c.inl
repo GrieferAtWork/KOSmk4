@@ -39,7 +39,7 @@
 #include <asm/cpu-flags.h>
 #include <asm/registers.h>
 #include <kos/bits/ukern-struct.h>
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state-verify.h>

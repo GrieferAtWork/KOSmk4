@@ -37,8 +37,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
-#include <kos/except-fs.h>
-#include <kos/except-inval.h>
+#include <kos/except/fs.h>
+#include <kos/except/inval.h>
 #include <kos/hop.h>
 
 #include <assert.h>

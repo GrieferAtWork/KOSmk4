@@ -49,7 +49,7 @@
 #include <bits/statfs.h>
 #include <compat/config.h>
 #include <kos/debugtrap.h>
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/kernel/handle.h>
 #include <sys/mount.h>
 #include <sys/statfs.h>

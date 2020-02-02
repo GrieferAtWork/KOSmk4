@@ -46,7 +46,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <kos/except-io.h>
+#include <kos/except/io.h>
 #include <kos/io/uhci.h>
 #include <kos/io/usb.h>
 

@@ -30,7 +30,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/limitcore.h>
 
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/types.h>
 
 #include <format-printer.h>

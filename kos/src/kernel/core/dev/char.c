@@ -47,8 +47,8 @@
 #include <hybrid/atomic.h>
 
 #include <kos/dev.h>
-#include <kos/except-fs.h>
-#include <kos/except-inval.h>
+#include <kos/except/fs.h>
+#include <kos/except/inval.h>
 #include <sys/stat.h>
 #include <sys/types.h> /* loff_t */
 

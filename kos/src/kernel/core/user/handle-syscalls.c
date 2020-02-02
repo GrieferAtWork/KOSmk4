@@ -42,8 +42,8 @@
 #include <hybrid/atomic.h>
 
 #include <bits/iovec-struct.h> /* struct iovec */
-#include <kos/except-fs.h>
-#include <kos/except-inval.h>
+#include <kos/except/fs.h>
+#include <kos/except/inval.h>
 #include <kos/hop.h>
 #include <kos/io.h>
 #include <linux/fs.h> /* General purpose ioctl()s */

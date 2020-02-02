@@ -34,7 +34,7 @@
 
 #include <hybrid/host.h>
 
-#include <kos/except-noexec.h>
+#include <kos/except/noexec.h>
 #include <kos/exec/asm/elf32.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>

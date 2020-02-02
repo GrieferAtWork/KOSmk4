@@ -29,8 +29,8 @@
 #include <kernel/types.h>
 #include <kernel/vm.h>
 
-#include <kos/except-fs.h>
-#include <kos/except-inval.h>
+#include <kos/except/fs.h>
+#include <kos/except/inval.h>
 #include <kos/kernel/handle.h>
 
 #include <assert.h>

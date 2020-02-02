@@ -35,7 +35,7 @@
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/io.h>
 #include <sys/eventfd.h>
 

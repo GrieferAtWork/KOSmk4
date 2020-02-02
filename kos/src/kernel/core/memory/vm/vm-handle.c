@@ -30,7 +30,7 @@
 #include <kernel/user.h>
 #include <kernel/vm.h>
 
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/hop.h>
 
 #include <assert.h>

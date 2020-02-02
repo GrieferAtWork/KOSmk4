@@ -443,11 +443,11 @@ incdir("", "../../include");
 #include <kos/bits/ukern.h>
 #include <kos/debugtrap.h>
 #include <kos/dev.h>
-#include <kos/except-fs.h>
+#include <kos/except/fs.h>
 #include <kos/except-handler.h>
-#include <kos/except-inval.h>
-#include <kos/except-io.h>
-#include <kos/except-noexec.h>
+#include <kos/except/inval.h>
+#include <kos/except/io.h>
+#include <kos/except/noexec.h>
 #include <kos/except.h>
 #include <kos/exec/asm/rtld.h>
 #include <kos/exec/asm/elf.h>

@@ -54,9 +54,9 @@
 
 #include <bits/confname.h>
 #include <bits/dirent.h>
-#include <kos/except-fs.h>
-#include <kos/except-inval.h>
-#include <kos/except-io.h>
+#include <kos/except/fs.h>
+#include <kos/except/inval.h>
+#include <kos/except/io.h>
 #include <linux/limits.h>
 #include <sys/stat.h>
 #include <sys/statfs.h>

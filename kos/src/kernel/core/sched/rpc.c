@@ -43,7 +43,7 @@
 #include <hybrid/atomic.h>
 
 #include <compat/config.h>
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <sys/wait.h>
 
 #include <alloca.h>

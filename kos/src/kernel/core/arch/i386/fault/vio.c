@@ -50,7 +50,7 @@ opt.append("-Os");
 #include <asm/intrin-arith.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>

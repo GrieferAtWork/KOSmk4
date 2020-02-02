@@ -29,7 +29,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 
 #include <format-printer.h>
 #include <stdio.h>

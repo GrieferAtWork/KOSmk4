@@ -51,7 +51,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/debugtrap.h>
-#include <kos/except-noexec.h>
+#include <kos/except/noexec.h>
 #include <kos/exec/elf.h> /* ELF_ARCH_USESRELA */
 #include <kos/exec/elf-rel.h> /* ELF_ARCH_*_R_* */
 

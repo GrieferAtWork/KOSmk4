@@ -26,7 +26,7 @@
 #include <fs/node.h>
 #include <kernel/driver.h>
 
-#include <kos/except-io.h>
+#include <kos/except/io.h>
 #include <sys/stat.h>
 
 #include <assert.h>

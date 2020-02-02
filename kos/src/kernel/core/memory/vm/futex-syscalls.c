@@ -38,7 +38,7 @@
 
 #include <bits/timespec.h>
 #include <compat/config.h>
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/futex.h>
 #include <kos/futexexpr.h>
 #include <kos/futexlock.h>

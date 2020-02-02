@@ -35,7 +35,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <sys/poll.h>
 #include <sys/signalfd.h>
 

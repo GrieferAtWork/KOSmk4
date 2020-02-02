@@ -34,7 +34,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/hop.h>
 #include <kos/io.h>
 #include <sys/mount.h>

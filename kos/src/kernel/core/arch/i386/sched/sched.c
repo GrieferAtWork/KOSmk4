@@ -44,7 +44,7 @@
 
 #include <asm/cpu-flags.h>
 #include <kos/compat/linux-ldt.h>
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <sys/io.h>

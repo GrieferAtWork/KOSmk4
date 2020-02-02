@@ -27,7 +27,7 @@
 #include <asm/registers.h>
 #include <bits/types.h>
 #include <kos/anno.h>
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/except.h>
 #include <kos/kernel/gdt.h>
 

@@ -45,7 +45,7 @@
 #include <asm/registers.h>
 #include <bits/siginfo-convert.h>  /* siginfo64_to_siginfo32 */
 #include <bits/siginfo-struct32.h> /* siginfo32_t */
-#include <kos/except-inval.h>
+#include <kos/except/inval.h>
 #include <kos/kernel/cpu-state-verify.h> /* cpustate_verify_user...() */
 #include <kos/kernel/cpu-state.h>        /* icpustate */
 #include <kos/kernel/cpu-state32.h>      /* ucpustate32 */
