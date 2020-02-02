@@ -1003,8 +1003,8 @@ again:
 			                              (node->m_tree.a_vmax - node->m_tree.a_vmin) + 1);
 		} else {
 			result += mall_reachable_data((byte_t *)(node->m_tree.a_vmin + CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE),
-			                              (node->m_tree.a_vmax - node->m_tree.a_vmin) -
-			                              ((CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE) - 1));
+			                              ((node->m_tree.a_vmax - node->m_tree.a_vmin) + 1) -
+			                              (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE));
 		}
 		node->m_visit = mall_leak_version;
 	}
@@ -1138,6 +1138,17 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 		for (; iter; iter = iter->cp_ctrl.cpc_prev)
 			mall_reachable_data((byte_t *)iter->cp_parts, sizeof(iter->cp_parts));
 	}
+
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+	/* TODO: Data of any slab pointer that was reached must be scanned
+	 *       recursively alongside for memory leaks. Finally, any slab
+	 *       pointer that wasn't reached should also be considered a
+	 *       memory leak!
+	 * -> Otherwise, heap-pointer stored in slab-allocated memory blocks
+	 *    would not be reachable and would be considered as memory leaks...
+	 */
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Recursively scan reached pointers\n");
 	if (mall_tree) {

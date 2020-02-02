@@ -59,6 +59,8 @@ DECL_BEGIN
 
 #define FAT_ISSPACE(c)  (isspace(c) || iscntrl(c)/* || isblank(c)*/)
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL Fat_FinalizeNode)(struct inode *__restrict self);
 
 /* The fat get/set implementation for different table sizes. */
 PRIVATE WUNUSED ATTR_PURE NONNULL((1)) FatClusterIndex KCALL Fat12_GetFatIndirection(FatSuperblock const *__restrict self, FatClusterIndex index);
@@ -78,7 +80,15 @@ INTDEF struct inode_type Fat16_RootDirectoryDirectoryEntryNodeOperators;
 INTDEF struct inode_type Fat16_RootDirectoryNodeOperators;
 INTDEF struct inode_type Fat32_RootDirectoryNodeOperators;
 
-
+/* Assert that `node->i_fsdata' is in a consistent state */
+#if 1
+#define VERIFY_INODE_FSDATA(node) (void)0
+#else
+#define VERIFY_INODE_FSDATA(node)                                   \
+	assert((node) == (node)->i_super                                \
+	       ? (node)->i_fsdata == &((FatSuperblock *)(node))->f_root \
+	       : kmalloc_usable_size((node)->i_fsdata) >= sizeof(FatNode))
+#endif
 
 
 
@@ -239,7 +249,8 @@ Fat16_VReadFromRootDirectory(FatSuperblock *__restrict self,
 	size_t max_read;
 	assert(self->i_super == self);
 	assert(self->f_type != FAT32);
-	max_read = self->i_fsdata->i16_root.f16_rootsiz;
+	assert(self->i_fsdata == &self->f_root);
+	max_read = self->f_root.i16_root.f16_rootsiz;
 	if (pos >= (pos_t)max_read) {
 		memset(buf, 0, bufsize);
 		return;
@@ -254,7 +265,7 @@ Fat16_VReadFromRootDirectory(FatSuperblock *__restrict self,
 	block_device_read(self->s_device,
 	                  buf,
 	                  max_read,
-	                  self->i_fsdata->i16_root.f16_rootpos + pos);
+	                  self->f_root.i16_root.f16_rootpos + pos);
 }
 
 INTERN NONNULL((1)) size_t KCALL
@@ -264,7 +275,8 @@ Fat16_VTryReadFromRootDirectory(FatSuperblock *__restrict self,
 	size_t max_read;
 	assert(self->i_super == self);
 	assert(self->f_type != FAT32);
-	max_read = self->i_fsdata->i16_root.f16_rootsiz;
+	assert(self->i_fsdata == &self->f_root);
+	max_read = self->f_root.i16_root.f16_rootsiz;
 	if (pos >= (pos_t)max_read)
 		return 0;
 	max_read -= (size_t)pos;
@@ -274,7 +286,7 @@ Fat16_VTryReadFromRootDirectory(FatSuperblock *__restrict self,
 	block_device_read(self->s_device,
 	                  buf,
 	                  max_read,
-	                  self->i_fsdata->i16_root.f16_rootpos + pos);
+	                  self->f_root.i16_root.f16_rootpos + pos);
 	return max_read;
 }
 
@@ -285,7 +297,8 @@ Fat16_VWriteToRootDirectory(FatSuperblock *__restrict self,
 	size_t max_write;
 	assert(self->i_super == self);
 	assert(self->f_type != FAT32);
-	max_write = self->i_fsdata->i16_root.f16_rootsiz;
+	assert(self->i_fsdata == &self->f_root);
+	max_write = self->f_root.i16_root.f16_rootsiz;
 	if (pos >= (pos_t)max_write)
 		goto too_large;
 	max_write -= (size_t)pos;
@@ -295,7 +308,7 @@ Fat16_VWriteToRootDirectory(FatSuperblock *__restrict self,
 	block_device_write(self->i_super->s_device,
 	                   buf,
 	                   bufsize,
-	                   self->i_fsdata->i16_root.f16_rootpos + pos);
+	                   self->f_root.i16_root.f16_rootpos + pos);
 	return;
 too_large:
 	THROW(E_FSERROR_DISK_FULL);
@@ -357,6 +370,7 @@ Fat_GetAbsDiskPos(struct inode *__restrict self, pos_t pos) {
 		diskpos += cluster_offset;
 		return diskpos;
 	}
+	VERIFY_INODE_FSDATA(self);
 	pos += self->i_fsdata->i16_root.f16_rootpos;
 	return pos;
 }
@@ -367,9 +381,11 @@ preallocate_cluster_vector_entries(struct inode *__restrict node,
                                    FatSuperblock *__restrict fat,
                                    size_t min_num_clusters) {
 	size_t new_alloc;
+	VERIFY_INODE_FSDATA(node);
 	assert(data == node->i_fsdata);
 	assert(fat == (FatSuperblock *)node->i_super);
 	assert(min_num_clusters >= data->i_clusterc);
+	assert(node->i_type && node->i_type->it_fini == &Fat_FinalizeNode);
 	new_alloc = CEILDIV((size_t)node->i_filesize, fat->f_clustersize);
 	if (new_alloc < min_num_clusters)
 		new_alloc = min_num_clusters;
@@ -418,6 +434,7 @@ Fat_GetFileCluster(struct inode *__restrict node,
 	FatNode *data;
 	FatSuperblock *fat;
 	assert(sync_reading(node));
+	VERIFY_INODE_FSDATA(node);
 	data = node->i_fsdata;
 	fat  = (FatSuperblock *)node->i_super;
 	if unlikely(!data->i_clusterc) {
@@ -910,6 +927,7 @@ dos_8dot3:
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL Fat_FinalizeNode)(struct inode *__restrict self) {
+	VERIFY_INODE_FSDATA(self);
 	if (self->i_fsdata) {
 		kfree(self->i_fsdata->i_directory.i_freev);
 		kfree(self->i_fsdata->i_clusterv);
@@ -1040,8 +1058,11 @@ PRIVATE NONNULL((1)) void
 PRIVATE NONNULL((1, 2)) void KCALL
 Fat_LoadINodeFromFatFile(struct inode *__restrict self,
                          FatFile const *__restrict file) {
-	FatNode *data        = self->i_fsdata;
-	FatSuperblock *super = (FatSuperblock *)self->i_super;
+	FatNode *data;
+	FatSuperblock *super;
+	VERIFY_INODE_FSDATA(self);
+	data  = self->i_fsdata;
+	super = (FatSuperblock *)self->i_super;
 	/* file --> self */
 	assert((data->i_clusterv != NULL) ==
 	       (data->i_clustera != 0));
@@ -1119,9 +1140,12 @@ Fat_LoadINodeFromFatFile(struct inode *__restrict self,
 PRIVATE NONNULL((1, 2)) void KCALL
 Fat_SaveINodeToFatFile(struct inode const *__restrict self,
                        FatFile *__restrict file) {
-	FatSuperblock *super = (FatSuperblock *)self->i_super;
-	FatNode *data = self->i_fsdata;
+	FatSuperblock *super;
+	FatNode *data;
 	u32 cluster;
+	VERIFY_INODE_FSDATA(self);
+	super = (FatSuperblock *)self->i_super;
+	data  = self->i_fsdata;
 	/* self --> file */
 	assert((data->i_clusterv != NULL) ==
 	       (data->i_clustera != 0));
@@ -1263,6 +1287,7 @@ PRIVATE NONNULL((1)) syscall_slong_t KCALL
 Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
           USER UNCHECKED void *arg, iomode_t mode)
 		THROWS(...) {
+	VERIFY_INODE_FSDATA(self);
 	(void)mode;
 	switch (cmd) {
 
@@ -1313,9 +1338,12 @@ Fat_Ioctl(struct inode *__restrict self, syscall_ulong_t cmd,
 PRIVATE NONNULL((1)) void KCALL
 Fat_DoTruncateINode(struct inode *__restrict self,
                     size_t new_cluster_count) {
-	FatNode *node      = self->i_fsdata;
-	FatSuperblock *fat = (FatSuperblock *)self->i_super;
+	FatNode *node;
+	FatSuperblock *fat;
 	FatClusterIndex delete_start;
+	VERIFY_INODE_FSDATA(self);
+	node = self->i_fsdata;
+	fat  = (FatSuperblock *)self->i_super;
 	delete_start = Fat_GetFileCluster(self, new_cluster_count,
 	                                  FAT_GETCLUSTER_MODE_FNORMAL);
 	if (delete_start >= fat->f_cluster_eof)
@@ -1754,6 +1782,7 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 	pos_t target_position;
 	u32 file_count = COMPILER_LENOF(buffer);
 	bool is_directory_end;
+	VERIFY_INODE_FSDATA(new_node);
 	files = Fat_GenerateFileEntriesAuto(target_directory,
 	                                    buffer,
 	                                    &file_count,
@@ -1826,6 +1855,7 @@ Fat_CreateFileInDirectory(struct directory_node *__restrict target_directory,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
 	struct inode_data *node;
+	VERIFY_INODE_FSDATA((struct inode *)new_node);
 	new_node->i_type = &Fat_FileNodeOperators;
 	if (target_directory == target_directory->i_super &&
 	    ((FatSuperblock *)target_directory)->f_type != FAT32)
@@ -1877,6 +1907,7 @@ Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_director
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
 	struct inode_data *node;
+	VERIFY_INODE_FSDATA((struct inode *)new_node);
 	new_node->i_type = &Fat_DirectoryNodeOperators;
 	if (target_directory == target_directory->i_super &&
 	    ((FatSuperblock *)target_directory)->f_type != FAT32)
@@ -2604,8 +2635,7 @@ Fat_OpenINode(FatSuperblock *__restrict self,
 	}
 
 	node->i_filenlink = (nlink_t)1;
-	node->i_fsdata = (FatNode *)kmalloc(sizeof(FatNode),
-	                                    FS_GFP | GFP_CALLOC);
+	node->i_fsdata = (FatNode *)kmalloc(sizeof(FatNode), FS_GFP | GFP_CALLOC);
 	if (self == parent_directory && self->f_type != FAT32) {
 		/* FAT-16 root directory entries have special operators. */
 		if ((node->i_filemode & S_IFMT) == S_IFREG) {

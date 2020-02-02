@@ -160,11 +160,7 @@ NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
 	 GFP_PREFLT |                                                               \
 	 GFP_VCBASE | /* Instruct the heap to only consider allocating from VCbase, \
 	               * thus preventing an infinite loop. */                       \
-	 GFP_NOOVER   /* Don't overallocate to prevent infinite recursion!          \
-	               * -> This flag guaranties that upon recursion, at most 1     \
-	               *    page will get allocated, in which case the              \
-	               *   `block0_size >= num_pages' check above will be           \
-	               *   `1 >= 1', meaning we'll never get here! */               \
+	 GFP_NOOVER   /* Don't overallocate to prevent infinite recursion! */       \
 	)
 
 
