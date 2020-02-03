@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92b0c3ef */
+/* HASH CRC-32:0x309b4f81 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ INTDEF ATTR_NORETURN NONNULL((1, 2)) void (LIBCCALL libc_Execvp)(char const *__r
 INTDEF ATTR_SENTINEL ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execl)(char const *__restrict path, char const *args, ... /*, (char *)NULL*/) __THROWS(...);
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execle)(char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -55,7 +55,7 @@ INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execle
 INTDEF ATTR_SENTINEL ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execpl)(char const *__restrict file, char const *args, ... /*, (char *)NULL*/) __THROWS(...);
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */

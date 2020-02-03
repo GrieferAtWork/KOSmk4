@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdaa27c9 */
+/* HASH CRC-32:0xe7a9f798 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT_VOID(__ATTR_NORETURN __ATTR_NONNULL((1, 2, 3)),,__localdep_Execve,(c
 __NAMESPACE_LOCAL_BEGIN
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 __LOCAL_LIBC(Execle) __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void
 (__VLIBCCALL __LIBC_LOCAL_NAME(Execle))(char const *__restrict __path,
                                         char const *__args,

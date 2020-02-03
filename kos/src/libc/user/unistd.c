@@ -174,10 +174,10 @@ NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
 }
 /*[[[end:execl]]]*/
 
-/*[[[head:execle,hash:CRC-32=0x2f5bafd7]]]*/
+/*[[[head:execle,hash:CRC-32=0xbc5f767e]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SENTINEL_O(1) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.exec.execle") int
 NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
@@ -289,10 +289,10 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 }
 /*[[[end:execvpe]]]*/
 
-/*[[[head:execlpe,hash:CRC-32=0xbcce3030]]]*/
+/*[[[head:execlpe,hash:CRC-32=0x39f6ffa]]]*/
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_SENTINEL_O(1) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.exec.execlpe") int
 NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,

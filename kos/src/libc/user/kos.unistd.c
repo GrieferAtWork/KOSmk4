@@ -166,10 +166,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execl") void
 }
 /*[[[end:Execl]]]*/
 
-/*[[[head:Execle,hash:CRC-32=0xa317214e]]]*/
+/*[[[head:Execle,hash:CRC-32=0xd8195bbf]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execle") void
 (VLIBCCALL libc_Execle)(char const *__restrict path,
@@ -228,10 +228,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execpl") void
 }
 /*[[[end:Execpl]]]*/
 
-/*[[[head:Execlpe,hash:CRC-32=0x817704e4]]]*/
+/*[[[head:Execlpe,hash:CRC-32=0xbf9f1d9a]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 INTERN ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execlpe") void
 (VLIBCCALL libc_Execlpe)(char const *__restrict file,

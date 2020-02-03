@@ -1982,7 +1982,7 @@ driver_special_symbol(struct driver *__restrict self,
 }
 
 struct kernel_syment {
-	char const *ks_name; /* [0..1] Symbol name (NULL for sentinal) */
+	char const *ks_name; /* [0..1] Symbol name (NULL for sentinel) */
 	void       *ks_addr; /* Symbol address */
 	u32         ds_size; /* Symbol size */
 	u32         ds_hash; /* Symbol hash (s.a. `elf_symhash()') */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf28450a2 */
+/* HASH CRC-32:0x10b6bad7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_USING(Execl)
 #ifdef __CRT_HAVE_Execle
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execle");
 #elif defined(__CRT_HAVE_Execve)
 #include <local/kos.unistd/Execle.h>
@@ -94,7 +94,7 @@ __NAMESPACE_LOCAL_USING(Execle)
 #else /* __cplusplus */
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 #define Execle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execle))
 #endif /* !__cplusplus */
 #endif /* Execle... */
@@ -117,7 +117,7 @@ __NAMESPACE_LOCAL_USING(Execpl)
 #ifdef __CRT_HAVE_Execlpe
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 __LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execlpe");
 #elif defined(__CRT_HAVE_Execvpe)
 #include <local/kos.unistd/Execlpe.h>
@@ -126,7 +126,7 @@ __NAMESPACE_LOCAL_USING(Execlpe)
 #else /* __cplusplus */
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
- * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
+ * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
 #define Execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execlpe))
 #endif /* !__cplusplus */
 #endif /* Execlpe... */
