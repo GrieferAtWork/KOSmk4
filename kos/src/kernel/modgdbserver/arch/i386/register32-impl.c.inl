@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "register.c"
+#include "register-impl.c.inl"
 #define SET_REGISTER 1
 #endif /* __INTELLISENSE__ */
 
@@ -29,68 +29,7 @@
 #include <kos/kernel/fpu-state32.h>
 #include <kos/kernel/gdb-cpu-state32.h>
 
-#if (defined(GET_REGISTER) + defined(SET_REGISTER)) != 1
-#error "Must either defined GET_REGISTER or SET_REGISTER"
-#endif
-
-
 DECL_BEGIN
-
-#ifdef GET_REGISTER
-#define FUNC(x) GDB_Get##x
-#define FIELD4(field)                                \
-	do {                                             \
-		if (bufsize >= 4)                            \
-			UNALIGNED_SET32((u32 *)buf, (u32)field); \
-		return 4;                                    \
-	} __WHILE0
-#define GETSET4(get, set)                       \
-	do {                                        \
-		if (bufsize >= 4) {                     \
-			u32 value;                          \
-			value = get;                        \
-			UNALIGNED_SET32((u32 *)buf, value); \
-		}                                       \
-		return 4;                               \
-	} __WHILE0
-#define GETSET4_NOOP()                      \
-	do {                                    \
-		if (bufsize >= 4) {                 \
-			UNALIGNED_SET32((u32 *)buf, 0); \
-		}                                   \
-		return 4;                           \
-	} __WHILE0
-#define STATE       state
-#define STATE_PARAM const *__restrict state
-#define STATE_CONST const
-#define BUF_CONST   /* nothing */
-#elif defined(SET_REGISTER)
-#define FUNC(x)       GDB_Set##x
-#define FIELD4(field)                                               \
-	do {                                                            \
-		if (bufsize == 4)                                           \
-			field = (__typeof__(field))UNALIGNED_GET32((u32 *)buf); \
-		return 4;                                                   \
-	} __WHILE0
-#define GETSET4(get, set)                        \
-	do {                                         \
-		if (bufsize == 4) {                      \
-			u32 value;                           \
-			value = UNALIGNED_GET32((u32 *)buf); \
-			set;                                 \
-		}                                        \
-		return 4;                                \
-	} __WHILE0
-#define GETSET4_NOOP()                           \
-	do {                                         \
-		return 4;                                \
-	} __WHILE0
-#define STATE       (*pstate)
-#define STATE_PARAM **__restrict pstate
-#define STATE_CONST /* nothing */
-#define BUF_CONST   const
-#endif
-
 
 PRIVATE NONNULL((1, 3)) size_t
 NOTHROW(FCALL FUNC(SGBaseRegister))(struct task *__restrict thread, uintptr_t regno,
@@ -729,22 +668,13 @@ NOTHROW(FCALL FUNC(Registers))(struct task *__restrict thread,
                                struct gdb_cpustate32 BUF_CONST *buf) {
 	uintptr_t regno;
 	for (regno = 0; regno <= sizeof(struct gdb_cpustate32) / 4; ++regno) {
-		if (FUNC(Register)(thread, regno, (u32 *)buf + regno, 4) != 4)
+		if (FUNC(Register)(thread, regno, (u32 *)buf + regno, 4) != 4) {
+			GDB_DEBUG("[gdb] Failed to access i386 register %#Ix\n", regno);
 			return false;
+		}
 	}
 	return true;
 }
 
 
 DECL_END
-
-#undef FUNC
-#undef SET_REGISTER
-#undef GET_REGISTER
-#undef FIELD4
-#undef GETSET4
-#undef GETSET4_NOOP
-#undef BUF_CONST
-#undef STATE
-#undef STATE_PARAM
-#undef STATE_CONST

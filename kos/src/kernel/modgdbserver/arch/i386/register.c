@@ -43,23 +43,10 @@
 #include "../../server.h"
 
 #ifndef __INTELLISENSE__
-#ifdef __x86_64__
-
 #define GET_REGISTER 1
-#include "register64-impl.c.inl"
-
+#include "register-impl.c.inl"
 #define SET_REGISTER 1
-#include "register64-impl.c.inl"
-
-#else /* __x86_64__ */
-
-#define GET_REGISTER 1
-#include "register32-impl.c.inl"
-
-#define SET_REGISTER 1
-#include "register32-impl.c.inl"
-
-#endif /* !__x86_64__ */
+#include "register-impl.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 DECL_BEGIN
