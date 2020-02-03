@@ -29,12 +29,12 @@
 DECL_BEGIN
 
 PRIVATE NONNULL((1, 3)) size_t
-NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t regno,
+NOTHROW(FCALL FUNC(ThreadRegister))(struct task *__restrict thread, uintptr_t regno,
                                     void BUF_CONST *buf, size_t bufsize) {
 	if (regno >= GDB_REGISTER_X86_64_ST0 &&
 	    regno <= GDB_REGISTER_X86_64_MXCSR) {
 		struct fpustate64 *fpu;
-		if (thread == THIS_TASK)
+		if (thread == GDBServer_Host)
 			fpustate_save();
 		fpu = FORTASK(thread, this_x86_fpustate);
 		if (!fpu) {
@@ -196,6 +196,59 @@ NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t re
 			break;
 		}
 	}
+	switch (regno) {
+
+	case GDB_REGISTER_X86_64_CS:
+		if (thread == GDBServer_Host) {
+			GETSET4(__rdcs(), __wrcs(value));
+		} else {
+			/* TODO */
+		}
+		break;
+
+	case GDB_REGISTER_X86_64_SS:
+		if (thread == GDBServer_Host) {
+			GETSET4(__rdss(), __wrss(value));
+		} else {
+			/* TODO */
+		}
+		break;
+
+	case GDB_REGISTER_X86_64_DS:
+		if (thread == GDBServer_Host) {
+			GETSET4(__rdds(), __wrds(value));
+		} else {
+			/* TODO */
+		}
+		break;
+
+	case GDB_REGISTER_X86_64_ES:
+		if (thread == GDBServer_Host) {
+			GETSET4(__rdes(), __wres(value));
+		} else {
+			/* TODO */
+		}
+		break;
+
+	case GDB_REGISTER_X86_64_FS:
+		if (thread == GDBServer_Host) {
+			GETSET4(__rdfs(), __wrfs_keepbase(value));
+		} else {
+			/* TODO */
+		}
+		break;
+
+	case GDB_REGISTER_X86_64_GS:
+		if (thread == GDBServer_Host) {
+			GETSET4(__rdgs(), __wrgs_keepbase(value));
+		} else {
+			/* TODO */
+		}
+		break;
+
+	default:
+		break;
+	}
 	return 0;
 }
 
@@ -242,6 +295,17 @@ NOTHROW(FCALL FUNC(GPRegsNspRegister))(uintptr_t regno, void BUF_CONST *buf, siz
 	return 0;
 }
 
+PRIVATE NONNULL((2, 4)) size_t
+NOTHROW(FCALL FUNC(SGBaseRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
+                                    struct sgbase64 STATE_CONST *__restrict sgbase) {
+	if (regno == GDB_REGISTER_X86_64_FSBASE ||
+	    regno == GDB_REGISTER_X86_64_GSBASE) {
+		FIELD8(*(regno == GDB_REGISTER_X86_64_FSBASE ? &sgbase->sg_fsbase
+		                                             : &sgbase->sg_gsbase));
+	}
+	return 0;
+}
+
 /* Arch-specific: Get/Set the value of a given register `regno'
  * @return: 0 : Invalid `regno'. */
 INTERN NONNULL((1, 3, 5)) size_t FCALL
@@ -251,7 +315,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 	switch (regno) {
 
 	case GDB_REGISTER_X86_64_RSP:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET8(icpustate64_getrsp(STATE),
 			        icpustate64_setrsp(STATE, value));
 		} else {
@@ -260,7 +324,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		break;
 
 	case GDB_REGISTER_X86_64_RIP:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET8(icpustate64_getrip(STATE),
 			        icpustate64_setrip(STATE, value));
 		} else {
@@ -269,7 +333,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		break;
 
 	case GDB_REGISTER_X86_64_RFLAGS:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET4(icpustate64_getrflags(STATE),
 			        icpustate64_setrflags(STATE, value));
 		} else {
@@ -278,7 +342,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		break;
 
 	case GDB_REGISTER_X86_64_CS:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET4(icpustate64_getcs(STATE),
 			        icpustate64_setcs(STATE, value));
 		} else {
@@ -287,7 +351,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		break;
 
 	case GDB_REGISTER_X86_64_SS:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET4(icpustate64_getss(STATE),
 			        icpustate64_setss(STATE, value));
 		} else {
@@ -295,47 +359,11 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		}
 		break;
 
-	case GDB_REGISTER_X86_64_DS:
-		if (thread == THIS_TASK) {
-			GETSET4(icpustate64_getds(STATE),
-			        icpustate64_setds(STATE, value));
-		} else {
-			/* TODO */
-		}
-		break;
-
-	case GDB_REGISTER_X86_64_ES:
-		if (thread == THIS_TASK) {
-			GETSET4(icpustate64_getes(STATE),
-			        icpustate64_setes(STATE, value));
-		} else {
-			/* TODO */
-		}
-		break;
-
-	case GDB_REGISTER_X86_64_FS:
-		if (thread == THIS_TASK) {
-			GETSET4(icpustate64_getfs(STATE),
-			        icpustate64_setfs(STATE, value));
-		} else {
-			/* TODO */
-		}
-		break;
-
-	case GDB_REGISTER_X86_64_GS:
-		if (thread == THIS_TASK) {
-			GETSET4(icpustate64_getgs(STATE),
-			        icpustate64_setgs(STATE, value));
-		} else {
-			/* TODO */
-		}
-		break;
-
 	default: {
 		size_t result;
 		result = FUNC(GPRegsNspRegister)(regno, buf, bufsize, &STATE->ics_gpregs);
 		if (result == 0)
-			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
+			result = FUNC(ThreadRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
@@ -397,7 +425,9 @@ NOTHROW(FCALL FUNC(SCpuStateRegister))(struct task *__restrict thread,
 		size_t result;
 		result = FUNC(GPRegsNspRegister)(regno, buf, bufsize, &STATE->scs_gpregs);
 		if (result == 0)
-			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
+			result = FUNC(SGBaseRegister)(regno, buf, bufsize, &STATE->scs_sgbase);
+		if (result == 0)
+			result = FUNC(ThreadRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
@@ -446,7 +476,9 @@ NOTHROW(FCALL FUNC(UCpuStateRegister))(struct task *__restrict thread,
 		size_t result;
 		result = FUNC(GPRegsRegister)(regno, buf, bufsize, &STATE->ucs_gpregs);
 		if (result == 0)
-			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
+			result = FUNC(SGBaseRegister)(regno, buf, bufsize, &STATE->ucs_sgbase);
+		if (result == 0)
+			result = FUNC(ThreadRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
@@ -454,58 +486,25 @@ NOTHROW(FCALL FUNC(UCpuStateRegister))(struct task *__restrict thread,
 }
 
 
-INTERN NONNULL((2)) size_t
-NOTHROW(FCALL FUNC(ActiveSegmentRegister))(uintptr_t regno,
-                                           void BUF_CONST *buf,
-                                           size_t bufsize) {
-	switch (regno) {
-
-	case GDB_REGISTER_X86_64_CS:
-		GETSET4(__rdcs(), __wrcs(value));
-		break;
-
-	case GDB_REGISTER_X86_64_SS:
-		GETSET4(__rdss(), __wrss(value));
-		break;
-
-	case GDB_REGISTER_X86_64_DS:
-		GETSET4(__rdds(), __wrds(value));
-		break;
-
-	case GDB_REGISTER_X86_64_ES:
-		GETSET4(__rdes(), __wres(value));
-		break;
-
-	case GDB_REGISTER_X86_64_FS:
-		GETSET4(__rdfs(), __wrfs_keepbase(value));
-		break;
-
-	case GDB_REGISTER_X86_64_GS:
-		GETSET4(__rdgs(), __wrgs_keepbase(value));
-		break;
-
-	default:
-		break;
-	}
-	return 0;
-}
-
 INTERN NONNULL((1, 3, 5)) size_t
 NOTHROW(FCALL FUNC(KCpuStateRegister))(struct task *__restrict thread,
                                        uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
                                        struct kcpustate64 STATE_PARAM) {
 	switch (regno) {
 
-	case GDB_REGISTER_X86_64_RIP: FIELD8(STATE->kcs_rip); break;
-	case GDB_REGISTER_X86_64_RFLAGS: FIELD4(STATE->kcs_rflags); break;
+	case GDB_REGISTER_X86_64_RIP:
+		FIELD8(STATE->kcs_rip);
+		break;
+
+	case GDB_REGISTER_X86_64_RFLAGS:
+		FIELD4(STATE->kcs_rflags);
+		break;
 
 	default: {
 		size_t result;
 		result = FUNC(GPRegsRegister)(regno, buf, bufsize, &STATE->kcs_gpregs);
 		if (result == 0)
-			result = FUNC(ActiveSegmentRegister)(regno, buf, bufsize);
-		if (result == 0)
-			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
+			result = FUNC(ThreadRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
@@ -559,9 +558,7 @@ NOTHROW(FCALL FUNC(LCpuStateRegister))(struct task *__restrict thread,
 		if (regno >= GDB_REGISTER_X86_64_RAX &&
 		    regno <= GDB_REGISTER_X86_64_R15)
 			GETSET8_NOOP();
-		result = FUNC(ActiveSegmentRegister)(regno, buf, bufsize);
-		if (result == 0)
-			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
+		result = FUNC(ThreadRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
@@ -610,7 +607,9 @@ NOTHROW(FCALL FUNC(FCpuStateRegister))(struct task *__restrict thread,
 		size_t result;
 		result = FUNC(GPRegsRegister)(regno, buf, bufsize, &STATE->fcs_gpregs);
 		if (result == 0)
-			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
+			result = FUNC(SGBaseRegister)(regno, buf, bufsize, &STATE->fcs_sgbase);
+		if (result == 0)
+			result = FUNC(ThreadRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
