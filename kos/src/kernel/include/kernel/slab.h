@@ -51,7 +51,9 @@ DECL_BEGIN
  *    bytes, this makes 5 slab variants: 4, 8, 12, 16, 20
  *  - Since slab-memory cannot be realloc()'ed, by default only kmalloc()
  *    will allocate slab memory, while krealloc() will only ever allocate
- *    actual heap memory. */
+ *    actual heap memory. However, krealloc(SLAB_PTR) still works, but will
+ *    never re-return SLAB_PTR (i.e. inplace_realloc), unless the block size
+ *    didn't change (and even then: it's not guarantied to do so) */
 
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
@@ -94,9 +96,9 @@ struct slab {
 
 #if HEAP_ALIGNMENT > __SIZEOF_POINTER__
 #define SLAB_SEGMENT_OFFSET(segment_size) ((((3 + SLAB_LENGTHOF_BITSET(segment_size)) * __SIZEOF_POINTER__) + (HEAP_ALIGNMENT - 1)) & ~(HEAP_ALIGNMENT - 1))
-#else
+#else /* HEAP_ALIGNMENT > __SIZEOF_POINTER__ */
 #define SLAB_SEGMENT_OFFSET(segment_size)   ((3 + SLAB_LENGTHOF_BITSET(segment_size)) * __SIZEOF_POINTER__)
-#endif
+#endif /* HEAP_ALIGNMENT <= __SIZEOF_POINTER__ */
 
 /* Return the number of segments available per page, when each has a size of `segment_size' */
 #define SLAB_SEGMENT_COUNT(segment_size) \
@@ -108,13 +110,13 @@ struct slab {
 
 #define PRIVATE_SLAB_GET_HINT2(a,b) b
 #define PRIVATE_SLAB_GET_HINT(x) PRIVATE_SLAB_GET_HINT2 x
-#if PRIVATE_SLAB_GET_HINT(KERNEL_VMHINT_SLAB) == VM_GETFREE_BELOW
 #undef CONFIG_SLAB_GROWS_UPWARDS
-#define CONFIG_SLAB_GROWS_DOWNWARDS 1
-#else
 #undef CONFIG_SLAB_GROWS_DOWNWARDS
+#if PRIVATE_SLAB_GET_HINT(KERNEL_VMHINT_SLAB) == VM_GETFREE_BELOW
+#define CONFIG_SLAB_GROWS_DOWNWARDS 1
+#else /* PRIVATE_SLAB_GET_HINT(KERNEL_VMHINT_SLAB) == VM_GETFREE_BELOW */
 #define CONFIG_SLAB_GROWS_UPWARDS 1
-#endif
+#endif /* PRIVATE_SLAB_GET_HINT(KERNEL_VMHINT_SLAB) != VM_GETFREE_BELOW */
 
 
 #define KERNEL_SLAB_INITIAL \

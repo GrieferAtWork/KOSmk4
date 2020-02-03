@@ -668,7 +668,7 @@ NOTHROW(KCALL slab_free)(void *__restrict ptr) {
 	self = SLAB_GET(ptr);
 	switch (self->s_size) {
 #ifndef __INTELLISENSE__
-#define CASE_SLAB_FREE(sz) \
+#define CASE_SLAB_FREE(sz)                       \
 	case sz:                                     \
 		slab_freeptr##sz(self, ptr, GFP_NORMAL); \
 		break;
@@ -693,7 +693,7 @@ NOTHROW(KCALL slab_ffree)(void *__restrict ptr, gfp_t flags) {
 	self = SLAB_GET(ptr);
 	switch (self->s_size) {
 #ifndef __INTELLISENSE__
-#define CASE_SLAB_FREE(sz) \
+#define CASE_SLAB_FREE(sz)                  \
 	case sz:                                \
 		slab_freeptr##sz(self, ptr, flags); \
 		break;
