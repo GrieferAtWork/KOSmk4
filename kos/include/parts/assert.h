@@ -19,8 +19,6 @@
  */
 #ifndef __do_assert
 #include "assert-failed.h"
-
-#ifndef NDEBUG
 #include "../features.h"
 
 /* Need KOS extensions for compile-time `assert()' support.
@@ -140,35 +138,4 @@
 #endif /* !__NO_builtin_expect */
 #endif /* !__USE_KOS_KERNEL */
 #endif /* !__do_cassert_wrapper */
-
-
-#elif !defined(__NO_builtin_assume)
-
-#if defined(CONFIG_ASSERT_ASSUME_EVERYTHING) || defined(ASSERT_ASSUME_EVERYTHING)
-#define __do_assert(expr, expr_str)        __builtin_assume(!!(expr))
-#define __do_assert0(expr, expr_str)       __builtin_assume(!!(expr))
-#define __do_asserta(expr, expr_str)       __builtin_assume(!!(expr))
-#define __do_assertf(expr, expr_str, ...)  __builtin_assume(!!(expr))
-#define __do_assert0f(expr, expr_str, ...) __builtin_assume(!!(expr))
-#define __do_assertaf(expr, expr_str, ...) __builtin_assume(!!(expr))
-#else /* CONFIG_ASSERT_ASSUME_EVERYTHING || ASSERT_ASSUME_EVERYTHING */
-#define __do_assert(expr, expr_str)        (void)0
-#define __do_assert0(expr, expr_str)       (void)0
-#define __do_asserta(expr, expr_str)       __builtin_assume(!!(expr))
-#define __do_assertf(expr, expr_str, ...)  (void)0
-#define __do_assert0f(expr, expr_str, ...) (void)0
-#define __do_assertaf(expr, expr_str, ...) __builtin_assume(!!(expr))
-#endif /* !CONFIG_ASSERT_ASSUME_EVERYTHING && !ASSERT_ASSUME_EVERYTHING */
-
-#else
-
-#define __do_assert(expr, expr_str)        (void)0
-#define __do_assert0(expr, expr_str)       (void)0
-#define __do_asserta(expr, expr_str)       (void)0
-#define __do_assertf(expr, expr_str, ...)  (void)0
-#define __do_assert0f(expr, expr_str, ...) (void)0
-#define __do_assertaf(expr, expr_str, ...) (void)0
-
-#endif /* !NDEBUG */
-
 #endif /* !__do_assert */

@@ -17,10 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __do_assert
-#include "parts/assert.h"
-#endif /* !__do_assert */
-
 /* Undef the old assert definition to allow for re-definitions! (mandated by the C standard) */
 #undef assert      /* Regular STD-C assert (with optional retry extension) */
 #undef __asserta   /* Assert + assume */
@@ -38,6 +34,10 @@
 #endif /* __USE_KOS */
 
 #if defined(__INTELLISENSE__)
+#ifndef __do_assert
+#include "parts/assert.h"
+#endif /* !__do_assert */
+
 #define assert        __NAMESPACE_INT_SYM __check_assertion
 #define __assert0     __NAMESPACE_INT_SYM __check_assertion
 #define __asserta     __NAMESPACE_INT_SYM __check_assertion
@@ -50,7 +50,50 @@
 #define assertaf      __NAMESPACE_INT_SYM __check_assertionf
 #define assert_failed(...) __assertion_failedf(__NULLPTR, __VA_ARGS__)
 #endif /* __USE_KOS */
-#else /* __INTELLISENSE__ */
+#elif defined(NDEBUG)
+#ifdef __NO_builtin_assume
+#define assert(expr)          (void)0
+#define __assert0(expr)       (void)0
+#define __asserta(expr)       (void)0
+#define __assertf(expr, ...)  (void)0
+#define __assertaf(expr, ...) (void)0
+#ifdef __USE_KOS
+#define assert0(expr)         (void)0
+#define asserta(expr)         (void)0
+#define assertf(expr, ...)    (void)0
+#define assertaf(expr, ...)   (void)0
+#define assert_failed(...)    __builtin_unreachable()
+#endif /* __USE_KOS */
+#else /* __NO_builtin_assume */
+#if defined(CONFIG_ASSERT_ASSUME_EVERYTHING) || defined(ASSERT_ASSUME_EVERYTHING)
+#define assert(expr)          __builtin_assume(!!(expr))
+#define __assert0(expr)       __builtin_assume(!!(expr))
+#define __assertf(expr, ...)  __builtin_assume(!!(expr))
+#ifdef __USE_KOS
+#define assert0(expr)         __builtin_assume(!!(expr))
+#define assertf(expr, ...)    __builtin_assume(!!(expr))
+#endif /* __USE_KOS */
+#else /* CONFIG_ASSERT_ASSUME_EVERYTHING || ASSERT_ASSUME_EVERYTHING */
+#define assert(expr)          (void)0
+#define __assert0(expr)       (void)0
+#define __assertf(expr, ...)  (void)0
+#ifdef __USE_KOS
+#define assert0(expr)         (void)0
+#define assertf(expr, ...)    (void)0
+#endif /* __USE_KOS */
+#endif /* !CONFIG_ASSERT_ASSUME_EVERYTHING && !ASSERT_ASSUME_EVERYTHING */
+#define __asserta(expr)       __builtin_assume(!!(expr))
+#define __assertaf(expr, ...) __builtin_assume(!!(expr))
+#ifdef __USE_KOS
+#define asserta(expr)         __builtin_assume(!!(expr))
+#define assertaf(expr, ...)   __builtin_assume(!!(expr))
+#define assert_failed(...)    __builtin_unreachable()
+#endif /* __USE_KOS */
+#endif /* !__NO_builtin_assume */
+#else /* NDEBUG */
+#ifndef __do_assert
+#include "parts/assert.h"
+#endif /* !__do_assert */
 #define assert(expr)          __do_assert(expr, #expr)
 #define __assert0(expr)       __do_assert0(expr, #expr)
 #define __asserta(expr)       __do_asserta(expr, #expr)
@@ -63,7 +106,7 @@
 #define assertaf(expr, ...)   __do_assertaf(expr, #expr, __VA_ARGS__)
 #define assert_failed(...)    __assertion_failedf(__NULLPTR, __VA_ARGS__)
 #endif /* __USE_KOS */
-#endif /* !__INTELLISENSE__ */
+#endif /* !NDEBUG */
 
 
 
