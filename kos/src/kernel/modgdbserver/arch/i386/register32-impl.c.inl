@@ -55,7 +55,7 @@ NOTHROW(FCALL FUNC(ThreadRegister))(struct task *__restrict thread, uintptr_t re
 	if (regno >= GDB_REGISTER_I386_ST0 &&
 	    regno <= GDB_REGISTER_I386_MXCSR) {
 		struct fpustate32 *fpu;
-		if (thread == THIS_TASK)
+		if (thread == GDBServer_Host)
 			fpustate_save();
 		fpu = FORTASK(thread, this_x86_fpustate);
 		if (!fpu) {
@@ -224,60 +224,70 @@ NOTHROW(FCALL FUNC(ThreadRegister))(struct task *__restrict thread, uintptr_t re
 	switch (regno) {
 
 	case GDB_REGISTER_I386_CS:
-		if (thread == THIS_TASK) {
-			GETSET4(SEGMENT_KERNEL_CODE,
-			        if (value != SEGMENT_KERNEL_CODE) return 0;);
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(GDBThread_IsKernelThread(thread)
+		        ? SEGMENT_KERNEL_CODE
+		        : SEGMENT_USER_CODE32_RPL,
+		        if (value != (GDBThread_IsKernelThread(thread)
+		                      ? SEGMENT_KERNEL_CODE
+		                      : SEGMENT_USER_CODE32_RPL)) return 0;);
 		break;
 
 	case GDB_REGISTER_I386_SS:
-		if (thread == THIS_TASK) {
-			GETSET4(SEGMENT_KERNEL_DATA,
-			        if (value != SEGMENT_KERNEL_DATA) return 0;);
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(GDBThread_IsKernelThread(thread)
+		        ? SEGMENT_KERNEL_DATA
+		        : SEGMENT_USER_DATA32_RPL,
+		        if (value != (GDBThread_IsKernelThread(thread)
+		                      ? SEGMENT_KERNEL_DATA
+		                      : SEGMENT_USER_DATA32_RPL)) return 0;);
 		break;
 
 	case GDB_REGISTER_I386_DS:
-		if (thread == THIS_TASK) {
-			GETSET4(__rdds(), __wrds(value));
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(SEGMENT_USER_DATA32_RPL,
+		        if (value != SEGMENT_USER_DATA32_RPL) return 0;);
 		break;
 
 	case GDB_REGISTER_I386_ES:
-		if (thread == THIS_TASK) {
-			GETSET4(__rdes(), __wres(value));
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(SEGMENT_USER_DATA32_RPL,
+		        if (value != SEGMENT_USER_DATA32_RPL) return 0;);
 		break;
 
 	case GDB_REGISTER_I386_FS:
-		if (thread == THIS_TASK) {
-			GETSET4(__rdfs(), __wrfs(value));
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(GDBThread_IsKernelThread(thread)
+		        ? SEGMENT_KERNEL_FSBASE
+		        : SEGMENT_USER_FSBASE_RPL,
+		        if (value != (GDBThread_IsKernelThread(thread)
+		                      ? SEGMENT_KERNEL_FSBASE
+		                      : SEGMENT_USER_FSBASE_RPL)) return 0;);
 		break;
 
 	case GDB_REGISTER_I386_GS:
-		if (thread == THIS_TASK) {
-			GETSET4(__rdgs(), __wrgs(value));
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(SEGMENT_USER_GSBASE_RPL,
+		        if (value != SEGMENT_USER_GSBASE_RPL) return 0;);
 		break;
 
 	case GDB_REGISTER_I386_FSBASE:
 		/* Read/Write the user-fs-base register */
 		FIELD4(FORTASK(thread, this_x86_user_fsbase));
 #ifdef SET_REGISTER
-		if (thread == THIS_TASK)
+		if (thread == GDBServer_Host)
 			reload_segment_register(SEGMENT_USER_FSBASE);
 #endif /* SET_REGISTER */
 		break;
@@ -286,7 +296,7 @@ NOTHROW(FCALL FUNC(ThreadRegister))(struct task *__restrict thread, uintptr_t re
 		/* Read/Write the user-gs-base register */
 		FIELD4(FORTASK(thread, this_x86_user_gsbase));
 #ifdef SET_REGISTER
-		if (thread == THIS_TASK)
+		if (thread == GDBServer_Host)
 			reload_segment_register(SEGMENT_USER_GSBASE);
 #endif /* SET_REGISTER */
 		break;
@@ -318,7 +328,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 	switch (regno) {
 
 	case GDB_REGISTER_I386_ESP:
-		GETSET4(thread == THIS_TASK
+		GETSET4(thread == GDBServer_Host
 		        ? icpustate32_getesp(STATE)
 		        : (((STATE->ics_irregs.ir_cs16 & 3) ||
 		            (STATE->ics_irregs.ir_eflags & EFLAGS_VM))
@@ -328,7 +338,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		break;
 
 	case GDB_REGISTER_I386_EIP:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET4(icpustate32_geteip(STATE),
 			        icpustate32_seteip(STATE, value));
 		} else {
@@ -337,7 +347,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		break;
 
 	case GDB_REGISTER_I386_EFLAGS:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET4(icpustate32_geteflags(STATE),
 			        icpustate32_seteflags(STATE, value));
 		} else {
@@ -346,7 +356,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		break;
 
 	case GDB_REGISTER_I386_CS:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET4(icpustate32_getcs(STATE),
 			        icpustate32_setcs(STATE, value));
 		} else {
@@ -355,7 +365,7 @@ NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
 		break;
 
 	case GDB_REGISTER_I386_SS:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			if (icpustate32_isuser(STATE)) {
 				FIELD4(STATE->ics_irregs_u.ir_ss);
 			} else {
@@ -372,7 +382,7 @@ getset_kernel_ss:
 		break;
 
 	case GDB_REGISTER_I386_DS:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET4(icpustate32_getds(STATE),
 			        icpustate32_setds(STATE, value));
 		} else {
@@ -383,7 +393,7 @@ getset_kernel_ss:
 		break;
 
 	case GDB_REGISTER_I386_ES:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET4(icpustate32_getes(STATE),
 			        icpustate32_setes(STATE, value));
 		} else {
@@ -394,7 +404,7 @@ getset_kernel_ss:
 		break;
 
 	case GDB_REGISTER_I386_FS:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET4(icpustate32_getfs(STATE),
 			        icpustate32_setfs(STATE, value));
 		} else {
@@ -405,7 +415,7 @@ getset_kernel_ss:
 		break;
 
 	case GDB_REGISTER_I386_GS:
-		if (thread == THIS_TASK) {
+		if (thread == GDBServer_Host) {
 			GETSET4(icpustate32_getgs(STATE),
 			        icpustate32_setgs(STATE, value));
 		} else if (STATE->ics_irregs.ir_eflags & EFLAGS_VM) {

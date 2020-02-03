@@ -199,51 +199,59 @@ NOTHROW(FCALL FUNC(ThreadRegister))(struct task *__restrict thread, uintptr_t re
 	switch (regno) {
 
 	case GDB_REGISTER_X86_64_CS:
-		if (thread == GDBServer_Host) {
-			GETSET4(__rdcs(), __wrcs(value));
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(GDBThread_IsKernelThread(thread)
+		        ? SEGMENT_KERNEL_CODE
+		        : SEGMENT_USER_CODE64_RPL,
+		        if (value != (GDBThread_IsKernelThread(thread)
+		                      ? SEGMENT_KERNEL_CODE
+		                      : SEGMENT_USER_CODE64_RPL)) return 0;);
 		break;
 
 	case GDB_REGISTER_X86_64_SS:
-		if (thread == GDBServer_Host) {
-			GETSET4(__rdss(), __wrss(value));
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(GDBThread_IsKernelThread(thread)
+		        ? SEGMENT_KERNEL_DATA
+		        : SEGMENT_USER_DATA64_RPL,
+		        if (value != (GDBThread_IsKernelThread(thread)
+		                      ? SEGMENT_KERNEL_DATA
+		                      : SEGMENT_USER_DATA64_RPL)) return 0;);
 		break;
 
 	case GDB_REGISTER_X86_64_DS:
-		if (thread == GDBServer_Host) {
-			GETSET4(__rdds(), __wrds(value));
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(SEGMENT_USER_DATA64_RPL,
+		        if (value != SEGMENT_USER_DATA64_RPL) return 0;);
 		break;
 
 	case GDB_REGISTER_X86_64_ES:
-		if (thread == GDBServer_Host) {
-			GETSET4(__rdes(), __wres(value));
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(SEGMENT_USER_DATA64_RPL,
+		        if (value != SEGMENT_USER_DATA64_RPL) return 0;);
 		break;
 
 	case GDB_REGISTER_X86_64_FS:
-		if (thread == GDBServer_Host) {
-			GETSET4(__rdfs(), __wrfs_keepbase(value));
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(SEGMENT_USER_DATA64_RPL,
+		        if (value != SEGMENT_USER_DATA64_RPL) return 0;);
 		break;
 
 	case GDB_REGISTER_X86_64_GS:
-		if (thread == GDBServer_Host) {
-			GETSET4(__rdgs(), __wrgs_keepbase(value));
-		} else {
+		if (thread != GDBServer_Host) {
 			/* TODO */
 		}
+		GETSET4(SEGMENT_USER_DATA64_RPL,
+		        if (value != SEGMENT_USER_DATA64_RPL) return 0;);
 		break;
 
 	default:

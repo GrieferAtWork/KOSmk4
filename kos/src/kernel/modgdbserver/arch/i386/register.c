@@ -42,13 +42,6 @@
 #include "../../gdb.h"
 #include "../../server.h"
 
-#ifndef __INTELLISENSE__
-#define GET_REGISTER 1
-#include "register-impl.c.inl"
-#define SET_REGISTER 1
-#include "register-impl.c.inl"
-#endif /* !__INTELLISENSE__ */
-
 DECL_BEGIN
 
 #ifdef __x86_64__
@@ -314,7 +307,13 @@ NOTHROW(FCALL GDB_PrintArchRegisterValue)(struct task *__restrict thread, uintpt
 	return result;
 }
 
-
 DECL_END
+
+#ifndef __INTELLISENSE__
+#define GET_REGISTER 1
+#include "register-impl.c.inl"
+#define SET_REGISTER 1
+#include "register-impl.c.inl"
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_MODGDBSERVER_ARCH_I386_REGISTER_C */
