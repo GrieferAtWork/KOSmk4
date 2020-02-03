@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6c01fc7 */
+/* HASH CRC-32:0x450098dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_rwlock_timedwrlock) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__pthread_rwlock_t *__restrict __rwlock,
                                                                         struct timespec const *__restrict __abstime) {
-#line 1049 "kos/src/libc/magic/pthread.c"
+#line 1050 "kos/src/libc/magic/pthread.c"
 #ifdef __CRT_HAVE_pthread_rwlock_timedwrlock
 	int __result;
 	struct __timespec32 __abstime32;

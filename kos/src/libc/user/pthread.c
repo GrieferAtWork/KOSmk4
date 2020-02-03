@@ -56,6 +56,7 @@
 
 #include "../libc/dl.h"
 #include "pthread.h"
+#include "sched.h"
 
 DECL_BEGIN
 
@@ -2672,11 +2673,49 @@ NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__rest
 #endif /* MAGIC:alias */
 /*[[[end:pthread_rwlock_timedwrlock64]]]*/
 
+/*[[[head:pthread_num_processors_np,hash:CRC-32=0x54cc3b90]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread_ext.pthread_num_processors_np") __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void)
+/*[[[body:pthread_num_processors_np]]]*/
+/*AUTO*/{
+	cpu_set_t cset;
+	if unlikely(libc_sched_getaffinity(0, sizeof(cset), &cset) != 0)
+		return 1;
+	return (__STDC_INT_AS_SIZE_T)__CPU_COUNT_S(sizeof(cset), &cset);
+}
+/*[[[end:pthread_num_processors_np]]]*/
+
+/*[[[head:pthread_set_num_processors_np,hash:CRC-32=0x83c09375]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread_ext.pthread_set_num_processors_np") int
+NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n)
+/*[[[body:pthread_set_num_processors_np]]]*/
+/*AUTO*/{
+	int i, result;
+	cpu_set_t cset;
+	if (n < 1) {
+#ifdef __EINVAL
+		return __EINVAL;
+#else /* __EINVAL */
+		return 1;
+#endif /* !__EINVAL */
+	}
+	__CPU_ZERO_S(sizeof(cset), &cset);
+	for (i = 0; i < n; ++i) {
+		if (!__CPU_SET_S(i, sizeof(cset), &cset))
+			break;
+	}
+	result = libc_sched_setaffinity(0, sizeof(cset), &cset);
+	if unlikely(result != 0)
+		result = __libc_geterrno_or(1);
+	return result;
+}
+/*[[[end:pthread_set_num_processors_np]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x29caad81]]]*/
+/*[[[start:exports,hash:CRC-32=0xcd3e59f5]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_create, libc_pthread_create);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_join, libc_pthread_join);
@@ -2806,6 +2845,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(tss_get, libc_pthread_getspecific);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_setspecific, libc_pthread_setspecific);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_getcpuclockid, libc_pthread_getcpuclockid);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_atfork, libc_pthread_atfork);
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_num_processors_np, libc_pthread_num_processors_np);
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_set_num_processors_np, libc_pthread_set_num_processors_np);
 /*[[[end:exports]]]*/
 
 DECL_END

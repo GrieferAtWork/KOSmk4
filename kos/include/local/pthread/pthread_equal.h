@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b4f3d10 */
+/* HASH CRC-32:0x36a46595 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_equal) __ATTR_CONST int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_equal))(__pthread_t __pthread1,
                                                            __pthread_t __pthread2) {
-#line 317 "kos/src/libc/magic/pthread.c"
+#line 318 "kos/src/libc/magic/pthread.c"
 	return __pthread1 == __pthread2;
 }
 __NAMESPACE_LOCAL_END

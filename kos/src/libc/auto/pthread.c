@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x173765c7 */
+/* HASH CRC-32:0x2fe94a66 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_equal") int
 NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t pthread1,
                                          pthread_t pthread2) {
-#line 317 "kos/src/libc/magic/pthread.c"
+#line 318 "kos/src/libc/magic/pthread.c"
 	return pthread1 == pthread2;
 }
 
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t pthread1,
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_cleanup_routine") void
 NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_frame *frame) {
-#line 642 "kos/src/libc/magic/pthread.c"
+#line 643 "kos/src/libc/magic/pthread.c"
 	if (frame->__do_it)
 		(*frame->__cancel_routine)(frame->__cancel_arg);
 }
@@ -56,7 +56,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_init") int
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
                                              int pshared) {
-#line 1252 "kos/src/libc/magic/pthread.c"
+#line 1253 "kos/src/libc/magic/pthread.c"
 	(void)pshared;
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELAXED);
 	return 0;
@@ -66,7 +66,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_destroy") int
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
-#line 1260 "kos/src/libc/magic/pthread.c"
+#line 1261 "kos/src/libc/magic/pthread.c"
 	COMPILER_IMPURE();
 	(void)lock; /* no-op */
 	return 0;
@@ -79,7 +79,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_lock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
-#line 1270 "kos/src/libc/magic/pthread.c"
+#line 1271 "kos/src/libc/magic/pthread.c"
 	while (libc_pthread_spin_trylock(lock) != 0)
 		__hybrid_yield();
 	return 0;
@@ -92,7 +92,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_trylock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
-#line 1280 "kos/src/libc/magic/pthread.c"
+#line 1281 "kos/src/libc/magic/pthread.c"
 	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
 #ifdef __EBUSY
@@ -111,7 +111,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_spin_unlock") int
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
-#line 1297 "kos/src/libc/magic/pthread.c"
+#line 1298 "kos/src/libc/magic/pthread.c"
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELEASE);
 	return 0;
 }

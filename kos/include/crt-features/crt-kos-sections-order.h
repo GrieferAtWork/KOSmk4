@@ -176,6 +176,7 @@
 	.string.encrypt*                  # String encryption
 	.string.match*                    # String matching functions
 	.string.argz*  .string.envz*      # <argz.h> and <envz.h>
+	.sched.pthread_ext*               # Pthread extensions
 	.glibc*                           # GLibc-specific stuff
 	.unsorted*                        # Everything else...
 
@@ -282,6 +283,7 @@
 	CB(PREFIX.string.encrypt.*) \
 	CB(PREFIX.string.match.*) \
 	CB(PREFIX.string.envz.* PREFIX.string.argz.*) \
+	CB(PREFIX.sched.pthread_ext.*) \
 	CB(PREFIX.glibc.*) \
 	CB(PREFIX.unsorted.*) \
 	CB(PREFIX.wchar.fs.exec.exec.*) \

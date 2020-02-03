@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2fc3635 */
+/* HASH CRC-32:0xf286506d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1777,6 +1777,7 @@ __CRT_FUNCTION(pthread_mutexattr_setpshared,0,(),2,(pthread_mutexattr_t *,attr,i
 __CRT_FUNCTION(pthread_mutexattr_setrobust,0,(),2,(pthread_mutexattr_t *,attr,int,robustness),int)
 __CRT_FUNCTION(pthread_mutexattr_setrobust_np,0,(),2,(pthread_mutexattr_t *,attr,int,robustness),int)
 __CRT_FUNCTION(pthread_mutexattr_settype,0,(),2,(pthread_mutexattr_t *,attr,int,kind),int)
+__CRT_FUNCTION(pthread_num_processors_np,0,(),0,(),__STDC_INT_AS_SIZE_T)
 __CRT_FUNCTION(pthread_once,0,(),2,(pthread_once_t *,once_control,__pthread_once_routine_t,init_routine),int)
 __CRT_FUNCTION(pthread_rwlock_destroy,0,(),1,(pthread_rwlock_t *,rwlock),int)
 __CRT_FUNCTION(pthread_rwlock_init,0,(),2,(pthread_rwlock_t *__restrict,rwlock,pthread_rwlockattr_t const *__restrict,attr),int)
@@ -1796,6 +1797,7 @@ __CRT_FUNCTION(pthread_rwlockattr_init,0,(),1,(pthread_rwlockattr_t *,attr),int)
 __CRT_FUNCTION(pthread_rwlockattr_setkind_np,0,(),2,(pthread_rwlockattr_t *,attr,int,pref),int)
 __CRT_FUNCTION(pthread_rwlockattr_setpshared,0,(),2,(pthread_rwlockattr_t *,attr,int,pshared),int)
 __CRT_FUNCTION(pthread_self,0,(),0,(),pthread_t)
+__CRT_FUNCTION(pthread_set_num_processors_np,0,(),1,(int,n),int)
 __CRT_FUNCTION(pthread_setaffinity_np,0,(),3,(pthread_t,pthread,size_t,cpusetsize,cpu_set_t const *,cpuset),int)
 __CRT_FUNCTION(pthread_setattr_default_np,0,(),1,(pthread_attr_t const *,attr),int)
 __CRT_FUNCTION(pthread_setcancelstate,0,(),2,(int,state,int *,oldstate),int)

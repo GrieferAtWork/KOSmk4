@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaecc18db */
+/* HASH CRC-32:0xcda495ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2527,6 +2527,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_pthread_mutexattr_setrobust 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_mutexattr_setrobust_np 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_mutexattr_settype 1
+#define __CRT_ATTR_NOTHROW_NCX_pthread_num_processors_np 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_rwlock_destroy 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_rwlock_init 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_rwlock_tryrdlock 1
@@ -2539,6 +2540,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_pthread_rwlockattr_setkind_np 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_rwlockattr_setpshared 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_self 1
+#define __CRT_ATTR_NOTHROW_NCX_pthread_set_num_processors_np 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_setaffinity_np 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_setattr_default_np 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_setcancelstate 1

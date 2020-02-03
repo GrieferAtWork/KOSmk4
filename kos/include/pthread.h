@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa91f12df */
+/* HASH CRC-32:0x1a3ab5f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1493,6 +1493,21 @@ typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
  * in FIFO (first added, first called) */
 __CDECLARE(,int,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))
 #endif /* pthread_atfork... */
+
+
+/* Some more functions from winpthread. */
+#ifdef __CRT_HAVE_pthread_num_processors_np
+__CDECLARE(,__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,pthread_num_processors_np,(void),())
+#elif defined(__CRT_HAVE_sched_getaffinity)
+#include <local/pthread/pthread_num_processors_np.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_num_processors_np, __FORCELOCAL __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL pthread_num_processors_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_num_processors_np))(); })
+#endif /* pthread_num_processors_np... */
+#ifdef __CRT_HAVE_pthread_set_num_processors_np
+__CDECLARE(,int,__NOTHROW_NCX,pthread_set_num_processors_np,(int __n),(__n))
+#elif defined(__CRT_HAVE_sched_setaffinity)
+#include <local/pthread/pthread_set_num_processors_np.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL pthread_set_num_processors_np)(int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(__n); })
+#endif /* pthread_set_num_processors_np... */
 #endif /* __CC__ */
 
 __SYSDECL_END

@@ -33,6 +33,7 @@
 %[define_replacement(pthread_spinlock_t = __pthread_spinlock_t)]
 %[define_replacement(pthread_barrier_t = __pthread_barrier_t)]
 %[define_replacement(pthread_barrierattr_t = __pthread_barrierattr_t)]
+%[define_replacement(cpu_set_t = __cpu_set_t)]
 
 
 %{
@@ -1400,6 +1401,44 @@ pthread_getcpuclockid:(pthread_t pthread_id, [nonnull] $clockid_t *clock_id) -> 
 pthread_atfork:([nullable] __pthread_atfork_func_t prepare,
                 [nullable] __pthread_atfork_func_t parent,
                 [nullable] __pthread_atfork_func_t child) -> int;
+
+%[default_impl_section(.text.crt.sched.pthread_ext)]
+
+%
+%
+%/* Some more functions from winpthread. */
+[dependency_include(<bits/sched.h>)]
+[userimpl][requires($has_function(sched_getaffinity))]
+pthread_num_processors_np:() -> __STDC_INT_AS_SIZE_T {
+	cpu_set_t cset;
+	if unlikely(sched_getaffinity(0, sizeof(cset), &cset) != 0)
+		return 1;
+	return (__STDC_INT_AS_SIZE_T)__CPU_COUNT_S(sizeof(cset), &cset);
+}
+
+[dependency_include(<bits/sched.h>)]
+[dependency_include(<parts/errno.h>)]
+[userimpl][requires($has_function(sched_setaffinity))]
+pthread_set_num_processors_np:(int n) -> int {
+	int i, result;
+	cpu_set_t cset;
+	if (n < 1) {
+#ifdef @__EINVAL@
+		return @__EINVAL@;
+#else /* __EINVAL */
+		return 1;
+#endif /* !__EINVAL */
+	}
+	__CPU_ZERO_S(sizeof(cset), &cset);
+	for (i = 0; i < n; ++i) {
+		if (!__CPU_SET_S(i, sizeof(cset), &cset))
+			break;
+	}
+	result = sched_setaffinity(0, sizeof(cset), &cset);
+	if unlikely(result != 0)
+		result = __libc_geterrno_or(1);
+	return result;
+}
 
 
 

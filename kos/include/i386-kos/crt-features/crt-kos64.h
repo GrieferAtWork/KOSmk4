@@ -1915,6 +1915,7 @@
 #define __CRT_HAVE_DOS$pthread_mutexattr_setrobust 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_setrobust_np 1
 #define __CRT_HAVE_DOS$pthread_mutexattr_settype 1
+#define __CRT_HAVE_DOS$pthread_num_processors_np 1
 #define __CRT_HAVE_DOS$pthread_once 1
 #define __CRT_HAVE_DOS$pthread_rwlock_destroy 1
 #define __CRT_HAVE_DOS$pthread_rwlock_init 1
@@ -1934,6 +1935,7 @@
 #define __CRT_HAVE_DOS$pthread_rwlockattr_setkind_np 1
 #define __CRT_HAVE_DOS$pthread_rwlockattr_setpshared 1
 #define __CRT_HAVE_DOS$pthread_self 1
+#define __CRT_HAVE_DOS$pthread_set_num_processors_np 1
 #define __CRT_HAVE_DOS$pthread_setaffinity_np 1
 #define __CRT_HAVE_DOS$pthread_setattr_default_np 1
 #define __CRT_HAVE_DOS$pthread_setcancelstate 1
@@ -5489,6 +5491,7 @@
 #define __CRT_HAVE_pthread_mutexattr_setrobust 1
 #define __CRT_HAVE_pthread_mutexattr_setrobust_np 1
 #define __CRT_HAVE_pthread_mutexattr_settype 1
+#define __CRT_HAVE_pthread_num_processors_np 1
 #define __CRT_HAVE_pthread_once 1
 #define __CRT_HAVE_pthread_rwlock_destroy 1
 #define __CRT_HAVE_pthread_rwlock_init 1
@@ -5508,6 +5511,7 @@
 #define __CRT_HAVE_pthread_rwlockattr_setkind_np 1
 #define __CRT_HAVE_pthread_rwlockattr_setpshared 1
 #define __CRT_HAVE_pthread_self 1
+#define __CRT_HAVE_pthread_set_num_processors_np 1
 #define __CRT_HAVE_pthread_setaffinity_np 1
 #define __CRT_HAVE_pthread_setattr_default_np 1
 #define __CRT_HAVE_pthread_setcancelstate 1

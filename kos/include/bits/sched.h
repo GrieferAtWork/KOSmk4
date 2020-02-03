@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd49ba892 */
+/* HASH CRC-32:0x3a9191b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -384,15 +384,9 @@ typedef struct __cpu_set_struct {
 		__XRETURN((__cpu / 8 < (setsize)) &&                                \
 		          ((cpusetp)->__bits[__CPUELT(__cpu)] & __CPUMASK(__cpu))); \
 	})
-
-#ifdef __USE_KOS
-#define __CPU_COUNT_S_RESULT_TYPE __size_t
-#else /* __USE_KOS */
-#define __CPU_COUNT_S_RESULT_TYPE int
-#endif /* !__USE_KOS */
 #define __CPU_COUNT_S(setsize, cpusetp)                                          \
 	__XBLOCK({                                                                   \
-		__CPU_COUNT_S_RESULT_TYPE __res = 0;                                     \
+		__STDC_INT_AS_SIZE_T __res = 0;                                          \
 		__cpu_mask const *__iter, *__end;                                        \
 		__end = (__iter = (cpusetp)->__bits) + ((setsize) / sizeof(__cpu_mask)); \
 		for (; __iter < __end; ++__iter)                                         \

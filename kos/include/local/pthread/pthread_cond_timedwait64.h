@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1e165c0 */
+/* HASH CRC-32:0x2960ea30 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __LOCAL_LIBC(pthread_cond_timedwait64) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__pthread_cond_t *__restrict __cond,
                                                                       __pthread_mutex_t *__restrict __mutex,
                                                                       struct __timespec64 const *__restrict __abstime) {
-#line 1200 "kos/src/libc/magic/pthread.c"
+#line 1201 "kos/src/libc/magic/pthread.c"
 	int __result;
 	struct __timespec32 __abstime32;
 	__abstime32.tv_sec  = (__time32_t)__abstime->tv_sec;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x294474dd */
+/* HASH CRC-32:0x857735ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -327,6 +327,8 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread
  * first called before FORK), and the PARENT and CHILD handlers are called
  * in FIFO (first added, first called) */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(__pthread_atfork_func_t prepare, __pthread_atfork_func_t parent, __pthread_atfork_func_t child);
+INTDEF __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n);
 
 DECL_END
 
