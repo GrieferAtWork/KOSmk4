@@ -105,7 +105,6 @@ STATIC_ASSERT(alignof(__LONGDOUBLE) == __ALIGNOF_LONG_DOUBLE__);
 
 #include <stdint.h>
 
-
 STATIC_ASSERT(__builtin_types_compatible_p(intmax_t, __INTMAX_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(uintmax_t, __UINTMAX_TYPE__));
 STATIC_ASSERT(sizeof(intmax_t) == __SIZEOF_INTMAX_T__);
@@ -114,43 +113,78 @@ STATIC_ASSERT(sizeof(uintmax_t) == __SIZEOF_INTMAX_T__);
 STATIC_ASSERT(__builtin_types_compatible_p(int_least8_t, __INT_LEAST8_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(int_least16_t, __INT_LEAST16_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(int_least32_t, __INT_LEAST32_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(int_least64_t, __INT_LEAST64_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(uint_least8_t, __UINT_LEAST8_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(uint_least16_t, __UINT_LEAST16_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(uint_least32_t, __UINT_LEAST32_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint_least64_t, __UINT_LEAST64_TYPE__));
 STATIC_ASSERT(sizeof(int_least8_t) == __SIZEOF_INT_LEAST8_T__);
 STATIC_ASSERT(sizeof(int_least16_t) == __SIZEOF_INT_LEAST16_T__);
 STATIC_ASSERT(sizeof(int_least32_t) == __SIZEOF_INT_LEAST32_T__);
-STATIC_ASSERT(sizeof(int_least64_t) == __SIZEOF_INT_LEAST64_T__);
 STATIC_ASSERT(sizeof(uint_least8_t) == __SIZEOF_INT_LEAST8_T__);
 STATIC_ASSERT(sizeof(uint_least16_t) == __SIZEOF_INT_LEAST16_T__);
 STATIC_ASSERT(sizeof(uint_least32_t) == __SIZEOF_INT_LEAST32_T__);
+
+STATIC_ASSERT(sizeof(int_least8_t) >= 1);
+STATIC_ASSERT(sizeof(uint_least8_t) >= 1);
+STATIC_ASSERT(sizeof(int_least16_t) >= 2);
+STATIC_ASSERT(sizeof(uint_least16_t) >= 2);
+STATIC_ASSERT(sizeof(int_least32_t) >= 4);
+STATIC_ASSERT(sizeof(uint_least32_t) >= 4);
+
+#ifdef __UINT_LEAST64_TYPE__
+STATIC_ASSERT(__builtin_types_compatible_p(int_least64_t, __INT_LEAST64_TYPE__));
+STATIC_ASSERT(__builtin_types_compatible_p(uint_least64_t, __UINT_LEAST64_TYPE__));
+STATIC_ASSERT(sizeof(int_least64_t) == __SIZEOF_INT_LEAST64_T__);
 STATIC_ASSERT(sizeof(uint_least64_t) == __SIZEOF_INT_LEAST64_T__);
+STATIC_ASSERT(sizeof(int_least64_t) >= 8);
+STATIC_ASSERT(sizeof(uint_least64_t) >= 8);
+#endif /* __UINT_LEAST64_TYPE__ */
 
 STATIC_ASSERT(__builtin_types_compatible_p(int_fast8_t, __INT_FAST8_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(int_fast16_t, __INT_FAST16_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(int_fast32_t, __INT_FAST32_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(int_fast64_t, __INT_FAST64_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(uint_fast8_t, __UINT_FAST8_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(uint_fast16_t, __UINT_FAST16_TYPE__));
 STATIC_ASSERT(__builtin_types_compatible_p(uint_fast32_t, __UINT_FAST32_TYPE__));
-STATIC_ASSERT(__builtin_types_compatible_p(uint_fast64_t, __UINT_FAST64_TYPE__));
 STATIC_ASSERT(sizeof(int_fast8_t) == __SIZEOF_INT_FAST8_T__);
 STATIC_ASSERT(sizeof(int_fast16_t) == __SIZEOF_INT_FAST16_T__);
 STATIC_ASSERT(sizeof(int_fast32_t) == __SIZEOF_INT_FAST32_T__);
-STATIC_ASSERT(sizeof(int_fast64_t) == __SIZEOF_INT_FAST64_T__);
 STATIC_ASSERT(sizeof(uint_fast8_t) == __SIZEOF_INT_FAST8_T__);
 STATIC_ASSERT(sizeof(uint_fast16_t) == __SIZEOF_INT_FAST16_T__);
 STATIC_ASSERT(sizeof(uint_fast32_t) == __SIZEOF_INT_FAST32_T__);
+
+#ifdef __UINT_FAST64_TYPE__
+STATIC_ASSERT(__builtin_types_compatible_p(int_fast64_t, __INT_FAST64_TYPE__));
+STATIC_ASSERT(__builtin_types_compatible_p(uint_fast64_t, __UINT_FAST64_TYPE__));
+STATIC_ASSERT(sizeof(int_fast64_t) == __SIZEOF_INT_FAST64_T__);
 STATIC_ASSERT(sizeof(uint_fast64_t) == __SIZEOF_INT_FAST64_T__);
+#endif /* __UINT_FAST64_TYPE__ */
+
+STATIC_ASSERT(sizeof(INT8_C(0x7f)) >= 1);
+STATIC_ASSERT(sizeof(UINT8_C(0xff)) >= 1);
+STATIC_ASSERT(sizeof(INT16_C(0x7fff)) >= 2);
+STATIC_ASSERT(sizeof(UINT16_C(0xffff)) >= 2);
+STATIC_ASSERT(sizeof(INT32_C(0x7fffffff)) >= 4);
+STATIC_ASSERT(sizeof(UINT32_C(0xffffffff)) >= 4);
+#ifdef INT64_C
+STATIC_ASSERT(sizeof(INT64_C(0x7fffffffffffffff)) >= 8);
+STATIC_ASSERT(sizeof(UINT64_C(0xffffffffffffffff)) >= 8);
+#endif /* INT64_C */
 
 
 STATIC_ASSERT(sizeof(__LONG32_TYPE__) == 4);
 STATIC_ASSERT(sizeof(__ULONG32_TYPE__) == 4);
+#if __SIZEOF_LONG__ == 4
+STATIC_ASSERT(__builtin_types_compatible_p(__LONG32_TYPE__, signed long));
+STATIC_ASSERT(__builtin_types_compatible_p(__ULONG32_TYPE__, unsigned long));
+#endif /* __SIZEOF_LONG__ == 4 */
+
 #ifdef __LONG64_TYPE__
 STATIC_ASSERT(sizeof(__LONG64_TYPE__) == 8);
 STATIC_ASSERT(sizeof(__ULONG64_TYPE__) == 8);
+#if __SIZEOF_LONG__ == 8
+STATIC_ASSERT(__builtin_types_compatible_p(__LONG64_TYPE__, signed long));
+STATIC_ASSERT(__builtin_types_compatible_p(__ULONG64_TYPE__, unsigned long));
+#endif /* __SIZEOF_LONG__ == 8 */
 #endif /* __LONG64_TYPE__ */
 
 STATIC_ASSERT(__builtin_types_compatible_p(int8_t, __INT8_TYPE__));

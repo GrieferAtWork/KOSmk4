@@ -123,7 +123,8 @@ DEFINE_NOREL_GLOBAL_META(struct process_peb, __peb, ".crt.glibc.application.init
 
 
 
-
+/* TODO: Add support for: __cxa_thread_atexit */
+/* TODO: Add support for: __cxa_thread_atexit_impl  */
 DEFINE_PUBLIC_ALIAS(__cxa_atexit, libc___cxa_atexit);
 
 struct cxa_atexit_callback {

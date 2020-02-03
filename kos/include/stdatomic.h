@@ -179,16 +179,20 @@ typedef __COMPILER_ATOMIC(__INT_LEAST16_TYPE__) atomic_int_least16_t;
 typedef __COMPILER_ATOMIC(__UINT_LEAST16_TYPE__) atomic_uint_least16_t;
 typedef __COMPILER_ATOMIC(__INT_LEAST32_TYPE__) atomic_int_least32_t;
 typedef __COMPILER_ATOMIC(__UINT_LEAST32_TYPE__) atomic_uint_least32_t;
+#ifdef __UINT_LEAST64_TYPE__
 typedef __COMPILER_ATOMIC(__INT_LEAST64_TYPE__) atomic_int_least64_t;
 typedef __COMPILER_ATOMIC(__UINT_LEAST64_TYPE__) atomic_uint_least64_t;
+#endif /* __UINT_LEAST64_TYPE__ */
 typedef __COMPILER_ATOMIC(__INT_FAST8_TYPE__) atomic_int_fast8_t;
 typedef __COMPILER_ATOMIC(__UINT_FAST8_TYPE__) atomic_uint_fast8_t;
 typedef __COMPILER_ATOMIC(__INT_FAST16_TYPE__) atomic_int_fast16_t;
 typedef __COMPILER_ATOMIC(__UINT_FAST16_TYPE__) atomic_uint_fast16_t;
 typedef __COMPILER_ATOMIC(__INT_FAST32_TYPE__) atomic_int_fast32_t;
 typedef __COMPILER_ATOMIC(__UINT_FAST32_TYPE__) atomic_uint_fast32_t;
+#ifdef __UINT_FAST64_TYPE__
 typedef __COMPILER_ATOMIC(__INT_FAST64_TYPE__) atomic_int_fast64_t;
 typedef __COMPILER_ATOMIC(__UINT_FAST64_TYPE__) atomic_uint_fast64_t;
+#endif /* __UINT_FAST64_TYPE__ */
 typedef __COMPILER_ATOMIC(__INTPTR_TYPE__) atomic_intptr_t;
 typedef __COMPILER_ATOMIC(__UINTPTR_TYPE__) atomic_uintptr_t;
 typedef __COMPILER_ATOMIC(__SIZE_TYPE__) atomic_size_t;

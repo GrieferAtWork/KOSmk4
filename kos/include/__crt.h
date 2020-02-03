@@ -32,22 +32,27 @@
  *   - __CRT_MIS          (generic / *)
  *   - __CRT_FREESTANDING (freestanding / none)
  */
-#if !defined(__CRT_DOS) && !defined(__CRT_GLC) && \
-    !defined(__CRT_KOS) && !defined(__CRT_CYG) && \
-    !defined(__CRT_KRS) && !defined(__CRT_KLS) && \
-    !defined(__CRT_MIS) && !defined(__CRT_KOS_KERNEL) && \
-    !defined(__CRT_FREESTANDING)
-#ifdef __KOS__
-#ifdef __KERNEL__
+#if (!defined(__CRT_DOS) && !defined(__CRT_GLC) && \
+     !defined(__CRT_KOS) && !defined(__CRT_CYG) && \
+     !defined(__CRT_KRS) && !defined(__CRT_KLS) && \
+     !defined(__CRT_MIS) && !defined(__CRT_KOS_KERNEL) && \
+     !defined(__CRT_FREESTANDING))
+#if defined(__KOS__) && defined(__KERNEL__)
 #   define __CRT_KOS_KERNEL 1
 #   define __CRT_KOS 1
 #   define __NO_STDSTREAMS 1
-#else
+/* This might seem like a good idea, but programs using `-ffreestanding',
+ * but still ending up #including some CRT header will likely also pass
+ * `-lc' on the commandline, so we shouldn't respond to that flag to
+ * determine the linked CRT library to be non-present... */
+//#elif defined(__STDC_HOSTED__) && (__STDC_HOSTED__ + 0) == 0
+///* Freestanding CRT environment. */
+//#   define __CRT_FREESTANDING 1
+#elif defined(__KOS__)
 #   define __CRT_KOS_NATIVE 1
 #   define __CRT_KOS 1
 #   define __CRT_GLC 1 /* Emulated by KOS */
 #   define __CRT_DOS 1 /* Emulated by KOS */
-#endif
 #elif defined(__CYGWIN__) || defined(__CYGWIN32__)
 #   define __CRT_CYG_NATIVE 1
 #   define __CRT_CYG 1
@@ -70,7 +75,7 @@
 #else
 #   define __CRT_MIS 1
 #endif
-#endif
+#endif /* !__CRT_... */
 
 #undef __CRT_GENERIC
 #if defined(__CRT_FREESTANDING)

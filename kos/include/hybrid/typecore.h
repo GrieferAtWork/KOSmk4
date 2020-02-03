@@ -442,30 +442,6 @@
 #endif /* !__SIZEOF_INT_FAST64_T__ */
 
 #ifndef __SIZEOF_SIG_ATOMIC_T__
-#ifdef __SIG_ATOMIC_MIN__
-#if __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S4
-#   define __SIZEOF_SIG_ATOMIC_T__ 4
-#elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S8
-#   define __SIZEOF_SIG_ATOMIC_T__ 8
-#elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S2
-#   define __SIZEOF_SIG_ATOMIC_T__ 2
-#elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S1
-#   define __SIZEOF_SIG_ATOMIC_T__ 1
-#elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_U4
-#   define __SIG_ATOMIC_UNSIGNED__ 1
-#   define __SIZEOF_SIG_ATOMIC_T__ 4
-#elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_U8
-#   define __SIG_ATOMIC_UNSIGNED__ 1
-#   define __SIZEOF_SIG_ATOMIC_T__ 8
-#elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_U2
-#   define __SIG_ATOMIC_UNSIGNED__ 1
-#   define __SIZEOF_SIG_ATOMIC_T__ 2
-#elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_U1
-#   define __SIG_ATOMIC_UNSIGNED__ 1
-#   define __SIZEOF_SIG_ATOMIC_T__ 1
-#endif
-#endif /* __SIG_ATOMIC_MIN__ */
-#ifndef __SIZEOF_SIG_ATOMIC_T__
 #ifdef __SIG_ATOMIC_MAX__
 #if __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_S4
 #   define __SIZEOF_SIG_ATOMIC_T__ 4
@@ -489,9 +465,21 @@
 #   define __SIZEOF_SIG_ATOMIC_T__ 1
 #endif
 #endif /* __SIG_ATOMIC_MAX__ */
+#if !defined(__SIZEOF_SIG_ATOMIC_T__) && defined(__SIG_ATOMIC_MIN__)
+#if __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S4
+#   define __SIZEOF_SIG_ATOMIC_T__ 4
+#elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S8
+#   define __SIZEOF_SIG_ATOMIC_T__ 8
+#elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S2
+#   define __SIZEOF_SIG_ATOMIC_T__ 2
+#elif __SIG_ATOMIC_MIN__ == __PRIVATE_MIN_S1
+#   define __SIZEOF_SIG_ATOMIC_T__ 1
+#elif __SIG_ATOMIC_MIN__ == 0
+#   define __SIG_ATOMIC_UNSIGNED__ 1
+#endif
+#endif /* __SIZEOF_SIG_ATOMIC_T__ && __SIG_ATOMIC_MIN__ */
 #ifndef __SIZEOF_SIG_ATOMIC_T__
 #define __SIZEOF_SIG_ATOMIC_T__ __SIZEOF_INT__
-#endif /* !__SIZEOF_SIG_ATOMIC_T__ */
 #endif /* !__SIZEOF_SIG_ATOMIC_T__ */
 #else /* !__SIZEOF_SIG_ATOMIC_T__ */
 #if (defined(__SIG_ATOMIC_MIN__) && (__SIG_ATOMIC_MIN__ == 0)) || \
@@ -499,7 +487,7 @@
                                      __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U8 || \
                                      __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U2 || \
                                      __SIG_ATOMIC_MAX__ == __PRIVATE_MAX_U1))
-#   define __SIG_ATOMIC_UNSIGNED__ 1
+#define __SIG_ATOMIC_UNSIGNED__ 1
 #endif /* ... */
 #endif /* __SIZEOF_SIG_ATOMIC_T__ */
 

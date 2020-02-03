@@ -37,8 +37,10 @@ typedef __INT_LEAST16_TYPE__  __int_least16_t;
 typedef __UINT_LEAST16_TYPE__ __uint_least16_t;
 typedef __INT_LEAST32_TYPE__  __int_least32_t;
 typedef __UINT_LEAST32_TYPE__ __uint_least32_t;
+#ifdef __UINT_LEAST64_TYPE__
 typedef __INT_LEAST64_TYPE__  __int_least64_t;
 typedef __UINT_LEAST64_TYPE__ __uint_least64_t;
+#endif /* __UINT_LEAST64_TYPE__ */
 typedef __INTMAX_TYPE__       __intmax_t;
 typedef __UINTMAX_TYPE__      __uintmax_t;
 
