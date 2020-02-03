@@ -23,15 +23,15 @@
 #ifndef __BITS_PER_LONG
 #include <hybrid/typecore.h>
 #if __SIZEOF_POINTER__ == 4
-#    define __BITS_PER_LONG 32
+#define __BITS_PER_LONG 32
 #elif __SIZEOF_POINTER__ == 8
-#    define __BITS_PER_LONG 64
+#define __BITS_PER_LONG 64
 #elif __SIZEOF_POINTER__ == 2
-#    define __BITS_PER_LONG 16
+#define __BITS_PER_LONG 16
 #elif __SIZEOF_POINTER__ == 1
-#    define __BITS_PER_LONG 8
+#define __BITS_PER_LONG 8
 #else
-#    define __BITS_PER_LONG (__SIZEOF_POINTER__ * 8)
+#define __BITS_PER_LONG (__SIZEOF_POINTER__ * 8)
 #endif
 #endif /* !__BITS_PER_LONG */
 

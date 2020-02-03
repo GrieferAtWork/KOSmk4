@@ -20,8 +20,8 @@
 #ifndef _ASM_TEMRIOS_H
 #define _ASM_TEMRIOS_H 1
 
-#include <asm/termbits.h>
 #include <asm/ioctls.h>
+#include <asm/termbits.h>
 #include <bits/ioctl-types.h>
 
 #endif /* !_ASM_TEMRIOS_H */

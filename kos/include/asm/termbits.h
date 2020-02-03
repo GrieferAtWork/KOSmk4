@@ -20,7 +20,7 @@
 #ifndef _ASM_TERMBITS_H
 #define _ASM_TERMBITS_H 1
 
-#include <linux/posix_types.h>
 #include <bits/termios.h>
+#include <linux/posix_types.h>
 
 #endif /* !_ASM_TERMBITS_H */

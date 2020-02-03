@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_BYTESWAP_H
-#define _BITS_BYTESWAP_H 1
+#ifndef _ASM_BYTESWAP_H
+#define _ASM_BYTESWAP_H 1
 
 #include <__stdinc.h>
 #include <hybrid/__byteswap.h>
@@ -27,12 +27,12 @@
 #define __bswap_constant_32(x)  __hybrid_bswap32_c(x)
 #ifdef __hybrid_bswap64_c
 #define __bswap_constant_64(x)  __hybrid_bswap64_c(x)
-#endif
+#endif /* __hybrid_bswap64_c */
 
 #define __bswap_16(x)  __hybrid_bswap16(x)
 #define __bswap_32(x)  __hybrid_bswap32(x)
 #ifdef __hybrid_bswap64
 #define __bswap_64(x)  __hybrid_bswap64(x)
-#endif
+#endif /* __hybrid_bswap64 */
 
-#endif /* _BITS_BYTESWAP_H */
+#endif /* _ASM_BYTESWAP_H */

@@ -24,7 +24,6 @@
 #include <asm/registers.h>
 
 /* General-purpose registers. */
-#define X86_REGISTER_GENERAL_PURPOSE   0x1000
 #ifdef __x86_64__
 #define X86_REGISTER_GENERAL_PURPOSE_PAX  X86_REGISTER_GENERAL_PURPOSE_RAX /* %pax */
 #define X86_REGISTER_GENERAL_PURPOSE_PCX  X86_REGISTER_GENERAL_PURPOSE_RCX /* %pcx */
