@@ -242,6 +242,44 @@ STATIC_ASSERT(WINT_MAX          == __WINT_MAX__);
 
 
 
+#if (defined(__SIZE_TYPE_IS_INT__) + \
+     defined(__SIZE_TYPE_IS_LONG__) + \
+     defined(__SIZE_TYPE_IS_LLONG__)) != 1
+#error "Badly configured feature macro: `__SIZE_TYPE_IS_XXX__'"
+#endif
+
+#if (defined(__PTRDIFF_TYPE_IS_INT__) + \
+     defined(__PTRDIFF_TYPE_IS_LONG__) + \
+     defined(__PTRDIFF_TYPE_IS_LLONG__)) != 1
+#error "Badly configured feature macro: `__PTRDIFF_TYPE_IS_XXX__'"
+#endif
+
+#ifdef __SIZE_TYPE_IS_INT__
+STATIC_ASSERT(__builtin_types_compatible_p(size_t, unsigned int));
+STATIC_ASSERT(__builtin_types_compatible_p(ssize_t, signed int));
+#endif /* __SIZE_TYPE_IS_INT__ */
+#ifdef __SIZE_TYPE_IS_LONG__
+STATIC_ASSERT(__builtin_types_compatible_p(size_t, unsigned long));
+STATIC_ASSERT(__builtin_types_compatible_p(ssize_t, signed long));
+#endif /* __SIZE_TYPE_IS_LONG__ */
+#ifdef __SIZE_TYPE_IS_LLONG__
+STATIC_ASSERT(__builtin_types_compatible_p(size_t, __ULONGLONG));
+STATIC_ASSERT(__builtin_types_compatible_p(ssize_t, __LONGLONG));
+#endif /* __SIZE_TYPE_IS_LLONG__ */
+
+#ifdef __PTRDIFF_TYPE_IS_INT__
+STATIC_ASSERT(__builtin_types_compatible_p(ptrdiff_t, signed int));
+#endif /* __PTRDIFF_TYPE_IS_INT__ */
+#ifdef __PTRDIFF_TYPE_IS_LONG__
+STATIC_ASSERT(__builtin_types_compatible_p(ptrdiff_t, signed long));
+#endif /* __PTRDIFF_TYPE_IS_LONG__ */
+#ifdef __PTRDIFF_TYPE_IS_LLONG__
+STATIC_ASSERT(__builtin_types_compatible_p(ptrdiff_t, __LONGLONG));
+#endif /* __PTRDIFF_TYPE_IS_LLONG__ */
+
+
+
+
 #include <pthread.h>
 STATIC_ASSERT(sizeof(pthread_t) == __SIZEOF_PTHREAD_T);
 STATIC_ASSERT(sizeof(pthread_key_t) == __SIZEOF_PTHREAD_KEY_T);

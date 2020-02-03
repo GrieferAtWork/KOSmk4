@@ -840,9 +840,6 @@
 #ifndef __UINTPTR_TYPE__
 #define __UINTPTR_TYPE__ __ATTR_W64 __TYPEFOR_UINTIB(__SIZEOF_POINTER__)
 #endif /* !__UINTPTR_TYPE__ */
-#ifndef __PTRDIFF_TYPE__
-#define __PTRDIFF_TYPE__ __ATTR_W64 __TYPEFOR_INTIB(__SIZEOF_PTRDIFF_T__)
-#endif /* !__PTRDIFF_TYPE__ */
 #ifndef __SIZE_TYPE__
 #define __SIZE_TYPE__    __ATTR_W64 __TYPEFOR_UINTIB(__SIZEOF_SIZE_T__)
 #endif /* !__SIZE_TYPE__ */
@@ -948,10 +945,6 @@
 #define __UINTPTR_HALF_TYPE__ __UINT32_TYPE__
 #endif
 
-#ifndef __SSIZE_TYPE__
-#define __SSIZE_TYPE__   __ATTR_W64 __TYPEFOR_INTIB(__SIZEOF_SIZE_T__)
-#endif /* !__SSIZE_TYPE__ */
-
 #ifndef __BYTE_TYPE__
 #define __SBYTE_TYPE__   __TYPEFOR_INTIB1
 #define __BYTE_TYPE__    __TYPEFOR_UINTIB1
@@ -1030,6 +1023,14 @@
 #ifndef __SIZEOF_DOUBLE__
 #define __SIZEOF_DOUBLE__      8
 #endif /* !__SIZEOF_DOUBLE__ */
+
+#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+#   define __INTSIZE_TYPE__  __ATTR_W64 unsigned int
+#   define __INTSSIZE_TYPE__ __ATTR_W64 signed int
+#else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+#   define __INTSIZE_TYPE__  __SIZE_TYPE__
+#   define __INTSSIZE_TYPE__ __SSIZE_TYPE__
+#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 
 #if __SIZEOF_LONG__ == __SIZEOF_SIZE_T__
 #   define __LONGSIZE_TYPE__  __ATTR_W64 unsigned long int
@@ -1205,6 +1206,155 @@
 #define __char16_t_defined        1
 #define __native_char16_t_defined 1
 #endif
+
+
+#ifdef __INTELLISENSE__
+/* Don't #define builtin keywords with Intellisense.
+ * Sometimes, Intellisense doesn't notice when those macros
+ * gets deleted and will continue chugging along as though
+ * they were still defined (leading to sporadic syntax errors
+ * in arbitrary source files...) */
+
+#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+#define __SIZE_TYPE_IS_INT__ 1
+#define __PTRDIFF_TYPE_IS_INT__ 1
+#else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+#define __SIZE_TYPE_IS_LLONG__ 1
+#define __PTRDIFF_TYPE_IS_LONG__ 1
+#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+
+#else /* __INTELLISENSE__ */
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("char")
+#pragma push_macro("short")
+#pragma push_macro("int")
+#pragma push_macro("long")
+#pragma push_macro("signed")
+#pragma push_macro("unsigned")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef char
+#undef short
+#undef int
+#undef long
+#undef signed
+#undef unsigned
+#undef __longlong_t
+#undef __ulonglong_t
+
+#define unsigned +1
+#define signed   +1
+#define int      +2
+#define long     +4
+#define short    +16
+#define char     +32
+#define __longlong_t  +9 /* signed long long */
+#define __ulonglong_t +9 /* unsigned long long */
+#ifndef __int8
+#define __HYBRID_TYPECORE_DEFINES_INT8 1
+#define __int8   +64
+#endif /* !__int8 */
+#ifndef __int16
+#define __HYBRID_TYPECORE_DEFINES_INT16 1
+#define __int16  +64
+#endif /* !__int16 */
+#ifndef __int32
+#define __HYBRID_TYPECORE_DEFINES_INT32 1
+#define __int32  +64
+#endif /* !__int32 */
+#ifndef __int64
+#define __HYBRID_TYPECORE_DEFINES_INT64 1
+#define __int64  +64
+#endif /* !__int64 */
+
+
+#if ((0 __SIZE_TYPE__) == 1 /* unsigned */ || \
+     (0 __SIZE_TYPE__) == 2 /* unsigned int */)
+#define __SIZE_TYPE_IS_INT__ 1
+#elif (((0 __SIZE_TYPE__) & ~3) == 4 /* [unsigned] long [int] */)
+#define __SIZE_TYPE_IS_LONG__ 1
+#elif (((0 __SIZE_TYPE__) & ~3) == 8 /* [unsigned] long long [int] */)
+#define __SIZE_TYPE_IS_LLONG__ 1
+#endif
+
+#ifdef __PTRDIFF_TYPE__
+#if ((0 __PTRDIFF_TYPE__) == 1 /* signed */ || \
+     (0 __PTRDIFF_TYPE__) == 2 /* signed int */)
+#define __PTRDIFF_TYPE_IS_INT__ 1
+#elif (((0 __PTRDIFF_TYPE__) & ~3) == 4 /* [signed] long [int] */)
+#define __PTRDIFF_TYPE_IS_LONG__ 1
+#elif (((0 __PTRDIFF_TYPE__) & ~3) == 8 /* [signed] long long [int] */)
+#define __PTRDIFF_TYPE_IS_LLONG__ 1
+#endif
+#else /* __PTRDIFF_TYPE__ */
+#ifdef __SIZE_TYPE_IS_INT__
+#define __PTRDIFF_TYPE_IS_INT__ 1
+#elif defined(__SIZE_TYPE_IS_LONG__)
+#define __PTRDIFF_TYPE_IS_LONG__ 1
+#elif defined(__SIZE_TYPE_IS_LLONG__)
+#define __PTRDIFF_TYPE_IS_LLONG__ 1
+#endif
+#endif /* !__PTRDIFF_TYPE__ */
+
+
+#ifdef __HYBRID_TYPECORE_DEFINES_INT8
+#undef __HYBRID_TYPECORE_DEFINES_INT8
+#undef __int8
+#endif /* __HYBRID_TYPECORE_DEFINES_INT8 */
+#ifdef __HYBRID_TYPECORE_DEFINES_INT16
+#undef __HYBRID_TYPECORE_DEFINES_INT16
+#undef __int16
+#endif /* __HYBRID_TYPECORE_DEFINES_INT16 */
+#ifdef __HYBRID_TYPECORE_DEFINES_INT32
+#undef __HYBRID_TYPECORE_DEFINES_INT32
+#undef __int32
+#endif /* __HYBRID_TYPECORE_DEFINES_INT32 */
+#ifdef __HYBRID_TYPECORE_DEFINES_INT64
+#undef __HYBRID_TYPECORE_DEFINES_INT64
+#undef __int64
+#endif /* __HYBRID_TYPECORE_DEFINES_INT64 */
+#undef char
+#undef short
+#undef int
+#undef long
+#undef signed
+#undef unsigned
+#undef __longlong_t
+#undef __ulonglong_t
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("unsigned")
+#pragma pop_macro("signed")
+#pragma pop_macro("long")
+#pragma pop_macro("int")
+#pragma pop_macro("short")
+#pragma pop_macro("char")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* !__INTELLISENSE__ */
+
+
+#ifndef __SSIZE_TYPE__
+#ifdef __SIZE_TYPE_IS_INT__
+#define __SSIZE_TYPE__   __ATTR_W64 signed int
+#elif defined(__SIZE_TYPE_IS_LONG__)
+#define __SSIZE_TYPE__   __ATTR_W64 signed long
+#elif defined(__SIZE_TYPE_IS_LLONG__)
+#define __SSIZE_TYPE__   __ATTR_W64 __LONGLONG
+#else
+#define __SSIZE_TYPE__   __ATTR_W64 __TYPEFOR_INTIB(__SIZEOF_SIZE_T__)
+#endif
+#endif /* !__SSIZE_TYPE__ */
+
+#ifndef __PTRDIFF_TYPE__
+#ifdef __PTRDIFF_TYPE_IS_INT__
+#define __SSIZE_TYPE__   __ATTR_W64 signed int
+#elif defined(__PTRDIFF_TYPE_IS_LONG__)
+#define __SSIZE_TYPE__   __ATTR_W64 signed long
+#elif defined(__PTRDIFF_TYPE_IS_LLONG__)
+#define __SSIZE_TYPE__   __ATTR_W64 __LONGLONG
+#else
+#define __PTRDIFF_TYPE__ __SSIZE_TYPE__
+#endif
+#endif /* !__PTRDIFF_TYPE__ */
 
 
 #endif /* !__GUARD_HYBRID_TYPECORE_H */
