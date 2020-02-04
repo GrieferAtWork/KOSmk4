@@ -36,7 +36,7 @@
 #include <sys/syslog.h>    /* syslog() */
 #include <sys/wait.h>      /* waitpid() */
 
-#include <assert.h>  /* assert() */
+//#include <assert.h>  /* assert() */
 #include <errno.h>   /* errno */
 #include <fcntl.h>   /* AT_FDDRIVE_ROOT() */
 #include <sched.h>   /* sched_yield() */

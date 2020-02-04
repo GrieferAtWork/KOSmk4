@@ -34,7 +34,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 typedef struct {
-	__ULONGPTR_TYPE__ fds_bits[__FD_SETSIZE/(8*sizeof(__ULONGPTR_TYPE__))];
+	__ULONGPTR_TYPE__ fds_bits[__FD_SETSIZE / (8 * sizeof(__ULONGPTR_TYPE__))];
 } __kernel_fd_set;
 
 typedef void (*__kernel_sighandler_t)(int);

@@ -336,9 +336,7 @@ do_symlink() {
 }
 
 
-ORIG_PATH="$PATH"
 export PREFIX="$KOS_BINUTILS/$NAME"
-export PATH="$PREFIX/bin:$PATH"
 
 do_mkdir "$PREFIX"
 do_mkdir "$PREFIX/binutils"
@@ -739,7 +737,6 @@ symlink_binutil strip
 
 
 # On windows, try to build the gdbridge wrapper program
-export PATH="$ORIG_PATH"
 if [[ `uname -s` == *CYGWIN* ]]; then
 	if ! [ -f "$KOS_MISC/gdbridge/gdbridge.exe" ] || \
 	     [ "$KOS_MISC/gdbridge/gdbridge.exe" -ot "$KOS_MISC/gdbridge/gdbridge.c" ]; then

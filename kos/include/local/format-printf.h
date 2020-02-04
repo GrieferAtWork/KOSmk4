@@ -555,7 +555,7 @@ __nextfmt:
 #endif /* !__NO_PRINTF_QUOTE */
 	case 's':
 #ifndef __NO_PRINTF_UNICODE_STRING
-		/* TODO: Support for `%Ls'   --> print wide-string (as utf-8) */
+		/* TODO: Support for `%ls'   --> print wide-string (as utf-8) */
 		/* TODO: Support for `%I16s' --> print utf-16 string (as utf-8) */
 		/* TODO: Support for `%I32s' --> print utf-32 string (as utf-8) */
 #endif /* !__NO_PRINTF_UNICODE_STRING */

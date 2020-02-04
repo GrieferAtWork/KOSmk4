@@ -4,7 +4,12 @@ Add support for *_chk variants (using __builtin_object_size())
 <a.out.h>
 
 <argp.h>
+<complex.h>
+<conio.h>
+<corecrt_wstdlib.h>
 <langinfo.h>
+<mbctype.h>
+<mbstring.h>
 <nl_types.h>
 <tgmath.h>
 <fts.h>

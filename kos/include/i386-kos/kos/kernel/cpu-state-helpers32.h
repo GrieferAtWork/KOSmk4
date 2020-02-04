@@ -38,7 +38,6 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #include <hybrid/__asm.h>
-/* TODO: CFI helpers */
 #endif /* __i386__ && !__x86_64 */
 
 #ifdef __CC__

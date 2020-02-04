@@ -528,11 +528,11 @@ __NOTHROW_NCX(icpustate64_to_kcpustate32)(struct icpustate64 const *__restrict _
 /************************************************************************/
 /* `struct scpustate32'                                                 */
 /************************************************************************/
-/* TODO: scpustate32_to_ucpustate64 */
-/* TODO: scpustate32_to_kcpustate64 */
-/* TODO: scpustate32_to_lcpustate64 */
-/* TODO: scpustate32_to_icpustate64_p */
-/* TODO: scpustate32_to_scpustate64_p */
+/* TO-DO: scpustate32_to_ucpustate64 */
+/* TO-DO: scpustate32_to_kcpustate64 */
+/* TO-DO: scpustate32_to_lcpustate64 */
+/* TO-DO: scpustate32_to_icpustate64_p */
+/* TO-DO: scpustate32_to_scpustate64_p */
 /************************************************************************/
 
 
@@ -541,9 +541,9 @@ __NOTHROW_NCX(icpustate64_to_kcpustate32)(struct icpustate64 const *__restrict _
 /************************************************************************/
 /* `struct scpustate64'                                                 */
 /************************************************************************/
-/* TODO: scpustate64_to_ucpustate32 */
-/* TODO: scpustate64_to_kcpustate32 */
-/* TODO: scpustate64_to_lcpustate32 */
+/* TO-DO: scpustate64_to_ucpustate32 */
+/* TO-DO: scpustate64_to_kcpustate32 */
+/* TO-DO: scpustate64_to_lcpustate32 */
 /************************************************************************/
 
 

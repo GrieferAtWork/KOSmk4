@@ -35,8 +35,6 @@
 __SYSDECL_BEGIN
 __NAMESPACE_FAST_BEGIN
 
-/* TODO: Inline optimizations (and call-forwarding to the regular `<optimized/string.h>' functions) */
-
 /*[[[deemon
 local aligned1 = "/" "*aligned(1)*" "/ ";
 local aligned2 = "/" "*aligned(2)*" "/ ";
