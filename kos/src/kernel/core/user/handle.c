@@ -2328,7 +2328,7 @@ handle_get_task(unsigned int fd)
 		return incref(task_getprocess());
 
 	case HANDLE_SYMBOLIC_GROUPLEADER:
-		return task_getprocessgroupleader();
+		return task_getprocessgroupleader_srch();
 
 	case HANDLE_SYMBOLIC_SESSIONLEADER:
 		return task_getsessionleader_srch();

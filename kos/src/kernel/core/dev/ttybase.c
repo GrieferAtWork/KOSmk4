@@ -101,94 +101,103 @@ kernel_terminal_check_sigtty(struct terminal *__restrict self,
 	term = container_of(self, struct ttybase_device, t_term);
 	assert(character_device_isattybase(term));
 	my_leader = task_getprocessgroupleader();
-	FINALLY_DECREF_UNLIKELY(my_leader);
-	if unlikely(FORTASK(my_leader, this_taskpid) != ATOMIC_READ(term->t_fproc.m_pointer)) {
-		struct taskpid *my_leader_pid;
-		REF struct task *oldproc;
-		REF struct taskpid *oldpid;
-		my_leader_pid = FORTASK(my_leader, this_taskpid);
+	if unlikely(!my_leader)
+		goto do_throw;
+	{
+		FINALLY_DECREF_UNLIKELY(my_leader);
+		if unlikely(FORTASK(my_leader, this_taskpid) != ATOMIC_READ(term->t_fproc.m_pointer)) {
+			struct taskpid *my_leader_pid;
+			REF struct task *oldproc;
+			REF struct taskpid *oldpid;
+			my_leader_pid = FORTASK(my_leader, this_taskpid);
 again_set_myleader_as_fproc:
-		if (term->t_fproc.cmpxch(NULL, my_leader_pid))
-			return; /* Lazily set the caller as the initial foreground process */
-		/* Check if the old foreground process has already
-		 * terminated, but hasn't been cleaned up, yet. */
-		oldpid = term->t_fproc.get();
-		if unlikely(!oldpid)
-			goto again_set_myleader_as_fproc;
-		oldproc = taskpid_gettask(oldpid);
-		if unlikely(!oldproc) {
-			bool xch_ok;
-do_try_override_fproc:
-			xch_ok = term->t_fproc.cmpxch(oldpid, my_leader_pid);
-			decref_likely(oldpid);
-			if unlikely(!xch_ok)
+			if (term->t_fproc.cmpxch(NULL, my_leader_pid))
+				return; /* Lazily set the caller as the initial foreground process */
+			/* Check if the old foreground process has already
+			 * terminated, but hasn't been cleaned up, yet. */
+			oldpid = term->t_fproc.get();
+			if unlikely(!oldpid)
 				goto again_set_myleader_as_fproc;
-			return; /* All right! we've got the lock. */
-		}
-		if (ATOMIC_READ(oldproc->t_flags) & (TASK_FTERMINATING |
-		                                     TASK_FTERMINATED)) {
-			decref_unlikely(oldproc);
-			goto do_try_override_fproc;
-		}
-		decref_unlikely(oldproc);
-		decref_unlikely(oldpid);
-
-
-		/* 11.1.4 -- Terminal Access Control */
-		if (is_SIGTTOU) {
-			printk(KERN_INFO "[tty:%q] Background process group %p [tid=%u], thread %p [tid=%u] tried to write\n",
-			       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader),
-			       THIS_TASK, task_getroottid_s());
-			/* ... Attempts by a process in a background process group to write to its controlling
-			 * terminal shall cause the process group to be sent a SIGTTOU signal unless one of the
-			 * following special cases applies:
-			 *   - If [...] the process is ignoring or blocking the SIGTTOU signal, the process
-			 *     is allowed to write to the terminal and the SIGTTOU signal is not sent.
-			 *   - If [...] the process group of the writing process is orphaned, and the writing
-			 *     process is not ignoring or blocking the SIGTTOU signal, the write() shall return -1
-			 *     with errno set to [EIO] and no signal shall be sent */
-			if (taskpid_isorphan_p(my_leader_pid)) {
-do_throw_ttou:
-				THROW(E_IOERROR_NODATA,
-				      E_IOERROR_SUBSYSTEM_TTY,
-				      E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU);
+			oldproc = taskpid_gettask(oldpid);
+			if unlikely(!oldproc) {
+				bool xch_ok;
+do_try_override_fproc:
+				xch_ok = term->t_fproc.cmpxch(oldpid, my_leader_pid);
+				decref_likely(oldpid);
+				if unlikely(!xch_ok)
+					goto again_set_myleader_as_fproc;
+				return; /* All right! we've got the lock. */
 			}
-			/* NOTE: We also do the same if our process group leader has died, because once
-			 *       that has happened, any other process is allowed to steal the TTY! */
-			if (my_leader->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED))
-				goto do_throw_ttou;
-			task_raisesignalprocessgroup(my_leader, SIGTTOU);
-			/* We might get here if the calling process changed its process group
-			 * in the mean time. - In this case, just re-raise `SIGTTIN' within the
-			 * calling process only. */
-			task_raisesignalprocess(task_getprocess(), SIGTTOU);
-			/* We might get here if `SIGTTOU' is being ignored by the calling thread.
-			 * -> As described by POSIX, allow the process to write in this szenario. */
-		} else {
-			printk(KERN_INFO "[tty:%q] Background process group %p [tid=%u], thread %p [tid=%u] tried to read\n",
-			       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader),
-			       THIS_TASK, task_getroottid_s());
-			/* ... if the reading process is ignoring or blocking the SIGTTIN signal, or if
-			 * the process group of the reading process isorphaned, the read() shall return
-			 * -1, with errno set to [EIO] and no signal shall be sent. */
-			if (taskpid_isorphan_p(my_leader_pid))
+			if (ATOMIC_READ(oldproc->t_flags) & (TASK_FTERMINATING |
+			                                     TASK_FTERMINATED)) {
+				decref_unlikely(oldproc);
+				goto do_try_override_fproc;
+			}
+			decref_unlikely(oldproc);
+			decref_unlikely(oldpid);
+	
+	
+			/* 11.1.4 -- Terminal Access Control */
+			if (is_SIGTTOU) {
+				printk(KERN_INFO "[tty:%q] Background process group %p [tid=%u], thread %p [tid=%u] tried to write\n",
+				       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader),
+				       THIS_TASK, task_getroottid_s());
+				/* ... Attempts by a process in a background process group to write to its controlling
+				 * terminal shall cause the process group to be sent a SIGTTOU signal unless one of the
+				 * following special cases applies:
+				 *   - If [...] the process is ignoring or blocking the SIGTTOU signal, the process
+				 *     is allowed to write to the terminal and the SIGTTOU signal is not sent.
+				 *   - If [...] the process group of the writing process is orphaned, and the writing
+				 *     process is not ignoring or blocking the SIGTTOU signal, the write() shall return -1
+				 *     with errno set to [EIO] and no signal shall be sent */
+				if (taskpid_isorphan_p(my_leader_pid))
+					goto do_throw_ttou;
+				/* NOTE: We also do the same if our process group leader has died, because once
+				 *       that has happened, any other process is allowed to steal the TTY! */
+				if (my_leader->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED))
+					goto do_throw_ttou;
+				task_raisesignalprocessgroup(my_leader, SIGTTOU);
+				/* We might get here if the calling process changed its process group
+				 * in the mean time. - In this case, just re-raise `SIGTTIN' within the
+				 * calling process only. */
+				task_raisesignalprocess(task_getprocess(), SIGTTOU);
+				/* We might get here if `SIGTTOU' is being ignored by the calling thread.
+				 * -> As described by POSIX, allow the process to write in this szenario. */
+			} else {
+				printk(KERN_INFO "[tty:%q] Background process group %p [tid=%u], thread %p [tid=%u] tried to read\n",
+				       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader),
+				       THIS_TASK, task_getroottid_s());
+				/* ... if the reading process is ignoring or blocking the SIGTTIN signal, or if
+				 * the process group of the reading process isorphaned, the read() shall return
+				 * -1, with errno set to [EIO] and no signal shall be sent. */
+				if (taskpid_isorphan_p(my_leader_pid))
+					goto do_throw_ttin;
+				/* NOTE: We also do the same if our process group leader has died, because once
+				 *       that has happened, any other process is allowed to steal the TTY! */
+				if (my_leader->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED))
+					goto do_throw_ttin;
+				task_raisesignalprocessgroup(my_leader, SIGTTIN);
+				/* We might get here if the calling process changed its process group
+				 * in the mean time. - In this case, just re-raise `SIGTTIN' within the
+				 * calling process only. */
+				task_raisesignalprocess(task_getprocess(), SIGTTIN);
+				/* We might get here if `SIGTTIN' is being ignored by the calling thread. */
 				goto do_throw_ttin;
-			/* NOTE: We also do the same if our process group leader has died, because once
-			 *       that has happened, any other process is allowed to steal the TTY! */
-			if (my_leader->t_flags & (TASK_FTERMINATING | TASK_FTERMINATED))
-				goto do_throw_ttin;
-			task_raisesignalprocessgroup(my_leader, SIGTTIN);
-			/* We might get here if the calling process changed its process group
-			 * in the mean time. - In this case, just re-raise `SIGTTIN' within the
-			 * calling process only. */
-			task_raisesignalprocess(task_getprocess(), SIGTTIN);
-			/* We might get here if `SIGTTIN' is being ignored by the calling thread. */
-do_throw_ttin:
-			THROW(E_IOERROR_NODATA,
-			      E_IOERROR_SUBSYSTEM_TTY,
-			      E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN);
+			}
 		}
 	}
+	return;
+do_throw:
+	if (!is_SIGTTOU)
+		goto do_throw_ttin;
+do_throw_ttou:
+	THROW(E_IOERROR_NODATA,
+	      E_IOERROR_SUBSYSTEM_TTY,
+	      E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU);
+do_throw_ttin:
+	THROW(E_IOERROR_NODATA,
+	      E_IOERROR_SUBSYSTEM_TTY,
+	      E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN);
 }
 
 /* Kernel-level implementations for terminal system operators. */

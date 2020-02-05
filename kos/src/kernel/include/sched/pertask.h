@@ -33,6 +33,9 @@ struct task;
 struct cpu;
 struct vm;
 extern "C++" {
+#define FORTASK FORTASK
+#define FORCPU  FORCPU
+#define FORVM   FORVM
 template<class __T> __T &(FORTASK)(struct task *__restrict self, __T &x);
 template<class __T> __T const &(FORTASK)(struct task const *__restrict self, __T const &x);
 template<class __T> __T &(FORCPU)(struct cpu *__restrict self, __T &x);
@@ -40,9 +43,6 @@ template<class __T> __T const &(FORCPU)(struct cpu const *__restrict self, __T c
 template<class __T> __T &(FORVM)(struct vm *__restrict self, __T &x);
 template<class __T> __T const &(FORVM)(struct vm const *__restrict self, __T const &x);
 }
-#define FORTASK FORTASK
-#define FORCPU  FORCPU
-#define FORVM   FORVM
 #else /* __INTELLISENSE__ && __cplusplus */
 #define FORTASK(self,x)  (*(__typeof__(&(x)))((__UINTPTR_TYPE__)(self)+(__UINTPTR_TYPE__)&(x)))
 #define FORCPU(self,x)   (*(__typeof__(&(x)))((__UINTPTR_TYPE__)(self)+(__UINTPTR_TYPE__)&(x)))

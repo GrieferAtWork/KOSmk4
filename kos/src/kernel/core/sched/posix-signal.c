@@ -1749,7 +1749,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, syscall_ulong_t, signo) {
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
 	} else if (pid == 0) {
 		/* Kill all processes in the calling thread's process group. */
-		target = task_getprocessgroupleader();
+		target = task_getprocessgroupleader_srch();
 		goto do_inherit_target_and_raise_processgroup;
 	} else if (pid == -1) {
 		/* TODO: Kill all processes that we're allowed to (except for pid=1). */
