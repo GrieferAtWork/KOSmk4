@@ -504,6 +504,9 @@ PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 	struct task *myidle;
 	myidle = &FORCPU(self, thiscpu_idle);
+#ifndef NDEBUG
+	ATOMIC_WRITE(myidle->t_refcnt, 0); /* Satisfy assertions... */
+#endif /* !NDEBUG */
 	{
 		/* Run finalizers for the IDLE task. */
 		pertask_fini_t *iter;

@@ -403,6 +403,8 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 #else /* __INTELLISENSE__ */
 #define mygroup FORTASK(self, this_taskgroup)
 #endif /* !__INTELLISENSE__ */
+	assert(wasdestroyed(self));
+	assert(!mypid || mypid->tp_thread.m_pointer == self);
 	sigqueue_fini(&FORTASK(self, this_sigqueue));
 	if unlikely(mygroup.tg_process == NULL)
 		; /* Incomplete initialization... */
@@ -446,11 +448,6 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 			assertf(mygroup.tg_pgrp_processes != self,
 			        "The group leader should not be apart of the group process chain\n"
 			        "self = %p", self);
-			assertf(mygroup.tg_pgrp_processes == NULL,
-			        "Other group members should have kept us "
-			        "alive via their `tg_proc_group' fields\n"
-			        "mygroup.tg_pgrp_processes = %p\n",
-			        mygroup.tg_pgrp_processes);
 			if (mygroup.tg_pgrp_session != mypid) {
 				if (mygroup.tg_pgrp_session != NULL)
 					decref(mygroup.tg_pgrp_session);
@@ -593,7 +590,7 @@ task_setprocess(struct task *__restrict self,
 	} else {
 		REF struct taskpid *grouppid;
 		/* Add to an existing process group. */
-		group = task_getprocessgroupleader_of(group);
+		group = task_getprocessgroupleader_srch_of(group);
 		TRY {
 			sync_write(&FORTASK(group, this_taskgroup).tg_pgrp_processes_lock);
 		} EXCEPT {
@@ -674,35 +671,37 @@ again_set_self:
 				*pold_group_leader = incref(old_group_pid);
 			sync_endwrite(&thread_taskgroup.tg_proc_group_lock);
 		} else {
-			REF struct task *old_group;
 			REF struct taskpid *session_pid = NULL;
-			old_group = taskpid_gettask(old_group_pid);
-			if likely(old_group) {
-				/* Figure out which session the new thread group should be apart of
-				 * (make it so that the thread keeps its effective, old session) */
-				if (!sync_trywrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock)) {
-					sync_endwrite(&thread_taskgroup.tg_proc_group_lock);
-					FINALLY_DECREF_UNLIKELY(old_group);
-					sync_write(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock);
+			{
+				REF struct task *old_group;
+				old_group = taskpid_gettask(old_group_pid);
+				if likely(old_group) {
+					/* Figure out which session the new thread group should be apart of
+					 * (make it so that the thread keeps its effective, old session) */
+					if (!sync_trywrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock)) {
+						sync_endwrite(&thread_taskgroup.tg_proc_group_lock);
+						FINALLY_DECREF_UNLIKELY(old_group);
+						sync_write(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock);
+						sync_endwrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock);
+						goto again_set_self;
+					}
+					session_pid = incref(FORTASK(old_group, this_taskgroup).tg_pgrp_session);
 					sync_endwrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock);
-					goto again_set_self;
-				}
-				session_pid = incref(FORTASK(old_group, this_taskgroup).tg_pgrp_session);
-				sync_endwrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock);
-
-				/* Remove the thread from its old process group. */
-				if (!sync_trywrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_processes_lock)) {
-					sync_endwrite(&thread_taskgroup.tg_proc_group_lock);
-					decref_unlikely(session_pid);
-					FINALLY_DECREF_UNLIKELY(old_group);
-					sync_write(&FORTASK(old_group, this_taskgroup).tg_pgrp_processes_lock);
+	
+					/* Remove the thread from its old process group. */
+					if (!sync_trywrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_processes_lock)) {
+						sync_endwrite(&thread_taskgroup.tg_proc_group_lock);
+						decref_unlikely(session_pid);
+						FINALLY_DECREF_UNLIKELY(old_group);
+						sync_write(&FORTASK(old_group, this_taskgroup).tg_pgrp_processes_lock);
+						sync_endwrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_processes_lock);
+						goto again_set_self;
+					}
+					/* Unlink the given thread from its old group */
+					LLIST_REMOVE_P(thread, PATH_this_taskgroup__tg_proc_group_siblings);
 					sync_endwrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_processes_lock);
-					goto again_set_self;
+					decref_unlikely(old_group);
 				}
-				/* Unlink the given thread from its old group */
-				LLIST_REMOVE_P(thread, PATH_this_taskgroup__tg_proc_group_siblings);
-				sync_endwrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_processes_lock);
-				decref_unlikely(old_group);
 			}
 			/* Setup the given thread to become its own process group. */
 			thread_taskgroup.tg_proc_group = incref(threadpid); /* Inherit old reference into `old_group_pid' */
@@ -842,6 +841,7 @@ again_set_existing:
 				sync_endwrite(&thread_taskgroup.tg_proc_group_lock);
 				xdecref_unlikely(old_group_leader);
 			}
+			decref_unlikely(new_group_leader);
 			if (pold_group_leader)
 				*pold_group_leader = old_group_leader_pid;
 			else {
@@ -2767,13 +2767,13 @@ again_waitfor:
 	case HOP_TASK_GETPGID: {
 		upid_t result;
 		REF struct task *thread;
-		REF struct task *leader;
+		REF struct taskpid *leader;
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
 		FINALLY_DECREF_UNLIKELY(thread);
-		leader = task_getprocessgroupleader_of(thread);
-		result = task_gettid_of_s(leader);
+		leader = task_getprocessgroupleaderpid_of(thread);
+		result = taskpid_getpid_s(leader);
 		decref_unlikely(leader);
 		return result;
 	}	break;
@@ -2781,13 +2781,13 @@ again_waitfor:
 	case HOP_TASK_GETSID: {
 		upid_t result;
 		REF struct task *thread;
-		REF struct task *leader;
+		REF struct taskpid *leader;
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
 		FINALLY_DECREF_UNLIKELY(thread);
-		leader = task_getsessionleader_srch_of(thread);
-		result = task_gettid_of_s(leader);
+		leader = task_getsessionleaderpid_of(thread);
+		result = taskpid_getpid_s(leader);
 		decref_unlikely(leader);
 		return result;
 	}	break;
