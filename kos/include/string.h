@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9aced285 */
+/* HASH CRC-32:0xc6aa8cd1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -324,9 +324,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strlen, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED 
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
 extern "C++" {
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char *,__NOTHROW_NCX,strchr,(char *__restrict __haystack, int __needle),{ return __builtin_strchr(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char *,__NOTHROW_NCX,strchr,(char *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char const *,__NOTHROW_NCX,strchr,(char const *__restrict __haystack, int __needle),{ return __builtin_strchr(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char const *,__NOTHROW_NCX,strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 }
 #elif defined(__CRT_HAVE_strchr)
 extern "C++" {
@@ -365,9 +365,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strchr, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED 
 #if __has_builtin(__builtin_strrchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strrchr)
 extern "C++" {
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char *,__NOTHROW_NCX,strrchr,(char *__restrict __haystack, int __needle),{ return __builtin_strrchr(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char *,__NOTHROW_NCX,strrchr,(char *__restrict __haystack, int __needle),strrchr,{ return __builtin_strrchr(__haystack, __needle); })
 /* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char const *,__NOTHROW_NCX,strrchr,(char const *__restrict __haystack, int __needle),{ return __builtin_strrchr(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char const *,__NOTHROW_NCX,strrchr,(char const *__restrict __haystack, int __needle),strrchr,{ return __builtin_strrchr(__haystack, __needle); })
 }
 #elif defined(__CRT_HAVE_strrchr)
 extern "C++" {
@@ -433,10 +433,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strncmp, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED
 extern "C++" {
 /* Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
  * If no such needle exists, return `NULL' */
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) ,char *,__NOTHROW_NCX,strstr,(char *__haystack, char *__needle),{ return __builtin_strstr(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) ,char *,__NOTHROW_NCX,strstr,(char *__haystack, char *__needle),strstr,{ return __builtin_strstr(__haystack, __needle); })
 /* Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
  * If no such needle exists, return `NULL' */
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) ,char const *,__NOTHROW_NCX,strstr,(char const *__haystack, char const *__needle),{ return __builtin_strstr(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) ,char const *,__NOTHROW_NCX,strstr,(char const *__haystack, char const *__needle),strstr,{ return __builtin_strstr(__haystack, __needle); })
 }
 #elif defined(__CRT_HAVE_strstr)
 extern "C++" {
@@ -541,8 +541,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strspn, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED 
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 #if __has_builtin(__builtin_strpbrk) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strpbrk)
 extern "C++" {
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) ,char *,__NOTHROW_NCX,strpbrk,(char *__haystack, char const *__accept),{ return __builtin_strpbrk(__haystack, __accept); })
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) ,char const *,__NOTHROW_NCX,strpbrk,(char const *__haystack, char const *__accept),{ return __builtin_strpbrk(__haystack, __accept); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) ,char *,__NOTHROW_NCX,strpbrk,(char *__haystack, char const *__accept),strpbrk,{ return __builtin_strpbrk(__haystack, __accept); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) ,char const *,__NOTHROW_NCX,strpbrk,(char const *__haystack, char const *__accept),strpbrk,{ return __builtin_strpbrk(__haystack, __accept); })
 }
 #elif defined(__CRT_HAVE_strpbrk)
 extern "C++" {
@@ -1235,8 +1235,8 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRINGS_H_PROTO)
 #if __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
 extern "C++" {
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char *,__NOTHROW_NCX,index,(char *__restrict __haystack, int __needle),{ return __builtin_index(__haystack, __needle); })
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char const *,__NOTHROW_NCX,index,(char const *__restrict __haystack, int __needle),{ return __builtin_index(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char *,__NOTHROW_NCX,index,(char *__restrict __haystack, int __needle),index,{ return __builtin_index(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char const *,__NOTHROW_NCX,index,(char const *__restrict __haystack, int __needle),index,{ return __builtin_index(__haystack, __needle); })
 }
 #elif defined(__CRT_HAVE_index)
 extern "C++" {
@@ -1266,8 +1266,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(index, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED _
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRINGS_H_PROTO)
 #if __has_builtin(__builtin_rindex) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rindex)
 extern "C++" {
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char *,__NOTHROW_NCX,rindex,(char *__restrict __haystack, int __needle),{ return __builtin_rindex(__haystack, __needle); })
-__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char const *,__NOTHROW_NCX,rindex,(char const *__restrict __haystack, int __needle),{ return __builtin_rindex(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char *,__NOTHROW_NCX,rindex,(char *__restrict __haystack, int __needle),rindex,{ return __builtin_rindex(__haystack, __needle); })
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) ,char const *,__NOTHROW_NCX,rindex,(char const *__restrict __haystack, int __needle),rindex,{ return __builtin_rindex(__haystack, __needle); })
 }
 #elif defined(__CRT_HAVE_rindex)
 extern "C++" {

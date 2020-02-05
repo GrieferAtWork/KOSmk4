@@ -5491,11 +5491,11 @@ do_return_crt:
 									fp, impl, key_identity, key_identity,
 									key_underscore, transform_argument_types, none);
 							} else {
-								if (extern_name == my_name) {
-									fp << "__CEIDECLARE(";
-								} else {
-									fp << "__CEIREDIRECT(";
-								}
+								/* Always re-direct in `extern "C++"' scopes! */
+								//if (extern_name == my_name) {
+								//	fp << "__CEIDECLARE(";
+								//} else 
+								fp << "__CEIREDIRECT(";
 								fp << decl_prefix[13:] << ",";
 								for (local is_word, word: split_words(return_type, env: this)) {
 									if (is_word)
@@ -5507,9 +5507,7 @@ do_return_crt:
 									fp << "__" << is_nothrow;
 								fp << "," << my_name << ",(";
 								print_argument_list(fp, args, key_underscore, "", transform_argument_types);
-								fp << "),";
-								if (extern_name != my_name)
-									fp << extern_name << ",";
+								fp << ")," << extern_name << ",";
 								do_transform_block(
 									fp, impl, key_identity, key_identity,
 									key_underscore, transform_argument_types, none);
