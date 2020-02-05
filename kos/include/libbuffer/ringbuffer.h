@@ -110,11 +110,15 @@ struct ringbuffer {
 #ifdef __INTELLISENSE__
 __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(ringbuffer_close)(struct ringbuffer *__restrict self);
+__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) bool
+__NOTHROW(ringbuffer_closed)(struct ringbuffer *__restrict self);
 #else /* __INTELLISENSE__ */
 #define ringbuffer_close(self)                                     \
 	(__hybrid_atomic_store((self)->rb_limit, 0, __ATOMIC_RELEASE), \
 	 sched_signal_broadcast(&(self)->rb_nempty),                   \
 	 sched_signal_broadcast(&(self)->rb_nfull))
+#define ringbuffer_closed(self) \
+	(__hybrid_atomic_load((self)->rb_limit, __ATOMIC_ACQUIRE) == 0)
 #endif /* !__INTELLISENSE__ */
 
 #ifdef __KERNEL__

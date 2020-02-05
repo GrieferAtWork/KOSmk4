@@ -769,7 +769,7 @@ mouse_device_read(struct character_device *__restrict self,
 	if (mode & IO_NONBLOCK) {
 		packet = mouse_buffer_trygetpacket(&me->md_buf);
 		if (packet.mp_type == MOUSE_PACKET_TYPE_NONE)
-			goto empty;
+			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
 	} else {
 		packet = mouse_buffer_getpacket(&me->md_buf);
 		assert(packet.mp_type != MOUSE_PACKET_TYPE_NONE);

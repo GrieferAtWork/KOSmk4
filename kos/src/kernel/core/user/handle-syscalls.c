@@ -211,14 +211,17 @@ ioctl_generic(syscall_ulong_t command,
 		break;
 
 	case FIONBIO:
-	case _IOW(_IOC_TYPE(FIONBIO), _IOC_NR(FIONBIO), int):
+	case _IOW(_IOC_TYPE(FIONBIO), _IOC_NR(FIONBIO), int): {
+		int mode;
 		/* Set/clear IO_NONBLOCK */
 		validate_readable(arg, sizeof(int));
+		mode = ATOMIC_READ(*(int *)arg);
+		/* XXX: Verify mode == 0/1 */
 		handle_stflags(THIS_HANDLE_MANAGER,
 		               fd,
 		               ~IO_NONBLOCK,
-		               ATOMIC_READ(*(int *)arg) ? IO_NONBLOCK : 0);
-		break;
+		               mode ? IO_NONBLOCK : 0);
+	}	break;
 
 	case FIOASYNC:
 	case _IOW(_IOC_TYPE(FIOASYNC), _IOC_NR(FIOASYNC), int): {
@@ -228,6 +231,7 @@ ioctl_generic(syscall_ulong_t command,
 		COMPILER_READ_BARRIER();
 		mode = *(USER CHECKED int *)arg;
 		COMPILER_READ_BARRIER();
+		/* XXX: Verify mode == 0/1 */
 		handle_stflags(THIS_HANDLE_MANAGER,
 		               fd,
 		               ~IO_ASYNC,

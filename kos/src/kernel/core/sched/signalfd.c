@@ -183,8 +183,11 @@ handle_signalfd_read(struct signalfd *__restrict self,
 		siginfo_t si;
 		USER CHECKED struct signalfd_siginfo *usi;
 		if (!signalfd_try_read(self, &si)) {
-			if (mode & IO_NONBLOCK)
-				break;
+			if (mode & IO_NONBLOCK) {
+				if (result)
+					break;
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+			}
 			connect_to_my_signal_queues();
 			if (signalfd_try_read(self, &si)) {
 				task_disconnectall();

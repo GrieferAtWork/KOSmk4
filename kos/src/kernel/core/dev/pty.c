@@ -132,23 +132,28 @@ again_read:
 		decref_unlikely(slave);
 		RETHROW();
 	}
-	if (!result && !(mode & IO_NONBLOCK)) {
-		/* Must not keep a reference to the slave while sleeping! */
-		poll_mode_t what;
-		TRY {
-			what = ringbuffer_poll(&slave->ps_obuf, POLLIN);
-		} EXCEPT {
+	if (!result) {
+		if (mode & IO_NONBLOCK) {
+			if (!ringbuffer_closed(&slave->ps_obuf))
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No data available. */
+		} else {
+			/* Must not keep a reference to the slave while sleeping! */
+			poll_mode_t what;
+			TRY {
+				what = ringbuffer_poll(&slave->ps_obuf, POLLIN);
+			} EXCEPT {
+				decref_unlikely(slave);
+				RETHROW();
+			}
+			if (what & POLLIN) {
+				task_disconnectall();
+				goto again_read;
+			}
+			/* Wait for something to happen without holding a reference to the slave! */
 			decref_unlikely(slave);
-			RETHROW();
+			task_waitfor();
+			goto again_getslave;
 		}
-		if (what & POLLIN) {
-			task_disconnectall();
-			goto again_read;
-		}
-		/* Wait for something to happen without holding a reference to the slave! */
-		decref_unlikely(slave);
-		task_waitfor();
-		goto again_getslave;
 	}
 	decref_unlikely(slave);
 	return result;
@@ -177,36 +182,40 @@ again_write:
 		RETHROW();
 	}
 	assert((size_t)result <= num_bytes);
-	if (!result && !(mode & IO_NONBLOCK)) {
-		/* Must not keep a reference to the slave while sleeping! */
-		int how;
-		TRY {
-			how = terminal_poll_iwrite(&slave->t_term);
-		} EXCEPT {
-			decref_unlikely(slave);
-			RETHROW();
-		}
-		if (how == TERMINAL_POLL_NONBLOCK) {
-			task_disconnectall();
-			goto again_write;
-		}
-		if (how == TERMINAL_POLL_MAYBLOCK_UNDERLYING) {
-			poll_mode_t what;
+	if (!result) {
+		if (mode & IO_NONBLOCK) {
+			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+		} else {
+			/* Must not keep a reference to the slave while sleeping! */
+			int how;
 			TRY {
-				what = ringbuffer_poll(&slave->ps_obuf, POLLOUT);
+				how = terminal_poll_iwrite(&slave->t_term);
 			} EXCEPT {
 				decref_unlikely(slave);
 				RETHROW();
 			}
-			if (what & POLLOUT) {
+			if (how == TERMINAL_POLL_NONBLOCK) {
 				task_disconnectall();
 				goto again_write;
 			}
+			if (how == TERMINAL_POLL_MAYBLOCK_UNDERLYING) {
+				poll_mode_t what;
+				TRY {
+					what = ringbuffer_poll(&slave->ps_obuf, POLLOUT);
+				} EXCEPT {
+					decref_unlikely(slave);
+					RETHROW();
+				}
+				if (what & POLLOUT) {
+					task_disconnectall();
+					goto again_write;
+				}
+			}
+			/* Wait for something to happen without holding a reference to the slave! */
+			decref_unlikely(slave);
+			task_waitfor();
+			goto again_getslave;
 		}
-		/* Wait for something to happen without holding a reference to the slave! */
-		decref_unlikely(slave);
-		task_waitfor();
-		goto again_getslave;
 	}
 	decref_unlikely(slave);
 	return (size_t)result;

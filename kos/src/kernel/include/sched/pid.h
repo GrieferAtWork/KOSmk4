@@ -182,6 +182,10 @@ struct taskgroup {
 	                                                      * In the event that the parent process terminates before its child, this field
 	                                                      * gets set to `NULL', at which point `THIS_TASKPID->tp_siblings' is unbound. */
 	struct atomic_rwlock         tg_proc_group_lock;     /* Lock for `tg_proc_group' */
+	/* TODO: This needs to become `struct taskpid *tg_proc_group'
+	 *       Otherwise, a terminated process might be kept alive
+	 *       and interfere with read(pipe()) after the write-end
+	 *       was closed by a different process. */
 	REF struct task             *tg_proc_group;          /* [1..1][ref_if(!= THIS_TASK)][lock(tg_proc_group_lock)]
 	                                                      * @assume(tg_proc_procgroup == FORTASK(tg_proc_procgroup,this_taskgroup).tg_proc_procgroup)
 	                                                      * The leader of the associated process group.
@@ -198,8 +202,12 @@ struct taskgroup {
 	                                                      * NOTE: This chain is set to `TASKGROUP_TG_PGRP_PROCESSES_TERMINATED' to prevent any
 	                                                      *       new processes from being added to the process group. */
 	struct atomic_rwlock         tg_pgrp_session_lock;   /* Lock for `tg_pgrp_session' */
+	/* TODO: This needs to become `struct taskpid *tg_pgrp_session'
+	 *       Otherwise, a terminated process might be kept alive
+	 *       and interfere with read(pipe()) after the write-end
+	 *       was closed by a different process. */
 	REF struct task             *tg_pgrp_session;        /* [1..1][ref_if(!= THIS_TASK)][const_if(== THIS_TASK)][lock(tg_pgrp_session_lock)]
-	                                                      * @assume(tg_pgrp_session == FORTASK(tg_pgrp_session,this_taskgroup).tg_pgrp_session)
+	                                                      * @assume(tg_pgrp_session == FORTASK(tg_pgrp_session, this_taskgroup).tg_pgrp_session)
 	                                                      * The session leader of the this process group.
 	                                                      * When set to `THIS_TASK', then the calling thread is that leader. */
 	/* All of the following fields are only valid when `tg_pgrp_session == THIS_TASK' (Otherwise, they are all `[0..1][const]') */

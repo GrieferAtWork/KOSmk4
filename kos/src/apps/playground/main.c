@@ -65,11 +65,6 @@
 
 DECL_BEGIN
 
-/* TODO: read() should return -EAGAIN when called with IO_NONBLOCK, and no
- *       data was available. Currently, the KOS kernel returns `0' for this
- *       case, which would be indicative of EOF. - There has to be a difference
- *       between these two (the biggest culprit here are ringbuffer-based objects) */
-
 /* TODO: Add support for `int ungetchar(int ch)' (same as `ungetc(ch, stdin)') */
 
 /* TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection... */

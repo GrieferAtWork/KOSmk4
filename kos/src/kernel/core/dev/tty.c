@@ -187,15 +187,7 @@ tty_device_fwd_main(REF struct tty_device_forward *__restrict fwd) {
 				 *       Otherwise, you would no longer be able to CTRL+C a hung
 				 *       application after hammering away at your keyboard for a
 				 *       couple of minutes. */
-				TRY {
-					terminal_iwrite(&tty->t_term, buf, count, IO_WRONLY | IO_NONBLOCK);
-				} EXCEPT {
-					if (!was_thrown(E_WOULDBLOCK))
-						RETHROW();
-					/* Discard `E_WOULDBLOCK' errors. (which can
-					 * happen because we're using `IO_NONBLOCK')
-					 * s.a. The note above... */
-				}
+				terminal_iwrite(&tty->t_term, buf, count, IO_WRONLY | IO_NONBLOCK);
 			}
 			assert(!task_isconnected());
 		} EXCEPT {

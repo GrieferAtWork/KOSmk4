@@ -90,10 +90,8 @@ struct tty_device_forward {
 	 * the application which a user is trying to terminate actually
 	 * reads from its TTY (which really defeats the point in the most
 	 * common use of CTRL+C being to halt a program that has hung itself)
-	 * The solution here is to designate a thread to continuously read from
-	 * the TTY input handle (keyboard) and pass anything that it gets to
-	 * `terminal_iwrite()' (with IO_NONBLOCK set, so that something like
-	 * a filled up input buffer won't hinder processing of control combinations, either)
+	 * The solution here is to designate a thread to continuously read from the TTY
+	 * input handle (keyboard) and pass anything that it gets to `terminal_iwrite()'
 	 *
 	 * Note however that there _has_ to be a way to terminate/restart this thread
 	 * using some ioctl(), because after all: Any given keyboard input can only

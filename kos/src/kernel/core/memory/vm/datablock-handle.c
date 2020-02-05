@@ -52,9 +52,9 @@ handle_datablock_pread(struct vm_datablock *__restrict self,
                        USER CHECKED void *dst,
                        size_t num_bytes, pos_t addr, iomode_t mode) {
 	if (vm_datablock_isinode(self)) {
-		return mode & IO_NONBLOCK
-		       ? inode_read_blocking((struct inode *)self, dst, num_bytes, addr)
-		       : inode_read((struct inode *)self, dst, num_bytes, addr);
+		/* TODO: Support for `IO_NONBLOCK' */
+		(void)mode;
+		return inode_read((struct inode *)self, dst, num_bytes, addr);
 	}
 	vm_datablock_read(self, dst, num_bytes, addr);
 	return num_bytes;
@@ -79,9 +79,9 @@ handle_datablock_preadv(struct vm_datablock *__restrict self,
                         struct aio_buffer *__restrict dst, size_t num_bytes,
                         pos_t addr, iomode_t mode) {
 	if (vm_datablock_isinode(self)) {
-		return mode & IO_NONBLOCK
-		       ? inode_readv((struct inode *)self, dst, num_bytes, addr)
-		       : inode_readv_blocking((struct inode *)self, dst, num_bytes, addr);
+		/* TODO: Support for `IO_NONBLOCK' */
+		(void)mode;
+		return inode_readv((struct inode *)self, dst, num_bytes, addr);
 	}
 	vm_datablock_readv(self, dst, num_bytes, addr);
 	return num_bytes;
@@ -1212,6 +1212,9 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		superblock_sync((struct superblock *)self,
 		                (unsigned int)(uintptr_t)arg != 0);
 		break;
+
+		/* TODO: HOP for using `inode_read_blocking()' */
+		/* TODO: HOP for using `inode_readv_blocking()' */
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

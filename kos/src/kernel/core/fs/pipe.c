@@ -219,9 +219,15 @@ again:
 		buf    = ATOMIC_READ(data->pws_buf);
 		buflen = ATOMIC_READ(data->pws_buflen);
 		validate_readable(buf, buflen);
-		buflen = mode & IO_NONBLOCK
-		         ? ringbuffer_write_nonblock(&self->p_buffer, buf, buflen)
-		         : ringbuffer_writesome(&self->p_buffer, buf, buflen);
+		if (mode & IO_NONBLOCK) {
+			size_t temp;
+			temp = ringbuffer_write_nonblock(&self->p_buffer, buf, buflen);
+			if (!temp && buflen && !ringbuffer_closed(&self->p_buffer))
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
+			buflen = temp;
+		} else {
+			buflen = ringbuffer_writesome(&self->p_buffer, buf, buflen);
+		}
 		ATOMIC_WRITE(data->pws_written, buflen);
 	} break;
 
@@ -249,9 +255,15 @@ again:
 			ent.iov_base = ATOMIC_READ(buf[i].iov_base);
 			ent.iov_len  = ATOMIC_READ(buf[i].iov_len);
 			validate_readable(ent.iov_base, ent.iov_len);
-			temp = result || mode & IO_NONBLOCK
-			       ? ringbuffer_write_nonblock(&self->p_buffer, ent.iov_base, ent.iov_len)
-			       : ringbuffer_writesome(&self->p_buffer, ent.iov_base, ent.iov_len);
+			if (result) {
+				temp = ringbuffer_write_nonblock(&self->p_buffer, ent.iov_base, ent.iov_len);
+			} else if (mode & IO_NONBLOCK) {
+				temp = ringbuffer_write_nonblock(&self->p_buffer, ent.iov_base, ent.iov_len);
+				if (!temp && ent.iov_len && !ringbuffer_closed(&self->p_buffer))
+					THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
+			} else {
+				temp = ringbuffer_writesome(&self->p_buffer, ent.iov_base, ent.iov_len);
+			}
 			result += temp;
 			if (temp < ent.iov_len)
 				break;
@@ -391,18 +403,30 @@ INTERN size_t KCALL
 handle_pipe_read(struct pipe *__restrict self,
                  USER CHECKED void *dst,
                  size_t num_bytes, iomode_t mode) {
-	return mode & IO_NONBLOCK
-	       ? ringbuffer_read_nonblock(&self->p_buffer, dst, num_bytes)
-	       : ringbuffer_read(&self->p_buffer, dst, num_bytes);
+	size_t result;
+	if (mode & IO_NONBLOCK) {
+		result = ringbuffer_read_nonblock(&self->p_buffer, dst, num_bytes);
+		if (!result && num_bytes && !ringbuffer_closed(&self->p_buffer))
+			THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No data available. */
+	} else {
+		result = ringbuffer_read(&self->p_buffer, dst, num_bytes);
+	}
+	return result;
 }
 
 INTERN size_t KCALL
 handle_pipe_write(struct pipe *__restrict self,
                   USER CHECKED void const *src,
                   size_t num_bytes, iomode_t mode) {
-	return mode & IO_NONBLOCK
-	       ? ringbuffer_write_nonblock(&self->p_buffer, src, num_bytes)
-	       : ringbuffer_write(&self->p_buffer, src, num_bytes);
+	size_t result;
+	if (mode & IO_NONBLOCK) {
+		result = ringbuffer_write_nonblock(&self->p_buffer, src, num_bytes);
+		if (!result && num_bytes && !ringbuffer_closed(&self->p_buffer))
+			THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
+	} else {
+		result = ringbuffer_write(&self->p_buffer, src, num_bytes);
+	}
+	return result;
 }
 
 INTERN size_t KCALL
@@ -413,11 +437,15 @@ handle_pipe_readv(struct pipe *__restrict self,
 	struct aio_buffer_entry ent;
 	(void)num_bytes;
 	AIO_BUFFER_FOREACH(ent, dst) {
-		if unlikely(!ent.ab_size)
-			continue;
-		temp = result || mode & IO_NONBLOCK
-		       ? ringbuffer_read_nonblock(&self->p_buffer, ent.ab_base, ent.ab_size)
-		       : ringbuffer_read(&self->p_buffer, ent.ab_base, ent.ab_size);
+		if (result) {
+			temp = ringbuffer_read_nonblock(&self->p_buffer, ent.ab_base, ent.ab_size);
+		} else if (mode & IO_NONBLOCK) {
+			temp = ringbuffer_read_nonblock(&self->p_buffer, ent.ab_base, ent.ab_size);
+			if (!temp && ent.ab_size && !ringbuffer_closed(&self->p_buffer))
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No data available. */
+		} else {
+			temp = ringbuffer_read(&self->p_buffer, ent.ab_base, ent.ab_size);
+		}
 		result += temp;
 		if (temp < ent.ab_size)
 			break;
@@ -433,11 +461,15 @@ handle_pipe_writev(struct pipe *__restrict self,
 	struct aio_buffer_entry ent;
 	(void)num_bytes;
 	AIO_BUFFER_FOREACH(ent, src) {
-		if unlikely(!ent.ab_size)
-			continue;
-		temp = mode & IO_NONBLOCK
-		       ? ringbuffer_write_nonblock(&self->p_buffer, ent.ab_base, ent.ab_size)
-		       : ringbuffer_write(&self->p_buffer, ent.ab_base, ent.ab_size);
+		if (result) {
+			temp = ringbuffer_write_nonblock(&self->p_buffer, ent.ab_base, ent.ab_size);
+		} else if (mode & IO_NONBLOCK) {
+			temp = ringbuffer_write_nonblock(&self->p_buffer, ent.ab_base, ent.ab_size);
+			if (!temp && ent.ab_size && !ringbuffer_closed(&self->p_buffer))
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No space available. */
+		} else {
+			temp = ringbuffer_write(&self->p_buffer, ent.ab_base, ent.ab_size);
+		}
 		result += temp;
 		if (temp < ent.ab_size)
 			break;
