@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62be7ad6 */
+/* HASH CRC-32:0x8d9c659 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -663,34 +663,34 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fputc, __FORCELOCAL __ATTR_NONNULL((2)) int (__L
 #ifndef __std_putc_defined
 #define __std_putc_defined 1
 #if __has_builtin(__builtin_fputc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputc)
-/* Alias for `fgetc()' */
+/* Alias for `fputc()' */
 __CEIREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),fputc,{ return __builtin_fputc(__ch, __stream); })
 #elif defined(__CRT_HAVE_fputc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Alias for `fgetc()' */
+/* Alias for `fputc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked) && defined(__USE_STDIO_UNLOCKED)
-/* Alias for `fgetc()' */
+/* Alias for `fputc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc)
-/* Alias for `fgetc()' */
+/* Alias for `fputc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),fputc,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc)
-/* Alias for `fgetc()' */
+/* Alias for `fputc()' */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),(__ch,__stream))
 #elif defined(__CRT_HAVE__IO_putc)
-/* Alias for `fgetc()' */
+/* Alias for `fputc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),_IO_putc,(__ch,__stream))
 #elif defined(__CRT_HAVE_fputc_unlocked)
-/* Alias for `fgetc()' */
+/* Alias for `fputc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),fputc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_putc_unlocked)
-/* Alias for `fgetc()' */
+/* Alias for `fputc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,putc,(int __ch, FILE *__restrict __stream),putc_unlocked,(__ch,__stream))
 #elif (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE__IO_fwrite)
 __NAMESPACE_STD_END
 #include <local/stdio/fputc.h>
 __NAMESPACE_STD_BEGIN
-/* Alias for `fgetc()' */
+/* Alias for `fputc()' */
 __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL putc)(int __ch, FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc))(__ch, __stream); }
 #else /* CUSTOM: fputc */
 #undef __std_putc_defined

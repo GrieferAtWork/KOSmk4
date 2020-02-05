@@ -484,7 +484,7 @@ fputc:(int ch, [nonnull] FILE *__restrict stream) -> int {
 #endif
 }
 
-@@Alias for `fgetc()'
+@@Alias for `fputc()'
 [std][attribute(*)][alias(*)] putc:(*) = fputc;
 
 @@Alias for `fputc(CH, stdout)'
