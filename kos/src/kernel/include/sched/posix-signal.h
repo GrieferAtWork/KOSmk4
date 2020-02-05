@@ -395,7 +395,7 @@ task_raisesignalprocessgroup(struct task *__restrict target,
                              USER CHECKED siginfo_t *info,
                              gfp_t rpc_flags DFL(GFP_NORMAL))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
-		       E_INTERRUPT_USER_RPC);
+		       E_INTERRUPT_USER_RPC, E_PROCESS_EXITED);
 
 /* Noexcept variant of `task_raisesignalprocessgroup()'
  * @return: * : The number of processes to which the signal was delivered,

@@ -437,7 +437,8 @@ NOTHROW_NX(KCALL FUNC(task_raisesignalprocessgroup))(struct task *__restrict tar
                                                      USER CHECKED siginfo_t *info,
                                                      gfp_t rpc_flags)
 #ifndef DELIVER_NX
-		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE, E_INTERRUPT_USER_RPC)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
+		       E_INTERRUPT_USER_RPC, E_PROCESS_EXITED)
 #endif /* !DELIVER_NX */
 {
 	size_t result;
@@ -445,8 +446,8 @@ NOTHROW_NX(KCALL FUNC(task_raisesignalprocessgroup))(struct task *__restrict tar
 	IFELSE(bool, int) error;
 	REF struct task *pgroup;
 	struct task *iter;
-	pgroup = FUNC(task_getprocessgroupleader_of)(target);
 #ifdef DELIVER_NX
+	pgroup = task_getprocessgroupleader_of_nx(target);
 	if unlikely(!pgroup)
 		return TASK_RAISESIGNALPROCESSGROUP_NX_WOULDBLOCK;
 	/* deliver the first signal to the process group leader. */
@@ -459,6 +460,7 @@ NOTHROW_NX(KCALL FUNC(task_raisesignalprocessgroup))(struct task *__restrict tar
 	}
 #else /* DELIVER_NX */
 	/* deliver the first signal to the process group leader. */
+	pgroup = task_getprocessgroupleader_srch_of(target);
 	TRY {
 		error = task_raisesignalprocess(pgroup, info, rpc_flags);
 		if unlikely(!error)
