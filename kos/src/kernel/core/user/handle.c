@@ -2331,7 +2331,7 @@ handle_get_task(unsigned int fd)
 		return task_getprocessgroupleader();
 
 	case HANDLE_SYMBOLIC_SESSIONLEADER:
-		return task_getsessionleader();
+		return task_getsessionleader_srch();
 
 	case HANDLE_SYMBOLIC_PARENTPROCESS: {
 		REF struct task *temp;

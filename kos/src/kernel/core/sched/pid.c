@@ -134,6 +134,16 @@ NOTHROW(KCALL taskpid_destroy)(struct taskpid *__restrict self) {
 	decref_unlikely(ns);
 }
 
+/* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
+PUBLIC WUNUSED ATTR_RETNONNULL REF struct task *KCALL
+taskpid_gettask_srch(struct taskpid *__restrict self) THROWS(E_PROCESS_EXITED) {
+	REF struct task *result;
+	result = taskpid_gettask(self);
+	if unlikely(!result)
+		THROW(E_PROCESS_EXITED, taskpid_getpid_s(self));
+	return result;
+}
+
 
 /* [valid_if(!TASK_FKERNTHREAD)]
  * [lock(LINKED_LIST(APPEND(ATOMIC),CLEAR(THIS_TASK)))]
@@ -294,7 +304,7 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 			/* Propagate the exit status to all of the other processes without this group. */
 			while (ATOMIC_READ(mygroup.tg_pgrp_processes)) {
 				struct task *group_proc;
-				REF struct task *my_session;
+				REF struct taskpid *my_session;
 				while (!sync_tryread(&mygroup.tg_pgrp_session_lock))
 					task_tryyield_or_pause();
 				my_session = incref(mygroup.tg_pgrp_session);
@@ -436,7 +446,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 			        "alive via their `tg_proc_group' fields\n"
 			        "mygroup.tg_pgrp_processes = %p\n",
 			        mygroup.tg_pgrp_processes);
-			if (mygroup.tg_pgrp_session != self) {
+			if (mygroup.tg_pgrp_session != mypid) {
 				if (mygroup.tg_pgrp_session != NULL)
 					decref(mygroup.tg_pgrp_session);
 			} else {
@@ -450,6 +460,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 					mytty->t_cproc.cmpxch(mypid, NULL);
 					decref(mytty);
 				}
+				decref_nokill(mypid); /* Reference stored in `mygroup.tg_pgrp_session' */
 			}
 		}
 		/* Finalize any signals that were never delivered. */
@@ -556,18 +567,21 @@ task_setprocess(struct task *__restrict self,
 	assertf(!(self->t_flags & TASK_FKERNTHREAD), "`task_setthread()' and `task_setprocess()' may not be used with kernel threads");
 	FORTASK(self, this_taskgroup).tg_process = self; /* We're our own process */
 	if (!group || group == self) {
+		REF struct taskpid *sessionpid;
 		/* Create a new process group. */
-		FORTASK(self, this_taskgroup).tg_proc_group                   = self;
+		if (!session)
+			sessionpid = incref(pid);
+		else {
+			sessionpid = task_getsessionleaderpid_of(session);
+		}
+		assert(sessionpid);
+		FORTASK(self, this_taskgroup).tg_proc_group = self;
 #ifndef NDEBUG
 		memset(&FORTASK(self, this_taskgroup).tg_proc_group_siblings, 0xcc,
 		       sizeof(FORTASK(self, this_taskgroup).tg_proc_group_siblings));
 #endif /* !NDEBUG */
 		FORTASK(self, this_taskgroup).tg_pgrp_processes = NULL;
-		if (!session)
-			session = self;
-		FORTASK(self, this_taskgroup).tg_pgrp_session = session;
-		if (session != self)
-			incref(session);
+		FORTASK(self, this_taskgroup).tg_pgrp_session = sessionpid; /* Inherit reference */
 	} else {
 		/* Add to an existing process group. */
 		group = task_getprocessgroupleader_of(group);
@@ -647,7 +661,7 @@ again_set_self:
 			if (pold_group_leader)
 				*pold_group_leader = incref(old_group);
 		} else {
-			REF struct task *old_session;
+			REF struct taskpid *old_session;
 			/* Figure out which session the new thread group should be apart of
 			 * (make it so that the thread keeps its effective, old session) */
 			if (!sync_trywrite(&FORTASK(old_group, this_taskgroup).tg_pgrp_session_lock)) {
@@ -819,10 +833,10 @@ again_set_existing:
 PUBLIC NONNULL((1, 2)) unsigned int KCALL
 task_setsessionleader(struct task *thread, struct task *leader,
                       /*OUT,OPT*/ REF struct task **pold_group_leader,
-                      /*OUT,OPT*/ REF struct task **pold_session_leader,
-                      /*OUT,OPT*/ REF struct task **pnew_session_leader)
+                      /*OUT,OPT*/ REF struct taskpid **pold_session_leader,
+                      /*OUT,OPT*/ REF struct taskpid **pnew_session_leader)
                       THROWS(E_WOULDBLOCK) {
-	REF struct task *new_session_leader;
+	REF struct taskpid *new_session_leader;
 #ifdef __INTELLISENSE__
 	struct taskgroup &thread_taskgroup = FORTASK(thread, this_taskgroup);
 #else /* __INTELLISENSE__ */
@@ -833,7 +847,7 @@ task_setsessionleader(struct task *thread, struct task *leader,
 	assert(task_isprocessleader_p(thread));
 	assert(task_isprocessleader_p(leader));
 	/* Try to lookup the specified session leader. */
-	new_session_leader = task_getsessionleader_of(leader);
+	new_session_leader = task_getsessionleaderpid_of(leader);
 	TRY {
 		REF struct task *old_group;
 again_set_self:
@@ -846,15 +860,17 @@ again_set_self:
 				*pold_group_leader = incref(old_group);
 			/* Thread is already a group leader. */
 			sync_write(&thread_taskgroup.tg_pgrp_session_lock);
-			if (thread_taskgroup.tg_pgrp_session == thread) {
+			if (thread_taskgroup.tg_pgrp_session == FORTASK(thread, this_taskpid)) {
 				/* The thread is already its own session leader.
 				 * -> Only allow setting the thread once again as a no-op, but
 				 *    don't allow the session to be changed to something else. */
-				if (new_session_leader != thread) {
+				if (new_session_leader != FORTASK(thread, this_taskpid)) {
 					sync_endwrite(&thread_taskgroup.tg_pgrp_session_lock);
 					decref(new_session_leader);
-					if (pold_group_leader)
+					if (pold_group_leader) {
+						assert(*pold_group_leader == old_group);
 						decref(old_group);
+					}
 					return TASK_SETSESSIONLEADER_LEADER;
 				}
 				/* No-op: The thread is its own session leader, and the caller
@@ -863,16 +879,17 @@ again_set_self:
 				sync_endwrite(&thread_taskgroup.tg_pgrp_session_lock);
 			} else {
 				/* Assign the new session. */
-				REF struct task *old_session;
-				old_session                      = thread_taskgroup.tg_pgrp_session;
+				REF struct taskpid *old_session;
+				old_session = thread_taskgroup.tg_pgrp_session;
 				thread_taskgroup.tg_pgrp_session = new_session_leader; /* Inherit reference */
 				if (pnew_session_leader)
 					*pnew_session_leader = incref(new_session_leader);
 				sync_endwrite(&thread_taskgroup.tg_pgrp_session_lock);
 				if (pold_session_leader)
 					*pold_session_leader = old_session; /* Inherit reference */
-				else
+				else {
 					decref(old_session);
+				}
 			}
 		} else {
 			if (pold_session_leader) {
@@ -1524,7 +1541,7 @@ NOTHROW(KCALL kernel_initialize_bootpid)(void) {
 	grp = &FORTASK(&_boottask, this_taskgroup);
 	grp->tg_process      = &_boottask; /* the boot task is a process */
 	grp->tg_proc_group   = &_boottask; /* the boot task is a process group */
-	grp->tg_pgrp_session = &_boottask; /* the boot task is a session */
+	grp->tg_pgrp_session = incref(FORTASK(&_boottask, this_taskpid)); /* the boot task is a session */
 }
 
 
@@ -1640,12 +1657,12 @@ DEFINE_SYSCALL1(pid_t, getsid, pid_t, pid) {
 	upid_t result;
 	REF struct task *session;
 	if ((upid_t)pid == 0) {
-		session = task_getsessionleader();
+		session = task_getsessionleader_srch();
 	} else {
 		REF struct task *temp;
 		temp = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
 		FINALLY_DECREF_UNLIKELY(temp);
-		session = task_getsessionleader_of(temp);
+		session = task_getsessionleader_srch_of(temp);
 	}
 	result = task_gettid_of(session);
 	decref_unlikely(session);
@@ -2720,7 +2737,7 @@ again_waitfor:
 		if unlikely(!thread)
 			goto err_exited;
 		FINALLY_DECREF_UNLIKELY(thread);
-		leader = task_getsessionleader_of(thread);
+		leader = task_getsessionleader_srch_of(thread);
 		result = task_gettid_of_s(leader);
 		decref_unlikely(leader);
 		return result;
@@ -2893,8 +2910,8 @@ again_waitfor:
 		REF struct task *thread;
 		REF struct task *leader;
 		REF struct task *old_group_leader;
-		REF struct task *old_session_leader;
-		REF struct task *new_session_leader;
+		REF struct taskpid *old_session_leader;
+		REF struct taskpid *new_session_leader;
 		unsigned int error;
 		size_t struct_size;
 		USER CHECKED struct hop_task_setsessionleader *data;
@@ -2939,7 +2956,7 @@ again_waitfor:
 				struct handle temp;
 				temp.h_type = HANDLE_TYPE_TASK;
 				temp.h_mode = mode;
-				temp.h_data = FORTASK(old_session_leader, this_taskpid);
+				temp.h_data = old_session_leader;
 				handle_installhop(fd, temp);
 			}
 			fd = ATOMIC_READ(data->tssl_new_leader);
@@ -2947,7 +2964,7 @@ again_waitfor:
 				struct handle temp;
 				temp.h_type = HANDLE_TYPE_TASK;
 				temp.h_mode = mode;
-				temp.h_data = FORTASK(new_session_leader, this_taskpid);
+				temp.h_data = new_session_leader;
 				handle_installhop(fd, temp);
 			}
 		}

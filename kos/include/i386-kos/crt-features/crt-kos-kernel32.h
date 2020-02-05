@@ -1876,6 +1876,7 @@
 #define __CRT_HAVE_task_yield 1
 #define __CRT_HAVE_task_yield_nx 1
 #define __CRT_HAVE_taskpid_destroy 1
+#define __CRT_HAVE_taskpid_gettask_srch 1
 #define __CRT_HAVE_tb 1
 #define __CRT_HAVE_terminal_flush_icanon 1
 #define __CRT_HAVE_terminal_init 1

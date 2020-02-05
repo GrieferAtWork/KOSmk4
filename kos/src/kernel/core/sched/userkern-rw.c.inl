@@ -171,7 +171,7 @@ userkern_segment_writeq(struct vio_args *__restrict args,
 	case offsetof(USERKERN_STRUCT, uk_sid): {
 #ifdef DEFINE_IO_READ
 		REF struct task *leader;
-		leader = task_getsessionleader();
+		leader = task_getsessionleader_srch();
 		result = task_getpid_of(leader);
 		decref(leader);
 #else /* DEFINE_IO_READ */

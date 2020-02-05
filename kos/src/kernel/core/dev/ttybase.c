@@ -813,8 +813,8 @@ NOTHROW(KCALL ttybase_device_setctty)(struct ttybase_device *__restrict self,
 	struct taskpid *session_pid;
 	assert(self);
 	assert(character_device_isattybase(self));
-	proc = task_getprocess();
-	session = task_getsessionleader_of(proc);
+	proc    = task_getprocess();
+	session = task_getsessionleader_srch_of(proc);
 	FINALLY_DECREF_UNLIKELY(session);
 	if unlikely(session != proc && caller_must_be_leader)
 		return TTYBASE_DEVICE_SETCTTY_NOTLEADER;
@@ -941,8 +941,8 @@ NOTHROW(KCALL ttybase_device_hupctty)(struct ttybase_device *required_old_ctty,
 	struct taskpid *session_pid;
 	REF struct task *session;
 	assert(!required_old_ctty || character_device_isattybase(required_old_ctty));
-	proc = task_getprocess();
-	session = task_getsessionleader_of(proc);
+	proc    = task_getprocess();
+	session = task_getsessionleader_srch_of(proc);
 	FINALLY_DECREF_UNLIKELY(session);
 	if unlikely(session != proc && caller_must_be_leader)
 		return TTYBASE_DEVICE_HUPCTTY_NOTLEADER;

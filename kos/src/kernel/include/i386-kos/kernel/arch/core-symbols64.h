@@ -14406,10 +14406,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datapart_allocswap; .quad vm_datapart_allocswap
 	.reloc ., R_X86_64_SIZE32, vm_datapart_allocswap; .int 0
 	.int 0x682e10
-	.quad 0 /* index: 3601 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3601 /* index: 3601 */
+	.weak taskpid_gettask_srch; .quad taskpid_gettask_srch
+	.reloc ., R_X86_64_SIZE32, taskpid_gettask_srch; .int 0
+	.int 0x5887a58
 	.quad .Lname3602 /* index: 3602 */
 	.weak cpu_quantum_end_nopr; .quad cpu_quantum_end_nopr
 	.reloc ., R_X86_64_SIZE32, cpu_quantum_end_nopr; .int 0
@@ -21422,6 +21422,8 @@ END(kernel_symbol_table)
 	.string "sys32_getitimer"
 .Lname3600:
 	.string "vm_datapart_allocswap"
+.Lname3601:
+	.string "taskpid_gettask_srch"
 .Lname3602:
 	.string "cpu_quantum_end_nopr"
 .Lname3603:

@@ -14406,10 +14406,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datapart_allocswap; .long vm_datapart_allocswap
 	.reloc ., R_386_SIZE32, vm_datapart_allocswap; .int 0
 	.int 0x682e10
-	.long 0 /* index: 3601 */
-	.long 0
-	.int 0
-	.int 0
+	.long .Lname3601 /* index: 3601 */
+	.weak taskpid_gettask_srch; .long taskpid_gettask_srch
+	.reloc ., R_386_SIZE32, taskpid_gettask_srch; .int 0
+	.int 0x5887a58
 	.long .Lname3602 /* index: 3602 */
 	.weak cpu_quantum_end_nopr; .long cpu_quantum_end_nopr
 	.reloc ., R_386_SIZE32, cpu_quantum_end_nopr; .int 0
@@ -20692,6 +20692,8 @@ END(kernel_symbol_table)
 	.string "sys_llistxattr"
 .Lname3600:
 	.string "vm_datapart_allocswap"
+.Lname3601:
+	.string "taskpid_gettask_srch"
 .Lname3602:
 	.string "cpu_quantum_end_nopr"
 .Lname3603:

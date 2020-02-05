@@ -60,6 +60,8 @@ task_getctty(void) THROWS(E_WOULDBLOCK) {
 	REF struct ttybase_device *result;
 	REF struct task *session_leader;
 	session_leader = task_getsessionleader();
+	if unlikely(!session_leader)
+		return __NULLPTR;
 	result = (REF struct ttybase_device *)__TASK_CTTY_FIELD(session_leader).get();
 	decref_unlikely(session_leader);
 	return result;
@@ -71,7 +73,7 @@ NOTHROW(KCALL task_getctty_nx)(void) {
 	REF struct task *session_leader;
 	session_leader = task_getsessionleader_nx();
 	if unlikely(!session_leader)
-		return NULL;
+		return __NULLPTR;
 	result = (REF struct ttybase_device *)__TASK_CTTY_FIELD(session_leader).get();
 	decref_unlikely(session_leader);
 	return result;
@@ -82,6 +84,8 @@ task_getctty_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	REF struct ttybase_device *result;
 	REF struct task *session_leader;
 	session_leader = task_getsessionleader_of(thread);
+	if unlikely(!session_leader)
+		return __NULLPTR;
 	result = (REF struct ttybase_device *)__TASK_CTTY_FIELD(session_leader).get();
 	decref_unlikely(session_leader);
 	return result;
@@ -93,7 +97,7 @@ NOTHROW(KCALL task_getctty_of_nx)(struct task *__restrict thread) {
 	REF struct task *session_leader;
 	session_leader = task_getsessionleader_of_nx(thread);
 	if unlikely(!session_leader)
-		return NULL;
+		return __NULLPTR;
 	result = (REF struct ttybase_device *)__TASK_CTTY_FIELD(session_leader).get();
 	decref_unlikely(session_leader);
 	return result;

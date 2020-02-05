@@ -80,11 +80,15 @@ DEFINE_REFCOUNT_FUNCTIONS(struct taskpid, tp_refcnt, taskpid_destroy)
 /* Return a reference to the task associated with the given PID.
  * If that task has already terminated and has already been destroyed, return `NULL' instead. */
 #ifdef __INTELLISENSE__
-FORCELOCAL WUNUSED REF struct task *
-NOTHROW(KCALL taskpid_gettask)(struct taskpid *__restrict self);
+FORCELOCAL WUNUSED REF struct task *NOTHROW(KCALL taskpid_gettask)(struct taskpid *__restrict self);
 #else /* __INTELLISENSE__ */
 #define taskpid_gettask(self) (self)->tp_thread.get()
 #endif /* !__INTELLISENSE__ */
+
+/* Same as `taskpid_gettask()', but throw an exception if the thread has exited. */
+FUNDEF WUNUSED ATTR_RETNONNULL REF struct task *KCALL
+taskpid_gettask_srch(struct taskpid *__restrict self) THROWS(E_PROCESS_EXITED);
+
 
 /* Return the PID of `self' within the given PID namespace. */
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1, 2)) upid_t
@@ -202,15 +206,11 @@ struct taskgroup {
 	                                                      * NOTE: This chain is set to `TASKGROUP_TG_PGRP_PROCESSES_TERMINATED' to prevent any
 	                                                      *       new processes from being added to the process group. */
 	struct atomic_rwlock         tg_pgrp_session_lock;   /* Lock for `tg_pgrp_session' */
-	/* TODO: This needs to become `struct taskpid *tg_pgrp_session'
-	 *       Otherwise, a terminated process might be kept alive
-	 *       and interfere with read(pipe()) after the write-end
-	 *       was closed by a different process. */
-	REF struct task             *tg_pgrp_session;        /* [1..1][ref_if(!= THIS_TASK)][const_if(== THIS_TASK)][lock(tg_pgrp_session_lock)]
-	                                                      * @assume(tg_pgrp_session == FORTASK(tg_pgrp_session, this_taskgroup).tg_pgrp_session)
+	REF struct taskpid          *tg_pgrp_session;        /* [1..1][const_if(== THIS_TASKPID)][lock(tg_pgrp_session_lock)]
+	                                                      * @assume(tg_pgrp_session == FORTASK(taskpid_gettask(tg_pgrp_session), this_taskgroup).tg_pgrp_session)
 	                                                      * The session leader of the this process group.
-	                                                      * When set to `THIS_TASK', then the calling thread is that leader. */
-	/* All of the following fields are only valid when `tg_pgrp_session == THIS_TASK' (Otherwise, they are all `[0..1][const]') */
+	                                                      * When set to `THIS_TASKPID', then the calling thread is that leader. */
+	/* All of the following fields are only valid when `tg_pgrp_session == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
 	XATOMIC_REF_STRUCT(struct ttybase_device) tg_ctty;   /* [0..1] The controlling terminal (/dev/tty) associated with this session
 	                                                      * When non-NULL, `tg_ctty->t_cproc == THIS_TASKPID' (for the session leader) */
 };
@@ -272,9 +272,11 @@ FORCELOCAL WUNUSED NONNULL((1)) REF struct task *NOTHROW(KCALL task_getprocessgr
 FORCELOCAL WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(KCALL task_getprocessgroupleaderpid_of_nx)(struct task *__restrict thread);
 
 /* Return a reference to the session leader of the process group of the calling/given thread. */
-FORCELOCAL WUNUSED ATTR_RETNONNULL REF struct task *KCALL task_getsessionleader(void) THROWS(E_WOULDBLOCK);
+FORCELOCAL WUNUSED REF struct task *KCALL task_getsessionleader(void) THROWS(E_WOULDBLOCK);
+FORCELOCAL WUNUSED ATTR_RETNONNULL REF struct task *KCALL task_getsessionleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED);
 FORCELOCAL WUNUSED ATTR_RETNONNULL REF struct taskpid *KCALL task_getsessionleaderpid(void) THROWS(E_WOULDBLOCK);
-FORCELOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *KCALL task_getsessionleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
+FORCELOCAL WUNUSED NONNULL((1)) REF struct task *KCALL task_getsessionleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
+FORCELOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *KCALL task_getsessionleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
 FORCELOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct taskpid *KCALL task_getsessionleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
 FORCELOCAL WUNUSED REF struct task *NOTHROW(KCALL task_getsessionleader_nx)(void);
 FORCELOCAL WUNUSED REF struct taskpid *NOTHROW(KCALL task_getsessionleaderpid_nx)(void);
@@ -375,8 +377,8 @@ task_setprocessgroupleader(struct task *thread, struct task *leader,
 FUNDEF NONNULL((1, 2)) unsigned int KCALL
 task_setsessionleader(struct task *thread, struct task *leader,
                       /*OUT,OPT*/ REF struct task **pold_group_leader DFL(__NULLPTR),
-                      /*OUT,OPT*/ REF struct task **pold_session_leader DFL(__NULLPTR),
-                      /*OUT,OPT*/ REF struct task **pnew_session_leader DFL(__NULLPTR))
+                      /*OUT,OPT*/ REF struct taskpid **pold_session_leader DFL(__NULLPTR),
+                      /*OUT,OPT*/ REF struct taskpid **pnew_session_leader DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK);
 #define TASK_SETSESSIONLEADER_SUCCESS 0 /* Successfully added `task_getprocess_of(thread)' (which at that
                                          * point is guarantied to be identical to `task_getprocessgroupleader(thread)')
@@ -808,9 +810,10 @@ NOTHROW(KCALL task_getprocessgroupleaderpid_of_nx)(struct task *__restrict threa
 	return result;
 }
 
-FORCELOCAL WUNUSED ATTR_RETNONNULL REF struct task *KCALL
-task_getsessionleader(void) THROWS(E_WOULDBLOCK) {
-	REF struct task *result, *grp;
+FORCELOCAL WUNUSED ATTR_RETNONNULL REF struct taskpid *KCALL
+task_getsessionleaderpid(void) THROWS(E_WOULDBLOCK) {
+	REF struct taskpid *result;
+	REF struct task *grp;
 	grp = task_getprocessgroupleader();
 	{
 		FINALLY_DECREF_UNLIKELY(grp);
@@ -821,9 +824,10 @@ task_getsessionleader(void) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-FORCELOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct task *KCALL
-task_getsessionleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
-	REF struct task *result, *grp;
+FORCELOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct taskpid *KCALL
+task_getsessionleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
+	REF struct taskpid *result;
+	REF struct task *grp;
 	grp = task_getprocessgroupleader_of(thread);
 	{
 		FINALLY_DECREF_UNLIKELY(grp);
@@ -834,9 +838,10 @@ task_getsessionleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-FORCELOCAL WUNUSED REF struct task *
-NOTHROW(KCALL task_getsessionleader_nx)(void) {
-	REF struct task *result, *grp;
+FORCELOCAL WUNUSED REF struct taskpid *
+NOTHROW(KCALL task_getsessionleaderpid_nx)(void) {
+	REF struct taskpid *result;
+	REF struct task *grp;
 	grp = task_getprocessgroupleader_nx();
 	if unlikely(!grp)
 		return __NULLPTR;
@@ -850,9 +855,10 @@ NOTHROW(KCALL task_getsessionleader_nx)(void) {
 	return result;
 }
 
-FORCELOCAL WUNUSED NONNULL((1)) REF struct task *
-NOTHROW(KCALL task_getsessionleader_of_nx)(struct task *__restrict thread) {
-	REF struct task *result, *grp;
+FORCELOCAL WUNUSED NONNULL((1)) REF struct taskpid *
+NOTHROW(KCALL task_getsessionleaderpid_of_nx)(struct task *__restrict thread) {
+	REF struct taskpid *result;
+	REF struct task *grp;
 	grp = task_getprocessgroupleader_of_nx(thread);
 	if unlikely(!grp)
 		return __NULLPTR;
@@ -866,50 +872,70 @@ NOTHROW(KCALL task_getsessionleader_of_nx)(struct task *__restrict thread) {
 	return result;
 }
 
-FORCELOCAL WUNUSED ATTR_RETNONNULL REF struct taskpid *KCALL
-task_getsessionleaderpid(void) THROWS(E_WOULDBLOCK) {
-	REF struct taskpid *result;
-	REF struct task *result_thread;
-	result_thread = task_getsessionleader();
-	result = incref(FORTASK(result_thread, this_taskpid));
-	decref_unlikely(result_thread);
+FORCELOCAL WUNUSED REF struct task *KCALL
+task_getsessionleader(void) THROWS(E_WOULDBLOCK) {
+	REF struct task *result;
+	REF struct taskpid *tpid;
+	tpid = task_getsessionleaderpid();
+	result = taskpid_gettask(tpid);
+	decref_unlikely(tpid);
 	return result;
 }
 
-FORCELOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct taskpid *KCALL
-task_getsessionleaderpid_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
-	REF struct taskpid *result;
-	REF struct task *result_thread;
-	result_thread = task_getsessionleader_of(thread);
-	result = incref(FORTASK(result_thread, this_taskpid));
-	decref_unlikely(result_thread);
+FORCELOCAL WUNUSED REF struct task *KCALL
+task_getsessionleader_srch(void) THROWS(E_WOULDBLOCK, E_PROCESS_EXITED) {
+	REF struct task *result;
+	REF struct taskpid *tpid;
+	tpid = task_getsessionleaderpid();
+	result = taskpid_gettask_srch(tpid);
+	decref_unlikely(tpid);
 	return result;
 }
 
+FORCELOCAL WUNUSED NONNULL((1)) REF struct task *KCALL
+task_getsessionleader_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
+	REF struct task *result;
+	REF struct taskpid *tpid;
+	tpid = task_getsessionleaderpid_of(thread);
+	result = taskpid_gettask(tpid);
+	decref_unlikely(tpid);
+	return result;
+}
 
-FORCELOCAL WUNUSED REF struct taskpid *
-NOTHROW(KCALL task_getsessionleaderpid_nx)(void) {
-	REF struct taskpid *result;
-	REF struct task *result_thread;
-	result_thread = task_getsessionleader_nx();
-	if unlikely(!result_thread)
+FORCELOCAL WUNUSED NONNULL((1)) REF struct task *KCALL
+task_getsessionleader_srch_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
+	REF struct task *result;
+	REF struct taskpid *tpid;
+	tpid = task_getsessionleaderpid_of(thread);
+	result = taskpid_gettask_srch(tpid);
+	decref_unlikely(tpid);
+	return result;
+}
+
+FORCELOCAL WUNUSED REF struct task *
+NOTHROW(KCALL task_getsessionleader_nx)(void) {
+	REF struct task *result;
+	REF struct taskpid *tpid;
+	tpid = task_getsessionleaderpid_nx();
+	if unlikely(!tpid)
 		return __NULLPTR;
-	result = incref(FORTASK(result_thread, this_taskpid));
-	decref_unlikely(result_thread);
+	result = taskpid_gettask(tpid);
+	decref_unlikely(tpid);
 	return result;
 }
 
-FORCELOCAL WUNUSED NONNULL((1)) REF struct taskpid *
-NOTHROW(KCALL task_getsessionleaderpid_of_nx)(struct task *__restrict thread) {
-	REF struct taskpid *result;
-	REF struct task *result_thread;
-	result_thread = task_getsessionleader_of_nx(thread);
-	if unlikely(!result_thread)
+FORCELOCAL WUNUSED NONNULL((1)) REF struct task *
+NOTHROW(KCALL task_getsessionleader_of_nx)(struct task *__restrict thread) {
+	REF struct task *result;
+	REF struct taskpid *tpid;
+	tpid = task_getsessionleaderpid_of_nx(thread);
+	if unlikely(!tpid)
 		return __NULLPTR;
-	result = incref(FORTASK(result_thread, this_taskpid));
-	decref_unlikely(result_thread);
+	result = taskpid_gettask(tpid);
+	decref_unlikely(tpid);
 	return result;
 }
+
 
 
 
@@ -938,13 +964,15 @@ NOTHROW(KCALL task_isprocessgroupleader_p)(struct task const *__restrict thread)
 
 FORCELOCAL WUNUSED ATTR_PURE bool
 NOTHROW(KCALL task_issessionleader)(void) {
-	return PERTASK_GET(this_taskgroup.tg_pgrp_session) == THIS_TASK;
+	return task_isprocessgroupleader() &&
+	       PERTASK_GET(this_taskgroup.tg_pgrp_session) == THIS_TASKPID;
 }
 
 FORCELOCAL WUNUSED ATTR_PURE NONNULL((1)) bool
 NOTHROW(KCALL task_issessionleader_p)(struct task const *__restrict thread) {
-	return __hybrid_atomic_load(FORTASK(thread, this_taskgroup.tg_pgrp_session),
-	                            __ATOMIC_ACQUIRE) == thread;
+	return task_isprocessgroupleader_p(thread) &&
+	       __hybrid_atomic_load(FORTASK(thread, this_taskgroup.tg_pgrp_session), __ATOMIC_ACQUIRE) ==
+	       FORTASK(thread, this_taskpid);
 }
 
 FORCELOCAL NOBLOCK WUNUSED ATTR_PURE upid_t
