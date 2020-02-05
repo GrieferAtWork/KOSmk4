@@ -377,7 +377,7 @@ DEFINE_SYSCALL2(errno_t, ftruncate, fd_t, fd, syscall_ulong_t, length) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
+		if unlikely(!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_TRUNC, hand.h_mode);
 		handle_truncate(hand, (pos_t)length);
 	} EXCEPT {
@@ -394,7 +394,7 @@ DEFINE_SYSCALL2(errno_t, ftruncate64, fd_t, fd, uint64_t, length) {
 	struct handle hand;
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
+		if unlikely(!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_TRUNC, hand.h_mode);
 		handle_truncate(hand, (pos_t)length);
 	} EXCEPT {
@@ -557,7 +557,7 @@ DEFINE_SYSCALL3(ssize_t, read, fd_t, fd,
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANREAD(hand.h_mode))
+		if unlikely(!IO_CANREAD(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		result = handle_read(hand, buf, bufsize);
 	} EXCEPT {
@@ -577,7 +577,7 @@ DEFINE_SYSCALL3(ssize_t, write, fd_t, fd,
 	validate_readable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
+		if unlikely(!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		result = handle_write(hand, buf, bufsize);
 	} EXCEPT {
@@ -601,7 +601,7 @@ DEFINE_SYSCALL4(ssize_t, readf,
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANREAD(hand.h_mode))
+		if unlikely(!IO_CANREAD(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		result = handle_readf(hand,
 		                      buf,
@@ -628,7 +628,7 @@ DEFINE_SYSCALL4(ssize_t, writef,
 	validate_readable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
+		if unlikely(!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
 		result = handle_writef(hand,
 		                       buf,
@@ -659,7 +659,7 @@ DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd,
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANREAD(hand.h_mode))
+		if unlikely(!IO_CANREAD(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		result = handle_pread(hand,
 		                      buf,
@@ -683,7 +683,7 @@ DEFINE_SYSCALL4(ssize_t, pwrite64, fd_t, fd,
 	validate_readable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
+		if unlikely(!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
 		result = handle_pwrite(hand,
 		                       buf,
@@ -710,7 +710,7 @@ DEFINE_SYSCALL5(ssize_t, pread64f,
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANREAD(hand.h_mode))
+		if unlikely(!IO_CANREAD(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		result = handle_preadf(hand,
 		                       buf,
@@ -738,7 +738,7 @@ DEFINE_SYSCALL5(ssize_t, pwrite64f,
 	validate_readable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
+		if unlikely(!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
 		result = handle_pwritef(hand,
 		                        buf,
@@ -771,7 +771,7 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANREAD(hand.h_mode))
+		if unlikely(!IO_CANREAD(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		if unlikely(!count)
 			result = 0;
@@ -818,7 +818,7 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
+		if unlikely(!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
 		if unlikely(!count)
 			result = 0;
@@ -865,7 +865,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANREAD(hand.h_mode))
+		if unlikely(!IO_CANREAD(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		if unlikely(!count)
 			result = 0;
@@ -912,7 +912,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
+		if unlikely(!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
 		if unlikely(!count)
 			result = 0;
@@ -966,7 +966,7 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANREAD(hand.h_mode))
+		if unlikely(!IO_CANREAD(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		if unlikely(!count)
 			result = 0;
@@ -1014,7 +1014,7 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 	validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
+		if unlikely(!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
 		if unlikely(!count)
 			result = 0;
@@ -1062,7 +1062,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANREAD(hand.h_mode))
+		if unlikely(!IO_CANREAD(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		if unlikely(!count)
 			result = 0;
@@ -1110,7 +1110,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 	compat_validate_readablem(iov, count, sizeof(*iov));
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANWRITE(hand.h_mode))
+		if unlikely(!IO_CANWRITE(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_WRITE, hand.h_mode);
 		if unlikely(!count)
 			result = 0;
@@ -1415,7 +1415,7 @@ DEFINE_SYSCALL4(ssize_t, kreaddir,
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANREAD(hand.h_mode))
+		if unlikely(!IO_CANREAD(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		if ((mode & READDIR_MODEMASK) == READDIR_MULTIPLE) {
 			size_t partial, alignoff;
@@ -1491,7 +1491,7 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 	validate_writable(buf, bufsize);
 	hand = handle_lookup((unsigned int)fd);
 	TRY {
-		if (!IO_CANREAD(hand.h_mode))
+		if unlikely(!IO_CANREAD(hand.h_mode))
 			THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
 		if ((mode & READDIR_MODEMASK) == READDIR_MULTIPLE) {
 			size_t partial, alignoff;
@@ -1610,11 +1610,11 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 	/* Verify that the caller has access to the
 	 * indicated data channel of the handle. */
 	if (what & POLLIN) {
-		if (!IO_CANREAD(hnd.h_mode))
+		if unlikely(!IO_CANREAD(hnd.h_mode))
 			return POLLERR;
 	}
 	if (what & POLLOUT) {
-		if (!IO_CANWRITE(hnd.h_mode))
+		if unlikely(!IO_CANWRITE(hnd.h_mode))
 			return POLLERR;
 	}
 	TRY {

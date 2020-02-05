@@ -65,8 +65,8 @@
 
 DECL_BEGIN
 
-/* TODO: read() should return -EWOULDBLOCK when called with IO_NONBLOCK, and
- *       no data was available. Currently, the KOS kernel returns `0' for this
+/* TODO: read() should return -EAGAIN when called with IO_NONBLOCK, and no
+ *       data was available. Currently, the KOS kernel returns `0' for this
  *       case, which would be indicative of EOF. - There has to be a difference
  *       between these two (the biggest culprit here are ringbuffer-based objects) */
 
@@ -77,7 +77,16 @@ DECL_BEGIN
 /* TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_MACHINE_ENDIAN_H' properly */
 /* TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_STRERROR_L' properly */
 /* TODO: libstdc++ doesn't detect `_GLIBCXX_HAVE_STRXFRM_L' properly */
-/* TODO: Add support for `HAVE___CXA_THREAD_ATEXIT' */
+/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_SCHED_YIELD' properly */
+/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_NANOSLEEP' properly */
+/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_SENDFILE' properly */
+/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_GETTIME_SYSCALL' properly */
+/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_MONOTONIC' properly */
+/* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_REALTIME' properly */
+/* TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT' */
+/* TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT_IMPL' */
+/* TODO: Implement `timespec_get()' so that `_GLIBCXX_HAVE_TIMESPEC_GET'
+ *       can be detected (__stub_timespec_get currently breaks that) */
 /* TODO: Add system header <sys/machine.h> */
 /* TODO: Add system header <sys/sdt.h> */
 /* TODO: Add system header <fp.h> */

@@ -82,6 +82,8 @@ DEFINE_REFCOUNT_TYPE_SUBCLASS(tty_device, ttybase_device);
 #define TTY_DEVICE_FORWARD(self) \
 	((XATOMIC_REF(struct tty_device_forward) &)(self)->t_forward)
 
+struct task;
+struct rpc_entry;
 struct tty_device_forward {
 	/* Reading keyboard input only when read() is called doesn't work:
 	 * With that design, things like CRTL+C wouldn't get recognized until
@@ -110,8 +112,7 @@ struct tty_device_forward {
 	 * E_INTERRUPT or E_WOULDBLOCK in case somwhere along the line `task_serve()' gets
 	 * called) */
 	WEAK refcnt_t                        tf_refcnt; /* Reference counter for this structure. */
-	struct sig                           tf_cancel; /* Signal broadcast when the input-forwarding
-	                                                 * thread should check for termination. */
+	struct rpc_entry                    *tf_cancel; /* [0..1][lock(CLEAR_ONCE)] The RPC which can be used to terminate the thread. */
 	REF struct task                     *tf_thread; /* [1..1][const] The thread used for forwarding input data. */
 	XATOMIC_WEAKLYREF(struct tty_device) tf_device; /* [0..1][lock(CLEAR_ONCE)] The associated device. (set to NULL to terminate the forwarding thread) */
 };

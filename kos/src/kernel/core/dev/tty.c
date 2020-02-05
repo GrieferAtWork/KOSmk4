@@ -34,6 +34,8 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <sched/rpc-internal.h>
+#include <sched/rpc.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -50,8 +52,30 @@ DECL_BEGIN
 
 PUBLIC NOBLOCK void
 NOTHROW(KCALL tty_device_forward_destroy)(struct tty_device_forward *__restrict self) {
+	if unlikely(self->tf_cancel)
+		task_free_rpc(self->tf_cancel);
 	decref(self->tf_thread);
 	kfree(self);
+}
+
+LOCAL NOBLOCK void
+NOTHROW(KCALL tty_device_forward_cancel)(struct tty_device_forward *__restrict self) {
+	struct rpc_entry *cancel;
+	cancel = ATOMIC_XCH(self->tf_cancel, NULL);
+	if likely(cancel) {
+		int error;
+		error = task_deliver_rpc(self->tf_thread, cancel);
+		assertf(error != TASK_DELIVER_RPC_INTERRUPTED, "Should only happen for user-RPCs");
+		assertf(error != TASK_DELIVER_RPC_KERNTHREAD, "Should only happen for user-RPCs");
+		assertf(error == TASK_DELIVER_RPC_SUCCESS ||
+		        error == TASK_DELIVER_RPC_TERMINATED,
+		        "error = %d", error);
+		/* The RPC delivery can fail if the thread already exited, which, though
+		 * highly unlikely, can have already happened if we've already cleared the
+		 * device pointer. */
+		if unlikely(!TASK_DELIVER_RPC_WASOK(error))
+			task_free_rpc(cancel);
+	}
 }
 
 PRIVATE ssize_t LIBTERM_CC
@@ -74,7 +98,7 @@ NOTHROW(KCALL tty_device_fini)(struct character_device *__restrict self) {
 	fwd = TTY_DEVICE_FORWARD(me).exchange(NULL);
 	if (fwd) {
 		fwd->tf_device.clear();
-		sig_broadcast(&fwd->tf_cancel);
+		tty_device_forward_cancel(fwd);
 		decref(fwd);
 	}
 	if (me->t_ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
@@ -142,13 +166,10 @@ tty_device_poll(struct character_device *__restrict self, poll_mode_t what) THRO
 
 PRIVATE void KCALL
 tty_device_fwd_main(REF struct tty_device_forward *__restrict fwd) {
-	struct task_connection cancel_con;
 	for (;;) {
 		REF struct tty_device *tty;
 		char buf[256];
 		size_t count;
-		poll_mode_t what;
-again:
 		tty = fwd->tf_device.get();
 		if unlikely(!tty)
 			break; /* Stop */
@@ -156,40 +177,48 @@ again:
 		 * NOTE: Do this without blocking, so we call poll for more
 		 *       data while still checking if we're supposed to stop. */
 		TRY {
-again_read:
-			count = (*tty->t_ihandle_read)(tty->t_ihandle_ptr, buf, sizeof(buf),
-			                               IO_RDONLY | IO_NONBLOCK);
-			if (count) {
+			for (;;) {
+				count = (*tty->t_ihandle_read)(tty->t_ihandle_ptr, buf, sizeof(buf), IO_RDONLY);
+				if (!count)
+					break;
 				/* NOTE: Data also gets written with the `IO_NONBLOCK' flag set.
 				 *       This has to be done because control characters still have
 				 *       to be processed, even when canon buffers have filled up.
 				 *       Otherwise, you would no longer be able to CTRL+C a hung
 				 *       application after hammering away at your keyboard for a
 				 *       couple of minutes. */
-				terminal_iwrite(&tty->t_term, buf, count, IO_WRONLY | IO_NONBLOCK);
-				goto again_read;
+				TRY {
+					terminal_iwrite(&tty->t_term, buf, count, IO_WRONLY | IO_NONBLOCK);
+				} EXCEPT {
+					if (!was_thrown(E_WOULDBLOCK))
+						RETHROW();
+					/* Discard `E_WOULDBLOCK' errors. (which can
+					 * happen because we're using `IO_NONBLOCK')
+					 * s.a. The note above... */
+				}
 			}
 			assert(!task_isconnected());
-			what = (*handle_type_db.h_poll[tty->t_ihandle_typ])(tty->t_ihandle_ptr, POLLIN);
 		} EXCEPT {
 			decref(tty);
+			decref(fwd);
 			RETHROW();
 		}
 		decref(tty);
-		if (what & POLLIN) {
-			task_disconnectall();
-			goto again;
-		}
-		task_connect_c(&cancel_con, &fwd->tf_cancel);
-		COMPILER_READ_BARRIER();
-		if unlikely(ATOMIC_READ(fwd->tf_device.m_pointer) == NULL) {
-			task_disconnectall();
-			break;
-		}
-		/* Wait for data to become available. */
-		task_waitfor();
 	}
 	decref(fwd);
+}
+
+
+PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
+terminate_ttyfwd_rpc(void *UNUSED(arg),
+                     struct icpustate *__restrict state,
+                     unsigned int reason,
+                     struct rpc_syscall_info const *UNUSED(sc_info)) {
+	assert(reason == TASK_RPC_REASON_SYNC ||
+	       reason == TASK_RPC_REASON_SHUTDOWN);
+	if likely(reason == TASK_RPC_REASON_SYNC)
+		THROW(E_EXIT_THREAD);
+	return state;
 }
 
 
@@ -212,18 +241,24 @@ tty_device_startfwd(struct tty_device *__restrict self)
 	thread = task_alloc(&vm_kernel);
 	TRY {
 		fwd = (REF struct tty_device_forward *)kmalloc(sizeof(struct tty_device_forward), GFP_NORMAL);
+		TRY {
+			/* Allocate an RPC descriptor which we ca use to terminate the ttyfwd thread. */
+			fwd->tf_cancel = task_alloc_synchronous_rpc(&terminate_ttyfwd_rpc);
+		} EXCEPT {
+			kfree(fwd);
+			RETHROW();
+		}
 	} EXCEPT {
 		decref_likely(thread);
 		RETHROW();
 	}
 	fwd->tf_refcnt = 2;
-	sig_init(&fwd->tf_cancel);
 	fwd->tf_thread = thread;
 	xatomic_weaklyref_init(&fwd->tf_device, self);
 	task_setup_kernel(thread, (thread_main_t)&tty_device_fwd_main, 1, fwd);
 	if unlikely(!TTY_DEVICE_FORWARD(self).cmpxch_inherit_new(NULL, fwd)) {
 		fwd->tf_device.clear();
-		sig_broadcast(&fwd->tf_cancel);
+		tty_device_forward_cancel(fwd);
 		destroy(fwd);
 		return false;
 	}
@@ -241,7 +276,7 @@ NOTHROW(KCALL tty_device_stopfwd)(struct tty_device *__restrict self) {
 	if (!fwd)
 		return false;
 	fwd->tf_device.clear();
-	sig_broadcast(&fwd->tf_cancel);
+	tty_device_forward_cancel(fwd);
 	decref(fwd);
 	return true;
 }
