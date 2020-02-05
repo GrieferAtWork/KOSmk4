@@ -681,7 +681,7 @@
 #include "stdc-predef.h"
 #endif /* !_STDC_PREDEF_H */
 
-#if 0 /* TODO: Enable this and re-build all utility programs from scratch */
+#if 1 /* TODO: Enable this and re-build all utility programs from scratch */
 #undef __GNU_LIBRARY__
 #define __GNU_LIBRARY__ 6
 #define __GLIBC__       2

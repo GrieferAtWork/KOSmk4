@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fb34f62 */
+/* HASH CRC-32:0x1a2b0894 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_remquo)(double __x, double __y, int *__pquo) { return __builtin_remquo(__x, __y, __pquo); }
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remquo,(double __x, double __y, int *__pquo),remquo,{ return __builtin_remquo(__x, __y, __pquo); })
 #elif defined(__CRT_HAVE_remquo)
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of

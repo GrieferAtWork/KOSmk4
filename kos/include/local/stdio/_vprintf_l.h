@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x737825da */
+/* HASH CRC-32:0xf807d2cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #if __has_builtin(__builtin_vprintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vprintf)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-__EXTERNINLINE __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T (__LIBCCALL __localdep_vprintf)(char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return __builtin_vprintf(__format, __args); }
+__CEIREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SSIZE_T,,__localdep_vprintf,(char const *__restrict __format, __builtin_va_list __args),vprintf,{ return __builtin_vprintf(__format, __args); }) __THROWS(...)
 #elif defined(__CRT_HAVE_vprintf_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */

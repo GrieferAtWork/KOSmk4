@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46615234 */
+/* HASH CRC-32:0x4fa39109 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #define ____localdep_cosh_defined 1
 #if __has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)
 /* Hyperbolic cosine of X */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_cosh)(double __x) { return __builtin_cosh(__x); }
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),cosh,{ return __builtin_cosh(__x); })
 #elif defined(__CRT_HAVE_cosh)
 /* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_cosh,(double __x),cosh,(__x))

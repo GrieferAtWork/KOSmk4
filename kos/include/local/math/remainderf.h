@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf48780e9 */
+/* HASH CRC-32:0x8dc8ccd7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #define ____localdep_remainder_defined 1
 #if __has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)
 /* Return the remainder of integer divison X/P with infinite precision */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_remainder)(double __x, double __p) { return __builtin_remainder(__x, __p); }
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),remainder,{ return __builtin_remainder(__x, __p); })
 #elif defined(__CRT_HAVE_remainder)
 /* Return the remainder of integer divison X/P with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_remainder,(double __x, double __p),remainder,(__x,__p))

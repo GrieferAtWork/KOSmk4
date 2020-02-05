@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x936eb781 */
+/* HASH CRC-32:0xf587783c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #define ____localdep_acosh_defined 1
 #if __has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)
 /* Hyperbolic arc cosine of X */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_acosh)(double __x) { return __builtin_acosh(__x); }
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acosh,(double __x),acosh,{ return __builtin_acosh(__x); })
 #elif defined(__CRT_HAVE_acosh)
 /* Hyperbolic arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_acosh,(double __x),acosh,(__x))

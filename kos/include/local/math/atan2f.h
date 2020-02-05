@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f998e99 */
+/* HASH CRC-32:0xdc26ee7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #define ____localdep_atan2_defined 1
 #if __has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)
 /* Arc tangent of Y/X */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_atan2)(double __y, double __x) { return __builtin_atan2(__y, __x); }
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan2,(double __y, double __x),atan2,{ return __builtin_atan2(__y, __x); })
 #elif defined(__CRT_HAVE_atan2)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_atan2,(double __y, double __x),atan2,(__y,__x))

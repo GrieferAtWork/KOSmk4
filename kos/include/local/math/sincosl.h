@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbff2e0ee */
+/* HASH CRC-32:0x59e55feb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #define ____localdep_sincos_defined 1
 #if __has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)
 /* Cosine and sine of X */
-__EXTERNINLINE __DECL_SIMD_sincos __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL __localdep_sincos)(double __x, double *__psinx, double *__pcosx) { return __builtin_sincos(__x, __psinx, __pcosx); }
+__CEIREDIRECT(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),void,__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),sincos,{ return __builtin_sincos(__x, __psinx, __pcosx); })
 #elif defined(__CRT_HAVE_sincos)
 /* Cosine and sine of X */
 __CREDIRECT_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__localdep_sincos,(double __x, double *__psinx, double *__pcosx),sincos,(__x,__psinx,__pcosx))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5408f4cb */
+/* HASH CRC-32:0x1d997e73 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #define ____localdep_significand_defined 1
 #if __has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_significand)(double __x) { return __builtin_significand(__x); }
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_significand,(double __x),significand,{ return __builtin_significand(__x); })
 #elif defined(__CRT_HAVE_significand)
 /* Return the fractional part of X after dividing out `ilogb(X)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_significand,(double __x),significand,(__x))

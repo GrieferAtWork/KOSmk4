@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16f513dc */
+/* HASH CRC-32:0x5ac55807 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifndef ____localdep_jn_defined
 #define ____localdep_jn_defined 1
 #if __has_builtin(__builtin_jn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_jn)
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_jn)(int __n, double __x) { return __builtin_jn(__n, __x); }
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_jn,(int __n, double __x),jn,{ return __builtin_jn(__n, __x); })
 #elif defined(__CRT_HAVE_jn)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_jn,(int __n, double __x),jn,(__n,__x))
 #elif defined(__CRT_HAVE___jn)

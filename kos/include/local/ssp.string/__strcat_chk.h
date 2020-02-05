@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6542b7fb */
+/* HASH CRC-32:0x92a144de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifndef ____localdep_strcat_defined
 #define ____localdep_strcat_defined 1
 #if __has_builtin(__builtin_strcat) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcat)
-__EXTERNINLINE __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __localdep_strcat)(char *__restrict __buf, char const *__restrict __src) { return __builtin_strcat(__buf, __src); }
+__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcat,(char *__restrict __buf, char const *__restrict __src),strcat,{ return __builtin_strcat(__buf, __src); })
 #elif defined(__CRT_HAVE_strcat)
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcat,(char *__restrict __buf, char const *__restrict __src),strcat,(__buf,__src))
 #else /* LIBC: strcat */

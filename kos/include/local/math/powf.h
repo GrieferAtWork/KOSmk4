@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25133c88 */
+/* HASH CRC-32:0xa3e3bfc8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 #define ____localdep_pow_defined 1
 #if __has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)
 /* Return X to the Y power */
-__EXTERNINLINE __DECL_SIMD_pow __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_pow)(double __x, double __y) { return __builtin_pow(__x, __y); }
+__CEIREDIRECT(__DECL_SIMD_pow __ATTR_WUNUSED,double,__NOTHROW,__localdep_pow,(double __x, double __y),pow,{ return __builtin_pow(__x, __y); })
 #elif defined(__CRT_HAVE_pow)
 /* Return X to the Y power */
 __CREDIRECT(__DECL_SIMD_pow __ATTR_WUNUSED,double,__NOTHROW,__localdep_pow,(double __x, double __y),pow,(__x,__y))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68383667 */
+/* HASH CRC-32:0xa9275c92 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -508,7 +508,7 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 
 __NAMESPACE_STD_BEGIN
 #if __has_builtin(__builtin_imaxabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_imaxabs)
-__EXTERNINLINE __ATTR_CONST __INTMAX_TYPE__ __NOTHROW(__LIBCCALL imaxabs)(__INTMAX_TYPE__ __x) { return __builtin_imaxabs(__x); }
+__CEIDECLARE(__ATTR_CONST,__INTMAX_TYPE__,__NOTHROW,imaxabs,(__INTMAX_TYPE__ __x),{ return __builtin_imaxabs(__x); })
 #elif defined(__CRT_HAVE_imaxabs)
 __CDECLARE(__ATTR_CONST,__INTMAX_TYPE__,__NOTHROW,imaxabs,(__INTMAX_TYPE__ __x),(__x))
 #elif defined(__CRT_HAVE_abs) && (__SIZEOF_INTMAX_T__ == __SIZEOF_INT__)

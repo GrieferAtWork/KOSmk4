@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1525b4a0 */
+/* HASH CRC-32:0x23772809 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifndef ____localdep_lgamma_defined
 #define ____localdep_lgamma_defined 1
 #if __has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_lgamma)(double __x) { return __builtin_lgamma(__x); }
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_lgamma,(double __x),lgamma,{ return __builtin_lgamma(__x); })
 #elif defined(__CRT_HAVE_lgamma)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_lgamma,(double __x),lgamma,(__x))
 #elif defined(__CRT_HAVE___lgamma)

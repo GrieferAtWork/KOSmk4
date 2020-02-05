@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfc1839a */
+/* HASH CRC-32:0xea29b167 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_iswlower_defined
 #define ____localdep_iswlower_defined 1
 #if __has_builtin(__builtin_iswlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswlower)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswlower)(__WINT_TYPE__ __wc) { return __builtin_iswlower(__wc); }
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswlower,(__WINT_TYPE__ __wc),iswlower,{ return __builtin_iswlower(__wc); })
 #elif defined(__CRT_HAVE_iswlower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswlower,(__WINT_TYPE__ __wc),iswlower,(__wc))
 #else /* LIBC: iswlower */

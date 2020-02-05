@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cf23f03 */
+/* HASH CRC-32:0xf172b028 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #define ____localdep_sin_defined 1
 #if __has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)
 /* Sine of X */
-__EXTERNINLINE __DECL_SIMD_sin __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_sin)(double __x) { return __builtin_sin(__x); }
+__CEIREDIRECT(__DECL_SIMD_sin __ATTR_WUNUSED,double,__NOTHROW,__localdep_sin,(double __x),sin,{ return __builtin_sin(__x); })
 #elif defined(__CRT_HAVE_sin)
 /* Sine of X */
 __CREDIRECT(__DECL_SIMD_sin __ATTR_WUNUSED,double,__NOTHROW,__localdep_sin,(double __x),sin,(__x))

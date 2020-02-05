@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52752980 */
+/* HASH CRC-32:0xd18966bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #define ____localdep_exp10_defined 1
 #if __has_builtin(__builtin_exp10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10)
 /* A function missing in all standards: compute exponent to base ten */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_exp10)(double __x) { return __builtin_exp10(__x); }
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp10,(double __x),exp10,{ return __builtin_exp10(__x); })
 #elif defined(__CRT_HAVE_exp10)
 /* A function missing in all standards: compute exponent to base ten */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_exp10,(double __x),exp10,(__x))

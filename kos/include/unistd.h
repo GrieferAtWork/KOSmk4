@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49b86781 */
+/* HASH CRC-32:0x6d4331e0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,7 +227,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__LOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execv)(char const *__restrict __path, __TARGV) { return __builtin_execv(__path, (char *const *)___argv); }
+__FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execv)(char const *__restrict __path, __TARGV) { return __builtin_execv(__path, (char *const *)___argv); }
 #elif defined(__CRT_HAVE_execv)
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -248,7 +248,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execv,(char const *__restri
 /* >> execve(2)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__LOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL execve)(char const *__restrict __path, __TARGV, __TENVP) { return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); }
+__FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL execve)(char const *__restrict __path, __TARGV, __TENVP) { return __builtin_execve(__path, (char *const *)___argv, (char *const *)___envp); }
 #elif defined(__CRT_HAVE_execve)
 /* >> execve(2)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -269,7 +269,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,execve,(char const *__re
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
-__LOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execvp)(char const *__restrict __file, __TARGV) { return __builtin_execvp(__file, (char *const *)___argv); }
+__FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL execvp)(char const *__restrict __file, __TARGV) { return __builtin_execvp(__file, (char *const *)___argv); }
 #elif defined(__CRT_HAVE_execvp)
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -290,7 +290,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,execvp,(char const *__restr
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-__EXTERNINLINE __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/) { return __builtin_execl(__path, __args, __builtin_va_arg_pack()); }
+__CEIDECLARE(__ATTR_SENTINEL __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execl,(char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/),{ return __builtin_execl(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execl)
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -321,7 +321,7 @@ __NAMESPACE_LOCAL_USING(execl)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinel */
-__EXTERNINLINE __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) { return __builtin_execle(__path, __args, __builtin_va_arg_pack()); }
+__CEIDECLARE(__ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execle,(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/),{ return __builtin_execle(__path, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execle)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -352,7 +352,7 @@ __NAMESPACE_LOCAL_USING(execle)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
-__EXTERNINLINE __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/) { return __builtin_execlp(__file, __args, __builtin_va_arg_pack()); }
+__CEIDECLARE(__ATTR_SENTINEL __ATTR_NONNULL((1)),int,__NOTHROW_RPC,execlp,(char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/),{ return __builtin_execlp(__file, __args, __builtin_va_arg_pack()); })
 #elif defined(__CRT_HAVE_execlp)
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -631,7 +631,7 @@ __CDECLARE(,int,__NOTHROW_NCX,setgid,(__gid_t __gid),(__gid))
  * The child then usually proceeds by calling `exec(2)' to replace its
  * application image with that of another program that the original
  * parent can then `wait(2)' for */
-__EXTERNINLINE __ATTR_WUNUSED __pid_t __NOTHROW_NCX(__LIBCCALL fork)(void) { return __builtin_fork(); }
+__CEIDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),{ return __builtin_fork(); })
 #elif defined(__CRT_HAVE_fork)
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
@@ -737,7 +737,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(link, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __
 #ifdef __std_exit_defined
 __NAMESPACE_STD_USING(exit)
 #elif __has_builtin(__builtin_exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exit)
-__EXTERNINLINE __ATTR_NORETURN void (__LIBCCALL exit)(int __status) __THROWS(...) { __builtin_exit(__status); }
+__CEIDECLARE(__ATTR_NORETURN,void,,exit,(int __status),{ __builtin_exit(__status); }) __THROWS(...)
 #elif defined(__CRT_HAVE_exit)
 __CDECLARE_VOID(__ATTR_NORETURN,,exit,(int __status),(__status)) __THROWS(...)
 #elif defined(__CRT_HAVE_quick_exit)
@@ -1538,7 +1538,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nice, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL 
 #ifndef ___exit_defined
 #define ___exit_defined 1
 #if __has_builtin(__builtin__exit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE__exit)
-__EXTERNINLINE __ATTR_NORETURN void (__LIBCCALL _exit)(int __status) { __builtin__exit(__status); }
+__CEIDECLARE(__ATTR_NORETURN,void,,_exit,(int __status),{ __builtin__exit(__status); })
 #elif defined(__CRT_HAVE__exit)
 __CDECLARE_VOID(__ATTR_NORETURN,,_exit,(int __status),(__status))
 #elif defined(__CRT_HAVE_quick_exit)

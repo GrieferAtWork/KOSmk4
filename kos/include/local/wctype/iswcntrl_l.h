@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x953a3502 */
+/* HASH CRC-32:0x7ff0bc2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep_iswcntrl_defined
 #define ____localdep_iswcntrl_defined 1
 #if __has_builtin(__builtin_iswcntrl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswcntrl)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswcntrl)(__WINT_TYPE__ __wc) { return __builtin_iswcntrl(__wc); }
+__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswcntrl,(__WINT_TYPE__ __wc),iswcntrl,{ return __builtin_iswcntrl(__wc); })
 #elif defined(__CRT_HAVE_iswcntrl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswcntrl,(__WINT_TYPE__ __wc),iswcntrl,(__wc))
 #else /* LIBC: iswcntrl */

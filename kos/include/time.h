@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf38199a0 */
+/* HASH CRC-32:0x7e552443 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -416,7 +416,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(localtime, __FORCELOCAL __ATTR_RETNONNULL __ATTR
 /* Format TP into S according to FORMAT.
  * Write no more than MAXSIZE characters and return the number
  * of characters written, or 0 if it would exceed MAXSIZE */
-__EXTERNINLINE __ATTR_NONNULL((1, 3, 4)) size_t __NOTHROW_NCX(__LIBCCALL strftime)(char *__restrict __buf, size_t __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp) { return __builtin_strftime(__buf, __bufsize, __format, __tp); }
+__CEIDECLARE(__ATTR_NONNULL((1, 3, 4)),size_t,__NOTHROW_NCX,strftime,(char *__restrict __buf, size_t __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp),{ return __builtin_strftime(__buf, __bufsize, __format, __tp); })
 #elif defined(__CRT_HAVE_strftime)
 /* Format TP into S according to FORMAT.
  * Write no more than MAXSIZE characters and return the number

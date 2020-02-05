@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cc064e3 */
+/* HASH CRC-32:0x80bb0e74 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #define ____localdep_hypot_defined 1
 #if __has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)
 /* Return `sqrt(X*X + Y*Y)' */
-__EXTERNINLINE __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_hypot)(double __x, double __y) { return __builtin_hypot(__x, __y); }
+__CEIREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_hypot,(double __x, double __y),hypot,{ return __builtin_hypot(__x, __y); })
 #elif defined(__CRT_HAVE_hypot)
 /* Return `sqrt(X*X + Y*Y)' */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__localdep_hypot,(double __x, double __y),hypot,(__x,__y))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6969842 */
+/* HASH CRC-32:0x8c285c4c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -154,7 +154,7 @@ __NAMESPACE_STD_USING(wctrans_t)
 
 __NAMESPACE_STD_BEGIN
 #if __has_builtin(__builtin_iswalnum) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswalnum)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswalnum)(wint_t __wc) { return __builtin_iswalnum(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswalnum,(wint_t __wc),{ return __builtin_iswalnum(__wc); })
 #elif defined(__CRT_HAVE_iswalnum)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswalnum,(wint_t __wc),(__wc))
 #else /* LIBC: iswalnum */
@@ -164,7 +164,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswalnum, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswalnum)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswalnum))(__wc); })
 #endif /* iswalnum... */
 #if __has_builtin(__builtin_iswalpha) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswalpha)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswalpha)(wint_t __wc) { return __builtin_iswalpha(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswalpha,(wint_t __wc),{ return __builtin_iswalpha(__wc); })
 #elif defined(__CRT_HAVE_iswalpha)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswalpha,(wint_t __wc),(__wc))
 #else /* LIBC: iswalpha */
@@ -174,7 +174,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswalpha, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswalpha)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswalpha))(__wc); })
 #endif /* iswalpha... */
 #if __has_builtin(__builtin_iswcntrl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswcntrl)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswcntrl)(wint_t __wc) { return __builtin_iswcntrl(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswcntrl,(wint_t __wc),{ return __builtin_iswcntrl(__wc); })
 #elif defined(__CRT_HAVE_iswcntrl)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswcntrl,(wint_t __wc),(__wc))
 #else /* LIBC: iswcntrl */
@@ -184,7 +184,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswcntrl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswcntrl)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswcntrl))(__wc); })
 #endif /* iswcntrl... */
 #if __has_builtin(__builtin_iswdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswdigit)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswdigit)(wint_t __wc) { return __builtin_iswdigit(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswdigit,(wint_t __wc),{ return __builtin_iswdigit(__wc); })
 #elif defined(__CRT_HAVE_iswdigit)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswdigit,(wint_t __wc),(__wc))
 #else /* LIBC: iswdigit */
@@ -194,7 +194,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswdigit, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswdigit)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswdigit))(__wc); })
 #endif /* iswdigit... */
 #if __has_builtin(__builtin_iswgraph) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswgraph)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswgraph)(wint_t __wc) { return __builtin_iswgraph(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswgraph,(wint_t __wc),{ return __builtin_iswgraph(__wc); })
 #elif defined(__CRT_HAVE_iswgraph)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswgraph,(wint_t __wc),(__wc))
 #else /* LIBC: iswgraph */
@@ -204,7 +204,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswgraph, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswgraph)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswgraph))(__wc); })
 #endif /* iswgraph... */
 #if __has_builtin(__builtin_iswlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswlower)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswlower)(wint_t __wc) { return __builtin_iswlower(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswlower,(wint_t __wc),{ return __builtin_iswlower(__wc); })
 #elif defined(__CRT_HAVE_iswlower)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswlower,(wint_t __wc),(__wc))
 #else /* LIBC: iswlower */
@@ -214,7 +214,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswlower, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswlower)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswlower))(__wc); })
 #endif /* iswlower... */
 #if __has_builtin(__builtin_iswprint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswprint)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswprint)(wint_t __wc) { return __builtin_iswprint(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswprint,(wint_t __wc),{ return __builtin_iswprint(__wc); })
 #elif defined(__CRT_HAVE_iswprint)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswprint,(wint_t __wc),(__wc))
 #else /* LIBC: iswprint */
@@ -224,7 +224,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswprint, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswprint)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswprint))(__wc); })
 #endif /* iswprint... */
 #if __has_builtin(__builtin_iswpunct) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswpunct)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswpunct)(wint_t __wc) { return __builtin_iswpunct(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswpunct,(wint_t __wc),{ return __builtin_iswpunct(__wc); })
 #elif defined(__CRT_HAVE_iswpunct)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswpunct,(wint_t __wc),(__wc))
 #else /* LIBC: iswpunct */
@@ -234,7 +234,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswpunct, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswpunct)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswpunct))(__wc); })
 #endif /* iswpunct... */
 #if __has_builtin(__builtin_iswspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswspace)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswspace)(wint_t __wc) { return __builtin_iswspace(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswspace,(wint_t __wc),{ return __builtin_iswspace(__wc); })
 #elif defined(__CRT_HAVE_iswspace)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswspace,(wint_t __wc),(__wc))
 #else /* LIBC: iswspace */
@@ -244,7 +244,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswspace, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswspace)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswspace))(__wc); })
 #endif /* iswspace... */
 #if __has_builtin(__builtin_iswupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswupper)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswupper)(wint_t __wc) { return __builtin_iswupper(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswupper,(wint_t __wc),{ return __builtin_iswupper(__wc); })
 #elif defined(__CRT_HAVE_iswupper)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswupper,(wint_t __wc),(__wc))
 #else /* LIBC: iswupper */
@@ -254,7 +254,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(iswupper, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswupper)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswupper))(__wc); })
 #endif /* iswupper... */
 #if __has_builtin(__builtin_iswxdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswxdigit)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswxdigit)(wint_t __wc) { return __builtin_iswxdigit(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswxdigit,(wint_t __wc),{ return __builtin_iswxdigit(__wc); })
 #elif defined(__CRT_HAVE_iswxdigit)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswxdigit,(wint_t __wc),(__wc))
 #else /* LIBC: iswxdigit */
@@ -319,7 +319,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(iswctype, __FORCELOCAL __ATTR_CONST __ATTR_WUNUS
 #ifdef __iswblank_defined
 __NAMESPACE_GLB_USING(iswblank)
 #elif __has_builtin(__builtin_iswblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswblank)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL iswblank)(wint_t __wc) { return __builtin_iswblank(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswblank,(wint_t __wc),{ return __builtin_iswblank(__wc); })
 #elif defined(__CRT_HAVE_iswblank)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iswblank,(wint_t __wc),(__wc))
 #else /* LIBC: iswblank */
@@ -331,7 +331,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(iswblank, __FORCELOCAL __ATTR_CONST __ATTR_WUNUS
 #endif /* !__std_iswblank_defined */
 #endif /* __USE_ISOC99 */
 #if __has_builtin(__builtin_towlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towlower)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED wint_t __NOTHROW(__LIBCCALL towlower)(wint_t __wc) { return __builtin_towlower(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW,towlower,(wint_t __wc),{ return __builtin_towlower(__wc); })
 #elif defined(__CRT_HAVE_towlower)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW,towlower,(wint_t __wc),(__wc))
 #else /* LIBC: towlower */
@@ -341,7 +341,7 @@ __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(towlower, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED wint_t __NOTHROW(__LIBCCALL towlower)(wint_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towlower))(__wc); })
 #endif /* towlower... */
 #if __has_builtin(__builtin_towupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_towupper)
-__EXTERNINLINE __ATTR_CONST __ATTR_WUNUSED wint_t __NOTHROW(__LIBCCALL towupper)(wint_t __wc) { return __builtin_towupper(__wc); }
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW,towupper,(wint_t __wc),{ return __builtin_towupper(__wc); })
 #elif defined(__CRT_HAVE_towupper)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,wint_t,__NOTHROW,towupper,(wint_t __wc),(__wc))
 #else /* LIBC: towupper */

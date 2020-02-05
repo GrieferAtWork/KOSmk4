@@ -2705,11 +2705,12 @@ again_enum_name:
 					define_as_builtin = false;
 					break;
 				case "preferred_impl":
-					preferred_impl.append(("__LOCAL", " && ".join(conditions), get_tag_operand().strip()));
+					preferred_impl.append((none, " && ".join(conditions), get_tag_operand().strip()));
 					break;
-				case "preferred_impl_extern":
-					preferred_impl.append(("__EXTERNINLINE", " && ".join(conditions), get_tag_operand().strip()));
-					break;
+				case "preferred_impl_extern": {
+					local extern_name, none, inline_impl = get_tag_operand().partition(",")...;
+					preferred_impl.append((extern_name.strip(), " && ".join(conditions), inline_impl.strip()));
+				}	break;
 				case "allow_macros":
 					allow_macros = true;
 					break;
@@ -3712,7 +3713,7 @@ got_chk_checkexpr:
 				if (fun.args_is_varargs)
 					blockfp << "__builtin_va_arg_pack()";
 				blockfp << "); }";
-				fun.preferred_impl.append(("__EXTERNINLINE", cond, blockfp.string));
+				fun.preferred_impl.append((funname, cond, blockfp.string));
 			}
 #ifdef WARN_KNOWN_BUILTINS
 			else if (!overload_alias) {
@@ -4063,8 +4064,8 @@ class Function {
 	@@:true if @this function has a fast variant, optionally defined in <optimized/[component_name].h>
 	member has_fast_implementation: bool;
 
-	@@List of (decl, condition_expr, impl) of preferred, inline implementations
-	member preferred_impl: {(string, string, string)...};
+	@@List of (extern_name, condition_expr, impl) of preferred, inline implementations
+	member preferred_impl: {(string | none, string, string)...};
 
 	@@:true if @this function's base name isn't a valid alias
 	member nocrt: bool;
@@ -5462,33 +5463,59 @@ do_return_crt:
 				if (is_nothrow) args_prefix = "__" + is_nothrow + args_prefix;
 				if (symbol_preferred_impl) {
 					local is_first = true;
-					for (local decl, cond, impl: symbol_preferred_impl) {
+					for (local extern_name, cond, impl: symbol_preferred_impl) {
 						printIfdefCond(fp, is_first, cond);
 						is_first = false;
 						fp << "extern \"C++\" {\n";
 						for (local args, return_type: extended_overloads) {
-							File.Writer return_type_fp;
-							File.Writer function_decl_fp;
-							for (local is_word, word: split_words(return_type, env: this)) {
-								if (is_word)
-									word = replace_word(word, transform_argument_types);
-								return_type_fp << word;
-							}
-							function_decl_fp << args_prefix;
-							print_argument_list(
-								function_decl_fp, args, key_underscore,
-								(single_line_local_wrappers ? "" : " " * #args_prefix),
-								transform_argument_types);
-							//if (is_nothrow) fp << ")";
-							function_decl_fp << ")";
-							printThrowsAnnotation(function_decl_fp);
 							print_doc(fp);
-							fp << decl << decl_prefix[12:];
-							fp << join_variable_name(return_type_fp.string, function_decl_fp.string);
-							fp << " ";
-							do_transform_block(
-								fp, impl, key_identity, key_identity,
-								key_underscore, transform_argument_types, none);
+							if (extern_name is none) {
+								File.Writer return_type_fp;
+								File.Writer function_decl_fp;
+								for (local is_word, word: split_words(return_type, env: this)) {
+									if (is_word)
+										word = replace_word(word, transform_argument_types);
+									return_type_fp << word;
+								}
+								function_decl_fp << args_prefix;
+								print_argument_list(
+									function_decl_fp, args, key_underscore,
+									(single_line_local_wrappers ? "" : " " * #args_prefix),
+									transform_argument_types);
+								function_decl_fp << ")";
+								printThrowsAnnotation(function_decl_fp);
+								fp << decl_prefix;
+								fp << join_variable_name(return_type_fp.string, function_decl_fp.string);
+								fp << " ";
+								do_transform_block(
+									fp, impl, key_identity, key_identity,
+									key_underscore, transform_argument_types, none);
+							} else {
+								if (extern_name == my_name) {
+									fp << "__CEIDECLARE(";
+								} else {
+									fp << "__CEIREDIRECT(";
+								}
+								fp << decl_prefix[13:] << ",";
+								for (local is_word, word: split_words(return_type, env: this)) {
+									if (is_word)
+										word = replace_word(word, transform_argument_types);
+									fp << word;
+								}
+								fp << ",";
+								if (is_nothrow)
+									fp << "__" << is_nothrow;
+								fp << "," << my_name << ",(";
+								print_argument_list(fp, args, key_underscore, "", transform_argument_types);
+								fp << "),";
+								if (extern_name != my_name)
+									fp << extern_name << ",";
+								do_transform_block(
+									fp, impl, key_identity, key_identity,
+									key_underscore, transform_argument_types, none);
+								fp << ")";
+								printThrowsAnnotation(fp);
+							}
 							fp << "\n";
 						}
 						fp << "}\n";
@@ -5983,42 +6010,82 @@ skip_alias_redirections:
 			}
 		}
 		if (symbol_preferred_impl) {
-			for (local decl, cond, impl: symbol_preferred_impl) {
+			for (local extern_name, cond, impl: symbol_preferred_impl) {
 				printIfdefCond(fp, is_first, cond);
 				is_first = false;
 				print_doc(fp);
-				fp << decl << " ";
-				local is_nothrow = "";
-				for (local at: attr_tags) {
-					at = at.strip();
-					if (at in nothrow_attributes) {
-						is_nothrow = at[#"ATTR_":];
-						continue;
+				if (extern_name is none) {
+					fp << "__FORCELOCAL ";
+					local is_nothrow = "";
+					for (local at: attr_tags) {
+						at = at.strip();
+						if (at in nothrow_attributes) {
+							is_nothrow = at[#"ATTR_":];
+							continue;
+						}
+						fp << key_attr_header(at) << " ";
 					}
-					fp << key_attr_header(at) << " ";
+					local args_prefix = "({} {})(".format({
+						args_is_varargs ? "__VLIBCCALL" : "__LIBCCALL", my_name });
+					if (is_nothrow) args_prefix = "__" + is_nothrow + args_prefix;
+					File.Writer return_type_fp;
+					File.Writer function_decl_fp;
+					for (local is_word, word: split_words(return_type, env: this)) {
+						if (is_word)
+							word = replace_word(word, transform_argument_types);
+						return_type_fp << word;
+					}
+					function_decl_fp << args_prefix;
+					print_argument_list(
+						function_decl_fp, args, key_underscore,
+						(single_line_local_wrappers ? "" : " " * #args_prefix),
+						transform_argument_types);
+					function_decl_fp << ")";
+					printThrowsAnnotation(function_decl_fp);
+					fp << join_variable_name(return_type_fp.string, function_decl_fp.string);
+					fp << " ";
+					do_transform_block(
+						fp, impl, key_identity, key_identity,
+						key_underscore, transform_argument_types, none);
+				} else {
+					if (my_name == extern_name) {
+						fp << "__CEIDECLARE(";
+					} else {
+						fp << "__CEIREDIRECT(";
+					}
+					local is_nothrow = "";
+					local is_first_attr = true;
+					for (local at: attr_tags) {
+						at = at.strip();
+						if (at in nothrow_attributes) {
+							is_nothrow = at[#"ATTR_":];
+							continue;
+						}
+						if (!is_first_attr)
+							fp << " ";
+						is_first_attr = false;
+						fp << key_attr_header(at);
+					}
+					fp << ",";
+					for (local is_word, word: split_words(return_type, env: this)) {
+						if (is_word)
+							word = replace_word(word, transform_argument_types);
+						fp << word;
+					}
+					fp << ",";
+					if (is_nothrow)
+						fp << "__" << is_nothrow;
+					fp << "," << my_name << ",(";
+					print_argument_list(fp, args, key_underscore, "", transform_argument_types);
+					fp << "),";
+					if (my_name != extern_name)
+						fp << extern_name << ",";
+					do_transform_block(
+						fp, impl, key_identity, key_identity,
+						key_underscore, transform_argument_types, none);
+					fp << ")";
+					printThrowsAnnotation(fp);
 				}
-				local args_prefix = "({} {})(".format({
-					args_is_varargs ? "__VLIBCCALL" : "__LIBCCALL", my_name });
-				if (is_nothrow) args_prefix = "__" + is_nothrow + args_prefix;
-				File.Writer return_type_fp;
-				File.Writer function_decl_fp;
-				for (local is_word, word: split_words(return_type, env: this)) {
-					if (is_word)
-						word = replace_word(word, transform_argument_types);
-					return_type_fp << word;
-				}
-				function_decl_fp << args_prefix;
-				print_argument_list(
-					function_decl_fp, args, key_underscore,
-					(single_line_local_wrappers ? "" : " " * #args_prefix),
-					transform_argument_types);
-				function_decl_fp << ")";
-				printThrowsAnnotation(function_decl_fp);
-				fp << join_variable_name(return_type_fp.string, function_decl_fp.string);
-				fp << " ";
-				do_transform_block(
-					fp, impl, key_identity, key_identity,
-					key_underscore, transform_argument_types, none);
 				fp << "\n";
 			}
 		}
