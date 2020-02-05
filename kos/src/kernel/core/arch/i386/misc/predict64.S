@@ -17,11 +17,54 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_PREDICT64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_PREDICT64_S 1
 
 #include <kernel/compiler.h>
+
 #include <asm/cfi.h>
 
-#ifndef CONFIG_NO_BRANCH_PROFILING
+#ifdef CONFIG_NO_BRANCH_PROFILING
+
+/* struct branch_prediction *pred = %rdi */
+.section .text.cold
+.cfi_startproc
+PUBLIC_FUNCTION(__predict_update_sil)
+PUBLIC_FUNCTION(__predict_update_si)
+PUBLIC_FUNCTION(__predict_update_esi)
+PUBLIC_FUNCTION(__predict_update_rsi)
+PUBLIC_FUNCTION(__predict_update_dl)
+PUBLIC_FUNCTION(__predict_update_dx)
+PUBLIC_FUNCTION(__predict_update_edx)
+PUBLIC_FUNCTION(__predict_update_rdx)
+PUBLIC_FUNCTION(__predict_update_cl)
+PUBLIC_FUNCTION(__predict_update_cx)
+PUBLIC_FUNCTION(__predict_update_ecx)
+PUBLIC_FUNCTION(__predict_update_rcx)
+PUBLIC_FUNCTION(__predict_update_al)
+PUBLIC_FUNCTION(__predict_update_ax)
+PUBLIC_FUNCTION(__predict_update_eax)
+PUBLIC_FUNCTION(__predict_update_rax)
+	ret
+END(__predict_update_rax)
+END(__predict_update_eax)
+END(__predict_update_ax)
+END(__predict_update_al)
+END(__predict_update_rcx)
+END(__predict_update_ecx)
+END(__predict_update_cx)
+END(__predict_update_cl)
+END(__predict_update_rdx)
+END(__predict_update_edx)
+END(__predict_update_dx)
+END(__predict_update_dl)
+END(__predict_update_rsi)
+END(__predict_update_esi)
+END(__predict_update_si)
+END(__predict_update_sil)
+.cfi_endproc
+
+#else /* CONFIG_NO_BRANCH_PROFILING */
 
 /* struct branch_prediction *pred = %rdi */
 .section .text.hot
@@ -71,9 +114,4 @@ END(__predict_update_rax)
 
 #endif /* !CONFIG_NO_BRANCH_PROFILING */
 
-
-
-
-
-
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_PREDICT64_S */

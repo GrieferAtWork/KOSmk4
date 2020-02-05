@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_VM86_C
-#define GUARD_KERNEL_CORE_ARCH_I386_VM86_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_VM86_C
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_VM86_C 1
 
 #include <kernel/compiler.h>
 
@@ -85,4 +85,4 @@ x86_vm86_outl(struct icpustate *__restrict state, u16 port, u32 value) {
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_VM86_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_VM86_C */

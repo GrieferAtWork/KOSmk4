@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_RAND_C
-#define GUARD_KERNEL_CORE_ARCH_I386_RAND_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_RAND_C
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_RAND_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 #define _KOS_SOURCE 1
 
@@ -63,4 +63,4 @@ NOTHROW(KCALL x86_initialize_rand_entropy)(void) {
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_RAND_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_RAND_C */

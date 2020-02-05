@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE_C
-#define GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_FSGSBASE_C
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_FSGSBASE_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 #define _KOS_SOURCE 1
 
@@ -191,4 +191,4 @@ NOTHROW(KCALL x86_initialize_fsgsbase)(void) {
 DECL_END
 #endif /* __x86_64__ */
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_FSGSBASE_C */

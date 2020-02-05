@@ -17,7 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_CORE_SYMBOLS64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_CORE_SYMBOLS64_S 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/arch/core-symbols64.h>
 
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_CORE_SYMBOLS64_S */

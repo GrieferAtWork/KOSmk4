@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_SYSLOG_C
-#define GUARD_KERNEL_CORE_ARCH_I386_SYSLOG_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_SYSLOG_C
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_SYSLOG_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 
 #include <kernel/compiler.h>
@@ -83,7 +83,6 @@ PUBLIC struct syslog_sink x86_default_syslog_sink = {
 };
 
 
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SYSLOG_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_SYSLOG_C */

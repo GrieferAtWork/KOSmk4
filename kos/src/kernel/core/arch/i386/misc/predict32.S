@@ -17,11 +17,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_PREDICT32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_PREDICT32_S 1
 
 #include <kernel/compiler.h>
+
 #include <asm/cfi.h>
 
-#ifndef CONFIG_NO_BRANCH_PROFILING
+#ifdef CONFIG_NO_BRANCH_PROFILING
+
+/* struct branch_prediction *pred = %ecx */
+/* int                       expr = %dl */
+.section .text.cold
+.cfi_startproc
+PUBLIC_FUNCTION(__predict_update_dl)
+PUBLIC_FUNCTION(__predict_update_dx)
+PUBLIC_FUNCTION(__predict_update_edx)
+PUBLIC_FUNCTION(__predict_update_al)
+PUBLIC_FUNCTION(__predict_update_ax)
+PUBLIC_FUNCTION(__predict_update_eax)
+	ret
+END(__predict_update_eax)
+END(__predict_update_ax)
+END(__predict_update_al)
+END(__predict_update_edx)
+END(__predict_update_dx)
+END(__predict_update_dl)
+.cfi_endproc
+
+#else /* CONFIG_NO_BRANCH_PROFILING */
 
 /* struct branch_prediction *pred = %ecx */
 /* int                       expr = %dl */
@@ -59,9 +83,4 @@ END(__predict_update_eax)
 
 #endif /* !CONFIG_NO_BRANCH_PROFILING */
 
-
-
-
-
-
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_PREDICT32_S */

@@ -17,8 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_ATOMIC64_32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_ATOMIC64_32_S 1
 
 #include <kernel/compiler.h>
+
 #include <asm/cfi.h>
 
 #define ST(name)                  \
@@ -222,5 +225,4 @@ ST(atomic64_fetchxor)
 	.cfi_endproc
 EN(atomic64_fetchxor)
 
-
-
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_ATOMIC64_32_S */

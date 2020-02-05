@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_GDT_C
-#define GUARD_KERNEL_CORE_ARCH_I386_GDT_C 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_GDT_C
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_GDT_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 
 #include <kernel/compiler.h>
@@ -132,4 +132,4 @@ PUBLIC ATTR_PERTASK uintptr_t this_x86_user_gsbase = 0;
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_GDT_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_GDT_C */

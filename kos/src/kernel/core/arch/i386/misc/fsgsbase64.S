@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_S
-#define GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_S 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_FSGSBASE64_S
+#define GUARD_KERNEL_CORE_ARCH_I386_MISC_FSGSBASE64_S 1
 
 #include <kernel/compiler.h>
 #include <asm/cfi.h>
@@ -84,4 +84,4 @@
 #endif /* !__INTELLISENSE__ */
 #endif /* !CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE */
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_FSGSBASE64_S */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_FSGSBASE64_S */
