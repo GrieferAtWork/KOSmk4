@@ -25,6 +25,8 @@
 #include <hybrid/__atomic.h>
 #include <hybrid/typecore.h>
 
+#define CONFIG_NO_BRANCH_PROFILING 1 /* Disable (for now...) */
+
 #ifdef __CC__
 
 #if defined(CONFIG_NO_BRANCH_PROFILING) || \
