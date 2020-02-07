@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ab5e149 */
+/* HASH CRC-32:0xe87e4a65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,12 @@
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
+
+
+
+
 #include <bits/format-printer.h>
+
 #include <hybrid/__alloca.h>
 /* Dependency: "memset" from "string" */
 #ifndef ____localdep_memset_defined
@@ -54,7 +59,7 @@ __LOCAL_LIBC(format_repeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__
                                               void *__arg,
                                               char __ch,
                                               __SIZE_TYPE__ __num_repetitions) __THROWS(...) {
-#line 109 "kos/src/libc/magic/format-printer.c"
+#line 116 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_REPEAT_BUFSIZE
 #define __FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */

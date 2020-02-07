@@ -78,11 +78,11 @@ __SYSDECL_BEGIN
 #define __pformatprinter_defined 1
 /* Callback functions prototypes provided to format functions.
  * NOTE: 'pformatprinter' usually returns the number of characters printed, but isn't required to.
+ * @param: ARG:     The user-defined closure parameter passed alongside this function pointer.
  * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
  * @param: DATALEN: The amount of characters that should be printed, starting at `data'.
  *                  Note that this is an exact value, meaning that a NUL-character appearing
  *                  before then should not terminate printing prematurely, but be printed as well.
- * @param: CLOSURE: The user-defined closure parameter passed alongside this function pointer.
  * @return: < 0:    An error occurred and the calling function shall return with this same value.
  * @return: >= 0:   The print was successful.
  *                  Usually, the return value is added to a sum of values which is then
@@ -104,7 +104,14 @@ typedef __pformatungetc pformatungetc;
 @@The usual format-printer rules apply, and this function
 @@is allowed to call `PRINTER' as often as it chooses
 [dependency_include(<hybrid/__alloca.h>)]
-[decl_include(<bits/format-printer.h>)][kernel][throws]
+[decl_prefix(
+@@if $wchar_function@@
+#include @<bits/wformat-printer.h>@
+#include @<bits/uformat-printer.h>@
+@@else@@
+#include @<bits/format-printer.h>@
+@@endif@@
+)][kernel][throws]
 format_repeat:([nonnull] pformatprinter printer, void *arg, char ch, $size_t num_repetitions) -> $ssize_t {
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
@@ -188,8 +195,14 @@ err:
 @@with the `FORMAT_ESCAPE_FFORCE*' flags
 @@@param: PRINTER: A function called for all quoted portions of the text
 @@@param: TEXTLEN: The total number of bytes to escape, starting at `text'
-[kernel][throws][export_alias(format_quote)]
-[decl_include(<bits/format-printer.h>)]
+[kernel][throws][export_alias(format_quote)][decl_prefix(
+@@if $wchar_function@@
+#include @<bits/wformat-printer.h>@
+#include @<bits/uformat-printer.h>@
+@@else@@
+#include @<bits/format-printer.h>@
+@@endif@@
+)]
 format_escape:([nonnull] pformatprinter printer, void *arg,
                /*utf-8*/ char const *__restrict text,
                $size_t textlen, unsigned int flags) -> $ssize_t {
@@ -511,7 +524,14 @@ err:
 [dependency_include(<hybrid/__alloca.h>)]
 [dependency_include(<hybrid/__unaligned.h>)]
 [dependency_include(<hybrid/byteorder.h>)]
-[decl_include(<bits/format-printer.h>)][kernel][throws]
+[decl_prefix(
+@@if $wchar_function@@
+#include @<bits/wformat-printer.h>@
+#include @<bits/uformat-printer.h>@
+@@else@@
+#include @<bits/format-printer.h>@
+@@endif@@
+)][kernel][throws]
 format_hexdump:([nonnull] pformatprinter printer, void *arg,
                 void const *__restrict data, $size_t size,
                 $size_t linesize, unsigned int flags) -> $ssize_t {
@@ -878,7 +898,14 @@ format_vprintf:([nonnull] pformatprinter printer, void *arg,
 }
 
 [ATTR_LIBC_PRINTF(3, 4)][throws][allow_macros]
-[decl_include(<bits/format-printer.h>)][doc_alias(format_vprintf)][kernel]
+[decl_prefix(
+@@if $wchar_function@@
+#include @<bits/wformat-printer.h>@
+#include @<bits/uformat-printer.h>@
+@@else@@
+#include @<bits/format-printer.h>@
+@@endif@@
+)][doc_alias(format_vprintf)][kernel]
 format_printf:([nonnull] pformatprinter printer, void *arg,
                [nonnull] char const *__restrict format, ...) -> $ssize_t {
 	ssize_t result;
@@ -918,8 +945,14 @@ format_printf:([nonnull] pformatprinter printer, void *arg,
 @@@return: EOF: `PGETC' returned EOF the first time an attempt at reading was made
 [dependency_include(<libc/unicode.h>)]
 [dependency_include(<libc/string.h>)]
-[decl_include(<bits/format-printer.h>)]
-[ATTR_LIBC_SCANF(4, 0)][throws][kernel]
+[decl_prefix(
+@@if $wchar_function@@
+#include @<bits/wformat-printer.h>@
+#include @<bits/uformat-printer.h>@
+@@else@@
+#include @<bits/format-printer.h>@
+@@endif@@
+)][ATTR_LIBC_SCANF(4, 0)][throws][kernel]
 format_vscanf:([nonnull] pformatgetc pgetc,
                [nonnull] pformatungetc pungetc, void *arg,
                [nonnull] char const *__restrict format, $va_list args) -> $ssize_t {
@@ -934,7 +967,14 @@ format_vscanf:([nonnull] pformatgetc pgetc,
 }
 
 [ATTR_LIBC_SCANF(4, 5)][throws][allow_macros]
-[decl_include(<bits/format-printer.h>)][doc_alias(format_vscanf)][kernel]
+[decl_prefix(
+@@if $wchar_function@@
+#include @<bits/wformat-printer.h>@
+#include @<bits/uformat-printer.h>@
+@@else@@
+#include @<bits/format-printer.h>@
+@@endif@@
+)][doc_alias(format_vscanf)][kernel]
 format_scanf:([nonnull] pformatgetc pgetc,
               [nonnull] pformatungetc pungetc, void *arg,
               [nonnull] char const *__restrict format, ...) -> $ssize_t {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88e4cea */
+/* HASH CRC-32:0xa526d6a8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,12 @@ DECL_BEGIN
 #define libc_format_c32escape format_c32escape
 #define libc_format_c32width  format_c32width
 #ifndef __KERNEL__
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 #include <hybrid/__alloca.h>
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
@@ -57,7 +62,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wrepeat)(pc32formatprinter printer,
                                           void *arg,
                                           char32_t ch,
                                           size_t num_repetitions) {
-#line 109 "kos/src/libc/magic/format-printer.c"
+#line 116 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -110,7 +115,12 @@ done:
 err:
 	return temp;
 }
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 #include <hybrid/__alloca.h>
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
@@ -121,7 +131,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
                                           void *arg,
                                           char16_t ch,
                                           size_t num_repetitions) {
-#line 109 "kos/src/libc/magic/format-printer.c"
+#line 116 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -175,7 +185,12 @@ err:
 	return temp;
 }
 
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -196,7 +211,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
                                           /*utf-8*/ char32_t const *__restrict text,
                                           size_t textlen,
                                           unsigned int flags) {
-#line 196 "kos/src/libc/magic/format-printer.c"
+#line 209 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_ESCAPE_FNORMAL
 #define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
 #define FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
@@ -485,7 +500,12 @@ err:
 #endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 #undef escape_tooct
 }
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -506,7 +526,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
                                           /*utf-8*/ char16_t const *__restrict text,
                                           size_t textlen,
                                           unsigned int flags) {
-#line 196 "kos/src/libc/magic/format-printer.c"
+#line 209 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_ESCAPE_FNORMAL
 #define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
 #define FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
@@ -796,7 +816,12 @@ err:
 #undef escape_tooct
 }
 
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 #include <hybrid/__alloca.h>
 
 #include <hybrid/__unaligned.h>
@@ -819,7 +844,7 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
                                            size_t size,
                                            size_t linesize,
                                            unsigned int flags) {
-#line 518 "kos/src/libc/magic/format-printer.c"
+#line 538 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_HEXDUMP_FNORMAL
 #define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
@@ -1015,7 +1040,12 @@ err:
 #undef DECIMALS_SELECTOR
 #endif /* LOCAL_DECIMALS_SELECTOR_DEFINED */
 }
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 #include <hybrid/__alloca.h>
 
 #include <hybrid/__unaligned.h>
@@ -1038,7 +1068,7 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
                                            size_t size,
                                            size_t linesize,
                                            unsigned int flags) {
-#line 518 "kos/src/libc/magic/format-printer.c"
+#line 538 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_HEXDUMP_FNORMAL
 #define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
@@ -1354,7 +1384,7 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
                                            void *arg,
                                            char32_t const *__restrict format,
                                            __builtin_va_list args) {
-#line 838 "kos/src/libc/magic/format-printer.c"
+#line 858 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char32_t
 #define __CHAR_SIZE                 4
@@ -1515,7 +1545,7 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
                                            void *arg,
                                            char16_t const *__restrict format,
                                            __builtin_va_list args) {
-#line 838 "kos/src/libc/magic/format-printer.c"
+#line 858 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char16_t
 #define __CHAR_SIZE                 2
@@ -1558,7 +1588,12 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
 #endif /* !__INTELLISENSE__ */
 }
 
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -1652,7 +1687,7 @@ NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer,
                                            void *arg,
                                            char32_t const *__restrict format,
                                            ...) {
-#line 884 "kos/src/libc/magic/format-printer.c"
+#line 911 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1660,7 +1695,12 @@ NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer,
 	va_end(args);
 	return result;
 }
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -1754,7 +1794,7 @@ NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer,
                                            void *arg,
                                            char16_t const *__restrict format,
                                            ...) {
-#line 884 "kos/src/libc/magic/format-printer.c"
+#line 911 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1770,7 +1810,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsprintf_printer") 
 NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/ void *arg,
                                                    char32_t const *__restrict data,
                                                    size_t datalen) {
-#line 958 "kos/src/libc/magic/format-printer.c"
+#line 998 "kos/src/libc/magic/format-printer.c"
 
 	*(char32_t **)arg = (char32_t *)libc_wmempcpy(*(char32_t **)arg, data, datalen);
 
@@ -1785,7 +1825,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsprintf_printe
 NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/ void *arg,
                                                    char16_t const *__restrict data,
                                                    size_t datalen) {
-#line 958 "kos/src/libc/magic/format-printer.c"
+#line 998 "kos/src/libc/magic/format-printer.c"
 
 	*(char16_t **)arg = (char16_t *)libd_wmempcpy(*(char16_t **)arg, data, datalen);
 
@@ -1804,7 +1844,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsnprintf_printer")
 NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg,
                                                     char32_t const *__restrict data,
                                                     size_t datalen) {
-#line 990 "kos/src/libc/magic/format-printer.c"
+#line 1030 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
 		char32_t         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -1833,7 +1873,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsnprintf_print
 NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg,
                                                     char16_t const *__restrict data,
                                                     size_t datalen) {
-#line 990 "kos/src/libc/magic/format-printer.c"
+#line 1030 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
 		char16_t         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5850f3aa */
+/* HASH CRC-32:0x11b93f95 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,12 @@
  */
 #ifndef __local_format_wescape_defined
 #define __local_format_wescape_defined 1
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 /* Dependency: "unicode_readutf16_n" from "unicode" */
 #ifndef ____localdep_unicode_readutf16_n_defined
 #define ____localdep_unicode_readutf16_n_defined 1
@@ -54,7 +59,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wescape))(__pwformatprinter __
                                                             /*utf-8*/ __WCHAR_TYPE__ const *__restrict __text,
                                                             __SIZE_TYPE__ __textlen,
                                                             unsigned int __flags) {
-#line 196 "kos/src/libc/magic/format-printer.c"
+#line 209 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_ESCAPE_FNORMAL
 #define __FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
 #define __FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */

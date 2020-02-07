@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4f66e3 */
+/* HASH CRC-32:0x18e0b962 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,12 @@
 #ifndef __local_format_escape_defined
 #define __local_format_escape_defined 1
 #include <kos/anno.h>
+
+
+
+
 #include <bits/format-printer.h>
+
 /* Dependency: "unicode_readutf8_n" from "unicode" */
 #ifndef ____localdep_unicode_readutf8_n_defined
 #define ____localdep_unicode_readutf8_n_defined 1
@@ -55,7 +60,7 @@ __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
                                               /*utf-8*/ char const *__restrict __text,
                                               __SIZE_TYPE__ __textlen,
                                               unsigned int __flags) __THROWS(...) {
-#line 196 "kos/src/libc/magic/format-printer.c"
+#line 209 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_ESCAPE_FNORMAL
 #define __FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
 #define __FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */

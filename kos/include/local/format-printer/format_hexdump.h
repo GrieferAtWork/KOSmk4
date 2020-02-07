@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6a8386b */
+/* HASH CRC-32:0x77eeb3ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,12 @@
 #define __local_format_hexdump_defined 1
 #include <kos/anno.h>
 #include <bits/format-printer.h>
+
+
+
+
 #include <bits/format-printer.h>
+
 #include <hybrid/__alloca.h>
 
 #include <hybrid/__unaligned.h>
@@ -75,7 +80,7 @@ __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
                                                __SIZE_TYPE__ __size,
                                                __SIZE_TYPE__ __linesize,
                                                unsigned int __flags) __THROWS(...) {
-#line 518 "kos/src/libc/magic/format-printer.c"
+#line 538 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_HEXDUMP_FNORMAL
 #define __FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define __FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */

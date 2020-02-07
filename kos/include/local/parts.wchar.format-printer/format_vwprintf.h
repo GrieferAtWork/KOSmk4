@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f9ce692 */
+/* HASH CRC-32:0x6fe9252e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,8 @@
 #ifndef __local_format_vwprintf_defined
 #define __local_format_vwprintf_defined 1
 #include <kos/anno.h>
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
 #include <bits/format-printer.h>
 
 #include <bits/wformat-printer.h>
@@ -555,7 +557,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_vwprintf))(__pwformatprinter _
                                                              void *__arg,
                                                              __WCHAR_TYPE__ const *__restrict __format,
                                                              __builtin_va_list __args) {
-#line 838 "kos/src/libc/magic/format-printer.c"
+#line 858 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 __WCHAR_TYPE__
 #define __CHAR_SIZE                 __SIZEOF_WCHAR_T__

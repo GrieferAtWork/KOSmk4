@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd518a253 */
+/* HASH CRC-32:0x4ccfb9c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,12 @@
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 #include <hybrid/__alloca.h>
 /* Dependency: "wmemset" from "wchar" */
 #ifndef ____localdep_wmemset_defined
@@ -68,7 +73,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wrepeat))(__pwformatprinter __
                                                             void *__arg,
                                                             __WCHAR_TYPE__ __ch,
                                                             __SIZE_TYPE__ __num_repetitions) {
-#line 109 "kos/src/libc/magic/format-printer.c"
+#line 116 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_REPEAT_BUFSIZE
 #define __FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */

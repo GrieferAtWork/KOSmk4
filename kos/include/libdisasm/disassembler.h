@@ -20,6 +20,9 @@
 #ifndef _LIBDISASM_DISASSEMBLER_H
 #define _LIBDISASM_DISASSEMBLER_H 1
 
+#include "api.h"
+/**/
+
 #include <hybrid/host.h>
 
 #include <bits/format-printer.h>
@@ -27,9 +30,7 @@
 
 #include <libc/string.h>
 
-#include "api.h"
 #include "format.h"
-
 
 /* Known disassembler target IDs. */
 /*[[[enum]]]*/
@@ -93,11 +94,11 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 #define __pformatprinter_defined 1
 /* Callback functions prototypes provided to format functions.
  * NOTE: 'pformatprinter' usually returns the number of characters printed, but isn't required to.
+ * @param: ARG:     The user-defined closure parameter passed alongside this function pointer.
  * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
  * @param: DATALEN: The amount of characters that should be printed, starting at `data'.
  *                  Note that this is an exact value, meaning that a NUL-character appearing
  *                  before then should not terminate printing prematurely, but be printed as well.
- * @param: CLOSURE: The user-defined closure parameter passed alongside this function pointer.
  * @return: < 0:    An error occurred and the calling function shall return with this same value.
  * @return: >= 0:   The print was successful.
  *                  Usually, the return value is added to a sum of values which is then

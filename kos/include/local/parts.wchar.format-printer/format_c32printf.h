@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7af2f5ad */
+/* HASH CRC-32:0xc484f116 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,12 @@
 #define __local_format_c32printf_defined 1
 #include <bits/wformat-printer.h>
 #include <bits/uformat-printer.h>
-#include <bits/format-printer.h>
+
+#include <bits/wformat-printer.h>
+#include <bits/uformat-printer.h>
+
+
+
 /* Dependency: "format_vwprintf" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_vc32printf_defined
 #define ____localdep_format_vc32printf_defined 1
@@ -391,7 +396,7 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(format_c32printf))(__pc32formatprint
                                                                void *__arg,
                                                                __CHAR32_TYPE__ const *__restrict __format,
                                                                ...) {
-#line 884 "kos/src/libc/magic/format-printer.c"
+#line 911 "kos/src/libc/magic/format-printer.c"
 	__SSIZE_TYPE__ __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

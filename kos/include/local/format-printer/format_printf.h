@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bdbcf50 */
+/* HASH CRC-32:0x1f0a5903 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,12 @@
 #define __local_format_printf_defined 1
 #include <kos/anno.h>
 #include <bits/format-printer.h>
+
+
+
+
 #include <bits/format-printer.h>
+
 /* Dependency: "format_vprintf" from "format-printer" */
 #ifndef ____localdep_format_vprintf_defined
 #define ____localdep_format_vprintf_defined 1
@@ -301,7 +306,7 @@ __LOCAL_LIBC(format_printf) __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 4) __SS
                                                void *__arg,
                                                char const *__restrict __format,
                                                ...) __THROWS(...) {
-#line 884 "kos/src/libc/magic/format-printer.c"
+#line 911 "kos/src/libc/magic/format-printer.c"
 	__SSIZE_TYPE__ __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
