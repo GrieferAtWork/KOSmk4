@@ -215,16 +215,16 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone)(VIRT void *addr);
 #endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_SYNCONE */
 
 /* Translate a virtual address into its physical counterpart. */
-FUNDEF NOBLOCK WUNUSED PHYS vm_phys_t NOTHROW(FCALL pagedir_translate)(VIRT void *addr);
-FUNDEF NOBLOCK PHYS vm_phys_t NOTHROW(KCALL pagedir_translate_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t NOTHROW(FCALL pagedir_translate)(VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t NOTHROW(KCALL pagedir_translate_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
 
 /* Low-level Get/Set the physical address of the currently active page directory. */
 #ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETSET
 #ifdef CONFIG_PAGEDIR_GETSET_USES_POINTER
-FUNDEF NOBLOCK PHYS pagedir_t *NOTHROW(KCALL pagedir_get)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS pagedir_t *NOTHROW(KCALL pagedir_get)(void);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value);
 #else /* CONFIG_PAGEDIR_GETSET_USES_POINTER */
-FUNDEF NOBLOCK PHYS vm_phys_t NOTHROW(KCALL pagedir_get)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t NOTHROW(KCALL pagedir_get)(void);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_set)(PHYS vm_phys_t value);
 #endif /* !CONFIG_PAGEDIR_GETSET_USES_POINTER */
 #endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETSET */
@@ -560,17 +560,17 @@ NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 /* Check if the given page is mapped.
  * NOTE: The given `addr' */
 #ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_ISMAPPED
-FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(FCALL pagedir_ismapped)(VIRT void *addr);
-FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(FCALL pagedir_iswritable)(VIRT void *addr);
-FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(FCALL pagedir_isuseraccessible)(VIRT void *addr);
-FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(FCALL pagedir_isuserwritable)(VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_ismapped)(VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_iswritable)(VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_isuseraccessible)(VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_isuserwritable)(VIRT void *addr);
 #endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_ISMAPPED */
 
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
 #ifndef CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_HASCHANGED
 /* TODO: Figure out a better design for these functions
  *       The current system is written under the assumption that 4MiB pages don't exist... */
-FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(FCALL pagedir_haschanged)(VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(FCALL pagedir_haschanged)(VIRT void *addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_unsetchanged)(VIRT void *addr);
 #endif /* !CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_HASCHANGED */
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
@@ -587,12 +587,12 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmapone_p)(PAGEDIR_P_SELFTYPE self, P
 #ifdef CONFIG_HAVE_PAGEDIR_UNWRITE
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unwriteone_p)(PAGEDIR_P_SELFTYPE self, PAGEDIR_PAGEALIGNED VIRT void *addr);
 #endif /* CONFIG_HAVE_PAGEDIR_UNWRITE */
-FUNDEF NOBLOCK __BOOL NOTHROW(KCALL pagedir_ismapped_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
-FUNDEF NOBLOCK __BOOL NOTHROW(KCALL pagedir_iswritable_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
-FUNDEF NOBLOCK __BOOL NOTHROW(KCALL pagedir_isuseraccessible_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
-FUNDEF NOBLOCK __BOOL NOTHROW(KCALL pagedir_isuserwritable_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_ismapped_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_iswritable_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_isuseraccessible_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_isuserwritable_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
 #ifdef CONFIG_HAVE_PAGEDIR_CHANGED
-FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(KCALL pagedir_haschanged_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL NOTHROW(KCALL pagedir_haschanged_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
 FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unsetchanged_p)(PAGEDIR_P_SELFTYPE self, VIRT void *addr);
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
 #ifndef __OMIT_PAGING_CONSTANT_P_WRAPPERS

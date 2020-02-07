@@ -172,7 +172,7 @@ PRIVATE char const dr_names[8][4] = {
 };
 
 
-PRIVATE char const *FCALL
+PRIVATE ATTR_CONST WUNUSED char const *FCALL
 register_name(uintptr_t id) {
 	char const *result = NULL;
 	switch (id & X86_REGISTER_CLASSMASK) {

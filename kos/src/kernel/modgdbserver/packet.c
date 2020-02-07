@@ -182,7 +182,7 @@ NOTHROW(FCALL GDBPacket_TransmitNotification)(char *endptr) {
 #define ESC_XMSK     0x20 /* XOR Escaped bytes with this mask */
 #define ESC_MUST(ch) ((ch) == '#' || (ch) == '$' || (ch) == '}' || (ch) == '*')
 
-LOCAL byte_t
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) byte_t
 NOTHROW(KCALL GDBPacket_GetCheckSumEscape)(void const *__restrict buf, size_t buflen) {
 	byte_t result;
 	size_t i;

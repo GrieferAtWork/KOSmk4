@@ -206,7 +206,7 @@ typedef union {
 #define CONFIG_PAGEDIR_ARCH_HEADER_DEFINES_PAGEDIR_GETSET 1
 #ifdef __CC__
 /* Low-level Get/Set the physical address of the currently active page directory. */
-FORCELOCAL NOBLOCK PHYS pagedir_t *
+FORCELOCAL NOBLOCK ATTR_PURE WUNUSED PHYS pagedir_t *
 NOTHROW(KCALL pagedir_get)(void) {
 	pagedir_t *result;
 	__asm__("movl %%cr3, %0"

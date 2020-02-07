@@ -922,7 +922,7 @@ again_read_word:
 }
 
 /* Translate a virtual address into its physical counterpart. */
-INTERN NOBLOCK WUNUSED PHYS vm_phys_t
+INTERN NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t
 NOTHROW(FCALL p32_pagedir_translate)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
@@ -938,7 +938,7 @@ NOTHROW(FCALL p32_pagedir_translate)(VIRT void *addr) {
 }
 
 /* Check if the given page is mapped. */
-INTERN NOBLOCK WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL p32_pagedir_ismapped)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
@@ -953,7 +953,7 @@ NOTHROW(FCALL p32_pagedir_ismapped)(VIRT void *addr) {
 	return (word & P32_PAGE_FPRESENT) != 0;
 }
 
-INTERN NOBLOCK WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL p32_pagedir_iswritable)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
@@ -969,7 +969,7 @@ NOTHROW(FCALL p32_pagedir_iswritable)(VIRT void *addr) {
 	       /*   */ (P32_PAGE_FWRITE | P32_PAGE_FPRESENT);
 }
 
-INTERN NOBLOCK WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL p32_pagedir_isuseraccessible)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
@@ -985,7 +985,7 @@ NOTHROW(FCALL p32_pagedir_isuseraccessible)(VIRT void *addr) {
 	       /*   */ (P32_PAGE_FUSER | P32_PAGE_FPRESENT);
 }
 
-INTERN NOBLOCK WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL p32_pagedir_isuserwritable)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
@@ -1002,7 +1002,7 @@ NOTHROW(FCALL p32_pagedir_isuserwritable)(VIRT void *addr) {
 	       /*   */ (P32_PAGE_FUSER | P32_PAGE_FPRESENT | P32_PAGE_FWRITE);
 }
 
-INTERN NOBLOCK WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL p32_pagedir_haschanged)(VIRT void *addr) {
 	u32 word;
 	unsigned int vec2, vec1;
@@ -1046,7 +1046,7 @@ NOTHROW(FCALL p32_pagedir_unsetchanged)(VIRT void *addr) {
 #if 0 /* TODO */
 #ifndef __OPTIMIZE_SIZE__
 
-INTERN NOBLOCK PHYS vm_phys_t
+INTERN NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t
 NOTHROW(KCALL pagedir_translate_p)(VIRT pagedir_t *__restrict self,
                                    VIRT void *virt_addr) {
 	u32 result;
@@ -1058,7 +1058,7 @@ NOTHROW(KCALL pagedir_translate_p)(VIRT pagedir_t *__restrict self,
 	return (vm_phys_t)((result & P32_PAGE_FADDR_4KIB) | P32_PDIR_PAGEINDEX_4KIB(virt_addr));
 }
 
-INTERN NOBLOCK bool
+INTERN NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL pagedir_ismapped_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t vpage) {
 	u32 temp;
 	unsigned int vec2;
@@ -1072,7 +1072,7 @@ NOTHROW(KCALL pagedir_ismapped_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t
 	return !!(temp & P32_PAGE_FPRESENT);
 }
 
-INTERN NOBLOCK bool
+INTERN NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL pagedir_iswritable_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t vpage) {
 	u32 temp;
 	unsigned int vec2;
@@ -1086,7 +1086,7 @@ NOTHROW(KCALL pagedir_iswritable_p)(VIRT pagedir_t *__restrict self, VIRT pageid
 	return (temp & (P32_PAGE_FWRITE | P32_PAGE_FPRESENT)) == (P32_PAGE_FWRITE | P32_PAGE_FPRESENT);
 }
 
-INTERN NOBLOCK bool
+INTERN NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL pagedir_isuseraccessible_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t vpage) {
 	u32 temp;
 	unsigned int vec2;
@@ -1100,7 +1100,7 @@ NOTHROW(KCALL pagedir_isuseraccessible_p)(VIRT pagedir_t *__restrict self, VIRT 
 	return (temp & (P32_PAGE_FUSER | P32_PAGE_FPRESENT)) == (P32_PAGE_FUSER | P32_PAGE_FPRESENT);
 }
 
-INTERN NOBLOCK bool
+INTERN NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL pagedir_isuserwritable_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t vpage) {
 	u32 temp;
 	unsigned int vec2;
@@ -1114,7 +1114,7 @@ NOTHROW(KCALL pagedir_isuserwritable_p)(VIRT pagedir_t *__restrict self, VIRT pa
 	return (temp & (P32_PAGE_FUSER | P32_PAGE_FPRESENT | P32_PAGE_FWRITE)) == (P32_PAGE_FUSER | P32_PAGE_FPRESENT | P32_PAGE_FWRITE);
 }
 
-INTERN NOBLOCK WUNUSED bool
+INTERN NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL pagedir_haschanged_p)(VIRT pagedir_t *__restrict self, VIRT pageid_t vpage) {
 	u32 temp;
 	unsigned int vec2;

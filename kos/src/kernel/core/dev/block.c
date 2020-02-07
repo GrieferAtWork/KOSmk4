@@ -1396,8 +1396,8 @@ _block_device_writev_phys(struct block_device *__restrict self,
 
 
 /* @return: BD_MAX_CACHE_SECTORS: The sector `addr' isn't being cached. */
-PRIVATE NOBLOCK NONNULL((1)) unsigned int
-NOTHROW(KCALL find_cached_sector)(struct block_device *__restrict self, lba_t addr) {
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) unsigned int
+NOTHROW(KCALL find_cached_sector)(struct block_device const *__restrict self, lba_t addr) {
 	unsigned int i;
 	for (i = 0; i < BD_MAX_CACHE_SECTORS; ++i) {
 		if (!(self->bd_cache[i].cs_flags & BD_CACHED_SECTOR_FPRESENT))

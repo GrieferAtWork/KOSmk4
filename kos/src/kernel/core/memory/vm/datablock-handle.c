@@ -1225,8 +1225,8 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 	return 0;
 }
 
-PRIVATE NOBLOCK size_t
-NOTHROW(KCALL vm_datablock_count_part)(struct vm_datapart *__restrict self) {
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) size_t
+NOTHROW(KCALL vm_datablock_count_part)(struct vm_datapart const *__restrict self) {
 	size_t result = 0;
 again:
 	++result;

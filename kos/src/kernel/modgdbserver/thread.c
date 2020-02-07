@@ -60,10 +60,10 @@ struct gdb_thread_stop_event_with_reason {
 
 
 #ifndef NDEBUG
-PRIVATE NOBLOCK NONNULL((2)) bool
-NOTHROW(FCALL GDBServer_HasStopEvent)(GDBThreadStopEvent *chain,
-                                      GDBThreadStopEvent *__restrict stop_event) {
-	GDBThreadStopEvent *iter;
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((2)) bool
+NOTHROW(FCALL GDBServer_HasStopEvent)(GDBThreadStopEvent const *chain,
+                                      GDBThreadStopEvent const *__restrict stop_event) {
+	GDBThreadStopEvent const *iter;
 	for (iter = chain; iter; iter = iter->tse_next) {
 		if (iter == stop_event)
 			return true;
@@ -469,8 +469,8 @@ INTERN void NOTHROW(FCALL GDBThread_ResumeEverything)(void) {
 
 
 /* Check if the given `thread' has been stopped by the GDB server */
-INTERN NONNULL((1)) bool
-NOTHROW(FCALL GDBThread_IsStopped)(struct task *__restrict thread) {
+INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL GDBThread_IsStopped)(struct task const *__restrict thread) {
 	if (GDBThread_IsAllStopModeActive)
 		return true; /* Everything is suspended in non-stop mode. */
 	return (ATOMIC_READ(thread->t_flags) & TASK_FGDB_STOPPED) != 0;
@@ -479,15 +479,15 @@ NOTHROW(FCALL GDBThread_IsStopped)(struct task *__restrict thread) {
 /* Same as `GDBThread_IsStopped()', but the thread doesn't count as truely
  * stopped, unless it was stopped explicitly (rather than implicitly, as
  * would be the case when `GDBThread_IsAllStopModeActive == true') */
-INTERN NONNULL((1)) bool
-NOTHROW(FCALL GDBThread_IsStoppedExplicitly)(struct task *__restrict thread) {
+INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL GDBThread_IsStoppedExplicitly)(struct task const *__restrict thread) {
 	return (ATOMIC_READ(thread->t_flags) & TASK_FGDB_STOPPED) != 0;
 }
 
 
 /* Check if the given `thread' has terminated */
-INTERN NONNULL((1)) bool
-NOTHROW(FCALL GDBThread_HasTerminated)(struct task *__restrict thread) {
+INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL GDBThread_HasTerminated)(struct task const *__restrict thread) {
 	return (ATOMIC_READ(thread->t_flags) & (TASK_FTERMINATED | TASK_FTERMINATING)) != 0;
 }
 
@@ -857,8 +857,8 @@ again_piter:
 /* Find and return the stop event for `thread'
  * If the thread hasn't been stopped, or has a pending
  * async stop notification, return NULL instead. */
-INTERN WUNUSED NONNULL((1)) GDBThreadStopEvent *
-NOTHROW(FCALL GDBThread_FindStopEvent)(struct task *__restrict thread) {
+INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) GDBThreadStopEvent *
+NOTHROW(FCALL GDBThread_FindStopEvent)(struct task const *__restrict thread) {
 	GDBThreadStopEvent *result;
 	for (result = GDBThread_Stopped; result;
 	     result = result->tse_next) {
@@ -967,8 +967,8 @@ NOTHROW(FCALL GDBThread_StopAllAndGenerateAsyncStopEvents)(void) {
 
 
 /* Check if the given `thread' is considered to be a kernel thread */
-INTERN NONNULL((1)) bool
-NOTHROW(FCALL GDBThread_IsKernelThread)(struct task *__restrict thread) {
+INTERN NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL GDBThread_IsKernelThread)(struct task const *__restrict thread) {
 	if (task_getroottid_of_s(thread) == 0)
 		return true;
 	if (task_getrootpid_of_s(thread) == 0)

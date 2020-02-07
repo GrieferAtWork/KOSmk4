@@ -1804,7 +1804,7 @@ driver_delmod_inode(struct inode *__restrict driver_node,
 
 
 
-LOCAL u32 KCALL
+LOCAL ATTR_PURE WUNUSED u32 KCALL
 elf_symhash(USER CHECKED char const *name) {
 	u32 h = 0;
 	while (*name) {
@@ -3339,8 +3339,8 @@ unmap_range(uintptr_t loadaddr,
 }
 
 
-PRIVATE NONNULL((1)) bool KCALL
-contains_illegal_overlap(ElfW(Phdr) *__restrict headers,
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool KCALL
+contains_illegal_overlap(ElfW(Phdr) const *__restrict headers,
                          size_t count) {
 	size_t i, j;
 	for (i = 0; i < count; ++i) {

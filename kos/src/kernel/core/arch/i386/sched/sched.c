@@ -611,6 +611,7 @@ INTERN unsigned int
 NOTHROW(KCALL x86_rpc_user_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                                     struct kcpustate *__restrict state,
                                                     byte_t *__restrict UNUSED(lsda)) {
+	COMPILER_IMPURE();
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as it is, with no modifications made to the register state. */
 	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_user_redirection)
@@ -622,6 +623,7 @@ INTERN unsigned int
 NOTHROW(KCALL x86_rpc_kernel_redirection_personality)(struct unwind_fde_struct *__restrict UNUSED(fde),
                                                       struct kcpustate *__restrict state,
                                                       byte_t *__restrict UNUSED(lsda)) {
+	COMPILER_IMPURE();
 	/* When unwinding directly into `x86_rpc_user_redirection', still execute that
 	 * frame just as it is, with no modifications made to the register state. */
 	if (kcpustate_getpc(state) == (uintptr_t)&x86_rpc_kernel_redirection) {

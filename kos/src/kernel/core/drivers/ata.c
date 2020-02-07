@@ -1235,10 +1235,13 @@ NOTHROW(KCALL Ata_ResetAndReinitializeBus)(struct ata_bus *__restrict self) {
 	}
 }
 
-LOCAL pos_t KCALL Ata_GetPartitionStart(struct block_device *__restrict self) {
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) pos_t
+NOTHROW(KCALL Ata_GetPartitionStart)(struct block_device const *__restrict self) {
+	struct block_device_partition *part;
 	if (!block_device_ispartition(self))
 		return 0;
-	return ((struct block_device_partition *)self)->bp_minaddr;
+	part = (struct block_device_partition *)self;
+	return part->bp_minaddr;
 }
 
 INTERN NONNULL((1)) syscall_slong_t KCALL

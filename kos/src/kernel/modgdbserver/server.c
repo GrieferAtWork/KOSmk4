@@ -353,7 +353,8 @@ NOTHROW(FCALL GDBEncode_IntptrAsHex)(char *buf, intptr_t v) {
 	return buf;
 }
 
-LOCAL intptr_t NOTHROW(FCALL GDBThread_GetPID)(struct task *__restrict thread) {
+LOCAL ATTR_PURE intptr_t
+NOTHROW(FCALL GDBThread_GetPID)(struct task const *__restrict thread) {
 	intptr_t pid, tid;
 	pid = (intptr_t)task_getrootpid_of_s(thread);
 	tid = (intptr_t)task_getroottid_of_s(thread);
@@ -362,7 +363,8 @@ LOCAL intptr_t NOTHROW(FCALL GDBThread_GetPID)(struct task *__restrict thread) {
 	return pid;
 }
 
-LOCAL intptr_t NOTHROW(FCALL GDBThread_GetTID)(struct task *__restrict thread) {
+LOCAL ATTR_PURE intptr_t
+NOTHROW(FCALL GDBThread_GetTID)(struct task const *__restrict thread) {
 	intptr_t pid, tid;
 	pid = (intptr_t)task_getrootpid_of_s(thread);
 	tid = (intptr_t)task_getroottid_of_s(thread);
@@ -372,7 +374,7 @@ LOCAL intptr_t NOTHROW(FCALL GDBThread_GetTID)(struct task *__restrict thread) {
 }
 
 INTERN char *
-NOTHROW(FCALL GDBThread_EncodeThreadID)(char *buf, struct task *__restrict thread) {
+NOTHROW(FCALL GDBThread_EncodeThreadID)(char *buf, struct task const *__restrict thread) {
 	intptr_t pid, tid;
 	pid = (intptr_t)task_getrootpid_of_s(thread);
 	tid = (intptr_t)task_getroottid_of_s(thread);

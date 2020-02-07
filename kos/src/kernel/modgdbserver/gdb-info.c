@@ -486,9 +486,9 @@ err:
 	return temp;
 }
 
-PRIVATE bool FCALL
-is_a_valid_driver(struct driver *__restrict d,
-                  struct driver_state const *__restrict ds) {
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) bool
+NOTHROW(FCALL is_a_valid_driver)(struct driver *__restrict d,
+                                 struct driver_state const *__restrict ds) {
 	size_t i;
 	if (d == &kernel_driver)
 		return true;

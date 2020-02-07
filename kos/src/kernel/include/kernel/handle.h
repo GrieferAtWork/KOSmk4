@@ -185,7 +185,7 @@ struct handle {
 
 
 /* Returns the type-kind code for `self' (One of `HANDLE_TYPEKIND_*') */
-FUNDEF NOBLOCK uintptr_half_t
+FUNDEF NOBLOCK ATTR_PURE WUNUSED uintptr_half_t
 NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self);
 
 /* Print the text that should result from `readlink("/proc/[pid]/fd/[fdno]")' */

@@ -2914,13 +2914,13 @@ uhci_controller_reset_port_and_probe(struct uhci_controller *__restrict self,
 #define UHC_BAR_CORRECT_IOTYPE 0x01 /* Require I/O typing (as opposed to mmio) */
 #define UHC_BAR_CORRECT_IOSIZE 0x02 /* Require that IOSIZE = 0x20 */
 #define UHC_BAR_CORRECT_UNIQUE 0x04 /* Require a unique match */
-PRIVATE ATTR_FREETEXT unsigned int KCALL
-uhci_find_pci_bar_ex(struct pci_device *__restrict dev,
+PRIVATE ATTR_FREETEXT ATTR_PURE WUNUSED unsigned int KCALL
+uhci_find_pci_bar_ex(struct pci_device const *__restrict dev,
                      unsigned int requirements) {
 	unsigned int result, i;
 	result = PD_RESOURCE_COUNT;
 	for (i = 0; i < PD_RESOURCE_COUNT; ++i) {
-		struct pci_resource *res;
+		struct pci_resource const *res;
 		res = &dev->pd_res[PD_RESOURCE_BAR(i)];
 		if (res->pr_flags == PCI_RESOURCE_FUNUSED)
 			continue;
@@ -2943,8 +2943,8 @@ uhci_find_pci_bar_ex(struct pci_device *__restrict dev,
 	return result;
 }
 
-PRIVATE ATTR_FREETEXT unsigned int KCALL
-uhci_find_pci_bar(struct pci_device *__restrict dev) {
+PRIVATE ATTR_FREETEXT ATTR_PURE WUNUSED unsigned int KCALL
+uhci_find_pci_bar(struct pci_device const *__restrict dev) {
 	unsigned int result, flags;
 	/* Nowhere in the UHCI specs does it say which BAR it has to be.
 	 * -> Go through each bar and look for one that matches what we're

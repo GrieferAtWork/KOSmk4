@@ -114,18 +114,22 @@ INTDEF bool GDBThread_IsNonStopModeActive;
 
 
 /* Check if the given `thread' has been stopped by the GDB server */
-INTDEF NONNULL((1)) bool NOTHROW(FCALL GDBThread_IsStopped)(struct task *__restrict thread);
+INTDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL GDBThread_IsStopped)(struct task const *__restrict thread);
 
 /* Same as `GDBThread_IsStopped()', but the thread doesn't count as truely
  * stopped, unless it was stopped explicitly (rather than implicitly, as
  * would be the case when `GDBThread_IsAllStopModeActive == true') */
-INTDEF NONNULL((1)) bool NOTHROW(FCALL GDBThread_IsStoppedExplicitly)(struct task *__restrict thread);
+INTDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL GDBThread_IsStoppedExplicitly)(struct task const *__restrict thread);
 
 /* Check if the given `thread' has terminated */
-INTDEF NONNULL((1)) bool NOTHROW(FCALL GDBThread_HasTerminated)(struct task *__restrict thread);
+INTDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL GDBThread_HasTerminated)(struct task const *__restrict thread);
 
 /* Check if the given `thread' is considered to be a kernel thread */
-INTDEF NONNULL((1)) bool NOTHROW(FCALL GDBThread_IsKernelThread)(struct task *__restrict thread);
+INTDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL GDBThread_IsKernelThread)(struct task const *__restrict thread);
 
 /* Stop/Resume execution of the given thread
  * Note that when `GDBThread_IsNonStopModeActive' is false, `GDBThread_Resume()' becomes
@@ -151,8 +155,8 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 /* Find and return the stop event for `thread'
  * If the thread hasn't been stopped, or has a pending
  * async stop notification, return NULL instead. */
-INTDEF WUNUSED NONNULL((1)) GDBThreadStopEvent *
-NOTHROW(FCALL GDBThread_FindStopEvent)(struct task *__restrict thread);
+INTDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) GDBThreadStopEvent *
+NOTHROW(FCALL GDBThread_FindStopEvent)(struct task const *__restrict thread);
 
 /* Same as `GDBThread_FindStopEvent()', but unlink the event
  * from the chain of stopped threads. (The caller is responsible

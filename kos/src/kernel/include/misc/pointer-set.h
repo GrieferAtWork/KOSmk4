@@ -189,8 +189,8 @@ NOTHROW(KCALL pointer_set_insert_nx)(struct pointer_set *__restrict self,
 	       : POINTER_SET_INSERT_NX_EXISTS;
 }
 
-LOCAL NOBLOCK bool
-NOTHROW(KCALL pointer_set_contains)(struct pointer_set *__restrict self,
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(KCALL pointer_set_contains)(struct pointer_set const *__restrict self,
                                     void *ptr) {
 	size_t i, perturb;
 	i = perturb = POINTER_SET_HASHPTR((uintptr_t)ptr) & self->ps_mask;

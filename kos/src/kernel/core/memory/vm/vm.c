@@ -688,8 +688,8 @@ NOTHROW(KCALL vm_datapart_map_ram_p)(struct vm_datapart *__restrict self,
 }
 
 
-LOCAL NOBLOCK u16
-NOTHROW(KCALL vm_datapart_get_page_permissions)(struct vm_datapart *__restrict self,
+LOCAL NOBLOCK ATTR_PURE WUNUSED u16
+NOTHROW(KCALL vm_datapart_get_page_permissions)(struct vm_datapart const *__restrict self,
                                                 size_t vpage_offset, u16 perm) {
 	uintptr_t mode;
 	unsigned int shift;

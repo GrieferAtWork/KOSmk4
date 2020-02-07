@@ -298,30 +298,30 @@ NOTHROW(KCALL vmb_node_remove)(struct vmb *__restrict self,
                                pageid_t page);
 
 /* Get the node associated with the given `page' */
-FUNDEF NOBLOCK WUNUSED struct vm_node *
-NOTHROW(FCALL vmb_getnodeofpageid)(struct vmb *__restrict self, pageid_t page);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vm_node *
+NOTHROW(FCALL vmb_getnodeofpageid)(struct vmb const *__restrict self, pageid_t page);
 
-LOCAL NOBLOCK WUNUSED struct vm_node *
-NOTHROW(FCALL vmb_getnodeofaddress)(struct vmb *__restrict self, UNCHECKED void *addr) {
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) struct vm_node *
+NOTHROW(FCALL vmb_getnodeofaddress)(struct vmb const *__restrict self, UNCHECKED void *addr) {
 	return vmb_getnodeofpageid(self, PAGEID_ENCODE(addr));
 }
 
 /* Check if some part of the given address range is currently in use. */
-FUNDEF NOBLOCK WUNUSED bool
-NOTHROW(FCALL vmb_paged_isused)(struct vmb *__restrict self,
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL vmb_paged_isused)(struct vmb const *__restrict self,
                                 pageid_t min_page,
                                 pageid_t max_page);
 
 /* Find the first node with `vm_node_getminpageid(return) >= min_page_index'
  * If no such node exists, return `NULL' instead. */
-FUNDEF NOBLOCK WUNUSED struct vm_node *
-NOTHROW(KCALL vmb_find_first_node_greater_equal)(struct vmb *__restrict self,
+FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) struct vm_node *
+NOTHROW(KCALL vmb_find_first_node_greater_equal)(struct vmb const *__restrict self,
                                                  pageid_t min_page_index);
 
 /* Find the last node with `vm_node_getmaxpageid(return) <= max_page_index'
  * If no such node exists, return `NULL' instead. */
-FUNDEF NOBLOCK WUNUSED struct vm_node *
-NOTHROW(KCALL vmb_find_last_node_lower_equal)(struct vmb *__restrict self,
+FUNDEF NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) struct vm_node *
+NOTHROW(KCALL vmb_find_last_node_lower_equal)(struct vmb const *__restrict self,
                                               pageid_t max_page_index);
 
 

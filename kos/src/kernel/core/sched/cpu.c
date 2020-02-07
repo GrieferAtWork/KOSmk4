@@ -57,7 +57,7 @@ DECL_BEGIN
 
 
 #ifndef NDEBUG
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(KCALL cpu_validate_pointer)(struct cpu *__restrict self) {
 	cpuid_t i;
 	for (i = 0; i < cpu_count; ++i) {

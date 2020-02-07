@@ -136,13 +136,15 @@ DATDEF SLIST(struct pci_device) pci_list;
 
 /* Return a PCI device located at the given
  * `address', or NULL if no such device exists. */
-FUNDEF WUNUSED struct pci_device *NOTHROW(KCALL lookup_pci_device)(pci_addr_t address);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED struct pci_device *
+NOTHROW(KCALL lookup_pci_device)(pci_addr_t address);
 
 /* Returns the name of a given PCI class `classid', or `NULL' if unknown.
  * @param: classid: One of `PCI_DEV8_CLASS_*'
  * @return: * :   The name of the class.
  * @return: NULL: The name of the class could not be determined. */
-FUNDEF WUNUSED char const *NOTHROW(KCALL pci_getclassname)(u8 classid);
+FUNDEF ATTR_CONST WUNUSED char const *
+NOTHROW(KCALL pci_getclassname)(u8 classid);
 
 
 /* Enumerate all PCI devices. */

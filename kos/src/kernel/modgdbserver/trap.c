@@ -85,10 +85,10 @@ INTERN struct sig GDBServer_HostUnlocked = SIG_INIT;
 
 
 #ifndef NDEBUG
-PRIVATE NOBLOCK NONNULL((2)) bool
-NOTHROW(FCALL GDBServer_HasStopEvent)(GDBThreadStopEvent *chain,
-                                      GDBThreadStopEvent *__restrict stop_event) {
-	GDBThreadStopEvent *iter;
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((2)) bool
+NOTHROW(FCALL GDBServer_HasStopEvent)(GDBThreadStopEvent const *chain,
+                                      GDBThreadStopEvent const *__restrict stop_event) {
+	GDBThreadStopEvent const *iter;
 	for (iter = chain; iter; iter = iter->tse_next) {
 		if (iter == stop_event)
 			return true;

@@ -109,8 +109,8 @@ PRIVATE struct library_listdef const peb_based_library_list = {
 
 
 
-LOCAL NOBLOCK WUNUSED NONNULL((1)) uintptr_t
-NOTHROW(KCALL elf_validate_ehdr)(ElfW(Ehdr) *__restrict ehdr) {
+LOCAL NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) uintptr_t
+NOTHROW(KCALL elf_validate_ehdr)(ElfW(Ehdr) const *__restrict ehdr) {
 	uintptr_t result;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS;
 	if unlikely(ehdr->e_ident[EI_CLASS] != ELF_ARCH_CLASS)
@@ -148,8 +148,8 @@ done:
 }
 
 #ifdef __ARCH_HAVE_COMPAT
-LOCAL NOBLOCK WUNUSED NONNULL((1)) uintptr_t
-NOTHROW(KCALL compat_elf_validate_ehdr)(COMPAT_ElfW(Ehdr) *__restrict ehdr) {
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
+NOTHROW(KCALL compat_elf_validate_ehdr)(COMPAT_ElfW(Ehdr) const *__restrict ehdr) {
 	uintptr_t result;
 	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS;
 	if unlikely(ehdr->e_ident[EI_CLASS] != COMPAT_ELF_ARCH_CLASS)

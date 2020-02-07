@@ -255,8 +255,8 @@ done:
 
 
 
-PRIVATE NOBLOCK bool
-NOTHROW(KCALL vector_contains)(struct usb_probe_vector *__restrict self,
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(KCALL vector_contains)(struct usb_probe_vector const *__restrict self,
                                void *func) {
 	size_t i;
 	for (i = 0; i < self->upv_count; ++i) {
@@ -675,9 +675,9 @@ usb_controller_request_sync(struct usb_controller *__restrict self,
 	return result;
 }
 
-LOCAL NOBLOCK bool
-NOTHROW(KCALL usb_controller_addused)(struct usb_controller *__restrict self,
-                                      u16 addr) {
+LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(KCALL usb_controller_isused)(struct usb_controller const *__restrict self,
+                                     u16 addr) {
 	struct usb_device *dev;
 	for (dev = self->uc_devs; dev; dev = dev->ud_next) {
 		if (dev->ud_dev == addr)
@@ -692,7 +692,7 @@ usb_controller_assign_device_address(struct usb_controller *__restrict self,
 	u16 addr;
 	sync_write(&self->uc_devslock);
 	/* Find an unused (and non-zero) address. */
-	for (addr = 1; usb_controller_addused(self, addr); ++addr)
+	for (addr = 1; usb_controller_isused(self, addr); ++addr)
 		;
 	/* Make sure that the device can understand the address. */
 	if unlikely(addr > 127) {

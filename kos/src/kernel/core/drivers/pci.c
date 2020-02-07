@@ -63,7 +63,7 @@ PUBLIC void NOTHROW(FCALL pci_writeaddr)(pci_addr_t addr, u32 value) {
 
 /* Return a PCI device located at the given
  * `address', or NULL if no such device exists. */
-PUBLIC WUNUSED struct pci_device *
+PUBLIC NOBLOCK ATTR_PURE WUNUSED struct pci_device *
 NOTHROW(KCALL lookup_pci_device)(pci_addr_t address) {
 	struct pci_device *result;
 	PCI_FOREACH(result) {
@@ -97,7 +97,7 @@ PRIVATE ATTR_COLDRODATA char const pci_class_names[][14] = {
 	/* [PCI_DEV8_CLASS_DATASIGNAL    - PCI_DEV8_CLASS_STORAGE] = */ "datasignal",
 };
 
-PUBLIC WUNUSED char const *
+PUBLIC ATTR_CONST WUNUSED char const *
 NOTHROW(KCALL pci_getclassname)(u8 classid) {
 	if (classid >= PCI_DEV8_CLASS_STORAGE && classid <= PCI_DEV8_CLASS_DATASIGNAL)
 		return pci_class_names[classid - 1];
