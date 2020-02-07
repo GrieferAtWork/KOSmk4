@@ -278,10 +278,18 @@ DEFINE_PUBLIC_ALIAS(F(memset),F(libc_memset))
 INTERN_FUNCTION(F_STRING(end))
 	.cfi_startproc
 	ENTER_CLD
+#if N == 2
+	/* char const *string = %rcx; */
+	pushq_cfi_r %rdi
+	movq   %rcx, %rdi
+#endif
 	movq   $-1, %rcx
 	xorl   %eax, %eax
 	repne; I(scas)
 	leaq   -N(%rdi), %rax
+#if N == 2
+	popq_cfi_r %rdi
+#endif
 	ret
 	.cfi_endproc
 END(F_STRING(end))
@@ -291,11 +299,19 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(end),F_STRING(end))
 INTERN_FUNCTION(F_STRING(len))
 	.cfi_startproc
 	ENTER_CLD
+#if N == 2
+	/* char const *string = %rcx; */
+	pushq_cfi_r %rdi
+	movq   %rcx, %rdi
+#endif
 	movq   $-1, %rcx
 	xorl   %eax, %eax
 	repne; I(scas)
 	subq   %rcx, %rax /* result = 0 - RCX; */
 	subq   $(2), %rax   /* result = (0 - RCX) - 2; */
+#if N == 2
+	popq_cfi_r %rdi
+#endif
 	ret
 	.cfi_endproc
 END(F_STRING(len))
@@ -305,6 +321,21 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(len),F_STRING(len))
 INTERN_FUNCTION(F_STRING(nlen))
 	.cfi_startproc
 	ENTER_CLD
+#if N == 2
+	/* char const *string = %rcx; */
+	/* size_t      maxlen = %rdx; */
+	pushq_cfi_r %rdi
+	movq   %rcx, %rdi
+	xorq   %rax, %rax
+	testq  %rdx, %rdx
+	jz     2f
+	movq   %rdx, %rcx
+	repne; I(scas)
+	jne    1f
+	incq   %rcx
+1:	subq   %rcx, %rdx
+	movq   %rdx, %rax /* result = max_chars - RCX; */
+#else /* N == 2 */
 	xorq   %rax, %rax
 	testq  %rsi, %rsi
 	jz     2f
@@ -314,6 +345,7 @@ INTERN_FUNCTION(F_STRING(nlen))
 	incq   %rcx
 1:	subq   %rcx, %rsi
 	movq   %rsi, %rax /* result = max_chars - RCX; */
+#endif
 2:	ret
 	.cfi_endproc
 END(F_STRING(nlen))
@@ -323,6 +355,22 @@ DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nlen),F_STRING(nlen))
 INTERN_FUNCTION(F_STRING(nend))
 	.cfi_startproc
 	ENTER_CLD
+#if N == 2
+	/* char const *string = %rcx; */
+	/* size_t      maxlen = %rdx; */
+	pushq_cfi_r %rdi
+	xorq   %rax, %rax
+	testq  %rdx, %rdx
+	movq   %rcx, %rdi
+	jz     1f
+	movq   %rdx, %rcx
+	repne; I(scas)
+	jne    1f
+	subq   $(2), %rdi
+1:	movq   %rdi, %rax
+	popq_cfi_r %rdi
+	ret
+#else
 	xorq   %rax, %rax
 	testq  %rsi, %rsi
 	jz     1f
@@ -332,10 +380,11 @@ INTERN_FUNCTION(F_STRING(nend))
 #if N == 1
 	decq   %rdi
 #else /* N == 1 */
-	subq   $N, %rdi
+	subq   $(N), %rdi
 #endif /* N != 1 */
 1:	movq   %rdi, %rax
 	ret
+#endif
 	.cfi_endproc
 END(F_STRING(nend))
 DEFINE_PUBLIC_ALIAS(F_STRING_EXPORT(nend),F_STRING(nend))
