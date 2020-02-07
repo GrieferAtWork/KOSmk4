@@ -562,6 +562,7 @@ __nextfmt:
 #endif /* __PRINTF_F_PREFIX != __FORMAT_ESCAPE_FPRINTRAW */
 #endif /* !__NO_PRINTF_QUOTE */
 	case 's':
+		__string = __builtin_va_arg(__FORMAT_ARGS, __CHAR_TYPE *);
 #ifndef __NO_PRINTF_UNICODE_STRING
 		/* Support for `%ls'   --> print wide-string */
 		/* Support for `%I8s'  --> print utf-8 string */
@@ -592,7 +593,7 @@ __do_wchar:;
 				} __format_data;
 				__format_data.__fd_printer = __FORMAT_PRINTER;
 #endif /* __CHAR_SIZE != 2 */
-				__format_data.__fd_arg     = __FORMAT_ARG;
+				__format_data.__fd_arg = __FORMAT_ARG;
 				if __unlikely(!__string)
 					__string = (__CHAR_TYPE *)__null_str32;
 				if (__flags & __PRINTF_F_FIXBUF)
@@ -797,13 +798,10 @@ __do_wchar:;
 		}
 #endif /* !__NO_PRINTF_UNICODE_STRING */
 
-
 #if __CHAR_SIZE == __SIZEOF_CHAR__
-		__string = __builtin_va_arg(__FORMAT_ARGS, char *);
 		if __unlikely(!__string)
 			__string = "(null)";
 #else /* __CHAR_SIZE == __SIZEOF_CHAR__ */
-		__string = __builtin_va_arg(__FORMAT_ARGS, __CHAR_TYPE *);
 		if __unlikely(!__string) {
 			static __CHAR_TYPE const __null_str[] = { '(', 'n', 'u', 'l', 'l', ')', 0 };
 			__string = __null_str;
