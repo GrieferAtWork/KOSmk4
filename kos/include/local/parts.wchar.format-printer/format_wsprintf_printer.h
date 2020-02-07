@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca3d5f5d */
+/* HASH CRC-32:0xaf44ca9d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __LOCAL_LIBC(format_wsprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wsprintf_printer))(/*wchar_t ***/ void *__arg,
                                                                      __WCHAR_TYPE__ const *__restrict __data,
                                                                      __SIZE_TYPE__ __datalen) {
-#line 972 "kos/src/libc/magic/format-printer.c"
+#line 958 "kos/src/libc/magic/format-printer.c"
 
 	*(__WCHAR_TYPE__ **)__arg = (__WCHAR_TYPE__ *)__localdep_wmempcpy(*(__WCHAR_TYPE__ **)__arg, __data, __datalen);
 

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x48c8961 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,18 +17,38 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_format_length_defined
-#define __local_format_length_defined 1
-__NAMESPACE_LOCAL_BEGIN
-/* Always re-return `datalen' and ignore all other arguments */
-__LOCAL_LIBC(format_length) __ATTR_CONST __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_length))(void *__arg,
-                                                           /*utf-8*/ char const *__restrict __data,
-                                                           __SIZE_TYPE__ __datalen) {
-#line 1031 "kos/src/libc/magic/format-printer.c"
-	(void)__arg;
-	(void)__data;
-	return (__SSIZE_TYPE__)__datalen;
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local_format_length_defined */
+#ifndef _ASM_PRINTF_CONFIG_H
+#define _ASM_PRINTF_CONFIG_H 1
+
+#include <__stdinc.h>
+#include <__crt.h>
+
+/* Disable unsupported/unwanted/unneeded printf() features */
+
+/* #define __NO_PRINTF_ESCAPE 1 */
+/* #define __NO_PRINTF_UNICODE_CHARS 1 */
+/* #define __NO_PRINTF_UNICODE_STRING 1 */
+/* #define __NO_PRINTF_HEX 1 */
+/* #define __NO_PRINTF_GEN 1 */
+/* #define __NO_PRINTF_DISASM 1 */
+/* #define __NO_PRINTF_VINFO 1 */
+/* #define __NO_PRINTF_FLOATING_POINT 1 */
+
+#if defined(__KOS__) && defined(__KERNEL__)
+#undef __NO_PRINTF_UNICODE_STRING
+#define __NO_PRINTF_UNICODE_STRING 1
+#undef __NO_PRINTF_UNICODE_CHARS
+#define __NO_PRINTF_UNICODE_CHARS 1
+#undef __NO_PRINTF_FLOATING_POINT
+#define __NO_PRINTF_FLOATING_POINT 1
+#undef __NO_PRINTF_DISASM
+#define __NO_PRINTF_DISASM 1
+#elif !defined(__CRT_KOS) || !defined(__KOS__)
+#undef __NO_PRINTF_DISASM
+#define __NO_PRINTF_DISASM 1
+#undef __NO_PRINTF_VINFO
+#define __NO_PRINTF_VINFO 1
+#endif /* !__CRT_KOS || !__KOS__ */
+
+
+#endif /* !_ASM_PRINTF_CONFIG_H */

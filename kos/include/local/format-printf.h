@@ -498,11 +498,11 @@ __nextfmt:
 		}
 	}	break;
 
-#ifndef __NO_PRINTF_QUOTE
+#ifndef __NO_PRINTF_ESCAPE
 	case 'Q': /* Quote a single character */
 		__ch = 'q';
 		__ATTR_FALLTHROUGH
-#endif /* !__NO_PRINTF_QUOTE */
+#endif /* !__NO_PRINTF_ESCAPE */
 	case 'c': {
 		__CHAR_TYPE const *__string;
 		__SIZE_TYPE__ __string_length;
@@ -510,6 +510,7 @@ __nextfmt:
 #ifdef __NO_PRINTF_UNICODE_CHARS
 		__CHAR_TYPE __given_char[1];
 		__string_length = 1;
+		__string        = __given_char;
 		__given_char[0] = (__CHAR_TYPE)__builtin_va_arg(__FORMAT_ARGS, int);
 #else /* __NO_PRINTF_UNICODE_CHARS */
 #if __CHAR_SIZE == __SIZEOF_CHAR__
@@ -553,14 +554,14 @@ __nextfmt:
 #endif /* __CHAR_SIZE != 4 */
 #endif /* !__NO_PRINTF_UNICODE_CHARS */
 		goto print_string;
-#ifndef __NO_PRINTF_QUOTE
+#ifndef __NO_PRINTF_ESCAPE
 	case 'q':
 #if __PRINTF_F_PREFIX == __FORMAT_ESCAPE_FPRINTRAW
 #define __FORMAT_ESCAPE_FLAGS __flags & __PRINTF_F_PREFIX
 #else /* __PRINTF_F_PREFIX == __FORMAT_ESCAPE_FPRINTRAW */
 #define __FORMAT_ESCAPE_FLAGS (__flags & __PRINTF_F_PREFIX ? __FORMAT_ESCAPE_FPRINTRAW : __FORMAT_ESCAPE_FNORMAL)
 #endif /* __PRINTF_F_PREFIX != __FORMAT_ESCAPE_FPRINTRAW */
-#endif /* !__NO_PRINTF_QUOTE */
+#endif /* !__NO_PRINTF_ESCAPE */
 	case 's':
 		__string = __builtin_va_arg(__FORMAT_ARGS, __CHAR_TYPE *);
 #ifndef __NO_PRINTF_UNICODE_STRING
@@ -605,14 +606,14 @@ __do_wchar:;
 				}
 				__string_width = __string_length;
 				if (__width != 0) {
-#ifndef __NO_PRINTF_QUOTE
+#ifndef __NO_PRINTF_ESCAPE
 					if (__ch == 'q') {
 						__string_width = (__SIZE_TYPE__)__FORMAT_ESCAPE32(&__FORMAT_WIDTH32, __NULLPTR,
 						                                                  (__CHAR32_TYPE__ const *)__string,
 						                                                  __string_length,
 						                                                  __FORMAT_ESCAPE_FLAGS);
 					} /*else*/
-#endif /* !__NO_PRINTF_QUOTE */
+#endif /* !__NO_PRINTF_ESCAPE */
 					/*{
 						__string_width = __string_length;
 					}*/
@@ -623,13 +624,13 @@ __do_wchar:;
 						__result += __temp;
 					}
 				}
-#ifndef __NO_PRINTF_QUOTE
+#ifndef __NO_PRINTF_ESCAPE
 				if (__ch == 'q') {
 					__temp = __FORMAT_ESCAPE32(&__FORMAT_UNICODE_FORMAT32, &__format_data,
 					                           (__CHAR32_TYPE__ const *)__string, __string_length,
 					                           __FORMAT_ESCAPE_FLAGS);
 				} else
-#endif /* !__NO_PRINTF_QUOTE */
+#endif /* !__NO_PRINTF_ESCAPE */
 				{
 					__temp = __FORMAT_UNICODE_FORMAT32(&__format_data,
 					                                   (__CHAR32_TYPE__ const *)__string,
@@ -678,14 +679,14 @@ __do_wchar:;
 				}
 				__string_width = __string_length;
 				if (__width != 0) {
-#ifndef __NO_PRINTF_QUOTE
+#ifndef __NO_PRINTF_ESCAPE
 					if (__ch == 'q') {
 						__string_width = (__SIZE_TYPE__)__FORMAT_ESCAPE16(&__FORMAT_WIDTH16, __NULLPTR,
 						                                                  (__CHAR16_TYPE__ const *)__string,
 						                                                  __string_length,
 						                                                  __FORMAT_ESCAPE_FLAGS);
 					} else
-#endif /* !__NO_PRINTF_QUOTE */
+#endif /* !__NO_PRINTF_ESCAPE */
 					{
 						__string_width = (__SIZE_TYPE__)__FORMAT_WIDTH16(__NULLPTR, (__CHAR16_TYPE__ const *)__string, __string_length);
 					}
@@ -696,13 +697,13 @@ __do_wchar:;
 						__result += __temp;
 					}
 				}
-#ifndef __NO_PRINTF_QUOTE
+#ifndef __NO_PRINTF_ESCAPE
 				if (__ch == 'q') {
 					__temp = __FORMAT_ESCAPE16(&__FORMAT_UNICODE_FORMAT16, &__format_data,
 					                           (__CHAR16_TYPE__ const *)__string, __string_length,
 					                           __FORMAT_ESCAPE_FLAGS);
 				} else
-#endif /* !__NO_PRINTF_QUOTE */
+#endif /* !__NO_PRINTF_ESCAPE */
 				{
 					__temp = __FORMAT_UNICODE_FORMAT16(&__format_data,
 					                                   (__CHAR16_TYPE__ const *)__string,
@@ -751,14 +752,14 @@ __do_wchar:;
 				}
 				__string_width = __string_length;
 				if (__width != 0) {
-#ifndef __NO_PRINTF_QUOTE
+#ifndef __NO_PRINTF_ESCAPE
 					if (__ch == 'q') {
 						__string_width = (__SIZE_TYPE__)__FORMAT_ESCAPE8(&__FORMAT_WIDTH8, __NULLPTR,
 						                                                 (char const *)__string,
 						                                                 __string_length,
 						                                                 __FORMAT_ESCAPE_FLAGS);
 					} else
-#endif /* !__NO_PRINTF_QUOTE */
+#endif /* !__NO_PRINTF_ESCAPE */
 					{
 						__string_width = (__SIZE_TYPE__)__FORMAT_WIDTH8(__NULLPTR, (char const *)__string, __string_length);
 					}
@@ -769,13 +770,13 @@ __do_wchar:;
 						__result += __temp;
 					}
 				}
-#ifndef __NO_PRINTF_QUOTE
+#ifndef __NO_PRINTF_ESCAPE
 				if (__ch == 'q') {
 					__temp = __FORMAT_ESCAPE8(&__FORMAT_UNICODE_FORMAT8, &__format_data,
 					                          (char const *)__string, __string_length,
 					                          __FORMAT_ESCAPE_FLAGS);
 				} else
-#endif /* !__NO_PRINTF_QUOTE */
+#endif /* !__NO_PRINTF_ESCAPE */
 				{
 					__temp = __FORMAT_UNICODE_FORMAT8(&__format_data,
 					                                  (char const *)__string,
@@ -831,13 +832,13 @@ __do_wchar:;
 print_string:
 		__string_width = __string_length;
 		if (__width != 0) {
-#ifndef __NO_PRINTF_QUOTE
+#ifndef __NO_PRINTF_ESCAPE
 			if (__ch == 'q') {
 				__string_width = (__SIZE_TYPE__)__FORMAT_ESCAPE(&__FORMAT_WIDTH, __NULLPTR,
 				                                                __string, __string_length,
 				                                                __FORMAT_ESCAPE_FLAGS);
 			} else
-#endif /* !__NO_PRINTF_QUOTE */
+#endif /* !__NO_PRINTF_ESCAPE */
 			{
 #if __CHAR_SIZE != 4
 				__string_width = (__SIZE_TYPE__)__FORMAT_WIDTH(__NULLPTR, __string, __string_length);
@@ -850,14 +851,14 @@ print_string:
 				__result += __temp;
 			}
 		}
-#ifndef __NO_PRINTF_QUOTE
+#ifndef __NO_PRINTF_ESCAPE
 		if (__ch == 'q') {
 			__temp = __FORMAT_ESCAPE(__FORMAT_PRINTER, __FORMAT_ARG,
 			                         __string, __string_length,
 			                         __FORMAT_ESCAPE_FLAGS);
 		} else
 #undef __FORMAT_ESCAPE_FLAGS
-#endif /* !__NO_PRINTF_QUOTE */
+#endif /* !__NO_PRINTF_ESCAPE */
 		{
 			__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __string, __string_length);
 		}
@@ -875,10 +876,8 @@ __check_string_error_and_print_tail:
 		}
 	}	break;
 
-#if !defined(__NO_PRINTF_HEX) || \
-    !defined(__NO_PRINTF_GEN) || \
-    (!defined(__NO_PRINTF_DISASM) && defined(CONFIG_USE_LIBDISASM)) || \
-    (!defined(__NO_PRINTF_VINFO) && (defined(CONFIG_USE_LIBDEBUGINFO) || defined(__KOS__)))
+#if (!defined(__NO_PRINTF_HEX) || !defined(__NO_PRINTF_GEN) || \
+     !defined(__NO_PRINTF_DISASM) || !defined(__NO_PRINTF_VINFO))
 	case '[': {
 		__CHAR_TYPE const *__xformat_start;
 		__CHAR_TYPE const *__xformat_arg;
@@ -1047,7 +1046,6 @@ __check_string_error_and_print_tail:
 		}
 #endif /* !__NO_PRINTF_GEN */
 #ifndef __NO_PRINTF_DISASM
-#ifdef CONFIG_USE_LIBDISASM
 		if (__COMPARE_NAME("disasm")) {
 			void *__p = __builtin_va_arg(__FORMAT_ARGS, void *);
 			{
@@ -1097,11 +1095,10 @@ __check_string_error_and_print_tail:
 			}
 			break;
 		}
-#endif /* CONFIG_USE_LIBDISASM */
 #endif /* !__NO_PRINTF_DISASM */
 #ifndef __NO_PRINTF_VINFO
 #if __CHAR_SIZE == __SIZEOF_CHAR__ /* TODO: Other char sizes! */
-#if defined(CONFIG_USE_LIBDEBUGINFO)
+#if 1 /* USE_LIBDEBUGINFO */
 		if (__COMPARE_NAME("vinfo")) {
 			__PRIVATE char const __vinfo_default_format[] = "%f(%l,%c) : %n";
 			void *__p = __builtin_va_arg(__FORMAT_ARGS, void *);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88cda5d0 */
+/* HASH CRC-32:0x88e4cea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wrepeat)(pc32formatprinter printer,
                                           void *arg,
                                           char32_t ch,
                                           size_t num_repetitions) {
-#line 111 "kos/src/libc/magic/format-printer.c"
+#line 109 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -121,7 +121,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
                                           void *arg,
                                           char16_t ch,
                                           size_t num_repetitions) {
-#line 111 "kos/src/libc/magic/format-printer.c"
+#line 109 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */
@@ -196,7 +196,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
                                           /*utf-8*/ char32_t const *__restrict text,
                                           size_t textlen,
                                           unsigned int flags) {
-#line 198 "kos/src/libc/magic/format-printer.c"
+#line 196 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_ESCAPE_FNORMAL
 #define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
 #define FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
@@ -506,7 +506,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
                                           /*utf-8*/ char16_t const *__restrict text,
                                           size_t textlen,
                                           unsigned int flags) {
-#line 198 "kos/src/libc/magic/format-printer.c"
+#line 196 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_ESCAPE_FNORMAL
 #define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
 #define FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
@@ -819,7 +819,7 @@ NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
                                            size_t size,
                                            size_t linesize,
                                            unsigned int flags) {
-#line 520 "kos/src/libc/magic/format-printer.c"
+#line 518 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_HEXDUMP_FNORMAL
 #define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
@@ -1038,7 +1038,7 @@ NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
                                            size_t size,
                                            size_t linesize,
                                            unsigned int flags) {
-#line 520 "kos/src/libc/magic/format-printer.c"
+#line 518 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_HEXDUMP_FNORMAL
 #define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
@@ -1241,36 +1241,26 @@ err:
 
 
 
+#include <parts/printf-config.h>
+
 #include <bits/uformat-printer.h>
 #include <libc/parts.uchar.string.h>
 #include <libc/string.h>
 #include <hybrid/__assert.h>
-#if !defined(CONFIG_USE_LIBDISASM) && !defined(CONFIG_NO_USE_LIBDISASM) && \
-  ((defined(__KERNEL__) && defined(__KOS__)) || ((defined(CONFIG_HAVE_LIBDISASM_DISASSEMBLER_H) || \
-    defined(HAVE_LIBDISASM_DISASSEMBLER_H) || __has_include(<libdisasm/disassembler.h>)) && \
-    defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym)))
-#define CONFIG_USE_LIBDISASM 1
-#endif
-#if !defined(CONFIG_USE_LIBDEBUGINFO) && !defined(CONFIG_NO_USE_LIBDEBUGINFO) && \
-  ((defined(__KERNEL__) && defined(__KOS__)) || ((defined(CONFIG_HAVE_LIBDEBUGINFO_ADDR2LINE_H) || \
-    defined(HAVE_LIBDEBUGINFO_ADDR2LINE_H) || __has_include(<libdebuginfo/addr2line.h>)) && \
-    defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym) && defined(__CRT_HAVE_dlgetmodule) && defined(__CRT_HAVE_dlmodulebase)))
-#define CONFIG_USE_LIBDEBUGINFO 1
-#endif
-#ifdef CONFIG_USE_LIBDISASM
+#ifndef __NO_PRINTF_DISASM
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include <dlfcn.h>
-#endif
+#endif /* !__KERNEL__ || !__KOS__ */
 #include <libdisasm/disassembler.h>
-#endif
-#ifdef CONFIG_USE_LIBDEBUGINFO
+#endif /* !__NO_PRINTF_DISASM */
+#ifndef __NO_PRINTF_VINFO
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include <dlfcn.h>
 #include <libdebuginfo/addr2line.h>
-#else
+#else /* !__KERNEL__ || !__KOS__ */
 #include <kernel/addr2line.h>
-#endif
-#endif
+#endif /* __KERNEL__ && __KOS__ */
+#endif /* !__NO_PRINTF_VINFO */
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -1364,7 +1354,7 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
                                            void *arg,
                                            char32_t const *__restrict format,
                                            __builtin_va_list args) {
-#line 852 "kos/src/libc/magic/format-printer.c"
+#line 838 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char32_t
 #define __CHAR_SIZE                 4
@@ -1412,36 +1402,26 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
 
 
 
+#include <parts/printf-config.h>
+
 #include <bits/uformat-printer.h>
 #include <libc/parts.uchar.string.h>
 #include <libc/string.h>
 #include <hybrid/__assert.h>
-#if !defined(CONFIG_USE_LIBDISASM) && !defined(CONFIG_NO_USE_LIBDISASM) && \
-  ((defined(__KERNEL__) && defined(__KOS__)) || ((defined(CONFIG_HAVE_LIBDISASM_DISASSEMBLER_H) || \
-    defined(HAVE_LIBDISASM_DISASSEMBLER_H) || __has_include(<libdisasm/disassembler.h>)) && \
-    defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym)))
-#define CONFIG_USE_LIBDISASM 1
-#endif
-#if !defined(CONFIG_USE_LIBDEBUGINFO) && !defined(CONFIG_NO_USE_LIBDEBUGINFO) && \
-  ((defined(__KERNEL__) && defined(__KOS__)) || ((defined(CONFIG_HAVE_LIBDEBUGINFO_ADDR2LINE_H) || \
-    defined(HAVE_LIBDEBUGINFO_ADDR2LINE_H) || __has_include(<libdebuginfo/addr2line.h>)) && \
-    defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym) && defined(__CRT_HAVE_dlgetmodule) && defined(__CRT_HAVE_dlmodulebase)))
-#define CONFIG_USE_LIBDEBUGINFO 1
-#endif
-#ifdef CONFIG_USE_LIBDISASM
+#ifndef __NO_PRINTF_DISASM
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include <dlfcn.h>
-#endif
+#endif /* !__KERNEL__ || !__KOS__ */
 #include <libdisasm/disassembler.h>
-#endif
-#ifdef CONFIG_USE_LIBDEBUGINFO
+#endif /* !__NO_PRINTF_DISASM */
+#ifndef __NO_PRINTF_VINFO
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include <dlfcn.h>
 #include <libdebuginfo/addr2line.h>
-#else
+#else /* !__KERNEL__ || !__KOS__ */
 #include <kernel/addr2line.h>
-#endif
-#endif
+#endif /* __KERNEL__ && __KOS__ */
+#endif /* !__NO_PRINTF_VINFO */
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -1535,7 +1515,7 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
                                            void *arg,
                                            char16_t const *__restrict format,
                                            __builtin_va_list args) {
-#line 852 "kos/src/libc/magic/format-printer.c"
+#line 838 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char16_t
 #define __CHAR_SIZE                 2
@@ -1672,7 +1652,7 @@ NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer,
                                            void *arg,
                                            char32_t const *__restrict format,
                                            ...) {
-#line 898 "kos/src/libc/magic/format-printer.c"
+#line 884 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1774,7 +1754,7 @@ NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer,
                                            void *arg,
                                            char16_t const *__restrict format,
                                            ...) {
-#line 898 "kos/src/libc/magic/format-printer.c"
+#line 884 "kos/src/libc/magic/format-printer.c"
 	ssize_t result;
 	va_list args;
 	va_start(args, format);
@@ -1790,7 +1770,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsprintf_printer") 
 NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/ void *arg,
                                                    char32_t const *__restrict data,
                                                    size_t datalen) {
-#line 972 "kos/src/libc/magic/format-printer.c"
+#line 958 "kos/src/libc/magic/format-printer.c"
 
 	*(char32_t **)arg = (char32_t *)libc_wmempcpy(*(char32_t **)arg, data, datalen);
 
@@ -1805,7 +1785,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsprintf_printe
 NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/ void *arg,
                                                    char16_t const *__restrict data,
                                                    size_t datalen) {
-#line 972 "kos/src/libc/magic/format-printer.c"
+#line 958 "kos/src/libc/magic/format-printer.c"
 
 	*(char16_t **)arg = (char16_t *)libd_wmempcpy(*(char16_t **)arg, data, datalen);
 
@@ -1824,7 +1804,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsnprintf_printer")
 NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg,
                                                     char32_t const *__restrict data,
                                                     size_t datalen) {
-#line 1004 "kos/src/libc/magic/format-printer.c"
+#line 990 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
 		char32_t         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -1853,7 +1833,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsnprintf_print
 NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/ void *arg,
                                                     char16_t const *__restrict data,
                                                     size_t datalen) {
-#line 1004 "kos/src/libc/magic/format-printer.c"
+#line 990 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
 		char16_t         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */

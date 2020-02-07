@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe217dda */
+/* HASH CRC-32:0x8817869f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_whexdump))(__pwformatprinter _
                                                              __SIZE_TYPE__ __size,
                                                              __SIZE_TYPE__ __linesize,
                                                              unsigned int __flags) {
-#line 520 "kos/src/libc/magic/format-printer.c"
+#line 518 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_HEXDUMP_FNORMAL
 #define __FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define __FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */

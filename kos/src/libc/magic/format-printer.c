@@ -43,13 +43,11 @@
 #include "../libc/unicode.h" /* Dependency of `#include <local/format-scanf.h>' */
 
 #include <libdisasm/disassembler.h>
-#define CONFIG_USE_LIBDISASM 1
 #ifdef __KERNEL__
 #include <kernel/addr2line.h>
 #else /* __KERNEL__ */
 #include <libdebuginfo/addr2line.h>
 #endif /* !__KERNEL__ */
-#define CONFIG_USE_LIBDEBUGINFO 1
 
 #include <unicode.h>
 #include <parts/uchar/format-printer.h>
@@ -808,37 +806,25 @@ err:
 @@                     increasing the buffer when it gets filled completely.
 @@ - syslog:           Unbuffered system-log output.
 @@ - ...               There are a _lot_ more...
-[dependency_prefix(
+[dependency_include(<parts/printf-config.h>)][dependency_prefix(
 #include @<bits/uformat-printer.h>@
 #include @<libc/parts.uchar.string.h>@
 #include @<libc/string.h>@
 #include @<hybrid/__assert.h>@
-#if !defined(CONFIG_USE_LIBDISASM) && !defined(CONFIG_NO_USE_LIBDISASM) && \
-  ((defined(__KERNEL__) && defined(__KOS__)) || ((defined(CONFIG_HAVE_LIBDISASM_DISASSEMBLER_H) || \
-    defined(HAVE_LIBDISASM_DISASSEMBLER_H) || __has_include(@<libdisasm/disassembler.h>@)) && \
-    defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym)))
-#define CONFIG_USE_LIBDISASM 1
-#endif
-#if !defined(CONFIG_USE_LIBDEBUGINFO) && !defined(CONFIG_NO_USE_LIBDEBUGINFO) && \
-  ((defined(__KERNEL__) && defined(__KOS__)) || ((defined(CONFIG_HAVE_LIBDEBUGINFO_ADDR2LINE_H) || \
-    defined(HAVE_LIBDEBUGINFO_ADDR2LINE_H) || __has_include(@<libdebuginfo/addr2line.h>@)) && \
-    defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym) && defined(__CRT_HAVE_dlgetmodule) && defined(__CRT_HAVE_dlmodulebase)))
-#define CONFIG_USE_LIBDEBUGINFO 1
-#endif
-#ifdef CONFIG_USE_LIBDISASM
+#ifndef __NO_PRINTF_DISASM
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include @<dlfcn.h>@
-#endif
+#endif /* !__KERNEL__ || !__KOS__ */
 #include @<libdisasm/disassembler.h>@
-#endif
-#ifdef CONFIG_USE_LIBDEBUGINFO
+#endif /* !__NO_PRINTF_DISASM */
+#ifndef __NO_PRINTF_VINFO
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include @<dlfcn.h>@
 #include @<libdebuginfo/addr2line.h>@
-#else
+#else /* !__KERNEL__ || !__KOS__ */
 #include @<kernel/addr2line.h>@
-#endif
-#endif
+#endif /* __KERNEL__ && __KOS__ */
+#endif /* !__NO_PRINTF_VINFO */
 )][decl_prefix(
 @@if $wchar_function@@
 #include @<bits/wformat-printer.h>@

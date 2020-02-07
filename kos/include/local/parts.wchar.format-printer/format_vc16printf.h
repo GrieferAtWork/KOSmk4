@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0a0c2d0 */
+/* HASH CRC-32:0x22c5d67e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,36 +28,26 @@
 
 
 
+#include <parts/printf-config.h>
+
 #include <bits/uformat-printer.h>
 #include <libc/parts.uchar.string.h>
 #include <libc/string.h>
 #include <hybrid/__assert.h>
-#if !defined(CONFIG_USE_LIBDISASM) && !defined(CONFIG_NO_USE_LIBDISASM) && \
-  ((defined(__KERNEL__) && defined(__KOS__)) || ((defined(CONFIG_HAVE_LIBDISASM_DISASSEMBLER_H) || \
-    defined(HAVE_LIBDISASM_DISASSEMBLER_H) || __has_include(<libdisasm/disassembler.h>)) && \
-    defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym)))
-#define CONFIG_USE_LIBDISASM 1
-#endif
-#if !defined(CONFIG_USE_LIBDEBUGINFO) && !defined(CONFIG_NO_USE_LIBDEBUGINFO) && \
-  ((defined(__KERNEL__) && defined(__KOS__)) || ((defined(CONFIG_HAVE_LIBDEBUGINFO_ADDR2LINE_H) || \
-    defined(HAVE_LIBDEBUGINFO_ADDR2LINE_H) || __has_include(<libdebuginfo/addr2line.h>)) && \
-    defined(__CRT_HAVE_dlopen) && defined(__CRT_HAVE_dlsym) && defined(__CRT_HAVE_dlgetmodule) && defined(__CRT_HAVE_dlmodulebase)))
-#define CONFIG_USE_LIBDEBUGINFO 1
-#endif
-#ifdef CONFIG_USE_LIBDISASM
+#ifndef __NO_PRINTF_DISASM
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include <dlfcn.h>
-#endif
+#endif /* !__KERNEL__ || !__KOS__ */
 #include <libdisasm/disassembler.h>
-#endif
-#ifdef CONFIG_USE_LIBDEBUGINFO
+#endif /* !__NO_PRINTF_DISASM */
+#ifndef __NO_PRINTF_VINFO
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include <dlfcn.h>
 #include <libdebuginfo/addr2line.h>
-#else
+#else /* !__KERNEL__ || !__KOS__ */
 #include <kernel/addr2line.h>
-#endif
-#endif
+#endif /* __KERNEL__ && __KOS__ */
+#endif /* !__NO_PRINTF_VINFO */
 /* Dependency: "format_wrepeat" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_c16repeat_defined
 #define ____localdep_format_c16repeat_defined 1
@@ -634,7 +624,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_vc16printf))(__pc16formatprint
                                                                void *__arg,
                                                                __CHAR16_TYPE__ const *__restrict __format,
                                                                __builtin_va_list __args) {
-#line 852 "kos/src/libc/magic/format-printer.c"
+#line 838 "kos/src/libc/magic/format-printer.c"
 #ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 __CHAR16_TYPE__
 #define __CHAR_SIZE                 2

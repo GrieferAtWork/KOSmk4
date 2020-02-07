@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae8299e9 */
+/* HASH CRC-32:0x5850f3aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_wescape))(__pwformatprinter __
                                                             /*utf-8*/ __WCHAR_TYPE__ const *__restrict __text,
                                                             __SIZE_TYPE__ __textlen,
                                                             unsigned int __flags) {
-#line 198 "kos/src/libc/magic/format-printer.c"
+#line 196 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_ESCAPE_FNORMAL
 #define __FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
 #define __FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
