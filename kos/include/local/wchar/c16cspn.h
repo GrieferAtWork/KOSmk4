@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9afac4c */
+/* HASH CRC-32:0x7a41b550 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcschr.h>
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_c16chr(haystack, needle) (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcschr))((__WCHAR_TYPE__ const *)(haystack), (__WCHAR_TYPE__)(needle))
+#define __localdep_c16chr (*(__CHAR16_TYPE__ *(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcschr)))
 #else /* LIBC: c16chr */
 #include <local/wchar/c16chr.h>
 /* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */

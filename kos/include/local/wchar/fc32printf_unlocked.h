@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac984921 */
+/* HASH CRC-32:0xb4cdf135 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_WPRINTF(2, 0),__STDC_INT_AS_SIZE_
 #elif defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/vfwprintf_unlocked.h>
-#define __localdep_vfc32printf_unlocked(stream, format, args) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf_unlocked))(stream, (__WCHAR_TYPE__ const *)(format), args)
+#define __localdep_vfc32printf_unlocked (*(__STDC_INT_AS_SIZE_T(__LIBCCALL*)(__FILE *__restrict, __CHAR32_TYPE__ const *__restrict, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf_unlocked)))
 #else /* LIBC: vfc32printf_unlocked */
 #include <local/wchar/vfc32printf_unlocked.h>
 #define __localdep_vfc32printf_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfc32printf_unlocked))

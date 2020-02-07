@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e7b72c7 */
+/* HASH CRC-32:0xe202b0fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "search.h"
-#include "unistd.h"
 #include "string.h"
 
 DECL_BEGIN

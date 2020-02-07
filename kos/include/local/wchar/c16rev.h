@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66fa5d64 */
+/* HASH CRC-32:0x48d5ece5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcslen.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_c16len(string) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)(string))
+#define __localdep_c16len (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen)))
 #else /* LIBC: c16len */
 #include <local/wchar/c16len.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */

@@ -284,6 +284,27 @@ int main_dl(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_ustring(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	{
+		char const *s8 = "8-bit string";
+		char16_t const *s16 = u"16-bit string";
+		char32_t const *s32 = U"32-bit string";
+		wchar_t const *sw = L"wide-character string";
+		printf("%s    (%q)\n", s8, s8);
+		printf("%I8s  (%I8q)\n", s8, s8);
+		printf("%I16s (%I16q)\n", s16, s16);
+		printf("%I32s (%I32q)\n", s32, s32);
+		printf("%ls   (%lq)\n", sw, sw);
+	}
+ 	return 0;
+}
+/************************************************************************/
+
+
+
+
 #if defined(__i386__) || defined(__x86_64__)
 #define HAVE_MAIN_SYSENTER 1
 /************************************************************************/
@@ -396,6 +417,7 @@ PRIVATE DEF defs[] = {
 	{ "fork", &main_fork },
 	{ "logtime", &main_logtime },
 	{ "dl", &main_dl },
+	{ "ustring", &main_ustring },
 #ifdef HAVE_MAIN_SYSENTER
 	{ "sysenter", &main_sysenter },
 #endif /* HAVE_MAIN_SYSENTER */

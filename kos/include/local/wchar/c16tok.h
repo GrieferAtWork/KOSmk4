@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b136afc */
+/* HASH CRC-32:0x644695fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NO
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16spn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsspn.h>
-#define __localdep_c16spn(haystack, accept) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsspn))((__WCHAR_TYPE__ const *)(haystack), (__WCHAR_TYPE__ const *)(accept))
+#define __localdep_c16spn (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsspn)))
 #else /* LIBC: c16spn */
 #include <local/wchar/c16spn.h>
 #define __localdep_c16spn (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16spn))
@@ -45,7 +45,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NO
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16cspn,(__CHAR16_TYPE__ const *__haystack, __CHAR16_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcscspn.h>
-#define __localdep_c16cspn(haystack, reject) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscspn))((__WCHAR_TYPE__ const *)(haystack), (__WCHAR_TYPE__ const *)(reject))
+#define __localdep_c16cspn (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscspn)))
 #else /* LIBC: c16cspn */
 #include <local/wchar/c16cspn.h>
 #define __localdep_c16cspn (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16cspn))

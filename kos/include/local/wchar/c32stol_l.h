@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9039a997 */
+/* HASH CRC-32:0x7137e3b5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_c32stol,(__CHAR32_
 __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_c32stol,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoimax,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcstol.h>
-#define __localdep_c32stol(nptr, endptr, base) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstol))((__WCHAR_TYPE__ const *)(nptr), (__WCHAR_TYPE__ **)(endptr), base)
+#define __localdep_c32stol (*(long(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, int))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstol)))
 #else /* LIBC: c32stol */
 #include <local/wchar/c32stol.h>
 #define __localdep_c32stol (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32stol))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc631f861 */
+/* HASH CRC-32:0xb511ebbd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_c16ncasecoll,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncasecoll,(__s1,__s2,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsncasecoll.h>
-#define __localdep_c16ncasecoll(s1, s2, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncasecoll))((__WCHAR_TYPE__ const *)(s1), (__WCHAR_TYPE__ const *)(s2), maxlen)
+#define __localdep_c16ncasecoll (*(int(__LIBCCALL*)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncasecoll)))
 #else /* LIBC: c16ncasecoll */
 #include <local/wchar/c16ncasecoll.h>
 #define __localdep_c16ncasecoll (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ncasecoll))

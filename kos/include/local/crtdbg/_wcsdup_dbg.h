@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb076083 */
+/* HASH CRC-32:0xde9bbb06 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_
 #elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsdup.h>
-#define __localdep_c16dup(string) (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsdup))((__WCHAR_TYPE__ const *)(string))
+#define __localdep_c16dup (*(__CHAR16_TYPE__ *(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsdup)))
 #else /* LIBC: c16dup */
 #include <local/wchar/c16dup.h>
 #define __localdep_c16dup (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16dup))

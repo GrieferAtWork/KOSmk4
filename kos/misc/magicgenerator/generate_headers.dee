@@ -636,6 +636,10 @@ function split_words(
 					case "exec":
 						execExpression(directive);
 						break;
+					case "noreplace_on_copy": {
+						/* Don't consider the token a work during copy */
+						yield (!for_copy, directive);
+					}	break;
 					case "yield": {
 						local val = execExpression(directive);
 						if (val !is none)
@@ -1481,7 +1485,12 @@ global str2wcs_keyword_replacements: {string: string | WeakReplacement} = Dict {
 	"/*utf-8*/" : "",
 };
 
-function identitiyConverter(oldFunction: Function, newFunction: Function, text: string): string -> text;
+function identitiyConverter(
+		oldFunction: Function,
+		newFunction: Function,
+		text: string): string {
+	return text;
+}
 
 function str2wcsReplaceTechnicalText(oldFunction: Function, newFunction: Function, fp: File, text: string) {
 	local prev_word = none;
@@ -1743,6 +1752,7 @@ function parse_functions(filename: string, text: string): {string | Function...}
 	local user_impl = none;
 	local allow_macros = false;
 	local helper_function = false;
+	local hide_in_header = false;
 	local forced_dependencies = [];
 	local alias_args = Dict();
 	local function_may_throw = false;
@@ -2586,6 +2596,9 @@ again_enum_name:
 					break;
 				case "no_helper":
 					helper_function = false;
+					break;
+				case "hide_in_header":
+					hide_in_header = true;
 					break;
 				case "libc":
 					export_as_libc = true;
@@ -3640,6 +3653,7 @@ got_chk_checkexpr:
 			fun.impl_section = impl_section;
 			fun.dependency_string = dependency_string;
 			fun.helper_function = helper_function;
+			fun.hide_in_header = hide_in_header;
 			if ((doc is string && !doc) && function_throws_anno) {
 				/* Auto-generate one documentation line for every
 				 * type of exception which may be thrown by the function */
@@ -3794,6 +3808,7 @@ known_alias_declared:
 			has_fast_implementation = false;
 			preferred_impl = [];
 			helper_function = false;
+			hide_in_header = false;
 			impl_prefix = "";
 			requires_prefix = "";
 			declaration_prefix = "";
@@ -4093,6 +4108,9 @@ class Function {
 
 	@@:true if @this function is a helper (not exported, and doesn't appear in headers)
 	member helper_function: bool;
+
+	@@:true if @this function should not be visibile in its default header
+	member hide_in_header: bool;
 
 	@@Tuple of the exact types of optional arguments passed through varargs
 	member vartypes: {string...};
@@ -4777,6 +4795,22 @@ class Function {
 		}
 	}
 
+	function print_argument_type_list(
+			fp: File, args: {(string, string)...},
+			is_uchar_variant: bool = false) {
+		for (local i = 0; i < #args; ++i) {
+			local tp, nm = args[i]...;
+			if (is_uchar_variant)
+				tp = replace_wchar_words(tp, uchar_function == 2 ? WCHAR_MODE_DOS : WCHAR_MODE_KOS, env: this);
+			for (local is_word, word: split_words(tp, env: this)) {
+				if (is_word)
+					word = replace_word(word, REPLACE_TYPE_WORDS_LOCAL);
+				fp << word;
+			}
+			if (i < #args - 1) fp << ", ";
+		}
+	}
+
 	function must_cast_arguments_when_calling(
 			args: {(string, string)...}, is_uchar_variant: bool = false) {
 		local my_args = this.args;
@@ -5306,34 +5340,50 @@ do_return_crt:
 			local must_cast_return =
 				must_cast_return_when_calling(return_type_for(alias_name), is_uchar_variant) &&
 				this.return_type !in ["", "void"];
-			if (!must_cast_arguments_when_calling(a, is_uchar_variant)) {
-				fp << "#define " << my_name << " ";
-				if (must_cast_return) {
-					fp << "(";
+			if (1) {
+				if (!must_cast_return && !must_cast_arguments_when_calling(a, is_uchar_variant)) {
+					fp << "#define " << my_name << " " << alias_name_expr << "\n";
+				} else {
+					fp << "#define " << my_name << " (*(";
 					for (local is_word, word: split_words(this.return_type, env: this)) {
 						if (is_word)
 							word = replace_word(word, transform_argument_types);
 						fp << word;
 					}
-					fp << ")";
+					fp << "(" << ((is_uchar_variant && uchar_function == 2) ? "__LIBDCALL" : "__LIBCCALL") << "*)(";
+					print_argument_type_list(fp, a, is_uchar_variant);
+					fp << "))&" << alias_name_expr << ")\n";
 				}
-				fp << alias_name_expr << "\n";
 			} else {
-				fp << "#define " << my_name << "(";
-				print_argument_name_list(fp, a, key_identity);
-				fp << ") ";
-				if (must_cast_return) {
-					fp << "(";
-					for (local is_word, word: split_words(this.return_type, env: this)) {
-						if (is_word)
-							word = replace_word(word, transform_argument_types);
-						fp << word;
+				if (!must_cast_arguments_when_calling(a, is_uchar_variant)) {
+					fp << "#define " << my_name << " ";
+					if (must_cast_return) {
+						fp << "(";
+						for (local is_word, word: split_words(this.return_type, env: this)) {
+							if (is_word)
+								word = replace_word(word, transform_argument_types);
+							fp << word;
+						}
+						fp << ")";
 					}
-					fp << ")";
+					fp << alias_name_expr << "\n";
+				} else {
+					fp << "#define " << my_name << "(";
+					print_argument_name_list(fp, a, key_identity);
+					fp << ") ";
+					if (must_cast_return) {
+						fp << "(";
+						for (local is_word, word: split_words(this.return_type, env: this)) {
+							if (is_word)
+								word = replace_word(word, transform_argument_types);
+							fp << word;
+						}
+						fp << ")";
+					}
+					fp << alias_name_expr << "(";
+					print_argument_cast_list(fp, a, key_identity, is_uchar_variant, true);
+					fp << ")\n";
 				}
-				fp << alias_name_expr << "(";
-				print_argument_cast_list(fp, a, key_identity, is_uchar_variant, true);
-				fp << ")\n";
 			}
 		}
 	}
@@ -5844,7 +5894,10 @@ skip_alias_redirections:
 						is_void_return = true;
 					print_doc(fp);
 					fp << "__CDECLARE";
-					if (is_void_return) fp << "_VOID";
+					if (is_void_return)
+						fp << "_VOID";
+					if (alias_name.startswith("DOS$"))
+						fp << "_DOS";
 					fp << "(" << attr_text << ",";
 					if (!is_void_return) {
 						for (local is_word, word: split_words(rt, env: this)) {
@@ -7002,6 +7055,8 @@ function write_libc_header(fp, comnam, functions, has_core_header) {
 			continue;
 		if (f.helper_function)
 			continue;
+		if (f.hide_in_header)
+			continue;
 		if (!f.has_fast_implementation)
 			continue;
 		has_fast_functions = true;
@@ -7025,6 +7080,8 @@ function write_libc_header(fp, comnam, functions, has_core_header) {
 		if (f !is Function)
 			continue;
 		if (f.helper_function)
+			continue;
+		if (f.hide_in_header)
 			continue;
 		if (f.component_name is bound && f.component_name != comnam)
 			continue;
@@ -7093,7 +7150,7 @@ function write_libc_core_header(fp, comnam, functions) {
 			continue;
 		if (f is ExternFunction)
 			f = f.func;
-		if (f !is Function || f.helper_function)
+		if (f !is Function || f.helper_function || f.hide_in_header)
 			continue;
 		if (f.component_name is bound && f.component_name != comnam)
 			continue;
@@ -7143,7 +7200,7 @@ function write_libc_core_header(fp, comnam, functions) {
 		}
 		if (f is ExternFunction)
 			f = f.func;
-		if (f !is Function || f.helper_function)
+		if (f !is Function || f.helper_function || f.hide_in_header)
 			continue;
 		if (f.component_name is bound && f.component_name != comnam) continue;
 		print "\tfunction:", key_libc(f.name);
@@ -7185,6 +7242,8 @@ for (local comnam, funcs: components) {
 		if (f !is Function)
 			continue;
 		if (f.helper_function)
+			continue;
+		if (f.hide_in_header)
 			continue;
 		if (f.export_as_libc) {
 			libc_fast_functions.append(f);
@@ -7281,6 +7340,8 @@ function write_std_header(fp, comnam, funcs) {
 			if (f is Function) {
 				if (f.helper_function)
 					continue;
+				if (f.hide_in_header)
+					continue;
 				if (f.export_in_std) {
 					if (f.overload_alias && f.export_in_std)
 						continue; /* Already imported elsewhere */
@@ -7312,6 +7373,8 @@ function write_std_header(fp, comnam, funcs) {
 		if (f is Function) {
 			if (f.helper_function)
 				continue;
+			if (f.hide_in_header)
+				continue;
 			if (f.export_in_std && !is_extern) {
 				if (f.overload_alias && f.export_in_std)
 					continue; /* Already imported elsewhere */
@@ -7337,6 +7400,8 @@ function write_std_header(fp, comnam, funcs) {
 			continue;
 		if (f.helper_function)
 			continue;
+		if (f.hide_in_header)
+			continue;
 		if (!f.has_fast_implementation)
 			continue;
 		if (f.component_name !is bound)
@@ -7360,6 +7425,8 @@ function write_std_header(fp, comnam, funcs) {
 		}
 		if (f is Function) {
 			if (f.helper_function)
+				continue;
+			if (f.hide_in_header)
 				continue;
 			print "\tfunction:", f.name;
 			if (f.export_in_std && !is_extern) {
@@ -8219,6 +8286,10 @@ function write_libc_auto_implementation(
 			continue;
 		for (local dep: f.dependencies) {
 			if (dep.component_name !is bound)
+				continue;
+			if (dep.block !is string)
+				continue;
+			if (dep.dont_export_symbol)
 				continue;
 			dep = dep.component_name;
 			if (dep !in dep_components)

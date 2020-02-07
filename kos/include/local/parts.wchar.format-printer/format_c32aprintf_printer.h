@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3955fdc0 */
+/* HASH CRC-32:0xba5eed75 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
-#define __localdep_format_c32aprintf_alloc(self, num_wchars) (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_alloc))((struct format_waprintf_data *)(self), num_wchars)
+#define __localdep_format_c32aprintf_alloc (*(__CHAR32_TYPE__ *(__LIBCCALL*)(struct format_c32aprintf_data *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_alloc)))
 #else /* LIBC: format_c32aprintf_alloc */
 #include <local/parts.wchar.format-printer/format_c32aprintf_alloc.h>
 /* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
@@ -63,7 +63,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wmemcpy.h>
-#define __localdep_c32memcpy(dst, src, num_chars) (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcpy))((__WCHAR_TYPE__ *)(dst), (__WCHAR_TYPE__ const *)(src), num_chars)
+#define __localdep_c32memcpy (*(__CHAR32_TYPE__ *(__LIBCCALL*)(__CHAR32_TYPE__ *__restrict, __CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcpy)))
 #else /* LIBC: c32memcpy */
 #include <local/wchar/c32memcpy.h>
 #define __localdep_c32memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32memcpy))
@@ -76,7 +76,7 @@ __LOCAL_LIBC(format_c32aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32aprintf_printer))(/*struct format_waprintf_data **/ void *__arg,
                                                                        __CHAR32_TYPE__ const *__restrict __data,
                                                                        __SIZE_TYPE__ __datalen) {
-#line 318 "kos/src/libc/magic/parts.wchar.format-printer.c"
+#line 334 "kos/src/libc/magic/parts.wchar.format-printer.c"
 	__CHAR32_TYPE__ *__buf;
 	__buf = __localdep_format_c32aprintf_alloc((struct format_c32aprintf_data *)__arg, __datalen);
 	if __unlikely(!__buf)

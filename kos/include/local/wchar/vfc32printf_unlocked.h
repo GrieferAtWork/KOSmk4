@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a796e08 */
+/* HASH CRC-32:0xa3910680 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -205,7 +205,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,__NOT
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-#define __localdep_format_vc32printf(printer, arg, format, args) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf))((__pwformatprinter)(printer), arg, (__WCHAR_TYPE__ const *)(format), args)
+#define __localdep_format_vc32printf (*(__SSIZE_TYPE__(__LIBCCALL*)(__pc32formatprinter, void *, __CHAR32_TYPE__ const *__restrict, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf)))
 #else /* LIBC: format_vc32printf */
 #include <local/parts.wchar.format-printer/format_vc32printf.h>
 /* Generic printf implementation
@@ -312,7 +312,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_file_
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/file_wprinter_unlocked.h>
 /* Same as `file_c32printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-#define __localdep_file_c32printer_unlocked(arg, data, datalen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_wprinter_unlocked))(arg, (__WCHAR_TYPE__ const *)(data), datalen)
+#define __localdep_file_c32printer_unlocked (*(__SSIZE_TYPE__(__LIBCCALL*)(void *, __CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_wprinter_unlocked)))
 #else /* LIBC: file_c32printer_unlocked */
 #include <local/wchar/file_c32printer_unlocked.h>
 /* Same as `file_c32printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */

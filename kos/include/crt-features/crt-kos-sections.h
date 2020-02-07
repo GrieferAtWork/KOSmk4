@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x773d66bd */
+/* HASH CRC-32:0x45126854 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3652,12 +3652,14 @@
 #define __CRT_SECTION_timerfd_settime64                     __CRT_SECTINFO_timer                                    /* .text.crt.timer.timerfd_settime64 */
 
 /* .text.crt.unicode.UTF.* */
-#define __CRT_SECTION_format_16to32                         __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_16to32 */
-#define __CRT_SECTION_format_16to8                          __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_16to8 */
-#define __CRT_SECTION_format_32to16                         __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_32to16 */
-#define __CRT_SECTION_format_32to8                          __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_32to8 */
+#define __CRT_DOS_SECTION_format_wto16                      __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_wto16 */
+#define __CRT_DOS_SECTION_format_wto32                      __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_wto32 */
+#define __CRT_DOS_SECTION_format_wto8                       __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_wto8 */
 #define __CRT_SECTION_format_8to16                          __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_8to16 */
 #define __CRT_SECTION_format_8to32                          __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_8to32 */
+#define __CRT_SECTION_format_wto16                          __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_wto16 */
+#define __CRT_SECTION_format_wto32                          __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_wto32 */
+#define __CRT_SECTION_format_wto8                           __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.format_wto8 */
 #define __CRT_SECTION_unicode_16to32                        __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.unicode_16to32 */
 #define __CRT_SECTION_unicode_16to8                         __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.unicode_16to8 */
 #define __CRT_SECTION_unicode_32to16                        __CRT_SECTINFO_unicode_UTF                              /* .text.crt.unicode.UTF.unicode_32to16 */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2af5aa8 */
+/* HASH CRC-32:0x9f032abd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc32scanf,(__CHAR32_TYPE__ const *__restrict __src, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/vswscanf.h>
-#define __localdep_vsc32scanf(src, format, args) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswscanf))((__WCHAR_TYPE__ const *)(src), (__WCHAR_TYPE__ const *)(format), args)
+#define __localdep_vsc32scanf (*(__STDC_INT_AS_SIZE_T(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ const *__restrict, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswscanf)))
 #else /* LIBC: vsc32scanf */
 #include <local/wchar/vsc32scanf.h>
 #define __localdep_vsc32scanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsc32scanf))

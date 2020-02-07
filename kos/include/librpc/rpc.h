@@ -302,11 +302,6 @@ LIBRPC_DECL int LIBRPC_CC rpc_service(void);
 #endif /* LIBRPC_WANT_PROTOTYPES */
 
 /* >> rpc_schedule_ex(2)
- * TODO: Go through misc/libc/*.c and mark all functions that invoke
- *       blocking system calls (system calls that may call `task_serve()'
- *       as `[nothrow_rpc]' which should become a new noexcept class
- *       similar to nothrow_ncx, but be used to select noexcept for
- *       functions that may throw by servicing synchronous RPCs)
  * Schedule an RPC for execution on the specified `target' thread.
  * @param: target:    The targeted thread.
  * @param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')

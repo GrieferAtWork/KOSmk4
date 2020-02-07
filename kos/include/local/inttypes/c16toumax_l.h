@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49beeed1 */
+/* HASH CRC-32:0x5e300be0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,_
 __CREDIRECT_DOS(__ATTR_LEAF __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoumax,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/inttypes/wcstoumax.h>
-#define __localdep_c16toumax(nptr, endptr, base) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoumax))((__WCHAR_TYPE__ const *)(nptr), (__WCHAR_TYPE__ **)(endptr), base)
+#define __localdep_c16toumax (*(__UINTMAX_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__ **, int))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoumax)))
 #else /* LIBC: c16toumax */
 #include <local/inttypes/c16toumax.h>
 #define __localdep_c16toumax (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16toumax))

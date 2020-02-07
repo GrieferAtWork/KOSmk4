@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44e84a58 */
+/* HASH CRC-32:0x606de44c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_WPRINTF(2, 0),__STDC_INT_AS_S
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/vfwprintf.h>
-#define __localdep_vfc16printf(stream, format, args) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf))(stream, (__WCHAR_TYPE__ const *)(format), args)
+#define __localdep_vfc16printf (*(__STDC_INT_AS_SIZE_T(__LIBCCALL*)(__FILE *__restrict, __CHAR16_TYPE__ const *__restrict, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf)))
 #else /* LIBC: vfc16printf */
 #include <local/wchar/vfc16printf.h>
 #define __localdep_vfc16printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfc16printf))

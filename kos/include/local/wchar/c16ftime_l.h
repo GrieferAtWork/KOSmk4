@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63e1c90 */
+/* HASH CRC-32:0x1b274688 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16ftime,(__CHAR16_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR16_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsftime.h>
-#define __localdep_c16ftime(buf, buflen, format, tp) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime))((__WCHAR_TYPE__ *)(buf), buflen, (__WCHAR_TYPE__ const *)(format), tp)
+#define __localdep_c16ftime (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ *__restrict, __SIZE_TYPE__, __CHAR16_TYPE__ const *__restrict, struct __NAMESPACE_STD_SYM tm const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime)))
 #else /* LIBC: c16ftime */
 #include <local/wchar/c16ftime.h>
 #define __localdep_c16ftime (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ftime))

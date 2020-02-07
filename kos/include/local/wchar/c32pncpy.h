@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4463fd9 */
+/* HASH CRC-32:0xe2a5ac99 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsnlen.h>
 /* Same as `c32len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
-#define __localdep_c32nlen(string, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen))((__WCHAR_TYPE__ const *)(string), maxlen)
+#define __localdep_c32nlen (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen)))
 #else /* LIBC: c32nlen */
 #include <local/wchar/c32nlen.h>
 /* Same as `c32len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
@@ -46,7 +46,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wmemcpy.h>
-#define __localdep_c32memcpy(dst, src, num_chars) (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcpy))((__WCHAR_TYPE__ *)(dst), (__WCHAR_TYPE__ const *)(src), num_chars)
+#define __localdep_c32memcpy (*(__CHAR32_TYPE__ *(__LIBCCALL*)(__CHAR32_TYPE__ *__restrict, __CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcpy)))
 #else /* LIBC: c32memcpy */
 #include <local/wchar/c32memcpy.h>
 #define __localdep_c32memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32memcpy))
@@ -65,7 +65,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wmempset.h>
 /* Same as wmemset, but return a pointer after the last written character */
-#define __localdep_c32mempset(dst, filler, num_chars) (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmempset))((__WCHAR_TYPE__ *)(dst), (__WCHAR_TYPE__)(filler), num_chars)
+#define __localdep_c32mempset (*(__CHAR32_TYPE__ *(__LIBCCALL*)(__CHAR32_TYPE__ *, __CHAR32_TYPE__, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmempset)))
 #else /* LIBC: c32mempset */
 #include <local/wchar/c32mempset.h>
 /* Same as wmemset, but return a pointer after the last written character */

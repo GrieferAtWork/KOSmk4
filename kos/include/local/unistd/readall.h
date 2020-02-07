@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22227c52 */
+/* HASH CRC-32:0x46238049 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off32_t __
 #include <local/unistd/lseek.h>
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
-#define __localdep_lseek(fd, offset, whence) (__FS_TYPE(off))(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek))(fd, (__FS_TYPE(off))(offset), whence)
+#define __localdep_lseek (*(__FS_TYPE(off)(__LIBCCALL*)(__fd_t, __off32_t, int))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek)))
 #else /* CUSTOM: lseek */
 #undef ____localdep_lseek_defined
 #endif /* lseek... */

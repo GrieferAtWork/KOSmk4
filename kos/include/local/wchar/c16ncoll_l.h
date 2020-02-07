@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7153357 */
+/* HASH CRC-32:0x783c9aac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_c16ncoll,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncoll,(__s1,__s2,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsncoll.h>
-#define __localdep_c16ncoll(s1, s2, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncoll))((__WCHAR_TYPE__ const *)(s1), (__WCHAR_TYPE__ const *)(s2), maxlen)
+#define __localdep_c16ncoll (*(int(__LIBCCALL*)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncoll)))
 #else /* LIBC: c16ncoll */
 #include <local/wchar/c16ncoll.h>
 #define __localdep_c16ncoll (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ncoll))

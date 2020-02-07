@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e8d0509 */
+/* HASH CRC-32:0x201770f1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NO
 #elif !defined(__NO_MALLOCA)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/fuzzy_wmemcmp.h>
-#define __localdep_fuzzy_c32memcmp(s1, s1_chars, s2, s2_chars) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wmemcmp))((__WCHAR_TYPE__ const *)(s1), s1_chars, (__WCHAR_TYPE__ const *)(s2), s2_chars)
+#define __localdep_fuzzy_c32memcmp (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR32_TYPE__ const *, __SIZE_TYPE__, __CHAR32_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wmemcmp)))
 #else /* LIBC: fuzzy_c32memcmp */
 #include <local/wchar/fuzzy_c32memcmp.h>
 #define __localdep_fuzzy_c32memcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_c32memcmp))
@@ -49,7 +49,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsnlen.h>
 /* Same as `c32len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
-#define __localdep_c32nlen(string, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen))((__WCHAR_TYPE__ const *)(string), maxlen)
+#define __localdep_c32nlen (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen)))
 #else /* LIBC: c32nlen */
 #include <local/wchar/c32nlen.h>
 /* Same as `c32len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */

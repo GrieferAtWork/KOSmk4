@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb92fa340 */
+/* HASH CRC-32:0xc150bcdd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__C
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsrchrnul.h>
 /* Same as `c32rchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_c32rchrnul(haystack, needle) (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsrchrnul))((__WCHAR_TYPE__ const *)(haystack), (__WCHAR_TYPE__)(needle))
+#define __localdep_c32rchrnul (*(__CHAR32_TYPE__ *(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsrchrnul)))
 #else /* LIBC: c32rchrnul */
 #include <local/wchar/c32rchrnul.h>
 /* Same as `c32rchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */

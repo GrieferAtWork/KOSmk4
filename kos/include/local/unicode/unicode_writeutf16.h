@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x519b52e7 */
+/* HASH CRC-32:0xdb726c89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(unicode_writeutf16) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_writeutf16))(/*utf-16*/ __CHAR16_TYPE__ *__restrict __dst,
                                                                 __CHAR32_TYPE__ __ch) {
-#line 721 "kos/src/libc/magic/unicode.c"
+#line 722 "kos/src/libc/magic/unicode.c"
 	if (__ch <= 0xffff && (__ch < 0xd800 || __ch > 0xdfff)) {
 		*__dst++ = (__CHAR16_TYPE__)__ch;
 	} else {

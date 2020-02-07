@@ -34,6 +34,22 @@
 
 %(auto_header)#include <parts/uchar/format-printer.h>
 
+%(auto_source){
+#include <parts/uchar/format-printer.h>
+#include <unicode.h>
+#define libc_format_8to16     format_8to16
+#define libc_format_8to32     format_8to32
+#define libc_format_16to8     format_16to8
+#define libc_format_16to32    format_16to32
+#define libc_format_32to8     format_32to8
+#define libc_format_32to16    format_32to16
+#define libc_format_c16escape format_c16escape
+#define libc_format_c16width  format_c16width
+#define libc_format_c32escape format_c32escape
+#define libc_format_c32width  format_c32width
+}
+
+
 %{
 #include <features.h>
 #ifndef _FORMAT_PRINTER_H

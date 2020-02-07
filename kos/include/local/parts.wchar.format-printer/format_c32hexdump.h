@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe08ffa8c */
+/* HASH CRC-32:0x3159d751 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
-#define __localdep_format_c32repeat(printer, arg, ch, num_repetitions) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wrepeat))((__pwformatprinter)(printer), arg, (__WCHAR_TYPE__)(ch), num_repetitions)
+#define __localdep_format_c32repeat (*(__SSIZE_TYPE__(__LIBCCALL*)(__pc32formatprinter, void *, __CHAR32_TYPE__, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wrepeat)))
 #else /* LIBC: format_c32repeat */
 #include <local/parts.wchar.format-printer/format_c32repeat.h>
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
@@ -80,7 +80,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32hexdump))(__pc32formatprint
                                                                __SIZE_TYPE__ __size,
                                                                __SIZE_TYPE__ __linesize,
                                                                unsigned int __flags) {
-#line 507 "kos/src/libc/magic/format-printer.c"
+#line 520 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_HEXDUMP_FNORMAL
 #define __FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define __FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */

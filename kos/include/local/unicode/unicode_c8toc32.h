@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbc7d78a */
+/* HASH CRC-32:0x43b603f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc32))(__CHAR32_TYPE__ *__
                                                              /*utf-8*/ char const *__restrict __s,
                                                              __SIZE_TYPE__ __n,
                                                              __mbstate_t *__restrict __mbs) {
-#line 1231 "kos/src/libc/magic/unicode.c"
+#line 1232 "kos/src/libc/magic/unicode.c"
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __n; ++__i) {
 		__UINT32_TYPE__ __state;

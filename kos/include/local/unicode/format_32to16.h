@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb7b13 */
+/* HASH CRC-32:0x4dabdcea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,13 +39,14 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NC
 #endif /* !____localdep_unicode_writeutf16_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-16 output */
+/* Format printer (compatible with `__pwformatprinter') for
+ * converting wide-character unicode input data into a UTF-16 output */
 __LOCAL_LIBC(format_32to16) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to16))(/*struct format_32to16_data **/ void *__arg,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to16))(/*struct format_wto16_data **/ void *__arg,
                                                            __CHAR32_TYPE__ const *__data,
                                                            __SIZE_TYPE__ __datalen) {
-#line 1633 "kos/src/libc/magic/unicode.c"
+#line 1678 "kos/src/libc/magic/unicode.c"
+#if 4 == 4
 	struct __local_format_32to16_data {
 		__pc16formatprinter __fd_printer; /* [1..1] Inner printer */
 		void               *__fd_arg;     /* Argument for `fd_printer' */
@@ -68,6 +69,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to16))(/*struct format_32to1
 	return __result;
 __err:
 	return __temp;
+#else
+	struct __local_format_16to16_data {
+		__pc16formatprinter __fd_printer;   /* [1..1] Inner printer */
+		void               *__fd_arg;       /* Argument for `fd_printer' */
+	};
+	struct __local_format_16to16_data *__closure;
+	__closure = (struct __local_format_16to16_data *)__arg;
+	return (*__closure->__fd_printer)(__closure->__fd_arg, (__CHAR16_TYPE__ const *)__data, __datalen);
+#endif
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_format_32to16_defined */

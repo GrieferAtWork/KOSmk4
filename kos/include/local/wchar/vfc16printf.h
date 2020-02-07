@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4a215d9 */
+/* HASH CRC-32:0xbbb5d2c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -294,7 +294,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,_
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-#define __localdep_format_vc16printf(printer, arg, format, args) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf))((__pwformatprinter)(printer), arg, (__WCHAR_TYPE__ const *)(format), args)
+#define __localdep_format_vc16printf (*(__SSIZE_TYPE__(__LIBCCALL*)(__pc16formatprinter, void *, __CHAR16_TYPE__ const *__restrict, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf)))
 #else /* LIBC: format_vc16printf */
 #include <local/parts.wchar.format-printer/format_vc16printf.h>
 /* Generic printf implementation
@@ -413,7 +413,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_f
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/file_wprinter.h>
 /* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
-#define __localdep_file_c16printer(arg, data, datalen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_wprinter))(arg, (__WCHAR_TYPE__ const *)(data), datalen)
+#define __localdep_file_c16printer (*(__SSIZE_TYPE__(__LIBCCALL*)(void *, __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_wprinter)))
 #else /* LIBC: file_c16printer */
 #include <local/wchar/file_c16printer.h>
 /* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */

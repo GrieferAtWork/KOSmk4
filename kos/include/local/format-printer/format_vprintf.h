@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1593ee06 */
+/* HASH CRC-32:0x12694c8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,9 @@
 
 #include <bits/format-printer.h>
 
-
-
-
+#include <bits/uformat-printer.h>
+#include <libc/parts.uchar.string.h>
 #include <libc/string.h>
-
 #include <hybrid/__assert.h>
 #if !defined(CONFIG_USE_LIBDISASM) && !defined(CONFIG_NO_USE_LIBDISASM) && \
   ((defined(__KERNEL__) && defined(__KOS__)) || ((defined(CONFIG_HAVE_LIBDISASM_DISASSEMBLER_H) || \
@@ -76,6 +74,88 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_repeat,(__pfor
 #define __localdep_format_repeat (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_repeat))
 #endif /* format_repeat... */
 #endif /* !____localdep_format_repeat_defined */
+
+/* Dependency: "format_hexdump" from "format-printer" */
+#ifndef ____localdep_format_hexdump_defined
+#define ____localdep_format_hexdump_defined 1
+#ifdef __CRT_HAVE_format_hexdump
+/* Print a hex dump of the given data using the provided format printer
+ * @param: PRINTER:  A function called for all quoted portions of the text
+ * @param: DATA:     A pointer to the data that should be dumped
+ * @param: SIZE:     The amount of bytes read starting at DATA
+ * @param: LINESIZE: The max amount of bytes to include per-line
+ *                   HINT: Pass ZERO(0) to use a default size (16)
+ * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
+ * @return: 0: The given data was successfully hex-dumped
+ * @return: *: The first non-ZERO(0) return value of PRINTER */
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_hexdump,(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_hexdump,(__printer,__arg,__data,__size,__linesize,__flags)) __THROWS(...)
+#else /* LIBC: format_hexdump */
+#include <local/format-printer/format_hexdump.h>
+/* Print a hex dump of the given data using the provided format printer
+ * @param: PRINTER:  A function called for all quoted portions of the text
+ * @param: DATA:     A pointer to the data that should be dumped
+ * @param: SIZE:     The amount of bytes read starting at DATA
+ * @param: LINESIZE: The max amount of bytes to include per-line
+ *                   HINT: Pass ZERO(0) to use a default size (16)
+ * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
+ * @return: 0: The given data was successfully hex-dumped
+ * @return: *: The first non-ZERO(0) return value of PRINTER */
+#define __localdep_format_hexdump (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_hexdump))
+#endif /* format_hexdump... */
+#endif /* !____localdep_format_hexdump_defined */
+
+/* Dependency: "format_width" from "format-printer" */
+#ifndef ____localdep_format_width_defined
+#define ____localdep_format_width_defined 1
+#ifdef __CRT_HAVE_format_width
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_width,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
+#else /* LIBC: format_width */
+#include <local/format-printer/format_width.h>
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+#define __localdep_format_width (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_width))
+#endif /* format_width... */
+#endif /* !____localdep_format_width_defined */
+
+/* Dependency: "format_c16width" from "parts.uchar.format-printer" */
+#ifndef ____localdep_format_c16width_defined
+#define ____localdep_format_c16width_defined 1
+#if defined(__CRT_HAVE_format_wwidth) && (__SIZEOF_WCHAR_T__ == 2)
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16width,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_DOS$format_wwidth)
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16width,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <local/parts.wchar.format-printer/format_wwidth.h>
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+#define __localdep_format_c16width (*(__SSIZE_TYPE__(__LIBCCALL*)(void *, __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wwidth)))
+#else /* LIBC: format_c16width */
+#include <local/parts.wchar.format-printer/format_c16width.h>
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+#define __localdep_format_c16width (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16width))
+#endif /* format_c16width... */
+#endif /* !____localdep_format_c16width_defined */
+
+/* Dependency: "format_c32width" from "parts.uchar.format-printer" */
+#ifndef ____localdep_format_c32width_defined
+#define ____localdep_format_c32width_defined 1
+#ifdef __CRT_HAVE_format_length
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32width,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_format_wwidth) && (__SIZEOF_WCHAR_T__ == 4)
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32width,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <local/parts.wchar.format-printer/format_wwidth.h>
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+#define __localdep_format_c32width (*(__SSIZE_TYPE__(__LIBCCALL*)(void *, __CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wwidth)))
+#else /* LIBC: format_c32width */
+#include <local/parts.wchar.format-printer/format_c32width.h>
+/* Returns the width (number of characters; not bytes) of the given unicode string */
+#define __localdep_format_c32width (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32width))
+#endif /* format_c32width... */
+#endif /* !____localdep_format_c32width_defined */
 
 /* Dependency: "format_escape" from "format-printer" */
 #ifndef ____localdep_format_escape_defined
@@ -129,34 +209,126 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_escape,(__pfor
 #endif /* format_escape... */
 #endif /* !____localdep_format_escape_defined */
 
-/* Dependency: "format_hexdump" from "format-printer" */
-#ifndef ____localdep_format_hexdump_defined
-#define ____localdep_format_hexdump_defined 1
-#ifdef __CRT_HAVE_format_hexdump
-/* Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  A function called for all quoted portions of the text
- * @param: DATA:     A pointer to the data that should be dumped
- * @param: SIZE:     The amount of bytes read starting at DATA
- * @param: LINESIZE: The max amount of bytes to include per-line
- *                   HINT: Pass ZERO(0) to use a default size (16)
- * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: 0: The given data was successfully hex-dumped
- * @return: *: The first non-ZERO(0) return value of PRINTER */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_hexdump,(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),format_hexdump,(__printer,__arg,__data,__size,__linesize,__flags)) __THROWS(...)
-#else /* LIBC: format_hexdump */
-#include <local/format-printer/format_hexdump.h>
-/* Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  A function called for all quoted portions of the text
- * @param: DATA:     A pointer to the data that should be dumped
- * @param: SIZE:     The amount of bytes read starting at DATA
- * @param: LINESIZE: The max amount of bytes to include per-line
- *                   HINT: Pass ZERO(0) to use a default size (16)
- * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: 0: The given data was successfully hex-dumped
- * @return: *: The first non-ZERO(0) return value of PRINTER */
-#define __localdep_format_hexdump (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_hexdump))
-#endif /* format_hexdump... */
-#endif /* !____localdep_format_hexdump_defined */
+/* Dependency: "format_c16escape" from "parts.uchar.format-printer" */
+#ifndef ____localdep_format_c16escape_defined
+#define ____localdep_format_c16escape_defined 1
+#if defined(__CRT_HAVE_format_wescape) && (__SIZEOF_WCHAR_T__ == 2)
+/* Do C-style escape on the given text, printing it to the given printer.
+ * Input:
+ * >> Hello "World" W
+ * >> hat a great day.
+ * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
+ * Output #2: >> Hello \"World\" W\nhat a great day
+ * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * This function escapes all control and non-ascii characters,
+ * preferring octal encoding for control characters and hex-encoding
+ * for other non-ascii characters, a behavior that may be modified
+ * with the `FORMAT_ESCAPE_FFORCE*' flags
+ * @param: PRINTER: A function called for all quoted portions of the text
+ * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, /*utf-8*/ __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+#elif defined(__CRT_HAVE_DOS$format_wescape)
+/* Do C-style escape on the given text, printing it to the given printer.
+ * Input:
+ * >> Hello "World" W
+ * >> hat a great day.
+ * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
+ * Output #2: >> Hello \"World\" W\nhat a great day
+ * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * This function escapes all control and non-ascii characters,
+ * preferring octal encoding for control characters and hex-encoding
+ * for other non-ascii characters, a behavior that may be modified
+ * with the `FORMAT_ESCAPE_FFORCE*' flags
+ * @param: PRINTER: A function called for all quoted portions of the text
+ * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, /*utf-8*/ __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <local/parts.wchar.format-printer/format_wescape.h>
+/* Do C-style escape on the given text, printing it to the given printer.
+ * Input:
+ * >> Hello "World" W
+ * >> hat a great day.
+ * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
+ * Output #2: >> Hello \"World\" W\nhat a great day
+ * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * This function escapes all control and non-ascii characters,
+ * preferring octal encoding for control characters and hex-encoding
+ * for other non-ascii characters, a behavior that may be modified
+ * with the `FORMAT_ESCAPE_FFORCE*' flags
+ * @param: PRINTER: A function called for all quoted portions of the text
+ * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
+#define __localdep_format_c16escape (*(__SSIZE_TYPE__(__LIBCCALL*)(__pc16formatprinter, void *, /*utf-8*/ __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__, unsigned int))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape)))
+#else /* LIBC: format_c16escape */
+#include <local/parts.wchar.format-printer/format_c16escape.h>
+/* Do C-style escape on the given text, printing it to the given printer.
+ * Input:
+ * >> Hello "World" W
+ * >> hat a great day.
+ * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
+ * Output #2: >> Hello \"World\" W\nhat a great day
+ * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * This function escapes all control and non-ascii characters,
+ * preferring octal encoding for control characters and hex-encoding
+ * for other non-ascii characters, a behavior that may be modified
+ * with the `FORMAT_ESCAPE_FFORCE*' flags
+ * @param: PRINTER: A function called for all quoted portions of the text
+ * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
+#define __localdep_format_c16escape (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16escape))
+#endif /* format_c16escape... */
+#endif /* !____localdep_format_c16escape_defined */
+
+/* Dependency: "format_c32escape" from "parts.uchar.format-printer" */
+#ifndef ____localdep_format_c32escape_defined
+#define ____localdep_format_c32escape_defined 1
+#if defined(__CRT_HAVE_format_wescape) && (__SIZEOF_WCHAR_T__ == 4)
+/* Do C-style escape on the given text, printing it to the given printer.
+ * Input:
+ * >> Hello "World" W
+ * >> hat a great day.
+ * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
+ * Output #2: >> Hello \"World\" W\nhat a great day
+ * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * This function escapes all control and non-ascii characters,
+ * preferring octal encoding for control characters and hex-encoding
+ * for other non-ascii characters, a behavior that may be modified
+ * with the `FORMAT_ESCAPE_FFORCE*' flags
+ * @param: PRINTER: A function called for all quoted portions of the text
+ * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, /*utf-8*/ __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <local/parts.wchar.format-printer/format_wescape.h>
+/* Do C-style escape on the given text, printing it to the given printer.
+ * Input:
+ * >> Hello "World" W
+ * >> hat a great day.
+ * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
+ * Output #2: >> Hello \"World\" W\nhat a great day
+ * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * This function escapes all control and non-ascii characters,
+ * preferring octal encoding for control characters and hex-encoding
+ * for other non-ascii characters, a behavior that may be modified
+ * with the `FORMAT_ESCAPE_FFORCE*' flags
+ * @param: PRINTER: A function called for all quoted portions of the text
+ * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
+#define __localdep_format_c32escape (*(__SSIZE_TYPE__(__LIBCCALL*)(__pc32formatprinter, void *, /*utf-8*/ __CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__, unsigned int))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape)))
+#else /* LIBC: format_c32escape */
+#include <local/parts.wchar.format-printer/format_c32escape.h>
+/* Do C-style escape on the given text, printing it to the given printer.
+ * Input:
+ * >> Hello "World" W
+ * >> hat a great day.
+ * Output #1: >> \"Hello \"World\" W\nhat a great day.\"
+ * Output #2: >> Hello \"World\" W\nhat a great day
+ * NOTE: Output #2 is generated if the `FORMAT_ESCAPE_FPRINTRAW' is set
+ * This function escapes all control and non-ascii characters,
+ * preferring octal encoding for control characters and hex-encoding
+ * for other non-ascii characters, a behavior that may be modified
+ * with the `FORMAT_ESCAPE_FFORCE*' flags
+ * @param: PRINTER: A function called for all quoted portions of the text
+ * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
+#define __localdep_format_c32escape (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32escape))
+#endif /* format_c32escape... */
+#endif /* !____localdep_format_c32escape_defined */
 
 /* Dependency: "unicode_writeutf8" from "unicode" */
 #ifndef ____localdep_unicode_writeutf8_defined
@@ -173,18 +345,49 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localde
 #endif /* unicode_writeutf8... */
 #endif /* !____localdep_unicode_writeutf8_defined */
 
-/* Dependency: "format_width" from "format-printer" */
-#ifndef ____localdep_format_width_defined
-#define ____localdep_format_width_defined 1
-#ifdef __CRT_HAVE_format_width
-/* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_width,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
-#else /* LIBC: format_width */
-#include <local/format-printer/format_width.h>
-/* Returns the width (number of characters; not bytes) of the given unicode string */
-#define __localdep_format_width (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_width))
-#endif /* format_width... */
-#endif /* !____localdep_format_width_defined */
+/* Dependency: "format_16to8" from "unicode" */
+#ifndef ____localdep_format_16to8_defined
+#define ____localdep_format_16to8_defined 1
+#if defined(__CRT_HAVE_format_wto8) && (__SIZEOF_WCHAR_T__ == 2)
+/* Format printer (compatible with `__pc16formatprinter') for
+ * converting UTF-16 unicode input data into a UTF-8 output */
+__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(/*struct format_16to8_data **/ void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+#elif defined(__CRT_HAVE_DOS$format_wto8)
+/* Format printer (compatible with `__pc16formatprinter') for
+ * converting UTF-16 unicode input data into a UTF-8 output */
+__CREDIRECT_DOS(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_16to8,(/*struct format_16to8_data **/ void *__arg, __CHAR16_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <local/unicode/format_wto8.h>
+/* Format printer (compatible with `__pc16formatprinter') for
+ * converting UTF-16 unicode input data into a UTF-8 output */
+#define __localdep_format_16to8 (*(__SSIZE_TYPE__(__LIBCCALL*)(/*struct format_16to8_data **/ void *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto8)))
+#else /* LIBC: format_16to8 */
+#include <local/unicode/format_16to8.h>
+/* Format printer (compatible with `__pc16formatprinter') for
+ * converting UTF-16 unicode input data into a UTF-8 output */
+#define __localdep_format_16to8 (*(__SSIZE_TYPE__(__LIBDCALL*)(/*struct format_16to8_data **/ void *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_16to8)))
+#endif /* format_16to8... */
+#endif /* !____localdep_format_16to8_defined */
+
+/* Dependency: "format_32to8" from "unicode" */
+#ifndef ____localdep_format_32to8_defined
+#define ____localdep_format_32to8_defined 1
+#if defined(__CRT_HAVE_format_wto8) && (__SIZEOF_WCHAR_T__ == 4)
+/* Format printer (compatible with `__pc32formatprinter') for
+ * converting UTF-32 unicode input data into a UTF-8 output */
+__CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_32to8,(/*struct format_32to8_data **/ void *__arg, __CHAR32_TYPE__ const *__data, __SIZE_TYPE__ __datalen),format_wto8,(__arg,__data,__datalen))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <local/unicode/format_wto8.h>
+/* Format printer (compatible with `__pc32formatprinter') for
+ * converting UTF-32 unicode input data into a UTF-8 output */
+#define __localdep_format_32to8 (*(__SSIZE_TYPE__(__LIBCCALL*)(/*struct format_32to8_data **/ void *, __CHAR32_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wto8)))
+#else /* LIBC: format_32to8 */
+#include <local/unicode/format_32to8.h>
+/* Format printer (compatible with `__pc32formatprinter') for
+ * converting UTF-32 unicode input data into a UTF-8 output */
+#define __localdep_format_32to8 (*(__SSIZE_TYPE__(__LIBCCALL*)(/*struct format_32to8_data **/ void *, __CHAR32_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_32to8)))
+#endif /* format_32to8... */
+#endif /* !____localdep_format_32to8_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
@@ -279,11 +482,11 @@ __LOCAL_LIBC(format_vprintf) __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0) __S
                                                void *__arg,
                                                char const *__restrict __format,
                                                __builtin_va_list __args) __THROWS(...) {
-#line 841 "kos/src/libc/magic/format-printer.c"
+#line 852 "kos/src/libc/magic/format-printer.c"
+#ifndef __INTELLISENSE__
 #define __CHAR_TYPE                 char
 #define __CHAR_SIZE                 __SIZEOF_CHAR__
 #define __FORMAT_REPEAT             __localdep_format_repeat
-#define __FORMAT_ESCAPE             __localdep_format_escape
 #define __FORMAT_HEXDUMP            __localdep_format_hexdump
 
 
@@ -293,14 +496,33 @@ __LOCAL_LIBC(format_vprintf) __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0) __S
 
 
 
-#define __FORMAT_UNICODE_WRITEUTF8  __localdep_unicode_writeutf8
+
+
+
+
+
+
+
+
+
+
+
 #define __FORMAT_WIDTH              __localdep_format_width
+#define __FORMAT_WIDTH16            __localdep_format_c16width
+#define __FORMAT_WIDTH32            __localdep_format_c32width
+#define __FORMAT_ESCAPE             __localdep_format_escape
+#define __FORMAT_ESCAPE16           __localdep_format_c16escape
+#define __FORMAT_ESCAPE32           __localdep_format_c32escape
+#define __FORMAT_UNICODE_WRITECHAR  __localdep_unicode_writeutf8
+#define __FORMAT_UNICODE_FORMAT16   __localdep_format_16to8
+#define __FORMAT_UNICODE_FORMAT32   __localdep_format_32to8
 
 #define __FORMAT_PRINTER            __printer
 #define __FORMAT_ARG                __arg
 #define __FORMAT_FORMAT             __format
 #define __FORMAT_ARGS               __args
 #include <local/format-printf.h>
+#endif /* !__INTELLISENSE__ */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_format_vprintf_defined */

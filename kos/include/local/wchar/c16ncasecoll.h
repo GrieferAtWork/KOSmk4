@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ad79c4c */
+/* HASH CRC-32:0xa9d06854 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_c16ncasecmp,(__CHAR16_TYPE__ const *__s1, __CHAR16_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncasecmp,(__s1,__s2,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsncasecmp.h>
-#define __localdep_c16ncasecmp(s1, s2, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncasecmp))((__WCHAR_TYPE__ const *)(s1), (__WCHAR_TYPE__ const *)(s2), maxlen)
+#define __localdep_c16ncasecmp (*(int(__LIBCCALL*)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncasecmp)))
 #else /* LIBC: c16ncasecmp */
 #include <local/wchar/c16ncasecmp.h>
 #define __localdep_c16ncasecmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ncasecmp))

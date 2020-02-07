@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae5de9f9 */
+/* HASH CRC-32:0x5b4fb144 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,__localdep_vfwprintf_s
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,__localdep_vfwprintf_s,(__FILE *__stream, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)
 #include <local/wchar/vfwprintf.h>
-#define __localdep_vfwprintf_s(stream, format, args) (__STDC_INT_AS_SSIZE_T)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf))((__FILE *)(stream), (__WCHAR_TYPE__ const *)(format), args)
+#define __localdep_vfwprintf_s (*(__STDC_INT_AS_SSIZE_T(__LIBCCALL*)(__FILE *, __WCHAR_TYPE__ const *, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf)))
 #else /* CUSTOM: vfwprintf */
 #undef ____localdep_vfwprintf_s_defined
 #endif /* vfwprintf_s... */

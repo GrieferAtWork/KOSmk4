@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2943e5bc */
+/* HASH CRC-32:0x3df34594 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __CREDIRECT(__ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 0),__STDC_INT_AS_SIZE_T,_
 __CREDIRECT_DOS(__ATTR_NONNULL((3)) __ATTR_LIBC_WPRINTF(3, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc16printf,(__CHAR16_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswprintf,(__buf,__buflen,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/vswprintf.h>
-#define __localdep_vsc16printf(buf, buflen, format, args) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswprintf))((__WCHAR_TYPE__ *)(buf), buflen, (__WCHAR_TYPE__ const *)(format), args)
+#define __localdep_vsc16printf (*(__STDC_INT_AS_SIZE_T(__LIBCCALL*)(__CHAR16_TYPE__ *__restrict, __SIZE_TYPE__, __CHAR16_TYPE__ const *__restrict, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswprintf)))
 #else /* LIBC: vsc16printf */
 #include <local/wchar/vsc16printf.h>
 #define __localdep_vsc16printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsc16printf))

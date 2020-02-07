@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58df4d65 */
+/* HASH CRC-32:0x2f1459b5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localde
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vswprintf_c,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),vswprintf,(__buf,__bufsize,__format,__args))
 #else /* LIBC: vswprintf */
 #include <local/wchar/vswprintf.h>
-#define __localdep__vswprintf_c(buf, bufsize, format, args) (__STDC_INT_AS_SSIZE_T)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswprintf))((__WCHAR_TYPE__ *)(buf), bufsize, (__WCHAR_TYPE__ const *)(format), args)
+#define __localdep__vswprintf_c (*(__STDC_INT_AS_SSIZE_T(__LIBCCALL*)(__WCHAR_TYPE__ *, __SIZE_TYPE__, __WCHAR_TYPE__ const *, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswprintf)))
 #endif /* _vswprintf_c... */
 #endif /* !____localdep__vswprintf_c_defined */
 

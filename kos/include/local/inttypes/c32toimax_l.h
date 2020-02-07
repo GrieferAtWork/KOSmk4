@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa692d6d0 */
+/* HASH CRC-32:0xb98f44b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__loca
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__INTMAX_TYPE__,__NOTHROW_NCX,__localdep_c32toimax,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/inttypes/wcstoimax.h>
-#define __localdep_c32toimax(nptr, endptr, base) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoimax))((__WCHAR_TYPE__ const *)(nptr), (__WCHAR_TYPE__ **)(endptr), base)
+#define __localdep_c32toimax (*(__INTMAX_TYPE__(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, int))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoimax)))
 #else /* LIBC: c32toimax */
 #include <local/inttypes/c32toimax.h>
 #define __localdep_c32toimax (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32toimax))

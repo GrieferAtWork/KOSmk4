@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50abac24 */
+/* HASH CRC-32:0xb2906b09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NC
 __CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16memset,(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ __filler, __SIZE_TYPE__ __num_chars),wmemset,(__dst,__filler,__num_chars))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wmemset.h>
-#define __localdep_c16memset(dst, filler, num_chars) (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemset))((__WCHAR_TYPE__ *)(dst), (__WCHAR_TYPE__)(filler), num_chars)
+#define __localdep_c16memset (*(__CHAR16_TYPE__ *(__LIBCCALL*)(__CHAR16_TYPE__ *, __CHAR16_TYPE__, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemset)))
 #else /* LIBC: c16memset */
 #include <local/wchar/c16memset.h>
 #define __localdep_c16memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16memset))
@@ -71,7 +71,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(format_c16repeat))(__pc16formatprinte
                                                               void *__arg,
                                                               __CHAR16_TYPE__ __ch,
                                                               __SIZE_TYPE__ __num_repetitions) {
-#line 98 "kos/src/libc/magic/format-printer.c"
+#line 111 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_REPEAT_BUFSIZE
 #define __FORMAT_REPEAT_BUFSIZE 64
 #endif /* !FORMAT_REPEAT_BUFSIZE */

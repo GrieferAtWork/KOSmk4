@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb170252 */
+/* HASH CRC-32:0x130af616 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WSCANF(2, 0),__STD
 __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsc16scanf,(__CHAR16_TYPE__ const *__restrict __src, __CHAR16_TYPE__ const *__restrict __format, __builtin_va_list __args),vswscanf,(__src,__format,__args))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/vswscanf.h>
-#define __localdep_vsc16scanf(src, format, args) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswscanf))((__WCHAR_TYPE__ const *)(src), (__WCHAR_TYPE__ const *)(format), args)
+#define __localdep_vsc16scanf (*(__STDC_INT_AS_SIZE_T(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict, __CHAR16_TYPE__ const *__restrict, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vswscanf)))
 #else /* LIBC: vsc16scanf */
 #include <local/wchar/vsc16scanf.h>
 #define __localdep_vsc16scanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsc16scanf))

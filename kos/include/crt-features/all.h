@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1774a03f */
+/* HASH CRC-32:0x9384e06b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -138,6 +138,8 @@
 #define __CRT_HAVE_DOS$format_wrepeat 1
 #define __CRT_HAVE_DOS$format_wsnprintf_printer 1
 #define __CRT_HAVE_DOS$format_wsprintf_printer 1
+#define __CRT_HAVE_DOS$format_wto32 1
+#define __CRT_HAVE_DOS$format_wto8 1
 #define __CRT_HAVE_DOS$format_wwidth 1
 #define __CRT_HAVE_DOS$fputwc 1
 #define __CRT_HAVE_DOS$fputwc_unlocked 1
@@ -2032,10 +2034,6 @@
 #define __CRT_HAVE_fopendirat 1
 #define __CRT_HAVE_fork 1
 #define __CRT_HAVE_forkpty 1
-#define __CRT_HAVE_format_16to32 1
-#define __CRT_HAVE_format_16to8 1
-#define __CRT_HAVE_format_32to16 1
-#define __CRT_HAVE_format_32to8 1
 #define __CRT_HAVE_format_8to16 1
 #define __CRT_HAVE_format_8to32 1
 #define __CRT_HAVE_format_aprintf_alloc 1
@@ -2063,6 +2061,9 @@
 #define __CRT_HAVE_format_wrepeat 1
 #define __CRT_HAVE_format_wsnprintf_printer 1
 #define __CRT_HAVE_format_wsprintf_printer 1
+#define __CRT_HAVE_format_wto16 1
+#define __CRT_HAVE_format_wto32 1
+#define __CRT_HAVE_format_wto8 1
 #define __CRT_HAVE_format_wwidth 1
 #define __CRT_HAVE_fpathconf 1
 #define __CRT_HAVE_fpclassify 1

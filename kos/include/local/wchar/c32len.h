@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2fbf46 */
+/* HASH CRC-32:0xa0b73a36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__C
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsend.h>
 /* Same as `STR+c32len(STR)' */
-#define __localdep_c32end(string) (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend))((__WCHAR_TYPE__ const *)(string))
+#define __localdep_c32end (*(__CHAR32_TYPE__ *(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend)))
 #else /* LIBC: c32end */
 #include <local/wchar/c32end.h>
 /* Same as `STR+c32len(STR)' */

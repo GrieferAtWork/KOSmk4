@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7eb64140 */
+/* HASH CRC-32:0x351738d7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16xfr
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c16xfrm,(__CHAR16_TYPE__ *__dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __maxlen),wcsxfrm,(__dst,__src,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsxfrm.h>
-#define __localdep_c16xfrm(dst, src, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsxfrm))((__WCHAR_TYPE__ *)(dst), (__WCHAR_TYPE__ const *)(src), maxlen)
+#define __localdep_c16xfrm (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ *, __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsxfrm)))
 #else /* LIBC: c16xfrm */
 #include <local/wchar/c16xfrm.h>
 #define __localdep_c16xfrm (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16xfrm))

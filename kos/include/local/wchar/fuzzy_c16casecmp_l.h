@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2fe122a */
+/* HASH CRC-32:0xe67f3c01 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,
 #elif !defined(__NO_MALLOCA)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/fuzzy_wmemcasecmp_l.h>
-#define __localdep_fuzzy_c16memcasecmp_l(s1, s1_bytes, s2, s2_bytes, locale) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l))((__WCHAR_TYPE__ const *)(s1), s1_bytes, (__WCHAR_TYPE__ const *)(s2), s2_bytes, locale)
+#define __localdep_fuzzy_c16memcasecmp_l (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ const *, __SIZE_TYPE__, __CHAR16_TYPE__ const *, __SIZE_TYPE__, __locale_t))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wmemcasecmp_l)))
 #else /* LIBC: fuzzy_c16memcasecmp_l */
 #include <local/wchar/fuzzy_c16memcasecmp_l.h>
 #define __localdep_fuzzy_c16memcasecmp_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_c16memcasecmp_l))
@@ -54,7 +54,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcslen.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_c16len(string) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)(string))
+#define __localdep_c16len (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen)))
 #else /* LIBC: c16len */
 #include <local/wchar/c16len.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */

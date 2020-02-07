@@ -2722,7 +2722,7 @@ split_cmdline(char *__restrict cmdline,
 				}
 				continue;
 			}
-			/* Space -> Argument seperator. */
+			/* Space -> Argument separator. */
 			if (isspace(ch)) {
 				cmdline[i] = '\0'; /* Terminate the previous argument. */
 				++i;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ae505f6 */
+/* HASH CRC-32:0xfd76b5ed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __NAMESPACE_STD_END
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32ftime,(__CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR32_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsftime.h>
-#define __localdep_c32ftime(buf, buflen, format, tp) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime))((__WCHAR_TYPE__ *)(buf), buflen, (__WCHAR_TYPE__ const *)(format), tp)
+#define __localdep_c32ftime (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR32_TYPE__ *__restrict, __SIZE_TYPE__, __CHAR32_TYPE__ const *__restrict, struct __NAMESPACE_STD_SYM tm const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime)))
 #else /* LIBC: c32ftime */
 #include <local/wchar/c32ftime.h>
 #define __localdep_c32ftime (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ftime))

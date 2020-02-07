@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5abeb71 */
+/* HASH CRC-32:0x419c0703 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOTHROW
 __CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16mempcpy,(__CHAR16_TYPE__ *__restrict __dst, __CHAR16_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmempcpy,(__dst,__src,__num_chars))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wmempcpy.h>
-#define __localdep_c16mempcpy(dst, src, num_chars) (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmempcpy))((__WCHAR_TYPE__ *)(dst), (__WCHAR_TYPE__ const *)(src), num_chars)
+#define __localdep_c16mempcpy (*(__CHAR16_TYPE__ *(__LIBCCALL*)(__CHAR16_TYPE__ *__restrict, __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmempcpy)))
 #else /* LIBC: c16mempcpy */
 #include <local/wchar/c16mempcpy.h>
 #define __localdep_c16mempcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16mempcpy))
@@ -50,7 +50,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcslen.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_c16len(string) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)(string))
+#define __localdep_c16len (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen)))
 #else /* LIBC: c16len */
 #include <local/wchar/c16len.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5df2f7e */
+/* HASH CRC-32:0x3d23d6ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32memcpy,(__CHAR32_TYPE__ *__restrict __dst, __CHAR32_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyl,(__dst,__src,__num_chars))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wmemcpy.h>
-#define __localdep_c32memcpy(dst, src, num_chars) (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcpy))((__WCHAR_TYPE__ *)(dst), (__WCHAR_TYPE__ const *)(src), num_chars)
+#define __localdep_c32memcpy (*(__CHAR32_TYPE__ *(__LIBCCALL*)(__CHAR32_TYPE__ *__restrict, __CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcpy)))
 #else /* LIBC: c32memcpy */
 #include <local/wchar/c32memcpy.h>
 #define __localdep_c32memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32memcpy))
@@ -46,7 +46,7 @@ __LOCAL_LIBC(format_c32snprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32snprintf_printer))(/*struct format_wsnprintf_data**/ void *__arg,
                                                                         __CHAR32_TYPE__ const *__restrict __data,
                                                                         __SIZE_TYPE__ __datalen) {
-#line 974 "kos/src/libc/magic/format-printer.c"
+#line 1004 "kos/src/libc/magic/format-printer.c"
 	struct __format_snprintf_data_ {
 		__CHAR32_TYPE__         *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */

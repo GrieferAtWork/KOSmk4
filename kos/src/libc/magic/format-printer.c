@@ -50,6 +50,19 @@
 #include <libdebuginfo/addr2line.h>
 #endif /* !__KERNEL__ */
 #define CONFIG_USE_LIBDEBUGINFO 1
+
+#include <unicode.h>
+#include <parts/uchar/format-printer.h>
+#define libc_format_8to16     format_8to16
+#define libc_format_8to32     format_8to32
+#define libc_format_16to8     format_16to8
+#define libc_format_16to32    format_16to32
+#define libc_format_32to8     format_32to8
+#define libc_format_32to16    format_32to16
+#define libc_format_c16escape format_c16escape
+#define libc_format_c16width  format_c16width
+#define libc_format_c32escape format_c32escape
+#define libc_format_c32width  format_c32width
 }
 
 %{
@@ -796,11 +809,9 @@ err:
 @@ - syslog:           Unbuffered system-log output.
 @@ - ...               There are a _lot_ more...
 [dependency_prefix(
-@@if $wchar_function@@
+#include @<bits/uformat-printer.h>@
 #include @<libc/parts.uchar.string.h>@
-@@else@@
 #include @<libc/string.h>@
-@@endif@@
 #include @<hybrid/__assert.h>@
 #if !defined(CONFIG_USE_LIBDISASM) && !defined(CONFIG_NO_USE_LIBDISASM) && \
   ((defined(__KERNEL__) && defined(__KOS__)) || ((defined(CONFIG_HAVE_LIBDISASM_DISASSEMBLER_H) || \
@@ -838,27 +849,46 @@ err:
 )][ATTR_LIBC_PRINTF(3, 0)][throws][kernel]
 format_vprintf:([nonnull] pformatprinter printer, void *arg,
                 [nonnull] char const *__restrict format, __builtin_va_list args) -> $ssize_t {
+#ifndef __INTELLISENSE__
 #define @__CHAR_TYPE@                 char
 #define @__CHAR_SIZE@                 __SIZEOF_CHAR__
 #define @__FORMAT_REPEAT@             format_repeat
-#define @__FORMAT_ESCAPE@             format_escape
 #define @__FORMAT_HEXDUMP@            format_hexdump
 @@if $wchar_function@@
-#if __SIZEOF_WCHAR_T__ == 2
-#define @__FORMAT_UNICODE_WRITEUTF8@  unicode_writeutf16
-#else
-#define @__FORMAT_UNICODE_WRITEUTF8@(dst, ch) ((dst)[0] = (ch), (dst) + 1)
-#endif
 #define @__FORMAT_WIDTH@              format_wwidth
+#define @__FORMAT_ESCAPE@             format_wescape
+#define @__FORMAT_WIDTH8@             @@noreplace_on_copy format_width@@
+#define @__FORMAT_ESCAPE8@            @@noreplace_on_copy format_escape@@
+#if __SIZEOF_WCHAR_T__ == 2
+#define @__FORMAT_WIDTH32@            format_c32width
+#define @__FORMAT_ESCAPE32@           format_c32escape
+#define @__FORMAT_UNICODE_WRITECHAR@  unicode_writeutf16
+#define @__FORMAT_UNICODE_FORMAT8@    format_8to16
+#define @__FORMAT_UNICODE_FORMAT32@   format_32to16
+#else
+#define @__FORMAT_WIDTH16@            format_c16width
+#define @__FORMAT_ESCAPE16@           format_c16escape
+#define @__FORMAT_UNICODE_WRITECHAR@(dst, ch) ((dst)[0] = (ch), (dst) + 1)
+#define @__FORMAT_UNICODE_FORMAT8@    format_8to32
+#define @__FORMAT_UNICODE_FORMAT16@   format_16to32
+#endif
 @@else@@
-#define @__FORMAT_UNICODE_WRITEUTF8@  unicode_writeutf8
 #define @__FORMAT_WIDTH@              format_width
+#define @__FORMAT_WIDTH16@            format_c16width
+#define @__FORMAT_WIDTH32@            format_c32width
+#define @__FORMAT_ESCAPE@             format_escape
+#define @__FORMAT_ESCAPE16@           format_c16escape
+#define @__FORMAT_ESCAPE32@           format_c32escape
+#define @__FORMAT_UNICODE_WRITECHAR@  unicode_writeutf8
+#define @__FORMAT_UNICODE_FORMAT16@   format_16to8
+#define @__FORMAT_UNICODE_FORMAT32@   format_32to8
 @@endif@@
 #define @__FORMAT_PRINTER@            printer
 #define @__FORMAT_ARG@                arg
 #define @__FORMAT_FORMAT@             format
 #define @__FORMAT_ARGS@               args
 #include @<local/format-printf.h>@
+#endif /* !__INTELLISENSE__ */
 }
 
 [ATTR_LIBC_PRINTF(3, 4)][throws][allow_macros]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60a146a9 */
+/* HASH CRC-32:0x5ee2f858 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__C
 #elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.utime/wutime64.h>
-#define __localdep_c16utime64(filename, file_times) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime64))((__WCHAR_TYPE__ const *)(filename), file_times)
+#define __localdep_c16utime64 (*(int(__LIBCCALL*)(__CHAR16_TYPE__ const *, struct utimbuf64 const *))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime64)))
 #else /* LIBC: c16utime64 */
 #include <local/parts.wchar.utime/c16utime64.h>
 #define __localdep_c16utime64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16utime64))

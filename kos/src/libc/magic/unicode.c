@@ -36,6 +36,7 @@
 #include <bits/mbstate.h>
 #include <bits/types.h>
 #include <bits/uformat-printer.h>
+#include <bits/wformat-printer.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -1342,6 +1343,7 @@ done:
 %[define(__UNICODE_FORMAT_XTOY_BUFSIZE = 64)]
 
 
+
 %{
 
 struct format_8to16_data {
@@ -1405,6 +1407,7 @@ struct format_8to32_data {
 
 @@Format printer (compatible with `__pformatprinter') for
 @@converting UTF-8 unicode input data into a UTF-32 output
+[dependency_include(<bits/mbstate.h>)]
 [dependency_include(<bits/format-printer.h>)]
 [dependency_include(<bits/uformat-printer.h>)]
 format_8to32:(/*struct format_8to32_data **/ void *arg,
@@ -1445,20 +1448,20 @@ err:
 }
 
 
-%{
-
-struct format_16to8_data {
-	__pformatprinter fd_printer;   /* [1..1] Inner printer */
-	void            *fd_arg;       /* Argument for `fd_printer' */
-	__CHAR16_TYPE__  fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
-};
-}
+//struct format_wto8_data {
+//	__pformatprinter fd_printer;   /* [1..1] Inner printer */
+//	void            *fd_arg;       /* Argument for `fd_printer' */
+//#if __SIZEOF_WCHAR_T__ == 2
+//	__CHAR16_TYPE__  fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+//#endif /* __SIZEOF_WCHAR_T__ == 2 */
+//};
 
 @@Format printer (compatible with `__pc16formatprinter') for
-@@converting UTF-16 unicode input data into a UTF-8 output
-[dependency_include(<bits/format-printer.h>)]
-format_16to8:(/*struct format_16to8_data **/ void *arg,
-              $char16_t const *data, $size_t datalen) -> $ssize_t {
+@@converting wide-character unicode input data into a UTF-8 output
+[dependency_include(<bits/format-printer.h>)][wchar][hide_in_header]
+format_wto8:(/*struct format_wto8_data **/ void *arg,
+             $wchar_t const *data, $size_t datalen) -> $ssize_t {
+#if __SIZEOF_WCHAR_T__ == 2
 	struct __local_format_16to8_data {
 		__pformatprinter fd_printer;   /* [1..1] Inner printer */
 		void            *fd_arg;       /* Argument for `fd_printer' */
@@ -1474,7 +1477,7 @@ format_16to8:(/*struct format_16to8_data **/ void *arg,
 		ch  = closure->fd_surrogate - UTF16_HIGH_SURROGATE_MIN;
 		closure->fd_surrogate = 0;
 		ch += UTF16_SURROGATE_SHIFT;
-		ch += data[0] - UTF16_LOW_SURROGATE_MIN;
+		ch += ((char16_t const *)data)[0] - UTF16_LOW_SURROGATE_MIN;
 		dst = unicode_writeutf8(dst, ch);
 		i = 1;
 		goto after_dst_write;
@@ -1482,7 +1485,7 @@ format_16to8:(/*struct format_16to8_data **/ void *arg,
 	while (i < datalen) {
 		do {
 			char16_t ch16;
-			ch16 = data[i++];
+			ch16 = ((char16_t const *)data)[i++];
 			if (ch16 >= UTF16_HIGH_SURROGATE_MIN &&
 			    ch16 <= UTF16_HIGH_SURROGATE_MAX) {
 				if (i >= datalen) {
@@ -1508,23 +1511,81 @@ after_dst_write:
 	return result;
 err:
 	return temp;
+#else
+	struct __local_format_32to8_data {
+		__pformatprinter fd_printer; /* [1..1] Inner printer */
+		void            *fd_arg;     /* Argument for `fd_printer' */
+	};
+	char buf[__UNICODE_FORMAT_XTOY_BUFSIZE];
+	struct __local_format_32to8_data *closure;
+	ssize_t temp, result = 0;
+	size_t i = 0;
+	closure = (struct __local_format_32to8_data *)arg;
+	while (i < datalen) {
+		char *dst = buf;
+		do {
+			dst = unicode_writeutf8(dst, ((char32_t const *)data)[i++]);
+		} while ((dst + 7) < __COMPILER_ENDOF(buf) && i < datalen);
+		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+	}
+	return result;
+err:
+	return temp;
+#endif
 }
 
 
 %{
 
-struct format_16to32_data {
-	__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
-	void               *fd_arg;       /* Argument for `fd_printer' */
-	__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+struct format_16to8_data {
+	__pformatprinter fd_printer;   /* [1..1] Inner printer */
+	void            *fd_arg;       /* Argument for `fd_printer' */
+	__CHAR16_TYPE__  fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 };
 }
 
 @@Format printer (compatible with `__pc16formatprinter') for
-@@converting UTF-16 unicode input data into a UTF-32 output
-[dependency_include(<bits/uformat-printer.h>)]
-format_16to32:(/*struct format_16to32_data **/ void *arg,
-               $char16_t const *data, $size_t datalen) -> $ssize_t {
+@@converting UTF-16 unicode input data into a UTF-8 output
+[attribute(*)]
+format_16to8:(/*struct format_16to8_data **/ void *arg,
+              $char16_t const *data, $size_t datalen)
+		-> $ssize_t %{uchar16(format_wto8)}
+
+
+%{
+
+struct format_32to8_data {
+	__pformatprinter fd_printer; /* [1..1] Inner printer */
+	void            *fd_arg;     /* Argument for `fd_printer' */
+};
+}
+
+@@Format printer (compatible with `__pc32formatprinter') for
+@@converting UTF-32 unicode input data into a UTF-8 output
+[attribute(*)]
+format_32to8:(/*struct format_32to8_data **/ void *arg,
+              $char32_t const *data, $size_t datalen)
+		-> $ssize_t %{uchar32(format_wto8)}
+
+
+
+//struct format_wto32_data {
+//	__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
+//	void               *fd_arg;       /* Argument for `fd_printer' */
+//#if __SIZEOF_WCHAR_T__ == 2
+//	__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+//#endif /* __SIZEOF_WCHAR_T__ == 2 */
+//};
+
+@@Format printer (compatible with `__pc16formatprinter') for
+@@converting wide-character unicode input data into a UTF-32 output
+[dependency_include(<bits/uformat-printer.h>)][wchar][hide_in_header]
+format_wto32:(/*struct format_wto32_data **/ void *arg,
+              $wchar_t const *data, $size_t datalen) -> $ssize_t {
+#if __SIZEOF_WCHAR_T__ == 2
 	struct __local_format_16to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
 		void               *fd_arg;       /* Argument for `fd_printer' */
@@ -1574,62 +1635,47 @@ after_dst_write:
 	return result;
 err:
 	return temp;
-}
-
-
-%{
-
-struct format_32to8_data {
-	__pformatprinter fd_printer; /* [1..1] Inner printer */
-	void            *fd_arg;     /* Argument for `fd_printer' */
-};
-}
-
-@@Format printer (compatible with `__pc32formatprinter') for
-@@converting UTF-32 unicode input data into a UTF-8 output
-[dependency_include(<bits/format-printer.h>)]
-format_32to8:(/*struct format_32to8_data **/ void *arg,
-              $char32_t const *data, $size_t datalen) -> $ssize_t {
-	struct __local_format_32to8_data {
-		__pformatprinter fd_printer; /* [1..1] Inner printer */
-		void            *fd_arg;     /* Argument for `fd_printer' */
+#else
+	struct __local_format_32to32_data {
+		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
+		void               *fd_arg;       /* Argument for `fd_printer' */
 	};
-	char buf[__UNICODE_FORMAT_XTOY_BUFSIZE];
-	struct __local_format_32to8_data *closure;
-	ssize_t temp, result = 0;
-	size_t i = 0;
-	closure = (struct __local_format_32to8_data *)arg;
-	while (i < datalen) {
-		char *dst = buf;
-		do {
-			dst = unicode_writeutf8(dst, data[i++]);
-		} while ((dst + 7) < __COMPILER_ENDOF(buf) && i < datalen);
-		temp = (*closure->fd_printer)(closure->fd_arg, buf, (size_t)(dst - buf));
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
-	}
-	return result;
-err:
-	return temp;
+	struct __local_format_32to32_data *closure;
+	closure = (struct __local_format_32to32_data *)arg;
+	return (*closure->fd_printer)(closure->fd_arg, (char32_t const *)data, datalen);
+#endif
 }
-
 
 
 %{
 
-struct format_32to16_data {
-	__pc16formatprinter fd_printer; /* [1..1] Inner printer */
-	void               *fd_arg;     /* Argument for `fd_printer' */
+struct format_16to32_data {
+	__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
+	void               *fd_arg;       /* Argument for `fd_printer' */
+	__CHAR16_TYPE__     fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
 };
 }
 
-@@Format printer (compatible with `__pc32formatprinter') for
-@@converting UTF-32 unicode input data into a UTF-16 output
-[dependency_include(<bits/format-printer.h>)]
+@@Format printer (compatible with `__pc16formatprinter') for
+@@converting UTF-16 unicode input data into a UTF-32 output
 [dependency_include(<bits/uformat-printer.h>)]
-format_32to16:(/*struct format_32to16_data **/ void *arg,
-               $char32_t const *data, $size_t datalen) -> $ssize_t {
+format_16to32:(/*struct format_16to32_data **/ void *arg,
+               $char16_t const *data, $size_t datalen)
+		-> $ssize_t %{uchar16(format_wto32)}
+
+
+//struct format_wto16_data {
+//	__pc16formatprinter fd_printer; /* [1..1] Inner printer */
+//	void               *fd_arg;     /* Argument for `fd_printer' */
+//};
+
+@@Format printer (compatible with `__pwformatprinter') for
+@@converting wide-character unicode input data into a UTF-16 output
+[dependency_include(<bits/format-printer.h>)]
+[dependency_include(<bits/uformat-printer.h>)][wchar][hide_in_header]
+format_wto16:(/*struct format_wto16_data **/ void *arg,
+              $wchar_t const *data, $size_t datalen) -> $ssize_t {
+#if __SIZEOF_WCHAR_T__ == 4
 	struct __local_format_32to16_data {
 		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
 		void               *fd_arg;     /* Argument for `fd_printer' */
@@ -1652,12 +1698,40 @@ format_32to16:(/*struct format_32to16_data **/ void *arg,
 	return result;
 err:
 	return temp;
+#else
+	struct __local_format_16to16_data {
+		__pc16formatprinter fd_printer;   /* [1..1] Inner printer */
+		void               *fd_arg;       /* Argument for `fd_printer' */
+	};
+	struct __local_format_16to16_data *closure;
+	closure = (struct __local_format_16to16_data *)arg;
+	return (*closure->fd_printer)(closure->fd_arg, (char16_t const *)data, datalen);
+#endif
 }
+
+
+%{
+
+struct format_32to16_data {
+	__pc16formatprinter fd_printer; /* [1..1] Inner printer */
+	void               *fd_arg;     /* Argument for `fd_printer' */
+};
+}
+
+@@Format printer (compatible with `__pc32formatprinter') for
+@@converting UTF-32 unicode input data into a UTF-16 output
+[dependency_include(<bits/format-printer.h>)]
+[dependency_include(<bits/uformat-printer.h>)]
+format_32to16:(/*struct format_32to16_data **/ void *arg,
+               $char32_t const *data, $size_t datalen)
+		-> $ssize_t %{uchar32(format_wto16)}
 
 
 
 
 %{
+
+
 
 /* Unicode character traits database */
 #ifdef __CRT_HAVE___unicode_descriptor

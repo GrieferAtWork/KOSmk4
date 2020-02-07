@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0673041 */
+/* HASH CRC-32:0x38097dfb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_WSCANF(1, 0),__STDC_I
 #elif defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/vwscanf.h>
-#define __localdep_vc32scanf(format, args) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwscanf))((__WCHAR_TYPE__ const *)(format), args)
+#define __localdep_vc32scanf (*(__STDC_INT_AS_SIZE_T(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict, __builtin_va_list))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwscanf)))
 #else /* LIBC: vc32scanf */
 #include <local/wchar/vc32scanf.h>
 #define __localdep_vc32scanf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vc32scanf))

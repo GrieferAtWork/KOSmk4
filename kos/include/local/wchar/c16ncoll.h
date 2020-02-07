@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe6c05c6 */
+/* HASH CRC-32:0x37e5b2e9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsncmp.h>
 /* Same as `c16cmp', but compare at most `MAXLEN' characters from either string */
-#define __localdep_c16ncmp(s1, s2, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp))((__WCHAR_TYPE__ const *)(s1), (__WCHAR_TYPE__ const *)(s2), maxlen)
+#define __localdep_c16ncmp (*(int(__LIBCCALL*)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp)))
 #else /* LIBC: c16ncmp */
 #include <local/wchar/c16ncmp.h>
 /* Same as `c16cmp', but compare at most `MAXLEN' characters from either string */

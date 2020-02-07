@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb75a4d2c */
+/* HASH CRC-32:0xabe494a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,__localdep_c32stoull,(
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,__localdep_c32stoull,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcstoumax,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcstoull.h>
-#define __localdep_c32stoull(nptr, endptr, base) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull))((__WCHAR_TYPE__ const *)(nptr), (__WCHAR_TYPE__ **)(endptr), base)
+#define __localdep_c32stoull (*(__ULONGLONG(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict, __CHAR32_TYPE__ **, int))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstoull)))
 #else /* LIBC: c32stoull */
 #include <local/wchar/c32stoull.h>
 #define __localdep_c32stoull (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32stoull))

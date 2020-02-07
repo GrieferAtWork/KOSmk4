@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bc33878 */
+/* HASH CRC-32:0x27df77d4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NO
 #elif !defined(__NO_MALLOCA)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/fuzzy_wmemcmp.h>
-#define __localdep_fuzzy_c32memcmp(s1, s1_chars, s2, s2_chars) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wmemcmp))((__WCHAR_TYPE__ const *)(s1), s1_chars, (__WCHAR_TYPE__ const *)(s2), s2_chars)
+#define __localdep_fuzzy_c32memcmp (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR32_TYPE__ const *, __SIZE_TYPE__, __CHAR32_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_wmemcmp)))
 #else /* LIBC: fuzzy_c32memcmp */
 #include <local/wchar/fuzzy_c32memcmp.h>
 #define __localdep_fuzzy_c32memcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fuzzy_c32memcmp))
@@ -49,7 +49,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcslen.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_c32len(string) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)(string))
+#define __localdep_c32len (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen)))
 #else /* LIBC: c32len */
 #include <local/wchar/c32len.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */

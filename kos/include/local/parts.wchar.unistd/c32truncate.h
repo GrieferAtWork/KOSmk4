@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d51bf11 */
+/* HASH CRC-32:0xf75c2c2f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_c32truncate64,(__CH
 #include <local/parts.wchar.unistd/wtruncate64.h>
 /* >> c32truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
-#define __localdep_c32truncate64(file, length) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtruncate64))((__WCHAR_TYPE__ const *)(file), length)
+#define __localdep_c32truncate64 (*(int(__LIBCCALL*)(__CHAR32_TYPE__ const *, __PIO_OFFSET64))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wtruncate64)))
 #else /* LIBC: c32truncate64 */
 #include <local/parts.wchar.unistd/c32truncate64.h>
 /* >> c32truncate(2)

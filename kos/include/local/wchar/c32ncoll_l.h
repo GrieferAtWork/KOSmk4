@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca38d6d */
+/* HASH CRC-32:0x349fc0ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_c32ncoll,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsncoll.h>
-#define __localdep_c32ncoll(s1, s2, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncoll))((__WCHAR_TYPE__ const *)(s1), (__WCHAR_TYPE__ const *)(s2), maxlen)
+#define __localdep_c32ncoll (*(int(__LIBCCALL*)(__CHAR32_TYPE__ const *, __CHAR32_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncoll)))
 #else /* LIBC: c32ncoll */
 #include <local/wchar/c32ncoll.h>
 #define __localdep_c32ncoll (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ncoll))

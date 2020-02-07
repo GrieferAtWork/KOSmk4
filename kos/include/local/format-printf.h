@@ -17,42 +17,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __CHAR_TYPE
-#define __CHAR_TYPE      char
-#endif /* !__CHAR_TYPE */
-#ifndef __CHAR_SIZE
-#define __CHAR_SIZE      __SIZEOF_CHAR__
-#endif /* !__CHAR_SIZE */
-#ifndef __FORMAT_VPRINTF
-#define __FORMAT_VPRINTF format_vprintf
-#endif /* !__FORMAT_VPRINTF */
-#ifndef __FORMAT_ESCAPE
-#define __FORMAT_ESCAPE  format_escape
-#endif /* !__FORMAT_ESCAPE */
-#ifndef __FORMAT_REPEAT
-#define __FORMAT_REPEAT  format_repeat
-#endif /* !__FORMAT_REPEAT */
-#ifndef __FORMAT_HEXDUMP
-#define __FORMAT_HEXDUMP format_hexdump
-#endif /* !__FORMAT_HEXDUMP */
-#ifndef __FORMAT_UNICODE_WRITEUTF8
-#define __FORMAT_UNICODE_WRITEUTF8 unicode_writeutf8
-#endif /* !__FORMAT_UNICODE_WRITEUTF8 */
-#ifndef __FORMAT_WIDTH
-#define __FORMAT_WIDTH format_width
-#endif /* !__FORMAT_WIDTH */
-#ifndef __FORMAT_FORMAT
-#define __FORMAT_FORMAT  format
-#endif /* !__FORMAT_FORMAT */
-#ifndef __FORMAT_PRINTER
-#define __FORMAT_PRINTER printer
-#endif /* !__FORMAT_PRINTER */
-#ifndef __FORMAT_ARG
-#define __FORMAT_ARG     arg
-#endif /* !__FORMAT_ARG */
-#ifndef __FORMAT_ARGS
-#define __FORMAT_ARGS    args
-#endif /* !__FORMAT_ARGS */
+#ifdef __INTELLISENSE__
+#ifndef _FORMAT_PRINTER_H
+#include <format-printer.h>
+#endif /* !_FORMAT_PRINTER_H */
+#include <bits/format-printer.h>
+#include <bits/uformat-printer.h>
+#include <hybrid/__assert.h>
+#include <libc/string.h>
+#include <libc/parts.uchar.string.h>
+#include <parts/uchar/format-printer.h>
+#include <unicode.h>
+#define __CHAR_TYPE                char
+#define __CHAR_SIZE                __SIZEOF_CHAR__
+#define __FORMAT_ESCAPE            format_escape
+#define __FORMAT_ESCAPE16          format_c16escape
+#define __FORMAT_ESCAPE32          format_c32escape
+#define __FORMAT_REPEAT            format_repeat
+#define __FORMAT_HEXDUMP           format_hexdump
+#define __FORMAT_UNICODE_WRITECHAR unicode_writeutf8
+#define __FORMAT_UNICODE_FORMAT16  format_16to8
+#define __FORMAT_UNICODE_FORMAT32  format_32to8
+#define __FORMAT_WIDTH             format_width
+#define __FORMAT_WIDTH16           format_c16width
+#define __FORMAT_WIDTH32           format_c32width
+#define __FORMAT_FORMAT            format
+#define __FORMAT_PRINTER           printer
+#define __FORMAT_ARG               arg
+#define __FORMAT_ARGS              args
+#endif /* __INTELLISENSE__ */
 
 #include <hybrid/typecore.h>
 #include <hybrid/__va_size.h>
@@ -112,7 +105,11 @@
 #define __PRINTF_LENGTH_SIZE __PP_CAT2(__PRINTF_LENGTH_I, __PP_MUL8(__SIZEOF_POINTER__))
 #define __PRINTF_LENGTH_HH   __PP_CAT2(__PRINTF_LENGTH_I, __PP_MUL8(__SIZEOF_CHAR__))
 #define __PRINTF_LENGTH_H    __PP_CAT2(__PRINTF_LENGTH_I, __PP_MUL8(__SIZEOF_SHORT__))
+#ifdef __NO_PRINTF_UNICODE_STRING
 #define __PRINTF_LENGTH_l    __PP_CAT2(__PRINTF_LENGTH_I, __PP_MUL8(__SIZEOF_LONG__))
+#else /* __NO_PRINTF_UNICODE_STRING */
+#define __PRINTF_LENGTH_l    (__PP_CAT2(__PRINTF_LENGTH_I, __PP_MUL8(__SIZEOF_LONG__)) | 0x1000)
+#endif /* !__NO_PRINTF_UNICODE_STRING */
 #ifdef __SIZEOF_LONG_LONG__
 #define __PRINTF_LENGTH_LL   __PP_CAT2(__PRINTF_LENGTH_I, __PP_MUL8(__SIZEOF_LONG_LONG__))
 #else /* __SIZEOF_LONG_LONG__ */
@@ -122,14 +119,14 @@
 #define __PRINTF_F_NONE     0x0000
 #define __PRINTF_F_PREFIX   0x0001 /* `%#'. */
 #define __PRINTF_F_UPPER    0x0002 /* Print upper-case hex-characters. */
-#define __PRINTF_F_LJUST    0x0004 /* '%-'. */
-#define __PRINTF_F_SIGN     0x0008 /* '%+'. */
-#define __PRINTF_F_SPACE    0x0010 /* '% '. */
-#define __PRINTF_F_PADZERO  0x0020 /* '%0'. */
-#define __PRINTF_F_HASWIDTH 0x0040 /* '%123'. */
+#define __PRINTF_F_LJUST    0x0004 /* `%-'. */
+#define __PRINTF_F_SIGN     0x0008 /* `%+'. */
+#define __PRINTF_F_SPACE    0x0010 /* `% '. */
+#define __PRINTF_F_PADZERO  0x0020 /* `%0'. */
+#define __PRINTF_F_HASWIDTH 0x0040 /* `%123'. */
 #define __PRINTF_F_HASPREC  0x0080 /* `%.123'. */
 #define __PRINTF_F_SIGNED   0x0100
-#define __PRINTF_F_FIXBUF   0x0200
+#define __PRINTF_F_FIXBUF   0x0200 /* `%$'. */
 #define __PRINTF_F_UPPER2   0x0400 /* Print the `x' and `b' in `0x123' and `0b010' as uppercase. */
 
 
@@ -144,6 +141,13 @@
 #endif /* !__FORMAT_ESCAPE_FNORMAL */
 
 
+#ifdef __INTELLISENSE__
+extern "C" __SSIZE_TYPE__
+format_vprintf(__pformatprinter __FORMAT_PRINTER,
+               void *__FORMAT_ARG,
+               __CHAR_TYPE const *__restrict __FORMAT_FORMAT,
+               __builtin_va_list __FORMAT_ARGS)
+#endif /* __INTELLISENSE__ */
 {
 #ifndef __DECIMALS_SELECTOR
 #define __LOCAL_DECIMALS_SELECTOR_DEFINED 1
@@ -353,7 +357,6 @@ __nextfmt:
 #endif /* __SIZEOF_POINTER__ != 2 */
 				__flags |= __PRINTF_F_HASPREC;
 			}
-			__ATTR_FALLTHROUGH
 			__IF0 {
 	case 'X':
 				__flags |= __PRINTF_F_UPPER2;
@@ -519,7 +522,7 @@ __nextfmt:
 		__CHAR32_TYPE__ __ch32;
 		/* `%I32c' --> print utf-32 character */
 		/* `%I16c' --> print utf-16 character (not surrogate support...) */
-		/* `%Lc'   --> print utf-16/32 character */
+		/* `%lc'   --> print utf-16/32 character */
 		if (!__length)
 			__ch32 = __builtin_va_arg(__FORMAT_ARGS, unsigned int) & 0x7f;
 #if __VA_SIZE >= 4
@@ -546,29 +549,264 @@ __nextfmt:
 		__given_char[0] = __ch32;
 		__string_length = 1;
 #else /* __CHAR_SIZE == 4 */
-		__string_length = (__SIZE_TYPE__)(__FORMAT_UNICODE_WRITEUTF8(__given_char, __ch32) - __given_char);
+		__string_length = (__SIZE_TYPE__)(__FORMAT_UNICODE_WRITECHAR(__given_char, __ch32) - __given_char);
 #endif /* __CHAR_SIZE != 4 */
 #endif /* !__NO_PRINTF_UNICODE_CHARS */
 		goto print_string;
 #ifndef __NO_PRINTF_QUOTE
 	case 'q':
+#if __PRINTF_F_PREFIX == __FORMAT_ESCAPE_FPRINTRAW
+#define __FORMAT_ESCAPE_FLAGS __flags & __PRINTF_F_PREFIX
+#else /* __PRINTF_F_PREFIX == __FORMAT_ESCAPE_FPRINTRAW */
+#define __FORMAT_ESCAPE_FLAGS (__flags & __PRINTF_F_PREFIX ? __FORMAT_ESCAPE_FPRINTRAW : __FORMAT_ESCAPE_FNORMAL)
+#endif /* __PRINTF_F_PREFIX != __FORMAT_ESCAPE_FPRINTRAW */
 #endif /* !__NO_PRINTF_QUOTE */
 	case 's':
 #ifndef __NO_PRINTF_UNICODE_STRING
-		/* TODO: Support for `%ls'   --> print wide-string (as utf-8) */
-		/* TODO: Support for `%I16s' --> print utf-16 string (as utf-8) */
-		/* TODO: Support for `%I32s' --> print utf-32 string (as utf-8) */
+		/* Support for `%ls'   --> print wide-string */
+		/* Support for `%I8s'  --> print utf-8 string */
+		/* Support for `%I16s' --> print utf-16 string */
+		/* Support for `%I32s' --> print utf-32 string */
+		if ((__length & 0xf0) == 0x20) {
+			/* utf-32 string */
+#ifdef __FORMAT_WCSIZE
+__do_utf32_string:;
+#elif __SIZEOF_WCHAR_T__ == 4
+__do_wchar:;
+#endif /* ... */
+#if __CHAR_SIZE != 4
+			{
+				static __UINT32_TYPE__ const __null_str32[] = { '(', 'n', 'u', 'l', 'l', ')', 0 };
+#if __CHAR_SIZE == 2
+				/* __FORMAT_UNICODE_FORMAT32: format_32to16 */
+				struct /*format_32to16_data*/ {
+					__pc16formatprinter __fd_printer; /* [1..1] Inner printer */
+					void               *__fd_arg;     /* Argument for `fd_printer' */
+				} __format_data;
+				__format_data.__fd_printer = (__pc16formatprinter)__FORMAT_PRINTER;
+#else /* __CHAR_SIZE == 2 */
+				/* __FORMAT_UNICODE_FORMAT32: format_32to8 */
+				struct /*format_32to8_data*/ {
+					__pformatprinter __fd_printer; /* [1..1] Inner printer */
+					void            *__fd_arg;     /* Argument for `fd_printer' */
+				} __format_data;
+				__format_data.__fd_printer = __FORMAT_PRINTER;
+#endif /* __CHAR_SIZE != 2 */
+				__format_data.__fd_arg     = __FORMAT_ARG;
+				if __unlikely(!__string)
+					__string = (__CHAR_TYPE *)__null_str32;
+				if (__flags & __PRINTF_F_FIXBUF)
+					__string_length = __precision;
+				else if (__flags & __PRINTF_F_HASPREC)
+					__string_length = __libc_c32nlen((__CHAR32_TYPE__ const *)__string, __precision);
+				else {
+					__string_length = __libc_c32len((__CHAR32_TYPE__ const *)__string);
+				}
+				__string_width = __string_length;
+				if (__width != 0) {
+#ifndef __NO_PRINTF_QUOTE
+					if (__ch == 'q') {
+						__string_width = (__SIZE_TYPE__)__FORMAT_ESCAPE32(&__FORMAT_WIDTH32, __NULLPTR,
+						                                                  (__CHAR32_TYPE__ const *)__string,
+						                                                  __string_length,
+						                                                  __FORMAT_ESCAPE_FLAGS);
+					} /*else*/
+#endif /* !__NO_PRINTF_QUOTE */
+					/*{
+						__string_width = __string_length;
+					}*/
+					if ((__width > __string_width) && !(__flags & __PRINTF_F_LJUST)) {
+						__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __string_width);
+						if __unlikely(__temp < 0)
+							goto __err;
+						__result += __temp;
+					}
+				}
+#ifndef __NO_PRINTF_QUOTE
+				if (__ch == 'q') {
+					__temp = __FORMAT_ESCAPE32(&__FORMAT_UNICODE_FORMAT32, &__format_data,
+					                           (__CHAR32_TYPE__ const *)__string, __string_length,
+					                           __FORMAT_ESCAPE_FLAGS);
+				} else
+#endif /* !__NO_PRINTF_QUOTE */
+				{
+					__temp = __FORMAT_UNICODE_FORMAT32(&__format_data,
+					                                   (__CHAR32_TYPE__ const *)__string,
+					                                   __string_length);
+				}
+			}
+			goto __check_string_error_and_print_tail;
+#endif /* __CHAR_SIZE != 4 */
+		} else if ((__length & 0xf0) == 0x10) {
+			/* utf-16 string */
+#ifdef __FORMAT_WCSIZE
+__do_utf16_string:;
+#elif __SIZEOF_WCHAR_T__ == 2
+__do_wchar:;
+#endif /* ... */
+#if __CHAR_SIZE != 2
+			{
+				static __UINT16_TYPE__ const __null_str16[] = { '(', 'n', 'u', 'l', 'l', ')', 0 };
+#if __CHAR_SIZE == 4
+				/* __FORMAT_UNICODE_FORMAT16: format_16to32 */
+				struct /*format_16to32_data*/ {
+					__pc32formatprinter __fd_printer;   /* [1..1] Inner printer */
+					void               *__fd_arg;       /* Argument for `fd_printer' */
+					__CHAR16_TYPE__     __fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+				} __format_data;
+				__format_data.__fd_printer = (__pc32formatprinter)__FORMAT_PRINTER;
+#else /* __CHAR_SIZE == 4 */
+				/* __FORMAT_UNICODE_FORMAT16: format_16to8 */
+				struct /*format_16to8_data*/ {
+					__pformatprinter __fd_printer;   /* [1..1] Inner printer */
+					void            *__fd_arg;       /* Argument for `fd_printer' */
+					__CHAR16_TYPE__  __fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+				} __format_data;
+				__format_data.__fd_printer = __FORMAT_PRINTER;
+#endif /* __CHAR_SIZE != 4 */
+				__format_data.__fd_arg       = __FORMAT_ARG;
+				__format_data.__fd_surrogate = 0;
+				if __unlikely(!__string)
+					__string = (__CHAR_TYPE *)__null_str16;
+				if (__flags & __PRINTF_F_FIXBUF)
+					__string_length = __precision;
+				else if (__flags & __PRINTF_F_HASPREC)
+					__string_length = __libc_c16nlen((__CHAR16_TYPE__ const *)__string, __precision);
+				else {
+					__string_length = __libc_c16len((__CHAR16_TYPE__ const *)__string);
+				}
+				__string_width = __string_length;
+				if (__width != 0) {
+#ifndef __NO_PRINTF_QUOTE
+					if (__ch == 'q') {
+						__string_width = (__SIZE_TYPE__)__FORMAT_ESCAPE16(&__FORMAT_WIDTH16, __NULLPTR,
+						                                                  (__CHAR16_TYPE__ const *)__string,
+						                                                  __string_length,
+						                                                  __FORMAT_ESCAPE_FLAGS);
+					} else
+#endif /* !__NO_PRINTF_QUOTE */
+					{
+						__string_width = (__SIZE_TYPE__)__FORMAT_WIDTH16(__NULLPTR, (__CHAR16_TYPE__ const *)__string, __string_length);
+					}
+					if ((__width > __string_width) && !(__flags & __PRINTF_F_LJUST)) {
+						__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __string_width);
+						if __unlikely(__temp < 0)
+							goto __err;
+						__result += __temp;
+					}
+				}
+#ifndef __NO_PRINTF_QUOTE
+				if (__ch == 'q') {
+					__temp = __FORMAT_ESCAPE16(&__FORMAT_UNICODE_FORMAT16, &__format_data,
+					                           (__CHAR16_TYPE__ const *)__string, __string_length,
+					                           __FORMAT_ESCAPE_FLAGS);
+				} else
+#endif /* !__NO_PRINTF_QUOTE */
+				{
+					__temp = __FORMAT_UNICODE_FORMAT16(&__format_data,
+					                                   (__CHAR16_TYPE__ const *)__string,
+					                                   __string_length);
+				}
+			}
+			goto __check_string_error_and_print_tail;
+#endif /* __CHAR_SIZE != 2 */
+		} else if ((__length & 0xf0) == 0x00) {
+			/* utf-8 string */
+#ifdef __FORMAT_WCSIZE
+__do_utf8_string:;
+#elif __SIZEOF_WCHAR_T__ == 1
+__do_wchar:;
+#endif /* ... */
+#if __CHAR_SIZE != 1
+			{
+				static __UINT8_TYPE__ const __null_str8[] = { '(', 'n', 'u', 'l', 'l', ')', 0 };
+#if __CHAR_SIZE == 4
+				/* __FORMAT_UNICODE_FORMAT8: format_8to32 */
+				struct /*format_8to32_data*/ {
+					__pc32formatprinter __fd_printer;    /* [1..1] Inner printer */
+					void               *__fd_arg;        /* Argument for `fd_printer' */
+					__UINT32_TYPE__     __fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+				} __format_data;
+				__format_data.__fd_printer = (__pc32formatprinter)__FORMAT_PRINTER;
+#else /* __CHAR_SIZE == 4 */
+				/* __FORMAT_UNICODE_FORMAT8: format_8to16 */
+				struct /*format_8to16_data*/ {
+					__pc16formatprinter __fd_printer;    /* [1..1] Inner printer */
+					void               *__fd_arg;        /* Argument for `fd_printer' */
+					__UINT32_TYPE__     __fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+				} __format_data;
+				__format_data.__fd_printer = (__pc16formatprinter)__FORMAT_PRINTER;
+#endif /* __CHAR_SIZE != 4 */
+				__format_data.__fd_arg        = __FORMAT_ARG;
+				__format_data.__fd_incomplete = 0;
+				if __unlikely(!__string)
+					__string = (__CHAR_TYPE *)__null_str8;
+				if (__flags & __PRINTF_F_FIXBUF)
+					__string_length = __precision;
+				else if (__flags & __PRINTF_F_HASPREC)
+					__string_length = __libc_strnlen((char const *)__string, __precision);
+				else {
+					__string_length = __libc_strlen((char const *)__string);
+				}
+				__string_width = __string_length;
+				if (__width != 0) {
+#ifndef __NO_PRINTF_QUOTE
+					if (__ch == 'q') {
+						__string_width = (__SIZE_TYPE__)__FORMAT_ESCAPE8(&__FORMAT_WIDTH8, __NULLPTR,
+						                                                 (char const *)__string,
+						                                                 __string_length,
+						                                                 __FORMAT_ESCAPE_FLAGS);
+					} else
+#endif /* !__NO_PRINTF_QUOTE */
+					{
+						__string_width = (__SIZE_TYPE__)__FORMAT_WIDTH8(__NULLPTR, (char const *)__string, __string_length);
+					}
+					if ((__width > __string_width) && !(__flags & __PRINTF_F_LJUST)) {
+						__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __string_width);
+						if __unlikely(__temp < 0)
+							goto __err;
+						__result += __temp;
+					}
+				}
+#ifndef __NO_PRINTF_QUOTE
+				if (__ch == 'q') {
+					__temp = __FORMAT_ESCAPE8(&__FORMAT_UNICODE_FORMAT8, &__format_data,
+					                          (char const *)__string, __string_length,
+					                          __FORMAT_ESCAPE_FLAGS);
+				} else
+#endif /* !__NO_PRINTF_QUOTE */
+				{
+					__temp = __FORMAT_UNICODE_FORMAT8(&__format_data,
+					                                  (char const *)__string,
+					                                  __string_length);
+				}
+			}
+			goto __check_string_error_and_print_tail;
+#endif /* __CHAR_SIZE != 1 */
+		} else if ((__length & 0x1000) == 0x1000) {
+#ifdef __FORMAT_WCSIZE
+			/* wchar-string */
+			if (__FORMAT_WCSIZE == 4)
+				goto __do_utf32_string;
+			if (__FORMAT_WCSIZE == 2)
+				goto __do_utf16_string;
+			goto __do_utf8_string;
+#else /* __FORMAT_WCSIZE */
+			goto __do_wchar;
+#endif /* !__FORMAT_WCSIZE */
+		}
 #endif /* !__NO_PRINTF_UNICODE_STRING */
+
+
 #if __CHAR_SIZE == __SIZEOF_CHAR__
 		__string = __builtin_va_arg(__FORMAT_ARGS, char *);
-		if __unlikely(!__string) {
+		if __unlikely(!__string)
 			__string = "(null)";
-		}
 #else /* __CHAR_SIZE == __SIZEOF_CHAR__ */
 		__string = __builtin_va_arg(__FORMAT_ARGS, __CHAR_TYPE *);
 		if __unlikely(!__string) {
-			static __CHAR_TYPE const null_str[] = { '(', 'n', 'u', 'l', 'l', ')' };
-			__string = null_str;
+			static __CHAR_TYPE const __null_str[] = { '(', 'n', 'u', 'l', 'l', ')', 0 };
+			__string = __null_str;
 		}
 #endif /* __CHAR_SIZE != __SIZEOF_CHAR__ */
 		if (__flags & __PRINTF_F_FIXBUF)
@@ -599,18 +837,13 @@ print_string:
 			if (__ch == 'q') {
 				__string_width = (__SIZE_TYPE__)__FORMAT_ESCAPE(&__FORMAT_WIDTH, __NULLPTR,
 				                                                __string, __string_length,
-#if __PRINTF_F_PREFIX == __FORMAT_ESCAPE_FPRINTRAW
-				                                                __flags & __PRINTF_F_PREFIX
-#else /* __PRINTF_F_PREFIX == __FORMAT_ESCAPE_FPRINTRAW */
-				                                                __flags & __PRINTF_F_PREFIX
-				                                                ? __FORMAT_ESCAPE_FPRINTRAW
-				                                                : __FORMAT_ESCAPE_FNORMAL
-#endif /* __PRINTF_F_PREFIX != __FORMAT_ESCAPE_FPRINTRAW */
-				                                                );
+				                                                __FORMAT_ESCAPE_FLAGS);
 			} else
 #endif /* !__NO_PRINTF_QUOTE */
 			{
+#if __CHAR_SIZE != 4
 				__string_width = (__SIZE_TYPE__)__FORMAT_WIDTH(__NULLPTR, __string, __string_length);
+#endif /* __CHAR_SIZE != 4 */
 			}
 			if ((__width > __string_width) && !(__flags & __PRINTF_F_LJUST)) {
 				__temp = __FORMAT_REPEAT(__FORMAT_PRINTER, __FORMAT_ARG, ' ', __width - __string_width);
@@ -621,20 +854,18 @@ print_string:
 		}
 #ifndef __NO_PRINTF_QUOTE
 		if (__ch == 'q') {
-			__temp = __FORMAT_ESCAPE(__FORMAT_PRINTER, __FORMAT_ARG, __string, __string_length,
-#if __PRINTF_F_PREFIX == __FORMAT_ESCAPE_FPRINTRAW
-			                         __flags & __PRINTF_F_PREFIX
-#else /* __PRINTF_F_PREFIX == __FORMAT_ESCAPE_FPRINTRAW */
-			                         __flags & __PRINTF_F_PREFIX
-			                         ? __FORMAT_ESCAPE_FPRINTRAW
-			                         : __FORMAT_ESCAPE_FNORMAL
-#endif /* __PRINTF_F_PREFIX != __FORMAT_ESCAPE_FPRINTRAW */
-			                         );
+			__temp = __FORMAT_ESCAPE(__FORMAT_PRINTER, __FORMAT_ARG,
+			                         __string, __string_length,
+			                         __FORMAT_ESCAPE_FLAGS);
 		} else
+#undef __FORMAT_ESCAPE_FLAGS
 #endif /* !__NO_PRINTF_QUOTE */
 		{
 			__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __string, __string_length);
 		}
+#ifndef __NO_PRINTF_UNICODE_STRING
+__check_string_error_and_print_tail:
+#endif /* !__NO_PRINTF_UNICODE_STRING */
 		if __unlikely(__temp < 0)
 			goto __err;
 		__result += __temp;
@@ -1440,7 +1671,7 @@ __do_float_normal_width:
 		}
 		if ((__flags & (__PRINTF_F_HASWIDTH | __PRINTF_F_LJUST)) == (__PRINTF_F_HASWIDTH) &&
 		    (__width > __total_len)) {
-			/* Insert a missing decimal seperator. */
+			/* Insert a missing decimal separator. */
 			if (__flags & __PRINTF_F_PADZERO && __max_prec == 0) {
 				__buf[0] = '.';
 				__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __buf, 1);
@@ -1499,7 +1730,6 @@ __err:
 #undef __LOCAL_DECIMALS_SELECTOR_DEFINED
 #undef __DECIMALS_SELECTOR
 #endif /* __LOCAL_DECIMALS_SELECTOR_DEFINED */
-#undef __FORMAT_VPRINTF
 #undef __FORMAT_ESCAPE
 #undef __FORMAT_REPEAT
 #undef __PRINTF_LENGTH_I64
@@ -1537,10 +1767,18 @@ __err:
 #undef __FORMAT_PRINTER
 #undef __FORMAT_FORMAT
 #undef __FORMAT_WIDTH
-#undef __FORMAT_UNICODE_WRITEUTF8
+#undef __FORMAT_WIDTH8
+#undef __FORMAT_WIDTH16
+#undef __FORMAT_WIDTH32
+#undef __FORMAT_UNICODE_FORMAT8
+#undef __FORMAT_UNICODE_FORMAT16
+#undef __FORMAT_UNICODE_FORMAT32
+#undef __FORMAT_UNICODE_WRITECHAR
 #undef __FORMAT_HEXDUMP
 #undef __FORMAT_REPEAT
 #undef __FORMAT_ESCAPE
-#undef __FORMAT_VPRINTF
+#undef __FORMAT_ESCAPE8
+#undef __FORMAT_ESCAPE16
+#undef __FORMAT_ESCAPE32
 #undef __CHAR_SIZE
 #undef __CHAR_TYPE

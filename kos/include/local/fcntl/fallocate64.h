@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17a0fbd0 */
+/* HASH CRC-32:0xdf965f8f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate,(__fd_t __fd, int __mode, __
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_fallocate,(__fd_t __fd, int __mode, __off32_t __offset, __off32_t __length),fallocate,(__fd,__mode,__offset,__length))
 #else /* LIBC: fallocate */
 #include <local/fcntl/fallocate.h>
-#define __localdep_fallocate(fd, mode, offset, length) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fallocate))(fd, mode, (__FS_TYPE(off))(offset), (__FS_TYPE(off))(length))
+#define __localdep_fallocate (*(int(__LIBCCALL*)(__fd_t, int, __off32_t, __off32_t))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fallocate)))
 #endif /* fallocate... */
 #endif /* !____localdep_fallocate_defined */
 

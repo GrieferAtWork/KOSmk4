@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9e9a8db */
+/* HASH CRC-32:0x572f4ba4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsend.h>
 /* Same as `STR+c16len(STR)' */
-#define __libc_core_c16end(string) (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend))((__WCHAR_TYPE__ const *)(string))
+#define __libc_core_c16end (*(__CHAR16_TYPE__ *(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend)))
 #else /* LIBC: c16end */
 #include <local/wchar/c16end.h>
 /* Same as `STR+c16len(STR)' */
@@ -50,7 +50,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__C
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsend.h>
 /* Same as `STR+c32len(STR)' */
-#define __libc_core_c32end(string) (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend))((__WCHAR_TYPE__ const *)(string))
+#define __libc_core_c32end (*(__CHAR32_TYPE__ *(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsend)))
 #else /* LIBC: c32end */
 #include <local/wchar/c32end.h>
 /* Same as `STR+c32len(STR)' */
@@ -65,7 +65,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsnend.h>
 /* Same as `STR+c16nlen(STR, MAX_CHARS)' */
-#define __libc_core_c16nend(string, maxlen) (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnend))((__WCHAR_TYPE__ const *)(string), maxlen)
+#define __libc_core_c16nend (*(__CHAR16_TYPE__ *(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnend)))
 #else /* LIBC: c16nend */
 #include <local/wchar/c16nend.h>
 /* Same as `STR+c16nlen(STR, MAX_CHARS)' */
@@ -77,7 +77,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__N
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsnend.h>
 /* Same as `STR+c32nlen(STR, MAX_CHARS)' */
-#define __libc_core_c32nend(string, maxlen) (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnend))((__WCHAR_TYPE__ const *)(string), maxlen)
+#define __libc_core_c32nend (*(__CHAR32_TYPE__ *(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnend)))
 #else /* LIBC: c32nend */
 #include <local/wchar/c32nend.h>
 /* Same as `STR+c32nlen(STR, MAX_CHARS)' */
@@ -92,7 +92,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcslen.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __libc_core_c16len(string) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)(string))
+#define __libc_core_c16len (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen)))
 #else /* LIBC: c16len */
 #include <local/wchar/c16len.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
@@ -104,7 +104,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcslen.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __libc_core_c32len(string) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)(string))
+#define __libc_core_c32len (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen)))
 #else /* LIBC: c32len */
 #include <local/wchar/c32len.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
@@ -119,7 +119,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsnlen.h>
 /* Same as `c16len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
-#define __libc_core_c16nlen(string, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen))((__WCHAR_TYPE__ const *)(string), maxlen)
+#define __libc_core_c16nlen (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen)))
 #else /* LIBC: c16nlen */
 #include <local/wchar/c16nlen.h>
 /* Same as `c16len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
@@ -131,7 +131,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsnlen.h>
 /* Same as `c32len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
-#define __libc_core_c32nlen(string, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen))((__WCHAR_TYPE__ const *)(string), maxlen)
+#define __libc_core_c32nlen (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR32_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsnlen)))
 #else /* LIBC: c32nlen */
 #include <local/wchar/c32nlen.h>
 /* Same as `c32len', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
@@ -146,7 +146,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcscmp.h>
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-#define __libc_core_c16cmp(s1, s2) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscmp))((__WCHAR_TYPE__ const *)(s1), (__WCHAR_TYPE__ const *)(s2))
+#define __libc_core_c16cmp (*(int(__LIBCCALL*)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscmp)))
 #else /* LIBC: c16cmp */
 #include <local/wchar/c16cmp.h>
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
@@ -158,7 +158,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcscmp.h>
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-#define __libc_core_c32cmp(s1, s2) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscmp))((__WCHAR_TYPE__ const *)(s1), (__WCHAR_TYPE__ const *)(s2))
+#define __libc_core_c32cmp (*(int(__LIBCCALL*)(__CHAR32_TYPE__ const *, __CHAR32_TYPE__ const *))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscmp)))
 #else /* LIBC: c32cmp */
 #include <local/wchar/c32cmp.h>
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
@@ -173,7 +173,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsncmp.h>
 /* Same as `c16cmp', but compare at most `MAXLEN' characters from either string */
-#define __libc_core_c16ncmp(s1, s2, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp))((__WCHAR_TYPE__ const *)(s1), (__WCHAR_TYPE__ const *)(s2), maxlen)
+#define __libc_core_c16ncmp (*(int(__LIBCCALL*)(__CHAR16_TYPE__ const *, __CHAR16_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp)))
 #else /* LIBC: c16ncmp */
 #include <local/wchar/c16ncmp.h>
 /* Same as `c16cmp', but compare at most `MAXLEN' characters from either string */
@@ -185,7 +185,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsncmp.h>
 /* Same as `c32cmp', but compare at most `MAXLEN' characters from either string */
-#define __libc_core_c32ncmp(s1, s2, maxlen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp))((__WCHAR_TYPE__ const *)(s1), (__WCHAR_TYPE__ const *)(s2), maxlen)
+#define __libc_core_c32ncmp (*(int(__LIBCCALL*)(__CHAR32_TYPE__ const *, __CHAR32_TYPE__ const *, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsncmp)))
 #else /* LIBC: c32ncmp */
 #include <local/wchar/c32ncmp.h>
 /* Same as `c32cmp', but compare at most `MAXLEN' characters from either string */

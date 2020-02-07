@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc086fad0 */
+/* HASH CRC-32:0xc7b6234e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -301,7 +301,7 @@ __LOCAL_LIBC(format_printf) __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 4) __SS
                                                void *__arg,
                                                char const *__restrict __format,
                                                ...) __THROWS(...) {
-#line 868 "kos/src/libc/magic/format-printer.c"
+#line 898 "kos/src/libc/magic/format-printer.c"
 	__SSIZE_TYPE__ __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

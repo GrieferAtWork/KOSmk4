@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10c6d54f */
+/* HASH CRC-32:0xd5bb1048 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,13 +37,64 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localde
 #endif /* !____localdep_unicode_writeutf8_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-/* Format printer (compatible with `__pc32formatprinter') for
- * converting UTF-32 unicode input data into a UTF-8 output */
+/* Format printer (compatible with `__pc16formatprinter') for
+ * converting wide-character unicode input data into a UTF-8 output */
 __LOCAL_LIBC(format_32to8) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to8))(/*struct format_32to8_data **/ void *__arg,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to8))(/*struct format_wto8_data **/ void *__arg,
                                                           __CHAR32_TYPE__ const *__data,
                                                           __SIZE_TYPE__ __datalen) {
-#line 1593 "kos/src/libc/magic/unicode.c"
+#line 1464 "kos/src/libc/magic/unicode.c"
+#if 4 == 2
+	struct __local_format_16to8_data {
+		__pformatprinter __fd_printer;   /* [1..1] Inner printer */
+		void            *__fd_arg;       /* Argument for `fd_printer' */
+		__CHAR16_TYPE__  __fd_surrogate; /* Pending high surrogate (or 0 if no surrogate is pending) */
+	};
+	char __buf[64], *__dst = __buf;
+	struct __local_format_16to8_data *__closure;
+	__SSIZE_TYPE__ __temp, __result = 0;
+	__SIZE_TYPE__ __i = 0;
+	__CHAR32_TYPE__ __ch;
+	__closure = (struct __local_format_16to8_data *)__arg;
+	if (__closure->__fd_surrogate && __datalen) {
+		__ch  = __closure->__fd_surrogate - 0xd800;
+		__closure->__fd_surrogate = 0;
+		__ch += 0x10000;
+		__ch += ((__CHAR16_TYPE__ const *)__data)[0] - 0xdc00;
+		__dst = __localdep_unicode_writeutf8(__dst, __ch);
+		__i = 1;
+		goto __after_dst_write;
+	}
+	while (__i < __datalen) {
+		do {
+			__CHAR16_TYPE__ __ch16;
+			__ch16 = ((__CHAR16_TYPE__ const *)__data)[__i++];
+			if (__ch16 >= 0xd800 &&
+			    __ch16 <= 0xdbff) {
+				if (__i >= __datalen) {
+					__closure->__fd_surrogate = __ch16;
+					break;
+				}
+				__ch  = __ch16 - 0xd800;
+				__ch += 0x10000;
+				__ch += __data[__i++] - 0xdc00;
+			} else {
+				__ch = __ch16;
+			}
+			__dst = __localdep_unicode_writeutf8(__dst, __ch);
+__after_dst_write:
+			;
+		} while ((__dst + 4) < __COMPILER_ENDOF(__buf) && __i < __datalen);
+		__temp = (*__closure->__fd_printer)(__closure->__fd_arg, __buf, (__SIZE_TYPE__)(__dst - __buf));
+		if __unlikely(__temp < 0)
+			goto __err;
+		__result += __temp;
+		__dst = __buf;
+	}
+	return __result;
+__err:
+	return __temp;
+#else
 	struct __local_format_32to8_data {
 		__pformatprinter __fd_printer; /* [1..1] Inner printer */
 		void            *__fd_arg;     /* Argument for `fd_printer' */
@@ -56,7 +107,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to8))(/*struct format_32to8_
 	while (__i < __datalen) {
 		char *__dst = __buf;
 		do {
-			__dst = __localdep_unicode_writeutf8(__dst, __data[__i++]);
+			__dst = __localdep_unicode_writeutf8(__dst, ((__CHAR32_TYPE__ const *)__data)[__i++]);
 		} while ((__dst + 7) < __COMPILER_ENDOF(__buf) && __i < __datalen);
 		__temp = (*__closure->__fd_printer)(__closure->__fd_arg, __buf, (__SIZE_TYPE__)(__dst - __buf));
 		if __unlikely(__temp < 0)
@@ -66,6 +117,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_32to8))(/*struct format_32to8_
 	return __result;
 __err:
 	return __temp;
+#endif
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_format_32to8_defined */

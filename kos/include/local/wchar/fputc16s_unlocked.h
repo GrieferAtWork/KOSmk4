@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6891edc */
+/* HASH CRC-32:0xec721aa4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_f
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/file_wprinter_unlocked.h>
 /* Same as `file_c16printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-#define __localdep_file_c16printer_unlocked(arg, data, datalen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_wprinter_unlocked))(arg, (__WCHAR_TYPE__ const *)(data), datalen)
+#define __localdep_file_c16printer_unlocked (*(__SSIZE_TYPE__(__LIBCCALL*)(void *, __CHAR16_TYPE__ const *__restrict, __SIZE_TYPE__))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_wprinter_unlocked)))
 #else /* LIBC: file_c16printer_unlocked */
 #include <local/wchar/file_c16printer_unlocked.h>
 /* Same as `file_c16printer()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
@@ -64,7 +64,7 @@ __CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__N
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcslen.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-#define __localdep_c16len(string) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen))((__WCHAR_TYPE__ const *)(string))
+#define __localdep_c16len (*(__SIZE_TYPE__(__LIBCCALL*)(__CHAR16_TYPE__ const *__restrict))&(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslen)))
 #else /* LIBC: c16len */
 #include <local/wchar/c16len.h>
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
