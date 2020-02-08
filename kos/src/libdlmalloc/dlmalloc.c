@@ -2614,7 +2614,12 @@ typedef struct malloc_state*    mstate;
 
 struct malloc_params {
   size_t magic;
+#ifdef MALLOC_PAGESIZE
+#define malloc_pagesize MALLOC_PAGESIZE
+#else /* !MALLOC_PAGESIZE */
   size_t page_size;
+#define malloc_pagesize mparams.page_size
+#endif /* !MALLOC_PAGESIZE */
   size_t granularity;
   size_t mmap_threshold;
   size_t trim_threshold;
@@ -2667,7 +2672,7 @@ static struct malloc_state _gm_;
 
 /* page-align a size */
 #define page_align(S)\
- (((S) + (mparams.page_size - SIZE_T_ONE)) & ~(mparams.page_size - SIZE_T_ONE))
+ (((S) + (malloc_pagesize - SIZE_T_ONE)) & ~(malloc_pagesize - SIZE_T_ONE))
 
 /* granularity-align a size */
 #define granularity_align(S)\
@@ -2686,7 +2691,7 @@ static struct malloc_state _gm_;
 #define SYS_ALLOC_PADDING (TOP_FOOT_SIZE + MALLOC_ALIGNMENT)
 
 #define is_page_aligned(S)\
-   (((size_t)(S) & (mparams.page_size - SIZE_T_ONE)) == 0)
+   (((size_t)(S) & (malloc_pagesize - SIZE_T_ONE)) == 0)
 #define is_granularity_aligned(S)\
    (((size_t)(S) & (mparams.granularity - SIZE_T_ONE)) == 0)
 
@@ -3137,7 +3142,9 @@ static int init_mparams(void) {
         ((psize            & (psize-SIZE_T_ONE))            != 0))
       ABORT;
     mparams.granularity = gsize;
-    mparams.page_size = psize;
+#ifndef MALLOC_PAGESIZE
+    malloc_pagesize = psize;
+#endif /* !MALLOC_PAGESIZE */
     mparams.mmap_threshold = DEFAULT_MMAP_THRESHOLD;
     mparams.trim_threshold = DEFAULT_TRIM_THRESHOLD;
 #if MORECORE_CONTIGUOUS
@@ -3195,7 +3202,7 @@ static int change_mparam(int param_number, int value) {
     mparams.trim_threshold = val;
     return 1;
   case M_GRANULARITY:
-    if (val >= mparams.page_size && ((val & (val-1)) == 0)) {
+    if (val >= malloc_pagesize && ((val & (val-1)) == 0)) {
       mparams.granularity = val;
       return 1;
     }
@@ -3241,7 +3248,7 @@ static void do_check_mmapped_chunk(mstate m, mchunkptr p) {
   assert((is_aligned(chunk2mem(p))) || (p->head == FENCEPOST_HEAD));
   assert(ok_address(m, p));
   assert(!is_small(sz));
-  assert((len & (mparams.page_size-SIZE_T_ONE)) == 0);
+  assert((len & (malloc_pagesize-SIZE_T_ONE)) == 0);
   assert(chunk_plus_offset(p, sz)->head == FENCEPOST_HEAD);
   assert(chunk_plus_offset(p, sz+SIZE_T_SIZE)->head == 0);
 }
@@ -5288,14 +5295,14 @@ int dlposix_memalign(void** pp, size_t alignment, size_t bytes) {
 void* dlvalloc(size_t bytes) {
   size_t pagesz;
   ensure_initialization();
-  pagesz = mparams.page_size;
+  pagesz = malloc_pagesize;
   return dlmemalign(pagesz, bytes);
 }
 
 void* dlpvalloc(size_t bytes) {
   size_t pagesz;
   ensure_initialization();
-  pagesz = mparams.page_size;
+  pagesz = malloc_pagesize;
   return dlmemalign(pagesz, (bytes + pagesz - SIZE_T_ONE) & ~(pagesz - SIZE_T_ONE));
 }
 
@@ -5421,7 +5428,7 @@ mspace create_mspace(size_t capacity, int locked) {
   size_t msize;
   ensure_initialization();
   msize = pad_request(sizeof(struct malloc_state));
-  if (capacity < (size_t) -(msize + TOP_FOOT_SIZE + mparams.page_size)) {
+  if (capacity < (size_t) -(msize + TOP_FOOT_SIZE + malloc_pagesize)) {
     size_t rs = ((capacity == 0)? mparams.granularity :
                  (capacity + TOP_FOOT_SIZE + msize));
     size_t tsize = granularity_align(rs);
@@ -5441,7 +5448,7 @@ mspace create_mspace_with_base(void* base, size_t capacity, int locked) {
   ensure_initialization();
   msize = pad_request(sizeof(struct malloc_state));
   if (capacity > msize + TOP_FOOT_SIZE &&
-      capacity < (size_t) -(msize + TOP_FOOT_SIZE + mparams.page_size)) {
+      capacity < (size_t) -(msize + TOP_FOOT_SIZE + malloc_pagesize)) {
     m = init_user_mstate((char*)base, capacity);
     m->seg.sflags = EXTERN_BIT;
     set_lock(m, locked);

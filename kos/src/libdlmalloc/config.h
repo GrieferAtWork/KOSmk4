@@ -140,12 +140,26 @@
 #include <assert.h>
 #include <unistd.h>
 
+/* Configure dlmalloc to be a lot more tame in regards to allocations */
+#define DEFAULT_GRANULARITY    (2048 * __SIZEOF_POINTER__)
+#define DEFAULT_TRIM_THRESHOLD 4096
+#define DEFAULT_MMAP_THRESHOLD 16384
+#define MAX_RELEASE_CHECK_RATE 511
+
 #ifdef __ARCH_PAGESIZE
+#define MALLOC_PAGESIZE    __ARCH_PAGESIZE
 #define malloc_getpagesize __ARCH_PAGESIZE
+#if DEFAULT_GRANULARITY < __ARCH_PAGESIZE
+#undef DEFAULT_GRANULARITY
+#define DEFAULT_GRANULARITY __ARCH_PAGESIZE
+#endif /* DEFAULT_GRANULARITY < __ARCH_PAGESIZE */
+#if DEFAULT_TRIM_THRESHOLD < __ARCH_PAGESIZE
+#undef DEFAULT_TRIM_THRESHOLD
+#define DEFAULT_TRIM_THRESHOLD __ARCH_PAGESIZE
+#endif /* DEFAULT_TRIM_THRESHOLD < __ARCH_PAGESIZE */
 #else /* __ARCH_PAGESIZE */
 #define malloc_getpagesize getpagesize()
 #endif /* !__ARCH_PAGESIZE */
-
 
 #if MALLOC_ALIGNMENT < 8
 #undef MALLOC_ALIGNMENT
