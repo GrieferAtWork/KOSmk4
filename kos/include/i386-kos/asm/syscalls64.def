@@ -76,6 +76,7 @@ clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRA
        pid_t *ctid, uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
+process_spawnveat = process_spawnveatx64;
 recvmsg = recvmsgx64;
 getitimer = getitimerx64;
 setitimer = setitimerx64;
@@ -509,6 +510,7 @@ mq_timedreceive = mq_timedreceivex64;
 -0x000000000000001b:mktty
 -0x000000000000001c:raiseat
 -0x000000000000001d:coredump
+-0x000000000000001e:process_spawnveat
 -0x000000000000004e:kreaddir
 -0x000000000000004f:kreaddirf
 -0x0000000000000050:fchdirat

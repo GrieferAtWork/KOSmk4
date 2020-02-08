@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x951ff59c */
+/* HASH CRC-32:0x781d23d7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -813,6 +813,12 @@
 #define __NRAN1_kreaddir               buf
 #define __NRAN2_kreaddir               bufsize
 #define __NRAN3_kreaddir               mode
+#define __NRAN0_process_spawnveat      dirfd
+#define __NRAN1_process_spawnveat      pathname
+#define __NRAN2_process_spawnveat      argv
+#define __NRAN3_process_spawnveat      envp
+#define __NRAN4_process_spawnveat      flags
+#define __NRAN5_process_spawnveat      actions
 #define __NRAN0_coredump               curr_state
 #define __NRAN1_coredump               orig_state
 #define __NRAN2_coredump               traceback_vector
@@ -2744,6 +2750,20 @@
                                                    ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
                                                    ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
                                                    ,((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK|READDIR_SKIPREL)) ? "|" : "",(mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
+#define __NRATRF0_process_spawnveat      "%d"
+#define __NRATRA0_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(int)(dirfd)
+#define __NRATRF1_process_spawnveat      "%q"
+#define __NRATRA1_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(validate_readable_opt(pathname,1),pathname)
+#define __NRATRF2_process_spawnveat      "%p"
+#define __NRATRA2_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,argv
+#define __NRATRF3_process_spawnveat      "%p"
+#define __NRATRA3_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,envp
+#define __NRATRF4_process_spawnveat      "%#" PRIxSIZ "=%s%s%s%s%s"
+#define __NRATRA4_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(uintptr_t)(flags),(flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
+                                                                                 ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
+                                                                                 ,((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF5_process_spawnveat      "%p"
+#define __NRATRA5_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,actions
 #define __NRATRF0_coredump               "%p"
 #define __NRATRA0_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,curr_state
 #define __NRATRF1_coredump               "%p"

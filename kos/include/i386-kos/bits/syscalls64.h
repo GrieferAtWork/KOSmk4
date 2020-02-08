@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62337e08 */
+/* HASH CRC-32:0x8f362925 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -439,6 +439,8 @@
 #define SYS_fchdirat               __NR_fchdirat               /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
 #define SYS_kreaddirf              __NR_kreaddirf              /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 #define SYS_kreaddir               __NR_kreaddir               /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+#define SYS_process_spawnveat      __NR_process_spawnveat      /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
  *                           Note that this state does not necessarily point to the location that originally

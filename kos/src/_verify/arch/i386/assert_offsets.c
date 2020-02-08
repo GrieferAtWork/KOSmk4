@@ -94,6 +94,8 @@ local files = {
 	"../../../../include/i386-kos/kos/bits/exception_data64.h",
 	"../../../../include/i386-kos/kos/bits/ukern-struct32.h",
 	"../../../../include/i386-kos/kos/bits/ukern-struct64.h",
+	"../../../../include/i386-kos/kos/bits/spawn-action32.h",
+	"../../../../include/i386-kos/kos/bits/spawn-action64.h",
 	"../../../../include/i386-kos/kos/exec/asm/elf32.h",
 	"../../../../include/i386-kos/kos/exec/asm/elf64.h",
 	"../../../../include/i386-kos/kos/exec/bits/library-listdef32.h",
@@ -1126,6 +1128,72 @@ STATIC_ASSERT(offsetof(struct userkern64, uk_tid) == OFFSET_USERKERN64_TID);
 STATIC_ASSERT(offsetof(struct userkern64, uk_uid) == OFFSET_USERKERN64_UID);
 STATIC_ASSERT(offsetof(struct userkern64, uk_xfpu) == OFFSET_USERKERN64_XFPU);
 STATIC_ASSERT(sizeof(struct userkern64) == SIZEOF_USERKERN64);
+
+
+
+
+
+#include <kos/bits/spawn-action32.h>
+
+/* struct spawn_actionx32 */
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_closerange.sa_hifd) == __OFFSET_SPAWN_ACTIONX32_CLOSERANGE_HIFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_closerange.sa_lofd) == __OFFSET_SPAWN_ACTIONX32_CLOSERANGE_LOFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_close.sa_fd) == __OFFSET_SPAWN_ACTIONX32_CLOSE_FD);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_dup2.sa_newfd) == __OFFSET_SPAWN_ACTIONX32_DUP2_NEWFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_dup2.sa_oldfd) == __OFFSET_SPAWN_ACTIONX32_DUP2_OLDFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_openat.sa_dfd) == __OFFSET_SPAWN_ACTIONX32_OPENAT_DFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_openat.sa_fd) == __OFFSET_SPAWN_ACTIONX32_OPENAT_FD);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_openat.sa_filename) == __OFFSET_SPAWN_ACTIONX32_OPENAT_FILENAME);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_openat.sa_mode) == __OFFSET_SPAWN_ACTIONX32_OPENAT_MODE);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_openat.sa_oflags) == __OFFSET_SPAWN_ACTIONX32_OPENAT_OFLAGS);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sched_setparam.sa_param) == __OFFSET_SPAWN_ACTIONX32_SCHED_SETPARAM_PARAM);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sched_setscheduler.sa_param) == __OFFSET_SPAWN_ACTIONX32_SCHED_SETSCHEDULER_PARAM);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sched_setscheduler.sa_policy) == __OFFSET_SPAWN_ACTIONX32_SCHED_SETSCHEDULER_POLICY);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_setpgid.sa_pid) == __OFFSET_SPAWN_ACTIONX32_SETPGID_PID);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sigdfl.sa_sigset) == __OFFSET_SPAWN_ACTIONX32_SIGDFL_SIGSET);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sigdfl.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX32_SIGDFL_SIGSETSZ);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sigprocmask.sa_sigset) == __OFFSET_SPAWN_ACTIONX32_SIGPROCMASK_SIGSET);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sigprocmask.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX32_SIGPROCMASK_SIGSETSZ);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_type) == __OFFSET_SPAWN_ACTIONX32_TYPE);
+
+/* struct spawn_action_listx32 */
+/* ... */
+
+/* struct spawn_actionsx32 */
+/* ... */
+
+
+
+
+
+#include <kos/bits/spawn-action64.h>
+
+/* struct spawn_actionx64 */
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_closerange.sa_hifd) == __OFFSET_SPAWN_ACTIONX64_CLOSERANGE_HIFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_closerange.sa_lofd) == __OFFSET_SPAWN_ACTIONX64_CLOSERANGE_LOFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_close.sa_fd) == __OFFSET_SPAWN_ACTIONX64_CLOSE_FD);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_dup2.sa_newfd) == __OFFSET_SPAWN_ACTIONX64_DUP2_NEWFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_dup2.sa_oldfd) == __OFFSET_SPAWN_ACTIONX64_DUP2_OLDFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_openat.sa_dfd) == __OFFSET_SPAWN_ACTIONX64_OPENAT_DFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_openat.sa_fd) == __OFFSET_SPAWN_ACTIONX64_OPENAT_FD);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_openat.sa_filename) == __OFFSET_SPAWN_ACTIONX64_OPENAT_FILENAME);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_openat.sa_mode) == __OFFSET_SPAWN_ACTIONX64_OPENAT_MODE);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_openat.sa_oflags) == __OFFSET_SPAWN_ACTIONX64_OPENAT_OFLAGS);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sched_setparam.sa_param) == __OFFSET_SPAWN_ACTIONX64_SCHED_SETPARAM_PARAM);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sched_setscheduler.sa_param) == __OFFSET_SPAWN_ACTIONX64_SCHED_SETSCHEDULER_PARAM);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sched_setscheduler.sa_policy) == __OFFSET_SPAWN_ACTIONX64_SCHED_SETSCHEDULER_POLICY);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_setpgid.sa_pid) == __OFFSET_SPAWN_ACTIONX64_SETPGID_PID);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sigdfl.sa_sigset) == __OFFSET_SPAWN_ACTIONX64_SIGDFL_SIGSET);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sigdfl.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX64_SIGDFL_SIGSETSZ);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sigprocmask.sa_sigset) == __OFFSET_SPAWN_ACTIONX64_SIGPROCMASK_SIGSET);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sigprocmask.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX64_SIGPROCMASK_SIGSETSZ);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_type) == __OFFSET_SPAWN_ACTIONX64_TYPE);
+
+/* struct spawn_action_listx64 */
+/* ... */
+
+/* struct spawn_actionsx64 */
+/* ... */
 
 
 

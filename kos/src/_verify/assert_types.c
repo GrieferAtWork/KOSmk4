@@ -276,6 +276,7 @@ STATIC_ASSERT(WINT_MAX          == __WINT_MAX__);
 
 
 
+#ifndef __DEEMON__
 #if (defined(__SIZE_TYPE_IS_INT__) + \
      defined(__SIZE_TYPE_IS_LONG__) + \
      defined(__SIZE_TYPE_IS_LLONG__)) != 1
@@ -287,6 +288,7 @@ STATIC_ASSERT(WINT_MAX          == __WINT_MAX__);
      defined(__PTRDIFF_TYPE_IS_LLONG__)) != 1
 #error "Badly configured feature macro: `__PTRDIFF_TYPE_IS_XXX__'"
 #endif
+#endif /* !__DEEMON__ */
 
 #ifdef __SIZE_TYPE_IS_INT__
 STATIC_ASSERT(__builtin_types_compatible_p(size_t, unsigned int));
@@ -372,6 +374,7 @@ local files = {
 	"../../include/elf.h",
 	"../../include/kos/bits/debugtrap.h",
 	"../../include/kos/bits/ukern-struct.h",
+	"../../include/kos/bits/spawn-action.h",
 	"../../include/kos/exec/bits/library-listdef.h",
 	"../../include/kos/exec/bits/peb.h",
 	"../../include/kos/exec/elf.h",
@@ -1185,6 +1188,39 @@ STATIC_ASSERT(offsetof(struct userkern, uk_suid) == OFFSET_USERKERN_SUID);
 STATIC_ASSERT(offsetof(struct userkern, uk_tid) == OFFSET_USERKERN_TID);
 STATIC_ASSERT(offsetof(struct userkern, uk_uid) == OFFSET_USERKERN_UID);
 STATIC_ASSERT(sizeof(struct userkern) == SIZEOF_USERKERN);
+
+
+
+
+
+#include <kos/bits/spawn-action.h>
+
+/* struct spawn_action */
+STATIC_ASSERT(offsetof(struct spawn_action, sa_closerange.sa_hifd) == __OFFSET_SPAWN_ACTION_CLOSERANGE_HIFD);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_closerange.sa_lofd) == __OFFSET_SPAWN_ACTION_CLOSERANGE_LOFD);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_close.sa_fd) == __OFFSET_SPAWN_ACTION_CLOSE_FD);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_dup2.sa_newfd) == __OFFSET_SPAWN_ACTION_DUP2_NEWFD);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_dup2.sa_oldfd) == __OFFSET_SPAWN_ACTION_DUP2_OLDFD);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_dfd) == __OFFSET_SPAWN_ACTION_OPENAT_DFD);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_fd) == __OFFSET_SPAWN_ACTION_OPENAT_FD);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_filename) == __OFFSET_SPAWN_ACTION_OPENAT_FILENAME);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_mode) == __OFFSET_SPAWN_ACTION_OPENAT_MODE);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_oflags) == __OFFSET_SPAWN_ACTION_OPENAT_OFLAGS);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_sched_setparam.sa_param) == __OFFSET_SPAWN_ACTION_SCHED_SETPARAM_PARAM);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_sched_setscheduler.sa_param) == __OFFSET_SPAWN_ACTION_SCHED_SETSCHEDULER_PARAM);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_sched_setscheduler.sa_policy) == __OFFSET_SPAWN_ACTION_SCHED_SETSCHEDULER_POLICY);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_setpgid.sa_pid) == __OFFSET_SPAWN_ACTION_SETPGID_PID);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_sigdfl.sa_sigset) == __OFFSET_SPAWN_ACTION_SIGDFL_SIGSET);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_sigdfl.sa_sigsetsz) == __OFFSET_SPAWN_ACTION_SIGDFL_SIGSETSZ);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_sigprocmask.sa_sigset) == __OFFSET_SPAWN_ACTION_SIGPROCMASK_SIGSET);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_sigprocmask.sa_sigsetsz) == __OFFSET_SPAWN_ACTION_SIGPROCMASK_SIGSETSZ);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_type) == __OFFSET_SPAWN_ACTION_TYPE);
+
+/* struct spawn_action_list */
+/* ... */
+
+/* struct spawn_actions */
+/* ... */
 
 
 

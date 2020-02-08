@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb9081a8 */
+/* HASH CRC-32:0x33fec49a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,6 +45,7 @@
 #include <kos/bits/except-handler64.h>
 #include <kos/bits/exception_data64.h>
 #include <kos/bits/futex-expr64.h>
+#include <kos/bits/spawn-action64.h>
 #include <kos/compat/linux-stat.h>
 #include <kos/exec/bits/library-listdef64.h>
 #include <kos/kernel/cpu-state64.h>
@@ -118,6 +119,7 @@ struct sigaction64;
 struct sigaltstack64;
 struct sigevent;
 struct sockaddr;
+struct spawn_actionsx64;
 struct sysinfo;
 struct termios;
 struct timezone;
@@ -1053,6 +1055,10 @@ __CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec64 const *__iovec, __
 /* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 __CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_SC(prlimit64) */
+#if __CRT_HAVE_SC(process_spawnveat)
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+__CDECLARE_SC(,__errno_t,process_spawnveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp, __atflag_t __flags, struct spawn_actionsx64 const *__actions),(__dirfd,__pathname,__argv,__envp,__flags,__actions))
+#endif /* __CRT_HAVE_SC(process_spawnveat) */
 #if __CRT_HAVE_SC(process_vm_readv)
 __CDECLARE_SC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec64 const *__local_iov, __size_t __liovcnt, struct iovec64 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_SC(process_vm_readv) */
@@ -2488,6 +2494,10 @@ __CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec64 const *__iovec, _
 /* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
 __CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_XSC(prlimit64) */
+#if __CRT_HAVE_XSC(process_spawnveat)
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+__CDECLARE_XSC(,__errno_t,process_spawnveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp, __atflag_t __flags, struct spawn_actionsx64 const *__actions),(__dirfd,__pathname,__argv,__envp,__flags,__actions))
+#endif /* __CRT_HAVE_XSC(process_spawnveat) */
 #if __CRT_HAVE_XSC(process_vm_readv)
 __CDECLARE_XSC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec64 const *__local_iov, __size_t __liovcnt, struct iovec64 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_XSC(process_vm_readv) */

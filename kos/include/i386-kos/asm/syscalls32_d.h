@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbfedc65 */
+/* HASH CRC-32:0x751f3d9d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -529,6 +529,8 @@
 #define __NR32_ioctlf                  __UINT32_C(0xffffffca) /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define __NR32_ftime64                 __UINT32_C(0xffffffdd) /* errno_t ftime64(struct __timebx32_64 *tp) */
 #define __NR32_utime64                 __UINT32_C(0xffffffe2) /* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+#define __NR32_process_spawnveat       __UINT32_C(0xffffffe6) /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 #define __NR32_stime64                 __UINT32_C(0xffffffe7) /* errno_t stime64(time64_t const *t) */
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
@@ -1289,6 +1291,7 @@
 #define __NR32RM_ioctlf                  0
 #define __NR32RM_ftime64                 0
 #define __NR32RM_utime64                 0
+#define __NR32RM_process_spawnveat       0
 #define __NR32RM_stime64                 0
 #define __NR32RM_coredump                2
 #define __NR32RM_raiseat                 2
@@ -1481,6 +1484,7 @@
 #define __NR32CP_select64                1
 #define __NR32CP_ioctlf                  1
 #define __NR32CP_utime64                 1
+#define __NR32CP_process_spawnveat       1
 #define __NR32CP_lfutexlockexpr          1
 #define __NR32CP_lfutexexpr              1
 #define __NR32CP_lseek64                 1
@@ -1929,6 +1933,7 @@
 #define __NR32RC_ioctlf                  4
 #define __NR32RC_ftime64                 1
 #define __NR32RC_utime64                 2
+#define __NR32RC_process_spawnveat       6
 #define __NR32RC_stime64                 1
 #define __NR32RC_coredump                6
 #define __NR32RC_raiseat                 2

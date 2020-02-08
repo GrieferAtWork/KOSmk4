@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c080e62 */
+/* HASH CRC-32:0x1c63e225 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1026,6 +1026,12 @@
 #define __NR32AN0_ftime64                 tp
 #define __NR32AN0_utime64                 filename
 #define __NR32AN1_utime64                 times
+#define __NR32AN0_process_spawnveat       dirfd
+#define __NR32AN1_process_spawnveat       pathname
+#define __NR32AN2_process_spawnveat       argv
+#define __NR32AN3_process_spawnveat       envp
+#define __NR32AN4_process_spawnveat       flags
+#define __NR32AN5_process_spawnveat       actions
 #define __NR32AN0_stime64                 t
 #define __NR32AN0_coredump                curr_state
 #define __NR32AN1_coredump                orig_state
@@ -3415,6 +3421,20 @@
 #define __NR32ATRA0_utime64(filename, times) ,(validate_readable_opt(filename,1),filename)
 #define __NR32ATRF1_utime64                 "%p"
 #define __NR32ATRA1_utime64(filename, times) ,times
+#define __NR32ATRF0_process_spawnveat       "%d"
+#define __NR32ATRA0_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(int)(dirfd)
+#define __NR32ATRF1_process_spawnveat       "%q"
+#define __NR32ATRA1_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(validate_readable_opt(pathname,1),pathname)
+#define __NR32ATRF2_process_spawnveat       "%p"
+#define __NR32ATRA2_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,argv
+#define __NR32ATRF3_process_spawnveat       "%p"
+#define __NR32ATRA3_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,envp
+#define __NR32ATRF4_process_spawnveat       "%#" PRIxSIZ "=%s%s%s%s%s"
+#define __NR32ATRA4_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(uintptr_t)(flags),(flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
+                                                                                   ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
+                                                                                   ,((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR32ATRF5_process_spawnveat       "%p"
+#define __NR32ATRA5_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,actions
 #define __NR32ATRF0_stime64                 "%p"
 #define __NR32ATRA0_stime64(t)              ,t
 #define __NR32ATRF0_coredump                "%p"

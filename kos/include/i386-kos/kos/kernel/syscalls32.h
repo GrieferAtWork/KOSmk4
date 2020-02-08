@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe83df20 */
+/* HASH CRC-32:0xc514ffa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -279,6 +279,7 @@
 #define __ARCH_WANT_SYSCALL_PREADV                  1
 #define __ARCH_WANT_SYSCALL_PREADVF                 1
 #define __ARCH_WANT_SYSCALL_PRLIMIT64               1
+#define __ARCH_WANT_SYSCALL_PROCESS_SPAWNVEAT       1
 #define __ARCH_WANT_SYSCALL_PROCESS_VM_READV        1
 #define __ARCH_WANT_SYSCALL_PROCESS_VM_WRITEV       1
 #define __ARCH_WANT_SYSCALL_PROF                    1

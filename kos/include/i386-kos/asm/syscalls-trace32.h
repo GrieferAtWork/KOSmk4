@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc7b5744 */
+/* HASH CRC-32:0xa94e5ab8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1026,6 +1026,12 @@
 #define __NRAN0_ftime64                 tp
 #define __NRAN0_utime64                 filename
 #define __NRAN1_utime64                 times
+#define __NRAN0_process_spawnveat       dirfd
+#define __NRAN1_process_spawnveat       pathname
+#define __NRAN2_process_spawnveat       argv
+#define __NRAN3_process_spawnveat       envp
+#define __NRAN4_process_spawnveat       flags
+#define __NRAN5_process_spawnveat       actions
 #define __NRAN0_stime64                 t
 #define __NRAN0_coredump                curr_state
 #define __NRAN1_coredump                orig_state
@@ -3415,6 +3421,20 @@
 #define __NRATRA0_utime64(filename, times) ,(validate_readable_opt(filename,1),filename)
 #define __NRATRF1_utime64                 "%p"
 #define __NRATRA1_utime64(filename, times) ,times
+#define __NRATRF0_process_spawnveat       "%d"
+#define __NRATRA0_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(int)(dirfd)
+#define __NRATRF1_process_spawnveat       "%q"
+#define __NRATRA1_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(validate_readable_opt(pathname,1),pathname)
+#define __NRATRF2_process_spawnveat       "%p"
+#define __NRATRA2_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,argv
+#define __NRATRF3_process_spawnveat       "%p"
+#define __NRATRA3_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,envp
+#define __NRATRF4_process_spawnveat       "%#" PRIxSIZ "=%s%s%s%s%s"
+#define __NRATRA4_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(uintptr_t)(flags),(flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
+                                                                                 ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
+                                                                                 ,((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NRATRF5_process_spawnveat       "%p"
+#define __NRATRA5_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,actions
 #define __NRATRF0_stime64                 "%p"
 #define __NRATRA0_stime64(t)              ,t
 #define __NRATRF0_coredump                "%p"

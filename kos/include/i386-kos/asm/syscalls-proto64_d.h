@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b53b35f */
+/* HASH CRC-32:0x119afe4c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -378,6 +378,7 @@
 #define __NR64AC_fchdirat               3
 #define __NR64AC_kreaddirf              5
 #define __NR64AC_kreaddir               4
+#define __NR64AC_process_spawnveat      6
 #define __NR64AC_coredump               6
 #define __NR64AC_raiseat                2
 #define __NR64AC_mktty                  4
@@ -757,6 +758,7 @@
 #define __NR64RT_fchdirat               (errno_t, __errno_t)
 #define __NR64RT_kreaddirf              (ssize_t, __ssize_t)
 #define __NR64RT_kreaddir               (ssize_t, __ssize_t)
+#define __NR64RT_process_spawnveat      (errno_t, __errno_t)
 #define __NR64RT_coredump               (errno_t, __errno_t)
 #define __NR64RT_raiseat                (errno_t, __errno_t)
 #define __NR64RT_mktty                  (fd_t, __fd_t)
@@ -1584,6 +1586,12 @@
 #define __NR64AT1_kreaddir               (struct dirent *, struct dirent *)
 #define __NR64AT2_kreaddir               (size_t, __size_t)
 #define __NR64AT3_kreaddir               (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_process_spawnveat      (fd_t, __fd_t)
+#define __NR64AT1_process_spawnveat      (char const *, char const *)
+#define __NR64AT2_process_spawnveat      (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
+#define __NR64AT3_process_spawnveat      (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
+#define __NR64AT4_process_spawnveat      (atflag_t, __atflag_t)
+#define __NR64AT5_process_spawnveat      (struct spawn_actionsx64 const *, struct spawn_actionsx64 const *)
 #define __NR64AT0_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NR64AT1_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NR64AT2_coredump               (__HYBRID_PTR64(void) const *, __HYBRID_PTR64(void) const *)
@@ -2033,6 +2041,7 @@
 #define __NR64AM_fchdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NR64AM_kreaddirf(a, b, c, d, e, f)              (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
 #define __NR64AM_kreaddir(a, b, c, d, e, f)               (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NR64AM_process_spawnveat(a, b, c, d, e, f)      (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e, (struct spawn_actionsx64 const *)f
 #define __NR64AM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
 #define __NR64AM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfo64_struct const *)b
 #define __NR64AM_mktty(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
@@ -2412,6 +2421,7 @@
 #define __NR64AP_fchdirat(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_kreaddirf(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_kreaddir(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_process_spawnveat(a, b, c, d, e, f)      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR64AP_coredump(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR64AP_raiseat(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_mktty(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d

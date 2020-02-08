@@ -179,6 +179,9 @@
 %[typeorg(<librt/bits/aioinit.h>: aioinit)]
 %[typeorg(<librt/bits/mqueue.h>: mq_attr)]
 %[typeorg(<elf.h>: elf32_phdr, elf64_phdr)]
+%[typeorg(<kos/bits/spawn-action.h>: spawn_action, spawn_actions, spawn_action_list)]
+%[typeorg(<kos/bits/spawn-action32.h>: spawn_actionx32, spawn_actionsx32, spawn_action_listx32)]
+%[typeorg(<kos/bits/spawn-action64.h>: spawn_actionx64, spawn_actionsx64, spawn_action_listx64)]
 
 %[mustundef(timezone, timeb, stat, dirent)]
 
@@ -1833,6 +1836,18 @@ coredumpx64:(struct ucpustate64 const *curr_state, struct ucpustate64 const *ori
              __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length,
              struct exception_data64 const *exception, syscall_ulong_t unwind_error) -> errno_t;
 %[endgroup]
+
+
+%[startgroup]
+@@@param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+[cp] process_spawnveat:(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp,
+                        [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags,
+                        struct spawn_actions const *actions) -> pid_t;
+[doc_alias(process_spawnveat)][cp] process_spawnveatx32:(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags, struct spawn_actionsx32 const *actions) -> errno_t;
+[doc_alias(process_spawnveat)][cp] process_spawnveatx64:(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags, struct spawn_actionsx64 const *actions) -> errno_t;
+%[endgroup]
+
+
 
 
 /* Generic system call numbers */

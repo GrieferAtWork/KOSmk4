@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c084043 */
+/* HASH CRC-32:0x777a374 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -532,6 +532,8 @@
 #define SYS_ioctlf                  __NR_ioctlf                  /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define SYS_ftime64                 __NR_ftime64                 /* errno_t ftime64(struct __timebx32_64 *tp) */
 #define SYS_utime64                 __NR_utime64                 /* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+#define SYS_process_spawnveat       __NR_process_spawnveat       /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 #define SYS_stime64                 __NR_stime64                 /* errno_t stime64(time64_t const *t) */
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done

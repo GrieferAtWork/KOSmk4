@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3d473ab */
+/* HASH CRC-32:0x9878edf4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10389,6 +10389,38 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
 	intr_exit_sysret
 	.cfi_endproc
 END(__x86_asm64_syscall_kreaddir)
+
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
+.section .text.x86.asm64_syscall.process_spawnveat
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_spawnveat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffe2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	EXTERN(sys_process_spawnveat)
+	call   sys_process_spawnveat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm64_syscall_process_spawnveat)
 
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
@@ -25529,6 +25561,44 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	.cfi_endproc
 END(__x86_asm32_int80_utime64)
 
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
+.section .text.x86.asm32_syscall_int80.process_spawnveat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_spawnveat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffe6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %ebp, %r9 /* ARG5 = REG5 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_process_spawnveat)
+	call   sys32_process_spawnveat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_int80_process_spawnveat)
+
 /* errno_t stime64(time64_t const *t) */
 .section .text.x86.asm32_syscall_int80.stime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime64)
@@ -29881,6 +29951,45 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime64, __x86_asm32_int80_ftime64
 
 /* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utime64, __x86_asm32_int80_utime64)
+
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
+.section .text.x86.asm32_syscall_sysenter.process_spawnveat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_spawnveat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffffe6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebp, %rbp
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_process_spawnveat)
+	call   sys32_process_spawnveat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__x86_asm32_sysenter_process_spawnveat)
 
 /* errno_t stime64(time64_t const *t) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_stime64, __x86_asm32_int80_stime64)
@@ -35196,6 +35305,22 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime64)
 	jmp    sys32_utime64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_utime64)
+
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
+.section .text.x86.asm32_syscall_sysrun32.process_spawnveat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_spawnveat)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_process_spawnveat)
+	jmp    sys32_process_spawnveat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_process_spawnveat)
 
 /* errno_t stime64(time64_t const *t) */
 .section .text.x86.asm32_syscall_sysrun32.stime64

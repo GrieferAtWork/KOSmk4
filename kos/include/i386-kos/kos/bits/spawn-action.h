@@ -17,12 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_THREAD_H
-#define _KOS_BITS_THREAD_H 1
+#ifndef _I386_KOS_BITS_SPAWN_ACTION_H
+#define _I386_KOS_BITS_SPAWN_ACTION_H 1
 
-#include <__stdinc.h>
+#include <hybrid/host.h>
 
-/* #define RD_TLS_BASE_REGISTER()   [arch-specific] */
-/* #define WR_TLS_BASE_REGISTER(v)  [arch-specific] */
+#ifdef __x86_64__
+#include "spawn-action64.h"
+#else /* __x86_64__ */
+#include "spawn-action32.h"
+#endif /* !__x86_64__ */
 
-#endif /* !_KOS_BITS_THREAD_H */
+#endif /* !_I386_KOS_BITS_SPAWN_ACTION_H */

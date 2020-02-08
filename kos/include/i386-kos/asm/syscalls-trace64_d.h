@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25703d98 */
+/* HASH CRC-32:0x159dccb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -813,6 +813,12 @@
 #define __NR64AN1_kreaddir               buf
 #define __NR64AN2_kreaddir               bufsize
 #define __NR64AN3_kreaddir               mode
+#define __NR64AN0_process_spawnveat      dirfd
+#define __NR64AN1_process_spawnveat      pathname
+#define __NR64AN2_process_spawnveat      argv
+#define __NR64AN3_process_spawnveat      envp
+#define __NR64AN4_process_spawnveat      flags
+#define __NR64AN5_process_spawnveat      actions
 #define __NR64AN0_coredump               curr_state
 #define __NR64AN1_coredump               orig_state
 #define __NR64AN2_coredump               traceback_vector
@@ -2744,6 +2750,20 @@
                                                      ,((mode) & READDIR_PEEK) && ((mode) & (READDIR_CONTINUE)) ? "|" : "",(mode) & READDIR_PEEK ? "READDIR_PEEK" : "" \
                                                      ,((mode) & READDIR_SKIPREL) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK)) ? "|" : "",(mode) & READDIR_SKIPREL ? "READDIR_SKIPREL" : "" \
                                                      ,((mode) & READDIR_WANTEOF) && ((mode) & (READDIR_CONTINUE|READDIR_PEEK|READDIR_SKIPREL)) ? "|" : "",(mode) & READDIR_WANTEOF ? "READDIR_WANTEOF" : ""
+#define __NR64ATRF0_process_spawnveat      "%d"
+#define __NR64ATRA0_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(int)(dirfd)
+#define __NR64ATRF1_process_spawnveat      "%q"
+#define __NR64ATRA1_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(validate_readable_opt(pathname,1),pathname)
+#define __NR64ATRF2_process_spawnveat      "%p"
+#define __NR64ATRA2_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,argv
+#define __NR64ATRF3_process_spawnveat      "%p"
+#define __NR64ATRA3_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,envp
+#define __NR64ATRF4_process_spawnveat      "%#" PRIxSIZ "=%s%s%s%s%s"
+#define __NR64ATRA4_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,(uintptr_t)(flags),(flags) & AT_EMPTY_PATH ? "AT_EMPTY_PATH" : "" \
+                                                                                   ,((flags) & AT_SYMLINK_NOFOLLOW) && ((flags) & (AT_EMPTY_PATH)) ? "|" : "",(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
+                                                                                   ,((flags) & AT_DOSPATH) && ((flags) & (AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR64ATRF5_process_spawnveat      "%p"
+#define __NR64ATRA5_process_spawnveat(dirfd, pathname, argv, envp, flags, actions) ,actions
 #define __NR64ATRF0_coredump               "%p"
 #define __NR64ATRA0_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,curr_state
 #define __NR64ATRF1_coredump               "%p"

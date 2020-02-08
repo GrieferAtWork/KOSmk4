@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9027a491 */
+/* HASH CRC-32:0xe4fb6364 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7445,6 +7445,24 @@ INTERN_FUNCTION(libc_sys_Xutime64)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xutime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xutime64, libc_sys_Xutime64)
+
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
+.section .text.crt.syscall.process_spawnveat
+INTERN_FUNCTION(libc_sys_process_spawnveat)
+	movl   $(0xffffffe6), %eax
+	jmp    libc_x86_exec_syscall6
+END(libc_sys_process_spawnveat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_process_spawnveat, libc_sys_process_spawnveat)
+
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
+.section .text.crt.syscall.Xprocess_spawnveat
+INTERN_FUNCTION(libc_sys_Xprocess_spawnveat)
+	movl   $(0xffffffe6), %eax
+	jmp    libc_x86_exec_Xsyscall6
+END(libc_sys_Xprocess_spawnveat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xprocess_spawnveat, libc_sys_Xprocess_spawnveat)
 
 /* errno_t stime64(time64_t const *t) */
 .section .text.crt.syscall.stime64

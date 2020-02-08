@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec0ecc16 */
+/* HASH CRC-32:0x25336a91 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -436,6 +436,8 @@
 #define __NR64_fchdirat               __UINT64_C(0xffffffffffffffb0) /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
 #define __NR64_kreaddirf              __UINT64_C(0xffffffffffffffb1) /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 #define __NR64_kreaddir               __UINT64_C(0xffffffffffffffb2) /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+#define __NR64_process_spawnveat      __UINT64_C(0xffffffffffffffe2) /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
  *                           Note that this state does not necessarily point to the location that originally
@@ -1115,6 +1117,7 @@
 #define __NR64RM_fchdirat               0
 #define __NR64RM_kreaddirf              0
 #define __NR64RM_kreaddir               0
+#define __NR64RM_process_spawnveat      0
 #define __NR64RM_coredump               2
 #define __NR64RM_raiseat                2
 #define __NR64RM_mktty                  0
@@ -1278,6 +1281,7 @@
 #define __NR64CP_fchdirat               1
 #define __NR64CP_kreaddirf              1
 #define __NR64CP_kreaddir               1
+#define __NR64CP_process_spawnveat      1
 #define __NR64CP_lfutexlockexpr         1
 #define __NR64CP_lfutexexpr             1
 #define __NR64CP_lfutex                 1
@@ -1648,6 +1652,7 @@
 #define __NR64RC_fchdirat               3
 #define __NR64RC_kreaddirf              5
 #define __NR64RC_kreaddir               4
+#define __NR64RC_process_spawnveat      6
 #define __NR64RC_coredump               6
 #define __NR64RC_raiseat                2
 #define __NR64RC_mktty                  4

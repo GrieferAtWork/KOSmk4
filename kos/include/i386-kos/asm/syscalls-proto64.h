@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bbedc14 */
+/* HASH CRC-32:0x4f0455c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -378,6 +378,7 @@
 #define __NRAC_fchdirat               3
 #define __NRAC_kreaddirf              5
 #define __NRAC_kreaddir               4
+#define __NRAC_process_spawnveat      6
 #define __NRAC_coredump               6
 #define __NRAC_raiseat                2
 #define __NRAC_mktty                  4
@@ -757,6 +758,7 @@
 #define __NRRT_fchdirat               (errno_t, __errno_t)
 #define __NRRT_kreaddirf              (ssize_t, __ssize_t)
 #define __NRRT_kreaddir               (ssize_t, __ssize_t)
+#define __NRRT_process_spawnveat      (errno_t, __errno_t)
 #define __NRRT_coredump               (errno_t, __errno_t)
 #define __NRRT_raiseat                (errno_t, __errno_t)
 #define __NRRT_mktty                  (fd_t, __fd_t)
@@ -1584,6 +1586,12 @@
 #define __NRAT1_kreaddir               (struct dirent *, struct dirent *)
 #define __NRAT2_kreaddir               (size_t, __size_t)
 #define __NRAT3_kreaddir               (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_process_spawnveat      (fd_t, __fd_t)
+#define __NRAT1_process_spawnveat      (char const *, char const *)
+#define __NRAT2_process_spawnveat      (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
+#define __NRAT3_process_spawnveat      (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
+#define __NRAT4_process_spawnveat      (atflag_t, __atflag_t)
+#define __NRAT5_process_spawnveat      (struct spawn_actionsx64 const *, struct spawn_actionsx64 const *)
 #define __NRAT0_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NRAT1_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NRAT2_coredump               (__HYBRID_PTR64(void) const *, __HYBRID_PTR64(void) const *)
@@ -2033,6 +2041,7 @@
 #define __NRAM_fchdirat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NRAM_kreaddirf(a, b, c, d, e, f)              (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
 #define __NRAM_kreaddir(a, b, c, d, e, f)               (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NRAM_process_spawnveat(a, b, c, d, e, f)      (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e, (struct spawn_actionsx64 const *)f
 #define __NRAM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
 #define __NRAM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfo64_struct const *)b
 #define __NRAM_mktty(a, b, c, d, e, f)                  (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
@@ -2412,6 +2421,7 @@
 #define __NRAP_fchdirat(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_kreaddirf(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_kreaddir(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_process_spawnveat(a, b, c, d, e, f)      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_coredump(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_raiseat(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_mktty(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
