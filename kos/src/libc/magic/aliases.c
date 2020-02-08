@@ -25,7 +25,7 @@
 
 /* /kos/src/libc/hybrid/arch/[...]/assert[...].S */
 %[declare_kernel_export(__stack_chk_fail, abort, _ZSt9terminatev, __crt_unreachable)]
-%[declare_kernel_export(__afail, __afailf, __acheck, __acheckf)]
+%[declare_kernel_export(__afail, __afailf, __acheck, __acheckf, __stack_chk_guard)]
 
 /* /kos/src/libc/hybrid/arch/[...]/except[...].S */
 %[declare_kernel_export(error_rethrow, __cxa_rethrow, _Unwind_Resume)]

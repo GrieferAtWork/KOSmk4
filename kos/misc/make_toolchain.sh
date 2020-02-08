@@ -15,8 +15,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- Fix some problems with File.Buffer
-DEEMON_VERSION="f9b095ac54edc9b0ea593eb600b4de5ba9eeb8d5"
+#     v -- Fix ipc cmdline escaping for programs compiled using cygwin
+DEEMON_VERSION="4947d0eff9c740cdd1fee38fb14d0cf603aa81a5"
 
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 

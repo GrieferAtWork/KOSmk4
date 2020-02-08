@@ -153,9 +153,7 @@ BEGIN
 		END
 	}
 
-	final local KERNEL_EXPORTS_SOURCE =
-		"/kos/src/kernel/include/" + XARCH + "-kos/kernel/arch/core-symbols" + SUFFIX + ".h";
-
+	final local KERNEL_EXPORTS_SOURCE = "/" + config.BUILD_PATH + "/kernel-symtab.S";
 	BEGIN GROUP("kernel") { LINK, MCOPY, ELF_DIHACK,
 			enumerateSymbolsStep(
 				elfBinary: KERNEL_BINARY,
@@ -209,7 +207,9 @@ BEGIN
 							}
 						}
 						fp << ".section .rodata.kernel_symtab\n"
-							"PUBLIC_OBJECT(kernel_symbol_table)\n"
+							".global kernel_symbol_table\n"
+							".type kernel_symbol_table, @object\n"
+							"kernel_symbol_table:\n"
 							"\t" << PTR << " " << hash_mask.hex() << "\n"
 							"\t/* Symbol table */\n";
 						for (local i: [:#hash_vector]) {
@@ -233,7 +233,7 @@ BEGIN
 								fp << "\t" << U32 << " " << data[2].hex() << "\n";
 							}
 						}
-						fp << "END(kernel_symbol_table)\n"
+						fp << ".size kernel_symbol_table, . - kernel_symbol_table\n"
 						      ".section .rodata.kernel_strtab\n";
 						for (local i: [:#hash_vector]) {
 							local data = hash_vector[i];

@@ -1,3 +1,10 @@
+/*[[[magic
+local d = import("deemon");
+local f = step.toolchain.config.BUILD_PATH + "/kernel-symtab.S";
+(try d.File.open(f, "wronly,creat,excl") catch (...) none)
+	<< "#define NO_SYMTAB\n";
+options.setdefault("COMPILE.macros", d.Dict(()))["SYMTAB"] = repr("../../../../../../../" + f);
+]]]*/
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,11 +24,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_CORE_SYMBOLS32_S
-#define GUARD_KERNEL_CORE_ARCH_I386_MISC_CORE_SYMBOLS32_S 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_EXEC_CORE_SYMBOLS32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_EXEC_CORE_SYMBOLS32_S 1
 
-#include <kernel/compiler.h>
+#include SYMTAB
 
-#include <kernel/arch/core-symbols32.h>
+#ifdef NO_SYMTAB
+.section .rodata.kernel_symtab
+.global kernel_symbol_table
+.type kernel_symbol_table, @object
+kernel_symbol_table:
+	.long 0
+	/* Symbol table */
+	.long 0
+	.long 0
+	.long 0
+	.long 0
+.size kernel_symbol_table, 20
+.section .rodata.kernel_strtab
+#endif /* NO_SYMTAB */
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_CORE_SYMBOLS32_S */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_EXEC_CORE_SYMBOLS32_S */
