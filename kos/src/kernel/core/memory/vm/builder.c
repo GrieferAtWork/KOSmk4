@@ -309,17 +309,17 @@ DECL_BEGIN
 
 /* A combination of `vmb_paged_getfree' + `vmb_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-PUBLIC pageid_t KCALL
+PUBLIC NONNULL((1, 6)) pageid_t KCALL
 vmb_paged_map(struct vmb *__restrict self,
-        pageid_t hint,
-        size_t num_pages,
-        size_t min_alignment_in_pages,
-        unsigned int getfree_mode,
-        struct vm_datablock *__restrict data,
-        vm_vpage64_t data_start_vpage,
-        uintptr_half_t prot,
-        uintptr_half_t flag,
-        uintptr_t guard)
+              pageid_t hint,
+              size_t num_pages,
+              size_t min_alignment_in_pages,
+              unsigned int getfree_mode,
+              struct vm_datablock *__restrict data,
+              vm_vpage64_t data_start_vpage,
+              uintptr_half_t prot,
+              uintptr_half_t flag,
+              uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	pageid_t result;
 	result = vmb_paged_getfree(self,
@@ -500,7 +500,7 @@ vmb_apply_terminate_thread(void *UNUSED(arg),
  *                 NOTE: This argument must not be the kernel VM
  * @param: additional_actions: Additional actions to be atomically performed alongside
  *                 the application of the new memory mappings (set of `VMB_APPLY_AA_*') */
-PUBLIC void KCALL
+PUBLIC NONNULL((1, 2)) void KCALL
 vmb_apply(struct vmb *__restrict self,
           struct vm *__restrict target,
           unsigned int additional_actions,
@@ -1039,7 +1039,7 @@ handle_remove_write_error:
  * @return: true:  The overlay was successful.
  * @return: false: The given `target' already contains
  *                 mappings with conflicting address ranges. */
-PUBLIC bool KCALL
+PUBLIC NONNULL((1, 2)) bool KCALL
 vmb_overlay(struct vmb *__restrict self,
             struct vm *__restrict target)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {

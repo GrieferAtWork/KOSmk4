@@ -153,12 +153,12 @@ vmb_mapat(struct vmb *__restrict self,
  * @param: hint:                   A hint used as base when searching for free memory ranges.
  * @param: min_alignment_in_pages: The minimum alignment required from the returned pointer (or `1')
  * @return: VM_PAGED_GETFREE_ERROR:      No more virtual memory available. */
-FUNDEF NOBLOCK WUNUSED pageid_t
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) pageid_t
 NOTHROW(KCALL vmb_paged_getfree)(struct vmb *__restrict self,
                                  pageid_t hint, size_t num_pages,
                                  size_t min_alignment_in_pages,
                                  unsigned int mode);
-LOCAL NOBLOCK WUNUSED PAGEDIR_PAGEALIGNED UNCHECKED void *
+LOCAL NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *
 NOTHROW(KCALL vmb_getfree)(struct vmb *__restrict self,
                            PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
                            PAGEDIR_PAGEALIGNED size_t num_bytes,
@@ -179,7 +179,7 @@ NOTHROW(KCALL vmb_getfree)(struct vmb *__restrict self,
 
 /* A combination of `vmb_paged_getfree' + `vmb_paged_mapat'
  * @throw: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to find suitable target. */
-FUNDEF pageid_t KCALL
+FUNDEF NONNULL((1, 6)) pageid_t KCALL
 vmb_paged_map(struct vmb *__restrict self,
               pageid_t hint,
               size_t num_pages,
@@ -191,7 +191,7 @@ vmb_paged_map(struct vmb *__restrict self,
               uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
               uintptr_t guard DFL(0))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-LOCAL PAGEDIR_PAGEALIGNED UNCHECKED void *KCALL
+LOCAL PAGEDIR_PAGEALIGNED UNCHECKED NONNULL((1, 6)) void *KCALL
 vmb_map(struct vmb *__restrict self,
         PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
         PAGEDIR_PAGEALIGNED size_t num_bytes,
@@ -342,7 +342,7 @@ struct vm_execinfo_struct;
  *                 NOTE: This argument must not be the kernel VM
  * @param: additional_actions: Additional actions to be atomically performed alongside
  *                 the application of the new memory mappings (set of `VMB_APPLY_AA_*') */
-FUNDEF void KCALL
+FUNDEF NONNULL((1, 2)) void KCALL
 vmb_apply(struct vmb *__restrict self,
           struct vm *__restrict target,
           unsigned int additional_actions,
@@ -362,7 +362,7 @@ vmb_apply(struct vmb *__restrict self,
  * @return: true:  The overlay was successful.
  * @return: false: The given `target' already contains
  *                 mappings with conflicting address ranges. */
-FUNDEF bool KCALL
+FUNDEF NONNULL((1, 2)) bool KCALL
 vmb_overlay(struct vmb *__restrict self,
             struct vm *__restrict target)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);

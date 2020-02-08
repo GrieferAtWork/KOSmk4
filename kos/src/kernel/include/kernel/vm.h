@@ -1847,7 +1847,7 @@ vm_mapresat(struct vm *__restrict self,
  * @param: hint:                   A hint used as base when searching for free memory ranges.
  * @param: min_alignment_in_pages: The minimum alignment required from the returned pointer (or `1')
  * @return: VM_PAGED_GETFREE_ERROR: No more virtual memory available. */
-FUNDEF NOBLOCK WUNUSED pageid_t
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) pageid_t
 NOTHROW(KCALL vm_paged_getfree)(struct vm *__restrict self,
                                 pageid_t hint, size_t num_pages,
                                 size_t min_alignment_in_pages,
@@ -1864,7 +1864,7 @@ NOTHROW(KCALL vm_paged_getfree)(struct vm *__restrict self,
 
 
 #define VM_GETFREE_ERROR ((void *)-1)
-LOCAL NOBLOCK WUNUSED PAGEDIR_PAGEALIGNED UNCHECKED void *
+LOCAL NOBLOCK WUNUSED NONNULL((1)) PAGEDIR_PAGEALIGNED UNCHECKED void *
 NOTHROW(KCALL vm_getfree)(struct vm *__restrict self,
                           PAGEDIR_PAGEALIGNED UNCHECKED void *hint,
                           PAGEDIR_PAGEALIGNED size_t num_bytes,

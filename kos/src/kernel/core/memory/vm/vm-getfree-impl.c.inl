@@ -155,13 +155,13 @@ PUBLIC bool NOTHROW(KCALL vm_set_aslr_disabled)(bool new_disabled) {
  * @param: min_alignment_in_pages: The minimum alignment required from the returned pointer (or `1')
  * @return: VM_PAGED_GETFREE_ERROR:      No more virtual memory available. */
 #ifdef VM_GETFREE_VMB
-PUBLIC NOBLOCK WUNUSED pageid_t
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) pageid_t
 NOTHROW(KCALL vmb_paged_getfree)(struct vmb *__restrict self,
                                  pageid_t hint, size_t num_pages,
                                  size_t min_alignment_in_pages,
                                  unsigned int mode)
 #else /* VM_GETFREE_VMB */
-PUBLIC NOBLOCK WUNUSED pageid_t
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) pageid_t
 NOTHROW(KCALL vm_paged_getfree)(struct vm *__restrict self,
                                 pageid_t hint, size_t num_pages,
                                 size_t min_alignment_in_pages,
