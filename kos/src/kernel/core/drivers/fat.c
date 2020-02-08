@@ -1184,7 +1184,7 @@ Fat_SaveINodeToFatFile(struct inode const *__restrict self,
 			arb |= FAT_ARB_NO_WW; /* Disable: Write by world */
 		if (!(unix_perm & S_IROTH))
 			arb |= FAT_ARB_NO_WR; /* Disable: Read by world */
-		if (!(self->i_filemode & 0222)) {
+		if (!(unix_perm & 0222)) {
 			/* Preserve ARB flags for write permissions if those can
 			 * already be represented through use of the READONLY flag. */
 			arb &= ~(FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
@@ -1378,16 +1378,13 @@ Fat_TruncateINode(struct inode *__restrict self, pos_t new_size) {
 }
 
 
-PRIVATE NONNULL((1, 2, 3)) void KCALL
-Fat_UnlinkFileFromParentDirectory(struct directory_node *__restrict containing_directory,
-                                  struct directory_entry *__restrict containing_entry,
-                                  struct inode *__restrict node_to_unlink)
+PRIVATE NONNULL((1, 2)) void KCALL
+Fat_UnlinkFileFromParentDirectoryImpl(struct directory_node *__restrict containing_directory,
+                                      struct directory_entry *__restrict containing_entry)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_FSERROR_READONLY, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
 	pos_t min, max, i;
-	assert(node_to_unlink->i_filesize == 0);
-	assert(node_to_unlink->i_filenlink == (nlink_t)1);
 	min = containing_entry->de_pos;
 	max = containing_entry->de_fsdata.de_start;
 	for (i = min; i <= max; i += sizeof(FatFile)) {
@@ -1401,6 +1398,19 @@ Fat_UnlinkFileFromParentDirectory(struct directory_node *__restrict containing_d
 	                          (u32)(((max - min) / sizeof(FatFile)) + 1));
 	/* Check if the directory can now be truncated. */
 	FatDirectory_CheckTruncation(containing_directory);
+}
+
+PRIVATE NONNULL((1, 2, 3)) void KCALL
+Fat_UnlinkFileFromParentDirectory(struct directory_node *__restrict containing_directory,
+                                  struct directory_entry *__restrict containing_entry,
+                                  struct inode *__restrict node_to_unlink)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
+		       E_FSERROR_READONLY, E_IOERROR_READONLY,
+		       E_IOERROR, ...) {
+	assert(node_to_unlink->i_filesize == 0);
+	assert(node_to_unlink->i_filenlink == (nlink_t)1);
+	Fat_UnlinkFileFromParentDirectoryImpl(containing_directory, containing_entry);
+	COMPILER_WRITE_BARRIER();
 	node_to_unlink->i_filenlink = 0;
 }
 
@@ -1778,11 +1788,13 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
+	FatSuperblock *super;
 	FatFile buffer[4], *files;
 	pos_t target_position;
 	u32 file_count = COMPILER_LENOF(buffer);
 	bool is_directory_end;
 	VERIFY_INODE_FSDATA(new_node);
+	super = (FatSuperblock *)target_directory->i_super;
 	files = Fat_GenerateFileEntriesAuto(target_directory,
 	                                    buffer,
 	                                    &file_count,
@@ -1795,10 +1807,50 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 		assert(data);
 		first_cluster = data->i_clusterc != 0
 		                ? data->i_clusterv[0]
-		                : ((FatSuperblock *)target_directory->i_super)->f_cluster_eof_marker;
+		                : super->f_cluster_eof_marker;
 		files[file_count - 1].f_clusterlo = (le16)LESWAP16((u16)first_cluster);
-		files[file_count - 1].f_clusterhi = (le16)LESWAP16((u16)(first_cluster >> 16));
-		files[file_count - 1].f_size      = (le32)0;
+		files[file_count - 1].f_size      = (le32)LESWAP32((u32)new_node->i_filesize);
+		if (super->f_features & FAT_FEATURE_ARB) {
+			u16 arb = data->i_file.f_arb;
+			mode_t unix_perm = new_node->i_filemode;
+			arb &= ~(FAT_ARB_NO_OX | FAT_ARB_NO_OW | FAT_ARB_NO_OR |
+			         FAT_ARB_NO_GX | FAT_ARB_NO_GW | FAT_ARB_NO_GR |
+			         FAT_ARB_NO_WX | FAT_ARB_NO_WW | FAT_ARB_NO_WR);
+			/* Use the ARB to implement unix file permissions. */
+			if (!(unix_perm & S_IXUSR))
+				arb |= FAT_ARB_NO_OX; /* Disable: Execute by owner */
+			if (!(unix_perm & S_IWUSR))
+				arb |= FAT_ARB_NO_OW; /* Disable: Write by owner */
+			if (!(unix_perm & S_IRUSR))
+				arb |= FAT_ARB_NO_OR; /* Disable: Read by owner */
+
+			if (!(unix_perm & S_IXGRP))
+				arb |= FAT_ARB_NO_GX; /* Disable: Execute by group */
+			if (!(unix_perm & S_IWGRP))
+				arb |= FAT_ARB_NO_GW; /* Disable: Write by group */
+			if (!(unix_perm & S_IRGRP))
+				arb |= FAT_ARB_NO_GR; /* Disable: Read by group */
+
+			if (!(unix_perm & S_IXOTH))
+				arb |= FAT_ARB_NO_WX; /* Disable: Execute by world */
+			if (!(unix_perm & S_IWOTH))
+				arb |= FAT_ARB_NO_WW; /* Disable: Write by world */
+			if (!(unix_perm & S_IROTH))
+				arb |= FAT_ARB_NO_WR; /* Disable: Read by world */
+			if (!(unix_perm & 0222)) {
+				/* Preserve ARB flags for write permissions if those can
+				 * already be represented through use of the READONLY flag. */
+				arb &= ~(FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
+				arb |= data->i_file.f_arb & (FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
+			}
+			files[file_count - 1].f_arb = (le16)LESWAP16(arb);
+		} else {
+			/* 32-bit clusters */
+			files[file_count - 1].f_clusterhi = (le16)LESWAP16((u16)(first_cluster >> 16));
+		}
+
+
+
 		/* Allocate space within the target directory. */
 		target_index = FatDirectory_AllocateFreeRange(target_directory,
 		                                              file_count,
@@ -1835,7 +1887,8 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 		/* Fill in file attribute persistence data. */
 		data->i_file.f_attr    = files[file_count - 1].f_attr;
 		data->i_file.f_ntflags = files[file_count - 1].f_ntflags;
-		data->i_file.f_arb     = 0;
+		if (super->f_features & FAT_FEATURE_ARB)
+			data->i_file.f_arb = LESWAP16(files[file_count - 1].f_arb);
 	} EXCEPT {
 		if (files != buffer)
 			kfree(files);
@@ -1855,10 +1908,11 @@ Fat_CreateFileInDirectory(struct directory_node *__restrict target_directory,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
 	struct inode_data *node;
+	FatSuperblock *super;
 	VERIFY_INODE_FSDATA((struct inode *)new_node);
 	new_node->i_type = &Fat_FileNodeOperators;
-	if (target_directory == target_directory->i_super &&
-	    ((FatSuperblock *)target_directory)->f_type != FAT32)
+	super            = (FatSuperblock *)target_directory->i_super;
+	if (target_directory == super && super->f_type != FAT32)
 		new_node->i_type = &Fat16_RootDirectoryFileEntryNodeOperators;
 	/* Allocate FS-specific INode data for the new file. */
 	node = (struct inode_data *)kmalloc(sizeof(struct inode_data),
@@ -1868,7 +1922,7 @@ Fat_CreateFileInDirectory(struct directory_node *__restrict target_directory,
 		node->i_clusterv    = (FatClusterIndex *)kmalloc(2 * sizeof(FatClusterIndex), FS_GFP);
 		node->i_clustera    = 2;
 		node->i_clusterc    = 1;
-		node->i_clusterv[0] = ((FatSuperblock *)target_directory->i_super)->f_cluster_eof_marker;
+		node->i_clusterv[0] = super->f_cluster_eof_marker;
 		/* Add the file to its parent's directory. */
 		Fat_AddFileToDirectory(target_directory, target_dirent, new_node);
 	} EXCEPT {
@@ -1907,10 +1961,11 @@ Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_director
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
 	struct inode_data *node;
+	FatSuperblock *super;
 	VERIFY_INODE_FSDATA((struct inode *)new_node);
 	new_node->i_type = &Fat_DirectoryNodeOperators;
-	if (target_directory == target_directory->i_super &&
-	    ((FatSuperblock *)target_directory)->f_type != FAT32)
+	super            = (FatSuperblock *)target_directory->i_super;
+	if (target_directory == super && super->f_type != FAT32)
 		new_node->i_type = &Fat16_RootDirectoryDirectoryEntryNodeOperators;
 	/* Allocate FS-specific INode data for the new file. */
 	node = (struct inode_data *)kmalloc(sizeof(struct inode_data),
@@ -1922,7 +1977,7 @@ Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_director
 		node->i_clusterv    = (FatClusterIndex *)kmalloc(2 * sizeof(FatClusterIndex), FS_GFP);
 		node->i_clustera    = 2;
 		node->i_clusterc    = 1;
-		node->i_clusterv[0] = ((FatSuperblock *)target_directory->i_super)->f_cluster_eof_marker;
+		node->i_clusterv[0] = super->f_cluster_eof_marker;
 		/* Allocate the initial contents of the directory. */
 		memcpy(pattern, new_directory_pattern, sizeof(pattern));
 		pattern[0].f_atime             = Fat_EncodeFileDate(new_node->i_fileatime.tv_sec);
@@ -1995,13 +2050,14 @@ Fat_RenameFileInDirectory(struct directory_node *__restrict source_directory,
 	TRY {
 		/* With the file now apart of the target directory,
 		 * we can now remove it from the source directory. */
-		Fat_UnlinkFileFromParentDirectory(source_directory, source_dirent, source_node);
+		Fat_UnlinkFileFromParentDirectoryImpl(source_directory, source_dirent);
 	} EXCEPT {
 		/* If we couldn't remove the node from the source directory, try to
 		 * remove it from the target directory, so we don't end up with the
 		 * same file in 2 different locations, which could end _real_ bad,
 		 * especially since FAT doesn't support hard links. */
-		Fat_UnlinkFileFromParentDirectory(target_directory, target_dirent, source_node);
+		source_node->i_fileino = source_dirent->de_ino;
+		Fat_UnlinkFileFromParentDirectoryImpl(target_directory, target_dirent);
 		RETHROW();
 	}
 	return (struct inode *)incref(source_node);
