@@ -593,6 +593,7 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 		pflag_t was;
 		bool must_restart;
 again_try_exchange_e2_word:
+		must_restart = false;
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_WRITE(was);
 		if unlikely(old_version != ATOMIC_READ(x86_pagedir_prepare_version))
 			must_restart = true;

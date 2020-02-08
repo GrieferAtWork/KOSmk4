@@ -1053,6 +1053,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten)(unsigned int vec4,
 		u64 new_e3_word;
 		union p64_pdir_e3 *e3_p, e3;
 again_try_exchange_e2_word:
+		must_restart = false;
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_WRITE(was);
 		if unlikely(old_version != ATOMIC_READ(x86_pagedir_prepare_version))
 			must_restart = true;
