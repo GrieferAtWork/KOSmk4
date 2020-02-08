@@ -140,24 +140,35 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 		}
 	}	break;
 
-
+#ifndef __NO_FPU
 	case JSON_TYPE_FLOAT:
 	case JSON_TYPE_DOUBLE:
-	case JSON_TYPE_LDOUBLE: {
+#ifdef __COMPILER_HAVE_LONGLONG
+	case JSON_TYPE_LDOUBLE:
+#endif /* __COMPILER_HAVE_LONGLONG */
+	{
 		double value;
 		result = libjson_parser_getfloat(parser, &value);
 		if likely(result == JSON_ERROR_OK) {
-			if (type == JSON_TYPE_DOUBLE)
+			if (type == JSON_TYPE_DOUBLE) {
 				memcpy(dst, &value, sizeof(value));
-			else if (type == JSON_TYPE_FLOAT) {
+			} else
+#ifdef __COMPILER_HAVE_LONGLONG
+				if (type == JSON_TYPE_FLOAT)
+#endif /* __COMPILER_HAVE_LONGLONG */
+			{
 				float temp = (float)value;
 				memcpy(dst, &temp, sizeof(temp));
-			} else {
+			}
+#ifdef __COMPILER_HAVE_LONGLONG
+			else {
 				__LONGDOUBLE temp = (__LONGDOUBLE)value;
 				memcpy(dst, &temp, sizeof(temp));
 			}
+#endif /* __COMPILER_HAVE_LONGLONG */
 		}
 	}	break;
+#endif /* !__NO_FPU */
 
 #else /* MODE_DECODE */
 
@@ -181,6 +192,7 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 		UNALIGNED_SET64((uint64_t *)dst, 0);
 		break;
 
+#ifndef __NO_FPU
 	case JSON_TYPE_FLOAT: {
 		float temp;
 		temp = 0.0f;
@@ -193,11 +205,14 @@ NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restri
 		memcpy(dst, &temp, sizeof(temp));
 	}	break;
 
+#ifdef __COMPILER_HAVE_LONGLONG
 	case JSON_TYPE_LDOUBLE: {
 		__LONGDOUBLE temp;
 		temp = 0.0L;
 		memcpy(dst, &temp, sizeof(temp));
 	}	break;
+#endif /* __COMPILER_HAVE_LONGLONG */
+#endif /* !__NO_FPU */
 
 #endif /* !MODE_DECODE */
 

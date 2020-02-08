@@ -1265,6 +1265,7 @@ NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
 #endif /* __SIZEOF_POINTER__ < 8 */
 DEFINE_INTERN_ALIAS(libjson_parser_getuint64, libjson_parser_getint64);
 
+#ifndef __NO_FPU
 INTERN NONNULL((1, 2)) int
 NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
                                         double *__restrict presult) {
@@ -1322,15 +1323,11 @@ NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
 			start = self->jp_pos;
 			ch = json_getc(self);
 		} while (unicode_isdecimal(ch));
-#ifdef __KERNEL__
-		exp = exp; /* TODO */
-#else /* __KERNEL__ */
 #ifdef __USE_GNU
 		exp = pow10(exp);
 #else /* __USE_GNU */
 		exp = pow(10.0, exp);
 #endif /* !__USE_GNU */
-#endif /* !__KERNEL__ */
 		if (exp_negative) {
 			result /= exp;
 		} else {
@@ -1350,6 +1347,7 @@ NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
 	*presult = result;
 	return JSON_ERROR_OK;
 }
+#endif /* !__NO_FPU */
 
 
 /* Decode a Json boolean and store its value in `*presult'
@@ -1420,7 +1418,9 @@ DEFINE_PUBLIC_ALIAS(json_parser_getstring, libjson_parser_getstring);
 DEFINE_PUBLIC_ALIAS(json_parser_getnumber, libjson_parser_getnumber);
 DEFINE_PUBLIC_ALIAS(json_parser_getint64, libjson_parser_getint64);
 DEFINE_PUBLIC_ALIAS(json_parser_getuint64, libjson_parser_getuint64);
+#ifndef __NO_FPU
 DEFINE_PUBLIC_ALIAS(json_parser_getfloat, libjson_parser_getfloat);
+#endif /* !__NO_FPU */
 DEFINE_PUBLIC_ALIAS(json_parser_getbool, libjson_parser_getbool);
 DEFINE_PUBLIC_ALIAS(json_parser_getnull, libjson_parser_getnull);
 

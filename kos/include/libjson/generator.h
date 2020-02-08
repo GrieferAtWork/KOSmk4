@@ -21,6 +21,7 @@
 #define _LIBJSON_GENERATOR_H 1
 
 #include <__stdinc.h>
+#include <__crt.h> /* __NO_FPU */
 
 #include <hybrid/__byteorder.h>
 #include <hybrid/typecore.h>
@@ -169,9 +170,13 @@ struct json_parser;
 #define JSON_TYPE_INLINE_STRING(length) JSON_TYPE_INLINE_STRING_OP, JGEN_ENCODE_UINT16(length)
 #define JSON_TYPE_STRING_WITH_LENGTH_OP 0xf9 /* [+uint16_t len_offset] utf8 *str; size_t len; */
 #define JSON_TYPE_STRING_WITH_LENGTH(len_offset) JSON_TYPE_STRING_WITH_LENGTH_OP, JGEN_ENCODE_UINT16(len_offset)
+#ifndef __NO_FPU
 #define JSON_TYPE_FLOAT                 0xfd /* float */
 #define JSON_TYPE_DOUBLE                0xfe /* double */
+#ifdef __COMPILER_HAVE_LONGLONG
 #define JSON_TYPE_LDOUBLE               0xff /* long double */
+#endif /* __COMPILER_HAVE_LONGLONG */
+#endif /* !__NO_FPU */
 
 
 #define JSON_PRIVATE_STYPEFOR_1  JSON_TYPE_INT8

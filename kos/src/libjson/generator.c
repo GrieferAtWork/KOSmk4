@@ -141,6 +141,7 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 		result = libjson_writer_putuint64(writer, UNALIGNED_GET64((uint64_t *)src));
 		break;
 
+#ifndef __NO_FPU
 	case JSON_TYPE_FLOAT: {
 		float value;
 		memcpy(&value, src, sizeof(value));
@@ -153,11 +154,14 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 		result = libjson_writer_putfloat(writer, value);
 	}	break;
 
+#ifdef __COMPILER_HAVE_LONGLONG
 	case JSON_TYPE_LDOUBLE: {
 		__LONGDOUBLE value;
 		memcpy(&value, src, sizeof(value));
 		result = libjson_writer_putfloat(writer, (double)value);
 	}	break;
+#endif /* __COMPILER_HAVE_LONGLONG */
+#endif /* !__NO_FPU */
 
 	case JSON_TYPE_INLINE_STRING_OP: {
 		char *str;

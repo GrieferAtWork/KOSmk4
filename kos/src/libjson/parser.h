@@ -206,9 +206,11 @@ NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
 INTDEF NONNULL((1, 2)) int
 NOTHROW_NCX(CC libjson_parser_getuint64)(struct json_parser *__restrict self,
                                          uint64_t *__restrict presult);
+#ifndef __NO_FPU
 INTDEF NONNULL((1, 2)) int
 NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
                                         double *__restrict presult);
+#endif /* !__NO_FPU */
 
 /* Decode a Json boolean and store its value in `*presult'
  * @return: JSON_ERROR_OK:     Success. - The value is stored in `*presult'

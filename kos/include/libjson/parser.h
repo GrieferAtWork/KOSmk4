@@ -340,9 +340,11 @@ typedef __ATTR_NONNULL((1, 2)) int
 typedef __ATTR_NONNULL((1, 2)) int
 (LIBJSON_CC *PJSON_PARSER_GETUINT64)(struct json_parser *__restrict self,
                                      __uint64_t *__restrict presult);
+#ifndef __NO_FPU
 typedef __ATTR_NONNULL((1, 2)) int
 (LIBJSON_CC *PJSON_PARSER_GETFLOAT)(struct json_parser *__restrict self,
                                     double *__restrict presult);
+#endif /* !__NO_FPU */
 #ifdef LIBJSON_WANT_PROTOTYPES
 LIBJSON_DECL __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(LIBJSON_CC json_parser_getnumber)(struct json_parser *__restrict self,
@@ -353,9 +355,11 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_getint64)(struct json_parser *__restrict se
 LIBJSON_DECL __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(LIBJSON_CC json_parser_getuint64)(struct json_parser *__restrict self,
                                                 __uint64_t *__restrict presult);
+#ifndef __NO_FPU
 LIBJSON_DECL __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(LIBJSON_CC json_parser_getfloat)(struct json_parser *__restrict self,
                                                double *__restrict presult);
+#endif /* !__NO_FPU */
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Decode a Json boolean and store its value in `*presult'
