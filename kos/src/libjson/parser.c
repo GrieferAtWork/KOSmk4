@@ -834,7 +834,7 @@ again:
 	return JSON_ERROR_NOOBJ;
 }
 
-/* Got the `index'th' array elements before returning `JSON_ERROR_OK'
+/* Goto the `index'th' array elements before returning `JSON_ERROR_OK'
  * the parser is rewound to the start of the current array before proceeding.
  * NOTE: If the intend is to enumerate array elements, it is more efficient
  *       to rewind to the start of the array with `json_parser_rewind()', then

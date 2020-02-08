@@ -21,8 +21,11 @@
 #define _LIBINSTRLEN_INSTRLEN_H 1
 
 #include "api.h"
-#include <bits/types.h>
+/**/
+
 #include <hybrid/host.h>
+
+#include <bits/types.h>
 
 #undef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
 #if defined(__arm__)

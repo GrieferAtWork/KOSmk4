@@ -31,9 +31,9 @@
  * >> struct json_parser parser;
  * >> char const *input = "{\"bar\":\"baz\",\"foo\":[10,20,30]}";
  * >> json_parser_init(&parser, input, strend(input));
- * >> json_parser_enter(&parser);
+ * >> json_parser_enterobject(&parser);
  * >> json_parser_findkey(&parser, "foo");
- * >> json_parser_enter(&parser);
+ * >> json_parser_enterarray(&parser);
  * >> json_parser_findindex(&parser, 1);
  * >> intptr_t value;
  * >> json_parser_getnumber(&parser, &value);
@@ -242,7 +242,7 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_findkey)(struct json_parser *__restrict sel
                                               size_t keylen);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
-/* Got the `index'th' array elements before returning `JSON_ERROR_OK'
+/* Goto the `index'th' array elements before returning `JSON_ERROR_OK'
  * the parser is rewound to the start of the current array before proceeding.
  * NOTE: If the intend is to enumerate array elements, it is more efficient
  *       to rewind to the start of the array with `json_parser_rewind()', then

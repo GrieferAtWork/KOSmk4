@@ -129,7 +129,7 @@ NOTHROW_NCX(CC libjson_parser_findkey)(struct json_parser *__restrict self,
                                        /*utf-8*/ char const *__restrict key,
                                        size_t keylen);
 
-/* Got the `index'th' array elements before returning `JSON_ERROR_OK'
+/* Goto the `index'th' array elements before returning `JSON_ERROR_OK'
  * the parser is rewound to the start of the current array before proceeding.
  * NOTE: If the intend is to enumerate array elements, it is more efficient
  *       to rewind to the start of the array with `json_parser_rewind()', then
