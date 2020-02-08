@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36a3eb03 */
+/* HASH CRC-32:0x4c7b71da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4033,7 +4033,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(memcpy, libc_memcpy);
 DEFINE_PUBLIC_WEAK_ALIAS(memmove, libc_memmove);
 DEFINE_PUBLIC_WEAK_ALIAS(memset, libc_memset);
 DEFINE_PUBLIC_WEAK_ALIAS(memcmp, libc_memcmp);
-DEFINE_PUBLIC_WEAK_ALIAS(bcmp, libc_memcmp);
 DEFINE_PUBLIC_WEAK_ALIAS(memchr, libc_memchr);
 DEFINE_PUBLIC_WEAK_ALIAS(strlen, libc_strlen);
 DEFINE_PUBLIC_WEAK_ALIAS(strchr, libc_strchr);
@@ -4041,9 +4040,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(strcmp, libc_strcmp);
 DEFINE_PUBLIC_WEAK_ALIAS(strnlen, libc_strnlen);
 DEFINE_PUBLIC_WEAK_ALIAS(memrchr, libc_memrchr);
 DEFINE_PUBLIC_WEAK_ALIAS(rawmemchr, libc_rawmemchr);
-DEFINE_PUBLIC_WEAK_ALIAS(__rawmemchr, libc_rawmemchr);
 DEFINE_PUBLIC_WEAK_ALIAS(mempcpy, libc_mempcpy);
-DEFINE_PUBLIC_WEAK_ALIAS(__mempcpy, libc_mempcpy);
 DEFINE_PUBLIC_WEAK_ALIAS(memcpyw, libc_memcpyw);
 DEFINE_PUBLIC_WEAK_ALIAS(mempcpyw, libc_mempcpyw);
 DEFINE_PUBLIC_WEAK_ALIAS(memcpyl, libc_memcpyl);
@@ -4126,6 +4123,9 @@ DEFINE_PUBLIC_WEAK_ALIAS(mempatw, libc_mempatw);
 DEFINE_PUBLIC_WEAK_ALIAS(mempatl, libc_mempatl);
 DEFINE_PUBLIC_WEAK_ALIAS(mempatq, libc_mempatq);
 #ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(bcmp, libc_memcmp);
+DEFINE_PUBLIC_WEAK_ALIAS(__rawmemchr, libc_rawmemchr);
+DEFINE_PUBLIC_WEAK_ALIAS(__mempcpy, libc_mempcpy);
 DEFINE_PUBLIC_WEAK_ALIAS(strrchr, libc_strrchr);
 DEFINE_PUBLIC_WEAK_ALIAS(strncmp, libc_strncmp);
 DEFINE_PUBLIC_WEAK_ALIAS(strstr, libc_strstr);

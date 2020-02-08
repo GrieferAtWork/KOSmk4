@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x399cc690 */
+/* HASH CRC-32:0x111c8ca1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,16 +27,13 @@
 #define __CRT_HAVE___afail 1
 #define __CRT_HAVE___afailf 1
 #define __CRT_HAVE___crt_unreachable 1
+#define __CRT_HAVE___cxa_begin_catch 1
+#define __CRT_HAVE___cxa_end_catch 1
 #define __CRT_HAVE___cxa_rethrow 1
-#define __CRT_HAVE___mempcpy 1
-#define __CRT_HAVE___rawmemchr 1
+#define __CRT_HAVE___gxx_personality_v0 1
 #define __CRT_HAVE___stack_chk_fail 1
 #define __CRT_HAVE___stack_chk_guard 1
-#define __CRT_HAVE___vsnprintf 1
-#define __CRT_HAVE__strtoi64 1
-#define __CRT_HAVE__strtoui64 1
 #define __CRT_HAVE_abort 1
-#define __CRT_HAVE_bcmp 1
 #define __CRT_HAVE_cfmakesane 1
 #define __CRT_HAVE_error_active 1
 #define __CRT_HAVE_error_as_errno 1
@@ -51,6 +48,7 @@
 #define __CRT_HAVE_error_throw 1
 #define __CRT_HAVE_error_throw_current 1
 #define __CRT_HAVE_error_thrown 1
+#define __CRT_HAVE_error_unwind 1
 #define __CRT_HAVE_format_escape 1
 #define __CRT_HAVE_format_hexdump 1
 #define __CRT_HAVE_format_printf 1
@@ -151,7 +149,6 @@
 #define __CRT_HAVE_rawmemrlenw 1
 #define __CRT_HAVE_snprintf 1
 #define __CRT_HAVE_sprintf 1
-#define __CRT_HAVE_sprintf_s 1
 #define __CRT_HAVE_strchr 1
 #define __CRT_HAVE_strcmp 1
 #define __CRT_HAVE_strend 1
@@ -185,4 +182,3 @@
 #define __CRT_HAVE_unicode_writeutf8 1
 #define __CRT_HAVE_vsnprintf 1
 #define __CRT_HAVE_vsprintf 1
-#define __CRT_HAVE_vsprintf_s 1

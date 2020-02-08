@@ -1728,6 +1728,7 @@ function parse_functions(filename: string, text: string): {string | Function...}
 	local aliases = [];
 	local intern_aliases = [];
 	local alternate_names = [];
+	local nokern_alternate_names = [];
 	local preferred_aliases = [];
 	@@Array of (condition_expr, impl) for preferred function implementations
 	local preferred_impl: {(string, string)...} = [];
@@ -2642,7 +2643,7 @@ again_enum_name:
 						err(tag_start, "The `export_alias' tag cannot be used conditionally");
 					for (local x: get_tag_operand().split(",")) {
 						x = x.strip();
-						if (x !in alternate_names)
+						if (x !in alternate_names && x !in nokern_alternate_names)
 							alternate_names.append(x);
 						aliases.append(("", x));
 					}
@@ -2651,8 +2652,26 @@ again_enum_name:
 				case "alternate_names":
 					for (local x: get_tag_operand().split(",")) {
 						x = x.strip();
-						if (x !in alternate_names)
+						if (x !in alternate_names && x !in nokern_alternate_names)
 							alternate_names.append(x);
+					}
+					break;
+				case "nokern_export_alias":
+					if (conditions)
+						err(tag_start, "The `nokern_export_alias' tag cannot be used conditionally");
+					for (local x: get_tag_operand().split(",")) {
+						x = x.strip();
+						if (x !in nokern_alternate_names && x !in alternate_names)
+							nokern_alternate_names.append(x);
+						aliases.append(("", x));
+					}
+					break;
+				case "nokern_alternate_name":
+				case "nokern_alternate_names":
+					for (local x: get_tag_operand().split(",")) {
+						x = x.strip();
+						if (x !in nokern_alternate_names && x !in alternate_names)
+							nokern_alternate_names.append(x);
 					}
 					break;
 					/* CP for stdio (because of libio, custom FILE cookies may throw exceptions)
@@ -3605,6 +3624,7 @@ got_chk_checkexpr:
 			fun.aliases = aliases;
 			fun.intern_aliases = intern_aliases;
 			fun.alternate_names = alternate_names;
+			fun.nokern_alternate_names = nokern_alternate_names;
 			fun.preferred_aliases = preferred_aliases;
 			fun.args = Tuple(split_argument_list(
 				argument_list, function_attributes,
@@ -3663,6 +3683,8 @@ got_chk_checkexpr:
 				if (!nocrt)
 					dosnames.append(key_libd_export(funname));
 				for (local alt: alternate_names)
+					dosnames.append(key_libd_export(alt));
+				for (local alt: nokern_alternate_names)
 					dosnames.append(key_libd_export(alt));
 			}
 			fun.dosnames = dosnames;
@@ -3762,7 +3784,8 @@ got_chk_checkexpr:
 			if (block !is UndefinedFunctionAlias) {
 				if (!overload_alias) {
 					local ka = known_aliases.get(funname);
-					if (ka !is none && ka !in alternate_names) {
+					if (ka !is none && ka !in alternate_names &&
+					    ka !in nokern_alternate_names) {
 						/* Check if the alias is defined as a regular alias. */
 						for (local none, name: aliases) {
 							if (name == ka)
@@ -3806,6 +3829,7 @@ known_alias_declared:
 			aliases = [];
 			intern_aliases = [];
 			alternate_names = [];
+			nokern_alternate_names = [];
 			preferred_aliases = [];
 			function_attributes = [];
 			forced_dependencies = [];
@@ -4031,6 +4055,9 @@ class Function {
 
 	@@Alternate names for @this Function
 	member alternate_names: {string...};
+
+	@@Alternate names for @this Function (outside of kernel-space)
+	member nokern_alternate_names: {string...};
 
 	@@A string expression that must be true in order to allow definition of this function
 	member define_require_string: string;
@@ -6914,10 +6941,20 @@ inherit_explicit_fields:
 	}
 	funblock.func = alias_func;
 	func.nouser = true;
-	if (func.name !in alias_func.alternate_names &&
-	    func.dont_export_symbol !== true && !func.nocrt) {
-		print "Found alternate name for", repr(alias_func.name), ":", repr(func.name);
-		alias_func.alternate_names.append(func.name);
+	if (func.export_in_kernel) {
+		if (func.name !in alias_func.alternate_names &&
+		    func.name !in alias_func.nokern_alternate_names &&
+		    func.dont_export_symbol !== true && !func.nocrt) {
+			print "Found alternate name for", repr(alias_func.name), ":", repr(func.name);
+			alias_func.alternate_names.append(func.name);
+		}
+	} else {
+		if (func.name !in alias_func.alternate_names &&
+		    func.name !in alias_func.nokern_alternate_names &&
+		    func.dont_export_symbol !== true && !func.nocrt) {
+			print "Found alternate name for", repr(alias_func.name), ":", repr(func.name),"(user-space only)";
+			alias_func.nokern_alternate_names.append(func.name);
+		}
 	}
 }
 
@@ -7728,6 +7765,10 @@ function generate_libc_user_exports(fp: File, comnam: string, funcs: {Function..
 				if (!key_crt_have_is_extended(alt))
 					fp << "#undef " << alt << "\n";
 			}
+			for (local alt: f.nokern_alternate_names) {
+				if (!key_crt_have_is_extended(alt))
+					fp << "#undef " << alt << "\n";
+			}
 //			if (f.wchar_function) {
 //				for (local name: f.dosnames) {
 //					if (!key_crt_have_is_extended(name))
@@ -7743,6 +7784,11 @@ function generate_libc_user_exports(fp: File, comnam: string, funcs: {Function..
 			   << key_libc_internal(f.name) << ");\n";
 		}
 		for (local alt: f.alternate_names) {
+			fp << "DEFINE_PUBLIC_WEAK_ALIAS("
+			   << key_asmname(alt) << ", "
+			   << key_libc_internal(f.name) << ");\n";
+		}
+		for (local alt: f.nokern_alternate_names) {
 			fp << "DEFINE_PUBLIC_WEAK_ALIAS("
 			   << key_asmname(alt) << ", "
 			   << key_libc_internal(f.name) << ");\n";
@@ -8414,6 +8460,29 @@ function write_libc_auto_implementation(
 	}
 	if (user_funcs) {
 		fp << "#ifndef __KERNEL__\n";
+			for (local f: kernel_funcs) {
+				if (f is IntermediateString)
+					continue;
+				if (f.helper_function)
+					continue;
+				if (f.allow_macros || f.args_is_varargs) {
+					for (local alt: f.nokern_alternate_names) {
+						if (!key_crt_have_is_extended(alt))
+							fp << "#undef " << alt << "\n";
+					}
+				}
+			}
+		for (local f: kernel_funcs) {
+			if (f is IntermediateString)
+				continue;
+			if (f.helper_function)
+				continue;
+			for (local alt: f.nokern_alternate_names) {
+				fp << "DEFINE_PUBLIC_WEAK_ALIAS("
+				   << key_asmname(alt) << ", "
+				   << key_libc_internal(f.name) << ");\n";
+			}
+		}
 //		for (local f: kernel_funcs) {
 //			if (f is IntermediateString)
 //				continue;
@@ -8453,6 +8522,10 @@ function write_libc_auto_implementation(
 					if (!key_crt_have_is_extended(alt))
 						fp << "#undef " << alt << "\n";
 				}
+				for (local alt: f.nokern_alternate_names) {
+					if (!key_crt_have_is_extended(alt))
+						fp << "#undef " << alt << "\n";
+				}
 //				if (f.wchar_function) {
 //					for (local n: f.dosnames) {
 //						if (!key_crt_have_is_extended(n))
@@ -8474,6 +8547,11 @@ function write_libc_auto_implementation(
 				fp << key_libc_internal(f.name) << ");\n";
 			}
 			for (local alt: f.alternate_names) {
+				fp << "DEFINE_PUBLIC_WEAK_ALIAS(";
+				fp << key_asmname(alt) << ", ";
+				fp << key_libc_internal(f.name) << ");\n";
+			}
+			for (local alt: f.nokern_alternate_names) {
 				fp << "DEFINE_PUBLIC_WEAK_ALIAS(";
 				fp << key_asmname(alt) << ", ";
 				fp << key_libc_internal(f.name) << ");\n";

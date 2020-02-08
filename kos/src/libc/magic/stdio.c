@@ -1018,7 +1018,7 @@ struct __format_snprintf_data {
 };
 #endif /* !____format_snprintf_data_defined */
 )][crtbuiltin][dependency(format_snprintf_printer)]
-[section(.text.crt.unicode.static.format.printf)][export_alias(__vsnprintf)]
+[section(.text.crt.unicode.static.format.printf)][nokern_export_alias(__vsnprintf)]
 vsnprintf:([outp_opt(min(return, buflen))] char *__restrict buf, size_t buflen,
            [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	struct @__format_snprintf_data@ data;

@@ -606,7 +606,7 @@ memrchr:([nonnull] void const *__restrict haystack, int needle, $size_t n_bytes)
 
 
 @@Same as `memchr' with a search limit of `(size_t)-1'
-[kernel][ATTR_WUNUSED][ATTR_PURE][export_alias(__rawmemchr)]
+[kernel][ATTR_WUNUSED][ATTR_PURE][nokern_export_alias(__rawmemchr)]
 rawmemchr:([nonnull] void const *__restrict haystack, int needle) -> [nonnull] void *
 	[([nonnull] void *__restrict haystack, int needle) -> [nonnull] void *]
 	[([nonnull] void const *__restrict haystack, int needle) -> [nonnull] void const *]
@@ -775,7 +775,7 @@ strverscmp:([nonnull] char const *s1, [nonnull] char const *s2) -> int {
 [alias(*)][attribute(*)] __mempcpy:(*) = mempcpy;
 
 @@Same as `memcpy', but return `DST + N_BYTES', rather than `DST'
-[libc][kernel][fast][nobuiltin][export_alias(__mempcpy)][ATTR_LEAF]
+[libc][kernel][fast][nobuiltin][alias(__mempcpy)][ATTR_LEAF]
 mempcpy:([nonnull] void *__restrict dst,
          [nonnull] void const *__restrict src,
          $size_t n_bytes) -> [== dst + n_bytes] void * {

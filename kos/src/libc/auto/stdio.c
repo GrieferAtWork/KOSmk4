@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80ad8f99 */
+/* HASH CRC-32:0x9508e733 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -652,15 +652,15 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
 #endif /* !__KERNEL__ */
 #undef sprintf
 #undef snprintf
-#undef sprintf_s
 DEFINE_PUBLIC_WEAK_ALIAS(vsprintf, libc_vsprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(sprintf, libc_sprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(vsnprintf, libc_vsnprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(snprintf, libc_snprintf);
+#ifndef __KERNEL__
+#undef sprintf_s
 DEFINE_PUBLIC_WEAK_ALIAS(__vsnprintf, libc_vsnprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(vsprintf_s, libc_vsnprintf);
-DEFINE_PUBLIC_WEAK_ALIAS(snprintf, libc_snprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(sprintf_s, libc_snprintf);
-#ifndef __KERNEL__
 #undef sscanf
 #undef _IO_sscanf
 #undef sscanf_s

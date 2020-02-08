@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e72878f */
+/* HASH CRC-32:0x26b28201 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2689,10 +2689,10 @@ NOTHROW_NCX(LIBDCALL libd__wtoll_l)(char16_t const *nptr,
 DEFINE_PUBLIC_WEAK_ALIAS(strtou32, libc_strtou32);
 DEFINE_PUBLIC_WEAK_ALIAS(strto32, libc_strto32);
 DEFINE_PUBLIC_WEAK_ALIAS(strtou64, libc_strtou64);
-DEFINE_PUBLIC_WEAK_ALIAS(_strtoui64, libc_strtou64);
 DEFINE_PUBLIC_WEAK_ALIAS(strto64, libc_strto64);
-DEFINE_PUBLIC_WEAK_ALIAS(_strtoi64, libc_strto64);
 #ifndef __KERNEL__
+DEFINE_PUBLIC_WEAK_ALIAS(_strtoui64, libc_strtou64);
+DEFINE_PUBLIC_WEAK_ALIAS(_strtoi64, libc_strto64);
 DEFINE_PUBLIC_WEAK_ALIAS(qsort_r, libc_qsort_r);
 DEFINE_PUBLIC_WEAK_ALIAS(bsearch_r, libc_bsearch_r);
 DEFINE_PUBLIC_WEAK_ALIAS(qsort, libc_qsort);

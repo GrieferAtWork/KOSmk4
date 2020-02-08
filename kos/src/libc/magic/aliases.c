@@ -35,6 +35,9 @@
 %[declare_kernel_export(error_info, error_data, error_register_state)]
 %[declare_kernel_export(error_code, error_active, error_class, error_subclass)]
 
+/* /kos/src/kernel/core/arch/[...]/except.c */
+%[declare_kernel_export(error_unwind, __gxx_personality_v0, __cxa_begin_catch, __cxa_end_catch)]
+
 /* /kos/src/libc/hybrid/except_to_posix.c */
 %[declare_kernel_export(error_as_errno, error_as_signal)]
 
