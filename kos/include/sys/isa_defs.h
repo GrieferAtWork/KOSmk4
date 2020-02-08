@@ -21,16 +21,16 @@
 #define _SYS_ISA_DEFS_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/__byteorder.h>
-#include <hybrid/typecore.h>
-#include <hybrid/limitcore.h>
 #include <hybrid/host.h>
+#include <hybrid/limitcore.h>
+#include <hybrid/typecore.h>
 
 /* This header is documented here:
  * http://www.sde.cs.titech.ac.jp/~gondow/dwarf2-xml/HTML-rxref/usr/include/sys/isa_defs.h.html
  * I would copy the documentation, but I don't think
  * the source's copyright allows that... */
-
 
 #ifdef _MACHINE__ENDIAN_H
 #ifndef __NO_WARNINGS
@@ -39,7 +39,7 @@ Both <machine/endian.h> (<machine/_endian.h>) and <sys/isa_defs.h> define the \
 macros `_LITTLE_ENDIAN' and `_BIG_ENDIAN', however assign entirely different \
 meanings (and values). - Please change your code to only include one of either"
 #endif /* !__NO_WARNINGS */
-#endif
+#endif /* _MACHINE__ENDIAN_H */
 
 #undef _LITTLE_ENDIAN
 #undef _BIG_ENDIAN
@@ -52,43 +52,42 @@ meanings (and values). - Please change your code to only include one of either"
 #define _PDB_ENDIAN 1
 #endif
 
-#if !defined(_STACK_GROWS_DOWNWARD) && \
-    !defined(_STACK_GROWS_UPWARD)
+#if (!defined(_STACK_GROWS_DOWNWARD) && !defined(_STACK_GROWS_UPWARD))
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 #define _STACK_GROWS_DOWNWARD 1
-#else
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
 #define _STACK_GROWS_UPWARD 1
-#endif
-#endif
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+#endif /* !_STACK_GROWS_DOWNWARD && !_STACK_GROWS_UPWARD */
 
 
 #if !defined(_LONG_LONG_LTOH) && !defined(_LONG_LONG_HTOL)
 #ifdef _LITTLE_ENDIAN
 #define _LONG_LONG_LTOH 1
-#else
+#else /* _LITTLE_ENDIAN */
 #define _LONG_LONG_HTOL 1
-#endif
-#endif
+#endif /* !_LITTLE_ENDIAN */
+#endif /* !_LONG_LONG_LTOH && !_LONG_LONG_HTOL */
 
 #if !defined(_BIT_FIELDS_HTOL) && !defined(_BIT_FIELDS_LTOH)
 #define _BIT_FIELDS_LTOH 1
-#endif
+#endif /* !_BIT_FIELDS_HTOL && !_BIT_FIELDS_LTOH */
 
 
 #ifndef _IEEE_754
-#define _IEEE_754
+#define _IEEE_754 1
 #endif /* !_IEEE_754 */
 
 #if !defined(_CHAR_IS_UNSIGNED) && !defined(_CHAR_IS_SIGNED)
 #ifdef __CHAR_UNSIGNED__
 #define _CHAR_IS_UNSIGNED 1
-#else
+#else /* __CHAR_UNSIGNED__ */
 #define _CHAR_IS_SIGNED 1
-#endif
-#endif
+#endif /* !__CHAR_UNSIGNED__ */
+#endif /* !_CHAR_IS_UNSIGNED && !_CHAR_IS_SIGNED */
 
 #ifndef _CHAR_ALIGNMENT
-#define _CHAR_ALIGNMENT  __SIZEOF_CHAR__
+#define _CHAR_ALIGNMENT __SIZEOF_CHAR__
 #endif /* !_CHAR_ALIGNMENT */
 
 #ifndef _SHORT_ALIGNMENT
@@ -96,11 +95,11 @@ meanings (and values). - Please change your code to only include one of either"
 #endif /* !_SHORT_ALIGNMENT */
 
 #ifndef _INT_ALIGNMENT
-#define _INT_ALIGNMENT  __SIZEOF_INT__
+#define _INT_ALIGNMENT __SIZEOF_INT__
 #endif /* !_INT_ALIGNMENT */
 
 #ifndef _LONG_ALIGNMENT
-#define _LONG_ALIGNMENT  __SIZEOF_LONG__
+#define _LONG_ALIGNMENT __SIZEOF_LONG__
 #endif /* !_LONG_ALIGNMENT */
 
 #ifndef _LONG_LONG_ALIGNMENT
@@ -134,15 +133,15 @@ meanings (and values). - Please change your code to only include one of either"
 
 #if !defined(_ILP32) && defined(__ILP32__)
 #define _ILP32 1
-#endif
+#endif /* !_ILP32 && __ILP32__ */
 
 #if !defined(_LP64) && defined(__LP64__)
 #define _LP64 1
-#endif
+#endif /* !_LP64 && __LP64__ */
 
 #if !defined(_I32LPx) && defined(___I32LPx__)
 #define _I32LPx 1
-#endif
+#endif /* !_I32LPx && ___I32LPx__ */
 
 
 /* I get all of the other options, but from this point on, it gets _extremely_ specific.
@@ -152,13 +151,13 @@ meanings (and values). - Please change your code to only include one of either"
 #undef _DMA_USES_VIRTADDR
 #if defined(__i386__) || defined(__x86_64__)
 #define _DMA_USES_PHYSADDR 1
-#endif
+#endif /* __i386__ || __x86_64__ */
 
 /* Cannot be determined at compile-time (I mean: how could you even determine this?) */
 #undef _FIRMWARE_NEEDS_FDISK
 #undef _NO_FDISK_PRESENT
 
-/* Again: this is device-dependent and what would knowing this even acomplish? */
+/* Again: this is device-dependent and what would knowing this even accomplish? */
 #undef _CONSOLE_OUTPUT_VIA_FIRMWARE
 #undef _CONSOLE_OUTPUT_VIA_SOFTWARE
 

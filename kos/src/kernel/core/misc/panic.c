@@ -37,6 +37,7 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/addr2line.h>
 #include <kernel/debugtrap.h>
 #include <kernel/memory.h>
+#include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <kernel/vm.h>
@@ -582,6 +583,15 @@ kernel_vpanic_scpustate(struct scpustate *__restrict state,
 	kernel_vpanic_ucpustate(&ustate, format, args);
 }
 
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
+kernel_vpanic_fcpustate(struct fcpustate *__restrict state,
+                        char const *format, va_list args) {
+	struct ucpustate ustate;
+	/* XXX: Don't convert to ucpustate. - This causes information to be lost... */
+	fcpustate_to_ucpustate(state, &ustate);
+	kernel_vpanic_ucpustate(&ustate, format, args);
+}
+
 
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
@@ -622,6 +632,14 @@ kernel_panic_scpustate(struct scpustate *__restrict state,
 	va_list args;
 	va_start(args, format);
 	kernel_vpanic_scpustate(state, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
+kernel_panic_fcpustate(struct fcpustate *__restrict state,
+                       char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	kernel_vpanic_fcpustate(state, format, args);
 }
 
 

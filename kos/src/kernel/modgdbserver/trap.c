@@ -228,10 +228,8 @@ do_print_message_in_nonstop_mode:
 				kernel_panic((struct kcpustate *)state, "Recursive GDB trap\n");
 			case CPUSTATE_KIND_LCPUSTATE:
 				kernel_panic((struct lcpustate *)state, "Recursive GDB trap\n");
-#ifdef __CRT_HAVE_kernel_panic_fcpustate
 			case CPUSTATE_KIND_FCPUSTATE:
 				kernel_panic((struct fcpustate *)state, "Recursive GDB trap\n");
-#endif /* __CRT_HAVE_kernel_panic_fcpustate */
 			default:
 				break;
 			}
