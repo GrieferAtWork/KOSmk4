@@ -390,6 +390,7 @@ case $UTILITY_NAME in
 				--config-mingw32=no
 			echo 'NATIVE_DEFINES+=-DTCC_TARGET_KOS="1"' >> config.mak
 			echo "NATIVE_DEFINES+=-DCONFIG_TCCDIR=\"\\\"/usr/$TARGET_LIBPATH\\\"\"" >> config.mak
+			echo "NATIVE_DEFINES+=-DCONFIG_LDDIR=\"\\\"$TARGET_LIBPATH\\\"\"" >> config.mak
 			cmd make cross-$TARGET_NAME $TARGET_NAME-libtcc1-usegcc=yes
 			cat > "$OPTPATH/hello-world.c" <<EOF
 /* A simple hello-world example which you can compile & run from inside of KOS:
