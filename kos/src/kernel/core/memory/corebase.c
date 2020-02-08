@@ -332,6 +332,7 @@ again_tryhard_mapping_target:
 		result.cp_node->vn_flags |= VM_NODE_FLAG_PREPARED;
 		result.cp_node->vn_part                       = result.cp_part;
 		result.cp_node->vn_link.ln_pself              = &LLIST_HEAD(result.cp_part->dp_srefs);
+		result.cp_part->dp_refcnt                     = 1;
 		result.cp_part->dp_srefs                      = result.cp_node;
 		result.cp_part->dp_state                      = VM_DATAPART_STATE_LOCKED;
 		result.cp_part->dp_pprop                      = (uintptr_t)-1;
