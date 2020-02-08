@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36ebe601 */
+/* HASH CRC-32:0x83a4ed82 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -300,8 +300,6 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __fn),(__x
 #include <local/math/scalb.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _scalb)(double __x, double __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalb))(__x, __fn); }
-#else /* CUSTOM: scalb */
-#undef none
 #endif /* _scalb... */
 #endif /* _scalb... */
 #ifdef __CRT_HAVE___logb
@@ -332,8 +330,6 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, 
 #include <local/math/nextafter.h>
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _nextafter)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafter))(__x, __y); }
-#else /* CUSTOM: nextafter */
-#undef none
 #endif /* _nextafter... */
 #endif /* _nextafter... */
 #if __has_builtin(__builtin_finite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finite)
@@ -392,8 +388,6 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __fn),(__x,_
 #include <local/math/scalbf.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float __fn) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __fn); }
-#else /* CUSTOM: scalbf */
-#undef none
 #endif /* _scalbf... */
 #endif /* _scalbf... */
 #endif

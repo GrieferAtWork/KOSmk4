@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd27e6fac */
+/* HASH CRC-32:0xc9d77380 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,8 +47,6 @@ __NAMESPACE_LOCAL_USING(warn)
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 #define warn (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warn))
 #endif /* !__cplusplus */
-#else /* CUSTOM: warn */
-#undef none
 #endif /* warn... */
 #endif /* warn... */
 #ifdef __CRT_HAVE_vwarn
@@ -60,8 +58,6 @@ __CDECLARE_VOID(__ATTR_LIBC_PRINTF(1, 0),,vwarn,(char const *__format, __builtin
 #include <local/err/vwarn.h>
 /* Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(vwarn, __FORCELOCAL __ATTR_LIBC_PRINTF(1, 0) void (__LIBCCALL vwarn)(char const *__format, __builtin_va_list __args) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwarn))(__format, __args); })
-#else /* CUSTOM: vwarn */
-#undef none
 #endif /* vwarn... */
 #endif /* vwarn... */
 #ifdef __CRT_HAVE_warnx
@@ -77,8 +73,6 @@ __NAMESPACE_LOCAL_USING(warnx)
 /* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 #define warnx (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(warnx))
 #endif /* !__cplusplus */
-#else /* CUSTOM: warnx */
-#undef none
 #endif /* warnx... */
 #endif /* warnx... */
 #ifdef __CRT_HAVE_vwarnx
@@ -90,8 +84,6 @@ __CDECLARE_VOID(__ATTR_LIBC_PRINTF(1, 0),,vwarnx,(char const *__format, __builti
 #include <local/err/vwarnx.h>
 /* Print to stderr: `<program_invocation_short_name>: <format...>\n' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(vwarnx, __FORCELOCAL __ATTR_LIBC_PRINTF(1, 0) void (__LIBCCALL vwarnx)(char const *__format, __builtin_va_list __args) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwarnx))(__format, __args); })
-#else /* CUSTOM: vwarnx */
-#undef none
 #endif /* vwarnx... */
 #endif /* vwarnx... */
 #ifdef __CRT_HAVE_err
@@ -107,8 +99,6 @@ __NAMESPACE_LOCAL_USING(err)
 /* Same as `warn()', but follow up by calling `exit(status)' */
 #define err (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(err))
 #endif /* !__cplusplus */
-#else /* CUSTOM: err */
-#undef none
 #endif /* err... */
 #endif /* err... */
 #ifdef __CRT_HAVE_verr
@@ -120,8 +110,6 @@ __CDECLARE_VOID(__ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 0),,verr,(int __status, ch
 #include <local/err/verr.h>
 /* Same as `warn()', but follow up by calling `exit(status)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(verr, __FORCELOCAL __ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 0) void (__LIBCCALL verr)(int __status, char const *__format, __builtin_va_list __args) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(verr))(__status, __format, __args); })
-#else /* CUSTOM: verr */
-#undef none
 #endif /* verr... */
 #endif /* verr... */
 #ifdef __CRT_HAVE_errx
@@ -137,8 +125,6 @@ __NAMESPACE_LOCAL_USING(errx)
 /* Same as `warnx()', but follow up by calling `exit(status)' */
 #define errx (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(errx))
 #endif /* !__cplusplus */
-#else /* CUSTOM: errx */
-#undef none
 #endif /* errx... */
 #endif /* errx... */
 #ifdef __CRT_HAVE_verrx
@@ -150,8 +136,6 @@ __CDECLARE_VOID(__ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 0),,verrx,(int __status, c
 #include <local/err/verrx.h>
 /* Same as `warn()', but follow up by calling `exit(status)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(verrx, __FORCELOCAL __ATTR_NORETURN __ATTR_LIBC_PRINTF(2, 0) void (__LIBCCALL verrx)(int __status, char const *__format, __builtin_va_list __args) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(verrx))(__status, __format, __args); })
-#else /* CUSTOM: verrx */
-#undef none
 #endif /* verrx... */
 #endif /* verrx... */
 

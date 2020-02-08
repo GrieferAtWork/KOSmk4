@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d4331e0 */
+/* HASH CRC-32:0x172b5ffd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1652,8 +1652,6 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,getpagesize,(void),__g
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(getpagesize, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL getpagesize)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getpagesize))(); })
-#else /* CUSTOM: getpagesize */
-#undef none
 #endif /* getpagesize... */
 #endif /* getpagesize... */
 

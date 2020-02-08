@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa926dc00 */
+/* HASH CRC-32:0x38c4be1b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,8 +67,6 @@ __NAMESPACE_LOCAL_USING(error)
  * If `STATUS' is non-zero, follow up with a call to `exit(status)' */
 #define error (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error))
 #endif /* !__cplusplus */
-#else /* CUSTOM: error */
-#undef none
 #endif /* error... */
 #endif /* error... */
 #ifdef __fast_error_at_line_defined
@@ -100,8 +98,6 @@ __NAMESPACE_LOCAL_USING(error_at_line)
  * pass the same values for `filename' and `line' will not produce the error message. */
 #define error_at_line (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_at_line))
 #endif /* !__cplusplus */
-#else /* CUSTOM: error_at_line */
-#undef none
 #endif /* error_at_line... */
 #endif /* error_at_line... */
 

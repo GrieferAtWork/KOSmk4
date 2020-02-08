@@ -5857,9 +5857,13 @@ skip_alias_redirections:
 					bind_local_function(symbol_name);
 				}
 				if (has_define_require_prefix) {
-					fp << "#else /* CUSTOM: " << symbol_name << " */\n"
-					      "#undef " << guard_name << "\n"
-					      "#endif /* " << name << "... */\n";
+					if (with_guard) {
+						fp << "#else /* CUSTOM: " << symbol_name << " */\n"
+						      "#undef " << guard_name << "\n"
+						      "#endif /* " << name << "... */\n";
+					} else {
+						fp << "#endif /* " << name << "... */\n";
+					}
 				} else if (!always_available && with_guard) {
 					fp << "#else /* CUSTOM: " << symbol_name << " */\n"
 					      "#undef " << guard_name << "\n";
@@ -6532,9 +6536,13 @@ skip_alias_redirections2:
 				bind_local_function(symbol_name);
 			}
 			if (has_define_require_prefix) {
-				fp << "#else /* CUSTOM: " << symbol_name << " */\n"
-				      "#undef " << guard_name << "\n"
-				      "#endif /* " << name << "... */\n";
+				if (with_guard) {
+					fp << "#else /* CUSTOM: " << symbol_name << " */\n"
+					      "#undef " << guard_name << "\n"
+					      "#endif /* " << name << "... */\n";
+				} else {
+					fp << "#endif /* " << name << "... */\n";
+				}
 			} else if (!always_available && with_guard) {
 				fp << "#else /* CUSTOM: " << symbol_name << " */\n"
 				      "#undef " << guard_name << "\n";
