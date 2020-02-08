@@ -42,6 +42,7 @@
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h>
 #include <kos/syscalls.h>
+#include <sys/ioctl.h>
 
 #include <malloc.h>
 #include <signal.h>
@@ -219,7 +220,23 @@ linker_main(struct elfexec_info *__restrict info,
 
 	return result;
 err:
-	syslog(LOG_ERR, "DL Initialization failed: %s\n", libdl_dlerror());
+	{
+		char *error = libdl_dlerror();
+		syslog(LOG_ERR, "DL Initialization failed: %s\n", error);
+		/* If STDERR is a tty, also print the error message there.
+		 * Don't do so when STDERR is something different (such as
+		 * a file) in order to not accidentally inject an unexpected
+		 * error message into an error stream that wouldn't understand
+		 * such an error. */
+		{
+			struct termios ios;
+			if (sys_ioctl(STDERR_FILENO, TCGETA, &ios) >= 0) {
+				sys_write(STDERR_FILENO, "DL: ", 4);
+				sys_write(STDERR_FILENO, error, strlen(error));
+				sys_write(STDERR_FILENO, "\n", 1);
+			}
+		}
+	}
 	sys_exit_group(EXIT_FAILURE);
 }
 
