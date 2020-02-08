@@ -290,20 +290,6 @@ NOTHROW(FCALL pae_pagedir_set_prepared)(union pae_pdir_e1 *__restrict e1_p) {
 }
 
 
-LOCAL NOBLOCK void
-NOTHROW(FCALL pae_pagedir_unset_prepared)(union pae_pdir_e1 *__restrict e1_p) {
-	u64 word;
-	for (;;) {
-		/* Corrupt is OK, since ISHINT() only depends on the low 32 bits. */
-		word = ATOMIC_READ64_ALLOW_CORRUPT(e1_p->p_word);
-		if unlikely(PAE_PDIR_E1_ISHINT(word))
-			break; /* Special case: Hint */
-		assert(word & PAE_PAGE_FPREPARED);
-		if likely(ATOMIC_CMPXCH_WEAK(e1_p->p_word, word, word & ~PAE_PAGE_FPREPARED))
-			break;
-	}
-}
-
 
 
 /* Try to widen a 2MiB mapping to a 512*4KiB vector of linear memory
@@ -449,7 +435,7 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 
 
 LOCAL NOBLOCK WUNUSED bool
-NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 e1_p[512],
+NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 const e1_p[512],
                                                  u64 *__restrict new_e2_word,
                                                  unsigned int still_prepared_vec2) {
 	unsigned int vec1;
@@ -502,10 +488,48 @@ NOTHROW(KCALL pae_pagedir_can_flatten_e1_vector)(union pae_pdir_e1 e1_p[512],
 		if (vec1 == still_prepared_vec2 && !PAE_PDIR_E1_ISHINT(e1.p_word))
 			e1.p_word &= ~PAE_PAGE_FPREPARED;
 		if (e1.p_word != PAE_PAGE_ABSENT)
-			return false; /* Non-present, but with meta-data (hint/prepared) -> Cannot flatten. */
+			return false; /* Present, or with meta-data (hint/prepared) -> Cannot flatten. */
 	}
 	*new_e2_word = PAE_PAGE_ABSENT;
 	return true;
+}
+
+
+
+#ifdef NDEBUG
+#define pae_pagedir_unset_prepared(e1_p, vec3, vec2, vec1, vec1_unprepare_start, vec1_unprepare_size) \
+	pae_pagedir_unset_prepared(e1_p)
+#endif /* NDEBUG */
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL pae_pagedir_unset_prepared)(union pae_pdir_e1 *__restrict e1_p
+#ifndef NDEBUG
+                                          ,
+                                          unsigned int vec3,
+                                          unsigned int vec2,
+                                          unsigned int vec1,
+                                          unsigned int vec1_unprepare_start,
+                                          unsigned int vec1_unprepare_size
+#endif /* !NDEBUG */
+                                          ) {
+	u64 word;
+	for (;;) {
+		/* Corrupt is OK, since ISHINT() only depends on the low 32 bits. */
+		word = ATOMIC_READ64_ALLOW_CORRUPT(e1_p->p_word);
+		if unlikely(PAE_PDIR_E1_ISHINT(word))
+			break; /* Special case: Hint */
+#ifndef NDEBUG
+		assertf(word & PAE_PAGE_FPREPARED,
+		        "Attempted to unprepare page %p...%p as part of "
+		        "%p...%p, but that page wasn't marked as prepared",
+		        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1),
+		        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1 + 1) - 1,
+		        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1_unprepare_start),
+		        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1_unprepare_start + vec1_unprepare_size) - 1);
+#endif /* !NDEBUG */
+		if likely(ATOMIC_CMPXCH_WEAK(e1_p->p_word, word, word & ~PAE_PAGE_FPREPARED))
+			break;
+	}
 }
 
 
@@ -527,15 +551,25 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 	assert(vec1_unprepare_size != 0);
 	assert(vec1_unprepare_start + vec1_unprepare_size > vec1_unprepare_start);
 	assert(vec1_unprepare_start + vec1_unprepare_size <= 512);
-	assert(PAE_PDIR_E3_IDENTITY[vec3].p_word & PAE_PAGE_FPRESENT);
+	assertf(PAE_PDIR_E3_IDENTITY[vec3].p_word & PAE_PAGE_FPRESENT,
+			"E2-Vector %u:0-511 (%p-%p) containing pages %p-%p is not present", vec3,
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, 0, 0),
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, 1, 0) - 1,
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1_unprepare_start),
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1_unprepare_start + vec1_unprepare_size) - 1);
 	assertf(vec3 < PAE_PDIR_VEC3INDEX(KERNELSPACE_BASE),
 	        "The caller must ensure that no kernel-space addresses get here");
 	e2_p = &PAE_PDIR_E2_IDENTITY[vec3][vec2];
 	e2.p_word = ATOMIC_READ64(e2_p->p_word);
-	if (!(e2.p_word & PAE_PAGE_FPRESENT))
-		return; /* Not present */
+	assertf(e2.p_word & PAE_PAGE_FPRESENT,
+	        "E1-Vector %u:%u:%u-%u (%p-%p) containing pages %p-%p is not present",
+	        vec3, vec2, vec1_unprepare_start, vec1_unprepare_start + vec1_unprepare_size - 1,
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, 0),
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2 + 1, 0) - 1,
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1_unprepare_start),
+	        (byte_t *)PAE_PDIR_VECADDR(vec3, vec2, vec1_unprepare_start + vec1_unprepare_size) - 1);
 	assertf(!(e2.p_word & PAE_PAGE_F2MIB),
-	        "2MiB pages cannot be prepared (only 4KiB pages can be)");
+	        "A 2MiB page couldn't have been prepared (only 4KiB pages can be)");
 	/* Check if the 4KiB vector can be merged.
 	 * NOTE: We are guarantied that accessing the E1-vector is OK, because
 	 *       the caller guaranties that at least some part of the vector is
@@ -545,21 +579,16 @@ NOTHROW(FCALL pae_pagedir_unprepare_impl_flatten)(unsigned int vec3,
 	e1_p = PAE_PDIR_E1_IDENTITY[vec3][vec2];
 	for (vec1 = vec1_unprepare_start + 1;
 	     vec1 < vec1_unprepare_start + vec1_unprepare_size; ++vec1) {
-		assertf(ATOMIC_READ64(e1_p[vec1].p_word) & PAE_PAGE_FPREPARED,
-		        "Attempted to unprepare page %p...%p as part of "
-		        "%p...%p, but that page wasn't marked as prepared",
-		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
-		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1 + 1) - 1),
-		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1_unprepare_start)),
-		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1_unprepare_start + vec1_unprepare_size) - 1));
-		pae_pagedir_unset_prepared(&e1_p[vec1]);
+		pae_pagedir_unset_prepared(&e1_p[vec1], vec3, vec2, vec1,
+		                           vec1_unprepare_start, vec1_unprepare_size);
 	}
 	/* Read the current prepare-version _before_ we check if flattening is
 	 * possible. - That way, other threads are allowed to increment the version,
-	 * and forcing us to check again further below. */
+	 * forcing us to check again further below. */
 	old_version = ATOMIC_READ(x86_pagedir_prepare_version);
 	can_flatten = pae_pagedir_can_flatten_e1_vector(e1_p, &new_e2_word, vec1_unprepare_start);
-	pae_pagedir_unset_prepared(&e1_p[vec1_unprepare_start]);
+	pae_pagedir_unset_prepared(&e1_p[vec1_unprepare_start], vec3, vec2, vec1_unprepare_start,
+	                           vec1_unprepare_start, vec1_unprepare_size);
 	if unlikely(can_flatten) {
 		pflag_t was;
 		bool must_restart;
@@ -592,7 +621,10 @@ again_try_exchange_e2_word:
 			goto again_try_exchange_e2_word;
 		}
 		/* Successfully merged the vector.
-		 * At this point, all that's left is to free the vector. */
+		 * At this point, all that's left is to free the vector.
+		 * NOTE: No need to Shoot-down anything for this, since the new,
+		 *       flattened control word has identical meaning to the old
+		 *       E1-vector. */
 		page_freeone(ppageof(e2.p_word & PAE_PAGE_FVECTOR));
 	}
 }
