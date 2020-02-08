@@ -248,11 +248,11 @@ handle_blockdevice_ioctl(struct basic_block_device *__restrict self,
 		break;
 
 	case BLKGETSIZE:
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 		if (syscall_iscompat())
 			goto do_BLKGETSIZE_compat;
 		ATTR_FALLTHROUGH
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 	case _IOR(_IOC_TYPE(BLKGETSIZE), _IOC_NR(BLKGETSIZE), uintptr_t):
 		validate_writable(arg, sizeof(uintptr_t));
 		COMPILER_WRITE_BARRIER();
@@ -260,7 +260,7 @@ handle_blockdevice_ioctl(struct basic_block_device *__restrict self,
 		COMPILER_WRITE_BARRIER();
 		break;
 
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 	case _IOR(_IOC_TYPE(BLKGETSIZE), _IOC_NR(BLKGETSIZE), __ARCH_COMPAT_ULONGPTR_TYPE):
 do_BLKGETSIZE_compat:
 		validate_writable(arg, sizeof(__ARCH_COMPAT_ULONGPTR_TYPE));
@@ -268,7 +268,7 @@ do_BLKGETSIZE_compat:
 		*(__ARCH_COMPAT_ULONGPTR_TYPE *)arg = (__ARCH_COMPAT_ULONGPTR_TYPE)(self->bd_total_bytes / 512);
 		COMPILER_WRITE_BARRIER();
 		break;
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 
 
 	case BLKFLSBUF:
@@ -276,77 +276,77 @@ do_BLKGETSIZE_compat:
 		break;
 
 	case BLKRASET:
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 		if (syscall_iscompat())
 			goto do_BLKRASET_compat;
 		ATTR_FALLTHROUGH
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 	case _IOW(_IOC_TYPE(BLKRASET), _IOC_NR(BLKRASET), uintptr_t):
 		validate_readable(arg, sizeof(uintptr_t));
 		block_device_set_readahead(self, (size_t)*(uintptr_t *)arg);
 		break;
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 	case _IOW(_IOC_TYPE(BLKRASET), _IOC_NR(BLKRASET), __ARCH_COMPAT_ULONGPTR_TYPE):
 do_BLKRASET_compat:
 		validate_readable(arg, sizeof(__ARCH_COMPAT_ULONGPTR_TYPE));
 		block_device_set_readahead(self, (size_t)*(__ARCH_COMPAT_ULONGPTR_TYPE *)arg);
 		break;
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 
 	case BLKRAGET:
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 		if (syscall_iscompat())
 			goto do_BLKRAGET_compat;
 		ATTR_FALLTHROUGH
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 	case _IOR(_IOC_TYPE(BLKRAGET), _IOC_NR(BLKRAGET), uintptr_t):
 		validate_writable(arg, sizeof(uintptr_t));
 		*(uintptr_t *)arg = (uintptr_t)block_device_get_readahead(self);
 		break;
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 	case _IOR(_IOC_TYPE(BLKRAGET), _IOC_NR(BLKRAGET), __ARCH_COMPAT_ULONGPTR_TYPE):
 do_BLKRAGET_compat:
 		validate_writable(arg, sizeof(__ARCH_COMPAT_ULONGPTR_TYPE));
 		*(__ARCH_COMPAT_ULONGPTR_TYPE *)arg = (__ARCH_COMPAT_ULONGPTR_TYPE)block_device_get_readahead(self);
 		break;
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 
 	case BLKFRASET:
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 		if (syscall_iscompat())
 			goto do_BLKFRASET_compat;
 		ATTR_FALLTHROUGH
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 	case _IOW(_IOC_TYPE(BLKFRASET), _IOC_NR(BLKFRASET), uintptr_t):
 		validate_readable(arg, sizeof(uintptr_t));
 		block_device_set_fsreadahead(self, (size_t)*(uintptr_t *)arg);
 		break;
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 	case _IOW(_IOC_TYPE(BLKFRASET), _IOC_NR(BLKFRASET), __ARCH_COMPAT_ULONGPTR_TYPE):
 do_BLKFRASET_compat:
 		validate_readable(arg, sizeof(__ARCH_COMPAT_ULONGPTR_TYPE));
 		block_device_set_fsreadahead(self, (size_t)*(__ARCH_COMPAT_ULONGPTR_TYPE *)arg);
 		break;
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 
 
 	case BLKFRAGET:
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 		if (syscall_iscompat())
 			goto do_BLKFRAGET_compat;
 		ATTR_FALLTHROUGH
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 	case _IOR(_IOC_TYPE(BLKFRAGET), _IOC_NR(BLKFRAGET), uintptr_t):
 		validate_writable(arg, sizeof(uintptr_t));
 		*(uintptr_t *)arg = (uintptr_t)block_device_get_fsreadahead(self);
 		break;
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__)
 	case _IOR(_IOC_TYPE(BLKFRAGET), _IOC_NR(BLKFRAGET), __ARCH_COMPAT_ULONGPTR_TYPE):
 do_BLKFRAGET_compat:
 		validate_writable(arg, sizeof(__ARCH_COMPAT_ULONGPTR_TYPE));
 		*(__ARCH_COMPAT_ULONGPTR_TYPE *)arg = (__ARCH_COMPAT_ULONGPTR_TYPE)block_device_get_fsreadahead(self);
 		break;
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__) */
 
 	case BLKSECTSET:
 	case _IOW(_IOC_TYPE(BLKSECTSET), _IOC_NR(BLKSECTSET), u16):
@@ -373,23 +373,23 @@ do_BLKFRAGET_compat:
 		validate_writable(arg, sizeof(size_t));
 		*(size_t *)arg = block_device_get_sector_size(self);
 		break;
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_SIZE_T != __SIZEOF_SIZE_T__)
 	case _IOR(_IOC_TYPE(BLKBSZGET), _IOC_NR(BLKBSZGET), __ARCH_COMPAT_SIZE_T):
 		validate_writable(arg, sizeof(__ARCH_COMPAT_SIZE_T));
 		*(__ARCH_COMPAT_SIZE_T *)arg = (__ARCH_COMPAT_SIZE_T)block_device_get_sector_size(self);
 		break;
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_SIZE_T != __SIZEOF_SIZE_T__) */
 
 	case BLKBSZSET:
 		validate_readable(arg, sizeof(size_t));
 		block_device_set_sector_size(self, *(size_t *)arg);
 		break;
-#ifdef __ARCH_HAVE_COMPAT
+#if defined(__ARCH_HAVE_COMPAT) && (__ARCH_COMPAT_SIZEOF_SIZE_T != __SIZEOF_SIZE_T__)
 	case _IOW(_IOC_TYPE(BLKBSZSET), _IOC_NR(BLKBSZSET), __ARCH_COMPAT_SIZE_T):
 		validate_readable(arg, sizeof(__ARCH_COMPAT_SIZE_T));
 		block_device_set_sector_size(self, (size_t)*(__ARCH_COMPAT_SIZE_T *)arg);
 		break;
-#endif /* __ARCH_HAVE_COMPAT */
+#endif /* __ARCH_HAVE_COMPAT && (__ARCH_COMPAT_SIZEOF_SIZE_T != __SIZEOF_SIZE_T__) */
 
 	case BLKGETSIZE64:
 #if __SIZEOF_SIZE_T__ != 8

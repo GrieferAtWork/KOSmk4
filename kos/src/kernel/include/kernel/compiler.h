@@ -155,13 +155,18 @@
 
 
 /* Breakpoint */
-#ifdef __INTELLISENSE__
+#ifndef __CC__
+#define BREAKPOINT() /* nothing */
+#elif defined(__INTELLISENSE__)
 FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 #define BREAKPOINT        BREAKPOINT
-#elif !defined(CONFIG_NO_DEBUGGER)
-#define BREAKPOINT()   ({ FUNDEF void KCALL dbg(void); dbg(); })
 #else
-#define BREAKPOINT()     (void)0 /* ??? */
+#include <debugger/config.h>
+#ifndef CONFIG_NO_DEBUGGER
+#define BREAKPOINT()      ({ FUNDEF void KCALL dbg(void); dbg() })
+#else /* !CONFIG_NO_DEBUGGER */
+#define BREAKPOINT()      (void)0 /* ??? */
+#endif /* CONFIG_NO_DEBUGGER */
 #endif
 
 #define __COMPILER_UNIQUE_IMPL2(x, y) x##y
