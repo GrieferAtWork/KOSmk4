@@ -26,6 +26,10 @@
 #include <hybrid/__overflow.h>
 #include <bits/types.h>
 
+#ifndef TLFT_NO_LOOKUP
+#include <hybrid/sequence/bsearch.h>
+#endif /* !TLFT_NO_LOOKUP */
+
 __DECL_BEGIN
 
 /* Definitions for a simple tile-based font file format.
@@ -96,6 +100,7 @@ typedef struct {
 } TLFT_UniGroup;
 
 
+#ifndef TLFT_NO_LOOKUP
 /* Sample implementation for how to perform a character bitmap
  * lookup for a given TLFT file that has been mapped into memory.
  * Upon success, return the `1 << self->h_log2chsize'-byte large
@@ -104,7 +109,7 @@ __LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __uint8_t const *
 tlft_lookup(TLFT_Hdr const *__restrict self, __uint32_t ch) {
 	__uint8_t const *chars, *ascii;
 	TLFT_UniGroup *groups;
-	__uint8_t i, step;
+	__uint8_t i;
 	groups = (TLFT_UniGroup *)((__byte_t *)self + self->h_hdrsize);
 	ascii  = (__uint8_t *)(groups + self->h_ngroups);
 	/* Check for simple case: ASCII character */
@@ -112,21 +117,14 @@ tlft_lookup(TLFT_Hdr const *__restrict self, __uint32_t ch) {
 		return ascii + ((ch - 0x0020) << self->h_log2chsize);
 	chars = ascii + (95 << self->h_log2chsize);
 	/* bsearch-style lookup */
-	for (i = self->h_ngroups / 2, step = i / 2;; step = (step + 1) / 2) {
-		if (ch < groups[i].ug_minuni) {
-			if (__hybrid_overflow_usub(i, step, &i))
-				break;
-			continue;
-		}
-		if (ch > groups[i].ug_minuni) {
-			if (__hybrid_overflow_uadd(i, step, &i) || i >= self->h_ngroups)
-				break;
-			continue;
-		}
+	BSEARCHR(i, groups, self->h_ngroups,
+	         /*item*/ .ug_minuni, /*item*/ .ug_maxuni, ch) {
+		/* Found it! */
 		return chars + (groups[i].ug_offset << self->h_log2chsize);
 	}
 	return __NULLPTR;
 }
+#endif /* !TLFT_NO_LOOKUP */
 
 #endif /* __CC__ */
 

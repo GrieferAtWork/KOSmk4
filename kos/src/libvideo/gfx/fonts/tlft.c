@@ -19,12 +19,14 @@
  */
 #ifndef GUARD_LIBVIDEO_GFX_FONTS_TLFT_C
 #define GUARD_LIBVIDEO_GFX_FONTS_TLFT_C 1
+#define TLFT_NO_LOOKUP 1
 
 #include "tlft.h"
 
 #include <hybrid/compiler.h>
 
 #include <hybrid/overflow.h>
+#include <hybrid/sequence/bsearch.h>
 
 #include <kos/types.h>
 #include <sys/mman.h>
@@ -52,6 +54,7 @@ libvideo_tlft_destroy(struct video_font *__restrict self) {
 	free(me);
 }
 
+
 /* Lookup the bitmap associated with a given character. */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) void *CC
 libvideo_tlft_lookup(struct tlft_font const *__restrict self,
@@ -59,12 +62,10 @@ libvideo_tlft_lookup(struct tlft_font const *__restrict self,
 	uint8_t i;
 	if (ord >= 0x0020 && ord <= 0x007e)
 		return self->tf_ascii + ((ord - 0x0020) << self->tf_hdr->h_log2chsize);
-	/* TODO: Do what bsearch() does here! */
-	for (i = 0; i < self->tf_hdr->h_ngroups; ++i) {
-		if ((uint16_t)ord < self->tf_grps[i].ug_minuni)
-			continue;
-		if ((uint16_t)ord > self->tf_grps[i].ug_maxuni)
-			continue;
+	BSEARCHR(i, self->tf_grps, self->tf_hdr->h_ngroups,
+	         /*item*/ .ug_minuni, /*item*/ .ug_maxuni,
+	         (uint16_t)ord) {
+		/* Found it! */
 		return self->tf_chars + ((self->tf_grps[i].ug_offset +
 		                          ((uint16_t)ord - self->tf_grps[i].ug_minuni))
 		                         << self->tf_hdr->h_log2chsize);
