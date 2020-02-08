@@ -2523,9 +2523,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, vm_datablock_anonymous_zero_type; .int 0
 	.int 0x362a275
 	.quad .Lname630 /* index: 630 */
-	.weak sys32_idle; .quad sys32_idle
-	.reloc ., R_X86_64_SIZE32, sys32_idle; .int 0
-	.int 0x6824b45
+	.weak path_lock_endwrite; .quad path_lock_endwrite
+	.reloc ., R_X86_64_SIZE32, path_lock_endwrite; .int 0
+	.int 0x28c4b45
 	.quad 0 /* index: 631 */
 	.quad 0
 	.int 0
@@ -2554,10 +2554,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak unwind_getreg_icpustate; .quad unwind_getreg_icpustate
 	.reloc ., R_X86_64_SIZE32, unwind_getreg_icpustate; .int 0
 	.int 0xb8c75b5
-	.quad 0 /* index: 638 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname638 /* index: 638 */
+	.weak unicode_utf8seqlen; .quad unicode_utf8seqlen
+	.reloc ., R_X86_64_SIZE32, unicode_utf8seqlen; .int 0
+	.int 0x2ee527e
 	.quad .Lname639 /* index: 639 */
 	.weak fs_filesystems_lock_trywrite; .quad fs_filesystems_lock_trywrite
 	.reloc ., R_X86_64_SIZE32, fs_filesystems_lock_trywrite; .int 0
@@ -3655,9 +3655,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, vm_kernel_treelock_write; .int 0
 	.int 0x94d43a5
 	.quad .Lname913 /* index: 913 */
-	.weak x86_fpustate_variant; .quad x86_fpustate_variant
-	.reloc ., R_X86_64_SIZE32, x86_fpustate_variant; .int 0
-	.int 0xde58d44
+	.weak x86_dbg_trapstatekind; .quad x86_dbg_trapstatekind
+	.reloc ., R_X86_64_SIZE32, x86_dbg_trapstatekind; .int 0
+	.int 0xf7a9e34
 	.quad .Lname914 /* index: 914 */
 	.weak sys32_membarrier; .quad sys32_membarrier
 	.reloc ., R_X86_64_SIZE32, sys32_membarrier; .int 0
@@ -3711,9 +3711,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname927 /* index: 927 */
-	.weak path_lock_endwrite; .quad path_lock_endwrite
-	.reloc ., R_X86_64_SIZE32, path_lock_endwrite; .int 0
-	.int 0x28c4b45
+	.weak kernel_vpanic_fcpustate; .quad kernel_vpanic_fcpustate
+	.reloc ., R_X86_64_SIZE32, kernel_vpanic_fcpustate; .int 0
+	.int 0xf5aeb45
 	.quad .Lname928 /* index: 928 */
 	.weak vm86_outl; .quad vm86_outl
 	.reloc ., R_X86_64_SIZE32, vm86_outl; .int 0
@@ -4031,9 +4031,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1007 /* index: 1007 */
-	.weak vm_datablock_readvp; .quad vm_datablock_readvp
-	.reloc ., R_X86_64_SIZE32, vm_datablock_readvp; .int 0
-	.int 0xc438930
+	.weak this_trampoline_node; .quad this_trampoline_node
+	.reloc ., R_X86_64_SIZE32, this_trampoline_node; .int 0
+	.int 0xe061b45
 	.quad 0 /* index: 1008 */
 	.quad 0
 	.int 0
@@ -4174,10 +4174,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak keyboard_device_trygetchar; .quad keyboard_device_trygetchar
 	.reloc ., R_X86_64_SIZE32, keyboard_device_trygetchar; .int 0
 	.int 0x2dfb412
-	.quad 0 /* index: 1043 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname1043 /* index: 1043 */
+	.weak this_exception_pointers; .quad this_exception_pointers
+	.reloc ., R_X86_64_SIZE32, this_exception_pointers; .int 0
+	.int 0xab7c603
 	.quad .Lname1044 /* index: 1044 */
 	.weak ringbuffer_skipread; .quad ringbuffer_skipread
 	.reloc ., R_X86_64_SIZE32, ringbuffer_skipread; .int 0
@@ -6159,9 +6159,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname1539 /* index: 1539 */
-	.weak this_exception_pointers; .quad this_exception_pointers
-	.reloc ., R_X86_64_SIZE32, this_exception_pointers; .int 0
-	.int 0xab7c603
+	.weak kernel_panic_fcpustate; .quad kernel_panic_fcpustate
+	.reloc ., R_X86_64_SIZE32, kernel_panic_fcpustate; .int 0
+	.int 0x78a8ef5
 	.quad .Lname1540 /* index: 1540 */
 	.weak pidns_trylookup_task_locked; .quad pidns_trylookup_task_locked
 	.reloc ., R_X86_64_SIZE32, pidns_trylookup_task_locked; .int 0
@@ -10563,9 +10563,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.int 0
 	.int 0
 	.quad .Lname2640 /* index: 2640 */
-	.weak x86_dbg_trapstatekind; .quad x86_dbg_trapstatekind
-	.reloc ., R_X86_64_SIZE32, x86_dbg_trapstatekind; .int 0
-	.int 0xf7a9e34
+	.weak vm_datablock_readvp; .quad vm_datablock_readvp
+	.reloc ., R_X86_64_SIZE32, vm_datablock_readvp; .int 0
+	.int 0xc438930
 	.quad .Lname2641 /* index: 2641 */
 	.weak superblock_mountlock_tryupgrade; .quad superblock_mountlock_tryupgrade
 	.reloc ., R_X86_64_SIZE32, superblock_mountlock_tryupgrade; .int 0
@@ -13915,9 +13915,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_X86_64_SIZE32, sys_close; .int 0
 	.int 0x95a6d95
 	.quad .Lname3478 /* index: 3478 */
-	.weak this_trampoline_node; .quad this_trampoline_node
-	.reloc ., R_X86_64_SIZE32, this_trampoline_node; .int 0
-	.int 0xe061b45
+	.weak sys32_idle; .quad sys32_idle
+	.reloc ., R_X86_64_SIZE32, sys32_idle; .int 0
+	.int 0x6824b45
 	.quad .Lname3479 /* index: 3479 */
 	.weak sys_reboot; .quad sys_reboot
 	.reloc ., R_X86_64_SIZE32, sys_reboot; .int 0
@@ -14258,10 +14258,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.quad 0
 	.int 0
 	.int 0
-	.quad 0 /* index: 3564 */
-	.quad 0
-	.int 0
-	.int 0
+	.quad .Lname3564 /* index: 3564 */
+	.weak x86_fpustate_variant; .quad x86_fpustate_variant
+	.reloc ., R_X86_64_SIZE32, x86_fpustate_variant; .int 0
+	.int 0xde58d44
 	.quad .Lname3565 /* index: 3565 */
 	.weak aio_pbuffer_copyfrommem; .quad aio_pbuffer_copyfrommem
 	.reloc ., R_X86_64_SIZE32, aio_pbuffer_copyfrommem; .int 0
@@ -17311,7 +17311,7 @@ END(kernel_symbol_table)
 .Lname629:
 	.string "vm_datablock_anonymous_zero_type"
 .Lname630:
-	.string "sys32_idle"
+	.string "path_lock_endwrite"
 .Lname632:
 	.string "sys32_waitpid"
 .Lname633:
@@ -17322,6 +17322,8 @@ END(kernel_symbol_table)
 	.string "vmb_find_last_node_lower_equal"
 .Lname637:
 	.string "unwind_getreg_icpustate"
+.Lname638:
+	.string "unicode_utf8seqlen"
 .Lname639:
 	.string "fs_filesystems_lock_trywrite"
 .Lname640:
@@ -17705,7 +17707,7 @@ END(kernel_symbol_table)
 .Lname912:
 	.string "vm_kernel_treelock_write"
 .Lname913:
-	.string "x86_fpustate_variant"
+	.string "x86_dbg_trapstatekind"
 .Lname914:
 	.string "sys32_membarrier"
 .Lname915:
@@ -17725,7 +17727,7 @@ END(kernel_symbol_table)
 .Lname924:
 	.string "memrendl"
 .Lname927:
-	.string "path_lock_endwrite"
+	.string "kernel_vpanic_fcpustate"
 .Lname928:
 	.string "vm86_outl"
 .Lname929:
@@ -17835,7 +17837,7 @@ END(kernel_symbol_table)
 .Lname1005:
 	.string "validate_userm"
 .Lname1007:
-	.string "vm_datablock_readvp"
+	.string "this_trampoline_node"
 .Lname1010:
 	.string "block_device_awrite_phys_sector"
 .Lname1011:
@@ -17886,6 +17888,8 @@ END(kernel_symbol_table)
 	.string "vm_copypagetophys"
 .Lname1042:
 	.string "keyboard_device_trygetchar"
+.Lname1043:
+	.string "this_exception_pointers"
 .Lname1044:
 	.string "ringbuffer_skipread"
 .Lname1049:
@@ -18559,7 +18563,7 @@ END(kernel_symbol_table)
 .Lname1537:
 	.string "kernel_panic"
 .Lname1539:
-	.string "this_exception_pointers"
+	.string "kernel_panic_fcpustate"
 .Lname1540:
 	.string "pidns_trylookup_task_locked"
 .Lname1541:
@@ -20047,7 +20051,7 @@ END(kernel_symbol_table)
 .Lname2638:
 	.string "handle_lookupin"
 .Lname2640:
-	.string "x86_dbg_trapstatekind"
+	.string "vm_datablock_readvp"
 .Lname2641:
 	.string "superblock_mountlock_tryupgrade"
 .Lname2642:
@@ -21251,7 +21255,7 @@ END(kernel_symbol_table)
 .Lname3477:
 	.string "sys_close"
 .Lname3478:
-	.string "this_trampoline_node"
+	.string "sys32_idle"
 .Lname3479:
 	.string "sys_reboot"
 .Lname3483:
@@ -21370,6 +21374,8 @@ END(kernel_symbol_table)
 	.string "x86_fpustate_load"
 .Lname3562:
 	.string "keyboard_device_putkey"
+.Lname3564:
+	.string "x86_fpustate_variant"
 .Lname3565:
 	.string "aio_pbuffer_copyfrommem"
 .Lname3566:

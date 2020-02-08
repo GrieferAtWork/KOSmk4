@@ -193,6 +193,9 @@ function key_libd_export(x: string): string {
 function key_libd_is_export(x: string): string {
 	return x.startswith("DOS$");
 }
+
+@@Set of all CRT functions assembly names exported by the kernel
+global allKernelCrtFunctions: {string...} = HashSet();
 global all_crt_features: {string...} = HashSet();
 
 @@Returns @true if @x requires an extended pp expression to become a viable alias
@@ -1875,6 +1878,19 @@ function parse_functions(filename: string, text: string): {string | Function...}
 					extern_name = extern_name[1:-1];
 					for (local x: extern_name.split(","))
 						yield FunctionAlias(x.strip());
+				} else if (directive.startswith("declare_kernel_export")) {
+					directive = directive[#"declare_kernel_export":].lstrip();
+					if (!directive.startswith("("))
+						err(directive_begin, "Expected `(' after `%[declare_kernel_export' in " + repr directive);
+					local defend = directive.findmatch("(", ")", 1);
+					if (defend < 0)
+						err(directive_begin, "Missing `)' after `%[declare_kernel_export" + repr directive + "'");
+					if (directive[defend + 1:].strip() != "")
+						err(directive_begin, "Trailing text after `%[declare_kernel_export(...)': " + repr directive[defend:].strip());
+					for (local x: directive[1:defend].split(",")) {
+						x = x.strip();
+						allKernelCrtFunctions.insert(x);
+					}
 				} else if (directive.startswith("declare_known_section")) {
 					directive = directive[#"declare_known_section":].lstrip();
 					if (!directive.startswith("("))
@@ -8384,11 +8400,13 @@ function write_libc_auto_implementation(
 		if (f.helper_function)
 			continue;
 		if (!f.nocrt) {
+			allKernelCrtFunctions.insert(f.name);
 			fp << "DEFINE_PUBLIC_WEAK_ALIAS(";
 			fp << key_asmname(f.name) << ", ";
 			fp << key_libc_internal(f.name) << ");\n";
 		}
 		for (local alt: f.alternate_names) {
+			allKernelCrtFunctions.insert(alt);
 			fp << "DEFINE_PUBLIC_WEAK_ALIAS("
 			   << key_asmname(alt) << ", "
 			   << key_libc_internal(f.name) << ");\n";
@@ -8510,6 +8528,14 @@ print;
 /* Write the crt-all-features header File. */
 write_hashed_file_l("include/crt-features/all.h", [](fp: File) {
 	local feat = List(all_crt_features);
+	feat.sort();
+	fp << copyright << "\n\n\n";
+	for (local f: feat)
+		fp << "#define __CRT_HAVE_" << crt_have_encode(f) << " 1\n";
+});
+
+write_hashed_file_l("include/crt-features/crt-kos-kernel.h", [](fp: File) {
+	local feat = List(allKernelCrtFunctions);
 	feat.sort();
 	fp << copyright << "\n\n\n";
 	for (local f: feat)

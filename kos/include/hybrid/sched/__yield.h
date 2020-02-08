@@ -44,7 +44,7 @@
 #ifdef __task_yield_defined
 #define __hybrid_yield()    task_yield()
 #define __hybrid_yield_nx() task_yield_nx()
-#elif defined(__CRT_HAVE_task_yield) && defined(__CRT_HAVE_task_yield_nx)
+#else /* __task_yield_defined */
 #define __task_yield_defined 1
 __DECL_BEGIN
 #ifdef THROWS
@@ -58,7 +58,7 @@ __PUBDEF __BOOL __NOTHROW(__KCALL task_yield_nx)(void);
 #define __hybrid_yield()    task_yield()
 #define __hybrid_yield_nx() task_yield_nx()
 __DECL_END
-#endif
+#endif /* !__task_yield_defined */
 
 #elif __KOS_VERSION__ >= 300
 /************************************************************************/
@@ -122,8 +122,9 @@ __DECL_END
 #endif /* __CRT_HAVE_SC(sched_yield) */
 #endif /* __WANT_INLINE_SYSCALLS */
 #ifndef __hybrid_yield
+#include <__crt.h>
 __DECL_BEGIN
-__INTDEF int (__ATTR_CDECL libc_sched_yield)(void);
+__INTDEF int (__LIBCCALL libc_sched_yield)(void);
 __DECL_END
 #define __hybrid_yield() libc_sched_yield()
 #endif /* !__hybrid_yield */
@@ -134,7 +135,9 @@ __DECL_END
 /************************************************************************/
 
 #include <__crt.h>
-#if defined(__CRT_HAVE_sched_yield)
+#if defined(__sched_yield_defined)
+#define __hybrid_yield() sched_yield()
+#elif defined(__CRT_HAVE_sched_yield)
 __DECL_BEGIN __NAMESPACE_INT_BEGIN
 __LIBC int (__LIBCCALL sched_yield)(void);
 __NAMESPACE_INT_END __DECL_END

@@ -153,8 +153,6 @@ BEGIN
 		END
 	}
 
-	final local KERNEL_FEATURES_HEADER =
-		"/kos/include/" + XARCH + "-kos/crt-features/crt-kos-kernel" + SUFFIX + ".h";
 	final local KERNEL_EXPORTS_SOURCE =
 		"/kos/src/kernel/include/" + XARCH + "-kos/kernel/arch/core-symbols" + SUFFIX + ".h";
 
@@ -181,11 +179,6 @@ BEGIN
 						symbols_map["kernel_symbol_table"] = 0; /* Filled later */
 					}
 					local sorted_keys = symbols_map.keys.sorted();
-					updateFileContents(self.group.fixFilename(KERNEL_FEATURES_HEADER), [](fp: File) {
-						fp << COPYRIGHT << "\n\n\n";
-						for (local x: sorted_keys)
-							fp << "#define __CRT_HAVE_" << x << " 1\n";
-					});
 					updateFileContents(self.group.fixFilename(KERNEL_EXPORTS_SOURCE), [](fp: File) {
 						/* Generate the hash-vector */
 						local U32 = try TARGET.AS_I32 catch (...) ".int32";
@@ -250,8 +243,7 @@ BEGIN
 					});
 				}
 			).withMaybeModifiedOutputFiles({
-				KERNEL_FEATURES_HEADER,
-				KERNEL_EXPORTS_SOURCE,
+				KERNEL_EXPORTS_SOURCE
 			}),
 		};
 
