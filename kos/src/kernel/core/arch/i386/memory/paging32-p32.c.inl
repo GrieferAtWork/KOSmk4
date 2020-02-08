@@ -744,6 +744,7 @@ NOTHROW(FCALL p32_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                   u16 perm) {
 	u32 e1_word;
 	unsigned int vec2, vec1;
+	PG_TRACE_MAP(addr, PAGESIZE, phys, perm);
 	e1_word = p32_pagedir_encode_4kib(addr, phys, perm);
 	vec2 = P32_PDIR_VEC2INDEX(addr);
 	vec1 = P32_PDIR_VEC1INDEX(addr);
@@ -758,6 +759,7 @@ NOTHROW(FCALL p32_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	size_t i;
 	u32 e1_word;
 	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
+	PG_TRACE_MAP(addr, num_bytes, phys, perm);
 	e1_word = p32_pagedir_encode_4kib(addr, phys, perm);
 	for (i = 0; i < num_bytes; i += 4096) {
 		unsigned int vec2, vec1;
@@ -782,6 +784,7 @@ NOTHROW(FCALL p32_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                        u16 perm) {
 	u32 e1_word, result;
 	unsigned int vec2, vec1;
+	PG_TRACE_MAP(addr, PAGESIZE, phys, perm);
 	e1_word = p32_pagedir_encode_4kib(addr, phys, perm);
 	vec2 = P32_PDIR_VEC2INDEX(addr);
 	vec1 = P32_PDIR_VEC1INDEX(addr);
@@ -807,6 +810,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL p32_pagedir_unmapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec2, vec1;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
+	PG_TRACE_UNMAP(addr, PAGESIZE);
 	vec2 = P32_PDIR_VEC2INDEX(addr);
 	vec1 = P32_PDIR_VEC1INDEX(addr);
 	p32_pagedir_set_e1_word(vec2, vec1,
@@ -819,6 +823,7 @@ NOTHROW(FCALL p32_pagedir_unmap)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                  PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	size_t i;
 	PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes);
+	PG_TRACE_UNMAP(addr, num_bytes);
 	for (i = 0; i < num_bytes; i += 4096) {
 		unsigned int vec2, vec1;
 		byte_t *effective_addr = (byte_t *)addr + i;

@@ -24,6 +24,8 @@
 
 #include <kernel/paging.h>
 
+#include <hybrid/align.h>
+
 #include <assert.h>
 
 #if !defined(NDEBUG) && 0

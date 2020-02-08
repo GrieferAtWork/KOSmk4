@@ -32,15 +32,6 @@
 #include <asm/cpu-cpuid.h>
 
 
-/* TODO: Re-add support for `TRACE_PAGING()' */
-#if !defined(NDEBUG) && 0
-#include <kernel/printk.h>
-#define TRACE_PAGING(...) printk(KERN_DEBUG __VA_ARGS__)
-#else
-#define NO_TRACE_PAGING 1
-#define TRACE_PAGING(...) (void)0
-#endif
-
 #if 1 /* Not used often enough to excuse taking up precious cache space */
 #define ATTR_PAGING_READMOSTLY /* nothing */
 #else
