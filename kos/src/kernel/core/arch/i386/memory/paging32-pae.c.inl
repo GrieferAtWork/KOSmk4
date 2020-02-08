@@ -95,11 +95,11 @@ STATIC_ASSERT(offsetof(struct pae_pdir_e3_identity_t_struct, x[1])       == 8);
  */
 #if 1 /* Since we need to use a cmpxchg8b anyways, it's better to \
        * simply use it to figure out the correct value from the get-go */
-#define ATOMIC_READ64(word)                   \
-	XBLOCK({                                  \
-		u64 _res;                             \
-		_res = ATOMIC_CMPXCH_VAL(word, 0, 0); \
-		XRETURN _res;                         \
+#define ATOMIC_READ64(word)                              \
+	XBLOCK({                                             \
+		u64 _res;                                        \
+		_res = ATOMIC_CMPXCH_VAL(*(u64 *)&(word), 0, 0); \
+		XRETURN _res;                                    \
 	})
 #else
 #define ATOMIC_READ64(word)                              \
