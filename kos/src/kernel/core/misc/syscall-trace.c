@@ -37,6 +37,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/pid.h>
+#include <sched/signal.h>
 #include <sched/task.h>
 
 #include <kos/bits/except-handler.h>
@@ -52,6 +53,7 @@
 #include <sys/syscall.h>       /* SYS_* */
 #include <sys/wait.h>          /* W* */
 
+#include <assert.h>
 #include <fcntl.h>          /* O_* */
 #include <format-printer.h> /* pformatprinter */
 #include <inttypes.h>       /* PRI* */
@@ -94,6 +96,7 @@ syscall_trace(struct rpc_syscall_info const *__restrict info) {
 #endif /* !__ARCH_HAVE_COMPAT */
 #endif
 	syscall_printtrace(info, &syslog_printer, SYSLOG_LEVEL_TRACE);
+	assert(!task_isconnected());
 }
 
 

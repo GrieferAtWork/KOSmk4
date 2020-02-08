@@ -30,7 +30,7 @@ DECL_BEGIN
 
 
 static int volatile x = 77;
-static int volatile *p = (int volatile *)0x1234;
+static int volatile *volatile p = (int volatile *)0x1234;
 
 PRIVATE ATTR_NOINLINE void cause_segfault() {
 	*p = x;

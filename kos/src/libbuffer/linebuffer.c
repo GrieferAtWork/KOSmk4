@@ -169,9 +169,14 @@ done:
 #ifdef __KERNEL__
 	/* Wait for the buffer */
 	task_connect(&self->lb_nful);
-	temp = linebuffer_write_nonblock(self,
-	                                 src,
-	                                 num_bytes);
+	TRY {
+		temp = linebuffer_write_nonblock(self,
+		                                 src,
+		                                 num_bytes);
+	} EXCEPT {
+		task_disconnectall();
+		RETHROW();
+	}
 	if likely(!temp) {
 		if unlikely(!ATOMIC_READ(self->lb_limt)) {
 			task_disconnectall();
@@ -217,9 +222,14 @@ again:
 #ifdef __KERNEL__
 		/* Wait for the buffer */
 		task_connect(&self->lb_nful);
-		result = liblinebuffer_write_nonblock(self,
-		                                      src,
-		                                      num_bytes);
+		TRY {
+			result = liblinebuffer_write_nonblock(self,
+			                                      src,
+			                                      num_bytes);
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
 		assert(result <= num_bytes);
 		if likely(!result && ATOMIC_READ(self->lb_limt)) {
 			task_waitfor();

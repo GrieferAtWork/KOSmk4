@@ -572,7 +572,7 @@ NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 	}
 #ifdef DEFINE_IO_ASYNC
 	TRY
-#endif
+#endif /* DEFINE_IO_ASYNC */
 	{
 		/* Check for overflow and truncate as needed. */
 		if unlikely(OVERFLOW_UADD(file_position, num_bytes, &file_end))

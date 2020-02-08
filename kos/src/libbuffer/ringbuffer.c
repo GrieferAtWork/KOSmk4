@@ -203,9 +203,14 @@ again_connect:
 #ifdef __KERNEL__
 	task_connect(&self->rb_nempty);
 	/* Try to read more data. */
-	temp = libringbuffer_read_nonblock(self,
-	                                   (byte_t *)dst + result,
-	                                   num_bytes - result);
+	TRY {
+		temp = libringbuffer_read_nonblock(self,
+		                                   (byte_t *)dst + result,
+		                                   num_bytes - result);
+	} EXCEPT {
+		task_disconnectall();
+		RETHROW();
+	}
 	if unlikely(temp) {
 		result += temp;
 		task_disconnectall();
@@ -437,9 +442,14 @@ again_connect:
 #ifdef __KERNEL__
 	task_connect(&self->rb_nfull);
 	/* Try to read more data. */
-	temp = libringbuffer_write_nonblock(self,
-	                                    (byte_t *)src + result,
-	                                    num_bytes - result);
+	TRY {
+		temp = libringbuffer_write_nonblock(self,
+		                                    (byte_t *)src + result,
+		                                    num_bytes - result);
+	} EXCEPT {
+		task_disconnectall();
+		RETHROW();
+	}
 	if unlikely(temp) {
 		result += temp;
 		if (result >= num_bytes) {
@@ -509,9 +519,14 @@ again_connect:
 #ifdef __KERNEL__
 	task_connect(&self->rb_nfull);
 	/* Try to read more data. */
-	temp = libringbuffer_write_nonblock(self,
-	                                    (byte_t *)src + result,
-	                                    num_bytes - result);
+	TRY {
+		temp = libringbuffer_write_nonblock(self,
+		                                    (byte_t *)src + result,
+		                                    num_bytes - result);
+	} EXCEPT {
+		task_disconnectall();
+		RETHROW();
+	}
 	if unlikely(temp) {
 		result += temp;
 		task_disconnectall();
