@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14fc5305 */
+/* HASH CRC-32:0xbc55f3c2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2112,6 +2112,10 @@ __CRT_FUNCTION(sinh,0,(),1,(double,x),double)
 __CRT_FUNCTION(sinhf,0,(),1,(float,x),float)
 __CRT_FUNCTION(sinhl,0,(),1,(__LONGDOUBLE,x),__LONGDOUBLE)
 __CRT_FUNCTION(sinl,0,(),1,(__LONGDOUBLE,x),__LONGDOUBLE)
+__CRT_FUNCTION(sl_add,0,(),2,(struct _stringlist *,sl,char *,name),int)
+__CRT_FUNCTION(sl_find,0,(),2,(struct _stringlist __KOS_FIXED_CONST *,sl,char const *,name),char *)
+__CRT_FUNCTION(sl_free,0,(),2,(struct _stringlist *,sl,int,all),void)
+__CRT_FUNCTION(sl_init,0,(),0,(),struct _stringlist *)
 __CRT_FUNCTION(sleep,0,(),1,(unsigned int,seconds),unsigned int)
 __CRT_FUNCTION(snprintf,0,(),VA(3),(char *__restrict,buf,size_t,buflen,char const *__restrict,format),__STDC_INT_AS_SIZE_T)
 __CRT_FUNCTION(sockatmark,0,(),1,(fd_t,sockfd),int)

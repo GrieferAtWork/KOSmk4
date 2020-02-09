@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce8d3639 */
+/* HASH CRC-32:0x41a6bfc2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2758,6 +2758,10 @@
 #define __CRT_ATTR_NOTHROW_NCX_sigset 1
 #define __CRT_ATTR_NOTHROW_NCX_sigsetmask 1
 #define __CRT_ATTR_NOTHROW_NCX_sigstack 1
+#define __CRT_ATTR_NOTHROW_NCX_sl_add 1
+#define __CRT_ATTR_NOTHROW_NCX_sl_find 1
+#define __CRT_ATTR_NOTHROW_NCX_sl_free 1
+#define __CRT_ATTR_NOTHROW_NCX_sl_init 1
 #define __CRT_ATTR_NOTHROW_NCX_snprintf 1
 #define __CRT_ATTR_NOTHROW_NCX_sockatmark 1
 #define __CRT_ATTR_NOTHROW_NCX_socket 1
@@ -4477,6 +4481,7 @@
 #define __CRT_ATTR_PURE_rindex 1
 #define __CRT_ATTR_PURE_sigisemptyset 1
 #define __CRT_ATTR_PURE_sigismember 1
+#define __CRT_ATTR_PURE_sl_find 1
 #define __CRT_ATTR_PURE_strcasecmp 1
 #define __CRT_ATTR_PURE_strcasecmp_l 1
 #define __CRT_ATTR_PURE_strcasecoll 1

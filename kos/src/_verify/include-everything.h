@@ -335,6 +335,7 @@ incdir("", "../../include");
 #include <compat/kos/types.h>
 #include <compat/pointer.h>
 #include <compat/signal.h>
+#include <corecrt.h>
 #include <cpio.h>
 #include <crtdbg.h>
 #include <crtdefs.h>
@@ -415,6 +416,7 @@ incdir("", "../../include");
 #include <hybrid/sched/__yield.h>
 #include <hybrid/sched/yield.h>
 #include <hybrid/sequence/atree.h>
+#include <hybrid/sequence/bsearch.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/vector.h>
 #include <hybrid/struct.h>
@@ -425,6 +427,7 @@ incdir("", "../../include");
 #include <hybrid/unaligned.h>
 #include <hybrid/wordbits.h>
 #include <ieee754.h>
+#include <ieeefp.h>
 #include <ifaddrs.h>
 #include <int128.h>
 #include <inttypes.h>
@@ -438,6 +441,8 @@ incdir("", "../../include");
 #include <kos/bits/exception_data.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>
+#include <kos/bits/spawn-action.h>
+#include <kos/bits/spawn.h>
 #include <kos/bits/thread.h>
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
@@ -728,6 +733,7 @@ incdir("", "../../include");
 #include <parts/generic/errno.h>
 #include <parts/glibc/errno.h>
 #include <parts/malloca.h>
+#include <parts/printf-config.h>
 #include <parts/redirect-exec.h>
 #include <parts/uchar/fcntl.h>
 #include <parts/uchar/format-printer.h>
@@ -784,6 +790,7 @@ incdir("", "../../include");
 #include <stdlib.h>
 #include <stdnoreturn.h>
 #include <string.h>
+#include <stringlist.h>
 #include <strings.h>
 #include <stropts.h>
 #include <sys/_types.h>
