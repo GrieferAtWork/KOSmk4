@@ -92,6 +92,8 @@
                                                 * Set the process group of a terminal to the same group
                                                 * as the child process. This action only makes sense if
                                                 * preceded by `SPAWN_ACTION_SETPGID' and/or `SPAWN_ACTION_SETSID' */
+#define SPAWN_ACTION_UMASK              0x000c /* `umask(sa_mask);' */
+#define SPAWN_ACTION_FSMODE             0x000d /* `fsmode(sa_mask, sa_flag);' */
 #endif /* !SPAWN_ACTION_NONE */
 
 

@@ -1141,6 +1141,8 @@ STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_closerange.sa_lofd) == __OFFSE
 STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_close.sa_fd) == __OFFSET_SPAWN_ACTIONX32_CLOSE_FD);
 STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_dup2.sa_newfd) == __OFFSET_SPAWN_ACTIONX32_DUP2_NEWFD);
 STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_dup2.sa_oldfd) == __OFFSET_SPAWN_ACTIONX32_DUP2_OLDFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_fsmode.sa_flag) == __OFFSET_SPAWN_ACTIONX32_FSMODE_FLAG);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_fsmode.sa_mask) == __OFFSET_SPAWN_ACTIONX32_FSMODE_MASK);
 STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_openat.sa_dfd) == __OFFSET_SPAWN_ACTIONX32_OPENAT_DFD);
 STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_openat.sa_fd) == __OFFSET_SPAWN_ACTIONX32_OPENAT_FD);
 STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_openat.sa_filename) == __OFFSET_SPAWN_ACTIONX32_OPENAT_FILENAME);
@@ -1154,7 +1156,9 @@ STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sigdfl.sa_sigset) == __OFFSET_
 STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sigdfl.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX32_SIGDFL_SIGSETSZ);
 STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sigprocmask.sa_sigset) == __OFFSET_SPAWN_ACTIONX32_SIGPROCMASK_SIGSET);
 STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_sigprocmask.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX32_SIGPROCMASK_SIGSETSZ);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_tcsetpgrp.sa_ttyfd) == __OFFSET_SPAWN_ACTIONX32_TCSETPGRP_TTYFD);
 STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_type) == __OFFSET_SPAWN_ACTIONX32_TYPE);
+STATIC_ASSERT(offsetof(struct spawn_actionx32, sa_umask.sa_mask) == __OFFSET_SPAWN_ACTIONX32_UMASK_MASK);
 
 /* struct spawn_action_listx32 */
 /* ... */
@@ -1174,6 +1178,8 @@ STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_closerange.sa_lofd) == __OFFSE
 STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_close.sa_fd) == __OFFSET_SPAWN_ACTIONX64_CLOSE_FD);
 STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_dup2.sa_newfd) == __OFFSET_SPAWN_ACTIONX64_DUP2_NEWFD);
 STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_dup2.sa_oldfd) == __OFFSET_SPAWN_ACTIONX64_DUP2_OLDFD);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_fsmode.sa_flag) == __OFFSET_SPAWN_ACTIONX64_FSMODE_FLAG);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_fsmode.sa_mask) == __OFFSET_SPAWN_ACTIONX64_FSMODE_MASK);
 STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_openat.sa_dfd) == __OFFSET_SPAWN_ACTIONX64_OPENAT_DFD);
 STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_openat.sa_fd) == __OFFSET_SPAWN_ACTIONX64_OPENAT_FD);
 STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_openat.sa_filename) == __OFFSET_SPAWN_ACTIONX64_OPENAT_FILENAME);
@@ -1187,7 +1193,9 @@ STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sigdfl.sa_sigset) == __OFFSET_
 STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sigdfl.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX64_SIGDFL_SIGSETSZ);
 STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sigprocmask.sa_sigset) == __OFFSET_SPAWN_ACTIONX64_SIGPROCMASK_SIGSET);
 STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_sigprocmask.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX64_SIGPROCMASK_SIGSETSZ);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_tcsetpgrp.sa_ttyfd) == __OFFSET_SPAWN_ACTIONX64_TCSETPGRP_TTYFD);
 STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_type) == __OFFSET_SPAWN_ACTIONX64_TYPE);
+STATIC_ASSERT(offsetof(struct spawn_actionx64, sa_umask.sa_mask) == __OFFSET_SPAWN_ACTIONX64_UMASK_MASK);
 
 /* struct spawn_action_listx64 */
 /* ... */

@@ -52,6 +52,9 @@ __DECL_BEGIN
 #define __OFFSET_SPAWN_ACTION_DUP2_OLDFD                __OFFSET_SPAWN_ACTIONX32_DUP2_OLDFD
 #define __OFFSET_SPAWN_ACTION_DUP2_NEWFD                __OFFSET_SPAWN_ACTIONX32_DUP2_NEWFD
 #define __OFFSET_SPAWN_ACTION_TCSETPGRP_TTYFD           __OFFSET_SPAWN_ACTIONX32_TCSETPGRP_TTYFD
+#define __OFFSET_SPAWN_ACTION_UMASK_MASK                __OFFSET_SPAWN_ACTIONX32_UMASK_MASK
+#define __OFFSET_SPAWN_ACTION_FSMODE_MASK               __OFFSET_SPAWN_ACTIONX32_FSMODE_MASK
+#define __OFFSET_SPAWN_ACTION_FSMODE_FLAG               __OFFSET_SPAWN_ACTIONX32_FSMODE_FLAG
 #endif /* !__x86_64__ && __i386__ */
 
 #define __OFFSET_SPAWN_ACTIONX32_TYPE                      0
@@ -73,7 +76,10 @@ __DECL_BEGIN
 #define __OFFSET_SPAWN_ACTIONX32_CLOSERANGE_HIFD           8  /* [FIELD(sa_closerange.sa_hifd)] */
 #define __OFFSET_SPAWN_ACTIONX32_DUP2_OLDFD                4  /* [FIELD(sa_dup2.sa_oldfd)] */
 #define __OFFSET_SPAWN_ACTIONX32_DUP2_NEWFD                8  /* [FIELD(sa_dup2.sa_newfd)] */
-#define __OFFSET_SPAWN_ACTIONX32_TCSETPGRP_TTYFD           8  /* [FIELD(sa_tcsetpgrp.sa_ttyfd)] */
+#define __OFFSET_SPAWN_ACTIONX32_TCSETPGRP_TTYFD           4  /* [FIELD(sa_tcsetpgrp.sa_ttyfd)] */
+#define __OFFSET_SPAWN_ACTIONX32_UMASK_MASK                4  /* [FIELD(sa_umask.sa_mask)] */
+#define __OFFSET_SPAWN_ACTIONX32_FSMODE_MASK               4  /* [FIELD(sa_fsmode.sa_mask)] */
+#define __OFFSET_SPAWN_ACTIONX32_FSMODE_FLAG               8  /* [FIELD(sa_fsmode.sa_flag)] */
 
 #ifdef __CC__
 struct __sigset_struct;
@@ -136,6 +142,15 @@ struct spawn_actionx32 /*[PREFIX(sa_)]*/ {
 		struct {
 			__INT32_TYPE__      sa_ttyfd;    /* File descriptor for the TTY to update. */
 		} sa_tcsetpgrp; /* SPAWN_ACTION_TCSETPGRP */
+
+		struct {
+			__UINT32_TYPE__     sa_mask;     /* The new umask to apply. */
+		} sa_umask; /* SPAWN_ACTION_UMASK */
+
+		struct {
+			__UINT32_TYPE__     sa_mask;     /* FS mode mask (set of bits to keep). */
+			__UINT32_TYPE__     sa_flag;     /* FS mode flag (set of bits to set). */
+		} sa_fsmode; /* SPAWN_ACTION_FSMODE */
 
 	};
 };

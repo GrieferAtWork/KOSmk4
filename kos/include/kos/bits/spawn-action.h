@@ -45,6 +45,9 @@ __DECL_BEGIN
 #define __OFFSET_SPAWN_ACTION_DUP2_OLDFD                __SIZEOF_POINTER__       /* [FIELD(sa_dup2.sa_oldfd)] */
 #define __OFFSET_SPAWN_ACTION_DUP2_NEWFD                (__SIZEOF_POINTER__ + __SIZEOF_FD_T__) /* [FIELD(sa_dup2.sa_newfd)] */
 #define __OFFSET_SPAWN_ACTION_TCSETPGRP_TTYFD           __SIZEOF_POINTER__       /* [FIELD(sa_tcsetpgrp.sa_ttyfd)] */
+#define __OFFSET_SPAWN_ACTION_UMASK_MASK                __SIZEOF_POINTER__       /* [FIELD(sa_umask.sa_mask)] */
+#define __OFFSET_SPAWN_ACTION_FSMODE_MASK               __SIZEOF_POINTER__       /* [FIELD(sa_fsmode.sa_mask)] */
+#define __OFFSET_SPAWN_ACTION_FSMODE_FLAG               (__SIZEOF_POINTER__ + 4) /* [FIELD(sa_fsmode.sa_flag)] */
 
 #ifdef __CC__
 struct __sigset_struct;
@@ -103,6 +106,15 @@ struct spawn_action /*[PREFIX(sa_)]*/ {
 		struct {
 			__fd_t      sa_ttyfd;    /* File descriptor for the TTY to update. */
 		} sa_tcsetpgrp; /* SPAWN_ACTION_TCSETPGRP */
+
+		struct {
+			__mode_t    sa_mask;     /* The new umask to apply. */
+		} sa_umask; /* SPAWN_ACTION_UMASK */
+
+		struct {
+			__uint32_t  sa_mask;     /* FS mode mask (set of bits to keep). */
+			__uint32_t  sa_flag;     /* FS mode flag (set of bits to set). */
+		} sa_fsmode; /* SPAWN_ACTION_FSMODE */
 
 	};
 };

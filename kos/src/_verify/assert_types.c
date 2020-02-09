@@ -1201,6 +1201,8 @@ STATIC_ASSERT(offsetof(struct spawn_action, sa_closerange.sa_lofd) == __OFFSET_S
 STATIC_ASSERT(offsetof(struct spawn_action, sa_close.sa_fd) == __OFFSET_SPAWN_ACTION_CLOSE_FD);
 STATIC_ASSERT(offsetof(struct spawn_action, sa_dup2.sa_newfd) == __OFFSET_SPAWN_ACTION_DUP2_NEWFD);
 STATIC_ASSERT(offsetof(struct spawn_action, sa_dup2.sa_oldfd) == __OFFSET_SPAWN_ACTION_DUP2_OLDFD);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_fsmode.sa_flag) == __OFFSET_SPAWN_ACTION_FSMODE_FLAG);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_fsmode.sa_mask) == __OFFSET_SPAWN_ACTION_FSMODE_MASK);
 STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_dfd) == __OFFSET_SPAWN_ACTION_OPENAT_DFD);
 STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_fd) == __OFFSET_SPAWN_ACTION_OPENAT_FD);
 STATIC_ASSERT(offsetof(struct spawn_action, sa_openat.sa_filename) == __OFFSET_SPAWN_ACTION_OPENAT_FILENAME);
@@ -1214,7 +1216,9 @@ STATIC_ASSERT(offsetof(struct spawn_action, sa_sigdfl.sa_sigset) == __OFFSET_SPA
 STATIC_ASSERT(offsetof(struct spawn_action, sa_sigdfl.sa_sigsetsz) == __OFFSET_SPAWN_ACTION_SIGDFL_SIGSETSZ);
 STATIC_ASSERT(offsetof(struct spawn_action, sa_sigprocmask.sa_sigset) == __OFFSET_SPAWN_ACTION_SIGPROCMASK_SIGSET);
 STATIC_ASSERT(offsetof(struct spawn_action, sa_sigprocmask.sa_sigsetsz) == __OFFSET_SPAWN_ACTION_SIGPROCMASK_SIGSETSZ);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_tcsetpgrp.sa_ttyfd) == __OFFSET_SPAWN_ACTION_TCSETPGRP_TTYFD);
 STATIC_ASSERT(offsetof(struct spawn_action, sa_type) == __OFFSET_SPAWN_ACTION_TYPE);
+STATIC_ASSERT(offsetof(struct spawn_action, sa_umask.sa_mask) == __OFFSET_SPAWN_ACTION_UMASK_MASK);
 
 /* struct spawn_action_list */
 /* ... */
