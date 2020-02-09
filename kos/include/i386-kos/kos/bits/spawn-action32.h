@@ -55,6 +55,22 @@ __DECL_BEGIN
 #define __OFFSET_SPAWN_ACTION_UMASK_MASK                __OFFSET_SPAWN_ACTIONX32_UMASK_MASK
 #define __OFFSET_SPAWN_ACTION_FSMODE_MASK               __OFFSET_SPAWN_ACTIONX32_FSMODE_MASK
 #define __OFFSET_SPAWN_ACTION_FSMODE_FLAG               __OFFSET_SPAWN_ACTIONX32_FSMODE_FLAG
+#define __OFFSET_SPAWN_ACTION_SETUID_UID                __OFFSET_SPAWN_ACTIONX32_SETUID_UID
+#define __OFFSET_SPAWN_ACTION_SETGID_GID                __OFFSET_SPAWN_ACTIONX32_SETGID_GID
+#define __OFFSET_SPAWN_ACTION_SETREUID_RUID             __OFFSET_SPAWN_ACTIONX32_SETREUID_RUID
+#define __OFFSET_SPAWN_ACTION_SETREUID_EUID             __OFFSET_SPAWN_ACTIONX32_SETREUID_EUID
+#define __OFFSET_SPAWN_ACTION_SETREGID_RGID             __OFFSET_SPAWN_ACTIONX32_SETREGID_RGID
+#define __OFFSET_SPAWN_ACTION_SETREGID_EGID             __OFFSET_SPAWN_ACTIONX32_SETREGID_EGID
+#define __OFFSET_SPAWN_ACTION_SETRESUID_RUID            __OFFSET_SPAWN_ACTIONX32_SETRESUID_RUID
+#define __OFFSET_SPAWN_ACTION_SETRESUID_EUID            __OFFSET_SPAWN_ACTIONX32_SETRESUID_EUID
+#define __OFFSET_SPAWN_ACTION_SETRESUID_SUID            __OFFSET_SPAWN_ACTIONX32_SETRESUID_SUID
+#define __OFFSET_SPAWN_ACTION_SETRESGID_RGID            __OFFSET_SPAWN_ACTIONX32_SETRESGID_RGID
+#define __OFFSET_SPAWN_ACTION_SETRESGID_EGID            __OFFSET_SPAWN_ACTIONX32_SETRESGID_EGID
+#define __OFFSET_SPAWN_ACTION_SETRESGID_SGID            __OFFSET_SPAWN_ACTIONX32_SETRESGID_SGID
+#define __OFFSET_SPAWN_ACTION_SETFSUID_FSUID            __OFFSET_SPAWN_ACTIONX32_SETFSUID_FSUID
+#define __OFFSET_SPAWN_ACTION_SETFSGID_FSGID            __OFFSET_SPAWN_ACTIONX32_SETFSGID_FSGID
+#define __OFFSET_SPAWN_ACTION_SETGROUPS_GCNT            __OFFSET_SPAWN_ACTIONX32_SETGROUPS_GCNT
+#define __OFFSET_SPAWN_ACTION_SETGROUPS_GVEC            __OFFSET_SPAWN_ACTIONX32_SETGROUPS_GVEC
 #endif /* !__x86_64__ && __i386__ */
 
 #define __OFFSET_SPAWN_ACTIONX32_TYPE                      0
@@ -80,6 +96,22 @@ __DECL_BEGIN
 #define __OFFSET_SPAWN_ACTIONX32_UMASK_MASK                4  /* [FIELD(sa_umask.sa_mask)] */
 #define __OFFSET_SPAWN_ACTIONX32_FSMODE_MASK               4  /* [FIELD(sa_fsmode.sa_mask)] */
 #define __OFFSET_SPAWN_ACTIONX32_FSMODE_FLAG               8  /* [FIELD(sa_fsmode.sa_flag)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETUID_UID                4  /* [FIELD(sa_setuid.sa_uid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETGID_GID                4  /* [FIELD(sa_setgid.sa_gid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETREUID_RUID             4  /* [FIELD(sa_setreuid.sa_ruid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETREUID_EUID             8  /* [FIELD(sa_setreuid.sa_euid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETREGID_RGID             4  /* [FIELD(sa_setregid.sa_rgid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETREGID_EGID             8  /* [FIELD(sa_setregid.sa_egid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETRESUID_RUID            4  /* [FIELD(sa_setresuid.sa_ruid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETRESUID_EUID            8  /* [FIELD(sa_setresuid.sa_euid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETRESUID_SUID            12 /* [FIELD(sa_setresuid.sa_suid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETRESGID_RGID            4  /* [FIELD(sa_setresgid.sa_rgid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETRESGID_EGID            8  /* [FIELD(sa_setresgid.sa_egid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETRESGID_SGID            12 /* [FIELD(sa_setresgid.sa_sgid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETFSUID_FSUID            4  /* [FIELD(sa_setfsuid.sa_fsuid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETFSGID_FSGID            4  /* [FIELD(sa_setfsgid.sa_fsgid)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETGROUPS_GCNT            4  /* [FIELD(sa_setgroups.sa_gcnt)] */
+#define __OFFSET_SPAWN_ACTIONX32_SETGROUPS_GVEC            8  /* [FIELD(sa_setgroups.sa_gvec)] */
 
 #ifdef __CC__
 struct __sigset_struct;
@@ -151,6 +183,49 @@ struct spawn_actionx32 /*[PREFIX(sa_)]*/ {
 			__UINT32_TYPE__     sa_mask;     /* FS mode mask (set of bits to keep). */
 			__UINT32_TYPE__     sa_flag;     /* FS mode flag (set of bits to set). */
 		} sa_fsmode; /* SPAWN_ACTION_FSMODE */
+
+		struct {
+			__UINT32_TYPE__     sa_uid;      /* User ID. */
+		} sa_setuid; /* SPAWN_ACTION_SETUID */
+
+		struct {
+			__UINT32_TYPE__     sa_gid;      /* Group ID. */
+		} sa_setgid; /* SPAWN_ACTION_SETGID */
+
+		struct {
+			__UINT32_TYPE__     sa_ruid;     /* Real user ID. */
+			__UINT32_TYPE__     sa_euid;     /* Effective user ID. */
+		} sa_setreuid; /* SPAWN_ACTION_SETREUID */
+
+		struct {
+			__UINT32_TYPE__     sa_rgid;     /* Real group ID. */
+			__UINT32_TYPE__     sa_egid;     /* Effective group ID. */
+		} sa_setregid; /* SPAWN_ACTION_SETREGID */
+
+		struct {
+			__UINT32_TYPE__     sa_ruid;     /* Real user ID. */
+			__UINT32_TYPE__     sa_euid;     /* Effective user ID. */
+			__UINT32_TYPE__     sa_suid;     /* Saved user ID. */
+		} sa_setresuid; /* SPAWN_ACTION_SETRESUID */
+
+		struct {
+			__UINT32_TYPE__     sa_rgid;     /* Real group ID. */
+			__UINT32_TYPE__     sa_egid;     /* Effective group ID. */
+			__UINT32_TYPE__     sa_sgid;     /* Saved group ID. */
+		} sa_setresgid; /* SPAWN_ACTION_SETRESGID */
+
+		struct {
+			__UINT32_TYPE__     sa_fsuid;    /* File system user ID. */
+		} sa_setfsuid; /* SPAWN_ACTION_SETFSUID */
+
+		struct {
+			__UINT32_TYPE__     sa_fsgid;    /* File system group ID. */
+		} sa_setfsgid; /* SPAWN_ACTION_SETFSGID */
+
+		struct {
+			__UINT32_TYPE__                 sa_gcnt; /* # of groups. */
+			__HYBRID_PTR32(__UINT32_TYPE__) sa_gvec; /* [0..sa_gcnt] Vector of groups */
+		} sa_setgroups; /* SPAWN_ACTION_SETGROUPS */
 
 	};
 };

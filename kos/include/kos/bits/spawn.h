@@ -76,24 +76,97 @@
  *
  */
 #ifndef SPAWN_ACTION_NONE
-#define SPAWN_ACTION_NONE               0x0000 /* No action (ignored) */
-#define SPAWN_ACTION_SIGDFL             0x0001 /* `foreach(s: sa_sigset) sigaction(s, SIG_DFL);' */
-#define SPAWN_ACTION_SIGPROCMASK        0x0002 /* `sigprocmask(SIG_SETMASK, sa_sigset);' */
-#define SPAWN_ACTION_SETPGID            0x0003 /* `setpgid(0, sa_pgid);' */
-#define SPAWN_ACTION_SETSID             0x0004 /* `setsid();' */
-#define SPAWN_ACTION_SCHED_SETPARAM     0x0005 /* `sched_setparam(sa_sched_setparam);' */
-#define SPAWN_ACTION_SCHED_SETSCHEDULER 0x0006 /* `sched_setscheduler(sa_sched_setparam);' */
-#define SPAWN_ACTION_OPENAT             0x0007 /* `dup2(openat(sa_dfd, sa_filename, sa_oflags, sa_mode), sa_fd);' */
-#define SPAWN_ACTION_CLOSE              0x0008 /* `close(sa_fd);' */
-#define SPAWN_ACTION_CLOSERANGE         0x0009 /* `for (fd_t f = sa_lofd; f <= sa_hifd; ++f) close(f);'
-                                                * NOTE: Invalid-handle errors are ignored for this operation! */
-#define SPAWN_ACTION_DUP2               0x000a /* `dup2(sa_oldfd, sa_newfd);' */
-#define SPAWN_ACTION_TCSETPGRP          0x000b /* `tcsetpgrp(sa_ttyfd, 0);'
-                                                * Set the process group of a terminal to the same group
-                                                * as the child process. This action only makes sense if
-                                                * preceded by `SPAWN_ACTION_SETPGID' and/or `SPAWN_ACTION_SETSID' */
-#define SPAWN_ACTION_UMASK              0x000c /* `umask(sa_mask);' */
-#define SPAWN_ACTION_FSMODE             0x000d /* `fsmode(sa_mask, sa_flag);' */
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+	SPAWN_ACTION_NONE,               /* No action (ignored) */
+	SPAWN_ACTION_SIGDFL,             /* `foreach(s: sa_sigset) sigaction(s, SIG_DFL);' */
+	SPAWN_ACTION_SIGPROCMASK,        /* `sigprocmask(SIG_SETMASK, sa_sigset);' */
+	SPAWN_ACTION_SETPGID,            /* `setpgid(0, sa_pgid);' */
+	SPAWN_ACTION_SETSID,             /* `setsid();' */
+	SPAWN_ACTION_SCHED_SETPARAM,     /* `sched_setparam(sa_sched_setparam);' */
+	SPAWN_ACTION_SCHED_SETSCHEDULER, /* `sched_setscheduler(sa_sched_setparam);' */
+	SPAWN_ACTION_OPENAT,             /* `dup2(openat(sa_dfd, sa_filename, sa_oflags, sa_mode), sa_fd);' */
+	SPAWN_ACTION_CLOSE,              /* `close(sa_fd);' */
+	SPAWN_ACTION_CLOSERANGE,         /* `for (fd_t f = sa_lofd; f <= sa_hifd; ++f) close(f);'
+	                                  * NOTE: Invalid-handle errors are ignored for this operation! */
+	SPAWN_ACTION_DUP2,               /* `dup2(sa_oldfd, sa_newfd);' */
+	SPAWN_ACTION_TCSETPGRP,          /* `tcsetpgrp(sa_ttyfd, 0);'
+	                                  * Set the process group of a terminal to the same group
+	                                  * as the child process. This action only makes sense if
+	                                  * preceded by `SPAWN_ACTION_SETPGID' and/or `SPAWN_ACTION_SETSID' */
+	SPAWN_ACTION_UMASK,              /* `umask(sa_mask);' */
+	SPAWN_ACTION_FSMODE,             /* `fsmode(sa_mask, sa_flag);' */
+	SPAWN_ACTION_SETUID,             /* `setuid(sa_uid);' */
+	SPAWN_ACTION_SETGID,             /* `setgid(sa_gid);' */
+	SPAWN_ACTION_SETREUID,           /* `setreuid(sa_ruid, sa_euid);' */
+	SPAWN_ACTION_SETREGID,           /* `setregid(sa_rgid, sa_egid);' */
+	SPAWN_ACTION_SETRESUID,          /* `setresuid(sa_ruid, sa_euid, sa_suid);' */
+	SPAWN_ACTION_SETRESGID,          /* `setresgid(sa_rgid, sa_egid, sa_sgid);' */
+	SPAWN_ACTION_SETFSUID,           /* `setfsuid(sa_fsuid);' */
+	SPAWN_ACTION_SETFSGID,           /* `setfsgid(sa_fsgid);' */
+	SPAWN_ACTION_SETGROUPS,          /* `setgroups(sa_gcnt, sa_gvec);' */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define SPAWN_ACTION_NONE               SPAWN_ACTION_NONE               /* No action (ignored) */
+#define SPAWN_ACTION_SIGDFL             SPAWN_ACTION_SIGDFL             /* `foreach(s: sa_sigset) sigaction(s, SIG_DFL);' */
+#define SPAWN_ACTION_SIGPROCMASK        SPAWN_ACTION_SIGPROCMASK        /* `sigprocmask(SIG_SETMASK, sa_sigset);' */
+#define SPAWN_ACTION_SETPGID            SPAWN_ACTION_SETPGID            /* `setpgid(0, sa_pgid);' */
+#define SPAWN_ACTION_SETSID             SPAWN_ACTION_SETSID             /* `setsid();' */
+#define SPAWN_ACTION_SCHED_SETPARAM     SPAWN_ACTION_SCHED_SETPARAM     /* `sched_setparam(sa_sched_setparam);' */
+#define SPAWN_ACTION_SCHED_SETSCHEDULER SPAWN_ACTION_SCHED_SETSCHEDULER /* `sched_setscheduler(sa_sched_setparam);' */
+#define SPAWN_ACTION_OPENAT             SPAWN_ACTION_OPENAT             /* `dup2(openat(sa_dfd, sa_filename, sa_oflags, sa_mode), sa_fd);' */
+#define SPAWN_ACTION_CLOSE              SPAWN_ACTION_CLOSE              /* `close(sa_fd);' */
+#define SPAWN_ACTION_CLOSERANGE         SPAWN_ACTION_CLOSERANGE         /* `for (fd_t f = sa_lofd; f <= sa_hifd; ++f) close(f);'
+                                                                         * NOTE: Invalid-handle errors are ignored for this operation! */
+#define SPAWN_ACTION_DUP2               SPAWN_ACTION_DUP2               /* `dup2(sa_oldfd, sa_newfd);' */
+#define SPAWN_ACTION_TCSETPGRP          SPAWN_ACTION_TCSETPGRP          /* `tcsetpgrp(sa_ttyfd, 0);'
+                                                                         * Set the process group of a terminal to the same group
+                                                                         * as the child process. This action only makes sense if
+                                                                         * preceded by `SPAWN_ACTION_SETPGID' and/or `SPAWN_ACTION_SETSID' */
+#define SPAWN_ACTION_UMASK              SPAWN_ACTION_UMASK              /* `umask(sa_mask);' */
+#define SPAWN_ACTION_FSMODE             SPAWN_ACTION_FSMODE             /* `fsmode(sa_mask, sa_flag);' */
+#define SPAWN_ACTION_SETUID             SPAWN_ACTION_SETUID             /* `setuid(sa_uid);' */
+#define SPAWN_ACTION_SETGID             SPAWN_ACTION_SETGID             /* `setgid(sa_gid);' */
+#define SPAWN_ACTION_SETREUID           SPAWN_ACTION_SETREUID           /* `setreuid(sa_ruid, sa_euid);' */
+#define SPAWN_ACTION_SETREGID           SPAWN_ACTION_SETREGID           /* `setregid(sa_rgid, sa_egid);' */
+#define SPAWN_ACTION_SETRESUID          SPAWN_ACTION_SETRESUID          /* `setresuid(sa_ruid, sa_euid, sa_suid);' */
+#define SPAWN_ACTION_SETRESGID          SPAWN_ACTION_SETRESGID          /* `setresgid(sa_rgid, sa_egid, sa_sgid);' */
+#define SPAWN_ACTION_SETFSUID           SPAWN_ACTION_SETFSUID           /* `setfsuid(sa_fsuid);' */
+#define SPAWN_ACTION_SETFSGID           SPAWN_ACTION_SETFSGID           /* `setfsgid(sa_fsgid);' */
+#define SPAWN_ACTION_SETGROUPS          SPAWN_ACTION_SETGROUPS          /* `setgroups(sa_gcnt, sa_gvec);' */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define SPAWN_ACTION_NONE               0  /* No action (ignored) */
+#define SPAWN_ACTION_SIGDFL             1  /* `foreach(s: sa_sigset) sigaction(s, SIG_DFL);' */
+#define SPAWN_ACTION_SIGPROCMASK        2  /* `sigprocmask(SIG_SETMASK, sa_sigset);' */
+#define SPAWN_ACTION_SETPGID            3  /* `setpgid(0, sa_pgid);' */
+#define SPAWN_ACTION_SETSID             4  /* `setsid();' */
+#define SPAWN_ACTION_SCHED_SETPARAM     5  /* `sched_setparam(sa_sched_setparam);' */
+#define SPAWN_ACTION_SCHED_SETSCHEDULER 6  /* `sched_setscheduler(sa_sched_setparam);' */
+#define SPAWN_ACTION_OPENAT             7  /* `dup2(openat(sa_dfd, sa_filename, sa_oflags, sa_mode), sa_fd);' */
+#define SPAWN_ACTION_CLOSE              8  /* `close(sa_fd);' */
+#define SPAWN_ACTION_CLOSERANGE         9  /* `for (fd_t f = sa_lofd; f <= sa_hifd; ++f) close(f);'
+                                            * NOTE: Invalid-handle errors are ignored for this operation! */
+#define SPAWN_ACTION_DUP2               10 /* `dup2(sa_oldfd, sa_newfd);' */
+#define SPAWN_ACTION_TCSETPGRP          11 /* `tcsetpgrp(sa_ttyfd, 0);'
+                                            * Set the process group of a terminal to the same group
+                                            * as the child process. This action only makes sense if
+                                            * preceded by `SPAWN_ACTION_SETPGID' and/or `SPAWN_ACTION_SETSID' */
+#define SPAWN_ACTION_UMASK              12 /* `umask(sa_mask);' */
+#define SPAWN_ACTION_FSMODE             13 /* `fsmode(sa_mask, sa_flag);' */
+#define SPAWN_ACTION_SETUID             14 /* `setuid(sa_uid);' */
+#define SPAWN_ACTION_SETGID             15 /* `setgid(sa_gid);' */
+#define SPAWN_ACTION_SETREUID           16 /* `setreuid(sa_ruid, sa_euid);' */
+#define SPAWN_ACTION_SETREGID           17 /* `setregid(sa_rgid, sa_egid);' */
+#define SPAWN_ACTION_SETRESUID          18 /* `setresuid(sa_ruid, sa_euid, sa_suid);' */
+#define SPAWN_ACTION_SETRESGID          19 /* `setresgid(sa_rgid, sa_egid, sa_sgid);' */
+#define SPAWN_ACTION_SETFSUID           20 /* `setfsuid(sa_fsuid);' */
+#define SPAWN_ACTION_SETFSGID           21 /* `setfsgid(sa_fsgid);' */
+#define SPAWN_ACTION_SETGROUPS          22 /* `setgroups(sa_gcnt, sa_gvec);' */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
 #endif /* !SPAWN_ACTION_NONE */
 
 

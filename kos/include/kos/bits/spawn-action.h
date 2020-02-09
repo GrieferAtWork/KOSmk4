@@ -48,6 +48,22 @@ __DECL_BEGIN
 #define __OFFSET_SPAWN_ACTION_UMASK_MASK                __SIZEOF_POINTER__       /* [FIELD(sa_umask.sa_mask)] */
 #define __OFFSET_SPAWN_ACTION_FSMODE_MASK               __SIZEOF_POINTER__       /* [FIELD(sa_fsmode.sa_mask)] */
 #define __OFFSET_SPAWN_ACTION_FSMODE_FLAG               (__SIZEOF_POINTER__ + 4) /* [FIELD(sa_fsmode.sa_flag)] */
+#define __OFFSET_SPAWN_ACTION_SETUID_UID                __SIZEOF_POINTER__       /* [FIELD(sa_setuid.sa_uid)] */
+#define __OFFSET_SPAWN_ACTION_SETGID_GID                __SIZEOF_POINTER__       /* [FIELD(sa_setgid.sa_gid)] */
+#define __OFFSET_SPAWN_ACTION_SETREUID_RUID             __SIZEOF_POINTER__       /* [FIELD(sa_setreuid.sa_ruid)] */
+#define __OFFSET_SPAWN_ACTION_SETREUID_EUID             (__SIZEOF_POINTER__ + __SIZEOF_UID_T__) /* [FIELD(sa_setreuid.sa_euid)] */
+#define __OFFSET_SPAWN_ACTION_SETREGID_RGID             __SIZEOF_POINTER__       /* [FIELD(sa_setregid.sa_rgid)] */
+#define __OFFSET_SPAWN_ACTION_SETREGID_EGID             (__SIZEOF_POINTER__ + __SIZEOF_GID_T__) /* [FIELD(sa_setregid.sa_egid)] */
+#define __OFFSET_SPAWN_ACTION_SETRESUID_RUID            __SIZEOF_POINTER__       /* [FIELD(sa_setresuid.sa_ruid)] */
+#define __OFFSET_SPAWN_ACTION_SETRESUID_EUID            (__SIZEOF_POINTER__ + __SIZEOF_UID_T__) /* [FIELD(sa_setresuid.sa_euid)] */
+#define __OFFSET_SPAWN_ACTION_SETRESUID_SUID            (__SIZEOF_POINTER__ + __SIZEOF_UID_T__ * 2) /* [FIELD(sa_setresuid.sa_suid)] */
+#define __OFFSET_SPAWN_ACTION_SETRESGID_RGID            __SIZEOF_POINTER__       /* [FIELD(sa_setresgid.sa_rgid)] */
+#define __OFFSET_SPAWN_ACTION_SETRESGID_EGID            (__SIZEOF_POINTER__ + __SIZEOF_GID_T__) /* [FIELD(sa_setresgid.sa_egid)] */
+#define __OFFSET_SPAWN_ACTION_SETRESGID_SGID            (__SIZEOF_POINTER__ + __SIZEOF_GID_T__ * 2) /* [FIELD(sa_setresgid.sa_sgid)] */
+#define __OFFSET_SPAWN_ACTION_SETFSUID_FSUID            __SIZEOF_POINTER__       /* [FIELD(sa_setfsuid.sa_fsuid)] */
+#define __OFFSET_SPAWN_ACTION_SETFSGID_FSGID            __SIZEOF_POINTER__       /* [FIELD(sa_setfsgid.sa_fsgid)] */
+#define __OFFSET_SPAWN_ACTION_SETGROUPS_GCNT            __SIZEOF_POINTER__       /* [FIELD(sa_setgroups.sa_gcnt)] */
+#define __OFFSET_SPAWN_ACTION_SETGROUPS_GVEC            (__SIZEOF_POINTER__ + __SIZEOF_SIZE_T__) /* [FIELD(sa_setgroups.sa_gvec)] */
 
 #ifdef __CC__
 struct __sigset_struct;
@@ -115,6 +131,49 @@ struct spawn_action /*[PREFIX(sa_)]*/ {
 			__uint32_t  sa_mask;     /* FS mode mask (set of bits to keep). */
 			__uint32_t  sa_flag;     /* FS mode flag (set of bits to set). */
 		} sa_fsmode; /* SPAWN_ACTION_FSMODE */
+
+		struct {
+			__uid_t     sa_uid;      /* User ID. */
+		} sa_setuid; /* SPAWN_ACTION_SETUID */
+
+		struct {
+			__gid_t     sa_gid;      /* Group ID. */
+		} sa_setgid; /* SPAWN_ACTION_SETGID */
+
+		struct {
+			__uid_t     sa_ruid;     /* Real user ID. */
+			__uid_t     sa_euid;     /* Effective user ID. */
+		} sa_setreuid; /* SPAWN_ACTION_SETREUID */
+
+		struct {
+			__gid_t     sa_rgid;     /* Real group ID. */
+			__gid_t     sa_egid;     /* Effective group ID. */
+		} sa_setregid; /* SPAWN_ACTION_SETREGID */
+
+		struct {
+			__uid_t     sa_ruid;     /* Real user ID. */
+			__uid_t     sa_euid;     /* Effective user ID. */
+			__uid_t     sa_suid;     /* Saved user ID. */
+		} sa_setresuid; /* SPAWN_ACTION_SETRESUID */
+
+		struct {
+			__gid_t     sa_rgid;     /* Real group ID. */
+			__gid_t     sa_egid;     /* Effective group ID. */
+			__gid_t     sa_sgid;     /* Saved group ID. */
+		} sa_setresgid; /* SPAWN_ACTION_SETRESGID */
+
+		struct {
+			__uid_t     sa_fsuid;    /* File system user ID. */
+		} sa_setfsuid; /* SPAWN_ACTION_SETFSUID */
+
+		struct {
+			__gid_t     sa_fsgid;    /* File system group ID. */
+		} sa_setfsgid; /* SPAWN_ACTION_SETFSGID */
+
+		struct {
+			__size_t    sa_gcnt;     /* # of groups. */
+			__gid_t    *sa_gvec;     /* [0..sa_gcnt] Vector of groups */
+		} sa_setgroups; /* SPAWN_ACTION_SETGROUPS */
 
 	};
 };
