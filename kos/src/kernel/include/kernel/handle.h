@@ -21,13 +21,17 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_HANDLE_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
+#include <sched/pertask.h>
+
 #include <hybrid/limitcore.h>
 #include <hybrid/sync/atomic-rwlock.h>
-#include <sched/pertask.h>
-#include <kos/kernel/handle.h>
-#include <kos/io.h>
+
 #include <bits/format-printer.h>
+#include <kos/io.h>
+#include <kos/kernel/handle.h>
+
 #include <stdbool.h>
 
 DECL_BEGIN

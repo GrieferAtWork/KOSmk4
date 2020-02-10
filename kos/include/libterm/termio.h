@@ -21,14 +21,18 @@
 #define _LIBTERM_TERMIO_H 1
 
 #include "api.h"
-#include <kos/io.h>
-#include <kos/anno.h>
-#include <bits/types.h>
+
+#include <hybrid/sync/atomic-rwlock.h>
+
 #include <bits/format-printer.h>
+#include <bits/types.h>
+#include <kos/anno.h>
+#include <kos/io.h>
+
+#include <termios.h>
+
 #include <libbuffer/linebuffer.h>
 #include <libbuffer/ringbuffer.h>
-#include <hybrid/sync/atomic-rwlock.h>
-#include <termios.h>
 
 __DECL_BEGIN
 

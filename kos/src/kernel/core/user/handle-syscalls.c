@@ -56,6 +56,7 @@
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <malloca.h>
 #include <signal.h>
 #include <stdint.h>

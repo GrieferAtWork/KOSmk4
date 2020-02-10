@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
+
 #include <kos/io.h>
 
 DECL_BEGIN

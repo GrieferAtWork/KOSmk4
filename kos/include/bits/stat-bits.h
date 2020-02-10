@@ -23,14 +23,14 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#define __S_IFMT           0170000 /* These bits determine file type. */
-#define __S_IFDIR          0040000 /* Directory. */
-#define __S_IFCHR          0020000 /* Character device. */
-#define __S_IFBLK          0060000 /* Block device. */
-#define __S_IFREG          0100000 /* Regular file. */
-#define __S_IFIFO          0010000 /* FIFO. */
-#define __S_IFLNK          0120000 /* Symbolic link. */
-#define __S_IFSOCK         0140000 /* Socket. */
+#define __S_IFMT   0170000 /* These bits determine file type. */
+#define __S_IFDIR  0040000 /* Directory. */
+#define __S_IFCHR  0020000 /* Character device. */
+#define __S_IFBLK  0060000 /* Block device. */
+#define __S_IFREG  0100000 /* Regular file. */
+#define __S_IFIFO  0010000 /* FIFO. */
+#define __S_IFLNK  0120000 /* Symbolic link. */
+#define __S_IFSOCK 0140000 /* Socket. */
 
 #define __S_ISDIR(x)  (((x)&__S_IFMT) == __S_IFDIR)
 #define __S_ISCHR(x)  (((x)&__S_IFMT) == __S_IFCHR)

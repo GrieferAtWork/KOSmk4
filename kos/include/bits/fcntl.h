@@ -133,7 +133,7 @@ __SYSDECL_BEGIN
 #ifdef __O_TMPFILE
 #define O_TMPFILE    __O_TMPFILE
 #endif /* __O_TMPFILE */
-#endif
+#endif /* __USE_GNU */
 
 #if defined(__USE_POSIX199309) || defined(__USE_UNIX98)
 #define O_DSYNC __O_DSYNC /* ??? */
@@ -275,7 +275,7 @@ __SYSDECL_BEGIN
 #define LOCK_UN        8 /* Remove lock. */
 #define __LOCK_ATOMIC 16 /* Atomic update.  */
 #endif /* !LOCK_SH */
-#endif
+#endif /* __USE_MISC */
 
 #ifdef __USE_GNU
 #ifndef LOCK_MAND

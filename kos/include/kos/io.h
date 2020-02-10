@@ -55,9 +55,9 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 /* Poll flags (`poll_mode_t' / `struct pollfd') */
 #ifndef POLLIN
-#define POLLIN           0x001 /* There is data to read. (`read' & friends won't block when invoked) */
-#define POLLPRI          0x002 /* There is urgent data to read. */
-#define POLLOUT          0x004 /* Writing now will not block. (`write' & friends won't block when invoked) */
+#define POLLIN   0x001 /* There is data to read. (`read' & friends won't block when invoked) */
+#define POLLPRI  0x002 /* There is urgent data to read. */
+#define POLLOUT  0x004 /* Writing now will not block. (`write' & friends won't block when invoked) */
 #endif /* !POLLOUT */
 
 
@@ -247,47 +247,6 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* __CC__ */
 #endif /* __KOS_VERSION__ >= 300 */
 #endif /* !READDIR_DEFAULT */
-
-
-
-
-/* fcntl() commands */
-#ifndef F_DUPFD
-#define F_DUPFD            0 /* Duplicate file descriptor. */
-#define F_GETFD            1 /* Get file descriptor flags (as a set of `O_CLOFORK | O_CLOEXEC'). */
-#define F_SETFD            2 /* Set file descriptor flags (as a set of `O_CLOFORK | O_CLOEXEC'). */
-#define F_GETFL            3 /* Get file status flags (as a set of `O_APPEND | O_NONBLOCK | O_SYNC | O_ASYNC | O_DIRECT'). */
-#define F_SETFL            4 /* Set file status flags (as a set of `O_APPEND | O_NONBLOCK | O_SYNC | O_ASYNC | O_DIRECT'). */
-#define F_GETLK32          5 /* Get record locking info. */
-#define F_SETLK32          6 /* Set record locking info (non-blocking). */
-#define F_SETLKW32         7 /* Set record locking info (blocking).    */
-#define F_SETOWN           8 /* Get owner (process receiving SIGIO). */
-#define F_GETOWN           9 /* Set owner (process receiving SIGIO). */
-#define F_SETSIG          10 /* Set number of signal to be sent. */
-#define F_GETSIG          11 /* Get number of signal to be sent. */
-#define F_GETLK64         12 /* Get record locking info. */
-#define F_SETLK64         13 /* Set record locking info (non-blocking). */
-#define F_SETLKW64        14 /* Set record locking info (blocking). */
-#define F_SETOWN_EX       15 /* Get owner (thread receiving SIGIO). */
-#define F_GETOWN_EX       16 /* Set owner (thread receiving SIGIO). */
-#define F_SETLEASE      1024 /* Set a lease. */
-#define F_GETLEASE      1025 /* Enquire what lease is active. */
-#define F_NOTIFY        1026 /* Request notifications on a directory. */
-#define F_SETPIPE_SZ    1031 /* Set pipe page size array. */
-#define F_GETPIPE_SZ    1032 /* Get pipe page size array. */
-#define F_DUPFD_CLOEXEC 1030 /* Duplicate file descriptor with close-on-exit set. */
-#define F_SETFL_XCH     5163 /* Same as 'F_SETFL', but return the old set of flags instead of `0' upon success.
-                              * (as a set of `O_APPEND|O_NONBLOCK|O_SYNC|O_ASYNC|O_DIRECT'). */
-#endif /* !F_DUPFD */
-
-
-
-/* File descriptor flags */
-#ifndef FD_CLOEXEC
-#define FD_CLOEXEC   0x01 /* FLAG: Close the descriptor on `exec()'. */
-#define FD_CLOFORK   0x02 /* FLAG: Close the descriptor during unsharing after `fork()'
-                           *      (Similar to `PROT_LOOSE' for memory). */
-#endif /* !FD_CLOEXEC */
 
 
 
