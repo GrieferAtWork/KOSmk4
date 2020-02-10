@@ -2827,6 +2827,33 @@ handle_fcntl(struct handle_manager *__restrict self,
 		decref_unlikely(temp);
 		break;
 
+	case F_DUP2FD:
+		result = (syscall_ulong_t)arg;
+		temp   = handle_lookupin(fd, self);
+		TRY {
+			temp.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
+			handle_installinto_sym((unsigned int)result, temp);
+		} EXCEPT {
+			decref_unlikely(temp);
+			RETHROW();
+		}
+		decref_unlikely(temp);
+		break;
+
+	case F_DUP2FD_CLOEXEC:
+		result = (syscall_ulong_t)arg;
+		temp   = handle_lookupin(fd, self);
+		TRY {
+			temp.h_mode &= ~(IO_CLOEXEC | IO_CLOFORK);
+			temp.h_mode |= IO_CLOEXEC;
+			handle_installinto_sym((unsigned int)result, temp);
+		} EXCEPT {
+			decref_unlikely(temp);
+			RETHROW();
+		}
+		decref_unlikely(temp);
+		break;
+
 	case F_GETFD: {
 		struct handle *p;
 		sync_read(&self->hm_lock);

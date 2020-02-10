@@ -241,6 +241,10 @@ __SYSDECL_BEGIN
 #define F_CLOSEM    5165 /* close all handles >= to the one given */
 #define F_MAXFD     5166 /* return the max open handle id (the given fd is ignored) */
 #endif /* __USE_KOS || __USE_NETBSD */
+#if defined(__USE_KOS) || defined(__USE_BSD)
+#define F_DUP2FD    5167 /* Same as `dup2()' (the target FD is given as `(int)arg') */
+#define F_DUP2FD_CLOEXEC 5168 /* Same as `F_DUP2FD', but set `FD_CLOEXEC'. */
+#endif /* __USE_KOS || __USE_BSD */
 #endif /* __KOS__ */
 
 #ifndef FD_CLOEXEC
