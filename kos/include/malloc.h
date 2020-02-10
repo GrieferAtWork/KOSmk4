@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95fd3fb6 */
+/* HASH CRC-32:0x6472c710 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,11 +32,11 @@
 
 __SYSDECL_BEGIN
 
-#ifdef __CRT_KOS
+#if (defined(__CRT_KOS) || defined(__CRT_GLC))
 /* malloc behavior attributes. */
 #define __MALLOC_ZERO_IS_NONNULL  1
 #define __REALLOC_ZERO_IS_NONNULL 1
-#endif
+#endif /* ... */
 
 #define M_TRIM_THRESHOLD     (-1)
 #define M_GRANULARITY        (-2)

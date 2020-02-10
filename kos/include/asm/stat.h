@@ -17,11 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_STAT_BITS_H
-#define _BITS_STAT_BITS_H 1
+#ifndef _ASM_STAT_H
+#define _ASM_STAT_H 1
 
 #include <__stdinc.h>
-#include <features.h>
 
 #define __S_IFMT   0170000 /* These bits determine file type. */
 #define __S_IFDIR  0040000 /* Directory. */
@@ -51,9 +50,7 @@
 #define __S_IWRITE 00200 /* Write by owner. */
 #define __S_IEXEC  00100 /* Execute by owner. */
 
-#ifdef __USE_ATFILE
-#define UTIME_NOW  ((1l << 30) - 1l)
-#define UTIME_OMIT ((1l << 30) - 2l)
-#endif /* __USE_ATFILE */
+#define __UTIME_NOW  ((1l << 30) - 1l)
+#define __UTIME_OMIT ((1l << 30) - 2l)
 
-#endif /* !_BITS_STAT_BITS_H */
+#endif /* !_ASM_STAT_H */

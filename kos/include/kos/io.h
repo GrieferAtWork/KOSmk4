@@ -22,7 +22,11 @@
 
 #include <__stdinc.h>
 #include <features.h>
+
+#include <asm/dirent.h>
+#include <asm/stat.h>
 #include <bits/types.h>
+#include <bits/fcntl.h> /* Open flags (`oflag_t') */
 
 #ifndef __KOS__
 #error "KOS-only system header"
@@ -64,52 +68,52 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 /* File status flags (`struct stat::st_mode') */
 #ifndef S_IFMT
-#define S_IFMT   0170000 /* These bits determine file type. */
-#define S_IFDIR  0040000 /* Directory. */
-#define S_IFCHR  0020000 /* Character device. */
-#define S_IFBLK  0060000 /* Block device. */
-#define S_IFREG  0100000 /* Regular file. */
-#define S_IFIFO  0010000 /* FIFO. */
-#define S_IFLNK  0120000 /* Symbolic link. */
-#define S_IFSOCK 0140000 /* Socket. */
-#define S_ISUID  0004000 /* Set user ID on execution. */
-#define S_ISGID  0002000 /* Set group ID on execution. */
-#define S_ISVTX  0001000 /* Save swapped text after use (sticky). */
-#define S_IREAD  0000400 /* Read by owner. */
-#define S_IWRITE 0000200 /* Write by owner. */
-#define S_IEXEC  0000100 /* Execute by owner. */
+#define S_IFMT   __S_IFMT   /* These bits determine file type. */
+#define S_IFDIR  __S_IFDIR  /* Directory. */
+#define S_IFCHR  __S_IFCHR  /* Character device. */
+#define S_IFBLK  __S_IFBLK  /* Block device. */
+#define S_IFREG  __S_IFREG  /* Regular file. */
+#define S_IFIFO  __S_IFIFO  /* FIFO. */
+#define S_IFLNK  __S_IFLNK  /* Symbolic link. */
+#define S_IFSOCK __S_IFSOCK /* Socket. */
+#define S_ISUID  __S_ISUID  /* Set user ID on execution. */
+#define S_ISGID  __S_ISGID  /* Set group ID on execution. */
+#define S_ISVTX  __S_ISVTX  /* Save swapped text after use (sticky). */
+#define S_IREAD  __S_IREAD  /* Read by owner. */
+#define S_IWRITE __S_IWRITE /* Write by owner. */
+#define S_IEXEC  __S_IEXEC  /* Execute by owner. */
 #endif /* !S_IFMT */
 
 #ifndef S_ISDIR
-#define S_ISDIR(x)  (((x) & S_IFMT) == S_IFDIR)
-#define S_ISCHR(x)  (((x) & S_IFMT) == S_IFCHR)
-#define S_ISBLK(x)  (((x) & S_IFMT) == S_IFBLK)
-#define S_ISREG(x)  (((x) & S_IFMT) == S_IFREG)
-#define S_ISFIFO(x) (((x) & S_IFMT) == S_IFIFO)
-#define S_ISLNK(x)  (((x) & S_IFMT) == S_IFLNK)
+#define S_ISDIR(x)  __S_ISDIR(x)
+#define S_ISCHR(x)  __S_ISCHR(x)
+#define S_ISBLK(x)  __S_ISBLK(x)
+#define S_ISREG(x)  __S_ISREG(x)
+#define S_ISFIFO(x) __S_ISFIFO(x)
+#define S_ISLNK(x)  __S_ISLNK(x)
 #endif /* !S_ISDIR */
 #ifndef S_ISDEV
-#define S_ISDEV(x)  (((x) & 0130000) == 0020000) /* S_IFCHR|S_IFBLK */
+#define S_ISDEV(x)  __S_ISDEV(x)
 #endif /* !S_ISDEV */
 
 
 /* Directory entry types (`struct dirent::d_type'). */
 #ifndef DT_UNKNOWN
-#define DT_UNKNOWN 0
-#define DT_FIFO    1
-#define DT_CHR     2
-#define DT_DIR     4
-#define DT_BLK     6
-#define DT_REG     8
-#define DT_LNK     10
-#define DT_SOCK    12
-#define DT_WHT     14
+#define DT_UNKNOWN __DT_UNKNOWN
+#define DT_FIFO    __DT_FIFO
+#define DT_CHR     __DT_CHR
+#define DT_DIR     __DT_DIR
+#define DT_BLK     __DT_BLK
+#define DT_REG     __DT_REG
+#define DT_LNK     __DT_LNK
+#define DT_SOCK    __DT_SOCK
+#define DT_WHT     __DT_WHT
 #endif /* DT_UNKNOWN */
 
 /* Convert between stat structure types and directory types. */
 #ifndef IFTODT
-#define IFTODT(mode)    (((mode) & 0170000) >> 12)
-#define DTTOIF(dirtype) ((dirtype) << 12)
+#define IFTODT(mode)    __IFTODT(mode)
+#define DTTOIF(dirtype) __DTTOIF(dirtype)
 #endif /* !IFTODT */
 
 
@@ -130,48 +134,6 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define FS_MODE_FALWAYS1FLAG              0x00000000 /* Mask of bits always 1 in `struct fs::f_atflag' */
 #endif /* !FS_MODE_FNORMAL */
 
-
-
-/* Open flags (`oflag_t') */
-#ifndef O_ACCMODE
-#define O_ACCMODE    0x0000003 /* Mask for ACCessMODE. */
-#define O_RDONLY     0x0000000 /* Read */
-#define O_WRONLY     0x0000001 /* Write */
-#define O_RDWR       0x0000002 /* Read + write */
-/*      O_RDWR       0x0000003 /* Implemented as an alias! */
-#define O_CREAT      0x0000040 /* If missing, create a new file */
-#define O_EXCL       0x0000080 /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'
-                                * exception if the file already exists. */
-#define O_NOCTTY     0x0000100 /* If the calling process does not have a controlling terminal assigned,
-                                * do not attempt to assign the newly opened file as terminal, even when
-                                * `isatty(open(...))' would be true. */
-#define O_TRUNC      0x0000200 /* Truncate existing files to 0 when opened. */
-#define O_APPEND     0x0000400 /* Always append data to the end of the file */
-#define O_NONBLOCK   0x0000800 /* Do not block when trying to read data that hasn't been written, yet. */
-#define O_SYNC       0x0001000 /* ??? */
-#define O_DSYNC      0x0001000 /* ??? */
-#define O_ASYNC      0x0002000 /* ??? */
-#define O_DIRECT     0x0004000 /* ??? */
-#define O_LARGEFILE  0x0008000 /* Ignored... */
-#define O_DIRECTORY  0x0010000 /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' exception when the final
-                                * path component of an open() system call turns out to be something other than a directory. */
-#define O_NOFOLLOW   0x0020000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' exception when the
-                                * final path component of an open() system call turns out to be a symbolic link. Otherwise, when
-                                * one of two things will happen: When `O_SYMLINK' is set, open the link itself, else walk
-                                * the link and open the file that it is pointing to instead. */
-#define O_NOATIME    0x0040000 /* Don't update last-accessed time stamps. */
-#define O_CLOEXEC    0x0080000 /* Close the file during exec() */
-#define O_CLOFORK    0x0100000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
-#define O_PATH       0x0200000 /* Open a path for *at system calls. */
-#define O_TMPFILE   (0x0400000 | O_DIRECTORY)
-#define O_SYMLINK    0x2000000 /* Open a symlink itself, rather than dereferencing it.
-                                * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
-                                *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link.
-                                * NOTE: When used alongside `O_NOFOLLOW', throw an `E_INVALID_ARGUMENT' */
-#define O_DOSPATH    0x4000000 /* Interpret '\\' as '/', and ignore casing during path resolution.
-                                * Additionally, recognize DOS mounting points, and interpret leading
-                                * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
-#endif /* !O_ACCMODE */
 
 
 

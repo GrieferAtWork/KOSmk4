@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc1b4b3 */
+/* HASH CRC-32:0x4aede2b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,7 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_opendir_defined
-#if defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_fopendirat) || defined(__CRT_HAVE_opendirat))
+#if defined(__CRT_AT_FDCWD) && ((defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || (defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)))) || defined(__CRT_HAVE_fopendirat) || defined(__CRT_HAVE_opendirat))
 #define __local_opendir_defined 1
 struct __dirstream;
 struct __dirstream;
@@ -29,7 +29,7 @@ struct __dirstream;
 #ifdef __CRT_HAVE_opendirat
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),struct __dirstream *,__NOTHROW_RPC,__localdep_opendirat,(__fd_t __dirfd, char const *__name),opendirat,(__dirfd,__name))
-#elif defined(__CRT_HAVE_fopendirat)
+#elif (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || (defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)))) || defined(__CRT_HAVE_fopendirat)
 #include <local/dirent/opendirat.h>
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 #define __localdep_opendirat (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(opendirat))
@@ -42,9 +42,11 @@ __NAMESPACE_LOCAL_BEGIN
 /* Open and return a new directory stream for reading, referring to `name' */
 __LOCAL_LIBC(opendir) __ATTR_WUNUSED __ATTR_NONNULL((1)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendir))(char const *__name) {
-#line 125 "kos/src/libc/magic/dirent.c"
+#line 118 "kos/src/libc/magic/dirent.c"
+	/* TODO: Emulate using DOS's _find* functions */
+	/* TODO: Emulate using fdopendir(open(name, 0)) */
 	return __localdep_opendirat(__CRT_AT_FDCWD, __name);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_AT_FDCWD && (__CRT_HAVE_fopendirat || __CRT_HAVE_opendirat) */
+#endif /* __CRT_AT_FDCWD && ((__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || (__CRT_HAVE_openat && !__USE_FILE_OFFSET64))) || __CRT_HAVE_fopendirat || __CRT_HAVE_opendirat) */
 #endif /* !__local_opendir_defined */

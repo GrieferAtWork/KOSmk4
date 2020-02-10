@@ -66,7 +66,7 @@
 #include <bits/types.h>
 #include <bits/stdio_lim.h>
 #include <libio.h>
-#include <bits/oflags.h>
+#include <asm/oflags.h>
 #ifdef __USE_DOS
 #include <xlocale.h>
 #endif /* __USE_DOS */
@@ -84,11 +84,11 @@ __SYSDECL_BEGIN
 #define _IOFBF 0x0000 /* Fully buffered. */
 #define _IOLBF 0x0040 /* Line buffered. */
 #define _IONBF 0x0004 /* No buffering. */
-#else
+#else /* __CRT_DOS_PRIMARY */
 #define _IOFBF 0      /* Fully buffered. */
 #define _IOLBF 1      /* Line buffered. */
 #define _IONBF 2      /* No buffering. */
-#endif
+#endif /* !__CRT_DOS_PRIMARY */
 
 /* Default buffer size.  */
 #ifndef BUFSIZ

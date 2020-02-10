@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xf7f78f4f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,26 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_alphasort64_defined
-#define __local_alphasort64_defined 1
-/* Dependency: "strcoll" from "string" */
-#ifndef ____localdep_strcoll_defined
-#define ____localdep_strcoll_defined 1
-#ifdef __CRT_HAVE_strcoll
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcoll,(char const *__s1, char const *__s2),strcoll,(__s1,__s2))
-#else /* LIBC: strcoll */
-#include <local/string/strcoll.h>
-#define __localdep_strcoll (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcoll))
-#endif /* strcoll... */
-#endif /* !____localdep_strcoll_defined */
+#ifndef _ASM_DIRENT_H
+#define _ASM_DIRENT_H 1
 
-__NAMESPACE_LOCAL_BEGIN
-/* 64-bit variant of `alphasort()' */
-__LOCAL_LIBC(alphasort64) __ATTR_PURE __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(alphasort64))(struct dirent64 const **__e1,
-                                                         struct dirent64 const **__e2) {
-#line 259 "kos/src/libc/magic/dirent.c"
-	return __localdep_strcoll((*__e1)->d_name, (*__e2)->d_name);
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local_alphasort64_defined */
+#include <__stdinc.h>
+
+#define __DT_UNKNOWN 0
+#define __DT_FIFO    1
+#define __DT_CHR     2
+#define __DT_DIR     4
+#define __DT_BLK     6
+#define __DT_REG     8
+#define __DT_LNK     10
+#define __DT_SOCK    12
+#define __DT_WHT     14
+
+#define __IFTODT(mode)    (((mode) & 0170000) >> 12)
+#define __DTTOIF(dirtype) ((dirtype) << 12)
+
+#endif /* !_ASM_DIRENT_H */

@@ -134,6 +134,8 @@ incdir("", "../../include");
 #include <asm/bitsperlong.h>
 #include <asm/byteswap.h>
 #include <asm/cacheline.h>
+#include <asm/dirent.h>
+#include <asm/fcntl.h>
 #include <asm/int-l64.h>
 #include <asm/int-ll64.h>
 #include <asm/intrin-arith.h>
@@ -141,12 +143,14 @@ incdir("", "../../include");
 #include <asm/ioctl.h>
 #include <asm/ioctls.h>
 #include <asm/ls-syscalls.h>
+#include <asm/oflags.h>
 #include <asm/pageid.h>
 #include <asm/pagesize.h>
 #include <asm/param.h>
 #include <asm/posix_types.h>
 #include <asm/socket.h>
 #include <asm/sockios.h>
+#include <asm/stat.h>
 #include <asm/syscalls-proto.h>
 #include <asm/syscalls-trace.h>
 #include <asm/syscalls.h>
@@ -195,7 +199,6 @@ incdir("", "../../include");
 #include <bits/msq.h>
 #include <bits/nan.h>
 #include <bits/netdb.h>
-#include <bits/oflags.h>
 #include <bits/os_defines.h>
 #include <bits/param.h>
 #include <bits/poll.h>
@@ -230,7 +233,6 @@ incdir("", "../../include");
 #include <bits/sockaddr.h>
 #include <bits/socket.h>
 #include <bits/socket_type.h>
-#include <bits/stat-bits.h>
 #include <bits/stat-cyg.h>
 #include <bits/stat-dos.h>
 #include <bits/stat-gen.h>

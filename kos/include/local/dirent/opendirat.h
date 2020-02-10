@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0b9e68a */
+/* HASH CRC-32:0x308e2d18 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,17 +19,21 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_opendirat_defined
-#ifdef __CRT_HAVE_fopendirat
+#if (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || (defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)))) || defined(__CRT_HAVE_fopendirat)
 #define __local_opendirat_defined 1
 struct __dirstream;
 struct __dirstream;
-/* Dependency: "fopendirat" */
+/* Dependency: "fopendirat" from "dirent" */
 #ifndef ____localdep_fopendirat_defined
 #define ____localdep_fopendirat_defined 1
 #ifdef __CRT_HAVE_fopendirat
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),struct __dirstream *,__NOTHROW_RPC,__localdep_fopendirat,(__fd_t __dirfd, char const *__name, __oflag_t __oflags),fopendirat,(__dirfd,__name,__oflags))
-#else /* LIBC: fopendirat */
+#elif defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || (defined(__CRT_HAVE_openat) && !defined(__USE_FILE_OFFSET64)))
+#include <local/dirent/fopendirat.h>
+/* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
+#define __localdep_fopendirat (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fopendirat))
+#else /* CUSTOM: fopendirat */
 #undef ____localdep_fopendirat_defined
 #endif /* fopendirat... */
 #endif /* !____localdep_fopendirat_defined */
@@ -39,9 +43,9 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(opendirat) __ATTR_WUNUSED __ATTR_NONNULL((2)) struct __dirstream *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(opendirat))(__fd_t __dirfd,
                                                        char const *__name) {
-#line 140 "kos/src/libc/magic/dirent.c"
+#line 146 "kos/src/libc/magic/dirent.c"
 	return __localdep_fopendirat(__dirfd, __name, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* __CRT_HAVE_fopendirat */
+#endif /* (__CRT_HAVE_fdopendir && (__CRT_HAVE_openat64 || (__CRT_HAVE_openat && !__USE_FILE_OFFSET64))) || __CRT_HAVE_fopendirat */
 #endif /* !__local_opendirat_defined */

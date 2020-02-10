@@ -605,7 +605,7 @@ typedef void *__locale_t;
 
 /* Special value used to indicate the *at functions should use the current working directory. */
 #ifndef __CRT_AT_FDCWD
-#if defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
+#if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
 #define __CRT_AT_FDCWD   (-100)
 #elif defined(__CRT_CYG)
 #define __CRT_AT_FDCWD   (-2)

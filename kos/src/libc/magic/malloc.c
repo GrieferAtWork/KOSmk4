@@ -32,11 +32,11 @@
 
 __SYSDECL_BEGIN
 
-#ifdef __CRT_KOS
+#if (defined(__CRT_KOS) || defined(__CRT_GLC))
 /* malloc behavior attributes. */
 #define __MALLOC_ZERO_IS_NONNULL  1
 #define __REALLOC_ZERO_IS_NONNULL 1
-#endif
+#endif /* ... */
 
 #define M_TRIM_THRESHOLD     (-1)
 #define M_GRANULARITY        (-2)

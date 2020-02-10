@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d9c659 */
+/* HASH CRC-32:0xc8ad30c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -231,7 +231,7 @@ __NAMESPACE_STD_USING(snprintf)
 #include <bits/types.h>
 #include <bits/stdio_lim.h>
 #include <libio.h>
-#include <bits/oflags.h>
+#include <asm/oflags.h>
 #ifdef __USE_DOS
 #include <xlocale.h>
 #endif /* __USE_DOS */
@@ -249,11 +249,11 @@ __SYSDECL_BEGIN
 #define _IOFBF 0x0000 /* Fully buffered. */
 #define _IOLBF 0x0040 /* Line buffered. */
 #define _IONBF 0x0004 /* No buffering. */
-#else
+#else /* __CRT_DOS_PRIMARY */
 #define _IOFBF 0      /* Fully buffered. */
 #define _IOLBF 1      /* Line buffered. */
 #define _IONBF 2      /* No buffering. */
-#endif
+#endif /* !__CRT_DOS_PRIMARY */
 
 /* Default buffer size.  */
 #ifndef BUFSIZ

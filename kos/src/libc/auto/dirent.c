@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc66d4ad */
+/* HASH CRC-32:0x4376f9f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ INTERN ATTR_PURE NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.alphasort") int
 NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1,
                                      struct dirent const **e2) {
-#line 247 "kos/src/libc/magic/dirent.c"
+#line 253 "kos/src/libc/magic/dirent.c"
 	return libc_strcoll((*e1)->d_name, (*e2)->d_name);
 }
 
@@ -47,7 +47,7 @@ INTERN ATTR_PURE NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.alphasort64") int
 NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1,
                                        struct dirent64 const **e2) {
-#line 253 "kos/src/libc/magic/dirent.c"
+#line 259 "kos/src/libc/magic/dirent.c"
 	return libc_strcoll((*e1)->d_name, (*e2)->d_name);
 }
 #endif /* MAGIC:alias */
@@ -57,7 +57,7 @@ INTERN ATTR_PURE NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.versionsort") int
 NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1,
                                        struct dirent const **e2) {
-#line 314 "kos/src/libc/magic/dirent.c"
+#line 320 "kos/src/libc/magic/dirent.c"
 	return libc_strverscmp((*e1)->d_name, (*e2)->d_name);
 }
 
@@ -69,7 +69,7 @@ INTERN ATTR_PURE NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.versionsort64") int
 NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct dirent64 const **e1,
                                          struct dirent64 const **e2) {
-#line 320 "kos/src/libc/magic/dirent.c"
+#line 326 "kos/src/libc/magic/dirent.c"
 	return libc_strverscmp((*e1)->d_name, (*e2)->d_name);
 }
 #endif /* MAGIC:alias */

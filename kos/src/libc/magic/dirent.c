@@ -33,11 +33,55 @@
 
 %{
 #include <features.h>
+
+#include <asm/dirent.h>
+#include <bits/dirent.h>
 #include <bits/types.h>
 
-#ifdef __CC__
-
 __SYSDECL_BEGIN
+
+#ifdef __USE_MISC
+#ifndef DT_UNKNOWN
+}%[enum @macro {
+	DT_UNKNOWN = __DT_UNKNOWN,
+	DT_FIFO    = __DT_FIFO,
+	DT_CHR     = __DT_CHR,
+	DT_DIR     = __DT_DIR,
+	DT_BLK     = __DT_BLK,
+	DT_REG     = __DT_REG,
+	DT_LNK     = __DT_LNK,
+	DT_SOCK    = __DT_SOCK,
+	DT_WHT     = __DT_WHT
+}]%{
+#endif /* !DT_UNKNOWN */
+
+/* Convert between stat structure types and directory types. */
+#ifndef IFTODT
+#define IFTODT(mode)    __IFTODT(mode)
+#define DTTOIF(dirtype) __DTTOIF(dirtype)
+#endif /* !IFTODT */
+
+#if defined(__USE_XOPEN2K8) && !defined(MAXNAMLEN)
+#define MAXNAMLEN    255 /* == 'NAME_MAX' from <linux/limits.h> */
+#endif /* __USE_XOPEN2K8 && !MAXNAMLEN */
+#endif /* __USE_MISC */
+
+
+#ifdef __CC__
+#ifdef _DIRENT_HAVE_D_NAMLEN
+#define _D_EXACT_NAMLEN(d) ((d)->d_namlen)
+#define _D_ALLOC_NAMLEN(d) (_D_EXACT_NAMLEN(d) + 1)
+#else /* _DIRENT_HAVE_D_NAMLEN */
+__SYSDECL_END
+#include <libc/string.h>
+__SYSDECL_BEGIN
+#define _D_EXACT_NAMLEN(d) __libc_strlen((d)->d_name)
+#ifdef _DIRENT_HAVE_D_RECLEN
+#define _D_ALLOC_NAMLEN(d) (((char *)(d) + (d)->d_reclen) - &(d)->d_name[0])
+#else /* _DIRENT_HAVE_D_RECLEN */
+#define _D_ALLOC_NAMLEN(d) (sizeof((d)->d_name) > 1 ? sizeof((d)->d_name) : _D_EXACT_NAMLEN(d) + 1)
+#endif /* !_DIRENT_HAVE_D_RECLEN */
+#endif /* !_DIRENT_HAVE_D_NAMLEN */
 
 #ifdef __USE_XOPEN
 #ifndef __ino_t_defined
@@ -56,58 +100,7 @@ typedef __ino64_t ino64_t;
 #define __size_t_defined 1
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
-#endif /* __CC__ */
 
-__SYSDECL_END
-
-#ifdef __CRT_DOS_PRIMARY
-
-/* TODO: Emulate using the _find* functions. */
-
-#else /* __CRT_DOS_PRIMARY */
-#include <bits/dirent.h>
-
-#ifdef _DIRENT_HAVE_D_NAMLEN
-#   define _D_EXACT_NAMLEN(d) ((d)->d_namlen)
-#   define _D_ALLOC_NAMLEN(d) (_D_EXACT_NAMLEN(d)+1)
-#else /* _DIRENT_HAVE_D_NAMLEN */
-#   include <libc/string.h>
-#   define _D_EXACT_NAMLEN(d) __libc_strlen((d)->d_name)
-#ifdef _DIRENT_HAVE_D_RECLEN
-#   define _D_ALLOC_NAMLEN(d) (((char *)(d)+(d)->d_reclen)-&(d)->d_name[0])
-#else /* _DIRENT_HAVE_D_RECLEN */
-#   define _D_ALLOC_NAMLEN(d) (sizeof((d)->d_name) > 1 ? sizeof((d)->d_name) : _D_EXACT_NAMLEN(d)+1)
-#endif /* !_DIRENT_HAVE_D_RECLEN */
-#endif /* !_DIRENT_HAVE_D_NAMLEN */
-
-__SYSDECL_BEGIN
-
-#ifdef __USE_MISC
-}%[enum @undef @macro {
-	DT_UNKNOWN = 0,
-	DT_FIFO    = 1,
-	DT_CHR     = 2,
-	DT_DIR     = 4,
-	DT_BLK     = 6,
-	DT_REG     = 8,
-	DT_LNK     = 10,
-	DT_SOCK    = 12,
-	DT_WHT     = 14
-}]%{
-
-/* Convert between stat structure types and directory types. */
-#ifndef IFTODT
-#define IFTODT(mode)    (((mode) & 0170000) >> 12)
-#define DTTOIF(dirtype) ((dirtype) << 12)
-#endif /* !IFTODT */
-
-#if defined(__USE_XOPEN2K8) && !defined(MAXNAMLEN)
-#define MAXNAMLEN    255 /* == 'NAME_MAX' from <linux/limits.h> */
-#endif /* __USE_XOPEN2K8 && !MAXNAMLEN */
-#endif /* __USE_MISC */
-
-
-#ifdef __CC__
 #ifndef __DIR_defined
 #define __DIR_defined 1
 typedef struct __dirstream DIR;
@@ -122,16 +115,29 @@ typedef struct __dirstream DIR;
 [cp][ATTR_WUNUSED][noexport][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(opendirat))]
 opendir:([nonnull] char const *name) -> DIR * {
+	/* TODO: Emulate using DOS's _find* functions */
+	/* TODO: Emulate using fdopendir(open(name, 0)) */
 	return opendirat(__CRT_AT_FDCWD, name);
 }
-/* TODO: Default-implement `opendir()' as opendirat(AT_FDCWD,name)! */
 
 
 %
 %#if defined(__USE_KOS) && defined(__USE_ATFILE)
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
 [cp][ATTR_WUNUSED][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
-fopendirat:($fd_t dirfd, [nonnull] char const *name, $oflag_t oflags) -> DIR *;
+[requires($has_function(fdopendir) && $has_function(openat))]
+fopendirat:($fd_t dirfd, [nonnull] char const *name, $oflag_t oflags) -> DIR * {
+	DIR *result;
+	fd_t fd = openat(dirfd, name, oflags);
+	if unlikely(fd < 0)
+		return NULL;
+	result = fdopendir(fd);
+@@if_has_function(close)@@
+	if unlikely(!result)
+		close(fd);
+@@endif_has_function(close)@@
+	return result;
+}
 
 @@Directory-handle-relative, and flags-enabled versions of `opendir(3)'
 [cp][ATTR_WUNUSED][noexport][decl_prefix(DEFINE_STRUCT_DIRSTREAM)]
@@ -446,6 +452,5 @@ kreaddirf64:($fd_t fd, struct dirent64 *buf, size_t bufsize, unsigned int mode, 
 #endif /* __CC__ */
 
 __SYSDECL_END
-#endif /* !__CRT_DOS_PRIMARY */
 
 }
