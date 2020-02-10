@@ -204,6 +204,9 @@
 #define __BSD_VISIBLE 1
 #endif /* _BSD_SOURCE */
 
+#ifdef _NETBSD_SOURCE
+#define __USE_NETBSD 1
+#endif /* _NETBSD_SOURCE */
 
 #if (defined(_BSD_SOURCE) || defined(_SVID_SOURCE)) && \
     !defined(_DEFAULT_SOURCE)
@@ -562,6 +565,8 @@
 #undef __USE_REENTRANT
 #undef __USE_UTF
 #undef __USE_ISOC_PURE
+#undef __USE_BSD
+#undef __USE_NETBSD
 
 #define __USE_KOS 1
 #define __USE_STRING_BWLQ 1
@@ -595,6 +600,8 @@
 #define __USE_GNU 1
 #define __USE_REENTRANT 1
 #define __USE_UTF 1
+#define __USE_BSD 1
+#define __USE_NETBSD 1
 #endif /* _EVERY_SOURCE */
 
 /* You may `#define _DOS_SOURCE_CLEAN 1' alongside `_DOS_SOURCE' in order

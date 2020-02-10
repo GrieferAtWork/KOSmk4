@@ -382,6 +382,21 @@ handle_close_nosym(unsigned int fd,
                    struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
+/* Close all open file handles `>= fd' and return how many were actually closed.
+ * If nothing was closed at all (i.e. what would be `return == 0'), then this
+ * function returns by throwing an `E_INVALID_HANDLE_FILE' (-EBADF) exception. */
+FUNDEF NONNULL((2)) unsigned int FCALL
+handle_closefrom_nosym(unsigned int startfd,
+                       struct handle_manager *__restrict self)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+
+/* Return the next valid FD that is `>= startfd'
+ * If no such FD exists, throw an `E_INVALID_HANDLE_FILE' exception */
+FUNDEF NONNULL((2)) unsigned int FCALL
+handle_nextfd(unsigned int startfd,
+              struct handle_manager *__restrict self)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+
 
 /* Modify the I/O-flags of a given file handle
  * The new I/O flags are calculated as `(old_flags & mask) | flag'

@@ -49,6 +49,7 @@
 #include <kos/hop.h>
 
 #include <assert.h>
+#include <fcntl.h>
 #include <sched.h>
 #include <stddef.h>
 #include <string.h>
@@ -929,6 +930,26 @@ NOTHROW(FCALL handle_manager_get_max_hashvector_fd_plus_one)(struct handle_manag
 	return result;
 }
 
+PRIVATE NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool
+NOTHROW(FCALL handle_manager_hashvector_isvalid)(struct handle_manager const *__restrict self,
+                                                 unsigned int fd) {
+	unsigned int i, perturb;
+	assert(self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR);
+	assert(self->hm_hashvector.hm_hashvec);
+	i = perturb = fd & self->hm_hashvector.hm_hashmsk;
+	for (;; handle_manager_hashnext(i, perturb)) {
+		struct handle_hashent *hashent;
+		hashent = &self->hm_hashvector.hm_hashvec[i & self->hm_hashvector.hm_hashmsk];
+		if (hashent->hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
+			break; /* end-of-chain */
+		if (hashent->hh_handle_id != fd)
+			continue; /* Some other handle. */
+		/* Found it! */
+		return true;
+	}
+	return false;
+}
+
 
 /* Same as `handle_tryclose()', but throw an error if the given `fd' is invalid */
 PUBLIC NONNULL((2)) void FCALL
@@ -1075,6 +1096,175 @@ do_delete_handle:
 		__builtin_unreachable();
 	}
 }
+
+/* Close all open file handles `>= startfd' and return how many were actually closed.
+ * If nothing was closed at all (i.e. what would be `return == 0'), then this
+ * function returns by throwing an `E_INVALID_HANDLE_FILE' (-EBADF) exception. */
+PUBLIC NONNULL((2)) unsigned int FCALL
+handle_closefrom_nosym(unsigned int startfd,
+                       struct handle_manager *__restrict self)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
+	unsigned int result;
+	struct handle *vec;
+	struct handle_hashent *hashvec = NULL;
+	unsigned int cnt;
+	sync_write(&self->hm_lock);
+	/* Special case: No files are open */
+	if unlikely(!self->hm_count) {
+		unsigned int fd_limit;
+		fd_limit = self->hm_maxlimit;
+		sync_endwrite(&self->hm_lock);
+		THROW(E_INVALID_HANDLE_FILE,
+		      startfd,
+		      E_INVALID_HANDLE_FILE_UNALLOCATED,
+		      0,
+		      fd_limit);
+	}
+	if unlikely(startfd == 0) {
+		/* Simple (but special) case: Close _all_ _files_ */
+		vec = self->hm_linear.hm_vector;
+		cnt = self->hm_linear.hm_alloc;
+		if (self->hm_mode != HANDLE_MANAGER_MODE_LINEAR)
+			hashvec = self->hm_hashvector.hm_hashvec;
+		result = self->hm_count;
+		self->hm_count            = 0;
+		self->hm_minfree          = 0;
+		self->hm_clofork_count    = 0;
+		self->hm_cloexec_count    = 0;
+		self->hm_mode             = HANDLE_MANAGER_MODE_LINEAR;
+		self->hm_linear.hm_alloc  = 0;
+		self->hm_linear.hm_vector = NULL;
+		sync_endwrite(&self->hm_lock);
+	} else {
+		/* Only close files after a certain point. */
+		sync_endwrite(&self->hm_lock);
+#if 1 /* Really ugly implementation. - An atomic approach would be better... */
+		cnt    = 0;
+		vec    = NULL;
+		result = 0;
+		for (;;) {
+			unsigned int fd;
+again_scan:
+			fd = startfd;
+			for (;;) {
+				unsigned int next;
+				TRY {
+					/* Find the next open fd >= startfd */
+					next = handle_nextfd(fd, self);
+				} EXCEPT {
+					if (!was_thrown(E_INVALID_HANDLE)) {
+						if (fd == startfd)
+							goto done; /* No more handles >= startfd */
+						/* Check again if we're missed something, or
+						 * if another thread created a new handle in
+						 * the mean time (this is the part I don't like
+						 * about the current implementation: it's non-
+						 * atomic when it could actually be atomic) */
+						goto again_scan;
+					}
+					RETHROW();
+				}
+				/* Try to close the handle */
+				if (handle_tryclose_nosym(next, self))
+					++result;
+				/* Continue by trying to close the next handle. */
+				fd = next + 1;
+			}
+		}
+done:
+		;
+#endif
+	}
+	assert(!cnt || vec);
+	while (cnt) {
+		--cnt;
+		decref(vec[cnt]);
+	}
+	kfree(vec);
+	kfree(hashvec);
+	return result;
+}
+
+/* Return the next valid FD that is `>= startfd'
+ * If no such FD exists, throw an `E_INVALID_HANDLE_FILE' exception */
+PUBLIC NONNULL((2)) unsigned int FCALL
+handle_nextfd(unsigned int startfd,
+              struct handle_manager *__restrict self)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
+	unsigned int result;
+	sync_read(&self->hm_lock);
+	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
+		result = startfd;
+		for (;;) {
+			if unlikely(result >= self->hm_linear.hm_alloc) {
+				unsigned int fd_limit;
+throw_f_next_unallocated:
+				fd_limit = self->hm_maxlimit;
+				sync_endread(&self->hm_lock);
+				THROW(E_INVALID_HANDLE_FILE,
+				      0,
+				      E_INVALID_HANDLE_FILE_UNALLOCATED,
+				      result,
+				      fd_limit);
+			}
+			if (self->hm_linear.hm_vector[result].h_type != HANDLE_TYPE_UNDEFINED)
+				break; /* This one's in use! */
+			++result;
+		}
+	} else if (handle_manager_hashvector_isvalid(self, startfd)) {
+		/* Simple (and pretty likely) case: the given FD exists.
+		 * Given the use case of this fcntl to iterate over one's
+		 * file descriptor table to find open files, and given the
+		 * possibility that `fd - 1' had already been tested before,
+		 * then it stands to reason that some cluster of allocated
+		 * files has a size that is greater than 1:
+		 * >> int fd = -1;
+		 * >> while ((fd = fcntl(fd + 1, F_NEXT)) >= 0) {
+		 * >>     printf("open fd: %d\n", fd);
+		 * >> }
+		 * Possible output:
+		 *    open fd: 0
+		 *    open fd: 1
+		 *    open fd: 2
+		 *    open fd: 3
+		 *    open fd: 4
+		 */
+		result = startfd;
+	} else {
+		unsigned int i, mask, max_fd;
+		struct handle_hashent *map;
+		/* The slow case: Must scan the entire hash-table to find:
+		 *  - The lowest valid handle `>= fd'
+		 *  - The greatest valid fd, period. (needed if we end up throwing an `E_INVALID_HANDLE_FILE')
+		 */
+		result = (unsigned int)-1;
+		max_fd = 0;
+		map  = self->hm_hashvector.hm_hashvec;
+		mask = self->hm_hashvector.hm_hashmsk;
+		/* Go through the FD table and  */
+		for (i = 0; i <= mask; ++i) {
+			unsigned int fdno;
+			if (map[i].hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
+				continue;
+			fdno = map[i].hh_vector_index;
+			if (fdno != (unsigned int)-1) {
+				if (max_fd <= fdno)
+					max_fd = fdno + 1;
+				if (fdno >= startfd && fdno < result)
+					result = fdno;
+			}
+		}
+		if unlikely(result == (unsigned int)-1) {
+			/* No valid handle found... */
+			result = max_fd;
+			goto throw_f_next_unallocated;
+		}
+	}
+	sync_endread(&self->hm_lock);
+	return result;
+}
+
+
 
 
 /* The manager is kept in linear mode (the caller's lock is also kept) */
@@ -2766,6 +2956,43 @@ handle_fcntl(struct handle_manager *__restrict self,
 			RETHROW();
 		}
 		decref_unlikely(temp);
+		break;
+
+	case F_NEXT:
+		/* Find the first valid FD >= the given one. */
+		result = handle_nextfd(fd, self);
+		break;
+
+	case F_CLOSEM:
+		/* Close all handles `>= fd'
+		 * KOS returns the actual number of closed files, however given
+		 * that this fcntl doesn't have very large support, this behavior
+		 * may differ on those few other platforms that actually implement
+		 * this command. */
+		result = handle_closefrom_nosym(fd, self);
+		break;
+
+	case F_MAXFD:
+		(void)fd; /* Unused by this fcntl() command */
+		sync_read(&self->hm_lock);
+		if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
+			result = handle_manager_get_max_linear_fd_plus_one(self);
+		} else {
+			result = handle_manager_get_max_hashvector_fd_plus_one(self);
+		}
+		/* Special case: There aren't any handles in use... */
+		if unlikely(result == 0) {
+			unsigned int fd_limit;
+			fd_limit = self->hm_maxlimit;
+			sync_endread(&self->hm_lock);
+			THROW(E_INVALID_HANDLE_FILE,
+			      0,
+			      E_INVALID_HANDLE_FILE_UNALLOCATED,
+			      0,
+			      fd_limit);
+		}
+		sync_endread(&self->hm_lock);
+		--result; /* Return the actual greatest FD currently in use (not that fd +1) */
 		break;
 
 	default:

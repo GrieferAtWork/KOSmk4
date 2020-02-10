@@ -231,11 +231,17 @@ __SYSDECL_BEGIN
 #endif /* !F_DUPFD_CLOEXEC */
 #endif /* __USE_XOPEN2K8 */
 
-#if defined(__USE_KOS) && defined(__KOS__)
-#ifndef F_SETFL_XCH
-#define F_SETFL_XCH  5163 /* Same as 'F_SETFL', but return the old set of flags instead of `-EOK' upon success. */
-#endif /* !F_SETFL_XCH */
-#endif /* __USE_KOS && __KOS__ */
+#ifdef __KOS__
+#ifdef __USE_KOS
+#define F_SETFL_XCH 5163 /* Same as 'F_SETFL', but return the old set of flags instead of `-EOK' upon success. */
+#define F_NEXT      5164 /* return the next open handle id >= the given fd, or `-EBADF' if no such FD exists.
+                          * https://lkml.org/lkml/2012/4/1/71 */
+#endif /* __USE_KOS */
+#if defined(__USE_KOS) || defined(__USE_NETBSD)
+#define F_CLOSEM    5165 /* close all handles >= to the one given */
+#define F_MAXFD     5166 /* return the max open handle id (the given fd is ignored) */
+#endif /* __USE_KOS || __USE_NETBSD */
+#endif /* __KOS__ */
 
 #ifndef FD_CLOEXEC
 #define FD_CLOEXEC   0x01 /* FLAG: Close the descriptor on `exec()'. */
