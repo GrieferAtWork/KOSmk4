@@ -378,9 +378,9 @@
 #           define __USE_XOPEN2K 1
 #           define __USE_XOPEN2KXSI 1
 #           undef __USE_ISOC95
-#           define __USE_ISOC95  1
+#           define __USE_ISOC95 1
 #           undef __USE_ISOC99
-#           define __USE_ISOC99  1
+#           define __USE_ISOC99 1
 #       else /* _XOPEN_SOURCE >= 700 */
 #           define __XSI_VISIBLE 500
 #       endif /* _XOPEN_SOURCE+0 >= 600 */
@@ -586,8 +586,8 @@
 #define __USE_POSIX2 1
 #define __USE_POSIX199309 1
 #define __USE_POSIX199506 1
-#define __USE_XOPEN2K  1
-#define __USE_XOPEN2K8  1
+#define __USE_XOPEN2K 1
+#define __USE_XOPEN2K8 1
 #define __USE_XOPEN 1
 #define __USE_XOPEN_EXTENDED 1
 #define __USE_UNIX98 1

@@ -119,24 +119,120 @@ function optimizePPBranch(b: Object): Object {
 				b = invertPPBranch(inner);
 				continue;
 			}
+			if (inner is string) {
+				if (inner == "0") {
+					b = "1";
+					break;
+				}
+				if (inner == "1") {
+					b = "0";
+					break;
+				}
+			}
 			break;
 		}
 		if (b is PPBranchAnd || b is PPBranchOr) {
+again_optimize_andor_branch:
 			b.optimize();
-			if (#b.conditions == 0) {
+			local cond = b.conditions;
+			local n = #cond;
+			if (n == 0) {
 				b = b is PPBranchAnd ? "1" : "0";
 				break;
 			}
-			if (#b.conditions == 1) {
-				b = b.conditions[0];
+			if (n == 1) {
+				b = cond[0];
 				continue;
 			}
+			for (local i: [:n]) {
+				local c = cond[i];
+				/* (a && !a) --> 0
+				 * (a || !a) --> 1 */
+				local cIsInverted = false;
+				if (c is PPBranchNot) {
+					c = c.branch;
+					cIsInverted = true;
+				}
+				if (c !is string)
+					continue;
+				for (local j: [i + 1:n]) {
+					local c2 = cond[j];
+					if (!cIsInverted) {
+						if (c2 !is PPBranchNot)
+							continue;
+						c2 = c2.branch;
+					}
+					if (c2 !is string)
+						continue;
+					if (c2 == c) {
+						b = b is PPBranchAnd ? "0" : "1";
+						goto done;
+					}
+				}
+				/* !a && (a || b||...) --> !a && (b||...) */
+				/* !a || (a && b&&...) --> !a || (b&&...) */
+				/* a && (!a || b||...) --> a && (b||...) */
+				/* a || (!a && b&&...) --> a || (b&&...) */
+				for (local j: [:n]) {
+					if (i == j)
+						continue;
+					local c2 = cond[j];
+					if (b is PPBranchAnd) {
+						if (c2 !is PPBranchOr)
+							continue;
+					} else {
+						if (c2 !is PPBranchAnd)
+							continue;
+					}
+					local c2c = c2.conditions;
+					local c2n = #c2c;
+					local ji = 0;
+again_ji_search:
+					for (; ji < c2n; ++ji) {
+						local elem = c2c[ji];
+						if (!cIsInverted) {
+							if (elem !is PPBranchNot)
+								continue;
+							elem = elem.branch;
+						}
+						if (elem !is string)
+							continue;
+						if (elem != c)
+							continue;
+						/* Remove c2c[ji] */
+						c2c.erase(ji);
+						--c2n;
+						goto again_ji_search;
+					}
+					if (c2n == 0) {
+						cond[j] = c2 is PPBranchAnd ? "0" : "1";
+						goto again_optimize_andor_branch;
+					}
+					if (c2n == 1) {
+						cond[j] = c2c[0];
+						goto again_optimize_andor_branch;
+					}
+				}
+			}
+
 			/* TODO: (a && b&&...) || (b&&...) --> (b&&...)
 			 *       (a || b||...) && (b||...) --> (b||...)
 			 * Where `b' can be any number of expressions */
 			break;
 		}
 		break;
+	}
+done:
+	return b;
+}
+
+function sortPPBranch(b: Object) {
+	if (b is PPBranchNot) {
+		sortPPBranch(b.branch);
+	} else if (b is PPBranchAnd || b is PPBranchOr) {
+		b.conditions.sort([](x) -> str(x));
+		for (local i: b.conditions)
+			sortPPBranch(i);
 	}
 	return b;
 }
@@ -504,7 +600,8 @@ function parsePPBranch(parser: PPBranchParser): Object {
 
 
 @@Try to optimize away redundant expressions
-function optimizePreprocessorExpression(expr: string): string {
+function optimizePreprocessorExpression(
+		expr: string, sortBranches: bool = false): string {
 	local parser = PPBranchParser(expr.strip());
 	if (!parser.next())
 		return "1";
@@ -517,6 +614,8 @@ function optimizePreprocessorExpression(expr: string): string {
 				parser.expr[parser.pos:parser.end], parser.expr }));
 	}
 	branch = optimizePPBranch(branch);
+	if (sortBranches)
+		sortPPBranch(branch);
 	return str(branch);
 }
 
@@ -564,20 +663,41 @@ function optimizeAndWrapProcessorExpressionForIf(expr: string): string {
 			expr));
 }
 
-assert optimizePreprocessorExpression("!(!bar && foo)") == "bar || !foo";
-assert optimizePreprocessorExpression("!(foo && !bar)") == "!foo || bar";
-assert optimizePreprocessorExpression("!(!defined(bar) && defined(foo))") == "defined(bar) || !defined(foo)";
-assert optimizePreprocessorExpression("!(defined(foo) && !defined(bar))") == "!defined(foo) || defined(bar)";
+assert optimizePreprocessorExpression("!a && (a || a)") == "0";
+assert optimizePreprocessorExpression("!a && (a || b)") == "!a && b";
+assert optimizePreprocessorExpression("!a && (a || b || c)") == "!a && (b || c)";
+assert optimizePreprocessorExpression("a && (!a || b)") == "a && b";
+assert optimizePreprocessorExpression("a && (!a || b || c)") == "a && (b || c)";
+assert optimizePreprocessorExpression("!a || (a && b)") == "!a || b";
+assert optimizePreprocessorExpression("!a || (a && b && c)") == "!a || (b && c)";
+assert optimizePreprocessorExpression("a || (!a && b)") == "a || b";
+assert optimizePreprocessorExpression("a || (!a && b && c)") == "a || (b && c)";
+assert optimizePreprocessorExpression("a && !a") == "0";
+assert optimizePreprocessorExpression("!a && a") == "0";
+assert optimizePreprocessorExpression("a || !a") == "1";
+assert optimizePreprocessorExpression("!a || a") == "1";
+assert optimizePreprocessorExpression("!(!b && a)") == "b || !a";
+assert optimizePreprocessorExpression("!(a && !b)") == "!a || b";
+assert optimizePreprocessorExpression("!(!defined(b) && defined(a))") == "defined(b) || !defined(a)";
+assert optimizePreprocessorExpression("!(defined(a) && !defined(b))") == "!defined(a) || defined(b)";
 assert optimizePreprocessorExpression("") == "1";
-assert optimizePreprocessorExpression("(foo)") == "foo";
-assert optimizePreprocessorExpression("(defined(foo) || defined(bar))") == "defined(foo) || defined(bar)";
-assert optimizePreprocessorExpression("foo || bar") == "foo || bar";
-assert optimizePreprocessorExpression("foo || bar && 1") == "foo || bar";
-assert optimizePreprocessorExpression("foo || bar && 0") == "foo";
-assert optimizePreprocessorExpression("foo || (bar && 1)") == "foo || bar";
-assert optimizePreprocessorExpression("foo || (bar && 0)") == "foo";
-assert optimizePreprocessorExpression("foo || !(bar && baz)") == "foo || !bar || !baz";
-assert optimizePreprocessorExpression("foo && !(bar || baz)") == "foo && !bar && !baz";
+assert optimizePreprocessorExpression("(a)") == "a";
+assert optimizePreprocessorExpression("(defined(a) || defined(b))") == "defined(a) || defined(b)";
+assert optimizePreprocessorExpression("a || b") == "a || b";
+assert optimizePreprocessorExpression("a || b && 1") == "a || b";
+assert optimizePreprocessorExpression("a || b && 0") == "a";
+assert optimizePreprocessorExpression("a || (b && 1)") == "a || b";
+assert optimizePreprocessorExpression("a || (b && 0)") == "a";
+assert optimizePreprocessorExpression("a || !(b && c)") == "a || !b || !c";
+assert optimizePreprocessorExpression("a && !(b || c)") == "a && !b && !c";
+assert optimizePreprocessorExpression("a && (a || b)") == "a";
 assert optimizePreprocessorExpression(
-"defined(__CRT_HAVE_tmpfile64) || defined(__CRT_HAVE_tmpfile) || (defined(__CRT_HAVE_tmpfile) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0))"
+"defined(__CRT_HAVE_tmpfile64) || defined(__CRT_HAVE_tmpfile) || "
+"(defined(__CRT_HAVE_tmpfile) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0))"
 ) == "defined(__CRT_HAVE_tmpfile64) || defined(__CRT_HAVE_tmpfile)";
+assert optimizePreprocessorExpression(
+"!defined(_KERNEL) && !defined(_SYS_FCNTL_H_) && !defined(_SYS_QUEUE_H_) && "
+"!defined(_SYS_STAT_H_) && !defined(_SYS_TIMEVAR_H_) && !defined(_SYS_TIME_H_) && "
+"((_POSIX_C_SOURCE - 0) >= 200809L || (_XOPEN_SOURCE - 0) >= 700 || defined(_NETBSD_SOURCE)) && "
+"defined(QUEUEDEBUG) && defined(_KERNEL) && defined(_XOPEN_SOURCE)"
+) == "0";
