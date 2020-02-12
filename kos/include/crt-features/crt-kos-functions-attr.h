@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41a6bfc2 */
+/* HASH CRC-32:0xbb68aa9e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2249,6 +2249,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_memendl 1
 #define __CRT_ATTR_NOTHROW_NCX_memendq 1
 #define __CRT_ATTR_NOTHROW_NCX_memendw 1
+#define __CRT_ATTR_NOTHROW_NCX_memfd_create 1
 #define __CRT_ATTR_NOTHROW_NCX_memfrob 1
 #define __CRT_ATTR_NOTHROW_NCX_memicmp 1
 #define __CRT_ATTR_NOTHROW_NCX_memlen 1
@@ -2376,6 +2377,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_mktime32 1
 #define __CRT_ATTR_NOTHROW_NCX_mktime64 1
 #define __CRT_ATTR_NOTHROW_NCX_mlock 1
+#define __CRT_ATTR_NOTHROW_NCX_mlock2 1
 #define __CRT_ATTR_NOTHROW_NCX_mlockall 1
 #define __CRT_ATTR_NOTHROW_NCX_mmap 1
 #define __CRT_ATTR_NOTHROW_NCX_mmap32 1
@@ -2420,6 +2422,11 @@
 #define __CRT_ATTR_NOTHROW_NCX_pclose 1
 #define __CRT_ATTR_NOTHROW_NCX_pipe 1
 #define __CRT_ATTR_NOTHROW_NCX_pipe2 1
+#define __CRT_ATTR_NOTHROW_NCX_pkey_alloc 1
+#define __CRT_ATTR_NOTHROW_NCX_pkey_free 1
+#define __CRT_ATTR_NOTHROW_NCX_pkey_get 1
+#define __CRT_ATTR_NOTHROW_NCX_pkey_mprotect 1
+#define __CRT_ATTR_NOTHROW_NCX_pkey_set 1
 #define __CRT_ATTR_NOTHROW_NCX_posix_fadvise 1
 #define __CRT_ATTR_NOTHROW_NCX_posix_fadvise32 1
 #define __CRT_ATTR_NOTHROW_NCX_posix_fadvise64 1

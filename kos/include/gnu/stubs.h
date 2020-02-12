@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26afd33f */
+/* HASH CRC-32:0xcec9605c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -340,6 +340,7 @@
 #define __stub_lrint 1
 #define __stub_makecontext 1
 #define __stub_mbsnrtowcs 1
+#define __stub_memfd_create 1
 #define __stub_mkdtemp 1
 #define __stub_mkostemp 1
 #define __stub_mkostemp64 1
@@ -349,6 +350,7 @@
 #define __stub_mkstemps 1
 #define __stub_mkstemps64 1
 #define __stub_mktemp 1
+#define __stub_mlock2 1
 #define __stub_mrand48 1
 #define __stub_mrand48_r 1
 #define __stub_msgctl 1
@@ -366,6 +368,11 @@
 #define __stub_open_wmemstream 1
 #define __stub_openlog 1
 #define __stub_pathconf 1
+#define __stub_pkey_alloc 1
+#define __stub_pkey_free 1
+#define __stub_pkey_get 1
+#define __stub_pkey_mprotect 1
+#define __stub_pkey_set 1
 #define __stub_popen 1
 #define __stub_posix_fadvise64 1
 #define __stub_posix_fallocate64 1

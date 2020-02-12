@@ -491,6 +491,51 @@ typedef __mode_t mode_t;
 #endif /* !MCL_CURRENT */
 
 
+/************************************************************************/
+/* Flags for `memfd_create()'                                           */
+/************************************************************************/
+
+/* Close-on-exec */
+#ifdef __MFD_CLOEXEC
+#define MFD_CLOEXEC __MFD_CLOEXEC
+#endif /* __MFD_CLOEXEC */
+
+/* Allow use of `F_ADD_SEALS' and `F_GET_SEALS' (when not given, `F_SEAL_SEAL' is set on creation) */
+#ifdef __MFD_ALLOW_SEALING
+#define MFD_ALLOW_SEALING __MFD_ALLOW_SEALING
+#endif /* __MFD_ALLOW_SEALING */
+
+/* ... */
+#ifdef __MFD_HUGETLB
+#define MFD_HUGETLB __MFD_HUGETLB
+#endif /* __MFD_HUGETLB */
+
+
+/************************************************************************/
+/* Flags for `mlock2()'                                                 */
+/************************************************************************/
+
+/* ... */
+#ifdef __MLOCK_ONFAULT
+#define MLOCK_ONFAULT __MLOCK_ONFAULT
+#endif /* __MLOCK_ONFAULT */
+
+
+/************************************************************************/
+/* `ACCESS_RIGHTS' for `pkey_alloc()' and `pkey_set()'                  */
+/************************************************************************/
+
+/* ... */
+#ifdef __PKEY_DISABLE_ACCESS
+#define PKEY_DISABLE_ACCESS __PKEY_DISABLE_ACCESS
+#endif /* __PKEY_DISABLE_ACCESS */
+
+/* ... */
+#ifdef __PKEY_DISABLE_WRITE
+#define PKEY_DISABLE_WRITE __PKEY_DISABLE_WRITE
+#endif /* __PKEY_DISABLE_WRITE */
+
+
 
 #ifdef __CC__
 }
@@ -588,6 +633,14 @@ posix_madvise:([nonnull] void *addr, size_t len, int advice) -> int {
 mremap:(void *addr, size_t old_len, size_t new_len, int flags, ... /* void *new_address */) -> void *;
 
 remap_file_pages:(void *start, size_t size, int prot, size_t pgoff, int flags) -> int;
+memfd_create:(char const *name, unsigned int flags) -> $fd_t;
+mlock2:(void const *addr, size_t length, unsigned int flags) -> int;
+pkey_alloc:(unsigned int flags, unsigned int access_rights) -> int;
+pkey_set:(int key, unsigned int access_rights) -> int;
+pkey_get:(int key) -> int;
+pkey_free:(int key) -> int;
+pkey_mprotect:(void *addr, size_t len, int prot, int pkey) -> int;
+
 
 %#endif /* __USE_GNU */
 

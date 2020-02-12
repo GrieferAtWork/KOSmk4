@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ff1e8b2 */
+/* HASH CRC-32:0x4a34c10f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3550,13 +3550,20 @@
 
 /* .text.crt.system.mman.* */
 #define __CRT_SECTION_madvise                               __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.madvise */
+#define __CRT_SECTION_memfd_create                          __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.memfd_create */
 #define __CRT_SECTION_mincore                               __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.mincore */
 #define __CRT_SECTION_mlock                                 __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.mlock */
+#define __CRT_SECTION_mlock2                                __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.mlock2 */
 #define __CRT_SECTION_mlockall                              __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.mlockall */
 #define __CRT_SECTION_mprotect                              __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.mprotect */
 #define __CRT_SECTION_msync                                 __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.msync */
 #define __CRT_SECTION_munlock                               __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.munlock */
 #define __CRT_SECTION_munlockall                            __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.munlockall */
+#define __CRT_SECTION_pkey_alloc                            __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.pkey_alloc */
+#define __CRT_SECTION_pkey_free                             __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.pkey_free */
+#define __CRT_SECTION_pkey_get                              __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.pkey_get */
+#define __CRT_SECTION_pkey_mprotect                         __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.pkey_mprotect */
+#define __CRT_SECTION_pkey_set                              __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.pkey_set */
 #define __CRT_SECTION_posix_madvise                         __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.posix_madvise */
 #define __CRT_SECTION_remap_file_pages                      __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.remap_file_pages */
 #define __CRT_SECTION_shm_open                              __CRT_SECTINFO_system_mman                              /* .text.crt.system.mman.shm_open */

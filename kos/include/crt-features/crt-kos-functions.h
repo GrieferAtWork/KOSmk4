@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39714229 */
+/* HASH CRC-32:0x81331a9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1453,6 +1453,7 @@ __CRT_FUNCTION(memend,0,(),3,(void const *__restrict,haystack,int,needle,size_t,
 __CRT_FUNCTION(memendl,0,(),3,(/*aligned(4)*/ void const *__restrict,haystack,uint32_t,dword,size_t,n_bytes),uint32_t *)
 __CRT_FUNCTION(memendq,0,(),3,(/*aligned(8)*/ void const *__restrict,haystack,uint64_t,qword,size_t,n_bytes),uint64_t *)
 __CRT_FUNCTION(memendw,0,(),3,(/*aligned(2)*/ void const *__restrict,haystack,uint16_t,word,size_t,n_bytes),uint16_t *)
+__CRT_FUNCTION(memfd_create,0,(),2,(char const *,name,unsigned int,flags),fd_t)
 __CRT_FUNCTION(memfrob,0,(),2,(void *,buf,size_t,num_bytes),void *)
 __CRT_FUNCTION(memlen,0,(),3,(void const *__restrict,haystack,int,needle,size_t,n_bytes),size_t)
 __CRT_FUNCTION(memlenl,0,(),3,(/*aligned(4)*/ void const *__restrict,haystack,uint32_t,dword,size_t,n_dwords),size_t)
@@ -1566,6 +1567,7 @@ __CRT_FUNCTION(mktemp,0,(),1,(char *,template_),char *)
 __CRT_FUNCTION(mktime,0,(),1,(__STRUCT_TM __KOS_FIXED_CONST *,tp),time_t)
 __CRT_FUNCTION(mktime64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,mktime),1,(__STRUCT_TM __KOS_FIXED_CONST *,tp),time64_t)
 __CRT_FUNCTION(mlock,0,(),2,(void const *,addr,size_t,len),int)
+__CRT_FUNCTION(mlock2,0,(),3,(void const *,addr,size_t,length,unsigned int,flags),int)
 __CRT_FUNCTION(mlockall,0,(),1,(int,flags),int)
 __CRT_FUNCTION(mmap,0,(),6,(void *,addr,size_t,len,int,prot,int,flags,fd_t,fd,off_t,offset),void *)
 __CRT_FUNCTION(mmap64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,mmap),6,(void *,addr,size_t,len,int,prot,int,flags,fd_t,fd,off64_t,offset),void *)
@@ -1632,6 +1634,11 @@ __CRT_FUNCTION(pclose,0,(),1,(FILE *,stream),int)
 __CRT_FUNCTION(perror,0,(),1,(char const *,message),void)
 __CRT_FUNCTION(pipe,0,(),1,(fd_t[2],pipedes),int)
 __CRT_FUNCTION(pipe2,0,(),2,(fd_t[2],pipedes,oflag_t,flags),int)
+__CRT_FUNCTION(pkey_alloc,0,(),2,(unsigned int,flags,unsigned int,access_rights),int)
+__CRT_FUNCTION(pkey_free,0,(),1,(int,key),int)
+__CRT_FUNCTION(pkey_get,0,(),1,(int,key),int)
+__CRT_FUNCTION(pkey_mprotect,0,(),4,(void *,addr,size_t,len,int,prot,int,pkey),int)
+__CRT_FUNCTION(pkey_set,0,(),2,(int,key,unsigned int,access_rights),int)
 __CRT_FUNCTION(poll,0,(),3,(struct pollfd *,fds,nfds_t,nfds,int,timeout),int)
 __CRT_FUNCTION(popen,0,(),2,(char const *,command,char const *,modes),FILE *)
 __CRT_FUNCTION(posix_fadvise,0,(),4,(fd_t,fd,off_t,offset,off_t,length,int,advise),int)

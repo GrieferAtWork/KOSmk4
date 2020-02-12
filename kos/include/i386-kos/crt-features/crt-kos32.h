@@ -2821,6 +2821,7 @@
 #define __CRT_HAVE_memendl 1
 #define __CRT_HAVE_memendq 1
 #define __CRT_HAVE_memendw 1
+#define __CRT_HAVE_memfd_create 1
 #define __CRT_HAVE_memfrob 1
 #define __CRT_HAVE_memicmp 1
 #define __CRT_HAVE_memlen 1
@@ -2937,6 +2938,7 @@
 #define __CRT_HAVE_mktime 1
 #define __CRT_HAVE_mktime64 1
 #define __CRT_HAVE_mlock 1
+#define __CRT_HAVE_mlock2 1
 #define __CRT_HAVE_mlockall 1
 #define __CRT_HAVE_mmap 1
 #define __CRT_HAVE_mmap64 1
@@ -3013,6 +3015,11 @@
 #define __CRT_HAVE_perror 1
 #define __CRT_HAVE_pipe 1
 #define __CRT_HAVE_pipe2 1
+#define __CRT_HAVE_pkey_alloc 1
+#define __CRT_HAVE_pkey_free 1
+#define __CRT_HAVE_pkey_get 1
+#define __CRT_HAVE_pkey_mprotect 1
+#define __CRT_HAVE_pkey_set 1
 #define __CRT_HAVE_poll 1
 #define __CRT_HAVE_popen 1
 #define __CRT_HAVE_posix_fadvise 1

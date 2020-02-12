@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c17679b */
+/* HASH CRC-32:0xb924e1c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -489,6 +489,51 @@ typedef __mode_t mode_t;
 #endif /* !MCL_CURRENT */
 
 
+/************************************************************************/
+/* Flags for `memfd_create()'                                           */
+/************************************************************************/
+
+/* Close-on-exec */
+#ifdef __MFD_CLOEXEC
+#define MFD_CLOEXEC __MFD_CLOEXEC
+#endif /* __MFD_CLOEXEC */
+
+/* Allow use of `F_ADD_SEALS' and `F_GET_SEALS' (when not given, `F_SEAL_SEAL' is set on creation) */
+#ifdef __MFD_ALLOW_SEALING
+#define MFD_ALLOW_SEALING __MFD_ALLOW_SEALING
+#endif /* __MFD_ALLOW_SEALING */
+
+/* ... */
+#ifdef __MFD_HUGETLB
+#define MFD_HUGETLB __MFD_HUGETLB
+#endif /* __MFD_HUGETLB */
+
+
+/************************************************************************/
+/* Flags for `mlock2()'                                                 */
+/************************************************************************/
+
+/* ... */
+#ifdef __MLOCK_ONFAULT
+#define MLOCK_ONFAULT __MLOCK_ONFAULT
+#endif /* __MLOCK_ONFAULT */
+
+
+/************************************************************************/
+/* `ACCESS_RIGHTS' for `pkey_alloc()' and `pkey_set()'                  */
+/************************************************************************/
+
+/* ... */
+#ifdef __PKEY_DISABLE_ACCESS
+#define PKEY_DISABLE_ACCESS __PKEY_DISABLE_ACCESS
+#endif /* __PKEY_DISABLE_ACCESS */
+
+/* ... */
+#ifdef __PKEY_DISABLE_WRITE
+#define PKEY_DISABLE_WRITE __PKEY_DISABLE_WRITE
+#endif /* __PKEY_DISABLE_WRITE */
+
+
 
 #ifdef __CC__
 #if defined(__CRT_HAVE_mmap64) && defined(__USE_FILE_OFFSET64)
@@ -605,6 +650,27 @@ __LIBC void *__NOTHROW_NCX(__VLIBCCALL mremap)(void *__addr, size_t __old_len, s
 #ifdef __CRT_HAVE_remap_file_pages
 __CDECLARE(,int,__NOTHROW_NCX,remap_file_pages,(void *__start, size_t __size, int __prot, size_t __pgoff, int __flags),(__start,__size,__prot,__pgoff,__flags))
 #endif /* remap_file_pages... */
+#ifdef __CRT_HAVE_memfd_create
+__CDECLARE(,__fd_t,__NOTHROW_NCX,memfd_create,(char const *__name, unsigned int __flags),(__name,__flags))
+#endif /* memfd_create... */
+#ifdef __CRT_HAVE_mlock2
+__CDECLARE(,int,__NOTHROW_NCX,mlock2,(void const *__addr, size_t __length, unsigned int __flags),(__addr,__length,__flags))
+#endif /* mlock2... */
+#ifdef __CRT_HAVE_pkey_alloc
+__CDECLARE(,int,__NOTHROW_NCX,pkey_alloc,(unsigned int __flags, unsigned int __access_rights),(__flags,__access_rights))
+#endif /* pkey_alloc... */
+#ifdef __CRT_HAVE_pkey_set
+__CDECLARE(,int,__NOTHROW_NCX,pkey_set,(int __key, unsigned int __access_rights),(__key,__access_rights))
+#endif /* pkey_set... */
+#ifdef __CRT_HAVE_pkey_get
+__CDECLARE(,int,__NOTHROW_NCX,pkey_get,(int __key),(__key))
+#endif /* pkey_get... */
+#ifdef __CRT_HAVE_pkey_free
+__CDECLARE(,int,__NOTHROW_NCX,pkey_free,(int __key),(__key))
+#endif /* pkey_free... */
+#ifdef __CRT_HAVE_pkey_mprotect
+__CDECLARE(,int,__NOTHROW_NCX,pkey_mprotect,(void *__addr, size_t __len, int __prot, int __pkey),(__addr,__len,__prot,__pkey))
+#endif /* pkey_mprotect... */
 #endif /* __USE_GNU */
 
 #endif /* __CC__ */

@@ -115,6 +115,12 @@
 #define __MS_SYNC        0x04 /* Wait for the sync to finish. */
 #define __MREMAP_MAYMOVE 0x01 /* Allowed to move to a different location */
 #define __MREMAP_FIXED   0x02 /* Allowed to move to a different location */
+#define __MFD_CLOEXEC       0x1 /* Close-on-exec */
+#define __MFD_ALLOW_SEALING 0x2 /* Allow use of `F_ADD_SEALS' and `F_GET_SEALS' (when not given, `F_SEAL_SEAL' is set on creation) */
+#define __MFD_HUGETLB       0x4 /* ... */
+#define __MLOCK_ONFAULT 0x1
+#define __PKEY_DISABLE_ACCESS 0x1
+#define __PKEY_DISABLE_WRITE  0x2
 
 /* DISCLAIMER: Documentation strings for MADV_*, POSIX_MADV_* and MCL_* were
  *             taken from glibc /usr/include/i386-linux-gnu/bits/mman-linux.h */

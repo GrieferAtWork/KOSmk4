@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ef7c11e */
+/* HASH CRC-32:0x2bb50c68 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,6 +61,13 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr, siz
 /* @param flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
 INTDEF void *NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr, size_t old_len, size_t new_len, int flags, ... /* void *new_address */);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start, size_t size, int prot, size_t pgoff, int flags);
+INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name, unsigned int flags);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr, size_t length, unsigned int flags);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags, unsigned int access_rights);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_set)(int key, unsigned int access_rights);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_get)(int key);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_free)(int key);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr, size_t len, int prot, int pkey);
 
 DECL_END
 

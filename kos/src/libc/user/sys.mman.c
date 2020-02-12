@@ -330,11 +330,111 @@ NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start,
 }
 /*[[[end:remap_file_pages]]]*/
 
+/*[[[head:memfd_create,hash:CRC-32=0x9bf85513]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.memfd_create") fd_t
+NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name,
+                                        unsigned int flags)
+/*[[[body:memfd_create]]]*/
+{
+	(void)name;
+	(void)flags;
+	CRT_UNIMPLEMENTED("memfd_create"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:memfd_create]]]*/
+
+/*[[[head:mlock2,hash:CRC-32=0xca5eea7b]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mlock2") int
+NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr,
+                                  size_t length,
+                                  unsigned int flags)
+/*[[[body:mlock2]]]*/
+{
+	(void)addr;
+	(void)length;
+	(void)flags;
+	CRT_UNIMPLEMENTED("mlock2"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:mlock2]]]*/
+
+/*[[[head:pkey_alloc,hash:CRC-32=0xcd9cf6c4]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.pkey_alloc") int
+NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags,
+                                      unsigned int access_rights)
+/*[[[body:pkey_alloc]]]*/
+{
+	(void)flags;
+	(void)access_rights;
+	CRT_UNIMPLEMENTED("pkey_alloc"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:pkey_alloc]]]*/
+
+/*[[[head:pkey_set,hash:CRC-32=0x174d5cbb]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.pkey_set") int
+NOTHROW_NCX(LIBCCALL libc_pkey_set)(int key,
+                                    unsigned int access_rights)
+/*[[[body:pkey_set]]]*/
+{
+	(void)key;
+	(void)access_rights;
+	CRT_UNIMPLEMENTED("pkey_set"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:pkey_set]]]*/
+
+/*[[[head:pkey_get,hash:CRC-32=0xf6e2d3b5]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.pkey_get") int
+NOTHROW_NCX(LIBCCALL libc_pkey_get)(int key)
+/*[[[body:pkey_get]]]*/
+{
+	(void)key;
+	CRT_UNIMPLEMENTED("pkey_get"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:pkey_get]]]*/
+
+/*[[[head:pkey_free,hash:CRC-32=0x68ab8966]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.pkey_free") int
+NOTHROW_NCX(LIBCCALL libc_pkey_free)(int key)
+/*[[[body:pkey_free]]]*/
+{
+	(void)key;
+	CRT_UNIMPLEMENTED("pkey_free"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:pkey_free]]]*/
+
+/*[[[head:pkey_mprotect,hash:CRC-32=0x60bdcbb4]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.pkey_mprotect") int
+NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr,
+                                         size_t len,
+                                         int prot,
+                                         int pkey)
+/*[[[body:pkey_mprotect]]]*/
+{
+	(void)addr;
+	(void)len;
+	(void)prot;
+	(void)pkey;
+	CRT_UNIMPLEMENTED("pkey_mprotect"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:pkey_mprotect]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf9f23ecd]]]*/
+/*[[[start:exports,hash:CRC-32=0x681074e3]]]*/
 #undef mremap
 DEFINE_PUBLIC_WEAK_ALIAS(mmap, libc_mmap);
 DEFINE_PUBLIC_WEAK_ALIAS(munmap, libc_munmap);
@@ -353,6 +453,13 @@ DEFINE_PUBLIC_WEAK_ALIAS(mmap64, libc_mmap64);
 DEFINE_PUBLIC_WEAK_ALIAS(posix_madvise, libc_posix_madvise);
 DEFINE_PUBLIC_WEAK_ALIAS(mremap, libc_mremap);
 DEFINE_PUBLIC_WEAK_ALIAS(remap_file_pages, libc_remap_file_pages);
+DEFINE_PUBLIC_WEAK_ALIAS(memfd_create, libc_memfd_create);
+DEFINE_PUBLIC_WEAK_ALIAS(mlock2, libc_mlock2);
+DEFINE_PUBLIC_WEAK_ALIAS(pkey_alloc, libc_pkey_alloc);
+DEFINE_PUBLIC_WEAK_ALIAS(pkey_set, libc_pkey_set);
+DEFINE_PUBLIC_WEAK_ALIAS(pkey_get, libc_pkey_get);
+DEFINE_PUBLIC_WEAK_ALIAS(pkey_free, libc_pkey_free);
+DEFINE_PUBLIC_WEAK_ALIAS(pkey_mprotect, libc_pkey_mprotect);
 /*[[[end:exports]]]*/
 
 DECL_END

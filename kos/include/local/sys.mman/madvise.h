@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c6cd814 */
+/* HASH CRC-32:0x2cf3ac0d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __LOCAL_LIBC(madvise) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(madvise))(void *__addr,
                                                      __SIZE_TYPE__ __len,
                                                      int __advice) {
-#line 548 "kos/src/libc/magic/sys.mman.c"
+#line 593 "kos/src/libc/magic/sys.mman.c"
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	(void)__addr;
 	(void)__len;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b679f31 */
+/* HASH CRC-32:0xb82f60f6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -340,6 +340,7 @@
 #define __CRT_STUB_lrint 1
 #define __CRT_STUB_makecontext 1
 #define __CRT_STUB_mbsnrtowcs 1
+#define __CRT_STUB_memfd_create 1
 #define __CRT_STUB_mkdtemp 1
 #define __CRT_STUB_mkostemp 1
 #define __CRT_STUB_mkostemp64 1
@@ -349,6 +350,7 @@
 #define __CRT_STUB_mkstemps 1
 #define __CRT_STUB_mkstemps64 1
 #define __CRT_STUB_mktemp 1
+#define __CRT_STUB_mlock2 1
 #define __CRT_STUB_mrand48 1
 #define __CRT_STUB_mrand48_r 1
 #define __CRT_STUB_msgctl 1
@@ -366,6 +368,11 @@
 #define __CRT_STUB_open_wmemstream 1
 #define __CRT_STUB_openlog 1
 #define __CRT_STUB_pathconf 1
+#define __CRT_STUB_pkey_alloc 1
+#define __CRT_STUB_pkey_free 1
+#define __CRT_STUB_pkey_get 1
+#define __CRT_STUB_pkey_mprotect 1
+#define __CRT_STUB_pkey_set 1
 #define __CRT_STUB_popen 1
 #define __CRT_STUB_posix_fadvise64 1
 #define __CRT_STUB_posix_fallocate64 1
