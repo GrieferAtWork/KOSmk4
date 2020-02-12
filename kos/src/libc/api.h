@@ -25,6 +25,7 @@
 #define __CRT_KOS_KERNEL 1
 #else /* __KERNEL__ */
 #define __CRT_KOS 1
+#define __CRT_KOS_PRIMARY 1
 #endif /* !__KERNEL__ */
 
 #ifndef __OPTIMIZE_SIZE__

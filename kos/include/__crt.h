@@ -29,18 +29,18 @@
  *   - __CRT_CYG          (windows / cygwin)
  *   - __CRT_KOS          (kos / libc.so)
  *   - __CRT_KOS_KERNEL   (kos / kernel.bin)
- *   - __CRT_MIS          (generic / *)
+ *   - __CRT_GENERIC      (generic / *)
  *   - __CRT_FREESTANDING (freestanding / none)
  */
 #if (!defined(__CRT_DOS) && !defined(__CRT_GLC) && \
      !defined(__CRT_KOS) && !defined(__CRT_CYG) && \
      !defined(__CRT_KRS) && !defined(__CRT_KLS) && \
-     !defined(__CRT_MIS) && !defined(__CRT_KOS_KERNEL) && \
+     !defined(__CRT_GENERIC) && !defined(__CRT_KOS_KERNEL) && \
      !defined(__CRT_FREESTANDING))
 #if defined(__KOS__) && defined(__KERNEL__)
 #   define __CRT_KOS_KERNEL 1
+#   define __CRT_KOS_PRIMARY 1
 #   define __CRT_KOS 1
-#   define __NO_STDSTREAMS 1
 /* This might seem like a good idea, but programs using `-ffreestanding',
  * but still ending up #including some CRT header will likely also pass
  * `-lc' on the commandline, so we shouldn't respond to that flag to
@@ -49,22 +49,26 @@
 ///* Freestanding CRT environment. */
 //#   define __CRT_FREESTANDING 1
 #elif defined(__KOS__)
-#   define __CRT_KOS_NATIVE 1
 #   define __CRT_KOS 1
 #   define __CRT_GLC 1 /* Emulated by KOS */
 #   define __CRT_DOS 1 /* Emulated by KOS */
+#ifdef __PE__
+#   define __CRT_DOS_PRIMARY 1
+#else /* __PE__ */
+#   define __CRT_KOS_PRIMARY 1
+#endif /* !__PE__ */
 #elif defined(__CYGWIN__) || defined(__CYGWIN32__)
-#   define __CRT_CYG_NATIVE 1
+#   define __CRT_CYG_PRIMARY 1
 #   define __CRT_CYG 1
 #elif defined(__linux__) || defined(__linux) || defined(linux) || \
       defined(__unix__) || defined(__unix) || defined(unix)
-#   define __CRT_GLC_NATIVE 1
+#   define __CRT_GLC_PRIMARY 1
 #   define __CRT_GLC 1
 #elif defined(__WINDOWS__) || defined(_MSC_VER) || \
       defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) || \
       defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
       defined(_WIN32_WCE) || defined(WIN32_WCE)
-#   define __CRT_DOS_NATIVE 1
+#   define __CRT_DOS_PRIMARY 1
 /* TinyC links against an older version of MSVCRT by default,
  * so we use the old names by default as well. */
 #ifdef __TINYC__
@@ -73,102 +77,11 @@
 #   define __CRT_DOS 2
 #endif
 #else
-#   define __CRT_MIS 1
+#   define __CRT_GENERIC 1
 #endif
 #endif /* !__CRT_... */
 
-#undef __CRT_GENERIC
-#if defined(__CRT_FREESTANDING)
-#undef __NO_STDSTREAMS
-#define __NO_STDSTREAMS 1
-#undef __CRT_CYG_NATIVE
-#undef __CRT_GLC_NATIVE
-#undef __CRT_DOS_NATIVE
-#undef __CRT_CYG_PRIMARY
-#undef __CRT_GLC_PRIMARY
-#undef __CRT_DOS_PRIMARY
-#undef __CRT_KOS_PRIMARY
-#elif defined(__CRT_KOS_NATIVE) || defined(__CRT_KOS_KERNEL)
-#undef __CRT_CYG_NATIVE
-#undef __CRT_GLC_NATIVE
-#undef __CRT_DOS_NATIVE
-#undef __CRT_CYG_PRIMARY
-#undef __CRT_GLC_PRIMARY
-#undef __CRT_DOS_PRIMARY
-#undef __CRT_KOS_PRIMARY
-#ifdef __PE__
-/* KOS's libc emulates DOS in PE-mode */
-#define __CRT_DOS_PRIMARY 1
-#else /* __PE__ */
-#define __CRT_KOS_PRIMARY 1
-#endif /* !__PE__ */
-#elif defined(__CRT_CYG_NATIVE)
-#undef __CRT_KOS_NATIVE
-#undef __CRT_GLC_NATIVE
-#undef __CRT_DOS_NATIVE
-#undef __CRT_KOS_PRIMARY
-#undef __CRT_GLC_PRIMARY
-#undef __CRT_DOS_PRIMARY
-#define __CRT_CYG_PRIMARY 1
-#elif defined(__CRT_GLC_NATIVE)
-#undef __CRT_KOS_NATIVE
-#undef __CRT_CYG_NATIVE
-#undef __CRT_DOS_NATIVE
-#undef __CRT_KOS_PRIMARY
-#undef __CRT_CYG_PRIMARY
-#undef __CRT_DOS_PRIMARY
-#define __CRT_GLC_PRIMARY 1
-#elif defined(__CRT_DOS_NATIVE)
-#undef __CRT_KOS_NATIVE
-#undef __CRT_CYG_NATIVE
-#undef __CRT_GLC_NATIVE
-#undef __CRT_KOS_PRIMARY
-#undef __CRT_CYG_PRIMARY
-#undef __CRT_GLC_PRIMARY
-#define __CRT_DOS_PRIMARY 1
-#elif defined(__CRT_KOS)
-#undef __CRT_CYG_NATIVE
-#undef __CRT_GLC_NATIVE
-#undef __CRT_DOS_NATIVE
-#undef __CRT_CYG_PRIMARY
-#undef __CRT_GLC_PRIMARY
-#undef __CRT_DOS_PRIMARY
-#define __CRT_KOS_PRIMARY 1
-#elif defined(__CRT_CYG)
-#undef __CRT_KOS_NATIVE
-#undef __CRT_GLC_NATIVE
-#undef __CRT_DOS_NATIVE
-#undef __CRT_KOS_PRIMARY
-#undef __CRT_GLC_PRIMARY
-#undef __CRT_DOS_PRIMARY
-#define __CRT_CYG_PRIMARY 1
-#elif defined(__CRT_GLC)
-#undef __CRT_KOS_NATIVE
-#undef __CRT_CYG_NATIVE
-#undef __CRT_DOS_NATIVE
-#undef __CRT_KOS_PRIMARY
-#undef __CRT_CYG_PRIMARY
-#undef __CRT_DOS_PRIMARY
-#define __CRT_GLC_PRIMARY 1
-#elif defined(__CRT_DOS)
-#undef __CRT_KOS_NATIVE
-#undef __CRT_CYG_NATIVE
-#undef __CRT_GLC_NATIVE
-#undef __CRT_KOS_PRIMARY
-#undef __CRT_CYG_PRIMARY
-#undef __CRT_GLC_PRIMARY
-#define __CRT_DOS_PRIMARY 1
-#else
-#undef __CRT_KOS_NATIVE
-#undef __CRT_CYG_NATIVE
-#undef __CRT_GLC_NATIVE
-#undef __CRT_DOS_NATIVE
-#undef __CRT_KOS_PRIMARY
-#undef __CRT_CYG_PRIMARY
-#undef __CRT_GLC_PRIMARY
-#undef __CRT_DOS_PRIMARY
-#define __CRT_GENERIC 1
-#endif
+
 
 
 #if defined(__KERNEL__) && defined(__KOS__)
@@ -178,6 +91,7 @@
 
 #ifdef __CRT_KOS_PRIMARY
 #ifdef __CRT_KOS_KERNEL
+#define __NO_STDSTREAMS 1
 #include <crt-features/crt-kos-kernel.h>
 #if defined(CONFIG_NO_ASSERT_RESTARTABLE) || defined(CONFIG_NO_DEBUGGER)
 #undef __CRT_HAVE___acheck
@@ -197,6 +111,8 @@
 #include <crt-features/crt-dos.h>
 #elif defined(__CRT_GENERIC)
 #include <crt-features/generic.h>
+#elif defined(__CRT_FREESTANDING)
+#define __NO_STDSTREAMS 1
 #endif
 
 
