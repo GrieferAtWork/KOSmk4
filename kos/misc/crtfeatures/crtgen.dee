@@ -1,0 +1,81 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from .crtfeatures;
+
+local p = CParser();
+
+p.ignoredMacrosPred.append([](x) {
+	return x.startswith("_") &&
+	       (x.endswith("_H") || x.endswith("_H_") ||
+	        x.endswith("_H__") || x.endswith("_H___")) &&
+	       x.upper() == x;
+});
+p.ignoredMacrosPred.append([](x) -> x.startswith("__need_"));
+p.ignoredMacrosPred.append([](x) -> x.startswith("__") && x.endswith("_defined"));
+
+#if 1
+
+p.ignoredMacros.update({ "__CYGWIN__" });
+
+DISABLED_WARNINGS.update({
+	WARN_BAD_INCLUDE,
+	WARN_MACRO_REDEFINED,
+	WARN_UNDEF_BUILTIN_MACRO,
+});
+
+p.systemIncludePaths.append(r"D:\cyg\root\usr\include");
+p.onceHeaderNames.update({
+	r'<.*types\.h>',
+	r'<.*_ansi\.h>',
+	r'<.*newlib\.h>',
+});
+p.knownMissingHeaders.update({
+	r'<stddef\.h>',
+	r'"../tlsoffsets(64)?\.h"',
+});
+p.include(r"D:\cyg\root\usr\include\fcntl.h");
+
+#else
+p.ignoredMacros.update({ "__ELF__", "_KERNEL", "_STANDALONE" });
+
+//p.systemIncludePaths.append("E:\\home\\src\\NetBSD-master\\src\\include");
+p.systemIncludePaths.append(r"E:\home\src\NetBSD-master\src\sys");
+p.knownMissingHeaders.update({
+	r'<pthread_types\.h>',
+	r'<std(arg|bool)\.h>',
+	r'<(machine|prop)/.*',
+	r'[\"<]opt_.*',
+});
+
+p.include(r"E:\home\src\NetBSD-master\src\sys\sys\fcntl.h");
+#endif
+
+p.parse();
+
+local defs = p.allMacroDefinitionsFiltered;
+for (local name: defs.keys.sorted()) {
+	local variants = defs[name];
+	print(name, ":");
+	for (local cond, mac: variants)
+		print("\t", repr(cond), ": ", repr(mac));
+}
+

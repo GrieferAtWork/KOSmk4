@@ -1,0 +1,1494 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from errors;
+import * from .cfile;
+import * from ..libgen.optiexpr;
+
+#if 1
+#define LOG_INCLUDE(...) none
+#else
+#define LOG_INCLUDE(...) print File.stderr:(__VA_ARGS__)
+#endif
+
+final global WARN_BAD_INCLUDE           = 0;
+final global WARN_MACRO_REDEFINED       = 1;
+final global WARN_MISSING_HEADER        = 2;
+final global WARN_TRAILING_DATA         = 3;
+final global WARN_UNDEF_BUILTIN_MACRO   = 4;
+final global WARN_UNDEF_MISSING_KEYWORD = 5;
+final global WARN_UNKNOWN_DIRECTIVE     = 6;
+final global WARN_COUNT = 7;
+final global DISABLED_WARNINGS: {string...} = HashSet();
+
+
+function replaceMacroInvocationKeywords(
+		text: string, arguments: {string: string},
+		err: Callable with string): string {
+	local fp = File.Writer();
+	local i = 0;
+	local len = #text;
+	local flushStart = 0;
+	while (i < len) {
+		local ch = text[i];
+		++i;
+		if (ch == "#") {
+			if (i >= len)
+				break;
+			ch = text[i];
+			if (ch == "#") {
+				/* Conat-operator (strip surrounding space-characters) */
+				local flushEnd = i - 1;
+				while (flushEnd && text.isspace(flushEnd - 1))
+					--flushEnd;
+				assert flushEnd >= flushStart;
+				if (flushEnd > flushStart)
+					fp << text[flushStart:flushEnd];
+				++i;
+				while (i < len && text.isspace(i))
+					++i;
+				flushStart = i;
+				continue;
+			}
+			local strReprBegin = i - 1;
+			if (ch.isspace()) {
+				while (i < len && text.isspace(i))
+					++i;
+				if (i >= len)
+					break;
+				ch = text[i];
+			}
+			if (!ch.issymstrt())
+				err('Expected "##" or "#<keyword>", but got "#{}"'
+					.format({ repr(ch)[1:-1] }));
+			local nameEnd = i + 1;
+			while (nameEnd < len && text.issymcont(nameEnd))
+				++nameEnd;
+			local name = text[i:nameEnd];
+			i = nameEnd;
+			if (name !in arguments)
+				err("Unknown macro argument: {!r}"
+					.format({ name }));
+			if (flushStart < strReprBegin)
+				fp << text[flushStart:strReprBegin];
+			flushStart = nameEnd;
+			fp << repr(arguments[name]); /* C-escape */
+			continue;
+		}
+		if (ch.issymstrt()) {
+			/* Check for argument expansion */
+			local kwdStart = i - 1;
+			while (i < len && text.issymcont(i))
+				++i;
+			local kwd = text[kwdStart:i];
+			if (kwd in arguments) {
+				if (flushStart < kwdStart)
+					fp << text[flushStart:kwdStart];
+				fp << arguments[kwd];
+				flushStart = i;
+			}
+		}
+	}
+	if (flushStart < len)
+		fp << text[flushStart:];
+	return fp.string;
+}
+
+final class CMacro {
+	this = default;
+	@@Macro text body
+	public member text: string;
+	@@Macro arguments (if function-like macro)
+	public member args: {string...} | none = none;
+
+	public operator == (other: CMacro): bool {
+		return text == other.text && args == other.args;
+	}
+	public operator != (other: CMacro): bool {
+		return text != other.text || args != other.args;
+	}
+	public operator hash(): int {
+		return text.operator hash() ^ args.operator hash();
+	}
+
+	public function defRepr(name: string): string {
+		if (args is none)
+			return "{} {}".format({ name, text });
+		return "{}({}) {}".format({ name, ", ".join(args), text });
+	}
+	public function invokeFunction(
+			myName: string,
+			iArgs: {string...},
+			err: Callable with string): string {
+		local iArgc = #iArgs;
+		local nReqArgs = #args;
+		/* Handle special case: No-argument macro */
+		if (!nReqArgs) {
+			if (iArgc >= 2 || (iArgc == 1 && !iArgs[0].isspace()))
+				err("Too many arguments for macro " + repr(myName) + " taking 0 arguments");
+			return text;
+		}
+		local iHaveVarargs = args.last.endswith("...");
+		local argsMapping: {string: string} = Dict();
+		if (iHaveVarargs) {
+			if (iArgc < nReqArgs - 1)
+				err("Too few arguments for macro " + repr(myName) +
+					" taking at least " + (nReqArgs - 1) + " arguments");
+			local effectiveReplacementStrings = [none] * nReqArgs;
+			for (local i: [:nReqArgs - 1])
+				effectiveReplacementStrings[i] = iArgs[i];
+			effectiveReplacementStrings.last = ",".join(iArgs[nReqArgs - 1:]);
+			for (local i: [:nReqArgs - 1])
+				argsMapping[args[i]] = effectiveReplacementStrings[i];
+			if (args.last != "...")
+				/* #define foo(args...) args */
+				argsMapping[args.last[:-3].rstrip()] = effectiveReplacementStrings.last;
+			else {
+				/* #define foo(...) __VA_ARGS__ */
+				argsMapping["__VA_ARGS__"] = effectiveReplacementStrings.last;
+			}
+		} else {
+			if (iArgc != nReqArgs)
+				err("Macro " + repr(myName) + " called with " + iArgc +
+					" arguments, but actually takes " + nReqArgs);
+			for (local i: [:nReqArgs])
+				argsMapping[args[i]] = iArgs[i];
+		}
+		return replaceMacroInvocationKeywords(text, argsMapping, err);
+	}
+}
+
+
+global final PREDEF_MACROS: {string: CMacro} = Dict({
+	"__CC__": CMacro("1"),
+	"__STDC__": CMacro("1"),
+	"__STDC_VERSION__": CMacro("201112L"),
+	"__GNUC__": CMacro("0"),
+	"__GNUC_MINOR__": CMacro("0"),
+	"__GNUC_PATCH__": CMacro("0"),
+	"__GNUC_PREREQ": CMacro("0", { "..." }),
+	"__GNUC_PREREQ__": CMacro("0", { "..." }),
+	"__GCC_VERSION_NUM": CMacro("0"),
+	"__cplusplus": CMacro("201703L"),
+	"__has_include": CMacro("0", { "..." }),
+	"__has_include_next": CMacro("0", { "..." }),
+	"__has_feature": CMacro("0", { "..." }),
+	"__has_extension": CMacro("0", { "..." }),
+	"__has_builtin": CMacro("0", { "..." }),
+	"__has_attribute": CMacro("0", { "..." }),
+	"__EXP": CMacro("__VA_ARGS__", { "..." }),
+	"__COUNTER__": CMacro("0"),
+	"__LINE__": CMacro("0"),
+	"__FILE__": CMacro("\"\""),
+	"__FUNCTION__": CMacro("\"\""),
+
+	/* Enable a whole bunch of *_SOURCE macros to expose all
+	 * features without having to worry about these macros
+	 * ending up in feature expressions */
+	"_POSIX_C_SOURCE": CMacro("200809L"),
+	"_GNU_SOURCE": CMacro("1"),
+	"_KOS_SOURCE": CMacro("1"),
+	"_KOS_KERNEL_SOURCE": CMacro("1"),
+	"_STRING_BWLQ_SOURCE": CMacro("1"),
+	"_STRING_XCHR_SOURCE": CMacro("1"),
+	"_DOS_SOURCE": CMacro("1"),
+	"_TIME64_SOURCE": CMacro("1"),
+	"_TIME64_T": CMacro("1"),
+	"_TIME_T_BITS": CMacro("64"),
+	"_USE_64BIT_TIME_T": CMacro("1"),
+	"_BSD_SOURCE": CMacro("1"),
+	"_NETBSD_SOURCE": CMacro("1"),
+	"_SVID_SOURCE": CMacro("1"),
+	"_DEFAULT_SOURCE": CMacro("1"),
+	"_XOPEN_SOURCE": CMacro("700"),
+	"_XOPEN_SOURCE_EXTENDED": CMacro("1"),
+	"_ISOC95_SOURCE": CMacro("1"),
+	"_ISOC99_SOURCE": CMacro("1"),
+	"_ISOC11_SOURCE": CMacro("1"),
+	"_POSIX_SOURCE": CMacro("1"),
+	"_LARGEFILE_SOURCE": CMacro("1"),
+	"_LARGEFILE64_SOURCE": CMacro("1"),
+	"_FILE_OFFSET_BITS": CMacro("64"),
+	"_ATFILE_SOURCE": CMacro("1"),
+	"_ISOCXX11_SOURCE": CMacro("1"),
+	"_ISOCXX14_SOURCE": CMacro("1"),
+	"_ISOCXX17_SOURCE": CMacro("1"),
+	"__GXX_EXPERIMENTAL_CXX0X__": CMacro("1"),
+	"_REENTRANT": CMacro("1"),
+	"_THREAD_SAFE": CMacro("1"),
+	"_UTF_SOURCE": CMacro("1"),
+	"_GLIBC_SOURCE": CMacro("1"),
+	"_EVERY_SOURCE": CMacro("1"),
+	"__USE_KOS": CMacro("1"),
+	"__USE_STRING_BWLQ": CMacro("1"),
+	"__USE_STRING_XCHR": CMacro("1"),
+	"__USE_KOS_KERNEL": CMacro("1"),
+	"__USE_CTYPE_MACROS": CMacro("1"),
+	"__USE_DOS": CMacro("1"),
+	"__USE_DOS_SLIB": CMacro("1"),
+	"__USE_TIME64": CMacro("1"),
+	"__USE_ISOC11": CMacro("1"),
+	"__USE_ISOC99": CMacro("1"),
+	"__USE_ISOC95": CMacro("1"),
+	"__USE_ISOCXX11": CMacro("1"),
+	"__USE_ISOCXX14": CMacro("1"),
+	"__USE_ISOCXX17": CMacro("1"),
+	"__USE_POSIX": CMacro("1"),
+	"__USE_POSIX2": CMacro("1"),
+	"__USE_POSIX199309": CMacro("1"),
+	"__USE_POSIX199506": CMacro("1"),
+	"__USE_XOPEN2K": CMacro("1"),
+	"__USE_XOPEN2K8": CMacro("1"),
+	"__USE_XOPEN": CMacro("1"),
+	"__USE_XOPEN_EXTENDED": CMacro("1"),
+	"__USE_UNIX98": CMacro("1"),
+	"__USE_XOPEN2K8XSI": CMacro("1"),
+	"__USE_XOPEN2KXSI": CMacro("1"),
+	"__USE_LARGEFILE": CMacro("1"),
+	"__USE_LARGEFILE64": CMacro("1"),
+	"__USE_MISC": CMacro("1"),
+	"__USE_ATFILE": CMacro("1"),
+	"__USE_GNU": CMacro("1"),
+	"__USE_REENTRANT": CMacro("1"),
+	"__USE_UTF": CMacro("1"),
+	"__USE_BSD": CMacro("1"),
+	"__USE_NETBSD": CMacro("1"),
+	"__MISC_VISIBLE": CMacro("1"),
+	"__GNU_VISIBLE": CMacro("1"),
+	"__BSD_VISIBLE": CMacro("1"),
+	"__XSI_VISIBLE": CMacro("700"),
+	"__POSIX_VISIBLE": CMacro("200809"),
+});
+
+global final PREDEF_DEL_MACROS: {string...} = HashSet({
+	"_MSC_VER", "_WIN32", "_WIN64", "__lint__", "__clang__",
+	"__ASSEMBLER__", "__ASSEMBLY__", "__LINKER__", "__TCC__",
+	"_USE_32BIT_TIME_T", "__COVERITY__", "__SANITIZE_ADDRESS__",
+	"__SANITIZE_LEAK__", "__DEEMON__"
+});
+
+global final PREDEF_ONCE_HEADERS: {string...} = HashSet({
+	r"<[^_]*(features|types|config|cdefs)\.h>",
+	r"<__std(inc|cxx)\.h>",
+});
+
+
+final class CFileMacroParser {
+	this = default;
+	public member file: CFile;
+	public member knownMacros: {string: CMacro};
+	public member knownDeletedMacros: {string...};
+	public member incstack: {CFile...} = [];
+
+	public property tok: (int, Object) = { get() -> file.tok; }
+	public function err(message: string, warn: bool = false)
+		-> file.err(message, warn);
+	public function errat(offset: int, message: string, warn: bool = false)
+		-> file.errat(offset, message, warn);
+	public function warn(id: int, message: string) {
+		if (id in DISABLED_WARNINGS)
+			return;
+		return err(message, warn: true);
+	}
+	public function warnat(id: int, offset: int, message: string) {
+		if (id in DISABLED_WARNINGS)
+			return;
+		return errat(offset, message, warn: true);
+	}
+
+
+	private member _deferFile: File = File.Writer();
+	private function _deferFlush() {
+		if (_deferCurMiscBegin !is none) {
+			_deferFile << file.text[_deferCurMiscBegin:file.tokbegin]
+				.replace("\\\n", "");
+			_deferCurMiscBegin = none;
+		}
+	}
+
+	public function _nextNoMacroNoDefer(): (int, Object) {
+again:
+		local tt, tr = file.next()...;
+		if (tt == TOK_EOF) {
+			_deferFlush();
+			if (incstack) {
+				file = incstack.popback();
+				goto again;
+			}
+			file = none;
+		}
+		return (tt, tr);
+	}
+	public function peekNoMacro(): (int, Object) {
+		local tt, tr = file.peek()...;
+		if (tt == TOK_EOF && incstack) {
+			local i = #incstack;
+			while (i) {
+				--i;
+				tt, tr = incstack[i].peek()...;
+				if (tt != TOK_EOF)
+					break;
+			}
+		}
+		return (tt, tr);
+	}
+
+	public function includeMacro(macroName: string, macroText: string) {
+		_deferFlush();
+		if (file !is none)
+			incstack.append(file);
+		file = CFile(macroName, macroText);
+	}
+
+	public function next(): (int, Object) {
+again:
+		local tt, tr = _nextNoMacroNoDefer()...;
+		if (tt == TOK_KEYWORD) {
+			local mac = knownMacros.get(tr);
+			if (mac is none)
+				mac = PREDEF_MACROS.get(tr);
+			if (mac !is none) {
+				if (mac.args is none) {
+					includeMacro(tr, mac.text);
+					goto again;
+				}
+				local ntt, ntr = peekNoMacro()...;
+				if (ntt == TOK_MISC && ntr == "(") {
+					_deferFlush();
+					_nextNoMacroNoDefer(); /* "(" */
+					_nextNoMacroNoDefer(); /* First token from argumen list, or ")" */
+					local argsEnd = file.text.findmatch(
+						"(", ")", file.tokbegin, file.len);
+					if (argsEnd < 0)
+						err("Missing `)' to terminate macro argument list");
+					file.tokend = argsEnd + 1;
+					local args = List(
+						file.text[file.tokbegin:argsEnd]
+							.split(",")
+							.each.strip());
+					includeMacro(tr, mac.invokeFunction(tr, args, err));
+					goto again;
+				}
+			}
+		}
+		_deferToken(tt, tr);
+		return (tt, tr);
+	}
+
+	public function nextNoMacro(): (int, Object) {
+		local tt, tr = _nextNoMacroNoDefer()...;
+		_deferToken(tt, tr);
+		return (tt, tr);
+	}
+
+	private member _deferLastTT: int = TOK_EOF;
+	private member _deferCurMiscBegin: int = none;
+	private function _deferToken(tt: int, tr: Object) {
+		if (_deferCurMiscBegin !is none) {
+			if (tt == TOK_MISC)
+				goto done;
+			_deferFile << file.text[_deferCurMiscBegin:file.tokbegin]
+				.replace("\\\n", "");
+			_deferCurMiscBegin = none;
+		}
+		switch (tt) {
+		case TOK_EOF:
+			break;
+		case TOK_DIRECTIVE:
+			_deferFile << "\n#" << tr[0];
+			if (tr[1])
+				_deferFile << " " << tr[1];
+			break;
+		case TOK_MISC:
+			if (_deferLastTT == TOK_DIRECTIVE)
+				_deferFile << "\n";
+			_deferCurMiscBegin = file.tokbegin;
+			break;
+		case TOK_KEYWORD:
+			if (_deferLastTT == TOK_DIRECTIVE)
+				_deferFile << "\n";
+			else if (_deferLastTT in [TOK_STRING, TOK_NUMBER, TOK_KEYWORD])
+				_deferFile << " ";
+			_deferFile << tr;
+			break;
+		default:
+			if (_deferLastTT == TOK_DIRECTIVE)
+				_deferFile << "\n";
+			else if (_deferLastTT in [TOK_STRING, TOK_NUMBER, TOK_KEYWORD])
+				_deferFile << " ";
+			_deferFile << repr(tr);
+			break;
+		}
+done:
+		_deferLastTT = tt;
+	}
+
+
+	public function getDeferExpression(): string {
+		_deferFlush();
+		return _deferFile.string;
+	}
+
+	public operator iter() -> this;
+	public operator next() -> next();
+
+	public function evalUnary(): int | none {
+		local tt, tr = tok...;
+again:
+		if (tt == TOK_NUMBER) {
+			assert tr is int;
+			next();
+			return tr;
+		}
+		if (tt == TOK_KEYWORD && tr == "defined") {
+			tt, tr = nextNoMacro()...;
+			local hasParen = false;
+			if (tt == TOK_MISC && tr == "(") {
+				hasParen = true;
+				tt, tr = nextNoMacro()...;
+			}
+			if (tt != TOK_KEYWORD)
+				err("Expected <keyword> after `defined()', but got " + repr((tt, tr)));
+			local macName = tr;
+			tt, tr = nextNoMacro()...;
+			if (hasParen) {
+				if (tt != TOK_MISC || tr != ")")
+					err("Expected `)' after `defined(" + macName + "'");
+				nextNoMacro();
+			}
+			if (macName in knownMacros || macName in PREDEF_MACROS)
+				return 1; /* Always defined */
+			if (macName in knownDeletedMacros || macName in PREDEF_DEL_MACROS)
+				return 0; /* Never defined */
+			return none;
+		}
+		if (tt == TOK_MISC) {
+			switch (tr) {
+			case "+":
+				tt, tr = next()...;
+				goto again;
+			case "-":
+				next();
+				return -evalUnary();
+			case "~":
+				next();
+				return ~evalUnary();
+			case "!": {
+				next();
+				local r = evalUnary();
+				if (r !is none)
+					r = !r;
+				return r;
+			}	break;
+			case "(": {
+				next();
+				local r = evalExpr();
+				tt, tr = tok...;
+				if (tt != TOK_MISC || tr != ")")
+					err("Expected `)' after `('");
+				next();
+				return r;
+			}	break;
+			default:
+				break;
+			}
+		}
+		next();
+		return none;
+	}
+	public function evalProd(): int | none {
+		local r = evalUnary();
+		for (;;) {
+			local t = tok;
+			if (t[0] != TOK_MISC)
+				break;
+			switch (t[1]) {
+			case "*":
+				next();
+				local b = evalUnary();
+				if (r !is none && b !is none)
+					r = r * b;
+				break;
+			case "/":
+				next();
+				local b = evalUnary();
+				if (r !is none && b !is none)
+					r = try r / b catch (...) none;
+				break;
+			case "%":
+				next();
+				local b = evalUnary();
+				if (r !is none && b !is none)
+					r = try r % b catch (...) none;
+				break;
+			default:
+				goto done;
+			}
+		}
+done:
+		return r;
+	}
+	public function evalSum(): int | none {
+		local r = evalProd();
+		for (;;) {
+			local t = tok;
+			if (t[0] != TOK_MISC)
+				break;
+			switch (t[1]) {
+			case "+":
+				next();
+				local b = evalProd();
+				if (r !is none && b !is none)
+					r = r + b;
+				break;
+			case "-":
+				next();
+				local b = evalProd();
+				if (r !is none && b !is none)
+					r = r - b;
+				break;
+			default:
+				goto done;
+			}
+		}
+done:
+		return r;
+	}
+	public function evalShift(): int | none {
+		local r = evalSum();
+		for (;;) {
+			local t = tok;
+			if (t[0] != TOK_MISC)
+				break;
+			switch (t[1]) {
+			case "<<":
+				next();
+				local b = evalSum();
+				if (r !is none && b !is none)
+					r = r << b;
+				break;
+			case ">>":
+				next();
+				local b = evalSum();
+				if (r !is none && b !is none)
+					r = r >> b;
+				break;
+			default:
+				goto done;
+			}
+		}
+done:
+		return r;
+	}
+	public function evalCmp(): int | none {
+		local r = evalShift();
+		for (;;) {
+			local t = tok;
+			if (t[0] != TOK_MISC)
+				break;
+			switch (t[1]) {
+			case "<":
+				next();
+				local b = evalShift();
+				if (r !is none && b !is none)
+					r = r < b;
+				break;
+			case "<=":
+				next();
+				local b = evalShift();
+				if (r !is none && b !is none)
+					r = r <= b;
+				break;
+			case ">":
+				next();
+				local b = evalShift();
+				if (r !is none && b !is none)
+					r = r > b;
+				break;
+			case ">=":
+				next();
+				local b = evalShift();
+				if (r !is none && b !is none)
+					r = r >= b;
+				break;
+			default:
+				goto done;
+			}
+		}
+done:
+		return r;
+	}
+	public function evalEq(): int | none {
+		local r = evalCmp();
+		for (;;) {
+			local t = tok;
+			if (t[0] != TOK_MISC)
+				break;
+			switch (t[1]) {
+			case "==":
+				next();
+				local b = evalCmp();
+				if (r !is none && b !is none)
+					r = r == b;
+				break;
+			case "!=":
+				next();
+				local b = evalCmp();
+				if (r !is none && b !is none)
+					r = r != b;
+				break;
+			default:
+				goto done;
+			}
+		}
+done:
+		return r;
+	}
+	public function evalAnd(): int | none {
+		local r = evalEq();
+		for (;;) {
+			local t = tok;
+			if (t[0] != TOK_MISC)
+				break;
+			if (t[1] != "&")
+				break;
+			next();
+			local b = evalEq();
+			if (r !is none && b !is none)
+				r = r & b;
+		}
+		return r;
+	}
+	public function evalXor(): int | none {
+		local r = evalAnd();
+		for (;;) {
+			local t = tok;
+			if (t[0] != TOK_MISC)
+				break;
+			if (t[1] != "^")
+				break;
+			next();
+			local b = evalAnd();
+			if (r !is none && b !is none)
+				r = r ^ b;
+		}
+		return r;
+	}
+	public function evalOr(): int | none {
+		local r = evalXor();
+		for (;;) {
+			local t = tok;
+			if (t[0] != TOK_MISC)
+				break;
+			if (t[1] != "|")
+				break;
+			next();
+			local b = evalXor();
+			if (r !is none && b !is none)
+				r = r | b;
+		}
+		return r;
+	}
+	public function evalLand(): int | none {
+		local r = evalOr();
+		for (;;) {
+			local t = tok;
+			if (t[0] != TOK_MISC)
+				break;
+			if (t[1] != "&&")
+				break;
+			next();
+			local b = evalOr();
+			/* <undef> && <undef> --> <undef> */
+			/* <undef> && 1       --> <undef> */
+			/* <undef> && 0       --> 0 */
+			if (b !is none && !b)
+				r = 0;
+		}
+		return r;
+	}
+	public function evalLor(): int | none {
+		local r = evalLand();
+		for (;;) {
+			local t = tok;
+			if (t[0] != TOK_MISC)
+				break;
+			if (t[1] != "||")
+				break;
+			next();
+			local b = evalLand();
+			/* <undef> || <undef> --> <undef> */
+			/* <undef> || 1       --> 1 */
+			/* <undef> || 0       --> <undef> */
+			if (b !is none && b)
+				r = 1;
+		}
+		return r;
+	}
+	public function evalExpr(): int | none {
+		local r = evalLor();
+		local t = tok;
+		if (t[0] == TOK_MISC && t[1] == "?") {
+			local tt, ff;
+			t = next();
+			if (t[0] == TOK_MISC && t[1] == ":") {
+				tt = r;
+			} else {
+				tt = evalLor();
+				t = tok;
+				if (t[0] != TOK_MISC || t[1] != ":")
+					err("Expected `:' after `?'");
+			}
+			next();
+			ff = evalExpr();
+			/* Select the appropriate return expression */
+			if (r !is none) {
+				r = r ? tt : ff;
+			} else if (tt == ff) {
+				r = tt;
+			}
+		}
+		return r;
+	}
+
+}
+
+
+
+function tryEvalPreprocessorExpression(
+		preprocessorAssumptions: string,
+		knownMacros: {string: CMacro},
+		knownDeletedMacros: {string...},
+		expr: string, exprFilename: string,
+		exprStartLine: int, exprStartColumn: int): bool | string {
+	local parser = CFileMacroParser(
+		file: CFile(exprFilename, expr)
+			.withOffset(exprStartLine, exprStartColumn),
+		knownMacros: knownMacros,
+		knownDeletedMacros: knownDeletedMacros);
+	parser.next();
+	/* Try to evaluate the expression */
+	local result = parser.evalExpr();
+	if (parser.tok[0] != TOK_EOF)
+		parser.warn(WARN_TRAILING_DATA, "Trailing data: {!r} in {!r}".format({
+			parser.file.text[parser.file.tokend:],
+			parser.file.text,
+		}));
+	if (result !is none) {
+		result = !!result; /* force-to-bool */
+		assert result === true || result === false;
+	} else {
+		for (;;) {
+			local tt, tr = parser.next()...;
+			if (tt == TOK_EOF)
+				break;
+		}
+		result = parser.getDeferExpression();
+	}
+	return result;
+}
+
+
+
+
+final class CParser {
+
+	@@Set of macro names that should be ignored in @allMacroDefinitionsFiltered
+	public member ignoredMacros: {string...} = HashSet();
+	public member ignoredMacrosPred: {Callable with string...} = List();
+
+	@@All known preprocessor macros, as well as the c-preprocessor
+	@@expression that need to be met in order to have them defined.
+	@@Mapping is: @{macroName: {ppExpr: macroDef}}
+	public member allMacroDefinitions: {string: {string: CMacro}} = Dict();
+
+	@@Same as @allMacroDefinitions, but filter out ignored macro conditionals,
+	@@as well as thereform resulting duplicate macro definitions.
+	@@If the process or removing ignored macros results in ambiguity, emit
+	@@a warning and don't discard ignored macros for that specific macro.
+	@@s.a. @ignoredMacros
+	@@     @ignoredMacrosPred
+	public property allMacroDefinitionsFiltered: {string: {string: CMacro}} = {
+		get(): {string: {string: CMacro}} {
+			if (_allMacroDefinitionsFiltered is none) {
+				local result = Dict();
+				for (local name, defs: allMacroDefinitions) {
+					local fDefs = Dict();
+					for (local cond, mac: defs) {
+						/* Special case: Always ignore a macro itself as
+						 *               part of its declaration condition.
+						 * This way, code like this:
+						 * >> #ifndef FOO
+						 * >> #define FOO 42
+						 * >> #endif
+						 * Doesn't end up with a dependency on `!defined(FOO)' */
+						local nameWasAlreadyIgnored = name in ignoredMacros;
+						if (!nameWasAlreadyIgnored)
+							ignoredMacros.insert(name);
+						cond = optimizePreprocessorExpressionAndRemoveIgnoredMacros(
+							cond, sortBranches: true);
+						if (!nameWasAlreadyIgnored)
+							ignoredMacros.remove(name);
+						if (cond is none)
+							cond = "1"; /* Emulate unconditionally */
+						if (cond in fDefs) {
+							local oldMac = fDefs[cond];
+							if (oldMac == mac)
+								continue; /* Same definition (ignore...) */
+							print File.stderr: (
+								"Warning: Discarding ignored macro dependencies in ",
+								name, " causes ambiguity");
+							fDefs = defs;
+							break;
+						}
+						fDefs[cond] = mac;
+					}
+					/* Check for cases where the same macro definition
+					 * results from multiple, seperate pp-conditions.
+					 * If such is the case, then we can merge the definitions
+					 * and potentially optimize their conditions by doing:
+					 * >> cond = optimize(a || b); */
+					local fDefs2 = Dict();
+					for (local cond, mac: fDefs) {
+						local oldCond = fDefs2.get(mac);
+						if (oldCond !is none) {
+							cond = optimizePreprocessorExpression(
+								"({}) || ({})".format({ oldCond, cond }));
+						}
+						fDefs2[mac] = cond;
+					}
+					fDefs = Dict();
+					for (local mac, cond: fDefs2)
+						fDefs[cond] = mac;
+					result[name] = fDefs;
+				}
+				_allMacroDefinitionsFiltered = result;
+			}
+			return _allMacroDefinitionsFiltered;
+		}
+	}
+	private member _allMacroDefinitionsFiltered = none;
+
+	@@Check if a given macro should be ignored when it appears in expression
+	@@This causes the macro to be omitted from macro definition condition expression
+	function shouldIgnoreMacro(name: string): bool {
+		if (name in ignoredMacros)
+			return true;
+		for (local cb: ignoredMacrosPred) {
+			if (cb(name))
+				return true;
+		}
+		return false;
+	}
+
+	function removedIgnoredMacrosFromPPBranch(b: Object): Object | none {
+		if (b is PPBranchNot) {
+			local temp = removedIgnoredMacrosFromPPBranch(b.branch);
+			if (temp is none)
+				return none;
+			b.branch = temp;
+		} else if (b is PPBranchAnd || b is PPBranchOr) {
+			local c = b.conditions;
+			local i = 0, len = #c;
+again_scan_cond:
+			for (; i < len; ++i) {
+				local temp = removedIgnoredMacrosFromPPBranch(c[i]);
+				if (temp is none) {
+					c.erase(i);
+					--len;
+					goto again_scan_cond;
+				}
+				c[i] = temp;
+			}
+			if (len == 0)
+				return none;
+			if (len == 1)
+				return c[0];
+		} else if (b is string) {
+			if (b.startswith("defined")) {
+				local temp = b[7:].lstrip();
+				if (temp.startswith("(") && temp.endswith(")"))
+					temp = temp[1:-1];
+				temp = temp.strip();
+				if (shouldIgnoreMacro(temp))
+					return none;
+			}
+		}
+		return b;
+	}
+
+	@@Returns @none if the expression only contained references to ignored macros
+	function optimizePreprocessorExpressionAndRemoveIgnoredMacros(
+			expr: string, sortBranches: bool = false): string | none {
+		local parser = PPBranchParser(expr.strip());
+		if (!parser.next())
+			return "1";
+		local branch = parsePPBranch(parser);
+		while (parser.pos < parser.end && parser.expr.isspace(parser.pos))
+			++parser.pos;
+		if (parser.pos < parser.end) {
+			throw Error(
+				"Unused tail {!r} in expression {!r}".format({
+					parser.expr[parser.pos:parser.end], parser.expr }));
+		}
+		branch = removedIgnoredMacrosFromPPBranch(branch);
+		if (branch is none)
+			return none;
+		branch = optimizePPBranch(branch);
+		if (sortBranches)
+			sortPPBranch(branch);
+		return str(branch);
+	}
+
+
+	@@The current CFile
+	public member file: CFile = none;
+
+	@@#include-stack of files (excluding the current file)
+	public member incstack: {CFile...} = [];
+
+	@@System `#include <...>' paths
+	public member systemIncludePaths: {string...} = [];
+
+	@@Set of regex for header names that are known to be missing
+	public member knownMissingHeaders: {string...} = HashSet();
+
+	@@Set of header names that should be ignored
+	public member ignoredHeaderNames: {string...} = HashSet();
+
+	@@Set of header names that should only be included once
+	public member onceHeaderNames: {string...} = HashSet();
+
+	public property tok: (int, Object) = { get() -> file.tok; }
+
+	public function err(message: string, warn: bool = false)
+		-> file.err(message, warn);
+	public function errat(offset: int, message: string, warn: bool = false)
+		-> file.errat(offset, message, warn);
+	public function warn(id: int, message: string) {
+		if (id in DISABLED_WARNINGS)
+			return;
+		return err(message, warn: true);
+	}
+	public function warnat(id: int, offset: int, message: string) {
+		if (id in DISABLED_WARNINGS)
+			return;
+		return errat(offset, message, warn: true);
+	}
+
+	@@Enumerate all files in order of most->least-recently-included
+	public property files: {CFile...} = {
+		get(): {CFile...} {
+			if (file is none)
+				return;
+			yield file;
+			local i = #incstack;
+			while (i) {
+				--i;
+				yield incstack[i];
+			}
+		}
+	}
+
+	@@Push a given filename onto the #include-stack
+	public function include(filename: string, text: string | none = none) {
+		includeFile(CFile(filename, text));
+	}
+	public function includeFile(cFile: CFile) {
+		LOG_INCLUDE(
+			"#include:push(", 1 + #incstack, "->", 2 + #incstack,
+			", ", repr(cFile.filename), ")");
+		if (file !is none)
+			incstack.append(file);
+		file = cFile;
+	}
+
+	public function tryIncludeFileWithPath(path: string, name: string): bool {
+		local fp;
+		local filename = "{}/{}".format({ path, name });
+		filename = replaceAll(filename, "//", "/");
+		if (filename in ignoredHeaderNames)
+			return none; /* Ignored */
+		try {
+			fp = File.open(filename, "r");
+		} catch (...) {
+			return false;
+		}
+		includeFile(CFile(filename, str(fp.read())));
+		return true;
+	}
+
+	@@Include a system header: `#include <@name>'
+	public function includeSysFile(name: string): bool {
+		for (local path: systemIncludePaths) {
+			local r = tryIncludeFileWithPath(path, name);
+			if (r || r is none)
+				return true;
+		}
+		return false;
+	}
+
+	@@Include a relative header: `#include "@name"'
+	public function includeRelFile(name: string): bool {
+		for (local f: files) {
+			local r = tryIncludeFileWithPath(f.filename.rpartition("/")[0], name);
+			if (r || r is none)
+				return true;
+		}
+		return includeSysFile(name);
+	}
+
+	@@Advance to the next token
+	public function nextRaw(followInclude: bool = true): (int, Object) {
+again:
+		local rt, rr = file.next()...;
+		if (rt == TOK_EOF) {
+			LOG_INCLUDE(
+				"#include:pop(", 1 + #incstack, "->", #incstack,
+				", ", repr(file.filename), ")");
+			if (!incstack)
+				file = none;
+			else {
+				file = incstack.popback();
+				goto again;
+			}
+		} else if (rt == TOK_DIRECTIVE) {
+			if (rr[0] == "include") {
+				if (!followInclude)
+					goto again;
+				local loc = removeComments(rr[1]).strip();
+				if (loc in ignoredHeaderNames)
+					goto again;
+				local incok;
+				if (loc.startswith("<") && loc.endswith(">")) {
+					incok = includeSysFile(loc[1:-1]);
+				} else if (loc.startswith("\"") && loc.endswith("\"")) {
+					incok = includeRelFile(loc[1:-1]);
+				} else {
+					warn(WARN_BAD_INCLUDE, "Bad #include location: " + repr(loc));
+					incok = true;
+				}
+				if (!incok) {
+					for (local x: knownMissingHeaders) {
+						if (loc.rematch(x))
+							goto again;
+					}
+					warn(WARN_MISSING_HEADER,
+						"Failed to #include header: " + repr(loc));
+				} else {
+					for (local x: onceHeaderNames) {
+						if (loc.rematch(x)) {
+do_ignore_once:
+							ignoredHeaderNames.insert(loc);
+							goto again;
+						}
+					}
+					for (local x: PREDEF_ONCE_HEADERS) {
+						if (loc.rematch(x))
+							goto do_ignore_once;
+					}
+				}
+				goto again;
+			}
+		}
+		return (rt, rr);
+	}
+
+	private function _warnIfMacroRedefined(
+			macName: string, oldMacro: CMacro,
+			newMacro: CMacro, cond: string = none) {
+		if (oldMacro != newMacro) {
+			warnat(WARN_MACRO_REDEFINED, file.directive_cmd_begin,
+				"Macro {!r} (previously: `#define {}') "
+				"re-defined as `#define {}'{}".format({
+					macName,
+					oldMacro.defRepr(macName),
+					newMacro.defRepr(macName),
+					cond !is none ? (" assuming that " + repr(cond)) : ""
+				}));
+		}
+	}
+
+	@@Evaluate the current preprocessor expression (@tok[1][1])
+	@@If the expression can be determined under the given assumptions
+	@@and known / known-deleted macros, return @true or @false.
+	@@Otherwise, return a pp-expresion who's evaluation must be
+	@@deferred until a later point in time.
+	public function evalutePreprocessorExpression(
+			preprocessorAssumptions: string,
+			knownMacros: {string: CMacro},
+			knownDeletedMacros: {string...}): bool | string {
+		local expr = removeComments(tok[1][1]).strip();
+		local expr_lc = file.lcat(file.directive_args_begin);
+		return tryEvalPreprocessorExpression(
+			preprocessorAssumptions,
+			knownMacros, knownDeletedMacros,
+			expr, file.filename,
+			expr_lc[0], expr_lc[1]);
+	}
+
+	@@Skip tokens until the next @"#else", @"#elif" or @"#endif" token
+	public function skipUntilPPBlockEnd() {
+		local recursion = 1;
+		for (;;) {
+			nextRaw(followInclude: false);
+			local tt, tr = tok...;
+			if (tt == TOK_EOF)
+				break;
+			if (tt != TOK_DIRECTIVE)
+				continue;
+			local cmd = tr[0];
+			switch (cmd) {
+			case "if":
+			case "ifdef":
+			case "ifndef":
+				++recursion;
+				break;
+			case "endif":
+				if (recursion == 1)
+					return;
+				--recursion;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	public function parse() {
+		if (tok is none)
+			nextRaw();
+		local knownMacros = Dict();
+		local knownDeletedMacros = HashSet();
+		doParse("1", knownMacros, knownDeletedMacros);
+		if (tok[0] != TOK_EOF)
+			err("Top-scope not terminated by EOF");
+	}
+
+	@@Parse definitions, given a set of macros known to be defined
+	@@@param: knownMacros: [inout] Set of macros defined at the current scope
+	public function doParse(
+			preprocessorAssumptions: string,
+			knownMacros: {string: CMacro},
+			knownDeletedMacros: {string...}) {
+		assert preprocessorAssumptions != "0";
+again:
+		local tt, tr = tok...;
+		switch (tt) {
+
+		case TOK_EOF:
+			return;
+
+		case TOK_DIRECTIVE: {
+			local cmd, args = tr...;
+			switch (cmd) {
+
+			case "define": {
+				args = removeComments(args).strip();
+				if (!args || !args.issymstrt(0))
+					errat(file.directive_args_begin,
+						"Expected keyboard after `#define', but got " + repr(args));
+				local macNameEnd = 1;
+				while (macNameEnd < #args && args.issymcont(macNameEnd))
+					++macNameEnd;
+				local macName = args[:macNameEnd];
+				local newMacro: CMacro = CMacro();
+				if (macNameEnd < #args && args[macNameEnd] == "(") {
+					local argsEnd = args.findmatch("(", ")", macNameEnd + 1);
+					if (argsEnd < 0)
+						errat(file.directive_args_begin,
+							"Missing `)' to terminate macro argument list in " +
+							repr(args));
+					newMacro.args = Tuple(
+						args[macNameEnd + 1: argsEnd].split(",")
+							.each.strip());
+					macNameEnd = argsEnd + 1;
+				}
+				newMacro.text = args[macNameEnd:].strip();
+				if (macName in knownMacros) {
+					local oldMacro = knownMacros[macName];
+					_warnIfMacroRedefined(macName, oldMacro, newMacro);
+				} else if (macName in PREDEF_MACROS) {
+					local oldMacro = PREDEF_MACROS[macName];
+					_warnIfMacroRedefined(macName, oldMacro, newMacro);
+				}
+				knownMacros[macName] = newMacro;
+				if (macName !in allMacroDefinitions) {
+					allMacroDefinitions[macName] = Dict({
+						preprocessorAssumptions: newMacro
+					});
+					_allMacroDefinitionsFiltered = none;
+				} else {
+					local existingDefs: Dict with {string: CMacro};
+					existingDefs = allMacroDefinitions[macName];
+					if (preprocessorAssumptions in existingDefs) {
+						local oldMacro = existingDefs[preprocessorAssumptions];
+						_warnIfMacroRedefined(
+							macName, oldMacro, newMacro, preprocessorAssumptions);
+					}
+					existingDefs[preprocessorAssumptions] = newMacro;
+				}
+				knownDeletedMacros.remove(macName);
+			}	break;
+
+			case "undef":
+				args = removeComments(args).strip();
+				if (!args) {
+					warnat(WARN_UNDEF_MISSING_KEYWORD,
+						file.directive_args_begin,
+						"Missing argument for `#undef'");
+					break;
+				}
+				if (!args.issymbol()) {
+					/* This may be a bug in headers, but sometimes people
+					 * will write `#undef foo(a,b)' to undef a macro `#define foo(a,b)'
+					 * Ignore this case! */
+					local lpar = args.find("(");
+					if (lpar >= 0) {
+						local newArgs = args[:lpar];
+						if (newArgs.issymbol()) {
+							args = newArgs;
+							goto do_undef_args;
+						}
+					}
+					warnat(WARN_UNDEF_MISSING_KEYWORD,
+						file.directive_args_begin,
+						"Expected an identifier as argument "
+						"for `#undef', but got " + repr(args));
+					break;
+				}
+do_undef_args:
+				if (args in PREDEF_MACROS) {
+					warnat(WARN_UNDEF_BUILTIN_MACRO,
+						file.directive_args_begin,
+						"#undef-inf pre-defined macro " + repr(args));
+				}
+				knownMacros.pop(args, none);
+				knownDeletedMacros.insert(args);
+				break;
+
+			{
+				local evalMode: bool | string;
+			case "ifdef":
+				args = removeComments(args).strip();
+				if (args in knownMacros || args in PREDEF_MACROS)
+					evalMode = true;
+				else if (args in knownDeletedMacros || args in PREDEF_DEL_MACROS)
+					evalMode = false;
+				else {
+					evalMode = none;
+				}
+				args = "defined({})".format({ args });
+				if (evalMode is none)
+					evalMode = args;
+				goto do_if_expression;
+			case "ifndef":
+				args = removeComments(args).strip();
+				if (args in knownMacros || args in PREDEF_MACROS)
+					evalMode = false;
+				else if (args in knownDeletedMacros || args in PREDEF_DEL_MACROS)
+					evalMode = true;
+				else {
+					evalMode = none;
+				}
+				args = "!defined({})".format({ args });
+				if (evalMode is none)
+					evalMode = args;
+				goto do_if_expression;
+			case "if":
+do_if_expression_eval:
+				evalMode = evalutePreprocessorExpression(
+					preprocessorAssumptions, knownMacros,
+					knownDeletedMacros);
+do_if_expression:
+				if (evalMode === true) {
+					/* Inline everything within this block */
+do_parse_inner_block:
+					nextRaw();
+					doParse(
+						preprocessorAssumptions,
+						knownMacros,
+						knownDeletedMacros);
+					for (;;) {
+						tt, tr = tok...;
+						if (tt != TOK_DIRECTIVE || tr[0] !in ["else", "elif", "endif"])
+							err("Expected #else, #elif or #endif");
+						if (tr[0] == "endif")
+							goto next;
+						if (tr[0] == "else")
+							break;
+						skipUntilPPBlockEnd();
+					}
+					skipUntilPPBlockEnd();
+					tt, tr = tok...;
+					if (tt != TOK_DIRECTIVE || tr[0] != "endif")
+						err("Expected #endif after #else");
+				} else if (evalMode === false) {
+					/* Ignore everything within this block */
+do_skip_inner_block:
+					skipUntilPPBlockEnd();
+					tt, tr = tok...;
+					if (tt != TOK_DIRECTIVE || tr[0] !in ["else", "elif", "endif"])
+						err("Expected #else, #elif or #endif");
+					cmd = tr[0];
+					if (cmd == "elif")
+						goto do_if_expression_eval;
+					if (cmd == "endif")
+						goto next;
+					/* `#else' after something along the lines
+					 * of `#if 0' This is equivalent to `#if 1'! */
+					goto do_parse_inner_block;
+				} else {
+					@@Conditions of past branches (or'd with each other)
+					local pastBranchConditions = "0";
+					local myPreprocessorAssumptions;
+					myPreprocessorAssumptions =
+						optimizePreprocessorExpression(
+							"({}) && ({})".format({
+								preprocessorAssumptions,
+								evalMode
+							}),
+						sortBranches: true);
+do_cond_inner_block:
+					if (myPreprocessorAssumptions == "1")
+						goto do_parse_inner_block;
+					if (myPreprocessorAssumptions == "0")
+						goto do_skip_inner_block;
+					local newKnownMacros = copy knownMacros;
+					local newKnownDeletedMacros = copy knownDeletedMacros;
+					nextRaw();
+					doParse(
+						myPreprocessorAssumptions,
+						newKnownMacros,
+						newKnownDeletedMacros);
+					tt, tr = tok...;
+					if (tt != TOK_DIRECTIVE || tr[0] !in ["else", "elif", "endif"])
+						err("Expected #else, #elif or #endif");
+					cmd = tr[0];
+					if (cmd == "endif")
+						goto next; /* End of if-directive block */
+					if (evalMode is none)
+						err("Expected #endif after #else");
+					if (pastBranchConditions != "0") {
+						pastBranchConditions = "{} || ({})".format({
+							pastBranchConditions, evalMode });
+					} else {
+						pastBranchConditions = "({})".format({ evalMode });
+					}
+					if (cmd == "elif") {
+						/* parse the elif-expression */
+						/* #if foo
+						 * #elif bar
+						 * ...
+						 * #endif
+						 * Same as:
+						 * #if !(foo) && (bar)
+						 * ...
+						 * #endif
+						 */
+						args = tr[1];
+						myPreprocessorAssumptions =
+							optimizePreprocessorExpression(
+								"({}) && !({}) && ({})".format({
+									preprocessorAssumptions,
+									pastBranchConditions,
+									args
+								}),
+							sortBranches: true);
+						evalMode = evalutePreprocessorExpression(
+							myPreprocessorAssumptions, knownMacros,
+							knownDeletedMacros);
+					} else {
+						/* #if foo
+						 * #elif bar
+						 * #else
+						 * ...
+						 * #endif
+						 * Same as:
+						 * #if !(foo || bar)
+						 * ...
+						 * #endif
+						 */
+						myPreprocessorAssumptions =
+							optimizePreprocessorExpression(
+								"({}) && !({})".format({
+									preprocessorAssumptions,
+									pastBranchConditions
+								}),
+							sortBranches: true);
+						if (myPreprocessorAssumptions == preprocessorAssumptions) {
+							evalMode = true;
+						} else if (myPreprocessorAssumptions == "0") {
+							evalMode = false;
+						} else {
+							evalMode = none;
+						}
+					}
+					if (evalMode === true)
+						goto do_parse_inner_block;
+					if (evalMode === false)
+						goto do_skip_inner_block;
+					goto do_cond_inner_block;
+				}
+			}	break;
+
+			case "elif":
+			case "else":
+			case "endif":
+				/* These directives must be handled by the caller. */
+				return;
+
+			case "error":
+			case "warning":
+				/* Skip until the end of the current PP-block */
+				return skipUntilPPBlockEnd();
+
+			case "pragma":
+				args = removeComments(args).strip();
+				if (args == "once") {
+					ignoredHeaderNames.insert(
+						file.filename.replace("\\", "/"));
+				}
+				break;
+
+			default:
+				warnat(WARN_UNKNOWN_DIRECTIVE,
+					file.directive_cmd_begin,
+					"Unknown directive: " + repr(cmd));
+				break;
+			}
+		}	break;
+
+		case TOK_KEYWORD:
+			/* TODO: enum {} support */
+			break;
+
+		default:
+			break;
+		}
+next:
+		nextRaw();
+		goto again;
+	}
+
+}
+
+

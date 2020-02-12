@@ -1,0 +1,447 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from errors;
+import util;
+
+@@[repr: @none] EOF
+final global TOK_EOF = none;
+
+@@[repr: @string] Misc. tokens (usually 1-character)
+final global TOK_MISC = 1;
+
+@@[repr: @string] C-String (the token repr is the un-escaped string text)
+final global TOK_STRING = 2;
+
+@@[repr: @int] Integer constant (the token repr is the keyword)
+final global TOK_NUMBER = 4;
+
+@@[repr: @string] Keyword constant (the token repr is the keyword)
+final global TOK_KEYWORD = 5;
+
+@@[repr: (@string, @string)] Preprocessor directive
+@@The repr is the (directive_cmd, directive_args).
+@@e.g.: @((TOK_DIRECTIVE, ("define", "foo 42")))
+@@for:  @"#define foo 42"
+final global TOK_DIRECTIVE = 6;
+
+@@Replace all occurances of @findStr with @replaceStr in @text
+function replaceAll(text: string, findStr: string, replaceStr: string): string {
+	for (;;) {
+		local newText = text.replace(findStr, replaceStr);
+		if (newText == text)
+			break;
+		text = newText;
+	}
+	return text;
+}
+
+function removeComments(text: string): string {
+	for (;;) {
+		local i = text.find("/*");
+		if (i < 0)
+			break;
+		local e = text.find("*/", i + 2);
+		if (e < 0)
+			break;
+		text = text[:i].rstrip() + " " + text[e + 2:].lstrip();
+	}
+	for (;;) {
+		local i = text.find("//");
+		if (i < 0)
+			break;
+		local e = text.find("\n", i + 2);
+		if (e < 0)
+			break;
+		text = text[:i].rstrip() + "\n" + text[e + 1:].lstrip();
+	}
+	return text;
+}
+
+final class CFile {
+	@@Name of the this input file
+	public member filename: string;
+	@@The text contents of the input file
+	public member text: string;
+	@@Length of the input text (== #text)
+	public member len: int;
+	@@Offset added to the line counter
+	public member offset_line: int = 0;
+	@@Offset added to the column counter when @((line - offset_line) == 1)
+	public member offset_col: int = 0;
+	@@The current token (type: int, repr: Object)
+	@@Where @type is one of `TOK_*'
+	public member tok: (int, Object) = none;
+	@@Starting offset of the current token
+	public member tokbegin: int;
+	@@Ending offset of the current token
+	public member tokend: int = 0;
+
+	public function withOffset(offLine: int, offCol: int): CFile {
+		offset_line = offLine;
+		offset_col  = offCol;
+		return this;
+	}
+
+	@@Additional file offsets for @TOK_DIRECTIVE tokens
+	public member directive_cmd_begin: int;
+	public member directive_cmd_end: int;
+	public member directive_args_begin: int;
+	public member directive_args_end: int;
+
+	public function saveState(): Object {
+		return (tok, tokbegin, tokend);
+	}
+	public function loadState(state: Object) {
+		tok, tokbegin, tokend = state...;
+	}
+
+	this(filename: string, text: string | none = none) {
+		this.filename = filename;
+		this.text     = text.unifylines();
+		if (this.text is none) {
+			with (local fp = File.open(filename, "r"))
+				this.text = str(fp.read());
+		}
+		this.len = #this.text;
+	}
+
+	public function isStartOfLine(offset: int): bool {
+		if (offset < len) {
+			while (offset) {
+				--offset;
+				if (text.islf(offset))
+					return true;
+				if (!text.isspace(offset))
+					break;
+			}
+			if (!offset)
+				return true;
+		}
+		return false;
+	}
+
+	@@Return the (line, column) pair (each is 1-based) for a given offset
+	public function lcat(offset: int): (int, int) {
+		local line, column;
+		local linestart = text.rfind("\n", 0, offset);
+		if (linestart < 0) {
+			line   = 0;
+			column = offset + 1;
+		} else {
+			line   = text.count("\n", 0, linestart) + 1;
+			column = (offset - linestart) + 1;
+		}
+		if (!line)
+			column += offset_col;
+		line += offset_line;
+		return (line + 1, column + 1);
+	}
+
+	public function errat(offset: int, message: string, warn: bool = false) {
+		local l, c = lcat(offset)...;
+		local disp = "{}({},{}) : {} : {}\n".format({
+			filename, l, c, warn ? "Warning" : "Error", message });
+		print File.stderr: disp,;
+		if (!warn)
+			throw Error(disp);
+	}
+
+	public function err(message: string, warn: bool = false)
+		-> errat(tokbegin, message, warn);
+
+	@@Advance to the next token
+	public function nextRaw(): (int, Object) {
+		local i = tokend;
+again:
+		while (i < len && text.isspace(i))
+			++i;
+		tokbegin = i;
+		if (i >= len) {
+			/* End-of-file */
+			tok = (TOK_EOF, "");
+			goto done;
+		}
+		local ch = text[i];
+		switch (ch) {
+
+		case "|":
+		case "&":
+			if (i + 1 < len && text[i + 1] == ch) {
+				tok = (TOK_MISC, ch + ch);
+				i += 2;
+				break;
+			}
+			goto def;
+
+		case "!":
+		case "=":
+			if (i + 1 < len && text[i + 1] == "=") {
+				/* !=, == */
+				tok = (TOK_MISC, ch + "=");
+				i += 2;
+				break;
+			}
+			goto def;
+
+		case "<":
+		case ">":
+			if (i + 1 < len) {
+				local ch2 = text[i + 1];
+				if (ch2 == ch || ch2 == "=") {
+					/* <<, >>, <=, >= */
+					tok = (TOK_MISC, ch + ch2);
+					i += 2;
+					break;
+				}
+			}
+			goto def;
+
+		case "/":
+			if (i + 1 < len) {
+				local n = text[i + 1];
+				if (n == "/") {
+					local e = text.find("\n", i + 2, len);
+					if (e < 0)
+						e = len;
+					i = len;
+					goto again;
+				}
+				if (n == "*") {
+					local e = text.find("*/", i + 2, len);
+					if (e < 0)
+						errat(i, "Unterminated comment");
+					i = e + 2;
+					goto again;
+				}
+			}
+			goto def;
+
+do_string:
+		case "\"":
+		case "\'": {
+			local e = i + 1;
+			for (;;) {
+				if (e >= len)
+					errat(i, "Unterminated string");
+				local strch = text[e];
+				if (strch == "\\")
+					++e;
+				else if (strch == ch) {
+					break;
+				}
+				++e;
+			}
+			local stringtext;
+			try {
+				stringtext = text[i + 1:e]
+					.replace("\\\n", "")
+					.decode("c-escape");
+			} catch (e...) {
+				errat(i, "Failed to unescape string: " + repr(e));
+			}
+			if (ch == "\"") {
+				tok = (TOK_STRING, stringtext);
+			} else {
+				/* Character (try to conver into a number) */
+				local val = 0;
+				local n = #stringtext;
+				for (local i, v: util.enumerate(stringtext.ordinals)) {
+					val += v << (((n - 1) * 8) * i);
+				}
+				tok = (TOK_NUMBER, val);
+			}
+			i = e + 1;
+		}	break;
+
+		case "#":
+			if (isStartOfLine(i)) {
+				++i;
+again_find_directive_end:
+				local e = text.find("\n", i, len);
+				if (e < 0)
+					e = len;
+				else if (text[e - 1] == "\\") {
+					i = e + 1;
+					goto again_find_directive_end;
+				}
+				i = tokbegin + 1;
+				for (;;) {
+					while (i < e && text.isspace(i))
+						++i;
+					if (i >= e)
+						goto again;
+					ch = text[i];
+					if (ch != "\\")
+						break;
+					ch = text[i + 1];
+					if (ch != "\n")
+						break;
+					i += 2;
+				}
+				directive_cmd_begin = i;
+				if (!text.issymstrt(i))
+					errat(i, "Expected identifier after `#'");
+				++i;
+				for (;;) {
+					while (i < e && text.issymcont(i))
+						++i;
+					if (i >= e)
+						break;
+					ch = text[i];
+					if (ch != "\\")
+						break;
+					ch = text[i + 1];
+					if (ch != "\n")
+						break;
+					i += 2;
+				}
+				directive_cmd_end = i;
+				for (;;) {
+					while (i < e && text.isspace(i))
+						++i;
+					if (i >= e)
+						break;
+					ch = text[i];
+					if (ch != "\\")
+						break;
+					ch = text[i + 1];
+					if (ch != "\n")
+						break;
+					i += 2;
+				}
+				directive_args_begin = i;
+				while (e > directive_args_begin) {
+					local p = e - 1;
+					if (text.islf(p)) {
+						if (text[p - 1] == "\\") {
+							e = p - 1;
+							continue;
+						}
+					}
+					if (text.isspace(p)) {
+						e = p;
+						continue;
+					}
+					break;
+				}
+				directive_args_end = e;
+				i = e;
+				tok = (
+					TOK_DIRECTIVE,
+					(
+						text[directive_cmd_begin:directive_cmd_end]
+							.replace("\\\n", ""),
+						text[directive_args_begin:directive_args_end]
+							.replace("\\\n", ""),
+					)
+				);
+				break;
+			}
+			goto def;
+
+def:
+		default:
+			++i;
+			if (ch.issymstrt()) {
+				for (;;) {
+					while (i < len && text.issymcont(i))
+						++i;
+					if (i >= len)
+						break;
+					if (text.substr(i, i + 2) != "\\\n")
+						break;
+					i += 2;
+				}
+				if (i < len) {
+					ch = text[i];
+					if (ch in ["\"", "\'"])
+						goto do_string;
+				}
+				tok = (TOK_KEYWORD, text[tokbegin:i].replace("\\\n", ""));
+			} else if (ch.isnumeric()) {
+				for (;;) {
+					while (i < len && (text.issymcont(i) || text.isnumeric(i)))
+						++i;
+					if (i >= len)
+						break;
+					if (text[i] != "\\")
+						break;
+					if (i + 1 >= len)
+						break;
+					if (text[i + 1] != "\n")
+						break;
+					i += 2;
+				}
+				local numrepr = text[tokbegin:i].replace("\\\n", "");
+				numrepr = numrepr.rstrip("uUlL");
+				try {
+					tok = (TOK_NUMBER, int(numrepr));
+				} catch (...) {
+					tok = (TOK_MISC, numrepr);
+				}
+			} else {
+				tok = (TOK_MISC, ch);
+			}
+			break;
+		}
+done:
+		tokend = i;
+		return tok;
+	}
+
+	@@Advance to the next token
+	public function next(): (int, Object) {
+		local ty, rp = nextRaw()...;
+		/* Concat adjacent strings */
+		if (ty == TOK_STRING) {
+			local st = tokbegin;
+			for (;;) {
+				local st = saveState();
+				local rty, rrp = nextRaw()...;
+				if (rty != TOK_STRING) {
+					loadState(st);
+					break;
+				}
+				rp += rrp;
+			}
+			tokbegin = st;
+		}
+		return (ty, rp);
+	}
+
+	@@Peek the next token
+	public function peek(): (int, Object) {
+		local st = saveState();
+		local result = nextRaw();
+		loadState(st);
+		return result;
+	}
+
+	public operator iter() -> this;
+	public operator next(): (int, Object) {
+		local r = next();
+		if (r[0] == TOK_EOF)
+			throw StopIteration();
+		return r;
+	}
+}
+
