@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1b8acae */
+/* HASH CRC-32:0xe747f29a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -782,7 +782,8 @@
 #define __NRAN4_renameat2               flags
 #define __NRAN0_seccomp                 TODO_PROTOTYPE
 #define __NRAN0_getrandom               TODO_PROTOTYPE
-#define __NRAN0_memfd_create            TODO_PROTOTYPE
+#define __NRAN0_memfd_create            name
+#define __NRAN1_memfd_create            flags
 #define __NRAN0_bpf                     TODO_PROTOTYPE
 #define __NRAN0_execveat                dirfd
 #define __NRAN1_execveat                pathname
@@ -2817,8 +2818,11 @@
 #define __NRATRA0_seccomp(TODO_PROTOTYPE) ,TODO_PROTOTYPE
 #define __NRATRF0_getrandom               "%d"
 #define __NRATRA0_getrandom(TODO_PROTOTYPE) ,TODO_PROTOTYPE
-#define __NRATRF0_memfd_create            "%d"
-#define __NRATRA0_memfd_create(TODO_PROTOTYPE) ,TODO_PROTOTYPE
+#define __NRATRF0_memfd_create            "%q"
+#define __NRATRA0_memfd_create(name, flags) ,(validate_readable_opt(name,1),name)
+#define __NRATRF1_memfd_create            "%#" PRIxSIZ "=%s%s%s"
+#define __NRATRA1_memfd_create(name, flags) ,(uintptr_t)(flags),(flags) & MFD_CLOEXEC ? "MFD_CLOEXEC" : "" \
+                                            ,((flags) & MFD_ALLOW_SEALING) && ((flags) & (MFD_CLOEXEC)) ? "|" : "",(flags) & MFD_ALLOW_SEALING ? "MFD_ALLOW_SEALING" : ""
 #define __NRATRF0_bpf                     "%d"
 #define __NRATRA0_bpf(TODO_PROTOTYPE)     ,TODO_PROTOTYPE
 #define __NRATRF0_execveat                "%d"

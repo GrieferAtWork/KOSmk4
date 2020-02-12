@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x120d9e5e */
+/* HASH CRC-32:0x5859ec2c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9730,7 +9730,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getrandom)
 	.cfi_endproc
 END(__x86_asm64_syscall_getrandom)
 
-/* errno_t memfd_create(int TODO_PROTOTYPE) */
+/* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.memfd_create
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_memfd_create)
 	.cfi_startproc simple
@@ -9820,7 +9820,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_bpf)
 	.cfi_endproc
 END(__x86_asm64_syscall_bpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm64_syscall.execveat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_execveat)
@@ -10390,7 +10390,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
 	.cfi_endproc
 END(__x86_asm64_syscall_kreaddir)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
 .section .text.x86.asm64_syscall.process_spawnveat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_spawnveat)
@@ -23036,7 +23036,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	.cfi_endproc
 END(__x86_asm32_int80_getrandom)
 
-/* errno_t memfd_create(int TODO_PROTOTYPE) */
+/* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.memfd_create
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_memfd_create)
 	.cfi_startproc simple
@@ -23053,6 +23053,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_memfd_create)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_memfd_create)
 	call   sys32_memfd_create
 	popq_cfi_r %r11
@@ -23098,7 +23099,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bpf)
 	.cfi_endproc
 END(__x86_asm32_int80_bpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.execveat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
@@ -25561,7 +25562,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	.cfi_endproc
 END(__x86_asm32_int80_utime64)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 .section .text.x86.asm32_syscall_int80.process_spawnveat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_spawnveat)
@@ -28934,13 +28935,13 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_seccomp, __x86_asm32_int80_seccomp
 /* errno_t getrandom(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getrandom, __x86_asm32_int80_getrandom)
 
-/* errno_t memfd_create(int TODO_PROTOTYPE) */
+/* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_memfd_create, __x86_asm32_int80_memfd_create)
 
 /* errno_t bpf(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_bpf, __x86_asm32_int80_bpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.execveat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
@@ -29952,7 +29953,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime64, __x86_asm32_int80_ftime64
 /* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utime64, __x86_asm32_int80_utime64)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 .section .text.x86.asm32_syscall_sysenter.process_spawnveat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_spawnveat)
@@ -34359,10 +34360,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getrandom)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getrandom)
 
-/* errno_t memfd_create(int TODO_PROTOTYPE) */
+/* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.memfd_create
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_memfd_create)
 	.cfi_startproc
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_memfd_create)
 	jmp    sys32_memfd_create
@@ -34379,7 +34381,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_bpf)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_bpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.execveat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_execveat)
@@ -35306,7 +35308,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_utime64)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 .section .text.x86.asm32_syscall_sysrun32.process_spawnveat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_spawnveat)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e401664 */
+/* HASH CRC-32:0x4ba96939 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -13236,7 +13236,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrandom)
 	.cfi_endproc
 END(__x86_asm32_int80_getrandom)
 
-/* errno_t memfd_create(int TODO_PROTOTYPE) */
+/* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.memfd_create
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_memfd_create)
 	.cfi_startproc simple
@@ -13255,14 +13255,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_memfd_create)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_memfd_create)
 	call   sys_memfd_create
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -13310,7 +13310,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_bpf)
 	.cfi_endproc
 END(__x86_asm32_int80_bpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.execveat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
@@ -16090,7 +16090,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	.cfi_endproc
 END(__x86_asm32_int80_utime64)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 .section .text.x86.asm32_syscall_int80.process_spawnveat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_spawnveat)
@@ -30585,7 +30585,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrandom)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getrandom)
 
-/* errno_t memfd_create(int TODO_PROTOTYPE) */
+/* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.memfd_create
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_memfd_create)
 	.cfi_startproc simple
@@ -30604,14 +30604,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_memfd_create)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_memfd_create)
 	call   sys_memfd_create
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -30659,7 +30659,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_bpf)
 	.cfi_endproc
 END(__x86_asm32_sysenter_bpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.execveat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
@@ -33483,7 +33483,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utime64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_utime64)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 .section .text.x86.asm32_syscall_sysenter.process_spawnveat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_spawnveat)

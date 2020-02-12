@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0711c9f */
+/* HASH CRC-32:0xc7fe8ec7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -290,7 +290,7 @@
 #define __NRAC_renameat2              5
 #define __NRAC_seccomp                1
 #define __NRAC_getrandom              1
-#define __NRAC_memfd_create           1
+#define __NRAC_memfd_create           2
 #define __NRAC_bpf                    1
 #define __NRAC_execveat               5
 #define __NRAC_userfaultfd            1
@@ -612,7 +612,7 @@
 #define __NRRT_renameat2              (errno_t, __errno_t)
 #define __NRRT_seccomp                (errno_t, __errno_t)
 #define __NRRT_getrandom              (errno_t, __errno_t)
-#define __NRRT_memfd_create           (errno_t, __errno_t)
+#define __NRRT_memfd_create           (fd_t, __fd_t)
 #define __NRRT_bpf                    (errno_t, __errno_t)
 #define __NRRT_execveat               (errno_t, __errno_t)
 #define __NRRT_userfaultfd            (errno_t, __errno_t)
@@ -1275,7 +1275,8 @@
 #define __NRAT4_renameat2              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_seccomp                (int, int)
 #define __NRAT0_getrandom              (int, int)
-#define __NRAT0_memfd_create           (int, int)
+#define __NRAT0_memfd_create           (char const *, char const *)
+#define __NRAT1_memfd_create           (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_bpf                    (int, int)
 #define __NRAT0_execveat               (fd_t, __fd_t)
 #define __NRAT1_execveat               (char const *, char const *)
@@ -1664,7 +1665,7 @@
 #define __NRAM_renameat2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__syscall_ulong_t)e
 #define __NRAM_seccomp(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (int)a
 #define __NRAM_getrandom(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (int)a
-#define __NRAM_memfd_create(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (int)a
+#define __NRAM_memfd_create(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (char const *)a, (__syscall_ulong_t)b
 #define __NRAM_bpf(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                    (int)a
 #define __NRAM_execveat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (char const *)b, (char const *const *)c, (char const *const *)d, (__atflag_t)e
 #define __NRAM_userfaultfd(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (int)a
@@ -1986,7 +1987,7 @@
 #define __NRAP_renameat2(a, b, c, d, e)                                                                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_seccomp(a)                                                                                           (__syscall_ulong_t)a
 #define __NRAP_getrandom(a)                                                                                         (__syscall_ulong_t)a
-#define __NRAP_memfd_create(a)                                                                                      (__syscall_ulong_t)a
+#define __NRAP_memfd_create(a, b)                                                                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_bpf(a)                                                                                               (__syscall_ulong_t)a
 #define __NRAP_execveat(a, b, c, d, e)                                                                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_userfaultfd(a)                                                                                       (__syscall_ulong_t)a

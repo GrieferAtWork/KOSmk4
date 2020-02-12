@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d69de07 */
+/* HASH CRC-32:0xcad2e77e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -428,9 +428,9 @@
 #define SYS_renameat2               __NR_renameat2               /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 #define SYS_seccomp                 __NR_seccomp                 /* errno_t seccomp(int TODO_PROTOTYPE) */
 #define SYS_getrandom               __NR_getrandom               /* errno_t getrandom(int TODO_PROTOTYPE) */
-#define SYS_memfd_create            __NR_memfd_create            /* errno_t memfd_create(int TODO_PROTOTYPE) */
+#define SYS_memfd_create            __NR_memfd_create            /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define SYS_bpf                     __NR_bpf                     /* errno_t bpf(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_execveat                __NR_execveat                /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 #define SYS_socket                  __NR_socket                  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 #define SYS_socketpair              __NR_socketpair              /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
@@ -532,7 +532,7 @@
 #define SYS_ioctlf                  __NR_ioctlf                  /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define SYS_ftime64                 __NR_ftime64                 /* errno_t ftime64(struct __timebx32_64 *tp) */
 #define SYS_utime64                 __NR_utime64                 /* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_process_spawnveat       __NR_process_spawnveat       /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 #define SYS_stime64                 __NR_stime64                 /* errno_t stime64(time64_t const *t) */
 /* Trigger a coredump of the calling process.

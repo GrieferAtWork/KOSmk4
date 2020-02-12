@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b4d4371 */
+/* HASH CRC-32:0xb94f7848 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -400,10 +400,10 @@
 #define SYS_renameat2              __NR_renameat2              /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 #define SYS_seccomp                __NR_seccomp                /* errno_t seccomp(int TODO_PROTOTYPE) */
 #define SYS_getrandom              __NR_getrandom              /* errno_t getrandom(int TODO_PROTOTYPE) */
-#define SYS_memfd_create           __NR_memfd_create           /* errno_t memfd_create(int TODO_PROTOTYPE) */
+#define SYS_memfd_create           __NR_memfd_create           /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define SYS_kexec_file_load        __NR_kexec_file_load        /* errno_t kexec_file_load(int TODO_PROTOTYPE) */
 #define SYS_bpf                    __NR_bpf                    /* errno_t bpf(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_execveat               __NR_execveat               /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 #define SYS_userfaultfd            __NR_userfaultfd            /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define SYS_membarrier             __NR_membarrier             /* errno_t membarrier(int TODO_PROTOTYPE) */
@@ -439,7 +439,7 @@
 #define SYS_fchdirat               __NR_fchdirat               /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
 #define SYS_kreaddirf              __NR_kreaddirf              /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 #define SYS_kreaddir               __NR_kreaddir               /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_process_spawnveat      __NR_process_spawnveat      /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done

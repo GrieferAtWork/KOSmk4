@@ -1362,7 +1362,7 @@ sched_getattr:(int TODO_PROTOTYPE) -> errno_t;
 
 seccomp:(int TODO_PROTOTYPE) -> errno_t;
 getrandom:(int TODO_PROTOTYPE) -> errno_t;
-memfd_create:(int TODO_PROTOTYPE) -> errno_t;
+memfd_create:(char const *name, [tostr(flagset(MFD_CLOEXEC, MFD_ALLOW_SEALING))] syscall_ulong_t flags) -> fd_t;
 bpf:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
@@ -1372,11 +1372,11 @@ bpf:(int TODO_PROTOTYPE) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-@@@param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+@@@param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [cp] execveat:(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp,
-               [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
-[doc_alias(execveat)][cp] execveatx32:(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
-[doc_alias(execveat)][cp] execveatx64:(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+               [tostr(flagset(AT_EMPTY_PATH, AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(execveat)][cp] execveatx32:(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH, AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
+[doc_alias(execveat)][cp] execveatx64:(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH, AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags) -> errno_t;
 %[endgroup]
 
 socket:(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) -> fd_t;
@@ -1839,12 +1839,12 @@ coredumpx64:(struct ucpustate64 const *curr_state, struct ucpustate64 const *ori
 
 
 %[startgroup]
-@@@param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+@@@param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 [cp] process_spawnveat:(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp,
-                        [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags,
+                        [tostr(flagset(AT_EMPTY_PATH, AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags,
                         struct spawn_actions const *actions) -> pid_t;
-[doc_alias(process_spawnveat)][cp] process_spawnveatx32:(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags, struct spawn_actionsx32 const *actions) -> errno_t;
-[doc_alias(process_spawnveat)][cp] process_spawnveatx64:(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags, struct spawn_actionsx64 const *actions) -> errno_t;
+[doc_alias(process_spawnveat)][cp] process_spawnveatx32:(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH, AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags, struct spawn_actionsx32 const *actions) -> errno_t;
+[doc_alias(process_spawnveat)][cp] process_spawnveatx64:(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, [tostr(flagset(AT_EMPTY_PATH, AT_SYMLINK_NOFOLLOW, AT_DOSPATH))] atflag_t flags, struct spawn_actionsx64 const *actions) -> errno_t;
 %[endgroup]
 
 

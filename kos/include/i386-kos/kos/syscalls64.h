@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7616923 */
+/* HASH CRC-32:0x2390fd5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -394,7 +394,7 @@ __CDECLARE_SC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t _
 __CDECLARE_SC(,__errno_t,execve,(char const *__path, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp),(__path,__argv,__envp))
 #endif /* __CRT_HAVE_SC(execve) */
 #if __CRT_HAVE_SC(execveat)
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp, __atflag_t __flags),(__dirfd,__pathname,__argv,__envp,__flags))
 #endif /* __CRT_HAVE_SC(execveat) */
 #if __CRT_HAVE_SC(exit)
@@ -887,7 +887,7 @@ __CDECLARE_SC(,__errno_t,mbind,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,membarrier,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(membarrier) */
 #if __CRT_HAVE_SC(memfd_create)
-__CDECLARE_SC(,__errno_t,memfd_create,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__fd_t,memfd_create,(char const *__name, __syscall_ulong_t __flags),(__name,__flags))
 #endif /* __CRT_HAVE_SC(memfd_create) */
 #if __CRT_HAVE_SC(migrate_pages)
 __CDECLARE_SC(,__errno_t,migrate_pages,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -1056,7 +1056,7 @@ __CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec64 const *__iovec, __
 __CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_SC(prlimit64) */
 #if __CRT_HAVE_SC(process_spawnveat)
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,process_spawnveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp, __atflag_t __flags, struct spawn_actionsx64 const *__actions),(__dirfd,__pathname,__argv,__envp,__flags,__actions))
 #endif /* __CRT_HAVE_SC(process_spawnveat) */
 #if __CRT_HAVE_SC(process_vm_readv)
@@ -1833,7 +1833,7 @@ __CDECLARE_XSC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t 
 __CDECLARE_XSC(,__errno_t,execve,(char const *__path, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp),(__path,__argv,__envp))
 #endif /* __CRT_HAVE_XSC(execve) */
 #if __CRT_HAVE_XSC(execveat)
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,execveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp, __atflag_t __flags),(__dirfd,__pathname,__argv,__envp,__flags))
 #endif /* __CRT_HAVE_XSC(execveat) */
 #if __CRT_HAVE_XSC(exit)
@@ -2326,7 +2326,7 @@ __CDECLARE_XSC(,__errno_t,mbind,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,membarrier,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(membarrier) */
 #if __CRT_HAVE_XSC(memfd_create)
-__CDECLARE_XSC(,__errno_t,memfd_create,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__fd_t,memfd_create,(char const *__name, __syscall_ulong_t __flags),(__name,__flags))
 #endif /* __CRT_HAVE_XSC(memfd_create) */
 #if __CRT_HAVE_XSC(migrate_pages)
 __CDECLARE_XSC(,__errno_t,migrate_pages,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -2495,7 +2495,7 @@ __CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec64 const *__iovec, _
 __CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_XSC(prlimit64) */
 #if __CRT_HAVE_XSC(process_spawnveat)
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,process_spawnveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *__argv, __HYBRID_PTR64(char const) const *__envp, __atflag_t __flags, struct spawn_actionsx64 const *__actions),(__dirfd,__pathname,__argv,__envp,__flags,__actions))
 #endif /* __CRT_HAVE_XSC(process_spawnveat) */
 #if __CRT_HAVE_XSC(process_vm_readv)

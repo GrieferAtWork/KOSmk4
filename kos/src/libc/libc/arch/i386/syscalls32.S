@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2eb4efde */
+/* HASH CRC-32:0x97a56b76 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6216,19 +6216,19 @@ INTERN_FUNCTION(libc_sys_Xgetrandom)
 END(libc_sys_Xgetrandom)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetrandom, libc_sys_Xgetrandom)
 
-/* errno_t memfd_create(int TODO_PROTOTYPE) */
+/* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.crt.syscall.memfd_create
 INTERN_FUNCTION(libc_sys_memfd_create)
 	movl   $(0x164), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall2
 END(libc_sys_memfd_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_memfd_create, libc_sys_memfd_create)
 
-/* errno_t memfd_create(int TODO_PROTOTYPE) */
+/* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xmemfd_create
 INTERN_FUNCTION(libc_sys_Xmemfd_create)
 	movl   $(0x164), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xmemfd_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmemfd_create, libc_sys_Xmemfd_create)
 
@@ -6248,7 +6248,7 @@ INTERN_FUNCTION(libc_sys_Xbpf)
 END(libc_sys_Xbpf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xbpf, libc_sys_Xbpf)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.crt.syscall.execveat
 INTERN_FUNCTION(libc_sys_execveat)
@@ -6257,7 +6257,7 @@ INTERN_FUNCTION(libc_sys_execveat)
 END(libc_sys_execveat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_execveat, libc_sys_execveat)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 .section .text.crt.syscall.Xexecveat
 INTERN_FUNCTION(libc_sys_Xexecveat)
@@ -7446,7 +7446,7 @@ INTERN_FUNCTION(libc_sys_Xutime64)
 END(libc_sys_Xutime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xutime64, libc_sys_Xutime64)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 .section .text.crt.syscall.process_spawnveat
 INTERN_FUNCTION(libc_sys_process_spawnveat)
@@ -7455,7 +7455,7 @@ INTERN_FUNCTION(libc_sys_process_spawnveat)
 END(libc_sys_process_spawnveat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_process_spawnveat, libc_sys_process_spawnveat)
 
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 .section .text.crt.syscall.Xprocess_spawnveat
 INTERN_FUNCTION(libc_sys_Xprocess_spawnveat)

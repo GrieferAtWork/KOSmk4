@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57f5b928 */
+/* HASH CRC-32:0x437f8997 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -782,7 +782,8 @@
 #define __NR32AN4_renameat2               flags
 #define __NR32AN0_seccomp                 TODO_PROTOTYPE
 #define __NR32AN0_getrandom               TODO_PROTOTYPE
-#define __NR32AN0_memfd_create            TODO_PROTOTYPE
+#define __NR32AN0_memfd_create            name
+#define __NR32AN1_memfd_create            flags
 #define __NR32AN0_bpf                     TODO_PROTOTYPE
 #define __NR32AN0_execveat                dirfd
 #define __NR32AN1_execveat                pathname
@@ -2817,8 +2818,11 @@
 #define __NR32ATRA0_seccomp(TODO_PROTOTYPE) ,TODO_PROTOTYPE
 #define __NR32ATRF0_getrandom               "%d"
 #define __NR32ATRA0_getrandom(TODO_PROTOTYPE) ,TODO_PROTOTYPE
-#define __NR32ATRF0_memfd_create            "%d"
-#define __NR32ATRA0_memfd_create(TODO_PROTOTYPE) ,TODO_PROTOTYPE
+#define __NR32ATRF0_memfd_create            "%q"
+#define __NR32ATRA0_memfd_create(name, flags) ,(validate_readable_opt(name,1),name)
+#define __NR32ATRF1_memfd_create            "%#" PRIxSIZ "=%s%s%s"
+#define __NR32ATRA1_memfd_create(name, flags) ,(uintptr_t)(flags),(flags) & MFD_CLOEXEC ? "MFD_CLOEXEC" : "" \
+                                              ,((flags) & MFD_ALLOW_SEALING) && ((flags) & (MFD_CLOEXEC)) ? "|" : "",(flags) & MFD_ALLOW_SEALING ? "MFD_ALLOW_SEALING" : ""
 #define __NR32ATRF0_bpf                     "%d"
 #define __NR32ATRA0_bpf(TODO_PROTOTYPE)     ,TODO_PROTOTYPE
 #define __NR32ATRF0_execveat                "%d"

@@ -49,7 +49,7 @@
 #define __F_DUPFD_CLOEXEC  1030 /* Duplicate file descriptor with close-on-exit set. */
 #define __F_SETPIPE_SZ     1031 /* Set pipe page size array. */
 #define __F_GETPIPE_SZ     1032 /* Get pipe page size array. */
-#endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
+#endif /* ... */
 
 #if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #define __F_SETFL_XCH      5163 /* Same as 'F_SETFL', but return the old set of flags instead of `-EOK' upon success. */
@@ -67,7 +67,7 @@
 
 #if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #define __FD_CLOFORK 0x02 /* FLAG: Close the descriptor during unsharing after `fork()' (Similar to `PROT_LOOSE' for memory). */
-#endif /* __KOS__ || __CRT_KOS || __CRT_KOS_KERNEL */
+#endif /* ... */
 
 #if defined(__KOS__) || defined(__linux__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL) || defined(__CRT_GLC)
 #define __F_RDLCK 0 /* Read lock. */
@@ -121,7 +121,7 @@
 #define __FALLOC_FL_ZERO_RANGE       16 /* Convert a range of a file to zeros. */
 
 #define __MAX_HANDLE_SZ 128
-#endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
+#endif /* ... */
 
 #ifdef __CRT_AT_FDCWD
 /* Special value used to indicate the *at functions should use the current working directory. */
@@ -135,7 +135,7 @@
 #define __AT_SYMLINK_FOLLOW    0x0400 /* If the last path component is a symlink, follow it. (WARNING: Only used by `linkat(2)') */
 #define __AT_NO_AUTOMOUNT      0x0800 /* Suppress terminal automount traversal. */
 #define __AT_EMPTY_PATH        0x1000 /* Allow empty relative pathname. */
-#endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
+#endif /* ... */
 
 #if defined(__KOS__) || defined(__CRT_KOS) || defined(__CRT_KOS_KERNEL)
 #if __KOS_VERSION__ >= 300
@@ -275,6 +275,6 @@
 #define __AT_DOS_DRIVEMIN            'A'
 #define __AT_DOS_DRIVEMAX            'Z'
 #endif /* __KOS_VERSION__ >= 300 */
-#endif /* __KOS__ || __CRT_KOS || __CRT_KOS_KERNEL */
+#endif /* ... */
 
 #endif /* !_ASM_FCNTL_H */

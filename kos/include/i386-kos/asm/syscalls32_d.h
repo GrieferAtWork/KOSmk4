@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a0eaf12 */
+/* HASH CRC-32:0x3bb55650 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -425,9 +425,9 @@
 #define __NR32_renameat2               0x161                  /* errno_t renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags) */
 #define __NR32_seccomp                 0x162                  /* errno_t seccomp(int TODO_PROTOTYPE) */
 #define __NR32_getrandom               0x163                  /* errno_t getrandom(int TODO_PROTOTYPE) */
-#define __NR32_memfd_create            0x164                  /* errno_t memfd_create(int TODO_PROTOTYPE) */
+#define __NR32_memfd_create            0x164                  /* fd_t memfd_create(char const *name, syscall_ulong_t flags) */
 #define __NR32_bpf                     0x165                  /* errno_t bpf(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR32_execveat                0x166                  /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
 #define __NR32_socket                  0x167                  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 #define __NR32_socketpair              0x168                  /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
@@ -529,7 +529,7 @@
 #define __NR32_ioctlf                  __UINT32_C(0xffffffca) /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define __NR32_ftime64                 __UINT32_C(0xffffffdd) /* errno_t ftime64(struct __timebx32_64 *tp) */
 #define __NR32_utime64                 __UINT32_C(0xffffffe2) /* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR32_process_spawnveat       __UINT32_C(0xffffffe6) /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 #define __NR32_stime64                 __UINT32_C(0xffffffe7) /* errno_t stime64(time64_t const *t) */
 /* Trigger a coredump of the calling process.
@@ -1860,7 +1860,7 @@
 #define __NR32RC_renameat2               5
 #define __NR32RC_seccomp                 1
 #define __NR32RC_getrandom               1
-#define __NR32RC_memfd_create            1
+#define __NR32RC_memfd_create            2
 #define __NR32RC_bpf                     1
 #define __NR32RC_execveat                5
 #define __NR32RC_socket                  3

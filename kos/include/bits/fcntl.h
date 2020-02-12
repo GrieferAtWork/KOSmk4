@@ -621,7 +621,7 @@ struct f_owner_ex {
 #pragma pop_macro("pid")
 #pragma pop_macro("type")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
+#endif /* ... */
 #endif /* __CC__ */
 #endif /* __USE_GNU */
 
@@ -734,7 +734,7 @@ struct file_handle {
 #pragma pop_macro("handle_type")
 #pragma pop_macro("handle_bytes")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* __KOS__ || __linux__ || __CRT_KOS || __CRT_KOS_KERNEL || __CRT_GLC */
+#endif /* ... */
 #endif /* __CC__ */
 
 #ifdef __MAX_HANDLE_SZ
