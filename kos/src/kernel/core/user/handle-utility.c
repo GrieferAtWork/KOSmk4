@@ -34,6 +34,7 @@
 #include <fs/file.h>
 #include <fs/node.h>
 #include <fs/pipe.h>
+#include <fs/ramfs.h>
 #include <fs/vfs.h>
 #include <kernel/driver.h>
 #include <kernel/handle.h>
@@ -45,6 +46,7 @@
 #include <sys/stat.h>
 
 #include <format-printer.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -218,22 +220,43 @@ handle_print(struct handle const *__restrict self,
 		}
 	}	break;
 
-	case HANDLE_TYPE_BLOCKDEVICE: {
-		struct block_device *dev = (struct block_device *)self->h_data;
-		result = format_printf(printer, arg, "/dev/%s", dev->bd_name);
+	case HANDLE_TYPE_BLOCKDEVICE:
+	case HANDLE_TYPE_CHARACTERDEVICE: {
+		REF struct path *mount;
+		char const *devname;
+		if (self->h_type == HANDLE_TYPE_CHARACTERDEVICE) {
+			struct character_device *me;
+			me      = (struct character_device *)self->h_data;
+			devname = me->cd_name;
+		} else {
+			struct block_device *me;
+			me      = (struct block_device *)self->h_data;
+			devname = me->bd_name;
+		}
+		mount = superblock_getmountloc(&devfs, THIS_VFS);
+		if unlikely(!mount) {
+			result = format_printf(printer, arg, "devfs:%s", devname);
+		} else {
+			FINALLY_DECREF_UNLIKELY(mount);
+			result = path_printent(mount,
+			                       devname,
+			                       strlen(devname),
+			                       printer, arg);
+		}
 	}	break;
 
 	case HANDLE_TYPE_DIRECTORYENTRY: {
 		struct directory_entry *ent = (struct directory_entry *)self->h_data;
 		result = format_printf(printer, arg, "anon_inode:[directory_entry:%$s]",
-		                  ent->de_namelen, ent->de_name);
+		                       ent->de_namelen, ent->de_name);
 	}	break;
 
 	case HANDLE_TYPE_FILE: {
 		struct file *f = (struct file *)self->h_data;
 		if (f->f_path && f->f_dirent) {
 			result = path_printent(f->f_path,
-			                       f->f_dirent,
+			                       f->f_dirent->de_name,
+			                       f->f_dirent->de_namelen,
 			                       printer, arg);
 		} else {
 			result = format_printf(printer, arg,
@@ -246,7 +269,8 @@ handle_print(struct handle const *__restrict self,
 		struct oneshot_directory_file *f = (struct oneshot_directory_file *)self->h_data;
 		if (f->d_path && f->d_dirent) {
 			result = path_printent(f->d_path,
-			                       f->d_dirent,
+			                       f->d_dirent->de_name,
+			                       f->d_dirent->de_namelen,
 			                       printer, arg);
 		} else {
 			result = format_printf(printer, arg, "anon_inode:[oneshot_directory_file:inode:%I64u]",
@@ -328,13 +352,6 @@ handle_print(struct handle const *__restrict self,
 		result = format_printf(printer, arg,
 		                       "anon_inode:[driver_state:%Iu]",
 		                       st);
-	}	break;
-
-	case HANDLE_TYPE_CHARACTERDEVICE: {
-		struct character_device *dev = (struct character_device *)self->h_data;
-		result = format_printf(printer, arg,
-		                       "/dev/%s",
-		                       dev->cd_name);
 	}	break;
 
 	case HANDLE_TYPE_EVENTFD_FENCE: {

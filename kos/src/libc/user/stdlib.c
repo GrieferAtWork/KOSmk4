@@ -660,18 +660,18 @@ NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
 }
 /*[[[end:_dupenv_s]]]*/
 
-/*[[[head:getenv_s,hash:CRC-32=0x96a565cd]]]*/
+/*[[[head:getenv_s,hash:CRC-32=0x8218b797]]]*/
 INTERN NONNULL((1, 2, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.utility.getenv_s") errno_t
 NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize,
                                     char *buf,
-                                    rsize_t bufsize,
+                                    rsize_t buflen,
                                     char const *varname)
 /*[[[body:getenv_s]]]*/
 {
 	(void)psize;
 	(void)buf;
-	(void)bufsize;
+	(void)buflen;
 	(void)varname;
 	CRT_UNIMPLEMENTED("getenv_s"); /* TODO */
 	libc_seterrno(ENOSYS);
@@ -1422,35 +1422,35 @@ NOTHROW_RPC(LIBCCALL libc_realpath)(char const *__restrict filename,
 }
 /*[[[end:realpath]]]*/
 
-/*[[[head:frealpath,hash:CRC-32=0xde151c69]]]*/
+/*[[[head:frealpath,hash:CRC-32=0xb9392b84]]]*/
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
- * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
+ * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
- *       pass `0' for `bufsize' to automatically determine the required buffer size. */
+ *       pass `0' for `buflen' to automatically determine the required buffer size. */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.frealpath") char *
 NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
                                      char *resolved,
-                                     size_t bufsize)
+                                     size_t buflen)
 /*[[[body:frealpath]]]*/
 {
-	return frealpath4(fd, resolved, bufsize, 0);
+	return frealpath4(fd, resolved, buflen, 0);
 }
 /*[[[end:frealpath]]]*/
 
-/*[[[head:frealpath4,hash:CRC-32=0x103a07d1]]]*/
+/*[[[head:frealpath4,hash:CRC-32=0xd1c669d6]]]*/
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0|AT_ALTPATH|AT_DOSPATH'
- * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
+ * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
- *       pass `0' for `bufsize' to automatically determine the required buffer size. */
+ *       pass `0' for `buflen' to automatically determine the required buffer size. */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.frealpath4") char *
 NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd,
                                       char *resolved,
-                                      size_t bufsize,
+                                      size_t buflen,
                                       atflag_t flags)
 /*[[[body:frealpath4]]]*/
 {
@@ -1461,20 +1461,20 @@ NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd,
 		return NULL;
 	}
 	if (!resolved) {
-		if (!bufsize) {
+		if (!buflen) {
 			/* Automatically allocate + determine buffer size. */
-			bufsize = PATH_MAX;
-			buffer  = (char *)malloc(bufsize);
+			buflen = PATH_MAX;
+			buffer  = (char *)malloc(buflen);
 			if unlikely(!buffer)
-				bufsize = 0;
+				buflen = 0;
 			for (;;) {
 				result = sys_frealpath4(fd,
 				                        buffer,
-				                        bufsize,
+				                        buflen,
 				                        flags | AT_READLINK_REQSIZE);
 				if unlikely(E_ISERR(result))
 					goto err_buffer_result_errno;
-				if likely((size_t)result <= bufsize)
+				if likely((size_t)result <= buflen)
 					break;
 				/* Allocate the required amount of memory. */
 				resolved = (char *)realloc(buffer, (size_t)result);
@@ -1482,23 +1482,23 @@ NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd,
 					free(buffer);
 					return NULL;
 				}
-				bufsize = (size_t)result;
+				buflen = (size_t)result;
 				buffer  = resolved;
 			}
-			if ((size_t)result != bufsize) {
+			if ((size_t)result != buflen) {
 				resolved = (char *)realloc(buffer, (size_t)result);
 				if likely(resolved)
 					buffer = resolved;
 			}
 			return buffer;
 		}
-		buffer = (char *)malloc(bufsize);
+		buffer = (char *)malloc(buflen);
 		if unlikely(!buffer)
 			goto done;
 	}
 	result = sys_frealpath4(fd,
 	                        buffer,
-	                        bufsize,
+	                        buflen,
 	                        flags);
 	if (E_ISERR(result)) {
 		if (!resolved) {
@@ -1513,21 +1513,21 @@ done:
 }
 /*[[[end:frealpath4]]]*/
 
-/*[[[head:frealpathat,hash:CRC-32=0x2a5dcd44]]]*/
+/*[[[head:frealpathat,hash:CRC-32=0x8631def6]]]*/
 /* Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_FOLLOW' is given, a final symlink is dereferenced,
  * causing the pointed-to file location to be retrieved. - Otherwise, the
  * location of the link is printed instead.
- * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
+ * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
  *       bytes automatically allocated in the heap, ontop of which you may also
- *       pass `0' for `bufsize' to automatically determine the required buffer size.
+ *       pass `0' for `buflen' to automatically determine the required buffer size.
  * @param flags: Set of `0|AT_ALTPATH|AT_SYMLINK_FOLLOW|AT_DOSPATH' */
 INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.frealpathat") char *
 NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
                                        char const *filename,
                                        char *resolved,
-                                       size_t bufsize,
+                                       size_t buflen,
                                        atflag_t flags)
 /*[[[body:frealpathat]]]*/
 {
@@ -1538,22 +1538,22 @@ NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
 		return NULL;
 	}
 	if (!resolved) {
-		if (!bufsize) {
+		if (!buflen) {
 			/* Automatically allocate + determine buffer size. */
-			bufsize = PATH_MAX;
-			buffer  = (char *)malloc(bufsize);
+			buflen = PATH_MAX;
+			buffer  = (char *)malloc(buflen);
 			if unlikely(!buffer)
-				bufsize = 0;
+				buflen = 0;
 			for (;;) {
 				result = sys_frealpathat(dirfd,
 				                         filename,
 				                         buffer,
-				                         bufsize,
+				                         buflen,
 				                         flags | AT_READLINK_REQSIZE);
 				if unlikely(E_ISERR(result))
 					goto err_buffer_result_errno;
 				if
-					likely((size_t)result <= bufsize)
+					likely((size_t)result <= buflen)
 				break;
 				/* Allocate the required amount of memory. */
 				resolved = (char *)realloc(buffer, (size_t)result);
@@ -1561,24 +1561,24 @@ NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd,
 					free(buffer);
 					return NULL;
 				}
-				bufsize = (size_t)result;
+				buflen = (size_t)result;
 				buffer  = resolved;
 			}
-			if ((size_t)result != bufsize) {
+			if ((size_t)result != buflen) {
 				resolved = (char *)realloc(buffer, (size_t)result);
 				if likely(resolved)
 					buffer = resolved;
 			}
 			return buffer;
 		}
-		buffer = (char *)malloc(bufsize);
+		buffer = (char *)malloc(buflen);
 		if unlikely(!buffer)
 			goto done;
 	}
 	result = sys_frealpathat(dirfd,
 	                         filename,
 	                         buffer,
-	                         bufsize,
+	                         buflen,
 	                         flags);
 	if (E_ISERR(result)) {
 		if (!resolved) {

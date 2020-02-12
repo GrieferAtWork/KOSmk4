@@ -148,7 +148,11 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 			xdecref_unlikely(path);
 			xdecref_unlikely(dent);
 		} else if (dent && path) {
-			result = path_printentex(path, dent, printer, arg,
+			result = path_printentex(path,
+			                         dent->de_name,
+			                         dent->de_namelen,
+			                         printer,
+			                         arg,
 			                         PATH_PRINT_MODE_NORMAL,
 			                         &vfs_kernel);
 			decref_unlikely(path);

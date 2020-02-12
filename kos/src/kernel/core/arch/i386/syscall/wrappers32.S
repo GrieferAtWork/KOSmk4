@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9082f52b */
+/* HASH CRC-32:0x8e401664 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -16959,7 +16959,7 @@ END(__x86_asm32_int80_frealpathat)
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
  * the required buffer size, rather than the used size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
 .section .text.x86.asm32_syscall_int80.frealpath4
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
 	.cfi_startproc simple
@@ -34366,7 +34366,7 @@ END(__x86_asm32_sysenter_frealpathat)
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
  * the required buffer size, rather than the used size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.frealpath4
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpath4)
 	.cfi_startproc simple

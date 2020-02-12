@@ -1459,11 +1459,11 @@ realpath:([nonnull] char const *__restrict filename, char *resolved) -> char *;
 % *       same _SOURCE-block as its `realpath()' companion. */
 @@Load the filesystem location of a given file handle.
 @@This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
-@@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
+@@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
 @@      bytes automatically allocated in the heap, ontop of which you may also
-@@      pass `0' for `bufsize' to automatically determine the required buffer size.
+@@      pass `0' for `buflen' to automatically determine the required buffer size.
 [section(.text.crt.fs.property)][cp][ATTR_WUNUSED]
-frealpath:($fd_t fd, char *resolved, $size_t bufsize) -> char *;
+frealpath:($fd_t fd, char *resolved, $size_t buflen) -> char *;
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 %
@@ -1471,23 +1471,23 @@ frealpath:($fd_t fd, char *resolved, $size_t bufsize) -> char *;
 @@Load the filesystem location of a given file handle.
 @@This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
 @@@param flags: Set of `0|AT_ALTPATH|AT_DOSPATH'
-@@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
+@@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
 @@      bytes automatically allocated in the heap, ontop of which you may also
-@@      pass `0' for `bufsize' to automatically determine the required buffer size.
+@@      pass `0' for `buflen' to automatically determine the required buffer size.
 [section(.text.crt.fs.property)][cp][ATTR_WUNUSED]
-frealpath4:($fd_t fd, char *resolved, $size_t bufsize, $atflag_t flags) -> char *;
+frealpath4:($fd_t fd, char *resolved, $size_t buflen, $atflag_t flags) -> char *;
 
 @@Returns the absolute filesystem path for the specified file
 @@When `AT_SYMLINK_FOLLOW' is given, a final symlink is dereferenced,
 @@causing the pointed-to file location to be retrieved. - Otherwise, the
 @@location of the link is printed instead.
-@@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
+@@NOTE: You may also pass `NULL' for `resolved' to have a buffer of `buflen'
 @@      bytes automatically allocated in the heap, ontop of which you may also
-@@      pass `0' for `bufsize' to automatically determine the required buffer size.
+@@      pass `0' for `buflen' to automatically determine the required buffer size.
 @@@param flags: Set of `0|AT_ALTPATH|AT_SYMLINK_FOLLOW|AT_DOSPATH'
 [section(.text.crt.fs.property)][cp][ATTR_WUNUSED]
 frealpathat:($fd_t dirfd, [nonnull] char const *filename,
-             char *resolved, $size_t bufsize, $atflag_t flags) -> char *;
+             char *resolved, $size_t buflen, $atflag_t flags) -> char *;
 %#endif /* __USE_KOS */
 
 
@@ -2196,7 +2196,7 @@ qsort_s:([nonnull] void *base, $size_t nmemb, $size_t size,
 %
 
 getenv_s:([nonnull] $size_t *psize,
-          [nonnull] char *buf, rsize_t bufsize,
+          [nonnull] char *buf, rsize_t buflen,
           [nonnull] char const *varname) -> errno_t;
 _dupenv_s:([nonnull] char **__restrict pbuf,
            [nonnull] $size_t *pbuflen,

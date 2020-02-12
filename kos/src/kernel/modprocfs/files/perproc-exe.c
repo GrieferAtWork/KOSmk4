@@ -66,7 +66,8 @@ ProcFS_PerProc_Exe_Printer(struct symlink_node *__restrict self,
 	return path_sprintent(buf,
 	                      bufsize,
 	                      exec_path,
-	                      exec_dent);
+	                      exec_dent->de_name,
+	                      exec_dent->de_namelen);
 }
 
 

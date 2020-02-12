@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x159dccb */
+/* HASH CRC-32:0x1795b09a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -893,7 +893,7 @@
 #define __NR64AN3_frealpathat            buflen
 #define __NR64AN4_frealpathat            flags
 #define __NR64AN0_frealpath4             fd
-#define __NR64AN1_frealpath4             buf
+#define __NR64AN1_frealpath4             resolved
 #define __NR64AN2_frealpath4             buflen
 #define __NR64AN3_frealpath4             flags
 #define __NR64AN0_detach                 pid
@@ -2963,15 +2963,15 @@
                                                                      ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
                                                                      ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_SYMLINK_NOFOLLOW|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_frealpath4             "%d"
-#define __NR64ATRA0_frealpath4(fd, buf, buflen, flags) ,(int)(fd)
+#define __NR64ATRA0_frealpath4(fd, resolved, buflen, flags) ,(int)(fd)
 #define __NR64ATRF1_frealpath4             "%p"
-#define __NR64ATRA1_frealpath4(fd, buf, buflen, flags) ,buf
+#define __NR64ATRA1_frealpath4(fd, resolved, buflen, flags) ,resolved
 #define __NR64ATRF2_frealpath4             "%" PRIuSIZ
-#define __NR64ATRA2_frealpath4(fd, buf, buflen, flags) ,buflen
+#define __NR64ATRA2_frealpath4(fd, resolved, buflen, flags) ,buflen
 #define __NR64ATRF3_frealpath4             "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NR64ATRA3_frealpath4(fd, buf, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
-                                                       ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
-                                                       ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR64ATRA3_frealpath4(fd, resolved, buflen, flags) ,(uintptr_t)(flags),(flags) & AT_ALTPATH ? "AT_ALTPATH" : "" \
+                                                            ,((flags) & AT_READLINK_REQSIZE) && ((flags) & (AT_ALTPATH)) ? "|" : "",(flags) & AT_READLINK_REQSIZE ? "AT_READLINK_REQSIZE" : "" \
+                                                            ,((flags) & AT_DOSPATH) && ((flags) & (AT_ALTPATH|AT_READLINK_REQSIZE)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
 #define __NR64ATRF0_detach                 "%" PRIdSIZ
 #define __NR64ATRA0_detach(pid)            ,(intptr_t)(pid)
 #define __NR64ATRF0_readf                  "%d"

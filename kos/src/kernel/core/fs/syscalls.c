@@ -30,6 +30,7 @@
 #include <dev/ttybase.h>
 #include <fs/file.h>
 #include <fs/node.h>
+#include <fs/ramfs.h>
 #include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
@@ -2513,14 +2514,42 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 	TRY {
 		switch (hnd.h_type) {
 
-		case HANDLE_TYPE_FILE:
-		case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
-			struct file *fp;
-			fp     = (struct file *)hnd.h_data;
+		case HANDLE_TYPE_CHARACTERDEVICE:
+		case HANDLE_TYPE_BLOCKDEVICE: {
+			/* Figure out where (if at all) devfs is mounted. */
+			REF struct path *mount;
+			char const *devname;
+			if (hnd.h_type == HANDLE_TYPE_CHARACTERDEVICE) {
+				struct character_device *me;
+				me      = (struct character_device *)hnd.h_data;
+				devname = me->cd_name;
+			} else {
+				struct block_device *me;
+				me      = (struct block_device *)hnd.h_data;
+				devname = me->bd_name;
+			}
+			mount = superblock_getmountloc(&devfs, THIS_VFS);
+			if unlikely(!mount)
+				goto bad_handle_type; /* devfs isn't mounted... */
+			FINALLY_DECREF_UNLIKELY(mount);
 			result = path_sprintentex(buf,
 			                          buflen,
-			                          fp->f_path,
-			                          fp->f_dirent,
+			                          mount,
+			                          devname,
+			                          strlen(devname),
+			                          print_mode,
+			                          root);
+		}	break;
+
+		case HANDLE_TYPE_FILE:
+		case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
+			struct file *me;
+			me     = (struct file *)hnd.h_data;
+			result = path_sprintentex(buf,
+			                          buflen,
+			                          me->f_path,
+			                          me->f_dirent->de_name,
+			                          me->f_dirent->de_namelen,
 			                          print_mode,
 			                          root);
 		}	break;
@@ -2535,9 +2564,11 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 
 		case HANDLE_TYPE_FS: {
 			REF struct path *pwd;
-			sync_read(&((struct fs *)hnd.h_data)->f_pathlock);
-			pwd = incref(((struct fs *)hnd.h_data)->f_cwd);
-			sync_endread(&((struct fs *)hnd.h_data)->f_pathlock);
+			struct fs *me;
+			me = (struct fs *)hnd.h_data;
+			sync_read(&me->f_pathlock);
+			pwd = incref(me->f_cwd);
+			sync_endread(&me->f_pathlock);
 			{
 				FINALLY_DECREF_UNLIKELY(pwd);
 				result = path_sprintex(buf,
@@ -2549,6 +2580,7 @@ DEFINE_SYSCALL4(ssize_t, frealpath4,
 		}	break;
 
 		default:
+bad_handle_type:
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      (unsigned int)fd, /* Filled in by the caller */
 			      HANDLE_TYPE_PATH,
@@ -2627,7 +2659,8 @@ DEFINE_SYSCALL5(ssize_t, frealpathat,
 			result = path_sprintentex(buf,
 			                          buflen,
 			                          containing_path,
-			                          containing_dentry,
+			                          containing_dentry->de_name,
+			                          containing_dentry->de_namelen,
 			                          print_mode,
 			                          root);
 		}
@@ -3326,7 +3359,11 @@ kernel_do_execveat(struct icpustate *__restrict state,
 		/* Trigger an EXEC debug trap. */
 		char *buf, *dst;
 		size_t reglen;
-		reglen = (size_t)path_printent(containing_path, containing_dentry, &format_length, NULL);
+		reglen = (size_t)path_printent(containing_path,
+		                               containing_dentry->de_name,
+		                               containing_dentry->de_namelen,
+		                               &format_length,
+		                               NULL);
 		/* Allocate the register buffer beforehand, so this
 		 * allocation failing can still be handled by user-space.
 		 * NOTE: We always allocate this buffer on the heap, since file paths can get quite long,
@@ -3336,7 +3373,15 @@ kernel_do_execveat(struct icpustate *__restrict state,
 		buf = (char *)kmalloc((reglen + 1) * sizeof(char), GFP_NORMAL);
 		TRY {
 			dst = buf;
-			path_printent(containing_path, containing_dentry, &format_sprintf_printer, &dst);
+			/* FIXME: If the process uses chroot() between this and the previous
+			 *        printent() call, then we may write past the end of the buffer!
+			 * Solution: Use `path_printentex()' and pass the same pre-loaded root-path
+			 *           during every invocation! */
+			path_printent(containing_path,
+			              containing_dentry->de_name,
+			              containing_dentry->de_namelen,
+			              &format_sprintf_printer,
+			              &dst);
 			*dst = '\0';
 			assert(dst == buf + reglen);
 			*dst = 0;

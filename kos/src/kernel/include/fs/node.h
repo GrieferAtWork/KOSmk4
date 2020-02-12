@@ -2090,6 +2090,14 @@ superblock_statfs(struct superblock *__restrict self,
                   USER CHECKED struct statfs *result)
 		THROWS(E_IOERROR, E_SEGFAULT, ...);
 
+struct path;
+struct vfs;
+
+/* Figure out where a given filesystem is mounted with a given namespace. */
+FUNDEF WUNUSED NONNULL((1)) REF struct path *KCALL
+superblock_getmountloc(struct superblock *__restrict self,
+                       struct vfs const *__restrict ns)
+		THROWS(E_WOULDBLOCK);
 
 
 struct filesystem_types {

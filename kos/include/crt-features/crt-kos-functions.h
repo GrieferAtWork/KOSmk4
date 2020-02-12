@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc55f3c2 */
+/* HASH CRC-32:0x39714229 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -866,9 +866,9 @@ __CRT_FUNCTION(fread,0,(),4,(void *__restrict,buf,size_t,elemsize,size_t,elemcou
 __CRT_FUNCTION(fread_s,0,(),5,(void *__restrict,buf,size_t,bufsize,size_t,elemsize,size_t,elemcount,FILE *__restrict,stream),size_t)
 __CRT_FUNCTION(fread_unlocked,0,(),4,(void *__restrict,buf,size_t,elemsize,size_t,elemcount,FILE *__restrict,stream),size_t)
 __CRT_FUNCTION(freadlinkat,0,(),5,(fd_t,dfd,char const *__restrict,path,char *__restrict,buf,size_t,buflen,atflag_t,flags),ssize_t)
-__CRT_FUNCTION(frealpath,0,(),3,(fd_t,fd,char *,resolved,size_t,bufsize),char *)
-__CRT_FUNCTION(frealpath4,0,(),4,(fd_t,fd,char *,resolved,size_t,bufsize,atflag_t,flags),char *)
-__CRT_FUNCTION(frealpathat,0,(),5,(fd_t,dirfd,char const *,filename,char *,resolved,size_t,bufsize,atflag_t,flags),char *)
+__CRT_FUNCTION(frealpath,0,(),3,(fd_t,fd,char *,resolved,size_t,buflen),char *)
+__CRT_FUNCTION(frealpath4,0,(),4,(fd_t,fd,char *,resolved,size_t,buflen,atflag_t,flags),char *)
+__CRT_FUNCTION(frealpathat,0,(),5,(fd_t,dirfd,char const *,filename,char *,resolved,size_t,buflen,atflag_t,flags),char *)
 __CRT_FUNCTION(free,0,(),1,(void *,mallptr),void)
 __CRT_FUNCTION(freeaddrinfo,0,(),1,(struct addrinfo *,ai),void)
 __CRT_FUNCTION(freeifaddrs,0,(),1,(struct ifaddrs *,ifa),void)
@@ -1055,7 +1055,7 @@ __CRT_FUNCTION(getdomainname,0,(),2,(char *,name,size_t,buflen),int)
 __CRT_FUNCTION(getdtablesize,0,(),0,(),int)
 __CRT_FUNCTION(getegid,0,(),0,(),gid_t)
 __CRT_FUNCTION(getenv,0,(),1,(char const *,varname),char *)
-__CRT_FUNCTION(getenv_s,0,(),4,(size_t *,psize,char *,buf,rsize_t,bufsize,char const *,varname),errno_t)
+__CRT_FUNCTION(getenv_s,0,(),4,(size_t *,psize,char *,buf,rsize_t,buflen,char const *,varname),errno_t)
 __CRT_FUNCTION(geteuid,0,(),0,(),uid_t)
 __CRT_FUNCTION(getgid,0,(),0,(),gid_t)
 __CRT_FUNCTION(getgrent,0,(),0,(),struct group *)

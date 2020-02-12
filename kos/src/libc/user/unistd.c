@@ -630,80 +630,94 @@ NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
                                      size_t buflen)
 /*[[[body:ttyname_r]]]*/
 {
-	struct stat64 st;
-	struct dirent *d;
-	DIR *dirstream;
-	int safe;
-	dev_t rdev;
-	ino_t ino;
-	if unlikely(buflen < (COMPILER_STRLEN(devpath) + 1) * sizeof(char)) {
-		libc_seterrno(ERANGE);
-		return ERANGE;
-	}
 	if unlikely(!libc_isatty(fd)) {
 		libc_seterrno(ENOTTY);
 		return ENOTTY;
 	}
-	/* TODO: All of the following isn't really necessary.
-	 *       Instead, we could simply do `readlink("/prov/self/fd/%d" % fd)',
-	 *       since that path would be the path of the given tty.
-	 *       That is: once that portion of procfs has been implemented. */
-	if unlikely(fstat64(fd, &st) < 0)
-		return libc_geterrno();
-	if ((dirstream = opendir(devpath)) == NULL)
-		return libc_geterrno();
-	memcpy(buf, devpath, COMPILER_STRLEN(devpath), sizeof(char));
-	buf[COMPILER_STRLEN(devpath)] = '/';
-	buflen -= (COMPILER_STRLEN(devpath) + 1) * sizeof(char);
-	safe = libc_geterrno();
-	rdev = st.st_dev;
-	ino  = st.st_ino;
-	while ((d = readdir(dirstream)) != NULL) {
-		size_t needed;
-		/* We need a character device. */
-		if (d->d_type != DT_CHR)
-			continue;
-		if (d->d_ino != ino)
-			continue;
-#if 0 /* These are symlinks (DT_LNK), so we've already skipped them ;) */
-		{
-			PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stdin")  char const str_stdin[] = "stdin";
-			PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stdout") char const str_stdout[] = "stdout";
-			PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stderr") char const str_stderr[] = "stderr";
-			/* Ignore the /dev/std(in|out|err) aliases */
-			if (strcmp(d->d_name, str_stdin) == 0)
-				continue;
-			if (strcmp(d->d_name, str_stdout) == 0)
-				continue;
-			if (strcmp(d->d_name, str_stderr) == 0)
-				continue;
-		}
-#endif
-		needed = _D_EXACT_NAMLEN(d) + 1;
-		if (needed > buflen) {
-			closedir(dirstream);
+	/* Simply try to realpath() the given `fd' */
+	{
+		ssize_t reqlen;
+		reqlen = sys_frealpath4(fd, buf, buflen, AT_READLINK_REQSIZE);
+		if unlikely(E_ISERR(reqlen))
+			goto fallback; /* Shouldn't happen... */
+		/* Check if the buffer was large enough */
+		if unlikely((size_t)reqlen > buflen) {
 			libc_seterrno(ERANGE);
 			return ERANGE;
 		}
-		memcpy(&buf[sizeof(devpath)],
-		       d->d_name,
-		       needed + 1,
-		       sizeof(char));
-		if (stat64(buf, &st) != 0)
-			continue;
-		if (st.st_rdev != rdev)
-			continue;
-		if unlikely(st.st_ino != ino)
-			continue;
-		if unlikely(!S_ISCHR(st.st_mode))
-			continue;
 		/* Found it! */
-		closedir(dirstream);
-		libc_seterrno(safe);
 		return 0;
 	}
-	closedir(dirstream);
-	libc_seterrno(safe);
+	/* Fallback: Search `/dev' for the proper file */
+fallback:
+	{
+		struct stat64 st;
+		struct dirent *d;
+		DIR *dirstream;
+		int safe;
+		dev_t rdev;
+		ino_t ino;
+		if unlikely(buflen < (COMPILER_STRLEN(devpath) + 1) * sizeof(char)) {
+			libc_seterrno(ERANGE);
+			return ERANGE;
+		}
+		if unlikely(fstat64(fd, &st) < 0)
+			return libc_geterrno();
+		if ((dirstream = opendir(devpath)) == NULL)
+			return libc_geterrno();
+		memcpy(buf, devpath, COMPILER_STRLEN(devpath), sizeof(char));
+		buf[COMPILER_STRLEN(devpath)] = '/';
+		buflen -= (COMPILER_STRLEN(devpath) + 1) * sizeof(char);
+		safe = libc_geterrno();
+		rdev = st.st_dev;
+		ino  = st.st_ino;
+		while ((d = readdir(dirstream)) != NULL) {
+			size_t needed;
+			/* We need a character device. */
+			if (d->d_type != DT_CHR)
+				continue;
+			if (d->d_ino != ino)
+				continue;
+#if 0 /* These are symlinks (DT_LNK), so we've already skipped them ;) */
+			{
+				PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stdin")  char const str_stdin[] = "stdin";
+				PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stdout") char const str_stdout[] = "stdout";
+				PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stderr") char const str_stderr[] = "stderr";
+				/* Ignore the /dev/std(in|out|err) aliases */
+				if (strcmp(d->d_name, str_stdin) == 0)
+					continue;
+				if (strcmp(d->d_name, str_stdout) == 0)
+					continue;
+				if (strcmp(d->d_name, str_stderr) == 0)
+					continue;
+			}
+#endif
+			needed = _D_EXACT_NAMLEN(d);
+			if (needed >= buflen) {
+				closedir(dirstream);
+				libc_seterrno(ERANGE);
+				return ERANGE;
+			}
+			memcpy(&buf[sizeof(devpath)],
+			       d->d_name,
+			       needed + 1,
+			       sizeof(char));
+			if (stat64(buf, &st) != 0)
+				continue;
+			if (st.st_rdev != rdev)
+				continue;
+			if unlikely(st.st_ino != ino)
+				continue;
+			if unlikely(!S_ISCHR(st.st_mode))
+				continue;
+			/* Found it! */
+			closedir(dirstream);
+			libc_seterrno(safe);
+			return 0;
+		}
+		closedir(dirstream);
+		libc_seterrno(safe);
+	}
 	return ENOTTY;
 }
 /*[[[end:ttyname_r]]]*/

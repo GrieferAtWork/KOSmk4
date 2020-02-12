@@ -309,24 +309,25 @@ path_print(struct path *__restrict self,
 
 /* Print the location of a given path+entry.
  * @param: mode: Set of `PATH_PRINT_MODE_DOSPATH|PATH_PRINT_MODE_EXCDRIVE' */
-FUNDEF NONNULL((1, 2, 3)) ssize_t KCALL
+FUNDEF NONNULL((1, 4)) ssize_t KCALL
 path_printentex(struct path *__restrict self,
-                struct directory_entry *__restrict dentry,
+                USER CHECKED char const *dentry_name, u16 dentry_namelen,
                 __pformatprinter printer, void *arg,
                 unsigned int mode,
                 struct path *__restrict root);
 /* Same as path_printentex(), using the current FS-mode & root. */
-FUNDEF NONNULL((1, 2, 3)) ssize_t KCALL
+FUNDEF NONNULL((1, 4)) ssize_t KCALL
 path_printent(struct path *__restrict self,
-              struct directory_entry *__restrict dentry,
+              USER CHECKED char const *dentry_name, u16 dentry_namelen,
               __pformatprinter printer, void *arg);
+
 
 
 
 /* Helper functions for printing a path into a user-space buffer.
  * @return: * : The required buffer size (including a trailing NUL-character) */
-FUNDEF NONNULL((3, 4, 6)) size_t KCALL path_sprintentex(USER CHECKED char *buffer, size_t buflen, struct path *__restrict self, struct directory_entry *__restrict dentry, unsigned int mode, struct path *__restrict root) THROWS(E_SEGFAULT);
-FUNDEF NONNULL((3, 4)) size_t KCALL path_sprintent(USER CHECKED char *buffer, size_t buflen, struct path *__restrict self, struct directory_entry *__restrict dentry) THROWS(E_SEGFAULT);
+FUNDEF NONNULL((3, 7)) size_t KCALL path_sprintentex(USER CHECKED char *buffer, size_t buflen, struct path *__restrict self, USER CHECKED char const *dentry_name, u16 dentry_namelen, unsigned int mode, struct path *__restrict root) THROWS(E_SEGFAULT);
+FUNDEF NONNULL((3)) size_t KCALL path_sprintent(USER CHECKED char *buffer, size_t buflen, struct path *__restrict self, USER CHECKED char const *dentry_name, u16 dentry_namelen) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((3, 5)) size_t KCALL path_sprintex(USER CHECKED char *buffer, size_t buflen, struct path *__restrict self, unsigned int mode, struct path *__restrict root) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((3)) size_t KCALL path_sprint(USER CHECKED char *buffer, size_t buflen, struct path *__restrict self) THROWS(E_SEGFAULT);
 

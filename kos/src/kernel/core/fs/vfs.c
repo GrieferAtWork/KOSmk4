@@ -231,9 +231,9 @@ DEFINE_HANDLE_REFCNT_FUNCTIONS(fs, struct fs)
 
 /* Print the location of a given path+entry.
  * @param: mode: Set of `PATH_PRINT_MODE_DOSPATH|PATH_PRINT_MODE_EXCDRIVE' */
-PUBLIC NONNULL((1, 2, 3)) ssize_t KCALL
+PUBLIC NONNULL((1, 4)) ssize_t KCALL
 path_printentex(struct path *__restrict self,
-                struct directory_entry *__restrict dentry,
+                USER CHECKED char const *dentry_name, u16 dentry_namelen,
                 pformatprinter printer, void *arg,
                 unsigned int mode,
                 struct path *__restrict root) {
@@ -245,8 +245,8 @@ path_printentex(struct path *__restrict self,
 	if likely(result >= 0) {
 		/* Print the name of the associated directory entry. */
 		temp = (*printer)(arg,
-		                  dentry->de_name,
-		                  dentry->de_namelen);
+		                  dentry_name,
+		                  dentry_namelen);
 		if unlikely(temp < 0)
 			goto err_temp;
 		result += temp;
@@ -257,9 +257,9 @@ err_temp:
 }
 
 /* Same as path_printentex(), using the current FS-mode & root. */
-PUBLIC NONNULL((1, 2, 3)) ssize_t KCALL
+PUBLIC NONNULL((1, 4)) ssize_t KCALL
 path_printent(struct path *__restrict self,
-              struct directory_entry *__restrict dentry,
+              USER CHECKED char const *dentry_name, u16 dentry_namelen,
               pformatprinter printer, void *arg) {
 	ssize_t result;
 	struct fs *f = THIS_FS;
@@ -277,7 +277,8 @@ path_printent(struct path *__restrict self,
 #endif
 	TRY {
 		result = path_printentex(self,
-		                         dentry,
+		                         dentry_name,
+		                         dentry_namelen,
 		                         printer,
 		                         arg,
 		                         mode,
@@ -395,17 +396,17 @@ err:
 
 
 /* Helper functions for printing a path into a user-space buffer. */
-PUBLIC NONNULL((3, 4, 6)) size_t KCALL
+PUBLIC NONNULL((3, 7)) size_t KCALL
 path_sprintentex(USER CHECKED char *buffer, size_t buflen,
                  struct path *__restrict self,
-                 struct directory_entry *__restrict dentry,
+                 USER CHECKED char const *dentry_name, u16 dentry_namelen,
                  unsigned int mode, struct path *__restrict root)
 		THROWS(E_SEGFAULT) {
 	size_t result;
 	struct format_snprintf_data data;
 	format_snprintf_init(&data, buffer, buflen);
 	result = (size_t)path_printentex(self,
-	                                 dentry,
+	                                 dentry_name, dentry_namelen,
 	                                 &format_snprintf_printer,
 	                                 &data,
 	                                 mode,
@@ -416,16 +417,16 @@ path_sprintentex(USER CHECKED char *buffer, size_t buflen,
 	return result;
 }
 
-PUBLIC NONNULL((3, 4)) size_t KCALL
+PUBLIC NONNULL((3)) size_t KCALL
 path_sprintent(USER CHECKED char *buffer, size_t buflen,
                struct path *__restrict self,
-               struct directory_entry *__restrict dentry)
+               USER CHECKED char const *dentry_name, u16 dentry_namelen)
 		THROWS(E_SEGFAULT) {
 	size_t result;
 	struct format_snprintf_data data;
 	format_snprintf_init(&data, buffer, buflen);
 	result = (size_t)path_printent(self,
-	                               dentry,
+	                               dentry_name, dentry_namelen,
 	                               &format_snprintf_printer,
 	                               &data);
 	if (result < buflen)

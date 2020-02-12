@@ -2633,7 +2633,8 @@ again_print_ent:
 		reqlen = path_sprintentex(buf,
 		                          buflen,
 		                          pth,
-		                          dent,
+		                          dent->de_name,
+		                          dent->de_namelen,
 		                          FS_MODE_FNORMAL,
 		                          &vfs_kernel);
 		buf = (char *)krealloc(buf, (reqlen + 1) * sizeof(char),

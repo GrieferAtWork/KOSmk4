@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6230fd7 */
+/* HASH CRC-32:0xef0e84c3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -531,7 +531,7 @@ __CDECLARE_SC(,__ssize_t,freadlinkat,(__fd_t __dirfd, char const *__path, char *
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
  * the required buffer size, rather than the used size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-__CDECLARE_SC(,__ssize_t,frealpath4,(__fd_t __fd, char *__buf, __size_t __buflen, __atflag_t __flags),(__fd,__buf,__buflen,__flags))
+__CDECLARE_SC(,__ssize_t,frealpath4,(__fd_t __fd, char *__resolved, __size_t __buflen, __atflag_t __flags),(__fd,__resolved,__buflen,__flags))
 #endif /* __CRT_HAVE_SC(frealpath4) */
 #if __CRT_HAVE_SC(frealpathat)
 /* Returns the absolute filesystem path for the specified file
@@ -2219,7 +2219,7 @@ __CDECLARE_XSC(,__ssize_t,freadlinkat,(__fd_t __dirfd, char const *__path, char 
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
  * the required buffer size, rather than the used size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-__CDECLARE_XSC(,__ssize_t,frealpath4,(__fd_t __fd, char *__buf, __size_t __buflen, __atflag_t __flags),(__fd,__buf,__buflen,__flags))
+__CDECLARE_XSC(,__ssize_t,frealpath4,(__fd_t __fd, char *__resolved, __size_t __buflen, __atflag_t __flags),(__fd,__resolved,__buflen,__flags))
 #endif /* __CRT_HAVE_XSC(frealpath4) */
 #if __CRT_HAVE_XSC(frealpathat)
 /* Returns the absolute filesystem path for the specified file

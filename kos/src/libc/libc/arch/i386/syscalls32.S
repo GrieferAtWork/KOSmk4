@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4fb6364 */
+/* HASH CRC-32:0x2eb4efde */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8067,7 +8067,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfrealpathat, libc_sys_Xfrealpathat)
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
  * the required buffer size, rather than the used size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
 .section .text.crt.syscall.frealpath4
 INTERN_FUNCTION(libc_sys_frealpath4)
 	movl   $(0xfffffff9), %eax
@@ -8078,7 +8078,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_frealpath4, libc_sys_frealpath4)
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
  * the required buffer size, rather than the used size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
 .section .text.crt.syscall.Xfrealpath4
 INTERN_FUNCTION(libc_sys_Xfrealpath4)
 	movl   $(0xfffffff9), %eax

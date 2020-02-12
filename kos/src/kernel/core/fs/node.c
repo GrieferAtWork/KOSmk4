@@ -4145,6 +4145,28 @@ superblock_statfs(struct superblock *__restrict self,
 }
 
 
+/* Figure out where a given filesystem is mounted with a given namespace. */
+PUBLIC WUNUSED NONNULL((1)) REF struct path *KCALL
+superblock_getmountloc(struct superblock *__restrict self,
+                       struct vfs const *__restrict ns)
+		THROWS(E_WOULDBLOCK) {
+	REF struct path *result;
+	superblock_mountlock_read(self);
+	result = self->s_mount;
+	while (result) {
+		if (result->p_vfs == ns) {
+			/* Got it! */
+			incref(result);
+			break;
+		}
+		assert(result->p_mount);
+		result = result->p_mount->mp_fsmount.ln_next;
+	}
+	superblock_mountlock_endread(self);
+	return result;
+}
+
+
 
 
 

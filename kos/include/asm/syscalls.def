@@ -1560,7 +1560,7 @@ epoll_ctl_old:(fd_t epfd, [tostr(select(EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_
 @@You may pass `AT_READLINK_REQSIZE' to always have the function return
 @@the required buffer size, rather than the used size.
 @@@param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH'
-[cp] frealpath4:(fd_t fd, char *buf, size_t buflen,
+[cp] frealpath4:(fd_t fd, char *resolved, size_t buflen,
                  [tostr(flagset(AT_ALTPATH, AT_READLINK_REQSIZE, AT_DOSPATH))] atflag_t flags) -> ssize_t;
 
 @@Returns the absolute filesystem path for the specified file

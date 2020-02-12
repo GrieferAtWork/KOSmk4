@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25336a91 */
+/* HASH CRC-32:0x8ef9c054 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -623,7 +623,7 @@
 /* You may pass `AT_READLINK_REQSIZE' to always have the function return
  * the required buffer size, rather than the used size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-#define __NR64_frealpath4             __UINT64_C(0xfffffffffffffff6) /* ssize_t frealpath4(fd_t fd, char *buf, size_t buflen, atflag_t flags) */
+#define __NR64_frealpath4             __UINT64_C(0xfffffffffffffff6) /* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
 /* Returns a bitset of all of the currently mounted dos-drives */
 #define __NR64_getdrives              __UINT64_C(0xfffffffffffffff7) /* syscall_slong_t getdrives(void) */
 /* >> detach(2)

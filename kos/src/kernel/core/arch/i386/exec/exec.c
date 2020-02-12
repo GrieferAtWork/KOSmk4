@@ -139,7 +139,8 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 		reqlen = path_sprintent((USER char *)user_state_sp - buflen,
 		                        buflen,
 		                        exec_path,
-		                        exec_dentry);
+		                        exec_dentry->de_name,
+		                        exec_dentry->de_namelen);
 		if (reqlen <= buflen)
 			break;
 		buflen = (reqlen + 7) & ~7;
@@ -254,7 +255,8 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 		reqlen = path_sprintent((USER char *)user_state_sp - buflen,
 		                        buflen,
 		                        exec_path,
-		                        exec_dentry);
+		                        exec_dentry->de_name,
+		                        exec_dentry->de_namelen);
 		if (reqlen <= buflen)
 			break;
 		buflen = (reqlen + 3) & ~3;
