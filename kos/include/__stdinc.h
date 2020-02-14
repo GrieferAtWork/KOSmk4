@@ -426,6 +426,21 @@
 #else /* __NO_EXTERNINLINE */
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) extern attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname)); __EXTERNINLINE attr Treturn nothrow(cc name) param __VA_ARGS__
 #endif /* !__NO_EXTERNINLINE */
+#elif defined(__PRAGMA_REDEFINE_EXTNAME)
+/* Use _Pragma("redefine_extname " #name " " #asmname). */
+#define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       __pragma(redefine_extname name asmname) decl attr Treturn nothrow(cc name) param;
+#define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          __pragma(redefine_extname name asmname) decl attr void nothrow(cc name) param;
+#define __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    __pragma(redefine_extname name asmname) decl attr Treturn nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...);
+#define __COMPILER_VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       __pragma(redefine_extname name asmname) decl attr void nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...);
+#define __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __pragma(redefine_extname name asmnamef) decl attr Treturn nothrow(cc name) paramf;
+#define __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    __pragma(redefine_extname name asmnamef) decl attr void nothrow(cc name) paramf;
+#define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      __pragma(redefine_extname name asmname) decl attr Treturn nothrow(cc name) param;
+#define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __pragma(redefine_extname name asmname) decl attr void nothrow(cc name) param;
+#ifdef __NO_EXTERNINLINE
+#define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__
+#else /* __NO_EXTERNINLINE */
+#define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __pragma(redefine_extname name asmname) __EXTERNINLINE attr Treturn nothrow(cc name) param __VA_ARGS__
+#endif /* !__NO_EXTERNINLINE */
 #else
 
 #define __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __LOCAL attr Treturn nothrow(cc name) param __VA_ARGS__

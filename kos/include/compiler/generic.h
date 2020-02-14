@@ -650,9 +650,8 @@
 #define __NO_DEFINE_ALIAS 1
 
 #if defined(__INTELLISENSE__)
-#elif defined(__TPP_VERSION__)
-#define __PRIVATE_PRAGMA(...) _Pragma(#__VA_ARGS__)
-#define __pragma(...) __PRIVATE_PRAGMA(__VA_ARGS__)
+#elif defined(__TPP_VERSION__) || defined(__STDC__)
+#define __pragma(...) _Pragma(#__VA_ARGS__)
 #else
 #define __NO_pragma   1
 #define __pragma(...) /* Nothing */

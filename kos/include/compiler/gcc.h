@@ -584,8 +584,7 @@
 #define __COMPILER_IMPURE() __asm__("")
 
 #ifdef __INTELLISENSE_GCC__
-#define __PRIVATE_PRAGMA(...)   _Pragma(#__VA_ARGS__)
-#define __pragma(...) __PRIVATE_PRAGMA(__VA_ARGS__)
+#define __pragma(...) _Pragma(#__VA_ARGS__)
 #define __XBLOCK                /* nothing */
 #define __XRETURN               /* nothing */
 #define __builtin_assume_has_sideeffects 1
@@ -597,11 +596,10 @@
 #define __builtin_assume(x)     __assume(x)
 #else
 #if __GCC_VERSION_NUM >= 40400 || defined(__TPP_VERSION__)
-#define __PRIVATE_PRAGMA(...)   _Pragma(#__VA_ARGS__)
-#define __pragma(...)           __PRIVATE_PRAGMA(__VA_ARGS__)
+#define __pragma(...) _Pragma(#__VA_ARGS__)
 #else
-#define __NO_pragma             1
-#define __pragma(...)           /* Nothing */
+#define __NO_pragma   1
+#define __pragma(...) /* Nothing */
 #endif
 #define __XBLOCK                __extension__
 #define __XRETURN               /* Nothing */
