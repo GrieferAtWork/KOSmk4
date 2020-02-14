@@ -4042,11 +4042,6 @@ function enumerateFormatRequireFunctionDependencies(text: string): {string...} {
 	}
 }
 
-function format_define_require_string_comment(fp: File, text: string) {
-	/* TODO: Special variant */
-	format_define_require_string(fp, text);
-}
-
 
 
 class Function {
@@ -7891,8 +7886,8 @@ continue_strip_body:
 			newbody = newbody[1:-1];
 		for (local c: " .,;(){}[]")
 			newbody = newbody.replace(" " + c, c).replace(c + " ", c);
-		if (newbody.startswith("/* TODO */")) {
-			body = newbody[#"/* TODO */":];
+		if (newbody.startswith("/* TO" "DO */")) {
+			body = newbody[#"/* TO" "DO */":];
 			continue;
 		}
 		if (newbody.startswith("(void)")) {

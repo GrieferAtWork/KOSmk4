@@ -25,18 +25,18 @@
 
 __DECL_BEGIN
 
-#define __hybrid_rol8_c(x,shift)   (((x)>>(0x8-((shift)&0x07)))|((x)<<((shift)&0x07)))
-#define __hybrid_ror8_c(x,shift)   (((x)<<(0x8-((shift)&0x07)))|((x)>>((shift)&0x07)))
-#define __hybrid_rol16_c(x,shift)  (((x)>>(0x10-((shift)&0x0f)))|((x)<<((shift)&0x0f)))
-#define __hybrid_ror16_c(x,shift)  (((x)<<(0x10-((shift)&0x0f)))|((x)>>((shift)&0x0f)))
-#define __hybrid_rol32_c(x,shift)  (((x)>>(0x20-((shift)&0x1f)))|((x)<<((shift)&0x1f)))
-#define __hybrid_ror32_c(x,shift)  (((x)<<(0x20-((shift)&0x1f)))|((x)>>((shift)&0x1f)))
+#define __hybrid_rol8_c(x, shift)  (((x) >> (0x8 - ((shift)&0x07))) | ((x) << ((shift)&0x07)))
+#define __hybrid_ror8_c(x, shift)  (((x) << (0x8 - ((shift)&0x07))) | ((x) >> ((shift)&0x07)))
+#define __hybrid_rol16_c(x, shift) (((x) >> (0x10 - ((shift)&0x0f))) | ((x) << ((shift)&0x0f)))
+#define __hybrid_ror16_c(x, shift) (((x) << (0x10 - ((shift)&0x0f))) | ((x) >> ((shift)&0x0f)))
+#define __hybrid_rol32_c(x, shift) (((x) >> (0x20 - ((shift)&0x1f))) | ((x) << ((shift)&0x1f)))
+#define __hybrid_ror32_c(x, shift) (((x) << (0x20 - ((shift)&0x1f))) | ((x) >> ((shift)&0x1f)))
 #ifdef __UINT64_TYPE__
-#define __hybrid_rol64_c(x,shift)  (((x)>>(0x40-((shift)&0x3f)))|((x)<<((shift)&0x3f)))
-#define __hybrid_ror64_c(x,shift)  (((x)<<(0x40-((shift)&0x3f)))|((x)>>((shift)&0x3f)))
+#define __hybrid_rol64_c(x, shift) (((x) >> (0x40 - ((shift)&0x3f))) | ((x) << ((shift)&0x3f)))
+#define __hybrid_ror64_c(x, shift) (((x) << (0x40 - ((shift)&0x3f))) | ((x) >> ((shift)&0x3f)))
 #ifdef __UINT128_TYPE__
-#define __hybrid_rol128_c(x,shift) (((x)>>(0x80-((shift)&0x7f)))|((x)<<((shift)&0x7f)))
-#define __hybrid_ror128_c(x,shift) (((x)<<(0x80-((shift)&0x7f)))|((x)>>((shift)&0x7f)))
+#define __hybrid_rol128_c(x, shift) (((x) >> (0x80 - ((shift)&0x7f))) | ((x) << ((shift)&0x7f)))
+#define __hybrid_ror128_c(x, shift) (((x) << (0x80 - ((shift)&0x7f))) | ((x) >> ((shift)&0x7f)))
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 

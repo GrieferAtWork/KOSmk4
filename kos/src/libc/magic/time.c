@@ -865,7 +865,7 @@ stime:([nonnull] $time_t const *when) -> int {
 @@endif_has_function(stime32)@@
 }
 
-@@Like `mktime', but for TP represents Universal Time, not local time
+@@Like `mktime', but TP represents Universal Time (UTC), not local time
 [if(defined(__USE_TIME_BITS64)), preferred_alias(timegm64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(timegm)]
 [ATTR_WUNUSED][ATTR_PURE][dependency_prefix(DEFINE_STRUCT_TM)][libc_impl({

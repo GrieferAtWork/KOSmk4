@@ -42,7 +42,7 @@
 #define __HYBRID_GETTID_PRINTF_FMT      "%p"
 #define __HYBRID_GETTID_PRINTF_ARG(x)   x
 #ifdef __CC__
-#define __hybrid_gettid()          THIS_TASK
+#define __hybrid_gettid() THIS_TASK
 __DECL_BEGIN
 typedef struct task *__hybrid_tid_t;
 __DECL_END
@@ -68,8 +68,8 @@ __DECL_END
 #endif /* __CC__ */
 
 #define __HYBRID_SIZEOF_TID__           __SIZEOF_POINTER__
-#define __HYBRID_GETTID_PRINTF_FMT     "%p"
-#define __HYBRID_GETTID_PRINTF_ARG(x)  (void *)(x)
+#define __HYBRID_GETTID_PRINTF_FMT      "%p"
+#define __HYBRID_GETTID_PRINTF_ARG(x)   (void *)(x)
 #define __HYBRID_GETTID_INVALID_IS_ZERO 1
 #define __HYBRID_GETTID_INVALID         0
 
@@ -110,8 +110,8 @@ __DECL_END
 #define __HYBRID_SIZEOF_TID__           4
 #define __HYBRID_GETTID_INVALID_IS_ZERO 1
 #define __HYBRID_GETTID_INVALID         0
-#define __HYBRID_GETTID_PRINTF_FMT     "%u"
-#define __HYBRID_GETTID_PRINTF_ARG(x)  (unsigned int)(x)
+#define __HYBRID_GETTID_PRINTF_FMT      "%u"
+#define __HYBRID_GETTID_PRINTF_ARG(x)   (unsigned int)(x)
 
 #ifdef __CC__
 #include <hybrid/typecore.h>
@@ -126,7 +126,7 @@ __DECL_END
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#define __hybrid_gettid()          GetCurrentThreadId()
+#define __hybrid_gettid() GetCurrentThreadId()
 #endif /* __CC__ */
 
 #elif defined(__unix__) || defined(__unix) || defined(unix)
@@ -135,12 +135,12 @@ __DECL_END
 
 #ifdef SYS_gettid
 #ifdef __SIZEOF_PID_T__
-#define __HYBRID_SIZEOF_TID__            __SIZEOF_PID_T__
+#define __HYBRID_SIZEOF_TID__ __SIZEOF_PID_T__
 #elif defined(__SIZEOF_PID_T)
-#define __HYBRID_SIZEOF_TID__            __SIZEOF_PID_T
+#define __HYBRID_SIZEOF_TID__ __SIZEOF_PID_T
 #else
-#define __HYBRID_SIZEOF_TID__            __SIZEOF_POINTER__
-__STATIC_ASSERT_MSG(sizeof(pid_t) == __HYBRID_SIZEOF_TID__,"Please adjust");
+#define __HYBRID_SIZEOF_TID__ __SIZEOF_INT__
+__STATIC_ASSERT_MSG(sizeof(pid_t) == __HYBRID_SIZEOF_TID__, "Please adjust");
 #endif
 #if __HYBRID_SIZEOF_TID__ <= __SIZEOF_INT__
 #define __HYBRID_GETTID_PRINTF_FMT     "%u"
@@ -152,7 +152,7 @@ __STATIC_ASSERT_MSG(sizeof(pid_t) == __HYBRID_SIZEOF_TID__,"Please adjust");
 #ifdef __CC__
 typedef pid_t __hybrid_tid_t;
 #endif /* __CC__ */
-#define __hybrid_gettid()          syscall(SYS_gettid)
+#define __hybrid_gettid() syscall(SYS_gettid)
 #define __HYBRID_GETTID_INVALID_IS_ZERO 1
 #define __HYBRID_GETTID_INVALID         0
 #endif /* !SYS_gettid */
@@ -207,11 +207,11 @@ typedef int __hybrid_tid_t;
 #endif /* !__hybrid_gettid */
 
 #ifndef __hybrid_gettid_equal
-#define __hybrid_gettid_equal(a,b)     ((a) == (b))
+#define __hybrid_gettid_equal(a, b) ((a) == (b))
 #endif /* !__hybrid_gettid_equal */
 
 #ifndef __hybrid_gettid_iscaller
-#define __hybrid_gettid_iscaller(tid)    __hybrid_gettid_equal(__hybrid_gettid(),tid)
+#define __hybrid_gettid_iscaller(tid) __hybrid_gettid_equal(__hybrid_gettid(), tid)
 #endif /* !__hybrid_gettid_iscaller */
 
 

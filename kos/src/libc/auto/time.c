@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x141e724 */
+/* HASH CRC-32:0x71a0cf9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -617,7 +617,7 @@ __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
 #endif /* !__STRUCT_TM */
-/* Like `mktime', but for TP represents Universal Time, not local time */
+/* Like `mktime', but TP represents Universal Time (UTC), not local time */
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.timegm") time_t
 NOTHROW_NCX(LIBCCALL libc_timegm)(__STRUCT_TM *tp) {
@@ -669,7 +669,7 @@ __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
 #endif /* !__STRUCT_TM */
-/* Like `mktime', but for TP represents Universal Time, not local time */
+/* Like `mktime', but TP represents Universal Time (UTC), not local time */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timegm64, libc_timegm);
 #else

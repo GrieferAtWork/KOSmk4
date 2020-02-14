@@ -688,11 +688,10 @@
 #include "stdc-predef.h"
 #endif /* !_STDC_PREDEF_H */
 
-#if 1 /* TODO: Enable this and re-build all utility programs from scratch */
+/* KOS headers are always trying to emulate glibc in some way... */
 #undef __GNU_LIBRARY__
 #define __GNU_LIBRARY__ 6
 #define __GLIBC__       2
 #define __GLIBC_MINOR__ 23
-#endif
 
 #endif /* !_FEATURES_H */

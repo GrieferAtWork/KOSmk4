@@ -48,7 +48,7 @@ typedef __uintptr_t lfutex_t;
  * in conjunction with a call to `poll()' (though note that the `LFUTEX_WAIT_WHILE_CMPXCH()'
  * and `LFUTEX_WAIT_UNTIL_CMPXCH()' operators will possibly modify pointed-to memory in
  * a way that makes repeated polling behave unexpectedly, requiring user-space to take
- * proper case that the behavior will be what is actually intended)
+ * proper care that the behavior will be what is actually intended)
  *
  * Other than this, there exists 2 ways of polling for futex objects
  * in parallel to polling any other type of file descriptor, as well
@@ -68,7 +68,7 @@ typedef __uintptr_t lfutex_t;
  *   TODO: Implement the `kpoll()' system call
  *
  * - Using the regular `poll()' / `select()' family of system calls, after
- *   having created 
+ *   having created a futexfd handle.
  *
  */
 

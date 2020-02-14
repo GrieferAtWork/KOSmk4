@@ -527,10 +527,15 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void);
 /* Hybrid of `pagedir_syncall()' and `pagedir_syncall_user()': When the given range
  * overlaps with kernel-space, behave the same as `pagedir_syncall()', otherwise,
  * behave the same as `pagedir_syncall_user()' */
-FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(VIRT void *virt_addr, size_t num_pages);
+FUNDEF NOBLOCK void
+NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                                PAGEDIR_PAGEALIGNED size_t num_bytes);
 
 /* X86-specific implementation for invalidating every TLB over a given range. */
-FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_sync)(VIRT void *virt_addr, size_t num_pages);
+FUNDEF NOBLOCK void
+NOTHROW(FCALL arch_pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+                                 PAGEDIR_PAGEALIGNED size_t num_bytes)
+		ASMNAME("pagedir_sync");
 
 /* Synchronize mappings within the given address range. */
 FORCELOCAL NOBLOCK void
@@ -559,12 +564,12 @@ NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 			return;
 		}
 		if (num_bytes >= CONFIG_NPAGEDIR_LARGESYNC_THRESHOLD) {
-			x86_pagedir_syncall_maybe_global(addr, num_bytes / 4096);
+			x86_pagedir_syncall_maybe_global(addr, num_bytes);
 			return;
 		}
 	}
 #endif /* !__OMIT_PAGING_CONSTANT_P_WRAPPERS */
-	x86_pagedir_sync(addr, num_bytes / 4096);
+	arch_pagedir_sync(addr, num_bytes);
 }
 #endif /* __CC__ */
 

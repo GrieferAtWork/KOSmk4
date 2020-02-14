@@ -104,7 +104,6 @@ function flattenElfBinary(
 			}
 			local file_readple = is64 ? file_read8le : file_read4le;
 #define OFFSET(x) (is64 ? __OFFSET_ELF64_##x : __OFFSET_ELF32_##x)
-			/* TODO: Support for Elf64_Ehdr */
 			i.seek(OFFSET(EHDR_ENTRY));
 			e_entry = file_readple(i);
 			//i.seek(OFFSET(EHDR_PHOFF));

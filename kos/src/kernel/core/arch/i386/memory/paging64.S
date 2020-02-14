@@ -79,12 +79,11 @@ END(pagedir_syncall)
  * overlaps with kernel-space, behave the same as `pagedir_syncall()', otherwise,
  * behave the same as `pagedir_syncall_user()' */
 /* >> FUNDEF NOBLOCK void
- * >> NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(VIRT vm_virt_t virt_addr,
- * >>                                                 size_t num_pages); */
+ * >> NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+ * >>                                                 PAGEDIR_PAGEALIGNED size_t num_bytes); */
 .section .text
 PUBLIC_FUNCTION(x86_pagedir_syncall_maybe_global)
 	.cfi_startproc
-	shlq   $(12), %rsi
 	addq   %rsi, %rdi
 	jo8    pagedir_syncall /* sync up until, or past the end of the address space. */
 	cmpq   $(0), %rdi
@@ -101,12 +100,15 @@ END(x86_pagedir_syncall_maybe_global)
 
 
 /* X86-specific implementation for invalidating every TLB over a given range. */
-/* FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_sync)(VIRT vm_virt_t virt_addr, size_t num_pages); */
+/* >> FUNDEF NOBLOCK void
+ * >> NOTHROW(FCALL pagedir_sync)(PAGEDIR_PAGEALIGNED VIRT void *addr,
+ * >>                             PAGEDIR_PAGEALIGNED size_t num_bytes); */
 .section .text
-PUBLIC_FUNCTION(x86_pagedir_sync)
+PUBLIC_FUNCTION(pagedir_sync)
 	.cfi_startproc
-	cmpq   $(CONFIG_PAGEDIR_LARGESYNC_THRESHOLD), %rsi
+	cmpq   $(CONFIG_PAGEDIR_LARGESYNC_THRESHOLD * 4096), %rsi
 	jae8   x86_pagedir_syncall_maybe_global
+	shrq   $(12), %rsi
 	testq  %rsi, %rsi
 	jz8    2f
 	movq   %rsi, %rcx
@@ -116,6 +118,6 @@ PUBLIC_FUNCTION(x86_pagedir_sync)
 	loop   1b
 2:	ret
 	.cfi_endproc
-END(x86_pagedir_sync)
+END(pagedir_sync)
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING64_S */

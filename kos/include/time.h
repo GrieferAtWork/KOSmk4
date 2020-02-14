@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e552443 */
+/* HASH CRC-32:0xe71df6cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -733,14 +733,14 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime,(__TM_TYPE(time) const *_
 __NAMESPACE_LOCAL_USING_OR_IMPL(stime, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL stime)(__TM_TYPE(time) const *__when) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stime))(__when); })
 #endif /* stime... */
 #if defined(__CRT_HAVE_timegm64) && defined(__USE_TIME_BITS64)
-/* Like `mktime', but for TP represents Universal Time, not local time */
+/* Like `mktime', but TP represents Universal Time (UTC), not local time */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,timegm,(__STRUCT_TM *__tp),timegm64,(__tp))
 #elif defined(__CRT_HAVE_timegm) && !defined(__USE_TIME_BITS64)
-/* Like `mktime', but for TP represents Universal Time, not local time */
+/* Like `mktime', but TP represents Universal Time (UTC), not local time */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,timegm,(__STRUCT_TM *__tp),(__tp))
 #else /* LIBC: timegm */
 #include <local/time/timegm.h>
-/* Like `mktime', but for TP represents Universal Time, not local time */
+/* Like `mktime', but TP represents Universal Time (UTC), not local time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(timegm, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __TM_TYPE(time) __NOTHROW_NCX(__LIBCCALL timegm)(__STRUCT_TM *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timegm))(__tp); })
 #endif /* timegm... */
 #if defined(__CRT_HAVE_mktime64) && defined(__USE_TIME_BITS64)
@@ -788,14 +788,14 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,stime64,(__time64_t const *__w
 __NAMESPACE_LOCAL_USING_OR_IMPL(stime64, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL stime64)(__time64_t const *__when) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stime64))(__when); })
 #endif /* stime64... */
 #ifdef __CRT_HAVE_timegm64
-/* Like `mktime', but for TP represents Universal Time, not local time */
+/* Like `mktime', but TP represents Universal Time (UTC), not local time */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,timegm64,(__STRUCT_TM *__tp),(__tp))
 #elif defined(__CRT_HAVE_timegm) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* Like `mktime', but for TP represents Universal Time, not local time */
+/* Like `mktime', but TP represents Universal Time (UTC), not local time */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,timegm64,(__STRUCT_TM *__tp),timegm,(__tp))
 #else /* LIBC: timegm64 */
 #include <local/time/timegm64.h>
-/* Like `mktime', but for TP represents Universal Time, not local time */
+/* Like `mktime', but TP represents Universal Time (UTC), not local time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(timegm64, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __time64_t __NOTHROW_NCX(__LIBCCALL timegm64)(__STRUCT_TM *__tp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timegm64))(__tp); })
 #endif /* timegm64... */
 #ifdef __CRT_HAVE_timelocal64

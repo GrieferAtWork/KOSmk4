@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae23d186 */
+/* HASH CRC-32:0xa9cacd92 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __LOCAL_LIBC(_ultow) __ATTR_NONNULL((2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultow))(unsigned long __val,
                                                     __WCHAR_TYPE__ *__buf,
                                                     int __radix) {
-#line 3137 "kos/src/libc/magic/stdlib.c"
+#line 3143 "kos/src/libc/magic/stdlib.c"
 	__localdep__ultow_s(__val, __buf, (__SIZE_TYPE__)-1, __radix);
 	return __buf;
 }

@@ -354,14 +354,14 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 
 	if (!HAVE_INSTR_INVLPG) {
 		if (HAVE_PAGE_GLOBAL_BIT) {
-			/* Must re-write `pagedir_syncone' and `x86_pagedir_sync' to use cr4 for flushing */
+			/* Must re-write `pagedir_syncone' and `arch_pagedir_sync' to use cr4 for flushing */
 			memcpy((void *)&pagedir_syncone, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
-			memcpy((void *)&x86_pagedir_sync, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
+			memcpy((void *)&arch_pagedir_sync, x86_pagedir_syncall_cr4, (size_t)x86_pagedir_syncall_cr4_size);
 		} else {
-			/* Must re-write `pagedir_syncone' and `x86_pagedir_sync'
+			/* Must re-write `pagedir_syncone' and `arch_pagedir_sync'
 			 * to use the cr3-trick for TLB invalidation */
 			memcpy((void *)&pagedir_syncone, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
-			memcpy((void *)&x86_pagedir_sync, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
+			memcpy((void *)&arch_pagedir_sync, x86_pagedir_syncall_cr3, (size_t)x86_pagedir_syncall_cr3_size);
 		}
 	}
 

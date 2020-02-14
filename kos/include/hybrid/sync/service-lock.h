@@ -256,7 +256,7 @@ __again:
 	 * service after having released the lock (in order to ensure interlocked
 	 * semantics in regards to there never being objects left in the service-
 	 * queue while no lock is held, and no thread is about to service them).
-	 * So with this in mind, we only service after releasing the lock. */
+	 * So with this in mind, we _only_ service after releasing the lock. */
 	SERLOCK_LOCK_ENDWRITE();
 	if __unlikely(SERLOCK_MUSTSERVICE()) {
 		if (SERLOCK_LOCK_TRYWRITE()) {

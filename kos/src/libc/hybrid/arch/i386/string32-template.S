@@ -494,10 +494,6 @@ DEFINE_PUBLIC_ALIAS(F(memset),F(libc_memset))
 
 
 
-/* TODO: memmove[b|w|l]()     (movs) */
-/* TODO: memmoveup[b|w|l]()   (movs) */
-/* TODO: memmovedown[b|w|l]() (movs) */
-
 
 #if !RETURN_PCPY
 

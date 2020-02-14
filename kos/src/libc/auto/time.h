@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7646353a */
+/* HASH CRC-32:0x38eec419 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,13 +59,13 @@ INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_ctim
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer);
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer);
-/* Like `mktime', but for TP represents Universal Time, not local time */
+/* Like `mktime', but TP represents Universal Time (UTC), not local time */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) time_t NOTHROW_NCX(LIBCCALL libc_timegm)(__STRUCT_TM *tp);
 /* Another name for `mktime' */
 #define libc_timelocal libc_mktime
 /* Return the number of days in YEAR */
 INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_dysize)(int year);
-/* Like `mktime', but for TP represents Universal Time, not local time */
+/* Like `mktime', but TP represents Universal Time (UTC), not local time */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) time64_t NOTHROW_NCX(LIBCCALL libc_timegm64)(__STRUCT_TM *tp);
 /* Another name for `mktime64' */
 #define libc_timelocal64 libc_mktime64

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78e0e2f2 */
+/* HASH CRC-32:0x96050148 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,30 +18,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_rand_s_defined
-#define __local_rand_s_defined 1
-#include <parts/errno.h>
-/* Dependency: "rand" from "stdlib" */
-#ifndef ____localdep_rand_defined
-#define ____localdep_rand_defined 1
-#ifdef __CRT_HAVE_rand
-__CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),rand,())
-#elif defined(__CRT_HAVE_random) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
-__CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),random,())
-#else /* LIBC: rand */
-#include <local/stdlib/rand.h>
-#define __localdep_rand (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rand))
-#endif /* rand... */
-#endif /* !____localdep_rand_defined */
-
+#ifndef __local__get_pgmptr_defined
+#include <local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_name
+#define __local__get_pgmptr_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(rand_s) __ATTR_NONNULL((1)) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rand_s))(unsigned int *__restrict __randval) {
-#line 2499 "kos/src/libc/magic/stdlib.c"
-	if (!__randval)
-		return __EINVAL;
-	*__randval = __localdep_rand();
+__LOCAL_LIBC(_get_pgmptr) __errno_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_get_pgmptr))(char **__pvalue) {
+#line 2028 "kos/src/libc/magic/stdlib.c"
+	*__pvalue = __LOCAL_program_invocation_name;
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* !__local_rand_s_defined */
+#endif /* __LOCAL_program_invocation_name */
+#endif /* !__local__get_pgmptr_defined */

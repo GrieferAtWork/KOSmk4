@@ -71,7 +71,7 @@ __ASM_L(.endm)
 
 
 /* Generate the mandatory suffix for an interrupt handler
- * @param: intr_enabled: When non-zero, EFLAGS.IF may be 1 when the suffix is reached */
+ * @param: intr_enabled: When non-zero, EFLAGS.IF may be set when this macro is reached */
 __ASM_L(.macro intr_exit intr_enabled=1)
 __ASM_L(.if __ASM_ARG(\intr_enabled))
 __ASM_L(	cli)

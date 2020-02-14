@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6aa8cd1 */
+/* HASH CRC-32:0xf318f2ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -176,10 +176,10 @@ __NAMESPACE_STD_USING(__forward_size)
  *   [kos] strnroff             - Same as `strnrchrnul', but return the offset from `STR', rather than the actual address.
  *   [std] strcpy               - Same as `(char *)memcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char))'
  *   [std] strcat               - Same as `memcpy(strend(DST), SRC, (strlen(SRC) + 1) * sizeof(char))', but re-return `DST'
- *   [std] strncpy              - <TODO: Check if this doc is correct> Similar to `strcpy', but always write `DSTSIZE' characters, copying from `SRC' and filling the rest with padding ZEROes.
- *   [std] strncat              - <TODO: Check if this doc is correct> Same as Copy `strnlen(SRC, MAX_CHARS)' characters to `strend(DST)', then append a NUL-character thereafter. - Return `DST'.
+ *   [std] strncpy              - Similar to `strcpy', but always write `DSTSIZE' characters, copying from `SRC' and filling the rest with padding ZEROes.
+ *   [std] strncat              - Copy `strnlen(SRC, MAX_CHARS)' characters to `strend(DST)', then (try to) append a NUL-character thereafter. - Return `DST'.
  *   [glc] stpcpy               - Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´
- *   [glc] stpncpy              - <TODO: Check if this doc is correct> Same as `strncpy(DST, SRC, DSTSIZE)+strnlen(SRC, DSTSIZE)' (Returns a pointer to the end of `DST', or to the first NUL-character)
+ *   [glc] stpncpy              - Copy `strnlen(SRC, MAX_CHARS)' characters to `DST', then (try to) append a NUL-character thereafter. - Return `DST'.
  *
  * Annotations:
  *   [std]: The function is defined by the C standard

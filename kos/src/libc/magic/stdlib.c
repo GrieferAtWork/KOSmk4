@@ -2022,7 +2022,13 @@ _get_invalid_parameter_handler:() -> _invalid_parameter_handler;
 
 %
 [section(.text.crt.dos.application.init)]
-_get_pgmptr:(char **pvalue) -> errno_t; /* TODO: Implement using `_pgmptr' */
+[requires_include(<local/program_invocation_name.h>)]
+[requires(defined(__LOCAL_program_invocation_name))]
+_get_pgmptr:(char **pvalue) -> errno_t {
+	*pvalue = __LOCAL_program_invocation_name;
+	return 0;
+}
+
 [section(.text.crt.dos.wchar.application.init)]
 [wchar] _get_wpgmptr:(wchar_t **pvalue) -> errno_t; /* TODO: Implement using `_wpgmptr' */
 

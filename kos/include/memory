@@ -44,20 +44,32 @@ align(__size_t __align, __size_t __size, void *&__ptr, __size_t &__space) __CXX_
 }
 
 #ifdef __COMPILER_HAVE_CXX_ENUM_CLASSES
-enum class pointer_safety { relaxed,
-	                        preferred,
-	                        strict };
+enum class pointer_safety {
+	relaxed,
+	preferred,
+	strict
+};
+
 __CXX_FORCEINLINE __ATTR_CONST pointer_safety __LIBCCALL
 get_pointer_safety() __CXX_NOEXCEPT {
 	return pointer_safety::relaxed;
 }
 #endif /* __COMPILER_HAVE_CXX_ENUM_CLASSES */
-__CXX_FORCEINLINE void __LIBCCALL declare_reachable(void *__ptr) {}
+
+__CXX_FORCEINLINE void __LIBCCALL
+declare_reachable(void *__ptr) {
+}
+
 template<class T> __ATTR_CONST __CXX_FORCEINLINE T *__LIBCCALL undeclare_reachable(T *__p) {
 	return __p;
 }
-__CXX_FORCEINLINE void __LIBCCALL declare_no_pointers(char *__UNUSED(__base), __size_t __UNUSED(__num_bytes)) {}
-__CXX_FORCEINLINE void __LIBCCALL undeclare_no_pointers(char *__UNUSED(__base), __size_t __UNUSED(__num_bytes)) {}
+
+__CXX_FORCEINLINE void __LIBCCALL
+declare_no_pointers(char *__UNUSED(__base), __size_t __UNUSED(__num_bytes)) {
+}
+__CXX_FORCEINLINE void __LIBCCALL
+undeclare_no_pointers(char *__UNUSED(__base), __size_t __UNUSED(__num_bytes)) {
+}
 
 __NAMESPACE_STD_END
 __CXXDECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12491582 */
+/* HASH CRC-32:0xbbf4d28b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2395,6 +2395,12 @@ __CDECLARE(,_invalid_parameter_handler,__NOTHROW_NCX,_get_invalid_parameter_hand
 
 #ifdef __CRT_HAVE__get_pgmptr
 __CDECLARE(,errno_t,__NOTHROW_NCX,_get_pgmptr,(char **__pvalue),(__pvalue))
+#else /* LIBC: _get_pgmptr */
+#include <local/program_invocation_name.h>
+#ifdef __LOCAL_program_invocation_name
+#include <local/stdlib/_get_pgmptr.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(_get_pgmptr, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _get_pgmptr)(char **__pvalue) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_pgmptr))(__pvalue); })
+#endif /* _get_pgmptr... */
 #endif /* _get_pgmptr... */
 #ifdef __CRT_HAVE__get_wpgmptr
 __CDECLARE(,errno_t,__NOTHROW_NCX,_get_wpgmptr,(wchar_t **__pvalue),(__pvalue))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd91b1cc */
+/* HASH CRC-32:0x4d12f7be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstowcs_l))(__WCHAR_TYPE__ *__dst,
                                                          char const *__src,
                                                          __SIZE_TYPE__ __dstlen,
                                                          __locale_t __locale) {
-#line 2443 "kos/src/libc/magic/stdlib.c"
+#line 2449 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_mbstowcs(__dst, __src, __dstlen);
 }
