@@ -21,9 +21,13 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_ISR_H 1
 
 #include <kernel/compiler.h>
+
+#include <kernel/arch/isr.h>
 #include <kernel/pic.h>
 #include <kernel/types.h>
-#include <kernel/arch/isr.h>
+
+#include <kos/kernel/handle.h>
+
 #include <stdbool.h>
 
 DECL_BEGIN
@@ -121,6 +125,100 @@ NOTHROW(KCALL isr_usage_of)(isr_vector_t vector);
 /* Trigger the given ISR vector, returning true if any handler returned
  * true, or if a greedy handler was defined. Otherwise, return `false'. */
 FUNDEF NOBLOCK bool NOTHROW(KCALL isr_vector_trigger)(isr_vector_t vector);
+
+
+
+/* Register a handle-based ISR handler, either by automatically
+ * selecting an appropriate vector, or by specifying the required vector.
+ * WARNING: The caller is responsible to ensure that any given func+arg
+ *          combination will only be registered once.
+ * These functions are quite similar to those above, however ISR
+ * callback invocation is improved such that:
+ *   - `*func' is invoked with a temporary reference to the associated
+ *     object, and in the event of the associated object already having
+ *     been destroyed (i.e. having its reference counter set to 0), the
+ *     callback will not be destroyed.
+ *   - Unregistering ISR callbacks can be done non-blocking-ly, and the
+ *     exposed `hisr_unregister[_at]()' functions should be called from
+ *     the destructor of `ob_pointer'
+ * As such, these functions should be used to register interrupt handlers
+ * on a per-object basis, while the functions above should be used to
+ * register interrupt handlers on a per-driver basis.
+ * @param: ob_pointer: Handle data pointer.
+ * @param: ob_type:    Handle type (one of `HANDLE_TYPE_*')
+ * @throws: E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS: The given, or all vectors are already in use,
+ *                                                     or the given vector cannot be allocated. */
+FUNDEF isr_vector_t KCALL hisr_register(isr_function_t func, void *ob_pointer, uintptr_half_t ob_type) THROWS(E_BADALLOC);
+FUNDEF isr_vector_t KCALL hisr_register_at(isr_vector_t vector, isr_function_t func, void *ob_pointer, uintptr_half_t ob_type) THROWS(E_BADALLOC);
+FUNDEF isr_vector_t KCALL hisr_register_greedy(isr_greedy_function_t func, void *ob_pointer, uintptr_half_t ob_type) THROWS(E_BADALLOC, E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS);
+FUNDEF isr_vector_t KCALL hisr_register_greedy_at(isr_vector_t vector, isr_greedy_function_t func, void *ob_pointer, uintptr_half_t ob_type) THROWS(E_BADALLOC, E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS);
+
+#if defined(__cplusplus) && !defined(__NO_ASMNAME)
+struct vm_datablock;
+struct block_device;
+struct taskpid;
+struct character_device;
+struct vm_datapart;
+struct vm_futex;
+struct vm_futexfd;
+extern "C++" {
+FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister)(isr_function_t func, void *ob_pointer, uintptr_half_t ob_type) ASMNAME("hisr_unregister");
+FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister)(isr_greedy_function_t func, void *ob_pointer, uintptr_half_t ob_type) ASMNAME("hisr_unregister");
+FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister_at)(isr_vector_t vector, isr_function_t func, void *ob_pointer, uintptr_half_t ob_type) ASMNAME("isr_unregister_any");
+FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister_at)(isr_vector_t vector, isr_greedy_function_t func, void *ob_pointer, uintptr_half_t ob_type) ASMNAME("isr_unregister_any");
+
+#define DEFINE_HISR_REGISTER_WRAPPER(T, HANDLE_TYPE)                                                \
+	LOCAL isr_vector_t KCALL hisr_register(isr_function_t func, T *ob_pointer) THROWS(E_BADALLOC) { \
+		return hisr_register(func, (void *)ob_pointer, HANDLE_TYPE);                                \
+	}                                                                                               \
+	LOCAL isr_vector_t KCALL                                                                        \
+	hisr_register_at(isr_vector_t vector, isr_function_t func, T *ob_pointer) THROWS(E_BADALLOC) {  \
+		return hisr_register_at(vector, func, (void *)ob_pointer, HANDLE_TYPE);                     \
+	}                                                                                               \
+	LOCAL isr_vector_t KCALL                                                                        \
+	hisr_register_greedy(isr_greedy_function_t func, T *ob_pointer)                                 \
+			THROWS(E_BADALLOC, E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS) {                         \
+		return hisr_register_greedy(func, (void *)ob_pointer, HANDLE_TYPE);                         \
+	}                                                                                               \
+	LOCAL isr_vector_t KCALL                                                                        \
+	hisr_register_greedy_at(isr_vector_t vector, isr_greedy_function_t func, T *ob_pointer)         \
+			THROWS(E_BADALLOC, E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS) {                         \
+		return hisr_register_greedy_at(vector, func, (void *)ob_pointer, HANDLE_TYPE);              \
+	}                                                                                               \
+	LOCAL NOBLOCK bool                                                                              \
+	NOTHROW(KCALL hisr_unregister)(isr_function_t func, T *ob_pointer) {                            \
+		return hisr_unregister(func, (void *)ob_pointer, HANDLE_TYPE);                              \
+	}                                                                                               \
+	LOCAL NOBLOCK bool                                                                              \
+	NOTHROW(KCALL hisr_unregister)(isr_greedy_function_t func, T *ob_pointer) {                     \
+		return hisr_unregister(func, (void *)ob_pointer, HANDLE_TYPE);                              \
+	}                                                                                               \
+	LOCAL NOBLOCK bool                                                                              \
+	NOTHROW(KCALL hisr_unregister_at)(isr_vector_t vector,                                          \
+	                                  isr_function_t func, T *ob_pointer) {                         \
+		return hisr_unregister_at(vector, func, (void *)ob_pointer, HANDLE_TYPE);                   \
+	}                                                                                               \
+	LOCAL NOBLOCK bool                                                                              \
+	NOTHROW(KCALL hisr_unregister_at)(isr_vector_t vector,                                          \
+	                                  isr_greedy_function_t func, T *ob_pointer) {                  \
+		return hisr_unregister_at(vector, func, (void *)ob_pointer, HANDLE_TYPE);                   \
+	}
+
+
+DEFINE_HISR_REGISTER_WRAPPER(struct vm_datablock, HANDLE_TYPE_DATABLOCK)
+DEFINE_HISR_REGISTER_WRAPPER(struct block_device, HANDLE_TYPE_BLOCKDEVICE)
+DEFINE_HISR_REGISTER_WRAPPER(struct taskpid, HANDLE_TYPE_TASK)
+DEFINE_HISR_REGISTER_WRAPPER(struct character_device, HANDLE_TYPE_CHARACTERDEVICE)
+DEFINE_HISR_REGISTER_WRAPPER(struct vm_datapart, HANDLE_TYPE_DATAPART)
+DEFINE_HISR_REGISTER_WRAPPER(struct vm_futex, HANDLE_TYPE_FUTEX)
+DEFINE_HISR_REGISTER_WRAPPER(struct vm_futexfd, HANDLE_TYPE_FUTEXFD)
+#undef DEFINE_HISR_REGISTER_WRAPPER
+}
+#else /* __cplusplus && !__NO_ASMNAME */
+FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister)(void *func, void *ob_pointer, uintptr_half_t ob_type);
+FUNDEF NOBLOCK bool NOTHROW(KCALL hisr_unregister_at)(isr_vector_t vector, void *func, void *ob_pointer, uintptr_half_t ob_type);
+#endif /* !__cplusplus || __NO_ASMNAME */
+
 #endif /* __CC__ */
 
 DECL_END

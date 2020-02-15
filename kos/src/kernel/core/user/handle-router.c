@@ -269,6 +269,7 @@ for (local h_name, h_typ: handle_types) {
 
 ]]]*/
 /* Fallback handle operators */
+INTERN NOBLOCK NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.tryincref") __BOOL NOTHROW(FCALL handle_undefined_tryincref)(void *__restrict UNUSED(self)) { return 1; }
 INTERN NOBLOCK NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.incref") void NOTHROW(FCALL handle_undefined_incref)(void *__restrict UNUSED(self)) {  }
 INTERN NOBLOCK NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.decref") void NOTHROW(FCALL handle_undefined_decref)(void *__restrict UNUSED(self)) {  }
 INTERN NOBLOCK WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.refcnt") refcnt_t NOTHROW(FCALL handle_undefined_refcnt)(void const *__restrict UNUSED(self)) { return 0; }
@@ -328,6 +329,32 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_DATAPART]               = */ "datapart",
 		/* [HANDLE_TYPE_FUTEX]                  = */ "futex",
 		/* [HANDLE_TYPE_FUTEXFD]                = */ "futexfd"
+	},
+	/* .h_tryincref = */ {
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_datablock_tryincref,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_blockdevice_tryincref,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (__BOOL (FCALL *)(void *__restrict))&handle_directoryentry_tryincref,
+		/* [HANDLE_TYPE_FILE]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_file_tryincref,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (__BOOL (FCALL *)(void *__restrict))&handle_oneshot_directory_file_tryincref,
+		/* [HANDLE_TYPE_PATH]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_path_tryincref,
+		/* [HANDLE_TYPE_FS]                     = */ (__BOOL (FCALL *)(void *__restrict))&handle_fs_tryincref,
+		/* [HANDLE_TYPE_VM]                     = */ (__BOOL (FCALL *)(void *__restrict))&handle_vm_tryincref,
+		/* [HANDLE_TYPE_TASK]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_task_tryincref,
+		/* [HANDLE_TYPE_CLOCK]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_clock_tryincref,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_tryincref,
+		/* [HANDLE_TYPE_PIPE]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_tryincref,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_reader_tryincref,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_writer_tryincref,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_pidns_tryincref,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_state_tryincref,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (__BOOL (FCALL *)(void *__restrict))&handle_characterdevice_tryincref,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_fence_tryincref,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_sema_tryincref,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (__BOOL (FCALL *)(void *__restrict))&handle_signalfd_tryincref,
+		/* [HANDLE_TYPE_DATAPART]               = */ (__BOOL (FCALL *)(void *__restrict))&handle_datapart_tryincref,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_futex_tryincref,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (__BOOL (FCALL *)(void *__restrict))&handle_futexfd_tryincref
 	},
 	/* .h_incref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(void *__restrict))&handle_undefined_incref,
@@ -1114,6 +1141,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 
 
 /* Weakly define operators for `HANDLE_TYPE_DATABLOCK' (`struct vm_datablock') */
+DEFINE_INTERN_WEAK_ALIAS(handle_datablock_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_refcnt, handle_undefined_refcnt);
@@ -1146,6 +1174,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_datablock_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_BLOCKDEVICE' (`struct basic_block_device') */
+DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_refcnt, handle_undefined_refcnt);
@@ -1178,6 +1207,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_DIRECTORYENTRY' (`struct directory_entry') */
+DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_refcnt, handle_undefined_refcnt);
@@ -1210,6 +1240,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_FILE' (`struct file') */
+DEFINE_INTERN_WEAK_ALIAS(handle_file_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_refcnt, handle_undefined_refcnt);
@@ -1242,6 +1273,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_file_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_ONESHOT_DIRECTORY_FILE' (`struct oneshot_directory_file') */
+DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_refcnt, handle_undefined_refcnt);
@@ -1274,6 +1306,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_poll, handle_undefined_po
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_PATH' (`struct path') */
+DEFINE_INTERN_WEAK_ALIAS(handle_path_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_refcnt, handle_undefined_refcnt);
@@ -1306,6 +1339,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_path_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_FS' (`struct fs') */
+DEFINE_INTERN_WEAK_ALIAS(handle_fs_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_refcnt, handle_undefined_refcnt);
@@ -1338,6 +1372,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_fs_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_VM' (`struct vm') */
+DEFINE_INTERN_WEAK_ALIAS(handle_vm_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_refcnt, handle_undefined_refcnt);
@@ -1370,6 +1405,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_vm_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
+DEFINE_INTERN_WEAK_ALIAS(handle_task_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_refcnt, handle_undefined_refcnt);
@@ -1402,6 +1438,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_task_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_CLOCK' (`struct wall_clock') */
+DEFINE_INTERN_WEAK_ALIAS(handle_clock_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_clock_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_clock_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_clock_refcnt, handle_undefined_refcnt);
@@ -1434,6 +1471,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_clock_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_clock_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_DRIVER' (`struct driver') */
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_refcnt, handle_undefined_refcnt);
@@ -1466,6 +1504,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_PIPE' (`struct pipe') */
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_refcnt, handle_undefined_refcnt);
@@ -1498,6 +1537,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_PIPE_READER' (`struct pipe_reader') */
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_refcnt, handle_undefined_refcnt);
@@ -1530,6 +1570,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_PIPE_WRITER' (`struct pipe_writer') */
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_refcnt, handle_undefined_refcnt);
@@ -1562,6 +1603,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_PIDNS' (`struct pidns') */
+DEFINE_INTERN_WEAK_ALIAS(handle_pidns_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_refcnt, handle_undefined_refcnt);
@@ -1594,6 +1636,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pidns_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_DRIVER_STATE' (`struct driver_state') */
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_refcnt, handle_undefined_refcnt);
@@ -1626,6 +1669,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_CHARACTERDEVICE' (`struct character_device') */
+DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_refcnt, handle_undefined_refcnt);
@@ -1658,6 +1702,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_EVENTFD_FENCE' (`struct eventfd') */
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_refcnt, handle_undefined_refcnt);
@@ -1690,6 +1735,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_EVENTFD_SEMA' (`struct eventfd') */
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_refcnt, handle_undefined_refcnt);
@@ -1722,6 +1768,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_SIGNALFD' (`struct signalfd') */
+DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_refcnt, handle_undefined_refcnt);
@@ -1754,6 +1801,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_DATAPART' (`struct vm_datapart') */
+DEFINE_INTERN_WEAK_ALIAS(handle_datapart_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_refcnt, handle_undefined_refcnt);
@@ -1786,6 +1834,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_datapart_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_FUTEX' (`struct vm_futex') */
+DEFINE_INTERN_WEAK_ALIAS(handle_futex_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_refcnt, handle_undefined_refcnt);
@@ -1818,6 +1867,7 @@ DEFINE_INTERN_WEAK_ALIAS(handle_futex_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_hop, handle_undefined_hop);
 
 /* Weakly define operators for `HANDLE_TYPE_FUTEXFD' (`struct vm_futexfd') */
+DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_tryincref, handle_undefined_tryincref);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_decref, handle_undefined_decref);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_refcnt, handle_undefined_refcnt);

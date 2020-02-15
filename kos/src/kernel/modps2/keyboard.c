@@ -460,12 +460,11 @@ ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
 		default: __builtin_unreachable();
 		}
 		COMPILER_BARRIER();
-		isr_register_at(PS2_GET_ISR_FOR_PORT(portno), &ps2_keyboard_isr_handler, kbd);
-
+		hisr_register_at(PS2_GET_ISR_FOR_PORT(portno), &ps2_keyboard_isr_handler, kbd);
 		TRY {
 			character_device_register_auto(kbd);
 		} EXCEPT {
-			isr_unregister_at(PS2_GET_ISR_FOR_PORT(portno), &ps2_keyboard_isr_handler, kbd);
+			hisr_unregister_at(PS2_GET_ISR_FOR_PORT(portno), &ps2_keyboard_isr_handler, kbd);
 			RETHROW();
 		}
 	} EXCEPT {
@@ -477,16 +476,16 @@ ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
 
 PRIVATE DRIVER_FINI void KCALL ps2_keyboard_driver_fini(void) {
 	if (ps2_keyboards[0]) {
-		isr_unregister_at(PS2_GET_ISR_FOR_PORT(PS2_PORT1),
-		                  &ps2_keyboard_isr_handler,
-		                  ps2_keyboards[0]);
+		hisr_unregister_at(PS2_GET_ISR_FOR_PORT(PS2_PORT1),
+		                   &ps2_keyboard_isr_handler,
+		                   ps2_keyboards[0]);
 		decref(ps2_keyboards[0]);
 		ps2_keyboards[0] = NULL;
 	}
 	if (ps2_keyboards[1]) {
-		isr_unregister_at(PS2_GET_ISR_FOR_PORT(PS2_PORT2),
-		                  &ps2_keyboard_isr_handler,
-		                  ps2_keyboards[1]);
+		hisr_unregister_at(PS2_GET_ISR_FOR_PORT(PS2_PORT2),
+		                   &ps2_keyboard_isr_handler,
+		                   ps2_keyboards[1]);
 		decref(ps2_keyboards[1]);
 		ps2_keyboards[1] = NULL;
 	}

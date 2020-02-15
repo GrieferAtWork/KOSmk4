@@ -182,8 +182,6 @@ NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self
  *   >> return->cd_type;
  * As well as optionally:
  *   >> return->cd_name
- * This function will initialize the following memory to non-zero values:
- *   >> return->cd_max_retry = 2;
  */
 PUBLIC WUNUSED ATTR_RETNONNULL ATTR_MALLOC REF struct character_device *KCALL
 character_device_alloc(struct driver *__restrict owner,

@@ -25,6 +25,7 @@
 
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/isr.h>
 #include <kernel/printk.h>
@@ -56,24 +57,135 @@ ISR_SPECIFIC_VECTOR_ENUM(ASSERT_INDICES_SPECIFIC);
 #define ISR_COUNT  (ISR_GENERIC_VECTOR_COUNT + ISR_SPECIFIC_VECTOR_COUNT)
 
 
+struct hisr {
+	union {
+		isr_function_t        hi_func;        /* [1..1][const] Object-level ISR handler */
+		isr_greedy_function_t hi_greedy_func; /* [1..1][const] Object-level ISR handler (greedy) */
+	};
+	WEAK void     *hi_obj;   /* [0..1][MAYBE(DESTROYED)][lock(CLEAR_ONCE)] Pointed-to object (weakly referenced) */
+	uintptr_half_t hi_typ;   /* [const] Handle object type for `hi_obj' */
+#ifndef CONFIG_NO_SMP
+	uintptr_half_t hi_pad;   /* ... */
+	WEAK uintptr_t hi_inuse; /* Cross-CPU is-in-use tracking for `hi_obj' */
+#endif /* !CONFIG_NO_SMP */
+};
+
+/* Try to acquire a reference to the pointed-to object, or return
+ * NULL if the pointed-to object had already been destroyed. */
+LOCAL NOPREEMPT NOBLOCK WUNUSED NONNULL((1)) REF void *KCALL
+NOTHROW(KCALL hisr_getref_nopr)(struct hisr *__restrict self) {
+	REF void *obj;
+	assert(!PREEMPTION_ENABLED());
+	/* Try to acquire a reference to the handle object. */
+#ifndef CONFIG_NO_SMP
+	ATOMIC_FETCHINC(self->hi_inuse);
+#endif /* !CONFIG_NO_SMP */
+	COMPILER_READ_BARRIER();
+	obj = self->hi_obj;
+	COMPILER_READ_BARRIER();
+	/* Try to acquire a reference */
+	if (likely(obj) && unlikely(!(*handle_type_db.h_tryincref[self->hi_typ])(obj)))
+		obj = NULL;
+#ifndef CONFIG_NO_SMP
+	ATOMIC_FETCHDEC(self->hi_inuse);
+#endif /* !CONFIG_NO_SMP */
+	return obj;
+}
+
+LOCAL NOBLOCK WUNUSED NONNULL((1)) void KCALL
+NOTHROW(KCALL hisr_clear)(struct hisr *__restrict self) {
+	/* Clear the `hi_obj' pointer of `self' */
+#ifdef CONFIG_NO_SMP
+	pflag_t was = PREEMPTION_PUSHOFF();
+#endif /* CONFIG_NO_SMP */
+	ATOMIC_STORE(self->hi_obj, NULL);
+#ifndef CONFIG_NO_SMP
+	while (ATOMIC_READ(self->hi_inuse))
+		task_tryyield_or_pause();
+#else /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
+#endif /* CONFIG_NO_SMP */
+}
+
+
+
+INTERN NOBLOCK bool NOTHROW(FCALL hisr_wrapper)(void *arg);
+#if 1
+#define HISR_GREEDY_WRAPPER_IS_ALIAS 1
+INTERN NOBLOCK void NOTHROW(FCALL hisr_greedy_wrapper)(void *arg) ASMNAME("hisr_wrapper");
+#else
+PRIVATE NOBLOCK void NOTHROW(FCALL hisr_greedy_wrapper)(void *arg);
+#endif
+
+#ifdef HISR_GREEDY_WRAPPER_IS_ALIAS
+#define hisr_iswrapper(f) ((void *)(f) == (void *)&hisr_wrapper)
+#else /* HISR_GREEDY_WRAPPER_IS_ALIAS */
+#define hisr_iswrapper(f) ((void *)(f) == (void *)&hisr_wrapper || (void *)(f) == (void *)&hisr_greedy_wrapper)
+#endif /* !HISR_GREEDY_WRAPPER_IS_ALIAS */
+
+/* Check if a given nullable driver/func/arg triple can be overwritten */
+#define hisr_callback_mayoverride(d, func, arg, is_greedy) \
+	(hisr_iswrapper(func) && (ATOMIC_READ(((struct hisr *)(arg))->hi_obj) == NULL))
+
+/* Construct a new HISR descriptor. */
+PRIVATE ATTR_RETNONNULL struct hisr *KCALL
+hisr_new(void *func, void *ob_pointer, uintptr_half_t ob_type)
+		THROWS(E_BADALLOC) {
+	struct hisr *hi;
+	hi = (struct hisr *)kmalloc(sizeof(struct hisr), GFP_LOCKED | GFP_PREFLT);
+	hi->hi_func = (isr_function_t)func;
+	hi->hi_obj  = ob_pointer;
+	hi->hi_typ  = ob_type;
+#ifndef CONFIG_NO_SMP
+	hi->hi_inuse = 0;
+#endif /* !CONFIG_NO_SMP */
+	return hi;
+}
+
+/* Destroy a given HISR descriptor. */
+LOCAL NOBLOCK void
+NOTHROW(KCALL hisr_destroy)(struct hisr *__restrict self) {
+	/* ... */
+	kfree(self);
+}
+
 PUBLIC NOBLOCK void
 NOTHROW(KCALL isr_vector_state_destroy)(struct isr_vector_state *__restrict self) {
 	size_t i;
 	for (i = 0; i < self->ivs_handc; ++i) {
 		decref_unlikely(self->ivs_handv[i].ivh_drv);
 	}
-	xdecref_unlikely(self->ivs_greedy_drv);
+	if (self->ivs_greedy_drv)
+		decref_unlikely(self->ivs_greedy_drv);
 	heap_free(&kernel_locked_heap, self, self->ivs_heapsize, GFP_LOCKED);
 }
 
 
-PRIVATE REF struct isr_vector_state *
+PRIVATE ATTR_RETNONNULL REF struct isr_vector_state *
 (KCALL isr_vector_state_alloc)(size_t handc) THROWS(E_BADALLOC) {
 	REF struct isr_vector_state *result;
-	struct heapptr ptr = heap_alloc(&kernel_locked_heap,
-	                                offsetof(struct isr_vector_state, ivs_handv) +
-	                                handc * sizeof(struct isr_vector_handler),
-	                                GFP_LOCKED | GFP_PREFLT);
+	struct heapptr ptr;
+	ptr = heap_alloc(&kernel_locked_heap,
+	                 offsetof(struct isr_vector_state, ivs_handv) +
+	                 handc * sizeof(struct isr_vector_handler),
+	                 GFP_LOCKED | GFP_PREFLT);
+	result = (REF struct isr_vector_state *)ptr.hp_ptr;
+	result->ivs_heapsize = ptr.hp_siz;
+	result->ivs_refcnt   = 1;
+	result->ivs_handc    = handc;
+	return result;
+}
+
+PRIVATE NOBLOCK REF struct isr_vector_state *
+NOTHROW(KCALL isr_vector_state_alloc_atomic_nx)(size_t handc) {
+	REF struct isr_vector_state *result;
+	struct heapptr ptr;
+	ptr = heap_alloc_nx(&kernel_locked_heap,
+                        offsetof(struct isr_vector_state, ivs_handv) +
+                        handc * sizeof(struct isr_vector_handler),
+                        GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
+	if unlikely(!ptr.hp_siz)
+		return NULL;
 	result = (REF struct isr_vector_state *)ptr.hp_ptr;
 	result->ivs_heapsize = ptr.hp_siz;
 	result->ivs_refcnt   = 1;
@@ -104,6 +216,155 @@ ATOMIC_REF(struct isr_vector_state) isr_vectors[ISR_COUNT] = {
 #undef ENUM_EMPTY_VECTOR_STATE
 };
 
+/* Remove no-op HISR callbacks from `self' */
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct isr_vector_state *
+NOTHROW(KCALL isr_vector_state_remove_noop_hisr)(struct isr_vector_state *__restrict self,
+                                                 void *ignored_arg) {
+	size_t i;
+	/* Check if the old greedy handler is dead. */
+	if (hisr_callback_mayoverride(self->ivs_greedy_drv,
+	                              self->ivs_greedy_fun,
+	                              self->ivs_greedy_arg,
+	                              true) &&
+	    self->ivs_greedy_arg != ignored_arg) {
+		assert(self->ivs_greedy_drv == &drv_self);
+		decref_nokill(&drv_self);
+		self->ivs_greedy_fun = NULL;
+		self->ivs_greedy_arg = NULL;
+		self->ivs_greedy_drv = NULL;
+		self->ivs_greedy_cnt = 0;
+	}
+	for (i = 0; i < self->ivs_handc;) {
+		if likely(!hisr_callback_mayoverride(self->ivs_handv[i].ivh_drv,
+		                                     self->ivs_handv[i].ivh_fun,
+		                                     self->ivs_handv[i].ivh_arg,
+		                                     false) ||
+		          self->ivs_handv[i].ivh_arg == ignored_arg) {
+			++i;
+			continue;
+		}
+		/* Found a dead HISR handler that should get removed!
+		 * NOTE: As far as the actual destruction of the associated callback,
+		 *       that job falls to our caller, as this can only be done _after_
+		 *       the new ISR vector has been installed (in order to ensure that
+		 *       an installed vector is always in a consistent state) */
+remove_dead_hisr_at_i:
+		assert(self->ivs_handv[i].ivh_drv == &drv_self);
+		/* The caller also has a reference to this, and ontop of that, this is our own
+		 * driver, so anyone calling into us also has to have some kind of refernece to
+		 * keep this driver from being unloaded! */
+		decref_nokill(self->ivs_handv[i].ivh_drv);
+		assert(self->ivs_handc);
+		--self->ivs_handc;
+		memmovedown(&self->ivs_handv[i],
+		            &self->ivs_handv[i + 1],
+		            (self->ivs_handc - i),
+		            sizeof(struct isr_vector_handler));
+		while (i < self->ivs_handc) {
+			if likely(!hisr_callback_mayoverride(self->ivs_handv[i].ivh_drv,
+			                                     self->ivs_handv[i].ivh_fun,
+			                                     self->ivs_handv[i].ivh_arg,
+			                                     false)) {
+				++i;
+				continue;
+			}
+			goto remove_dead_hisr_at_i;
+		}
+		/* Since some handlers got removed, try to truncate the
+		 * ISR vector heap block to release unused trailing memory. */
+		{
+			struct heapptr shrunked_vector;
+			shrunked_vector = heap_realloc_nx(&kernel_locked_heap,
+			                                  self, self->ivs_heapsize,
+			                                  offsetof(struct isr_vector_state, ivs_handv) +
+			                                  self->ivs_handc * sizeof(struct isr_vector_handler),
+			                                  GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC,
+			                                  GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
+			if likely(shrunked_vector.hp_siz) {
+				self = (struct isr_vector_state *)shrunked_vector.hp_ptr;
+				self->ivs_heapsize = shrunked_vector.hp_siz;
+			}
+		}
+		break;
+	}
+	return self;
+}
+
+#ifdef NDEBUG
+#define isr_vector_state_cleanup_noop_hisr(old_state, new_state, ignored_arg) \
+	isr_vector_state_cleanup_noop_hisr(old_state, new_state)
+#endif /* NDEBUG */
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(KCALL isr_vector_state_cleanup_noop_hisr)(struct isr_vector_state *__restrict old_state,
+                                                  struct isr_vector_state *__restrict new_state
+#ifndef NDEBUG
+                                                  ,
+                                                  void *ignored_arg
+#endif /* !NDEBUG */
+                                                  ) {
+	/* Try to finalize the old greedy callback (in case we've overwritten it after
+	 * a prior call to `hisr_unregister_impl()' failed to replace the ISR vector) */
+	if (hisr_iswrapper(old_state->ivs_greedy_fun) &&
+	    (new_state->ivs_greedy_fun != old_state->ivs_greedy_fun ||
+	     new_state->ivs_greedy_arg != old_state->ivs_greedy_arg)) {
+		/* The greedy function has changed. */
+		assert(old_state->ivs_greedy_drv == &drv_self);
+#ifndef NDEBUG
+		assert(old_state->ivs_greedy_arg != ignored_arg);
+#endif /* !NDEBUG */
+		hisr_destroy((struct hisr *)old_state->ivs_greedy_arg);
+	}
+	/* Check for, and finalize no-op HISR handlers that were removed. */
+	if (new_state->ivs_handc <= old_state->ivs_handc) {
+		/* At least 1 handler got removed. */
+		size_t oi = 0, ni = 0;
+		for (;;) {
+			if (oi >= old_state->ivs_handc) {
+				assertf(ni == new_state->ivs_handc,
+				        "Unaccounted callbacks in new_state");
+				break;
+			}
+			if (ni >= new_state->ivs_handc) {
+				/* All remaining handlers from `old_state' were removed. */
+				do {
+					if (hisr_callback_mayoverride(old_state->ivs_handv[oi].ivh_drv,
+					                              old_state->ivs_handv[oi].ivh_fun,
+					                              old_state->ivs_handv[oi].ivh_arg,
+					                              false)) {
+						assert(old_state->ivs_handv[oi].ivh_drv == &drv_self);
+#ifndef NDEBUG
+						assert(old_state->ivs_handv[oi].ivh_arg != ignored_arg);
+#endif /* !NDEBUG */
+						hisr_destroy((struct hisr *)old_state->ivs_greedy_arg);;
+					}
+				} while (++oi < old_state->ivs_handc);
+				break;
+			}
+			/* Check if a handler got removed in this position. */
+			if (old_state->ivs_handv[oi].ivh_drv == new_state->ivs_handv[ni].ivh_drv &&
+			    old_state->ivs_handv[oi].ivh_fun == new_state->ivs_handv[ni].ivh_fun &&
+			    old_state->ivs_handv[oi].ivh_arg == new_state->ivs_handv[ni].ivh_arg) {
+				++oi;
+				++ni;
+				continue;
+			}
+			/* The handler from `old_state->ivs_handv[oi]' was removed!
+			 * The only reason this might happen is if that handler is
+			 * a dead HISR callback, in which case we must destroy it. */
+			assert(old_state->ivs_handv[oi].ivh_drv == &drv_self);
+			assert(hisr_callback_mayoverride(old_state->ivs_handv[oi].ivh_drv,
+			                                 old_state->ivs_handv[oi].ivh_fun,
+			                                 old_state->ivs_handv[oi].ivh_arg,
+			                                 false));
+#ifndef NDEBUG
+			assert(old_state->ivs_handv[oi].ivh_arg != ignored_arg);
+#endif /* !NDEBUG */
+			hisr_destroy((struct hisr *)old_state->ivs_greedy_arg);
+			++oi;
+		}
+	}
+}
+
 LOCAL bool KCALL
 isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict func_driver,
                          struct isr_vector_state *__restrict old_state, size_t index,
@@ -111,10 +372,15 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 		THROWS(E_BADALLOC) {
 	size_t i;
 	struct isr_vector_state *new_state;
+	void *ignored_hisr_arg = hisr_iswrapper(func) ? arg : NULL;
 	new_state = isr_vector_state_alloc(is_greedy ? old_state->ivs_handc
 	                                             : old_state->ivs_handc + 1);
 	if (is_greedy) {
-		assert(!old_state->ivs_greedy_drv);
+		assert(!old_state->ivs_greedy_drv ||
+		       hisr_callback_mayoverride(old_state->ivs_greedy_drv,
+		                                 old_state->ivs_greedy_fun,
+		                                 old_state->ivs_greedy_arg,
+		                                 true));
 		new_state->ivs_greedy_fun = (isr_greedy_function_t)func;
 		new_state->ivs_greedy_arg = arg;
 		new_state->ivs_greedy_drv = incref(func_driver);
@@ -143,12 +409,28 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 		for (i = 1; i < new_state->ivs_handc; ++i)
 			incref(new_state->ivs_handv[i].ivh_drv);
 	}
+	/* Remove all no-op HISR handlers. */
+	new_state = isr_vector_state_remove_noop_hisr(new_state, ignored_hisr_arg);
 	new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
 	/* With the new state now fully initialized, try to install it (atomically). */
-	if (isr_vectors[index].cmpxch_inherit_new(old_state, new_state)) {
+	if (isr_vectors[index].cmpxch(old_state, new_state)) {
+		void *real_func = func, *real_arg = arg;
+		if (hisr_iswrapper(func)) {
+			struct hisr *hi;
+			hi = (struct hisr *)arg;
+			real_func = (void *)hi->hi_func;
+			real_arg  = hi->hi_obj;
+			assert(func_driver == &drv_self);
+			decref_nokill(func_driver); /* Inherit on success. */
+			func_driver = driver_at_address(real_func);
+			if unlikely(!func_driver)
+				func_driver = incref(&drv_self); /* Shouldn't happen... */
+		}
 		printk(KERN_INFO "[isr] Register handler for vector %#Ix (%[vinfo:%n(%p)] with %p in driver %q)\n",
-		       (size_t)ISR_INDEX_TO_VECTOR(index), func, arg, func_driver->d_name);
+		       (size_t)ISR_INDEX_TO_VECTOR(index), real_func, real_arg, func_driver->d_name);
 		decref_unlikely(func_driver); /* Inherit on success. */
+		isr_vector_state_cleanup_noop_hisr(old_state, new_state, ignored_hisr_arg);
+		decref_unlikely(new_state);
 		return true;
 	}
 	/* Failed to install the new state (so we must destroy it now) */
@@ -197,7 +479,11 @@ again_determine_winner:
 			}
 		}
 	}
-	if unlikely(is_greedy && winner->ivs_greedy_fun) {
+	if unlikely(is_greedy && winner->ivs_greedy_drv &&
+	            !hisr_callback_mayoverride(winner->ivs_greedy_drv,
+	                                      winner->ivs_greedy_fun,
+	                                      winner->ivs_greedy_arg,
+	                                      true)) {
 		/* Try to reclaim cache resources, which may free up a suitable interrupt vector slot. */
 		if (system_clearcaches_s(&cache_version))
 			goto again_check_finalizing;
@@ -251,7 +537,11 @@ again_check_finalizing:
 	index = ISR_VECTOR_TO_INDEX(vector);
 again_get_old_state:
 	old_state = isr_vectors[index].get();
-	if (is_greedy && old_state->ivs_greedy_drv) {
+	if (is_greedy && old_state->ivs_greedy_drv &&
+	    !hisr_callback_mayoverride(old_state->ivs_greedy_drv,
+	                               old_state->ivs_greedy_fun,
+	                               old_state->ivs_greedy_arg,
+	                               true)) {
 		/* The old vector is already in use. */
 		decref(old_state);
 		/* Try to reclaim resources. */
@@ -330,13 +620,16 @@ again:
 		arg              = old_state->ivs_greedy_arg;
 		declaring_driver = old_state->ivs_greedy_drv;
 assign_new_state:
+		new_state = isr_vector_state_remove_noop_hisr(new_state, NULL);
 		new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
-		success = isr_vectors[index].cmpxch_inherit_new(old_state, new_state);
+		success = isr_vectors[index].cmpxch(old_state, new_state);
 		if unlikely(!success) {
 			decref(old_state);
 			decref(new_state); /* Not inherited on failure */
 			goto again;
 		}
+		isr_vector_state_cleanup_noop_hisr(old_state, new_state, NULL);
+		decref_unlikely(new_state);
 		printk(KERN_INFO "[isr] Delete handler for vector %#Ix (%[vinfo:%n(%p)] with %p in driver %q)\n",
 		       (size_t)ISR_INDEX_TO_VECTOR(index), func, arg, declaring_driver->d_name);
 		decref(old_state);
@@ -456,6 +749,274 @@ isr_register_greedy_at(isr_vector_t vector,
 
 
 
+
+
+
+
+
+
+INTERN NOBLOCK bool NOTHROW(FCALL hisr_wrapper)(void *arg) {
+	bool result;
+	struct hisr *me;
+	REF void *obj;
+	assert(!PREEMPTION_ENABLED());
+	me = (struct hisr *)arg;
+	/* Try to acquire a reference to the handle object. */
+	obj = hisr_getref_nopr(me);
+	if unlikely(!obj)
+		return false;
+	/* Invoke the actual handler. */
+	result = (*me->hi_func)(obj);
+	(*handle_type_db.h_decref[me->hi_typ])(obj);
+	return result;
+}
+
+#ifndef HISR_GREEDY_WRAPPER_IS_ALIAS
+INTERN NOBLOCK void NOTHROW(FCALL hisr_greedy_wrapper)(void *arg) {
+	struct hisr *me;
+	REF void *obj;
+	assert(!PREEMPTION_ENABLED());
+	me = (struct hisr *)arg;
+	/* Try to acquire a reference to the handle object. */
+	obj = hisr_getref_nopr(me);
+	if unlikely(!obj)
+		return;
+	/* Invoke the actual handler. */
+	(*me->hi_greedy_func)(obj);
+	(*handle_type_db.h_decref[me->hi_typ])(obj);
+}
+#endif /* !HISR_GREEDY_WRAPPER_IS_ALIAS */
+
+
+PUBLIC isr_vector_t KCALL
+hisr_register(isr_function_t func,
+              void *ob_pointer,
+              uintptr_half_t ob_type)
+		THROWS(E_BADALLOC) {
+	isr_vector_t result;
+	struct hisr *hi;
+	hi = hisr_new((void *)func, ob_pointer, ob_type);
+	TRY {
+		result = isr_register(&hisr_wrapper, hi);
+	} EXCEPT {
+		hisr_destroy(hi);
+		RETHROW();
+	}
+	assert(result != ISR_VECTOR_INVALID);
+	return result;
+}
+
+PUBLIC isr_vector_t KCALL
+hisr_register_at(isr_vector_t vector, isr_function_t func,
+                 void *ob_pointer, uintptr_half_t ob_type)
+		THROWS(E_BADALLOC) {
+	isr_vector_t result;
+	struct hisr *hi;
+	hi = hisr_new((void *)func, ob_pointer, ob_type);
+	TRY {
+		result = isr_register_at(vector, &hisr_wrapper, hi);
+	} EXCEPT {
+		hisr_destroy(hi);
+		RETHROW();
+	}
+	assert(result != ISR_VECTOR_INVALID);
+	return result;
+}
+
+PUBLIC isr_vector_t KCALL
+hisr_register_greedy(isr_greedy_function_t func,
+                     void *ob_pointer,
+                     uintptr_half_t ob_type)
+		THROWS(E_BADALLOC, E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS) {
+	isr_vector_t result;
+	struct hisr *hi;
+	hi = hisr_new((void *)func, ob_pointer, ob_type);
+	TRY {
+		result = isr_register_greedy(&hisr_greedy_wrapper, hi);
+	} EXCEPT {
+		hisr_destroy(hi);
+		RETHROW();
+	}
+	assert(result != ISR_VECTOR_INVALID);
+	return result;
+}
+
+PUBLIC isr_vector_t KCALL
+hisr_register_greedy_at(isr_vector_t vector, isr_greedy_function_t func,
+                        void *ob_pointer, uintptr_half_t ob_type)
+		THROWS(E_BADALLOC, E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS) {
+	isr_vector_t result;
+	struct hisr *hi;
+	hi = hisr_new((void *)func, ob_pointer, ob_type);
+	TRY {
+		result = isr_register_greedy_at(vector, &hisr_greedy_wrapper, hi);
+	} EXCEPT {
+		hisr_destroy(hi);
+		RETHROW();
+	}
+	assert(result != ISR_VECTOR_INVALID);
+	return result;
+}
+
+PRIVATE NOBLOCK bool
+NOTHROW(KCALL hisr_unregister_impl)(size_t index, void *func,
+                                    void *ob_pointer,
+                                    uintptr_half_t ob_type) {
+	struct isr_vector_state *old_state;
+	struct isr_vector_state *new_state;
+	size_t i;
+	bool success;
+	assert(index < ISR_COUNT);
+again:
+	old_state = isr_vectors[index].get();
+	if (old_state->ivs_greedy_fun == &hisr_greedy_wrapper) {
+		struct hisr *hi;
+		hi = (struct hisr *)old_state->ivs_greedy_arg;
+		if (hi->hi_func == func && hi->hi_obj == ob_pointer && hi->hi_typ == ob_type) {
+			/* Clear the HISR descriptor. */
+			hisr_clear(hi);
+			/* Delete the greedy handler of this ISR, thus marking
+			 * the greedy handler as no longer being in-use. */
+			if (old_state->ivs_handc == 0) {
+				new_state = incref(&empty_vector_state);
+			} else {
+				/* _try_ to allocate a new ISR vector state (but don't block, or throw an
+				 * exception if this cannot be done). If we're unable to delete the ISR
+				 * handler that we had registered for the given function, then the fact
+				 * that we've already called `hisr_clear()' above will already allow other
+				 * pieces of code to detect that the associated callback is dead and can
+				 * be overwritten/discarded as will.
+				 * In other words: If we fail this allocation, there's going to be a temporary
+				 *                 memory leak that'll get fixed as soon as some other piece
+				 *                 of code ties to modify the ISR vector.
+				 */
+				new_state = isr_vector_state_alloc_atomic_nx(old_state->ivs_handc);
+				if unlikely(!new_state)
+					goto shortcut_success;
+				new_state->ivs_greedy_fun = NULL;
+				new_state->ivs_greedy_arg = NULL;
+				new_state->ivs_greedy_drv = NULL;
+				new_state->ivs_greedy_cnt = 0;
+				memcpy(new_state->ivs_handv, old_state->ivs_handv,
+				       old_state->ivs_handc,
+				       sizeof(struct isr_vector_handler));
+				for (i = 0; i < new_state->ivs_handc; ++i) {
+					incref(new_state->ivs_handv[i].ivh_drv);
+				}
+			}
+assign_new_state:
+			new_state = isr_vector_state_remove_noop_hisr(new_state, NULL);
+			new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
+			success = isr_vectors[index].cmpxch(old_state, new_state);
+			if unlikely(!success) {
+				decref(old_state);
+				decref(new_state); /* Not inherited on failure */
+				goto again;
+			}
+			isr_vector_state_cleanup_noop_hisr(old_state, new_state, NULL);
+			decref_unlikely(new_state);
+shortcut_success:
+			{
+				REF struct driver *declaring_driver;
+				declaring_driver = driver_at_address(func);
+				if unlikely(!declaring_driver)
+					declaring_driver = incref(&drv_self);
+				printk(KERN_INFO "[isr] Delete handler for vector %#Ix (%[vinfo:%n(%p)] with %p in driver %q)\n",
+				       (size_t)ISR_INDEX_TO_VECTOR(index), func, ob_pointer, declaring_driver->d_name);
+				decref_unlikely(declaring_driver);
+			}
+			decref(old_state);
+			return true;
+		}
+	}
+
+	/* Search the handler vector for the given func+arg. */
+	for (i = 0; i < old_state->ivs_handc; ++i) {
+		struct hisr *hi;
+		if (old_state->ivs_handv[i].ivh_fun != &hisr_wrapper)
+			continue;
+		hi = (struct hisr *)old_state->ivs_handv[i].ivh_arg;
+		if (hi->hi_func != func || hi->hi_obj != ob_pointer || hi->hi_typ != ob_type)
+			continue;
+		/* Found it! */
+		hisr_clear(hi);
+		if (old_state->ivs_handc == 1 && !old_state->ivs_greedy_drv) {
+			new_state = incref(&empty_vector_state);
+		} else {
+			new_state = isr_vector_state_alloc_atomic_nx(old_state->ivs_handc - 1);
+			if unlikely(!new_state)
+				goto shortcut_success;
+			new_state->ivs_greedy_fun = old_state->ivs_greedy_fun;
+			new_state->ivs_greedy_arg = old_state->ivs_greedy_arg;
+			new_state->ivs_greedy_drv = xincref(old_state->ivs_greedy_drv);
+			new_state->ivs_greedy_cnt = old_state->ivs_greedy_cnt;
+			/* Copy handlers, but leave out the one at index=`i' */
+			memcpy(&new_state->ivs_handv[0],
+			       &old_state->ivs_handv[0],
+			       i, sizeof(struct isr_vector_handler));
+			memcpy(&new_state->ivs_handv[i],
+			       &old_state->ivs_handv[i + 1],
+			       new_state->ivs_handc - i,
+			       sizeof(struct isr_vector_handler));
+			for (i = 0; i < new_state->ivs_handc; ++i) {
+				incref(new_state->ivs_handv[i].ivh_drv);
+			}
+		}
+		goto assign_new_state;
+	}
+
+	/* Not found */
+	decref_unlikely(old_state);
+	return false;
+}
+
+FUNDEF NOBLOCK bool
+NOTHROW(KCALL hisr_unregister_)(void *func, void *ob_pointer,
+                                uintptr_half_t ob_type)
+		ASMNAME("hisr_unregister");
+PUBLIC NOBLOCK bool
+NOTHROW(KCALL hisr_unregister_)(void *func, void *ob_pointer,
+                                uintptr_half_t ob_type) {
+	size_t i;
+	for (i = 0; i < ISR_COUNT; ++i) {
+		if (hisr_unregister_impl(i, func, ob_pointer, ob_type))
+			return true;
+	}
+	return false;
+}
+
+FUNDEF NOBLOCK bool
+NOTHROW(KCALL hisr_unregister_at_)(isr_vector_t vector, void *func,
+                                   void *ob_pointer, uintptr_half_t ob_type)
+		ASMNAME("hisr_unregister_at");
+PUBLIC NOBLOCK bool
+NOTHROW(KCALL hisr_unregister_at_)(isr_vector_t vector, void *func,
+                                   void *ob_pointer, uintptr_half_t ob_type) {
+	if unlikely(!ISR_VECTOR_IS_VALID(vector))
+		return false;
+	return hisr_unregister_impl(ISR_VECTOR_TO_INDEX(vector),
+	                            func, ob_pointer, ob_type);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Return the usage descriptor for the given ISR vector. */
 PUBLIC NOBLOCK ATTR_RETNONNULL REF struct isr_vector_state *
 NOTHROW(KCALL isr_usage_of)(isr_vector_t vector) {
@@ -552,8 +1113,11 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
 	for (i = 0; i < new_state->ivs_handc; ++i) {
 		incref(new_state->ivs_handv[i].ivh_drv);
 	}
+	new_state = isr_vector_state_remove_noop_hisr(new_state, NULL);
 	new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
-	if (isr_vectors[i].cmpxch_inherit_new(old_state, new_state)) {
+	if (isr_vectors[i].cmpxch(old_state, new_state)) {
+		isr_vector_state_cleanup_noop_hisr(old_state, new_state, NULL);
+		destroy(new_state);
 		printk(KERN_INFO "[isr] Reorder handlers for vector %#Ix (%Iu -> %Iu)\n",
 		       (size_t)ISR_INDEX_TO_VECTOR(vector_index),
 		       src_handler_index, dst_handler_index);
@@ -612,6 +1176,7 @@ NOTHROW(KCALL isr_vector_trigger_impl)(size_t index) {
  * true, or if a greedy handler was defined. Otherwise, return `false'. */
 PUBLIC ATTR_NOINLINE NOBLOCK bool
 NOTHROW(KCALL isr_vector_trigger)(isr_vector_t vector) {
+	assert(!PREEMPTION_ENABLED());
 	if unlikely_untraced(!ISR_VECTOR_IS_VALID(vector))
 		return false;
 	return isr_vector_trigger_impl(ISR_VECTOR_TO_INDEX(vector));

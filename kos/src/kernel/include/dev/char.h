@@ -88,8 +88,6 @@ DEFINE_REFCOUNT_FUNCTIONS(struct character_device, cd_refcnt, character_device_d
  *   >> return->cd_type;
  * As well as optionally:
  *   >> return->cd_name;
- * This function will initialize the following memory to non-zero values:
- *   >> return->cd_max_retry = 2;
  */
 FUNDEF WUNUSED ATTR_RETNONNULL ATTR_MALLOC REF struct character_device *KCALL
 character_device_alloc(struct driver *__restrict owner,

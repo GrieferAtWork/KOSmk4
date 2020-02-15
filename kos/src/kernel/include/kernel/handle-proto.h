@@ -31,6 +31,9 @@ DECL_BEGIN
 #ifdef __DEEMON__
 #define HANDLE_OPERATOR_PROTOTYPES                                                                       \
 	{                                                                                                    \
+		("tryincref", "NOBLOCK NONNULL((1))", "__BOOL", "NOTHROW", "FCALL",                              \
+		 { ("void *__restrict", "self") },                                                               \
+		 "", "return 1;"),                                                                               \
 		("incref", "NOBLOCK NONNULL((1))", "void", "NOTHROW", "FCALL",                                   \
 		 { ("void *__restrict", "self") },                                                               \
 		 "", ""),                                                                                        \
@@ -362,6 +365,7 @@ struct vm_futexfd;
 
 
 /* Handle operators for `HANDLE_TYPE_DATABLOCK' (`struct vm_datablock') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_datablock_tryincref)(struct vm_datablock *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datablock_incref)(struct vm_datablock *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datablock_decref)(struct vm_datablock *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_datablock_refcnt)(struct vm_datablock const *__restrict self);
@@ -394,6 +398,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_datablock_poll(struct vm_da
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datablock_hop(struct vm_datablock *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_BLOCKDEVICE' (`struct basic_block_device') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_blockdevice_tryincref)(struct basic_block_device *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_incref)(struct basic_block_device *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_decref)(struct basic_block_device *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_blockdevice_refcnt)(struct basic_block_device const *__restrict self);
@@ -426,6 +431,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_blockdevice_poll(struct bas
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_blockdevice_hop(struct basic_block_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_DIRECTORYENTRY' (`struct directory_entry') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_directoryentry_tryincref)(struct directory_entry *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_incref)(struct directory_entry *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_decref)(struct directory_entry *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_directoryentry_refcnt)(struct directory_entry const *__restrict self);
@@ -458,6 +464,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_directoryentry_poll(struct 
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_directoryentry_hop(struct directory_entry *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_FILE' (`struct file') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_file_tryincref)(struct file *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_file_incref)(struct file *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_file_decref)(struct file *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_file_refcnt)(struct file const *__restrict self);
@@ -490,6 +497,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_file_poll(struct file *__re
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_file_hop(struct file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_ONESHOT_DIRECTORY_FILE' (`struct oneshot_directory_file') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_oneshot_directory_file_tryincref)(struct oneshot_directory_file *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_incref)(struct oneshot_directory_file *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_decref)(struct oneshot_directory_file *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_oneshot_directory_file_refcnt)(struct oneshot_directory_file const *__restrict self);
@@ -522,6 +530,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_oneshot_directory_file_poll
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_oneshot_directory_file_hop(struct oneshot_directory_file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_PATH' (`struct path') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_path_tryincref)(struct path *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_incref)(struct path *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_decref)(struct path *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_path_refcnt)(struct path const *__restrict self);
@@ -554,6 +563,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_path_poll(struct path *__re
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_path_hop(struct path *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_FS' (`struct fs') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_fs_tryincref)(struct fs *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_incref)(struct fs *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_decref)(struct fs *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fs_refcnt)(struct fs const *__restrict self);
@@ -586,6 +596,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fs_poll(struct fs *__restri
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fs_hop(struct fs *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_VM' (`struct vm') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_vm_tryincref)(struct vm *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_vm_incref)(struct vm *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_vm_decref)(struct vm *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_vm_refcnt)(struct vm const *__restrict self);
@@ -618,6 +629,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_vm_poll(struct vm *__restri
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_vm_hop(struct vm *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_task_tryincref)(struct taskpid *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_incref)(struct taskpid *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_decref)(struct taskpid *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_task_refcnt)(struct taskpid const *__restrict self);
@@ -650,6 +662,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_task_poll(struct taskpid *_
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_CLOCK' (`struct wall_clock') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_clock_tryincref)(struct wall_clock *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_clock_incref)(struct wall_clock *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_clock_decref)(struct wall_clock *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_clock_refcnt)(struct wall_clock const *__restrict self);
@@ -682,6 +695,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_clock_poll(struct wall_cloc
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_clock_hop(struct wall_clock *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_DRIVER' (`struct driver') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_tryincref)(struct driver *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_incref)(struct driver *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_decref)(struct driver *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_refcnt)(struct driver const *__restrict self);
@@ -714,6 +728,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_poll(struct driver *
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_hop(struct driver *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_PIPE' (`struct pipe') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_pipe_tryincref)(struct pipe *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_incref)(struct pipe *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_decref)(struct pipe *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pipe_refcnt)(struct pipe const *__restrict self);
@@ -746,6 +761,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_poll(struct pipe *__re
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_hop(struct pipe *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_PIPE_READER' (`struct pipe_reader') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_pipe_reader_tryincref)(struct pipe_reader *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_reader_incref)(struct pipe_reader *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_reader_decref)(struct pipe_reader *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pipe_reader_refcnt)(struct pipe_reader const *__restrict self);
@@ -778,6 +794,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_reader_poll(struct pip
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_reader_hop(struct pipe_reader *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_PIPE_WRITER' (`struct pipe_writer') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_pipe_writer_tryincref)(struct pipe_writer *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_writer_incref)(struct pipe_writer *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_writer_decref)(struct pipe_writer *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pipe_writer_refcnt)(struct pipe_writer const *__restrict self);
@@ -810,6 +827,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_writer_poll(struct pip
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_writer_hop(struct pipe_writer *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_PIDNS' (`struct pidns') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_pidns_tryincref)(struct pidns *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_incref)(struct pidns *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_decref)(struct pidns *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pidns_refcnt)(struct pidns const *__restrict self);
@@ -842,6 +860,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pidns_poll(struct pidns *__
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pidns_hop(struct pidns *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_DRIVER_STATE' (`struct driver_state') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_state_tryincref)(struct driver_state *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_state_incref)(struct driver_state *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_state_decref)(struct driver_state *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_state_refcnt)(struct driver_state const *__restrict self);
@@ -874,6 +893,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_state_poll(struct dr
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_state_hop(struct driver_state *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_CHARACTERDEVICE' (`struct character_device') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_characterdevice_tryincref)(struct character_device *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_incref)(struct character_device *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_decref)(struct character_device *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_characterdevice_refcnt)(struct character_device const *__restrict self);
@@ -906,6 +926,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_characterdevice_poll(struct
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_characterdevice_hop(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_EVENTFD_FENCE' (`struct eventfd') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_eventfd_fence_tryincref)(struct eventfd *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_fence_incref)(struct eventfd *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_fence_decref)(struct eventfd *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_eventfd_fence_refcnt)(struct eventfd const *__restrict self);
@@ -938,6 +959,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_eventfd_fence_poll(struct e
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_eventfd_fence_hop(struct eventfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_EVENTFD_SEMA' (`struct eventfd') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_eventfd_sema_tryincref)(struct eventfd *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_sema_incref)(struct eventfd *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_sema_decref)(struct eventfd *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_eventfd_sema_refcnt)(struct eventfd const *__restrict self);
@@ -970,6 +992,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_eventfd_sema_poll(struct ev
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_eventfd_sema_hop(struct eventfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_SIGNALFD' (`struct signalfd') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_signalfd_tryincref)(struct signalfd *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_signalfd_incref)(struct signalfd *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_signalfd_decref)(struct signalfd *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_signalfd_refcnt)(struct signalfd const *__restrict self);
@@ -1002,6 +1025,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_signalfd_poll(struct signal
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_signalfd_hop(struct signalfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_DATAPART' (`struct vm_datapart') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_datapart_tryincref)(struct vm_datapart *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datapart_incref)(struct vm_datapart *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datapart_decref)(struct vm_datapart *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_datapart_refcnt)(struct vm_datapart const *__restrict self);
@@ -1034,6 +1058,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_datapart_poll(struct vm_dat
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_FUTEX' (`struct vm_futex') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_futex_tryincref)(struct vm_futex *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_incref)(struct vm_futex *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_decref)(struct vm_futex *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futex_refcnt)(struct vm_futex const *__restrict self);
@@ -1066,6 +1091,7 @@ INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futex_poll(struct vm_futex 
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_FUTEXFD' (`struct vm_futexfd') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_futexfd_tryincref)(struct vm_futexfd *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_incref)(struct vm_futexfd *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_decref)(struct vm_futexfd *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futexfd_refcnt)(struct vm_futexfd const *__restrict self);
@@ -1114,6 +1140,10 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_hop(struct vm_futexfd *
 	INTERN NOBLOCK WUNUSED NONNULL((1)) refcnt_t                      \
 	NOTHROW(FCALL handle_##name##_refcnt)(T const *__restrict self) { \
 		return getrefcnt(self);                                       \
+	}                                                                 \
+	INTERN NOBLOCK NONNULL((1)) __BOOL                                \
+	NOTHROW(FCALL handle_##name##_tryincref)(T *__restrict self) {    \
+		return tryincref(self);                                       \
 	}                                                                 \
 	INTERN NOBLOCK NONNULL((1)) void                                  \
 	NOTHROW(FCALL handle_##name##_incref)(T *__restrict self) {       \

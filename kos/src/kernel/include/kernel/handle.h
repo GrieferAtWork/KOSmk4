@@ -69,6 +69,7 @@ struct handle_types {
 	 *       >> calll  *handle_type_db+h_sync(,%eax,4)
 	 */
 	char const *h_typename[HANDLE_TYPE_COUNT];
+	__BOOL /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_tryincref[HANDLE_TYPE_COUNT])(void *__restrict ptr);
 	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_incref[HANDLE_TYPE_COUNT])(void *__restrict ptr);
 	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_decref[HANDLE_TYPE_COUNT])(void *__restrict ptr);
 	refcnt_t /*NOTHROW*/ (NOBLOCK WUNUSED NONNULL((1)) FCALL *h_refcnt[HANDLE_TYPE_COUNT])(void const *__restrict ptr);
@@ -200,12 +201,13 @@ handle_print(struct handle const *__restrict self,
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
  * @return: true:  The data size was stored in `*presult'.
  * @return: false: The data size could not be determined. */
-FUNDEF bool KCALL handle_datasize(struct handle const *__restrict self, pos_t *__restrict presult);
+FUNDEF __BOOL KCALL handle_datasize(struct handle const *__restrict self, pos_t *__restrict presult);
 
 #define HANDLE_FUNC(self, name) (*handle_type_db.name[(self).h_type])
 
 #define handle_typename(self)                                    handle_type_db.h_typename[(self).h_type]
 #define handle_refcnt(self)                                      HANDLE_FUNC(self, h_refcnt)((self).h_data)
+#define handle_tryincref(self)                                   HANDLE_FUNC(self, h_tryincref)((self).h_data)
 #define handle_incref(self)                                      HANDLE_FUNC(self, h_incref)((self).h_data)
 #define handle_decref(self)                                      HANDLE_FUNC(self, h_decref)((self).h_data)
 #define handle_read(self, dst, num_bytes)                        HANDLE_FUNC(self, h_read)((self).h_data, dst, num_bytes, (self).h_mode)
@@ -369,9 +371,9 @@ handle_manager_cloexec(struct handle_manager *__restrict self) THROWS(E_WOULDBLO
  * @return: true:  The handle under `fd' was closed.
  * @return: false: No handle was associated with `fd'.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked. */
-FUNDEF bool FCALL
+FUNDEF __BOOL FCALL
 handle_tryclose(unsigned int fd) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((2)) bool FCALL
+FUNDEF NONNULL((2)) __BOOL FCALL
 handle_tryclose_nosym(unsigned int fd,
                       struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK);

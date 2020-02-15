@@ -245,6 +245,7 @@ heap_align(struct heap *__restrict self, size_t min_alignment,
 	return __os_heap_align(self, min_alignment, offset, num_bytes, flags);
 }
 
+/* Upon failure, `return.hp_siz == 0' */
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_alloc_nx)(struct heap *__restrict self, size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes))
@@ -254,6 +255,7 @@ NOTHROW(KCALL heap_alloc_nx)(struct heap *__restrict self, size_t num_bytes, gfp
 	return __os_heap_alloc_nx(self, num_bytes, flags);
 }
 
+/* Upon failure, `return.hp_siz == 0' */
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_align_nx)(struct heap *__restrict self,
                               size_t min_alignment, ptrdiff_t offset,
@@ -291,6 +293,7 @@ heap_align_untraced(struct heap *__restrict self, size_t min_alignment,
 	return __os_heap_align_untraced(self, min_alignment, offset, num_bytes, flags);
 }
 
+/* Upon failure, `return.hp_siz == 0' */
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_alloc_untraced_nx)(struct heap *__restrict self,
                                       size_t num_bytes, gfp_t flags) {
@@ -301,6 +304,7 @@ NOTHROW(KCALL heap_alloc_untraced_nx)(struct heap *__restrict self,
 	return __os_heap_alloc_untraced_nx(self, num_bytes, flags);
 }
 
+/* Upon failure, `return.hp_siz == 0' */
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_align_untraced_nx)(struct heap *__restrict self,
                                       size_t min_alignment, ptrdiff_t offset,
@@ -450,6 +454,7 @@ heap_realign(struct heap *__restrict self,
 	                         offset, new_bytes, alloc_flags, free_flags);
 }
 
+/* Upon failure, `return.hp_siz == 0' */
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_realloc_nx)(struct heap *__restrict self,
                                 VIRT void *old_ptr, size_t old_bytes,
@@ -467,6 +472,7 @@ NOTHROW(KCALL heap_realloc_nx)(struct heap *__restrict self,
 	                            alloc_flags, free_flags);
 }
 
+/* Upon failure, `return.hp_siz == 0' */
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_realign_nx)(struct heap *__restrict self,
                                 VIRT void *old_ptr, size_t old_bytes,
@@ -525,6 +531,7 @@ heap_realign_untraced(struct heap *__restrict self,
 	                                  offset, new_bytes, alloc_flags, free_flags);
 }
 
+/* Upon failure, `return.hp_siz == 0' */
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_realloc_untraced_nx)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
@@ -542,6 +549,7 @@ NOTHROW(KCALL heap_realloc_untraced_nx)(struct heap *__restrict self,
 	                                     alloc_flags, free_flags);
 }
 
+/* Upon failure, `return.hp_siz == 0' */
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_realign_untraced_nx)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
