@@ -64,12 +64,12 @@ NOTHROW(VCALL dbg_addr2line_printf)(uintptr_t start_pc, uintptr_t end_pc,
 
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict ainfo,
-                                        uintptr_t module_relative_pc,
+                                        uintptr_t module_relative_start_pc,
                                         uintptr_t start_pc, uintptr_t end_pc,
                                         char const *message_format, va_list args) {
 	di_debug_addr2line_t info;
 	addr2line_errno_t error;
-	error = addr2line(ainfo, module_relative_pc, &info, 0);
+	error = addr2line(ainfo, module_relative_start_pc, &info, 0);
 	if (error != DEBUG_INFO_ERROR_SUCCESS) {
 		dbg_printf(DBGSTR(DF_SETFGCOLOR(DBG_COLOR_WHITE) "%p" DF_DEFFGCOLOR "+"
 		                  DF_SETFGCOLOR(DBG_COLOR_WHITE) "%-4Iu" DF_DEFFGCOLOR),
@@ -94,7 +94,10 @@ again_printlevel:
 		        : DBG_COLOR_WHITE;
 		attr  = dbg_attr;
 		dbg_setfgcolor(color);
-		dbg_printf(DBGSTR("%p"), level == 0 ? start_pc : info.al_symstart);
+		dbg_printf(DBGSTR("%p"),
+		           level == 0 ? start_pc
+		                      : ((start_pc - module_relative_start_pc) +
+		                         info.al_symstart));
 		dbg_attr = attr;
 		dbg_putc('+');
 		attr = dbg_attr;
@@ -112,7 +115,7 @@ again_printlevel:
 		attr = dbg_attr;
 		dbg_setfgcolor(color);
 		dbg_printf(DBGSTR("%Iu"),
-		           level == 0 ? (size_t)(start_pc - info.al_symstart)
+		           level == 0 ? (size_t)(module_relative_start_pc - info.al_symstart)
 		                      : (size_t)(info.al_linestart - info.al_symstart));
 		dbg_attr = attr;
 		dbg_putc(']');
@@ -181,10 +184,10 @@ PUBLIC ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_addr2line_vprintf)(uintptr_t start_pc, uintptr_t end_pc,
                                      char const *message_format, va_list args) {
 	struct addr2line_buf ainfo;
-	uintptr_t module_relative_pc;
-	module_relative_pc = addr2line_begin(&ainfo, start_pc);
+	uintptr_t module_relative_start_pc;
+	module_relative_start_pc = addr2line_begin(&ainfo, start_pc);
 	do_dbg_addr2line_vprintf(&ainfo,
-	                         module_relative_pc,
+	                         module_relative_start_pc,
 	                         start_pc,
 	                         end_pc,
 	                         message_format,
