@@ -21,12 +21,11 @@
 #define GUARD_LIBC_API_H 1
 #define __BUILDING_LIBC 1
 
+#define __CRT_KOS_PRIMARY 1
+#define __CRT_KOS 1
 #ifdef __KERNEL__
 #define __CRT_KOS_KERNEL 1
-#else /* __KERNEL__ */
-#define __CRT_KOS 1
-#define __CRT_KOS_PRIMARY 1
-#endif /* !__KERNEL__ */
+#endif /* __KERNEL__ */
 
 #ifndef __OPTIMIZE_SIZE__
 /* Enable system call inlining, causing calls to `sys_*' functions from <kos/syscalls.h>
@@ -98,6 +97,11 @@
 #define __CRT_HAVE___assert_func 1
 #define __CRT_HAVE___assertfail 1
 #define __CRT_HAVE__assert 1
+
+/* Do some quick probing if crt linkage was configured correctly */
+#ifndef __CRT_HAVE_memmove
+#error "Bad libc build environment"
+#endif /* !__CRT_HAVE_memmove */
 
 
 #ifdef __KERNEL__
