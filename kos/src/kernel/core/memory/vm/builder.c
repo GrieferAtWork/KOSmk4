@@ -143,8 +143,8 @@ again:
 		                                 GFP_LOCKED | GFP_PREFLT);
 		TRY {
 			part = vm_paged_datablock_locatepart_exact(data,
-			                                     data_start_vpage,
-			                                     num_pages);
+			                                           data_start_vpage,
+			                                           num_pages);
 		} EXCEPT {
 			kfree(node);
 			RETHROW();

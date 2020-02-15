@@ -1265,8 +1265,8 @@ handle_datablock_stat(struct vm_datablock *__restrict self,
 
 INTERN WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct vm_datablock *KCALL
 handle_datablock_mmap(struct vm_datablock *__restrict self,
-                      vm_vpage64_t *__restrict UNUSED(pminpage),
-                      vm_vpage64_t *__restrict UNUSED(pmaxpage))
+                      pos_t *__restrict UNUSED(pminoffset),
+                      pos_t *__restrict UNUSED(pnumbytes))
 		THROWS(...) {
 	return incref(self);
 }

@@ -27,6 +27,7 @@
 #include <kernel/vm.h>
 #include <kernel/vm/futex.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
 #include <assert.h>
@@ -406,8 +407,8 @@ done_check_oob:
  *          meaning that the part would get freshly allocated, and repeated calls with
  *          the same arguments would not yield the same futex object!
  *       -> As such, in the most common case of a futex lookup where you wish to find
- *          the futex associated with some given `vm_virt_t', the process would be to
- *          to determine the `vm_node' of the address, and using that node then determine
+ *          the futex associated with some given address, the process would be to
+ *          determine the `vm_node' of the address, and using that node then determine
  *          the associated vm_datapart, and relative offset into that datapart. If a lookup
  *          of the futex then returns `VM_DATAPART_GETFUTEX_OUTOFRANGE', loop back around
  *          and once again lookup the `vm_node'.
@@ -423,7 +424,7 @@ PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
 	pos_t partrel_addr;
 again:
 	/* Lookup the datapart that should contain the associated futex. */
-	part = vm_paged_datablock_locatepart(self, (vm_vpage64_t)(offset / PAGESIZE), 1);
+	part = vm_datablock_locatepart(self, (pos_t)FLOOR_ALIGN(offset, PAGESIZE), PAGESIZE);
 	partrel_addr = (pos_t)(offset - vm_datapart_minbyte(part));
 #if __SIZEOF_POINTER__ < __FS_SIZEOF(OFF)
 	/* Make sure that the part-relative address offset
@@ -431,7 +432,9 @@ again:
 	if (partrel_addr > (pos_t)(uintptr_t)-1) {
 		REF struct vm_datapart *used_part;
 		TRY {
-			used_part = vm_paged_datablock_locatepart_exact(self, (vm_vpage64_t)(offset / PAGESIZE), 1);
+			used_part = vm_datablock_locatepart_exact(self,
+			                                          (pos_t)FLOOR_ALIGN(offset, PAGESIZE),
+			                                          PAGESIZE);
 		} EXCEPT {
 			decref_unlikely(part);
 			RETHROW();

@@ -230,7 +230,6 @@ NOTHROW(KCALL pagedir_unsetchanged_p)(PAGEDIR_P_SELFTYPE self,
 }
 #endif /* CONFIG_HAVE_PAGEDIR_CHANGED */
 
-
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_unmap_userspace_p") void
 NOTHROW(KCALL pagedir_unmap_userspace_p)(PAGEDIR_P_SELFTYPE self,
                                          struct vm *__restrict sync_vm) {

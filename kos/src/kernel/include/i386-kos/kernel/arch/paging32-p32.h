@@ -116,8 +116,8 @@ DECL_BEGIN
 
 /* Return the in-page offset of a regular pointer mapping,
  * or one that has been mapped within a 4MiB page. */
-#define P32_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u32)(__CCAST(vm_virt_t)(ptr) & P32_PAGE_OFFST_4KIB))
-#define P32_PDIR_PAGEINDEX_4MIB(ptr) (__CCAST(u32)(__CCAST(vm_virt_t)(ptr) & P32_PAGE_OFFST_4MIB))
+#define P32_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u32)(__CCAST(uintptr_t)(ptr) & P32_PAGE_OFFST_4KIB))
+#define P32_PDIR_PAGEINDEX_4MIB(ptr) (__CCAST(u32)(__CCAST(uintptr_t)(ptr) & P32_PAGE_OFFST_4MIB))
 
 #define P32_PDIR_ALIGN  4096 /* Alignment required for instances of `struct p32_pdir' */
 #define P32_PDIR_SIZE   4096 /* The total size of `struct p32_pdir' in bytes. */

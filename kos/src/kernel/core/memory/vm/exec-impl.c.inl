@@ -127,11 +127,11 @@ MY_FUNC(vm_exec_impl)(struct vm *__restrict effective_vm,
 						prot |= VM_PROT_READ;
 #endif
 					map_ok = vmb_paged_mapat(&builder,
-					                   page_index,
-					                   num_pages,
-					                   exec_node,
-					                   (vm_vpage64_t)(phdr_vector[i].p_offset / PAGESIZE),
-					                   prot | VM_PROT_PRIVATE);
+					                         page_index,
+					                         num_pages,
+					                         exec_node,
+					                         (vm_vpage64_t)(phdr_vector[i].p_offset / PAGESIZE),
+					                         prot | VM_PROT_PRIVATE);
 					if unlikely(!map_ok) {
 err_overlap:
 						THROW(E_NOT_EXECUTABLE_FAULTY,

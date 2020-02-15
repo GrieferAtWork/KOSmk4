@@ -25,6 +25,7 @@
 #include <dev/char.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/handle-proto.h>
 #include <sched/pid-ctty.h>
 #include <sched/pid.h>
 
@@ -99,12 +100,12 @@ ctty_ioctl(struct character_device *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1)) REF struct vm_datablock *KCALL
 ctty_mmap(struct character_device *__restrict UNUSED(self),
-          vm_vpage64_t *__restrict pminpage,
-          vm_vpage64_t *__restrict pmaxpage) THROWS(...) {
+          pos_t *__restrict pminoffset,
+          pos_t *__restrict pnumbytes) THROWS(...) {
 	REF struct vm_datablock *result;
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	result = character_device_mmap(ctty, pminpage, pmaxpage);
+	result = character_device_mmap(ctty, pminoffset, pnumbytes);
 	return result;
 }
 

@@ -1301,10 +1301,10 @@ again_handle_questionmark:
 	}	break;
 
 	case 'B': {
-		vm_virt_t addr;
+		VIRT void *addr;
 		errno_t error;
 		/* Old-style breakpoint packet */
-		addr = (vm_virt_t)strtou(i, &i, 16);
+		addr = (VIRT void *)strtou(i, &i, 16);
 		if (*i++ != ',')
 			ERROR(err_syntax);
 		if (i != endptr - 1)
@@ -1471,9 +1471,9 @@ resume_dostep:
 		break;
 
 	case 'm': {
-		vm_virt_t addr;
+		VIRT void *addr;
 		size_t length, error, j;
-		addr = (vm_virt_t)strtou(i, &i, 16);
+		addr = (VIRT void *)strtou(i, &i, 16);
 		if (*i++ != ',')
 			ERROR(err_syntax);
 		length = strtou(i, &i, 16);
@@ -1496,9 +1496,9 @@ resume_dostep:
 	}	break;
 
 	case 'M': {
-		vm_virt_t addr;
+		VIRT void *addr;
 		size_t length, error, j;
-		addr = (vm_virt_t)strtou(i, &i, 16);
+		addr = (VIRT void *)strtou(i, &i, 16);
 		if (*i++ != ',')
 			ERROR(err_syntax);
 		length = strtou(i, &i, 16);
@@ -1617,9 +1617,9 @@ handle_set_register_error:
 	}	break;
 
 	case 't': {
-		vm_virt_t addr;
+		VIRT void *addr;
 		u32 pattern, mask;
-		addr = (vm_virt_t)strtou(i, &i, 16);
+		addr = (VIRT void *)strtou(i, &i, 16);
 		if (*i++ != ':')
 			ERROR(err_syntax);
 		pattern = (u32)strtou32(i, &i, 16);
@@ -1630,12 +1630,12 @@ handle_set_register_error:
 			ERROR(err_syntax);
 		/* Really weird packet, but easy enough to implement... */
 		for (;;) {
-			uintptr_t pagebase, search_size;
-			pagebase    = ((uintptr_t)addr - 3) & ~PAGEMASK;
-			search_size = ((uintptr_t)addr - pagebase) + 3;
+			VIRT byte_t *pagebase;
+			size_t search_size;
+			pagebase    = (VIRT byte_t *)(((uintptr_t)addr - 3) & ~PAGEMASK);
+			search_size = ((VIRT byte_t *)addr - pagebase) + 3;
 			if (GDB_ReadMemory(GDB_CurrentThread_general.ts_thread,
-			                   (vm_virt_t)pagebase,
-			                   GDBRemote_CommandBuffer, search_size))
+			                   pagebase, GDBRemote_CommandBuffer, search_size))
 				ERROR(err_EFAULT);
 			while (search_size--) {
 				u32 value;
@@ -1774,11 +1774,11 @@ set_single_step_all_threads:
 				}	break;
 
 				case 'r': {
-					vm_virt_t start, end;
-					start = (vm_virt_t)strtou(i, &i, 16);
+					VIRT void const *start, *end;
+					start = (VIRT void const *)strtou(i, &i, 16);
 					if (*i++ != ',')
 						ERROR(err_syntax);
-					end = (vm_virt_t)strtou(i, &i, 16);
+					end = (VIRT void const *)strtou(i, &i, 16);
 					action = 's';
 					if (*i == ':') {
 						++i;
@@ -1889,12 +1889,12 @@ send_empty:
 			*o++ = 'C';
 			o = GDBThreadSel_EncodeThreadID(o, &GDB_CurrentThread_general);
 		} else if (ISNAME("CRC")) {
-			vm_virt_t addr;
+			VIRT void const *addr;
 			size_t length;
 			u32 res;
 			if (*nameEnd++ != ':')
 				ERROR(err_syntax);
-			addr = (vm_virt_t)strtou(i, &i, 16);
+			addr = (VIRT void const *)strtou(i, &i, 16);
 			if (*i++ != ',')
 				ERROR(err_syntax);
 			length = strtou(i, &i, 16);
@@ -1906,7 +1906,7 @@ send_empty:
 			*o++ = 'C';
 			o += sprintf(o, "%" PRIx32, res);
 		} else if (ISNAME("Search")) {
-			vm_virt_t haystack, addr;
+			VIRT void const *haystack, *addr;
 			size_t haystack_length, needle_length;
 			if (*nameEnd++ != ':')
 				ERROR(err_syntax);
@@ -1915,7 +1915,7 @@ send_empty:
 			i = nameEnd + COMPILER_STRLEN("memory");
 			if (*i++ != ':')
 				ERROR(err_syntax);
-			haystack = (vm_virt_t)strtou(i, &i, 16);
+			haystack = (VIRT void const *)strtou(i, &i, 16);
 			if (*i++ != ';')
 				ERROR(err_syntax);
 			haystack_length = strtou(i, &i, 16);
@@ -2394,9 +2394,9 @@ do_return_attached_everything:
 	}	break;
 
 	case 'X': {
-		vm_virt_t addr;
+		VIRT void *addr;
 		size_t length, error;
-		addr = (vm_virt_t)strtou(i, &i, 16);
+		addr = (VIRT void *)strtou(i, &i, 16);
 		if (*i++ != ',')
 			ERROR(err_syntax);
 		length = strtou(i, &i, 16);
@@ -2406,7 +2406,7 @@ do_return_attached_everything:
 		if (length != error)
 			ERROR(err_syntax);
 		error = GDB_WriteMemory(GDB_CurrentThread_general.ts_thread,
-		                        (vm_virt_t)addr, i, length);
+		                        addr, i, length);
 		if (error != 0)
 			ERROR(err_EFAULT);
 		goto send_ok;
@@ -2416,14 +2416,14 @@ do_return_attached_everything:
 	case 'Z': {
 		unsigned int type;
 		unsigned int kind;
-		vm_virt_t addr;
+		VIRT void *addr;
 		errno_t error;
 		if (!(*i >= '0' && *i <= '4'))
 			ERROR(err_syntax);
 		type = (unsigned int)(*i++ - '0');
 		if (*i++ != ',')
 			ERROR(err_syntax);
-		addr = (vm_virt_t)strtou(i, &i, 16);
+		addr = (VIRT void *)strtou(i, &i, 16);
 		if (*i++ != ',')
 			ERROR(err_syntax);
 		kind = (unsigned int)strtoul(i, &i, 16);

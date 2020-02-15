@@ -39,20 +39,20 @@
 
 DECL_BEGIN
 
-PRIVATE struct task *GDB_SingleStep_IngoreThread = NULL;
-PRIVATE uintptr_t GDB_SingleStep_IngoreStart     = 0;
-PRIVATE uintptr_t GDB_SingleStep_IngoreEnd       = 0;
+PRIVATE struct task const *GDB_SingleStep_IngoreThread = NULL;
+PRIVATE VIRT void const *GDB_SingleStep_IngoreStart     = 0;
+PRIVATE VIRT void const *GDB_SingleStep_IngoreEnd       = 0;
 
 /* Set a hint to the GDB backend to ignore single-step events
  * for instruction pointers `>= start_pc && < end_pc'.
  * Only a single such hint can exist at any point in time. */
 INTERN void
-NOTHROW(FCALL GDB_SetSingleStepIgnoredRange)(struct task *thread,
-                                             vm_virt_t start_pc,
-                                             vm_virt_t end_pc) {
+NOTHROW(FCALL GDB_SetSingleStepIgnoredRange)(struct task const *thread,
+                                             VIRT void const *start_pc,
+                                             VIRT void const *end_pc) {
 	GDB_SingleStep_IngoreThread = thread;
-	GDB_SingleStep_IngoreStart  = (uintptr_t)start_pc;
-	GDB_SingleStep_IngoreEnd    = (uintptr_t)end_pc;
+	GDB_SingleStep_IngoreStart  = start_pc;
+	GDB_SingleStep_IngoreEnd    = end_pc;
 }
 
 INTERN void
@@ -72,9 +72,9 @@ GDBX86Interrupt_Int1Handler(struct icpustate *__restrict state) {
 		if (GDB_SingleStep_IngoreThread == NULL ||
 		    GDB_SingleStep_IngoreThread == THIS_TASK) {
 			/* Check if this interrupt should be ignored. */
-			uintptr_t pc = irregs_rdip(&state->ics_irregs);
-			if (pc >= GDB_SingleStep_IngoreStart &&
-			    pc < GDB_SingleStep_IngoreEnd) {
+			byte_t *pc = (byte_t *)icpustate_getpc(state);
+			if (pc >= (byte_t *)GDB_SingleStep_IngoreStart &&
+			    pc < (byte_t *)GDB_SingleStep_IngoreEnd) {
 				GDB_DEBUG("[gdb][pc:%p] Skip single-step hit\n", pc);
 				return state;
 			}
@@ -102,7 +102,8 @@ GDBX86Interrupt_Int3Handler(struct icpustate *__restrict state) {
 	/* INT3 - #BP */
 	struct debugtrap_reason reason;
 	struct exception_info old_error;
-	uintptr_t pc = irregs_rdip(&state->ics_irregs);
+	byte_t *pc;
+	pc = (byte_t *)icpustate_getpc(state);
 	reason.dtr_signo  = SIGTRAP;
 	reason.dtr_reason = DEBUGTRAP_REASON_NONE;
 	printk(KERN_TRACE "[gdb][pc:%p] sw-breakpoint hit\n", pc);
@@ -112,7 +113,7 @@ GDBX86Interrupt_Int3Handler(struct icpustate *__restrict state) {
 		byte_t instr;
 		memcpy(&old_error, error_info(), sizeof(old_error));
 		TRY {
-			instr = ((byte_t *)pc)[-1];
+			instr = pc[-1];
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT) &&
 			    !was_thrown(E_WOULDBLOCK))
@@ -121,7 +122,7 @@ GDBX86Interrupt_Int3Handler(struct icpustate *__restrict state) {
 		}
 		if (instr == 0xcc) {
 			/* int3 */
-			icpustate_setpc(state, pc - 1);
+			icpustate_setpc(state, (uintptr_t)(pc - 1));
 set_swbreak_regs:
 			reason.dtr_reason = DEBUGTRAP_REASON_SWBREAK;
 		} else if (instr == 0x03) {
@@ -132,7 +133,7 @@ set_swbreak_regs:
 			}
 			if (instr == 0xcd) {
 				/* int $3 */
-				icpustate_setpc(state, pc - 2);
+				icpustate_setpc(state, (uintptr_t)(pc - 2));
 				goto set_swbreak_regs;
 			}
 		}

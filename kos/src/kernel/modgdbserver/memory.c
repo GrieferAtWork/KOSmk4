@@ -44,7 +44,7 @@ DECL_BEGIN
  *               - `buf + num_bytes - return ... buf + num_bytes - 1' */
 INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_ReadMemory)(struct task *__restrict thread,
-                              vm_virt_t addr, void *buf, size_t num_bytes) {
+                              VIRT void const *addr, void *buf, size_t num_bytes) {
 	size_t result;
 	if (ADDR_ISKERN(addr))
 		result = GDB_VM_ReadMemory(&vm_kernel, addr, buf, num_bytes);
@@ -59,7 +59,7 @@ NOTHROW(FCALL GDB_ReadMemory)(struct task *__restrict thread,
 
 INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_WriteMemory)(struct task *__restrict thread,
-                               vm_virt_t addr, void *buf, size_t num_bytes) {
+                               VIRT void *addr, void *buf, size_t num_bytes) {
 	size_t result;
 	if (ADDR_ISKERN(addr))
 		result = GDB_VM_WriteMemory(&vm_kernel, addr, buf, num_bytes);
@@ -74,7 +74,8 @@ NOTHROW(FCALL GDB_WriteMemory)(struct task *__restrict thread,
 
 INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_ReadMemoryWithoutSwBreak)(struct task *__restrict thread,
-                                            vm_virt_t addr, void *buf, size_t num_bytes) {
+                                            VIRT void const *addr,
+                                            void *buf, size_t num_bytes) {
 	size_t result;
 	if (ADDR_ISKERN(addr))
 		result = GDB_VM_ReadMemoryWithoutSwBreak(&vm_kernel, addr, buf, num_bytes);
@@ -89,7 +90,8 @@ NOTHROW(FCALL GDB_ReadMemoryWithoutSwBreak)(struct task *__restrict thread,
 
 INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_WriteMemoryWithoutSwBreak)(struct task *__restrict thread,
-                                             vm_virt_t addr, void const *buf, size_t num_bytes) {
+                                             VIRT void *addr,
+                                             void const *buf, size_t num_bytes) {
 	size_t result;
 	if (ADDR_ISKERN(addr))
 		result = GDB_VM_WriteMemoryWithoutSwBreak(&vm_kernel, addr, buf, num_bytes);
@@ -104,7 +106,8 @@ NOTHROW(FCALL GDB_WriteMemoryWithoutSwBreak)(struct task *__restrict thread,
 
 INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_VM_ReadMemory)(struct vm *__restrict effective_vm,
-                                 vm_virt_t addr, void *buf, size_t num_bytes) {
+                                 VIRT void const *addr,
+                                 void *buf, size_t num_bytes) {
 	size_t result;
 	result = GDB_VM_ReadMemoryWithoutSwBreak(effective_vm, addr, buf, num_bytes);
 	GDB_ExcludeSwBreak(effective_vm, addr, buf, num_bytes - __builtin_expect(result, 0));
@@ -113,7 +116,7 @@ NOTHROW(FCALL GDB_VM_ReadMemory)(struct vm *__restrict effective_vm,
 
 INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_VM_WriteMemory)(struct vm *__restrict effective_vm,
-                                  vm_virt_t addr, void *buf, size_t num_bytes) {
+                                  VIRT void *addr, void *buf, size_t num_bytes) {
 	size_t result;
 	GDB_IncludeSwBreak(effective_vm, addr, buf, num_bytes);
 	result = GDB_VM_WriteMemoryWithoutSwBreak(effective_vm, addr, buf, num_bytes);
@@ -122,7 +125,7 @@ NOTHROW(FCALL GDB_VM_WriteMemory)(struct vm *__restrict effective_vm,
 
 INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_vm,
-                                               vm_virt_t addr, void *buf, size_t num_bytes) {
+                                               VIRT void const *addr, void *buf, size_t num_bytes) {
 	size_t result;
 	result = vm_read_nopf(effective_vm, (void const *)addr, buf, num_bytes);
 	if (result) {
@@ -139,7 +142,7 @@ NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_v
 
 INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(struct vm *__restrict effective_vm,
-                                                vm_virt_t addr, void const *buf, size_t num_bytes) {
+                                                VIRT void *addr, void const *buf, size_t num_bytes) {
 	size_t result;
 	result = vm_write_nopf(effective_vm, (void *)addr, buf, num_bytes);
 	if (result) {
@@ -162,9 +165,9 @@ NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(struct vm *__restrict effective_
  * @return: false: The needle wasn't found. */
 INTERN NONNULL((1, 4)) bool
 NOTHROW(FCALL GDB_FindMemory)(struct task *__restrict thread,
-                              vm_virt_t haystack, size_t haystack_length,
+                              VIRT void const *haystack, size_t haystack_length,
                               void const *needle, size_t needle_length,
-                              vm_virt_t *__restrict presult) {
+                              VIRT void const **__restrict presult) {
 	/* Since the length of `needle' is restricted by the max length of a packet,
 	 * we can assume that `needle_length < CONFIG_GDBSERVER_PACKET_MAXLEN / 2', as
 	 * well as that we are free to use `GDBPacket_Start()' as a temporary buffer. */
@@ -208,7 +211,7 @@ continue_scanning:
 					}
 found_it_at_pos:
 					/* Found it! */
-					*presult = haystack + (size_t)(pos - buf);
+					*presult = (byte_t *)haystack + (size_t)(pos - buf);
 					return true;
 				} else {
 					size_t missing_bytes;
@@ -231,7 +234,7 @@ found_it_at_pos:
 					 * that reading the next block of memory will yield all of the
 					 * remaining data left to-be matched. */
 					missing_bytes = needle_length - avail;
-					haystack += maxcount;
+					haystack = (VIRT byte_t const *)haystack + maxcount;
 					haystack_length -= maxcount;
 					if (missing_bytes > haystack_length)
 						goto not_found;
@@ -254,7 +257,7 @@ found_it_at_pos:
 advance_to_next_haystack:
 		if (maxcount >= haystack_length)
 			break;
-		haystack += maxcount;
+		haystack = (VIRT byte_t const *)haystack + maxcount;
 		haystack_length -= maxcount;
 	}
 not_found:
@@ -269,7 +272,7 @@ INTDEF u32 FCALL libiberty_xcrc32(byte_t const *buf, size_t len, u32 crc);
  * Otherwise, return `true' and store the CRC value in `*presult' */
 INTERN NONNULL((1, 4)) bool
 NOTHROW(FCALL GDB_CalculateCRC32)(struct task *__restrict thread,
-                                  vm_virt_t addr, size_t length,
+                                  VIRT void const *addr, size_t length,
                                   u32 *__restrict presult) {
 	u32 result = 0xffffffff;
 	if likely(length != 0) {
@@ -285,7 +288,7 @@ NOTHROW(FCALL GDB_CalculateCRC32)(struct task *__restrict thread,
 			if (maxlen >= length)
 				break;
 			length -= maxlen;
-			addr += maxlen;
+			addr = (VIRT byte_t const *)addr + maxlen;
 		}
 	}
 	*presult = result;

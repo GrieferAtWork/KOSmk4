@@ -213,7 +213,10 @@ INTDEF ATTR_NORETURN void NOTHROW(FCALL GDBThread_KillKernel)(void);
 /* Set a hint to the GDB backend to ignore single-step events
  * for instruction pointers `>= start_pc && < end_pc'.
  * Only a single such hint can exist at any point in time. */
-INTDEF void NOTHROW(FCALL GDB_SetSingleStepIgnoredRange)(struct task *thread, vm_virt_t start_pc, vm_virt_t end_pc);
+INTDEF void
+NOTHROW(FCALL GDB_SetSingleStepIgnoredRange)(struct task const *thread,
+                                             VIRT void const *start_pc,
+                                             VIRT void const *end_pc);
 INTDEF void NOTHROW(FCALL GDB_DelSingleStepIgnoredRange)(void);
 
 
@@ -283,10 +286,10 @@ INTDEF bool NOTHROW(FCALL GDB_SetSingleStep)(struct task *__restrict thread, boo
  * @return: ENOMEM:   [GDB_AddBreak] Failed to add the breakpoint (too many breakpoints already defined)
  * @return: EFAULT:   [GDB_AddBreak] Attempted to define a software-breakpoint at a faulty memory location.
  * @return: ENOENT:   [GDB_DelBreak] The specified breakpoint doesn't exist. */
-INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_AddBreak)(struct task *__restrict thread, unsigned int type, vm_virt_t addr, unsigned int kind);
-INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_DelBreak)(struct task *__restrict thread, unsigned int type, vm_virt_t addr, unsigned int kind);
-INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_VM_AddBreak)(struct vm *__restrict effective_vm, unsigned int type, vm_virt_t addr, unsigned int kind);
-INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_VM_DelBreak)(struct vm *__restrict effective_vm, unsigned int type, vm_virt_t addr, unsigned int kind);
+INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_AddBreak)(struct task *__restrict thread, unsigned int type, VIRT void *addr, unsigned int kind);
+INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_DelBreak)(struct task *__restrict thread, unsigned int type, VIRT void *addr, unsigned int kind);
+INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_VM_AddBreak)(struct vm *__restrict effective_vm, unsigned int type, VIRT void *addr, unsigned int kind);
+INTDEF WUNUSED errno_t NOTHROW(FCALL GDB_VM_DelBreak)(struct vm *__restrict effective_vm, unsigned int type, VIRT void *addr, unsigned int kind);
 
 /* Remove all breakpoints from any sort of VM */
 INTDEF void NOTHROW(FCALL GDB_RemoveAllBreakpoints)(void);
@@ -306,14 +309,14 @@ INTDEF void NOTHROW(FCALL GDB_CloneAllBreakpointsFromVM)(struct vm *__restrict n
  *              The affected memory ranges are:
  *               - `addr + num_bytes - return ... addr + num_bytes - 1'
  *               - `buf + num_bytes - return ... buf + num_bytes - 1' */
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_ReadMemory)(struct task *__restrict thread, vm_virt_t addr, void *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_WriteMemory)(struct task *__restrict thread, vm_virt_t addr, void *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_ReadMemoryWithoutSwBreak)(struct task *__restrict thread, vm_virt_t addr, void *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_WriteMemoryWithoutSwBreak)(struct task *__restrict thread, vm_virt_t addr, void const *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_ReadMemory)(struct vm *__restrict effective_vm, vm_virt_t addr, void *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_WriteMemory)(struct vm *__restrict effective_vm, vm_virt_t addr, void *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_vm, vm_virt_t addr, void *buf, size_t num_bytes);
-INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(struct vm *__restrict effective_vm, vm_virt_t addr, void const *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_ReadMemory)(struct task *__restrict thread, VIRT void const *addr, void *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_WriteMemory)(struct task *__restrict thread, VIRT void *addr, void *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_ReadMemoryWithoutSwBreak)(struct task *__restrict thread, VIRT void const *addr, void *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_WriteMemoryWithoutSwBreak)(struct task *__restrict thread, VIRT void *addr, void const *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_ReadMemory)(struct vm *__restrict effective_vm, VIRT void const *addr, void *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_WriteMemory)(struct vm *__restrict effective_vm, VIRT void *addr, void *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_vm, VIRT void const *addr, void *buf, size_t num_bytes);
+INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(struct vm *__restrict effective_vm, VIRT void *addr, void const *buf, size_t num_bytes);
 
 /* Search memory for a specific need
  * This function behaves identical to `memmem()'
@@ -321,16 +324,16 @@ INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(st
  * @return: false: The needle wasn't found. */
 INTDEF NONNULL((1, 4)) bool
 NOTHROW(FCALL GDB_FindMemory)(struct task *__restrict thread,
-                              vm_virt_t haystack, size_t haystack_length,
+                              VIRT void const *haystack, size_t haystack_length,
                               void const *needle, size_t needle_length,
-                              vm_virt_t *__restrict presult);
+                              VIRT void const **__restrict presult);
 
 /* Calculate the CRC32 checksum for the given region of memory.
  * If access to anything with the given range fail, return `false'.
  * Otherwise, return `true' and store the CRC value in `*presult' */
 INTDEF NONNULL((1, 4)) bool
 NOTHROW(FCALL GDB_CalculateCRC32)(struct task *__restrict thread,
-                                  vm_virt_t addr, size_t length,
+                                  VIRT void const *addr, size_t length,
                                   u32 *__restrict presult);
 
 /* Include (insert) or exclude (remove) SwBreak instruction overrides
@@ -348,8 +351,12 @@ NOTHROW(FCALL GDB_CalculateCRC32)(struct task *__restrict thread,
  *       writing overtop of a software breakpoint will actually write into
  *       the restore buffer and only into main memory once the breakpoint
  *       is removed. */
-INTDEF NONNULL((1, 3)) void NOTHROW(FCALL GDB_IncludeSwBreak)(struct vm *__restrict effective_vm, vm_virt_t addr, void *buf, size_t bufsize);
-INTDEF NONNULL((1, 3)) void NOTHROW(FCALL GDB_ExcludeSwBreak)(struct vm *__restrict effective_vm, vm_virt_t addr, void *buf, size_t bufsize);
+INTDEF NONNULL((1, 3)) void
+NOTHROW(FCALL GDB_IncludeSwBreak)(struct vm *__restrict effective_vm,
+                                  VIRT void const *addr, void *buf, size_t bufsize);
+INTDEF NONNULL((1, 3)) void
+NOTHROW(FCALL GDB_ExcludeSwBreak)(struct vm *__restrict effective_vm,
+                                  VIRT void const *addr, void *buf, size_t bufsize);
 
 
 /* Arch-specific: Get/Set the value of a given register `regno'

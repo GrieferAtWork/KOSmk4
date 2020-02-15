@@ -1000,7 +1000,7 @@ struct vm_datablock {
 	 * >> db_pagemask  = 0;
 	 * >> db_pagesize  = PAGESIZE; */
 	unsigned int              db_pageshift; /* [const][<= PAGESHIFT] Shift applied to page indices for converting between
-	                                         * `pageid_t' and `datapage_t', or `vm_virt_t' and `pos_t' or `pos_t'.
+	                                         * `pageid_t' and `datapage_t', or `uintptr_t' and `pos_t' or `pos_t'.
 	                                         * -> Since loading file data is most efficient when done in blocks,
 	                                         *    which are usually 512 bytes large, it would be a waste if any
 	                                         *    form of file access that wishes to use VM data-blocks as access
@@ -1012,7 +1012,7 @@ struct vm_datablock {
 	                                         *    simply require to load 8 continuous blocks at once. */
 #ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
 	unsigned int              db_addrshift; /* [const][== PAGESHIFT - db_pageshift]
-	                                         * Shift that must be applied to convert between `datapage_t' and `pos_t' or `pos_t' or `vm_virt_t'. */
+	                                         * Shift that must be applied to convert between `datapage_t' and `pos_t' or `pos_t' or `uintptr_t'. */
 	size_t                    db_pagealign; /* [const][== 1 << db_pageshift]
 	                                         * The minimum alignment for the `vm_datapart_startdpage()' / `vm_datapart_enddpage()'
 	                                         * of any data part found within this data block.
@@ -1091,9 +1091,9 @@ struct vm_datablock {
 
 /* Convert between different address types.
  *    datapage_t DPAGE: DataPAGE (usually identical to sector numbers)
- *    pageid_t VPAGE: VirtualPAGE (Virtual page number, referring to the host's understanding of PAGESIZE)
- *    pos_t DADDR: DataADDRess (alias for `pos_t', used to specific exact in-file positions)
- *    vm_virt_t  VADDR: VirtualADDRess (Virtual memory address. - Same as `DADDR', but intended for memory addressing) */
+ *    pageid_t  VPAGE: VirtualPAGE (Virtual page number, referring to the host's understanding of PAGESIZE)
+ *    pos_t     DADDR: DataADDRess (alias for `pos_t', used to specific exact in-file positions)
+ *    uintptr_t VADDR: VirtualADDRess (Virtual memory address. - Same as `DADDR', but intended for memory addressing) */
 #ifdef __INTELLISENSE__
 #define VM_DATABLOCK_DPAGE2DADDR VM_DATABLOCK_DPAGE2DADDR
 #define VM_DATABLOCK_DPAGE2VADDR VM_DATABLOCK_DPAGE2VADDR
@@ -1102,14 +1102,14 @@ struct vm_datablock {
 #define VM_DATABLOCK_VADDR2DPAGE VM_DATABLOCK_VADDR2DPAGE
 #define VM_DATABLOCK_PAGEID2DATAPAGE VM_DATABLOCK_PAGEID2DATAPAGE
 pos_t VM_DATABLOCK_DPAGE2DADDR(struct vm_datablock const *__restrict self, datapage_t dpage);
-vm_virt_t VM_DATABLOCK_DPAGE2VADDR(struct vm_datablock const *__restrict self, datapage_t dpage);
+uintptr_t VM_DATABLOCK_DPAGE2VADDR(struct vm_datablock const *__restrict self, datapage_t dpage);
 pageid_t VM_DATABLOCK_DATAPAGE2PAGEID(struct vm_datablock const *__restrict self, datapage_t dpage);
 datapage_t VM_DATABLOCK_DADDR2DPAGE(struct vm_datablock const *__restrict self, pos_t daddr);
-datapage_t VM_DATABLOCK_VADDR2DPAGE(struct vm_datablock const *__restrict self, vm_virt_t vaddr);
+datapage_t VM_DATABLOCK_VADDR2DPAGE(struct vm_datablock const *__restrict self, uintptr_t vaddr);
 datapage_t VM_DATABLOCK_PAGEID2DATAPAGE(struct vm_datablock const *__restrict self, pageid_t vpage);
 #else /* __INTELLISENSE__ */
 #define VM_DATABLOCK_DPAGE2DADDR(self, dpage)     ((pos_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
-#define VM_DATABLOCK_DPAGE2VADDR(self, dpage)     ((vm_virt_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
+#define VM_DATABLOCK_DPAGE2VADDR(self, dpage)     ((uintptr_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
 #define VM_DATABLOCK_DATAPAGE2PAGEID(self, dpage) ((pageid_t)(dpage) >> VM_DATABLOCK_PAGESHIFT(self))
 #define VM_DATABLOCK_DADDR2DPAGE(self, daddr)     ((datapage_t)(daddr) >> VM_DATABLOCK_ADDRSHIFT(self))
 #define VM_DATABLOCK_VADDR2DPAGE(self, vaddr)     ((datapage_t)(vaddr) >> VM_DATABLOCK_ADDRSHIFT(self))

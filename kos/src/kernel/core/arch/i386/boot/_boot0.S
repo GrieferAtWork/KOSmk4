@@ -296,7 +296,7 @@ PRIVATE_FUNCTION(read_lba)
 	/* Temp     = %ax / SEC_TRACK
 	 * Sector   = (%ax % SEC_TRACK) + 1
 	 * Cylinder = Temp / NUM_HEADS
-	 * Head     = Temp % NUM_HEADS*/
+	 * Head     = Temp % NUM_HEADS */
 	pushaw
 	xorw   %dx, %dx
 	divw   SEC_TRACK

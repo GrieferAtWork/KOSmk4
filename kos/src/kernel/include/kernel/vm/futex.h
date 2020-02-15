@@ -116,7 +116,7 @@ FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *
  *          meaning that the part would get freshly allocated, and repeated calls with
  *          the same arguments would not yield the same futex object!
  *       -> As such, in the most common case of a futex lookup where you wish to find
- *          the futex associated with some given `vm_virt_t', the process would be to
+ *          the futex associated with some given `uintptr_t', the process would be to
  *          to determine the `vm_node' of the address, and using that node then determine
  *          the associated vm_datapart, and relative offset into that datapart. If a lookup
  *          of the futex then returns `VM_DATAPART_GETFUTEX_OUTOFRANGE', loop back around

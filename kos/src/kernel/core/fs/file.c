@@ -405,8 +405,8 @@ handle_file_ioctl(struct file *__restrict self,
 
 INTERN REF struct vm_datablock *KCALL
 handle_file_mmap(struct file *__restrict self,
-                 vm_vpage64_t *__restrict UNUSED(pminpage),
-                 vm_vpage64_t *__restrict UNUSED(pmaxpage)) {
+                 pos_t *__restrict UNUSED(pminoffset),
+                 pos_t *__restrict UNUSED(pnumbytes)) {
 	return incref(self->f_node);
 }
 

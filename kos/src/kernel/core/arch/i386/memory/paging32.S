@@ -101,7 +101,7 @@ END(x86_pagedir_syncall_maybe_global)
 
 
 /* X86-specific implementation for invalidating the TLB of a single page. */
-/* FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone)(VIRT vm_virt_t virt_addr); */
+/* FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncone)(VIRT void *addr); */
 PUBLIC_FUNCTION(pagedir_syncone)
 	.cfi_startproc
 	invlpg (%ecx)

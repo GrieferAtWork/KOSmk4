@@ -118,8 +118,8 @@ DECL_BEGIN
 
 /* Return the in-page offset of a regular pointer mapping,
  * or one that has been mapped within a 2MiB page. */
-#define PAE_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u64)(__CCAST(vm_virt_t)(ptr) & 0xfff))
-#define PAE_PDIR_PAGEINDEX_2MIB(ptr) (__CCAST(u64)(__CCAST(vm_virt_t)(ptr) & 0x1fffff))
+#define PAE_PDIR_PAGEINDEX_4KIB(ptr) (__CCAST(u64)(__CCAST(uintptr_t)(ptr) & 0xfff))
+#define PAE_PDIR_PAGEINDEX_2MIB(ptr) (__CCAST(u64)(__CCAST(uintptr_t)(ptr) & 0x1fffff))
 
 #define PAE_PDIR_ALIGN  4096 /* Alignment required for instances of `struct pae_pdir' */
 #define PAE_PDIR_SIZE   32   /* The total size of `struct pae_pdir' in bytes. */

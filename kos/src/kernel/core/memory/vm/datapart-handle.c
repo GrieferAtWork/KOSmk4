@@ -149,13 +149,13 @@ handle_datapart_truncate(struct vm_datapart *__restrict self, pos_t new_size) {
 
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct vm_datablock *KCALL
 handle_datapart_mmap(struct vm_datapart *__restrict self,
-                     vm_vpage64_t *__restrict pminpage,
-                     vm_vpage64_t *__restrict pmaxpage) {
+                     pos_t *__restrict pminoffset,
+                     pos_t *__restrict pnumbytes) {
 	REF struct vm_datablock *result;
 	sync_read(self);
-	result    = incref(self->dp_block);
-	*pminpage = vm_datapart_minvpage(self);
-	*pmaxpage = vm_datapart_maxvpage(self);
+	result      = incref(self->dp_block);
+	*pminoffset = vm_datapart_minbyte(self);
+	*pnumbytes  = (pos_t)vm_datapart_numbytes(self);
 	sync_endread(self);
 	return result;
 }

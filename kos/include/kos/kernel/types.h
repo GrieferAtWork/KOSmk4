@@ -84,7 +84,6 @@ typedef __pageptr_t pageptr_t; /* Physical memory page index (`physical_address 
 
 typedef /*VIRT*/ __vm_vpage64_t vm_vpage64_t; /* Virtual memory page index (with at least 64 bits). */ /* DEPRECATED; REMOVE ME */
 typedef /*PHYS*/ __vm_spage_t   vm_spage_t;   /* Swap memory page index (`swap_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
-typedef /*VIRT*/ __vm_virt_t    vm_virt_t;    /* A virtual memory pointer. */ /* DEPRECATED; REMOVE ME */
 typedef /*PHYS*/ __vm_phys_t    vm_phys_t;    /* A physical memory pointer. */ /* TODO: Rename to `phys_t'; TODO: Move into <kernel/arch/paging.h> */
 
 #if __SIZEOF_VM_PHYS_T__ >= 8

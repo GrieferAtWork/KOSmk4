@@ -165,12 +165,12 @@ NOTHROW(FCALL GDB_AddSwBreak)(struct vm *__restrict effective_vm, byte_t *addr) 
 	byte_t op_int3[] = { OP_INT3 };
 	if unlikely(GDBBreak_SwExists(effective_vm, addr))
 		return EALREADY;
-	if unlikely(GDB_VM_ReadMemory(effective_vm, (vm_virt_t)addr, &prev, 1) != 0)
+	if unlikely(GDB_VM_ReadMemory(effective_vm, addr, &prev, 1) != 0)
 		return EFAULT; /* Faulty memory */
 	if unlikely(!GDBBreak_SwPush(effective_vm, addr, prev))
 		return ENOMEM; /* Too many breakpoints already */
 	/* Override the target location. */
-	if unlikely(GDB_VM_WriteMemoryWithoutSwBreak(effective_vm, (vm_virt_t)addr, op_int3, 1) != 0) {
+	if unlikely(GDB_VM_WriteMemoryWithoutSwBreak(effective_vm, addr, op_int3, 1) != 0) {
 		GDBBreak_SwPop(effective_vm, addr, &prev);
 		return EFAULT; /* Faulty memory */
 	}
@@ -183,7 +183,7 @@ NOTHROW(FCALL GDB_DelSwBreak)(struct vm *__restrict effective_vm, byte_t *addr) 
 	if (!GDBBreak_SwPop(effective_vm, (byte_t *)addr, &prev))
 		return ENOENT; /* No breakpoint at this location */
 	/* Restore what was originally written at the given address. */
-	if unlikely(GDB_VM_WriteMemoryWithoutSwBreak(effective_vm, (vm_virt_t)addr, &prev, 1) != 0)
+	if unlikely(GDB_VM_WriteMemoryWithoutSwBreak(effective_vm, addr, &prev, 1) != 0)
 		return EFAULT; /* Faulty memory */
 	return EOK;
 }
@@ -199,7 +199,7 @@ NOTHROW(FCALL GDB_DelSwBreak)(struct vm *__restrict effective_vm, byte_t *addr) 
  * @return: ENOENT:   [GDB_DelBreak] The specified breakpoint doesn't exist. */
 INTERN WUNUSED errno_t
 NOTHROW(FCALL GDB_VM_AddBreak)(struct vm *__restrict effective_vm,
-                               unsigned int type, vm_virt_t addr,
+                               unsigned int type, VIRT void *addr,
                                unsigned int kind) {
 	unsigned int cond;
 	(void)kind;
@@ -212,14 +212,14 @@ NOTHROW(FCALL GDB_VM_AddBreak)(struct vm *__restrict effective_vm,
 	else {
 		cond = DR_CREADWRITE;
 	}
-	if (!vm_addhwbreak(effective_vm, (void *)addr, cond, DR_S1))
+	if (!vm_addhwbreak(effective_vm, addr, cond, DR_S1))
 		return ENOMEM;
 	return EOK;
 }
 
 INTERN WUNUSED errno_t
 NOTHROW(FCALL GDB_VM_DelBreak)(struct vm *__restrict effective_vm,
-                               unsigned int type, vm_virt_t addr,
+                               unsigned int type, VIRT void *addr,
                                unsigned int kind) {
 	unsigned int cond;
 	(void)kind;
@@ -232,7 +232,7 @@ NOTHROW(FCALL GDB_VM_DelBreak)(struct vm *__restrict effective_vm,
 	else {
 		cond = DR_CREADWRITE;
 	}
-	if (!vm_addhwbreak(effective_vm, (void *)addr, cond, DR_S1))
+	if (!vm_addhwbreak(effective_vm, addr, cond, DR_S1))
 		return ENOENT;
 	return EOK;
 }
@@ -315,7 +315,8 @@ NOTHROW(FCALL GDB_CloneAllBreakpointsFromVM)(struct vm *__restrict newvm,
  *       is removed. */
 INTERN NONNULL((1, 3)) void
 NOTHROW(FCALL GDB_IncludeSwBreak)(struct vm *__restrict effective_vm,
-                                  vm_virt_t addr, void *buf, size_t bufsize) {
+                                  VIRT void const *addr,
+                                  void *buf, size_t bufsize) {
 	size_t i;
 	byte_t *start, *end;
 	start = (byte_t *)addr;
@@ -336,7 +337,8 @@ NOTHROW(FCALL GDB_IncludeSwBreak)(struct vm *__restrict effective_vm,
 
 INTERN NONNULL((1, 3)) void
 NOTHROW(FCALL GDB_ExcludeSwBreak)(struct vm *__restrict effective_vm,
-                                  vm_virt_t addr, void *buf, size_t bufsize) {
+                                  VIRT void const *addr,
+                                  void *buf, size_t bufsize) {
 	size_t i;
 	byte_t *start, *end;
 	start = (byte_t *)addr;

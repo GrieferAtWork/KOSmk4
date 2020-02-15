@@ -26,7 +26,6 @@
 #include <hybrid/typecore.h>
 
 #define __SIZEOF_VM_VPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
-#define __SIZEOF_VM_VIRT_T__    __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
 #define __SIZEOF_VM_SPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
 #define __SIZEOF_PAGEPTR_T__    __SIZEOF_POINTER__
 #define __SIZEOF_VM_PHYS_T__    8
@@ -82,12 +81,10 @@ typedef __bitwise __UINT64_TYPE__ __be64;
 
 #ifdef __KERNEL__
 #include <hybrid/__altint.h>
-__HYBRID_ALTINT_TYPEDEF(__ULONGPTR_TYPE__, __vm_virt_t, false);  /* A virtual memory pointer. */ /* DEPRECATED; REMOVE ME */
 __HYBRID_ALTINT_TYPEDEF(__ULONGPTR_TYPE__, __vm_spage_t, false); /* Swap memory page index (`swap_address / PAGESIZE'). */ /* DEPRECATED; REMOVE ME */
 __HYBRID_ALTINT_TYPEDEF(__ULONGPTR_TYPE__, __pageptr_t, false);  /* Physical memory page index (`physical_address / PAGESIZE'). */
 __HYBRID_ALTINT_TYPEDEF(__UINT64_TYPE__, __vm_phys_t, false);    /* A physical memory pointer. */ /* TODO: Rename to `__phys_t' */
 #else /* __KERNEL__ */
-typedef /*VIRT*/ __ULONGPTR_TYPE__ __vm_virt_t;  /* A virtual memory pointer. */ /* DEPRECATED; REMOVE ME */
 typedef /*SWAP*/ __ULONGPTR_TYPE__ __vm_spage_t; /* Swap memory page index (`swap_address / PAGESIZE'). */ /* DEPRECATED; REMOVE ME */
 typedef /*PHYS*/ __ULONGPTR_TYPE__ __pageptr_t;  /* Physical memory page index (`physical_address / PAGESIZE'). */
 typedef /*PHYS*/ __UINT64_TYPE__ __vm_phys_t;  /* A physical memory pointer. */ /* TODO: Rename to `phys_t'; TODO: Move into <kernel/arch/paging.h> */
