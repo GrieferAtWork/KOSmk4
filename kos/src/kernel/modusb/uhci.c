@@ -1486,7 +1486,7 @@ NOTHROW(KCALL uhci_fini)(struct character_device *__restrict self) {
 	if (me->uc_base.uc_mmbase != NULL)
 		uhci_wrw(me, UHCI_USBCMD, 0);
 
-	isr_unregister(&uhci_interrupt_handler, me); /* FIXME: This one can cause exceptions... */
+	hisr_unregister(&uhci_interrupt_handler, me);
 	iter = me->uc_intreg;
 	while (iter) {
 		assert(!(iter->ui_flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS));
@@ -3073,9 +3073,9 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	uhci_wrw(result, UHCI_USBSTS, 0xffff);
 
 	/* Register the interrupt handler. */
-	isr_register_at(X86_INTERRUPT_PIC1_BASE +
-	                PCI_GDEV3C_IRQLINE(pci_read(dev->pd_base, PCI_GDEV3C)),
-	                &uhci_interrupt_handler, result);
+	hisr_register_at(X86_INTERRUPT_PIC1_BASE +
+	                 PCI_GDEV3C_IRQLINE(pci_read(dev->pd_base, PCI_GDEV3C)),
+	                 &uhci_interrupt_handler, result);
 
 	/* Enable interrupts that we want to listen for. */
 	uhci_wrw(result, UHCI_USBINTR,
