@@ -158,30 +158,30 @@
 		return __result;                                                   \
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK bool                                       \
-	operator==(T const &__other) __CXX_NOEXCEPT {                          \
+	operator==(T const &__other) const __CXX_NOEXCEPT {                    \
 		return (tv_sec == __other.tv_sec && tv_nsec == __other.tv_nsec);   \
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK bool                                       \
-	operator!=(T const &__other) __CXX_NOEXCEPT {                          \
+	operator!=(T const &__other) const __CXX_NOEXCEPT {                    \
 		return (tv_sec != __other.tv_sec || tv_nsec != __other.tv_nsec);   \
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK bool                                       \
-	operator<(T const &__other) __CXX_NOEXCEPT {                           \
+	operator<(T const &__other) const __CXX_NOEXCEPT {                     \
 		return ((tv_sec < __other.tv_sec) ||                               \
 		        (tv_sec == __other.tv_sec && tv_nsec < __other.tv_nsec));  \
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK bool                                       \
-	operator<=(T const &__other) __CXX_NOEXCEPT {                          \
+	operator<=(T const &__other) const __CXX_NOEXCEPT {                    \
 		return ((tv_sec < __other.tv_sec) ||                               \
 		        (tv_sec == __other.tv_sec && tv_nsec <= __other.tv_nsec)); \
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK bool                                       \
-	operator>(T const &__other) __CXX_NOEXCEPT {                           \
+	operator>(T const &__other) const __CXX_NOEXCEPT {                     \
 		return ((tv_sec > __other.tv_sec) ||                               \
 		        (tv_sec == __other.tv_sec && tv_nsec > __other.tv_nsec));  \
 	}                                                                      \
 	__CXX_CLASSMEMBER __NOBLOCK bool                                       \
-	operator>=(T const &__other) __CXX_NOEXCEPT {                          \
+	operator>=(T const &__other) const __CXX_NOEXCEPT {                    \
 		return ((tv_sec > __other.tv_sec) ||                               \
 		        (tv_sec == __other.tv_sec && tv_nsec >= __other.tv_nsec)); \
 	}
