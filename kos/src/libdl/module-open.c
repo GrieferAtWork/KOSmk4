@@ -29,7 +29,7 @@
 #include <hybrid/minmax.h>
 
 #include <kos/exec/elf.h>
-#include <kos/hop.h>
+#include <kos/hop/handle.h>
 #include <kos/io.h>
 #include <kos/syscalls.h>
 

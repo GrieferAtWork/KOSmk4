@@ -46,7 +46,7 @@
 
 #include <kos/except/fs.h>
 #include <kos/except/inval.h>
-#include <kos/hop.h>
+#include <kos/hop/openfd.h>
 
 #include <assert.h>
 #include <fcntl.h>

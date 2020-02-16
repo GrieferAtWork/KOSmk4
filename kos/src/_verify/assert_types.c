@@ -378,7 +378,18 @@ local files = {
 	"../../include/kos/exec/bits/library-listdef.h",
 	"../../include/kos/exec/bits/peb.h",
 	"../../include/kos/exec/elf.h",
-	"../../include/kos/hop.h",
+	"../../include/kos/hop/api.h",
+	"../../include/kos/hop/blockdevice.h",
+	"../../include/kos/hop/datablock.h",
+	"../../include/kos/hop/driver.h",
+	"../../include/kos/hop/file.h",
+	"../../include/kos/hop/futex.h",
+	"../../include/kos/hop/handle.h",
+	"../../include/kos/hop/openfd.h",
+	"../../include/kos/hop/path.h",
+	"../../include/kos/hop/pidns.h",
+	"../../include/kos/hop/pipe.h",
+	"../../include/kos/hop/task.h",
 	"../../include/kos/ksysctl.h",
 };
 
@@ -1286,23 +1297,36 @@ STATIC_ASSERT(offsetof(struct process_peb, pp_envp) == OFFSET_PROCESS_PEB_ENVP);
 
 
 
-#include <kos/hop.h>
+#include <kos/hop/api.h>
 
-/* struct hop_openfd */
-STATIC_ASSERT(offsetof(struct hop_openfd, of_flags) == __OFFSET_HOP_OPENFD_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_openfd, of_hint) == __OFFSET_HOP_OPENFD_HINT);
-STATIC_ASSERT(offsetof(struct hop_openfd, of_mode) == __OFFSET_HOP_OPENFD_MODE);
-STATIC_ASSERT(sizeof(struct hop_openfd) == __SIZEOF_HOP_OPENFD);
 
-/* struct hop_handle_stat */
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_address) == __OFFSET_HOP_HANDLE_STAT_ADDRESS);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_kind) == __OFFSET_HOP_HANDLE_STAT_KIND);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_mode) == __OFFSET_HOP_HANDLE_STAT_MODE);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_refcnt) == __OFFSET_HOP_HANDLE_STAT_REFCNT);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_struct_size) == __OFFSET_HOP_HANDLE_STAT_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_type) == __OFFSET_HOP_HANDLE_STAT_TYPE);
-STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_typename) == __OFFSET_HOP_HANDLE_STAT_TYPENAME);
-STATIC_ASSERT(sizeof(struct hop_handle_stat) == __SIZEOF_HOP_HANDLE_STAT);
+
+
+
+#include <kos/hop/blockdevice.h>
+
+/* struct hop_blockdevice_stat */
+STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_device_flag) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVICE_FLAG);
+STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_devno) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO);
+STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_name) == __OFFSET_HOP_BLOCKDEVICE_STAT_NAME);
+STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_partcount) == __OFFSET_HOP_BLOCKDEVICE_STAT_PARTCOUNT);
+STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_sector_count) == __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_COUNT);
+STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_sector_size) == __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_SIZE);
+STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_struct_size) == __OFFSET_HOP_BLOCKDEVICE_STAT_STRUCT_SIZE);
+STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_total_bytes) == __OFFSET_HOP_BLOCKDEVICE_STAT_TOTAL_BYTES);
+STATIC_ASSERT(sizeof(struct hop_blockdevice_stat) == __SIZEOF_HOP_BLOCKDEVICE_STAT);
+
+/* struct hop_blockdevice_openpart */
+STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_openfd) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_OPENFD);
+STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_partno) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_PARTNO);
+STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_struct_size) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct hop_blockdevice_openpart) == __SIZEOF_HOP_BLOCKDEVICE_OPENPART);
+
+
+
+
+
+#include <kos/hop/datablock.h>
 
 /* struct hop_datablock_stat */
 STATIC_ASSERT(offsetof(struct hop_datablock_stat, ds_features) == __OFFSET_HOP_DATABLOCK_STAT_FEATURES);
@@ -1359,23 +1383,6 @@ STATIC_ASSERT(offsetof(struct hop_datablock_open_futex, dof_address) == __OFFSET
 STATIC_ASSERT(offsetof(struct hop_datablock_open_futex, dof_openfd) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_OPENFD);
 STATIC_ASSERT(offsetof(struct hop_datablock_open_futex, dof_struct_size) == __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_STRUCT_SIZE);
 STATIC_ASSERT(sizeof(struct hop_datablock_open_futex) == __SIZEOF_HOP_DATABLOCK_OPEN_FUTEX);
-
-/* struct hop_blockdevice_stat */
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_device_flag) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVICE_FLAG);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_devno) == __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_name) == __OFFSET_HOP_BLOCKDEVICE_STAT_NAME);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_partcount) == __OFFSET_HOP_BLOCKDEVICE_STAT_PARTCOUNT);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_sector_count) == __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_COUNT);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_sector_size) == __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_SIZE);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_struct_size) == __OFFSET_HOP_BLOCKDEVICE_STAT_STRUCT_SIZE);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_stat, bs_total_bytes) == __OFFSET_HOP_BLOCKDEVICE_STAT_TOTAL_BYTES);
-STATIC_ASSERT(sizeof(struct hop_blockdevice_stat) == __SIZEOF_HOP_BLOCKDEVICE_STAT);
-
-/* struct hop_blockdevice_openpart */
-STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_openfd) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_OPENFD);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_partno) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_PARTNO);
-STATIC_ASSERT(offsetof(struct hop_blockdevice_openpart, bop_struct_size) == __OFFSET_HOP_BLOCKDEVICE_OPENPART_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_blockdevice_openpart) == __SIZEOF_HOP_BLOCKDEVICE_OPENPART);
 
 /* struct hop_inode_chmod */
 STATIC_ASSERT(offsetof(struct hop_inode_chmod, icm_perm_flag) == __OFFSET_HOP_INODE_CHMOD_PERM_FLAG);
@@ -1484,6 +1491,46 @@ STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_owner) == __OFFSET_HOP_DI
 STATIC_ASSERT(offsetof(struct hop_directory_mkdir, dmd_struct_size) == __OFFSET_HOP_DIRECTORY_MKDIR_STRUCT_SIZE);
 STATIC_ASSERT(sizeof(struct hop_directory_mkdir) == __SIZEOF_HOP_DIRECTORY_MKDIR);
 
+
+
+
+
+#include <kos/hop/driver.h>
+
+/* struct hop_driver_stat */
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_argc) == __OFFSET_HOP_DRIVER_STAT_ARGC);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_depc) == __OFFSET_HOP_DRIVER_STAT_DEPC);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_flags) == __OFFSET_HOP_DRIVER_STAT_FLAGS);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_loadaddr) == __OFFSET_HOP_DRIVER_STAT_LOADADDR);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_loadend) == __OFFSET_HOP_DRIVER_STAT_LOADEND);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_loadstart) == __OFFSET_HOP_DRIVER_STAT_LOADSTART);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_shnum) == __OFFSET_HOP_DRIVER_STAT_SHNUM);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_shstrtabsz) == __OFFSET_HOP_DRIVER_STAT_SHSTRTABSZ);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_state) == __OFFSET_HOP_DRIVER_STAT_STATE);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_strtabsz) == __OFFSET_HOP_DRIVER_STAT_STRTABSZ);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_struct_size) == __OFFSET_HOP_DRIVER_STAT_STRUCT_SIZE);
+STATIC_ASSERT(offsetof(struct hop_driver_stat, ds_symcnt) == __OFFSET_HOP_DRIVER_STAT_SYMCNT);
+STATIC_ASSERT(sizeof(struct hop_driver_stat) == __SIZEOF_HOP_DRIVER_STAT);
+
+/* struct hop_driver_string */
+STATIC_ASSERT(offsetof(struct hop_driver_string, ds_buf) == __OFFSET_HOP_DRIVER_STRING_BUF);
+STATIC_ASSERT(offsetof(struct hop_driver_string, ds_index) == __OFFSET_HOP_DRIVER_STRING_INDEX);
+STATIC_ASSERT(offsetof(struct hop_driver_string, ds_size) == __OFFSET_HOP_DRIVER_STRING_SIZE);
+STATIC_ASSERT(offsetof(struct hop_driver_string, ds_struct_size) == __OFFSET_HOP_DRIVER_STRING_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct hop_driver_string) == __SIZEOF_HOP_DRIVER_STRING);
+
+/* struct hop_driver_open_dependency */
+STATIC_ASSERT(offsetof(struct hop_driver_open_dependency, dod_depno) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_DEPNO);
+STATIC_ASSERT(offsetof(struct hop_driver_open_dependency, dod_result) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_RESULT);
+STATIC_ASSERT(offsetof(struct hop_driver_open_dependency, dod_struct_size) == __OFFSET_HOP_DRIVER_OPEN_DEPENDENCY_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct hop_driver_open_dependency) == __SIZEOF_HOP_DRIVER_OPEN_DEPENDENCY);
+
+
+
+
+
+#include <kos/hop/file.h>
+
 /* struct hop_file_cmpxchg_offset */
 STATIC_ASSERT(offsetof(struct hop_file_cmpxchg_offset, cxo_expoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_EXPOFFSET);
 STATIC_ASSERT(offsetof(struct hop_file_cmpxchg_offset, cxo_newoffset) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_NEWOFFSET);
@@ -1491,27 +1538,57 @@ STATIC_ASSERT(offsetof(struct hop_file_cmpxchg_offset, cxo_oldoffset) == __OFFSE
 STATIC_ASSERT(offsetof(struct hop_file_cmpxchg_offset, cxo_struct_size) == __OFFSET_HOP_FILE_CMPXCHG_OFFSET_STRUCT_SIZE);
 STATIC_ASSERT(sizeof(struct hop_file_cmpxchg_offset) == __SIZEOF_HOP_FILE_CMPXCHG_OFFSET);
 
-/* struct hop_task_join */
-STATIC_ASSERT(offsetof(struct hop_task_join, tj_reltimeout_nsec) == __OFFSET_HOP_TASK_JOIN_RELTIMEOUT_NSEC);
-STATIC_ASSERT(offsetof(struct hop_task_join, tj_reltimeout_sec) == __OFFSET_HOP_TASK_JOIN_RELTIMEOUT_SEC);
-STATIC_ASSERT(offsetof(struct hop_task_join, tj_status) == __OFFSET_HOP_TASK_JOIN_STATUS);
-STATIC_ASSERT(offsetof(struct hop_task_join, tj_struct_size) == __OFFSET_HOP_TASK_JOIN_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_task_join) == __SIZEOF_HOP_TASK_JOIN);
 
-/* struct hop_task_setprocessgroupleader */
-STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_new_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_NEW_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_old_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_OLD_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_struct_size) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_task_setprocessgroupleader) == __SIZEOF_HOP_TASK_SETPROCESSGROUPLEADER);
 
-/* struct hop_task_setsessionleader */
-STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_new_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_NEW_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_old_grp_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_GRP_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_old_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_LEADER);
-STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_struct_size) == __OFFSET_HOP_TASK_SETSESSIONLEADER_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_task_setsessionleader) == __SIZEOF_HOP_TASK_SETSESSIONLEADER);
+
+
+#include <kos/hop/futex.h>
+
+
+
+
+
+#include <kos/hop/handle.h>
+
+/* struct hop_handle_stat */
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_address) == __OFFSET_HOP_HANDLE_STAT_ADDRESS);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_kind) == __OFFSET_HOP_HANDLE_STAT_KIND);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_mode) == __OFFSET_HOP_HANDLE_STAT_MODE);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_refcnt) == __OFFSET_HOP_HANDLE_STAT_REFCNT);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_struct_size) == __OFFSET_HOP_HANDLE_STAT_STRUCT_SIZE);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_type) == __OFFSET_HOP_HANDLE_STAT_TYPE);
+STATIC_ASSERT(offsetof(struct hop_handle_stat, hs_typename) == __OFFSET_HOP_HANDLE_STAT_TYPENAME);
+STATIC_ASSERT(sizeof(struct hop_handle_stat) == __SIZEOF_HOP_HANDLE_STAT);
+
+
+
+
+
+#include <kos/hop/openfd.h>
+
+/* struct hop_openfd */
+STATIC_ASSERT(offsetof(struct hop_openfd, of_flags) == __OFFSET_HOP_OPENFD_FLAGS);
+STATIC_ASSERT(offsetof(struct hop_openfd, of_hint) == __OFFSET_HOP_OPENFD_HINT);
+STATIC_ASSERT(offsetof(struct hop_openfd, of_mode) == __OFFSET_HOP_OPENFD_MODE);
+STATIC_ASSERT(sizeof(struct hop_openfd) == __SIZEOF_HOP_OPENFD);
+
+
+
+
+
+#include <kos/hop/path.h>
+
+
+
+
+
+#include <kos/hop/pidns.h>
+
+
+
+
+
+#include <kos/hop/pipe.h>
 
 /* struct hop_pipe_stat */
 STATIC_ASSERT(offsetof(struct hop_pipe_stat, ps_avail) == __OFFSET_HOP_PIPE_STAT_AVAIL);
@@ -1556,29 +1633,39 @@ STATIC_ASSERT(offsetof(struct hop_pipe_unwrite, puw_unwritten) == __OFFSET_HOP_P
 STATIC_ASSERT(offsetof(struct hop_pipe_unwrite, puw_wrpos) == __OFFSET_HOP_PIPE_UNWRITE_WRPOS);
 STATIC_ASSERT(sizeof(struct hop_pipe_unwrite) == __SIZEOF_HOP_PIPE_UNWRITE);
 
-/* struct hop_datapart_stat */
-STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_features) == __OFFSET_HOP_DATAPART_STAT_FEATURES);
-STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_maxaddr) == __OFFSET_HOP_DATAPART_STAT_MAXADDR);
-STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_maxdpage) == __OFFSET_HOP_DATAPART_STAT_MAXDPAGE);
-STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_maxvpage) == __OFFSET_HOP_DATAPART_STAT_MAXVPAGE);
-STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_minaddr) == __OFFSET_HOP_DATAPART_STAT_MINADDR);
-STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_mindpage) == __OFFSET_HOP_DATAPART_STAT_MINDPAGE);
-STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_minvpage) == __OFFSET_HOP_DATAPART_STAT_MINVPAGE);
-STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_state) == __OFFSET_HOP_DATAPART_STAT_STATE);
-STATIC_ASSERT(offsetof(struct hop_datapart_stat, ds_struct_size) == __OFFSET_HOP_DATAPART_STAT_STRUCT_SIZE);
-STATIC_ASSERT(sizeof(struct hop_datapart_stat) == __SIZEOF_HOP_DATAPART_STAT);
+
+
+
+
+#include <kos/hop/task.h>
+
+/* struct hop_task_join */
+STATIC_ASSERT(offsetof(struct hop_task_join, tj_reltimeout_nsec) == __OFFSET_HOP_TASK_JOIN_RELTIMEOUT_NSEC);
+STATIC_ASSERT(offsetof(struct hop_task_join, tj_reltimeout_sec) == __OFFSET_HOP_TASK_JOIN_RELTIMEOUT_SEC);
+STATIC_ASSERT(offsetof(struct hop_task_join, tj_status) == __OFFSET_HOP_TASK_JOIN_STATUS);
+STATIC_ASSERT(offsetof(struct hop_task_join, tj_struct_size) == __OFFSET_HOP_TASK_JOIN_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct hop_task_join) == __SIZEOF_HOP_TASK_JOIN);
+
+/* struct hop_task_setprocessgroupleader */
+STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_LEADER);
+STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_new_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_NEW_LEADER);
+STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_old_leader) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_OLD_LEADER);
+STATIC_ASSERT(offsetof(struct hop_task_setprocessgroupleader, tspgl_struct_size) == __OFFSET_HOP_TASK_SETPROCESSGROUPLEADER_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct hop_task_setprocessgroupleader) == __SIZEOF_HOP_TASK_SETPROCESSGROUPLEADER);
+
+/* struct hop_task_setsessionleader */
+STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_LEADER);
+STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_new_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_NEW_LEADER);
+STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_old_grp_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_GRP_LEADER);
+STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_old_leader) == __OFFSET_HOP_TASK_SETSESSIONLEADER_OLD_LEADER);
+STATIC_ASSERT(offsetof(struct hop_task_setsessionleader, tssl_struct_size) == __OFFSET_HOP_TASK_SETSESSIONLEADER_STRUCT_SIZE);
+STATIC_ASSERT(sizeof(struct hop_task_setsessionleader) == __SIZEOF_HOP_TASK_SETSESSIONLEADER);
 
 
 
 
 
 #include <kos/ksysctl.h>
-
-/* struct hop_openfd */
-STATIC_ASSERT(offsetof(struct hop_openfd, of_flags) == __OFFSET_HOP_OPENFD_FLAGS);
-STATIC_ASSERT(offsetof(struct hop_openfd, of_hint) == __OFFSET_HOP_OPENFD_HINT);
-STATIC_ASSERT(offsetof(struct hop_openfd, of_mode) == __OFFSET_HOP_OPENFD_MODE);
-STATIC_ASSERT(sizeof(struct hop_openfd) == __SIZEOF_HOP_OPENFD);
 
 /* struct ksysctl_driver_insmod */
 STATIC_ASSERT(offsetof(struct ksysctl_driver_insmod, im_blob.b_base) == __OFFSET_KSYSCTL_DRIVER_INSMOD_BLOB_BASE);

@@ -35,7 +35,7 @@
 #include <hybrid/minmax.h>
 
 #include <kos/except/inval.h>
-#include <kos/hop.h>
+#include <kos/hop/blockdevice.h>
 #include <kos/io.h>
 #include <sys/mount.h>
 #include <sys/stat.h>

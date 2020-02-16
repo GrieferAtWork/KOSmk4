@@ -44,7 +44,7 @@
 #include <bits/param.h>
 #include <kos/except/fs.h>
 #include <kos/except/inval.h>
-#include <kos/hop.h>
+#include <kos/hop/path.h>
 
 #include <assert.h>
 #include <format-printer.h>
@@ -211,6 +211,11 @@ handle_path_hop(struct path *__restrict self,
 		*(uint32_t *)arg = (uint32_t)ATOMIC_READ(self->p_isdrive);
 		COMPILER_BARRIER();
 		break;
+
+	//TODO:HOP_PATH_GETNAME    0x00060007 /* [struct hop_path_getname *data] Read the name of the given path */
+	//TODO:HOP_PATH_OPENCHILD  0x00060008 /* [struct hop_path_openchild *data] Open a child of the given path */
+	//TODO:HOP_PATH_RENAME     0x00060009 /* [struct hop_path_rename *data] Rename a child entry within a given path (wrapper for `path_rename()') */
+	//TODO:HOP_PATH_TRAVERSE   0x0006000a /* [struct hop_path_traverse *data] Traverse the filesystem, starting at the given path (wrapper for `path_traverse_ex()') */
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

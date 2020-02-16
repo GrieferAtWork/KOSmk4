@@ -36,7 +36,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except/inval.h>
-#include <kos/hop.h>
+#include <kos/hop/datablock.h>
 #include <sys/stat.h>
 
 #include <errno.h>

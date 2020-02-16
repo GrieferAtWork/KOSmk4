@@ -167,7 +167,7 @@ struct handle_types {
 	                                                                    poll_mode_t what)
 			THROWS(...);
 
-	/* Implement handle control operations (s.a. `<kos/hop.h>')
+	/* Implement handle control operations (s.a. `<kos/hop/[...].h>')
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment) */
 	syscall_slong_t (NONNULL((1)) KCALL *h_hop[HANDLE_TYPE_COUNT])(void *__restrict ptr, syscall_ulong_t cmd,
 	                                                               USER UNCHECKED void *arg, iomode_t mode)

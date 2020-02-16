@@ -36,7 +36,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except/inval.h>
-#include <kos/hop.h>
+#include <kos/hop/datapart.h>
 #include <sys/stat.h>
 
 #include <assert.h>
@@ -257,7 +257,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		struct_size = ATOMIC_READ(data->dof_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_open_futex))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_open_futex), struct_size);
-		if (cmd == HOP_DATABLOCK_OPEN_FUTEX_EXISTING) {
+		if (cmd == HOP_DATAPART_OPEN_FUTEX_EXISTING) {
 			ftx = vm_datapart_getfutex_existing(self, (uintptr_t)data->dof_address);
 			if (!ftx)
 				return -ENOENT;

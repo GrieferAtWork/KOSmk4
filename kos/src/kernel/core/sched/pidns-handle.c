@@ -17,9 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_FUTEX_HANDLE_C
-#define GUARD_KERNEL_SRC_MEMORY_VM_FUTEX_HANDLE_C 1
+#ifndef GUARD_KERNEL_SRC_SCHED_PIDNS_HANDLE_C
+#define GUARD_KERNEL_SRC_SCHED_PIDNS_HANDLE_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 #define _TIME64_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -27,64 +28,28 @@
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
-#include <kernel/vm.h>
-#include <kernel/vm/futex.h>
-
-#include <hybrid/atomic.h>
+#include <sched/pid.h>
+#include <sched/task.h>
 
 #include <kos/except/inval.h>
-#include <kos/hop/futex.h>
-
-#include <errno.h>
+#include <kos/hop/pidns.h>
 
 DECL_BEGIN
 
-/* futex handle operation. */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(futex, struct vm_futex)
-
-INTDEF NONNULL((1)) syscall_slong_t KCALL
-handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
-                 USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+/* Pidns HOP functions */
+DEFINE_HANDLE_REFCNT_FUNCTIONS(pidns, struct pidns)
+INTERN syscall_slong_t KCALL
+handle_pidns_hop(struct pidns *__restrict self,
+                 syscall_ulong_t cmd,
+                 USER UNCHECKED void *arg,
+                 iomode_t mode) {
+	(void)self;
+	(void)arg;
+	(void)mode;
+	COMPILER_IMPURE();
 	switch (cmd) {
 
-	case HOP_FUTEX_OPEN_DATAPART: {
-		struct handle hnd;
-		REF struct vm_datapart *part;
-		part = self->f_part.get();
-		if (!part)
-			return -EOWNERDEAD;
-		FINALLY_DECREF_UNLIKELY(part);
-		hnd.h_type = HANDLE_TYPE_DATAPART;
-		hnd.h_mode = mode;
-		hnd.h_data = part;
-		return handle_installhop((struct hop_openfd *)arg, hnd);
-	}	break;
-
-	case HOP_FUTEX_OPEN_DATABLOCK: {
-		struct handle hnd;
-		REF struct vm_datablock *block;
-		REF struct vm_datapart *part;
-		part = self->f_part.get();
-		if (!part)
-			return -EOWNERDEAD;
-		{
-			FINALLY_DECREF_UNLIKELY(part);
-			sync_read(part);
-			block = incref(part->dp_block);
-			sync_endread(part);
-		}
-		FINALLY_DECREF_UNLIKELY(block);
-		hnd.h_type = HANDLE_TYPE_DATABLOCK;
-		hnd.h_mode = mode;
-		hnd.h_data = block;
-		return handle_installhop((struct hop_openfd *)arg, hnd);
-	}	break;
-
-	case HOP_FUTEX_ISWAITING:
-		return ATOMIC_READ(self->f_signal.s_ptr) != NULL ? 1 : 0;
-
-	case HOP_FUTEX_BROADCAST:
-		return sig_broadcast(&self->f_signal);
+	/* TODO */
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
@@ -95,8 +60,6 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 	return 0;
 }
 
-
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_FUTEX_HANDLE_C */
+#endif /* !GUARD_KERNEL_SRC_SCHED_PIDNS_HANDLE_C */

@@ -39,7 +39,7 @@
 
 #include <kos/except/fs.h>
 #include <kos/except/inval.h>
-#include <kos/hop.h>
+#include <kos/hop/file.h>
 
 #include <assert.h>
 #include <dirent.h>
@@ -708,8 +708,8 @@ handle_file_hop(struct file *__restrict self,
 		validate_writable(arg, sizeof(struct hop_file_cmpxchg_offset));
 		data        = (struct hop_file_cmpxchg_offset *)arg;
 		struct_size = ATOMIC_READ(data->cxo_struct_size);
-		if (struct_size != sizeof(struct hop_directory_opennode))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_directory_opennode), struct_size);
+		if (struct_size != sizeof(struct hop_file_cmpxchg_offset))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_file_cmpxchg_offset), struct_size);
 		COMPILER_READ_BARRIER();
 		exppos = (pos64_t)data->cxo_expoffset;
 		newpos = (pos64_t)data->cxo_newoffset;
