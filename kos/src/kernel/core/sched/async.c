@@ -502,6 +502,9 @@ again:
 		       old_workers->av_workc - old_workers->av_testc,
 		       sizeof(REF struct aworker *));
 	}
+	/* Acquire references to all of the old workers. */
+	for (i = 0; i < old_workers->av_workc; ++i)
+		incref(old_workers->av_workv[i]);
 
 	/* Try to install the new async workers vector. */
 	if (awork.cmpxch_inherit_new(old_workers, new_workers)) {
