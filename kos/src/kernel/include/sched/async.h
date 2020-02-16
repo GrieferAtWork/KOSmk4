@@ -95,6 +95,9 @@ struct async_work_callbacks {
  *       that a single thread can wait for async work to become available for
  *       _all_ async workers)
  * @param: cb:         Callbacks for the async worker being registered.
+ *                     NOTE: The backing storage of the `cb' container itself
+ *                           doesn't need to be persistent! It only needs to
+ *                           remain valid until this function returns!
  * @param: ob_pointer: A pointer to a handle data object. The destructor of this
  *                     object is responsible for invoking `unregister_async_worker()'
  *                     Callbacks will no longer be invoked if this object's
@@ -114,6 +117,9 @@ register_async_worker(struct async_work_callbacks const *__restrict cb,
  * previously passed to `register_async_worker()'. This function should be
  * called from the destructor of `ob_pointer'
  * @param: cb:     Callbacks for the async worker being unregistered.
+ *                 NOTE: The backing storage of the `cb' container itself
+ *                       doesn't need to be persistent! It only needs to
+ *                       remain valid until this function returns!
  * @return: true:  Successfully deleted an async worker for the
  *                 given object/callback combination.
  * @return: false: No async worker for the given object/callback
