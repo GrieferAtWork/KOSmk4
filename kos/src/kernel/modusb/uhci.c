@@ -1393,12 +1393,16 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 	if (status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR |
 	              UHCI_USBSTS_RD | UHCI_USBSTS_HSE |
 	              UHCI_USBSTS_HCPE | UHCI_USBSTS_HCH)) {
+		struct timespec now;
 		/* Remember that we've just gotten an interrupt. */
+		now = realtime();
 #ifndef CONFIG_NO_SMP
 		while (!sync_trywrite(&self->uc_lastint_lock))
 			task_pause();
 #endif /* !CONFIG_NO_SMP */
-		self->uc_lastint = realtime();
+		COMPILER_WRITE_BARRIER();
+		self->uc_lastint = now;
+		COMPILER_WRITE_BARRIER();
 #ifndef CONFIG_NO_SMP
 		sync_endwrite(&self->uc_lastint_lock);
 #endif /* !CONFIG_NO_SMP */
@@ -2815,11 +2819,16 @@ do_connect:
 		 * the entire bus has been suspended (so we need to do this to be
 		 * able to handle attach/detach events!) */
 		assert(PREEMPTION_ENABLED());
-		PREEMPTION_DISABLE();
 #ifndef CONFIG_NO_SMP
-		while (!sync_tryread(&uc->uc_lastint_lock))
-			task_pause();
-#endif /* !CONFIG_NO_SMP */
+		PREEMPTION_DISABLE();
+		while (!sync_tryread(&uc->uc_lastint_lock)) {
+			PREEMPTION_ENABLE();
+			task_yield();
+			PREEMPTION_DISABLE();
+		}
+#else /* !CONFIG_NO_SMP */
+		PREEMPTION_DISABLE();
+#endif /* CONFIG_NO_SMP */
 		COMPILER_READ_BARRIER();
 		timeout = uc->uc_lastint;
 		COMPILER_READ_BARRIER();
@@ -2873,9 +2882,11 @@ do_connect:
 		 * any ports with changed connectivity indicators! */
 		egsm_ok = uhci_controller_egsm_enter(uc);
 		uhci_controller_endwrite(uc);
+
 		/* If we've successfully managed to enter EGSM mode, directly loop back. */
 		if (egsm_ok)
 			goto again_read_flags;
+
 		/* There are some ports that have changed their connectivity status.
 		 * -> Handle this change in connectivity, and loop back. */
 		TRY {
