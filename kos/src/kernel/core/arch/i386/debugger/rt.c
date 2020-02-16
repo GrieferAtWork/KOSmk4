@@ -40,6 +40,7 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
 #include <sched/tss.h>
@@ -392,6 +393,8 @@ INTDEF byte_t __kernel_boottask_stack_pageid[];
 INTDEF byte_t __kernel_boottask_stack_pageptr[];
 INTDEF byte_t __kernel_bootidle_stack_pageid[];
 INTDEF byte_t __kernel_bootidle_stack_pageptr[];
+INTDEF byte_t __kernel_asyncwork_stack_pageid[];
+INTDEF byte_t __kernel_asyncwork_stack_pageptr[];
 
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
@@ -405,6 +408,9 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 	} else if (thread == &_bootidle) {
 		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)loadfarptr(__kernel_bootidle_stack_pageid);
 		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_bootidle_stack_pageptr);
+	} else if (thread == &_asyncwork) {
+		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)loadfarptr(__kernel_asyncwork_stack_pageid);
+		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_asyncwork_stack_pageptr);
 	}
 	FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmax = FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin +
 	                                                         CEILDIV(stack_size, PAGESIZE) - 1;

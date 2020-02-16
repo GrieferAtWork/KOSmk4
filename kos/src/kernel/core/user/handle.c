@@ -411,7 +411,7 @@ check_new_alloc_linear:
 
 /* The handle manager of the kernel itself. */
 PUBLIC struct handle_manager handle_manager_kernel = {
-	.hm_refcnt        = 3, /* `handle_manager_kernel', _boottask, _bootidle */
+	.hm_refcnt        = 4, /* `handle_manager_kernel', _boottask, _asyncwork, _bootidle */
 	.hm_lock          = ATOMIC_RWLOCK_INIT,
 	.hm_cntlimit      = (unsigned int)-2,
 	.hm_maxlimit      = (unsigned int)-2,

@@ -174,14 +174,21 @@ INTERN_FUNCTION(_start)
 	rep;   movsb
 
 	/* memcpy(&_boottask, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
-	PUBLIC(_boottask)
+	EXTERN(_boottask)
 	movl   $(V2P(_boottask)), %edi
 	movl   $(V2P(__kernel_pertask_start)), %esi
 	movl   $(__kernel_pertask_size), %ecx
 	rep;   movsb
 
+	/* memcpy(&_asyncwork, __kernel_pertask_start, (size_t)__kernel_pertask_size); */
+	EXTERN(_asyncwork)
+	movl   $(V2P(_asyncwork)), %edi
+	movl   $(V2P(__kernel_pertask_start)), %esi
+	movl   $(__kernel_pertask_size), %ecx
+	rep;   movsb
+
 	/* memcpy((byte_t *)&vm_kernel + PAGEDIR_SIZE, __kernel_pervm_start, (size_t)__kernel_pervm_size); */
-	PUBLIC(vm_kernel)
+	EXTERN(vm_kernel)
 	movl   $(V2P(vm_kernel) + PAGEDIR_SIZE), %edi
 	movl   $(V2P(__kernel_pervm_start)), %esi
 	movl   $(__kernel_pervm_size), %ecx
@@ -593,7 +600,7 @@ END(__x86_paging_init_identity_mapped_text)
 	lldtw  %ax
 
 	/* Initialize the interrupt handling subsystem. */
-	PUBLIC(x86_idt_ptr)
+	EXTERN(x86_idt_ptr)
 	lidtl  x86_idt_ptr
 
 	/* Setup the state of /bin/init at our stack base, thus following the

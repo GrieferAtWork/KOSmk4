@@ -399,6 +399,10 @@ SECTIONS {
 		PROVIDE(_boottask = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 
+		IP_ALIGN(__ARCH_CACHELINESIZE);
+		PROVIDE_HIDDEN(_asyncwork = ABSOLUTE(.));
+		. += __kernel_pertask_size;
+
 		IP_ALIGN(PAGEDIR_ALIGN);
 		PROVIDE(vm_kernel = ABSOLUTE(.));
 		PROVIDE(pagedir_kernel = ABSOLUTE(.));
@@ -410,6 +414,8 @@ SECTIONS {
 		PROVIDE_HIDDEN(__debug_malloc_tracked_size = ABSOLUTE(ABSOLUTE(__debug_malloc_tracked_end) - ABSOLUTE(__debug_malloc_tracked_start)));
 
 		PROVIDE_HIDDEN(kernel_membanks_initial = ABSOLUTE(.));
+
+
 		IP_ALIGN(PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_boottask_stack_guard = ABSOLUTE(.));
 		/* Insert a placeholder page to catch stack overflows */
@@ -418,6 +424,17 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_boottask_stack_pageid = addr2pageid(ABSOLUTE(.)));
 		PROVIDE_HIDDEN(__kernel_boottask_stack_pageptr = addr2pageptr(ABSOLUTE(.)));
 		. += KERNEL_STACKSIZE;
+
+
+		IP_ALIGN(PAGESIZE);
+		PROVIDE_HIDDEN(__kernel_asyncwork_stack_guard = ABSOLUTE(.));
+		/* Insert a placeholder page to catch stack overflows */
+		. += PAGESIZE;
+		PROVIDE_HIDDEN(__kernel_asyncwork_stack = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__kernel_asyncwork_stack_pageid = addr2pageid(ABSOLUTE(.)));
+		PROVIDE_HIDDEN(__kernel_asyncwork_stack_pageptr = addr2pageptr(ABSOLUTE(.)));
+		. += KERNEL_STACKSIZE;
+
 
 		IP_ALIGN(PAGESIZE);
 		PROVIDE_HIDDEN(__kernel_bootidle_stack = ABSOLUTE(.));

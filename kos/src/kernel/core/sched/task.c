@@ -34,6 +34,7 @@
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
 
@@ -100,6 +101,8 @@ INTDEF byte_t __kernel_boottask_stack_pageid[];
 INTDEF byte_t __kernel_boottask_stack_pageptr[];
 INTDEF byte_t __kernel_bootidle_stack_pageid[];
 INTDEF byte_t __kernel_bootidle_stack_pageptr[];
+INTDEF byte_t __kernel_asyncwork_stack_pageid[];
+INTDEF byte_t __kernel_asyncwork_stack_pageptr[];
 
 PUBLIC ATTR_PERTASK struct vm_datapart
 this_kernel_stackpart_ ASMNAME("this_kernel_stackpart") = {
@@ -157,7 +160,7 @@ this_kernel_stacknode_ ASMNAME("this_kernel_stacknode") = {
 typedef void (KCALL *pertask_init_t)(struct task *__restrict self);
 INTDEF pertask_init_t __kernel_pertask_init_start[];
 INTDEF pertask_init_t __kernel_pertask_init_end[];
-INTDEF FREE void KCALL kernel_initialize_scheduler_arch(void);
+INTDEF FREE void NOTHROW(KCALL kernel_initialize_scheduler_arch)(void);
 
 LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL initialize_predefined_vm_trampoline)(struct task *__restrict self,
@@ -214,6 +217,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 
 	assert(_boottask.t_refcnt == 1);
 	assert(_bootidle.t_refcnt == 1);
+	assert(_asyncwork.t_refcnt == 1);
 
 	/* Figure out where to put the initial trampolines for _boottask and _bootidle */
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
@@ -229,8 +233,10 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	/* Construct the trampoline node for the predefined tasks. */
 	initialize_predefined_vm_trampoline(&_boottask, PAGEID_ENCODE((byte_t *)boot_trampoline_pages + 0 * PAGESIZE));
 	initialize_predefined_vm_trampoline(&_bootidle, PAGEID_ENCODE((byte_t *)boot_trampoline_pages + 1 * PAGESIZE));
+	initialize_predefined_vm_trampoline(&_asyncwork, PAGEID_ENCODE((byte_t *)boot_trampoline_pages + 2 * PAGESIZE));
 
 #define REL(x, offset) ((x) = (__typeof__(x))(uintptr_t)((byte_t *)(x) + (uintptr_t)(offset)))
+	/* _boottask */
 	REL(FORTASK(&_boottask, this_kernel_stacknode_).vn_part, &_boottask);
 	REL(FORTASK(&_boottask, this_kernel_stacknode_).vn_link.ln_pself, &_boottask);
 	REL(FORTASK(&_boottask, this_kernel_stackpart_).dp_srefs, &_boottask);
@@ -242,6 +248,19 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	}
 	FORTASK(&_boottask, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_boottask_stack_pageptr);
 
+	/* _asyncwork */
+	REL(FORTASK(&_asyncwork, this_kernel_stacknode_).vn_part, &_asyncwork);
+	REL(FORTASK(&_asyncwork, this_kernel_stacknode_).vn_link.ln_pself, &_asyncwork);
+	REL(FORTASK(&_asyncwork, this_kernel_stackpart_).dp_srefs, &_asyncwork);
+	REL(FORTASK(&_asyncwork, this_kernel_stackpart_).dp_ramdata.rd_blockv, &_asyncwork);
+	{
+		pageid_t boottask_stack_pageid = (pageid_t)loadfarptr(__kernel_asyncwork_stack_pageid);
+		FORTASK(&_asyncwork, this_kernel_stacknode_).vn_node.a_vmin = boottask_stack_pageid;
+		FORTASK(&_asyncwork, this_kernel_stacknode_).vn_node.a_vmax = boottask_stack_pageid + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
+	}
+	FORTASK(&_asyncwork, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_asyncwork_stack_pageptr);
+
+	/* _bootidle */
 	REL(FORTASK(&_bootidle, this_kernel_stacknode_).vn_part, &_bootidle);
 	REL(FORTASK(&_bootidle, this_kernel_stacknode_).vn_link.ln_pself, &_bootidle);
 	REL(FORTASK(&_bootidle, this_kernel_stackpart_).dp_srefs, &_bootidle);
@@ -264,20 +283,32 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	/* The stack of IDLE threads is executable in order to allow for hacking around .free restrictions. */
 	FORTASK(&_bootidle, this_kernel_stacknode_).vn_prot = (VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ);
 
-	vm_kernel.v_tasks             = &_boottask;
-	_boottask.t_vm_tasks.ln_pself = &vm_kernel.v_tasks;
-	_boottask.t_vm_tasks.ln_next  = &_bootidle;
-	_bootidle.t_vm_tasks.ln_pself = &_boottask.t_vm_tasks.ln_next;
-	_boottask.t_refcnt            = 2; /* +1: scheduler chain, +1: public symbol `_boottask' */
-	_bootidle.t_refcnt            = 2; /* +1: scheduler chain, +1: public symbol `_bootidle' */
+	vm_kernel.v_tasks              = &_boottask;
+	_boottask.t_vm_tasks.ln_pself  = &vm_kernel.v_tasks;
+	_boottask.t_vm_tasks.ln_next   = &_asyncwork;
+	_asyncwork.t_vm_tasks.ln_pself = &_boottask.t_vm_tasks.ln_next;
+	_asyncwork.t_vm_tasks.ln_next  = &_bootidle;
+	_bootidle.t_vm_tasks.ln_pself  = &_asyncwork.t_vm_tasks.ln_next;
+	assert(_bootidle.t_vm_tasks.ln_next == NULL);
 
-	_boottask.t_flags                     = TASK_FCRITICAL | TASK_FSTARTED | TASK_FRUNNING;
-	_bootidle.t_flags                     = TASK_FCRITICAL | TASK_FSTARTED | TASK_FKEEPCORE;
-	_boottask.t_sched.s_running.sr_runnxt = &_boottask;
-	_boottask.t_sched.s_running.sr_runprv = &_boottask;
-	_boottask.t_self                      = &_boottask;
-	_bootidle.t_self                      = &_bootidle;
-	_bootcpu.c_current                    = &_boottask;
+	_boottask.t_refcnt  = 2; /* +1: scheduler chain, +1: public symbol `_boottask' */
+	_asyncwork.t_refcnt = 2; /* +1: scheduler chain, +1: intern symbol `_asyncwork' */
+	_bootidle.t_refcnt  = 2; /* +1: scheduler chain, +1: public symbol `_bootidle' */
+
+	_boottask.t_flags  = TASK_FCRITICAL | TASK_FSTARTED | TASK_FRUNNING;
+	_asyncwork.t_flags = TASK_FCRITICAL | TASK_FSTARTED | TASK_FRUNNING | TASK_FKERNTHREAD;
+	_bootidle.t_flags  = TASK_FCRITICAL | TASK_FSTARTED | TASK_FKEEPCORE | TASK_FKERNTHREAD;
+
+	_boottask.t_sched.s_running.sr_runnxt  = &_asyncwork;
+	_boottask.t_sched.s_running.sr_runprv  = &_asyncwork;
+	_asyncwork.t_sched.s_running.sr_runnxt = &_boottask;
+	_asyncwork.t_sched.s_running.sr_runprv = &_boottask;
+
+	_boottask.t_self  = &_boottask;
+	_bootidle.t_self  = &_bootidle;
+	_asyncwork.t_self = &_asyncwork;
+
+	_bootcpu.c_current = &_boottask;
 
 	kernel_initialize_scheduler_arch();
 }
@@ -290,6 +321,7 @@ NOTHROW(KCALL kernel_initialize_scheduler_callbacks)(void) {
 	for (; iter < __kernel_pertask_init_end; ++iter) {
 		(**iter)(&_boottask);
 		(**iter)(&_bootidle);
+		(**iter)(&_asyncwork);
 	}
 }
 
@@ -312,12 +344,14 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	void *addr;
 	size_t size;
 	assertf(self != &_boottask &&
-	        self != &_bootidle,
+	        self != &_bootidle &&
+	        self != &_asyncwork,
 	        "Cannot destroy the BOOT or IDLE task of CPU0\n"
-	        "self       = %p\n"
-	        "&_boottask = %p\n"
-	        "&_bootidle = %p\n",
-	        self, &_boottask, &_bootidle);
+	        "self        = %p\n"
+	        "&_boottask  = %p\n"
+	        "&_bootidle  = %p\n"
+	        "&_asyncwork = %p\n",
+	        self, &_boottask, &_bootidle, &_asyncwork);
 	assert(sync_writing(&vm_kernel.v_treelock));
 
 	/* Unlink + unmap the trampoline node. */

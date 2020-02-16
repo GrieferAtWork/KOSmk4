@@ -36,6 +36,7 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/util.h>
 #include <kernel/addr2line.h>
 #include <kernel/vm.h>
+#include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/task.h>
@@ -94,6 +95,8 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		dbg_print(DBGSTR("\t_boottask"));
 	else if (thread == &_bootidle)
 		dbg_print(DBGSTR("\t_bootidle"));
+	else if (thread == &_asyncwork)
+		dbg_print(DBGSTR("\t_asyncwork"));
 	else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle)) {
 		dbg_printf(DBGSTR("\t_idle[%u]"), (unsigned int)thread->t_cpu->c_id);
 	}

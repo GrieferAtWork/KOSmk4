@@ -120,6 +120,23 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
+	__CXX_CLASSMEMBER NOPREEMPT ATTR_LEAF NOBLOCK WUNUSED ATTR_RETNONNULL REF T *KCALL get_nopr() __CXX_NOEXCEPT {
+		REF T *result;
+		__hybrid_assert(!PREEMPTION_ENABLED());
+#ifndef CONFIG_NO_SMP
+		__hybrid_atomic_fetchinc(this->m_inuse, __ATOMIC_SEQ_CST);
+#endif /* !CONFIG_NO_SMP */
+		COMPILER_READ_BARRIER();
+		result = this->m_pointer;
+		COMPILER_READ_BARRIER();
+		refcnt_methods<T>::incref(result);
+#ifndef CONFIG_NO_SMP
+		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
+#endif /* !CONFIG_NO_SMP */
+		return result;
+	}
+
+	/* Return a reference to the current pointed-to value */
 	__CXX_CLASSMEMBER NONNULL((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
 	void KCALL set(T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REF T *old_pointer;

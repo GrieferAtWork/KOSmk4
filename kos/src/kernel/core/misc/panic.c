@@ -41,6 +41,7 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/printk.h>
 #include <kernel/syslog.h>
 #include <kernel/vm.h>
+#include <sched/async.h>
 #include <sched/rwlock-intern.h>
 #include <sched/signal-intern.h>
 #include <sched/task.h>
@@ -87,8 +88,10 @@ PRIVATE ATTR_COLDTEXT NOBLOCK void
 NOTHROW(KCALL fixup_potential_system_inconsistencies)(void) {
 	struct task *mythread = THIS_TASK;
 	fixup_uninitialized_thread(&_boottask);
+	fixup_uninitialized_thread(&_asyncwork);
 	fixup_uninitialized_thread(&_bootidle);
 	if (mythread != &_boottask &&
+	    mythread != &_asyncwork &&
 	    mythread != &_bootidle && mythread != NULL)
 		fixup_uninitialized_thread(mythread);
 }

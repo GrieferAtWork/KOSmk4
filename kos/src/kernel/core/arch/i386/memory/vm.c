@@ -330,6 +330,7 @@ STATIC_ASSERT(VM_PROT_WRITE == PAGEDIR_MAP_FWRITE);
 STATIC_ASSERT(VM_PROT_READ  == PAGEDIR_MAP_FREAD);
 
 INTDEF byte_t __kernel_boottask_stack_guard[];
+INTDEF byte_t __kernel_asyncwork_stack_guard[];
 
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
@@ -532,6 +533,12 @@ NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void) {
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmapone(__kernel_boottask_stack_guard);
+	}
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	if (pagedir_prepare_mapone(__kernel_asyncwork_stack_guard))
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	{
+		pagedir_unmapone(__kernel_asyncwork_stack_guard);
 	}
 }
 

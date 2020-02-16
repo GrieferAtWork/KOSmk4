@@ -147,9 +147,10 @@ again_calculate_vecN:
 		boot_trampoline_e1v[i].p_word = e1_word;
 		e1_word += 4096;
 	}
-	/* Mark the 2 pages used for the trampolines as prepared. */
+	/* Mark the 3 pages used for the trampolines as prepared. */
 	boot_trampoline_e1v[vec1 + 0].p_word |= P64_PAGE_FPREPARED;
 	boot_trampoline_e1v[vec1 + 1].p_word |= P64_PAGE_FPREPARED;
+	boot_trampoline_e1v[vec1 + 2].p_word |= P64_PAGE_FPREPARED;
 	/* Setup the replacement E2-word */
 	e2_word = (u64)boot_trampoline_e1v - KERNEL_CORE_BASE; /* virt2phys() */
 	e2_word |= (P64_PAGE_FPRESENT | P64_PAGE_FWRITE | P64_PAGE_FACCESSED);
@@ -157,7 +158,7 @@ again_calculate_vecN:
 	/* Set the E1-vector as being used. */
 	ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, e2_word);
 	/* Return the virtual memory locations used for the
-	 * trampolines needed by `_boottask' and `_bootidle' */
+	 * trampolines needed by `_boottask', `_bootidle' and `_asyncwork' */
 	return trampoline_addr;
 }
 

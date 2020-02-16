@@ -36,6 +36,7 @@
 #include <kernel/syscall-tables.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -45,6 +46,7 @@
 #include <asm/cpu-flags.h>
 #include <kos/compat/linux-ldt.h>
 #include <kos/except/inval.h>
+#include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <sys/io.h>
@@ -57,37 +59,46 @@
 
 DECL_BEGIN
 
-INTDEF byte_t __kernel_bootidle_stack[KERNEL_IDLE_STACKSIZE];
-
-INTERN ATTR_FREETEXT void KCALL
-kernel_initialize_scheduler_arch(void) {
+PRIVATE ATTR_FREETEXT void KCALL
+kernel_initialize_threadstack(struct task *__restrict thread,
+                              byte_t *__restrict sp_base,
+                              size_t sp_size,
+                              void *__restrict entry) {
 	struct scpustate *init_state;
 	/* Initialize the CPU state of the boot CPU's idle thread. */
 #ifdef __x86_64__
-	init_state = (struct scpustate *)((__kernel_bootidle_stack + KERNEL_IDLE_STACKSIZE) - SIZEOF_SCPUSTATE);
+	init_state = (struct scpustate *)((sp_base + sp_size) - SIZEOF_SCPUSTATE);
 	memset(init_state, 0, SIZEOF_SCPUSTATE);
-	init_state->scs_sgbase.sg_gsbase = (u64)&_bootidle;
+	init_state->scs_sgbase.sg_gsbase = (u64)thread;
 	init_state->scs_sgregs.sg_gs     = SEGMENT_USER_DATA_RPL;
 	init_state->scs_sgregs.sg_fs     = SEGMENT_USER_DATA_RPL;
 	init_state->scs_sgregs.sg_es     = SEGMENT_USER_DATA_RPL;
 	init_state->scs_sgregs.sg_ds     = SEGMENT_USER_DATA_RPL;
 	init_state->scs_irregs.ir_cs     = SEGMENT_KERNEL_CODE;
 	init_state->scs_irregs.ir_ss     = SEGMENT_KERNEL_DATA0;
-	init_state->scs_irregs.ir_rsp    = (u64)(__kernel_bootidle_stack + KERNEL_IDLE_STACKSIZE);
-	init_state->scs_irregs.ir_rip    = (u64)(void *)&cpu_idlemain;
-	_bootidle.t_sched.s_state        = init_state;
+	init_state->scs_irregs.ir_rsp    = (u64)(sp_base + sp_size);
 #else /* __x86_64__ */
-	init_state = (struct scpustate *)((__kernel_bootidle_stack + KERNEL_IDLE_STACKSIZE) -
-	                                  (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL));
+	init_state = (struct scpustate *)((sp_base + sp_size) - (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL));
 	memset(init_state, 0, OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL);
-	init_state->scs_sgregs.sg_gs    = SEGMENT_USER_GSBASE_RPL;
-	init_state->scs_sgregs.sg_fs    = SEGMENT_KERNEL_FSBASE;
-	init_state->scs_sgregs.sg_es    = SEGMENT_USER_DATA_RPL;
-	init_state->scs_sgregs.sg_ds    = SEGMENT_USER_DATA_RPL;
-	init_state->scs_irregs_k.ir_cs  = SEGMENT_KERNEL_CODE;
-	init_state->scs_irregs_k.ir_eip = (u32)(void *)&cpu_idlemain;
-	_bootidle.t_sched.s_state       = init_state;
+	init_state->scs_sgregs.sg_gs   = SEGMENT_USER_GSBASE_RPL;
+	init_state->scs_sgregs.sg_fs   = SEGMENT_KERNEL_FSBASE;
+	init_state->scs_sgregs.sg_es   = SEGMENT_USER_DATA_RPL;
+	init_state->scs_sgregs.sg_ds   = SEGMENT_USER_DATA_RPL;
+	init_state->scs_irregs_k.ir_cs = SEGMENT_KERNEL_CODE;
 #endif /* !__x86_64__ */
+	init_state->scs_irregs.ir_pip    = (uintptr_t)(void *)entry;
+	init_state->scs_irregs.ir_pflags = EFLAGS_IF;
+	thread->t_sched.s_state = init_state;
+}
+
+INTDEF byte_t __kernel_bootidle_stack[KERNEL_IDLE_STACKSIZE];
+INTDEF byte_t __kernel_asyncwork_stack[KERNEL_STACKSIZE];
+
+INTERN ATTR_FREETEXT void
+NOTHROW(KCALL kernel_initialize_scheduler_arch)(void) {
+	/* Initialize the CPU state of the boot CPU's idle thread, as well as the ASYNC worker thread. */
+	kernel_initialize_threadstack(&_bootidle, __kernel_bootidle_stack, KERNEL_IDLE_STACKSIZE, (void *)&cpu_idlemain);
+	kernel_initialize_threadstack(&_asyncwork, __kernel_asyncwork_stack, KERNEL_STACKSIZE, (void *)&_asyncmain);
 }
 
 
