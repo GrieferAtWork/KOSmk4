@@ -37,8 +37,6 @@
 
 DECL_BEGIN
 
-
-
 typedef struct: nic_device {
 	struct pci_device   *nd_pcidev;        /* [1..1][const] The associated PCI device. */
 	struct rwlock        nd_iolock;        /* Lock for configuring I/O (TODO: Remove me & use async workers) */

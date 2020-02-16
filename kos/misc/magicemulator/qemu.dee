@@ -202,11 +202,10 @@ did_update_x86_64_kernel:
 		"-display", "gtk",
 		"-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
 //		"-d", "int",
-//		"-netdev", tap ? "tap,ifname=tap0,id=u1" : "user,id=u1",
-//		"-device", "ne2k_pci,netdev=u1",
-//		"-object", "filter-dump,id=f1,netdev=u1,file=dump.dat",
-//		"-net", "nic,model=rtl8139", "-net", "user",
-		"-net", "nic,model=ne2k_pci", "-net", "user",
+
+//		"-netdev", "user,id=n1", "-device", "rtl8139,netdev=n1",
+		"-netdev", "user,id=n1", "-device", "ne2k_pci,netdev=n1",
+		"-object", "filter-dump,id=f1,netdev=n1,file=qemu-netdump.dat",
 		"-vga", "std",
 	});
 	if (fs.stat.exists("bin/ext2.img")) {

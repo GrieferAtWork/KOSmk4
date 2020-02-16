@@ -131,9 +131,9 @@ struct ip {
 	u_short        ip_off;    /* fragment offset field */
 #ifdef __USE_KOS
 #define IP_EVIL 0x8000     /* Evil bit (Set for malicious packets) */
-#else
+#else /* __USE_KOS */
 #define IP_RF   0x8000     /* reserved fragment flag */
-#endif
+#endif /* !__USE_KOS */
 #define IP_DF   0x4000     /* dont fragment flag */
 #define IP_MF   0x2000     /* more fragments flag */
 #define IP_OFFMASK 0x1fff  /* mask for fragmenting bits */

@@ -10,6 +10,7 @@
 /kos/.vs/ProjectSettings.json
 /kos/.vs/VSWorkspaceState.json
 /qemu-events
+/qemu-netdump.dat
 /asm.S
 /kos/include/i386-kos/c++
 /kos/include/i386-kos/c++-backup-*

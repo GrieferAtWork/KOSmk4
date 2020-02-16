@@ -145,7 +145,7 @@ __SYSDECL_BEGIN
 struct __ATTR_PACKED ethhdr {
 	unsigned char h_dest[ETH_ALEN];   /* Destination eth addr. */
 	unsigned char h_source[ETH_ALEN]; /* Source ether addr. */
-	__be16        h_proto;            /* Packet type ID field. */
+	__be16        h_proto;            /* Packet type ID field. (one of `ETH_P_*') */
 };
 #endif /* __CC__ */
 

@@ -39,6 +39,10 @@
 #include <kos/types.h>
 #include <kos/ukern.h>
 #include <kos/unistd.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/if_ether.h>
+#include <netinet/udp.h>
 #include <sys/io.h>
 #include <sys/mmio.h>
 #include <sys/stat.h>
@@ -63,6 +67,7 @@
 #include <syslog.h>
 #include <termios.h>
 #include <unistd.h>
+#include <linux/if_ether.h>
 
 DECL_BEGIN
 
@@ -316,23 +321,38 @@ int main_nic(int argc, char *argv[], char *envp[]) {
 	signal(SIGINT, SIG_IGN);
 	{
 		fd_t fd = Open("/dev/ne2k0", O_RDWR);
-		struct {
-			unsigned char h_dest[6];
-			unsigned char h_source[6];
-			uint16_t h_proto;
-			char h_data[64];
+		struct ATTR_PACKED {
+			struct ethhdr eth;
+			struct ip     ip;
+			struct udphdr udp;
+			char          dat[64];
 		} d;
 		memset(&d, 0, sizeof(d));
-		d.h_source[0] = 0x12;
-		d.h_source[1] = 0x34;
-		d.h_source[2] = 0x56;
-		d.h_source[3] = 0x78;
-		d.h_source[4] = 0x9a;
-		d.h_source[5] = 0xbc;
-		d.h_source[6] = 0xde;
-		d.h_proto = 0x0300; /* ETH_P_ALL */
-		strcpy(d.h_data, "<<Hello world?>>\n");
-		writeall(fd, &d, sizeof(d));
+		d.eth.h_source[0] = 0x12;
+		d.eth.h_source[1] = 0x34;
+		d.eth.h_source[2] = 0x56;
+		d.eth.h_source[3] = 0x78;
+		d.eth.h_source[4] = 0x9a;
+		d.eth.h_source[5] = 0xbc;
+		d.eth.h_source[6] = 0xde;
+		d.eth.h_proto = (be16)htons(ETH_P_IP);
+		d.ip.ip_v   = 4;
+		d.ip.ip_hl  = 5; /* 5 * 4 = 20 bytes */
+		d.ip.ip_tos = 0; /* ??? */
+		d.ip.ip_len = htons(sizeof(d.ip) + sizeof(d.udp) + sizeof(d.dat));
+		d.ip.ip_id  = 0; /* ??? */
+		d.ip.ip_off = 0; /* ??? */
+		d.ip.ip_ttl = 64;
+		d.ip.ip_p   = IPPROTO_UDP;
+		d.ip.ip_sum = 42; /* TODO */
+		d.ip.ip_src.s_addr = 0;
+		d.ip.ip_dst.s_addr = 0;
+		d.udp.uh_sport = 1234;
+		d.udp.uh_dport = 1234;
+		d.udp.uh_ulen  = htons(sizeof(d.udp) + sizeof(d.dat));
+		d.udp.uh_sum   = 42;
+		strcpy(d.dat, "<<Hello world?>>\n");
+		Write(fd, &d, sizeof(d));
 		pause();
 		close(fd);
 	}
