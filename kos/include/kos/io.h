@@ -228,6 +228,9 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define IO_SYNC        0x1000 /* Ensure that all modified caches are flushed during write() */
 #define IO_ASYNC       0x2000 /* Use asynchronous I/O and generate SIGIO upon completion. */
 #define IO_DIRECT      0x4000 /* Bypass input/output buffers if possible. - Try to read/write data directly to/from provided buffers. */
+#define IO_NODATAZERO  0x8000 /* For use with `IO_NONBLOCK': Allow 0 to be returned (which normally indicates EOF)
+                               * when no data is available at the moment (which normally would cause `E_WOULDBLOCK'
+                               * to be thrown). NOTE: This flag is merely a hint. - Functions are allowed to ignore it! */
 
 /* Check if reading/writing is possible with a given I/O mode. */
 #define IO_CANREAD(mode)      (((mode) & IO_ACCMODE) != IO_WRONLY)
@@ -236,10 +239,10 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 /* Mask of flags accepted by the kos extension functions:
  *  `readf', `writef', `preadf', `pwritef', `ioctlf()', `hopf()' */
-#define IO_USERF_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC | IO_DIRECT)
+#define IO_USERF_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC | IO_DIRECT | IO_NODATAZERO)
 
 /* Mask of flags modifiable via `F_SETFD' / `F_SETFL' */
-#define IO_SETFL_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC | IO_DIRECT)
+#define IO_SETFL_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC | IO_DIRECT | IO_NODATAZERO)
 
 /* Mask for handle flags (flags not inherited during `dup()'). */
 #define IO_SETFD_MASK (IO_CLOEXEC | IO_CLOFORK)

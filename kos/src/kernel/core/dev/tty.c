@@ -34,6 +34,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <sched/async.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -49,35 +50,6 @@
 
 DECL_BEGIN
 
-
-PUBLIC NOBLOCK void
-NOTHROW(KCALL tty_device_forward_destroy)(struct tty_device_forward *__restrict self) {
-	if unlikely(self->tf_cancel)
-		task_free_rpc(self->tf_cancel);
-	decref(self->tf_thread);
-	kfree(self);
-}
-
-LOCAL NOBLOCK void
-NOTHROW(KCALL tty_device_forward_cancel)(struct tty_device_forward *__restrict self) {
-	struct rpc_entry *cancel;
-	cancel = ATOMIC_XCH(self->tf_cancel, NULL);
-	if likely(cancel) {
-		int error;
-		error = task_deliver_rpc(self->tf_thread, cancel);
-		assertf(error != TASK_DELIVER_RPC_INTERRUPTED, "Should only happen for user-RPCs");
-		assertf(error != TASK_DELIVER_RPC_KERNTHREAD, "Should only happen for user-RPCs");
-		assertf(error == TASK_DELIVER_RPC_SUCCESS ||
-		        error == TASK_DELIVER_RPC_TERMINATED,
-		        "error = %d", error);
-		/* The RPC delivery can fail if the thread already exited, which, though
-		 * highly unlikely, can have already happened if we've already cleared the
-		 * device pointer. */
-		if unlikely(!TASK_DELIVER_RPC_WASOK(error))
-			task_free_rpc(cancel);
-	}
-}
-
 PRIVATE ssize_t LIBTERM_CC
 tty_device_oprinter(struct terminal *__restrict term,
                     void const *__restrict src,
@@ -92,15 +64,9 @@ tty_device_oprinter(struct terminal *__restrict term,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL tty_device_fini)(struct character_device *__restrict self) {
 	struct tty_device *me;
-	REF struct tty_device_forward *fwd;
 	me = (struct tty_device *)self;
 	/* Stop the associated forwarding thread (if one is running) */
-	fwd = TTY_DEVICE_FORWARD(me).exchange(NULL);
-	if (fwd) {
-		fwd->tf_device.clear();
-		tty_device_forward_cancel(fwd);
-		decref(fwd);
-	}
+	tty_device_stopfwd(me);
 	if (me->t_ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
 	    character_device_isanansitty((struct character_device *)me->t_ohandle_ptr)) {
 		struct ansitty_device *odev;
@@ -164,53 +130,48 @@ tty_device_poll(struct character_device *__restrict self, poll_mode_t what) THRO
 	return 0;
 }
 
-PRIVATE void KCALL
-tty_device_fwd_main(REF struct tty_device_forward *__restrict fwd) {
-	for (;;) {
-		REF struct tty_device *tty;
-		char buf[256];
-		size_t count;
-		tty = fwd->tf_device.get();
-		if unlikely(!tty)
-			break; /* Stop */
-		/* Try to read some data.
-		 * NOTE: Do this without blocking, so we call poll for more
-		 *       data while still checking if we're supposed to stop. */
-		TRY {
-			for (;;) {
-				count = (*tty->t_ihandle_read)(tty->t_ihandle_ptr, buf, sizeof(buf), IO_RDONLY);
-				if (!count)
-					break;
-				/* NOTE: Data also gets written with the `IO_NONBLOCK' flag set.
-				 *       This has to be done because control characters still have
-				 *       to be processed, even when canon buffers have filled up.
-				 *       Otherwise, you would no longer be able to CTRL+C a hung
-				 *       application after hammering away at your keyboard for a
-				 *       couple of minutes. */
-				terminal_iwrite(&tty->t_term, buf, count, IO_WRONLY | IO_NONBLOCK);
-			}
-			assert(!task_isconnected());
-		} EXCEPT {
-			decref(tty);
-			decref(fwd);
-			RETHROW();
-		}
-		decref(tty);
-	}
-	decref(fwd);
+PRIVATE bool FCALL ttyfwd_poll(void *arg) {
+	struct tty_device *tty;
+	poll_mode_t what;
+	tty  = (struct tty_device *)arg;
+	what = (*tty->t_ihandle_poll)(tty->t_ihandle_ptr, POLLIN);
+	return (what & POLLIN) != 0;
 }
 
-
-PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
-terminate_ttyfwd_rpc(void *UNUSED(arg),
-                     struct icpustate *__restrict state,
-                     unsigned int reason,
-                     struct rpc_syscall_info const *UNUSED(sc_info)) {
-	assert(reason == TASK_RPC_REASON_SYNC ||
-	       reason == TASK_RPC_REASON_SHUTDOWN);
-	if likely(reason == TASK_RPC_REASON_SYNC)
-		THROW(E_EXIT_THREAD);
-	return state;
+PRIVATE bool FCALL ttyfwd_work(void *arg) {
+	bool result = false;
+	char buf[256];
+	struct tty_device *tty;
+	tty  = (struct tty_device *)arg;
+	for (;;) {
+		size_t count;
+		TRY {
+			count = (*tty->t_ihandle_read)(tty->t_ihandle_ptr, buf, sizeof(buf),
+			                               IO_RDONLY | IO_NODATAZERO);
+		} EXCEPT {
+			if (was_thrown(E_WOULDBLOCK))
+				goto done;
+			RETHROW();
+		}
+		if (!count)
+			break;
+		result = true;
+		/* NOTE: Data also gets written with the `IO_NONBLOCK' flag set.
+		 *       This has to be done because control characters still have
+		 *       to be processed, even when canon buffers have filled up.
+		 *       Otherwise, you would no longer be able to CTRL+C a hung
+		 *       application after hammering away at your keyboard for a
+		 *       couple of minutes. */
+		TRY {
+			terminal_iwrite(&tty->t_term, buf, count,
+			                IO_WRONLY | IO_NONBLOCK | IO_NODATAZERO);
+		} EXCEPT {
+			if (!was_thrown(E_WOULDBLOCK))
+				RETHROW();
+		}
+	}
+done:
+	return result;
 }
 
 
@@ -226,51 +187,22 @@ terminate_ttyfwd_rpc(void *UNUSED(arg),
 PUBLIC bool KCALL
 tty_device_startfwd(struct tty_device *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	REF struct task *thread;
-	REF struct tty_device_forward *fwd;
-	if (ATOMIC_READ(self->t_forward.m_pointer) != NULL)
-		return false; /* Already running. */
-	thread = task_alloc(&vm_kernel);
-	TRY {
-		fwd = (REF struct tty_device_forward *)kmalloc(sizeof(struct tty_device_forward), GFP_NORMAL);
-		TRY {
-			/* Allocate an RPC descriptor which we ca use to terminate the ttyfwd thread. */
-			fwd->tf_cancel = task_alloc_synchronous_rpc(&terminate_ttyfwd_rpc);
-		} EXCEPT {
-			kfree(fwd);
-			RETHROW();
-		}
-	} EXCEPT {
-		decref_likely(thread);
-		RETHROW();
-	}
-	fwd->tf_refcnt = 2;
-	fwd->tf_thread = thread;
-	xatomic_weaklyref_init(&fwd->tf_device, self);
-	task_setup_kernel(thread, (thread_main_t)&tty_device_fwd_main, 1, fwd);
-	if unlikely(!TTY_DEVICE_FORWARD(self).cmpxch_inherit_new(NULL, fwd)) {
-		fwd->tf_device.clear();
-		tty_device_forward_cancel(fwd);
-		destroy(fwd);
-		return false;
-	}
-	/* Start the forwarding thread once everything has checked out.
-	 * Note that this operation is NOTHROW, so we're save to call it
-	 * without having to deal with errors. */
-	task_start(thread);
-	return true;
+	bool result;
+	result = register_async_worker(NULL,
+	                               &ttyfwd_poll,
+	                               &ttyfwd_work,
+	                               self);
+	return result;
 }
 
 PUBLIC NOBLOCK bool
 NOTHROW(KCALL tty_device_stopfwd)(struct tty_device *__restrict self) {
-	REF struct tty_device_forward *fwd;
-	fwd = TTY_DEVICE_FORWARD(self).exchange(NULL);
-	if (!fwd)
-		return false;
-	fwd->tf_device.clear();
-	tty_device_forward_cancel(fwd);
-	decref(fwd);
-	return true;
+	bool result;
+	result = unregister_async_worker(NULL,
+	                                 &ttyfwd_poll,
+	                                 &ttyfwd_work,
+	                                 self);
+	return result;
 }
 
 
@@ -398,6 +330,7 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	typedef size_t (KCALL *phandle_read_function_t)(void *__restrict ptr, USER CHECKED void *, size_t, iomode_t);
 	typedef size_t (KCALL *phandle_write_function_t)(void *__restrict ptr, USER CHECKED void const *, size_t, iomode_t);
+	typedef poll_mode_t (KCALL *phandle_poll_function_t)(void *__restrict ptr, poll_mode_t);
 	REF struct tty_device *result;
 	assert(ihandle_typ < HANDLE_TYPE_COUNT);
 	assert(ohandle_typ < HANDLE_TYPE_COUNT);
@@ -413,12 +346,23 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	result->t_ihandle_ptr    = ihandle_ptr;
 	result->t_ohandle_ptr    = ohandle_ptr;
 	result->t_ihandle_read   = handle_type_db.h_read[ihandle_typ];
+	result->t_ihandle_poll   = handle_type_db.h_poll[ihandle_typ];
 	result->t_ohandle_write  = handle_type_db.h_write[ohandle_typ];
 	/* Optimization to by-pass handle operators for known character devices. */
-	if (ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE && ((struct character_device *)ihandle_ptr)->cd_type.ct_read)
-		result->t_ihandle_read = (phandle_read_function_t)((struct character_device *)ihandle_ptr)->cd_type.ct_read;
-	if (ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE && ((struct character_device *)ohandle_ptr)->cd_type.ct_write)
-		result->t_ohandle_write = (phandle_write_function_t)((struct character_device *)ohandle_ptr)->cd_type.ct_write;
+	if (ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE) {
+		struct character_device *cdev;
+		cdev = (struct character_device *)ihandle_ptr;
+		if (cdev->cd_type.ct_read)
+			result->t_ihandle_read = (phandle_read_function_t)cdev->cd_type.ct_read;
+		if (cdev->cd_type.ct_poll)
+			result->t_ihandle_poll = (phandle_poll_function_t)cdev->cd_type.ct_poll;
+	}
+	if (ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE) {
+		struct character_device *cdev;
+		cdev = (struct character_device *)ohandle_ptr;
+		if (cdev->cd_type.ct_write)
+			result->t_ohandle_write = (phandle_write_function_t)cdev->cd_type.ct_write;
+	}
 	/* Special case: Already read characters from a connected keyboard device, rather
 	 *               than reading  */
 	if (ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&

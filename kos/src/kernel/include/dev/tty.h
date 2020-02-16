@@ -71,52 +71,14 @@ struct tty_device
 	/* [1..1][const] Input handle read operator callback. */
 	size_t (KCALL *t_ihandle_read)(void *__restrict ptr, USER CHECKED void *dst,
 	                               size_t num_bytes, iomode_t mode) THROWS(...);
+	/* [1..1][const] Input handle poll operator callback. */
+	poll_mode_t (KCALL *t_ihandle_poll)(void *__restrict ptr, poll_mode_t what) THROWS(...);
 	/* [1..1][const] Output handle write operator callback. */
 	size_t (KCALL *t_ohandle_write)(void *__restrict ptr, USER CHECKED void const *src,
 	                                size_t num_bytes, iomode_t mode) THROWS(...);
-	XATOMIC_REF_STRUCT(struct tty_device_forward) t_forward; /* [0..1] TTY data forwarding thread. */
 };
 
 DEFINE_REFCOUNT_TYPE_SUBCLASS(tty_device, ttybase_device);
-
-#define TTY_DEVICE_FORWARD(self) \
-	((XATOMIC_REF(struct tty_device_forward) &)(self)->t_forward)
-
-struct task;
-struct rpc_entry;
-struct tty_device_forward {
-	/* Reading keyboard input only when read() is called doesn't work:
-	 * With that design, things like CRTL+C wouldn't get recognized until
-	 * the application which a user is trying to terminate actually
-	 * reads from its TTY (which really defeats the point in the most
-	 * common use of CTRL+C being to halt a program that has hung itself)
-	 * The solution here is to designate a thread to continuously read from the TTY
-	 * input handle (keyboard) and pass anything that it gets to `terminal_iwrite()'
-	 *
-	 * Note however that there _has_ to be a way to terminate/restart this thread
-	 * using some ioctl(), because after all: Any given keyboard input can only
-	 * ever be read once before it disappears into the aether
-	 * Also note that control over this thread also has to be made available to
-	 * the VT (VirtualTerminal) controller to only have the active terminal read
-	 * input data from the keyboard.
-	 *
-	 * Also note that we can't just have the keyboard driver directly forward its
-	 * output data to the tty driver, since this would mean that `terminal_iwrite()'
-	 * would have to be called in the context of an interrupt, meaning that a
-	 * call to `t_ohandle_write()' would have to allow for asynchronous and re-entrant
-	 * calls into itself (and even more general be able to work as NOEXCEPT, since any
-	 * exception it could throw would have to be something that the keyboard interrupt
-	 * handler could reasonably handle by itself, which doesn't work for things like
-	 * E_INTERRUPT or E_WOULDBLOCK in case somwhere along the line `task_serve()' gets
-	 * called) */
-	WEAK refcnt_t                        tf_refcnt; /* Reference counter for this structure. */
-	struct rpc_entry                    *tf_cancel; /* [0..1][lock(CLEAR_ONCE)] The RPC which can be used to terminate the thread. */
-	REF struct task                     *tf_thread; /* [1..1][const] The thread used for forwarding input data. */
-	XATOMIC_WEAKLYREF(struct tty_device) tf_device; /* [0..1][lock(CLEAR_ONCE)] The associated device. (set to NULL to terminate the forwarding thread) */
-};
-FUNDEF NOBLOCK void NOTHROW(KCALL tty_device_forward_destroy)(struct tty_device_forward *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct tty_device_forward, tf_refcnt, tty_device_forward_destroy)
-
 
 
 #define ttybase_isatty(self) \

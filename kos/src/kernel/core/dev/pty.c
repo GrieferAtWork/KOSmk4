@@ -134,7 +134,7 @@ again_read:
 	}
 	if (!result) {
 		if (mode & IO_NONBLOCK) {
-			if (!ringbuffer_closed(&slave->ps_obuf))
+			if (!(mode & IO_NODATAZERO) && !ringbuffer_closed(&slave->ps_obuf))
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No data available. */
 		} else {
 			/* Must not keep a reference to the slave while sleeping! */
@@ -184,7 +184,8 @@ again_write:
 	assert((size_t)result <= num_bytes);
 	if (!result) {
 		if (mode & IO_NONBLOCK) {
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+			if (!(mode & IO_NODATAZERO))
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
 		} else {
 			/* Must not keep a reference to the slave while sleeping! */
 			int how;

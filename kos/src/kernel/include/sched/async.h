@@ -24,6 +24,10 @@
 
 #include <kernel/types.h>
 
+#ifdef __cplusplus
+#include <kernel/handle.h>
+#endif /* __cplusplus */
+
 /* The async callback API can be used to facilitate the servicing of
  * operations that require synchronous access as the result of async
  * input (such as hardware interrupts)
@@ -80,24 +84,57 @@ typedef bool (FCALL *async_callback_t)(void *arg);
  *                      destructor must still unregister the callbacks before
  *                      the memory used to back its reference counter is free()d!
  * @param: ob_type:     The object type for `ob_pointer' (one of `HANDLE_TYPE_*')
- */
-FUNDEF NONNULL((2, 3, 4)) void KCALL
+ * @return: true:       Successfully registered a new async worker.
+ * @return: false:      An async worker for the given object/callback combination
+ *                      was already registered. */
+FUNDEF NONNULL((2, 3, 4)) bool KCALL
 register_async_worker(async_callback_t test,
                       async_callback_t poll,
                       async_callback_t work,
-                      void *ob_pointer,
+                      void *__restrict ob_pointer,
                       uintptr_half_t ob_type)
 		THROWS(E_BADALLOC);
 
 /* Delete a previously defined async worker, using the same arguments as those
  * previously passed to `register_async_worker()'. This function should be
- * called from the destructor of `ob_pointer' */
-FUNDEF NOBLOCK NONNULL((2, 3, 4)) void
+ * called from the destructor of `ob_pointer'
+ * @return: true:  Successfully deleted an async worker for the
+ *                 given object/callback combination.
+ * @return: false: No async worker for the given object/callback
+ *                 combination had been registered. */
+FUNDEF NOBLOCK NONNULL((2, 3, 4)) bool
 NOTHROW(KCALL unregister_async_worker)(async_callback_t test,
                                        async_callback_t poll,
                                        async_callback_t work,
-                                       void *ob_pointer,
+                                       void *__restrict ob_pointer,
                                        uintptr_half_t ob_type);
+
+#ifdef __cplusplus
+#define _ASYNC_WORKER_CXX_FWD_STRUCT(HT, T) T;
+HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_FWD_STRUCT)
+#undef _ASYNC_WORKER_CXX_FWD_STRUCT
+extern "C++" {
+
+#define _ASYNC_WORKER_CXX_DECLARE(HT, T)                                          \
+	LOCAL NONNULL((2, 3, 4)) bool KCALL                                           \
+	register_async_worker(async_callback_t test, async_callback_t poll,           \
+	                      async_callback_t work, T *__restrict ob_pointer)        \
+			THROWS(E_BADALLOC) {                                                  \
+		return register_async_worker(test, poll, work, (void *)ob_pointer, HT);   \
+	}                                                                             \
+	LOCAL NOBLOCK NONNULL((2, 3, 4)) bool                                         \
+	NOTHROW(KCALL unregister_async_worker)(async_callback_t test,                 \
+	                                       async_callback_t poll,                 \
+	                                       async_callback_t work,                 \
+	                                       T *__restrict ob_pointer)              \
+			THROWS(E_BADALLOC) {                                                  \
+		return unregister_async_worker(test, poll, work, (void *)ob_pointer, HT); \
+	}
+HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_DECLARE)
+#undef _ASYNC_WORKER_CXX_DECLARE
+
+}
+#endif /* __cplusplus */
 
 
 #endif /* __CC__ */

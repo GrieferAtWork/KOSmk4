@@ -63,7 +63,7 @@
 #define HANDLE_TYPE_FS              0x0007 /* `struct fs' */
 #define HANDLE_TYPE_VM              0x0008 /* `struct vm' */
 #define HANDLE_TYPE_TASK            0x0009 /* `struct taskpid' */
-#define HANDLE_TYPE_CLOCK           0x000a /* `struct wall_clock' (TODO) */
+#define HANDLE_TYPE_CLOCK           0x000a /* `struct realtime_clock_struct' */
 #define HANDLE_TYPE_DRIVER          0x000b /* `struct driver' */
 #define HANDLE_TYPE_PIPE            0x000c /* `struct pipe' */
 #define HANDLE_TYPE_PIPE_READER     0x000d /* `struct pipe_reader' */
@@ -81,6 +81,43 @@
 #define HANDLE_TYPE_COUNT           0x0018 /* # of recognized handle types
                                             * NOTE: After changing this value, be sure to
                                             * `touch /kos/src/kernel/include/kernel/handle.h' */
+
+/* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type with an associated struct */
+#define HANDLE_FOREACH_TYPE(cb)                                           \
+	cb(HANDLE_TYPE_DATABLOCK, struct vm_datablock)                        \
+	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device)                \
+	cb(HANDLE_TYPE_DIRECTORYENTRY, struct directory_entry)                \
+	cb(HANDLE_TYPE_FILE, struct file)                                     \
+	cb(HANDLE_TYPE_ONESHOT_DIRECTORY_FILE, struct oneshot_directory_file) \
+	cb(HANDLE_TYPE_PATH, struct path)                                     \
+	cb(HANDLE_TYPE_FS, struct fs)                                         \
+	cb(HANDLE_TYPE_VM, struct vm)                                         \
+	cb(HANDLE_TYPE_TASK, struct taskpid)                                  \
+	cb(HANDLE_TYPE_CLOCK, struct realtime_clock_struct)                   \
+	cb(HANDLE_TYPE_DRIVER, struct driver)                                 \
+	cb(HANDLE_TYPE_PIPE, struct pipe)                                     \
+	cb(HANDLE_TYPE_PIPE_READER, struct pipe_reader)                       \
+	cb(HANDLE_TYPE_PIPE_WRITER, struct pipe_writer)                       \
+	cb(HANDLE_TYPE_PIDNS, struct pidns)                                   \
+	cb(HANDLE_TYPE_DRIVER_STATE, struct driver_state)                     \
+	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device)              \
+	cb(HANDLE_TYPE_SIGNALFD, struct signalfd)                             \
+	cb(HANDLE_TYPE_DATAPART, struct vm_datapart)                          \
+	cb(HANDLE_TYPE_FUTEX, struct vm_futex)                                \
+	cb(HANDLE_TYPE_FUTEXFD, struct vm_futexfd)
+
+/* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type
+ * that could reasonably be used for callback registrations (such
+ * as `register_async_worker()' or `hisr_register()') */
+#define HANDLE_FOREACH_CUSTOMTYPE(cb)                      \
+	cb(HANDLE_TYPE_DATABLOCK, struct vm_datablock)         \
+	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device) \
+	cb(HANDLE_TYPE_VM, struct vm)                          \
+	cb(HANDLE_TYPE_CLOCK, struct realtime_clock_struct)    \
+	cb(HANDLE_TYPE_DRIVER, struct driver)                  \
+	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device)
+
+
 
 /* Handle type-kind codes (used to identify special sub-classes of handle types). */
 #define HANDLE_TYPEKIND_GENERIC     0x0000 /* Generic catch-all handle-type kind */

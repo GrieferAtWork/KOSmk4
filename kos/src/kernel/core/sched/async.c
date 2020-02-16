@@ -51,26 +51,37 @@ struct asyncworker {
 	async_callback_t aw_poll;  /* [1..1][const] Poll-callback */
 	async_callback_t aw_work;  /* [1..1][const] Work-callback */
 	WEAK void       *aw_obj;   /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))] Object pointer.
-	                            * When set to NULL, this worker may be removed  */
+	                            * When set to NULL, this worker may be removed */
 	uintptr_half_t   aw_typ;   /* [const] Object type (one of `HANDLE_TYPE_*'). */
-	uintptr_half_t  _aw_pad;   /* ... */
+	uintptr_half_t   aw_didrm; /* Set to non-zero in the old async-vector when the entry is removed.
+	                            *  */
 #ifndef CONFIG_NO_SMP
 	uintptr_t        aw_inuse; /* # of CPUs using `aw_obj' right now. */
 #endif /* !CONFIG_NO_SMP */
 };
 
-LOCAL NOBLOCK void
+#define asyncworker_eq(self, test, poll, work, obj, typ) \
+	((self)->aw_work == (work) &&                        \
+	 ATOMIC_READ((self)->aw_obj) == (obj) &&             \
+	 (self)->aw_poll == (poll) &&                        \
+	 (self)->aw_test == (test) &&                        \
+	 (self)->aw_typ == (typ))
+
+
+LOCAL NOBLOCK bool
 NOTHROW(FCALL asyncworker_clearobj)(struct asyncworker *__restrict self) {
+	void *old_value;
 #ifdef CONFIG_NO_SMP
 	pflag_t was = PREEMPTION_PUSHOFF();
 #endif /* CONFIG_NO_SMP */
-	ATOMIC_STORE(self->aw_obj, NULL);
+	old_value = ATOMIC_XCH(self->aw_obj, NULL);
 #ifndef CONFIG_NO_SMP
 	while (ATOMIC_READ(self->aw_inuse))
 		task_tryyield_or_pause();
 #else /* !CONFIG_NO_SMP */
 	PREEMPTION_POP(was);
 #endif /* CONFIG_NO_SMP */
+	return old_value != NULL;
 }
 
 LOCAL bool
@@ -148,7 +159,7 @@ PRIVATE struct sig awork_changed = SIG_INIT;
 
 /* Try to delete a worker from `old_workers' and assign atomically
  * update the global set of active async workers. */
-PRIVATE NOBLOCK_IF(gfp_flags & GFP_ATOMIC) WUNUSED NONNULL((1)) unsigned int
+PRIVATE NOBLOCK_IF(gfp_flags & GFP_ATOMIC) NONNULL((1)) unsigned int
 NOTHROW(KCALL try_delete_async_worker)(struct asyncworkers *__restrict old_workers,
                                        size_t worker_index, gfp_t gfp_flags) {
 	REF struct asyncworkers *new_workers;
@@ -188,8 +199,10 @@ NOTHROW(KCALL try_delete_async_worker)(struct asyncworkers *__restrict old_worke
 		assert(oi == old_workers->awc_workc);
 	}
 	/* Try to exchange the global async workers vector. */
-	if (awork.cmpxch_inherit_new(old_workers, new_workers))
+	if (awork.cmpxch_inherit_new(old_workers, new_workers)) {
+		ATOMIC_WRITE(old_workers->awc_workv[worker_index].aw_didrm, 1);
 		return TRY_DELETE_ASYNC_WORKER_SUCCESS; /* success! */
+	}
 	/* The async workers vector was changed in the mean time. */
 	decref_likely(new_workers);
 	return TRY_DELETE_ASYNC_WORKER_CHANGED;
@@ -251,11 +264,10 @@ again:
 			(*handle_type_db.h_decref[w->aw_typ])(obj);
 		}
 		/* Second pass: poll() for work and service if available. */
-		for (i = 0; i < workers->awc_testc; ++i) {
+		for (i = 0; i < workers->awc_workc; ++i) {
 			struct asyncworker *w;
 			REF void *obj;
 			w = &workers->awc_workv[i];
-			assert(w->aw_test);
 			PREEMPTION_DISABLE();
 			IF_SMP(ATOMIC_FETCHINC(w->aw_inuse));
 			COMPILER_READ_BARRIER();
@@ -331,12 +343,14 @@ again:
  *                      destructor must still unregister the callbacks before
  *                      the memory used to back its reference counter is free()d!
  * @param: ob_type:     The object type for `ob_pointer' (one of `HANDLE_TYPE_*')
- */
-PUBLIC NONNULL((2, 3, 4)) void KCALL
+ * @return: true:       Successfully registered a new async worker.
+ * @return: false:      An async worker for the given object/callback combination
+ *                      was already registered. */
+PUBLIC NONNULL((2, 3, 4)) bool KCALL
 register_async_worker(async_callback_t test,
                       async_callback_t poll,
                       async_callback_t work,
-                      void *ob_pointer,
+                      void *__restrict ob_pointer,
                       uintptr_half_t ob_type)
 		THROWS(E_BADALLOC) {
 	REF struct asyncworkers *old_workers;
@@ -349,6 +363,22 @@ register_async_worker(async_callback_t test,
 	assert(ob_type < HANDLE_TYPE_COUNT);
 again:
 	old_workers = awork.get();
+	/* Check if this worker has already been defined. */
+	{
+		size_t c;
+		i = 0;
+		c = old_workers->awc_testc;
+		if (!test) {
+			i = c;
+			c = old_workers->awc_workc;
+		}
+		for (; i < c; ++i) {
+			if (asyncworker_eq(&old_workers->awc_workv[i],
+			                   test, poll, work,
+			                   ob_pointer, ob_type))
+				return false; /* Already defined. */
+		}
+	}
 	TRY {
 		/* Allocate enough space for +1 additional worker. */
 		new_workers = (REF struct asyncworkers *)kmalloc(offsetof(struct asyncworkers, awc_workv) +
@@ -402,7 +432,7 @@ again:
 		decref_likely(old_workers);
 		/* Indicate that workers have changed. */
 		sig_broadcast(&awork_changed);
-		return;
+		return true;
 	}
 	/* The old set of workers has changed -> try again! */
 	decref_likely(new_workers);
@@ -412,15 +442,20 @@ again:
 
 /* Delete a previously defined async worker, using the same arguments as those
  * previously passed to `register_async_worker()'. This function should be
- * called from the destructor of `ob_pointer' */
-PUBLIC NOBLOCK NONNULL((2, 3, 4)) void
+ * called from the destructor of `ob_pointer'
+ * @return: true:  Successfully deleted an async worker for the
+ *                 given object/callback combination.
+ * @return: false: No async worker for the given object/callback
+ *                 combination had been registered. */
+PUBLIC NOBLOCK NONNULL((2, 3, 4)) bool
 NOTHROW(KCALL unregister_async_worker)(async_callback_t test,
                                        async_callback_t poll,
                                        async_callback_t work,
-                                       void *ob_pointer,
+                                       void *__restrict ob_pointer,
                                        uintptr_half_t ob_type) {
 	REF struct asyncworkers *workers;
 	size_t i, count;
+	bool fail_result = false;
 	assert(poll);
 	assert(work);
 	assert(ob_pointer);
@@ -437,14 +472,16 @@ again:
 		struct asyncworker *w;
 		unsigned int error;
 		w = &workers->awc_workv[i];
-		if (w->aw_test != test ||
-		    w->aw_poll != poll ||
-		    w->aw_work != work ||
-		    w->aw_obj != ob_pointer ||
-		    w->aw_typ != ob_type)
+		if (!asyncworker_eq(w, test, poll, work,
+		                    ob_pointer, ob_type))
 			continue; /* Different worker. */
 		/* Found it! */
-		asyncworker_clearobj(w);
+		if unlikely(!asyncworker_clearobj(w)) {
+			/* The entry was already deleted by another thread.
+			 * -> Try to remove the entry (in case the other thread failed in doing this) */
+			try_delete_async_worker(workers, i, GFP_ATOMIC);
+			break;
+		}
 		/* Try to delete (but use GFP_ATOMIC since we're not allowed to block) */
 		error = try_delete_async_worker(workers, i, GFP_ATOMIC);
 		/* Indicate that workers have changed */
@@ -455,30 +492,43 @@ again:
 			 * before we've called `asyncworker_clearobj()', meaning that the
 			 * worker we're trying to delete is still apart of the active set
 			 * of async workers! */
-			decref_unlikely(workers);
-			if (ATOMIC_READ(awork.m_pointer) != workers)
+			if (ATOMIC_READ(awork.m_pointer) != workers) {
+again_success:
+				/* Account for the possibility that the new set of workers
+				 * were created before we've deleted our async worker, such
+				 * that even though we've deleted the worker from some older
+				 * async-worker-vector, it _may_ still be contained within
+				 * the current vector.
+				 * Notice the _may_ here, as irregardless of the worker still
+				 * being contained inside the current vector, we do already
+				 * know that it was contained in some past vector prior to
+				 * our function being called, meaning that even if it's already
+				 * gone at this point, it was there once, and our call to
+				 * `asyncworker_clearobj()' was what caused it to be removed.
+				 * -> As such, return `true' in all branches that would normally
+				 *    cause `false' to be returned!
+				 */
+				decref_likely(workers);
+				fail_result = true;
 				goto again;
+			}
+			decref_unlikely(workers);
 			/* Workers didn't change, but we've failed to allocate a smaller
 			 * workers vector. However, since we've already cleared out worker's
 			 * object pointer (s.a. `asyncworker_clearobj()'), the worker will
 			 * no longer be invoked, and `_asyncwork' will be try to truncate
 			 * the vector for us until it succeeds in doing so. */
-			return;
+			return true;
 		}
-		if (error == TRY_DELETE_ASYNC_WORKER_CHANGED) {
-			/* Workers have chained.
-			 * This may have happened before we've cleared ours, so the worker
-			 * may still be active. - Just scan the workers vector again and see
-			 * if we find our worker. If not, then that doesn't matter either,
-			 * since `unregister_async_worker()' doesn't need to indicate if
-			 * the worker was found or not to its caller. */
-			decref_unlikely(workers);
-			goto again;
-		}
+		if (error == TRY_DELETE_ASYNC_WORKER_CHANGED)
+			goto again_success; /* Workers have changed. */
 		/* Success: The workers vector was truncated. */
-		return;
+		decref_likely(workers);
+		return true;
 	}
 	/* The worker wasn't found (or it was deleted during a prior pass) */
+	decref_unlikely(workers);
+	return fail_result;
 }
 
 

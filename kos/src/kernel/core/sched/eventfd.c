@@ -73,8 +73,11 @@ handle_eventfd_fence_read(struct eventfd *__restrict self,
 again:
 	val = atomic64_xch(&self->ef_value, 0);
 	if (!val) {
-		if (mode & IO_NONBLOCK)
+		if (mode & IO_NONBLOCK) {
+			if (mode & IO_NODATAZERO)
+				return 0;
 			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+		}
 		task_connect(&self->ef_signal);
 		val = atomic64_xch(&self->ef_value, 0);
 		if likely(val == 0) {
@@ -105,8 +108,11 @@ handle_eventfd_sema_read(struct eventfd *__restrict self,
 		/* Decrement by one if non-zero, and wait if zero. */
 		val = atomic64_read(&self->ef_value);
 		if (!val) {
-			if (mode & IO_NONBLOCK)
+			if (mode & IO_NONBLOCK) {
+				if (mode & IO_NODATAZERO)
+					return 0;
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+			}
 			task_connect(&self->ef_signal);
 			val = atomic64_read(&self->ef_value);
 			if likely(val == 0) {

@@ -783,8 +783,11 @@ keyboard_device_readkeys(struct character_device *__restrict self, USER CHECKED 
 	}
 	if (mode & IO_NONBLOCK) {
 		key = keyboard_device_trygetkey(me);
-		if (key.kp_key == KEY_NONE)
+		if (key.kp_key == KEY_NONE) {
+			if (mode & IO_NODATAZERO)
+				goto empty;
 			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+		}
 	} else {
 		key = keyboard_device_getkey(me);
 		assert(key.kp_key != KEY_NONE);
@@ -821,8 +824,11 @@ keyboard_device_readchars(struct character_device *__restrict self, USER CHECKED
 		goto empty;
 	if (mode & IO_NONBLOCK) {
 		ch = keyboard_device_trygetchar(me);
-		if (ch == -1)
+		if (ch == -1) {
+			if (mode & IO_NODATAZERO)
+				goto empty;
 			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+		}
 	} else {
 		ch = (int)(unsigned int)(unsigned char)keyboard_device_getchar(me);
 		assert(ch != -1);

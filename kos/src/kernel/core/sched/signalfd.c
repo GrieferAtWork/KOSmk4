@@ -186,6 +186,8 @@ handle_signalfd_read(struct signalfd *__restrict self,
 			if (mode & IO_NONBLOCK) {
 				if (result)
 					break;
+				if (mode & IO_NODATAZERO)
+					break;
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
 			}
 			connect_to_my_signal_queues();
