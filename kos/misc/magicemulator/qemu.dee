@@ -206,7 +206,7 @@ did_update_x86_64_kernel:
 //		"-device", "ne2k_pci,netdev=u1",
 //		"-object", "filter-dump,id=f1,netdev=u1,file=dump.dat",
 //		"-net", "nic,model=rtl8139", "-net", "user",
-//		"-net", "nic,model=ne2k_pci", "-net", "user",
+		"-net", "nic,model=ne2k_pci", "-net", "user",
 		"-vga", "std",
 	});
 	if (fs.stat.exists("bin/ext2.img")) {

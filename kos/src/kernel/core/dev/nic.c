@@ -17,26 +17,53 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_SOCKADDR_H
-#define _BITS_SOCKADDR_H 1
+#ifndef GUARD_KERNEL_SRC_DEV_NIC_C
+#define GUARD_KERNEL_SRC_DEV_NIC_C 1
+#define _KOS_SOURCE 1
 
-#include <__stdinc.h>
-#include <hybrid/typecore.h>
+#include <kernel/compiler.h>
 
-__SYSDECL_BEGIN
+#include <dev/nic.h>
+#include <kernel/types.h>
+#include <kernel/aio.h>
+#include <stddef.h>
 
-#ifndef __sa_family_t_defined
-#define __sa_family_t_defined 1
-#ifdef __CC__
-typedef __UINT16_TYPE__ sa_family_t; /* One of `AF_*' */
-#endif /* __CC__ */
-#define __SIZEOF_SA_FAMILY_T__ 2
-#endif /* !__sa_family_t_defined */
+DECL_BEGIN
 
-#define __SOCKADDR_COMMON(sa_prefix) sa_family_t sa_prefix##family
-#define __SOCKADDR_COMMON_SIZE       __SIZEOF_SA_FAMILY_T__
-#define _SS_SIZE                     128
+/* Default write-operator for NIC devices. */
+PUBLIC NONNULL((1)) size_t KCALL
+nic_device_write(struct character_device *__restrict self,
+                 USER CHECKED void const *src,
+                 size_t num_bytes, iomode_t UNUSED(mode))
+		THROWS(...) {
+	struct nic_packet packet;
+	struct nic_device *me;
+	struct aio_handle_generic aio;
+	me = (struct nic_device *)self;
+	aio_handle_generic_init(&aio);
 
-__SYSDECL_END
+	/* Send a simple packet. */
+	packet.np_head   = (USER CHECKED void *)src;
+	packet.np_headsz = num_bytes;
+	packet.np_inner  = NULL;
+	packet.np_tail   = NULL;
+	packet.np_tailsz = 0;
+	packet.np_total  = num_bytes;
+	(*me->nd_ops.nd_send)(me, &packet, &aio);
 
-#endif /* !_BITS_SOCKADDR_H */
+	/* Wait for the send to finish. */
+	TRY {
+		aio_handle_generic_waitfor(&aio);
+		aio_handle_generic_checkerror(&aio);
+	} EXCEPT {
+		aio_handle_generic_fini(&aio);
+		RETHROW();
+	}
+	aio_handle_generic_fini(&aio);
+	return num_bytes;
+}
+
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_SRC_DEV_NIC_C */

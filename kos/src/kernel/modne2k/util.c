@@ -17,26 +17,56 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_SOCKADDR_H
-#define _BITS_SOCKADDR_H 1
+#ifndef GUARD_MODNE2K_UTIL_C
+#define GUARD_MODNE2K_UTIL_C 1
+#define _KOS_SOURCE 1
 
-#include <__stdinc.h>
-#include <hybrid/typecore.h>
+#include "ne2k.h"
 
-__SYSDECL_BEGIN
+#include <kernel/compiler.h>
 
-#ifndef __sa_family_t_defined
-#define __sa_family_t_defined 1
-#ifdef __CC__
-typedef __UINT16_TYPE__ sa_family_t; /* One of `AF_*' */
-#endif /* __CC__ */
-#define __SIZEOF_SA_FAMILY_T__ 2
-#endif /* !__sa_family_t_defined */
+#include <drivers/pci.h>
+#include <kernel/driver.h>
+#include <kernel/except.h>
+#include <kernel/isr.h>
+#include <kernel/printk.h>
+#include <sched/cpu.h>
 
-#define __SOCKADDR_COMMON(sa_prefix) sa_family_t sa_prefix##family
-#define __SOCKADDR_COMMON_SIZE       __SIZEOF_SA_FAMILY_T__
-#define _SS_SIZE                     128
+#include <kos/except/io.h>
+#include <kos/io/ne2k.h>
+#include <sys/io.h>
 
-__SYSDECL_END
+#include <stddef.h>
+#include <string.h>
 
-#endif /* !_BITS_SOCKADDR_H */
+DECL_BEGIN
+
+INTERN void KCALL Ne2k_ResetCard(port_t iobase) THROWS(E_IOERROR_TIMEOUT) {
+	struct timespec timeout;
+	u8 reset_word;
+	/* Select page #0 */
+	outb(E8390_CMD(iobase), E8390_STOP | E8390_PAGE0 | E8390_NODMA);
+
+	/* Set the card */
+	reset_word = inb(NE_RESET(iobase));
+	outb(NE_RESET(iobase), reset_word);
+
+	/* Wait for the reset to be completed. */
+	timeout = realtime();
+	timeout.add_milliseconds(400);
+	while (!(inb(EN0_ISR(iobase)) & ENISR_RESET)) {
+		if (realtime() > timeout) {
+			printk(KERN_WARNING "[ne2k] Card at %#I16x failed to acknowledge reset\n",
+			       iobase);
+			THROW(E_IOERROR_TIMEOUT,
+			      E_IOERROR_SUBSYSTEM_NET,
+			      E_IOERROR_REASON_NE2K_RESET_ACK);
+		}
+		task_tryyield_or_pause();
+	}
+}
+
+
+DECL_END
+
+#endif /* !GUARD_MODNE2K_UTIL_C */

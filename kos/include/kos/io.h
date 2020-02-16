@@ -262,6 +262,28 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* !IO_GENERIC */
 
 
+/* Standard interface flags. */
+#ifndef IFF_UP
+#define IFF_UP          0x0001  /* Interface is up. */
+#define IFF_BROADCAST   0x0002  /* Broadcast address valid. */
+#define IFF_DEBUG       0x0004  /* Turn on debugging. */
+#define IFF_LOOPBACK    0x0008  /* Is a loopback net. */
+#define IFF_POINTOPOINT 0x0010  /* Interface is point-to-point link. */
+#define IFF_NOTRAILERS  0x0020  /* Avoid use of trailers. */
+#define IFF_RUNNING     0x0040  /* Resources allocated. */
+#define IFF_NOARP       0x0080  /* No address resolution protocol. */
+#define IFF_PROMISC     0x0100  /* Receive all packets. */
+#define IFF_ALLMULTI    0x0200  /* Receive all multicast packets. */
+#define IFF_MASTER      0x0400  /* [const] Master of a load balancer. */
+#define IFF_SLAVE       0x0800  /* [const] Slave of a load balancer. */
+#define IFF_MULTICAST   0x1000  /* [const] Supports multicast. */
+#define IFF_PORTSEL     0x2000  /* [const] Can set media type. */
+#define IFF_AUTOMEDIA   0x4000  /* [const] Auto media select active. */
+#define IFF_DYNAMIC     0x8000  /* [const] Dialup device with changing addresses. */
+#endif /* !IFF_UP */
+#define IFF_STATUS      0x0040  /* Mask for status flags. */
+#define IFF_CONST       0xfc00  /* [const] Mask for constant (feature) flags. */
+
 
 __DECL_END
 

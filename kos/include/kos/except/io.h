@@ -34,6 +34,7 @@ enum {
 	E_IOERROR_SUBSYSTEM_HID,      /* The error stems from a HumanInterfaceDevice-related connection error */
 	E_IOERROR_SUBSYSTEM_USB,      /* The error stems from the USB sub-system */
 	E_IOERROR_SUBSYSTEM_TTY,      /* The error stems from the TTY sub-system */
+	E_IOERROR_SUBSYSTEM_NET,      /* The error stems from the network sub-system */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -44,6 +45,7 @@ enum {
 #define E_IOERROR_SUBSYSTEM_HID      E_IOERROR_SUBSYSTEM_HID      /* The error stems from a HumanInterfaceDevice-related connection error */
 #define E_IOERROR_SUBSYSTEM_USB      E_IOERROR_SUBSYSTEM_USB      /* The error stems from the USB sub-system */
 #define E_IOERROR_SUBSYSTEM_TTY      E_IOERROR_SUBSYSTEM_TTY      /* The error stems from the TTY sub-system */
+#define E_IOERROR_SUBSYSTEM_NET      E_IOERROR_SUBSYSTEM_NET      /* The error stems from the network sub-system */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_IOERROR_SUBSYSTEM_GENERIC  0 /* Generic I/O sub-system */
 #define E_IOERROR_SUBSYSTEM_HARDDISK 1 /* The error stems from the physical disk faulting */
@@ -51,6 +53,7 @@ enum {
 #define E_IOERROR_SUBSYSTEM_HID      3 /* The error stems from a HumanInterfaceDevice-related connection error */
 #define E_IOERROR_SUBSYSTEM_USB      4 /* The error stems from the USB sub-system */
 #define E_IOERROR_SUBSYSTEM_TTY      5 /* The error stems from the TTY sub-system */
+#define E_IOERROR_SUBSYSTEM_NET      6 /* The error stems from the network sub-system */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
@@ -75,6 +78,8 @@ enum {
 	E_IOERROR_REASON_UHCI_INCOMPLETE,    /* The `UHCI_TDCS_ACTIVE' bit got cleared without any apparent reason. */
 	E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN, /* E_IOERROR_NODATA: Attempted to read() from a TTY from an orphaned process group, or `SIGTTIN' is being ignored. */
 	E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU, /* E_IOERROR_NODATA: Attempted to write() to a TTY from an orphaned process group. */
+	E_IOERROR_REASON_NE2K_RESET_ACK,     /* E_IOERROR_TIMEOUT: Card didn't acknowledge reset command */
+	E_IOERROR_REASON_NE2K_WAIT4RDMA,     /* E_IOERROR_TIMEOUT: Timeout while waiting for `ENISR_RDC' */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -93,6 +98,8 @@ enum {
 #define E_IOERROR_REASON_UHCI_INCOMPLETE    E_IOERROR_REASON_UHCI_INCOMPLETE    /* The `UHCI_TDCS_ACTIVE' bit got cleared without any apparent reason. */
 #define E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN /* E_IOERROR_NODATA: Attempted to read() from a TTY from an orphaned process group, or `SIGTTIN' is being ignored. */
 #define E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU /* E_IOERROR_NODATA: Attempted to write() to a TTY from an orphaned process group. */
+#define E_IOERROR_REASON_NE2K_RESET_ACK     E_IOERROR_REASON_NE2K_RESET_ACK     /* E_IOERROR_TIMEOUT: Card didn't acknowledge reset command */
+#define E_IOERROR_REASON_NE2K_WAIT4RDMA     E_IOERROR_REASON_NE2K_WAIT4RDMA     /* E_IOERROR_TIMEOUT: Timeout while waiting for `ENISR_RDC' */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_IOERROR_REASON_GENERIC            0  /* Generic error reason */
 #define E_IOERROR_REASON_ATA_DCR_ERR        1  /* `ATA_DCR_ERR' was set */
@@ -108,6 +115,8 @@ enum {
 #define E_IOERROR_REASON_UHCI_INCOMPLETE    11 /* The `UHCI_TDCS_ACTIVE' bit got cleared without any apparent reason. */
 #define E_IOERROR_REASON_TTY_ORPHAN_SIGTTIN 12 /* E_IOERROR_NODATA: Attempted to read() from a TTY from an orphaned process group, or `SIGTTIN' is being ignored. */
 #define E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU 13 /* E_IOERROR_NODATA: Attempted to write() to a TTY from an orphaned process group. */
+#define E_IOERROR_REASON_NE2K_RESET_ACK     14 /* E_IOERROR_TIMEOUT: Card didn't acknowledge reset command */
+#define E_IOERROR_REASON_NE2K_WAIT4RDMA     15 /* E_IOERROR_TIMEOUT: Timeout while waiting for `ENISR_RDC' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

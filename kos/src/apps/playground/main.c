@@ -32,6 +32,7 @@
 #include <asm/intrin.h>
 #include <kos/debugtrap.h>
 #include <kos/except.h>
+#include <kos/fcntl.h>
 #include <kos/kernel/types.h>
 #include <kos/ksysctl.h>
 #include <kos/syscalls.h>
@@ -308,6 +309,40 @@ int main_ustring(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+int main_nic(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	KSysctlInsmod("ne2k", NULL);
+	signal(SIGINT, SIG_IGN);
+	{
+		fd_t fd = Open("/dev/ne2k0", O_RDWR);
+		struct {
+			unsigned char h_dest[6];
+			unsigned char h_source[6];
+			uint16_t h_proto;
+			char h_data[64];
+		} d;
+		memset(&d, 0, sizeof(d));
+		d.h_source[0] = 0x12;
+		d.h_source[1] = 0x34;
+		d.h_source[2] = 0x56;
+		d.h_source[3] = 0x78;
+		d.h_source[4] = 0x9a;
+		d.h_source[5] = 0xbc;
+		d.h_source[6] = 0xde;
+		d.h_proto = 0x0300; /* ETH_P_ALL */
+		strcpy(d.h_data, "<<Hello world?>>\n");
+		writeall(fd, &d, sizeof(d));
+		pause();
+		close(fd);
+	}
+ 	return 0;
+}
+/************************************************************************/
+
+
+
+
 #if defined(__i386__) || defined(__x86_64__)
 #define HAVE_MAIN_SYSENTER 1
 /************************************************************************/
@@ -421,6 +456,7 @@ PRIVATE DEF defs[] = {
 	{ "logtime", &main_logtime },
 	{ "dl", &main_dl },
 	{ "ustring", &main_ustring },
+	{ "nic", &main_nic },
 #ifdef HAVE_MAIN_SYSENTER
 	{ "sysenter", &main_sysenter },
 #endif /* HAVE_MAIN_SYSENTER */
