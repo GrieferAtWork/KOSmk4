@@ -173,6 +173,12 @@ done:
 }
 
 
+PRIVATE struct async_work_callbacks ttyfwd_cb = {
+	/* .awc_test = */ NULL,
+	/* .awc_poll = */ &ttyfwd_poll,
+	/* .awc_work = */ &ttyfwd_work
+};
+
 /* Start/Stop forwarding input handle data on the given TTY
  * Note that for any given input handle, only a single TTY should
  * ever be allowed to process data. - Allowing multiple TTYs to do
@@ -186,20 +192,14 @@ PUBLIC bool KCALL
 tty_device_startfwd(struct tty_device *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	bool result;
-	result = register_async_worker(NULL,
-	                               &ttyfwd_poll,
-	                               &ttyfwd_work,
-	                               self);
+	result = register_async_worker(&ttyfwd_cb, self);
 	return result;
 }
 
 PUBLIC NOBLOCK bool
 NOTHROW(KCALL tty_device_stopfwd)(struct tty_device *__restrict self) {
 	bool result;
-	result = unregister_async_worker(NULL,
-	                                 &ttyfwd_poll,
-	                                 &ttyfwd_work,
-	                                 self);
+	result = unregister_async_worker(&ttyfwd_cb, self);
 	return result;
 }
 

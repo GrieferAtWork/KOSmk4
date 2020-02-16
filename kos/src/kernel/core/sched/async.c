@@ -39,6 +39,9 @@
 
 DECL_BEGIN
 
+
+
+
 #ifndef CONFIG_NO_SMP
 #define IF_SMP(...) __VA_ARGS__
 #else /* !CONFIG_NO_SMP */
@@ -47,23 +50,21 @@ DECL_BEGIN
 
 
 struct asyncworker {
-	async_test_callback_t aw_test;  /* [0..1][const] Test-callback */
-	async_poll_callback_t aw_poll;  /* [1..1][const] Poll-callback */
-	async_work_callback_t aw_work;  /* [1..1][const] Work-callback */
-	WEAK void            *aw_obj;   /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))] Object pointer.
-	                                 * When set to NULL, this worker may be removed */
-	uintptr_half_t        aw_typ;   /* [const] Object type (one of `HANDLE_TYPE_*'). */
-	uintptr_half_t        aw_didrm; /* Set to non-zero in the old async-vector when the entry is removed. */
+	struct async_work_callbacks aw_cb;    /* [const] Worker callbacks */
+	WEAK void                  *aw_obj;   /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))] Object pointer.
+	                                       * When set to NULL, this worker may be removed */
+	uintptr_half_t              aw_typ;   /* [const] Object type (one of `HANDLE_TYPE_*'). */
+	uintptr_half_t              aw_didrm; /* Set to non-zero in the old async-vector when the entry is removed. */
 #ifndef CONFIG_NO_SMP
-	uintptr_t             aw_inuse; /* # of CPUs using `aw_obj' right now. */
+	uintptr_t                   aw_inuse; /* # of CPUs using `aw_obj' right now. */
 #endif /* !CONFIG_NO_SMP */
 };
 
-#define asyncworker_eq(self, test, poll, work, obj, typ) \
-	((self)->aw_work == (work) &&                        \
-	 ATOMIC_READ((self)->aw_obj) == (obj) &&             \
-	 (self)->aw_poll == (poll) &&                        \
-	 (self)->aw_test == (test) &&                        \
+#define asyncworker_eq(self, cb, obj, typ)       \
+	((self)->aw_cb.awc_work == (cb)->awc_work && \
+	 ATOMIC_READ((self)->aw_obj) == (obj) &&     \
+	 (self)->aw_cb.awc_poll == (cb)->awc_poll && \
+	 (self)->aw_cb.awc_test == (cb)->awc_test && \
 	 (self)->aw_typ == (typ))
 
 
@@ -88,10 +89,10 @@ NOTHROW(FCALL asyncworker_calltest)(struct asyncworker const *__restrict self,
                                     void *obj) {
 	bool result;
 	TRY {
-		result = (*self->aw_test)(obj);
+		result = (*self->aw_cb.awc_test)(obj);
 	} EXCEPT {
 		error_printf("_asyncmain:test@%p(%p:%#x)",
-		             self->aw_test, obj,
+		             self->aw_cb.awc_test, obj,
 		             (unsigned int)self->aw_typ);
 		result = false;
 	}
@@ -103,10 +104,10 @@ NOTHROW(FCALL asyncworker_callpoll)(struct asyncworker const *__restrict self,
                                     void *obj) {
 	bool result;
 	TRY {
-		result = (*self->aw_poll)(obj);
+		result = (*self->aw_cb.awc_poll)(obj);
 	} EXCEPT {
 		error_printf("_asyncmain:poll@%p(%p:%#x)",
-		             self->aw_poll, obj,
+		             self->aw_cb.awc_poll, obj,
 		             (unsigned int)self->aw_typ);
 		result = false;
 	}
@@ -117,10 +118,10 @@ LOCAL void
 NOTHROW(FCALL asyncworker_callwork)(struct asyncworker const *__restrict self,
                                     void *obj) {
 	TRY {
-		(*self->aw_work)(obj);
+		(*self->aw_cb.awc_work)(obj);
 	} EXCEPT {
 		error_printf("_asyncmain:poll@%p(%p:%#x)",
-		             self->aw_work, obj,
+		             self->aw_cb.awc_work, obj,
 		             (unsigned int)self->aw_typ);
 	}
 }
@@ -183,11 +184,9 @@ NOTHROW(KCALL try_delete_async_worker)(struct asyncworkers *__restrict old_worke
 				continue; /* Don't copy this worker! */
 			nw = &new_workers->awc_workv[ni];
 			ow = &old_workers->awc_workv[oi];
-			nw->aw_test = ow->aw_test;
-			nw->aw_poll = ow->aw_poll;
-			nw->aw_work = ow->aw_work;
-			nw->aw_obj  = ATOMIC_READ(ow->aw_obj); /* Must be read as an atomic work (we can't have byte-splits here!) */
-			nw->aw_typ  = ow->aw_typ;
+			nw->aw_cb  = ow->aw_cb;
+			nw->aw_obj = ATOMIC_READ(ow->aw_obj); /* Must be read as an atomic work (we can't have byte-splits here!) */
+			nw->aw_typ = ow->aw_typ;
 			IF_SMP(nw->aw_inuse = 0);
 			++ni;
 		}
@@ -221,7 +220,7 @@ again:
 			struct asyncworker *w;
 			REF void *obj;
 			w = &workers->awc_workv[i];
-			assert(w->aw_test);
+			assert(w->aw_cb.awc_test);
 			PREEMPTION_DISABLE();
 			IF_SMP(ATOMIC_FETCHINC(w->aw_inuse));
 			COMPILER_READ_BARRIER();
@@ -320,41 +319,28 @@ again:
  *       work to become available themself (that's what `poll()' is for, such
  *       that a single thread can wait for async work to become available for
  *       _all_ async workers)
- * @param: test: [0..1] Check if work is available right now, returning `true'
- *                      if this is the case and `work()' should be invoked.
- *                      `arg' is a temporary reference to `ob_pointer:ob_type'
- *                      This callback is optional.
- * @param: poll: [1..1] Do the equivalent of test()+connect()+test() for work
- *                      being available, returning `true' if this is the case.
- *                      `arg' is a temporary reference to `ob_pointer:ob_type'
- * @param: work: [1..1] Perform the actual work, but don't block if no work is
- *                      available. Returns `true' if work was performed, but
- *                      returns `false' if no work was available. This callback
- *                      should be written with the assumption that work being
- *                      available is highly likely.
- * @param: ob_pointer:  A pointer to a handle data object. The destructor of this
- *                      object is responsible for invoking `unregister_async_worker()'
- *                      Callbacks will no longer be invoked if this object's
- *                      reference counter has reached 0, however the object's
- *                      destructor must still unregister the callbacks before
- *                      the memory used to back its reference counter is free()d!
- * @param: ob_type:     The object type for `ob_pointer' (one of `HANDLE_TYPE_*')
- * @return: true:       Successfully registered a new async worker.
- * @return: false:      An async worker for the given object/callback combination
- *                      was already registered. */
-PUBLIC NONNULL((2, 3, 4)) bool KCALL
-register_async_worker(async_test_callback_t test,
-                      async_poll_callback_t poll,
-                      async_work_callback_t work,
-                      void *__restrict ob_pointer,
-                      uintptr_half_t ob_type)
+ * @param: cb:         Callbacks for the async worker being registered.
+ * @param: ob_pointer: A pointer to a handle data object. The destructor of this
+ *                     object is responsible for invoking `unregister_async_worker()'
+ *                     Callbacks will no longer be invoked if this object's
+ *                     reference counter has reached 0, however the object's
+ *                     destructor must still unregister the callbacks before
+ *                     the memory used to back its reference counter is free()d!
+ * @param: ob_type:    The object type for `ob_pointer' (one of `HANDLE_TYPE_*')
+ * @return: true:      Successfully registered a new async worker.
+ * @return: false:     An async worker for the given object/callback combination
+ *                     was already registered. */
+PUBLIC NONNULL((1, 2)) bool KCALL
+register_async_worker(struct async_work_callbacks const *__restrict cb,
+                      void *__restrict ob_pointer, uintptr_half_t ob_type)
 		THROWS(E_BADALLOC) {
 	REF struct asyncworkers *old_workers;
 	REF struct asyncworkers *new_workers;
 	struct asyncworker *nw;
 	size_t i;
-	assert(poll);
-	assert(work);
+	assert(cb);
+	assert(cb->awc_poll);
+	assert(cb->awc_work);
 	assert(ob_pointer);
 	assert(ob_type < HANDLE_TYPE_COUNT);
 again:
@@ -364,14 +350,13 @@ again:
 		size_t c;
 		i = 0;
 		c = old_workers->awc_testc;
-		if (!test) {
+		if (!cb->awc_test) {
 			i = c;
 			c = old_workers->awc_workc;
 		}
 		for (; i < c; ++i) {
 			if (asyncworker_eq(&old_workers->awc_workv[i],
-			                   test, poll, work,
-			                   ob_pointer, ob_type))
+			                   cb, ob_pointer, ob_type))
 				return false; /* Already defined. */
 		}
 	}
@@ -394,15 +379,13 @@ again:
 		struct asyncworker *ow;
 		nw = &new_workers->awc_workv[i];
 		ow = &old_workers->awc_workv[i];
-		nw->aw_test = ow->aw_test;
-		nw->aw_poll = ow->aw_poll;
-		nw->aw_work = ow->aw_work;
-		nw->aw_obj  = ATOMIC_READ(ow->aw_obj); /* Must be read as an atomic work (we can't have byte-splits here!) */
-		nw->aw_typ  = ow->aw_typ;
+		nw->aw_cb  = ow->aw_cb;
+		nw->aw_obj = ATOMIC_READ(ow->aw_obj); /* Must be read as an atomic work (we can't have byte-splits here!) */
+		nw->aw_typ = ow->aw_typ;
 		IF_SMP(nw->aw_inuse = 0);
 	}
 	/* Insert the new worker. */
-	if (test) {
+	if (cb->awc_test) {
 		/* Insert at the very beginning */
 		nw = &new_workers->awc_workv[0];
 		memmoveup(nw + 1, nw,
@@ -417,11 +400,9 @@ again:
 		          sizeof(struct asyncworker));
 	}
 	++new_workers->awc_workc;
-	nw->aw_test = test;
-	nw->aw_poll = poll;
-	nw->aw_work = work;
-	nw->aw_obj  = ob_pointer;
-	nw->aw_typ  = ob_type;
+	memcpy(&nw->aw_cb, cb, sizeof(*cb));
+	nw->aw_obj = ob_pointer;
+	nw->aw_typ = ob_type;
 	IF_SMP(nw->aw_inuse = 0);
 	/* Try to install the new async workers vector. */
 	if (awork.cmpxch_inherit_new(old_workers, new_workers)) {
@@ -439,28 +420,27 @@ again:
 /* Delete a previously defined async worker, using the same arguments as those
  * previously passed to `register_async_worker()'. This function should be
  * called from the destructor of `ob_pointer'
+ * @param: cb:     Callbacks for the async worker being unregistered.
  * @return: true:  Successfully deleted an async worker for the
  *                 given object/callback combination.
  * @return: false: No async worker for the given object/callback
  *                 combination had been registered. */
-PUBLIC NOBLOCK NONNULL((2, 3, 4)) bool
-NOTHROW(KCALL unregister_async_worker)(async_test_callback_t test,
-                                       async_poll_callback_t poll,
-                                       async_work_callback_t work,
-                                       void *__restrict ob_pointer,
-                                       uintptr_half_t ob_type) {
+PUBLIC NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(KCALL unregister_async_worker)(struct async_work_callbacks const *__restrict cb,
+                                       void *__restrict ob_pointer, uintptr_half_t ob_type) {
 	REF struct asyncworkers *workers;
 	size_t i, count;
 	bool fail_result = false;
-	assert(poll);
-	assert(work);
+	assert(cb);
+	assert(cb->awc_poll);
+	assert(cb->awc_work);
 	assert(ob_pointer);
 	assert(ob_type < HANDLE_TYPE_COUNT);
 again:
 	workers = awork.get();
 	i       = 0;
 	count   = workers->awc_testc;
-	if (!test) {
+	if (!cb->awc_test) {
 		i     = count;
 		count = workers->awc_workc;
 	}
@@ -468,8 +448,7 @@ again:
 		struct asyncworker *w;
 		unsigned int error;
 		w = &workers->awc_workv[i];
-		if (!asyncworker_eq(w, test, poll, work,
-		                    ob_pointer, ob_type))
+		if (!asyncworker_eq(w, cb, ob_pointer, ob_type))
 			continue; /* Different worker. */
 		/* Found it! */
 		if unlikely(!asyncworker_clearobj(w)) {
@@ -505,6 +484,13 @@ again_success:
 				 *    cause `false' to be returned!
 				 */
 				decref_likely(workers);
+				/* FIXME: Race condition:
+				 *   If there is another thread currently modifying the async-vector,
+				 *   and it had copied the async-worker vector before we've cleared
+				 *   the object-pointer of our worker, but has yet to install its
+				 *   new async-vector, then we have no way of ensuring that our entry
+				 *   doesn't get restored once that thread installs its new vector!
+				 */
 				fail_result = true;
 				goto again;
 			}

@@ -82,7 +82,11 @@ typedef bool (FCALL *async_poll_callback_t)(void *__restrict arg);
  * @param: arg: [1..1] A reference to `ob_pointer' passed when the object was registered. */
 typedef void (FCALL *async_work_callback_t)(void *__restrict arg);
 
-
+struct async_work_callbacks {
+	async_test_callback_t awc_test; /* [0..1] Test-callback */
+	async_poll_callback_t awc_poll; /* [1..1] Poll-callback */
+	async_work_callback_t awc_work; /* [1..1] Work-callback */
+};
 
 
 /* Register an async worker callback.
@@ -90,49 +94,33 @@ typedef void (FCALL *async_work_callback_t)(void *__restrict arg);
  *       work to become available themself (that's what `poll()' is for, such
  *       that a single thread can wait for async work to become available for
  *       _all_ async workers)
- * @param: test: [0..1] Check if work is available right now, returning `true'
- *                      if this is the case and `work()' should be invoked.
- *                      `arg' is a temporary reference to `ob_pointer:ob_type'
- *                      This callback is optional.
- * @param: poll: [1..1] Do the equivalent of test()+connect()+test() for work
- *                      being available, returning `true' if this is the case.
- *                      `arg' is a temporary reference to `ob_pointer:ob_type'
- * @param: work: [1..1] Perform the actual work, but don't block if no work is
- *                      available. Returns `true' if work was performed, but
- *                      returns `false' if no work was available. This callback
- *                      should be written with the assumption that work being
- *                      available is highly likely.
- * @param: ob_pointer:  A pointer to a handle data object. The destructor of this
- *                      object is responsible for invoking `unregister_async_worker()'
- *                      Callbacks will no longer be invoked if this object's
- *                      reference counter has reached 0, however the object's
- *                      destructor must still unregister the callbacks before
- *                      the memory used to back its reference counter is free()d!
- * @param: ob_type:     The object type for `ob_pointer' (one of `HANDLE_TYPE_*')
- * @return: true:       Successfully registered a new async worker.
- * @return: false:      An async worker for the given object/callback combination
- *                      was already registered. */
-FUNDEF NONNULL((2, 3, 4)) bool KCALL
-register_async_worker(async_test_callback_t test,
-                      async_poll_callback_t poll,
-                      async_work_callback_t work,
-                      void *__restrict ob_pointer,
-                      uintptr_half_t ob_type)
+ * @param: cb:         Callbacks for the async worker being registered.
+ * @param: ob_pointer: A pointer to a handle data object. The destructor of this
+ *                     object is responsible for invoking `unregister_async_worker()'
+ *                     Callbacks will no longer be invoked if this object's
+ *                     reference counter has reached 0, however the object's
+ *                     destructor must still unregister the callbacks before
+ *                     the memory used to back its reference counter is free()d!
+ * @param: ob_type:    The object type for `ob_pointer' (one of `HANDLE_TYPE_*')
+ * @return: true:      Successfully registered a new async worker.
+ * @return: false:     An async worker for the given object/callback combination
+ *                     was already registered. */
+FUNDEF NONNULL((1, 2)) bool KCALL
+register_async_worker(struct async_work_callbacks const *__restrict cb,
+                      void *__restrict ob_pointer, uintptr_half_t ob_type)
 		THROWS(E_BADALLOC);
 
 /* Delete a previously defined async worker, using the same arguments as those
  * previously passed to `register_async_worker()'. This function should be
  * called from the destructor of `ob_pointer'
+ * @param: cb:     Callbacks for the async worker being unregistered.
  * @return: true:  Successfully deleted an async worker for the
  *                 given object/callback combination.
  * @return: false: No async worker for the given object/callback
  *                 combination had been registered. */
-FUNDEF NOBLOCK NONNULL((2, 3, 4)) bool
-NOTHROW(KCALL unregister_async_worker)(async_test_callback_t test,
-                                       async_poll_callback_t poll,
-                                       async_work_callback_t work,
-                                       void *__restrict ob_pointer,
-                                       uintptr_half_t ob_type);
+FUNDEF NOBLOCK NONNULL((1, 2)) bool
+NOTHROW(KCALL unregister_async_worker)(struct async_work_callbacks const *__restrict cb,
+                                       void *__restrict ob_pointer, uintptr_half_t ob_type);
 
 #ifdef __cplusplus
 #define _ASYNC_WORKER_CXX_FWD_STRUCT(HT, T) T;
@@ -140,20 +128,16 @@ HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_FWD_STRUCT)
 #undef _ASYNC_WORKER_CXX_FWD_STRUCT
 extern "C++" {
 
-#define _ASYNC_WORKER_CXX_DECLARE(HT, T)                                          \
-	LOCAL NONNULL((2, 3, 4)) bool KCALL                                           \
-	register_async_worker(async_test_callback_t test, async_poll_callback_t poll, \
-	                      async_work_callback_t work, T *__restrict ob_pointer)   \
-			THROWS(E_BADALLOC) {                                                  \
-		return register_async_worker(test, poll, work, (void *)ob_pointer, HT);   \
-	}                                                                             \
-	LOCAL NOBLOCK NONNULL((2, 3, 4)) bool                                         \
-	NOTHROW(KCALL unregister_async_worker)(async_test_callback_t test,            \
-	                                       async_poll_callback_t poll,            \
-	                                       async_work_callback_t work,            \
-	                                       T * __restrict ob_pointer)             \
-			THROWS(E_BADALLOC) {                                                  \
-		return unregister_async_worker(test, poll, work, (void *)ob_pointer, HT); \
+#define _ASYNC_WORKER_CXX_DECLARE(HT, T)                                                     \
+	LOCAL NONNULL((1, 2)) bool KCALL                                                         \
+	register_async_worker(struct async_work_callbacks const *__restrict cb,                  \
+	                      T *__restrict ob_pointer) THROWS(E_BADALLOC) {                     \
+		return register_async_worker(cb, (void *)ob_pointer, HT);                            \
+	}                                                                                        \
+	LOCAL NOBLOCK NONNULL((1, 2)) bool                                                       \
+	NOTHROW(KCALL unregister_async_worker)(struct async_work_callbacks const *__restrict cb, \
+	                                       T *__restrict ob_pointer) {                       \
+		return unregister_async_worker(cb, (void *)ob_pointer, HT);                          \
 	}
 HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_DECLARE)
 #undef _ASYNC_WORKER_CXX_DECLARE
