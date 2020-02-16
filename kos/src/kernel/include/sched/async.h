@@ -58,48 +58,47 @@ INTDEF ATTR_NORETURN void NOTHROW(FCALL _asyncmain)(void);
 
 #define ASYNC_CALLBACK_CC FCALL
 
-/* Prototype for test-async-work-available
- * NOTE: Exceptions thrown by this function are logged and silently discarded
- * @param: arg:    [1..1] A reference to `ob_pointer' passed when the object was registered.
- * @return: true:  Work is available, and the `awc_work()'-callback should be invoked.
- * @return: false: No work available at the moment. */
-typedef NONNULL((1)) bool (ASYNC_CALLBACK_CC *async_test_callback_t)(void *__restrict arg);
+struct async_worker_callbacks {
+	/* [1..1] Poll-callback.
+	 * Test for available work (if available, return `true'),
+	 * else: connect to the appropriate signals that get broadcast
+	 * when work does become available, and finally test once again
+	 * for work being available (and also return `true' if this is
+	 * the case), in order to prevent the race condition of work
+	 * becoming available after the first test, but before a signal
+	 * connection got established.
+	 * NOTE: If need be, this function should also call `async_worker_timeout()'
+	 *       with the appropriate realtime()-timeout for when the `awc_time()'
+	 *       callback should be invoked. Also note that this has to be done
+	 *       every time that this callback is invoked, as timeouts may either
+	 *       only be maintained until the next time that the backing async-thread
+	 *       restarts polling, and/or only exist on the basis of keeping track of
+	 *       the timeout that will expire the earliest.
+	 * NOTE: Exceptions thrown by this function are logged and silently discarded
+	 * @param: arg:    [1..1] A reference to `ob_pointer' passed when the object was registered.
+	 * @return: true:  Work is available, and the `awc_work()'-callback should be invoked.
+	 * @return: false: No work available at the moment. */
+	NONNULL((1, 2)) bool (ASYNC_CALLBACK_CC *awc_poll)(void *__restrict arg,
+	                                                   void *__restrict cookie);
 
-/* Test for available work (if available, return `true'),
- * else: connect to the appropriate signals that get broadcast
- * when work does become available, and finally test once again
- * for work being available (and also return `true' if this is
- * the case), in order to prevent the race condition of work
- * becoming available after the first test, but before a signal
- * connection got established.
- * NOTE: If need be, this function should also call `async_worker_timeout()'
- *       with the appropriate realtime()-timeout for when the `awc_time()'
- *       callback should be invoked. Also note that this has to be done
- *       every time that this callback is invoked, as timeouts may either
- *       only be maintained until the next time that the backing async-thread
- *       restarts polling, and/or only exist on the basis of keeping track of
- *       the timeout that will expire the earliest.
- * NOTE: Exceptions thrown by this function are logged and silently discarded
- * @param: arg:    [1..1] A reference to `ob_pointer' passed when the object was registered.
- * @return: true:  Work is available, and the `awc_work()'-callback should be invoked.
- * @return: false: No work available at the moment. */
-typedef NONNULL((1, 2)) bool (ASYNC_CALLBACK_CC *async_poll_callback_t)(void *__restrict arg,
-                                                                        void *__restrict cookie);
+	/* [1..1] Work-callback.
+	 * Perform async work with all available data, returning
+	 * once all work currently available has been completed.
+	 * NOTE: Exceptions thrown by this function are logged and silently discarded
+	 * @param: arg: [1..1] A reference to `ob_pointer' passed when the object was registered. */
+	NONNULL((1)) void (ASYNC_CALLBACK_CC *awc_work)(void *__restrict arg);
 
-/* Perform async work with all available data, returning
- * once all work currently available has been completed.
- * NOTE: Exceptions thrown by this function are logged and silently discarded
- * @param: arg: [1..1] A reference to `ob_pointer' passed when the object was registered. */
-typedef NONNULL((1)) void (ASYNC_CALLBACK_CC *async_work_callback_t)(void *__restrict arg);
+	/* [0..1] Test-callback.
+	 * Prototype for test-async-work-available
+	 * NOTE: Exceptions thrown by this function are logged and silently discarded
+	 * @param: arg:    [1..1] A reference to `ob_pointer' passed when the object was registered.
+	 * @return: true:  Work is available, and the `awc_work()'-callback should be invoked.
+	 * @return: false: No work available at the moment. */
+	NONNULL((1)) bool (ASYNC_CALLBACK_CC *awc_test)(void *__restrict arg);
 
-/* Called after a timeout set during `awc_poll()' has expired. */
-typedef NONNULL((1)) void (ASYNC_CALLBACK_CC *async_time_callback_t)(void *__restrict arg);
-
-struct async_work_callbacks {
-	async_test_callback_t awc_test; /* [0..1] Test-callback */
-	async_poll_callback_t awc_poll; /* [1..1] Poll-callback */
-	async_work_callback_t awc_work; /* [1..1] Work-callback */
-	async_time_callback_t awc_time; /* [0..1] Timeout-callback */
+	/* [0..1] Timeout-callback.
+	 * Called after a timeout set during `awc_poll()' has expired. */
+	NONNULL((1)) void (ASYNC_CALLBACK_CC *awc_time)(void *__restrict arg);
 };
 
 struct timespec;
@@ -133,7 +132,7 @@ NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(struct timespec const *__restric
  * @return: false:     An async worker for the given object/callback combination
  *                     was already registered. */
 FUNDEF NONNULL((1, 2)) bool KCALL
-register_async_worker(struct async_work_callbacks const *__restrict cb,
+register_async_worker(struct async_worker_callbacks const *__restrict cb,
                       void *__restrict ob_pointer, uintptr_half_t ob_type)
 		THROWS(E_BADALLOC);
 
@@ -149,7 +148,7 @@ register_async_worker(struct async_work_callbacks const *__restrict cb,
  * @return: false: No async worker for the given object/callback
  *                 combination had been registered. */
 FUNDEF NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(KCALL unregister_async_worker)(struct async_work_callbacks const *__restrict cb,
+NOTHROW(KCALL unregister_async_worker)(struct async_worker_callbacks const *__restrict cb,
                                        void *__restrict ob_pointer, uintptr_half_t ob_type);
 
 #ifdef __cplusplus
@@ -160,12 +159,12 @@ extern "C++" {
 
 #define _ASYNC_WORKER_CXX_DECLARE(HT, T)                                                     \
 	LOCAL NONNULL((1, 2)) bool KCALL                                                         \
-	register_async_worker(struct async_work_callbacks const *__restrict cb,                  \
+	register_async_worker(struct async_worker_callbacks const *__restrict cb,                  \
 	                      T *__restrict ob_pointer) THROWS(E_BADALLOC) {                     \
 		return register_async_worker(cb, (void *)ob_pointer, HT);                            \
 	}                                                                                        \
 	LOCAL NOBLOCK NONNULL((1, 2)) bool                                                       \
-	NOTHROW(KCALL unregister_async_worker)(struct async_work_callbacks const *__restrict cb, \
+	NOTHROW(KCALL unregister_async_worker)(struct async_worker_callbacks const *__restrict cb, \
 	                                       T *__restrict ob_pointer) {                       \
 		return unregister_async_worker(cb, (void *)ob_pointer, HT);                          \
 	}

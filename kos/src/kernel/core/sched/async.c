@@ -47,14 +47,14 @@ DECL_BEGIN
 #endif /* CONFIG_NO_SMP */
 
 struct aworker {
-	WEAK refcnt_t               aw_refcnt; /* Reference counter */
-	struct async_work_callbacks aw_cb;     /* [const] Worker callbacks */
-	WEAK void                  *aw_obj;    /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))] Object pointer.
-	                                        * When set to NULL, this worker may be removed */
-	uintptr_half_t              aw_typ;    /* [const] Object type (one of `HANDLE_TYPE_*'). */
-	uintptr_half_t             _aw_pad;    /* ... */
+	WEAK refcnt_t                 aw_refcnt; /* Reference counter */
+	struct async_worker_callbacks aw_cb;     /* [const] Worker callbacks */
+	WEAK void                    *aw_obj;    /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))] Object pointer.
+	                                          * When set to NULL, this worker may be removed */
+	uintptr_half_t                aw_typ;    /* [const] Object type (one of `HANDLE_TYPE_*'). */
+	uintptr_half_t               _aw_pad;    /* ... */
 #ifndef CONFIG_NO_SMP
-	uintptr_t                   aw_inuse;  /* # of CPUs using `aw_obj' right now. */
+	uintptr_t                     aw_inuse;  /* # of CPUs using `aw_obj' right now. */
 #endif /* !CONFIG_NO_SMP */
 };
 
@@ -63,12 +63,13 @@ struct aworker {
 
 DEFINE_REFCOUNT_FUNCTIONS(struct aworker, aw_refcnt, kfree)
 
-#define aworker_eq(self, cb, obj, typ)      \
+#define aworker_eq(self, cb, obj, typ)           \
 	((self)->aw_cb.awc_work == (cb)->awc_work && \
 	 ATOMIC_READ((self)->aw_obj) == (obj) &&     \
 	 (self)->aw_cb.awc_poll == (cb)->awc_poll && \
 	 (self)->aw_cb.awc_test == (cb)->awc_test && \
-	 (self)->aw_typ == (typ))
+	 (self)->aw_typ == (typ) &&                  \
+	 (self)->aw_cb.awc_time == (cb)->awc_time)
 
 LOCAL NOBLOCK bool
 NOTHROW(FCALL aworker_clearobj)(struct aworker *__restrict self) {
@@ -424,7 +425,7 @@ again:
  * @return: false:     An async worker for the given object/callback combination
  *                     was already registered. */
 PUBLIC NONNULL((1, 2)) bool KCALL
-register_async_worker(struct async_work_callbacks const *__restrict cb,
+register_async_worker(struct async_worker_callbacks const *__restrict cb,
                       void *__restrict ob_pointer, uintptr_half_t ob_type)
 		THROWS(E_BADALLOC) {
 	REF struct aworker *new_worker;
@@ -527,7 +528,7 @@ again:
  * @return: false: No async worker for the given object/callback
  *                 combination had been registered. */
 PUBLIC NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(KCALL unregister_async_worker)(struct async_work_callbacks const *__restrict cb,
+NOTHROW(KCALL unregister_async_worker)(struct async_worker_callbacks const *__restrict cb,
                                        void *__restrict ob_pointer, uintptr_half_t ob_type) {
 	REF struct awork_vector *workers;
 	size_t i, count;

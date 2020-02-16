@@ -176,10 +176,11 @@ done:
 }
 
 
-PRIVATE struct async_work_callbacks ttyfwd_cb = {
-	/* .awc_test = */ NULL,
+PRIVATE struct async_worker_callbacks const ttyfwd_cb = {
 	/* .awc_poll = */ &ttyfwd_poll,
-	/* .awc_work = */ &ttyfwd_work
+	/* .awc_work = */ &ttyfwd_work,
+	/* .awc_test = */ NULL,
+	/* .awc_time = */ NULL
 };
 
 /* Start/Stop forwarding input handle data on the given TTY
