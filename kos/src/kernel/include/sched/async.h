@@ -56,8 +56,33 @@ INTDEF struct task _asyncwork;
 INTDEF ATTR_NORETURN void NOTHROW(FCALL _asyncmain)(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
-/* Async callback prototype. */
-typedef bool (FCALL *async_callback_t)(void *arg);
+/* Prototype for test-async-work-available
+ * NOTE: Exceptions thrown by this function are logged and silently discarded
+ * @param: arg:    [1..1] A reference to `ob_pointer' passed when the object was registered.
+ * @return: true:  Work is available, and the `work'-callback should be invoked.
+ * @return: false: No work available at the moment. */
+typedef bool (FCALL *async_test_callback_t)(void *__restrict arg);
+
+/* Test for available work (if available, return `true'),
+ * else: connect to the appropriate signals that get broadcast
+ * when work does become available, and finally test once again
+ * for work being available (and also return `true' if this is
+ * the case), in order to prevent the race condition of work
+ * becoming available after the first test, but before a signal
+ * connection got established.
+ * NOTE: Exceptions thrown by this function are logged and silently discarded
+ * @param: arg:    [1..1] A reference to `ob_pointer' passed when the object was registered.
+ * @return: true:  Work is available, and the `work'-callback should be invoked.
+ * @return: false: No work available at the moment. */
+typedef bool (FCALL *async_poll_callback_t)(void *__restrict arg);
+
+/* Perform async work with all available data, returning
+ * once all work currently available has been completed.
+ * NOTE: Exceptions thrown by this function are logged and silently discarded
+ * @param: arg: [1..1] A reference to `ob_pointer' passed when the object was registered. */
+typedef void (FCALL *async_work_callback_t)(void *__restrict arg);
+
+
 
 
 /* Register an async worker callback.
@@ -88,9 +113,9 @@ typedef bool (FCALL *async_callback_t)(void *arg);
  * @return: false:      An async worker for the given object/callback combination
  *                      was already registered. */
 FUNDEF NONNULL((2, 3, 4)) bool KCALL
-register_async_worker(async_callback_t test,
-                      async_callback_t poll,
-                      async_callback_t work,
+register_async_worker(async_test_callback_t test,
+                      async_poll_callback_t poll,
+                      async_work_callback_t work,
                       void *__restrict ob_pointer,
                       uintptr_half_t ob_type)
 		THROWS(E_BADALLOC);
@@ -103,9 +128,9 @@ register_async_worker(async_callback_t test,
  * @return: false: No async worker for the given object/callback
  *                 combination had been registered. */
 FUNDEF NOBLOCK NONNULL((2, 3, 4)) bool
-NOTHROW(KCALL unregister_async_worker)(async_callback_t test,
-                                       async_callback_t poll,
-                                       async_callback_t work,
+NOTHROW(KCALL unregister_async_worker)(async_test_callback_t test,
+                                       async_poll_callback_t poll,
+                                       async_work_callback_t work,
                                        void *__restrict ob_pointer,
                                        uintptr_half_t ob_type);
 
@@ -117,16 +142,16 @@ extern "C++" {
 
 #define _ASYNC_WORKER_CXX_DECLARE(HT, T)                                          \
 	LOCAL NONNULL((2, 3, 4)) bool KCALL                                           \
-	register_async_worker(async_callback_t test, async_callback_t poll,           \
-	                      async_callback_t work, T *__restrict ob_pointer)        \
+	register_async_worker(async_test_callback_t test, async_poll_callback_t poll, \
+	                      async_work_callback_t work, T *__restrict ob_pointer)   \
 			THROWS(E_BADALLOC) {                                                  \
 		return register_async_worker(test, poll, work, (void *)ob_pointer, HT);   \
 	}                                                                             \
 	LOCAL NOBLOCK NONNULL((2, 3, 4)) bool                                         \
-	NOTHROW(KCALL unregister_async_worker)(async_callback_t test,                 \
-	                                       async_callback_t poll,                 \
-	                                       async_callback_t work,                 \
-	                                       T *__restrict ob_pointer)              \
+	NOTHROW(KCALL unregister_async_worker)(async_test_callback_t test,            \
+	                                       async_poll_callback_t poll,            \
+	                                       async_work_callback_t work,            \
+	                                       T * __restrict ob_pointer)             \
 			THROWS(E_BADALLOC) {                                                  \
 		return unregister_async_worker(test, poll, work, (void *)ob_pointer, HT); \
 	}
@@ -135,6 +160,7 @@ HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_DECLARE)
 
 }
 #endif /* __cplusplus */
+
 
 
 #endif /* __CC__ */

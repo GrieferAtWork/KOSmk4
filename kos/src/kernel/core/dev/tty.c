@@ -138,8 +138,7 @@ PRIVATE bool FCALL ttyfwd_poll(void *arg) {
 	return (what & POLLIN) != 0;
 }
 
-PRIVATE bool FCALL ttyfwd_work(void *arg) {
-	bool result = false;
+PRIVATE void FCALL ttyfwd_work(void *arg) {
 	char buf[256];
 	struct tty_device *tty;
 	tty  = (struct tty_device *)arg;
@@ -155,7 +154,6 @@ PRIVATE bool FCALL ttyfwd_work(void *arg) {
 		}
 		if (!count)
 			break;
-		result = true;
 		/* NOTE: Data also gets written with the `IO_NONBLOCK' flag set.
 		 *       This has to be done because control characters still have
 		 *       to be processed, even when canon buffers have filled up.
@@ -171,7 +169,7 @@ PRIVATE bool FCALL ttyfwd_work(void *arg) {
 		}
 	}
 done:
-	return result;
+	;
 }
 
 
@@ -363,8 +361,8 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 		if (cdev->cd_type.ct_write)
 			result->t_ohandle_write = (phandle_write_function_t)cdev->cd_type.ct_write;
 	}
-	/* Special case: Already read characters from a connected keyboard device, rather
-	 *               than reading  */
+	/* Special case: Always read characters from a connected
+	 *               keyboard device, rather than reading key codes. */
 	if (ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
 	    character_device_isakeyboard((struct character_device *)ihandle_ptr)) {
 		result->t_ihandle_read = (phandle_read_function_t)&keyboard_device_readchars;

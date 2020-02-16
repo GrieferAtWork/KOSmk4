@@ -47,16 +47,15 @@ DECL_BEGIN
 
 
 struct asyncworker {
-	async_callback_t aw_test;  /* [0..1][const] Test-callback */
-	async_callback_t aw_poll;  /* [1..1][const] Poll-callback */
-	async_callback_t aw_work;  /* [1..1][const] Work-callback */
-	WEAK void       *aw_obj;   /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))] Object pointer.
-	                            * When set to NULL, this worker may be removed */
-	uintptr_half_t   aw_typ;   /* [const] Object type (one of `HANDLE_TYPE_*'). */
-	uintptr_half_t   aw_didrm; /* Set to non-zero in the old async-vector when the entry is removed.
-	                            *  */
+	async_test_callback_t aw_test;  /* [0..1][const] Test-callback */
+	async_poll_callback_t aw_poll;  /* [1..1][const] Poll-callback */
+	async_work_callback_t aw_work;  /* [1..1][const] Work-callback */
+	WEAK void            *aw_obj;   /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))] Object pointer.
+	                                 * When set to NULL, this worker may be removed */
+	uintptr_half_t        aw_typ;   /* [const] Object type (one of `HANDLE_TYPE_*'). */
+	uintptr_half_t        aw_didrm; /* Set to non-zero in the old async-vector when the entry is removed. */
 #ifndef CONFIG_NO_SMP
-	uintptr_t        aw_inuse; /* # of CPUs using `aw_obj' right now. */
+	uintptr_t             aw_inuse; /* # of CPUs using `aw_obj' right now. */
 #endif /* !CONFIG_NO_SMP */
 };
 
@@ -114,19 +113,16 @@ NOTHROW(FCALL asyncworker_callpoll)(struct asyncworker const *__restrict self,
 	return result;
 }
 
-LOCAL bool
+LOCAL void
 NOTHROW(FCALL asyncworker_callwork)(struct asyncworker const *__restrict self,
                                     void *obj) {
-	bool result;
 	TRY {
-		result = (*self->aw_work)(obj);
+		(*self->aw_work)(obj);
 	} EXCEPT {
 		error_printf("_asyncmain:poll@%p(%p:%#x)",
 		             self->aw_work, obj,
 		             (unsigned int)self->aw_typ);
-		result = false;
 	}
-	return result;
 }
 
 
@@ -347,9 +343,9 @@ again:
  * @return: false:      An async worker for the given object/callback combination
  *                      was already registered. */
 PUBLIC NONNULL((2, 3, 4)) bool KCALL
-register_async_worker(async_callback_t test,
-                      async_callback_t poll,
-                      async_callback_t work,
+register_async_worker(async_test_callback_t test,
+                      async_poll_callback_t poll,
+                      async_work_callback_t work,
                       void *__restrict ob_pointer,
                       uintptr_half_t ob_type)
 		THROWS(E_BADALLOC) {
@@ -448,9 +444,9 @@ again:
  * @return: false: No async worker for the given object/callback
  *                 combination had been registered. */
 PUBLIC NOBLOCK NONNULL((2, 3, 4)) bool
-NOTHROW(KCALL unregister_async_worker)(async_callback_t test,
-                                       async_callback_t poll,
-                                       async_callback_t work,
+NOTHROW(KCALL unregister_async_worker)(async_test_callback_t test,
+                                       async_poll_callback_t poll,
+                                       async_work_callback_t work,
                                        void *__restrict ob_pointer,
                                        uintptr_half_t ob_type) {
 	REF struct asyncworkers *workers;

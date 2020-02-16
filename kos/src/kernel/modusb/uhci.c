@@ -2839,7 +2839,7 @@ do_connect:
 		uc = READ_CTRL();
 		if unlikely(!uc)
 			break;
-		/* Quick check: Has something that we should worry about happened? */
+		/* Quick check: Has something happened that we should worry about? */
 		flags = ATOMIC_READ(uc->uc_flags);
 		if (flags & UHCI_CONTROLLER_FLAG_RESDECT)
 			goto do_resdect;
