@@ -137,14 +137,17 @@ struct hop_driver_open_dependency /*[PREFIX(dod_)]*/ {
 #define HOP_DRIVER_GET_CMDLINE      0x000b0003 /* [struct hop_driver_string *result] Return the driver's cmdline (`ds_index' must be `0') */
 #define HOP_DRIVER_GET_FILENAME     0x000b0004 /* [struct hop_driver_string *result] Return the driver's filename (`ds_index' must be `0') */
 #define HOP_DRIVER_GET_ARGV         0x000b0005 /* [struct hop_driver_string *result] Return one of the driver's argument string (`ds_index' specifies the argument index) */
-#define HOP_DRIVER_OPEN_FILE        0x000b0006 /* [struct hop_openfd *result] Open the driver's file */
-#define HOP_DRIVER_OPEN_DEPENDENCY  0x000b0007 /* [struct hop_driver_open_dependency *result] Open the driver's file */
+#define HOP_DRIVER_OPEN_FILE        0x000b0006 /* [struct hop_openfd *result] Open the driver's file
+                                                * @return: == arg->of_hint */
+#define HOP_DRIVER_OPEN_DEPENDENCY  0x000b0007 /* [struct hop_driver_open_dependency *result] Open the driver's file
+                                                * @return: == result->dod_result.of_hint */
 #define HOP_DRIVER_INITIALIZE       0x000b0008 /* Run driver initializers (if those hadn't been run already) */
 #define HOP_DRIVER_FINALIZE         0x000b0009 /* Run driver finalizers (if those hadn't been run already) */
 
 /* For `HANDLE_TYPE_DRIVER_STATE' */
 #define HOP_DRIVER_STATE_GET_COUNT  0x00100002 /* [uint64_t *result] Return the # of drivers contained with this driver state. */
-#define HOP_DRIVER_STATE_GET_DRIVER 0x00100003 /* [struct hop_driver_open_dependency *result] Open one of the individual drivers. */
+#define HOP_DRIVER_STATE_GET_DRIVER 0x00100003 /* [struct hop_driver_open_dependency *result] Open one of the individual drivers.
+                                                * @return: == result->dod_result.of_hint */
 
 __DECL_END
 

@@ -56,10 +56,14 @@ struct hop_file_cmpxchg_offset /*[PREFIX(cxo_)]*/ {
 
 /* For `HANDLE_TYPE_FILE' */
 #define HOP_FILE_CMPXCHG_OFFSET 0x00040001 /* [struct hop_file_cmpxchg_offset *arg] Compare-exchange the current file offset. */
-#define HOP_FILE_OPENNODE       0x00040002 /* [struct hop_openfd *result] Open the Inode that is backing the file. */
-#define HOP_FILE_OPENPATH       0x00040003 /* [struct hop_openfd *result] Open the path within which the file is stored (aka. the VFS path of its containing directory). */
-#define HOP_FILE_OPENDIR        0x00040004 /* [struct hop_openfd *result] Open the directory Inode within which the file is stored. */
-#define HOP_FILE_OPENDENTRY     0x00040005 /* [struct hop_openfd *result] Open the directory entry used to describe the file's INode. */
+#define HOP_FILE_OPENNODE       0x00040002 /* [struct hop_openfd *result] Open the Inode that is backing the file.
+                                            * @return: == result->of_hint */
+#define HOP_FILE_OPENPATH       0x00040003 /* [struct hop_openfd *result] Open the path within which the file is stored (aka. the VFS path of its containing directory).
+                                            * @return: == result->of_hint */
+#define HOP_FILE_OPENDIR        0x00040004 /* [struct hop_openfd *result] Open the directory Inode within which the file is stored.
+                                            * @return: == result->of_hint */
+#define HOP_FILE_OPENDENTRY     0x00040005 /* [struct hop_openfd *result] Open the directory entry used to describe the file's INode.
+                                            * @return: == result->of_hint */
 
 
 __DECL_END

@@ -188,7 +188,7 @@ again_waitfor:
 		leader.h_type = HANDLE_TYPE_TASK;
 		leader.h_mode = mode;
 		leader.h_data = task_getprocesspid_of(thread);
-		handle_installhop((struct hop_openfd *)arg, leader);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, leader);
 	}	break;
 
 	case HOP_TASK_OPEN_PROCESS_PARENT: {
@@ -204,7 +204,7 @@ again_waitfor:
 		if unlikely(!parent.h_data)
 			THROW(E_NO_SUCH_PROCESS);
 		FINALLY_DECREF_UNLIKELY((struct taskpid *)parent.h_data);
-		handle_installhop((struct hop_openfd *)arg, parent);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, parent);
 	}	break;
 
 	case HOP_TASK_OPEN_PROCESS_GROUP_LEADER: {
@@ -218,7 +218,7 @@ again_waitfor:
 		leader.h_mode = mode;
 		leader.h_data = task_getprocessgroupleaderpid_of(thread);
 		FINALLY_DECREF_UNLIKELY((struct taskpid *)leader.h_data);
-		handle_installhop((struct hop_openfd *)arg, leader);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, leader);
 	}	break;
 
 	case HOP_TASK_OPEN_SESSION_LEADER: {
@@ -232,7 +232,7 @@ again_waitfor:
 		leader.h_mode = mode;
 		leader.h_data = task_getsessionleaderpid_of(thread);
 		FINALLY_DECREF_UNLIKELY((struct taskpid *)leader.h_data);
-		handle_installhop((struct hop_openfd *)arg, leader);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, leader);
 	}	break;
 
 	case HOP_TASK_IS_PROCESS_LEADER: {

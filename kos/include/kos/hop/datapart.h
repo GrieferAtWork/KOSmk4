@@ -82,16 +82,16 @@ struct hop_datapart_stat /*[PREFIX(ds_)]*/ {
 
 /* HANDLE_TYPE_DATAPART */
 #define HOP_DATAPART_OPEN_DATABLOCK      0x00150001 /* [struct hop_openfd *result] Open the datablock associated with the given datapart.
-                                                     * @return: * : The value written to `result->of_hint' */
+                                                     * @return: == result->of_hint */
 #define HOP_DATAPART_OPEN_FUTEX          0x00150002 /* [struct hop_datablock_open_futex *result] Return, or create a futex for the given address.
-                                                     * @return: * : The value written to `result->dof_openfd.of_hint' */
+                                                     * @return: == result->dof_openfd.of_hint */
 #define HOP_DATAPART_OPEN_FUTEX_EXISTING 0x00150003 /* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address.
-                                                     * @return: * : The value written to `result->dof_openfd.of_hint'
                                                      * @return: -ENOENT: No futex exists for the given address
                                                      * @return: -ERANGE: The given address lies outside of the bounds of this datapart
                                                      *                   Note that this can happen arbitrarily since it is possible that
                                                      *                   the datapart is truncated between the time of you accessing it,
-                                                     *                   and invoking this command! */
+                                                     *                   and invoking this command!
+                                                     * @return: == result->dof_openfd.of_hint */
 #define HOP_DATAPART_STAT                0x00150004 /* [struct hop_datapart_stat *result] Read information about the datapart */
 #define HOP_DATAPART_HASCHANGED          0x00150005 /* [struct hop_datablock_haschanged *result] Check for changes within the data part (s.a. `vm_datapart_haschanged()') */
 //TODO:#define HOP_DATAPART_SYNC         -- vm_datapart_sync() */

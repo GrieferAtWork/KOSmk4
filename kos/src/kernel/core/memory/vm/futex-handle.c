@@ -57,7 +57,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 		hnd.h_type = HANDLE_TYPE_DATAPART;
 		hnd.h_mode = mode;
 		hnd.h_data = part;
-		return handle_installhop((struct hop_openfd *)arg, hnd);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hnd);
 	}	break;
 
 	case HOP_FUTEX_OPEN_DATABLOCK: {
@@ -77,7 +77,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 		hnd.h_type = HANDLE_TYPE_DATABLOCK;
 		hnd.h_mode = mode;
 		hnd.h_data = block;
-		return handle_installhop((struct hop_openfd *)arg, hnd);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hnd);
 	}	break;
 
 	case HOP_FUTEX_ISWAITING:

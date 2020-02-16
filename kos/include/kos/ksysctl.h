@@ -278,12 +278,14 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #define KSYSCTL_DRIVER_LSMOD                   0x000d0001 /* [struct hop_openfd *result] Capture a snapshot of all currently loaded kernel
                                                            * drivers, and return a `HANDLE_TYPE_DRIVER_STATE' handle for that snapshot.
                                                            * WARNING: None of the drivers loaded at the point this call is made can be
-                                                           *          fully unloaded before the returned handle has been closed! */
-#define KSYSCTL_DRIVER_INSMOD                  0x000d0002 /* [struct ksysctl_driver_insmod *data] Load a new driver into the kernel. */
+                                                           *          fully unloaded before the returned handle has been closed!
+                                                           * @return: == result->of_hint */
+#define KSYSCTL_DRIVER_INSMOD                  0x000d0002 /* [struct ksysctl_driver_insmod *data] Load a new driver into the kernel.
+                                                           * @return: == data->im_driver ? data->im_driver->of_hint : 0 */
 #define KSYSCTL_DRIVER_DELMOD                  0x000d0003 /* [struct ksysctl_driver_delmod *data] Delete a driver from the kernel.
                                                            * @return: * : One of `KSYSCTL_DRIVER_DELMOD_*' */
 #define KSYSCTL_DRIVER_GETMOD                  0x000d0004 /* [struct ksysctl_driver_getmod *data] Lookup an existing driver.
-                                                           * @return: 0 :      Successfully found the driver (a handle was opened in `data->gm_driver')
+                                                           * @return: == data->gm_driver.of_hint: Successfully found the driver (a handle was opened in `data->gm_driver')
                                                            * @return: -ENOENT: No such driver exists. */
 #define KSYSCTL_DRIVER_GET_LIBRARY_PATH        0x000d0005 /* [struct ksysctl_driver_get_library_path *data] Read the kernel driver library path. */
 #define KSYSCTL_DRIVER_SET_LIBRARY_PATH        0x000d0006 /* [struct ksysctl_driver_set_library_path *data] Set the kernel driver library path.
@@ -295,12 +297,18 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 /* TODO: Wrapper for `character_device_lookup_name' */
 /* TODO: Wrapper for `boot_partition' */
 
-#define KSYSCTL_OPEN_KERNEL_VFS                0xfffe0001 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_PATH' to `vfs_kernel' */
-#define KSYSCTL_OPEN_KERNEL_FS                 0xfffe0002 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_FS' to `fs_kernel' */
-#define KSYSCTL_OPEN_KERNEL_VM                 0xfffe0003 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_VM' to `vm_kernel' */
-#define KSYSCTL_OPEN_KERNEL_DRIVER             0xfffe0004 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_DRIVER' to `kernel_driver' */
-#define KSYSCTL_OPEN_ROOT_PIDNS                0xfffe0005 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_PIDNS' to `pidns_root' */
-#define KSYSCTL_OPEN_BOOT_TASK                 0xfffe0006 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_TASK' to `_boottask' */
+#define KSYSCTL_OPEN_KERNEL_VFS                0xfffe0001 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_PATH' to `vfs_kernel'
+                                                           * @return: == result->of_hint */
+#define KSYSCTL_OPEN_KERNEL_FS                 0xfffe0002 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_FS' to `fs_kernel'
+                                                           * @return: == result->of_hint */
+#define KSYSCTL_OPEN_KERNEL_VM                 0xfffe0003 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_VM' to `vm_kernel'
+                                                           * @return: == result->of_hint */
+#define KSYSCTL_OPEN_KERNEL_DRIVER             0xfffe0004 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_DRIVER' to `kernel_driver'
+                                                           * @return: == result->of_hint */
+#define KSYSCTL_OPEN_ROOT_PIDNS                0xfffe0005 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_PIDNS' to `pidns_root'
+                                                           * @return: == result->of_hint */
+#define KSYSCTL_OPEN_BOOT_TASK                 0xfffe0006 /* [struct hop_openfd *result] Open a handle `HANDLE_TYPE_TASK' to `_boottask'
+                                                           * @return: == result->of_hint */
 
 
 #ifdef __CC__

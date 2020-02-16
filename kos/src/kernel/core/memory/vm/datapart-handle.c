@@ -243,7 +243,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		hnd.h_mode = mode;
 		hnd.h_data = vm_datapart_get_datablock(self);
 		FINALLY_DECREF_UNLIKELY((struct vm_datablock *)hnd.h_data);
-		return handle_installhop((struct hop_openfd *)arg, hnd);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, hnd);
 	}	break;
 
 	case HOP_DATAPART_OPEN_FUTEX:

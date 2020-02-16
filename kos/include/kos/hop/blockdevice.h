@@ -84,7 +84,7 @@ struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
 /* For `HANDLE_TYPE_BLOCKDEVICE' */
 #define HOP_BLOCKDEVICE_STAT          0x00020001 /* [struct hop_blockdevice_stat *result] Read information about the datablock */
 #define HOP_BLOCKDEVICE_SYNC          0x00020002 /* Write any modified, but unsaved sectors to disk. */
-#define HOP_BLOCKDEVICE_RDREADONLY    0x00020003 /* [uint32_t *result] Check if the given block-device is in read-only mode */
+#define HOP_BLOCKDEVICE_RDREADONLY    0x00020003 /* @return: (0|1): Check if the given block-device is in read-only mode */
 #define HOP_BLOCKDEVICE_WRREADONLY    0x00020004 /* [uint32_t enabled] Set the read-only mode for the given block-device.
                                                   * WARNING: Setting a drive root to read-only will prevent writes to partitions,
                                                   *          even though the partitions will continue to indicate being writable!
@@ -97,9 +97,11 @@ struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
                                                   * >> hop(root.of_hint,HOP_BLOCKDEVICE_WRREADONLY,0);
                                                   * >> close(root.of_hint); */
 #define HOP_BLOCKDEVICE_OPENDRIVEROOT 0x00020005 /* [struct hop_openfd *arg] Open the drive root of a partition, or re-open a partition.
+                                                  * @return: == arg->of_hint
                                                   * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a block-device. */
 #define HOP_BLOCKDEVICE_OPENDRIVEPART 0x00020006 /* [struct hop_blockdevice_openpart *arg] Open a given partition.
                                                   * If the given handle already refers to a partition, open a sibling partition instead.
+                                                  * @return: == arg->of_hint
                                                   * @throw: E_INVALID_HANDLE_FILETYPE:   The given handle wasn't a block-device.
                                                   * @throw: E_INDEX_ERROR_OUT_OF_BOUNDS: The given partition index is invalid. */
 

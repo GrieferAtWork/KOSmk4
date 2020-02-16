@@ -729,7 +729,7 @@ handle_file_hop(struct file *__restrict self,
 		temp.h_type = HANDLE_TYPE_DATABLOCK;
 		temp.h_mode = mode;
 		temp.h_data = self->f_node;
-		handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case HOP_FILE_OPENPATH: {
@@ -737,7 +737,7 @@ handle_file_hop(struct file *__restrict self,
 		temp.h_type = HANDLE_TYPE_PATH;
 		temp.h_mode = mode;
 		temp.h_data = self->f_path;
-		handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case HOP_FILE_OPENDIR: {
@@ -745,7 +745,7 @@ handle_file_hop(struct file *__restrict self,
 		temp.h_type = HANDLE_TYPE_DATABLOCK;
 		temp.h_mode = mode;
 		temp.h_data = self->f_dir;
-		handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case HOP_FILE_OPENDENTRY: {
@@ -753,7 +753,7 @@ handle_file_hop(struct file *__restrict self,
 		temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
 		temp.h_mode = mode;
 		temp.h_data = self->f_dirent;
-		handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	default:

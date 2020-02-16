@@ -181,7 +181,8 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                            * limit is set to 0), once all remaining data has been read, read() on
                                            * the pipe will no longer block, but instead always return 0 immediately.
                                            * A pipe can be un-closed by re-assigning a new limit value. */
-#define HOP_PIPE_OPEN_PIPE     0x000c000c /* [struct hop_openfd *arg] Open the associated `HANDLE_TYPE_PIPE' of a `HANDLE_TYPE_PIPE_READER' or `HANDLE_TYPE_PIPE_WRITER' */
+#define HOP_PIPE_OPEN_PIPE     0x000c000c /* [struct hop_openfd *arg] Open the associated `HANDLE_TYPE_PIPE' of a `HANDLE_TYPE_PIPE_READER' or `HANDLE_TYPE_PIPE_WRITER'
+                                           * @return: == arg->of_hint */
 #define HOP_PIPE_CREATE_READER 0x000c000d /* [struct hop_openfd *arg] Create a new reader object for the associated pipe.
                                            * When the pipe(2) system call is used to create a new pipe, the internal `HANDLE_TYPE_PIPE'
                                            * object is hidden from user-space, and instead is wrapped by 1 reader, and 1 writer object.
@@ -189,7 +190,8 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                            * objects can be created for a pipe (although pretty much identical behavior can be achieved by
                                            * simply dup(2)-ing the original reader/writer).
                                            * Once either all reader objects have been destroyed, or all writer objects have, the underlying
-                                           * pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE') */
+                                           * pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE')
+                                           * @return: == arg->of_hint */
 #define HOP_PIPE_CREATE_WRITER 0x000c000e /* [struct hop_openfd *arg] Create a new writer object for the associated pipe.
                                            * When the pipe(2) system call is used to create a new pipe, the internal `HANDLE_TYPE_PIPE'
                                            * object is hidden from user-space, and instead is wrapped by 1 reader, and 1 writer object.
@@ -197,7 +199,8 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                            * objects can be created for a pipe (although pretty much identical behavior can be achieved by
                                            * simply dup(2)-ing the original reader/writer).
                                            * Once either all reader objects have been destroyed, or all writer objects have, the underlying
-                                           * pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE') */
+                                           * pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE')
+                                           * @return: == arg->of_hint */
 
 __DECL_END
 

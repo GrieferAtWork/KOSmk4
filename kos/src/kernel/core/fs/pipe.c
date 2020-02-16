@@ -181,7 +181,7 @@ again:
 		data->ps_avail   = (u64)ps_avail;
 		data->ps_bufcur  = (u64)ps_bufcur;
 		data->ps_buflim  = (u64)ps_buflim;
-	} break;
+	}	break;
 
 	case HOP_PIPE_GETLIM: /* [OUT:uint64_t *result] Return the max allocated size of the pipe. */
 		validate_writable(arg, sizeof(u64));
@@ -201,7 +201,7 @@ again:
 		temp = (size_t)ATOMIC_READ(*value);
 		temp = user_set_pipe_limit(self, temp);
 		ATOMIC_WRITE(*value, temp);
-	} break;
+	}	break;
 
 	case HOP_PIPE_WRITESOME: {
 		USER CHECKED struct hop_pipe_writesome *data;
@@ -229,7 +229,7 @@ again:
 			buflen = ringbuffer_writesome(&self->p_buffer, buf, buflen);
 		}
 		ATOMIC_WRITE(data->pws_written, buflen);
-	} break;
+	}	break;
 
 
 	case HOP_PIPE_VWRITESOME: {
@@ -269,7 +269,7 @@ again:
 				break;
 		}
 		ATOMIC_WRITE(data->pvws_written, result);
-	} break;
+	}	break;
 
 	case HOP_PIPE_SKIPDATA: {
 		USER CHECKED struct hop_pipe_skipdata *data;
@@ -288,7 +288,7 @@ again:
 		                             &new_rdpos);
 		ATOMIC_WRITE(data->psd_rdpos, new_rdpos);
 		ATOMIC_WRITE(data->psd_skipped, result);
-	} break;
+	}	break;
 
 	case HOP_PIPE_UNREAD: {
 		USER CHECKED struct hop_pipe_unread *data;
@@ -307,7 +307,7 @@ again:
 		                           &new_rdpos);
 		ATOMIC_WRITE(data->pur_rdpos, new_rdpos);
 		ATOMIC_WRITE(data->pur_unread, result);
-	} break;
+	}	break;
 
 	case HOP_PIPE_UNWRITE: {
 		USER CHECKED struct hop_pipe_unwrite *data;
@@ -326,7 +326,7 @@ again:
 		                           &new_wrpos);
 		ATOMIC_WRITE(data->puw_wrpos, new_wrpos);
 		ATOMIC_WRITE(data->puw_unwritten, result);
-	} break;
+	}	break;
 
 	case HOP_PIPE_SETWRITTEN: {
 		USER CHECKED u64 *data;
@@ -336,47 +336,51 @@ again:
 		temp = ATOMIC_READ(*(size_t *)data);
 		temp = ringbuffer_setwritten(&self->p_buffer, temp);
 		ATOMIC_WRITE(*data, temp);
-	} break;
+	}	break;
 
 	case HOP_PIPE_OPEN_PIPE: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_PIPE;
 		temp.h_mode = mode;
 		temp.h_data = self;
-		handle_installhop((struct hop_openfd *)arg, temp);
-	} break;
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+	}	break;
 
 	case HOP_PIPE_CREATE_READER: {
 		struct handle temp;
+		unsigned int result;
 		temp.h_type = HANDLE_TYPE_PIPE_READER;
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_RDONLY;
 		ATOMIC_FETCHINC(self->p_rdcnt); /* Prevent the PIPE from being closed on error */
 		TRY {
 			temp.h_data = pipe_reader_create(self);
 			FINALLY_DECREF((struct pipe_reader *)temp.h_data);
-			handle_installhop((struct hop_openfd *)arg, temp);
+			result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 		} EXCEPT {
 			ATOMIC_FETCHDEC(self->p_rdcnt);
 			RETHROW();
 		}
 		ATOMIC_FETCHDEC(self->p_rdcnt);
-	} break;
+		return result;
+	}	break;
 
 	case HOP_PIPE_CREATE_WRITER: {
 		struct handle temp;
+		unsigned int result;
 		temp.h_type = HANDLE_TYPE_PIPE_WRITER;
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_WRONLY;
 		ATOMIC_FETCHINC(self->p_wrcnt); /* Prevent the PIPE from being closed on error */
 		TRY {
 			temp.h_data = pipe_writer_create(self);
 			FINALLY_DECREF((struct pipe_writer *)temp.h_data);
-			handle_installhop((struct hop_openfd *)arg, temp);
+			result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 		} EXCEPT {
 			ATOMIC_FETCHDEC(self->p_wrcnt);
 			RETHROW();
 		}
 		ATOMIC_FETCHDEC(self->p_wrcnt);
-	} break;
+		return result;
+	}	break;
 
 	default:
 		if (used_cmd == cmd) {

@@ -168,8 +168,8 @@ handle_path_hop(struct path *__restrict self,
 		temp.h_type = HANDLE_TYPE_PATH;
 		temp.h_mode = mode;
 		temp.h_data = self->p_parent;
-		handle_installhop((struct hop_openfd *)arg, temp);
-	} break;
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+	}	break;
 
 	case HOP_PATH_OPENVFS: {
 		struct handle temp;
@@ -178,32 +178,34 @@ handle_path_hop(struct path *__restrict self,
 		temp.h_type = HANDLE_TYPE_PATH;
 		temp.h_mode = mode;
 		temp.h_data = self->p_vfs;
-		handle_installhop((struct hop_openfd *)arg, temp);
-	} break;
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+	}	break;
 
 	case HOP_PATH_OPENNODE: {
 		struct handle temp;
+		unsigned int result;
 		temp.h_type = HANDLE_TYPE_DATABLOCK;
 		temp.h_mode = mode;
 		sync_read(self);
 		temp.h_data = incref(self->p_inode);
 		sync_endread(self);
 		TRY {
-			handle_installhop((struct hop_openfd *)arg, temp);
+			result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 		} EXCEPT {
 			decref((struct inode *)temp.h_data);
 			RETHROW();
 		}
 		decref((struct inode *)temp.h_data);
-	} break;
+		return result;
+	}	break;
 
 	case HOP_PATH_OPENDENTRY: {
 		struct handle temp;
 		temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
 		temp.h_mode = mode;
 		temp.h_data = self->p_dirent;
-		handle_installhop((struct hop_openfd *)arg, temp);
-	} break;
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
+	}	break;
 
 	case HOP_PATH_ISDRIVE:
 		validate_writable(arg, sizeof(uint32_t));

@@ -133,15 +133,19 @@ struct hop_task_setsessionleader /*[PREFIX(tssl_)]*/ {
 #define HOP_TASK_GETSID                           0x00090006 /* hop() returns the session ID of the given thread
                                                               * @throw: E_PROCESS_EXITED: [...] */
 #define HOP_TASK_OPEN_PROCESS                     0x00090007 /* [struct hop_openfd *result] Open the process leader of the given thread.
-                                                              * @throw: E_PROCESS_EXITED: [...] */
+                                                              * @throw: E_PROCESS_EXITED: [...]
+                                                              * @return: == result->of_hint */
 #define HOP_TASK_OPEN_PROCESS_PARENT              0x00090008 /* [struct hop_openfd *result] Open the parent process of the given thread.
                                                               * If the thread doesn't have a parent, return 0 instead
                                                               * @throw: E_NO_SUCH_PROCESS: The thread was detached from its parent process.
-                                                              * @throw: E_PROCESS_EXITED:  [...] */
+                                                              * @throw: E_PROCESS_EXITED:  [...]
+                                                              * @return: == result->of_hint */
 #define HOP_TASK_OPEN_PROCESS_GROUP_LEADER        0x00090009 /* [struct hop_openfd *result] Open the process group leader of the given thread.
-                                                              * @throw: E_PROCESS_EXITED: [...] */
+                                                              * @throw: E_PROCESS_EXITED: [...]
+                                                              * @return: == result->of_hint */
 #define HOP_TASK_OPEN_SESSION_LEADER              0x0009000a /* [struct hop_openfd *result] Open the process group leader of the given thread.
-                                                              * @throw: E_PROCESS_EXITED: [...] */
+                                                              * @throw: E_PROCESS_EXITED: [...]
+                                                              * @return: == result->of_hint */
 #define HOP_TASK_IS_PROCESS_LEADER                0x0009000b /* hop() returns 0/1 indicating if the thread is a process leader
                                                               * @throw: E_PROCESS_EXITED: [...] */
 #define HOP_TASK_IS_PROCESS_GROUP_LEADER          0x0009000c /* hop() returns 0/1 indicating if the thread is a process group leader

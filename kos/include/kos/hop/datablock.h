@@ -601,20 +601,20 @@ struct hop_directory_mkdir /*[PREFIX(dmd_)]*/ {
                                                               *  - 1: The data block has been deanonymized. */
 #define HOP_DATABLOCK_OPEN_PART                   0x00010007 /* [struct hop_datablock_openpart *arg] Lookup (and create if missing) the data
                                                               * part associated with a given page offset (s.a. `vm_paged_datablock_locatepart()')
-                                                              * @return: * : The value written to `arg->dop_openfd.of_hint' */
+                                                              * @return: == arg->dop_openfd.of_hint */
 #define HOP_DATABLOCK_OPEN_PART_EXACT             0x00010008 /* [struct hop_datablock_openpart *arg] Same as `HOP_DATABLOCK_OPEN_PART', but make sure
                                                               * that the part begins at the exact given offset (s.a. `vm_paged_datablock_locatepart_exact()')
-                                                              * @return: * : The value written to `arg->dop_openfd.of_hint' */
+                                                              * @return: == arg->dop_openfd.of_hint */
 #define HOP_DATABLOCK_HASCHANGED                  0x00010009 /* [struct hop_datablock_haschanged *arg] Check for changes within
                                                               * the given address range (s.a. `vm_datablock_haschanged()') */
 #define HOP_DATABLOCK_OPEN_FUTEX                  0x0001000a /* [struct hop_datablock_open_futex *result] Return, or create a futex for the given address.
-                                                              * @return: * : The value written to `result->dof_openfd.of_hint' */
+                                                              * @return: == result->dof_openfd.of_hint */
 #define HOP_DATABLOCK_OPEN_FUTEX_EXISTING         0x0001000b /* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address.
-                                                              * @return: * : The value written to `result->dof_openfd.of_hint'
+                                                              * @return: == result->dof_openfd.of_hint
                                                               * @return: -ENOENT: No futex exists for the given address */
 #define HOP_INODE_OPEN_SUPERBLOCK                 0x00010101 /* [struct hop_openfd *arg] Open the superblock associated with an INode.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode.
-                                                              * @return: * : The value written to `arg->of_hint' */
+                                                              * @return: == arg->of_hint */
 #define HOP_INODE_CHMOD                           0x00010102 /* [struct hop_inode_chmod *arg] Extended interface for changing file permissions in a more controlled manner.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode. */
 #define HOP_INODE_CHOWN                           0x00010103 /* [struct hop_inode_chown *arg] Extended interface for changing file ownership in a more controlled manner.
@@ -728,10 +728,10 @@ struct hop_directory_mkdir /*[PREFIX(dmd_)]*/ {
 #define HOP_SUPERBLOCK_OPEN_BLOCKDEVICE           0x00010501 /* [struct hop_openfd *arg] Open the block-device associated with a superblock.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
                                                               * @throw: E_NO_SUCH_BLOCKDEVICE: No block device is bound to the given superblock.
-                                                              * @return: * : The value written to `arg->of_hint' */
+                                                              * @return: == arg->of_hint */
 #define HOP_SUPERBLOCK_OPEN_DRIVER                0x00010502 /* [struct hop_openfd *arg] Open the driver associated with a superblock.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
-                                                              * @return: * : The value written to `arg->of_hint' */
+                                                              * @return: == arg->of_hint */
 #define HOP_SUPERBLOCK_SYNC                       0x00010503 /* [unsigned int sync_device] Synchronize the given superblock (when `sync_device' is non-zero, also sync the associated block device (if any)).
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock. */
 

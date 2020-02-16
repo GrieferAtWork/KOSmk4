@@ -517,9 +517,7 @@ INTERN syscall_slong_t
 		break;
 
 	case HOP_BLOCKDEVICE_RDREADONLY:
-		validate_writable(arg, sizeof(u32));
-		*(u32 *)arg = ATOMIC_READ(self->bd_flags) & BLOCK_DEVICE_FLAG_READONLY ? 1 : 0;
-		break;
+		return ATOMIC_READ(self->bd_flags) & BLOCK_DEVICE_FLAG_READONLY ? 1 : 0;
 
 	case HOP_BLOCKDEVICE_WRREADONLY:
 		if (arg)
@@ -536,44 +534,45 @@ INTERN syscall_slong_t
 		result_handle.h_data = self;
 		if (block_device_ispartition(self))
 			result_handle.h_data = ((struct block_device_partition *)self)->bp_master;
-		handle_installhop((struct hop_openfd *)arg, result_handle);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 	}	break;
 
-	case HOP_BLOCKDEVICE_OPENDRIVEPART:
+	case HOP_BLOCKDEVICE_OPENDRIVEPART: {
+		struct handle result_handle;
+		u32 index, count;
+		struct block_device_partition *part;
+		size_t struct_size;
+		unsigned int result;
 		validate_writable(arg, sizeof(struct hop_blockdevice_openpart));
 		if (block_device_ispartition(self))
 			self = ((struct block_device_partition *)self)->bp_master;
-		{
-			struct handle result_handle;
-			u32 index, count;
-			struct block_device_partition *part;
-			size_t struct_size = ATOMIC_READ(((struct hop_blockdevice_openpart *)arg)->bop_struct_size);
-			if (struct_size != sizeof(struct hop_blockdevice_openpart))
-				THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_blockdevice_openpart), struct_size);
-			index = ((struct hop_blockdevice_openpart *)arg)->bop_partno;
-			COMPILER_BARRIER();
-			sync_read(&((struct block_device *)self)->bd_parts_lock);
-			part = ((struct block_device *)self)->bd_parts;
-			for (count = 0; index-- && part; ++count, part = part->bp_parts.ln_next)
-				;
-			if unlikely(!part) {
-				sync_endread(&((struct block_device *)self)->bd_parts_lock);
-				THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, index + count, 0, count - 1);
-			}
-			incref(part);
+		struct_size = ATOMIC_READ(((struct hop_blockdevice_openpart *)arg)->bop_struct_size);
+		if (struct_size != sizeof(struct hop_blockdevice_openpart))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_blockdevice_openpart), struct_size);
+		index = ((struct hop_blockdevice_openpart *)arg)->bop_partno;
+		COMPILER_BARRIER();
+		sync_read(&((struct block_device *)self)->bd_parts_lock);
+		part = ((struct block_device *)self)->bd_parts;
+		for (count = 0; index-- && part; ++count, part = part->bp_parts.ln_next)
+			;
+		if unlikely(!part) {
 			sync_endread(&((struct block_device *)self)->bd_parts_lock);
-			result_handle.h_type = HANDLE_TYPE_BLOCKDEVICE;
-			result_handle.h_mode = mode;
-			result_handle.h_data = part;
-			TRY {
-				handle_installhop(&((struct hop_blockdevice_openpart *)arg)->bop_openfd, result_handle);
-			} EXCEPT {
-				decref(part);
-				RETHROW();
-			}
-			decref(part);
+			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS, index + count, 0, count - 1);
 		}
-		break;
+		incref(part);
+		sync_endread(&((struct block_device *)self)->bd_parts_lock);
+		result_handle.h_type = HANDLE_TYPE_BLOCKDEVICE;
+		result_handle.h_mode = mode;
+		result_handle.h_data = part;
+		TRY {
+			result = handle_installhop(&((struct hop_blockdevice_openpart *)arg)->bop_openfd, result_handle);
+		} EXCEPT {
+			decref(part);
+			RETHROW();
+		}
+		decref(part);
+		return result;
+	}	break;
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

@@ -132,7 +132,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		temp.h_mode = IO_RDWR;
 		temp.h_data = driver_get_state();
 		FINALLY_DECREF_UNLIKELY((struct driver_state *)temp.h_data);
-		return handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case KSYSCTL_DRIVER_INSMOD: {
@@ -224,7 +224,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 				temp.h_type = HANDLE_TYPE_DRIVER;
 				temp.h_mode = IO_RDWR;
 				temp.h_data = drv;
-				handle_installhop(drv_fd, temp);
+				return handle_installhop(drv_fd, temp);
 			}
 		}
 	}	break;
@@ -444,7 +444,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_DRIVER;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &kernel_driver;
-		return handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case KSYSCTL_OPEN_KERNEL_VFS: {
@@ -452,7 +452,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_PATH;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &vfs_kernel;
-		return handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case KSYSCTL_OPEN_KERNEL_FS: {
@@ -460,7 +460,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_FS;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &fs_kernel;
-		return handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case KSYSCTL_OPEN_KERNEL_VM: {
@@ -468,7 +468,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_FS;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &vm_kernel;
-		return handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case KSYSCTL_OPEN_ROOT_PIDNS: {
@@ -476,7 +476,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_FS;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &pidns_root;
-		return handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	case KSYSCTL_OPEN_BOOT_TASK: {
@@ -484,7 +484,7 @@ again_get_oldpath:
 		temp.h_type = HANDLE_TYPE_TASK;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = FORTASK(&_boottask, this_taskpid);
-		return handle_installhop((struct hop_openfd *)arg, temp);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
 
 	default:

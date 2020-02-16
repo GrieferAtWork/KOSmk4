@@ -455,7 +455,8 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		return handle_installhop(&data->dof_openfd, hnd);
 	}	break;
 
-	case HOP_INODE_OPEN_SUPERBLOCK:
+	case HOP_INODE_OPEN_SUPERBLOCK: {
+		struct handle result_handle;
 		if (!vm_datablock_isinode(self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
@@ -463,14 +464,11 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_INODE,
 			      0);
-		{
-			struct handle result_handle;
-			result_handle.h_mode = mode;
-			result_handle.h_type = HANDLE_TYPE_DATABLOCK;
-			result_handle.h_data = ((struct inode *)self)->i_super;
-			return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
-		}
-		break;
+		result_handle.h_mode = mode;
+		result_handle.h_type = HANDLE_TYPE_DATABLOCK;
+		result_handle.h_data = ((struct inode *)self)->i_super;
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
+	}	break;
 
 	case HOP_INODE_CHMOD: {
 		size_t struct_size;
@@ -1163,9 +1161,8 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		decref(child_node);
 	}	break;
 
-
-
-	case HOP_SUPERBLOCK_OPEN_BLOCKDEVICE:
+	case HOP_SUPERBLOCK_OPEN_BLOCKDEVICE: {
+		struct handle result_handle;
 		if (!vm_datablock_isinode(self) || !INODE_ISSUPER((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
@@ -1173,18 +1170,16 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
 			      0);
-		{
-			struct handle result_handle;
-			result_handle.h_data = ((struct superblock *)self)->s_device;
-			if (!result_handle.h_data)
-				THROW(E_NO_SUCH_BLOCKDEVICE);
-			result_handle.h_mode = mode;
-			result_handle.h_type = HANDLE_TYPE_BLOCKDEVICE;
-			return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
-		}
-		break;
+		result_handle.h_data = ((struct superblock *)self)->s_device;
+		if (!result_handle.h_data)
+			THROW(E_NO_SUCH_BLOCKDEVICE);
+		result_handle.h_mode = mode;
+		result_handle.h_type = HANDLE_TYPE_BLOCKDEVICE;
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
+	}	break;
 
-	case HOP_SUPERBLOCK_OPEN_DRIVER:
+	case HOP_SUPERBLOCK_OPEN_DRIVER: {
+		struct handle result_handle;
 		if (!vm_datablock_isinode(self) || !INODE_ISSUPER((struct inode *)self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
 			      0, /* Filled in by the caller */
@@ -1192,14 +1187,11 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
 			      0);
-		{
-			struct handle result_handle;
-			result_handle.h_data = ((struct superblock *)self)->s_driver;
-			result_handle.h_mode = mode;
-			result_handle.h_type = HANDLE_TYPE_DRIVER;
-			return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
-		}
-		break;
+		result_handle.h_type = HANDLE_TYPE_DRIVER;
+		result_handle.h_mode = mode;
+		result_handle.h_data = ((struct superblock *)self)->s_driver;
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
+	}	break;
 
 	case HOP_SUPERBLOCK_SYNC:
 		if (!vm_datablock_isinode(self) || !INODE_ISSUPER((struct inode *)self))

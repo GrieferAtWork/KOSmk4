@@ -1237,7 +1237,7 @@ PRIVATE syscall_slong_t
 	}	break;
 
 	case HOP_HANDLE_REOPEN:
-		return handle_installhop((struct hop_openfd *)arg, *hand);
+		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, *hand);
 		break;
 
 	case HOP_HANDLE_NOOP:
