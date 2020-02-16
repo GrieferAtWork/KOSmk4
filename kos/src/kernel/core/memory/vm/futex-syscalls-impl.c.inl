@@ -19,7 +19,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "futex-syscalls.c"
-#define DEFINE_COMPAT_FUTEX 1
+//#define DEFINE_COMPAT_FUTEX 1
 #endif /* __INTELLISENSE__ */
 
 #ifdef DEFINE_COMPAT_FUTEX

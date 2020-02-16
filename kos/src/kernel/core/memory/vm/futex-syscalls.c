@@ -107,6 +107,8 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 				*timeout += realtime();
 			if (!task_waitfor(timeout))
 				result = -ETIMEDOUT;
+		} else {
+			task_disconnectall();
 		}
 	}	break;
 
@@ -156,6 +158,7 @@ sys_futex_impl(USER UNCHECKED uint32_t *uaddr,
 		      futex_op);
 		break;
 	}
+	assert(!task_isconnected());
 	return result;
 }
 #endif /* WANT_FUTEX */
