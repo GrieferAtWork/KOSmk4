@@ -24,13 +24,132 @@
 
 #include <asm/cfi.h>
 
+#ifdef __x86_64__
+#define PAX %rax
+#define PCX %rcx
+#else /* __x86_64__ */
+#define PAX %eax
+#define PCX %ecx
+#endif /* !__x86_64__ */
+
+
+
+.section .text
+.cfi_startproc
+PUBLIC_LABEL(x86_nopf_begin):
+
+PUBLIC_FUNCTION(x86_nopf_movb_Pax_al)
+	clc
+	movb   (PAX), %al
+	ret
+END(x86_nopf_movb_Pax_al)
+
+PUBLIC_FUNCTION(x86_nopf_movw_Pax_ax)
+	clc
+	movw   (PAX), %ax
+	ret
+END(x86_nopf_movw_Pax_ax)
+
+PUBLIC_FUNCTION(x86_nopf_movl_Pax_eax)
+	clc
+	movl   (PAX), %eax
+	ret
+END(x86_nopf_movl_Pax_eax)
+
+#ifdef __x86_64__
+PUBLIC_FUNCTION(x86_nopf_movq_Pax_rax)
+	clc
+	movq   (PAX), %rax
+	ret
+END(x86_nopf_movq_Pax_rax)
+#endif /* __x86_64__ */
+
+PUBLIC_FUNCTION(x86_nopf_movb_al_Pcx)
+	clc
+	movb   %al, (PCX)
+	ret
+END(x86_nopf_movb_al_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_movw_ax_Pcx)
+	clc
+	movw   %ax, (PCX)
+	ret
+END(x86_nopf_movw_ax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_movl_eax_Pcx)
+	clc
+	movl   %eax, (PCX)
+	ret
+END(x86_nopf_movl_eax_Pcx)
+
+#ifdef __x86_64__
+PUBLIC_FUNCTION(x86_nopf_movq_rax_Pcx)
+	clc
+	movq   %rax, (PCX)
+	ret
+END(x86_nopf_movq_rax_Pcx)
+#endif /* __x86_64__ */
+
+PUBLIC_LABEL(x86_nopf_end_clc):
+
+
+
+
+PUBLIC_FUNCTION(x86_nopf_rep_insb)
+	cld
+	rep;   insb
+	ret
+END(x86_nopf_rep_insb)
+
+PUBLIC_FUNCTION(x86_nopf_rep_insw)
+	cld
+	rep;   insw
+	ret
+END(x86_nopf_rep_insw)
+
+PUBLIC_FUNCTION(x86_nopf_rep_insl)
+	cld
+	rep;   insl
+	ret
+END(x86_nopf_rep_insl)
+
+PUBLIC_FUNCTION(x86_nopf_rep_outsb)
+	cld
+	rep;   outsb
+	ret
+END(x86_nopf_rep_outsb)
+
+PUBLIC_FUNCTION(x86_nopf_rep_outsw)
+	cld
+	rep;   outsw
+	ret
+END(x86_nopf_rep_outsw)
+
+PUBLIC_FUNCTION(x86_nopf_rep_outsl)
+	cld
+	rep;   outsl
+	ret
+END(x86_nopf_rep_outsl)
+
+
+PUBLIC_FUNCTION(x86_nopf_repe_cmpsb)
+	cld
+	repe;  cmpsb
+	ret
+END(x86_nopf_repe_cmpsb)
+
+PUBLIC_FUNCTION(x86_nopf_rep_stosb)
+	cld
+	rep;   stosb
+	ret
+END(x86_nopf_rep_stosb)
 
 /* Assembly function:
- * >> PUBLIC_FUNCTION(x86_memcpy_nopf)
+ * >> PUBLIC_FUNCTION(x86_nopf_rep_movsb)
  * >>     cld
  * >>     rep;   movsb
  * >>     ret
- * >> END(x86_memcpy_nopf)
+ * >> END(x86_nopf_rep_movsb)
  * Yes. - That's literally the implementation,
  * however there is something very special about it:
  *  - Whenever a #PF happens, the kernel will see if it originated from
@@ -53,18 +172,20 @@
  *            else if (OUT(%cr2) == OUT(%esi))
  *                <#PF in `src'>
  */
-.section .text
-PUBLIC_FUNCTION(x86_memcpy_nopf)
-	.cfi_startproc
+PUBLIC_FUNCTION(x86_nopf_rep_movsb)
 	cld
-PUBLIC_FUNCTION(x86_memcpy_nopf_rep_pointer)
 	rep;   movsb
-END(x86_memcpy_nopf_rep_pointer)
-PUBLIC_FUNCTION(x86_memcpy_nopf_ret_pointer)
+PUBLIC_LABEL(x86_nopf_end):
+PUBLIC_FUNCTION(x86_nopf_ret)
 	ret
-END(x86_memcpy_nopf_ret_pointer)
-	.cfi_endproc
-END(x86_memcpy_nopf)
+END(x86_nopf_rep_movsb)
+END(x86_nopf_ret)
+
+PUBLIC_FUNCTION(x86_nopf_ret_stc)
+	stc
+	ret
+END(x86_nopf_ret_stc)
+.cfi_endproc
 
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_MEMCPY_NOPF32_S */

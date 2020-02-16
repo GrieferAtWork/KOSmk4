@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/vm.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/fault.h>
@@ -267,10 +268,6 @@ nope:
 #endif /* CONFIG_NO_SMP */
 
 
-DATDEF byte_t x86_memcpy_nopf_rep_pointer[];
-DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
-
-
 INTERN struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 #if 1
@@ -287,8 +284,8 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	bool has_changed;
 	/* Check for memcpy_nopf() */
 	pc = state->ics_irregs.ir_pip;
-	if unlikely_untraced(pc == (uintptr_t)x86_memcpy_nopf_rep_pointer) {
-		state->ics_irregs.ir_pip = (uintptr_t)x86_memcpy_nopf_ret_pointer;
+	if unlikely_untraced(x86_nopf_check(pc)) {
+		state->ics_irregs.ir_pip = x86_nopf_retof(pc);
 		return state;
 	}
 	addr = __rdcr2();

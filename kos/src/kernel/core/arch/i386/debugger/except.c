@@ -32,6 +32,7 @@ if (gcc_opt.remove("-O3"))
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/function.h>
+#include <kernel/arch/vm.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
@@ -58,9 +59,6 @@ DECL_BEGIN
                                         *       instruction-fetch fault can also easily be detected
                                         *       by comparing `%eip' with `%cr2' */
 
-DATDEF byte_t x86_memcpy_nopf_rep_pointer[];
-DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
-
 #ifdef __x86_64__
 #define ir_pip ir_rip
 #else /* __x86_64__ */
@@ -75,9 +73,9 @@ NOTHROW(FCALL x86_handle_dbg_pagefault)(struct icpustate *__restrict state, uint
 	 *       other side-effects such as VIO callbacks or the like. */
 	uintptr_t pc;
 	void *addr;
-	/* Check for memcpy_nopf() */
-	if unlikely(state->ics_irregs.ir_pip == (uintptr_t)x86_memcpy_nopf_rep_pointer) {
-		state->ics_irregs.ir_pip = (uintptr_t)x86_memcpy_nopf_ret_pointer;
+	/* Check for `memcpy_nopf()' */
+	if unlikely(x86_nopf_check(state->ics_irregs.ir_pip)) {
+		state->ics_irregs.ir_pip = x86_nopf_retof(state->ics_irregs.ir_pip);
 		return state;
 	}
 	addr = __rdcr2();

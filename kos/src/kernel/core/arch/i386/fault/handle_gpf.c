@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/vm.h>
 #include <kernel/except.h>
 #include <kernel/fault.h>
 #include <kernel/paging.h>
@@ -70,11 +71,6 @@ INTERN struct icpustate *FCALL
 x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) {
 	return x86_handle_gpf_impl(state, ecode, false);
 }
-
-#ifdef __x86_64__
-DATDEF byte_t x86_memcpy_nopf_rep_pointer[];
-DATDEF byte_t x86_memcpy_nopf_ret_pointer[];
-#endif /* __x86_64__ */
 
 PRIVATE struct icpustate *FCALL
 x86_handle_gpf_impl(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) {
@@ -278,7 +274,7 @@ set_noncanon_pc_exception:
 				if (mod.mi_type != MODRM_MEMORY)
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-				goto noncanon_write;
+				goto chk_noncanon_write;
 
 			case 0x8a:    /* MOV r8,r/m8 */
 			case 0x8b:    /* MOV r16,r/m16; MOV r32,r/m32; MOV r64,r/m64 */
@@ -521,13 +517,13 @@ set_noncanon_pc_exception:
 				if (mod.mi_type != MODRM_MEMORY)
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
-				goto noncanon_read;
+				goto chk_noncanon_read;
 
 			case 0xa0:  /* MOV AL,moffs8* */
 				nc_addr = *(u8 *)pc;
 				pc += 1;
 				nc_addr += x86_decode_segmentbase(state, op_flags);
-				goto noncanon_read;
+				goto chk_noncanon_read;
 			case 0xa1: /* MOV AX,moffs16*; MOV EAX,moffs32*; MOV RAX,moffs64* */
 				if (op_flags & F_AD64) {
 					nc_addr = *(u64 *)pc;
@@ -537,7 +533,7 @@ set_noncanon_pc_exception:
 					pc += 4;
 				}
 				nc_addr += x86_decode_segmentbase(state, op_flags);
-				goto noncanon_read;
+				goto chk_noncanon_read;
 
 			case 0x0f01: /* invlpg m / lgdt m48 / lidt m48 / lmsw r/m16
 			              * monitor / mwait / sgdt m48 / sidt m48
@@ -547,12 +543,12 @@ set_noncanon_pc_exception:
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (mod.mi_reg == 0)
-					goto noncanon_write; /* sgdt */
+					goto chk_noncanon_write; /* sgdt */
 				if (mod.mi_reg == 1)
-					goto noncanon_write; /* sidt */
+					goto chk_noncanon_write; /* sidt */
 				if (mod.mi_reg == 4)
-					goto noncanon_write; /* smsw */
-				goto noncanon_read;
+					goto chk_noncanon_write; /* smsw */
+				goto chk_noncanon_read;
 
 			case 0x0fae: /* clflush m8 / fxrstor m512byte / fxsave m512byte
 			              * ldmxcsr m32 / lfence / mfence / sfence
@@ -562,16 +558,16 @@ set_noncanon_pc_exception:
 					break;
 				nc_addr = x86_decode_modrmgetmem(state, &mod, op_flags);
 				if (mod.mi_reg == 1)
-					goto noncanon_write; /* fxrstor */
+					goto chk_noncanon_write; /* fxrstor */
 				if (mod.mi_reg == 2)
-					goto noncanon_write; /* ldmxcsr */
-				goto noncanon_read;
+					goto chk_noncanon_write; /* ldmxcsr */
+				goto chk_noncanon_read;
 
 			case 0xa2: /* MOV moffs8*,AL */
 				nc_addr = *(u8 *)pc;
 				pc += 1;
 				nc_addr += x86_decode_segmentbase(state, op_flags);
-				goto noncanon_write;
+				goto chk_noncanon_write;
 			case 0xa3: /* MOV moffs16*,AX; MOV moffs32*,EAX; MOV moffs64*,RAX */
 				if (op_flags & F_AD64) {
 					nc_addr = *(u64 *)pc;
@@ -581,14 +577,18 @@ set_noncanon_pc_exception:
 					pc += 4;
 				}
 				nc_addr += x86_decode_segmentbase(state, op_flags);
-				goto noncanon_write;
+				goto chk_noncanon_write;
 
 			case 0xac: /* lodsb */
 			case 0xad: /* lodsw / lodsl / lodsq */
 			case 0x6e: /* outsb */
 			case 0x6f: /* outsw / outsl / outsq */
 				nc_addr = state->ics_gpregs.gp_rsi;
-				goto noncanon_read;
+chk_noncanon_read_nopf:
+				if (ADDR_IS_NONCANON(nc_addr) ||
+				    ADDR_IS_NONCANON(nc_addr + 8))
+					goto do_noncanon_read_nopf;
+				break;
 
 			case 0x6c: /* insb */
 			case 0x6d: /* insw / insl / insq */
@@ -597,37 +597,59 @@ set_noncanon_pc_exception:
 			case 0xae: /* scasb */
 			case 0xaf: /* scasw / scasl / scasq */
 				nc_addr = state->ics_gpregs.gp_rdi;
-				goto noncanon_write;
+				goto chk_noncanon_write_nopf;
 
 			case 0xa4: /* movsb */
-				/* Check for special case: `memcpy_nopf()' was used with non-canonical pointers.
-				 * In this case, we mustn't throw an exception (or even clobber exception pointers),
-				 * but instead have to directly resume execution at `x86_memcpy_nopf_ret_pointer' */
-				if (orig_pc == x86_memcpy_nopf_rep_pointer) {
-					icpustate64_setrip(state, (uintptr_t)x86_memcpy_nopf_ret_pointer);
-					return state;
-				}
-				ATTR_FALLTHROUGH
 			case 0xa5: /* movsw / movsl / movsq */
 				nc_addr = state->ics_gpregs.gp_rsi;
 				if (ADDR_IS_NONCANON(nc_addr) ||
-				    ADDR_IS_NONCANON(nc_addr + 8))
-					goto noncanon_read;
+				    ADDR_IS_NONCANON(nc_addr + 8)) {
+do_noncanon_read_nopf:
+					/* Check for special case: `memcpy_nopf()' & friends was used with non-canonical pointers.
+					 * In this case, we mustn't throw an exception (or even clobber exception pointers),
+					 * but instead have to directly resume execution at `x86_memcpy_nopf_ret_pointer' */
+					if (x86_nopf_check(orig_pc)) {
+set_nopf_ret:
+						icpustate64_setrip(state, x86_nopf_retof(orig_pc));
+						return state;
+					}
+					goto do_noncanon_read;
+				}
 				nc_addr = state->ics_gpregs.gp_rdi;
-				goto noncanon_write;
+chk_noncanon_write_nopf:
+				if (ADDR_IS_NONCANON(nc_addr) ||
+				    ADDR_IS_NONCANON(nc_addr + 8)) {
+/*do_noncanon_write_nopf:*/
+					/* Check for special case: `memcpy_nopf()' & friends ... */
+					if (x86_nopf_check(orig_pc))
+						goto set_nopf_ret;
+					goto do_noncanon_write;
+				}
+				break;
+
+			case 0xa6: /* cmpsb */
+			case 0xa7: /* cmpsw / cmpsl / cmpsq */
+				nc_addr = state->ics_gpregs.gp_rsi;
+				if (ADDR_IS_NONCANON(nc_addr) ||
+				    ADDR_IS_NONCANON(nc_addr + 8))
+					goto do_noncanon_read_nopf;
+				nc_addr = state->ics_gpregs.gp_rdi;
+				goto chk_noncanon_read_nopf;
 
 			default: break;
 			}
 			__IF0 {
-noncanon_read:
+chk_noncanon_read:
 				if (!ADDR_IS_NONCANON(nc_addr) && !ADDR_IS_NONCANON(nc_addr + 8))
+do_noncanon_read:
 					goto done_noncanon_check;
 				PERTASK_SET(this_exception_pointers[1],
 				            (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON);
 				goto do_noncanon;
-noncanon_write:
+chk_noncanon_write:
 				if (!ADDR_IS_NONCANON(nc_addr) && !ADDR_IS_NONCANON(nc_addr + 8))
 					goto done_noncanon_check;
+do_noncanon_write:
 				PERTASK_SET(this_exception_pointers[1],
 				            (uintptr_t)E_SEGFAULT_CONTEXT_NONCANON | E_SEGFAULT_CONTEXT_WRITING);
 do_noncanon:

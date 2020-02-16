@@ -2448,6 +2448,24 @@ NOTHROW(KCALL memeq_ku_nopf)(KERNEL void const *kernel_buffer,
 #endif /* !memeq_ku_nopf */
 #endif /* CONFIG_VM_ARCH_DEFINES_MEMEQ_NOPF */
 
+#ifndef CONFIG_VM_ARCH_DEFINES_READBWLQ_NOPF
+/* Try to read from a possibly faulty `addr' into `*presult'
+ * Return `true' on success, `false' on error */
+#define readb_nopf(addr, presult) (memcpy_nopf(presult, addr, 1) == 0)
+#define readw_nopf(addr, presult) (memcpy_nopf(presult, addr, 2) == 0)
+#define readl_nopf(addr, presult) (memcpy_nopf(presult, addr, 4) == 0)
+#define readq_nopf(addr, presult) (memcpy_nopf(presult, addr, 8) == 0)
+#endif /* !CONFIG_VM_ARCH_DEFINES_READBWLQ_NOPF */
+
+#ifndef CONFIG_VM_ARCH_DEFINES_WRITEBWLQ_NOPF
+/* Try to write `value' into a possibly faulty `addr'
+ * Return `true' on success, `false' on error */
+LOCAL NOBLOCK WUNUSED bool NOTHROW(KCALL writeb_nopf)(USER CHECKED void *addr, u8 value) { return memcpy_nopf(addr, &value, 1) == 0; }
+LOCAL NOBLOCK WUNUSED bool NOTHROW(KCALL writew_nopf)(USER CHECKED void *addr, u16 value) { return memcpy_nopf(addr, &value, 2) == 0; }
+LOCAL NOBLOCK WUNUSED bool NOTHROW(KCALL writel_nopf)(USER CHECKED void *addr, u32 value) { return memcpy_nopf(addr, &value, 4) == 0; }
+LOCAL NOBLOCK WUNUSED bool NOTHROW(KCALL writeq_nopf)(USER CHECKED void *addr, u64 value) { return memcpy_nopf(addr, &value, 8) == 0; }
+#endif /* !CONFIG_VM_ARCH_DEFINES_WRITEBWLQ_NOPF */
+
 
 /* Descriptor for a lock held for the purposes of DMA */
 struct vm_dmalock {
