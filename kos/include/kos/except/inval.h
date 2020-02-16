@@ -153,6 +153,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP,                           /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 	E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE,                         /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
 	E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC,                        /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
+	E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0,              /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -281,6 +282,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
+#define E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG                        1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFD' */
@@ -406,6 +408,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_FUTEX_OP                           107 /* E_INVALID_ARGUMENT_BAD_VALUE: [syscall_ulong_t futex_op] The `futex_op' given to one of `futex()' is invalid. */
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         108 /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        109 /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
+#define E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              110 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

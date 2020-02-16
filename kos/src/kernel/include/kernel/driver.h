@@ -477,7 +477,7 @@ driver_insmod(USER CHECKED byte_t *base, size_t num_bytes,
 
 
 #ifdef __INTELLISENSE__
-FUNDEF NOBLOCK WUNUSED ATTR_CONST NONNULL((1)) char const *
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) char const *
 NOTHROW(KCALL driver_getname)(struct driver *__restrict self);
 #else
 #define driver_getname(self) ((self)->d_name)
@@ -485,10 +485,10 @@ NOTHROW(KCALL driver_getname)(struct driver *__restrict self);
 
 /* Return the INode/filename of a given driver (which is
  * lazily loaded for drivers loaded via the kernel commandline) */
-FUNDEF WUNUSED ATTR_CONST NONNULL((1)) struct regular_node *KCALL
+FUNDEF WUNUSED NONNULL((1)) struct regular_node *KCALL
 driver_getfile(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
-FUNDEF WUNUSED ATTR_CONST NONNULL((1)) char const *KCALL
+FUNDEF WUNUSED NONNULL((1)) char const *KCALL
 driver_getfilename(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
 
@@ -499,7 +499,7 @@ driver_getfilename(struct driver *__restrict self)
  * @return: * :   Returns `self->d_shdr'
  * @return: NULL: Failed to load the section headers vector (the driver
  *                file wasn't found, or doesn't contain any sections) */
-FUNDEF WUNUSED ATTR_CONST NONNULL((1)) ElfW(Shdr) const *KCALL
+FUNDEF WUNUSED NONNULL((1)) ElfW(Shdr) const *KCALL
 driver_getshdrs(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
 
@@ -507,7 +507,7 @@ driver_getshdrs(struct driver *__restrict self)
  * @return: * :   Returns `self->d_shstrtab'
  * @return: NULL: Failed to load the section headers string table (the driver
  *                file wasn't found, or doesn't contain any sections) */
-FUNDEF WUNUSED ATTR_CONST NONNULL((1)) char const *KCALL
+FUNDEF WUNUSED NONNULL((1)) char const *KCALL
 driver_getshstrtab(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC);
 

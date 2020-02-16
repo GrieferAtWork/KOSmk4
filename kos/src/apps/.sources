@@ -44,6 +44,10 @@ BEGIN GROUP("apps.keymap") { COMPILE, LINK, MCOPY };
 END
 
 
+BEGIN GROUP("apps.insmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/insmod") SOURCE({ "insmod/insmod.c" }) END
+BEGIN GROUP("apps.lsmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/lsmod") SOURCE({ "insmod/lsmod.c" }) END
+BEGIN GROUP("apps.rmmod") { COMPILE, LINK, MCOPY }; SET_OUTPUT("/bin/rmmod") SOURCE({ "insmod/rmmod.c" }) END
+
 BEGIN GROUP("apps.gfx") { COMPILE, LINK, MCOPY };
 	SET_OUTPUT("/bin/gfx")
 	USELIB("libvideo-gfx")

@@ -194,14 +194,16 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED uintptr_half_t
 NOTHROW(KCALL handle_typekind)(struct handle const *__restrict self);
 
 /* Print the text that should result from `readlink("/proc/[pid]/fd/[fdno]")' */
-FUNDEF ssize_t KCALL
+FUNDEF NONNULL((1, 2)) ssize_t KCALL
 handle_print(struct handle const *__restrict self,
              __pformatprinter printer, void *arg);
 
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
  * @return: true:  The data size was stored in `*presult'.
  * @return: false: The data size could not be determined. */
-FUNDEF __BOOL KCALL handle_datasize(struct handle const *__restrict self, pos_t *__restrict presult);
+FUNDEF NONNULL((1, 2)) __BOOL KCALL
+handle_datasize(struct handle const *__restrict self,
+                pos_t *__restrict presult);
 
 #define HANDLE_FUNC(self, name) (*handle_type_db.name[(self).h_type])
 

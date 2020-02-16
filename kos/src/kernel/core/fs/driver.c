@@ -33,8 +33,6 @@
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
-#include <kernel/handle-proto.h>
-#include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/panic.h>
@@ -1203,7 +1201,7 @@ err_elf_reason:
 
 /* Return the INode/filename of a given driver (which is
  * lazily loaded for drivers loaded via the kernel commandline) */
-PUBLIC WUNUSED ATTR_CONST NONNULL((1)) struct regular_node *KCALL
+PUBLIC WUNUSED NONNULL((1)) struct regular_node *KCALL
 driver_getfile(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC) {
 	char const *filename;
@@ -1265,7 +1263,7 @@ driver_getfile(struct driver *__restrict self)
 	return driver_node;
 }
 
-PUBLIC WUNUSED ATTR_CONST NONNULL((1)) char const *
+PUBLIC WUNUSED NONNULL((1)) char const *
 (KCALL driver_getfilename)(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC) {
 	if (self->d_filename)
@@ -1281,7 +1279,7 @@ PUBLIC WUNUSED ATTR_CONST NONNULL((1)) char const *
  * @return: * :   Returns `self->d_shdr'
  * @return: NULL: Failed to load the section headers vector (the driver
  *                file wasn't found, or doesn't contain any sections) */
-PUBLIC WUNUSED ATTR_CONST NONNULL((1)) ElfW(Shdr) const *KCALL
+PUBLIC WUNUSED NONNULL((1)) ElfW(Shdr) const *KCALL
 driver_getshdrs(struct driver *__restrict self)
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC) {
 	struct regular_node *node;
@@ -1317,7 +1315,7 @@ driver_getshdrs(struct driver *__restrict self)
  * @return: * :   Returns `self->d_shstrtab'
  * @return: NULL: Failed to load the section headers string table (the driver
  *                file wasn't found, or doesn't contain any sections) */
-PUBLIC WUNUSED ATTR_CONST NONNULL((1)) char const *KCALL
+PUBLIC WUNUSED NONNULL((1)) char const *KCALL
 driver_getshstrtab(struct driver *__restrict self)
 		THROWS(E_IOERROR,E_WOULDBLOCK, E_BADALLOC) {
 	char *result;
@@ -4460,12 +4458,6 @@ again_init_drivers:
 		goto again_init_drivers;
 }
 #endif /* !CONFIG_NO_BOOTLOADER_DRIVERS */
-
-
-/* Driver-handle API */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(driver, struct driver);
-DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_state, struct driver_state);
-/* TODO: Other handle operators (specifically: hop()) */
 
 
 #ifdef CONFIG_HAVE_DEBUGGER

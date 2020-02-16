@@ -348,7 +348,7 @@ struct path;
 struct fs;
 struct vm;
 struct taskpid;
-struct wall_clock;
+struct realtime_clock_struct;
 struct driver;
 struct pipe;
 struct pipe_reader;
@@ -361,6 +361,7 @@ struct signalfd;
 struct vm_datapart;
 struct vm_futex;
 struct vm_futexfd;
+struct driver_section;
 
 
 
@@ -661,38 +662,38 @@ INTDEF NONNULL((1)) void KCALL handle_task_stat(struct taskpid *__restrict self,
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_task_poll(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
-/* Handle operators for `HANDLE_TYPE_CLOCK' (`struct wall_clock') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_clock_tryincref)(struct wall_clock *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_clock_incref)(struct wall_clock *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_clock_decref)(struct wall_clock *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_clock_refcnt)(struct wall_clock const *__restrict self);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_read(struct wall_clock *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_write(struct wall_clock *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_pread(struct wall_clock *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_pwrite(struct wall_clock *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_readv(struct wall_clock *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_writev(struct wall_clock *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_preadv(struct wall_clock *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_pwritev(struct wall_clock *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 5)) size_t KCALL handle_clock_aread(struct wall_clock *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 5)) size_t KCALL handle_clock_awrite(struct wall_clock *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 6)) size_t KCALL handle_clock_apread(struct wall_clock *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 6)) size_t KCALL handle_clock_apwrite(struct wall_clock *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2, 5)) size_t KCALL handle_clock_areadv(struct wall_clock *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2, 5)) size_t KCALL handle_clock_awritev(struct wall_clock *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2, 6)) size_t KCALL handle_clock_apreadv(struct wall_clock *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2, 6)) size_t KCALL handle_clock_apwritev(struct wall_clock *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_readdir(struct wall_clock *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_clock_seek(struct wall_clock *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_clock_ioctl(struct wall_clock *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_clock_truncate(struct wall_clock *__restrict self, pos_t new_size) THROWS(...);
-INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct vm_datablock *KCALL handle_clock_mmap(struct wall_clock *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_clock_allocate(struct wall_clock *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_clock_sync(struct wall_clock *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_clock_datasync(struct wall_clock *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_clock_stat(struct wall_clock *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_clock_poll(struct wall_clock *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_clock_hop(struct wall_clock *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+/* Handle operators for `HANDLE_TYPE_CLOCK' (`struct realtime_clock_struct') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_clock_tryincref)(struct realtime_clock_struct *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_clock_incref)(struct realtime_clock_struct *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_clock_decref)(struct realtime_clock_struct *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_clock_refcnt)(struct realtime_clock_struct const *__restrict self);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_read(struct realtime_clock_struct *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_write(struct realtime_clock_struct *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_pread(struct realtime_clock_struct *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_pwrite(struct realtime_clock_struct *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_readv(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_writev(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_preadv(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_pwritev(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 5)) size_t KCALL handle_clock_aread(struct realtime_clock_struct *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 5)) size_t KCALL handle_clock_awrite(struct realtime_clock_struct *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 6)) size_t KCALL handle_clock_apread(struct realtime_clock_struct *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 6)) size_t KCALL handle_clock_apwrite(struct realtime_clock_struct *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 5)) size_t KCALL handle_clock_areadv(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 5)) size_t KCALL handle_clock_awritev(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 6)) size_t KCALL handle_clock_apreadv(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 6)) size_t KCALL handle_clock_apwritev(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_readdir(struct realtime_clock_struct *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_clock_seek(struct realtime_clock_struct *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_clock_ioctl(struct realtime_clock_struct *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_clock_truncate(struct realtime_clock_struct *__restrict self, pos_t new_size) THROWS(...);
+INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct vm_datablock *KCALL handle_clock_mmap(struct realtime_clock_struct *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_clock_allocate(struct realtime_clock_struct *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_clock_sync(struct realtime_clock_struct *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_clock_datasync(struct realtime_clock_struct *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_clock_stat(struct realtime_clock_struct *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_clock_poll(struct realtime_clock_struct *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_clock_hop(struct realtime_clock_struct *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 /* Handle operators for `HANDLE_TYPE_DRIVER' (`struct driver') */
 INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_tryincref)(struct driver *__restrict self);
@@ -1122,6 +1123,39 @@ INTDEF NONNULL((1)) void KCALL handle_futexfd_datasync(struct vm_futexfd *__rest
 INTDEF NONNULL((1)) void KCALL handle_futexfd_stat(struct vm_futexfd *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futexfd_poll(struct vm_futexfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_hop(struct vm_futexfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+
+/* Handle operators for `HANDLE_TYPE_DRIVER_SECTION' (`struct driver_section') */
+INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_section_tryincref)(struct driver_section *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_section_incref)(struct driver_section *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_section_decref)(struct driver_section *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_section_refcnt)(struct driver_section const *__restrict self);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_read(struct driver_section *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_write(struct driver_section *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_pread(struct driver_section *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_pwrite(struct driver_section *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_section_readv(struct driver_section *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_section_writev(struct driver_section *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_section_preadv(struct driver_section *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_driver_section_pwritev(struct driver_section *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 5)) size_t KCALL handle_driver_section_aread(struct driver_section *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 5)) size_t KCALL handle_driver_section_awrite(struct driver_section *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 6)) size_t KCALL handle_driver_section_apread(struct driver_section *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 6)) size_t KCALL handle_driver_section_apwrite(struct driver_section *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 5)) size_t KCALL handle_driver_section_areadv(struct driver_section *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 5)) size_t KCALL handle_driver_section_awritev(struct driver_section *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 6)) size_t KCALL handle_driver_section_apreadv(struct driver_section *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2, 6)) size_t KCALL handle_driver_section_apwritev(struct driver_section *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_readdir(struct driver_section *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_driver_section_seek(struct driver_section *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_section_ioctl(struct driver_section *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_section_truncate(struct driver_section *__restrict self, pos_t new_size) THROWS(...);
+INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct vm_datablock *KCALL handle_driver_section_mmap(struct driver_section *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes) THROWS(...);
+INTDEF NONNULL((1)) pos_t KCALL handle_driver_section_allocate(struct driver_section *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_section_sync(struct driver_section *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_section_datasync(struct driver_section *__restrict self) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_section_stat(struct driver_section *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_section_poll(struct driver_section *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_section_hop(struct driver_section *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */

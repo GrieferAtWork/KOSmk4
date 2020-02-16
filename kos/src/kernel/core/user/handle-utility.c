@@ -45,6 +45,7 @@
 
 #include <sys/stat.h>
 
+#include <assert.h>
 #include <format-printer.h>
 #include <string.h>
 
@@ -125,7 +126,7 @@ character_device_datasize(struct character_device *__restrict self,
 /* Try to determine the effective data size of the given handle (as returned by `FIOQSIZE')
  * @return: true:  The data size was stored in `*presult'.
  * @return: false: The data size could not be determined. */
-PUBLIC bool KCALL
+PUBLIC NONNULL((1, 2)) bool KCALL
 handle_datasize(struct handle const *__restrict self,
                 pos_t *__restrict presult) {
 	pos_t value;
@@ -201,7 +202,7 @@ badtype:
 }
 
 /* Print the text that should result from `readlink("/proc/[pid]/fd/[fdno]")' */
-PUBLIC ssize_t KCALL
+PUBLIC NONNULL((1, 2)) ssize_t KCALL
 handle_print(struct handle const *__restrict self,
              pformatprinter printer, void *arg) {
 	size_t result;
@@ -373,6 +374,22 @@ handle_print(struct handle const *__restrict self,
 		result = format_printf(printer, arg,
 		                       "anon_inode:[signalfd:%Iu]",
 		                       sfd);
+	}	break;
+
+	case HANDLE_TYPE_DRIVER_SECTION: {
+		struct driver_section *sect = (struct driver_section *)self->h_data;
+		struct driver *d = sect->ds_module;
+		char const *name;
+		assert(sect->ds_index < d->d_shnum);
+		assert(d->d_shdr);
+		assert(d->d_shstrtab);
+		assert(d->d_shdr[sect->ds_index].sh_name <= (size_t)(d->d_shstrtab_end - d->d_shstrtab));
+		name = d->d_shstrtab + d->d_shdr[sect->ds_index].sh_name;
+		if (d->d_shdr[sect->ds_index].sh_name >= (size_t)(d->d_shstrtab_end - d->d_shstrtab) || !*name)
+			name = "?";
+		result = format_printf(printer, arg,
+		                       "anon_inode:[driver_section:%s]",
+		                       name);
 	}	break;
 
 	default:

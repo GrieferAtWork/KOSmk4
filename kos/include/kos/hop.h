@@ -20,97 +20,18 @@
 #ifndef _KOS_HOP_H
 #define _KOS_HOP_H 1
 
-#include <__stdinc.h>
 #include <__crt.h>
-#include <bits/types.h>
+#include <__stdinc.h>
+
 #include <hybrid/typecore.h>
 
+#include <bits/types.h>
+#include <kos/hop/api.h>
+#include <kos/hop/handle.h>
+#include <kos/hop/openfd.h>
+#include <kos/hop/driver.h>
+
 __SYSDECL_BEGIN
-
-#if defined(__KERNEL__) && __SIZEOF_SIZE_T__ < 8
-#define __HOP_SIZE64_FIELD(name) union { __size_t name; __uint64_t __##name##64; }
-#else /* __KERNEL__ */
-/* For compatibility, user-space must always write the full 64-bit field,
- * while the kernel will only ever read a size_t-sized field.
- * This is required when a 32-bit application is running under a 64-bit kernel,
- * allowing the kernel to not have to look out for user-space running in
- * compatibility mode, but can instead always read the full 64-bit value,
- * with is simply zero-extended from 32-bit by user-space. */
-#define __HOP_SIZE64_FIELD(name) __uint64_t name
-#endif /* !__KERNEL__ */
-
-/* Special HandleOPeration control codes for extended handle types.
- * These are function codes with may be used alongside the `hop()'
- * system call provided by the KOSmk4 kernel.
- * WARNING: The interface exposed here is _extremely_ volatile!
- *          It may be changed without notice, get removed, or changed in other
- *          ways that may break existing code using it. - Use with caution!
- * WARNING: All padding data must be initialized to zero by user-space! */
-
-
-#if __SIZEOF_POINTER__ < 8
-#define __HOP_PAD_POINTER(name) __uint32_t name;
-#else /* __SIZEOF_POINTER__ < 8 */
-#define __HOP_PAD_POINTER(name) /* nothing */
-#endif /* __SIZEOF_POINTER__ >= 8 */
-
-#ifndef __hop_openfd_defined
-#define __hop_openfd_defined 1
-#define HOP_OPENFD_MODE_AUTO       0x0000 /* Ignore `of_hint' and automatically select an appropriate handle
-                                           * This is the same as `HOP_OPENFD_MODE_HINT' with `of_hint=0' */
-#define HOP_OPENFD_MODE_HINT       0x0001 /* Install the newly opened handle into the lowest unused handle that is `>= of_hint' */
-#define HOP_OPENFD_MODE_INTO       0x0002 /* Install the newly opened handle into `of_hint', automatically
-                                           * closing any handle that may have been stored inside before.
-                                           * Additionally, `of_hint' may be any writable symbolic handle */
-#define HOP_OPENFD_MODE_INTO_EXACT 0x0003 /* Same as `HOP_OPENFD_MODE_INTO', but don't recognize symbolic
-                                           * handles, and throw an `E_INVALID_HANDLE_FILE' error instead. */
-#define __OFFSET_HOP_OPENFD_MODE  0
-#define __OFFSET_HOP_OPENFD_FLAGS 2
-#define __OFFSET_HOP_OPENFD_HINT  4
-#define __SIZEOF_HOP_OPENFD       8
-#ifdef __CC__
-struct hop_openfd /*[PREFIX(of_)]*/ {
-	__uint16_t of_mode;  /* Open mode (One of `HOP_OPENFD_MODE_*') */
-	__uint16_t of_flags; /* Set of `IO_CLOEXEC|IO_CLOFORK' */
-	__uint32_t of_hint;  /* [IN]  Open hint (s.a. `HOP_OPENFD_MODE_INTO')
-	                      * [OUT] The ID of the handle that has been opened (must be close(2)'ed). */
-};
-#endif /* __CC__ */
-#endif /* !__hop_openfd_defined */
-
-
-#define __OFFSET_HOP_HANDLE_STAT_STRUCT_SIZE 0
-#define __OFFSET_HOP_HANDLE_STAT_MODE        4
-#define __OFFSET_HOP_HANDLE_STAT_TYPE        8
-#define __OFFSET_HOP_HANDLE_STAT_KIND        10
-#define __OFFSET_HOP_HANDLE_STAT_REFCNT      16
-#define __OFFSET_HOP_HANDLE_STAT_ADDRESS     24
-#define __OFFSET_HOP_HANDLE_STAT_TYPENAME    32
-#define __SIZEOF_HOP_HANDLE_STAT             64
-#ifdef __CC__
-struct hop_handle_stat /*[PREFIX(hs_)]*/ {
-	__uint32_t            hs_struct_size;  /* [== sizeof(struct hop_handle_stat)]
-	                                        * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                        * this value is too small or doesn't match any recognized
-	                                        * structure version. */
-	__uint16_t            hs_mode;         /* The I/O mode with which this handle operates (set of `IO_*'). */
-	__uint16_t          __hs_pad1;         /* ... */
-	__uint16_t            hs_type;         /* The handle type (one of `HANDLE_TYPE_*'). */
-	__uint16_t            hs_kind;         /* The handle kind (one of `HANDLE_TYPEKIND_*'). */
-	__uint32_t          __hs_pad2;         /* ... */
-	__uintptr_t           hs_refcnt;       /* Reference counter of this handle. */
-	__HOP_PAD_POINTER  (__hs_pad3)         /* ... */
-	__uint64_t            hs_address;      /* Kernel-space pointer to the address where data of this handle is stored.
-	                                        * Note: Do not rely on this actually being the proper address when interfacing
-	                                        *       with custom drivers (as a matter of fact: custom drivers should never
-	                                        *       blindly trust kernel-space pointers passed from user-space, and should
-	                                        *       always instead make use of handles to kernel-space objects).
-	                                        *       Anyways: the kernel is allowed to mangle the actual address however
-	                                        *                it pleases, so-long as the value stored here ends up being
-	                                        *                unique. */
-	char                  hs_typename[32]; /* The name of the handle's type. */
-};
-#endif /* __CC__ */
 
 
 #define HOP_DATABLOCK_STAT_FEATURE_NONE    0x00000000 /* No special features. */
@@ -982,24 +903,6 @@ struct hop_datapart_stat /*[PREFIX(ds_)]*/ {
 #endif /* __CC__ */
 
 
-#undef __HOP_SIZE64_FIELD
-#undef __HOP_PAD_POINTER
-
-
-/* For any kind of handle */
-#define HOP_HANDLE_STAT                           0xffff0001 /* [struct hop_handle_stat *result] Read information about the given handle */
-#define HOP_HANDLE_NOOP                           0xffff0002 /* Do nothing other than verifying that `fd' is a valid handle. */
-#define HOP_HANDLE_REOPEN                         0xffff0003 /* [struct hop_openfd *result] Re-open the given handle
-                                                              * NOTE: The value returned by `hop()' is identical to the value written to `result->of_hint'. */
-#define HOP_HANDLE_GETREFCNT                      0xffff0004 /* [uintptr_t *result] Return the reference counter for the given handle. */
-#define HOP_HANDLE_GETADDRESS                     0xffff0005 /* [uint64_t *result] Return the kernel-space address of the handle (s.a. `struct hop_handle_stat::hs_address'). */
-#define HOP_HANDLE_GETTYPE                        0xffff0006 /* [uint16_t *result] Return the handle's type. */
-#define HOP_HANDLE_GETKIND                        0xffff0007 /* [uint16_t *result] Return the handle's kind. */
-#define HOP_HANDLE_GETMODE                        0xffff0008 /* [uint16_t *result] Return the handle's I/O mode (s.a. `iomode_t'). */
-#define HOP_HANDLE_DUP                            0xffff0009 /* Quick alias for `dup(fd)' (`hop()' returns the new file handle) */
-#define HOP_HANDLE_DUP_CLOEXEC                    0xffff000a /* Quick alias for `dup(fd)' + set the CLOEXEC flag (`hop()' returns the new file handle) */
-#define HOP_HANDLE_DUP_CLOFORK                    0xffff000b /* Quick alias for `dup(fd)' + set the CLOFORK flag (`hop()' returns the new file handle) */
-#define HOP_HANDLE_DUP_CLOEXEC_CLOFORK            0xffff000c /* Quick alias for `dup(fd)' + set the CLOEXEC+CLOFORK flag (`hop()' returns the new file handle) */
 
 /* For `HANDLE_TYPE_DATABLOCK' */
 #define HOP_DATABLOCK_STAT                        0x00010001 /* [struct hop_datablock_stat *result] Read information about the datablock */
@@ -1253,8 +1156,6 @@ struct hop_datapart_stat /*[PREFIX(ds_)]*/ {
 /* TODO: HOP_TASK_RPC -- FD-interface for the `rpc_schedule()' system call */
 
 
-
-
 /* For `HANDLE_TYPE_PIPE', `HANDLE_TYPE_PIPE_READER' and `HANDLE_TYPE_PIPE_WRITER' */
 #define HOP_PIPE_STAT          0x000c0001 /* [struct hop_pipe_stat *result] Return statistics about the pipe */
 #define HOP_PIPE_GETLIM        0x000c0002 /* [uint64_t *result] Return the max allocated size of the pipe. */
@@ -1340,20 +1241,7 @@ struct hop_datapart_stat /*[PREFIX(ds_)]*/ {
 /* TODO: HOP_FUTEXFD_STAT             (returns a `HANDLE_TYPE_FUTEX' object) */
 /* TODO: HOP_FUTEXFD_OPEN_FUTEX       (returns a `HANDLE_TYPE_FUTEX' object) */
 /* TODO: HOP_FUTEXFD_OPEN_DATABLOCK   (returns a `HANDLE_TYPE_DATABLOCK' object) */
-/* TODO: HANDLE_TYPE_DRIVER */
-/* TODO: HANDLE_TYPE_DRIVER:d_cmdline */
-/* TODO: HANDLE_TYPE_DRIVER:STAT:d_flags */
-/* TODO: HANDLE_TYPE_DRIVER:STAT:d_loadaddr */
-/* TODO: HANDLE_TYPE_DRIVER:STAT:d_loadstart */
-/* TODO: HANDLE_TYPE_DRIVER:STAT:d_loadend */
-/* TODO: HANDLE_TYPE_DRIVER:d_depvec (dereferencable as `for (d: driver_get_state()) if (d in self->d_depvec) yield d;') */
-/* TODO: HANDLE_TYPE_DRIVER:driver_getname() */
-/* TODO: HANDLE_TYPE_DRIVER:driver_getfile() */
-/* TODO: HANDLE_TYPE_DRIVER:driver_getfilename() */
-/* TODO: HANDLE_TYPE_DRIVER:driver_initialize() */
-/* TODO: HANDLE_TYPE_DRIVER:driver_finalize() */
-/* TODO: HANDLE_TYPE_DRIVER_STATE */
-/* TODO: HANDLE_TYPE_DRIVER_STATE:Enumerate drivers */
+
 /* TODO: HANDLE_TYPE_VM: */
 
 

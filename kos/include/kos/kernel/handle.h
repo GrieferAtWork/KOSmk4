@@ -48,7 +48,7 @@
 
 /* KOS Handle type codes.
  * NOTE: Changes to this list must be updated with:
- * $ deemon -F src/kernel/core/user/handle-router.c
+ * $ deemon -F kos/src/kernel/core/user/handle-router.c kos/src/kernel/include/kernel/handle-proto.h
  */
 #define HANDLE_TYPE_UNDEFINED       0x0000 /* Undefined/unused handle */
 #define HANDLE_TYPE_DATABLOCK       0x0001 /* `struct vm_datablock' (also includes `struct inode') */
@@ -78,7 +78,8 @@
 #define HANDLE_TYPE_DATAPART        0x0015 /* `struct vm_datapart' */
 #define HANDLE_TYPE_FUTEX           0x0016 /* `struct vm_futex' */
 #define HANDLE_TYPE_FUTEXFD         0x0017 /* `struct vm_futexfd' */
-#define HANDLE_TYPE_COUNT           0x0018 /* # of recognized handle types
+#define HANDLE_TYPE_DRIVER_SECTION  0x0018 /* `struct driver_section' */
+#define HANDLE_TYPE_COUNT           0x0019 /* # of recognized handle types
                                             * NOTE: After changing this value, be sure to
                                             * `touch /kos/src/kernel/include/kernel/handle.h' */
 
@@ -104,7 +105,8 @@
 	cb(HANDLE_TYPE_SIGNALFD, struct signalfd)                             \
 	cb(HANDLE_TYPE_DATAPART, struct vm_datapart)                          \
 	cb(HANDLE_TYPE_FUTEX, struct vm_futex)                                \
-	cb(HANDLE_TYPE_FUTEXFD, struct vm_futexfd)
+	cb(HANDLE_TYPE_FUTEXFD, struct vm_futexfd)                            \
+	cb(HANDLE_TYPE_DRIVER_SECTION, struct driver_section)
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type
  * that could reasonably be used for callback registrations (such

@@ -26,6 +26,7 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
+#include <kos/hop/openfd.h>
 
 #ifdef __CC__
 #ifndef NO_KSYSCTL_HELPER_FUNCTIONS
@@ -51,34 +52,6 @@ __SYSDECL_BEGIN
 
 
 /* Kernel system control command codes. (For use with `ksysctl()') */
-
-#ifndef __hop_openfd_defined
-#define __hop_openfd_defined 1
-#define HOP_OPENFD_MODE_AUTO       0x0000 /* Ignore `of_hint' and automatically select an appropriate handle
-                                           * This is the same as `HOP_OPENFD_MODE_HINT' with `of_hint=0' */
-#define HOP_OPENFD_MODE_HINT       0x0001 /* Install the newly opened handle into the lowest unused handle that is `>= of_hint' */
-#define HOP_OPENFD_MODE_INTO       0x0002 /* Install the newly opened handle into `of_hint', automatically
-                                           * closing any handle that may have been stored inside before.
-                                           * Additionally, `of_hint' may be any writable symbolic handle */
-#define HOP_OPENFD_MODE_INTO_EXACT 0x0003 /* Same as `HOP_OPENFD_MODE_INTO', but don't recognize symbolic
-                                           * handles, and throw an `E_INVALID_HANDLE_FILE' error instead. */
-#define __OFFSET_HOP_OPENFD_MODE  0
-#define __OFFSET_HOP_OPENFD_FLAGS 2
-#define __OFFSET_HOP_OPENFD_HINT  4
-#define __SIZEOF_HOP_OPENFD       8
-#ifdef __CC__
-struct hop_openfd /*[PREFIX(of_)]*/ {
-	__uint16_t of_mode;  /* Open mode (One of `HOP_OPENFD_MODE_*') */
-	__uint16_t of_flags; /* Set of `IO_CLOEXEC|IO_CLOFORK' */
-	__uint32_t of_hint;  /* [IN]  Open hint (s.a. `HOP_OPENFD_MODE_INTO')
-	                      * [OUT] The ID of the handle that has been opened (must be close(2)'ed). */
-};
-#endif /* __CC__ */
-#endif /* !__hop_openfd_defined */
-
-
-
-
 
 #define KSYSCTL_DRIVER_FORMAT_BLOB  1 /* Load a driver from an given data-blob (which should represent a valid ELF binary)
                                        * For more information on driver binaries, see the documentation in <kernel/driver.h> */
@@ -188,7 +161,7 @@ struct ksysctl_driver_delmod /*[PREFIX(dm_)]*/ {
 		                                    * of the driver, loaded relative to the system root VFS, as
 		                                    * can be opened by `KSYSCTL_OPEN_KERNEL_VFS' */
 	};
-	__KSYSCTL_PAD_POINTER(__dm_pad1);
+	__KSYSCTL_PAD_POINTER(__dm_pad1);      /* ... */
 };
 #endif
 
@@ -220,7 +193,7 @@ struct ksysctl_driver_getmod /*[PREFIX(gm_)]*/ {
 		                                    * of the driver, loaded relative to the system root VFS, as
 		                                    * can be opened by `KSYSCTL_OPEN_KERNEL_VFS' */
 	};
-	__KSYSCTL_PAD_POINTER(__gm_pad2);
+	__KSYSCTL_PAD_POINTER(__gm_pad2);      /* ... */
 };
 #endif
 
@@ -235,16 +208,16 @@ struct ksysctl_driver_getmod /*[PREFIX(gm_)]*/ {
 #define __SIZEOF_KSYSCTL_DRIVER_GET_LIBRARY_PATH             24
 #ifdef __CC__
 struct ksysctl_driver_get_library_path /*[PREFIX(glp_)]*/ {
-	__uint32_t             glp_struct_size; /* [== sizeof(struct ksysctl_driver_get_library_path)]
-	                                         * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                         * this value is too small or doesn't match any recognized
-	                                         * structure version. */
-	__uint32_t           __glp_pad1;
-	char                  *glp_buf;         /* [1..glp_bufsize] User-space buffer to-be filled with the library path. */
-	__KSYSCTL_PAD_POINTER(__glp_pad2);
-	__size_t               glp_size;        /* [IN] Available buffer size (in bytes).
-	                                         * [OUT] Required buffer size (in bytes; including a trailing NUL) */
-	__KSYSCTL_PAD_POINTER(__glp_pad3);
+	__uint32_t              glp_struct_size; /* [== sizeof(struct ksysctl_driver_get_library_path)]
+	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
+	                                          * this value is too small or doesn't match any recognized
+	                                          * structure version. */
+	__uint32_t            __glp_pad1;        /* ... */
+	char                   *glp_buf;         /* [1..glp_size] User-space buffer to-be filled with the library path. */
+	__KSYSCTL_PAD_POINTER(__glp_pad2);       /* ... */
+	__size_t                glp_size;        /* [IN] Available buffer size (in bytes).
+	                                          * [OUT] Required buffer size (in bytes; including a trailing NUL) */
+	__KSYSCTL_PAD_POINTER(__glp_pad3);       /* ... */
 };
 #endif /* __CC__ */
 
@@ -254,24 +227,24 @@ struct ksysctl_driver_get_library_path /*[PREFIX(glp_)]*/ {
 #define __SIZEOF_KSYSCTL_DRIVER_SET_LIBRARY_PATH             24
 #ifdef __CC__
 struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
-	__uint32_t             slp_struct_size; /* [== sizeof(struct ksysctl_driver_set_library_path)]
-	                                         * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                         * this value is too small or doesn't match any recognized
-	                                         * structure version. */
-	__uint32_t           __slp_pad1;        /* ... */
-	char const            *slp_newpath;     /* [1..1] The new library path to-be set (':' - separated list of paths).
-	                                         * Separately, you may specify `KSYSCTL_DRIVER_LIBRARY_PATH_DEFAULT' for
-	                                         * this field to restore the default library path (as set during booting
-	                                         * when no `driver-libpath=...' option was passed) */
-	__KSYSCTL_PAD_POINTER(__slp_pad2);
-	char const            *slp_oldpath;     /* [0..1] The expected old library path.
-	                                         * When non-NULL, only allow `slp_newpath' to-be set when the old path
-	                                         * is equal to this value (this exchange is done atomically and allows
-	                                         * the user to implement compare-exchange semantics for setting the driver
-	                                         * library path, thus allowing user-code to add/remove individual paths
-	                                         * without causing a potential race condition with other software which
-	                                         * may be attempting to do the same) */
-	__KSYSCTL_PAD_POINTER(__slp_pad3);
+	__uint32_t              slp_struct_size; /* [== sizeof(struct ksysctl_driver_set_library_path)]
+	                                          * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
+	                                          * this value is too small or doesn't match any recognized
+	                                          * structure version. */
+	__uint32_t            __slp_pad1;        /* ... */
+	char const             *slp_newpath;     /* [1..1] The new library path to-be set (':' - separated list of paths).
+	                                          * Separately, you may specify `KSYSCTL_DRIVER_LIBRARY_PATH_DEFAULT' for
+	                                          * this field to restore the default library path (as set during booting
+	                                          * when no `driver-libpath=...' option was passed) */
+	__KSYSCTL_PAD_POINTER(__slp_pad2);       /* ... */
+	char const             *slp_oldpath;     /* [0..1] The expected old library path.
+	                                          * When non-NULL, only allow `slp_newpath' to-be set when the old path
+	                                          * is equal to this value (this exchange is done atomically and allows
+	                                          * the user to implement compare-exchange semantics for setting the driver
+	                                          * library path, thus allowing user-code to add/remove individual paths
+	                                          * without causing a potential race condition with other software which
+	                                          * may be attempting to do the same) */
+	__KSYSCTL_PAD_POINTER(__slp_pad3);       /* ... */
 };
 #endif
 #undef __KSYSCTL_PAD_POINTER
