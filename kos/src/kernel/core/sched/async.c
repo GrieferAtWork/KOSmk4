@@ -26,6 +26,7 @@
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/paging.h>
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
 #include <sched/async.h>
@@ -39,37 +40,38 @@
 
 DECL_BEGIN
 
-
-
-
 #ifndef CONFIG_NO_SMP
 #define IF_SMP(...) __VA_ARGS__
 #else /* !CONFIG_NO_SMP */
 #define IF_SMP(...) /* nothing */
 #endif /* CONFIG_NO_SMP */
 
-
-struct asyncworker {
-	struct async_work_callbacks aw_cb;    /* [const] Worker callbacks */
-	WEAK void                  *aw_obj;   /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))] Object pointer.
-	                                       * When set to NULL, this worker may be removed */
-	uintptr_half_t              aw_typ;   /* [const] Object type (one of `HANDLE_TYPE_*'). */
-	uintptr_half_t              aw_didrm; /* Set to non-zero in the old async-vector when the entry is removed. */
+struct aworker {
+	WEAK refcnt_t               aw_refcnt; /* Reference counter */
+	struct async_work_callbacks aw_cb;     /* [const] Worker callbacks */
+	WEAK void                  *aw_obj;    /* [0..1][lock(CLEAR_ONCE && SMP(aw_inuse))] Object pointer.
+	                                        * When set to NULL, this worker may be removed */
+	uintptr_half_t              aw_typ;    /* [const] Object type (one of `HANDLE_TYPE_*'). */
+	uintptr_half_t             _aw_pad;    /* ... */
 #ifndef CONFIG_NO_SMP
-	uintptr_t                   aw_inuse; /* # of CPUs using `aw_obj' right now. */
+	uintptr_t                   aw_inuse;  /* # of CPUs using `aw_obj' right now. */
 #endif /* !CONFIG_NO_SMP */
 };
 
-#define asyncworker_eq(self, cb, obj, typ)       \
+#define aworker_decref_obj(self, obj) \
+	(*handle_type_db.h_decref[(self)->aw_typ])(obj);
+
+DEFINE_REFCOUNT_FUNCTIONS(struct aworker, aw_refcnt, kfree)
+
+#define aworker_eq(self, cb, obj, typ)      \
 	((self)->aw_cb.awc_work == (cb)->awc_work && \
 	 ATOMIC_READ((self)->aw_obj) == (obj) &&     \
 	 (self)->aw_cb.awc_poll == (cb)->awc_poll && \
 	 (self)->aw_cb.awc_test == (cb)->awc_test && \
 	 (self)->aw_typ == (typ))
 
-
 LOCAL NOBLOCK bool
-NOTHROW(FCALL asyncworker_clearobj)(struct asyncworker *__restrict self) {
+NOTHROW(FCALL aworker_clearobj)(struct aworker *__restrict self) {
 	void *old_value;
 #ifdef CONFIG_NO_SMP
 	pflag_t was = PREEMPTION_PUSHOFF();
@@ -84,14 +86,30 @@ NOTHROW(FCALL asyncworker_clearobj)(struct asyncworker *__restrict self) {
 	return old_value != NULL;
 }
 
-LOCAL bool
-NOTHROW(FCALL asyncworker_calltest)(struct asyncworker const *__restrict self,
-                                    void *obj) {
+LOCAL WUNUSED NONNULL((1)) /*nullable*/ REF void *
+NOTHROW(FCALL aworker_getref)(struct aworker *__restrict self) {
+	REF void *result;
+	PREEMPTION_DISABLE();
+	IF_SMP(ATOMIC_FETCHINC(self->aw_inuse));
+	COMPILER_READ_BARRIER();
+	result = self->aw_obj;
+	COMPILER_READ_BARRIER();
+	/* Try to acquire a reference. */
+	if (likely(result) && unlikely(!(*handle_type_db.h_tryincref[self->aw_typ])(result)))
+		result = NULL;
+	IF_SMP(ATOMIC_FETCHDEC(self->aw_inuse));
+	PREEMPTION_ENABLE();
+	return result;
+}
+
+LOCAL NONNULL((1, 2)) bool
+NOTHROW(FCALL aworker_calltest)(struct aworker *__restrict self,
+                                void *__restrict obj) {
 	bool result;
 	TRY {
 		result = (*self->aw_cb.awc_test)(obj);
 	} EXCEPT {
-		error_printf("_asyncmain:test@%p(%p:%#x)",
+		error_printf("aworker:test@%p(%p:%#x)",
 		             self->aw_cb.awc_test, obj,
 		             (unsigned int)self->aw_typ);
 		result = false;
@@ -99,14 +117,14 @@ NOTHROW(FCALL asyncworker_calltest)(struct asyncworker const *__restrict self,
 	return result;
 }
 
-LOCAL bool
-NOTHROW(FCALL asyncworker_callpoll)(struct asyncworker const *__restrict self,
-                                    void *obj) {
+LOCAL NONNULL((1, 2)) bool
+NOTHROW(FCALL aworker_callpoll)(struct aworker *__restrict self,
+                                void *__restrict obj) {
 	bool result;
 	TRY {
-		result = (*self->aw_cb.awc_poll)(obj);
+		result = (*self->aw_cb.awc_poll)(obj, (void *)self);
 	} EXCEPT {
-		error_printf("_asyncmain:poll@%p(%p:%#x)",
+		error_printf("aworker:poll@%p(%p:%#x)",
 		             self->aw_cb.awc_poll, obj,
 		             (unsigned int)self->aw_typ);
 		result = false;
@@ -114,38 +132,58 @@ NOTHROW(FCALL asyncworker_callpoll)(struct asyncworker const *__restrict self,
 	return result;
 }
 
-LOCAL void
-NOTHROW(FCALL asyncworker_callwork)(struct asyncworker const *__restrict self,
-                                    void *obj) {
+LOCAL NONNULL((1, 2)) void
+NOTHROW(FCALL aworker_callwork)(struct aworker *__restrict self,
+                                void *__restrict obj) {
 	TRY {
 		(*self->aw_cb.awc_work)(obj);
 	} EXCEPT {
-		error_printf("_asyncmain:poll@%p(%p:%#x)",
+		error_printf("aworker:poll@%p(%p:%#x)",
 		             self->aw_cb.awc_work, obj,
+		             (unsigned int)self->aw_typ);
+	}
+}
+
+LOCAL NONNULL((1, 2)) void
+NOTHROW(FCALL aworker_calltime)(struct aworker *__restrict self,
+                                void *__restrict obj) {
+	TRY {
+		(*self->aw_cb.awc_time)(obj);
+	} EXCEPT {
+		error_printf("aworker:time@%p(%p:%#x)",
+		             self->aw_cb.awc_time, obj,
 		             (unsigned int)self->aw_typ);
 	}
 }
 
 
 
-struct asyncworkers {
-	WEAK refcnt_t                               aws_refcnt; /* Reference counter. */
-	size_t                                      awc_testc;  /* # of worker threads with test-callbacks.
-	                                                         * All such workers come before those without! */
-	size_t                                      awc_workc;  /* # of worker threads. */
-	COMPILER_FLEXIBLE_ARRAY(struct asyncworker, awc_workv); /* [0..awc_workc] Vector of workers */
+struct awork_vector {
+	WEAK refcnt_t                                 av_refcnt; /* Reference counter. */
+	size_t                                        av_testc;  /* # of worker threads with test-callbacks.
+	                                                           * All such workers come before those without! */
+	size_t                                        av_workc;  /* # of worker threads. */
+	COMPILER_FLEXIBLE_ARRAY(REF struct aworker *, av_workv); /* [0..awc_workc] Vector of workers */
 };
 
-DEFINE_REFCOUNT_FUNCTIONS(struct asyncworkers, aws_refcnt, kfree)
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL awork_vector_destroy)(struct awork_vector *__restrict self) {
+	size_t i;
+	for (i = 0; i < self->av_workc; ++i)
+		decref_unlikely(self->av_workv[i]);
+	kfree(self);
+}
 
-PRIVATE struct asyncworkers empty_asyncworkers = {
-	/* .aws_refcnt = */ 2, /* +1: empty_asyncworkers; +1: awork */
+DEFINE_REFCOUNT_FUNCTIONS(struct awork_vector, av_refcnt, awork_vector_destroy)
+
+PRIVATE struct awork_vector empty_awork = {
+	/* .aws_refcnt = */ 2, /* +1: empty_awork; +1: awork */
 	/* .awc_testc  = */ 0, /* No workers defined by default... */
 	/* .awc_workc  = */ 0  /* No workers defined by default... */
 };
 
 /* Registered async work. */
-PRIVATE ATOMIC_REF(struct asyncworkers) awork = ATOMIC_REF_INIT(&empty_asyncworkers);
+PRIVATE ATOMIC_REF(struct awork_vector) awork = ATOMIC_REF_INIT(&empty_awork);
 
 /* Signal broadcast when `awork' has changed. */
 PRIVATE struct sig awork_changed = SIG_INIT;
@@ -157,58 +195,92 @@ PRIVATE struct sig awork_changed = SIG_INIT;
 /* Try to delete a worker from `old_workers' and assign atomically
  * update the global set of active async workers. */
 PRIVATE NOBLOCK_IF(gfp_flags & GFP_ATOMIC) NONNULL((1)) unsigned int
-NOTHROW(KCALL try_delete_async_worker)(struct asyncworkers *__restrict old_workers,
+NOTHROW(KCALL try_delete_async_worker)(struct awork_vector *__restrict old_workers,
                                        size_t worker_index, gfp_t gfp_flags) {
-	REF struct asyncworkers *new_workers;
-	assert(worker_index < old_workers->awc_workc);
-	if (old_workers->awc_workc == 1) {
+	REF struct awork_vector *new_workers;
+	assert(worker_index < old_workers->av_workc);
+	if (old_workers->av_workc == 1) {
 		/* Simple case: Just assign the empty workers list. */
-		new_workers = incref(&empty_asyncworkers);
+		new_workers = incref(&empty_awork);
 	} else {
-		size_t oi, ni;
-		assert(old_workers->awc_workc >= 2);
-		new_workers = (REF struct asyncworkers *)kmalloc_nx(offsetof(struct asyncworkers, awc_workv) +
-		                                                    ((old_workers->awc_workc - 1) *
-		                                                     sizeof(struct asyncworker)),
+		size_t i;
+		assert(old_workers->av_workc >= 2);
+		new_workers = (REF struct awork_vector *)kmalloc_nx(offsetof(struct awork_vector, av_workv) +
+		                                                    ((old_workers->av_workc - 1) *
+		                                                     sizeof(REF struct aworker *)),
 		                                                    gfp_flags);
 		if unlikely(!new_workers)
 			return TRY_DELETE_ASYNC_WORKER_BADALLOC;
-		new_workers->aws_refcnt = 1;
-		new_workers->awc_testc  = old_workers->awc_testc;
-		new_workers->awc_workc  = old_workers->awc_workc - 1;
-		if (worker_index < new_workers->awc_testc)
-			--new_workers->awc_testc; /* The to-be-removed worker had a test-function */
-		for (oi = ni = 0; ni < new_workers->awc_workc; ++oi) {
-			struct asyncworker *nw, *ow;
-			if (oi == worker_index)
-				continue; /* Don't copy this worker! */
-			nw = &new_workers->awc_workv[ni];
-			ow = &old_workers->awc_workv[oi];
-			nw->aw_cb  = ow->aw_cb;
-			nw->aw_obj = ATOMIC_READ(ow->aw_obj); /* Must be read as an atomic work (we can't have byte-splits here!) */
-			nw->aw_typ = ow->aw_typ;
-			IF_SMP(nw->aw_inuse = 0);
-			++ni;
-		}
-		assert(ni == new_workers->awc_workc);
-		assert(oi == old_workers->awc_workc);
+		new_workers->av_refcnt = 1;
+		new_workers->av_testc  = old_workers->av_testc;
+		new_workers->av_workc  = old_workers->av_workc - 1;
+		if (worker_index < new_workers->av_testc)
+			--new_workers->av_testc; /* The to-be-removed worker had a test-function */
+		memcpy(new_workers->av_workv,
+		       old_workers->av_workv,
+		       worker_index,
+		       sizeof(REF struct aworker *));
+		memcpy(new_workers->av_workv + worker_index,
+		       old_workers->av_workv + worker_index + 1,
+		       old_workers->av_workc - worker_index,
+		       sizeof(REF struct aworker *));
+		for (i = 0; i < new_workers->av_workc; ++i)
+			incref(new_workers->av_workv[i]);
 	}
 	/* Try to exchange the global async workers vector. */
-	if (awork.cmpxch_inherit_new(old_workers, new_workers)) {
-		ATOMIC_WRITE(old_workers->awc_workv[worker_index].aw_didrm, 1);
+	if (awork.cmpxch_inherit_new(old_workers, new_workers))
 		return TRY_DELETE_ASYNC_WORKER_SUCCESS; /* success! */
-	}
 	/* The async workers vector was changed in the mean time. */
 	decref_likely(new_workers);
 	return TRY_DELETE_ASYNC_WORKER_CHANGED;
 }
 
 
+
+/* [lock(PRIVATE(_asyncwork))] Timeout storage for `asyncmain_timeout_p' */
+PRIVATE struct timespec asyncmain_timeout = { 0, 0 };
+
+/* [lock(PRIVATE(_asyncwork))][0..1] The timeout argument
+ * for the async worker main `task_waitfor()' function */
+PRIVATE struct timespec *asyncmain_timeout_p = NULL;
+
+/* [0..1] The worker who's timeout callback should
+ * be invoked when `asyncmain_timeout_p' expires. */
+PRIVATE XATOMIC_REF(struct aworker) asyncmain_timeout_worker = XATOMIC_REF_INIT(NULL);
+
+
+/* This function may be called by `awc_poll()'-callbacks to
+ * specify the realtime() timestamp when `awc_time()' should
+ * be invoked. The given `cookie' must be the same argument
+ * prviously passed to `awc_poll()' */
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(struct timespec const *__restrict abs_timeout,
+                                                void *__restrict cookie) {
+	struct aworker *w;
+	w = (struct aworker *)cookie;
+	assertf(THIS_TASK == &_asyncwork, "This function may only be called by async-worker-poll-callbacks");
+	assertf(w && ADDR_ISKERN(w) && !wasdestroyed(w), "Bad cookie");
+	assertf(w->aw_cb.awc_time, "No time-callback");
+	if (!asyncmain_timeout_p) {
+		asyncmain_timeout_p = &asyncmain_timeout;
+	} else {
+		assert(asyncmain_timeout_p == &asyncmain_timeout);
+		if (*abs_timeout >= asyncmain_timeout)
+			return; /* The previous timeout is already older! */
+	}
+	/* Set the used timeout. */
+	asyncmain_timeout = *abs_timeout;
+	/* Set the associated worker as the one that will receive the timeout. */
+	asyncmain_timeout_worker.set(w);
+}
+
+
+
 INTERN ATTR_NORETURN void
 NOTHROW(FCALL _asyncmain)(void) {
 	for (;;) {
 		size_t i;
-		REF struct asyncworkers *workers;
+		REF struct awork_vector *workers;
 again:
 		assert(PREEMPTION_ENABLED());
 		assert(!task_isconnected());
@@ -216,10 +288,10 @@ again:
 		workers = awork.get_nopr();
 		PREEMPTION_ENABLE();
 		/* First pass: test() for work and service immediatly if present. */
-		for (i = 0; i < workers->awc_testc; ++i) {
-			struct asyncworker *w;
+		for (i = 0; i < workers->av_testc; ++i) {
+			struct aworker *w;
 			REF void *obj;
-			w = &workers->awc_workv[i];
+			w = workers->av_workv[i];
 			assert(w->aw_cb.awc_test);
 			PREEMPTION_DISABLE();
 			IF_SMP(ATOMIC_FETCHINC(w->aw_inuse));
@@ -247,22 +319,22 @@ again:
 			IF_SMP(ATOMIC_FETCHDEC(w->aw_inuse));
 			PREEMPTION_ENABLE();
 			assert(!task_isconnected());
-			if (asyncworker_calltest(w, obj)) {
+			if (aworker_calltest(w, obj)) {
 				assert(!task_isconnected());
 				/* Service this worker. */
-				asyncworker_callwork(w, obj);
+				aworker_callwork(w, obj);
 				assert(!task_isconnected());
 				/* TODO: Do automatic re-ordering of async workers based on how often
 				 *       they are being triggered. (workers that have work more often
 				 *       should come before those that have less often) */
 			}
-			(*handle_type_db.h_decref[w->aw_typ])(obj);
+			aworker_decref_obj(w, obj);
 		}
 		/* Second pass: poll() for work and service if available. */
-		for (i = 0; i < workers->awc_workc; ++i) {
-			struct asyncworker *w;
+		for (i = 0; i < workers->av_workc; ++i) {
+			struct aworker *w;
 			REF void *obj;
-			w = &workers->awc_workv[i];
+			w = workers->av_workv[i];
 			PREEMPTION_DISABLE();
 			IF_SMP(ATOMIC_FETCHINC(w->aw_inuse));
 			COMPILER_READ_BARRIER();
@@ -288,27 +360,45 @@ again:
 			}
 			IF_SMP(ATOMIC_FETCHDEC(w->aw_inuse));
 			PREEMPTION_ENABLE();
-			if (asyncworker_callpoll(w, obj)) {
+			if (aworker_callpoll(w, obj)) {
 				/* Service this worker. */
 				task_disconnectall();
-				asyncworker_callwork(w, obj);
-				(*handle_type_db.h_decref[w->aw_typ])(obj);
+				aworker_callwork(w, obj);
+				aworker_decref_obj(w, obj);
 				decref_unlikely(workers);
 				goto again;
 			}
-			(*handle_type_db.h_decref[w->aw_typ])(obj);
+			aworker_decref_obj(w, obj);
 		}
 
 		{
 			struct task_connection awork_changed_con;
+			struct sig *received_signal;
 			/* Also wait for async workers to have changed. */
 			task_connect_c(&awork_changed_con, &awork_changed);
 			TRY {
-				task_waitfor();
+				received_signal = task_waitfor(asyncmain_timeout_p);
 			} EXCEPT {
 				error_printf("_asyncmain:task_waitfor()");
 			}
 			decref_unlikely(workers);
+			if (!received_signal) {
+				REF struct aworker *receiver;
+				/* A timeout expired. (invoke the associated worker's time-callback) */
+				assert(asyncmain_timeout_p);
+				asyncmain_timeout_p = NULL;
+				receiver = asyncmain_timeout_worker.exchange(NULL);
+				if likely(receiver) {
+					REF void *obj;
+					assert(receiver->aw_cb.awc_time);
+					obj = aworker_getref(receiver);
+					if likely(obj) {
+						aworker_calltime(receiver, obj);
+						aworker_decref_obj(receiver, obj);
+					}
+					decref_unlikely(receiver);
+				}
+			}
 		}
 	}
 }
@@ -337,9 +427,9 @@ PUBLIC NONNULL((1, 2)) bool KCALL
 register_async_worker(struct async_work_callbacks const *__restrict cb,
                       void *__restrict ob_pointer, uintptr_half_t ob_type)
 		THROWS(E_BADALLOC) {
-	REF struct asyncworkers *old_workers;
-	REF struct asyncworkers *new_workers;
-	struct asyncworker *nw;
+	REF struct aworker *new_worker;
+	REF struct awork_vector *old_workers;
+	REF struct awork_vector *new_workers;
 	size_t i;
 	assert(cb);
 	assert(cb->awc_poll);
@@ -352,61 +442,66 @@ again:
 	{
 		size_t c;
 		i = 0;
-		c = old_workers->awc_testc;
+		c = old_workers->av_testc;
 		if (!cb->awc_test) {
 			i = c;
-			c = old_workers->awc_workc;
+			c = old_workers->av_workc;
 		}
 		for (; i < c; ++i) {
-			if (asyncworker_eq(&old_workers->awc_workv[i],
-			                   cb, ob_pointer, ob_type))
+			if (aworker_eq(old_workers->av_workv[i],
+			               cb, ob_pointer, ob_type))
 				return false; /* Already defined. */
 		}
 	}
 	TRY {
 		/* Allocate enough space for +1 additional worker. */
-		new_workers = (REF struct asyncworkers *)kmalloc(offsetof(struct asyncworkers, awc_workv) +
-		                                                 (old_workers->awc_workc + 1) *
-		                                                 sizeof(struct asyncworker),
+		new_workers = (REF struct awork_vector *)kmalloc(offsetof(struct awork_vector, av_workv) +
+		                                                 (old_workers->av_workc + 1) *
+		                                                 sizeof(struct aworker),
 		                                                 GFP_NORMAL);
+		TRY {
+			new_worker = (REF struct aworker *)kmalloc(sizeof(struct aworker), GFP_NORMAL);
+		} EXCEPT {
+			kfree(new_workers);
+			RETHROW();
+		}
 	} EXCEPT {
 		decref_unlikely(old_workers);
 		RETHROW();
 	}
+
+	/* Initialize the new worker */
+	new_worker->aw_refcnt = 1;
+	memcpy(&new_worker->aw_cb, cb, sizeof(*cb));
+	new_worker->aw_obj = ob_pointer;
+	new_worker->aw_typ = ob_type;
+	IF_SMP(new_worker->aw_inuse = 0);
+
 	/* Fill in the new workers vector. */
-	new_workers->aws_refcnt = 1;
-	new_workers->awc_testc  = old_workers->awc_testc;
-	new_workers->awc_workc  = old_workers->awc_workc;
-	assert(new_workers->awc_workc >= new_workers->awc_testc);
-	for (i = 0; i < old_workers->awc_workc; ++i) {
-		struct asyncworker *ow;
-		nw = &new_workers->awc_workv[i];
-		ow = &old_workers->awc_workv[i];
-		nw->aw_cb  = ow->aw_cb;
-		nw->aw_obj = ATOMIC_READ(ow->aw_obj); /* Must be read as an atomic work (we can't have byte-splits here!) */
-		nw->aw_typ = ow->aw_typ;
-		IF_SMP(nw->aw_inuse = 0);
-	}
-	/* Insert the new worker. */
+	new_workers->av_refcnt = 1;
+	new_workers->av_testc  = old_workers->av_testc;
+	new_workers->av_workc  = old_workers->av_workc + 1;
 	if (cb->awc_test) {
-		/* Insert at the very beginning */
-		nw = &new_workers->awc_workv[0];
-		memmoveup(nw + 1, nw,
-		          new_workers->awc_workc,
-		          sizeof(struct asyncworker));
-		++new_workers->awc_testc;
+		/* Insert `new_worker' at the front */
+		++new_workers->av_testc;
+		memcpy(new_workers->av_workv + 1,
+		       old_workers->av_workv,
+		       old_workers->av_workc,
+		       sizeof(REF struct aworker *));
+		new_workers->av_workv[0] = new_worker;
 	} else {
-		/* Insert after all workers with test-functions */
-		nw = &new_workers->awc_workv[new_workers->awc_testc];
-		memmoveup(nw + 1, nw,
-		          new_workers->awc_workc - new_workers->awc_testc,
-		          sizeof(struct asyncworker));
+		/* Insert `new_worker' after test-enabled workers */
+		memcpy(new_workers->av_workv,
+		       old_workers->av_workv,
+		       old_workers->av_testc,
+		       sizeof(REF struct aworker *));
+		new_workers->av_workv[old_workers->av_testc] = new_worker; /* Inherit reference. */
+		memcpy(new_workers->av_workv + old_workers->av_testc + 1,
+		       old_workers->av_workv + old_workers->av_testc,
+		       old_workers->av_workc - old_workers->av_testc,
+		       sizeof(REF struct aworker *));
 	}
-	++new_workers->awc_workc;
-	memcpy(&nw->aw_cb, cb, sizeof(*cb));
-	nw->aw_obj = ob_pointer;
-	nw->aw_typ = ob_type;
-	IF_SMP(nw->aw_inuse = 0);
+
 	/* Try to install the new async workers vector. */
 	if (awork.cmpxch_inherit_new(old_workers, new_workers)) {
 		decref_likely(old_workers);
@@ -434,91 +529,39 @@ again:
 PUBLIC NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(KCALL unregister_async_worker)(struct async_work_callbacks const *__restrict cb,
                                        void *__restrict ob_pointer, uintptr_half_t ob_type) {
-	REF struct asyncworkers *workers;
+	REF struct awork_vector *workers;
 	size_t i, count;
-	bool fail_result = false;
 	assert(cb);
 	assert(cb->awc_poll);
 	assert(cb->awc_work);
 	assert(ob_pointer);
 	assert(ob_type < HANDLE_TYPE_COUNT);
-again:
 	workers = awork.get();
-	i       = 0;
-	count   = workers->awc_testc;
+	/* Figure out which parts of the worker-vector we need to search. */
+	i     = 0;
+	count = workers->av_testc;
 	if (!cb->awc_test) {
 		i     = count;
-		count = workers->awc_workc;
+		count = workers->av_workc;
 	}
 	for (; i < count; ++i) {
-		struct asyncworker *w;
-		unsigned int error;
-		w = &workers->awc_workv[i];
-		if (!asyncworker_eq(w, cb, ob_pointer, ob_type))
-			continue; /* Different worker. */
-		/* Found it! */
-		if unlikely(!asyncworker_clearobj(w)) {
-			/* The entry was already deleted by another thread.
-			 * -> Try to remove the entry (in case the other thread failed in doing this) */
+		struct aworker *w;
+		w = workers->av_workv[i];
+		/* Check if this is the worker we're looking for. */
+		if (aworker_eq(w, cb, ob_pointer, ob_type)) {
+			bool result;
+			/* Try to clear the worker's pointed-to object. */
+			result = aworker_clearobj(w);
+			/* Always try to remove the worker. */
 			try_delete_async_worker(workers, i, GFP_ATOMIC);
-			break;
+			decref_likely(workers);
+			return result;
 		}
-		/* Try to delete (but use GFP_ATOMIC since we're not allowed to block) */
-		error = try_delete_async_worker(workers, i, GFP_ATOMIC);
-		/* Indicate that workers have changed */
-		sig_broadcast(&awork_changed);
-		if (error == TRY_DELETE_ASYNC_WORKER_BADALLOC) {
-			/* Must still check if the active set of workers has changed.
-			 * If so, then we must try again since it may have already changed
-			 * before we've called `asyncworker_clearobj()', meaning that the
-			 * worker we're trying to delete is still apart of the active set
-			 * of async workers! */
-			if (ATOMIC_READ(awork.m_pointer) != workers) {
-again_success:
-				/* Account for the possibility that the new set of workers
-				 * were created before we've deleted our async worker, such
-				 * that even though we've deleted the worker from some older
-				 * async-worker-vector, it _may_ still be contained within
-				 * the current vector.
-				 * Notice the _may_ here, as irregardless of the worker still
-				 * being contained inside the current vector, we do already
-				 * know that it was contained in some past vector prior to
-				 * our function being called, meaning that even if it's already
-				 * gone at this point, it was there once, and our call to
-				 * `asyncworker_clearobj()' was what caused it to be removed.
-				 * -> As such, return `true' in all branches that would normally
-				 *    cause `false' to be returned!
-				 */
-				decref_likely(workers);
-				/* FIXME: Race condition:
-				 *   If there is another thread currently modifying the async-vector,
-				 *   and it had copied the async-worker vector before we've cleared
-				 *   the object-pointer of our worker, but has yet to install its
-				 *   new async-vector, then we have no way of ensuring that our entry
-				 *   doesn't get restored once that thread installs its new vector!
-				 */
-				fail_result = true;
-				goto again;
-			}
-			decref_unlikely(workers);
-			/* Workers didn't change, but we've failed to allocate a smaller
-			 * workers vector. However, since we've already cleared out worker's
-			 * object pointer (s.a. `asyncworker_clearobj()'), the worker will
-			 * no longer be invoked, and `_asyncwork' will be try to truncate
-			 * the vector for us until it succeeds in doing so. */
-			return true;
-		}
-		if (error == TRY_DELETE_ASYNC_WORKER_CHANGED)
-			goto again_success; /* Workers have changed. */
-		/* Success: The workers vector was truncated. */
-		decref_likely(workers);
-		return true;
 	}
 	/* The worker wasn't found (or it was deleted during a prior pass) */
 	decref_unlikely(workers);
-	return fail_result;
+	return false;
 }
-
 
 DECL_END
 

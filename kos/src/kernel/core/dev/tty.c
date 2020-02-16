@@ -130,7 +130,9 @@ tty_device_poll(struct character_device *__restrict self, poll_mode_t what) THRO
 	return 0;
 }
 
-PRIVATE bool FCALL ttyfwd_poll(void *arg) {
+PRIVATE NONNULL((1, 2)) bool ASYNC_CALLBACK_CC
+ttyfwd_poll(void *__restrict arg,
+            void *__restrict UNUSED(cookie)) {
 	struct tty_device *tty;
 	poll_mode_t what;
 	tty  = (struct tty_device *)arg;
@@ -138,7 +140,8 @@ PRIVATE bool FCALL ttyfwd_poll(void *arg) {
 	return (what & POLLIN) != 0;
 }
 
-PRIVATE void FCALL ttyfwd_work(void *arg) {
+PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
+ttyfwd_work(void *__restrict arg) {
 	char buf[256];
 	struct tty_device *tty;
 	tty  = (struct tty_device *)arg;

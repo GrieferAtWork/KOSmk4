@@ -56,12 +56,14 @@ INTDEF struct task _asyncwork;
 INTDEF ATTR_NORETURN void NOTHROW(FCALL _asyncmain)(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
+#define ASYNC_CALLBACK_CC FCALL
+
 /* Prototype for test-async-work-available
  * NOTE: Exceptions thrown by this function are logged and silently discarded
  * @param: arg:    [1..1] A reference to `ob_pointer' passed when the object was registered.
- * @return: true:  Work is available, and the `work'-callback should be invoked.
+ * @return: true:  Work is available, and the `awc_work()'-callback should be invoked.
  * @return: false: No work available at the moment. */
-typedef bool (FCALL *async_test_callback_t)(void *__restrict arg);
+typedef NONNULL((1)) bool (ASYNC_CALLBACK_CC *async_test_callback_t)(void *__restrict arg);
 
 /* Test for available work (if available, return `true'),
  * else: connect to the appropriate signals that get broadcast
@@ -70,23 +72,45 @@ typedef bool (FCALL *async_test_callback_t)(void *__restrict arg);
  * the case), in order to prevent the race condition of work
  * becoming available after the first test, but before a signal
  * connection got established.
+ * NOTE: If need be, this function should also call `async_worker_timeout()'
+ *       with the appropriate realtime()-timeout for when the `awc_time()'
+ *       callback should be invoked. Also note that this has to be done
+ *       every time that this callback is invoked, as timeouts may either
+ *       only be maintained until the next time that the backing async-thread
+ *       restarts polling, and/or only exist on the basis of keeping track of
+ *       the timeout that will expire the earliest.
  * NOTE: Exceptions thrown by this function are logged and silently discarded
  * @param: arg:    [1..1] A reference to `ob_pointer' passed when the object was registered.
- * @return: true:  Work is available, and the `work'-callback should be invoked.
+ * @return: true:  Work is available, and the `awc_work()'-callback should be invoked.
  * @return: false: No work available at the moment. */
-typedef bool (FCALL *async_poll_callback_t)(void *__restrict arg);
+typedef NONNULL((1, 2)) bool (ASYNC_CALLBACK_CC *async_poll_callback_t)(void *__restrict arg,
+                                                                        void *__restrict cookie);
 
 /* Perform async work with all available data, returning
  * once all work currently available has been completed.
  * NOTE: Exceptions thrown by this function are logged and silently discarded
  * @param: arg: [1..1] A reference to `ob_pointer' passed when the object was registered. */
-typedef void (FCALL *async_work_callback_t)(void *__restrict arg);
+typedef NONNULL((1)) void (ASYNC_CALLBACK_CC *async_work_callback_t)(void *__restrict arg);
+
+/* Called after a timeout set during `awc_poll()' has expired. */
+typedef NONNULL((1)) void (ASYNC_CALLBACK_CC *async_time_callback_t)(void *__restrict arg);
 
 struct async_work_callbacks {
 	async_test_callback_t awc_test; /* [0..1] Test-callback */
 	async_poll_callback_t awc_poll; /* [1..1] Poll-callback */
 	async_work_callback_t awc_work; /* [1..1] Work-callback */
+	async_time_callback_t awc_time; /* [0..1] Timeout-callback */
 };
+
+struct timespec;
+
+/* This function may be called by `awc_poll()'-callbacks to
+ * specify the realtime() timestamp when `awc_time()' should
+ * be invoked. The given `cookie' must be the same argument
+ * prviously passed to `awc_poll()' */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(struct timespec const *__restrict abs_timeout,
+                                                void *__restrict cookie);
 
 
 /* Register an async worker callback.
