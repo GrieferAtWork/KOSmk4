@@ -68,8 +68,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct aworker, aw_refcnt, kfree)
 	 ATOMIC_READ((self)->aw_obj) == (obj) &&     \
 	 (self)->aw_cb.awc_poll == (cb)->awc_poll && \
 	 (self)->aw_cb.awc_test == (cb)->awc_test && \
-	 (self)->aw_typ == (typ) &&                  \
-	 (self)->aw_cb.awc_time == (cb)->awc_time)
+	 (self)->aw_typ == (typ))
 
 LOCAL NOBLOCK bool
 NOTHROW(FCALL aworker_clearobj)(struct aworker *__restrict self) {
@@ -141,18 +140,6 @@ NOTHROW(FCALL aworker_callwork)(struct aworker *__restrict self,
 	} EXCEPT {
 		error_printf("aworker:poll@%p(%p:%#x)",
 		             self->aw_cb.awc_work, obj,
-		             (unsigned int)self->aw_typ);
-	}
-}
-
-LOCAL NONNULL((1, 2)) void
-NOTHROW(FCALL aworker_calltime)(struct aworker *__restrict self,
-                                void *__restrict obj) {
-	TRY {
-		(*self->aw_cb.awc_time)(obj);
-	} EXCEPT {
-		error_printf("aworker:time@%p(%p:%#x)",
-		             self->aw_cb.awc_time, obj,
 		             (unsigned int)self->aw_typ);
 	}
 }
@@ -249,19 +236,26 @@ PRIVATE struct timespec *asyncmain_timeout_p = NULL;
  * be invoked when `asyncmain_timeout_p' expires. */
 PRIVATE XATOMIC_REF(struct aworker) asyncmain_timeout_worker = XATOMIC_REF_INIT(NULL);
 
+/* [lock(PRIVATE(_asyncwork))][1..1]
+ * [valid_if(asyncmain_timeout_worker != NULL)]
+ * The timeout callback to-be invoked when the timeout expires. */
+PRIVATE async_worker_timeout_t asyncmain_timeout_cb = NULL;
+
 
 /* This function may be called by `awc_poll()'-callbacks to
  * specify the realtime() timestamp when `awc_time()' should
  * be invoked. The given `cookie' must be the same argument
  * prviously passed to `awc_poll()' */
-PUBLIC NOBLOCK NONNULL((1, 2)) void
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(struct timespec const *__restrict abs_timeout,
-                                                void *__restrict cookie) {
+                                                void *__restrict cookie,
+                                                async_worker_timeout_t on_timeout) {
 	struct aworker *w;
 	w = (struct aworker *)cookie;
 	assertf(THIS_TASK == &_asyncwork, "This function may only be called by async-worker-poll-callbacks");
+	assertf(abs_timeout && ADDR_ISKERN(abs_timeout), "Bad timeout argument");
+	assertf(on_timeout && ADDR_ISKERN((void *)on_timeout), "Bad on_timeout callback");
 	assertf(w && ADDR_ISKERN(w) && !wasdestroyed(w), "Bad cookie");
-	assertf(w->aw_cb.awc_time, "No time-callback");
 	if (!asyncmain_timeout_p) {
 		asyncmain_timeout_p = &asyncmain_timeout;
 	} else {
@@ -271,6 +265,7 @@ NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(struct timespec const *__restric
 	}
 	/* Set the used timeout. */
 	asyncmain_timeout = *abs_timeout;
+	asyncmain_timeout_cb = on_timeout;
 	/* Set the associated worker as the one that will receive the timeout. */
 	asyncmain_timeout_worker.set(w);
 }
@@ -391,14 +386,23 @@ again:
 				receiver = asyncmain_timeout_worker.exchange(NULL);
 				if likely(receiver) {
 					REF void *obj;
-					assert(receiver->aw_cb.awc_time);
 					obj = aworker_getref(receiver);
 					if likely(obj) {
-						aworker_calltime(receiver, obj);
+						TRY {
+							(*asyncmain_timeout_cb)(obj);
+						} EXCEPT {
+							error_printf("aworker:time@%p(%p:%#x)",
+							             asyncmain_timeout_cb, obj,
+							             (unsigned int)receiver->aw_typ);
+						}
 						aworker_decref_obj(receiver, obj);
 					}
 					decref_unlikely(receiver);
 				}
+			} else if (received_signal == &awork_changed) {
+				/* If workers have changed, clear any defined timeout. */
+				asyncmain_timeout_p = NULL;
+				asyncmain_timeout_worker.clear();
 			}
 		}
 	}
@@ -556,9 +560,17 @@ NOTHROW(KCALL unregister_async_worker)(struct async_worker_callbacks const *__re
 			bool result;
 			/* Try to clear the worker's pointed-to object. */
 			result = aworker_clearobj(w);
+
+			/* If this worker is currently set as the timeout
+			 * receiver, then remove it from that position. */
+			asyncmain_timeout_worker.cmpxch_inherit_new(w, NULL);
+
 			/* Always try to remove the worker. */
 			try_delete_async_worker(workers, i, GFP_ATOMIC);
 			decref_likely(workers);
+
+			/* Indicate that workers have changed. */
+			sig_broadcast(&awork_changed);
 			return result;
 		}
 	}

@@ -95,21 +95,22 @@ struct async_worker_callbacks {
 	 * @return: true:  Work is available, and the `awc_work()'-callback should be invoked.
 	 * @return: false: No work available at the moment. */
 	NONNULL((1)) bool (ASYNC_CALLBACK_CC *awc_test)(void *__restrict arg);
-
-	/* [0..1] Timeout-callback.
-	 * Called after a timeout set during `awc_poll()' has expired. */
-	NONNULL((1)) void (ASYNC_CALLBACK_CC *awc_time)(void *__restrict arg);
 };
 
 struct timespec;
+/* Called after a timeout set during `awc_poll()' has expired. */
+typedef NONNULL((1)) void (ASYNC_CALLBACK_CC *async_worker_timeout_t)(void *__restrict arg);
 
 /* This function may be called by `awc_poll()'-callbacks to
- * specify the realtime() timestamp when `awc_time()' should
+ * specify the realtime() timestamp when `on_timeout()' should
  * be invoked. The given `cookie' must be the same argument
- * prviously passed to `awc_poll()' */
-FUNDEF NOBLOCK NONNULL((1, 2)) void
+ * prviously passed to `awc_poll()'
+ * NOTE: After this function got called, `awc_poll()' should return
+ *       `false', as the timeout may not come into effect otherwise. */
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) void
 NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(struct timespec const *__restrict abs_timeout,
-                                                void *__restrict cookie);
+                                                void *__restrict cookie,
+                                                async_worker_timeout_t on_timeout);
 
 
 /* Register an async worker callback.
@@ -157,16 +158,16 @@ HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_FWD_STRUCT)
 #undef _ASYNC_WORKER_CXX_FWD_STRUCT
 extern "C++" {
 
-#define _ASYNC_WORKER_CXX_DECLARE(HT, T)                                                     \
-	LOCAL NONNULL((1, 2)) bool KCALL                                                         \
+#define _ASYNC_WORKER_CXX_DECLARE(HT, T)                                                       \
+	LOCAL NONNULL((1, 2)) bool KCALL                                                           \
 	register_async_worker(struct async_worker_callbacks const *__restrict cb,                  \
-	                      T *__restrict ob_pointer) THROWS(E_BADALLOC) {                     \
-		return register_async_worker(cb, (void *)ob_pointer, HT);                            \
-	}                                                                                        \
-	LOCAL NOBLOCK NONNULL((1, 2)) bool                                                       \
+	                      T *__restrict ob_pointer) THROWS(E_BADALLOC) {                       \
+		return register_async_worker(cb, (void *)ob_pointer, HT);                              \
+	}                                                                                          \
+	LOCAL NOBLOCK NONNULL((1, 2)) bool                                                         \
 	NOTHROW(KCALL unregister_async_worker)(struct async_worker_callbacks const *__restrict cb, \
-	                                       T *__restrict ob_pointer) {                       \
-		return unregister_async_worker(cb, (void *)ob_pointer, HT);                          \
+	                                       T *__restrict ob_pointer) {                         \
+		return unregister_async_worker(cb, (void *)ob_pointer, HT);                            \
 	}
 HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_DECLARE)
 #undef _ASYNC_WORKER_CXX_DECLARE
