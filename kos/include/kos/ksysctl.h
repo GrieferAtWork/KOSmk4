@@ -122,7 +122,7 @@ struct ksysctl_driver_insmod /*[PREFIX(im_)]*/ {
 		                                       * can be opened by `KSYSCTL_OPEN_KERNEL_VFS' */
 	};
 };
-#endif
+#endif /* __CC__ */
 
 
 /* Sysctl return values for `KSYSCTL_DRIVER_DELMOD' / `KSYSCTL_DRIVER_DELMOD_N' */
@@ -163,7 +163,7 @@ struct ksysctl_driver_delmod /*[PREFIX(dm_)]*/ {
 	};
 	__KSYSCTL_PAD_POINTER(__dm_pad1);      /* ... */
 };
-#endif
+#endif /* __CC__ */
 
 
 #define __OFFSET_KSYSCTL_DRIVER_GETMOD_STRUCT_SIZE 0
@@ -195,12 +195,8 @@ struct ksysctl_driver_getmod /*[PREFIX(gm_)]*/ {
 	};
 	__KSYSCTL_PAD_POINTER(__gm_pad2);      /* ... */
 };
-#endif
+#endif /* __CC__ */
 
-
-
-/* Restore the default driver library path */
-#define KSYSCTL_DRIVER_LIBRARY_PATH_DEFAULT (__CCAST(char const *)-1)
 
 #define __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_STRUCT_SIZE 0
 #define __OFFSET_KSYSCTL_DRIVER_GET_LIBRARY_PATH_BUF         8
@@ -220,6 +216,10 @@ struct ksysctl_driver_get_library_path /*[PREFIX(glp_)]*/ {
 	__KSYSCTL_PAD_POINTER(__glp_pad3);       /* ... */
 };
 #endif /* __CC__ */
+
+
+/* Restore the default driver library path */
+#define KSYSCTL_DRIVER_LIBRARY_PATH_DEFAULT (__CCAST(char const *)-1)
 
 #define __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_STRUCT_SIZE 0
 #define __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_NEWPATH     8
@@ -246,7 +246,7 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 	                                          * may be attempting to do the same) */
 	__KSYSCTL_PAD_POINTER(__slp_pad3);       /* ... */
 };
-#endif
+#endif /* __CC__ */
 #undef __KSYSCTL_PAD_POINTER
 
 
@@ -325,7 +325,7 @@ __LIBC __syscall_slong_t (__VLIBCCALL KSysctl)(__syscall_ulong_t __cmd, ... /*, 
 #ifndef NO_KSYSCTL_HELPER_FUNCTIONS
 #ifdef __CRT_HAVE_ksysctl
 
-__FORCELOCAL int
+__LOCAL int
 __NOTHROW_NCX(__LIBCCALL ksysctl_insmod)(char const *__driver_name,
                                          char const *__driver_cmdline __DFL(__NULLPTR)) {
 	struct ksysctl_driver_insmod __args;
@@ -338,7 +338,7 @@ __NOTHROW_NCX(__LIBCCALL ksysctl_insmod)(char const *__driver_name,
 	return (int)ksysctl(KSYSCTL_DRIVER_INSMOD, &__args);
 }
 
-__FORCELOCAL int
+__LOCAL int
 __NOTHROW_NCX(__LIBCCALL ksysctl_insmodf)(__fd_t __driver_file,
                                           char const *__driver_cmdline __DFL(__NULLPTR)) {
 	struct ksysctl_driver_insmod __args;
@@ -353,7 +353,7 @@ __NOTHROW_NCX(__LIBCCALL ksysctl_insmodf)(__fd_t __driver_file,
 	return (int)ksysctl(KSYSCTL_DRIVER_INSMOD, &__args);
 }
 
-__FORCELOCAL int
+__LOCAL int
 __NOTHROW_NCX(__LIBCCALL ksysctl_insmodb)(void const *__driver_blob, __size_t __driver_size,
                                           char const *__driver_cmdline __DFL(__NULLPTR)) {
 	struct ksysctl_driver_insmod __args;
@@ -367,7 +367,7 @@ __NOTHROW_NCX(__LIBCCALL ksysctl_insmodb)(void const *__driver_blob, __size_t __
 	return (int)ksysctl(KSYSCTL_DRIVER_INSMOD, &__args);
 }
 
-__FORCELOCAL int
+__LOCAL int
 __NOTHROW_NCX(__LIBCCALL ksysctl_delmod)(char const *__driver_name) {
 	struct ksysctl_driver_delmod __args;
 	__libc_memset(&__args, 0, sizeof(__args));
@@ -379,7 +379,7 @@ __NOTHROW_NCX(__LIBCCALL ksysctl_delmod)(char const *__driver_name) {
 }
 
 /* @return: * : Required buffer size. */
-__FORCELOCAL __ssize_t
+__LOCAL __ssize_t
 __NOTHROW_NCX(__LIBCCALL ksysctl_get_driver_library_path)(char *__buf, __size_t __bufsize) {
 	struct ksysctl_driver_get_library_path __args;
 	__libc_memset(&__args, 0, sizeof(__args));
@@ -394,7 +394,7 @@ __NOTHROW_NCX(__LIBCCALL ksysctl_get_driver_library_path)(char *__buf, __size_t 
 /* @param: PATH: The set path to assign, or `KSYSCTL_DRIVER_LIBRARY_PATH_DEFAULT'
  *               if the default path should be restored (as set during booting
  *               when no `driver-libpath=...' option was passed) */
-__FORCELOCAL int
+__LOCAL int
 __NOTHROW_NCX(__LIBCCALL ksysctl_set_driver_library_path)(char const *__path) {
 	struct ksysctl_driver_set_library_path __args;
 	__libc_memset(&__args, 0, sizeof(__args));
@@ -408,8 +408,9 @@ __NOTHROW_NCX(__LIBCCALL ksysctl_set_driver_library_path)(char const *__path) {
 
 #ifdef __CRT_HAVE_KSysctl
 
-__FORCELOCAL void __LIBCCALL KSysctlInsmod(char const *__driver_name,
-                                           char const *__driver_cmdline __DFL(__NULLPTR)) {
+__LOCAL void __LIBCCALL
+KSysctlInsmod(char const *__driver_name,
+              char const *__driver_cmdline __DFL(__NULLPTR)) {
 	struct ksysctl_driver_insmod __args;
 	__libc_memset(&__args, 0, sizeof(__args));
 	__args.im_struct_size = sizeof(__args);
@@ -420,8 +421,9 @@ __FORCELOCAL void __LIBCCALL KSysctlInsmod(char const *__driver_name,
 	KSysctl(KSYSCTL_DRIVER_INSMOD, &__args);
 }
 
-__FORCELOCAL void __LIBCCALL KSysctlInsmodf(__fd_t __driver_file,
-                                            char const *__driver_cmdline __DFL(__NULLPTR)) {
+__LOCAL void __LIBCCALL
+KSysctlInsmodf(__fd_t __driver_file,
+               char const *__driver_cmdline __DFL(__NULLPTR)) {
 	struct ksysctl_driver_insmod __args;
 	__libc_memset(&__args, 0, sizeof(__args));
 	__args.im_struct_size   = sizeof(__args);
@@ -434,8 +436,9 @@ __FORCELOCAL void __LIBCCALL KSysctlInsmodf(__fd_t __driver_file,
 	KSysctl(KSYSCTL_DRIVER_INSMOD, &__args);
 }
 
-__FORCELOCAL void __LIBCCALL KSysctlInsmodb(void const *__driver_blob, __size_t __driver_size,
-                                            char const *__driver_cmdline __DFL(__NULLPTR)) {
+__LOCAL void __LIBCCALL
+KSysctlInsmodb(void const *__driver_blob, __size_t __driver_size,
+               char const *__driver_cmdline __DFL(__NULLPTR)) {
 	struct ksysctl_driver_insmod __args;
 	__libc_memset(&__args, 0, sizeof(__args));
 	__args.im_struct_size = sizeof(__args);
@@ -447,7 +450,7 @@ __FORCELOCAL void __LIBCCALL KSysctlInsmodb(void const *__driver_blob, __size_t 
 	KSysctl(KSYSCTL_DRIVER_INSMOD, &__args);
 }
 
-__FORCELOCAL void __LIBCCALL KSysctlDelmod(char const *__driver_name) {
+__LOCAL void __LIBCCALL KSysctlDelmod(char const *__driver_name) {
 	struct ksysctl_driver_delmod __args;
 	__libc_memset(&__args, 0, sizeof(__args));
 	__args.dm_struct_size = sizeof(__args);
@@ -458,7 +461,8 @@ __FORCELOCAL void __LIBCCALL KSysctlDelmod(char const *__driver_name) {
 }
 
 /* @return: * : Required buffer size. */
-__FORCELOCAL __size_t __LIBCCALL KSysctlGetDriverLibraryPath(char *__buf, __size_t __bufsize) {
+__LOCAL __size_t __LIBCCALL
+KSysctlGetDriverLibraryPath(char *__buf, __size_t __bufsize) {
 	struct ksysctl_driver_get_library_path __args;
 	__libc_memset(&__args, 0, sizeof(__args));
 	__args.glp_struct_size = sizeof(__args);
@@ -471,7 +475,8 @@ __FORCELOCAL __size_t __LIBCCALL KSysctlGetDriverLibraryPath(char *__buf, __size
 /* @param: PATH: The set path to assign, or `KSYSCTL_DRIVER_LIBRARY_PATH_DEFAULT'
  *               if the default path should be restored (as set during booting
  *               when no `driver-libpath=...' option was passed) */
-__FORCELOCAL void __LIBCCALL KSysctlSetDriverLibraryPath(char const *__path) {
+__LOCAL void __LIBCCALL
+KSysctlSetDriverLibraryPath(char const *__path) {
 	struct ksysctl_driver_set_library_path __args;
 	__libc_memset(&__args, 0, sizeof(__args));
 	__args.slp_struct_size = sizeof(__args);

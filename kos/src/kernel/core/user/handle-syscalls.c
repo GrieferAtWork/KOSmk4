@@ -1210,7 +1210,9 @@ PRIVATE syscall_slong_t
 	(u64)(uintptr_t)(p) /* TODO: Option to mangle kernel-space pointers! */
 
 	case HOP_HANDLE_STAT: {
+		USER CHECKED struct hop_handle_stat *info;
 		struct hop_handle_stat st;
+		size_t info_size;
 		char const *name;
 		memset(&st, 0, sizeof(st));
 		st.hs_struct_size = sizeof(st);
@@ -1224,16 +1226,12 @@ PRIVATE syscall_slong_t
 		       strnlen(name, COMPILER_LENOF(st.hs_typename) - 1),
 		       sizeof(char));
 		COMPILER_BARRIER();
-		{
-			struct hop_handle_stat *info;
-			size_t info_size;
-			info = (struct hop_handle_stat *)arg;
-			validate_writable(info, sizeof(struct hop_handle_stat));
-			info_size = ATOMIC_READ(info->hs_struct_size);
-			if (info_size != sizeof(struct hop_handle_stat))
-				THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_handle_stat), info_size);
-			memcpy(info, &st, sizeof(struct hop_handle_stat));
-		}
+		info = (USER CHECKED struct hop_handle_stat *)arg;
+		validate_writable(info, sizeof(*info));
+		info_size = ATOMIC_READ(info->hs_struct_size);
+		if (info_size != sizeof(*info))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(*info), info_size);
+		memcpy(info, &st, sizeof(*info));
 	}	break;
 
 	case HOP_HANDLE_REOPEN:
@@ -1243,29 +1241,29 @@ PRIVATE syscall_slong_t
 	case HOP_HANDLE_NOOP:
 		break;
 
-	case HOP_HANDLE_GETREFCNT:
+	case HOP_HANDLE_GET_REFCNT:
 		validate_writable(arg, sizeof(uintptr_t));
 		*(uintptr_t *)arg = handle_refcnt(*hand);
 		break;
 
-	case HOP_HANDLE_GETADDRESS:
+	case HOP_HANDLE_GET_ADDRESS:
 		validate_writable(arg, sizeof(u64));
-		*(USER u64 *)arg = MANGLE_HANDLE_DATA_POINTER(hand->h_data);
+		*(USER CHECKED u64 *)arg = MANGLE_HANDLE_DATA_POINTER(hand->h_data);
 		break;
 
-	case HOP_HANDLE_GETTYPE:
+	case HOP_HANDLE_GET_TYPE:
 		validate_writable(arg, sizeof(uint16_t));
-		*(USER uint16_t *)arg = (uint16_t)hand->h_type;
+		*(USER CHECKED uint16_t *)arg = (uint16_t)hand->h_type;
 		break;
 
-	case HOP_HANDLE_GETKIND:
+	case HOP_HANDLE_GET_KIND:
 		validate_writable(arg, sizeof(uint16_t));
-		*(USER uint16_t *)arg = (uint16_t)handle_typekind(hand);
+		*(USER CHECKED uint16_t *)arg = (uint16_t)handle_typekind(hand);
 		break;
 
-	case HOP_HANDLE_GETMODE:
+	case HOP_HANDLE_GET_MODE:
 		validate_writable(arg, sizeof(uint16_t));
-		*(USER uint16_t *)arg = (uint16_t)hand->h_mode;
+		*(USER CHECKED uint16_t *)arg = (uint16_t)hand->h_mode;
 		break;
 
 	case HOP_HANDLE_DUP: {
@@ -1313,6 +1311,7 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
                                            uintptr_t hop_command) {
 	error_code_t code = error_code();
 	switch (code) {
+
 	case ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE):
 		if (!PERTASK_GET(this_exception_pointers[0])) /* fd */
 			PERTASK_SET(this_exception_pointers[0], (uintptr_t)fd);
@@ -1321,13 +1320,16 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 		if (!PERTASK_GET(this_exception_pointers[4])) /* actual_handle_kind */
 			PERTASK_SET(this_exception_pointers[4], (uintptr_t)handle_typekind(hand));
 		break;
+
 	case ERROR_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND):
 		if (PERTASK_GET(this_exception_pointers[0]) != E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND)
 			break;
 		if ((hop_command >> 16) == HANDLE_TYPE_UNDEFINED ||
 		    (hop_command >> 16) >= HANDLE_TYPE_COUNT)
 			break;
-		/* If the command does actually exist, but simply cannot be applied to the
+		if (hand->h_type == (hop_command >> 16))
+			break;
+		/* If the command (may) actually exist, but simply cannot be applied to the
 		 * associated handle type, translate the exception to `E_INVALID_HANDLE_FILETYPE',
 		 * with the required file type set there. */
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE));
@@ -1354,6 +1356,11 @@ DEFINE_SYSCALL3(syscall_slong_t, hop,
 		if ((cmd & 0xffff0000) == (HOP_HANDLE_STAT & 0xffff0000)) {
 			result = hop_do_generic_operation(&hand, cmd, (unsigned int)fd, arg);
 		} else {
+			/* TODO: Do implicit handle casting based on
+			 *       the expected type encoded in `cmd >> 16'.
+			 *       e.g.: A DATABLOCK command on a FILE object
+			 *             should be allowed, but would require
+			 *             an implicit cast */
 			result = (*handle_type_db.h_hop[hand.h_type])(hand.h_data,
 			                                              cmd,
 			                                              arg,

@@ -486,8 +486,8 @@ INTERN syscall_slong_t
 		st.bs_sector_count = (u64)self->bd_sector_count;
 		st.bs_sector_size  = (u64)self->bd_sector_size;
 		st.bs_device_flag  = self->bd_flags;
-		st.bs_devno        = (u32)block_device_devno(self);
 		st.bs_partcount    = 0;
+		st.bs_devno        = (u64)block_device_devno(self);
 		if (!block_device_ispartition(self)) {
 			struct block_device *me;
 			struct block_device_partition *iter;
@@ -501,14 +501,14 @@ INTERN syscall_slong_t
 		       MIN(sizeof(st.bs_name), sizeof(self->bd_name)));
 		COMPILER_BARRIER();
 		{
-			struct hop_blockdevice_stat *info;
+			USER CHECKED struct hop_blockdevice_stat *data;
 			size_t info_size;
-			info = (struct hop_blockdevice_stat *)arg;
-			validate_writable(info, sizeof(struct hop_blockdevice_stat));
-			info_size = ATOMIC_READ(info->bs_struct_size);
-			if (info_size != sizeof(struct hop_blockdevice_stat))
-				THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_blockdevice_stat), info_size);
-			memcpy(info, &st, sizeof(struct hop_blockdevice_stat));
+			data = (USER CHECKED struct hop_blockdevice_stat *)arg;
+			validate_writable(data, sizeof(*data));
+			info_size = ATOMIC_READ(data->bs_struct_size);
+			if (info_size != sizeof(*data))
+				THROW(E_BUFFER_TOO_SMALL, sizeof(*data), info_size);
+			memcpy(data, &st, sizeof(*data));
 		}
 	}	break;
 
@@ -543,13 +543,15 @@ INTERN syscall_slong_t
 		struct block_device_partition *part;
 		size_t struct_size;
 		unsigned int result;
-		validate_writable(arg, sizeof(struct hop_blockdevice_openpart));
+		USER CHECKED struct hop_blockdevice_openpart *data;
+		data = (USER CHECKED struct hop_blockdevice_openpart *)arg;
+		validate_writable(data, sizeof(*data));
 		if (block_device_ispartition(self))
 			self = ((struct block_device_partition *)self)->bp_master;
-		struct_size = ATOMIC_READ(((struct hop_blockdevice_openpart *)arg)->bop_struct_size);
-		if (struct_size != sizeof(struct hop_blockdevice_openpart))
-			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_blockdevice_openpart), struct_size);
-		index = ((struct hop_blockdevice_openpart *)arg)->bop_partno;
+		struct_size = ATOMIC_READ(data->bop_struct_size);
+		if (struct_size != sizeof(*data))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
+		index = data->bop_partno;
 		COMPILER_BARRIER();
 		sync_read(&((struct block_device *)self)->bd_parts_lock);
 		part = ((struct block_device *)self)->bd_parts;
@@ -565,7 +567,7 @@ INTERN syscall_slong_t
 		result_handle.h_mode = mode;
 		result_handle.h_data = part;
 		TRY {
-			result = handle_installhop(&((struct hop_blockdevice_openpart *)arg)->bop_openfd, result_handle);
+			result = handle_installhop(&data->bop_openfd, result_handle);
 		} EXCEPT {
 			decref(part);
 			RETHROW();

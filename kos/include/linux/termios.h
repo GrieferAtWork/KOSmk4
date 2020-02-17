@@ -39,7 +39,11 @@ struct termiox {
 #endif /* __CC__ */
 
 /* XXX: Where are these flags used?
- *      Are they used in by one of the fields of the struct above? */
+ *      Are they used in by one of the fields of the struct above?
+ * Here are some docs for it?
+ *  - https://docs.oracle.com/cd/E86824_01/html/E54777/termiox-7i.html
+ *  - https://docstore.mik.ua/manuals/hp-ux/en/B2355-60130/termiox.7.html
+ */
 #define RTSXOFF 0x0001 /* RTS flow control on input */
 #define CTSXON  0x0002 /* CTS flow control on output */
 #define DTRXOFF 0x0004 /* DTR flow control on input */

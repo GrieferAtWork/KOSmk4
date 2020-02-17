@@ -140,7 +140,9 @@ int main(int argc, char *argv[]) {
 	Hop(drivers, HOP_DRIVER_STATE_GET_COUNT, &count);
 	for (i = 0; i < count; ++i) {
 		fd_t depfd;
-		depfd = OpenDriverDependency(drivers, HOP_DRIVER_STATE_GET_DRIVER, i);
+		depfd = OpenDriverDependency(drivers,
+		                             HOP_DRIVER_STATE_GET_DRIVER,
+		                             i);
 		PrinterDriverInformation(depfd);
 		close(depfd);
 	}

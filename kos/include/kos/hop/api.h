@@ -45,13 +45,6 @@
 #endif /* __SIZEOF_POINTER__ >= 8 */
 #endif /* !__HOP_PAD_POINTER */
 
-/* HANDLE_TYPE_FUTEXFD */
-/* TODO: HOP_FUTEXFD_STAT             (returns a `HANDLE_TYPE_FUTEX' object) */
-/* TODO: HOP_FUTEXFD_OPEN_FUTEX       (returns a `HANDLE_TYPE_FUTEX' object) */
-/* TODO: HOP_FUTEXFD_OPEN_DATABLOCK   (returns a `HANDLE_TYPE_DATABLOCK' object) */
-
-/* TODO: HANDLE_TYPE_VM: */
-
 #ifdef __CC__
 __SYSDECL_BEGIN
 

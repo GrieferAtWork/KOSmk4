@@ -51,8 +51,7 @@ struct hop_handle_stat /*[PREFIX(hs_)]*/ {
 	__uint16_t            hs_type;         /* The handle type (one of `HANDLE_TYPE_*'). */
 	__uint16_t            hs_kind;         /* The handle kind (one of `HANDLE_TYPEKIND_*'). */
 	__uint32_t          __hs_pad2;         /* ... */
-	__uintptr_t           hs_refcnt;       /* Reference counter of this handle. */
-	__HOP_PAD_POINTER  (__hs_pad3)         /* ... */
+	__uint64_t            hs_refcnt;       /* Reference counter of this handle. */
 	__uint64_t            hs_address;      /* Kernel-space pointer to the address where data of this handle is stored.
 	                                        * Note: Do not rely on this actually being the proper address when interfacing
 	                                        *       with custom drivers (as a matter of fact: custom drivers should never
@@ -60,7 +59,8 @@ struct hop_handle_stat /*[PREFIX(hs_)]*/ {
 	                                        *       always instead make use of handles to kernel-space objects).
 	                                        *       Anyways: the kernel is allowed to mangle the actual address however
 	                                        *                it pleases, so-long as the value stored here ends up being
-	                                        *                unique. */
+	                                        *                system-wide persistent-unique for as long as references
+	                                        *                exist for the handle. */
 	char                  hs_typename[32]; /* The name of the handle's type. */
 };
 #endif /* __CC__ */
@@ -70,11 +70,11 @@ struct hop_handle_stat /*[PREFIX(hs_)]*/ {
 #define HOP_HANDLE_NOOP                0xffff0002 /* Do nothing other than verifying that `fd' is a valid handle. */
 #define HOP_HANDLE_REOPEN              0xffff0003 /* [struct hop_openfd *result] Re-open the given handle
                                                    * NOTE: The value returned by `hop()' is identical to the value written to `result->of_hint'. */
-#define HOP_HANDLE_GETREFCNT           0xffff0004 /* [uintptr_t *result] Return the reference counter for the given handle. */
-#define HOP_HANDLE_GETADDRESS          0xffff0005 /* [uint64_t *result] Return the kernel-space address of the handle (s.a. `struct hop_handle_stat::hs_address'). */
-#define HOP_HANDLE_GETTYPE             0xffff0006 /* [uint16_t *result] Return the handle's type. */
-#define HOP_HANDLE_GETKIND             0xffff0007 /* [uint16_t *result] Return the handle's kind. */
-#define HOP_HANDLE_GETMODE             0xffff0008 /* [uint16_t *result] Return the handle's I/O mode (s.a. `iomode_t'). */
+#define HOP_HANDLE_GET_REFCNT          0xffff0004 /* [uintptr_t *result] Return the reference counter for the given handle. */
+#define HOP_HANDLE_GET_ADDRESS         0xffff0005 /* [uint64_t *result] Return the kernel-space address of the handle (s.a. `struct hop_handle_stat::hs_address'). */
+#define HOP_HANDLE_GET_TYPE            0xffff0006 /* [uint16_t *result] Return the handle's type. */
+#define HOP_HANDLE_GET_KIND            0xffff0007 /* [uint16_t *result] Return the handle's kind. */
+#define HOP_HANDLE_GET_MODE            0xffff0008 /* [uint16_t *result] Return the handle's I/O mode (s.a. `iomode_t'). */
 #define HOP_HANDLE_DUP                 0xffff0009 /* Quick alias for `dup(fd)' (`hop()' returns the new file handle) */
 #define HOP_HANDLE_DUP_CLOEXEC         0xffff000a /* Quick alias for `dup(fd)' + set the CLOEXEC flag (`hop()' returns the new file handle) */
 #define HOP_HANDLE_DUP_CLOFORK         0xffff000b /* Quick alias for `dup(fd)' + set the CLOFORK flag (`hop()' returns the new file handle) */

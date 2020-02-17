@@ -32,9 +32,6 @@
 
 __DECL_BEGIN
 
-
-
-
 /* For `HANDLE_TYPE_PATH' */
 #define HOP_PATH_RECENT     0x00060001 /* Cache the given path as having been used recently. */
 #define HOP_PATH_OPENPARENT 0x00060002 /* [struct hop_openfd *result] Open the parent node of a given path.

@@ -39,7 +39,7 @@ __DECL_BEGIN
 #define HOP_FUTEX_OPEN_DATABLOCK         0x00160002 /* [struct hop_openfd *arg] Open the datablock associated with the datapart associated with a given futex.
                                                      * @return: * : The value written to `result->of_hint'
                                                      * @return: -EOWNERDEAD: The datapart associated with the futex was destroyed. */
-#define HOP_FUTEX_ISWAITING              0x00160003 /* @return: 1: There are threads are currently waiting on the futex
+#define HOP_FUTEX_ISWAITING              0x00160003 /* @return: 1: There are threads currently waiting on the futex
                                                      * @return: 0: No threads are waiting for this futex */
 #define HOP_FUTEX_BROADCAST              0x00160004 /* Broadcast a wakeup-signal to all threads waiting for this futex.
                                                      * @return: *: The number of threads to which the signal was sent. */

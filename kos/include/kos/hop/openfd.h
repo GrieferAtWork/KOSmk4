@@ -32,7 +32,7 @@
 #define HOP_OPENFD_MODE_HINT       0x0001 /* Install the newly opened handle into the lowest unused handle that is `>= of_hint' */
 #define HOP_OPENFD_MODE_INTO       0x0002 /* Install the newly opened handle into `of_hint', automatically
                                            * closing any handle that may have been stored inside before.
-                                           * Additionally, `of_hint' may be any writable symbolic handle */
+                                           * Additionally, `of_hint' may be any writable symbolic handle (e.g. `AT_FDCWD') */
 #define HOP_OPENFD_MODE_INTO_EXACT 0x0003 /* Same as `HOP_OPENFD_MODE_INTO', but don't recognize symbolic
                                            * handles, and throw an `E_INVALID_HANDLE_FILE' error instead. */
 #define __OFFSET_HOP_OPENFD_MODE  0

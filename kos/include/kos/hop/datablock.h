@@ -187,7 +187,7 @@ struct hop_datablock_open_futex /*[PREFIX(dof_)]*/ {
 	                                      * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
 	                                      * this value is too small or doesn't match any recognized
 	                                      * structure version. */
-	__uint32_t        __dof_pad1;        /* ... */
+	__uint32_t        __dof_pad;         /* ... */
 	__uint64_t          dof_address;     /* [IN] Address of the futex */
 	struct hop_openfd   dof_openfd;      /* File descriptor open controller (filled with a handle for the futex). */
 };

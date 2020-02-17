@@ -43,9 +43,9 @@ __DECL_BEGIN
 #define __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_COUNT 16
 #define __OFFSET_HOP_BLOCKDEVICE_STAT_SECTOR_SIZE  24
 #define __OFFSET_HOP_BLOCKDEVICE_STAT_DEVICE_FLAG  32
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO        36
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_PARTCOUNT    40
-#define __OFFSET_HOP_BLOCKDEVICE_STAT_NAME         44
+#define __OFFSET_HOP_BLOCKDEVICE_STAT_PARTCOUNT    36
+#define __OFFSET_HOP_BLOCKDEVICE_STAT_DEVNO        40
+#define __OFFSET_HOP_BLOCKDEVICE_STAT_NAME         48
 #define __SIZEOF_HOP_BLOCKDEVICE_STAT              128
 #ifdef __CC__
 struct hop_blockdevice_stat /*[PREFIX(bs_)]*/ {
@@ -59,9 +59,9 @@ struct hop_blockdevice_stat /*[PREFIX(bs_)]*/ {
 	__uint64_t   bs_sector_size;   /* Size of a single sector (in bytes). */
 	__uint32_t   bs_device_flag;   /* Active device flags (Set of `BD_F*').
 	                                * NOTE: If this device is a partition, the `BLOCK_DEVICE_FLAG_PARTITION' bit is set */
-	__uint32_t   bs_devno;         /* Device number (`dev_t') */
 	__uint32_t   bs_partcount;     /* Number of child partitions of thsi block device. */
-	char         bs_name[84];      /* Name of the device (as used for the auto-node that may appear in `/dev') */
+	__uint64_t   bs_devno;         /* Device number (`dev_t') */
+	char         bs_name[80];      /* Name of the device (as used for the auto-node that may appear in `/dev') */
 };
 #endif /* __CC__ */
 
@@ -75,7 +75,7 @@ struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
 	                                    * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
 	                                    * this value is too small or doesn't match any recognized
 	                                    * structure version. */
-	__uint32_t        bop_partno;      /* Total number of bytes available. */
+	__uint32_t        bop_partno;      /* Partition index. */
 	struct hop_openfd bop_openfd;      /* File descriptor open controller. */
 };
 #endif /* __CC__ */
