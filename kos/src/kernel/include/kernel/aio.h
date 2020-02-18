@@ -533,11 +533,11 @@ aio_buffer_copytomem(struct aio_buffer const *__restrict self,
  * [device_async_aio_type]               +---> [aio_fini(aio)]                               |     |
  * >> struct aio_handle_type = {         |     >> device = aio->ah_data[0];                  |     |
  * >>     .ht_fini     = &aio_fini,     -+     >> decref(device);           <----------------+     |
- * >>     .ht_cancel   = &aio_cancel,   ---+                                                       |
- * >>     .ht_progress = &aio_progress  -+ |                                                       |
- * >> };                                 | +-> [aio_cancel(aio)]                                   |
- *                                       |     >> [COMMAND_DESCRIPTOR] *cmd;   <-------------------+
- * +-------------------------------------+     >> device = aio->ah_data[0];                        |
+ * >>     .ht_cancel   = &aio_cancel,   ---+                                                 |     |
+ * >>     .ht_progress = &aio_progress  -+ |                                                 |     |
+ * >> };                                 | +-> [aio_cancel(aio)]                             |     |
+ *                                       |     >> device = aio->ah_data[0];   <--------------+     |
+ * +-------------------------------------+     >> [COMMAND_DESCRIPTOR] *cmd;   <-------------------+
  * |                                           >> cmd = ATOMIC_XCH(aio->ah_data[1], NULL);   <-----+
  * v                                           >> if (cmd) {
  * [aio_progress(aio)]                         >>     // Cancelled before started
