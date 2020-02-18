@@ -741,10 +741,12 @@ tx_switch_to_idle:
 			/* Change NIC states to mirror what would have happened on success.
 			 * Doing this simplifies what has to be done within aio_cancel() */
 			Ne2k_SwitchToTxPkSendMode(me);
+			PREEMPTION_DISABLE();
 			aio = ATOMIC_XCH(me->nk_current, NULL);
 			/* Indicate error-completion. */
 			if likely(aio)
 				aio_handle_complete(aio, AIO_COMPLETION_FAILURE);
+			PREEMPTION_ENABLE();
 			/* Switch to IDLE mode. */
 			while unlikely(!Ne2k_SwitchToIdleMode(me, state.ns_word)) {
 				/* This should really only happen due to REQUIO */
@@ -756,12 +758,11 @@ tx_switch_to_idle:
 		decref_likely(packet);
 		decref_unlikely(packet_vm);
 
-#ifndef __OPTIMIZE_SIZE__
 		/* Check once again if the operation was canceled.
-		 * This part is entirely optional, since the interrupt handle _has_
-		 * to check for cancel as part of its ATOMIC_XCH(nk_current, NULL),
-		 * however by checking here as well, we can keep the NIC from sending
-		 * the packet if the user cancels the operation prior to this point! */
+		 * This must be done in case there was a cancel during the upload
+		 * process, in which case we wouldn't want to send a packet after
+		 * it has been canceled at a point in time when that cancel was
+		 * still possible. */
 		if (ATOMIC_READ(me->nk_current) == NULL) {
 			while unlikely(!Ne2k_SwitchToIdleMode(me, state.ns_word)) {
 				/* This should really only happen due to REQUIO */
@@ -770,7 +771,6 @@ tx_switch_to_idle:
 			}
 			goto again;
 		}
-#endif /* !__OPTIMIZE_SIZE__ */
 
 		NE2K_DEBUG("[ne2k:async] Transmit packet (size=%Iu) and switch to TX_PKSEND\n", aligned_size);
 		/* Set-up transmission information. */
@@ -924,6 +924,31 @@ again_poll_transit:
 	 * handled, move on to handling it for the case where uploading or
 	 * sending is currently in progress. */
 	if (ATOMIC_CMPXCH(me->nk_current, self, NULL)) {
+		/* XXX: If the async-worker is currently in the process of uploading packet data
+		 *      to the NIC, then we have to get it to stop doing so. Technically, we can
+		 *      just let it do whatever in this scenario, since kernel-space packet header
+		 *      memory is reference counted, meaning that the async-worker won't access
+		 *      arbitrary kernel-space memory. However, it may access user-space memory
+		 *      at a point in time when doing so may cause a SEGFAULT (i.e. if the async-
+		 *      worker is currently uploading, and we return to user-space, at which point
+		 *      user-space munmap()s the memory from which the async-worker is reading)
+		 *      The same also applies to the case of kernel-space memory appearing within
+		 *      the payload, in which case we may upload arbitrary data to the NIC, or
+		 *      SEGFAULT prior to upload completion. However since we check for cancel
+		 *      once again before starting the SEND-process, such arbitrary data would
+		 *      never actually leave the NIC's internal buffer...
+		 * Now this may seem like a problem, but it really isn't because if this were to
+		 * happen, then yes: the async-worker would experience a SEGFAULT, and would stop
+		 * uploading data. However, the exception will be propagated, and immediately
+		 * handled inside of `Ne2k_AsyncWork()', where it will be discarded since `nk_current'
+		 * would already be NULL at that point.
+		 * In other words: In the specific case of NIC-device-related AIO, this is a problem
+		 *                 that solves itself, meaning that this would _only_ be an optimization,
+		 *                 rather than a bug-fix!
+		 * The only kind-of questionable corner-case is VIO, where this situation could result
+		 * in arbitrary VIO memory reads being performed, so I'd call that a maybe-look-
+		 * into-fixing-this-at-some-point? */
+
 		/* The simple case: If we've managed to clear the current-field with our AIO handle,
 		 *                  then that means that our AIO operation is (or was) being performed
 		 *                  at this (or that) very moment.
