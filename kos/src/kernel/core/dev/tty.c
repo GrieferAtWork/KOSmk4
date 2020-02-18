@@ -149,7 +149,7 @@ ttyfwd_work(void *__restrict arg) {
 		size_t count;
 		TRY {
 			count = (*tty->t_ihandle_read)(tty->t_ihandle_ptr, buf, sizeof(buf),
-			                               IO_RDONLY | IO_NODATAZERO);
+			                               IO_RDONLY | IO_NONBLOCK | IO_NODATAZERO);
 		} EXCEPT {
 			if (was_thrown(E_WOULDBLOCK))
 				goto done;
