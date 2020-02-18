@@ -638,6 +638,19 @@ NOTHROW(KCALL uhci_aio_cancel)(struct aio_handle *__restrict self) {
 	struct uhci_controller *ctrl;
 	data = (struct uhci_aio_data *)self->ah_data;
 again:
+	/* FIXME: Race condition:
+	 *  Thread #1: Set `UHCI_AIO_FSERVED'
+	 *             yielded before the handle's function is called.
+	 *  Thread #2: Calls `aio_handle_cancel()'
+	 *             Sees that `UHCI_AIO_FSERVED' has already been set
+	 *             `aio_handle_cancel()' return
+	 *             Calls `aio_handle_fini()'
+	 *             free()s the handle
+	 *  Thread #1: Continues working with a free()ed handle.
+	 *  Solution: Don't use a `UHCI_AIO_FSERVED' flag.
+	 *            For a proper implementation of AIO, see `Ne2k_TxAioCancel()'
+	 * FIXME: This function doesn't call `AIO_COMPLETION_CANCEL'
+	 */
 	if (ATOMIC_READ(data->ud_flags) & UHCI_AIO_FSERVED)
 		return; /* Already completed. */
 	ctrl = data->ud_ctrl;
@@ -761,7 +774,7 @@ NOTHROW(FCALL uhci_osqh_aio_docomplete)(struct aio_handle *__restrict aio,
 	data = (struct uhci_aio_data *)aio->ah_data;
 	if (!(ATOMIC_FETCHOR(data->ud_flags, UHCI_AIO_FSERVED) & UHCI_AIO_FSERVED)) {
 		uhci_aio_handle_finidma(data);
-		(*aio->ah_func)(aio, status);
+		aio_handle_complete(aio, status);
 	}
 }
 
@@ -2194,7 +2207,7 @@ cleanup_configured_and_do_syncio:
 		aio->ah_data[0] = (void *)transfer_size;
 		aio_handle_init(aio, &uhci_aio_sync_type);
 	}
-	aio_handle_success(aio);
+	aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);
 }
 
 

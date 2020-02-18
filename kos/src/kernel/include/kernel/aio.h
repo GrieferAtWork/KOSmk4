@@ -21,12 +21,17 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_AIO_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
+
 #include <kernel/except.h>
+#include <kernel/types.h>
 #include <sched/signal.h>
-#include <libc/string.h>
+#include <sched/task.h>
+
 #include <hybrid/__assert.h>
+#include <hybrid/__atomic.h>
 #include <hybrid/typecore.h>
+
+#include <libc/string.h>
 
 #ifndef CONFIG_NO_SMP
 #include <hybrid/sync/atomic-rwlock.h>
@@ -44,19 +49,22 @@ struct aio_buffer_entry {
 	USER CHECKED VIRT void  *ab_base; /* Virtual base address of the target buffer. */
 	USER CHECKED VIRT size_t ab_size; /* Number of bytes that should be written at `ab_base' */
 };
+
 struct aio_buffer {
 	size_t                         ab_entc; /* [!0] Number of entries. */
 	struct aio_buffer_entry const *ab_entv; /* [1..ab_entc] Vector of entries. */
 	struct aio_buffer_entry        ab_head; /* Override for `ab_entv[0]' */
 	size_t                         ab_last; /* Override for `ab_entv[ab_entc - 1].ab_size' */
 };
+
 struct aio_pbuffer_entry {
 	USER CHECKED VIRT vm_phys_t ab_base; /* Physical base address of the target buffer. */
-	USER CHECKED VIRT size_t    ab_size; /* Number of bytes that should be written at `ab_base' */
 #if __SIZEOF_VM_PHYS_T__ > __SIZEOF_SIZE_T__
-	byte_t ab_pad[__SIZEOF_VM_PHYS_T__ - __SIZEOF_SIZE_T__]; /* ... */
-#endif
+	byte_t                      ab_pad[__SIZEOF_VM_PHYS_T__ - __SIZEOF_SIZE_T__]; /* ... */
+#endif /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_SIZE_T__ */
+	USER CHECKED VIRT size_t    ab_size; /* Number of bytes that should be written at `ab_base' */
 };
+
 struct aio_pbuffer {
 	size_t                          ab_entc; /* [!0] Number of entries. */
 	struct aio_pbuffer_entry const *ab_entv; /* [1..ab_entc] Vector of entries. */
@@ -428,7 +436,8 @@ struct aio_handle_type {
 	 * NOTE: This function is required to _immediatly_ cancel the operation associated
 	 *       with the given handle, so long as that operation hasn't yet completed.
 	 *       If the first holds true, the associated handle function must be invoked
-	 *       with `AIO_COMPLETION_CANCEL' before this operator may return. */
+	 *       with `AIO_COMPLETION_CANCEL' before this operator may return.
+	 * WARNING: This callback may only be invoked _once_! */
 	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *ht_cancel)(struct aio_handle *__restrict self);
 	/* [0..1] An optional operator which can be used to query the operation progress
 	 *        in order to determine how much has already been done, and how much is
@@ -466,6 +475,7 @@ struct aio_handle_type {
 
 /* AIO completion callback. Guarantied to always be invoked _exactly_
  * once for each AIO operation started at any point before then.
+ * NOTE: This callback is _always_ invoked with preemption disabled!
  * @param: self:   The associated AIO operations handle.
  *                 When this function is invoked, this handle has already been
  *                 unbound from the AIO-capable device's chain of pending AIO
@@ -473,24 +483,37 @@ struct aio_handle_type {
  *                 either pass ownership of `self' to some waiter, or to destroy
  *                `self' on its own.
  * @param: status: One of `AIO_COMPLETION_*', explaining how the operation ended. */
-typedef NOBLOCK NONNULL((1)) void /*NOTHROW*/ (KCALL *aio_completion_t)(struct aio_handle *__restrict self,
-                                                                       unsigned int status);
+typedef NOBLOCK NOPREEMPT NONNULL((1)) void
+/*NOTHROW*/ (KCALL *aio_completion_t)(struct aio_handle *__restrict self,
+                                      unsigned int status);
 
 /* Number of pointers available for drivers
  * to store data inline within AIO handles. */
 #define AIO_HANDLE_DRIVER_POINTER_COUNT 6
 #define AIO_HANDLE_ALIGNMENT __SIZEOF_POINTER__
 
+
+/* Value written to `ah_next' after an AIO handle's `ah_func' callback returns.
+ * This is required to prevent a race condition where one CPU is currently
+ * calling `ah_func' while another CPU is inside of the AIO's cancel+fini sequence.
+ * In this case, the cancel+fini sequence would have no way of waiting for the first
+ * CPU to return from `ah_func' before moving on to deallocate the aio_handle's
+ * backing memory. */
+#define AIO_HANDLE_NEXT_COMPLETED ((struct aio_handle *)-1)
+
 struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
-#define AIO_HANDLE_HEAD                                                                        \
-	struct aio_handle      *ah_next; /* [0..1][lock(INTERNAL)] Pointer to the next AIO handle. \
-	                                  * This field is only used internally in order to easily  \
-	                                  * chain pending AIO operations */                        \
-	struct aio_handle_type *ah_type; /* [1..1][lock(WRITE_ONCE)]                               \
-	                                  * AIO usage type (set by a driver implementing AIO       \
-	                                  * such that operations can continue even after the       \
-	                                  * associated callbacks return). */                       \
-	aio_completion_t        ah_func; /* [1..1][const] AIO completion callback. */              \
+#define AIO_HANDLE_HEAD                                                                                    \
+	struct aio_handle            *ah_next; /* [0..1][lock(INTERNAL)] Pointer to the next AIO handle.       \
+	                                        * This field is only used internally in order to easily chain  \
+	                                        * pending AIO operations. Filled in during device-specific     \
+	                                        * handle init, and set to `AIO_HANDLE_NEXT_COMPLETED' in order \
+	                                        * to allow the AIO handle to be destroyed after `ah_func' has  \
+	                                        * returned */                                                  \
+	struct aio_handle_type const *ah_type; /* [1..1][lock(WRITE_ONCE_DURING_INIT)]                         \
+	                                        * AIO usage type (set by a driver implementing AIO             \
+	                                        * such that operations can continue even after the             \
+	                                        * associated callbacks return). */                             \
+	aio_completion_t              ah_func; /* [1..1][const] AIO completion callback. */                    \
 	void *ah_data[AIO_HANDLE_DRIVER_POINTER_COUNT]; /* Driver/device-specific handle data pointers. */
 /**/
 	AIO_HANDLE_HEAD
@@ -500,27 +523,95 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
 /* No-op AIO handle type (intended for synchronous operations) */
 DATDEF struct aio_handle_type aio_noop_type;
 
+
 /* Initialize the given AIO handle with a type-specific v-table.
  * Must be called by all functions taking an `/ *out* / struct aio_handle *...'
- * argument for the purpose of initializing said AIO handle. */
-#define aio_handle_init(self, type) \
-	((self)->ah_type = (type))
+ * argument for the purpose of initializing said AIO handle.
+ * NOTE: After a call to this function, the caller is responsible to initialize
+ *       the `self->ah_next' field with some non-AIO_HANDLE_NEXT_COMPLETED value. */
+LOCAL NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL aio_handle_init)(struct aio_handle *__restrict self,
+                               struct aio_handle_type const *__restrict typ) {
+#ifndef NDEBUG
+	__libc_memset(&self->ah_next, 0xcc, sizeof(self->ah_next));
+#endif /* !NDEBUG */
+	self->ah_type = typ;
+}
 
-/* Finalize a fully initialized AIO handle. */
-#define aio_handle_fini(self) \
-	(*(self)->ah_type->ht_fini)(self)
+/* Finalize a fully initialized AIO handle.
+ * WARNING: The caller must ensure that the AIO handle's completion function
+ *          was invoked prior to calling this function. The simplest way of
+ *          doing this is by inserting a call to `aio_handle_cancel()' before
+ *          a call to this function. */
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL aio_handle_fini)(struct aio_handle *__restrict self) {
+#ifndef CONFIG_NO_SMP
+	/* Make sure that some other thread still inside of `ah_func' */
+	while (__hybrid_atomic_load(self->ah_next, __ATOMIC_ACQUIRE) != AIO_HANDLE_NEXT_COMPLETED)
+		task_tryyield_or_pause();
+#endif /* !CONFIG_NO_SMP */
+	(*self->ah_type->ht_fini)(self);
+}
 
-/* Cancel execution */
-#define aio_handle_cancel(self) \
-	(*(self)->ah_type->ht_cancel)(self)
+/* Check if the given AIO handle's callback has already been invoked. */
+LOCAL NOBLOCK NONNULL((1)) bool
+NOTHROW(KCALL aio_handle_completed)(struct aio_handle const *__restrict self) {
+	return __hybrid_atomic_load(self->ah_next, __ATOMIC_ACQUIRE) == AIO_HANDLE_NEXT_COMPLETED;
+}
 
-/* Indicate AIO execution completion. */
-#define aio_handle_success(self) \
-	(*(self)->ah_func)(self, AIO_COMPLETION_SUCCESS)
+/* Cancel an in-progress or finished AIO operation.
+ * This function can be called any number of times, however
+ * additional invocations after the first one become no-ops.
+ * NOTE: This function _must_ be called before `aio_handle_fini()'
+ *       in any path where it is unknown if the AIO handle has
+ *       already completed (this usually means that it has to be
+ *       called in all EXCEPT-paths that finalize some handle) */
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL aio_handle_cancel)(struct aio_handle *__restrict self) {
+	if likely(!aio_handle_completed(self))
+		(*self->ah_type->ht_cancel)(self);
+}
 
-/* Indicate AIO execution failure due to the currently set exception. */
-#define aio_handle_fail(self) \
-	(*(self)->ah_func)(self, AIO_COMPLETION_FAILURE)
+/* ONLY CALL THIS FUNCTION FROM WITHIN DRIVERS!
+ * Signal AIO completion and mark the AIO handle as completed
+ * by setting its ah_next field to `AIO_HANDLE_NEXT_COMPLETED'
+ * WARNING: Any further access to any of the members of `self' becomes
+ *          illegal after the first can to this function! As such, the
+ *          semantics of this function as after as the `self' argument
+ *          goes are `inherit(always)'
+ * WARNING: It could already be implied by the previous warning,
+ *          however just to state it as clear as possible: _ONLY_
+ *          call this function _ONCE_ for any given AIO handle!
+ * @param: status: One of `AIO_COMPLETION_*' */
+LOCAL NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(KCALL aio_handle_complete_nopr)(/*inherit(always)*/ struct aio_handle *__restrict self,
+                                        unsigned int status) {
+	__hybrid_assert(!PREEMPTION_ENABLED());
+	/* Invoke the completion callback */
+	(*self->ah_func)(self, status);
+	/* Mark the handle as finished. */
+	__hybrid_atomic_store(self->ah_next,
+	                      AIO_HANDLE_NEXT_COMPLETED,
+	                      __ATOMIC_RELEASE);
+}
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL aio_handle_complete)(/*inherit(always)*/ struct aio_handle *__restrict self,
+                                   unsigned int status) {
+	pflag_t was;
+	/* Ensure that the call to the completion function, as well as the
+	 * sub-sequent write of `AIO_HANDLE_NEXT_COMPLETED' to `ah_next'.
+	 * This must be done to guaranty SMP-ATOMIC NONBLOCK-semantics in
+	 * `aio_handle_fini()' */
+	was = PREEMPTION_PUSHOFF();
+	__hybrid_assert(!aio_handle_completed(self));
+	/* Invoke the completion callback */
+	(*self->ah_func)(self, status);
+	/* Mark the handle as finished. */
+	__hybrid_atomic_store(self->ah_next,
+	                      AIO_HANDLE_NEXT_COMPLETED,
+	                      __ATOMIC_RELEASE);
+	PREEMPTION_POP(was);
+}
 
 
 
@@ -564,7 +655,8 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_generic
 	struct exception_data hg_error;  /* [valid_if(hg_status == AIO_COMPLETION_FAILURE)] AIO failure error. */
 };
 
-#define aio_handle_generic_fini(self) aio_handle_fini(self)
+#define aio_handle_generic_fini(self) \
+	aio_handle_fini(self)
 
 /* Callback for `aio_handle_generic' */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -582,7 +674,7 @@ NOTHROW(KCALL aio_handle_generic_init)(struct aio_handle_generic *__restrict sel
 }
 
 #define aio_handle_generic_hascompleted(self) \
-	(__hybrid_atomic_load((self)->hg_status,__ATOMIC_ACQUIRE) != 0)
+	(__hybrid_atomic_load((self)->hg_status, __ATOMIC_ACQUIRE) != 0)
 
 /* Check if the AIO operation failed, and propagate the error if it did. */
 LOCAL NONNULL((1)) void KCALL

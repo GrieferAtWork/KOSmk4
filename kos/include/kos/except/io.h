@@ -80,6 +80,8 @@ enum {
 	E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU, /* E_IOERROR_NODATA: Attempted to write() to a TTY from an orphaned process group. */
 	E_IOERROR_REASON_NE2K_RESET_ACK,     /* E_IOERROR_TIMEOUT: Card didn't acknowledge reset command */
 	E_IOERROR_REASON_NE2K_WAIT4RDMA,     /* E_IOERROR_TIMEOUT: Timeout while waiting for `ENISR_RDC' */
+	E_IOERROR_REASON_NE2K_TXTSR,         /* E_IOERROR_ERRORBIT: [u8 tst = ENISR_*] Transmit error occurred. */
+	E_IOERROR_REASON_NE2K_PACKETSIZE,    /* E_IOERROR_BADBOUNDS: [size_t packet_size] Packet is too large */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -100,6 +102,8 @@ enum {
 #define E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU /* E_IOERROR_NODATA: Attempted to write() to a TTY from an orphaned process group. */
 #define E_IOERROR_REASON_NE2K_RESET_ACK     E_IOERROR_REASON_NE2K_RESET_ACK     /* E_IOERROR_TIMEOUT: Card didn't acknowledge reset command */
 #define E_IOERROR_REASON_NE2K_WAIT4RDMA     E_IOERROR_REASON_NE2K_WAIT4RDMA     /* E_IOERROR_TIMEOUT: Timeout while waiting for `ENISR_RDC' */
+#define E_IOERROR_REASON_NE2K_TXTSR         E_IOERROR_REASON_NE2K_TXTSR         /* E_IOERROR_ERRORBIT: [u8 tst = ENISR_*] Transmit error occurred. */
+#define E_IOERROR_REASON_NE2K_PACKETSIZE    E_IOERROR_REASON_NE2K_PACKETSIZE    /* E_IOERROR_BADBOUNDS: [size_t packet_size] Packet is too large */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_IOERROR_REASON_GENERIC            0  /* Generic error reason */
 #define E_IOERROR_REASON_ATA_DCR_ERR        1  /* `ATA_DCR_ERR' was set */
@@ -117,6 +121,8 @@ enum {
 #define E_IOERROR_REASON_TTY_ORPHAN_SIGTTOU 13 /* E_IOERROR_NODATA: Attempted to write() to a TTY from an orphaned process group. */
 #define E_IOERROR_REASON_NE2K_RESET_ACK     14 /* E_IOERROR_TIMEOUT: Card didn't acknowledge reset command */
 #define E_IOERROR_REASON_NE2K_WAIT4RDMA     15 /* E_IOERROR_TIMEOUT: Timeout while waiting for `ENISR_RDC' */
+#define E_IOERROR_REASON_NE2K_TXTSR         16 /* E_IOERROR_ERRORBIT: [u8 tst = ENISR_*] Transmit error occurred. */
+#define E_IOERROR_REASON_NE2K_PACKETSIZE    17 /* E_IOERROR_BADBOUNDS: [size_t packet_size] Packet is too large */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

@@ -578,7 +578,7 @@ NOTHROW(FCALL ata_dohandle_signal)(struct aio_handle *__restrict self,
 	}
 	if (!(data->hd_flags & ATA_AIO_HANDLE_FSINGLE))
 		kfree(data->hd_prd_vector);
-	(*self->ah_func)(self, status);
+	aio_handle_complete(self, status);
 }
 
 PRIVATE NOBLOCK void
@@ -589,7 +589,9 @@ NOTHROW(FCALL ata_handle_signal)(struct aio_handle *__restrict self,
 	 *        If the waiter has allocated the handle on their stack, and calls
 	 *        cancel() after we got here, but before we finished invoking their
 	 *        callback, then cancel() won't wait for us to finish, and we may
-	 *        access uninitialized memory! */
+	 *        access uninitialized memory!
+	 *  Solution: Don't use a `ATA_AIO_HANDLE_FSERVED' flag.
+	 *            For a proper implementation of AIO, see `Ne2k_TxAioCancel()' */
 	if (!(ATOMIC_FETCHOR(data->hd_flags, ATA_AIO_HANDLE_FSERVED) & ATA_AIO_HANDLE_FSERVED))
 		ata_dohandle_signal(self, status);
 }
@@ -623,7 +625,7 @@ NOTHROW(FCALL handle_completion_ioerror_generic)(struct aio_handle *__restrict s
 	mydata->e_pointers[0] = E_IOERROR_SUBSYSTEM_HARDDISK;
 	mydata->e_pointers[1] = ERRR_R(errr);
 	COMPILER_WRITE_BARRIER();
-	aio_handle_fail(self);
+	aio_handle_complete(self, AIO_COMPLETION_FAILURE);
 	COMPILER_WRITE_BARRIER();
 	memcpy(mydata, &old_data, sizeof(struct exception_data));
 }

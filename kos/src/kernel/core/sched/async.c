@@ -27,6 +27,7 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/paging.h>
+#include <kernel/printk.h>
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
 #include <sched/async.h>
@@ -377,6 +378,7 @@ again:
 			} EXCEPT {
 				error_printf("_asyncmain:task_waitfor()");
 			}
+			printk(KERN_DEBUG "ASYNC:SIGNAL:%p\n", received_signal);
 			decref_unlikely(workers);
 			if (!received_signal) {
 				REF struct aworker *receiver;

@@ -166,7 +166,7 @@ struct ata_drive;
 
 /* The layout of the `ah_data' field of AIO handles used with ATA */
 typedef struct {
-	REF struct ata_drive *hd_drive;        /* [1..1][const] The drive associated with this handle. */
+	REF struct ata_drive *hd_drive;       /* [1..1][const] The drive associated with this handle. */
 	union {
 		struct vm_dmalock  hd_dmalock;    /* [valid_if(ATA_AIO_HANDLE_FONEDMA)] Single DMA lock */
 		struct vm_dmalock *hd_dmalockvec; /* [valid_if(!ATA_AIO_HANDLE_FONEDMA)][0..1][owned] Vector of DMA locks
@@ -187,7 +187,7 @@ typedef struct {
 	};
 #if __SIZEOF_POINTER__ > 4
 	byte_t            hd_pad[__SIZEOF_POINTER__ - 4];
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 	union {
 		PHYS u32      hd_prd0_bufaddr; /* [valid_if(ATA_AIO_HANDLE_FSINGLE)] Physical buffer base address. */
 		AtaPRD       *hd_prd_vector;   /* [valid_if(!ATA_AIO_HANDLE_FSINGLE)][hd_prd_count][owned]

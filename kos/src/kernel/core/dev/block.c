@@ -1000,7 +1000,7 @@ _block_device_sync(struct block_device *__restrict self)
 				++result;
 			} EXCEPT {
 				aio_handle_init(handle, &aio_noop_type);
-				aio_handle_fail(handle);
+				aio_handle_complete(handle, AIO_COMPLETION_FAILURE);
 				break;
 			}
 		}
@@ -1081,7 +1081,7 @@ again:
 			                          sector_id, &handle);
 		} EXCEPT {
 			aio_handle_init(&handle, &aio_noop_type);
-			aio_handle_fail(&handle);
+			aio_handle_complete(&handle, AIO_COMPLETION_FAILURE);
 		}
 		/* Search for additional sectors which may need saving, so we can improve
 		 * performance by saving a whole bunch of different blocks at once. */
@@ -1114,7 +1114,7 @@ again:
 				                          sector_id, my_handle);
 			} EXCEPT {
 				aio_handle_init(my_handle, &aio_noop_type);
-				aio_handle_fail(my_handle);
+				aio_handle_complete(my_handle, AIO_COMPLETION_FAILURE);
 			}
 			++ex_handles_count;
 		}
@@ -1195,7 +1195,7 @@ check_handle_state_for_save:
 		                         &handle);
 	} EXCEPT {
 		aio_handle_init(&handle, &aio_noop_type);
-		aio_handle_fail(&handle);
+		aio_handle_complete(&handle, AIO_COMPLETION_FAILURE);
 	}
 	COMPILER_BARRIER();
 	TRY {
