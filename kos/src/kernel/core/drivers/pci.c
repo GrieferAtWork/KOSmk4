@@ -50,12 +50,17 @@ DECL_BEGIN
 #define PCI_ADDR_PORT __CCAST(port_t)0xcf8
 #define PCI_DATA_PORT __CCAST(port_t)0xcfc
 
-PUBLIC u32 NOTHROW(FCALL pci_readaddr)(pci_addr_t addr) {
+/* Remove from a given PCI address. */
+PUBLIC NOBLOCK u32
+NOTHROW(FCALL pci_readaddr)(pci_addr_t addr) {
 	assert(IS_ALIGNED(addr, PCI_ADDR_ALIGN));
 	outl(PCI_ADDR_PORT, addr);
 	return inl(PCI_DATA_PORT);
 }
-PUBLIC void NOTHROW(FCALL pci_writeaddr)(pci_addr_t addr, u32 value) {
+
+/* Write to a given PCI address. */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pci_writeaddr)(pci_addr_t addr, u32 value) {
 	assert(IS_ALIGNED(addr, PCI_ADDR_ALIGN));
 	outl(PCI_ADDR_PORT, addr);
 	outl(PCI_DATA_PORT, value);

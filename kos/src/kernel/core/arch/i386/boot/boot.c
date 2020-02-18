@@ -286,10 +286,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       by the bootloader are themself mapped as preserved memory. */
 	minfo_release_presevations();
 
-	/* Initialize special builtin character devices (/dev/null, /dev/zero, etc.)
-	 * TODO: Have these device files be defined by a dedicated driver, which
-	 *       will then be loaded by /bin/init, rather than have them hard-coded
-	 *       within the kernel core. */
+	/* Initialize special builtin character devices (/dev/null, /dev/zero, etc.) */
 	kernel_initialize_null_devices();
 
 	/* Initialize the /dev/tty alias device */
@@ -366,10 +363,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	path_mount(THIS_VFS, "fat", boot_partition, SUPERBLOCK_FNORMAL, NULL, NULL, true);
 
 	mall_dump_leaks(GFP_NORMAL);
-
-	/* TODO: Spread ATTR_LEAF around throughout headers
-	 *    - https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#leaf
-	 * TODO: Use libvm86 to emulate BIOS callbacks */
 
 	/* Enable system call tracing. */
 	syscall_tracing_setenabled(true); /* TODO: Remove me */

@@ -36,13 +36,21 @@
 DECL_BEGIN
 
 #ifdef __CC__
-FUNDEF u32 NOTHROW(FCALL pci_readaddr)(pci_addr_t addr);
-FUNDEF void NOTHROW(FCALL pci_writeaddr)(pci_addr_t addr, u32 value);
-FORCELOCAL u32 NOTHROW(FCALL pci_read)(pci_addr_t base, pci_reg_t reg) {
+/* Remove from a given PCI address. */
+FUNDEF NOBLOCK u32
+NOTHROW(FCALL pci_readaddr)(pci_addr_t addr);
+
+/* Write to a given PCI address. */
+FUNDEF NOBLOCK void
+NOTHROW(FCALL pci_writeaddr)(pci_addr_t addr, u32 value);
+
+FORCELOCAL NOBLOCK u32
+NOTHROW(FCALL pci_read)(pci_addr_t base, pci_reg_t reg) {
 	__hybrid_assert(!(base & PCI_ADDR_REGMASK));
 	return pci_readaddr(base | reg);
 }
-FORCELOCAL void NOTHROW(FCALL pci_write)(pci_addr_t base, pci_reg_t reg, u32 value) {
+
+FORCELOCAL NOBLOCK void NOTHROW(FCALL pci_write)(pci_addr_t base, pci_reg_t reg, u32 value) {
 	__hybrid_assert(!(base & PCI_ADDR_REGMASK));
 	pci_writeaddr(base | reg, value);
 }
