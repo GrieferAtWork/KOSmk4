@@ -378,7 +378,6 @@ again:
 			} EXCEPT {
 				error_printf("_asyncmain:task_waitfor()");
 			}
-			printk(KERN_DEBUG "ASYNC:SIGNAL:%p\n", received_signal);
 			decref_unlikely(workers);
 			if (!received_signal) {
 				REF struct aworker *receiver;

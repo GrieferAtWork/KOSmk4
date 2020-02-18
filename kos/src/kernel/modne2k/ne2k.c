@@ -341,7 +341,7 @@ NOTHROW(FCALL Ne2k_InterruptHandler)(void *arg) {
 	status = inb(EN0_ISR(me->nk_iobase));
 	if (!(status & ENISR_ALL))
 		return false; /* Not our interrupt... */
-	printk(KERN_DEBUG "[ne2k] Interrupt: %p: %#.2I8x!\n", me, status);
+	NE2K_DEBUG("[ne2k] Interrupt: %p: %#.2I8x!\n", me, status);
 	if (state.ns_state == NE2K_STATE_UIO) {
 		/* Interrupt during user-IO (broadcast the result on `nk_uioint') */
 handle_uio:
@@ -371,13 +371,15 @@ switch_state_after_rx:
 					return true; /* Shouldn't happen... */
 				if unlikely(state.ns_state == NE2K_STATE_UIO)
 					goto handle_uio;
+				if unlikely(state.ns_flags & NE2K_FLAG_RXPEND)
+					goto warn_rx_set;
 				goto switch_state_after_rx;
 			}
 			/* Broadcast that a packet should now be downloaded. */
 			if (new_state.ns_state == NE2K_STATE_RX_DNLOAD)
 				sig_broadcast(&me->nk_stpkld);
 		} else {
-/*want_rx_set:*/
+warn_rx_set:
 			printk(KERN_WARNING "[ne2k] RX-interrupt with RXPEND already set\n");
 		}
 		/* Don't acknowledge the receive signal below.
@@ -390,7 +392,7 @@ switch_state_after_rx:
 		struct aio_handle *aio;
 		if unlikely(state.ns_state != NE2K_STATE_TX_PKSEND) {
 warn_tx_bad_state:
-			printk(KERN_WARNING "[ne2k] TX interrupt when not sending a packet\n");
+			printk(KERN_WARNING "[ne2k] TX-interrupt when not sending a packet\n");
 			goto done_tx;
 		}
 		/* If the send operation got canceled at any point before now, `nk_current'
@@ -520,7 +522,7 @@ Ne2k_WaitForRemoteDmaComplete(Ne2kDevice *__restrict self) {
 		timeout.add_milliseconds(400);
 		while (!((status = inb(EN0_ISR(self->nk_iobase))) & ENISR_RDC)) {
 			if (realtime() > timeout) {
-				printk(KERN_WARNING "[ne2k] Timeout waiting for remote-dma-complete on card at %#I16x\n",
+				printk(KERN_ERR "[ne2k] Timeout waiting for remote-dma-complete on card at %#I16x\n",
 				       self->nk_iobase);
 				THROW(E_IOERROR_TIMEOUT,
 				      E_IOERROR_SUBSYSTEM_NET,
@@ -556,7 +558,11 @@ Ne2k_HandleSendTimeout(void *__restrict arg) {
 	printk(KERN_ERR "[ne2k] Watchdog send timeout (TODO)\n");
 	/* TODO: Do the equivalent of aio_cancel() for Ne2k,
 	 *       however indicate a TIMEOUT-error as the reason for
-	 *       completion. */
+	 *       completion.
+	 * NOTE: To facilitate TX_PKSEND timeouts, we need a new NIC
+	 *       state `NE2K_STATE_TX_PKSEND_TIMEOUT' that we can set
+	 *       here in order to perform the necessary cleanup before
+	 *       resetting the device and calling `Ne2k_SwitchToIdleMode()' */
 }
 
 
@@ -592,6 +598,14 @@ NOTHROW(KCALL Ne2k_SwitchToTxPkSendMode)(Ne2kDevice *__restrict self) {
 		assert(old_state.ns_state == NE2K_STATE_TX_UPLOAD);
 		new_state.ns_state = NE2K_STATE_TX_PKSEND;
 		new_state.ns_flags = old_state.ns_flags;
+		{
+			struct timespec send_timeout;
+			send_timeout = realtime();
+			send_timeout.tv_sec += 2; /* TODO: Make this configurable! */
+			COMPILER_WRITE_BARRIER();
+			self->nk_cursendtmo = send_timeout;
+			COMPILER_WRITE_BARRIER();
+		}
 	} while (!ATOMIC_CMPXCH_WEAK(self->nk_state.ns_word,
 	                             old_state.ns_word,
 	                             new_state.ns_word));
@@ -772,7 +786,7 @@ tx_switch_to_idle:
 		outb(E8390_CMD(me->nk_iobase), E8390_TRANS | E8390_NODMA | E8390_START);
 	} else if (state.ns_state == NE2K_STATE_RX_DNLOAD) {
 		/* TODO */
-		printk(KERN_DEBUG "[ne2k] TODO: RX_DNLOAD\n");
+		printk(KERN_WARNING "[ne2k] TODO: RX_DNLOAD\n");
 	}
 }
 
@@ -1123,7 +1137,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	if (dev->pd_res[0].pr_size < 0xff)
 		return false;
 	iobase = (port_t)dev->pd_res[0].pr_start;
-	printk(FREESTR(KERN_DEBUG "[ne2k] Found NE2K(%p) at %#I16x (pci:%#I32x)\n"),
+	printk(FREESTR(KERN_INFO "[ne2k] Found NE2K(%p) at %#I16x (pci:%#I32x)\n"),
 	       dev, iobase, dev->pd_base);
 	Ne2k_ResetCard(iobase);
 	/* Execute a sequence of startup instructions. */
@@ -1138,8 +1152,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 		prom[i] = inb(NE_DATAPORT(iobase));
 	outb(E8390_CMD(iobase), E8390_PAGE1 | E8390_NODMA | E8390_STOP);
 
-	printk(FREESTR(KERN_DEBUG "[ne2k] PROM:\n%$[hex]\n"),
-	       sizeof(prom), prom);
+	NE2K_DEBUG("[ne2k] PROM:\n%$[hex]\n", sizeof(prom), prom);
 
 	/* Construct the device. */
 	self = CHARACTER_DEVICE_ALLOC(Ne2kDevice);
@@ -1225,7 +1238,6 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL Ne2k_InitDriver(void) {
 			             dev->pd_base);
 		}
 	}
-	printk(KERN_DEBUG "NE2K: DONE\n");
 }
 
 

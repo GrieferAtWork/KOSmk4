@@ -115,25 +115,25 @@ typedef struct ne2k_device: nic_device {
 	 *    - Download & route all pending packets
 	 *    - Switch state to IDLE (or RX_SEND or RX_DNLOAD)
 	 */
-	struct pci_device       *nk_pcidev;        /* [1..1][const] The associated PCI device. */
-	WEAK struct aio_handle  *nk_current;       /* [0..1][valid_if(NE2K_STATE_TX_UPLOAD || NE2K_STATE_TX_PKSEND)]
-	                                            * The current outgoing packet. */
-	WEAK struct aio_handle  *nk_tranit;        /* [0..1] Linked list of pending DMA packets. */
-	WEAK Ne2kState           nk_state;         /* Ne2k state control word */
-	struct timespec          nk_cursendtmo;    /* [lock(NE2K_STATE_TX_PKSEND)] Timeout for the current TX_PKSEND */
-	struct sig               nk_stidle;        /* Signal broadcast when the NIC switches to IDLE or OFF */
-	struct sig               nk_stpkld;        /* Signal broadcast when the NIC switches to TX_UPLOAD or RX_DNLOAD */
-	struct sig               nk_uioint;        /* Signal broadcast upon interrupt while in UIO-mode
-	                                            * NOTE: The signal delivered here is:
-	                                            *      `NE2K_UIOINT_ENCODE_ISR(inb(EN0_ISR(me->nd_iobase)))' */
-	port_t                   nk_iobase;        /* [const] I/O base address. */
-	u8                       nk_mac[ETH_ALEN]; /* [const] The original mac address */
+	struct pci_device      *nk_pcidev;        /* [1..1][const] The associated PCI device. */
+	WEAK struct aio_handle *nk_current;       /* [0..1][valid_if(NE2K_STATE_TX_UPLOAD || NE2K_STATE_TX_PKSEND)]
+	                                           * The current outgoing packet. */
+	WEAK struct aio_handle *nk_tranit;        /* [0..1] Linked list of pending DMA packets. */
+	WEAK Ne2kState          nk_state;         /* Ne2k state control word */
+	struct timespec         nk_cursendtmo;    /* [lock(NE2K_STATE_TX_PKSEND)] Timeout for the current TX_PKSEND */
+	struct sig              nk_stidle;        /* Signal broadcast when the NIC switches to IDLE or OFF */
+	struct sig              nk_stpkld;        /* Signal broadcast when the NIC switches to TX_UPLOAD or RX_DNLOAD */
+	struct sig              nk_uioint;        /* Signal broadcast upon interrupt while in UIO-mode
+	                                           * NOTE: The signal delivered here is:
+	                                           *      `NE2K_UIOINT_ENCODE_ISR(inb(EN0_ISR(me->nd_iobase)))' */
+	port_t                  nk_iobase;        /* [const] I/O base address. */
+	u8                      nk_mac[ETH_ALEN]; /* [const] The original mac address */
 	/* NOTE: Ne2k pages consist of 256 bytes! */
-	u8                       nk_tx_start;      /* [const] Transmit buffer start page */
-	u8                       nk_tx_end;        /* [const] Transmit buffer end page */
-	u8                       nk_rx_start;      /* [const] Receive buffer start page */
-	u8                       nk_rx_end;        /* [const] Receive buffer end page */
-	u8                       nk_rx_nxt;        /* [lock(NE2K_STATE_RX_DNLOAD)] Next unread incoming packet. */
+	u8                      nk_tx_start;      /* [const] Transmit buffer start page */
+	u8                      nk_tx_end;        /* [const] Transmit buffer end page */
+	u8                      nk_rx_start;      /* [const] Receive buffer start page */
+	u8                      nk_rx_end;        /* [const] Receive buffer end page */
+	u8                      nk_rx_nxt;        /* [lock(NE2K_STATE_RX_DNLOAD)] Next unread incoming packet. */
 } Ne2kDevice;
 
 /* Reset the network card via `NE_RESET()'. */
