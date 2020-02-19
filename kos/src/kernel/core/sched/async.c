@@ -377,6 +377,7 @@ again:
 				received_signal = task_waitfor(asyncmain_timeout_p);
 			} EXCEPT {
 				error_printf("_asyncmain:task_waitfor()");
+				goto again;
 			}
 			decref_unlikely(workers);
 			if (!received_signal) {

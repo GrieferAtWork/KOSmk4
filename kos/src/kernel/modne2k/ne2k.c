@@ -451,7 +451,7 @@ struct ne2k_upload_printer_data {
 	bool   nup_hashalf;  /* Half-word-valid */
 };
 
-LOCAL void KCALL
+PRIVATE void KCALL
 Ne2k_PrintData(struct ne2k_upload_printer_data *__restrict self,
                USER CHECKED void const *data, size_t num_bytes) {
 	if unlikely(self->nup_hashalf) {
@@ -470,8 +470,8 @@ Ne2k_PrintData(struct ne2k_upload_printer_data *__restrict self,
 	}
 	outsw(self->nup_dataport, data, num_bytes / 2);
 	if unlikely(num_bytes & 1) {
-		self->nup_hashalf = true;
 		self->nup_half = ((byte_t *)data)[num_bytes - 1];
+		self->nup_hashalf = true;
 	}
 }
 
