@@ -427,118 +427,120 @@ aio_buffer_copytomem(struct aio_buffer const *__restrict self,
  * which was the first one to actually get it correct.
  * To try and bring all of the information together, you may use the following flow-chart:
  *
- *   +--- <ENTRY>
- *   |
- *   |                                      +------------> [struct device]
- *   |                                      |              >> // [0..1][lock(ATOMIC)] Chain of scheduled AIO operations
- *   |                                      |              >> WEAK struct aio_handle *d_aio_current;
- *   |                                      |              >> // [0..1][clear(ON_CANCEL)] The current AIO operation
- *   |                                      |              >> WEAK struct aio_handle *d_aio_pending;
- *   |                                      |              >> // Signal broadcast when new AIO becomes available
- *   |                                      |              >> struct sig              d_aio_avail;
- *   |                                      |              APPEND(ent):
- *   |                                      |              >> do ent->ah_next = old = ATOMIC_READ(d_aio_pending);
- *   |                                      |              >> while (!ATOMIC_CMPXCH_WEAK(d_aio_pending, old, ent));
- *   |                                      |          +-- >> if (!old) SIGNAL_PENDING_AIO_BECAME_AVAILABLE();
- *   |                                      |          |   RESTORE_ALL(ent):
- *   v                                      |          |   >> last = ent->ah_next[->ah_next...]; // While non-NULL
- * [AIO-USER-OPERATION]                     |          |   >> do last->ah_next = old = ATOMIC_READ(d_aio_pending);
- * >> struct aio_handle_generic aio;        |          |   >> while (!ATOMIC_CMPXCH_WEAK(d_aio_pending, old, ent));
- * >> aio_handle_generic_init(&aio);        |          +-- >> if (!old) SIGNAL_PENDING_AIO_BECAME_AVAILABLE();
- * >>                   +-------------------+          |   TAKEONE(bool (*pred)(struct aio_handle *ent)):
- * >>                   |                              |   >> ent = ATOMIC_XCH(d_aio_pending, NULL);
- * >> async_operation(device, [...], &aio);  --+       |   >> for (r = ent; r && !(*pred)(r); r = r->ah_next);
- * >> TRY {                                    |       |   >> if (r) REMOVE_FROM_CHAIN(&ent, r);
- * >>     aio_handle_generic_waitfor(&aio);    |       |   >> if (ent) RESTORE_ALL(ent);
- * >>     aio_handle_generic_checkerror(&aio); |       |   >> return r;
- * >> } EXCEPT {                               |       |   REMOVE(ent):
- * >>     aio_handle_generic_fini(&aio);       |       |   >> do {
- * >>     RETHROW();                           |       |   >>     chain = ATOMIC_XCH(d_aio_pending, NULL);
- * >> }                                        |       |   >>     found = REMOVE_FROM_CHAIN(&chain, ent);
- * >> aio_handle_generic_fini(&aio);           |       |   >>     if (chain)
- *                                             |       |   >>         RESTORE_ALL(chain);
- *                                             |       |   >> } while (!found);
- *   +-----------------------------------------+       |
- *   |                                                 +-> [SIGNAL_PENDING_AIO_BECAME_AVAILABLE(device)]
- *   |                                                     NOTE: This part doesn't necessarily have to be implemented by
- *   |                                                           an async-worker, so-long as the process of kick-starting
- *   v                                                           the I/O operation doesn't take O(NUMBER_OF_IO_BYTES) long.
- * [async_operation(device, aio)]                          In other words: DMA operations can be kick-started here, too.
- * >> // Always need some COMMAND_DESCRIPTOR-pointer       >> sig_broadcast(&device->d_aio_avail);
- * >> // The used pointer-id doens't matter, though                                     |
- * >> aio->ah_data[0]    = incref(device);   -------------------------------------------|--------------+
- * >> aio->ah_data[1]    = incref([COMMAND_DESCRIPTOR]);  ------------------------------|----------+   |
- * >> aio->ah_data[2..n] = ...;                                                         |          |   |
- * >> aio_handle_init(aio, &device_async_aio_type);                                     |          |   |
- * >> device->d_aio_pending.APPEND(aio);      |                                         |          |   |
- *                                            +-----------------------------------------|----------|-+ |
- *                                                                                      |          | | |
- *   +----------------------------------------------------------------------------------+          | | |
- *   |                                                                                             | | |
- *   v                                        +----> [async_poll(device)]                          | | |
- * [ASYNC_WORKER(device)]                     |      >> if (async_test(device)) return true;       | | |
- * >> struct async_worker_callbacks = {       |      >> task_connect(&device->d_aio_avail);        | | |
- * >>     .awc_poll = &async_poll, -----------+      >> return async_test(device);                 | | |
- * >>     .awc_work = &async_work, -------+                                                        | | |
- * >>     .awc_test = &async_test  -------|--------> [async_test(device)]                          | | |
- * >> };                                  |          >> return ATOMIC_READ(device->d_aio_pending)  | | |
- *                                        |          >>        != NULL;                            | | |
- *   +------------------------------------+                                                        | | |
- *   |                                                                                             | | |
- *   v                                                                                             | | |
- * [async_work(device)]                                                                            | | |
- * >> for (;;) {                                                                                   | | |
- * >>     struct aio_handle *aio;                                                                  | | |
- * >>     [COMMAND_DESCRIPTOR] *cmd;   <------------------------------------------+----------------+ | |
- * >>     was = PREEMPTION_PUSHOFF();                                             |                | | |
- * >>     // Take an AIO handle with a present command-descriptor                 |                | | |
- * >>     // The command-descriptor is cleared during AIO-cancel!                 |        +-------|-+ |
- * >>     aio = device->d_aio_pending.TAKEONE([](ent) {                           |        |       |   |
- * >>         // Inherit reference into `ent'                                     |        | +-----|---+
- * >>         cmd = ATOMIC_XCH(ent->ah_data[1], NULL);   <------------------------+        | |     |
- * >>         return cmd != NULL;   <---------------------------------------------+        | |     |
- * >>     });                                                                     |        | |     |
- * >>     ATOMIC_WRITE(device->d_aio_current, aio);                               |        | |     |
- * >>     PREEMPTION_POP(was);                                                    |        | |     |
- * >>     if (!aio) break;                                                        |        | |     |
- * >>     FINALLY_DECREF_LIKELY(cmd);   <-----------------------------------------+        | |     |
- * >>     // Allow cancelation between command-steps by testing `d_aio_current'   |        | |     |
- * >>     TRY {                                                                   |        | |     |
- * >>         while (ATOMIC_READ(device->d_aio_current) != NULL) {                |        | |     |
- * >>             [COMMAND_DESCRIPTOR_DO_NEXT_STEP](cmd);   <---------------------+        | |     |
- * >>             if ([COMMAND_DESCRIPTOR_FINISHED](cmd)) break;   <--------------+        | |     |
- * >>         }                                                                            | |     |
- * >>     } EXCEPT {                                                                       | |     |
- * >>         // Indicate AIO failure                                                      | |     |
- * >>         PREEMPTION_DISABLE();                                                        | |     |
- * >>         aio = ATOMIC_XCH(device->d_aio_current, NULL);                               | |     |
- * >>         if (aio) aio_handle_complete(aio, AIO_COMPLETION_FAILURE);                   | |     |
- * >>         PREEMPTION_ENABLE();                                                         | |     |
- * >>         continue;                                                                    | |     |
- * >>     }                                                                                | |     |
- * >>     // Indicate AIO success                                                          | |     |
- * >>     PREEMPTION_DISABLE();                                                            | |     |
- * >>     aio = ATOMIC_XCH(device->d_aio_current, NULL);                                   | |     |
- * >>     if (aio) aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);                       | |     |
- * >>     else {                                                                           | |     |
- * >>         // Wait for [HWIO_CANCEL_CURRENT_OPERATION] in aio_cancel() to finish        | |     |
- * >>         [HWIO_WAIT_FOR_CANCEL_COMPLETION](device);                                   | |     |
- * >>     }                                                                                | |     |
- * >>     PREEMPTION_ENABLE();                                                             | |     |
- * >> }                                                                                    | |     |
- *                                                                                         | |     |
- *  +--------------------------------------------------------------------------------------+ |     |
- *  |                                                                                        |     |
- *  v                                                                                        |     |
- * [device_async_aio_type]               +---> [aio_fini(aio)]                               |     |
- * >> struct aio_handle_type = {         |     >> device = aio->ah_data[0];                  |     |
- * >>     .ht_fini     = &aio_fini,     -+     >> decref(device);           <----------------+     |
- * >>     .ht_cancel   = &aio_cancel,   ---+                                                 |     |
- * >>     .ht_progress = &aio_progress  -+ |                                                 |     |
- * >> };                                 | +-> [aio_cancel(aio)]                             |     |
- *                                       |     >> device = aio->ah_data[0];   <--------------+     |
- * +-------------------------------------+     >> [COMMAND_DESCRIPTOR] *cmd;   <-------------------+
- * |                                           >> cmd = ATOMIC_XCH(aio->ah_data[1], NULL);   <-----+
+ *   ┌─── <ENTRY>
+ *   │
+ *   │                                      ┌────────────> [struct device]
+ *   │                                      │              >> // [0..1][lock(ATOMIC)] Chain of scheduled AIO operations
+ *   │                                      │              >> WEAK struct aio_handle *d_aio_current;
+ *   │                                      │              >> // [0..1][clear(ON_CANCEL)] The current AIO operation
+ *   │                                      │              >> WEAK struct aio_handle *d_aio_pending;
+ *   │                                      │              >> // Signal broadcast when new AIO becomes available
+ *   │                                      │              >> struct sig              d_aio_avail;
+ *   │                                      │       ┌────> APPEND(ent):
+ *   │                                      │       │      >> do ent->ah_next = old = ATOMIC_READ(d_aio_pending);
+ *   │                                      │       │      >> while (!ATOMIC_CMPXCH_WEAK(d_aio_pending, old, ent));
+ *   │                                      │       │  ┌── >> if (!old) SIGNAL_PENDING_AIO_BECAME_AVAILABLE();
+ *   │                                      │       │  │   RESTORE_ALL(ent):
+ *   v                                      │       │  │   >> last = ent->ah_next[->ah_next...]; // While non-NULL
+ * [AIO-USER-OPERATION]                     │       │  │   >> do last->ah_next = old = ATOMIC_READ(d_aio_pending);
+ * >> struct aio_handle_generic aio;        │       │  │   >> while (!ATOMIC_CMPXCH_WEAK(d_aio_pending, old, ent));
+ * >> aio_handle_generic_init(&aio);        │       │  ├── >> if (!old) SIGNAL_PENDING_AIO_BECAME_AVAILABLE();
+ * >>                   ┌───────────────────┘       │  │   TAKEONE(bool (*pred)(struct aio_handle *ent)):
+ * >>                   │                           │  │   >> ent = ATOMIC_XCH(d_aio_pending, NULL);
+ * >> async_operation(device, [...], &aio);  ──┐    │  │   >> for (r = ent; r && !(*pred)(r); r = r->ah_next);
+ * >> TRY {                                    │    │  │   >> if (r) REMOVE_FROM_CHAIN(&ent, r);
+ * >>     aio_handle_generic_waitfor(&aio);    │    │  │   >> if (ent) RESTORE_ALL(ent);
+ * >>     aio_handle_generic_checkerror(&aio); │    │  │   >> return r;
+ * >> } EXCEPT {                               │    │  │   REMOVE(ent):
+ * >>     aio_handle_generic_fini(&aio);       │    │  │   >> do {
+ * >>     RETHROW();                           │    │  │   >>     chain = ATOMIC_XCH(d_aio_pending, NULL);
+ * >> }                                        │    │  │   >>     found = REMOVE_FROM_CHAIN(&chain, ent);
+ * >> aio_handle_generic_fini(&aio);           │    │  │   >>     if (chain)
+ *                                             │    │  │   >>         RESTORE_ALL(chain);
+ *                                             │    │  │   >> } while (!found);
+ *   ┌─────────────────────────────────────────┘    │  │
+ *   │                                              │  └─> [SIGNAL_PENDING_AIO_BECAME_AVAILABLE(device)]
+ *   │                                              │      NOTE: This part doesn't necessarily have to be implemented by
+ *   │                                              │            an async-worker, so-long as the process of kick-starting
+ *   │                                              │            the I/O operation doesn't take O(NUMBER_OF_IO_BYTES) long.
+ *   │                                              │       In other words: DMA operations can be kick-started here, too.
+ *   v                                              │       >> sig_broadcast(&device->d_aio_avail);
+ * [async_operation(device, aio)]                   │                                   │
+ * >> // Always need some COMMAND_DESCRIPTOR        └────────┐                          │
+ * >> // The used id doens't matter, though                  │                          │
+ * >> aio->ah_data[0]    = incref(device);  ─────────────────│──────────────────────────│──────────────┐
+ * >> aio->ah_data[1]    = incref([COMMAND_DESCRIPTOR]);  ───│──────────────────────────│──────────┐   │
+ * >> aio->ah_data[2..n] = ...;                              │                          │          │   │
+ * >> aio_handle_init(aio, &device_async_aio_type);          │                          │          │   │
+ * >> device->d_aio_pending.APPEND(aio);      │              │                          │          │   │
+ *                             │              └──────────────│──────────────────────────│──────────│─┐ │
+ *                             └─────────────────────────────┘                          │          │ │ │
+ *   ┌──────────────────────────────────────────────────────────────────────────────────┘          │ │ │
+ *   │                                                                                             │ │ │
+ *   v                                        ┌────> [async_poll(device)]                          │ │ │
+ * [ASYNC_WORKER(device)]                     │      >> if (async_test(device)) return true;       │ │ │
+ * >> struct async_worker_callbacks = {       │      >> task_connect(&device->d_aio_avail);        │ │ │
+ * >>     .awc_poll = &async_poll, ───────────┘      >> return async_test(device);                 │ │ │
+ * >>     .awc_work = &async_work, ───────┐                                                        │ │ │
+ * >>     .awc_test = &async_test  ───────│────────> [async_test(device)]                          │ │ │
+ * >> };                                  │          >> return ATOMIC_READ(device->d_aio_pending)  │ │ │
+ *                                        │          >>        != NULL;                            │ │ │
+ *   ┌────────────────────────────────────┘                                                        │ │ │
+ *   │                                                                                             │ │ │
+ *   v                                                                                             │ │ │
+ * [async_work(device)]                                                                            │ │ │
+ * >> for (;;) {                                                                                   │ │ │
+ * >>     struct aio_handle *aio;                                                                  │ │ │
+ * >>     [COMMAND_DESCRIPTOR] *cmd;   <──────────────────────────────────────────┬────────────────┤ │ │
+ * >>     was = PREEMPTION_PUSHOFF();                                             │                │ │ │
+ * >>     // Take an AIO handle with a present command-descriptor                 │                │ │ │
+ * >>     // The command-descriptor is cleared during AIO-cancel!                 │        ┌───────│─┘ │
+ * >>     aio = device->d_aio_pending.TAKEONE([](ent) {                           │        │       │   │
+ * >>         // Inherit reference into `ent'                                     │        │ ┌─────│───┘
+ * >>         cmd = ATOMIC_XCH(ent->ah_data[1], NULL);   <────────────────────────┤        │ │     │
+ * >>         return cmd != NULL;   <─────────────────────────────────────────────┤        │ │     │
+ * >>     });                                                                     │        │ │     │
+ * >>     ATOMIC_WRITE(device->d_aio_current, aio);                               │        │ │     │
+ * >>     PREEMPTION_POP(was);                                                    │        │ │     │
+ * >>     if (!aio) break;                                                        │        │ │     │
+ * >>     FINALLY_DECREF_LIKELY(cmd);   <─────────────────────────────────────────┤        │ │     │
+ * >>     // Allow cancelation between command-steps by testing `d_aio_current'   │        │ │     │
+ * >>     TRY {                                                                   │        │ │     │
+ * >>         while (ATOMIC_READ(device->d_aio_current) != NULL) {                │        │ │     │
+ * >>             [COMMAND_DESCRIPTOR_DO_NEXT_STEP](cmd);   <─────────────────────┤        │ │     │
+ * >>             if ([COMMAND_DESCRIPTOR_FINISHED](cmd)) break;   <──────────────┘        │ │     │
+ * >>         }                                                                            │ │     │
+ * >>     } EXCEPT {                                                                       │ │     │
+ * >>         // Indicate AIO failure                                                      │ │     │
+ * >>         PREEMPTION_DISABLE();                                                        │ │     │
+ * >>         aio = ATOMIC_XCH(device->d_aio_current, NULL);                               │ │     │
+ * >>         if (aio) aio_handle_complete(aio, AIO_COMPLETION_FAILURE);                   │ │     │
+ * >>         PREEMPTION_ENABLE();                                                         │ │     │
+ * >>         continue;                                                                    │ │     │
+ * >>     }                                                                                │ │     │
+ * >>     // Indicate AIO success                                                          │ │     │
+ * >>     PREEMPTION_DISABLE();                                                            │ │     │
+ * >>     aio = ATOMIC_XCH(device->d_aio_current, NULL);                                   │ │     │
+ * >>     if (aio) aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);                       │ │     │
+ * >>     else {                                                                           │ │     │
+ * >>         // Wait for [HWIO_CANCEL_CURRENT_OPERATION] in aio_cancel() to finish        │ │     │
+ * >>         [HWIO_WAIT_FOR_CANCEL_COMPLETION](device);                                   │ │     │
+ * >>     }                                                                                │ │     │
+ * >>     PREEMPTION_ENABLE();                                                             │ │     │
+ * >> }                                                                                    │ │     │
+ *                                                                                         │ │     │
+ *  ┌──────────────────────────────────────────────────────────────────────────────────────┘ │     │
+ *  │                                                                                        │     │
+ *  v                                                                                        │     │
+ * [device_async_aio_type]               ┌───> [aio_fini(aio)]                               │     │
+ * >> struct aio_handle_type = {         │     >> device = aio->ah_data[0];                  │     │
+ * >>     .ht_fini     = &aio_fini,     ─┘     >> decref(device);           <────────────────┤     │
+ * >>     .ht_cancel   = &aio_cancel,   ───┐                                                 │     │
+ * >>     .ht_progress = &aio_progress  ─┐ │                                                 │     │
+ * >> };                                 │ └─> [aio_cancel(aio)]                             │     │
+ *                                       │     >> device = aio->ah_data[0];   <──────────────┘     │
+ * ┌─────────────────────────────────────┘     >> [COMMAND_DESCRIPTOR] *cmd;   <───────────────────┤
+ * │                                           >> cmd = ATOMIC_XCH(aio->ah_data[1], NULL);   <─────┘
  * v                                           >> if (cmd) {
  * [aio_progress(aio)]                         >>     // Cancelled before started
  * Optional, but in case of multi-step         >>     decref_likely(cmd);
