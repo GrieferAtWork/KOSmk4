@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x123c2df6 */
+/* HASH CRC-32:0x9ec66c2f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2032,7 +2032,7 @@ __CRT_FUNCTION(setgroups,0,(),2,(size_t,count,gid_t const *,groups),int)
 __CRT_FUNCTION(sethostent,0,(),1,(int,stay_open),void)
 __CRT_FUNCTION(sethostid,0,(),1,(long int,id),int)
 __CRT_FUNCTION(sethostname,0,(),2,(char const *,name,size_t,len),int)
-__CRT_FUNCTION(setipv4sourcefilter,0,(),6,(fd_t,sockfd,struct in_addr,interface_addr,struct in_addr,group,uint32_t,fmode,uint32_t,numsrc,const struct in_addr *,slist),int)
+__CRT_FUNCTION(setipv4sourcefilter,0,(),6,(fd_t,sockfd,struct in_addr,interface_addr,struct in_addr,group,uint32_t,fmode,uint32_t,numsrc,struct in_addr const *,slist),int)
 __CRT_FUNCTION(setitimer,0,(),3,(__itimer_which_t,which,struct itimerval const *,newval,struct itimerval *,oldval),int)
 __CRT_FUNCTION(setitimer64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,setitimer),3,(__itimer_which_t,which,struct itimerval64 const *,newval,struct itimerval64 *,oldval),int)
 __CRT_FUNCTION(setkey,0,(),1,(char const *,key),void)
@@ -2061,7 +2061,7 @@ __CRT_FUNCTION(setrpcent,0,(),1,(int,stayopen),void)
 __CRT_FUNCTION(setservent,0,(),1,(int,stay_open),void)
 __CRT_FUNCTION(setsid,0,(),0,(),pid_t)
 __CRT_FUNCTION(setsockopt,0,(),5,(fd_t,sockfd,int,level,int,optname,void const *,optval,socklen_t,optlen),int)
-__CRT_FUNCTION(setsourcefilter,0,(),7,(fd_t,sockfd,uint32_t,interface_addr,struct sockaddr const *,group,socklen_t,grouplen,uint32_t,fmode,uint32_t,numsrc,const struct sockaddr_storage *,slist),int)
+__CRT_FUNCTION(setsourcefilter,0,(),7,(fd_t,sockfd,uint32_t,interface_addr,struct sockaddr const *,group,socklen_t,grouplen,uint32_t,fmode,uint32_t,numsrc,struct sockaddr_storage const *,slist),int)
 __CRT_FUNCTION(setspent,0,(),0,(),void)
 __CRT_FUNCTION(setstate,0,(),1,(char *,statebuf),char *)
 __CRT_FUNCTION(setstate_r,0,(),2,(char *__restrict,statebuf,struct random_data *__restrict,buf),int)

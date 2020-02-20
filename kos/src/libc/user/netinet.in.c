@@ -423,7 +423,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd,
 }
 /*[[[end:getipv4sourcefilter]]]*/
 
-/*[[[head:setipv4sourcefilter,hash:CRC-32=0xe5be540f]]]*/
+/*[[[head:setipv4sourcefilter,hash:CRC-32=0x2cfe631b]]]*/
 /* Set IPv4 source filter */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter.setipv4sourcefilter") int
 NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd,
@@ -431,7 +431,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd,
                                                    struct in_addr group,
                                                    uint32_t fmode,
                                                    uint32_t numsrc,
-                                                   const struct in_addr *slist)
+                                                   struct in_addr const *slist)
 /*[[[body:setipv4sourcefilter]]]*/
 {
 	(void)sockfd;
@@ -471,7 +471,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd,
 }
 /*[[[end:getsourcefilter]]]*/
 
-/*[[[head:setsourcefilter,hash:CRC-32=0x99e3babc]]]*/
+/*[[[head:setsourcefilter,hash:CRC-32=0x97f63420]]]*/
 /* Set source filter */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.source_filter.setsourcefilter") int
 NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
@@ -480,7 +480,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
                                                socklen_t grouplen,
                                                uint32_t fmode,
                                                uint32_t numsrc,
-                                               const struct sockaddr_storage *slist)
+                                               struct sockaddr_storage const *slist)
 /*[[[body:setsourcefilter]]]*/
 {
 	(void)sockfd;

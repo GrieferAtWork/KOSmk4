@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5670c2e */
+/* HASH CRC-32:0xbde4bf2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ DECL_BEGIN
 INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.htons") uint16_t
 NOTHROW_NCX(LIBCCALL libc_htons)(uint16_t hostword) {
-#line 311 "kos/src/libc/magic/netinet.in.c"
+#line 239 "kos/src/libc/magic/netinet.in.c"
 	return (uint16_t)__hybrid_htobe32(hostword);
 }
 
@@ -44,7 +44,7 @@ DEFINE_INTERN_ALIAS(libc_ntohs, libc_htons);
 INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.ntohs") uint16_t
 NOTHROW_NCX(LIBCCALL libc_ntohs)(uint16_t netshort) {
-#line 317 "kos/src/libc/magic/netinet.in.c"
+#line 245 "kos/src/libc/magic/netinet.in.c"
 	return (uint16_t)__hybrid_betoh16(netshort);
 }
 #endif /* MAGIC:alias */
@@ -53,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc_ntohs)(uint16_t netshort) {
 INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.htonl") uint32_t
 NOTHROW_NCX(LIBCCALL libc_htonl)(uint32_t hostlong) {
-#line 323 "kos/src/libc/magic/netinet.in.c"
+#line 251 "kos/src/libc/magic/netinet.in.c"
 	return (uint32_t)__hybrid_htobe32(hostlong);
 }
 
@@ -64,7 +64,7 @@ DEFINE_INTERN_ALIAS(libc_ntohl, libc_htonl);
 INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.ntohl") uint32_t
 NOTHROW_NCX(LIBCCALL libc_ntohl)(uint32_t netlong) {
-#line 329 "kos/src/libc/magic/netinet.in.c"
+#line 257 "kos/src/libc/magic/netinet.in.c"
 	return (uint32_t)__hybrid_betoh32(netlong);
 }
 #endif /* MAGIC:alias */
@@ -73,7 +73,7 @@ NOTHROW_NCX(LIBCCALL libc_ntohl)(uint32_t netlong) {
 INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.htonq") uint64_t
 NOTHROW_NCX(LIBCCALL libc_htonq)(uint64_t hostlong) {
-#line 336 "kos/src/libc/magic/netinet.in.c"
+#line 264 "kos/src/libc/magic/netinet.in.c"
 	return (uint64_t)__hybrid_htobe64(hostlong);
 }
 
@@ -84,7 +84,7 @@ DEFINE_INTERN_ALIAS(libc_ntohq, libc_htonq);
 INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.ntohq") uint64_t
 NOTHROW_NCX(LIBCCALL libc_ntohq)(uint64_t netlong) {
-#line 342 "kos/src/libc/magic/netinet.in.c"
+#line 270 "kos/src/libc/magic/netinet.in.c"
 	return (uint64_t)__hybrid_betoh64(netlong);
 }
 #endif /* MAGIC:alias */

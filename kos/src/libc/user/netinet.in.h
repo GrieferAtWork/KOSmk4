@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0fafed9 */
+/* HASH CRC-32:0x9d59fb11 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,11 +74,11 @@ INTDEF struct in6_addr *NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_getaddr)(void co
 /* Get IPv4 source filter */
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t *fmode, uint32_t *numsrc, struct in_addr *slist);
 /* Set IPv4 source filter */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t fmode, uint32_t numsrc, const struct in_addr *slist);
+INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t fmode, uint32_t numsrc, struct in_addr const *slist);
 /* Get source filter */
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t *fmode, uint32_t *numsrc, struct sockaddr_storage *slist);
 /* Set source filter */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t fmode, uint32_t numsrc, const struct sockaddr_storage *slist);
+INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t fmode, uint32_t numsrc, struct sockaddr_storage const *slist);
 
 DECL_END
 

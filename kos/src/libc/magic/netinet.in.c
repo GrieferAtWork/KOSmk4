@@ -32,10 +32,11 @@
 #include <bits/sockaddr_storage-struct.h>
 #include <bits/types.h>
 #include <net/types.h>
-
-#include <stdint.h>
+#include <netinet/ipport.h>
+#include <netinet/ipproto.h>
 
 #ifdef __USE_GLIBC
+#include <stdint.h>
 #include <sys/socket.h>
 #endif /* __USE_GLIBC */
 
@@ -58,79 +59,6 @@
    <http://www.gnu.org/licenses/>.  */
 
 __SYSDECL_BEGIN
-
-/* Standard well-defined IP protocols. */
-}%[enum @macro @undef {
-	IPPROTO_IP      = 0,   /* Dummy protocol for TCP. */
-	IPPROTO_ICMP    = 1,   /* Internet Control Message Protocol. */
-	IPPROTO_IGMP    = 2,   /* Internet Group Management Protocol. */
-	IPPROTO_IPIP    = 4,   /* IPIP tunnels (older KA9Q tunnels use 94). */
-	IPPROTO_TCP     = 6,   /* Transmission Control Protocol. */
-	IPPROTO_EGP     = 8,   /* Exterior Gateway Protocol. */
-	IPPROTO_PUP     = 12,  /* PUP protocol. */
-	IPPROTO_UDP     = 17,  /* User Datagram Protocol. */
-	IPPROTO_IDP     = 22,  /* XNS IDP protocol. */
-	IPPROTO_TP      = 29,  /* SO Transport Protocol Class 4. */
-	IPPROTO_DCCP    = 33,  /* Datagram Congestion Control Protocol. */
-	IPPROTO_IPV6    = 41,  /* IPv6 header. */
-	IPPROTO_RSVP    = 46,  /* Reservation Protocol. */
-	IPPROTO_GRE     = 47,  /* General Routing Encapsulation. */
-	IPPROTO_ESP     = 50,  /* encapsulating security payload. */
-	IPPROTO_AH      = 51,  /* authentication header. */
-	IPPROTO_MTP     = 92,  /* Multicast Transport Protocol. */
-	IPPROTO_BEETPH  = 94,  /* IP option pseudo header for BEET. */
-	IPPROTO_ENCAP   = 98,  /* Encapsulation Header. */
-	IPPROTO_PIM     = 103, /* Protocol Independent Multicast. */
-	IPPROTO_COMP    = 108, /* Compression Header Protocol. */
-	IPPROTO_SCTP    = 132, /* Stream Control Transmission Protocol. */
-	IPPROTO_UDPLITE = 136, /* UDP-Lite protocol. */
-	IPPROTO_MPLS    = 137, /* MPLS in IP. */
-	IPPROTO_RAW     = 255, /* Raw IP packets. */
-	IPPROTO_MAX     = 256
-}]%{
-
-
-}%[enum @macro @undef {
-	IPPROTO_HOPOPTS  = 0,  /* IPv6 Hop-by-Hop options. */
-	IPPROTO_ROUTING  = 43, /* IPv6 routing header. */
-	IPPROTO_FRAGMENT = 44, /* IPv6 fragmentation header. */
-	IPPROTO_ICMPV6   = 58, /* ICMPv6. */
-	IPPROTO_NONE     = 59, /* IPv6 no next header. */
-	IPPROTO_DSTOPTS  = 60, /* IPv6 destination options. */
-	IPPROTO_MH       = 135 /* IPv6 mobility header. */
-}]%{
-
-
-/* Standard well-known ports. */
-}%[enum @macro @undef {
-	IPPORT_ECHO         = 7,    /* Echo service. */
-	IPPORT_DISCARD      = 9,    /* Discard transmissions service. */
-	IPPORT_SYSTAT       = 11,   /* System status service. */
-	IPPORT_DAYTIME      = 13,   /* Time of day service. */
-	IPPORT_NETSTAT      = 15,   /* Network status service. */
-	IPPORT_FTP          = 21,   /* File Transfer Protocol. */
-	IPPORT_TELNET       = 23,   /* Telnet protocol. */
-	IPPORT_SMTP         = 25,   /* Simple Mail Transfer Protocol. */
-	IPPORT_TIMESERVER   = 37,   /* Timeserver service. */
-	IPPORT_NAMESERVER   = 42,   /* Domain Name Service. */
-	IPPORT_WHOIS        = 43,   /* Internet Whois service. */
-	IPPORT_MTP          = 57,
-	IPPORT_TFTP         = 69,   /* Trivial File Transfer Protocol. */
-	IPPORT_RJE          = 77,
-	IPPORT_FINGER       = 79,   /* Finger service. */
-	IPPORT_TTYLINK      = 87,
-	IPPORT_SUPDUP       = 95,   /* SUPDUP protocol. */
-	IPPORT_EXECSERVER   = 512,  /* execd service. */
-	IPPORT_LOGINSERVER  = 513,  /* rlogind service. */
-	IPPORT_CMDSERVER    = 514,
-	IPPORT_EFSSERVER    = 520,
-	IPPORT_BIFFUDP      = 512,  /* UDP ports. */
-	IPPORT_WHOSERVER    = 513,  /* ... */
-	IPPORT_ROUTESERVER  = 520,  /* ... */
-	IPPORT_RESERVED     = 1024, /* Ports less than this value are reserved for privileged processes. */
-	IPPORT_USERRESERVED = 5000  /* Ports greater this value are reserved for (non-privileged) servers. */
-}]%{
-
 
 /* Definitions of the bits in an Internet address integer.
  * On subnets, host and network parts are found according to
@@ -266,12 +194,12 @@ struct ipv6_mreq {
 #ifdef __USE_MISC
 /* Multicast group request. */
 struct group_req {
-	uint32_t                gr_interface; /* Interface index. */
+	__uint32_t              gr_interface; /* Interface index. */
 	struct sockaddr_storage gr_group;     /* Group address. */
 };
 
 struct group_source_req {
-	uint32_t                gsr_interface; /* Interface index. */
+	__uint32_t              gsr_interface; /* Interface index. */
 	struct sockaddr_storage gsr_group;     /* Group address. */
 	struct sockaddr_storage gsr_source;    /* Source address. */
 };
@@ -280,8 +208,8 @@ struct group_source_req {
 struct ip_msfilter {
 	struct in_addr imsf_multiaddr; /* IP multicast address of group. */
 	struct in_addr imsf_interface; /* Local IP address of interface. */
-	uint32_t       imsf_fmode;     /* Filter mode. */
-	uint32_t       imsf_numsrc;    /* Number of source addresses. */
+	__uint32_t     imsf_fmode;     /* Filter mode. */
+	__uint32_t     imsf_numsrc;    /* Number of source addresses. */
 	struct in_addr imsf_slist[1];  /* Source addresses. */
 };
 #define IP_MSFILTER_SIZE(numsrc)  \
@@ -290,10 +218,10 @@ struct ip_msfilter {
 	 ((numsrc) * sizeof(struct in_addr)))
 
 struct group_filter {
-	uint32_t                gf_interface; /* Interface index. */
+	__uint32_t              gf_interface; /* Interface index. */
 	struct sockaddr_storage gf_group;     /* Group address. */
-	uint32_t                gf_fmode;     /* Filter mode. */
-	uint32_t                gf_numsrc;    /* Number of source addresses. */
+	__uint32_t              gf_fmode;     /* Filter mode. */
+	__uint32_t              gf_numsrc;    /* Number of source addresses. */
 	struct sockaddr_storage gf_slist[1];  /* Source addresses. */
 };
 #define GROUP_FILTER_SIZE(numsrc)      \
@@ -307,38 +235,38 @@ struct group_filter {
 %[default_impl_section(.text.crt.net.convert)]
 [dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
 [if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohs)]
-htons:(uint16_t hostword) -> uint16_t {
+htons:($uint16_t hostword) -> $uint16_t {
 	return (uint16_t)__hybrid_htobe32(hostword);
 }
 
 [dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
 [alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htons)]
-ntohs:(uint16_t netshort) -> uint16_t {
+ntohs:($uint16_t netshort) -> $uint16_t {
 	return (uint16_t)__hybrid_betoh16(netshort);
 }
 
 [dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
 [if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohl)]
-htonl:(uint32_t hostlong) -> uint32_t {
+htonl:($uint32_t hostlong) -> $uint32_t {
 	return (uint32_t)__hybrid_htobe32(hostlong);
 }
 
 [dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
 [alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonl)]
-ntohl:(uint32_t netlong) -> uint32_t {
+ntohl:($uint32_t netlong) -> $uint32_t {
 	return (uint32_t)__hybrid_betoh32(netlong);
 }
 
 %#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
 [dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
 [if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohq)]
-htonq:(uint64_t hostlong) -> uint64_t {
+htonq:($uint64_t hostlong) -> $uint64_t {
 	return (uint64_t)__hybrid_htobe64(hostlong);
 }
 
 [dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
 [alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonq)]
-ntohq:(uint64_t netlong) -> uint64_t {
+ntohq:($uint64_t netlong) -> $uint64_t {
 	return (uint64_t)__hybrid_betoh64(netlong);
 }
 %#endif /* __USE_KOS && __UINT64_TYPE__ */
@@ -381,16 +309,16 @@ ntohq:(uint64_t netlong) -> uint64_t {
                                                         __a->s6_addr32[2] == __b->s6_addr32[2] && \
                                                         __a->s6_addr32[3] == __b->s6_addr32[3]; }))
 #else /* !__NO_XBLOCK */
-#define IN6_IS_ADDR_UNSPECIFIED(a) (((const uint32_t *)(a))[0] == 0 && ((const uint32_t *)(a))[1] == 0 && ((const uint32_t *)(a))[2] == 0 && ((const uint32_t *)(a))[3] == 0)
-#define IN6_IS_ADDR_LOOPBACK(a)    (((const uint32_t *)(a))[0] == 0 && ((const uint32_t *)(a))[1] == 0 && ((const uint32_t *)(a))[2] == 0 && ((const uint32_t *)(a))[3] == htonl(1))
-#define IN6_IS_ADDR_LINKLOCAL(a)  ((((const uint32_t *)(a))[0] & htonl(0xffc00000)) == htonl(0xfe800000))
-#define IN6_IS_ADDR_SITELOCAL(a)  ((((const uint32_t *)(a))[0] & htonl(0xffc00000)) == htonl(0xfec00000))
-#define IN6_IS_ADDR_V4MAPPED(a)   ((((const uint32_t *)(a))[0] == 0) && (((const uint32_t *)(a))[1] == 0) && (((const uint32_t *)(a))[2] == htonl(0xffff)))
-#define IN6_IS_ADDR_V4COMPAT(a)   ((((const uint32_t *)(a))[0] == 0) && (((const uint32_t *)(a))[1] == 0) && (((const uint32_t *)(a))[2] == 0) && (ntohl (((const uint32_t *)(a))[3]) > 1))
-#define IN6_ARE_ADDR_EQUAL(a, b)  ((((const uint32_t *)(a))[0] == ((const uint32_t *)(b))[0]) && \
-                                   (((const uint32_t *)(a))[1] == ((const uint32_t *)(b))[1]) && \
-                                   (((const uint32_t *)(a))[2] == ((const uint32_t *)(b))[2]) && \
-                                   (((const uint32_t *)(a))[3] == ((const uint32_t *)(b))[3]))
+#define IN6_IS_ADDR_UNSPECIFIED(a) (((__uint32_t const *)(a))[0] == 0 && ((__uint32_t const *)(a))[1] == 0 && ((__uint32_t const *)(a))[2] == 0 && ((__uint32_t const *)(a))[3] == 0)
+#define IN6_IS_ADDR_LOOPBACK(a)    (((__uint32_t const *)(a))[0] == 0 && ((__uint32_t const *)(a))[1] == 0 && ((__uint32_t const *)(a))[2] == 0 && ((__uint32_t const *)(a))[3] == htonl(1))
+#define IN6_IS_ADDR_LINKLOCAL(a)  ((((__uint32_t const *)(a))[0] & htonl(0xffc00000)) == htonl(0xfe800000))
+#define IN6_IS_ADDR_SITELOCAL(a)  ((((__uint32_t const *)(a))[0] & htonl(0xffc00000)) == htonl(0xfec00000))
+#define IN6_IS_ADDR_V4MAPPED(a)   ((((__uint32_t const *)(a))[0] == 0) && (((__uint32_t const *)(a))[1] == 0) && (((__uint32_t const *)(a))[2] == htonl(0xffff)))
+#define IN6_IS_ADDR_V4COMPAT(a)   ((((__uint32_t const *)(a))[0] == 0) && (((__uint32_t const *)(a))[1] == 0) && (((__uint32_t const *)(a))[2] == 0) && (ntohl (((__uint32_t const *)(a))[3]) > 1))
+#define IN6_ARE_ADDR_EQUAL(a, b)  ((((__uint32_t const *)(a))[0] == ((__uint32_t const *)(b))[0]) && \
+                                   (((__uint32_t const *)(a))[1] == ((__uint32_t const *)(b))[1]) && \
+                                   (((__uint32_t const *)(a))[2] == ((__uint32_t const *)(b))[2]) && \
+                                   (((__uint32_t const *)(a))[3] == ((__uint32_t const *)(b))[3]))
 #endif /* __NO_XBLOCK */
 #define IN6_IS_ADDR_MULTICAST(a)    (((uint8_t const *)(a))[0] == 0xff)
 }
@@ -406,11 +334,11 @@ ntohq:(uint64_t netlong) -> uint64_t {
 
 %
 %{
-#define IN6_IS_ADDR_MC_NODELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((uint8_t const *)(a))[1] & 0xf) == 0x1))
-#define IN6_IS_ADDR_MC_LINKLOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((uint8_t const *)(a))[1] & 0xf) == 0x2))
-#define IN6_IS_ADDR_MC_SITELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((uint8_t const *)(a))[1] & 0xf) == 0x5))
-#define IN6_IS_ADDR_MC_ORGLOCAL(a)  (IN6_IS_ADDR_MULTICAST(a) && ((((uint8_t const *)(a))[1] & 0xf) == 0x8))
-#define IN6_IS_ADDR_MC_GLOBAL(a)    (IN6_IS_ADDR_MULTICAST(a) && ((((uint8_t const *)(a))[1] & 0xf) == 0xe))
+#define IN6_IS_ADDR_MC_NODELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & 0xf) == 0x1))
+#define IN6_IS_ADDR_MC_LINKLOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & 0xf) == 0x2))
+#define IN6_IS_ADDR_MC_SITELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & 0xf) == 0x5))
+#define IN6_IS_ADDR_MC_ORGLOCAL(a)  (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & 0xf) == 0x8))
+#define IN6_IS_ADDR_MC_GLOBAL(a)    (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & 0xf) == 0xe))
 }
 
 %{
@@ -421,13 +349,13 @@ struct cmsghdr;
 /* IPv6 packet information. */
 struct in6_pktinfo {
 	struct in6_addr ipi6_addr;    /* src/dst IPv6 address */
-	unsigned int    ipi6_ifindex; /* send/recv interface index */
+	__UINT32_TYPE__ ipi6_ifindex; /* send/recv interface index */
 };
 
 /* IPv6 MTU information. */
 struct ip6_mtuinfo {
 	struct sockaddr_in6 ip6m_addr; /* dst address including zone ID */
-	uint32_t            ip6m_mtu;  /* path MTU in host byte order */
+	__uint32_t          ip6m_mtu;  /* path MTU in host byte order */
 };
 
 }
@@ -462,15 +390,30 @@ struct ip6_mtuinfo {
 
 %[default_impl_section(.text.crt.net.inet.6.ipv4_source_filter)]
 @@Get IPv4 source filter
-[cp_kos] getipv4sourcefilter:($fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t *fmode, uint32_t *numsrc, struct in_addr *slist) -> int;
+[cp_kos]
+getipv4sourcefilter:($fd_t sockfd, struct in_addr interface_addr,
+                     struct in_addr group, $uint32_t *fmode,
+                     $uint32_t *numsrc, struct in_addr *slist) -> int;
+
 @@Set IPv4 source filter
-[cp_kos] setipv4sourcefilter:($fd_t sockfd, struct in_addr interface_addr, struct in_addr group, uint32_t fmode, uint32_t numsrc, const struct in_addr *slist) -> int;
+[cp_kos]
+setipv4sourcefilter:($fd_t sockfd, struct in_addr interface_addr,
+                     struct in_addr group, $uint32_t fmode,
+                     $uint32_t numsrc, struct in_addr const *slist) -> int;
 
 %[default_impl_section(.text.crt.net.inet.6.source_filter)]
 @@Get source filter
-[cp_kos] getsourcefilter:($fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t *fmode, uint32_t *numsrc, struct sockaddr_storage *slist) -> int;
+[cp_kos]
+getsourcefilter:($fd_t sockfd, $uint32_t interface_addr,
+                 struct sockaddr const *group, socklen_t grouplen,
+                 $uint32_t *fmode, uint32_t *numsrc,
+                 struct sockaddr_storage *slist) -> int;
 @@Set source filter
-[cp_kos] setsourcefilter:($fd_t sockfd, uint32_t interface_addr, struct sockaddr const *group, socklen_t grouplen, uint32_t fmode, uint32_t numsrc, const struct sockaddr_storage *slist) -> int;
+[cp_kos]
+setsourcefilter:($fd_t sockfd, $uint32_t interface_addr,
+                 struct sockaddr const *group, socklen_t grouplen,
+                 $uint32_t fmode, uint32_t numsrc,
+                 struct sockaddr_storage const *slist) -> int;
 %#endif /* __USE_GNU */
 
 
