@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb68aa9e */
+/* HASH CRC-32:0xc9ed46ee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2129,6 +2129,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_hsearch_r 1
 #define __CRT_ATTR_NOTHROW_NCX_hstrerror 1
 #define __CRT_ATTR_NOTHROW_NCX_htonl 1
+#define __CRT_ATTR_NOTHROW_NCX_htonq 1
 #define __CRT_ATTR_NOTHROW_NCX_htons 1
 #define __CRT_ATTR_NOTHROW_NCX_if_freenameindex 1
 #define __CRT_ATTR_NOTHROW_NCX_index 1
@@ -2403,6 +2404,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_nrand48 1
 #define __CRT_ATTR_NOTHROW_NCX_nrand48_r 1
 #define __CRT_ATTR_NOTHROW_NCX_ntohl 1
+#define __CRT_ATTR_NOTHROW_NCX_ntohq 1
 #define __CRT_ATTR_NOTHROW_NCX_ntohs 1
 #define __CRT_ATTR_NOTHROW_NCX_ntp_adjtime 1
 #define __CRT_ATTR_NOTHROW_NCX_ntp_adjtime32 1
@@ -4791,6 +4793,7 @@
 #define __CRT_ATTR_CONST_gnu_dev_minor 1
 #define __CRT_ATTR_CONST_hstrerror 1
 #define __CRT_ATTR_CONST_htonl 1
+#define __CRT_ATTR_CONST_htonq 1
 #define __CRT_ATTR_CONST_htons 1
 #define __CRT_ATTR_CONST_imaxabs 1
 #define __CRT_ATTR_CONST_imaxdiv 1
@@ -4849,6 +4852,7 @@
 #define __CRT_ATTR_CONST_nexttowardf 1
 #define __CRT_ATTR_CONST_nexttowardl 1
 #define __CRT_ATTR_CONST_ntohl 1
+#define __CRT_ATTR_CONST_ntohq 1
 #define __CRT_ATTR_CONST_ntohs 1
 #define __CRT_ATTR_CONST_pthread_equal 1
 #define __CRT_ATTR_CONST_pthread_gettid_np 1

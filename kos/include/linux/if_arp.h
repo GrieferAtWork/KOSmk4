@@ -21,9 +21,14 @@
 #define _LINUX_IF_ARG_H 1
 
 #include <__stdinc.h>
-#include <kos/bits/types.h>
-#include <bits/socket.h> /* struct sockaddr */
-//#include <linux/netdevice.h>
+
+#include <bits/sockaddr-struct.h>
+#include <bits/types.h>
+#include <net/types.h>
+
+#if 0
+#include <linux/netdevice.h>
+#endif
 
 __SYSDECL_BEGIN
 
@@ -53,20 +58,34 @@ __SYSDECL_BEGIN
  */
 
 /* ARP protocol HARDWARE identifiers. */
-#define ARPHRD_NETROM      0 /* from KA9Q: NET/ROM pseudo. */
-#define ARPHRD_ETHER       1 /* Ethernet 10Mbps. */
-#define ARPHRD_EETHER      2 /* Experimental Ethernet. */
-#define ARPHRD_AX25        3 /* AX.25 Level 2. */
-#define ARPHRD_PRONET      4 /* PROnet token ring. */
-#define ARPHRD_CHAOS       5 /* Chaosnet. */
-#define ARPHRD_IEEE802     6 /* IEEE 802.2 Ethernet/TR/TB. */
-#define ARPHRD_ARCNET      7 /* ARCnet. */
-#define ARPHRD_APPLETLK    8 /* APPLEtalk. */
+#define ARPHRD_NETROM     0  /* from KA9Q: NET/ROM pseudo. */
+#define ARPHRD_ETHER      1  /* Ethernet 10Mbps. */
+#define ARPHRD_EETHER     2  /* Experimental Ethernet. */
+#define ARPHRD_AX25       3  /* AX.25 Level 2. */
+#define ARPHRD_PRONET     4  /* PROnet token ring. */
+#define ARPHRD_CHAOS      5  /* Chaosnet. */
+#define ARPHRD_IEEE802    6  /* IEEE 802.2 Ethernet/TR/TB. */
+#define ARPHRD_ARCNET     7  /* ARCnet. */
+#define ARPHRD_APPLETLK   8  /* APPLEtalk. */
+/*      ARPHRD_           9   * ... */
+/*      ARPHRD_           ... * ... */
+/*      ARPHRD_           14  * ... */
 #define ARPHRD_DLCI       15 /* Frame Relay DLCI. */
+/*      ARPHRD_           16  * ... */
+/*      ARPHRD_           ... * ... */
+/*      ARPHRD_           18  * ... */
 #define ARPHRD_ATM        19 /* ATM. */
+/*      ARPHRD_           20  * ... */
+/*      ARPHRD_           21  * ... */
+/*      ARPHRD_           22  * ... */
 #define ARPHRD_METRICOM   23 /* Metricom STRIP (new IANA id). */
 #define ARPHRD_IEEE1394   24 /* IEEE 1394 IPv4 - RFC 2734. */
+/*      ARPHRD_           25  * ... */
+/*      ARPHRD_           26  * ... */
 #define ARPHRD_EUI64      27 /* EUI-64. */
+/*      ARPHRD_           28  * ... */
+/*      ARPHRD_           ... * ... */
+/*      ARPHRD_           31  * ... */
 #define ARPHRD_INFINIBAND 32 /* InfiniBand. */
 
 /* Dummy types for non ARP hardware */
@@ -123,8 +142,8 @@ __SYSDECL_BEGIN
 #define ARPHRD_NETLINK    824  /* Netlink header. */
 #define ARPHRD_6LOWPAN    825  /* IPv6 over LoWPAN. */
 
-#define ARPHRD_VOID 0xFFFF /* Void type, nothing is known. */
-#define ARPHRD_NONE 0xFFFE /* zero header length. */
+#define ARPHRD_VOID 0xffff /* Void type, nothing is known. */
+#define ARPHRD_NONE 0xfffe /* zero header length. */
 
 /* ARP protocol opcodes. */
 #define ARPOP_REQUEST   1  /* ARP request. */
@@ -138,8 +157,6 @@ __SYSDECL_BEGIN
 
 /* ARP ioctl request. */
 #ifdef __CC__
-#ifndef __arpreq_defined
-#define __arpreq_defined 1
 struct arpreq {
 	struct sockaddr arp_pa;      /* protocol address. */
 	struct sockaddr arp_ha;      /* hardware address. */
@@ -147,45 +164,47 @@ struct arpreq {
 	struct sockaddr arp_netmask; /* netmask (only for proxy arps). */
 	char            arp_dev[16];
 };
-#endif /* !__arpreq_defined */
 
-#ifndef __arpreq_old_defined
-#define __arpreq_old_defined 1
 struct arpreq_old {
 	struct sockaddr arp_pa;      /* protocol address. */
 	struct sockaddr arp_ha;      /* hardware address. */
 	__INT32_TYPE__  arp_flags;   /* flags. */
 	struct sockaddr arp_netmask; /* netmask (only for proxy arps). */
 };
-#endif /* !__arpreq_old_defined */
 #endif /* __CC__ */
 
 /* ARP Flag values. */
-#define ATF_COM         0x02 /* completed entry (ha valid). */
-#define ATF_PERM        0x04 /* permanent entry. */
-#define ATF_PUBL        0x08 /* publish entry. */
-#define ATF_USETRAILERS 0x10 /* has requested trailers. */
-#define ATF_NETMASK     0x20 /* want to use a netmask (only for proxy entries). */
-#define ATF_DONTPUB     0x40 /* don't answer this addresses. */
+#define ATF_COM         0x02 /* Completed entry (ha valid). */
+#define ATF_PERM        0x04 /* Permanent entry. */
+#define ATF_PUBL        0x08 /* Publish entry. */
+#define ATF_USETRAILERS 0x10 /* Has requested trailers. */
+#define ATF_NETMASK     0x20 /* Want to use a netmask (only for proxy entries). */
+#define ATF_DONTPUB     0x40 /* Don't answer this addresses. */
+#define ATF_MAGIC       0x80 /* Automatically added entry. */
+
+
+/* See RFC 826 for protocol description. ARP packets are variable
+ * in size; the arphdr structure defines the fixed-length portion.
+ * Protocol type values are the same as those for 10 Mb/s Ethernet.
+ * It is followed by the variable-sized fields ar_sha, arp_spa,
+ * arp_tha and arp_tpa in that order, according to the lengths
+ * specified. Field names used correspond to RFC 826. */
 
 /* This structure defines an ethernet arp header. */
 #ifdef __CC__
-#ifndef __arphdr_defined
-#define __arphdr_defined 1
 struct arphdr {
-	__be16        ar_hrd; /* format of hardware address. */
-	__be16        ar_pro; /* format of protocol address. */
-	unsigned char ar_hln; /* length of hardware address. */
-	unsigned char ar_pln; /* length of protocol address. */
-	__be16        ar_op;  /* ARP opcode (command). */
+	__u_net16_t ar_hrd; /* format of hardware address. (One of `ARPHRD_*') */
+	__u_net16_t ar_pro; /* format of protocol address. (One of `ETH_P_*' from <linux/if_ether.h>) */
+	__uint8_t   ar_hln; /* length of hardware address (in bytes). */
+	__uint8_t   ar_pln; /* length of protocol address (in bytes). */
+	__u_net16_t ar_op;  /* ARP opcode (command). (One of `ARPOP_*') */
 #if 0 /* The variable part looks like this: */
-	unsigned char ar_sha[ar_hln]; /* sender hardware address. */
-	unsigned char ar_sip[ar_pln]; /* sender protocol address. */
-	unsigned char ar_tha[ar_hln]; /* target hardware address. */
-	unsigned char ar_tip[ar_pln]; /* target protocol address. */
+	__byte_t    ar_sha[ar_hln]; /* Sender hardware address. */
+	__byte_t    ar_sip[ar_pln]; /* Sender protocol address. */
+	__byte_t    ar_tha[ar_hln]; /* Target hardware address. */
+	__byte_t    ar_tip[ar_pln]; /* Target protocol address. */
 #endif
 };
-#endif /* !__arphdr_defined */
 #endif /* __CC__ */
 
 __SYSDECL_END

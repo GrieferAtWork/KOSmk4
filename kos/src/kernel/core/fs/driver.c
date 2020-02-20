@@ -1268,6 +1268,7 @@ PUBLIC WUNUSED NONNULL((1)) char const *
 		THROWS(E_IOERROR, E_WOULDBLOCK, E_BADALLOC) {
 	if (self->d_filename)
 		return self->d_filename;
+	COMPILER_IMPURE();
 	/* TODO: Search for a file `self->d_name' in the kernel driver library path list. */
 	return NULL;
 }

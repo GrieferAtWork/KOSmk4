@@ -20,9 +20,10 @@
 #ifndef _LINUX_IF_ETHER_H
 #define _LINUX_IF_ETHER_H 1
 
-#include <features.h>
 #include <__stdinc.h>
-#include <kos/bits/types.h>
+#include <features.h>
+
+#include <net/types.h>
 
 /*
  * INET   An implementation of the TCP/IP protocol suite for the LINUX
@@ -53,19 +54,21 @@ __SYSDECL_BEGIN
 #define ETH_ZLEN       60   /* Min. octets in frame sans FCS. */
 #define ETH_DATA_LEN   1500 /* Max. octets in payload. */
 #define ETH_FRAME_LEN  1514 /* Max. octets in frame sans FCS. */
-#define ETH_FCS_LEN    4    /* Octets in the FCS. */
+#define ETH_FCS_LEN    4    /* Octets in the FCS. (FrameCheckSequence; aka. trailing CRC) */
 
 /* These are the defined Ethernet Protocol ID's. */
 #define ETH_P_LOOP       0x0060 /* Ethernet Loopback packet. */
 #define ETH_P_PUP        0x0200 /* Xerox PUP packet. */
 #define ETH_P_PUPAT      0x0201 /* Xerox PUP Addr Trans packet. */
-#define ETH_P_TSN        0x22f0 /* TSN (IEEE 1722) packet. */
+#define ETH_P_SPRITE     0x0500 /* Sprite */
+#define ETH_P_802_3_MIN  0x0600 /* If the value in the ethernet type is less than this value then the frame is Ethernet II. Else it is 802.3. */
 #define ETH_P_IP         0x0800 /* Internet Protocol packet. */
 #define ETH_P_X25        0x0805 /* CCITT X.25. */
 #define ETH_P_ARP        0x0806 /* Address Resolution packet. */
 #define ETH_P_BPQ        0x08ff /* G8BPQ AX.25 Ethernet Packet [ NOT AN OFFICIALLY REGISTERED ID ]. */
 #define ETH_P_IEEEPUP    0x0a00 /* Xerox IEEE802.3 PUP packet. */
 #define ETH_P_IEEEPUPAT  0x0a01 /* Xerox IEEE802.3 PUP Addr Trans packet. */
+#define ETH_P_TSN        0x22f0 /* TSN (IEEE 1722) packet. */
 #define ETH_P_BATMAN     0x4305 /* B.A.T.M.A.N.-Advanced packet [ NOT AN OFFICIALLY REGISTERED ID ]. */
 #define ETH_P_DEC        0x6000 /* DEC Assigned proto. */
 #define ETH_P_DNA_DL     0x6001 /* DEC DNA Dump/Load. */
@@ -111,7 +114,6 @@ __SYSDECL_BEGIN
 #define ETH_P_QINQ3      0x9300 /* deprecated QinQ VLAN [ NOT AN OFFICIALLY REGISTERED ID ]. */
 #define ETH_P_EDSA       0xdada /* Ethertype DSA [ NOT AN OFFICIALLY REGISTERED ID ]. */
 #define ETH_P_AF_IUCV    0xfbfb /* IBM af_iucv [ NOT AN OFFICIALLY REGISTERED ID ]. */
-#define ETH_P_802_3_MIN  0x0600 /* If the value in the ethernet type is less than this value then the frame is Ethernet II. Else it is 802.3. */
 
 /* Non DIX types. Won't clash for 1500 types. */
 #define ETH_P_802_3      0x0001 /* Dummy type for 802.3 frames. */
@@ -140,12 +142,17 @@ __SYSDECL_BEGIN
 #define ETH_P_CAIF       0x00f7 /* ST-Ericsson CAIF protocol. */
 #define ETH_P_XDSA       0x00f8 /* Multiplexed DSA protocol. */
 
+
+#define __OFFSET_ETHHDR_DEST   0
+#define __OFFSET_ETHHDR_SOURCE 6
+#define __OFFSET_ETHHDR_PROTO  12
+#define __SIZEOF_ETHHDR        14
 #ifdef __CC__
 /* This is an Ethernet frame header. */
-struct __ATTR_PACKED ethhdr {
+struct __ATTR_PACKED ethhdr /*[PREFIX(h_)]*/ {
 	unsigned char h_dest[ETH_ALEN];   /* Destination eth addr. */
 	unsigned char h_source[ETH_ALEN]; /* Source ether addr. */
-	__be16        h_proto;            /* Packet type ID field. (one of `ETH_P_*') */
+	__u_net16_t   h_proto;            /* Packet type ID field. (one of `ETH_P_*') */
 };
 #endif /* __CC__ */
 

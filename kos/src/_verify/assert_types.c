@@ -391,6 +391,7 @@ local files = {
 	"../../include/kos/hop/pipe.h",
 	"../../include/kos/hop/task.h",
 	"../../include/kos/ksysctl.h",
+	"../../include/linux/if_ether.h",
 };
 
 local include_prefixes = {
@@ -1710,6 +1711,18 @@ STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_newpath) == _
 STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_oldpath) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_OLDPATH);
 STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_struct_size) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_STRUCT_SIZE);
 STATIC_ASSERT(sizeof(struct ksysctl_driver_set_library_path) == __SIZEOF_KSYSCTL_DRIVER_SET_LIBRARY_PATH);
+
+
+
+
+
+#include <linux/if_ether.h>
+
+/* struct ethhdr */
+STATIC_ASSERT(offsetof(struct ethhdr, h_dest) == __OFFSET_ETHHDR_DEST);
+STATIC_ASSERT(offsetof(struct ethhdr, h_proto) == __OFFSET_ETHHDR_PROTO);
+STATIC_ASSERT(offsetof(struct ethhdr, h_source) == __OFFSET_ETHHDR_SOURCE);
+STATIC_ASSERT(sizeof(struct ethhdr) == __SIZEOF_ETHHDR);
 //[[[end]]]
 
 

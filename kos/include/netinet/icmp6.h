@@ -20,10 +20,19 @@
 #ifndef _NETINET_ICMP6_H
 #define _NETINET_ICMP6_H 1
 
+#include <__stdinc.h>
+#include <features.h>
+
+#include <bits/types.h>
+#include <net/types.h>
+#include <libc/string.h>
+
+#ifdef __USE_GLIBC
+#include <netinet/in.h>
+#include <sys/types.h>
 #include <inttypes.h>
 #include <string.h>
-#include <sys/types.h>
-#include <netinet/in.h>
+#endif /* __USE_GLIBC */
 
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -52,24 +61,24 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 struct icmp6_filter {
-	uint32_t icmp6_filt[8];
+	__u_net32_t icmp6_filt[8];
 };
 struct icmp6_hdr {
-	uint8_t    icmp6_type;   /* type field */
-	uint8_t    icmp6_code;   /* code field */
-	uint16_t   icmp6_cksum;  /* checksum field */
+	__uint8_t    icmp6_type;   /* type field */
+	__uint8_t    icmp6_code;   /* code field */
+	__u_net16_t   icmp6_cksum;  /* checksum field */
 #ifdef __COMPILER_HAVE_TRANSPARENT_UNION
 	union { /* Type-specific data. */
-		uint32_t  icmp6_data32[1];
-		uint16_t  icmp6_data16[2];
-		uint8_t   icmp6_data8[4];
-		uint32_t  icmp6_pptr;     /* Parameter prob */
-		uint32_t  icmp6_mtu;      /* Packet too big */
-		uint16_t  icmp6_maxdelay; /* Mcast group membership */
+		__u_net32_t  icmp6_data32[1];
+		__u_net16_t  icmp6_data16[2];
+		__uint8_t   icmp6_data8[4];
+		__u_net32_t  icmp6_pptr;     /* Parameter prob */
+		__u_net32_t  icmp6_mtu;      /* Packet too big */
+		__u_net16_t  icmp6_maxdelay; /* Mcast group membership */
 #ifdef __COMPILER_HAVE_TRANSPARENT_STRUCT
 		struct {
-			uint16_t icmp6_id;  /* Echo request/reply */
-			uint16_t icmp6_seq; /* Echo request/reply */
+			__u_net16_t icmp6_id;  /* Echo request/reply */
+			__u_net16_t icmp6_seq; /* Echo request/reply */
 		};
 #else /* __COMPILER_HAVE_TRANSPARENT_STRUCT */
 #define icmp6_id  icmp6_data16[0] /* Echo request/reply */
@@ -78,9 +87,9 @@ struct icmp6_hdr {
 	};
 #else /* __COMPILER_HAVE_TRANSPARENT_UNION */
 	union { /* Type-specific data. */
-		uint32_t  icmp6_un_data32[1];
-		uint16_t  icmp6_un_data16[2];
-		uint8_t   icmp6_un_data8[4];
+		__u_net32_t  icmp6_un_data32[1];
+		__u_net16_t  icmp6_un_data16[2];
+		__uint8_t   icmp6_un_data8[4];
 	} icmp6_dataun;
 #define icmp6_data32    icmp6_dataun.icmp6_un_data32
 #define icmp6_data16    icmp6_dataun.icmp6_un_data16
@@ -119,8 +128,8 @@ struct icmp6_hdr {
 #define ICMP6_FILTER_WILLBLOCK(type,filterp) ((((filterp)->icmp6_filt[(type) >> 5]) & (1 << ((type) & 31))) != 0)
 #define ICMP6_FILTER_SETPASS(type,filterp)   ((((filterp)->icmp6_filt[(type) >> 5]) &= ~(1 << ((type) & 31))))
 #define ICMP6_FILTER_SETBLOCK(type,filterp)  ((((filterp)->icmp6_filt[(type) >> 5]) |=  (1 << ((type) & 31))))
-#define ICMP6_FILTER_SETPASSALL(filterp)      memset(filterp,0,sizeof(struct icmp6_filter));
-#define ICMP6_FILTER_SETBLOCKALL(filterp)     memset(filterp,0xFF,sizeof(struct icmp6_filter));
+#define ICMP6_FILTER_SETPASSALL(filterp)     __libc_memset(filterp, 0, sizeof(struct icmp6_filter));
+#define ICMP6_FILTER_SETBLOCKALL(filterp)    __libc_memset(filterp, 0xff, sizeof(struct icmp6_filter));
 #define ND_ROUTER_SOLICIT           133
 #define ND_ROUTER_ADVERT            134
 #define ND_NEIGHBOR_SOLICIT         135
@@ -140,8 +149,8 @@ struct nd_router_solicit {
 #ifdef __CC__
 struct nd_router_advert {
 	struct icmp6_hdr          nd_ra_hdr;
-	uint32_t                  nd_ra_reachable;  /* reachable time. */
-	uint32_t                  nd_ra_retransmit; /* retransmit timer. */
+	__u_net32_t                  nd_ra_reachable;  /* reachable time. */
+	__u_net32_t                  nd_ra_retransmit; /* retransmit timer. */
 #define nd_ra_type            nd_ra_hdr.icmp6_type
 #define nd_ra_code            nd_ra_hdr.icmp6_code
 #define nd_ra_cksum           nd_ra_hdr.icmp6_cksum
@@ -204,8 +213,8 @@ struct nd_redirect {
 
 #ifdef __CC__
 struct nd_opt_hdr {
-	uint8_t nd_opt_type;
-	uint8_t nd_opt_len;  /* in units of 8 octets */
+	__uint8_t nd_opt_type;
+	__uint8_t nd_opt_len;  /* in units of 8 octets */
 	/* Options go here. */
 };
 #endif /* __CC__ */
@@ -219,13 +228,13 @@ struct nd_opt_hdr {
 
 #ifdef __CC__
 struct nd_opt_prefix_info {
-	uint8_t         nd_opt_pi_type;
-	uint8_t         nd_opt_pi_len;
-	uint8_t         nd_opt_pi_prefix_len;
-	uint8_t         nd_opt_pi_flags_reserved;
-	uint32_t        nd_opt_pi_valid_time;
-	uint32_t        nd_opt_pi_preferred_time;
-	uint32_t        nd_opt_pi_reserved2;
+	__uint8_t         nd_opt_pi_type;
+	__uint8_t         nd_opt_pi_len;
+	__uint8_t         nd_opt_pi_prefix_len;
+	__uint8_t         nd_opt_pi_flags_reserved;
+	__u_net32_t        nd_opt_pi_valid_time;
+	__u_net32_t        nd_opt_pi_preferred_time;
+	__u_net32_t        nd_opt_pi_reserved2;
 	struct in6_addr nd_opt_pi_prefix;
 };
 #endif /* __CC__ */
@@ -235,20 +244,20 @@ struct nd_opt_prefix_info {
 
 #ifdef __CC__
 struct nd_opt_rd_hdr {
-	uint8_t   nd_opt_rh_type;
-	uint8_t   nd_opt_rh_len;
-	uint16_t  nd_opt_rh_reserved1;
-	uint32_t  nd_opt_rh_reserved2;
+	__uint8_t   nd_opt_rh_type;
+	__uint8_t   nd_opt_rh_len;
+	__u_net16_t  nd_opt_rh_reserved1;
+	__u_net32_t  nd_opt_rh_reserved2;
 	/* IP header and data go here. */
 };
 #endif /* __CC__ */
 
 #ifdef __CC__
 struct nd_opt_mtu {
-	uint8_t  nd_opt_mtu_type;
-	uint8_t  nd_opt_mtu_len;
-	uint16_t nd_opt_mtu_reserved;
-	uint32_t nd_opt_mtu_mtu;
+	__uint8_t  nd_opt_mtu_type;
+	__uint8_t  nd_opt_mtu_len;
+	__u_net16_t nd_opt_mtu_reserved;
+	__u_net32_t nd_opt_mtu_mtu;
 };
 #endif /* __CC__ */
 
@@ -272,10 +281,10 @@ struct icmp6_router_renum {
 #define rr_code   rr_hdr.icmp6_code
 #define rr_cksum  rr_hdr.icmp6_cksum
 #define rr_seqnum rr_hdr.icmp6_data32[0]
-	uint8_t          rr_segnum;
-	uint8_t          rr_flags;
-	uint16_t         rr_maxdelay;
-	uint32_t         rr_reserved;
+	__uint8_t          rr_segnum;
+	__uint8_t          rr_flags;
+	__u_net16_t         rr_maxdelay;
+	__u_net32_t         rr_reserved;
 };
 #endif /* __CC__ */
 
@@ -289,13 +298,13 @@ struct icmp6_router_renum {
 
 #ifdef __CC__
 struct rr_pco_match {
-	uint8_t             rpm_code;
-	uint8_t             rpm_len;
-	uint8_t             rpm_ordinal;
-	uint8_t             rpm_matchlen;
-	uint8_t             rpm_minlen;
-	uint8_t             rpm_maxlen;
-	uint16_t            rpm_reserved;
+	__uint8_t             rpm_code;
+	__uint8_t             rpm_len;
+	__uint8_t             rpm_ordinal;
+	__uint8_t             rpm_matchlen;
+	__uint8_t             rpm_minlen;
+	__uint8_t             rpm_maxlen;
+	__u_net16_t            rpm_reserved;
 	struct in6_addr     rpm_prefix;
 };
 #endif /* __CC__ */
@@ -307,13 +316,13 @@ struct rr_pco_match {
 
 #ifdef __CC__
 struct rr_pco_use {
-	uint8_t         rpu_uselen;
-	uint8_t         rpu_keeplen;
-	uint8_t         rpu_ramask;
-	uint8_t         rpu_raflags;
-	uint32_t        rpu_vltime;
-	uint32_t        rpu_pltime;
-	uint32_t        rpu_flags;
+	__uint8_t         rpu_uselen;
+	__uint8_t         rpu_keeplen;
+	__uint8_t         rpu_ramask;
+	__uint8_t         rpu_raflags;
+	__u_net32_t        rpu_vltime;
+	__u_net32_t        rpu_pltime;
+	__u_net32_t        rpu_flags;
 	struct in6_addr rpu_prefix;
 };
 #endif /* __CC__ */
@@ -329,10 +338,10 @@ struct rr_pco_use {
 
 #ifdef __CC__
 struct rr_result {
-	uint16_t        rrr_flags;
-	uint8_t         rrr_ordinal;
-	uint8_t         rrr_matchedlen;
-	uint32_t        rrr_ifid;
+	__u_net16_t     rrr_flags;
+	__uint8_t       rrr_ordinal;
+	__uint8_t       rrr_matchedlen;
+	__u_net32_t     rrr_ifid;
 	struct in6_addr rrr_prefix;
 };
 #endif /* __CC__ */
@@ -346,18 +355,18 @@ struct rr_result {
 
 #ifdef __CC__
 struct nd_opt_adv_interval {
-	uint8_t  nd_opt_adv_interval_type;
-	uint8_t  nd_opt_adv_interval_len;
-	uint16_t nd_opt_adv_interval_reserved;
-	uint32_t nd_opt_adv_interval_ival;
+	__uint8_t   nd_opt_adv_interval_type;
+	__uint8_t   nd_opt_adv_interval_len;
+	__u_net16_t nd_opt_adv_interval_reserved;
+	__u_net32_t nd_opt_adv_interval_ival;
 };
 
 struct nd_opt_home_agent_info {
-	uint8_t  nd_opt_home_agent_info_type;
-	uint8_t  nd_opt_home_agent_info_len;
-	uint16_t nd_opt_home_agent_info_reserved;
-	uint16_t nd_opt_home_agent_info_preference;
-	uint16_t nd_opt_home_agent_info_lifetime;
+	__uint8_t   nd_opt_home_agent_info_type;
+	__uint8_t   nd_opt_home_agent_info_len;
+	__u_net16_t nd_opt_home_agent_info_reserved;
+	__u_net16_t nd_opt_home_agent_info_preference;
+	__u_net16_t nd_opt_home_agent_info_lifetime;
 };
 #endif /* __CC__ */
 

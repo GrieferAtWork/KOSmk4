@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4d230c63 */
+/* HASH CRC-32:0xebff9c9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,6 +87,11 @@ enum {
 #define __size_t_defined 1
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
+
+#ifndef __socklen_t_defined
+#define __socklen_t_defined 1
+typedef __socklen_t socklen_t;
+#endif /* !__socklen_t_defined */
 
 #ifdef __USE_MISC
 #ifndef __osockaddr_defined

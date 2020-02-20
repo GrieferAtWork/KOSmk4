@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fbad0a2 */
+/* HASH CRC-32:0xcde5143e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wlink) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wlink))(__WCHAR_TYPE__ const *__from,
                                                    __WCHAR_TYPE__ const *__to) {
-#line 530 "kos/src/libc/magic/unistd.c"
+#line 529 "kos/src/libc/magic/unistd.c"
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
 	return __localdep_wlinkat(__CRT_AT_FDCWD, __from, __CRT_AT_FDCWD, __to, 0);
 }

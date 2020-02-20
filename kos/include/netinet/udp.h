@@ -66,28 +66,87 @@
  * SUCH DAMAGE.
  */
 
+#include <__stdinc.h>
 #include <features.h>
+
+#include <net/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
 /* UDP header as specified by RFC 768, August 1980. */
 #ifdef __CC__
+
 struct udphdr {
+#ifdef __USE_KOS_PURE
+	__u_net16_t uh_sport; /* source port */
+	__u_net16_t uh_dport; /* destination port */
+	__u_net16_t uh_ulen;  /* udp length */
+	__u_net16_t uh_sum;   /* udp checksum */
+#else /* __USE_KOS_PURE */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("source")
+#pragma push_macro("dest")
+#pragma push_macro("len")
+#pragma push_macro("check")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef source
+#undef dest
+#undef len
+#undef check
+#if (defined(__COMPILER_HAVE_TRANSPARENT_UNION) && \
+     defined(__COMPILER_HAVE_TRANSPARENT_STRUCT))
 	union {
 		struct {
-			u_int16_t uh_sport; /* source port */
-			u_int16_t uh_dport; /* destination port */
-			u_int16_t uh_ulen;  /* udp length */
-			u_int16_t uh_sum;   /* udp checksum */
+			__u_net16_t uh_sport; /* source port */
+			__u_net16_t uh_dport; /* destination port */
+			__u_net16_t uh_ulen;  /* udp length */
+			__u_net16_t uh_sum;   /* udp checksum */
 		};
 		struct {
-			u_int16_t source;
-			u_int16_t dest;
-			u_int16_t len;
-			u_int16_t check;
+			__u_net16_t source; /* source port */
+			__u_net16_t dest;   /* destination port */
+			__u_net16_t len;    /* udp length */
+			__u_net16_t check;  /* udp checksum */
 		};
 	};
+#elif defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+	union {
+		__u_net16_t uh_sport; /* source port */
+		__u_net16_t source;   /* source port */
+	};
+	union {
+		__u_net16_t uh_dport; /* destination port */
+		__u_net16_t dest;     /* destination port */
+	};
+	union {
+		__u_net16_t uh_ulen;  /* udp length */
+		__u_net16_t len;      /* udp length */
+	};
+	union {
+		__u_net16_t uh_sum;   /* udp checksum */
+		__u_net16_t check;    /* udp checksum */
+	};
+#else /* ... */
+	__u_net16_t source; /* source port */
+	__u_net16_t dest;   /* destination port */
+	__u_net16_t len;    /* udp length */
+	__u_net16_t check;  /* udp checksum */
+#define uh_sport source /* source port */
+#define uh_dport dest   /* destination port */
+#define uh_ulen  len    /* udp length */
+#define uh_sum   check  /* udp checksum */
+#endif /* !... */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("check")
+#pragma pop_macro("len")
+#pragma pop_macro("dest")
+#pragma pop_macro("source")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* !__USE_KOS_PURE */
 };
 #endif /* __CC__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32579dd */
+/* HASH CRC-32:0xc3bf2693 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,22 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <stdint.h>
-#include <bits/in.h>
-#include <bits/types.h>
-#include <sys/socket.h>
+
 #include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
+
+#include <bits/in.h>
+#include <bits/sockaddr-struct.h>
+#include <bits/sockaddr.h>
+#include <bits/sockaddr_storage-struct.h>
+#include <bits/types.h>
+#include <net/types.h>
+
+#include <stdint.h>
+
+#ifdef __USE_GLIBC
+#include <sys/socket.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/netinet/in.h */
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
@@ -348,9 +358,9 @@ enum {
 #define INADDR_NONE          (__CCAST(in_addr_t)0xffffffff) /* Address indicating an error return. */
 
 #define IN_LOOPBACKNET         127 /* Network number for local host loopback. */
-#ifndef INADDR_LOOPBACK            /* Address to loopback in software to local host. */
+#ifndef INADDR_LOOPBACK /* Address to loopback in software to local host. */
 #define INADDR_LOOPBACK      (__CCAST(in_addr_t)0x7f000001) /* Inet 127.0.0.1. */
-#endif
+#endif /* !INADDR_LOOPBACK */
 
 /* Defines for Multicast INADDR. */
 #define INADDR_UNSPEC_GROUP    (__CCAST(in_addr_t)0xe0000000) /* 224.0.0.0 */
@@ -361,29 +371,35 @@ enum {
 
 #ifdef __CC__
 
-typedef uint16_t in_port_t; /* Type to represent a port. */
+typedef __u_net16_t in_port_t; /* Type to represent a port. */
+
+#ifndef __socklen_t_defined
+#define __socklen_t_defined 1
+typedef __socklen_t socklen_t;
+#endif /* !__socklen_t_defined */
+
 
 /* IPv6 address */
 struct in6_addr {
 #ifdef __COMPILER_HAVE_TRANSPARENT_UNION
 	union {
 #undef s6_addr
-		uint8_t  s6_addr[16];
+		__uint8_t  s6_addr[16];
 #ifdef __USE_MISC
 #undef s6_addr16
 #undef s6_addr32
-		uint16_t s6_addr16[8];
-		uint32_t s6_addr32[4];
+		__u_net16_t s6_addr16[8];
+		__u_net32_t s6_addr32[4];
 #endif /* __USE_MISC */
 	};
 #else /* __COMPILER_HAVE_TRANSPARENT_UNION */
 	union {
-		uint8_t  __u6_addr8[16];
+		__uint8_t  __u6_addr8[16];
 #undef s6_addr
 #define s6_addr      __in6_u.__u6_addr8
 #ifdef __USE_MISC
-		uint16_t __u6_addr16[8];
-		uint32_t __u6_addr32[4];
+		__u_net16_t __u6_addr16[8];
+		__u_net32_t __u6_addr32[4];
 #undef s6_addr16
 #undef s6_addr32
 #define s6_addr16 __in6_u.__u6_addr16
@@ -395,15 +411,15 @@ struct in6_addr {
 
 #ifdef __CRT_HAVE_in6addr_any
 #undef in6addr_any
-__LIBC struct in6_addr const (in6addr_any);        /* :: */
+__LIBC struct in6_addr const (in6addr_any); /* :: */
 #endif /* __CRT_HAVE_in6addr_any */
 #ifdef __CRT_HAVE_in6addr_loopback
 #undef in6addr_loopback
-__LIBC struct in6_addr const (in6addr_loopback);   /* ::1 */
+__LIBC struct in6_addr const (in6addr_loopback); /* ::1 */
 #endif /* __CRT_HAVE_in6addr_loopback */
 
-#define IN6ADDR_ANY_INIT      {{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}}
-#define IN6ADDR_LOOPBACK_INIT {{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}}}
+#define IN6ADDR_ANY_INIT      { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } } }
+#define IN6ADDR_LOOPBACK_INIT { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } } }
 #define INET_ADDRSTRLEN  16
 #define INET6_ADDRSTRLEN 46
 
@@ -413,16 +429,18 @@ struct sockaddr_in {
 	in_port_t      sin_port; /* Port number. */
 	struct in_addr sin_addr; /* Internet address. */
 	/* Pad to size of `struct sockaddr'. */
-	unsigned char  sin_zero[sizeof(struct sockaddr)-__SOCKADDR_COMMON_SIZE-
-	                        sizeof(in_port_t)-sizeof(struct in_addr)];
+	unsigned char sin_zero[sizeof(struct sockaddr) -
+	                       (__SOCKADDR_COMMON_SIZE +
+	                        sizeof(in_port_t) +
+	                        sizeof(struct in_addr))];
 };
 
 struct sockaddr_in6 {
 	__SOCKADDR_COMMON(sin6_);
 	in_port_t       sin6_port;     /* Transport layer port # */
-	uint32_t        sin6_flowinfo; /* IPv6 flow information */
+	__u_net32_t     sin6_flowinfo; /* IPv6 flow information */
 	struct in6_addr sin6_addr;     /* IPv6 address */
-	uint32_t        sin6_scope_id; /* IPv6 scope-id */
+	__u_net32_t     sin6_scope_id; /* IPv6 scope-id */
 };
 
 #ifdef __USE_MISC
@@ -465,9 +483,10 @@ struct ip_msfilter {
 	uint32_t       imsf_numsrc;    /* Number of source addresses. */
 	struct in_addr imsf_slist[1];  /* Source addresses. */
 };
-#define IP_MSFILTER_SIZE(numsrc) (sizeof(struct ip_msfilter) \
-                                 -sizeof(struct in_addr) \
-                                 +(numsrc)*sizeof(struct in_addr))
+#define IP_MSFILTER_SIZE(numsrc)  \
+	(sizeof(struct ip_msfilter) - \
+	 sizeof(struct in_addr) +     \
+	 ((numsrc) * sizeof(struct in_addr)))
 
 struct group_filter {
 	uint32_t                gf_interface; /* Interface index. */
@@ -476,22 +495,23 @@ struct group_filter {
 	uint32_t                gf_numsrc;    /* Number of source addresses. */
 	struct sockaddr_storage gf_slist[1];  /* Source addresses. */
 };
-#define GROUP_FILTER_SIZE(numsrc) (sizeof(struct group_filter) \
-                                  -sizeof(struct sockaddr_storage) \
-                                  +((numsrc)*sizeof(struct sockaddr_storage)))
+#define GROUP_FILTER_SIZE(numsrc)      \
+	(sizeof(struct group_filter) -     \
+	 sizeof(struct sockaddr_storage) + \
+	 ((numsrc) * sizeof(struct sockaddr_storage)))
 #endif /* __USE_MISC */
 
-#ifdef __CRT_HAVE_ntohl
-__CDECLARE(__ATTR_CONST,uint32_t,__NOTHROW_NCX,ntohl,(uint32_t __netlong),(__netlong))
-#elif defined(__CRT_HAVE_htonl)
-__CREDIRECT(__ATTR_CONST,uint32_t,__NOTHROW_NCX,ntohl,(uint32_t __netlong),htonl,(__netlong))
-#else /* LIBC: ntohl */
-#include <local/netinet.in/ntohl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ntohl, __FORCELOCAL __ATTR_CONST uint32_t __NOTHROW_NCX(__LIBCCALL ntohl)(uint32_t __netlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohl))(__netlong); })
-#endif /* ntohl... */
+#ifdef __CRT_HAVE_htons
+__CDECLARE(__ATTR_CONST,uint16_t,__NOTHROW_NCX,htons,(uint16_t __hostword),(__hostword))
+#elif defined(__CRT_HAVE_ntohs) && defined(__HYBRID_HTOBE_IS_BETOH)
+__CREDIRECT(__ATTR_CONST,uint16_t,__NOTHROW_NCX,htons,(uint16_t __hostword),ntohs,(__hostword))
+#else /* LIBC: htons */
+#include <local/netinet.in/htons.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(htons, __FORCELOCAL __ATTR_CONST uint16_t __NOTHROW_NCX(__LIBCCALL htons)(uint16_t __hostword) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htons))(__hostword); })
+#endif /* htons... */
 #ifdef __CRT_HAVE_ntohs
 __CDECLARE(__ATTR_CONST,uint16_t,__NOTHROW_NCX,ntohs,(uint16_t __netshort),(__netshort))
-#elif defined(__CRT_HAVE_htons)
+#elif defined(__CRT_HAVE_htons) && defined(__HYBRID_HTOBE_IS_BETOH)
 __CREDIRECT(__ATTR_CONST,uint16_t,__NOTHROW_NCX,ntohs,(uint16_t __netshort),htons,(__netshort))
 #else /* LIBC: ntohs */
 #include <local/netinet.in/ntohs.h>
@@ -499,33 +519,59 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntohs, __FORCELOCAL __ATTR_CONST uint16_t __NOTH
 #endif /* ntohs... */
 #ifdef __CRT_HAVE_htonl
 __CDECLARE(__ATTR_CONST,uint32_t,__NOTHROW_NCX,htonl,(uint32_t __hostlong),(__hostlong))
-#elif defined(__CRT_HAVE_ntohl)
+#elif defined(__CRT_HAVE_ntohl) && defined(__HYBRID_HTOBE_IS_BETOH)
 __CREDIRECT(__ATTR_CONST,uint32_t,__NOTHROW_NCX,htonl,(uint32_t __hostlong),ntohl,(__hostlong))
+#else /* LIBC: htonl */
+#include <local/netinet.in/htonl.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(htonl, __FORCELOCAL __ATTR_CONST uint32_t __NOTHROW_NCX(__LIBCCALL htonl)(uint32_t __hostlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonl))(__hostlong); })
+#endif /* htonl... */
+#ifdef __CRT_HAVE_ntohl
+__CDECLARE(__ATTR_CONST,uint32_t,__NOTHROW_NCX,ntohl,(uint32_t __netlong),(__netlong))
+#elif defined(__CRT_HAVE_htonl) && defined(__HYBRID_HTOBE_IS_BETOH)
+__CREDIRECT(__ATTR_CONST,uint32_t,__NOTHROW_NCX,ntohl,(uint32_t __netlong),htonl,(__netlong))
 #else /* LIBC: ntohl */
 #include <local/netinet.in/ntohl.h>
-__FORCELOCAL __ATTR_CONST uint32_t __NOTHROW_NCX(__LIBCCALL htonl)(uint32_t __hostlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohl))(__hostlong); }
-#endif /* htonl... */
-#ifdef __CRT_HAVE_htons
-__CDECLARE(__ATTR_CONST,uint16_t,__NOTHROW_NCX,htons,(uint16_t __hostlong),(__hostlong))
-#elif defined(__CRT_HAVE_ntohs)
-__CREDIRECT(__ATTR_CONST,uint16_t,__NOTHROW_NCX,htons,(uint16_t __hostlong),ntohs,(__hostlong))
-#else /* LIBC: ntohs */
-#include <local/netinet.in/ntohs.h>
-__FORCELOCAL __ATTR_CONST uint16_t __NOTHROW_NCX(__LIBCCALL htons)(uint16_t __hostlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohs))(__hostlong); }
-#endif /* htons... */
-#ifdef __OPTIMIZE__
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#   define ntohl(x)   (x)
-#   define ntohs(x)   (x)
-#   define htonl(x)   (x)
-#   define htons(x)   (x)
-#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#   define ntohl(x)    __bswap_32(x)
-#   define ntohs(x)    __bswap_16(x)
-#   define htonl(x)    __bswap_32(x)
-#   define htons(x)    __bswap_16(x)
-#endif
-#endif
+__NAMESPACE_LOCAL_USING_OR_IMPL(ntohl, __FORCELOCAL __ATTR_CONST uint32_t __NOTHROW_NCX(__LIBCCALL ntohl)(uint32_t __netlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohl))(__netlong); })
+#endif /* ntohl... */
+#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
+#ifdef __CRT_HAVE_htonq
+__CDECLARE(__ATTR_CONST,uint64_t,__NOTHROW_NCX,htonq,(uint64_t __hostlong),(__hostlong))
+#elif defined(__CRT_HAVE_ntohq) && defined(__HYBRID_HTOBE_IS_BETOH)
+__CREDIRECT(__ATTR_CONST,uint64_t,__NOTHROW_NCX,htonq,(uint64_t __hostlong),ntohq,(__hostlong))
+#else /* LIBC: htonq */
+#include <local/netinet.in/htonq.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(htonq, __FORCELOCAL __ATTR_CONST uint64_t __NOTHROW_NCX(__LIBCCALL htonq)(uint64_t __hostlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonq))(__hostlong); })
+#endif /* htonq... */
+#ifdef __CRT_HAVE_ntohq
+__CDECLARE(__ATTR_CONST,uint64_t,__NOTHROW_NCX,ntohq,(uint64_t __netlong),(__netlong))
+#elif defined(__CRT_HAVE_htonq) && defined(__HYBRID_HTOBE_IS_BETOH)
+__CREDIRECT(__ATTR_CONST,uint64_t,__NOTHROW_NCX,ntohq,(uint64_t __netlong),htonq,(__netlong))
+#else /* LIBC: ntohq */
+#include <local/netinet.in/ntohq.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_CONST uint64_t __NOTHROW_NCX(__LIBCCALL ntohq)(uint64_t __netlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohq))(__netlong); })
+#endif /* ntohq... */
+#endif /* __USE_KOS && __UINT64_TYPE__ */
+
+
+#ifdef __USE_KOS
+#define htons(x) __hybrid_htobe16(x)
+#define ntohs(x) __hybrid_betoh16(x)
+#define htonl(x) __hybrid_htobe32(x)
+#define ntohl(x) __hybrid_betoh32(x)
+#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
+#define htonq(x) __hybrid_htobe64(x)
+#define ntohq(x) __hybrid_betoh64(x)
+#endif /* __USE_KOS && __UINT64_TYPE__ */
+#else /* __USE_KOS */
+#define htons(x) __CCAST(__uint16_t)__hybrid_htobe16(x)
+#define ntohs(x) __CCAST(__uint16_t)__hybrid_betoh16(x)
+#define htonl(x) __CCAST(__uint32_t)__hybrid_htobe32(x)
+#define ntohl(x) __CCAST(__uint32_t)__hybrid_betoh32(x)
+#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
+#define htonq(x) __CCAST(__uint64_t)__hybrid_htobe64(x)
+#define ntohq(x) __CCAST(__uint64_t)__hybrid_betoh64(x)
+#endif /* __USE_KOS && __UINT64_TYPE__ */
+#endif /* !__USE_KOS */
 
 #ifndef __NO_XBLOCK
 #define IN6_IS_ADDR_UNSPECIFIED(a) __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == 0; })

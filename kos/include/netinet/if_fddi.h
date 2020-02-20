@@ -22,9 +22,16 @@
 
 #include <__stdinc.h>
 #include <features.h>
-#include <sys/types.h>
-#include <asm/types.h>
+
 #include <linux/if_fddi.h>
+
+#if defined(__USE_MISC) && defined(__CC__) && !defined(__USE_KOS_PURE)
+#include <bits/types.h>
+#endif /* __USE_MISC && __CC__ && !__USE_KOS_PURE */
+
+#ifdef __USE_GLIBC
+#include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 /* Copyright (C) 1997-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -47,11 +54,13 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_MISC
 #ifdef __CC__
+#ifndef __USE_KOS_PURE /* Use `struct fddihdr' instead */
 struct fddi_header {
-	u_int8_t fddi_fc;                 /* Frame Control (FC) value */
-	u_int8_t fddi_dhost[FDDI_K_ALEN]; /* Destination host */
-	u_int8_t fddi_shost[FDDI_K_ALEN]; /* Source host */
+	__uint8_t fddi_fc;                 /* Frame Control (FC) value. */
+	__uint8_t fddi_dhost[FDDI_K_ALEN]; /* Destination address. */
+	__uint8_t fddi_shost[FDDI_K_ALEN]; /* Source address. */
 };
+#endif /* !__USE_KOS_PURE */
 #endif /* __CC__ */
 #endif /* __USE_MISC */
 

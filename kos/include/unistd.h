@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x172b5ffd */
+/* HASH CRC-32:0xeca4280c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -162,29 +162,28 @@ typedef __off64_t off64_t;
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
-#if defined(__USE_XOPEN_EXTENDED) || \
-    defined(__USE_XOPEN2K)
+#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #ifndef __intptr_t_defined
 #define __intptr_t_defined 1
 typedef __intptr_t intptr_t;
 #endif /* !__intptr_t_defined */
-#endif
+#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #ifndef __socklen_t_defined
 #define __socklen_t_defined 1
 typedef __socklen_t socklen_t;
 #endif /* !__socklen_t_defined */
-#endif
+#endif /* __USE_MISC || __USE_XOPEN */
 
 #ifndef __TARGV
 #ifdef __USE_DOS
-#   define __TARGV  char const *const *___argv
-#   define __TENVP  char const *const *___envp
-#else
-#   define __TARGV  char *const ___argv[__restrict_arr]
-#   define __TENVP  char *const ___envp[__restrict_arr]
-#endif
+#define __TARGV char const *const *___argv
+#define __TENVP char const *const *___envp
+#else /* __USE_DOS */
+#define __TARGV char *const ___argv[__restrict_arr]
+#define __TENVP char *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
 #endif /* !__TARGV */
 
 #ifndef ____environ_defined
@@ -216,9 +215,9 @@ __LIBC char **environ;
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p__environ,(void),())
 #endif /* !____p__environ_defined */
 #define __environ (*__p__environ())
-#else
+#else /* ... */
 #undef ____environ_defined
-#endif
+#endif /* !... */
 #endif /* !____environ_defined */
 
 #ifndef __execv_defined

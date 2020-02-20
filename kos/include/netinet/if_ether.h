@@ -19,11 +19,9 @@
  */
 #ifndef _NETINET_IF_ETHER_H
 #define _NETINET_IF_ETHER_H  1
-#ifndef __NETINET_IF_ETHER_H
-#define __NETINET_IF_ETHER_H 1
 
+#include <__stdinc.h>
 #include <features.h>
-#include <sys/types.h>
 #include <linux/if_ether.h>
 
 /* Copyright (C) 1996-2016 Free Software Foundation, Inc.
@@ -80,6 +78,10 @@
 #include <net/ethernet.h>
 #include <net/if_arp.h>
 
+#ifdef __USE_GLIBC
+#include <sys/types.h>
+#endif /* __USE_GLIBC */
+
 __SYSDECL_BEGIN
 /*
  * Ethernet Address Resolution Protocol.
@@ -90,37 +92,51 @@ __SYSDECL_BEGIN
  */
 #ifdef __CC__
 struct ether_arp {
-	struct   arphdr ea_hdr;     /* fixed-size header. */
-	u_int8_t arp_sha[ETH_ALEN]; /* sender hardware address. */
-	u_int8_t arp_spa[4];        /* sender protocol address. */
-	u_int8_t arp_tha[ETH_ALEN]; /* target hardware address. */
-	u_int8_t arp_tpa[4];        /* target protocol address. */
+#ifdef __USE_KOS_PURE
+	struct arphdr ea_hdr; /* fixed-size header. */
+#elif (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+       defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+	union {
+		struct arphdr   ea_hdr; /* fixed-size header. */
+		struct {
+			__u_net16_t arp_hrd; /* format of hardware address. (One of `ARPHRD_*') */
+			__u_net16_t arp_pro; /* format of protocol address. (One of `ETH_P_*' from <linux/if_ether.h>) */
+			__uint8_t   arp_hln; /* length of hardware address (in bytes). */
+			__uint8_t   arp_pln; /* length of protocol address (in bytes). */
+			__u_net16_t arp_op;  /* ARP opcode (command). (One of `ARPOP_*') */
+		};
+	};
+#else /* ... */
+	struct arphdr ea_hdr; /* fixed-size header. */
+#define arp_hrd   ea_hdr.ar_hrd
+#define arp_pro   ea_hdr.ar_pro
+#define arp_hln   ea_hdr.ar_hln
+#define arp_pln   ea_hdr.ar_pln
+#define arp_op    ea_hdr.ar_op
+#endif /* !... */
+	__uint8_t     arp_sha[ETH_ALEN]; /* sender hardware address. */
+	__uint8_t     arp_spa[4];        /* sender protocol address. */
+	__uint8_t     arp_tha[ETH_ALEN]; /* target hardware address. */
+	__uint8_t     arp_tpa[4];        /* target protocol address. */
 };
-#define arp_hrd ea_hdr.ar_hrd
-#define arp_pro ea_hdr.ar_pro
-#define arp_hln ea_hdr.ar_hln
-#define arp_pln ea_hdr.ar_pln
-#define arp_op  ea_hdr.ar_op
 #endif /* __CC__ */
 
 /* Macro to map an IP multicast address to an Ethernet multicast address.
  * The high-order 25 bits of the Ethernet address are statically assigned,
  * and the low-order 23 bits are taken from the low end of the IP address. */
 #ifdef __CC__
-#define ETHER_MAP_IP_MULTICAST(ipaddr, enaddr) \
-  /* struct in_addr *ipaddr;  */ \
-  /* u_char enaddr[ETH_ALEN]; */ \
-{ (enaddr)[0] = 0x01; \
-  (enaddr)[1] = 0x00; \
-  (enaddr)[2] = 0x5e; \
-  (enaddr)[3] = ((u_int8_t *)ipaddr)[1] & 0x7f; \
-  (enaddr)[4] = ((u_int8_t *)ipaddr)[2]; \
-  (enaddr)[5] = ((u_int8_t *)ipaddr)[3]; \
-}
+#define ETHER_MAP_IP_MULTICAST(ipaddr, enaddr)       \
+	/* struct in_addr *ipaddr;  */                   \
+	/* u_char enaddr[ETH_ALEN]; */                   \
+	((enaddr)[0] = 0x01,                             \
+	 (enaddr)[1] = 0x00,                             \
+	 (enaddr)[2] = 0x5e,                             \
+	 (enaddr)[3] = ((u_int8_t *)(ipaddr))[1] & 0x7f, \
+	 (enaddr)[4] = ((u_int8_t *)(ipaddr))[2],        \
+	 (enaddr)[5] = ((u_int8_t *)(ipaddr))[3])
 #endif /* __CC__ */
 
 __SYSDECL_END
 #endif /* __USE_MISC */
 
-#endif /* !__NETINET_IF_ETHER_H */
 #endif /* !_NETINET_IF_ETHER_H */

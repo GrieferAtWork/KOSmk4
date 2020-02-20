@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63b4dac2 */
+/* HASH CRC-32:0x5cd7e649 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 __LOCAL_LIBC(usleep) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(usleep))(__useconds_t __useconds) {
-#line 1163 "kos/src/libc/magic/unistd.c"
+#line 1162 "kos/src/libc/magic/unistd.c"
 	__localdep___crtSleep(__useconds / 1000l); /*USEC_PER_MSEC*/
 	return 0;
 }

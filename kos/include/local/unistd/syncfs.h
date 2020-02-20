@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51049a18 */
+/* HASH CRC-32:0x68b8ca44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(syncfs) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(syncfs))(__fd_t __fd) {
-#line 1137 "kos/src/libc/magic/unistd.c"
+#line 1136 "kos/src/libc/magic/unistd.c"
 	(void)__fd;
 	/* NO-OP */
 	return 0;

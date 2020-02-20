@@ -21,8 +21,15 @@
 #define _NET_ETHERNET_H 1
 
 #include <__stdinc.h>
+#include <features.h>
+
+#include <linux/if_ether.h> /* IEEE 802.3 Ethernet constants */
+#include <bits/types.h>
+#include <net/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
-#include <linux/if_ether.h>     /* IEEE 802.3 Ethernet constants */
+#endif /* __USE_GLIBC */
 
 /* Copyright (C) 1997-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -49,41 +56,44 @@ __SYSDECL_BEGIN
 /* This is a name for the 48 bit ethernet address available on many systems. */
 #ifdef __CC__
 struct __ATTR_PACKED ether_addr {
-	u_int8_t ether_addr_octet[ETH_ALEN];
+	__uint8_t ether_addr_octet[ETH_ALEN];
 };
 #endif /* __CC__ */
 
 /* 10Mb/s ethernet header */
 #ifdef __CC__
+#ifndef __USE_KOS_PURE /* Use `struct ethhdr' (it's the same structure with different names) */
 struct __ATTR_PACKED ether_header {
-	u_int8_t  ether_dhost[ETH_ALEN];    /* destination eth addr */
-	u_int8_t  ether_shost[ETH_ALEN];    /* source ether addr */
-	u_int16_t ether_type;                /* packet type ID field */
+	__uint8_t   ether_dhost[ETH_ALEN]; /* destination eth addr */
+	__uint8_t   ether_shost[ETH_ALEN]; /* source ether addr */
+	__u_net16_t ether_type;            /* packet type ID field */
 };
+#endif /* !__USE_KOS_PURE */
 #endif /* __CC__ */
 
 /* Ethernet protocol ID's */
-#define ETHERTYPE_PUP       0x0200 /* Xerox PUP */
-#define ETHERTYPE_SPRITE    0x0500 /* Sprite */
-#define ETHERTYPE_IP        0x0800 /* IP */
-#define ETHERTYPE_ARP       0x0806 /* Address resolution */
-#define ETHERTYPE_REVARP    0x8035 /* Reverse ARP */
-#define ETHERTYPE_AT        0x809B /* AppleTalk protocol */
-#define ETHERTYPE_AARP      0x80F3 /* AppleTalk ARP */
-#define ETHERTYPE_VLAN      0x8100 /* IEEE 802.1Q VLAN tagging */
-#define ETHERTYPE_IPX       0x8137 /* IPX */
-#define ETHERTYPE_IPV6      0x86dd /* IP protocol version 6 */
-#define ETHERTYPE_LOOPBACK  0x9000 /* used to test interfaces */
-
+#ifndef __USE_KOS_PURE /* Use the underlying macros instead */
+#define ETHERTYPE_PUP       ETH_P_PUP      /* Xerox PUP */
+#define ETHERTYPE_SPRITE    ETH_P_SPRITE   /* Sprite */
+#define ETHERTYPE_IP        ETH_P_IP       /* IP */
+#define ETHERTYPE_ARP       ETH_P_ARP      /* Address resolution */
+#define ETHERTYPE_REVARP    ETH_P_RARP     /* Reverse ARP */
+#define ETHERTYPE_AT        ETH_P_ATALK    /* AppleTalk protocol */
+#define ETHERTYPE_AARP      ETH_P_AARP     /* AppleTalk ARP */
+#define ETHERTYPE_VLAN      ETH_P_8021Q    /* IEEE 802.1Q VLAN tagging */
+#define ETHERTYPE_IPX       ETH_P_IPX      /* IPX */
+#define ETHERTYPE_IPV6      ETH_P_IPV6     /* IP protocol version 6 */
+#define ETHERTYPE_LOOPBACK  ETH_P_LOOPBACK /* used to test interfaces */
+#endif /* !__USE_KOS_PURE */
 
 #define ETHER_ADDR_LEN   ETH_ALEN                       /* size of ethernet addr */
-#define ETHER_TYPE_LEN   2                              /* bytes in type field */
-#define ETHER_CRC_LEN    4                              /* bytes in CRC field */
+#define ETHER_TYPE_LEN   (ETH_HLEN - (2 * ETH_ALEN))    /* bytes in type field */
+#define ETHER_CRC_LEN    ETH_FCS_LEN                    /* bytes in CRC field */
 #define ETHER_HDR_LEN    ETH_HLEN                       /* total octets in header */
 #define ETHER_MIN_LEN   (ETH_ZLEN + ETHER_CRC_LEN)      /* min packet length */
 #define ETHER_MAX_LEN   (ETH_FRAME_LEN + ETHER_CRC_LEN) /* max packet length */
 
-/* make sure ethenet length is valid */
+/* make sure ethernet length is valid */
 #define ETHER_IS_VALID_LEN(foo) \
 	((foo) >= ETHER_MIN_LEN && (foo) <= ETHER_MAX_LEN)
 

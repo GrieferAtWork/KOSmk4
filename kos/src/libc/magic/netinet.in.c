@@ -22,12 +22,22 @@
 
 %{
 #include <features.h>
-#include <stdint.h>
-#include <bits/in.h>
-#include <bits/types.h>
-#include <sys/socket.h>
+
 #include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
+
+#include <bits/in.h>
+#include <bits/sockaddr-struct.h>
+#include <bits/sockaddr.h>
+#include <bits/sockaddr_storage-struct.h>
+#include <bits/types.h>
+#include <net/types.h>
+
+#include <stdint.h>
+
+#ifdef __USE_GLIBC
+#include <sys/socket.h>
+#endif /* __USE_GLIBC */
 
 /* Documentation taken from Glibc /usr/include/netinet/in.h */
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
@@ -149,9 +159,9 @@ __SYSDECL_BEGIN
 #define INADDR_NONE          (__CCAST(in_addr_t)0xffffffff) /* Address indicating an error return. */
 
 #define IN_LOOPBACKNET         127 /* Network number for local host loopback. */
-#ifndef INADDR_LOOPBACK            /* Address to loopback in software to local host. */
+#ifndef INADDR_LOOPBACK /* Address to loopback in software to local host. */
 #define INADDR_LOOPBACK      (__CCAST(in_addr_t)0x7f000001) /* Inet 127.0.0.1. */
-#endif
+#endif /* !INADDR_LOOPBACK */
 
 /* Defines for Multicast INADDR. */
 #define INADDR_UNSPEC_GROUP    (__CCAST(in_addr_t)0xe0000000) /* 224.0.0.0 */
@@ -162,29 +172,35 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-typedef uint16_t in_port_t; /* Type to represent a port. */
+typedef __u_net16_t in_port_t; /* Type to represent a port. */
+
+#ifndef __socklen_t_defined
+#define __socklen_t_defined 1
+typedef __socklen_t socklen_t;
+#endif /* !__socklen_t_defined */
+
 
 /* IPv6 address */
 struct in6_addr {
 #ifdef __COMPILER_HAVE_TRANSPARENT_UNION
 	union {
 #undef s6_addr
-		uint8_t  s6_addr[16];
+		__uint8_t  s6_addr[16];
 #ifdef __USE_MISC
 #undef s6_addr16
 #undef s6_addr32
-		uint16_t s6_addr16[8];
-		uint32_t s6_addr32[4];
+		__u_net16_t s6_addr16[8];
+		__u_net32_t s6_addr32[4];
 #endif /* __USE_MISC */
 	};
 #else /* __COMPILER_HAVE_TRANSPARENT_UNION */
 	union {
-		uint8_t  __u6_addr8[16];
+		__uint8_t  __u6_addr8[16];
 #undef s6_addr
 #define s6_addr      __in6_u.__u6_addr8
 #ifdef __USE_MISC
-		uint16_t __u6_addr16[8];
-		uint32_t __u6_addr32[4];
+		__u_net16_t __u6_addr16[8];
+		__u_net32_t __u6_addr32[4];
 #undef s6_addr16
 #undef s6_addr32
 #define s6_addr16 __in6_u.__u6_addr16
@@ -196,15 +212,15 @@ struct in6_addr {
 
 #ifdef __CRT_HAVE_in6addr_any
 #undef in6addr_any
-__LIBC struct in6_addr const (in6addr_any);        /* :: */
+__LIBC struct in6_addr const (in6addr_any); /* :: */
 #endif /* __CRT_HAVE_in6addr_any */
 #ifdef __CRT_HAVE_in6addr_loopback
 #undef in6addr_loopback
-__LIBC struct in6_addr const (in6addr_loopback);   /* ::1 */
+__LIBC struct in6_addr const (in6addr_loopback); /* ::1 */
 #endif /* __CRT_HAVE_in6addr_loopback */
 
-#define IN6ADDR_ANY_INIT      {{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}}
-#define IN6ADDR_LOOPBACK_INIT {{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}}}
+#define IN6ADDR_ANY_INIT      { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } } }
+#define IN6ADDR_LOOPBACK_INIT { { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } } }
 #define INET_ADDRSTRLEN  16
 #define INET6_ADDRSTRLEN 46
 
@@ -214,16 +230,18 @@ struct sockaddr_in {
 	in_port_t      sin_port; /* Port number. */
 	struct in_addr sin_addr; /* Internet address. */
 	/* Pad to size of `struct sockaddr'. */
-	unsigned char  sin_zero[sizeof(struct sockaddr)-__SOCKADDR_COMMON_SIZE-
-	                        sizeof(in_port_t)-sizeof(struct in_addr)];
+	unsigned char sin_zero[sizeof(struct sockaddr) -
+	                       (__SOCKADDR_COMMON_SIZE +
+	                        sizeof(in_port_t) +
+	                        sizeof(struct in_addr))];
 };
 
 struct sockaddr_in6 {
 	__SOCKADDR_COMMON(sin6_);
 	in_port_t       sin6_port;     /* Transport layer port # */
-	uint32_t        sin6_flowinfo; /* IPv6 flow information */
+	__u_net32_t     sin6_flowinfo; /* IPv6 flow information */
 	struct in6_addr sin6_addr;     /* IPv6 address */
-	uint32_t        sin6_scope_id; /* IPv6 scope-id */
+	__u_net32_t     sin6_scope_id; /* IPv6 scope-id */
 };
 
 #ifdef __USE_MISC
@@ -266,9 +284,10 @@ struct ip_msfilter {
 	uint32_t       imsf_numsrc;    /* Number of source addresses. */
 	struct in_addr imsf_slist[1];  /* Source addresses. */
 };
-#define IP_MSFILTER_SIZE(numsrc) (sizeof(struct ip_msfilter) \
-                                 -sizeof(struct in_addr) \
-                                 +(numsrc)*sizeof(struct in_addr))
+#define IP_MSFILTER_SIZE(numsrc)  \
+	(sizeof(struct ip_msfilter) - \
+	 sizeof(struct in_addr) +     \
+	 ((numsrc) * sizeof(struct in_addr)))
 
 struct group_filter {
 	uint32_t                gf_interface; /* Interface index. */
@@ -277,43 +296,76 @@ struct group_filter {
 	uint32_t                gf_numsrc;    /* Number of source addresses. */
 	struct sockaddr_storage gf_slist[1];  /* Source addresses. */
 };
-#define GROUP_FILTER_SIZE(numsrc) (sizeof(struct group_filter) \
-                                  -sizeof(struct sockaddr_storage) \
-                                  +((numsrc)*sizeof(struct sockaddr_storage)))
+#define GROUP_FILTER_SIZE(numsrc)      \
+	(sizeof(struct group_filter) -     \
+	 sizeof(struct sockaddr_storage) + \
+	 ((numsrc) * sizeof(struct sockaddr_storage)))
 #endif /* __USE_MISC */
 
 }
 
 %[default_impl_section(.text.crt.net.convert)]
-[dependency_include(<hybrid/__byteswap.h>)]
-[alias(htonl)][ATTR_CONST]
-ntohl:(uint32_t netlong) -> uint32_t {
-	return (uint32_t)__hybrid_beswap32(netlong);
+[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohs)]
+htons:(uint16_t hostword) -> uint16_t {
+	return (uint16_t)__hybrid_htobe32(hostword);
 }
 
-[dependency_include(<hybrid/__byteswap.h>)]
-[alias(htons)][ATTR_CONST]
+[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htons)]
 ntohs:(uint16_t netshort) -> uint16_t {
-	return (uint16_t)__hybrid_beswap16(netshort);
+	return (uint16_t)__hybrid_betoh16(netshort);
 }
 
-[ATTR_CONST] htonl:(uint32_t hostlong) -> uint32_t = ntohl;
-[ATTR_CONST] htons:(uint16_t hostlong) -> uint16_t = ntohs;
+[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohl)]
+htonl:(uint32_t hostlong) -> uint32_t {
+	return (uint32_t)__hybrid_htobe32(hostlong);
+}
+
+[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonl)]
+ntohl:(uint32_t netlong) -> uint32_t {
+	return (uint32_t)__hybrid_betoh32(netlong);
+}
+
+%#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
+[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[if(defined(__HYBRID_HTOBE_IS_BETOH)), alias(ntohq)]
+htonq:(uint64_t hostlong) -> uint64_t {
+	return (uint64_t)__hybrid_htobe64(hostlong);
+}
+
+[dependency_include(<hybrid/__byteswap.h>)][ATTR_CONST]
+[alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonq)]
+ntohq:(uint64_t netlong) -> uint64_t {
+	return (uint64_t)__hybrid_betoh64(netlong);
+}
+%#endif /* __USE_KOS && __UINT64_TYPE__ */
+
 
 %{
-#ifdef __OPTIMIZE__
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#   define ntohl(x)   (x)
-#   define ntohs(x)   (x)
-#   define htonl(x)   (x)
-#   define htons(x)   (x)
-#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#   define ntohl(x)    __bswap_32(x)
-#   define ntohs(x)    __bswap_16(x)
-#   define htonl(x)    __bswap_32(x)
-#   define htons(x)    __bswap_16(x)
-#endif
-#endif
+
+
+#ifdef __USE_KOS
+#define htons(x) __hybrid_htobe16(x)
+#define ntohs(x) __hybrid_betoh16(x)
+#define htonl(x) __hybrid_htobe32(x)
+#define ntohl(x) __hybrid_betoh32(x)
+#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
+#define htonq(x) __hybrid_htobe64(x)
+#define ntohq(x) __hybrid_betoh64(x)
+#endif /* __USE_KOS && __UINT64_TYPE__ */
+#else /* __USE_KOS */
+#define htons(x) __CCAST(__uint16_t)__hybrid_htobe16(x)
+#define ntohs(x) __CCAST(__uint16_t)__hybrid_betoh16(x)
+#define htonl(x) __CCAST(__uint32_t)__hybrid_htobe32(x)
+#define ntohl(x) __CCAST(__uint32_t)__hybrid_betoh32(x)
+#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
+#define htonq(x) __CCAST(__uint64_t)__hybrid_htobe64(x)
+#define ntohq(x) __CCAST(__uint64_t)__hybrid_betoh64(x)
+#endif /* __USE_KOS && __UINT64_TYPE__ */
+#endif /* !__USE_KOS */
 
 #ifndef __NO_XBLOCK
 #define IN6_IS_ADDR_UNSPECIFIED(a) __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == 0; })

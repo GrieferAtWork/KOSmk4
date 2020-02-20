@@ -323,7 +323,7 @@ int main_nic(int argc, char *argv[], char *envp[]) {
 		fd_t fd = Open("/dev/ne2k0", O_RDWR);
 		struct ATTR_PACKED {
 			struct ethhdr eth;
-			struct ip     ip;
+			struct iphdr  ip;
 			struct udphdr udp;
 			char          dat[64];
 		} d;
@@ -335,22 +335,22 @@ int main_nic(int argc, char *argv[], char *envp[]) {
 		d.eth.h_source[4] = 0x9a;
 		d.eth.h_source[5] = 0xbc;
 		d.eth.h_source[6] = 0xde;
-		d.eth.h_proto = (be16)htons(ETH_P_IP);
+		d.eth.h_proto = htons(ETH_P_IP);
 		d.ip.ip_v   = 4;
 		d.ip.ip_hl  = 5; /* 5 * 4 = 20 bytes */
 		d.ip.ip_tos = 0; /* ??? */
 		d.ip.ip_len = htons(sizeof(d.ip) + sizeof(d.udp) + sizeof(d.dat));
-		d.ip.ip_id  = 0; /* ??? */
-		d.ip.ip_off = 0; /* ??? */
+		d.ip.ip_id  = htons(0); /* ??? */
+		d.ip.ip_off = htons(0); /* ??? */
 		d.ip.ip_ttl = 64;
 		d.ip.ip_p   = IPPROTO_UDP;
-		d.ip.ip_sum = 42; /* TODO */
-		d.ip.ip_src.s_addr = 0;
-		d.ip.ip_dst.s_addr = 0;
-		d.udp.uh_sport = 1234;
-		d.udp.uh_dport = 1234;
+		d.ip.ip_sum = htons(42); /* TODO */
+		d.ip.ip_src.s_addr = htonl(0);
+		d.ip.ip_dst.s_addr = htonl(0);
+		d.udp.uh_sport = htons(1234);
+		d.udp.uh_dport = htons(1234);
 		d.udp.uh_ulen  = htons(sizeof(d.udp) + sizeof(d.dat));
-		d.udp.uh_sum   = 42;
+		d.udp.uh_sum   = htons(42);
 		strcpy(d.dat, "<<Hello world?>>\n");
 		Write(fd, &d, sizeof(d));
 		pause();

@@ -19,8 +19,6 @@
  */
 #ifndef _NETINET_IP_H
 #define _NETINET_IP_H 1
-#ifndef __NETINET_IP_H
-#define __NETINET_IP_H 1
 
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -40,16 +38,24 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <features.h>
-#include <sys/types.h>
-#include <netinet/in.h>
+
 #include <hybrid/__byteorder.h>
 
-__SYSDECL_BEGIN
+#include <bits/types.h>
+#include <net/types.h>
+
+#ifdef __USE_GLIBC
+#include <netinet/in.h>
+#include <sys/types.h>
+#endif /* __USE_GLIBC */
+
+__DECL_BEGIN
 
 #ifdef __CC__
+#ifndef __USE_KOS_PURE /* The same structure as `struct ip_timestamp' */
 struct timestamp {
-	u_int8_t len;
-	u_int8_t ptr;
+	__uint8_t    len;
+	__uint8_t    ptr;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int flags : 4;
 	unsigned int overflow : 4;
@@ -57,25 +63,114 @@ struct timestamp {
 	unsigned int overflow : 4;
 	unsigned int flags : 4;
 #endif
-	u_int32_t data[9];
+	__uint32_t   data[9];
 };
+#endif /* !__USE_KOS_PURE */
+
 struct iphdr {
+#ifdef __USE_KOS_PURE
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	unsigned int ihl : 4;
-	unsigned int version : 4;
+	unsigned int   ip_hl : 4; /* header length */
+	unsigned int   ip_v : 4;  /* version */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	unsigned int version : 4;
-	unsigned int ihl : 4;
+	unsigned int   ip_v : 4;  /* version */
+	unsigned int   ip_hl : 4; /* header length */
 #endif
-	u_int8_t  tos;
-	u_int16_t tot_len;
-	u_int16_t id;
-	u_int16_t frag_off;
-	u_int8_t  ttl;
-	u_int8_t  protocol;
-	u_int16_t check;
-	u_int32_t saddr;
-	u_int32_t daddr;
+	__uint8_t      ip_tos;    /* type of service (s.a. `IPTOS_*') */
+	__u_net16_t    ip_len;    /* total length */
+	__u_net16_t    ip_id;     /* identification */
+	__u_net16_t    ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
+	__uint8_t      ip_ttl;    /* time to live */
+	__uint8_t      ip_p;      /* protocol */
+	__u_net16_t    ip_sum;    /* checksum */
+	struct in_addr ip_src;    /* source address */
+	struct in_addr ip_dst;    /* dest address */
+#elif (defined(__USE_KOS) &&                          \
+       defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+       defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+	union {
+		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+			unsigned int   ip_hl : 4; /* header length */
+			unsigned int   ip_v : 4;  /* version */
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+			unsigned int   ip_v : 4;  /* version */
+			unsigned int   ip_hl : 4; /* header length */
+#endif
+			__uint8_t      ip_tos;    /* type of service (s.a. `IPTOS_*') */
+			__u_net16_t    ip_len;    /* total length */
+			__u_net16_t    ip_id;     /* identification */
+			__u_net16_t    ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
+			__uint8_t      ip_ttl;    /* time to live */
+			__uint8_t      ip_p;      /* protocol */
+			__u_net16_t    ip_sum;    /* checksum */
+			struct in_addr ip_src;    /* source address */
+			struct in_addr ip_dst;    /* dest address */
+		};
+		struct {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+			unsigned int ihl : 4;     /* header length */
+			unsigned int version : 4; /* version */
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+			unsigned int version : 4; /* version */
+			unsigned int ihl : 4;     /* header length */
+#endif
+			__uint8_t    tos;         /* type of service (s.a. `IPTOS_*') */
+			__u_net16_t  tot_len;     /* total length */
+			__u_net16_t  id;          /* identification */
+			__u_net16_t  frag_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
+			__uint8_t    ttl;         /* time to live */
+			__uint8_t    protocol;    /* protocol */
+			__u_net16_t  check;       /* checksum */
+			__u_net32_t  saddr;       /* source address */
+			__u_net32_t  daddr;       /* dest address */
+		};
+	};
+#else /* ... */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+	unsigned int ihl : 4;     /* header length */
+	unsigned int version : 4; /* version */
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	unsigned int version : 4; /* version */
+	unsigned int ihl : 4;     /* header length */
+#endif
+	__uint8_t    tos;         /* type of service (s.a. `IPTOS_*') */
+	__u_net16_t  tot_len;     /* total length */
+	__u_net16_t  id;          /* identification */
+	__u_net16_t  frag_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
+	__uint8_t    ttl;         /* time to live */
+	__uint8_t    protocol;    /* protocol */
+	__u_net16_t  check;       /* checksum */
+#ifdef __USE_KOS
+#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
+	union {
+		struct in_addr ip_src; /* source address */
+		__u_net32_t    saddr;  /* source address */
+	};
+	union {
+		struct in_addr ip_dst; /* dest address */
+		__u_net32_t    daddr;  /* dest address */
+	};
+#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
+	struct in_addr ip_src; /* source address */
+	struct in_addr ip_dst; /* dest address */
+#define saddr  ip_src.s_addr
+#define daddr  ip_dst.s_addr
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+#define ip_hl  ihl
+#define ip_v   version
+#define ip_tos tos
+#define ip_len tot_len
+#define ip_id  id
+#define ip_off frag_off
+#define ip_ttl ttl
+#define ip_p   protocol
+#define ip_sum check
+#else /* __USE_KOS */
+	__u_net32_t  saddr; /* source address */
+	__u_net32_t  daddr; /* dest address */
+#endif /* !__USE_KOS */
+#endif /* !... */
 	/* The options start here. */
 };
 #endif /* __CC__ */
@@ -115,8 +210,17 @@ struct iphdr {
 /* Definitions for internet protocol version 4.
  * Per RFC 791, September 1981. */
 
+
+/* Masks and flags for `ip_off' */
+#define IP_RF      0x8000 /* reserved fragment flag */
+#define IP_DF      0x4000 /* dont fragment flag */
+#define IP_MF      0x2000 /* more fragments flag */
+#define IP_OFFMASK 0x1fff /* mask for fragmenting bits */
+
 /* Structure of an internet header, naked of options. */
 #ifdef __CC__
+
+#ifndef __USE_KOS_PURE /* The same structure as `struct iphdr' */
 struct ip {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int   ip_hl : 4; /* header length */
@@ -125,32 +229,25 @@ struct ip {
 	unsigned int   ip_v : 4;  /* version */
 	unsigned int   ip_hl : 4; /* header length */
 #endif
-	u_int8_t       ip_tos;    /* type of service */
-	u_short        ip_len;    /* total length */
-	u_short        ip_id;     /* identification */
-	u_short        ip_off;    /* fragment offset field */
-#ifdef __USE_KOS
-#define IP_EVIL 0x8000     /* Evil bit (Set for malicious packets) */
-#else /* __USE_KOS */
-#define IP_RF   0x8000     /* reserved fragment flag */
-#endif /* !__USE_KOS */
-#define IP_DF   0x4000     /* dont fragment flag */
-#define IP_MF   0x2000     /* more fragments flag */
-#define IP_OFFMASK 0x1fff  /* mask for fragmenting bits */
-	u_int8_t       ip_ttl;    /* time to live */
-	u_int8_t       ip_p;      /* protocol */
-	u_short        ip_sum;    /* checksum */
+	__uint8_t      ip_tos;    /* type of service (s.a. `IPTOS_*') */
+	__u_net16_t    ip_len;    /* total length */
+	__u_net16_t    ip_id;     /* identification */
+	__u_net16_t    ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
+	__uint8_t      ip_ttl;    /* time to live */
+	__uint8_t      ip_p;      /* protocol */
+	__u_net16_t    ip_sum;    /* checksum */
 	struct in_addr ip_src;    /* source address */
 	struct in_addr ip_dst;    /* dest address */
 };
 #endif /* __CC__ */
+#endif /* !__USE_KOS_PURE */
 
 /* Time stamp option structure. */
 #ifdef __CC__
 struct ip_timestamp {
-	u_int8_t     ipt_code;     /* IPOPT_TS */
-	u_int8_t     ipt_len;      /* size of structure (variable) */
-	u_int8_t     ipt_ptr;      /* index of current entry */
+	__uint8_t    ipt_code;     /* IPOPT_TS */
+	__uint8_t    ipt_len;      /* size of structure (variable) */
+	__uint8_t    ipt_ptr;      /* index of current entry */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int ipt_flg : 4;  /* flags, see below */
 	unsigned int ipt_oflw : 4; /* overflow counter */
@@ -158,7 +255,16 @@ struct ip_timestamp {
 	unsigned int ipt_oflw : 4; /* overflow counter */
 	unsigned int ipt_flg : 4;  /* flags, see below */
 #endif
-	u_int32_t    data[9];
+#ifdef __USE_KOS_PURE
+	__u_net32_t  ipt_data[9];
+#elif (defined(__USE_KOS) && defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+	union {
+		__u_net32_t ipt_data[9];
+		__u_net32_t data[9];
+	};
+#else /* ... */
+	__u_net32_t  data[9];
+#endif /* !... */
 };
 #endif /* __CC__ */
 #endif /* __USE_MISC */
@@ -284,7 +390,6 @@ struct ip_timestamp {
 #define IPTTLDEC              1    /* subtracted when forwarding */
 #define IP_MSS                576  /* default maximum segment size */
 
-__SYSDECL_END
+__DECL_END
 
-#endif /* !__NETINET_IP_H */
 #endif /* !_NETINET_IP_H */

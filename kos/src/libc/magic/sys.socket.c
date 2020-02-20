@@ -76,6 +76,11 @@ __SYSDECL_BEGIN
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
+#ifndef __socklen_t_defined
+#define __socklen_t_defined 1
+typedef __socklen_t socklen_t;
+#endif /* !__socklen_t_defined */
+
 #ifdef __USE_MISC
 #ifndef __osockaddr_defined
 #define __osockaddr_defined 1

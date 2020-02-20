@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a34c10f */
+/* HASH CRC-32:0xb3a8d5db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2598,8 +2598,12 @@
 #define __CRT_SECTION_lldiv                                 __CRT_SECTINFO_math_utility                             /* .text.crt.math.utility.lldiv */
 
 /* .text.crt.net.convert.* */
-#define __CRT_SECTION_ntohs                                 __CRT_SECTINFO_net_convert                              /* .text.crt.net.convert.ntohs */
+#define __CRT_SECTION_htonl                                 __CRT_SECTINFO_net_convert                              /* .text.crt.net.convert.htonl */
+#define __CRT_SECTION_htonq                                 __CRT_SECTINFO_net_convert                              /* .text.crt.net.convert.htonq */
+#define __CRT_SECTION_htons                                 __CRT_SECTINFO_net_convert                              /* .text.crt.net.convert.htons */
 #define __CRT_SECTION_ntohl                                 __CRT_SECTINFO_net_convert                              /* .text.crt.net.convert.ntohl */
+#define __CRT_SECTION_ntohq                                 __CRT_SECTINFO_net_convert                              /* .text.crt.net.convert.ntohq */
+#define __CRT_SECTION_ntohs                                 __CRT_SECTINFO_net_convert                              /* .text.crt.net.convert.ntohs */
 
 /* .text.crt.net.db.* */
 #define __CRT_SECTION___h_errno_location                    __CRT_SECTINFO_net_db                                   /* .text.crt.net.db.__h_errno_location */

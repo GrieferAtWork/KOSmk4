@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x85a81caa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,14 +17,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_ntohl_defined
-#define __local_ntohl_defined 1
-#include <hybrid/__byteswap.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ntohl) __ATTR_CONST __UINT32_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntohl))(__UINT32_TYPE__ __netlong) {
-#line 329 "kos/src/libc/magic/netinet.in.c"
-	return (__UINT32_TYPE__)__hybrid_betoh32(__netlong);
-}
-__NAMESPACE_LOCAL_END
-#endif /* !__local_ntohl_defined */
+#ifndef _BITS_SOCKADDR_STRUCT_H
+#define _BITS_SOCKADDR_STRUCT_H 1
+
+#include <__stdinc.h>
+
+/* Structure describing a generic socket address. */
+#ifdef __CC__
+#ifndef __sockaddr_defined
+#define __sockaddr_defined 1
+#include <bits/sockaddr.h>
+__DECL_BEGIN
+struct sockaddr {
+	__SOCKADDR_COMMON(sa_); /* Common data: address family and length. */
+	char sa_data[14];       /* Address data. */
+};
+__DECL_END
+#endif /* !__sockaddr_defined */
+#endif /* __CC__ */
+
+#endif /* !_BITS_SOCKADDR_STRUCT_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8055c82b */
+/* HASH CRC-32:0xeed151f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Remove a directory referred to by `PATH' */
 __LOCAL_LIBC(wrmdir) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wrmdir))(__WCHAR_TYPE__ const *__path) {
-#line 719 "kos/src/libc/magic/unistd.c"
+#line 718 "kos/src/libc/magic/unistd.c"
 	return __localdep_wunlinkat(__CRT_AT_FDCWD, __path, 0x0200); /* AT_REMOVEDIR */
 }
 __NAMESPACE_LOCAL_END

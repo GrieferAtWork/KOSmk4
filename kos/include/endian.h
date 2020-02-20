@@ -22,6 +22,7 @@
 
 #include <__stdinc.h>
 #include <features.h>
+
 #include <bits/endian.h>
 
 #ifndef __ORDER_LITTLE_ENDIAN__
@@ -65,18 +66,19 @@
 
 #ifdef __USE_MISC
 #include <bits/byteswap.h>
-#define htobe16(x)  __hybrid_beswap16(x)
-#define htole16(x)  __hybrid_leswap16(x)
-#define be16toh(x)  __hybrid_beswap16(x)
-#define le16toh(x)  __hybrid_leswap16(x)
-#define htobe32(x)  __hybrid_beswap32(x)
-#define htole32(x)  __hybrid_leswap32(x)
-#define be32toh(x)  __hybrid_beswap32(x)
-#define le32toh(x)  __hybrid_leswap32(x)
-#define htobe64(x)  __hybrid_beswap64(x)
-#define htole64(x)  __hybrid_leswap64(x)
-#define be64toh(x)  __hybrid_beswap64(x)
-#define le64toh(x)  __hybrid_leswap64(x)
+#include <hybrid/__byteswap.h>
+#define htobe16(x)  __hybrid_htobe16(x)
+#define htole16(x)  __hybrid_htole16(x)
+#define be16toh(x)  __hybrid_betoh16(x)
+#define le16toh(x)  __hybrid_letoh16(x)
+#define htobe32(x)  __hybrid_htobe32(x)
+#define htole32(x)  __hybrid_htole32(x)
+#define be32toh(x)  __hybrid_betoh32(x)
+#define le32toh(x)  __hybrid_letoh32(x)
+#define htobe64(x)  __hybrid_htobe64(x)
+#define htole64(x)  __hybrid_htole64(x)
+#define be64toh(x)  __hybrid_betoh64(x)
+#define le64toh(x)  __hybrid_letoh64(x)
 #endif /* __USE_MISC */
 
 #endif /* !_ENDIAN_H */

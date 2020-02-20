@@ -22,7 +22,13 @@
 
 #include <__stdinc.h>
 #include <features.h>
+
+#include <bits/types.h>
+#include <net/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
@@ -46,7 +52,7 @@ __SYSDECL_BEGIN
 /* IEEE 802.5 Token-Ring magic constants.
  * The frame sizes omit the preamble and FCS/CRC (frame check sequence). */
 #define TR_ALEN   6 /* Octets in one token-ring addr */
-#define TR_HLEN  (sizeof(struct trh_hdr)+sizeof(struct trllc))
+#define TR_HLEN   (sizeof(struct trh_hdr) + sizeof(struct trllc))
 #define AC        0x10
 #define LLC_FRAME 0x40
 
@@ -56,54 +62,65 @@ __SYSDECL_BEGIN
 
 /* This is a Token-Ring frame header. */
 #ifdef __CC__
+#undef ac
+#undef fc
+#undef daddr
+#undef saddr
+#undef rcf
+#undef rseg
 struct trh_hdr {
-    u_int8_t  ac;             /* access control field */
-    u_int8_t  fc;             /* frame control field */
-    u_int8_t  daddr[TR_ALEN]; /* destination address */
-    u_int8_t  saddr[TR_ALEN]; /* source address */
-    u_int16_t rcf;            /* route control field */
-    u_int16_t rseg[8];        /* routing registers */
+	__uint8_t   ac;             /* access control field */
+	__uint8_t   fc;             /* frame control field */
+	__uint8_t   daddr[TR_ALEN]; /* destination address */
+	__uint8_t   saddr[TR_ALEN]; /* source address */
+	__u_net16_t rcf;            /* route control field */
+	__u_net16_t rseg[8];        /* routing registers */
 };
 #endif /* __CC__ */
 
 /* This is a Token-Ring LLC structure */
 #ifdef __CC__
+#undef dsap
+#undef ssap
+#undef llc
+#undef protid
+#undef ethertype
 struct trllc {
-    u_int8_t  dsap;      /* destination SAP */
-    u_int8_t  ssap;      /* source SAP */
-    u_int8_t  llc;       /* LLC control field */
-    u_int8_t  protid[3]; /* protocol id */
-    u_int16_t ethertype; /* ether type field */
+	__uint8_t   dsap;      /* destination SAP */
+	__uint8_t   ssap;      /* source SAP */
+	__uint8_t   llc;       /* LLC control field */
+	__uint8_t   protid[3]; /* protocol id */
+	__u_net16_t ethertype; /* ether type field (one of `ETH_P_*' from <linux/if_ether.h>) */
 };
 #endif /* __CC__ */
 
 /* Token-Ring statistics collection data. */
 #ifdef __CC__
 struct tr_statistics {
-    unsigned long rx_packets; /* total packets received. */
-    unsigned long tx_packets; /* total packets transmitted. */
-    unsigned long rx_bytes;   /* total bytes received. */
-    unsigned long tx_bytes;   /* total bytes transmitted. */
-    unsigned long rx_errors;  /* bad packets received. */
-    unsigned long tx_errors;  /* packet transmit problems. */
-    unsigned long rx_dropped; /* no space in linux buffers. */
-    unsigned long tx_dropped; /* no space available in linux. */
-    unsigned long multicast;  /* multicast packets received. */
-    unsigned long transmit_collision;
+	__ULONGPTR_TYPE__ rx_packets; /* total packets received. */
+	__ULONGPTR_TYPE__ tx_packets; /* total packets transmitted. */
+	__ULONGPTR_TYPE__ rx_bytes;   /* total bytes received. */
+	__ULONGPTR_TYPE__ tx_bytes;   /* total bytes transmitted. */
+	__ULONGPTR_TYPE__ rx_errors;  /* bad packets received. */
+	__ULONGPTR_TYPE__ tx_errors;  /* packet transmit problems. */
+	__ULONGPTR_TYPE__ rx_dropped; /* no space in linux buffers. */
+	__ULONGPTR_TYPE__ tx_dropped; /* no space available in linux. */
+	__ULONGPTR_TYPE__ multicast;  /* multicast packets received. */
+	__ULONGPTR_TYPE__ transmit_collision;
 
-    /* detailed Token-Ring errors.
-     * See IBM Token-Ring Network Architecture for more info */
-    unsigned long line_errors;
-    unsigned long internal_errors;
-    unsigned long burst_errors;
-    unsigned long A_C_errors;
-    unsigned long abort_delimiters;
-    unsigned long lost_frames;
-    unsigned long recv_congest_count;
-    unsigned long frame_copied_errors;
-    unsigned long frequency_errors;
-    unsigned long token_errors;
-    unsigned long dummy1;
+	/* detailed Token-Ring errors.
+	 * See IBM Token-Ring Network Architecture for more info */
+	__ULONGPTR_TYPE__ line_errors;
+	__ULONGPTR_TYPE__ internal_errors;
+	__ULONGPTR_TYPE__ burst_errors;
+	__ULONGPTR_TYPE__ A_C_errors;
+	__ULONGPTR_TYPE__ abort_delimiters;
+	__ULONGPTR_TYPE__ lost_frames;
+	__ULONGPTR_TYPE__ recv_congest_count;
+	__ULONGPTR_TYPE__ frame_copied_errors;
+	__ULONGPTR_TYPE__ frequency_errors;
+	__ULONGPTR_TYPE__ token_errors;
+	__ULONGPTR_TYPE__ dummy1;
 };
 #endif /* __CC__ */
 
@@ -120,12 +137,12 @@ struct tr_statistics {
 #ifdef __USE_MISC
 #ifdef __CC__
 struct trn_hdr {
-    u_int8_t  trn_ac;             /* access control field. */
-    u_int8_t  trn_fc;             /* field control field. */
-    u_int8_t  trn_dhost[TR_ALEN]; /* destination host. */
-    u_int8_t  trn_shost[TR_ALEN]; /* source host. */
-    u_int16_t trn_rcf;            /* route control field. */
-    u_int16_t trn_rseg[8];        /* routing registers. */
+	__uint8_t   trn_ac;             /* access control field. */
+	__uint8_t   trn_fc;             /* field control field. */
+	__uint8_t   trn_dhost[TR_ALEN]; /* destination host. */
+	__uint8_t   trn_shost[TR_ALEN]; /* source host. */
+	__u_net16_t trn_rcf;            /* route control field. */
+	__u_net16_t trn_rseg[8];        /* routing registers. */
 };
 #endif /* __CC__ */
 #endif /* __USE_MISC */

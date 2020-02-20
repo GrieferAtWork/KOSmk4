@@ -120,86 +120,169 @@ __NOTHROW(__impl_hybrid_bswap128)(__UINT128_TYPE__ __x) {
 #endif /* ... */
 
 
-#ifdef ____INTELLISENSE_ENDIAN
-#define __hybrid_leswap16         __intern::__intellisense_leswap16
-#define __hybrid_leswap32         __intern::__intellisense_leswap32
-#define __hybrid_beswap16         __intern::__intellisense_beswap16
-#define __hybrid_beswap32         __intern::__intellisense_beswap32
+#if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ || \
+     __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#define __HYBRID_HTOLE_IS_LETOH 1 /* __hybrid_htoleNN is binary compatible with __hybrid_letohNN */
+#define __HYBRID_HTOBE_IS_BETOH 1 /* __hybrid_htobeNN is binary compatible with __hybrid_betohNN */
+#endif /* ... */
+
+
+/* LE/BE Converter bindings */
+#ifdef ____INTELLISENSE_STDINC_COMMON_H
+#define __hybrid_htole16(x) __intern::__intellisense_htole16(x)
+#define __hybrid_htobe16(x) __intern::__intellisense_htobe16(x)
+#define __hybrid_letoh16(x) __intern::__intellisense_letoh16(x)
+#define __hybrid_betoh16(x) __intern::__intellisense_betoh16(x)
+#define __hybrid_htole32(x) __intern::__intellisense_htole32(x)
+#define __hybrid_htobe32(x) __intern::__intellisense_htobe32(x)
+#define __hybrid_letoh32(x) __intern::__intellisense_letoh32(x)
+#define __hybrid_betoh32(x) __intern::__intellisense_betoh32(x)
 #ifdef __UINT64_TYPE__
-#define __hybrid_leswap64         __intern::__intellisense_leswap64
-#define __hybrid_beswap64         __intern::__intellisense_beswap64
+#define __hybrid_htole64(x) __intern::__intellisense_htole64(x)
+#define __hybrid_htobe64(x) __intern::__intellisense_htobe64(x)
+#define __hybrid_letoh64(x) __intern::__intellisense_letoh64(x)
+#define __hybrid_betoh64(x) __intern::__intellisense_betoh64(x)
 #ifdef __UINT128_TYPE__
-#define __hybrid_leswap128        __intern::__intellisense_leswap128
-#define __hybrid_beswap128        __intern::__intellisense_beswap128
-#endif /* __UINT128_TYPE__ */
-#endif /* __UINT64_TYPE__ */
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define __hybrid_leswap16_c(x)  ((__UINT16_TYPE__)(x))
-#define __hybrid_leswap32_c(x)  ((__UINT32_TYPE__)(x))
-#define __hybrid_beswap16_c(x)    __hybrid_bswap16_c(x)
-#define __hybrid_beswap32_c(x)    __hybrid_bswap32_c(x)
-#ifdef __UINT64_TYPE__
-#define __hybrid_leswap64_c(x)  ((__UINT64_TYPE__)(x))
-#define __hybrid_beswap64_c(x)    __hybrid_bswap64_c(x)
-#ifdef __UINT128_TYPE__
-#define __hybrid_leswap128_c(x) ((__UINT128_TYPE__)(x))
-#define __hybrid_beswap128_c(x)   __hybrid_bswap128_c(x)
+#define __hybrid_htole128(x) __intern::__intellisense_htole128(x)
+#define __hybrid_htobe128(x) __intern::__intellisense_htobe128(x)
+#define __hybrid_letoh128(x) __intern::__intellisense_letoh128(x)
+#define __hybrid_betoh128(x) __intern::__intellisense_betoh128(x)
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define __hybrid_leswap16_c(x)    __hybrid_bswap16_c(x)
-#define __hybrid_leswap32_c(x)    __hybrid_bswap32_c(x)
-#define __hybrid_beswap16_c(x)  ((__UINT16_TYPE__)(x))
-#define __hybrid_beswap32_c(x)  ((__UINT32_TYPE__)(x))
+#define __hybrid_htole16(x) __hybrid_bswap16(x)
+#define __hybrid_htobe16(x) (x)
+#define __hybrid_letoh16(x) __hybrid_bswap16(x)
+#define __hybrid_betoh16(x) (x)
+#define __hybrid_htole32(x) __hybrid_bswap32(x)
+#define __hybrid_htobe32(x) (x)
+#define __hybrid_letoh32(x) __hybrid_bswap32(x)
+#define __hybrid_betoh32(x) (x)
 #ifdef __UINT64_TYPE__
-#define __hybrid_leswap64_c(x)    __hybrid_bswap64_c(x)
-#define __hybrid_beswap64_c(x)  ((__UINT64_TYPE__)(x))
+#define __hybrid_htole64(x) __hybrid_bswap64(x)
+#define __hybrid_htobe64(x) (x)
+#define __hybrid_letoh64(x) __hybrid_bswap64(x)
+#define __hybrid_betoh64(x) (x)
 #ifdef __UINT128_TYPE__
-#define __hybrid_leswap128_c(x)   __hybrid_bswap128_c(x)
-#define __hybrid_beswap128_c(x) ((__UINT128_TYPE__)(x))
+#define __hybrid_htole128(x) __hybrid_bswap128(x)
+#define __hybrid_htobe128(x) (x)
+#define __hybrid_letoh128(x) __hybrid_bswap128(x)
+#define __hybrid_betoh128(x) (x)
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
-#endif
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define __hybrid_leswap16(x)    ((__UINT16_TYPE__)(x))
-#define __hybrid_leswap16_c(x)  ((__UINT16_TYPE__)(x))
-#define __hybrid_leswap32(x)    ((__UINT32_TYPE__)(x))
-#define __hybrid_leswap32_c(x)  ((__UINT32_TYPE__)(x))
-#define __hybrid_beswap16(x)      __hybrid_bswap16(x)
-#define __hybrid_beswap16_c(x)    __hybrid_bswap16_c(x)
-#define __hybrid_beswap32(x)      __hybrid_bswap32(x)
-#define __hybrid_beswap32_c(x)    __hybrid_bswap32_c(x)
+#define __hybrid_htole16(x) (x)
+#define __hybrid_htobe16(x) __hybrid_bswap16(x)
+#define __hybrid_letoh16(x) (x)
+#define __hybrid_betoh16(x) __hybrid_bswap16(x)
+#define __hybrid_htole32(x) (x)
+#define __hybrid_htobe32(x) __hybrid_bswap32(x)
+#define __hybrid_letoh32(x) (x)
+#define __hybrid_betoh32(x) __hybrid_bswap32(x)
 #ifdef __UINT64_TYPE__
-#define __hybrid_leswap64(x)    ((__UINT64_TYPE__)(x))
-#define __hybrid_leswap64_c(x)  ((__UINT64_TYPE__)(x))
-#define __hybrid_beswap64(x)      __hybrid_bswap64(x)
-#define __hybrid_beswap64_c(x)    __hybrid_bswap64_c(x)
+#define __hybrid_htole64(x) (x)
+#define __hybrid_htobe64(x) __hybrid_bswap64(x)
+#define __hybrid_letoh64(x) (x)
+#define __hybrid_betoh64(x) __hybrid_bswap64(x)
 #ifdef __UINT128_TYPE__
-#define __hybrid_leswap128(x)   ((__UINT128_TYPE__)(x))
-#define __hybrid_leswap128_c(x) ((__UINT128_TYPE__)(x))
-#define __hybrid_beswap128(x)     __hybrid_bswap128(x)
-#define __hybrid_beswap128_c(x)   __hybrid_bswap128_c(x)
+#define __hybrid_htole128(x) (x)
+#define __hybrid_htobe128(x) __hybrid_bswap128(x)
+#define __hybrid_letoh128(x) (x)
+#define __hybrid_betoh128(x) __hybrid_bswap128(x)
+#endif /* __UINT128_TYPE__ */
+#endif /* __UINT64_TYPE__ */
+#else
+#error "Unsupported endian"
+#endif
+
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define __hybrid_htole16_c(x) __hybrid_bswap16_c(x)
+#define __hybrid_htobe16_c(x) (x)
+#define __hybrid_letoh16_c(x) __hybrid_bswap16_c(x)
+#define __hybrid_betoh16_c(x) (x)
+#define __hybrid_htole32_c(x) __hybrid_bswap32_c(x)
+#define __hybrid_htobe32_c(x) (x)
+#define __hybrid_letoh32_c(x) __hybrid_bswap32_c(x)
+#define __hybrid_betoh32_c(x) (x)
+#ifdef __UINT64_TYPE__
+#define __hybrid_htole64_c(x) __hybrid_bswap64_c(x)
+#define __hybrid_htobe64_c(x) (x)
+#define __hybrid_letoh64_c(x) __hybrid_bswap64_c(x)
+#define __hybrid_betoh64_c(x) (x)
+#ifdef __UINT128_TYPE__
+#define __hybrid_htole128_c(x) __hybrid_bswap128_c(x)
+#define __hybrid_htobe128_c(x) (x)
+#define __hybrid_letoh128_c(x) __hybrid_bswap128_c(x)
+#define __hybrid_betoh128_c(x) (x)
+#endif /* __UINT128_TYPE__ */
+#endif /* __UINT64_TYPE__ */
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define __hybrid_htole16_c(x) (x)
+#define __hybrid_htobe16_c(x) __hybrid_bswap16_c(x)
+#define __hybrid_letoh16_c(x) (x)
+#define __hybrid_betoh16_c(x) __hybrid_bswap16_c(x)
+#define __hybrid_htole32_c(x) (x)
+#define __hybrid_htobe32_c(x) __hybrid_bswap32_c(x)
+#define __hybrid_letoh32_c(x) (x)
+#define __hybrid_betoh32_c(x) __hybrid_bswap32_c(x)
+#ifdef __UINT64_TYPE__
+#define __hybrid_htole64_c(x) (x)
+#define __hybrid_htobe64_c(x) __hybrid_bswap64_c(x)
+#define __hybrid_letoh64_c(x) (x)
+#define __hybrid_betoh64_c(x) __hybrid_bswap64_c(x)
+#ifdef __UINT128_TYPE__
+#define __hybrid_htole128_c(x) (x)
+#define __hybrid_htobe128_c(x) __hybrid_bswap128_c(x)
+#define __hybrid_letoh128_c(x) (x)
+#define __hybrid_betoh128_c(x) __hybrid_bswap128_c(x)
+#endif /* __UINT128_TYPE__ */
+#endif /* __UINT64_TYPE__ */
+#else
+#error "Unsupported endian"
+#endif
+
+
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define __hybrid_leswap16(x)    ((__UINT16_TYPE__)(x))  /* Deprecated */
+#define __hybrid_leswap16_c(x)  ((__UINT16_TYPE__)(x))  /* Deprecated */
+#define __hybrid_leswap32(x)    ((__UINT32_TYPE__)(x))  /* Deprecated */
+#define __hybrid_leswap32_c(x)  ((__UINT32_TYPE__)(x))  /* Deprecated */
+#define __hybrid_beswap16(x)      __hybrid_bswap16(x)   /* Deprecated */
+#define __hybrid_beswap16_c(x)    __hybrid_bswap16_c(x) /* Deprecated */
+#define __hybrid_beswap32(x)      __hybrid_bswap32(x)   /* Deprecated */
+#define __hybrid_beswap32_c(x)    __hybrid_bswap32_c(x) /* Deprecated */
+#ifdef __UINT64_TYPE__
+#define __hybrid_leswap64(x)    ((__UINT64_TYPE__)(x))  /* Deprecated */
+#define __hybrid_leswap64_c(x)  ((__UINT64_TYPE__)(x))  /* Deprecated */
+#define __hybrid_beswap64(x)      __hybrid_bswap64(x)   /* Deprecated */
+#define __hybrid_beswap64_c(x)    __hybrid_bswap64_c(x) /* Deprecated */
+#ifdef __UINT128_TYPE__
+#define __hybrid_leswap128(x)   ((__UINT128_TYPE__)(x)) /* Deprecated */
+#define __hybrid_leswap128_c(x) ((__UINT128_TYPE__)(x)) /* Deprecated */
+#define __hybrid_beswap128(x)     __hybrid_bswap128(x)  /* Deprecated */
+#define __hybrid_beswap128_c(x)   __hybrid_bswap128_c(x)/* Deprecated */
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define __hybrid_leswap16(x)      __hybrid_bswap16(x)
-#define __hybrid_leswap16_c(x)    __hybrid_bswap16_c(x)
-#define __hybrid_leswap32(x)      __hybrid_bswap32(x)
-#define __hybrid_leswap32_c(x)    __hybrid_bswap32_c(x)
-#define __hybrid_beswap16(x)    ((__UINT16_TYPE__)(x))
-#define __hybrid_beswap16_c(x)  ((__UINT16_TYPE__)(x))
-#define __hybrid_beswap32(x)    ((__UINT32_TYPE__)(x))
-#define __hybrid_beswap32_c(x)  ((__UINT32_TYPE__)(x))
+#define __hybrid_leswap16(x)      __hybrid_bswap16(x)   /* Deprecated */
+#define __hybrid_leswap16_c(x)    __hybrid_bswap16_c(x) /* Deprecated */
+#define __hybrid_leswap32(x)      __hybrid_bswap32(x)   /* Deprecated */
+#define __hybrid_leswap32_c(x)    __hybrid_bswap32_c(x) /* Deprecated */
+#define __hybrid_beswap16(x)    ((__UINT16_TYPE__)(x))  /* Deprecated */
+#define __hybrid_beswap16_c(x)  ((__UINT16_TYPE__)(x))  /* Deprecated */
+#define __hybrid_beswap32(x)    ((__UINT32_TYPE__)(x))  /* Deprecated */
+#define __hybrid_beswap32_c(x)  ((__UINT32_TYPE__)(x))  /* Deprecated */
 #ifdef __UINT64_TYPE__
-#define __hybrid_leswap64(x)      __hybrid_bswap64(x)
-#define __hybrid_leswap64_c(x)    __hybrid_bswap64_c(x)
-#define __hybrid_beswap64(x)    ((__UINT64_TYPE__)(x))
-#define __hybrid_beswap64_c(x)  ((__UINT64_TYPE__)(x))
+#define __hybrid_leswap64(x)      __hybrid_bswap64(x)   /* Deprecated */
+#define __hybrid_leswap64_c(x)    __hybrid_bswap64_c(x) /* Deprecated */
+#define __hybrid_beswap64(x)    ((__UINT64_TYPE__)(x))  /* Deprecated */
+#define __hybrid_beswap64_c(x)  ((__UINT64_TYPE__)(x))  /* Deprecated */
 #ifdef __UINT128_TYPE__
-#define __hybrid_leswap128(x)     __hybrid_bswap128(x)
-#define __hybrid_leswap128_c(x)   __hybrid_bswap128_c(x)
-#define __hybrid_beswap128(x)   ((__UINT128_TYPE__)(x))
-#define __hybrid_beswap128_c(x) ((__UINT128_TYPE__)(x))
+#define __hybrid_leswap128(x)     __hybrid_bswap128(x)  /* Deprecated */
+#define __hybrid_leswap128_c(x)   __hybrid_bswap128_c(x)/* Deprecated */
+#define __hybrid_beswap128(x)   ((__UINT128_TYPE__)(x)) /* Deprecated */
+#define __hybrid_beswap128_c(x) ((__UINT128_TYPE__)(x)) /* Deprecated */
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 #endif

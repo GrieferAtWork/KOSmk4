@@ -17,23 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_BITS_TYPES_H
-#define _I386_KOS_KOS_BITS_TYPES_H 1
+#ifndef _NET_TYPES_H
+#define _NET_TYPES_H 1
 
 #include <__stdinc.h>
-#include <bits/types.h>
-#include <hybrid/host.h>
-#include <hybrid/typecore.h>
+#include <features.h>
 
-#define __SIZEOF_VM_VPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
-#define __SIZEOF_VM_SPAGE_T__   __SIZEOF_POINTER__ /* DEPRECATED; REMOVE ME */
-#define __SIZEOF_PAGEPTR_T__    __SIZEOF_POINTER__
-#define __SIZEOF_VM_PHYS_T__    8
+#include <hybrid/typecore.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-
+#ifdef __USE_KOS
 #ifndef ____le8_defined
 #define ____le8_defined 1
 #ifdef __INTELLISENSE__
@@ -76,26 +71,20 @@ typedef __bitwise __UINT64_TYPE__ __be64;
 #endif /* !__INTELLISENSE__ */
 #endif /* !____le8_defined */
 
-#ifdef __KERNEL__
-#include <hybrid/__altint.h>
-__HYBRID_ALTINT_TYPEDEF(__ULONGPTR_TYPE__, __vm_spage_t, false); /* Swap memory page index (`swap_address / PAGESIZE'). */ /* DEPRECATED; REMOVE ME */
-__HYBRID_ALTINT_TYPEDEF(__ULONGPTR_TYPE__, __pageptr_t, false);  /* Physical memory page index (`physical_address / PAGESIZE'). */
-__HYBRID_ALTINT_TYPEDEF(__UINT64_TYPE__, __vm_phys_t, false);    /* A physical memory pointer. */ /* TODO: Rename to `__phys_t' */
-#else /* __KERNEL__ */
-typedef /*SWAP*/ __ULONGPTR_TYPE__ __vm_spage_t; /* Swap memory page index (`swap_address / PAGESIZE'). */ /* DEPRECATED; REMOVE ME */
-typedef /*PHYS*/ __ULONGPTR_TYPE__ __pageptr_t;  /* Physical memory page index (`physical_address / PAGESIZE'). */
-typedef /*PHYS*/ __UINT64_TYPE__ __vm_phys_t;  /* A physical memory pointer. */ /* TODO: Rename to `phys_t'; TODO: Move into <kernel/arch/paging.h> */
-#endif /* !__KERNEL__ */
-
-#if defined(__KERNEL__)
-#include <hybrid/__altint.h>
-__HYBRID_ALTINT_TYPEDEF(__UINT64_TYPE__, __vm_vpage64_t, false); /* DEPRECATED; REMOVE ME */
-#else
-typedef __UINT64_TYPE__ __vm_vpage64_t; /* DEPRECATED; REMOVE ME */
-#endif
-
+typedef __be16 __u_net16_t;
+typedef __be32 __u_net32_t;
+#ifdef __UINT64_TYPE__
+typedef __be64 __u_net64_t;
+#endif /* __UINT64_TYPE__ */
+#else /* __USE_KOS */
+typedef __UINT16_TYPE__ __u_net16_t;
+typedef __UINT32_TYPE__ __u_net32_t;
+#ifdef __UINT64_TYPE__
+typedef __UINT64_TYPE__ __u_net64_t;
+#endif /* __UINT64_TYPE__ */
+#endif /* !__USE_KOS */
 
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_I386_KOS_KOS_BITS_TYPES_H */
+#endif /* !_NET_TYPES_H */

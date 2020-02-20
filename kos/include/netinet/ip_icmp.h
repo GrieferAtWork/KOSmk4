@@ -19,8 +19,6 @@
  */
 #ifndef _NETINET_IP_ICMP_H
 #define _NETINET_IP_ICMP_H 1
-#ifndef __NETINET_IP_ICMP_H
-#define __NETINET_IP_ICMP_H 1
 
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -40,76 +38,166 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <__stdinc.h>
+#include <features.h>
+
+#include <bits/in.h>
+#include <bits/types.h>
+#include <net/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
+#endif /* __USE_GLIBC */
 
-__SYSDECL_BEGIN
+__DECL_BEGIN
 
+/* Internal of an ICMP Router Advertisement */
 #ifdef __CC__
+struct icmp_ra_addr {
+	__u_net32_t ira_addr;
+	__u_net32_t ira_preference;
+};
+
 struct icmphdr {
-	u_int8_t           type; /* message type */
-	u_int8_t           code; /* type sub-code */
-	u_int16_t          checksum;
+#ifdef __USE_KOS_PURE
+	__uint8_t           icmp_type;  /* message type (e.g. `ICMP_UNREACH') */
+	__uint8_t           icmp_code;  /* type sub-code (e.g. `ICMP_UNREACH_NET') */
+	__u_net16_t         icmp_cksum; /* ones complement checksum of struct. */
+	union {
+		__uint8_t       ih_pptr;    /* ICMP_PARAMPROB */
+		struct in_addr  ih_gwaddr;  /* gateway address */
+		struct {
+			__u_net16_t icd_id;
+			__u_net16_t icd_seq;
+		}               ih_idseq;   /* echo datagram */
+		__u_net32_t     ih_void;
+		/* ICMP_UNREACH_NEEDFRAG -- Path MTU Discovery (RFC1191) */
+		struct {
+			__u_net16_t ipm_void;
+			__u_net16_t ipm_nextmtu;
+		}               ih_pmtu;
+		struct {
+			__uint8_t   irt_num_addrs;
+			__uint8_t   irt_wpa;
+			__u_net16_t irt_lifetime;
+		}               ih_rtradv;
+	}                   icmp_hun;
 	union {
 		struct {
-			u_int16_t  id;
-			u_int16_t  sequence;
-		}              echo;    /* echo datagram */
-		u_int32_t      gateway; /* gateway address */
+			__u_net32_t its_otime;
+			__u_net32_t its_rtime;
+			__u_net32_t its_ttime;
+		}               id_ts;
 		struct {
-			u_int16_t  __glibc_reserved;
-			u_int16_t  mtu;
-		}              frag; /* path mtu discovery */
-	}                  un;
+			struct iphdr idi_ip;
+			/* options and then 64 bits of data */
+		}               id_ip;
+		struct icmp_ra_addr id_radv;
+		__u_net32_t     id_mask;
+		__uint8_t       id_data[1];
+	}                   icmp_dun;
+#else /* __USE_KOS_PURE */
+#ifdef __USE_KOS
+#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
+#ifdef __COMPILER_HAVE_TRANSPARENT_STRUCT
+	union {
+		struct {
+			__uint8_t   icmp_type;  /* message type (e.g. `ICMP_UNREACH') */
+			__uint8_t   icmp_code;  /* type sub-code (e.g. `ICMP_UNREACH_NET') */
+			__u_net16_t icmp_cksum; /* ones complement checksum of struct. */
+		};
+		struct {
+			__uint8_t   type;       /* message type (e.g. `ICMP_UNREACH') */
+			__uint8_t   code;       /* type sub-code (e.g. `ICMP_UNREACH_NET') */
+			__u_net16_t checksum;   /* ones complement checksum of struct. */
+		};
+	};
+#else /* __COMPILER_HAVE_TRANSPARENT_STRUCT */
+	union {
+		__uint8_t type;      /* message type (e.g. `ICMP_UNREACH') */
+		__uint8_t icmp_type; /* message type (e.g. `ICMP_UNREACH') */
+	};
+	union {
+		__uint8_t code;      /* type sub-code (e.g. `ICMP_UNREACH_NET') */
+		__uint8_t icmp_code; /* type sub-code (e.g. `ICMP_UNREACH_NET') */
+	};
+	union {
+		__u_net16_t checksum;   /* ones complement checksum of struct. */
+		__u_net16_t icmp_cksum; /* ones complement checksum of struct. */
+	};
+#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
+#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
+	__uint8_t           type;     /* message type (e.g. `ICMP_UNREACH') */
+	__uint8_t           code;     /* type sub-code (e.g. `ICMP_UNREACH_NET') */
+	__u_net16_t         checksum; /* ones complement checksum of struct. */
+#define icmp_type  type     /* message type (e.g. `ICMP_UNREACH') */
+#define icmp_code  code     /* type sub-code (e.g. `ICMP_UNREACH_NET') */
+#define icmp_cksum checksum /* ones complement checksum of struct. */
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+#else /* __USE_KOS */
+	__uint8_t           type;     /* message type (e.g. `ICMP_UNREACH') */
+	__uint8_t           code;     /* type sub-code (e.g. `ICMP_UNREACH_NET') */
+	__u_net16_t         checksum; /* ones complement checksum of struct. */
+#endif /* !__USE_KOS */
+	union {
+#ifdef __USE_KOS
+		struct {
+			union {
+				__uint8_t       ih_pptr;    /* ICMP_PARAMPROB */
+				struct in_addr  ih_gwaddr;  /* gateway address */
+				struct {
+					__u_net16_t icd_id;
+					__u_net16_t icd_seq;
+				}               ih_idseq;   /* echo datagram */
+				__u_net32_t     ih_void;
+				/* ICMP_UNREACH_NEEDFRAG -- Path MTU Discovery (RFC1191) */
+				struct {
+					__u_net16_t ipm_void;
+					__u_net16_t ipm_nextmtu;
+				}               ih_pmtu;
+				struct {
+					__uint8_t   irt_num_addrs;
+					__uint8_t   irt_wpa;
+					__u_net16_t irt_lifetime;
+				}               ih_rtradv;
+			}                   icmp_hun;
+			union {
+				struct {
+					__u_net32_t its_otime;
+					__u_net32_t its_rtime;
+					__u_net32_t its_ttime;
+				}               id_ts;
+				struct {
+					struct iphdr idi_ip;
+					/* options and then 64 bits of data */
+				}               id_ip;
+				struct icmp_ra_addr id_radv;
+				__u_net32_t     id_mask;
+				__uint8_t       id_data[1];
+			}                   icmp_dun;
+		}
+#ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
+		__icmp_hundun
+#define icmp_hun __icmp_hundun.icmp_hun
+#define icmp_dun __icmp_hundun.icmp_dun
+#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
+		;
+#endif /* __USE_KOS */
+		struct {
+			__u_net16_t id;
+			__u_net16_t sequence;
+		}               echo;    /* echo datagram */
+		__u_net32_t     gateway; /* gateway address */
+		struct {
+			__u_net16_t __glibc_reserved;
+			__u_net16_t mtu;
+		}               frag; /* path mtu discovery */
+	}                   un;
+#endif /* !__USE_KOS_PURE */
 };
 #endif /* __CC__ */
 
-#define ICMP_ECHOREPLY      0  /* Echo Reply. */
-#define ICMP_DEST_UNREACH   3  /* Destination Unreachable. */
-#define ICMP_SOURCE_QUENCH  4  /* Source Quench. */
-#define ICMP_REDIRECT       5  /* Redirect (change route). */
-#define ICMP_ECHO           8  /* Echo Request. */
-#define ICMP_TIME_EXCEEDED  11 /* Time Exceeded. */
-#define ICMP_PARAMETERPROB  12 /* Parameter Problem. */
-#define ICMP_TIMESTAMP      13 /* Timestamp Request. */
-#define ICMP_TIMESTAMPREPLY 14 /* Timestamp Reply. */
-#define ICMP_INFO_REQUEST   15 /* Information Request. */
-#define ICMP_INFO_REPLY     16 /* Information Reply. */
-#define ICMP_ADDRESS        17 /* Address Mask Request. */
-#define ICMP_ADDRESSREPLY   18 /* Address Mask Reply. */
-#define NR_ICMP_TYPES       18
+#if defined(__USE_MISC) || defined(__USE_KOS_PURE)
 
-/* Codes for UNREACH. */
-#define ICMP_NET_UNREACH     0  /* Network Unreachable. */
-#define ICMP_HOST_UNREACH    1  /* Host Unreachable. */
-#define ICMP_PROT_UNREACH    2  /* Protocol Unreachable. */
-#define ICMP_PORT_UNREACH    3  /* Port Unreachable. */
-#define ICMP_FRAG_NEEDED     4  /* Fragmentation Needed/DF set. */
-#define ICMP_SR_FAILED       5  /* Source Route failed. */
-#define ICMP_NET_UNKNOWN     6
-#define ICMP_HOST_UNKNOWN    7
-#define ICMP_HOST_ISOLATED   8
-#define ICMP_NET_ANO         9
-#define ICMP_HOST_ANO        10
-#define ICMP_NET_UNR_TOS     11
-#define ICMP_HOST_UNR_TOS    12
-#define ICMP_PKT_FILTERED    13 /* Packet filtered */
-#define ICMP_PREC_VIOLATION  14 /* Precedence violation */
-#define ICMP_PREC_CUTOFF     15 /* Precedence cut off */
-#define NR_ICMP_UNREACH      15 /* instead of hardcoding immediate value */
-
-/* Codes for REDIRECT. */
-#define ICMP_REDIR_NET       0  /* Redirect Net. */
-#define ICMP_REDIR_HOST      1  /* Redirect Host. */
-#define ICMP_REDIR_NETTOS    2  /* Redirect Net for TOS. */
-#define ICMP_REDIR_HOSTTOS   3  /* Redirect Host for TOS. */
-
-/* Codes for TIME_EXCEEDED. */
-#define ICMP_EXC_TTL         0  /* TTL count exceeded. */
-#define ICMP_EXC_FRAGTIME    1  /* Fragment Reass time exceeded. */
-
-__SYSDECL_END
-
-#ifdef __USE_MISC
 /*
  * Copyright (c) 1982, 1986, 1993
  *    The Regents of the University of California.  All rights reserved.
@@ -141,75 +229,80 @@ __SYSDECL_END
  *    @(#)ip_icmp.h    8.1 (Berkeley) 6/10/93
  */
 
+#ifndef __USE_KOS_PURE
 #include <netinet/in.h>
 #include <netinet/ip.h>
-
-__SYSDECL_BEGIN
-
-/* Internal of an ICMP Router Advertisement */
-#ifdef __CC__
-struct icmp_ra_addr {
-	u_int32_t ira_addr;
-	u_int32_t ira_preference;
-};
-#endif /* __CC__ */
+#endif /* !__USE_KOS_PURE */
 
 #ifdef __CC__
+#ifndef __USE_KOS_PURE
 struct icmp {
-	u_int8_t          icmp_type;  /* type of message, see below. */
-	u_int8_t          icmp_code;  /* type sub code. */
-	u_int16_t         icmp_cksum; /* ones complement checksum of struct. */
+	__uint8_t           icmp_type;  /* message type (e.g. `ICMP_UNREACH') */
+	__uint8_t           icmp_code;  /* type sub-code (e.g. `ICMP_UNREACH_NET') */
+	__u_net16_t         icmp_cksum; /* ones complement checksum of struct. */
+#if defined(__USE_KOS) && !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
+	struct {
+#undef icmp_hun
+#undef icmp_dun
+#endif /* __USE_KOS && !__COMPILER_HAVE_TRANSPARENT_STRUCT */
 	union {
-		u_char        ih_pptr;    /* ICMP_PARAMPROB */
-		struct in_addr ih_gwaddr; /* gateway address */
+		__uint8_t       ih_pptr;    /* ICMP_PARAMPROB */
+		struct in_addr  ih_gwaddr;  /* gateway address */
 		struct ih_idseq {
-			u_int16_t icd_id;
-			u_int16_t icd_seq;
-		}             ih_idseq;    /* echo datagram */
-		u_int32_t     ih_void;
+			__u_net16_t icd_id;
+			__u_net16_t icd_seq;
+		}               ih_idseq;   /* echo datagram */
+		__u_net32_t     ih_void;
 		/* ICMP_UNREACH_NEEDFRAG -- Path MTU Discovery (RFC1191) */
 		struct ih_pmtu {
-			u_int16_t ipm_void;
-			u_int16_t ipm_nextmtu;
-		}             ih_pmtu;
+			__u_net16_t ipm_void;
+			__u_net16_t ipm_nextmtu;
+		}               ih_pmtu;
 		struct ih_rtradv {
-			u_int8_t  irt_num_addrs;
-			u_int8_t  irt_wpa;
-			u_int16_t irt_lifetime;
-		}             ih_rtradv;
-	}                 icmp_hun;
-#define icmp_pptr      icmp_hun.ih_pptr
-#define icmp_gwaddr    icmp_hun.ih_gwaddr
-#define icmp_id        icmp_hun.ih_idseq.icd_id
-#define icmp_seq       icmp_hun.ih_idseq.icd_seq
-#define icmp_void      icmp_hun.ih_void
-#define icmp_pmvoid    icmp_hun.ih_pmtu.ipm_void
-#define icmp_nextmtu   icmp_hun.ih_pmtu.ipm_nextmtu
-#define icmp_num_addrs icmp_hun.ih_rtradv.irt_num_addrs
-#define icmp_wpa       icmp_hun.ih_rtradv.irt_wpa
-#define icmp_lifetime  icmp_hun.ih_rtradv.irt_lifetime
+			__uint8_t   irt_num_addrs;
+			__uint8_t   irt_wpa;
+			__u_net16_t irt_lifetime;
+		}               ih_rtradv;
+	}                   icmp_hun;
+#define icmp_pptr       icmp_hun.ih_pptr
+#define icmp_gwaddr     icmp_hun.ih_gwaddr
+#define icmp_id         icmp_hun.ih_idseq.icd_id
+#define icmp_seq        icmp_hun.ih_idseq.icd_seq
+#define icmp_void       icmp_hun.ih_void
+#define icmp_pmvoid     icmp_hun.ih_pmtu.ipm_void
+#define icmp_nextmtu    icmp_hun.ih_pmtu.ipm_nextmtu
+#define icmp_num_addrs  icmp_hun.ih_rtradv.irt_num_addrs
+#define icmp_wpa        icmp_hun.ih_rtradv.irt_wpa
+#define icmp_lifetime   icmp_hun.ih_rtradv.irt_lifetime
 	union {
 		struct {
-			u_int32_t its_otime;
-			u_int32_t its_rtime;
-			u_int32_t its_ttime;
-		}             id_ts;
+			__u_net32_t its_otime;
+			__u_net32_t its_rtime;
+			__u_net32_t its_ttime;
+		}               id_ts;
 		struct {
-			struct ip idi_ip;
+			struct ip   idi_ip;
 			/* options and then 64 bits of data */
-		}             id_ip;
+		}               id_ip;
 		struct icmp_ra_addr id_radv;
-		u_int32_t     id_mask;
-		u_int8_t      id_data[1];
-	}                 icmp_dun;
-#define icmp_otime icmp_dun.id_ts.its_otime
-#define icmp_rtime icmp_dun.id_ts.its_rtime
-#define icmp_ttime icmp_dun.id_ts.its_ttime
-#define icmp_ip    icmp_dun.id_ip.idi_ip
-#define icmp_radv  icmp_dun.id_radv
-#define icmp_mask  icmp_dun.id_mask
-#define icmp_data  icmp_dun.id_data
+		__u_net32_t     id_mask;
+		__uint8_t       id_data[1];
+	}                   icmp_dun;
+#define icmp_otime      icmp_dun.id_ts.its_otime
+#define icmp_rtime      icmp_dun.id_ts.its_rtime
+#define icmp_ttime      icmp_dun.id_ts.its_ttime
+#define icmp_ip         icmp_dun.id_ip.idi_ip
+#define icmp_radv       icmp_dun.id_radv
+#define icmp_mask       icmp_dun.id_mask
+#define icmp_data       icmp_dun.id_data
+#if defined(__USE_KOS) && !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
+	} __icmp_hundun;
+#define icmp_hun __icmp_hundun.icmp_hun
+#define icmp_dun __icmp_hundun.icmp_dun
+#endif /* __USE_KOS && !__COMPILER_HAVE_TRANSPARENT_STRUCT */
 };
+#endif /* !__USE_KOS_PURE */
+
 #endif /* __CC__ */
 
 /* Lower bounds on packet lengths for various types.
@@ -231,9 +324,11 @@ struct icmp {
 #endif
 
 /* Definition of type and code fields. */
-/* defined above: ICMP_ECHOREPLY, ICMP_REDIRECT, ICMP_ECHO */
+#define ICMP_ECHOREPLY     0  /* Echo Reply. */
 #define ICMP_UNREACH       3  /* dest unreachable, codes: */
 #define ICMP_SOURCEQUENCH  4  /* packet lost, slow down */
+#define ICMP_REDIRECT      5  /* Redirect (change route). */
+#define ICMP_ECHO          8  /* Echo Request. */
 #define ICMP_ROUTERADVERT  9  /* router advertisement */
 #define ICMP_ROUTERSOLICIT 10 /* router solicitation */
 #define ICMP_TIMXCEED      11 /* time exceeded, code: */
@@ -246,7 +341,7 @@ struct icmp {
 #define ICMP_MASKREPLY     18 /* address mask reply */
 #define ICMP_MAXTYPE       18
 
-/* UNREACH codes */
+/* Codes for `ICMP_UNREACH' */
 #define ICMP_UNREACH_NET               0  /* bad net */
 #define ICMP_UNREACH_HOST              1  /* bad host */
 #define ICMP_UNREACH_PROTOCOL          2  /* bad protocol */
@@ -264,29 +359,85 @@ struct icmp {
 #define ICMP_UNREACH_HOST_PRECEDENCE   14 /* host prec vio. */
 #define ICMP_UNREACH_PRECEDENCE_CUTOFF 15 /* prec cutoff */
 
-/* REDIRECT codes */
+/* Codes for `ICMP_REDIRECT' */
 #define ICMP_REDIRECT_NET              0  /* for network */
 #define ICMP_REDIRECT_HOST             1  /* for host */
 #define ICMP_REDIRECT_TOSNET           2  /* for tos and net */
 #define ICMP_REDIRECT_TOSHOST          3  /* for tos and host */
 
-/* TIMEXCEED codes */
+/* Codes for `ICMP_TIMXCEED' */
 #define ICMP_TIMXCEED_INTRANS          0  /* ttl==0 in transit */
 #define ICMP_TIMXCEED_REASS            1  /* ttl==0 in reass */
 
-/* PARAMPROB code */
+/* Codes for `ICMP_PARAMPROB' */
 #define ICMP_PARAMPROB_OPTABSENT       1  /* req. opt. absent */
 
-#define ICMP_INFOTYPE(type) \
-    ((type) == ICMP_ECHOREPLY || (type) == ICMP_ECHO || \
-     (type) == ICMP_ROUTERADVERT || (type) == ICMP_ROUTERSOLICIT || \
-     (type) == ICMP_TSTAMP || (type) == ICMP_TSTAMPREPLY || \
-     (type) == ICMP_IREQ || (type) == ICMP_IREQREPLY || \
-     (type) == ICMP_MASKREQ || (type) == ICMP_MASKREPLY)
+#define ICMP_INFOTYPE(type)                                         \
+	((type) == ICMP_ECHOREPLY || (type) == ICMP_ECHO ||             \
+	 (type) == ICMP_ROUTERADVERT || (type) == ICMP_ROUTERSOLICIT || \
+	 (type) == ICMP_TSTAMP || (type) == ICMP_TSTAMPREPLY ||         \
+	 (type) == ICMP_IREQ || (type) == ICMP_IREQREPLY ||             \
+	 (type) == ICMP_MASKREQ || (type) == ICMP_MASKREPLY)
+#endif /* __USE_MISC || __USE_KOS_PURE */
 
-__SYSDECL_END
+#ifndef __USE_KOS_PURE
 
-#endif /* __USE_MISC */
+/* Badly namespace'd aliases for macros above (not exposed in KOS-PURE mode) */
+#ifndef ICMP_ECHOREPLY
+#define ICMP_ECHOREPLY      0  /* See above... */
+#endif /* !ICMP_ECHOREPLY */
+#define ICMP_DEST_UNREACH   3  /* == ICMP_UNREACH */
+#define ICMP_SOURCE_QUENCH  4  /* == ICMP_SOURCEQUENCH */
+#ifndef ICMP_REDIRECT
+#define ICMP_REDIRECT       5  /* Redirect (change route). */
+#endif /* !ICMP_REDIRECT */
+#ifndef ICMP_ECHO
+#define ICMP_ECHO           8  /* Echo Request. */
+#endif /* !ICMP_ECHO */
+#define ICMP_TIME_EXCEEDED  11 /* == ICMP_TIMXCEED */
+#define ICMP_PARAMETERPROB  12 /* == ICMP_PARAMPROB */
+#define ICMP_TIMESTAMP      13 /* == ICMP_TSTAMP */
+#define ICMP_TIMESTAMPREPLY 14 /* == ICMP_TSTAMPREPLY */
+#define ICMP_INFO_REQUEST   15 /* == ICMP_IREQ */
+#define ICMP_INFO_REPLY     16 /* == ICMP_IREQREPLY */
+#define ICMP_ADDRESS        17 /* == ICMP_MASKREQ */
+#define ICMP_ADDRESSREPLY   18 /* == ICMP_MASKREPLY */
+#define NR_ICMP_TYPES       18 /* == ICMP_MAXTYPE */
 
-#endif /* !__NETINET_IP_ICMP_H */
+/* Badly namespace'd aliases for macros above (not exposed in KOS-PURE mode) */
+/* Codes for `ICMP_UNREACH' */
+#define ICMP_NET_UNREACH     0  /* == ICMP_UNREACH_NET */
+#define ICMP_HOST_UNREACH    1  /* == ICMP_UNREACH_HOST */
+#define ICMP_PROT_UNREACH    2  /* == ICMP_UNREACH_PROTOCOL */
+#define ICMP_PORT_UNREACH    3  /* == ICMP_UNREACH_PORT */
+#define ICMP_FRAG_NEEDED     4  /* == ICMP_UNREACH_NEEDFRAG */
+#define ICMP_SR_FAILED       5  /* == ICMP_UNREACH_SRCFAIL */
+#define ICMP_NET_UNKNOWN     6  /* == ICMP_UNREACH_NET_UNKNOWN */
+#define ICMP_HOST_UNKNOWN    7  /* == ICMP_UNREACH_HOST_UNKNOWN */
+#define ICMP_HOST_ISOLATED   8  /* == ICMP_UNREACH_ISOLATED */
+#define ICMP_NET_ANO         9  /* == ICMP_UNREACH_NET_PROHIB */
+#define ICMP_HOST_ANO        10 /* == ICMP_UNREACH_HOST_PROHIB */
+#define ICMP_NET_UNR_TOS     11 /* == ICMP_UNREACH_TOSNET */
+#define ICMP_HOST_UNR_TOS    12 /* == ICMP_UNREACH_TOSHOST */
+#define ICMP_PKT_FILTERED    13 /* == ICMP_UNREACH_FILTER_PROHIB */
+#define ICMP_PREC_VIOLATION  14 /* == ICMP_UNREACH_HOST_PRECEDENCE */
+#define ICMP_PREC_CUTOFF     15 /* == ICMP_UNREACH_PRECEDENCE_CUTOFF */
+#define NR_ICMP_UNREACH      15 /* instead of hardcoding immediate value */
+
+/* Badly namespace'd aliases for macros above (not exposed in KOS-PURE mode) */
+/* Codes for `ICMP_REDIRECT' */
+#define ICMP_REDIR_NET       0 /* == ICMP_REDIRECT_NET */
+#define ICMP_REDIR_HOST      1 /* == ICMP_REDIRECT_HOST */
+#define ICMP_REDIR_NETTOS    2 /* == ICMP_REDIRECT_TOSNET */
+#define ICMP_REDIR_HOSTTOS   3 /* == ICMP_REDIRECT_TOSHOST */
+
+/* Badly namespace'd aliases for macros above (not exposed in KOS-PURE mode) */
+/* Codes for `ICMP_TIMXCEED' */
+#define ICMP_EXC_TTL         0 /* == ICMP_TIMXCEED_INTRANS */
+#define ICMP_EXC_FRAGTIME    1 /* == ICMP_TIMXCEED_REASS */
+
+#endif /* !__USE_KOS_PURE */
+
+__DECL_END
+
 #endif /* !_NETINET_IP_ICMP_H */

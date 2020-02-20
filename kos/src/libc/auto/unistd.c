@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5699e1fd */
+/* HASH CRC-32:0x5a528ec3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.getdtablesize") int
 NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void) {
-#line 1430 "kos/src/libc/magic/unistd.c"
+#line 1429 "kos/src/libc/magic/unistd.c"
 #if defined(__KOS__)
 	return 0x7fffffff; /* INT_MAX */
 #elif defined(__linux__) || defined(__linux) || defined(linux)
@@ -50,7 +50,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.swab") void
 NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
                                 void *__restrict to,
                                 __STDC_INT_AS_SSIZE_T n_bytes) {
-#line 1692 "kos/src/libc/magic/unistd.c"
+#line 1691 "kos/src/libc/magic/unistd.c"
 	n_bytes &= ~1;
 	while (n_bytes >= 2) {
 		byte_t a, b;

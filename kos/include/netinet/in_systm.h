@@ -39,14 +39,20 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <__stdinc.h>
+#include <features.h>
+
+#include <net/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
-typedef u_int16_t n_short; /* short as received from the net. */
-typedef u_int32_t n_long;  /* long as received from the net. */
-typedef u_int32_t n_time;  /* ms since 00:00 GMT, byte rev. */
+typedef __u_net16_t n_short; /* short as received from the net. */
+typedef __u_net32_t n_long;  /* long as received from the net. */
+typedef __u_net32_t n_time;  /* ms since 00:00 GMT, byte rev. */
 #endif /* __CC__ */
 
 __SYSDECL_END

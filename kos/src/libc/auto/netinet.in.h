@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf08f4f7a */
+/* HASH CRC-32:0x581b8e77 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,10 +29,12 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF ATTR_CONST uint32_t NOTHROW_NCX(LIBCCALL libc_ntohl)(uint32_t netlong);
+INTDEF ATTR_CONST uint16_t NOTHROW_NCX(LIBCCALL libc_htons)(uint16_t hostword);
 INTDEF ATTR_CONST uint16_t NOTHROW_NCX(LIBCCALL libc_ntohs)(uint16_t netshort);
-#define libc_htonl libc_ntohl
-#define libc_htons libc_ntohs
+INTDEF ATTR_CONST uint32_t NOTHROW_NCX(LIBCCALL libc_htonl)(uint32_t hostlong);
+INTDEF ATTR_CONST uint32_t NOTHROW_NCX(LIBCCALL libc_ntohl)(uint32_t netlong);
+INTDEF ATTR_CONST uint64_t NOTHROW_NCX(LIBCCALL libc_htonq)(uint64_t hostlong);
+INTDEF ATTR_CONST uint64_t NOTHROW_NCX(LIBCCALL libc_ntohq)(uint64_t netlong);
 #endif /* !__KERNEL__ */
 
 DECL_END

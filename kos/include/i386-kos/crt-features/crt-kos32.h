@@ -2534,6 +2534,7 @@
 #define __CRT_HAVE_hsearch_r 1
 #define __CRT_HAVE_hstrerror 1
 #define __CRT_HAVE_htonl 1
+#define __CRT_HAVE_htonq 1
 #define __CRT_HAVE_htons 1
 #define __CRT_HAVE_hypot 1
 #define __CRT_HAVE_hypotf 1
@@ -2985,6 +2986,7 @@
 #define __CRT_HAVE_nrand48 1
 #define __CRT_HAVE_nrand48_r 1
 #define __CRT_HAVE_ntohl 1
+#define __CRT_HAVE_ntohq 1
 #define __CRT_HAVE_ntohs 1
 #define __CRT_HAVE_ntp_adjtime 1
 #define __CRT_HAVE_ntp_adjtime64 1

@@ -42,9 +42,11 @@
 #include <features.h>
 
 #include <asm/socket.h>
-#include <bits/sockaddr.h>
-#include <bits/socket_type.h>
 #include <bits/msghdr-struct.h>
+#include <bits/sockaddr-struct.h>
+#include <bits/sockaddr.h>
+#include <bits/sockaddr_storage-struct.h>
+#include <bits/socket_type.h>
 #include <bits/types.h>
 
 #ifdef __USE_GLIBC
@@ -53,349 +55,111 @@
 
 __SYSDECL_BEGIN
 
-#ifdef __CC__
-#ifndef __size_t_defined
-#define __size_t_defined 1
-typedef __SIZE_TYPE__ size_t;
-#endif /* !__size_t_defined */
-#ifndef __socklen_t_defined
-#define __socklen_t_defined 1
-typedef __socklen_t socklen_t;
-#endif /* !__socklen_t_defined */
-#endif /* __CC__ */
-
 /* Protocol families. */
-#ifndef PF_UNSPEC
 #define PF_UNSPEC       0  /* Unspecified. */
-#endif /* !PF_UNSPEC */
-#ifndef PF_LOCAL
 #define PF_LOCAL        1  /* Local to host (pipes and file-domain). */
-#endif /* !PF_LOCAL */
-#ifndef PF_UNIX
 #define PF_UNIX         PF_LOCAL /* POSIX name for PF_LOCAL. */
-#endif /* !PF_UNIX */
-#ifndef PF_FILE
 #define PF_FILE         PF_LOCAL /* Another non-standard name for PF_LOCAL. */
-#endif /* !PF_FILE */
-#ifndef PF_INET
 #define PF_INET         2  /* IP protocol family. */
-#endif /* !PF_INET */
-#ifndef PF_AX25
 #define PF_AX25         3  /* Amateur Radio AX.25. */
-#endif /* !PF_AX25 */
-#ifndef PF_IPX
 #define PF_IPX          4  /* Novell Internet Protocol. */
-#endif /* !PF_IPX */
-#ifndef PF_APPLETALK
 #define PF_APPLETALK    5  /* Appletalk DDP. */
-#endif /* !PF_APPLETALK */
-#ifndef PF_NETROM
 #define PF_NETROM       6  /* Amateur radio NetROM. */
-#endif /* !PF_NETROM */
-#ifndef PF_BRIDGE
 #define PF_BRIDGE       7  /* Multiprotocol bridge. */
-#endif /* !PF_BRIDGE */
-#ifndef PF_ATMPVC
 #define PF_ATMPVC       8  /* ATM PVCs. */
-#endif /* !PF_ATMPVC */
-#ifndef PF_X25
 #define PF_X25          9  /* Reserved for X.25 project. */
-#endif /* !PF_X25 */
-#ifndef PF_INET6
 #define PF_INET6        10 /* IP version 6. */
-#endif /* !PF_INET6 */
-#ifndef PF_ROSE
 #define PF_ROSE         11 /* Amateur Radio X.25 PLP. */
-#endif /* !PF_ROSE */
-#ifndef PF_DECnet
 #define PF_DECnet       12 /* Reserved for DECnet project. */
-#endif /* !PF_DECnet */
-#ifndef PF_NETBEUI
 #define PF_NETBEUI      13 /* Reserved for 802.2LLC project. */
-#endif /* !PF_NETBEUI */
-#ifndef PF_SECURITY
 #define PF_SECURITY     14 /* Security callback pseudo AF. */
-#endif /* !PF_SECURITY */
-#ifndef PF_KEY
 #define PF_KEY          15 /* PF_KEY key management API. */
-#endif /* !PF_KEY */
-#ifndef PF_NETLINK
 #define PF_NETLINK      16
-#endif /* !PF_NETLINK */
-#ifndef PF_ROUTE
 #define PF_ROUTE        PF_NETLINK /* Alias to emulate 4.4BSD. */
-#endif /* !PF_ROUTE */
-#ifndef PF_PACKET
 #define PF_PACKET       17 /* Packet family. */
-#endif /* !PF_PACKET */
-#ifndef PF_ASH
 #define PF_ASH          18 /* Ash. */
-#endif /* !PF_ASH */
-#ifndef PF_ECONET
 #define PF_ECONET       19 /* Acorn Econet. */
-#endif /* !PF_ECONET */
-#ifndef PF_ATMSVC
 #define PF_ATMSVC       20 /* ATM SVCs. */
-#endif /* !PF_ATMSVC */
-#ifndef PF_RDS
 #define PF_RDS          21 /* RDS sockets. */
-#endif /* !PF_RDS */
-#ifndef PF_SNA
 #define PF_SNA          22 /* Linux SNA Project */
-#endif /* !PF_SNA */
-#ifndef PF_IRDA
 #define PF_IRDA         23 /* IRDA sockets. */
-#endif /* !PF_IRDA */
-#ifndef PF_PPPOX
 #define PF_PPPOX        24 /* PPPoX sockets. */
-#endif /* !PF_PPPOX */
-#ifndef PF_WANPIPE
 #define PF_WANPIPE      25 /* Wanpipe API sockets. */
-#endif /* !PF_WANPIPE */
-#ifndef PF_LLC
 #define PF_LLC          26 /* Linux LLC. */
-#endif /* !PF_LLC */
-#ifndef PF_IB
 #define PF_IB           27 /* Native InfiniBand address. */
-#endif /* !PF_IB */
-#ifndef PF_MPLS
 #define PF_MPLS         28 /* MPLS. */
-#endif /* !PF_MPLS */
-#ifndef PF_CAN
 #define PF_CAN          29 /* Controller Area Network. */
-#endif /* !PF_CAN */
-#ifndef PF_TIPC
 #define PF_TIPC         30 /* TIPC sockets. */
-#endif /* !PF_TIPC */
-#ifndef PF_BLUETOOTH
 #define PF_BLUETOOTH    31 /* Bluetooth sockets. */
-#endif /* !PF_BLUETOOTH */
-#ifndef PF_IUCV
 #define PF_IUCV         32 /* IUCV sockets. */
-#endif /* !PF_IUCV */
-#ifndef PF_RXRPC
 #define PF_RXRPC        33 /* RxRPC sockets. */
-#endif /* !PF_RXRPC */
-#ifndef PF_ISDN
 #define PF_ISDN         34 /* mISDN sockets. */
-#endif /* !PF_ISDN */
-#ifndef PF_PHONET
 #define PF_PHONET       35 /* Phonet sockets. */
-#endif /* !PF_PHONET */
-#ifndef PF_IEEE802154
 #define PF_IEEE802154   36 /* IEEE 802.15.4 sockets. */
-#endif /* !PF_IEEE802154 */
-#ifndef PF_CAIF
 #define PF_CAIF         37 /* CAIF sockets. */
-#endif /* !PF_CAIF */
-#ifndef PF_ALG
 #define PF_ALG          38 /* Algorithm sockets. */
-#endif /* !PF_ALG */
-#ifndef PF_NFC
 #define PF_NFC          39 /* NFC sockets. */
-#endif /* !PF_NFC */
-#ifndef PF_VSOCK
 #define PF_VSOCK        40 /* vSockets. */
-#endif /* !PF_VSOCK */
-#ifndef PF_MAX
 #define PF_MAX          41 /* For now.. */
-#endif /* !PF_MAX */
 
 /* Address families. */
-#ifndef AF_UNSPEC
 #define AF_UNSPEC       PF_UNSPEC
-#endif /* !AF_UNSPEC */
-#ifndef AF_LOCAL
 #define AF_LOCAL        PF_LOCAL
-#endif /* !AF_LOCAL */
-#ifndef AF_UNIX
 #define AF_UNIX         PF_UNIX
-#endif /* !AF_UNIX */
-#ifndef AF_FILE
 #define AF_FILE         PF_FILE
-#endif /* !AF_FILE */
-#ifndef AF_INET
 #define AF_INET         PF_INET
-#endif /* !AF_INET */
-#ifndef AF_AX25
 #define AF_AX25         PF_AX25
-#endif /* !AF_AX25 */
-#ifndef AF_IPX
 #define AF_IPX          PF_IPX
-#endif /* !AF_IPX */
-#ifndef AF_APPLETALK
 #define AF_APPLETALK    PF_APPLETALK
-#endif /* !AF_APPLETALK */
-#ifndef AF_NETROM
 #define AF_NETROM       PF_NETROM
-#endif /* !AF_NETROM */
-#ifndef AF_BRIDGE
 #define AF_BRIDGE       PF_BRIDGE
-#endif /* !AF_BRIDGE */
-#ifndef AF_ATMPVC
 #define AF_ATMPVC       PF_ATMPVC
-#endif /* !AF_ATMPVC */
-#ifndef AF_X25
 #define AF_X25          PF_X25
-#endif /* !AF_X25 */
-#ifndef AF_INET6
 #define AF_INET6        PF_INET6
-#endif /* !AF_INET6 */
-#ifndef AF_ROSE
 #define AF_ROSE         PF_ROSE
-#endif /* !AF_ROSE */
-#ifndef AF_DECnet
 #define AF_DECnet       PF_DECnet
-#endif /* !AF_DECnet */
-#ifndef AF_NETBEUI
 #define AF_NETBEUI      PF_NETBEUI
-#endif /* !AF_NETBEUI */
-#ifndef AF_SECURITY
 #define AF_SECURITY     PF_SECURITY
-#endif /* !AF_SECURITY */
-#ifndef AF_KEY
 #define AF_KEY          PF_KEY
-#endif /* !AF_KEY */
-#ifndef AF_NETLINK
 #define AF_NETLINK      PF_NETLINK
-#endif /* !AF_NETLINK */
-#ifndef AF_ROUTE
 #define AF_ROUTE        PF_ROUTE
-#endif /* !AF_ROUTE */
-#ifndef AF_PACKET
 #define AF_PACKET       PF_PACKET
-#endif /* !AF_PACKET */
-#ifndef AF_ASH
 #define AF_ASH          PF_ASH
-#endif /* !AF_ASH */
-#ifndef AF_ECONET
 #define AF_ECONET       PF_ECONET
-#endif /* !AF_ECONET */
-#ifndef AF_ATMSVC
 #define AF_ATMSVC       PF_ATMSVC
-#endif /* !AF_ATMSVC */
-#ifndef AF_RDS
 #define AF_RDS          PF_RDS
-#endif /* !AF_RDS */
-#ifndef AF_SNA
 #define AF_SNA          PF_SNA
-#endif /* !AF_SNA */
-#ifndef AF_IRDA
 #define AF_IRDA         PF_IRDA
-#endif /* !AF_IRDA */
-#ifndef AF_PPPOX
 #define AF_PPPOX        PF_PPPOX
-#endif /* !AF_PPPOX */
-#ifndef AF_WANPIPE
 #define AF_WANPIPE      PF_WANPIPE
-#endif /* !AF_WANPIPE */
-#ifndef AF_LLC
 #define AF_LLC          PF_LLC
-#endif /* !AF_LLC */
-#ifndef AF_IB
 #define AF_IB           PF_IB
-#endif /* !AF_IB */
-#ifndef AF_MPLS
 #define AF_MPLS         PF_MPLS
-#endif /* !AF_MPLS */
-#ifndef AF_CAN
 #define AF_CAN          PF_CAN
-#endif /* !AF_CAN */
-#ifndef AF_TIPC
 #define AF_TIPC         PF_TIPC
-#endif /* !AF_TIPC */
-#ifndef AF_BLUETOOTH
 #define AF_BLUETOOTH    PF_BLUETOOTH
-#endif /* !AF_BLUETOOTH */
-#ifndef AF_IUCV
 #define AF_IUCV         PF_IUCV
-#endif /* !AF_IUCV */
-#ifndef AF_RXRPC
 #define AF_RXRPC        PF_RXRPC
-#endif /* !AF_RXRPC */
-#ifndef AF_ISDN
 #define AF_ISDN         PF_ISDN
-#endif /* !AF_ISDN */
-#ifndef AF_PHONET
 #define AF_PHONET       PF_PHONET
-#endif /* !AF_PHONET */
-#ifndef AF_IEEE802154
 #define AF_IEEE802154   PF_IEEE802154
-#endif /* !AF_IEEE802154 */
-#ifndef AF_CAIF
 #define AF_CAIF         PF_CAIF
-#endif /* !AF_CAIF */
-#ifndef AF_ALG
 #define AF_ALG          PF_ALG
-#endif /* !AF_ALG */
-#ifndef AF_NFC
 #define AF_NFC          PF_NFC
-#endif /* !AF_NFC */
-#ifndef AF_VSOCK
 #define AF_VSOCK        PF_VSOCK
-#endif /* !AF_VSOCK */
-#ifndef AF_MAX
 #define AF_MAX          PF_MAX
-#endif /* !AF_MAX */
 
 /* Socket level values. Others are defined in the appropriate headers.
  * XXX These definitions also should go into the appropriate headers as
  * far as they are available. */
-#ifndef SOL_RAW
 #define SOL_RAW         255
-#endif /* !SOL_RAW */
-#ifndef SOL_DECNET
 #define SOL_DECNET      261
-#endif /* !SOL_DECNET */
-#ifndef SOL_X25
 #define SOL_X25         262
-#endif /* !SOL_X25 */
-#ifndef SOL_PACKET
 #define SOL_PACKET      263
-#endif /* !SOL_PACKET */
-#ifndef SOL_ATM
 #define SOL_ATM         264 /* ATM layer (cell level). */
-#endif /* !SOL_ATM */
-#ifndef SOL_AAL
 #define SOL_AAL         265 /* ATM Adaption Layer (packet level). */
-#endif /* !SOL_AAL */
-#ifndef SOL_IRDA
 #define SOL_IRDA        266
-#endif /* !SOL_IRDA */
-#ifndef SOMAXCONN
 #define SOMAXCONN       128 /* Maximum queue length specifiable by listen. */
-#endif /* !SOMAXCONN */
-
-/* Structure describing a generic socket address. */
-#ifdef __CC__
-#ifndef __sockaddr_defined
-#define __sockaddr_defined 1
-struct sockaddr {
-	__SOCKADDR_COMMON(sa_); /* Common data: address family and length. */
-	char sa_data[14];       /* Address data. */
-};
-#endif /* !__sockaddr_defined */
-#endif /* __CC__ */
-
-/* Structure large enough to hold any socket address (with the historical exception of AF_UNIX). */
-#ifndef __ss_aligntype
-#define __ss_aligntype   __ULONGPTR_TYPE__
-#endif /* !__ss_aligntype */
-#ifndef _SS_PADSIZE
-#define _SS_PADSIZE     (_SS_SIZE-__SOCKADDR_COMMON_SIZE-sizeof(__ss_aligntype))
-#endif /* !_SS_PADSIZE */
-
-#ifdef __CC__
-#ifndef __sockaddr_storage_defined
-#define __sockaddr_storage_defined 1
-struct sockaddr_storage {
-	__SOCKADDR_COMMON(ss_);    /* Address family, etc. */
-	__BYTE_TYPE__  __ss_padding[_SS_PADSIZE];
-	__ss_aligntype __ss_align; /* Force desired alignment. */
-};
-#endif /* !__sockaddr_storage_defined */
-#endif /* __CC__ */
-
 
 /* Bits in the FLAGS argument to `send', `recv', et al. */
 #ifndef MSG_OOB
@@ -491,7 +255,13 @@ enum {
 #ifndef __cmsghdr_defined
 #define __cmsghdr_defined 1
 struct cmsghdr {
-	size_t           cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure. !! The type should be socklen_t but the definition of the kernel is incompatible with this. */
+#if __SIZEOF_SOCKLEN_T__ == __SIZEOF_SIZE_T__
+	__socklen_t      cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure. */
+#else /* __SIZEOF_SOCKLEN_T__ == __SIZEOF_SIZE_T__ */
+	__size_t         cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure.
+	                                * !! The type should be socklen_t but the definition
+	                                *    of the kernel is incompatible with this. */
+#endif /* __SIZEOF_SOCKLEN_T__ != __SIZEOF_SIZE_T__ */
 	__INT32_TYPE__   cmsg_level;   /* Originating protocol. (One of `SOL_*'; (always `SOL_SOCKET'?)) */
 	__INT32_TYPE__   cmsg_type;    /* Protocol specific type (One of `SCM_*'). */
 	__UINT8_TYPE__ __cmsg_data[1]; /* Ancillary data. */
@@ -505,14 +275,14 @@ struct cmsghdr {
 #define CMSG_DATA(cmsg) ((cmsg)->__cmsg_data)
 #endif /* !CMSG_DATA */
 #ifndef CMSG_FIRSTHDR
-#define CMSG_FIRSTHDR(mhdr)                                                            \
-	((size_t)(mhdr)->msg_controllen >= __builtin_offsetof(struct cmsghdr, __cmsg_data) \
-	 ? (struct cmsghdr *)(mhdr)->msg_control                                           \
+#define CMSG_FIRSTHDR(mhdr)                                                              \
+	((__size_t)(mhdr)->msg_controllen >= __builtin_offsetof(struct cmsghdr, __cmsg_data) \
+	 ? (struct cmsghdr *)(mhdr)->msg_control                                             \
 	 : (struct cmsghdr *)0)
 #endif /* !CMSG_FIRSTHDR */
 #ifndef CMSG_ALIGN
 #define CMSG_ALIGN(len) \
-	(((len) + sizeof(size_t) - 1) & (size_t) ~(sizeof(size_t) - 1))
+	(((len) + sizeof(__size_t) - 1) & (__size_t) ~(sizeof(__size_t) - 1))
 #endif /* !CMSG_ALIGN */
 #ifndef CMSG_SPACE
 #define CMSG_SPACE(len) \
@@ -523,19 +293,18 @@ struct cmsghdr {
 	(CMSG_ALIGN(__builtin_offsetof(struct cmsghdr, __cmsg_data)) + (len))
 #endif /* !CMSG_LEN */
 #ifndef CMSG_NXTHDR
-#define CMSG_NXTHDR(mhdr, cmsg) \
-	__cmsg_nxthdr(mhdr, cmsg)
+#define CMSG_NXTHDR(mhdr, cmsg) __cmsg_nxthdr(mhdr, cmsg)
 #ifdef __CRT_HAVE___cmsg_nxthdr
 __CDECLARE(__ATTR_WUNUSED,struct cmsghdr *,__NOTHROW_NCX,__cmsg_nxthdr,(struct msghdr *__mhdr, struct cmsghdr *__cmsg),(__mhdr,__cmsg))
 #else /* __CRT_HAVE___cmsg_nxthdr */
 __LOCAL __ATTR_WUNUSED struct cmsghdr *
 __NOTHROW_NCX(__LIBCCALL __cmsg_nxthdr)(struct msghdr *__mhdr, struct cmsghdr *__cmsg) {
-	if ((size_t)__cmsg->cmsg_len < __builtin_offsetof(struct cmsghdr, __cmsg_data))
+	if ((__size_t)__cmsg->cmsg_len < __builtin_offsetof(struct cmsghdr, __cmsg_data))
 		return (struct cmsghdr *)0;
-	__cmsg = (struct cmsghdr *)((unsigned char *)__cmsg + CMSG_ALIGN(__cmsg->cmsg_len));
-	if ((unsigned char *)(__cmsg + 1) > ((unsigned char *)__mhdr->msg_control + __mhdr->msg_controllen) ||
-	    ((unsigned char *)__cmsg + CMSG_ALIGN(__cmsg->cmsg_len) >
-	     ((unsigned char *)__mhdr->msg_control + __mhdr->msg_controllen)))
+	__cmsg = (struct cmsghdr *)((__byte_t *)__cmsg + CMSG_ALIGN(__cmsg->cmsg_len));
+	if ((__byte_t *)(__cmsg + 1) > ((__byte_t *)__mhdr->msg_control + __mhdr->msg_controllen) ||
+	    ((__byte_t *)__cmsg + CMSG_ALIGN(__cmsg->cmsg_len) >
+	     ((__byte_t *)__mhdr->msg_control + __mhdr->msg_controllen)))
 		return (struct cmsghdr *)0;
 	return __cmsg;
 }

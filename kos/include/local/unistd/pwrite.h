@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac2a2ef7 */
+/* HASH CRC-32:0xb503fc04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -126,7 +126,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwrite))(__fd_t __fd,
                                                     void const *__buf,
                                                     __SIZE_TYPE__ __bufsize,
                                                     __PIO_OFFSET __offset) {
-#line 903 "kos/src/libc/magic/unistd.c"
+#line 902 "kos/src/libc/magic/unistd.c"
 #ifdef __CRT_HAVE_pwrite64
 	return __localdep_pwrite64(__fd, __buf, __bufsize, (__PIO_OFFSET64)__offset);
 #else

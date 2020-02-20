@@ -39,10 +39,18 @@
 
 #include <__stdinc.h>
 #include <features.h>
-#include <sys/types.h>
 
+#ifdef __USE_GLIBC
+#include <sys/types.h>
 #ifdef __USE_MISC
 #include <netinet/in.h>
+#endif /* __USE_MISC */
+#endif /* __USE_GLIBC */
+
+#ifdef __USE_MISC
+#include <bits/in.h>
+#include <bits/types.h>
+#include <net/types.h>
 
 __SYSDECL_BEGIN
 
@@ -83,9 +91,9 @@ __SYSDECL_BEGIN
  */
 #ifdef __CC__
 struct igmp {
-	u_int8_t       igmp_type;  /* IGMP type. */
-	u_int8_t       igmp_code;  /* routing code. */
-	u_int16_t      igmp_cksum; /* checksum. */
+	__uint8_t      igmp_type;  /* IGMP type. */
+	__uint8_t      igmp_code;  /* routing code. */
+	__u_net16_t    igmp_cksum; /* checksum. */
 	struct in_addr igmp_group; /* group address. */
 };
 #endif /* __CC__ */

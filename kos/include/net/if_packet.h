@@ -21,6 +21,9 @@
 #define _NET_IF_PACKET_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/typecore.h>
+
 #include <bits/sockaddr.h>
 
 /* Definitions for use with Linux SOCK_PACKET sockets.
@@ -50,8 +53,8 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 struct sockaddr_pkt {
 	__SOCKADDR_COMMON(spkt_);
-	unsigned char  spkt_device[14];
-	unsigned short spkt_protocol;
+	unsigned char   spkt_device[14];
+	__UINT16_TYPE__ spkt_protocol;
 };
 #endif /* __CC__ */
 

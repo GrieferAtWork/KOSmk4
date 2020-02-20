@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c4b7918 */
+/* HASH CRC-32:0xa5670c2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,26 +31,72 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <hybrid/__byteswap.h>
 INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.ntohl") uint32_t
-NOTHROW_NCX(LIBCCALL libc_ntohl)(uint32_t netlong) {
-#line 291 "kos/src/libc/magic/netinet.in.c"
-	return (uint32_t)__hybrid_beswap32(netlong);
+ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.htons") uint16_t
+NOTHROW_NCX(LIBCCALL libc_htons)(uint16_t hostword) {
+#line 311 "kos/src/libc/magic/netinet.in.c"
+	return (uint16_t)__hybrid_htobe32(hostword);
 }
 
 #include <hybrid/__byteswap.h>
+#if defined(__HYBRID_HTOBE_IS_BETOH)
+DEFINE_INTERN_ALIAS(libc_ntohs, libc_htons);
+#else
 INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.ntohs") uint16_t
 NOTHROW_NCX(LIBCCALL libc_ntohs)(uint16_t netshort) {
-#line 297 "kos/src/libc/magic/netinet.in.c"
-	return (uint16_t)__hybrid_beswap16(netshort);
+#line 317 "kos/src/libc/magic/netinet.in.c"
+	return (uint16_t)__hybrid_betoh16(netshort);
 }
+#endif /* MAGIC:alias */
+
+#include <hybrid/__byteswap.h>
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.htonl") uint32_t
+NOTHROW_NCX(LIBCCALL libc_htonl)(uint32_t hostlong) {
+#line 323 "kos/src/libc/magic/netinet.in.c"
+	return (uint32_t)__hybrid_htobe32(hostlong);
+}
+
+#include <hybrid/__byteswap.h>
+#if defined(__HYBRID_HTOBE_IS_BETOH)
+DEFINE_INTERN_ALIAS(libc_ntohl, libc_htonl);
+#else
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.ntohl") uint32_t
+NOTHROW_NCX(LIBCCALL libc_ntohl)(uint32_t netlong) {
+#line 329 "kos/src/libc/magic/netinet.in.c"
+	return (uint32_t)__hybrid_betoh32(netlong);
+}
+#endif /* MAGIC:alias */
+
+#include <hybrid/__byteswap.h>
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.htonq") uint64_t
+NOTHROW_NCX(LIBCCALL libc_htonq)(uint64_t hostlong) {
+#line 336 "kos/src/libc/magic/netinet.in.c"
+	return (uint64_t)__hybrid_htobe64(hostlong);
+}
+
+#include <hybrid/__byteswap.h>
+#if defined(__HYBRID_HTOBE_IS_BETOH)
+DEFINE_INTERN_ALIAS(libc_ntohq, libc_htonq);
+#else
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.net.convert.ntohq") uint64_t
+NOTHROW_NCX(LIBCCALL libc_ntohq)(uint64_t netlong) {
+#line 342 "kos/src/libc/magic/netinet.in.c"
+	return (uint64_t)__hybrid_betoh64(netlong);
+}
+#endif /* MAGIC:alias */
 
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
-DEFINE_PUBLIC_WEAK_ALIAS(ntohl, libc_ntohl);
-DEFINE_PUBLIC_WEAK_ALIAS(htonl, libc_ntohl);
+DEFINE_PUBLIC_WEAK_ALIAS(htons, libc_htons);
 DEFINE_PUBLIC_WEAK_ALIAS(ntohs, libc_ntohs);
-DEFINE_PUBLIC_WEAK_ALIAS(htons, libc_ntohs);
+DEFINE_PUBLIC_WEAK_ALIAS(htonl, libc_htonl);
+DEFINE_PUBLIC_WEAK_ALIAS(ntohl, libc_ntohl);
+DEFINE_PUBLIC_WEAK_ALIAS(htonq, libc_htonq);
+DEFINE_PUBLIC_WEAK_ALIAS(ntohq, libc_ntohq);
 #endif /* !__KERNEL__ */
 
 DECL_END

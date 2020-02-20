@@ -38,46 +38,83 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <__stdinc.h>
-#include <inttypes.h>
+#include <features.h>
+#include <bits/types.h>
+#include <net/types.h>
+
+#ifdef __USE_GLIBC
 #include <netinet/in.h>
+#include <inttypes.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
 struct ip6_hdr {
+#ifdef __USE_KOS_PURE
+	__u_net32_t ip6_flow; /* 4 bits version, 8 bits TC, 20 bits flow-ID */
+	__u_net16_t ip6_plen; /* payload length */
+	__uint8_t   ip6_nxt;  /* next header */
+	__uint8_t   ip6_hops; /* hop limit */
+	__uint8_t   ip6_vfc;  /* 4 bits version, top 4 bits tclass */
+#elif (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+       defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+	union {
+		struct {
+			struct ip6_hdrctl {
+				__u_net32_t   ip6_un1_flow; /* 4 bits version, 8 bits TC, 20 bits flow-ID */
+				__u_net16_t   ip6_un1_plen; /* payload length */
+				__uint8_t     ip6_un1_nxt;  /* next header */
+				__uint8_t     ip6_un1_hlim; /* hop limit */
+			}                 ip6_un1;
+			__uint8_t         ip6_un2_vfc;  /* 4 bits version, top 4 bits tclass */
+		} ip6_ctlun;
+		struct {
+			__u_net32_t       ip6_flow;     /* 4 bits version, 8 bits TC, 20 bits flow-ID */
+			__u_net16_t       ip6_plen;     /* payload length */
+			__uint8_t         ip6_nxt;      /* next header */
+			union {
+				__uint8_t     ip6_hlim;     /* hop limit */
+				__uint8_t     ip6_hops;     /* hop limit */
+			};
+			__uint8_t         ip6_vfc;      /* 4 bits version, top 4 bits tclass */
+		};
+	};
+#else /* ... */
 	union {
 		struct ip6_hdrctl {
-			uint32_t      ip6_un1_flow; /* 4 bits version, 8 bits TC, 20 bits flow-ID */
-			uint16_t      ip6_un1_plen; /* payload length */
-			uint8_t       ip6_un1_nxt;  /* next header */
-			uint8_t       ip6_un1_hlim; /* hop limit */
+			__u_net32_t   ip6_un1_flow; /* 4 bits version, 8 bits TC, 20 bits flow-ID */
+			__u_net16_t   ip6_un1_plen; /* payload length */
+			__uint8_t     ip6_un1_nxt;  /* next header */
+			__uint8_t     ip6_un1_hlim; /* hop limit */
 		}                 ip6_un1;
-		uint8_t           ip6_un2_vfc;  /* 4 bits version, top 4 bits tclass */
+		__uint8_t         ip6_un2_vfc;  /* 4 bits version, top 4 bits tclass */
 	}                     ip6_ctlun;
-	struct in6_addr       ip6_src;      /* source address */
-	struct in6_addr       ip6_dst;      /* destination address */
-#define ip6_vfc  ip6_ctlun.ip6_un2_vfc
-#define ip6_flow ip6_ctlun.ip6_un1.ip6_un1_flow
-#define ip6_plen ip6_ctlun.ip6_un1.ip6_un1_plen
-#define ip6_nxt  ip6_ctlun.ip6_un1.ip6_un1_nxt
-#define ip6_hlim ip6_ctlun.ip6_un1.ip6_un1_hlim
-#define ip6_hops ip6_ctlun.ip6_un1.ip6_un1_hlim
+#define ip6_vfc  ip6_ctlun.ip6_un2_vfc          /* 4 bits version, top 4 bits tclass */
+#define ip6_flow ip6_ctlun.ip6_un1.ip6_un1_flow /* 4 bits version, 8 bits TC, 20 bits flow-ID */
+#define ip6_plen ip6_ctlun.ip6_un1.ip6_un1_plen /* payload length */
+#define ip6_nxt  ip6_ctlun.ip6_un1.ip6_un1_nxt  /* next header */
+#define ip6_hlim ip6_ctlun.ip6_un1.ip6_un1_hlim /* hop limit */
+#define ip6_hops ip6_ctlun.ip6_un1.ip6_un1_hlim /* hop limit */
+#endif /* !... */
+	struct in6_addr ip6_src;      /* source address */
+	struct in6_addr ip6_dst;      /* destination address */
 };
 #endif /* __CC__ */
 
 /* Generic extension header. */
 #ifdef __CC__
 struct ip6_ext {
-	uint8_t  ip6e_nxt; /* next header. */
-	uint8_t  ip6e_len; /* length in units of 8 octets. */
+	__uint8_t  ip6e_nxt; /* next header. */
+	__uint8_t  ip6e_len; /* length in units of 8 octets. */
 };
 #endif /* __CC__ */
 
 /* Hop-by-Hop options header. */
 #ifdef __CC__
 struct ip6_hbh {
-	uint8_t  ip6h_nxt; /* next header. */
-	uint8_t  ip6h_len; /* length in units of 8 octets. */
+	__uint8_t  ip6h_nxt; /* next header. */
+	__uint8_t  ip6h_len; /* length in units of 8 octets. */
 	/* followed by options */
 };
 #endif /* __CC__ */
@@ -85,8 +122,8 @@ struct ip6_hbh {
 /* Destination options header */
 #ifdef __CC__
 struct ip6_dest {
-	uint8_t  ip6d_nxt; /* next header */
-	uint8_t  ip6d_len; /* length in units of 8 octets */
+	__uint8_t  ip6d_nxt; /* next header */
+	__uint8_t  ip6d_len; /* length in units of 8 octets */
 	/* followed by options */
 };
 #endif /* __CC__ */
@@ -94,10 +131,10 @@ struct ip6_dest {
 /* Routing header */
 #ifdef __CC__
 struct ip6_rthdr {
-	uint8_t ip6r_nxt;     /* next header */
-	uint8_t ip6r_len;     /* length in units of 8 octets */
-	uint8_t ip6r_type;    /* routing type */
-	uint8_t ip6r_segleft; /* segments left */
+	__uint8_t ip6r_nxt;     /* next header */
+	__uint8_t ip6r_len;     /* length in units of 8 octets */
+	__uint8_t ip6r_type;    /* routing type */
+	__uint8_t ip6r_segleft; /* segments left */
 	/* followed by routing type specific data */
 };
 #endif /* __CC__ */
@@ -105,12 +142,12 @@ struct ip6_rthdr {
 /* Type 0 Routing header */
 #ifdef __CC__
 struct ip6_rthdr0 {
-	uint8_t  ip6r0_nxt;      /* next header */
-	uint8_t  ip6r0_len;      /* length in units of 8 octets */
-	uint8_t  ip6r0_type;     /* always zero */
-	uint8_t  ip6r0_segleft;  /* segments left */
-	uint8_t  ip6r0_reserved; /* reserved field */
-	uint8_t  ip6r0_slmap[3]; /* strict/loose bit map */
+	__uint8_t  ip6r0_nxt;      /* next header */
+	__uint8_t  ip6r0_len;      /* length in units of 8 octets */
+	__uint8_t  ip6r0_type;     /* always zero */
+	__uint8_t  ip6r0_segleft;  /* segments left */
+	__uint8_t  ip6r0_reserved; /* reserved field */
+	__uint8_t  ip6r0_slmap[3]; /* strict/loose bit map */
 	/* followed by up to 127 struct in6_addr */
 	__COMPILER_FLEXIBLE_ARRAY(struct in6_addr, ip6r0_addr);
 };
@@ -119,28 +156,28 @@ struct ip6_rthdr0 {
 /* Fragment header */
 #ifdef __CC__
 struct ip6_frag {
-	uint8_t   ip6f_nxt;      /* next header */
-	uint8_t   ip6f_reserved; /* reserved field */
-	uint16_t  ip6f_offlg;    /* offset, reserved, and flag */
-	uint32_t  ip6f_ident;    /* identification */
+	__uint8_t   ip6f_nxt;      /* next header */
+	__uint8_t   ip6f_reserved; /* reserved field */
+	__u_net16_t ip6f_offlg;    /* offset, reserved, and flag */
+	__u_net32_t ip6f_ident;    /* identification */
 };
 #endif /* __CC__ */
 
 #if __BYTE_ORDER == __BIG_ENDIAN
-#   define IP6F_OFF_MASK       0xfff8  /* mask out offset from _offlg */
-#   define IP6F_RESERVED_MASK  0x0006  /* reserved bits in ip6f_offlg */
-#   define IP6F_MORE_FRAG      0x0001  /* more-fragments flag */
+#define IP6F_OFF_MASK       __CCAST(__u_net16_t)0xfff8  /* mask out offset from _offlg */
+#define IP6F_RESERVED_MASK  __CCAST(__u_net16_t)0x0006  /* reserved bits in ip6f_offlg */
+#define IP6F_MORE_FRAG      __CCAST(__u_net16_t)0x0001  /* more-fragments flag */
 #elif __BYTE_ORDER == __LITTLE_ENDIAN
-#   define IP6F_OFF_MASK       0xf8ff  /* mask out offset from _offlg */
-#   define IP6F_RESERVED_MASK  0x0600  /* reserved bits in ip6f_offlg */
-#   define IP6F_MORE_FRAG      0x0100  /* more-fragments flag */
+#define IP6F_OFF_MASK       __CCAST(__u_net16_t)0xf8ff  /* mask out offset from _offlg */
+#define IP6F_RESERVED_MASK  __CCAST(__u_net16_t)0x0600  /* reserved bits in ip6f_offlg */
+#define IP6F_MORE_FRAG      __CCAST(__u_net16_t)0x0100  /* more-fragments flag */
 #endif
 
 /* IPv6 options */
 #ifdef __CC__
 struct ip6_opt {
-	uint8_t  ip6o_type;
-	uint8_t  ip6o_len;
+	__uint8_t ip6o_type;
+	__uint8_t ip6o_len;
 };
 #endif /* __CC__ */
 
@@ -164,9 +201,9 @@ struct ip6_opt {
 /* Jumbo Payload Option */
 #ifdef __CC__
 struct ip6_opt_jumbo {
-	uint8_t  ip6oj_type;
-	uint8_t  ip6oj_len;
-	uint8_t  ip6oj_jumbo_len[4];
+	__uint8_t ip6oj_type;
+	__uint8_t ip6oj_len;
+	__uint8_t ip6oj_jumbo_len[4];
 };
 #endif /* __CC__ */
 #define IP6OPT_JUMBO_LEN    6
@@ -174,10 +211,10 @@ struct ip6_opt_jumbo {
 /* NSAP Address Option */
 #ifdef __CC__
 struct ip6_opt_nsap {
-	uint8_t  ip6on_type;
-	uint8_t  ip6on_len;
-	uint8_t  ip6on_src_nsap_len;
-	uint8_t  ip6on_dst_nsap_len;
+	__uint8_t ip6on_type;
+	__uint8_t ip6on_len;
+	__uint8_t ip6on_src_nsap_len;
+	__uint8_t ip6on_dst_nsap_len;
 	/* followed by source NSAP */
 	/* followed by destination NSAP */
 };
@@ -186,30 +223,30 @@ struct ip6_opt_nsap {
 /* Tunnel Limit Option */
 #ifdef __CC__
 struct ip6_opt_tunnel {
-	uint8_t  ip6ot_type;
-	uint8_t  ip6ot_len;
-	uint8_t  ip6ot_encap_limit;
+	__uint8_t ip6ot_type;
+	__uint8_t ip6ot_len;
+	__uint8_t ip6ot_encap_limit;
 };
 #endif /* __CC__ */
 
 /* Router Alert Option */
 #ifdef __CC__
 struct ip6_opt_router {
-	uint8_t  ip6or_type;
-	uint8_t  ip6or_len;
-	uint8_t  ip6or_value[2];
+	__uint8_t ip6or_type;
+	__uint8_t ip6or_len;
+	__uint8_t ip6or_value[2];
 };
 #endif /* __CC__ */
 
 /* Router alert values (in network byte order) */
 #if __BYTE_ORDER == __BIG_ENDIAN
-#   define IP6_ALERT_MLD  0x0000
-#   define IP6_ALERT_RSVP 0x0001
-#   define IP6_ALERT_AN   0x0002
+#define IP6_ALERT_MLD  __CCAST(__u_net16_t)0x0000
+#define IP6_ALERT_RSVP __CCAST(__u_net16_t)0x0001
+#define IP6_ALERT_AN   __CCAST(__u_net16_t)0x0002
 #elif __BYTE_ORDER == __LITTLE_ENDIAN
-#   define IP6_ALERT_MLD  0x0000
-#   define IP6_ALERT_RSVP 0x0100
-#   define IP6_ALERT_AN   0x0200
+#define IP6_ALERT_MLD  __CCAST(__u_net16_t)0x0000
+#define IP6_ALERT_RSVP __CCAST(__u_net16_t)0x0100
+#define IP6_ALERT_AN   __CCAST(__u_net16_t)0x0200
 #endif
 
 __SYSDECL_END

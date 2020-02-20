@@ -43,8 +43,12 @@
  *        as published by the Free Software Foundation; either version
  *        2 of the License, or (at your option) any later version.
  */
+
 #include <__stdinc.h>
-#include <kos/bits/types.h>
+#include <features.h>
+
+#include <bits/types.h>
+#include <net/types.h>
 
 __SYSDECL_BEGIN
 
@@ -86,38 +90,266 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 /* Define 802.2 Type 1 header */
 struct __ATTR_PACKED fddi_8022_1_hdr {
-	__u8 dsap; /* destination service access point */
-	__u8 ssap; /* source service access point */
-	__u8 ctrl; /* control byte #1 */
+#ifdef __USE_KOS_PURE
+	__uint8_t llc1_dsap; /* destination service access point */
+	__uint8_t llc1_ssap; /* source service access point */
+	__uint8_t llc1_ctrl; /* control byte #1 */
+#elif defined(__USE_KOS)
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+	union {
+		struct {
+			__uint8_t llc1_dsap; /* destination service access point */
+			__uint8_t llc1_ssap; /* source service access point */
+			__uint8_t llc1_ctrl; /* control byte #1 */
+		};
+		struct {
+			__uint8_t dsap; /* destination service access point */
+			__uint8_t ssap; /* source service access point */
+			__uint8_t ctrl; /* control byte #1 */
+		};
+	};
+#elif defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+	union {
+		__uint8_t llc1_dsap; /* destination service access point */
+		__uint8_t dsap;      /* destination service access point */
+	};
+	union {
+		__uint8_t llc1_ssap; /* source service access point */
+		__uint8_t ssap;      /* source service access point */
+	};
+	union {
+		__uint8_t llc1_ctrl; /* control byte #1 */
+		__uint8_t ctrl;      /* control byte #1 */
+	};
+#else /* ... */
+	__uint8_t     dsap; /* destination service access point */
+	__uint8_t     ssap; /* source service access point */
+	__uint8_t     ctrl; /* control byte #1 */
+#define llc1_dsap dsap  /* destination service access point */
+#define llc1_ssap ssap  /* source service access point */
+#define llc1_ctrl ctrl  /* control byte #1 */
+#endif /* !... */
+#else /* ... */
+	__uint8_t dsap; /* destination service access point */
+	__uint8_t ssap; /* source service access point */
+	__uint8_t ctrl; /* control byte #1 */
+#endif /* !... */
 };
 
 /* Define 802.2 Type 2 header */
 struct __ATTR_PACKED fddi_8022_2_hdr {
-	__u8 dsap;   /* destination service access point */
-	__u8 ssap;   /* source service access point */
-	__u8 ctrl_1; /* control byte #1 */
-	__u8 ctrl_2; /* control byte #2 */
+#ifdef __USE_KOS_PURE
+	__uint8_t llc2_dsap;   /* destination service access point */
+	__uint8_t llc2_ssap;   /* source service access point */
+	__uint8_t llc2_ctrl_1; /* control byte #1 */
+	__uint8_t llc2_ctrl_2; /* control byte #2 */
+#elif defined(__USE_KOS)
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+	union {
+		struct {
+			__uint8_t llc2_dsap;   /* destination service access point */
+			__uint8_t llc2_ssap;   /* source service access point */
+			__uint8_t llc2_ctrl_1; /* control byte #1 */
+			__uint8_t llc2_ctrl_2; /* control byte #2 */
+		};
+		struct {
+			__uint8_t dsap;   /* destination service access point */
+			__uint8_t ssap;   /* source service access point */
+			__uint8_t ctrl_1; /* control byte #1 */
+			__uint8_t ctrl_2; /* control byte #2 */
+		};
+	};
+#elif defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+	union {
+		__uint8_t llc2_dsap; /* destination service access point */
+		__uint8_t dsap;      /* destination service access point */
+	};
+	union {
+		__uint8_t llc2_ssap; /* source service access point */
+		__uint8_t ssap;      /* source service access point */
+	};
+	union {
+		__uint8_t llc2_ctrl_1; /* control byte #1 */
+		__uint8_t ctrl_1;      /* control byte #1 */
+	};
+	union {
+		__uint8_t llc2_ctrl_2; /* control byte #2 */
+		__uint8_t ctrl_2;      /* control byte #2 */
+	};
+#else /* ... */
+	__uint8_t       dsap;   /* destination service access point */
+	__uint8_t       ssap;   /* source service access point */
+	__uint8_t       ctrl_1; /* control byte #1 */
+	__uint8_t       ctrl_2; /* control byte #2 */
+#define llc2_dsap   dsap    /* destination service access point */
+#define llc2_ssap   ssap    /* source service access point */
+#define llc2_ctrl_1 ctrl_1  /* control byte #1 */
+#define llc2_ctrl_2 ctrl_2  /* control byte #2 */
+#endif /* !... */
+#else /* ... */
+	__uint8_t dsap;   /* destination service access point */
+	__uint8_t ssap;   /* source service access point */
+	__uint8_t ctrl_1; /* control byte #1 */
+	__uint8_t ctrl_2; /* control byte #2 */
+#endif /* !... */
 };
 
 /* Define 802.2 SNAP header */
 struct __ATTR_PACKED fddi_snap_hdr {
-	__u8   dsap;                /* always 0xAA. */
-	__u8   ssap;                /* always 0xAA. */
-	__u8   ctrl;                /* always 0x03. */
-	__u8   oui[FDDI_K_OUI_LEN]; /* organizational universal id. */
-	__be16 ethertype;           /* packet type ID field. */
+#ifdef __USE_KOS_PURE
+	__uint8_t   snap_dsap;                /* always 0xAA. */
+	__uint8_t   snap_ssap;                /* always 0xAA. */
+	__uint8_t   snap_ctrl;                /* always 0x03. */
+	__uint8_t   snap_oui[FDDI_K_OUI_LEN]; /* organizational universal id. */
+	__u_net16_t snap_ethertype;           /* packet type ID field. (One of `ETH_P_*' from <linux/if_ether.h>) */
+#elif defined(__USE_KOS)
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+	union {
+		struct {
+			__uint8_t   snap_dsap;                /* always 0xAA. */
+			__uint8_t   snap_ssap;                /* always 0xAA. */
+			__uint8_t   snap_ctrl;                /* always 0x03. */
+			__uint8_t   snap_oui[FDDI_K_OUI_LEN]; /* organizational universal id. */
+			__u_net16_t snap_ethertype;           /* packet type ID field. (One of `ETH_P_*' from <linux/if_ether.h>) */
+		};
+		struct {
+			__uint8_t   dsap;                /* always 0xAA. */
+			__uint8_t   ssap;                /* always 0xAA. */
+			__uint8_t   ctrl;                /* always 0x03. */
+			__uint8_t   oui[FDDI_K_OUI_LEN]; /* organizational universal id. */
+			__u_net16_t ethertype;           /* packet type ID field. (One of `ETH_P_*' from <linux/if_ether.h>) */
+		};
+	};
+#elif defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+	union {
+		__uint8_t snap_dsap; /* always 0xAA. */
+		__uint8_t dsap;      /* always 0xAA. */
+	};
+	union {
+		__uint8_t snap_ssap; /* always 0xAA. */
+		__uint8_t ssap;      /* always 0xAA. */
+	};
+	union {
+		__uint8_t snap_ctrl; /* always 0x03. */
+		__uint8_t ctrl;      /* always 0x03. */
+	};
+	union {
+		__uint8_t snap_oui[FDDI_K_OUI_LEN]; /* organizational universal id. */
+		__uint8_t oui[FDDI_K_OUI_LEN];      /* organizational universal id. */
+	};
+	union {
+		__u_net16_t snap_ethertype; /* packet type ID field. (One of `ETH_P_*' from <linux/if_ether.h>) */
+		__u_net16_t ethertype;      /* packet type ID field. (One of `ETH_P_*' from <linux/if_ether.h>) */
+	};
+#else /* ... */
+	__uint8_t           dsap;                /* always 0xAA. */
+	__uint8_t           ssap;                /* always 0xAA. */
+	__uint8_t           ctrl;                /* always 0x03. */
+	__uint8_t           oui[FDDI_K_OUI_LEN]; /* organizational universal id. */
+	__u_net16_t         ethertype;           /* packet type ID field. (One of `ETH_P_*' from <linux/if_ether.h>) */
+#define snap_dsap       dsap                 /* always 0xAA. */
+#define snap_ssap       ssap                 /* always 0xAA. */
+#define snap_ctrl       ctrl                 /* always 0x03. */
+#define snap_oui        oui                  /* organizational universal id. */
+#define snap_ethertype  ethertype            /* packet type ID field. (One of `ETH_P_*' from <linux/if_ether.h>) */
+#endif /* !... */
+#else /* ... */
+	__uint8_t   dsap;                /* always 0xAA. */
+	__uint8_t   ssap;                /* always 0xAA. */
+	__uint8_t   ctrl;                /* always 0x03. */
+	__uint8_t   oui[FDDI_K_OUI_LEN]; /* organizational universal id. */
+	__u_net16_t ethertype;           /* packet type ID field. (One of `ETH_P_*' from <linux/if_ether.h>) */
+#endif /* !... */
 };
 
 /* Define FDDI LLC frame header */
 struct __ATTR_PACKED fddihdr {
-	__u8 fc;                 /* frame control. */
-	__u8 daddr[FDDI_K_ALEN]; /* destination address. */
-	__u8 saddr[FDDI_K_ALEN]; /* source address. */
+#ifdef __USE_KOS_PURE
+	__uint8_t fddi_fc;                 /* Frame Control (FC) value. */
+	__uint8_t fddi_daddr[FDDI_K_ALEN]; /* Destination address. */
+	__uint8_t fddi_saddr[FDDI_K_ALEN]; /* Source address. */
+	union {
+		struct fddi_8022_1_hdr llc_8022_1;
+		struct fddi_8022_2_hdr llc_8022_2;
+		struct fddi_snap_hdr   llc_snap;
+	} fddi_hdr;
+#elif defined(__USE_KOS)
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+	union {
+		struct {
+			__uint8_t fddi_fc;                 /* Frame Control (FC) value. */
+			__uint8_t fddi_daddr[FDDI_K_ALEN]; /* Destination address. */
+			__uint8_t fddi_saddr[FDDI_K_ALEN]; /* Source address. */
+			union {
+				struct fddi_8022_1_hdr llc_8022_1;
+				struct fddi_8022_2_hdr llc_8022_2;
+				struct fddi_snap_hdr   llc_snap;
+			} fddi_hdr;
+		};
+		struct {
+			__uint8_t fc;                 /* Frame Control (FC) value. */
+			__uint8_t daddr[FDDI_K_ALEN]; /* Destination address. */
+			__uint8_t saddr[FDDI_K_ALEN]; /* Source address. */
+			union {
+				struct fddi_8022_1_hdr llc_8022_1;
+				struct fddi_8022_2_hdr llc_8022_2;
+				struct fddi_snap_hdr   llc_snap;
+			} hdr;
+		};
+	};
+#elif defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+	union {
+		__uint8_t fc;      /* Frame Control (FC) value. */
+		__uint8_t fddi_fc; /* Frame Control (FC) value. */
+	};
+	union {
+		__uint8_t fddi_daddr[FDDI_K_ALEN]; /* Destination address. */
+		__uint8_t daddr[FDDI_K_ALEN];      /* Destination address. */
+	};
+	union {
+		__uint8_t fddi_saddr[FDDI_K_ALEN]; /* Source address. */
+		__uint8_t saddr[FDDI_K_ALEN];      /* Source address. */
+	};
+	union {
+		union {
+			struct fddi_8022_1_hdr llc_8022_1;
+			struct fddi_8022_2_hdr llc_8022_2;
+			struct fddi_snap_hdr   llc_snap;
+		} fddi_hdr;
+		union {
+			struct fddi_8022_1_hdr llc_8022_1;
+			struct fddi_8022_2_hdr llc_8022_2;
+			struct fddi_snap_hdr   llc_snap;
+		} hdr;
+	};
+#else /* ... */
+	__uint8_t fc;                 /* Frame Control (FC) value. */
+	__uint8_t daddr[FDDI_K_ALEN]; /* Destination address. */
+	__uint8_t saddr[FDDI_K_ALEN]; /* Source address. */
 	union {
 		struct fddi_8022_1_hdr llc_8022_1;
 		struct fddi_8022_2_hdr llc_8022_2;
 		struct fddi_snap_hdr   llc_snap;
 	} hdr;
+#define fddi_fc    fc    /* Frame Control (FC) value. */
+#define fddi_daddr daddr /* Destination address. */
+#define fddi_saddr saddr /* Source address. */
+#define fddi_hdr   hdr
+#endif /* !... */
+#else /* ... */
+	__uint8_t fc;                 /* Frame Control (FC) value. */
+	__uint8_t daddr[FDDI_K_ALEN]; /* Destination address. */
+	__uint8_t saddr[FDDI_K_ALEN]; /* Source address. */
+	union {
+		struct fddi_8022_1_hdr llc_8022_1;
+		struct fddi_8022_2_hdr llc_8022_2;
+		struct fddi_snap_hdr   llc_snap;
+	} hdr;
+#endif /* !... */
 };
 #endif /* __CC__ */
 

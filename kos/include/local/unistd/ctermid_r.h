@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc39380f3 */
+/* HASH CRC-32:0xa1eb5318 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 __LOCAL_LIBC(ctermid_r) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctermid_r))(char *__s) {
-#line 1718 "kos/src/libc/magic/unistd.c"
+#line 1717 "kos/src/libc/magic/unistd.c"
 	return __s ? __localdep_ctermid(__s) : __NULLPTR;
 }
 __NAMESPACE_LOCAL_END

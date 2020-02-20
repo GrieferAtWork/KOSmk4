@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd52680c6 */
+/* HASH CRC-32:0xc3b91f51 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,8 +24,8 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ntohs) __ATTR_CONST __UINT16_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntohs))(__UINT16_TYPE__ __netshort) {
-#line 297 "kos/src/libc/magic/netinet.in.c"
-	return (__UINT16_TYPE__)__hybrid_beswap16(__netshort);
+#line 317 "kos/src/libc/magic/netinet.in.c"
+	return (__UINT16_TYPE__)__hybrid_betoh16(__netshort);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_ntohs_defined */

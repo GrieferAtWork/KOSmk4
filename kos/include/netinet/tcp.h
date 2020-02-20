@@ -51,6 +51,7 @@
  *    @(#)tcp.h    8.1 (Berkeley) 6/10/93
  */
 
+#include <__stdinc.h>
 #include <features.h>
 
 __SYSDECL_BEGIN
@@ -88,73 +89,220 @@ __SYSDECL_BEGIN
 __SYSDECL_END
 
 #ifdef __USE_MISC
+#include <bits/sockaddr_storage-struct.h>
+#include <bits/types.h>
+#include <net/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
 #include <sys/socket.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
-typedef u_int32_t tcp_seq;
+typedef __u_net32_t tcp_seq;
 #endif /* __CC__ */
 
-/* TCP header. (Per RFC 793, September, 1981). */
-#ifdef __CC__
-struct tcphdr {
-	union {
-		struct {
-			u_int16_t th_sport;   /* source port. */
-			u_int16_t th_dport;   /* destination port. */
-			tcp_seq   th_seq;     /* sequence number. */
-			tcp_seq   th_ack;     /* acknowledgement number. */
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-			u_int8_t  th_x2 : 4;  /* (unused) */
-			u_int8_t  th_off : 4; /* data offset */
-#elif __BYTE_ORDER == __BIG_ENDIAN
-			u_int8_t  th_off : 4; /* data offset */
-			u_int8_t  th_x2 : 4;  /* (unused) */
-#endif
-			u_int8_t  th_flags;
+/* Bits for `th_flags' */
 #define TH_FIN  0x01
 #define TH_SYN  0x02
 #define TH_RST  0x04
 #define TH_PUSH 0x08
 #define TH_ACK  0x10
 #define TH_URG  0x20
-			u_int16_t th_win;     /* window */
-			u_int16_t th_sum;     /* checksum */
-			u_int16_t th_urp;     /* urgent pointer */
+
+/* TCP header. (Per RFC 793, September, 1981). */
+#ifdef __CC__
+struct tcphdr {
+#ifdef __USE_KOS_PURE
+	__u_net16_t  th_sport;   /* source port. */
+	__u_net16_t  th_dport;   /* destination port. */
+	tcp_seq      th_seq;     /* sequence number. */
+	tcp_seq      th_ack;     /* acknowledgement number. */
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+	unsigned int th_x2 : 4;  /* (unused) */
+	unsigned int th_off : 4; /* data offset */
+#elif __BYTE_ORDER == __BIG_ENDIAN
+	unsigned int th_off : 4; /* data offset */
+	unsigned int th_x2 : 4;  /* (unused) */
+#endif
+	__uint8_t    th_flags;   /* Set of `TH_*' */
+	__u_net16_t  th_win;     /* window */
+	__u_net16_t  th_sum;     /* checksum */
+	__u_net16_t  th_urp;     /* urgent pointer */
+#elif (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+       defined(__COMPILER_HAVE_TRANSPARENT_UNION))
+	union {
+		struct {
+			__u_net16_t  th_sport;   /* source port. */
+			__u_net16_t  th_dport;   /* destination port. */
+			tcp_seq      th_seq;     /* sequence number. */
+			tcp_seq      th_ack;     /* acknowledgement number. */
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+			unsigned int th_x2 : 4;  /* (unused) */
+			unsigned int th_off : 4; /* data offset */
+#elif __BYTE_ORDER == __BIG_ENDIAN
+			unsigned int th_off : 4; /* data offset */
+			unsigned int th_x2 : 4;  /* (unused) */
+#endif
+			__uint8_t    th_flags;   /* Set of `TH_*' */
+			__u_net16_t  th_win;     /* window */
+			__u_net16_t  th_sum;     /* checksum */
+			__u_net16_t  th_urp;     /* urgent pointer */
 		};
 		struct {
-			u_int16_t source;
-			u_int16_t dest;
-			u_int32_t seq;
-			u_int32_t ack_seq;
+			__u_net16_t source;  /* source port. */
+			__u_net16_t dest;    /* destination port. */
+			tcp_seq     seq;     /* sequence number. */
+			tcp_seq     ack_seq; /* acknowledgement number. */
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-			u_int16_t res1 : 4;
-			u_int16_t doff : 4;
-			u_int16_t fin : 1;
-			u_int16_t syn : 1;
-			u_int16_t rst : 1;
-			u_int16_t psh : 1;
-			u_int16_t ack : 1;
-			u_int16_t urg : 1;
-			u_int16_t res2 : 2;
+			unsigned int res1 : 4; /* (unused) */
+			unsigned int doff : 4; /* data offset */
+			unsigned int fin : 1;
+			unsigned int syn : 1;
+			unsigned int rst : 1;
+			unsigned int psh : 1;
+			unsigned int ack : 1;
+			unsigned int urg : 1;
+			unsigned int res2 : 2; /* (unused) */
 #elif __BYTE_ORDER == __BIG_ENDIAN
-			u_int16_t doff : 4;
-			u_int16_t res1 : 4;
-			u_int16_t res2 : 2;
-			u_int16_t urg : 1;
-			u_int16_t ack : 1;
-			u_int16_t psh : 1;
-			u_int16_t rst : 1;
-			u_int16_t syn : 1;
-			u_int16_t fin : 1;
+			unsigned int doff : 4; /* data offset */
+			unsigned int res1 : 4; /* (unused) */
+			unsigned int res2 : 2; /* (unused) */
+			unsigned int urg : 1;
+			unsigned int ack : 1;
+			unsigned int psh : 1;
+			unsigned int rst : 1;
+			unsigned int syn : 1;
+			unsigned int fin : 1;
 #endif
-			u_int16_t window;
-			u_int16_t check;
-			u_int16_t urg_ptr;
+			__u_net16_t window;  /* window */
+			__u_net16_t check;   /* checksum */
+			__u_net16_t urg_ptr; /* urgent pointer */
 		};
 	};
+#else /* ... */
+#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
+	union {
+		__u_net16_t  th_sport;   /* source port. */
+		__u_net16_t  source;     /* source port. */
+	};
+	union {
+		__u_net16_t  th_dport;   /* destination port. */
+		__u_net16_t  dest;       /* destination port. */
+	};
+	union {
+		tcp_seq      th_seq;     /* sequence number. */
+		tcp_seq      seq;        /* sequence number. */
+	};
+	union {
+		tcp_seq      th_ack;     /* acknowledgement number. */
+		tcp_seq      ack_seq;    /* acknowledgement number. */
+	};
+#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
+	__u_net16_t      source;     /* source port. */
+	__u_net16_t      dest;       /* destination port. */
+	tcp_seq          seq;        /* sequence number. */
+	tcp_seq          ack_seq;    /* acknowledgement number. */
+#define th_sport     source      /* source port. */
+#define th_dport     dest        /* destination port. */
+#define th_seq       seq         /* sequence number. */
+#define th_ack       ack_seq     /* acknowledgement number. */
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+	unsigned int res1 : 4; /* (unused) */
+	unsigned int doff : 4; /* data offset */
+#elif __BYTE_ORDER == __BIG_ENDIAN
+	unsigned int doff : 4; /* data offset */
+	unsigned int res1 : 4; /* (unused) */
+#endif
+#define th_x2  res1 /* (unused) */
+#define th_off doff /* data offset */
+	union {
+		__uint8_t    th_flags;   /* Set of `TH_*' */
+		struct {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+			unsigned int fin : 1;
+			unsigned int syn : 1;
+			unsigned int rst : 1;
+			unsigned int psh : 1;
+			unsigned int ack : 1;
+			unsigned int urg : 1;
+			unsigned int res2 : 2;
+#elif __BYTE_ORDER == __BIG_ENDIAN
+			unsigned int res2 : 2;
+			unsigned int urg : 1;
+			unsigned int ack : 1;
+			unsigned int psh : 1;
+			unsigned int rst : 1;
+			unsigned int syn : 1;
+			unsigned int fin : 1;
+#endif
+		}
+#ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
+		_th_flag_bits
+#define fin  _th_flag_bits.fin
+#define syn  _th_flag_bits.syn
+#define rst  _th_flag_bits.rst
+#define psh  _th_flag_bits.psh
+#define ack  _th_flag_bits.ack
+#define urg  _th_flag_bits.urg
+#define res2 _th_flag_bits.res2
+#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
+		;
+	}
+#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
+	_th_flags_and_bits
+#define th_flags _th_flags_and_bits.th_flags
+#ifdef __COMPILER_HAVE_TRANSPARENT_STRUCT
+#undef fin
+#undef syn
+#undef rst
+#undef psh
+#undef ack
+#undef urg
+#undef res2
+#define fin  _th_flags_and_bits._th_flag_bits.fin
+#define syn  _th_flags_and_bits._th_flag_bits.syn
+#define rst  _th_flags_and_bits._th_flag_bits.rst
+#define psh  _th_flags_and_bits._th_flag_bits.psh
+#define ack  _th_flags_and_bits._th_flag_bits.ack
+#define urg  _th_flags_and_bits._th_flag_bits.urg
+#define res2 _th_flags_and_bits._th_flag_bits.res2
+#else /* __COMPILER_HAVE_TRANSPARENT_STRUCT */
+#define fin  _th_flags_and_bits.fin
+#define syn  _th_flags_and_bits.syn
+#define rst  _th_flags_and_bits.rst
+#define psh  _th_flags_and_bits.psh
+#define ack  _th_flags_and_bits.ack
+#define urg  _th_flags_and_bits.urg
+#define res2 _th_flags_and_bits.res2
+#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+	;
+#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
+	union {
+		__u_net16_t th_win;  /* window */
+		__u_net16_t window;  /* window */
+	};
+	union {
+		__u_net16_t th_sum;  /* checksum */
+		__u_net16_t check;   /* checksum */
+	};
+	union {
+		__u_net16_t th_urp;  /* urgent pointer */
+		__u_net16_t urg_ptr; /* urgent pointer */
+	};
+#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
+	__u_net16_t window;  /* window */
+	__u_net16_t check;   /* checksum */
+	__u_net16_t urg_ptr; /* urgent pointer */
+#define th_win  window   /* window */
+#define th_sum  check    /* checksum */
+#define th_urp  urg_ptr  /* urgent pointer */
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+#endif /* !... */
 };
 #endif /* __CC__ */
 
@@ -222,7 +370,7 @@ enum {
 /* Default maximum segment size for TCP.
  * With an IP MSS of 576, this is 536,
  * but 512 is probably more convenient.
- * This should be defined as MIN(512,IP_MSS-sizeof(struct tcpiphdr)). */
+ * This should be defined as MIN(512, IP_MSS - sizeof(struct tcpiphdr)). */
 #define TCP_MSS                 512
 #define TCP_MAXWIN              65535 /* largest value for (unscaled) window */
 #define TCP_MAX_WINSHIFT        14    /* maximum window shift */
@@ -264,40 +412,40 @@ enum tcp_ca_state {
 
 #ifdef __CC__
 struct tcp_info {
-	u_int8_t  tcpi_state;
-	u_int8_t  tcpi_ca_state;
-	u_int8_t  tcpi_retransmits;
-	u_int8_t  tcpi_probes;
-	u_int8_t  tcpi_backoff;
-	u_int8_t  tcpi_options;
-	u_int8_t  tcpi_snd_wscale : 4;
-	u_int8_t  tcpi_rcv_wscale : 4;
-	u_int32_t tcpi_rto;
-	u_int32_t tcpi_ato;
-	u_int32_t tcpi_snd_mss;
-	u_int32_t tcpi_rcv_mss;
-	u_int32_t tcpi_unacked;
-	u_int32_t tcpi_sacked;
-	u_int32_t tcpi_lost;
-	u_int32_t tcpi_retrans;
-	u_int32_t tcpi_fackets;
+	__uint8_t  tcpi_state;
+	__uint8_t  tcpi_ca_state;
+	__uint8_t  tcpi_retransmits;
+	__uint8_t  tcpi_probes;
+	__uint8_t  tcpi_backoff;
+	__uint8_t  tcpi_options;
+	__uint8_t  tcpi_snd_wscale : 4;
+	__uint8_t  tcpi_rcv_wscale : 4;
+	__uint32_t tcpi_rto;
+	__uint32_t tcpi_ato;
+	__uint32_t tcpi_snd_mss;
+	__uint32_t tcpi_rcv_mss;
+	__uint32_t tcpi_unacked;
+	__uint32_t tcpi_sacked;
+	__uint32_t tcpi_lost;
+	__uint32_t tcpi_retrans;
+	__uint32_t tcpi_fackets;
 	/* Times. */
-	u_int32_t tcpi_last_data_sent;
-	u_int32_t tcpi_last_ack_sent; /* Not remembered, sorry. */
-	u_int32_t tcpi_last_data_recv;
-	u_int32_t tcpi_last_ack_recv;
+	__uint32_t tcpi_last_data_sent;
+	__uint32_t tcpi_last_ack_sent; /* Not remembered, sorry. */
+	__uint32_t tcpi_last_data_recv;
+	__uint32_t tcpi_last_ack_recv;
 	/* Metrics. */
-	u_int32_t tcpi_pmtu;
-	u_int32_t tcpi_rcv_ssthresh;
-	u_int32_t tcpi_rtt;
-	u_int32_t tcpi_rttvar;
-	u_int32_t tcpi_snd_ssthresh;
-	u_int32_t tcpi_snd_cwnd;
-	u_int32_t tcpi_advmss;
-	u_int32_t tcpi_reordering;
-	u_int32_t tcpi_rcv_rtt;
-	u_int32_t tcpi_rcv_space;
-	u_int32_t tcpi_total_retrans;
+	__uint32_t tcpi_pmtu;
+	__uint32_t tcpi_rcv_ssthresh;
+	__uint32_t tcpi_rtt;
+	__uint32_t tcpi_rttvar;
+	__uint32_t tcpi_snd_ssthresh;
+	__uint32_t tcpi_snd_cwnd;
+	__uint32_t tcpi_advmss;
+	__uint32_t tcpi_reordering;
+	__uint32_t tcpi_rcv_rtt;
+	__uint32_t tcpi_rcv_space;
+	__uint32_t tcpi_total_retrans;
 };
 #endif /* __CC__ */
 
@@ -307,18 +455,18 @@ struct tcp_info {
 #ifdef __CC__
 struct tcp_md5sig {
 	struct sockaddr_storage tcpm_addr;   /* Address associated. */
-	u_int16_t             __tcpm_pad1;   /* Zero. */
-	u_int16_t               tcpm_keylen; /* Key length. */
-	u_int32_t             __tcpm_pad2;   /* Zero. */
-	u_int8_t                tcpm_key[TCP_MD5SIG_MAXKEYLEN]; /* Key (binary). */
+	__uint16_t            __tcpm_pad1;   /* Zero. */
+	__uint16_t              tcpm_keylen; /* Key length. */
+	__uint32_t            __tcpm_pad2;   /* Zero. */
+	__uint8_t               tcpm_key[TCP_MD5SIG_MAXKEYLEN]; /* Key (binary). */
 };
 #endif /* __CC__ */
 
 /* For socket repair options. */
 #ifdef __CC__
 struct tcp_repair_opt {
-	u_int32_t opt_code;
-	u_int32_t opt_val;
+	__uint32_t opt_code;
+	__uint32_t opt_val;
 };
 #endif /* __CC__ */
 
@@ -364,12 +512,12 @@ enum {
 
 #ifdef __CC__
 struct tcp_cookie_transactions {
-	u_int16_t   tcpct_flags;
-	u_int8_t  __tcpct_pad1;
-	u_int8_t    tcpct_cookie_desired;
-	u_int16_t   tcpct_s_data_desired;
-	u_int16_t   tcpct_used;
-	u_int8_t    tcpct_value[TCP_MSS_DEFAULT];
+	__uint16_t   tcpct_flags;
+	__uint8_t  __tcpct_pad1;
+	__uint8_t    tcpct_cookie_desired;
+	__uint16_t   tcpct_s_data_desired;
+	__uint16_t   tcpct_used;
+	__uint8_t    tcpct_value[TCP_MSS_DEFAULT];
 };
 #endif /* __CC__ */
 
