@@ -59,10 +59,10 @@
 #define IPPROTO_PUP      12  /* PUP protocol. */
 #define IPPROTO_ARGUS    13  /* ARGUS */
 #define IPPROTO_EMCON    14  /* EMCON */
-#define IPPROTO_XNET     15  /* Cross Net Debugger IEN 158[2] */
+#define IPPROTO_XNET     15  /* Cross Net Debugger IEN 158 */
 #define IPPROTO_CHAOS    16  /* Chaos */
 #define IPPROTO_UDP      17  /* User Datagram Protocol. */
-#define IPPROTO_MUX      18  /* Multiplexing IEN 90[3] */
+#define IPPROTO_MUX      18  /* Multiplexing IEN 90 */
 #define IPPROTO_DCN_MEAS 19  /* DCN Measurement Subsystems */
 #define IPPROTO_HMP      20  /* Host Monitoring Protocol RFC 869 */
 #define IPPROTO_PRM      21  /* Packet Radio Measurement */
@@ -146,7 +146,7 @@
 #define IPPROTO_PNNI     102 /* PNNI over IP */
 #define IPPROTO_PIM      103 /* Protocol Independent Multicast. */
 #define IPPROTO_ARIS     104 /* IBM's ARIS (Aggregate Route IP Switching) Protocol */
-#define IPPROTO_SCPS     105 /* SCPS (Space Communications Protocol Standards) SCPS-TP[4] */
+#define IPPROTO_SCPS     105 /* SCPS (Space Communications Protocol Standards) SCPS-TP */
 #define IPPROTO_QNX      106 /* QNX */
 #define IPPROTO_AN       107 /* A/N Active Networks */
 #define IPPROTO_COMP     108 /* Compression Header Protocol. */

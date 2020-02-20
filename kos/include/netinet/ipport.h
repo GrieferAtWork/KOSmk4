@@ -57,8 +57,10 @@
 #define IPPORT_TFTP         69   /* Trivial File Transfer Protocol. */
 #define IPPORT_RJE          77
 #define IPPORT_FINGER       79   /* Finger service. */
+#define IPPORT_HTTP         80   /* Hypertext Transfer Protocol */
 #define IPPORT_TTYLINK      87
 #define IPPORT_SUPDUP       95   /* SUPDUP protocol. */
+#define IPPORT_HTTPS        443  /* Hypertext Transfer Protocol Secure */
 #define IPPORT_EXECSERVER   512  /* execd service. */
 #define IPPORT_LOGINSERVER  513  /* rlogind service. */
 #define IPPORT_CMDSERVER    514
