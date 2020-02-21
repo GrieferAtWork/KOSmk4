@@ -1229,6 +1229,9 @@
 #undef unsigned
 #undef __longlong_t
 #undef __ulonglong_t
+#ifndef __NO_ATTR_W64
+#undef __w64
+#endif /* !__NO_ATTR_W64 */
 
 #define unsigned +1
 #define signed   +1
@@ -1254,6 +1257,9 @@
 #define __HYBRID_TYPECORE_DEFINES_INT64 1
 #define __int64  +64
 #endif /* !__int64 */
+#ifndef __NO_ATTR_W64
+#define __w64 +0
+#endif /* !__NO_ATTR_W64 */
 
 
 #if ((0 __SIZE_TYPE__) == 1 /* unsigned */ || \
@@ -1301,6 +1307,9 @@
 #undef __HYBRID_TYPECORE_DEFINES_INT64
 #undef __int64
 #endif /* __HYBRID_TYPECORE_DEFINES_INT64 */
+#ifndef __NO_ATTR_W64
+#undef __w64
+#endif /* !__NO_ATTR_W64 */
 #undef char
 #undef short
 #undef int

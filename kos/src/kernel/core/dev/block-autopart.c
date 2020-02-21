@@ -69,17 +69,17 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 	       MAJOR(block_device_devno(self)),
 	       MINOR(block_device_devno(self)),
 	       self->bd_name);
-	efi.gpt_revision        = (le32)LESWAP32(efi.gpt_revision);
-	efi.gpt_hdrsize         = (le32)LESWAP32(efi.gpt_hdrsize);
-	efi.gpt_hdrcrc32        = (le32)LESWAP32(efi.gpt_hdrcrc32);
-	efi.gpt_currlba         = (le64)LESWAP64(efi.gpt_currlba);
-	efi.gpt_backlba         = (le64)LESWAP64(efi.gpt_backlba);
-	efi.gpt_firstpart       = (le64)LESWAP64(efi.gpt_firstpart);
-	efi.gpt_lastpart        = (le64)LESWAP64(efi.gpt_lastpart);
-	efi.gpt_partition_start = (le64)LESWAP64(efi.gpt_partition_start);
-	efi.gpt_partition_count = (le32)LESWAP32(efi.gpt_partition_count);
-	efi.gpt_partition_entsz = (le32)LESWAP32(efi.gpt_partition_entsz);
-	efi.gpt_partition_crc32 = (le32)LESWAP32(efi.gpt_partition_crc32);
+	efi.gpt_revision        = (le32)LETOH32(efi.gpt_revision);
+	efi.gpt_hdrsize         = (le32)LETOH32(efi.gpt_hdrsize);
+	efi.gpt_hdrcrc32        = (le32)LETOH32(efi.gpt_hdrcrc32);
+	efi.gpt_currlba         = (le64)LETOH64(efi.gpt_currlba);
+	efi.gpt_backlba         = (le64)LETOH64(efi.gpt_backlba);
+	efi.gpt_firstpart       = (le64)LETOH64(efi.gpt_firstpart);
+	efi.gpt_lastpart        = (le64)LETOH64(efi.gpt_lastpart);
+	efi.gpt_partition_start = (le64)LETOH64(efi.gpt_partition_start);
+	efi.gpt_partition_count = (le32)LETOH32(efi.gpt_partition_count);
+	efi.gpt_partition_entsz = (le32)LETOH32(efi.gpt_partition_entsz);
+	efi.gpt_partition_crc32 = (le32)LETOH32(efi.gpt_partition_crc32);
 	if ((u32)efi.gpt_hdrsize < offsetafter(struct efi_descriptor, gpt_partition_count)) {
 		printk(KERN_ERR "[blk] EFI header table at %#I64x...%#I64x on %.2x:%.2x (%q) is too small (%I32u bytes)\n",
 		       (u64)part_min, (u64)part_max,
@@ -124,8 +124,8 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 			block_device_read(self, &part, entsize, vecaddr);
 			if (GUID_EQUALS(part.p_type_guid, 00000000, 0000, 0000, 0000, 000000000000))
 				break; /* Sentinel. */
-			part.p_part_min = (le64)LESWAP64(part.p_part_min);
-			part.p_part_end = (le64)LESWAP64(part.p_part_end);
+			part.p_part_min = (le64)LETOH64(part.p_part_min);
+			part.p_part_end = (le64)LETOH64(part.p_part_end);
 			if ((u64)part.p_part_end < (u64)part.p_part_min) {
 				printk(KERN_ERR "[blk] EFI partition from EFI table in %#I64x...%#I64x on %.2x:%.2x (%q) ends at %I64u before it starts at %I64u\n",
 				       (u64)part_min, (u64)part_max,
@@ -138,7 +138,7 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 			}
 			if ((u64)part.p_part_end <= (u64)part.p_part_min)
 				continue; /* Empty partition. */
-			part.p_flags = (le64)LESWAP64(part.p_flags);
+			part.p_flags = (le64)LETOH64(part.p_flags);
 			if (entsize < offsetafter(struct efi_partition, p_flags))
 				part.p_flags = (le64)0;
 			name_maxlen = 0;
@@ -146,7 +146,7 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 				name_maxlen = (entsize - offsetof(struct efi_partition, p_name)) / 2;
 			dst = name;
 			for (i = 0; i < name_maxlen; ++i) {
-				u16 ch = LESWAP16(part.p_name[i]);
+				u16 ch = LETOH16(part.p_name[i]);
 				*dst++ = (char)ch; /* TODO: utf16_to_utf8 */
 			}
 			flags = 0;
@@ -238,13 +238,13 @@ block_device_autopart_impl(struct basic_block_device *__restrict self,
 			if ((mbr.mbr_part[i].pt.pt_bootable & PART_BOOTABLE_LBA48) &&
 			    (mbr.mbr_part[i].pt_48.pt_sig1 == PART48_SIG1 &&
 			     mbr.mbr_part[i].pt_48.pt_sig2 == PART48_SIG2)) {
-				lba_min = (lba_t)(u64)LESWAP32(mbr.mbr_part[i].pt_48.pt_lbastart);
-				lba_min |= (lba_t)(u64)LESWAP16(mbr.mbr_part[i].pt_48.pt_lbastarthi) << 32;
-				lba_siz = (lba_t)(u64)LESWAP32(mbr.mbr_part[i].pt_48.pt_lbasize);
-				lba_siz |= (lba_t)(u64)LESWAP16(mbr.mbr_part[i].pt_48.pt_lbasizehi) << 32;
+				lba_min = (lba_t)LETOH32(mbr.mbr_part[i].pt_48.pt_lbastart);
+				lba_min |= (lba_t)LETOH16(mbr.mbr_part[i].pt_48.pt_lbastarthi) << 32;
+				lba_siz = (lba_t)LETOH32(mbr.mbr_part[i].pt_48.pt_lbasize);
+				lba_siz |= (lba_t)LETOH16(mbr.mbr_part[i].pt_48.pt_lbasizehi) << 32;
 			} else {
-				lba_min = (lba_t)(u64)LESWAP32(mbr.mbr_part[i].pt_32.pt_lbastart);
-				lba_siz = (lba_t)(u64)LESWAP32(mbr.mbr_part[i].pt_32.pt_lbasize);
+				lba_min = (lba_t)LETOH32(mbr.mbr_part[i].pt_32.pt_lbastart);
+				lba_siz = (lba_t)LETOH32(mbr.mbr_part[i].pt_32.pt_lbasize);
 			}
 			if unlikely(!lba_siz) {
 				bool has_other_partitions;

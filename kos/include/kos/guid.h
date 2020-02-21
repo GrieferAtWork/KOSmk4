@@ -89,22 +89,22 @@ typedef union __ATTR_PACKED {
 #endif /* !__guid_t_defined */
 
 
-#define GUID_A(x)        __hybrid_beswap32((x).g_data.g_a)
-#define GUID_B(x)        __hybrid_beswap16((x).g_data.g_b)
-#define GUID_C(x)        __hybrid_beswap16((x).g_data.g_c)
-#define GUID_D(x)        __hybrid_beswap16((x).g_data.g_d)
+#define GUID_A(x) __hybrid_betoh32((x).g_data.g_a)
+#define GUID_B(x) __hybrid_betoh16((x).g_data.g_b)
+#define GUID_C(x) __hybrid_betoh16((x).g_data.g_c)
+#define GUID_D(x) __hybrid_betoh16((x).g_data.g_d)
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define GUID_E(x) (((u64)__hybrid_beswap32((x).g_data.g_e_1) << 16) | (u64)__hybrid_beswap16((x).g_data.g_e_2))
+#define GUID_E(x) (((u64)__hybrid_betoh32((x).g_data.g_e_1) << 16) | (u64)__hybrid_betoh16((x).g_data.g_e_2))
 #else
-#define GUID_E(x)  ((u64)__hybrid_beswap32((x).g_data.g_e_1) | ((u64)__hybrid_beswap16((x).g_data.g_e_2) << 32))
+#define GUID_E(x) ((u64)__hybrid_betoh32((x).g_data.g_e_1) | ((u64)__hybrid_betoh16((x).g_data.g_e_2) << 32))
 #endif
 
 /* Printf helpers for GUID printing */
 #define FORMAT_GUID_T         "%.8I32X-%.4I16X-%.4I16X-%.4I16X-%.12I64X"
-#define FORMAT_GUID_T_ARGS(x) GUID_A(x),GUID_B(x),GUID_C(x),GUID_D(x),GUID_E(x)
+#define FORMAT_GUID_T_ARGS(x) GUID_A(x), GUID_B(x), GUID_C(x), GUID_D(x), GUID_E(x)
 
 /* Compare `self' against the given, constant GUID */
-#define GUID_EQUALS(self, a, b, c, d, e) \
+#define GUID_EQUALS(self, a, b, c, d, e)                                                  \
 	((self).g_guid[0] == (u8)((__UINT32_C(0x##a) & __UINT32_C(0xff000000)) >> 24) &&      \
 	 (self).g_guid[1] == (u8)((__UINT32_C(0x##a) & __UINT32_C(0x00ff0000)) >> 16) &&      \
 	 (self).g_guid[2] == (u8)((__UINT32_C(0x##a) & __UINT32_C(0x0000ff00)) >> 8) &&       \
@@ -124,25 +124,25 @@ typedef union __ATTR_PACKED {
 
 
 /* Static initializer for GUIDs */
-#define GUID_INIT(a, b, c, d, e) \
-{{                                                                \
-	(u8)((__UINT32_C(0x##a) & __UINT32_C(0xff000000)) >> 24),     \
-	(u8)((__UINT32_C(0x##a) & __UINT32_C(0x00ff0000)) >> 16),     \
-	(u8)((__UINT32_C(0x##a) & __UINT32_C(0x0000ff00)) >> 8),      \
-	(u8)((__UINT32_C(0x##a) & __UINT32_C(0x000000ff))),           \
-	(u8)((__UINT16_C(0x##b) & __UINT16_C(0xff00)) >> 8),          \
-	(u8)((__UINT16_C(0x##b) & __UINT16_C(0x00ff))),               \
-	(u8)((__UINT16_C(0x##c) & __UINT16_C(0xff00)) >> 8),          \
-	(u8)((__UINT16_C(0x##c) & __UINT16_C(0x00ff))),               \
-	(u8)((__UINT16_C(0x##d) & __UINT16_C(0xff00)) >> 8),          \
-	(u8)((__UINT16_C(0x##d) & __UINT16_C(0x00ff))),               \
-	(u8)((__UINT64_C(0x##e) & __UINT64_C(0xff0000000000)) >> 40), \
-	(u8)((__UINT64_C(0x##e) & __UINT64_C(0x00ff00000000)) >> 32), \
-	(u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000ff000000)) >> 24), \
-	(u8)((__UINT64_C(0x##e) & __UINT64_C(0x000000ff0000)) >> 16), \
-	(u8)((__UINT64_C(0x##e) & __UINT64_C(0x00000000ff00)) >> 8),  \
-	(u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000000000ff))),       \
-}}
+#define GUID_INIT(a, b, c, d, e)                                      \
+	{{                                                                \
+		(u8)((__UINT32_C(0x##a) & __UINT32_C(0xff000000)) >> 24),     \
+		(u8)((__UINT32_C(0x##a) & __UINT32_C(0x00ff0000)) >> 16),     \
+		(u8)((__UINT32_C(0x##a) & __UINT32_C(0x0000ff00)) >> 8),      \
+		(u8)((__UINT32_C(0x##a) & __UINT32_C(0x000000ff))),           \
+		(u8)((__UINT16_C(0x##b) & __UINT16_C(0xff00)) >> 8),          \
+		(u8)((__UINT16_C(0x##b) & __UINT16_C(0x00ff))),               \
+		(u8)((__UINT16_C(0x##c) & __UINT16_C(0xff00)) >> 8),          \
+		(u8)((__UINT16_C(0x##c) & __UINT16_C(0x00ff))),               \
+		(u8)((__UINT16_C(0x##d) & __UINT16_C(0xff00)) >> 8),          \
+		(u8)((__UINT16_C(0x##d) & __UINT16_C(0x00ff))),               \
+		(u8)((__UINT64_C(0x##e) & __UINT64_C(0xff0000000000)) >> 40), \
+		(u8)((__UINT64_C(0x##e) & __UINT64_C(0x00ff00000000)) >> 32), \
+		(u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000ff000000)) >> 24), \
+		(u8)((__UINT64_C(0x##e) & __UINT64_C(0x000000ff0000)) >> 16), \
+		(u8)((__UINT64_C(0x##e) & __UINT64_C(0x00000000ff00)) >> 8),  \
+		(u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000000000ff)))        \
+	}}
 
 __DECL_END
 #endif /* __CC__ */

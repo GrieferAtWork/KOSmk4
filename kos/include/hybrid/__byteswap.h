@@ -21,18 +21,18 @@
 #define __GUARD_HYBRID___BYTESWAP_H 1
 
 #include "../__stdinc.h"
-#include "typecore.h"
 #include "__byteorder.h"
+#include "typecore.h"
 
 __DECL_BEGIN
 
 
-#define __hybrid_bswap16_c(x)  ((((x)&0xffu) << 8)|(((x) >> 8)&0xffu))
-#define __hybrid_bswap32_c(x)  ((__hybrid_bswap16_c(x) << 16)|__hybrid_bswap16_c((x) >> 16))
+#define __hybrid_bswap16_c(x) ((((x)&0xffu) << 8) | (((x) >> 8) & 0xffu))
+#define __hybrid_bswap32_c(x) ((__hybrid_bswap16_c(x) << 16) | __hybrid_bswap16_c((x) >> 16))
 #ifdef __UINT64_TYPE__
-#define __hybrid_bswap64_c(x)  ((__hybrid_bswap32_c(x) << 32)|__hybrid_bswap32_c((x) >> 32))
+#define __hybrid_bswap64_c(x) ((__hybrid_bswap32_c(x) << 32) | __hybrid_bswap32_c((x) >> 32))
 #ifdef __UINT128_TYPE__
-#define __hybrid_bswap128_c(x) ((__hybrid_bswap64_c(x) << 64)|__hybrid_bswap64_c((x) >> 64))
+#define __hybrid_bswap128_c(x) ((__hybrid_bswap64_c(x) << 64) | __hybrid_bswap64_c((x) >> 64))
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 
@@ -239,52 +239,6 @@ __NOTHROW(__impl_hybrid_bswap128)(__UINT128_TYPE__ __x) {
 #endif /* __UINT64_TYPE__ */
 #else
 #error "Unsupported endian"
-#endif
-
-
-
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define __hybrid_leswap16(x)    ((__UINT16_TYPE__)(x))  /* Deprecated */
-#define __hybrid_leswap16_c(x)  ((__UINT16_TYPE__)(x))  /* Deprecated */
-#define __hybrid_leswap32(x)    ((__UINT32_TYPE__)(x))  /* Deprecated */
-#define __hybrid_leswap32_c(x)  ((__UINT32_TYPE__)(x))  /* Deprecated */
-#define __hybrid_beswap16(x)      __hybrid_bswap16(x)   /* Deprecated */
-#define __hybrid_beswap16_c(x)    __hybrid_bswap16_c(x) /* Deprecated */
-#define __hybrid_beswap32(x)      __hybrid_bswap32(x)   /* Deprecated */
-#define __hybrid_beswap32_c(x)    __hybrid_bswap32_c(x) /* Deprecated */
-#ifdef __UINT64_TYPE__
-#define __hybrid_leswap64(x)    ((__UINT64_TYPE__)(x))  /* Deprecated */
-#define __hybrid_leswap64_c(x)  ((__UINT64_TYPE__)(x))  /* Deprecated */
-#define __hybrid_beswap64(x)      __hybrid_bswap64(x)   /* Deprecated */
-#define __hybrid_beswap64_c(x)    __hybrid_bswap64_c(x) /* Deprecated */
-#ifdef __UINT128_TYPE__
-#define __hybrid_leswap128(x)   ((__UINT128_TYPE__)(x)) /* Deprecated */
-#define __hybrid_leswap128_c(x) ((__UINT128_TYPE__)(x)) /* Deprecated */
-#define __hybrid_beswap128(x)     __hybrid_bswap128(x)  /* Deprecated */
-#define __hybrid_beswap128_c(x)   __hybrid_bswap128_c(x)/* Deprecated */
-#endif /* __UINT128_TYPE__ */
-#endif /* __UINT64_TYPE__ */
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define __hybrid_leswap16(x)      __hybrid_bswap16(x)   /* Deprecated */
-#define __hybrid_leswap16_c(x)    __hybrid_bswap16_c(x) /* Deprecated */
-#define __hybrid_leswap32(x)      __hybrid_bswap32(x)   /* Deprecated */
-#define __hybrid_leswap32_c(x)    __hybrid_bswap32_c(x) /* Deprecated */
-#define __hybrid_beswap16(x)    ((__UINT16_TYPE__)(x))  /* Deprecated */
-#define __hybrid_beswap16_c(x)  ((__UINT16_TYPE__)(x))  /* Deprecated */
-#define __hybrid_beswap32(x)    ((__UINT32_TYPE__)(x))  /* Deprecated */
-#define __hybrid_beswap32_c(x)  ((__UINT32_TYPE__)(x))  /* Deprecated */
-#ifdef __UINT64_TYPE__
-#define __hybrid_leswap64(x)      __hybrid_bswap64(x)   /* Deprecated */
-#define __hybrid_leswap64_c(x)    __hybrid_bswap64_c(x) /* Deprecated */
-#define __hybrid_beswap64(x)    ((__UINT64_TYPE__)(x))  /* Deprecated */
-#define __hybrid_beswap64_c(x)  ((__UINT64_TYPE__)(x))  /* Deprecated */
-#ifdef __UINT128_TYPE__
-#define __hybrid_leswap128(x)     __hybrid_bswap128(x)  /* Deprecated */
-#define __hybrid_leswap128_c(x)   __hybrid_bswap128_c(x)/* Deprecated */
-#define __hybrid_beswap128(x)   ((__UINT128_TYPE__)(x)) /* Deprecated */
-#define __hybrid_beswap128_c(x) ((__UINT128_TYPE__)(x)) /* Deprecated */
-#endif /* __UINT128_TYPE__ */
-#endif /* __UINT64_TYPE__ */
 #endif
 
 

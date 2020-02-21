@@ -741,17 +741,17 @@ continue_reading:
 			char *end          = dst + UNICODE_16TO8_MAXBUF(LFN_NAME);
 			char16_t *textend;
 			lfn_valid |= 1 << index;
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
 			{
 				unsigned int i;
 				for (i = 0; i < LFN_NAME1; ++i)
-					fatfile.lfn_name_1[i] = (le16)LESWAP16(fatfile.lfn_name_1[i]);
+					fatfile.lfn_name_1[i] = HTOLE16((u16)fatfile.lfn_name_1[i]);
 				for (i = 0; i < LFN_NAME2; ++i)
-					fatfile.lfn_name_2[i] = (le16)LESWAP16(fatfile.lfn_name_2[i]);
+					fatfile.lfn_name_2[i] = HTOLE16((u16)fatfile.lfn_name_2[i]);
 				for (i = 0; i < LFN_NAME3; ++i)
-					fatfile.lfn_name_3[i] = (le16)LESWAP16(fatfile.lfn_name_3[i]);
+					fatfile.lfn_name_3[i] = HTOLE16((u16)fatfile.lfn_name_3[i]);
 			}
-#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 			textend = (char16_t *)memchrw(fatfile.lfn_name_1, 0xffff, LFN_NAME1);
 			if (textend) {
 				dst = unicode_16to8(dst, (char16_t *)fatfile.lfn_name_1,
@@ -1073,13 +1073,13 @@ Fat_LoadINodeFromFatFile(struct inode *__restrict self,
 	}
 	/* Setup the initial cluster. */
 	data->i_clusterc    = 1;
-	data->i_clusterv[0] = LESWAP16(file->f_clusterlo);
+	data->i_clusterv[0] = LETOH16(file->f_clusterlo);
 	memcpy(&data->i_file, &file->f_attr, sizeof(data->i_file));
-	self->i_filesize = (pos_t)LESWAP32(file->f_size);
+	self->i_filesize = (pos_t)LETOH32(file->f_size);
 
 	self->i_filemode &= S_IFMT;
 	if (super->f_features & FAT_FEATURE_ARB) {
-		u16 arb = LESWAP16(file->f_arb);
+		u16 arb = LETOH16(file->f_arb);
 		mode_t unix_perm = 0777;
 		/* Use the ARB to implement unix file permissions. */
 		if (arb & FAT_ARB_NO_OX)
@@ -1107,7 +1107,7 @@ Fat_LoadINodeFromFatFile(struct inode *__restrict self,
 	} else {
 		assert(!(super->f_mode & ~0777));
 		/* 32-bit clusters */
-		data->i_clusterv[0] |= (u32)LESWAP16(file->f_clusterhi) << 16;
+		data->i_clusterv[0] |= (u32)LETOH16(file->f_clusterhi) << 16;
 		self->i_filemode |= 0222 | (super->f_mode & 0555);
 	}
 	/* Implement the read-only attribute. */
@@ -1156,7 +1156,7 @@ Fat_SaveINodeToFatFile(struct inode const *__restrict self,
 	}
 	/* Copy basic file data. */
 	memcpy(&file->f_attr, &data->i_file, sizeof(data->i_file));
-	file->f_clusterlo = (le16)LESWAP16(cluster & 0xffff);
+	file->f_clusterlo = HTOLE16(cluster & 0xffff);
 	if (super->f_features & FAT_FEATURE_ARB) {
 		u16 arb = data->i_file.f_arb;
 		mode_t unix_perm = self->i_filemode;
@@ -1190,12 +1190,12 @@ Fat_SaveINodeToFatFile(struct inode const *__restrict self,
 			arb &= ~(FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
 			arb |= data->i_file.f_arb & (FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
 		}
-		file->f_arb = (le16)LESWAP16(arb);
+		file->f_arb = HTOLE16(arb);
 	} else {
 		/* 32-bit clusters */
-		file->f_clusterhi = (le16)LESWAP16((u16)(cluster >> 16));
+		file->f_clusterhi = HTOLE16((u16)(cluster >> 16));
 	}
-	file->f_size = (le32)LESWAP32((u32)self->i_filesize);
+	file->f_size = HTOLE32((u32)self->i_filesize);
 	/* Implement the read-only attribute. */
 	if (!(self->i_filemode & 0222))
 		file->f_attr |= FAT_ATTR_READONLY;
@@ -1671,10 +1671,10 @@ Fat_GenerateFileEntries(FatFile *__restrict buffer,
 				THROW(E_FSERROR_ILLEGAL_PATH);
 		}
 		lfn_length = (size_t)(dst - lfn_name);
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#if __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__
 		for (i = 0; i < lfn_length; ++i)
-			lfn_name[i] = (char16_t)LESWAP16(lfn_name[i]);
-#endif
+			lfn_name[i] = (char16_t)(u16)HTOLE16((u16)lfn_name[i]);
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		assert(lfn_length <= LFN_SEQNUM_MAXCOUNT * LFN_NAME);
 		req_files = (u32)((lfn_length + (LFN_NAME - 1)) / LFN_NAME) + 1;
 		assert((req_files - 1) <= LFN_SEQNUM_MAXCOUNT);
@@ -1808,8 +1808,8 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 		first_cluster = data->i_clusterc != 0
 		                ? data->i_clusterv[0]
 		                : super->f_cluster_eof_marker;
-		files[file_count - 1].f_clusterlo = (le16)LESWAP16((u16)first_cluster);
-		files[file_count - 1].f_size      = (le32)LESWAP32((u32)new_node->i_filesize);
+		files[file_count - 1].f_clusterlo = HTOLE16((u16)first_cluster);
+		files[file_count - 1].f_size      = HTOLE32((u32)new_node->i_filesize);
 		if (super->f_features & FAT_FEATURE_ARB) {
 			u16 arb = data->i_file.f_arb;
 			mode_t unix_perm = new_node->i_filemode;
@@ -1843,13 +1843,11 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 				arb &= ~(FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
 				arb |= data->i_file.f_arb & (FAT_ARB_NO_OW | FAT_ARB_NO_GW | FAT_ARB_NO_WW);
 			}
-			files[file_count - 1].f_arb = (le16)LESWAP16(arb);
+			files[file_count - 1].f_arb = HTOLE16(arb);
 		} else {
 			/* 32-bit clusters */
-			files[file_count - 1].f_clusterhi = (le16)LESWAP16((u16)(first_cluster >> 16));
+			files[file_count - 1].f_clusterhi = HTOLE16((u16)(first_cluster >> 16));
 		}
-
-
 
 		/* Allocate space within the target directory. */
 		target_index = FatDirectory_AllocateFreeRange(target_directory,
@@ -1888,7 +1886,7 @@ Fat_AddFileToDirectory(struct directory_node *__restrict target_directory,
 		data->i_file.f_attr    = files[file_count - 1].f_attr;
 		data->i_file.f_ntflags = files[file_count - 1].f_ntflags;
 		if (super->f_features & FAT_FEATURE_ARB)
-			data->i_file.f_arb = LESWAP16(files[file_count - 1].f_arb);
+			data->i_file.f_arb = LETOH16(files[file_count - 1].f_arb);
 	} EXCEPT {
 		if (files != buffer)
 			kfree(files);
@@ -1996,8 +1994,8 @@ Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_director
 			index = Fat_GetFileCluster(target_directory, 0,
 			                           FAT_GETCLUSTER_MODE_FCREATE |
 			                           FAT_GETCLUSTER_MODE_FNOZERO);
-			pattern[1].f_clusterlo = (le16)LESWAP16(index & 0xffff);
-			pattern[1].f_clusterhi = (le16)LESWAP16((u16)(index >> 16));
+			pattern[1].f_clusterlo = HTOLE16(index & 0xffff);
+			pattern[1].f_clusterhi = HTOLE16((u16)(index >> 16));
 		} else {
 			/* 0x0000 -- Free Cluster; also used by DOS to refer to the parent directory starting cluster
 			 *           in ".." entries of subdirectories of the root directory on FAT12/FAT16 volumes
@@ -2010,8 +2008,8 @@ Fat_CreateDirectoryInDirectory(struct directory_node *__restrict target_director
 		                           FAT_GETCLUSTER_MODE_FNOZERO |
 		                           FAT_GETCLUSTER_MODE_FNCHNGE);
 		TRY {
-			pattern[0].f_clusterlo = (le16)LESWAP16(index & 0xffff);
-			pattern[0].f_clusterhi = (le16)LESWAP16((u16)(index >> 16));
+			pattern[0].f_clusterlo = HTOLE16(index & 0xffff);
+			pattern[0].f_clusterhi = HTOLE16((u16)(index >> 16));
 			/* Write the directory content into the new directory node. */
 			Fat32_VWriteToINode(new_node, (byte_t *)pattern, sizeof(pattern), 0);
 
@@ -2484,7 +2482,7 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		if (!disk_header.bpb.bpb_sectors_per_cluster ||
 		    !disk_header.bpb.bpb_reserved_sectors) /* What's the first sector, then? */
 			THROW(E_FSERROR_WRONG_FILE_SYSTEM);
-		sector_size = LESWAP16(disk_header.bpb.bpb_bytes_per_sector);
+		sector_size = LETOH16(disk_header.bpb.bpb_bytes_per_sector);
 #if PAGESIZE < 512
 #error "System page size is too small to support any FAT variation"
 #endif
@@ -2511,33 +2509,33 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 #endif
 	}
 	/* Extract some common information. */
-	self->f_fat_start   = (FatSectorIndex)LESWAP16(disk_header.bpb.bpb_reserved_sectors);
+	self->f_fat_start   = (FatSectorIndex)LETOH16(disk_header.bpb.bpb_reserved_sectors);
 	self->f_sec4clus    = (size_t)disk_header.bpb.bpb_sectors_per_cluster;
 	self->f_fat_count   = (u32)disk_header.bpb.bpb_fatc;
 	self->f_clustersize = (size_t)(self->f_sec4clus << FAT_SECTORSHIFT(self));
 
 	/* Figure out what kind of FAT filesystem this is. */
 	if (!disk_header.bpb.bpb_sectors_per_fat || !disk_header.bpb.bpb_maxrootsize) {
-		self->f_dat_start = self->f_fat_start + (LESWAP32(disk_header.fat32.f32_sectors_per_fat) *
+		self->f_dat_start = self->f_fat_start + (LETOH32(disk_header.fat32.f32_sectors_per_fat) *
 		                                         disk_header.bpb.bpb_fatc);
 		self->f_type      = FAT32;
 	} else {
 		u32 fat_size, root_sectors;
 		u32 data_sectors, total_clusters;
-		root_sectors = (LESWAP16(disk_header.bpb.bpb_maxrootsize) * sizeof(FatFile) +
+		root_sectors = (LETOH16(disk_header.bpb.bpb_maxrootsize) * sizeof(FatFile) +
 		                (FAT_SECTORSIZE(self) - 1)) >>
 		               FAT_SECTORSHIFT(self);
-		fat_size          = (disk_header.bpb.bpb_fatc * LESWAP16(disk_header.bpb.bpb_sectors_per_fat));
-		self->f_dat_start = LESWAP16(disk_header.bpb.bpb_reserved_sectors);
+		fat_size          = (disk_header.bpb.bpb_fatc * LETOH16(disk_header.bpb.bpb_sectors_per_fat));
+		self->f_dat_start = LETOH16(disk_header.bpb.bpb_reserved_sectors);
 		self->f_dat_start += fat_size;
 		self->f_dat_start += root_sectors;
 		/* Calculate the total number of data sectors. */
 		if (disk_header.bpb.bpb_shortsectorc) {
-			data_sectors = (u32)LESWAP16(disk_header.bpb.bpb_shortsectorc);
+			data_sectors = LETOH16(disk_header.bpb.bpb_shortsectorc);
 		} else {
-			data_sectors = LESWAP32(disk_header.bpb.bpb_longsectorc);
+			data_sectors = LETOH32(disk_header.bpb.bpb_longsectorc);
 		}
-		if (OVERFLOW_USUB(data_sectors, LESWAP16(disk_header.bpb.bpb_reserved_sectors), &data_sectors))
+		if (OVERFLOW_USUB(data_sectors, LETOH16(disk_header.bpb.bpb_reserved_sectors), &data_sectors))
 			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 		if (OVERFLOW_USUB(data_sectors, fat_size, &data_sectors))
 			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
@@ -2545,28 +2543,29 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 		/* Calculate the total number of data clusters. */
 		total_clusters = data_sectors / disk_header.bpb.bpb_sectors_per_cluster;
-		/**/ if (total_clusters > FAT16_MAXCLUSTERS)
+		if (total_clusters > FAT16_MAXCLUSTERS)
 			self->f_type = FAT32;
 		else if (total_clusters > FAT12_MAXCLUSTERS)
 			self->f_type = FAT16;
-		else
+		else {
 			self->f_type = FAT12;
+		}
 	}
 	if (self->f_type == FAT32) {
 		if (disk_header.fat32.f32_signature != 0x28 &&
 		    disk_header.fat32.f32_signature != 0x29)
 			THROW(E_FSERROR_WRONG_FILE_SYSTEM);
-		self->f_volid = LESWAP32(disk_header.fat32.f32_volid);
+		self->f_volid = LETOH32(disk_header.fat32.f32_volid);
 		memcpy(self->f_label, disk_header.fat32.f32_label, sizeof(disk_header.fat32.f32_label));
 		memcpy(self->f_sysname, disk_header.fat32.f32_sysname, sizeof(disk_header.fat32.f32_sysname));
-		self->f_sec4fat            = LESWAP32(disk_header.fat32.f32_sectors_per_fat);
+		self->f_sec4fat            = LETOH32(disk_header.fat32.f32_sectors_per_fat);
 		self->f_cluster_eof        = (self->f_sec4fat << FAT_SECTORSHIFT(self)) / 4;
 		self->f_cluster_eof_marker = 0xffffffff;
 		/* Must lookup the cluster of the root directory. */
 		self->f_root.i_clusterc    = 1;
 		self->f_root.i_clustera    = 2;
 		self->f_root.i_clusterv    = (FatClusterIndex *)kmalloc(2 * sizeof(FatClusterIndex), FS_GFP);
-		self->f_root.i_clusterv[0] = LESWAP32(disk_header.fat32.f32_root_cluster);
+		self->f_root.i_clusterv[0] = LETOH32(disk_header.fat32.f32_root_cluster);
 		self->f_fat_get            = &Fat32_GetFatIndirection;
 		self->f_fat_set            = &Fat32_SetFatIndirection;
 		self->f_fat_sector         = &Fat32_GetTableSector;
@@ -2585,14 +2584,14 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		if (disk_header.fat16.f16_signature != 0x28 &&
 		    disk_header.fat16.f16_signature != 0x29)
 			THROW(E_FSERROR_WRONG_FILE_SYSTEM);
-		self->f_volid = LESWAP32(disk_header.fat16.f16_volid);
+		self->f_volid = LETOH32(disk_header.fat16.f16_volid);
 		memcpy(self->f_label, disk_header.fat16.f16_label, sizeof(disk_header.fat16.f16_label));
 		memcpy(self->f_sysname, disk_header.fat16.f16_sysname, sizeof(disk_header.fat16.f16_sysname));
-		self->f_root.i16_root.f16_rootpos = (pos_t)LESWAP16(disk_header.bpb.bpb_reserved_sectors);
-		self->f_root.i16_root.f16_rootpos += (disk_header.bpb.bpb_fatc * LESWAP16(disk_header.bpb.bpb_sectors_per_fat));
+		self->f_root.i16_root.f16_rootpos = (pos_t)LETOH16(disk_header.bpb.bpb_reserved_sectors);
+		self->f_root.i16_root.f16_rootpos += (disk_header.bpb.bpb_fatc * LETOH16(disk_header.bpb.bpb_sectors_per_fat));
 		self->f_root.i16_root.f16_rootpos <<= FAT_SECTORSHIFT(self);
-		self->f_sec4fat                   = LESWAP16(disk_header.bpb.bpb_sectors_per_fat);
-		self->f_root.i16_root.f16_rootsiz = (u32)LESWAP16(disk_header.bpb.bpb_maxrootsize);
+		self->f_sec4fat                   = LETOH16(disk_header.bpb.bpb_sectors_per_fat);
+		self->f_root.i16_root.f16_rootsiz = (u32)LETOH16(disk_header.bpb.bpb_maxrootsize);
 		self->f_root.i16_root.f16_rootsiz *= sizeof(FatFile);
 		self->f_cluster_eof = (self->f_sec4fat << FAT_SECTORSHIFT(self)) / 2;
 		/* It is possible to create a FAT16 filesystem with 0x10000 sectors.

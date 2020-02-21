@@ -363,7 +363,7 @@ usb_scsi_create_lun(struct usb_controller *__restrict self,
 		/* TODO: Must use `SCSI_CMD_SAI_READ_CAPACITY_16' to get the real size! */
 	}
 	/* With the disk geometry all figured out, it's time to create the block device! */
-	result = (REF struct ms_scsi_device *)block_device_alloc((size_t)BESWAP32(cap.cap_sector_len),
+	result = (REF struct ms_scsi_device *)block_device_alloc((size_t)BETOH32(cap.cap_sector_len),
 	                                                         sizeof(struct ms_scsi_device));
 	FINALLY_DECREF_UNLIKELY(result);
 	result->bd_type.dt_fini = &ms_scsi_device_fini;
@@ -377,7 +377,7 @@ usb_scsi_create_lun(struct usb_controller *__restrict self,
 	assert(result->msd_tag == 0);
 
 	/* Fill in missing capacity information. */
-	result->bd_sector_count = (lba_t)(u32)BESWAP32(cap.cap_sector_max) + 1;
+	result->bd_sector_count = (lba_t)(u32)BETOH32(cap.cap_sector_max) + 1;
 	result->bd_total_bytes  = (pos_t)(result->bd_sector_count * result->bd_sector_size);
 
 	/* Fill in I/O operators. */

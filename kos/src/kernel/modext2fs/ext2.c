@@ -191,12 +191,12 @@ Ext2_Group(Ext2Superblock *__restrict self, ext2_bgroup_t index)
 			assert(!result->bg_busage);
 			assert(!result->bg_iusage);
 			/* Fill in the block groups data fields. */
-			result->bg_busage_addr = LESWAP32(group.bg_busage);
-			result->bg_iusage_addr = LESWAP32(group.bg_iusage);
-			result->bg_inodes      = LESWAP32(group.bg_inodes);
-			result->bg_free_blocks = LESWAP16(group.bg_free_blocks);
-			result->bg_free_inodes = LESWAP16(group.bg_free_inodes);
-			result->bg_num_dirs    = LESWAP16(group.bg_num_dirs);
+			result->bg_busage_addr = LETOH32(group.bg_busage);
+			result->bg_iusage_addr = LETOH32(group.bg_iusage);
+			result->bg_inodes      = LETOH32(group.bg_inodes);
+			result->bg_free_blocks = LETOH16(group.bg_free_blocks);
+			result->bg_free_inodes = LETOH16(group.bg_free_inodes);
+			result->bg_num_dirs    = LETOH16(group.bg_num_dirs);
 			result->bg_flags |= BLOCK_GROUP_FLOADED;
 		}
 		sync_endwrite(&result->bg_lock);
@@ -274,13 +274,13 @@ ExtINode_LoadAttr(struct inode *__restrict self) {
 	node->i_os2[2]     = data.i_os2[2];
 	/* Copy block pointers. */
 	for (i = 0; i < EXT2_DIRECT_BLOCK_COUNT; ++i)
-		node->i_dblock[i] = LESWAP32(data.i_dblock[i]);
-	node->i_siblock_addr = LESWAP32(data.i_siblock);
-	node->i_diblock_addr = LESWAP32(data.i_diblock);
-	node->i_tiblock_addr = LESWAP32(data.i_tiblock);
+		node->i_dblock[i] = LETOH32(data.i_dblock[i]);
+	node->i_siblock_addr = LETOH32(data.i_siblock);
+	node->i_diblock_addr = LETOH32(data.i_diblock);
+	node->i_tiblock_addr = LETOH32(data.i_tiblock);
 	/* Read general-purpose INode attributes. */
-	self->i_filenlink = (nlink_t)LESWAP16(data.i_nlink);
-	real_mode         = LESWAP16(data.i_mode);
+	self->i_filenlink = (nlink_t)LETOH16(data.i_nlink);
+	real_mode         = LETOH16(data.i_mode);
 	/* Race condition: The file got deleted and another node with the
 	 *                 same ID, but of a different type may have been
 	 *                 created in the mean time.
@@ -297,30 +297,30 @@ ExtINode_LoadAttr(struct inode *__restrict self) {
 	if ((self->i_filemode & S_IFMT) != (real_mode & S_IFMT))
 		THROW(E_FSERROR_FILE_NOT_FOUND);
 	self->i_filemode          = real_mode;
-	self->i_fileuid           = (uid_t)LESWAP16(data.i_uid);
-	self->i_filegid           = (gid_t)LESWAP16(data.i_gid);
-	self->i_filesize          = (pos_t)LESWAP32(data.i_size_low);
-	self->i_fileatime.tv_sec  = LESWAP32(data.i_atime);
+	self->i_fileuid           = (uid_t)LETOH16(data.i_uid);
+	self->i_filegid           = (gid_t)LETOH16(data.i_gid);
+	self->i_filesize          = (pos_t)LETOH32(data.i_size_low);
+	self->i_fileatime.tv_sec  = LETOH32(data.i_atime);
 	self->i_fileatime.tv_nsec = 0;
-	self->i_filemtime.tv_sec  = LESWAP32(data.i_mtime);
+	self->i_filemtime.tv_sec  = LETOH32(data.i_mtime);
 	self->i_filemtime.tv_nsec = 0;
-	self->i_filectime.tv_sec  = LESWAP32(data.i_ctime);
+	self->i_filectime.tv_sec  = LETOH32(data.i_ctime);
 	self->i_filectime.tv_nsec = 0;
-	node->i_block_count       = LESWAP32(data.i_blocks);
+	node->i_block_count       = LETOH32(data.i_blocks);
 
 	/* Parse Version-specific fields. */
 	if (super->sd_feat_mountro & EXT2_FEAT_MRO_FSIZE64)
-		self->i_filesize |= (pos_t)((u64)LESWAP32(data.i_size_high) << 32);
+		self->i_filesize |= (pos_t)((u64)LETOH32(data.i_size_high) << 32);
 	/* Parse OS-specific fields. */
 	switch (super->sd_os) {
 
 	case EXT2_OS_FGNU_HURD:
-		self->i_filemode |= LESWAP16(data.i_os_hurd.h_mode_high) << 16;
+		self->i_filemode |= LETOH16(data.i_os_hurd.h_mode_high) << 16;
 		/* Linux-specific fields are also implemented by HURD, so just fallthrough */
 		ATTR_FALLTHROUGH
 	case EXT2_OS_FLINUX:
-		self->i_fileuid |= LESWAP16(data.i_os_linux.l_uid_high) << 16;
-		self->i_filegid |= LESWAP16(data.i_os_linux.l_gid_high) << 16;
+		self->i_fileuid |= LETOH16(data.i_os_linux.l_uid_high) << 16;
+		self->i_filegid |= LETOH16(data.i_os_linux.l_gid_high) << 16;
 		break;
 
 	default: break;
@@ -346,26 +346,26 @@ ExtINode_SaveAttr(struct inode *__restrict self) {
 	data.i_os2[2]     = node->i_os2[2];
 	/* Copy block pointers. */
 	for (i = 0; i < EXT2_DIRECT_BLOCK_COUNT; ++i)
-		data.i_dblock[i] = (le32)LESWAP32((u32)node->i_dblock[i]);
-	data.i_siblock = (le32)LESWAP32((u32)node->i_siblock_addr);
-	data.i_diblock = (le32)LESWAP32((u32)node->i_diblock_addr);
-	data.i_tiblock = (le32)LESWAP32((u32)node->i_tiblock_addr);
+		data.i_dblock[i] = HTOLE32(node->i_dblock[i]);
+	data.i_siblock = HTOLE32(node->i_siblock_addr);
+	data.i_diblock = HTOLE32(node->i_diblock_addr);
+	data.i_tiblock = HTOLE32(node->i_tiblock_addr);
 	/* Write general-purpose INode attributes. */
-	data.i_nlink    = (le16)LESWAP16((u16)self->i_filenlink);
-	data.i_mode     = (le16)LESWAP16((u16)self->i_filemode);
-	data.i_uid      = (le16)LESWAP16((u16)self->i_fileuid);
-	data.i_gid      = (le16)LESWAP16((u16)self->i_filegid);
-	data.i_size_low = (le32)LESWAP32((u32)self->i_filesize);
-	data.i_atime    = (le32)LESWAP32((u32)self->i_fileatime.tv_sec);
-	data.i_mtime    = (le32)LESWAP32((u32)self->i_filemtime.tv_sec);
-	data.i_ctime    = (le32)LESWAP32((u32)self->i_filectime.tv_sec);
-	data.i_blocks   = (le32)LESWAP32((u32)node->i_block_count);
+	data.i_nlink    = HTOLE16((u16)self->i_filenlink);
+	data.i_mode     = HTOLE16((u16)self->i_filemode);
+	data.i_uid      = HTOLE16((u16)self->i_fileuid);
+	data.i_gid      = HTOLE16((u16)self->i_filegid);
+	data.i_size_low = HTOLE32((u32)self->i_filesize);
+	data.i_atime    = HTOLE32((u32)self->i_fileatime.tv_sec);
+	data.i_mtime    = HTOLE32((u32)self->i_filemtime.tv_sec);
+	data.i_ctime    = HTOLE32((u32)self->i_filectime.tv_sec);
+	data.i_blocks   = HTOLE32((u32)node->i_block_count);
 
 	super = (Ext2Superblock *)self->i_super;
 
 	/* Parse Version-specific fields. */
 	if (super->sd_feat_mountro & EXT2_FEAT_MRO_FSIZE64)
-		data.i_size_high = (le32)LESWAP32((u32)(self->i_filesize >> 32));
+		data.i_size_high = HTOLE32((u32)(self->i_filesize >> 32));
 	else
 		data.i_size_high = (le32)0;
 
@@ -373,12 +373,12 @@ ExtINode_SaveAttr(struct inode *__restrict self) {
 	switch (super->sd_os) {
 
 	case EXT2_OS_FGNU_HURD:
-		data.i_os_hurd.h_mode_high = (le16)LESWAP16((u16)(self->i_filemode >> 16));
+		data.i_os_hurd.h_mode_high = HTOLE16((u16)(self->i_filemode >> 16));
 		/* Linux-specific fields are also implemented by HURD, so just fallthrough */
 		ATTR_FALLTHROUGH
 	case EXT2_OS_FLINUX:
-		data.i_os_linux.l_uid_high = (le16)LESWAP16((u16)(self->i_fileuid >> 16));
-		data.i_os_linux.l_gid_high = (le16)LESWAP16((u16)(self->i_filegid >> 16));
+		data.i_os_linux.l_uid_high = HTOLE16((u16)(self->i_fileuid >> 16));
+		data.i_os_linux.l_gid_high = HTOLE16((u16)(self->i_filegid >> 16));
 		break;
 
 	default: break;
@@ -440,7 +440,7 @@ ExtDir_ReadDir(struct directory_node *__restrict self,
 again:
 	entry_pos = *pentry_pos;
 	Ext2_VReadFromINode(self, &entry, sizeof(Ext2DiskDirent), entry_pos);
-	entsize = LESWAP16(entry.d_entsize);
+	entsize = LETOH16(entry.d_entsize);
 	if (entsize <= sizeof(Ext2DiskDirent))
 		return NULL; /* End of directory */
 	*pentry_pos += entsize;
@@ -477,18 +477,18 @@ again:
 		pos_t ino_addr;
 		le16 ino_type;
 		ino_addr = Ext2_InoAddr((Ext2Superblock *)self->i_super,
-		                        LESWAP32(entry.d_ino));
+		                        LETOH32(entry.d_ino));
 		/* Read the directory entry type from its INode. */
 		block_device_read(self->i_super->s_device, &ino_type, 2,
 		                  ino_addr + offsetof(Ext2DiskINode, i_mode));
-		entry_type = IFTODT(LESWAP16(ino_type));
-		namlen     = LESWAP16(entry.d_namlen);
+		entry_type = IFTODT(LETOH16(ino_type));
+		namlen     = LETOH16(entry.d_namlen);
 	}
 	/* Construct the resulting directory entry. */
 	result = directory_entry_alloc(namlen);
 	TRY {
 		result->de_pos  = entry_pos;
-		result->de_ino  = (ino_t)LESWAP32(entry.d_ino);
+		result->de_ino  = (ino_t)LETOH32(entry.d_ino);
 		result->de_type = entry_type;
 		/* Read in the directory entry's name. */
 		Ext2_VReadFromINode(self,
@@ -677,24 +677,24 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 	                 (pos_t)EXT2_SUPERBLOCK_OFFSET);
 
 	/* Do some basic verification to check if this is really an EXT2 filesystem. */
-	if (LESWAP16(super.e_signature) != EXT2_SIGNATURE)
+	if (LETOH16(super.e_signature) != EXT2_SIGNATURE)
 		THROW(E_FSERROR_WRONG_FILE_SYSTEM);
 
 	/* Do some validation on the superblock state. */
-	if unlikely(LESWAP32(super.e_free_inodes) > LESWAP32(super.e_total_inodes) ||
-	            LESWAP32(super.e_free_blocks) > LESWAP32(super.e_total_blocks))
+	if unlikely(LETOH32(super.e_free_inodes) > LETOH32(super.e_total_inodes) ||
+	            LETOH32(super.e_free_blocks) > LETOH32(super.e_total_blocks))
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 	if unlikely(!super.e_blocks_per_group || !super.e_inodes_per_group)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 
-	num_block_groups = CEILDIV(LESWAP32(super.e_total_blocks), LESWAP32(super.e_blocks_per_group));
-	temp             = CEILDIV(LESWAP32(super.e_total_inodes), LESWAP32(super.e_inodes_per_group));
+	num_block_groups = CEILDIV(LETOH32(super.e_total_blocks), LETOH32(super.e_blocks_per_group));
+	temp             = CEILDIV(LETOH32(super.e_total_inodes), LETOH32(super.e_inodes_per_group));
 	if unlikely(num_block_groups != temp)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 	if unlikely(!num_block_groups)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 
-	self->sd_block_shift = 10 + LESWAP32(super.e_log2_blocksz);
+	self->sd_block_shift = 10 + LETOH32(super.e_log2_blocksz);
 	if unlikely(self->sd_block_shift >= PAGESHIFT)
 		THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 
@@ -723,17 +723,17 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 	self->sd_bgroups_pos = EXT2_SUPERBLOCK_OFFSET + 1024;
 #endif
 	self->sd_bgroups_cnt  = num_block_groups;
-	self->sd_ino_per_bgrp = LESWAP32(super.e_inodes_per_group);
-	self->sd_blk_per_bgrp = LESWAP32(super.e_blocks_per_group);
-	self->sd_total_inodes = LESWAP32(super.e_total_inodes);
-	self->sd_total_blocks = LESWAP32(super.e_total_blocks);
-	self->sd_version      = ((u32)LESWAP16(super.e_version_major) << 16 |
-	                         (u32)LESWAP16(super.e_version_minor));
+	self->sd_ino_per_bgrp = LETOH32(super.e_inodes_per_group);
+	self->sd_blk_per_bgrp = LETOH32(super.e_blocks_per_group);
+	self->sd_total_inodes = LETOH32(super.e_total_inodes);
+	self->sd_total_blocks = LETOH32(super.e_total_blocks);
+	self->sd_version      = ((u32)LETOH16(super.e_version_major) << 16 |
+	                         (u32)LETOH16(super.e_version_minor));
 	if (self->sd_version >= EXT2_VERSION_1) {
-		self->sd_feat_optional = LESWAP32(super.e_feat_optional);
-		self->sd_feat_required = LESWAP32(super.e_feat_required);
-		self->sd_feat_mountro  = LESWAP32(super.e_feat_mountro);
-		self->sd_inode_size    = LESWAP16(super.e_inode_size);
+		self->sd_feat_optional = LETOH32(super.e_feat_optional);
+		self->sd_feat_required = LETOH32(super.e_feat_required);
+		self->sd_feat_mountro  = LETOH32(super.e_feat_mountro);
+		self->sd_inode_size    = LETOH16(super.e_inode_size);
 		/* Make sure that the specified INode size isn't too small. */
 		if unlikely(self->sd_inode_size < 128)
 			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);

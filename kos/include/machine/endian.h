@@ -50,10 +50,10 @@
 
 #ifndef __machine_host_to_from_network_defined
 #define __machine_host_to_from_network_defined 1
-#define __htonl(_x) __hybrid_beswap32(_x)
-#define __htons(_x) __hybrid_beswap16(_x)
-#define __ntohl(_x) __hybrid_beswap32(_x)
-#define __ntohs(_x) __hybrid_beswap16(_x)
+#define __htonl(x) __hybrid_htobe32(x)
+#define __htons(x) __hybrid_htobe16(x)
+#define __ntohl(x) __hybrid_betoh32(x)
+#define __ntohs(x) __hybrid_betoh16(x)
 #endif /* __machine_host_to_from_network_defined */
 
 #endif /* !_MACHINE_ENDIAN_H */

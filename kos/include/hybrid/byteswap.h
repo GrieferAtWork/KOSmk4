@@ -83,45 +83,6 @@ __DECL_BEGIN
 #endif /* __hybrid_htobe128 */
 
 
-
-
-
-#define LESWAP16(x)     __hybrid_leswap16(x)   /* Deprecated */
-#define LESWAP32(x)     __hybrid_leswap32(x)   /* Deprecated */
-#define BESWAP16(x)     __hybrid_beswap16(x)   /* Deprecated */
-#define BESWAP32(x)     __hybrid_beswap32(x)   /* Deprecated */
-#define LESWAP16_C(x)   __hybrid_leswap16_c(x) /* Deprecated */
-#define LESWAP32_C(x)   __hybrid_leswap32_c(x) /* Deprecated */
-#define BESWAP16_C(x)   __hybrid_beswap16_c(x) /* Deprecated */
-#define BESWAP32_C(x)   __hybrid_beswap32_c(x) /* Deprecated */
-#ifdef __UINT64_TYPE__
-#define LESWAP64(x)     __hybrid_leswap64(x)   /* Deprecated */
-#define BESWAP64(x)     __hybrid_beswap64(x)   /* Deprecated */
-#define LESWAP64_C(x)   __hybrid_leswap64_c(x) /* Deprecated */
-#define BESWAP64_C(x)   __hybrid_beswap64_c(x) /* Deprecated */
-#ifdef __UINT128_TYPE__
-#define LESWAP128(x)    __hybrid_leswap128(x)  /* Deprecated */
-#define BESWAP128(x)    __hybrid_beswap128(x)  /* Deprecated */
-#define LESWAP128_C(x)  __hybrid_leswap128_c(x)/* Deprecated */
-#define BESWAP128_C(x)  __hybrid_beswap128_c(x)/* Deprecated */
-#endif /* __UINT128_TYPE__ */
-#endif /* __UINT64_TYPE__ */
-
-/* Convert to/from network endian. */
-#define NETSWAP16(x)     __hybrid_beswap16(x)   /* Deprecated */
-#define NETSWAP32(x)     __hybrid_beswap32(x)   /* Deprecated */
-#define NETSWAP16_C(x)   __hybrid_beswap16_c(x) /* Deprecated */
-#define NETSWAP32_C(x)   __hybrid_beswap32_c(x) /* Deprecated */
-#ifdef __UINT64_TYPE__
-#define NETSWAP64(x)     __hybrid_beswap64(x)   /* Deprecated */
-#define NETSWAP64_C(x)   __hybrid_beswap64_c(x) /* Deprecated */
-#ifdef __UINT128_TYPE__
-#define NETSWAP128(x)    __hybrid_beswap128(x)   /* Deprecated */
-#define NETSWAP128_C(x)  __hybrid_beswap128_c(x) /* Deprecated */
-#endif /* __UINT128_TYPE__ */
-#endif /* __UINT64_TYPE__ */
-
-
 #ifdef __GUARD_HYBRID_UNALIGNED_H
 #define UNALIGNED_GETLE(ptr)       __hybrid_unaligned_getle(ptr)
 #define UNALIGNED_SETLE(ptr, v)    __hybrid_unaligned_setle(ptr, v)
