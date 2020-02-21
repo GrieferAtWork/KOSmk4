@@ -26,7 +26,6 @@
 
 #include <bits/types.h>
 
-__SYSDECL_BEGIN
 
 /* Interface for NE2K network cards. */
 
@@ -144,6 +143,16 @@ __SYSDECL_BEGIN
 #define EN1_MULT(base)          ((base) + 0x08)    /* Multicast filter mask array (8 bytes) RD WR */
 #define EN1_MULT_SHIFT(base, i) ((base) + (i) + 8) /* Get and set multicast filter */
 
-__SYSDECL_END
+#ifdef __CC__
+__DECL_BEGIN
+
+struct e8390_pkt_hdr {
+	__uint8_t  ph_status; /* Status byte (unused / not well defined; just ignore it...) */
+	__uint8_t  ph_next;   /* Page # of the next header. */
+	__uint16_t ph_count;  /* Length of this header + the actual packet. */
+};
+
+__DECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_IO_NE2K_H */

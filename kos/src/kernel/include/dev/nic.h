@@ -38,7 +38,7 @@ struct nic_device_stat;
 struct nic_device;
 
 struct nic_packet_part {
-	USER CHECKED void const *pp_base; /* Virtual base address of the buffer. */
+	USER CHECKED void const *pp_base; /* [?..pp_size] Virtual base address of the buffer. */
 	size_t                   pp_size; /* Buffer size of `pp_base' (in bytes) */
 };
 
@@ -121,15 +121,17 @@ struct nic_device_ops {
 };
 
 struct nic_device_stat {
-	WEAK size_t nds_rx_packets;      /* # of packets received. */
-	WEAK size_t nds_tx_packets;      /* # of packets transmitted. */
-	WEAK size_t nds_rx_bytes;        /* # of bytes received. */
-	WEAK size_t nds_tx_bytes;        /* # of bytes transmitted. */
-	WEAK size_t nds_rx_dropped;      /* # of dropped incoming packets. */
-	WEAK size_t nds_rx_frame_errors; /* # of receive frame errors. */
-	WEAK size_t nds_rx_crc_errors;   /* # of receive crc errors. */
-	WEAK size_t nds_rx_miss_errors;  /* # of receive missed errors. */
+	WEAK size_t nds_rx_packets;       /* # of packets received. */
+	WEAK size_t nds_tx_packets;       /* # of packets transmitted. */
+	WEAK size_t nds_rx_bytes;         /* # of bytes received. */
+	WEAK size_t nds_tx_bytes;         /* # of bytes transmitted. */
+	WEAK size_t nds_rx_dropped;       /* # of dropped incoming packets. */
+	WEAK size_t nds_rx_frame_errors;  /* # of receive frame errors. */
+	WEAK size_t nds_rx_crc_errors;    /* # of receive crc errors. */
+	WEAK size_t nds_rx_miss_errors;   /* # of receive missed errors. */
+	WEAK size_t nds_rx_length_errors; /* # of receive length errors. */
 };
+
 
 struct nic_device
 #ifdef __cplusplus
@@ -137,14 +139,14 @@ struct nic_device
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device nd_base;      /* The underlying character device */
+	struct character_device nd_base;    /* The underlying character device */
 #endif /* !__cplusplus */
-	struct nic_device_ops   nd_ops;       /* Device operators. */
-	WEAK uintptr_t          nd_ifflags;   /* [lock(INTERN)] Netword interface flags (set of `IFF_*') */
-	struct nic_device_stat  nd_stat;      /* Usage statistics */
-	gfp_t                   nd_hdgfp;     /* [const] Additional GFP flags for packet header/tail buffers.
-	                                       * This is mainly useful in case the driver can be written more
-	                                       * efficiently if header/tail memory is allocated as `GFP_LOCKED'. */
+	struct nic_device_ops   nd_ops;     /* Device operators. */
+	WEAK uintptr_t          nd_ifflags; /* [lock(INTERN)] Netword interface flags (set of `IFF_*') */
+	struct nic_device_stat  nd_stat;    /* Usage statistics */
+	gfp_t                   nd_hdgfp;   /* [const] Additional GFP flags for packet header/tail buffers.
+	                                     * This is mainly useful in case the driver can be written more
+	                                     * efficiently if header/tail memory is allocated as `GFP_LOCKED'. */
 };
 
 /* Allocate a new NIC packet which may be used to send the given payload.
@@ -178,6 +180,39 @@ FUNDEF NONNULL((1)) size_t KCALL
 nic_device_write(struct character_device *__restrict self,
                  USER CHECKED void const *src,
                  size_t num_bytes, iomode_t mode) THROWS(...);
+
+
+/* Routable packet buffer. */
+struct nic_rpacket {
+	size_t                          rp_size;  /* Max packet size (in bytes) */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, rp_data); /* [rp_size] Packet data buffer. */
+};
+
+/* Allocate a buffer for a routable NIC packet for use with `nic_device_routepacket()'
+ * @param: max_packet_size: The max packet size that the returned buffer must be able to hold.
+ *                          The guaranty here is that: `return->rp_size >= max_packet_size' */
+FUNDEF ATTR_RETNONNULL struct nic_rpacket *KCALL
+nic_rpacket_alloc(size_t max_packet_size) THROWS(E_BADALLOC);
+
+/* Free a routable NIC packet. */
+FUNDEF NOBLOCK void NOTHROW(KCALL nic_rpacket_free)(struct nic_rpacket *__restrict self);
+
+/* Inherit a routable NIC packet and route it.
+ * Routing may either be done synchronously (i.e. before this function returns),
+ * or asynchronously (i.e. at some future point in time by some other thread)
+ * If the caller _needs_ routing to be performed immediately, they should instead
+ * make use of `nic_device_route()', followed by `nic_rpacket_free()'
+ * @param: real_packet_size: The actual used packet size (`<= packet->rp_size') */
+FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
+nic_device_routepacket(struct nic_device const *__restrict self,
+                       /*inherit(always)*/ struct nic_rpacket *__restrict packet,
+                       size_t real_packet_size);
+
+/* Route an incoming packet through the given NIC device. */
+FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
+nic_device_route(struct nic_device const *__restrict self,
+                 void const *__restrict packet_data,
+                 size_t packet_size);
 
 
 #endif /* __CC__ */

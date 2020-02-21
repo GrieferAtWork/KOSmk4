@@ -25,11 +25,14 @@
 
 #include <dev/nic.h>
 #include <kernel/aio.h>
+#include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/printk.h>
 #include <kernel/types.h>
 
-#include <string.h>
+#include <assert.h>
 #include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -122,6 +125,63 @@ nic_device_write(struct character_device *__restrict self,
 	}
 	aio_handle_generic_fini(&aio);
 	return num_bytes;
+}
+
+
+
+/* Allocate a buffer for a routable NIC packet for use with `nic_device_routepacket()'
+ * @param: max_packet_size: The max packet size that the returned buffer must be able to hold.
+ *                          The guaranty here is that: `return->rp_size >= max_packet_size' */
+PUBLIC ATTR_RETNONNULL struct nic_rpacket *KCALL
+nic_rpacket_alloc(size_t max_packet_size) THROWS(E_BADALLOC) {
+	struct nic_rpacket *result;
+	struct heapptr resptr;
+	/* XXX: Pre-cache a certain number of specifically-sized packets. */
+	resptr = heap_alloc(&kernel_default_heap,
+	                    offsetof(struct nic_rpacket, rp_data) +
+	                    max_packet_size,
+	                    GFP_NORMAL);
+	result = (struct nic_rpacket *)resptr.hp_ptr;
+	result->rp_size = resptr.hp_siz;
+	return result;
+}
+
+/* Free a routable NIC packet. */
+PUBLIC NOBLOCK void
+NOTHROW(KCALL nic_rpacket_free)(struct nic_rpacket *__restrict self) {
+	/* XXX: Pre-cache a certain number of specifically-sized packets. */
+	heap_free(&kernel_default_heap, self, self->rp_size, GFP_NORMAL);
+}
+
+/* Inherit a routable NIC packet and route it.
+ * Routing may either be done synchronously (i.e. before this function returns),
+ * or asynchronously (i.e. at some future point in time by some other thread)
+ * If the caller _needs_ routing to be performed immediately, they should instead
+ * make use of `nic_device_route()', followed by `nic_rpacket_free()'
+ * @param: real_packet_size: The actual used packet size (`<= packet->rp_size') */
+PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
+nic_device_routepacket(struct nic_device const *__restrict self,
+                       /*inherit(always)*/ struct nic_rpacket *__restrict packet,
+                       size_t real_packet_size) {
+	assert(real_packet_size <= packet->rp_size);
+	/* XXX: Option to have the routing be done asynchronously! */
+	TRY {
+		nic_device_route(self, packet->rp_data, real_packet_size);
+	} EXCEPT {
+		nic_rpacket_free(packet); /* Always inherit `packet' */
+		RETHROW();
+	}
+	nic_rpacket_free(packet);
+}
+
+/* Route an incoming packet through the given NIC device. */
+PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
+nic_device_route(struct nic_device const *__restrict self,
+                 void const *__restrict packet_data,
+                 size_t packet_size) {
+	printk(KERN_DEBUG "[nic:%s] Route %Iu-byte long packet:\n%$[hex]\n",
+		   self->cd_name, packet_size, packet_size, packet_data);
+	/* TODO */
 }
 
 

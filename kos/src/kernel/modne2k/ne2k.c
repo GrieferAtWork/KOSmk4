@@ -39,6 +39,7 @@
 
 #include <kos/except/io.h>
 #include <kos/io/ne2k.h>
+#include <linux/if_ether.h>
 #include <sys/io.h>
 
 #include <assert.h>
@@ -562,7 +563,11 @@ Ne2k_HandleSendTimeout(void *__restrict arg) {
 	 * NOTE: To facilitate TX_PKSEND timeouts, we need a new NIC
 	 *       state `NE2K_STATE_TX_PKSEND_TIMEOUT' that we can set
 	 *       here in order to perform the necessary cleanup before
-	 *       resetting the device and calling `Ne2k_SwitchToIdleMode()' */
+	 *       resetting the device and calling `Ne2k_SwitchToIdleMode()'
+	 *       This is required to handle the race condition where the
+	 *       send might complete after timing out, in which case the
+	 *       interrupt handler can't be responsible for signaling
+	 *       transmit completion. */
 }
 
 
@@ -785,8 +790,136 @@ tx_switch_to_idle:
 		/* Initiate the transmission */
 		outb(E8390_CMD(me->nk_iobase), E8390_TRANS | E8390_NODMA | E8390_START);
 	} else if (state.ns_state == NE2K_STATE_RX_DNLOAD) {
-		/* TODO */
-		printk(KERN_WARNING "[ne2k] TODO: RX_DNLOAD\n");
+		for (;;) {
+			struct e8390_pkt_hdr hdr;
+			u8 cpage, npage;
+			u16 hibytes;
+			struct nic_rpacket *packet;
+			/* Signal start. */
+			outb(E8390_CMD(me->nk_iobase), E8390_PAGE1 | E8390_NODMA | E8390_START);
+			/* Stop if the current read-header is where the next package will eventually be. */
+			cpage = inb(EN1_CURPAG(me->nk_iobase));
+			npage = me->nk_rx_nxt;
+			if (cpage == npage)
+				break;
+
+			/* Read the package header. */
+			outb(E8390_CMD(me->nk_iobase), E8390_PAGE0 | E8390_NODMA | E8390_START);
+			outb(EN0_RCNTLO(me->nk_iobase), sizeof(hdr) & 0xff); /* Only read the header (for now). */
+			outb(EN0_RCNTHI(me->nk_iobase), (sizeof(hdr) >> 8) & 0xff);
+			outb(EN0_RSARLO(me->nk_iobase), 0); /* Start reading at the page base address. */
+			outb(EN0_RSARHI(me->nk_iobase), npage);
+			outb(E8390_CMD(me->nk_iobase), E8390_PAGE0 | E8390_RREAD | E8390_START); /* initiate the read. */
+			insw(NE_DATAPORT(me->nk_iobase), &hdr, sizeof(hdr) / 2);
+			if unlikely(hdr.ph_count < sizeof(hdr) + ETH_ZLEN ||
+			            hdr.ph_count > sizeof(hdr) + (ETH_FRAME_LEN + ETH_FCS_LEN)) {
+				/* Header too small (shouldn't happen) */
+				printk(KERN_WARNING "[ne2k] Received packet has a bad size (%I16u bytes)\n",
+				       hdr.ph_count);
+				++me->nd_stat.nds_rx_length_errors;
+				me->nk_rx_nxt = hdr.ph_next;
+				break;
+			}
+			/* Allocate a buffer for the packet. */
+			hdr.ph_count -= sizeof(hdr);
+			packet = nic_rpacket_alloc(hdr.ph_count);
+			/* Figure out how much to read from low/high memory. */
+			hibytes = (me->nk_rx_end - cpage) * 256;
+			if (hdr.ph_count <= hibytes) {
+				u16 used_hibytes;
+				/* Only need to read from high memory. */
+				outb(E8390_CMD(me->nk_iobase), E8390_NODMA | E8390_START);
+				used_hibytes = hdr.ph_count;
+				if (used_hibytes & 1)
+					++used_hibytes;
+				outb(EN0_RCNTLO(me->nk_iobase), used_hibytes & 0xff);
+				outb(EN0_RCNTHI(me->nk_iobase), used_hibytes >> 16);
+				outb(EN0_RSARLO(me->nk_iobase), sizeof(hdr)); /* Read data after the package header. */
+				outb(EN0_RSARHI(me->nk_iobase), npage);
+				outb(E8390_CMD(me->nk_iobase), E8390_RREAD | E8390_START); /* Initiate the read. */
+				insw(NE_DATAPORT(me->nk_iobase), packet->rp_data, hdr.ph_count / 2);
+				/* Also read the last byte. */
+				if (hdr.ph_count & 1) {
+					union {
+						u8 b[2];
+						u16 w;
+					} last;
+					last.w = inw(NE_DATAPORT(me->nk_iobase));
+					packet->rp_data[hdr.ph_count - 1] = last.b[0];
+				}
+			} else {
+				u16 lobytes;
+				u16 used_bytes;
+
+				/* Read from high memory. */
+				outb(E8390_CMD(me->nk_iobase), E8390_NODMA | E8390_START);
+				used_bytes = hibytes;
+				if (used_bytes & 1)
+					++used_bytes;
+				outb(EN0_RCNTLO(me->nk_iobase), used_bytes & 0xff);
+				outb(EN0_RCNTHI(me->nk_iobase), used_bytes >> 16);
+				outb(EN0_RSARLO(me->nk_iobase), sizeof(hdr)); /* Read data after the package header. */
+				outb(EN0_RSARHI(me->nk_iobase), npage);
+				outb(E8390_CMD(me->nk_iobase), E8390_RREAD | E8390_START); /* Initiate the read. */
+				insw(NE_DATAPORT(me->nk_iobase), packet->rp_data, hibytes / 2);
+				/* Also read the last byte. */
+				if (hibytes & 1) {
+					union {
+						u8 b[2];
+						u16 w;
+					} last;
+					last.w = inw(NE_DATAPORT(me->nk_iobase));
+					packet->rp_data[hibytes - 1] = last.b[0];
+				}
+
+				/* Read from low memory. */
+				lobytes = hdr.ph_count - hibytes;
+				outb(E8390_CMD(me->nk_iobase), E8390_NODMA | E8390_START);
+				used_bytes = lobytes;
+				if (used_bytes & 1)
+					++used_bytes;
+				outb(EN0_RCNTLO(me->nk_iobase), used_bytes & 0xff);
+				outb(EN0_RCNTHI(me->nk_iobase), used_bytes >> 16);
+				outb(EN0_RSARLO(me->nk_iobase), 0); /* Read data from the start of the receive buffer. */
+				outb(EN0_RSARHI(me->nk_iobase), me->nk_rx_start);
+				outb(E8390_CMD(me->nk_iobase), E8390_RREAD | E8390_START); /* Initiate the read. */
+				insw(NE_DATAPORT(me->nk_iobase), packet->rp_data + hibytes, lobytes / 2);
+				/* Also read the last byte. */
+				if (lobytes & 1) {
+					union {
+						u8 b[2];
+						u16 w;
+					} last;
+					last.w = inw(NE_DATAPORT(me->nk_iobase));
+					packet->rp_data[hdr.ph_count - 1] = last.b[0];
+				}
+			}
+
+			/* Update the boundary pointer. */
+			outb(E8390_CMD(me->nk_iobase), E8390_PAGE0 | E8390_NODMA | E8390_START);
+			outb(EN0_BOUNDARY(me->nk_iobase),
+			     hdr.ph_next == me->nk_rx_start ? me->nk_rx_end - 1
+			                                    : hdr.ph_next - 1);
+			me->nk_rx_nxt = hdr.ph_next;
+
+			/* Route the packet. */
+			nic_device_routepacket(me, packet, hdr.ph_count);
+		}
+		/* Clear the RX-PENDING bit. */
+		ATOMIC_FETCHAND(me->nk_state.ns_flags, ~NE2K_FLAG_RXPEND);
+		COMPILER_BARRIER();
+		/* Re-enable packet-receive interrupts */
+		outb(E8390_CMD(me->nk_iobase), E8390_PAGE0 | E8390_NODMA | E8390_START);
+		outb(EN0_ISR(me->nk_iobase), ENISR_RX | ENISR_RX_ERR);
+		outb(EN0_IMR(me->nk_iobase), ENISR_ALL);
+		COMPILER_BARRIER();
+		/* Switch the card back into IDLE-mode. */
+		while unlikely(!Ne2k_SwitchToIdleMode(me, state.ns_word)) {
+			/* This should really only happen due to REQUIO */
+			state.ns_word = ATOMIC_READ(me->nk_state.ns_word);
+			assert(state.ns_state == NE2K_STATE_RX_DNLOAD);
+		}
+		goto again;
 	}
 }
 
@@ -1093,17 +1226,23 @@ Ne2k_SetFlags(struct nic_device *__restrict self,
 	assert(!(new_flags & IFF_STATUS));
 	assert((old_flags & IFF_CONST) == (new_flags & IFF_CONST));
 	me = (Ne2kDevice *)self;
-	if unlikely(self->nd_ifflags != old_flags)
+	if unlikely(ATOMIC_READ(self->nd_ifflags) != old_flags)
 		return false;
 	/* Acquire the UIO lock. */
 	Ne2k_AcquireUIO(me);
+	if unlikely(ATOMIC_READ(self->nd_ifflags) != old_flags) {
+		Ne2k_ReleaseUIO(me);
+		return false;
+	}
 	TRY {
 		Ne2k_ApplyFlagsUnlocked(me, new_flags);
 	} EXCEPT {
 		Ne2k_ReleaseUIO(me);
 		RETHROW();
 	}
+	COMPILER_WRITE_BARRIER();
 	self->nd_ifflags = new_flags;
+	COMPILER_WRITE_BARRIER();
 	/* XXX: Register/delete HISR and ASYNC_WORKER callbacks
 	 *      on-the-fly based on the state of the `IFF_UP'-bit
 	 *      When the NIC is turned off, then  */
