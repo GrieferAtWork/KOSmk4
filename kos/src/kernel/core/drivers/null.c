@@ -31,6 +31,7 @@
 #include <kernel/vio.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
+#include <sched/cred.h>
 
 #include <hybrid/unaligned.h>
 
@@ -177,6 +178,13 @@ port_pwrite(struct character_device *__restrict UNUSED(self),
 	for (i = 0; i < num_bytes; ++i)
 		outb((port_t)(addr + i), ((u8 const *)src)[i]);
 	return num_bytes;
+}
+
+PRIVATE NONNULL((1, 2)) void KCALL
+port_open(struct character_device *__restrict UNUSED(self),
+          struct handle *__restrict UNUSED(hand)) THROWS(...) {
+	/* XXX: Maybe just restrict on a per-port basis? */
+	cred_require_hwio();
 }
 
 
@@ -408,41 +416,43 @@ urandom_mmap(struct character_device *__restrict UNUSED(self),
 
 
 
-#define INIT_DEVICE(name, mkdev, read, write, pread, pwrite, mmap, stat, poll) \
-	{                                                                          \
-		/* .cd_refcnt   = */ 1,                                                \
-		/* .cd_heapsize = */ sizeof(struct character_device),                  \
-		/* .cd_type     = */ {                                                 \
-			/* .ct_driver    = */ &drv_self,                                   \
-			/* .ct_fini      = */ NULL,                                        \
-			/* .ct_read      = */ read,                                        \
-			/* .ct_write     = */ write,                                       \
-			/* .ct_pread     = */ pread,                                       \
-			/* .ct_pwrite    = */ pwrite,                                      \
-			/* .ct_ioctl     = */ NULL,                                        \
-			/* .ct_mmap      = */ mmap,                                        \
-			/* .ct_sync      = */ NULL,                                        \
-			/* .ct_stat      = */ stat,                                        \
-			/* .ct_poll      = */ poll                                         \
-		},                                                                     \
-		/* .cd_devlink     = */ { NULL, NULL, mkdev },                         \
-		/* .cd_flags       = */ CHARACTER_DEVICE_FLAG_NORMAL,                  \
-		/* .cd_devfs_inode = */ NULL,                                          \
-		/* .cd_devfs_entry = */ NULL,                                          \
-		/* .cd_name     = */ name                                              \
+#define INIT_DEVICE(name, mkdev, read, write, pread,          \
+                    pwrite, mmap, stat, poll, open)           \
+	{                                                         \
+		/* .cd_refcnt   = */ 1,                               \
+		/* .cd_heapsize = */ sizeof(struct character_device), \
+		/* .cd_type     = */ {                                \
+			/* .ct_driver    = */ &drv_self,                  \
+			/* .ct_fini      = */ NULL,                       \
+			/* .ct_read      = */ read,                       \
+			/* .ct_write     = */ write,                      \
+			/* .ct_pread     = */ pread,                      \
+			/* .ct_pwrite    = */ pwrite,                     \
+			/* .ct_ioctl     = */ NULL,                       \
+			/* .ct_mmap      = */ mmap,                       \
+			/* .ct_sync      = */ NULL,                       \
+			/* .ct_stat      = */ stat,                       \
+			/* .ct_poll      = */ poll,                       \
+			/* .ct_open      = */ open                        \
+		},                                                    \
+		/* .cd_devlink     = */ { NULL, NULL, mkdev },        \
+		/* .cd_flags       = */ CHARACTER_DEVICE_FLAG_NORMAL, \
+		/* .cd_devfs_inode = */ NULL,                         \
+		/* .cd_devfs_entry = */ NULL,                         \
+		/* .cd_name     = */ name                             \
 	}
 
 
 PRIVATE struct character_device null_devices[] = {
-	INIT_DEVICE("mem", MKDEV(1, 1), NULL, NULL, &mem_pread, &mem_pwrite, &phys_mmap, NULL, &null_poll),
-	INIT_DEVICE("kmem", MKDEV(1, 2), NULL, NULL, &kmem_pread, &kmem_pwrite, NULL, NULL, &null_poll),
-	INIT_DEVICE("null", MKDEV(1, 3), &null_read, &null_write, &null_pread, &null_pwrite, &zero_mmap, NULL, &null_poll),
-	INIT_DEVICE("port", MKDEV(1, 4), NULL, NULL, &port_pread, &port_pwrite, PORT_MMAP_POINTER, NULL, &null_poll),
-	INIT_DEVICE("zero", MKDEV(1, 5), &zero_read, &null_write, &zero_pread, &null_pwrite, &zero_mmap, NULL, &null_poll),
-	INIT_DEVICE("full", MKDEV(1, 7), &zero_read, &full_write, &zero_pread, &full_pwrite, &zero_mmap, NULL, &null_poll),
-	INIT_DEVICE("random", MKDEV(1, 8), &random_read, NULL, &random_pread, NULL, RANDOM_MMAP_POINTER, NULL, &random_poll),
-	INIT_DEVICE("urandom", MKDEV(1, 9), &urandom_read, NULL, &urandom_pread, NULL, URANDOM_MMAP_POINTER, NULL, &urandom_poll),
-	INIT_DEVICE("kmsg", MKDEV(1, 11), NULL, &kmsg_write, NULL, NULL, NULL, NULL, &kmsg_poll),
+	INIT_DEVICE("mem", MKDEV(1, 1), NULL, NULL, &mem_pread, &mem_pwrite, &phys_mmap, NULL, &null_poll, NULL),
+	INIT_DEVICE("kmem", MKDEV(1, 2), NULL, NULL, &kmem_pread, &kmem_pwrite, NULL, NULL, &null_poll, NULL),
+	INIT_DEVICE("null", MKDEV(1, 3), &null_read, &null_write, &null_pread, &null_pwrite, &zero_mmap, NULL, &null_poll, NULL),
+	INIT_DEVICE("port", MKDEV(1, 4), NULL, NULL, &port_pread, &port_pwrite, PORT_MMAP_POINTER, NULL, &null_poll, &port_open),
+	INIT_DEVICE("zero", MKDEV(1, 5), &zero_read, &null_write, &zero_pread, &null_pwrite, &zero_mmap, NULL, &null_poll, NULL),
+	INIT_DEVICE("full", MKDEV(1, 7), &zero_read, &full_write, &zero_pread, &full_pwrite, &zero_mmap, NULL, &null_poll, NULL),
+	INIT_DEVICE("random", MKDEV(1, 8), &random_read, NULL, &random_pread, NULL, RANDOM_MMAP_POINTER, NULL, &random_poll, NULL),
+	INIT_DEVICE("urandom", MKDEV(1, 9), &urandom_read, NULL, &urandom_pread, NULL, URANDOM_MMAP_POINTER, NULL, &urandom_poll, NULL),
+	INIT_DEVICE("kmsg", MKDEV(1, 11), NULL, &kmsg_write, NULL, NULL, NULL, NULL, &kmsg_poll, NULL),
 };
 
 

@@ -32,6 +32,7 @@
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
 
 #include <hybrid/atomic.h>
 
@@ -331,6 +332,8 @@ again:
 	case HOP_PIPE_SETWRITTEN: {
 		USER CHECKED u64 *data;
 		size_t temp;
+		if ((mode & IO_ACCMODE) == IO_RDONLY)
+			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_WRITE, mode);
 		validate_writable(arg, sizeof(u64));
 		data = (USER CHECKED u64 *)arg;
 		temp = ATOMIC_READ(*(size_t *)data);
@@ -340,6 +343,7 @@ again:
 
 	case HOP_PIPE_OPEN_PIPE: {
 		struct handle temp;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_PIPE;
 		temp.h_mode = mode;
 		temp.h_data = self;
@@ -349,6 +353,7 @@ again:
 	case HOP_PIPE_CREATE_READER: {
 		struct handle temp;
 		unsigned int result;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_PIPE_READER;
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_RDONLY;
 		ATOMIC_FETCHINC(self->p_rdcnt); /* Prevent the PIPE from being closed on error */
@@ -367,6 +372,7 @@ again:
 	case HOP_PIPE_CREATE_WRITER: {
 		struct handle temp;
 		unsigned int result;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_PIPE_WRITER;
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_WRONLY;
 		ATOMIC_FETCHINC(self->p_wrcnt); /* Prevent the PIPE from being closed on error */

@@ -29,6 +29,7 @@
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
 
 #include <hybrid/atomic.h>
 
@@ -131,6 +132,7 @@ handle_driver_hop(struct driver *__restrict self,
 		struct_size = ATOMIC_READ(data->ds_struct_size);
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
+		cred_require_sysadmin();
 		COMPILER_WRITE_BARRIER();
 		data->ds_state      = hop_driver_getstate(self);
 		data->ds_flags      = hop_driver_getflags(self);
@@ -147,12 +149,15 @@ handle_driver_hop(struct driver *__restrict self,
 	}	break;
 
 	case HOP_DRIVER_GET_NAME: {
-		char const *name = driver_getname(self);
+		char const *name;
+		cred_require_sysadmin();
+		name = driver_getname(self);
 		return handle_driver_getstring0(arg, name, strlen(name) + 1);
 	}	break;
 
 	case HOP_DRIVER_GET_CMDLINE: {
 		char *cmdline, *endptr;
+		cred_require_sysadmin();
 		cmdline = self->d_cmdline;
 		endptr  = cmdline;
 		do {
@@ -164,6 +169,7 @@ handle_driver_hop(struct driver *__restrict self,
 
 	case HOP_DRIVER_GET_FILENAME: {
 		char const *filename;
+		cred_require_sysadmin();
 		filename = driver_getfilename(self);
 		if unlikely(!filename)
 			THROW(E_NO_SUCH_OBJECT);
@@ -181,6 +187,7 @@ handle_driver_hop(struct driver *__restrict self,
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
 		COMPILER_WRITE_BARRIER();
+		cred_require_sysadmin();
 		index = ATOMIC_READ(data->ds_index);
 		if unlikely(index >= (u64)self->d_argc) {
 			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS,
@@ -196,6 +203,7 @@ handle_driver_hop(struct driver *__restrict self,
 	case HOP_DRIVER_OPEN_FILE: {
 		struct handle d;
 		struct regular_node *file;
+		cred_require_sysadmin();
 		file = driver_getfile(self);
 		if unlikely(!file)
 			THROW(E_NO_SUCH_OBJECT);
@@ -215,6 +223,7 @@ handle_driver_hop(struct driver *__restrict self,
 		struct_size = ATOMIC_READ(data->dod_struct_size);
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
+		cred_require_sysadmin();
 		COMPILER_READ_BARRIER();
 		depno = data->dod_depno;
 		COMPILER_READ_BARRIER();
@@ -231,9 +240,11 @@ handle_driver_hop(struct driver *__restrict self,
 	}	break;
 
 	case HOP_DRIVER_INITIALIZE:
+		cred_require_sysadmin();
 		return driver_initialize(self);
 
 	case HOP_DRIVER_FINALIZE:
+		cred_require_sysadmin();
 		return driver_finalize(self);
 
 	default:
@@ -261,6 +272,7 @@ handle_driver_state_hop(struct driver_state *__restrict self,
 		USER CHECKED u64 *dest;
 		dest = (USER CHECKED u64 *)arg;
 		validate_writable(dest, sizeof(*dest));
+		cred_require_sysadmin();
 		ATOMIC_WRITE(*dest, (u64)self->ds_count);
 	}	break;
 
@@ -274,6 +286,7 @@ handle_driver_state_hop(struct driver_state *__restrict self,
 		struct_size = ATOMIC_READ(data->dod_struct_size);
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
+		cred_require_sysadmin();
 		COMPILER_READ_BARRIER();
 		depno = data->dod_depno;
 		COMPILER_READ_BARRIER();

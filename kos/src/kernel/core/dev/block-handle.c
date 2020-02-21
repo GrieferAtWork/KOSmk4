@@ -30,6 +30,7 @@
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
@@ -168,6 +169,7 @@ block_device_get_readahead(struct basic_block_device *__restrict self) {
 
 LOCAL NONNULL((1)) void KCALL
 block_device_set_readahead(struct basic_block_device *__restrict self, size_t value) {
+	cred_require_sysadmin();
 	/* KOS doesn't implement read-ahead on the block-device layer.
 	 * Instead, read-ahead (if at all) is only done on a per-file
 	 * basis, where we cache them in vm_datapart objects. */
@@ -194,6 +196,7 @@ block_device_get_max_sectors_per_request(struct basic_block_device *__restrict s
 
 LOCAL NONNULL((1)) void KCALL
 block_device_set_max_sectors_per_request(struct basic_block_device *__restrict self, u16 value) {
+	cred_require_sysadmin();
 	(void)self;
 	(void)value;
 	/* XXX: Implement me? */
@@ -206,6 +209,7 @@ block_device_get_sector_size(struct basic_block_device *__restrict self) {
 
 LOCAL NONNULL((1)) void KCALL
 block_device_set_sector_size(struct basic_block_device *__restrict self, size_t value) {
+	cred_require_sysadmin();
 	/* XXX: Throw some kind of error when `value != self->bd_sector_size' */
 	(void)self;
 	(void)value;
@@ -222,9 +226,13 @@ handle_blockdevice_ioctl(struct basic_block_device *__restrict self,
 	case _IOW(_IOC_TYPE(BLKROSET), _IOC_NR(BLKROSET), int): {
 		int value;
 		validate_readable(arg, sizeof(value));
-		value = *(int *)arg;
+		cred_require_sysadmin();
+		value = *(USER CHECKED int *)arg;
 		if (value)
 			ATOMIC_FETCHOR(self->bd_flags, BLOCK_DEVICE_FLAG_READONLY);
+		else {
+			ATOMIC_FETCHAND(self->bd_flags, ~BLOCK_DEVICE_FLAG_READONLY);
+		}
 	}	break;
 
 	case BLKROGET:
@@ -232,7 +240,7 @@ handle_blockdevice_ioctl(struct basic_block_device *__restrict self,
 		int retval;
 		validate_writable(arg, sizeof(retval));
 		retval = ATOMIC_READ(self->bd_flags) & BLOCK_DEVICE_FLAG_READONLY ? 1 : 0;
-		*(int *)arg = retval;
+		*(USER CHECKED int *)arg = retval;
 	}	break;
 
 	case BLKRRPART:
@@ -272,6 +280,7 @@ do_BLKGETSIZE_compat:
 
 
 	case BLKFLSBUF:
+		/*cred_require_sysadmin();*/ /* Linux does this... Why? */
 		block_device_sync(self);
 		break;
 
@@ -513,6 +522,7 @@ INTERN syscall_slong_t
 	}	break;
 
 	case HOP_BLOCKDEVICE_SYNC:
+		/*cred_require_sysadmin();*/ /* Linux does this... Why? */
 		block_device_sync(self);
 		break;
 
@@ -520,6 +530,7 @@ INTERN syscall_slong_t
 		return ATOMIC_READ(self->bd_flags) & BLOCK_DEVICE_FLAG_READONLY ? 1 : 0;
 
 	case HOP_BLOCKDEVICE_WRREADONLY:
+		cred_require_sysadmin();
 		if (arg)
 			ATOMIC_FETCHOR(self->bd_flags, BLOCK_DEVICE_FLAG_READONLY);
 		else {
@@ -534,6 +545,7 @@ INTERN syscall_slong_t
 		result_handle.h_data = self;
 		if (block_device_ispartition(self))
 			result_handle.h_data = ((struct block_device_partition *)self)->bp_master;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 	}	break;
 
@@ -551,6 +563,7 @@ INTERN syscall_slong_t
 		struct_size = ATOMIC_READ(data->bop_struct_size);
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		index = data->bop_partno;
 		COMPILER_BARRIER();
 		sync_read(&((struct block_device *)self)->bd_parts_lock);

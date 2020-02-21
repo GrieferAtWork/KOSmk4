@@ -34,6 +34,7 @@ DECL_BEGIN
 struct character_device;
 struct character_device_type;
 struct aio_multihandle;
+struct handle;
 
 struct character_device_type {
 	REF struct driver *ct_driver; /* [1..1] The associated, implementing driver. */
@@ -50,6 +51,20 @@ struct character_device_type {
 	NONNULL((1)) void (KCALL *ct_stat)(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 	/* @return: * : Set of available signals. */
 	NONNULL((1)) poll_mode_t (KCALL *ct_poll)(struct character_device *__restrict self, poll_mode_t what);
+	/* [0..1] Optional callback that is invoked when the device is opened by user-space.
+	 * @param: hand: [in|out] Upon input, this handle describes the already-initialized
+	 *                        handle that will be made available to user-space. This callback
+	 *                        is allowed to modify that handle, however it must also take care
+	 *                        to account for the fact that `hand->h_data' must contain a
+	 *                        reference both on entry and exit!
+	 * HINT: `hand' is initialized as follows upon entry:
+	 * >> hand->h_type = HANDLE_TYPE_CHARACTERDEVICE;
+	 * >> hand->h_mode = ...; // Depending on o-flags passed to open(2).
+	 * >> hand->h_data = incref(self);
+	 * NOTE: `h_data' is reference on entry (when modified, you must
+	 *       `decref_nokill(self)' and assign `incref(new_obj)') */
+	NONNULL((1, 2)) void (KCALL *ct_open)(struct character_device *__restrict self,
+	                                      struct handle *__restrict hand);
 };
 
 #define CHARACTER_DEVICE_FLAG_NORMAL  0x0000 /* Normal flags. */

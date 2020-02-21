@@ -28,6 +28,7 @@
 #include <kernel/handle.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
+#include <sched/cred.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
@@ -86,6 +87,7 @@ handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd,
 		struct_size = ATOMIC_READ(data->tj_struct_size);
 		if (struct_size != sizeof(struct hop_task_join))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_task_join), struct_size);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		COMPILER_BARRIER();
 		if (WIFEXITED(self->tp_status)) {
 			ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
@@ -119,11 +121,13 @@ again_waitfor:
 	}	break;
 
 	case HOP_TASK_GETTID:
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		return taskpid_getpid(self, THIS_PIDNS);
 
 	case HOP_TASK_GETPID: {
 		upid_t result;
 		REF struct task *thread;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -136,6 +140,7 @@ again_waitfor:
 		upid_t result;
 		REF struct task *thread;
 		REF struct task *parent;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -154,6 +159,7 @@ again_waitfor:
 		upid_t result;
 		REF struct task *thread;
 		REF struct taskpid *leader;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -168,6 +174,7 @@ again_waitfor:
 		upid_t result;
 		REF struct task *thread;
 		REF struct taskpid *leader;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -181,6 +188,7 @@ again_waitfor:
 	case HOP_TASK_OPEN_PROCESS: {
 		REF struct task *thread;
 		struct handle leader;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -194,6 +202,7 @@ again_waitfor:
 	case HOP_TASK_OPEN_PROCESS_PARENT: {
 		REF struct task *thread;
 		struct handle parent;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -210,6 +219,7 @@ again_waitfor:
 	case HOP_TASK_OPEN_PROCESS_GROUP_LEADER: {
 		REF struct task *thread;
 		struct handle leader;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -224,6 +234,7 @@ again_waitfor:
 	case HOP_TASK_OPEN_SESSION_LEADER: {
 		REF struct task *thread;
 		struct handle leader;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -237,6 +248,7 @@ again_waitfor:
 
 	case HOP_TASK_IS_PROCESS_LEADER: {
 		REF struct task *thread;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -246,6 +258,7 @@ again_waitfor:
 
 	case HOP_TASK_IS_PROCESS_GROUP_LEADER: {
 		REF struct task *thread;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -255,6 +268,7 @@ again_waitfor:
 
 	case HOP_TASK_IS_SESSION_LEADER: {
 		REF struct task *thread;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -264,6 +278,7 @@ again_waitfor:
 
 	case HOP_TASK_DETACH: {
 		REF struct task *thread;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -273,6 +288,7 @@ again_waitfor:
 
 	case HOP_TASK_DETACH_CHILDREN: {
 		REF struct task *thread;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		thread = taskpid_gettask(self);
 		if unlikely(!thread)
 			goto err_exited;
@@ -297,6 +313,7 @@ again_waitfor:
 		struct_size = ATOMIC_READ(data->tspgl_struct_size);
 		if (struct_size != sizeof(struct hop_task_setprocessgroupleader))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_task_setprocessgroupleader), struct_size);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		COMPILER_BARRIER();
 		{
 			thread = taskpid_gettask(self);
@@ -357,6 +374,7 @@ again_waitfor:
 		struct_size = ATOMIC_READ(data->tssl_struct_size);
 		if (struct_size != sizeof(struct hop_task_setsessionleader))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_task_setsessionleader), struct_size);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		COMPILER_BARRIER();
 		{
 			thread = taskpid_gettask(self);

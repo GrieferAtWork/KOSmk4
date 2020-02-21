@@ -35,47 +35,12 @@ cred_require_hwio(void) THROWS(E_INSUFFICIENT_RIGHTS) {
 }
 
 PUBLIC void KCALL
-cred_require_mount(void) THROWS(E_INSUFFICIENT_RIGHTS) {
+cred_require_hwio_r(port_t from, port_t num)
+		THROWS(E_INSUFFICIENT_RIGHTS) {
+	(void)from;
+	(void)num;
 	/* TODO */
 }
-
-PUBLIC void KCALL
-cred_require_vmread(struct vm *__restrict target_vm) THROWS(E_INSUFFICIENT_RIGHTS) {
-	(void)target_vm;
-	/* TODO */
-}
-
-PUBLIC void KCALL
-cred_require_vmwrite(struct vm *__restrict target_vm) THROWS(E_INSUFFICIENT_RIGHTS) {
-	(void)target_vm;
-	/* TODO */
-}
-
-PUBLIC void KCALL
-cred_require_resource(void) THROWS(E_INSUFFICIENT_RIGHTS) {
-	/* TODO: `CAP_SYS_RESOURCE' */
-}
-
-PUBLIC void KCALL
-cred_require_sysadmin(void) THROWS(E_INSUFFICIENT_RIGHTS) {
-	/* TODO: `CAP_SYS_ADMIN' */
-}
-
-PUBLIC void KCALL
-cred_require_driveroot(void) THROWS(E_INSUFFICIENT_RIGHTS) {
-	/* TODO */
-}
-
-PUBLIC void KCALL
-cred_require_debugtrap(void) THROWS(E_INSUFFICIENT_RIGHTS) {
-	/* Caller is allowed to trigger arbitrary debug traps */
-}
-
-PUBLIC void KCALL
-cred_require_mmap_uninitialized(void) THROWS(E_INSUFFICIENT_RIGHTS) {
-	/* Caller is allowed to use `MAP_UNINITIALIZED' */
-}
-
 
 DECL_END
 

@@ -53,15 +53,37 @@ struct vm;
 #define cred_has_sys_admin() 1
 #define cred_allow_ctty_stealing() cred_has_sys_admin()
 
-FUNDEF void KCALL cred_require_hwio(void) THROWS(E_INSUFFICIENT_RIGHTS);                               /* Caller can directly access hardware I/O. */
-FUNDEF void KCALL cred_require_mount(void) THROWS(E_INSUFFICIENT_RIGHTS);                              /* Caller can mount/umount filesystems. */
-FUNDEF void KCALL cred_require_vmread(struct vm *__restrict target_vm) THROWS(E_INSUFFICIENT_RIGHTS);  /* Caller can read from `target_vm' */
-FUNDEF void KCALL cred_require_vmwrite(struct vm *__restrict target_vm) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller can write to `target_vm' */
-FUNDEF void KCALL cred_require_resource(void) THROWS(E_INSUFFICIENT_RIGHTS); /* `CAP_SYS_RESOURCE' */
-FUNDEF void KCALL cred_require_sysadmin(void) THROWS(E_INSUFFICIENT_RIGHTS); /* `CAP_SYS_ADMIN' */
-FUNDEF void KCALL cred_require_driveroot(void) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller is allowed to change DOS drive roots */
-FUNDEF void KCALL cred_require_debugtrap(void) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller is allowed to trigger arbitrary debug traps */
-FUNDEF void KCALL cred_require_mmap_uninitialized(void) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller is allowed to use `MAP_UNINITIALIZED' */
+/* Caller can directly access hardware I/O. */
+FUNDEF void KCALL
+cred_require_hwio(void)
+		THROWS(E_INSUFFICIENT_RIGHTS);
+FUNDEF void KCALL
+cred_require_hwio_r(port_t from, port_t num)
+		THROWS(E_INSUFFICIENT_RIGHTS);
+
+/* Caller can mount/umount filesystems. */
+#define cred_require_mount() (void)0
+
+/* Caller can read from `target_vm' */
+#define cred_require_vmread(target_vm) (void)0
+
+/* Caller can write to `target_vm' */
+#define cred_require_vmwrite(target_vm) (void)0
+
+/* `CAP_SYS_RESOURCE' */
+#define cred_require_resource() (void)0
+
+/* `CAP_SYS_ADMIN' */
+#define cred_require_sysadmin() (void)0
+
+/* Caller is allowed to change DOS drive roots */
+#define cred_require_driveroot() (void)0
+
+/* Caller is allowed to trigger arbitrary debug traps */
+#define cred_require_debugtrap() (void)0
+
+/* Caller is allowed to use `MAP_UNINITIALIZED' */
+#define cred_require_mmap_uninitialized() (void)0
 
 /* TODO: Go through all system calls already defined and add credential checks where necessary. */
 /* TODO: Add credential checks for individual ksysctl() and hop() commands */

@@ -28,6 +28,7 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <sched/cpu.h>
+#include <sched/cred.h>
 #include <sched/iobm.h>
 #include <sched/task.h>
 #include <sched/tss.h>
@@ -116,6 +117,15 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 		      E_INVALID_ARGUMENT_CONTEXT_IOPERM_TURNON,
 		      turn_on);
 	}
+	/* Ensure that the caller is allowed hardware port access.
+	 * This essentially enforces that:
+	 *  - Anyone is allowed to disable (or keep enabled if also so) ports
+	 *    for which they already have access (since cred_require_hwio_r()
+	 *    returns true for ports that are set to 1 within one's own IOBM)
+	 *  - In order to enable permission for ports that aren't already
+	 *    turned on, this function is identical to `cred_require_hwio()'. */
+	cred_require_hwio_r((port_t)from, (port_t)num);
+
 	/* Manipulate the IOBM of our own thread through use of the `thiscpu_x86_iob' vector.
 	 * Access to said vector is directly granted so-long as we keep the TASK_FKEEPCORE flag set. */
 	old_thread_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FKEEPCORE);

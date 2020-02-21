@@ -31,6 +31,7 @@
 #include <kernel/user.h>
 #include <kernel/vm.h>
 #include <kernel/vm/futex.h>
+#include <sched/cred.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -239,6 +240,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 
 	case HOP_DATAPART_OPEN_DATABLOCK: {
 		struct handle hnd;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		hnd.h_type = HANDLE_TYPE_DATABLOCK;
 		hnd.h_mode = mode;
 		hnd.h_data = vm_datapart_get_datablock(self);
@@ -252,6 +254,7 @@ handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd,
 		struct hop_datablock_open_futex *data;
 		REF struct vm_futex *ftx;
 		struct handle hnd;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		validate_writable(arg, sizeof(struct hop_datablock_open_futex));
 		data        = (struct hop_datablock_open_futex *)arg;
 		struct_size = ATOMIC_READ(data->dof_struct_size);

@@ -35,6 +35,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
 #include <sched/sync.h>
 
 #include <hybrid/atomic.h>
@@ -158,11 +159,13 @@ handle_path_hop(struct path *__restrict self,
 	switch (cmd) {
 
 	case HOP_PATH_RECENT:
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		path_recent(self);
 		break;
 
 	case HOP_PATH_OPENPARENT: {
 		struct handle temp;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		if (!self->p_parent || self == ATOMIC_READ(THIS_FS->f_root))
 			THROW(E_NO_SUCH_OBJECT);
 		temp.h_type = HANDLE_TYPE_PATH;
@@ -173,6 +176,7 @@ handle_path_hop(struct path *__restrict self,
 
 	case HOP_PATH_OPENVFS: {
 		struct handle temp;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		if (self->p_vfs != ATOMIC_READ(THIS_FS->f_root))
 			THROW(E_NO_SUCH_OBJECT);
 		temp.h_type = HANDLE_TYPE_PATH;
@@ -184,6 +188,7 @@ handle_path_hop(struct path *__restrict self,
 	case HOP_PATH_OPENNODE: {
 		struct handle temp;
 		unsigned int result;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_DATABLOCK;
 		temp.h_mode = mode;
 		sync_read(self);
@@ -201,6 +206,7 @@ handle_path_hop(struct path *__restrict self,
 
 	case HOP_PATH_OPENDENTRY: {
 		struct handle temp;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
 		temp.h_mode = mode;
 		temp.h_data = self->p_dirent;

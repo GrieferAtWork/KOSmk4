@@ -25,14 +25,15 @@
 
 #include <fs/node.h>
 #include <fs/vfs.h>
-#include <kernel/personality.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/personality.h>
 #include <kernel/profiler.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
@@ -66,26 +67,33 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 	switch (command) {
 
 	case KSYSCTL_SYSTEM_CLEARCACHES:
+		cred_require_sysadmin();
 		return (syscall_slong_t)system_clearcaches();
 
 	case KSYSCTL_SYSTEM_TRIMHEAPS:
+		cred_require_sysadmin();
 		return (syscall_slong_t)system_trimheaps();
 
 	case KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS:
+		cred_require_sysadmin();
 		return (syscall_slong_t)mall_dump_leaks(GFP_NORMAL);
 
 	case KSYSCTL_SYSTEM_MEMORY_VALIDATE_PADDING:
+		cred_require_sysadmin();
 		mall_validate_padding();
 		return 0;
 
 	case KSYSCTL_SYSTEM_BRANCH_DUMP_STATS:
+		cred_require_sysadmin();
 		dump_branch_stats();
 		return 0;
 
 	case KSYSCTL_SYSCALL_GET_TRACING_ENABLED:
+		cred_require_sysadmin();
 		return syscall_tracing_getenabled() ? 1 : 0;
 
 	case KSYSCTL_SYSCALL_SET_TRACING_ENABLED:
+		cred_require_sysadmin();
 		return syscall_tracing_setenabled(arg != 0) ? 1 : 0;
 
 	case KSYSCTL_SYSCALL_GET_PERSONALITY: {
@@ -116,6 +124,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			      E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,
 			      (uintptr_t)arg);
 		}
+		cred_require_sysadmin();
 		index = kp / 8;
 		mask  = (byte_t)1 << (kp % 8);
 		if (enable) {
@@ -128,6 +137,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 
 	case KSYSCTL_DRIVER_LSMOD: {
 		struct handle temp;
+		cred_require_sysadmin();
 		temp.h_type = HANDLE_TYPE_DRIVER_STATE;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = driver_get_state();
@@ -167,6 +177,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			base = ATOMIC_READ(data->im_blob.b_base);
 			size = ATOMIC_READ(data->im_blob.b_size);
 			validate_readable(base, size);
+			cred_require_sysadmin();
 			drv = driver_insmod((byte_t *)base,
 			                    size,
 			                    commandline,
@@ -191,6 +202,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			if (temp != (uint32_t)-1)
 				driver_dentry = handle_get_directory_entry((unsigned int)temp);
 			FINALLY_XDECREF_UNLIKELY(driver_dentry);
+			cred_require_sysadmin();
 			drv = driver_insmod(ino,
 			                    driver_path,
 			                    driver_dentry,
@@ -203,6 +215,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			USER CHECKED char const *name;
 			name = ATOMIC_READ(data->im_name);
 			validate_readable(name, 1);
+			cred_require_sysadmin();
 			drv = driver_insmod(name,
 			                    commandline,
 			                    &new_driver_loaded,
@@ -257,6 +270,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			REF struct regular_node *node;
 			node = handle_get_regular_node((unsigned int)ATOMIC_READ(data->dm_file));
 			FINALLY_DECREF_UNLIKELY(node);
+			cred_require_sysadmin();
 			error = driver_delmod(node, delmod_flags);
 		}	break;
 
@@ -264,6 +278,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			USER CHECKED char const *name;
 			name = ATOMIC_READ(data->dm_name);
 			validate_readable(name, 1);
+			cred_require_sysadmin();
 			error = driver_delmod(name, delmod_flags);
 		}	break;
 
@@ -292,15 +307,18 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		case KSYSCTL_DRIVER_FORMAT_BLOB: {
 			void *addr = ATOMIC_READ(data->gm_addr);
 			COMPILER_READ_BARRIER();
+			cred_require_sysadmin();
 			drv = driver_at_address(addr);
 		}	break;
 
 		case KSYSCTL_DRIVER_FORMAT_FILE: {
 			REF struct regular_node *node;
-			unsigned int fileno = (unsigned int)ATOMIC_READ(data->gm_file);
+			unsigned int fileno;
+			fileno = (unsigned int)ATOMIC_READ(data->gm_file);
 			COMPILER_READ_BARRIER();
 			node = handle_get_regular_node(fileno);
 			FINALLY_DECREF_UNLIKELY(node);
+			cred_require_sysadmin();
 			drv = driver_with_file(node);
 		}	break;
 
@@ -309,6 +327,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			name = ATOMIC_READ(data->gm_name);
 			validate_readable(name, 1);
 			COMPILER_READ_BARRIER();
+			cred_require_sysadmin();
 			drv = name[0] == '/'
 			      ? driver_with_filename(name)
 			      : driver_with_name(name);
@@ -341,6 +360,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		struct_size = ATOMIC_READ(data->glp_struct_size);
 		if (struct_size != sizeof(struct ksysctl_driver_get_library_path))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_get_library_path), struct_size);
+		cred_require_sysadmin();
 
 		/* Read the user-space buffer address/size. */
 		COMPILER_READ_BARRIER();
@@ -383,6 +403,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		struct_size = ATOMIC_READ(data->slp_struct_size);
 		if (struct_size != sizeof(struct ksysctl_driver_set_library_path))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct ksysctl_driver_set_library_path), struct_size);
+		cred_require_sysadmin();
 		COMPILER_READ_BARRIER();
 		oldpath = data->slp_oldpath;
 		newpath = data->slp_newpath;
@@ -441,6 +462,7 @@ again_get_oldpath:
 
 	case KSYSCTL_OPEN_KERNEL_DRIVER: {
 		struct handle temp;
+		cred_require_sysadmin();
 		temp.h_type = HANDLE_TYPE_DRIVER;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &kernel_driver;
@@ -449,6 +471,7 @@ again_get_oldpath:
 
 	case KSYSCTL_OPEN_KERNEL_VFS: {
 		struct handle temp;
+		cred_require_sysadmin();
 		temp.h_type = HANDLE_TYPE_PATH;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &vfs_kernel;
@@ -457,6 +480,7 @@ again_get_oldpath:
 
 	case KSYSCTL_OPEN_KERNEL_FS: {
 		struct handle temp;
+		cred_require_sysadmin();
 		temp.h_type = HANDLE_TYPE_FS;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &fs_kernel;
@@ -465,6 +489,7 @@ again_get_oldpath:
 
 	case KSYSCTL_OPEN_KERNEL_VM: {
 		struct handle temp;
+		cred_require_sysadmin();
 		temp.h_type = HANDLE_TYPE_FS;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &vm_kernel;
@@ -473,6 +498,7 @@ again_get_oldpath:
 
 	case KSYSCTL_OPEN_ROOT_PIDNS: {
 		struct handle temp;
+		cred_require_sysadmin();
 		temp.h_type = HANDLE_TYPE_FS;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = &pidns_root;
@@ -481,6 +507,7 @@ again_get_oldpath:
 
 	case KSYSCTL_OPEN_BOOT_TASK: {
 		struct handle temp;
+		cred_require_sysadmin();
 		temp.h_type = HANDLE_TYPE_TASK;
 		temp.h_mode = IO_RDWR;
 		temp.h_data = FORTASK(&_boottask, this_taskpid);

@@ -32,6 +32,7 @@
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -726,6 +727,7 @@ handle_file_hop(struct file *__restrict self,
 
 	case HOP_FILE_OPENNODE: {
 		struct handle temp;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_DATABLOCK;
 		temp.h_mode = mode;
 		temp.h_data = self->f_node;
@@ -742,6 +744,7 @@ handle_file_hop(struct file *__restrict self,
 
 	case HOP_FILE_OPENDIR: {
 		struct handle temp;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_DATABLOCK;
 		temp.h_mode = mode;
 		temp.h_data = self->f_dir;
@@ -750,6 +753,7 @@ handle_file_hop(struct file *__restrict self,
 
 	case HOP_FILE_OPENDENTRY: {
 		struct handle temp;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
 		temp.h_mode = mode;
 		temp.h_data = self->f_dirent;

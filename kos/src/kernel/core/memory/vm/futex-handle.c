@@ -29,6 +29,7 @@
 #include <kernel/handle.h>
 #include <kernel/vm.h>
 #include <kernel/vm/futex.h>
+#include <sched/cred.h>
 
 #include <hybrid/atomic.h>
 
@@ -50,6 +51,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 	case HOP_FUTEX_OPEN_DATAPART: {
 		struct handle hnd;
 		REF struct vm_datapart *part;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		part = self->f_part.get();
 		if (!part)
 			return -EOWNERDEAD;
@@ -64,6 +66,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 		struct handle hnd;
 		REF struct vm_datablock *block;
 		REF struct vm_datapart *part;
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		part = self->f_part.get();
 		if (!part)
 			return -EOWNERDEAD;

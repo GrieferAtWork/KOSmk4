@@ -315,6 +315,21 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 	}
 	GDB_DEBUG("[gdb] vFile:open(%q, %#x, %#x)\n",
 	          filename, (unsigned int)oflags, (unsigned int)mode);
+	/* Set the I/O mode. */
+	switch (oflags & GDB_O_ACCMODE) {
+	default:
+/*	case GDB_O_RDONLY: */
+		result->h_mode = IO_RDONLY;
+		break;
+	case GDB_O_WRONLY:
+		result->h_mode = IO_WRONLY;
+		break;
+	case GDB_O_RDWR:
+		result->h_mode = IO_RDWR;
+		break;
+	}
+	if (oflags & GDB_O_APPEND)
+		result->h_mode |= IO_APPEND;
 	TRY {
 		if (oflags & GDB_O_CREAT) {
 			REF struct directory_node *result_containing_directory;
@@ -383,11 +398,11 @@ do_check_truncate:
 			COMPILER_READ_BARRIER();
 			devno = node->i_filerdev;
 			COMPILER_READ_BARRIER();
+			decref(node);
 			result->h_data = block_device_lookup(devno);
 			if unlikely(!result->h_data)
 				THROW(E_NO_DEVICE /*, E_NO_DEVICE_KIND_BLOCK_DEVICE, devno*/);
 			result->h_type = HANDLE_TYPE_BLOCKDEVICE;
-			decref(node);
 		}	break;
 
 		case S_IFCHR: {
@@ -398,12 +413,17 @@ do_check_truncate:
 			COMPILER_READ_BARRIER();
 			devno = node->i_filerdev;
 			COMPILER_READ_BARRIER();
+			decref(node);
 			cdev = character_device_lookup(devno);
 			if unlikely(!cdev)
 				THROW(E_NO_DEVICE /*, E_NO_DEVICE_KIND_CHARACTER_DEVICE, devno*/);
 			result->h_data = cdev;
 			result->h_type = HANDLE_TYPE_CHARACTERDEVICE;
-			decref(node);
+			if (cdev->cd_type.ct_open) {
+				incref(cdev);
+				FINALLY_DECREF_UNLIKELY(cdev);
+				(*cdev->cd_type.ct_open)(cdev, result);
+			}
 		}	break;
 
 		default: {
@@ -417,21 +437,6 @@ do_check_truncate:
 		error = error_as_errno(error_data());
 		return GDB_ErrnoEncode(error);
 	}
-	/* Set the I/O mode. */
-	switch (oflags & GDB_O_ACCMODE) {
-	default:
-/*	case GDB_O_RDONLY: */
-		result->h_mode = IO_RDONLY;
-		break;
-	case GDB_O_WRONLY:
-		result->h_mode = IO_WRONLY;
-		break;
-	case GDB_O_RDWR:
-		result->h_mode = IO_RDWR;
-		break;
-	}
-	if (oflags & GDB_O_APPEND)
-		result->h_mode |= IO_APPEND;
 	return 0;
 }
 

@@ -241,6 +241,7 @@ DEFINE_SYSCALL5(errno_t, fmknodat, fd_t, dirfd,
 	                 E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS);
 	fsmode = fs_getmode_for(f, flags);
 	validate_readable(nodename, 1);
+	mode &= ~ATOMIC_READ(f->f_umask);
 	VALIDATE_FLAGSET(mode, 07777 | S_IFMT,
 	                 E_INVALID_ARGUMENT_CONTEXT_MKNOD_MODE);
 	if ((mode & S_IFMT) != S_IFREG &&
@@ -1080,9 +1081,6 @@ DEFINE_SYSCALL2(errno_t, umount2,
 	struct path *p;
 	struct fs *f = THIS_FS;
 	fsmode_t fsmode;
-	/* Require mounting rights. */
-	cred_require_mount();
-
 	VALIDATE_FLAGSET(flags,
 	                 MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW,
 	                 E_INVALID_ARGUMENT_CONTEXT_UMOUNT2_FLAGS);
@@ -1103,6 +1101,8 @@ DEFINE_SYSCALL2(errno_t, umount2,
 	                         NULL);
 	{
 		FINALLY_DECREF_UNLIKELY(p);
+		/* Require mounting rights. */
+		cred_require_mount();
 		path_umount(p);
 	}
 	return -EOK;
@@ -1139,8 +1139,6 @@ DEFINE_SYSCALL5(errno_t, mount,
                 USER UNCHECKED void const *, data) {
 	struct fs *f = THIS_FS;
 	fsmode_t fsmode;
-	/* Require mounting rights. */
-	cred_require_mount();
 	fsmode = ATOMIC_READ(f->f_atflag) | FS_MODE_FIGNORE_TRAILING_SLASHES;
 	if (mountflags & MS_MOVE) {
 		REF struct path *source_path;
@@ -1159,6 +1157,8 @@ DEFINE_SYSCALL5(errno_t, mount,
 			target_path = path_traverse(f, target, NULL, NULL, fsmode, NULL);
 			{
 				FINALLY_DECREF(target_path);
+				/* Require mounting rights. */
+				cred_require_mount();
 				path_movemount(target_path,
 				               source_path,
 				               (mountflags & MS_REMOUNT) != 0);
@@ -1189,6 +1189,8 @@ DEFINE_SYSCALL5(errno_t, mount,
 			p = path_traverse(f, target, NULL, NULL, fsmode, NULL);
 			{
 				FINALLY_DECREF(p);
+				/* Require mounting rights. */
+				cred_require_mount();
 				/* Mount the directory from the other node. */
 				path_mount(p,
 				           node,
@@ -1224,6 +1226,9 @@ DEFINE_SYSCALL5(errno_t, mount,
 			super = (REF struct superblock *)incref(mp->p_mount->mp_super);
 			sync_endread(mp);
 		}
+		FINALLY_DECREF_UNLIKELY(super);
+		/* Require mounting rights. */
+		cred_require_mount();
 		do {
 			old_flags = ATOMIC_READ(super->s_flags);
 			new_flags = old_flags | SUPERBLOCK_FDOATIME;
@@ -1240,7 +1245,6 @@ DEFINE_SYSCALL5(errno_t, mount,
 			/* TODO: MS_SYNCHRONOUS */
 			/* TODO: MS_DIRSYNC */
 		} while (!ATOMIC_CMPXCH_WEAK(super->s_flags, old_flags, new_flags));
-		decref(super);
 	} else {
 		struct superblock_type *type;
 		REF struct path *mount_location;
@@ -1267,6 +1271,8 @@ DEFINE_SYSCALL5(errno_t, mount,
 		                                      fsmode,
 		                                      NULL);
 		FINALLY_DECREF_UNLIKELY(mount_location);
+		/* Require mounting rights. */
+		cred_require_mount();
 		super_flags = SUPERBLOCK_FDOATIME;
 		if (mountflags & MS_NOATIME)
 			super_flags &= ~SUPERBLOCK_FDOATIME;
@@ -1992,6 +1998,7 @@ openat_create_follow_symlink_dynamic_impl(struct fs *__restrict f,
 		*presult_containing_directory = new_result_containing_directory;
 
 		/* Repeat the create() function with the symlink's dereferenced text. */
+		/* TODO: Permission checks */
 		new_result_inode = directory_creatfile(new_result_containing_directory,
 		                                       last_seg,
 		                                       last_seglen,
@@ -2193,6 +2200,7 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 					TRY {
 						bool was_newly_created;
 						/* Create/open an existing INode within the associated directory. */
+						/* TODO: Permission checks */
 						result_inode = directory_creatfile(result_containing_directory,
 						                                   last_seg,
 						                                   last_seglen,
@@ -2237,6 +2245,7 @@ check_result_inode_for_symlink:
 									result_containing_directory = new_result_containing_directory;
 
 									/* Repeat the create() function with the symlink's dereferenced text. */
+									/* TODO: Permission checks */
 									new_result_inode = directory_creatfile(result_containing_directory,
 									                                       last_seg,
 									                                       last_seglen,
@@ -2365,8 +2374,18 @@ check_result_inode_for_symlink:
 				if (!(oflags & O_NOCTTY) && character_device_isattybase(cdev) &&
 				    ((struct ttybase_device *)cdev)->t_cproc.m_pointer == NULL)
 					ttybase_device_setctty((struct ttybase_device *)cdev);
-				result_handle.h_data = cdev;
+				result_handle.h_data = cdev; /* Inherit reference. */
 				result_handle.h_type = HANDLE_TYPE_CHARACTERDEVICE;
+				/* Allow custom callbacks during open(2) */
+				if unlikely(cdev->cd_type.ct_open) {
+					/* Keep an additional reference around during the callbacks
+					 * This is to ensure that the device doesn't get destroyed
+					 * from within one of its own callbacks in the event that
+					 * the callback chooses to replace the handle data pointer. */
+					incref(cdev);
+					FINALLY_DECREF_UNLIKELY(cdev);
+					(*cdev->cd_type.ct_open)(cdev, &result_handle);
+				}
 				decref(result_inode);
 				decref(result_containing_path);
 				decref(result_containing_directory);

@@ -32,6 +32,7 @@
 #include <kernel/user.h>
 #include <kernel/vm.h>
 #include <kernel/vm/futex.h>
+#include <sched/cred.h>
 
 #include <hybrid/atomic.h>
 
@@ -210,29 +211,35 @@ again:
 	num_dpages = vm_datapart_numdpages(self);
 	st->ds_part_mapped_pages += num_dpages;
 	switch (ATOMIC_READ(self->dp_state)) {
+
 	case VM_DATAPART_STATE_INCORE:
 		++st->ds_part_st_incore;
 		st->ds_part_st_incore_pages += num_dpages;
 do_track_ramblocks:
 		if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0)
 			++st->ds_part_ram_blocks;
-		else
+		else {
 			st->ds_part_ram_blocks += ATOMIC_READ(self->dp_ramdata.rd_blockc);
+		}
 		break;
+
 	case VM_DATAPART_STATE_LOCKED:
 		++st->ds_part_st_locked;
 		st->ds_part_st_locked_pages += num_dpages;
 		goto do_track_ramblocks;
+
 #ifndef CONFIG_NO_SWAP
 	case VM_DATAPART_STATE_INSWAP:
 		++st->ds_part_st_inswap;
 		st->ds_part_st_inswap_pages += num_dpages;
 		if (self->dp_swpdata.sd_blockv == &self->dp_swpdata.sd_block0)
 			++st->ds_part_swap_blocks;
-		else
+		else {
 			st->ds_part_swap_blocks += ATOMIC_READ(self->dp_swpdata.sd_blockc);
+		}
 		break;
 #endif /* !CONFIG_NO_SWAP */
+
 	default: break;
 	}
 	flags = ATOMIC_READ(self->dp_flags);
@@ -248,17 +255,22 @@ do_track_ramblocks:
 		uintptr_t page_state;
 		page_state = vm_datapart_getstate(self, i);
 		switch (page_state) {
+
 		case VM_DATAPART_PPP_UNINITIALIZED:
 			++st->ds_part_uninit_pages;
 			break;
+
 		case VM_DATAPART_PPP_INITIALIZING:
 			break;
+
 		case VM_DATAPART_PPP_INITIALIZED:
 			++st->ds_part_init_pages;
 			break;
+
 		case VM_DATAPART_PPP_HASCHANGED:
 			++st->ds_part_changed_pages;
 			break;
+
 		default: __builtin_unreachable();
 		}
 	}
@@ -301,7 +313,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 #ifdef CONFIG_VIO
 		if (self->db_vio)
 			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_ISVIO;
-#endif
+#endif /* CONFIG_VIO */
 		if (self->db_type->dt_initpart)
 			st.ds_features |= HOP_DATABLOCK_STAT_FEATURE_INIT;
 		if (self->db_type->dt_loadpart)
@@ -374,11 +386,13 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 	}	break;
 
 	case HOP_DATABLOCK_ANONYMIZE:
+		cred_require_sysadmin();
 		validate_writable(arg, sizeof(int));
 		*(int *)arg = vm_datablock_anonymize(self) ? 1 : 0;
 		break;
 
 	case HOP_DATABLOCK_DEANONYMIZE:
+		cred_require_sysadmin();
 		validate_writable(arg, sizeof(int));
 		*(int *)arg = vm_datablock_deanonymize(self) ? 1 : 0;
 		break;
@@ -394,6 +408,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct_size = ATOMIC_READ(data->dop_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_openpart))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_openpart), struct_size);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		part = cmd == HOP_DATABLOCK_OPEN_PART_EXACT
 		       ? vm_paged_datablock_locatepart_exact(self,
 		                                       (vm_vpage64_t)data->dop_pageno,
@@ -441,6 +456,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct_size = ATOMIC_READ(data->dof_struct_size);
 		if (struct_size != sizeof(struct hop_datablock_open_futex))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_open_futex), struct_size);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		if (cmd == HOP_DATABLOCK_OPEN_FUTEX_EXISTING) {
 			ftx = vm_datablock_getfutex_existing(self, (pos_t)data->dof_address);
 			if (!ftx)
@@ -464,6 +480,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_INODE,
 			      0);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		result_handle.h_mode = mode;
 		result_handle.h_type = HANDLE_TYPE_DATABLOCK;
 		result_handle.h_data = ((struct inode *)self)->i_super;
@@ -485,6 +502,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct_size = ATOMIC_READ(data->icm_struct_size);
 		if (struct_size != sizeof(struct hop_inode_chmod))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_inode_chmod), struct_size);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		data->icm_perm_old = inode_chmod((struct inode *)self,
 		                                 ATOMIC_READ(data->icm_perm_mask),
 		                                 ATOMIC_READ(data->icm_perm_flag));
@@ -507,6 +525,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		struct_size = ATOMIC_READ(data->ico_struct_size);
 		if (struct_size != sizeof(struct hop_inode_chown))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_inode_chown), struct_size);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		inode_chown((struct inode *)self,
 		            (uid_t)ATOMIC_READ(data->ico_newowner),
 		            (gid_t)ATOMIC_READ(data->ico_newgroup),
@@ -547,14 +566,17 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		VALIDATE_FLAGSET(openflags,
 		                 HOP_DIRECTORY_OPENNODE_FNOCASE,
 		                 E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_OPENNODE_FLAGS);
-		hash       = directory_entry_hash(name, namelen);
+		hash = directory_entry_hash(name, namelen);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		child_node = openflags & HOP_DIRECTORY_OPENNODE_FNOCASE
 		             ? directory_getcasenode((struct directory_node *)self, name, namelen, hash, &child_entry)
 		             : directory_getnode((struct directory_node *)self, name, namelen, hash, &child_entry);
 		if unlikely(!child_node)
 			THROW(E_FSERROR_FILE_NOT_FOUND);
-		TRY {
+		{
 			struct hop_openfd *fd;
+			FINALLY_DECREF(child_entry);
+			FINALLY_DECREF(child_node);
 			/* Install handles for objects that the caller wants to open */
 			fd = ATOMIC_READ(data->don_node);
 			if (fd) {
@@ -570,13 +592,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
 			}
-		} EXCEPT {
-			decref(child_entry);
-			decref(child_node);
-			RETHROW();
 		}
-		decref(child_entry);
-		decref(child_node);
 	}	break;
 
 	case HOP_DIRECTORY_CREATFILE: {
@@ -622,6 +638,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			newfile_owner = fs_getuid(THIS_FS);
 		if (newfile_group == (gid_t)-1)
 			newfile_group = fs_getgid(THIS_FS);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		child_node = directory_creatfile((struct directory_node *)self,
 		                                 name,
 		                                 namelen,
@@ -631,8 +648,10 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		                                 newfile_mode & ~ATOMIC_READ(THIS_FS->f_umask),
 		                                 &child_entry,
 		                                 &was_newly_created);
-		TRY {
+		{
 			struct hop_openfd *fd;
+			FINALLY_DECREF(child_entry);
+			FINALLY_DECREF(child_node);
 			ATOMIC_WRITE(data->dcf_status, was_newly_created
 			                               ? HOP_DIRECTORY_CREATFILE_STATUS_CREATED_NEW
 			                               : HOP_DIRECTORY_CREATFILE_STATUS_ALREADY_EXISTED);
@@ -651,13 +670,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
 			}
-		} EXCEPT {
-			decref(child_entry);
-			decref(child_node);
-			RETHROW();
 		}
-		decref(child_entry);
-		decref(child_node);
 	}	break;
 
 	case HOP_DIRECTORY_REMOVE: {
@@ -707,18 +720,21 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      HOP_DIRECTORY_REMOVE_FLAG_REGULAR | HOP_DIRECTORY_REMOVE_FLAG_DIRECTORY,
 			      0);
 		}
-		hash          = directory_entry_hash(name, namelen);
+		hash = directory_entry_hash(name, namelen);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		remove_status = directory_remove((struct directory_node *)self,
 		                                 name,
 		                                 namelen,
 		                                 hash,
-		                                 remove_mode | DIRECTORY_REMOVE_FCHKACCESS,
+		                                 remove_mode,
 		                                 &child_node,
 		                                 &child_entry,
 		                                 NULL,
 		                                 NULL);
-		TRY {
+		{
 			struct hop_openfd *fd;
+			FINALLY_DECREF(child_entry);
+			FINALLY_DECREF(child_node);
 			/* Install handles for objects that the caller wants to open */
 			ATOMIC_WRITE(data->drm_status, (u16)remove_status);
 			fd = ATOMIC_READ(data->drm_node);
@@ -735,13 +751,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
 			}
-		} EXCEPT {
-			decref(child_entry);
-			decref(child_node);
-			RETHROW();
 		}
-		decref(child_entry);
-		decref(child_node);
 	}	break;
 
 
@@ -791,7 +801,9 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		} else {
 			target_dir = handle_get_directory_node(dstdir);
 		}
-		TRY {
+		{
+			FINALLY_DECREF(target_dir);
+			cred_require_sysadmin(); /* TODO: More finely grained access! */
 			directory_rename((struct directory_node *)self,
 			                 srcname,
 			                 srcnamelen,
@@ -799,20 +811,20 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			                 target_dir,
 			                 dstname,
 			                 dstnamelen,
-			                 rename_mode | DIRECTORY_RENAME_FCHKACCESS,
+			                 rename_mode,
 			                 &srcchild_entry,
 			                 &dstchild_entry,
 			                 &srcchild_node,
 			                 &dstchild_node,
 			                 NULL,
 			                 NULL);
-		} EXCEPT {
-			decref(target_dir);
-			RETHROW();
 		}
-		decref(target_dir);
-		TRY {
+		{
 			struct hop_openfd *fd;
+			FINALLY_DECREF(srcchild_entry);
+			FINALLY_DECREF(dstchild_entry);
+			FINALLY_DECREF(srcchild_node);
+			FINALLY_DECREF(dstchild_node);
 			/* Install handles for objects that the caller wants to open */
 			if ((fd = ATOMIC_READ(data->drn_srcnode)) != NULL) {
 				temp.h_type = HANDLE_TYPE_DATABLOCK;
@@ -838,17 +850,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 				temp.h_data = dstchild_entry;
 				handle_installhop(fd, temp);
 			}
-		} EXCEPT {
-			decref(srcchild_entry);
-			decref(dstchild_entry);
-			decref(srcchild_node);
-			decref(dstchild_node);
-			RETHROW();
 		}
-		decref(srcchild_entry);
-		decref(dstchild_entry);
-		decref(srcchild_node);
-		decref(dstchild_node);
 	}	break;
 
 	case HOP_DIRECTORY_LINK: {
@@ -886,20 +888,19 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		                 HOP_DIRECTORY_LINK_FNOCASE,
 		                 E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_LINK_FLAGS);
 		link_node = handle_get_inode(link_nodefd);
-		TRY {
+		{
+			FINALLY_DECREF(link_node);
+			cred_require_sysadmin(); /* TODO: More finely grained access! */
 			directory_link((struct directory_node *)self,
 			               name,
 			               namelen,
 			               link_node,
 			               link_mode,
 			               &child_entry);
-		} EXCEPT {
-			decref(link_node);
-			RETHROW();
 		}
-		decref(link_node);
-		TRY {
+		{
 			struct hop_openfd *fd;
+			FINALLY_DECREF(child_entry);
 			/* Install handles for objects that the caller wants to open */
 			if ((fd = ATOMIC_READ(data->dli_dent)) != NULL) {
 				temp.h_type = HANDLE_TYPE_DIRECTORYENTRY;
@@ -907,11 +908,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
 			}
-		} EXCEPT {
-			decref(child_entry);
-			RETHROW();
 		}
-		decref(child_entry);
 	}	break;
 
 	case HOP_DIRECTORY_SYMLINK: {
@@ -963,6 +960,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			symlink_owner = fs_getuid(THIS_FS);
 		if (symlink_group == (gid_t)-1)
 			symlink_group = fs_getgid(THIS_FS);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		child_node = directory_symlink((struct directory_node *)self,
 		                               name,
 		                               namelen,
@@ -973,8 +971,10 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		                               symlink_mode,
 		                               symlink_createmode,
 		                               &child_entry);
-		TRY {
+		{
 			struct hop_openfd *fd;
+			FINALLY_DECREF(child_entry);
+			FINALLY_DECREF(child_node);
 			/* Install handles for objects that the caller wants to open */
 			if ((fd = ATOMIC_READ(data->dsl_node)) != NULL) {
 				temp.h_type = HANDLE_TYPE_DATABLOCK;
@@ -988,13 +988,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
 			}
-		} EXCEPT {
-			decref(child_node);
-			decref(child_entry);
-			RETHROW();
 		}
-		decref(child_node);
-		decref(child_entry);
 	}	break;
 
 	case HOP_DIRECTORY_MKNOD: {
@@ -1034,6 +1028,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		mknod_dev     = (dev_t)data->dmn_device;
 		COMPILER_READ_BARRIER();
 		validate_readable(name, namelen);
+		newfile_mode &= ~ATOMIC_READ(THIS_FS->f_umask);
 		VALIDATE_FLAGSET(mknod_mode,
 		                 HOP_DIRECTORY_MKNOD_FNOCASE,
 		                 E_INVALID_ARGUMENT_CONTEXT_HOP_DIRECTORY_MKNOD_FLAGS);
@@ -1051,17 +1046,20 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			newfile_owner = fs_getuid(THIS_FS);
 		if (newfile_group == (gid_t)-1)
 			newfile_group = fs_getgid(THIS_FS);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		child_node = directory_mknod((struct directory_node *)self,
 		                             name,
 		                             namelen,
-		                             newfile_mode & ~ATOMIC_READ(THIS_FS->f_umask),
+		                             newfile_mode,
 		                             newfile_owner,
 		                             newfile_group,
 		                             mknod_dev,
 		                             mknod_mode,
 		                             &child_entry);
-		TRY {
+		{
 			struct hop_openfd *fd;
+			FINALLY_DECREF(child_entry);
+			FINALLY_DECREF(child_node);
 			/* Install handles for objects that the caller wants to open */
 			if ((fd = ATOMIC_READ(data->dmn_node)) != NULL) {
 				temp.h_type = HANDLE_TYPE_DATABLOCK;
@@ -1075,13 +1073,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 				temp.h_data = child_entry;
 				handle_installhop(fd, temp);
 			}
-		} EXCEPT {
-			decref(child_entry);
-			decref(child_node);
-			RETHROW();
 		}
-		decref(child_entry);
-		decref(child_node);
 	}	break;
 
 	case HOP_DIRECTORY_MKDIR: {
@@ -1128,6 +1120,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			newfile_owner = fs_getuid(THIS_FS);
 		if (newfile_group == (gid_t)-1)
 			newfile_group = fs_getgid(THIS_FS);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		child_node = directory_mkdir((struct directory_node *)self,
 		                             name,
 		                             namelen,
@@ -1136,8 +1129,10 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		                             newfile_group,
 		                             mkdir_mode,
 		                             &child_entry);
-		TRY {
+		{
 			struct hop_openfd *fd;
+			FINALLY_DECREF(child_entry);
+			FINALLY_DECREF(child_node);
 			/* Install handles for objects that the caller wants to open */
 			if ((fd = ATOMIC_READ(data->dmd_node)) != NULL) {
 				temp.h_type = HANDLE_TYPE_DATABLOCK;
@@ -1152,13 +1147,6 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 				handle_installhop(fd, temp);
 			}
 		}
-		EXCEPT {
-			decref(child_entry);
-			decref(child_node);
-			RETHROW();
-		}
-		decref(child_entry);
-		decref(child_node);
 	}	break;
 
 	case HOP_SUPERBLOCK_OPEN_BLOCKDEVICE: {
@@ -1170,6 +1158,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
 			      0);
+		cred_require_sysadmin(); /* TODO: More finely grained access! */
 		result_handle.h_data = ((struct superblock *)self)->s_device;
 		if (!result_handle.h_data)
 			THROW(E_NO_SUCH_BLOCKDEVICE);
@@ -1187,6 +1176,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0,
 			      HANDLE_TYPEKIND_DATABLOCK_SUPERBLOCK,
 			      0);
+		cred_require_sysadmin();
 		result_handle.h_type = HANDLE_TYPE_DRIVER;
 		result_handle.h_mode = mode;
 		result_handle.h_data = ((struct superblock *)self)->s_driver;
