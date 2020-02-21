@@ -17,41 +17,45 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_NETWORK_ARP_H
-#define GUARD_KERNEL_INCLUDE_NETWORK_ARP_H 1
+#ifndef GUARD_KERNEL_SRC_NETWORK_IP_C
+#define GUARD_KERNEL_SRC_NETWORK_IP_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <dev/nic.h>
-#include <kernel/types.h>
+#include <kernel/printk.h>
+
+#include <bits/in.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <network/ip.h>
+
+#include <assert.h>
+#include <inttypes.h>
+#include <string.h>
 
 DECL_BEGIN
 
-#ifdef __CC__
+/* Route a given IP packet.
+ * @assume(packet_size >= 20); */
+PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
+ip_routepacket(struct nic_device *__restrict dev,
+               void const *__restrict packet_data,
+               size_t packet_size) {
+	struct iphdr *hdr;
+	assert(packet_size >= 20);
+	hdr = (struct iphdr *)packet_data;
 
-/* Route an ARP packet.
- * @assume(packet_size >= 8); */
-FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
-arp_routepacket(struct nic_device *__restrict dev,
-                void const *__restrict packet_data,
-                size_t packet_size);
+	/* TODO */
 
-/* Construct and return a mac address request packet.
- * NOTE: The caller should also make use of `network_peers_requireip()'
- *       to ensure that the associated network peer descriptor has been
- *       allocated, and that its MAC field will be filled in once the
- *       named device responds back to the given NIC. */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
-arp_makemacrequest(struct nic_device *__restrict dev, be32 ip);
+	(void)hdr;
+	(void)dev;
+	(void)packet_data;
+	(void)packet_size;
+}
 
-/* TODO: Implement IP support */
-/* TODO: Implement UDP support */
-/* TODO: Implement DHCP support */
-/* TODO: Use DHCP to automatically configure `nic_addresses::na_ip' the
- *       first time that we need our own IP address for some protocol. */
-
-#endif /* __CC__ */
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_NETWORK_ARP_H */
+#endif /* !GUARD_KERNEL_SRC_NETWORK_IP_C */

@@ -27,9 +27,10 @@
 #include <kernel/printk.h>
 
 #include <linux/if_ether.h>
+#include <netinet/in.h>
 #include <network/arp.h>
 #include <network/ethernet.h>
-#include <netinet/in.h>
+#include <network/ip.h>
 
 #include <assert.h>
 #include <string.h>
@@ -49,6 +50,10 @@ eth_routepacket(struct nic_device *__restrict self,
 #endif
 	hdr = (struct ethhdr *)packet_data;
 	switch (ntohs(hdr->h_proto)) {
+
+	case ETH_P_IP:
+		ip_routepacket(self, hdr + 1, packet_size - sizeof(*hdr));
+		break;
 
 	case ETH_P_ARP:
 		arp_routepacket(self, hdr + 1, packet_size - sizeof(*hdr));

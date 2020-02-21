@@ -147,9 +147,10 @@ __SYSDECL_BEGIN
 #define __OFFSET_ETHHDR_SOURCE 6
 #define __OFFSET_ETHHDR_PROTO  12
 #define __SIZEOF_ETHHDR        14
+#define __ALIGNOF_ETHHDR       2
 #ifdef __CC__
 /* This is an Ethernet frame header. */
-struct __ATTR_PACKED ethhdr /*[PREFIX(h_)]*/ {
+struct __ATTR_PACKED __ATTR_ALIGNED(2) ethhdr /*[PREFIX(h_)]*/ {
 	unsigned char h_dest[ETH_ALEN];   /* Destination eth addr. */
 	unsigned char h_source[ETH_ALEN]; /* Source ether addr. */
 	__u_net16_t   h_proto;            /* Packet type ID field. (one of `ETH_P_*') */

@@ -247,7 +247,8 @@ struct nic_rpacket {
 
 /* Allocate a buffer for a routable NIC packet for use with `nic_device_routepacket()'
  * @param: max_packet_size: The max packet size that the returned buffer must be able to hold.
- *                          The guaranty here is that: `return->rp_size >= max_packet_size' */
+ *                          The guaranty here is that: `return->rp_size >= max_packet_size'
+ *                          NOTE: Must be at least `ETH_ZLEN' */
 FUNDEF ATTR_RETNONNULL struct nic_rpacket *KCALL
 nic_rpacket_alloc(size_t max_packet_size) THROWS(E_BADALLOC);
 
@@ -259,7 +260,8 @@ FUNDEF NOBLOCK void NOTHROW(KCALL nic_rpacket_free)(struct nic_rpacket *__restri
  * or asynchronously (i.e. at some future point in time by some other thread)
  * If the caller _needs_ routing to be performed immediately, they should instead
  * make use of `eth_routepacket()', followed by `nic_rpacket_free()'
- * @param: real_packet_size: The actual used packet size (`<= packet->rp_size') */
+ * @param: real_packet_size: The actual used packet size (`<= packet->rp_size')
+ *                     NOTE: The caller must ensure that this is at least `ETH_ZLEN' */
 FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
 nic_device_routepacket(struct nic_device *__restrict self,
                        /*inherit(always)*/ struct nic_rpacket *__restrict packet,

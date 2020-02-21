@@ -393,6 +393,7 @@ local files = {
 	"../../include/kos/ksysctl.h",
 	"../../include/linux/if_arp.h",
 	"../../include/linux/if_ether.h",
+	"../../include/netinet/ip.h",
 };
 
 local include_prefixes = {
@@ -1725,6 +1726,7 @@ STATIC_ASSERT(offsetof(struct arphdr, ar_hrd) == __OFFSET_ARPHDR_HRD);
 STATIC_ASSERT(offsetof(struct arphdr, ar_op) == __OFFSET_ARPHDR_OP);
 STATIC_ASSERT(offsetof(struct arphdr, ar_pln) == __OFFSET_ARPHDR_PLN);
 STATIC_ASSERT(offsetof(struct arphdr, ar_pro) == __OFFSET_ARPHDR_PRO);
+STATIC_ASSERT(alignof(struct arphdr) == __ALIGNOF_ARPHDR);
 
 /* struct arpreq */
 /* ... */
@@ -1743,6 +1745,35 @@ STATIC_ASSERT(offsetof(struct ethhdr, h_dest) == __OFFSET_ETHHDR_DEST);
 STATIC_ASSERT(offsetof(struct ethhdr, h_proto) == __OFFSET_ETHHDR_PROTO);
 STATIC_ASSERT(offsetof(struct ethhdr, h_source) == __OFFSET_ETHHDR_SOURCE);
 STATIC_ASSERT(sizeof(struct ethhdr) == __SIZEOF_ETHHDR);
+STATIC_ASSERT(alignof(struct ethhdr) == __ALIGNOF_ETHHDR);
+
+
+
+
+
+#include <netinet/ip.h>
+
+/* struct timestamp */
+/* ... */
+
+/* struct iphdr */
+STATIC_ASSERT(offsetof(struct iphdr, ip_dst) == __OFFSET_IPHDR_DST);
+STATIC_ASSERT(offsetof(struct iphdr, ip_id) == __OFFSET_IPHDR_ID);
+STATIC_ASSERT(offsetof(struct iphdr, ip_len) == __OFFSET_IPHDR_LEN);
+STATIC_ASSERT(offsetof(struct iphdr, ip_off) == __OFFSET_IPHDR_OFF);
+STATIC_ASSERT(offsetof(struct iphdr, ip_p) == __OFFSET_IPHDR_P);
+STATIC_ASSERT(offsetof(struct iphdr, ip_src) == __OFFSET_IPHDR_SRC);
+STATIC_ASSERT(offsetof(struct iphdr, ip_sum) == __OFFSET_IPHDR_SUM);
+STATIC_ASSERT(offsetof(struct iphdr, ip_tos) == __OFFSET_IPHDR_TOS);
+STATIC_ASSERT(offsetof(struct iphdr, ip_ttl) == __OFFSET_IPHDR_TTL);
+STATIC_ASSERT(sizeof(struct iphdr) == __SIZEOF_IPHDR);
+STATIC_ASSERT(alignof(struct iphdr) == __ALIGNOF_IPHDR);
+
+/* struct ip */
+/* ... */
+
+/* struct ip_timestamp */
+/* ... */
 //[[[end]]]
 
 

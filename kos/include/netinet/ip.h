@@ -41,6 +41,7 @@
 
 #include <hybrid/__byteorder.h>
 
+#include <bits/in.h>
 #include <bits/types.h>
 #include <net/types.h>
 
@@ -53,7 +54,7 @@ __DECL_BEGIN
 
 #ifdef __CC__
 #ifndef __USE_KOS_PURE /* The same structure as `struct ip_timestamp' */
-struct timestamp {
+struct __ATTR_PACKED __ATTR_ALIGNED(4) timestamp {
 	__uint8_t    len;
 	__uint8_t    ptr;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -66,8 +67,22 @@ struct timestamp {
 	__uint32_t   data[9];
 };
 #endif /* !__USE_KOS_PURE */
+#endif /* __CC__ */
 
-struct iphdr {
+
+#define __OFFSET_IPHDR_TOS 1
+#define __OFFSET_IPHDR_LEN 2
+#define __OFFSET_IPHDR_ID  4
+#define __OFFSET_IPHDR_OFF 6
+#define __OFFSET_IPHDR_TTL 8
+#define __OFFSET_IPHDR_P   9
+#define __OFFSET_IPHDR_SUM 10
+#define __OFFSET_IPHDR_SRC 12
+#define __OFFSET_IPHDR_DST 16
+#define __SIZEOF_IPHDR     20
+#define __ALIGNOF_IPHDR    4
+#ifdef __CC__
+struct __ATTR_PACKED __ATTR_ALIGNED(4) iphdr /*[PREFIX(ip_)]*/ {
 #ifdef __USE_KOS_PURE
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int   ip_hl : 4; /* header length */
@@ -221,7 +236,7 @@ struct iphdr {
 #ifdef __CC__
 
 #ifndef __USE_KOS_PURE /* The same structure as `struct iphdr' */
-struct ip {
+struct __ATTR_PACKED __ATTR_ALIGNED(4) ip {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int   ip_hl : 4; /* header length */
 	unsigned int   ip_v : 4;  /* version */
@@ -244,7 +259,7 @@ struct ip {
 
 /* Time stamp option structure. */
 #ifdef __CC__
-struct ip_timestamp {
+struct __ATTR_PACKED __ATTR_ALIGNED(4) ip_timestamp {
 	__uint8_t    ipt_code;     /* IPOPT_TS */
 	__uint8_t    ipt_len;      /* size of structure (variable) */
 	__uint8_t    ipt_ptr;      /* index of current entry */

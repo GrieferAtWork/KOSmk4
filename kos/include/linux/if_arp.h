@@ -167,8 +167,9 @@ __SYSDECL_BEGIN
 #define __OFFSET_ARPHDR_HLN 4
 #define __OFFSET_ARPHDR_PLN 5
 #define __OFFSET_ARPHDR_OP  6
+#define __ALIGNOF_ARPHDR    2
 #ifdef __CC__
-struct arphdr /*[PREFIX(ar_)]*/ {
+struct __ATTR_PACKED __ATTR_ALIGNED(2) arphdr /*[PREFIX(ar_)]*/ {
 	__u_net16_t ar_hrd; /* format of hardware address. (One of `ARPHRD_*') */
 	__u_net16_t ar_pro; /* format of protocol address. (One of `ETH_P_*' from <linux/if_ether.h> for `ARPHRD_ETHER') */
 	__uint8_t   ar_hln; /* length of hardware address (in bytes). */

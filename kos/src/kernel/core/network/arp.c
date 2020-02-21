@@ -97,7 +97,7 @@ arp_reply_myip(struct nic_device *__restrict dev,
 
 
 /* Route an ARP packet.
- * @assume(packet_size >= 8) */
+ * @assume(packet_size >= 8); */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
 arp_routepacket(struct nic_device *__restrict dev,
               void const *__restrict packet_data,
@@ -128,7 +128,7 @@ arp_routepacket(struct nic_device *__restrict dev,
 			if (ahdr->ar_pln != sizeof(struct in_addr))
 				return; /* IPv4 addresses are 4-byte long */
 			/* Who has <IP:ar_tip>? Tell <IP:ar_sip,MAC:ar_sha> */
-			hdr = (struct arphdr_ether_in *)ahdr;
+			hdr = (struct arphdr_ether_in *)packet_data;
 			/* Check if this is our ip... */
 			if (hdr->ar_tip.s_addr == dev->nd_addr.na_ip &&
 			    dev->nd_addr.na_flags & NIC_ADDR_HAVE_IP)
@@ -143,7 +143,7 @@ arp_routepacket(struct nic_device *__restrict dev,
 			struct net_peeraddr *peer;
 			if (ahdr->ar_pln != sizeof(struct in_addr))
 				return; /* IPv4 addresses are 4-byte long */
-			hdr = (struct arphdr_ether_in *)ahdr;
+			hdr = (struct arphdr_ether_in *)packet_data;
 			/* Check if we've asked who this is in the past. */
 			peers = dev->nd_net.n_peers.get();
 			peer  = net_peeraddrs_lookup_ip(peers, hdr->ar_sip.s_addr);
