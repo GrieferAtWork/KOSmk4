@@ -59,7 +59,9 @@ __SYSDECL_BEGIN
 
 
 /* Some internals from deep down in the kernel. */
+#ifndef MAX_ADDR_LEN
 #define MAX_ADDR_LEN 7
+#endif /* !MAX_ADDR_LEN */
 
 /* This header defines a different name for this one... */
 #define ARPHRD_IEEE802154_PHY ARPHRD_IEEE802154_MONITOR

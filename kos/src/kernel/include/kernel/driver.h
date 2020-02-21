@@ -794,7 +794,7 @@ FUNDEF NOBLOCK size_t NOTHROW(KCALL system_trimheaps)(void);
 #ifndef DEFINE_SYSTEM_CACHE_CLEAR
 /* >> NOBLOCK size_t NOTHROW(KCALL func)(void);
  * Define a function that should be called when `system_clearcaches()' is invoked. */
-#define DEFINE_SYSTEM_CACHE_CLEAR(func)  DEFINE_CALLBACK(".rodata.cold.callback.system_clearcaches",func)
+#define DEFINE_SYSTEM_CACHE_CLEAR(func) DEFINE_CALLBACK(".rodata.cold.callback.system_clearcaches", func)
 #endif /* !DEFINE_SYSTEM_CACHE_CLEAR */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 

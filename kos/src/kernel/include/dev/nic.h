@@ -25,9 +25,12 @@
 #include <dev/char.h>
 #include <kernel/malloc-defs.h>
 #include <kernel/types.h>
+#include <sched/signal.h>
 
 #include <bits/socket.h>
 #include <kos/io.h>
+#include <linux/if_ether.h>
+#include <network/network.h>
 
 DECL_BEGIN
 
@@ -132,6 +135,14 @@ struct nic_device_stat {
 	WEAK size_t nds_rx_length_errors; /* # of receive length errors. */
 };
 
+#define NIC_ADDR_HAVE_NONE 0x0000
+#define NIC_ADDR_HAVE_IP   0x0001 /* `na_ip' has been configured. */
+struct nic_addresses {
+	u8   na_hwmac[ETH_ALEN]; /* [const] The device's a hardware (mac) address */
+	u16  na_flags;           /* Flags used to describe configured addresses (set of `NIC_ADDR_HAVE_*') */
+	be32 na_ip;              /* [valid_if(NIC_ADDR_HAVE_IP)] IP Address.
+	                          * NOTE: `:nd_net.n_addravl' is broadcast when this becomes available! */
+};
 
 struct nic_device
 #ifdef __cplusplus
@@ -147,6 +158,8 @@ struct nic_device
 	gfp_t                   nd_hdgfp;   /* [const] Additional GFP flags for packet header/tail buffers.
 	                                     * This is mainly useful in case the driver can be written more
 	                                     * efficiently if header/tail memory is allocated as `GFP_LOCKED'. */
+	struct nic_addresses    nd_addr;    /* Network addresses. */
+	struct network          nd_net;     /* A description of the attached network. */
 };
 
 /* Allocate a new NIC packet which may be used to send the given payload.
@@ -162,13 +175,30 @@ nic_device_newpacketv(struct nic_device const *__restrict self,
                       struct aio_buffer const *__restrict payload,
                       size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC);
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct nic_packet *KCALL
+nic_device_newpacketk_impl(struct nic_device const *__restrict self,
+                           size_t buffer_size)
+		THROWS(E_BADALLOC);
+LOCAL ATTR_RETNONNULL WUNUSED REF struct nic_packet *KCALL
+nic_device_newpacketk(struct nic_device const *__restrict self,
+                      /*out*/ void **__restrict pbuffer,
+                      size_t buffer_size)
+		THROWS(E_BADALLOC) {
+	REF struct nic_packet *result;
+	result   = nic_device_newpacketk_impl(self, buffer_size);
+	*pbuffer = result->np_head;
+	return result;
+}
 
-#define nic_device_cinit(self, ops)     \
-	((self)->nd_ops           = *(ops), \
-	 (self)->cd_type.ct_write = &nic_device_write)
+/* Initialize a given NIC device. */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL nic_device_cinit)(struct nic_device *__restrict self,
+                                struct nic_device_ops const *__restrict ops);
 
-#define nic_device_fini(self) \
-	(void)0
+/* Default finalizer for NIC devices.
+ * NOTE: Must be called by drivers when `cd_type.ct_fini' gets overwritten. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL nic_device_fini)(struct character_device *__restrict self);
 
 /* Check if a given character device is a NIC. */
 #define character_device_isanic(self)                    \
@@ -180,6 +210,33 @@ FUNDEF NONNULL((1)) size_t KCALL
 nic_device_write(struct character_device *__restrict self,
                  USER CHECKED void const *src,
                  size_t num_bytes, iomode_t mode) THROWS(...);
+
+/* Send a given packet */
+LOCAL NONNULL((1, 2, 3)) void KCALL
+nic_device_send(struct nic_device *__restrict self,
+                struct nic_packet *__restrict packet,
+                /*out*/ struct aio_handle *__restrict aio) {
+	(*self->nd_ops.nd_send)(self, packet, aio);
+}
+
+/* Same as `nic_device_send()', however handle _all_ exceptions as AIO-failures
+ * WARNING: This function may still clobber exception pointers! */
+FUNDEF NONNULL((1, 2, 3)) void
+NOTHROW(KCALL nic_device_send_nx)(struct nic_device *__restrict self,
+                                  struct nic_packet *__restrict packet,
+                                  /*out*/ struct aio_handle *__restrict aio);
+
+/* Send the given packet in the background (s.a. `aio_handle_async_alloc()')
+ * NOTE: Transmit errors get logged, but are silently discarded. */
+FUNDEF NONNULL((1, 2)) void KCALL
+nic_device_send_background(struct nic_device *__restrict self,
+                           struct nic_packet *__restrict packet);
+
+/* Same as `nic_device_send_background()', however handle _all_ exceptions as AIO-failures
+ * WARNING: This function may still clobber exception pointers! */
+FUNDEF NONNULL((1, 2)) void
+NOTHROW(KCALL nic_device_send_background_nx)(struct nic_device *__restrict self,
+                                             struct nic_packet *__restrict packet);
 
 
 /* Routable packet buffer. */
@@ -201,19 +258,12 @@ FUNDEF NOBLOCK void NOTHROW(KCALL nic_rpacket_free)(struct nic_rpacket *__restri
  * Routing may either be done synchronously (i.e. before this function returns),
  * or asynchronously (i.e. at some future point in time by some other thread)
  * If the caller _needs_ routing to be performed immediately, they should instead
- * make use of `nic_device_route()', followed by `nic_rpacket_free()'
+ * make use of `eth_routepacket()', followed by `nic_rpacket_free()'
  * @param: real_packet_size: The actual used packet size (`<= packet->rp_size') */
 FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
-nic_device_routepacket(struct nic_device const *__restrict self,
+nic_device_routepacket(struct nic_device *__restrict self,
                        /*inherit(always)*/ struct nic_rpacket *__restrict packet,
                        size_t real_packet_size);
-
-/* Route an incoming packet through the given NIC device. */
-FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
-nic_device_route(struct nic_device const *__restrict self,
-                 void const *__restrict packet_data,
-                 size_t packet_size);
-
 
 #endif /* __CC__ */
 

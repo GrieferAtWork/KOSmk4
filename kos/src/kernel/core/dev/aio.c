@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/aio.h>
+#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/types.h>
@@ -53,11 +54,11 @@ PUBLIC struct aio_handle_type aio_noop_type = {
 
 /* Callback for `aio_handle_generic' */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict self,
+NOTHROW(FCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict self,
                                         unsigned int status)
 		ASMNAME("aio_handle_generic_func");
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict self,
+NOTHROW(FCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict self,
                                         unsigned int status) {
 	self->hg_status = status;
 	if (status == AIO_COMPLETION_FAILURE) {
@@ -69,11 +70,11 @@ NOTHROW(KCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict se
 }
 
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__restrict self,
+NOTHROW(FCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__restrict self,
                                              unsigned int status)
 		ASMNAME("aio_multihandle_generic_func");
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__restrict self,
+NOTHROW(FCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__restrict self,
                                              unsigned int UNUSED(status)) {
 	sig_broadcast(&self->mg_signal);
 }
@@ -337,11 +338,11 @@ NOTHROW(KCALL aio_pbuffer_copytovphys)(struct aio_pbuffer const *__restrict src,
 
 /* Callback for `aio_handle_multiple' */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict self,
+NOTHROW(FCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict self,
                                          unsigned int status)
 		ASMNAME("aio_handle_multiple_func");
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict self,
+NOTHROW(FCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict self,
                                          unsigned int status) {
 	struct aio_multihandle *hand;
 	uintptr_t old_status;
@@ -624,6 +625,151 @@ NOTHROW(KCALL aio_multihandle_cancel)(struct aio_multihandle *__restrict self) {
 	        "self->am_status = %.8I64X\n", self->am_status);
 }
 
+
+
+
+
+/* Allocate and return a special AIO handle that can be used just like any other,
+ * however will clean-up itself after the usual init+complete+fini cycle of any
+ * given AIO handle. This allows the caller to use this handle to detach themself
+ * from any async-operation such that the operation will either succeed or fail
+ * at an arbitrary point in the future, potentially long after the caller started
+ * the operation. To-be used as follows:
+ * >> void nic_background_send(struct nic_device const *__restrict self,
+ * >>                          struct nic_packet *__restrict packet) {
+ * >>     struct aio_handle *aio;
+ * >>     aio = aio_handle_async_alloc();
+ * >>     TRY {
+ * >>         // This call essentially behaves as `inherit(on_success)' for `aio'
+ * >>         (*self->nd_ops.nd_send)(self, packet, aio);
+ * >>     } EXCEPT {
+ * >>         aio_handle_async_free(aio);
+ * >>         RETHROW();
+ * >>     }
+ * >> }
+ * NOTE: When the AIO operation completes with `AIO_COMPLETION_FAILURE',
+ *       then an error message is written to the system log.
+ */
+struct async_aio_handle: aio_handle {
+	struct async_aio_handle *aah_next; /* [lock(IN_CHAIN(async_aio_handles))][0..1]
+	                                    * The next used/free async-aio handle. */
+};
+
+/* [0..1][lock(ATOMIC)] Chain of used/free async-aio handles. */
+PRIVATE WEAK struct async_aio_handle *async_aio_handles = NULL;
+
+LOCAL NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL aio_handle_async_restore_chain)(struct async_aio_handle *first,
+                                              struct async_aio_handle *last) {
+	struct async_aio_handle *next;
+	do {
+		next = ATOMIC_READ(async_aio_handles);
+		last->aah_next = next;
+		COMPILER_WRITE_BARRIER();
+	} while (!ATOMIC_CMPXCH_WEAK(async_aio_handles, next, first));
+}
+
+/* Return the first handle with `aio_handle_completed(handle) == true'
+ * from `async_aio_handles' and remove that handle from the chain.
+ * If no such handle exists, or the chain is already being used by
+ * some other thread, return `NULL' instead. */
+PRIVATE NOBLOCK WUNUSED struct async_aio_handle *
+NOTHROW(KCALL aio_handle_async_alloc_exising)(void) {
+	struct async_aio_handle *chain, **piter, *iter;
+	chain = ATOMIC_XCH(async_aio_handles, NULL);
+	for (piter = &chain; (iter = *piter) != NULL; piter = &iter->aah_next) {
+		struct async_aio_handle *result;
+		if (!aio_handle_completed(iter))
+			continue;
+		result = iter;
+		*piter = iter->aah_next; /* Unlink the resulting handle. */
+		if (iter->aah_next) {
+			while (iter->aah_next)
+				iter = iter->aah_next;
+		} else if (piter == &chain) {
+			assert(chain == NULL);
+			goto nothing_to_restore;
+		} else {
+			iter = container_of(piter, struct async_aio_handle, aah_next);
+		}
+		/* Restore the remainder of the chain. */
+		aio_handle_async_restore_chain(chain, iter);
+nothing_to_restore:
+		/* Finalize the old handle. */
+		aio_handle_fini(result);
+#ifndef NDEBUG
+		memset(&result->aah_next, 0xcc, sizeof(result->aah_next));
+#endif /* !NDEBUG */
+		return result;
+	}
+	return NULL;
+}
+
+
+/* Remove all AIO handles that are `aio_handle_completed()'
+ * from `async_aio_handles', and kfree() them. */
+DEFINE_SYSTEM_CACHE_CLEAR(async_aio_handles_clear);
+INTERN NOBLOCK size_t
+NOTHROW(KCALL async_aio_handles_clear)(void) {
+	/* TODO: A function similar to this one should be called when the CPU goes into
+	 *       IDLE mode in order to finalize and kfree() unused AIO handles, since
+	 *       in-use AIO handles could potentially slow down the system since they
+	 *       might contain arbitrary, device-specific references to other objects!
+	 * TODO: This function should be called after driver finalization to delete AIO
+	 *       handles which may still be holding references to the driver (Note that
+	 *       such references would likely be indirect; e.g.: aio->device->driver). */
+	size_t i, result = 0;
+	struct async_aio_handle *h;
+	while ((h = aio_handle_async_alloc_exising()) != NULL) {
+free_h:
+		result += sizeof(struct async_aio_handle);
+		aio_handle_async_free(h);
+	}
+	/* Try to yield to some other thread, who may still be holding AIO handles. */
+	for (i = 0; i < 8; ++i) {
+		if (task_tryyield() != TASK_TRYYIELD_SUCCESS)
+			break;
+		h = aio_handle_async_alloc_exising();
+		if (h)
+			goto free_h;
+	}
+	return result;
+}
+
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL aio_handle_async_func)(struct aio_handle *__restrict self,
+                                     unsigned int status) {
+	struct async_aio_handle *me;
+	if (status == AIO_COMPLETION_FAILURE)
+		error_printf("Performing background AIO operation");
+	me = (struct async_aio_handle *)self;
+	aio_handle_async_restore_chain(me, me);
+}
+
+
+PUBLIC WUNUSED ATTR_RETNONNULL struct aio_handle *KCALL
+aio_handle_async_alloc(void) THROWS(E_BADALLOC) {
+	struct async_aio_handle *result;
+	result = aio_handle_async_alloc_exising();
+	if (!result) {
+		/* Must allocate a new AIO handle. */
+		result = (struct async_aio_handle *)kmalloc(sizeof(struct async_aio_handle),
+		                                            GFP_LOCKED | GFP_PREFLT);
+		/* Set-up the handle such that it will add itself to the
+		 * async-aio-handle chain once its completion-function is invoked.
+		 * NOTE: We can't have the completion-function simply kfree() the
+		 *       handle immediately, because the caller of the callback
+		 *       must still be able to set the handle's next pointer to
+		 *       indicate `AIO_HANDLE_NEXT_COMPLETED' */
+		result->ah_func = &aio_handle_async_func;
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(KCALL aio_handle_async_free)(struct aio_handle *__restrict self) {
+	kfree(self);
+}
 
 
 

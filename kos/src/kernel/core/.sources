@@ -89,6 +89,7 @@ BEGIN
 		"dev/*.c",
 		"fs/*.c",
 		"misc/*.c",
+		"network/*.c",
 		"sched/*.c",
 		"drivers/*.c",
 		"user/*.c",

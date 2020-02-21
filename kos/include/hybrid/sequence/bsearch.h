@@ -71,4 +71,20 @@
 	BSEARCHR(index, vector, count, field, field, key)
 
 
+/* Same as `BSEARCHR()', but on failure, the index where the element
+ * should have been placed into is stored in `lo' and `hi' (with `lo == hi') */
+#define BSEARCHR_EX(index, lo, hi, vector, count, field_lo, field_hi, key) \
+	for ((lo) = 0, (hi) = (count); (lo) < (hi);)                           \
+		if (((index) = ((lo) + (hi)) / 2,                                  \
+		     (key) < (vector)[index] field_lo))                            \
+			(hi) = (index);                                                \
+		else if ((key) > (vector)[index] field_hi)                         \
+			(lo) = (index) + 1;                                            \
+		else if (((lo) = (hi), 0))                                         \
+			; /* Found it! (element is in `vector[index]') */              \
+		else
+#define BSEARCH_EX(index, lo, hi, vector, count, field, key) \
+	BSEARCHR_EX(index, lo, hi, vector, count, field, field, key)
+
+
 #endif /* !__GUARD_HYBRID_SEQUENCE_BSEARCH_H */

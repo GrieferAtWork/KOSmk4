@@ -72,7 +72,7 @@ struct hisr {
 
 /* Try to acquire a reference to the pointed-to object, or return
  * NULL if the pointed-to object had already been destroyed. */
-LOCAL NOPREEMPT NOBLOCK WUNUSED NONNULL((1)) REF void *KCALL
+LOCAL NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) REF void *KCALL
 NOTHROW(KCALL hisr_getref_nopr)(struct hisr *__restrict self) {
 	REF void *obj;
 	assert(!PREEMPTION_ENABLED());

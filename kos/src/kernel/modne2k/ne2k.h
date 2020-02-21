@@ -127,7 +127,6 @@ typedef struct ne2k_device: nic_device {
 	                                           * NOTE: The signal delivered here is:
 	                                           *      `NE2K_UIOINT_ENCODE_ISR(inb(EN0_ISR(me->nd_iobase)))' */
 	port_t                  nk_iobase;        /* [const] I/O base address. */
-	u8                      nk_mac[ETH_ALEN]; /* [const] The original mac address */
 	/* NOTE: Ne2k pages consist of 256 bytes! */
 	u8                      nk_tx_start;      /* [const] Transmit buffer start page */
 	u8                      nk_tx_end;        /* [const] Transmit buffer end page */

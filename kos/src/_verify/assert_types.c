@@ -391,6 +391,7 @@ local files = {
 	"../../include/kos/hop/pipe.h",
 	"../../include/kos/hop/task.h",
 	"../../include/kos/ksysctl.h",
+	"../../include/linux/if_arp.h",
 	"../../include/linux/if_ether.h",
 };
 
@@ -1711,6 +1712,25 @@ STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_newpath) == _
 STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_oldpath) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_OLDPATH);
 STATIC_ASSERT(offsetof(struct ksysctl_driver_set_library_path, slp_struct_size) == __OFFSET_KSYSCTL_DRIVER_SET_LIBRARY_PATH_STRUCT_SIZE);
 STATIC_ASSERT(sizeof(struct ksysctl_driver_set_library_path) == __SIZEOF_KSYSCTL_DRIVER_SET_LIBRARY_PATH);
+
+
+
+
+
+#include <linux/if_arp.h>
+
+/* struct arphdr */
+STATIC_ASSERT(offsetof(struct arphdr, ar_hln) == __OFFSET_ARPHDR_HLN);
+STATIC_ASSERT(offsetof(struct arphdr, ar_hrd) == __OFFSET_ARPHDR_HRD);
+STATIC_ASSERT(offsetof(struct arphdr, ar_op) == __OFFSET_ARPHDR_OP);
+STATIC_ASSERT(offsetof(struct arphdr, ar_pln) == __OFFSET_ARPHDR_PLN);
+STATIC_ASSERT(offsetof(struct arphdr, ar_pro) == __OFFSET_ARPHDR_PRO);
+
+/* struct arpreq */
+/* ... */
+
+/* struct arpreq_old */
+/* ... */
 
 
 

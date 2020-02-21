@@ -30,6 +30,10 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
+#include <linux/if_ether.h>
+#include <network/ethernet.h>
+#include <network/network.h>
+
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
@@ -91,10 +95,94 @@ nic_device_newpacketv(struct nic_device const *__restrict self,
 	return result;
 }
 
+PUBLIC ATTR_RETNONNULL WUNUSED REF struct nic_packet *KCALL
+nic_device_newpacketk_impl(struct nic_device const *__restrict self,
+                           size_t buffer_size)
+		THROWS(E_BADALLOC) {
+	REF struct nic_packet *result;
+	result = nic_packet_alloc(self, 0, buffer_size);
+	result->np_refcnt   = 1;
+	result->np_payloadc = 0;
+	result->np_payloads = 0;
+	result->np_tail     = (byte_t *)result->np_payloadv + buffer_size;
+	result->np_head     = (byte_t *)result->np_payloadv;
+	result->np_tailend  = result->np_tail;
+	return result;
+}
+
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL nic_packet_destroy)(struct nic_packet *__restrict self) {
 	kfree(self);
+}
+
+
+
+
+/* Initialize a given NIC device. */
+PUBLIC NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL nic_device_cinit)(struct nic_device *__restrict self,
+                                struct nic_device_ops const *__restrict ops) {
+	assert(ops);
+	assert(ops->nd_send);
+	assert(ops->nd_setflags);
+	network_cinit(&self->nd_net);
+	memcpy(&self->nd_ops, ops, sizeof(struct nic_device_ops));
+	self->cd_type.ct_write = &nic_device_write;
+	self->cd_type.ct_fini  = &nic_device_fini;
+}
+
+/* Default finalizer for NIC devices.
+ * NOTE: Must be called by drivers when `cd_type.ct_fini' gets overwritten. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL nic_device_fini)(struct character_device *__restrict self) {
+	struct nic_device *me;
+	me = (struct nic_device *)self,
+	network_fini(&me->nd_net);
+}
+
+
+
+/* Same as `nic_device_send()', however handle _all_ exceptions as AIO-failures
+ * WARNING: This function may still clobber exception pointers! */
+PUBLIC NONNULL((1, 2, 3)) void
+NOTHROW(KCALL nic_device_send_nx)(struct nic_device *__restrict self,
+                                  struct nic_packet *__restrict packet,
+                                  /*out*/ struct aio_handle *__restrict aio) {
+	TRY {
+		nic_device_send(self, packet, aio);
+	} EXCEPT {
+		aio_handle_init(aio, &aio_noop_type);
+		aio_handle_complete(aio, AIO_COMPLETION_FAILURE);
+	}
+}
+
+/* Send the given packet in the background (s.a. `aio_handle_async_alloc()')
+ * NOTE: Transmit errors get logged, but are silently discarded. */
+PUBLIC NONNULL((1, 2)) void KCALL
+nic_device_send_background(struct nic_device *__restrict self,
+                           struct nic_packet *__restrict packet) {
+	struct aio_handle *aio;
+	aio = aio_handle_async_alloc();
+	TRY {
+		/* NOTE: `aio' is inherited on success. */
+		nic_device_send(self, packet, aio);
+	} EXCEPT {
+		aio_handle_async_free(aio);
+		RETHROW();
+	}
+}
+
+/* Same as `nic_device_send_background()', however handle _all_ exceptions as AIO-failures
+ * WARNING: This function may still clobber exception pointers! */
+PUBLIC NONNULL((1, 2)) void
+NOTHROW(KCALL nic_device_send_background_nx)(struct nic_device *__restrict self,
+                                             struct nic_packet *__restrict packet) {
+	TRY {
+		nic_device_send_background(self, packet);
+	} EXCEPT {
+		error_printf("Performing background AIO operation");
+	}
 }
 
 
@@ -112,8 +200,10 @@ nic_device_write(struct character_device *__restrict self,
 
 	/* Send a simple packet. */
 	packet = nic_device_newpacket(me, src, num_bytes, 0, 0);
-	FINALLY_DECREF(packet);
-	(*me->nd_ops.nd_send)(me, packet, &aio);
+	{
+		FINALLY_DECREF_UNLIKELY(packet);
+		nic_device_send(me, packet, &aio);
+	}
 
 	/* Wait for the send to finish. */
 	TRY {
@@ -157,33 +247,23 @@ NOTHROW(KCALL nic_rpacket_free)(struct nic_rpacket *__restrict self) {
  * Routing may either be done synchronously (i.e. before this function returns),
  * or asynchronously (i.e. at some future point in time by some other thread)
  * If the caller _needs_ routing to be performed immediately, they should instead
- * make use of `nic_device_route()', followed by `nic_rpacket_free()'
+ * make use of `eth_routepacket()', followed by `nic_rpacket_free()'
  * @param: real_packet_size: The actual used packet size (`<= packet->rp_size') */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
-nic_device_routepacket(struct nic_device const *__restrict self,
+nic_device_routepacket(struct nic_device *__restrict self,
                        /*inherit(always)*/ struct nic_rpacket *__restrict packet,
                        size_t real_packet_size) {
 	assert(real_packet_size <= packet->rp_size);
+	assert(real_packet_size >= ETH_ZLEN);
 	/* XXX: Option to have the routing be done asynchronously! */
 	TRY {
-		nic_device_route(self, packet->rp_data, real_packet_size);
+		eth_routepacket(self, packet->rp_data, real_packet_size);
 	} EXCEPT {
 		nic_rpacket_free(packet); /* Always inherit `packet' */
 		RETHROW();
 	}
 	nic_rpacket_free(packet);
 }
-
-/* Route an incoming packet through the given NIC device. */
-PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
-nic_device_route(struct nic_device const *__restrict self,
-                 void const *__restrict packet_data,
-                 size_t packet_size) {
-	printk(KERN_DEBUG "[nic:%s] Route %Iu-byte long packet:\n%$[hex]\n",
-		   self->cd_name, packet_size, packet_size, packet_data);
-	/* TODO */
-}
-
 
 DECL_END
 

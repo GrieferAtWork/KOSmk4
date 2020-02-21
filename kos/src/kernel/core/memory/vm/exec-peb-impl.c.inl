@@ -82,7 +82,7 @@ MY_VMB_ALLOC_PEB(struct vmb *__restrict self,
                  USER UNCHECKED IN_PTR(char const) USER CHECKED const *argv,
                  USER UNCHECKED IN_PTR(char const) USER CHECKED const *envp)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT) {
-#define ATOMC_READ_IN_CHARP(p) \
+#define ATOMIC_READ_IN_CHARP(p) \
 	(USER UNCHECKED IN_PTR(char const))ATOMIC_READ(*(IN_UIP *)&(p))
 #if OU_POINTERSIZE == __SIZEOF_POINTER__
 	typedef struct process_peb peb_t;
@@ -111,7 +111,7 @@ again:
 	for (i = 0; i < argc_inject; ++i)
 		strings_total_size += (strlen(argv_inject[i]) + 1) * sizeof(char);
 	if likely((iter = argv) != NULL) {
-		while ((string = ATOMC_READ_IN_CHARP(*iter)) != NULL) {
+		while ((string = ATOMIC_READ_IN_CHARP(*iter)) != NULL) {
 			size_t temp;
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
@@ -122,7 +122,7 @@ again:
 		}
 	}
 	if likely((iter = envp) != NULL) {
-		while ((string = ATOMC_READ_IN_CHARP(*iter)) != NULL) {
+		while ((string = ATOMIC_READ_IN_CHARP(*iter)) != NULL) {
 			size_t temp;
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
@@ -180,7 +180,7 @@ again:
 		}
 		for (i = 0; i < argc_user; ++i) {
 			size_t temp;
-			string = ATOMC_READ_IN_CHARP(argv[i]);
+			string = ATOMIC_READ_IN_CHARP(argv[i]);
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
 			if unlikely(OVERFLOW_UADD(strings_total_copied, temp, &strings_total_copied) ||
@@ -192,7 +192,7 @@ again:
 		}
 		for (i = 0; i < envc_user; ++i) {
 			size_t temp;
-			string = ATOMC_READ_IN_CHARP(envp[i]);
+			string = ATOMIC_READ_IN_CHARP(envp[i]);
 			validate_readable(string, 1);
 			temp = (strlen(string) + 1) * sizeof(char);
 			if unlikely(OVERFLOW_UADD(strings_total_copied, temp, &strings_total_copied) ||
@@ -296,7 +296,7 @@ string_size_changed:
 	vmb_node_insert(self, stolen_node);
 
 	return result;
-#undef ATOMC_READ_IN_CHARP
+#undef ATOMIC_READ_IN_CHARP
 }
 
 DECL_END

@@ -154,35 +154,6 @@ __SYSDECL_BEGIN
 #define ARPOP_InREPLY   9  /* InARP reply. */
 #define ARPOP_NAK       10 /* (ATM)ARP NAK. */
 
-
-/* ARP ioctl request. */
-#ifdef __CC__
-struct arpreq {
-	struct sockaddr arp_pa;      /* protocol address. */
-	struct sockaddr arp_ha;      /* hardware address. */
-	__INT32_TYPE__  arp_flags;   /* flags. */
-	struct sockaddr arp_netmask; /* netmask (only for proxy arps). */
-	char            arp_dev[16];
-};
-
-struct arpreq_old {
-	struct sockaddr arp_pa;      /* protocol address. */
-	struct sockaddr arp_ha;      /* hardware address. */
-	__INT32_TYPE__  arp_flags;   /* flags. */
-	struct sockaddr arp_netmask; /* netmask (only for proxy arps). */
-};
-#endif /* __CC__ */
-
-/* ARP Flag values. */
-#define ATF_COM         0x02 /* Completed entry (ha valid). */
-#define ATF_PERM        0x04 /* Permanent entry. */
-#define ATF_PUBL        0x08 /* Publish entry. */
-#define ATF_USETRAILERS 0x10 /* Has requested trailers. */
-#define ATF_NETMASK     0x20 /* Want to use a netmask (only for proxy entries). */
-#define ATF_DONTPUB     0x40 /* Don't answer this addresses. */
-#define ATF_MAGIC       0x80 /* Automatically added entry. */
-
-
 /* See RFC 826 for protocol description. ARP packets are variable
  * in size; the arphdr structure defines the fixed-length portion.
  * Protocol type values are the same as those for 10 Mb/s Ethernet.
@@ -191,10 +162,15 @@ struct arpreq_old {
  * specified. Field names used correspond to RFC 826. */
 
 /* This structure defines an ethernet arp header. */
+#define __OFFSET_ARPHDR_HRD 0
+#define __OFFSET_ARPHDR_PRO 2
+#define __OFFSET_ARPHDR_HLN 4
+#define __OFFSET_ARPHDR_PLN 5
+#define __OFFSET_ARPHDR_OP  6
 #ifdef __CC__
-struct arphdr {
+struct arphdr /*[PREFIX(ar_)]*/ {
 	__u_net16_t ar_hrd; /* format of hardware address. (One of `ARPHRD_*') */
-	__u_net16_t ar_pro; /* format of protocol address. (One of `ETH_P_*' from <linux/if_ether.h>) */
+	__u_net16_t ar_pro; /* format of protocol address. (One of `ETH_P_*' from <linux/if_ether.h> for `ARPHRD_ETHER') */
 	__uint8_t   ar_hln; /* length of hardware address (in bytes). */
 	__uint8_t   ar_pln; /* length of protocol address (in bytes). */
 	__u_net16_t ar_op;  /* ARP opcode (command). (One of `ARPOP_*') */
@@ -206,6 +182,41 @@ struct arphdr {
 #endif
 };
 #endif /* __CC__ */
+
+
+
+
+/************************************************************************/
+/* ioctl()-related things from here on!                                 */
+/************************************************************************/
+
+/* ARP Flag values. */
+#define ATF_COM         0x02 /* Completed entry (ha valid). */
+#define ATF_PERM        0x04 /* Permanent entry. */
+#define ATF_PUBL        0x08 /* Publish entry. */
+#define ATF_USETRAILERS 0x10 /* Has requested trailers. */
+#define ATF_NETMASK     0x20 /* Want to use a netmask (only for proxy entries). */
+#define ATF_DONTPUB     0x40 /* Don't answer this addresses. */
+#define ATF_MAGIC       0x80 /* Automatically added entry. */
+
+/* ARP ioctl request. */
+#ifdef __CC__
+struct arpreq {
+	struct sockaddr arp_pa;      /* Protocol address. */
+	struct sockaddr arp_ha;      /* Hardware address. */
+	__INT32_TYPE__  arp_flags;   /* Flags. (set of `ATF_*') */
+	struct sockaddr arp_netmask; /* Netmask (only for proxy arps). */
+	char            arp_dev[16];
+};
+
+struct arpreq_old {
+	struct sockaddr arp_pa;      /* Protocol address. */
+	struct sockaddr arp_ha;      /* Hardware address. */
+	__INT32_TYPE__  arp_flags;   /* Flags. (set of `ATF_*') */
+	struct sockaddr arp_netmask; /* Netmask (only for proxy arps). */
+};
+#endif /* __CC__ */
+
 
 __SYSDECL_END
 

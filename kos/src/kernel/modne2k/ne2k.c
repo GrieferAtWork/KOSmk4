@@ -326,7 +326,7 @@ NOTHROW(FCALL Ne2k_HandleAioTxError)(Ne2kDevice *__restrict self,
 }
 
 
-PRIVATE NOPREEMPT NOBLOCK bool
+PRIVATE NOBLOCK NOPREEMPT bool
 NOTHROW(FCALL Ne2k_InterruptHandler)(void *arg) {
 	Ne2kDevice *me;
 	Ne2kState state;
@@ -1156,7 +1156,7 @@ Ne2k_ApplyFlagsUnlocked(Ne2kDevice *__restrict self,
 	Ne2k_ResetCard(self->nk_iobase);
 	self->nk_rx_nxt = self->nk_rx_start;
 	if (!(flags & IFF_UP))
-		return flags;
+		return flags & ~IFF_RUNNING;
 
 	/* Acknowledge interrupts. (From `Ne2k_ResetCard()') */
 	outb(EN0_ISR(self->nk_iobase), 0xff);
@@ -1202,7 +1202,7 @@ Ne2k_ApplyFlagsUnlocked(Ne2kDevice *__restrict self,
 
 	/* Configure the hardware address to listen for. */
 	for (i = 0; i < ETH_ALEN; ++i)
-		outb(EN1_PHYS_SHIFT(self->nk_iobase, i), self->nk_mac[i]);
+		outb(EN1_PHYS_SHIFT(self->nk_iobase, i), self->nd_addr.na_hwmac[i]);
 	for (i = 0; i < 8; ++i) /* XXX: Multicast? */
 		outb(EN1_MULT_SHIFT(self->nk_iobase, i), 0xff);
 	/* Still being in page #1, set the next-package pointer. */
@@ -1235,7 +1235,7 @@ Ne2k_SetFlags(struct nic_device *__restrict self,
 		return false;
 	}
 	TRY {
-		Ne2k_ApplyFlagsUnlocked(me, new_flags);
+		new_flags = Ne2k_ApplyFlagsUnlocked(me, new_flags);
 	} EXCEPT {
 		Ne2k_ReleaseUIO(me);
 		RETHROW();
@@ -1330,7 +1330,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	self->cd_type.ct_fini = &Ne2k_Fini;
 	self->nk_pcidev = dev;
 	self->nk_iobase = iobase;
-	memcpy(self->nk_mac, prom, ETH_ALEN);
+	memcpy(self->nd_addr.na_hwmac, prom, ETH_ALEN);
 	self->nd_ifflags   = IFF_BROADCAST | IFF_MULTICAST;
 	self->nk_tx_start  = 64;
 	self->nk_tx_end    = 70;

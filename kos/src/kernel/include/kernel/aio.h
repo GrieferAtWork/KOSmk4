@@ -77,37 +77,44 @@ struct aio_pbuffer {
  * >>     ...
  * >> }
  */
-#define AIO_BUFFER_FOREACH(ent,self) \
-	for (size_t _abf_i = 0; _abf_i < (self)->ab_entc; ++_abf_i) \
-	if (((_abf_i) == 0 \
-	   ? (void)((ent) = (self)->ab_head) \
-	   : (void)((ent).ab_base = (self)->ab_entv[_abf_i].ab_base, \
-	            (ent).ab_size = _abf_i == (self)->ab_entc - 1 ? (self)->ab_last : \
-	                                      (self)->ab_entv[_abf_i].ab_size),0)); \
-	else
-#define AIO_BUFFER_FOREACH_N(ent,self) \
-	for (size_t _abf_i = 0;; ++_abf_i) \
-	if (((__hybrid_assert(_abf_i < (self)->ab_entc)), \
-	     (_abf_i) == 0 \
-	   ? (void)((ent) = (self)->ab_head) \
-	   : (void)((ent).ab_base = (self)->ab_entv[_abf_i].ab_base, \
-	            (ent).ab_size = _abf_i == (self)->ab_entc - 1 ? (self)->ab_last : \
-	                                      (self)->ab_entv[_abf_i].ab_size),0)); \
-	else
-#define AIO_PBUFFER_FOREACH(ent,self) \
-        AIO_BUFFER_FOREACH(ent,self)
-#define AIO_PBUFFER_FOREACH_N(ent,self) \
-        AIO_BUFFER_FOREACH_N(ent,self)
+#define AIO_BUFFER_FOREACH(ent, self)                                     \
+	for (size_t _abf_i = 0; _abf_i < (self)->ab_entc; ++_abf_i)           \
+		if (((_abf_i) == 0                                                \
+		     ? (void)((ent) = (self)->ab_head)                            \
+		     : (void)((ent).ab_base = (self)->ab_entv[_abf_i].ab_base,    \
+		              (ent).ab_size = _abf_i == (self)->ab_entc - 1       \
+		                              ? (self)->ab_last                   \
+		                              : (self)->ab_entv[_abf_i].ab_size), \
+		     0))                                                          \
+			;                                                             \
+		else
+#define AIO_BUFFER_FOREACH_N(ent, self)                                   \
+	for (size_t _abf_i = 0;; ++_abf_i)                                    \
+		if (((__hybrid_assert(_abf_i < (self)->ab_entc)),                 \
+		     (_abf_i) == 0                                                \
+		     ? (void)((ent) = (self)->ab_head)                            \
+		     : (void)((ent).ab_base = (self)->ab_entv[_abf_i].ab_base,    \
+		              (ent).ab_size = _abf_i == (self)->ab_entc - 1       \
+		                              ? (self)->ab_last                   \
+		                              : (self)->ab_entv[_abf_i].ab_size), \
+		     0))                                                          \
+			;                                                             \
+		else
+#define AIO_PBUFFER_FOREACH(ent, self) \
+	AIO_BUFFER_FOREACH(ent, self)
+#define AIO_PBUFFER_FOREACH_N(ent, self) \
+	AIO_BUFFER_FOREACH_N(ent, self)
 
 
-#define AIO_BUFFER_GETENT(result,self,i) \
-	((i) == 0 \
-	  ? (void)((result) = (self)->ab_head) \
-	  : (void)((result).ab_base = (self)->ab_entv[i].ab_base, \
-	           (result).ab_size = (i) == (self)->ab_entc - 1 ? (self)->ab_last : \
-	                                     (self)->ab_entv[i].ab_size))
-#define AIO_PBUFFER_GETENT(result,self,i) \
-        AIO_BUFFER_GETENT(result,self,i)
+#define AIO_BUFFER_GETENT(result, self, i)                   \
+	((i) == 0                                                \
+	 ? (void)((result) = (self)->ab_head)                    \
+	 : (void)((result).ab_base = (self)->ab_entv[i].ab_base, \
+	          (result).ab_size = (i) == (self)->ab_entc - 1  \
+	                             ? (self)->ab_last           \
+	                             : (self)->ab_entv[i].ab_size))
+#define AIO_PBUFFER_GETENT(result, self, i) \
+	AIO_BUFFER_GETENT(result, self, i)
 
 
 /* Determine the number of bytes inside of the given buffer. */
@@ -595,7 +602,7 @@ struct aio_handle_type {
 	 * @param: stat: Filled in by this operator.
 	 * @return: * :  One of `AIO_PROGRESS_STATUS_*' */
 	NOBLOCK NONNULL((1, 2)) unsigned int /*NOTHROW*/ (KCALL *ht_progress)(struct aio_handle *__restrict self,
-	                                                                     struct aio_handle_stat *__restrict stat);
+	                                                                      struct aio_handle_stat *__restrict stat);
 #define AIO_PROGRESS_STATUS_PENDING    0x0000 /* The operation is still pending execution. */
 #define AIO_PROGRESS_STATUS_INPROGRESS 0x0001 /* The operation is currently being performed. */
 #define AIO_PROGRESS_STATUS_COMPLETED  0x0002 /* The operation has finished (either due to being canceled, failing, or succeeding)
@@ -634,7 +641,7 @@ struct aio_handle_type {
  *                `self' on its own.
  * @param: status: One of `AIO_COMPLETION_*', explaining how the operation ended. */
 typedef NOBLOCK NOPREEMPT NONNULL((1)) void
-/*NOTHROW*/ (KCALL *aio_completion_t)(struct aio_handle *__restrict self,
+/*NOTHROW*/ (FCALL *aio_completion_t)(struct aio_handle *__restrict self,
                                       unsigned int status);
 
 /* Number of pointers available for drivers
@@ -809,8 +816,8 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_generic
 	aio_handle_fini(self)
 
 /* Callback for `aio_handle_generic' */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_handle_generic_func)(struct aio_handle *__restrict self,
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL aio_handle_generic_func)(struct aio_handle *__restrict self,
                                        unsigned int status);
 
 LOCAL NOBLOCK NONNULL((1)) void
@@ -902,14 +909,14 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_multiple
 };
 
 /* Callback for `aio_handle_multiple' */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_handle_multiple_func)(struct aio_handle *__restrict self,
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL aio_handle_multiple_func)(struct aio_handle *__restrict self,
                                         unsigned int status);
 
 /* Callback for `aio_multihandle' (called under the same context as `aio_completion_t') */
-typedef NOBLOCK NONNULL((1)) void
-/*NOTHROW*/ (KCALL *aio_multiple_completion_t)(struct aio_multihandle *__restrict self,
-                                              unsigned int status);
+typedef NOBLOCK NOPREEMPT NONNULL((1)) void
+/*NOTHROW*/ (FCALL *aio_multiple_completion_t)(struct aio_multihandle *__restrict self,
+                                               unsigned int status);
 #define AIO_MULTIHANDLE_IVECLIMIT  2    /* Max number of inline-allocated handles. */
 #define AIO_MULTIHANDLE_XVECLIMIT  8    /* Max number of heap-allocated handles per extension. */
 
@@ -1018,8 +1025,8 @@ struct aio_multihandle_generic
 	struct sig             mg_signal; /* Signal broadcast upon completion. */
 };
 
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_multihandle_generic_func)(struct aio_multihandle *__restrict self,
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+NOTHROW(FCALL aio_multihandle_generic_func)(struct aio_multihandle *__restrict self,
                                             unsigned int status);
 
 LOCAL NOBLOCK NONNULL((1)) void
@@ -1098,6 +1105,32 @@ aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self)
 		}
 	}
 }
+
+
+
+/* Allocate and return a special AIO handle that can be used just like any other,
+ * however will clean-up itself after the usual init+complete+fini cycle of any
+ * given AIO handle. This allows the caller to use this handle to detach themself
+ * from any async-operation such that the operation will either succeed or fail
+ * at an arbitrary point in the future, potentially long after the caller started
+ * the operation. To-be used as follows:
+ * >> void nic_background_send(struct nic_device const *__restrict self,
+ * >>                          struct nic_packet *__restrict packet) {
+ * >>     struct aio_handle *aio;
+ * >>     aio = aio_handle_async_alloc();
+ * >>     TRY {
+ * >>         // This call essentially behaves as `inherit(on_success)' for `aio'
+ * >>         (*self->nd_ops.nd_send)(self, packet, aio);
+ * >>     } EXCEPT {
+ * >>         aio_handle_async_free(aio);
+ * >>         RETHROW();
+ * >>     }
+ * >> }
+ * NOTE: When the AIO operation completes with `AIO_COMPLETION_FAILURE',
+ *       then an error message is written to the system log.
+ */
+FUNDEF WUNUSED ATTR_RETNONNULL struct aio_handle *KCALL aio_handle_async_alloc(void) THROWS(E_BADALLOC);
+FUNDEF NOBLOCK void NOTHROW(KCALL aio_handle_async_free)(struct aio_handle *__restrict self);
 
 #endif /* __CC__ */
 
