@@ -34,10 +34,13 @@ DECL_BEGIN
 
 #ifdef __CC__
 
+#ifndef __aio_buffer_entry_defined
+#define __aio_buffer_entry_defined 1
 struct aio_buffer_entry {
-	USER CHECKED VIRT void  *ab_base; /* Virtual base address of the target buffer. */
-	USER CHECKED VIRT size_t ab_size; /* Number of bytes that should be written at `ab_base' */
+	USER CHECKED void *ab_base; /* [?..ab_size] Virtual base address of the buffer. */
+	size_t             ab_size; /* Buffer size of `ab_base' (in bytes) */
 };
+#endif /* !__aio_buffer_entry_defined */
 
 struct aio_buffer {
 	size_t                         ab_entc; /* [!0] Number of entries. */
@@ -47,11 +50,11 @@ struct aio_buffer {
 };
 
 struct aio_pbuffer_entry {
-	USER CHECKED VIRT vm_phys_t ab_base; /* Physical base address of the target buffer. */
+	vm_phys_t ab_base; /* [?..ab_size] Physical base address of the target buffer. */
 #if __SIZEOF_VM_PHYS_T__ > __SIZEOF_SIZE_T__
-	byte_t                      ab_pad[__SIZEOF_VM_PHYS_T__ - __SIZEOF_SIZE_T__]; /* ... */
+	byte_t    ab_pad[__SIZEOF_VM_PHYS_T__ - __SIZEOF_SIZE_T__]; /* ... */
 #endif /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_SIZE_T__ */
-	USER CHECKED VIRT size_t    ab_size; /* Number of bytes that should be written at `ab_base' */
+	size_t    ab_size; /* Number of bytes that should be written at `ab_base' */
 };
 
 struct aio_pbuffer {
@@ -62,7 +65,7 @@ struct aio_pbuffer {
 };
 
 /* >> struct aio_buffer_entry ent;
- * >> AIO_BUFFER_FOREACH(ent,buf) {
+ * >> AIO_BUFFER_FOREACH(ent, buf) {
  * >>     ...
  * >> }
  */

@@ -28,8 +28,13 @@
 
 #include <bits/timespec.h>
 #include <netinet/ip.h>
+#include <network/ethernet.h>
 
 DECL_BEGIN
+
+/* IP packet requirements */
+#define IP_PACKET_HEADSIZE (ETH_PACKET_HEADSIZE + 20)
+#define IP_PACKET_TAILSIZE (ETH_PACKET_TAILSIZE)
 
 #ifdef __CC__
 
@@ -96,6 +101,44 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
 ip_routedatagram(struct nic_device *__restrict dev,
                  struct iphdr const *__restrict packet,
                  u16 packet_size);
+
+/* Send a given IP datagram packet `packet'.
+ * NOTE: The caller is responsible to ensure that `packet'
+ *       still has sufficient head/tail memory to include
+ *       ethernet headers.
+ * Or in other words, this function assumes that:
+ * >> assert(nic_packet_headfree(packet) >= ETH_PACKET_HEADSIZE);
+ * >> assert(nic_packet_tailfree(packet) >= ETH_PACKET_TAILSIZE);
+ * - Additionally, the caller is responsible to ensure that the
+ *   fully initialized IP header (i.e. `struct iphdr') is pointed
+ *   to by `packet->np_head' upon entry, as this function will try
+ *   to read from that structure in order to figure out addressing
+ *   information that are required for filling in information for
+ *   underlying network layers.
+ * - NOTE: If necessary, this function will also perform the required
+ *         ARP network traffic in order to translate the target IP
+ *         address pointed to by the IP header of `packet'. */
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) void KCALL
+ip_senddatagram(struct nic_device *__restrict dev,
+                struct nic_packet *__restrict packet,
+                struct aio_handle *__restrict aio);
+
+struct nic_packet_desc;
+
+/* Similar to `ip_senddatagram()', however instead of taking a NIC
+ * packet object, this function takes a packet descriptor. With this
+ * in mind, this function is more efficient in cases where the caller
+ * isn't given a packet object, but rather, is presented with an I/O-
+ * vector, or similar.
+ * Note however that if you've been given a NIC packet, you should really
+ * use the above function instead, since doing so reduces the amount of
+ * copying necessary when the datagram can fit into a single fragment. */
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) void KCALL
+ip_senddatagram_ex(struct nic_device *__restrict dev,
+                   struct nic_packet_desc const *__restrict packet,
+                   struct aio_handle *__restrict aio);
+
+
 
 #endif /* __CC__ */
 

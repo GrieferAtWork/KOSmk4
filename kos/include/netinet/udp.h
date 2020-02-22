@@ -78,9 +78,15 @@
 __SYSDECL_BEGIN
 
 /* UDP header as specified by RFC 768, August 1980. */
+
+#define __OFFSET_UDPHDR_SPORT 0
+#define __OFFSET_UDPHDR_DPORT 2
+#define __OFFSET_UDPHDR_ULEN  4
+#define __OFFSET_UDPHDR_SUM   6
+#define __SIZEOF_UDPHDR       8
 #ifdef __CC__
 
-struct udphdr {
+struct __ATTR_PACKED __ATTR_ALIGNED(2) udphdr /*[PREFIX(uh_)]*/ {
 #ifdef __USE_KOS_PURE
 	__u_net16_t uh_sport; /* source port */
 	__u_net16_t uh_dport; /* destination port */

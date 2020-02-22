@@ -27,16 +27,20 @@
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
+#include <sched/async.h>
 #include <sched/cpu.h>
 
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 
 #include <bits/in.h>
+#include <linux/if_ether.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
+#include <network/arp.h>
 #include <network/ip.h>
 #include <network/network.h>
+#include <network/packet.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -589,6 +593,106 @@ ip_routedatagram(struct nic_device *__restrict dev,
 	       ((u8 *)&packet->ip_src.s_addr)[3],
 	       packet->ip_p, packet_size, packet);
 	/* TODO */
+}
+
+
+
+
+
+
+/* Send a given IP datagram packet `packet'.
+ * NOTE: The caller is responsible to ensure that `packet'
+ *       still has sufficient head/tail memory to include
+ *       ethernet headers.
+ * Or in other words, this function assumes that:
+ * >> assert(nic_packet_headfree(packet) >= ETH_PACKET_HEADSIZE);
+ * >> assert(nic_packet_tailfree(packet) >= ETH_PACKET_TAILSIZE);
+ * - Additionally, the caller is responsible to ensure that the
+ *   fully initialized IP header (i.e. `struct iphdr') is pointed
+ *   to by `packet->np_head' upon entry, as this function will try
+ *   to read from that structure in order to figure out addressing
+ *   information that are required for filling in information for
+ *   underlying network layers.
+ * - NOTE: If necessary, this function will also perform the required
+ *         ARP network traffic in order to translate the target IP
+ *         address pointed to by the IP header of `packet'. */
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) void KCALL
+ip_senddatagram(struct nic_device *__restrict dev,
+                struct nic_packet *__restrict packet,
+                struct aio_handle *__restrict aio) {
+	struct iphdr *hdr;
+	size_t total_packet_size;
+	REF struct net_peeraddr *peer;
+	assert(nic_packet_headfree(packet) >= ETH_PACKET_HEADSIZE);
+#if ETH_PACKET_TAILSIZE != 0
+	assert(nic_packet_tailfree(packet) >= ETH_PACKET_TAILSIZE);
+#endif /* ETH_PACKET_TAILSIZE != 0 */
+	/* Check for simple case: the packet can fit into a single datagram. */
+	total_packet_size = nic_packet_size(packet);
+	if (total_packet_size > dev->nd_net.n_ipsize) {
+		/* Nope! In this case, we can't actually re-use `packet',
+		 *       so use a packet descriptor instead, and off-load
+		 *       the task to `ip_senddatagram_ex()'. */
+		struct nic_packet_desc desc;
+		nic_packet_desc_for_packet(&desc, packet);
+		ip_senddatagram_ex(dev, &desc, aio);
+		return;
+	}
+	assert(nic_packet_headsize(packet) >= sizeof(struct iphdr));
+	hdr  = (struct iphdr *)packet->np_head;
+	peer = network_peers_requireip(&dev->nd_net, hdr->ip_dst.s_addr);
+	if (peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
+		/* Simple case: we already have the MAC for this peer! */
+		struct ethhdr *eth;
+		eth = nic_packet_tallochead(packet, struct ethhdr);
+		memcpy(eth->h_dest, peer->npa_hwmac, ETH_ALEN);
+		decref_unlikely(peer);
+		memcpy(eth->h_source, dev->nd_addr.na_hwmac, ETH_ALEN);
+		eth->h_proto = htons(ETH_P_IP);
+		/* Send the packet. */
+		nic_device_send(dev, packet, aio);
+		return;
+	}
+	{
+		/* Send out an ARP request */
+		REF struct nic_packet *areq;
+		FINALLY_DECREF_UNLIKELY(peer);
+		areq = arp_makemacrequest(dev, peer->npa_ip);
+		FINALLY_DECREF_UNLIKELY(areq);
+		/* TODO: Use an async-job to wait for the MAC request to complete,
+		 *       as well as retry the request a couple of times if necessary
+		 *       before eventually filling in all of the missing data from
+		 *       the original packet's header, and sending out that packet. */
+		(void)dev;
+		(void)hdr;
+		(void)packet;
+		(void)aio;
+		/* TODO */
+		THROW(E_NOT_IMPLEMENTED_TODO);
+	}
+}
+
+/* Similar to `ip_senddatagram()', however instead of taking a NIC
+ * packet object, this function takes a packet descriptor. With this
+ * in mind, this function is more efficient in cases where the caller
+ * isn't given a packet object, but rather, is presented with an I/O-
+ * vector, or similar.
+ * Note however that if you've been given a NIC packet, you should really
+ * use the above function instead, since doing so reduces the amount of
+ * copying necessary when the datagram can fit into a single fragment. */
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) void KCALL
+ip_senddatagram_ex(struct nic_device *__restrict dev,
+                   struct nic_packet_desc const *__restrict packet,
+                   struct aio_handle *__restrict aio) {
+	struct iphdr *hdr;
+	assert(nic_packet_desc_headsize(packet) >= sizeof(struct iphdr));
+	hdr = (struct iphdr *)packet->npd_head;
+	(void)dev;
+	(void)hdr;
+	(void)packet;
+	(void)aio;
+	/* TODO */
+	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
 

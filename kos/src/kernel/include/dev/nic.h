@@ -23,10 +23,12 @@
 #include <kernel/compiler.h>
 
 #include <dev/char.h>
-#include <kernel/malloc.h>
 #include <kernel/malloc-defs.h>
+#include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <sched/signal.h>
+
+#include <hybrid/__assert.h>
 
 #include <bits/socket.h>
 #include <kos/io.h>
@@ -42,10 +44,13 @@ struct aio_multihandle;
 struct nic_device_stat;
 struct nic_device;
 
-struct nic_packet_part {
-	USER CHECKED void const *pp_base; /* [?..pp_size] Virtual base address of the buffer. */
-	size_t                   pp_size; /* Buffer size of `pp_base' (in bytes) */
+#ifndef __aio_buffer_entry_defined
+#define __aio_buffer_entry_defined 1
+struct aio_buffer_entry {
+	USER CHECKED void *ab_base; /* [?..ab_size] Virtual base address of the buffer. */
+	size_t             ab_size; /* Buffer size of `ab_base' (in bytes) */
 };
+#endif /* !__aio_buffer_entry_defined */
 
 struct nic_packet {
 	/* NetworkInterfaceCard buffer for outgoing packets.
@@ -64,14 +69,29 @@ struct nic_packet {
 	byte_t           *np_tailend;  /* [1..1] End of tail data (grows down) */
 	size_t            np_payloads; /* [const] Total payload size (in bytes) */
 	size_t            np_payloadc; /* [const] # of payload vectors. */
-	COMPILER_FLEXIBLE_ARRAY(struct nic_packet_part, np_payloadv); /* [const][np_payloadc] Specified payloads */
+	COMPILER_FLEXIBLE_ARRAY(struct aio_buffer_entry, np_payloadv); /* [const][np_payloadc] Specified payloads */
 };
+
+/* Return the amount of free head/tail memory */
+#define nic_packet_headfree(self) (size_t)((self)->np_head - (byte_t *)&(self)->np_payloadv[(self)->np_payloadc])
+#define nic_packet_tailfree(self) (size_t)(((byte_t *)(self) + kmalloc_usable_size(self)) - (self)->np_tailend)
 
 /* Allocate space for headers/footers.
  * NOTE: The caller is responsible to ensure that the packet was originally
  *       allocated with sufficient space for all headers and footers. */
-#define nic_packet_allochead(self, num_bytes) ((self)->np_head -= (num_bytes))
-#define nic_packet_alloctail(self, num_bytes) (((self)->np_tailend += (num_bytes)) - (num_bytes))
+#define nic_packet_allochead(self, num_bytes)                   \
+	(__hybrid_assertf((num_bytes) <= nic_packet_headfree(self), \
+	                  "Insufficient head space (%Iu > %Iu)",    \
+	                  (num_bytes), nic_packet_headfree(self)),  \
+	 (self)->np_head -= (num_bytes))
+#define nic_packet_alloctail(self, num_bytes)                   \
+	(__hybrid_assertf((num_bytes) <= nic_packet_tailfree(self), \
+	                  "Insufficient tail space (%Iu > %Iu)",    \
+	                  (num_bytes), nic_packet_tailfree(self)),  \
+	 ((self)->np_tailend += (num_bytes)) - (num_bytes))
+#define nic_packet_tallochead(self, T) ((T *)nic_packet_allochead(self, sizeof(T)))
+#define nic_packet_talloctail(self, T) ((T *)nic_packet_alloctail(self, sizeof(T)))
+
 
 /* Return the size of some part of a given NIC packet. */
 #define nic_packet_headsize(self)     (size_t)((self)->np_headend - (self)->np_head)
@@ -89,7 +109,7 @@ struct nic_packet {
 		size_t _npp_i;                                                                \
 		cb((self)->np_head, nic_packet_headsize(self));                               \
 		for (_npp_i = 0; _npp_i < (self)->np_payloadc; ++_npp_i) {                    \
-			cb(self->np_payloadv[_npp_i].pp_base, self->np_payloadv[_npp_i].pp_size); \
+			cb(self->np_payloadv[_npp_i].ab_base, self->np_payloadv[_npp_i].ab_size); \
 		}                                                                             \
 		cb((self)->np_tail, nic_packet_tailsize(self));                               \
 	} __WHILE0
@@ -172,9 +192,13 @@ nic_device_newpacket(struct nic_device const *__restrict self,
                      USER CHECKED void const *payload, size_t payload_size,
                      size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) REF struct nic_packet *KCALL
 nic_device_newpacketv(struct nic_device const *__restrict self,
                       struct aio_buffer const *__restrict payload,
+                      size_t max_head_size, size_t max_tail_size)
+		THROWS(E_BADALLOC);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
+nic_device_newpacketh(struct nic_device const *__restrict self,
                       size_t max_head_size, size_t max_tail_size)
 		THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
@@ -268,80 +292,6 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
 nic_device_routepacket(struct nic_device *__restrict self,
                        /*inherit(always)*/ struct nic_rpacket *__restrict packet,
                        size_t real_packet_size);
-
-
-struct nic_packetlist {
-	size_t                  npl_cnt;    /* # of used packets */
-	REF struct nic_packet **npl_vec;    /* [1..1][0..npl_cnt][owned_if(!= npl_sta)] Vector of packets. */
-	REF struct nic_packet  *npl_sta[4]; /* Pre-allocated packets array. */
-};
-
-/* Initialize a given packet list */
-#define nic_packetlist_init(self) \
-	((self)->npl_cnt = 0, (self)->npl_vec = (self)->npl_sta)
-
-/* Finalize a given packet list */
-LOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL nic_packetlist_fini)(struct nic_packetlist *__restrict self) {
-	size_t i;
-	for (i = 0; i < self->npl_cnt; ++i)
-		decref_unlikely(self->npl_vec[i]);
-	if (self->npl_vec != self->npl_sta)
-		kfree(self->npl_vec);
-}
-
-/* Append the given packet to `self'
- * @return: * : Always re-returns `packet' */
-FUNDEF ATTR_RETNONNULL NONNULL((1, 2)) struct nic_packet *KCALL
-nic_packetlist_append(struct nic_packetlist *__restrict self,
-                      struct nic_packet *__restrict packet)
-		THROWS(E_BADALLOC);
-
-/* Allocate a new NIC packet and append it to the given packet list. */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
-nic_packetlist_newpacket(struct nic_packetlist *__restrict self,
-                         struct nic_device const *__restrict dev,
-                         USER CHECKED void const *payload, size_t payload_size,
-                         size_t max_head_size, size_t max_tail_size)
-		THROWS(E_BADALLOC);
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
-nic_packetlist_newpacketv(struct nic_packetlist *__restrict self,
-                          struct nic_device const *__restrict dev,
-                          struct aio_buffer const *__restrict payload,
-                          size_t max_head_size, size_t max_tail_size)
-		THROWS(E_BADALLOC);
-/* @return: * : A buffer of `buffer_size' bytes */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *KCALL
-nic_packetlist_newpacketk(struct nic_packetlist *__restrict self,
-                          struct nic_device const *__restrict dev,
-                          size_t buffer_size)
-		THROWS(E_BADALLOC);
-
-/* Send all of the packets within the given packet-size. */
-FUNDEF NONNULL((1, 2, 3)) void KCALL
-nic_device_sendall(struct nic_device *__restrict self,
-                   struct nic_packetlist const *__restrict packets,
-                   struct aio_multihandle *__restrict aio);
-
-/* Same as `nic_device_sendall()', however handle _all_ exceptions as AIO-failures
- * WARNING: This function may still clobber exception pointers! */
-FUNDEF NONNULL((1, 2, 3)) void
-NOTHROW(KCALL nic_device_sendall_nx)(struct nic_device *__restrict self,
-                                     struct nic_packetlist const *__restrict packets,
-                                     struct aio_multihandle *__restrict aio);
-
-/* Send the given packet in the background (s.a. `aio_handle_async_alloc()')
- * NOTE: Transmit errors get logged, but are silently discarded. */
-FUNDEF NONNULL((1, 2)) void KCALL
-nic_device_sendall_background(struct nic_device *__restrict self,
-                              struct nic_packetlist const *__restrict packets);
-
-/* Same as `nic_device_sendall_background()', however handle _all_ exceptions as AIO-failures
- * WARNING: This function may still clobber exception pointers! */
-FUNDEF NONNULL((1, 2)) void
-NOTHROW(KCALL nic_device_sendall_background_nx)(struct nic_device *__restrict self,
-                                                struct nic_packetlist const *__restrict packets);
-
 
 #endif /* __CC__ */
 

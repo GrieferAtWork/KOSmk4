@@ -394,6 +394,7 @@ local files = {
 	"../../include/linux/if_arp.h",
 	"../../include/linux/if_ether.h",
 	"../../include/netinet/ip.h",
+	"../../include/netinet/udp.h",
 };
 
 local include_prefixes = {
@@ -1774,6 +1775,19 @@ STATIC_ASSERT(alignof(struct iphdr) == __ALIGNOF_IPHDR);
 
 /* struct ip_timestamp */
 /* ... */
+
+
+
+
+
+#include <netinet/udp.h>
+
+/* struct udphdr */
+STATIC_ASSERT(offsetof(struct udphdr, uh_dport) == __OFFSET_UDPHDR_DPORT);
+STATIC_ASSERT(offsetof(struct udphdr, uh_sport) == __OFFSET_UDPHDR_SPORT);
+STATIC_ASSERT(offsetof(struct udphdr, uh_sum) == __OFFSET_UDPHDR_SUM);
+STATIC_ASSERT(offsetof(struct udphdr, uh_ulen) == __OFFSET_UDPHDR_ULEN);
+STATIC_ASSERT(sizeof(struct udphdr) == __SIZEOF_UDPHDR);
 //[[[end]]]
 
 

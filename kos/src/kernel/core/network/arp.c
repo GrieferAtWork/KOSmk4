@@ -100,8 +100,8 @@ arp_reply_myip(struct nic_device *__restrict dev,
  * @assume(packet_size >= 8); */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
 arp_routepacket(struct nic_device *__restrict dev,
-              void const *__restrict packet_data,
-              size_t packet_size) {
+                void const *__restrict packet_data,
+                size_t packet_size) {
 	struct arphdr *ahdr;
 	size_t required_size;
 	assert(packet_size >= 8);

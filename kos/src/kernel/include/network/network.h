@@ -36,8 +36,8 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-#define NET_PEERADDR_HAVE_NONE   0x0000
-#define NET_PEERADDR_HAVE_MAC    0x0001 /* [lock(SET_ONCE)] `npa_hwmac' is valid. */
+#define NET_PEERADDR_HAVE_NONE 0x0000
+#define NET_PEERADDR_HAVE_MAC  0x0001 /* [lock(SET_ONCE)] `npa_hwmac' is valid. */
 struct net_peeraddr {
 	WEAK refcnt_t npa_refcnt;          /* Reference counter. */
 	union {

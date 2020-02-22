@@ -27,6 +27,10 @@
 
 DECL_BEGIN
 
+/* Ethernet packet requirements */
+#define ETH_PACKET_HEADSIZE ETH_HLEN
+#define ETH_PACKET_TAILSIZE 0
+
 #ifdef __CC__
 
 /* Route an incoming packet through the given NIC device.
