@@ -27,14 +27,17 @@
 #include <misc/atomic-ref.h>
 #include <sched/signal.h>
 
+#include <hybrid/__assert.h>
+#include <hybrid/sync/atomic-rwlock.h>
+
 #include <linux/if_ether.h>
 
 DECL_BEGIN
 
 #ifdef __CC__
 
-#define NET_PEERADDR_HAVE_NONE 0x0000
-#define NET_PEERADDR_HAVE_MAC  0x0001 /* [lock(SET_ONCE)] `npa_hwmac' is valid. */
+#define NET_PEERADDR_HAVE_NONE   0x0000
+#define NET_PEERADDR_HAVE_MAC    0x0001 /* [lock(SET_ONCE)] `npa_hwmac' is valid. */
 struct net_peeraddr {
 	WEAK refcnt_t npa_refcnt;          /* Reference counter. */
 	union {
@@ -76,10 +79,38 @@ NOTHROW(KCALL net_peeraddrs_lookup_ip)(struct net_peeraddrs *__restrict self, be
 /* Empty network peer address list. */
 DATDEF struct net_peeraddrs net_peeraddrs_empty;
 
+struct ip_datagram;
+struct network_ip_datagrams {
+	struct atomic_rwlock  nid_lock;  /* Lock for accessing the datagram vector. */
+	size_t                nid_size;  /* Used vector length. */
+	size_t                nid_alloc; /* Allocated vector length. */
+	/* TODO: Free up datagrams that have timed out as part of system_clearcache()! */
+	struct ip_datagram   *nid_list;  /* [1..1][lock(nid_lock)][0..nid_size|alloc(nid_alloc)]
+	                                  * [SORTED][lock(nid_lock)][owned] Vector of incomplete datagrams */
+};
+
+#define network_ip_datagrams_init(self)     \
+	(atomic_rwlock_init(&(self)->nid_lock), \
+	 (self)->nid_size  = 0,                 \
+	 (self)->nid_alloc = 0,                 \
+	 (self)->nid_list  = __NULLPTR)
+#define network_ip_datagrams_cinit(self)      \
+	(atomic_rwlock_init(&(self)->nid_lock),   \
+	 __hybrid_assert((self)->nid_size == 0),  \
+	 __hybrid_assert((self)->nid_alloc == 0), \
+	 __hybrid_assert((self)->nid_list == __NULLPTR))
+
+/* Finalize a given network IP datagrams descriptor. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL network_ip_datagrams_fini)(struct network_ip_datagrams *__restrict self);
+
+
 struct network {
 	/* Generic network descriptor. */
 	ATOMIC_REF(struct net_peeraddrs) n_peers;   /* [1..1] Known network peers, and their addresses. */
 	struct sig                       n_addravl; /* Signal broadcast once a peer mac address becomes available. */
+	struct network_ip_datagrams      n_ipgrams; /* IP datagrams. */
+	u16                              n_ipsize;  /* Max IP fragment size (default initialize to `IP_MSS'). */
 };
 
 /* Ensure that a peer entry exists for `ip', returning its descriptor. */
@@ -88,16 +119,23 @@ network_peers_requireip(struct network *__restrict self, be32 ip)
 		THROWS(E_BADALLOC);
 
 /* Initialize a given network descriptor */
+#define __network_init_common(self) \
+	((self)->n_ipsize = 576 /*IP_MSS*/)
 #define network_init(self)                                    \
 	(atomic_ref_init(&(self)->n_peers, &net_peeraddrs_empty), \
-	 sig_init(&(self)->n_addravl))
+	 sig_init(&(self)->n_addravl),                            \
+	 network_ip_datagrams_init(&(self)->n_ipgrams),           \
+	 __network_init_common(self))
 #define network_cinit(self)                                    \
 	(atomic_ref_cinit(&(self)->n_peers, &net_peeraddrs_empty), \
-	 sig_cinit(&(self)->n_addravl))
+	 sig_cinit(&(self)->n_addravl),                            \
+	 network_ip_datagrams_cinit(&(self)->n_ipgrams),           \
+	 __network_init_common(self))
 
 /* Finalize a given network descriptor */
-#define network_fini(self) \
-	(atomic_ref_fini(&(self)->n_peers))
+#define network_fini(self)              \
+	(atomic_ref_fini(&(self)->n_peers), \
+	 network_ip_datagrams_fini(&(self)->n_ipgrams))
 
 
 #endif /* __CC__ */

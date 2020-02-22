@@ -92,7 +92,7 @@ struct __ATTR_PACKED __ATTR_ALIGNED(4) iphdr /*[PREFIX(ip_)]*/ {
 	unsigned int   ip_hl : 4; /* header length */
 #endif
 	__uint8_t      ip_tos;    /* type of service (s.a. `IPTOS_*') */
-	__u_net16_t    ip_len;    /* total length */
+	__u_net16_t    ip_len;    /* total length (of _this_ fragment) */
 	__u_net16_t    ip_id;     /* identification */
 	__u_net16_t    ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
 	__uint8_t      ip_ttl;    /* time to live */
@@ -113,7 +113,7 @@ struct __ATTR_PACKED __ATTR_ALIGNED(4) iphdr /*[PREFIX(ip_)]*/ {
 			unsigned int   ip_hl : 4; /* header length */
 #endif
 			__uint8_t      ip_tos;    /* type of service (s.a. `IPTOS_*') */
-			__u_net16_t    ip_len;    /* total length */
+			__u_net16_t    ip_len;    /* total length (of _this_ fragment) */
 			__u_net16_t    ip_id;     /* identification */
 			__u_net16_t    ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
 			__uint8_t      ip_ttl;    /* time to live */
@@ -131,7 +131,7 @@ struct __ATTR_PACKED __ATTR_ALIGNED(4) iphdr /*[PREFIX(ip_)]*/ {
 			unsigned int ihl : 4;     /* header length */
 #endif
 			__uint8_t    tos;         /* type of service (s.a. `IPTOS_*') */
-			__u_net16_t  tot_len;     /* total length */
+			__u_net16_t  tot_len;     /* total length (of _this_ fragment) */
 			__u_net16_t  id;          /* identification */
 			__u_net16_t  frag_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
 			__uint8_t    ttl;         /* time to live */
@@ -150,7 +150,7 @@ struct __ATTR_PACKED __ATTR_ALIGNED(4) iphdr /*[PREFIX(ip_)]*/ {
 	unsigned int ihl : 4;     /* header length */
 #endif
 	__uint8_t    tos;         /* type of service (s.a. `IPTOS_*') */
-	__u_net16_t  tot_len;     /* total length */
+	__u_net16_t  tot_len;     /* total length (of _this_ fragment) */
 	__u_net16_t  id;          /* identification */
 	__u_net16_t  frag_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
 	__uint8_t    ttl;         /* time to live */
@@ -228,7 +228,7 @@ struct __ATTR_PACKED __ATTR_ALIGNED(4) iphdr /*[PREFIX(ip_)]*/ {
 
 /* Masks and flags for `ip_off' */
 #define IP_RF      0x8000 /* reserved fragment flag */
-#define IP_DF      0x4000 /* dont fragment flag */
+#define IP_DF      0x4000 /* don't fragment flag */
 #define IP_MF      0x2000 /* more fragments flag */
 #define IP_OFFMASK 0x1fff /* mask for fragmenting bits */
 
@@ -245,7 +245,7 @@ struct __ATTR_PACKED __ATTR_ALIGNED(4) ip {
 	unsigned int   ip_hl : 4; /* header length */
 #endif
 	__uint8_t      ip_tos;    /* type of service (s.a. `IPTOS_*') */
-	__u_net16_t    ip_len;    /* total length */
+	__u_net16_t    ip_len;    /* total length (of _this_ fragment) */
 	__u_net16_t    ip_id;     /* identification */
 	__u_net16_t    ip_off;    /* fragment offset field (+ flags; aka. set of `IP_*') */
 	__uint8_t      ip_ttl;    /* time to live */

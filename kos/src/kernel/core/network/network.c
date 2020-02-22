@@ -22,12 +22,13 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/except.h>
 
 #include <dev/nic.h>
+#include <kernel/except.h>
 
 #include <hybrid/sequence/bsearch.h>
 
+#include <network/ip.h>
 #include <network/network.h>
 
 #include <assert.h>
@@ -117,6 +118,8 @@ again:
 	}
 	return result; /* Inherit reference */
 }
+
+
 
 
 DECL_END
