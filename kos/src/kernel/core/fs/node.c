@@ -35,6 +35,7 @@
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
+#include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/swap.h>
@@ -4556,10 +4557,10 @@ db_inode_loadpart(struct inode *__restrict self, datapage_t start,
 		TRY {
 			SCOPED_READLOCK((struct vm_datablock *)self);
 			(*type->it_file.f_pread)(self, buffer, num_bytes, daddr, &hand);
+			aio_multihandle_done(&hand);
 		} EXCEPT {
 			aio_multihandle_fail(&hand);
 		}
-		aio_multihandle_done(&hand);
 		TRY {
 			aio_multihandle_generic_waitfor(&hand);
 			aio_multihandle_generic_checkerror(&hand);
@@ -4598,10 +4599,10 @@ db_inode_savepart(struct inode *__restrict self, datapage_t start,
 		TRY {
 			SCOPED_WRITELOCK((struct vm_datablock *)self);
 			(*type->it_file.f_pwrite)(self, buffer, num_bytes, daddr, &hand);
+			aio_multihandle_done(&hand);
 		} EXCEPT {
 			aio_multihandle_fail(&hand);
 		}
-		aio_multihandle_done(&hand);
 		TRY {
 			aio_multihandle_generic_waitfor(&hand);
 			aio_multihandle_generic_checkerror(&hand);

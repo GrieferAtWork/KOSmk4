@@ -34,6 +34,7 @@
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
+#include <kernel/iovec.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
@@ -1004,10 +1005,10 @@ _block_device_sync(struct block_device *__restrict self)
 				break;
 			}
 		}
+		aio_multihandle_done(&hand);
 	} EXCEPT {
 		aio_multihandle_fail(&hand);
 	}
-	aio_multihandle_done(&hand);
 	TRY {
 		aio_multihandle_generic_waitfor(&hand);
 		aio_multihandle_generic_checkerror(&hand);

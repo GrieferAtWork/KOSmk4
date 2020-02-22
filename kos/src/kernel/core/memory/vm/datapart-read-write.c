@@ -24,7 +24,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/aio.h>
+#include <kernel/iovec.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
@@ -35,8 +35,8 @@
 
 #include <alloca.h>
 #include <assert.h>
-#include <string.h>
 #include <limits.h>
+#include <string.h>
 
 DECL_BEGIN
 

@@ -22,10 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/aio.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
+#include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>

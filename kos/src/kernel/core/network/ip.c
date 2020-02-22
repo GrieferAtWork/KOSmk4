@@ -274,7 +274,8 @@ ip_routepacket(struct nic_device *__restrict dev,
 		if (fragment_start != 0) {
 			if (fragment_start < 20) {
 				/* Only offset=0 fragments are allowed to write the IP header. */
-				printk(KERN_WARNING "[ip:%s] Datagram fragment start-offset clips into IP header (start=%I16u,size=%I16u)\n",
+				printk(KERN_WARNING "[ip:%s] Datagram fragment start-offset clips "
+				                    "into IP header (start=%I16u,size=%I16u)\n",
 				       dev->cd_name, fragment_start, fragment_size);
 				return;
 			}

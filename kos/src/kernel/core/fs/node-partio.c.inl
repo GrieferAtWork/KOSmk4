@@ -150,10 +150,10 @@ inode_do_load_datapart_pages_sync(struct inode *__restrict self,
 		                             partrelative_pageno,
 		                             num_data_pages,
 		                             &hand);
+		aio_multihandle_done(&hand);
 	} EXCEPT {
 		aio_multihandle_fail(&hand);
 	}
-	aio_multihandle_done(&hand);
 	TRY {
 		aio_multihandle_generic_waitfor(&hand);
 		aio_multihandle_generic_checkerror(&hand);

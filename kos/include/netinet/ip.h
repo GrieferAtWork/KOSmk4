@@ -54,7 +54,7 @@ __DECL_BEGIN
 
 #ifdef __CC__
 #ifndef __USE_KOS_PURE /* The same structure as `struct ip_timestamp' */
-struct __ATTR_PACKED __ATTR_ALIGNED(4) timestamp {
+struct __ATTR_PACKED __ATTR_ALIGNED(2) timestamp {
 	__uint8_t    len;
 	__uint8_t    ptr;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -80,9 +80,9 @@ struct __ATTR_PACKED __ATTR_ALIGNED(4) timestamp {
 #define __OFFSET_IPHDR_SRC 12
 #define __OFFSET_IPHDR_DST 16
 #define __SIZEOF_IPHDR     20
-#define __ALIGNOF_IPHDR    4
+#define __ALIGNOF_IPHDR    2
 #ifdef __CC__
-struct __ATTR_PACKED __ATTR_ALIGNED(4) iphdr /*[PREFIX(ip_)]*/ {
+struct __ATTR_PACKED __ATTR_ALIGNED(2) iphdr /*[PREFIX(ip_)]*/ {
 #ifdef __USE_KOS_PURE
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int   ip_hl : 4; /* header length */
@@ -236,7 +236,7 @@ struct __ATTR_PACKED __ATTR_ALIGNED(4) iphdr /*[PREFIX(ip_)]*/ {
 #ifdef __CC__
 
 #ifndef __USE_KOS_PURE /* The same structure as `struct iphdr' */
-struct __ATTR_PACKED __ATTR_ALIGNED(4) ip {
+struct __ATTR_PACKED __ATTR_ALIGNED(2) ip {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	unsigned int   ip_hl : 4; /* header length */
 	unsigned int   ip_v : 4;  /* version */
@@ -259,7 +259,7 @@ struct __ATTR_PACKED __ATTR_ALIGNED(4) ip {
 
 /* Time stamp option structure. */
 #ifdef __CC__
-struct __ATTR_PACKED __ATTR_ALIGNED(4) ip_timestamp {
+struct __ATTR_PACKED __ATTR_ALIGNED(2) ip_timestamp {
 	__uint8_t    ipt_code;     /* IPOPT_TS */
 	__uint8_t    ipt_len;      /* size of structure (variable) */
 	__uint8_t    ipt_ptr;      /* index of current entry */

@@ -82,259 +82,6 @@ NOTHROW(FCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__r
 
 
 
-/* Read/write/set data associated with AIO buffers. */
-PUBLIC NONNULL((1)) void KCALL
-aio_buffer_copyfromphys(struct aio_buffer const *__restrict self,
-                        uintptr_t dst_offset, vm_phys_t src, size_t num_bytes)
-		THROWS(E_SEGFAULT) {
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
-			continue;
-		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copyfromphys((byte_t *)ent.ab_base + dst_offset, src, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
-			break;
-		src += ent.ab_size;
-		num_bytes -= ent.ab_size;
-		dst_offset = 0;
-	}
-}
-
-PUBLIC NONNULL((1)) void KCALL
-aio_buffer_copytophys(struct aio_buffer const *__restrict self,
-                      vm_phys_t dst, uintptr_t src_offset, size_t num_bytes)
-		THROWS(E_SEGFAULT) {
-	struct aio_buffer_entry ent;
-	AIO_BUFFER_FOREACH_N(ent, self) {
-		if (src_offset >= ent.ab_size) {
-			src_offset -= ent.ab_size;
-			continue;
-		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copytophys(dst, (byte_t *)ent.ab_base + src_offset, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
-			break;
-		dst += ent.ab_size;
-		num_bytes -= ent.ab_size;
-		src_offset = 0;
-	}
-}
-
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_pbuffer_memset)(struct aio_pbuffer const *__restrict self,
-                                  uintptr_t dst_offset, int byte, size_t num_bytes) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
-			continue;
-		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_memsetphys(ent.ab_base + dst_offset, byte, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
-			break;
-		num_bytes -= ent.ab_size;
-		dst_offset = 0;
-	}
-}
-
-PUBLIC NONNULL((1)) void KCALL
-aio_pbuffer_copyfrommem(struct aio_pbuffer const *__restrict self,
-                        uintptr_t dst_offset,
-                        USER CHECKED void const *src, size_t num_bytes)
-		THROWS(E_SEGFAULT) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
-			continue;
-		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copytophys(ent.ab_base + dst_offset, src, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
-			break;
-		src = (byte_t *)src + ent.ab_size;
-		num_bytes -= ent.ab_size;
-		dst_offset = 0;
-	}
-}
-
-PUBLIC NONNULL((1)) void KCALL
-aio_pbuffer_copytomem(struct aio_pbuffer const *__restrict self,
-                      USER CHECKED void *dst,
-                      uintptr_t src_offset, size_t num_bytes)
-       THROWS(E_SEGFAULT) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH_N(ent, self) {
-		if (src_offset >= ent.ab_size) {
-			src_offset -= ent.ab_size;
-			continue;
-		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copyfromphys(dst, (vm_phys_t)(ent.ab_base + src_offset), ent.ab_size);
-		if (ent.ab_size >= num_bytes)
-			break;
-		dst = (byte_t *)dst + ent.ab_size;
-		num_bytes -= ent.ab_size;
-		src_offset = 0;
-	}
-}
-
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_pbuffer_copyfromphys)(struct aio_pbuffer const *__restrict self,
-                                        uintptr_t dst_offset,
-                                        vm_phys_t src, size_t num_bytes) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH_N(ent, self) {
-		if (dst_offset >= ent.ab_size) {
-			dst_offset -= ent.ab_size;
-			continue;
-		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copyinphys(ent.ab_base + dst_offset, src, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
-			break;
-		src += ent.ab_size;
-		num_bytes -= ent.ab_size;
-		dst_offset = 0;
-	}
-}
-
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_pbuffer_copytophys)(struct aio_pbuffer const *__restrict self,
-                                      vm_phys_t dst,
-                                      uintptr_t src_offset, size_t num_bytes) {
-	struct aio_pbuffer_entry ent;
-	AIO_PBUFFER_FOREACH_N(ent, self) {
-		if (src_offset >= ent.ab_size) {
-			src_offset -= ent.ab_size;
-			continue;
-		}
-		if (ent.ab_size > num_bytes)
-			ent.ab_size = num_bytes;
-		vm_copyinphys(dst, ent.ab_base + src_offset, ent.ab_size);
-		if (ent.ab_size >= num_bytes)
-			break;
-		dst += ent.ab_size;
-		num_bytes -= ent.ab_size;
-		src_offset = 0;
-	}
-}
-
-PUBLIC NONNULL((1)) void KCALL
-aio_buffer_copytovphys(struct aio_buffer const *__restrict src,
-                       struct aio_pbuffer const *__restrict dst,
-                       uintptr_t dst_offset,
-                       uintptr_t src_offset,
-                       size_t num_bytes)
-		THROWS(E_SEGFAULT) {
-	struct aio_pbuffer_entry dstent;
-	assert(aio_buffer_size(src) >= src_offset + num_bytes);
-	assert(aio_pbuffer_size(dst) >= dst_offset + num_bytes);
-	AIO_PBUFFER_FOREACH_N(dstent, dst) {
-		size_t partcopy;
-		if (dst_offset != 0) {
-			if (dst_offset >= dstent.ab_size) {
-				dst_offset -= dstent.ab_size;
-				continue;
-			}
-			dstent.ab_base += dst_offset;
-			dstent.ab_size -= dst_offset;
-			dst_offset = 0;
-		}
-		partcopy = dstent.ab_size;
-		if (partcopy > num_bytes)
-			partcopy = num_bytes;
-		aio_buffer_copytophys(src,
-		                      dstent.ab_base,
-		                      src_offset,
-		                      partcopy);
-		if (partcopy >= num_bytes)
-			break;
-		num_bytes  -= partcopy;
-		src_offset += partcopy;
-	}
-}
-
-PUBLIC NONNULL((1)) void KCALL
-aio_pbuffer_copytovmem(struct aio_pbuffer const *__restrict src,
-                       struct aio_buffer const *__restrict dst,
-                       uintptr_t dst_offset,
-                       uintptr_t src_offset,
-                       size_t num_bytes)
-		THROWS(E_SEGFAULT) {
-	struct aio_buffer_entry dstent;
-	assert(aio_pbuffer_size(src) >= src_offset + num_bytes);
-	assert(aio_buffer_size(dst) >= dst_offset + num_bytes);
-	AIO_BUFFER_FOREACH_N(dstent, dst) {
-		size_t partcopy;
-		if (dst_offset != 0) {
-			if (dst_offset >= dstent.ab_size) {
-				dst_offset -= dstent.ab_size;
-				continue;
-			}
-			dstent.ab_base = (byte_t *)dstent.ab_base + dst_offset;
-			dstent.ab_size -= dst_offset;
-			dst_offset = 0;
-		}
-		partcopy = dstent.ab_size;
-		if (partcopy > num_bytes)
-			partcopy = num_bytes;
-		aio_pbuffer_copytomem(src,
-		                      dstent.ab_base,
-		                      src_offset,
-		                      partcopy);
-		if (partcopy >= num_bytes)
-			break;
-		num_bytes  -= partcopy;
-		src_offset += partcopy;
-	}
-}
-
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_pbuffer_copytovphys)(struct aio_pbuffer const *__restrict src,
-                                       struct aio_pbuffer const *__restrict dst,
-                                       uintptr_t dst_offset,
-                                       uintptr_t src_offset,
-                                       size_t num_bytes) {
-	struct aio_pbuffer_entry dstent;
-	assert(aio_pbuffer_size(src) >= src_offset + num_bytes);
-	assert(aio_pbuffer_size(dst) >= dst_offset + num_bytes);
-	AIO_PBUFFER_FOREACH_N(dstent, dst) {
-		size_t partcopy;
-		if (dst_offset != 0) {
-			if (dst_offset >= dstent.ab_size) {
-				dst_offset -= dstent.ab_size;
-				continue;
-			}
-			dstent.ab_base += dst_offset;
-			dstent.ab_size -= dst_offset;
-			dst_offset = 0;
-		}
-		partcopy = dstent.ab_size;
-		if (partcopy > num_bytes)
-			partcopy = num_bytes;
-		aio_pbuffer_copytophys(src,
-		                       dstent.ab_base,
-		                       src_offset,
-		                       partcopy);
-		if (partcopy >= num_bytes)
-			break;
-		num_bytes  -= partcopy;
-		src_offset += partcopy;
-	}
-}
-
-
 
 /* Callback for `aio_handle_multiple' */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -390,7 +137,7 @@ NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
 		ent = &self->am_ivec[i];
 		assert(ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED ||
 		       ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE);
-		if (ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE)
+		if (ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE && ent->ah_type)
 			aio_handle_fini(ent);
 #ifndef NDEBUG
 		memset(ent, 0xcc, sizeof(*ent));
@@ -407,7 +154,7 @@ NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
 			ent = &iter->ame_handles[i];
 			assert(ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED ||
 			       ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE);
-			if (ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE)
+			if (ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE && ent->ah_type)
 				aio_handle_fini(ent);
 		}
 		kfree(iter);
@@ -481,6 +228,9 @@ fill_in_result:
 #endif /* !NDEBUG */
 	result->ah_func       = &aio_handle_multiple_func;
 	result->hg_controller = self;
+	/* Required by `aio_multihandle_cancel()'
+	 * Used to ensure that the handle was actually initialized. */
+	result->ah_type = NULL;
 	ATOMIC_FETCHINC(self->am_status); /* Increment the run counter. */
 	return result;
 }
@@ -538,6 +288,9 @@ fill_in_result:
 #endif /* !NDEBUG */
 	result->ah_func       = &aio_handle_multiple_func;
 	result->hg_controller = self;
+	/* Required by `aio_multihandle_cancel()'
+	 * Used to ensure that the handle was actually initialized. */
+	result->ah_type = NULL;
 	ATOMIC_FETCHINC(self->am_status); /* Increment the run counter. */
 	return result;
 err:
@@ -567,10 +320,18 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 		unsigned int status;
 		/* All handles have already completed. */
 		status = (old_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) >> AIO_MULTIHANDLE_STATUS_STATUSSHFT;
-		if (status == AIO_COMPLETION_FAILURE)
-			memcpy(&THIS_EXCEPTION_DATA, &self->am_error, sizeof(self->am_error));
-		/* Invoke the completion callback. */
-		(*self->am_func)(self, status);
+		if (status == AIO_COMPLETION_FAILURE) {
+			struct exception_data old_exc, *my_exc;
+			my_exc = &THIS_EXCEPTION_DATA;
+			memcpy(&old_exc, &my_exc, sizeof(my_exc));
+			memcpy(my_exc, &self->am_error, sizeof(self->am_error));
+			/* Invoke the completion callback. */
+			(*self->am_func)(self, status);
+			memcpy(&my_exc, &old_exc, sizeof(my_exc));
+		} else {
+			/* Invoke the completion callback. */
+			(*self->am_func)(self, status);
+		}
 	}
 }
 
@@ -604,6 +365,8 @@ NOTHROW(KCALL aio_multihandle_fail)(struct aio_multihandle *__restrict self) {
 }
 
 
+/* Cancel all currently running handles of `self'
+ * NOTE: May be called multiple times without causing harm. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_multihandle_cancel)(struct aio_multihandle *__restrict self) {
 	unsigned int i;
@@ -621,8 +384,6 @@ NOTHROW(KCALL aio_multihandle_cancel)(struct aio_multihandle *__restrict self) {
 				aio_handle_cancel(&ext->ame_handles[i]);
 		}
 	}
-	assertf((ATOMIC_READ(self->am_status) & AIO_MULTIHANDLE_STATUS_RUNMASK) == 0,
-	        "self->am_status = %.8I64X\n", self->am_status);
 }
 
 
@@ -653,6 +414,7 @@ NOTHROW(KCALL aio_multihandle_cancel)(struct aio_multihandle *__restrict self) {
 struct async_aio_handle: aio_handle {
 	struct async_aio_handle *aah_next; /* [lock(IN_CHAIN(async_aio_handles))][0..1]
 	                                    * The next used/free async-aio handle. */
+	aio_completion_t         aah_func; /* [0..1] The user-defined completion function. */
 };
 
 /* [0..1][lock(ATOMIC)] Chain of used/free async-aio handles. */
@@ -740,15 +502,20 @@ PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL aio_handle_async_func)(struct aio_handle *__restrict self,
                                      unsigned int status) {
 	struct async_aio_handle *me;
-	if (status == AIO_COMPLETION_FAILURE)
-		error_printf("Performing background AIO operation");
 	me = (struct async_aio_handle *)self;
 	aio_handle_async_restore_chain(me, me);
+	/* Invoke the user-defined completion function (if defined) */
+	if (me->aah_func) {
+		(*me->aah_func)(me, status);
+	} else {
+		if (status == AIO_COMPLETION_FAILURE)
+			error_printf("Performing background AIO operation");
+	}
 }
 
 
 PUBLIC WUNUSED ATTR_RETNONNULL struct aio_handle *KCALL
-aio_handle_async_alloc(void) THROWS(E_BADALLOC) {
+aio_handle_async_alloc(aio_completion_t func) THROWS(E_BADALLOC) {
 	struct async_aio_handle *result;
 	result = aio_handle_async_alloc_exising();
 	if (!result) {
@@ -761,7 +528,8 @@ aio_handle_async_alloc(void) THROWS(E_BADALLOC) {
 		 *       handle immediately, because the caller of the callback
 		 *       must still be able to set the handle's next pointer to
 		 *       indicate `AIO_HANDLE_NEXT_COMPLETED' */
-		result->ah_func = &aio_handle_async_func;
+		result->ah_func  = &aio_handle_async_func;
+		result->aah_func = func;
 	}
 	return result;
 }

@@ -320,7 +320,7 @@ ntohq:($uint64_t netlong) -> $uint64_t {
                                    (((__uint32_t const *)(a))[2] == ((__uint32_t const *)(b))[2]) && \
                                    (((__uint32_t const *)(a))[3] == ((__uint32_t const *)(b))[3]))
 #endif /* __NO_XBLOCK */
-#define IN6_IS_ADDR_MULTICAST(a)    (((uint8_t const *)(a))[0] == 0xff)
+#define IN6_IS_ADDR_MULTICAST(a)    (((__uint8_t const *)(a))[0] == 0xff)
 }
 %[default_impl_section(.text.crt.net.inet.6.bind_reserved)]
 
@@ -364,19 +364,19 @@ struct ip6_mtuinfo {
 @@Obsolete hop-by-hop and Destination Options Processing (RFC 2292)
 [cp_kos][ATTR_DEPRECATED_] inet6_option_space:(int nbytes) -> int;
 [cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_init:(void *bp, struct cmsghdr **cmsgp, int type) -> int;
-[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_append:(struct cmsghdr *cmsg, uint8_t const *typep, int multx, int plusy) -> int;
-[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_alloc:(struct cmsghdr *cmsg, int datalen, int multx, int plusy) -> uint8_t *;
-[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_next:(struct cmsghdr const *cmsg, uint8_t **tptrp) -> int;
-[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_find:(struct cmsghdr const *cmsg, uint8_t **tptrp, int type) -> int;
+[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_append:(struct cmsghdr *cmsg, $uint8_t const *typep, int multx, int plusy) -> int;
+[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_alloc:(struct cmsghdr *cmsg, int datalen, int multx, int plusy) -> $uint8_t *;
+[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_next:(struct cmsghdr const *cmsg, $uint8_t **tptrp) -> int;
+[cp_kos][ATTR_DEPRECATED_][doc_alias(inet6_option_space)] inet6_option_find:(struct cmsghdr const *cmsg, $uint8_t **tptrp, int type) -> int;
 
 %[default_impl_section(.text.crt.net.inet.6.RFC_3542)]
 @@Hop-by-Hop and Destination Options Processing (RFC 3542)
 [cp_kos] inet6_opt_init:(void *extbuf, socklen_t extlen) -> int;
-[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_append:(void *extbuf, socklen_t extlen, int offset, uint8_t type, socklen_t len, uint8_t align, void **databufp) -> int;
+[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_append:(void *extbuf, socklen_t extlen, int offset, $uint8_t type, socklen_t len, $uint8_t align, void **databufp) -> int;
 [cp_kos][doc_alias(inet6_opt_init)] inet6_opt_finish:(void *extbuf, socklen_t extlen, int offset) -> int;
 [cp_kos][doc_alias(inet6_opt_init)] inet6_opt_set_val:(void *databuf, int offset, void *val, socklen_t vallen) -> int;
-[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_next:(void *extbuf, socklen_t extlen, int offset, uint8_t *typep, socklen_t *lenp, void **databufp) -> int;
-[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_find:(void *extbuf, socklen_t extlen, int offset, uint8_t type, socklen_t *lenp, void **databufp) -> int;
+[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_next:(void *extbuf, socklen_t extlen, int offset, $uint8_t *typep, socklen_t *lenp, void **databufp) -> int;
+[cp_kos][doc_alias(inet6_opt_init)] inet6_opt_find:(void *extbuf, socklen_t extlen, int offset, $uint8_t type, socklen_t *lenp, void **databufp) -> int;
 [cp_kos][doc_alias(inet6_opt_init)] inet6_opt_get_val:(void *databuf, int offset, void *val, socklen_t vallen) -> int;
 
 %[default_impl_section(.text.crt.net.inet.6.RFC_3542)]
@@ -406,13 +406,13 @@ setipv4sourcefilter:($fd_t sockfd, struct in_addr interface_addr,
 [cp_kos]
 getsourcefilter:($fd_t sockfd, $uint32_t interface_addr,
                  struct sockaddr const *group, socklen_t grouplen,
-                 $uint32_t *fmode, uint32_t *numsrc,
+                 $uint32_t *fmode, $uint32_t *numsrc,
                  struct sockaddr_storage *slist) -> int;
 @@Set source filter
 [cp_kos]
 setsourcefilter:($fd_t sockfd, $uint32_t interface_addr,
                  struct sockaddr const *group, socklen_t grouplen,
-                 $uint32_t fmode, uint32_t numsrc,
+                 $uint32_t fmode, $uint32_t numsrc,
                  struct sockaddr_storage const *slist) -> int;
 %#endif /* __USE_GNU */
 

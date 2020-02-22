@@ -28,6 +28,7 @@
 #include <drivers/usb.h>
 #include <kernel/aio.h>
 #include <kernel/except.h>
+#include <kernel/iovec.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 

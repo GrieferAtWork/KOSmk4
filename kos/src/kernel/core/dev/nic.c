@@ -26,6 +26,7 @@
 #include <dev/nic.h>
 #include <kernel/aio.h>
 #include <kernel/heap.h>
+#include <kernel/iovec.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
@@ -49,7 +50,7 @@ DECL_BEGIN
 /* Allocate a new NIC packet which may be used to send the given payload.
  * Reserve sufficient space for headers and footers of up to the specified
  * sizes to be included alongside the payload. */
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct nic_packet *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
 nic_device_newpacket(struct nic_device const *__restrict self,
                      USER CHECKED void const *payload, size_t payload_size,
                      size_t max_head_size, size_t max_tail_size)
@@ -67,7 +68,7 @@ nic_device_newpacket(struct nic_device const *__restrict self,
 	return result;
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct nic_packet *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
 nic_device_newpacketv(struct nic_device const *__restrict self,
                       struct aio_buffer const *__restrict payload,
                       size_t max_head_size, size_t max_tail_size)
@@ -95,7 +96,7 @@ nic_device_newpacketv(struct nic_device const *__restrict self,
 	return result;
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct nic_packet *KCALL
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
 nic_device_newpacketk_impl(struct nic_device const *__restrict self,
                            size_t buffer_size)
 		THROWS(E_BADALLOC) {
@@ -270,6 +271,154 @@ nic_device_routepacket(struct nic_device *__restrict self,
 	}
 	nic_rpacket_free(packet);
 }
+
+
+
+/* Append the given packet to `self' */
+PRIVATE ATTR_RETNONNULL NONNULL((1, 2)) struct nic_packet *KCALL
+nic_packetlist_append_inherit(struct nic_packetlist *__restrict self,
+                              /*inherit(always)*/ REF struct nic_packet *__restrict packet)
+		THROWS(E_BADALLOC) {
+	size_t alloc = COMPILER_LENOF(self->npl_sta);
+	if (self->npl_vec != self->npl_sta)
+		alloc = kmalloc_usable_size(self->npl_vec) / sizeof(REF struct nic_packet *);
+	assert(self->npl_cnt <= alloc);
+	if (self->npl_cnt >= alloc) {
+		REF struct nic_packet **new_vector;
+		size_t new_alloc = self->npl_cnt * 2;
+		assert(new_alloc > self->npl_cnt);
+		new_vector = self->npl_vec == self->npl_sta
+		             ? (REF struct nic_packet **)kmalloc_nx(new_alloc * sizeof(REF struct nic_packet *), GFP_NORMAL)
+		             : (REF struct nic_packet **)krealloc_nx(self->npl_vec,
+		                                                     new_alloc * sizeof(REF struct nic_packet *),
+		                                                     GFP_NORMAL);
+		if unlikely(!new_vector) {
+			new_alloc  = self->npl_cnt + 1;
+			TRY {
+				new_vector = self->npl_vec == self->npl_sta
+				             ? (REF struct nic_packet **)kmalloc(new_alloc * sizeof(REF struct nic_packet *), GFP_NORMAL)
+				             : (REF struct nic_packet **)krealloc(self->npl_vec,
+				                                                  new_alloc * sizeof(REF struct nic_packet *),
+				                                                  GFP_NORMAL);
+			} EXCEPT {
+				decref(packet); /* inherit(always) */
+				RETHROW();
+			}
+		}
+		self->npl_vec = new_vector;
+	}
+	self->npl_vec[self->npl_cnt++] = packet; /* Inherit reference */
+	return packet;
+}
+
+/* Append the given packet to `self'
+ * @return: * : Always re-returns `packet' */
+PUBLIC ATTR_RETNONNULL NONNULL((1, 2)) struct nic_packet *KCALL
+nic_packetlist_append(struct nic_packetlist *__restrict self,
+                      struct nic_packet *__restrict packet)
+		THROWS(E_BADALLOC) {
+	return nic_packetlist_append_inherit(self, incref(packet));
+}
+
+/* Allocate a new NIC packet and append it to the given packet list. */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
+nic_packetlist_newpacket(struct nic_packetlist *__restrict self,
+                         struct nic_device const *__restrict dev,
+                         USER CHECKED void const *payload, size_t payload_size,
+                         size_t max_head_size, size_t max_tail_size)
+		THROWS(E_BADALLOC) {
+	REF struct nic_packet *packet;
+	packet = nic_device_newpacket(dev, payload, payload_size,
+	                              max_head_size, max_tail_size);
+	return nic_packetlist_append_inherit(self, packet);
+}
+
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct nic_packet *KCALL
+nic_packetlist_newpacketv(struct nic_packetlist *__restrict self,
+                          struct nic_device const *__restrict dev,
+                          struct aio_buffer const *__restrict payload,
+                          size_t max_head_size, size_t max_tail_size)
+		THROWS(E_BADALLOC) {
+	REF struct nic_packet *packet;
+	packet = nic_device_newpacketv(dev, payload, max_head_size, max_tail_size);
+	return nic_packetlist_append_inherit(self, packet);
+}
+
+/* @return: * : A buffer of `buffer_size' bytes */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *KCALL
+nic_packetlist_newpacketk(struct nic_packetlist *__restrict self,
+                          struct nic_device const *__restrict dev,
+                          size_t buffer_size)
+		THROWS(E_BADALLOC) {
+	void *result;
+	REF struct nic_packet *packet;
+	packet = nic_device_newpacketk(dev, &result, buffer_size);
+	nic_packetlist_append_inherit(self, packet);
+	return result;
+}
+
+
+/* Send all of the packets within the given packet-size. */
+PUBLIC NONNULL((1, 2, 3)) void KCALL
+nic_device_sendall(struct nic_device *__restrict self,
+                   struct nic_packetlist const *__restrict packets,
+                   struct aio_multihandle *__restrict aio) {
+	TRY {
+		size_t i;
+		for (i = 0; i < packets->npl_cnt; ++i) {
+			struct aio_handle *hand;
+			hand = aio_multihandle_allochandle(aio);
+			nic_device_send(self, packets->npl_vec[i], hand);
+		}
+	} EXCEPT {
+		aio_multihandle_done(aio);
+		aio_multihandle_cancel(aio);
+		RETHROW();
+	}
+}
+
+
+/* Same as `nic_device_sendall()', however handle _all_ exceptions as AIO-failures
+ * WARNING: This function may still clobber exception pointers! */
+PUBLIC NONNULL((1, 2, 3)) void
+NOTHROW(KCALL nic_device_sendall_nx)(struct nic_device *__restrict self,
+                                     struct nic_packetlist const *__restrict packets,
+                                     struct aio_multihandle *__restrict aio) {
+	TRY {
+		size_t i;
+		for (i = 0; i < packets->npl_cnt; ++i) {
+			struct aio_handle *hand;
+			hand = aio_multihandle_allochandle(aio);
+			nic_device_send(self, packets->npl_vec[i], hand);
+		}
+	} EXCEPT {
+		aio_multihandle_fail(aio);
+	}
+}
+
+/* Send the given packet in the background (s.a. `aio_handle_async_alloc()')
+ * NOTE: Transmit errors get logged, but are silently discarded. */
+PUBLIC NONNULL((1, 2)) void KCALL
+nic_device_sendall_background(struct nic_device *__restrict self,
+                              struct nic_packetlist const *__restrict packets) {
+	size_t i;
+	/* XXX: Cancel already started packets on error! */
+	for (i = 0; i < packets->npl_cnt; ++i)
+		nic_device_send_background(self, packets->npl_vec[i]);
+}
+
+/* Same as `nic_device_sendall_background()', however handle _all_ exceptions as AIO-failures
+ * WARNING: This function may still clobber exception pointers! */
+PUBLIC NONNULL((1, 2)) void
+NOTHROW(KCALL nic_device_sendall_background_nx)(struct nic_device *__restrict self,
+                                                struct nic_packetlist const *__restrict packets) {
+	size_t i;
+	/* XXX: Cancel already started packets on error! */
+	for (i = 0; i < packets->npl_cnt; ++i)
+		nic_device_send_background_nx(self, packets->npl_vec[i]);
+}
+
+
 
 DECL_END
 

@@ -28,6 +28,7 @@
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
+#include <kernel/iovec.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
 #include <kernel/vm/futex.h>

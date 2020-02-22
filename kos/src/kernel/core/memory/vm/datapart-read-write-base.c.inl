@@ -25,8 +25,10 @@
 #define DEFINE_IO_NOPF 1
 #endif
 
-#include <limits.h> /* SSIZE_MAX */
+#include <kernel/except.h>
 #include <kernel/vm/phys.h>
+
+#include <limits.h> /* SSIZE_MAX */
 
 DECL_BEGIN
 

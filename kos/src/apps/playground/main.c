@@ -321,7 +321,7 @@ int main_nic(int argc, char *argv[], char *envp[]) {
 	signal(SIGINT, SIG_IGN);
 	{
 		fd_t fd = Open("/dev/ne2k0", O_RDWR);
-		struct ATTR_PACKED {
+		struct ATTR_PACKED ATTR_ALIGNED(2) {
 			struct ethhdr eth;
 			struct iphdr  ip;
 			struct udphdr udp;

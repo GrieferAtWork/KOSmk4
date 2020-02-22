@@ -25,6 +25,7 @@
 #endif
 
 #include <kernel/aio.h>
+#include <kernel/iovec.h>
 
 DECL_BEGIN
 

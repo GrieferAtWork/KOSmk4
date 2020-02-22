@@ -26,6 +26,7 @@
 #endif
 
 #include <kernel/aio.h>
+#include <kernel/iovec.h>
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 

@@ -22,6 +22,8 @@
 #endif /* __INTELLISENSE__ */
 
 #include <fs/node.h>
+#include <kernel/aio.h>
+#include <kernel/iovec.h>
 #include <kernel/swap.h>
 #include <kernel/vm/phys.h>
 
@@ -381,11 +383,10 @@ load_next_part:
 			               num_bytes,
 			               file_position,
 			               &hand);
+			aio_multihandle_done(&hand);
 		} EXCEPT {
 			aio_multihandle_fail(&hand);
-			RETHROW();
 		}
-		aio_multihandle_done(&hand);
 		/* Wait for AIO completion */
 		aio_multihandle_generic_waitfor(&hand);
 		aio_multihandle_generic_checkerror(&hand);

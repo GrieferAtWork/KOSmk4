@@ -30,6 +30,7 @@
 #include <kernel/aio.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
+#include <kernel/iovec.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
