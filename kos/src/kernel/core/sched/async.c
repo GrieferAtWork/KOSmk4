@@ -23,6 +23,8 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/aio.h>
+#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
@@ -35,6 +37,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/minmax.h>
 
 #include <assert.h>
 #include <string.h>
@@ -272,6 +275,9 @@ NOTHROW(ASYNC_CALLBACK_CC async_worker_timeout)(struct timespec const *__restric
 }
 
 
+/* @return: true:  Previously connected signals have been disconnected.
+ * @return: false: Move onto the step of waiting for something to happen. */
+PRIVATE bool NOTHROW(FCALL _asyncjob_main)(void);
 
 INTERN ATTR_NORETURN void
 NOTHROW(FCALL _asyncmain)(void) {
@@ -367,7 +373,12 @@ again:
 			}
 			aworker_decref_obj(w, obj);
 		}
-
+		decref_unlikely(workers);
+		/* Service async jobs. */
+		if (_asyncjob_main()) {
+			task_disconnectall();
+			goto again;
+		}
 		{
 			struct task_connection awork_changed_con;
 			struct sig *received_signal;
@@ -379,7 +390,6 @@ again:
 				error_printf("_asyncmain:task_waitfor()");
 				goto again;
 			}
-			decref_unlikely(workers);
 			if (!received_signal) {
 				REF struct aworker *receiver;
 				/* A timeout expired. (invoke the associated worker's time-callback) */
@@ -580,6 +590,514 @@ NOTHROW(KCALL unregister_async_worker)(struct async_worker_callbacks const *__re
 	decref_unlikely(workers);
 	return false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/************************************************************************/
+/* ASYNC_JOB API                                                        */
+/************************************************************************/
+
+/* Special values for `async_job::aj_aio' */
+#define ASYNC_JOB_AIO_NONPRESENT ((struct aio_handle *)0)  /* No AIO attached to this job, or AIO has already been triggered */
+#define ASYNC_JOB_AIO_CANCELED   ((struct aio_handle *)-1) /* The async job has been canceled. */
+#if 1
+#define ASYNC_JOB_AIO_ISSPEC(x)    ((x) == ASYNC_JOB_AIO_CANCELED)
+#else
+#define ASYNC_JOB_AIO_ISSPEC(x)    ((uintptr_t)(x) >= (uintptr_t)-1)
+#endif
+#define ASYNC_JOB_AIO_ISPRESENT(x) (((uintptr_t)(x)-1) < (uintptr_t)-2)
+
+struct async_job {
+	REF struct async_job             *aj_next;   /* [0..1][lock(PRIVATE(ASYNC_WORKER))] Next async job. */
+	struct async_job_callbacks const *aj_ops;    /* [1..1][const] Async job callbacks.
+	                                              * NOTE: This field also holds a reference to `aj_ops->jc_driver' */
+	WEAK struct aio_handle           *aj_aio;    /* [0..1][lock(CLEAR_ONCE)] Attached AIO and job cancellation indicator. */
+	WEAK refcnt_t                     aj_refcnt; /* Reference counter.
+	                                              * WARNING: This function _must_ always be located at the end of this structure!
+	                                              *          This placement is part of the ABI (s.a. `async_job_refcnt()') */
+};
+
+/* [0..1][lock(INSERT(ATOMIC), REMOVE(PRIVATE(ASYNC_WORKER)))]
+ * Chain of active async-jobs. */
+PRIVATE ATTR_READMOSTLY REF struct async_job *WEAK async_jobs = NULL;
+
+/* [?..1] The async job currently configured to receive timeouts. */
+PRIVATE struct async_job *async_job_current_timeout = NULL;
+
+PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
+asyncjob_timeout_worker_timeout(void *__restrict UNUSED(self)) {
+	bool incomplete;
+	assert(async_job_current_timeout);
+	TRY {
+		incomplete = (*async_job_current_timeout->aj_ops->jc_time)(async_job_current_timeout + 1);
+	} EXCEPT {
+		struct aio_handle *aio;
+		/* Signal AIO completion with error. */
+		PREEMPTION_DISABLE();
+		aio = ATOMIC_XCH(async_job_current_timeout->aj_aio,
+		                 ASYNC_JOB_AIO_NONPRESENT);
+		if (ASYNC_JOB_AIO_ISPRESENT(aio)) {
+			aio_handle_complete_nopr(aio, AIO_COMPLETION_FAILURE);
+			PREEMPTION_ENABLE();
+		} else {
+			PREEMPTION_ENABLE();
+			/* Log an exception that's going to be discarded. */
+			error_printf("ajob:work@%p(%p)",
+			             async_job_current_timeout->aj_ops->jc_work,
+			             async_job_current_timeout + 1);
+		}
+		goto do_delete_job;
+	}
+	if (!incomplete) {
+		struct async_job **pjob, *job;
+do_delete_job:
+		/* Delete this job. */
+		pjob = &async_jobs;
+		job  = ATOMIC_READ(async_jobs);
+		for (;;) {
+			assert(job);
+			if (job == async_job_current_timeout)
+				break;
+			pjob = &job->aj_next;
+			job  = *pjob;
+		}
+		if unlikely(!ATOMIC_CMPXCH(*pjob, job, job->aj_next)) {
+			/* This can happen when `pjob == &async_jobs',
+			 * and new jobs have been added in the mean time. */
+			struct async_job *prev;
+			assert(pjob == &async_jobs);
+			prev = ATOMIC_READ(async_jobs);
+			for (;;) {
+				assert(prev);
+				if (prev->aj_next == job)
+					break;
+				prev = prev->aj_next;
+			}
+			ATOMIC_WRITE(prev->aj_next, job->aj_next);
+		}
+		/* Drop our reference to the job, which will likely destroy it. */
+		decref_likely(job + 1);
+	}
+}
+
+
+PRIVATE NONNULL((1, 2)) bool ASYNC_CALLBACK_CC
+asyncjob_timeout_worker_poll(void *__restrict UNUSED(self),
+                             void *__restrict UNUSED(cookie)) {
+	/* Should never be called */
+	return false;
+}
+
+PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
+asyncjob_timeout_worker_work(void *__restrict UNUSED(self)) {
+	/* Should never be called */
+}
+
+/* A stub async-worker that's used for async-job timeouts */
+PRIVATE struct aworker asyncjob_timeout_worker = {
+	/* .aw_refcnt = */ 1, /* +1: asyncjob_timeout_worker */
+	/* .aw_cb     = */ {
+		/* .awc_poll = */ &asyncjob_timeout_worker_poll,
+		/* .awc_work = */ &asyncjob_timeout_worker_work,
+		/* .awc_test = */ NULL
+	},
+	/* .aw_obj   = */ &drv_self,
+	/* .aw_typ   = */ HANDLE_TYPE_DRIVER,
+	/* ._aw_pad  = */ 0
+#ifndef CONFIG_NO_SMP
+	,
+	/* .aw_inuse = */ 0
+#endif /* !CONFIG_NO_SMP */
+};
+
+
+/* Passed to async-job poll() functions as timeout argument. */
+PRIVATE struct timespec asyncjob_main_timeout = { 0, 0 };
+
+/* @return: true:  Previously connected signals have been disconnected.
+ * @return: false: Move onto the step of waiting for something to happen. */
+PRIVATE bool NOTHROW(FCALL _asyncjob_main)(void) {
+	struct async_job **pjob, *job;
+	bool result = false;
+	pjob = &async_jobs;
+	job  = ATOMIC_READ(async_jobs);
+	while (job) {
+		struct aio_handle *state;
+handle_job:
+		state = ATOMIC_READ(job->aj_aio);
+		if unlikely(ASYNC_JOB_AIO_ISSPEC(state)) {
+			/* Special state handling. */
+			if (state == ASYNC_JOB_AIO_CANCELED) {
+				/* Invoke the cancellation callback. */
+				if (job->aj_ops->jc_cancel) {
+					TRY {
+						(*job->aj_ops->jc_cancel)(job + 1);
+					} EXCEPT {
+						error_printf("ajob:cancel@%p(%p)",
+						             job->aj_ops->jc_cancel,
+						             job + 1);
+					}
+				}
+				goto do_delete_job;
+			}
+		} else {
+			/* Normal operations: poll()+work() if available. */
+			unsigned int pollcode;
+			TRY {
+				pollcode = (*job->aj_ops->jc_poll)(job + 1, &asyncjob_main_timeout);
+			} EXCEPT {
+				struct aio_handle *aio;
+				/* Signal AIO completion with error. */
+				PREEMPTION_DISABLE();
+				aio = ATOMIC_XCH(job->aj_aio, ASYNC_JOB_AIO_NONPRESENT);
+				if (ASYNC_JOB_AIO_ISPRESENT(aio)) {
+					aio_handle_complete_nopr(aio, AIO_COMPLETION_FAILURE);
+					PREEMPTION_ENABLE();
+				} else {
+					PREEMPTION_ENABLE();
+					/* Log an exception that's going to be discarded. */
+					error_printf("ajob:poll@%p(%p)",
+					             job->aj_ops->jc_poll,
+					             job + 1);
+				}
+				goto do_delete_job;
+			}
+			switch (pollcode) {
+
+			case ASYNC_JOB_POLL_AVAILABLE: {
+				bool incomplete;
+				result = true;
+				task_disconnectall();
+				TRY {
+					incomplete = (*job->aj_ops->jc_work)(job + 1);
+				} EXCEPT {
+					struct aio_handle *aio;
+					/* Signal AIO completion with error. */
+					PREEMPTION_DISABLE();
+					aio = ATOMIC_XCH(job->aj_aio, ASYNC_JOB_AIO_NONPRESENT);
+					if (ASYNC_JOB_AIO_ISPRESENT(aio)) {
+						aio_handle_complete_nopr(aio, AIO_COMPLETION_FAILURE);
+						PREEMPTION_ENABLE();
+					} else {
+						PREEMPTION_ENABLE();
+						/* Log an exception that's going to be discarded. */
+						error_printf("ajob:work@%p(%p)",
+						             job->aj_ops->jc_work,
+						             job + 1);
+					}
+					goto do_delete_job;
+				}
+				if (!incomplete) {
+					struct aio_handle *aio;
+					struct async_job *next;
+					/* Signal successful AIO completion. */
+					PREEMPTION_DISABLE();
+					aio = ATOMIC_XCH(job->aj_aio, ASYNC_JOB_AIO_NONPRESENT);
+					if (ASYNC_JOB_AIO_ISPRESENT(aio))
+						aio_handle_complete_nopr(aio, AIO_COMPLETION_SUCCESS);
+					PREEMPTION_ENABLE();
+do_delete_job:
+					/* Remove this job. */
+					next = job->aj_next;
+					COMPILER_READ_BARRIER();
+					if unlikely(!ATOMIC_CMPXCH(*pjob, job, next)) {
+						/* This can happen when `pjob == &async_jobs',
+						 * and new jobs have been added in the mean time. */
+						struct async_job *prev;
+						assert(pjob == &async_jobs);
+						prev = ATOMIC_READ(async_jobs);
+						for (;;) {
+							assert(prev);
+							if (prev->aj_next == job)
+								break;
+							prev = prev->aj_next;
+						}
+						ATOMIC_WRITE(prev->aj_next, next);
+					}
+					/* Drop our reference to the job, which will likely destroy it. */
+					decref_likely(job + 1);
+					job = next;
+					goto handle_job;
+				}
+			}	break;
+
+			case ASYNC_JOB_POLL_WAITFOR: {
+				assertf(job->aj_ops->jc_time,
+				        "poll returned `ASYNC_JOB_POLL_WAITFOR', but "
+				        "the job does not define a timeout callback!");
+				/* Use the async-worker timeout mechanism to set-up
+				 * a custom callback for when the timeout expires. */
+				if (!asyncmain_timeout_p) {
+					asyncmain_timeout_p = &asyncmain_timeout;
+				} else {
+					assert(asyncmain_timeout_p == &asyncmain_timeout);
+					if (asyncjob_main_timeout >= asyncmain_timeout)
+						break; /* The previous timeout is already older! */
+				}
+				/* Set the used timeout and callback routing. */
+				asyncmain_timeout = asyncjob_main_timeout;
+				asyncmain_timeout_cb = &asyncjob_timeout_worker_timeout;
+				/* NOTE: Because only the async worker (i.e. us) is allowed to
+				 *       remove async jobs, we don't even have to store a reference
+				 *       to the job within `async_job_current_timeout', since the
+				 *       job will always be kept alive by its entry with the
+				 *       `async_jobs' chain. */
+				async_job_current_timeout = job;
+				/* Set the associated worker as the one that will receive the timeout. */
+				asyncmain_timeout_worker.set(&asyncjob_timeout_worker);
+			}	break;
+
+			case ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT:
+				break;
+
+			case ASYNC_JOB_POLL_DELETE:
+				goto do_delete_job;
+
+			default:
+				__builtin_unreachable();
+			}
+
+		}
+		pjob = &job->aj_next;
+		job = *pjob;
+	}
+	return result;
+}
+
+
+/* Destroy an async-job that has previously been started (i.e. `async_job_start(self)' was called). */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_job_destroy)(async_job_t self) {
+	struct async_job *me;
+	me = self - 1;
+	if (me->aj_ops->aj_fini)
+		(*me->aj_ops->aj_fini)(self);
+	decref_unlikely(me->aj_ops->jc_driver);
+	kfree(me);
+}
+
+
+/* Allocate and return a new async-job with the given callbacks.
+ * Note that this job hasn't been started yet, which is something
+ * that will only be done once the caller invokes `async_job_start()'
+ * If the job should be free()'d before that point, `async_job_free()' should be used.
+ * Afterwards, the job should be considered as reference-counted, with the caller
+ * of `async_job_start()' being responsible to inherit a reference to the job.
+ * NOTE: The returned pointer itself points at a user-defined structure of
+ *       `cb->jc_jobsize' bytes aligned on some `cb->jc_jobalign'-byte border.
+ * >> struct my_job_desc *desc;
+ * >> async_job_t job;
+ * >> job  = async_job_alloc(&my_job);
+ * >> desc = (struct my_job_desc *)job;
+ * >> // Initialize the job descriptor.
+ * >> desc->...;
+ * >> // Start the job and inherit a reference to `job'
+ * >> async_job_start(job);
+ * >> // Do something else...
+ * >> ...
+ * >> if (should_cancel) {
+ * >>     async_job_cancel(job);
+ * >>     decref(job);
+ * >> } else {
+ * >>     decref(job);
+ * >> }
+ * WARNING: Unlike with async workers, the backing memory for the given `cb' must
+ *          have static storage duration backed by a reference to `cb->jc_driver' */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) /*inherit*/ async_job_t FCALL
+async_job_alloc(struct async_job_callbacks const *__restrict cb) {
+	struct async_job *result;
+	assert(cb);
+	assert(cb->jc_driver);
+	assert(cb->jc_poll);
+	assert(cb->jc_work);
+	assertf((cb->jc_jobalign & (cb->jc_jobalign - 1)) == 0,
+	        "Not a pointer-of-2: %Iu", cb->jc_jobalign);
+	result = (struct async_job *)kmemalign_offset(MAX(sizeof(void *), cb->jc_jobalign),
+	                                              sizeof(struct async_job),
+	                                              sizeof(struct async_job) + cb->jc_jobsize,
+	                                              GFP_NORMAL);
+	result->aj_refcnt = 2;
+	result->aj_ops    = cb;
+	result->aj_aio    = ASYNC_JOB_AIO_NONPRESENT;
+	incref(cb->jc_driver);
+#ifndef NDEBUG
+	result->aj_next = (REF struct async_job *)0x1234;
+#endif /* !NDEBUG */
+	return result + 1;
+}
+
+/* Free a previously allocated, but not-yet started job */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_job_free)(async_job_t self) {
+	struct async_job *me;
+	me = self - 1;
+	assert(me->aj_refcnt == 2);
+	assert(me->aj_aio == ASYNC_JOB_AIO_NONPRESENT);
+	kfree(me);
+}
+
+
+struct async_job_aio_data {
+	REF async_job_t ajad_job; /* [1..1] A reference to the associated job.
+	                           * NOTE: This points to the user-data portion! */
+};
+STATIC_ASSERT(sizeof(struct async_job_aio_data) <=
+              AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *));
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL async_job_aio_fini)(struct aio_handle *__restrict self) {
+	struct async_job_aio_data *data;
+	data = (struct async_job_aio_data *)self->ah_data;
+	decref(data->ajad_job);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL async_job_aio_cancel)(struct aio_handle *__restrict self) {
+	struct async_job_aio_data *data;
+	data = (struct async_job_aio_data *)self->ah_data;
+	async_job_cancel(data->ajad_job);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) unsigned int
+NOTHROW(KCALL async_job_aio_progress)(struct aio_handle *__restrict self,
+                                      struct aio_handle_stat *__restrict stat) {
+	struct async_job_aio_data *data;
+	struct aio_handle *aio_status;
+	struct async_job *job;
+	data = (struct async_job_aio_data *)self->ah_data;
+	job  = data->ajad_job - 1;
+	aio_status = ATOMIC_READ(job->aj_aio);
+	/* Check if the operation has completed. */
+	if (!ASYNC_JOB_AIO_ISPRESENT(aio_status)) {
+		stat->hs_completed = 1;
+		stat->hs_total     = 1;
+		return AIO_PROGRESS_STATUS_COMPLETED;
+	}
+	if (!job->aj_ops->jc_progress) {
+		stat->hs_completed = 0;
+		stat->hs_total     = 1;
+		return AIO_PROGRESS_STATUS_INPROGRESS;
+	}
+	return (*job->aj_ops->jc_progress)(job + 1, stat);
+}
+
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) size_t
+NOTHROW(KCALL async_job_aio_retsize)(struct aio_handle *__restrict self) {
+	struct async_job_aio_data *data;
+	struct aio_handle *aio_status;
+	struct async_job *job;
+	data = (struct async_job_aio_data *)self->ah_data;
+	job  = data->ajad_job - 1;
+	aio_status = ATOMIC_READ(job->aj_aio);
+	/* Check if the operation has completed. */
+	if (!ASYNC_JOB_AIO_ISPRESENT(aio_status))
+		return 0;
+	if unlikely(!job->aj_ops->jc_retsize)
+		return 0;
+	return (*job->aj_ops->jc_retsize)(job + 1);
+}
+
+PRIVATE struct aio_handle_type async_job_aio = {
+	/* .ht_fini     = */ &async_job_aio_fini,
+	/* .ht_cancel   = */ &async_job_aio_cancel,
+	/* .ht_progress = */ &async_job_aio_progress,
+	/* .ht_retsize  = */ &async_job_aio_retsize
+};
+
+
+
+/* Start the given async job, and optionally connect a given AIO handle
+ * for process monitoring, as well as job completion notification:
+ *   - `aio_handle_cancel()' can be used to the same effect as `async_job_cancel()'
+ *   - `aio->ah_func' will be invoked under the following conditions
+ *     after `async_job_start()' had been called to start the async job,
+ *     just after the job has been deleted:
+ *     - AIO_COMPLETION_SUCCESS:
+ *       - `jc_poll()' returning `ASYNC_JOB_POLL_DELETE'
+ *       - `jc_work()' returning `false'
+ *       - `jc_time()' returning `false'
+ *     - AIO_COMPLETION_CANCEL:
+ *       - `aio_handle_cancel()' has been called
+ *       - `async_job_cancel()' has been called
+ *     - AIO_COMPLETION_FAILURE:
+ *       - `jc_poll()' returned with an exception
+ *       - `jc_work()' returned with an exception
+ *       - `jc_time()' returned with an exception
+ * @return: * : Always re-returns `self' */
+PUBLIC NOBLOCK NONNULL((1)) REF async_job_t
+NOTHROW(FCALL async_job_start)(async_job_t self,
+                               /*out,opt*/ struct aio_handle *aio) {
+	struct async_job *me, *next;
+	assert(!ASYNC_JOB_AIO_ISSPEC(aio));
+	me = self - 1;
+#ifndef NDEBUG
+	assert(me->aj_next == (REF struct async_job *)0x1234);
+#endif /* !NDEBUG */
+	assert(me->aj_refcnt == 2);
+	assert(me->aj_aio == ASYNC_JOB_AIO_NONPRESENT);
+	/* Initialize the AIO handle (if given) */
+	if (aio) {
+		struct async_job_aio_data *data;
+		data = (struct async_job_aio_data *)aio->ah_data;
+		data->ajad_job = self;
+		me->aj_refcnt  = 3; /* +1: `data->ajad_job' */
+		COMPILER_WRITE_BARRIER();
+		aio_handle_init(aio, &async_job_aio);
+	}
+
+	me->aj_aio = aio;
+	/* Register the job.
+	 * NOTE: The first implicit reference is inherited by `async_jobs' */
+	do {
+		next = ATOMIC_READ(async_jobs);
+		me->aj_next = next;
+		COMPILER_WRITE_BARRIER();
+	} while (!ATOMIC_CMPXCH_WEAK(async_jobs, next, me));
+	/* Signal that new async jobs have become available. */
+	sig_broadcast(&awork_changed);
+	return self; /* Return the second implicit reference */
+}
+
+
+/* Cancel a given job.
+ * This function can be used to prevent future invocation of the given job's functions.
+ * WARNING: Job cancellation also happens asynchronously (except for in regards to
+ *          the `AIO_COMPLETION_CANCEL' completion status of a possibly connected AIO
+ *          handle), meaning that even after this function returns, the job may continue
+ *          to exist for a while longer before eventually being deleted! */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL async_job_cancel)(async_job_t self) {
+	struct async_job *me;
+	struct aio_handle *aio;
+	me  = self - 1;
+	PREEMPTION_DISABLE();
+	aio = ATOMIC_XCH(me->aj_aio, ASYNC_JOB_AIO_CANCELED);
+	if (ASYNC_JOB_AIO_ISPRESENT(aio)) {
+		/* Signal AIO completion with `AIO_COMPLETION_CANCEL' */
+		aio_handle_complete_nopr(aio, AIO_COMPLETION_CANCEL);
+	}
+	PREEMPTION_ENABLE();
+	/* Wake up the async worker to have to get rid of this job. */
+	if (aio != ASYNC_JOB_AIO_CANCELED)
+		sig_broadcast(&awork_changed);
+}
+
+
+
+
+
 
 DECL_END
 

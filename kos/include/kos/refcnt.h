@@ -31,12 +31,15 @@
 #include <kos/anno.h>
 
 #if defined(__COMPILER_HAVE_TYPEOF) && 0
-#define __PRIVATE_REFCNT_TYPE(T, field) __typeof__(((T *)0)->field)
+#define __PRIVATE_REFCNT_TYPE(T, field)       __typeof__(((T *)0)->field)
+#define __PRIVATE_REFCNT_TYPE_EX(T, getfield) __typeof__(getfield((T *)0))
 #elif defined(__COMPILER_HAVE_CXX_DECLTYPE)
-#define __PRIVATE_REFCNT_TYPE(T, field) decltype(((T *)0)->field)
+#define __PRIVATE_REFCNT_TYPE(T, field)       decltype(((T *)0)->field)
+#define __PRIVATE_REFCNT_TYPE_EX(T, getfield) decltype(getfield((T *)0))
 #else /* __COMPILER_HAVE_CXX_DECLTYPE */
 #include <hybrid/typecore.h>
-#define __PRIVATE_REFCNT_TYPE(T, field) __UINTPTR_TYPE__
+#define __PRIVATE_REFCNT_TYPE(T, field)       __UINTPTR_TYPE__
+#define __PRIVATE_REFCNT_TYPE_EX(T, getfield) __UINTPTR_TYPE__
 #endif /* !__COMPILER_HAVE_CXX_DECLTYPE */
 
 #ifndef __REFCNT_CC
@@ -135,6 +138,25 @@ public:
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_likely)(T *self);                                                                           \
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_unlikely)(T *self);                                                                         \
 	}
+#define __DEFINE_REFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                                                                               \
+	extern "C++" {                                                                                                                                        \
+	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                                                       \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE_EX(T, getfield) __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(T const *__restrict self); \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC isshared)(T const *__restrict self);                                 \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC wasdestroyed)(T const *__restrict self);                             \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryincref)(T *__restrict self);                                      \
+	__NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC xincref)(T *__restrict self);                                                                               \
+	__NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) T *__REFCNT_NOTHROW(__REFCNT_CC incref)(T *__restrict self);                                          \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC destroy)(T *__restrict self);                                                         \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref)(T *__restrict self);                                                          \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_nokill)(T *__restrict self);                                                   \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_likely)(T *__restrict self);                                                   \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC decref_unlikely)(T *__restrict self);                                                 \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref)(T *self);                                                                                        \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_nokill)(T *self);                                                                                 \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_likely)(T *self);                                                                                 \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xdecref_unlikely)(T *self);                                                                               \
+	}
 #define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_)                                                                                               \
 	extern "C++" {                                                                                                                                      \
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                                                 \
@@ -153,6 +175,25 @@ public:
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_nokill)(T *self);                                                                           \
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_likely)(T *self);                                                                           \
 	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(T *self);                                                                         \
+	}
+#define __DEFINE_WEAKREFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                                                                               \
+	extern "C++" {                                                                                                                                            \
+	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                                                       \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __PRIVATE_REFCNT_TYPE_EX(T, getfield) __REFCNT_NOTHROW(__REFCNT_CC getweakrefcnt)(T const *__restrict self); \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC isweakshared)(T const *__restrict self);                                 \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC wasweakdestroyed)(T const *__restrict self);                             \
+	__NOBLOCK __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL __REFCNT_NOTHROW(__REFCNT_CC tryweakincref)(T *__restrict self);                                      \
+	__NOBLOCK T *__REFCNT_NOTHROW(__REFCNT_CC xweakincref)(T *__restrict self);                                                                               \
+	__NOBLOCK __ATTR_RETNONNULL __ATTR_NONNULL((1)) T *__REFCNT_NOTHROW(__REFCNT_CC weakincref)(T *__restrict self);                                          \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdestroy)(T *__restrict self);                                                         \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref)(T *__restrict self);                                                          \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_nokill)(T *__restrict self);                                                   \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_likely)(T *__restrict self);                                                   \
+	__NOBLOCK __ATTR_NONNULL((1)) void __REFCNT_NOTHROW(__REFCNT_CC weakdecref_unlikely)(T *__restrict self);                                                 \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref)(T *self);                                                                                        \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_nokill)(T *self);                                                                                 \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_likely)(T *self);                                                                                 \
+	__NOBLOCK void __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(T *self);                                                                               \
 	}
 #endif /* __INTELLISENSE__ */
 #else /* __USE_KOS || __USE_KOS_KERNEL */
@@ -253,6 +294,56 @@ public:
 		}                                                                                                  \
 	};                                                                                                     \
 	}
+#define __DEFINE_REFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                                \
+	extern "C++" {                                                                                         \
+	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                        \
+	template<> class refcnt_methods< T > {                                                                 \
+	public:                                                                                                \
+		typedef __PRIVATE_REFCNT_TYPE_EX(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                     \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_PURE __ATTR_NONNULL((1)) __PRIVATE_REFCNT_NAME(refcnt_t) \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getrefcnt))(T const *__restrict __self) {       \
+			return __hybrid_atomic_load(getfield(__self), __ATOMIC_ACQUIRE);                               \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(incref))(T *__restrict __self) {                \
+			__hybrid_atomic_fetchinc(getfield(__self), __ATOMIC_SEQ_CST);                                  \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) __BOOL                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(tryincref))(T *__restrict __self) {             \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt;                                                  \
+			do {                                                                                           \
+				__old_refcnt = __hybrid_atomic_load(getfield(__self), __ATOMIC_ACQUIRE);                   \
+				if unlikely(__old_refcnt == 0)                                                             \
+					return false;                                                                          \
+			} while (!__hybrid_atomic_cmpxch_weak(getfield(__self), __old_refcnt, __old_refcnt + 1,        \
+			                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));                    \
+			return true;                                                                                   \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                \
+			if (__hybrid_atomic_decfetch(getfield(__self), __ATOMIC_SEQ_CST) == 0)                         \
+				destroy_(__self);                                                                          \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {               \
+			destroy_(__self);                                                                              \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_nokill))(T *__restrict __self) {         \
+			__hybrid_atomic_fetchdec(getfield(__self), __ATOMIC_SEQ_CST);                                  \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {         \
+			if __likely(__hybrid_atomic_decfetch(getfield(__self), __ATOMIC_SEQ_CST) == 0)                 \
+				destroy_(__self);                                                                          \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {       \
+			if __unlikely(__hybrid_atomic_decfetch(getfield(__self), __ATOMIC_SEQ_CST) == 0)               \
+				destroy_(__self);                                                                          \
+		}                                                                                                  \
+	};                                                                                                     \
+	}
 #define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_)                                                  \
 	extern "C++" {                                                                                         \
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                    \
@@ -299,6 +390,56 @@ public:
 		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {       \
 			if __unlikely(__hybrid_atomic_decfetch(__self->field, __ATOMIC_SEQ_CST) == 0)                  \
+				destroy_(__self);                                                                          \
+		}                                                                                                  \
+	};                                                                                                     \
+	}
+#define __DEFINE_WEAKREFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                            \
+	extern "C++" {                                                                                         \
+	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                    \
+	template<> class weakrefcnt_methods< T > {                                                             \
+	public:                                                                                                \
+		typedef __PRIVATE_REFCNT_TYPE_EX(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                     \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_PURE __ATTR_NONNULL((1)) __PRIVATE_REFCNT_NAME(refcnt_t) \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getrefcnt))(T const *__restrict __self) {       \
+			return __hybrid_atomic_load(getfield(__self), __ATOMIC_ACQUIRE);                               \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(incref))(T *__restrict __self) {                \
+			__hybrid_atomic_fetchinc(getfield(__self), __ATOMIC_SEQ_CST);                                  \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) __BOOL                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(tryincref))(T *__restrict __self) {             \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt;                                                  \
+			do {                                                                                           \
+				__old_refcnt = __hybrid_atomic_load(getfield(__self), __ATOMIC_ACQUIRE);                   \
+				if unlikely(__old_refcnt == 0)                                                             \
+					return false;                                                                          \
+			} while (!__hybrid_atomic_cmpxch_weak(getfield(__self), __old_refcnt,__old_refcnt + 1,         \
+			                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));                    \
+			return true;                                                                                   \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                \
+			if (__hybrid_atomic_decfetch(getfield(__self), __ATOMIC_SEQ_CST) == 0)                         \
+				destroy_(__self);                                                                          \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {               \
+			destroy_(__self);                                                                              \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_nokill))(T *__restrict __self) {         \
+			__hybrid_atomic_fetchdec(getfield(__self), __ATOMIC_SEQ_CST);                                  \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {         \
+			if __likely(__hybrid_atomic_decfetch(getfield(__self), __ATOMIC_SEQ_CST) == 0)                 \
+				destroy_(__self);                                                                          \
+		}                                                                                                  \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                        \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {       \
+			if __unlikely(__hybrid_atomic_decfetch(getfield(__self), __ATOMIC_SEQ_CST) == 0)               \
 				destroy_(__self);                                                                          \
 		}                                                                                                  \
 	};                                                                                                     \
@@ -369,6 +510,67 @@ extern "C++" {
 		}                                                                                                             \
 	};                                                                                                                \
 	}
+#define __DEFINE_REFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                                              \
+	extern "C++" {                                                                                                       \
+	T operator,(T const&, __NAMESPACE_INT_SYM __refcnt_select_tag);                                                      \
+	template<> class __PRIVATE_REFCNT_NAME(refcnt_methods)< T > {                                                        \
+	public:                                                                                                              \
+		typedef __PRIVATE_REFCNT_TYPE_EX(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                                   \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_PURE __ATTR_NONNULL((1)) __PRIVATE_REFCNT_NAME(refcnt_t)               \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getrefcnt))(T const *__restrict __self) {                     \
+			return __hybrid_atomic_load(getfield(__self), __ATOMIC_ACQUIRE);                                             \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(incref))(T *__restrict __self) {                              \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt = __hybrid_atomic_fetchinc(getfield(__self), __ATOMIC_SEQ_CST); \
+			__hybrid_assertf(__old_refcnt > 0, "incref(%p): Object was already destroyed", __self);                      \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) __BOOL                                                    \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(tryincref))(T *__restrict __self) {                           \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt;                                                                \
+			do {                                                                                                         \
+				__old_refcnt = __hybrid_atomic_load(getfield(__self), __ATOMIC_ACQUIRE);                                 \
+				if unlikely(__old_refcnt == 0)                                                                           \
+					return false;                                                                                        \
+			} while (!__hybrid_atomic_cmpxch_weak(getfield(__self), __old_refcnt, __old_refcnt + 1,                      \
+			                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));                                  \
+			return true;                                                                                                 \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                              \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt;                                                                \
+			__old_refcnt = __hybrid_atomic_fetchdec(getfield(__self), __ATOMIC_SEQ_CST);                                 \
+			__hybrid_assertf(__old_refcnt > 0, "decref(%p): Object was already destroyed", __self);                      \
+			if (__old_refcnt == 1)                                                                                       \
+				destroy_(__self);                                                                                        \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {                             \
+			__hybrid_atomic_store(getfield(__self), (__PRIVATE_REFCNT_NAME(refcnt_t))0, __ATOMIC_RELEASE);               \
+			destroy_(__self);                                                                                            \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_nokill))(T *__restrict __self) {                       \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt = __hybrid_atomic_fetchdec(getfield(__self), __ATOMIC_SEQ_CST); \
+			__hybrid_assertf(__old_refcnt > 0, "decref_nokill(%p): Object was already destroyed", __self);               \
+			__hybrid_assertf(__old_refcnt > 1, "decref_nokill(%p): Object should have been destroyed", __self);          \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {                       \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt = __hybrid_atomic_fetchdec(getfield(__self), __ATOMIC_SEQ_CST); \
+			__hybrid_assertf(__old_refcnt > 0, "decref_likely(%p): Object was already destroyed", __self);               \
+			if __likely(__old_refcnt == 1)                                                                               \
+				destroy_(__self);                                                                                        \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {                     \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt = __hybrid_atomic_fetchdec(getfield(__self), __ATOMIC_SEQ_CST); \
+			__hybrid_assertf(__old_refcnt > 0, "decref_unlikely(%p): Object was already destroyed", __self);             \
+			if __unlikely(__old_refcnt == 1)                                                                             \
+				destroy_(__self);                                                                                        \
+		}                                                                                                                \
+	};                                                                                                                   \
+	}
 #define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_)                                                             \
 	extern "C++" {                                                                                                    \
 	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                               \
@@ -429,6 +631,67 @@ extern "C++" {
 				destroy_(__self);                                                                                     \
 		}                                                                                                             \
 	};                                                                                                                \
+	}
+#define __DEFINE_WEAKREFCNT_FUNCTIONS_EX(T, getfield, destroy_)                                                          \
+	extern "C++" {                                                                                                       \
+	T operator,(T const&, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                                  \
+	template<> class weakrefcnt_methods< T > {                                                                           \
+	public:                                                                                                              \
+		typedef __PRIVATE_REFCNT_TYPE_EX(T, getfield) __PRIVATE_REFCNT_NAME(refcnt_t);                                   \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_PURE __ATTR_NONNULL((1)) __PRIVATE_REFCNT_NAME(refcnt_t)               \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(getrefcnt))(T const *__restrict __self) {                     \
+			return __hybrid_atomic_load(getfield(__self), __ATOMIC_ACQUIRE);                                             \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(incref))(T *__restrict __self) {                              \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt = __hybrid_atomic_fetchinc(getfield(__self), __ATOMIC_SEQ_CST); \
+			__hybrid_assertf(__old_refcnt > 0, "weakincref(%p): Object was already destroyed", __self);                  \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) __BOOL                                                    \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(tryincref))(T *__restrict __self) {                           \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt;                                                                \
+			do {                                                                                                         \
+				__old_refcnt = __hybrid_atomic_load(getfield(__self), __ATOMIC_ACQUIRE);                                 \
+				if unlikely(__old_refcnt == 0)                                                                           \
+					return false;                                                                                        \
+			} while (!__hybrid_atomic_cmpxch_weak(getfield(__self), __old_refcnt,__old_refcnt + 1,                       \
+			                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));                                  \
+			return true;                                                                                                 \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref))(T *__restrict __self) {                              \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt;                                                                \
+			__old_refcnt = __hybrid_atomic_fetchdec(getfield(__self), __ATOMIC_SEQ_CST);                                 \
+			__hybrid_assertf(__old_refcnt > 0, "weakdecref(%p): Object was already destroyed", __self);                  \
+			if (__old_refcnt == 1)                                                                                       \
+				destroy_(__self);                                                                                        \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(destroy))(T *__restrict __self) {                             \
+			__hybrid_atomic_store(getfield(__self), (__PRIVATE_REFCNT_NAME(refcnt_t))0, __ATOMIC_RELEASE);               \
+			destroy_(__self);                                                                                            \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_nokill))(T *__restrict __self) {                       \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt = __hybrid_atomic_fetchdec(getfield(__self), __ATOMIC_SEQ_CST); \
+			__hybrid_assertf(__old_refcnt > 0, "weakdecref_nokill(%p): Object was already destroyed", __self);           \
+			__hybrid_assertf(__old_refcnt > 1, "weakdecref_nokill(%p): Object should have been destroyed", __self);      \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_likely))(T *__restrict __self) {                       \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt = __hybrid_atomic_fetchdec(getfield(__self), __ATOMIC_SEQ_CST); \
+			__hybrid_assertf(__old_refcnt > 0, "weakdecref_likely(%p): Object was already destroyed", __self);           \
+			if __likely(__old_refcnt == 1)                                                                               \
+				destroy_(__self);                                                                                        \
+		}                                                                                                                \
+		static __CXX_FORCEINLINE __NOBLOCK __ATTR_NONNULL((1)) void                                                      \
+		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(decref_unlikely))(T *__restrict __self) {                     \
+			__PRIVATE_REFCNT_NAME(refcnt_t) __old_refcnt = __hybrid_atomic_fetchdec(getfield(__self), __ATOMIC_SEQ_CST); \
+			__hybrid_assertf(__old_refcnt > 0, "weakdecref_unlikely(%p): Object was already destroyed", __self);         \
+			if __unlikely(__old_refcnt == 1)                                                                             \
+				destroy_(__self);                                                                                        \
+		}                                                                                                                \
+	};                                                                                                                   \
 	}
 #endif /* !NDEBUG */
 #endif /* !__DEFINE_REFCNT_FUNCTIONS */
@@ -637,8 +900,10 @@ __REFCNT_NOTHROW(__REFCNT_CC xweakdecref_unlikely)(__T *__self) {
 
 #else /* __cplusplus && __CC__ */
 
-#define __DEFINE_REFCNT_FUNCTIONS(T, field, destroy_)     /* nothing */
-#define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_) /* nothing */
+#define __DEFINE_REFCNT_FUNCTIONS(T, field, destroy_)           /* nothing */
+#define __DEFINE_REFCNT_FUNCTIONS_EX(T, getfield, destroy_)     /* nothing */
+#define __DEFINE_WEAKREFCNT_FUNCTIONS(T, field, destroy_)       /* nothing */
+#define __DEFINE_WEAKREFCNT_FUNCTIONS_EX(T, getfield, destroy_) /* nothing */
 
 #endif /* !__cplusplus || !__CC__ */
 

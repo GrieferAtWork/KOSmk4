@@ -133,21 +133,21 @@ DECL_BEGIN
  * >>         }                                                                            │ │     │
  * >>     } EXCEPT {                                                                       │ │     │
  * >>         // Indicate AIO failure                                                      │ │     │
- * >>         PREEMPTION_DISABLE();                                                        │ │     │
+ * >>         was = PREEMPTION_PUSHOFF();                                                  │ │     │
  * >>         aio = ATOMIC_XCH(device->d_aio_current, NULL);                               │ │     │
  * >>         if (aio) aio_handle_complete(aio, AIO_COMPLETION_FAILURE);                   │ │     │
- * >>         PREEMPTION_ENABLE();                                                         │ │     │
+ * >>         PREEMPTION_POP(was);                                                         │ │     │
  * >>         continue;                                                                    │ │     │
  * >>     }                                                                                │ │     │
  * >>     // Indicate AIO success                                                          │ │     │
- * >>     PREEMPTION_DISABLE();                                                            │ │     │
+ * >>     was = PREEMPTION_PUSHOFF();                                                      │ │     │
  * >>     aio = ATOMIC_XCH(device->d_aio_current, NULL);                                   │ │     │
  * >>     if (aio) aio_handle_complete(aio, AIO_COMPLETION_SUCCESS);                       │ │     │
  * >>     else {                                                                           │ │     │
  * >>         // Wait for [HWIO_CANCEL_CURRENT_OPERATION] in aio_cancel() to finish        │ │     │
  * >>         [HWIO_WAIT_FOR_CANCEL_COMPLETION](device);                                   │ │     │
  * >>     }                                                                                │ │     │
- * >>     PREEMPTION_ENABLE();                                                             │ │     │
+ * >>     PREEMPTION_POP(was);                                                             │ │     │
  * >> }                                                                                    │ │     │
  *                                                                                         │ │     │
  *  ┌──────────────────────────────────────────────────────────────────────────────────────┘ │     │
@@ -177,7 +177,7 @@ DECL_BEGIN
  *                                             >> // is either current in progress (i.e. the async-worker is executing
  *                                             >> // `COMMAND_DESCRIPTOR_DO_NEXT_STEP()'), or the AIO operation was
  *                                             >> // already completed.
- *                                             >> PREEMPTION_DISABLE();
+ *                                             >> was = PREEMPTION_PUSHOFF();
  *                                             >> if (ATOMIC_CMPXCH(device->d_aio_current, aio, NULL)) {
  *                                             >>     // Cancel the current operation on a hardware-level
  *                                             >>     // Note that this function can assume that the async-worker thread
@@ -187,10 +187,12 @@ DECL_BEGIN
  *                                             >>     PREEMPTION_ENABLE();
  *                                             >>     goto do_cancel;
  *                                             >> }
- *                                             >> PREEMPTION_ENABLE();
+ *                                             >> PREEMPTION_POP(was);
  *                                             >> return;
  *                                             >>do_cancel:
  *                                             >> aio_handle_complete(aio, AIO_COMPLETION_CANCEL);
+ * HINT: SMP locks aren't required because `aio_handle_fini()' will
+ *       wait until the handle's completion function has returned!
  */
 
 
