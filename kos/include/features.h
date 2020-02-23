@@ -648,6 +648,7 @@
 #define __STDC_INT32_AS_SIZE_T  /* nothing */
 #define __STDC_UINT_AS_SIZE_T   /* nothing */
 #define __STDC_UINT32_AS_SIZE_T /* nothing */
+#define __STDC_INT_AS_UINT_T    /* nothing */
 #elif defined(__USE_KOS)
 #if !defined(__SIZEOF_SIZE_T__) || !defined(__SIZEOF_INT__)
 #include "hybrid/typecore.h"
@@ -668,6 +669,7 @@
 #endif /* __SIZEOF_SIZE_T__ > 4 */
 #define __STDC_UINT_AS_SIZE_T   __STDC_INT_AS_SIZE_T
 #define __STDC_UINT32_AS_SIZE_T __STDC_INT32_AS_SIZE_T
+#define __STDC_INT_AS_UINT_T    unsigned int
 #else /* __USE_KOS */
 #define __STDC_INT_AS_SSIZE_T   int
 #define __STDC_INT_AS_SIZE_T    int
@@ -675,6 +677,7 @@
 #define __STDC_INT32_AS_SIZE_T  __INT32_TYPE__
 #define __STDC_UINT_AS_SIZE_T   unsigned int
 #define __STDC_UINT32_AS_SIZE_T __UINT32_TYPE__
+#define __STDC_INT_AS_UINT_T    int
 #endif /* !__USE_KOS */
 
 #ifndef __KOS_FIXED_CONST

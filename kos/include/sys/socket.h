@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebff9c9f */
+/* HASH CRC-32:0x9644881e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
+
 #include <hybrid/typecore.h>
+
+#include <bits/socket.h>
 #include <bits/timespec.h>
 #include <bits/types.h>
 #include <sys/uio.h>
-#include <bits/socket.h>
 
 #ifdef __USE_GNU
 #include <bits/sigset.h>
@@ -104,24 +106,24 @@ struct osockaddr {
 #endif /* __USE_MISC */
 
 
-#if defined(__cplusplus) || !defined(__USE_GNU) || \
-    defined(__NO_ATTR_TRANSPARENT_UNION)
+#if (defined(__cplusplus) || !defined(__USE_GNU) || \
+     defined(__NO_ATTR_TRANSPARENT_UNION))
 #define __SOCKADDR_ARG       struct sockaddr *__restrict
 #define __CONST_SOCKADDR_ARG struct sockaddr const *__restrict
-#else
-#define __SOCKADDR_ALLTYPES \
-	__SOCKADDR_ONETYPE(sockaddr) \
-	__SOCKADDR_ONETYPE(sockaddr_at) \
-	__SOCKADDR_ONETYPE(sockaddr_ax25) \
-	__SOCKADDR_ONETYPE(sockaddr_dl) \
-	__SOCKADDR_ONETYPE(sockaddr_eon) \
-	__SOCKADDR_ONETYPE(sockaddr_in) \
-	__SOCKADDR_ONETYPE(sockaddr_in6) \
+#else /* __cplusplus || !__USE_GNU || __NO_ATTR_TRANSPARENT_UNION */
+#define __SOCKADDR_ALLTYPES            \
+	__SOCKADDR_ONETYPE(sockaddr)       \
+	__SOCKADDR_ONETYPE(sockaddr_at)    \
+	__SOCKADDR_ONETYPE(sockaddr_ax25)  \
+	__SOCKADDR_ONETYPE(sockaddr_dl)    \
+	__SOCKADDR_ONETYPE(sockaddr_eon)   \
+	__SOCKADDR_ONETYPE(sockaddr_in)    \
+	__SOCKADDR_ONETYPE(sockaddr_in6)   \
 	__SOCKADDR_ONETYPE(sockaddr_inarp) \
-	__SOCKADDR_ONETYPE(sockaddr_ipx) \
-	__SOCKADDR_ONETYPE(sockaddr_iso) \
-	__SOCKADDR_ONETYPE(sockaddr_ns) \
-	__SOCKADDR_ONETYPE(sockaddr_un) \
+	__SOCKADDR_ONETYPE(sockaddr_ipx)   \
+	__SOCKADDR_ONETYPE(sockaddr_iso)   \
+	__SOCKADDR_ONETYPE(sockaddr_ns)    \
+	__SOCKADDR_ONETYPE(sockaddr_un)    \
 	__SOCKADDR_ONETYPE(sockaddr_x25)
 #ifdef __cplusplus
 #define __SOCKADDR_ONETYPE(type) struct type;
@@ -134,7 +136,7 @@ typedef union { __SOCKADDR_ALLTYPES } __SOCKADDR_ARG __ATTR_TRANSPARENT_UNION;
 #define __SOCKADDR_ONETYPE(type) struct type const *__restrict __##type##__;
 typedef union { __SOCKADDR_ALLTYPES } __CONST_SOCKADDR_ARG __ATTR_TRANSPARENT_UNION;
 #undef __SOCKADDR_ONETYPE
-#endif
+#endif /* !__cplusplus && __USE_GNU && !__NO_ATTR_TRANSPARENT_UNION */
 
 #ifdef __USE_GNU
 /* For `recvmmsg' and `sendmmsg'. */
@@ -145,25 +147,76 @@ struct mmsghdr {
 	__UINT32_TYPE__ msg_len; /* Number of received or sent bytes for the entry. */
 };
 #endif /* !__mmsghdr_defined */
-#endif
+#endif /* __USE_GNU */
 
 #ifdef __CRT_HAVE_socket
-/* Create a new socket of type TYPE in domain DOMAIN, using
- * protocol PROTOCOL.  If PROTOCOL is zero, one is chosen automatically.
- * Returns a file descriptor for the new socket, or -1 for errors */
-__CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,socket,(int __domain, int __type, int __protocol),(__domain,__type,__protocol))
+/* Create a new socket of type TYPE in domain FAMILY, using
+ * protocol PROTOCOL. If PROTOCOL is zero, one is chosen automatically.
+ * Returns a file descriptor for the new socket, or -1 for errors
+ * @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+__CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,socket,(__STDC_INT_AS_UINT_T __family, __STDC_INT_AS_UINT_T __type, __STDC_INT_AS_UINT_T __protocol),(__family,__type,__protocol))
 #elif defined(__CRT_HAVE___socket)
-/* Create a new socket of type TYPE in domain DOMAIN, using
- * protocol PROTOCOL.  If PROTOCOL is zero, one is chosen automatically.
- * Returns a file descriptor for the new socket, or -1 for errors */
-__CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,socket,(int __domain, int __type, int __protocol),__socket,(__domain,__type,__protocol))
+/* Create a new socket of type TYPE in domain FAMILY, using
+ * protocol PROTOCOL. If PROTOCOL is zero, one is chosen automatically.
+ * Returns a file descriptor for the new socket, or -1 for errors
+ * @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+__CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,socket,(__STDC_INT_AS_UINT_T __family, __STDC_INT_AS_UINT_T __type, __STDC_INT_AS_UINT_T __protocol),__socket,(__family,__type,__protocol))
 #endif /* socket... */
 #ifdef __CRT_HAVE_socketpair
-/* Create two new sockets, of type TYPE in domain DOMAIN and using
+/* Create two new sockets, of type TYPE in domain FAMILY and using
  * protocol PROTOCOL, which are connected to each other, and put file
  * descriptors for them in FDS[0] and FDS[1].  If PROTOCOL is zero,
- * one will be chosen automatically.  Returns 0 on success, -1 for errors */
-__CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,socketpair,(int __domain, int __type, int __protocol, __fd_t __fds[2]),(__domain,__type,__protocol,__fds))
+ * one will be chosen automatically.  Returns 0 on success, -1 for errors
+ * @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+__CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,socketpair,(__STDC_INT_AS_UINT_T __family, __STDC_INT_AS_UINT_T __type, __STDC_INT_AS_UINT_T __protocol, __fd_t __fds[2]),(__family,__type,__protocol,__fds))
 #endif /* socketpair... */
 #ifdef __CRT_HAVE_bind
 /* Give the socket FD the local address ADDR (which is LEN bytes long) */
@@ -192,66 +245,87 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CO
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getpeername,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* getpeername... */
 #ifdef __CRT_HAVE_send
-/* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1 */
-__CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, int __flags),(__sockfd,__buf,__bufsize,__flags))
+/* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1
+ * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+__CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__sockfd,__buf,__bufsize,__flags))
 #elif defined(__CRT_HAVE___send)
-/* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1 */
-__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, int __flags),__send,(__sockfd,__buf,__bufsize,__flags))
+/* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1
+ * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),__send,(__sockfd,__buf,__bufsize,__flags))
 #endif /* send... */
 #ifdef __CRT_HAVE_recv
 /* Read BUFSIZE bytes into BUF from socket FD.
- * Returns the number read or -1 for errors */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, int __flags),(__sockfd,__buf,__bufsize,__flags))
+ * Returns the number read or -1 for errors
+ * @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),(__sockfd,__buf,__bufsize,__flags))
 #elif defined(__CRT_HAVE___recv)
 /* Read BUFSIZE bytes into BUF from socket FD.
- * Returns the number read or -1 for errors */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, int __flags),__recv,(__sockfd,__buf,__bufsize,__flags))
+ * Returns the number read or -1 for errors
+ * @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags),__recv,(__sockfd,__buf,__bufsize,__flags))
 #endif /* recv... */
 #ifdef __CRT_HAVE_sendto
 /* Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
- * (which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors. */
-__CDECLARE(__ATTR_NONNULL((2, 5)),ssize_t,__NOTHROW_RPC,sendto,(__fd_t __sockfd, void const *__buf, size_t __bufsize, int __flags, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__buf,__bufsize,__flags,__addr,__addr_len))
+ * (which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors.
+ * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+__CDECLARE(__ATTR_NONNULL((2, 5)),ssize_t,__NOTHROW_RPC,sendto,(__fd_t __sockfd, void const *__buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__buf,__bufsize,__flags,__addr,__addr_len))
 #endif /* sendto... */
 #ifdef __CRT_HAVE_recvfrom
 /* Read BUFSIZE bytes into BUF through socket FD.
  * If ADDR is not NULL, fill in *ADDR_LEN bytes of it with tha address of
  * the sender, and store the actual size of the address in *ADDR_LEN.
- * Returns the number of bytes read or -1 for errors */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2, 5)),ssize_t,__NOTHROW_RPC,recvfrom,(__fd_t __sockfd, void *__restrict __buf, size_t __bufsize, int __flags, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__buf,__bufsize,__flags,__addr,__addr_len))
+ * Returns the number of bytes read or -1 for errors
+ * @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2, 5)),ssize_t,__NOTHROW_RPC,recvfrom,(__fd_t __sockfd, void *__restrict __buf, size_t __bufsize, __STDC_INT_AS_UINT_T __flags, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__buf,__bufsize,__flags,__addr,__addr_len))
 #endif /* recvfrom... */
 #ifdef __CRT_HAVE_sendmsg
 /* Send a message described MESSAGE on socket FD.
- * Returns the number of bytes sent, or -1 for errors */
-__CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,sendmsg,(__fd_t __sockfd, struct msghdr const *__message, int __flags),(__sockfd,__message,__flags))
+ * Returns the number of bytes sent, or -1 for errors
+ * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+__CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,sendmsg,(__fd_t __sockfd, struct msghdr const *__message, __STDC_INT_AS_UINT_T __flags),(__sockfd,__message,__flags))
 #endif /* sendmsg... */
 #ifdef __CRT_HAVE_recvmsg
 /* Receive a message as described by MESSAGE from socket FD.
- * Returns the number of bytes read or -1 for errors. */
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recvmsg,(__fd_t __sockfd, struct msghdr *__message, int __flags),(__sockfd,__message,__flags))
+ * Returns the number of bytes read or -1 for errors.
+ * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recvmsg,(__fd_t __sockfd, struct msghdr *__message, __STDC_INT_AS_UINT_T __flags),(__sockfd,__message,__flags))
 #endif /* recvmsg... */
 #ifdef __CRT_HAVE_getsockopt
 /* Put the current value for socket FD's option OPTNAME at protocol level LEVEL
  * into OPTVAL (which is *OPTLEN bytes long), and set *OPTLEN to the value's
- * actual length.  Returns 0 on success, -1 for errors */
-__CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,getsockopt,(__fd_t __sockfd, int __level, int __optname, void *__restrict __optval, socklen_t *__restrict __optlen),(__sockfd,__level,__optname,__optval,__optlen))
+ * actual length.  Returns 0 on success, -1 for errors
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level' */
+__CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,getsockopt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void *__restrict __optval, socklen_t *__restrict __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* getsockopt... */
 #ifdef __CRT_HAVE_setsockopt
-/* Set socket FD's option OPTNAME at protocol level LEVEL to *OPTVAL (which is OPTLEN bytes long).
- * Returns 0 on success, -1 for errors */
-__CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,setsockopt,(__fd_t __sockfd, int __level, int __optname, void const *__optval, socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
+/* Set socket FD's option OPTNAME at protocol level LEVEL to *OPTVAL
+ * (which is OPTLEN bytes long). Returns 0 on success, -1 for errors
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level' */
+__CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,setsockopt,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __level, __STDC_INT_AS_UINT_T __optname, void const *__optval, socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* setsockopt... */
 #ifdef __CRT_HAVE_listen
 /* Prepare to accept connections on socket FD.
- * MAX_BACKLOG connection requests will be queued before further requests are refused.
- * Returns 0 on success, -1 for errors */
-__CDECLARE(,int,__NOTHROW_NCX,listen,(__fd_t __sockfd, int __max_backlog),(__sockfd,__max_backlog))
+ * `MAX_BACKLOG' connection requests will be queued before further
+ * requests are refused. Returns 0 on success, -1 for errors */
+__CDECLARE(,int,__NOTHROW_NCX,listen,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __max_backlog),(__sockfd,__max_backlog))
 #endif /* listen... */
 #ifdef __CRT_HAVE_accept
 /* Await a connection on socket FD.
  * When a connection arrives, open a new socket to communicate with it,
- * set *ADDR (which is *ADDR_LEN bytes long) to the address of the connecting
- * peer and *ADDR_LEN to the address's actual length, and return the
- * new socket's descriptor, or -1 for errors */
+ * set *ADDR (which is *ADDR_LEN bytes long) to the address of the
+ * connecting peer and *ADDR_LEN to the address's actual length, and
+ * return the new socket's descriptor, or -1 for errors */
 __CDECLARE(__ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,accept,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* accept... */
 #ifdef __CRT_HAVE_shutdown
@@ -261,59 +335,84 @@ __CDECLARE(__ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,accept,(__fd_t __sockfd, __S
  *     - SHUT_WR   = No more transmissions;
  *     - SHUT_RDWR = No more receptions or transmissions.
  * Returns 0 on success, -1 for errors */
-__CDECLARE(,int,__NOTHROW_NCX,shutdown,(__fd_t __sockfd, int __how),(__sockfd,__how))
+__CDECLARE(,int,__NOTHROW_NCX,shutdown,(__fd_t __sockfd, __STDC_INT_AS_UINT_T __how),(__sockfd,__how))
 #endif /* shutdown... */
 
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_accept4
-/* Similar to 'accept' but takes an additional parameter to specify flags.
- * @param: FLAGS: Set of `SOCK_NONBLOCK|SOCK_CLOEXEC|SOCK_CLOFORK' */
-__CDECLARE(__ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,accept4,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len, int __flags),(__sockfd,__addr,__addr_len,__flags))
+/* Similar to 'accept(2)' but takes an additional parameter to specify flags.
+ * @param: FLAGS: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+__CDECLARE(__ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,accept4,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len, __STDC_INT_AS_UINT_T __flags),(__sockfd,__addr,__addr_len,__flags))
 #endif /* accept4... */
 #ifdef __CRT_HAVE_sendmmsg
 /* Send a VLEN messages as described by VMESSAGES to socket FD.
- * Returns the number of datagrams successfully written or -1 for errors */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags),(__sockfd,__vmessages,__vlen,__flags))
+ * Returns the number of datagrams successfully written or -1 for errors
+ * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags),(__sockfd,__vmessages,__vlen,__flags))
 #elif defined(__CRT_HAVE___sendmmsg)
 /* Send a VLEN messages as described by VMESSAGES to socket FD.
- * Returns the number of datagrams successfully written or -1 for errors */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags),__sendmmsg,(__sockfd,__vmessages,__vlen,__flags))
+ * Returns the number of datagrams successfully written or -1 for errors
+ * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags),__sendmmsg,(__sockfd,__vmessages,__vlen,__flags))
 #endif /* sendmmsg... */
 #if defined(__CRT_HAVE_recvmmsg64) && defined(__USE_TIME_BITS64)
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors. */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct timespec *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__flags,__tmo))
+ * Returns the number of messages received or -1 for errors.
+ * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags, struct timespec *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg) && !defined(__USE_TIME_BITS64)
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors. */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct timespec *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
+ * Returns the number of messages received or -1 for errors.
+ * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags, struct timespec *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64)
 #include <local/sys.socket/recvmmsg.h>
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL recvmmsg)(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct timespec *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg))(__sockfd, __vmessages, __vlen, __flags, __tmo); })
+ * Returns the number of messages received or -1 for errors.
+ * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL recvmmsg)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags, struct timespec *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg))(__sockfd, __vmessages, __vlen, __flags, __tmo); })
 #endif /* recvmmsg... */
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_recvmmsg64
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors. */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct __timespec64 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
+ * Returns the number of messages received or -1 for errors.
+ * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags, struct __timespec64 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors. */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct __timespec64 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__flags,__tmo))
+ * Returns the number of messages received or -1 for errors.
+ * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags, struct __timespec64 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg)
 #include <local/sys.socket/recvmmsg64.h>
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg64, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL recvmmsg64)(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct __timespec64 *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg64))(__sockfd, __vmessages, __vlen, __flags, __tmo); })
+ * Returns the number of messages received or -1 for errors.
+ * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg64, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL recvmmsg64)(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags, struct __timespec64 *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg64))(__sockfd, __vmessages, __vlen, __flags, __tmo); })
 #endif /* recvmmsg64... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
 
 #ifdef __USE_XOPEN2K
 #ifdef __CRT_HAVE_sockatmark
-/* Determine whether socket is at a out-of-band mark */
+/* Determine whether socket is at a out-of-band mark
+ * @return: > 0 : The read-pointer is pointing at out-of-band data
+ * @return: == 0: The read-pointer is not pointing at out-of-band data
+ * @return: < 0 : Error (s.a. `errno') */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,sockatmark,(__fd_t __sockfd),(__sockfd))
 #endif /* sockatmark... */
 #endif /* __USE_XOPEN2K */
@@ -322,8 +421,9 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,sockatmark,(__fd_t __sockfd),(__sock
 #ifdef __CRT_HAVE_isfdtype
 /* FDTYPE is S_IFSOCK or another S_IF* macro defined in <sys/stat.h>;
  * returns 1 if FD is open on an object of the indicated
- * type, 0 if not, or -1 for errors (setting errno) */
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,isfdtype,(__fd_t __fd, int __fdtype),(__fd,__fdtype))
+ * type, 0 if not, or -1 for errors (setting errno)
+ * @param: fdtype: One of `S_IF*' from `<sys/stat.h>' */
+__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,isfdtype,(__fd_t __fd, __STDC_INT_AS_UINT_T __fdtype),(__fd,__fdtype))
 #endif /* isfdtype... */
 #endif /* __USE_MISC */
 #endif /* __CC__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbf3403c */
+/* HASH CRC-32:0xd1a37b53 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -429,11 +429,46 @@
 #define __NR_bpf                     0x165                  /* errno_t bpf(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR_execveat                0x166                  /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags) */
+/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 #define __NR_socket                  0x167                  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
+/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 #define __NR_socketpair              0x168                  /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 #define __NR_bind                    0x169                  /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define __NR_connect                 0x16a                  /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define __NR_listen                  0x16b                  /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
+/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
 #define __NR_accept4                 0x16c                  /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
 /* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
  * @param: optname: Dependent on `level' */
@@ -443,10 +478,18 @@
 #define __NR_setsockopt              0x16e                  /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
 #define __NR_getsockname             0x16f                  /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 #define __NR_getpeername             0x170                  /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
-/* param flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 #define __NR_sendto                  0x171                  /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
+/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 #define __NR_sendmsg                 0x172                  /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
+/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 #define __NR_recvfrom                0x173                  /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
+/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 #define __NR_recvmsg                 0x174                  /* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t flags) */
 /* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
 #define __NR_shutdown                0x175                  /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */

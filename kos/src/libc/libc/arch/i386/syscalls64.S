@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc67eb1a9 */
+/* HASH CRC-32:0x2d2d1934 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1046,6 +1046,23 @@ INTERN_FUNCTION(libc_sys_Xsendfile)
 END(libc_sys_Xsendfile)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsendfile, libc_sys_Xsendfile)
 
+/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 .section .text.crt.syscall.socket
 INTERN_FUNCTION(libc_sys_socket)
@@ -1058,6 +1075,23 @@ INTERN_FUNCTION(libc_sys_socket)
 END(libc_sys_socket)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_socket, libc_sys_socket)
 
+/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 .section .text.crt.syscall.Xsocket
 INTERN_FUNCTION(libc_sys_Xsocket)
@@ -1118,7 +1152,8 @@ INTERN_FUNCTION(libc_sys_Xaccept)
 END(libc_sys_Xaccept)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xaccept, libc_sys_Xaccept)
 
-/* param flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.crt.syscall.sendto
 INTERN_FUNCTION(libc_sys_sendto)
@@ -1132,7 +1167,8 @@ INTERN_FUNCTION(libc_sys_sendto)
 END(libc_sys_sendto)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sendto, libc_sys_sendto)
 
-/* param flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.crt.syscall.Xsendto
 INTERN_FUNCTION(libc_sys_Xsendto)
@@ -1146,6 +1182,8 @@ INTERN_FUNCTION(libc_sys_Xsendto)
 END(libc_sys_Xsendto)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsendto, libc_sys_Xsendto)
 
+/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.recvfrom
 INTERN_FUNCTION(libc_sys_recvfrom)
@@ -1159,6 +1197,8 @@ INTERN_FUNCTION(libc_sys_recvfrom)
 END(libc_sys_recvfrom)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_recvfrom, libc_sys_recvfrom)
 
+/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.Xrecvfrom
 INTERN_FUNCTION(libc_sys_Xrecvfrom)
@@ -1172,6 +1212,8 @@ INTERN_FUNCTION(libc_sys_Xrecvfrom)
 END(libc_sys_Xrecvfrom)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrecvfrom, libc_sys_Xrecvfrom)
 
+/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
 .section .text.crt.syscall.sendmsg
 INTERN_FUNCTION(libc_sys_sendmsg)
@@ -1184,6 +1226,8 @@ INTERN_FUNCTION(libc_sys_sendmsg)
 END(libc_sys_sendmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sendmsg, libc_sys_sendmsg)
 
+/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xsendmsg
 INTERN_FUNCTION(libc_sys_Xsendmsg)
@@ -1196,6 +1240,9 @@ INTERN_FUNCTION(libc_sys_Xsendmsg)
 END(libc_sys_Xsendmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsendmsg, libc_sys_Xsendmsg)
 
+/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 /* ssize_t recvmsg(fd_t sockfd, struct msghdr64 *message, syscall_ulong_t flags) */
 .section .text.crt.syscall.recvmsg
 INTERN_FUNCTION(libc_sys_recvmsg)
@@ -1208,6 +1255,9 @@ INTERN_FUNCTION(libc_sys_recvmsg)
 END(libc_sys_recvmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_recvmsg, libc_sys_recvmsg)
 
+/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 /* ssize_t recvmsg(fd_t sockfd, struct msghdr64 *message, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xrecvmsg
 INTERN_FUNCTION(libc_sys_Xrecvmsg)
@@ -1342,6 +1392,23 @@ INTERN_FUNCTION(libc_sys_Xgetpeername)
 END(libc_sys_Xgetpeername)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetpeername, libc_sys_Xgetpeername)
 
+/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 .section .text.crt.syscall.socketpair
 INTERN_FUNCTION(libc_sys_socketpair)
@@ -1355,6 +1422,23 @@ INTERN_FUNCTION(libc_sys_socketpair)
 END(libc_sys_socketpair)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_socketpair, libc_sys_socketpair)
 
+/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 .section .text.crt.syscall.Xsocketpair
 INTERN_FUNCTION(libc_sys_Xsocketpair)
@@ -7120,6 +7204,7 @@ INTERN_FUNCTION(libc_sys_Xtimerfd_gettime)
 END(libc_sys_Xtimerfd_gettime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimerfd_gettime, libc_sys_Xtimerfd_gettime)
 
+/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
 .section .text.crt.syscall.accept4
 INTERN_FUNCTION(libc_sys_accept4)
@@ -7133,6 +7218,7 @@ INTERN_FUNCTION(libc_sys_accept4)
 END(libc_sys_accept4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_accept4, libc_sys_accept4)
 
+/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xaccept4
 INTERN_FUNCTION(libc_sys_Xaccept4)

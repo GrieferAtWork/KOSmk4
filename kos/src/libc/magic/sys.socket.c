@@ -24,15 +24,19 @@
 %[define_replacement(time_t   = __TM_TYPE(time))]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
+%[define_replacement(__SOCKADDR_ARG       = struct sockaddr *__restrict)]
+%[define_replacement(__CONST_SOCKADDR_ARG = struct sockaddr const *__restrict)]
 %[default_impl_section(.text.crt.net.socket)]
 
 %{
 #include <features.h>
+
 #include <hybrid/typecore.h>
+
+#include <bits/socket.h>
 #include <bits/timespec.h>
 #include <bits/types.h>
 #include <sys/uio.h>
-#include <bits/socket.h>
 
 #ifdef __USE_GNU
 #include <bits/sigset.h>
@@ -92,24 +96,24 @@ struct osockaddr {
 #endif /* __USE_MISC */
 
 
-#if defined(__cplusplus) || !defined(__USE_GNU) || \
-    defined(__NO_ATTR_TRANSPARENT_UNION)
+#if (defined(__cplusplus) || !defined(__USE_GNU) || \
+     defined(__NO_ATTR_TRANSPARENT_UNION))
 #define __SOCKADDR_ARG       struct sockaddr *__restrict
 #define __CONST_SOCKADDR_ARG struct sockaddr const *__restrict
-#else
-#define __SOCKADDR_ALLTYPES \
-	__SOCKADDR_ONETYPE(sockaddr) \
-	__SOCKADDR_ONETYPE(sockaddr_at) \
-	__SOCKADDR_ONETYPE(sockaddr_ax25) \
-	__SOCKADDR_ONETYPE(sockaddr_dl) \
-	__SOCKADDR_ONETYPE(sockaddr_eon) \
-	__SOCKADDR_ONETYPE(sockaddr_in) \
-	__SOCKADDR_ONETYPE(sockaddr_in6) \
+#else /* __cplusplus || !__USE_GNU || __NO_ATTR_TRANSPARENT_UNION */
+#define __SOCKADDR_ALLTYPES            \
+	__SOCKADDR_ONETYPE(sockaddr)       \
+	__SOCKADDR_ONETYPE(sockaddr_at)    \
+	__SOCKADDR_ONETYPE(sockaddr_ax25)  \
+	__SOCKADDR_ONETYPE(sockaddr_dl)    \
+	__SOCKADDR_ONETYPE(sockaddr_eon)   \
+	__SOCKADDR_ONETYPE(sockaddr_in)    \
+	__SOCKADDR_ONETYPE(sockaddr_in6)   \
 	__SOCKADDR_ONETYPE(sockaddr_inarp) \
-	__SOCKADDR_ONETYPE(sockaddr_ipx) \
-	__SOCKADDR_ONETYPE(sockaddr_iso) \
-	__SOCKADDR_ONETYPE(sockaddr_ns) \
-	__SOCKADDR_ONETYPE(sockaddr_un) \
+	__SOCKADDR_ONETYPE(sockaddr_ipx)   \
+	__SOCKADDR_ONETYPE(sockaddr_iso)   \
+	__SOCKADDR_ONETYPE(sockaddr_ns)    \
+	__SOCKADDR_ONETYPE(sockaddr_un)    \
 	__SOCKADDR_ONETYPE(sockaddr_x25)
 #ifdef __cplusplus
 #define __SOCKADDR_ONETYPE(type) struct type;
@@ -122,7 +126,7 @@ typedef union { __SOCKADDR_ALLTYPES } __SOCKADDR_ARG __ATTR_TRANSPARENT_UNION;
 #define __SOCKADDR_ONETYPE(type) struct type const *__restrict __##type##__;
 typedef union { __SOCKADDR_ALLTYPES } __CONST_SOCKADDR_ARG __ATTR_TRANSPARENT_UNION;
 #undef __SOCKADDR_ONETYPE
-#endif
+#endif /* !__cplusplus && __USE_GNU && !__NO_ATTR_TRANSPARENT_UNION */
 
 #ifdef __USE_GNU
 /* For `recvmmsg' and `sendmmsg'. */
@@ -133,90 +137,158 @@ struct mmsghdr {
 	__UINT32_TYPE__ msg_len; /* Number of received or sent bytes for the entry. */
 };
 #endif /* !__mmsghdr_defined */
-#endif
+#endif /* __USE_GNU */
 
 }
 
 
-@@Create a new socket of type TYPE in domain DOMAIN, using
-@@protocol PROTOCOL.  If PROTOCOL is zero, one is chosen automatically.
+@@Create a new socket of type TYPE in domain FAMILY, using
+@@protocol PROTOCOL. If PROTOCOL is zero, one is chosen automatically.
 @@Returns a file descriptor for the new socket, or -1 for errors
+@@@param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+@@@param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+@@                  May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+@@@param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+@@                  depend on the selected `family', and may be further specialized by the
+@@                  `type' argument. In general, only 1 protocol exists for any family+type
+@@                  combination, in which case `0' can be passed as alias for this protocol.
+@@                  However, if more than one protocol is defined, it's ID has to be passed
+@@                  instead, and `0' is not accepted. A list of known protocol ids can be
+@@                  found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+@@                  and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+@@                  re-use the corresponding address-family id, however note that this detail
+@@                  is not guarantied by all protocols)
+@@                  In general, you should always be safe to do one of the following:
+@@                  >> socket(AF_INET, SOCK_STREAM, PF_INET);
+@@                  >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+@@                  Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
 [ATTR_WUNUSED][export_alias(__socket)]
-socket:(int domain, int type, int protocol) -> $fd_t;
+socket:(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type,
+        __STDC_INT_AS_UINT_T protocol) -> $fd_t;
 
-@@Create two new sockets, of type TYPE in domain DOMAIN and using
+@@Create two new sockets, of type TYPE in domain FAMILY and using
 @@protocol PROTOCOL, which are connected to each other, and put file
 @@descriptors for them in FDS[0] and FDS[1].  If PROTOCOL is zero,
 @@one will be chosen automatically.  Returns 0 on success, -1 for errors
-socketpair:(int domain, int type, int protocol, [nonnull] $fd_t fds[2]) -> int;
+@@@param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+@@@param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+@@                  May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+@@@param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+@@                  depend on the selected `family', and may be further specialized by the
+@@                  `type' argument. In general, only 1 protocol exists for any family+type
+@@                  combination, in which case `0' can be passed as alias for this protocol.
+@@                  However, if more than one protocol is defined, it's ID has to be passed
+@@                  instead, and `0' is not accepted. A list of known protocol ids can be
+@@                  found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+@@                  and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+@@                  re-use the corresponding address-family id, however note that this detail
+@@                  is not guarantied by all protocols)
+@@                  In general, you should always be safe to do one of the following:
+@@                  >> socket(AF_INET, SOCK_STREAM, PF_INET);
+@@                  >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+@@                  Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
+socketpair:(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type,
+            __STDC_INT_AS_UINT_T protocol, [nonnull] $fd_t fds[2]) -> int;
 
 @@Give the socket FD the local address ADDR (which is LEN bytes long)
-bind:($fd_t sockfd, [inp(addr_len)] __CONST_SOCKADDR_ARG addr, socklen_t addr_len) -> int;
+bind:($fd_t sockfd, [inp(addr_len)] __CONST_SOCKADDR_ARG addr,
+      socklen_t addr_len) -> int;
 
 @@Put the local address of FD into *ADDR and its length in *LEN
-getsockname:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) -> int;
+getsockname:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
+             socklen_t *__restrict addr_len) -> int;
 
 @@Open a connection on socket FD to peer at ADDR (which LEN bytes long).
 @@For connectionless socket types, just set the default address to send to
 @@and the only address from which to accept transmissions.
 @@Return 0 on success, -1 for errors
 [cp][export_alias(__connect)]
-connect:($fd_t sockfd, [inp(addr_len)] __CONST_SOCKADDR_ARG addr, socklen_t addr_len) -> int;
+connect:($fd_t sockfd, [inp(addr_len)] __CONST_SOCKADDR_ARG addr,
+         socklen_t addr_len) -> int;
 
 @@Put the address of the peer connected to socket FD into *ADDR
 @@(which is *LEN bytes long), and its actual length into *LEN
-getpeername:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) -> int;
+getpeername:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
+             socklen_t *__restrict addr_len) -> int;
 
 @@Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1
+@@@param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+@@                       MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [cp][export_alias(__send)]
-send:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, int flags) -> ssize_t;
+send:($fd_t sockfd, [inp(bufsize)] void const *buf,
+      size_t bufsize, __STDC_INT_AS_UINT_T flags) -> ssize_t;
 
 @@Read BUFSIZE bytes into BUF from socket FD.
 @@Returns the number read or -1 for errors
+@@@param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                       MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][ATTR_WUNUSED][export_alias(__recv)]
-recv:($fd_t sockfd, [outp(bufsize)] void *buf, size_t bufsize, int flags) -> ssize_t;
+recv:($fd_t sockfd, [outp(bufsize)] void *buf, size_t bufsize,
+      __STDC_INT_AS_UINT_T flags) -> ssize_t;
 
 @@Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
 @@(which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors.
-[cp] sendto:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, int flags,
-             [inp(addr_len)] __CONST_SOCKADDR_ARG addr, socklen_t addr_len) -> ssize_t;
+@@@param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+@@                       MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+[cp]
+sendto:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags,
+        [inp(addr_len)] __CONST_SOCKADDR_ARG addr, socklen_t addr_len) -> ssize_t;
 
 @@Read BUFSIZE bytes into BUF through socket FD.
 @@If ADDR is not NULL, fill in *ADDR_LEN bytes of it with tha address of
 @@the sender, and store the actual size of the address in *ADDR_LEN.
 @@Returns the number of bytes read or -1 for errors
-[cp][ATTR_WUNUSED] recvfrom:($fd_t sockfd, [outp(bufsize)] void *__restrict buf, size_t bufsize, int flags,
-                             [outp(*addr_len)] __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) -> ssize_t;
+@@@param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                       MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+[cp][ATTR_WUNUSED]
+recvfrom:($fd_t sockfd, [outp(bufsize)] void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T flags,
+          [outp(*addr_len)] __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) -> ssize_t;
 
 @@Send a message described MESSAGE on socket FD.
 @@Returns the number of bytes sent, or -1 for errors
-[cp] sendmsg:($fd_t sockfd, [nonnull] struct msghdr const *message, int flags) -> ssize_t;
+@@@param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+@@                       MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+[cp]
+sendmsg:($fd_t sockfd, [nonnull] struct msghdr const *message,
+         __STDC_INT_AS_UINT_T flags) -> ssize_t;
 
 @@Receive a message as described by MESSAGE from socket FD.
 @@Returns the number of bytes read or -1 for errors.
-[cp][ATTR_WUNUSED] recvmsg:($fd_t sockfd, [nonnull] struct msghdr *message, int flags) -> ssize_t;
+@@@param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+@@                       MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                       MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+[cp][ATTR_WUNUSED]
+recvmsg:($fd_t sockfd, [nonnull] struct msghdr *message,
+         __STDC_INT_AS_UINT_T flags) -> ssize_t;
 
 @@Put the current value for socket FD's option OPTNAME at protocol level LEVEL
 @@into OPTVAL (which is *OPTLEN bytes long), and set *OPTLEN to the value's
 @@actual length.  Returns 0 on success, -1 for errors
-getsockopt:($fd_t sockfd, int level, int optname,
+@@@param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+@@@param: optname: Dependent on `level'
+getsockopt:($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
             [outp(*optlen)] void *__restrict optval, socklen_t *__restrict optlen) -> int;
 
-@@Set socket FD's option OPTNAME at protocol level LEVEL to *OPTVAL (which is OPTLEN bytes long).
-@@Returns 0 on success, -1 for errors
-setsockopt:($fd_t sockfd, int level, int optname, [inp(optlen)] void const *optval, socklen_t optlen) -> int;
+@@Set socket FD's option OPTNAME at protocol level LEVEL to *OPTVAL
+@@(which is OPTLEN bytes long). Returns 0 on success, -1 for errors
+@@@param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+@@@param: optname: Dependent on `level'
+setsockopt:($fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname,
+            [inp(optlen)] void const *optval, socklen_t optlen) -> int;
 
 @@Prepare to accept connections on socket FD.
-@@MAX_BACKLOG connection requests will be queued before further requests are refused.
-@@Returns 0 on success, -1 for errors
-listen:($fd_t sockfd, int max_backlog) -> int;
+@@`MAX_BACKLOG' connection requests will be queued before further
+@@requests are refused. Returns 0 on success, -1 for errors
+listen:($fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog) -> int;
 
 @@Await a connection on socket FD.
 @@When a connection arrives, open a new socket to communicate with it,
-@@set *ADDR (which is *ADDR_LEN bytes long) to the address of the connecting
-@@peer and *ADDR_LEN to the address's actual length, and return the
-@@new socket's descriptor, or -1 for errors
-[cp] accept:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) -> $fd_t;
+@@set *ADDR (which is *ADDR_LEN bytes long) to the address of the
+@@connecting peer and *ADDR_LEN to the address's actual length, and
+@@return the new socket's descriptor, or -1 for errors
+[cp]
+accept:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
+        socklen_t *__restrict addr_len) -> $fd_t;
 
 @@Shut down all or part of the connection open on socket FD.
 @@HOW determines what to shut down:
@@ -224,57 +296,71 @@ listen:($fd_t sockfd, int max_backlog) -> int;
 @@    - SHUT_WR   = No more transmissions;
 @@    - SHUT_RDWR = No more receptions or transmissions.
 @@Returns 0 on success, -1 for errors
-shutdown:($fd_t sockfd, int how) -> int;
+shutdown:($fd_t sockfd, __STDC_INT_AS_UINT_T how) -> int;
 
 %
 %#ifdef __USE_GNU
-@@Similar to 'accept' but takes an additional parameter to specify flags.
-@@@param: FLAGS: Set of `SOCK_NONBLOCK|SOCK_CLOEXEC|SOCK_CLOFORK'
-[cp] accept4:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, int flags) -> $fd_t;
+@@Similar to 'accept(2)' but takes an additional parameter to specify flags.
+@@@param: FLAGS: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+[cp]
+accept4:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
+         socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T flags) -> $fd_t;
 
 @@Send a VLEN messages as described by VMESSAGES to socket FD.
 @@Returns the number of datagrams successfully written or -1 for errors
+@@@param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+@@                       MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [cp][export_alias(__sendmmsg)]
-sendmmsg:($fd_t sockfd, [nonnull] struct mmsghdr *vmessages, unsigned int vlen, int flags) -> int;
+sendmmsg:($fd_t sockfd, [nonnull] struct mmsghdr *vmessages,
+          __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags) -> int;
 
+@@@param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+@@                       MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                       MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][ignore][doc_alias(recvmmsg)]
-recvmmsg32:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages, unsigned int vlen,
-            int flags, [nullable] struct $timespec32 *tmo) = recvmmsg?;
+recvmmsg32:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
+            __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags,
+            [nullable] struct $timespec32 *tmo) = recvmmsg?;
 
 @@Receive up to VLEN messages as described by VMESSAGES from socket FD.
 @@Returns the number of messages received or -1 for errors.
+@@@param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+@@                       MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                       MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][if(defined(__USE_TIME_BITS64)),preferred_alias(recvmmsg64)]
 [if(!defined(__USE_TIME_BITS64)),preferred_alias(recvmmsg)]
 [requires(defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64))]
-recvmmsg:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages, unsigned int vlen,
-          int flags, [nullable] struct timespec *tmo) -> int {
+recvmmsg:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
+          __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags,
+          [nullable] struct timespec *tmo) -> int {
 #ifdef __CRT_HAVE_recvmmsg64
 	struct timespec64 tmo64;
 	if (!tmo)
-		return recvmmsg64(sockfd,vmessages,vlen,flags,NULL);
+		return recvmmsg64(sockfd, vmessages, vlen, flags, NULL);
 	tmo32.@tv_sec@  = (time64_t)tmo->@tv_sec@,
 	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
-	return recvmmsg64(sockfd,vmessages,vlen,flags,&tmo64);
-#else
+	return recvmmsg64(sockfd, vmessages, vlen, flags, &tmo64);
+#else /* __CRT_HAVE_recvmmsg64 */
 	struct timespec32 tmo32;
 	if (!tmo)
-		return recvmmsg32(sockfd,vmessages,vlen,flags,NULL);
+		return recvmmsg32(sockfd, vmessages, vlen, flags, NULL);
 	tmo32.@tv_sec@  = (time32_t)tmo->@tv_sec@,
 	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
-	return recvmmsg32(sockfd,vmessages,vlen,flags,&tmo32);
-#endif
+	return recvmmsg32(sockfd, vmessages, vlen, flags, &tmo32);
+#endif /* !__CRT_HAVE_recvmmsg64 */
 }
 
 %#ifdef __USE_TIME64
 [cp][requires($has_function(recvmmsg32))][time64_variant_of(recvmmsg)]
-recvmmsg64:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages, unsigned int vlen,
-            int flags, [nullable] struct $timespec64 *tmo) -> int {
+recvmmsg64:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
+            __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags,
+            [nullable] struct $timespec64 *tmo) -> int {
 	struct timespec32 tmo32;
 	if (!tmo)
-		return recvmmsg32(sockfd,vmessages,vlen,flags,NULL);
+		return recvmmsg32(sockfd, vmessages, vlen, flags, NULL);
 	tmo32.@tv_sec@  = (time32_t)tmo->@tv_sec@,
 	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
-	return recvmmsg32(sockfd,vmessages,vlen,flags,&tmo32);
+	return recvmmsg32(sockfd, vmessages, vlen, flags, &tmo32);
 }
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_GNU */
@@ -282,6 +368,9 @@ recvmmsg64:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages, unsigned int vl
 %
 %#ifdef __USE_XOPEN2K
 @@Determine whether socket is at a out-of-band mark
+@@@return: > 0 : The read-pointer is pointing at out-of-band data
+@@@return: == 0: The read-pointer is not pointing at out-of-band data
+@@@return: < 0 : Error (s.a. `errno')
 [ATTR_WUNUSED] sockatmark:($fd_t sockfd) -> int;
 %#endif /* __USE_XOPEN2K */
 
@@ -290,7 +379,8 @@ recvmmsg64:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages, unsigned int vl
 @@FDTYPE is S_IFSOCK or another S_IF* macro defined in <sys/stat.h>;
 @@returns 1 if FD is open on an object of the indicated
 @@type, 0 if not, or -1 for errors (setting errno)
-[ATTR_WUNUSED] isfdtype:($fd_t fd, int fdtype) -> int;
+@@@param: fdtype: One of `S_IF*' from `<sys/stat.h>'
+[ATTR_WUNUSED] isfdtype:($fd_t fd, __STDC_INT_AS_UINT_T fdtype) -> int;
 %#endif /* __USE_MISC */
 
 %{

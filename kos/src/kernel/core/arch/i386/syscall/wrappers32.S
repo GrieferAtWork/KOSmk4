@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ba96939 */
+/* HASH CRC-32:0x4c418fd0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -13352,6 +13352,23 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_execveat)
 	.cfi_endproc
 END(__x86_asm32_int80_execveat)
 
+/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 .section .text.x86.asm32_syscall_int80.socket
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_socket)
@@ -13389,6 +13406,23 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_socket)
 	.cfi_endproc
 END(__x86_asm32_int80_socket)
 
+/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 .section .text.x86.asm32_syscall_int80.socketpair
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_socketpair)
@@ -13539,6 +13573,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_listen)
 	.cfi_endproc
 END(__x86_asm32_int80_listen)
 
+/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.accept4
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_accept4)
@@ -13738,7 +13773,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getpeername)
 	.cfi_endproc
 END(__x86_asm32_int80_getpeername)
 
-/* param flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm32_syscall_int80.sendto
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendto)
@@ -13781,6 +13817,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendto)
 	.cfi_endproc
 END(__x86_asm32_int80_sendto)
 
+/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.sendmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmsg)
@@ -13818,6 +13856,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmsg)
 	.cfi_endproc
 END(__x86_asm32_int80_sendmsg)
 
+/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm32_syscall_int80.recvfrom
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
@@ -13860,6 +13900,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvfrom)
 	.cfi_endproc
 END(__x86_asm32_int80_recvfrom)
 
+/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 /* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmsg)
@@ -30703,6 +30746,23 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_execveat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_execveat)
 
+/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 .section .text.x86.asm32_syscall_sysenter.socket
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_socket)
@@ -30740,6 +30800,23 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_socket)
 	.cfi_endproc
 END(__x86_asm32_sysenter_socket)
 
+/* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 .section .text.x86.asm32_syscall_sysenter.socketpair
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_socketpair)
@@ -30890,6 +30967,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_listen)
 	.cfi_endproc
 END(__x86_asm32_sysenter_listen)
 
+/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.accept4
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_accept4)
@@ -31093,7 +31171,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getpeername)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getpeername)
 
-/* param flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT | MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.x86.asm32_syscall_sysenter.sendto
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendto)
@@ -31138,6 +31217,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendto)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sendto)
 
+/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.sendmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendmsg)
@@ -31175,6 +31256,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sendmsg)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sendmsg)
 
+/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.x86.asm32_syscall_sysenter.recvfrom
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvfrom)
@@ -31219,6 +31302,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvfrom)
 	.cfi_endproc
 END(__x86_asm32_sysenter_recvfrom)
 
+/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 /* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmsg)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x810e4c51 */
+/* HASH CRC-32:0x18c3ce03 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,49 @@
 
 DECL_BEGIN
 
-/* Create a new socket of type TYPE in domain DOMAIN, using
- * protocol PROTOCOL.  If PROTOCOL is zero, one is chosen automatically.
- * Returns a file descriptor for the new socket, or -1 for errors */
-INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_socket)(int domain, int type, int protocol);
-/* Create two new sockets, of type TYPE in domain DOMAIN and using
+/* Create a new socket of type TYPE in domain FAMILY, using
+ * protocol PROTOCOL. If PROTOCOL is zero, one is chosen automatically.
+ * Returns a file descriptor for the new socket, or -1 for errors
+ * @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_socket)(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type, __STDC_INT_AS_UINT_T protocol);
+/* Create two new sockets, of type TYPE in domain FAMILY and using
  * protocol PROTOCOL, which are connected to each other, and put file
  * descriptors for them in FDS[0] and FDS[1].  If PROTOCOL is zero,
- * one will be chosen automatically.  Returns 0 on success, -1 for errors */
-INTDEF NONNULL((4)) int NOTHROW_NCX(LIBCCALL libc_socketpair)(int domain, int type, int protocol, fd_t fds[2]);
+ * one will be chosen automatically.  Returns 0 on success, -1 for errors
+ * @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
+ * @param: type:     Socket type (one of `SOCK_*' from `<bits/socket_type.h>')
+ *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
+ * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
+ *                   depend on the selected `family', and may be further specialized by the
+ *                   `type' argument. In general, only 1 protocol exists for any family+type
+ *                   combination, in which case `0' can be passed as alias for this protocol.
+ *                   However, if more than one protocol is defined, it's ID has to be passed
+ *                   instead, and `0' is not accepted. A list of known protocol ids can be
+ *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
+ *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
+ *                   re-use the corresponding address-family id, however note that this detail
+ *                   is not guarantied by all protocols)
+ *                   In general, you should always be safe to do one of the following:
+ *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
+ *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
+INTDEF NONNULL((4)) int NOTHROW_NCX(LIBCCALL libc_socketpair)(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type, __STDC_INT_AS_UINT_T protocol, fd_t fds[2]);
 /* Give the socket FD the local address ADDR (which is LEN bytes long) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_bind)(fd_t sockfd, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
 /* Put the local address of FD into *ADDR and its length in *LEN */
@@ -49,41 +83,58 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_connect)(fd_t sockfd, __CONST_
 /* Put the address of the peer connected to socket FD into *ADDR
  * (which is *LEN bytes long), and its actual length into *LEN */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_getpeername)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
-/* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1 */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd, void const *buf, size_t bufsize, int flags);
+/* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1
+ * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* Read BUFSIZE bytes into BUF from socket FD.
- * Returns the number read or -1 for errors */
-INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_recv)(fd_t sockfd, void *buf, size_t bufsize, int flags);
+ * Returns the number read or -1 for errors
+ * @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_recv)(fd_t sockfd, void *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
 /* Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
- * (which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors. */
-INTDEF NONNULL((2, 5)) ssize_t NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd, void const *buf, size_t bufsize, int flags, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
+ * (which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors.
+ * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+INTDEF NONNULL((2, 5)) ssize_t NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
 /* Read BUFSIZE bytes into BUF through socket FD.
  * If ADDR is not NULL, fill in *ADDR_LEN bytes of it with tha address of
  * the sender, and store the actual size of the address in *ADDR_LEN.
- * Returns the number of bytes read or -1 for errors */
-INTDEF WUNUSED NONNULL((2, 5)) ssize_t NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd, void *__restrict buf, size_t bufsize, int flags, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
+ * Returns the number of bytes read or -1 for errors
+ * @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+INTDEF WUNUSED NONNULL((2, 5)) ssize_t NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd, void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T flags, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
 /* Send a message described MESSAGE on socket FD.
- * Returns the number of bytes sent, or -1 for errors */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd, struct msghdr const *message, int flags);
+ * Returns the number of bytes sent, or -1 for errors
+ * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd, struct msghdr const *message, __STDC_INT_AS_UINT_T flags);
 /* Receive a message as described by MESSAGE from socket FD.
- * Returns the number of bytes read or -1 for errors. */
-INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd, struct msghdr *message, int flags);
+ * Returns the number of bytes read or -1 for errors.
+ * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd, struct msghdr *message, __STDC_INT_AS_UINT_T flags);
 /* Put the current value for socket FD's option OPTNAME at protocol level LEVEL
  * into OPTVAL (which is *OPTLEN bytes long), and set *OPTLEN to the value's
- * actual length.  Returns 0 on success, -1 for errors */
-INTDEF NONNULL((4)) int NOTHROW_NCX(LIBCCALL libc_getsockopt)(fd_t sockfd, int level, int optname, void *__restrict optval, socklen_t *__restrict optlen);
-/* Set socket FD's option OPTNAME at protocol level LEVEL to *OPTVAL (which is OPTLEN bytes long).
- * Returns 0 on success, -1 for errors */
-INTDEF NONNULL((4)) int NOTHROW_NCX(LIBCCALL libc_setsockopt)(fd_t sockfd, int level, int optname, void const *optval, socklen_t optlen);
+ * actual length.  Returns 0 on success, -1 for errors
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level' */
+INTDEF NONNULL((4)) int NOTHROW_NCX(LIBCCALL libc_getsockopt)(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void *__restrict optval, socklen_t *__restrict optlen);
+/* Set socket FD's option OPTNAME at protocol level LEVEL to *OPTVAL
+ * (which is OPTLEN bytes long). Returns 0 on success, -1 for errors
+ * @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+ * @param: optname: Dependent on `level' */
+INTDEF NONNULL((4)) int NOTHROW_NCX(LIBCCALL libc_setsockopt)(fd_t sockfd, __STDC_INT_AS_UINT_T level, __STDC_INT_AS_UINT_T optname, void const *optval, socklen_t optlen);
 /* Prepare to accept connections on socket FD.
- * MAX_BACKLOG connection requests will be queued before further requests are refused.
- * Returns 0 on success, -1 for errors */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_listen)(fd_t sockfd, int max_backlog);
+ * `MAX_BACKLOG' connection requests will be queued before further
+ * requests are refused. Returns 0 on success, -1 for errors */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_listen)(fd_t sockfd, __STDC_INT_AS_UINT_T max_backlog);
 /* Await a connection on socket FD.
  * When a connection arrives, open a new socket to communicate with it,
- * set *ADDR (which is *ADDR_LEN bytes long) to the address of the connecting
- * peer and *ADDR_LEN to the address's actual length, and return the
- * new socket's descriptor, or -1 for errors */
+ * set *ADDR (which is *ADDR_LEN bytes long) to the address of the
+ * connecting peer and *ADDR_LEN to the address's actual length, and
+ * return the new socket's descriptor, or -1 for errors */
 INTDEF NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_accept)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
 /* Shut down all or part of the connection open on socket FD.
  * HOW determines what to shut down:
@@ -91,25 +142,37 @@ INTDEF NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_accept)(fd_t sockfd, __SOCKAD
  *     - SHUT_WR   = No more transmissions;
  *     - SHUT_RDWR = No more receptions or transmissions.
  * Returns 0 on success, -1 for errors */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_shutdown)(fd_t sockfd, int how);
-/* Similar to 'accept' but takes an additional parameter to specify flags.
- * @param: FLAGS: Set of `SOCK_NONBLOCK|SOCK_CLOEXEC|SOCK_CLOFORK' */
-INTDEF NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_accept4)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, int flags);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_shutdown)(fd_t sockfd, __STDC_INT_AS_UINT_T how);
+/* Similar to 'accept(2)' but takes an additional parameter to specify flags.
+ * @param: FLAGS: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+INTDEF NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_accept4)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T flags);
 /* Send a VLEN messages as described by VMESSAGES to socket FD.
- * Returns the number of datagrams successfully written or -1 for errors */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd, struct mmsghdr *vmessages, unsigned int vlen, int flags);
+ * Returns the number of datagrams successfully written or -1 for errors
+ * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags);
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors. */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd, struct mmsghdr *vmessages, unsigned int vlen, int flags, struct timespec *tmo);
+ * Returns the number of messages received or -1 for errors.
+ * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags, struct timespec *tmo);
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
- * Returns the number of messages received or -1 for errors. */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd, struct mmsghdr *vmessages, unsigned int vlen, int flags, struct timespec64 *tmo);
-/* Determine whether socket is at a out-of-band mark */
+ * Returns the number of messages received or -1 for errors.
+ * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags, struct timespec64 *tmo);
+/* Determine whether socket is at a out-of-band mark
+ * @return: > 0 : The read-pointer is pointing at out-of-band data
+ * @return: == 0: The read-pointer is not pointing at out-of-band data
+ * @return: < 0 : Error (s.a. `errno') */
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_sockatmark)(fd_t sockfd);
 /* FDTYPE is S_IFSOCK or another S_IF* macro defined in <sys/stat.h>;
  * returns 1 if FD is open on an object of the indicated
- * type, 0 if not, or -1 for errors (setting errno) */
-INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd, int fdtype);
+ * type, 0 if not, or -1 for errors (setting errno)
+ * @param: fdtype: One of `S_IF*' from `<sys/stat.h>' */
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd, __STDC_INT_AS_UINT_T fdtype);
 
 DECL_END
 
