@@ -34,7 +34,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:socket,hash:CRC-32=0x49f81105]]]*/
+/*[[[head:socket,hash:CRC-32=0xd1f3c75e]]]*/
 /* Create a new socket of type TYPE in domain FAMILY, using
  * protocol PROTOCOL. If PROTOCOL is zero, one is chosen automatically.
  * Returns a file descriptor for the new socket, or -1 for errors
@@ -43,17 +43,8 @@ DECL_BEGIN
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
- *                   `type' argument. In general, only 1 protocol exists for any family+type
- *                   combination, in which case `0' can be passed as alias for this protocol.
- *                   However, if more than one protocol is defined, it's ID has to be passed
- *                   instead, and `0' is not accepted. A list of known protocol ids can be
- *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
- *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
- *                   re-use the corresponding address-family id, however note that this detail
- *                   is not guarantied by all protocols)
- *                   In general, you should always be safe to do one of the following:
- *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
- *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+ *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.socket") fd_t
@@ -70,7 +61,7 @@ NOTHROW_NCX(LIBCCALL libc_socket)(__STDC_INT_AS_UINT_T family,
 }
 /*[[[end:socket]]]*/
 
-/*[[[head:socketpair,hash:CRC-32=0x42e95cc0]]]*/
+/*[[[head:socketpair,hash:CRC-32=0x548bd75d]]]*/
 /* Create two new sockets, of type TYPE in domain FAMILY and using
  * protocol PROTOCOL, which are connected to each other, and put file
  * descriptors for them in FDS[0] and FDS[1].  If PROTOCOL is zero,
@@ -80,17 +71,8 @@ NOTHROW_NCX(LIBCCALL libc_socket)(__STDC_INT_AS_UINT_T family,
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
- *                   `type' argument. In general, only 1 protocol exists for any family+type
- *                   combination, in which case `0' can be passed as alias for this protocol.
- *                   However, if more than one protocol is defined, it's ID has to be passed
- *                   instead, and `0' is not accepted. A list of known protocol ids can be
- *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
- *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
- *                   re-use the corresponding address-family id, however note that this detail
- *                   is not guarantied by all protocols)
- *                   In general, you should always be safe to do one of the following:
- *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
- *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+ *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 INTERN NONNULL((4))
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.socketpair") int

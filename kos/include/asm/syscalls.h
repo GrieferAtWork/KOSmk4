@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5839bf4b */
+/* HASH CRC-32:0x92176eb2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -238,17 +238,8 @@
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
- *                   `type' argument. In general, only 1 protocol exists for any family+type
- *                   combination, in which case `0' can be passed as alias for this protocol.
- *                   However, if more than one protocol is defined, it's ID has to be passed
- *                   instead, and `0' is not accepted. A list of known protocol ids can be
- *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
- *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
- *                   re-use the corresponding address-family id, however note that this detail
- *                   is not guarantied by all protocols)
- *                   In general, you should always be safe to do one of the following:
- *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
- *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+ *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 #define __NR_socket                 0xc6  /* fd_t socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol) */
 /* @param: family:   Socket address family (one of `AF_*' from `<asm/socket-families.h>')
@@ -256,17 +247,8 @@
  *                   May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
  * @param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
  *                   depend on the selected `family', and may be further specialized by the
- *                   `type' argument. In general, only 1 protocol exists for any family+type
- *                   combination, in which case `0' can be passed as alias for this protocol.
- *                   However, if more than one protocol is defined, it's ID has to be passed
- *                   instead, and `0' is not accepted. A list of known protocol ids can be
- *                   found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
- *                   and are usually aliases for the same `AF_*' id (i.e. most protocol ids
- *                   re-use the corresponding address-family id, however note that this detail
- *                   is not guarantied by all protocols)
- *                   In general, you should always be safe to do one of the following:
- *                   >> socket(AF_INET, SOCK_STREAM, PF_INET);
- *                   >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+ *                   `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+ *                   >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
  *                   Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>' */
 #define __NR_socketpair             0xc7  /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 #define __NR_bind                   0xc8  /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */

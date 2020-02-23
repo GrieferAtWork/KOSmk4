@@ -150,17 +150,8 @@ struct mmsghdr {
 @@                  May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
 @@@param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
 @@                  depend on the selected `family', and may be further specialized by the
-@@                  `type' argument. In general, only 1 protocol exists for any family+type
-@@                  combination, in which case `0' can be passed as alias for this protocol.
-@@                  However, if more than one protocol is defined, it's ID has to be passed
-@@                  instead, and `0' is not accepted. A list of known protocol ids can be
-@@                  found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
-@@                  and are usually aliases for the same `AF_*' id (i.e. most protocol ids
-@@                  re-use the corresponding address-family id, however note that this detail
-@@                  is not guarantied by all protocols)
-@@                  In general, you should always be safe to do one of the following:
-@@                  >> socket(AF_INET, SOCK_STREAM, PF_INET);
-@@                  >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+@@                  `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+@@                  >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 @@                  Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
 [ATTR_WUNUSED][export_alias(__socket)]
 socket:(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type,
@@ -175,17 +166,8 @@ socket:(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type,
 @@                  May optionally be or'd with `SOCK_CLOEXEC | SOCK_CLOFORK | SOCK_NONBLOCK'
 @@@param: protocol: Socket protocol (`0' for automatic). Available socket protocols mainly
 @@                  depend on the selected `family', and may be further specialized by the
-@@                  `type' argument. In general, only 1 protocol exists for any family+type
-@@                  combination, in which case `0' can be passed as alias for this protocol.
-@@                  However, if more than one protocol is defined, it's ID has to be passed
-@@                  instead, and `0' is not accepted. A list of known protocol ids can be
-@@                  found in `<asm/socket-families.h>', where they are namespaced as `PF_*',
-@@                  and are usually aliases for the same `AF_*' id (i.e. most protocol ids
-@@                  re-use the corresponding address-family id, however note that this detail
-@@                  is not guarantied by all protocols)
-@@                  In general, you should always be safe to do one of the following:
-@@                  >> socket(AF_INET, SOCK_STREAM, PF_INET);
-@@                  >> socket(AF_INET, SOCK_STREAM, 0); // Same thing...
+@@                  `type' argument. for example, `AF_INET' takes one of `IPPROTO_*'
+@@                  >> socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 @@                  Also note that protocol IDs can be enumerated by `getprotoent(3)' from `<netdb.h>'
 socketpair:(__STDC_INT_AS_UINT_T family, __STDC_INT_AS_UINT_T type,
             __STDC_INT_AS_UINT_T protocol, [nonnull] $fd_t fds[2]) -> int;
