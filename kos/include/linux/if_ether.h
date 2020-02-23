@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <net/types.h>
+#include <net/bits/types.h>
 
 /*
  * INET   An implementation of the TCP/IP protocol suite for the LINUX

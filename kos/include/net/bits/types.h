@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _NET_TYPES_H
-#define _NET_TYPES_H 1
+#ifndef _NET_BITS_TYPES_H
+#define _NET_BITS_TYPES_H 1
 
 #include <__stdinc.h>
 #include <features.h>
@@ -87,4 +87,4 @@ typedef __UINT64_TYPE__ __u_net64_t;
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_NET_TYPES_H */
+#endif /* !_NET_BITS_TYPES_H */

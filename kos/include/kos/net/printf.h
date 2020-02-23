@@ -17,44 +17,47 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _NETINET_IN_SYSTM_H
-#define _NETINET_IN_SYSTM_H 1
+#ifndef _KOS_NET_PRINTF_H
+#define _KOS_NET_PRINTF_H 1
 
-/* System specific type definitions for networking code.
-   Copyright (C) 1997-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+/* KOS-specific data/function annotations. */
 
 #include <__stdinc.h>
-#include <features.h>
 
-#include <net/bits/types.h>
+#include <hybrid/__byteswap.h>
 
-#ifdef __USE_GLIBC
-#include <sys/types.h>
-#endif /* __USE_GLIBC */
+#include <bits/types.h>
 
-__SYSDECL_BEGIN
+#include <inttypes.h> /* WARNING: Not guarantied to always be included */
 
-#ifdef __CC__
-typedef __u_net16_t n_short; /* short as received from the net. */
-typedef __u_net32_t n_long;  /* long as received from the net. */
-typedef __u_net32_t n_time;  /* ms since 00:00 GMT, byte rev. */
-#endif /* __CC__ */
+/* Encode a mac address */
+#define NET_PRINTF_MACADDR_FMT \
+	"%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8
+#define NET_PRINTF_MACADDR_ARG(/*u8*/ macaddr /*[6]*/) \
+	(__uint8_t)(macaddr)[0], (__uint8_t)(macaddr)[1],  \
+	(__uint8_t)(macaddr)[2], (__uint8_t)(macaddr)[3],  \
+	(__uint8_t)(macaddr)[4], (__uint8_t)(macaddr)[5]
 
-__SYSDECL_END
+/* Encode an IP address */
+#define NET_PRINTF_IPADDR_FMT \
+	"%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8
+#define NET_PRINTF_IPADDR_ARG(/*be32*/ ipaddr)   \
+	(__uint8_t)(__hybrid_betoh32(ipaddr) >> 24), \
+	(__uint8_t)(__hybrid_betoh32(ipaddr) >> 16), \
+	(__uint8_t)(__hybrid_betoh32(ipaddr) >> 8),  \
+	(__uint8_t)(__hybrid_betoh32(ipaddr))
 
-#endif /* !_NETINET_IN_SYSTM_H */
+/* Encode a port number address */
+#define NET_PRINTF_PORT_FMT \
+	"%" PRIu16
+#define NET_PRINTF_PORT_ARG(/*u16*/ port) \
+	(__uint16_t)(port)
+
+/* Encode an ip+port address pair */
+#define NET_PRINTF_IPADDRPORT_FMT \
+	NET_PRINTF_IPADDR_FMT ":" NET_PRINTF_PORT_FMT
+#define NET_PRINTF_IPADDRPORT_ARG(/*be32*/ ipaddr, /*u16*/ port) \
+	NET_PRINTF_IPADDR_ARG(ipaddr), NET_PRINTF_PORT_ARG(port)
+
+
+#endif /* !_KOS_NET_PRINTF_H */

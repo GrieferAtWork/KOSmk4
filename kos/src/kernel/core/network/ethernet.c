@@ -26,6 +26,7 @@
 #include <dev/nic.h>
 #include <kernel/printk.h>
 
+#include <kos/net/printf.h>
 #include <linux/if_ether.h>
 #include <netinet/in.h>
 #include <network/arp.h>
@@ -33,32 +34,48 @@
 #include <network/ip.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 DECL_BEGIN
 
-/* Route an incoming packet through the given NIC device. */
+/* Route an incoming packet through the given NIC device.
+ * @assume(packet_size >= ETH_ZLEN) */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
-eth_routepacket(struct nic_device *__restrict self,
+eth_routepacket(struct nic_device *__restrict dev,
                 void const *__restrict packet_data,
                 size_t packet_size) {
 	struct ethhdr *hdr;
-	assert(packet_size >= ETH_ZLEN);
-	printk(KERN_TRACE "[nic:%s] Route eth-packet (%Iu bytes):\n",
-	       self->cd_name, packet_size);
 	hdr = (struct ethhdr *)packet_data;
+	assert(packet_size >= ETH_ZLEN);
+	printk(KERN_TRACE "[eth:%s] Route eth packet ["
+	                  "dst=" NET_PRINTF_MACADDR_FMT ","
+	                  "src=" NET_PRINTF_MACADDR_FMT ","
+	                  "prot=%#.4" PRIx16 ","
+	                  "siz=%" PRIuSIZ "]\n",
+	       dev->cd_name,
+	       NET_PRINTF_MACADDR_ARG(hdr->h_dest),
+	       NET_PRINTF_MACADDR_ARG(hdr->h_source),
+	       ntohs(hdr->h_proto), packet_size);
 	switch (ntohs(hdr->h_proto)) {
 
 	case ETH_P_IP:
-		ip_routepacket(self, hdr + 1, packet_size - sizeof(*hdr));
+		ip_routepacket(dev, hdr + 1, packet_size - sizeof(*hdr));
 		break;
 
 	case ETH_P_ARP:
-		arp_routepacket(self, hdr + 1, packet_size - sizeof(*hdr));
+		arp_routepacket(dev, hdr + 1, packet_size - sizeof(*hdr));
 		break;
 
 	default:
-		printk(KERN_WARNING "[nic:%s] Unrecognized eth-protocol (%#.4I16x, size=%Iu)\n",
+		printk(KERN_WARNING "[eth:%s] Unrecognized eth packet ["
+		                    "dst=" NET_PRINTF_MACADDR_FMT ","
+		                    "src=" NET_PRINTF_MACADDR_FMT ","
+		                    "prot=%#.4" PRIx16 ","
+		                    "siz=%" PRIuSIZ "]\n",
+		       dev->cd_name,
+		       NET_PRINTF_MACADDR_ARG(hdr->h_dest),
+		       NET_PRINTF_MACADDR_ARG(hdr->h_source),
 		       ntohs(hdr->h_proto), packet_size);
 		break;
 	}

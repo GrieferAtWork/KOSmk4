@@ -31,7 +31,7 @@
 #include <bits/sockaddr.h>
 #include <bits/sockaddr_storage-struct.h>
 #include <bits/types.h>
-#include <net/types.h>
+#include <net/bits/types.h>
 #include <netinet/ipport.h>
 #include <netinet/ipproto.h>
 

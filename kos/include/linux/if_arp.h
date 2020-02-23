@@ -24,7 +24,7 @@
 
 #include <bits/sockaddr-struct.h>
 #include <bits/types.h>
-#include <net/types.h>
+#include <net/bits/types.h>
 
 #if 0
 #include <linux/netdevice.h>

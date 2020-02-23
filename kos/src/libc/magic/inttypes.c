@@ -204,36 +204,36 @@ __SYSDECL_BEGIN
 
 
 /* printf(): (u)int8_t */
-#define PRId8          __PRI1_PREFIX "d"
-#define PRIi8          __PRI1_PREFIX "i"
-#define PRIo8          __PRI1_PREFIX "o"
-#define PRIu8          __PRI1_PREFIX "u"
-#define PRIx8          __PRI1_PREFIX "x"
-#define PRIX8          __PRI1_PREFIX "X"
+#define PRId8          __PRI1_PREFIX "d" /* I8d */
+#define PRIi8          __PRI1_PREFIX "i" /* I8i */
+#define PRIo8          __PRI1_PREFIX "o" /* I8o */
+#define PRIu8          __PRI1_PREFIX "u" /* I8u */
+#define PRIx8          __PRI1_PREFIX "x" /* I8x */
+#define PRIX8          __PRI1_PREFIX "X" /* I8X */
 
 /* printf(): (u)int16_t */
-#define PRId16         __PRI2_PREFIX "d"
-#define PRIi16         __PRI2_PREFIX "i"
-#define PRIo16         __PRI2_PREFIX "o"
-#define PRIu16         __PRI2_PREFIX "u"
-#define PRIx16         __PRI2_PREFIX "x"
-#define PRIX16         __PRI2_PREFIX "X"
+#define PRId16         __PRI2_PREFIX "d" /* I16d */
+#define PRIi16         __PRI2_PREFIX "i" /* I16i */
+#define PRIo16         __PRI2_PREFIX "o" /* I16o */
+#define PRIu16         __PRI2_PREFIX "u" /* I16u */
+#define PRIx16         __PRI2_PREFIX "x" /* I16x */
+#define PRIX16         __PRI2_PREFIX "X" /* I16X */
 
 /* printf(): (u)int32_t */
-#define PRId32         __PRI4_PREFIX "d"
-#define PRIi32         __PRI4_PREFIX "i"
-#define PRIo32         __PRI4_PREFIX "o"
-#define PRIu32         __PRI4_PREFIX "u"
-#define PRIx32         __PRI4_PREFIX "x"
-#define PRIX32         __PRI4_PREFIX "X"
+#define PRId32         __PRI4_PREFIX "d" /* I32d */
+#define PRIi32         __PRI4_PREFIX "i" /* I32i */
+#define PRIo32         __PRI4_PREFIX "o" /* I32o */
+#define PRIu32         __PRI4_PREFIX "u" /* I32u */
+#define PRIx32         __PRI4_PREFIX "x" /* I32x */
+#define PRIX32         __PRI4_PREFIX "X" /* I32X */
 
 /* printf(): (u)int64_t */
-#define PRId64         __PRI8_PREFIX "d"
-#define PRIi64         __PRI8_PREFIX "i"
-#define PRIo64         __PRI8_PREFIX "o"
-#define PRIu64         __PRI8_PREFIX "u"
-#define PRIx64         __PRI8_PREFIX "x"
-#define PRIX64         __PRI8_PREFIX "X"
+#define PRId64         __PRI8_PREFIX "d" /* I64d */
+#define PRIi64         __PRI8_PREFIX "i" /* I64i */
+#define PRIo64         __PRI8_PREFIX "o" /* I64o */
+#define PRIu64         __PRI8_PREFIX "u" /* I64u */
+#define PRIx64         __PRI8_PREFIX "x" /* I64x */
+#define PRIX64         __PRI8_PREFIX "X" /* I64X */
 
 /* printf(): (u)int_least8_t */
 #define PRIdLEAST8     __PRIL1_PREFIX "d"
@@ -308,21 +308,21 @@ __SYSDECL_BEGIN
 #define PRIXMAX        __PRI8_PREFIX "X"
 
 /* printf(): (u)intptr_t / void * */
-#define PRIdPTR        __PRIP_PREFIX "d"
-#define PRIiPTR        __PRIP_PREFIX "i"
-#define PRIoPTR        __PRIP_PREFIX "o"
-#define PRIuPTR        __PRIP_PREFIX "u"
-#define PRIxPTR        __PRIP_PREFIX "x"
-#define PRIXPTR        __PRIP_PREFIX "X"
+#define PRIdPTR        __PRIP_PREFIX "d" /* Id */
+#define PRIiPTR        __PRIP_PREFIX "i" /* Ii */
+#define PRIoPTR        __PRIP_PREFIX "o" /* Io */
+#define PRIuPTR        __PRIP_PREFIX "u" /* Iu */
+#define PRIxPTR        __PRIP_PREFIX "x" /* Ix */
+#define PRIXPTR        __PRIP_PREFIX "X" /* IX */
 
 #ifdef __USE_KOS
 /* printf(): (s)size_t */
-#define PRIdSIZ        __PRIP_PREFIX "d"
-#define PRIiSIZ        __PRIP_PREFIX "i"
-#define PRIoSIZ        __PRIP_PREFIX "o"
-#define PRIuSIZ        __PRIP_PREFIX "u"
-#define PRIxSIZ        __PRIP_PREFIX "x"
-#define PRIXSIZ        __PRIP_PREFIX "X"
+#define PRIdSIZ        __PRIP_PREFIX "d" /* Id */
+#define PRIiSIZ        __PRIP_PREFIX "i" /* Ii */
+#define PRIoSIZ        __PRIP_PREFIX "o" /* Io */
+#define PRIuSIZ        __PRIP_PREFIX "u" /* Iu */
+#define PRIxSIZ        __PRIP_PREFIX "x" /* Ix */
+#define PRIXSIZ        __PRIP_PREFIX "X" /* IX */
 #endif /* __USE_KOS */
 
 

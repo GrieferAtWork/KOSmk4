@@ -50,7 +50,7 @@
 #ifdef __USE_MISC
 #include <bits/in.h>
 #include <bits/types.h>
-#include <net/types.h>
+#include <net/bits/types.h>
 
 __SYSDECL_BEGIN
 

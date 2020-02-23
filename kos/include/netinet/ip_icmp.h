@@ -42,7 +42,7 @@
 
 #include <bits/in.h>
 #include <bits/types.h>
-#include <net/types.h>
+#include <net/bits/types.h>
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>

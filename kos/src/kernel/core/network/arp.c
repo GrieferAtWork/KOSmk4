@@ -29,6 +29,7 @@
 #include <hybrid/atomic.h>
 
 #include <bits/in.h>
+#include <kos/net/printf.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
 #include <netinet/in.h>
@@ -57,27 +58,16 @@ struct ATTR_PACKED ATTR_ALIGNED(2) arphdr_ether_in /*[PREFIX(ar_)]*/ {
 	struct in_addr ar_tip;           /* Target ip address. */
 };
 
-#define PRIFMT_IP \
-	"%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8
-#define PRIARG_IP(s_addr)                                   \
-	((u8 const *)&(s_addr))[0], ((u8 const *)&(s_addr))[1], \
-	((u8 const *)&(s_addr))[2], ((u8 const *)&(s_addr))[3]
-#define PRIFMT_MAC \
-	"%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8 ":%.2" PRIx8
-#define PRIARG_MAC(macaddr)     \
-	(macaddr)[0], (macaddr)[1], \
-	(macaddr)[2], (macaddr)[3], \
-	(macaddr)[4], (macaddr)[5]
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void KCALL
 arp_reply_myip(struct nic_device *__restrict dev,
                struct arphdr_ether_in const *__restrict packet) {
 	struct etharphdr_ether_in *response;
 	REF struct nic_packet *response_packet;
-	printk(KERN_TRACE "[arp:%s] Tell " PRIFMT_IP " (" PRIFMT_MAC ") "
-	                  "that we are " PRIFMT_IP " (" PRIFMT_MAC ")\n",
-	       PRIARG_IP(packet->ar_sip.s_addr), PRIARG_MAC(packet->ar_sha),
-	       PRIARG_IP(dev->nd_addr.na_ip), PRIARG_MAC(dev->nd_addr.na_hwmac));
+	printk(KERN_TRACE "[arp:%s] Tell " NET_PRINTF_IPADDR_FMT " [mac:" NET_PRINTF_MACADDR_FMT "] "
+	                  "that we are " NET_PRINTF_IPADDR_FMT " [mac:" NET_PRINTF_MACADDR_FMT "]\n",
+	       NET_PRINTF_IPADDR_ARG(packet->ar_sip.s_addr), NET_PRINTF_MACADDR_ARG(packet->ar_sha),
+	       NET_PRINTF_IPADDR_ARG(dev->nd_addr.na_ip), NET_PRINTF_MACADDR_ARG(dev->nd_addr.na_hwmac));
 	response_packet = nic_device_newpacketk(dev, (void **)&response, sizeof(*response));
 	FINALLY_DECREF_UNLIKELY(response_packet);
 	/* Construct an ARP response containing our MAC and IP addresses. */
@@ -118,7 +108,7 @@ arp_routepacket(struct nic_device *__restrict dev,
 	                ETH_ALEN * 2 +
 	                ahdr->ar_pln * 2;
 	if unlikely(packet_size < required_size) {
-		printk(KERN_WARNING "[arp:%s] Packet too small (%Iu < %Iu)\n",
+		printk(KERN_WARNING "[arp:%s] Packet too small (%" PRIuSIZ " < %" PRIuSIZ ")\n",
 		       packet_size, required_size);
 		return;
 	}
@@ -156,8 +146,12 @@ arp_routepacket(struct nic_device *__restrict dev,
 				memcpy(peer->npa_hwmac, hdr->ar_sha, ETH_ALEN);
 				if unlikely((ATOMIC_FETCHOR(peer->npa_flags, NET_PEERADDR_HAVE_MAC) & NET_PEERADDR_HAVE_MAC) &&
 				            (memcmp(peer->npa_hwmac, hdr->ar_sha, ETH_ALEN) != 0)) {
-					printk(KERN_NOTICE "[arp:%s] MAC for " PRIFMT_IP " changed from " PRIFMT_MAC " to " PRIFMT_MAC "\n",
-					       PRIARG_IP(peer->npa_ip), PRIARG_MAC(oldmac), PRIARG_MAC(hdr->ar_sha));
+					printk(KERN_NOTICE "[arp:%s] macaddr for " NET_PRINTF_IPADDR_FMT
+					                   " changed from " NET_PRINTF_MACADDR_FMT
+					                   " to " NET_PRINTF_MACADDR_FMT "\n",
+					       NET_PRINTF_IPADDR_ARG(peer->npa_ip),
+					       NET_PRINTF_MACADDR_ARG(oldmac),
+					       NET_PRINTF_MACADDR_ARG(hdr->ar_sha));
 				}
 				/* Indicate that the mac address of a peer has just become available. */
 				sig_broadcast(&dev->nd_net.n_addravl);

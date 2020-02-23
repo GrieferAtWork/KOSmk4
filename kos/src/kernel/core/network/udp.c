@@ -26,6 +26,7 @@
 #include <dev/nic.h>
 #include <kernel/printk.h>
 
+#include <kos/net/printf.h>
 #include <netinet/in.h>
 #include <netinet/udp.h>
 #include <network/ip.h>
@@ -43,27 +44,57 @@ PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
 udp_routepacket(struct nic_device *__restrict dev,
                 struct udphdr const *__restrict packet, u16 packet_size,
                 struct iphdr const *__restrict ip_header) {
+	byte_t const *payload;
+	u16 payload_length;
 	assert(packet_size >= sizeof(struct udphdr));
+	payload        = (byte_t const *)packet + sizeof(struct udphdr);
+	payload_length = ntohs(packet->uh_ulen);
+	/* Ensure that the */
+	if unlikely(payload_length < sizeof(struct udphdr)) {
+		printk(KERN_ERR "[udp:%s] udp packet udp.size=%" PRIu16 " from "
+		                "[" NET_PRINTF_IPADDRPORT_FMT "] to "
+		                "[" NET_PRINTF_IPADDRPORT_FMT "] "
+		                "is too small\n",
+		       dev->cd_name, payload_length,
+		       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_src.s_addr,
+		                                 ntohs(packet->uh_sport)),
+		       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_dst.s_addr,
+		                                 ntohs(packet->uh_dport)));
+		return;
+	}
+	if unlikely(payload_length > packet_size) {
+		printk(KERN_ERR "[udp:%s] udp packet udp.size=%" PRIu16 " from "
+		                "[" NET_PRINTF_IPADDRPORT_FMT "] to "
+		                "[" NET_PRINTF_IPADDRPORT_FMT "] "
+		                "exceeds ip.size=%" PRIu16 "\n",
+		       dev->cd_name, payload_length,
+		       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_src.s_addr,
+		                                 ntohs(packet->uh_sport)),
+		       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_dst.s_addr,
+		                                 ntohs(packet->uh_dport)),
+		       packet_size);
+		return;
+	}
+	payload_length -= sizeof(struct udphdr);
+
+#if 1
 	printk(KERN_TRACE "[udp:%s] Packet from "
-	                  "[%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8 ":%" PRIu16 "] to "
-	                  "[%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8 ":%" PRIu16 "]:\n"
+	                  "[" NET_PRINTF_IPADDRPORT_FMT "] to "
+	                  "[" NET_PRINTF_IPADDRPORT_FMT "]:\n"
 	                  "%$[hex]\n",
 	       dev->cd_name,
-	       ((u8 *)&ip_header->ip_src.s_addr)[0],
-	       ((u8 *)&ip_header->ip_src.s_addr)[1],
-	       ((u8 *)&ip_header->ip_src.s_addr)[2],
-	       ((u8 *)&ip_header->ip_src.s_addr)[3],
-	       ntohs(packet->uh_sport),
-	       ((u8 *)&ip_header->ip_dst.s_addr)[0],
-	       ((u8 *)&ip_header->ip_dst.s_addr)[1],
-	       ((u8 *)&ip_header->ip_dst.s_addr)[2],
-	       ((u8 *)&ip_header->ip_dst.s_addr)[3],
-	       ntohs(packet->uh_dport),
-	       packet_size, packet);
+	       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_src.s_addr,
+	                                 ntohs(packet->uh_sport)),
+	       NET_PRINTF_IPADDRPORT_ARG(ip_header->ip_dst.s_addr,
+	                                 ntohs(packet->uh_dport)),
+	       payload_length, payload);
+#endif
 	(void)dev;
 	(void)packet;
 	(void)packet_size;
 	(void)ip_header;
+	(void)payload_length;
+	(void)payload;
 	/* TODO */
 }
 

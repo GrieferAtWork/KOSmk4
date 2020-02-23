@@ -25,7 +25,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <net/types.h>
+#include <net/bits/types.h>
 
 #ifdef __USE_GLIBC
 #include <stdint.h>

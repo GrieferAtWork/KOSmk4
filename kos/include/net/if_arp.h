@@ -26,7 +26,7 @@
 #include <hybrid/typecore.h>
 
 #include <linux/if_arp.h>
-#include <net/types.h>
+#include <net/bits/types.h>
 
 /* NOTE: None of the things in here are imporant for the kernel! */
 #ifndef __USE_GLIBC

@@ -24,7 +24,7 @@
 #include <features.h>
 
 #include <bits/types.h>
-#include <net/types.h>
+#include <net/bits/types.h>
 #include <libc/string.h>
 
 #ifdef __USE_GLIBC

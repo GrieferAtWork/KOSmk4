@@ -37,6 +37,7 @@
 #include <hybrid/sequence/bsearch.h>
 
 #include <bits/in.h>
+#include <kos/net/printf.h>
 #include <linux/if_ether.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -233,9 +234,9 @@ ip_routepacket(struct nic_device *__restrict dev,
 	u16 header_length, total_length, offset;
 	assert(packet_size >= 20);
 	hdr = (struct iphdr *)packet_data;
-	if unlikely(hdr->ip_v != 4) {
+	if unlikely(hdr->ip_v != IPVERSION) {
 		/* Bad IP version. */
-		printk(KERN_WARNING "[ip:%s] Bad IP version in header isn't 4, but is %u\n",
+		printk(KERN_ERR "[ip:%s] Bad IP version in header isn't 4, but is %u\n",
 		       dev->cd_name, hdr->ip_v);
 		return;
 	}
@@ -245,19 +246,19 @@ ip_routepacket(struct nic_device *__restrict dev,
 	header_length = hdr->ip_hl * 4;
 	if unlikely(header_length < 20) {
 		/* Header too small. */
-		printk(KERN_WARNING "[ip:%s] IP header length is too small (%I16u < 20)\n",
+		printk(KERN_ERR "[ip:%s] ip.siz[%" PRIu16 "] is less than 20\n",
 		       dev->cd_name, header_length);
 		return;
 	}
 	if unlikely(header_length > total_length) {
 		/* Header too large. */
-		printk(KERN_WARNING "[ip:%s] IP header exceeds datagram size (%I16u > %I16u)\n",
+		printk(KERN_ERR "[ip:%s] iphdr.siz[%" PRIu16 "] exceeds dgram.siz[%" PRIu16 "]\n",
 		       dev->cd_name, header_length, total_length);
 		return;
 	}
 	if unlikely(total_length > packet_size) {
 		/* total too large. */
-		printk(KERN_WARNING "[ip:%s] Payload exceeds packet size (%I16u > %Iu)\n",
+		printk(KERN_ERR "[ip:%s] payload.siz[%" PRIu16 "] exceeds pck.siz[%" PRIuSIZ "]\n",
 		       dev->cd_name, header_length, packet_size);
 		return;
 	}
@@ -284,8 +285,7 @@ ip_routepacket(struct nic_device *__restrict dev,
 		if (fragment_start != 0) {
 			if (fragment_start < 20) {
 				/* Only offset=0 fragments are allowed to write the IP header. */
-				printk(KERN_WARNING "[ip:%s] Datagram fragment start-offset clips "
-				                    "into IP header (start=%I16u,size=%I16u)\n",
+				printk(KERN_ERR "[ip:%s] dgram.frag[start=%" PRIu16 ",siz=%" PRIu16 "] clips into iphdr\n",
 				       dev->cd_name, fragment_start, fragment_size);
 				return;
 			}
@@ -298,7 +298,7 @@ ip_routepacket(struct nic_device *__restrict dev,
 		/* Calculate the fragment's end-offset */
 		if (OVERFLOW_UADD(fragment_start, fragment_size, &fragment_end)) {
 			/* Fragment buffer area is out-of-bounds. */
-			printk(KERN_WARNING "[ip:%s] Datagram fragment end-offset overflows (start=%I16u,size=%I16u)\n",
+			printk(KERN_ERR "[ip:%s] dgram.frag[start=%" PRIu16 ",siz=%" PRIu16 "] overflows its end-offset\n",
 			       dev->cd_name, fragment_start, fragment_size);
 			return;
 		}
@@ -319,13 +319,10 @@ again_lock_datagrams:
 			if unlikely(now.tv_sec > dg->dg_tmo) {
 				struct iphdr *datagram;
 				/* Discard this packet. */
-				printk(KERN_WARNING "[ip:%s] Timeout while receiving datagram from "
-				                    "%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8 "\n",
+				printk(KERN_ERR "[ip:%s] Timeout while receiving datagram "
+				                "from " NET_PRINTF_IPADDR_FMT "\n",
 				       dev->cd_name,
-				       ((u8 const *)&uid.dg_src.s_addr)[0],
-				       ((u8 const *)&uid.dg_src.s_addr)[1],
-				       ((u8 const *)&uid.dg_src.s_addr)[2],
-				       ((u8 const *)&uid.dg_src.s_addr)[3]);
+				       NET_PRINTF_IPADDR_ARG(uid.dg_src.s_addr));
 				datagram = dg->dg_buf; /* Inherit */
 				/* Delete the datagram. */
 				assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
@@ -344,13 +341,10 @@ again_lock_datagrams:
 					if unlikely(dg->dg_flg & IP_DATAGRAM_FLAG_GOTLAST) {
 						struct iphdr *datagram;
 						/* Discard this packet. */
-						printk(KERN_WARNING "[ip:%s] Multiple last fragments in datagram from "
-						                    "%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8 "\n",
+						printk(KERN_ERR "[ip:%s] Multiple last fragments in datagram "
+						                "from " NET_PRINTF_IPADDR_FMT "\n",
 						       dev->cd_name,
-						       ((u8 const *)&uid.dg_src.s_addr)[0],
-						       ((u8 const *)&uid.dg_src.s_addr)[1],
-						       ((u8 const *)&uid.dg_src.s_addr)[2],
-						       ((u8 const *)&uid.dg_src.s_addr)[3]);
+							   NET_PRINTF_IPADDR_ARG(uid.dg_src.s_addr));
 						datagram = dg->dg_buf; /* Inherit */
 						/* Delete the datagram. */
 						assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
@@ -374,15 +368,11 @@ do_write_fragment_nogotlast:
 			if unlikely(dg->dg_flg & IP_DATAGRAM_FLAG_GOTLAST) {
 				struct iphdr *datagram;
 				/* Discard this packet. */
-				printk(KERN_WARNING "[ip:%s] Fragment from %" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8 " at %I16u-%I16u "
-				                    "would exceed the last fragment maximum at %I16u\n",
-				       dev->cd_name,
-				       ((u8 const *)&uid.dg_src.s_addr)[0],
-				       ((u8 const *)&uid.dg_src.s_addr)[1],
-				       ((u8 const *)&uid.dg_src.s_addr)[2],
-				       ((u8 const *)&uid.dg_src.s_addr)[3],
-				       fragment_start, fragment_end - 1,
-				       dg->dg_len);
+				printk(KERN_ERR "[ip:%s] Fragment from " NET_PRINTF_IPADDR_FMT " "
+				                "at %" PRIu16 "-%" PRIu16 " would exceed the "
+				                "last fragment maximum at %" PRIu16 "\n",
+				       dev->cd_name, NET_PRINTF_IPADDR_ARG(uid.dg_src.s_addr),
+				       fragment_start, fragment_end - 1, dg->dg_len);
 				datagram = dg->dg_buf; /* Inherit */
 				/* Delete the datagram. */
 				assert(dg == &dev->nd_net.n_ipgrams.nid_list[i]);
@@ -600,13 +590,20 @@ ip_routedatagram(struct nic_device *__restrict dev,
 	switch (packet->ip_p) {
 
 	case IPPROTO_UDP:
+		if unlikely(payload_len < sizeof(struct udphdr)) {
+			printk(KERN_ERR "[ip:%s] udp packet of ip[siz=%" PRIu16 "] "
+			                "from " NET_PRINTF_IPADDR_FMT " is too small\n",
+			       dev->cd_name, packet_size,
+			       NET_PRINTF_IPADDR_ARG(packet->ip_src.s_addr));
+			return;
+		}
 		udp_routepacket(dev, (struct udphdr const *)payload,
 		                payload_len, packet);
 		break;
 
 	default:
-		printk(KERN_WARNING "[nic:%s] Unrecognized ip-protocol (%#.2I8x, size=%I16u)\n",
-		       packet->ip_p, packet_size);
+		printk(KERN_WARNING "[ip:%s] Unrecognized ip packet [prot=%#.2" PRIx8 ",siz=%" PRIu16 "]\n",
+		       dev->cd_name, packet->ip_p, packet_size);
 		break;
 	}
 }

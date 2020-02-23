@@ -91,7 +91,7 @@ __SYSDECL_END
 #ifdef __USE_MISC
 #include <bits/sockaddr_storage-struct.h>
 #include <bits/types.h>
-#include <net/types.h>
+#include <net/bits/types.h>
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>

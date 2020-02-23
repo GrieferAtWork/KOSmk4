@@ -69,7 +69,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <net/types.h>
+#include <net/bits/types.h>
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>
