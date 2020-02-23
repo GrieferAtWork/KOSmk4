@@ -44,10 +44,8 @@ eth_routepacket(struct nic_device *__restrict self,
                 size_t packet_size) {
 	struct ethhdr *hdr;
 	assert(packet_size >= ETH_ZLEN);
-#if 0
-	printk(KERN_DEBUG "[nic:%s] Route eth-packet (%Iu bytes):\n%$[hex]\n",
-	       self->cd_name, packet_size, packet_size, packet_data);
-#endif
+	printk(KERN_TRACE "[nic:%s] Route eth-packet (%Iu bytes):\n",
+	       self->cd_name, packet_size);
 	hdr = (struct ethhdr *)packet_data;
 	switch (ntohs(hdr->h_proto)) {
 
@@ -60,7 +58,7 @@ eth_routepacket(struct nic_device *__restrict self,
 		break;
 
 	default:
-		printk(KERN_WARNING "[nic:%s] Unrecognized eth-protocol (%#.4I16x, size=%Iu):\n",
+		printk(KERN_WARNING "[nic:%s] Unrecognized eth-protocol (%#.4I16x, size=%Iu)\n",
 		       ntohs(hdr->h_proto), packet_size);
 		break;
 	}

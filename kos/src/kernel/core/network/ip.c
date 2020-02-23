@@ -607,18 +607,18 @@ ip_routedatagram(struct nic_device *__restrict dev,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL iphdr_calculate_sum)(struct iphdr *__restrict self) {
 	u32 chksum;
-	u16 i, cnt, *base;
-	/* XXX: I think this is correct? */
+	u16 i, cnt;
+	be16 *base;
 	self->ip_sum = htons(0);
 	cnt  = self->ip_hl * 2;
-	base = (u16 *)self;
+	base = (be16 *)self;
 	for (i = 0, chksum = 0; i < cnt; ++i) {
-		chksum += base[i];
+		chksum += ntohs(base[i]);
 	}
-	while (chksum > 0xffff)
+	if (chksum > 0xffff)
 		chksum += (chksum >> 16);
 	chksum = ~chksum;
-	self->ip_sum = htons(chksum);
+	self->ip_sum = htons((u16)chksum);
 }
 
 

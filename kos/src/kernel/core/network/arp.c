@@ -26,11 +26,13 @@
 #include <dev/nic.h>
 #include <kernel/printk.h>
 
+#include <hybrid/atomic.h>
+
 #include <bits/in.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
-#include <network/arp.h>
 #include <netinet/in.h>
+#include <network/arp.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -38,7 +40,7 @@
 
 DECL_BEGIN
 
-struct etharphdr_ether_in /*[PREFIX(ar_)]*/ {
+struct ATTR_PACKED ATTR_ALIGNED(2) etharphdr_ether_in /*[PREFIX(ar_)]*/ {
 	struct ethhdr  ar_eth; /* Ethernet header. */
 	struct arphdr  ar_arp; /* ARP header. */
 	byte_t         ar_sha[ETH_ALEN]; /* Sender mac address. */
@@ -47,7 +49,7 @@ struct etharphdr_ether_in /*[PREFIX(ar_)]*/ {
 	struct in_addr ar_tip;           /* Target ip address. */
 };
 
-struct arphdr_ether_in /*[PREFIX(ar_)]*/ {
+struct ATTR_PACKED ATTR_ALIGNED(2) arphdr_ether_in /*[PREFIX(ar_)]*/ {
 	struct arphdr  ar_arp; /* ARP header. */
 	byte_t         ar_sha[ETH_ALEN]; /* Sender mac address. */
 	struct in_addr ar_sip;           /* Sender ip address. */
@@ -149,14 +151,14 @@ arp_routepacket(struct nic_device *__restrict dev,
 			peer  = net_peeraddrs_lookup_ip(peers, hdr->ar_sip.s_addr);
 			if (peer) {
 				/* Fill in peer information. */
-				if unlikely(peer->npa_flags & NET_PEERADDR_HAVE_MAC &&
-				            (memcmp(peer->npa_hwmac, hdr->ar_sha, ETH_ALEN) != 0)) {
-					printk(KERN_WARNING "[arp:%s] MAC for " PRIFMT_IP " changed from " PRIFMT_MAC " to " PRIFMT_MAC "\n",
-					       PRIARG_IP(peer->npa_ip),
-					       PRIARG_MAC(peer->npa_hwmac),
-					       PRIARG_MAC(hdr->ar_sha));
-				}
+				u8 oldmac[ETH_ALEN];
+				memcpy(oldmac, peer->npa_hwmac, ETH_ALEN);
 				memcpy(peer->npa_hwmac, hdr->ar_sha, ETH_ALEN);
+				if unlikely((ATOMIC_FETCHOR(peer->npa_flags, NET_PEERADDR_HAVE_MAC) & NET_PEERADDR_HAVE_MAC) &&
+				            (memcmp(peer->npa_hwmac, hdr->ar_sha, ETH_ALEN) != 0)) {
+					printk(KERN_NOTICE "[arp:%s] MAC for " PRIFMT_IP " changed from " PRIFMT_MAC " to " PRIFMT_MAC "\n",
+					       PRIARG_IP(peer->npa_ip), PRIARG_MAC(oldmac), PRIARG_MAC(hdr->ar_sha));
+				}
 				/* Indicate that the mac address of a peer has just become available. */
 				sig_broadcast(&dev->nd_net.n_addravl);
 			}

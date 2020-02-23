@@ -123,12 +123,14 @@ network_peers_requireip(struct network *__restrict self, be32 ip)
 #define __network_init_common(self) \
 	((self)->n_ipsize = 576 /*IP_MSS*/)
 #define network_init(self)                                    \
-	(atomic_ref_init(&(self)->n_peers, &net_peeraddrs_empty), \
+	(incref(&net_peeraddrs_empty),                            \
+	 atomic_ref_init(&(self)->n_peers, &net_peeraddrs_empty), \
 	 sig_init(&(self)->n_addravl),                            \
 	 network_ip_datagrams_init(&(self)->n_ipgrams),           \
 	 __network_init_common(self))
 #define network_cinit(self)                                    \
-	(atomic_ref_cinit(&(self)->n_peers, &net_peeraddrs_empty), \
+	(incref(&net_peeraddrs_empty),                             \
+	 atomic_ref_cinit(&(self)->n_peers, &net_peeraddrs_empty), \
 	 sig_cinit(&(self)->n_addravl),                            \
 	 network_ip_datagrams_cinit(&(self)->n_ipgrams),           \
 	 __network_init_common(self))

@@ -746,9 +746,9 @@ PRIVATE bool NOTHROW(FCALL _asyncjob_main)(void) {
 	bool result = false;
 	pjob = &async_jobs;
 	job  = ATOMIC_READ(async_jobs);
+handle_job:
 	while (job) {
 		struct aio_handle *state;
-handle_job:
 		state = ATOMIC_READ(job->aj_aio);
 		if unlikely(ASYNC_JOB_AIO_ISSPEC(state)) {
 			/* Special state handling. */
