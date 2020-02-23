@@ -36,6 +36,8 @@ DECL_BEGIN
 
 #ifdef __CC__
 
+struct nic_device;
+
 #define NET_PEERADDR_HAVE_NONE 0x0000
 #define NET_PEERADDR_HAVE_MAC  0x0001 /* [lock(SET_ONCE)] `npa_hwmac' is valid. */
 struct net_peeraddr {
@@ -116,7 +118,7 @@ struct network {
 
 /* Ensure that a peer entry exists for `ip', returning its descriptor. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct net_peeraddr *KCALL
-network_peers_requireip(struct network *__restrict self, be32 ip)
+nic_device_requireip(struct nic_device *__restrict self, be32 ip)
 		THROWS(E_BADALLOC);
 
 /* Initialize a given network descriptor */

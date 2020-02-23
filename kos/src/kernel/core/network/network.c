@@ -28,6 +28,7 @@
 
 #include <hybrid/sequence/bsearch.h>
 
+#include <netinet/in.h>
 #include <network/ip.h>
 #include <network/network.h>
 
@@ -67,14 +68,14 @@ NOTHROW(KCALL net_peeraddrs_destroy)(struct net_peeraddrs *__restrict self) {
 
 /* Ensure that a peer entry exists for `ip', returning its descriptor. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct net_peeraddr *KCALL
-network_peers_requireip(struct network *__restrict self, be32 ip)
+nic_device_requireip(struct nic_device *__restrict self, be32 ip)
 		THROWS(E_BADALLOC) {
 	size_t i, lo, hi;
 	REF struct net_peeraddr *result;
 	REF struct net_peeraddrs *old_peers;
 	REF struct net_peeraddrs *new_peers;
 again:
-	old_peers = self->n_peers.get();
+	old_peers = self->nd_net.n_peers.get();
 	BSEARCH_EX(i, lo, hi, old_peers->nps_addrs, old_peers->nps_count, ->_npa_hip, (u32)ip) {
 		/* Already exists. */
 		result = incref(old_peers->nps_addrs[i]);
@@ -103,9 +104,22 @@ again:
 	result->npa_refcnt = 2; /* +1: result, +1: new_peers->nps_addrs[lo] */
 	result->npa_ip     = ip;
 	result->npa_flags  = NET_PEERADDR_HAVE_NONE;
+
+	if (ip == htonl(0xffffffff)) {
+		/* Special case: Broadcast IP */
+		result->npa_flags = NET_PEERADDR_HAVE_MAC;
+		memset(result->npa_hwmac, 0xff, ETH_ALEN);
+	} else if (ip == htonl(0x7f000001)) {
+		/* Special case: localhost (127.0.0.1) */
+		result->npa_flags = NET_PEERADDR_HAVE_MAC;
+		memcpy(result->npa_hwmac,
+		       self->nd_addr.na_hwmac,
+		       ETH_ALEN);
+	}
+
 	new_peers->nps_addrs[lo] = result; /* Inherit reference */
 	/* Try to install the new peers vector. */
-	if unlikely(!self->n_peers.cmpxch_inherit_new(old_peers, new_peers)) {
+	if unlikely(!self->nd_net.n_peers.cmpxch_inherit_new(old_peers, new_peers)) {
 		assert(!wasdestroyed(new_peers));
 		assert(!isshared(new_peers));
 		assert(!wasdestroyed(new_peers));

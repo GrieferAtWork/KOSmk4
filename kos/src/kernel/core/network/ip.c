@@ -828,7 +828,7 @@ ip_senddatagram(struct nic_device *__restrict dev,
 		ip_senddatagram_ex(dev, &desc, aio);
 		return;
 	}
-	peer = network_peers_requireip(&dev->nd_net, hdr->ip_dst.s_addr);
+	peer = nic_device_requireip(dev, hdr->ip_dst.s_addr);
 	{
 		u16 dgramid;
 		/* Fill in header fields that are automatically calculated.
@@ -1051,7 +1051,7 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 	struct iphdr *hdr;
 	assert(nic_packet_desc_headsize(packet) >= sizeof(struct iphdr));
 	hdr  = (struct iphdr *)packet->npd_head;
-	peer = network_peers_requireip(&dev->nd_net, hdr->ip_dst.s_addr);
+	peer = nic_device_requireip(dev, hdr->ip_dst.s_addr);
 	TRY {
 		if (!(peer->npa_flags & NET_PEERADDR_HAVE_MAC))
 			nic_device_send_arp_request(dev, peer->npa_ip);
