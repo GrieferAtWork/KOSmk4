@@ -40,10 +40,12 @@
 #include <linux/if_ether.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
+#include <netinet/udp.h>
 #include <network/arp.h>
 #include <network/ip.h>
 #include <network/network.h>
 #include <network/packet.h>
+#include <network/udp.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -579,25 +581,34 @@ datagram_complete_and_unlock:
 
 
 /* Route an IP datagram after it has been fully re-assembled.
- * WARNING: `packet->ip_len' may indicate a greater size than `packet_size'
- *          if then packet has been corrupted or was maliciously crafted!
- *          The given `packet_size' is the upper limit on the amount of data
- *          that was actually received. The specified `packet->ip_len' should
- *          only be taken seriously when `packet->ip_len <= packet_size'
+ * @assume(packet->ip_hl >= 5);
+ * @assume(packet->ip_hl * 4 <= packet_size);
  * @assume(packet_size >= 20); */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
 ip_routedatagram(struct nic_device *__restrict dev,
                  struct iphdr const *__restrict packet,
                  u16 packet_size) {
+	u16 iphdr_size, payload_len;
+	byte_t const *payload;
 	assert(packet_size >= 20);
-	printk(KERN_DEBUG "[ip:%s] Datagram from %u.%u.%u.%u (proto:%I8u):\n%$[hex]\n",
-	       dev->cd_name,
-	       ((u8 *)&packet->ip_src.s_addr)[0],
-	       ((u8 *)&packet->ip_src.s_addr)[1],
-	       ((u8 *)&packet->ip_src.s_addr)[2],
-	       ((u8 *)&packet->ip_src.s_addr)[3],
-	       packet->ip_p, packet_size, packet);
-	/* TODO */
+	iphdr_size = packet->ip_hl * 4;
+	assertf(iphdr_size >= 20, "Guarantied by the caller");
+	assertf(iphdr_size <= packet_size, "Guarantied by the caller");
+	payload     = (byte_t const *)packet + iphdr_size;
+	payload_len = packet_size - iphdr_size;
+	/* Route the datagram based on the protocol number. */
+	switch (packet->ip_p) {
+
+	case IPPROTO_UDP:
+		udp_routepacket(dev, (struct udphdr const *)payload,
+		                payload_len, packet);
+		break;
+
+	default:
+		printk(KERN_WARNING "[nic:%s] Unrecognized ip-protocol (%#.2I8x, size=%I16u)\n",
+		       packet->ip_p, packet_size);
+		break;
+	}
 }
 
 

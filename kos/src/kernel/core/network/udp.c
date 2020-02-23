@@ -17,35 +17,58 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_NETWORK_ARP_H
-#define GUARD_KERNEL_INCLUDE_NETWORK_ARP_H 1
+#ifndef GUARD_KERNEL_SRC_NETWORK_UDP_C
+#define GUARD_KERNEL_SRC_NETWORK_UDP_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <dev/nic.h>
-#include <kernel/types.h>
+#include <kernel/printk.h>
+
+#include <netinet/in.h>
+#include <netinet/udp.h>
+#include <network/ip.h>
+#include <network/network.h>
+#include <network/udp.h>
+
+#include <assert.h>
+#include <inttypes.h>
 
 DECL_BEGIN
 
-#ifdef __CC__
+/* Route a UDP packet.
+ * @assume(packet_size >= sizeof(struct udphdr)); */
+PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
+udp_routepacket(struct nic_device *__restrict dev,
+                struct udphdr const *__restrict packet, u16 packet_size,
+                struct iphdr const *__restrict ip_header) {
+	assert(packet_size >= sizeof(struct udphdr));
+	printk(KERN_TRACE "[udp:%s] Packet from "
+	                  "[%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8 ":%" PRIu16 "] to "
+	                  "[%" PRIu8 ".%" PRIu8 ".%" PRIu8 ".%" PRIu8 ":%" PRIu16 "]:\n"
+	                  "%$[hex]\n",
+	       dev->cd_name,
+	       ((u8 *)&ip_header->ip_src.s_addr)[0],
+	       ((u8 *)&ip_header->ip_src.s_addr)[1],
+	       ((u8 *)&ip_header->ip_src.s_addr)[2],
+	       ((u8 *)&ip_header->ip_src.s_addr)[3],
+	       ntohs(packet->uh_sport),
+	       ((u8 *)&ip_header->ip_dst.s_addr)[0],
+	       ((u8 *)&ip_header->ip_dst.s_addr)[1],
+	       ((u8 *)&ip_header->ip_dst.s_addr)[2],
+	       ((u8 *)&ip_header->ip_dst.s_addr)[3],
+	       ntohs(packet->uh_dport),
+	       packet_size, packet);
+	(void)dev;
+	(void)packet;
+	(void)packet_size;
+	(void)ip_header;
+	/* TODO */
+}
 
-/* Route an ARP packet.
- * @assume(packet_size >= 8); */
-FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
-arp_routepacket(struct nic_device *__restrict dev,
-                void const *__restrict packet_data,
-                size_t packet_size);
 
-/* Construct and return a mac address request packet.
- * NOTE: The caller should also make use of `network_peers_requireip()'
- *       to ensure that the associated network peer descriptor has been
- *       allocated, and that its MAC field will be filled in once the
- *       named device responds back to the given NIC. */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct nic_packet *KCALL
-arp_makemacrequest(struct nic_device *__restrict dev, be32 ip);
-
-#endif /* __CC__ */
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_NETWORK_ARP_H */
+#endif /* !GUARD_KERNEL_SRC_NETWORK_UDP_C */

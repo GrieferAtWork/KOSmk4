@@ -92,11 +92,7 @@ ip_routepacket(struct nic_device *__restrict dev,
                size_t packet_size);
 
 /* Route an IP datagram after it has been fully re-assembled.
- * WARNING: `packet->ip_len' may indicate a greater size than `packet_size'
- *          if then packet has been corrupted or was maliciously crafted!
- *          The given `packet_size' is the upper limit on the amount of data
- *          that was actually received. The specified `packet->ip_len' should
- *          only be taken seriously when `packet->ip_len <= packet_size'
+ * @assume(packet->ip_hl >= 5);
  * @assume(packet_size >= 20); */
 FUNDEF NOBLOCK NONNULL((1, 2)) void KCALL
 ip_routedatagram(struct nic_device *__restrict dev,
