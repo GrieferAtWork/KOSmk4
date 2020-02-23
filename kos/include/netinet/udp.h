@@ -137,10 +137,10 @@ struct __ATTR_PACKED __ATTR_ALIGNED(2) udphdr /*[PREFIX(uh_)]*/ {
 		__u_net16_t check;    /* udp checksum */
 	};
 #else /* ... */
-	__u_net16_t source; /* source port */
-	__u_net16_t dest;   /* destination port */
-	__u_net16_t len;    /* udp length */
-	__u_net16_t check;  /* udp checksum */
+	__u_net16_t  source; /* source port */
+	__u_net16_t  dest;   /* destination port */
+	__u_net16_t  len;    /* udp length */
+	__u_net16_t  check;  /* udp checksum */
 #define uh_sport source /* source port */
 #define uh_dport dest   /* destination port */
 #define uh_ulen  len    /* udp length */
@@ -157,10 +157,10 @@ struct __ATTR_PACKED __ATTR_ALIGNED(2) udphdr /*[PREFIX(uh_)]*/ {
 #endif /* __CC__ */
 
 /* UDP socket options */
-#define UDP_CORK         1   /* Never send partially complete segments.  */
-#define UDP_ENCAP        100 /* Set the socket to accept encapsulated packets.  */
-#define UDP_NO_CHECK6_TX 101 /* Disable sending checksum for UDP over IPv6.  */
-#define UDP_NO_CHECK6_RX 102 /* Disable accepting checksum for UDP over IPv6.  */
+#define UDP_CORK         1   /* Never send partially complete segments. */
+#define UDP_ENCAP        100 /* Set the socket to accept encapsulated packets. */
+#define UDP_NO_CHECK6_TX 101 /* Disable sending checksum for UDP over IPv6. */
+#define UDP_NO_CHECK6_RX 102 /* Disable accepting checksum for UDP over IPv6. */
 
 /* UDP encapsulation types */
 #define UDP_ENCAP_ESPINUDP_NON_IKE 1  /* draft-ietf-ipsec-nat-t-ike-00/01 */

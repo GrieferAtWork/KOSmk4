@@ -37,7 +37,8 @@
 
 DECL_BEGIN
 
-/* Append the given packet to `self' */
+/* Append the given packet to `self'
+ * @return: * : Always re-returns `packet' */
 PRIVATE ATTR_RETNONNULL NONNULL((1, 2)) struct nic_packet *KCALL
 nic_packetlist_append_inherit(struct nic_packetlist *__restrict self,
                               /*inherit(always)*/ REF struct nic_packet *__restrict packet)

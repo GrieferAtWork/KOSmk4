@@ -107,14 +107,15 @@ ip_routedatagram(struct nic_device *__restrict dev,
  * >> assert(nic_packet_headfree(packet) >= ETH_PACKET_HEADSIZE);
  * >> assert(nic_packet_tailfree(packet) >= ETH_PACKET_TAILSIZE);
  * - Additionally, the caller is responsible to ensure that the
- *   fully initialized IP header (i.e. `struct iphdr') is pointed
+ *   partially initialized IP header (i.e. `struct iphdr') is pointed
  *   to by `packet->np_head' upon entry, as this function will try
- *   to read from that structure in order to figure out addressing
- *   information that are required for filling in information for
- *   underlying network layers.
+ *   to read/write from that structure in order to figure out addressing
+ *   information required for filling in information for underlying
+ *   network layers.
  * - NOTE: If necessary, this function will also perform the required
  *         ARP network traffic in order to translate the target IP
  *         address pointed to by the IP header of `packet'.
+ *         This is done asynchronously, and transparently to the caller.
  * NOTE: This function automatically fills in the following fields of the IP header:
  *   - ip_v      (With the value `4')
  *   - ip_len    (With the value `nic_packet_size(packet)')

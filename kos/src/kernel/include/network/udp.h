@@ -25,7 +25,13 @@
 #include <dev/nic.h>
 #include <kernel/types.h>
 
+#include <network/ip.h>
+
 DECL_BEGIN
+
+/* UDP packet requirements */
+#define UDP_PACKET_HEADSIZE (IP_PACKET_HEADSIZE + 8)
+#define UDP_PACKET_TAILSIZE (IP_PACKET_TAILSIZE)
 
 #ifdef __CC__
 
