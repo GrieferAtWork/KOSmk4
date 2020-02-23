@@ -1417,6 +1417,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 #undef IP
 			ip->ip_hl  = 5;  /* 5 * 4 = 20 bytes */
 			ip->ip_tos = 0;  /* ??? */
+			ip->ip_off = htons(0);
 			ip->ip_ttl = 64; /* ??? */
 			ip->ip_p   = IPPROTO_UDP;
 

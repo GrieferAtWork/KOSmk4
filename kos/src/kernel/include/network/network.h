@@ -111,7 +111,7 @@ struct network {
 	ATOMIC_REF(struct net_peeraddrs) n_peers;   /* [1..1] Known network peers, and their addresses. */
 	struct sig                       n_addravl; /* Signal broadcast once a peer mac address becomes available. */
 	struct network_ip_datagrams      n_ipgrams; /* IP datagrams. */
-	u16                              n_ipsize;  /* Max IP fragment size (default initialize to `IP_MSS'). */
+	u16                              n_ipsize;  /* Max IP fragment size (default initialize to `IP_MSS'; must be divisible by `8'). */
 };
 
 /* Ensure that a peer entry exists for `ip', returning its descriptor. */

@@ -780,18 +780,20 @@ PRIVATE struct async_job_callbacks const ip_arp_and_datagram = {
  *         ARP network traffic in order to translate the target IP
  *         address pointed to by the IP header of `packet'.
  * NOTE: This function automatically fills in the following fields of the IP header:
- *   - ip_v    (With the value `4')
- *   - ip_len  (With the value `nic_packet_size(packet)')
- *   - ip_id   (using `struct net_peeraddr::npa_ipgramid')
- *   - ip_off  (as required for fragmentation; else `0')
- *   - ip_sum  (Only if not done by hardware, then will be filled with the correct value)
+ *   - ip_v      (With the value `4')
+ *   - ip_len    (With the value `nic_packet_size(packet)')
+ *   - ip_id     (using `struct net_peeraddr::npa_ipgramid')
+ *   - ip_off    (as required for fragmentation; the RF and DF flags are not overwritten!)
+ *   - ip_sum    (Only if not done by hardware, then will be filled with the correct value)
  * With this in mind, the caller must have already filled in:
- *   - ip_hl   (header length divided by 4)
- *   - ip_tos  (Type of IP service)
- *   - ip_ttl  (Time to live)
- *   - ip_p    (IP Protocol; One of `IPPROTO_*')
- *   - ip_src  (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
- *   - ip_dst  (Target IP address) */
+ *   - ip_hl     (header length divided by 4)
+ *   - ip_tos    (Type of IP service)
+ *   - ip_off.RF (Should already be cleared)
+ *   - ip_off.DF (Don't-fragment flag)
+ *   - ip_ttl    (Time to live)
+ *   - ip_p      (IP Protocol; One of `IPPROTO_*')
+ *   - ip_src    (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
+ *   - ip_dst    (Target IP address) */
 PUBLIC NONNULL((1, 2, 3)) void KCALL
 ip_senddatagram(struct nic_device *__restrict dev,
                 struct nic_packet *__restrict packet,
@@ -799,13 +801,17 @@ ip_senddatagram(struct nic_device *__restrict dev,
 	struct iphdr *hdr;
 	size_t total_packet_size;
 	REF struct net_peeraddr *peer;
+	u16 orig_offset;
 	assert(nic_packet_headfree(packet) >= ETH_PACKET_HEADSIZE);
 #if ETH_PACKET_TAILSIZE != 0
 	assert(nic_packet_tailfree(packet) >= ETH_PACKET_TAILSIZE);
 #endif /* ETH_PACKET_TAILSIZE != 0 */
+	assert(nic_packet_headsize(packet) >= sizeof(struct iphdr));
+	hdr = (struct iphdr *)packet->np_head;
+	orig_offset = ntohs(hdr->ip_off);
 	/* Check for simple case: the packet can fit into a single datagram. */
 	total_packet_size = nic_packet_size(packet);
-	if (total_packet_size > dev->nd_net.n_ipsize) {
+	if (total_packet_size > dev->nd_net.n_ipsize && !(orig_offset & IP_DF)) {
 		/* Nope! In this case, we can't actually re-use `packet',
 		 *       so use a packet descriptor instead, and off-load
 		 *       the task to `ip_senddatagram_ex()'. */
@@ -814,8 +820,6 @@ ip_senddatagram(struct nic_device *__restrict dev,
 		ip_senddatagram_ex(dev, &desc, aio);
 		return;
 	}
-	assert(nic_packet_headsize(packet) >= sizeof(struct iphdr));
-	hdr  = (struct iphdr *)packet->np_head;
 	peer = network_peers_requireip(&dev->nd_net, hdr->ip_dst.s_addr);
 	{
 		u16 dgramid;
@@ -827,7 +831,7 @@ ip_senddatagram(struct nic_device *__restrict dev,
 		hdr->ip_v   = IPVERSION;
 		hdr->ip_len = htons((u16)total_packet_size);
 		hdr->ip_id  = htons(dgramid);
-		hdr->ip_off = htons(0);
+		hdr->ip_off = htons(orig_offset & (IP_RF | IP_DF));
 		iphdr_calculate_sum(hdr);
 	}
 	if (peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
@@ -1015,18 +1019,20 @@ PRIVATE struct async_job_callbacks const ip_arp_and_datagrams = {
  * use the above function instead, since doing so reduces the amount of
  * copying necessary when the datagram can fit into a single fragment.
  * NOTE: This function automatically fills in the following fields of the IP header:
- *   - ip_v    (With the value `4')
- *   - ip_len  (With the value `nic_packet_size(packet)')
- *   - ip_id   (using `struct net_peeraddr::npa_ipgramid')
- *   - ip_off  (as required for fragmentation; else `0')
- *   - ip_sum  (Only if not done by hardware, then will be filled with the correct value)
+ *   - ip_v      (With the value `4')
+ *   - ip_len    (With the value `nic_packet_size(packet)')
+ *   - ip_id     (using `struct net_peeraddr::npa_ipgramid')
+ *   - ip_off    (as required for fragmentation; the RF and DF flags are not overwritten!)
+ *   - ip_sum    (Only if not done by hardware, then will be filled with the correct value)
  * With this in mind, the caller must have already filled in:
- *   - ip_hl   (header length divided by 4)
- *   - ip_tos  (Type of IP service)
- *   - ip_ttl  (Time to live)
- *   - ip_p    (IP Protocol; One of `IPPROTO_*')
- *   - ip_src  (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
- *   - ip_dst  (Target IP address) */
+ *   - ip_hl     (header length divided by 4)
+ *   - ip_tos    (Type of IP service)
+ *   - ip_off.RF (Should already be cleared)
+ *   - ip_off.DF (Don't-fragment flag)
+ *   - ip_ttl    (Time to live)
+ *   - ip_p      (IP Protocol; One of `IPPROTO_*')
+ *   - ip_src    (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
+ *   - ip_dst    (Target IP address) */
 PUBLIC NONNULL((1, 2, 3)) void KCALL
 ip_senddatagram_ex(struct nic_device *__restrict dev,
                    struct nic_packet_desc const *__restrict packet,
@@ -1052,21 +1058,40 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 		job = (struct ip_arp_and_datagrams_job *)aj;
 		TRY {
 			size_t i;
-			u16 dgramid, offset;
+			u16 dgramid, offset, offset_addend;
+			/* Take these two flags from the original `ip_off' */
+			offset_addend = ntohs(hdr->ip_off) & (IP_RF | IP_DF);
 			nic_packetlist_init(&job->adj_gram);
 			TRY {
 				/* Split the packet into multiple segments. */
 				struct nic_packet_desc used_packet;
 				memcpy(&used_packet, packet, sizeof(used_packet));
+
 				/* Don't include the original IP header within datagram fragments.
 				 * Instead, the IP header is replicated within every fragment. */
 				used_packet.npd_head += sizeof(struct iphdr);
 				used_packet.npd_headsz -= sizeof(struct iphdr);
-				nic_packetlist_segments_ex(&job->adj_gram,
-				                           dev, &used_packet,
-				                           dev->nd_net.n_ipsize,
-				                           IP_PACKET_HEADSIZE,
-				                           IP_PACKET_TAILSIZE);
+				assert((dev->nd_net.n_ipsize & 7) == 0);
+				if unlikely(offset_addend & IP_DF) {
+					/* Ignore `n_ipsize' and never create fragments! */
+					struct nic_packet *pck;
+					pck = nic_packetlist_newpacketv(&job->adj_gram, dev,
+					                                &used_packet.npd_payload,
+					                                IP_PACKET_HEADSIZE + used_packet.npd_headsz,
+					                                used_packet.npd_tailsz + IP_PACKET_TAILSIZE);
+					memcpy(nic_packet_allochead(pck, used_packet.npd_headsz),
+					       used_packet.npd_head, used_packet.npd_headsz);
+					if unlikely(used_packet.npd_tailsz) {
+						memcpy(nic_packet_alloctail(pck, used_packet.npd_tailsz),
+						       used_packet.npd_tail, used_packet.npd_tailsz);
+					}
+				} else {
+					nic_packetlist_segments_ex(&job->adj_gram,
+					                           dev, &used_packet,
+					                           dev->nd_net.n_ipsize,
+					                           IP_PACKET_HEADSIZE,
+					                           IP_PACKET_TAILSIZE);
+				}
 			} EXCEPT {
 				nic_packetlist_fini(&job->adj_gram);
 				RETHROW();
@@ -1081,7 +1106,7 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 			for (i = 0; i < job->adj_gram.npl_cnt; ++i) {
 				struct nic_packet *pck;
 				struct iphdr *fragment_hdr;
-				u16 fraglen;
+				u16 fraglen, used_offset;
 				pck = job->adj_gram.npl_vec[i];
 				fragment_hdr = nic_packet_tallochead(pck, struct iphdr);
 				/* Default-fill the IP header with the one from the original datagram. */
@@ -1092,7 +1117,13 @@ ip_senddatagram_ex(struct nic_device *__restrict dev,
 				fraglen = (u16)nic_packet_size(pck);
 				fragment_hdr->ip_len = htons(fraglen);
 				fragment_hdr->ip_id  = htons(dgramid);
-				fragment_hdr->ip_off = htons(offset);
+				assert((offset & 7) == 0);
+				used_offset = offset / 8;
+				assert((used_offset & ~IP_OFFMASK) == 0);
+				used_offset |= offset_addend;
+				if (i != job->adj_gram.npl_cnt - 1)
+					used_offset |= IP_MF; /* There are more fragments. */
+				fragment_hdr->ip_off = htons(used_offset);
 				iphdr_calculate_sum(fragment_hdr);
 				offset += fraglen;
 			}

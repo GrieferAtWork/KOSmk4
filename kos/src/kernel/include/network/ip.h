@@ -120,19 +120,20 @@ ip_routedatagram(struct nic_device *__restrict dev,
  *         ARP network traffic in order to translate the target IP
  *         address pointed to by the IP header of `packet'.
  * NOTE: This function automatically fills in the following fields of the IP header:
- *   - ip_v    (With the value `4')
- *   - ip_len  (With the value `nic_packet_size(packet)')
- *   - ip_id   (using `struct net_peeraddr::npa_ipgramid')
- *   - ip_off  (as required for fragmentation; else `0')
- *   - ip_sum  (Only if not done by hardware, then will be filled with the correct value)
+ *   - ip_v      (With the value `4')
+ *   - ip_len    (With the value `nic_packet_size(packet)')
+ *   - ip_id     (using `struct net_peeraddr::npa_ipgramid')
+ *   - ip_off    (as required for fragmentation; the RF and DF flags are not overwritten!)
+ *   - ip_sum    (Only if not done by hardware, then will be filled with the correct value)
  * With this in mind, the caller must have already filled in:
- *   - ip_hl   (header length divided by 4)
- *   - ip_tos  (Type of IP service)
- *   - ip_ttl  (Time to live)
- *   - ip_p    (IP Protocol; One of `IPPROTO_*')
- *   - ip_src  (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
- *   - ip_dst  (Target IP address)
- */
+ *   - ip_hl     (header length divided by 4)
+ *   - ip_tos    (Type of IP service)
+ *   - ip_off.RF (Should already be cleared)
+ *   - ip_off.DF (Don't-fragment flag)
+ *   - ip_ttl    (Time to live)
+ *   - ip_p      (IP Protocol; One of `IPPROTO_*')
+ *   - ip_src    (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
+ *   - ip_dst    (Target IP address) */
 FUNDEF NONNULL((1, 2, 3)) void KCALL
 ip_senddatagram(struct nic_device *__restrict dev,
                 struct nic_packet *__restrict packet,
@@ -149,18 +150,20 @@ struct nic_packet_desc;
  * use the above function instead, since doing so reduces the amount of
  * copying necessary when the datagram can fit into a single fragment.
  * NOTE: This function automatically fills in the following fields of the IP header:
- *   - ip_v    (With the value `4')
- *   - ip_len  (With the value `nic_packet_size(packet)')
- *   - ip_id   (using `struct net_peeraddr::npa_ipgramid')
- *   - ip_off  (as required for fragmentation; else `0')
- *   - ip_sum  (Only if not done by hardware, then will be filled with the correct value)
+ *   - ip_v      (With the value `4')
+ *   - ip_len    (With the value `nic_packet_size(packet)')
+ *   - ip_id     (using `struct net_peeraddr::npa_ipgramid')
+ *   - ip_off    (as required for fragmentation; the RF and DF flags are not overwritten!)
+ *   - ip_sum    (Only if not done by hardware, then will be filled with the correct value)
  * With this in mind, the caller must have already filled in:
- *   - ip_hl   (header length divided by 4)
- *   - ip_tos  (Type of IP service)
- *   - ip_ttl  (Time to live)
- *   - ip_p    (IP Protocol; One of `IPPROTO_*')
- *   - ip_src  (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
- *   - ip_dst  (Target IP address) */
+ *   - ip_hl     (header length divided by 4)
+ *   - ip_tos    (Type of IP service)
+ *   - ip_off.RF (Should already be cleared)
+ *   - ip_off.DF (Don't-fragment flag)
+ *   - ip_ttl    (Time to live)
+ *   - ip_p      (IP Protocol; One of `IPPROTO_*')
+ *   - ip_src    (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
+ *   - ip_dst    (Target IP address) */
 FUNDEF NONNULL((1, 2, 3)) void KCALL
 ip_senddatagram_ex(struct nic_device *__restrict dev,
                    struct nic_packet_desc const *__restrict packet,
