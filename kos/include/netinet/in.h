@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a6d6bea */
+/* HASH CRC-32:0x81bc1376 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 
 #include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
+#include <hybrid/typecore.h>
 
 #include <bits/in.h>
 #include <bits/sockaddr-struct.h>
@@ -68,41 +69,41 @@
 __SYSDECL_BEGIN
 
 /* Definitions of the bits in an Internet address integer.
- * On subnets, host and network parts are found according to
- * the subnet mask, not these masks. */
-#define IN_CLASSA(a)       (((__CCAST(in_addr_t)(a)) & 0x80000000) == 0)
-#define IN_CLASSA_NET         0xff000000
-#define IN_CLASSA_NSHIFT      24
-#define IN_CLASSA_HOST       (0xffffffff & ~IN_CLASSA_NET)
-#define IN_CLASSA_MAX         128
-#define IN_CLASSB(a)       (((__CCAST(in_addr_t)(a)) & 0xc0000000) == 0x80000000)
-#define IN_CLASSB_NET         0xffff0000
-#define IN_CLASSB_NSHIFT      16
-#define IN_CLASSB_HOST       (0xffffffff & ~IN_CLASSB_NET)
-#define IN_CLASSB_MAX         65536
-#define IN_CLASSC(a)       (((__CCAST(in_addr_t)(a)) & 0xe0000000) == 0xc0000000)
-#define IN_CLASSC_NET         0xffffff00
-#define IN_CLASSC_NSHIFT      8
-#define IN_CLASSC_HOST       (0xffffffff & ~IN_CLASSC_NET)
-#define IN_CLASSD(a)       (((__CCAST(in_addr_t)(a)) & 0xf0000000) == 0xe0000000)
-#define IN_MULTICAST(a)       IN_CLASSD(a)
-#define IN_EXPERIMENTAL(a) (((__CCAST(in_addr_t)(a)) & 0xe0000000) == 0xe0000000)
-#define IN_BADCLASS(a)     (((__CCAST(in_addr_t)(a)) & 0xf0000000) == 0xf0000000)
+ * On subnets, host and network parts are found according
+ * to the subnet mask, not these masks. */
+#define IN_CLASSA(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0x80000000)) == 0)
+#define IN_CLASSA_NET              __UINT32_C(0xff000000)
+#define IN_CLASSA_NSHIFT           24
+#define IN_CLASSA_HOST             __UINT32_C(0x00ffffff) /* 0xffffffff & ~IN_CLASSA_NET */
+#define IN_CLASSA_MAX              128
+#define IN_CLASSB(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xc0000000)) == __UINT32_C(0x80000000))
+#define IN_CLASSB_NET              __UINT32_C(0xffff0000)
+#define IN_CLASSB_NSHIFT           16
+#define IN_CLASSB_HOST             __UINT32_C(0x0000ffff) /* 0xffffffff & ~IN_CLASSB_NET */
+#define IN_CLASSB_MAX              65536
+#define IN_CLASSC(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xe0000000)) == __UINT32_C(0xc0000000))
+#define IN_CLASSC_NET              __UINT32_C(0xffffff00)
+#define IN_CLASSC_NSHIFT           8
+#define IN_CLASSC_HOST             __UINT32_C(0x000000ff) /* 0xffffffff & ~IN_CLASSC_NET */
+#define IN_CLASSD(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xf0000000)) == __UINT32_C(0xe0000000))
+#define IN_MULTICAST(/*u32*/ a)    IN_CLASSD(a)
+#define IN_EXPERIMENTAL(/*u32*/ a) (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xe0000000)) == __UINT32_C(0xe0000000))
+#define IN_BADCLASS(/*u32*/ a)     (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xf0000000)) == __UINT32_C(0xf0000000))
 
-#define INADDR_ANY           (__CCAST(in_addr_t)0x00000000) /* Address to accept any incoming messages. */
-#define INADDR_BROADCAST     (__CCAST(in_addr_t)0xffffffff) /* Address to send to all hosts. */
-#define INADDR_NONE          (__CCAST(in_addr_t)0xffffffff) /* Address indicating an error return. */
+#define INADDR_ANY       __UINT32_C(0x00000000) /* Address to accept any incoming messages. */
+#define INADDR_BROADCAST __UINT32_C(0xffffffff) /* Address to send to all hosts. */
+#define INADDR_NONE      __UINT32_C(0xffffffff) /* Address indicating an error return. */
 
-#define IN_LOOPBACKNET         127 /* Network number for local host loopback. */
+#define IN_LOOPBACKNET   127 /* Network number for local host loopback. */
 #ifndef INADDR_LOOPBACK /* Address to loopback in software to local host. */
-#define INADDR_LOOPBACK      (__CCAST(in_addr_t)0x7f000001) /* Inet 127.0.0.1. */
+#define INADDR_LOOPBACK  __UINT32_C(0x7f000001) /* Inet 127.0.0.1. */
 #endif /* !INADDR_LOOPBACK */
 
 /* Defines for Multicast INADDR. */
-#define INADDR_UNSPEC_GROUP    (__CCAST(in_addr_t)0xe0000000) /* 224.0.0.0 */
-#define INADDR_ALLHOSTS_GROUP  (__CCAST(in_addr_t)0xe0000001) /* 224.0.0.1 */
-#define INADDR_ALLRTRS_GROUP   (__CCAST(in_addr_t)0xe0000002) /* 224.0.0.2 */
-#define INADDR_MAX_LOCAL_GROUP (__CCAST(in_addr_t)0xe00000ff) /* 224.0.0.255 */
+#define INADDR_UNSPEC_GROUP    0xe0000000 /* 224.0.0.0 */
+#define INADDR_ALLHOSTS_GROUP  0xe0000001 /* 224.0.0.1 */
+#define INADDR_ALLRTRS_GROUP   0xe0000002 /* 224.0.0.2 */
+#define INADDR_MAX_LOCAL_GROUP 0xe00000ff /* 224.0.0.255 */
 
 
 #ifdef __CC__
@@ -312,9 +313,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__
 #ifndef __NO_XBLOCK
 #define IN6_IS_ADDR_UNSPECIFIED(a) __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == 0; })
 #define IN6_IS_ADDR_LOOPBACK(a)    __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == htonl(1); }))
-#define IN6_IS_ADDR_LINKLOCAL(a)   __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN (__a->s6_addr32[0] & htonl(0xffc00000)) == htonl(0xfe800000); })
-#define IN6_IS_ADDR_SITELOCAL(a)   __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN (__a->s6_addr32[0] & htonl(0xffc00000)) == htonl(0xfec00000); })
-#define IN6_IS_ADDR_V4MAPPED(a)    __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == htonl(0xffff); })
+#define IN6_IS_ADDR_LINKLOCAL(a)   __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN (__a->s6_addr32[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfe800000)); })
+#define IN6_IS_ADDR_SITELOCAL(a)   __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN (__a->s6_addr32[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfec00000)); })
+#define IN6_IS_ADDR_V4MAPPED(a)    __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == htonl(__UINT32_C(0x0000ffff)); })
 #define IN6_IS_ADDR_V4COMPAT(a)    __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && ntohl (__a->s6_addr32[3]) > 1; })
 #define IN6_ARE_ADDR_EQUAL(a, b)   __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); \
                                               struct in6_addr const *__b = (struct in6_addr const *)(b); \
@@ -325,16 +326,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_CONST __UINT64_TYPE__
 #else /* !__NO_XBLOCK */
 #define IN6_IS_ADDR_UNSPECIFIED(a) (((__uint32_t const *)(a))[0] == 0 && ((__uint32_t const *)(a))[1] == 0 && ((__uint32_t const *)(a))[2] == 0 && ((__uint32_t const *)(a))[3] == 0)
 #define IN6_IS_ADDR_LOOPBACK(a)    (((__uint32_t const *)(a))[0] == 0 && ((__uint32_t const *)(a))[1] == 0 && ((__uint32_t const *)(a))[2] == 0 && ((__uint32_t const *)(a))[3] == htonl(1))
-#define IN6_IS_ADDR_LINKLOCAL(a)  ((((__uint32_t const *)(a))[0] & htonl(0xffc00000)) == htonl(0xfe800000))
-#define IN6_IS_ADDR_SITELOCAL(a)  ((((__uint32_t const *)(a))[0] & htonl(0xffc00000)) == htonl(0xfec00000))
-#define IN6_IS_ADDR_V4MAPPED(a)   ((((__uint32_t const *)(a))[0] == 0) && (((__uint32_t const *)(a))[1] == 0) && (((__uint32_t const *)(a))[2] == htonl(0xffff)))
+#define IN6_IS_ADDR_LINKLOCAL(a)  ((((__uint32_t const *)(a))[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfe800000)))
+#define IN6_IS_ADDR_SITELOCAL(a)  ((((__uint32_t const *)(a))[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfec00000)))
+#define IN6_IS_ADDR_V4MAPPED(a)   ((((__uint32_t const *)(a))[0] == 0) && (((__uint32_t const *)(a))[1] == 0) && (((__uint32_t const *)(a))[2] == htonl(__UINT32_C(0x0000ffff))))
 #define IN6_IS_ADDR_V4COMPAT(a)   ((((__uint32_t const *)(a))[0] == 0) && (((__uint32_t const *)(a))[1] == 0) && (((__uint32_t const *)(a))[2] == 0) && (ntohl (((__uint32_t const *)(a))[3]) > 1))
 #define IN6_ARE_ADDR_EQUAL(a, b)  ((((__uint32_t const *)(a))[0] == ((__uint32_t const *)(b))[0]) && \
                                    (((__uint32_t const *)(a))[1] == ((__uint32_t const *)(b))[1]) && \
                                    (((__uint32_t const *)(a))[2] == ((__uint32_t const *)(b))[2]) && \
                                    (((__uint32_t const *)(a))[3] == ((__uint32_t const *)(b))[3]))
 #endif /* __NO_XBLOCK */
-#define IN6_IS_ADDR_MULTICAST(a)    (((__uint8_t const *)(a))[0] == 0xff)
+#define IN6_IS_ADDR_MULTICAST(a)    (((__uint8_t const *)(a))[0] == __UINT8_C(0xff))
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_bindresvport
@@ -347,11 +348,11 @@ __CDECLARE(,int,__NOTHROW_RPC,bindresvport6,(__fd_t __sockfd, struct sockaddr_in
 #endif /* bindresvport6... */
 #endif /* __USE_MISC */
 
-#define IN6_IS_ADDR_MC_NODELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & 0xf) == 0x1))
-#define IN6_IS_ADDR_MC_LINKLOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & 0xf) == 0x2))
-#define IN6_IS_ADDR_MC_SITELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & 0xf) == 0x5))
-#define IN6_IS_ADDR_MC_ORGLOCAL(a)  (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & 0xf) == 0x8))
-#define IN6_IS_ADDR_MC_GLOBAL(a)    (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & 0xf) == 0xe))
+#define IN6_IS_ADDR_MC_NODELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x1)))
+#define IN6_IS_ADDR_MC_LINKLOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x2)))
+#define IN6_IS_ADDR_MC_SITELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x5)))
+#define IN6_IS_ADDR_MC_ORGLOCAL(a)  (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x8)))
+#define IN6_IS_ADDR_MC_GLOBAL(a)    (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0xe)))
 
 #ifdef __USE_GNU
 struct cmsghdr;

@@ -33,6 +33,7 @@
 #include <network/network.h>
 
 #include <assert.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -105,16 +106,14 @@ again:
 	result->npa_ip     = ip;
 	result->npa_flags  = NET_PEERADDR_HAVE_NONE;
 
-	if (ip == htonl(0xffffffff)) {
+	if (ip == htonl(INADDR_BROADCAST)) {
 		/* Special case: Broadcast IP */
 		result->npa_flags = NET_PEERADDR_HAVE_MAC;
 		memset(result->npa_hwmac, 0xff, ETH_ALEN);
-	} else if (ip == htonl(0x7f000001)) {
-		/* Special case: localhost (127.0.0.1) */
+	} else if ((ip & htonl(UINT32_C(0xff000000))) == htonl(INADDR_LOOPBACK & UINT32_C(0xff000000))) {
+		/* Special case: localhost (127.x.x.x) */
 		result->npa_flags = NET_PEERADDR_HAVE_MAC;
-		memcpy(result->npa_hwmac,
-		       self->nd_addr.na_hwmac,
-		       ETH_ALEN);
+		memcpy(result->npa_hwmac, self->nd_addr.na_hwmac, ETH_ALEN);
 	}
 
 	new_peers->nps_addrs[lo] = result; /* Inherit reference */

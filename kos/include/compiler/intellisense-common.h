@@ -341,8 +341,9 @@ template<> struct ____INTELLISENSE_promote<unsigned long long> { typedef unsigne
  * >> Again: Only meant to highlight usage errors in visual studio. */
 template<int endian,class __T> class ____intellisense_endianint {
 	__T __v;
+
 public:
-/*	bool operator ! () const; */
+	/*	bool operator ! () const; */
 	explicit operator bool() const throw();
 	explicit operator char() const throw();
 	explicit operator short() const throw();
@@ -356,13 +357,19 @@ public:
 	explicit operator unsigned long() const throw();
 	explicit operator unsigned long long() const throw();
 	//____intellisense_endianint &operator = (__T) throw();
-	____intellisense_endianint &operator = (____intellisense_endianint const &) throw() = default;
-	template<class __S> bool operator <  (____intellisense_endianint<endian,__S> const &) const throw();
-	template<class __S> bool operator <= (____intellisense_endianint<endian,__S> const &) const throw();
-	template<class __S> bool operator == (____intellisense_endianint<endian,__S> const &) const throw();
-	template<class __S> bool operator != (____intellisense_endianint<endian,__S> const &) const throw();
-	template<class __S> bool operator >  (____intellisense_endianint<endian,__S> const &) const throw();
-	template<class __S> bool operator >= (____intellisense_endianint<endian,__S> const &) const throw();
+	____intellisense_endianint &operator=(____intellisense_endianint const &) throw() = default;
+	template<class __S> bool operator<(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> bool operator<=(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> bool operator==(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> bool operator!=(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> bool operator>(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> bool operator>=(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> ____intellisense_endianint operator|(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> ____intellisense_endianint operator&(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> ____intellisense_endianint operator^(____intellisense_endianint<endian, __S> const &) const throw();
+	template<class __S> ____intellisense_endianint &operator|=(____intellisense_endianint<endian, __S> const &) throw();
+	template<class __S> ____intellisense_endianint &operator&=(____intellisense_endianint<endian, __S> const &) throw();
+	template<class __S> ____intellisense_endianint &operator^=(____intellisense_endianint<endian, __S> const &) throw();
 	____intellisense_endianint() = default;
 	____intellisense_endianint(____intellisense_endianint const &) = default;
 	explicit ____intellisense_endianint(char) throw();

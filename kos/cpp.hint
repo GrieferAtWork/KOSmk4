@@ -574,3 +574,4 @@
 #define DLIST_RFOREACH(elem,l,key) for(;;)
 #define DLIST_RFOREACH_P(elem,l,getpath) for(;;)
 
+#define __SOCKADDR_COMMON(x) sa_family_t x##family
