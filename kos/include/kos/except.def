@@ -657,6 +657,11 @@ class E_NET_ERROR = 0x0081 {
 }
 /* TODO: Net-error sub-classes */
 
+[errno(EHOSTUNREACH)]
+class E_NET_HOST_UNREACHABLE : E_NET_ERROR = 0x0001 {
+	/* TODO: Exception pointers, such as the IP (maybe?) */
+}
+
 %
 %
 %

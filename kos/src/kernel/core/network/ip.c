@@ -24,12 +24,15 @@
 #include <kernel/compiler.h>
 
 #include <dev/nic.h>
+#include <kernel/aio.h>
+#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
 
+#include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 
@@ -44,6 +47,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stdalign.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -575,10 +579,11 @@ datagram_complete_and_unlock:
 
 
 /* Route an IP datagram after it has been fully re-assembled.
- * NOTE: The following fields of `packet' should be ignored and may contain invalid values:
- *   - packet->ip_len  (use `htons(packet_size)' instead)
- *   - packet->ip_sum  (re-calculate if needed)
- * @param: packet_size: == ntohs(packet->ip_len);
+ * WARNING: `packet->ip_len' may indicate a greater size than `packet_size'
+ *          if then packet has been corrupted or was maliciously crafted!
+ *          The given `packet_size' is the upper limit on the amount of data
+ *          that was actually received. The specified `packet->ip_len' should
+ *          only be taken seriously when `packet->ip_len <= packet_size'
  * @assume(packet_size >= 20); */
 PUBLIC NOBLOCK NONNULL((1, 2)) void KCALL
 ip_routedatagram(struct nic_device *__restrict dev,
@@ -598,6 +603,164 @@ ip_routedatagram(struct nic_device *__restrict dev,
 
 
 
+/* Calculate and fill in the `ip_sum' field of the given ip header. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL iphdr_calculate_sum)(struct iphdr *__restrict self) {
+	u32 chksum;
+	u16 i, cnt, *base;
+	/* XXX: I think this is correct? */
+	self->ip_sum = htons(0);
+	cnt  = self->ip_hl * 2;
+	base = (u16 *)self;
+	for (i = 0, chksum = 0; i < cnt; ++i) {
+		chksum += base[i];
+	}
+	while (chksum > 0xffff)
+		chksum += (chksum >> 16);
+	chksum = ~chksum;
+	self->ip_sum = htons(chksum);
+}
+
+
+
+/* Add the ARP request response timeout to `timeout' */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL nic_device_add_arp_response_timeout)(struct nic_device *__restrict self,
+                                                   struct timespec *__restrict timeout) {
+	(void)self;
+	/* XXX: This timeout should be a field of the NIC device... */
+	timeout->add_milliseconds(100);
+}
+
+
+struct ip_arp_and_datagram_job {
+	REF struct nic_device    *adj_dev;    /* [1..1][const] The associated network device. */
+	REF struct net_peeraddr  *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
+	REF struct nic_packet    *adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram (with sufficient header space for an ethernet header) */
+	struct timespec           adj_arptmo; /* Timeout for ARP request responses. */
+	unsigned int              adj_arpc;   /* # of remaining ARP request attempts (set to 0 when the peer's mac became available). */
+	struct aio_handle_generic adj_done;   /* [valid_if(adj_arpc == 0)] AIO handle used to wait for transmit completion of `adj_gram' */
+	/* XXX: Have another state where we wait for an ARP request to finish being sent?
+	 *      Right now, our ARP timeout starts as soon as the ARP request is started,
+	 *      rather than waiting until the ARP request has made it through our NIC... */
+};
+
+PRIVATE NONNULL((1)) void KCALL
+nic_device_send_arp_request(struct nic_device *__restrict self, be32 ip) {
+	REF struct nic_packet *areq;
+	areq = arp_makemacrequest(self, ip);
+	FINALLY_DECREF_UNLIKELY(areq);
+	nic_device_send_background(self, areq);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(ASYNC_CALLBACK_CC ip_arp_and_datagram_fini)(async_job_t self) {
+	struct ip_arp_and_datagram_job *me;
+	me = (struct ip_arp_and_datagram_job *)self;
+	if (me->adj_arpc == 0) {
+		aio_handle_generic_fini(&me->adj_done);
+	} else {
+		decref_likely(me->adj_gram);
+		decref_unlikely(me->adj_peer);
+	}
+	decref_unlikely(me->adj_dev);
+}
+
+PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
+ip_arp_and_datagram_poll(async_job_t self, struct timespec *__restrict timeout) {
+	struct ip_arp_and_datagram_job *me;
+	me = (struct ip_arp_and_datagram_job *)self;
+	if (me->adj_arpc == 0) {
+		/* Wait for the send to be completed. */
+		if (aio_handle_generic_poll_err(&me->adj_done))
+			return ASYNC_JOB_POLL_DELETE;
+		return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
+	}
+	/* Wait for the peer's MAC to become available. */
+	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
+		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
+	task_connect(&me->adj_dev->nd_net.n_addravl);
+	COMPILER_READ_BARRIER();
+	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
+		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
+	/* Setup a timeout before re-sending the ARP request. */
+	*timeout = me->adj_arptmo;
+	return ASYNC_JOB_POLL_WAITFOR;
+}
+
+PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+ip_arp_and_datagram_work(async_job_t self) {
+	struct ip_arp_and_datagram_job *me;
+	me = (struct ip_arp_and_datagram_job *)self;
+	if (me->adj_arpc == 0)
+		return true; /* The delete-transmit-complete is handled by poll() */
+	/* Check if the MAC has become available. */
+	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
+		/* There we go! */
+		struct ethhdr *eth;
+		eth = nic_packet_tallochead(me->adj_gram, struct ethhdr);
+		memcpy(eth->h_dest, me->adj_peer->npa_hwmac, ETH_ALEN);
+		memcpy(eth->h_source, me->adj_dev->nd_addr.na_hwmac, ETH_ALEN);
+		eth->h_proto = htons(ETH_P_IP);
+
+		/* Send the packet. */
+		aio_handle_generic_init(&me->adj_done);
+		nic_device_send(me->adj_dev, me->adj_gram, &me->adj_done);
+
+		/* Drop reference and switch to wait-for-transmit-complete mode. */
+		COMPILER_BARRIER();
+		decref_unlikely(me->adj_peer);
+		decref_unlikely(me->adj_gram);
+		COMPILER_WRITE_BARRIER();
+		me->adj_arpc = 0;
+		COMPILER_BARRIER();
+	}
+	return true;
+}
+
+PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+ip_arp_and_datagram_time(async_job_t self) {
+	struct ip_arp_and_datagram_job *me;
+	me = (struct ip_arp_and_datagram_job *)self;
+	assert(me->adj_arpc != 0);
+	/* Check once again if the MAC has become available (unlikely) */
+	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
+		return true;
+	/* Check if this was the last attempt */
+	if (me->adj_arpc == 1) {
+		THROW(E_NET_HOST_UNREACHABLE); /* XXX: Exception pointers? */
+	}
+	--me->adj_arpc;
+	/* Re-try sending the ARP request. */
+	nic_device_send_arp_request(me->adj_dev,
+	                            me->adj_peer->npa_ip);
+	me->adj_arptmo = realtime();
+	nic_device_add_arp_response_timeout(me->adj_dev, &me->adj_arptmo);
+	return true;
+}
+
+PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
+ip_arp_and_datagram_cancel(async_job_t self) {
+	struct ip_arp_and_datagram_job *me;
+	me = (struct ip_arp_and_datagram_job *)self;
+	if (me->adj_arpc == 0) {
+		aio_handle_cancel(&me->adj_done);
+	} else {
+		/* XXX: Cancel the current ARP request? */
+	}
+}
+
+
+PRIVATE struct async_job_callbacks const ip_arp_and_datagram = {
+	/* .jc_jobsize  = */ sizeof(struct ip_arp_and_datagram_job),
+	/* .jc_jobalign = */ alignof(struct ip_arp_and_datagram_job),
+	/* .jc_driver   = */ &drv_self,
+	/* .aj_fini     = */ &ip_arp_and_datagram_fini,
+	/* .aj_poll     = */ &ip_arp_and_datagram_poll,
+	/* .aj_work     = */ &ip_arp_and_datagram_work,
+	/* .aj_time     = */ &ip_arp_and_datagram_time,
+	/* .aj_cancel   = */ &ip_arp_and_datagram_cancel,
+};
 
 
 /* Send a given IP datagram packet `packet'.
@@ -615,8 +778,21 @@ ip_routedatagram(struct nic_device *__restrict dev,
  *   underlying network layers.
  * - NOTE: If necessary, this function will also perform the required
  *         ARP network traffic in order to translate the target IP
- *         address pointed to by the IP header of `packet'. */
-PUBLIC NOBLOCK NONNULL((1, 2, 3)) void KCALL
+ *         address pointed to by the IP header of `packet'.
+ * NOTE: This function automatically fills in the following fields of the IP header:
+ *   - ip_v    (With the value `4')
+ *   - ip_len  (With the value `nic_packet_size(packet)')
+ *   - ip_id   (using `struct net_peeraddr::npa_ipgramid')
+ *   - ip_off  (as required for fragmentation; else `0')
+ *   - ip_sum  (Only if not done by hardware, then will be filled with the correct value)
+ * With this in mind, the caller must have already filled in:
+ *   - ip_hl   (header length divided by 4)
+ *   - ip_tos  (Type of IP service)
+ *   - ip_ttl  (Time to live)
+ *   - ip_p    (IP Protocol; One of `IPPROTO_*')
+ *   - ip_src  (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
+ *   - ip_dst  (Target IP address) */
+PUBLIC NONNULL((1, 2, 3)) void KCALL
 ip_senddatagram(struct nic_device *__restrict dev,
                 struct nic_packet *__restrict packet,
                 struct aio_handle *__restrict aio) {
@@ -641,6 +817,19 @@ ip_senddatagram(struct nic_device *__restrict dev,
 	assert(nic_packet_headsize(packet) >= sizeof(struct iphdr));
 	hdr  = (struct iphdr *)packet->np_head;
 	peer = network_peers_requireip(&dev->nd_net, hdr->ip_dst.s_addr);
+	{
+		u16 dgramid;
+		/* Fill in header fields that are automatically calculated.
+		 * NOTE: We use one datagram ID per peer so we get the max
+		 *       number of unique IDs, whilst not leaking any info
+		 *       about how much we've been talking to different peers. */
+		dgramid = ATOMIC_FETCHINC(peer->npa_ipgramid);
+		hdr->ip_v   = IPVERSION;
+		hdr->ip_len = htons((u16)total_packet_size);
+		hdr->ip_id  = htons(dgramid);
+		hdr->ip_off = htons(0);
+		iphdr_calculate_sum(hdr);
+	}
 	if (peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
 		/* Simple case: we already have the MAC for this peer! */
 		struct ethhdr *eth;
@@ -654,23 +843,168 @@ ip_senddatagram(struct nic_device *__restrict dev,
 		return;
 	}
 	{
-		/* Send out an ARP request */
-		REF struct nic_packet *areq;
-		FINALLY_DECREF_UNLIKELY(peer);
-		areq = arp_makemacrequest(dev, peer->npa_ip);
-		FINALLY_DECREF_UNLIKELY(areq);
-		/* TODO: Use an async-job to wait for the MAC request to complete,
-		 *       as well as retry the request a couple of times if necessary
-		 *       before eventually filling in all of the missing data from
-		 *       the original packet's header, and sending out that packet. */
-		(void)dev;
-		(void)hdr;
-		(void)packet;
-		(void)aio;
-		/* TODO */
-		THROW(E_NOT_IMPLEMENTED_TODO);
+		/* Send out an async job for doing the arp+send asynchronously */
+		async_job_t aj;
+		struct ip_arp_and_datagram_job *job;
+		/* Send the first ARP request.
+		 * XXX: the async job should be configurable to wait for this... */
+		TRY {
+			nic_device_send_arp_request(dev, hdr->ip_dst.s_addr);
+			aj = async_job_alloc(&ip_arp_and_datagram);
+		} EXCEPT {
+			decref_unlikely(peer);
+			RETHROW();
+		}
+		job = (struct ip_arp_and_datagram_job *)aj;
+		job->adj_dev  = (REF struct nic_device *)incref(dev);
+		job->adj_peer = peer; /* Inherit reference */
+		job->adj_gram = incref(packet);
+		job->adj_arptmo = realtime();
+		nic_device_add_arp_response_timeout(dev, &job->adj_arptmo);
+		job->adj_arpc = 5; /* Must not be 0, but should be configurable */
+		/* Start the async job and attach it to the given AIO handle. */
+		decref(async_job_start(aj, aio));
 	}
 }
+
+
+
+struct ip_arp_and_datagrams_job {
+	REF struct nic_device         *adj_dev;    /* [1..1][const] The associated network device. */
+	REF struct net_peeraddr       *adj_peer;   /* [1..1][const][valid_if(adj_arpc != 0)] The peer who's mac address we're in need of. */
+	struct nic_packetlist          adj_gram;   /* [1..1][const][valid_if(adj_arpc != 0)] The IP datagram list (with sufficient header space for an ethernet header) */
+	struct timespec                adj_arptmo; /* Timeout for ARP request responses. */
+	unsigned int                   adj_arpc;   /* # of remaining ARP request attempts (set to 0 when the peer's mac became available). */
+	struct aio_multihandle_generic adj_done;   /* [valid_if(adj_arpc == 0)] AIO handle used to wait for transmit completion of `adj_gram' */
+	/* XXX: Have another state where we wait for an ARP request to finish being sent?
+	 *      Right now, our ARP timeout starts as soon as the ARP request is started,
+	 *      rather than waiting until the ARP request has made it through our NIC... */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(ASYNC_CALLBACK_CC ip_arp_and_datagrams_fini)(async_job_t self) {
+	struct ip_arp_and_datagrams_job *me;
+	me = (struct ip_arp_and_datagrams_job *)self;
+	if (me->adj_arpc == 0) {
+		aio_multihandle_generic_fini(&me->adj_done);
+	} else {
+		nic_packetlist_fini(&me->adj_gram);
+		decref_unlikely(me->adj_peer);
+	}
+	decref_unlikely(me->adj_dev);
+}
+
+PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
+ip_arp_and_datagrams_poll(async_job_t self, struct timespec *__restrict timeout) {
+	struct ip_arp_and_datagrams_job *me;
+	me = (struct ip_arp_and_datagrams_job *)self;
+	if (me->adj_arpc == 0) {
+		/* Wait for the send to be completed. */
+		if (aio_multihandle_generic_poll_err(&me->adj_done))
+			return ASYNC_JOB_POLL_DELETE;
+		return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
+	}
+	/* Wait for the peer's MAC to become available. */
+	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
+		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
+	task_connect(&me->adj_dev->nd_net.n_addravl);
+	COMPILER_READ_BARRIER();
+	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
+		return ASYNC_JOB_POLL_AVAILABLE; /* Move on to sending the datagram. */
+	/* Setup a timeout before re-sending the ARP request. */
+	*timeout = me->adj_arptmo;
+	return ASYNC_JOB_POLL_WAITFOR;
+}
+
+PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+ip_arp_and_datagrams_work(async_job_t self) {
+	struct ip_arp_and_datagrams_job *me;
+	me = (struct ip_arp_and_datagrams_job *)self;
+	if (me->adj_arpc == 0)
+		return true; /* The delete-transmit-complete is handled by poll() */
+	/* Check if the MAC has become available. */
+	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
+		/* There we go!
+		 * Now all we've got to do is add ethernet headers to all segments. */
+		size_t i;
+		struct ethhdr hdr;
+		memcpy(hdr.h_dest, me->adj_peer->npa_hwmac, ETH_ALEN);
+		memcpy(hdr.h_source, me->adj_dev->nd_addr.na_hwmac, ETH_ALEN);
+		hdr.h_proto = htons(ETH_P_IP);
+		for (i = 0; i < me->adj_gram.npl_cnt; ++i) {
+			struct ethhdr *eth;
+			eth = nic_packet_tallochead(me->adj_gram.npl_vec[i], struct ethhdr);
+			memcpy(eth, &hdr, sizeof(struct ethhdr));
+		}
+
+		/* Send all of the packets. */
+		aio_multihandle_generic_init(&me->adj_done);
+		TRY {
+			for (i = 0; i < me->adj_gram.npl_cnt; ++i) {
+				struct aio_handle *hand;
+				hand = aio_multihandle_allochandle(&me->adj_done);
+				nic_device_send(me->adj_dev, me->adj_gram.npl_vec[i], hand);
+			}
+		} EXCEPT {
+			aio_multihandle_cancel(&me->adj_done);
+			RETHROW();
+		}
+
+		/* Drop reference and switch to wait-for-transmit-complete mode. */
+		COMPILER_BARRIER();
+		decref_unlikely(me->adj_peer);
+		nic_packetlist_fini(&me->adj_gram);
+		COMPILER_WRITE_BARRIER();
+		me->adj_arpc = 0;
+		COMPILER_BARRIER();
+	}
+	return true;
+}
+
+PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+ip_arp_and_datagrams_time(async_job_t self) {
+	struct ip_arp_and_datagrams_job *me;
+	me = (struct ip_arp_and_datagrams_job *)self;
+	assert(me->adj_arpc != 0);
+	/* Check once again if the MAC has become available (unlikely) */
+	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC)
+		return true;
+	/* Check if this was the last attempt */
+	if (me->adj_arpc == 1) {
+		THROW(E_NET_HOST_UNREACHABLE); /* XXX: Exception pointers? */
+	}
+	--me->adj_arpc;
+	/* Re-try sending the ARP request. */
+	nic_device_send_arp_request(me->adj_dev,
+	                            me->adj_peer->npa_ip);
+	me->adj_arptmo = realtime();
+	nic_device_add_arp_response_timeout(me->adj_dev, &me->adj_arptmo);
+	return true;
+}
+
+PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
+ip_arp_and_datagrams_cancel(async_job_t self) {
+	struct ip_arp_and_datagrams_job *me;
+	me = (struct ip_arp_and_datagrams_job *)self;
+	if (me->adj_arpc == 0) {
+		aio_multihandle_cancel(&me->adj_done);
+	} else {
+		/* XXX: Cancel the current ARP request? */
+	}
+}
+
+
+PRIVATE struct async_job_callbacks const ip_arp_and_datagrams = {
+	/* .jc_jobsize  = */ sizeof(struct ip_arp_and_datagrams_job),
+	/* .jc_jobalign = */ alignof(struct ip_arp_and_datagrams_job),
+	/* .jc_driver   = */ &drv_self,
+	/* .aj_fini     = */ &ip_arp_and_datagrams_fini,
+	/* .aj_poll     = */ &ip_arp_and_datagrams_poll,
+	/* .aj_work     = */ &ip_arp_and_datagrams_work,
+	/* .aj_time     = */ &ip_arp_and_datagrams_time,
+	/* .aj_cancel   = */ &ip_arp_and_datagrams_cancel,
+};
+
 
 /* Similar to `ip_senddatagram()', however instead of taking a NIC
  * packet object, this function takes a packet descriptor. With this
@@ -679,20 +1013,103 @@ ip_senddatagram(struct nic_device *__restrict dev,
  * vector, or similar.
  * Note however that if you've been given a NIC packet, you should really
  * use the above function instead, since doing so reduces the amount of
- * copying necessary when the datagram can fit into a single fragment. */
-PUBLIC NOBLOCK NONNULL((1, 2, 3)) void KCALL
+ * copying necessary when the datagram can fit into a single fragment.
+ * NOTE: This function automatically fills in the following fields of the IP header:
+ *   - ip_v    (With the value `4')
+ *   - ip_len  (With the value `nic_packet_size(packet)')
+ *   - ip_id   (using `struct net_peeraddr::npa_ipgramid')
+ *   - ip_off  (as required for fragmentation; else `0')
+ *   - ip_sum  (Only if not done by hardware, then will be filled with the correct value)
+ * With this in mind, the caller must have already filled in:
+ *   - ip_hl   (header length divided by 4)
+ *   - ip_tos  (Type of IP service)
+ *   - ip_ttl  (Time to live)
+ *   - ip_p    (IP Protocol; One of `IPPROTO_*')
+ *   - ip_src  (Sender IP address (usually `dev->nd_addr.na_ip', or a broadcast IP))
+ *   - ip_dst  (Target IP address) */
+PUBLIC NONNULL((1, 2, 3)) void KCALL
 ip_senddatagram_ex(struct nic_device *__restrict dev,
                    struct nic_packet_desc const *__restrict packet,
                    struct aio_handle *__restrict aio) {
+	async_job_t aj;
+	struct ip_arp_and_datagrams_job *job;
+	REF struct net_peeraddr *peer;
 	struct iphdr *hdr;
 	assert(nic_packet_desc_headsize(packet) >= sizeof(struct iphdr));
-	hdr = (struct iphdr *)packet->npd_head;
-	(void)dev;
-	(void)hdr;
-	(void)packet;
-	(void)aio;
-	/* TODO */
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	hdr  = (struct iphdr *)packet->npd_head;
+	peer = network_peers_requireip(&dev->nd_net, hdr->ip_dst.s_addr);
+	TRY {
+		if (!(peer->npa_flags & NET_PEERADDR_HAVE_MAC))
+			nic_device_send_arp_request(dev, peer->npa_ip);
+#ifndef __OPTIMIZE_SIZE__
+		else {
+			/* XXX: No need to have the send-part be started by the async-job.
+			 *      When the MAC is already available, then _we_ can do that
+			 *      already! */
+		}
+#endif /* !__OPTIMIZE_SIZE__ */
+		aj  = async_job_alloc(&ip_arp_and_datagrams);
+		job = (struct ip_arp_and_datagrams_job *)aj;
+		TRY {
+			size_t i;
+			u16 dgramid, offset;
+			nic_packetlist_init(&job->adj_gram);
+			TRY {
+				/* Split the packet into multiple segments. */
+				struct nic_packet_desc used_packet;
+				memcpy(&used_packet, packet, sizeof(used_packet));
+				/* Don't include the original IP header within datagram fragments.
+				 * Instead, the IP header is replicated within every fragment. */
+				used_packet.npd_head += sizeof(struct iphdr);
+				used_packet.npd_headsz -= sizeof(struct iphdr);
+				nic_packetlist_segments_ex(&job->adj_gram,
+				                           dev, &used_packet,
+				                           dev->nd_net.n_ipsize,
+				                           IP_PACKET_HEADSIZE,
+				                           IP_PACKET_TAILSIZE);
+			} EXCEPT {
+				nic_packetlist_fini(&job->adj_gram);
+				RETHROW();
+			}
+			/* Fill in header fields that are automatically calculated.
+			 * NOTE: We use one datagram ID per peer so we get the max
+			 *       number of unique IDs, whilst not leaking any info
+			 *       about how much we've been talking to different peers. */
+			dgramid = ATOMIC_FETCHINC(peer->npa_ipgramid);
+			/* Construct the IP headers for all of the fragments. */
+			offset = 0;
+			for (i = 0; i < job->adj_gram.npl_cnt; ++i) {
+				struct nic_packet *pck;
+				struct iphdr *fragment_hdr;
+				u16 fraglen;
+				pck = job->adj_gram.npl_vec[i];
+				fragment_hdr = nic_packet_tallochead(pck, struct iphdr);
+				/* Default-fill the IP header with the one from the original datagram. */
+				memcpy(fragment_hdr, hdr, sizeof(struct iphdr));
+				fragment_hdr->ip_v = IPVERSION;
+				if (i != 0) /* An extended IP header gets placed into the first fragment payload. */
+					fragment_hdr->ip_hl = sizeof(struct iphdr) / 4;
+				fraglen = (u16)nic_packet_size(pck);
+				fragment_hdr->ip_len = htons(fraglen);
+				fragment_hdr->ip_id  = htons(dgramid);
+				fragment_hdr->ip_off = htons(offset);
+				iphdr_calculate_sum(fragment_hdr);
+				offset += fraglen;
+			}
+		} EXCEPT {
+			async_job_free(aj);
+			RETHROW();
+		}
+	} EXCEPT {
+		decref_unlikely(peer);
+		RETHROW();
+	}
+	job->adj_dev  = (REF struct nic_device *)incref(dev);
+	job->adj_peer = peer; /* Inherit reference */
+	job->adj_arptmo = realtime();
+	nic_device_add_arp_response_timeout(dev, &job->adj_arptmo);
+	job->adj_arpc = 5; /* Must not be 0, but should be configurable */
+	decref(async_job_start(aj, aio));
 }
 
 

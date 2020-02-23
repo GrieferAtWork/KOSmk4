@@ -182,7 +182,7 @@ HANDLE_FOREACH_CUSTOMTYPE(_ASYNC_WORKER_CXX_DECLARE)
 #define ASYNC_JOB_POLL_AVAILABLE         0 /* Work appears to be available, and `jc_work()' should be invoked. */
 #define ASYNC_JOB_POLL_WAITFOR           1 /* No work available right now (but the proper signals were connected) */
 #define ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT 2 /* Same as `ASYNC_JOB_POLL_WAITFOR', but ignore `timeout'. */
-#define ASYNC_JOB_POLL_DELETE            3 /* Nothing left to do (delete the job) */
+#define ASYNC_JOB_POLL_DELETE            3 /* Nothing left to do (delete the job with a success status) */
 
 /* A pointer to the `self' argument of async jobs. */
 struct async_job;
@@ -190,7 +190,22 @@ typedef struct async_job *async_job_t;
 struct aio_handle_stat;
 
 /* Async jobs are similar to async workers, however are designed as
- * one-time jobs that delete themself once they've been completed. */
+ * one-time jobs that delete themself once they've been completed.
+ * NOTE: async job callbacks are inherently thread-safe:
+ *   - aj_fini() is the last function that may ever be called, and
+ *     will only be invoked _after_ any other callback has already
+ *     returned.
+ *   - Only one of `jc_poll()', `jc_work()', `jc_time()' and `jc_cancel()'
+ *     may ever be called at the same time. (i.e. no synchronization is
+ *     necessary between these callbacks)
+ *   - Only `jc_progress()' and `jc_retsize()' might be called from the
+ *     outside of the async-job, however since these callbacks are meant
+ *     to perform read-only operations, they should also be inherently
+ *     thread-safe, since they aren't meant to modify the state of an
+ *     async-job (though if done right, even that would be allowed and
+ *     possible) (also note that `jc_retsize()' is only called after
+ *     the job had already been deleted/canceled)
+ */
 struct async_job_callbacks {
 	size_t         jc_jobsize;  /* Size of the structure pointed-to by the `self' arguments used by callbacks. */
 	size_t         jc_jobalign; /* Alignment requirements of the structure pointed-to by the `self' arguments used by callbacks. */
@@ -237,9 +252,7 @@ struct async_job_callbacks {
 	NONNULL((1)) void (ASYNC_CALLBACK_CC *jc_cancel)(async_job_t self);
 
 	/* [0..1] Optional callback to facilitate the `ht_progress' operation of AIO handles.
-	 * WARNING: This callback may be called at the same time as one of the callbacks!
-	 * NOTE: This callback will no longer be called after the handle's callback has completed,
-	 *       and the async job has already been, or is currently pending deletion. */
+	 * WARNING: This callback may be called at the same time as one of the callbacks! */
 	NOBLOCK NONNULL((1)) unsigned int
 	/*NOTHROW*/ (ASYNC_CALLBACK_CC *jc_progress)(async_job_t self, struct aio_handle_stat *__restrict stat);
 
@@ -296,7 +309,7 @@ async_job_alloc(struct async_job_callbacks const *__restrict cb);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL async_job_free)(async_job_t self);
 
 /* Start the given async job, and optionally connect a given AIO handle
- * for process monitoring, as well as job completion notification:
+ * for process monitoring, job completion notification, and cancellation:
  *   - `aio_handle_cancel()' can be used to the same effect as `async_job_cancel()'
  *   - `aio->ah_func' will be invoked under the following conditions
  *     after `async_job_start()' had been called to start the async job,

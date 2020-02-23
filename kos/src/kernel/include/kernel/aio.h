@@ -485,6 +485,29 @@ NOTHROW(KCALL aio_handle_generic_connect_ghost_c)(struct task_connection *__rest
 	task_connect_ghost_c(con, &self->hg_signal);
 }
 
+LOCAL NONNULL((1)) bool KCALL
+aio_handle_generic_poll(struct aio_handle_generic *__restrict self)
+		THROWS(...) {
+	if (aio_handle_generic_hascompleted(self))
+		return true;
+	task_connect(&self->hg_signal);
+	return aio_handle_generic_hascompleted(self);
+}
+
+LOCAL NONNULL((1)) bool KCALL
+aio_handle_generic_poll_err(struct aio_handle_generic *__restrict self)
+		THROWS(...) {
+	if (aio_handle_generic_hascompleted(self))
+		goto check_error_and_return_true;
+	task_connect(&self->hg_signal);
+	if (aio_handle_generic_hascompleted(self))
+		goto check_error_and_return_true;
+	return false;
+check_error_and_return_true:
+	aio_handle_generic_checkerror(self);
+	return true;
+}
+
 LOCAL NONNULL((1)) void KCALL
 aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self)
 		THROWS(E_WOULDBLOCK, ...) {
@@ -705,6 +728,29 @@ aio_multihandle_generic_checkerror(struct aio_multihandle_generic *__restrict se
 		__libc_memcpy(&THIS_EXCEPTION_DATA, &self->am_error, sizeof(self->am_error));
 		error_throw_current();
 	}
+}
+
+LOCAL NONNULL((1)) bool KCALL
+aio_multihandle_generic_poll(struct aio_multihandle_generic *__restrict self)
+		THROWS(...) {
+	if (aio_multihandle_generic_hascompleted(self))
+		return true;
+		task_connect(&self->mg_signal);
+	return aio_multihandle_generic_hascompleted(self);
+}
+
+LOCAL NONNULL((1)) bool KCALL
+aio_multihandle_generic_poll_err(struct aio_multihandle_generic *__restrict self)
+		THROWS(...) {
+	if (aio_multihandle_generic_hascompleted(self))
+		goto check_error_and_return_true;
+		task_connect(&self->mg_signal);
+	if (aio_multihandle_generic_hascompleted(self))
+		goto check_error_and_return_true;
+	return false;
+check_error_and_return_true:
+	aio_multihandle_generic_checkerror(self);
+	return true;
 }
 
 LOCAL NONNULL((1)) void KCALL

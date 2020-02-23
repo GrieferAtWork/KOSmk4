@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84eed492 */
+/* HASH CRC-32:0xb7684591 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -113,6 +113,7 @@ CLASS(E_FSERROR,MESSAGE("Filesystem error"),NO_ERRNO,())
        GET_EXCEPTION_POINTER(0) == E_FILESYSTEM_OPERATION_TRUNC || GET_EXCEPTION_POINTER(0) == E_FILESYSTEM_OPERATION_READDIR) ? EINVAL : EPERM),(MEMBER(uintptr_t,operation_id)))
 END
 CLASS(E_NET_ERROR,MESSAGE("Network error"),NO_ERRNO,())
+	SUBCLASS(E_NET_HOST_UNREACHABLE,NO_MESSAGE,ERRNO(EHOSTUNREACH),())
 END
 CLASS(E_IOERROR,MESSAGE("Hardware error, or miss-behaving/miss-configured device"),ERRNO(EIO),())
 	SUBCLASS(E_IOERROR_ERRORBIT,MESSAGE("A hardware error bit has been set"),NO_ERRNO,(MEMBER(uintptr_t,subsystem) MEMBER(uintptr_t,reason)))

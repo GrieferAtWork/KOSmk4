@@ -640,6 +640,19 @@ PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
 asyncjob_timeout_worker_timeout(void *__restrict UNUSED(self)) {
 	bool incomplete;
 	assert(async_job_current_timeout);
+	/* Check for `ASYNC_JOB_AIO_CANCELED' and call jc_cancel that's what happened. */
+	if (ATOMIC_READ(async_job_current_timeout->aj_aio) == ASYNC_JOB_AIO_CANCELED) {
+		if (async_job_current_timeout->aj_ops->jc_cancel) {
+			TRY {
+				(*async_job_current_timeout->aj_ops->jc_cancel)(async_job_current_timeout + 1);
+			} EXCEPT {
+				error_printf("ajob:cancel@%p(%p)",
+				             async_job_current_timeout->aj_ops->jc_cancel,
+				             async_job_current_timeout + 1);
+			}
+		}
+		goto do_delete_job;
+	}
 	TRY {
 		incomplete = (*async_job_current_timeout->aj_ops->jc_time)(async_job_current_timeout + 1);
 	} EXCEPT {
@@ -654,8 +667,8 @@ asyncjob_timeout_worker_timeout(void *__restrict UNUSED(self)) {
 		} else {
 			PREEMPTION_ENABLE();
 			/* Log an exception that's going to be discarded. */
-			error_printf("ajob:work@%p(%p)",
-			             async_job_current_timeout->aj_ops->jc_work,
+			error_printf("ajob:time@%p(%p)",
+			             async_job_current_timeout->aj_ops->jc_time,
 			             async_job_current_timeout + 1);
 		}
 		goto do_delete_job;
@@ -742,6 +755,8 @@ handle_job:
 			if (state == ASYNC_JOB_AIO_CANCELED) {
 				/* Invoke the cancellation callback. */
 				if (job->aj_ops->jc_cancel) {
+					result = true;
+					task_disconnectall();
 					TRY {
 						(*job->aj_ops->jc_cancel)(job + 1);
 					} EXCEPT {
@@ -760,6 +775,8 @@ handle_job:
 			} EXCEPT {
 				struct aio_handle *aio;
 				/* Signal AIO completion with error. */
+				result = true;
+				task_disconnectall();
 				PREEMPTION_DISABLE();
 				aio = ATOMIC_XCH(job->aj_aio, ASYNC_JOB_AIO_NONPRESENT);
 				if (ASYNC_JOB_AIO_ISPRESENT(aio)) {
@@ -803,6 +820,7 @@ handle_job:
 					struct aio_handle *aio;
 					struct async_job *next;
 					/* Signal successful AIO completion. */
+do_delete_job_success:
 					PREEMPTION_DISABLE();
 					aio = ATOMIC_XCH(job->aj_aio, ASYNC_JOB_AIO_NONPRESENT);
 					if (ASYNC_JOB_AIO_ISPRESENT(aio))
@@ -863,7 +881,7 @@ do_delete_job:
 				break;
 
 			case ASYNC_JOB_POLL_DELETE:
-				goto do_delete_job;
+				goto do_delete_job_success;
 
 			default:
 				__builtin_unreachable();
@@ -1009,7 +1027,7 @@ NOTHROW(KCALL async_job_aio_retsize)(struct aio_handle *__restrict self) {
 	return (*job->aj_ops->jc_retsize)(job + 1);
 }
 
-PRIVATE struct aio_handle_type async_job_aio = {
+PRIVATE struct aio_handle_type const async_job_aio = {
 	/* .ht_fini     = */ &async_job_aio_fini,
 	/* .ht_cancel   = */ &async_job_aio_cancel,
 	/* .ht_progress = */ &async_job_aio_progress,
@@ -1019,7 +1037,7 @@ PRIVATE struct aio_handle_type async_job_aio = {
 
 
 /* Start the given async job, and optionally connect a given AIO handle
- * for process monitoring, as well as job completion notification:
+ * for process monitoring, job completion notification, and cancellation:
  *   - `aio_handle_cancel()' can be used to the same effect as `async_job_cancel()'
  *   - `aio->ah_func' will be invoked under the following conditions
  *     after `async_job_start()' had been called to start the async job,

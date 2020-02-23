@@ -46,11 +46,12 @@ struct net_peeraddr {
 	};
 	u16           npa_flags;           /* Peer address flags (set of `NET_PEERADDR_HAVE_*') */
 	u8            npa_hwmac[ETH_ALEN]; /* [valid_if(NET_PEERADDR_HAVE_MAC)] The peer's mac address */
+	WEAK u16      npa_ipgramid;        /* Next IP datagram ID */
 };
 
 #define net_peeraddr_destroy(self) kfree(self)
 #define net_peeraddr_malloc() \
-	((struct net_peeraddr *)kmalloc(sizeof(struct net_peeraddr), GFP_NORMAL))
+	((struct net_peeraddr *)kmalloc(sizeof(struct net_peeraddr), GFP_CALLOC))
 DEFINE_REFCOUNT_FUNCTIONS(struct net_peeraddr, npa_refcnt, net_peeraddr_destroy)
 
 struct net_peeraddrs {
