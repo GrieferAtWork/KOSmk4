@@ -1019,10 +1019,9 @@ NOTHROW(KCALL async_job_aio_retsize)(struct aio_handle *__restrict self) {
 	data = (struct async_job_aio_data *)self->ah_data;
 	job  = data->ajad_job - 1;
 	aio_status = ATOMIC_READ(job->aj_aio);
+	assert(job->aj_ops->jc_retsize);
 	/* Check if the operation has completed. */
 	if (!ASYNC_JOB_AIO_ISPRESENT(aio_status))
-		return 0;
-	if unlikely(!job->aj_ops->jc_retsize)
 		return 0;
 	return (*job->aj_ops->jc_retsize)(job + 1);
 }
@@ -1032,6 +1031,12 @@ PRIVATE struct aio_handle_type const async_job_aio = {
 	/* .ht_cancel   = */ &async_job_aio_cancel,
 	/* .ht_progress = */ &async_job_aio_progress,
 	/* .ht_retsize  = */ &async_job_aio_retsize
+};
+
+PRIVATE struct aio_handle_type const async_job_aio_noretsize = {
+	/* .ht_fini     = */ &async_job_aio_fini,
+	/* .ht_cancel   = */ &async_job_aio_cancel,
+	/* .ht_progress = */ &async_job_aio_progress
 };
 
 
@@ -1072,7 +1077,10 @@ NOTHROW(FCALL async_job_start)(async_job_t self,
 		data->ajad_job = self;
 		me->aj_refcnt  = 3; /* +1: `data->ajad_job' */
 		COMPILER_WRITE_BARRIER();
-		aio_handle_init(aio, &async_job_aio);
+		aio_handle_init(aio,
+		                me->aj_ops->jc_retsize
+		                ? &async_job_aio_noretsize
+		                : &async_job_aio);
 	}
 
 	me->aj_aio = aio;
