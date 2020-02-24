@@ -17,39 +17,44 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BIT_SIGVAL32_H
-#define _I386_KOS_BIT_SIGVAL32_H 1
+#ifndef _BITS_CMSGHDR_STRUCT_H
+#define _BITS_CMSGHDR_STRUCT_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
-#include <hybrid/__pointer.h>
-#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-__SYSDECL_BEGIN
+#include <bits/types.h>
 
-#ifndef __x86_64__
-#ifndef __sigval_t_defined
-#define __sigval_t_defined 1
-#define __SIZEOF_SIGVAL  __SIZEOF_SIGVAL32
-#define __ALIGNOF_SIGVAL __ALIGNOF_SIGVAL32
-#define __sigval_defined 1
-#define sigval32        sigval
-#define sigval32_t      sigval_t
-#endif /* !__sigval_t_defined */
-#endif /* !__x86_64__ */
+__DECL_BEGIN
 
-
-#define __SIZEOF_SIGVAL32  4
-#define __ALIGNOF_SIGVAL32 __ALIGNOF_INT32__
+#define __OFFSET_CMSGHDR_LEN   0
+#define __OFFSET_CMSGHDR_LEVEL __SIZEOF_SIZE_T__
+#define __OFFSET_CMSGHDR_TYPE  (__SIZEOF_SIZE_T__ + 4)
+#define __OFFSET_CMSGHDR_DATA  (__SIZEOF_SIZE_T__ + 8)
 #ifdef __CC__
-/* Type for data associated with a signal. */
-typedef union sigval32 /*[PREFIX(sival_)]*/ { /* TODO: Rename to sigvalx32 */
-	__INT32_TYPE__       sival_int;
-	__HYBRID_PTR32(void) sival_ptr;
-} sigval32_t;
+
+/* Structure used for storage of ancillary data object information. */
+struct cmsghdr /*[PREFIX(cmsg_)]*/ {
+#if __SIZEOF_SOCKLEN_T__ == __SIZEOF_SIZE_T__
+	__socklen_t      cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure. */
+#else /* __SIZEOF_SOCKLEN_T__ == __SIZEOF_SIZE_T__ */
+	__size_t         cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure.
+	                                * !! The type should be socklen_t but the definition
+	                                *    of the kernel is incompatible with this. */
+#endif /* __SIZEOF_SOCKLEN_T__ != __SIZEOF_SIZE_T__ */
+	__INT32_TYPE__   cmsg_level;   /* Originating protocol. (One of `SOL_*'; (always `SOL_SOCKET'?)) */
+	__INT32_TYPE__   cmsg_type;    /* Protocol specific type (One of `SCM_*'). */
+#ifdef __USE_KOS
+	__COMPILER_FLEXIBLE_ARRAY(__BYTE_TYPE__, cmsg_data); /* Ancillary data. */
+#else /* __USE_KOS */
+	__COMPILER_FLEXIBLE_ARRAY(__BYTE_TYPE__, __cmsg_data); /* Ancillary data. */
+#endif /* !__USE_KOS */
+};
+
 #endif /* __CC__ */
 
-__SYSDECL_END
+__DECL_END
 
-#endif /* !_I386_KOS_BIT_SIGVAL32_H */
+#endif /* !_BITS_CMSGHDR_STRUCT_H */

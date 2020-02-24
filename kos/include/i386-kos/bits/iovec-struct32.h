@@ -43,7 +43,7 @@
 #include <hybrid/__pointer.h>
 
 __SYSDECL_BEGIN
-struct iovec32 /*[prefix(iov_)]*/ {
+struct iovec32 /*[prefix(iov_)]*/ { /* TODO: Rename to iovecx32 */
 	__HYBRID_PTR32(void) iov_base; /* Pointer to data. */
 	__UINT32_TYPE__      iov_len;  /* Length of data. */
 };

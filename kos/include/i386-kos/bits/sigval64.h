@@ -44,7 +44,7 @@ __SYSDECL_BEGIN
 #define __ALIGNOF_SIGVAL64 __ALIGNOF_INT64__
 #ifdef __CC__
 /* Type for data associated with a signal. */
-typedef union sigval64 /*[PREFIX(sival_)]*/ {
+typedef union sigval64 /*[PREFIX(sival_)]*/ { /* TODO: Rename to sigvalx64 */
 	__INT64_TYPE__       sival_int;
 	__HYBRID_PTR64(void) sival_ptr;
 } sigval64_t;

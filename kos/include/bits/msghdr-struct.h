@@ -54,26 +54,28 @@ struct cmsghdr;
 
 struct msghdr /*[PREFIX(msg_)]*/ {
 #ifdef __USE_KOS_KERNEL
-	struct sockaddr *msg_name;      /* [TYPE(struct sockaddr *)] Address to send to/receive from. */
+	struct sockaddr *msg_name;      /* [out][0..msg_namelen] Address to send to/receive from. */
 #else /* __USE_KOS_KERNEL */
-	void           *msg_name;       /* [TYPE(struct sockaddr *)] Address to send to/receive from. */
+	void           *msg_name;       /* [out][0..msg_namelen][TYPE(struct sockaddr *)] Address to send to/receive from. */
 #endif /* !__USE_KOS_KERNEL */
-	__socklen_t     msg_namelen;    /* Length of address data. */
+	__socklen_t     msg_namelen;    /* [in|out][valid_if(msg_name != NULL)] Length of address data. */
 #if __SIZEOF_POINTER__ > __SIZEOF_SOCKLEN_T__
 	__byte_t      __msg_pad1[__SIZEOF_POINTER__ - __SIZEOF_SOCKLEN_T__];
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_SOCKLEN_T__ */
-	struct iovec   *msg_iov;        /* Vector of data to send/receive into. */
+	struct iovec   *msg_iov;        /* [0..msg_iovlen] Vector of data to send/receive into. */
 	__size_t        msg_iovlen;     /* Number of elements in the vector. */
 #ifdef __USE_KOS_KERNEL
-	struct cmsghdr *msg_control;    /* [TYPE(struct cmsghdr *)] Ancillary data (eg BSD filedesc passing). */
+	struct cmsghdr *msg_control;    /* [0..msg_controllen] Ancillary data (eg BSD filedesc passing). */
 #else /* __USE_KOS_KERNEL */
-	void           *msg_control;    /* [TYPE(struct cmsghdr *)] Ancillary data (eg BSD filedesc passing). */
+	void           *msg_control;    /* [0..msg_controllen][TYPE(struct cmsghdr32 *)] Ancillary data (eg BSD filedesc passing). */
 #endif /* !__USE_KOS_KERNEL */
-	__size_t        msg_controllen; /* Ancillary data buffer length. !! The type should be socklen_t but the definition of the kernel is incompatible with this. */
+	__size_t        msg_controllen; /* [in|out][valid_if(msg_control != NULL)] Ancillary data buffer length.
+	                                                * !! The type should be socklen_t but the definition of the
+	                                                *    kernel is incompatible with this. */
 #ifdef __USE_KOS_KERNEL
-	__UINT32_TYPE__ msg_flags;      /* Flags returned by recvmsg() */
+	__UINT32_TYPE__ msg_flags;      /* [out] Flags returned by recvmsg() (set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC | MSG_OOB | MSG_ERRQUEUE') */
 #else /* __USE_KOS_KERNEL */
-	__INT32_TYPE__  msg_flags;      /* Flags returned by recvmsg() */
+	__INT32_TYPE__  msg_flags;      /* [out] Flags returned by recvmsg() (set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC | MSG_OOB | MSG_ERRQUEUE') */
 #endif /* !__USE_KOS_KERNEL */
 #if __SIZEOF_POINTER__ > 4
 	__INT32_TYPE__ __msg_pad2;      /* ... */

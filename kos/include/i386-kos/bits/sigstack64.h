@@ -64,7 +64,7 @@ typedef struct sigaltstack stack_t;
 
 #ifdef __CC__
 /* Structure describing a signal stack (obsolete). */
-struct sigstack64 /*[PREFIX(ss_)]*/ {
+struct sigstack64 /*[PREFIX(ss_)]*/ { /* TODO: Rename to sigstackx64 */
 	__HYBRID_PTR64(void) ss_sp;      /* Signal stack pointer. */
 	__INT32_TYPE__       ss_onstack; /* Nonzero if executing on this stack. */
 	__BYTE_TYPE__      __ss_pad[4];  /* ... */

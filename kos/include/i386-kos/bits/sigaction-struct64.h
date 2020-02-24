@@ -77,7 +77,7 @@ struct ucontext64;
 #define __ALIGNOF_SIGACTION64          8
 #ifdef __CC__
 /* Structure describing the action to be taken when a signal arrives. */
-struct __ATTR_ALIGNED(__ALIGNOF_SIGACTION64) sigaction64 /*[PREFIX(sa_)]*/ {
+struct __ATTR_ALIGNED(__ALIGNOF_SIGACTION64) sigaction64 /*[PREFIX(sa_)]*/ { /* TODO: Rename to sigactionx64 */
 	/* Signal handler. */
 #ifdef __USE_POSIX199309
 	union {

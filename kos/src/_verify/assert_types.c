@@ -359,6 +359,7 @@ STATIC_ASSERT(sizeof(Elf64_Versym) == __SIZEOF_ELF64_VERSYM__);
 /*[[[deemon
 import * from ...misc.libgen.assert_offsetof;
 local files = {
+	"../../include/bits/cmsghdr-struct.h",
 	"../../include/bits/flock-struct.h",
 	"../../include/bits/itimerspec.h",
 	"../../include/bits/itimerval.h",
@@ -422,6 +423,18 @@ for (local f: files)
 	genAsserts(f);
 
 ]]]*/
+#include <bits/cmsghdr-struct.h>
+
+/* struct cmsghdr */
+STATIC_ASSERT(offsetof(struct cmsghdr, cmsg_data) == __OFFSET_CMSGHDR_DATA);
+STATIC_ASSERT(offsetof(struct cmsghdr, cmsg_len) == __OFFSET_CMSGHDR_LEN);
+STATIC_ASSERT(offsetof(struct cmsghdr, cmsg_level) == __OFFSET_CMSGHDR_LEVEL);
+STATIC_ASSERT(offsetof(struct cmsghdr, cmsg_type) == __OFFSET_CMSGHDR_TYPE);
+
+
+
+
+
 #include <bits/flock-struct.h>
 
 /* struct flock */

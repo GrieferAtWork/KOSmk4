@@ -44,7 +44,7 @@
 #include <hybrid/__pointer.h>
 
 __SYSDECL_BEGIN
-struct iovec64 /*[prefix(iov_)]*/ {
+struct iovec64 /*[prefix(iov_)]*/ { /* TODO: Rename to iovecx64 */
 	__HYBRID_PTR64(void) iov_base; /* Pointer to data. */
 	__UINT64_TYPE__      iov_len;  /* Length of data. */
 };

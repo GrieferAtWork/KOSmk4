@@ -43,12 +43,16 @@
 
 #include <asm/socket-families.h>
 #include <asm/socket.h>
+#include <bits/cmsghdr-struct.h>
 #include <bits/msghdr-struct.h>
 #include <bits/sockaddr-struct.h>
 #include <bits/sockaddr.h>
 #include <bits/sockaddr_storage-struct.h>
 #include <bits/socket_type.h>
 #include <bits/types.h>
+#if defined(__KOS__) && defined(__USE_KOS_KERNEL)
+#include <compat/config.h>
+#endif /* __KOS__ && __USE_KOS_KERNEL */
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>
@@ -98,6 +102,14 @@ enum {
 #if defined(__KOS__) && defined(__USE_KOS)
 	MSG_CMSG_CLOFORK = 0x80000000, /* Set close_on_fork for file descriptor received through SCM_RIGHTS. */
 #endif /* __KOS__ && __USE_KOS */
+#if defined(__KOS__) && defined(__USE_KOS_KERNEL)
+#ifdef __ARCH_HAVE_COMPAT
+	MSG_CMSG_COMPAT = 0x10000000, /* Write ancillary data as `struct compat_cmsghdr'
+	                               * WARNING: No user-space interface accepts this flag! */
+#else /* __ARCH_HAVE_COMPAT */
+	MSG_CMSG_COMPAT = 0,
+#endif /* !__ARCH_HAVE_COMPAT */
+#endif /* __KOS__ && __USE_KOS_KERNEL */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -127,78 +139,89 @@ enum {
 #if defined(__KOS__) && defined(__USE_KOS)
 #define MSG_CMSG_CLOFORK MSG_CMSG_CLOFORK /* Set close_on_fork for file descriptor received through SCM_RIGHTS. */
 #endif /* __KOS__ && __USE_KOS */
+#if defined(__KOS__) && defined(__USE_KOS_KERNEL)
+#ifdef __ARCH_HAVE_COMPAT
+#define MSG_CMSG_COMPAT  MSG_CMSG_COMPAT  /* Write ancillary data as `struct compat_cmsghdr'
+                                           * WARNING: No user-space interface accepts this flag! */
+#else /* __ARCH_HAVE_COMPAT */
+#define MSG_CMSG_COMPAT  MSG_CMSG_COMPAT
+#endif /* !__ARCH_HAVE_COMPAT */
+#endif /* __KOS__ && __USE_KOS_KERNEL */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define MSG_OOB          0x00000001    /* Process out-of-band data. */
-#define MSG_PEEK         0x00000002    /* Peek at incoming messages. */
-#define MSG_DONTROUTE    0x00000004    /* Don't use local routing. */
+#define MSG_OOB          0x00000001 /* Process out-of-band data. */
+#define MSG_PEEK         0x00000002 /* Peek at incoming messages. */
+#define MSG_DONTROUTE    0x00000004 /* Don't use local routing. */
 #ifdef __USE_GNU
-#define MSG_TRYHARD      MSG_DONTROUTE /* DECnet uses a different name. */
+#define MSG_TRYHARD      0x00000004 /* DECnet uses a different name. */
 #endif /* __USE_GNU */
-#define MSG_CTRUNC       0x00000008    /* Control data lost before delivery. */
-#define MSG_PROXY        0x00000010    /* Supply or ask second address. */
+#define MSG_CTRUNC       0x00000008 /* Control data lost before delivery. */
+#define MSG_PROXY        0x00000010 /* Supply or ask second address. */
 #define MSG_TRUNC        0x00000020
-#define MSG_DONTWAIT     0x00000040    /* Nonblocking IO. */
-#define MSG_EOR          0x00000080    /* End of record. */
-#define MSG_WAITALL      0x00000100    /* Wait for a full request. */
+#define MSG_DONTWAIT     0x00000040 /* Nonblocking IO. */
+#define MSG_EOR          0x00000080 /* End of record. */
+#define MSG_WAITALL      0x00000100 /* Wait for a full request. */
 #define MSG_FIN          0x00000200
 #define MSG_SYN          0x00000400
-#define MSG_CONFIRM      0x00000800    /* Confirm path validity. */
+#define MSG_CONFIRM      0x00000800 /* Confirm path validity. */
 #define MSG_RST          0x00001000
-#define MSG_ERRQUEUE     0x00002000    /* Fetch message from error queue. */
-#define MSG_NOSIGNAL     0x00004000    /* Do not generate SIGPIPE. */
-#define MSG_MORE         0x00008000    /* Sender will send more. */
-#define MSG_WAITFORONE   0x00010000    /* Wait for at least one packet to return.*/
-#define MSG_FASTOPEN     0x20000000    /* Send data in TCP SYN. */
-#define MSG_CMSG_CLOEXEC 0x40000000    /* Set close_on_exit for file descriptor received through SCM_RIGHTS. */
+#define MSG_ERRQUEUE     0x00002000 /* Fetch message from error queue. */
+#define MSG_NOSIGNAL     0x00004000 /* Do not generate SIGPIPE. */
+#define MSG_MORE         0x00008000 /* Sender will send more. */
+#define MSG_WAITFORONE   0x00010000 /* Wait for at least one packet to return.*/
+#define MSG_FASTOPEN     0x20000000 /* Send data in TCP SYN. */
+#define MSG_CMSG_CLOEXEC 0x40000000 /* Set close_on_exit for file descriptor received through SCM_RIGHTS. */
 #if defined(__KOS__) && defined(__USE_KOS)
-#define MSG_CMSG_CLOFORK 0x80000000    /* Set close_on_fork for file descriptor received through SCM_RIGHTS. */
+#define MSG_CMSG_CLOFORK 0x80000000 /* Set close_on_fork for file descriptor received through SCM_RIGHTS. */
 #endif /* __KOS__ && __USE_KOS */
+#if defined(__KOS__) && defined(__USE_KOS_KERNEL)
+#ifdef __ARCH_HAVE_COMPAT
+#define MSG_CMSG_COMPAT  0x10000000 /* Write ancillary data as `struct compat_cmsghdr'
+                                     * WARNING: No user-space interface accepts this flag! */
+#else /* __ARCH_HAVE_COMPAT */
+#define MSG_CMSG_COMPAT  0
+#endif /* !__ARCH_HAVE_COMPAT */
+#endif /* __KOS__ && __USE_KOS_KERNEL */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* !MSG_OOB */
 
-/* Structure used for storage of ancillary data object information. */
-#ifdef __CC__
-#ifndef __cmsghdr_defined
-#define __cmsghdr_defined 1
-struct cmsghdr {
-#if __SIZEOF_SOCKLEN_T__ == __SIZEOF_SIZE_T__
-	__socklen_t      cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure. */
-#else /* __SIZEOF_SOCKLEN_T__ == __SIZEOF_SIZE_T__ */
-	__size_t         cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure.
-	                                * !! The type should be socklen_t but the definition
-	                                *    of the kernel is incompatible with this. */
-#endif /* __SIZEOF_SOCKLEN_T__ != __SIZEOF_SIZE_T__ */
-	__INT32_TYPE__   cmsg_level;   /* Originating protocol. (One of `SOL_*'; (always `SOL_SOCKET'?)) */
-	__INT32_TYPE__   cmsg_type;    /* Protocol specific type (One of `SCM_*'). */
-	__UINT8_TYPE__ __cmsg_data[1]; /* Ancillary data. */
-};
-#endif /* !__cmsghdr_defined */
-#endif /* __CC__ */
-
 /* Ancillary data object manipulation macros. */
 #ifdef __CC__
 #ifndef CMSG_DATA
+#ifdef __USE_KOS
+#define CMSG_DATA(cmsg) ((cmsg)->cmsg_data)
+#else /* __USE_KOS */
 #define CMSG_DATA(cmsg) ((cmsg)->__cmsg_data)
+#endif /* !__USE_KOS */
 #endif /* !CMSG_DATA */
+
+/* struct cmsghdr *CMSG_FIRSTHDR(struct msghdr *mhdr) */
 #ifndef CMSG_FIRSTHDR
-#define CMSG_FIRSTHDR(mhdr)                                                              \
-	((__size_t)(mhdr)->msg_controllen >= __builtin_offsetof(struct cmsghdr, __cmsg_data) \
-	 ? (struct cmsghdr *)(mhdr)->msg_control                                             \
+#define CMSG_FIRSTHDR(mhdr)                                    \
+	((__size_t)(mhdr)->msg_controllen >= __OFFSET_CMSGHDR_DATA \
+	 ? (struct cmsghdr *)(mhdr)->msg_control                   \
 	 : (struct cmsghdr *)0)
 #endif /* !CMSG_FIRSTHDR */
+
+/* size_t CMSG_ALIGN(size_t len) */
 #ifndef CMSG_ALIGN
 #define CMSG_ALIGN(len) \
-	(((len) + sizeof(__size_t) - 1) & (__size_t) ~(sizeof(__size_t) - 1))
+	(((len) + __SIZEOF_SIZE_T__ - 1) & __CCAST(__size_t)~(__SIZEOF_SIZE_T__ - 1))
 #endif /* !CMSG_ALIGN */
+
+/* size_t CMSG_SPACE(size_t len) */
 #ifndef CMSG_SPACE
 #define CMSG_SPACE(len) \
-	(CMSG_ALIGN(len) + CMSG_ALIGN(__builtin_offsetof(struct cmsghdr, __cmsg_data)))
+	(CMSG_ALIGN(len) + CMSG_ALIGN(__OFFSET_CMSGHDR_DATA))
 #endif /* !CMSG_SPACE */
+
+/* size_t CMSG_LEN(size_t len) */
 #ifndef CMSG_LEN
 #define CMSG_LEN(len) \
-	(CMSG_ALIGN(__builtin_offsetof(struct cmsghdr, __cmsg_data)) + (len))
+	(CMSG_ALIGN(__OFFSET_CMSGHDR_DATA) + (len))
 #endif /* !CMSG_LEN */
+
+/* struct cmsghdr *CMSG_NXTHDR(struct msghdr *mhdr, struct cmsghdr *cmsg) */
 #ifndef CMSG_NXTHDR
 #define CMSG_NXTHDR(mhdr, cmsg) __cmsg_nxthdr(mhdr, cmsg)
 #ifdef __CRT_HAVE___cmsg_nxthdr
@@ -206,7 +229,7 @@ __CDECLARE(__ATTR_WUNUSED,struct cmsghdr *,__NOTHROW_NCX,__cmsg_nxthdr,(struct m
 #else /* __CRT_HAVE___cmsg_nxthdr */
 __LOCAL __ATTR_WUNUSED struct cmsghdr *
 __NOTHROW_NCX(__LIBCCALL __cmsg_nxthdr)(struct msghdr *__mhdr, struct cmsghdr *__cmsg) {
-	if ((__size_t)__cmsg->cmsg_len < __builtin_offsetof(struct cmsghdr, __cmsg_data))
+	if ((__size_t)__cmsg->cmsg_len < __OFFSET_CMSGHDR_DATA)
 		return (struct cmsghdr *)0;
 	__cmsg = (struct cmsghdr *)((__byte_t *)__cmsg + CMSG_ALIGN(__cmsg->cmsg_len));
 	if ((__byte_t *)(__cmsg + 1) > ((__byte_t *)__mhdr->msg_control + __mhdr->msg_controllen) ||

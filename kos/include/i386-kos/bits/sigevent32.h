@@ -70,7 +70,7 @@ typedef union pthread_attr_t pthread_attr_t;
 #define __SIZEOF_SIGEVENT32   __SIGEV32_MAX_SIZE
 
 #ifdef __CC__
-typedef struct sigevent32 /*[PREFIX(sigev_)]*/ {
+typedef struct sigevent32 /*[PREFIX(sigev_)]*/ { /* TODO: Rename to sigeventx32 */
 	union sigval32 sigev_value;
 	__INT32_TYPE__ sigev_signo;
 	__INT32_TYPE__ sigev_notify;

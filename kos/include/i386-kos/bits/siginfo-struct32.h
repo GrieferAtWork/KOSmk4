@@ -101,7 +101,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
-typedef struct __siginfo32_struct /*[NAME(siginfo32)][PREFIX(si_)]*/ {
+typedef struct __siginfo32_struct /*[NAME(siginfo32)][PREFIX(si_)]*/ { /* TODO: Rename to __siginfox32_struct */
 	__INT32_TYPE__ si_signo; /* Signal number. */
 	__INT32_TYPE__ si_errno; /* If non-zero, an errno value associated with this signal, as defined in <errno.h>. */
 	__INT32_TYPE__ si_code;  /* Signal code. */

@@ -69,33 +69,35 @@ struct cmsghdr32;
 
 
 /* Structure describing messages sent by `sendmsg' and received by `recvmsg'. */
-struct msghdr32 /*[PREFIX(msg_)]*/ {
+struct msghdr32 /*[PREFIX(msg_)]*/ { /* TODO: Rename to msghdrx32 */
 #ifdef __USE_KOS_KERNEL
-	__HYBRID_PTR32(struct sockaddr) msg_name;      /* [TYPE(struct sockaddr *)] Address to send to/receive from. */
+	__HYBRID_PTR32(struct sockaddr) msg_name;      /* [out][0..msg_namelen] Address to send to/receive from. */
 #else /* __USE_KOS_KERNEL */
-	__HYBRID_PTR32(void)           msg_name;       /* [TYPE(struct sockaddr *)] Address to send to/receive from. */
+	__HYBRID_PTR32(void)           msg_name;       /* [out][0..msg_namelen][TYPE(struct sockaddr *)] Address to send to/receive from. */
 #endif /* !__USE_KOS_KERNEL */
-	__UINT32_TYPE__                msg_namelen;    /* Length of address data. */
+	__UINT32_TYPE__                msg_namelen;    /* [in|out][valid_if(msg_name != NULL)] Length of address data. */
 #if defined(__i386__) && !defined(__x86_64__)
-	__HYBRID_PTR32(struct iovec)   msg_iov;        /* Vector of data to send/receive into. */
+	__HYBRID_PTR32(struct iovec)   msg_iov;        /* [0..msg_iovlen] Vector of data to send/receive into. */
 #else /* __i386__ && !__x86_64__ */
-	__HYBRID_PTR32(struct iovec32) msg_iov;        /* Vector of data to send/receive into. */
+	__HYBRID_PTR32(struct iovec32) msg_iov;        /* [0..msg_iovlen] Vector of data to send/receive into. */
 #endif /* !__i386__ || __x86_64__ */
 	__UINT32_TYPE__                msg_iovlen;     /* Number of elements in the vector. */
 #ifdef __USE_KOS_KERNEL
 #if defined(__i386__) && !defined(__x86_64__)
-	__HYBRID_PTR32(struct cmsghdr) msg_control;    /* [TYPE(struct cmsghdr32 *)] Ancillary data (eg BSD filedesc passing). */
+	__HYBRID_PTR32(struct cmsghdr) msg_control;    /* [0..msg_controllen] Ancillary data (eg BSD filedesc passing). */
 #else /* __i386__ && !__x86_64__ */
-	__HYBRID_PTR32(struct cmsghdr32) msg_control;  /* [TYPE(struct cmsghdr32 *)] Ancillary data (eg BSD filedesc passing). */
+	__HYBRID_PTR32(struct cmsghdr32) msg_control;  /* [0..msg_controllen] Ancillary data (eg BSD filedesc passing). */
 #endif /* !__i386__ || __x86_64__ */
 #else /* __USE_KOS_KERNEL */
-	__HYBRID_PTR32(void)           msg_control;    /* [TYPE(struct cmsghdr32 *)] Ancillary data (eg BSD filedesc passing). */
+	__HYBRID_PTR32(void)           msg_control;    /* [0..msg_controllen][TYPE(struct cmsghdr32 *)] Ancillary data (eg BSD filedesc passing). */
 #endif /* !__USE_KOS_KERNEL */
-	__UINT32_TYPE__                msg_controllen; /* Ancillary data buffer length. !! The type should be socklen_t but the definition of the kernel is incompatible with this. */
+	__UINT32_TYPE__                msg_controllen; /* [in|out][valid_if(msg_control != NULL)] Ancillary data buffer length.
+	                                                * !! The type should be socklen_t but the definition of the
+	                                                *    kernel is incompatible with this. */
 #ifdef __USE_KOS_KERNEL
-	__UINT32_TYPE__                msg_flags;      /* Flags returned by recvmsg() */
+	__UINT32_TYPE__                msg_flags;      /* [out] Flags returned by recvmsg() (set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC | MSG_OOB | MSG_ERRQUEUE') */
 #else /* __USE_KOS_KERNEL */
-	__INT32_TYPE__                 msg_flags;      /* Flags returned by recvmsg() */
+	__INT32_TYPE__                 msg_flags;      /* [out] Flags returned by recvmsg() (set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC | MSG_OOB | MSG_ERRQUEUE') */
 #endif /* !__USE_KOS_KERNEL */
 };
 

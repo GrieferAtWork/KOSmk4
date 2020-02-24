@@ -55,6 +55,8 @@ STATIC_ASSERT(sizeof(union ieee854_float80) == 10);
 /*[[[deemon
 import * from .....misc.libgen.assert_offsetof;
 local files = {
+	"../../../../include/i386-kos/bits/cmsghdr-struct32.h",
+	"../../../../include/i386-kos/bits/cmsghdr-struct64.h",
 	"../../../../include/i386-kos/bits/flock-struct32.h",
 	"../../../../include/i386-kos/bits/flock-struct64.h",
 	"../../../../include/i386-kos/bits/itimerspec32.h",
@@ -195,6 +197,30 @@ for (local i: [:16]) {
 }
 
 ]]]*/
+#include <bits/cmsghdr-struct32.h>
+
+/* struct cmsghdrx32 */
+STATIC_ASSERT(offsetof(struct cmsghdrx32, cmsg_data) == __OFFSET_CMSGHDRX32_DATA);
+STATIC_ASSERT(offsetof(struct cmsghdrx32, cmsg_len) == __OFFSET_CMSGHDRX32_LEN);
+STATIC_ASSERT(offsetof(struct cmsghdrx32, cmsg_level) == __OFFSET_CMSGHDRX32_LEVEL);
+STATIC_ASSERT(offsetof(struct cmsghdrx32, cmsg_type) == __OFFSET_CMSGHDRX32_TYPE);
+
+
+
+
+
+#include <bits/cmsghdr-struct64.h>
+
+/* struct cmsghdrx64 */
+STATIC_ASSERT(offsetof(struct cmsghdrx64, cmsg_data) == __OFFSET_CMSGHDRX64_DATA);
+STATIC_ASSERT(offsetof(struct cmsghdrx64, cmsg_len) == __OFFSET_CMSGHDRX64_LEN);
+STATIC_ASSERT(offsetof(struct cmsghdrx64, cmsg_level) == __OFFSET_CMSGHDRX64_LEVEL);
+STATIC_ASSERT(offsetof(struct cmsghdrx64, cmsg_type) == __OFFSET_CMSGHDRX64_TYPE);
+
+
+
+
+
 #include <bits/flock-struct32.h>
 
 /* struct flockx32 */

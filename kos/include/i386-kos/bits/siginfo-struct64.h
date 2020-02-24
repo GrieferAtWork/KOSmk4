@@ -103,7 +103,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 typedef __ATTR_ALIGNED(4) __LONG64_TYPE__ __siginfo64_clock_t;
 
-typedef struct __siginfo64_struct /*[NAME(siginfo64)][PREFIX(si_)]*/ {
+typedef struct __siginfo64_struct /*[NAME(siginfo64)][PREFIX(si_)]*/ { /* TODO: Rename to __siginfox64_struct */
 	__INT32_TYPE__   si_signo; /* Signal number. */
 	__INT32_TYPE__   si_errno; /* If non-zero, an errno value associated with this signal, as defined in <errno.h>. */
 	__INT32_TYPE__   si_code;  /* Signal code. */

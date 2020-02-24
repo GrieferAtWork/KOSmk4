@@ -89,7 +89,7 @@ typedef struct __sigset_struct32 {
 #define __ALIGNOF_SIGACTION32          4
 #ifdef __CC__
 /* Structure describing the action to be taken when a signal arrives. */
-struct __ATTR_ALIGNED(__ALIGNOF_SIGACTION32) sigaction32 /*[PREFIX(sa_)]*/ {
+struct __ATTR_ALIGNED(__ALIGNOF_SIGACTION32) sigaction32 /*[PREFIX(sa_)]*/ { /* TODO: Rename to sigactionx32 */
 	/* Signal handler. */
 #ifdef __USE_POSIX199309
 	union {

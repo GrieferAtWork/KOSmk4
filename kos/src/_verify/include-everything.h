@@ -148,7 +148,9 @@ incdir("", "../../include");
 #include <asm/pageid.h>
 #include <asm/pagesize.h>
 #include <asm/param.h>
+#include <asm/poll.h>
 #include <asm/posix_types.h>
+#include <asm/socket-families.h>
 #include <asm/socket.h>
 #include <asm/sockios.h>
 #include <asm/stat.h>
@@ -163,6 +165,7 @@ incdir("", "../../include");
 #include <attr/xattr.h>
 #include <bits/auxv.h>
 #include <bits/byteswap.h>
+#include <bits/cmsghdr-struct.h>
 #include <bits/confname.h>
 #include <bits/dirent.h>
 #include <bits/dlfcn.h>
@@ -231,7 +234,9 @@ incdir("", "../../include");
 #include <bits/sigstack.h>
 #include <bits/sigthread.h>
 #include <bits/sigval.h>
+#include <bits/sockaddr-struct.h>
 #include <bits/sockaddr.h>
+#include <bits/sockaddr_storage-struct.h>
 #include <bits/socket.h>
 #include <bits/socket_type.h>
 #include <bits/stat-cyg.h>
@@ -304,6 +309,7 @@ incdir("", "../../include");
 #include <bits/xopen_lim.h>
 #include <bits/xtitypes.h>
 #include <byteswap.h>
+#include <compat/bits/cmsghdr-struct.h>
 #include <compat/bits/flock-struct.h>
 #include <compat/bits/iovec-struct.h>
 #include <compat/bits/itimerspec.h>
@@ -514,6 +520,7 @@ incdir("", "../../include");
 #include <kos/keyboard.h>
 #include <kos/ksysctl.h>
 #include <kos/malloc.h>
+#include <kos/net/printf.h>
 #include <kos/personality.h>
 #include <kos/refcnt.h>
 #include <kos/refptr.h>
@@ -714,6 +721,7 @@ incdir("", "../../include");
 #if __has_include(<ncurses_dll.h>)
 #include <ncurses_dll.h>
 #endif /* __has_include(<ncurses_dll.h>) */
+#include <net/bits/types.h>
 #include <net/ethernet.h>
 #include <net/if.h>
 #include <net/if_arp.h>
@@ -730,6 +738,8 @@ incdir("", "../../include");
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <netinet/ip_icmp.h>
+#include <netinet/ipport.h>
+#include <netinet/ipproto.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
 #include <netpacket/packet.h>

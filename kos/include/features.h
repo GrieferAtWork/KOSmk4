@@ -114,8 +114,14 @@
 #if defined(_KOS_KERNEL_SOURCE) || \
    (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE))
 #define __USE_KOS_KERNEL 1
+#if !defined(_KOS_PURE_SOURCE) || (_KOS_PURE_SOURCE + 0) == 0
 #define __USE_KOS_PURE 1
-#endif /* _KOS_KERNEL_SOURCE || (__KOS__ && __KERNEL__ && !__USE_ISOC_PURE) */
+#endif /* !_KOS_PURE_SOURCE */
+#else /* _KOS_KERNEL_SOURCE || (__KOS__ && __KERNEL__ && !__USE_ISOC_PURE) */
+#if defined(_KOS_PURE_SOURCE) && (_KOS_PURE_SOURCE + 0) != 0
+#define __USE_KOS_PURE 1
+#endif /* _KOS_PURE_SOURCE */
+#endif /* !_KOS_KERNEL_SOURCE && (!__KOS__ || !__KERNEL__ || __USE_ISOC_PURE) */
 
 /* `memcpy[bwlq]()' (Also implied by `_KOS_SOURCE') */
 #ifdef _STRING_BWLQ_SOURCE
