@@ -70,8 +70,8 @@ struct msghdr /*[PREFIX(msg_)]*/ {
 	void           *msg_control;    /* [0..msg_controllen][TYPE(struct cmsghdr32 *)] Ancillary data (eg BSD filedesc passing). */
 #endif /* !__USE_KOS_KERNEL */
 	__size_t        msg_controllen; /* [in|out][valid_if(msg_control != NULL)] Ancillary data buffer length.
-	                                                * !! The type should be socklen_t but the definition of the
-	                                                *    kernel is incompatible with this. */
+	                                 * !! The type should be socklen_t but the definition of the
+	                                 *    kernel is incompatible with this. */
 #ifdef __USE_KOS_KERNEL
 	__UINT32_TYPE__ msg_flags;      /* [out] Flags returned by recvmsg() (set of `MSG_EOR | MSG_TRUNC | MSG_CTRUNC | MSG_OOB | MSG_ERRQUEUE') */
 #else /* __USE_KOS_KERNEL */

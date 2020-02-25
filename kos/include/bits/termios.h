@@ -249,10 +249,10 @@ struct termios2 {
                               * EOL2, LNEXT, REPRINT, WERASE to be interpreted, and for the
                               * IUCLC flag to be effective */
 #ifdef __USE_MISC
-#define EXTPROC     0x010000 /* ??? */
+#define EXTPROC     0x010000 /* Skip handling of: `PARMRK', `ECHO' and `IXON'+`IXANY', as well as `c_cc[*]' */
 #endif /* __USE_MISC */
 #define __IERASING  0x100000 /* Status bit for `ECHOPRT' */
-#define __IXCASEING 0x200000 /* Status bit for `XCASE' */
+#define __IXCASEING 0x200000 /* Status bit for `XCASE' (the previous character was \) */
 #define __IEOFING   0x400000 /* Status bit for a pending `VEOF' character
                               * When set, the next time input is attempted to be read from the TTY,
                               * and the operation would have blocked, read(2) instead returns immediately,

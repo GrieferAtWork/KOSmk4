@@ -447,7 +447,7 @@ libterminal_do_iwrite_canon(struct terminal *__restrict self,
 			return temp;
 	}
 	/* Echo canonical input on-screen */
-	if (lflag & ECHO)
+	if ((lflag & (ECHO | EXTPROC)) == ECHO)
 		libterminal_do_owrite_echo(self, src, result, mode, lflag);
 done:
 	return result;
@@ -880,17 +880,14 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 		                                         lflag);
 		return result + 1;
 	}
-#if 0
-	if (!(lflag & (ISIG | IXON))) {
+	if unlikely(lflag & EXTPROC) {
 		result = libterminal_do_iwrite_controlled(self,
-		                                   src,
-		                                   num_bytes,
-		                                   mode,
-		                                   iflag,
-		                                   lflag);
-	} else
-#endif
-	{
+		                                          src,
+		                                          num_bytes,
+		                                          mode,
+		                                          iflag,
+		                                          lflag);
+	} else {
 		byte_t *iter, *end, *flush_start;
 		result      = 0;
 		end         = (iter = (byte_t *)src) + num_bytes;
@@ -1076,7 +1073,8 @@ libterminal_do_iwrite(struct terminal *__restrict self,
 	ssize_t result, temp;
 	lflag = ATOMIC_READ(self->t_ios.c_lflag);
 	/* Check for special case: No formatting required. */
-	if ((iflag & (PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IUCLC)) == 0) {
+	if ((iflag & (PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IUCLC)) == 0 ||
+	    ((lflag & EXTPROC) && (iflag & (ISTRIP | INLCR | IGNCR | ICRNL | IUCLC)) == 0)) {
 		result = libterminal_do_iwrite_formatted(self,
 		                                         src,
 		                                         num_bytes,
@@ -1116,7 +1114,7 @@ switch_ch:
 				switch (ch) {
 
 				case 255:
-					if (iflag & PARMRK) {
+					if (iflag & PARMRK && !(lflag & EXTPROC)) {
 						/*  Must escape `\377' (255) as `\377\377' */
 						if (flush_start < iter) {
 							size_t count;
@@ -1645,7 +1643,7 @@ libterminal_poll_iwrite(struct terminal *__restrict self)
 	}
 	if (!ringbuffer_poll(&self->t_ibuf, POLLOUT))
 		return TERMINAL_POLL_MAYBLOCK;
-	if (ATOMIC_READ(self->t_ios.c_lflag) & ECHO)
+	if ((ATOMIC_READ(self->t_ios.c_lflag) & (ECHO | EXTPROC)) == ECHO)
 		return TERMINAL_POLL_MAYBLOCK_UNDERLYING;
 	return TERMINAL_POLL_NONBLOCK;
 }

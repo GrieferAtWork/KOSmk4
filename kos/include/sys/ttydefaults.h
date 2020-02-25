@@ -30,13 +30,13 @@
 __SYSDECL_BEGIN
 
 #ifndef ECHOKE
-#define ECHOKE  0004000 /* If ICANON is also set, KILL is echoed by erasing each character on the line, as specified by ECHOE and ECHOPRT */
+#define ECHOKE 0x000800 /* If ICANON is also set, KILL is echoed by erasing each character on the line, as specified by ECHOE and ECHOPRT */
 #endif /* !ECHOKE */
 #ifndef ECHOCTL
-#define ECHOCTL 0001000 /* If ECHO is also set, terminal special characters other than TAB(\t), NL(\n),
-                         * START, and STOP are echoed as ^X, where X is the character with ASCII code
-                         * 0x40 greater than the special character. For example, character 0x08 (BS)
-                         * is echoed as ^H */
+#define ECHOCTL 0x000200 /* If ECHO is also set, terminal special characters other than TAB(\t), NL(\n),
+                          * START, and STOP are echoed as ^X, where X is the character with ASCII code
+                          * 0x40 greater than the special character. For example, character 0x08 (BS)
+                          * is echoed as ^H */
 #endif /* !ECHOCTL */
 
 /* Defaults on values for `c_iflag', `c_oflag', `c_cflag' and `c_lflag'. */
