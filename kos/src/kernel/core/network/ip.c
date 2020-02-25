@@ -680,7 +680,7 @@ ip_arp_and_datagram_poll(async_job_t self, struct timespec *__restrict timeout) 
 	me = (struct ip_arp_and_datagram_job *)self;
 	if (me->adj_arpc == 0) {
 		/* Wait for the send to be completed. */
-		if (aio_handle_generic_poll_err(&me->adj_done))
+		if (aio_handle_generic_poll(&me->adj_done))
 			return ASYNC_JOB_POLL_DELETE;
 		return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
 	}
@@ -700,8 +700,11 @@ PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
 ip_arp_and_datagram_work(async_job_t self) {
 	struct ip_arp_and_datagram_job *me;
 	me = (struct ip_arp_and_datagram_job *)self;
-	if (me->adj_arpc == 0)
+	if (me->adj_arpc == 0) {
+		assert(aio_handle_generic_hascompleted(&me->adj_done));
+		aio_handle_generic_checkerror(&me->adj_done);
 		return true; /* The delete-transmit-complete is handled by poll() */
+	}
 	/* Check if the MAC has become available. */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
 		/* There we go! */
@@ -912,7 +915,7 @@ ip_arp_and_datagrams_poll(async_job_t self, struct timespec *__restrict timeout)
 	me = (struct ip_arp_and_datagrams_job *)self;
 	if (me->adj_arpc == 0) {
 		/* Wait for the send to be completed. */
-		if (aio_multihandle_generic_poll_err(&me->adj_done))
+		if (aio_multihandle_generic_poll(&me->adj_done))
 			return ASYNC_JOB_POLL_DELETE;
 		return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
 	}
@@ -932,8 +935,11 @@ PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
 ip_arp_and_datagrams_work(async_job_t self) {
 	struct ip_arp_and_datagrams_job *me;
 	me = (struct ip_arp_and_datagrams_job *)self;
-	if (me->adj_arpc == 0)
+	if (me->adj_arpc == 0) {
+		assert(aio_multihandle_generic_hascompleted(&me->adj_done));
+		aio_multihandle_generic_checkerror(&me->adj_done);
 		return true; /* The delete-transmit-complete is handled by poll() */
+	}
 	/* Check if the MAC has become available. */
 	if (me->adj_peer->npa_flags & NET_PEERADDR_HAVE_MAC) {
 		/* There we go!

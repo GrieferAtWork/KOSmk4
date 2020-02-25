@@ -154,6 +154,21 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE,                         /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
 	E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC,                        /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
 	E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0,              /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
+	E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT,                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
+	E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT,                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
+	E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING,               /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED,             /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `shutdown(2)' on a socket without first calling `connect(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED,          /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getpeername(2)' on a socket without first calling `connect(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED,                 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `send(2)' on a socket without first calling `connect(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED,                 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `recv(2)' on a socket without first calling `connect(2)'. */
+	E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED,          /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `connect(2)' or `sendto(2)' on a socket that had already been `connect(2)'ed before. */
+	E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND,                 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `bind(2)' or `recvfrom(2)' on a socket that had already been `bind(2)'ed before. */
+	E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY,          /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `bind()'). */
+	E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY,       /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `connect()'). */
+	E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY,        /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `sendto()'). */
+	E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY,                  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `family' argument passed to `socket(2)' is unknown or unsupported. */
+	E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE,                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `socket(2)' is unknown or unsupported by the given `family'. */
+	E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL,                /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `protocol' argument passed to `socket(2)' is unknown or unsupported by the given `family' and `type'. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -283,6 +298,21 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
 #define E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
+#define E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
+#define E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED             E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED             /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `shutdown(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED          E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED          /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getpeername(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED                 E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED                 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `send(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED                 E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED                 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `recv(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED          E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED          /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `connect(2)' or `sendto(2)' on a socket that had already been `connect(2)'ed before. */
+#define E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND                 E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND                 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `bind(2)' or `recvfrom(2)' on a socket that had already been `bind(2)'ed before. */
+#define E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY          E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY          /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `bind()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY       E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY       /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `connect()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY        E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY        /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `sendto()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY                  E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY                  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `family' argument passed to `socket(2)' is unknown or unsupported. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE                    E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `socket(2)' is unknown or unsupported by the given `family'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL                E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL                /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `protocol' argument passed to `socket(2)' is unknown or unsupported by the given `family' and `type'. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG                        1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFD' */
@@ -409,6 +439,21 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_MODE                         108 /* E_INVALID_ARGUMENT_BAD_VALUE: [unsigned int mode = (KD_TEXT, KD_GRAPHICS)] Attempted to set an unsupported video mode. */
 #define E_INVALID_ARGUMENT_CONTEXT_VIDEO_CODEC                        109 /* E_INVALID_ARGUMENT_BAD_VALUE: [vd_codec_t codec] Attempted to set an unsupported video codec/resolution combination. */
 #define E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0              110 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [uintptr_t index] The `hop_driver_string::ds_index' field was non-zero for a HOP that only accepts `0' as index. */
+#define E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                         111 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT                         112 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `setsockopt()'. */
+#define E_INVALID_ARGUMENT_CONTEXT_ACCEPT_NOT_LISTENING               113 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `accept(2)' on a socket without first calling `listen(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED             114 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `shutdown(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED          115 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `getpeername(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED                 116 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `send(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED                 117 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `recv(2)' on a socket without first calling `connect(2)'. */
+#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED          118 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `connect(2)' or `sendto(2)' on a socket that had already been `connect(2)'ed before. */
+#define E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND                 119 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `bind(2)' or `recvfrom(2)' on a socket that had already been `bind(2)'ed before. */
+#define E_INVALID_ARGUMENT_CONTEXT_BIND_WRONG_ADDRESS_FAMILY          120 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `bind()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY       121 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `connect()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY        122 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: A different address family was expected (in `sendto()'). */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY                  123 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `family' argument passed to `socket(2)' is unknown or unsupported. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE                    124 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `socket(2)' is unknown or unsupported by the given `family'. */
+#define E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL                125 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `protocol' argument passed to `socket(2)' is unknown or unsupported by the given `family' and `type'. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

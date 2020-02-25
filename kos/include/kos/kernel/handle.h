@@ -79,7 +79,8 @@
 #define HANDLE_TYPE_FUTEX           0x0016 /* `struct vm_futex' */
 #define HANDLE_TYPE_FUTEXFD         0x0017 /* `struct vm_futexfd' */
 #define HANDLE_TYPE_DRIVER_SECTION  0x0018 /* `struct driver_section' */
-#define HANDLE_TYPE_COUNT           0x0019 /* # of recognized handle types
+#define HANDLE_TYPE_SOCKET          0x0019 /* `struct socket' */
+#define HANDLE_TYPE_COUNT           0x001a /* # of recognized handle types
                                             * NOTE: After changing this value, be sure to
                                             * `touch /kos/src/kernel/include/kernel/handle.h' */
 
@@ -106,23 +107,25 @@
 	cb(HANDLE_TYPE_DATAPART, struct vm_datapart)                          \
 	cb(HANDLE_TYPE_FUTEX, struct vm_futex)                                \
 	cb(HANDLE_TYPE_FUTEXFD, struct vm_futexfd)                            \
-	cb(HANDLE_TYPE_DRIVER_SECTION, struct driver_section)
+	cb(HANDLE_TYPE_DRIVER_SECTION, struct driver_section)                 \
+	cb(HANDLE_TYPE_SOCKET, struct socket)
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle type
  * that could reasonably be used for callback registrations (such
  * as `register_async_worker()' or `hisr_register()') */
-#define HANDLE_FOREACH_CUSTOMTYPE(cb)                      \
-	cb(HANDLE_TYPE_DATABLOCK, struct vm_datablock)         \
-	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device) \
-	cb(HANDLE_TYPE_VM, struct vm)                          \
-	cb(HANDLE_TYPE_CLOCK, struct realtime_clock_struct)    \
-	cb(HANDLE_TYPE_DRIVER, struct driver)                  \
-	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device)
+#define HANDLE_FOREACH_CUSTOMTYPE(cb)                        \
+	cb(HANDLE_TYPE_DATABLOCK, struct vm_datablock)           \
+	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device)   \
+	cb(HANDLE_TYPE_VM, struct vm)                            \
+	cb(HANDLE_TYPE_CLOCK, struct realtime_clock_struct)      \
+	cb(HANDLE_TYPE_DRIVER, struct driver)                    \
+	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device) \
+	cb(HANDLE_TYPE_SOCKET, struct socket)
 
 
 
 /* Handle type-kind codes (used to identify special sub-classes of handle types). */
-#define HANDLE_TYPEKIND_GENERIC     0x0000 /* Generic catch-all handle-type kind */
+#define HANDLE_TYPEKIND_GENERIC 0x0000 /* Generic catch-all handle-type kind */
 
 /* Handle kinds for `HANDLE_TYPE_DATABLOCK' */
 #define HANDLE_TYPEKIND_DATABLOCK_GENERIC     0x0000 /* The handle refers to a `struct vm_datablock' */

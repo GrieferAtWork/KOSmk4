@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d2bf34a */
+/* HASH CRC-32:0xaf546665 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,6 +133,14 @@ __DECL_BEGIN
  * 	@@or (uintptr_t)-1 when all vectors are already in use.
  * 	member vector: uintptr_t; */
 #define E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS (E_BADALLOC,0x0008)
+/* Failed to dynamically allocate a socket port number
+ * 	@@The socket's address family (one of `AF_*')
+ * 	member address_family: uintptr_t;
+ * 	@@The socket's type (one of `SOCK_*')
+ * 	member socket_type: uintptr_t;
+ * 	@@The socket's protocol (dependent on `address_family' and `socket_type')
+ * 	member protocol: uintptr_t; */
+#define E_BADALLOC_INSUFFICIENT_PORT_NUMBERS (E_BADALLOC,0x0009)
 
 
 
@@ -203,6 +211,26 @@ __DECL_BEGIN
  * 	@@The command that was given
  * 	member command: uintptr_t; */
 #define E_INVALID_ARGUMENT_UNKNOWN_COMMAND (E_INVALID_ARGUMENT,0x0008)
+/* The current object state does not allow this operation
+ * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
+ * 	member context: unsigned int; */
+#define E_INVALID_ARGUMENT_BAD_STATE (E_INVALID_ARGUMENT,0x0009)
+/* Unrecognized combination of level/optname
+ * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
+ * 	member context: unsigned int;
+ * 	@@The level that was given to `getoptname()' or `setoptname()'
+ * 	member level: uintptr_t;
+ * 	@@The optname that was given to `getoptname()' or `setoptname()'
+ * 	member optname: uintptr_t; */
+#define E_INVALID_ARGUMENT_SOCKET_OPT (E_INVALID_ARGUMENT,0x000a)
+/* One command was given when a different one was expected
+ * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
+ * 	member context: unsigned int;
+ * 	@@The command that was given
+ * 	member command: uintptr_t;
+ * 	@@The command that had been expected
+ * 	member expected_command: uintptr_t; */
+#define E_INVALID_ARGUMENT_UNEXPECTED_COMMAND (E_INVALID_ARGUMENT,0x000b)
 
 
 
@@ -266,6 +294,18 @@ __DECL_BEGIN
 #define E_INVALID_HANDLE_OPERATION_GETPROPERTY 0x0011
 /* Same as `E_INVALID_HANDLE_OPERATION_GETPROPERTY', but for setting properties */
 #define E_INVALID_HANDLE_OPERATION_SETPROPERTY 0x0012
+/* Network operation not supported by address familiy, socket type, and protocol
+ * 	@@The FD number that was accessed
+ * 	member fd: unsigned int;
+ * 	@@The attempted network operation (One of `E_NET_OPERATION_*')
+ * 	member operation_id: uintptr_t;
+ * 	@@The socket's address family (one of `AF_*')
+ * 	member address_family: uintptr_t;
+ * 	@@The socket's type (one of `SOCK_*')
+ * 	member socket_type: uintptr_t;
+ * 	@@The socket's protocol (dependent on `address_family' and `socket_type')
+ * 	member protocol: uintptr_t; */
+#define E_INVALID_HANDLE_NET_OPERATION (E_INVALID_HANDLE,0x0004)
 
 
 
@@ -447,7 +487,32 @@ __DECL_BEGIN
 
 /* Network error */
 #define E_NET_ERROR (0x0081)
+/* The given host cannot be reached */
 #define E_NET_HOST_UNREACHABLE (E_NET_ERROR,0x0001)
+/* The specified address is already in use
+ * 	@@The context under which the address is already in use
+ * 	member context: unsigned int; */
+#define E_NET_ADDRESS_IN_USE (E_NET_ERROR,0x0002)
+/* The given message is too long
+ * 	@@The requested message length
+ * 	member req_length: size_t;
+ * 	@@The max possible message length
+ * 	member max_length: size_t; */
+#define E_NET_MESSAGE_TOO_LONG (E_NET_ERROR,0x0003)
+/* accept() failed to fully establish a connection */
+#define E_NET_CONNECTION_ABORT (E_NET_ERROR,0x0004)
+/* connect() or recv() found no one to be listening on the remote address */
+#define E_NET_CONNECTION_REFUSED (E_NET_ERROR,0x0005)
+/* The connection was reset by the remote during send() */
+#define E_NET_CONNECTION_RESET (E_NET_ERROR,0x0006)
+/* Establishing a connection has failed due to a timeout */
+#define E_NET_TIMEOUT (E_NET_ERROR,0x0007)
+/* The requested network cannot be reached */
+#define E_NET_UNREACHABLE (E_NET_ERROR,0x0008)
+/* Attempted to bind() to a non-local address */
+#define E_NET_ADDRESS_NOT_AVAILABLE (E_NET_ERROR,0x0009)
+/* Attempted to write() after the local end had been shutdown() */
+#define E_NET_SHUTDOWN (E_NET_ERROR,0x000a)
 
 
 

@@ -58,8 +58,8 @@ linebuffer_writef(struct linebuffer *__restrict self,
                   size_t num_bytes, iomode_t mode) {
 	KERNEL_SELECT(__size_t, __ssize_t) result;
 	result = mode & IO_NONBLOCK
-	       ? linebuffer_write_nonblock(self, src, num_bytes)
-	       : linebuffer_write(self, src, num_bytes);
+	         ? linebuffer_write_nonblock(self, src, num_bytes)
+	         : linebuffer_write(self, src, num_bytes);
 #ifdef __KERNEL__
 	assert((size_t)result <= num_bytes);
 #else /* __KERNEL__ */

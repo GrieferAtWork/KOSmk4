@@ -166,6 +166,21 @@ class E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS: E_BADALLOC = 0x0008 {
 	member vector: uintptr_t;
 }
 
+[errno(EADDRNOTAVAIL)]
+[message("Failed to dynamically allocate a socket port number")]
+class E_BADALLOC_INSUFFICIENT_PORT_NUMBERS: E_BADALLOC = 0x0009 {
+	@@The socket's address family (one of `AF_*')
+	[tostr(select("AF_*"))]
+	member address_family: uintptr_t;
+	@@The socket's type (one of `SOCK_*')
+	[tostr(select("SOCK_*"))]
+	member socket_type: uintptr_t;
+	@@The socket's protocol (dependent on `address_family' and `socket_type')
+	member protocol: uintptr_t;
+}
+
+
+
 %
 %
 %
@@ -260,6 +275,10 @@ class E_INVALID_ARGUMENT_RESERVED_ARGUMENT: E_INVALID_ARGUMENT = 0x0007 {
 	member context: unsigned int;
 }
 
+[errno({ptr0} == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY ? EAFNOSUPPORT :
+       {ptr0} == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE ? ESOCKTNOSUPPORT :
+       {ptr0} == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL ? EPROTONOSUPPORT :
+       EINVAL)]
 [message("An unknown command was given")]
 class E_INVALID_ARGUMENT_UNKNOWN_COMMAND: E_INVALID_ARGUMENT = 0x0008 {
 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
@@ -267,6 +286,44 @@ class E_INVALID_ARGUMENT_UNKNOWN_COMMAND: E_INVALID_ARGUMENT = 0x0008 {
 	member context: unsigned int;
 	@@The command that was given
 	member command: uintptr_t;
+}
+
+[errno({ptr0} == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
+       {ptr0} == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
+       {ptr0} == E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED ? ENOTCONN :
+       {ptr0} == E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED ? EDESTADDRREQ :
+       {ptr0} == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED ? EISCONN :
+       EINVAL)]
+[message("The current object state does not allow this operation")]
+class E_INVALID_ARGUMENT_BAD_STATE: E_INVALID_ARGUMENT = 0x0009 {
+	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
+	[tostr(select("E_INVALID_ARGUMENT_CONTEXT_*"))]
+	member context: unsigned int;
+}
+
+[errno(ENOPROTOOPT)]
+[message("Unrecognized combination of level/optname")]
+class E_INVALID_ARGUMENT_SOCKET_OPT: E_INVALID_ARGUMENT = 0x000a {
+	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
+	[tostr(select("E_INVALID_ARGUMENT_CONTEXT_*"))]
+	member context: unsigned int;
+	@@The level that was given to `getoptname()' or `setoptname()'
+	member level: uintptr_t;
+	@@The optname that was given to `getoptname()' or `setoptname()'
+	member optname: uintptr_t;
+}
+
+/* For some reason, connect() sets a different errno for bad address families... */
+[errno({ptr0} == E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY ? EAFNOSUPPORT : EINVAL)]
+[message("One command was given when a different one was expected")]
+class E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: E_INVALID_ARGUMENT = 0x000b {
+	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')
+	[tostr(select("E_INVALID_ARGUMENT_CONTEXT_*"))]
+	member context: unsigned int;
+	@@The command that was given
+	member command: uintptr_t;
+	@@The command that had been expected
+	member expected_command: uintptr_t;
 }
 
 
@@ -313,6 +370,7 @@ const E_INVALID_HANDLE_FILE_UNALLOCATED = 0x0002;
 const E_INVALID_HANDLE_FILE_ILLEGAL     = 0x0003;
 
 [errno(EBADFD)]
+[errno({ptr1} == HANDLE_TYPE_SOCKET ? ENOTSOCK : EBADFD)]
 [message("Invalid file handle type")]
 class E_INVALID_HANDLE_FILETYPE: E_INVALID_HANDLE = 0x0002 {
 	@@The FD number that was accessed
@@ -351,6 +409,26 @@ const E_INVALID_HANDLE_OPERATION_TRUNC = 0x0003;
 const E_INVALID_HANDLE_OPERATION_GETPROPERTY = 0x0011;
 @@Same as `E_INVALID_HANDLE_OPERATION_GETPROPERTY', but for setting properties
 const E_INVALID_HANDLE_OPERATION_SETPROPERTY = 0x0012;
+
+
+[errno(EOPNOTSUPP)]
+[message("Network operation not supported by address familiy, socket type, and protocol")]
+class E_INVALID_HANDLE_NET_OPERATION: E_INVALID_HANDLE = 0x0004 {
+	@@The FD number that was accessed
+	member fd: unsigned int;
+	@@The attempted network operation (One of `E_NET_OPERATION_*')
+	[tostr(select("E_NET_OPERATION_*"))]
+	member operation_id: uintptr_t;
+	@@The socket's address family (one of `AF_*')
+	[tostr(select("AF_*"))]
+	member address_family: uintptr_t;
+	@@The socket's type (one of `SOCK_*')
+	[tostr(select("SOCK_*"))]
+	member socket_type: uintptr_t;
+	@@The socket's protocol (dependent on `address_family' and `socket_type')
+	member protocol: uintptr_t;
+}
+
 
 
 %
@@ -658,8 +736,61 @@ class E_NET_ERROR = 0x0081 {
 /* TODO: Net-error sub-classes */
 
 [errno(EHOSTUNREACH)]
+[message("The given host cannot be reached")]
 class E_NET_HOST_UNREACHABLE : E_NET_ERROR = 0x0001 {
 	/* TODO: Exception pointers, such as the IP (maybe?) */
+}
+
+[errno(EADDRINUSE)]
+[message("The specified address is already in use")]
+class E_NET_ADDRESS_IN_USE : E_NET_ERROR = 0x0002 {
+	@@The context under which the address is already in use
+	[tostr(select("E_NET_ADDRESS_IN_USE_CONTEXT_*"))]
+	member context: unsigned int;
+}
+
+[errno(EMSGSIZE)]
+[message("The given message is too long")]
+class E_NET_MESSAGE_TOO_LONG : E_NET_ERROR = 0x0003 {
+	@@The requested message length
+	member req_length: size_t;
+	@@The max possible message length
+	member max_length: size_t;
+}
+
+[errno(ECONNABORTED)]
+[message("accept() failed to fully establish a connection")]
+class E_NET_CONNECTION_ABORT : E_NET_ERROR = 0x0004 {
+}
+
+[errno(ECONNREFUSED)]
+[message("connect() or recv() found no one to be listening on the remote address")]
+class E_NET_CONNECTION_REFUSED : E_NET_ERROR = 0x0005 {
+}
+
+[errno(ECONNRESET)]
+[message("The connection was reset by the remote during send()")]
+class E_NET_CONNECTION_RESET : E_NET_ERROR = 0x0006 {
+}
+
+[errno(ETIMEDOUT)]
+[message("Establishing a connection has failed due to a timeout")]
+class E_NET_TIMEOUT : E_NET_ERROR = 0x0007 {
+}
+
+[errno(ENETUNREACH)]
+[message("The requested network cannot be reached")]
+class E_NET_UNREACHABLE : E_NET_ERROR = 0x0008 {
+}
+
+[errno(EADDRNOTAVAIL)]
+[message("Attempted to bind() to a non-local address")]
+class E_NET_ADDRESS_NOT_AVAILABLE : E_NET_ERROR = 0x0009 {
+}
+
+[errno(EPIPE)]
+[message("Attempted to write() after the local end had been shutdown()")]
+class E_NET_SHUTDOWN : E_NET_ERROR = 0x000a {
 }
 
 %

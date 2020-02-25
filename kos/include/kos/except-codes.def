@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7684591 */
+/* HASH CRC-32:0xe928e709 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,7 @@ CLASS(E_BADALLOC,MESSAGE("Failed to allocate sufficient resources"),ERRNO(ENOMEM
 	SUBCLASS(E_BADALLOC_INSUFFICIENT_HANDLE_RANGE,MESSAGE("Attempted to allocated a handle index greater than the max allowed index"),ERRNO(ENFILE),(MEMBER(unsigned int,req_handle) MEMBER(unsigned int,cur_max) MEMBER(unsigned int,cur_limit)))
 	SUBCLASS(E_BADALLOC_INSUFFICIENT_DEVICE_NUMBERS,MESSAGE("No suitable, free device numbers are available"),ERRNO(ENOMEM),(MEMBER(unsigned int,dev_kind)))
 	SUBCLASS(E_BADALLOC_INSUFFICIENT_INTERRUPT_VECTORS,MESSAGE("The given interrupt vector is, or all usable vectors are already in use"),ERRNO(ENOMEM),(MEMBER(uintptr_t,vector)))
+	SUBCLASS(E_BADALLOC_INSUFFICIENT_PORT_NUMBERS,MESSAGE("Failed to dynamically allocate a socket port number"),ERRNO(EADDRNOTAVAIL),(MEMBER(uintptr_t,address_family) MEMBER(uintptr_t,socket_type) MEMBER(uintptr_t,protocol)))
 END
 CLASS(E_INVALID_ARGUMENT,MESSAGE("Invalid argument"),ERRNO(EINVAL),())
 	SUBCLASS(E_INVALID_ARGUMENT_UNKNOWN_FLAG,MESSAGE("An invalid set of flags was given"),NO_ERRNO,(MEMBER(unsigned int,context) MEMBER(uintptr_t,value) MEMBER(uintptr_t,mask) MEMBER(uintptr_t,result)))
@@ -51,7 +52,18 @@ CLASS(E_INVALID_ARGUMENT,MESSAGE("Invalid argument"),ERRNO(EINVAL),())
 	SUBCLASS(E_INVALID_ARGUMENT_BAD_ALIGNMENT,MESSAGE("A given value has an invalid alignment"),NO_ERRNO,(MEMBER(unsigned int,context) MEMBER(uintptr_t,value) MEMBER(uintptr_t,mask) MEMBER(uintptr_t,required_masked_value)))
 	SUBCLASS(E_INVALID_ARGUMENT_BAD_VALUE,MESSAGE("A given value is invalid for the associated argument"),NO_ERRNO,(MEMBER(unsigned int,context) MEMBER(uintptr_t,value)))
 	SUBCLASS(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,MESSAGE("A reserved argument had an unexpected value"),NO_ERRNO,(MEMBER(unsigned int,context)))
-	SUBCLASS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,MESSAGE("An unknown command was given"),NO_ERRNO,(MEMBER(unsigned int,context) MEMBER(uintptr_t,command)))
+	SUBCLASS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,MESSAGE("An unknown command was given"),ERRNO(GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY ? EAFNOSUPPORT :
+       GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE ? ESOCKTNOSUPPORT :
+       GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL ? EPROTONOSUPPORT :
+       EINVAL),(MEMBER(unsigned int,context) MEMBER(uintptr_t,command)))
+	SUBCLASS(E_INVALID_ARGUMENT_BAD_STATE,MESSAGE("The current object state does not allow this operation"),ERRNO(GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED ||
+       GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED ||
+       GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED ? ENOTCONN :
+       GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED ? EDESTADDRREQ :
+       GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED ? EISCONN :
+       EINVAL),(MEMBER(unsigned int,context)))
+	SUBCLASS(E_INVALID_ARGUMENT_SOCKET_OPT,MESSAGE("Unrecognized combination of level/optname"),ERRNO(ENOPROTOOPT),(MEMBER(unsigned int,context) MEMBER(uintptr_t,level) MEMBER(uintptr_t,optname)))
+	SUBCLASS(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,MESSAGE("One command was given when a different one was expected"),ERRNO(GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY ? EAFNOSUPPORT : EINVAL),(MEMBER(unsigned int,context) MEMBER(uintptr_t,command) MEMBER(uintptr_t,expected_command)))
 END
 CLASS(E_NOT_IMPLEMENTED,MESSAGE("Unimplemented function"),ERRNO(EPERM),())
 	SUBCLASS(E_NOT_IMPLEMENTED_UNSUPPORTED,NO_MESSAGE,NO_ERRNO,())
@@ -59,8 +71,9 @@ CLASS(E_NOT_IMPLEMENTED,MESSAGE("Unimplemented function"),ERRNO(EPERM),())
 END
 CLASS(E_INVALID_HANDLE,MESSAGE("Bad file descriptor"),ERRNO(EBADF),())
 	SUBCLASS(E_INVALID_HANDLE_FILE,MESSAGE("The given file descriptor is invalid"),NO_ERRNO,(MEMBER(unsigned int,fd) MEMBER(unsigned int,reason) MEMBER(unsigned int,fd_max) MEMBER(unsigned int,fd_limit)))
-	SUBCLASS(E_INVALID_HANDLE_FILETYPE,MESSAGE("Invalid file handle type"),ERRNO(EBADFD),(MEMBER(unsigned int,fd) MEMBER(unsigned int,needed_handle_type) MEMBER(unsigned int,actual_handle_type) MEMBER(unsigned int,needed_handle_kind) MEMBER(unsigned int,actual_handle_kind)))
+	SUBCLASS(E_INVALID_HANDLE_FILETYPE,MESSAGE("Invalid file handle type"),ERRNO(GET_EXCEPTION_POINTER(1) == HANDLE_TYPE_SOCKET ? ENOTSOCK : EBADFD),(MEMBER(unsigned int,fd) MEMBER(unsigned int,needed_handle_type) MEMBER(unsigned int,actual_handle_type) MEMBER(unsigned int,needed_handle_kind) MEMBER(unsigned int,actual_handle_kind)))
 	SUBCLASS(E_INVALID_HANDLE_OPERATION,MESSAGE("Invalid handle operation"),ERRNO(EINVAL),(MEMBER(unsigned int,fd) MEMBER(unsigned int,op) MEMBER(iomode_t,handle_mode)))
+	SUBCLASS(E_INVALID_HANDLE_NET_OPERATION,MESSAGE("Network operation not supported by address familiy, socket type, and protocol"),ERRNO(EOPNOTSUPP),(MEMBER(unsigned int,fd) MEMBER(uintptr_t,operation_id) MEMBER(uintptr_t,address_family) MEMBER(uintptr_t,socket_type) MEMBER(uintptr_t,protocol)))
 END
 CLASS(E_WOULDBLOCK,MESSAGE("A blocking call was attempted when non-blocking behavior was requested"),ERRNO(EAGAIN),())
 	SUBCLASS(E_WOULDBLOCK_PREEMPTED,NO_MESSAGE,NO_ERRNO,())
@@ -113,7 +126,16 @@ CLASS(E_FSERROR,MESSAGE("Filesystem error"),NO_ERRNO,())
        GET_EXCEPTION_POINTER(0) == E_FILESYSTEM_OPERATION_TRUNC || GET_EXCEPTION_POINTER(0) == E_FILESYSTEM_OPERATION_READDIR) ? EINVAL : EPERM),(MEMBER(uintptr_t,operation_id)))
 END
 CLASS(E_NET_ERROR,MESSAGE("Network error"),NO_ERRNO,())
-	SUBCLASS(E_NET_HOST_UNREACHABLE,NO_MESSAGE,ERRNO(EHOSTUNREACH),())
+	SUBCLASS(E_NET_HOST_UNREACHABLE,MESSAGE("The given host cannot be reached"),ERRNO(EHOSTUNREACH),())
+	SUBCLASS(E_NET_ADDRESS_IN_USE,MESSAGE("The specified address is already in use"),ERRNO(EADDRINUSE),(MEMBER(unsigned int,context)))
+	SUBCLASS(E_NET_MESSAGE_TOO_LONG,MESSAGE("The given message is too long"),ERRNO(EMSGSIZE),(MEMBER(size_t,req_length) MEMBER(size_t,max_length)))
+	SUBCLASS(E_NET_CONNECTION_ABORT,MESSAGE("accept() failed to fully establish a connection"),ERRNO(ECONNABORTED),())
+	SUBCLASS(E_NET_CONNECTION_REFUSED,MESSAGE("connect() or recv() found no one to be listening on the remote address"),ERRNO(ECONNREFUSED),())
+	SUBCLASS(E_NET_CONNECTION_RESET,MESSAGE("The connection was reset by the remote during send()"),ERRNO(ECONNRESET),())
+	SUBCLASS(E_NET_TIMEOUT,MESSAGE("Establishing a connection has failed due to a timeout"),ERRNO(ETIMEDOUT),())
+	SUBCLASS(E_NET_UNREACHABLE,MESSAGE("The requested network cannot be reached"),ERRNO(ENETUNREACH),())
+	SUBCLASS(E_NET_ADDRESS_NOT_AVAILABLE,MESSAGE("Attempted to bind() to a non-local address"),ERRNO(EADDRNOTAVAIL),())
+	SUBCLASS(E_NET_SHUTDOWN,MESSAGE("Attempted to write() after the local end had been shutdown()"),ERRNO(EPIPE),())
 END
 CLASS(E_IOERROR,MESSAGE("Hardware error, or miss-behaving/miss-configured device"),ERRNO(EIO),())
 	SUBCLASS(E_IOERROR_ERRORBIT,MESSAGE("A hardware error bit has been set"),NO_ERRNO,(MEMBER(uintptr_t,subsystem) MEMBER(uintptr_t,reason)))
