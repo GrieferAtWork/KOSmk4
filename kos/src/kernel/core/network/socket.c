@@ -154,6 +154,9 @@ socket_poll(struct socket *__restrict self, poll_mode_t what) {
 	return result;
 }
 
+/* Define the socket poll() handle operator */
+DEFINE_INTERN_ALIAS(handle_socket_poll, socket_poll);
+
 
 
 /* The synchronous / non-blocking version of the async function `socket_aconnect()'.
@@ -1519,6 +1522,8 @@ socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd,
 	return result;
 }
 
+/* Define the socket ioctl() handle operator */
+DEFINE_INTERN_ALIAS(handle_socket_ioctl, socket_ioctl);
 
 
 
