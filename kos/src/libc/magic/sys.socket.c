@@ -204,7 +204,7 @@ recv:($fd_t sockfd, [outp(bufsize)] void *buf, size_t bufsize,
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [cp]
 sendto:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
-        [inp(addr_len)] __CONST_SOCKADDR_ARG addr, socklen_t addr_len) -> ssize_t;
+        [inp_opt(addr_len)] __CONST_SOCKADDR_ARG addr, socklen_t addr_len) -> ssize_t;
 
 @@Read BUFSIZE bytes into BUF through socket FD.
 @@If ADDR is not NULL, fill in *ADDR_LEN bytes of it with tha address of
@@ -214,7 +214,7 @@ sendto:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, __STDC_INT
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][ATTR_WUNUSED]
 recvfrom:($fd_t sockfd, [outp(bufsize)] void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
-          [outp(*addr_len)] __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) -> ssize_t;
+          [outp_opt(*addr_len)] __SOCKADDR_ARG addr, [nullable] socklen_t *__restrict addr_len) -> ssize_t;
 
 @@Send a message described MESSAGE on socket FD.
 @@Returns the number of bytes sent, or -1 for errors
