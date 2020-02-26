@@ -185,7 +185,7 @@ struct socket_ops {
 	 *       the same as so_poll() indicate that no data can be received) */
 
 	/* Socket address family (one of `AF_*'). */
-	uintptr_t sk_family;
+	uintptr_t so_family;
 
 	/* [0..1] Optional finalizer callback. */
 	NOBLOCK NONNULL((1)) void
@@ -464,6 +464,14 @@ struct socket_ops {
 	                       socklen_t optlen, iomode_t mode)
 			THROWS(E_INVALID_ARGUMENT_SOCKET_OPT, E_BUFFER_TOO_SMALL);
 
+	/* [0..1]
+	 * Custom I/O control command handler for this socket type.
+	 * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
+	NONNULL((1)) syscall_slong_t
+	(KCALL *so_ioctl)(struct socket *__restrict self, syscall_ulong_t cmd,
+	                  USER UNCHECKED void *arg, iomode_t mode)
+			THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
+
 	/* [0..1] Optional free function. */
 	NOBLOCK NONNULL((1)) void
 	/*NOTHROW*/ (KCALL *so_free)(struct socket *__restrict self);
@@ -487,7 +495,7 @@ struct socket {
 	 *       the potential reference loop) */
 	WEAK refcnt_t                          sk_refcnt;     /* Reference counter. */
 	WEAK refcnt_t                          sk_weakrefcnt; /* Weak reference counter. */
-	struct socket_ops                     *sk_ops;        /* [1..1][const] Socket operation callbacks. */
+	struct socket_ops const               *sk_ops;        /* [1..1][const] Socket operation callbacks. */
 	uintptr_half_t                         sk_type;       /* [const] Socket type (one of `SOCK_*'). */
 	uintptr_half_t                         sk_prot;       /* [const] Socket protocol (depends on `s_family' and `s_type'; e.g. `IPPROTO_*'). */
 	XATOMIC_REF(struct socket_connect_aio) sk_ncon;       /* [0..1] Non-blocking connect controller.
@@ -514,6 +522,16 @@ DEFINE_WEAKREFCOUNT_FUNCTIONS(struct socket, sk_weakrefcnt, socket_free)
 FUNDEF WUNUSED NONNULL((1)) bool KCALL
 socket_isconnected(struct socket *__restrict self);
 
+
+/* Return the address family of the socket (one of `AF_*') */
+#define socket_getfamily(self) ((self)->sk_ops->so_family)
+
+/* Return the type of socket (one of `SOCK_*') */
+#define socket_gettype(self) ((self)->sk_type)
+
+/* Return the protocol of this socket (dependent
+ * on `socket_getfamily()' and `socket_gettype()') */
+#define socket_getprotocol(self) ((self)->sk_prot)
 
 /* Poll for special condition
  * The following conditions are defined:
@@ -736,17 +754,21 @@ socket_arecvv(struct socket *__restrict self,
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED);
 
 /* Recv helper functions for blocking and non-blocking operations.
- * @return: * : The actual number of received bytes (as returned by AIO) */
+ * @return: * : The actual number of received bytes (as returned by AIO)
+ * @throws: E_NET_TIMEOUT: The given `timeout' has expired, and `IO_NODATAZERO' wasn't set.
+ *                         When `IO_NODATAZERO' was set, then `0' will be returned instead. */
 FUNDEF NONNULL((1)) size_t KCALL
 socket_recv(struct socket *__restrict self,
             USER CHECKED void *buf, size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-            struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED);
+            struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
+            iomode_t mode, struct timespec const *timeout)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT);
 FUNDEF NONNULL((1, 2)) size_t KCALL
 socket_recvv(struct socket *__restrict self, struct aio_buffer const *__restrict buf,
              size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-             struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED);
+             struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
+             iomode_t mode, struct timespec const *timeout)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT);
 
 
 /* Receive data over this socket, and store the contents within the given buffer.
@@ -786,7 +808,9 @@ socket_arecvfromv(struct socket *__restrict self,
 		THROWS_INDIRECT(E_NET_CONNECTION_REFUSED);
 
 /* Recv helper functions for blocking and non-blocking operations.
- * @return: * : The actual number of received bytes (as returned by AIO) */
+ * @return: * : The actual number of received bytes (as returned by AIO)
+ * @throws: E_NET_TIMEOUT: The given `timeout' has expired, and `IO_NODATAZERO' wasn't set.
+ *                         When `IO_NODATAZERO' was set, then `0' will be returned instead. */
 FUNDEF NONNULL((1)) size_t KCALL
 socket_recvfrom(struct socket *__restrict self,
                 USER CHECKED void *buf, size_t bufsize,
@@ -794,8 +818,9 @@ socket_recvfrom(struct socket *__restrict self,
                 /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
                 /*0..1*/ USER CHECKED u32 *presult_flags,
                 struct ancillary_rmessage const *msg_control,
-                syscall_ulong_t msg_flags, iomode_t mode)
-		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK);
+                syscall_ulong_t msg_flags,
+                iomode_t mode, struct timespec const *timeout)
+		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK, E_NET_TIMEOUT);
 FUNDEF NONNULL((1, 2)) size_t KCALL
 socket_recvfromv(struct socket *__restrict self,
                  struct aio_buffer const *__restrict buf, size_t bufsize,
@@ -803,8 +828,9 @@ socket_recvfromv(struct socket *__restrict self,
                  /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
                  /*0..1*/ USER CHECKED u32 *presult_flags,
                  struct ancillary_rmessage const *msg_control,
-                 syscall_ulong_t msg_flags, iomode_t mode)
-		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK);
+                 syscall_ulong_t msg_flags,
+                 iomode_t mode, struct timespec const *timeout)
+		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK, E_NET_TIMEOUT);
 
 /* Begin to listen for incoming client (aka. peer) connection requests.
  * @throws: E_NET_ADDRESS_IN_USE:E_NET_ADDRESS_IN_USE_CONTEXT_LISTEN: [...] (The bound address is already in use)
@@ -858,6 +884,13 @@ socket_setsockopt(struct socket *__restrict self,
                   USER CHECKED void const *optval,
                   socklen_t optlen, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT, E_BUFFER_TOO_SMALL);
+
+/* Custom I/O control command handler for this socket type.
+ * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
+FUNDEF NONNULL((1)) syscall_slong_t KCALL
+socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd,
+             USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND);
 
 
 

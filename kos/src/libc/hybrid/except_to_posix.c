@@ -26,11 +26,13 @@
 #include "../api.h"
 /**/
 
+#include <kos/except.h>
 #include <kos/except/fs.h>
 #include <kos/except/inval.h>
 #include <kos/except/io.h>
+#include <kos/except/net.h>
 #include <kos/except/noexec.h>
-#include <kos/except.h>
+#include <kos/kernel/handle.h>
 
 #include <signal.h>
 #include <stdbool.h>

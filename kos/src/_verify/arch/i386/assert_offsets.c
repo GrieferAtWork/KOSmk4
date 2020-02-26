@@ -63,6 +63,8 @@ local files = {
 	"../../../../include/i386-kos/bits/itimerspec64.h",
 	"../../../../include/i386-kos/bits/itimerval32.h",
 	"../../../../include/i386-kos/bits/itimerval64.h",
+	"../../../../include/i386-kos/bits/mmsghdr-struct32.h",
+	"../../../../include/i386-kos/bits/mmsghdr-struct64.h",
 	"../../../../include/i386-kos/bits/msghdr-struct32.h",
 	"../../../../include/i386-kos/bits/msghdr-struct64.h",
 	"../../../../include/i386-kos/bits/rusage-struct32.h",
@@ -199,11 +201,11 @@ for (local i: [:16]) {
 ]]]*/
 #include <bits/cmsghdr-struct32.h>
 
-/* struct cmsghdrx32 */
-STATIC_ASSERT(offsetof(struct cmsghdrx32, cmsg_data) == __OFFSET_CMSGHDRX32_DATA);
-STATIC_ASSERT(offsetof(struct cmsghdrx32, cmsg_len) == __OFFSET_CMSGHDRX32_LEN);
-STATIC_ASSERT(offsetof(struct cmsghdrx32, cmsg_level) == __OFFSET_CMSGHDRX32_LEVEL);
-STATIC_ASSERT(offsetof(struct cmsghdrx32, cmsg_type) == __OFFSET_CMSGHDRX32_TYPE);
+/* struct __cmsghdrx32 */
+STATIC_ASSERT(offsetof(struct __cmsghdrx32, cmsg_data) == __OFFSET_CMSGHDRX32_DATA);
+STATIC_ASSERT(offsetof(struct __cmsghdrx32, cmsg_len) == __OFFSET_CMSGHDRX32_LEN);
+STATIC_ASSERT(offsetof(struct __cmsghdrx32, cmsg_level) == __OFFSET_CMSGHDRX32_LEVEL);
+STATIC_ASSERT(offsetof(struct __cmsghdrx32, cmsg_type) == __OFFSET_CMSGHDRX32_TYPE);
 
 
 
@@ -211,11 +213,11 @@ STATIC_ASSERT(offsetof(struct cmsghdrx32, cmsg_type) == __OFFSET_CMSGHDRX32_TYPE
 
 #include <bits/cmsghdr-struct64.h>
 
-/* struct cmsghdrx64 */
-STATIC_ASSERT(offsetof(struct cmsghdrx64, cmsg_data) == __OFFSET_CMSGHDRX64_DATA);
-STATIC_ASSERT(offsetof(struct cmsghdrx64, cmsg_len) == __OFFSET_CMSGHDRX64_LEN);
-STATIC_ASSERT(offsetof(struct cmsghdrx64, cmsg_level) == __OFFSET_CMSGHDRX64_LEVEL);
-STATIC_ASSERT(offsetof(struct cmsghdrx64, cmsg_type) == __OFFSET_CMSGHDRX64_TYPE);
+/* struct __cmsghdrx64 */
+STATIC_ASSERT(offsetof(struct __cmsghdrx64, cmsg_data) == __OFFSET_CMSGHDRX64_DATA);
+STATIC_ASSERT(offsetof(struct __cmsghdrx64, cmsg_len) == __OFFSET_CMSGHDRX64_LEN);
+STATIC_ASSERT(offsetof(struct __cmsghdrx64, cmsg_level) == __OFFSET_CMSGHDRX64_LEVEL);
+STATIC_ASSERT(offsetof(struct __cmsghdrx64, cmsg_type) == __OFFSET_CMSGHDRX64_TYPE);
 
 
 
@@ -335,6 +337,30 @@ STATIC_ASSERT(alignof(struct itimervalx64) == __ALIGNOF_ITIMERVALX64);
 
 
 
+#include <bits/mmsghdr-struct32.h>
+
+/* struct __mmsghdrx32 */
+STATIC_ASSERT(offsetof(struct __mmsghdrx32, msg_len) == __OFFSET_MMSGHDRX32_LEN);
+STATIC_ASSERT(offsetof(struct __mmsghdrx32, msg_hdr) == __OFFSET_MMSGHDRX32_HDR);
+STATIC_ASSERT(sizeof(struct __mmsghdrx32) == __SIZEOF_MMSGHDRX32);
+STATIC_ASSERT(alignof(struct __mmsghdrx32) == __ALIGNOF_MMSGHDRX32);
+
+
+
+
+
+#include <bits/mmsghdr-struct64.h>
+
+/* struct __mmsghdrx64 */
+STATIC_ASSERT(offsetof(struct __mmsghdrx64, msg_len) == __OFFSET_MMSGHDRX64_LEN);
+STATIC_ASSERT(offsetof(struct __mmsghdrx64, msg_hdr) == __OFFSET_MMSGHDRX64_HDR);
+STATIC_ASSERT(sizeof(struct __mmsghdrx64) == __SIZEOF_MMSGHDRX64);
+STATIC_ASSERT(alignof(struct __mmsghdrx64) == __ALIGNOF_MMSGHDRX64);
+
+
+
+
+
 #include <bits/msghdr-struct32.h>
 
 /* struct msghdr32 */
@@ -346,6 +372,7 @@ STATIC_ASSERT(offsetof(struct msghdr32, msg_iovlen) == __OFFSET_MSGHDR32_IOVLEN)
 STATIC_ASSERT(offsetof(struct msghdr32, msg_name) == __OFFSET_MSGHDR32_NAME);
 STATIC_ASSERT(offsetof(struct msghdr32, msg_namelen) == __OFFSET_MSGHDR32_NAMELEN);
 STATIC_ASSERT(sizeof(struct msghdr32) == __SIZEOF_MSGHDR32);
+STATIC_ASSERT(alignof(struct msghdr32) == __ALIGNOF_MSGHDR32);
 
 
 
@@ -362,6 +389,7 @@ STATIC_ASSERT(offsetof(struct msghdr64, msg_iovlen) == __OFFSET_MSGHDR64_IOVLEN)
 STATIC_ASSERT(offsetof(struct msghdr64, msg_name) == __OFFSET_MSGHDR64_NAME);
 STATIC_ASSERT(offsetof(struct msghdr64, msg_namelen) == __OFFSET_MSGHDR64_NAMELEN);
 STATIC_ASSERT(sizeof(struct msghdr64) == __SIZEOF_MSGHDR64);
+STATIC_ASSERT(alignof(struct msghdr64) == __ALIGNOF_MSGHDR64);
 
 
 

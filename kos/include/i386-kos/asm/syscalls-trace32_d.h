@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x437f8997 */
+/* HASH CRC-32:0x7e3c7688 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -808,7 +808,7 @@
 #define __NR32AN0_accept4                 sockfd
 #define __NR32AN1_accept4                 addr
 #define __NR32AN2_accept4                 addr_len
-#define __NR32AN3_accept4                 flags
+#define __NR32AN3_accept4                 sock_flags
 #define __NR32AN0_getsockopt              sockfd
 #define __NR32AN1_getsockopt              level
 #define __NR32AN2_getsockopt              optname
@@ -828,21 +828,21 @@
 #define __NR32AN0_sendto                  sockfd
 #define __NR32AN1_sendto                  buf
 #define __NR32AN2_sendto                  bufsize
-#define __NR32AN3_sendto                  flags
+#define __NR32AN3_sendto                  msg_flags
 #define __NR32AN4_sendto                  addr
 #define __NR32AN5_sendto                  addr_len
 #define __NR32AN0_sendmsg                 sockfd
 #define __NR32AN1_sendmsg                 message
-#define __NR32AN2_sendmsg                 flags
+#define __NR32AN2_sendmsg                 msg_flags
 #define __NR32AN0_recvfrom                sockfd
 #define __NR32AN1_recvfrom                buf
 #define __NR32AN2_recvfrom                bufsize
-#define __NR32AN3_recvfrom                flags
+#define __NR32AN3_recvfrom                msg_flags
 #define __NR32AN4_recvfrom                addr
 #define __NR32AN5_recvfrom                addr_len
 #define __NR32AN0_recvmsg                 sockfd
 #define __NR32AN1_recvmsg                 message
-#define __NR32AN2_recvmsg                 flags
+#define __NR32AN2_recvmsg                 msg_flags
 #define __NR32AN0_shutdown                sockfd
 #define __NR32AN1_shutdown                how
 #define __NR32AN0_userfaultfd             TODO_PROTOTYPE
@@ -2868,15 +2868,15 @@
 #define __NR32ATRF1_listen                  "%#" PRIxSIZ
 #define __NR32ATRA1_listen(sockfd, max_backlog) ,(uintptr_t)(max_backlog)
 #define __NR32ATRF0_accept4                 "%d"
-#define __NR32ATRA0_accept4(sockfd, addr, addr_len, flags) ,(int)(sockfd)
+#define __NR32ATRA0_accept4(sockfd, addr, addr_len, sock_flags) ,(int)(sockfd)
 #define __NR32ATRF1_accept4                 "%p"
-#define __NR32ATRA1_accept4(sockfd, addr, addr_len, flags) ,addr
+#define __NR32ATRA1_accept4(sockfd, addr, addr_len, sock_flags) ,addr
 #define __NR32ATRF2_accept4                 "%p"
-#define __NR32ATRA2_accept4(sockfd, addr, addr_len, flags) ,addr_len
+#define __NR32ATRA2_accept4(sockfd, addr, addr_len, sock_flags) ,addr_len
 #define __NR32ATRF3_accept4                 "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NR32ATRA3_accept4(sockfd, addr, addr_len, flags) ,(uintptr_t)(flags),(flags) & SOCK_NONBLOCK ? "SOCK_NONBLOCK" : "" \
-                                                           ,((flags) & SOCK_CLOEXEC) && ((flags) & (SOCK_NONBLOCK)) ? "|" : "",(flags) & SOCK_CLOEXEC ? "SOCK_CLOEXEC" : "" \
-                                                           ,((flags) & SOCK_CLOFORK) && ((flags) & (SOCK_NONBLOCK|SOCK_CLOEXEC)) ? "|" : "",(flags) & SOCK_CLOFORK ? "SOCK_CLOFORK" : ""
+#define __NR32ATRA3_accept4(sockfd, addr, addr_len, sock_flags) ,(uintptr_t)(sock_flags),(sock_flags) & SOCK_NONBLOCK ? "SOCK_NONBLOCK" : "" \
+                                                                ,((sock_flags) & SOCK_CLOEXEC) && ((sock_flags) & (SOCK_NONBLOCK)) ? "|" : "",(sock_flags) & SOCK_CLOEXEC ? "SOCK_CLOEXEC" : "" \
+                                                                ,((sock_flags) & SOCK_CLOFORK) && ((sock_flags) & (SOCK_NONBLOCK|SOCK_CLOEXEC)) ? "|" : "",(sock_flags) & SOCK_CLOFORK ? "SOCK_CLOFORK" : ""
 #define __NR32ATRF0_getsockopt              "%d"
 #define __NR32ATRA0_getsockopt(sockfd, level, optname, optval, optlen) ,(int)(sockfd)
 #define __NR32ATRF1_getsockopt              "%#Ix=%s"
@@ -2910,65 +2910,65 @@
 #define __NR32ATRF2_getpeername             "%p"
 #define __NR32ATRA2_getpeername(sockfd, addr, addr_len) ,addr_len
 #define __NR32ATRF0_sendto                  "%d"
-#define __NR32ATRA0_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(int)(sockfd)
+#define __NR32ATRA0_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,(int)(sockfd)
 #define __NR32ATRF1_sendto                  "%p"
-#define __NR32ATRA1_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,buf
+#define __NR32ATRA1_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,buf
 #define __NR32ATRF2_sendto                  "%" PRIuSIZ
-#define __NR32ATRA2_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,bufsize
+#define __NR32ATRA2_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,bufsize
 #define __NR32ATRF3_sendto                  "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR32ATRA3_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(flags),(flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
-                                                                        ,((flags) & MSG_DONTROUTE) && ((flags) & (MSG_CONFIRM)) ? "|" : "",(flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
-                                                                        ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                                        ,((flags) & MSG_EOR) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_EOR ? "MSG_EOR" : "" \
-                                                                        ,((flags) & MSG_MORE) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR)) ? "|" : "",(flags) & MSG_MORE ? "MSG_MORE" : "" \
-                                                                        ,((flags) & MSG_NOSIGNAL) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE)) ? "|" : "",(flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
-                                                                        ,((flags) & MSG_OOB) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : ""
+#define __NR32ATRA3_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,(uintptr_t)(msg_flags),(msg_flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
+                                                                            ,((msg_flags) & MSG_DONTROUTE) && ((msg_flags) & (MSG_CONFIRM)) ? "|" : "",(msg_flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
+                                                                            ,((msg_flags) & MSG_DONTWAIT) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
+                                                                            ,((msg_flags) & MSG_EOR) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT)) ? "|" : "",(msg_flags) & MSG_EOR ? "MSG_EOR" : "" \
+                                                                            ,((msg_flags) & MSG_MORE) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR)) ? "|" : "",(msg_flags) & MSG_MORE ? "MSG_MORE" : "" \
+                                                                            ,((msg_flags) & MSG_NOSIGNAL) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE)) ? "|" : "",(msg_flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
+                                                                            ,((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(msg_flags) & MSG_OOB ? "MSG_OOB" : ""
 #define __NR32ATRF4_sendto                  "%p"
-#define __NR32ATRA4_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,addr
+#define __NR32ATRA4_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,addr
 #define __NR32ATRF5_sendto                  "%" PRIuSIZ
-#define __NR32ATRA5_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(addr_len)
+#define __NR32ATRA5_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,(uintptr_t)(addr_len)
 #define __NR32ATRF0_sendmsg                 "%d"
-#define __NR32ATRA0_sendmsg(sockfd, message, flags) ,(int)(sockfd)
+#define __NR32ATRA0_sendmsg(sockfd, message, msg_flags) ,(int)(sockfd)
 #define __NR32ATRF1_sendmsg                 "%p"
-#define __NR32ATRA1_sendmsg(sockfd, message, flags) ,message
+#define __NR32ATRA1_sendmsg(sockfd, message, msg_flags) ,message
 #define __NR32ATRF2_sendmsg                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR32ATRA2_sendmsg(sockfd, message, flags) ,(uintptr_t)(flags),(flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
-                                                    ,((flags) & MSG_DONTROUTE) && ((flags) & (MSG_CONFIRM)) ? "|" : "",(flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
-                                                    ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                    ,((flags) & MSG_EOR) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_EOR ? "MSG_EOR" : "" \
-                                                    ,((flags) & MSG_MORE) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR)) ? "|" : "",(flags) & MSG_MORE ? "MSG_MORE" : "" \
-                                                    ,((flags) & MSG_NOSIGNAL) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE)) ? "|" : "",(flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
-                                                    ,((flags) & MSG_OOB) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : ""
+#define __NR32ATRA2_sendmsg(sockfd, message, msg_flags) ,(uintptr_t)(msg_flags),(msg_flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
+                                                        ,((msg_flags) & MSG_DONTROUTE) && ((msg_flags) & (MSG_CONFIRM)) ? "|" : "",(msg_flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
+                                                        ,((msg_flags) & MSG_DONTWAIT) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
+                                                        ,((msg_flags) & MSG_EOR) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT)) ? "|" : "",(msg_flags) & MSG_EOR ? "MSG_EOR" : "" \
+                                                        ,((msg_flags) & MSG_MORE) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR)) ? "|" : "",(msg_flags) & MSG_MORE ? "MSG_MORE" : "" \
+                                                        ,((msg_flags) & MSG_NOSIGNAL) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE)) ? "|" : "",(msg_flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
+                                                        ,((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(msg_flags) & MSG_OOB ? "MSG_OOB" : ""
 #define __NR32ATRF0_recvfrom                "%d"
-#define __NR32ATRA0_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,(int)(sockfd)
+#define __NR32ATRA0_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,(int)(sockfd)
 #define __NR32ATRF1_recvfrom                "%p"
-#define __NR32ATRA1_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,buf
+#define __NR32ATRA1_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,buf
 #define __NR32ATRF2_recvfrom                "%" PRIuSIZ
-#define __NR32ATRA2_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,bufsize
+#define __NR32ATRA2_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,bufsize
 #define __NR32ATRF3_recvfrom                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR32ATRA3_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(flags),(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                                          ,((flags) & MSG_ERRQUEUE) && ((flags) & (MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
-                                                                          ,((flags) & MSG_OOB) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : "" \
-                                                                          ,((flags) & MSG_PEEK) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB)) ? "|" : "",(flags) & MSG_PEEK ? "MSG_PEEK" : "" \
-                                                                          ,((flags) & MSG_TRUNC) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK)) ? "|" : "",(flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
-                                                                          ,((flags) & MSG_WAITALL) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK|MSG_TRUNC)) ? "|" : "",(flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
+#define __NR32ATRA3_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,(uintptr_t)(msg_flags),(msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
+                                                                              ,((msg_flags) & MSG_ERRQUEUE) && ((msg_flags) & (MSG_DONTWAIT)) ? "|" : "",(msg_flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
+                                                                              ,((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(msg_flags) & MSG_OOB ? "MSG_OOB" : "" \
+                                                                              ,((msg_flags) & MSG_PEEK) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB)) ? "|" : "",(msg_flags) & MSG_PEEK ? "MSG_PEEK" : "" \
+                                                                              ,((msg_flags) & MSG_TRUNC) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK)) ? "|" : "",(msg_flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
+                                                                              ,((msg_flags) & MSG_WAITALL) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK|MSG_TRUNC)) ? "|" : "",(msg_flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
 #define __NR32ATRF4_recvfrom                "%p"
-#define __NR32ATRA4_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,addr
+#define __NR32ATRA4_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,addr
 #define __NR32ATRF5_recvfrom                "%p"
-#define __NR32ATRA5_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,addr_len
+#define __NR32ATRA5_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,addr_len
 #define __NR32ATRF0_recvmsg                 "%d"
-#define __NR32ATRA0_recvmsg(sockfd, message, flags) ,(int)(sockfd)
+#define __NR32ATRA0_recvmsg(sockfd, message, msg_flags) ,(int)(sockfd)
 #define __NR32ATRF1_recvmsg                 "%p"
-#define __NR32ATRA1_recvmsg(sockfd, message, flags) ,message
+#define __NR32ATRA1_recvmsg(sockfd, message, msg_flags) ,message
 #define __NR32ATRF2_recvmsg                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NR32ATRA2_recvmsg(sockfd, message, flags) ,(uintptr_t)(flags),(flags) & MSG_CMSG_CLOEXEC ? "MSG_CMSG_CLOEXEC" : "" \
-                                                    ,((flags) & MSG_CMSG_CLOFORK) && ((flags) & (MSG_CMSG_CLOEXEC)) ? "|" : "",(flags) & MSG_CMSG_CLOFORK ? "MSG_CMSG_CLOFORK" : "" \
-                                                    ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                    ,((flags) & MSG_ERRQUEUE) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
-                                                    ,((flags) & MSG_OOB) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : "" \
-                                                    ,((flags) & MSG_PEEK) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB)) ? "|" : "",(flags) & MSG_PEEK ? "MSG_PEEK" : "" \
-                                                    ,((flags) & MSG_TRUNC) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK)) ? "|" : "",(flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
-                                                    ,((flags) & MSG_WAITALL) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK|MSG_TRUNC)) ? "|" : "",(flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
+#define __NR32ATRA2_recvmsg(sockfd, message, msg_flags) ,(uintptr_t)(msg_flags),(msg_flags) & MSG_CMSG_CLOEXEC ? "MSG_CMSG_CLOEXEC" : "" \
+                                                        ,((msg_flags) & MSG_CMSG_CLOFORK) && ((msg_flags) & (MSG_CMSG_CLOEXEC)) ? "|" : "",(msg_flags) & MSG_CMSG_CLOFORK ? "MSG_CMSG_CLOFORK" : "" \
+                                                        ,((msg_flags) & MSG_DONTWAIT) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK)) ? "|" : "",(msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
+                                                        ,((msg_flags) & MSG_ERRQUEUE) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT)) ? "|" : "",(msg_flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
+                                                        ,((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(msg_flags) & MSG_OOB ? "MSG_OOB" : "" \
+                                                        ,((msg_flags) & MSG_PEEK) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB)) ? "|" : "",(msg_flags) & MSG_PEEK ? "MSG_PEEK" : "" \
+                                                        ,((msg_flags) & MSG_TRUNC) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK)) ? "|" : "",(msg_flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
+                                                        ,((msg_flags) & MSG_WAITALL) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK|MSG_TRUNC)) ? "|" : "",(msg_flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
 #define __NR32ATRF0_shutdown                "%d"
 #define __NR32ATRA0_shutdown(sockfd, how)   ,(int)(sockfd)
 #define __NR32ATRF1_shutdown                "%#Ix=%s"

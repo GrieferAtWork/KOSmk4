@@ -148,6 +148,7 @@ do_overwrite_file:
 @@Mapping between types and their respective origins
 global syscallTypeDeclarationOrigins: {string: string} = Dict();
 global syscallTypeMustPushMacro: HashSet with string = HashSet();
+global syscallTypeEscapedStructTypes: {string: string} = Dict();
 
 class CType {
 	this = default;
@@ -187,8 +188,23 @@ class CType {
 	}
 	property escapedTypename: string = {
 		get(): string {
-			if (typename.startswith("struct "))
+			if (typename.startswith("struct ")) {
+				local s = 7;
+				local len = #typename;
+				while (s < len && typename.isspace(s))
+					++s;
+				local e = s;
+				while (e < len && typename.issymcont(e))
+					++e;
+				if (s < e) {
+					local esc = syscallTypeEscapedStructTypes.get(typename[s:e]);
+					if (esc !is none) {
+						return "{}{}{}".format({
+							typename[:s], esc, typename[e:] });
+					}
+				}
 				return typename;
+			}
 			if (typename && typename.issymstrt(0) && !typename.startswith("__")) {
 				local e = 0;
 				while (e < #typename && typename.issymcont(e))
@@ -201,7 +217,7 @@ class CType {
 			return typename;
 		}
 	}
-	gatherUsedStructTypes(types: HashSet with string) {
+	gatherUsedEscapedStructTypes(types: HashSet with string) {
 		if (typename.startswith("struct ")) {
 			local s = 7;
 			local len = #typename;
@@ -210,8 +226,11 @@ class CType {
 			local e = s;
 			while (e < len && typename.issymcont(e))
 				++e;
-			if (s < e)
-				types.insert(typename[s:e]);
+			if (s < e) {
+				local n = typename[s:e];
+				n = syscallTypeEscapedStructTypes.get(n, n);
+				types.insert(n);
+			}
 		}
 	}
 	gatherTypeOriginHeaders(headers: HashSet with string) {
@@ -224,9 +243,18 @@ class CType {
 			while (e < len && typename.issymcont(e))
 				++e;
 			if (s < e) {
-				local org = syscallTypeDeclarationOrigins.get(typename[s:e]);
+				local n = typename[s:e];
+				local org = syscallTypeDeclarationOrigins.get(n);
 				if (org !is none)
 					headers.insert(org);
+				else {
+					n = syscallTypeEscapedStructTypes.get(n);
+					if (n !is none) {
+						local org = syscallTypeDeclarationOrigins.get(n);
+						if (org !is none)
+							headers.insert(org);
+					}
+				}
 			}
 			return;
 		}
@@ -256,6 +284,7 @@ class CType {
 				++e;
 			if (s < e) {
 				local n = typename[s:e];
+				n = syscallTypeEscapedStructTypes.get(n, n);
 				if (n in syscallTypeMustPushMacro)
 					names.insert(n);
 			}
@@ -386,10 +415,10 @@ class Function {
 			fp << " */\n";
 		}
 	}
-	gatherUsedStructTypes(types: HashSet with string) {
-		returnType.gatherUsedStructTypes(types);
+	gatherUsedEscapedStructTypes(types: HashSet with string) {
+		returnType.gatherUsedEscapedStructTypes(types);
 		for (local t, none: args)
-			t.gatherUsedStructTypes(types);
+			t.gatherUsedEscapedStructTypes(types);
 	}
 	gatherTypeOriginHeaders(headers: HashSet with string) {
 		returnType.gatherTypeOriginHeaders(headers);
@@ -1225,6 +1254,28 @@ function parseSyscallDefs(
 						}
 					}	break;
 
+					case "struct_escape": {
+						if ("=" !in directive_args)
+							err(i, "Missing `=' in struct_escape argument");
+						for (local arg: directive_args.split(",")) {
+							local origName, none, escapedName =
+								arg.partition("=")...;
+							origName = origName.strip();
+							escapedName = escapedName.strip();
+							if (origName.startswith("struct "))
+								origName = origName[7:].lstrip();
+							if (escapedName.startswith("struct "))
+								escapedName = escapedName[7:].lstrip();
+							if (origName in syscallTypeEscapedStructTypes) {
+								local o = syscallTypeEscapedStructTypes[origName];
+								if (o != escapedName)
+									err(i, "Struct name escape for {!r} re-defined as {!r} (old definition was {!r})"
+										.format({ origName, escapedName, o }));
+							}
+							syscallTypeEscapedStructTypes[origName] = escapedName;
+						}
+					}	break;
+
 					default:
 						err(name_start, "Unknown directive {!r}".format({ directive_name }));
 					}
@@ -1568,7 +1619,7 @@ function printSyscallDeclarations(
 	local pragmaPushMacroNames: HashSet with string = HashSet();
 	decls = List(decls);
 	for (local x: decls) {
-		x.gatherUsedStructTypes(usedStructTypes);
+		x.gatherUsedEscapedStructTypes(usedStructTypes);
 		x.gatherPragmaPushMacroNames(pragmaPushMacroNames);
 		local used_name = "sys_" + x.name;
 		if (used_name in syscallTypeMustPushMacro)

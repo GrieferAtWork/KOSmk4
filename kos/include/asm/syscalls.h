@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92176eb2 */
+/* HASH CRC-32:0xa8026735 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -157,7 +157,7 @@
 #define __NR_sched_yield            0x7c  /* errno_t sched_yield(void) */
 #define __NR_sched_get_priority_max 0x7d  /* syscall_slong_t sched_get_priority_max(syscall_ulong_t algorithm) */
 #define __NR_sched_get_priority_min 0x7e  /* syscall_slong_t sched_get_priority_min(syscall_ulong_t algorithm) */
-#define __NR_sched_rr_get_interval  0x7f  /* errno_t sched_rr_get_interval(pid_t pid, struct __timespec *tms) */
+#define __NR_sched_rr_get_interval  0x7f  /* errno_t sched_rr_get_interval(pid_t pid, struct timespec *tms) */
 #define __NR_restart_syscall        0x80  /* errno_t restart_syscall(void) */
 /* @param: signo: One of `SIG*' */
 #define __NR_kill                   0x81  /* errno_t kill(pid_t pid, syscall_ulong_t signo) */
@@ -253,16 +253,16 @@
 #define __NR_socketpair             0xc7  /* errno_t socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, fd_t[2] fds) */
 #define __NR_bind                   0xc8  /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define __NR_listen                 0xc9  /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
-#define __NR_accept                 0xca  /* errno_t accept(int TODO_PROTOTYPE) */
+#define __NR_accept                 0xca  /* fd_t accept(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 #define __NR_connect                0xcb  /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define __NR_getsockname            0xcc  /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 #define __NR_getpeername            0xcd  /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-#define __NR_sendto                 0xce  /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
-/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-#define __NR_recvfrom               0xcf  /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+#define __NR_sendto                 0xce  /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
+/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+#define __NR_recvfrom               0xcf  /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
 /* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
  * @param: optname: Dependent on `level' */
 #define __NR_setsockopt             0xd0  /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
@@ -271,13 +271,13 @@
 #define __NR_getsockopt             0xd1  /* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
 /* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
 #define __NR_shutdown               0xd2  /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-#define __NR_sendmsg                0xd3  /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
-/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-#define __NR_recvmsg                0xd4  /* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+#define __NR_sendmsg                0xd3  /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t msg_flags) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+#define __NR_recvmsg                0xd4  /* ssize_t recvmsg(fd_t sockfd, struct msghdr *message, syscall_ulong_t msg_flags) */
 #define __NR_readahead              0xd5  /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */
 #define __NR_brk                    0xd6  /* errno_t brk(void *addr) */
 #define __NR_munmap                 0xd7  /* errno_t munmap(void *addr, size_t len) */
@@ -309,9 +309,9 @@
 /* @param: signo: One of `SIG*' */
 #define __NR_rt_tgsigqueueinfo      0xf0  /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo) */
 #define __NR_perf_event_open        0xf1  /* errno_t perf_event_open(int TODO_PROTOTYPE) */
-/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
-#define __NR_accept4                0xf2  /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
-#define __NR_recvmmsg               0xf3  /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct timespec *tmo) */
+/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+#define __NR_accept4                0xf2  /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
+#define __NR_recvmmsg               0xf3  /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct timespec const *tmo) */
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 #define __NR_wait4                  0x104 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
@@ -395,12 +395,12 @@
 #define __NR_ustat                  0x42e /* errno_t ustat(dev_t dev, struct ustat *ubuf) */
 #define __NR_vfork                  0x42f /* pid_t vfork(void) */
 #define __NR_oldwait4               0x430 /* pid_t oldwait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
-/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-#define __NR_recv                   0x431 /* ssize_t recv(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags) */
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-#define __NR_send                   0x432 /* ssize_t send(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+#define __NR_recv                   0x431 /* ssize_t recv(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+#define __NR_send                   0x432 /* ssize_t send(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags) */
 #define __NR_bdflush                0x433 /* errno_t bdflush(int TODO_PROTOTYPE) */
 #define __NR_umount                 0x434 /* errno_t umount(char const *special_file) */
 #define __NR_uselib                 0x435 /* errno_t uselib(char const *library) */
@@ -1097,7 +1097,7 @@
 #define __NRRC_socketpair             4
 #define __NRRC_bind                   3
 #define __NRRC_listen                 2
-#define __NRRC_accept                 1
+#define __NRRC_accept                 3
 #define __NRRC_connect                3
 #define __NRRC_getsockname            3
 #define __NRRC_getpeername            3

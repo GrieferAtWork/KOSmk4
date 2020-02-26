@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c0af5a4 */
+/* HASH CRC-32:0x3d027a59 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3124,7 +3124,7 @@ INTERN_FUNCTION(libc_sys_Xsched_get_priority_min)
 END(libc_sys_Xsched_get_priority_min)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsched_get_priority_min, libc_sys_Xsched_get_priority_min)
 
-/* errno_t sched_rr_get_interval(pid_t pid, struct __timespecx32 *tms) */
+/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *tms) */
 .section .text.crt.syscall.sched_rr_get_interval
 INTERN_FUNCTION(libc_sys_sched_rr_get_interval)
 	movl   $(0xa1), %eax
@@ -3132,7 +3132,7 @@ INTERN_FUNCTION(libc_sys_sched_rr_get_interval)
 END(libc_sys_sched_rr_get_interval)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sched_rr_get_interval, libc_sys_sched_rr_get_interval)
 
-/* errno_t sched_rr_get_interval(pid_t pid, struct __timespecx32 *tms) */
+/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *tms) */
 .section .text.crt.syscall.Xsched_rr_get_interval
 INTERN_FUNCTION(libc_sys_Xsched_rr_get_interval)
 	movl   $(0xa1), %eax
@@ -3140,7 +3140,7 @@ INTERN_FUNCTION(libc_sys_Xsched_rr_get_interval)
 END(libc_sys_Xsched_rr_get_interval)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsched_rr_get_interval, libc_sys_Xsched_rr_get_interval)
 
-/* errno_t nanosleep(struct __timespecx32 const *req, struct __timespecx32 *rem) */
+/* errno_t nanosleep(struct timespecx32 const *req, struct timespecx32 *rem) */
 .section .text.crt.syscall.nanosleep
 INTERN_FUNCTION(libc_sys_nanosleep)
 	movl   $(0xa2), %eax
@@ -3148,7 +3148,7 @@ INTERN_FUNCTION(libc_sys_nanosleep)
 END(libc_sys_nanosleep)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_nanosleep, libc_sys_nanosleep)
 
-/* errno_t nanosleep(struct __timespecx32 const *req, struct __timespecx32 *rem) */
+/* errno_t nanosleep(struct timespecx32 const *req, struct timespecx32 *rem) */
 .section .text.crt.syscall.Xnanosleep
 INTERN_FUNCTION(libc_sys_Xnanosleep)
 	movl   $(0xa2), %eax
@@ -3376,7 +3376,7 @@ INTERN_FUNCTION(libc_sys_Xrt_sigpending)
 END(libc_sys_Xrt_sigpending)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrt_sigpending, libc_sys_Xrt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.rt_sigtimedwait
 INTERN_FUNCTION(libc_sys_rt_sigtimedwait)
 	movl   $(0xb1), %eax
@@ -3384,7 +3384,7 @@ INTERN_FUNCTION(libc_sys_rt_sigtimedwait)
 END(libc_sys_rt_sigtimedwait)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigtimedwait, libc_sys_rt_sigtimedwait)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.Xrt_sigtimedwait
 INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait)
 	movl   $(0xb1), %eax
@@ -4354,7 +4354,7 @@ INTERN_FUNCTION(libc_sys_Xsendfile64)
 END(libc_sys_Xsendfile64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsendfile64, libc_sys_Xsendfile64)
 
-/* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+/* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 .section .text.crt.syscall.futex
 INTERN_FUNCTION(libc_sys_futex)
 	movl   $(0xf0), %eax
@@ -4362,7 +4362,7 @@ INTERN_FUNCTION(libc_sys_futex)
 END(libc_sys_futex)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_futex, libc_sys_futex)
 
-/* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+/* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 .section .text.crt.syscall.Xfutex
 INTERN_FUNCTION(libc_sys_Xfutex)
 	movl   $(0xf0), %eax
@@ -4658,7 +4658,7 @@ INTERN_FUNCTION(libc_sys_Xtimer_create)
 END(libc_sys_Xtimer_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimer_create, libc_sys_Xtimer_create)
 
-/* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32 const *value, struct __itimerspecx32 *ovalue) */
+/* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32 const *value, struct itimerspecx32 *ovalue) */
 .section .text.crt.syscall.timer_settime
 INTERN_FUNCTION(libc_sys_timer_settime)
 	movl   $(0x104), %eax
@@ -4666,7 +4666,7 @@ INTERN_FUNCTION(libc_sys_timer_settime)
 END(libc_sys_timer_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timer_settime, libc_sys_timer_settime)
 
-/* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32 const *value, struct __itimerspecx32 *ovalue) */
+/* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32 const *value, struct itimerspecx32 *ovalue) */
 .section .text.crt.syscall.Xtimer_settime
 INTERN_FUNCTION(libc_sys_Xtimer_settime)
 	movl   $(0x104), %eax
@@ -4674,7 +4674,7 @@ INTERN_FUNCTION(libc_sys_Xtimer_settime)
 END(libc_sys_Xtimer_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimer_settime, libc_sys_Xtimer_settime)
 
-/* errno_t timer_gettime(timer_t timerid, struct __itimerspecx32 *value) */
+/* errno_t timer_gettime(timer_t timerid, struct itimerspecx32 *value) */
 .section .text.crt.syscall.timer_gettime
 INTERN_FUNCTION(libc_sys_timer_gettime)
 	movl   $(0x105), %eax
@@ -4682,7 +4682,7 @@ INTERN_FUNCTION(libc_sys_timer_gettime)
 END(libc_sys_timer_gettime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timer_gettime, libc_sys_timer_gettime)
 
-/* errno_t timer_gettime(timer_t timerid, struct __itimerspecx32 *value) */
+/* errno_t timer_gettime(timer_t timerid, struct itimerspecx32 *value) */
 .section .text.crt.syscall.Xtimer_gettime
 INTERN_FUNCTION(libc_sys_Xtimer_gettime)
 	movl   $(0x105), %eax
@@ -4722,7 +4722,7 @@ INTERN_FUNCTION(libc_sys_Xtimer_delete)
 END(libc_sys_Xtimer_delete)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimer_delete, libc_sys_Xtimer_delete)
 
-/* errno_t clock_settime(clockid_t clock_id, struct __timespecx32 const *tp) */
+/* errno_t clock_settime(clockid_t clock_id, struct timespecx32 const *tp) */
 .section .text.crt.syscall.clock_settime
 INTERN_FUNCTION(libc_sys_clock_settime)
 	movl   $(0x108), %eax
@@ -4730,7 +4730,7 @@ INTERN_FUNCTION(libc_sys_clock_settime)
 END(libc_sys_clock_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_clock_settime, libc_sys_clock_settime)
 
-/* errno_t clock_settime(clockid_t clock_id, struct __timespecx32 const *tp) */
+/* errno_t clock_settime(clockid_t clock_id, struct timespecx32 const *tp) */
 .section .text.crt.syscall.Xclock_settime
 INTERN_FUNCTION(libc_sys_Xclock_settime)
 	movl   $(0x108), %eax
@@ -4738,7 +4738,7 @@ INTERN_FUNCTION(libc_sys_Xclock_settime)
 END(libc_sys_Xclock_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xclock_settime, libc_sys_Xclock_settime)
 
-/* errno_t clock_gettime(clockid_t clock_id, struct __timespecx32 *tp) */
+/* errno_t clock_gettime(clockid_t clock_id, struct timespecx32 *tp) */
 .section .text.crt.syscall.clock_gettime
 INTERN_FUNCTION(libc_sys_clock_gettime)
 	movl   $(0x109), %eax
@@ -4746,7 +4746,7 @@ INTERN_FUNCTION(libc_sys_clock_gettime)
 END(libc_sys_clock_gettime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_clock_gettime, libc_sys_clock_gettime)
 
-/* errno_t clock_gettime(clockid_t clock_id, struct __timespecx32 *tp) */
+/* errno_t clock_gettime(clockid_t clock_id, struct timespecx32 *tp) */
 .section .text.crt.syscall.Xclock_gettime
 INTERN_FUNCTION(libc_sys_Xclock_gettime)
 	movl   $(0x109), %eax
@@ -4754,7 +4754,7 @@ INTERN_FUNCTION(libc_sys_Xclock_gettime)
 END(libc_sys_Xclock_gettime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xclock_gettime, libc_sys_Xclock_gettime)
 
-/* errno_t clock_getres(clockid_t clock_id, struct __timespecx32 *res) */
+/* errno_t clock_getres(clockid_t clock_id, struct timespecx32 *res) */
 .section .text.crt.syscall.clock_getres
 INTERN_FUNCTION(libc_sys_clock_getres)
 	movl   $(0x10a), %eax
@@ -4762,7 +4762,7 @@ INTERN_FUNCTION(libc_sys_clock_getres)
 END(libc_sys_clock_getres)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_clock_getres, libc_sys_clock_getres)
 
-/* errno_t clock_getres(clockid_t clock_id, struct __timespecx32 *res) */
+/* errno_t clock_getres(clockid_t clock_id, struct timespecx32 *res) */
 .section .text.crt.syscall.Xclock_getres
 INTERN_FUNCTION(libc_sys_Xclock_getres)
 	movl   $(0x10a), %eax
@@ -4770,7 +4770,7 @@ INTERN_FUNCTION(libc_sys_Xclock_getres)
 END(libc_sys_Xclock_getres)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xclock_getres, libc_sys_Xclock_getres)
 
-/* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32 const *requested_time, struct __timespecx32 *remaining) */
+/* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32 const *requested_time, struct timespecx32 *remaining) */
 .section .text.crt.syscall.clock_nanosleep
 INTERN_FUNCTION(libc_sys_clock_nanosleep)
 	movl   $(0x10b), %eax
@@ -4778,7 +4778,7 @@ INTERN_FUNCTION(libc_sys_clock_nanosleep)
 END(libc_sys_clock_nanosleep)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_clock_nanosleep, libc_sys_clock_nanosleep)
 
-/* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32 const *requested_time, struct __timespecx32 *remaining) */
+/* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32 const *requested_time, struct timespecx32 *remaining) */
 .section .text.crt.syscall.Xclock_nanosleep
 INTERN_FUNCTION(libc_sys_Xclock_nanosleep)
 	movl   $(0x10b), %eax
@@ -4962,7 +4962,7 @@ INTERN_FUNCTION(libc_sys_Xmq_unlink)
 END(libc_sys_Xmq_unlink)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_unlink, libc_sys_Xmq_unlink)
 
-/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32 const *abs_timeout) */
 .section .text.crt.syscall.mq_timedsend
 INTERN_FUNCTION(libc_sys_mq_timedsend)
 	movl   $(0x117), %eax
@@ -4970,7 +4970,7 @@ INTERN_FUNCTION(libc_sys_mq_timedsend)
 END(libc_sys_mq_timedsend)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_timedsend, libc_sys_mq_timedsend)
 
-/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
+/* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32 const *abs_timeout) */
 .section .text.crt.syscall.Xmq_timedsend
 INTERN_FUNCTION(libc_sys_Xmq_timedsend)
 	movl   $(0x117), %eax
@@ -4978,7 +4978,7 @@ INTERN_FUNCTION(libc_sys_Xmq_timedsend)
 END(libc_sys_Xmq_timedsend)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_timedsend, libc_sys_Xmq_timedsend)
 
-/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32 const *abs_timeout) */
 .section .text.crt.syscall.mq_timedreceive
 INTERN_FUNCTION(libc_sys_mq_timedreceive)
 	movl   $(0x118), %eax
@@ -4986,7 +4986,7 @@ INTERN_FUNCTION(libc_sys_mq_timedreceive)
 END(libc_sys_mq_timedreceive)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_timedreceive, libc_sys_mq_timedreceive)
 
-/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
+/* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32 const *abs_timeout) */
 .section .text.crt.syscall.Xmq_timedreceive
 INTERN_FUNCTION(libc_sys_Xmq_timedreceive)
 	movl   $(0x118), %eax
@@ -5426,7 +5426,7 @@ INTERN_FUNCTION(libc_sys_Xfaccessat)
 END(libc_sys_Xfaccessat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfaccessat, libc_sys_Xfaccessat)
 
-/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
 .section .text.crt.syscall.pselect6
 INTERN_FUNCTION(libc_sys_pselect6)
 	movl   $(0x134), %eax
@@ -5434,7 +5434,7 @@ INTERN_FUNCTION(libc_sys_pselect6)
 END(libc_sys_pselect6)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_pselect6, libc_sys_pselect6)
 
-/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
 .section .text.crt.syscall.Xpselect6
 INTERN_FUNCTION(libc_sys_Xpselect6)
 	movl   $(0x134), %eax
@@ -5442,7 +5442,7 @@ INTERN_FUNCTION(libc_sys_Xpselect6)
 END(libc_sys_Xpselect6)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpselect6, libc_sys_Xpselect6)
 
-/* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct __timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 .section .text.crt.syscall.ppoll
 INTERN_FUNCTION(libc_sys_ppoll)
 	movl   $(0x135), %eax
@@ -5450,7 +5450,7 @@ INTERN_FUNCTION(libc_sys_ppoll)
 END(libc_sys_ppoll)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_ppoll, libc_sys_ppoll)
 
-/* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct __timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 .section .text.crt.syscall.Xppoll
 INTERN_FUNCTION(libc_sys_Xppoll)
 	movl   $(0x135), %eax
@@ -5621,7 +5621,7 @@ END(libc_sys_Xepoll_pwait)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xepoll_pwait, libc_sys_Xepoll_pwait)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat(fd_t dirfd, char const *filename, struct __timespecx32 const[2] times, atflag_t flags) */
+/* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx32 const[2] times, atflag_t flags) */
 .section .text.crt.syscall.utimensat
 INTERN_FUNCTION(libc_sys_utimensat)
 	movl   $(0x140), %eax
@@ -5630,7 +5630,7 @@ END(libc_sys_utimensat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utimensat, libc_sys_utimensat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat(fd_t dirfd, char const *filename, struct __timespecx32 const[2] times, atflag_t flags) */
+/* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx32 const[2] times, atflag_t flags) */
 .section .text.crt.syscall.Xutimensat
 INTERN_FUNCTION(libc_sys_Xutimensat)
 	movl   $(0x140), %eax
@@ -5707,7 +5707,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfallocate, libc_sys_Xfallocate)
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
  * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32 const *utmr, struct __itimerspecx32 *otmr) */
+/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
 .section .text.crt.syscall.timerfd_settime
 INTERN_FUNCTION(libc_sys_timerfd_settime)
 	movl   $(0x145), %eax
@@ -5718,7 +5718,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_settime, libc_sys_timerfd_settime)
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
  * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32 const *utmr, struct __itimerspecx32 *otmr) */
+/* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
 .section .text.crt.syscall.Xtimerfd_settime
 INTERN_FUNCTION(libc_sys_Xtimerfd_settime)
 	movl   $(0x145), %eax
@@ -5727,7 +5727,7 @@ END(libc_sys_Xtimerfd_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimerfd_settime, libc_sys_Xtimerfd_settime)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime(fd_t ufd, struct __itimerspecx32 *otmr) */
+/* errno_t timerfd_gettime(fd_t ufd, struct itimerspecx32 *otmr) */
 .section .text.crt.syscall.timerfd_gettime
 INTERN_FUNCTION(libc_sys_timerfd_gettime)
 	movl   $(0x146), %eax
@@ -5736,7 +5736,7 @@ END(libc_sys_timerfd_gettime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_gettime, libc_sys_timerfd_gettime)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime(fd_t ufd, struct __itimerspecx32 *otmr) */
+/* errno_t timerfd_gettime(fd_t ufd, struct itimerspecx32 *otmr) */
 .section .text.crt.syscall.Xtimerfd_gettime
 INTERN_FUNCTION(libc_sys_Xtimerfd_gettime)
 	movl   $(0x146), %eax
@@ -5908,7 +5908,7 @@ INTERN_FUNCTION(libc_sys_Xperf_event_open)
 END(libc_sys_Xperf_event_open)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xperf_event_open, libc_sys_Xperf_event_open)
 
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32 *tmo) */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32 const *tmo) */
 .section .text.crt.syscall.recvmmsg
 INTERN_FUNCTION(libc_sys_recvmmsg)
 	movl   $(0x151), %eax
@@ -5916,7 +5916,7 @@ INTERN_FUNCTION(libc_sys_recvmmsg)
 END(libc_sys_recvmmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_recvmmsg, libc_sys_recvmmsg)
 
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32 *tmo) */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32 const *tmo) */
 .section .text.crt.syscall.Xrecvmmsg
 INTERN_FUNCTION(libc_sys_Xrecvmmsg)
 	movl   $(0x151), %eax
@@ -6038,7 +6038,7 @@ INTERN_FUNCTION(libc_sys_Xsyncfs)
 END(libc_sys_Xsyncfs)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsyncfs, libc_sys_Xsyncfs)
 
-/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) */
+/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags) */
 .section .text.crt.syscall.sendmmsg
 INTERN_FUNCTION(libc_sys_sendmmsg)
 	movl   $(0x159), %eax
@@ -6046,7 +6046,7 @@ INTERN_FUNCTION(libc_sys_sendmmsg)
 END(libc_sys_sendmmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sendmmsg, libc_sys_sendmmsg)
 
-/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) */
+/* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xsendmmsg
 INTERN_FUNCTION(libc_sys_Xsendmmsg)
 	movl   $(0x159), %eax
@@ -6378,8 +6378,8 @@ INTERN_FUNCTION(libc_sys_Xlisten)
 END(libc_sys_Xlisten)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlisten, libc_sys_Xlisten)
 
-/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
-/* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
+/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 .section .text.crt.syscall.accept4
 INTERN_FUNCTION(libc_sys_accept4)
 	movl   $(0x16c), %eax
@@ -6387,8 +6387,8 @@ INTERN_FUNCTION(libc_sys_accept4)
 END(libc_sys_accept4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_accept4, libc_sys_accept4)
 
-/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
-/* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
+/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 .section .text.crt.syscall.Xaccept4
 INTERN_FUNCTION(libc_sys_Xaccept4)
 	movl   $(0x16c), %eax
@@ -6468,9 +6468,9 @@ INTERN_FUNCTION(libc_sys_Xgetpeername)
 END(libc_sys_Xgetpeername)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetpeername, libc_sys_Xgetpeername)
 
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-/* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.crt.syscall.sendto
 INTERN_FUNCTION(libc_sys_sendto)
 	movl   $(0x171), %eax
@@ -6478,9 +6478,9 @@ INTERN_FUNCTION(libc_sys_sendto)
 END(libc_sys_sendto)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sendto, libc_sys_sendto)
 
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-/* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
 .section .text.crt.syscall.Xsendto
 INTERN_FUNCTION(libc_sys_Xsendto)
 	movl   $(0x171), %eax
@@ -6488,9 +6488,9 @@ INTERN_FUNCTION(libc_sys_Xsendto)
 END(libc_sys_Xsendto)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsendto, libc_sys_Xsendto)
 
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-/* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendmsg(fd_t sockfd, struct msghdr32 const *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.sendmsg
 INTERN_FUNCTION(libc_sys_sendmsg)
 	movl   $(0x172), %eax
@@ -6498,9 +6498,9 @@ INTERN_FUNCTION(libc_sys_sendmsg)
 END(libc_sys_sendmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sendmsg, libc_sys_sendmsg)
 
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-/* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+/* ssize_t sendmsg(fd_t sockfd, struct msghdr32 const *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.Xsendmsg
 INTERN_FUNCTION(libc_sys_Xsendmsg)
 	movl   $(0x172), %eax
@@ -6508,9 +6508,9 @@ INTERN_FUNCTION(libc_sys_Xsendmsg)
 END(libc_sys_Xsendmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsendmsg, libc_sys_Xsendmsg)
 
-/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-/* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
+/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.recvfrom
 INTERN_FUNCTION(libc_sys_recvfrom)
 	movl   $(0x173), %eax
@@ -6518,9 +6518,9 @@ INTERN_FUNCTION(libc_sys_recvfrom)
 END(libc_sys_recvfrom)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_recvfrom, libc_sys_recvfrom)
 
-/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-/* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
+/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
 .section .text.crt.syscall.Xrecvfrom
 INTERN_FUNCTION(libc_sys_Xrecvfrom)
 	movl   $(0x173), %eax
@@ -6528,10 +6528,10 @@ INTERN_FUNCTION(libc_sys_Xrecvfrom)
 END(libc_sys_Xrecvfrom)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrecvfrom, libc_sys_Xrecvfrom)
 
-/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.recvmsg
 INTERN_FUNCTION(libc_sys_recvmsg)
 	movl   $(0x174), %eax
@@ -6539,10 +6539,10 @@ INTERN_FUNCTION(libc_sys_recvmsg)
 END(libc_sys_recvmsg)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_recvmsg, libc_sys_recvmsg)
 
-/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.Xrecvmsg
 INTERN_FUNCTION(libc_sys_Xrecvmsg)
 	movl   $(0x174), %eax
@@ -6616,7 +6616,7 @@ INTERN_FUNCTION(libc_sys_Xmlock2)
 END(libc_sys_Xmlock2)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmlock2, libc_sys_Xmlock2)
 
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
+/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32_64 const *tmo) */
 .section .text.crt.syscall.recvmmsg64
 INTERN_FUNCTION(libc_sys_recvmmsg64)
 	movl   $(0xfffffeaf), %eax
@@ -6624,7 +6624,7 @@ INTERN_FUNCTION(libc_sys_recvmmsg64)
 END(libc_sys_recvmmsg64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_recvmmsg64, libc_sys_recvmmsg64)
 
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
+/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32_64 const *tmo) */
 .section .text.crt.syscall.Xrecvmmsg64
 INTERN_FUNCTION(libc_sys_Xrecvmmsg64)
 	movl   $(0xfffffeaf), %eax
@@ -6665,7 +6665,7 @@ END(libc_sys_Xpreadvf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpreadvf, libc_sys_Xpreadvf)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t ufd, struct __itimerspecx32_64 *otmr) */
+/* errno_t timerfd_gettime64(fd_t ufd, struct itimerspecx32_64 *otmr) */
 .section .text.crt.syscall.timerfd_gettime64
 INTERN_FUNCTION(libc_sys_timerfd_gettime64)
 	movl   $(0xfffffeba), %eax
@@ -6674,7 +6674,7 @@ END(libc_sys_timerfd_gettime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_gettime64, libc_sys_timerfd_gettime64)
 
 /* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t ufd, struct __itimerspecx32_64 *otmr) */
+/* errno_t timerfd_gettime64(fd_t ufd, struct itimerspecx32_64 *otmr) */
 .section .text.crt.syscall.Xtimerfd_gettime64
 INTERN_FUNCTION(libc_sys_Xtimerfd_gettime64)
 	movl   $(0xfffffeba), %eax
@@ -6685,7 +6685,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimerfd_gettime64, libc_sys_Xtimerfd_gettime64)
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
  * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) */
+/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 .section .text.crt.syscall.timerfd_settime64
 INTERN_FUNCTION(libc_sys_timerfd_settime64)
 	movl   $(0xfffffebb), %eax
@@ -6696,7 +6696,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_settime64, libc_sys_timerfd_settime64)
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
  * is absolute. Optionally return the old expiration time in OTMR */
-/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) */
+/* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 .section .text.crt.syscall.Xtimerfd_settime64
 INTERN_FUNCTION(libc_sys_Xtimerfd_settime64)
 	movl   $(0xfffffebb), %eax
@@ -6721,7 +6721,7 @@ END(libc_sys_Xfallocate64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfallocate64, libc_sys_Xfallocate64)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat64(fd_t dirfd, char const *filename, struct __timespecx32_64 const[2] times, atflag_t flags) */
+/* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
 .section .text.crt.syscall.utimensat64
 INTERN_FUNCTION(libc_sys_utimensat64)
 	movl   $(0xfffffec0), %eax
@@ -6730,7 +6730,7 @@ END(libc_sys_utimensat64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utimensat64, libc_sys_utimensat64)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat64(fd_t dirfd, char const *filename, struct __timespecx32_64 const[2] times, atflag_t flags) */
+/* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
 .section .text.crt.syscall.Xutimensat64
 INTERN_FUNCTION(libc_sys_Xutimensat64)
 	movl   $(0xfffffec0), %eax
@@ -6738,7 +6738,7 @@ INTERN_FUNCTION(libc_sys_Xutimensat64)
 END(libc_sys_Xutimensat64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xutimensat64, libc_sys_Xutimensat64)
 
-/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 .section .text.crt.syscall.ppoll64
 INTERN_FUNCTION(libc_sys_ppoll64)
 	movl   $(0xfffffecb), %eax
@@ -6746,7 +6746,7 @@ INTERN_FUNCTION(libc_sys_ppoll64)
 END(libc_sys_ppoll64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_ppoll64, libc_sys_ppoll64)
 
-/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 .section .text.crt.syscall.Xppoll64
 INTERN_FUNCTION(libc_sys_Xppoll64)
 	movl   $(0xfffffecb), %eax
@@ -6754,7 +6754,7 @@ INTERN_FUNCTION(libc_sys_Xppoll64)
 END(libc_sys_Xppoll64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xppoll64, libc_sys_Xppoll64)
 
-/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
 .section .text.crt.syscall.pselect6_64
 INTERN_FUNCTION(libc_sys_pselect6_64)
 	movl   $(0xfffffecc), %eax
@@ -6762,7 +6762,7 @@ INTERN_FUNCTION(libc_sys_pselect6_64)
 END(libc_sys_pselect6_64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_pselect6_64, libc_sys_pselect6_64)
 
-/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
 .section .text.crt.syscall.Xpselect6_64
 INTERN_FUNCTION(libc_sys_Xpselect6_64)
 	movl   $(0xfffffecc), %eax
@@ -6912,7 +6912,7 @@ INTERN_FUNCTION(libc_sys_Xwaitid64)
 END(libc_sys_Xwaitid64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xwaitid64, libc_sys_Xwaitid64)
 
-/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
 .section .text.crt.syscall.mq_timedreceive64
 INTERN_FUNCTION(libc_sys_mq_timedreceive64)
 	movl   $(0xfffffee8), %eax
@@ -6920,7 +6920,7 @@ INTERN_FUNCTION(libc_sys_mq_timedreceive64)
 END(libc_sys_mq_timedreceive64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_timedreceive64, libc_sys_mq_timedreceive64)
 
-/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
+/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
 .section .text.crt.syscall.Xmq_timedreceive64
 INTERN_FUNCTION(libc_sys_Xmq_timedreceive64)
 	movl   $(0xfffffee8), %eax
@@ -6928,7 +6928,7 @@ INTERN_FUNCTION(libc_sys_Xmq_timedreceive64)
 END(libc_sys_Xmq_timedreceive64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_timedreceive64, libc_sys_Xmq_timedreceive64)
 
-/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
 .section .text.crt.syscall.mq_timedsend64
 INTERN_FUNCTION(libc_sys_mq_timedsend64)
 	movl   $(0xfffffee9), %eax
@@ -6936,7 +6936,7 @@ INTERN_FUNCTION(libc_sys_mq_timedsend64)
 END(libc_sys_mq_timedsend64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mq_timedsend64, libc_sys_mq_timedsend64)
 
-/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
 .section .text.crt.syscall.Xmq_timedsend64
 INTERN_FUNCTION(libc_sys_Xmq_timedsend64)
 	movl   $(0xfffffee9), %eax
@@ -6960,7 +6960,7 @@ INTERN_FUNCTION(libc_sys_Xutimes64)
 END(libc_sys_Xutimes64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xutimes64, libc_sys_Xutimes64)
 
-/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
+/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
 .section .text.crt.syscall.clock_nanosleep64
 INTERN_FUNCTION(libc_sys_clock_nanosleep64)
 	movl   $(0xfffffef5), %eax
@@ -6968,7 +6968,7 @@ INTERN_FUNCTION(libc_sys_clock_nanosleep64)
 END(libc_sys_clock_nanosleep64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_clock_nanosleep64, libc_sys_clock_nanosleep64)
 
-/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
+/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
 .section .text.crt.syscall.Xclock_nanosleep64
 INTERN_FUNCTION(libc_sys_Xclock_nanosleep64)
 	movl   $(0xfffffef5), %eax
@@ -6976,7 +6976,7 @@ INTERN_FUNCTION(libc_sys_Xclock_nanosleep64)
 END(libc_sys_Xclock_nanosleep64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xclock_nanosleep64, libc_sys_Xclock_nanosleep64)
 
-/* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
+/* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
 .section .text.crt.syscall.clock_getres64
 INTERN_FUNCTION(libc_sys_clock_getres64)
 	movl   $(0xfffffef6), %eax
@@ -6984,7 +6984,7 @@ INTERN_FUNCTION(libc_sys_clock_getres64)
 END(libc_sys_clock_getres64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_clock_getres64, libc_sys_clock_getres64)
 
-/* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
+/* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
 .section .text.crt.syscall.Xclock_getres64
 INTERN_FUNCTION(libc_sys_Xclock_getres64)
 	movl   $(0xfffffef6), %eax
@@ -6992,7 +6992,7 @@ INTERN_FUNCTION(libc_sys_Xclock_getres64)
 END(libc_sys_Xclock_getres64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xclock_getres64, libc_sys_Xclock_getres64)
 
-/* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
+/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 .section .text.crt.syscall.clock_gettime64
 INTERN_FUNCTION(libc_sys_clock_gettime64)
 	movl   $(0xfffffef7), %eax
@@ -7000,7 +7000,7 @@ INTERN_FUNCTION(libc_sys_clock_gettime64)
 END(libc_sys_clock_gettime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_clock_gettime64, libc_sys_clock_gettime64)
 
-/* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
+/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 .section .text.crt.syscall.Xclock_gettime64
 INTERN_FUNCTION(libc_sys_Xclock_gettime64)
 	movl   $(0xfffffef7), %eax
@@ -7008,7 +7008,7 @@ INTERN_FUNCTION(libc_sys_Xclock_gettime64)
 END(libc_sys_Xclock_gettime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xclock_gettime64, libc_sys_Xclock_gettime64)
 
-/* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
+/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
 .section .text.crt.syscall.clock_settime64
 INTERN_FUNCTION(libc_sys_clock_settime64)
 	movl   $(0xfffffef8), %eax
@@ -7016,7 +7016,7 @@ INTERN_FUNCTION(libc_sys_clock_settime64)
 END(libc_sys_clock_settime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_clock_settime64, libc_sys_clock_settime64)
 
-/* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
+/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
 .section .text.crt.syscall.Xclock_settime64
 INTERN_FUNCTION(libc_sys_Xclock_settime64)
 	movl   $(0xfffffef8), %eax
@@ -7024,7 +7024,7 @@ INTERN_FUNCTION(libc_sys_Xclock_settime64)
 END(libc_sys_Xclock_settime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xclock_settime64, libc_sys_Xclock_settime64)
 
-/* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
+/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
 .section .text.crt.syscall.timer_gettime64
 INTERN_FUNCTION(libc_sys_timer_gettime64)
 	movl   $(0xfffffefb), %eax
@@ -7032,7 +7032,7 @@ INTERN_FUNCTION(libc_sys_timer_gettime64)
 END(libc_sys_timer_gettime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timer_gettime64, libc_sys_timer_gettime64)
 
-/* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
+/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
 .section .text.crt.syscall.Xtimer_gettime64
 INTERN_FUNCTION(libc_sys_Xtimer_gettime64)
 	movl   $(0xfffffefb), %eax
@@ -7040,7 +7040,7 @@ INTERN_FUNCTION(libc_sys_Xtimer_gettime64)
 END(libc_sys_Xtimer_gettime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimer_gettime64, libc_sys_Xtimer_gettime64)
 
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
 .section .text.crt.syscall.timer_settime64
 INTERN_FUNCTION(libc_sys_timer_settime64)
 	movl   $(0xfffffefc), %eax
@@ -7048,7 +7048,7 @@ INTERN_FUNCTION(libc_sys_timer_settime64)
 END(libc_sys_timer_settime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timer_settime64, libc_sys_timer_settime64)
 
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
 .section .text.crt.syscall.Xtimer_settime64
 INTERN_FUNCTION(libc_sys_Xtimer_settime64)
 	movl   $(0xfffffefc), %eax
@@ -7152,7 +7152,7 @@ INTERN_FUNCTION(libc_sys_Xpread64f)
 END(libc_sys_Xpread64f)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpread64f, libc_sys_Xpread64f)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.rt_sigtimedwait64
 INTERN_FUNCTION(libc_sys_rt_sigtimedwait64)
 	movl   $(0xffffff4f), %eax
@@ -7160,7 +7160,7 @@ INTERN_FUNCTION(libc_sys_rt_sigtimedwait64)
 END(libc_sys_rt_sigtimedwait64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigtimedwait64, libc_sys_rt_sigtimedwait64)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.Xrt_sigtimedwait64
 INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait64)
 	movl   $(0xffffff4f), %eax
@@ -7168,7 +7168,7 @@ INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait64)
 END(libc_sys_Xrt_sigtimedwait64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrt_sigtimedwait64, libc_sys_Xrt_sigtimedwait64)
 
-/* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
+/* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 .section .text.crt.syscall.nanosleep64
 INTERN_FUNCTION(libc_sys_nanosleep64)
 	movl   $(0xffffff5e), %eax
@@ -7176,7 +7176,7 @@ INTERN_FUNCTION(libc_sys_nanosleep64)
 END(libc_sys_nanosleep64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_nanosleep64, libc_sys_nanosleep64)
 
-/* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
+/* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 .section .text.crt.syscall.Xnanosleep64
 INTERN_FUNCTION(libc_sys_Xnanosleep64)
 	movl   $(0xffffff5e), %eax
@@ -7184,7 +7184,7 @@ INTERN_FUNCTION(libc_sys_Xnanosleep64)
 END(libc_sys_Xnanosleep64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xnanosleep64, libc_sys_Xnanosleep64)
 
-/* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
+/* errno_t sched_rr_get_interval64(pid_t pid, struct timespecx32_64 *tms) */
 .section .text.crt.syscall.sched_rr_get_interval64
 INTERN_FUNCTION(libc_sys_sched_rr_get_interval64)
 	movl   $(0xffffff5f), %eax
@@ -7192,7 +7192,7 @@ INTERN_FUNCTION(libc_sys_sched_rr_get_interval64)
 END(libc_sys_sched_rr_get_interval64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sched_rr_get_interval64, libc_sys_sched_rr_get_interval64)
 
-/* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
+/* errno_t sched_rr_get_interval64(pid_t pid, struct timespecx32_64 *tms) */
 .section .text.crt.syscall.Xsched_rr_get_interval64
 INTERN_FUNCTION(libc_sys_Xsched_rr_get_interval64)
 	movl   $(0xffffff5f), %eax
@@ -7677,7 +7677,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmktty, libc_sys_Xmktty)
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 .section .text.crt.syscall.lfutexlockexpr
 INTERN_FUNCTION(libc_sys_lfutexlockexpr)
 	movl   $(0xffffffeb), %eax
@@ -7712,7 +7712,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexlockexpr, libc_sys_lfutexlockexpr)
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+/* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 .section .text.crt.syscall.Xlfutexlockexpr
 INTERN_FUNCTION(libc_sys_Xlfutexlockexpr)
 	movl   $(0xffffffeb), %eax
@@ -7747,7 +7747,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutexlockexpr, libc_sys_Xlfutexlockexpr)
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 .section .text.crt.syscall.lfutexexpr
 INTERN_FUNCTION(libc_sys_lfutexexpr)
 	movl   $(0xffffffec), %eax
@@ -7782,7 +7782,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexexpr, libc_sys_lfutexexpr)
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+/* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 .section .text.crt.syscall.Xlfutexexpr
 INTERN_FUNCTION(libc_sys_Xlfutexexpr)
 	movl   $(0xffffffec), %eax
@@ -7828,7 +7828,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlseek64, libc_sys_Xlseek64)
  * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
  * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
  * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) */
+/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
 .section .text.crt.syscall.lfutex
 INTERN_FUNCTION(libc_sys_lfutex)
 	movl   $(0xffffffee), %eax
@@ -7858,7 +7858,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutex, libc_sys_lfutex)
  * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
  * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
  * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) */
+/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
 .section .text.crt.syscall.Xlfutex
 INTERN_FUNCTION(libc_sys_Xlfutex)
 	movl   $(0xffffffee), %eax

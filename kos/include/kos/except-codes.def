@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe928e709 */
+/* HASH CRC-32:0x198ccdb8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ CLASS(E_INVALID_ARGUMENT,MESSAGE("Invalid argument"),ERRNO(EINVAL),())
        GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED ? EDESTADDRREQ :
        GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED ? EISCONN :
        EINVAL),(MEMBER(unsigned int,context)))
-	SUBCLASS(E_INVALID_ARGUMENT_SOCKET_OPT,MESSAGE("Unrecognized combination of level/optname"),ERRNO(ENOPROTOOPT),(MEMBER(unsigned int,context) MEMBER(uintptr_t,level) MEMBER(uintptr_t,optname)))
+	SUBCLASS(E_INVALID_ARGUMENT_SOCKET_OPT,MESSAGE("Unrecognized combination of level/optname"),ERRNO(ENOPROTOOPT),(MEMBER(unsigned int,context) MEMBER(uintptr_t,level) MEMBER(uintptr_t,optname) MEMBER(uintptr_t,address_family) MEMBER(uintptr_t,socket_type) MEMBER(uintptr_t,protocol)))
 	SUBCLASS(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,MESSAGE("One command was given when a different one was expected"),ERRNO(GET_EXCEPTION_POINTER(0) == E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY ? EAFNOSUPPORT : EINVAL),(MEMBER(unsigned int,context) MEMBER(uintptr_t,command) MEMBER(uintptr_t,expected_command)))
 END
 CLASS(E_NOT_IMPLEMENTED,MESSAGE("Unimplemented function"),ERRNO(EPERM),())

@@ -41,6 +41,7 @@ __DECL_BEGIN
 #define __OFFSET_MSGHDR_CONTROLLEN __OFFSET_MSGHDR64_CONTROLLEN
 #define __OFFSET_MSGHDR_FLAGS      __OFFSET_MSGHDR64_FLAGS
 #define __SIZEOF_MSGHDR            __SIZEOF_MSGHDR64
+#define __ALIGNOF_MSGHDR           __ALIGNOF_MSGHDR64
 #endif /* __x86_64__ */
 
 #define __OFFSET_MSGHDR64_NAME       0
@@ -51,6 +52,7 @@ __DECL_BEGIN
 #define __OFFSET_MSGHDR64_CONTROLLEN 40
 #define __OFFSET_MSGHDR64_FLAGS      48
 #define __SIZEOF_MSGHDR64            56
+#define __ALIGNOF_MSGHDR64           __ALIGNOF_INT64__
 #ifdef __CC__
 
 #ifdef __x86_64__
@@ -63,7 +65,7 @@ struct sockaddr;
 #ifdef __x86_64__
 struct cmsghdr;
 #else /* __x86_64__ */
-struct cmsghdr64;
+struct __cmsghdrx64;
 #endif /* !__x86_64__ */
 #endif /* __USE_KOS_KERNEL */
 
@@ -86,10 +88,10 @@ struct msghdr64 /*[PREFIX(msg_)]*/ { /* TODO: Rename to msghdrx64 */
 #ifdef __x86_64__
 	__HYBRID_PTR64(struct cmsghdr) msg_control;    /* [0..msg_controllen] Ancillary data (eg BSD filedesc passing). */
 #else /* __x86_64__ */
-	__HYBRID_PTR64(struct cmsghdr64) msg_control;  /* [0..msg_controllen] Ancillary data (eg BSD filedesc passing). */
+	__HYBRID_PTR64(struct __cmsghdrx64) msg_control;  /* [0..msg_controllen] Ancillary data (eg BSD filedesc passing). */
 #endif /* !__x86_64__ */
 #else /* __USE_KOS_KERNEL */
-	__HYBRID_PTR64(void)           msg_control;    /* [0..msg_controllen][TYPE(struct cmsghdr32 *)] Ancillary data (eg BSD filedesc passing). */
+	__HYBRID_PTR64(void)           msg_control;    /* [0..msg_controllen][TYPE(struct __cmsghdrx64 *)] Ancillary data (eg BSD filedesc passing). */
 #endif /* !__USE_KOS_KERNEL */
 	__UINT64_TYPE__                msg_controllen; /* [in|out][valid_if(msg_control != NULL)] Ancillary data buffer length.
 	                                                * !! The type should be socklen_t but the definition of the

@@ -508,8 +508,10 @@ check_error_and_return_true:
 	return true;
 }
 
-LOCAL NONNULL((1)) void KCALL
-aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self)
+struct timespec;
+LOCAL NONNULL((1)) bool KCALL
+aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
+                           struct timespec const *timeout DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_isconnected());
 	while (!aio_handle_generic_hascompleted(self)) {
@@ -519,12 +521,17 @@ aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self)
 				task_disconnectall();
 				break;
 			}
-			task_waitfor();
+			if (!task_waitfor(timeout)) {
+				__hybrid_assert(timeout);
+				aio_handle_cancel(self);
+				return false;
+			}
 		} EXCEPT {
 			aio_handle_cancel(self);
 			RETHROW();
 		}
 	}
+	return true;
 }
 
 
@@ -753,8 +760,10 @@ check_error_and_return_true:
 	return true;
 }
 
-LOCAL NONNULL((1)) void KCALL
-aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self)
+struct timespec;
+LOCAL NONNULL((1)) bool KCALL
+aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
+                                struct timespec const *timeout DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, ...) {
 	__hybrid_assert(!task_isconnected());
 	while (!aio_multihandle_generic_hascompleted(self)) {
@@ -764,12 +773,17 @@ aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self)
 				task_disconnectall();
 				break;
 			}
-			task_waitfor();
+			if (!task_waitfor(timeout)) {
+				__hybrid_assert(timeout);
+				aio_multihandle_cancel(self);
+				return false;
+			}
 		} EXCEPT {
 			aio_multihandle_cancel(self);
 			RETHROW();
 		}
 	}
+	return true;
 }
 
 

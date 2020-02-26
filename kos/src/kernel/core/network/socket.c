@@ -496,13 +496,13 @@ socket_sendv(struct socket *__restrict self,
 
 struct connect_and_send_job {
 	WEAK REF struct socket   *cas_socket;   /* [0..1][lock(CLEAR_ONCE)] Weak reference to the associated socket. */
-	REF struct vm            *can_bufvm;    /* [0..1][lock(CLEAR_ONCE)] VM for user-space buffers. */
-	struct ancillary_message *cas_pcontrol; /* [const] Pointer to ancillary message data. */
+	REF struct vm            *cas_bufvm;    /* [0..1][lock(CLEAR_ONCE)] VM for user-space buffers. */
+	struct ancillary_message *cas_pcontrol; /* [0..1][const] Pointer to ancillary message data. */
 	struct ancillary_message  cas_control;  /* [const][valid_if(cas_pcontrol)] ancillary message data. */
 	syscall_ulong_t           cas_msgflags; /* [const] Message flags */
 	struct aio_buffer         cas_buffer;   /* [override(.ab_entv, [if(.ab_entc != 1, [owned])])][const] I/O buffer. */
-	size_t                    can_bufsize;  /* [const][== aio_buffer_size(&cas_buffer)] I/O buffer size. */
-	struct aio_handle_generic can_aio;      /* if (cas_socket != NULL): AIO handle for connect()
+	size_t                    cas_bufsize;  /* [const][== aio_buffer_size(&cas_buffer)] I/O buffer size. */
+	struct aio_handle_generic cas_aio;      /* if (cas_socket != NULL): AIO handle for connect()
 	                                         * if (cas_socket == NULL): AIO handle for send() */
 };
 
@@ -510,19 +510,18 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(ASYNC_CALLBACK_CC connect_and_send_fini)(async_job_t self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
-	if likely(me->can_aio.ah_type) /* This can be NULL if the send() setup failed. */
-		aio_handle_generic_fini(&me->can_aio);
+	aio_handle_generic_fini(&me->cas_aio);
 	if (me->cas_buffer.ab_entc != 1)
 		kfree((void *)me->cas_buffer.ab_entv);
 	xweakdecref_unlikely(me->cas_socket);
-	xdecref_unlikely(me->can_bufvm);
+	xdecref_unlikely(me->cas_bufvm);
 }
 
 PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
 connect_and_send_poll(async_job_t self, struct timespec *__restrict UNUSED(timeout)) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
-	if (aio_handle_generic_poll(&me->can_aio))
+	if (aio_handle_generic_poll(&me->cas_aio))
 		return ASYNC_JOB_POLL_AVAILABLE;
 	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
 }
@@ -532,36 +531,39 @@ connect_and_send_work(async_job_t self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
 	/* Check for AIO errors. */
-	assert(aio_handle_generic_hascompleted(&me->can_aio));
-	aio_handle_generic_checkerror(&me->can_aio);
+	assert(aio_handle_generic_hascompleted(&me->cas_aio));
+	aio_handle_generic_checkerror(&me->cas_aio);
 	if (!me->cas_socket)
 		return false; /* send() has completed. */
-	/* connect() has completed (successfully).
-	 * Move on to the send() part. */
 	if (!tryincref(me->cas_socket))
 		THROW(E_NO_SUCH_OBJECT);
-	aio_handle_generic_fini(&me->can_aio);
-	aio_handle_generic_init(&me->can_aio);
+	/* connect() has completed (successfully).
+	 * Move on to the send() part. */
+	aio_handle_generic_fini(&me->cas_aio);
+	aio_handle_generic_init(&me->cas_aio);
 	TRY {
-		REF struct vm *oldvm = incref(THIS_VM);
+		REF struct vm *oldvm;
+		oldvm = incref(THIS_VM);
 		FINALLY_DECREF_UNLIKELY(oldvm);
-		task_setvm(me->can_bufvm); /* TODO: Bad way of switching VMs! */
-		decref_nokill(me->can_bufvm);
-		me->can_bufvm = NULL;
+		task_setvm(me->cas_bufvm); /* TODO: Bad way of switching VMs! */
+		decref_nokill(me->cas_bufvm);
+		me->cas_bufvm = NULL;
 		TRY {
 			(*me->cas_socket->sk_ops->so_sendv)(me->cas_socket,
 			                                    &me->cas_buffer,
-			                                    me->can_bufsize,
+			                                    me->cas_bufsize,
 			                                    me->cas_pcontrol,
 			                                    me->cas_msgflags,
-			                                    &me->can_aio);
+			                                    &me->cas_aio);
 		} EXCEPT {
 			task_setvm(oldvm); /* TODO: This might throw an exception! */
 			RETHROW();
 		}
 		task_setvm(oldvm);
 	} EXCEPT {
-		me->can_aio.ah_type = NULL;
+		aio_handle_init(&me->cas_aio, &aio_noop_type);
+		aio_handle_complete(&me->cas_aio, AIO_COMPLETION_FAILURE);
+		decref_unlikely(me->cas_socket);
 		RETHROW();
 	}
 	decref_unlikely(me->cas_socket);
@@ -573,22 +575,19 @@ PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
 connect_and_send_cancel(async_job_t self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
-	assert(me->can_aio.ah_type);
 	/* Cancel the current AIO operation. */
-	aio_handle_cancel(&me->can_aio);
+	aio_handle_cancel(&me->cas_aio);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) size_t
 NOTHROW(ASYNC_CALLBACK_CC connect_and_send_retsize)(async_job_t self) {
 	struct connect_and_send_job *me;
 	me = (struct connect_and_send_job *)self;
-	if unlikely(!me->can_aio.ah_type)
-		return 0; /* Might get here if retsize() is called after AIO_FAILURE */
-	assert(aio_handle_generic_hascompleted(&me->can_aio));
+	assert(aio_handle_generic_hascompleted(&me->cas_aio));
 	assert(!me->cas_socket);
-	if (!me->can_aio.ah_type->ht_retsize)
-		return me->can_bufsize;
-	return (*me->can_aio.ah_type->ht_retsize)(&me->can_aio);
+	if (!me->cas_aio.ah_type->ht_retsize)
+		return me->cas_bufsize;
+	return (*me->cas_aio.ah_type->ht_retsize)(&me->cas_aio);
 }
 
 
@@ -631,13 +630,14 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
 			job->cas_pcontrol = &job->cas_control;
 		}
 		job->cas_msgflags = msg_flags;
-		job->can_bufsize = bufsize;
+		job->cas_bufsize = bufsize;
 		if (buf->ab_entc != 1) {
 			struct aio_buffer_entry *entv;
 			entv = (struct aio_buffer_entry *)kmalloc(buf->ab_entc *
 			                                          sizeof(struct aio_buffer_entry),
 			                                          GFP_NORMAL);
-			memcpy(entv, buf->ab_entv, buf->ab_entc, sizeof(struct aio_buffer_entry));
+			if (buf->ab_entc > 1)
+				memcpy(entv + 1, buf->ab_entv + 1, buf->ab_entc - 1, sizeof(struct aio_buffer_entry));
 			job->cas_buffer.ab_entc         = buf->ab_entc;
 			job->cas_buffer.ab_entv         = entv;
 			job->cas_buffer.ab_head.ab_base = buf->ab_head.ab_base;
@@ -650,15 +650,15 @@ socket_asendtov_connect_and_send(struct socket *__restrict self,
 			job->cas_buffer.ab_head.ab_size = buf->ab_head.ab_size;
 			job->cas_buffer.ab_last         = buf->ab_last;
 		}
-		aio_handle_generic_init(&job->can_aio);
-		job->can_bufvm = incref(THIS_VM);
+		aio_handle_generic_init(&job->cas_aio);
+		job->cas_bufvm = incref(THIS_VM);
 		TRY {
 			/* Initiate the connect() operation. */
-			(*self->sk_ops->so_connect)(self, addr, addr_len, &job->can_aio);
+			(*self->sk_ops->so_connect)(self, addr, addr_len, &job->cas_aio);
 		} EXCEPT {
 			if (job->cas_buffer.ab_entc != 1)
 				kfree((void *)job->cas_buffer.ab_entv);
-			decref_unlikely(job->can_bufvm);
+			decref_unlikely(job->cas_bufvm);
 			RETHROW();
 		}
 	} EXCEPT {
@@ -815,6 +815,238 @@ socket_sendtov(struct socket *__restrict self,
 
 
 
+struct recvfrom_peer_job {
+	WEAK REF struct socket          *rpj_sock;        /* [1..1][const] Weak reference to the associated socket. */
+	REF struct vm                   *rpj_bufvm;       /* [1..1][const] Pointer to the user-space buffer VM. */
+	USER CHECKED u32                *rpj_presflg;     /* [0..1][const] Pointer to user-space result flags (set of `MSG_*'). */
+	syscall_ulong_t                  rpj_msgflags;    /* [const] Message flags (set of `MSG_*'). */
+	struct aio_buffer                rpj_buffer;      /* [override(.ab_entv, [if(.ab_entc != 1, [owned])])][const] I/O buffer. */
+	size_t                           rpj_bufsize;     /* [const][== aio_buffer_size(&cas_buffer)] I/O buffer size. */
+	struct ancillary_rmessage const *rpj_pcontrol;    /* [0..1][const] Pointer to ancillary message data. */
+	struct ancillary_rmessage        rpj_control;     /* [const][valid_if(cas_pcontrol)] ancillary message data. */
+	struct aio_handle_generic        rpj_aio;         /* AIO handle used for receiving data from an arbitrary  */
+	struct sockaddr                 *rpj_wantpeer;    /* [1..rpj_wantpeerlen][const][owned_if(!= &_rpj_wantpeer)] Expected peer */
+	socklen_t                        rpj_wantpeerlen; /* [const] Buffer length of `rpj_wantpeer' */
+	struct sockaddr                 *rpj_gotpeer;     /* [1..rpj_gotpeerlen][const][owned_if(!= &_rpj_gotpeer)] Actual peer */
+	socklen_t                        rpj_gotpeerlen;  /* Buffer length of `rpj_gotpeer' */
+	struct sockaddr_storage         _rpj_wantpeer;    /* Static buffer for most kinds of socket peers. */
+	struct sockaddr_storage         _rpj_gotpeer;     /* Static buffer for most kinds of socket peers. */
+};
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(ASYNC_CALLBACK_CC recvfrom_peer_fini)(async_job_t self) {
+	struct recvfrom_peer_job *me;
+	me = (struct recvfrom_peer_job *)self;
+	if (me->rpj_aio.ah_type)
+		aio_handle_generic_fini(&me->rpj_aio);
+	if (me->rpj_buffer.ab_entc != 1)
+		kfree((void *)me->rpj_buffer.ab_entv);
+	if (me->rpj_wantpeer != (struct sockaddr *)&me->_rpj_wantpeer)
+		kfree(me->rpj_wantpeer);
+	if (me->rpj_gotpeer != (struct sockaddr *)&me->_rpj_gotpeer)
+		kfree(me->rpj_gotpeer);
+	decref_unlikely(me->rpj_bufvm);
+	weakdecref_unlikely(me->rpj_sock);
+}
+
+PRIVATE NONNULL((1, 2)) unsigned int ASYNC_CALLBACK_CC
+recvfrom_peer_poll(async_job_t self, struct timespec *__restrict UNUSED(timeout)) {
+	struct recvfrom_peer_job *me;
+	me = (struct recvfrom_peer_job *)self;
+	if (aio_handle_generic_poll(&me->rpj_aio))
+		return ASYNC_JOB_POLL_AVAILABLE;
+	return ASYNC_JOB_POLL_WAITFOR_NOTIMEOUT;
+}
+
+PRIVATE NONNULL((1)) bool ASYNC_CALLBACK_CC
+recvfrom_peer_work(async_job_t self) {
+	struct recvfrom_peer_job *me;
+	me = (struct recvfrom_peer_job *)self;
+	assert(aio_handle_generic_hascompleted(&me->rpj_aio));
+	aio_handle_generic_checkerror(&me->rpj_aio);
+	/* Check if the packet came from the correct peer. */
+	if (me->rpj_gotpeerlen != me->rpj_wantpeerlen)
+		goto wrong_peer;
+	if (memcmp(me->rpj_gotpeer, me->rpj_wantpeer, me->rpj_wantpeerlen) != 0)
+		goto wrong_peer;
+	return false; /* done! */
+wrong_peer:
+	if (!tryincref(me->rpj_sock))
+		THROW(E_NO_SUCH_OBJECT);
+	/* re-start the send operation. */
+	aio_handle_generic_fini(&me->rpj_aio);
+	aio_handle_generic_init(&me->rpj_aio);
+	TRY {
+		REF struct vm *oldvm;
+		oldvm = incref(THIS_VM);
+		FINALLY_DECREF_UNLIKELY(oldvm);
+		task_setvm(me->rpj_bufvm); /* TODO: Bad way of switching VMs! */
+		TRY {
+			/* Reset the received socket address. */
+			me->rpj_gotpeerlen = me->rpj_wantpeerlen;
+			(*me->rpj_sock->sk_ops->so_recvfromv)(me->rpj_sock,
+			                                      &me->rpj_buffer,
+			                                      me->rpj_bufsize,
+			                                      me->rpj_gotpeer,
+			                                      me->rpj_wantpeerlen,
+			                                      &me->rpj_gotpeerlen,
+			                                      me->rpj_presflg,
+			                                      me->rpj_pcontrol,
+			                                      me->rpj_msgflags,
+			                                      &me->rpj_aio);
+		} EXCEPT {
+			task_setvm(oldvm); /* TODO: This might throw an exception! */
+			RETHROW();
+		}
+		task_setvm(oldvm);
+	} EXCEPT {
+		decref_unlikely(me->rpj_sock);
+		aio_handle_init(&me->rpj_aio, &aio_noop_type);
+		aio_handle_complete(&me->rpj_aio, AIO_COMPLETION_FAILURE);
+		RETHROW();
+	}
+	return true;
+}
+
+PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
+recvfrom_peer_cancel(async_job_t self) {
+	struct recvfrom_peer_job *me;
+	me = (struct recvfrom_peer_job *)self;
+	/* Cancel the current AIO operation. */
+	aio_handle_cancel(&me->rpj_aio);
+}
+
+PRIVATE NOBLOCK NONNULL((1)) size_t
+NOTHROW(ASYNC_CALLBACK_CC recvfrom_peer_retsize)(async_job_t self) {
+	struct recvfrom_peer_job *me;
+	me = (struct recvfrom_peer_job *)self;
+	assert(aio_handle_generic_hascompleted(&me->rpj_aio));
+	if (!me->rpj_aio.ah_type->ht_retsize)
+		return me->rpj_bufsize;
+	return (*me->rpj_aio.ah_type->ht_retsize)(&me->rpj_aio);
+}
+
+PRIVATE struct async_job_callbacks const recvfrom_peer_cb = {
+	/* .jc_jobsize  = */ sizeof(struct recvfrom_peer_job),
+	/* .jc_jobalign = */ alignof(struct recvfrom_peer_job),
+	/* .jc_driver   = */ &drv_self,
+	/* .jc_fini     = */ &recvfrom_peer_fini,
+	/* .jc_poll     = */ &recvfrom_peer_poll,
+	/* .jc_work     = */ &recvfrom_peer_work,
+	/* .jc_time     = */ NULL, /* Unused */
+	/* .jc_cancel   = */ &recvfrom_peer_cancel,
+	/* .jc_progress = */ NULL, /* Unused */
+	/* .jc_retsize  = */ &recvfrom_peer_retsize,
+};
+
+
+
+PRIVATE NONNULL((1, 7)) void KCALL
+socket_arecvfrom_peer(struct socket *__restrict self,
+                      struct aio_buffer const *buf, size_t bufsize,
+                      /*0..1*/ USER CHECKED u32 *presult_flags,
+                      struct ancillary_rmessage const *msg_control,
+                      syscall_ulong_t msg_flags,
+                      /*out*/ struct aio_handle *__restrict aio) {
+	async_job_t aj;
+	struct recvfrom_peer_job *job;
+	assert(self->sk_ops->so_recvfromv);
+	aj = async_job_alloc(&recvfrom_peer_cb);
+	job = (struct recvfrom_peer_job *)aj;
+	TRY {
+		/* Fill in the async job. */
+		socklen_t reqlen;
+		/* Lookup the connected peer address. */
+		reqlen = socket_getpeername(self, (struct sockaddr *)&job->_rpj_wantpeer,
+		                            sizeof(job->_rpj_wantpeer));
+		if likely(reqlen <= sizeof(job->_rpj_wantpeer)) {
+			job->rpj_wantpeer    = (struct sockaddr *)&job->_rpj_wantpeer;
+			job->rpj_wantpeerlen = reqlen;
+			job->rpj_gotpeer     = (struct sockaddr *)&job->_rpj_gotpeer;
+		} else {
+			/* Must dynamically allocate the want/got peer length */
+			job->rpj_wantpeer = (struct sockaddr *)kmalloc(reqlen, GFP_NORMAL);
+			TRY {
+				socklen_t new_reqlen;
+again_want_peer_malloc:
+				new_reqlen = socket_getpeername(self, job->rpj_wantpeer, reqlen);
+				if unlikely(new_reqlen > reqlen) {
+					job->rpj_wantpeer = (struct sockaddr *)krealloc(job->rpj_wantpeer,
+					                                                new_reqlen, GFP_NORMAL);
+					reqlen = new_reqlen;
+					goto again_want_peer_malloc;
+				}
+				job->rpj_wantpeerlen = new_reqlen;
+				job->rpj_gotpeer     = (struct sockaddr *)kmalloc(new_reqlen, GFP_NORMAL);
+			} EXCEPT {
+				kfree(job->rpj_wantpeer);
+				RETHROW();
+			}
+		}
+		/* Fill in the AIO buffer. */
+		TRY {
+			if (buf->ab_entc == 1) {
+				aio_buffer_init(&job->rpj_buffer,
+				                buf->ab_head.ab_base,
+				                buf->ab_last);
+			} else {
+				struct aio_buffer_entry *entv;
+				entv = (struct aio_buffer_entry *)kmalloc(buf->ab_entc *
+				                                          sizeof(struct aio_buffer_entry),
+				                                          GFP_NORMAL);
+				if (buf->ab_entc > 1)
+					memcpy(entv + 1, buf->ab_entv + 1, buf->ab_entc - 1, sizeof(struct aio_buffer_entry));
+				job->rpj_buffer.ab_entv         = entv;
+				job->rpj_buffer.ab_entc         = buf->ab_entc;
+				job->rpj_buffer.ab_head.ab_base = buf->ab_head.ab_base;
+				job->rpj_buffer.ab_head.ab_size = buf->ab_head.ab_size;
+				job->rpj_buffer.ab_last         = buf->ab_last;
+			}
+			/* Finally, start the actual recv() operation! */
+			TRY {
+				aio_handle_generic_init(&job->rpj_aio);
+				(*self->sk_ops->so_recvfromv)(self,
+				                              &job->rpj_buffer,
+				                              bufsize,
+				                              job->rpj_gotpeer,
+				                              job->rpj_wantpeerlen,
+				                              &job->rpj_gotpeerlen,
+				                              presult_flags,
+				                              msg_control,
+				                              msg_flags,
+				                              &job->rpj_aio);
+			} EXCEPT {
+				if (job->rpj_buffer.ab_entc != 1)
+					kfree((void *)job->rpj_buffer.ab_entv);
+				RETHROW();
+			}
+		} EXCEPT {
+			if (job->rpj_wantpeer != (struct sockaddr *)&job->_rpj_wantpeer)
+				kfree(job->rpj_wantpeer);
+			if (job->rpj_gotpeer != (struct sockaddr *)&job->_rpj_gotpeer)
+				kfree(job->rpj_gotpeer);
+			RETHROW();
+		}
+	} EXCEPT {
+		async_job_free(aj);
+		RETHROW();
+	}
+	/* Fill in fields that are NOEXCEPT after the fact! */
+	job->rpj_sock     = weakincref(self);
+	job->rpj_bufvm    = incref(THIS_VM);
+	job->rpj_presflg  = presult_flags;
+	job->rpj_msgflags = msg_flags;
+	job->rpj_bufsize  = bufsize;
+	job->rpj_pcontrol = NULL;
+	if (msg_control) {
+		job->rpj_pcontrol = &job->rpj_control;
+		memcpy(&job->rpj_control, msg_control,
+		       sizeof(struct ancillary_rmessage));
+	}
+	decref(async_job_start(aj, aio));
+}
+
+
 /* Receive data over this socket, and store the contents within the given buffer.
  * NOTE: `aio' is initialized with a handle supporting the RETSIZE
  *        command, which in turn return the actual # of read bytes.
@@ -837,15 +1069,20 @@ socket_arecv(struct socket *__restrict self,
              struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
              /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED) {
-	/* TODO */
-	(void)self;
-	(void)buf;
-	(void)bufsize;
-	(void)presult_flags;
-	(void)msg_control;
-	(void)msg_flags;
-	(void)aio;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	if (self->sk_ops->so_recv) {
+		(*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
+		                         msg_control, msg_flags, aio);
+	} else {
+		struct aio_buffer iov;
+		aio_buffer_init(&iov, buf, bufsize);
+		if (self->sk_ops->so_recvv) {
+			(*self->sk_ops->so_recvv)(self, &iov, bufsize, presult_flags,
+			                          msg_control, msg_flags, aio);
+		} else {
+			socket_arecvfrom_peer(self, &iov, bufsize, presult_flags,
+			                      msg_control, msg_flags, aio);
+		}
+	}
 }
 
 PUBLIC NONNULL((1, 2, 7)) void KCALL
@@ -855,15 +1092,13 @@ socket_arecvv(struct socket *__restrict self,
               struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
               /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED) {
-	/* TODO */
-	(void)self;
-	(void)buf;
-	(void)bufsize;
-	(void)presult_flags;
-	(void)msg_control;
-	(void)msg_flags;
-	(void)aio;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	if (self->sk_ops->so_recvv) {
+		(*self->sk_ops->so_recvv)(self, buf, bufsize, presult_flags,
+		                          msg_control, msg_flags, aio);
+	} else {
+		socket_arecvfrom_peer(self, buf, bufsize, presult_flags,
+		                      msg_control, msg_flags, aio);
+	}
 }
 
 /* Recv helper functions for blocking and non-blocking operations.
@@ -871,33 +1106,83 @@ socket_arecvv(struct socket *__restrict self,
 PUBLIC NONNULL((1)) size_t KCALL
 socket_recv(struct socket *__restrict self,
             USER CHECKED void *buf, size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-            struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED) {
-	/* TODO */
-	(void)self;
-	(void)buf;
-	(void)bufsize;
-	(void)presult_flags;
-	(void)msg_control;
-	(void)msg_flags;
-	(void)mode;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+            struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
+            iomode_t mode, struct timespec const *timeout)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT) {
+	size_t result;
+	struct aio_handle_generic aio;
+	aio_handle_generic_init(&aio);
+	socket_arecv(self, buf, bufsize, presult_flags, msg_control, msg_flags, &aio);
+	if (mode & IO_NONBLOCK) {
+		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
+		COMPILER_READ_BARRIER();
+		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
+			if (mode & IO_NODATAZERO)
+				return 0;
+			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+		}
+	} else {
+		TRY {
+			if (!aio_handle_generic_waitfor(&aio, timeout)) {
+				if (mode & IO_NODATAZERO) {
+					aio_handle_generic_fini(&aio);
+					return 0;
+				}
+				THROW(E_NET_TIMEOUT);
+			}
+		} EXCEPT {
+			aio_handle_generic_fini(&aio);
+			RETHROW();
+		}
+	}
+	/* Default-return the whole buffer size. */
+	result = bufsize;
+	/* Invoke the retsize operator (if defined). */
+	if (aio.ah_type->ht_retsize)
+		result = (*aio.ah_type->ht_retsize)(&aio);
+	aio_handle_generic_fini(&aio);
+	return result;
 }
 
 PUBLIC NONNULL((1, 2)) size_t KCALL
 socket_recvv(struct socket *__restrict self, struct aio_buffer const *__restrict buf,
              size_t bufsize, /*0..1*/ USER CHECKED u32 *presult_flags,
-             struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags, iomode_t mode)
-		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED) {
-	/* TODO */
-	(void)self;
-	(void)buf;
-	(void)bufsize;
-	(void)presult_flags;
-	(void)msg_control;
-	(void)msg_flags;
-	(void)mode;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+             struct ancillary_rmessage const *msg_control, syscall_ulong_t msg_flags,
+             iomode_t mode, struct timespec const *timeout)
+		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_NET_CONNECTION_REFUSED, E_NET_TIMEOUT) {
+	size_t result;
+	struct aio_handle_generic aio;
+	aio_handle_generic_init(&aio);
+	socket_arecvv(self, buf, bufsize, presult_flags, msg_control, msg_flags, &aio);
+	if (mode & IO_NONBLOCK) {
+		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
+		COMPILER_READ_BARRIER();
+		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
+			if (mode & IO_NODATAZERO)
+				return 0;
+			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+		}
+	} else {
+		TRY {
+			if (!aio_handle_generic_waitfor(&aio, timeout)) {
+				if (mode & IO_NODATAZERO) {
+					aio_handle_generic_fini(&aio);
+					return 0;
+				}
+				THROW(E_NET_TIMEOUT);
+			}
+		} EXCEPT {
+			aio_handle_generic_fini(&aio);
+			RETHROW();
+		}
+	}
+	/* Default-return the whole buffer size. */
+	result = bufsize;
+	/* Invoke the retsize operator (if defined). */
+	if (aio.ah_type->ht_retsize)
+		result = (*aio.ah_type->ht_retsize)(&aio);
+	aio_handle_generic_fini(&aio);
+	return result;
 }
 
 
@@ -926,18 +1211,31 @@ socket_arecvfrom(struct socket *__restrict self,
                  syscall_ulong_t msg_flags,
                  /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_NET_CONNECTION_REFUSED) {
-	/* TODO */
-	(void)self;
-	(void)buf;
-	(void)bufsize;
-	(void)addr;
-	(void)addr_len;
-	(void)preq_addr_len;
-	(void)presult_flags;
-	(void)msg_control;
-	(void)msg_flags;
-	(void)aio;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	if (self->sk_ops->so_recvfrom) {
+		(*self->sk_ops->so_recvfrom)(self, buf, bufsize, addr, addr_len,
+		                             preq_addr_len, presult_flags,
+		                             msg_control, msg_flags, aio);
+	} else if (self->sk_ops->so_recvfromv) {
+		struct aio_buffer iov;
+		aio_buffer_init(&iov, buf, bufsize);
+		(*self->sk_ops->so_recvfromv)(self, &iov, bufsize, addr, addr_len,
+		                              preq_addr_len, presult_flags,
+		                              msg_control, msg_flags, aio);
+	} else {
+		socklen_t reqlen;
+		reqlen = socket_getpeername(self, addr, addr_len);
+		*preq_addr_len = reqlen; /* Truncate if too small... */
+		if (self->sk_ops->so_recv) {
+			(*self->sk_ops->so_recv)(self, buf, bufsize, presult_flags,
+			                         msg_control, msg_flags, aio);
+		} else {
+			struct aio_buffer iov;
+			assert(self->sk_ops->so_recvv);
+			aio_buffer_init(&iov, buf, bufsize);
+			(*self->sk_ops->so_recvv)(self, &iov, bufsize, presult_flags,
+			                          msg_control, msg_flags, aio);
+		}
+	}
 }
 
 PUBLIC NONNULL((1, 2, 10)) void KCALL
@@ -950,22 +1248,24 @@ socket_arecvfromv(struct socket *__restrict self,
                   syscall_ulong_t msg_flags,
                   /*out*/ struct aio_handle *__restrict aio)
 		THROWS_INDIRECT(E_NET_CONNECTION_REFUSED) {
-	/* TODO */
-	(void)self;
-	(void)buf;
-	(void)bufsize;
-	(void)addr;
-	(void)addr_len;
-	(void)preq_addr_len;
-	(void)presult_flags;
-	(void)msg_control;
-	(void)msg_flags;
-	(void)aio;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	if (self->sk_ops->so_recvfromv) {
+		(*self->sk_ops->so_recvfromv)(self, buf, bufsize, addr, addr_len,
+		                              preq_addr_len, presult_flags,
+		                              msg_control, msg_flags, aio);
+	} else {
+		socklen_t reqlen;
+		reqlen = socket_getpeername(self, addr, addr_len);
+		*preq_addr_len = reqlen; /* Truncate if too small... */
+		assert(self->sk_ops->so_recvv);
+		(*self->sk_ops->so_recvv)(self, buf, bufsize, presult_flags,
+		                          msg_control, msg_flags, aio);
+	}
 }
 
 /* Recv helper functions for blocking and non-blocking operations.
- * @return: * : The actual number of received bytes (as returned by AIO) */
+ * @return: * : The actual number of received bytes (as returned by AIO)
+ * @throws: E_NET_TIMEOUT: The given `timeout' has expired, and `IO_NODATAZERO' wasn't set.
+ *                         When `IO_NODATAZERO' was set, then `0' will be returned instead. */
 PUBLIC NONNULL((1)) size_t KCALL
 socket_recvfrom(struct socket *__restrict self,
                 USER CHECKED void *buf, size_t bufsize,
@@ -973,20 +1273,43 @@ socket_recvfrom(struct socket *__restrict self,
                 /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
                 /*0..1*/ USER CHECKED u32 *presult_flags,
                 struct ancillary_rmessage const *msg_control,
-                syscall_ulong_t msg_flags, iomode_t mode)
+                syscall_ulong_t msg_flags,
+                iomode_t mode, struct timespec const *timeout)
 		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK) {
-	/* TODO */
-	(void)self;
-	(void)buf;
-	(void)bufsize;
-	(void)addr;
-	(void)addr_len;
-	(void)preq_addr_len;
-	(void)presult_flags;
-	(void)msg_control;
-	(void)msg_flags;
-	(void)mode;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	size_t result;
+	struct aio_handle_generic aio;
+	aio_handle_generic_init(&aio);
+	socket_arecvfrom(self, buf, bufsize, addr, addr_len, preq_addr_len,
+	                 presult_flags, msg_control, msg_flags, &aio);
+	if (mode & IO_NONBLOCK) {
+		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
+		COMPILER_READ_BARRIER();
+		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
+			if (mode & IO_NODATAZERO)
+				return 0;
+			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+		}
+	} else {
+		TRY {
+			if (!aio_handle_generic_waitfor(&aio, timeout)) {
+				if (mode & IO_NODATAZERO) {
+					aio_handle_generic_fini(&aio);
+					return 0;
+				}
+				THROW(E_NET_TIMEOUT);
+			}
+		} EXCEPT {
+			aio_handle_generic_fini(&aio);
+			RETHROW();
+		}
+	}
+	/* Default-return the whole buffer size. */
+	result = bufsize;
+	/* Invoke the retsize operator (if defined). */
+	if (aio.ah_type->ht_retsize)
+		result = (*aio.ah_type->ht_retsize)(&aio);
+	aio_handle_generic_fini(&aio);
+	return result;
 }
 
 PUBLIC NONNULL((1, 2)) size_t KCALL
@@ -996,20 +1319,43 @@ socket_recvfromv(struct socket *__restrict self,
                  /*?..1*/ USER CHECKED socklen_t *preq_addr_len,
                  /*0..1*/ USER CHECKED u32 *presult_flags,
                  struct ancillary_rmessage const *msg_control,
-                 syscall_ulong_t msg_flags, iomode_t mode)
-		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK) {
-	/* TODO */
-	(void)self;
-	(void)buf;
-	(void)bufsize;
-	(void)addr;
-	(void)addr_len;
-	(void)preq_addr_len;
-	(void)presult_flags;
-	(void)msg_control;
-	(void)msg_flags;
-	(void)mode;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+                 syscall_ulong_t msg_flags,
+                 iomode_t mode, struct timespec const *timeout)
+		THROWS(E_NET_CONNECTION_REFUSED, E_WOULDBLOCK, E_NET_TIMEOUT) {
+	size_t result;
+	struct aio_handle_generic aio;
+	aio_handle_generic_init(&aio);
+	socket_arecvfromv(self, buf, bufsize, addr, addr_len, preq_addr_len,
+	                  presult_flags, msg_control, msg_flags, &aio);
+	if (mode & IO_NONBLOCK) {
+		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
+		COMPILER_READ_BARRIER();
+		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
+			if (mode & IO_NODATAZERO)
+				return 0;
+			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+		}
+	} else {
+		TRY {
+			if (!aio_handle_generic_waitfor(&aio, timeout)) {
+				if (mode & IO_NODATAZERO) {
+					aio_handle_generic_fini(&aio);
+					return 0;
+				}
+				THROW(E_NET_TIMEOUT);
+			}
+		} EXCEPT {
+			aio_handle_generic_fini(&aio);
+			RETHROW();
+		}
+	}
+	/* Default-return the whole buffer size. */
+	result = bufsize;
+	/* Invoke the retsize operator (if defined). */
+	if (aio.ah_type->ht_retsize)
+		result = (*aio.ah_type->ht_retsize)(&aio);
+	aio_handle_generic_fini(&aio);
+	return result;
 }
 
 /* Begin to listen for incoming client (aka. peer) connection requests.
@@ -1019,10 +1365,12 @@ PUBLIC NONNULL((1)) void KCALL
 socket_listen(struct socket *__restrict self,
               syscall_ulong_t max_backlog)
 		THROWS(E_NET_ADDRESS_IN_USE, E_INVALID_HANDLE_NET_OPERATION) {
-	/* TODO */
-	(void)self;
-	(void)max_backlog;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	if unlikely(!self->sk_ops->so_listen) {
+		THROW(E_INVALID_HANDLE_NET_OPERATION, E_NET_OPERATION_LISTEN,
+		      socket_getfamily(self), socket_gettype(self),
+		      socket_getprotocol(self));
+	}
+	(*self->sk_ops->so_listen)(self, max_backlog);
 }
 
 /* Accept incoming client (aka. peer) connection requests.
@@ -1039,13 +1387,12 @@ socket_accept(struct socket *__restrict self,
               USER CHECKED socklen_t *preq_addr_len, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE, E_INVALID_HANDLE_NET_OPERATION,
 		       E_NET_CONNECTION_ABORT) {
-	/* TODO */
-	(void)self;
-	(void)addr;
-	(void)addr_len;
-	(void)preq_addr_len;
-	(void)mode;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	if unlikely(!self->sk_ops->so_accept) {
+		THROW(E_INVALID_HANDLE_NET_OPERATION, E_NET_OPERATION_ACCEPT,
+		      socket_getfamily(self), socket_gettype(self),
+		      socket_getprotocol(self));
+	}
+	return (*self->sk_ops->so_accept)(self, addr, addr_len, preq_addr_len, mode);
 }
 
 /* Disallow further reception of data (causing `recv()' to return `0' as soon
@@ -1057,10 +1404,15 @@ PUBLIC NONNULL((1)) void KCALL
 socket_shutdown(struct socket *__restrict self,
                 syscall_ulong_t how)
 		THROWS(E_INVALID_ARGUMENT_BAD_STATE) {
-	/* TODO */
-	(void)self;
-	(void)how;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	if unlikely(!self->sk_ops->so_shutdown) {
+		/* Simply verify that the socket is connected in this case... */
+		if (!socket_isconnected(self)) {
+			THROW(E_INVALID_ARGUMENT_BAD_STATE,
+			      E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED);
+		}
+	} else {
+		(*self->sk_ops->so_shutdown)(self, how);
+	}
 }
 
 /* Get the value of the named socket option and store it in `optval'
@@ -1072,14 +1424,38 @@ socket_getsockopt(struct socket *__restrict self,
                   USER CHECKED void *optval,
                   socklen_t optlen, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT) {
-	/* TODO */
-	(void)self;
-	(void)level;
-	(void)optname;
-	(void)optval;
-	(void)optlen;
-	(void)mode;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	socklen_t result;
+	/* TODO: Builtin socket options. */
+	if (self->sk_ops->so_getsockopt) {
+		TRY {
+			result = (*self->sk_ops->so_getsockopt)(self, level, optname,
+			                                        optval, optlen, mode);
+		} EXCEPT {
+			if (was_thrown(E_INVALID_ARGUMENT_SOCKET_OPT)) {
+				if (!PERTASK_GET(this_exception_pointers[0]))
+					PERTASK_SET(this_exception_pointers[0], (uintptr_t)E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT);
+				if (!PERTASK_GET(this_exception_pointers[1]))
+					PERTASK_SET(this_exception_pointers[1], (uintptr_t)level);
+				if (!PERTASK_GET(this_exception_pointers[2]))
+					PERTASK_SET(this_exception_pointers[2], (uintptr_t)optname);
+				if (!PERTASK_GET(this_exception_pointers[3]))
+					PERTASK_SET(this_exception_pointers[3], (uintptr_t)socket_getfamily(self));
+				if (!PERTASK_GET(this_exception_pointers[4]))
+					PERTASK_SET(this_exception_pointers[4], (uintptr_t)socket_gettype(self));
+				if (!PERTASK_GET(this_exception_pointers[5]))
+					PERTASK_SET(this_exception_pointers[5], (uintptr_t)socket_getprotocol(self));
+			}
+			RETHROW();
+		}
+	} else {
+		THROW(E_INVALID_ARGUMENT_SOCKET_OPT,
+		      E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT,
+		      level, optname,
+		      socket_getfamily(self),
+		      socket_gettype(self),
+		      socket_getprotocol(self));
+	}
+	return result;
 }
 
 /* Set the value of the named socket option from what is given in `optval'
@@ -1091,14 +1467,56 @@ socket_setsockopt(struct socket *__restrict self,
                   USER CHECKED void const *optval,
                   socklen_t optlen, iomode_t mode)
 		THROWS(E_INVALID_ARGUMENT_SOCKET_OPT, E_BUFFER_TOO_SMALL) {
-	/* TODO */
-	(void)self;
-	(void)level;
-	(void)optname;
-	(void)optval;
-	(void)optlen;
-	(void)mode;
-	THROW(E_NOT_IMPLEMENTED_TODO);
+	/* TODO: Builtin socket options. */
+	if (self->sk_ops->so_setsockopt) {
+		TRY {
+			(*self->sk_ops->so_setsockopt)(self, level, optname,
+			                               optval, optlen, mode);
+		} EXCEPT {
+			if (was_thrown(E_INVALID_ARGUMENT_SOCKET_OPT)) {
+				if (!PERTASK_GET(this_exception_pointers[0]))
+					PERTASK_SET(this_exception_pointers[0], (uintptr_t)E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT);
+				if (!PERTASK_GET(this_exception_pointers[1]))
+					PERTASK_SET(this_exception_pointers[1], (uintptr_t)level);
+				if (!PERTASK_GET(this_exception_pointers[2]))
+					PERTASK_SET(this_exception_pointers[2], (uintptr_t)optname);
+				if (!PERTASK_GET(this_exception_pointers[3]))
+					PERTASK_SET(this_exception_pointers[3], (uintptr_t)socket_getfamily(self));
+				if (!PERTASK_GET(this_exception_pointers[4]))
+					PERTASK_SET(this_exception_pointers[4], (uintptr_t)socket_gettype(self));
+				if (!PERTASK_GET(this_exception_pointers[5]))
+					PERTASK_SET(this_exception_pointers[5], (uintptr_t)socket_getprotocol(self));
+			}
+			RETHROW();
+		}
+	} else {
+		THROW(E_INVALID_ARGUMENT_SOCKET_OPT,
+		      E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT,
+		      level, optname,
+		      socket_getfamily(self),
+		      socket_gettype(self),
+		      socket_getprotocol(self));
+	}
+}
+
+
+
+/* Custom I/O control command handler for this socket type.
+ * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
+PUBLIC NONNULL((1)) syscall_slong_t KCALL
+socket_ioctl(struct socket *__restrict self, syscall_ulong_t cmd,
+             USER UNCHECKED void *arg, iomode_t mode)
+		THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) {
+	syscall_slong_t result;
+	/* TODO: Builtin socket ioctls. */
+	if (self->sk_ops->so_ioctl) {
+		result = (*self->sk_ops->so_ioctl)(self, cmd, arg, mode);
+	} else {
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+		      cmd);
+	}
+	return result;
 }
 
 

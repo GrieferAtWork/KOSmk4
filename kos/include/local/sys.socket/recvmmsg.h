@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf917f15b */
+/* HASH CRC-32:0xce3e1853 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,24 +27,24 @@
 #ifdef __CRT_HAVE_recvmmsg64
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags, struct __timespec64 *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__flags,__tmo))
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags, struct __timespec64 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__flags,__tmo))
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec64 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #elif defined(__CRT_HAVE_recvmmsg)
 #include <local/sys.socket/recvmmsg64.h>
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 #define __localdep_recvmmsg64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg64))
 #else /* CUSTOM: recvmmsg64 */
 #undef ____localdep_recvmmsg64_defined
@@ -57,10 +57,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t 
 #ifdef __CRT_HAVE_recvmmsg
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-__CREDIRECT_VOID(__ATTR_NONNULL((2)),__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__flags,__tmo))
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CREDIRECT_VOID(__ATTR_NONNULL((2)),__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, __STDC_UINT_AS_SIZE_T __vlen, __STDC_INT_AS_UINT_T __msg_flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #else /* LIBC: recvmmsg */
 #undef ____localdep_recvmmsg32_defined
 #endif /* recvmmsg32... */
@@ -69,30 +69,30 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2)),__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t
 __NAMESPACE_LOCAL_BEGIN
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 __LOCAL_LIBC(recvmmsg) __ATTR_NONNULL((2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg))(__fd_t __sockfd,
                                                       struct mmsghdr *__vmessages,
                                                       __STDC_UINT_AS_SIZE_T __vlen,
-                                                      __STDC_INT_AS_UINT_T __flags,
+                                                      __STDC_INT_AS_UINT_T __msg_flags,
                                                       struct timespec *__tmo) {
-#line 318 "kos/src/libc/magic/sys.socket.c"
+#line 308 "kos/src/libc/magic/sys.socket.c"
 #ifdef __CRT_HAVE_recvmmsg64
 	struct __timespec64 __tmo64;
 	if (!__tmo)
-		return __localdep_recvmmsg64(__sockfd, __vmessages, __vlen, __flags, __NULLPTR);
+		return __localdep_recvmmsg64(__sockfd, __vmessages, __vlen, __msg_flags, __NULLPTR);
 	__tmo32.tv_sec  = (__time64_t)__tmo->tv_sec,
 	__tmo32.tv_nsec = __tmo->tv_nsec;
-	return __localdep_recvmmsg64(__sockfd, __vmessages, __vlen, __flags, &__tmo64);
+	return __localdep_recvmmsg64(__sockfd, __vmessages, __vlen, __msg_flags, &__tmo64);
 #else /* __CRT_HAVE_recvmmsg64 */
 	struct __timespec32 __tmo32;
 	if (!__tmo)
-		return __localdep_recvmmsg32(__sockfd, __vmessages, __vlen, __flags, __NULLPTR);
+		return __localdep_recvmmsg32(__sockfd, __vmessages, __vlen, __msg_flags, __NULLPTR);
 	__tmo32.tv_sec  = (__time32_t)__tmo->tv_sec,
 	__tmo32.tv_nsec = __tmo->tv_nsec;
-	return __localdep_recvmmsg32(__sockfd, __vmessages, __vlen, __flags, &__tmo32);
+	return __localdep_recvmmsg32(__sockfd, __vmessages, __vlen, __msg_flags, &__tmo32);
 #endif /* !__CRT_HAVE_recvmmsg64 */
 }
 __NAMESPACE_LOCAL_END

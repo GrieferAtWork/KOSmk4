@@ -76,8 +76,11 @@ clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRA
        pid_t *ctid, uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
-process_spawnveat = process_spawnveatx64;
+sendmsg = sendmsgx64;
 recvmsg = recvmsgx64;
+sendmmsg = sendmmsgx64;
+recvmmsg = recvmmsgx64;
+process_spawnveat = process_spawnveatx64;
 getitimer = getitimerx64;
 setitimer = setitimerx64;
 statfs = statfsx64;
@@ -114,7 +117,6 @@ clock_nanosleep = clock_nanosleepx64;
 pselect6 = pselect6_x64;
 ppoll = ppollx64;
 utimensat = utimensatx64;
-recvmmsg = recvmmsgx64;
 rt_sigqueueinfo = rt_sigqueueinfox64;
 rt_tgsigqueueinfo = rt_tgsigqueueinfox64;
 raiseat = raiseatx64;

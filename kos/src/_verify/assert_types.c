@@ -363,6 +363,7 @@ local files = {
 	"../../include/bits/flock-struct.h",
 	"../../include/bits/itimerspec.h",
 	"../../include/bits/itimerval.h",
+	"../../include/bits/mmsghdr-struct.h",
 	"../../include/bits/msghdr-struct.h",
 	"../../include/bits/rusage-struct.h",
 	"../../include/bits/sigaction-struct.h",
@@ -507,6 +508,18 @@ STATIC_ASSERT(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
 
 
 
+#include <bits/mmsghdr-struct.h>
+
+/* struct mmsghdr */
+STATIC_ASSERT(offsetof(struct mmsghdr, msg_len) == __OFFSET_MMSGHDR_LEN);
+STATIC_ASSERT(offsetof(struct mmsghdr, msg_hdr) == __OFFSET_MMSGHDR_HDR);
+STATIC_ASSERT(sizeof(struct mmsghdr) == __SIZEOF_MMSGHDR);
+STATIC_ASSERT(alignof(struct mmsghdr) == __ALIGNOF_MMSGHDR);
+
+
+
+
+
 #include <bits/msghdr-struct.h>
 
 /* struct msghdr */
@@ -518,6 +531,7 @@ STATIC_ASSERT(offsetof(struct msghdr, msg_iovlen) == __OFFSET_MSGHDR_IOVLEN);
 STATIC_ASSERT(offsetof(struct msghdr, msg_name) == __OFFSET_MSGHDR_NAME);
 STATIC_ASSERT(offsetof(struct msghdr, msg_namelen) == __OFFSET_MSGHDR_NAMELEN);
 STATIC_ASSERT(sizeof(struct msghdr) == __SIZEOF_MSGHDR);
+STATIC_ASSERT(alignof(struct msghdr) == __ALIGNOF_MSGHDR);
 
 
 

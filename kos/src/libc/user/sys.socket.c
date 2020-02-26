@@ -163,64 +163,64 @@ NOTHROW_NCX(LIBCCALL libc_getpeername)(fd_t sockfd,
 }
 /*[[[end:getpeername]]]*/
 
-/*[[[head:send,hash:CRC-32=0xfad4d0ab]]]*/
+/*[[[head:send,hash:CRC-32=0x3358c9e2]]]*/
 /* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1
- * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.send") ssize_t
 NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd,
                                 void const *buf,
                                 size_t bufsize,
-                                __STDC_INT_AS_UINT_T flags)
+                                __STDC_INT_AS_UINT_T msg_flags)
 /*[[[body:send]]]*/
 {
 	ssize_t result;
 	result = sys_sendto(sockfd,
 	                    buf,
 	                    bufsize,
-	                    (syscall_ulong_t)flags,
+	                    (syscall_ulong_t)msg_flags,
 	                    NULL,
 	                    0);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:send]]]*/
 
-/*[[[head:recv,hash:CRC-32=0xa02ea4ba]]]*/
+/*[[[head:recv,hash:CRC-32=0x7aa05a4f]]]*/
 /* Read BUFSIZE bytes into BUF from socket FD.
  * Returns the number read or -1 for errors
- * @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.recv") ssize_t
 NOTHROW_RPC(LIBCCALL libc_recv)(fd_t sockfd,
                                 void *buf,
                                 size_t bufsize,
-                                __STDC_INT_AS_UINT_T flags)
+                                __STDC_INT_AS_UINT_T msg_flags)
 /*[[[body:recv]]]*/
 {
 	ssize_t result;
 	result = sys_recvfrom(sockfd,
 	                      buf,
 	                      bufsize,
-	                      (syscall_ulong_t)flags,
+	                      (syscall_ulong_t)msg_flags,
 	                      NULL,
 	                      0);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:recv]]]*/
 
-/*[[[head:sendto,hash:CRC-32=0x3df0fc33]]]*/
+/*[[[head:sendto,hash:CRC-32=0x27a2e30]]]*/
 /* Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
  * (which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors.
- * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 INTERN NONNULL((2, 5))
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.sendto") ssize_t
 NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd,
                                   void const *buf,
                                   size_t bufsize,
-                                  __STDC_INT_AS_UINT_T flags,
+                                  __STDC_INT_AS_UINT_T msg_flags,
                                   __CONST_SOCKADDR_ARG addr,
                                   socklen_t addr_len)
 /*[[[body:sendto]]]*/
@@ -229,26 +229,26 @@ NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd,
 	result = sys_sendto(sockfd,
 	                    buf,
 	                    bufsize,
-	                    (syscall_ulong_t)flags,
+	                    (syscall_ulong_t)msg_flags,
 	                    (struct sockaddr const *)addr,
 	                    addr_len);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:sendto]]]*/
 
-/*[[[head:recvfrom,hash:CRC-32=0x638baa29]]]*/
+/*[[[head:recvfrom,hash:CRC-32=0x59c88351]]]*/
 /* Read BUFSIZE bytes into BUF through socket FD.
  * If ADDR is not NULL, fill in *ADDR_LEN bytes of it with tha address of
  * the sender, and store the actual size of the address in *ADDR_LEN.
  * Returns the number of bytes read or -1 for errors
- * @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 INTERN WUNUSED NONNULL((2, 5))
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.recvfrom") ssize_t
 NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd,
                                     void *__restrict buf,
                                     size_t bufsize,
-                                    __STDC_INT_AS_UINT_T flags,
+                                    __STDC_INT_AS_UINT_T msg_flags,
                                     __SOCKADDR_ARG addr,
                                     socklen_t *__restrict addr_len)
 /*[[[body:recvfrom]]]*/
@@ -257,50 +257,50 @@ NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd,
 	result = sys_recvfrom(sockfd,
 	                      buf,
 	                      bufsize,
-	                      (syscall_ulong_t)flags,
+	                      (syscall_ulong_t)msg_flags,
 	                      (struct sockaddr *)addr,
 	                      addr_len);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:recvfrom]]]*/
 
-/*[[[head:sendmsg,hash:CRC-32=0xddc7c91]]]*/
+/*[[[head:sendmsg,hash:CRC-32=0x13f475cb]]]*/
 /* Send a message described MESSAGE on socket FD.
  * Returns the number of bytes sent, or -1 for errors
- * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.sendmsg") ssize_t
 NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd,
                                    struct msghdr const *message,
-                                   __STDC_INT_AS_UINT_T flags)
+                                   __STDC_INT_AS_UINT_T msg_flags)
 /*[[[body:sendmsg]]]*/
 {
 	ssize_t result;
 	result = sys_sendmsg(sockfd,
 	                     message,
-	                     (syscall_ulong_t)flags);
+	                     (syscall_ulong_t)msg_flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:sendmsg]]]*/
 
-/*[[[head:recvmsg,hash:CRC-32=0xd8430825]]]*/
+/*[[[head:recvmsg,hash:CRC-32=0x69377018]]]*/
 /* Receive a message as described by MESSAGE from socket FD.
  * Returns the number of bytes read or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.recvmsg") ssize_t
 NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd,
                                    struct msghdr *message,
-                                   __STDC_INT_AS_UINT_T flags)
+                                   __STDC_INT_AS_UINT_T msg_flags)
 /*[[[body:recvmsg]]]*/
 {
 	ssize_t result;
 	result = sys_recvmsg(sockfd,
 	                     message,
-	                     (syscall_ulong_t)flags);
+	                     (syscall_ulong_t)msg_flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:recvmsg]]]*/
@@ -411,60 +411,60 @@ NOTHROW_NCX(LIBCCALL libc_shutdown)(fd_t sockfd,
 }
 /*[[[end:shutdown]]]*/
 
-/*[[[head:accept4,hash:CRC-32=0xa916eb9d]]]*/
-/* Similar to 'accept(2)' but takes an additional parameter to specify flags.
- * @param: FLAGS: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+/*[[[head:accept4,hash:CRC-32=0x5fbacf6d]]]*/
+/* Similar to 'accept(2)' but takes an additional parameter to specify socket flags.
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.accept4") fd_t
 NOTHROW_RPC(LIBCCALL libc_accept4)(fd_t sockfd,
                                    __SOCKADDR_ARG addr,
                                    socklen_t *__restrict addr_len,
-                                   __STDC_INT_AS_UINT_T flags)
+                                   __STDC_INT_AS_UINT_T sock_flags)
 /*[[[body:accept4]]]*/
 {
 	fd_t result;
 	result = sys_accept4(sockfd,
 	                     (struct sockaddr *)addr,
 	                     addr_len,
-	                     (syscall_ulong_t)flags);
+	                     (syscall_ulong_t)sock_flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:accept4]]]*/
 
-/*[[[head:sendmmsg,hash:CRC-32=0x10b8fec8]]]*/
+/*[[[head:sendmmsg,hash:CRC-32=0x7394a1e2]]]*/
 /* Send a VLEN messages as described by VMESSAGES to socket FD.
  * Returns the number of datagrams successfully written or -1 for errors
- * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.sendmmsg") int
 NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd,
                                     struct mmsghdr *vmessages,
                                     __STDC_UINT_AS_SIZE_T vlen,
-                                    __STDC_INT_AS_UINT_T flags)
+                                    __STDC_INT_AS_UINT_T msg_flags)
 /*[[[body:sendmmsg]]]*/
 {
 	ssize_t error;
 	error = sys_sendmmsg(sockfd,
 	                     vmessages,
 	                     (size_t)vlen,
-	                     (syscall_ulong_t)flags);
+	                     (syscall_ulong_t)msg_flags);
 	return (int)libc_seterrno_syserr(error);
 }
 /*[[[end:sendmmsg]]]*/
 
-/*[[[head:recvmmsg,hash:CRC-32=0x98d43334]]]*/
+/*[[[head:recvmmsg,hash:CRC-32=0x32f6de72]]]*/
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.recvmmsg") int
 NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd,
                                     struct mmsghdr *vmessages,
                                     __STDC_UINT_AS_SIZE_T vlen,
-                                    __STDC_INT_AS_UINT_T flags,
+                                    __STDC_INT_AS_UINT_T msg_flags,
                                     struct timespec *tmo)
 /*[[[body:recvmmsg]]]*/
 {
@@ -472,18 +472,18 @@ NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd,
 	error = sys_recvmmsg(sockfd,
 	                     vmessages,
 	                     (size_t)vlen,
-	                     (syscall_ulong_t)flags,
+	                     (syscall_ulong_t)msg_flags,
 	                     tmo);
 	return (int)libc_seterrno_syserr(error);
 }
 /*[[[end:recvmmsg]]]*/
 
-/*[[[head:recvmmsg64,hash:CRC-32=0x1e536b8c]]]*/
+/*[[[head:recvmmsg64,hash:CRC-32=0x1b275033]]]*/
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_recvmmsg64, libc_recvmmsg);
 #else
@@ -492,7 +492,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.recvmmsg64") int
 NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd,
                                       struct mmsghdr *vmessages,
                                       __STDC_UINT_AS_SIZE_T vlen,
-                                      __STDC_INT_AS_UINT_T flags,
+                                      __STDC_INT_AS_UINT_T msg_flags,
                                       struct timespec64 *tmo)
 /*[[[body:recvmmsg64]]]*/
 {
@@ -500,7 +500,7 @@ NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd,
 	error = sys_recvmmsg64(sockfd,
 	                       vmessages,
 	                       (size_t)vlen,
-	                       (syscall_ulong_t)flags,
+	                       (syscall_ulong_t)msg_flags,
 	                       tmo);
 	return (int)libc_seterrno_syserr(error);
 }

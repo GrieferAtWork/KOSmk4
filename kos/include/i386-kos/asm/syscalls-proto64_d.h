@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91640747 */
+/* HASH CRC-32:0x74bd436d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@
 #define __NR64AC_sendfile               4
 #define __NR64AC_socket                 3
 #define __NR64AC_connect                3
-#define __NR64AC_accept                 1
+#define __NR64AC_accept                 3
 #define __NR64AC_sendto                 6
 #define __NR64AC_recvfrom               6
 #define __NR64AC_sendmsg                3
@@ -461,7 +461,7 @@
 #define __NR64RT_sendfile               (ssize_t, __ssize_t)
 #define __NR64RT_socket                 (fd_t, __fd_t)
 #define __NR64RT_connect                (errno_t, __errno_t)
-#define __NR64RT_accept                 (errno_t, __errno_t)
+#define __NR64RT_accept                 (fd_t, __fd_t)
 #define __NR64RT_sendto                 (ssize_t, __ssize_t)
 #define __NR64RT_recvfrom               (ssize_t, __ssize_t)
 #define __NR64RT_sendmsg                (ssize_t, __ssize_t)
@@ -885,8 +885,8 @@
 #define __NR64AT0_dup                    (fd_t, __fd_t)
 #define __NR64AT0_dup2                   (fd_t, __fd_t)
 #define __NR64AT1_dup2                   (fd_t, __fd_t)
-#define __NR64AT0_nanosleep              (struct __timespecx64 const *, struct __timespecx64 const *)
-#define __NR64AT1_nanosleep              (struct __timespecx64 *, struct __timespecx64 *)
+#define __NR64AT0_nanosleep              (struct timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT1_nanosleep              (struct timespecx64 *, struct __timespecx64 *)
 #define __NR64AT0_getitimer              (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_getitimer              (struct __itimervalx64 *, struct __itimervalx64 *)
 #define __NR64AT0_alarm                  (syscall_ulong_t, __syscall_ulong_t)
@@ -903,7 +903,9 @@
 #define __NR64AT0_connect                (fd_t, __fd_t)
 #define __NR64AT1_connect                (struct sockaddr const *, struct sockaddr const *)
 #define __NR64AT2_connect                (socklen_t, __socklen_t)
-#define __NR64AT0_accept                 (int, int)
+#define __NR64AT0_accept                 (fd_t, __fd_t)
+#define __NR64AT1_accept                 (struct sockaddr *, struct sockaddr *)
+#define __NR64AT2_accept                 (socklen_t *, __socklen_t *)
 #define __NR64AT0_sendto                 (fd_t, __fd_t)
 #define __NR64AT1_sendto                 (void const *, void const *)
 #define __NR64AT2_sendto                 (size_t, __size_t)
@@ -917,7 +919,7 @@
 #define __NR64AT4_recvfrom               (struct sockaddr *, struct sockaddr *)
 #define __NR64AT5_recvfrom               (socklen_t *, __socklen_t *)
 #define __NR64AT0_sendmsg                (fd_t, __fd_t)
-#define __NR64AT1_sendmsg                (struct msghdr const *, struct msghdr const *)
+#define __NR64AT1_sendmsg                (struct msghdr64 const *, struct msghdr64 const *)
 #define __NR64AT2_sendmsg                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_recvmsg                (fd_t, __fd_t)
 #define __NR64AT1_recvmsg                (struct msghdr64 *, struct msghdr64 *)
@@ -1069,7 +1071,7 @@
 #define __NR64AT1_rt_sigpending          (size_t, __size_t)
 #define __NR64AT0_rt_sigtimedwait        (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NR64AT1_rt_sigtimedwait        (struct __siginfo64_struct *, struct __siginfo64_struct *)
-#define __NR64AT2_rt_sigtimedwait        (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT2_rt_sigtimedwait        (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT3_rt_sigtimedwait        (size_t, __size_t)
 #define __NR64AT0_rt_sigqueueinfo        (pid_t, __pid_t)
 #define __NR64AT1_rt_sigqueueinfo        (syscall_ulong_t, __syscall_ulong_t)
@@ -1108,7 +1110,7 @@
 #define __NR64AT0_sched_get_priority_max (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_sched_get_priority_min (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_sched_rr_get_interval  (pid_t, __pid_t)
-#define __NR64AT1_sched_rr_get_interval  (struct __timespecx64 *, struct __timespecx64 *)
+#define __NR64AT1_sched_rr_get_interval  (struct timespecx64 *, struct __timespecx64 *)
 #define __NR64AT0_mlock                  (void const *, void const *)
 #define __NR64AT1_mlock                  (size_t, __size_t)
 #define __NR64AT0_munlock                (void const *, void const *)
@@ -1210,7 +1212,7 @@
 #define __NR64AT0_futex                  (uint32_t *, __uint32_t *)
 #define __NR64AT1_futex                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT2_futex                  (uint32_t, __uint32_t)
-#define __NR64AT3_futex                  (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT3_futex                  (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT4_futex                  (uint32_t *, __uint32_t *)
 #define __NR64AT5_futex                  (uint32_t, __uint32_t)
 #define __NR64AT0_sched_setaffinity      (pid_t, __pid_t)
@@ -1252,22 +1254,22 @@
 #define __NR64AT2_timer_create           (timer_t *, __timer_t *)
 #define __NR64AT0_timer_settime          (timer_t, __timer_t)
 #define __NR64AT1_timer_settime          (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT2_timer_settime          (struct __itimerspecx64 const *, struct __itimerspecx64 const *)
-#define __NR64AT3_timer_settime          (struct __itimerspecx64 *, struct __itimerspecx64 *)
+#define __NR64AT2_timer_settime          (struct itimerspecx64 const *, struct __itimerspecx64 const *)
+#define __NR64AT3_timer_settime          (struct itimerspecx64 *, struct __itimerspecx64 *)
 #define __NR64AT0_timer_gettime          (timer_t, __timer_t)
-#define __NR64AT1_timer_gettime          (struct __itimerspecx64 *, struct __itimerspecx64 *)
+#define __NR64AT1_timer_gettime          (struct itimerspecx64 *, struct __itimerspecx64 *)
 #define __NR64AT0_timer_getoverrun       (timer_t, __timer_t)
 #define __NR64AT0_timer_delete           (timer_t, __timer_t)
 #define __NR64AT0_clock_settime          (clockid_t, __clockid_t)
-#define __NR64AT1_clock_settime          (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT1_clock_settime          (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT0_clock_gettime          (clockid_t, __clockid_t)
-#define __NR64AT1_clock_gettime          (struct __timespecx64 *, struct __timespecx64 *)
+#define __NR64AT1_clock_gettime          (struct timespecx64 *, struct __timespecx64 *)
 #define __NR64AT0_clock_getres           (clockid_t, __clockid_t)
-#define __NR64AT1_clock_getres           (struct __timespecx64 *, struct __timespecx64 *)
+#define __NR64AT1_clock_getres           (struct timespecx64 *, struct __timespecx64 *)
 #define __NR64AT0_clock_nanosleep        (clockid_t, __clockid_t)
 #define __NR64AT1_clock_nanosleep        (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT2_clock_nanosleep        (struct __timespecx64 const *, struct __timespecx64 const *)
-#define __NR64AT3_clock_nanosleep        (struct __timespecx64 *, struct __timespecx64 *)
+#define __NR64AT2_clock_nanosleep        (struct timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT3_clock_nanosleep        (struct timespecx64 *, struct __timespecx64 *)
 #define __NR64AT0_exit_group             (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_epoll_wait             (fd_t, __fd_t)
 #define __NR64AT1_epoll_wait             (struct epoll_event *, struct epoll_event *)
@@ -1294,12 +1296,12 @@
 #define __NR64AT1_mq_timedsend           (char const *, char const *)
 #define __NR64AT2_mq_timedsend           (size_t, __size_t)
 #define __NR64AT3_mq_timedsend           (uint32_t, __uint32_t)
-#define __NR64AT4_mq_timedsend           (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT4_mq_timedsend           (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT0_mq_timedreceive        (fd_t, __fd_t)
 #define __NR64AT1_mq_timedreceive        (char *, char *)
 #define __NR64AT2_mq_timedreceive        (size_t, __size_t)
 #define __NR64AT3_mq_timedreceive        (uint32_t *, __uint32_t *)
-#define __NR64AT4_mq_timedreceive        (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT4_mq_timedreceive        (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT0_mq_notify              (fd_t, __fd_t)
 #define __NR64AT1_mq_notify              (struct sigevent const *, struct sigevent const *)
 #define __NR64AT0_mq_getsetattr          (fd_t, __fd_t)
@@ -1377,11 +1379,11 @@
 #define __NR64AT1_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NR64AT2_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NR64AT3_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
-#define __NR64AT4_pselect6               (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT4_pselect6               (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT5_pselect6               (void const *, void const *)
 #define __NR64AT0_ppoll                  (struct pollfd *, struct pollfd *)
 #define __NR64AT1_ppoll                  (size_t, __size_t)
-#define __NR64AT2_ppoll                  (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT2_ppoll                  (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT3_ppoll                  (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NR64AT4_ppoll                  (size_t, __size_t)
 #define __NR64AT0_unshare                (syscall_ulong_t, __syscall_ulong_t)
@@ -1408,7 +1410,7 @@
 #define __NR64AT0_move_pages             (int, int)
 #define __NR64AT0_utimensat              (fd_t, __fd_t)
 #define __NR64AT1_utimensat              (char const *, char const *)
-#define __NR64AT2_utimensat              (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT2_utimensat              (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT3_utimensat              (atflag_t, __atflag_t)
 #define __NR64AT0_epoll_pwait            (fd_t, __fd_t)
 #define __NR64AT1_epoll_pwait            (struct epoll_event *, struct epoll_event *)
@@ -1427,10 +1429,10 @@
 #define __NR64AT3_fallocate              (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_timerfd_settime        (fd_t, __fd_t)
 #define __NR64AT1_timerfd_settime        (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT2_timerfd_settime        (struct __itimerspecx64 const *, struct __itimerspecx64 const *)
-#define __NR64AT3_timerfd_settime        (struct __itimerspecx64 *, struct __itimerspecx64 *)
+#define __NR64AT2_timerfd_settime        (struct itimerspecx64 const *, struct __itimerspecx64 const *)
+#define __NR64AT3_timerfd_settime        (struct itimerspecx64 *, struct __itimerspecx64 *)
 #define __NR64AT0_timerfd_gettime        (fd_t, __fd_t)
-#define __NR64AT1_timerfd_gettime        (struct __itimerspecx64 *, struct __itimerspecx64 *)
+#define __NR64AT1_timerfd_gettime        (struct itimerspecx64 *, struct __itimerspecx64 *)
 #define __NR64AT0_accept4                (fd_t, __fd_t)
 #define __NR64AT1_accept4                (struct sockaddr *, struct sockaddr *)
 #define __NR64AT2_accept4                (socklen_t *, __socklen_t *)
@@ -1462,10 +1464,10 @@
 #define __NR64AT3_rt_tgsigqueueinfo      (struct __siginfo64_struct const *, struct __siginfo64_struct const *)
 #define __NR64AT0_perf_event_open        (int, int)
 #define __NR64AT0_recvmmsg               (fd_t, __fd_t)
-#define __NR64AT1_recvmmsg               (struct mmsghdr *, struct mmsghdr *)
+#define __NR64AT1_recvmmsg               (struct mmsghdrx64 *, struct __mmsghdrx64 *)
 #define __NR64AT2_recvmmsg               (size_t, __size_t)
 #define __NR64AT3_recvmmsg               (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT4_recvmmsg               (struct __timespecx64 *, struct __timespecx64 *)
+#define __NR64AT4_recvmmsg               (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT0_fanotify_init          (int, int)
 #define __NR64AT0_fanotify_mark          (int, int)
 #define __NR64AT0_prlimit64              (pid_t, __pid_t)
@@ -1483,7 +1485,7 @@
 #define __NR64AT0_clock_adjtime          (int, int)
 #define __NR64AT0_syncfs                 (fd_t, __fd_t)
 #define __NR64AT0_sendmmsg               (fd_t, __fd_t)
-#define __NR64AT1_sendmmsg               (struct mmsghdr *, struct mmsghdr *)
+#define __NR64AT1_sendmmsg               (struct mmsghdrx64 *, struct __mmsghdrx64 *)
 #define __NR64AT2_sendmmsg               (size_t, __size_t)
 #define __NR64AT3_sendmmsg               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_setns                  (fd_t, __fd_t)
@@ -1609,17 +1611,17 @@
 #define __NR64AT1_lfutexlockexpr         (void *, void *)
 #define __NR64AT2_lfutexlockexpr         (size_t, __size_t)
 #define __NR64AT3_lfutexlockexpr         (struct lfutexexprx64 const *, struct lfutexexprx64 const *)
-#define __NR64AT4_lfutexlockexpr         (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT4_lfutexlockexpr         (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT5_lfutexlockexpr         (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_lfutexexpr             (void *, void *)
 #define __NR64AT1_lfutexexpr             (size_t, __size_t)
 #define __NR64AT2_lfutexexpr             (struct lfutexexprx64 const *, struct lfutexexprx64 const *)
-#define __NR64AT3_lfutexexpr             (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT3_lfutexexpr             (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT4_lfutexexpr             (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_lfutex                 (uint64_t *, __uint64_t *)
 #define __NR64AT1_lfutex                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT2_lfutex                 (uint64_t, __uint64_t)
-#define __NR64AT3_lfutex                 (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NR64AT3_lfutex                 (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NR64AT4_lfutex                 (uint64_t, __uint64_t)
 #define __NR64AT0_debugtrap              (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NR64AT1_debugtrap              (struct debugtrap_reason64 const *, struct debugtrap_reason64 const *)
@@ -1745,10 +1747,10 @@
 #define __NR64AM_sendfile(a, b, c, d, e, f)               (__fd_t)a, (__fd_t)b, (__syscall_ulong_t *)c, (__size_t)d
 #define __NR64AM_socket(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AM_connect(a, b, c, d, e, f)                (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
-#define __NR64AM_accept(a, b, c, d, e, f)                 (int)a
+#define __NR64AM_accept(a, b, c, d, e, f)                 (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c
 #define __NR64AM_sendto(a, b, c, d, e, f)                 (__fd_t)a, (void const *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr const *)e, (__socklen_t)f
 #define __NR64AM_recvfrom(a, b, c, d, e, f)               (__fd_t)a, (void *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr *)e, (__socklen_t *)f
-#define __NR64AM_sendmsg(a, b, c, d, e, f)                (__fd_t)a, (struct msghdr const *)b, (__syscall_ulong_t)c
+#define __NR64AM_sendmsg(a, b, c, d, e, f)                (__fd_t)a, (struct msghdr64 const *)b, (__syscall_ulong_t)c
 #define __NR64AM_recvmsg(a, b, c, d, e, f)                (__fd_t)a, (struct msghdr64 *)b, (__syscall_ulong_t)c
 #define __NR64AM_shutdown(a, b, c, d, e, f)               (__fd_t)a, (__syscall_ulong_t)b
 #define __NR64AM_bind(a, b, c, d, e, f)                   (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
@@ -2001,7 +2003,7 @@
 #define __NR64AM_pwritev(a, b, c, d, e, f)                (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__uint64_t)d
 #define __NR64AM_rt_tgsigqueueinfo(a, b, c, d, e, f)      (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (struct __siginfo64_struct const *)d
 #define __NR64AM_perf_event_open(a, b, c, d, e, f)        (int)a
-#define __NR64AM_recvmmsg(a, b, c, d, e, f)               (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx64 *)e
+#define __NR64AM_recvmmsg(a, b, c, d, e, f)               (__fd_t)a, (struct __mmsghdrx64 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx64 const *)e
 #define __NR64AM_fanotify_init(a, b, c, d, e, f)          (int)a
 #define __NR64AM_fanotify_mark(a, b, c, d, e, f)          (int)a
 #define __NR64AM_prlimit64(a, b, c, d, e, f)              (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
@@ -2009,7 +2011,7 @@
 #define __NR64AM_open_by_handle_at(a, b, c, d, e, f)      (__fd_t)a, (struct file_handle *)b, (__syscall_ulong_t)c
 #define __NR64AM_clock_adjtime(a, b, c, d, e, f)          (int)a
 #define __NR64AM_syncfs(a, b, c, d, e, f)                 (__fd_t)a
-#define __NR64AM_sendmmsg(a, b, c, d, e, f)               (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NR64AM_sendmmsg(a, b, c, d, e, f)               (__fd_t)a, (struct __mmsghdrx64 *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NR64AM_setns(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b
 #define __NR64AM_getcpu(a, b, c, d, e, f)                 (__uint32_t *)a, (__uint32_t *)b, (struct getcpu_cache *)c
 #define __NR64AM_process_vm_readv(a, b, c, d, e, f)       (__pid_t)a, (struct iovec64 const *)b, (__size_t)c, (struct iovec64 const *)d, (__size_t)e, (__syscall_ulong_t)f
@@ -2125,7 +2127,7 @@
 #define __NR64AP_sendfile(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_socket(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_connect(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR64AP_accept(a)                                (__syscall_ulong_t)a
+#define __NR64AP_accept(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_sendto(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR64AP_recvfrom(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR64AP_sendmsg(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

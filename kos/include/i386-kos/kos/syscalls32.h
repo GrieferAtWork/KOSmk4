@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95469af4 */
+/* HASH CRC-32:0xb740ea61 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #include <bits/iovec-struct32.h>
 #include <bits/itimerspec32.h>
 #include <bits/itimerval32.h>
-#include <bits/msghdr-struct.h>
+#include <bits/mmsghdr-struct32.h>
 #include <bits/msghdr-struct32.h>
 #include <bits/rusage-struct32.h>
 #include <bits/sigaction-struct.h>
@@ -97,6 +97,7 @@ struct __itimerspecx32_64;
 struct __itimervalx32;
 struct __itimervalx32_64;
 struct __kos_statx32;
+struct __mmsghdrx32;
 struct __rusagex32;
 struct __rusagex32_64;
 struct __siginfo32_struct;
@@ -130,9 +131,7 @@ struct linux_oldstat;
 struct linux_olduname;
 struct linux_statx32;
 struct linux_statx32_64;
-struct mmsghdr;
 struct mq_attr;
-struct msghdr;
 struct msghdr32;
 struct old_linux_dirent;
 struct pollfd;
@@ -166,8 +165,8 @@ __CDECLARE_SC(,__errno_t,_newselect,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,_sysctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(_sysctl) */
 #if __CRT_HAVE_SC(accept4)
-/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
-__CDECLARE_SC(,__fd_t,accept4,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len, __syscall_ulong_t __flags),(__sockfd,__addr,__addr_len,__flags))
+/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+__CDECLARE_SC(,__fd_t,accept4,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len, __syscall_ulong_t __sock_flags),(__sockfd,__addr,__addr_len,__sock_flags))
 #endif /* __CRT_HAVE_SC(accept4) */
 #if __CRT_HAVE_SC(access)
 /* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK' */
@@ -1289,21 +1288,21 @@ __CDECLARE_SC(,__ssize_t,readvf,(__fd_t __fd, struct iovec32 const *__iovec, __s
 __CDECLARE_SC(,__errno_t,reboot,(__syscall_ulong_t __how),(__how))
 #endif /* __CRT_HAVE_SC(reboot) */
 #if __CRT_HAVE_SC(recvfrom)
-/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-__CDECLARE_SC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __bufsize, __syscall_ulong_t __flags, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__buf,__bufsize,__flags,__addr,__addr_len))
+/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CDECLARE_SC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(recvfrom) */
 #if __CRT_HAVE_SC(recvmmsg)
-__CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx32 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
+__CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx32 const *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
 #endif /* __CRT_HAVE_SC(recvmmsg) */
 #if __CRT_HAVE_SC(recvmmsg64)
-__CDECLARE_SC(,__ssize_t,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx32_64 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
+__CDECLARE_SC(,__ssize_t,recvmmsg64,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx32_64 const *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
 #endif /* __CRT_HAVE_SC(recvmmsg64) */
 #if __CRT_HAVE_SC(recvmsg)
-/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-__CDECLARE_SC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr32 *__message, __syscall_ulong_t __flags),(__sockfd,__message,__flags))
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CDECLARE_SC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr32 *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_SC(recvmsg) */
 #if __CRT_HAVE_SC(remap_file_pages)
 __CDECLARE_SC(,__errno_t,remap_file_pages,(void *__start, __size_t __size, __syscall_ulong_t __prot, __size_t __pgoff, __syscall_ulong_t __flags),(__start,__size,__prot,__pgoff,__flags))
@@ -1431,17 +1430,17 @@ __CDECLARE_SC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __ULONG32_TY
 __CDECLARE_SC(,__ssize_t,sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __ULONG64_TYPE__ *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_SC(sendfile64) */
 #if __CRT_HAVE_SC(sendmmsg)
-__CDECLARE_SC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags),(__sockfd,__vmessages,__vlen,__flags))
+__CDECLARE_SC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __flags),(__sockfd,__vmessages,__vlen,__flags))
 #endif /* __CRT_HAVE_SC(sendmmsg) */
 #if __CRT_HAVE_SC(sendmsg)
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-__CDECLARE_SC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct msghdr const *__message, __syscall_ulong_t __flags),(__sockfd,__message,__flags))
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+__CDECLARE_SC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct msghdr32 const *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_SC(sendmsg) */
 #if __CRT_HAVE_SC(sendto)
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-__CDECLARE_SC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__buf,__bufsize,__flags,__addr,__addr_len))
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+__CDECLARE_SC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(sendto) */
 #if __CRT_HAVE_SC(set_exception_handler)
 /* Set the exception handler mode for the calling thread.
@@ -1879,8 +1878,8 @@ __CDECLARE_XSC(,__errno_t,_newselect,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,_sysctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(_sysctl) */
 #if __CRT_HAVE_XSC(accept4)
-/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
-__CDECLARE_XSC(,__fd_t,accept4,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len, __syscall_ulong_t __flags),(__sockfd,__addr,__addr_len,__flags))
+/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+__CDECLARE_XSC(,__fd_t,accept4,(__fd_t __sockfd, struct sockaddr *__addr, __socklen_t *__addr_len, __syscall_ulong_t __sock_flags),(__sockfd,__addr,__addr_len,__sock_flags))
 #endif /* __CRT_HAVE_XSC(accept4) */
 #if __CRT_HAVE_XSC(access)
 /* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK' */
@@ -3002,21 +3001,21 @@ __CDECLARE_XSC(,__ssize_t,readvf,(__fd_t __fd, struct iovec32 const *__iovec, __
 __CDECLARE_XSC(,__errno_t,reboot,(__syscall_ulong_t __how),(__how))
 #endif /* __CRT_HAVE_XSC(reboot) */
 #if __CRT_HAVE_XSC(recvfrom)
-/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-__CDECLARE_XSC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __bufsize, __syscall_ulong_t __flags, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__buf,__bufsize,__flags,__addr,__addr_len))
+/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CDECLARE_XSC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags, struct sockaddr *__addr, __socklen_t *__addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(recvfrom) */
 #if __CRT_HAVE_XSC(recvmmsg)
-__CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx32 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
+__CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx32 const *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
 #endif /* __CRT_HAVE_XSC(recvmmsg) */
 #if __CRT_HAVE_XSC(recvmmsg64)
-__CDECLARE_XSC(,__ssize_t,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx32_64 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
+__CDECLARE_XSC(,__ssize_t,recvmmsg64,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __flags, struct __timespecx32_64 const *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
 #endif /* __CRT_HAVE_XSC(recvmmsg64) */
 #if __CRT_HAVE_XSC(recvmsg)
-/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-__CDECLARE_XSC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr32 *__message, __syscall_ulong_t __flags),(__sockfd,__message,__flags))
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+__CDECLARE_XSC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr32 *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_XSC(recvmsg) */
 #if __CRT_HAVE_XSC(remap_file_pages)
 __CDECLARE_XSC(,__errno_t,remap_file_pages,(void *__start, __size_t __size, __syscall_ulong_t __prot, __size_t __pgoff, __syscall_ulong_t __flags),(__start,__size,__prot,__pgoff,__flags))
@@ -3141,17 +3140,17 @@ __CDECLARE_XSC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __ULONG32_T
 __CDECLARE_XSC(,__ssize_t,sendfile64,(__fd_t __out_fd, __fd_t __in_fd, __ULONG64_TYPE__ *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_XSC(sendfile64) */
 #if __CRT_HAVE_XSC(sendmmsg)
-__CDECLARE_XSC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __flags),(__sockfd,__vmessages,__vlen,__flags))
+__CDECLARE_XSC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __flags),(__sockfd,__vmessages,__vlen,__flags))
 #endif /* __CRT_HAVE_XSC(sendmmsg) */
 #if __CRT_HAVE_XSC(sendmsg)
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-__CDECLARE_XSC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct msghdr const *__message, __syscall_ulong_t __flags),(__sockfd,__message,__flags))
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+__CDECLARE_XSC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct msghdr32 const *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_XSC(sendmsg) */
 #if __CRT_HAVE_XSC(sendto)
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-__CDECLARE_XSC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__buf,__bufsize,__flags,__addr,__addr_len))
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+__CDECLARE_XSC(,__ssize_t,sendto,(__fd_t __sockfd, void const *__buf, __size_t __bufsize, __syscall_ulong_t __msg_flags, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__buf,__bufsize,__msg_flags,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(sendto) */
 #if __CRT_HAVE_XSC(set_exception_handler)
 /* Set the exception handler mode for the calling thread.

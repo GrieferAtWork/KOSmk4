@@ -89,8 +89,12 @@ setfsuid = setfsuid16;
 setfsgid = setfsgid16;
 
 /* Configure binding of multi-arch types in system calls. */
-process_spawnveat = process_spawnveatx32;
+sendmsg = sendmsgx32;
 recvmsg = recvmsgx32;
+sendmmsg = sendmmsgx32;
+recvmmsg = recvmmsgx32;
+recvmmsg64 = recvmmsgx32_64;
+process_spawnveat = process_spawnveatx32;
 sendfile = sendfile32;
 statfs = statfsx32;
 statfs64 = statfsx32_64;
@@ -161,8 +165,6 @@ ppoll = ppollx32;
 ppoll64 = ppollx32_64;
 utimensat = utimensatx32;
 utimensat64 = utimensatx32_64;
-recvmmsg = recvmmsgx32;
-recvmmsg64 = recvmmsgx32_64;
 rt_sigqueueinfo = rt_sigqueueinfox32;
 rt_tgsigqueueinfo = rt_tgsigqueueinfox32;
 raiseat = raiseatx32;

@@ -39,6 +39,7 @@
 #include <sys/uio.h>
 
 #ifdef __USE_GNU
+#include <bits/mmsghdr-struct.h>
 #include <bits/sigset.h>
 #endif /* __USE_GNU */
 
@@ -128,17 +129,6 @@ typedef union { __SOCKADDR_ALLTYPES } __CONST_SOCKADDR_ARG __ATTR_TRANSPARENT_UN
 #undef __SOCKADDR_ONETYPE
 #endif /* !__cplusplus && __USE_GNU && !__NO_ATTR_TRANSPARENT_UNION */
 
-#ifdef __USE_GNU
-/* For `recvmmsg' and `sendmmsg'. */
-#ifndef __mmsghdr_defined
-#define __mmsghdr_defined 1
-struct mmsghdr {
-	struct msghdr   msg_hdr; /* Actual message header. */
-	__UINT32_TYPE__ msg_len; /* Number of received or sent bytes for the entry. */
-};
-#endif /* !__mmsghdr_defined */
-#endif /* __USE_GNU */
-
 }
 
 
@@ -194,54 +184,54 @@ getpeername:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
              socklen_t *__restrict addr_len) -> int;
 
 @@Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1
-@@@param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
-@@                       MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+@@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+@@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [cp][export_alias(__send)]
 send:($fd_t sockfd, [inp(bufsize)] void const *buf,
-      size_t bufsize, __STDC_INT_AS_UINT_T flags) -> ssize_t;
+      size_t bufsize, __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
 @@Read BUFSIZE bytes into BUF from socket FD.
 @@Returns the number read or -1 for errors
-@@@param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-@@                       MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+@@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][ATTR_WUNUSED][export_alias(__recv)]
 recv:($fd_t sockfd, [outp(bufsize)] void *buf, size_t bufsize,
-      __STDC_INT_AS_UINT_T flags) -> ssize_t;
+      __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
 @@Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
 @@(which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors.
-@@@param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
-@@                       MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+@@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+@@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [cp]
-sendto:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags,
+sendto:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
         [inp(addr_len)] __CONST_SOCKADDR_ARG addr, socklen_t addr_len) -> ssize_t;
 
 @@Read BUFSIZE bytes into BUF through socket FD.
 @@If ADDR is not NULL, fill in *ADDR_LEN bytes of it with tha address of
 @@the sender, and store the actual size of the address in *ADDR_LEN.
 @@Returns the number of bytes read or -1 for errors
-@@@param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-@@                       MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+@@@param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][ATTR_WUNUSED]
-recvfrom:($fd_t sockfd, [outp(bufsize)] void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T flags,
+recvfrom:($fd_t sockfd, [outp(bufsize)] void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags,
           [outp(*addr_len)] __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) -> ssize_t;
 
 @@Send a message described MESSAGE on socket FD.
 @@Returns the number of bytes sent, or -1 for errors
-@@@param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
-@@                       MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+@@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+@@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [cp]
 sendmsg:($fd_t sockfd, [nonnull] struct msghdr const *message,
-         __STDC_INT_AS_UINT_T flags) -> ssize_t;
+         __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
 @@Receive a message as described by MESSAGE from socket FD.
 @@Returns the number of bytes read or -1 for errors.
-@@@param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
-@@                       MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-@@                       MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+@@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+@@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][ATTR_WUNUSED]
 recvmsg:($fd_t sockfd, [nonnull] struct msghdr *message,
-         __STDC_INT_AS_UINT_T flags) -> ssize_t;
+         __STDC_INT_AS_UINT_T msg_flags) -> ssize_t;
 
 @@Put the current value for socket FD's option OPTNAME at protocol level LEVEL
 @@into OPTVAL (which is *OPTLEN bytes long), and set *OPTLEN to the value's
@@ -282,67 +272,67 @@ shutdown:($fd_t sockfd, __STDC_INT_AS_UINT_T how) -> int;
 
 %
 %#ifdef __USE_GNU
-@@Similar to 'accept(2)' but takes an additional parameter to specify flags.
-@@@param: FLAGS: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
+@@Similar to 'accept(2)' but takes an additional parameter to specify socket flags.
+@@@param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK'
 [cp]
 accept4:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr,
-         socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T flags) -> $fd_t;
+         socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags) -> $fd_t;
 
 @@Send a VLEN messages as described by VMESSAGES to socket FD.
 @@Returns the number of datagrams successfully written or -1 for errors
-@@@param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
-@@                       MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+@@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+@@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [cp][export_alias(__sendmmsg)]
 sendmmsg:($fd_t sockfd, [nonnull] struct mmsghdr *vmessages,
-          __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags) -> int;
+          __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags) -> int;
 
-@@@param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
-@@                       MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-@@                       MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+@@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+@@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][ignore][doc_alias(recvmmsg)]
 recvmmsg32:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
-            __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags,
+            __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
             [nullable] struct $timespec32 *tmo) = recvmmsg?;
 
 @@Receive up to VLEN messages as described by VMESSAGES from socket FD.
 @@Returns the number of messages received or -1 for errors.
-@@@param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
-@@                       MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
-@@                       MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
+@@@param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+@@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+@@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [cp][if(defined(__USE_TIME_BITS64)),preferred_alias(recvmmsg64)]
 [if(!defined(__USE_TIME_BITS64)),preferred_alias(recvmmsg)]
 [requires(defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64))]
 recvmmsg:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
-          __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags,
+          __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
           [nullable] struct timespec *tmo) -> int {
 #ifdef __CRT_HAVE_recvmmsg64
 	struct timespec64 tmo64;
 	if (!tmo)
-		return recvmmsg64(sockfd, vmessages, vlen, flags, NULL);
+		return recvmmsg64(sockfd, vmessages, vlen, msg_flags, NULL);
 	tmo32.@tv_sec@  = (time64_t)tmo->@tv_sec@,
 	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
-	return recvmmsg64(sockfd, vmessages, vlen, flags, &tmo64);
+	return recvmmsg64(sockfd, vmessages, vlen, msg_flags, &tmo64);
 #else /* __CRT_HAVE_recvmmsg64 */
 	struct timespec32 tmo32;
 	if (!tmo)
-		return recvmmsg32(sockfd, vmessages, vlen, flags, NULL);
+		return recvmmsg32(sockfd, vmessages, vlen, msg_flags, NULL);
 	tmo32.@tv_sec@  = (time32_t)tmo->@tv_sec@,
 	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
-	return recvmmsg32(sockfd, vmessages, vlen, flags, &tmo32);
+	return recvmmsg32(sockfd, vmessages, vlen, msg_flags, &tmo32);
 #endif /* !__CRT_HAVE_recvmmsg64 */
 }
 
 %#ifdef __USE_TIME64
 [cp][requires($has_function(recvmmsg32))][time64_variant_of(recvmmsg)]
 recvmmsg64:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages,
-            __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags,
+            __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags,
             [nullable] struct $timespec64 *tmo) -> int {
 	struct timespec32 tmo32;
 	if (!tmo)
-		return recvmmsg32(sockfd, vmessages, vlen, flags, NULL);
+		return recvmmsg32(sockfd, vmessages, vlen, msg_flags, NULL);
 	tmo32.@tv_sec@  = (time32_t)tmo->@tv_sec@,
 	tmo32.@tv_nsec@ = tmo->@tv_nsec@;
-	return recvmmsg32(sockfd, vmessages, vlen, flags, &tmo32);
+	return recvmmsg32(sockfd, vmessages, vlen, msg_flags, &tmo32);
 }
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_GNU */

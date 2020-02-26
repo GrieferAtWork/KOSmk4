@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfde0de17 */
+/* HASH CRC-32:0x160ec371 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,37 +66,37 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_connect)(fd_t sockfd, __CONST_
  * (which is *LEN bytes long), and its actual length into *LEN */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_getpeername)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
 /* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1
- * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 /* Read BUFSIZE bytes into BUF from socket FD.
  * Returns the number read or -1 for errors
- * @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_recv)(fd_t sockfd, void *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags);
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_recv)(fd_t sockfd, void *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags);
 /* Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
  * (which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors.
- * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-INTDEF NONNULL((2, 5)) ssize_t NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T flags, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+INTDEF NONNULL((2, 5)) ssize_t NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd, void const *buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __CONST_SOCKADDR_ARG addr, socklen_t addr_len);
 /* Read BUFSIZE bytes into BUF through socket FD.
  * If ADDR is not NULL, fill in *ADDR_LEN bytes of it with tha address of
  * the sender, and store the actual size of the address in *ADDR_LEN.
  * Returns the number of bytes read or -1 for errors
- * @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-INTDEF WUNUSED NONNULL((2, 5)) ssize_t NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd, void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T flags, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
+ * @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+INTDEF WUNUSED NONNULL((2, 5)) ssize_t NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd, void *__restrict buf, size_t bufsize, __STDC_INT_AS_UINT_T msg_flags, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len);
 /* Send a message described MESSAGE on socket FD.
  * Returns the number of bytes sent, or -1 for errors
- * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd, struct msghdr const *message, __STDC_INT_AS_UINT_T flags);
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd, struct msghdr const *message, __STDC_INT_AS_UINT_T msg_flags);
 /* Receive a message as described by MESSAGE from socket FD.
  * Returns the number of bytes read or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd, struct msghdr *message, __STDC_INT_AS_UINT_T flags);
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd, struct msghdr *message, __STDC_INT_AS_UINT_T msg_flags);
 /* Put the current value for socket FD's option OPTNAME at protocol level LEVEL
  * into OPTVAL (which is *OPTLEN bytes long), and set *OPTLEN to the value's
  * actual length.  Returns 0 on success, -1 for errors
@@ -125,26 +125,26 @@ INTDEF NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_accept)(fd_t sockfd, __SOCKAD
  *     - SHUT_RDWR = No more receptions or transmissions.
  * Returns 0 on success, -1 for errors */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_shutdown)(fd_t sockfd, __STDC_INT_AS_UINT_T how);
-/* Similar to 'accept(2)' but takes an additional parameter to specify flags.
- * @param: FLAGS: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
-INTDEF NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_accept4)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T flags);
+/* Similar to 'accept(2)' but takes an additional parameter to specify socket flags.
+ * @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+INTDEF NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_accept4)(fd_t sockfd, __SOCKADDR_ARG addr, socklen_t *__restrict addr_len, __STDC_INT_AS_UINT_T sock_flags);
 /* Send a VLEN messages as described by VMESSAGES to socket FD.
  * Returns the number of datagrams successfully written or -1 for errors
- * @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags);
+ * @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags);
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags, struct timespec *tmo);
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec *tmo);
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors.
- * @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T flags, struct timespec64 *tmo);
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd, struct mmsghdr *vmessages, __STDC_UINT_AS_SIZE_T vlen, __STDC_INT_AS_UINT_T msg_flags, struct timespec64 *tmo);
 /* Determine whether socket is at a out-of-band mark
  * @return: > 0 : The read-pointer is pointing at out-of-band data
  * @return: == 0: The read-pointer is not pointing at out-of-band data

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35b1290f */
+/* HASH CRC-32:0x577a044c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -215,8 +215,8 @@
 #define SYS_sched_yield             __NR_sched_yield             /* errno_t sched_yield(void) */
 #define SYS_sched_get_priority_max  __NR_sched_get_priority_max  /* syscall_slong_t sched_get_priority_max(syscall_ulong_t algorithm) */
 #define SYS_sched_get_priority_min  __NR_sched_get_priority_min  /* syscall_slong_t sched_get_priority_min(syscall_ulong_t algorithm) */
-#define SYS_sched_rr_get_interval   __NR_sched_rr_get_interval   /* errno_t sched_rr_get_interval(pid_t pid, struct __timespecx32 *tms) */
-#define SYS_nanosleep               __NR_nanosleep               /* errno_t nanosleep(struct __timespecx32 const *req, struct __timespecx32 *rem) */
+#define SYS_sched_rr_get_interval   __NR_sched_rr_get_interval   /* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *tms) */
+#define SYS_nanosleep               __NR_nanosleep               /* errno_t nanosleep(struct timespecx32 const *req, struct timespecx32 *rem) */
 /* @param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
 #define SYS_mremap                  __NR_mremap                  /* void *mremap(void *addr, size_t old_len, size_t new_len, syscall_ulong_t flags, void *new_address) */
 #define SYS_setresuid               __NR_setresuid               /* errno_t setresuid(uint16_t ruid, uint16_t euid, uint16_t suid) */
@@ -233,7 +233,7 @@
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define SYS_rt_sigprocmask          __NR_rt_sigprocmask          /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 #define SYS_rt_sigpending           __NR_rt_sigpending           /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
-#define SYS_rt_sigtimedwait         __NR_rt_sigtimedwait         /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32 const *timeout, size_t sigsetsize) */
+#define SYS_rt_sigtimedwait         __NR_rt_sigtimedwait         /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 /* @param: signo: One of `SIG*' */
 #define SYS_rt_sigqueueinfo         __NR_rt_sigqueueinfo         /* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
 #define SYS_rt_sigsuspend           __NR_rt_sigsuspend           /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
@@ -295,7 +295,7 @@
 #define SYS_fremovexattr            __NR_fremovexattr            /* errno_t fremovexattr(int fd, char const *name) */
 #define SYS_tkill                   __NR_tkill                   /* errno_t tkill(pid_t tid, syscall_ulong_t signo) */
 #define SYS_sendfile64              __NR_sendfile64              /* ssize_t sendfile64(fd_t out_fd, fd_t in_fd, __ULONG64_TYPE__ *pin_offset, size_t num_bytes) */
-#define SYS_futex                   __NR_futex                   /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+#define SYS_futex                   __NR_futex                   /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 #define SYS_sched_setaffinity       __NR_sched_setaffinity       /* errno_t sched_setaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset) */
 #define SYS_sched_getaffinity       __NR_sched_getaffinity       /* errno_t sched_getaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct *cpuset) */
 #define SYS_set_thread_area         __NR_set_thread_area         /* errno_t set_thread_area(int TODO_PROTOTYPE) */
@@ -314,14 +314,14 @@
 #define SYS_remap_file_pages        __NR_remap_file_pages        /* errno_t remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
 #define SYS_set_tid_address         __NR_set_tid_address         /* pid_t set_tid_address(pid_t *tidptr) */
 #define SYS_timer_create            __NR_timer_create            /* errno_t timer_create(clockid_t clock_id, struct sigevent *evp, timer_t *timerid) */
-#define SYS_timer_settime           __NR_timer_settime           /* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32 const *value, struct __itimerspecx32 *ovalue) */
-#define SYS_timer_gettime           __NR_timer_gettime           /* errno_t timer_gettime(timer_t timerid, struct __itimerspecx32 *value) */
+#define SYS_timer_settime           __NR_timer_settime           /* errno_t timer_settime(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32 const *value, struct itimerspecx32 *ovalue) */
+#define SYS_timer_gettime           __NR_timer_gettime           /* errno_t timer_gettime(timer_t timerid, struct itimerspecx32 *value) */
 #define SYS_timer_getoverrun        __NR_timer_getoverrun        /* syscall_slong_t timer_getoverrun(timer_t timerid) */
 #define SYS_timer_delete            __NR_timer_delete            /* errno_t timer_delete(timer_t timerid) */
-#define SYS_clock_settime           __NR_clock_settime           /* errno_t clock_settime(clockid_t clock_id, struct __timespecx32 const *tp) */
-#define SYS_clock_gettime           __NR_clock_gettime           /* errno_t clock_gettime(clockid_t clock_id, struct __timespecx32 *tp) */
-#define SYS_clock_getres            __NR_clock_getres            /* errno_t clock_getres(clockid_t clock_id, struct __timespecx32 *res) */
-#define SYS_clock_nanosleep         __NR_clock_nanosleep         /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32 const *requested_time, struct __timespecx32 *remaining) */
+#define SYS_clock_settime           __NR_clock_settime           /* errno_t clock_settime(clockid_t clock_id, struct timespecx32 const *tp) */
+#define SYS_clock_gettime           __NR_clock_gettime           /* errno_t clock_gettime(clockid_t clock_id, struct timespecx32 *tp) */
+#define SYS_clock_getres            __NR_clock_getres            /* errno_t clock_getres(clockid_t clock_id, struct timespecx32 *res) */
+#define SYS_clock_nanosleep         __NR_clock_nanosleep         /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32 const *requested_time, struct timespecx32 *remaining) */
 #define SYS_statfs64                __NR_statfs64                /* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
 #define SYS_fstatfs64               __NR_fstatfs64               /* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
 #define SYS_tgkill                  __NR_tgkill                  /* errno_t tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo) */
@@ -333,8 +333,8 @@
 #define SYS_set_mempolicy           __NR_set_mempolicy           /* errno_t set_mempolicy(int TODO_PROTOTYPE) */
 #define SYS_mq_open                 __NR_mq_open                 /* fd_t mq_open(char const *name, oflag_t oflags, mode_t mode) */
 #define SYS_mq_unlink               __NR_mq_unlink               /* errno_t mq_unlink(char const *name) */
-#define SYS_mq_timedsend            __NR_mq_timedsend            /* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32 const *abs_timeout) */
-#define SYS_mq_timedreceive         __NR_mq_timedreceive         /* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32 const *abs_timeout) */
+#define SYS_mq_timedsend            __NR_mq_timedsend            /* errno_t mq_timedsend(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32 const *abs_timeout) */
+#define SYS_mq_timedreceive         __NR_mq_timedreceive         /* ssize_t mq_timedreceive(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32 const *abs_timeout) */
 #define SYS_mq_notify               __NR_mq_notify               /* errno_t mq_notify(fd_t mqdes, struct sigevent const *notification) */
 #define SYS_mq_getsetattr           __NR_mq_getsetattr           /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 #define SYS_kexec_load              __NR_kexec_load              /* errno_t kexec_load(int TODO_PROTOTYPE) */
@@ -369,8 +369,8 @@
 /* @param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
  * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW|AT_EACCESS | AT_DOSPATH' */
 #define SYS_faccessat               __NR_faccessat               /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
-#define SYS_pselect6                __NR_pselect6                /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
-#define SYS_ppoll                   __NR_ppoll                   /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct __timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+#define SYS_pselect6                __NR_pselect6                /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32 const *timeout, void const *sigmask_sigset_and_len) */
+#define SYS_ppoll                   __NR_ppoll                   /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespecx32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* param flags: Set of `CLONE_*' */
 #define SYS_unshare                 __NR_unshare                 /* errno_t unshare(syscall_ulong_t flags) */
 #define SYS_set_robust_list         __NR_set_robust_list         /* errno_t set_robust_list(int TODO_PROTOTYPE) */
@@ -383,7 +383,7 @@
 #define SYS_getcpu                  __NR_getcpu                  /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
 #define SYS_epoll_pwait             __NR_epoll_pwait             /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-#define SYS_utimensat               __NR_utimensat               /* errno_t utimensat(fd_t dirfd, char const *filename, struct __timespecx32 const[2] times, atflag_t flags) */
+#define SYS_utimensat               __NR_utimensat               /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx32 const[2] times, atflag_t flags) */
 #define SYS_signalfd                __NR_signalfd                /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* Return file descriptor for new interval timer source */
 #define SYS_timerfd_create          __NR_timerfd_create          /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
@@ -392,9 +392,9 @@
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
  * is absolute. Optionally return the old expiration time in OTMR */
-#define SYS_timerfd_settime         __NR_timerfd_settime         /* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32 const *utmr, struct __itimerspecx32 *otmr) */
+#define SYS_timerfd_settime         __NR_timerfd_settime         /* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32 const *utmr, struct itimerspecx32 *otmr) */
 /* Return the next expiration time of UFD */
-#define SYS_timerfd_gettime         __NR_timerfd_gettime         /* errno_t timerfd_gettime(fd_t ufd, struct __itimerspecx32 *otmr) */
+#define SYS_timerfd_gettime         __NR_timerfd_gettime         /* errno_t timerfd_gettime(fd_t ufd, struct itimerspecx32 *otmr) */
 #define SYS_signalfd4               __NR_signalfd4               /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
 #define SYS_eventfd2                __NR_eventfd2                /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 #define SYS_epoll_create1           __NR_epoll_create1           /* fd_t epoll_create1(syscall_ulong_t flags) */
@@ -407,7 +407,7 @@
 /* @param: signo: One of `SIG*' */
 #define SYS_rt_tgsigqueueinfo       __NR_rt_tgsigqueueinfo       /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
 #define SYS_perf_event_open         __NR_perf_event_open         /* errno_t perf_event_open(int TODO_PROTOTYPE) */
-#define SYS_recvmmsg                __NR_recvmmsg                /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32 *tmo) */
+#define SYS_recvmmsg                __NR_recvmmsg                /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32 const *tmo) */
 #define SYS_fanotify_init           __NR_fanotify_init           /* errno_t fanotify_init(int TODO_PROTOTYPE) */
 #define SYS_fanotify_mark           __NR_fanotify_mark           /* errno_t fanotify_mark(int TODO_PROTOTYPE) */
 /* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
@@ -416,7 +416,7 @@
 #define SYS_open_by_handle_at       __NR_open_by_handle_at       /* fd_t open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags) */
 #define SYS_clock_adjtime           __NR_clock_adjtime           /* errno_t clock_adjtime(int TODO_PROTOTYPE) */
 #define SYS_syncfs                  __NR_syncfs                  /* errno_t syncfs(fd_t fd) */
-#define SYS_sendmmsg                __NR_sendmmsg                /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags) */
+#define SYS_sendmmsg                __NR_sendmmsg                /* ssize_t sendmmsg(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags) */
 #define SYS_setns                   __NR_setns                   /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
 #define SYS_process_vm_readv        __NR_process_vm_readv        /* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 #define SYS_process_vm_writev       __NR_process_vm_writev       /* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
@@ -453,8 +453,8 @@
 #define SYS_bind                    __NR_bind                    /* errno_t bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define SYS_connect                 __NR_connect                 /* errno_t connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len) */
 #define SYS_listen                  __NR_listen                  /* errno_t listen(fd_t sockfd, syscall_ulong_t max_backlog) */
-/* @param: flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
-#define SYS_accept4                 __NR_accept4                 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
+/* @param: sock_flags: Set of `SOCK_NONBLOCK | SOCK_CLOEXEC | SOCK_CLOFORK' */
+#define SYS_accept4                 __NR_accept4                 /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t sock_flags) */
 /* @param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
  * @param: optname: Dependent on `level' */
 #define SYS_getsockopt              __NR_getsockopt              /* errno_t getsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void *optval, socklen_t *optlen) */
@@ -463,38 +463,38 @@
 #define SYS_setsockopt              __NR_setsockopt              /* errno_t setsockopt(fd_t sockfd, syscall_ulong_t level, syscall_ulong_t optname, void const *optval, socklen_t optlen) */
 #define SYS_getsockname             __NR_getsockname             /* errno_t getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
 #define SYS_getpeername             __NR_getpeername             /* errno_t getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len) */
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-#define SYS_sendto                  __NR_sendto                  /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr const *addr, socklen_t addr_len) */
-/* @param: flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
- *                        MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-#define SYS_sendmsg                 __NR_sendmsg                 /* ssize_t sendmsg(fd_t sockfd, struct msghdr const *message, syscall_ulong_t flags) */
-/* @param: flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-#define SYS_recvfrom                __NR_recvfrom                /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t flags, struct sockaddr *addr, socklen_t *addr_len) */
-/* @param: flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                        MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                        MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-#define SYS_recvmsg                 __NR_recvmsg                 /* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t flags) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+#define SYS_sendto                  __NR_sendto                  /* ssize_t sendto(fd_t sockfd, void const *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr const *addr, socklen_t addr_len) */
+/* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
+ *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
+#define SYS_sendmsg                 __NR_sendmsg                 /* ssize_t sendmsg(fd_t sockfd, struct msghdr32 const *message, syscall_ulong_t msg_flags) */
+/* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+#define SYS_recvfrom                __NR_recvfrom                /* ssize_t recvfrom(fd_t sockfd, void *buf, size_t bufsize, syscall_ulong_t msg_flags, struct sockaddr *addr, socklen_t *addr_len) */
+/* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
+#define SYS_recvmsg                 __NR_recvmsg                 /* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t msg_flags) */
 /* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
 #define SYS_shutdown                __NR_shutdown                /* errno_t shutdown(fd_t sockfd, syscall_ulong_t how) */
 #define SYS_userfaultfd             __NR_userfaultfd             /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define SYS_membarrier              __NR_membarrier              /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define SYS_mlock2                  __NR_mlock2                  /* errno_t mlock2(int TODO_PROTOTYPE) */
-#define SYS_recvmmsg64              __NR_recvmmsg64              /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespecx32_64 *tmo) */
+#define SYS_recvmmsg64              __NR_recvmmsg64              /* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t flags, struct timespecx32_64 const *tmo) */
 #define SYS_pwritevf                __NR_pwritevf                /* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 #define SYS_preadvf                 __NR_preadvf                 /* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 /* Return the next expiration time of UFD */
-#define SYS_timerfd_gettime64       __NR_timerfd_gettime64       /* errno_t timerfd_gettime64(fd_t ufd, struct __itimerspecx32_64 *otmr) */
+#define SYS_timerfd_gettime64       __NR_timerfd_gettime64       /* errno_t timerfd_gettime64(fd_t ufd, struct itimerspecx32_64 *otmr) */
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
  * is absolute. Optionally return the old expiration time in OTMR */
-#define SYS_timerfd_settime64       __NR_timerfd_settime64       /* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspecx32_64 const *utmr, struct __itimerspecx32_64 *otmr) */
+#define SYS_timerfd_settime64       __NR_timerfd_settime64       /* errno_t timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 #define SYS_fallocate64             __NR_fallocate64             /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-#define SYS_utimensat64             __NR_utimensat64             /* errno_t utimensat64(fd_t dirfd, char const *filename, struct __timespecx32_64 const[2] times, atflag_t flags) */
-#define SYS_ppoll64                 __NR_ppoll64                 /* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct __timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-#define SYS_pselect6_64             __NR_pselect6_64             /* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+#define SYS_utimensat64             __NR_utimensat64             /* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
+#define SYS_ppoll64                 __NR_ppoll64                 /* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+#define SYS_pselect6_64             __NR_pselect6_64             /* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
 /* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
 #define SYS_freadlinkat             __NR_freadlinkat             /* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
@@ -510,24 +510,24 @@
 #define SYS_fmkdirat                __NR_fmkdirat                /* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
 #define SYS_waitid64                __NR_waitid64                /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
-#define SYS_mq_timedreceive64       __NR_mq_timedreceive64       /* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct __timespecx32_64 const *abs_timeout) */
-#define SYS_mq_timedsend64          __NR_mq_timedsend64          /* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct __timespecx32_64 const *abs_timeout) */
+#define SYS_mq_timedreceive64       __NR_mq_timedreceive64       /* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
+#define SYS_mq_timedsend64          __NR_mq_timedsend64          /* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
 #define SYS_utimes64                __NR_utimes64                /* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
-#define SYS_clock_nanosleep64       __NR_clock_nanosleep64       /* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespecx32_64 const *requested_time, struct __timespecx32_64 *remaining) */
-#define SYS_clock_getres64          __NR_clock_getres64          /* errno_t clock_getres64(clockid_t clock_id, struct __timespecx32_64 *res) */
-#define SYS_clock_gettime64         __NR_clock_gettime64         /* errno_t clock_gettime64(clockid_t clock_id, struct __timespecx32_64 *tp) */
-#define SYS_clock_settime64         __NR_clock_settime64         /* errno_t clock_settime64(clockid_t clock_id, struct __timespecx32_64 const *tp) */
-#define SYS_timer_gettime64         __NR_timer_gettime64         /* errno_t timer_gettime64(timer_t timerid, struct __itimerspecx32_64 *value) */
-#define SYS_timer_settime64         __NR_timer_settime64         /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspecx32_64 const *value, struct __itimerspecx32_64 *ovalue) */
+#define SYS_clock_nanosleep64       __NR_clock_nanosleep64       /* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
+#define SYS_clock_getres64          __NR_clock_getres64          /* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
+#define SYS_clock_gettime64         __NR_clock_gettime64         /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+#define SYS_clock_settime64         __NR_clock_settime64         /* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+#define SYS_timer_gettime64         __NR_timer_gettime64         /* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+#define SYS_timer_settime64         __NR_timer_settime64         /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
 #define SYS_kreaddirf               __NR_kreaddirf               /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 #define SYS_kfstat                  __NR_kfstat                  /* errno_t kfstat(fd_t fd, struct __kos_statx32 *statbuf) */
 #define SYS_klstat                  __NR_klstat                  /* errno_t klstat(char const *filename, struct __kos_statx32 *statbuf) */
 #define SYS_kstat                   __NR_kstat                   /* errno_t kstat(char const *filename, struct __kos_statx32 *statbuf) */
 #define SYS_pwrite64f               __NR_pwrite64f               /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define SYS_pread64f                __NR_pread64f                /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-#define SYS_rt_sigtimedwait64       __NR_rt_sigtimedwait64       /* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct __timespecx32_64 const *timeout, size_t sigsetsize) */
-#define SYS_nanosleep64             __NR_nanosleep64             /* errno_t nanosleep64(struct __timespecx32_64 const *req, struct __timespecx32_64 *rem) */
-#define SYS_sched_rr_get_interval64 __NR_sched_rr_get_interval64 /* errno_t sched_rr_get_interval64(pid_t pid, struct __timespecx32_64 *tms) */
+#define SYS_rt_sigtimedwait64       __NR_rt_sigtimedwait64       /* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+#define SYS_nanosleep64             __NR_nanosleep64             /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
+#define SYS_sched_rr_get_interval64 __NR_sched_rr_get_interval64 /* errno_t sched_rr_get_interval64(pid_t pid, struct timespecx32_64 *tms) */
 #define SYS_rpc_service             __NR_rpc_service             /* syscall_slong_t rpc_service(void) */
 #define SYS_ksysctl                 __NR_ksysctl                 /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 #define SYS_writevf                 __NR_writevf                 /* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
@@ -626,7 +626,7 @@
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define SYS_lfutexlockexpr          __NR_lfutexlockexpr          /* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+#define SYS_lfutexlockexpr          __NR_lfutexlockexpr          /* errno_t lfutexlockexpr(uint32_t *ulockaddr, void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -654,7 +654,7 @@
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define SYS_lfutexexpr              __NR_lfutexexpr              /* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct __timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
+#define SYS_lfutexexpr              __NR_lfutexexpr              /* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexprx32 const *exprv, struct timespecx32_64 const *timeout, syscall_ulong_t timeout_flags) */
 #define SYS_lseek64                 __NR_lseek64                 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -678,7 +678,7 @@
  * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
  * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
  * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-#define SYS_lfutex                  __NR_lfutex                  /* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespecx32_64 const *timeout, uint32_t val2) */
+#define SYS_lfutex                  __NR_lfutex                  /* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
 /* Trigger a debugger trap `trapno', optionally extended with `regs'
  * at either the system call return location, or at the given `state'
  * In the later case, this system call will by default return to the

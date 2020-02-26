@@ -41,6 +41,7 @@ __DECL_BEGIN
 #define __OFFSET_MSGHDR_CONTROLLEN __OFFSET_MSGHDR32_CONTROLLEN
 #define __OFFSET_MSGHDR_FLAGS      __OFFSET_MSGHDR32_FLAGS
 #define __SIZEOF_MSGHDR            __SIZEOF_MSGHDR32
+#define __ALIGNOF_MSGHDR           __ALIGNOF_MSGHDR32
 #endif /* !__x86_64__ && __i386__ */
 
 #define __OFFSET_MSGHDR32_NAME       0
@@ -51,6 +52,7 @@ __DECL_BEGIN
 #define __OFFSET_MSGHDR32_CONTROLLEN 20
 #define __OFFSET_MSGHDR32_FLAGS      24
 #define __SIZEOF_MSGHDR32            28
+#define __ALIGNOF_MSGHDR32           __ALIGNOF_INT32__
 #ifdef __CC__
 
 #if defined(__i386__) && !defined(__x86_64__)
@@ -63,7 +65,7 @@ struct sockaddr;
 #if defined(__i386__) && !defined(__x86_64__)
 struct cmsghdr;
 #else /* __i386__ && !__x86_64__ */
-struct cmsghdr32;
+struct __cmsghdrx32;
 #endif /* !__i386__ || __x86_64__ */
 #endif /* __USE_KOS_KERNEL */
 
@@ -86,12 +88,12 @@ struct msghdr32 /*[PREFIX(msg_)]*/ { /* TODO: Rename to msghdrx32 */
 #if defined(__i386__) && !defined(__x86_64__)
 	__HYBRID_PTR32(struct cmsghdr) msg_control;    /* [0..msg_controllen] Ancillary data (eg BSD filedesc passing). */
 #else /* __i386__ && !__x86_64__ */
-	__HYBRID_PTR32(struct cmsghdr32) msg_control;  /* [0..msg_controllen] Ancillary data (eg BSD filedesc passing). */
+	__HYBRID_PTR32(struct __cmsghdrx32) msg_control;  /* [0..msg_controllen] Ancillary data (eg BSD filedesc passing). */
 #endif /* !__i386__ || __x86_64__ */
 #else /* __USE_KOS_KERNEL */
-	__HYBRID_PTR32(void)           msg_control;    /* [0..msg_controllen][TYPE(struct cmsghdr32 *)] Ancillary data (eg BSD filedesc passing). */
+	__HYBRID_PTR32(void)           msg_control;    /* [0..msg_controllen][TYPE(struct __cmsghdrx32 *)] Ancillary data (eg BSD filedesc passing). */
 #endif /* !__USE_KOS_KERNEL */
-	__UINT32_TYPE__                msg_controllen; /* [in|out][valid_if(msg_control != NULL)] Ancillary data buffer length.
+	__ULONG32_TYPE__               msg_controllen; /* [in|out][valid_if(msg_control != NULL)] Ancillary data buffer length.
 	                                                * !! The type should be socklen_t but the definition of the
 	                                                *    kernel is incompatible with this. */
 #ifdef __USE_KOS_KERNEL

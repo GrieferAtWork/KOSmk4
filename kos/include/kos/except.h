@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf546665 */
+/* HASH CRC-32:0x858350ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -221,7 +221,13 @@ __DECL_BEGIN
  * 	@@The level that was given to `getoptname()' or `setoptname()'
  * 	member level: uintptr_t;
  * 	@@The optname that was given to `getoptname()' or `setoptname()'
- * 	member optname: uintptr_t; */
+ * 	member optname: uintptr_t;
+ * 	@@The socket's address family (one of `AF_*')
+ * 	member address_family: uintptr_t;
+ * 	@@The socket's type (one of `SOCK_*')
+ * 	member socket_type: uintptr_t;
+ * 	@@The socket's protocol (dependent on `address_family' and `socket_type')
+ * 	member protocol: uintptr_t; */
 #define E_INVALID_ARGUMENT_SOCKET_OPT (E_INVALID_ARGUMENT,0x000a)
 /* One command was given when a different one was expected
  * 	@@Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*')

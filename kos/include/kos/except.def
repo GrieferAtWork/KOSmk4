@@ -311,6 +311,14 @@ class E_INVALID_ARGUMENT_SOCKET_OPT: E_INVALID_ARGUMENT = 0x000a {
 	member level: uintptr_t;
 	@@The optname that was given to `getoptname()' or `setoptname()'
 	member optname: uintptr_t;
+	@@The socket's address family (one of `AF_*')
+	[tostr(select("AF_*"))]
+	member address_family: uintptr_t;
+	@@The socket's type (one of `SOCK_*')
+	[tostr(select("SOCK_*"))]
+	member socket_type: uintptr_t;
+	@@The socket's protocol (dependent on `address_family' and `socket_type')
+	member protocol: uintptr_t;
 }
 
 /* For some reason, connect() sets a different errno for bad address families... */

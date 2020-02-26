@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7fe8ec7 */
+/* HASH CRC-32:0xcf0edbd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -231,7 +231,7 @@
 #define __NRAC_socketpair             4
 #define __NRAC_bind                   3
 #define __NRAC_listen                 2
-#define __NRAC_accept                 1
+#define __NRAC_accept                 3
 #define __NRAC_connect                3
 #define __NRAC_getsockname            3
 #define __NRAC_getpeername            3
@@ -553,7 +553,7 @@
 #define __NRRT_socketpair             (errno_t, __errno_t)
 #define __NRRT_bind                   (errno_t, __errno_t)
 #define __NRRT_listen                 (errno_t, __errno_t)
-#define __NRRT_accept                 (errno_t, __errno_t)
+#define __NRRT_accept                 (fd_t, __fd_t)
 #define __NRRT_connect                (errno_t, __errno_t)
 #define __NRRT_getsockname            (errno_t, __errno_t)
 #define __NRRT_getpeername            (errno_t, __errno_t)
@@ -983,7 +983,7 @@
 #define __NRAT0_sched_get_priority_max (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_sched_get_priority_min (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_sched_rr_get_interval  (pid_t, __pid_t)
-#define __NRAT1_sched_rr_get_interval  (struct __timespec *, struct __timespec *)
+#define __NRAT1_sched_rr_get_interval  (struct timespec *, struct timespec *)
 #define __NRAT0_kill                   (pid_t, __pid_t)
 #define __NRAT1_kill                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_tkill                  (pid_t, __pid_t)
@@ -1116,7 +1116,9 @@
 #define __NRAT2_bind                   (socklen_t, __socklen_t)
 #define __NRAT0_listen                 (fd_t, __fd_t)
 #define __NRAT1_listen                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_accept                 (int, int)
+#define __NRAT0_accept                 (fd_t, __fd_t)
+#define __NRAT1_accept                 (struct sockaddr *, struct sockaddr *)
+#define __NRAT2_accept                 (socklen_t *, __socklen_t *)
 #define __NRAT0_connect                (fd_t, __fd_t)
 #define __NRAT1_connect                (struct sockaddr const *, struct sockaddr const *)
 #define __NRAT2_connect                (socklen_t, __socklen_t)
@@ -1221,7 +1223,7 @@
 #define __NRAT1_recvmmsg               (struct mmsghdr *, struct mmsghdr *)
 #define __NRAT2_recvmmsg               (size_t, __size_t)
 #define __NRAT3_recvmmsg               (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT4_recvmmsg               (struct timespec *, struct timespec *)
+#define __NRAT4_recvmmsg               (struct timespec const *, struct timespec const *)
 #define __NRAT0_wait4                  (pid_t, __pid_t)
 #define __NRAT1_wait4                  (int32_t *, __int32_t *)
 #define __NRAT2_wait4                  (syscall_ulong_t, __syscall_ulong_t)
@@ -1531,7 +1533,7 @@
 #define __NRAM_sched_yield(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            /* nothing */
 #define __NRAM_sched_get_priority_max(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z) (__syscall_ulong_t)a
 #define __NRAM_sched_get_priority_min(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z) (__syscall_ulong_t)a
-#define __NRAM_sched_rr_get_interval(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)  (__pid_t)a, (struct __timespec *)b
+#define __NRAM_sched_rr_get_interval(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)  (__pid_t)a, (struct timespec *)b
 #define __NRAM_restart_syscall(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        /* nothing */
 #define __NRAM_kill(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__pid_t)a, (__syscall_ulong_t)b
 #define __NRAM_tkill(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__pid_t)a, (__syscall_ulong_t)b
@@ -1606,7 +1608,7 @@
 #define __NRAM_socketpair(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__fd_t *)d
 #define __NRAM_bind(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
 #define __NRAM_listen(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__fd_t)a, (__syscall_ulong_t)b
-#define __NRAM_accept(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (int)a
+#define __NRAM_accept(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c
 #define __NRAM_connect(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
 #define __NRAM_getsockname(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c
 #define __NRAM_getpeername(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c
@@ -1645,7 +1647,7 @@
 #define __NRAM_rt_tgsigqueueinfo(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (struct __siginfo_struct const *)d
 #define __NRAM_perf_event_open(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)        (int)a
 #define __NRAM_accept4(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c, (__syscall_ulong_t)d
-#define __NRAM_recvmmsg(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d, (struct timespec *)e
+#define __NRAM_recvmmsg(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d, (struct timespec const *)e
 #define __NRAM_wait4(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct rusage *)d
 #define __NRAM_prlimit64(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
 #define __NRAM_fanotify_init(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
@@ -1928,7 +1930,7 @@
 #define __NRAP_socketpair(a, b, c, d)                                                                               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_bind(a, b, c)                                                                                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_listen(a, b)                                                                                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_accept(a)                                                                                            (__syscall_ulong_t)a
+#define __NRAP_accept(a, b, c)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_connect(a, b, c)                                                                                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_getsockname(a, b, c)                                                                                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_getpeername(a, b, c)                                                                                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

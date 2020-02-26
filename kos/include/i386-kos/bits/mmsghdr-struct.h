@@ -17,13 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_COMPAT_BITS_CMSGHDR_STRUCT_H
-#define _I386_KOS_COMPAT_BITS_CMSGHDR_STRUCT_H 1
+#ifndef _I386_KOS_BITS_MMSGHDR_STRUCT_H
+#define _I386_KOS_BITS_MMSGHDR_STRUCT_H 1
 
 #include <hybrid/host.h>
-#ifdef __x86_64__
-#include <bits/cmsghdr-struct32.h>
-#define compat_cmsghdr __cmsghdrx32
-#endif /* __x86_64__ */
 
-#endif /* !_I386_KOS_COMPAT_BITS_CMSGHDR_STRUCT_H */
+#ifdef __x86_64__
+#include "mmsghdr-struct64.h"
+#else /* __x86_64__ */
+#include "mmsghdr-struct32.h"
+#endif /* !__x86_64__ */
+
+#endif /* !_I386_KOS_BITS_MMSGHDR_STRUCT_H */

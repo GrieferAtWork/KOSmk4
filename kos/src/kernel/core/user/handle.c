@@ -2725,6 +2725,25 @@ handle_get_pidns(unsigned int fd)
 	      HANDLE_TYPEKIND_GENERIC, subkind);
 }
 
+PUBLIC WUNUSED ATTR_RETNONNULL REF struct socket *FCALL
+handle_get_socket(unsigned int fd)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
+	uintptr_half_t subkind;
+	struct handle result;
+	result = handle_lookup(fd);
+	switch (result.h_type) {
+
+	case HANDLE_TYPE_SOCKET:
+		return (REF struct socket *)result.h_data;
+
+	default: break;
+	}
+	subkind = handle_typekind(&result);
+	decref_unlikely(result);
+	THROW(E_INVALID_HANDLE_FILETYPE, fd,
+	      HANDLE_TYPE_SOCKET, result.h_type,
+	      HANDLE_TYPEKIND_GENERIC, subkind);
+}
 
 
 STATIC_ASSERT(IO_FROM_OPENFLAG(O_APPEND)            == IO_APPEND);

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_CMSGHDR_STRUCT32_H
-#define _I386_KOS_BITS_CMSGHDR_STRUCT32_H 1
+#ifndef _I386_KOS_BITS_MMSGHDR_STRUCT64_H
+#define _I386_KOS_BITS_MMSGHDR_STRUCT64_H 1
 
 #include <__stdinc.h>
 #include <features.h>
@@ -26,46 +26,42 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <bits/types.h>
+#include <bits/msghdr-struct64.h>
 
 __DECL_BEGIN
 
-#if defined(__i386__) && !defined(__x86_64__)
-#define __OFFSET_CMSGHDR_LEN   __OFFSET_CMSGHDRX32_LEN
-#define __OFFSET_CMSGHDR_LEVEL __OFFSET_CMSGHDRX32_LEVEL
-#define __OFFSET_CMSGHDR_TYPE  __OFFSET_CMSGHDRX32_TYPE
-#define __OFFSET_CMSGHDR_DATA  __OFFSET_CMSGHDRX32_DATA
-#define __cmsghdrx32  cmsghdr
-#endif /* __i386__ && !__x86_64__ */
+#ifdef __x86_64__
+#define __OFFSET_MMSGHDR_HDR  __OFFSET_MMSGHDRX64_HDR
+#define __OFFSET_MMSGHDR_LEN  __OFFSET_MMSGHDRX64_LEN
+#define __SIZEOF_MMSGHDR      __SIZEOF_MMSGHDRX64
+#define __ALIGNOF_MMSGHDR     __ALIGNOF_MMSGHDRX64
+#define __mmsghdrx64          mmsghdr
+#endif /* __x86_64__ */
 
-#define __OFFSET_CMSGHDRX32_LEN   0
-#define __OFFSET_CMSGHDRX32_LEVEL 4
-#define __OFFSET_CMSGHDRX32_TYPE  8
-#define __OFFSET_CMSGHDRX32_DATA  12
-#ifdef __CC__
+#define __OFFSET_MMSGHDRX64_HDR  0
+#define __OFFSET_MMSGHDRX64_LEN  56
+#if __ALIGNOF_INT64__ > 4
+#define __SIZEOF_MMSGHDRX64      64
+#else /* __ALIGNOF_INT64__ > 4 */
+#define __SIZEOF_MMSGHDRX64      60
+#endif /* __ALIGNOF_INT64__ <= 4 */
+#define __ALIGNOF_MMSGHDRX64     __ALIGNOF_INT64__
 
 #ifdef __USE_KOS_KERNEL
-#define cmsghdrx32 __cmsghdrx32
-#endif /* __USE_KOS_KERNEL */
-
-/* Structure used for storage of ancillary data object information. */
-struct __cmsghdrx32 /*[NAME(cmsghdrx32)][PREFIX(cmsg_)]*/ {
-	__UINT32_TYPE__  cmsg_len;     /* Length of data in cmsg_data plus length of cmsghdr structure. */
-	__INT32_TYPE__   cmsg_level;   /* Originating protocol. (One of `SOL_*'; (always `SOL_SOCKET'?)) */
-	__INT32_TYPE__   cmsg_type;    /* Protocol specific type (One of `SCM_*'). */
-#ifdef __USE_KOS
-	__COMPILER_FLEXIBLE_ARRAY(__BYTE_TYPE__, cmsg_data); /* Ancillary data. */
-#else /* __USE_KOS */
-	__COMPILER_FLEXIBLE_ARRAY(__BYTE_TYPE__, __cmsg_data); /* Ancillary data. */
-#endif /* !__USE_KOS */
-};
-
-#endif /* __CC__ */
-
-#ifndef __USE_KOS_KERNEL
-#undef cmsghdrx32
+#define mmsghdrx64 __mmsghdrx64
 #endif /* !__USE_KOS_KERNEL */
+
+#ifdef __CC__
+/* For `recvmmsg' and `sendmmsg'. */
+struct __mmsghdrx64 /*[NAME(mmsghdrx64)][PREFIX(msg_)]*/ {
+	struct msghdr64 msg_hdr; /* Actual message header. */
+	__UINT32_TYPE__ msg_len; /* Number of received or sent bytes for the entry. */
+#if __ALIGNOF_INT64__ > 4
+	__BYTE_TYPE__ __msg_pad[__ALIGNOF_INT64__ - 4]; /* ... */
+#endif /* __ALIGNOF_INT64__ > 4 */
+};
+#endif /* __CC__ */
 
 __DECL_END
 
-#endif /* !_I386_KOS_BITS_CMSGHDR_STRUCT32_H */
+#endif /* !_I386_KOS_BITS_MMSGHDR_STRUCT64_H */

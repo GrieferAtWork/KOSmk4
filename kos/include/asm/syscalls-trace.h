@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa732269c */
+/* HASH CRC-32:0x61f3ac0c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -459,7 +459,9 @@
 #define __NRAN2_bind                   addr_len
 #define __NRAN0_listen                 sockfd
 #define __NRAN1_listen                 max_backlog
-#define __NRAN0_accept                 TODO_PROTOTYPE
+#define __NRAN0_accept                 sockfd
+#define __NRAN1_accept                 addr
+#define __NRAN2_accept                 addr_len
 #define __NRAN0_connect                sockfd
 #define __NRAN1_connect                addr
 #define __NRAN2_connect                addr_len
@@ -472,13 +474,13 @@
 #define __NRAN0_sendto                 sockfd
 #define __NRAN1_sendto                 buf
 #define __NRAN2_sendto                 bufsize
-#define __NRAN3_sendto                 flags
+#define __NRAN3_sendto                 msg_flags
 #define __NRAN4_sendto                 addr
 #define __NRAN5_sendto                 addr_len
 #define __NRAN0_recvfrom               sockfd
 #define __NRAN1_recvfrom               buf
 #define __NRAN2_recvfrom               bufsize
-#define __NRAN3_recvfrom               flags
+#define __NRAN3_recvfrom               msg_flags
 #define __NRAN4_recvfrom               addr
 #define __NRAN5_recvfrom               addr_len
 #define __NRAN0_setsockopt             sockfd
@@ -495,10 +497,10 @@
 #define __NRAN1_shutdown               how
 #define __NRAN0_sendmsg                sockfd
 #define __NRAN1_sendmsg                message
-#define __NRAN2_sendmsg                flags
+#define __NRAN2_sendmsg                msg_flags
 #define __NRAN0_recvmsg                sockfd
 #define __NRAN1_recvmsg                message
-#define __NRAN2_recvmsg                flags
+#define __NRAN2_recvmsg                msg_flags
 #define __NRAN0_readahead              fd
 #define __NRAN1_readahead              offset
 #define __NRAN2_readahead              count
@@ -559,7 +561,7 @@
 #define __NRAN0_accept4                sockfd
 #define __NRAN1_accept4                addr
 #define __NRAN2_accept4                addr_len
-#define __NRAN3_accept4                flags
+#define __NRAN3_accept4                sock_flags
 #define __NRAN0_recvmmsg               sockfd
 #define __NRAN1_recvmmsg               vmessages
 #define __NRAN2_recvmmsg               vlen
@@ -737,11 +739,11 @@
 #define __NRAN0_recv                   sockfd
 #define __NRAN1_recv                   buf
 #define __NRAN2_recv                   bufsize
-#define __NRAN3_recv                   flags
+#define __NRAN3_recv                   msg_flags
 #define __NRAN0_send                   sockfd
 #define __NRAN1_send                   buf
 #define __NRAN2_send                   bufsize
-#define __NRAN3_send                   flags
+#define __NRAN3_send                   msg_flags
 #define __NRAN0_bdflush                TODO_PROTOTYPE
 #define __NRAN0_umount                 special_file
 #define __NRAN0_uselib                 library
@@ -1731,7 +1733,11 @@
 #define __NRATRF1_listen                 "%#" PRIxSIZ
 #define __NRATRA1_listen(sockfd, max_backlog) ,(uintptr_t)(max_backlog)
 #define __NRATRF0_accept                 "%d"
-#define __NRATRA0_accept(TODO_PROTOTYPE) ,TODO_PROTOTYPE
+#define __NRATRA0_accept(sockfd, addr, addr_len) ,(int)(sockfd)
+#define __NRATRF1_accept                 "%p"
+#define __NRATRA1_accept(sockfd, addr, addr_len) ,addr
+#define __NRATRF2_accept                 "%p"
+#define __NRATRA2_accept(sockfd, addr, addr_len) ,addr_len
 #define __NRATRF0_connect                "%d"
 #define __NRATRA0_connect(sockfd, addr, addr_len) ,(int)(sockfd)
 #define __NRATRF1_connect                "%p"
@@ -1751,40 +1757,40 @@
 #define __NRATRF2_getpeername            "%p"
 #define __NRATRA2_getpeername(sockfd, addr, addr_len) ,addr_len
 #define __NRATRF0_sendto                 "%d"
-#define __NRATRA0_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(int)(sockfd)
+#define __NRATRA0_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,(int)(sockfd)
 #define __NRATRF1_sendto                 "%p"
-#define __NRATRA1_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,buf
+#define __NRATRA1_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,buf
 #define __NRATRF2_sendto                 "%" PRIuSIZ
-#define __NRATRA2_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,bufsize
+#define __NRATRA2_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,bufsize
 #define __NRATRF3_sendto                 "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(flags),(flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
-                                                                      ,((flags) & MSG_DONTROUTE) && ((flags) & (MSG_CONFIRM)) ? "|" : "",(flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
-                                                                      ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                                      ,((flags) & MSG_EOR) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_EOR ? "MSG_EOR" : "" \
-                                                                      ,((flags) & MSG_MORE) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR)) ? "|" : "",(flags) & MSG_MORE ? "MSG_MORE" : "" \
-                                                                      ,((flags) & MSG_NOSIGNAL) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE)) ? "|" : "",(flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
-                                                                      ,((flags) & MSG_OOB) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : ""
+#define __NRATRA3_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,(uintptr_t)(msg_flags),(msg_flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
+                                                                          ,((msg_flags) & MSG_DONTROUTE) && ((msg_flags) & (MSG_CONFIRM)) ? "|" : "",(msg_flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
+                                                                          ,((msg_flags) & MSG_DONTWAIT) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
+                                                                          ,((msg_flags) & MSG_EOR) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT)) ? "|" : "",(msg_flags) & MSG_EOR ? "MSG_EOR" : "" \
+                                                                          ,((msg_flags) & MSG_MORE) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR)) ? "|" : "",(msg_flags) & MSG_MORE ? "MSG_MORE" : "" \
+                                                                          ,((msg_flags) & MSG_NOSIGNAL) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE)) ? "|" : "",(msg_flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
+                                                                          ,((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(msg_flags) & MSG_OOB ? "MSG_OOB" : ""
 #define __NRATRF4_sendto                 "%p"
-#define __NRATRA4_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,addr
+#define __NRATRA4_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,addr
 #define __NRATRF5_sendto                 "%" PRIuSIZ
-#define __NRATRA5_sendto(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(addr_len)
+#define __NRATRA5_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,(uintptr_t)(addr_len)
 #define __NRATRF0_recvfrom               "%d"
-#define __NRATRA0_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,(int)(sockfd)
+#define __NRATRA0_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,(int)(sockfd)
 #define __NRATRF1_recvfrom               "%p"
-#define __NRATRA1_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,buf
+#define __NRATRA1_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,buf
 #define __NRATRF2_recvfrom               "%" PRIuSIZ
-#define __NRATRA2_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,bufsize
+#define __NRATRA2_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,bufsize
 #define __NRATRF3_recvfrom               "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,(uintptr_t)(flags),(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                                        ,((flags) & MSG_ERRQUEUE) && ((flags) & (MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
-                                                                        ,((flags) & MSG_OOB) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : "" \
-                                                                        ,((flags) & MSG_PEEK) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB)) ? "|" : "",(flags) & MSG_PEEK ? "MSG_PEEK" : "" \
-                                                                        ,((flags) & MSG_TRUNC) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK)) ? "|" : "",(flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
-                                                                        ,((flags) & MSG_WAITALL) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK|MSG_TRUNC)) ? "|" : "",(flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
+#define __NRATRA3_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,(uintptr_t)(msg_flags),(msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
+                                                                            ,((msg_flags) & MSG_ERRQUEUE) && ((msg_flags) & (MSG_DONTWAIT)) ? "|" : "",(msg_flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
+                                                                            ,((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(msg_flags) & MSG_OOB ? "MSG_OOB" : "" \
+                                                                            ,((msg_flags) & MSG_PEEK) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB)) ? "|" : "",(msg_flags) & MSG_PEEK ? "MSG_PEEK" : "" \
+                                                                            ,((msg_flags) & MSG_TRUNC) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK)) ? "|" : "",(msg_flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
+                                                                            ,((msg_flags) & MSG_WAITALL) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK|MSG_TRUNC)) ? "|" : "",(msg_flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
 #define __NRATRF4_recvfrom               "%p"
-#define __NRATRA4_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,addr
+#define __NRATRA4_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,addr
 #define __NRATRF5_recvfrom               "%p"
-#define __NRATRA5_recvfrom(sockfd, buf, bufsize, flags, addr, addr_len) ,addr_len
+#define __NRATRA5_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) ,addr_len
 #define __NRATRF0_setsockopt             "%d"
 #define __NRATRA0_setsockopt(sockfd, level, optname, optval, optlen) ,(int)(sockfd)
 #define __NRATRF1_setsockopt             "%#Ix=%s"
@@ -1810,30 +1816,30 @@
 #define __NRATRF1_shutdown               "%#Ix=%s"
 #define __NRATRA1_shutdown(sockfd, how)  ,(how),(how) == SHUT_RD ? "SHUT_RD" : (how) == SHUT_WR ? "SHUT_WR" : (how) == SHUT_RDWR ? "SHUT_RDWR" : "?"
 #define __NRATRF0_sendmsg                "%d"
-#define __NRATRA0_sendmsg(sockfd, message, flags) ,(int)(sockfd)
+#define __NRATRA0_sendmsg(sockfd, message, msg_flags) ,(int)(sockfd)
 #define __NRATRF1_sendmsg                "%p"
-#define __NRATRA1_sendmsg(sockfd, message, flags) ,message
+#define __NRATRA1_sendmsg(sockfd, message, msg_flags) ,message
 #define __NRATRF2_sendmsg                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_sendmsg(sockfd, message, flags) ,(uintptr_t)(flags),(flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
-                                                  ,((flags) & MSG_DONTROUTE) && ((flags) & (MSG_CONFIRM)) ? "|" : "",(flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
-                                                  ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                  ,((flags) & MSG_EOR) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_EOR ? "MSG_EOR" : "" \
-                                                  ,((flags) & MSG_MORE) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR)) ? "|" : "",(flags) & MSG_MORE ? "MSG_MORE" : "" \
-                                                  ,((flags) & MSG_NOSIGNAL) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE)) ? "|" : "",(flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
-                                                  ,((flags) & MSG_OOB) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : ""
+#define __NRATRA2_sendmsg(sockfd, message, msg_flags) ,(uintptr_t)(msg_flags),(msg_flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
+                                                      ,((msg_flags) & MSG_DONTROUTE) && ((msg_flags) & (MSG_CONFIRM)) ? "|" : "",(msg_flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
+                                                      ,((msg_flags) & MSG_DONTWAIT) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
+                                                      ,((msg_flags) & MSG_EOR) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT)) ? "|" : "",(msg_flags) & MSG_EOR ? "MSG_EOR" : "" \
+                                                      ,((msg_flags) & MSG_MORE) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR)) ? "|" : "",(msg_flags) & MSG_MORE ? "MSG_MORE" : "" \
+                                                      ,((msg_flags) & MSG_NOSIGNAL) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE)) ? "|" : "",(msg_flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
+                                                      ,((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(msg_flags) & MSG_OOB ? "MSG_OOB" : ""
 #define __NRATRF0_recvmsg                "%d"
-#define __NRATRA0_recvmsg(sockfd, message, flags) ,(int)(sockfd)
+#define __NRATRA0_recvmsg(sockfd, message, msg_flags) ,(int)(sockfd)
 #define __NRATRF1_recvmsg                "%p"
-#define __NRATRA1_recvmsg(sockfd, message, flags) ,message
+#define __NRATRA1_recvmsg(sockfd, message, msg_flags) ,message
 #define __NRATRF2_recvmsg                "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA2_recvmsg(sockfd, message, flags) ,(uintptr_t)(flags),(flags) & MSG_CMSG_CLOEXEC ? "MSG_CMSG_CLOEXEC" : "" \
-                                                  ,((flags) & MSG_CMSG_CLOFORK) && ((flags) & (MSG_CMSG_CLOEXEC)) ? "|" : "",(flags) & MSG_CMSG_CLOFORK ? "MSG_CMSG_CLOFORK" : "" \
-                                                  ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                  ,((flags) & MSG_ERRQUEUE) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
-                                                  ,((flags) & MSG_OOB) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : "" \
-                                                  ,((flags) & MSG_PEEK) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB)) ? "|" : "",(flags) & MSG_PEEK ? "MSG_PEEK" : "" \
-                                                  ,((flags) & MSG_TRUNC) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK)) ? "|" : "",(flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
-                                                  ,((flags) & MSG_WAITALL) && ((flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK|MSG_TRUNC)) ? "|" : "",(flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
+#define __NRATRA2_recvmsg(sockfd, message, msg_flags) ,(uintptr_t)(msg_flags),(msg_flags) & MSG_CMSG_CLOEXEC ? "MSG_CMSG_CLOEXEC" : "" \
+                                                      ,((msg_flags) & MSG_CMSG_CLOFORK) && ((msg_flags) & (MSG_CMSG_CLOEXEC)) ? "|" : "",(msg_flags) & MSG_CMSG_CLOFORK ? "MSG_CMSG_CLOFORK" : "" \
+                                                      ,((msg_flags) & MSG_DONTWAIT) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK)) ? "|" : "",(msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
+                                                      ,((msg_flags) & MSG_ERRQUEUE) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT)) ? "|" : "",(msg_flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
+                                                      ,((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(msg_flags) & MSG_OOB ? "MSG_OOB" : "" \
+                                                      ,((msg_flags) & MSG_PEEK) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB)) ? "|" : "",(msg_flags) & MSG_PEEK ? "MSG_PEEK" : "" \
+                                                      ,((msg_flags) & MSG_TRUNC) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK)) ? "|" : "",(msg_flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
+                                                      ,((msg_flags) & MSG_WAITALL) && ((msg_flags) & (MSG_CMSG_CLOEXEC|MSG_CMSG_CLOFORK|MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK|MSG_TRUNC)) ? "|" : "",(msg_flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
 #define __NRATRF0_readahead              "%d"
 #define __NRATRA0_readahead(fd, offset, count) ,(int)(fd)
 #define __NRATRF1_readahead              "%" PRIu64
@@ -1975,15 +1981,15 @@
 #define __NRATRF0_perf_event_open        "%d"
 #define __NRATRA0_perf_event_open(TODO_PROTOTYPE) ,TODO_PROTOTYPE
 #define __NRATRF0_accept4                "%d"
-#define __NRATRA0_accept4(sockfd, addr, addr_len, flags) ,(int)(sockfd)
+#define __NRATRA0_accept4(sockfd, addr, addr_len, sock_flags) ,(int)(sockfd)
 #define __NRATRF1_accept4                "%p"
-#define __NRATRA1_accept4(sockfd, addr, addr_len, flags) ,addr
+#define __NRATRA1_accept4(sockfd, addr, addr_len, sock_flags) ,addr
 #define __NRATRF2_accept4                "%p"
-#define __NRATRA2_accept4(sockfd, addr, addr_len, flags) ,addr_len
+#define __NRATRA2_accept4(sockfd, addr, addr_len, sock_flags) ,addr_len
 #define __NRATRF3_accept4                "%#" PRIxSIZ "=%s%s%s%s%s"
-#define __NRATRA3_accept4(sockfd, addr, addr_len, flags) ,(uintptr_t)(flags),(flags) & SOCK_NONBLOCK ? "SOCK_NONBLOCK" : "" \
-                                                         ,((flags) & SOCK_CLOEXEC) && ((flags) & (SOCK_NONBLOCK)) ? "|" : "",(flags) & SOCK_CLOEXEC ? "SOCK_CLOEXEC" : "" \
-                                                         ,((flags) & SOCK_CLOFORK) && ((flags) & (SOCK_NONBLOCK|SOCK_CLOEXEC)) ? "|" : "",(flags) & SOCK_CLOFORK ? "SOCK_CLOFORK" : ""
+#define __NRATRA3_accept4(sockfd, addr, addr_len, sock_flags) ,(uintptr_t)(sock_flags),(sock_flags) & SOCK_NONBLOCK ? "SOCK_NONBLOCK" : "" \
+                                                              ,((sock_flags) & SOCK_CLOEXEC) && ((sock_flags) & (SOCK_NONBLOCK)) ? "|" : "",(sock_flags) & SOCK_CLOEXEC ? "SOCK_CLOEXEC" : "" \
+                                                              ,((sock_flags) & SOCK_CLOFORK) && ((sock_flags) & (SOCK_NONBLOCK|SOCK_CLOEXEC)) ? "|" : "",(sock_flags) & SOCK_CLOFORK ? "SOCK_CLOFORK" : ""
 #define __NRATRF0_recvmmsg               "%d"
 #define __NRATRA0_recvmmsg(sockfd, vmessages, vlen, flags, tmo) ,(int)(sockfd)
 #define __NRATRF1_recvmmsg               "%p"
@@ -2386,32 +2392,32 @@
 #define __NRATRF3_oldwait4               "%p"
 #define __NRATRA3_oldwait4(pid, stat_loc, options, usage) ,usage
 #define __NRATRF0_recv                   "%d"
-#define __NRATRA0_recv(sockfd, buf, bufsize, flags) ,(int)(sockfd)
+#define __NRATRA0_recv(sockfd, buf, bufsize, msg_flags) ,(int)(sockfd)
 #define __NRATRF1_recv                   "%p"
-#define __NRATRA1_recv(sockfd, buf, bufsize, flags) ,buf
+#define __NRATRA1_recv(sockfd, buf, bufsize, msg_flags) ,buf
 #define __NRATRF2_recv                   "%" PRIuSIZ
-#define __NRATRA2_recv(sockfd, buf, bufsize, flags) ,bufsize
+#define __NRATRA2_recv(sockfd, buf, bufsize, msg_flags) ,bufsize
 #define __NRATRF3_recv                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_recv(sockfd, buf, bufsize, flags) ,(uintptr_t)(flags),(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                    ,((flags) & MSG_ERRQUEUE) && ((flags) & (MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
-                                                    ,((flags) & MSG_OOB) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : "" \
-                                                    ,((flags) & MSG_PEEK) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB)) ? "|" : "",(flags) & MSG_PEEK ? "MSG_PEEK" : "" \
-                                                    ,((flags) & MSG_TRUNC) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK)) ? "|" : "",(flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
-                                                    ,((flags) & MSG_WAITALL) && ((flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK|MSG_TRUNC)) ? "|" : "",(flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
+#define __NRATRA3_recv(sockfd, buf, bufsize, msg_flags) ,(uintptr_t)(msg_flags),(msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
+                                                        ,((msg_flags) & MSG_ERRQUEUE) && ((msg_flags) & (MSG_DONTWAIT)) ? "|" : "",(msg_flags) & MSG_ERRQUEUE ? "MSG_ERRQUEUE" : "" \
+                                                        ,((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE)) ? "|" : "",(msg_flags) & MSG_OOB ? "MSG_OOB" : "" \
+                                                        ,((msg_flags) & MSG_PEEK) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB)) ? "|" : "",(msg_flags) & MSG_PEEK ? "MSG_PEEK" : "" \
+                                                        ,((msg_flags) & MSG_TRUNC) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK)) ? "|" : "",(msg_flags) & MSG_TRUNC ? "MSG_TRUNC" : "" \
+                                                        ,((msg_flags) & MSG_WAITALL) && ((msg_flags) & (MSG_DONTWAIT|MSG_ERRQUEUE|MSG_OOB|MSG_PEEK|MSG_TRUNC)) ? "|" : "",(msg_flags) & MSG_WAITALL ? "MSG_WAITALL" : ""
 #define __NRATRF0_send                   "%d"
-#define __NRATRA0_send(sockfd, buf, bufsize, flags) ,(int)(sockfd)
+#define __NRATRA0_send(sockfd, buf, bufsize, msg_flags) ,(int)(sockfd)
 #define __NRATRF1_send                   "%p"
-#define __NRATRA1_send(sockfd, buf, bufsize, flags) ,buf
+#define __NRATRA1_send(sockfd, buf, bufsize, msg_flags) ,buf
 #define __NRATRF2_send                   "%" PRIuSIZ
-#define __NRATRA2_send(sockfd, buf, bufsize, flags) ,bufsize
+#define __NRATRA2_send(sockfd, buf, bufsize, msg_flags) ,bufsize
 #define __NRATRF3_send                   "%#" PRIxSIZ "=%s%s%s%s%s%s%s%s%s%s%s%s%s"
-#define __NRATRA3_send(sockfd, buf, bufsize, flags) ,(uintptr_t)(flags),(flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
-                                                    ,((flags) & MSG_DONTROUTE) && ((flags) & (MSG_CONFIRM)) ? "|" : "",(flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
-                                                    ,((flags) & MSG_DONTWAIT) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
-                                                    ,((flags) & MSG_EOR) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT)) ? "|" : "",(flags) & MSG_EOR ? "MSG_EOR" : "" \
-                                                    ,((flags) & MSG_MORE) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR)) ? "|" : "",(flags) & MSG_MORE ? "MSG_MORE" : "" \
-                                                    ,((flags) & MSG_NOSIGNAL) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE)) ? "|" : "",(flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
-                                                    ,((flags) & MSG_OOB) && ((flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(flags) & MSG_OOB ? "MSG_OOB" : ""
+#define __NRATRA3_send(sockfd, buf, bufsize, msg_flags) ,(uintptr_t)(msg_flags),(msg_flags) & MSG_CONFIRM ? "MSG_CONFIRM" : "" \
+                                                        ,((msg_flags) & MSG_DONTROUTE) && ((msg_flags) & (MSG_CONFIRM)) ? "|" : "",(msg_flags) & MSG_DONTROUTE ? "MSG_DONTROUTE" : "" \
+                                                        ,((msg_flags) & MSG_DONTWAIT) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE)) ? "|" : "",(msg_flags) & MSG_DONTWAIT ? "MSG_DONTWAIT" : "" \
+                                                        ,((msg_flags) & MSG_EOR) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT)) ? "|" : "",(msg_flags) & MSG_EOR ? "MSG_EOR" : "" \
+                                                        ,((msg_flags) & MSG_MORE) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR)) ? "|" : "",(msg_flags) & MSG_MORE ? "MSG_MORE" : "" \
+                                                        ,((msg_flags) & MSG_NOSIGNAL) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE)) ? "|" : "",(msg_flags) & MSG_NOSIGNAL ? "MSG_NOSIGNAL" : "" \
+                                                        ,((msg_flags) & MSG_OOB) && ((msg_flags) & (MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL)) ? "|" : "",(msg_flags) & MSG_OOB ? "MSG_OOB" : ""
 #define __NRATRF0_bdflush                "%d"
 #define __NRATRA0_bdflush(TODO_PROTOTYPE) ,TODO_PROTOTYPE
 #define __NRATRF0_umount                 "%q"

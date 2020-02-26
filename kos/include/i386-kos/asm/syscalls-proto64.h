@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3f4b9bb */
+/* HASH CRC-32:0x9dba140c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@
 #define __NRAC_sendfile               4
 #define __NRAC_socket                 3
 #define __NRAC_connect                3
-#define __NRAC_accept                 1
+#define __NRAC_accept                 3
 #define __NRAC_sendto                 6
 #define __NRAC_recvfrom               6
 #define __NRAC_sendmsg                3
@@ -461,7 +461,7 @@
 #define __NRRT_sendfile               (ssize_t, __ssize_t)
 #define __NRRT_socket                 (fd_t, __fd_t)
 #define __NRRT_connect                (errno_t, __errno_t)
-#define __NRRT_accept                 (errno_t, __errno_t)
+#define __NRRT_accept                 (fd_t, __fd_t)
 #define __NRRT_sendto                 (ssize_t, __ssize_t)
 #define __NRRT_recvfrom               (ssize_t, __ssize_t)
 #define __NRRT_sendmsg                (ssize_t, __ssize_t)
@@ -885,8 +885,8 @@
 #define __NRAT0_dup                    (fd_t, __fd_t)
 #define __NRAT0_dup2                   (fd_t, __fd_t)
 #define __NRAT1_dup2                   (fd_t, __fd_t)
-#define __NRAT0_nanosleep              (struct __timespecx64 const *, struct __timespecx64 const *)
-#define __NRAT1_nanosleep              (struct __timespecx64 *, struct __timespecx64 *)
+#define __NRAT0_nanosleep              (struct timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT1_nanosleep              (struct timespecx64 *, struct __timespecx64 *)
 #define __NRAT0_getitimer              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_getitimer              (struct __itimervalx64 *, struct __itimervalx64 *)
 #define __NRAT0_alarm                  (syscall_ulong_t, __syscall_ulong_t)
@@ -903,7 +903,9 @@
 #define __NRAT0_connect                (fd_t, __fd_t)
 #define __NRAT1_connect                (struct sockaddr const *, struct sockaddr const *)
 #define __NRAT2_connect                (socklen_t, __socklen_t)
-#define __NRAT0_accept                 (int, int)
+#define __NRAT0_accept                 (fd_t, __fd_t)
+#define __NRAT1_accept                 (struct sockaddr *, struct sockaddr *)
+#define __NRAT2_accept                 (socklen_t *, __socklen_t *)
 #define __NRAT0_sendto                 (fd_t, __fd_t)
 #define __NRAT1_sendto                 (void const *, void const *)
 #define __NRAT2_sendto                 (size_t, __size_t)
@@ -917,7 +919,7 @@
 #define __NRAT4_recvfrom               (struct sockaddr *, struct sockaddr *)
 #define __NRAT5_recvfrom               (socklen_t *, __socklen_t *)
 #define __NRAT0_sendmsg                (fd_t, __fd_t)
-#define __NRAT1_sendmsg                (struct msghdr const *, struct msghdr const *)
+#define __NRAT1_sendmsg                (struct msghdr64 const *, struct msghdr64 const *)
 #define __NRAT2_sendmsg                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_recvmsg                (fd_t, __fd_t)
 #define __NRAT1_recvmsg                (struct msghdr64 *, struct msghdr64 *)
@@ -1069,7 +1071,7 @@
 #define __NRAT1_rt_sigpending          (size_t, __size_t)
 #define __NRAT0_rt_sigtimedwait        (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NRAT1_rt_sigtimedwait        (struct __siginfo64_struct *, struct __siginfo64_struct *)
-#define __NRAT2_rt_sigtimedwait        (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT2_rt_sigtimedwait        (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT3_rt_sigtimedwait        (size_t, __size_t)
 #define __NRAT0_rt_sigqueueinfo        (pid_t, __pid_t)
 #define __NRAT1_rt_sigqueueinfo        (syscall_ulong_t, __syscall_ulong_t)
@@ -1108,7 +1110,7 @@
 #define __NRAT0_sched_get_priority_max (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_sched_get_priority_min (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_sched_rr_get_interval  (pid_t, __pid_t)
-#define __NRAT1_sched_rr_get_interval  (struct __timespecx64 *, struct __timespecx64 *)
+#define __NRAT1_sched_rr_get_interval  (struct timespecx64 *, struct __timespecx64 *)
 #define __NRAT0_mlock                  (void const *, void const *)
 #define __NRAT1_mlock                  (size_t, __size_t)
 #define __NRAT0_munlock                (void const *, void const *)
@@ -1210,7 +1212,7 @@
 #define __NRAT0_futex                  (uint32_t *, __uint32_t *)
 #define __NRAT1_futex                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_futex                  (uint32_t, __uint32_t)
-#define __NRAT3_futex                  (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT3_futex                  (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT4_futex                  (uint32_t *, __uint32_t *)
 #define __NRAT5_futex                  (uint32_t, __uint32_t)
 #define __NRAT0_sched_setaffinity      (pid_t, __pid_t)
@@ -1252,22 +1254,22 @@
 #define __NRAT2_timer_create           (timer_t *, __timer_t *)
 #define __NRAT0_timer_settime          (timer_t, __timer_t)
 #define __NRAT1_timer_settime          (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_timer_settime          (struct __itimerspecx64 const *, struct __itimerspecx64 const *)
-#define __NRAT3_timer_settime          (struct __itimerspecx64 *, struct __itimerspecx64 *)
+#define __NRAT2_timer_settime          (struct itimerspecx64 const *, struct __itimerspecx64 const *)
+#define __NRAT3_timer_settime          (struct itimerspecx64 *, struct __itimerspecx64 *)
 #define __NRAT0_timer_gettime          (timer_t, __timer_t)
-#define __NRAT1_timer_gettime          (struct __itimerspecx64 *, struct __itimerspecx64 *)
+#define __NRAT1_timer_gettime          (struct itimerspecx64 *, struct __itimerspecx64 *)
 #define __NRAT0_timer_getoverrun       (timer_t, __timer_t)
 #define __NRAT0_timer_delete           (timer_t, __timer_t)
 #define __NRAT0_clock_settime          (clockid_t, __clockid_t)
-#define __NRAT1_clock_settime          (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT1_clock_settime          (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT0_clock_gettime          (clockid_t, __clockid_t)
-#define __NRAT1_clock_gettime          (struct __timespecx64 *, struct __timespecx64 *)
+#define __NRAT1_clock_gettime          (struct timespecx64 *, struct __timespecx64 *)
 #define __NRAT0_clock_getres           (clockid_t, __clockid_t)
-#define __NRAT1_clock_getres           (struct __timespecx64 *, struct __timespecx64 *)
+#define __NRAT1_clock_getres           (struct timespecx64 *, struct __timespecx64 *)
 #define __NRAT0_clock_nanosleep        (clockid_t, __clockid_t)
 #define __NRAT1_clock_nanosleep        (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_clock_nanosleep        (struct __timespecx64 const *, struct __timespecx64 const *)
-#define __NRAT3_clock_nanosleep        (struct __timespecx64 *, struct __timespecx64 *)
+#define __NRAT2_clock_nanosleep        (struct timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT3_clock_nanosleep        (struct timespecx64 *, struct __timespecx64 *)
 #define __NRAT0_exit_group             (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_epoll_wait             (fd_t, __fd_t)
 #define __NRAT1_epoll_wait             (struct epoll_event *, struct epoll_event *)
@@ -1294,12 +1296,12 @@
 #define __NRAT1_mq_timedsend           (char const *, char const *)
 #define __NRAT2_mq_timedsend           (size_t, __size_t)
 #define __NRAT3_mq_timedsend           (uint32_t, __uint32_t)
-#define __NRAT4_mq_timedsend           (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT4_mq_timedsend           (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT0_mq_timedreceive        (fd_t, __fd_t)
 #define __NRAT1_mq_timedreceive        (char *, char *)
 #define __NRAT2_mq_timedreceive        (size_t, __size_t)
 #define __NRAT3_mq_timedreceive        (uint32_t *, __uint32_t *)
-#define __NRAT4_mq_timedreceive        (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT4_mq_timedreceive        (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT0_mq_notify              (fd_t, __fd_t)
 #define __NRAT1_mq_notify              (struct sigevent const *, struct sigevent const *)
 #define __NRAT0_mq_getsetattr          (fd_t, __fd_t)
@@ -1377,11 +1379,11 @@
 #define __NRAT1_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT2_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT3_pselect6               (struct __fd_set_struct *, struct __fd_set_struct *)
-#define __NRAT4_pselect6               (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT4_pselect6               (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT5_pselect6               (void const *, void const *)
 #define __NRAT0_ppoll                  (struct pollfd *, struct pollfd *)
 #define __NRAT1_ppoll                  (size_t, __size_t)
-#define __NRAT2_ppoll                  (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT2_ppoll                  (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT3_ppoll                  (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NRAT4_ppoll                  (size_t, __size_t)
 #define __NRAT0_unshare                (syscall_ulong_t, __syscall_ulong_t)
@@ -1408,7 +1410,7 @@
 #define __NRAT0_move_pages             (int, int)
 #define __NRAT0_utimensat              (fd_t, __fd_t)
 #define __NRAT1_utimensat              (char const *, char const *)
-#define __NRAT2_utimensat              (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT2_utimensat              (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT3_utimensat              (atflag_t, __atflag_t)
 #define __NRAT0_epoll_pwait            (fd_t, __fd_t)
 #define __NRAT1_epoll_pwait            (struct epoll_event *, struct epoll_event *)
@@ -1427,10 +1429,10 @@
 #define __NRAT3_fallocate              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_timerfd_settime        (fd_t, __fd_t)
 #define __NRAT1_timerfd_settime        (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_timerfd_settime        (struct __itimerspecx64 const *, struct __itimerspecx64 const *)
-#define __NRAT3_timerfd_settime        (struct __itimerspecx64 *, struct __itimerspecx64 *)
+#define __NRAT2_timerfd_settime        (struct itimerspecx64 const *, struct __itimerspecx64 const *)
+#define __NRAT3_timerfd_settime        (struct itimerspecx64 *, struct __itimerspecx64 *)
 #define __NRAT0_timerfd_gettime        (fd_t, __fd_t)
-#define __NRAT1_timerfd_gettime        (struct __itimerspecx64 *, struct __itimerspecx64 *)
+#define __NRAT1_timerfd_gettime        (struct itimerspecx64 *, struct __itimerspecx64 *)
 #define __NRAT0_accept4                (fd_t, __fd_t)
 #define __NRAT1_accept4                (struct sockaddr *, struct sockaddr *)
 #define __NRAT2_accept4                (socklen_t *, __socklen_t *)
@@ -1462,10 +1464,10 @@
 #define __NRAT3_rt_tgsigqueueinfo      (struct __siginfo64_struct const *, struct __siginfo64_struct const *)
 #define __NRAT0_perf_event_open        (int, int)
 #define __NRAT0_recvmmsg               (fd_t, __fd_t)
-#define __NRAT1_recvmmsg               (struct mmsghdr *, struct mmsghdr *)
+#define __NRAT1_recvmmsg               (struct mmsghdrx64 *, struct __mmsghdrx64 *)
 #define __NRAT2_recvmmsg               (size_t, __size_t)
 #define __NRAT3_recvmmsg               (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT4_recvmmsg               (struct __timespecx64 *, struct __timespecx64 *)
+#define __NRAT4_recvmmsg               (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT0_fanotify_init          (int, int)
 #define __NRAT0_fanotify_mark          (int, int)
 #define __NRAT0_prlimit64              (pid_t, __pid_t)
@@ -1483,7 +1485,7 @@
 #define __NRAT0_clock_adjtime          (int, int)
 #define __NRAT0_syncfs                 (fd_t, __fd_t)
 #define __NRAT0_sendmmsg               (fd_t, __fd_t)
-#define __NRAT1_sendmmsg               (struct mmsghdr *, struct mmsghdr *)
+#define __NRAT1_sendmmsg               (struct mmsghdrx64 *, struct __mmsghdrx64 *)
 #define __NRAT2_sendmmsg               (size_t, __size_t)
 #define __NRAT3_sendmmsg               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_setns                  (fd_t, __fd_t)
@@ -1609,17 +1611,17 @@
 #define __NRAT1_lfutexlockexpr         (void *, void *)
 #define __NRAT2_lfutexlockexpr         (size_t, __size_t)
 #define __NRAT3_lfutexlockexpr         (struct lfutexexprx64 const *, struct lfutexexprx64 const *)
-#define __NRAT4_lfutexlockexpr         (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT4_lfutexlockexpr         (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT5_lfutexlockexpr         (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_lfutexexpr             (void *, void *)
 #define __NRAT1_lfutexexpr             (size_t, __size_t)
 #define __NRAT2_lfutexexpr             (struct lfutexexprx64 const *, struct lfutexexprx64 const *)
-#define __NRAT3_lfutexexpr             (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT3_lfutexexpr             (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT4_lfutexexpr             (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_lfutex                 (uint64_t *, __uint64_t *)
 #define __NRAT1_lfutex                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_lfutex                 (uint64_t, __uint64_t)
-#define __NRAT3_lfutex                 (struct __timespecx64 const *, struct __timespecx64 const *)
+#define __NRAT3_lfutex                 (struct timespecx64 const *, struct __timespecx64 const *)
 #define __NRAT4_lfutex                 (uint64_t, __uint64_t)
 #define __NRAT0_debugtrap              (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NRAT1_debugtrap              (struct debugtrap_reason64 const *, struct debugtrap_reason64 const *)
@@ -1745,10 +1747,10 @@
 #define __NRAM_sendfile(a, b, c, d, e, f)               (__fd_t)a, (__fd_t)b, (__syscall_ulong_t *)c, (__size_t)d
 #define __NRAM_socket(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAM_connect(a, b, c, d, e, f)                (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
-#define __NRAM_accept(a, b, c, d, e, f)                 (int)a
+#define __NRAM_accept(a, b, c, d, e, f)                 (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c
 #define __NRAM_sendto(a, b, c, d, e, f)                 (__fd_t)a, (void const *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr const *)e, (__socklen_t)f
 #define __NRAM_recvfrom(a, b, c, d, e, f)               (__fd_t)a, (void *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr *)e, (__socklen_t *)f
-#define __NRAM_sendmsg(a, b, c, d, e, f)                (__fd_t)a, (struct msghdr const *)b, (__syscall_ulong_t)c
+#define __NRAM_sendmsg(a, b, c, d, e, f)                (__fd_t)a, (struct msghdr64 const *)b, (__syscall_ulong_t)c
 #define __NRAM_recvmsg(a, b, c, d, e, f)                (__fd_t)a, (struct msghdr64 *)b, (__syscall_ulong_t)c
 #define __NRAM_shutdown(a, b, c, d, e, f)               (__fd_t)a, (__syscall_ulong_t)b
 #define __NRAM_bind(a, b, c, d, e, f)                   (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
@@ -2001,7 +2003,7 @@
 #define __NRAM_pwritev(a, b, c, d, e, f)                (__fd_t)a, (struct iovec64 const *)b, (__size_t)c, (__uint64_t)d
 #define __NRAM_rt_tgsigqueueinfo(a, b, c, d, e, f)      (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (struct __siginfo64_struct const *)d
 #define __NRAM_perf_event_open(a, b, c, d, e, f)        (int)a
-#define __NRAM_recvmmsg(a, b, c, d, e, f)               (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx64 *)e
+#define __NRAM_recvmmsg(a, b, c, d, e, f)               (__fd_t)a, (struct __mmsghdrx64 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx64 const *)e
 #define __NRAM_fanotify_init(a, b, c, d, e, f)          (int)a
 #define __NRAM_fanotify_mark(a, b, c, d, e, f)          (int)a
 #define __NRAM_prlimit64(a, b, c, d, e, f)              (__pid_t)a, (__syscall_ulong_t)b, (struct rlimit64 const *)c, (struct rlimit64 *)d
@@ -2009,7 +2011,7 @@
 #define __NRAM_open_by_handle_at(a, b, c, d, e, f)      (__fd_t)a, (struct file_handle *)b, (__syscall_ulong_t)c
 #define __NRAM_clock_adjtime(a, b, c, d, e, f)          (int)a
 #define __NRAM_syncfs(a, b, c, d, e, f)                 (__fd_t)a
-#define __NRAM_sendmmsg(a, b, c, d, e, f)               (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NRAM_sendmmsg(a, b, c, d, e, f)               (__fd_t)a, (struct __mmsghdrx64 *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_setns(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b
 #define __NRAM_getcpu(a, b, c, d, e, f)                 (__uint32_t *)a, (__uint32_t *)b, (struct getcpu_cache *)c
 #define __NRAM_process_vm_readv(a, b, c, d, e, f)       (__pid_t)a, (struct iovec64 const *)b, (__size_t)c, (struct iovec64 const *)d, (__size_t)e, (__syscall_ulong_t)f
@@ -2125,7 +2127,7 @@
 #define __NRAP_sendfile(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_socket(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_connect(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NRAP_accept(a)                                (__syscall_ulong_t)a
+#define __NRAP_accept(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_sendto(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_recvfrom(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_sendmsg(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
