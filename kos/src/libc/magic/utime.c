@@ -32,7 +32,7 @@
 %{
 #include <features.h>
 #include <bits/types.h>
-#include <bits/utimebuf.h>
+#include <bits/utimbuf.h>
 
 __SYSDECL_BEGIN
 

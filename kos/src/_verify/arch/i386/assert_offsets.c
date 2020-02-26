@@ -90,6 +90,8 @@ local files = {
 	"../../../../include/i386-kos/bits/timespec64.h",
 	"../../../../include/i386-kos/bits/timeval32.h",
 	"../../../../include/i386-kos/bits/timeval64.h",
+	"../../../../include/i386-kos/bits/utimbuf32.h",
+	"../../../../include/i386-kos/bits/utimbuf64.h",
 	"../../../../include/i386-kos/bits/va_list-struct32.h",
 	"../../../../include/i386-kos/bits/va_list-struct64.h",
 	"../../../../include/i386-kos/kos/bits/debugtrap32.h",
@@ -1046,6 +1048,42 @@ STATIC_ASSERT(sizeof(struct timevalx64) == __SIZEOF_TIMEVALX64);
 STATIC_ASSERT(alignof(struct timevalx64) == __ALIGNOF_TIMEVALX64);
 
 /* struct __timevalx64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/utimbuf32.h>
+
+/* struct utimbufx32 */
+STATIC_ASSERT(offsetof(struct utimbufx32, modtime) == __OFFSET_UTIMBUFX32_MODTIME);
+STATIC_ASSERT(offsetof(struct utimbufx32, actime) == __OFFSET_UTIMBUFX32_ACTIME);
+STATIC_ASSERT(sizeof(struct utimbufx32) == __SIZEOF_UTIMBUFX32);
+STATIC_ASSERT(alignof(struct utimbufx32) == __ALIGNOF_UTIMBUFX32);
+
+/* struct utimbufx32_64 */
+STATIC_ASSERT(offsetof(struct utimbufx32_64, modtime) == __OFFSET_UTIMBUFX32_64_MODTIME);
+STATIC_ASSERT(offsetof(struct utimbufx32_64, actime) == __OFFSET_UTIMBUFX32_64_ACTIME);
+STATIC_ASSERT(sizeof(struct utimbufx32_64) == __SIZEOF_UTIMBUFX32_64);
+STATIC_ASSERT(alignof(struct utimbufx32_64) == __ALIGNOF_UTIMBUFX32_64);
+
+/* struct __utimbufx32_64_alt */
+/* ... */
+
+
+
+
+
+#include <bits/utimbuf64.h>
+
+/* struct utimbufx64 */
+STATIC_ASSERT(offsetof(struct utimbufx64, modtime) == __OFFSET_UTIMBUFX64_MODTIME);
+STATIC_ASSERT(offsetof(struct utimbufx64, actime) == __OFFSET_UTIMBUFX64_ACTIME);
+STATIC_ASSERT(sizeof(struct utimbufx64) == __SIZEOF_UTIMBUFX64);
+STATIC_ASSERT(alignof(struct utimbufx64) == __ALIGNOF_UTIMBUFX64);
+
+/* struct __utimbufx64_alt */
 /* ... */
 
 

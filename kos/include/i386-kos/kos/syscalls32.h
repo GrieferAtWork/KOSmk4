@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb740ea61 */
+/* HASH CRC-32:0xac089aff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,10 +35,11 @@
 #include <bits/siginfo-struct32.h>
 #include <bits/stat-kos32.h>
 #include <bits/statfs32.h>
+#include <bits/timeb32.h>
 #include <bits/timespec32.h>
 #include <bits/timeval32.h>
 #include <bits/types.h>
-#include <bits/utimebuf.h>
+#include <bits/utimbuf32.h>
 #include <elf.h>
 #include <hybrid/__pointer.h>
 #include <hybrid/typecore.h>
@@ -110,8 +111,6 @@ struct __timespecx32;
 struct __timespecx32_64;
 struct __timevalx32;
 struct __timevalx32_64;
-struct __utimbuf32;
-struct __utimbuf64;
 struct debugtrap_reason32;
 struct dirent;
 struct elf32_phdr;
@@ -152,6 +151,8 @@ struct tms;
 struct ucpustate;
 struct ucpustate32;
 struct ustat;
+struct utimbufx32;
+struct utimbufx32_64;
 struct utsname;
 struct winsize;
 
@@ -1792,10 +1793,10 @@ __CDECLARE_SC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_SC(ustat) */
 #if __CRT_HAVE_SC(utime)
-__CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct __utimbuf32 const *__times),(__filename,__times))
+__CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct utimbufx32 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utime) */
 #if __CRT_HAVE_SC(utime64)
-__CDECLARE_SC(,__errno_t,utime64,(char const *__filename, struct __utimbuf64 const *__times),(__filename,__times))
+__CDECLARE_SC(,__errno_t,utime64,(char const *__filename, struct utimbufx32_64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utime64) */
 #if __CRT_HAVE_SC(utimensat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
@@ -3493,10 +3494,10 @@ __CDECLARE_XSC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_XSC(ustat) */
 #if __CRT_HAVE_XSC(utime)
-__CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct __utimbuf32 const *__times),(__filename,__times))
+__CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct utimbufx32 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utime) */
 #if __CRT_HAVE_XSC(utime64)
-__CDECLARE_XSC(,__errno_t,utime64,(char const *__filename, struct __utimbuf64 const *__times),(__filename,__times))
+__CDECLARE_XSC(,__errno_t,utime64,(char const *__filename, struct utimbufx32_64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utime64) */
 #if __CRT_HAVE_XSC(utimensat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b2718c3 */
+/* HASH CRC-32:0xa02bf76f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,7 @@
 #include <bits/timespec.h>
 #include <bits/timeval.h>
 #include <bits/types.h>
+#include <bits/utimbuf.h>
 #include <kos/compat/linux-stat.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>

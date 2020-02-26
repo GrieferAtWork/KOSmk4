@@ -44,7 +44,8 @@
 %[typecompat(x86_64:winsize = *:winsize)]
 
 /* Define type compatibilities between x86_64 and i386 */
-%[typecompat(x86_64:[timeb,__timebx64] = i386:[__timebx32_64])]
+%[typecompat(x86_64:[timeb,timebx64,__timebx64] = i386:[timebx32_64,__timebx32_64])]
+%[typecompat(x86_64:[utimbuf,utimbufx64,__utimbufx64] = i386:[utimbufx32_64,__utimbufx32_64])]
 
 
 
@@ -76,6 +77,7 @@ clone:([tostr(flagset(CLONE_VM, CLONE_FS, CLONE_FILES, CLONE_SIGHAND, CLONE_PTRA
        pid_t *ctid, uintptr_t newtls) -> pid_t;
 
 /* Configure binding of multi-arch types in system calls. */
+utime = utimex64;
 sendmsg = sendmsgx64;
 recvmsg = recvmsgx64;
 sendmmsg = sendmmsgx64;

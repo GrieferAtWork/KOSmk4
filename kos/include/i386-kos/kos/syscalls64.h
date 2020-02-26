@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9906630 */
+/* HASH CRC-32:0x3ea0c95a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,7 @@
 #include <bits/timespec64.h>
 #include <bits/timeval64.h>
 #include <bits/types.h>
+#include <bits/utimbuf64.h>
 #include <elf.h>
 #include <hybrid/__pointer.h>
 #include <hybrid/typecore.h>
@@ -125,7 +126,7 @@ struct timezone;
 struct tms;
 struct ucpustate64;
 struct ustat;
-struct utimbuf;
+struct utimbufx64;
 struct utsname;
 struct winsize;
 
@@ -1551,7 +1552,7 @@ __CDECLARE_SC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_SC(ustat) */
 #if __CRT_HAVE_SC(utime)
-__CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct utimbuf const *__times),(__filename,__times))
+__CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct utimbufx64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utime) */
 #if __CRT_HAVE_SC(utimensat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
@@ -2998,7 +2999,7 @@ __CDECLARE_XSC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_XSC(ustat) */
 #if __CRT_HAVE_XSC(utime)
-__CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct utimbuf const *__times),(__filename,__times))
+__CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct utimbufx64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utime) */
 #if __CRT_HAVE_XSC(utimensat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */

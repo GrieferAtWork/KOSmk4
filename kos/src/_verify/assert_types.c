@@ -373,6 +373,7 @@ local files = {
 	"../../include/bits/timeb.h",
 	"../../include/bits/timespec.h",
 	"../../include/bits/timeval.h",
+	"../../include/bits/utimbuf.h",
 	"../../include/elf.h",
 	"../../include/kos/bits/debugtrap.h",
 	"../../include/kos/bits/ukern-struct.h",
@@ -882,6 +883,27 @@ STATIC_ASSERT(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
 STATIC_ASSERT(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
 STATIC_ASSERT(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
 STATIC_ASSERT(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
+
+
+
+
+
+#include <bits/utimbuf.h>
+
+/* struct utimbuf */
+STATIC_ASSERT(offsetof(struct utimbuf, modtime) == __OFFSET_UTIMBUF_MODTIME);
+STATIC_ASSERT(offsetof(struct utimbuf, actime) == __OFFSET_UTIMBUF_ACTIME);
+STATIC_ASSERT(sizeof(struct utimbuf) == __SIZEOF_UTIMBUF);
+
+/* struct __utimbuf64 */
+STATIC_ASSERT(offsetof(struct __utimbuf64, modtime) == __OFFSET_UTIMBUF64_MODTIME);
+STATIC_ASSERT(offsetof(struct __utimbuf64, actime) == __OFFSET_UTIMBUF64_ACTIME);
+STATIC_ASSERT(sizeof(struct __utimbuf64) == __SIZEOF_UTIMBUF64);
+
+/* struct __utimbuf32 */
+STATIC_ASSERT(offsetof(struct __utimbuf32, modtime) == __OFFSET_UTIMBUF32_MODTIME);
+STATIC_ASSERT(offsetof(struct __utimbuf32, actime) == __OFFSET_UTIMBUF32_ACTIME);
+STATIC_ASSERT(sizeof(struct __utimbuf32) == __SIZEOF_UTIMBUF32);
 
 
 

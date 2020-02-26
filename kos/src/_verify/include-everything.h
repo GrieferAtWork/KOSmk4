@@ -199,6 +199,7 @@ incdir("", "../../include");
 #include <bits/mathdef.h>
 #include <bits/mbstate.h>
 #include <bits/mman.h>
+#include <bits/mmsghdr-struct.h>
 #include <bits/msghdr-struct.h>
 #include <bits/msq.h>
 #include <bits/nan.h>
@@ -297,7 +298,7 @@ incdir("", "../../include");
 #include <bits/uformat-printer.h>
 #include <bits/uio.h>
 #include <bits/ustat.h>
-#include <bits/utimebuf.h>
+#include <bits/utimbuf.h>
 #include <bits/utmp.h>
 #include <bits/utmpx.h>
 #include <bits/utsname.h>
@@ -314,6 +315,7 @@ incdir("", "../../include");
 #include <compat/bits/iovec-struct.h>
 #include <compat/bits/itimerspec.h>
 #include <compat/bits/itimerval.h>
+#include <compat/bits/mmsghdr-struct.h>
 #include <compat/bits/msghdr-struct.h>
 #include <compat/bits/rusage-convert.h>
 #include <compat/bits/rusage-struct.h>
@@ -331,6 +333,7 @@ incdir("", "../../include");
 #include <compat/bits/timeval.h>
 #include <compat/bits/types.h>
 #include <compat/bits/typesizes.h>
+#include <compat/bits/utimbuf.h>
 #include <compat/bits/va_list-struct.h>
 #include <compat/config.h>
 #include <compat/kos/bits/except-handler.h>
@@ -460,6 +463,7 @@ incdir("", "../../include");
 #include <kos/except/fs.h>
 #include <kos/except/inval.h>
 #include <kos/except/io.h>
+#include <kos/except/net.h>
 #include <kos/except/noexec.h>
 #include <kos/except-handler.h>
 #include <kos/except.h>

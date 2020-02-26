@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1631cc0e */
+/* HASH CRC-32:0xe59238ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1011,11 +1011,11 @@
 #define __NRAT0_linux_oldfstat          (fd_t, __fd_t)
 #define __NRAT1_linux_oldfstat          (struct linux_oldstat *, struct linux_oldstat *)
 #define __NRAT0_utime                   (char const *, char const *)
-#define __NRAT1_utime                   (struct __utimbuf32 const *, struct __utimbuf32 const *)
+#define __NRAT1_utime                   (struct utimbufx32 const *, struct utimbufx32 const *)
 #define __NRAT0_access                  (char const *, char const *)
 #define __NRAT1_access                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_nice                    (syscall_slong_t, __syscall_slong_t)
-#define __NRAT0_ftime                   (struct __timebx32 *, struct __timebx32 *)
+#define __NRAT0_ftime                   (struct timebx32 *, struct __timebx32 *)
 #define __NRAT0_kill                    (pid_t, __pid_t)
 #define __NRAT1_kill                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_rename                  (char const *, char const *)
@@ -1065,10 +1065,10 @@
 #define __NRAT0_getrlimit               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_getrlimit               (struct rlimit *, struct rlimit *)
 #define __NRAT0_getrusage               (syscall_slong_t, __syscall_slong_t)
-#define __NRAT1_getrusage               (struct __rusagex32 *, struct __rusagex32 *)
-#define __NRAT0_gettimeofday            (struct __timevalx32 *, struct __timevalx32 *)
+#define __NRAT1_getrusage               (struct rusagex32 *, struct __rusagex32 *)
+#define __NRAT0_gettimeofday            (struct timevalx32 *, struct __timevalx32 *)
 #define __NRAT1_gettimeofday            (struct timezone *, struct timezone *)
-#define __NRAT0_settimeofday            (struct __timevalx32 const *, struct __timevalx32 const *)
+#define __NRAT0_settimeofday            (struct timevalx32 const *, struct __timevalx32 const *)
 #define __NRAT1_settimeofday            (struct timezone const *, struct timezone const *)
 #define __NRAT0_getgroups               (size_t, __size_t)
 #define __NRAT1_getgroups               (uint16_t *, __uint16_t *)
@@ -1078,7 +1078,7 @@
 #define __NRAT1_select                  (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT2_select                  (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT3_select                  (struct __fd_set_struct *, struct __fd_set_struct *)
-#define __NRAT4_select                  (struct __timevalx32 *, struct __timevalx32 *)
+#define __NRAT4_select                  (struct timevalx32 *, struct __timevalx32 *)
 #define __NRAT0_symlink                 (char const *, char const *)
 #define __NRAT1_symlink                 (char const *, char const *)
 #define __NRAT0_linux_oldlstat          (char const *, char const *)
@@ -1148,7 +1148,7 @@
 #define __NRAT0_wait4                   (pid_t, __pid_t)
 #define __NRAT1_wait4                   (int32_t *, __int32_t *)
 #define __NRAT2_wait4                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT3_wait4                   (struct __rusagex32 *, struct __rusagex32 *)
+#define __NRAT3_wait4                   (struct rusagex32 *, struct __rusagex32 *)
 #define __NRAT0_swapoff                 (char const *, char const *)
 #define __NRAT0_sysinfo                 (struct sysinfo *, struct sysinfo *)
 #define __NRAT0_ipc                     (int, int)
@@ -1481,7 +1481,7 @@
 #define __NRAT1_tgkill                  (pid_t, __pid_t)
 #define __NRAT2_tgkill                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_utimes                  (char const *, char const *)
-#define __NRAT1_utimes                  (struct __timevalx32 const *, struct __timevalx32 const *)
+#define __NRAT1_utimes                  (struct timevalx32 const *, struct __timevalx32 const *)
 #define __NRAT0_fadvise64_64            (int, int)
 #define __NRAT0_vserver                 (int, int)
 #define __NRAT0_mbind                   (int, int)
@@ -1511,7 +1511,7 @@
 #define __NRAT1_waitid                  (id_t, __id_t)
 #define __NRAT2_waitid                  (struct __siginfo32_struct *, struct __siginfo32_struct *)
 #define __NRAT3_waitid                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT4_waitid                  (struct __rusagex32 *, struct __rusagex32 *)
+#define __NRAT4_waitid                  (struct rusagex32 *, struct __rusagex32 *)
 #define __NRAT0_add_key                 (int, int)
 #define __NRAT0_request_key             (int, int)
 #define __NRAT0_keyctl                  (int, int)
@@ -1542,7 +1542,7 @@
 #define __NRAT4_fchownat                (atflag_t, __atflag_t)
 #define __NRAT0_futimesat               (fd_t, __fd_t)
 #define __NRAT1_futimesat               (const char *, __const char *)
-#define __NRAT2_futimesat               (struct __timevalx32 const *, struct __timevalx32 const *)
+#define __NRAT2_futimesat               (struct timevalx32 const *, struct __timevalx32 const *)
 #define __NRAT0_linux_fstatat64         (fd_t, __fd_t)
 #define __NRAT1_linux_fstatat64         (char const *, char const *)
 #define __NRAT2_linux_fstatat64         (struct linux_statx32_64 *, struct linux_statx32_64 *)
@@ -1841,7 +1841,7 @@
 #define __NRAT3_kfstatat                (atflag_t, __atflag_t)
 #define __NRAT0_futimesat64             (fd_t, __fd_t)
 #define __NRAT1_futimesat64             (const char *, __const char *)
-#define __NRAT2_futimesat64             (struct __timevalx32_64 const *, struct __timevalx32_64 const *)
+#define __NRAT2_futimesat64             (struct timevalx32_64 const *, struct __timevalx32_64 const *)
 #define __NRAT0_fmknodat                (fd_t, __fd_t)
 #define __NRAT1_fmknodat                (char const *, char const *)
 #define __NRAT2_fmknodat                (mode_t, __mode_t)
@@ -1855,7 +1855,7 @@
 #define __NRAT1_waitid64                (id_t, __id_t)
 #define __NRAT2_waitid64                (struct __siginfo32_struct *, struct __siginfo32_struct *)
 #define __NRAT3_waitid64                (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT4_waitid64                (struct __rusagex32_64 *, struct __rusagex32_64 *)
+#define __NRAT4_waitid64                (struct rusagex32_64 *, struct __rusagex32_64 *)
 #define __NRAT0_mq_timedreceive64       (fd_t, __fd_t)
 #define __NRAT1_mq_timedreceive64       (char *, char *)
 #define __NRAT2_mq_timedreceive64       (size_t, __size_t)
@@ -1867,7 +1867,7 @@
 #define __NRAT3_mq_timedsend64          (uint32_t, __uint32_t)
 #define __NRAT4_mq_timedsend64          (struct timespecx32_64 const *, struct __timespecx32_64 const *)
 #define __NRAT0_utimes64                (char const *, char const *)
-#define __NRAT1_utimes64                (struct __timevalx32_64 const *, struct __timevalx32_64 const *)
+#define __NRAT1_utimes64                (struct timevalx32_64 const *, struct __timevalx32_64 const *)
 #define __NRAT0_clock_nanosleep64       (clockid_t, __clockid_t)
 #define __NRAT1_clock_nanosleep64       (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_clock_nanosleep64       (struct timespecx32_64 const *, struct __timespecx32_64 const *)
@@ -1930,7 +1930,7 @@
 #define __NRAT0_wait4_64                (pid_t, __pid_t)
 #define __NRAT1_wait4_64                (int32_t *, __int32_t *)
 #define __NRAT2_wait4_64                (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT3_wait4_64                (struct __rusagex32_64 *, struct __rusagex32_64 *)
+#define __NRAT3_wait4_64                (struct rusagex32_64 *, struct __rusagex32_64 *)
 #define __NRAT0_getitimer64             (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_getitimer64             (struct __itimervalx32_64 *, struct __itimervalx32_64 *)
 #define __NRAT0_setitimer64             (syscall_ulong_t, __syscall_ulong_t)
@@ -1945,21 +1945,21 @@
 #define __NRAT1_select64                (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT2_select64                (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NRAT3_select64                (struct __fd_set_struct *, struct __fd_set_struct *)
-#define __NRAT4_select64                (struct __timevalx32_64 *, struct __timevalx32_64 *)
-#define __NRAT0_settimeofday64          (struct __timevalx32_64 const *, struct __timevalx32_64 const *)
+#define __NRAT4_select64                (struct timevalx32_64 *, struct __timevalx32_64 *)
+#define __NRAT0_settimeofday64          (struct timevalx32_64 const *, struct __timevalx32_64 const *)
 #define __NRAT1_settimeofday64          (struct timezone const *, struct timezone const *)
-#define __NRAT0_gettimeofday64          (struct __timevalx32_64 *, struct __timevalx32_64 *)
+#define __NRAT0_gettimeofday64          (struct timevalx32_64 *, struct __timevalx32_64 *)
 #define __NRAT1_gettimeofday64          (struct timezone *, struct timezone *)
 #define __NRAT0_getrusage64             (syscall_slong_t, __syscall_slong_t)
-#define __NRAT1_getrusage64             (struct __rusagex32_64 *, struct __rusagex32_64 *)
+#define __NRAT1_getrusage64             (struct rusagex32_64 *, struct __rusagex32_64 *)
 #define __NRAT0_fsmode                  (uint64_t, __uint64_t)
 #define __NRAT0_ioctlf                  (fd_t, __fd_t)
 #define __NRAT1_ioctlf                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_ioctlf                  (iomode_t, __iomode_t)
 #define __NRAT3_ioctlf                  (void *, void *)
-#define __NRAT0_ftime64                 (struct __timebx32_64 *, struct __timebx32_64 *)
+#define __NRAT0_ftime64                 (struct timebx32_64 *, struct __timebx32_64 *)
 #define __NRAT0_utime64                 (char const *, char const *)
-#define __NRAT1_utime64                 (struct __utimbuf64 const *, struct __utimbuf64 const *)
+#define __NRAT1_utime64                 (struct utimbufx32_64 const *, struct utimbufx32_64 const *)
 #define __NRAT0_process_spawnveat       (fd_t, __fd_t)
 #define __NRAT1_process_spawnveat       (char const *, char const *)
 #define __NRAT2_process_spawnveat       (__HYBRID_PTR32(char const) const *, __HYBRID_PTR32(char const) const *)
@@ -2085,7 +2085,7 @@
 #define __NRAM_alarm(a, b, c, d, e, f)                   (__syscall_ulong_t)a
 #define __NRAM_linux_oldfstat(a, b, c, d, e, f)          (__fd_t)a, (struct linux_oldstat *)b
 #define __NRAM_pause(a, b, c, d, e, f)                   /* nothing */
-#define __NRAM_utime(a, b, c, d, e, f)                   (char const *)a, (struct __utimbuf32 const *)b
+#define __NRAM_utime(a, b, c, d, e, f)                   (char const *)a, (struct utimbufx32 const *)b
 #define __NRAM_stty(a, b, c, d, e, f)                    /* nothing */
 #define __NRAM_gtty(a, b, c, d, e, f)                    /* nothing */
 #define __NRAM_access(a, b, c, d, e, f)                  (char const *)a, (__syscall_ulong_t)b
@@ -2479,7 +2479,7 @@
 #define __NRAM_fsmode(a, b, c, d, e, f)                  (__uint64_t)((__uint64_t)a | (__uint64_t)b << 32)
 #define __NRAM_ioctlf(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
 #define __NRAM_ftime64(a, b, c, d, e, f)                 (struct __timebx32_64 *)a
-#define __NRAM_utime64(a, b, c, d, e, f)                 (char const *)a, (struct __utimbuf64 const *)b
+#define __NRAM_utime64(a, b, c, d, e, f)                 (char const *)a, (struct utimbufx32_64 const *)b
 #define __NRAM_process_spawnveat(a, b, c, d, e, f)       (__fd_t)a, (char const *)b, (__HYBRID_PTR32(char const) const *)c, (__HYBRID_PTR32(char const) const *)d, (__atflag_t)e, (struct spawn_actionsx32 const *)f
 #define __NRAM_stime64(a, b, c, d, e, f)                 (__time64_t const *)a
 #define __NRAM_coredump(a, b, c, d, e, f)                (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void) const *)c, (__size_t)d, (struct exception_data32 const *)e, (__syscall_ulong_t)f

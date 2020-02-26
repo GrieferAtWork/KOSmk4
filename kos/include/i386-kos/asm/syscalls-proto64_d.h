@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74bd436d */
+/* HASH CRC-32:0x6a24193f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -864,7 +864,7 @@
 #define __NR64AT1_select                 (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NR64AT2_select                 (struct __fd_set_struct *, struct __fd_set_struct *)
 #define __NR64AT3_select                 (struct __fd_set_struct *, struct __fd_set_struct *)
-#define __NR64AT4_select                 (struct __timevalx64 *, struct __timevalx64 *)
+#define __NR64AT4_select                 (struct timevalx64 *, struct __timevalx64 *)
 #define __NR64AT0_mremap                 (void *, void *)
 #define __NR64AT1_mremap                 (size_t, __size_t)
 #define __NR64AT2_mremap                 (size_t, __size_t)
@@ -963,7 +963,7 @@
 #define __NR64AT0_wait4                  (pid_t, __pid_t)
 #define __NR64AT1_wait4                  (int32_t *, __int32_t *)
 #define __NR64AT2_wait4                  (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT3_wait4                  (struct __rusagex64 *, struct __rusagex64 *)
+#define __NR64AT3_wait4                  (struct rusagex64 *, struct __rusagex64 *)
 #define __NR64AT0_kill                   (pid_t, __pid_t)
 #define __NR64AT1_kill                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_uname                  (struct utsname *, struct utsname *)
@@ -1022,12 +1022,12 @@
 #define __NR64AT1_lchown                 (uid_t, __uid_t)
 #define __NR64AT2_lchown                 (gid_t, __gid_t)
 #define __NR64AT0_umask                  (mode_t, __mode_t)
-#define __NR64AT0_gettimeofday           (struct __timevalx64 *, struct __timevalx64 *)
+#define __NR64AT0_gettimeofday           (struct timevalx64 *, struct __timevalx64 *)
 #define __NR64AT1_gettimeofday           (struct timezone *, struct timezone *)
 #define __NR64AT0_getrlimit              (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_getrlimit              (struct rlimit *, struct rlimit *)
 #define __NR64AT0_getrusage              (syscall_slong_t, __syscall_slong_t)
-#define __NR64AT1_getrusage              (struct __rusagex64 *, struct __rusagex64 *)
+#define __NR64AT1_getrusage              (struct rusagex64 *, struct __rusagex64 *)
 #define __NR64AT0_sysinfo                (struct sysinfo *, struct sysinfo *)
 #define __NR64AT0_times                  (struct tms *, struct tms *)
 #define __NR64AT0_ptrace                 (syscall_ulong_t, __syscall_ulong_t)
@@ -1081,7 +1081,7 @@
 #define __NR64AT0_sigaltstack            (struct sigaltstack64 const *, struct sigaltstack64 const *)
 #define __NR64AT1_sigaltstack            (struct sigaltstack64 *, struct sigaltstack64 *)
 #define __NR64AT0_utime                  (char const *, char const *)
-#define __NR64AT1_utime                  (struct utimbuf const *, struct utimbuf const *)
+#define __NR64AT1_utime                  (struct utimbufx64 const *, struct utimbufx64 const *)
 #define __NR64AT0_mknod                  (char const *, char const *)
 #define __NR64AT1_mknod                  (mode_t, __mode_t)
 #define __NR64AT2_mknod                  (dev_t, __dev_t)
@@ -1128,7 +1128,7 @@
 #define __NR64AT1_setrlimit              (struct rlimit const *, struct rlimit const *)
 #define __NR64AT0_chroot                 (char const *, char const *)
 #define __NR64AT0_acct                   (char const *, char const *)
-#define __NR64AT0_settimeofday           (struct __timevalx64 const *, struct __timevalx64 const *)
+#define __NR64AT0_settimeofday           (struct timevalx64 const *, struct __timevalx64 const *)
 #define __NR64AT1_settimeofday           (struct timezone const *, struct timezone const *)
 #define __NR64AT0_mount                  (char const *, char const *)
 #define __NR64AT1_mount                  (char const *, char const *)
@@ -1283,7 +1283,7 @@
 #define __NR64AT1_tgkill                 (pid_t, __pid_t)
 #define __NR64AT2_tgkill                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_utimes                 (char const *, char const *)
-#define __NR64AT1_utimes                 (struct __timevalx64 const *, struct __timevalx64 const *)
+#define __NR64AT1_utimes                 (struct timevalx64 const *, struct __timevalx64 const *)
 #define __NR64AT0_vserver                (int, int)
 #define __NR64AT0_mbind                  (int, int)
 #define __NR64AT0_set_mempolicy          (int, int)
@@ -1312,7 +1312,7 @@
 #define __NR64AT1_waitid                 (id_t, __id_t)
 #define __NR64AT2_waitid                 (struct __siginfo64_struct *, struct __siginfo64_struct *)
 #define __NR64AT3_waitid                 (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT4_waitid                 (struct __rusagex64 *, struct __rusagex64 *)
+#define __NR64AT4_waitid                 (struct rusagex64 *, struct __rusagex64 *)
 #define __NR64AT0_add_key                (int, int)
 #define __NR64AT0_request_key            (int, int)
 #define __NR64AT0_keyctl                 (int, int)
@@ -1343,7 +1343,7 @@
 #define __NR64AT4_fchownat               (atflag_t, __atflag_t)
 #define __NR64AT0_futimesat              (fd_t, __fd_t)
 #define __NR64AT1_futimesat              (const char *, __const char *)
-#define __NR64AT2_futimesat              (struct __timevalx64 const *, struct __timevalx64 const *)
+#define __NR64AT2_futimesat              (struct timevalx64 const *, struct __timevalx64 const *)
 #define __NR64AT0_linux_fstatat          (fd_t, __fd_t)
 #define __NR64AT1_linux_fstatat          (char const *, char const *)
 #define __NR64AT2_linux_fstatat          (struct linux_statx64 *, struct linux_statx64 *)
@@ -1836,7 +1836,7 @@
 #define __NR64AM_rt_sigqueueinfo(a, b, c, d, e, f)        (__pid_t)a, (__syscall_ulong_t)b, (struct __siginfo64_struct const *)c
 #define __NR64AM_rt_sigsuspend(a, b, c, d, e, f)          (struct __sigset_struct const *)a, (__size_t)b
 #define __NR64AM_sigaltstack(a, b, c, d, e, f)            (struct sigaltstack64 const *)a, (struct sigaltstack64 *)b
-#define __NR64AM_utime(a, b, c, d, e, f)                  (char const *)a, (struct utimbuf const *)b
+#define __NR64AM_utime(a, b, c, d, e, f)                  (char const *)a, (struct utimbufx64 const *)b
 #define __NR64AM_mknod(a, b, c, d, e, f)                  (char const *)a, (__mode_t)b, (__dev_t)c
 #define __NR64AM_uselib(a, b, c, d, e, f)                 (char const *)a
 #define __NR64AM_personality(a, b, c, d, e, f)            (int)a

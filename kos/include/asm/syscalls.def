@@ -106,9 +106,15 @@
 %[typeorg(<bits/timeval.h>: timeval, timeval32, timeval64, __timeval32, __timeval64)]
 %[typeorg(<bits/timeval32.h>: __timevalx32, __timevalx32_64, timevalx32, timevalx32_64)]
 %[typeorg(<bits/timeval64.h>: __timevalx64, timevalx64)]
+%[typeorg(<bits/timeb.h>: timeb, timeb32, timeb64, __timeb32, __timeb64)]
+%[typeorg(<bits/timeb32.h>: __timebx32, __timebx32_64, timebx32, timebx32_64)]
+%[typeorg(<bits/timeb64.h>: __timebx64, timebx64)]
+%[typeorg(<bits/utimbuf.h>: utimbuf, utimbuf32, utimbuf64, __utimbuf32, __utimbuf64)]
+%[typeorg(<bits/utimbuf32.h>: __utimbufx32, __utimbufx32_64, utimbufx32, utimbufx32_64)]
+%[typeorg(<bits/utimbuf64.h>: __utimbufx64, utimbufx64)]
 %[typeorg(<bits/rusage-struct.h>: rusage, __rusage32, __rusage64)]
-%[typeorg(<bits/rusage-struct32.h>: __rusagex32, __rusagex32_64)]
-%[typeorg(<bits/rusage-struct64.h>: __rusagex64)]
+%[typeorg(<bits/rusage-struct32.h>: rusagex32, __rusagex32, rusagex32_64, __rusagex32_64)]
+%[typeorg(<bits/rusage-struct64.h>: rusagex64, __rusagex64)]
 %[typeorg(<bits/stat-kos.h>: __kos_stat)]
 %[typeorg(<bits/stat-kos32.h>: __kos_statx32)]
 %[typeorg(<bits/stat-kos64.h>: __kos_statx64)]
@@ -118,7 +124,6 @@
 %[typeorg(<bits/sigaction-struct.h>: sigaction, __sighandler_t)]
 %[typeorg(<bits/sigaction-struct32.h>: sigaction32, __sighandler32_t)]
 %[typeorg(<bits/sigaction-struct64.h>: sigaction64, __sighandler64_t)]
-%[typeorg(<bits/utimebuf.h>: __utimbuf32, __utimbuf64)]
 %[typeorg(<bits/siginfo-struct.h>: __siginfo_struct, siginfo_t)]
 %[typeorg(<bits/siginfo-struct32.h>: __siginfo32_struct, siginfo32_t)]
 %[typeorg(<bits/siginfo-struct64.h>: __siginfo64_struct, siginfo64_t)]
@@ -147,6 +152,10 @@
 %[struct_escape(itimerval64 = __itimerval64, itimervalx64 = __itimervalx64)]
 %[struct_escape(itimerspec32 = __itimerspec32, itimerspecx32 = __itimerspecx32, itimerspecx32_64 = __itimerspecx32_64)]
 %[struct_escape(itimerspec64 = __itimerspec64, itimerspecx64 = __itimerspecx64)]
+%[struct_escape(rusage32 = __rusage32, rusagex32 = __rusagex32, rusagex32_64 = __rusagex32_64)]
+%[struct_escape(rusage64 = __rusage64, rusagex64 = __rusagex64)]
+%[struct_escape(timeb32 = __timeb32, timebx32 = __timebx32, timebx32_64 = __timebx32_64)]
+%[struct_escape(timeb64 = __timeb64, timebx64 = __timebx64)]
 
 %[typeorg(<librpc/bits/syscall-info.h>: rpc_syscall_info)]
 %[typeorg(<librpc/bits/syscall-info32.h>: rpc_syscall_info32)]
@@ -458,8 +467,11 @@ alarm:(syscall_ulong_t seconds) -> syscall_ulong_t;
 
 %[startgroup]
 [cp] utime:(char const *filename, struct utimbuf const *times) -> errno_t;
-[cp] utime32:(char const *filename, struct __utimbuf32 const *times) -> errno_t;
-[cp] utime64:(char const *filename, struct __utimbuf64 const *times) -> errno_t;
+[cp] utime32:(char const *filename, struct utimbuf32 const *times) -> errno_t;
+[cp] utime64:(char const *filename, struct utimbuf64 const *times) -> errno_t;
+[cp] utimex32:(char const *filename, struct utimbufx32 const *times) -> errno_t;
+[cp] utimex32_64:(char const *filename, struct utimbufx32_64 const *times) -> errno_t;
+[cp] utimex64:(char const *filename, struct utimbufx64 const *times) -> errno_t;
 %[endgroup]
 
 @@@param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
@@ -469,11 +481,11 @@ nice:(syscall_slong_t inc) -> errno_t;
 
 %[startgroup]
 ftime:(struct timeb *tp) -> errno_t;
-ftime32:(struct __timeb32 *tp) -> errno_t;
-ftime64:(struct __timeb64 *tp) -> errno_t;
-ftimex32:(struct __timebx32 *tp) -> errno_t;
-ftimex32_64:(struct __timebx32_64 *tp) -> errno_t;
-ftimex64:(struct __timebx64 *tp) -> errno_t;
+ftime32:(struct timeb32 *tp) -> errno_t;
+ftime64:(struct timeb64 *tp) -> errno_t;
+ftimex32:(struct timebx32 *tp) -> errno_t;
+ftimex32_64:(struct timebx32_64 *tp) -> errno_t;
+ftimex64:(struct timebx64 *tp) -> errno_t;
 %[endgroup]
 
 [cp] sync:() -> errno_t;
@@ -541,38 +553,38 @@ getrlimit:(syscall_ulong_t resource, struct rlimit *rlimits) -> errno_t;
 
 %[startgroup]
 getrusage:(syscall_slong_t who, struct rusage *usage) -> errno_t;
-getrusage32:(syscall_slong_t who, struct __rusage32 *tv) -> errno_t;
-getrusage64:(syscall_slong_t who, struct __rusage64 *tv) -> errno_t;
-getrusagex32:(syscall_slong_t who, struct __rusagex32 *tv) -> errno_t;
-getrusagex32_64:(syscall_slong_t who, struct __rusagex32_64 *tv) -> errno_t;
-getrusagex64:(syscall_slong_t who, struct __rusagex64 *tv) -> errno_t;
+getrusage32:(syscall_slong_t who, struct rusage32 *tv) -> errno_t;
+getrusage64:(syscall_slong_t who, struct rusage64 *tv) -> errno_t;
+getrusagex32:(syscall_slong_t who, struct rusagex32 *tv) -> errno_t;
+getrusagex32_64:(syscall_slong_t who, struct rusagex32_64 *tv) -> errno_t;
+getrusagex64:(syscall_slong_t who, struct rusagex64 *tv) -> errno_t;
 %[endgroup]
 
 %[startgroup]
 gettimeofday:(struct timeval *tv, struct timezone *tz) -> errno_t;
-gettimeofday32:(struct __timeval32 *tv, struct timezone *tz) -> errno_t;
-gettimeofday64:(struct __timeval64 *tv, struct timezone *tz) -> errno_t;
-gettimeofdayx32:(struct __timevalx32 *tv, struct timezone *tz) -> errno_t;
-gettimeofdayx32_64:(struct __timevalx32_64 *tv, struct timezone *tz) -> errno_t;
-gettimeofdayx64:(struct __timevalx64 *tv, struct timezone *tz) -> errno_t;
+gettimeofday32:(struct timeval32 *tv, struct timezone *tz) -> errno_t;
+gettimeofday64:(struct timeval64 *tv, struct timezone *tz) -> errno_t;
+gettimeofdayx32:(struct timevalx32 *tv, struct timezone *tz) -> errno_t;
+gettimeofdayx32_64:(struct timevalx32_64 *tv, struct timezone *tz) -> errno_t;
+gettimeofdayx64:(struct timevalx64 *tv, struct timezone *tz) -> errno_t;
 %[endgroup]
 
 %[startgroup]
 settimeofday:(struct timeval const *tv, struct timezone const *tz) -> errno_t;
-settimeofday32:(struct __timeval32 const *tv, struct timezone const *tz) -> errno_t;
-settimeofday64:(struct __timeval64 const *tv, struct timezone const *tz) -> errno_t;
-settimeofdayx32:(struct __timevalx32 const *tv, struct timezone const *tz) -> errno_t;
-settimeofdayx32_64:(struct __timevalx32_64 const *tv, struct timezone const *tz) -> errno_t;
-settimeofdayx64:(struct __timevalx64 const *tv, struct timezone const *tz) -> errno_t;
+settimeofday32:(struct timeval32 const *tv, struct timezone const *tz) -> errno_t;
+settimeofday64:(struct timeval64 const *tv, struct timezone const *tz) -> errno_t;
+settimeofdayx32:(struct timevalx32 const *tv, struct timezone const *tz) -> errno_t;
+settimeofdayx32_64:(struct timevalx32_64 const *tv, struct timezone const *tz) -> errno_t;
+settimeofdayx64:(struct timevalx64 const *tv, struct timezone const *tz) -> errno_t;
 %[endgroup]
 
 %[startgroup]
 [restart(dont)][cp] select:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timeval *timeout) -> ssize_t;
-[restart(dont)][cp] select32:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval32 *timeout) -> ssize_t;
-[restart(dont)][cp] select64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval64 *timeout) -> ssize_t;
-[restart(dont)][cp] selectx32:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32 *timeout) -> ssize_t;
-[restart(dont)][cp] selectx32_64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) -> ssize_t;
-[restart(dont)][cp] selectx64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx64 *timeout) -> ssize_t;
+[restart(dont)][cp] select32:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timeval32 *timeout) -> ssize_t;
+[restart(dont)][cp] select64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timeval64 *timeout) -> ssize_t;
+[restart(dont)][cp] selectx32:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) -> ssize_t;
+[restart(dont)][cp] selectx32_64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) -> ssize_t;
+[restart(dont)][cp] selectx64:(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx64 *timeout) -> ssize_t;
 %[endgroup]
 
 [cp] symlink:(char const *link_text, char const *target_path) -> errno_t;
@@ -702,20 +714,20 @@ vm86old:(int TODO_PROTOTYPE) -> errno_t;
 wait4:(pid_t pid, int32_t *stat_loc,
        [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options,
        struct rusage *usage) -> pid_t;
-[doc_alias(wait4)][restart(dont)][cp] wait4_32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusage32 *usage) -> pid_t;
-[doc_alias(wait4)][restart(dont)][cp] wait4_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusage64 *usage) -> pid_t;
-[doc_alias(wait4)][restart(dont)][cp] wait4_x32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex32 *usage) -> pid_t;
-[doc_alias(wait4)][restart(dont)][cp] wait4_x32_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex32_64 *usage) -> pid_t;
-[doc_alias(wait4)][restart(dont)][cp] wait4_x64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex64 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusage32 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusage64 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_x32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusagex32 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_x32_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusagex32_64 *usage) -> pid_t;
+[doc_alias(wait4)][restart(dont)][cp] wait4_x64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusagex64 *usage) -> pid_t;
 %[endgroup]
 
 %[startgroup]
 [restart(dont)][cp] oldwait4:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusage *usage) -> pid_t;
-[restart(dont)][cp] oldwait4_32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusage32 *usage) -> pid_t;
-[restart(dont)][cp] oldwait4_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusage64 *usage) -> pid_t;
-[restart(dont)][cp] oldwait4_x32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex32 *usage) -> pid_t;
-[restart(dont)][cp] oldwait4_x32_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex32_64 *usage) -> pid_t;
-[restart(dont)][cp] oldwait4_x64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct __rusagex64 *usage) -> pid_t;
+[restart(dont)][cp] oldwait4_32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusage32 *usage) -> pid_t;
+[restart(dont)][cp] oldwait4_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusage64 *usage) -> pid_t;
+[restart(dont)][cp] oldwait4_x32:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusagex32 *usage) -> pid_t;
+[restart(dont)][cp] oldwait4_x32_64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusagex32_64 *usage) -> pid_t;
+[restart(dont)][cp] oldwait4_x64:(pid_t pid, int32_t *stat_loc, [tostr(flagset(WNOHANG, WUNTRACED, WCONTINUED, WNOWAIT))] syscall_ulong_t options, struct rusagex64 *usage) -> pid_t;
 %[endgroup]
 
 [cp] sysinfo:(struct sysinfo *info) -> errno_t;
@@ -1090,11 +1102,11 @@ tgkill:(pid_t tgid, pid_t tid, syscall_ulong_t signo) -> errno_t;
 
 %[startgroup]
 [cp] utimes:(char const *filename, struct timeval const times[2]) -> errno_t;
-[cp] utimes32:(char const *filename, struct __timeval32 const times[2]) -> errno_t;
-[cp] utimes64:(char const *filename, struct __timeval64 const times[2]) -> errno_t;
-[cp] utimesx32:(char const *filename, struct __timevalx32 const times[2]) -> errno_t;
-[cp] utimesx32_64:(char const *filename, struct __timevalx32_64 const times[2]) -> errno_t;
-[cp] utimesx64:(char const *filename, struct __timevalx64 const times[2]) -> errno_t;
+[cp] utimes32:(char const *filename, struct timeval32 const times[2]) -> errno_t;
+[cp] utimes64:(char const *filename, struct timeval64 const times[2]) -> errno_t;
+[cp] utimesx32:(char const *filename, struct timevalx32 const times[2]) -> errno_t;
+[cp] utimesx32_64:(char const *filename, struct timevalx32_64 const times[2]) -> errno_t;
+[cp] utimesx64:(char const *filename, struct timevalx64 const times[2]) -> errno_t;
 %[endgroup]
 
 vserver:(int TODO_PROTOTYPE) -> errno_t;
@@ -1133,11 +1145,11 @@ mq_getsetattr:(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldatt
 waitid:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop,
         [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options,
         struct rusage *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitid32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct __rusage32 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitid64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct __rusage64 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct __rusagex32 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx32_64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct __rusagex32_64 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct __rusagex64 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitid32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage32 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitid64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage64 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusagex32 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx32_64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusagex32_64 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusagex64 *ru) -> errno_t;
 %[endgroup]
 
 add_key:(int TODO_PROTOTYPE) -> errno_t;
@@ -1165,11 +1177,11 @@ migrate_pages:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
 [cp] futimesat:(fd_t dirfd, const char *filename, struct timeval const times[2]) -> errno_t;
-[cp] futimesat32:(fd_t dirfd, const char *filename, struct __timeval32 const times[2]) -> errno_t;
-[cp] futimesat64:(fd_t dirfd, const char *filename, struct __timeval64 const times[2]) -> errno_t;
-[cp] futimesatx32:(fd_t dirfd, const char *filename, struct __timevalx32 const times[2]) -> errno_t;
-[cp] futimesatx32_64:(fd_t dirfd, const char *filename, struct __timevalx32_64 const times[2]) -> errno_t;
-[cp] futimesatx64:(fd_t dirfd, const char *filename, struct __timevalx64 const times[2]) -> errno_t;
+[cp] futimesat32:(fd_t dirfd, const char *filename, struct timeval32 const times[2]) -> errno_t;
+[cp] futimesat64:(fd_t dirfd, const char *filename, struct timeval64 const times[2]) -> errno_t;
+[cp] futimesatx32:(fd_t dirfd, const char *filename, struct timevalx32 const times[2]) -> errno_t;
+[cp] futimesatx32_64:(fd_t dirfd, const char *filename, struct timevalx32_64 const times[2]) -> errno_t;
+[cp] futimesatx64:(fd_t dirfd, const char *filename, struct timevalx64 const times[2]) -> errno_t;
 %[endgroup]
 
 @@@param: flags: Set of `0 | AT_REMOVEDIR|AT_REMOVEREG | AT_DOSPATH'

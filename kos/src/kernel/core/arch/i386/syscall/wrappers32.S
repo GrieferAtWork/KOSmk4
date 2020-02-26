@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66e8bf53 */
+/* HASH CRC-32:0x1795c77d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1138,7 +1138,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pause)
 	.cfi_endproc
 END(__x86_asm32_int80_pause)
 
-/* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
+/* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 .section .text.x86.asm32_syscall_int80.utime
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime)
 	.cfi_startproc simple
@@ -1320,7 +1320,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nice)
 	.cfi_endproc
 END(__x86_asm32_int80_nice)
 
-/* errno_t ftime(struct __timebx32 *tp) */
+/* errno_t ftime(struct timebx32 *tp) */
 .section .text.x86.asm32_syscall_int80.ftime
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime)
 	.cfi_startproc simple
@@ -2852,7 +2852,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrlimit)
 	.cfi_endproc
 END(__x86_asm32_int80_getrlimit)
 
-/* errno_t getrusage(syscall_slong_t who, struct __rusagex32 *tv) */
+/* errno_t getrusage(syscall_slong_t who, struct rusagex32 *tv) */
 .section .text.x86.asm32_syscall_int80.getrusage
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage)
 	.cfi_startproc simple
@@ -2889,7 +2889,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage)
 	.cfi_endproc
 END(__x86_asm32_int80_getrusage)
 
-/* errno_t gettimeofday(struct __timevalx32 *tv, struct timezone *tz) */
+/* errno_t gettimeofday(struct timevalx32 *tv, struct timezone *tz) */
 .section .text.x86.asm32_syscall_int80.gettimeofday
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday)
 	.cfi_startproc simple
@@ -2926,7 +2926,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday)
 	.cfi_endproc
 END(__x86_asm32_int80_gettimeofday)
 
-/* errno_t settimeofday(struct __timevalx32 const *tv, struct timezone const *tz) */
+/* errno_t settimeofday(struct timevalx32 const *tv, struct timezone const *tz) */
 .section .text.x86.asm32_syscall_int80.settimeofday
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday)
 	.cfi_startproc simple
@@ -3037,7 +3037,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setgroups)
 	.cfi_endproc
 END(__x86_asm32_int80_setgroups)
 
-/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32 *timeout) */
+/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
 .section .text.x86.asm32_syscall_int80.select
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_select)
 	.cfi_startproc simple
@@ -4238,7 +4238,7 @@ END(__x86_asm32_int80_vm86old)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32 *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32 *usage) */
 .section .text.x86.asm32_syscall_int80.wait4
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4)
 	.cfi_startproc simple
@@ -10000,7 +10000,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tgkill)
 	.cfi_endproc
 END(__x86_asm32_int80_tgkill)
 
-/* errno_t utimes(char const *filename, struct __timevalx32 const[2] times) */
+/* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 .section .text.x86.asm32_syscall_int80.utimes
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes)
 	.cfi_startproc simple
@@ -10490,7 +10490,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kexec_load)
 END(__x86_asm32_int80_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32 *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
 	.cfi_startproc simple
@@ -11021,7 +11021,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fchownat)
 	.cfi_endproc
 END(__x86_asm32_int80_fchownat)
 
-/* errno_t futimesat(fd_t dirfd, const char *filename, struct __timevalx32 const[2] times) */
+/* errno_t futimesat(fd_t dirfd, const char *filename, struct timevalx32 const[2] times) */
 .section .text.x86.asm32_syscall_int80.futimesat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat)
 	.cfi_startproc simple
@@ -14605,7 +14605,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kfstatat)
 	.cfi_endproc
 END(__x86_asm32_int80_kfstatat)
 
-/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
+/* errno_t futimesat64(fd_t dirfd, const char *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_int80.futimesat64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat64)
 	.cfi_startproc simple
@@ -14725,7 +14725,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 END(__x86_asm32_int80_fmkdirat)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
 	.cfi_startproc simple
@@ -14848,7 +14848,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend64)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedsend64)
 
-/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
+/* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_int80.utimes64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
 	.cfi_startproc simple
@@ -15651,7 +15651,7 @@ END(__x86_asm32_int80_kreaddir)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32_64 *usage) */
 .section .text.x86.asm32_syscall_int80.wait4_64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_wait4_64)
 	.cfi_startproc simple
@@ -15815,7 +15815,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
 	.cfi_endproc
 END(__x86_asm32_int80_maplibrary)
 
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
 .section .text.x86.asm32_syscall_int80.select64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
 	.cfi_startproc simple
@@ -15856,7 +15856,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
 	.cfi_endproc
 END(__x86_asm32_int80_select64)
 
-/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
+/* errno_t settimeofday64(struct timevalx32_64 const *tv, struct timezone const *tz) */
 .section .text.x86.asm32_syscall_int80.settimeofday64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday64)
 	.cfi_startproc simple
@@ -15893,7 +15893,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_settimeofday64)
 	.cfi_endproc
 END(__x86_asm32_int80_settimeofday64)
 
-/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
+/* errno_t gettimeofday64(struct timevalx32_64 *tv, struct timezone *tz) */
 .section .text.x86.asm32_syscall_int80.gettimeofday64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday64)
 	.cfi_startproc simple
@@ -15930,7 +15930,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_gettimeofday64)
 	.cfi_endproc
 END(__x86_asm32_int80_gettimeofday64)
 
-/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
+/* errno_t getrusage64(syscall_slong_t who, struct rusagex32_64 *tv) */
 .section .text.x86.asm32_syscall_int80.getrusage64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_getrusage64)
 	.cfi_startproc simple
@@ -16041,7 +16041,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ioctlf)
 	.cfi_endproc
 END(__x86_asm32_int80_ioctlf)
 
-/* errno_t ftime64(struct __timebx32_64 *tp) */
+/* errno_t ftime64(struct timebx32_64 *tp) */
 .section .text.x86.asm32_syscall_int80.ftime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
 	.cfi_startproc simple
@@ -16078,7 +16078,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
 	.cfi_endproc
 END(__x86_asm32_int80_ftime64)
 
-/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+/* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_int80.utime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	.cfi_startproc simple
@@ -18448,7 +18448,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pause)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pause)
 
-/* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
+/* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 .section .text.x86.asm32_syscall_sysenter.utime
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utime)
 	.cfi_startproc simple
@@ -18630,7 +18630,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_nice)
 	.cfi_endproc
 END(__x86_asm32_sysenter_nice)
 
-/* errno_t ftime(struct __timebx32 *tp) */
+/* errno_t ftime(struct timebx32 *tp) */
 .section .text.x86.asm32_syscall_sysenter.ftime
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftime)
 	.cfi_startproc simple
@@ -20162,7 +20162,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrlimit)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getrlimit)
 
-/* errno_t getrusage(syscall_slong_t who, struct __rusagex32 *tv) */
+/* errno_t getrusage(syscall_slong_t who, struct rusagex32 *tv) */
 .section .text.x86.asm32_syscall_sysenter.getrusage
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrusage)
 	.cfi_startproc simple
@@ -20199,7 +20199,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrusage)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getrusage)
 
-/* errno_t gettimeofday(struct __timevalx32 *tv, struct timezone *tz) */
+/* errno_t gettimeofday(struct timevalx32 *tv, struct timezone *tz) */
 .section .text.x86.asm32_syscall_sysenter.gettimeofday
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_gettimeofday)
 	.cfi_startproc simple
@@ -20236,7 +20236,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_gettimeofday)
 	.cfi_endproc
 END(__x86_asm32_sysenter_gettimeofday)
 
-/* errno_t settimeofday(struct __timevalx32 const *tv, struct timezone const *tz) */
+/* errno_t settimeofday(struct timevalx32 const *tv, struct timezone const *tz) */
 .section .text.x86.asm32_syscall_sysenter.settimeofday
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_settimeofday)
 	.cfi_startproc simple
@@ -20347,7 +20347,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_setgroups)
 	.cfi_endproc
 END(__x86_asm32_sysenter_setgroups)
 
-/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32 *timeout) */
+/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
 .section .text.x86.asm32_syscall_sysenter.select
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select)
 	.cfi_startproc simple
@@ -21552,7 +21552,7 @@ END(__x86_asm32_sysenter_vm86old)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32 *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32 *usage) */
 .section .text.x86.asm32_syscall_sysenter.wait4
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_wait4)
 	.cfi_startproc simple
@@ -27338,7 +27338,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_tgkill)
 	.cfi_endproc
 END(__x86_asm32_sysenter_tgkill)
 
-/* errno_t utimes(char const *filename, struct __timevalx32 const[2] times) */
+/* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 .section .text.x86.asm32_syscall_sysenter.utimes
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimes)
 	.cfi_startproc simple
@@ -27832,7 +27832,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kexec_load)
 END(__x86_asm32_sysenter_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32 *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
 	.cfi_startproc simple
@@ -28367,7 +28367,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fchownat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_fchownat)
 
-/* errno_t futimesat(fd_t dirfd, const char *filename, struct __timevalx32 const[2] times) */
+/* errno_t futimesat(fd_t dirfd, const char *filename, struct timevalx32 const[2] times) */
 .section .text.x86.asm32_syscall_sysenter.futimesat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futimesat)
 	.cfi_startproc simple
@@ -32005,7 +32005,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kfstatat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_kfstatat)
 
-/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
+/* errno_t futimesat64(fd_t dirfd, const char *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_sysenter.futimesat64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futimesat64)
 	.cfi_startproc simple
@@ -32127,7 +32127,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fmkdirat)
 END(__x86_asm32_sysenter_fmkdirat)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
 	.cfi_startproc simple
@@ -32256,7 +32256,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_timedsend64)
 
-/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
+/* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_sysenter.utimes64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimes64)
 	.cfi_startproc simple
@@ -33065,7 +33065,7 @@ END(__x86_asm32_sysenter_kreaddir)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32_64 *usage) */
 .section .text.x86.asm32_syscall_sysenter.wait4_64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_wait4_64)
 	.cfi_startproc simple
@@ -33231,7 +33231,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
 	.cfi_endproc
 END(__x86_asm32_sysenter_maplibrary)
 
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
 .section .text.x86.asm32_syscall_sysenter.select64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
 	.cfi_startproc simple
@@ -33274,7 +33274,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_select64)
 
-/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
+/* errno_t settimeofday64(struct timevalx32_64 const *tv, struct timezone const *tz) */
 .section .text.x86.asm32_syscall_sysenter.settimeofday64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_settimeofday64)
 	.cfi_startproc simple
@@ -33311,7 +33311,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_settimeofday64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_settimeofday64)
 
-/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
+/* errno_t gettimeofday64(struct timevalx32_64 *tv, struct timezone *tz) */
 .section .text.x86.asm32_syscall_sysenter.gettimeofday64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_gettimeofday64)
 	.cfi_startproc simple
@@ -33348,7 +33348,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_gettimeofday64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_gettimeofday64)
 
-/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
+/* errno_t getrusage64(syscall_slong_t who, struct rusagex32_64 *tv) */
 .section .text.x86.asm32_syscall_sysenter.getrusage64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getrusage64)
 	.cfi_startproc simple
@@ -33459,7 +33459,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ioctlf)
 	.cfi_endproc
 END(__x86_asm32_sysenter_ioctlf)
 
-/* errno_t ftime64(struct __timebx32_64 *tp) */
+/* errno_t ftime64(struct timebx32_64 *tp) */
 .section .text.x86.asm32_syscall_sysenter.ftime64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftime64)
 	.cfi_startproc simple
@@ -33496,7 +33496,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftime64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_ftime64)
 
-/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+/* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_sysenter.utime64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utime64)
 	.cfi_startproc simple

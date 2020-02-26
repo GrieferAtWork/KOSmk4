@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d027a59 */
+/* HASH CRC-32:0x616ffb3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1000,7 +1000,7 @@ INTERN_FUNCTION(libc_sys_Xpause)
 END(libc_sys_Xpause)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpause, libc_sys_Xpause)
 
-/* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
+/* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 .section .text.crt.syscall.utime
 INTERN_FUNCTION(libc_sys_utime)
 	movl   $(0x1e), %eax
@@ -1008,7 +1008,7 @@ INTERN_FUNCTION(libc_sys_utime)
 END(libc_sys_utime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utime, libc_sys_utime)
 
-/* errno_t utime(char const *filename, struct __utimbuf32 const *times) */
+/* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 .section .text.crt.syscall.Xutime
 INTERN_FUNCTION(libc_sys_Xutime)
 	movl   $(0x1e), %eax
@@ -1082,7 +1082,7 @@ INTERN_FUNCTION(libc_sys_Xnice)
 END(libc_sys_Xnice)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xnice, libc_sys_Xnice)
 
-/* errno_t ftime(struct __timebx32 *tp) */
+/* errno_t ftime(struct timebx32 *tp) */
 .section .text.crt.syscall.ftime
 INTERN_FUNCTION(libc_sys_ftime)
 	movl   $(0x23), %eax
@@ -1090,7 +1090,7 @@ INTERN_FUNCTION(libc_sys_ftime)
 END(libc_sys_ftime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_ftime, libc_sys_ftime)
 
-/* errno_t ftime(struct __timebx32 *tp) */
+/* errno_t ftime(struct timebx32 *tp) */
 .section .text.crt.syscall.Xftime
 INTERN_FUNCTION(libc_sys_Xftime)
 	movl   $(0x23), %eax
@@ -1758,7 +1758,7 @@ INTERN_FUNCTION(libc_sys_Xgetrlimit)
 END(libc_sys_Xgetrlimit)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetrlimit, libc_sys_Xgetrlimit)
 
-/* errno_t getrusage(syscall_slong_t who, struct __rusagex32 *tv) */
+/* errno_t getrusage(syscall_slong_t who, struct rusagex32 *tv) */
 .section .text.crt.syscall.getrusage
 INTERN_FUNCTION(libc_sys_getrusage)
 	movl   $(0x4d), %eax
@@ -1766,7 +1766,7 @@ INTERN_FUNCTION(libc_sys_getrusage)
 END(libc_sys_getrusage)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getrusage, libc_sys_getrusage)
 
-/* errno_t getrusage(syscall_slong_t who, struct __rusagex32 *tv) */
+/* errno_t getrusage(syscall_slong_t who, struct rusagex32 *tv) */
 .section .text.crt.syscall.Xgetrusage
 INTERN_FUNCTION(libc_sys_Xgetrusage)
 	movl   $(0x4d), %eax
@@ -1774,7 +1774,7 @@ INTERN_FUNCTION(libc_sys_Xgetrusage)
 END(libc_sys_Xgetrusage)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetrusage, libc_sys_Xgetrusage)
 
-/* errno_t gettimeofday(struct __timevalx32 *tv, struct timezone *tz) */
+/* errno_t gettimeofday(struct timevalx32 *tv, struct timezone *tz) */
 .section .text.crt.syscall.gettimeofday
 INTERN_FUNCTION(libc_sys_gettimeofday)
 	movl   $(0x4e), %eax
@@ -1782,7 +1782,7 @@ INTERN_FUNCTION(libc_sys_gettimeofday)
 END(libc_sys_gettimeofday)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_gettimeofday, libc_sys_gettimeofday)
 
-/* errno_t gettimeofday(struct __timevalx32 *tv, struct timezone *tz) */
+/* errno_t gettimeofday(struct timevalx32 *tv, struct timezone *tz) */
 .section .text.crt.syscall.Xgettimeofday
 INTERN_FUNCTION(libc_sys_Xgettimeofday)
 	movl   $(0x4e), %eax
@@ -1790,7 +1790,7 @@ INTERN_FUNCTION(libc_sys_Xgettimeofday)
 END(libc_sys_Xgettimeofday)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgettimeofday, libc_sys_Xgettimeofday)
 
-/* errno_t settimeofday(struct __timevalx32 const *tv, struct timezone const *tz) */
+/* errno_t settimeofday(struct timevalx32 const *tv, struct timezone const *tz) */
 .section .text.crt.syscall.settimeofday
 INTERN_FUNCTION(libc_sys_settimeofday)
 	movl   $(0x4f), %eax
@@ -1798,7 +1798,7 @@ INTERN_FUNCTION(libc_sys_settimeofday)
 END(libc_sys_settimeofday)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_settimeofday, libc_sys_settimeofday)
 
-/* errno_t settimeofday(struct __timevalx32 const *tv, struct timezone const *tz) */
+/* errno_t settimeofday(struct timevalx32 const *tv, struct timezone const *tz) */
 .section .text.crt.syscall.Xsettimeofday
 INTERN_FUNCTION(libc_sys_Xsettimeofday)
 	movl   $(0x4f), %eax
@@ -1838,7 +1838,7 @@ INTERN_FUNCTION(libc_sys_Xsetgroups)
 END(libc_sys_Xsetgroups)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsetgroups, libc_sys_Xsetgroups)
 
-/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32 *timeout) */
+/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
 .section .text.crt.syscall.select
 INTERN_FUNCTION(libc_sys_select)
 	movl   $(0x52), %eax
@@ -1846,7 +1846,7 @@ INTERN_FUNCTION(libc_sys_select)
 END(libc_sys_select)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_select, libc_sys_select)
 
-/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32 *timeout) */
+/* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32 *timeout) */
 .section .text.crt.syscall.Xselect
 INTERN_FUNCTION(libc_sys_Xselect)
 	movl   $(0x52), %eax
@@ -2368,7 +2368,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xvm86old, libc_sys_Xvm86old)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32 *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32 *usage) */
 .section .text.crt.syscall.wait4
 INTERN_FUNCTION(libc_sys_wait4)
 	movl   $(0x72), %eax
@@ -2378,7 +2378,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_wait4, libc_sys_wait4)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32 *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32 *usage) */
 .section .text.crt.syscall.Xwait4
 INTERN_FUNCTION(libc_sys_Xwait4)
 	movl   $(0x72), %eax
@@ -4834,7 +4834,7 @@ INTERN_FUNCTION(libc_sys_Xtgkill)
 END(libc_sys_Xtgkill)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtgkill, libc_sys_Xtgkill)
 
-/* errno_t utimes(char const *filename, struct __timevalx32 const[2] times) */
+/* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 .section .text.crt.syscall.utimes
 INTERN_FUNCTION(libc_sys_utimes)
 	movl   $(0x10f), %eax
@@ -4842,7 +4842,7 @@ INTERN_FUNCTION(libc_sys_utimes)
 END(libc_sys_utimes)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utimes, libc_sys_utimes)
 
-/* errno_t utimes(char const *filename, struct __timevalx32 const[2] times) */
+/* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 .section .text.crt.syscall.Xutimes
 INTERN_FUNCTION(libc_sys_Xutimes)
 	movl   $(0x10f), %eax
@@ -5043,7 +5043,7 @@ END(libc_sys_Xkexec_load)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkexec_load, libc_sys_Xkexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32 *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.crt.syscall.waitid
 INTERN_FUNCTION(libc_sys_waitid)
 	movl   $(0x11c), %eax
@@ -5052,7 +5052,7 @@ END(libc_sys_waitid)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_waitid, libc_sys_waitid)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32 *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.crt.syscall.Xwaitid
 INTERN_FUNCTION(libc_sys_Xwaitid)
 	movl   $(0x11c), %eax
@@ -5270,7 +5270,7 @@ INTERN_FUNCTION(libc_sys_Xfchownat)
 END(libc_sys_Xfchownat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfchownat, libc_sys_Xfchownat)
 
-/* errno_t futimesat(fd_t dirfd, const char *filename, struct __timevalx32 const[2] times) */
+/* errno_t futimesat(fd_t dirfd, const char *filename, struct timevalx32 const[2] times) */
 .section .text.crt.syscall.futimesat
 INTERN_FUNCTION(libc_sys_futimesat)
 	movl   $(0x12b), %eax
@@ -5278,7 +5278,7 @@ INTERN_FUNCTION(libc_sys_futimesat)
 END(libc_sys_futimesat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_futimesat, libc_sys_futimesat)
 
-/* errno_t futimesat(fd_t dirfd, const char *filename, struct __timevalx32 const[2] times) */
+/* errno_t futimesat(fd_t dirfd, const char *filename, struct timevalx32 const[2] times) */
 .section .text.crt.syscall.Xfutimesat
 INTERN_FUNCTION(libc_sys_Xfutimesat)
 	movl   $(0x12b), %eax
@@ -6842,7 +6842,7 @@ INTERN_FUNCTION(libc_sys_Xkfstatat)
 END(libc_sys_Xkfstatat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkfstatat, libc_sys_Xkfstatat)
 
-/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
+/* errno_t futimesat64(fd_t dirfd, const char *filename, struct timevalx32_64 const[2] times) */
 .section .text.crt.syscall.futimesat64
 INTERN_FUNCTION(libc_sys_futimesat64)
 	movl   $(0xfffffed5), %eax
@@ -6850,7 +6850,7 @@ INTERN_FUNCTION(libc_sys_futimesat64)
 END(libc_sys_futimesat64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_futimesat64, libc_sys_futimesat64)
 
-/* errno_t futimesat64(fd_t dirfd, const char *filename, struct __timevalx32_64 const[2] times) */
+/* errno_t futimesat64(fd_t dirfd, const char *filename, struct timevalx32_64 const[2] times) */
 .section .text.crt.syscall.Xfutimesat64
 INTERN_FUNCTION(libc_sys_Xfutimesat64)
 	movl   $(0xfffffed5), %eax
@@ -6895,7 +6895,7 @@ END(libc_sys_Xfmkdirat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfmkdirat, libc_sys_Xfmkdirat)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.crt.syscall.waitid64
 INTERN_FUNCTION(libc_sys_waitid64)
 	movl   $(0xfffffee4), %eax
@@ -6904,7 +6904,7 @@ END(libc_sys_waitid64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_waitid64, libc_sys_waitid64)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct __rusagex32_64 *ru) */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.crt.syscall.Xwaitid64
 INTERN_FUNCTION(libc_sys_Xwaitid64)
 	movl   $(0xfffffee4), %eax
@@ -6944,7 +6944,7 @@ INTERN_FUNCTION(libc_sys_Xmq_timedsend64)
 END(libc_sys_Xmq_timedsend64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmq_timedsend64, libc_sys_Xmq_timedsend64)
 
-/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
+/* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.crt.syscall.utimes64
 INTERN_FUNCTION(libc_sys_utimes64)
 	movl   $(0xfffffef1), %eax
@@ -6952,7 +6952,7 @@ INTERN_FUNCTION(libc_sys_utimes64)
 END(libc_sys_utimes64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utimes64, libc_sys_utimes64)
 
-/* errno_t utimes64(char const *filename, struct __timevalx32_64 const[2] times) */
+/* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.crt.syscall.Xutimes64
 INTERN_FUNCTION(libc_sys_Xutimes64)
 	movl   $(0xfffffef1), %eax
@@ -7282,7 +7282,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkreaddir, libc_sys_Xkreaddir)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32_64 *usage) */
 .section .text.crt.syscall.wait4_64
 INTERN_FUNCTION(libc_sys_wait4_64)
 	movl   $(0xffffff8e), %eax
@@ -7292,7 +7292,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_wait4_64, libc_sys_wait4_64)
 
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct __rusagex32_64 *usage) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32_64 *usage) */
 .section .text.crt.syscall.Xwait4_64
 INTERN_FUNCTION(libc_sys_Xwait4_64)
 	movl   $(0xffffff8e), %eax
@@ -7368,7 +7368,7 @@ INTERN_FUNCTION(libc_sys_Xmaplibrary)
 END(libc_sys_Xmaplibrary)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmaplibrary, libc_sys_Xmaplibrary)
 
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
 .section .text.crt.syscall.select64
 INTERN_FUNCTION(libc_sys_select64)
 	movl   $(0xffffffae), %eax
@@ -7376,7 +7376,7 @@ INTERN_FUNCTION(libc_sys_select64)
 END(libc_sys_select64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_select64, libc_sys_select64)
 
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timevalx32_64 *timeout) */
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
 .section .text.crt.syscall.Xselect64
 INTERN_FUNCTION(libc_sys_Xselect64)
 	movl   $(0xffffffae), %eax
@@ -7384,7 +7384,7 @@ INTERN_FUNCTION(libc_sys_Xselect64)
 END(libc_sys_Xselect64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xselect64, libc_sys_Xselect64)
 
-/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
+/* errno_t settimeofday64(struct timevalx32_64 const *tv, struct timezone const *tz) */
 .section .text.crt.syscall.settimeofday64
 INTERN_FUNCTION(libc_sys_settimeofday64)
 	movl   $(0xffffffb1), %eax
@@ -7392,7 +7392,7 @@ INTERN_FUNCTION(libc_sys_settimeofday64)
 END(libc_sys_settimeofday64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_settimeofday64, libc_sys_settimeofday64)
 
-/* errno_t settimeofday64(struct __timevalx32_64 const *tv, struct timezone const *tz) */
+/* errno_t settimeofday64(struct timevalx32_64 const *tv, struct timezone const *tz) */
 .section .text.crt.syscall.Xsettimeofday64
 INTERN_FUNCTION(libc_sys_Xsettimeofday64)
 	movl   $(0xffffffb1), %eax
@@ -7400,7 +7400,7 @@ INTERN_FUNCTION(libc_sys_Xsettimeofday64)
 END(libc_sys_Xsettimeofday64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsettimeofday64, libc_sys_Xsettimeofday64)
 
-/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
+/* errno_t gettimeofday64(struct timevalx32_64 *tv, struct timezone *tz) */
 .section .text.crt.syscall.gettimeofday64
 INTERN_FUNCTION(libc_sys_gettimeofday64)
 	movl   $(0xffffffb2), %eax
@@ -7408,7 +7408,7 @@ INTERN_FUNCTION(libc_sys_gettimeofday64)
 END(libc_sys_gettimeofday64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_gettimeofday64, libc_sys_gettimeofday64)
 
-/* errno_t gettimeofday64(struct __timevalx32_64 *tv, struct timezone *tz) */
+/* errno_t gettimeofday64(struct timevalx32_64 *tv, struct timezone *tz) */
 .section .text.crt.syscall.Xgettimeofday64
 INTERN_FUNCTION(libc_sys_Xgettimeofday64)
 	movl   $(0xffffffb2), %eax
@@ -7416,7 +7416,7 @@ INTERN_FUNCTION(libc_sys_Xgettimeofday64)
 END(libc_sys_Xgettimeofday64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgettimeofday64, libc_sys_Xgettimeofday64)
 
-/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
+/* errno_t getrusage64(syscall_slong_t who, struct rusagex32_64 *tv) */
 .section .text.crt.syscall.getrusage64
 INTERN_FUNCTION(libc_sys_getrusage64)
 	movl   $(0xffffffb3), %eax
@@ -7424,7 +7424,7 @@ INTERN_FUNCTION(libc_sys_getrusage64)
 END(libc_sys_getrusage64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getrusage64, libc_sys_getrusage64)
 
-/* errno_t getrusage64(syscall_slong_t who, struct __rusagex32_64 *tv) */
+/* errno_t getrusage64(syscall_slong_t who, struct rusagex32_64 *tv) */
 .section .text.crt.syscall.Xgetrusage64
 INTERN_FUNCTION(libc_sys_Xgetrusage64)
 	movl   $(0xffffffb3), %eax
@@ -7464,7 +7464,7 @@ INTERN_FUNCTION(libc_sys_Xioctlf)
 END(libc_sys_Xioctlf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xioctlf, libc_sys_Xioctlf)
 
-/* errno_t ftime64(struct __timebx32_64 *tp) */
+/* errno_t ftime64(struct timebx32_64 *tp) */
 .section .text.crt.syscall.ftime64
 INTERN_FUNCTION(libc_sys_ftime64)
 	movl   $(0xffffffdd), %eax
@@ -7472,7 +7472,7 @@ INTERN_FUNCTION(libc_sys_ftime64)
 END(libc_sys_ftime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_ftime64, libc_sys_ftime64)
 
-/* errno_t ftime64(struct __timebx32_64 *tp) */
+/* errno_t ftime64(struct timebx32_64 *tp) */
 .section .text.crt.syscall.Xftime64
 INTERN_FUNCTION(libc_sys_Xftime64)
 	movl   $(0xffffffdd), %eax
@@ -7480,7 +7480,7 @@ INTERN_FUNCTION(libc_sys_Xftime64)
 END(libc_sys_Xftime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xftime64, libc_sys_Xftime64)
 
-/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+/* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.crt.syscall.utime64
 INTERN_FUNCTION(libc_sys_utime64)
 	movl   $(0xffffffe2), %eax
@@ -7488,7 +7488,7 @@ INTERN_FUNCTION(libc_sys_utime64)
 END(libc_sys_utime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utime64, libc_sys_utime64)
 
-/* errno_t utime64(char const *filename, struct __utimbuf64 const *times) */
+/* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.crt.syscall.Xutime64
 INTERN_FUNCTION(libc_sys_Xutime64)
 	movl   $(0xffffffe2), %eax
