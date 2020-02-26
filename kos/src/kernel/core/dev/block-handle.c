@@ -101,66 +101,6 @@ handle_blockdevice_pwritev(struct basic_block_device *__restrict self,
 	return num_bytes;
 }
 
-INTERN size_t KCALL
-handle_blockdevice_apread(struct basic_block_device *__restrict self,
-                          USER CHECKED void *dst, size_t num_bytes,
-                          pos_t addr, iomode_t mode,
-                          struct aio_multihandle *__restrict aio) {
-	/* TODO: IO_NONBLOCK */
-	(void)mode;
-	block_device_aread(self,
-	                   dst,
-	                   num_bytes,
-	                   addr,
-	                   aio_multihandle_allochandle(aio));
-	return num_bytes;
-}
-
-INTERN size_t KCALL
-handle_blockdevice_apwrite(struct basic_block_device *__restrict self,
-                           USER CHECKED void const *src, size_t num_bytes,
-                           pos_t addr, iomode_t mode,
-                           struct aio_multihandle *__restrict aio) {
-	/* TODO: IO_NONBLOCK */
-	(void)mode;
-	block_device_awrite(self,
-	                    src,
-	                    num_bytes,
-	                    addr,
-	                    aio_multihandle_allochandle(aio));
-	return num_bytes;
-}
-
-INTERN size_t KCALL
-handle_blockdevice_apreadv(struct basic_block_device *__restrict self,
-                           struct aio_buffer *__restrict dst, size_t num_bytes,
-                           pos_t addr, iomode_t mode,
-                           struct aio_multihandle *__restrict aio) {
-	/* TODO: IO_NONBLOCK */
-	(void)mode;
-	block_device_areadv(self,
-	                    dst,
-	                    num_bytes,
-	                    addr,
-	                    aio_multihandle_allochandle(aio));
-	return num_bytes;
-}
-
-INTERN size_t KCALL
-handle_blockdevice_apwritev(struct basic_block_device *__restrict self,
-                            struct aio_buffer *__restrict src, size_t num_bytes,
-                            pos_t addr, iomode_t mode,
-                            struct aio_multihandle *__restrict aio) {
-	/* TODO: IO_NONBLOCK */
-	(void)mode;
-	block_device_awritev(self,
-	                     src,
-	                     num_bytes,
-	                     addr,
-	                     aio_multihandle_allochandle(aio));
-	return num_bytes;
-}
-
 
 LOCAL ATTR_PURE NONNULL((1)) size_t KCALL
 block_device_get_readahead(struct basic_block_device *__restrict self) {

@@ -110,11 +110,6 @@ handle_datapart_pwritev(struct vm_datapart *__restrict self,
 	return vm_datapart_writev(self, src, num_bytes, (size_t)addr);
 }
 
-DEFINE_HANDLE_APREAD_FROM_PREAD(datapart, struct vm_datapart)
-DEFINE_HANDLE_APWRITE_FROM_PWRITE(datapart, struct vm_datapart)
-DEFINE_HANDLE_APREADV_FROM_PREADV(datapart, struct vm_datapart)
-DEFINE_HANDLE_APWRITEV_FROM_PWRITEV(datapart, struct vm_datapart)
-
 LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_datablock *KCALL
 vm_datapart_get_datablock(struct vm_datapart *__restrict self) {
 	REF struct vm_datablock *result;

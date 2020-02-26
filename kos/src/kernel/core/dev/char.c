@@ -704,15 +704,6 @@ handle_characterdevice_pwritev(struct character_device *__restrict self,
 	return result;
 }
 
-DEFINE_HANDLE_AREAD_FROM_READ(characterdevice, struct character_device)
-DEFINE_HANDLE_AWRITE_FROM_WRITE(characterdevice, struct character_device)
-DEFINE_HANDLE_AREADV_FROM_READV(characterdevice, struct character_device)
-DEFINE_HANDLE_AWRITEV_FROM_WRITEV(characterdevice, struct character_device)
-DEFINE_HANDLE_APREAD_FROM_PREAD(characterdevice, struct character_device)
-DEFINE_HANDLE_APWRITE_FROM_PWRITE(characterdevice, struct character_device)
-DEFINE_HANDLE_APREADV_FROM_PREADV(characterdevice, struct character_device)
-DEFINE_HANDLE_APWRITEV_FROM_PWRITEV(characterdevice, struct character_device)
-
 INTERN syscall_slong_t KCALL
 handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
                              USER UNCHECKED void *arg, iomode_t mode) {

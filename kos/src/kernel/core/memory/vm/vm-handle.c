@@ -58,13 +58,6 @@ handle_vm_pwrite(struct vm *__restrict self,
 	return num_bytes;
 }
 
-DEFINE_HANDLE_PREADV_FROM_PREAD(vm, struct vm)
-DEFINE_HANDLE_PWRITEV_FROM_PWRITE(vm, struct vm)
-DEFINE_HANDLE_APREAD_FROM_PREAD(vm, struct vm)
-DEFINE_HANDLE_APWRITE_FROM_PWRITE(vm, struct vm)
-DEFINE_HANDLE_APREADV_FROM_PREADV(vm, struct vm)
-DEFINE_HANDLE_APWRITEV_FROM_PWRITEV(vm, struct vm)
-
 //INTERN NONNULL((1)) pos_t KCALL /* TODO: Use vm_prefault()??? */
 //handle_vm_allocate(struct vm *__restrict self,
 //                   fallocate_mode_t mode,

@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_FS_PIPE_C
 #define GUARD_KERNEL_CORE_FS_PIPE_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -487,14 +488,6 @@ handle_pipe_writev(struct pipe *__restrict self,
 	}
 	return result;
 }
-
-DEFINE_HANDLE_AREAD_FROM_READ(pipe, struct pipe)
-DEFINE_HANDLE_AWRITE_FROM_WRITE(pipe, struct pipe)
-DEFINE_HANDLE_AREADV_FROM_READV(pipe, struct pipe)
-DEFINE_HANDLE_AWRITEV_FROM_WRITEV(pipe, struct pipe)
-
-
-
 
 INTERN void KCALL
 handle_pipe_truncate(struct pipe *__restrict self,

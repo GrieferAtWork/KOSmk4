@@ -95,21 +95,6 @@ struct handle_types {
 	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_preadv[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_pwritev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 
-	/* Read/write primitives with support for asynchronous I/O
-	 * NOTE: Don't call `aio_multihandle_done(aio)' from within these callbacks!
-	 *       It is the responsibility of whoever declared the multihandle to indicate
-	 *       that all async operations to-be performed with it have been started!
-	 * @throws: * : Same as `h_read' / `h_write'
-	 * @return: * : Same as `h_read' / `h_write' */
-	size_t (WUNUSED NONNULL((1, 5)) KCALL *h_aread[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-	size_t (WUNUSED NONNULL((1, 5)) KCALL *h_awrite[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-	size_t (WUNUSED NONNULL((1, 6)) KCALL *h_apread[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-	size_t (WUNUSED NONNULL((1, 6)) KCALL *h_apwrite[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-	size_t (WUNUSED NONNULL((1, 2, 5)) KCALL *h_areadv[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-	size_t (WUNUSED NONNULL((1, 2, 5)) KCALL *h_awritev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-	size_t (WUNUSED NONNULL((1, 2, 6)) KCALL *h_apreadv[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-	size_t (WUNUSED NONNULL((1, 2, 6)) KCALL *h_apwritev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
-
 	/* Read a directory entry from the given handle.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @return: * : The required buffer size for the current entry */
@@ -229,22 +214,6 @@ handle_datasize(struct handle const *__restrict self,
 #define handle_pwritev(self, src, num_bytes, addr)               HANDLE_FUNC(self, h_pwritev)((self).h_data, src, num_bytes, addr, (self).h_mode)
 #define handle_preadvf(self, dst, num_bytes, addr, mode)         HANDLE_FUNC(self, h_preadv)((self).h_data, dst, num_bytes, addr, mode)
 #define handle_pwritevf(self, src, num_bytes, addr, mode)        HANDLE_FUNC(self, h_pwritev)((self).h_data, src, num_bytes, addr, mode)
-#define handle_aread(self, dst, num_bytes, aio)                  HANDLE_FUNC(self, h_aread)((self).h_data, dst, num_bytes, (self).h_mode, aio)
-#define handle_awrite(self, src, num_bytes, aio)                 HANDLE_FUNC(self, h_awrite)((self).h_data, src, num_bytes, (self).h_mode, aio)
-#define handle_areadf(self, dst, num_bytes, mode, aio)           HANDLE_FUNC(self, h_aread)((self).h_data, dst, num_bytes, mode, aio)
-#define handle_awritef(self, src, num_bytes, mode, aio)          HANDLE_FUNC(self, h_awrite)((self).h_data, src, num_bytes, mode, aio)
-#define handle_areadv(self, dst, num_bytes, aio)                 HANDLE_FUNC(self, h_areadv)((self).h_data, dst, num_bytes, (self).h_mode, aio)
-#define handle_awritev(self, src, num_bytes, aio)                HANDLE_FUNC(self, h_awritev)((self).h_data, src, num_bytes, (self).h_mode, aio)
-#define handle_areadvf(self, dst, num_bytes, mode, aio)          HANDLE_FUNC(self, h_areadv)((self).h_data, dst, num_bytes, mode, aio)
-#define handle_awritevf(self, src, num_bytes, mode, aio)         HANDLE_FUNC(self, h_awritev)((self).h_data, src, num_bytes, mode, aio)
-#define handle_apread(self, dst, num_bytes, addr, aio)           HANDLE_FUNC(self, h_apread)((self).h_data, dst, num_bytes, addr, (self).h_mode, aio)
-#define handle_apwrite(self, src, num_bytes, addr, aio)          HANDLE_FUNC(self, h_apwrite)((self).h_data, src, num_bytes, addr, (self).h_mode, aio)
-#define handle_apreadf(self, dst, num_bytes, addr, mode, aio)    HANDLE_FUNC(self, h_apread)((self).h_data, dst, num_bytes, addr, mode, aio)
-#define handle_apwritef(self, src, num_bytes, addr, mode, aio)   HANDLE_FUNC(self, h_apwrite)((self).h_data, src, num_bytes, addr, mode, aio)
-#define handle_apreadv(self, dst, num_bytes, addr, aio)          HANDLE_FUNC(self, h_apreadv)((self).h_data, dst, num_bytes, addr, (self).h_mode, aio)
-#define handle_apwritev(self, src, num_bytes, addr, aio)         HANDLE_FUNC(self, h_apwritev)((self).h_data, src, num_bytes, addr, (self).h_mode, aio)
-#define handle_apreadvf(self, dst, num_bytes, addr, mode, aio)   HANDLE_FUNC(self, h_apreadv)((self).h_data, dst, num_bytes, addr, mode, aio)
-#define handle_apwritevf(self, src, num_bytes, addr, mode, aio)  HANDLE_FUNC(self, h_apwritev)((self).h_data, src, num_bytes, addr, mode, aio)
 #define handle_readdir(self, buf, bufsize, readdir_mode)         HANDLE_FUNC(self, h_readdir)((self).h_data, buf, bufsize, readdir_mode, (self).h_mode)
 #define handle_readdirf(self, buf, bufsize, readdir_mode, mode)  HANDLE_FUNC(self, h_readdir)((self).h_data, buf, bufsize, readdir_mode, mode)
 #define handle_seek(self, off, whence)                           HANDLE_FUNC(self, h_seek)((self).h_data, off, whence)

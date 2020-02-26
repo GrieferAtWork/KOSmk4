@@ -186,21 +186,7 @@ evenfd_getavail(struct eventfd *__restrict self) {
 }
 
 DEFINE_INTERN_ALIAS(handle_eventfd_sema_write, handle_eventfd_fence_write);
-
-DEFINE_HANDLE_READV_FROM_READ(eventfd_fence, struct eventfd)
-DEFINE_HANDLE_READV_FROM_READ(eventfd_sema, struct eventfd)
-DEFINE_HANDLE_WRITEV_FROM_WRITE(eventfd_fence, struct eventfd)
 DEFINE_INTERN_ALIAS(handle_eventfd_sema_writev, handle_eventfd_fence_writev);
-DEFINE_HANDLE_AREAD_FROM_READ(eventfd_fence, struct eventfd)
-DEFINE_HANDLE_AREAD_FROM_READ(eventfd_sema, struct eventfd)
-DEFINE_HANDLE_AWRITE_FROM_WRITE(eventfd_fence, struct eventfd)
-DEFINE_INTERN_ALIAS(handle_eventfd_sema_awrite, handle_eventfd_fence_awrite);
-DEFINE_HANDLE_AREADV_FROM_READV(eventfd_fence, struct eventfd)
-DEFINE_HANDLE_AREADV_FROM_READV(eventfd_sema, struct eventfd)
-DEFINE_HANDLE_AWRITEV_FROM_WRITEV(eventfd_fence, struct eventfd)
-DEFINE_INTERN_ALIAS(handle_eventfd_sema_awritev, handle_eventfd_fence_awritev);
-
-
 
 INTERN poll_mode_t KCALL
 handle_eventfd_fence_poll(struct eventfd *__restrict self,
