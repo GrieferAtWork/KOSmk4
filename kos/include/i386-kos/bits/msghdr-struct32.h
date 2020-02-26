@@ -32,33 +32,33 @@
 __DECL_BEGIN
 
 #if !defined(__x86_64__) && defined(__i386__)
-#define msghdr32 msghdr
-#define __OFFSET_MSGHDR_NAME       __OFFSET_MSGHDR32_NAME
-#define __OFFSET_MSGHDR_NAMELEN    __OFFSET_MSGHDR32_NAMELEN
-#define __OFFSET_MSGHDR_IOV        __OFFSET_MSGHDR32_IOV
-#define __OFFSET_MSGHDR_IOVLEN     __OFFSET_MSGHDR32_IOVLEN
-#define __OFFSET_MSGHDR_CONTROL    __OFFSET_MSGHDR32_CONTROL
-#define __OFFSET_MSGHDR_CONTROLLEN __OFFSET_MSGHDR32_CONTROLLEN
-#define __OFFSET_MSGHDR_FLAGS      __OFFSET_MSGHDR32_FLAGS
-#define __SIZEOF_MSGHDR            __SIZEOF_MSGHDR32
-#define __ALIGNOF_MSGHDR           __ALIGNOF_MSGHDR32
+#define __msghdrx32 msghdr
+#define __OFFSET_MSGHDR_NAME       __OFFSET_MSGHDRX32_NAME
+#define __OFFSET_MSGHDR_NAMELEN    __OFFSET_MSGHDRX32_NAMELEN
+#define __OFFSET_MSGHDR_IOV        __OFFSET_MSGHDRX32_IOV
+#define __OFFSET_MSGHDR_IOVLEN     __OFFSET_MSGHDRX32_IOVLEN
+#define __OFFSET_MSGHDR_CONTROL    __OFFSET_MSGHDRX32_CONTROL
+#define __OFFSET_MSGHDR_CONTROLLEN __OFFSET_MSGHDRX32_CONTROLLEN
+#define __OFFSET_MSGHDR_FLAGS      __OFFSET_MSGHDRX32_FLAGS
+#define __SIZEOF_MSGHDR            __SIZEOF_MSGHDRX32
+#define __ALIGNOF_MSGHDR           __ALIGNOF_MSGHDRX32
 #endif /* !__x86_64__ && __i386__ */
 
-#define __OFFSET_MSGHDR32_NAME       0
-#define __OFFSET_MSGHDR32_NAMELEN    4
-#define __OFFSET_MSGHDR32_IOV        8
-#define __OFFSET_MSGHDR32_IOVLEN     12
-#define __OFFSET_MSGHDR32_CONTROL    16
-#define __OFFSET_MSGHDR32_CONTROLLEN 20
-#define __OFFSET_MSGHDR32_FLAGS      24
-#define __SIZEOF_MSGHDR32            28
-#define __ALIGNOF_MSGHDR32           __ALIGNOF_INT32__
+#define __OFFSET_MSGHDRX32_NAME       0
+#define __OFFSET_MSGHDRX32_NAMELEN    4
+#define __OFFSET_MSGHDRX32_IOV        8
+#define __OFFSET_MSGHDRX32_IOVLEN     12
+#define __OFFSET_MSGHDRX32_CONTROL    16
+#define __OFFSET_MSGHDRX32_CONTROLLEN 20
+#define __OFFSET_MSGHDRX32_FLAGS      24
+#define __SIZEOF_MSGHDRX32            28
+#define __ALIGNOF_MSGHDRX32           __ALIGNOF_INT32__
 #ifdef __CC__
 
 #if defined(__i386__) && !defined(__x86_64__)
 struct iovec;
 #else /* __i386__ && !__x86_64__ */
-struct iovec32;
+struct __iovecx32;
 #endif /* !__i386__ || __x86_64__ */
 #ifdef __USE_KOS_KERNEL
 struct sockaddr;
@@ -67,11 +67,12 @@ struct cmsghdr;
 #else /* __i386__ && !__x86_64__ */
 struct __cmsghdrx32;
 #endif /* !__i386__ || __x86_64__ */
+#define msghdrx32 __msghdrx32
 #endif /* __USE_KOS_KERNEL */
 
 
 /* Structure describing messages sent by `sendmsg' and received by `recvmsg'. */
-struct msghdr32 /*[PREFIX(msg_)]*/ { /* TODO: Rename to msghdrx32 */
+struct __msghdrx32 /*[NAME(msghdrx32)][PREFIX(msg_)]*/ {
 #ifdef __USE_KOS_KERNEL
 	__HYBRID_PTR32(struct sockaddr) msg_name;      /* [out][0..msg_namelen] Address to send to/receive from. */
 #else /* __USE_KOS_KERNEL */
@@ -81,7 +82,7 @@ struct msghdr32 /*[PREFIX(msg_)]*/ { /* TODO: Rename to msghdrx32 */
 #if defined(__i386__) && !defined(__x86_64__)
 	__HYBRID_PTR32(struct iovec)   msg_iov;        /* [0..msg_iovlen] Vector of data to send/receive into. */
 #else /* __i386__ && !__x86_64__ */
-	__HYBRID_PTR32(struct iovec32) msg_iov;        /* [0..msg_iovlen] Vector of data to send/receive into. */
+	__HYBRID_PTR32(struct __iovecx32) msg_iov;     /* [0..msg_iovlen] Vector of data to send/receive into. */
 #endif /* !__i386__ || __x86_64__ */
 	__UINT32_TYPE__                msg_iovlen;     /* Number of elements in the vector. */
 #ifdef __USE_KOS_KERNEL

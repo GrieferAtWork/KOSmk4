@@ -52,7 +52,7 @@ struct ucontext64; /* Userlevel context. */
 typedef struct ucontext64 {
 	mcontext64_t                      uc_mcontext;
 	__sigset_t                        uc_sigmask;
-	struct sigaltstack64              uc_stack;
+	struct __sigaltstackx64           uc_stack;
 	__HYBRID_PTR64(struct ucontext64) uc_link;
 } ucontext64_t;
 #endif /* __CC__ */

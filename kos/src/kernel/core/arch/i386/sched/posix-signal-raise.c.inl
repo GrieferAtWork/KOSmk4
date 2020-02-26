@@ -74,7 +74,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	bool must_restore_sigmask;
 	sigset_t old_sigmask;
 	u32 signo = ATOMIC_READ(siginfo->si_signo);
-	USER CHECKED NAME2(siginfo, _t) *user_siginfo;
+	USER CHECKED NAME2(siginfox, _t) *user_siginfo;
 	USER CHECKED NAME2(ucontext, _t) *user_ucontext;
 	USER CHECKED sigset_t *user_sigset;
 	USER CHECKED struct NAME(fpustate) *user_fpustate;
@@ -151,14 +151,14 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	user_fpustate = NULL;
 	if (action->sa_flags & SIGACTION_SA_SIGINFO) {
 		/* In 3-argument mode, we always have to push everything... */
-		STATIC_ASSERT(NAME2(__SI, _USER_MAX_SIZE) >= NAME2(__SI, _KERNEL_MAX_SIZE));
-		STATIC_ASSERT(NAME2(__SI, _KERNEL_MAX_SIZE) == sizeof(NAME2(siginfo, _t)));
+		STATIC_ASSERT(NAME2(__SIX, _USER_MAX_SIZE) >= NAME2(__SIX, _KERNEL_MAX_SIZE));
+		STATIC_ASSERT(NAME2(__SIX, _KERNEL_MAX_SIZE) == sizeof(NAME2(siginfox, _t)));
 		/* Try to have the padding of `siginfo_t' overlap with `ucontextN_t' */
-#define EFFECTIVE_PADDING_SIGINFO_T (NAME2(__SI, _USER_MAX_SIZE) - NAME2(__SI, _KERNEL_MAX_SIZE))
+#define EFFECTIVE_PADDING_SIGINFO_T (NAME2(__SIX, _USER_MAX_SIZE) - NAME2(__SIX, _KERNEL_MAX_SIZE))
 #define EFFECTIVE_SIZEOF_SIGINFO_T                                  \
 		(EFFECTIVE_PADDING_SIGINFO_T <= sizeof(NAME2(ucontext, _t)) \
-		 ? NAME2(__SI, _KERNEL_MAX_SIZE)                            \
-		 : (NAME2(__SI, _USER_MAX_SIZE) - sizeof(NAME2(ucontext, _t))))
+		 ? NAME2(__SIX, _KERNEL_MAX_SIZE)                           \
+		 : (NAME2(__SIX, _USER_MAX_SIZE) - sizeof(NAME2(ucontext, _t))))
 		/* Must push a full `ucontextN_t' */
 		user_ucontext = (NAME2(ucontext, _t) *)(usp - sizeof(NAME2(ucontext, _t)));
 		validate_writable((byte_t *)user_ucontext - EFFECTIVE_SIZEOF_SIGINFO_T,
@@ -185,8 +185,8 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		}
 		usp -= sizeof(NAME2(ucontext, _t)) + EFFECTIVE_SIZEOF_SIGINFO_T;
 		/* Copy signal information into user-space. */
-		user_siginfo = (NAME2(siginfo, _t) *)usp;
-		NAME(siginfo_to_siginfo)(siginfo, user_siginfo);
+		user_siginfo = (NAME2(siginfox, _t) *)usp;
+		NAME(siginfo_to_siginfox)(siginfo, user_siginfo);
 #undef EFFECTIVE_PADDING_SIGINFO_T
 #undef EFFECTIVE_SIZEOF_SIGINFO_T
 	} else {

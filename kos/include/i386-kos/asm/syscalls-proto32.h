@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe59238ca */
+/* HASH CRC-32:0x53c8b353 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1011,7 +1011,7 @@
 #define __NRAT0_linux_oldfstat          (fd_t, __fd_t)
 #define __NRAT1_linux_oldfstat          (struct linux_oldstat *, struct linux_oldstat *)
 #define __NRAT0_utime                   (char const *, char const *)
-#define __NRAT1_utime                   (struct utimbufx32 const *, struct utimbufx32 const *)
+#define __NRAT1_utime                   (struct utimbufx32 const *, struct __utimbufx32 const *)
 #define __NRAT0_access                  (char const *, char const *)
 #define __NRAT1_access                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_nice                    (syscall_slong_t, __syscall_slong_t)
@@ -1049,8 +1049,8 @@
 #define __NRAT0_dup2                    (fd_t, __fd_t)
 #define __NRAT1_dup2                    (fd_t, __fd_t)
 #define __NRAT0_sigaction               (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_sigaction               (struct sigaction32 const *, struct sigaction32 const *)
-#define __NRAT2_sigaction               (struct sigaction32 *, struct sigaction32 *)
+#define __NRAT1_sigaction               (struct sigactionx32 const *, struct __sigactionx32 const *)
+#define __NRAT2_sigaction               (struct sigactionx32 *, struct __sigactionx32 *)
 #define __NRAT0_ssetmask                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_setreuid                (uint16_t, __uint16_t)
 #define __NRAT1_setreuid                (uint16_t, __uint16_t)
@@ -1204,10 +1204,10 @@
 #define __NRAT1_msync                   (size_t, __size_t)
 #define __NRAT2_msync                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_readv                   (fd_t, __fd_t)
-#define __NRAT1_readv                   (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_readv                   (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_readv                   (size_t, __size_t)
 #define __NRAT0_writev                  (fd_t, __fd_t)
-#define __NRAT1_writev                  (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_writev                  (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_writev                  (size_t, __size_t)
 #define __NRAT0_getsid                  (pid_t, __pid_t)
 #define __NRAT0_fdatasync               (fd_t, __fd_t)
@@ -1260,8 +1260,8 @@
 #define __NRAT2_rt_sigreturn            (struct rpc_syscall_info *, struct rpc_syscall_info *)
 #define __NRAT3_rt_sigreturn            (struct ucpustate const *, struct ucpustate const *)
 #define __NRAT0_rt_sigaction            (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_rt_sigaction            (struct sigaction32 const *, struct sigaction32 const *)
-#define __NRAT2_rt_sigaction            (struct sigaction32 *, struct sigaction32 *)
+#define __NRAT1_rt_sigaction            (struct sigactionx32 const *, struct __sigactionx32 const *)
+#define __NRAT2_rt_sigaction            (struct sigactionx32 *, struct __sigactionx32 *)
 #define __NRAT3_rt_sigaction            (size_t, __size_t)
 #define __NRAT0_rt_sigprocmask          (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_rt_sigprocmask          (struct __sigset_struct const *, struct __sigset_struct const *)
@@ -1270,12 +1270,12 @@
 #define __NRAT0_rt_sigpending           (struct __sigset_struct *, struct __sigset_struct *)
 #define __NRAT1_rt_sigpending           (size_t, __size_t)
 #define __NRAT0_rt_sigtimedwait         (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NRAT1_rt_sigtimedwait         (struct __siginfo32_struct *, struct __siginfo32_struct *)
+#define __NRAT1_rt_sigtimedwait         (struct __siginfox32_struct *, struct __siginfox32_struct *)
 #define __NRAT2_rt_sigtimedwait         (struct timespecx32 const *, struct __timespecx32 const *)
 #define __NRAT3_rt_sigtimedwait         (size_t, __size_t)
 #define __NRAT0_rt_sigqueueinfo         (pid_t, __pid_t)
 #define __NRAT1_rt_sigqueueinfo         (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT2_rt_sigqueueinfo         (struct __siginfo32_struct const *, struct __siginfo32_struct const *)
+#define __NRAT2_rt_sigqueueinfo         (struct __siginfox32_struct const *, struct __siginfox32_struct const *)
 #define __NRAT0_rt_sigsuspend           (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NRAT1_rt_sigsuspend           (size_t, __size_t)
 #define __NRAT0_pread64                 (fd_t, __fd_t)
@@ -1293,8 +1293,8 @@
 #define __NRAT1_getcwd                  (size_t, __size_t)
 #define __NRAT0_capget                  (int, int)
 #define __NRAT0_capset                  (int, int)
-#define __NRAT0_sigaltstack             (struct sigaltstack32 const *, struct sigaltstack32 const *)
-#define __NRAT1_sigaltstack             (struct sigaltstack32 *, struct sigaltstack32 *)
+#define __NRAT0_sigaltstack             (struct sigaltstackx32 const *, struct __sigaltstackx32 const *)
+#define __NRAT1_sigaltstack             (struct sigaltstackx32 *, struct __sigaltstackx32 *)
 #define __NRAT0_sendfile                (fd_t, __fd_t)
 #define __NRAT1_sendfile                (fd_t, __fd_t)
 #define __NRAT2_sendfile                (__ULONG32_TYPE__ *, __ULONG32_TYPE__ *)
@@ -1509,7 +1509,7 @@
 #define __NRAT0_kexec_load              (int, int)
 #define __NRAT0_waitid                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_waitid                  (id_t, __id_t)
-#define __NRAT2_waitid                  (struct __siginfo32_struct *, struct __siginfo32_struct *)
+#define __NRAT2_waitid                  (struct __siginfox32_struct *, struct __siginfox32_struct *)
 #define __NRAT3_waitid                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT4_waitid                  (struct rusagex32 *, struct __rusagex32 *)
 #define __NRAT0_add_key                 (int, int)
@@ -1603,7 +1603,7 @@
 #define __NRAT2_tee                     (size_t, __size_t)
 #define __NRAT3_tee                     (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_vmsplice                (fd_t, __fd_t)
-#define __NRAT1_vmsplice                (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_vmsplice                (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_vmsplice                (size_t, __size_t)
 #define __NRAT3_vmsplice                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_move_pages              (int, int)
@@ -1649,17 +1649,17 @@
 #define __NRAT1_pipe2                   (oflag_t, __oflag_t)
 #define __NRAT0_inotify_init1           (int, int)
 #define __NRAT0_preadv                  (fd_t, __fd_t)
-#define __NRAT1_preadv                  (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_preadv                  (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_preadv                  (size_t, __size_t)
 #define __NRAT3_preadv                  (uint64_t, __uint64_t)
 #define __NRAT0_pwritev                 (fd_t, __fd_t)
-#define __NRAT1_pwritev                 (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_pwritev                 (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_pwritev                 (size_t, __size_t)
 #define __NRAT3_pwritev                 (uint64_t, __uint64_t)
 #define __NRAT0_rt_tgsigqueueinfo       (pid_t, __pid_t)
 #define __NRAT1_rt_tgsigqueueinfo       (pid_t, __pid_t)
 #define __NRAT2_rt_tgsigqueueinfo       (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT3_rt_tgsigqueueinfo       (struct __siginfo32_struct const *, struct __siginfo32_struct const *)
+#define __NRAT3_rt_tgsigqueueinfo       (struct __siginfox32_struct const *, struct __siginfox32_struct const *)
 #define __NRAT0_perf_event_open         (int, int)
 #define __NRAT0_recvmmsg                (fd_t, __fd_t)
 #define __NRAT1_recvmmsg                (struct mmsghdrx32 *, struct __mmsghdrx32 *)
@@ -1689,15 +1689,15 @@
 #define __NRAT0_setns                   (fd_t, __fd_t)
 #define __NRAT1_setns                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_process_vm_readv        (pid_t, __pid_t)
-#define __NRAT1_process_vm_readv        (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_process_vm_readv        (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_process_vm_readv        (size_t, __size_t)
-#define __NRAT3_process_vm_readv        (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT3_process_vm_readv        (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT4_process_vm_readv        (size_t, __size_t)
 #define __NRAT5_process_vm_readv        (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_process_vm_writev       (pid_t, __pid_t)
-#define __NRAT1_process_vm_writev       (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_process_vm_writev       (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_process_vm_writev       (size_t, __size_t)
-#define __NRAT3_process_vm_writev       (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT3_process_vm_writev       (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT4_process_vm_writev       (size_t, __size_t)
 #define __NRAT5_process_vm_writev       (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_kcmp                    (pid_t, __pid_t)
@@ -1765,7 +1765,7 @@
 #define __NRAT4_sendto                  (struct sockaddr const *, struct sockaddr const *)
 #define __NRAT5_sendto                  (socklen_t, __socklen_t)
 #define __NRAT0_sendmsg                 (fd_t, __fd_t)
-#define __NRAT1_sendmsg                 (struct msghdr32 const *, struct msghdr32 const *)
+#define __NRAT1_sendmsg                 (struct msghdrx32 const *, struct __msghdrx32 const *)
 #define __NRAT2_sendmsg                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_recvfrom                (fd_t, __fd_t)
 #define __NRAT1_recvfrom                (void *, void *)
@@ -1774,7 +1774,7 @@
 #define __NRAT4_recvfrom                (struct sockaddr *, struct sockaddr *)
 #define __NRAT5_recvfrom                (socklen_t *, __socklen_t *)
 #define __NRAT0_recvmsg                 (fd_t, __fd_t)
-#define __NRAT1_recvmsg                 (struct msghdr32 *, struct msghdr32 *)
+#define __NRAT1_recvmsg                 (struct msghdrx32 *, struct __msghdrx32 *)
 #define __NRAT2_recvmsg                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_shutdown                (fd_t, __fd_t)
 #define __NRAT1_shutdown                (syscall_ulong_t, __syscall_ulong_t)
@@ -1787,12 +1787,12 @@
 #define __NRAT3_recvmmsg64              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT4_recvmmsg64              (struct timespecx32_64 const *, struct __timespecx32_64 const *)
 #define __NRAT0_pwritevf                (fd_t, __fd_t)
-#define __NRAT1_pwritevf                (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_pwritevf                (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_pwritevf                (size_t, __size_t)
 #define __NRAT3_pwritevf                (uint64_t, __uint64_t)
 #define __NRAT4_pwritevf                (iomode_t, __iomode_t)
 #define __NRAT0_preadvf                 (fd_t, __fd_t)
-#define __NRAT1_preadvf                 (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_preadvf                 (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_preadvf                 (size_t, __size_t)
 #define __NRAT3_preadvf                 (uint64_t, __uint64_t)
 #define __NRAT4_preadvf                 (iomode_t, __iomode_t)
@@ -1853,7 +1853,7 @@
 #define __NRAT3_fmkdirat                (atflag_t, __atflag_t)
 #define __NRAT0_waitid64                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_waitid64                (id_t, __id_t)
-#define __NRAT2_waitid64                (struct __siginfo32_struct *, struct __siginfo32_struct *)
+#define __NRAT2_waitid64                (struct __siginfox32_struct *, struct __siginfox32_struct *)
 #define __NRAT3_waitid64                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT4_waitid64                (struct rusagex32_64 *, struct __rusagex32_64 *)
 #define __NRAT0_mq_timedreceive64       (fd_t, __fd_t)
@@ -1906,7 +1906,7 @@
 #define __NRAT3_pread64f                (uint64_t, __uint64_t)
 #define __NRAT4_pread64f                (iomode_t, __iomode_t)
 #define __NRAT0_rt_sigtimedwait64       (struct __sigset_struct const *, struct __sigset_struct const *)
-#define __NRAT1_rt_sigtimedwait64       (struct __siginfo32_struct *, struct __siginfo32_struct *)
+#define __NRAT1_rt_sigtimedwait64       (struct __siginfox32_struct *, struct __siginfox32_struct *)
 #define __NRAT2_rt_sigtimedwait64       (struct timespecx32_64 const *, struct __timespecx32_64 const *)
 #define __NRAT3_rt_sigtimedwait64       (size_t, __size_t)
 #define __NRAT0_nanosleep64             (struct timespecx32_64 const *, struct __timespecx32_64 const *)
@@ -1916,11 +1916,11 @@
 #define __NRAT0_ksysctl                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_ksysctl                 (void *, void *)
 #define __NRAT0_writevf                 (fd_t, __fd_t)
-#define __NRAT1_writevf                 (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_writevf                 (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_writevf                 (size_t, __size_t)
 #define __NRAT3_writevf                 (iomode_t, __iomode_t)
 #define __NRAT0_readvf                  (fd_t, __fd_t)
-#define __NRAT1_readvf                  (struct iovec32 const *, struct iovec32 const *)
+#define __NRAT1_readvf                  (struct iovecx32 const *, struct __iovecx32 const *)
 #define __NRAT2_readvf                  (size_t, __size_t)
 #define __NRAT3_readvf                  (iomode_t, __iomode_t)
 #define __NRAT0_kreaddir                (fd_t, __fd_t)
@@ -1959,7 +1959,7 @@
 #define __NRAT3_ioctlf                  (void *, void *)
 #define __NRAT0_ftime64                 (struct timebx32_64 *, struct __timebx32_64 *)
 #define __NRAT0_utime64                 (char const *, char const *)
-#define __NRAT1_utime64                 (struct utimbufx32_64 const *, struct utimbufx32_64 const *)
+#define __NRAT1_utime64                 (struct utimbufx32_64 const *, struct __utimbufx32_64 const *)
 #define __NRAT0_process_spawnveat       (fd_t, __fd_t)
 #define __NRAT1_process_spawnveat       (char const *, char const *)
 #define __NRAT2_process_spawnveat       (__HYBRID_PTR32(char const) const *, __HYBRID_PTR32(char const) const *)
@@ -1974,7 +1974,7 @@
 #define __NRAT4_coredump                (struct exception_data32 const *, struct exception_data32 const *)
 #define __NRAT5_coredump                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_raiseat                 (struct ucpustate32 const *, struct ucpustate32 const *)
-#define __NRAT1_raiseat                 (struct __siginfo32_struct const *, struct __siginfo32_struct const *)
+#define __NRAT1_raiseat                 (struct __siginfox32_struct const *, struct __siginfox32_struct const *)
 #define __NRAT0_mktty                   (fd_t, __fd_t)
 #define __NRAT1_mktty                   (fd_t, __fd_t)
 #define __NRAT2_mktty                   (char const *, char const *)
@@ -2085,7 +2085,7 @@
 #define __NRAM_alarm(a, b, c, d, e, f)                   (__syscall_ulong_t)a
 #define __NRAM_linux_oldfstat(a, b, c, d, e, f)          (__fd_t)a, (struct linux_oldstat *)b
 #define __NRAM_pause(a, b, c, d, e, f)                   /* nothing */
-#define __NRAM_utime(a, b, c, d, e, f)                   (char const *)a, (struct utimbufx32 const *)b
+#define __NRAM_utime(a, b, c, d, e, f)                   (char const *)a, (struct __utimbufx32 const *)b
 #define __NRAM_stty(a, b, c, d, e, f)                    /* nothing */
 #define __NRAM_gtty(a, b, c, d, e, f)                    /* nothing */
 #define __NRAM_access(a, b, c, d, e, f)                  (char const *)a, (__syscall_ulong_t)b
@@ -2122,7 +2122,7 @@
 #define __NRAM_getppid(a, b, c, d, e, f)                 /* nothing */
 #define __NRAM_getpgrp(a, b, c, d, e, f)                 /* nothing */
 #define __NRAM_setsid(a, b, c, d, e, f)                  /* nothing */
-#define __NRAM_sigaction(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct sigaction32 const *)b, (struct sigaction32 *)c
+#define __NRAM_sigaction(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __sigactionx32 const *)b, (struct __sigactionx32 *)c
 #define __NRAM_sgetmask(a, b, c, d, e, f)                /* nothing */
 #define __NRAM_ssetmask(a, b, c, d, e, f)                (__syscall_ulong_t)a
 #define __NRAM_setreuid(a, b, c, d, e, f)                (__uint16_t)a, (__uint16_t)b
@@ -2200,8 +2200,8 @@
 #define __NRAM__newselect(a, b, c, d, e, f)              (int)a
 #define __NRAM_flock(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b
 #define __NRAM_msync(a, b, c, d, e, f)                   (void *)a, (__size_t)b, (__syscall_ulong_t)c
-#define __NRAM_readv(a, b, c, d, e, f)                   (__fd_t)a, (struct iovec32 const *)b, (__size_t)c
-#define __NRAM_writev(a, b, c, d, e, f)                  (__fd_t)a, (struct iovec32 const *)b, (__size_t)c
+#define __NRAM_readv(a, b, c, d, e, f)                   (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c
+#define __NRAM_writev(a, b, c, d, e, f)                  (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c
 #define __NRAM_getsid(a, b, c, d, e, f)                  (__pid_t)a
 #define __NRAM_fdatasync(a, b, c, d, e, f)               (__fd_t)a
 #define __NRAM__sysctl(a, b, c, d, e, f)                 (int)a
@@ -2229,11 +2229,11 @@
 #define __NRAM_getresgid(a, b, c, d, e, f)               (__uint16_t *)a, (__uint16_t *)b, (__uint16_t *)c
 #define __NRAM_prctl(a, b, c, d, e, f)                   (int)a
 #define __NRAM_rt_sigreturn(a, b, c, d, e, f)            (struct fpustate const *)a, (struct __sigset_struct const *)b, (struct rpc_syscall_info *)c, (struct ucpustate const *)d
-#define __NRAM_rt_sigaction(a, b, c, d, e, f)            (__syscall_ulong_t)a, (struct sigaction32 const *)b, (struct sigaction32 *)c, (__size_t)d
+#define __NRAM_rt_sigaction(a, b, c, d, e, f)            (__syscall_ulong_t)a, (struct __sigactionx32 const *)b, (struct __sigactionx32 *)c, (__size_t)d
 #define __NRAM_rt_sigprocmask(a, b, c, d, e, f)          (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c, (__size_t)d
 #define __NRAM_rt_sigpending(a, b, c, d, e, f)           (struct __sigset_struct *)a, (__size_t)b
-#define __NRAM_rt_sigtimedwait(a, b, c, d, e, f)         (struct __sigset_struct const *)a, (struct __siginfo32_struct *)b, (struct __timespecx32 const *)c, (__size_t)d
-#define __NRAM_rt_sigqueueinfo(a, b, c, d, e, f)         (__pid_t)a, (__syscall_ulong_t)b, (struct __siginfo32_struct const *)c
+#define __NRAM_rt_sigtimedwait(a, b, c, d, e, f)         (struct __sigset_struct const *)a, (struct __siginfox32_struct *)b, (struct __timespecx32 const *)c, (__size_t)d
+#define __NRAM_rt_sigqueueinfo(a, b, c, d, e, f)         (__pid_t)a, (__syscall_ulong_t)b, (struct __siginfox32_struct const *)c
 #define __NRAM_rt_sigsuspend(a, b, c, d, e, f)           (struct __sigset_struct const *)a, (__size_t)b
 #define __NRAM_pread64(a, b, c, d, e, f)                 (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
 #define __NRAM_pwrite64(a, b, c, d, e, f)                (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
@@ -2241,7 +2241,7 @@
 #define __NRAM_getcwd(a, b, c, d, e, f)                  (char *)a, (__size_t)b
 #define __NRAM_capget(a, b, c, d, e, f)                  (int)a
 #define __NRAM_capset(a, b, c, d, e, f)                  (int)a
-#define __NRAM_sigaltstack(a, b, c, d, e, f)             (struct sigaltstack32 const *)a, (struct sigaltstack32 *)b
+#define __NRAM_sigaltstack(a, b, c, d, e, f)             (struct __sigaltstackx32 const *)a, (struct __sigaltstackx32 *)b
 #define __NRAM_sendfile(a, b, c, d, e, f)                (__fd_t)a, (__fd_t)b, (__ULONG32_TYPE__ *)c, (__size_t)d
 #define __NRAM_getpmsg(a, b, c, d, e, f)                 (int)a
 #define __NRAM_putpmsg(a, b, c, d, e, f)                 (int)a
@@ -2336,7 +2336,7 @@
 #define __NRAM_mq_notify(a, b, c, d, e, f)               (__fd_t)a, (struct sigevent const *)b
 #define __NRAM_mq_getsetattr(a, b, c, d, e, f)           (__fd_t)a, (struct mq_attr const *)b, (struct mq_attr *)c
 #define __NRAM_kexec_load(a, b, c, d, e, f)              (int)a
-#define __NRAM_waitid(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo32_struct *)c, (__syscall_ulong_t)d, (struct __rusagex32 *)e
+#define __NRAM_waitid(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__id_t)b, (struct __siginfox32_struct *)c, (__syscall_ulong_t)d, (struct __rusagex32 *)e
 #define __NRAM_add_key(a, b, c, d, e, f)                 (int)a
 #define __NRAM_request_key(a, b, c, d, e, f)             (int)a
 #define __NRAM_keyctl(a, b, c, d, e, f)                  (int)a
@@ -2367,7 +2367,7 @@
 #define __NRAM_splice(a, b, c, d, e, f)                  (__fd_t)a, (__uint64_t *)b, (__fd_t)c, (__uint64_t *)d, (__size_t)e, (__syscall_ulong_t)f
 #define __NRAM_sync_file_range(a, b, c, d, e, f)         (__fd_t)a, (__uint64_t)((__uint64_t)b | (__uint64_t)c << 32), (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__syscall_ulong_t)f
 #define __NRAM_tee(a, b, c, d, e, f)                     (__fd_t)a, (__fd_t)b, (__size_t)c, (__syscall_ulong_t)d
-#define __NRAM_vmsplice(a, b, c, d, e, f)                (__fd_t)a, (struct iovec32 const *)b, (__size_t)c, (__syscall_ulong_t)d
+#define __NRAM_vmsplice(a, b, c, d, e, f)                (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_move_pages(a, b, c, d, e, f)              (int)a
 #define __NRAM_getcpu(a, b, c, d, e, f)                  (__uint32_t *)a, (__uint32_t *)b, (struct getcpu_cache *)c
 #define __NRAM_epoll_pwait(a, b, c, d, e, f)             (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e
@@ -2384,9 +2384,9 @@
 #define __NRAM_dup3(a, b, c, d, e, f)                    (__fd_t)a, (__fd_t)b, (__oflag_t)c
 #define __NRAM_pipe2(a, b, c, d, e, f)                   (__fd_t *)a, (__oflag_t)b
 #define __NRAM_inotify_init1(a, b, c, d, e, f)           (int)a
-#define __NRAM_preadv(a, b, c, d, e, f)                  (__fd_t)a, (struct iovec32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
-#define __NRAM_pwritev(a, b, c, d, e, f)                 (__fd_t)a, (struct iovec32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
-#define __NRAM_rt_tgsigqueueinfo(a, b, c, d, e, f)       (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (struct __siginfo32_struct const *)d
+#define __NRAM_preadv(a, b, c, d, e, f)                  (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
+#define __NRAM_pwritev(a, b, c, d, e, f)                 (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
+#define __NRAM_rt_tgsigqueueinfo(a, b, c, d, e, f)       (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (struct __siginfox32_struct const *)d
 #define __NRAM_perf_event_open(a, b, c, d, e, f)         (int)a
 #define __NRAM_recvmmsg(a, b, c, d, e, f)                (__fd_t)a, (struct __mmsghdrx32 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx32 const *)e
 #define __NRAM_fanotify_init(a, b, c, d, e, f)           (int)a
@@ -2398,8 +2398,8 @@
 #define __NRAM_syncfs(a, b, c, d, e, f)                  (__fd_t)a
 #define __NRAM_sendmmsg(a, b, c, d, e, f)                (__fd_t)a, (struct __mmsghdrx32 *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_setns(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_ulong_t)b
-#define __NRAM_process_vm_readv(a, b, c, d, e, f)        (__pid_t)a, (struct iovec32 const *)b, (__size_t)c, (struct iovec32 const *)d, (__size_t)e, (__syscall_ulong_t)f
-#define __NRAM_process_vm_writev(a, b, c, d, e, f)       (__pid_t)a, (struct iovec32 const *)b, (__size_t)c, (struct iovec32 const *)d, (__size_t)e, (__syscall_ulong_t)f
+#define __NRAM_process_vm_readv(a, b, c, d, e, f)        (__pid_t)a, (struct __iovecx32 const *)b, (__size_t)c, (struct __iovecx32 const *)d, (__size_t)e, (__syscall_ulong_t)f
+#define __NRAM_process_vm_writev(a, b, c, d, e, f)       (__pid_t)a, (struct __iovecx32 const *)b, (__size_t)c, (struct __iovecx32 const *)d, (__size_t)e, (__syscall_ulong_t)f
 #define __NRAM_kcmp(a, b, c, d, e, f)                    (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAM_finit_module(a, b, c, d, e, f)            (int)a
 #define __NRAM_sched_setattr(a, b, c, d, e, f)           (int)a
@@ -2421,16 +2421,16 @@
 #define __NRAM_getsockname(a, b, c, d, e, f)             (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c
 #define __NRAM_getpeername(a, b, c, d, e, f)             (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c
 #define __NRAM_sendto(a, b, c, d, e, f)                  (__fd_t)a, (void const *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr const *)e, (__socklen_t)f
-#define __NRAM_sendmsg(a, b, c, d, e, f)                 (__fd_t)a, (struct msghdr32 const *)b, (__syscall_ulong_t)c
+#define __NRAM_sendmsg(a, b, c, d, e, f)                 (__fd_t)a, (struct __msghdrx32 const *)b, (__syscall_ulong_t)c
 #define __NRAM_recvfrom(a, b, c, d, e, f)                (__fd_t)a, (void *)b, (__size_t)c, (__syscall_ulong_t)d, (struct sockaddr *)e, (__socklen_t *)f
-#define __NRAM_recvmsg(a, b, c, d, e, f)                 (__fd_t)a, (struct msghdr32 *)b, (__syscall_ulong_t)c
+#define __NRAM_recvmsg(a, b, c, d, e, f)                 (__fd_t)a, (struct __msghdrx32 *)b, (__syscall_ulong_t)c
 #define __NRAM_shutdown(a, b, c, d, e, f)                (__fd_t)a, (__syscall_ulong_t)b
 #define __NRAM_userfaultfd(a, b, c, d, e, f)             (int)a
 #define __NRAM_membarrier(a, b, c, d, e, f)              (int)a
 #define __NRAM_mlock2(a, b, c, d, e, f)                  (int)a
 #define __NRAM_recvmmsg64(a, b, c, d, e, f)              (__fd_t)a, (struct __mmsghdrx32 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx32_64 const *)e
-#define __NRAM_pwritevf(a, b, c, d, e, f)                (__fd_t)a, (struct iovec32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
-#define __NRAM_preadvf(a, b, c, d, e, f)                 (__fd_t)a, (struct iovec32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
+#define __NRAM_pwritevf(a, b, c, d, e, f)                (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
+#define __NRAM_preadvf(a, b, c, d, e, f)                 (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NRAM_timerfd_gettime64(a, b, c, d, e, f)       (__fd_t)a, (struct __itimerspecx32_64 *)b
 #define __NRAM_timerfd_settime64(a, b, c, d, e, f)       (__fd_t)a, (__syscall_ulong_t)b, (struct __itimerspecx32_64 const *)c, (struct __itimerspecx32_64 *)d
 #define __NRAM_fallocate64(a, b, c, d, e, f)             (__fd_t)a, (__syscall_ulong_t)b, (__uint64_t)((__uint64_t)c | (__uint64_t)d << 32), (__uint64_t)((__uint64_t)e | (__uint64_t)f << 32)
@@ -2444,7 +2444,7 @@
 #define __NRAM_futimesat64(a, b, c, d, e, f)             (__fd_t)a, (__const char *)b, (struct __timevalx32_64 const *)c
 #define __NRAM_fmknodat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d, (__atflag_t)e
 #define __NRAM_fmkdirat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__mode_t)c, (__atflag_t)d
-#define __NRAM_waitid64(a, b, c, d, e, f)                (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo32_struct *)c, (__syscall_ulong_t)d, (struct __rusagex32_64 *)e
+#define __NRAM_waitid64(a, b, c, d, e, f)                (__syscall_ulong_t)a, (__id_t)b, (struct __siginfox32_struct *)c, (__syscall_ulong_t)d, (struct __rusagex32_64 *)e
 #define __NRAM_mq_timedreceive64(a, b, c, d, e, f)       (__fd_t)a, (char *)b, (__size_t)c, (__uint32_t *)d, (struct __timespecx32_64 const *)e
 #define __NRAM_mq_timedsend64(a, b, c, d, e, f)          (__fd_t)a, (char const *)b, (__size_t)c, (__uint32_t)d, (struct __timespecx32_64 const *)e
 #define __NRAM_utimes64(a, b, c, d, e, f)                (char const *)a, (struct __timevalx32_64 const *)b
@@ -2460,13 +2460,13 @@
 #define __NRAM_kstat(a, b, c, d, e, f)                   (char const *)a, (struct __kos_statx32 *)b
 #define __NRAM_pwrite64f(a, b, c, d, e, f)               (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NRAM_pread64f(a, b, c, d, e, f)                (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
-#define __NRAM_rt_sigtimedwait64(a, b, c, d, e, f)       (struct __sigset_struct const *)a, (struct __siginfo32_struct *)b, (struct __timespecx32_64 const *)c, (__size_t)d
+#define __NRAM_rt_sigtimedwait64(a, b, c, d, e, f)       (struct __sigset_struct const *)a, (struct __siginfox32_struct *)b, (struct __timespecx32_64 const *)c, (__size_t)d
 #define __NRAM_nanosleep64(a, b, c, d, e, f)             (struct __timespecx32_64 const *)a, (struct __timespecx32_64 *)b
 #define __NRAM_sched_rr_get_interval64(a, b, c, d, e, f) (__pid_t)a, (struct __timespecx32_64 *)b
 #define __NRAM_rpc_service(a, b, c, d, e, f)             /* nothing */
 #define __NRAM_ksysctl(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (void *)b
-#define __NRAM_writevf(a, b, c, d, e, f)                 (__fd_t)a, (struct iovec32 const *)b, (__size_t)c, (__iomode_t)d
-#define __NRAM_readvf(a, b, c, d, e, f)                  (__fd_t)a, (struct iovec32 const *)b, (__size_t)c, (__iomode_t)d
+#define __NRAM_writevf(a, b, c, d, e, f)                 (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__iomode_t)d
+#define __NRAM_readvf(a, b, c, d, e, f)                  (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__iomode_t)d
 #define __NRAM_kreaddir(a, b, c, d, e, f)                (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_wait4_64(a, b, c, d, e, f)                (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusagex32_64 *)d
 #define __NRAM_getitimer64(a, b, c, d, e, f)             (__syscall_ulong_t)a, (struct __itimervalx32_64 *)b
@@ -2479,11 +2479,11 @@
 #define __NRAM_fsmode(a, b, c, d, e, f)                  (__uint64_t)((__uint64_t)a | (__uint64_t)b << 32)
 #define __NRAM_ioctlf(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
 #define __NRAM_ftime64(a, b, c, d, e, f)                 (struct __timebx32_64 *)a
-#define __NRAM_utime64(a, b, c, d, e, f)                 (char const *)a, (struct utimbufx32_64 const *)b
+#define __NRAM_utime64(a, b, c, d, e, f)                 (char const *)a, (struct __utimbufx32_64 const *)b
 #define __NRAM_process_spawnveat(a, b, c, d, e, f)       (__fd_t)a, (char const *)b, (__HYBRID_PTR32(char const) const *)c, (__HYBRID_PTR32(char const) const *)d, (__atflag_t)e, (struct spawn_actionsx32 const *)f
 #define __NRAM_stime64(a, b, c, d, e, f)                 (__time64_t const *)a
 #define __NRAM_coredump(a, b, c, d, e, f)                (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void) const *)c, (__size_t)d, (struct exception_data32 const *)e, (__syscall_ulong_t)f
-#define __NRAM_raiseat(a, b, c, d, e, f)                 (struct ucpustate32 const *)a, (struct __siginfo32_struct const *)b
+#define __NRAM_raiseat(a, b, c, d, e, f)                 (struct ucpustate32 const *)a, (struct __siginfox32_struct const *)b
 #define __NRAM_mktty(a, b, c, d, e, f)                   (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
 #define __NRAM_lfutexlockexpr(a, b, c, d, e, f)          (__uint32_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx32 const *)d, (struct __timespecx32_64 const *)e, (__syscall_ulong_t)f
 #define __NRAM_lfutexexpr(a, b, c, d, e, f)              (void *)a, (__size_t)b, (struct lfutexexprx32 const *)c, (struct __timespecx32_64 const *)d, (__syscall_ulong_t)e

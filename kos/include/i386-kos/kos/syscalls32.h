@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac089aff */
+/* HASH CRC-32:0xff4d7cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@
 #include <bits/sigaction-struct.h>
 #include <bits/sigaction-struct32.h>
 #include <bits/siginfo-struct32.h>
+#include <bits/sigstack32.h>
 #include <bits/stat-kos32.h>
 #include <bits/statfs32.h>
 #include <bits/timeb32.h>
@@ -93,15 +94,19 @@ __SYSDECL_BEGIN
 
 struct __cpu_set_struct;
 struct __fd_set_struct;
+struct __iovecx32;
 struct __itimerspecx32;
 struct __itimerspecx32_64;
 struct __itimervalx32;
 struct __itimervalx32_64;
 struct __kos_statx32;
 struct __mmsghdrx32;
+struct __msghdrx32;
 struct __rusagex32;
 struct __rusagex32_64;
-struct __siginfo32_struct;
+struct __sigactionx32;
+struct __sigaltstackx32;
+struct __siginfox32_struct;
 struct __sigset_struct;
 struct __statfsx32;
 struct __statfsx32_64;
@@ -111,6 +116,8 @@ struct __timespecx32;
 struct __timespecx32_64;
 struct __timevalx32;
 struct __timevalx32_64;
+struct __utimbufx32;
+struct __utimbufx32_64;
 struct debugtrap_reason32;
 struct dirent;
 struct elf32_phdr;
@@ -120,7 +127,6 @@ struct file_handle;
 struct fpustate;
 struct fpustate32;
 struct getcpu_cache;
-struct iovec32;
 struct lfutexexprx32;
 struct library_listdef32;
 struct linux_dirent;
@@ -131,7 +137,6 @@ struct linux_olduname;
 struct linux_statx32;
 struct linux_statx32_64;
 struct mq_attr;
-struct msghdr32;
 struct old_linux_dirent;
 struct pollfd;
 struct rlimit;
@@ -139,8 +144,6 @@ struct rlimit64;
 struct rpc_syscall_info;
 struct rpc_syscall_info32;
 struct sched_param;
-struct sigaction32;
-struct sigaltstack32;
 struct sigevent;
 struct sockaddr;
 struct spawn_actionsx32;
@@ -151,8 +154,6 @@ struct tms;
 struct ucpustate;
 struct ucpustate32;
 struct ustat;
-struct utimbufx32;
-struct utimbufx32_64;
 struct utsname;
 struct winsize;
 
@@ -1193,10 +1194,10 @@ __CDECLARE_SC(,__ssize_t,pread64,(__fd_t __fd, void *__buf, __size_t __bufsize, 
 __CDECLARE_SC(,__ssize_t,pread64f,(__fd_t __fd, void *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_SC(pread64f) */
 #if __CRT_HAVE_SC(preadv)
-__CDECLARE_SC(,__ssize_t,preadv,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
+__CDECLARE_SC(,__ssize_t,preadv,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_SC(preadv) */
 #if __CRT_HAVE_SC(preadvf)
-__CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
+__CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_SC(preadvf) */
 #if __CRT_HAVE_SC(prlimit64)
 /* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
@@ -1207,10 +1208,10 @@ __CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource,
 __CDECLARE_SC(,__errno_t,process_spawnveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR32(char const) const *__argv, __HYBRID_PTR32(char const) const *__envp, __atflag_t __flags, struct spawn_actionsx32 const *__actions),(__dirfd,__pathname,__argv,__envp,__flags,__actions))
 #endif /* __CRT_HAVE_SC(process_spawnveat) */
 #if __CRT_HAVE_SC(process_vm_readv)
-__CDECLARE_SC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec32 const *__local_iov, __size_t __liovcnt, struct iovec32 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
+__CDECLARE_SC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct __iovecx32 const *__local_iov, __size_t __liovcnt, struct __iovecx32 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_SC(process_vm_readv) */
 #if __CRT_HAVE_SC(process_vm_writev)
-__CDECLARE_SC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct iovec32 const *__local_iov, __size_t __liovcnt, struct iovec32 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
+__CDECLARE_SC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct __iovecx32 const *__local_iov, __size_t __liovcnt, struct __iovecx32 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_SC(process_vm_writev) */
 #if __CRT_HAVE_SC(prof)
 __CDECLARE_SC(,__errno_t,prof,(void),())
@@ -1237,10 +1238,10 @@ __CDECLARE_SC(,__ssize_t,pwrite64,(__fd_t __fd, void const *__buf, __size_t __bu
 __CDECLARE_SC(,__ssize_t,pwrite64f,(__fd_t __fd, void const *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_SC(pwrite64f) */
 #if __CRT_HAVE_SC(pwritev)
-__CDECLARE_SC(,__ssize_t,pwritev,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
+__CDECLARE_SC(,__ssize_t,pwritev,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_SC(pwritev) */
 #if __CRT_HAVE_SC(pwritevf)
-__CDECLARE_SC(,__ssize_t,pwritevf,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
+__CDECLARE_SC(,__ssize_t,pwritevf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_SC(pwritevf) */
 #if __CRT_HAVE_SC(query_module)
 __CDECLARE_SC(,__errno_t,query_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -1257,7 +1258,7 @@ __CDECLARE_SC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-__CDECLARE_SC(,__errno_t,raiseat,(struct ucpustate32 const *__state, struct __siginfo32_struct const *__si),(__state,__si))
+__CDECLARE_SC(,__errno_t,raiseat,(struct ucpustate32 const *__state, struct __siginfox32_struct const *__si),(__state,__si))
 #endif /* __CRT_HAVE_SC(raiseat) */
 #if __CRT_HAVE_SC(read)
 __CDECLARE_SC(,__ssize_t,read,(__fd_t __fd, void *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
@@ -1279,10 +1280,10 @@ __CDECLARE_SC(,__ssize_t,readlink,(char const *__path, char *__buf, __size_t __b
 __CDECLARE_SC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *__buf, __size_t __buflen),(__dirfd,__path,__buf,__buflen))
 #endif /* __CRT_HAVE_SC(readlinkat) */
 #if __CRT_HAVE_SC(readv)
-__CDECLARE_SC(,__ssize_t,readv,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count),(__fd,__iovec,__count))
+__CDECLARE_SC(,__ssize_t,readv,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count),(__fd,__iovec,__count))
 #endif /* __CRT_HAVE_SC(readv) */
 #if __CRT_HAVE_SC(readvf)
-__CDECLARE_SC(,__ssize_t,readvf,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
+__CDECLARE_SC(,__ssize_t,readvf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
 #endif /* __CRT_HAVE_SC(readvf) */
 #if __CRT_HAVE_SC(reboot)
 /* @param: how: One of the `RB_*' constants from <sys/reboot.h> */
@@ -1303,7 +1304,7 @@ __CDECLARE_SC(,__ssize_t,recvmmsg64,(__fd_t __sockfd, struct __mmsghdrx32 *__vme
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-__CDECLARE_SC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr32 *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
+__CDECLARE_SC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct __msghdrx32 *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_SC(recvmsg) */
 #if __CRT_HAVE_SC(remap_file_pages)
 __CDECLARE_SC(,__errno_t,remap_file_pages,(void *__start, __size_t __size, __syscall_ulong_t __prot, __size_t __pgoff, __syscall_ulong_t __flags),(__start,__size,__prot,__pgoff,__flags))
@@ -1347,7 +1348,7 @@ __CDECLARE_SC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong
 __CDECLARE_SC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_SC(rpc_service) */
 #if __CRT_HAVE_SC(rt_sigaction)
-__CDECLARE_SC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct sigaction32 const *__act, struct sigaction32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_SC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct __sigactionx32 const *__act, struct __sigactionx32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigaction) */
 #if __CRT_HAVE_SC(rt_sigpending)
 __CDECLARE_SC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -1358,7 +1359,7 @@ __CDECLARE_SC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigse
 #endif /* __CRT_HAVE_SC(rt_sigprocmask) */
 #if __CRT_HAVE_SC(rt_sigqueueinfo)
 /* @param: signo: One of `SIG*' */
-__CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __syscall_ulong_t __signo, struct __siginfo32_struct const *__uinfo),(__tgid,__signo,__uinfo))
+__CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __syscall_ulong_t __signo, struct __siginfox32_struct const *__uinfo),(__tgid,__signo,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
 #if __CRT_HAVE_SC(rt_sigreturn)
 __CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate const *__restore_fpu, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info *__sc_info, struct ucpustate const *__restore_cpu),(__restore_fpu,__restore_sigmask,__sc_info,__restore_cpu))
@@ -1367,14 +1368,14 @@ __CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate const *__restore_fpu, struct _
 __CDECLARE_SC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __size_t __sigsetsize),(__set,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigsuspend) */
 #if __CRT_HAVE_SC(rt_sigtimedwait)
-__CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfo32_struct *__info, struct __timespecx32 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
+__CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfox32_struct *__info, struct __timespecx32 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigtimedwait) */
 #if __CRT_HAVE_SC(rt_sigtimedwait64)
-__CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait64,(struct __sigset_struct const *__set, struct __siginfo32_struct *__info, struct __timespecx32_64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
+__CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait64,(struct __sigset_struct const *__set, struct __siginfox32_struct *__info, struct __timespecx32_64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigtimedwait64) */
 #if __CRT_HAVE_SC(rt_tgsigqueueinfo)
 /* @param: signo: One of `SIG*' */
-__CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo, struct __siginfo32_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
+__CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo, struct __siginfox32_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_SC(sched_get_priority_max)
 __CDECLARE_SC(,__syscall_slong_t,sched_get_priority_max,(__syscall_ulong_t __algorithm),(__algorithm))
@@ -1436,7 +1437,7 @@ __CDECLARE_SC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmess
 #if __CRT_HAVE_SC(sendmsg)
 /* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-__CDECLARE_SC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct msghdr32 const *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
+__CDECLARE_SC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct __msghdrx32 const *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_SC(sendmsg) */
 #if __CRT_HAVE_SC(sendto)
 /* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
@@ -1574,10 +1575,10 @@ __CDECLARE_SC(,__syscall_ulong_t,sgetmask,(void),())
 __CDECLARE_SC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_SC(shutdown) */
 #if __CRT_HAVE_SC(sigaction)
-__CDECLARE_SC(,__errno_t,sigaction,(__syscall_ulong_t __signo, struct sigaction32 const *__act, struct sigaction32 *__oact),(__signo,__act,__oact))
+__CDECLARE_SC(,__errno_t,sigaction,(__syscall_ulong_t __signo, struct __sigactionx32 const *__act, struct __sigactionx32 *__oact),(__signo,__act,__oact))
 #endif /* __CRT_HAVE_SC(sigaction) */
 #if __CRT_HAVE_SC(sigaltstack)
-__CDECLARE_SC(,__errno_t,sigaltstack,(struct sigaltstack32 const *__ss, struct sigaltstack32 *__oss),(__ss,__oss))
+__CDECLARE_SC(,__errno_t,sigaltstack,(struct __sigaltstackx32 const *__ss, struct __sigaltstackx32 *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_SC(sigaltstack) */
 #if __CRT_HAVE_SC(signal)
 /* @param: signo: One of `SIG*' */
@@ -1793,10 +1794,10 @@ __CDECLARE_SC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_SC(ustat) */
 #if __CRT_HAVE_SC(utime)
-__CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct utimbufx32 const *__times),(__filename,__times))
+__CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct __utimbufx32 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utime) */
 #if __CRT_HAVE_SC(utime64)
-__CDECLARE_SC(,__errno_t,utime64,(char const *__filename, struct utimbufx32_64 const *__times),(__filename,__times))
+__CDECLARE_SC(,__errno_t,utime64,(char const *__filename, struct __utimbufx32_64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utime64) */
 #if __CRT_HAVE_SC(utimensat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
@@ -1825,7 +1826,7 @@ __CDECLARE_SC(,__errno_t,vm86,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,vm86old,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(vm86old) */
 #if __CRT_HAVE_SC(vmsplice)
-__CDECLARE_SC(,__ssize_t,vmsplice,(__fd_t __fdout, struct iovec32 const *__iov, __size_t __count, __syscall_ulong_t __flags),(__fdout,__iov,__count,__flags))
+__CDECLARE_SC(,__ssize_t,vmsplice,(__fd_t __fdout, struct __iovecx32 const *__iov, __size_t __count, __syscall_ulong_t __flags),(__fdout,__iov,__count,__flags))
 #endif /* __CRT_HAVE_SC(vmsplice) */
 #if __CRT_HAVE_SC(vserver)
 __CDECLARE_SC(,__errno_t,vserver,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -1842,11 +1843,11 @@ __CDECLARE_SC(,__pid_t,wait4_64,(__pid_t __pid, __int32_t *__stat_loc, __syscall
 #endif /* __CRT_HAVE_SC(wait4_64) */
 #if __CRT_HAVE_SC(waitid)
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-__CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32 *__ru),(__idtype,__id,__infop,__options,__ru))
+__CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfox32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_SC(waitid) */
 #if __CRT_HAVE_SC(waitid64)
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-__CDECLARE_SC(,__errno_t,waitid64,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32_64 *__ru),(__idtype,__id,__infop,__options,__ru))
+__CDECLARE_SC(,__errno_t,waitid64,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfox32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32_64 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_SC(waitid64) */
 #if __CRT_HAVE_SC(waitpid)
 /* Wait for a child process:
@@ -1864,10 +1865,10 @@ __CDECLARE_SC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufsi
 __CDECLARE_SC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __bufsize, __iomode_t __mode),(__fd,__buf,__bufsize,__mode))
 #endif /* __CRT_HAVE_SC(writef) */
 #if __CRT_HAVE_SC(writev)
-__CDECLARE_SC(,__ssize_t,writev,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count),(__fd,__iovec,__count))
+__CDECLARE_SC(,__ssize_t,writev,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count),(__fd,__iovec,__count))
 #endif /* __CRT_HAVE_SC(writev) */
 #if __CRT_HAVE_SC(writevf)
-__CDECLARE_SC(,__ssize_t,writevf,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
+__CDECLARE_SC(,__ssize_t,writevf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
 #endif /* __CRT_HAVE_SC(writevf) */
 #if __CRT_HAVE_XSC(_llseek)
 __CDECLARE_XSC(,__errno_t,_llseek,(__fd_t __fd, __int64_t __offset, __uint64_t *__result, __syscall_ulong_t __whence),(__fd,__offset,__result,__whence))
@@ -2906,10 +2907,10 @@ __CDECLARE_XSC(,__ssize_t,pread64,(__fd_t __fd, void *__buf, __size_t __bufsize,
 __CDECLARE_XSC(,__ssize_t,pread64f,(__fd_t __fd, void *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(pread64f) */
 #if __CRT_HAVE_XSC(preadv)
-__CDECLARE_XSC(,__ssize_t,preadv,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
+__CDECLARE_XSC(,__ssize_t,preadv,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_XSC(preadv) */
 #if __CRT_HAVE_XSC(preadvf)
-__CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
+__CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(preadvf) */
 #if __CRT_HAVE_XSC(prlimit64)
 /* @param: resource: One of `RLIMIT_*' from <bits/resource.h> */
@@ -2920,10 +2921,10 @@ __CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource
 __CDECLARE_XSC(,__errno_t,process_spawnveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR32(char const) const *__argv, __HYBRID_PTR32(char const) const *__envp, __atflag_t __flags, struct spawn_actionsx32 const *__actions),(__dirfd,__pathname,__argv,__envp,__flags,__actions))
 #endif /* __CRT_HAVE_XSC(process_spawnveat) */
 #if __CRT_HAVE_XSC(process_vm_readv)
-__CDECLARE_XSC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct iovec32 const *__local_iov, __size_t __liovcnt, struct iovec32 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
+__CDECLARE_XSC(,__ssize_t,process_vm_readv,(__pid_t __pid, struct __iovecx32 const *__local_iov, __size_t __liovcnt, struct __iovecx32 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_XSC(process_vm_readv) */
 #if __CRT_HAVE_XSC(process_vm_writev)
-__CDECLARE_XSC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct iovec32 const *__local_iov, __size_t __liovcnt, struct iovec32 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
+__CDECLARE_XSC(,__ssize_t,process_vm_writev,(__pid_t __pid, struct __iovecx32 const *__local_iov, __size_t __liovcnt, struct __iovecx32 const *__remote_iov, __size_t __riovcnt, __syscall_ulong_t __flags),(__pid,__local_iov,__liovcnt,__remote_iov,__riovcnt,__flags))
 #endif /* __CRT_HAVE_XSC(process_vm_writev) */
 #if __CRT_HAVE_XSC(prof)
 __CDECLARE_XSC(,__errno_t,prof,(void),())
@@ -2950,10 +2951,10 @@ __CDECLARE_XSC(,__ssize_t,pwrite64,(__fd_t __fd, void const *__buf, __size_t __b
 __CDECLARE_XSC(,__ssize_t,pwrite64f,(__fd_t __fd, void const *__buf, __size_t __bufsize, __uint64_t __offset, __iomode_t __mode),(__fd,__buf,__bufsize,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(pwrite64f) */
 #if __CRT_HAVE_XSC(pwritev)
-__CDECLARE_XSC(,__ssize_t,pwritev,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
+__CDECLARE_XSC(,__ssize_t,pwritev,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_XSC(pwritev) */
 #if __CRT_HAVE_XSC(pwritevf)
-__CDECLARE_XSC(,__ssize_t,pwritevf,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
+__CDECLARE_XSC(,__ssize_t,pwritevf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(pwritevf) */
 #if __CRT_HAVE_XSC(query_module)
 __CDECLARE_XSC(,__errno_t,query_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -2970,7 +2971,7 @@ __CDECLARE_XSC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-__CDECLARE_XSC(,__errno_t,raiseat,(struct ucpustate32 const *__state, struct __siginfo32_struct const *__si),(__state,__si))
+__CDECLARE_XSC(,__errno_t,raiseat,(struct ucpustate32 const *__state, struct __siginfox32_struct const *__si),(__state,__si))
 #endif /* __CRT_HAVE_XSC(raiseat) */
 #if __CRT_HAVE_XSC(read)
 __CDECLARE_XSC(,__ssize_t,read,(__fd_t __fd, void *__buf, __size_t __bufsize),(__fd,__buf,__bufsize))
@@ -2992,10 +2993,10 @@ __CDECLARE_XSC(,__ssize_t,readlink,(char const *__path, char *__buf, __size_t __
 __CDECLARE_XSC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *__buf, __size_t __buflen),(__dirfd,__path,__buf,__buflen))
 #endif /* __CRT_HAVE_XSC(readlinkat) */
 #if __CRT_HAVE_XSC(readv)
-__CDECLARE_XSC(,__ssize_t,readv,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count),(__fd,__iovec,__count))
+__CDECLARE_XSC(,__ssize_t,readv,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count),(__fd,__iovec,__count))
 #endif /* __CRT_HAVE_XSC(readv) */
 #if __CRT_HAVE_XSC(readvf)
-__CDECLARE_XSC(,__ssize_t,readvf,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
+__CDECLARE_XSC(,__ssize_t,readvf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
 #endif /* __CRT_HAVE_XSC(readvf) */
 #if __CRT_HAVE_XSC(reboot)
 /* @param: how: One of the `RB_*' constants from <sys/reboot.h> */
@@ -3016,7 +3017,7 @@ __CDECLARE_XSC(,__ssize_t,recvmmsg64,(__fd_t __sockfd, struct __mmsghdrx32 *__vm
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-__CDECLARE_XSC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct msghdr32 *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
+__CDECLARE_XSC(,__ssize_t,recvmsg,(__fd_t __sockfd, struct __msghdrx32 *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_XSC(recvmsg) */
 #if __CRT_HAVE_XSC(remap_file_pages)
 __CDECLARE_XSC(,__errno_t,remap_file_pages,(void *__start, __size_t __size, __syscall_ulong_t __prot, __size_t __pgoff, __syscall_ulong_t __flags),(__start,__size,__prot,__pgoff,__flags))
@@ -3060,7 +3061,7 @@ __CDECLARE_XSC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulon
 __CDECLARE_XSC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_XSC(rpc_service) */
 #if __CRT_HAVE_XSC(rt_sigaction)
-__CDECLARE_XSC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct sigaction32 const *__act, struct sigaction32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
+__CDECLARE_XSC(,__errno_t,rt_sigaction,(__syscall_ulong_t __signo, struct __sigactionx32 const *__act, struct __sigactionx32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigaction) */
 #if __CRT_HAVE_XSC(rt_sigpending)
 __CDECLARE_XSC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -3071,20 +3072,20 @@ __CDECLARE_XSC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigs
 #endif /* __CRT_HAVE_XSC(rt_sigprocmask) */
 #if __CRT_HAVE_XSC(rt_sigqueueinfo)
 /* @param: signo: One of `SIG*' */
-__CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __syscall_ulong_t __signo, struct __siginfo32_struct const *__uinfo),(__tgid,__signo,__uinfo))
+__CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __syscall_ulong_t __signo, struct __siginfox32_struct const *__uinfo),(__tgid,__signo,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_sigqueueinfo) */
 #if __CRT_HAVE_XSC(rt_sigsuspend)
 __CDECLARE_XSC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __size_t __sigsetsize),(__set,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigsuspend) */
 #if __CRT_HAVE_XSC(rt_sigtimedwait)
-__CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfo32_struct *__info, struct __timespecx32 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
+__CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfox32_struct *__info, struct __timespecx32 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigtimedwait) */
 #if __CRT_HAVE_XSC(rt_sigtimedwait64)
-__CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait64,(struct __sigset_struct const *__set, struct __siginfo32_struct *__info, struct __timespecx32_64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
+__CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait64,(struct __sigset_struct const *__set, struct __siginfox32_struct *__info, struct __timespecx32_64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigtimedwait64) */
 #if __CRT_HAVE_XSC(rt_tgsigqueueinfo)
 /* @param: signo: One of `SIG*' */
-__CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo, struct __siginfo32_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
+__CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __syscall_ulong_t __signo, struct __siginfox32_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_XSC(sched_get_priority_max)
 __CDECLARE_XSC(,__syscall_slong_t,sched_get_priority_max,(__syscall_ulong_t __algorithm),(__algorithm))
@@ -3146,7 +3147,7 @@ __CDECLARE_XSC(,__ssize_t,sendmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmes
 #if __CRT_HAVE_XSC(sendmsg)
 /* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-__CDECLARE_XSC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct msghdr32 const *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
+__CDECLARE_XSC(,__ssize_t,sendmsg,(__fd_t __sockfd, struct __msghdrx32 const *__message, __syscall_ulong_t __msg_flags),(__sockfd,__message,__msg_flags))
 #endif /* __CRT_HAVE_XSC(sendmsg) */
 #if __CRT_HAVE_XSC(sendto)
 /* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
@@ -3284,10 +3285,10 @@ __CDECLARE_XSC(,__syscall_ulong_t,sgetmask,(void),())
 __CDECLARE_XSC(,__errno_t,shutdown,(__fd_t __sockfd, __syscall_ulong_t __how),(__sockfd,__how))
 #endif /* __CRT_HAVE_XSC(shutdown) */
 #if __CRT_HAVE_XSC(sigaction)
-__CDECLARE_XSC(,__errno_t,sigaction,(__syscall_ulong_t __signo, struct sigaction32 const *__act, struct sigaction32 *__oact),(__signo,__act,__oact))
+__CDECLARE_XSC(,__errno_t,sigaction,(__syscall_ulong_t __signo, struct __sigactionx32 const *__act, struct __sigactionx32 *__oact),(__signo,__act,__oact))
 #endif /* __CRT_HAVE_XSC(sigaction) */
 #if __CRT_HAVE_XSC(sigaltstack)
-__CDECLARE_XSC(,__errno_t,sigaltstack,(struct sigaltstack32 const *__ss, struct sigaltstack32 *__oss),(__ss,__oss))
+__CDECLARE_XSC(,__errno_t,sigaltstack,(struct __sigaltstackx32 const *__ss, struct __sigaltstackx32 *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_XSC(sigaltstack) */
 #if __CRT_HAVE_XSC(signal)
 /* @param: signo: One of `SIG*' */
@@ -3494,10 +3495,10 @@ __CDECLARE_XSC(,__errno_t,userfaultfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_XSC(ustat) */
 #if __CRT_HAVE_XSC(utime)
-__CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct utimbufx32 const *__times),(__filename,__times))
+__CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct __utimbufx32 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utime) */
 #if __CRT_HAVE_XSC(utime64)
-__CDECLARE_XSC(,__errno_t,utime64,(char const *__filename, struct utimbufx32_64 const *__times),(__filename,__times))
+__CDECLARE_XSC(,__errno_t,utime64,(char const *__filename, struct __utimbufx32_64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utime64) */
 #if __CRT_HAVE_XSC(utimensat)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
@@ -3526,7 +3527,7 @@ __CDECLARE_XSC(,__errno_t,vm86,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,vm86old,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(vm86old) */
 #if __CRT_HAVE_XSC(vmsplice)
-__CDECLARE_XSC(,__ssize_t,vmsplice,(__fd_t __fdout, struct iovec32 const *__iov, __size_t __count, __syscall_ulong_t __flags),(__fdout,__iov,__count,__flags))
+__CDECLARE_XSC(,__ssize_t,vmsplice,(__fd_t __fdout, struct __iovecx32 const *__iov, __size_t __count, __syscall_ulong_t __flags),(__fdout,__iov,__count,__flags))
 #endif /* __CRT_HAVE_XSC(vmsplice) */
 #if __CRT_HAVE_XSC(vserver)
 __CDECLARE_XSC(,__errno_t,vserver,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -3543,11 +3544,11 @@ __CDECLARE_XSC(,__pid_t,wait4_64,(__pid_t __pid, __int32_t *__stat_loc, __syscal
 #endif /* __CRT_HAVE_XSC(wait4_64) */
 #if __CRT_HAVE_XSC(waitid)
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-__CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32 *__ru),(__idtype,__id,__infop,__options,__ru))
+__CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfox32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_XSC(waitid) */
 #if __CRT_HAVE_XSC(waitid64)
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-__CDECLARE_XSC(,__errno_t,waitid64,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32_64 *__ru),(__idtype,__id,__infop,__options,__ru))
+__CDECLARE_XSC(,__errno_t,waitid64,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfox32_struct *__infop, __syscall_ulong_t __options, struct __rusagex32_64 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_XSC(waitid64) */
 #if __CRT_HAVE_XSC(waitpid)
 /* Wait for a child process:
@@ -3565,10 +3566,10 @@ __CDECLARE_XSC(,__ssize_t,write,(__fd_t __fd, void const *__buf, __size_t __bufs
 __CDECLARE_XSC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __bufsize, __iomode_t __mode),(__fd,__buf,__bufsize,__mode))
 #endif /* __CRT_HAVE_XSC(writef) */
 #if __CRT_HAVE_XSC(writev)
-__CDECLARE_XSC(,__ssize_t,writev,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count),(__fd,__iovec,__count))
+__CDECLARE_XSC(,__ssize_t,writev,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count),(__fd,__iovec,__count))
 #endif /* __CRT_HAVE_XSC(writev) */
 #if __CRT_HAVE_XSC(writevf)
-__CDECLARE_XSC(,__ssize_t,writevf,(__fd_t __fd, struct iovec32 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
+__CDECLARE_XSC(,__ssize_t,writevf,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __iomode_t __mode),(__fd,__iovec,__count,__mode))
 #endif /* __CRT_HAVE_XSC(writevf) */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO

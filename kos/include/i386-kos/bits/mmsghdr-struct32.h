@@ -50,8 +50,8 @@ __DECL_BEGIN
 #ifdef __CC__
 /* For `recvmmsg' and `sendmmsg'. */
 struct __mmsghdrx32 /*[NAME(mmsghdrx32)][PREFIX(msg_)]*/ {
-	struct msghdr32 msg_hdr; /* Actual message header. */
-	__UINT32_TYPE__ msg_len; /* Number of received or sent bytes for the entry. */
+	struct __msghdrx32 msg_hdr; /* Actual message header. */
+	__UINT32_TYPE__    msg_len; /* Number of received or sent bytes for the entry. */
 };
 #endif /* __CC__ */
 

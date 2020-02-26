@@ -28,21 +28,21 @@
 #include <hybrid/host.h>      /* __x86_64__ */
 #include <hybrid/typecore.h>  /* __INT32_TYPE__ */
 
-#include <bits/sigval32.h> /* union sigval32 */
+#include <bits/sigval32.h> /* union __sigvalx32 */
 
 #if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__)
 #define __sigevent_t_defined 1
-#define sigevent32                          sigevent
-#define sigevent32_t                        sigevent_t
-#define __SIGEV_MAX_SIZE                    __SIGEV32_MAX_SIZE
-#define __OFFSET_SIGEVENT_VALUE             __OFFSET_SIGEVENT32_VALUE
-#define __OFFSET_SIGEVENT_SIGNO             __OFFSET_SIGEVENT32_SIGNO
-#define __OFFSET_SIGEVENT_NOTIFY            __OFFSET_SIGEVENT32_NOTIFY
-#define __OFFSET_SIGEVENT_DATA              __OFFSET_SIGEVENT32_DATA
-#define __OFFSET_SIGEVENT_TID               __OFFSET_SIGEVENT32_TID
-#define __OFFSET_SIGEVENT_NOTIFY_FUNCTION   __OFFSET_SIGEVENT32_NOTIFY_FUNCTION
-#define __OFFSET_SIGEVENT_NOTIFY_ATTRIBUTES __OFFSET_SIGEVENT32_NOTIFY_ATTRIBUTES
-#define __SIZEOF_SIGEVENT                   __SIZEOF_SIGEVENT32
+#define __sigeventx32                       sigevent
+#define __sigeventx32_t                     sigevent_t
+#define __SIGEV_MAX_SIZE                    __SIGEVX32_MAX_SIZE
+#define __OFFSET_SIGEVENT_VALUE             __OFFSET_SIGEVENTX32_VALUE
+#define __OFFSET_SIGEVENT_SIGNO             __OFFSET_SIGEVENTX32_SIGNO
+#define __OFFSET_SIGEVENT_NOTIFY            __OFFSET_SIGEVENTX32_NOTIFY
+#define __OFFSET_SIGEVENT_DATA              __OFFSET_SIGEVENTX32_DATA
+#define __OFFSET_SIGEVENT_TID               __OFFSET_SIGEVENTX32_TID
+#define __OFFSET_SIGEVENT_NOTIFY_FUNCTION   __OFFSET_SIGEVENTX32_NOTIFY_FUNCTION
+#define __OFFSET_SIGEVENT_NOTIFY_ATTRIBUTES __OFFSET_SIGEVENTX32_NOTIFY_ATTRIBUTES
+#define __SIZEOF_SIGEVENT                   __SIZEOF_SIGEVENTX32
 #endif /* !__CRT_CYG_PRIMARY && !__x86_64__ */
 
 
@@ -56,58 +56,63 @@ typedef union pthread_attr_t pthread_attr_t;
 #endif /* __CC__ */
 
 #ifdef __KERNEL__
-#define __SIGEV32_MAX_SIZE    20
+#define __SIGEVX32_MAX_SIZE 20
 #else /* __KERNEL__ */
-#define __SIGEV32_MAX_SIZE    64
+#define __SIGEVX32_MAX_SIZE 64
 #endif /* !__KERNEL__ */
-#define __OFFSET_SIGEVENT32_VALUE             0
-#define __OFFSET_SIGEVENT32_SIGNO             4
-#define __OFFSET_SIGEVENT32_NOTIFY            8
-#define __OFFSET_SIGEVENT32_DATA              12 /* [FIELD(_sigev_data, _sigev_un._data)] */
-#define __OFFSET_SIGEVENT32_TID               12 /* [FIELD(_sigev_tid, _sigev_un._tid)] */
-#define __OFFSET_SIGEVENT32_NOTIFY_FUNCTION   12 /* [FIELD(sigev_notify_function, _sigev_un._sigev_thread._function)] */
-#define __OFFSET_SIGEVENT32_NOTIFY_ATTRIBUTES 16 /* [FIELD(sigev_notify_attributes, _sigev_un._sigev_thread._attribute)] */
-#define __SIZEOF_SIGEVENT32   __SIGEV32_MAX_SIZE
+#define __OFFSET_SIGEVENTX32_VALUE             0
+#define __OFFSET_SIGEVENTX32_SIGNO             4
+#define __OFFSET_SIGEVENTX32_NOTIFY            8
+#define __OFFSET_SIGEVENTX32_DATA              12 /* [FIELD(_sigev_data, _sigev_un._data)] */
+#define __OFFSET_SIGEVENTX32_TID               12 /* [FIELD(_sigev_tid, _sigev_un._tid)] */
+#define __OFFSET_SIGEVENTX32_NOTIFY_FUNCTION   12 /* [FIELD(sigev_notify_function, _sigev_un._sigev_thread._function)] */
+#define __OFFSET_SIGEVENTX32_NOTIFY_ATTRIBUTES 16 /* [FIELD(sigev_notify_attributes, _sigev_un._sigev_thread._attribute)] */
+#define __SIZEOF_SIGEVENTX32 __SIGEVX32_MAX_SIZE
 
 #ifdef __CC__
-typedef struct sigevent32 /*[PREFIX(sigev_)]*/ { /* TODO: Rename to sigeventx32 */
-	union sigval32 sigev_value;
-	__INT32_TYPE__ sigev_signo;
-	__INT32_TYPE__ sigev_notify;
+#ifdef __USE_KOS_KERNEL
+#define sigeventx32   __sigeventx32
+#define sigeventx32_t __sigeventx32_t
+#endif /* __USE_KOS_KERNEL */
+
+typedef struct __sigeventx32 /*[NAME(sigeventx32)][PREFIX(sigev_)]*/ {
+	union __sigvalx32 sigev_value;
+	__INT32_TYPE__    sigev_signo;
+	__INT32_TYPE__    sigev_notify;
 #if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
     defined(__COMPILER_HAVE_TRANSPARENT_UNION)
 #if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
 	union {
 #endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */
 	union {
-		__UINT32_TYPE__ _sigev_data[(__SIGEV32_MAX_SIZE - 12) / 4];
+		__UINT32_TYPE__ _sigev_data[(__SIGEVX32_MAX_SIZE - 12) / 4];
 		__INT32_TYPE__  _sigev_tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
 		                             * TID (pid_t) of the thread to receive the signal. */
 		struct {
-			__HYBRID_FUNCPTR32(void, __LIBCCALL, sigev_notify_function,(union sigval32 __val)); /* Function to start. */
-			__HYBRID_PTR32(pthread_attr_t)       sigev_notify_attributes;                       /* Thread attributes. */
+			__HYBRID_FUNCPTR32(void, __LIBCCALL, sigev_notify_function,(union __sigvalx32 __val)); /* Function to start. */
+			__HYBRID_PTR32(pthread_attr_t)       sigev_notify_attributes;                          /* Thread attributes. */
 		};
 	};
 #if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
 	union {
-		__UINT32_TYPE__ _data[(__SIGEV32_MAX_SIZE - 12) / 4];
+		__UINT32_TYPE__ _data[(__SIGEVX32_MAX_SIZE - 12) / 4];
 		__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
 		                       * TID (pid_t) of the thread to receive the signal. */
 		struct {
-			__HYBRID_FUNCPTR32(void, __LIBCCALL, _function,(union sigval32 __val)); /* Function to start. */
-			__HYBRID_PTR32(pthread_attr_t)       _attribute;                        /* Thread attributes. */
+			__HYBRID_FUNCPTR32(void, __LIBCCALL, _function,(union __sigvalx32 __val)); /* Function to start. */
+			__HYBRID_PTR32(pthread_attr_t)       _attribute;                           /* Thread attributes. */
 		} _sigev_thread;
 	} _sigev_un;
 	};
 #endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */
 #else
 	union {
-		__UINT32_TYPE__ _data[(__SIGEV32_MAX_SIZE - 12) / 4];
+		__UINT32_TYPE__ _data[(__SIGEVX32_MAX_SIZE - 12) / 4];
 		__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
 		                       * TID (pid_t) of the thread to receive the signal. */
 		struct {
-			__HYBRID_FUNCPTR32(void, __LIBCCALL, _function,(union sigval32 __val)); /* Function to start. */
-			__HYBRID_PTR32(pthread_attr_t)       _attribute;                        /* Thread attributes. */
+			__HYBRID_FUNCPTR32(void, __LIBCCALL, _function,(union __sigvalx32 __val)); /* Function to start. */
+			__HYBRID_PTR32(pthread_attr_t)       _attribute;                           /* Thread attributes. */
 		} _sigev_thread;
 	} _sigev_un;
 #define _sigev_data             _sigev_un._data
@@ -115,7 +120,7 @@ typedef struct sigevent32 /*[PREFIX(sigev_)]*/ { /* TODO: Rename to sigeventx32 
 #define sigev_notify_function   _sigev_un._sigev_thread._function
 #define sigev_notify_attributes _sigev_un._sigev_thread._attribute
 #endif
-} sigevent32_t;
+} __sigeventx32_t;
 #endif /* __CC__ */
 
 __SYSDECL_END

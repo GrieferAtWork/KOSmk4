@@ -23,8 +23,8 @@
 #include <hybrid/host.h> /* __x86_64__ */
 #ifdef __x86_64__
 #include <bits/siginfo-struct32.h>
-#define __compat_siginfo_struct __siginfo32_struct
-#define compat_siginfo_t        siginfo32_t
+#define __compat_siginfo_struct __siginfox32_struct
+#define compat_siginfo_t        __siginfox32_t
 #endif /* !__x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_BITS_SIGINFO_STRUCT_H */

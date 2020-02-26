@@ -23,7 +23,7 @@
 #include <hybrid/host.h>
 #ifdef __x86_64__
 #include <bits/iovec-struct32.h>
-#define compat_iovec iovec32
+#define compat_iovec __iovecx32
 #endif /* __x86_64__ */
 
 #endif /* !_COMPAT_BITS_IOVEC_STRUCT_H */

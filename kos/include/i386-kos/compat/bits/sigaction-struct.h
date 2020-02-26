@@ -24,8 +24,8 @@
 
 #ifdef __x86_64__
 #include <bits/sigaction-struct32.h>
-#define compat_sigaction       sigaction32
-#define __compat_sighandler_t  __sighandler32_t
+#define compat_sigaction       __sigactionx32
+#define __compat_sighandler_t  __sighandlerx32_t
 #endif /* __x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_BITS_SIGACTION_STRUCT_H */

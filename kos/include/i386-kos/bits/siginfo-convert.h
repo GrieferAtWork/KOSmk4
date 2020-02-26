@@ -36,17 +36,17 @@
 __DECL_BEGIN
 
 /* Convert between 32-bit and 64-bit siginfo_t structures */
-#define siginfo32_to_siginfo32(self, result)                     \
-	__libc_memcpy(__COMPILER_REQTYPE(siginfo32_t *, result),     \
-	              __COMPILER_REQTYPE(siginfo32_t const *, self), \
-	              sizeof(siginfo32_t))
-#define siginfo64_to_siginfo64(self, result)                     \
-	__libc_memcpy(__COMPILER_REQTYPE(siginfo64_t *, result),     \
-	              __COMPILER_REQTYPE(siginfo64_t const *, self), \
-	              sizeof(siginfo64_t))
+#define siginfox32_to_siginfox32(self, result)                      \
+	__libc_memcpy(__COMPILER_REQTYPE(__siginfox32_t *, result),     \
+	              __COMPILER_REQTYPE(__siginfox32_t const *, self), \
+	              sizeof(__siginfox32_t))
+#define siginfox64_to_siginfox64(self, result)                      \
+	__libc_memcpy(__COMPILER_REQTYPE(__siginfox64_t *, result),     \
+	              __COMPILER_REQTYPE(__siginfox64_t const *, self), \
+	              sizeof(__siginfox64_t))
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(siginfo32_to_siginfo64)(siginfo32_t const *__restrict __self,
-                                      siginfo64_t *__restrict __result) {
+__NOTHROW_NCX(siginfox32_to_siginfox64)(__siginfox32_t const *__restrict __self,
+                                        __siginfox64_t *__restrict __result) {
 	__INT32_TYPE__ __signo;
 	__result->si_signo = __signo = __self->si_signo;
 	__result->si_errno = __self->si_errno;
@@ -91,8 +91,8 @@ __NOTHROW_NCX(siginfo32_to_siginfo64)(siginfo32_t const *__restrict __self,
 }
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(siginfo64_to_siginfo32)(siginfo64_t const *__restrict __self,
-                                      siginfo32_t *__restrict __result) {
+__NOTHROW_NCX(siginfox64_to_siginfox32)(__siginfox64_t const *__restrict __self,
+                                        __siginfox32_t *__restrict __result) {
 	__INT32_TYPE__ __signo;
 	__result->si_signo = __signo = __self->si_signo;
 	__result->si_errno = __self->si_errno;
@@ -137,15 +137,15 @@ __NOTHROW_NCX(siginfo64_to_siginfo32)(siginfo64_t const *__restrict __self,
 }
 
 #ifdef __x86_64__
-#define siginfo64_to_siginfo siginfo64_to_siginfo64
-#define siginfo32_to_siginfo siginfo32_to_siginfo64
-#define siginfo_to_siginfo32 siginfo64_to_siginfo32
-#define siginfo_to_siginfo64 siginfo64_to_siginfo64
+#define siginfox64_to_siginfo siginfox64_to_siginfox64
+#define siginfox32_to_siginfo siginfox32_to_siginfox64
+#define siginfo_to_siginfox32 siginfox64_to_siginfox32
+#define siginfo_to_siginfox64 siginfox64_to_siginfox64
 #else /* __x86_64__ */
-#define siginfo64_to_siginfo siginfo64_to_siginfo32
-#define siginfo32_to_siginfo siginfo32_to_siginfo32
-#define siginfo_to_siginfo32 siginfo32_to_siginfo32
-#define siginfo_to_siginfo64 siginfo32_to_siginfo64
+#define siginfox64_to_siginfo siginfox64_to_siginfox32
+#define siginfox32_to_siginfo siginfox32_to_siginfox32
+#define siginfo_to_siginfox32 siginfox32_to_siginfox32
+#define siginfo_to_siginfox64 siginfox32_to_siginfox64
 #endif /* !__x86_64__ */
 
 

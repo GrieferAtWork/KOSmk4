@@ -25,25 +25,30 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#ifndef __x86_64__
+#if defined(__i386__) && !defined(__x86_64__)
 #ifndef __iovec_defined
 #define __iovec_defined 1
-#define iovec32  iovec
-#define __OFFSET_IOVEC_BASE __OFFSET_IOVEC32_BASE
-#define __OFFSET_IOVEC_LEN  __OFFSET_IOVEC32_LEN
-#define __SIZEOF_IOVEC      __SIZEOF_IOVEC32
+#define __iovecx32 iovec
+#define __OFFSET_IOVEC_BASE __OFFSET_IOVECX32_BASE
+#define __OFFSET_IOVEC_LEN  __OFFSET_IOVECX32_LEN
+#define __SIZEOF_IOVEC      __SIZEOF_IOVECX32
 #endif /* !__iovec_defined */
-#endif /* !__x86_64__ */
+#endif /* __i386__ && !__x86_64__ */
 
-#define __OFFSET_IOVEC32_BASE 0
-#define __OFFSET_IOVEC32_LEN  4
-#define __SIZEOF_IOVEC32      __ALIGNOF_INT32__
+#define __OFFSET_IOVECX32_BASE 0
+#define __OFFSET_IOVECX32_LEN  4
+#define __SIZEOF_IOVECX32      __ALIGNOF_INT32__
 
 #ifdef __CC__
+#include <features.h>
 #include <hybrid/__pointer.h>
 
+#ifdef __USE_KOS_KERNEL
+#define iovecx32 __iovecx32
+#endif /* __USE_KOS_KERNEL */
+
 __SYSDECL_BEGIN
-struct iovec32 /*[prefix(iov_)]*/ { /* TODO: Rename to iovecx32 */
+struct __iovecx32 /*[name(iovecx32)][prefix(iov_)]*/ {
 	__HYBRID_PTR32(void) iov_base; /* Pointer to data. */
 	__UINT32_TYPE__      iov_len;  /* Length of data. */
 };

@@ -30,7 +30,7 @@
 
 #ifdef __CRT_CYG_PRIMARY
 #define __siginfo_cygwin_struct __siginfo_struct
-#define siginfo_cygwin_t        siginfo_t
+#define __siginfo_cygwin_t      siginfo_t
 #define __siginfo_t_defined     1
 #endif /* __CRT_CYG_PRIMARY */
 
@@ -146,7 +146,7 @@ typedef struct __ATTR_PACKED __siginfo_cygwin_struct /*[NAME(siginfo_cygwin)][PR
 		};
 		void               *si_addr;
 	};
-} siginfo_cygwin_t;
+} __siginfo_cygwin_t;
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("si_addr")

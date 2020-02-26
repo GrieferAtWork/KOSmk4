@@ -28,23 +28,28 @@
 #ifdef __x86_64__
 #ifndef __iovec_defined
 #define __iovec_defined 1
-#define iovec64  iovec
-#define __OFFSET_IOVEC_BASE __OFFSET_IOVEC64_BASE
-#define __OFFSET_IOVEC_LEN  __OFFSET_IOVEC64_LEN
-#define __SIZEOF_IOVEC      __SIZEOF_IOVEC64
+#define __iovecx64 iovec
+#define __OFFSET_IOVEC_BASE __OFFSET_IOVECX64_BASE
+#define __OFFSET_IOVEC_LEN  __OFFSET_IOVECX64_LEN
+#define __SIZEOF_IOVEC      __SIZEOF_IOVECX64
 #endif /* !__iovec_defined */
 #endif /* __x86_64__ */
 
-#define __OFFSET_IOVEC64_BASE 0
-#define __OFFSET_IOVEC64_LEN  8
-#define __SIZEOF_IOVEC64      16
-#define __ALIGNOF_IOVEC64     __ALIGNOF_INT64__
+#define __OFFSET_IOVECX64_BASE 0
+#define __OFFSET_IOVECX64_LEN  8
+#define __SIZEOF_IOVECX64      16
+#define __ALIGNOF_IOVECX64     __ALIGNOF_INT64__
 
 #ifdef __CC__
+#include <features.h>
 #include <hybrid/__pointer.h>
 
+#ifdef __USE_KOS_KERNEL
+#define iovecx64 __iovecx64
+#endif /* __USE_KOS_KERNEL */
+
 __SYSDECL_BEGIN
-struct iovec64 /*[prefix(iov_)]*/ { /* TODO: Rename to iovecx64 */
+struct __iovecx64 /*[prefix(iov_)]*/ {
 	__HYBRID_PTR64(void) iov_base; /* Pointer to data. */
 	__UINT64_TYPE__      iov_len;  /* Length of data. */
 };

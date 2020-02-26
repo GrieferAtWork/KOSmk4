@@ -365,16 +365,16 @@ STATIC_ASSERT(alignof(struct __mmsghdrx64) == __ALIGNOF_MMSGHDRX64);
 
 #include <bits/msghdr-struct32.h>
 
-/* struct msghdr32 */
-STATIC_ASSERT(offsetof(struct msghdr32, msg_control) == __OFFSET_MSGHDR32_CONTROL);
-STATIC_ASSERT(offsetof(struct msghdr32, msg_controllen) == __OFFSET_MSGHDR32_CONTROLLEN);
-STATIC_ASSERT(offsetof(struct msghdr32, msg_flags) == __OFFSET_MSGHDR32_FLAGS);
-STATIC_ASSERT(offsetof(struct msghdr32, msg_iov) == __OFFSET_MSGHDR32_IOV);
-STATIC_ASSERT(offsetof(struct msghdr32, msg_iovlen) == __OFFSET_MSGHDR32_IOVLEN);
-STATIC_ASSERT(offsetof(struct msghdr32, msg_name) == __OFFSET_MSGHDR32_NAME);
-STATIC_ASSERT(offsetof(struct msghdr32, msg_namelen) == __OFFSET_MSGHDR32_NAMELEN);
-STATIC_ASSERT(sizeof(struct msghdr32) == __SIZEOF_MSGHDR32);
-STATIC_ASSERT(alignof(struct msghdr32) == __ALIGNOF_MSGHDR32);
+/* struct __msghdrx32 */
+STATIC_ASSERT(offsetof(struct __msghdrx32, msg_control) == __OFFSET_MSGHDRX32_CONTROL);
+STATIC_ASSERT(offsetof(struct __msghdrx32, msg_controllen) == __OFFSET_MSGHDRX32_CONTROLLEN);
+STATIC_ASSERT(offsetof(struct __msghdrx32, msg_flags) == __OFFSET_MSGHDRX32_FLAGS);
+STATIC_ASSERT(offsetof(struct __msghdrx32, msg_iov) == __OFFSET_MSGHDRX32_IOV);
+STATIC_ASSERT(offsetof(struct __msghdrx32, msg_iovlen) == __OFFSET_MSGHDRX32_IOVLEN);
+STATIC_ASSERT(offsetof(struct __msghdrx32, msg_name) == __OFFSET_MSGHDRX32_NAME);
+STATIC_ASSERT(offsetof(struct __msghdrx32, msg_namelen) == __OFFSET_MSGHDRX32_NAMELEN);
+STATIC_ASSERT(sizeof(struct __msghdrx32) == __SIZEOF_MSGHDRX32);
+STATIC_ASSERT(alignof(struct __msghdrx32) == __ALIGNOF_MSGHDRX32);
 
 
 
@@ -382,16 +382,16 @@ STATIC_ASSERT(alignof(struct msghdr32) == __ALIGNOF_MSGHDR32);
 
 #include <bits/msghdr-struct64.h>
 
-/* struct msghdr64 */
-STATIC_ASSERT(offsetof(struct msghdr64, msg_control) == __OFFSET_MSGHDR64_CONTROL);
-STATIC_ASSERT(offsetof(struct msghdr64, msg_controllen) == __OFFSET_MSGHDR64_CONTROLLEN);
-STATIC_ASSERT(offsetof(struct msghdr64, msg_flags) == __OFFSET_MSGHDR64_FLAGS);
-STATIC_ASSERT(offsetof(struct msghdr64, msg_iov) == __OFFSET_MSGHDR64_IOV);
-STATIC_ASSERT(offsetof(struct msghdr64, msg_iovlen) == __OFFSET_MSGHDR64_IOVLEN);
-STATIC_ASSERT(offsetof(struct msghdr64, msg_name) == __OFFSET_MSGHDR64_NAME);
-STATIC_ASSERT(offsetof(struct msghdr64, msg_namelen) == __OFFSET_MSGHDR64_NAMELEN);
-STATIC_ASSERT(sizeof(struct msghdr64) == __SIZEOF_MSGHDR64);
-STATIC_ASSERT(alignof(struct msghdr64) == __ALIGNOF_MSGHDR64);
+/* struct __msghdrx64 */
+STATIC_ASSERT(offsetof(struct __msghdrx64, msg_control) == __OFFSET_MSGHDRX64_CONTROL);
+STATIC_ASSERT(offsetof(struct __msghdrx64, msg_controllen) == __OFFSET_MSGHDRX64_CONTROLLEN);
+STATIC_ASSERT(offsetof(struct __msghdrx64, msg_flags) == __OFFSET_MSGHDRX64_FLAGS);
+STATIC_ASSERT(offsetof(struct __msghdrx64, msg_iov) == __OFFSET_MSGHDRX64_IOV);
+STATIC_ASSERT(offsetof(struct __msghdrx64, msg_iovlen) == __OFFSET_MSGHDRX64_IOVLEN);
+STATIC_ASSERT(offsetof(struct __msghdrx64, msg_name) == __OFFSET_MSGHDRX64_NAME);
+STATIC_ASSERT(offsetof(struct __msghdrx64, msg_namelen) == __OFFSET_MSGHDRX64_NAMELEN);
+STATIC_ASSERT(sizeof(struct __msghdrx64) == __SIZEOF_MSGHDRX64);
+STATIC_ASSERT(alignof(struct __msghdrx64) == __ALIGNOF_MSGHDRX64);
 
 
 
@@ -491,17 +491,17 @@ STATIC_ASSERT(alignof(struct __sigaction_cygwin) == __ALIGNOF_SIGACTION_CYGWIN);
 
 #include <bits/sigaction-struct32.h>
 
-/* struct __sigset_struct32 */
+/* struct __sigset_structx32 */
 /* ... */
 
-/* struct sigaction32 */
-STATIC_ASSERT(offsetof(struct sigaction32, sa_flags) == __OFFSET_SIGACTION32_FLAGS);
-STATIC_ASSERT(offsetof(struct sigaction32, sa_handler) == __OFFSET_SIGACTION32_HANDLER);
-STATIC_ASSERT(offsetof(struct sigaction32, sa_mask) == __OFFSET_SIGACTION32_MASK);
-STATIC_ASSERT(offsetof(struct sigaction32, sa_restorer) == __OFFSET_SIGACTION32_RESTORER);
-STATIC_ASSERT(offsetof(struct sigaction32, sa_sigaction) == __OFFSET_SIGACTION32_SIGACTION);
-STATIC_ASSERT(sizeof(struct sigaction32) == __SIZEOF_SIGACTION32);
-STATIC_ASSERT(alignof(struct sigaction32) == __ALIGNOF_SIGACTION32);
+/* struct __sigactionx32 */
+STATIC_ASSERT(offsetof(struct __sigactionx32, sa_flags) == __OFFSET_SIGACTIONX32_FLAGS);
+STATIC_ASSERT(offsetof(struct __sigactionx32, sa_handler) == __OFFSET_SIGACTIONX32_HANDLER);
+STATIC_ASSERT(offsetof(struct __sigactionx32, sa_mask) == __OFFSET_SIGACTIONX32_MASK);
+STATIC_ASSERT(offsetof(struct __sigactionx32, sa_restorer) == __OFFSET_SIGACTIONX32_RESTORER);
+STATIC_ASSERT(offsetof(struct __sigactionx32, sa_sigaction) == __OFFSET_SIGACTIONX32_SIGACTION);
+STATIC_ASSERT(sizeof(struct __sigactionx32) == __SIZEOF_SIGACTIONX32);
+STATIC_ASSERT(alignof(struct __sigactionx32) == __ALIGNOF_SIGACTIONX32);
 
 
 
@@ -509,14 +509,14 @@ STATIC_ASSERT(alignof(struct sigaction32) == __ALIGNOF_SIGACTION32);
 
 #include <bits/sigaction-struct64.h>
 
-/* struct sigaction64 */
-STATIC_ASSERT(offsetof(struct sigaction64, sa_flags) == __OFFSET_SIGACTION64_FLAGS);
-STATIC_ASSERT(offsetof(struct sigaction64, sa_handler) == __OFFSET_SIGACTION64_HANDLER);
-STATIC_ASSERT(offsetof(struct sigaction64, sa_mask) == __OFFSET_SIGACTION64_MASK);
-STATIC_ASSERT(offsetof(struct sigaction64, sa_restorer) == __OFFSET_SIGACTION64_RESTORER);
-STATIC_ASSERT(offsetof(struct sigaction64, sa_sigaction) == __OFFSET_SIGACTION64_SIGACTION);
-STATIC_ASSERT(sizeof(struct sigaction64) == __SIZEOF_SIGACTION64);
-STATIC_ASSERT(alignof(struct sigaction64) == __ALIGNOF_SIGACTION64);
+/* struct __sigactionx64 */
+STATIC_ASSERT(offsetof(struct __sigactionx64, sa_flags) == __OFFSET_SIGACTIONX64_FLAGS);
+STATIC_ASSERT(offsetof(struct __sigactionx64, sa_handler) == __OFFSET_SIGACTIONX64_HANDLER);
+STATIC_ASSERT(offsetof(struct __sigactionx64, sa_mask) == __OFFSET_SIGACTIONX64_MASK);
+STATIC_ASSERT(offsetof(struct __sigactionx64, sa_restorer) == __OFFSET_SIGACTIONX64_RESTORER);
+STATIC_ASSERT(offsetof(struct __sigactionx64, sa_sigaction) == __OFFSET_SIGACTIONX64_SIGACTION);
+STATIC_ASSERT(sizeof(struct __sigactionx64) == __SIZEOF_SIGACTIONX64);
+STATIC_ASSERT(alignof(struct __sigactionx64) == __ALIGNOF_SIGACTIONX64);
 
 
 
@@ -524,19 +524,19 @@ STATIC_ASSERT(alignof(struct sigaction64) == __ALIGNOF_SIGACTION64);
 
 #include <bits/sigevent32.h>
 
-/* struct sigevent32 */
-STATIC_ASSERT(offsetof(struct sigevent32, _sigev_data) == __OFFSET_SIGEVENT32_DATA);
-STATIC_ASSERT(offsetof(struct sigevent32, _sigev_un._data) == __OFFSET_SIGEVENT32_DATA);
-STATIC_ASSERT(offsetof(struct sigevent32, sigev_notify) == __OFFSET_SIGEVENT32_NOTIFY);
-STATIC_ASSERT(offsetof(struct sigevent32, sigev_notify_attributes) == __OFFSET_SIGEVENT32_NOTIFY_ATTRIBUTES);
-STATIC_ASSERT(offsetof(struct sigevent32, _sigev_un._sigev_thread._attribute) == __OFFSET_SIGEVENT32_NOTIFY_ATTRIBUTES);
-STATIC_ASSERT(offsetof(struct sigevent32, sigev_notify_function) == __OFFSET_SIGEVENT32_NOTIFY_FUNCTION);
-STATIC_ASSERT(offsetof(struct sigevent32, _sigev_un._sigev_thread._function) == __OFFSET_SIGEVENT32_NOTIFY_FUNCTION);
-STATIC_ASSERT(offsetof(struct sigevent32, sigev_signo) == __OFFSET_SIGEVENT32_SIGNO);
-STATIC_ASSERT(offsetof(struct sigevent32, _sigev_tid) == __OFFSET_SIGEVENT32_TID);
-STATIC_ASSERT(offsetof(struct sigevent32, _sigev_un._tid) == __OFFSET_SIGEVENT32_TID);
-STATIC_ASSERT(offsetof(struct sigevent32, sigev_value) == __OFFSET_SIGEVENT32_VALUE);
-STATIC_ASSERT(sizeof(struct sigevent32) == __SIZEOF_SIGEVENT32);
+/* struct __sigeventx32 */
+STATIC_ASSERT(offsetof(struct __sigeventx32, _sigev_data) == __OFFSET_SIGEVENTX32_DATA);
+STATIC_ASSERT(offsetof(struct __sigeventx32, _sigev_un._data) == __OFFSET_SIGEVENTX32_DATA);
+STATIC_ASSERT(offsetof(struct __sigeventx32, sigev_notify) == __OFFSET_SIGEVENTX32_NOTIFY);
+STATIC_ASSERT(offsetof(struct __sigeventx32, sigev_notify_attributes) == __OFFSET_SIGEVENTX32_NOTIFY_ATTRIBUTES);
+STATIC_ASSERT(offsetof(struct __sigeventx32, _sigev_un._sigev_thread._attribute) == __OFFSET_SIGEVENTX32_NOTIFY_ATTRIBUTES);
+STATIC_ASSERT(offsetof(struct __sigeventx32, sigev_notify_function) == __OFFSET_SIGEVENTX32_NOTIFY_FUNCTION);
+STATIC_ASSERT(offsetof(struct __sigeventx32, _sigev_un._sigev_thread._function) == __OFFSET_SIGEVENTX32_NOTIFY_FUNCTION);
+STATIC_ASSERT(offsetof(struct __sigeventx32, sigev_signo) == __OFFSET_SIGEVENTX32_SIGNO);
+STATIC_ASSERT(offsetof(struct __sigeventx32, _sigev_tid) == __OFFSET_SIGEVENTX32_TID);
+STATIC_ASSERT(offsetof(struct __sigeventx32, _sigev_un._tid) == __OFFSET_SIGEVENTX32_TID);
+STATIC_ASSERT(offsetof(struct __sigeventx32, sigev_value) == __OFFSET_SIGEVENTX32_VALUE);
+STATIC_ASSERT(sizeof(struct __sigeventx32) == __SIZEOF_SIGEVENTX32);
 
 
 
@@ -544,19 +544,19 @@ STATIC_ASSERT(sizeof(struct sigevent32) == __SIZEOF_SIGEVENT32);
 
 #include <bits/sigevent64.h>
 
-/* struct sigevent64 */
-STATIC_ASSERT(offsetof(struct sigevent64, _sigev_data) == __OFFSET_SIGEVENT64_DATA);
-STATIC_ASSERT(offsetof(struct sigevent64, _sigev_un._data) == __OFFSET_SIGEVENT64_DATA);
-STATIC_ASSERT(offsetof(struct sigevent64, sigev_notify) == __OFFSET_SIGEVENT64_NOTIFY);
-STATIC_ASSERT(offsetof(struct sigevent64, sigev_notify_attributes) == __OFFSET_SIGEVENT64_NOTIFY_ATTRIBUTES);
-STATIC_ASSERT(offsetof(struct sigevent64, _sigev_un._sigev_thread._attribute) == __OFFSET_SIGEVENT64_NOTIFY_ATTRIBUTES);
-STATIC_ASSERT(offsetof(struct sigevent64, sigev_notify_function) == __OFFSET_SIGEVENT64_NOTIFY_FUNCTION);
-STATIC_ASSERT(offsetof(struct sigevent64, _sigev_un._sigev_thread._function) == __OFFSET_SIGEVENT64_NOTIFY_FUNCTION);
-STATIC_ASSERT(offsetof(struct sigevent64, sigev_signo) == __OFFSET_SIGEVENT64_SIGNO);
-STATIC_ASSERT(offsetof(struct sigevent64, _sigev_tid) == __OFFSET_SIGEVENT64_TID);
-STATIC_ASSERT(offsetof(struct sigevent64, _sigev_un._tid) == __OFFSET_SIGEVENT64_TID);
-STATIC_ASSERT(offsetof(struct sigevent64, sigev_value) == __OFFSET_SIGEVENT64_VALUE);
-STATIC_ASSERT(sizeof(struct sigevent64) == __SIZEOF_SIGEVENT64);
+/* struct __sigeventx64 */
+STATIC_ASSERT(offsetof(struct __sigeventx64, _sigev_data) == __OFFSET_SIGEVENTX64_DATA);
+STATIC_ASSERT(offsetof(struct __sigeventx64, _sigev_un._data) == __OFFSET_SIGEVENTX64_DATA);
+STATIC_ASSERT(offsetof(struct __sigeventx64, sigev_notify) == __OFFSET_SIGEVENTX64_NOTIFY);
+STATIC_ASSERT(offsetof(struct __sigeventx64, sigev_notify_attributes) == __OFFSET_SIGEVENTX64_NOTIFY_ATTRIBUTES);
+STATIC_ASSERT(offsetof(struct __sigeventx64, _sigev_un._sigev_thread._attribute) == __OFFSET_SIGEVENTX64_NOTIFY_ATTRIBUTES);
+STATIC_ASSERT(offsetof(struct __sigeventx64, sigev_notify_function) == __OFFSET_SIGEVENTX64_NOTIFY_FUNCTION);
+STATIC_ASSERT(offsetof(struct __sigeventx64, _sigev_un._sigev_thread._function) == __OFFSET_SIGEVENTX64_NOTIFY_FUNCTION);
+STATIC_ASSERT(offsetof(struct __sigeventx64, sigev_signo) == __OFFSET_SIGEVENTX64_SIGNO);
+STATIC_ASSERT(offsetof(struct __sigeventx64, _sigev_tid) == __OFFSET_SIGEVENTX64_TID);
+STATIC_ASSERT(offsetof(struct __sigeventx64, _sigev_un._tid) == __OFFSET_SIGEVENTX64_TID);
+STATIC_ASSERT(offsetof(struct __sigeventx64, sigev_value) == __OFFSET_SIGEVENTX64_VALUE);
+STATIC_ASSERT(sizeof(struct __sigeventx64) == __SIZEOF_SIGEVENTX64);
 
 
 
@@ -564,61 +564,61 @@ STATIC_ASSERT(sizeof(struct sigevent64) == __SIZEOF_SIGEVENT64);
 
 #include <bits/siginfo-struct32.h>
 
-/* struct __siginfo32_struct */
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_addr) == __OFFSET_SIGINFO32_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigfault._si_addr) == __OFFSET_SIGINFO32_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_addr_lsb) == __OFFSET_SIGINFO32_ADDR_LSB);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigfault._si_addr_lsb) == __OFFSET_SIGINFO32_ADDR_LSB);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_arch) == __OFFSET_SIGINFO32_ARCH);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigsys._arch) == __OFFSET_SIGINFO32_ARCH);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_band) == __OFFSET_SIGINFO32_BAND);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigpoll._si_band) == __OFFSET_SIGINFO32_BAND);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_call_addr) == __OFFSET_SIGINFO32_CALL_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigsys._call_addr) == __OFFSET_SIGINFO32_CALL_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_code) == __OFFSET_SIGINFO32_CODE);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _si_data) == __OFFSET_SIGINFO32_DATA);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._data) == __OFFSET_SIGINFO32_DATA);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_errno) == __OFFSET_SIGINFO32_ERRNO);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_fd) == __OFFSET_SIGINFO32_FD);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigpoll._si_fd) == __OFFSET_SIGINFO32_FD);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_int) == __OFFSET_SIGINFO32_INT);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._timer.si_sigval.sival_int) == __OFFSET_SIGINFO32_INT);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_lower) == __OFFSET_SIGINFO32_LOWER);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigfault.si_addr_bnd._lower) == __OFFSET_SIGINFO32_LOWER);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_overrun) == __OFFSET_SIGINFO32_OVERRUN);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._timer._si_overrun) == __OFFSET_SIGINFO32_OVERRUN);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_pid) == __OFFSET_SIGINFO32_PID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, __sig_si_pid) == __OFFSET_SIGINFO32_PID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, __cld_si_pid) == __OFFSET_SIGINFO32_PID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._kill._si_pid) == __OFFSET_SIGINFO32_PID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._rt._si_pid) == __OFFSET_SIGINFO32_PID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigchld._si_pid) == __OFFSET_SIGINFO32_PID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_ptr) == __OFFSET_SIGINFO32_PTR);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._timer.si_sigval.sival_ptr) == __OFFSET_SIGINFO32_PTR);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_signo) == __OFFSET_SIGINFO32_SIGNO);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_status) == __OFFSET_SIGINFO32_STATUS);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigchld._si_status) == __OFFSET_SIGINFO32_STATUS);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_stime) == __OFFSET_SIGINFO32_STIME);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigchld._si_stime) == __OFFSET_SIGINFO32_STIME);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_syscall) == __OFFSET_SIGINFO32_SYSCALL);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigsys._syscall) == __OFFSET_SIGINFO32_SYSCALL);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_timerid) == __OFFSET_SIGINFO32_TIMERID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._timer._si_tid) == __OFFSET_SIGINFO32_TIMERID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_uid) == __OFFSET_SIGINFO32_UID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, __sig_si_uid) == __OFFSET_SIGINFO32_UID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, __cld_si_uid) == __OFFSET_SIGINFO32_UID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._kill._si_uid) == __OFFSET_SIGINFO32_UID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._rt._si_uid) == __OFFSET_SIGINFO32_UID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigchld._si_uid) == __OFFSET_SIGINFO32_UID);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_upper) == __OFFSET_SIGINFO32_UPPER);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigfault.si_addr_bnd._upper) == __OFFSET_SIGINFO32_UPPER);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_utime) == __OFFSET_SIGINFO32_UTIME);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._sigchld._si_utime) == __OFFSET_SIGINFO32_UTIME);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, si_value) == __OFFSET_SIGINFO32_VALUE);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, __sig_si_sigval) == __OFFSET_SIGINFO32_VALUE);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._rt.si_sigval) == __OFFSET_SIGINFO32_VALUE);
-STATIC_ASSERT(offsetof(struct __siginfo32_struct, _sifields._timer.si_sigval) == __OFFSET_SIGINFO32_VALUE);
-STATIC_ASSERT(sizeof(struct __siginfo32_struct) == __SIZEOF_SIGINFO32);
+/* struct __siginfox32_struct */
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_addr) == __OFFSET_SIGINFOX32_ADDR);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigfault._si_addr) == __OFFSET_SIGINFOX32_ADDR);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_addr_lsb) == __OFFSET_SIGINFOX32_ADDR_LSB);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigfault._si_addr_lsb) == __OFFSET_SIGINFOX32_ADDR_LSB);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_arch) == __OFFSET_SIGINFOX32_ARCH);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigsys._arch) == __OFFSET_SIGINFOX32_ARCH);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_band) == __OFFSET_SIGINFOX32_BAND);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigpoll._si_band) == __OFFSET_SIGINFOX32_BAND);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_call_addr) == __OFFSET_SIGINFOX32_CALL_ADDR);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigsys._call_addr) == __OFFSET_SIGINFOX32_CALL_ADDR);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_code) == __OFFSET_SIGINFOX32_CODE);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _si_data) == __OFFSET_SIGINFOX32_DATA);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._data) == __OFFSET_SIGINFOX32_DATA);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_errno) == __OFFSET_SIGINFOX32_ERRNO);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_fd) == __OFFSET_SIGINFOX32_FD);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigpoll._si_fd) == __OFFSET_SIGINFOX32_FD);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_int) == __OFFSET_SIGINFOX32_INT);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._timer.si_sigval.sival_int) == __OFFSET_SIGINFOX32_INT);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_lower) == __OFFSET_SIGINFOX32_LOWER);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigfault.si_addr_bnd._lower) == __OFFSET_SIGINFOX32_LOWER);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_overrun) == __OFFSET_SIGINFOX32_OVERRUN);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._timer._si_overrun) == __OFFSET_SIGINFOX32_OVERRUN);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_pid) == __OFFSET_SIGINFOX32_PID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, __sig_si_pid) == __OFFSET_SIGINFOX32_PID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, __cld_si_pid) == __OFFSET_SIGINFOX32_PID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._kill._si_pid) == __OFFSET_SIGINFOX32_PID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._rt._si_pid) == __OFFSET_SIGINFOX32_PID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigchld._si_pid) == __OFFSET_SIGINFOX32_PID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_ptr) == __OFFSET_SIGINFOX32_PTR);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._timer.si_sigval.sival_ptr) == __OFFSET_SIGINFOX32_PTR);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_signo) == __OFFSET_SIGINFOX32_SIGNO);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_status) == __OFFSET_SIGINFOX32_STATUS);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigchld._si_status) == __OFFSET_SIGINFOX32_STATUS);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_stime) == __OFFSET_SIGINFOX32_STIME);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigchld._si_stime) == __OFFSET_SIGINFOX32_STIME);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_syscall) == __OFFSET_SIGINFOX32_SYSCALL);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigsys._syscall) == __OFFSET_SIGINFOX32_SYSCALL);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_timerid) == __OFFSET_SIGINFOX32_TIMERID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._timer._si_tid) == __OFFSET_SIGINFOX32_TIMERID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_uid) == __OFFSET_SIGINFOX32_UID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, __sig_si_uid) == __OFFSET_SIGINFOX32_UID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, __cld_si_uid) == __OFFSET_SIGINFOX32_UID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._kill._si_uid) == __OFFSET_SIGINFOX32_UID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._rt._si_uid) == __OFFSET_SIGINFOX32_UID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigchld._si_uid) == __OFFSET_SIGINFOX32_UID);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_upper) == __OFFSET_SIGINFOX32_UPPER);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigfault.si_addr_bnd._upper) == __OFFSET_SIGINFOX32_UPPER);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_utime) == __OFFSET_SIGINFOX32_UTIME);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._sigchld._si_utime) == __OFFSET_SIGINFOX32_UTIME);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, si_value) == __OFFSET_SIGINFOX32_VALUE);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, __sig_si_sigval) == __OFFSET_SIGINFOX32_VALUE);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._rt.si_sigval) == __OFFSET_SIGINFOX32_VALUE);
+STATIC_ASSERT(offsetof(struct __siginfox32_struct, _sifields._timer.si_sigval) == __OFFSET_SIGINFOX32_VALUE);
+STATIC_ASSERT(sizeof(struct __siginfox32_struct) == __SIZEOF_SIGINFOX32);
 
 
 
@@ -626,61 +626,61 @@ STATIC_ASSERT(sizeof(struct __siginfo32_struct) == __SIZEOF_SIGINFO32);
 
 #include <bits/siginfo-struct64.h>
 
-/* struct __siginfo64_struct */
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_addr) == __OFFSET_SIGINFO64_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigfault._si_addr) == __OFFSET_SIGINFO64_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_addr_lsb) == __OFFSET_SIGINFO64_ADDR_LSB);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigfault._si_addr_lsb) == __OFFSET_SIGINFO64_ADDR_LSB);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_arch) == __OFFSET_SIGINFO64_ARCH);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigsys._arch) == __OFFSET_SIGINFO64_ARCH);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_band) == __OFFSET_SIGINFO64_BAND);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigpoll._si_band) == __OFFSET_SIGINFO64_BAND);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_call_addr) == __OFFSET_SIGINFO64_CALL_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigsys._call_addr) == __OFFSET_SIGINFO64_CALL_ADDR);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_code) == __OFFSET_SIGINFO64_CODE);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _si_data) == __OFFSET_SIGINFO64_DATA);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._data) == __OFFSET_SIGINFO64_DATA);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_errno) == __OFFSET_SIGINFO64_ERRNO);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_fd) == __OFFSET_SIGINFO64_FD);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigpoll._si_fd) == __OFFSET_SIGINFO64_FD);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_int) == __OFFSET_SIGINFO64_INT);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._timer.si_sigval.sival_int) == __OFFSET_SIGINFO64_INT);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_lower) == __OFFSET_SIGINFO64_LOWER);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigfault.si_addr_bnd._lower) == __OFFSET_SIGINFO64_LOWER);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_overrun) == __OFFSET_SIGINFO64_OVERRUN);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._timer._si_overrun) == __OFFSET_SIGINFO64_OVERRUN);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_pid) == __OFFSET_SIGINFO64_PID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, __sig_si_pid) == __OFFSET_SIGINFO64_PID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, __cld_si_pid) == __OFFSET_SIGINFO64_PID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._kill._si_pid) == __OFFSET_SIGINFO64_PID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._rt._si_pid) == __OFFSET_SIGINFO64_PID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigchld._si_pid) == __OFFSET_SIGINFO64_PID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_ptr) == __OFFSET_SIGINFO64_PTR);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._timer.si_sigval.sival_ptr) == __OFFSET_SIGINFO64_PTR);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_signo) == __OFFSET_SIGINFO64_SIGNO);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_status) == __OFFSET_SIGINFO64_STATUS);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigchld._si_status) == __OFFSET_SIGINFO64_STATUS);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_stime) == __OFFSET_SIGINFO64_STIME);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigchld._si_stime) == __OFFSET_SIGINFO64_STIME);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_syscall) == __OFFSET_SIGINFO64_SYSCALL);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigsys._syscall) == __OFFSET_SIGINFO64_SYSCALL);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_timerid) == __OFFSET_SIGINFO64_TIMERID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._timer._si_tid) == __OFFSET_SIGINFO64_TIMERID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_uid) == __OFFSET_SIGINFO64_UID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, __sig_si_uid) == __OFFSET_SIGINFO64_UID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, __cld_si_uid) == __OFFSET_SIGINFO64_UID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._kill._si_uid) == __OFFSET_SIGINFO64_UID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._rt._si_uid) == __OFFSET_SIGINFO64_UID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigchld._si_uid) == __OFFSET_SIGINFO64_UID);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_upper) == __OFFSET_SIGINFO64_UPPER);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigfault.si_addr_bnd._upper) == __OFFSET_SIGINFO64_UPPER);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_utime) == __OFFSET_SIGINFO64_UTIME);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._sigchld._si_utime) == __OFFSET_SIGINFO64_UTIME);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, si_value) == __OFFSET_SIGINFO64_VALUE);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, __sig_si_sigval) == __OFFSET_SIGINFO64_VALUE);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._rt.si_sigval) == __OFFSET_SIGINFO64_VALUE);
-STATIC_ASSERT(offsetof(struct __siginfo64_struct, _sifields._timer.si_sigval) == __OFFSET_SIGINFO64_VALUE);
-STATIC_ASSERT(sizeof(struct __siginfo64_struct) == __SIZEOF_SIGINFO64);
+/* struct __siginfox64_struct */
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_addr) == __OFFSET_SIGINFOX64_ADDR);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigfault._si_addr) == __OFFSET_SIGINFOX64_ADDR);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_addr_lsb) == __OFFSET_SIGINFOX64_ADDR_LSB);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigfault._si_addr_lsb) == __OFFSET_SIGINFOX64_ADDR_LSB);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_arch) == __OFFSET_SIGINFOX64_ARCH);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigsys._arch) == __OFFSET_SIGINFOX64_ARCH);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_band) == __OFFSET_SIGINFOX64_BAND);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigpoll._si_band) == __OFFSET_SIGINFOX64_BAND);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_call_addr) == __OFFSET_SIGINFOX64_CALL_ADDR);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigsys._call_addr) == __OFFSET_SIGINFOX64_CALL_ADDR);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_code) == __OFFSET_SIGINFOX64_CODE);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _si_data) == __OFFSET_SIGINFOX64_DATA);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._data) == __OFFSET_SIGINFOX64_DATA);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_errno) == __OFFSET_SIGINFOX64_ERRNO);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_fd) == __OFFSET_SIGINFOX64_FD);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigpoll._si_fd) == __OFFSET_SIGINFOX64_FD);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_int) == __OFFSET_SIGINFOX64_INT);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._timer.si_sigval.sival_int) == __OFFSET_SIGINFOX64_INT);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_lower) == __OFFSET_SIGINFOX64_LOWER);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigfault.si_addr_bnd._lower) == __OFFSET_SIGINFOX64_LOWER);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_overrun) == __OFFSET_SIGINFOX64_OVERRUN);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._timer._si_overrun) == __OFFSET_SIGINFOX64_OVERRUN);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_pid) == __OFFSET_SIGINFOX64_PID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, __sig_si_pid) == __OFFSET_SIGINFOX64_PID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, __cld_si_pid) == __OFFSET_SIGINFOX64_PID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._kill._si_pid) == __OFFSET_SIGINFOX64_PID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._rt._si_pid) == __OFFSET_SIGINFOX64_PID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigchld._si_pid) == __OFFSET_SIGINFOX64_PID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_ptr) == __OFFSET_SIGINFOX64_PTR);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._timer.si_sigval.sival_ptr) == __OFFSET_SIGINFOX64_PTR);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_signo) == __OFFSET_SIGINFOX64_SIGNO);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_status) == __OFFSET_SIGINFOX64_STATUS);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigchld._si_status) == __OFFSET_SIGINFOX64_STATUS);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_stime) == __OFFSET_SIGINFOX64_STIME);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigchld._si_stime) == __OFFSET_SIGINFOX64_STIME);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_syscall) == __OFFSET_SIGINFOX64_SYSCALL);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigsys._syscall) == __OFFSET_SIGINFOX64_SYSCALL);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_timerid) == __OFFSET_SIGINFOX64_TIMERID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._timer._si_tid) == __OFFSET_SIGINFOX64_TIMERID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_uid) == __OFFSET_SIGINFOX64_UID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, __sig_si_uid) == __OFFSET_SIGINFOX64_UID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, __cld_si_uid) == __OFFSET_SIGINFOX64_UID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._kill._si_uid) == __OFFSET_SIGINFOX64_UID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._rt._si_uid) == __OFFSET_SIGINFOX64_UID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigchld._si_uid) == __OFFSET_SIGINFOX64_UID);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_upper) == __OFFSET_SIGINFOX64_UPPER);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigfault.si_addr_bnd._upper) == __OFFSET_SIGINFOX64_UPPER);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_utime) == __OFFSET_SIGINFOX64_UTIME);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._sigchld._si_utime) == __OFFSET_SIGINFOX64_UTIME);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, si_value) == __OFFSET_SIGINFOX64_VALUE);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, __sig_si_sigval) == __OFFSET_SIGINFOX64_VALUE);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._rt.si_sigval) == __OFFSET_SIGINFOX64_VALUE);
+STATIC_ASSERT(offsetof(struct __siginfox64_struct, _sifields._timer.si_sigval) == __OFFSET_SIGINFOX64_VALUE);
+STATIC_ASSERT(sizeof(struct __siginfox64_struct) == __SIZEOF_SIGINFOX64);
 
 
 
@@ -688,16 +688,16 @@ STATIC_ASSERT(sizeof(struct __siginfo64_struct) == __SIZEOF_SIGINFO64);
 
 #include <bits/sigstack32.h>
 
-/* struct sigstack32 */
-STATIC_ASSERT(offsetof(struct sigstack32, ss_sp) == __OFFSET_SIGSTACK32_SP);
-STATIC_ASSERT(offsetof(struct sigstack32, ss_onstack) == __OFFSET_SIGSTACK32_ONSTACK);
-STATIC_ASSERT(sizeof(struct sigstack32) == __SIZEOF_SIGSTACK32);
+/* struct __sigstackx32 */
+STATIC_ASSERT(offsetof(struct __sigstackx32, ss_sp) == __OFFSET_SIGSTACKX32_SP);
+STATIC_ASSERT(offsetof(struct __sigstackx32, ss_onstack) == __OFFSET_SIGSTACKX32_ONSTACK);
+STATIC_ASSERT(sizeof(struct __sigstackx32) == __SIZEOF_SIGSTACKX32);
 
-/* struct sigaltstack32 */
-STATIC_ASSERT(offsetof(struct sigaltstack32, ss_flags) == __OFFSET_SIGALTSTACK32_FLAGS);
-STATIC_ASSERT(offsetof(struct sigaltstack32, ss_size) == __OFFSET_SIGALTSTACK32_SIZE);
-STATIC_ASSERT(offsetof(struct sigaltstack32, ss_sp) == __OFFSET_SIGALTSTACK32_SP);
-STATIC_ASSERT(sizeof(struct sigaltstack32) == __SIZEOF_SIGALTSTACK32);
+/* struct __sigaltstackx32 */
+STATIC_ASSERT(offsetof(struct __sigaltstackx32, ss_flags) == __OFFSET_SIGALTSTACKX32_FLAGS);
+STATIC_ASSERT(offsetof(struct __sigaltstackx32, ss_size) == __OFFSET_SIGALTSTACKX32_SIZE);
+STATIC_ASSERT(offsetof(struct __sigaltstackx32, ss_sp) == __OFFSET_SIGALTSTACKX32_SP);
+STATIC_ASSERT(sizeof(struct __sigaltstackx32) == __SIZEOF_SIGALTSTACKX32);
 
 
 
@@ -705,14 +705,14 @@ STATIC_ASSERT(sizeof(struct sigaltstack32) == __SIZEOF_SIGALTSTACK32);
 
 #include <bits/sigstack64.h>
 
-/* struct sigstack64 */
-STATIC_ASSERT(offsetof(struct sigstack64, ss_sp) == __OFFSET_SIGSTACK64_SP);
-STATIC_ASSERT(offsetof(struct sigstack64, ss_onstack) == __OFFSET_SIGSTACK64_ONSTACK);
+/* struct __sigstackx64 */
+STATIC_ASSERT(offsetof(struct __sigstackx64, ss_sp) == __OFFSET_SIGSTACKX64_SP);
+STATIC_ASSERT(offsetof(struct __sigstackx64, ss_onstack) == __OFFSET_SIGSTACKX64_ONSTACK);
 
-/* struct sigaltstack64 */
-STATIC_ASSERT(offsetof(struct sigaltstack64, ss_flags) == __OFFSET_SIGALTSTACK64_FLAGS);
-STATIC_ASSERT(offsetof(struct sigaltstack64, ss_size) == __OFFSET_SIGALTSTACK64_SIZE);
-STATIC_ASSERT(offsetof(struct sigaltstack64, ss_sp) == __OFFSET_SIGALTSTACK64_SP);
+/* struct __sigaltstackx64 */
+STATIC_ASSERT(offsetof(struct __sigaltstackx64, ss_flags) == __OFFSET_SIGALTSTACKX64_FLAGS);
+STATIC_ASSERT(offsetof(struct __sigaltstackx64, ss_size) == __OFFSET_SIGALTSTACKX64_SIZE);
+STATIC_ASSERT(offsetof(struct __sigaltstackx64, ss_sp) == __OFFSET_SIGALTSTACKX64_SP);
 
 
 
@@ -720,9 +720,9 @@ STATIC_ASSERT(offsetof(struct sigaltstack64, ss_sp) == __OFFSET_SIGALTSTACK64_SP
 
 #include <bits/sigval32.h>
 
-/* union sigval32 */
-STATIC_ASSERT(sizeof(union sigval32) == __SIZEOF_SIGVAL32);
-STATIC_ASSERT(alignof(union sigval32) == __ALIGNOF_SIGVAL32);
+/* union __sigvalx32 */
+STATIC_ASSERT(sizeof(union __sigvalx32) == __SIZEOF_SIGVALX32);
+STATIC_ASSERT(alignof(union __sigvalx32) == __ALIGNOF_SIGVALX32);
 
 
 
@@ -730,9 +730,9 @@ STATIC_ASSERT(alignof(union sigval32) == __ALIGNOF_SIGVAL32);
 
 #include <bits/sigval64.h>
 
-/* union sigval64 */
-STATIC_ASSERT(sizeof(union sigval64) == __SIZEOF_SIGVAL64);
-STATIC_ASSERT(alignof(union sigval64) == __ALIGNOF_SIGVAL64);
+/* union __sigvalx64 */
+STATIC_ASSERT(sizeof(union __sigvalx64) == __SIZEOF_SIGVALX64);
+STATIC_ASSERT(alignof(union __sigvalx64) == __ALIGNOF_SIGVALX64);
 
 
 
@@ -1876,7 +1876,7 @@ STATIC_ASSERT(alignof(struct tss64) == ALIGNOF_TSS64);
 
 #include <kos/kernel/ucontext32.h>
 
-/* struct __sigset_struct32 */
+/* struct __sigset_structx32 */
 /* ... */
 
 /* struct ucontext32 */

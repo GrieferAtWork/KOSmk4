@@ -54,10 +54,10 @@ __DECL_BEGIN
 #ifdef __CC__
 /* For `recvmmsg' and `sendmmsg'. */
 struct __mmsghdrx64 /*[NAME(mmsghdrx64)][PREFIX(msg_)]*/ {
-	struct msghdr64 msg_hdr; /* Actual message header. */
-	__UINT32_TYPE__ msg_len; /* Number of received or sent bytes for the entry. */
+	struct __msghdrx64 msg_hdr; /* Actual message header. */
+	__UINT32_TYPE__    msg_len; /* Number of received or sent bytes for the entry. */
 #if __ALIGNOF_INT64__ > 4
-	__BYTE_TYPE__ __msg_pad[__ALIGNOF_INT64__ - 4]; /* ... */
+	__BYTE_TYPE__    __msg_pad[__ALIGNOF_INT64__ - 4]; /* ... */
 #endif /* __ALIGNOF_INT64__ > 4 */
 };
 #endif /* __CC__ */

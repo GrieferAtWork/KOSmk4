@@ -49,23 +49,23 @@ __DECL_BEGIN
 #define __SIZEOF_UCONTEXT32          736
 
 #ifdef __CC__
-#ifndef ____sigset32_t_defined
-#define ____sigset32_t_defined 1
+#ifndef ____sigsetx32_t_defined
+#define ____sigsetx32_t_defined 1
 #ifdef __x86_64__
-typedef struct __sigset_struct32 {
+typedef struct __sigset_structx32 {
 	__UINT32_TYPE__ __val[__SIZEOF_SIGSET_T__ / 4];
-} __sigset32_t;
+} __sigsetx32_t;
 #else /* __x86_64__ */
-#define __sigset_struct32 __sigset_struct
-#define __sigset32_t      __sigset_t
+#define __sigset_structx32 __sigset_struct
+#define __sigsetx32_t      __sigset_t
 #endif /* !__x86_64__ */
-#endif /* !____sigset32_t_defined */
+#endif /* !____sigsetx32_t_defined */
 
 struct ucontext32; /* Userlevel context. */
 typedef struct ucontext32 {
 	mcontext32_t                      uc_mcontext;
-	__sigset32_t                      uc_sigmask;
-	struct sigaltstack32              uc_stack;
+	__sigsetx32_t                     uc_sigmask;
+	struct __sigaltstackx32           uc_stack;
 	__HYBRID_PTR32(struct ucontext32) uc_link;
 } ucontext32_t;
 #endif /* __CC__ */

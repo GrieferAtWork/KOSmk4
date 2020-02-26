@@ -23,8 +23,8 @@
 #include <hybrid/host.h> /* __x86_64__ */
 #ifdef __x86_64__
 #include <bits/siginfo-convert.h>
-#define compat_siginfo_to_siginfo siginfo32_to_siginfo
-#define siginfo_to_compat_siginfo siginfo_to_siginfo32
+#define compat_siginfo_to_siginfo siginfox32_to_siginfo
+#define siginfo_to_compat_siginfo siginfo_to_siginfox32
 #endif /* !__x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_BITS_SIGINFO_CONVERT_H */

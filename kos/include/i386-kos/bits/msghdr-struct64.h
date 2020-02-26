@@ -32,33 +32,33 @@
 __DECL_BEGIN
 
 #ifdef __x86_64__
-#define msghdr64 msghdr
-#define __OFFSET_MSGHDR_NAME       __OFFSET_MSGHDR64_NAME
-#define __OFFSET_MSGHDR_NAMELEN    __OFFSET_MSGHDR64_NAMELEN
-#define __OFFSET_MSGHDR_IOV        __OFFSET_MSGHDR64_IOV
-#define __OFFSET_MSGHDR_IOVLEN     __OFFSET_MSGHDR64_IOVLEN
-#define __OFFSET_MSGHDR_CONTROL    __OFFSET_MSGHDR64_CONTROL
-#define __OFFSET_MSGHDR_CONTROLLEN __OFFSET_MSGHDR64_CONTROLLEN
-#define __OFFSET_MSGHDR_FLAGS      __OFFSET_MSGHDR64_FLAGS
-#define __SIZEOF_MSGHDR            __SIZEOF_MSGHDR64
-#define __ALIGNOF_MSGHDR           __ALIGNOF_MSGHDR64
+#define __msghdrx64 msghdr
+#define __OFFSET_MSGHDR_NAME       __OFFSET_MSGHDRX64_NAME
+#define __OFFSET_MSGHDR_NAMELEN    __OFFSET_MSGHDRX64_NAMELEN
+#define __OFFSET_MSGHDR_IOV        __OFFSET_MSGHDRX64_IOV
+#define __OFFSET_MSGHDR_IOVLEN     __OFFSET_MSGHDRX64_IOVLEN
+#define __OFFSET_MSGHDR_CONTROL    __OFFSET_MSGHDRX64_CONTROL
+#define __OFFSET_MSGHDR_CONTROLLEN __OFFSET_MSGHDRX64_CONTROLLEN
+#define __OFFSET_MSGHDR_FLAGS      __OFFSET_MSGHDRX64_FLAGS
+#define __SIZEOF_MSGHDR            __SIZEOF_MSGHDRX64
+#define __ALIGNOF_MSGHDR           __ALIGNOF_MSGHDRX64
 #endif /* __x86_64__ */
 
-#define __OFFSET_MSGHDR64_NAME       0
-#define __OFFSET_MSGHDR64_NAMELEN    8
-#define __OFFSET_MSGHDR64_IOV        16
-#define __OFFSET_MSGHDR64_IOVLEN     24
-#define __OFFSET_MSGHDR64_CONTROL    32
-#define __OFFSET_MSGHDR64_CONTROLLEN 40
-#define __OFFSET_MSGHDR64_FLAGS      48
-#define __SIZEOF_MSGHDR64            56
-#define __ALIGNOF_MSGHDR64           __ALIGNOF_INT64__
+#define __OFFSET_MSGHDRX64_NAME       0
+#define __OFFSET_MSGHDRX64_NAMELEN    8
+#define __OFFSET_MSGHDRX64_IOV        16
+#define __OFFSET_MSGHDRX64_IOVLEN     24
+#define __OFFSET_MSGHDRX64_CONTROL    32
+#define __OFFSET_MSGHDRX64_CONTROLLEN 40
+#define __OFFSET_MSGHDRX64_FLAGS      48
+#define __SIZEOF_MSGHDRX64            56
+#define __ALIGNOF_MSGHDRX64           __ALIGNOF_INT64__
 #ifdef __CC__
 
 #ifdef __x86_64__
 struct iovec;
 #else /* __x86_64__ */
-struct iovec64;
+struct __iovecx64;
 #endif /* !__x86_64__ */
 #ifdef __USE_KOS_KERNEL
 struct sockaddr;
@@ -67,10 +67,11 @@ struct cmsghdr;
 #else /* __x86_64__ */
 struct __cmsghdrx64;
 #endif /* !__x86_64__ */
+#define msghdrx64 __msghdrx64
 #endif /* __USE_KOS_KERNEL */
 
 /* Structure describing messages sent by `sendmsg' and received by `recvmsg'. */
-struct msghdr64 /*[PREFIX(msg_)]*/ { /* TODO: Rename to msghdrx64 */
+struct __msghdrx64 /*[NAME(msghdrx64)][PREFIX(msg_)]*/ {
 #ifdef __USE_KOS_KERNEL
 	__HYBRID_PTR64(struct sockaddr) msg_name;      /* [out][0..msg_namelen] Address to send to/receive from. */
 #else /* __USE_KOS_KERNEL */
@@ -81,7 +82,7 @@ struct msghdr64 /*[PREFIX(msg_)]*/ { /* TODO: Rename to msghdrx64 */
 #ifdef __x86_64__
 	__HYBRID_PTR64(struct iovec)   msg_iov;        /* [0..msg_iovlen] Vector of data to send/receive into. */
 #else /* __x86_64__ */
-	__HYBRID_PTR64(struct iovec64) msg_iov;        /* [0..msg_iovlen] Vector of data to send/receive into. */
+	__HYBRID_PTR64(struct __iovecx64) msg_iov;     /* [0..msg_iovlen] Vector of data to send/receive into. */
 #endif /* !__x86_64__ */
 	__UINT64_TYPE__                msg_iovlen;     /* Number of elements in the vector. */
 #ifdef __USE_KOS_KERNEL

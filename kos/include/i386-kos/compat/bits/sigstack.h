@@ -24,11 +24,11 @@
 
 #ifdef __x86_64__
 #include <bits/sigstack32.h>
-#define compat_sigstack    sigstack32
-#define compat_sigaltstack sigaltstack32
+#define compat_sigstack    __sigstackx32
+#define compat_sigaltstack __sigaltstackx32
 #ifdef __CC__
 __DECL_BEGIN
-typedef struct sigaltstack32 compat_stack_t;
+typedef struct __sigaltstackx32 compat_stack_t;
 __DECL_END
 #endif /* __CC__ */
 #endif /* __x86_64__ */

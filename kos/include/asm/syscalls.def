@@ -119,29 +119,36 @@
 %[typeorg(<bits/stat-kos32.h>: __kos_statx32)]
 %[typeorg(<bits/stat-kos64.h>: __kos_statx64)]
 %[typeorg(<bits/statfs.h>: statfs, statfs32, statfs64, __statfs32, __statfs64)]
-%[typeorg(<bits/statfs32.h>: __statfsx32, __statfsx32_64, statfsx32, statfsx32_64)]
-%[typeorg(<bits/statfs64.h>: __statfsx64, statfsx64)]
+%[typeorg(<bits/statfs32.h>: statfsx32, __statfsx32, statfsx32_64, __statfsx32_64)]
+%[typeorg(<bits/statfs64.h>: statfsx64, __statfsx64)]
 %[typeorg(<bits/sigaction-struct.h>: sigaction, __sighandler_t)]
-%[typeorg(<bits/sigaction-struct32.h>: sigaction32, __sighandler32_t)]
-%[typeorg(<bits/sigaction-struct64.h>: sigaction64, __sighandler64_t)]
+%[typeorg(<bits/sigaction-struct32.h>: sigactionx32, __sigactionx32, __sighandlerx32_t)]
+%[typeorg(<bits/sigaction-struct64.h>: sigactionx64, __sigactionx64, __sighandlerx64_t)]
 %[typeorg(<bits/siginfo-struct.h>: __siginfo_struct, siginfo_t)]
-%[typeorg(<bits/siginfo-struct32.h>: __siginfo32_struct, siginfo32_t)]
-%[typeorg(<bits/siginfo-struct64.h>: __siginfo64_struct, siginfo64_t)]
+%[typeorg(<bits/siginfo-struct32.h>: __siginfox32_struct, siginfox32_t)]
+%[typeorg(<bits/siginfo-struct64.h>: __siginfox64_struct, siginfox64_t)]
 %[typeorg(<hybrid/__pointer.h>: __HYBRID_PTR32, __HYBRID_PTR64)]
 %[typeorg(<bits/iovec-struct.h>: iovec)]
-%[typeorg(<bits/iovec-struct32.h>: iovec32)]
-%[typeorg(<bits/iovec-struct64.h>: iovec64)]
+%[typeorg(<bits/iovec-struct32.h>: iovecx32, __iovecx32)]
+%[typeorg(<bits/iovec-struct64.h>: iovecx64, __iovecx64)]
 %[typeorg(<bits/msghdr-struct.h>: msghdr)]
-%[typeorg(<bits/msghdr-struct32.h>: msghdr32)]
-%[typeorg(<bits/msghdr-struct64.h>: msghdr64)]
+%[typeorg(<bits/msghdr-struct32.h>: msghdrx32, __msghdrx32)]
+%[typeorg(<bits/msghdr-struct64.h>: msghdrx64, __msghdrx64)]
 %[typeorg(<bits/cmsghdr-struct.h>: cmsghdr)]
 %[typeorg(<bits/cmsghdr-struct32.h>: cmsghdrx32, __cmsghdrx32)]
 %[typeorg(<bits/cmsghdr-struct64.h>: cmsghdrx64, __cmsghdrx64)]
 %[typeorg(<bits/mmsghdr-struct.h>: mmsghdr)]
 %[typeorg(<bits/mmsghdr-struct32.h>: mmsghdrx32, __mmsghdrx32)]
 %[typeorg(<bits/mmsghdr-struct64.h>: mmsghdrx64, __mmsghdrx64)]
+%[typeorg(<bits/sigstack32.h>: sigstackx32, __sigstackx32, sigaltstackx32, __sigaltstackx32)]
+%[typeorg(<bits/sigstack64.h>: sigstackx64, __sigstackx64, sigaltstackx64, __sigaltstackx64)]
 
 /* Define how specific struct names should be escaped in headers */
+%[struct_escape(sigstackx32 = __sigstackx32, sigstackx64 = __sigstackx64)]
+%[struct_escape(sigaltstackx32 = __sigaltstackx32, sigaltstackx64 = __sigaltstackx64)]
+%[struct_escape(sigactionx32 = __sigactionx32, sigactionx64 = __sigactionx64)]
+%[struct_escape(iovecx32 = __iovecx32, iovecx64 = __iovecx64)]
+%[struct_escape(msghdrx32 = __msghdrx32, msghdrx64 = __msghdrx64)]
 %[struct_escape(cmsghdrx32 = __cmsghdrx32, cmsghdrx64 = __cmsghdrx64)]
 %[struct_escape(mmsghdrx32 = __mmsghdrx32, mmsghdrx64 = __mmsghdrx64)]
 %[struct_escape(timespec32 = __timespec32, timespecx32 = __timespecx32, timespecx32_64 = __timespecx32_64)]
@@ -156,6 +163,10 @@
 %[struct_escape(rusage64 = __rusage64, rusagex64 = __rusagex64)]
 %[struct_escape(timeb32 = __timeb32, timebx32 = __timebx32, timebx32_64 = __timebx32_64)]
 %[struct_escape(timeb64 = __timeb64, timebx64 = __timebx64)]
+%[struct_escape(utimbuf32 = __utimbuf32, utimbufx32 = __utimbufx32, utimbufx32_64 = __utimbufx32_64)]
+%[struct_escape(utimbuf64 = __utimbuf64, utimbufx64 = __utimbufx64)]
+%[struct_escape(statfs32 = __statfs32, statfsx32 = __statfsx32, statfsx32_64 = __statfsx32_64)]
+%[struct_escape(statfs64 = __statfs64, statfsx64 = __statfsx64)]
 
 %[typeorg(<librpc/bits/syscall-info.h>: rpc_syscall_info)]
 %[typeorg(<librpc/bits/syscall-info32.h>: rpc_syscall_info32)]
@@ -529,15 +540,15 @@ uname:(struct utsname *name) -> errno_t;
 %[startgroup]
 @@@param: signo: One of `SIG*'
 sigaction:(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact) -> errno_t;
-sigactionx32:(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) -> errno_t;
-sigactionx64:(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact) -> errno_t;
+sigactionx32:(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) -> errno_t;
+sigactionx64:(syscall_ulong_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact) -> errno_t;
 %[endgroup]
 
 %[startgroup]
 @@@param: signo: One of `SIG*'
 rt_sigaction:(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) -> errno_t;
-rt_sigactionx32:(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) -> errno_t;
-rt_sigactionx64:(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx32:(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) -> errno_t;
+rt_sigactionx64:(syscall_ulong_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) -> errno_t;
 %[endgroup]
 
 
@@ -788,26 +799,26 @@ _newselect:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
 [cp] readv:(fd_t fd, struct iovec const *iovec, size_t count) -> ssize_t;
-[cp] readvx32:(fd_t fd, struct iovec32 const *iovec, size_t count) -> ssize_t;
-[cp] readvx64:(fd_t fd, struct iovec64 const *iovec, size_t count) -> ssize_t;
+[cp] readvx32:(fd_t fd, struct iovecx32 const *iovec, size_t count) -> ssize_t;
+[cp] readvx64:(fd_t fd, struct iovecx64 const *iovec, size_t count) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
 [cp] readvf:(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode) -> ssize_t;
-[cp] readvfx32:(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
-[cp] readvfx64:(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] readvfx32:(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] readvfx64:(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
 [cp] writev:(fd_t fd, struct iovec const *iovec, size_t count) -> ssize_t;
-[cp] writevx32:(fd_t fd, struct iovec32 const *iovec, size_t count) -> ssize_t;
-[cp] writevx64:(fd_t fd, struct iovec64 const *iovec, size_t count) -> ssize_t;
+[cp] writevx32:(fd_t fd, struct iovecx32 const *iovec, size_t count) -> ssize_t;
+[cp] writevx64:(fd_t fd, struct iovecx64 const *iovec, size_t count) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
 [cp] writevf:(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode) -> ssize_t;
-[cp] writevfx32:(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
-[cp] writevfx64:(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] writevfx32:(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) -> ssize_t;
+[cp] writevfx64:(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) -> ssize_t;
 %[endgroup]
 
 [restart(must)] getsid:(pid_t pid) -> pid_t;
@@ -864,16 +875,16 @@ rt_sigpending:(struct __sigset_struct *set, size_t sigsetsize) -> errno_t;
 [restart(dont)][cp] rt_sigtimedwait:(struct __sigset_struct const *set, struct __siginfo_struct *info, struct timespec const *timeout, size_t sigsetsize) -> syscall_slong_t;
 [restart(dont)][cp] rt_sigtimedwait32:(struct __sigset_struct const *set, struct __siginfo_struct *info, struct timespec32 const *timeout, size_t sigsetsize) -> syscall_slong_t;
 [restart(dont)][cp] rt_sigtimedwait64:(struct __sigset_struct const *set, struct __siginfo_struct *info, struct timespec64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
-[restart(dont)][cp] rt_sigtimedwaitx32:(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) -> syscall_slong_t;
-[restart(dont)][cp] rt_sigtimedwaitx32_64:(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
-[restart(dont)][cp] rt_sigtimedwaitx64:(struct __sigset_struct const *set, struct __siginfo64_struct *info, struct timespecx64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwaitx32:(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwaitx32_64:(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
+[restart(dont)][cp] rt_sigtimedwaitx64:(struct __sigset_struct const *set, struct __siginfox64_struct *info, struct timespecx64 const *timeout, size_t sigsetsize) -> syscall_slong_t;
 %[endgroup]
 
 %[startgroup]
 @@@param: signo: One of `SIG*'
 rt_sigqueueinfo:(pid_t tgid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo) -> errno_t;
-[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox32:(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) -> errno_t;
-[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox64:(pid_t tgid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) -> errno_t;
+[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox32:(pid_t tgid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) -> errno_t;
+[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox64:(pid_t tgid, syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) -> errno_t;
 %[endgroup]
 
 rt_sigsuspend:(struct __sigset_struct const *set, size_t sigsetsize) -> errno_t;
@@ -890,8 +901,8 @@ capset:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
 sigaltstack:(struct sigaltstack const *ss, struct sigaltstack *oss) -> errno_t;
-sigaltstackx32:(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) -> errno_t;
-sigaltstackx64:(struct sigaltstack64 const *ss, struct sigaltstack64 *oss) -> errno_t;
+sigaltstackx32:(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) -> errno_t;
+sigaltstackx64:(struct sigaltstackx64 const *ss, struct sigaltstackx64 *oss) -> errno_t;
 %[endgroup]
 
 %[startgroup]
@@ -1147,9 +1158,9 @@ waitid:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, s
         struct rusage *ru) -> errno_t;
 [restart(dont)][cp][doc_alias(waitid)] waitid32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage32 *ru) -> errno_t;
 [restart(dont)][cp][doc_alias(waitid)] waitid64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusage64 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusagex32 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx32_64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusagex32_64 *ru) -> errno_t;
-[restart(dont)][cp][doc_alias(waitid)] waitidx64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusagex64 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx32:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusagex32 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx32_64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusagex32_64 *ru) -> errno_t;
+[restart(dont)][cp][doc_alias(waitid)] waitidx64:([tostr(select(P_ALL, P_PID, P_PGID))] syscall_ulong_t idtype, id_t id, struct __siginfox64_struct *infop, [tostr(flagset(WEXITED, WSTOPPED, WCONTINUED, WNOHANG, WNOWAIT))] syscall_ulong_t options, struct rusagex64 *ru) -> errno_t;
 %[endgroup]
 
 add_key:(int TODO_PROTOTYPE) -> errno_t;
@@ -1253,8 +1264,8 @@ get_robust_list:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
 [cp] vmsplice:(fd_t fdout, struct iovec const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
-[cp] vmsplicex32:(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
-[cp] vmsplicex64:(fd_t fdout, struct iovec64 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
+[cp] vmsplicex32:(fd_t fdout, struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
+[cp] vmsplicex64:(fd_t fdout, struct iovecx64 const *iov, size_t count, syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
 move_pages:(int TODO_PROTOTYPE) -> errno_t;
@@ -1321,27 +1332,27 @@ inotify_init1:(int TODO_PROTOTYPE) -> errno_t;
 
 %[startgroup]
 [cp] preadv:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] preadvx32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] preadvx64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] preadvx32:(fd_t fd, struct iovecx32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] preadvx64:(fd_t fd, struct iovecx64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
 [cp] preadvf:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] preadvfx32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] preadvfx64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] preadvfx32:(fd_t fd, struct iovecx32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] preadvfx64:(fd_t fd, struct iovecx64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
 [cp] pwritev:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] pwritevx32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
-[cp] pwritevx64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] pwritevx32:(fd_t fd, struct iovecx32 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
+[cp] pwritevx64:(fd_t fd, struct iovecx64 const *iovec, size_t count, [reg64] uint64_t offset) -> ssize_t;
 [cp] pwritevf:(fd_t fd, struct iovec const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] pwritevfx32:(fd_t fd, struct iovec32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
-[cp] pwritevfx64:(fd_t fd, struct iovec64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pwritevfx32:(fd_t fd, struct iovecx32 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
+[cp] pwritevfx64:(fd_t fd, struct iovecx64 const *iovec, size_t count, [reg64] uint64_t offset, iomode_t mode) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
 @@@param: signo: One of `SIG*'
 rt_tgsigqueueinfo:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo) -> errno_t;
-[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox32:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) -> errno_t;
-[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox64:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) -> errno_t;
+[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox32:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) -> errno_t;
+[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox64:(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) -> errno_t;
 %[endgroup]
 
 perf_event_open:(int TODO_PROTOTYPE) -> errno_t;
@@ -1360,14 +1371,14 @@ setns:(fd_t fd, syscall_ulong_t nstype) -> errno_t;
 
 %[startgroup]
 process_vm_readv:(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_readvx32:(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_readvx64:(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_readvx32:(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_readvx64:(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
 process_vm_writev:(pid_t pid, struct iovec const *local_iov, size_t liovcnt, struct iovec const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_writevx32:(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
-process_vm_writevx64:(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_writevx32:(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
+process_vm_writevx64:(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) -> ssize_t;
 %[endgroup]
 
 kcmp:(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) -> syscall_slong_t;
@@ -1452,8 +1463,8 @@ sendto:(fd_t sockfd, void const *buf, size_t bufsize,
 @@@param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
 @@                           MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
 [restart(dont)][cp] sendmsg:(fd_t sockfd, struct msghdr const *message, [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t msg_flags) -> ssize_t;
-[doc_alias(sendmsg)][restart(dont)][cp] sendmsgx32:(fd_t sockfd, struct msghdr32 const *message, [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t msg_flags) -> ssize_t;
-[doc_alias(sendmsg)][restart(dont)][cp] sendmsgx64:(fd_t sockfd, struct msghdr64 const *message, [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t msg_flags) -> ssize_t;
+[doc_alias(sendmsg)][restart(dont)][cp] sendmsgx32:(fd_t sockfd, struct msghdrx32 const *message, [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t msg_flags) -> ssize_t;
+[doc_alias(sendmsg)][restart(dont)][cp] sendmsgx64:(fd_t sockfd, struct msghdrx64 const *message, [tostr(flagset(MSG_CONFIRM, MSG_DONTROUTE, MSG_DONTWAIT, MSG_EOR, MSG_MORE, MSG_NOSIGNAL, MSG_OOB))] syscall_ulong_t msg_flags) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
@@ -1480,8 +1491,8 @@ recvfrom:(fd_t sockfd, void *buf, size_t bufsize,
 @@                           MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
 @@                           MSG_PEEK | MSG_TRUNC | MSG_WAITALL'
 [restart(dont)][cp] recvmsg:(fd_t sockfd, struct msghdr *message, [tostr(flagset(MSG_CMSG_CLOEXEC, MSG_CMSG_CLOFORK, MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t msg_flags) -> ssize_t;
-[doc_alias(recvmsg)][restart(dont)][cp] recvmsgx32:(fd_t sockfd, struct msghdr32 *message, [tostr(flagset(MSG_CMSG_CLOEXEC, MSG_CMSG_CLOFORK, MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t msg_flags) -> ssize_t;
-[doc_alias(recvmsg)][restart(dont)][cp] recvmsgx64:(fd_t sockfd, struct msghdr64 *message, [tostr(flagset(MSG_CMSG_CLOEXEC, MSG_CMSG_CLOFORK, MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t msg_flags) -> ssize_t;
+[doc_alias(recvmsg)][restart(dont)][cp] recvmsgx32:(fd_t sockfd, struct msghdrx32 *message, [tostr(flagset(MSG_CMSG_CLOEXEC, MSG_CMSG_CLOFORK, MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t msg_flags) -> ssize_t;
+[doc_alias(recvmsg)][restart(dont)][cp] recvmsgx64:(fd_t sockfd, struct msghdrx64 *message, [tostr(flagset(MSG_CMSG_CLOEXEC, MSG_CMSG_CLOFORK, MSG_DONTWAIT, MSG_ERRQUEUE, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))] syscall_ulong_t msg_flags) -> ssize_t;
 %[endgroup]
 
 %[startgroup]
@@ -1853,8 +1864,8 @@ mktty:(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) -> f
 @@TODO: Add a flags argument to control if the current signal mask
 @@      should be ignored (currently, it's always being ignored)
 [restart(must)] raiseat:(struct ucpustate const *state, struct __siginfo_struct const *si) -> errno_t;
-[doc_alias(raiseat)][restart(must)] raiseatx32:(struct ucpustate32 const *state, struct __siginfo32_struct const *si) -> errno_t;
-[doc_alias(raiseat)][restart(must)] raiseatx64:(struct ucpustate64 const *state, struct __siginfo64_struct const *si) -> errno_t;
+[doc_alias(raiseat)][restart(must)] raiseatx32:(struct ucpustate32 const *state, struct __siginfox32_struct const *si) -> errno_t;
+[doc_alias(raiseat)][restart(must)] raiseatx64:(struct ucpustate64 const *state, struct __siginfox64_struct const *si) -> errno_t;
 %[endgroup]
 
 %[startgroup]

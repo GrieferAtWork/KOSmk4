@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x616ffb3 */
+/* HASH CRC-32:0xd8f709b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1598,7 +1598,7 @@ INTERN_FUNCTION(libc_sys_Xsetsid)
 END(libc_sys_Xsetsid)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsetsid, libc_sys_Xsetsid)
 
-/* errno_t sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) */
+/* errno_t sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
 .section .text.crt.syscall.sigaction
 INTERN_FUNCTION(libc_sys_sigaction)
 	movl   $(0x43), %eax
@@ -1606,7 +1606,7 @@ INTERN_FUNCTION(libc_sys_sigaction)
 END(libc_sys_sigaction)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sigaction, libc_sys_sigaction)
 
-/* errno_t sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) */
+/* errno_t sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
 .section .text.crt.syscall.Xsigaction
 INTERN_FUNCTION(libc_sys_Xsigaction)
 	movl   $(0x43), %eax
@@ -2868,7 +2868,7 @@ INTERN_FUNCTION(libc_sys_Xmsync)
 END(libc_sys_Xmsync)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmsync, libc_sys_Xmsync)
 
-/* ssize_t readv(fd_t fd, struct iovec32 const *iovec, size_t count) */
+/* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.crt.syscall.readv
 INTERN_FUNCTION(libc_sys_readv)
 	movl   $(0x91), %eax
@@ -2876,7 +2876,7 @@ INTERN_FUNCTION(libc_sys_readv)
 END(libc_sys_readv)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_readv, libc_sys_readv)
 
-/* ssize_t readv(fd_t fd, struct iovec32 const *iovec, size_t count) */
+/* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.crt.syscall.Xreadv
 INTERN_FUNCTION(libc_sys_Xreadv)
 	movl   $(0x91), %eax
@@ -2884,7 +2884,7 @@ INTERN_FUNCTION(libc_sys_Xreadv)
 END(libc_sys_Xreadv)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xreadv, libc_sys_Xreadv)
 
-/* ssize_t writev(fd_t fd, struct iovec32 const *iovec, size_t count) */
+/* ssize_t writev(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.crt.syscall.writev
 INTERN_FUNCTION(libc_sys_writev)
 	movl   $(0x92), %eax
@@ -2892,7 +2892,7 @@ INTERN_FUNCTION(libc_sys_writev)
 END(libc_sys_writev)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_writev, libc_sys_writev)
 
-/* ssize_t writev(fd_t fd, struct iovec32 const *iovec, size_t count) */
+/* ssize_t writev(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.crt.syscall.Xwritev
 INTERN_FUNCTION(libc_sys_Xwritev)
 	movl   $(0x92), %eax
@@ -3326,7 +3326,7 @@ INTERN_FUNCTION(libc_sys_rt_sigreturn)
 END(libc_sys_rt_sigreturn)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigreturn, libc_sys_rt_sigreturn)
 
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
 .section .text.crt.syscall.rt_sigaction
 INTERN_FUNCTION(libc_sys_rt_sigaction)
 	movl   $(0xae), %eax
@@ -3334,7 +3334,7 @@ INTERN_FUNCTION(libc_sys_rt_sigaction)
 END(libc_sys_rt_sigaction)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigaction, libc_sys_rt_sigaction)
 
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
 .section .text.crt.syscall.Xrt_sigaction
 INTERN_FUNCTION(libc_sys_Xrt_sigaction)
 	movl   $(0xae), %eax
@@ -3376,7 +3376,7 @@ INTERN_FUNCTION(libc_sys_Xrt_sigpending)
 END(libc_sys_Xrt_sigpending)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrt_sigpending, libc_sys_Xrt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.rt_sigtimedwait
 INTERN_FUNCTION(libc_sys_rt_sigtimedwait)
 	movl   $(0xb1), %eax
@@ -3384,7 +3384,7 @@ INTERN_FUNCTION(libc_sys_rt_sigtimedwait)
 END(libc_sys_rt_sigtimedwait)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigtimedwait, libc_sys_rt_sigtimedwait)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.Xrt_sigtimedwait
 INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait)
 	movl   $(0xb1), %eax
@@ -3393,7 +3393,7 @@ END(libc_sys_Xrt_sigtimedwait)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrt_sigtimedwait, libc_sys_Xrt_sigtimedwait)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.rt_sigqueueinfo
 INTERN_FUNCTION(libc_sys_rt_sigqueueinfo)
 	movl   $(0xb2), %eax
@@ -3402,7 +3402,7 @@ END(libc_sys_rt_sigqueueinfo)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigqueueinfo, libc_sys_rt_sigqueueinfo)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.Xrt_sigqueueinfo
 INTERN_FUNCTION(libc_sys_Xrt_sigqueueinfo)
 	movl   $(0xb2), %eax
@@ -3522,7 +3522,7 @@ INTERN_FUNCTION(libc_sys_Xcapset)
 END(libc_sys_Xcapset)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xcapset, libc_sys_Xcapset)
 
-/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
+/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
 .section .text.crt.syscall.sigaltstack
 INTERN_FUNCTION(libc_sys_sigaltstack)
 	movl   $(0xba), %eax
@@ -3530,7 +3530,7 @@ INTERN_FUNCTION(libc_sys_sigaltstack)
 END(libc_sys_sigaltstack)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_sigaltstack, libc_sys_sigaltstack)
 
-/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
+/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
 .section .text.crt.syscall.Xsigaltstack
 INTERN_FUNCTION(libc_sys_Xsigaltstack)
 	movl   $(0xba), %eax
@@ -5043,7 +5043,7 @@ END(libc_sys_Xkexec_load)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xkexec_load, libc_sys_Xkexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.crt.syscall.waitid
 INTERN_FUNCTION(libc_sys_waitid)
 	movl   $(0x11c), %eax
@@ -5052,7 +5052,7 @@ END(libc_sys_waitid)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_waitid, libc_sys_waitid)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.crt.syscall.Xwaitid
 INTERN_FUNCTION(libc_sys_Xwaitid)
 	movl   $(0x11c), %eax
@@ -5556,7 +5556,7 @@ INTERN_FUNCTION(libc_sys_Xtee)
 END(libc_sys_Xtee)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtee, libc_sys_Xtee)
 
-/* ssize_t vmsplice(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) */
+/* ssize_t vmsplice(fd_t fdout, struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) */
 .section .text.crt.syscall.vmsplice
 INTERN_FUNCTION(libc_sys_vmsplice)
 	movl   $(0x13c), %eax
@@ -5564,7 +5564,7 @@ INTERN_FUNCTION(libc_sys_vmsplice)
 END(libc_sys_vmsplice)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_vmsplice, libc_sys_vmsplice)
 
-/* ssize_t vmsplice(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) */
+/* ssize_t vmsplice(fd_t fdout, struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xvmsplice
 INTERN_FUNCTION(libc_sys_Xvmsplice)
 	movl   $(0x13c), %eax
@@ -5842,7 +5842,7 @@ INTERN_FUNCTION(libc_sys_Xinotify_init1)
 END(libc_sys_Xinotify_init1)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xinotify_init1, libc_sys_Xinotify_init1)
 
-/* ssize_t preadv(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.crt.syscall.preadv
 INTERN_FUNCTION(libc_sys_preadv)
 	movl   $(0x14d), %eax
@@ -5850,7 +5850,7 @@ INTERN_FUNCTION(libc_sys_preadv)
 END(libc_sys_preadv)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_preadv, libc_sys_preadv)
 
-/* ssize_t preadv(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.crt.syscall.Xpreadv
 INTERN_FUNCTION(libc_sys_Xpreadv)
 	movl   $(0x14d), %eax
@@ -5858,7 +5858,7 @@ INTERN_FUNCTION(libc_sys_Xpreadv)
 END(libc_sys_Xpreadv)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpreadv, libc_sys_Xpreadv)
 
-/* ssize_t pwritev(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.crt.syscall.pwritev
 INTERN_FUNCTION(libc_sys_pwritev)
 	movl   $(0x14e), %eax
@@ -5866,7 +5866,7 @@ INTERN_FUNCTION(libc_sys_pwritev)
 END(libc_sys_pwritev)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_pwritev, libc_sys_pwritev)
 
-/* ssize_t pwritev(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.crt.syscall.Xpwritev
 INTERN_FUNCTION(libc_sys_Xpwritev)
 	movl   $(0x14e), %eax
@@ -5875,7 +5875,7 @@ END(libc_sys_Xpwritev)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpwritev, libc_sys_Xpwritev)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.rt_tgsigqueueinfo
 INTERN_FUNCTION(libc_sys_rt_tgsigqueueinfo)
 	movl   $(0x14f), %eax
@@ -5884,7 +5884,7 @@ END(libc_sys_rt_tgsigqueueinfo)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_tgsigqueueinfo, libc_sys_rt_tgsigqueueinfo)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.Xrt_tgsigqueueinfo
 INTERN_FUNCTION(libc_sys_Xrt_tgsigqueueinfo)
 	movl   $(0x14f), %eax
@@ -6070,7 +6070,7 @@ INTERN_FUNCTION(libc_sys_Xsetns)
 END(libc_sys_Xsetns)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsetns, libc_sys_Xsetns)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.process_vm_readv
 INTERN_FUNCTION(libc_sys_process_vm_readv)
 	movl   $(0x15b), %eax
@@ -6078,7 +6078,7 @@ INTERN_FUNCTION(libc_sys_process_vm_readv)
 END(libc_sys_process_vm_readv)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_process_vm_readv, libc_sys_process_vm_readv)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xprocess_vm_readv
 INTERN_FUNCTION(libc_sys_Xprocess_vm_readv)
 	movl   $(0x15b), %eax
@@ -6086,7 +6086,7 @@ INTERN_FUNCTION(libc_sys_Xprocess_vm_readv)
 END(libc_sys_Xprocess_vm_readv)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xprocess_vm_readv, libc_sys_Xprocess_vm_readv)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.process_vm_writev
 INTERN_FUNCTION(libc_sys_process_vm_writev)
 	movl   $(0x15c), %eax
@@ -6094,7 +6094,7 @@ INTERN_FUNCTION(libc_sys_process_vm_writev)
 END(libc_sys_process_vm_writev)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_process_vm_writev, libc_sys_process_vm_writev)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xprocess_vm_writev
 INTERN_FUNCTION(libc_sys_Xprocess_vm_writev)
 	movl   $(0x15c), %eax
@@ -6490,7 +6490,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsendto, libc_sys_Xsendto)
 
 /* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-/* ssize_t sendmsg(fd_t sockfd, struct msghdr32 const *message, syscall_ulong_t msg_flags) */
+/* ssize_t sendmsg(fd_t sockfd, struct msghdrx32 const *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.sendmsg
 INTERN_FUNCTION(libc_sys_sendmsg)
 	movl   $(0x172), %eax
@@ -6500,7 +6500,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_sendmsg, libc_sys_sendmsg)
 
 /* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-/* ssize_t sendmsg(fd_t sockfd, struct msghdr32 const *message, syscall_ulong_t msg_flags) */
+/* ssize_t sendmsg(fd_t sockfd, struct msghdrx32 const *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.Xsendmsg
 INTERN_FUNCTION(libc_sys_Xsendmsg)
 	movl   $(0x172), %eax
@@ -6531,7 +6531,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrecvfrom, libc_sys_Xrecvfrom)
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t msg_flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdrx32 *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.recvmsg
 INTERN_FUNCTION(libc_sys_recvmsg)
 	movl   $(0x174), %eax
@@ -6542,7 +6542,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_recvmsg, libc_sys_recvmsg)
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t msg_flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdrx32 *message, syscall_ulong_t msg_flags) */
 .section .text.crt.syscall.Xrecvmsg
 INTERN_FUNCTION(libc_sys_Xrecvmsg)
 	movl   $(0x174), %eax
@@ -6632,7 +6632,7 @@ INTERN_FUNCTION(libc_sys_Xrecvmmsg64)
 END(libc_sys_Xrecvmmsg64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xrecvmmsg64, libc_sys_Xrecvmmsg64)
 
-/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.crt.syscall.pwritevf
 INTERN_FUNCTION(libc_sys_pwritevf)
 	movl   $(0xfffffeb2), %eax
@@ -6640,7 +6640,7 @@ INTERN_FUNCTION(libc_sys_pwritevf)
 END(libc_sys_pwritevf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_pwritevf, libc_sys_pwritevf)
 
-/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.crt.syscall.Xpwritevf
 INTERN_FUNCTION(libc_sys_Xpwritevf)
 	movl   $(0xfffffeb2), %eax
@@ -6648,7 +6648,7 @@ INTERN_FUNCTION(libc_sys_Xpwritevf)
 END(libc_sys_Xpwritevf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpwritevf, libc_sys_Xpwritevf)
 
-/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.crt.syscall.preadvf
 INTERN_FUNCTION(libc_sys_preadvf)
 	movl   $(0xfffffeb3), %eax
@@ -6656,7 +6656,7 @@ INTERN_FUNCTION(libc_sys_preadvf)
 END(libc_sys_preadvf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_preadvf, libc_sys_preadvf)
 
-/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.crt.syscall.Xpreadvf
 INTERN_FUNCTION(libc_sys_Xpreadvf)
 	movl   $(0xfffffeb3), %eax
@@ -6895,7 +6895,7 @@ END(libc_sys_Xfmkdirat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfmkdirat, libc_sys_Xfmkdirat)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.crt.syscall.waitid64
 INTERN_FUNCTION(libc_sys_waitid64)
 	movl   $(0xfffffee4), %eax
@@ -6904,7 +6904,7 @@ END(libc_sys_waitid64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_waitid64, libc_sys_waitid64)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.crt.syscall.Xwaitid64
 INTERN_FUNCTION(libc_sys_Xwaitid64)
 	movl   $(0xfffffee4), %eax
@@ -7152,7 +7152,7 @@ INTERN_FUNCTION(libc_sys_Xpread64f)
 END(libc_sys_Xpread64f)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xpread64f, libc_sys_Xpread64f)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.rt_sigtimedwait64
 INTERN_FUNCTION(libc_sys_rt_sigtimedwait64)
 	movl   $(0xffffff4f), %eax
@@ -7160,7 +7160,7 @@ INTERN_FUNCTION(libc_sys_rt_sigtimedwait64)
 END(libc_sys_rt_sigtimedwait64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rt_sigtimedwait64, libc_sys_rt_sigtimedwait64)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.Xrt_sigtimedwait64
 INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait64)
 	movl   $(0xffffff4f), %eax
@@ -7232,7 +7232,7 @@ INTERN_FUNCTION(libc_sys_Xksysctl)
 END(libc_sys_Xksysctl)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xksysctl, libc_sys_Xksysctl)
 
-/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t writevf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.crt.syscall.writevf
 INTERN_FUNCTION(libc_sys_writevf)
 	movl   $(0xffffff6e), %eax
@@ -7240,7 +7240,7 @@ INTERN_FUNCTION(libc_sys_writevf)
 END(libc_sys_writevf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_writevf, libc_sys_writevf)
 
-/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t writevf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.crt.syscall.Xwritevf
 INTERN_FUNCTION(libc_sys_Xwritevf)
 	movl   $(0xffffff6e), %eax
@@ -7248,7 +7248,7 @@ INTERN_FUNCTION(libc_sys_Xwritevf)
 END(libc_sys_Xwritevf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xwritevf, libc_sys_Xwritevf)
 
-/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.crt.syscall.readvf
 INTERN_FUNCTION(libc_sys_readvf)
 	movl   $(0xffffff6f), %eax
@@ -7256,7 +7256,7 @@ INTERN_FUNCTION(libc_sys_readvf)
 END(libc_sys_readvf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_readvf, libc_sys_readvf)
 
-/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.crt.syscall.Xreadvf
 INTERN_FUNCTION(libc_sys_Xreadvf)
 	movl   $(0xffffff6f), %eax
@@ -7602,7 +7602,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xcoredump, libc_sys_Xcoredump)
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
+/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
 .section .text.crt.syscall.raiseat
 INTERN_FUNCTION(libc_sys_raiseat)
 	movl   $(0xffffffe9), %eax
@@ -7618,7 +7618,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_raiseat, libc_sys_raiseat)
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
+/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
 .section .text.crt.syscall.Xraiseat
 INTERN_FUNCTION(libc_sys_Xraiseat)
 	movl   $(0xffffffe9), %eax

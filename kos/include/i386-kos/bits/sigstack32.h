@@ -21,6 +21,7 @@
 #define _I386_KOS_BITS_SIGSTACK32_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
 #include <hybrid/__pointer.h>
 #include <hybrid/host.h>
@@ -32,19 +33,19 @@ __SYSDECL_BEGIN
 
 #ifndef __sigstack_defined
 #define __sigstack_defined 1
-#define __OFFSET_SIGSTACK_SP       __OFFSET_SIGSTACK32_SP
-#define __OFFSET_SIGSTACK_ONSTACK  __OFFSET_SIGSTACK32_ONSTACK
-#define __SIZEOF_SIGSTACK          __SIZEOF_SIGSTACK32
-#define sigstack32                 sigstack
+#define __OFFSET_SIGSTACK_SP       __OFFSET_SIGSTACKX32_SP
+#define __OFFSET_SIGSTACK_ONSTACK  __OFFSET_SIGSTACKX32_ONSTACK
+#define __SIZEOF_SIGSTACK          __SIZEOF_SIGSTACKX32
+#define __sigstackx32              sigstack
 #endif /* !__sigstack_defined */
 
 #ifndef __sigaltstack_defined
 #define __sigaltstack_defined 1
-#define __OFFSET_SIGALTSTACK_SP    __OFFSET_SIGALTSTACK32_SP
-#define __OFFSET_SIGALTSTACK_FLAGS __OFFSET_SIGALTSTACK32_FLAGS
-#define __OFFSET_SIGALTSTACK_SIZE  __OFFSET_SIGALTSTACK32_SIZE
-#define __SIZEOF_SIGALTSTACK       __SIZEOF_SIGALTSTACK32
-#define sigaltstack32              sigaltstack
+#define __OFFSET_SIGALTSTACK_SP    __OFFSET_SIGALTSTACKX32_SP
+#define __OFFSET_SIGALTSTACK_FLAGS __OFFSET_SIGALTSTACKX32_FLAGS
+#define __OFFSET_SIGALTSTACK_SIZE  __OFFSET_SIGALTSTACKX32_SIZE
+#define __SIZEOF_SIGALTSTACK       __SIZEOF_SIGALTSTACKX32
+#define __sigaltstackx32           sigaltstack
 #endif /* !__sigaltstack_defined */
 
 #ifndef __stack_t_defined
@@ -57,16 +58,19 @@ typedef struct sigaltstack stack_t;
 
 #endif /* !__x86_64__ */
 
+#ifdef __USE_KOS_KERNEL
+#define sigstackx32    __sigstackx32
+#define sigaltstackx32 __sigaltstackx32
+#endif /* __USE_KOS_KERNEL */
 
 
-
-#define __OFFSET_SIGSTACK32_SP       0
-#define __OFFSET_SIGSTACK32_ONSTACK  4
-#define __SIZEOF_SIGSTACK32          8
+#define __OFFSET_SIGSTACKX32_SP      0
+#define __OFFSET_SIGSTACKX32_ONSTACK 4
+#define __SIZEOF_SIGSTACKX32         8
 
 #ifdef __CC__
 /* Structure describing a signal stack (obsolete). */
-struct sigstack32 /*[PREFIX(ss_)]*/ { /* TODO: Rename to sigstackx32 */
+struct __sigstackx32 /*[NAME(sigstackx32)][PREFIX(ss_)]*/ {
 	__HYBRID_PTR32(void) ss_sp;      /* Signal stack pointer. */
 	int                  ss_onstack; /* Nonzero if executing on this stack. */
 #if __SIZEOF_INT__ < 4
@@ -76,17 +80,17 @@ struct sigstack32 /*[PREFIX(ss_)]*/ { /* TODO: Rename to sigstackx32 */
 #endif /* __CC__ */
 
 
-#define __OFFSET_SIGALTSTACK32_SP    0
-#define __OFFSET_SIGALTSTACK32_FLAGS 4
-#define __OFFSET_SIGALTSTACK32_SIZE  8
-#define __SIZEOF_SIGALTSTACK32       12
+#define __OFFSET_SIGALTSTACKX32_SP    0
+#define __OFFSET_SIGALTSTACKX32_FLAGS 4
+#define __OFFSET_SIGALTSTACKX32_SIZE  8
+#define __SIZEOF_SIGALTSTACKX32       12
 
 #ifdef __CC__
 /* Alternate, preferred interface. */
-struct sigaltstack32 /*[PREFIX(ss_)]*/ {
-	__HYBRID_PTR32(void) ss_sp;
-	__INT32_TYPE__       ss_flags;
-	__ULONG32_TYPE__     ss_size;
+struct __sigaltstackx32 /*[NAME(sigaltstackx32)][PREFIX(ss_)]*/ {
+	__HYBRID_PTR32(void) ss_sp;    /* Signal stack pointer. */
+	__INT32_TYPE__       ss_flags; /* Set of `SS_*' from `<bits/sigstack.h>' */
+	__ULONG32_TYPE__     ss_size;  /* Signal stack size (in bytes) */
 };
 #endif /* __CC__ */
 

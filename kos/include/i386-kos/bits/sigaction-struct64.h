@@ -30,17 +30,17 @@
 #include <bits/types.h>
 
 #if defined(__x86_64__) && !defined(__CRT_CYG_PRIMARY)
-#define __OFFSET_SIGACTION_HANDLER   __OFFSET_SIGACTION64_HANDLER
-#define __OFFSET_SIGACTION_SIGACTION __OFFSET_SIGACTION64_SIGACTION
-#define __OFFSET_SIGACTION_MASK      __OFFSET_SIGACTION64_MASK
-#define __OFFSET_SIGACTION_FLAGS     __OFFSET_SIGACTION64_FLAGS
-#define __OFFSET_SIGACTION_RESTORER  __OFFSET_SIGACTION64_RESTORER
-#define __SIZEOF_SIGACTION           __SIZEOF_SIGACTION64
-#define __ALIGNOF_SIGACTION          __ALIGNOF_SIGACTION64
-#define sigaction64       sigaction
+#define __OFFSET_SIGACTION_HANDLER   __OFFSET_SIGACTIONX64_HANDLER
+#define __OFFSET_SIGACTION_SIGACTION __OFFSET_SIGACTIONX64_SIGACTION
+#define __OFFSET_SIGACTION_MASK      __OFFSET_SIGACTIONX64_MASK
+#define __OFFSET_SIGACTION_FLAGS     __OFFSET_SIGACTIONX64_FLAGS
+#define __OFFSET_SIGACTION_RESTORER  __OFFSET_SIGACTIONX64_RESTORER
+#define __SIZEOF_SIGACTION           __SIZEOF_SIGACTIONX64
+#define __ALIGNOF_SIGACTION          __ALIGNOF_SIGACTIONX64
+#define __sigactionx64 sigaction
 #ifndef ____sighandler_t_defined
 #define ____sighandler_t_defined 1
-#define __sighandler64_t  __sighandler_t
+#define __sighandlerx64_t __sighandler_t
 #endif /* !____sighandler_t_defined */
 #endif /* __x86_64__ && !__CRT_CYG_PRIMARY */
 
@@ -49,7 +49,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
-typedef __HYBRID_FUNCPTR64(void,__ATTR_SYSVABI,__sighandler64_t,(int __signo));
+typedef __HYBRID_FUNCPTR64(void,__ATTR_SYSVABI,__sighandlerx64_t,(int __signo));
 
 #ifdef __USE_POSIX199309
 #ifdef __x86_64__
@@ -68,21 +68,21 @@ struct ucontext64;
 #endif /* __CC__ */
 
 
-#define __OFFSET_SIGACTION64_HANDLER   0
-#define __OFFSET_SIGACTION64_SIGACTION 0
-#define __OFFSET_SIGACTION64_MASK      8
-#define __OFFSET_SIGACTION64_FLAGS     136
-#define __OFFSET_SIGACTION64_RESTORER  144
-#define __SIZEOF_SIGACTION64           152
-#define __ALIGNOF_SIGACTION64          8
+#define __OFFSET_SIGACTIONX64_HANDLER   0
+#define __OFFSET_SIGACTIONX64_SIGACTION 0
+#define __OFFSET_SIGACTIONX64_MASK      8
+#define __OFFSET_SIGACTIONX64_FLAGS     136
+#define __OFFSET_SIGACTIONX64_RESTORER  144
+#define __SIZEOF_SIGACTIONX64           152
+#define __ALIGNOF_SIGACTIONX64          8
 #ifdef __CC__
 /* Structure describing the action to be taken when a signal arrives. */
-struct __ATTR_ALIGNED(__ALIGNOF_SIGACTION64) sigaction64 /*[PREFIX(sa_)]*/ { /* TODO: Rename to sigactionx64 */
+struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX64) __sigactionx64 /*[NAME(sigactionx64)][PREFIX(sa_)]*/ {
 	/* Signal handler. */
 #ifdef __USE_POSIX199309
 	union {
 		/* Used if SA_SIGINFO is not set. */
-		__sighandler64_t sa_handler;
+		__sighandlerx64_t sa_handler;
 		/* Used if SA_SIGINFO is set. */
 #ifdef __USE_KOS
 #ifdef __x86_64__
@@ -99,7 +99,7 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTION64) sigaction64 /*[PREFIX(sa_)]*/ { /* 
 #endif /* !__USE_KOS */
 	};
 #else /* __USE_POSIX199309 */
-	__sighandler64_t sa_handler;
+	__sighandlerx64_t sa_handler;
 #endif /* !__USE_POSIX199309 */
 	__sigset_t sa_mask;  /* Additional set of signals to be blocked. */
 	__uint32_t sa_flags; /* Special flags. */

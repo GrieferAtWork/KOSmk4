@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91ce631 */
+/* HASH CRC-32:0xf11b0eed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -436,7 +436,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_brk)
 	.cfi_endproc
 END(__x86_asm64_syscall_brk)
 
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction64 const *act, struct sigaction64 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx64 const *act, struct sigactionx64 *oact, size_t sigsetsize) */
 .section .text.x86.asm64_syscall.rt_sigaction
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigaction)
 	.cfi_startproc simple
@@ -635,7 +635,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwrite64)
 	.cfi_endproc
 END(__x86_asm64_syscall_pwrite64)
 
-/* ssize_t readv(fd_t fd, struct iovec64 const *iovec, size_t count) */
+/* ssize_t readv(fd_t fd, struct iovecx64 const *iovec, size_t count) */
 .section .text.x86.asm64_syscall.readv
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readv)
 	.cfi_startproc simple
@@ -665,7 +665,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readv)
 	.cfi_endproc
 END(__x86_asm64_syscall_readv)
 
-/* ssize_t writev(fd_t fd, struct iovec64 const *iovec, size_t count) */
+/* ssize_t writev(fd_t fd, struct iovecx64 const *iovec, size_t count) */
 .section .text.x86.asm64_syscall.writev
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writev)
 	.cfi_startproc simple
@@ -1466,7 +1466,7 @@ END(__x86_asm64_syscall_recvfrom)
 
 /* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-/* ssize_t sendmsg(fd_t sockfd, struct msghdr64 const *message, syscall_ulong_t msg_flags) */
+/* ssize_t sendmsg(fd_t sockfd, struct msghdrx64 const *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm64_syscall.sendmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sendmsg)
 	.cfi_startproc simple
@@ -1499,7 +1499,7 @@ END(__x86_asm64_syscall_sendmsg)
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr64 *message, syscall_ulong_t msg_flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdrx64 *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm64_syscall.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_recvmsg)
 	.cfi_startproc simple
@@ -3951,7 +3951,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigpending)
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo64_struct *info, struct timespecx64 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox64_struct *info, struct timespecx64 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm64_syscall.rt_sigtimedwait
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigtimedwait)
 	.cfi_startproc simple
@@ -3983,7 +3983,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigtimedwait)
 END(__x86_asm64_syscall_rt_sigtimedwait)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) */
 .section .text.x86.asm64_syscall.rt_sigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigqueueinfo)
 	.cfi_startproc simple
@@ -4043,7 +4043,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigsuspend)
 	.cfi_endproc
 END(__x86_asm64_syscall_rt_sigsuspend)
 
-/* errno_t sigaltstack(struct sigaltstack64 const *ss, struct sigaltstack64 *oss) */
+/* errno_t sigaltstack(struct sigaltstackx64 const *ss, struct sigaltstackx64 *oss) */
 .section .text.x86.asm64_syscall.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sigaltstack)
 	.cfi_startproc simple
@@ -7543,7 +7543,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kexec_load)
 END(__x86_asm64_syscall_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo64_struct *infop, syscall_ulong_t options, struct rusagex64 *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox64_struct *infop, syscall_ulong_t options, struct rusagex64 *ru) */
 .section .text.x86.asm64_syscall.waitid
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_waitid)
 	.cfi_startproc simple
@@ -8496,7 +8496,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sync_file_range)
 	.cfi_endproc
 END(__x86_asm64_syscall_sync_file_range)
 
-/* ssize_t vmsplice(fd_t fdout, struct iovec64 const *iov, size_t count, syscall_ulong_t flags) */
+/* ssize_t vmsplice(fd_t fdout, struct iovecx64 const *iov, size_t count, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.vmsplice
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_vmsplice)
 	.cfi_startproc simple
@@ -9021,7 +9021,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_inotify_init1)
 	.cfi_endproc
 END(__x86_asm64_syscall_inotify_init1)
 
-/* ssize_t preadv(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t preadv(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm64_syscall.preadv
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadv)
 	.cfi_startproc simple
@@ -9052,7 +9052,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadv)
 	.cfi_endproc
 END(__x86_asm64_syscall_preadv)
 
-/* ssize_t pwritev(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t pwritev(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm64_syscall.pwritev
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritev)
 	.cfi_startproc simple
@@ -9084,7 +9084,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritev)
 END(__x86_asm64_syscall_pwritev)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo64_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox64_struct const *uinfo) */
 .section .text.x86.asm64_syscall.rt_tgsigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_tgsigqueueinfo)
 	.cfi_startproc simple
@@ -9480,7 +9480,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_getcpu)
 	.cfi_endproc
 END(__x86_asm64_syscall_getcpu)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_readv)
 	.cfi_startproc simple
@@ -9511,7 +9511,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm64_syscall_process_vm_readv)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec64 const *local_iov, size_t liovcnt, struct iovec64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovecx64 const *local_iov, size_t liovcnt, struct iovecx64 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_process_vm_writev)
 	.cfi_startproc simple
@@ -9967,7 +9967,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlock2)
 	.cfi_endproc
 END(__x86_asm64_syscall_mlock2)
 
-/* ssize_t pwritevf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t pwritevf(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm64_syscall.pwritevf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritevf)
 	.cfi_startproc simple
@@ -9998,7 +9998,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritevf)
 	.cfi_endproc
 END(__x86_asm64_syscall_pwritevf)
 
-/* ssize_t preadvf(fd_t fd, struct iovec64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t preadvf(fd_t fd, struct iovecx64 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm64_syscall.preadvf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadvf)
 	.cfi_startproc simple
@@ -10510,7 +10510,7 @@ END(__x86_asm64_syscall_coredump)
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfo64_struct const *si) */
+/* errno_t raiseat(struct ucpustate64 const *state, struct __siginfox64_struct const *si) */
 .section .text.x86.asm64_syscall.raiseat
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_raiseat)
 	.cfi_startproc simple
@@ -10845,7 +10845,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_library_listdef)
 	.cfi_endproc
 END(__x86_asm64_syscall_set_library_listdef)
 
-/* ssize_t writevf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t writevf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm64_syscall.writevf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writevf)
 	.cfi_startproc simple
@@ -10876,7 +10876,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_writevf)
 	.cfi_endproc
 END(__x86_asm64_syscall_writevf)
 
-/* ssize_t readvf(fd_t fd, struct iovec64 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t readvf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm64_syscall.readvf
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_readvf)
 	.cfi_startproc simple
@@ -13710,7 +13710,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setsid)
 	.cfi_endproc
 END(__x86_asm32_int80_setsid)
 
-/* errno_t sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) */
+/* errno_t sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
 .section .text.x86.asm32_syscall_int80.sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaction)
 	.cfi_startproc simple
@@ -16233,7 +16233,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msync)
 	.cfi_endproc
 END(__x86_asm32_int80_msync)
 
-/* ssize_t readv(fd_t fd, struct iovec32 const *iovec, size_t count) */
+/* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.x86.asm32_syscall_int80.readv
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_readv)
 	.cfi_startproc simple
@@ -16266,7 +16266,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readv)
 	.cfi_endproc
 END(__x86_asm32_int80_readv)
 
-/* ssize_t writev(fd_t fd, struct iovec32 const *iovec, size_t count) */
+/* ssize_t writev(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.x86.asm32_syscall_int80.writev
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_writev)
 	.cfi_startproc simple
@@ -17162,7 +17162,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigreturn)
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigreturn)
 
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.rt_sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigaction)
 	.cfi_startproc simple
@@ -17265,7 +17265,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigpending)
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.rt_sigtimedwait
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 	.cfi_startproc simple
@@ -17301,7 +17301,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 END(__x86_asm32_int80_rt_sigtimedwait)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_int80.rt_sigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigqueueinfo)
 	.cfi_startproc simple
@@ -17569,7 +17569,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_capset)
 	.cfi_endproc
 END(__x86_asm32_int80_capset)
 
-/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
+/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
 .section .text.x86.asm32_syscall_int80.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigaltstack)
 	.cfi_startproc simple
@@ -20661,7 +20661,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kexec_load)
 END(__x86_asm32_int80_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid)
 	.cfi_startproc simple
@@ -21715,7 +21715,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tee)
 	.cfi_endproc
 END(__x86_asm32_int80_tee)
 
-/* ssize_t vmsplice(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) */
+/* ssize_t vmsplice(fd_t fdout, struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.vmsplice
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_vmsplice)
 	.cfi_startproc simple
@@ -22284,7 +22284,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_inotify_init1)
 	.cfi_endproc
 END(__x86_asm32_int80_inotify_init1)
 
-/* ssize_t preadv(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_int80.preadv
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
 	.cfi_startproc simple
@@ -22322,7 +22322,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv)
 	.cfi_endproc
 END(__x86_asm32_int80_preadv)
 
-/* ssize_t pwritev(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_int80.pwritev
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
 	.cfi_startproc simple
@@ -22361,7 +22361,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
 END(__x86_asm32_int80_pwritev)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_int80.rt_tgsigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_tgsigqueueinfo)
 	.cfi_startproc simple
@@ -22759,7 +22759,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_setns)
 	.cfi_endproc
 END(__x86_asm32_int80_setns)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	.cfi_startproc simple
@@ -22796,7 +22796,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_int80_process_vm_readv)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_process_vm_writev)
 	.cfi_startproc simple
@@ -23562,7 +23562,7 @@ END(__x86_asm32_int80_sendto)
 
 /* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-/* ssize_t sendmsg(fd_t sockfd, struct msghdr32 const *message, syscall_ulong_t msg_flags) */
+/* ssize_t sendmsg(fd_t sockfd, struct msghdrx32 const *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_int80.sendmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sendmsg)
 	.cfi_startproc simple
@@ -23637,7 +23637,7 @@ END(__x86_asm32_int80_recvfrom)
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t msg_flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdrx32 *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_int80.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmsg)
 	.cfi_startproc simple
@@ -23832,7 +23832,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
 	.cfi_endproc
 END(__x86_asm32_int80_recvmmsg64)
 
-/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_int80.pwritevf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
 	.cfi_startproc simple
@@ -23871,7 +23871,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritevf)
 	.cfi_endproc
 END(__x86_asm32_int80_pwritevf)
 
-/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_int80.preadvf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 	.cfi_startproc simple
@@ -24384,7 +24384,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fmkdirat)
 END(__x86_asm32_int80_fmkdirat)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_int80.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
 	.cfi_startproc simple
@@ -24932,7 +24932,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	.cfi_endproc
 END(__x86_asm32_int80_pread64f)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.rt_sigtimedwait64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait64)
 	.cfi_startproc simple
@@ -25093,7 +25093,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
 	.cfi_endproc
 END(__x86_asm32_int80_ksysctl)
 
-/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t writevf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm32_syscall_int80.writevf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
 	.cfi_startproc simple
@@ -25128,7 +25128,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
 	.cfi_endproc
 END(__x86_asm32_int80_writevf)
 
-/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm32_syscall_int80.readvf
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
 	.cfi_startproc simple
@@ -25750,7 +25750,7 @@ END(__x86_asm32_int80_coredump)
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
+/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
 .section .text.x86.asm32_syscall_int80.raiseat
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_raiseat)
 	.cfi_startproc simple
@@ -26979,7 +26979,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getpgrp, __x86_asm32_int80_getpgrp
 /* pid_t setsid(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setsid, __x86_asm32_int80_setsid)
 
-/* errno_t sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) */
+/* errno_t sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigaction, __x86_asm32_int80_sigaction)
 
 /* syscall_ulong_t sgetmask(void) */
@@ -27405,10 +27405,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_flock, __x86_asm32_int80_flock)
 /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_msync, __x86_asm32_int80_msync)
 
-/* ssize_t readv(fd_t fd, struct iovec32 const *iovec, size_t count) */
+/* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readv, __x86_asm32_int80_readv)
 
-/* ssize_t writev(fd_t fd, struct iovec32 const *iovec, size_t count) */
+/* ssize_t writev(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writev, __x86_asm32_int80_writev)
 
 /* pid_t getsid(pid_t pid) */
@@ -27527,7 +27527,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_prctl, __x86_asm32_int80_prctl)
 /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigreturn, __x86_asm32_int80_rt_sigreturn)
 
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigaction, __x86_asm32_int80_rt_sigaction)
 
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
@@ -27537,11 +27537,11 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigprocmask, __x86_asm32_int80_
 /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigpending, __x86_asm32_int80_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigtimedwait, __x86_asm32_int80_rt_sigtimedwait)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigqueueinfo, __x86_asm32_int80_rt_sigqueueinfo)
 
 /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
@@ -27637,7 +27637,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_capget, __x86_asm32_int80_capget)
 /* errno_t capset(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_capset, __x86_asm32_int80_capset)
 
-/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
+/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigaltstack, __x86_asm32_int80_sigaltstack)
 
 /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, __ULONG32_TYPE__ *pin_offset, size_t num_bytes) */
@@ -28197,7 +28197,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mq_getsetattr, __x86_asm32_int80_m
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_kexec_load, __x86_asm32_int80_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid)
 	.cfi_startproc simple
@@ -28543,7 +28543,7 @@ END(__x86_asm32_sysenter_sync_file_range)
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_tee, __x86_asm32_int80_tee)
 
-/* ssize_t vmsplice(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) */
+/* ssize_t vmsplice(fd_t fdout, struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_vmsplice, __x86_asm32_int80_vmsplice)
 
 /* errno_t move_pages(int TODO_PROTOTYPE) */
@@ -28635,7 +28635,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pipe2, __x86_asm32_int80_pipe2)
 /* errno_t inotify_init1(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_inotify_init1, __x86_asm32_int80_inotify_init1)
 
-/* ssize_t preadv(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_sysenter.preadv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv)
 	.cfi_startproc simple
@@ -28674,7 +28674,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv)
 	.cfi_endproc
 END(__x86_asm32_sysenter_preadv)
 
-/* ssize_t pwritev(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_sysenter.pwritev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev)
 	.cfi_startproc simple
@@ -28714,7 +28714,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev)
 END(__x86_asm32_sysenter_pwritev)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_tgsigqueueinfo, __x86_asm32_int80_rt_tgsigqueueinfo)
 
 /* errno_t perf_event_open(int TODO_PROTOTYPE) */
@@ -28819,7 +28819,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sendmmsg, __x86_asm32_int80_sendmm
 /* errno_t setns(fd_t fd, syscall_ulong_t nstype) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setns, __x86_asm32_int80_setns)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	.cfi_startproc simple
@@ -28857,7 +28857,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_sysenter_process_vm_readv)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_process_vm_writev)
 	.cfi_startproc simple
@@ -29190,7 +29190,7 @@ END(__x86_asm32_sysenter_sendto)
 
 /* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-/* ssize_t sendmsg(fd_t sockfd, struct msghdr32 const *message, syscall_ulong_t msg_flags) */
+/* ssize_t sendmsg(fd_t sockfd, struct msghdrx32 const *message, syscall_ulong_t msg_flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sendmsg, __x86_asm32_int80_sendmsg)
 
 /* @param: msg_flags: Set of `MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
@@ -29236,7 +29236,7 @@ END(__x86_asm32_sysenter_recvfrom)
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t msg_flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdrx32 *message, syscall_ulong_t msg_flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_recvmsg, __x86_asm32_int80_recvmsg)
 
 /* @param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR' */
@@ -29289,7 +29289,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_recvmmsg64)
 
-/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysenter.pwritevf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
 	.cfi_startproc simple
@@ -29329,7 +29329,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritevf)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pwritevf)
 
-/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysenter.preadvf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
 	.cfi_startproc simple
@@ -29630,7 +29630,7 @@ END(__x86_asm32_sysenter_fmknodat)
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fmkdirat, __x86_asm32_int80_fmkdirat)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_sysenter.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
 	.cfi_startproc simple
@@ -29888,7 +29888,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pread64f)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigtimedwait64, __x86_asm32_int80_rt_sigtimedwait64)
 
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
@@ -29903,10 +29903,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_service, __x86_asm32_int80_rpc
 /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ksysctl, __x86_asm32_int80_ksysctl)
 
-/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t writevf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_writevf, __x86_asm32_int80_writevf)
 
-/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_readvf, __x86_asm32_int80_readvf)
 
 /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
@@ -30140,7 +30140,7 @@ END(__x86_asm32_sysenter_coredump)
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
+/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_raiseat, __x86_asm32_int80_raiseat)
 
 /* Create and return a new tty terminal controller connected to the given keyboard and display
@@ -31199,7 +31199,7 @@ END(__x86_asm32_sysrun32_dup2)
 /* pid_t setsid(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_setsid, sys32_setsid); */
 
-/* errno_t sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact) */
+/* errno_t sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact) */
 .section .text.x86.asm32_syscall_sysrun32.sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigaction)
 	.cfi_startproc
@@ -32059,7 +32059,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_msync)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_msync)
 
-/* ssize_t readv(fd_t fd, struct iovec32 const *iovec, size_t count) */
+/* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.x86.asm32_syscall_sysrun32.readv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readv)
 	.cfi_startproc
@@ -32071,7 +32071,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readv)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_readv)
 
-/* ssize_t writev(fd_t fd, struct iovec32 const *iovec, size_t count) */
+/* ssize_t writev(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 .section .text.x86.asm32_syscall_sysrun32.writev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writev)
 	.cfi_startproc
@@ -32365,7 +32365,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigreturn)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_rt_sigreturn)
 
-/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigaction32 const *act, struct sigaction32 *oact, size_t sigsetsize) */
+/* errno_t rt_sigaction(syscall_ulong_t signo, struct sigactionx32 const *act, struct sigactionx32 *oact, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigaction
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigaction)
 	.cfi_startproc
@@ -32403,7 +32403,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigpending)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_rt_sigpending)
 
-/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait)
 	.cfi_startproc
@@ -32417,7 +32417,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait)
 END(__x86_asm32_sysrun32_rt_sigtimedwait)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigqueueinfo)
 	.cfi_startproc
@@ -32515,7 +32515,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_capset)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_capset)
 
-/* errno_t sigaltstack(struct sigaltstack32 const *ss, struct sigaltstack32 *oss) */
+/* errno_t sigaltstack(struct sigaltstackx32 const *ss, struct sigaltstackx32 *oss) */
 .section .text.x86.asm32_syscall_sysrun32.sigaltstack
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigaltstack)
 	.cfi_startproc
@@ -33558,7 +33558,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kexec_load)
 END(__x86_asm32_sysrun32_kexec_load)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32 *ru) */
 .section .text.x86.asm32_syscall_sysrun32.waitid
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid)
 	.cfi_startproc
@@ -33946,7 +33946,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tee)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_tee)
 
-/* ssize_t vmsplice(fd_t fdout, struct iovec32 const *iov, size_t count, syscall_ulong_t flags) */
+/* ssize_t vmsplice(fd_t fdout, struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.vmsplice
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_vmsplice)
 	.cfi_startproc
@@ -34152,7 +34152,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_inotify_init1)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_inotify_init1)
 
-/* ssize_t preadv(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t preadv(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_sysrun32.preadv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadv)
 	.cfi_startproc
@@ -34168,7 +34168,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadv)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_preadv)
 
-/* ssize_t pwritev(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset) */
+/* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
 .section .text.x86.asm32_syscall_sysrun32.pwritev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritev)
 	.cfi_startproc
@@ -34185,7 +34185,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritev)
 END(__x86_asm32_sysrun32_pwritev)
 
 /* @param: signo: One of `SIG*' */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo32_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_sysrun32.rt_tgsigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_tgsigqueueinfo)
 	.cfi_startproc
@@ -34326,7 +34326,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_setns)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_setns)
 
-/* ssize_t process_vm_readv(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_readv(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.process_vm_readv
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_readv)
 	.cfi_startproc
@@ -34341,7 +34341,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_readv)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_process_vm_readv)
 
-/* ssize_t process_vm_writev(pid_t pid, struct iovec32 const *local_iov, size_t liovcnt, struct iovec32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
+/* ssize_t process_vm_writev(pid_t pid, struct iovecx32 const *local_iov, size_t liovcnt, struct iovecx32 const *remote_iov, size_t riovcnt, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.process_vm_writev
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_process_vm_writev)
 	.cfi_startproc
@@ -34636,7 +34636,7 @@ END(__x86_asm32_sysrun32_sendto)
 
 /* @param: msg_flags: Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_DONTWAIT |
  *                            MSG_EOR | MSG_MORE | MSG_NOSIGNAL | MSG_OOB' */
-/* ssize_t sendmsg(fd_t sockfd, struct msghdr32 const *message, syscall_ulong_t msg_flags) */
+/* ssize_t sendmsg(fd_t sockfd, struct msghdrx32 const *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_sysrun32.sendmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sendmsg)
 	.cfi_startproc
@@ -34668,7 +34668,7 @@ END(__x86_asm32_sysrun32_recvfrom)
 /* @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
  *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
  *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL' */
-/* ssize_t recvmsg(fd_t sockfd, struct msghdr32 *message, syscall_ulong_t msg_flags) */
+/* ssize_t recvmsg(fd_t sockfd, struct msghdrx32 *message, syscall_ulong_t msg_flags) */
 .section .text.x86.asm32_syscall_sysrun32.recvmsg
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmsg)
 	.cfi_startproc
@@ -34736,7 +34736,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_recvmmsg64)
 
-/* ssize_t pwritevf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t pwritevf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.pwritevf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritevf)
 	.cfi_startproc
@@ -34753,7 +34753,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritevf)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pwritevf)
 
-/* ssize_t preadvf(fd_t fd, struct iovec32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.preadvf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadvf)
 	.cfi_startproc
@@ -34960,7 +34960,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fmkdirat)
 END(__x86_asm32_sysrun32_fmkdirat)
 
 /* @param: options: At least one of `WEXITED | WSTOPPED | WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
 .section .text.x86.asm32_syscall_sysrun32.waitid64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid64)
 	.cfi_startproc
@@ -35164,7 +35164,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pread64f)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pread64f)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait64)
 	.cfi_startproc
@@ -35213,7 +35213,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ksysctl)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ksysctl)
 
-/* ssize_t writevf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t writevf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.writevf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writevf)
 	.cfi_startproc
@@ -35226,7 +35226,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_writevf)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_writevf)
 
-/* ssize_t readvf(fd_t fd, struct iovec32 const *iovec, size_t count, iomode_t mode) */
+/* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 .section .text.x86.asm32_syscall_sysrun32.readvf
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_readvf)
 	.cfi_startproc
@@ -35481,7 +35481,7 @@ END(__x86_asm32_sysrun32_coredump)
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfo32_struct const *si) */
+/* errno_t raiseat(struct ucpustate32 const *state, struct __siginfox32_struct const *si) */
 .section .text.x86.asm32_syscall_sysrun32.raiseat
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_raiseat)
 	.cfi_startproc

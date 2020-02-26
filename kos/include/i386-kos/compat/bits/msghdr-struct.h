@@ -23,7 +23,7 @@
 #include <hybrid/host.h>
 #ifdef __x86_64__
 #include <bits/msghdr-struct32.h>
-#define compat_msghdr msghdr32
+#define compat_msghdr __msghdrx32
 #endif /* __x86_64__ */
 
 #endif /* !_I386_KOS_COMPAT_BITS_MSGHDR_STRUCT_H */
