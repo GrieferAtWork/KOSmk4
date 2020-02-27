@@ -1507,6 +1507,8 @@ socket_getsockopt_default(struct socket *__restrict self,
                           USER CHECKED void *optval,
                           socklen_t optlen, iomode_t mode) {
 	socklen_t result = 0;
+	(void)self;
+	(void)mode;
 	/* Provide default values for a couple of socket options. */
 	if (level == SOL_SOCKET) {
 		switch (optname) {
