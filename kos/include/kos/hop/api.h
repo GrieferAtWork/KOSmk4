@@ -48,19 +48,45 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+#ifndef __hopf_defined
+#ifdef __CRT_HAVE_hopf
+#define __hopf_defined 1
 /* Perform a handle operation specified by `cmd' */
-#if defined(__CRT_HAVE_hop)
-__LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hop)(__fd_t __fd, __syscall_ulong_t __cmd, ... /*, void *arg*/) __CASMNAME_SAME("hop");
-#endif /* hop... */
-#if defined(__CRT_HAVE_hopf)
-__LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ... /*, void *arg*/) __CASMNAME_SAME("hopf");
-#endif /* hopf... */
-#if defined(__CRT_HAVE_Hop)
-__LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL Hop)(__fd_t __fd, __syscall_ulong_t __cmd, ... /*, void *arg*/) __CASMNAME_SAME("Hop");
-#endif /* hop... */
-#if defined(__CRT_HAVE_Hopf)
-__LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL Hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ... /*, void *arg*/) __CASMNAME_SAME("Hopf");
-#endif /* hopf... */
+__LIBC __syscall_slong_t
+__NOTHROW_NCX(__VLIBCCALL hopf)(__fd_t __fd, __syscall_ulong_t __cmd,
+                                __iomode_t __mode, ... /*, void *arg*/)
+		__CASMNAME_SAME("hopf");
+#endif /* __CRT_HAVE_hopf */
+#endif /* !__hopf_defined */
+
+#ifndef __hop_defined
+#ifdef __CRT_HAVE_hop
+#define __hop_defined 1
+/* Perform a handle operation specified by `cmd' */
+__LIBC __syscall_slong_t
+__NOTHROW_NCX(__VLIBCCALL hop)(__fd_t __fd, __syscall_ulong_t __cmd,
+                               ... /*, void *arg*/)
+		__CASMNAME_SAME("hop");
+#endif /* __CRT_HAVE_hop */
+#endif /* !__hop_defined */
+
+#ifndef __Hop_defined
+#ifdef __CRT_HAVE_Hop
+#define __Hop_defined 1
+/* Perform a handle operation specified by `cmd' */
+__LIBC __syscall_slong_t __VLIBCCALL
+Hop(__fd_t __fd, __syscall_ulong_t __cmd, ... /*, void *arg*/) __CASMNAME_SAME("Hop");
+#endif /* __CRT_HAVE_Hop */
+#endif /* !__Hop_defined */
+
+#ifndef __Hopf_defined
+#ifdef __CRT_HAVE_Hopf
+#define __Hopf_defined  1
+/* Perform a handle operation specified by `cmd' */
+__LIBC __syscall_slong_t __VLIBCCALL
+Hopf(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ... /*, void *arg*/) __CASMNAME_SAME("Hopf");
+#endif /* __CRT_HAVE_Hopf */
+#endif /* !__Hopf_defined */
 
 __SYSDECL_END
 #endif /* __CC__ */

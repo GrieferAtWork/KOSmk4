@@ -249,6 +249,8 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #endif /* __CC__ */
 #undef __KSYSCTL_PAD_POINTER
 
+/* KOS extensions */
+#define KSYSCTL_UAIO_CREATE 0xe0010001 /* [syscall_ulong_t uaio_flags = UAIO_CREATE_*] Create and return a new UAIO object. */
 
 /* Generic kernel house-keeping */
 #define KSYSCTL_SYSTEM_CLEARCACHES             0xc05e0001 /* Invoke cache clear callbacks for each and every globally reachable
@@ -315,15 +317,21 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 
 /* Perform a handle operation specified by `cmd'
  * @param: CMD: One of `KSYSCTL_*' (see above) */
-#if defined(__CRT_HAVE_ksysctl)
+#ifndef __ksysctl_defined
+#ifdef __CRT_HAVE_ksysctl
+#define __ksysctl_defined 1
 __LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL ksysctl)(__syscall_ulong_t __cmd, ... /*, void *arg*/) __CASMNAME_SAME("ksysctl");
-#endif /* ksysctl... */
-#if defined(__CRT_HAVE_KSysctl)
+#endif /* __CRT_HAVE_ksysctl */
+#endif /* !__ksysctl_defined */
+#ifndef __KSysctl_defined
+#ifdef __CRT_HAVE_KSysctl
+#define __KSysctl_defined 1
 __LIBC __syscall_slong_t (__VLIBCCALL KSysctl)(__syscall_ulong_t __cmd, ... /*, void *arg*/) __CASMNAME_SAME("KSysctl");
-#endif /* KSysctl... */
+#endif /* __CRT_HAVE_KSysctl */
+#endif /* !__KSysctl_defined */
 
 #ifndef NO_KSYSCTL_HELPER_FUNCTIONS
-#ifdef __CRT_HAVE_ksysctl
+#ifdef __ksysctl_defined
 
 __LOCAL int
 __NOTHROW_NCX(__LIBCCALL ksysctl_insmod)(char const *__driver_name,
@@ -403,10 +411,10 @@ __NOTHROW_NCX(__LIBCCALL ksysctl_set_driver_library_path)(char const *__path) {
 	return (int)ksysctl(KSYSCTL_DRIVER_SET_LIBRARY_PATH, &__args);
 }
 
-#endif /* __CRT_HAVE_ksysctl */
+#endif /* __ksysctl_defined */
 
 
-#ifdef __CRT_HAVE_KSysctl
+#ifdef __KSysctl_defined
 
 __LOCAL void __LIBCCALL
 KSysctlInsmod(char const *__driver_name,
@@ -484,7 +492,7 @@ KSysctlSetDriverLibraryPath(char const *__path) {
 	KSysctl(KSYSCTL_DRIVER_SET_LIBRARY_PATH, &__args);
 }
 
-#endif /* __CRT_HAVE_KSysctl */
+#endif /* __KSysctl_defined */
 #endif /* !NO_KSYSCTL_HELPER_FUNCTIONS */
 
 #endif /* __CC__ */

@@ -72,7 +72,7 @@ struct aiocb /*[PREFIX(aio_)]*/ {
 	__size_t            aio_nbytes;     /* Length of transfer. */
 	struct sigevent     aio_sigevent;   /* Signal number and value. */
 	/* Internal members. */
-	struct __aiocb32 *__next_prio;
+	struct aiocb     *__next_prio;
 	__INT32_TYPE__    __abs_prio;
 	__INT32_TYPE__    __policy;
 	__INT32_TYPE__    __error_code;
