@@ -273,8 +273,7 @@ struct socket_ops {
 	 *                      length. Note that this function must copy the contents of this structure
 	 *                      if it needs to be accessed after returning. (i.e. AIO needs to use its
 	 *                      own copy of this structure)
-	 * @param: msg_flags:   Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_EOR |
-	 *                              MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+	 * @param: msg_flags:   Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_EOR | MSG_MORE | MSG_OOB'
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED: [...]
 	 * @throws: E_NET_MESSAGE_TOO_LONG:                                                     [...]
 	 * @throws: E_NET_CONNECTION_RESET:                                                     [...]
@@ -308,8 +307,7 @@ struct socket_ops {
 	 *                      length. Note that this function must copy the contents of this structure
 	 *                      if it needs to be accessed after returning. (i.e. AIO needs to use its
 	 *                      own copy of this structure)
-	 * @param: msg_flags:   Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_EOR |
-	 *                              MSG_MORE | MSG_NOSIGNAL | MSG_OOB'
+	 * @param: msg_flags:   Set of `MSG_CONFIRM | MSG_DONTROUTE | MSG_EOR | MSG_MORE | MSG_OOB'
 	 * @throws: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SENDTO_WRONG_ADDRESS_FAMILY: [...]
 	 * @throws: E_NET_MESSAGE_TOO_LONG:                                                                       [...]
 	 * @throws: E_NET_CONNECTION_RESET:                                                                       [...]

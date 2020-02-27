@@ -30,6 +30,7 @@
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <sched/async.h>
+#include <sched/posix-signal.h>
 #include <sched/signal.h>
 
 #include <kos/except/inval.h>
@@ -429,22 +430,29 @@ socket_send(struct socket *__restrict self,
 	size_t result;
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
-	socket_asend(self, buf, bufsize, msg_control, msg_flags, &aio);
-	if (mode & IO_NONBLOCK) {
-		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
-		COMPILER_READ_BARRIER();
-		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
-			if (mode & IO_NODATAZERO)
-				return 0;
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+	TRY {
+		socket_asend(self, buf, bufsize, msg_control, msg_flags, &aio);
+		if (mode & IO_NONBLOCK) {
+			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
+			COMPILER_READ_BARRIER();
+			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
+				if (mode & IO_NODATAZERO)
+					return 0;
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+			}
+		} else {
+			TRY {
+				aio_handle_generic_waitfor(&aio);
+				aio_handle_generic_checkerror(&aio);
+			} EXCEPT {
+				aio_handle_generic_fini(&aio);
+				RETHROW();
+			}
 		}
-	} else {
-		TRY {
-			aio_handle_generic_waitfor(&aio);
-		} EXCEPT {
-			aio_handle_generic_fini(&aio);
-			RETHROW();
-		}
+	} EXCEPT {
+		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL))
+			task_raisesignalprocess(THIS_TASK, SIGPIPE);
+		RETHROW();
 	}
 	/* Default-return the whole buffer size. */
 	result = bufsize;
@@ -465,22 +473,29 @@ socket_sendv(struct socket *__restrict self,
 	size_t result;
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
-	socket_asendv(self, buf, bufsize, msg_control, msg_flags, &aio);
-	if (mode & IO_NONBLOCK) {
-		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
-		COMPILER_READ_BARRIER();
-		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
-			if (mode & IO_NODATAZERO)
-				return 0;
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+	TRY {
+		socket_asendv(self, buf, bufsize, msg_control, msg_flags, &aio);
+		if (mode & IO_NONBLOCK) {
+			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
+			COMPILER_READ_BARRIER();
+			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
+				if (mode & IO_NODATAZERO)
+					return 0;
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+			}
+		} else {
+			TRY {
+				aio_handle_generic_waitfor(&aio);
+				aio_handle_generic_checkerror(&aio);
+			} EXCEPT {
+				aio_handle_generic_fini(&aio);
+				RETHROW();
+			}
 		}
-	} else {
-		TRY {
-			aio_handle_generic_waitfor(&aio);
-		} EXCEPT {
-			aio_handle_generic_fini(&aio);
-			RETHROW();
-		}
+	} EXCEPT {
+		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL))
+			task_raisesignalprocess(THIS_TASK, SIGPIPE);
+		RETHROW();
 	}
 	/* Default-return the whole buffer size. */
 	result = bufsize;
@@ -752,22 +767,29 @@ socket_sendto(struct socket *__restrict self,
 	size_t result;
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
-	socket_asendto(self, buf, bufsize, addr, addr_len, msg_control, msg_flags, &aio);
-	if (mode & IO_NONBLOCK) {
-		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
-		COMPILER_READ_BARRIER();
-		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
-			if (mode & IO_NODATAZERO)
-				return 0;
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+	TRY {
+		socket_asendto(self, buf, bufsize, addr, addr_len, msg_control, msg_flags, &aio);
+		if (mode & IO_NONBLOCK) {
+			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
+			COMPILER_READ_BARRIER();
+			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
+				if (mode & IO_NODATAZERO)
+					return 0;
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+			}
+		} else {
+			TRY {
+				aio_handle_generic_waitfor(&aio);
+				aio_handle_generic_checkerror(&aio);
+			} EXCEPT {
+				aio_handle_generic_fini(&aio);
+				RETHROW();
+			}
 		}
-	} else {
-		TRY {
-			aio_handle_generic_waitfor(&aio);
-		} EXCEPT {
-			aio_handle_generic_fini(&aio);
-			RETHROW();
-		}
+	} EXCEPT {
+		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL))
+			task_raisesignalprocess(THIS_TASK, SIGPIPE);
+		RETHROW();
 	}
 	/* Default-return the whole buffer size. */
 	result = bufsize;
@@ -789,22 +811,29 @@ socket_sendtov(struct socket *__restrict self,
 	size_t result;
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
-	socket_asendtov(self, buf, bufsize, addr, addr_len, msg_control, msg_flags, &aio);
-	if (mode & IO_NONBLOCK) {
-		aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
-		COMPILER_READ_BARRIER();
-		if (aio.hg_status == AIO_COMPLETION_CANCEL) {
-			if (mode & IO_NODATAZERO)
-				return 0;
-			THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+	TRY {
+		socket_asendtov(self, buf, bufsize, addr, addr_len, msg_control, msg_flags, &aio);
+		if (mode & IO_NONBLOCK) {
+			aio_handle_cancel(&aio); /* Force AIO completion one way or another... */
+			COMPILER_READ_BARRIER();
+			if (aio.hg_status == AIO_COMPLETION_CANCEL) {
+				if (mode & IO_NODATAZERO)
+					return 0;
+				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
+			}
+		} else {
+			TRY {
+				aio_handle_generic_waitfor(&aio);
+				aio_handle_generic_checkerror(&aio);
+			} EXCEPT {
+				aio_handle_generic_fini(&aio);
+				RETHROW();
+			}
 		}
-	} else {
-		TRY {
-			aio_handle_generic_waitfor(&aio);
-		} EXCEPT {
-			aio_handle_generic_fini(&aio);
-			RETHROW();
-		}
+	} EXCEPT {
+		if (was_thrown(E_NET_SHUTDOWN) && !(msg_flags & MSG_NOSIGNAL))
+			task_raisesignalprocess(THIS_TASK, SIGPIPE);
+		RETHROW();
 	}
 	/* Default-return the whole buffer size. */
 	result = bufsize;
