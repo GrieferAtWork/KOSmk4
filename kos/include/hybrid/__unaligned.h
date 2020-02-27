@@ -806,24 +806,25 @@ __NOTHROW_NCX(__hybrid_unaligned_set_swap)(__UFIFTHINT_TYPE__ *__restrict __ptr,
 }
 
 #ifdef __INTELLISENSE__
-#define __hybrid_unaligned_get16(ptr)          (*(__UINT16_TYPE__ *)(ptr))
-#define __hybrid_unaligned_get16_swap(ptr)     (*(__UINT16_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set16(ptr, v)       (void)(*(__UINT16_TYPE__ *)(ptr)=(__UINT16_TYPE__)(v))
-#define __hybrid_unaligned_set16_swap(ptr, v)  (void)(*(__UINT16_TYPE__ *)(ptr)=(__UINT16_TYPE__)(v))
-#define __hybrid_unaligned_get32(ptr)          (*(__UINT32_TYPE__ *)(ptr))
-#define __hybrid_unaligned_get32_swap(ptr)     (*(__UINT32_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set32(ptr, v)       (void)(*(__UINT32_TYPE__ *)(ptr)=(__UINT32_TYPE__)(v))
-#define __hybrid_unaligned_set32_swap(ptr, v)  (void)(*(__UINT32_TYPE__ *)(ptr)=(__UINT32_TYPE__)(v))
+extern "C++" { namespace __intern { void *____intellisense_reqptr(void *); } }
+#define __hybrid_unaligned_get16(ptr)          (*(__UINT16_TYPE__ *)::__intern::____intellisense_reqptr(ptr))
+#define __hybrid_unaligned_get16_swap(ptr)     (*(__UINT16_TYPE__ *)::__intern::____intellisense_reqptr(ptr))
+#define __hybrid_unaligned_set16(ptr, v)       (void)(*(__UINT16_TYPE__ *)::__intern::____intellisense_reqptr(ptr)=(__UINT16_TYPE__)(v))
+#define __hybrid_unaligned_set16_swap(ptr, v)  (void)(*(__UINT16_TYPE__ *)::__intern::____intellisense_reqptr(ptr)=(__UINT16_TYPE__)(v))
+#define __hybrid_unaligned_get32(ptr)          (*(__UINT32_TYPE__ *)::__intern::____intellisense_reqptr(ptr))
+#define __hybrid_unaligned_get32_swap(ptr)     (*(__UINT32_TYPE__ *)::__intern::____intellisense_reqptr(ptr))
+#define __hybrid_unaligned_set32(ptr, v)       (void)(*(__UINT32_TYPE__ *)::__intern::____intellisense_reqptr(ptr)=(__UINT32_TYPE__)(v))
+#define __hybrid_unaligned_set32_swap(ptr, v)  (void)(*(__UINT32_TYPE__ *)::__intern::____intellisense_reqptr(ptr)=(__UINT32_TYPE__)(v))
 #ifdef __UINT64_TYPE__
-#define __hybrid_unaligned_get64(ptr)          (*(__UINT64_TYPE__ *)(ptr))
-#define __hybrid_unaligned_get64_swap(ptr)     (*(__UINT64_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set64(ptr, v)       (void)(*(__UINT64_TYPE__ *)(ptr)=(__UINT64_TYPE__)(v))
-#define __hybrid_unaligned_set64_swap(ptr, v)  (void)(*(__UINT64_TYPE__ *)(ptr)=(__UINT64_TYPE__)(v))
+#define __hybrid_unaligned_get64(ptr)          (*(__UINT64_TYPE__ *)::__intern::____intellisense_reqptr(ptr))
+#define __hybrid_unaligned_get64_swap(ptr)     (*(__UINT64_TYPE__ *)::__intern::____intellisense_reqptr(ptr))
+#define __hybrid_unaligned_set64(ptr, v)       (void)(*(__UINT64_TYPE__ *)::__intern::____intellisense_reqptr(ptr)=(__UINT64_TYPE__)(v))
+#define __hybrid_unaligned_set64_swap(ptr, v)  (void)(*(__UINT64_TYPE__ *)::__intern::____intellisense_reqptr(ptr)=(__UINT64_TYPE__)(v))
 #ifdef __UINT128_TYPE__
-#define __hybrid_unaligned_get128(ptr)         (*(__UINT128_TYPE__ *)(ptr))
-#define __hybrid_unaligned_get128_swap(ptr)    (*(__UINT128_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set128(ptr, v)      (void)(*(__UINT128_TYPE__ *)(ptr)=(__UINT128_TYPE__)(v))
-#define __hybrid_unaligned_set128_swap(ptr, v) (void)(*(__UINT128_TYPE__ *)(ptr)=(__UINT128_TYPE__)(v))
+#define __hybrid_unaligned_get128(ptr)         (*(__UINT128_TYPE__ *)::__intern::____intellisense_reqptr(ptr))
+#define __hybrid_unaligned_get128_swap(ptr)    (*(__UINT128_TYPE__ *)::__intern::____intellisense_reqptr(ptr))
+#define __hybrid_unaligned_set128(ptr, v)      (void)(*(__UINT128_TYPE__ *)::__intern::____intellisense_reqptr(ptr)=(__UINT128_TYPE__)(v))
+#define __hybrid_unaligned_set128_swap(ptr, v) (void)(*(__UINT128_TYPE__ *)::__intern::____intellisense_reqptr(ptr)=(__UINT128_TYPE__)(v))
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 #else /* __INTELLISENSE__ */
