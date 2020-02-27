@@ -40,9 +40,9 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/in.h>
 #include <bits/types.h>
 #include <net/bits/types.h>
+#include <netinet/bits/in.h>
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>

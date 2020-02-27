@@ -28,7 +28,6 @@
 
 #include <hybrid/atomic.h>
 
-#include <bits/in.h>
 #include <kos/net/printf.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>

@@ -36,7 +36,6 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 
-#include <bits/in.h>
 #include <kos/net/printf.h>
 #include <linux/if_ether.h>
 #include <netinet/in.h>

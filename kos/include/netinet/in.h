@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81bc1376 */
+/* HASH CRC-32:0x8fd2acd0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,12 +34,12 @@
 #include <hybrid/__byteswap.h>
 #include <hybrid/typecore.h>
 
-#include <bits/in.h>
 #include <bits/sockaddr-struct.h>
 #include <bits/sockaddr.h>
 #include <bits/sockaddr_storage-struct.h>
 #include <bits/types.h>
 #include <net/bits/types.h>
+#include <netinet/bits/in.h>
 #include <netinet/ipport.h>
 #include <netinet/ipproto.h>
 

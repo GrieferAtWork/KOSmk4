@@ -448,6 +448,7 @@ incdir("", "../../include");
 #include <kos/anno.h>
 #include <kos/asm/except.h>
 #include <kos/asm/syscall.h>
+#include <kos/asm/uaio.h>
 #include <kos/bits/debugtrap.h>
 #include <kos/bits/except-handler.h>
 #include <kos/bits/exception_data.h>
@@ -456,6 +457,7 @@ incdir("", "../../include");
 #include <kos/bits/spawn-action.h>
 #include <kos/bits/spawn.h>
 #include <kos/bits/thread.h>
+#include <kos/bits/uaio.h>
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
 #include <kos/debugtrap.h>
@@ -497,6 +499,7 @@ incdir("", "../../include");
 #include <kos/hop/pidns.h>
 #include <kos/hop/pipe.h>
 #include <kos/hop/task.h>
+#include <kos/hop/uaio.h>
 #include <kos/hop/vm.h>
 #include <kos/hybrid/sched-signal.h>
 #include <kos/hybrid/heap.h>
@@ -533,6 +536,7 @@ incdir("", "../../include");
 #include <kos/syscalls.h>
 #include <kos/thread.h>
 #include <kos/types.h>
+#include <kos/uaio.h>
 #include <kos/ukern.h>
 #include <kos/unistd.h>
 #include <lastlog.h>
@@ -731,6 +735,7 @@ incdir("", "../../include");
 #include <net/if_arp.h>
 #include <net/if_packet.h>
 #include <netdb.h>
+#include <netinet/bits/in.h>
 #include <netinet/ether.h>
 #include <netinet/icmp6.h>
 #include <netinet/if_ether.h>
