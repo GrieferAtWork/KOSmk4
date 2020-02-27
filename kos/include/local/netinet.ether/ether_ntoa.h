@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9b8177 */
+/* HASH CRC-32:0x8bbd74b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_NETINET_ETHER_H
-#define GUARD_LIBC_USER_NETINET_ETHER_H 1
+#ifndef __local_ether_ntoa_defined
+#define __local_ether_ntoa_defined 1
+#include <net/ethernet.h>
+/* Dependency: "ether_ntoa_r" from "netinet.ether" */
+#ifndef ____localdep_ether_ntoa_r_defined
+#define ____localdep_ether_ntoa_r_defined 1
+#ifdef __CRT_HAVE_ether_ntoa_r
+/* Convert 48 bit Ethernet ADDRess to ASCII */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_ether_ntoa_r,(struct ether_addr const *__restrict __addr, char *__restrict __buf),ether_ntoa_r,(__addr,__buf))
+#else /* LIBC: ether_ntoa_r */
+#include <local/netinet.ether/ether_ntoa_r.h>
+/* Convert 48 bit Ethernet ADDRess to ASCII */
+#define __localdep_ether_ntoa_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_ntoa_r))
+#endif /* ether_ntoa_r... */
+#endif /* !____localdep_ether_ntoa_r_defined */
 
-#include "../api.h"
-#include "../auto/netinet.ether.h"
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <netinet/ether.h>
-
-DECL_BEGIN
-
-/* Map 48 bit Ethernet number ADDR to HOSTNAME */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname, struct ether_addr const *addr);
-/* Map HOSTNAME to 48 bit Ethernet address */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname, struct ether_addr *addr);
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_NETINET_ETHER_H */
+__NAMESPACE_LOCAL_BEGIN
+/* Convert 48 bit Ethernet ADDRess to ASCII */
+__LOCAL_LIBC(ether_ntoa) __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_ntoa))(struct ether_addr const *__restrict __addr) {
+#line 54 "kos/src/libc/magic/netinet.ether.c"
+	static char __buf[21];
+	return __localdep_ether_ntoa_r(__addr, __buf);
+}
+__NAMESPACE_LOCAL_END
+#endif /* !__local_ether_ntoa_defined */

@@ -1976,6 +1976,7 @@
 #define __CRT_HAVE_ether_ntoa 1
 #define __CRT_HAVE_ether_ntoa_r 1
 #define __CRT_HAVE_ether_ntohost 1
+#define __CRT_HAVE_ether_paton_r 1
 #define __CRT_HAVE_euidaccess 1
 #define __CRT_HAVE_eventfd 1
 #define __CRT_HAVE_eventfd_read 1

@@ -58,11 +58,11 @@ enum __socket_type {
 	                      * For writing rarp and other similar things on the user level. */
 	/* Flags to be ORed into the type parameter of socket and
 	 * socketpair and used for the flags parameter of paccept. */
-	SOCK_CLOEXEC   = 0x80000,   /* Atomically set close-on-exec flag for the new descriptor(s). */
+	SOCK_CLOEXEC   = 0x80000,  /* Atomically set close-on-exec flag for the new descriptor(s). */
 #if (defined(__USE_KOS) || defined(__USE_KOS_KERNEL)) && defined(__KOS__)
-	SOCK_CLOFORK   = 0x0100000, /* Atomically set close-on-fork flag for the new descriptor(s). */
+	SOCK_CLOFORK   = 0x100000, /* Atomically set close-on-fork flag for the new descriptor(s). */
 #endif /* (__USE_KOS || __USE_KOS_KERNEL) && __KOS__ */
-	SOCK_NONBLOCK  = 0x00800    /* Atomically mark descriptor(s) as non-blocking. */
+	SOCK_NONBLOCK  = 0x00800   /* Atomically mark descriptor(s) as non-blocking. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/

@@ -49,21 +49,112 @@ __SYSDECL_BEGIN
 }
 
 @@Convert 48 bit Ethernet ADDRess to ASCII
-[cp_kos] ether_ntoa:(struct ether_addr const *addr) -> char *;
-[cp_kos][doc_alias(ether_ntoa)] ether_ntoa_r:(struct ether_addr const *addr, char *buf) -> char *;
+[dependency_include(<net/ethernet.h>)]
+ether_ntoa:([nonnull] struct ether_addr const *__restrict addr) -> [nonnull] char * {
+	static char buf[21];
+	return ether_ntoa_r(addr, buf);
+}
+
+[doc_alias(ether_ntoa)][dependency_include(<net/ethernet.h>)]
+ether_ntoa_r:([nonnull] struct ether_addr const *__restrict addr,
+              [nonnull] char *__restrict buf) -> [nonnull] char * {
+	sprintf(buf, "%x:%x:%x:%x:%x:%x",
+	        addr->@ether_addr_octet@[0], addr->@ether_addr_octet@[1],
+	        addr->@ether_addr_octet@[2], addr->@ether_addr_octet@[3],
+	        addr->@ether_addr_octet@[4], addr->@ether_addr_octet@[5]);
+	return buf;
+}
 
 @@Convert ASCII string S to 48 bit Ethernet address
-[cp_kos] ether_aton:(char const *asc) -> struct ether_addr *;
-[cp_kos][doc_alias(ether_aton)] ether_aton_r:(char const *asc, struct ether_addr *addr) -> struct ether_addr *;
+[dependency_include(<net/ethernet.h>)]
+ether_aton:([nonnull] char const *__restrict asc) -> [nonnull] struct ether_addr * {
+	static struct @ether_addr@ addr;
+	return ether_aton_r(asc, &addr);
+}
+
+[doc_alias(ether_aton)][ATTR_WUNUSED]
+[dependency_include(<net/ethernet.h>)]
+ether_aton_r:([nonnull] char const *__restrict asc,
+              [nonnull] struct ether_addr *__restrict addr) -> struct ether_addr * {
+	return ether_paton_r((char const **)&asc, addr);
+}
+
+%#ifdef __USE_KOS
+[doc_alias(ether_aton)][ATTR_WUNUSED]
+[dependency_include(<net/ethernet.h>)]
+ether_paton_r:([nonnull] char const **__restrict pasc,
+               [nonnull] struct ether_addr *__restrict addr) -> struct ether_addr * {
+	unsigned int i;
+	char const *asc = *pasc;
+	for (i = 0; i < 6; ++i) {
+		u8 octet;
+		char c;
+		c = *asc++;
+		if (c >= '0' && c <= '9')
+			octet = c - '0';
+		else if (c >= 'a' && c <= 'f')
+			octet = 10 + c - 'a';
+		else if (c >= 'A' && c <= 'F')
+			octet = 10 + c - 'A';
+		else {
+			return NULL;
+		}
+		c = *asc++;
+		octet <<= 4;
+		if (c >= '0' && c <= '9')
+			octet |= c - '0';
+		else if (c >= 'a' && c <= 'f')
+			octet |= 10 + c - 'a';
+		else if (c >= 'A' && c <= 'F')
+			octet |= 10 + c - 'A';
+		else {
+			return NULL;
+		}
+		c = *asc++;
+		if (c == ':') {
+			if (i >= 5)
+				return NULL;
+		} else if (!c || isspace(c)) {
+			if (i < 5)
+				return NULL;
+		} else {
+			return NULL;
+		}
+		addr->@ether_addr_octet@[i] = octet;
+	}
+	*pasc = asc;
+	return addr;
+}
+%#endif /* __USE_KOS */
+
+@@Scan LINE and set ADDR and HOSTNAME
+ether_line:([nonnull] char const *line,
+            [nonnull] struct ether_addr *addr,
+            [nonnull] char *hostname) -> int {
+	size_t hnlen;
+	while (isspace(*line) && *line != '\r' && *line != '\n')
+		++line;
+	if (!ether_paton_r(&line, addr))
+		return -1; /* This also handles comment lines! */
+	while (isspace(*line) && *line != '\r' && *line != '\n')
+		++line;
+	/* The remainder of the line is the hostname. */
+	for (hnlen = 0; line[hnlen] && line[hnlen] != '\r' && line[hnlen] != '\n'; ++hnlen)
+		;
+	while (hnlen && isspace(line[hnlen - 1]))
+		--hnlen;
+	if (!hnlen)
+		return -1; /* No hostname */
+	hostname = (char *)mempcpy(hostname, line, hnlen);
+	*hostname = '\0'; /* NUL-terminate */
+	return 0;
+}
 
 @@Map 48 bit Ethernet number ADDR to HOSTNAME
 [cp_kos] ether_ntohost:(char *hostname, struct ether_addr const *addr) -> int;
 
 @@Map HOSTNAME to 48 bit Ethernet address
 [cp_kos] ether_hostton:(char const *hostname, struct ether_addr *addr) -> int;
-
-@@Scan LINE and set ADDR and HOSTNAME
-[cp_kos] ether_line:(char const *line, struct ether_addr *addr, char *hostname) -> int;
 
 
 %{

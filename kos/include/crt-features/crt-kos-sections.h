@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3a8d5db */
+/* HASH CRC-32:0x63f10862 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2676,6 +2676,7 @@
 #define __CRT_SECTION_ether_ntoa                            __CRT_SECTINFO_net_ether                                /* .text.crt.net.ether.ether_ntoa */
 #define __CRT_SECTION_ether_ntoa_r                          __CRT_SECTINFO_net_ether                                /* .text.crt.net.ether.ether_ntoa_r */
 #define __CRT_SECTION_ether_ntohost                         __CRT_SECTINFO_net_ether                                /* .text.crt.net.ether.ether_ntohost */
+#define __CRT_SECTION_ether_paton_r                         __CRT_SECTINFO_net_ether                                /* .text.crt.net.ether.ether_paton_r */
 
 /* .text.crt.net.inet.* */
 #define __CRT_SECTION_inet_addr                             __CRT_SECTINFO_net_inet                                 /* .text.crt.net.inet.inet_addr */

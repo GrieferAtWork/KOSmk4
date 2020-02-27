@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9ed46ee */
+/* HASH CRC-32:0xda6400ed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1859,6 +1859,12 @@
 #define __CRT_ATTR_NOTHROW_NCX_epoll_ctl 1
 #define __CRT_ATTR_NOTHROW_NCX_erand48 1
 #define __CRT_ATTR_NOTHROW_NCX_erand48_r 1
+#define __CRT_ATTR_NOTHROW_NCX_ether_aton 1
+#define __CRT_ATTR_NOTHROW_NCX_ether_aton_r 1
+#define __CRT_ATTR_NOTHROW_NCX_ether_line 1
+#define __CRT_ATTR_NOTHROW_NCX_ether_ntoa 1
+#define __CRT_ATTR_NOTHROW_NCX_ether_ntoa_r 1
+#define __CRT_ATTR_NOTHROW_NCX_ether_paton_r 1
 #define __CRT_ATTR_NOTHROW_NCX_eventfd 1
 #define __CRT_ATTR_NOTHROW_NCX_exit_thread 1
 #define __CRT_ATTR_NOTHROW_NCX_fallocate 1
@@ -3993,12 +3999,7 @@
 
 /* ATTR_NOTHROW_RPC_KOS */
 #define __CRT_ATTR_NOTHROW_RPC_KOS_endttyent 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_ether_aton 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_ether_aton_r 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_ether_hostton 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_ether_line 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_ether_ntoa 1
-#define __CRT_ATTR_NOTHROW_RPC_KOS_ether_ntoa_r 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_ether_ntohost 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_fattach 1
 #define __CRT_ATTR_NOTHROW_RPC_KOS_fdetach 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab241db1 */
+/* HASH CRC-32:0x4f79f910 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -699,13 +699,14 @@ __CRT_FUNCTION(err,0,(),VA(2),(int,status,char const *,format),void)
 __CRT_FUNCTION(error,0,(),VA(3),(int,status,errno_t,errnum,const char *,format),void)
 __CRT_FUNCTION(error_at_line,0,(),VA(5),(int,status,errno_t,errnum,char const *,filename,unsigned int,line,char const *,format),void)
 __CRT_FUNCTION(errx,0,(),VA(2),(int,status,char const *,format),void)
-__CRT_FUNCTION(ether_aton,0,(),1,(char const *,asc),struct ether_addr *)
-__CRT_FUNCTION(ether_aton_r,0,(),2,(char const *,asc,struct ether_addr *,addr),struct ether_addr *)
+__CRT_FUNCTION(ether_aton,0,(),1,(char const *__restrict,asc),struct ether_addr *)
+__CRT_FUNCTION(ether_aton_r,0,(),2,(char const *__restrict,asc,struct ether_addr *__restrict,addr),struct ether_addr *)
 __CRT_FUNCTION(ether_hostton,0,(),2,(char const *,hostname,struct ether_addr *,addr),int)
 __CRT_FUNCTION(ether_line,0,(),3,(char const *,line,struct ether_addr *,addr,char *,hostname),int)
-__CRT_FUNCTION(ether_ntoa,0,(),1,(struct ether_addr const *,addr),char *)
-__CRT_FUNCTION(ether_ntoa_r,0,(),2,(struct ether_addr const *,addr,char *,buf),char *)
+__CRT_FUNCTION(ether_ntoa,0,(),1,(struct ether_addr const *__restrict,addr),char *)
+__CRT_FUNCTION(ether_ntoa_r,0,(),2,(struct ether_addr const *__restrict,addr,char *__restrict,buf),char *)
 __CRT_FUNCTION(ether_ntohost,0,(),2,(char *,hostname,struct ether_addr const *,addr),int)
+__CRT_FUNCTION(ether_paton_r,0,(),2,(char const **__restrict,pasc,struct ether_addr *__restrict,addr),struct ether_addr *)
 __CRT_FUNCTION(euidaccess,0,(),2,(char const *,file,int,type),int)
 __CRT_FUNCTION(eventfd,0,(),2,(unsigned int,count,int,flags),fd_t)
 __CRT_FUNCTION(eventfd_read,0,(),2,(fd_t,fd,eventfd_t *,value),int)

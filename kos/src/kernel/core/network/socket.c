@@ -1519,6 +1519,11 @@ socket_getsockopt_default(struct socket *__restrict self,
 			GETSOCKOPT_RETURN_INT(0);
 			break;
 
+		case SO_RCVLOWAT:
+		case SO_SNDLOWAT:
+			GETSOCKOPT_RETURN_INT(1);
+			break;
+
 		default:
 			break;
 		}
@@ -1595,6 +1600,11 @@ again_read_ncon:
 		case SO_DONTWAIT:
 			GETSOCKOPT_RETURN_INT(ATOMIC_READ(self->sk_msgflags) & MSG_DONTWAIT ? 1 : 0);
 			break;
+
+		case SO_PEERNAME:
+			/* seems to be an alias for `getpeername()' */
+			result = socket_getpeername(self, (USER CHECKED struct sockaddr *)optval, optlen);
+			goto done;
 
 		default:
 			break;

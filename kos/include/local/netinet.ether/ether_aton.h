@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9b8177 */
+/* HASH CRC-32:0xeb78073 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +18,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_NETINET_ETHER_H
-#define GUARD_LIBC_USER_NETINET_ETHER_H 1
+#ifndef __local_ether_aton_defined
+#define __local_ether_aton_defined 1
+#include <net/ethernet.h>
+/* Dependency: "ether_aton_r" from "netinet.ether" */
+#ifndef ____localdep_ether_aton_r_defined
+#define ____localdep_ether_aton_r_defined 1
+#ifdef __CRT_HAVE_ether_aton_r
+/* Convert ASCII string S to 48 bit Ethernet address */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_aton_r,(char const *__restrict __asc, struct ether_addr *__restrict __addr),ether_aton_r,(__asc,__addr))
+#else /* LIBC: ether_aton_r */
+#include <local/netinet.ether/ether_aton_r.h>
+/* Convert ASCII string S to 48 bit Ethernet address */
+#define __localdep_ether_aton_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ether_aton_r))
+#endif /* ether_aton_r... */
+#endif /* !____localdep_ether_aton_r_defined */
 
-#include "../api.h"
-#include "../auto/netinet.ether.h"
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <netinet/ether.h>
-
-DECL_BEGIN
-
-/* Map 48 bit Ethernet number ADDR to HOSTNAME */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname, struct ether_addr const *addr);
-/* Map HOSTNAME to 48 bit Ethernet address */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname, struct ether_addr *addr);
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_NETINET_ETHER_H */
+__NAMESPACE_LOCAL_BEGIN
+/* Convert ASCII string S to 48 bit Ethernet address */
+__LOCAL_LIBC(ether_aton) __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct ether_addr *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_aton))(char const *__restrict __asc) {
+#line 71 "kos/src/libc/magic/netinet.ether.c"
+	static struct ether_addr __addr;
+	return __localdep_ether_aton_r(__asc, &__addr);
+}
+__NAMESPACE_LOCAL_END
+#endif /* !__local_ether_aton_defined */

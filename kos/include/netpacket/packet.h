@@ -19,7 +19,6 @@
  */
 #ifndef _NETPACKET_PACKET_H
 #define _NETPACKET_PACKET_H 1
-#define __NETPACKET_PACKET_H 1
 
 #include <__stdinc.h>
 #include <hybrid/typecore.h>

@@ -54,8 +54,6 @@
 #include <__stdinc.h>
 #include <features.h>
 
-__SYSDECL_BEGIN
-
 /* User-settable options (used with setsockopt). */
 #define TCP_NODELAY              1  /* Don't delay send to coalesce packets.  */
 #define TCP_MAXSEG               2  /* Set maximum segment size.  */
@@ -85,8 +83,6 @@ __SYSDECL_BEGIN
 #define TCP_CC_INFO              26 /* Get Congestion Control (optional) info. */
 #define TCP_SAVE_SYN             27 /* Record SYN headers for new connections. */
 #define TCP_SAVED_SYN            28 /* Get SYN headers recorded for connection. */
-
-__SYSDECL_END
 
 #ifdef __USE_MISC
 #include <bits/sockaddr_storage-struct.h>
